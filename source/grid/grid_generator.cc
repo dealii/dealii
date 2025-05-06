@@ -8164,6 +8164,7 @@ namespace GridGenerator
         // temporary array storing the global indices of each cell entity in the
         // sequence: vertices, edges/faces, cell
         std::array<unsigned int, dim == 2 ? 9 : 14> local_vertex_indices;
+        local_vertex_indices.fill(numbers::invalid_unsigned_int);
 
         // (i) copy the existing vertex locations
         for (const auto v : cell->vertex_indices())
