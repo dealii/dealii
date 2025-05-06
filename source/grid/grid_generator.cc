@@ -8016,14 +8016,15 @@ namespace GridGenerator
     // Cell definition 2d:
     // A quadrilateral element is converted to 8 simplices elements. Each
     // triangle is defined by 3 vertices.
-    static const ndarray<unsigned int, 8, 3> table_2D_cell = {{{{0, 6, 4}},
-                                                               {{8, 4, 6}},
-                                                               {{8, 6, 5}},
-                                                               {{1, 5, 6}},
-                                                               {{2, 4, 7}},
-                                                               {{8, 7, 4}},
-                                                               {{8, 5, 7}},
-                                                               {{3, 7, 5}}}};
+    static const ndarray<unsigned int, 8, 3> vertex_ids_for_cells_2d = {
+      {{{0, 6, 4}},
+       {{8, 4, 6}},
+       {{8, 6, 5}},
+       {{1, 5, 6}},
+       {{2, 4, 7}},
+       {{8, 7, 4}},
+       {{8, 5, 7}},
+       {{3, 7, 5}}}};
 
     // Cell definition 3d:
     // A hexahedron element is converted to 24 tetrahedron elements. Each
@@ -8287,7 +8288,7 @@ namespace GridGenerator
             // get cell-manifold id from current quad cell
             const auto manifold_id_cell = cell->manifold_id();
             // inherit cell manifold
-            for (const auto &cell_vertices : table_2D_cell)
+            for (const auto &cell_vertices : vertex_ids_for_cells_2d)
               add_cell(dim, cell_vertices, material_id_cell, manifold_id_cell);
 
             // inherit inner manifold (faces)
@@ -8416,7 +8417,7 @@ namespace GridGenerator
       in_tria.n_global_levels() > 1 ? temp_tria : in_tria;
 
     // Three triangles connecting to barycenter with vertex index 3:
-    static const ndarray<unsigned int, 3, 3> table_2D_cell = {
+    static const ndarray<unsigned int, 3, 3> vertex_ids_for_cells_2d = {
       {{{0, 1, 3}}, {{1, 2, 3}}, {{2, 0, 3}}}};
 
     // Boundary-faces 2d:
@@ -8426,7 +8427,7 @@ namespace GridGenerator
         {{{{{0, 1}}}}, {{{{1, 2}}}}, {{{{2, 0}}}}}};
 
     // Three tetrahedra connecting to barycenter with vertex index 4:
-    static const ndarray<unsigned int, 4, 4> table_3D_cell = {
+    static const ndarray<unsigned int, 4, 4> vertex_ids_for_cells_3d = {
       {{{0, 1, 2, 4}}, {{1, 0, 3, 4}}, {{0, 2, 3, 4}}, {{2, 1, 3, 4}}}};
 
     // Boundary-faces 3d:
@@ -8581,12 +8582,12 @@ namespace GridGenerator
         // create cells one by one
         if (dim == 2)
           {
-            for (const auto &cell_vertices : table_2D_cell)
+            for (const auto &cell_vertices : vertex_ids_for_cells_2d)
               add_cell(dim, cell_vertices, material_id_cell, manifold_id_cell);
           }
         else if (dim == 3)
           {
-            for (const auto &cell_vertices : table_3D_cell)
+            for (const auto &cell_vertices : vertex_ids_for_cells_3d)
               add_cell(dim, cell_vertices, material_id_cell, manifold_id_cell);
           }
         else
