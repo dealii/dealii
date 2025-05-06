@@ -933,7 +933,7 @@ namespace FETools
 
   /**
    * This function returns a map from cell DoFs to DoFs on two adjacent cells
-   * sharing face perpendicular to  @p direction in reference space.
+   * sharing a face perpendicular to  @p direction in reference space.
    * The map is given in the form of a pair of vectors, where the
    * first vector contains the DoFs on the first cell and the second vector
    * contains the DoFs on the second cell. Flag @p is_continuous  indicates whether
