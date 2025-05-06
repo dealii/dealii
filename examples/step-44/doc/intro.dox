@@ -388,8 +388,11 @@ The boundary of the current configuration  $\partial \Omega$ is composed into tw
 $\partial \Omega = \partial \Omega_{\mathbf{u}} \cup \partial \Omega_{\sigma}$,
 where
 $\partial \Omega_{\mathbf{u}} \cap \partial \Omega_{\boldsymbol{\sigma}} = \emptyset$.
-The prescribed Cauchy traction, denoted $\mathbf{t}^\text{p}$, is applied to $ \partial \Omega_{\boldsymbol{\sigma}}$ while the motion is prescribed on the remaining portion of the boundary $\partial \Omega_{\mathbf{u}}$.
+The externally prescribed Cauchy traction, denoted $\mathbf{t}^\text{p}$, is applied to $ \partial \Omega_{\boldsymbol{\sigma}}$ while the motion (displacement) is prescribed on the remaining portion of the boundary $\partial \Omega_{\mathbf{u}}$.
 The body force per unit current volume is denoted $\mathbf{b}^\text{p}$.
+(In these terms, the superscript $\text{p}$ is meant to suggest that a
+quantity is *prescribed*, not that it is related to the unknown pressure
+$\tilde p$.)
 
 
 
@@ -511,7 +514,7 @@ Thus,
 @f}
 where
 @f{align*}{
-	D_{d \mathbf{u}} R( \mathbf{\Xi}; \delta \mathbf{\Xi})
+	D_{d \mathbf{u}} R( \mathbf{\Xi}; \delta \mathbf{\Xi}) \cdot d \mathbf{u}
  	&=
  	\int_{\Omega_0} \bigl[ \textrm{grad}\ \delta \mathbf{u} :
  			\textrm{grad}\ d \mathbf{u} [\boldsymbol{\tau}_{\textrm{iso}} + \boldsymbol{\tau}_{\textrm{vol}}]
@@ -522,12 +525,12 @@ where
  		\\
  	&\quad + \int_{\Omega_0} \delta \widetilde{p} J \mathbf{I} : \textrm{grad}\ d \mathbf{u} ~\textrm{d}V
  	\\
- 	D_{d \widetilde{p}} R( \mathbf{\Xi}; \delta \mathbf{\Xi})
+ 	D_{d \widetilde{p}} R( \mathbf{\Xi}; \delta \mathbf{\Xi})  d \widetilde{p}
  	&=
  	\int_{\Omega_0} \textrm{grad}\ \delta \mathbf{u} : J \mathbf{I} d \widetilde{p} ~\textrm{d}V
  		-  \int_{\Omega_0} \delta \widetilde{J} d \widetilde{p}  ~\textrm{d}V \, ,
  	\\
- 	D_{d \widetilde{J}} R( \mathbf{\Xi}; \delta \mathbf{\Xi})
+ 	D_{d \widetilde{J}} R( \mathbf{\Xi}; \delta \mathbf{\Xi})  d \widetilde{J}
  	&=  -\int_{\Omega_0} \delta \widetilde{p} d \widetilde{J}~\textrm{d}V
  	 + \int_{\Omega_0} \delta \widetilde{J}  \dfrac{\textrm{d}^2 \Psi_{\textrm{vol}}(\widetilde{J})}{\textrm{d} \widetilde{J}\textrm{d}\widetilde{J}} d \widetilde{J} ~\textrm{d}V \, .
 @f}
