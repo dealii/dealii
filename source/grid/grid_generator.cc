@@ -7994,10 +7994,10 @@ namespace GridGenerator
                                     Triangulation<dim, spacedim> &out_tria)
   {
     Assert(dim > 1, ExcNotImplemented());
-    AssertThrow(
-      in_tria.all_reference_cells_are_hyper_cube(),
-      ExcMessage(
-        "GridGenerator::convert_hypercube_to_simplex_mesh() expects a mesh that consists only of quads/hexes."));
+    AssertThrow(in_tria.all_reference_cells_are_hyper_cube(),
+                ExcMessage(
+                  "GridGenerator::convert_hypercube_to_simplex_mesh() expects "
+                  "a Triangulation that consists only of quads/hexes."));
 
     Triangulation<dim, spacedim> temp_tria;
     if (in_tria.n_global_levels() > 1)
@@ -8016,14 +8016,15 @@ namespace GridGenerator
     // Cell definition 2d:
     // A quadrilateral element is converted to 8 simplices elements. Each
     // triangle is defined by 3 vertices.
-    static const ndarray<unsigned int, 8, 3> table_2D_cell = {{{{0, 6, 4}},
-                                                               {{8, 4, 6}},
-                                                               {{8, 6, 5}},
-                                                               {{1, 5, 6}},
-                                                               {{2, 4, 7}},
-                                                               {{8, 7, 4}},
-                                                               {{8, 5, 7}},
-                                                               {{3, 7, 5}}}};
+    static const ndarray<unsigned int, 8, 3> vertex_ids_for_cells_2d = {
+      {{{0, 6, 4}},
+       {{8, 4, 6}},
+       {{8, 6, 5}},
+       {{1, 5, 6}},
+       {{2, 4, 7}},
+       {{8, 7, 4}},
+       {{8, 5, 7}},
+       {{3, 7, 5}}}};
 
     // Cell definition 3d:
     // A hexahedron element is converted to 24 tetrahedron elements. Each
@@ -8042,24 +8043,32 @@ namespace GridGenerator
     // After converting, each of the 4 quadrilateral faces is defined by faces
     // of 2 different triangles, i.e., lines. Note that lines are defined by 2
     // vertices.
-    static const ndarray<unsigned int, 4, 2, 2>
-      vertex_ids_for_boundary_faces_2d = {{{{{{0, 4}}, {{4, 2}}}},
-                                           {{{{1, 5}}, {{5, 3}}}},
-                                           {{{{0, 6}}, {{6, 1}}}},
-                                           {{{{2, 7}}, {{7, 3}}}}}};
+    static const std::
+      array<std::pair<unsigned int, std::array<unsigned int, 2>>, 8>
+        vertex_ids_for_boundary_faces_2d = {{{0, {{0, 4}}},
+                                             {0, {{4, 2}}},
+                                             {1, {{1, 5}}},
+                                             {1, {{5, 3}}},
+                                             {2, {{0, 6}}},
+                                             {2, {{6, 1}}},
+                                             {3, {{2, 7}}},
+                                             {3, {{7, 3}}}}};
 
     // Boundary-faces 3d:
     // After converting, each of the 6 hexahedron faces corresponds to faces of
     // 4 different tetrahedron faces, i.e., triangles. Note that a triangle is
     // defined by 3 vertices.
-    static const ndarray<unsigned int, 6, 4, 3>
-      vertex_ids_for_boundary_faces_3d = {
-        {{{{{0, 4, 8}}, {{4, 8, 6}}, {{8, 6, 2}}, {{0, 2, 8}}}},
-         {{{{1, 3, 9}}, {{3, 9, 7}}, {{9, 7, 5}}, {{1, 9, 5}}}},
-         {{{{0, 1, 10}}, {{1, 10, 5}}, {{10, 5, 4}}, {{0, 10, 4}}}},
-         {{{{2, 3, 11}}, {{3, 11, 7}}, {{11, 7, 6}}, {{2, 11, 6}}}},
-         {{{{0, 1, 12}}, {{1, 12, 3}}, {{12, 3, 2}}, {{0, 12, 2}}}},
-         {{{{4, 5, 13}}, {{5, 13, 7}}, {{13, 7, 6}}, {{4, 13, 6}}}}}};
+    static const std::
+      array<std::pair<unsigned int, std::array<unsigned int, 3>>, 24>
+        vertex_ids_for_boundary_faces_3d = {
+          {{0, {{0, 4, 8}}},  {0, {{4, 8, 6}}},  {0, {{8, 6, 2}}},
+           {0, {{0, 2, 8}}},  {1, {{1, 3, 9}}},  {1, {{3, 9, 7}}},
+           {1, {{9, 7, 5}}},  {1, {{1, 9, 5}}},  {2, {{0, 1, 10}}},
+           {2, {{1, 10, 5}}}, {2, {{10, 5, 4}}}, {2, {{0, 10, 4}}},
+           {3, {{2, 3, 11}}}, {3, {{3, 11, 7}}}, {3, {{11, 7, 6}}},
+           {3, {{2, 11, 6}}}, {4, {{0, 1, 12}}}, {4, {{1, 12, 3}}},
+           {4, {{12, 3, 2}}}, {4, {{0, 12, 2}}}, {5, {{4, 5, 13}}},
+           {5, {{5, 13, 7}}}, {5, {{13, 7, 6}}}, {5, {{4, 13, 6}}}}};
 
     // Inner-faces 2d:
     // The converted triangulation based on simplices has 8 faces that do not
@@ -8121,14 +8130,16 @@ namespace GridGenerator
     // triangulation. The new 4 edges inherit the manifold id of the relevant
     // face, but the other 4 need to be copied from the input and thus do not
     // require a lookup table.
-    static const ndarray<unsigned int, 6, 4, 2>
-      vertex_ids_for_new_boundary_edges_3d = {
-        {{{{{4, 8}}, {{6, 8}}, {{0, 8}}, {{2, 8}}}},
-         {{{{5, 9}}, {{7, 9}}, {{1, 9}}, {{3, 9}}}},
-         {{{{4, 10}}, {{5, 10}}, {{0, 10}}, {{1, 10}}}},
-         {{{{6, 11}}, {{7, 11}}, {{2, 11}}, {{3, 11}}}},
-         {{{{2, 12}}, {{3, 12}}, {{0, 12}}, {{1, 12}}}},
-         {{{{6, 13}}, {{7, 13}}, {{4, 13}}, {{5, 13}}}}}};
+    static const std::
+      array<std::pair<unsigned int, std::array<unsigned int, 2>>, 24>
+        vertex_ids_for_new_boundary_edges_3d = {{
+          {0, {{4, 8}}},  {0, {{6, 8}}},  {0, {{0, 8}}},  {0, {{2, 8}}},
+          {1, {{5, 9}}},  {1, {{7, 9}}},  {1, {{1, 9}}},  {1, {{3, 9}}},
+          {2, {{4, 10}}}, {2, {{5, 10}}}, {2, {{0, 10}}}, {2, {{1, 10}}},
+          {3, {{6, 11}}}, {3, {{7, 11}}}, {3, {{2, 11}}}, {3, {{3, 11}}},
+          {4, {{2, 12}}}, {4, {{3, 12}}}, {4, {{0, 12}}}, {4, {{1, 12}}},
+          {5, {{6, 13}}}, {5, {{7, 13}}}, {5, {{4, 13}}}, {5, {{5, 13}}},
+        }};
 
     std::vector<Point<spacedim>> vertices;
     std::vector<CellData<dim>>   cells;
@@ -8153,6 +8164,7 @@ namespace GridGenerator
         // temporary array storing the global indices of each cell entity in the
         // sequence: vertices, edges/faces, cell
         std::array<unsigned int, dim == 2 ? 9 : 14> local_vertex_indices;
+        local_vertex_indices.fill(numbers::invalid_unsigned_int);
 
         // (i) copy the existing vertex locations
         for (const auto v : cell->vertex_indices())
@@ -8287,7 +8299,7 @@ namespace GridGenerator
             // get cell-manifold id from current quad cell
             const auto manifold_id_cell = cell->manifold_id();
             // inherit cell manifold
-            for (const auto &cell_vertices : table_2D_cell)
+            for (const auto &cell_vertices : vertex_ids_for_cells_2d)
               add_cell(dim, cell_vertices, material_id_cell, manifold_id_cell);
 
             // inherit inner manifold (faces)
@@ -8328,34 +8340,42 @@ namespace GridGenerator
           DEAL_II_NOT_IMPLEMENTED();
 
         // Set up sub-cell data.
-        for (const auto f : cell->face_indices())
+        if (dim == 2)
           {
-            const auto bid = cell->face(f)->boundary_id();
-            const auto mid = cell->face(f)->manifold_id();
-
-            // process boundary-faces: set boundary and manifold ids
-            if (dim == 2) // 2d boundary-faces
+            for (const auto &[quad_face_no, tri_face_vertices] :
+                 vertex_ids_for_boundary_faces_2d)
               {
-                for (const auto &face_vertices :
-                     vertex_ids_for_boundary_faces_2d[f])
-                  add_cell(1, face_vertices, bid, mid);
+                const auto face = cell->face(quad_face_no);
+                add_cell(1,
+                         tri_face_vertices,
+                         face->boundary_id(),
+                         face->manifold_id());
               }
-            else if (dim == 3) // 3d boundary-faces
-              {
-                // set manifold ids of tet-boundary-faces according to
-                // hex-boundary-faces
-                for (const auto &face_vertices :
-                     vertex_ids_for_boundary_faces_3d[f])
-                  add_cell(2, face_vertices, bid, mid);
-                // set manifold ids of new tet-boundary-edges according to
-                // hex-boundary-faces
-                for (const auto &edge_vertices :
-                     vertex_ids_for_new_boundary_edges_3d[f])
-                  add_cell(1, edge_vertices, bid, mid);
-              }
-            else
-              DEAL_II_NOT_IMPLEMENTED();
           }
+        else if (dim == 3)
+          {
+            for (const auto &[hex_face_no, tet_face_vertices] :
+                 vertex_ids_for_boundary_faces_3d)
+              {
+                const auto face = cell->face(hex_face_no);
+                add_cell(2,
+                         tet_face_vertices,
+                         face->boundary_id(),
+                         face->manifold_id());
+              }
+
+            for (const auto &[hex_face_no, tet_edge_vertices] :
+                 vertex_ids_for_new_boundary_edges_3d)
+              {
+                const auto face = cell->face(hex_face_no);
+                add_cell(1,
+                         tet_edge_vertices,
+                         face->boundary_id(),
+                         face->manifold_id());
+              }
+          }
+        else
+          DEAL_II_NOT_IMPLEMENTED();
 
         // set manifold ids of edges that were already present in the
         // triangulation.
@@ -8416,7 +8436,7 @@ namespace GridGenerator
       in_tria.n_global_levels() > 1 ? temp_tria : in_tria;
 
     // Three triangles connecting to barycenter with vertex index 3:
-    static const ndarray<unsigned int, 3, 3> table_2D_cell = {
+    static const ndarray<unsigned int, 3, 3> vertex_ids_for_cells_2d = {
       {{{0, 1, 3}}, {{1, 2, 3}}, {{2, 0, 3}}}};
 
     // Boundary-faces 2d:
@@ -8426,7 +8446,7 @@ namespace GridGenerator
         {{{{{0, 1}}}}, {{{{1, 2}}}}, {{{{2, 0}}}}}};
 
     // Three tetrahedra connecting to barycenter with vertex index 4:
-    static const ndarray<unsigned int, 4, 4> table_3D_cell = {
+    static const ndarray<unsigned int, 4, 4> vertex_ids_for_cells_3d = {
       {{{0, 1, 2, 4}}, {{1, 0, 3, 4}}, {{0, 2, 3, 4}}, {{2, 1, 3, 4}}}};
 
     // Boundary-faces 3d:
@@ -8581,12 +8601,12 @@ namespace GridGenerator
         // create cells one by one
         if (dim == 2)
           {
-            for (const auto &cell_vertices : table_2D_cell)
+            for (const auto &cell_vertices : vertex_ids_for_cells_2d)
               add_cell(dim, cell_vertices, material_id_cell, manifold_id_cell);
           }
         else if (dim == 3)
           {
-            for (const auto &cell_vertices : table_3D_cell)
+            for (const auto &cell_vertices : vertex_ids_for_cells_3d)
               add_cell(dim, cell_vertices, material_id_cell, manifold_id_cell);
           }
         else
