@@ -1,0 +1,9 @@
+Fix: Ensure that undefined parameters within nested JSON subnodes
+trigger proper exception handling when using
+ParameterHandler::parse_input_from_json() with skip_undefined set
+to false. Previously, the exception ExcEntryUndeclared was only
+thrown when undefined parameters appeared at the top level of the
+parameter file. This fix extends the check to nested subnode
+entries as well.
+<br>
+(Magdalena Schreter-Fleischhacker, 2025/05/08)
