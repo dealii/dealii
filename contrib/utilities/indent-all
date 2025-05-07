@@ -66,6 +66,7 @@ checks
 
 process "tests include source examples contrib/python-bindings" ".*\.(cc|h)" format_file
 process "source" ".*\.inst.in" format_inst
+process "tests include source examples contrib" ".*\.py" format_python_file
 
 #
 # Fix permissions and convert to unix line ending if necessary:
@@ -81,6 +82,8 @@ process "tests include source examples cmake/scripts contrib/python-bindings" \
 
 process "doc/news/*/*" "doc/news/.*/.*/[0-9].*" dos_to_unix
 
+process "tests include source examples contrib" ".*\.py" dos_to_unix
+
 #
 # Removing trailing whitespace
 #
@@ -90,6 +93,8 @@ process "tests include source examples cmake/scripts contrib/python-bindings doc
 
 process "doc/news/*/*" "doc/news/.*/.*/[0-9].*" remove_trailing_whitespace
 
+process "tests include source examples contrib" ".*\.py" remove_trailing_whitespace
+
 #
 # Ensure only a single newline at end of files
 #
@@ -98,3 +103,5 @@ process "tests include source examples cmake/scripts contrib/python-bindings doc
   ".*\.(cc|h|html|dox|txt)" ensure_single_trailing_newline
 
 process "doc/news/*/*" "doc/news/.*/.*/[0-9].*" ensure_single_trailing_newline
+
+process "tests include source examples contrib" ".*\.py" ensure_single_trailing_newline
