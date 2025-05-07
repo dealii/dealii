@@ -92,10 +92,10 @@ main()
     {
       auto niter = kinsol.solve(v);
     }
-  catch (const std::exception &e)
+  catch (const ExceptionBase &e)
     {
       deallog << "KINSOL threw an exception with the following message:"
-              << std::endl
-              << e.what() << std::endl;
+              << std::endl;
+      e.print_info(deallog.get_file_stream());
     }
 }
