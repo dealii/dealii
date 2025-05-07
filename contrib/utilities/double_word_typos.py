@@ -33,6 +33,7 @@ of the next line matches the last word of the previous line) to the screen.
 The output format used by this script is similar to GCC's and it can be run very
 conveniently from inside emacs' compilation-mode.
 """
+
 import sys
 
 # Skip the following tokens since they show up frequently but are not related to
