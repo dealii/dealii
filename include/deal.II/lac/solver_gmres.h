@@ -293,7 +293,7 @@ namespace internal
 
 /**
  * Implementation of the Restarted Preconditioned Direct Generalized Minimal
- * Residual Method. The stopping criterion is the norm of the residual.
+ * Residual Method (GMRES). The stopping criterion is the norm of the residual.
  *
  * The AdditionalData structure allows to control the size of the Arnoldi
  * basis used for orthogonalization (default: 30 vectors). It is related to
@@ -308,19 +308,71 @@ namespace internal
  * <h3>Left versus right preconditioning</h3>
  *
  * @p AdditionalData allows you to choose between left and right
- * preconditioning. As expected, this switches between solving for the systems
- * <i>P<sup>-1</sup>A</i> and <i>AP<sup>-1</sup></i>, respectively.
+ * preconditioning. Left preconditioning, conceptually, corresponds to
+ * replacing the linear system $Ax=b$ by $P^{-1}Ax=P^{-1}b$ where
+ * $P^{-1}$ is the preconditioner (i.e., an approximation of
+ * $A^{-1}$). In contrast, right preconditioning should be understood
+ * as replacing $Ax=b$ by $AP^{-1}y=b$, solving for $y$, and then
+ * computing the solution of the original problem as $x=P^{-1}y$. Note
+ * that in either case, $P^{-1}$ is simply an operator that can be
+ * applied to a vector; that is, it is not the inverse of some
+ * operator that also separately has to be available. In practice,
+ * $P^{-1}$ should be an operator that approximates multiplying by
+ * $A^{-1}$.
  *
- * A second consequence is the type of residual used to measure
- * convergence. With left preconditioning, this is the <b>preconditioned</b>
- * residual, while with right preconditioning, it is the residual of the
- * unpreconditioned system.
+ * The choice between left and right preconditioning also affects
+ * which kind of residual is used to measure convergence. With left
+ * preconditioning, this is the <b>preconditioned</b> residual
+ * $r_k=P^{-1}b-P^{-1}Ax_k$ given the approximate solution $x_k$ in
+ * the $k$th iteration, while with right preconditioning, it is the
+ * residual $r_k=b-Ax_k$ of the unpreconditioned system.
  *
  * Optionally, this behavior can be overridden by using the flag
  * AdditionalData::use_default_residual. A <tt>true</tt> value refers to the
  * behavior described in the previous paragraph, while <tt>false</tt> reverts
  * it. Be aware though that additional residuals have to be computed in this
  * case, impeding the overall performance of the solver.
+ *
+ *
+ * <h3> Preconditioners need to be linear operators </h3>
+ *
+ * GMRES expects the preconditioner to be a *linear* operator, i.e.,
+ * the operator $P^{-1}$ used as preconditioner needs to satisfy
+ * $P^{-1}(x+y) = P^{-1}x + P^{-1}y$ and $P^{-1}(\alpha x) = \alpha
+ * P^{-1}x$. For many preconditioners, this is true. For example, if
+ * you used Jacobi preconditioning, then $P^{-1}$ is a diagonal matrix
+ * whose diagonal entries equal $\frac{1}{A_{ii}}$. In this case, the
+ * operator $P^{-1}$ is clearly linear since it is simply the
+ * multiplication of a given vector by a fixed matrix.
+ *
+ * On the other hand, if $P^{-1}$ involves more complicated
+ * operations, it is sometimes *not* linear. The typical case to
+ * illustrate this is where $A$ is a block matrix and $P^{-1}$
+ * involves multiplication with blocks (as done, for example, in
+ * step-20, step-22, and several other preconditioners) where one
+ * block involves a linear solve. For example, in a Stokes problem,
+ * the preconditioner may involve a linear solve with the upper left
+ * $A_{uu}$ block. If this linear solve is done exactly (e.g., via a
+ * direct solver, or an iterative solver with a very tight tolerance),
+ * then the linear solve corresponds to multiplying by $A^{-1}_{uu}$,
+ * which is a linear operation. On the other hand, if one uses an
+ * iterative solver with a loose tolerance (e.g.,
+ * `1e-3*right_hand_side.l2_norm()`), then many solvers like CG will
+ * find the solution in a Krylov subspace of fairly low dimension;
+ * crucially, this subspace is built iteratively starting with the
+ * initial residual -- in other words, the *subspace depends on the
+ * right hand side*, and consequently the solution returned by such a
+ * solver *is not a linear operation on the given right hand side* of
+ * the linear system being solved.
+ *
+ * In cases such as these, the preconditioner with its inner, inexact
+ * linear solve is not a linear operator. This violates the
+ * assumptions of GMRES, and often leads to unnecessarily many GMRES
+ * iterations. The solution is to use the SolverFGMRES class instead,
+ * which does not rely on the assumption that the preconditioner is a
+ * linear operator, and instead explicitly does the extra work
+ * necessary to satisfy the assumptions that lead GMRES to implicitly
+ * require a linear operator as preconditioner.
  *
  *
  * <h3>The size of the Arnoldi basis</h3>
@@ -816,10 +868,13 @@ private:
  * preconditioning (flexible GMRES or FGMRES).
  *
  * This flexible version of the GMRES method allows for the use of a
- * different preconditioner in each iteration step. Therefore, it is also
- * more robust with respect to inaccurate evaluation of the preconditioner.
- * An important application is the use of a Krylov space method inside the
- * preconditioner with low solver tolerance.
+ * different preconditioner in each iteration step; in particular,
+ * this also allows for the use of preconditioners that are not linear
+ * operators. Therefore, it is also more robust with respect to
+ * inaccurate evaluation of the preconditioner.  An important
+ * application is the use of a Krylov space method inside the
+ * preconditioner with low solver tolerance. See the documentation of
+ * the SolverGMRES class for an elaboration of the issues involved.
  *
  * For more details see @cite Saad1991.
  *
