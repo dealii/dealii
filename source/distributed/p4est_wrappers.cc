@@ -20,6 +20,9 @@ DEAL_II_NAMESPACE_OPEN
 
 #ifdef DEAL_II_WITH_P4EST
 
+#  include <sc_containers.h>
+
+
 namespace internal
 {
   namespace p4est
