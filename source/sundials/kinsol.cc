@@ -564,7 +564,17 @@ namespace SUNDIALS
             throw;
           }
       }
-    AssertKINSOL(status);
+    // It is of course also possible that KINSOL experienced
+    // convergence issues even if the user-side callbacks
+    // succeeded. In that case, we also want to throw an exception
+    // that can be caught by the user -- whether that's actually
+    // useful to determine a different course of action (i.e., whether
+    // the user side can do something to recover the ability to
+    // converge) is a separate matter that we need not decide
+    // here. (One could imagine this happening in a time or load
+    // stepping procedure where re-starting with a smaller time step
+    // or load step could help.)
+    AssertThrow(status >= 0, ExcKINSOLError(status));
 
     long nniters;
     status = KINGetNumNonlinSolvIters(kinsol_mem, &nniters);
