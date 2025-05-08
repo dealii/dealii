@@ -707,15 +707,14 @@ namespace FETools
     template <typename T>
     inline constexpr bool is_la_vector = false;
 
-    template <typename... Ts>
+    template <typename Number, typename MemorySpace>
     inline constexpr bool
-      is_la_vector<LinearAlgebra::distributed::Vector<Ts...>> =
+      is_la_vector<LinearAlgebra::distributed::Vector<Number, MemorySpace>> =
         true;
 
-    template <typename... Ts>
-    inline constexpr bool
-      is_la_vector<LinearAlgebra::distributed::BlockVector<Ts...>> =
-        true;
+    template <typename Number, typename MemorySpace>
+    inline constexpr bool is_la_vector<
+      LinearAlgebra::distributed::BlockVector<Number, MemorySpace>> = true;
 
     template <int dim, int spacedim, class OutVector>
     void
