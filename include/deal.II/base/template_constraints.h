@@ -672,7 +672,13 @@ namespace LinearAlgebra
     class Vector;
 
     template <typename Number, typename MemorySpace>
+    class BlockVector;
+
+    template <typename Number, typename MemorySpace>
     class SparseMatrix;
+
+    template <typename Number, typename MemorySpace>
+    class BlockSparseMatrix;
   } // namespace TpetraWrappers
 #  endif
 } // namespace LinearAlgebra
@@ -788,6 +794,11 @@ namespace concepts
     template <typename Number, typename MemorySpace>
     inline constexpr bool is_dealii_vector_type<
       dealii::LinearAlgebra::TpetraWrappers::Vector<Number, MemorySpace>> =
+      true;
+
+    template <typename Number, typename MemorySpace>
+    inline constexpr bool is_dealii_vector_type<
+      dealii::LinearAlgebra::TpetraWrappers::BlockVector<Number, MemorySpace>> =
       true;
 #    endif
 #  endif

@@ -117,6 +117,11 @@ VECTOR_TYPES := {   Vector<double>;
 
                     @DEAL_II_EXPAND_TRILINOS_MPI_BLOCKVECTOR@;
                     @DEAL_II_EXPAND_PETSC_MPI_BLOCKVECTOR@;
+
+                    @DEAL_II_EXPAND_TPETRA_BLOCKVECTOR_DOUBLE@;
+                    @DEAL_II_EXPAND_TPETRA_BLOCKVECTOR_FLOAT@;
+                    @DEAL_II_EXPAND_TPETRA_BLOCKVECTOR_COMPLEX_DOUBLE@;
+                    @DEAL_II_EXPAND_TPETRA_BLOCKVECTOR_COMPLEX_FLOAT@;
                   }
 
 // same as VECTOR_TYPES but only real-valued vectors (and only with PETSc
@@ -141,6 +146,8 @@ REAL_VECTOR_TYPES  := {  Vector<double>;
 
                          @DEAL_II_EXPAND_TRILINOS_MPI_BLOCKVECTOR@;
                          @DEAL_II_EXPAND_PETSC_MPI_BLOCKVECTOR_REAL@;
+                         @DEAL_II_EXPAND_TPETRA_BLOCKVECTOR_DOUBLE@;
+                         @DEAL_II_EXPAND_TPETRA_BLOCKVECTOR_FLOAT@;
                        }
 
 // real vector types excluding block vectors
@@ -166,7 +173,11 @@ EXTERNAL_PARALLEL_VECTORS := { @DEAL_II_EXPAND_TRILINOS_MPI_VECTOR@;
                                @DEAL_II_EXPAND_TPETRA_VECTOR_COMPLEX_DOUBLE@;
                                @DEAL_II_EXPAND_TPETRA_VECTOR_COMPLEX_FLOAT@;
                                @DEAL_II_EXPAND_PETSC_MPI_VECTOR@;
-                               @DEAL_II_EXPAND_PETSC_MPI_BLOCKVECTOR@
+                               @DEAL_II_EXPAND_PETSC_MPI_BLOCKVECTOR@;
+                               @DEAL_II_EXPAND_TPETRA_BLOCKVECTOR_DOUBLE@;
+                               @DEAL_II_EXPAND_TPETRA_BLOCKVECTOR_FLOAT@;
+                               @DEAL_II_EXPAND_TPETRA_BLOCKVECTOR_COMPLEX_DOUBLE@;
+                               @DEAL_II_EXPAND_TPETRA_BLOCKVECTOR_COMPLEX_FLOAT@;
                              }
 
 // Vectors we can do GMG with excluding the LinearAlgebra::distributed::Vector<> (which is handled separately):
@@ -183,6 +194,11 @@ VECTORS_WITHOUT_LAVEC := { Vector<double>;
                          @DEAL_II_EXPAND_TPETRA_VECTOR_COMPLEX_DOUBLE@;
                          @DEAL_II_EXPAND_TPETRA_VECTOR_COMPLEX_FLOAT@;
                          @DEAL_II_EXPAND_PETSC_MPI_VECTOR@;
+
+                         @DEAL_II_EXPAND_TPETRA_BLOCKVECTOR_DOUBLE@;
+                         @DEAL_II_EXPAND_TPETRA_BLOCKVECTOR_FLOAT@;
+                         @DEAL_II_EXPAND_TPETRA_BLOCKVECTOR_COMPLEX_DOUBLE@;
+                         @DEAL_II_EXPAND_TPETRA_BLOCKVECTOR_COMPLEX_FLOAT@;
                        }
 
 // Matrices
