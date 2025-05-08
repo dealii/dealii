@@ -1,0 +1,6 @@
+Fixed: FETools::extrapolate previously failed to correctly compress ghost values on
+MPI simulations with distributed triangulation and LinearAlgebra::distributed
+vectors, due to the different behaviours of the compress(insert) operation on
+Petsc/Trilinos and LinearAlgebra::distributed vectors. This is now fixed.
+<br>
+(Guilhem Poy, 2025/05/08)
