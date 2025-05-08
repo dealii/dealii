@@ -705,17 +705,17 @@ namespace FETools
     }
 
     template <typename T>
-    inline constexpr bool is_la_vector = std::false_type{};
+    inline constexpr bool is_la_vector = false;
 
     template <typename... Ts>
     inline constexpr bool
       is_la_vector<LinearAlgebra::distributed::Vector<Ts...>> =
-        std::true_type{};
+        true;
 
     template <typename... Ts>
     inline constexpr bool
       is_la_vector<LinearAlgebra::distributed::BlockVector<Ts...>> =
-        std::true_type{};
+        true;
 
     template <int dim, int spacedim, class OutVector>
     void
@@ -1362,14 +1362,14 @@ namespace FETools
 
       compute_all_non_local_data(dof2, u2_relevant);
 
-      // List all DoFs that, on this mpi rank, lives at the intersection between
+      // List all DoFs that, on this mpi rank, live at the intersection between
       // a non-artificial cell and a more refined ghost cell (the dofs being
       // enumerated from the more refined side). For each of these DoFs, also
       // store the most refined level among the neighboring cells. This set of
       // DoFs naturally includes the set of DoFs shared between a refined ghost
       // cell and a coarser locally owned cell and can be constructed without a
       // recursion to find cells with common vertices (which are not necessarily
-      // direct neighbours in 2D and 3D).
+      // direct neighbors in 2D and 3D).
       const FiniteElement<dim, spacedim> &fe = dof2.get_fe();
       if (fe.max_dofs_per_face() > 0)
         {
@@ -1508,7 +1508,7 @@ namespace FETools
           queue.pop();
         }
 
-      // Correctly synchronise values at ghost interface for all processors. For
+      // Correctly synchronize values at ghost interface for all processors. For
       // Petsc/Trilinos, a simple compress(insert) operation allows to insert
       // values set by other processors into locally owned DoF, but the deal.II
       // implementation of the LinearAlgebra::distributed vectors and associated
