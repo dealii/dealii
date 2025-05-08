@@ -842,12 +842,8 @@ namespace FETools
    * treated patches if the mesh had been refined adaptively (this cannot
    * happen if the  mesh has been refined globally because there the children
    * of a patch are all active). We also perform the operation described above
-   * on these patches, but it is easy to see that on patches that are children
-   * of previously treated patches, the operation is now the identity operation
-   * (since it interpolates from the children of the current patch a function
-   * that had previously been interpolated to these children from an even
-   * coarser patch). Consequently, this does not alter the solution vector any
-   * more.
+   * on these patches, which means that the final DoF values will always
+   * originate from the most refined patches.
    *
    * The name of the function originates from the fact that it can be used to
    * construct a representation of a function of higher polynomial degree on a
