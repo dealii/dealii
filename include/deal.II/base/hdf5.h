@@ -1655,7 +1655,7 @@ namespace HDF5
     std::string string_value(string_out);
     // The memory of the variable length string has to be freed.
     // H5Dvlen_reclaim could be also used
-    free(string_out);
+    std::free(string_out);
     ret = H5Tclose(type);
     Assert(ret >= 0, ExcInternalError());
 
