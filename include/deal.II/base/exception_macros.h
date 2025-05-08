@@ -996,12 +996,12 @@
  *
  * @ingroup Exceptions
  */
-#define AssertIndexRange(index, range)                                       \
-  Assert(::dealii::deal_II_exceptions::internals::compare_less_than(index,   \
-                                                                    range),  \
-         dealii::ExcIndexRangeType<::dealii::internal::argument_type_t<void( \
-           std::common_type_t<decltype(index), decltype(range)>)>>((index),  \
-                                                                   0,        \
+#define AssertIndexRange(index, range)                                         \
+  Assert(::dealii::deal_II_exceptions::internals::compare_less_than(index,     \
+                                                                    range),    \
+         ::dealii::ExcIndexRangeType<::dealii::internal::argument_type_t<void( \
+           std::common_type_t<decltype(index), decltype(range)>)>>((index),    \
+                                                                   0,          \
                                                                    (range)))
 
 /**
