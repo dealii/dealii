@@ -1285,7 +1285,7 @@ namespace DoFRenumbering
    * expressed as Kronecker products of lower-dimensional matrices.
    *
    * @warning This function is intended to be used on a small grid.
-   * Parallel::distributed::Triangulation objects are not supported.
+   * parallel::distributed::Triangulation objects are not supported.
    * The finite element must have support points.
    */
   template <int dim>
