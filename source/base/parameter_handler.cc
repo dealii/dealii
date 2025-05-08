@@ -641,37 +641,30 @@ namespace
         if (p.second.empty())
           {
             // set the found parameter in the destination argument
-            if (skip_undefined)
+            try
               {
-                try
-                  {
-                    prm.set(demangle(p.first), p.second.data());
-                  }
-                catch (const ParameterHandler::ExcEntryUndeclared &)
-                  {
-                    // ignore undeclared entry assert
-                  }
+                prm.set(demangle(p.first), p.second.data());
               }
-            else
-              prm.set(demangle(p.first), p.second.data());
+            catch (const ParameterHandler::ExcEntryUndeclared &entry_string)
+              {
+                // ignore undeclared entry assert
+                AssertThrow(skip_undefined,
+                            ParameterHandler::ExcEntryUndeclared(entry_string));
+              }
           }
         else if (p.second.get_optional<std::string>("value"))
           {
             // set the found parameter in the destination argument
-            if (skip_undefined)
+            try
               {
-                try
-                  {
-                    prm.set(demangle(p.first),
-                            p.second.get<std::string>("value"));
-                  }
-                catch (const ParameterHandler::ExcEntryUndeclared &)
-                  {
-                    // ignore undeclared entry assert
-                  }
+                prm.set(demangle(p.first), p.second.get<std::string>("value"));
               }
-            else
-              prm.set(demangle(p.first), p.second.get<std::string>("value"));
+            catch (const ParameterHandler::ExcEntryUndeclared &entry_string)
+              {
+                // ignore undeclared entry assert
+                AssertThrow(skip_undefined,
+                            ParameterHandler::ExcEntryUndeclared(entry_string));
+              }
 
             // this node might have sub-nodes in addition to "value", such as
             // "default_value", "documentation", etc. we might at some point
@@ -701,9 +694,11 @@ namespace
                                      prm);
                 prm.leave_subsection();
               }
-            catch (const ParameterHandler::ExcEntryUndeclared &)
+            catch (const ParameterHandler::ExcEntryUndeclared &entry_string)
               {
                 // ignore undeclared entry assert
+                AssertThrow(skip_undefined,
+                            ParameterHandler::ExcEntryUndeclared(entry_string));
               }
           }
       }

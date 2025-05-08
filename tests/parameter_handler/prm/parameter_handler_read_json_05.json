@@ -1,0 +1,21 @@
+{
+    "ss1":
+    {
+        "defined double 1":
+        {
+            "value": "2.234",
+            "default_value": "1.234",
+            "documentation": "doc 3",
+            "pattern": "2",
+            "pattern_description": "[Double -MAX_DOUBLE...MAX_DOUBLE (inclusive)]"
+        },
+        "undefined double 1":
+        {
+            "value": "2.234",
+            "default_value": "1.234",
+            "documentation": "doc 3",
+            "pattern": "2",
+            "pattern_description": "[Double -MAX_DOUBLE...MAX_DOUBLE (inclusive)]"
+        }
+    }
+}
