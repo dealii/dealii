@@ -842,8 +842,8 @@ namespace FETools
    * treated patches if the mesh had been refined adaptively (this cannot
    * happen if the  mesh has been refined globally because there the children
    * of a patch are all active). We also perform the operation described above
-   * on these patches, which means that the final DoF values will always originate
-   * from the most refined patches.
+   * on these patches, which means that the final DoF values will always
+   * originate from the most refined patches.
    *
    * The name of the function originates from the fact that it can be used to
    * construct a representation of a function of higher polynomial degree on a
