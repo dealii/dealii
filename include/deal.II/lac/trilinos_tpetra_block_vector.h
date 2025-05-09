@@ -228,6 +228,16 @@ namespace LinearAlgebra
 
 } // namespace LinearAlgebra
 
+/**
+ * Declare dealii::LinearAlgebra::TpetraWrappers::BlockVector as distributed
+ * vector.
+ */
+template <typename Number, typename MemorySpace>
+struct is_serial_vector<
+  LinearAlgebra::TpetraWrappers::BlockVector<Number, MemorySpace>>
+  : std::false_type
+{};
+
 DEAL_II_NAMESPACE_CLOSE
 
 #endif // DEAL_II_TRILINOS_WITH_TPETRA

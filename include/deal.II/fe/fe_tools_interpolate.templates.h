@@ -42,6 +42,7 @@
 #include <deal.II/lac/petsc_vector.h>
 #include <deal.II/lac/trilinos_epetra_vector.h>
 #include <deal.II/lac/trilinos_parallel_block_vector.h>
+#include <deal.II/lac/trilinos_tpetra_block_vector.h>
 #include <deal.II/lac/trilinos_tpetra_vector.h>
 #include <deal.II/lac/trilinos_vector.h>
 #include <deal.II/lac/vector.h>
@@ -511,6 +512,21 @@ namespace FETools
       const AffineConstraints<typename LinearAlgebra::TpetraWrappers::
                                 Vector<Number, MemorySpace>::value_type> &,
       LinearAlgebra::TpetraWrappers::Vector<Number, MemorySpace> &)
+    {
+      AssertThrow(false, ExcNotImplemented());
+    }
+
+    template <int dim, int spacedim, typename Number, typename MemorySpace>
+    void
+    back_interpolate(
+      const DoFHandler<dim, spacedim> &,
+      const AffineConstraints<typename LinearAlgebra::TpetraWrappers::
+                                BlockVector<Number, MemorySpace>::value_type> &,
+      const LinearAlgebra::TpetraWrappers::BlockVector<Number, MemorySpace> &,
+      const DoFHandler<dim, spacedim> &,
+      const AffineConstraints<typename LinearAlgebra::TpetraWrappers::
+                                BlockVector<Number, MemorySpace>::value_type> &,
+      LinearAlgebra::TpetraWrappers::BlockVector<Number, MemorySpace> &)
     {
       AssertThrow(false, ExcNotImplemented());
     }

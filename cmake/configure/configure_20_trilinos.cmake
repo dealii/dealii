@@ -430,12 +430,18 @@ macro(feature_trilinos_configure_external)
       set(DEAL_II_EXPAND_TPETRA_VECTOR_DOUBLE
         "LinearAlgebra::TpetraWrappers::Vector<double, MemorySpace::Host>"
         "LinearAlgebra::TpetraWrappers::Vector<double, MemorySpace::Default>")
+      set(DEAL_II_EXPAND_TPETRA_BLOCKVECTOR_DOUBLE
+        "LinearAlgebra::TpetraWrappers::BlockVector<double, MemorySpace::Host>"
+        "LinearAlgebra::TpetraWrappers::BlockVector<double, MemorySpace::Default>")
     endif()
 
     if(_tpetra_inst_float)
       set(DEAL_II_EXPAND_TPETRA_VECTOR_FLOAT
         "LinearAlgebra::TpetraWrappers::Vector<float, MemorySpace::Host>"
         "LinearAlgebra::TpetraWrappers::Vector<float, MemorySpace::Default>")
+      set(DEAL_II_EXPAND_TPETRA_BLOCKVECTOR_FLOAT
+        "LinearAlgebra::TpetraWrappers::BlockVector<float, MemorySpace::Host>"
+        "LinearAlgebra::TpetraWrappers::BlockVector<float, MemorySpace::Default>")
     endif()
 
     if(${DEAL_II_WITH_COMPLEX_NUMBERS})
@@ -443,12 +449,18 @@ macro(feature_trilinos_configure_external)
         set(DEAL_II_EXPAND_TPETRA_VECTOR_COMPLEX_DOUBLE
           "LinearAlgebra::TpetraWrappers::Vector<std::complex<double>, MemorySpace::Host>"
           "LinearAlgebra::TpetraWrappers::Vector<std::complex<double>, MemorySpace::Default>")
+        set(DEAL_II_EXPAND_TPETRA_BLOCKVECTOR_COMPLEX_DOUBLE
+          "LinearAlgebra::TpetraWrappers::BlockVector<std::complex<double>, MemorySpace::Host>"
+          "LinearAlgebra::TpetraWrappers::BlockVector<std::complex<double>, MemorySpace::Default>")
       endif()
 
       if(_tpetra_inst_complex_float)
         set(DEAL_II_EXPAND_TPETRA_VECTOR_COMPLEX_FLOAT
           "LinearAlgebra::TpetraWrappers::Vector<std::complex<float>, MemorySpace::Host>"
           "LinearAlgebra::TpetraWrappers::Vector<std::complex<float>, MemorySpace::Default>")
+        set(DEAL_II_EXPAND_TPETRA_BLOCKVECTOR_COMPLEX_FLOAT
+          "LinearAlgebra::TpetraWrappers::BlockVector<std::complex<float>, MemorySpace::Host>"
+          "LinearAlgebra::TpetraWrappers::BlockVector<std::complex<float>, MemorySpace::Default>")
       endif()
     endif()
   endif()
