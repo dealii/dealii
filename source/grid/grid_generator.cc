@@ -8745,7 +8745,7 @@ namespace GridGenerator
            volume_mesh.begin(0);
          cell != volume_mesh.end(0);
          ++cell)
-      for (const unsigned int i : GeometryInfo<dim>::face_indices())
+      for (const unsigned int i : cell->reference_cell().face_indices())
         {
           const typename MeshType<dim, spacedim>::face_iterator face =
             cell->face(i);
