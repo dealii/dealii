@@ -1,0 +1,9 @@
+
+DEAL::Computing residual for the 1th time, at u=10.0000
+DEAL::Setting up Jacobian system at u=10.0000
+DEAL::Computing residual for the 2th time, at u=10.0000
+DEAL::Reporting recoverable failure.
+DEAL::KINSOL threw an exception with the following message:
+    A user call-back function encountered a recoverable error, but the underlying library that called the call-back did not manage to recover from the error and aborted its operation.
+
+See the glossary entry on user call-back functions for more information.
