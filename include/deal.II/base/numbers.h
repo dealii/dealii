@@ -621,14 +621,15 @@ namespace numbers
 } // namespace numbers
 
 
-// Forward declarations
+// Forward declarations.  These are all declared in
+// differentiation/ad/ad_number_traits.h and
+// differentiation/ad/sacado_number_traits.h
 namespace Differentiation
 {
   namespace AD
   {
     namespace internal
     {
-      // Defined in differentiation/ad/ad_number_traits.h
       template <typename T>
       struct NumberType;
     } // namespace internal
@@ -636,6 +637,17 @@ namespace Differentiation
     // Defined in differentiation/ad/ad_number_traits.h
     template <typename NumberType>
     struct is_ad_number;
+
+
+    template <typename NumberType, typename = void>
+    struct is_sacado_number;
+
+    template <typename NumberType, typename = void>
+    struct is_sacado_dfad_number;
+
+    template <typename NumberType, typename = void>
+    struct is_sacado_rad_number;
+
   } // namespace AD
 } // namespace Differentiation
 
