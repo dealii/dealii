@@ -2116,6 +2116,14 @@ namespace Utilities
 
     template std::set<unsigned int>
     compute_set_union(const std::set<unsigned int> &set, const MPI_Comm comm);
+
+
+    template std::vector<double>
+    compute_set_union(const std::vector<double> &vec, const MPI_Comm comm);
+
+
+    template std::set<double>
+    compute_set_union(const std::set<double> &set, const MPI_Comm comm);
 #endif
 
 #include "base/mpi.inst"
