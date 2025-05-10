@@ -46,6 +46,14 @@ repos:
   hooks:
   - id: typos
     files: (?x) ^(doc|examples|include|source|tests)/
+- repo: https://github.com/astral-sh/ruff-pre-commit
+  rev: v0.11.8
+  hooks:
+    - id: ruff-format
+      exclude: |
+        (?x)(
+            ^bundled/
+        )
 - repo: local
   hooks:
   - id: detect-include-cycles
