@@ -7993,7 +7993,12 @@ namespace GridGenerator
   convert_hypercube_to_simplex_mesh(const Triangulation<dim, spacedim> &in_tria,
                                     Triangulation<dim, spacedim> &out_tria)
   {
-    Assert(dim > 1, ExcNotImplemented());
+    if (dim == 1)
+      {
+        out_tria.copy_triangulation(in_tria);
+        return;
+      }
+
     AssertThrow(in_tria.all_reference_cells_are_hyper_cube(),
                 ExcMessage(
                   "GridGenerator::convert_hypercube_to_simplex_mesh() expects "
@@ -8406,17 +8411,6 @@ namespace GridGenerator
     for (const auto i : out_tria.get_manifold_ids())
       if (i != numbers::flat_manifold_id)
         out_tria.set_manifold(i, FlatManifold<dim, spacedim>());
-  }
-
-
-
-  template <int spacedim>
-  void
-  convert_hypercube_to_simplex_mesh(const Triangulation<1, spacedim> &in_tria,
-                                    Triangulation<1, spacedim>       &out_tria)
-  {
-    out_tria.copy_triangulation(in_tria);
-    return;
   }
 
 

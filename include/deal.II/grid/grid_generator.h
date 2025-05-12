@@ -2411,24 +2411,14 @@ namespace GridGenerator
    *
    * @note This function is available through the python interface as
    * `in_tria.convert_hypercube_to_simplex_mesh(out_tria)`.
+   *
+   * @note in 1d this function copies @p in_tria into @p out_tria since 1d
+   * elements (lines) are both hypercubes and simplices.
    */
   template <int dim, int spacedim>
   void
   convert_hypercube_to_simplex_mesh(const Triangulation<dim, spacedim> &in_tria,
                                     Triangulation<dim, spacedim> &out_tria);
-
-  // Doxygen will not show the function above if we include the
-  // specialization.
-#ifndef DOXYGEN
-  /**
-   * Specialization of the above function for 1d: simply copy triangulation.
-   */
-  template <int spacedim>
-  void
-  convert_hypercube_to_simplex_mesh(const Triangulation<1, spacedim> &in_tria,
-                                    Triangulation<1, spacedim>       &out_tria);
-#endif
-
 
   /**
    * Perform an Alfeld split (also called barycentric refinement) of a simplex
