@@ -31,20 +31,25 @@ find_package(ArborX QUIET
   HINTS ${ARBORX_DIR} ${ArborX_DIR} $ENV{ArborX_DIR}
   )
 
+#
+# ArborX's compatibility mode is set to SameMajorVersion. Therefore if we
+# want to support both the 1.X and the 2.X, we cannot set a minimum
+# version in find_package. Instead we need to check the minimum version
+# ourselves.
+#
+if(ArborX_FOUND)
+  if(ArborX_VERSION VERSION_LESS 1.3)
+    message(STATUS "Found ArborX version ${ArborX_VERSION} but the minimum version supported is 1.3")
+    unset(ArborX_FOUND)
+  elseif(ArborX_VERSION VERSION_GREATER_EQUAL 2.0)
+    message(STATUS "Found ArborX version ${ArborX_VERSION}. The 2.X series is not currently supported")
+    unset(ArborX_FOUND)
+  endif()
+endif()
+
+
 if(ArborX_FOUND)
   get_property(ARBORX_INSTALL_INCLUDE_DIR TARGET ArborX::ArborX PROPERTY INTERFACE_INCLUDE_DIRECTORIES)
-
-  #
-  # ArborX's compatibility mode is set to SameMajorVersion. Therefore if we want to
-  # support both the 1.X and the 2.X, we cannot set a minimum version in
-  # find_package. Instead we need to check the minimum version ourselves.
-  #
-  if(ArborX_VERSION VERSION_LESS 1.3)
-    message(FATAL_ERROR "Found ArborX version ${ArborX_VERSION} but the minimum version supported is 1.3")
-  elseif(ArborX_VERSION VERSION_GREATER_EQUAL 2.0)
-    message(FATAL_ERROR "Found ArborX version ${ArborX_VERSION}. The 2.X series is not currently supported")
-  endif()
-
 
   #
   # Check whether ArborX was compiled with MPI support
