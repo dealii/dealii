@@ -151,6 +151,13 @@ main()
   // TETRAHEDRAL ELEMENTS
   // dim = spacedim = 3
   deallog.push(
+    "3D: conversion triangulation with tet elements to hex elements (split 6): ");
+  check_file<3, 3>(6, 1);
+  deallog.pop();
+
+  // TETRAHEDRAL ELEMENTS
+  // dim = spacedim = 3
+  deallog.push(
     "3D: conversion triangulation with tet elements to hex elements + refinement: ");
   check_file<3, 3>(24, 1);
   deallog.pop();
