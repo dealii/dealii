@@ -364,10 +364,27 @@ SparseDirectUMFPACK::factorize(const Matrix &matrix)
                                 &numeric_decomposition,
                                 control.data(),
                                 nullptr);
-  AssertThrow(status == UMFPACK_OK,
-              ExcUMFPACKError("umfpack_dl_numeric", status));
 
+  // Clean up before we deal with the error code from the calls above:
   umfpack_dl_free_symbolic(&symbolic_decomposition);
+  if (status == UMFPACK_WARNING_singular_matrix)
+    {
+      // UMFPACK sometimes warns that the matrix is singular, but that a
+      // factorization was successful nonetheless. Report this by
+      // throwing an exception that can be caught at a higher level:
+      AssertThrow(false,
+                  ExcMessage(
+                    "UMFPACK reports that the matrix is singular, "
+                    "but that the factorization was successful anyway. "
+                    "You can try and see whether you can still "
+                    "solve a linear system with such a factorization "
+                    "by catching and ignoring this exception, "
+                    "though in practice this will typically not "
+                    "work."));
+    }
+  else
+    AssertThrow(status == UMFPACK_OK,
+                ExcUMFPACKError("umfpack_dl_numeric", status));
 }
 
 
