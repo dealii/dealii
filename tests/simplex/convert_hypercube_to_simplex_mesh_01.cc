@@ -133,6 +133,14 @@ main()
   check_file<2, 3>(8);
   deallog.pop();
 
+  // TRIANGULAR ELEMENTS
+  // dim = 2, spacedim = 2
+  deallog.push(
+    "2D: conversion triangulation with quad elements to tri elements "
+    "(split 2): ");
+  check_file<2, 2>(2, 1);
+  deallog.pop();
+
   // TETRAHEDRAL ELEMENTS
   // dim = spacedim = 3
   deallog.push(
