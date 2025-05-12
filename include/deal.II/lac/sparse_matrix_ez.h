@@ -163,7 +163,7 @@ public:
      */
     unsigned short length;
     /**
-     * Position of the diagonal element relative tor the start index.
+     * Position of the diagonal element relative to the start index.
      */
     unsigned short diagonal;
     /**
