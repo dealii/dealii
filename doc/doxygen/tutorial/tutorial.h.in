@@ -703,9 +703,9 @@
  *
  *   <tr valign="top">
  *       <td>step-97</td>
- *       <td> Illustrates application of the Nedelec and Raviart-Thomas finite elements to a magnetic
- *       <br/> problem formulated in terms of the magnetic vector potential and current vector potential.
- *       <br/> Solves the curl-curl equation.
+ *       <td> Application of the Nedelec and Raviart-Thomas finite elements to a magnetic
+ *       problem formulated in terms of the magnetic vector potential and current vector potential.
+ *       Solving the curl-curl equation.
  *       <br/> Keywords: FE_Nedelec, FE_RaviartThomas, WorkStream::run()
  *       </td></tr>
  * </table>
