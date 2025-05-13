@@ -19,7 +19,7 @@ with boundary conditions is suggested as a possibility for extension.
 The first figure below illustrates a cross section of the coil. The second
 figure illustrates the corresponding problem domain, coordinate system, and the
 relevant notations. The coil consists of two spherical shells. The inner shell,
-it is depicted in green color, is the magnetic core. The walls of the core are
+depicted in green, is the magnetic core. The walls of the core are
 filled with a soft magnetic material of permeability $\mu_1$. The magnetic
 material is assumed to be homogeneous, linear, lossless, and isotropic. The
 permeability of the rest of the space (the ball-shaped space inside the core and
