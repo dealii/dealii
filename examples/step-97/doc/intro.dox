@@ -34,11 +34,12 @@ permeability of the entire space can be expressed as
 \end{aligned}
 \right.
 \f}
-The outer shell, depicted in blue,
-contains free current. The current fills all the space available in the wall of
+The outer shell, depicted in blue, contains the current-carrying windings of
+the coil. The windings are modeled by a prescribed free-current density. The
+prescribed free-current density fills all the space available in the wall of
 the shell. In the figure below, however, only three cross sections of the
-current are shown. The current density is the highest on the equator and equals
-zero at the two poles. It can be described as
+free-current density are shown. The free-current density is the highest on the
+equator and equals zero at the two poles. It can be described as
 \f[
 \vec{J}_f = \left\{
 \begin{aligned}
