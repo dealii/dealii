@@ -345,7 +345,7 @@ same Laplacian matrix, which reduces the memory consumption for the inverse
 matrices. As compared to the algorithm implemented in this tutorial program,
 one would define the length scales as the distances between opposing
 faces. For continuous elements, the code project <a
-href=https://github.com/peterrum/dealii-dd-and-schwarz">Cache-optimized and
+href="https://github.com/peterrum/dealii-dd-and-schwarz">Cache-optimized and
 low-overhead implementations of multigrid smoothers for high-order FEM
 computations</a> presents the computation for continuous elements. There is
 currently no infrastructure in deal.II to automatically generate the 1D
