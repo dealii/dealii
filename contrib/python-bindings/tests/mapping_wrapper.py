@@ -19,39 +19,40 @@ try:
 except ImportError:
     from PyDealII.Release import *
 
-class TestMappingWrapperCube(unittest.TestCase):
 
+class TestMappingWrapperCube(unittest.TestCase):
     def setUp(self):
-        self.triangulation = Triangulation('2D')
+        self.triangulation = Triangulation("2D")
         self.triangulation.generate_hyper_cube()
         self.triangulation.refine_global(1)
 
     def test_mapping(self):
-        mapping = MappingQ(dim = 2, spacedim = 2, degree = 1)
+        mapping = MappingQ(dim=2, spacedim=2, degree=1)
         p_unit = Point([0.5, 0.5])
-        
+
         for cell in self.triangulation.active_cells():
             p_real = mapping.transform_unit_to_real_cell(cell, p_unit)
             p_unit_back = mapping.transform_real_to_unit_cell(cell, p_real)
-            
+
             self.assertTrue(p_unit.distance(p_unit_back) < 1e-10)
 
-class TestMappingWrapperSphere(unittest.TestCase):
 
+class TestMappingWrapperSphere(unittest.TestCase):
     def setUp(self):
-        self.triangulation = Triangulation('2D', '3D')
-        p_center = Point([0., 0., 0.])
+        self.triangulation = Triangulation("2D", "3D")
+        p_center = Point([0.0, 0.0, 0.0])
         self.triangulation.generate_hyper_sphere(p_center)
 
     def test_mapping(self):
-        mapping = MappingQ(dim = 2, spacedim = 3, degree = 4)
+        mapping = MappingQ(dim=2, spacedim=3, degree=4)
         p_unit = Point([0.5, 0.5])
-        
+
         for cell in self.triangulation.active_cells():
             p_real = mapping.transform_unit_to_real_cell(cell, p_unit)
             p_unit_back = mapping.transform_real_to_unit_cell(cell, p_real)
-            
+
             self.assertTrue(p_unit.distance(p_unit_back) < 1e-10)
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     unittest.main()

@@ -19,6 +19,8 @@
 #include <deal.II/lac/petsc_vector.h>
 #include <deal.II/lac/trilinos_epetra_vector.h>
 #include <deal.II/lac/trilinos_parallel_block_vector.h>
+#include <deal.II/lac/trilinos_tpetra_block_vector.h>
+#include <deal.II/lac/trilinos_tpetra_vector.h>
 #include <deal.II/lac/trilinos_vector.h>
 #include <deal.II/lac/vector.h>
 #include <deal.II/lac/vector_element_access.h>
@@ -29,6 +31,6 @@ DEAL_II_NAMESPACE_OPEN
 
 #define SPLIT_INSTANTIATIONS_COUNT 2
 #define SPLIT_INSTANTIATIONS_INDEX 0
-#include "data_out_dof_data.inst"
+#include "numerics/data_out_dof_data.inst"
 
 DEAL_II_NAMESPACE_CLOSE

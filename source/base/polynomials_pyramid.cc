@@ -61,7 +61,7 @@ ScalarLagrangePolynomialPyramid<dim>::compute_value(const unsigned int i,
   const double s = p[1];
   const double t = p[2];
 
-  if (fabs(t - 1.0) > 1.0e-14)
+  if (std::fabs(t - 1.0) > 1.0e-14)
     {
       ration = (r * s * t) / (1.0 - t);
     }
@@ -106,7 +106,7 @@ ScalarLagrangePolynomialPyramid<dim>::compute_grad(const unsigned int i,
       double rationds;
       double rationdt;
 
-      if (fabs(t - 1.0) > 1.0e-14)
+      if (std::fabs(t - 1.0) > 1.0e-14)
         {
           rationdr = s * t / (1.0 - t);
           rationds = r * t / (1.0 - t);

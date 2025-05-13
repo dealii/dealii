@@ -1,8 +1,6 @@
 
 DEAL::Size 32 Unknowns 961
 DEAL::Testing non-symmetric mode
-DEAL::Convergence step 1 value 0.000
 DEAL::residual = 7.366e-13
 DEAL::Testing symmetric mode
-DEAL::Convergence step 1 value 0.000
 DEAL::residual = 5.412e-13

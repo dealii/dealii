@@ -1,3 +1,3 @@
 
-DEAL::ExcEntryUndeclared(entry_string)
+DEAL::ParameterHandler::ExcEntryUndeclared(entry_string)
     You can't ask for entry <int1234> you have not yet declared.

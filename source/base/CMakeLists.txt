@@ -28,7 +28,6 @@ set(_unity_include_src
   exceptions.cc
   flow_function.cc
   function.cc
-  function_cspline.cc
   function_derivative.cc
   function_signed_distance.cc
   function_lib.cc
@@ -46,7 +45,6 @@ set(_unity_include_src
   index_set.cc
   job_identifier.cc
   logstream.cc
-  hdf5.cc
   kokkos.cc
   mpi.cc
   mpi_noncontiguous_partitioner.cc
@@ -82,7 +80,6 @@ set(_unity_include_src
   polynomials_raviart_thomas.cc
   polynomials_rt_bubbles.cc
   polynomials_wedge.cc
-  process_grid.cc
   qprojector.cc
   quadrature.cc
   quadrature_lib.cc
@@ -108,6 +105,28 @@ set(_separate_src
   data_out_base.cc
   symmetric_tensor.cc
   )
+
+if(DEAL_II_WITH_SCALAPACK)
+  set(_unity_include_src
+    ${_unity_include_src}
+    process_grid.cc
+  )
+endif()
+
+if(DEAL_II_WITH_HDF5)
+  set(_unity_include_src
+    ${_unity_include_src}
+    hdf5.cc
+  )
+endif()
+
+if(DEAL_II_WITH_GSL)
+  set(_unity_include_src
+    ${_unity_include_src}
+    function_cspline.cc
+  )
+endif()
+
 
 # determined by profiling
 set(_n_includes_per_unity_file 29)
@@ -141,7 +160,8 @@ set(_inst
   time_stepping.inst.in
   )
 
-file(GLOB _header
+
+file(GLOB _header CONFIGURE_DEPENDS
   ${CMAKE_SOURCE_DIR}/include/deal.II/base/*.h
   )
 
@@ -149,3 +169,5 @@ define_object_library(object_base OBJECT ${_src} ${_header} ${_inst}
   ${CMAKE_BINARY_DIR}/include/deal.II/base/config.h
   )
 expand_instantiations(object_base "${_inst}")
+
+collect_source_and_header_files("${_unity_include_src};${_separate_src}" "${_header}")

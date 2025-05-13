@@ -30,6 +30,8 @@
 
 #include <deal.II/non_matching/immersed_surface_quadrature.h>
 
+#include <boost/container/small_vector.hpp>
+
 #include <array>
 #include <cmath>
 #include <memory>

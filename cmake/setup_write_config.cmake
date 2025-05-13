@@ -172,19 +172,24 @@ foreach(_feature ${_deal_ii_features_sorted})
         _both("#        ${_var} set up with bundled packages\n")
       endif()
     else()
-     _both("#        ${_var} = ${${_var}}\n")
+      _both("#        ${_var} = ${${_var}}\n")
     endif()
 
     #
-    # Print some non interface target related configuration values:
+    # Print some non interface target related configuration values.
+    # Specifically, go through all combinations of
+    #   ${FEATURE}_EXECUTABLE
+    #   ${FEATURE}_VERSION
+    #   ...
+    # and if a variable of that name is found, prints its value.
     #
 
-    foreach(_var
+    foreach(_conf_var
       EXECUTABLE VERSION DIR C_COMPILER CXX_COMPILER Fortran_COMPILER
       WITH_64BIT_BLAS_INDICES
       )
-      if(NOT "${${_feature}_${_var}}" STREQUAL "")
-        _detailed("#            ${_feature}_${_var} = ${${_feature}_${_var}}\n")
+      if(NOT "${${_feature}_${_conf_var}}" STREQUAL "")
+        _detailed("#            ${_feature}_${_conf_var} = ${${_feature}_${_conf_var}}\n")
       endif()
     endforeach()
 
@@ -197,7 +202,6 @@ foreach(_feature ${_deal_ii_features_sorted})
     endif()
 
     if(_feature MATCHES "KOKKOS")
-      _detailed("#            KOKKOS_VERSION = ${Kokkos_VERSION}\n")
       _detailed("#            KOKKOS_BACKENDS = ${Kokkos_DEVICES}\n")
       _detailed("#            KOKKOS_ARCHITECTURES = ${Kokkos_ARCH}\n")
     endif()

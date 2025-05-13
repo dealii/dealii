@@ -19,6 +19,8 @@
 
 #include <deal.II/multigrid/mg_transfer_matrix_free.h>
 
+#include <type_traits>
+
 
 DEAL_II_NAMESPACE_OPEN
 

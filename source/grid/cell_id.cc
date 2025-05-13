@@ -53,7 +53,7 @@ CellId::CellId(const types::coarse_cell_id coarse_cell_id,
   , n_child_indices(n_child_indices)
 {
   Assert(n_child_indices < child_indices.size(), ExcInternalError());
-  memcpy(child_indices.data(), id, n_child_indices);
+  std::memcpy(child_indices.data(), id, n_child_indices);
 }
 
 
@@ -162,6 +162,6 @@ CellId::to_string() const
 
 
 // explicit instantiations
-#include "cell_id.inst"
+#include "grid/cell_id.inst"
 
 DEAL_II_NAMESPACE_CLOSE

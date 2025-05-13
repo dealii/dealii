@@ -25,6 +25,10 @@
 
 #ifdef DEAL_II_WITH_GMSH
 
+#  ifdef DEAL_II_WITH_OPENCASCADE
+#    include <TopoDS_Edge.hxx>
+#  endif
+
 DEAL_II_NAMESPACE_OPEN
 
 namespace Gmsh
@@ -142,7 +146,13 @@ namespace Gmsh
 
   // explicit instantiations
 #  ifdef DEAL_II_WITH_OPENCASCADE
-#    include "utilities.inst"
+// We don't build the utilities.inst file if deal.II isn't configured
+// with GMSH, but doxygen doesn't know that and tries to find that
+// file anyway for parsing -- which then of course it fails on. So
+// exclude the following from doxygen consideration.
+#    ifndef DOXYGEN
+#      include "gmsh/utilities.inst"
+#    endif
 #  endif
 } // namespace Gmsh
 

@@ -42,44 +42,41 @@ namespace TrilinosWrappers
   {
     namespace NOXWrappers
     {
-      namespace
+      /**
+       * A function that calls the function object given by its first argument
+       * with the set of arguments following at the end. If the call returns
+       * regularly, the current function returns zero to indicate success. If
+       * the call fails with an exception, then the current function returns
+       * with an error code of -1. In that case, the exception thrown by `f`
+       * is captured and `eptr` is set to the exception. In case of success,
+       * `eptr` is set to `nullptr`.
+       */
+      template <typename F, typename... Args>
+      int
+      call_and_possibly_capture_exception(const F            &f,
+                                          std::exception_ptr &eptr,
+                                          Args &&...args)
       {
-        /**
-         * A function that calls the function object given by its first argument
-         * with the set of arguments following at the end. If the call returns
-         * regularly, the current function returns zero to indicate success. If
-         * the call fails with an exception, then the current function returns
-         * with an error code of -1. In that case, the exception thrown by `f`
-         * is captured and `eptr` is set to the exception. In case of success,
-         * `eptr` is set to `nullptr`.
-         */
-        template <typename F, typename... Args>
-        int
-        call_and_possibly_capture_exception(const F            &f,
-                                            std::exception_ptr &eptr,
-                                            Args &&...args)
-        {
-          // See whether there is already something in the exception pointer
-          // variable. There is no reason why this should be so, and
-          // we should probably bail out:
-          AssertThrow(eptr == nullptr, ExcInternalError());
+        // See whether there is already something in the exception pointer
+        // variable. There is no reason why this should be so, and
+        // we should probably bail out:
+        AssertThrow(eptr == nullptr, ExcInternalError());
 
-          // Call the function and if that succeeds, return zero:
-          try
-            {
-              f(std::forward<Args>(args)...);
-              eptr = nullptr;
-              return 0;
-            }
-          // In case of an exception, capture the exception and
-          // return -1:
-          catch (...)
-            {
-              eptr = std::current_exception();
-              return -1;
-            }
-        }
-      } // namespace
+        // Call the function and if that succeeds, return zero:
+        try
+          {
+            f(std::forward<Args>(args)...);
+            eptr = nullptr;
+            return 0;
+          }
+        // In case of an exception, capture the exception and
+        // return -1:
+        catch (...)
+          {
+            eptr = std::current_exception();
+            return -1;
+          }
+      }
 
 
       template <typename VectorType>

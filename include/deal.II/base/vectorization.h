@@ -19,6 +19,7 @@
 #include <deal.II/base/config.h>
 
 #include <deal.II/base/exceptions.h>
+#include <deal.II/base/numbers.h>
 #include <deal.II/base/template_constraints.h>
 
 #include <algorithm>
@@ -217,7 +218,7 @@ public:
   operator-(const VectorizedArrayIterator<T> &other) const
   {
     return static_cast<std::ptrdiff_t>(lane) -
-           static_cast<ptrdiff_t>(other.lane);
+           static_cast<std::ptrdiff_t>(other.lane);
   }
 
 private:

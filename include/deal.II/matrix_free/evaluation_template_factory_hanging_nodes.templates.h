@@ -24,6 +24,9 @@
 #include <deal.II/matrix_free/evaluation_template_factory_internal.h>
 #include <deal.II/matrix_free/shape_info.h>
 
+#include <array>
+
+
 DEAL_II_NAMESPACE_OPEN
 
 namespace internal

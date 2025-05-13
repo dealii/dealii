@@ -12,11 +12,16 @@
 //
 // ------------------------------------------------------------------------
 
+#ifndef dealii_nonlinear_h
+#define dealii_nonlinear_h
+
 #include <deal.II/base/config.h>
 
 #include <deal.II/base/exceptions.h>
+#include <deal.II/base/mpi_stub.h>
 
 #include <deal.II/lac/petsc_snes.h>
+#include <deal.II/lac/vector.h>
 
 #include <deal.II/sundials/kinsol.h>
 
@@ -407,6 +412,8 @@ void
 NonlinearSolverSelector<VectorType>::set_data(
   const AdditionalData &additional_data)
 {
+  (void)additional_data;
+
 #ifdef DEAL_II_WITH_SUNDIALS
   // These if statements pass on the strategy to the other nonlinear solvers
   if (additional_data.strategy ==
@@ -710,3 +717,5 @@ NonlinearSolverSelector<VectorType>::solve(
 }
 
 DEAL_II_NAMESPACE_CLOSE
+
+#endif

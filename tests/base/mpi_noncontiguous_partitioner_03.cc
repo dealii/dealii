@@ -87,4 +87,14 @@ main(int argc, char *argv[])
       test(comm, {4, 5, 6, 7}, {0, 1, 2, 3});
     deallog.pop();
   }
+
+  {
+    deallog.push("duplicates");
+
+    if (rank == 0)
+      test(comm, {0, 1, 2, 3}, {4, 4, 5, 6, 7, 6});
+    else
+      test(comm, {4, 5, 6, 7}, {0, 1, 2, 1, 1, 3});
+    deallog.pop();
+  }
 }

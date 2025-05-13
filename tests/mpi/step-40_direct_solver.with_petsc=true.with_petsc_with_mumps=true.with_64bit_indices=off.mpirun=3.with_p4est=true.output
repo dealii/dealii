@@ -4,7 +4,6 @@ Cycle 0:
       340+344+340+
    Number of degrees of freedom: 4225
       1453+1412+1360+
-DEAL:mpi::Convergence step 1 value 0
    Solved in 1 iterations.
 
 Cycle 1:
@@ -12,6 +11,5 @@ Cycle 1:
       1364+1368+1364+
    Number of degrees of freedom: 16641
       5645+5540+5456+
-DEAL:mpi::Convergence step 1 value 0
    Solved in 1 iterations.
 

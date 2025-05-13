@@ -22,6 +22,7 @@
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/point.h>
 #include <deal.II/base/template_constraints.h>
+#include <deal.II/base/tensor.h>
 #include <deal.II/base/utilities.h>
 
 #include <deal.II/fe/component_mask.h>
@@ -1631,14 +1632,14 @@ namespace Patterns
     template <typename T>
     struct is_list_compatible
     {
-      static constexpr const bool value =
+      static constexpr bool value =
         internal::is_list_compatible<std::decay_t<T>>::value;
     };
 
     template <typename T>
     struct is_map_compatible
     {
-      static constexpr const bool value =
+      static constexpr bool value =
         internal::is_map_compatible<std::decay_t<T>>::value;
     };
 

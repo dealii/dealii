@@ -193,9 +193,8 @@ DEAL_II_NAMESPACE_OPEN
  * The following code can be used to query the I/O method.
  * @code
  * auto dataset = group.create_dataset<double>("name", dimensions);
- * #ifdef DEBUG
- * dataset.set_query_io_mode(true);
- * #endif
+ * if constexpr (running_in_debug_mode())
+ *   dataset.set_query_io_mode(true);
  *
  * if (Utilities::MPI::this_mpi_process(mpi_communicator) == 0)
  *   {
@@ -1656,7 +1655,7 @@ namespace HDF5
     std::string string_value(string_out);
     // The memory of the variable length string has to be freed.
     // H5Dvlen_reclaim could be also used
-    free(string_out);
+    std::free(string_out);
     ret = H5Tclose(type);
     Assert(ret >= 0, ExcInternalError());
 

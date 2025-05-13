@@ -37,6 +37,9 @@
 #  include <deal.II/sundials/n_vector.h>
 #  include <deal.II/sundials/sundials_types.h>
 
+#  include <sundials/sundials_iterative.h>
+#  include <sundials/sundials_linearsolver.h>
+
 DEAL_II_NAMESPACE_OPEN
 
 

@@ -3,8 +3,6 @@
 0.156 0.344             
             0.344 0.156 
             0.156 0.344 
-DEAL:cg::Starting value 1.4533424147
-DEAL:cg::Convergence step 2 value 0.0000000000
 DEAL::Degree=0: 2 iterations to obtain convergence.
 0.174       -0.014                               -0.129                   
       0.196       -0.015                                     -0.145       
@@ -18,8 +16,6 @@ DEAL::Degree=0: 2 iterations to obtain convergence.
                         -0.129       -0.129             1.195             
       -0.145       -0.145                                     1.345       
                               -0.145       -0.145                   1.345 
-DEAL:cg::Starting value 2.1732256211
-DEAL:cg::Convergence step 6 value 0.0000000000
 DEAL::Degree=1: 6 iterations to obtain convergence.
 0.167       0.023 -0.006       -0.001                                     -0.129       0.178                               -0.018       0.025       
       0.187             -0.007                                                                   -0.145       0.200                               
@@ -45,8 +41,6 @@ DEAL::Degree=1: 6 iterations to obtain convergence.
                                           0.200             -0.200                                                             1.483             
 0.025       0.284 -0.025       -0.284                                                 0.184                                           2.111       
                                     0.025       0.284 -0.025       -0.284                                           0.184                   2.111 
-DEAL:cg::Starting value 2.6969187164
-DEAL:cg::Convergence step 12 value 0.0000000000
 DEAL::Degree=2: 12 iterations to obtain convergence.
 0.168       0.024       -0.005       -0.001                                                       -0.064       0.178       -0.118                                           -0.009       0.025       -0.017                                           
       0.189       0.108       -0.005       -0.003                                                                                     -0.072       0.200       -0.133                                           -0.041       0.114       -0.076       
@@ -88,6 +82,4 @@ DEAL::Degree=2: 12 iterations to obtain convergence.
                                                 -0.017       -0.189       -0.017       -0.189             -0.010                   -0.111                                                                   0.143                   1.641             
       -0.076       -0.286       -0.076       -0.286                                                                                     -0.045                   0.660                                           -0.168                   2.479       
                                                       -0.076       -0.286       -0.076       -0.286                   -0.045                   -0.168                                                                   0.660                   2.479 
-DEAL:cg::Starting value 3.8136634795
-DEAL:cg::Convergence step 22 value 0.0000000000
 DEAL::Degree=3: 22 iterations to obtain convergence.

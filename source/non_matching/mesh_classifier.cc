@@ -16,9 +16,9 @@
 
 #include <deal.II/dofs/dof_accessor.h>
 
-#include "deal.II/fe/fe_q_iso_q1.h"
 #include <deal.II/fe/fe_bernstein.h>
 #include <deal.II/fe/fe_q.h>
+#include <deal.II/fe/fe_q_iso_q1.h>
 #include <deal.II/fe/fe_values.h>
 
 #include <deal.II/lac/block_vector.h>
@@ -28,6 +28,7 @@
 #include <deal.II/lac/petsc_vector.h>
 #include <deal.II/lac/trilinos_epetra_vector.h>
 #include <deal.II/lac/trilinos_parallel_block_vector.h>
+#include <deal.II/lac/trilinos_tpetra_block_vector.h>
 #include <deal.II/lac/trilinos_tpetra_vector.h>
 #include <deal.II/lac/trilinos_vector.h>
 #include <deal.II/lac/vector.h>
@@ -507,6 +508,6 @@ namespace NonMatching
 
 } // namespace NonMatching
 
-#include "mesh_classifier.inst"
+#include "non_matching/mesh_classifier.inst"
 
 DEAL_II_NAMESPACE_CLOSE

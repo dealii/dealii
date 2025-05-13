@@ -18,6 +18,7 @@
 #include <deal.II/base/config.h>
 
 #include <deal.II/base/exceptions.h>
+#include <deal.II/base/types.h>
 
 #include <boost/archive/binary_iarchive.hpp>
 #include <boost/archive/binary_oarchive.hpp>
@@ -574,7 +575,7 @@ namespace Utilities
    * most common use cases for this function).
    */
   template <typename T>
-  size_t
+  std::size_t
   pack(const T           &object,
        std::vector<char> &dest_buffer,
        const bool         allow_compression = true);
@@ -968,7 +969,7 @@ namespace Utilities
 #if defined(DEBUG) && !defined(DEAL_II_CXX14_CONSTEXPR_BUG)
     // Up to __builtin_expect this is the same code as in the 'Assert' macro.
     // The call to __builtin_expect turns out to be problematic.
-#  if KOKKOS_VERSION >= 30600
+#  if DEAL_II_KOKKOS_VERSION_GTE(3, 6, 0)
     KOKKOS_IF_ON_HOST(({
       if (!(iexp >= 0))
         ::dealii::deal_II_exceptions::internals::issue_error_noreturn(
@@ -1290,7 +1291,7 @@ namespace Utilities
 
       // Get the size of the vector
       typename std::vector<T>::size_type vector_size;
-      memcpy(&vector_size, &*cbegin, sizeof(vector_size));
+      std::memcpy(&vector_size, &*cbegin, sizeof(vector_size));
 
       Assert(static_cast<std::ptrdiff_t>(cend - cbegin) ==
                static_cast<std::ptrdiff_t>(sizeof(vector_size) +
@@ -1338,7 +1339,7 @@ namespace Utilities
       using size_type = typename std::vector<T>::size_type;
       std::vector<char>::const_iterator iterator = cbegin;
       size_type                         vector_size;
-      memcpy(&vector_size, &*iterator, sizeof(vector_size));
+      std::memcpy(&vector_size, &*iterator, sizeof(vector_size));
       object.clear();
       object.resize(vector_size);
       std::vector<size_type> sizes(vector_size);
@@ -1377,7 +1378,7 @@ namespace Utilities
 
 
   template <typename T>
-  size_t
+  std::size_t
   pack(const T           &object,
        std::vector<char> &dest_buffer,
        const bool         allow_compression)

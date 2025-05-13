@@ -534,7 +534,8 @@ FE_RaviartThomasNodal<dim>::get_face_interpolation_matrix(
   const Quadrature<dim> face_projection =
     QProjector<dim>::project_to_face(this->reference_cell(),
                                      quad_face_support,
-                                     0);
+                                     0,
+                                     numbers::default_geometric_orientation);
 
   for (unsigned int i = 0; i < source_fe.n_dofs_per_face(face_no); ++i)
     {
@@ -557,20 +558,21 @@ FE_RaviartThomasNodal<dim>::get_face_interpolation_matrix(
         }
     }
 
-#ifdef DEBUG
-  // make sure that the row sum of each of the matrices is 1 at this
-  // point. this must be so since the shape functions sum up to 1
-  for (unsigned int j = 0; j < source_fe.n_dofs_per_face(face_no); ++j)
+  if constexpr (running_in_debug_mode())
     {
-      double sum = 0.;
+      // make sure that the row sum of each of the matrices is 1 at this
+      // point. this must be so since the shape functions sum up to 1
+      for (unsigned int j = 0; j < source_fe.n_dofs_per_face(face_no); ++j)
+        {
+          double sum = 0.;
 
-      for (unsigned int i = 0; i < this->n_dofs_per_face(face_no); ++i)
-        sum += interpolation_matrix(j, i);
+          for (unsigned int i = 0; i < this->n_dofs_per_face(face_no); ++i)
+            sum += interpolation_matrix(j, i);
 
-      Assert(std::fabs(sum - 1) < 2e-13 * this->degree * (dim - 1),
-             ExcInternalError());
+          Assert(std::fabs(sum - 1) < 2e-13 * this->degree * (dim - 1),
+                 ExcInternalError());
+        }
     }
-#endif
 }
 
 
@@ -622,10 +624,13 @@ FE_RaviartThomasNodal<dim>::get_subface_interpolation_matrix(
   // compute the interpolation matrix by simply taking the value at the
   // support points.
   const Quadrature<dim> subface_projection =
-    QProjector<dim>::project_to_subface(this->reference_cell(),
-                                        quad_face_support,
-                                        0,
-                                        subface);
+    QProjector<dim>::project_to_subface(
+      this->reference_cell(),
+      quad_face_support,
+      0,
+      subface,
+      numbers::default_geometric_orientation,
+      RefinementCase<dim - 1>::isotropic_refinement);
 
   for (unsigned int i = 0; i < source_fe.n_dofs_per_face(face_no); ++i)
     {
@@ -648,20 +653,21 @@ FE_RaviartThomasNodal<dim>::get_subface_interpolation_matrix(
         }
     }
 
-#ifdef DEBUG
-  // make sure that the row sum of each of the matrices is 1 at this
-  // point. this must be so since the shape functions sum up to 1
-  for (unsigned int j = 0; j < source_fe.n_dofs_per_face(face_no); ++j)
+  if constexpr (running_in_debug_mode())
     {
-      double sum = 0.;
+      // make sure that the row sum of each of the matrices is 1 at this
+      // point. this must be so since the shape functions sum up to 1
+      for (unsigned int j = 0; j < source_fe.n_dofs_per_face(face_no); ++j)
+        {
+          double sum = 0.;
 
-      for (unsigned int i = 0; i < this->n_dofs_per_face(face_no); ++i)
-        sum += interpolation_matrix(j, i);
+          for (unsigned int i = 0; i < this->n_dofs_per_face(face_no); ++i)
+            sum += interpolation_matrix(j, i);
 
-      Assert(std::fabs(sum - 1) < 2e-13 * this->degree * (dim - 1),
-             ExcInternalError());
+          Assert(std::fabs(sum - 1) < 2e-13 * this->degree * (dim - 1),
+                 ExcInternalError());
+        }
     }
-#endif
 }
 
 
@@ -677,7 +683,8 @@ FE_RaviartThomasNodal<dim>::get_prolongation_matrix(
   Assert(refinement_case != RefinementCase<dim>::no_refinement,
          ExcMessage(
            "Prolongation matrices are only available for refined cells!"));
-  AssertIndexRange(child, GeometryInfo<dim>::n_children(refinement_case));
+  AssertIndexRange(
+    child, this->reference_cell().template n_children<dim>(refinement_case));
 
   // initialization upon first request
   if (this->prolongation[refinement_case - 1][child].n() == 0)
@@ -698,7 +705,8 @@ FE_RaviartThomasNodal<dim>::get_prolongation_matrix(
           std::vector<std::vector<FullMatrix<double>>> isotropic_matrices(
             RefinementCase<dim>::isotropic_refinement);
           isotropic_matrices.back().resize(
-            GeometryInfo<dim>::n_children(RefinementCase<dim>(refinement_case)),
+            this->reference_cell().template n_children<dim>(
+              RefinementCase<dim>(refinement_case)),
             FullMatrix<double>(this->n_dofs_per_cell(),
                                this->n_dofs_per_cell()));
           FETools::compute_embedding_matrices(*this, isotropic_matrices, true);
@@ -735,7 +743,8 @@ FE_RaviartThomasNodal<dim>::get_restriction_matrix(
   Assert(refinement_case != RefinementCase<dim>::no_refinement,
          ExcMessage(
            "Restriction matrices are only available for refined cells!"));
-  AssertIndexRange(child, GeometryInfo<dim>::n_children(refinement_case));
+  AssertIndexRange(
+    child, this->reference_cell().template n_children<dim>(refinement_case));
 
   // initialization upon first request
   if (this->restriction[refinement_case - 1][child].n() == 0)
@@ -756,7 +765,8 @@ FE_RaviartThomasNodal<dim>::get_restriction_matrix(
           std::vector<std::vector<FullMatrix<double>>> isotropic_matrices(
             RefinementCase<dim>::isotropic_refinement);
           isotropic_matrices.back().resize(
-            GeometryInfo<dim>::n_children(RefinementCase<dim>(refinement_case)),
+            this->reference_cell().template n_children<dim>(
+              RefinementCase<dim>(refinement_case)),
             FullMatrix<double>(this->n_dofs_per_cell(),
                                this->n_dofs_per_cell()));
           FETools::compute_projection_matrices(*this, isotropic_matrices, true);
@@ -783,7 +793,7 @@ FE_RaviartThomasNodal<dim>::get_restriction_matrix(
 
 
 // explicit instantiations
-#include "fe_raviart_thomas_nodal.inst"
+#include "fe/fe_raviart_thomas_nodal.inst"
 
 
 DEAL_II_NAMESPACE_CLOSE

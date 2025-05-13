@@ -73,7 +73,7 @@ html {
     /* content text properties. These only affect the page content, not the navigation or any other ui elements */
     --content-line-height: 27px;
     /* The content is centered and constraint in it's width. To make the content fill the whole page, set the variable to auto.*/
-    --content-maxwidth: 1050px;
+    --content-maxwidth: auto;
     --table-line-height: 24px;
     --toc-sticky-top: var(--spacing-medium);
     --toc-width: 200px;

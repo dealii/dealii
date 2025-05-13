@@ -51,8 +51,6 @@
 
 DEAL_II_NAMESPACE_OPEN
 
-// Shorthand notation for IDA error codes.
-#  define AssertIDA(code) Assert(code >= 0, ExcIDAError(code))
 
 namespace SUNDIALS
 {

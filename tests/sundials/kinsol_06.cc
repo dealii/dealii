@@ -14,7 +14,6 @@
 
 #include <deal.II/base/parameter_handler.h>
 
-#include <deal.II/lac/full_matrix.h>
 #include <deal.II/lac/vector.h>
 
 #include <deal.II/sundials/kinsol.h>

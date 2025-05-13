@@ -35,6 +35,7 @@
 #include <iomanip>
 #include <iostream>
 #include <limits>
+#include <set>
 #include <sstream>
 
 
@@ -640,37 +641,30 @@ namespace
         if (p.second.empty())
           {
             // set the found parameter in the destination argument
-            if (skip_undefined)
+            try
               {
-                try
-                  {
-                    prm.set(demangle(p.first), p.second.data());
-                  }
-                catch (const ParameterHandler::ExcEntryUndeclared &)
-                  {
-                    // ignore undeclared entry assert
-                  }
+                prm.set(demangle(p.first), p.second.data());
               }
-            else
-              prm.set(demangle(p.first), p.second.data());
+            catch (const ParameterHandler::ExcEntryUndeclared &entry_string)
+              {
+                // ignore undeclared entry assert
+                AssertThrow(skip_undefined,
+                            ParameterHandler::ExcEntryUndeclared(entry_string));
+              }
           }
         else if (p.second.get_optional<std::string>("value"))
           {
             // set the found parameter in the destination argument
-            if (skip_undefined)
+            try
               {
-                try
-                  {
-                    prm.set(demangle(p.first),
-                            p.second.get<std::string>("value"));
-                  }
-                catch (const ParameterHandler::ExcEntryUndeclared &)
-                  {
-                    // ignore undeclared entry assert
-                  }
+                prm.set(demangle(p.first), p.second.get<std::string>("value"));
               }
-            else
-              prm.set(demangle(p.first), p.second.get<std::string>("value"));
+            catch (const ParameterHandler::ExcEntryUndeclared &entry_string)
+              {
+                // ignore undeclared entry assert
+                AssertThrow(skip_undefined,
+                            ParameterHandler::ExcEntryUndeclared(entry_string));
+              }
 
             // this node might have sub-nodes in addition to "value", such as
             // "default_value", "documentation", etc. we might at some point
@@ -700,9 +694,11 @@ namespace
                                      prm);
                 prm.leave_subsection();
               }
-            catch (const ParameterHandler::ExcEntryUndeclared &)
+            catch (const ParameterHandler::ExcEntryUndeclared &entry_string)
               {
                 // ignore undeclared entry assert
+                AssertThrow(skip_undefined,
+                            ParameterHandler::ExcEntryUndeclared(entry_string));
               }
           }
       }
@@ -868,7 +864,7 @@ ParameterHandler::parse_input_from_json(std::istream &in,
     }
 
   // The xml function is reused to read in the xml into the parameter file.
-  // This function can only read mangled files. Therefore, we create a mangeled
+  // This function can only read mangled files. Therefore, we create a mangled
   // tree first.
   boost::property_tree::ptree node_tree_mangled;
   recursively_mangle_or_demangle(node_tree,
@@ -1592,7 +1588,9 @@ ParameterHandler::recursively_print_parameters(
 
                 for (const auto &doc_line : doc_lines)
                   {
-                    out << std::setw(overall_indent_level * 2) << '#';
+                    // Start with the comment start ('#'), padded with
+                    // overall_indent_level*2 spaces at the front.
+                    out << std::setw(overall_indent_level * 2) << "" << '#';
 
                     if (!doc_line.empty())
                       out << ' ' << doc_line;
@@ -1601,9 +1599,10 @@ ParameterHandler::recursively_print_parameters(
                   }
               }
 
-            // print the name and (if set) value of this entry
-            out << std::setw(overall_indent_level * 2) << "set "
-                << demangle(p.first)
+            // Print the name and (if set) value of this entry. Ensure proper
+            // padding with overall_indent_level*2 spaces at the front.
+            out << std::setw(overall_indent_level * 2) << ""
+                << "set " << demangle(p.first)
                 << std::setw(longest_name - demangle(p.first).size() + 1) << ' '
                 << '=';
             if (!value.empty())

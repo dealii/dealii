@@ -12,31 +12,39 @@
 ##
 ## ------------------------------------------------------------------------
 
-#
-# We have to compile the "intersections.cc" file without the misleading
-# indentation warning enabled. Otherwise, we run into quite a number of
-# warnings with gcc, see https://gcc.gnu.org/bugzilla/show_bug.cgi?id=89549
-#
+
+set(_src)
+set(_inst)
+
 if(DEAL_II_WITH_CGAL)
+  #
+  # We have to compile the "intersections.cc" file without the misleading
+  # indentation warning enabled. Otherwise, we run into quite a number of
+  # warnings with gcc, see https://gcc.gnu.org/bugzilla/show_bug.cgi?id=89549
+  #
   enable_if_supported(_flag "-Wno-misleading-indentation")
   set_property(SOURCE "intersections.cc"
     APPEND PROPERTY COMPILE_OPTIONS "${_flag}"
     )
+
+  set(_src
+    ${_src}
+    surface_mesh.cc
+    intersections.cc
+  )
+
+  set(_inst
+      ${_inst}
+  surface_mesh.inst.in
+  intersections.inst.in
+  )
 endif()
 
-set(_src
-  surface_mesh.cc
-  intersections.cc
-)
-
-set(_inst
-surface_mesh.inst.in
-intersections.inst.in
-)
-
-file(GLOB _header
+file(GLOB _header CONFIGURE_DEPENDS
   ${CMAKE_SOURCE_DIR}/include/deal.II/cgal/*.h
   )
 
 define_object_library(object_cgal OBJECT ${_src} ${_header} ${_inst})
 expand_instantiations(object_cgal "${_inst}")
+
+collect_source_and_header_files("${_src}" "${_header}")

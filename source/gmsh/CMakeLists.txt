@@ -12,17 +12,28 @@
 ##
 ## ------------------------------------------------------------------------
 
-set(_src
-  utilities.cc
-  )
 
-set(_inst
-  utilities.inst.in
-  )
+set(_src)
+set(_inst)
 
-file(GLOB _header
+if(DEAL_II_WITH_GMSH)
+  set(_src
+    ${_src}
+    utilities.cc
+    )
+
+  set(_inst
+    ${_inst}
+    utilities.inst.in
+    )
+endif()
+
+
+file(GLOB _header CONFIGURE_DEPENDS
   ${CMAKE_SOURCE_DIR}/include/deal.II/gmsh/*.h
   )
 
 define_object_library(object_gmsh OBJECT ${_src} ${_header} ${_inst})
 expand_instantiations(object_gmsh "${_inst}")
+
+collect_source_and_header_files("${_src}" "${_header}")

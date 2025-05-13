@@ -37,10 +37,22 @@ import sys
 
 # Skip the following tokens since they show up frequently but are not related to
 # double word typos
-SKIP = ["//", "*", "}", "|", "};", ">", "\"", "|", "/",
-        "numbers::invalid_unsigned_int,", "std::string,", "int,"]
+SKIP = [
+    "//",
+    "*",
+    "}",
+    "|",
+    "};",
+    ">",
+    '"',
+    "|",
+    "/",
+    "numbers::invalid_unsigned_int,",
+    "std::string,",
+    "int,",
+]
 
-with open(sys.argv[1], 'r', encoding='utf-8') as handle:
+with open(sys.argv[1], "r", encoding="utf-8") as handle:
     previous_line = ""
     for line_n, line in enumerate(handle):
         line = line.strip()

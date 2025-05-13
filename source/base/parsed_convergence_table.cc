@@ -17,6 +17,10 @@
 #include <deal.II/base/patterns.h>
 #include <deal.II/base/utilities.h>
 
+#include <fstream>
+#include <set>
+
+
 DEAL_II_NAMESPACE_OPEN
 
 namespace

@@ -210,8 +210,8 @@ namespace Step32
   // from the one used in step-31. Specifically, it is a right preconditioner,
   // implementing the matrix
   // @f{align*}{
-  //   \left(\begin{array}{cc}A^{-1} & -A^{-1}B^TS^{-1}
-  //                        \\0 & S^{-1}
+  //   \left(\begin{array}{cc}A^{-1} & A^{-1}B^TS^{-1}
+  //                        \\0 & -S^{-1}
   // \end{array}\right)
   // @f}
   // where the two inverse matrix operations

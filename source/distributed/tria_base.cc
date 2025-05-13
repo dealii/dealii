@@ -233,60 +233,61 @@ namespace parallel
             this->number_cache.level_ghost_owners.insert(
               cell->level_subdomain_id());
 
-#  ifdef DEBUG
-        // Check that level_ghost_owners is symmetric by sending a message
-        // to everyone
-        {
-          int ierr = MPI_Barrier(this->mpi_communicator);
-          AssertThrowMPI(ierr);
-
-          const int mpi_tag = Utilities::MPI::internal::Tags::
-            triangulation_base_fill_level_ghost_owners;
-
-          // important: preallocate to avoid (re)allocation:
-          std::vector<MPI_Request> requests(
-            this->number_cache.level_ghost_owners.size());
-          unsigned int dummy       = 0;
-          unsigned int req_counter = 0;
-
-          for (const auto &it : this->number_cache.level_ghost_owners)
+        if constexpr (running_in_debug_mode())
+          {
+            // Check that level_ghost_owners is symmetric by sending a message
+            // to everyone
             {
-              ierr = MPI_Isend(&dummy,
-                               1,
-                               MPI_UNSIGNED,
-                               it,
-                               mpi_tag,
-                               this->mpi_communicator,
-                               &requests[req_counter]);
+              int ierr = MPI_Barrier(this->mpi_communicator);
               AssertThrowMPI(ierr);
-              ++req_counter;
-            }
 
-          for (const auto &it : this->number_cache.level_ghost_owners)
-            {
-              unsigned int dummy;
-              ierr = MPI_Recv(&dummy,
-                              1,
-                              MPI_UNSIGNED,
-                              it,
-                              mpi_tag,
-                              this->mpi_communicator,
-                              MPI_STATUS_IGNORE);
+              const int mpi_tag = Utilities::MPI::internal::Tags::
+                triangulation_base_fill_level_ghost_owners;
+
+              // important: preallocate to avoid (re)allocation:
+              std::vector<MPI_Request> requests(
+                this->number_cache.level_ghost_owners.size());
+              unsigned int dummy       = 0;
+              unsigned int req_counter = 0;
+
+              for (const auto &it : this->number_cache.level_ghost_owners)
+                {
+                  ierr = MPI_Isend(&dummy,
+                                   1,
+                                   MPI_UNSIGNED,
+                                   it,
+                                   mpi_tag,
+                                   this->mpi_communicator,
+                                   &requests[req_counter]);
+                  AssertThrowMPI(ierr);
+                  ++req_counter;
+                }
+
+              for (const auto &it : this->number_cache.level_ghost_owners)
+                {
+                  unsigned int dummy;
+                  ierr = MPI_Recv(&dummy,
+                                  1,
+                                  MPI_UNSIGNED,
+                                  it,
+                                  mpi_tag,
+                                  this->mpi_communicator,
+                                  MPI_STATUS_IGNORE);
+                  AssertThrowMPI(ierr);
+                }
+
+              if (requests.size() > 0)
+                {
+                  ierr = MPI_Waitall(requests.size(),
+                                     requests.data(),
+                                     MPI_STATUSES_IGNORE);
+                  AssertThrowMPI(ierr);
+                }
+
+              ierr = MPI_Barrier(this->mpi_communicator);
               AssertThrowMPI(ierr);
             }
-
-          if (requests.size() > 0)
-            {
-              ierr = MPI_Waitall(requests.size(),
-                                 requests.data(),
-                                 MPI_STATUSES_IGNORE);
-              AssertThrowMPI(ierr);
-            }
-
-          ierr = MPI_Barrier(this->mpi_communicator);
-          AssertThrowMPI(ierr);
-        }
-#  endif
+          }
 
         Assert(this->number_cache.level_ghost_owners.size() <
                  Utilities::MPI::n_mpi_processes(this->mpi_communicator),
@@ -583,17 +584,18 @@ namespace parallel
     const std::vector<bool> &vertex_locally_moved)
   {
     AssertDimension(vertex_locally_moved.size(), this->n_vertices());
-#ifdef DEBUG
-    {
-      const std::vector<bool> locally_owned_vertices =
-        dealii::GridTools::get_locally_owned_vertices(*this);
-      for (unsigned int i = 0; i < locally_owned_vertices.size(); ++i)
-        Assert((vertex_locally_moved[i] == false) ||
-                 (locally_owned_vertices[i] == true),
-               ExcMessage("The vertex_locally_moved argument must not "
-                          "contain vertices that are not locally owned"));
-    }
-#endif
+    if constexpr (running_in_debug_mode())
+      {
+        {
+          const std::vector<bool> locally_owned_vertices =
+            dealii::GridTools::get_locally_owned_vertices(*this);
+          for (unsigned int i = 0; i < locally_owned_vertices.size(); ++i)
+            Assert((vertex_locally_moved[i] == false) ||
+                     (locally_owned_vertices[i] == true),
+                   ExcMessage("The vertex_locally_moved argument must not "
+                              "contain vertices that are not locally owned"));
+        }
+      }
 
     Point<spacedim> invalid_point;
     for (unsigned int d = 0; d < spacedim; ++d)
@@ -724,6 +726,6 @@ namespace parallel
 
 
 /*-------------- Explicit Instantiations -------------------------------*/
-#include "tria_base.inst"
+#include "distributed/tria_base.inst"
 
 DEAL_II_NAMESPACE_CLOSE

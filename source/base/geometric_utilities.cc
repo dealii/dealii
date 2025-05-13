@@ -15,6 +15,8 @@
 
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/geometric_utilities.h>
+#include <deal.II/base/numbers.h>
+#include <deal.II/base/point.h>
 
 #include <array>
 #include <cmath>
@@ -109,7 +111,7 @@ namespace GeometricUtilities
     }
 
     // explicit instantiations
-#include "geometric_utilities.inst"
+#include "base/geometric_utilities.inst"
 
   } // namespace Coordinates
 } // namespace GeometricUtilities

@@ -17,6 +17,9 @@ CMakeLists.txt.user
 /.cache
 /.clangd
 
+# Python compiled modules
+/contrib/utilities/__pycache__
+
 # misc
 /compile_commands.json
 /.clang_complete

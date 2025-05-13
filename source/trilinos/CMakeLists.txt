@@ -12,19 +12,27 @@
 ##
 ## ------------------------------------------------------------------------
 
-include_directories(BEFORE ${CMAKE_CURRENT_BINARY_DIR})
+set(_src)
+set(_inst)
 
-set(_src
-  nox.cc
-  )
+if(DEAL_II_TRILINOS_WITH_NOX)
+  set(_src
+    ${_src}
+    nox.cc
+    )
 
-set(_inst
-  nox.inst.in
-  )
+  set(_inst
+    ${_inst}
+    nox.inst.in
+    )
+endif()
 
-file(GLOB _header
+
+file(GLOB _header CONFIGURE_DEPENDS
   ${CMAKE_SOURCE_DIR}/include/deal.II/trilinos/*.h
   )
 
 define_object_library(object_trilinos OBJECT ${_src} ${_header} ${_inst})
 expand_instantiations(object_trilinos "${_inst}")
+
+collect_source_and_header_files("${_src}" "${_header}")

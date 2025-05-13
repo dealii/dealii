@@ -101,11 +101,11 @@ SparseMatrixEZ<number>::operator=(const double d)
 
 template <typename number>
 void
-SparseMatrixEZ<number>::reinit(const size_type n_rows,
-                               const size_type n_cols,
-                               size_type       default_row_length,
-                               unsigned int    default_increment,
-                               size_type       reserve)
+SparseMatrixEZ<number>::reinit(const size_type    n_rows,
+                               const size_type    n_cols,
+                               const size_type    default_row_length,
+                               const unsigned int default_increment,
+                               const size_type    reserve)
 {
   clear();
 

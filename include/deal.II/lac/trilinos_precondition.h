@@ -1308,11 +1308,11 @@ namespace TrilinosWrappers
    * many processors. SSOR, on the other hand, gets more Jacobi-like on many
    * processors.
    *
-   * For proper functionality of this class we recommend using Trilinos v9.0
-   * and higher. Older versions may have problems with generating the
-   * coarse-matrix structure when using matrices with many nonzero entries per
-   * row (i.e., matrices stemming from higher order finite element
-   * discretizations).
+   * This class can be used as a preconditioner for linear solvers. It
+   * also provides a `vmult()` function (implemented in the
+   * PreconditionBase base class) that, when called, performs one
+   * multigrid cycle. By default, this is a V-cycle, but the
+   * AdditionalData class allows to also select a W-cycle.
    *
    * @ingroup TrilinosWrappers
    * @ingroup Preconditioners
@@ -1698,8 +1698,16 @@ namespace TrilinosWrappers
    * on the Trilinos MueLu implementation, which is a black-box preconditioner
    * that works well for many PDE-based linear problems. The interface of
    * PreconditionerAMGMueLu is the same as the interface of PreconditionerAMG
-   * except for the higher_order_elements parameter which does not exist in
+   * (which, instead of the Trilinos package MueLu is built on the older
+   * Trilinos package ML). The only functional difference between the two
+   * classes is the `higher_order_elements` parameter which does not exist in
    * PreconditionerAMGMueLu.
+   *
+   * This class can be used as a preconditioner for linear solvers. It
+   * also provides a `vmult()` function (implemented in the
+   * PreconditionBase base class) that, when called, performs one
+   * multigrid cycle. By default, this is a V-cycle, but the
+   * AdditionalData class allows to also select a W-cycle.
    *
    * @note You need to configure Trilinos with MueLU support for this
    * preconditioner to work.
@@ -1869,7 +1877,7 @@ namespace TrilinosWrappers
      * Let Trilinos compute a multilevel hierarchy for the solution of a
      * linear system with the given matrix. As opposed to the other initialize
      * function above, this function uses an object of type
-     * Epetra_CrsMatrixCrs.
+     * Epetra_CrsMatrix.
      */
     void
     initialize(const Epetra_CrsMatrix &matrix,

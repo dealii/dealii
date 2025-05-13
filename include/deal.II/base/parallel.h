@@ -20,6 +20,7 @@
 
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/mutex.h>
+#include <deal.II/base/std_cxx20/type_traits.h>
 #include <deal.II/base/synchronous_iterator.h>
 #include <deal.II/base/template_constraints.h>
 
@@ -437,7 +438,7 @@ namespace parallel
     // warnings about unused arguments
     (void)grainsize;
 
-    for (OutputIterator1 in1 = begin_in1; in1 != end_in1;)
+    for (OutputIterator in1 = begin_in1; in1 != end_in1;)
       *out++ = function(*in1++, *in2++, *in3++);
 #endif
   }

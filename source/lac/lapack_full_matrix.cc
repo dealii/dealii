@@ -2651,7 +2651,7 @@ PreconditionLU<number>::Tvmult(BlockVector<number>       &dst,
 
 
 
-#include "lapack_full_matrix.inst"
+#include "lac/lapack_full_matrix.inst"
 
 
 DEAL_II_NAMESPACE_CLOSE

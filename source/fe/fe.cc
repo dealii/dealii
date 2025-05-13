@@ -1208,15 +1208,16 @@ FiniteElement<dim, spacedim>::get_sub_fe(const ComponentMask &mask) const
   const unsigned int first_selected =
     mask.first_selected_component(n_total_components);
 
-#  ifdef DEBUG
-  // check that it is contiguous:
-  for (unsigned int c = 0; c < n_total_components; ++c)
-    Assert((c < first_selected && (!mask[c])) ||
-             (c >= first_selected && c < first_selected + n_selected &&
-              mask[c]) ||
-             (c >= first_selected + n_selected && !mask[c]),
-           ExcMessage("Error: the given ComponentMask is not contiguous!"));
-#  endif
+  if constexpr (running_in_debug_mode())
+    {
+      // check that it is contiguous:
+      for (unsigned int c = 0; c < n_total_components; ++c)
+        Assert((c < first_selected && (!mask[c])) ||
+                 (c >= first_selected && c < first_selected + n_selected &&
+                  mask[c]) ||
+                 (c >= first_selected + n_selected && !mask[c]),
+               ExcMessage("Error: the given ComponentMask is not contiguous!"));
+    }
 
   return get_sub_fe(first_selected, n_selected);
 }
@@ -1432,7 +1433,7 @@ FiniteElement<dim, spacedim>::base_element(const unsigned int index) const
 
 #endif
 /*------------------------------- Explicit Instantiations -------------*/
-#include "fe.inst"
+#include "fe/fe.inst"
 
 
 DEAL_II_NAMESPACE_CLOSE

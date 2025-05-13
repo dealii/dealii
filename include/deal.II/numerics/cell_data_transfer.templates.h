@@ -22,6 +22,8 @@
 
 #include <deal.II/numerics/cell_data_transfer.h>
 
+#include <set>
+
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -125,11 +127,14 @@ CellDataTransfer<dim, spacedim, VectorType>::
         }
     }
 
-#ifdef DEBUG
-  n_active_cells_pre = triangulation->n_active_cells();
-#else
-  (void)n_active_cells_pre;
-#endif
+  if constexpr (running_in_debug_mode())
+    {
+      n_active_cells_pre = triangulation->n_active_cells();
+    }
+  else
+    {
+      (void)n_active_cells_pre;
+    }
 }
 
 
@@ -139,14 +144,17 @@ void
 CellDataTransfer<dim, spacedim, VectorType>::unpack(const VectorType &in,
                                                     VectorType       &out)
 {
-#ifdef DEBUG
-  Assert(in.size() == n_active_cells_pre,
-         ExcDimensionMismatch(in.size(), n_active_cells_pre));
-  Assert(out.size() == triangulation->n_active_cells(),
-         ExcDimensionMismatch(out.size(), triangulation->n_active_cells()));
-#else
-  (void)n_active_cells_pre;
-#endif
+  if constexpr (running_in_debug_mode())
+    {
+      Assert(in.size() == n_active_cells_pre,
+             ExcDimensionMismatch(in.size(), n_active_cells_pre));
+      Assert(out.size() == triangulation->n_active_cells(),
+             ExcDimensionMismatch(out.size(), triangulation->n_active_cells()));
+    }
+  else
+    {
+      (void)n_active_cells_pre;
+    }
 
   // Transfer data of persisting cells.
   for (const auto &persisting : persisting_cells_active_index)

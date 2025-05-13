@@ -58,8 +58,9 @@ function(populate_target_properties _target _build)
   # Build-directory specific includes:
 
   target_include_directories(${_target} PRIVATE
-    ${CMAKE_BINARY_DIR}/include
-    ${CMAKE_SOURCE_DIR}/include
+    ${CMAKE_BINARY_DIR}/include   # e.g., deal.II/base/config.h that has been placed into the binary dir
+    ${CMAKE_BINARY_DIR}/source    # all of the .inst files that have been placed into the binary dir
+    ${CMAKE_SOURCE_DIR}/include   # all unprocessed header files
     )
 
   #

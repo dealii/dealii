@@ -26,9 +26,12 @@
 
 #include <boost/container/small_vector.hpp>
 
+#include <algorithm>
 #include <cmath>
 #include <limits>
 #include <memory>
+#include <numeric>
+
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -171,8 +174,8 @@ Manifold<3, 3>::normal_vector(const Triangulation<3, 3>::face_iterator &face,
                                          vertices[1].distance(p),
                                          vertices[2].distance(p),
                                          vertices[3].distance(p)}};
-  const double max_distance = std::max(std::max(distances[0], distances[1]),
-                                       std::max(distances[2], distances[3]));
+  const double                max_distance =
+    std::max({distances[0], distances[1], distances[2], distances[3]});
 
   // We need to find two tangential vectors to the given point p, but we do
   // not know how the point is oriented against the face. We guess the two
@@ -1122,6 +1125,6 @@ ChartManifold<dim, spacedim, chartdim>::get_periodicity() const
 }
 
 // explicit instantiations
-#include "manifold.inst"
+#include "grid/manifold.inst"
 
 DEAL_II_NAMESPACE_CLOSE

@@ -19,6 +19,7 @@
 
 #include <deal.II/base/array_view.h>
 #include <deal.II/base/communication_pattern_base.h>
+#include <deal.II/base/exceptions.h>
 #include <deal.II/base/index_set.h>
 #include <deal.II/base/memory_space.h>
 #include <deal.II/base/mpi_stub.h>
@@ -26,8 +27,12 @@
 
 #include <deal.II/lac/vector_operation.h>
 
+#include <Kokkos_Core.hpp>
+
 #include <limits>
 #include <memory>
+#include <vector>
+
 
 DEAL_II_NAMESPACE_OPEN
 

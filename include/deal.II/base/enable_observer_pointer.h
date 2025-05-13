@@ -23,6 +23,7 @@
 #include <atomic>
 #include <map>
 #include <mutex>
+#include <ostream>
 #include <string>
 #include <typeinfo>
 #include <vector>

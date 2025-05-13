@@ -18,19 +18,27 @@
 #include <deal.II/base/config.h>
 
 #include <deal.II/base/array_view.h>
+#include <deal.II/base/exceptions.h>
 #include <deal.II/base/init_finalize.h>
 #include <deal.II/base/mpi_stub.h>
 #include <deal.II/base/mpi_tags.h>
 #include <deal.II/base/numbers.h>
 #include <deal.II/base/template_constraints.h>
+#include <deal.II/base/types.h>
 #include <deal.II/base/utilities.h>
 
 #include <complex>
 #include <limits>
 #include <map>
 #include <numeric>
+#include <set>
 #include <vector>
 
+#ifdef DEAL_II_WITH_MPI
+DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
+#  include <mpi.h>
+DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
+#endif
 
 
 /**
@@ -1255,7 +1263,7 @@ namespace Utilities
     template <typename T>
     void
     broadcast(T                 *buffer,
-              const size_t       count,
+              const std::size_t  count,
               const unsigned int root,
               const MPI_Comm     comm);
 
@@ -2128,7 +2136,7 @@ namespace Utilities
     template <typename T>
     void
     broadcast(T                 *buffer,
-              const size_t       count,
+              const std::size_t  count,
               const unsigned int root,
               const MPI_Comm     comm)
     {

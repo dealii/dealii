@@ -70,6 +70,16 @@ f5(const double t, const Vector<double> &y)
   return values;
 }
 
+Vector<double>
+f6(const double t, const Vector<double> &y)
+{
+  Vector<double> values(y);
+  for (unsigned int i = 0; i < values.size(); ++i)
+    values[i] = 6.0 * t * t * t * t * t;
+
+  return values;
+}
+
 
 Vector<double>
 my_rhs_function(const double t, const Vector<double> &y)
@@ -111,6 +121,12 @@ id_minus_tau_J_inv5(const double t, const double tau, const Vector<double> &y)
   return y;
 }
 
+Vector<double>
+id_minus_tau_J_inv6(const double t, const double tau, const Vector<double> &y)
+{
+  return y;
+}
+
 double
 my1(const double t)
 {
@@ -139,6 +155,12 @@ double
 my5(const double t)
 {
   return t * t * t * t * t;
+}
+
+double
+my6(const double t)
+{
+  return t * t * t * t * t * t;
 }
 
 double
@@ -288,6 +310,16 @@ main()
       TimeStepping::RK_CLASSIC_FOURTH_ORDER);
     test(rk4, f4, id_minus_tau_J_inv4, my4);
 
+    deallog << "Runge-Kutta fifth order" << std::endl;
+    TimeStepping::ExplicitRungeKutta<Vector<double>> rk5(
+      TimeStepping::RK_FIFTH_ORDER);
+    test(rk5, f5, id_minus_tau_J_inv5, my5);
+
+    deallog << "Runge-Kutta sixth order" << std::endl;
+    TimeStepping::ExplicitRungeKutta<Vector<double>> rk6(
+      TimeStepping::RK_SIXTH_ORDER);
+    test(rk5, f6, id_minus_tau_J_inv6, my6);
+
     deallog << "Low-storage Runge-Kutta stage 3 order 3" << std::endl;
     TimeStepping::LowStorageRungeKutta<Vector<double>> lsrk33(
       TimeStepping::LOW_STORAGE_RK_STAGE3_ORDER3);
@@ -388,6 +420,22 @@ main()
     test_convergence(rk4,
                      my_rhs_function,
                      id_minus_tau_J_inv4,
+                     my_exact_solution);
+
+    deallog << "Runge-Kutta fifth order" << std::endl;
+    TimeStepping::ExplicitRungeKutta<Vector<double>> rk5(
+      TimeStepping::RK_FIFTH_ORDER);
+    test_convergence(rk5,
+                     my_rhs_function,
+                     id_minus_tau_J_inv5,
+                     my_exact_solution);
+
+    deallog << "Runge-Kutta sixth order" << std::endl;
+    TimeStepping::ExplicitRungeKutta<Vector<double>> rk6(
+      TimeStepping::RK_SIXTH_ORDER);
+    test_convergence(rk6,
+                     my_rhs_function,
+                     id_minus_tau_J_inv6,
                      my_exact_solution);
 
     deallog << "Low-storage Runge-Kutta stage 3 order 3" << std::endl;

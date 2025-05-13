@@ -50,27 +50,29 @@ macro(feature_arborx_find_external var)
       ArborX::ArborX
     )
 
-    check_cxx_compiler_bug(
-      "
-      #include <ArborX.hpp>
-      int main() {
-        Kokkos::View<ArborX::Point*, Kokkos::HostSpace> points(\"points\", 0);
-        [[maybe_unused]] ArborX::BVH<Kokkos::HostSpace> bvh(Kokkos::DefaultHostExecutionSpace{}, points);
-      }
-      "
-      DEAL_II_ARBORX_CXX20_BUG)
-    reset_cmake_required()
+    if(ArborX_VERSION VERSION_LESS 2.0.0)
+      check_cxx_compiler_bug(
+        "
+        #include <ArborX.hpp>
+        int main() {
+          Kokkos::View<ArborX::Point*, Kokkos::HostSpace> points(\"points\", 0);
+          [[maybe_unused]] ArborX::BVH<Kokkos::HostSpace> bvh(Kokkos::DefaultHostExecutionSpace{}, points);
+        }
+        "
+        DEAL_II_ARBORX_CXX20_BUG)
+      reset_cmake_required()
 
-    if(DEAL_II_ARBORX_CXX20_BUG)
-      message(STATUS "Could not find a sufficient ArborX installation: "
-        "The ArborX version doesn't work with C++20 or higher."
-        )
-      set(ARBORX_ADDITIONAL_ERROR_STRING
-        ${ARBORX_ADDITIONAL_ERROR_STRING}
-        "Could not find a sufficient ArborX installation:\n"
-        "The ArborX version doesn't work with C++20 or higher. Try using a later ArborX release or try specifying a lower C++ standard.\n"
-        )
-      set(${var} FALSE)
+      if(DEAL_II_ARBORX_CXX20_BUG)
+        message(STATUS "Could not find a sufficient ArborX installation: "
+          "The ArborX version doesn't work with C++20 or higher."
+          )
+        set(ARBORX_ADDITIONAL_ERROR_STRING
+          ${ARBORX_ADDITIONAL_ERROR_STRING}
+          "Could not find a sufficient ArborX installation:\n"
+          "The ArborX version doesn't work with C++20 or higher. Try using a later ArborX release or try specifying a lower C++ standard.\n"
+          )
+        set(${var} FALSE)
+      endif()
     endif()
   endif()
 

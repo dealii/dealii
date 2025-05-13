@@ -19,6 +19,8 @@
 #include <deal.II/hp/fe_values.h>
 
 #include <memory>
+#include <numeric>
+
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -36,6 +38,7 @@ namespace hp
     {
       std::vector<QCollection<q_dim>> q_collections;
 
+      q_collections.reserve(q_collection.size());
       for (unsigned int q = 0; q < q_collection.size(); ++q)
         q_collections.emplace_back(q_collection[q]);
 
@@ -639,7 +642,7 @@ namespace hp
 
 
 // explicit instantiations
-#include "fe_values.inst"
+#include "hp/fe_values.inst"
 
 
 DEAL_II_NAMESPACE_CLOSE

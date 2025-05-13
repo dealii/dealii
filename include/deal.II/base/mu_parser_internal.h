@@ -21,6 +21,7 @@
 #include <deal.II/base/config.h>
 
 #include <deal.II/base/array_view.h>
+#include <deal.II/base/exceptions.h>
 #include <deal.II/base/point.h>
 #include <deal.II/base/thread_local_storage.h>
 

@@ -7,8 +7,6 @@ DEAL:0::Assemble matrix
 DEAL:0::Assemble multilevel matrix
 DEAL:0::Assemble right hand side
 DEAL:0::Solve
-DEAL:0:cg::Starting value 20.6576
-DEAL:0:cg::Convergence step 15 value 8.11943e-13
 DEAL:0::Estimate 1.10045
 DEAL:0::Step 1
 DEAL:0::Triangulation 18 cells, 3 levels
@@ -17,8 +15,6 @@ DEAL:0::Assemble matrix
 DEAL:0::Assemble multilevel matrix
 DEAL:0::Assemble right hand side
 DEAL:0::Solve
-DEAL:0:cg::Starting value 21.1045
-DEAL:0:cg::Convergence step 16 value 8.12709e-13
 DEAL:0::Estimate 1.03046
 DEAL:0::Step 2
 DEAL:0::Triangulation 27 cells, 4 levels
@@ -27,8 +23,6 @@ DEAL:0::Assemble matrix
 DEAL:0::Assemble multilevel matrix
 DEAL:0::Assemble right hand side
 DEAL:0::Solve
-DEAL:0:cg::Starting value 21.3244
-DEAL:0:cg::Convergence step 17 value 6.05005e-13
 DEAL:0::Estimate 0.836764
 DEAL:0::Step 3
 DEAL:0::Triangulation 39 cells, 5 levels
@@ -37,8 +31,6 @@ DEAL:0::Assemble matrix
 DEAL:0::Assemble multilevel matrix
 DEAL:0::Assemble right hand side
 DEAL:0::Solve
-DEAL:0:cg::Starting value 21.4584
-DEAL:0:cg::Convergence step 16 value 3.55455e-13
 DEAL:0::Estimate 0.644552
 DEAL:0::Step 4
 DEAL:0::Triangulation 54 cells, 6 levels
@@ -47,8 +39,6 @@ DEAL:0::Assemble matrix
 DEAL:0::Assemble multilevel matrix
 DEAL:0::Assemble right hand side
 DEAL:0::Solve
-DEAL:0:cg::Starting value 21.5437
-DEAL:0:cg::Convergence step 16 value 8.06366e-13
 DEAL:0::Estimate 0.474987
 DEAL:0::Step 5
 DEAL:0::Triangulation 84 cells, 7 levels
@@ -57,6 +47,4 @@ DEAL:0::Assemble matrix
 DEAL:0::Assemble multilevel matrix
 DEAL:0::Assemble right hand side
 DEAL:0::Solve
-DEAL:0:cg::Starting value 25.5435
-DEAL:0:cg::Convergence step 17 value 8.48262e-13
 DEAL:0::Estimate 0.356044

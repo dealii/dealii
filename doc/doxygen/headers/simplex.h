@@ -65,10 +65,8 @@
  *
  * @section simplex_reference_cells Reference cells
  *
- * In 2D, we provide triangles and quadrilaterals with the following possible
- * orientations in 3D:
+ * In 2D, we provide triangles and quadrilaterals:
  *
- * <div class="twocolumn" style="width: 100%">
  *   <div class="parent">
  *     <div class="img" align="center">
  *       @image html reference_cells_0.png
@@ -77,15 +75,6 @@
  *       2D: triangle and quadrilateral
  *     </div>
  *   </div>
- *   <div class="parent">
- *     <div class="img" align="center">
- *       @image html reference_cells_1.png
- *     </div>
- *     <div class="text" align="center">
- *       Possible orientations of triangles and quadrilaterals in 3D
- *     </div>
- *   </div>
- * </div>
  *
  * In 3D, tetrahedra, pyramids, wedges, and hexahedra are available:
  *

@@ -480,6 +480,6 @@ namespace internal
   } // namespace SolverGMRESImplementation
 } // namespace internal
 
-#include "solver_gmres.inst"
+#include "lac/solver_gmres.inst"
 
 DEAL_II_NAMESPACE_CLOSE

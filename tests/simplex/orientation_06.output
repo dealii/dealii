@@ -1,21 +1,11 @@
 
 DEAL::rhs l2 = 2.27397
-DEAL:cg::Starting value 1.73734
-DEAL:cg::Convergence step 23 value 8.54649e-13
 DEAL::global error = 0.00166288
 DEAL::rhs l2 = 2.08466
-DEAL:cg::Starting value 2.45428
-DEAL:cg::Convergence step 39 value 8.26837e-13
 DEAL::global error = 0.000105423
 DEAL::rhs l2 = 2.69354
-DEAL:cg::Starting value 3.47449
-DEAL:cg::Convergence step 67 value 7.08130e-13
 DEAL::global error = 6.61142e-06
 DEAL::rhs l2 = 3.77050
-DEAL:cg::Starting value 4.91796
-DEAL:cg::Convergence step 105 value 9.99712e-13
 DEAL::global error = 4.13368e-07
 DEAL::rhs l2 = 5.33304
-DEAL:cg::Starting value 6.95866
-DEAL:cg::Convergence step 169 value 9.77791e-13
 DEAL::global error = 2.58314e-08

@@ -252,7 +252,7 @@ protected:
    * no sign change at all. Derived finite element classes have to
    * fill this Table with the correct values, see the documentation in
    * GeometryInfo<dim> and this
-   * @ref GlossFaceOrientation "glossary entry on face orientation".
+   * @ref GlossCombinedOrientation "glossary entry on face orientations".
    *
    * The table must be filled in finite element classes derived
    * from FE_PolyTensor in a meaningful way since the permutation

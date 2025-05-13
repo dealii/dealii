@@ -34,7 +34,7 @@ namespace types
    * The type used to represent face and line orientations.
    *
    * See the
-   * @ref GlossFaceOrientation "glossary"
+   * @ref GlossCombinedOrientation "glossary"
    * for more information.
    */
   using geometric_orientation = unsigned char;
@@ -59,6 +59,10 @@ namespace types
   /**
    * An identifier that denotes the MPI type associated with
    * types::global_vertex_index.
+   *
+   * This preprocessor variable is deprecated. Use the variable
+   * `Utilities::MPI::mpi_type_id_for_type<types::global_vertex_index>`
+   * instead.
    */
 #define DEAL_II_VERTEX_INDEX_MPI_TYPE MPI_UINT64_T
 
@@ -104,6 +108,10 @@ namespace types
   /**
    * An identifier that denotes the MPI type associated with
    * types::global_dof_index.
+   *
+   * This preprocessor variable is deprecated. Use the variable
+   * `Utilities::MPI::mpi_type_id_for_type<types::global_dof_index>`
+   * instead.
    */
 #ifdef DEAL_II_WITH_64BIT_INDICES
 #  define DEAL_II_DOF_INDEX_MPI_TYPE MPI_UINT64_T
@@ -214,9 +222,7 @@ namespace TrilinosWrappers
 } // namespace TrilinosWrappers
 
 
-// this part of the namespace numbers got moved to the bottom types.h file,
-// because otherwise we get a circular inclusion of config.h, types.h, and
-// numbers.h
+
 namespace numbers
 {
   /**
@@ -229,8 +235,7 @@ namespace numbers
    * @ref GlossInvalidValue "invalid value".
    * See there for more information.
    */
-  static const unsigned int invalid_unsigned_int =
-    static_cast<unsigned int>(-1);
+  constexpr unsigned int invalid_unsigned_int = static_cast<unsigned int>(-1);
 
   /**
    * Representation of the largest number that can be put into a size_type.
@@ -242,7 +247,7 @@ namespace numbers
    * @ref GlossInvalidValue "invalid value".
    * See there for more information.
    */
-  const types::global_dof_index invalid_size_type =
+  constexpr types::global_dof_index invalid_size_type =
     static_cast<types::global_dof_index>(-1);
 
   /**
@@ -252,7 +257,7 @@ namespace numbers
    * @ref GlossInvalidValue "invalid value".
    * See there for more information.
    */
-  const types::fe_index invalid_fe_index = static_cast<types::fe_index>(-1);
+  constexpr types::fe_index invalid_fe_index = static_cast<types::fe_index>(-1);
 
   /**
    * An invalid value for indices of degrees of freedom.
@@ -261,7 +266,7 @@ namespace numbers
    * @ref GlossInvalidValue "invalid value".
    * See there for more information.
    */
-  const types::global_dof_index invalid_dof_index =
+  constexpr types::global_dof_index invalid_dof_index =
     static_cast<types::global_dof_index>(-1);
 
   /**
@@ -274,7 +279,7 @@ namespace numbers
    * @ref GlossInvalidValue "invalid value".
    * See there for more information.
    */
-  const types::coarse_cell_id invalid_coarse_cell_id =
+  constexpr types::coarse_cell_id invalid_coarse_cell_id =
     static_cast<types::coarse_cell_id>(-1);
 
   /**
@@ -286,7 +291,7 @@ namespace numbers
    * @ref GlossInvalidValue "invalid value".
    * See there for more information.
    */
-  const types::material_id invalid_material_id =
+  constexpr types::material_id invalid_material_id =
     static_cast<types::material_id>(-1);
 
   /**
@@ -301,7 +306,7 @@ namespace numbers
    * @see
    * @ref GlossBoundaryIndicator "Glossary entry on boundary indicators"
    */
-  const types::boundary_id invalid_boundary_id =
+  constexpr types::boundary_id invalid_boundary_id =
     static_cast<types::boundary_id>(-1);
 
   /**
@@ -321,7 +326,7 @@ namespace numbers
    * @see
    * @ref GlossBoundaryIndicator "Glossary entry on boundary indicators"
    */
-  const types::boundary_id internal_face_boundary_id =
+  constexpr types::boundary_id internal_face_boundary_id =
     static_cast<types::boundary_id>(-1);
 
   /**
@@ -334,18 +339,18 @@ namespace numbers
    * @see
    * @ref GlossManifoldIndicator "Glossary entry on manifold indicators"
    */
-  const types::manifold_id flat_manifold_id =
+  constexpr types::manifold_id flat_manifold_id =
     static_cast<types::manifold_id>(-1);
 
   /**
    * Value indicating that a face or line is in its default orientation.
    *
    * See the
-   * @ref GlossFaceOrientation "glossary"
+   * @ref GlossCombinedOrientation "glossary"
    * for more information.
    */
-  const types::geometric_orientation default_geometric_orientation =
-    static_cast<types::geometric_orientation>(0b001);
+  constexpr types::geometric_orientation default_geometric_orientation =
+    static_cast<types::geometric_orientation>(0b000);
 
   /**
    * Value indicating that a line is in the reverse orientation. Since lines can
@@ -354,11 +359,11 @@ namespace numbers
    * line orientations.
    *
    * See the
-   * @ref GlossFaceOrientation "glossary"
+   * @ref GlossCombinedOrientation "glossary"
    * for more information.
    */
-  const types::geometric_orientation reverse_line_orientation =
-    static_cast<types::geometric_orientation>(0b000);
+  constexpr types::geometric_orientation reverse_line_orientation =
+    static_cast<types::geometric_orientation>(0b001);
 
   /**
    * A special id for an invalid subdomain id. This value may not be used as a
@@ -373,7 +378,7 @@ namespace numbers
    * @ref GlossSubdomainId "glossary"
    * for more information.
    */
-  const types::subdomain_id invalid_subdomain_id =
+  constexpr types::subdomain_id invalid_subdomain_id =
     static_cast<types::subdomain_id>(-1);
 
   /**
@@ -394,7 +399,7 @@ namespace numbers
    * @ref GlossInvalidValue "invalid value".
    * See there for more information.
    */
-  const types::subdomain_id artificial_subdomain_id =
+  constexpr types::subdomain_id artificial_subdomain_id =
     static_cast<types::subdomain_id>(-2);
 } // namespace numbers
 

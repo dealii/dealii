@@ -31,7 +31,10 @@
 
 #include <deal.II/multigrid/mg_base.h>
 
+#include <boost/signals2.hpp>
+
 #include <vector>
+
 
 DEAL_II_NAMESPACE_OPEN
 

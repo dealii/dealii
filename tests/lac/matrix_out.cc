@@ -57,7 +57,7 @@ main()
       MatrixOut matrix_out;
       matrix_out.build_patches(sparse_matrix,
                                "sparse_matrix",
-                               MatrixOut::Options(true));
+                               MatrixOut::Options(true, 1, false, false));
       matrix_out.write_eps(logfile);
     };
 
@@ -73,7 +73,7 @@ main()
       MatrixOut matrix_out;
       matrix_out.build_patches(full_matrix,
                                "collated_matrix",
-                               MatrixOut::Options(false, 4));
+                               MatrixOut::Options(false, 4, false, false));
       matrix_out.write_gmv(logfile);
     };
 }

@@ -717,7 +717,7 @@ namespace TrilinosWrappers
       /**
        * Another copy function. This one takes a deal.II vector and copies it
        * into a TrilinosWrapper vector. Note that since we do not provide any
-       * Epetra_map that tells about the partitioning of the vector among the
+       * Epetra_Map that tells about the partitioning of the vector among the
        * MPI processes, the size of the TrilinosWrapper vector has to be the
        * same as the size of the input vector.
        */

@@ -19,27 +19,28 @@ try:
 except ImportError:
     from PyDealII.Release import *
 
+
 class TestQuadratureWrapper(unittest.TestCase):
-
     def test_gauss(self):
-        quadrature = Quadrature(dim = 3)
-        quadrature.create_gauss(n = 1);
+        quadrature = Quadrature(dim=3)
+        quadrature.create_gauss(n=1)
 
-        w_sum = 0.
+        w_sum = 0.0
         for weight in quadrature.weights():
             w_sum += weight
 
-        self.assertTrue(abs(1. - w_sum) < 1e-10)
+        self.assertTrue(abs(1.0 - w_sum) < 1e-10)
 
     def test_gauss_lobatto(self):
-        quadrature = Quadrature(dim = 3)
-        quadrature.create_gauss_lobatto(n = 2);
+        quadrature = Quadrature(dim=3)
+        quadrature.create_gauss_lobatto(n=2)
 
-        w_sum = 0.
+        w_sum = 0.0
         for weight in quadrature.weights():
             w_sum += weight
 
-        self.assertTrue(abs(1. - w_sum) < 1e-10)
+        self.assertTrue(abs(1.0 - w_sum) < 1e-10)
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     unittest.main()

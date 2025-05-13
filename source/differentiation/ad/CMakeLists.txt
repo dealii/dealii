@@ -12,28 +12,59 @@
 ##
 ## ------------------------------------------------------------------------
 
-set(_src
-  ad_drivers.cc
-  ad_helpers.cc
-  adolc_number_types.cc
-  sacado_number_types.cc
-  )
+set(_src)
+set(_inst)
 
-set(_inst
-  ad_drivers.inst.in
-  ad_drivers.inst1.in
-  ad_drivers.inst2.in
-  ad_helpers.inst.in
-  ad_helpers.inst1.in
-  ad_helpers.inst2.in
-  adolc_number_types.inst.in
-  sacado_number_types.inst1.in
-  sacado_number_types.inst2.in
-  )
+if (DEAL_II_WITH_ADOLC OR DEAL_II_TRILINOS_WITH_SACADO)
+  set(_src
+    ${_src}
+    ad_drivers.cc
+    ad_helpers.cc
+    )
 
-file(GLOB _header
+  set(_inst
+    ${_inst}
+    ad_drivers.inst.in
+    ad_drivers.inst1.in
+    ad_drivers.inst2.in
+    ad_helpers.inst.in
+    ad_helpers.inst1.in
+    ad_helpers.inst2.in
+    )
+endif()
+
+if(DEAL_II_WITH_ADOLC)
+  set(_src
+    ${_src}
+    adolc_number_types.cc
+    )
+
+  set(_inst
+    ${_inst}
+    adolc_number_types.inst.in
+    )
+endif()
+
+
+if(DEAL_II_TRILINOS_WITH_SACADO)
+  set(_src
+    ${_src}
+    sacado_number_types.cc
+    )
+
+  set(_inst
+    ${_inst}
+    sacado_number_types.inst1.in
+    sacado_number_types.inst2.in
+    )
+endif()
+
+
+file(GLOB _header CONFIGURE_DEPENDS
   ${CMAKE_SOURCE_DIR}/include/deal.II/differentiation/ad/*.h
   )
 
 define_object_library(object_differentiation_ad OBJECT ${_src} ${_header} ${_inst})
 expand_instantiations(object_differentiation_ad "${_inst}")
+
+collect_source_and_header_files("${_src}" "${_header}")

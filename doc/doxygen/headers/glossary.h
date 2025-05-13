@@ -1013,49 +1013,46 @@
  * p4est paper listed at their website.
  * </dd>
  *
+ * <dt class="glossary">@anchor GlossCombinedOrientation <b>Combined
+ * orientation</b></dt>
+ * <dd>
+ * A Triangulation contains cells as well as lower dimensional objects such as
+ * faces (which are either lines in 2d or quadrilaterals or triangles in 3d). In
+ * general, the vertices of each cell are numbered in a way which results in a
+ * mapping with a positive Jacobian. A consequence of this choice is that the
+ * vertices which define a face may be, from the perspective of an arbitrary
+ * cell, in a different order than the order given to that face by the
+ * neighboring cell. To resolve this inconsistency deal.II stores, for each face
+ * and (in 3d) line, a value which may be used to permute the vertices on both
+ * faces into a matching configuration. This encoding contains both the number
+ * of times a face should be rotated (relative to its neighbor) as well as
+ * whether or not the face should be viewed in an opposite orientation (e.g.,
+ * for a Quadrilateral, whether or not vertices $1$ and $2$ should be swapped).
  *
- * <dt class="glossary">@anchor GlossFaceOrientation <b>Face orientation</b></dt>
- * <dd>In a triangulation, the normal vector to a face
- * can be deduced from the face orientation by
- * applying the right hand side rule (x,y -> normal).  We note, that
- * in the standard orientation of faces in 2d, faces 0 and 2 have
- * normals that point into the cell, and faces 1 and 3 have normals
- * pointing outward. In 3d, faces 0, 2, and 4
- * have normals that point into the cell, while the normals of faces
- * 1, 3, and 5 point outward. This information, again, can be queried from
- * GeometryInfo<dim>::unit_normal_orientation.
+ * This value is called the <em>combined_orientation</em> since it combines both
+ * the orientation (as defined above) as well as rotations. In some
+ * circumstances, to disambiguate between faces and lines, it may alternatively
+ * be called either the `combined_face_orientation` or the
+ * `combined_line_orientation`. These orientations are represented by
+ * types::geometric_orientation, which encodes how the vertices of the canonical
+ * definition of a face should be permuted so that they equal the current cell's
+ * definition of that face. The binary encoding (which is usually represented as
+ * a decomposition of three booleans called orientation, rotation, and flip) of
+ * that permutation is an internal library detail and is documented in
+ * @ref reordering "the cell reordering page".
+ * The default value (which corresponds to the identity permutation) is
+ * numbers::default_geometric_orientation. As lines only have two possible
+ * orientations (i.e., the vertices are either in the same order as the
+ * canonical line or are swapped), the other orientation is encoded as
+ * numbers::reverse_line_orientation.
  *
- * However, it turns out that a significant number of 3d meshes cannot
- * satisfy this convention. This is due to the fact that the face
- * convention for one cell already implies something for the
- * neighbor, since they share a common face and fixing it for the
- * first cell also fixes the normal vectors of the opposite faces of
- * both cells. It is easy to construct cases of loops of cells for
- * which this leads to cases where we cannot find orientations for
- * all faces that are consistent with this convention.
- *
- * For this reason, above convention is only what we call the
- * <em>standard orientation</em>. deal.II actually allows faces in 3d
- * to have either the standard direction, or its opposite, in which
- * case the lines that make up a cell would have reverted orders, and
- * the normal vector would have the opposite direction. You can ask a
- * cell whether a given face has standard orientation by calling
- * <tt>cell->face_orientation(face_no)</tt>: if the result is @p true,
- * then the face has standard orientation, otherwise its normal vector
- * is pointing the other direction. There are not very many places in
- * application programs where you need this information actually, but
- * a few places in the library make use of this. Note that in 2d, the
- * result is always @p true. However, while every face in 2d is always
- * in standard orientation, you can sometimes specify something to
- * assume that this is not so; an example is the function
- * DoFTools::make_periodicity_constraints().
- *
- * There are two other flags that describe the orientation of a face:
- * face_flip and face_rotation. Some documentation for these
- * exists in the GeometryInfo class. An example of their use in user
- * code is given in the DoFTools::make_periodicity_constraints function.
+ * These values are taken into consideration by deal.II classes (such as
+ * QProjector) to ensure that quantities computed on two adjacent cells use the
+ * same quadrature points and shape function orderings. Unless you are working
+ * on deal.II internals or new FiniteElement classes, it is not necessary to
+ * consider these values. In practice, essentially no applications dependent on
+ * deal.II ever need to handle orientation problems.
  * </dd>
- *
  *
  * <dt class="glossary">@anchor GlossGeneralizedSupport <b>Generalized support points</b></dt>
  * <dd>"Generalized support points" are, as the name suggests, a
@@ -2451,7 +2448,8 @@
  *     [line search algorithms](https://en.wikipedia.org/wiki/Line_search)
  *     where using a shorter step length might actually succeed.) In such
  *     cases, a user-provided callback function should throw an exception
- *     of type RecoverableUserCallbackError, which will then internally be
+ *     of type StandardExceptions::RecoverableUserCallbackError,
+ *     which will then internally be
  *     translated into an appropriate code understandable by the underlying
  *     library. It is worthwhile pointing out that a user callback throwing
  *     a "recoverable" exception does not actually guarantee that the

@@ -504,7 +504,7 @@ namespace Step81
     GridGenerator::hyper_cube(triangulation, -scaling, scaling);
     triangulation.refine_global(refinements);
 
-    if (!absorbing_boundary)
+    if (absorbing_boundary)
       {
         for (auto &face : triangulation.active_face_iterators())
           if (face->at_boundary())
@@ -710,6 +710,11 @@ namespace Step81
         // \f}
         // respectively. The test variables and the PML are implemented
         // similarly as the domain.
+        //
+        // If we are at the domain boundary $\partial\Omega$ and absorbing
+        // boundary conditions are set (<code>id == 1</code>) we assemble
+        // the corresponding boundary term:
+        //
         const FEValuesExtractors::Vector real_part(0);
         const FEValuesExtractors::Vector imag_part(dim);
         for (const auto &face : cell->face_iterators())
@@ -717,7 +722,7 @@ namespace Step81
             if (face->at_boundary())
               {
                 const auto id = face->boundary_id();
-                if (id != 0)
+                if (id == 1)
                   {
                     fe_face_values.reinit(cell, face);
 

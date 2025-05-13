@@ -36,6 +36,8 @@
 
 #include <boost/range/iterator_range.hpp>
 #include <boost/serialization/map.hpp>
+#include <boost/signals2.hpp>
+
 
 DEAL_II_NAMESPACE_OPEN
 

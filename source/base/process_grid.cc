@@ -71,7 +71,6 @@ namespace
     //  ++Pc;
     // but this affects the grid shape dramatically, i.e. 10 cores 3x3 becomes
     // 2x5.
-
     // limit our estimate to be in [2, Np]
     int n_process_columns = std::min(Np, std::max(2, Pc));
     // finally, get the rows:
@@ -195,12 +194,13 @@ namespace Utilities
       AssertThrowMPI(ierr);
 
       // Double check that the process with rank 0 in subgroup is active:
-#  ifdef DEBUG
-      if (mpi_communicator_inactive_with_root != MPI_COMM_NULL &&
-          Utilities::MPI::this_mpi_process(
-            mpi_communicator_inactive_with_root) == 0)
-        Assert(mpi_process_is_active, ExcInternalError());
-#  endif
+      if constexpr (running_in_debug_mode())
+        {
+          if (mpi_communicator_inactive_with_root != MPI_COMM_NULL &&
+              Utilities::MPI::this_mpi_process(
+                mpi_communicator_inactive_with_root) == 0)
+            Assert(mpi_process_is_active, ExcInternalError());
+        }
     }
 
 

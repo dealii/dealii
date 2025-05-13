@@ -12,21 +12,31 @@
 ##
 ## ------------------------------------------------------------------------
 
-set(_src
-  arkode.cc
-  ida.cc
-  kinsol.cc
-  n_vector.cc
-  sunlinsol_wrapper.cc
-  )
 
-set(_inst
-  n_vector.inst.in
-  )
+set(_src)
+set(_inst)
 
-file(GLOB _header
+if (DEAL_II_WITH_SUNDIALS)
+  set(_src
+    ${_src}
+    arkode.cc
+    ida.cc
+    kinsol.cc
+    n_vector.cc
+    sunlinsol_wrapper.cc
+    )
+
+  set(_inst
+    ${_inst}
+    n_vector.inst.in
+    )
+endif()
+
+file(GLOB _header CONFIGURE_DEPENDS
   ${CMAKE_SOURCE_DIR}/include/deal.II/sundials/*.h
   )
 
 define_object_library(object_sundials OBJECT ${_src} ${_header} ${_inst})
 expand_instantiations(object_sundials "${_inst}")
+
+collect_source_and_header_files("${_src}" "${_header}")

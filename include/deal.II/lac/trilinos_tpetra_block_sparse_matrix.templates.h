@@ -98,32 +98,33 @@ namespace LinearAlgebra
       const MPI_Comm                  communicator,
       const bool                      exchange_data)
     {
-#  ifdef DEBUG
-      std::vector<typename TpetraTypes::MapType<MemorySpace>> tpetra_maps;
-      for (size_type i = 0; i < block_sparsity_pattern.n_block_rows(); ++i)
-        tpetra_maps.push_back(
-          parallel_partitioning[i]
-            .template make_tpetra_map<
-              typename TpetraTypes::NodeType<MemorySpace>>(communicator,
-                                                           false));
+      if constexpr (running_in_debug_mode())
+        {
+          std::vector<typename TpetraTypes::MapType<MemorySpace>> tpetra_maps;
+          for (size_type i = 0; i < block_sparsity_pattern.n_block_rows(); ++i)
+            tpetra_maps.push_back(
+              parallel_partitioning[i]
+                .template make_tpetra_map<
+                  typename TpetraTypes::NodeType<MemorySpace>>(communicator,
+                                                               false));
 
-      Assert(tpetra_maps.size() == block_sparsity_pattern.n_block_rows(),
-             ExcDimensionMismatch(tpetra_maps.size(),
-                                  block_sparsity_pattern.n_block_rows()));
-      Assert(tpetra_maps.size() == block_sparsity_pattern.n_block_cols(),
-             ExcDimensionMismatch(tpetra_maps.size(),
-                                  block_sparsity_pattern.n_block_cols()));
+          Assert(tpetra_maps.size() == block_sparsity_pattern.n_block_rows(),
+                 ExcDimensionMismatch(tpetra_maps.size(),
+                                      block_sparsity_pattern.n_block_rows()));
+          Assert(tpetra_maps.size() == block_sparsity_pattern.n_block_cols(),
+                 ExcDimensionMismatch(tpetra_maps.size(),
+                                      block_sparsity_pattern.n_block_cols()));
 
-      const size_type n_block_rows = tpetra_maps.size();
-      (void)n_block_rows;
+          const size_type n_block_rows = tpetra_maps.size();
+          (void)n_block_rows;
 
-      Assert(n_block_rows == block_sparsity_pattern.n_block_rows(),
-             ExcDimensionMismatch(n_block_rows,
-                                  block_sparsity_pattern.n_block_rows()));
-      Assert(n_block_rows == block_sparsity_pattern.n_block_cols(),
-             ExcDimensionMismatch(n_block_rows,
-                                  block_sparsity_pattern.n_block_cols()));
-#  endif
+          Assert(n_block_rows == block_sparsity_pattern.n_block_rows(),
+                 ExcDimensionMismatch(n_block_rows,
+                                      block_sparsity_pattern.n_block_rows()));
+          Assert(n_block_rows == block_sparsity_pattern.n_block_cols(),
+                 ExcDimensionMismatch(n_block_rows,
+                                      block_sparsity_pattern.n_block_cols()));
+        }
 
 
       // Call the other basic reinit function, ...

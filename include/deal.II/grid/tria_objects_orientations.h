@@ -198,7 +198,7 @@ namespace internal
     TriaObjectsOrientations::get_orientation(const unsigned int object) const
     {
       AssertIndexRange(object, n_stored_objects);
-      return Utilities::get_bit(object_orientations[object], 0);
+      return !Utilities::get_bit(object_orientations[object], 0);
     }
 
 

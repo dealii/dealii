@@ -45,6 +45,7 @@ DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
 #  include <CGAL/Projection_traits_xy_3.h>
 #  include <CGAL/Segment_3.h>
 #  include <CGAL/Simple_cartesian.h>
+#  include <CGAL/Surface_mesh/Surface_mesh.h>
 #  include <CGAL/Tetrahedron_3.h>
 #  include <CGAL/Triangle_2.h>
 #  include <CGAL/Triangle_3.h>
@@ -865,7 +866,15 @@ namespace CGALWrappers
       vertices0, vertices1, tol);
   }
 
-#  include "intersections.inst"
+// Explicit instantiations.
+//
+// We don't build the instantiations.inst file if deal.II isn't
+// configured with CGAL, but doxygen doesn't know that and tries to
+// find that file anyway for parsing -- which then of course it fails
+// on. So exclude the following from doxygen consideration.
+#  ifndef DOXYGEN
+#    include "cgal/intersections.inst"
+#  endif
 
 } // namespace CGALWrappers
 

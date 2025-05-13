@@ -24,6 +24,8 @@
 
 #include <deal.II/lac/vector_memory.h>
 
+#include <Kokkos_Core.hpp>
+
 #include <memory>
 
 DEAL_II_NAMESPACE_OPEN

@@ -19,6 +19,7 @@
 #include <deal.II/base/config.h>
 
 #include <deal.II/base/exceptions.h>
+#include <deal.II/base/types.h>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -149,39 +150,39 @@ namespace LAPACKSupport
   /**
    * Character constant.
    */
-  static const char A = 'A';
+  constexpr char A = 'A';
   /**
    * Character constant.
    */
-  static const char N = 'N';
+  constexpr char N = 'N';
   /**
    * Character constant.
    */
-  static const char O = 'O';
+  constexpr char O = 'O';
   /**
    * Character constant.
    */
-  static const char T = 'T';
+  constexpr char T = 'T';
   /**
    * Character constant.
    */
-  static const char U = 'U';
+  constexpr char U = 'U';
   /**
    * Character constant.
    */
-  static const char L = 'L';
+  constexpr char L = 'L';
   /**
    * Character constant.
    */
-  static const char V = 'V';
+  constexpr char V = 'V';
   /**
    * Integer constant.
    */
-  static const types::blas_int zero = 0;
+  constexpr types::blas_int zero = 0;
   /**
    * Integer constant.
    */
-  static const types::blas_int one = 1;
+  constexpr types::blas_int one = 1;
 
   /**
    * A LAPACK function returned an error code.

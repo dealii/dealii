@@ -1,0 +1,19 @@
+set Function norm stopping tolerance       = 0.000000
+set Maximum number of nonlinear iterations = 5
+set Scaled step stopping tolerance         = 0.000000
+set Solution strategy                      = newton
+
+subsection Fixed point and Picard parameters
+  set Anderson acceleration subspace size = 5
+end
+
+subsection Linesearch parameters
+  set Maximum number of beta-condition failures = 0
+end
+
+subsection Newton parameters
+  set Maximum allowable scaled length of the Newton step = 0.000000
+  set Maximum iterations without matrix setup            = 0
+  set No initial matrix setup                            = false
+  set Relative error for different quotient computation  = 0.000000
+end

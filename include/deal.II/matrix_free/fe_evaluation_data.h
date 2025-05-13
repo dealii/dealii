@@ -102,7 +102,7 @@ namespace internal
  * quadrature dimension the same as the space dimension) or for a face
  * integrator (with quadrature dimension one less)
  *
- * @tparam VectorizedArrayType Type of array to be woked on in a vectorized
+ * @tparam VectorizedArrayType Type of array to be worked on in a vectorized
  *                             fashion, defaults to VectorizedArray<Number>
  *
  * @note Currently only VectorizedArray<Number, width> is supported as
@@ -497,10 +497,11 @@ public:
   const std::array<unsigned int, n_lanes> &
   get_cell_ids() const
   {
-// implemented inline to avoid compilation problems on Windows
-#ifdef DEBUG
-    Assert(is_reinitialized, ExcNotInitialized());
-#endif
+    // implemented inline to avoid compilation problems on Windows
+    if constexpr (running_in_debug_mode())
+      {
+        Assert(is_reinitialized, ExcNotInitialized());
+      }
     return cell_ids;
   }
 
@@ -511,10 +512,11 @@ public:
   const std::array<unsigned int, n_lanes> &
   get_face_ids() const
   {
-// implemented inline to avoid compilation problems on Windows
-#ifdef DEBUG
-    Assert(is_reinitialized && is_face, ExcNotInitialized());
-#endif
+    // implemented inline to avoid compilation problems on Windows
+    if constexpr (running_in_debug_mode())
+      {
+        Assert(is_reinitialized && is_face, ExcNotInitialized());
+      }
     return face_ids;
   }
 
@@ -525,10 +527,11 @@ public:
   unsigned int
   get_cell_or_face_batch_id() const
   {
-// implemented inline to avoid compilation problems on Windows
-#ifdef DEBUG
-    Assert(is_reinitialized, ExcNotInitialized());
-#endif
+    // implemented inline to avoid compilation problems on Windows
+    if constexpr (running_in_debug_mode())
+      {
+        Assert(is_reinitialized, ExcNotInitialized());
+      }
 
     return cell;
   }
@@ -540,10 +543,11 @@ public:
   const std::array<unsigned int, n_lanes> &
   get_cell_or_face_ids() const
   {
-// implemented inline to avoid compilation problems on Windows
-#ifdef DEBUG
-    Assert(is_reinitialized, ExcNotInitialized());
-#endif
+    // implemented inline to avoid compilation problems on Windows
+    if constexpr (running_in_debug_mode())
+      {
+        Assert(is_reinitialized, ExcNotInitialized());
+      }
 
     if (!is_face || dof_access_index ==
                       internal::MatrixFreeFunctions::DoFInfo::dof_access_cell)
@@ -1082,7 +1086,9 @@ inline FEEvaluationData<dim, Number, is_face>::FEEvaluationData(
   , subface_index(0)
   , cell_type(internal::MatrixFreeFunctions::general)
   , divergence_is_requested(false)
-{}
+{
+  Assert(!data->data.empty(), ExcInternalError());
+}
 
 
 
@@ -1158,15 +1164,16 @@ FEEvaluationData<dim, Number, is_face>::operator=(const FEEvaluationData &other)
   quadrature_points              = nullptr;
   quadrature_weights             = other.quadrature_weights;
 
-#  ifdef DEBUG
-  is_reinitialized           = false;
-  dof_values_initialized     = false;
-  values_quad_initialized    = false;
-  gradients_quad_initialized = false;
-  hessians_quad_initialized  = false;
-  values_quad_submitted      = false;
-  gradients_quad_submitted   = false;
-#  endif
+  if constexpr (running_in_debug_mode())
+    {
+      is_reinitialized           = false;
+      dof_values_initialized     = false;
+      values_quad_initialized    = false;
+      gradients_quad_initialized = false;
+      hessians_quad_initialized  = false;
+      values_quad_submitted      = false;
+      gradients_quad_submitted   = false;
+    }
 
   cell          = numbers::invalid_unsigned_int;
   interior_face = other.is_interior_face();
@@ -1194,6 +1201,9 @@ FEEvaluationData<dim, Number, is_face>::set_data_pointers(
   const unsigned int     n_components)
 {
   Assert(scratch_data_array != nullptr, ExcInternalError());
+  Assert(data != nullptr, ExcInternalError());
+  Assert(!data->data.empty(), ExcInternalError());
+
 
   const unsigned int tensor_dofs_per_component =
     Utilities::fixed_power<dim>(data->data.front().fe_degree + 1);
@@ -1201,7 +1211,7 @@ FEEvaluationData<dim, Number, is_face>::set_data_pointers(
 
   const unsigned int size_scratch_data =
     std::max(tensor_dofs_per_component + 1, dofs_per_component) * n_components *
-      3 +
+      4 +
     2 * n_quadrature_points;
   const unsigned int size_data_arrays =
     n_components * dofs_per_component +
@@ -1211,13 +1221,16 @@ FEEvaluationData<dim, Number, is_face>::set_data_pointers(
   // include 12 extra fields to insert some padding between values, gradients
   // and hessians, which helps to reduce the probability of cache conflicts
   const unsigned int allocated_size = size_scratch_data + size_data_arrays + 12;
-#  ifdef DEBUG
-  scratch_data_array->clear();
-  scratch_data_array->resize(allocated_size,
-                             Number(numbers::signaling_nan<ScalarNumber>()));
-#  else
-  scratch_data_array->resize_fast(allocated_size);
-#  endif
+  if constexpr (running_in_debug_mode())
+    {
+      scratch_data_array->clear();
+      scratch_data_array->resize(
+        allocated_size, Number(numbers::signaling_nan<ScalarNumber>()));
+    }
+  else
+    {
+      scratch_data_array->resize_fast(allocated_size);
+    }
   scratch_data.reinit(scratch_data_array->begin() + size_data_arrays + 12,
                       size_scratch_data);
 
@@ -1386,9 +1399,10 @@ template <int dim, typename Number, bool is_face>
 inline Number *
 FEEvaluationData<dim, Number, is_face>::begin_dof_values()
 {
-#  ifdef DEBUG
-  dof_values_initialized = true;
-#  endif
+  if constexpr (running_in_debug_mode())
+    {
+      dof_values_initialized = true;
+    }
   return values_dofs;
 }
 
@@ -1398,9 +1412,11 @@ template <int dim, typename Number, bool is_face>
 inline const Number *
 FEEvaluationData<dim, Number, is_face>::begin_values() const
 {
-#  ifdef DEBUG
-  Assert(values_quad_initialized || values_quad_submitted, ExcNotInitialized());
-#  endif
+  if constexpr (running_in_debug_mode())
+    {
+      Assert(values_quad_initialized || values_quad_submitted,
+             ExcNotInitialized());
+    }
   return values_quad;
 }
 
@@ -1410,10 +1426,11 @@ template <int dim, typename Number, bool is_face>
 inline Number *
 FEEvaluationData<dim, Number, is_face>::begin_values()
 {
-#  ifdef DEBUG
-  values_quad_initialized = true;
-  values_quad_submitted   = true;
-#  endif
+  if constexpr (running_in_debug_mode())
+    {
+      values_quad_initialized = true;
+      values_quad_submitted   = true;
+    }
   return values_quad;
 }
 
@@ -1423,10 +1440,11 @@ template <int dim, typename Number, bool is_face>
 inline const Number *
 FEEvaluationData<dim, Number, is_face>::begin_gradients() const
 {
-#  ifdef DEBUG
-  Assert(gradients_quad_initialized || gradients_quad_submitted,
-         ExcNotInitialized());
-#  endif
+  if constexpr (running_in_debug_mode())
+    {
+      Assert(gradients_quad_initialized || gradients_quad_submitted,
+             ExcNotInitialized());
+    }
   return gradients_quad;
 }
 
@@ -1436,10 +1454,11 @@ template <int dim, typename Number, bool is_face>
 inline Number *
 FEEvaluationData<dim, Number, is_face>::begin_gradients()
 {
-#  ifdef DEBUG
-  gradients_quad_submitted   = true;
-  gradients_quad_initialized = true;
-#  endif
+  if constexpr (running_in_debug_mode())
+    {
+      gradients_quad_submitted   = true;
+      gradients_quad_initialized = true;
+    }
   return gradients_quad;
 }
 
@@ -1449,9 +1468,10 @@ template <int dim, typename Number, bool is_face>
 inline const Number *
 FEEvaluationData<dim, Number, is_face>::begin_hessians() const
 {
-#  ifdef DEBUG
-  Assert(hessians_quad_initialized, ExcNotInitialized());
-#  endif
+  if constexpr (running_in_debug_mode())
+    {
+      Assert(hessians_quad_initialized, ExcNotInitialized());
+    }
   return hessians_quad;
 }
 
@@ -1461,9 +1481,10 @@ template <int dim, typename Number, bool is_face>
 inline Number *
 FEEvaluationData<dim, Number, is_face>::begin_hessians()
 {
-#  ifdef DEBUG
-  hessians_quad_initialized = true;
-#  endif
+  if constexpr (running_in_debug_mode())
+    {
+      hessians_quad_initialized = true;
+    }
   return hessians_quad;
 }
 
@@ -1490,9 +1511,10 @@ template <int dim, typename Number, bool is_face>
 inline internal::MatrixFreeFunctions::GeometryType
 FEEvaluationData<dim, Number, is_face>::get_cell_type() const
 {
-#  ifdef DEBUG
-  Assert(is_reinitialized, ExcNotInitialized());
-#  endif
+  if constexpr (running_in_debug_mode())
+    {
+      Assert(is_reinitialized, ExcNotInitialized());
+    }
   return cell_type;
 }
 
@@ -1653,7 +1675,8 @@ template <int dim, typename Number, bool is_face>
 inline std_cxx20::ranges::iota_view<unsigned int, unsigned int>
 FEEvaluationData<dim, Number, is_face>::quadrature_point_indices() const
 {
-  return {0U, n_quadrature_points};
+  return std_cxx20::ranges::iota_view<unsigned int, unsigned int>(
+    0U, n_quadrature_points);
 }
 
 

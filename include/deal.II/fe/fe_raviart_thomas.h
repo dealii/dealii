@@ -226,7 +226,7 @@ private:
    * faces. These are given in the form three flags (face_orientation,
    * face_flip, face_rotation), see the documentation in GeometryInfo<dim> and
    * this
-   * @ref GlossFaceOrientation "glossary entry on face orientation".
+   * @ref GlossCombinedOrientation "glossary entry on face orientations".
    *
    * <h3>Example: Raviart-Thomas Elements of order 2 (tensor polynomial
    * degree 3)</h3>

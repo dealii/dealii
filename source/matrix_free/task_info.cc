@@ -1136,12 +1136,13 @@ namespace internal
       cell_partition_data.push_back(n_cell_batches + n_ghost_batches);
       partition_row_index.back() = cell_partition_data.size() - 1;
 
-#ifdef DEBUG
-      std::vector<unsigned int> renumber_cpy(renumbering);
-      std::sort(renumber_cpy.begin(), renumber_cpy.end());
-      for (unsigned int i = 0; i < renumber_cpy.size(); ++i)
-        AssertDimension(i, renumber_cpy[i]);
-#endif
+      if constexpr (running_in_debug_mode())
+        {
+          std::vector<unsigned int> renumber_cpy(renumbering);
+          std::sort(renumber_cpy.begin(), renumber_cpy.end());
+          for (unsigned int i = 0; i < renumber_cpy.size(); ++i)
+            AssertDimension(i, renumber_cpy[i]);
+        }
     }
 
 
@@ -1302,15 +1303,16 @@ namespace internal
 
       partition_list = renumbering;
 
-#ifdef DEBUG
-      // in debug mode, check that the partition color list is one-to-one
-      {
-        std::vector<unsigned int> sorted_pc_list(partition_color_list);
-        std::sort(sorted_pc_list.begin(), sorted_pc_list.end());
-        for (unsigned int i = 0; i < sorted_pc_list.size(); ++i)
-          Assert(sorted_pc_list[i] == i, ExcInternalError());
-      }
-#endif
+      if constexpr (running_in_debug_mode())
+        {
+          // in debug mode, check that the partition color list is one-to-one
+          {
+            std::vector<unsigned int> sorted_pc_list(partition_color_list);
+            std::sort(sorted_pc_list.begin(), sorted_pc_list.end());
+            for (unsigned int i = 0; i < sorted_pc_list.size(); ++i)
+              Assert(sorted_pc_list[i] == i, ExcInternalError());
+          }
+        }
 
       // set the start list for each block and compute the renumbering of
       // cells
@@ -1369,14 +1371,15 @@ namespace internal
       AssertDimension(counter_macro, n_cell_batches);
 
       // check that the renumbering is one-to-one
-#ifdef DEBUG
-      {
-        std::vector<unsigned int> sorted_renumbering(renumbering);
-        std::sort(sorted_renumbering.begin(), sorted_renumbering.end());
-        for (unsigned int i = 0; i < sorted_renumbering.size(); ++i)
-          Assert(sorted_renumbering[i] == i, ExcInternalError());
-      }
-#endif
+      if constexpr (running_in_debug_mode())
+        {
+          {
+            std::vector<unsigned int> sorted_renumbering(renumbering);
+            std::sort(sorted_renumbering.begin(), sorted_renumbering.end());
+            for (unsigned int i = 0; i < sorted_renumbering.size(); ++i)
+              Assert(sorted_renumbering[i] == i, ExcInternalError());
+          }
+        }
 
 
       update_task_info(
@@ -1483,15 +1486,16 @@ namespace internal
                                                       partition_2layers_list);
         }
 
-        // in debug mode, check that the partition_2layers_list is one-to-one
-#ifdef DEBUG
-      {
-        std::vector<unsigned int> sorted_pc_list(partition_2layers_list);
-        std::sort(sorted_pc_list.begin(), sorted_pc_list.end());
-        for (unsigned int i = 0; i < sorted_pc_list.size(); ++i)
-          Assert(sorted_pc_list[i] == i, ExcInternalError());
-      }
-#endif
+      // in debug mode, check that the partition_2layers_list is one-to-one
+      if constexpr (running_in_debug_mode())
+        {
+          {
+            std::vector<unsigned int> sorted_pc_list(partition_2layers_list);
+            std::sort(sorted_pc_list.begin(), sorted_pc_list.end());
+            for (unsigned int i = 0; i < sorted_pc_list.size(); ++i)
+              Assert(sorted_pc_list[i] == i, ExcInternalError());
+          }
+        }
 
       // Set the new renumbering
       std::vector<unsigned int> renumbering_in(n_active_cells, 0);
@@ -1566,14 +1570,15 @@ namespace internal
           AssertDimension(counter, n_active_cells);
           AssertDimension(counter_macro, n_cell_batches);
           // check that the renumbering is one-to-one
-#ifdef DEBUG
-          {
-            std::vector<unsigned int> sorted_renumbering(renumbering);
-            std::sort(sorted_renumbering.begin(), sorted_renumbering.end());
-            for (unsigned int i = 0; i < sorted_renumbering.size(); ++i)
-              Assert(sorted_renumbering[i] == i, ExcInternalError());
-          }
-#endif
+          if constexpr (running_in_debug_mode())
+            {
+              {
+                std::vector<unsigned int> sorted_renumbering(renumbering);
+                std::sort(sorted_renumbering.begin(), sorted_renumbering.end());
+                for (unsigned int i = 0; i < sorted_renumbering.size(); ++i)
+                  Assert(sorted_renumbering[i] == i, ExcInternalError());
+              }
+            }
         }
 
       // Update the task_info with the more information for the thread graph.

@@ -37,17 +37,17 @@ def filename_generator(suffix):
                     yield root + "/" + file_name
 
 
-filenames = itertools.chain(filename_generator(".h"),
-                            filename_generator(".cc"),
-                            filename_generator(".html"))
+filenames = itertools.chain(
+    filename_generator(".h"), filename_generator(".cc"), filename_generator(".html")
+)
 
 return_code = 0
 for filename in filenames:
-    file_handle = io.open(filename, encoding='utf-8')
+    file_handle = io.open(filename, encoding="utf-8")
     try:
         file_handle.read()
     except UnicodeDecodeError:
-        print(filename + ' is not encoded with UTF-8')
+        print(filename + " is not encoded with UTF-8")
         return_code = 1
     finally:
         file_handle.close()

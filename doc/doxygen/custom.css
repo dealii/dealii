@@ -79,6 +79,19 @@ div.image img[src="fe_enriched_h-refinement.png"] {
 }
 
 /*
+ * environment for aligning pictures in four columns.
+ */
+.fourcolumn {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr 1fr;
+  grid-column-gap: 25px;
+  grid-row-gap: 25px;
+  margin-left: auto;
+  margin-right: auto;
+  margin-bottom: 25px;
+}
+
+/*
  * environment for aligning pictures in three columns.
  */
 .threecolumn {

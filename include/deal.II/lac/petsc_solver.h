@@ -20,6 +20,7 @@
 
 #ifdef DEAL_II_WITH_PETSC
 
+#  include <deal.II/base/mpi_stub.h>
 #  include <deal.II/base/observer_pointer.h>
 
 #  include <deal.II/lac/exceptions.h>
@@ -27,9 +28,6 @@
 
 #  include <petscksp.h>
 
-#  ifdef DEAL_II_WITH_SLEPC
-#    include <deal.II/lac/slepc_spectral_transformation.h>
-#  endif
 
 DEAL_II_NAMESPACE_OPEN
 

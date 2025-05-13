@@ -14,8 +14,10 @@
 
 #include <deal.II/base/config.h>
 
+#include <deal.II/base/exceptions.h>
 #include <deal.II/base/polynomials_barycentric.h>
 #include <deal.II/base/qprojector.h>
+#include <deal.II/base/types.h>
 
 #include <deal.II/fe/fe_dgq.h>
 #include <deal.II/fe/fe_nothing.h>
@@ -25,6 +27,7 @@
 #include <deal.II/fe/mapping.h>
 
 #include <deal.II/grid/grid_generator.h>
+#include <deal.II/grid/tria_orientation.h>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -437,6 +440,140 @@ FE_SimplexPoly<dim, spacedim>::get_prolongation_matrix(
 
 
 template <int dim, int spacedim>
+unsigned int
+FE_SimplexPoly<dim, spacedim>::face_to_cell_index(
+  const unsigned int                 face_dof_index,
+  const unsigned int                 face,
+  const types::geometric_orientation combined_orientation) const
+{
+  // Function largely lifted from FE_Q_Base::face_to_cell_index()
+  AssertIndexRange(face_dof_index, this->n_dofs_per_face(face));
+  AssertIndexRange(face, this->reference_cell().n_faces());
+
+  // TODO: once the default orientation is switched to 0 then we can remove this
+  // special case for 1D.
+  if (dim == 1)
+    Assert(combined_orientation == numbers::default_geometric_orientation,
+           ExcMessage("In 1D, all faces must have the default orientation."));
+  else
+    AssertIndexRange(combined_orientation,
+                     this->reference_cell().n_face_orientations(face));
+
+  // we need to distinguish between DoFs on vertices, lines and in 3d quads.
+  // do so in a sequence of if-else statements
+  if (face_dof_index < this->get_first_face_line_index(face))
+    // DoF is on a vertex
+    {
+      // get the number of the vertex on the face that corresponds to this DoF,
+      // along with the number of the DoF on this vertex
+      const unsigned int face_vertex =
+        face_dof_index / this->n_dofs_per_vertex();
+      const unsigned int dof_index_on_vertex =
+        face_dof_index % this->n_dofs_per_vertex();
+
+      // then get the number of this vertex on the cell and translate
+      // this to a DoF number on the cell
+      return this->reference_cell().face_to_cell_vertices(
+               face, face_vertex, combined_orientation) *
+               this->n_dofs_per_vertex() +
+             dof_index_on_vertex;
+    }
+  else if (face_dof_index < this->get_first_face_quad_index(face))
+    // DoF is on a line
+    {
+      // do the same kind of translation as before. we need to only consider
+      // DoFs on the lines, i.e., ignoring those on the vertices
+      const unsigned int index =
+        face_dof_index - this->get_first_face_line_index(face);
+
+      const unsigned int face_line         = index / this->n_dofs_per_line();
+      const unsigned int dof_index_on_line = index % this->n_dofs_per_line();
+
+      // we now also need to adjust the line index for the case of
+      // face orientation, face flips, etc
+      unsigned int adjusted_dof_index_on_line = 0;
+      switch (dim)
+        {
+          case 1:
+            DEAL_II_ASSERT_UNREACHABLE();
+            break;
+
+          case 2:
+            if (combined_orientation == numbers::default_geometric_orientation)
+              adjusted_dof_index_on_line = dof_index_on_line;
+            else
+              adjusted_dof_index_on_line =
+                this->n_dofs_per_line() - dof_index_on_line - 1;
+            break;
+
+          case 3:
+            // in 3d, things are difficult. someone will have to think
+            // about how this code here should look like, by drawing a bunch
+            // of pictures of how all the faces can look like with the various
+            // flips and rotations.
+            //
+            // that said, we can implement a couple other situations easily:
+            // if the face orientation is
+            // numbers::default_combined_face_orientation then things are
+            // simple. Likewise if the face orientation is
+            // internal::combined_face_orientation(false,false,false) then we
+            // just know we need to reverse the DoF order on each line.
+            //
+            // this at least allows for tetrahedral meshes where periodic face
+            // pairs are each in one of the two above configurations. Doing so
+            // may turn out to be always possible or it may not, but at least
+            // this is less restrictive.
+            Assert((this->n_dofs_per_line() <= 1) ||
+                     combined_orientation ==
+                       numbers::default_geometric_orientation ||
+                     combined_orientation ==
+                       internal::combined_face_orientation(false, false, false),
+                   ExcNotImplemented());
+
+            if (combined_orientation == numbers::default_geometric_orientation)
+              {
+                adjusted_dof_index_on_line = dof_index_on_line;
+              }
+            else
+              {
+                adjusted_dof_index_on_line =
+                  this->n_dofs_per_line() - dof_index_on_line - 1;
+              }
+            break;
+
+          default:
+            DEAL_II_ASSERT_UNREACHABLE();
+        }
+
+      return (this->get_first_line_index() +
+              this->reference_cell().face_to_cell_lines(face,
+                                                        face_line,
+                                                        combined_orientation) *
+                this->n_dofs_per_line() +
+              adjusted_dof_index_on_line);
+    }
+  else
+    // DoF is on a quad
+    {
+      Assert(dim >= 3, ExcInternalError());
+
+      // ignore vertex and line dofs
+      const unsigned int index =
+        face_dof_index - this->get_first_face_quad_index(face);
+
+      // the same is true here as above for the 3d case -- someone will
+      // just have to draw a bunch of pictures. in the meantime,
+      // we can implement the degree <= 3 case in which it is simple
+      Assert((this->n_dofs_per_quad(face) <= 1) ||
+               combined_orientation == numbers::default_geometric_orientation,
+             ExcNotImplemented());
+      return (this->get_first_quad_index(face) + index);
+    }
+}
+
+
+
+template <int dim, int spacedim>
 const FullMatrix<double> &
 FE_SimplexPoly<dim, spacedim>::get_restriction_matrix(
   const unsigned int         child,
@@ -519,24 +656,25 @@ FE_SimplexPoly<dim, spacedim>::get_restriction_matrix(
               restriction_mat[i][j] =
                 this->shape_value(j, transformed_point[0]);
         }
-#ifdef DEBUG
-      for (unsigned int i = 0; i < this->n_dofs_per_cell(); i++)
+      if constexpr (running_in_debug_mode())
         {
-          double sum = 0.;
+          for (unsigned int i = 0; i < this->n_dofs_per_cell(); i++)
+            {
+              double sum = 0.;
 
-          for (unsigned int j = 0; j < this->n_dofs_per_cell(); j++)
-            sum += restriction_mat[i][j];
+              for (unsigned int j = 0; j < this->n_dofs_per_cell(); j++)
+                sum += restriction_mat[i][j];
 
-          Assert(std::fabs(sum - 1) < eps || std::fabs(sum) < eps,
-                 ExcInternalError(
-                   "The entries in a row of the local "
-                   "restriction matrix do not add to zero or one. "
-                   "This typically indicates that the "
-                   "polynomial interpolation is "
-                   "ill-conditioned such that round-off "
-                   "prevents the sum to be one."));
+              Assert(std::fabs(sum - 1) < eps || std::fabs(sum) < eps,
+                     ExcInternalError(
+                       "The entries in a row of the local "
+                       "restriction matrix do not add to zero or one. "
+                       "This typically indicates that the "
+                       "polynomial interpolation is "
+                       "ill-conditioned such that round-off "
+                       "prevents the sum to be one."));
+            }
         }
-#endif
 
       // Remove small entries from the matrix
       for (unsigned int i = 0; i < restriction_mat.m(); ++i)
@@ -580,11 +718,12 @@ FE_SimplexPoly<dim, spacedim>::get_face_interpolation_matrix(
 
       const double eps = 2e-13 * this->degree * (dim - 1);
 
-      std::vector<Point<dim>> face_quadrature_points(quad_face_support.size());
-      QProjector<dim>::project_to_face(this->reference_cell(),
-                                       quad_face_support,
-                                       face_no,
-                                       face_quadrature_points);
+      const std::vector<Point<dim>> face_quadrature_points =
+        QProjector<dim>::project_to_face(this->reference_cell(),
+                                         quad_face_support,
+                                         face_no,
+                                         numbers::default_geometric_orientation)
+          .get_points();
 
       for (unsigned int i = 0; i < source_fe.n_dofs_per_face(face_no); ++i)
         for (unsigned int j = 0; j < this->n_dofs_per_face(face_no); ++j)
@@ -604,17 +743,18 @@ FE_SimplexPoly<dim, spacedim>::get_face_interpolation_matrix(
             interpolation_matrix(i, j) = matrix_entry;
           }
 
-#ifdef DEBUG
-      for (unsigned int j = 0; j < source_fe.n_dofs_per_face(face_no); ++j)
+      if constexpr (running_in_debug_mode())
         {
-          double sum = 0.;
+          for (unsigned int j = 0; j < source_fe.n_dofs_per_face(face_no); ++j)
+            {
+              double sum = 0.;
 
-          for (unsigned int i = 0; i < this->n_dofs_per_face(face_no); ++i)
-            sum += interpolation_matrix(j, i);
+              for (unsigned int i = 0; i < this->n_dofs_per_face(face_no); ++i)
+                sum += interpolation_matrix(j, i);
 
-          Assert(std::fabs(sum - 1) < eps, ExcInternalError());
+              Assert(std::fabs(sum - 1) < eps, ExcInternalError());
+            }
         }
-#endif
     }
   else if (dynamic_cast<const FE_Nothing<dim> *>(&source_fe) != nullptr)
     {
@@ -651,20 +791,21 @@ FE_SimplexPoly<dim, spacedim>::get_subface_interpolation_matrix(
 
       const double eps = 2e-13 * this->degree * (dim - 1);
 
-      std::vector<Point<dim>> subface_quadrature_points(
-        quad_face_support.size());
-      QProjector<dim>::project_to_subface(this->reference_cell(),
-                                          quad_face_support,
-                                          face_no,
-                                          subface,
-                                          subface_quadrature_points);
+      const Quadrature<dim> subface_quadrature =
+        QProjector<dim>::project_to_subface(
+          this->reference_cell(),
+          quad_face_support,
+          face_no,
+          subface,
+          numbers::default_geometric_orientation,
+          RefinementCase<dim - 1>::isotropic_refinement);
 
       for (unsigned int i = 0; i < source_fe.n_dofs_per_face(face_no); ++i)
         for (unsigned int j = 0; j < this->n_dofs_per_face(face_no); ++j)
           {
             double matrix_entry =
               this->shape_value(this->face_to_cell_index(j, 0),
-                                subface_quadrature_points[i]);
+                                subface_quadrature.point(i));
 
             // Correct the interpolated value. I.e. if it is close to 1 or
             // 0, make it exactly 1 or 0. Unfortunately, this is required to
@@ -677,17 +818,18 @@ FE_SimplexPoly<dim, spacedim>::get_subface_interpolation_matrix(
             interpolation_matrix(i, j) = matrix_entry;
           }
 
-#ifdef DEBUG
-      for (unsigned int j = 0; j < source_fe.n_dofs_per_face(face_no); ++j)
+      if constexpr (running_in_debug_mode())
         {
-          double sum = 0.;
+          for (unsigned int j = 0; j < source_fe.n_dofs_per_face(face_no); ++j)
+            {
+              double sum = 0.;
 
-          for (unsigned int i = 0; i < this->n_dofs_per_face(face_no); ++i)
-            sum += interpolation_matrix(j, i);
+              for (unsigned int i = 0; i < this->n_dofs_per_face(face_no); ++i)
+                sum += interpolation_matrix(j, i);
 
-          Assert(std::fabs(sum - 1) < eps, ExcInternalError());
+              Assert(std::fabs(sum - 1) < eps, ExcInternalError());
+            }
         }
-#endif
     }
   else if (dynamic_cast<const FE_Nothing<dim> *>(&source_fe) != nullptr)
     {
@@ -1184,6 +1326,6 @@ FE_SimplexDGP<dim, spacedim>::get_restriction_matrix(
 }
 
 // explicit instantiations
-#include "fe_simplex_p.inst"
+#include "fe/fe_simplex_p.inst"
 
 DEAL_II_NAMESPACE_CLOSE

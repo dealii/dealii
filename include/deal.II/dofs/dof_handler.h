@@ -36,6 +36,7 @@
 #include <deal.II/hp/fe_collection.h>
 
 #include <boost/serialization/split_member.hpp>
+#include <boost/signals2/connection.hpp>
 
 #include <map>
 #include <memory>

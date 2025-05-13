@@ -57,7 +57,7 @@
 //
 // The combined face orientation is computes as
 //
-// orientation_no = face_flip*4 + face_rotation*2 + face_orientation*1;
+// orientation_no = face_flip*4 + face_rotation*2 + !face_orientation;
 //
 // See tria_orientation.h.
 //
@@ -68,7 +68,7 @@
 // In this program the one parameter is used to encode the face orientation in
 // two- and three- dimensions. This parameter is
 //
-// unsigned char combined_face_orientation;
+// types::geometric_orientation combined_face_orientation;
 //
 // Interpretation of this parameter in three dimensions is straightforward:
 // it is the combined face orientation as it is known in deal.II. In the
@@ -130,16 +130,17 @@ print_shared_face(Triangulation<dim> &triangulation);
 
 template <>
 void
-create_triangulation<2>(Triangulation<2>   &triangulation,
-                        const unsigned char combined_face_orientation)
+create_triangulation<2>(
+  Triangulation<2>                  &triangulation,
+  const types::geometric_orientation combined_face_orientation)
 
 {
   // Only the leftmost shared face is considered. Even values of
-  // combined_face_orientation produce misaligned faces (the middle square is
-  // rotated by 2*[pi/2]). Odd values of combined_face_orientation produce
-  // aligned faces (the middle square is not rotated).
+  // combined_face_orientation produce aligned faces (the middle square is
+  // not rotated). Odd values of combined_face_orientation produce
+  // misaligned faces (the middle square is rotated by 2*[pi/2]).
   const unsigned int n_rotate_middle_square =
-    (combined_face_orientation % 2 == 0) ? 2 : 0;
+    (combined_face_orientation % 2 == 1) ? 2 : 0;
 
   GridGenerator::non_standard_orientation_mesh(triangulation,
                                                n_rotate_middle_square);
@@ -147,8 +148,9 @@ create_triangulation<2>(Triangulation<2>   &triangulation,
 
 template <>
 void
-create_triangulation<3>(Triangulation<3>   &triangulation,
-                        const unsigned char combined_face_orientation)
+create_triangulation<3>(
+  Triangulation<3>                  &triangulation,
+  const types::geometric_orientation combined_face_orientation)
 
 {
   bool face_orientation;
@@ -313,13 +315,9 @@ print_shared_face<3>(Triangulation<3> &triangulation)
                 << std::endl;
       std::cout << "Shared face - orientation: " << cell->face_orientation(face)
                 << std::endl;
-      std::cout
-        << "Shared face - combined orientation: "
-        << static_cast<unsigned int>(
-             internal::combined_face_orientation(cell->face_orientation(face),
-                                                 cell->face_rotation(face),
-                                                 cell->face_flip(face)))
-        << std::endl;
+      std::cout << "Shared face - combined orientation: "
+                << static_cast<int>(cell->combined_face_orientation(face))
+                << std::endl;
     }
 }
 
@@ -375,7 +373,7 @@ classify(const std::vector<Vector<double>> &shape_function_left,
 
 template <int dim, unsigned int order>
 void
-run(unsigned char combined_face_orientation)
+run(types::geometric_orientation combined_face_orientation)
 {
   Triangulation<dim> triangulation;
 

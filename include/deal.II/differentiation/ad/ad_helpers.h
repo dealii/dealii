@@ -3818,24 +3818,25 @@ namespace Differentiation
       // function, in the sense that we simply populate our array of independent
       // values with a meaningful number. However, in this case we need to
       // double check that we're not registering these variables twice
-#    ifdef DEBUG
-      const std::vector<unsigned int> index_set(
-        internal::extract_field_component_indices<dim>(extractor));
-      for (const unsigned int index : index_set)
+      if constexpr (running_in_debug_mode())
         {
-          Assert(
-            this->registered_independent_variable_values[index] == false,
-            ExcMessage(
-              "Overlapping indices for independent variables. "
-              "One or more indices associated with the field that "
-              "is being registered as an independent variable have "
-              "already been associated with another field. This suggests "
-              "that the component offsets used to construct their counterpart "
-              "extractors are incompatible with one another. Make sure that "
-              "the first component for each extractor properly takes into "
-              "account the dimensionality of the preceding fields."));
+          const std::vector<unsigned int> index_set(
+            internal::extract_field_component_indices<dim>(extractor));
+          for (const unsigned int index : index_set)
+            {
+              Assert(
+                this->registered_independent_variable_values[index] == false,
+                ExcMessage(
+                  "Overlapping indices for independent variables. "
+                  "One or more indices associated with the field that "
+                  "is being registered as an independent variable have "
+                  "already been associated with another field. This suggests "
+                  "that the component offsets used to construct their counterpart "
+                  "extractors are incompatible with one another. Make sure that "
+                  "the first component for each extractor properly takes into "
+                  "account the dimensionality of the preceding fields."));
+            }
         }
-#    endif
       set_independent_variable(value, extractor);
     }
 

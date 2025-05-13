@@ -33,6 +33,14 @@ namespace LinearAlgebra
       const ::dealii::BlockDynamicSparsityPattern &);
 
     template void
+    BlockSparseMatrix<double, MemorySpace::Host>::reinit<
+      ::dealii::BlockDynamicSparsityPattern>(
+      const std::vector<dealii::IndexSet> &,
+      const ::dealii::BlockDynamicSparsityPattern &,
+      MPI_Comm,
+      bool);
+
+    template void
     BlockSparseMatrix<double, MemorySpace::Host>::vmult(
       TpetraWrappers::Vector<double, MemorySpace::Host> &,
       const TpetraWrappers::Vector<double, MemorySpace::Host> &) const;

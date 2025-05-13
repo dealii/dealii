@@ -23,6 +23,6 @@
 
 DEAL_II_NAMESPACE_OPEN
 
-#include "matrix_free.inst"
+#include "matrix_free/matrix_free.inst"
 
 DEAL_II_NAMESPACE_CLOSE

@@ -265,7 +265,8 @@ FE_P1NC::fill_fe_face_values(
   const Quadrature<2> quadrature_on_face =
     QProjector<2>::project_to_face(this->reference_cell(),
                                    quadrature[0],
-                                   face_no);
+                                   face_no,
+                                   numbers::default_geometric_orientation);
 
   if (flags & update_values)
     for (unsigned int i = 0; i < quadrature_on_face.size(); ++i)
@@ -308,8 +309,13 @@ FE_P1NC::fill_fe_subface_values(
   const ndarray<double, 4, 3> coeffs = get_linear_shape_coefficients(cell);
 
   // compute on the subface
-  const Quadrature<2> quadrature_on_subface = QProjector<2>::project_to_subface(
-    this->reference_cell(), quadrature, face_no, sub_no);
+  const Quadrature<2> quadrature_on_subface =
+    QProjector<2>::project_to_subface(this->reference_cell(),
+                                      quadrature,
+                                      face_no,
+                                      sub_no,
+                                      numbers::default_geometric_orientation,
+                                      RefinementCase<1>::isotropic_refinement);
 
   if (flags & update_values)
     for (unsigned int i = 0; i < quadrature_on_subface.size(); ++i)

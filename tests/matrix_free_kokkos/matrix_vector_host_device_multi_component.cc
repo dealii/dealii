@@ -166,17 +166,12 @@ public:
   {}
 
   DEAL_II_HOST_DEVICE void
-  operator()(const unsigned int                                      cell,
-             const typename Portable::MatrixFree<dim, Number>::Data *gpu_data,
-             Portable::SharedData<dim, Number> *shared_data,
-             const Number                      *src,
-             Number                            *dst) const
+  operator()(const typename Portable::MatrixFree<dim, Number>::Data *data,
+             const Portable::DeviceVector<Number>                   &src,
+             Portable::DeviceVector<Number>                         &dst) const
   {
-    (void)cell; // TODO?
-
     Portable::FEEvaluation<dim, fe_degree, fe_degree + 1, n_components, Number>
-      phi(
-        /*cell,*/ gpu_data, shared_data);
+      phi(data);
     phi.read_dof_values(src);
 
     if (version == 0)
@@ -198,9 +193,9 @@ public:
 
     phi.distribute_local_to_global(dst);
   }
-  static const unsigned int n_dofs_1d    = fe_degree + 1;
-  static const unsigned int n_local_dofs = Utilities::pow(fe_degree + 1, dim);
-  static const unsigned int n_q_points   = Utilities::pow(fe_degree + 1, dim);
+  static const unsigned int n_local_dofs =
+    Utilities::pow(fe_degree + 1, dim) * n_components;
+  static const unsigned int n_q_points = Utilities::pow(fe_degree + 1, dim);
 
 private:
   const unsigned int version;

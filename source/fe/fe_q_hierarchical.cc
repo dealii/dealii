@@ -209,7 +209,8 @@ FE_Q_Hierarchical<dim>::get_prolongation_matrix(
     ExcMessage(
       "Prolongation matrices are only available for isotropic refinement!"));
 
-  AssertIndexRange(child, GeometryInfo<dim>::n_children(refinement_case));
+  AssertIndexRange(
+    child, this->reference_cell().template n_children<dim>(refinement_case));
 
   return this->prolongation[refinement_case - 1][child];
 }
@@ -274,6 +275,7 @@ FE_Q_Hierarchical<dim>::hp_line_dof_identities(
       // increasingly. Thus we return a vector of pairs for the first N-1, where
       // N is minimum number of dofs_per_line for each FE_Q_Hierarchical.
       std::vector<std::pair<unsigned int, unsigned int>> res;
+      res.reserve(std::min(this_dpl, other_dpl));
       for (unsigned int i = 0; i < std::min(this_dpl, other_dpl); ++i)
         res.emplace_back(i, i);
 
@@ -318,6 +320,7 @@ FE_Q_Hierarchical<dim>::hp_quad_dof_identities(
       // increasingly. Thus we return a vector of pairs for the first N-1, where
       // N is minimum number of dofs_per_line for each FE_Q_Hierarchical.
       std::vector<std::pair<unsigned int, unsigned int>> res;
+      res.reserve(std::min(this_dpq, other_dpq));
       for (unsigned int i = 0; i < std::min(this_dpq, other_dpq); ++i)
         res.emplace_back(i, i);
 
@@ -2457,7 +2460,7 @@ FE_Q_Hierarchical<dim>::memory_consumption() const
 
 
 // explicit instantiations
-#include "fe_q_hierarchical.inst"
+#include "fe/fe_q_hierarchical.inst"
 
 
 DEAL_II_NAMESPACE_CLOSE

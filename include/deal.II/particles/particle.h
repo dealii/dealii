@@ -23,9 +23,11 @@
 
 #include <deal.II/particles/property_pool.h>
 
+#include <boost/geometry/index/indexable.hpp>
 #include <boost/serialization/array.hpp>
 
 #include <cstdint>
+
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -691,10 +693,6 @@ namespace boost
   {
     namespace index
     {
-      // Forward declaration of bgi::indexable
-      template <class T>
-      struct indexable;
-
       /**
        * Make sure we can construct an RTree of Particles::Particle objects.
        */

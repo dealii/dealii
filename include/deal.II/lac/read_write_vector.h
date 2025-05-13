@@ -36,6 +36,7 @@
 #ifdef DEAL_II_WITH_TRILINOS
 #  include <deal.II/lac/trilinos_epetra_communication_pattern.h>
 #  include <deal.II/lac/trilinos_epetra_vector.h>
+#  include <deal.II/lac/trilinos_tpetra_block_vector.h>
 #  include <deal.II/lac/trilinos_tpetra_vector.h>
 
 #  include <Epetra_MultiVector.h>

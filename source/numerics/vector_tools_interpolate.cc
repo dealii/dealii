@@ -15,9 +15,12 @@
 
 #include <deal.II/numerics/vector_tools_interpolate.templates.h>
 
+#include <map>
+
+
 DEAL_II_NAMESPACE_OPEN
 
 // ---------------------------- explicit instantiations --------------------
-#include "vector_tools_interpolate.inst"
+#include "numerics/vector_tools_interpolate.inst"
 
 DEAL_II_NAMESPACE_CLOSE

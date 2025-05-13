@@ -2264,12 +2264,13 @@ namespace DoFTools
         std::vector<types::global_dof_index> local_dof_count =
           dofs_per_component;
 
-        const int ierr = MPI_Allreduce(local_dof_count.data(),
-                                       dofs_per_component.data(),
-                                       n_target_components,
-                                       DEAL_II_DOF_INDEX_MPI_TYPE,
-                                       MPI_SUM,
-                                       tria->get_mpi_communicator());
+        const int ierr = MPI_Allreduce(
+          local_dof_count.data(),
+          dofs_per_component.data(),
+          n_target_components,
+          Utilities::MPI::mpi_type_id_for_type<types::global_dof_index>,
+          MPI_SUM,
+          tria->get_mpi_communicator());
         AssertThrowMPI(ierr);
       }
 #endif
@@ -2352,12 +2353,13 @@ namespace DoFTools
           {
             std::vector<types::global_dof_index> local_dof_count =
               dofs_per_block;
-            const int ierr = MPI_Allreduce(local_dof_count.data(),
-                                           dofs_per_block.data(),
-                                           n_target_blocks,
-                                           DEAL_II_DOF_INDEX_MPI_TYPE,
-                                           MPI_SUM,
-                                           tria->get_mpi_communicator());
+            const int ierr = MPI_Allreduce(
+              local_dof_count.data(),
+              dofs_per_block.data(),
+              n_target_blocks,
+              Utilities::MPI::mpi_type_id_for_type<types::global_dof_index>,
+              MPI_SUM,
+              tria->get_mpi_communicator());
             AssertThrowMPI(ierr);
           }
 #endif
@@ -2497,8 +2499,13 @@ namespace DoFTools
 
         std::vector<types::global_dof_index> local_dof_indices;
         for (const auto &cell : dof_handler.active_cell_iterators())
-          // only work on locally relevant cells
-          if (cell->is_artificial() == false)
+          // Only work on locally relevant cells. Exclude cells
+          // without DoFs (e.g., if a cell has FE_Nothing associated
+          // with it) because that trips up internal assertions about
+          // using FEValues with quadrature formulas without
+          // quadrature points.
+          if ((cell->is_artificial() == false) &&
+              (cell->get_fe().n_dofs_per_cell() > 0))
             {
               hp_fe_values.reinit(cell);
               const FEValues<dim, spacedim> &fe_values =
@@ -3154,7 +3161,7 @@ namespace DoFTools
 
 // explicit instantiations
 
-#include "dof_tools.inst"
+#include "dofs/dof_tools.inst"
 
 
 

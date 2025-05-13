@@ -18,6 +18,8 @@
 #include <deal.II/lac/vector.h>
 
 #include <cmath>
+#include <vector>
+
 
 DEAL_II_NAMESPACE_OPEN
 

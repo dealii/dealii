@@ -167,6 +167,129 @@ namespace TimeStepping
 
             break;
           }
+        case (RK_FIFTH_ORDER):
+          {
+            /**
+             * Rabiei, F. and Ismail, F., 2012. Fifth-order improved
+             * Runge-Kutta method with reduced number of function evaluations.
+             * Australian Journal of Basic and Applied Sciences, 6(3),
+             * pp.97-105.
+             *
+             * Hossain, M.B., Hossain, M.J., Miah, M.M. and Alam, M.S., 2017.
+             * A comparative study on fourth order and butcher’s fifth order
+             * runge-kutta methods with third order initial value problem (IVP).
+             * Appl. Comput. Math, 6(6), p.243.
+             */
+            this->n_stages = 6;
+            this->b.reserve(this->n_stages);
+            this->c.reserve(this->n_stages);
+            std::vector<double> tmp;
+            this->a.push_back(tmp);
+            tmp.assign(5, 0.0);
+            tmp[0] = 1.0 / 4.0;
+            this->a.push_back(tmp);
+            tmp.assign(5, 0.0);
+            tmp[0] = 1.0 / 8.0;
+            tmp[1] = 1.0 / 8.0;
+            this->a.push_back(tmp);
+            tmp.assign(5, 0.0);
+            tmp[0] = 0.0;
+            tmp[1] = -1.0 / 2.0;
+            tmp[2] = 1.0;
+            this->a.push_back(tmp);
+            tmp.assign(5, 0.0);
+            tmp[0] = 3.0 / 16.0;
+            tmp[1] = 0.0;
+            tmp[2] = 0.0;
+            tmp[3] = 9.0 / 16.0;
+            this->a.push_back(tmp);
+            tmp.assign(5, 0.0);
+            tmp[0] = -3.0 / 7.0;
+            tmp[1] = 2.0 / 7.0;
+            tmp[2] = 12.0 / 7.0;
+            tmp[3] = -12.0 / 7.0;
+            tmp[4] = 8.0 / 7.0;
+            this->a.push_back(tmp);
+
+            this->b.push_back(7.0 / 90.0);
+            this->b.push_back(0.0);
+            this->b.push_back(32.0 / 90.0);
+            this->b.push_back(12.0 / 90.0);
+            this->b.push_back(32.0 / 90.0);
+            this->b.push_back(7.0 / 90.0);
+
+            this->c.push_back(0.0);
+            this->c.push_back(1.0 / 4.0);
+            this->c.push_back(1.0 / 4.0);
+            this->c.push_back(1.0 / 2.0);
+            this->c.push_back(3.0 / 4.0);
+            this->c.push_back(1.0);
+
+            break;
+          }
+        case (RK_SIXTH_ORDER):
+          {
+            /**
+             * Butcher, J.C., 1964. On Runge-Kutta processes of high order.
+             * Journal of the Australian Mathematical Society, 4(2), pp.179-194.
+             */
+            this->n_stages = 7;
+            this->b.reserve(this->n_stages);
+            this->c.reserve(this->n_stages);
+            std::vector<double> tmp;
+            this->a.push_back(tmp);
+            tmp.assign(6, 0.0);
+            tmp[0] = 1.0 / 3.0;
+            this->a.push_back(tmp);
+            tmp.assign(6, 0.0);
+            tmp[0] = 0.0;
+            tmp[1] = 2.0 / 3.0;
+            this->a.push_back(tmp);
+            tmp.assign(6, 0.0);
+            tmp[0] = 1.0 / 12.0;
+            tmp[1] = 1.0 / 3.0;
+            tmp[2] = -1.0 / 12.0;
+            this->a.push_back(tmp);
+            tmp.assign(6, 0.0);
+            tmp[0] = -1.0 / 16.0;
+            tmp[1] = 9.0 / 8.0;
+            tmp[2] = -3.0 / 16.0;
+            tmp[3] = -3.0 / 8.0;
+            this->a.push_back(tmp);
+            tmp.assign(6, 0.0);
+            tmp[0] = 0.0;
+            tmp[1] = 9.0 / 8.0;
+            tmp[2] = -3.0 / 8.0;
+            tmp[3] = -3.0 / 4.0;
+            tmp[4] = 1.0 / 2.0;
+            this->a.push_back(tmp);
+            tmp.assign(6, 0.0);
+            tmp[0] = 9.0 / 44.0;
+            tmp[1] = -9.0 / 11.0;
+            tmp[2] = 63.0 / 44.0;
+            tmp[3] = 18.0 / 11.0;
+            tmp[4] = 0.0;
+            tmp[5] = -16.0 / 11.0;
+            this->a.push_back(tmp);
+
+            this->b.push_back(11.0 / 120.0);
+            this->b.push_back(0.0);
+            this->b.push_back(27.0 / 40.0);
+            this->b.push_back(27.0 / 40.0);
+            this->b.push_back(-4.0 / 15.0);
+            this->b.push_back(-4.0 / 15.0);
+            this->b.push_back(11.0 / 120.0);
+
+            this->c.push_back(0.0);
+            this->c.push_back(1.0 / 3.0);
+            this->c.push_back(2.0 / 3.0);
+            this->c.push_back(1.0 / 3.0);
+            this->c.push_back(1.0 / 2.0);
+            this->c.push_back(1.0 / 2.0);
+            this->c.push_back(1.0);
+
+            break;
+          }
         default:
           {
             AssertThrow(

@@ -22,39 +22,32 @@
 // e.g., MPI_Comm in the API.
 
 #if defined(DEAL_II_WITH_MPI)
+DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
 #  include <mpi.h>
+DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
 #else
-// without MPI, we would still like to use
-// some constructs with MPI data
-// types. Therefore, create some dummies
+
+// Without MPI, we would still like to use some constructs with MPI
+// data types. Therefore, create some dummies. Since we only ever use
+// them inside our own constructs, the right thing to do is to put
+// them into namespace dealii:
+DEAL_II_NAMESPACE_OPEN
+
 using MPI_Comm     = int;
 using MPI_Request  = int;
 using MPI_Datatype = int;
 using MPI_Op       = int;
-#  ifndef MPI_COMM_WORLD
-#    define MPI_COMM_WORLD 0
-#  endif
-#  ifndef MPI_COMM_SELF
-#    define MPI_COMM_SELF 0
-#  endif
-#  ifndef MPI_COMM_NULL
-#    define MPI_COMM_NULL 0
-#  endif
-#  ifndef MPI_REQUEST_NULL
-#    define MPI_REQUEST_NULL 0
-#  endif
-#  ifndef MPI_MIN
-#    define MPI_MIN 0
-#  endif
-#  ifndef MPI_MAX
-#    define MPI_MAX 0
-#  endif
-#  ifndef MPI_SUM
-#    define MPI_SUM 0
-#  endif
-#  ifndef MPI_LOR
-#    define MPI_LOR 0
-#  endif
-#endif
 
+constexpr MPI_Comm    MPI_COMM_WORLD   = 0;
+constexpr MPI_Comm    MPI_COMM_SELF    = 0;
+constexpr MPI_Comm    MPI_COMM_NULL    = 0;
+constexpr MPI_Request MPI_REQUEST_NULL = 0;
+constexpr MPI_Op      MPI_MIN          = 0;
+constexpr MPI_Op      MPI_MAX          = 0;
+constexpr MPI_Op      MPI_SUM          = 0;
+constexpr MPI_Op      MPI_LOR          = 0;
+
+DEAL_II_NAMESPACE_CLOSE
+
+#endif
 #endif

@@ -18,10 +18,10 @@
 
 #include <deal.II/base/config.h>
 
-#include "deal.II/base/exceptions.h"
+#include <deal.II/base/exceptions.h>
 #include <deal.II/base/index_set.h>
 
-#include "deal.II/lac/trilinos_tpetra_types.h"
+#include <deal.II/lac/trilinos_tpetra_types.h>
 
 #include <string>
 
@@ -34,7 +34,7 @@
 #    include <Ifpack2_IdentitySolver.hpp>
 #    include <Ifpack2_IdentitySolver_decl.hpp>
 #    include <Ifpack2_Preconditioner.hpp>
-#    include <Kokkos_Core_fwd.hpp>
+#    include <Kokkos_Core.hpp>
 #    include <Kokkos_DualView.hpp>
 #    include <Teuchos_RCPDecl.hpp>
 #    include <Tpetra_CrsMatrix_decl.hpp>

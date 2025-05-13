@@ -36,6 +36,7 @@
 #include <cmath>
 #include <cstdio>
 #include <cstdlib>
+#include <iomanip>
 #include <limits>
 #include <vector>
 
@@ -519,10 +520,19 @@ FullMatrix<number>::mmult(FullMatrix<number2>       &dst,
   Assert(n() == src.m(), ExcDimensionMismatch(n(), src.m()));
   Assert(dst.n() == src.n(), ExcDimensionMismatch(dst.n(), src.n()));
   Assert(dst.m() == m(), ExcDimensionMismatch(m(), dst.m()));
+  if constexpr (std::is_same_v<number, number2>)
+    {
+      Assert(&dst != this,
+             ExcMessage(
+               "The output matrix cannot be the same as the current matrix."));
+      Assert(&dst != &src,
+             ExcMessage(
+               "The output matrix cannot be the same as the input matrix."));
+    }
 
-  // see if we can use BLAS algorithms for this and if the type for 'number'
-  // works for us (it is usually not efficient to use BLAS for very small
-  // matrices):
+    // see if we can use BLAS algorithms for this and if the type for 'number'
+    // works for us (it is usually not efficient to use BLAS for very small
+    // matrices):
 #ifdef DEAL_II_WITH_LAPACK
   const size_type max_blas_int = std::numeric_limits<types::blas_int>::max();
   if ((std::is_same_v<number, double> ||
@@ -929,6 +939,32 @@ FullMatrix<number>::triple_product(const FullMatrix<number> &A,
           for (size_type k = 0; k < m(); ++k)
             this->operator()(k, j) += scaling * ADij * B(k, i);
       }
+}
+
+
+template <typename number>
+void
+FullMatrix<number>::kronecker_product(const FullMatrix<number> &A,
+                                      const FullMatrix<number> &B,
+                                      const bool                adding)
+{
+  Assert(!A.empty(), ExcEmptyMatrix());
+  Assert(!B.empty(), ExcEmptyMatrix());
+
+  const size_type m = A.m() * B.m();
+  const size_type n = A.n() * B.n();
+
+  if (adding)
+    {
+      AssertDimension(m, this->m());
+      AssertDimension(n, this->n());
+    }
+  else
+    this->reinit(m, n);
+
+  for (size_type i = 0; i < m; ++i)
+    for (size_type j = 0; j < n; ++j)
+      (*this)(i, j) += A(i / B.m(), j / B.n()) * B(i % B.m(), j % B.n());
 }
 
 

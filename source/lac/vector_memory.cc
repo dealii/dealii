@@ -19,6 +19,7 @@
 #include <deal.II/lac/petsc_vector.h>
 #include <deal.II/lac/trilinos_epetra_vector.h>
 #include <deal.II/lac/trilinos_parallel_block_vector.h>
+#include <deal.II/lac/trilinos_tpetra_block_vector.h>
 #include <deal.II/lac/trilinos_tpetra_vector.h>
 #include <deal.II/lac/trilinos_vector.h>
 #include <deal.II/lac/vector.h>
@@ -27,7 +28,7 @@
 
 DEAL_II_NAMESPACE_OPEN
 
-#include "vector_memory.inst"
+#include "lac/vector_memory.inst"
 template class VectorMemory<
   LinearAlgebra::distributed::Vector<float, MemorySpace::Default>>;
 template class VectorMemory<
@@ -44,7 +45,7 @@ namespace internal
     void
     release_all_unused_memory()
     {
-#include "vector_memory_release.inst"
+#include "lac/vector_memory_release.inst"
       dealii::GrowingVectorMemory<dealii::LinearAlgebra::distributed::Vector<
         float,
         MemorySpace::Default>>::release_unused_memory();

@@ -1,0 +1,6 @@
+Improved: The MappingQEulerian class now supports
+the use of higher order mappings for the underlying
+undeformed geometry. This for example allows
+for higher accuracy in models with curved boundaries.
+<br>
+(Rene Gassmoeller, 2025/04/29)

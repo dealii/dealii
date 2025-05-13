@@ -22,6 +22,7 @@
 #include <deal.II/base/exceptions.h>
 
 #include <atomic>
+#include <string>
 #include <typeinfo>
 
 DEAL_II_NAMESPACE_OPEN
@@ -611,13 +612,16 @@ template <class Q>
 inline void
 ObserverPointer<T, P>::swap(ObserverPointer<T, Q> &other)
 {
-#ifdef DEBUG
-  ObserverPointer<T, P> aux(pointer, id);
-  *this = other;
-  other = aux;
-#else
-  std::swap(pointer, other.pointer);
-#endif
+  if constexpr (running_in_debug_mode())
+    {
+      ObserverPointer<T, P> aux(pointer, id);
+      *this = other;
+      other = aux;
+    }
+  else
+    {
+      std::swap(pointer, other.pointer);
+    }
 }
 
 

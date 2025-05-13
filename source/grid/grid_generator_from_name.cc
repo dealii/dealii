@@ -232,7 +232,7 @@ namespace GridGenerator
                          bool>(concentric_hyper_shells, arguments, tria);
 
       else if (name == "subdivided_hyper_cube_with_simplices")
-        parse_and_create<dim, dim, unsigned int, double, double, bool>(
+        parse_and_create<dim, dim, unsigned int, double, double, bool, bool>(
           subdivided_hyper_cube_with_simplices, arguments, tria);
 
       else if (name == "subdivided_hyper_rectangle_with_simplices")
@@ -241,9 +241,20 @@ namespace GridGenerator
                          const std::vector<unsigned int> &,
                          const Point<dim> &,
                          const Point<dim> &,
+                         bool,
                          bool>(subdivided_hyper_rectangle_with_simplices,
                                arguments,
                                tria);
+
+      else if (name == "subdivided_hyper_L")
+        parse_and_create<dim,
+                         dim,
+                         const std::vector<unsigned int> &,
+                         const Point<dim> &,
+                         const Point<dim> &,
+                         const std::vector<int> &>(subdivided_hyper_L,
+                                                   arguments,
+                                                   tria);
 
       else
         return false;
@@ -403,6 +414,6 @@ namespace GridGenerator
   }
 } // namespace GridGenerator
 
-#include "grid_generator_from_name.inst"
+#include "grid/grid_generator_from_name.inst"
 
 DEAL_II_NAMESPACE_CLOSE

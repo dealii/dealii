@@ -97,8 +97,8 @@ function(define_interface_target _feature)
         #
         if("${_lib}" MATCHES "::")
           message(FATAL_ERROR
-            "Undefined imported target name »${_lib}« present when defining "
-            "interface target »${_interface_target}«"
+            "Undefined imported target name \"${_lib}\" present when defining "
+            "interface target \"${_interface_target}\""
             )
         endif()
       endforeach()

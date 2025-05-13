@@ -1,0 +1,9 @@
+Changed: Flexible GMRES can be viewed as a special case
+of the MPGMRES algorithm. Consequently, the SolverFGMRES class
+is now derived from SolverMPGMRES and its solve method now
+supports the function signature
+<code>
+solve(A, x, b, preconditioner_1, preconditioner_2, ...)
+</code>
+<br>
+(Wyatt Smith, Matthias Maier, 2025/04/10)

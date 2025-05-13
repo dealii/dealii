@@ -23,6 +23,9 @@
 
 #include <deal.II/grid/manifold.h>
 
+#include <boost/signals2/connection.hpp>
+
+
 DEAL_II_NAMESPACE_OPEN
 
 // forward declaration

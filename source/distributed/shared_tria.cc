@@ -86,19 +86,20 @@ namespace parallel
     DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
     void Triangulation<dim, spacedim>::partition()
     {
-#  ifdef DEBUG
-      // Check that all meshes are the same (or at least have the same
-      // total number of active cells):
-      const unsigned int max_active_cells =
-        Utilities::MPI::max(this->n_active_cells(),
-                            this->get_mpi_communicator());
-      Assert(
-        max_active_cells == this->n_active_cells(),
-        ExcMessage(
-          "A parallel::shared::Triangulation needs to be refined in the same "
-          "way on all processors, but the participating processors don't "
-          "agree on the number of active cells."));
-#  endif
+      if constexpr (running_in_debug_mode())
+        {
+          // Check that all meshes are the same (or at least have the same
+          // total number of active cells):
+          const unsigned int max_active_cells =
+            Utilities::MPI::max(this->n_active_cells(),
+                                this->get_mpi_communicator());
+          Assert(
+            max_active_cells == this->n_active_cells(),
+            ExcMessage(
+              "A parallel::shared::Triangulation needs to be refined in the same "
+              "way on all processors, but the participating processors don't "
+              "agree on the number of active cells."));
+        }
 
       auto partition_settings = (partition_zoltan | partition_metis |
                                  partition_zorder | partition_custom_signal) &
@@ -284,37 +285,38 @@ namespace parallel
             true_subdomain_ids_of_cells[index] = cell->subdomain_id();
         }
 
-#  ifdef DEBUG
-      {
-        // Assert that each cell is owned by a processor
-        const unsigned int n_my_cells = std::count_if(
-          this->begin_active(),
-          typename Triangulation<dim, spacedim>::active_cell_iterator(
-            this->end()),
-          [](const auto &i) { return (i.is_locally_owned()); });
-
-        const unsigned int total_cells =
-          Utilities::MPI::sum(n_my_cells, this->get_mpi_communicator());
-        Assert(total_cells == this->n_active_cells(),
-               ExcMessage("Not all cells are assigned to a processor."));
-      }
-
-      // If running with multigrid, assert that each level
-      // cell is owned by a processor
-      if (settings & construct_multigrid_hierarchy)
+      if constexpr (running_in_debug_mode())
         {
-          const unsigned int n_my_cells =
-            std::count_if(this->begin(), this->end(), [](const auto &i) {
-              return (i.is_locally_owned_on_level());
-            });
+          {
+            // Assert that each cell is owned by a processor
+            const unsigned int n_my_cells = std::count_if(
+              this->begin_active(),
+              typename Triangulation<dim, spacedim>::active_cell_iterator(
+                this->end()),
+              [](const auto &i) { return (i.is_locally_owned()); });
+
+            const unsigned int total_cells =
+              Utilities::MPI::sum(n_my_cells, this->get_mpi_communicator());
+            Assert(total_cells == this->n_active_cells(),
+                   ExcMessage("Not all cells are assigned to a processor."));
+          }
+
+          // If running with multigrid, assert that each level
+          // cell is owned by a processor
+          if (settings & construct_multigrid_hierarchy)
+            {
+              const unsigned int n_my_cells =
+                std::count_if(this->begin(), this->end(), [](const auto &i) {
+                  return (i.is_locally_owned_on_level());
+                });
 
 
-          const unsigned int total_cells =
-            Utilities::MPI::sum(n_my_cells, this->get_mpi_communicator());
-          Assert(total_cells == this->n_cells(),
-                 ExcMessage("Not all cells are assigned to a processor."));
+              const unsigned int total_cells =
+                Utilities::MPI::sum(n_my_cells, this->get_mpi_communicator());
+              Assert(total_cells == this->n_cells(),
+                     ExcMessage("Not all cells are assigned to a processor."));
+            }
         }
-#  endif
     }
 
 
@@ -591,6 +593,6 @@ namespace internal
 
 
 /*-------------- Explicit Instantiations -------------------------------*/
-#include "shared_tria.inst"
+#include "distributed/shared_tria.inst"
 
 DEAL_II_NAMESPACE_CLOSE

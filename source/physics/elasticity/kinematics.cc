@@ -12,11 +12,13 @@
 //
 // ------------------------------------------------------------------------
 
+#include <deal.II/base/tensor.h>
+
 #include <deal.II/physics/elasticity/kinematics.h>
 
 DEAL_II_NAMESPACE_OPEN
 
 // explicit instantiations
-#include "kinematics.inst"
+#include "physics/elasticity/kinematics.inst"
 
 DEAL_II_NAMESPACE_CLOSE

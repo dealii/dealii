@@ -880,7 +880,8 @@ public:
    * @param face The number of the face this degree of freedom lives on. This
    * number must be between zero and GeometryInfo::faces_per_cell.
    * @param combined_orientation The combined orientation flag containing the
-   * orientation, rotation, and flip of the face. See @ref GlossFaceOrientation.
+   * orientation, rotation, and flip of the face. See
+   * @ref GlossCombinedOrientation.
    * @return The index of this degree of freedom within the set of degrees of
    * freedom on the entire cell. The returned value will be between zero and
    * dofs_per_cell.

@@ -322,22 +322,24 @@ FE_DGQ<dim, spacedim>::get_interpolation_matrix(
           if (std::fabs(interpolation_matrix(i, j)) < 1e-15)
             interpolation_matrix(i, j) = 0.;
 
-#ifdef DEBUG
-      // make sure that the row sum of
-      // each of the matrices is 1 at
-      // this point. this must be so
-      // since the shape functions sum up
-      // to 1
-      for (unsigned int i = 0; i < this->n_dofs_per_cell(); ++i)
+      if constexpr (running_in_debug_mode())
         {
-          double sum = 0.;
-          for (unsigned int j = 0; j < source_fe->n_dofs_per_cell(); ++j)
-            sum += interpolation_matrix(i, j);
+          // make sure that the row sum of
+          // each of the matrices is 1 at
+          // this point. this must be so
+          // since the shape functions sum up
+          // to 1
+          for (unsigned int i = 0; i < this->n_dofs_per_cell(); ++i)
+            {
+              double sum = 0.;
+              for (unsigned int j = 0; j < source_fe->n_dofs_per_cell(); ++j)
+                sum += interpolation_matrix(i, j);
 
-          Assert(std::fabs(sum - 1) < 5e-14 * std::max(this->degree, 1U) * dim,
-                 ExcInternalError());
+              Assert(std::fabs(sum - 1) <
+                       5e-14 * std::max(this->degree, 1U) * dim,
+                     ExcInternalError());
+            }
         }
-#endif
     }
   else if (dynamic_cast<const FE_Nothing<dim> *>(&x_source_fe))
     {
@@ -430,7 +432,8 @@ FE_DGQ<dim, spacedim>::get_prolongation_matrix(
   Assert(refinement_case != RefinementCase<dim>::no_refinement,
          ExcMessage(
            "Prolongation matrices are only available for refined cells!"));
-  AssertIndexRange(child, GeometryInfo<dim>::n_children(refinement_case));
+  AssertIndexRange(
+    child, this->reference_cell().template n_children<dim>(refinement_case));
 
   // initialization upon first request
   if (this->prolongation[refinement_case - 1][child].n() == 0)
@@ -451,7 +454,8 @@ FE_DGQ<dim, spacedim>::get_prolongation_matrix(
           std::vector<std::vector<FullMatrix<double>>> isotropic_matrices(
             RefinementCase<dim>::isotropic_refinement);
           isotropic_matrices.back().resize(
-            GeometryInfo<dim>::n_children(RefinementCase<dim>(refinement_case)),
+            this->reference_cell().template n_children<dim>(
+              RefinementCase<dim>(refinement_case)),
             FullMatrix<double>(this->n_dofs_per_cell(),
                                this->n_dofs_per_cell()));
           if (dim == spacedim)
@@ -506,7 +510,8 @@ FE_DGQ<dim, spacedim>::get_restriction_matrix(
   Assert(refinement_case != RefinementCase<dim>::no_refinement,
          ExcMessage(
            "Restriction matrices are only available for refined cells!"));
-  AssertIndexRange(child, GeometryInfo<dim>::n_children(refinement_case));
+  AssertIndexRange(
+    child, this->reference_cell().template n_children<dim>(refinement_case));
 
   // initialization upon first request
   if (this->restriction[refinement_case - 1][child].n() == 0)
@@ -527,7 +532,8 @@ FE_DGQ<dim, spacedim>::get_restriction_matrix(
           std::vector<std::vector<FullMatrix<double>>> isotropic_matrices(
             RefinementCase<dim>::isotropic_refinement);
           isotropic_matrices.back().resize(
-            GeometryInfo<dim>::n_children(RefinementCase<dim>(refinement_case)),
+            this->reference_cell().template n_children<dim>(
+              RefinementCase<dim>(refinement_case)),
             FullMatrix<double>(this->n_dofs_per_cell(),
                                this->n_dofs_per_cell()));
           if (dim == spacedim)
@@ -1074,7 +1080,7 @@ FE_DGQHermite<dim, spacedim>::clone() const
 
 
 // explicit instantiations
-#include "fe_dgq.inst"
+#include "fe/fe_dgq.inst"
 
 
 DEAL_II_NAMESPACE_CLOSE

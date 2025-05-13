@@ -81,7 +81,7 @@ namespace numbers
       };
 
 
-      template <typename T, size_t width>
+      template <typename T, std::size_t width>
       struct NaNInitializer<VectorizedArray<T, width>>
       {
         static VectorizedArray<T, width>

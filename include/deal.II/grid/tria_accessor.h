@@ -1816,6 +1816,8 @@ private:
    * Set the combined face orientation (i.e., the integer that uniquely encodes
    * the orientation, flip, and rotation). This function is only implemented for
    * objects which have faces, i.e., for structdim == dim.
+   * For more information see the
+   * @ref GlossCombinedOrientation "combined orientation glossary entry".
    *
    * @ingroup reordering
    */
@@ -4896,33 +4898,23 @@ namespace internal
       inline static void
       set_combined_face_orientation(
         const TriaAccessor<structdim, dim, spacedim> &accessor,
-        const unsigned int                            face,
+        const unsigned int                            face_no,
         const types::geometric_orientation            combined_orientation)
       {
         Assert(structdim == dim,
                ExcMessage("This function can only be used on objects that are "
                           "cells and not on objects which bound cells."));
-        AssertIndexRange(face, accessor.n_faces());
-
-        if (dim == 1)
-          Assert(combined_orientation == numbers::default_geometric_orientation,
-                 ExcMessage("In 1d, faces do not have an orientation, so the "
-                            "only valid value is the default."));
-        else if (dim == 2)
-          Assert(combined_orientation ==
-                     numbers::default_geometric_orientation ||
-                   combined_orientation == numbers::reverse_line_orientation,
-                 ExcMessage(
-                   "In 2d, the only valid values of the combined orientation "
-                   "are the standard orientation or the reversed line "
-                   "orientation."));
+        AssertIndexRange(face_no, accessor.n_faces());
+        AssertIndexRange(combined_orientation,
+                         accessor.reference_cell().n_face_orientations(
+                           face_no));
 
         // face_orientations is not set up in 1d
         if (dim != 1)
           accessor.tria->levels[accessor.present_level]
             ->face_orientations.set_combined_orientation(
               accessor.present_index * ReferenceCells::max_n_faces<dim>() +
-                face,
+                face_no,
               combined_orientation);
       }
 
@@ -5428,7 +5420,7 @@ TriaAccessor<structdim, dim, spacedim>::combined_face_orientation(
         return numbers::default_geometric_orientation;
       else
         return this->tria->levels[this->present_level]
-          ->face_orientations.get_orientation(
+          ->face_orientations.get_combined_orientation(
             this->present_index * ReferenceCells::max_n_faces<dim>() + face);
     }
   else
@@ -5591,7 +5583,7 @@ TriaAccessor<structdim, dim, spacedim>::set_line_orientation(
   Assert(dim != 2,
          ExcMessage("In 2d lines are faces, and, for compatibility with other "
                     "dimensions, their orientations should be set via "
-                    "set_combined_orientation()."));
+                    "set_combined_face_orientation()."));
   // work around a bogus GCC-9 warning which considers line and value unused
   // except in 3d
   (void)line;
@@ -6473,21 +6465,22 @@ TriaAccessor<structdim, dim, spacedim>::enclosing_ball() const
             // outside the old ball.
           }
       }
-#  ifdef DEBUG
-  bool all_vertices_within_ball = true;
+  if constexpr (running_in_debug_mode())
+    {
+      bool all_vertices_within_ball = true;
 
-  // Set all_vertices_within_ball false if any of the vertices of the object
-  // are geometrically outside the ball
-  for (const unsigned int v : this->vertex_indices())
-    if (center.distance(this->vertex(v)) >
-        radius + 100. * std::numeric_limits<double>::epsilon())
-      {
-        all_vertices_within_ball = false;
-        break;
-      }
-  // If all the vertices are not within the ball throw error
-  Assert(all_vertices_within_ball, ExcInternalError());
-#  endif
+      // Set all_vertices_within_ball false if any of the vertices of the object
+      // are geometrically outside the ball
+      for (const unsigned int v : this->vertex_indices())
+        if (center.distance(this->vertex(v)) >
+            radius + 100. * std::numeric_limits<double>::epsilon())
+          {
+            all_vertices_within_ball = false;
+            break;
+          }
+      // If all the vertices are not within the ball throw error
+      Assert(all_vertices_within_ball, ExcInternalError());
+    }
   return std::make_pair(center, radius);
 }
 
@@ -6592,7 +6585,8 @@ template <int structdim, int dim, int spacedim>
 std_cxx20::ranges::iota_view<unsigned int, unsigned int>
 TriaAccessor<structdim, dim, spacedim>::vertex_indices() const
 {
-  return {0U, n_vertices()};
+  return std_cxx20::ranges::iota_view<unsigned int, unsigned int>(0U,
+                                                                  n_vertices());
 }
 
 
@@ -6601,7 +6595,8 @@ template <int structdim, int dim, int spacedim>
 std_cxx20::ranges::iota_view<unsigned int, unsigned int>
 TriaAccessor<structdim, dim, spacedim>::line_indices() const
 {
-  return {0U, n_lines()};
+  return std_cxx20::ranges::iota_view<unsigned int, unsigned int>(0U,
+                                                                  n_lines());
 }
 
 
@@ -6610,7 +6605,8 @@ template <int structdim, int dim, int spacedim>
 std_cxx20::ranges::iota_view<unsigned int, unsigned int>
 TriaAccessor<structdim, dim, spacedim>::face_indices() const
 {
-  return {0U, n_faces()};
+  return std_cxx20::ranges::iota_view<unsigned int, unsigned int>(0U,
+                                                                  n_faces());
 }
 
 
@@ -7322,7 +7318,7 @@ inline types::geometric_orientation
 TriaAccessor<0, 1, spacedim>::combined_face_orientation(
   const unsigned int /*face*/)
 {
-  return 0;
+  return numbers::reverse_line_orientation;
 }
 
 
@@ -7530,7 +7526,8 @@ template <int spacedim>
 std_cxx20::ranges::iota_view<unsigned int, unsigned int>
 TriaAccessor<0, 1, spacedim>::vertex_indices() const
 {
-  return {0U, n_vertices()};
+  return std_cxx20::ranges::iota_view<unsigned int, unsigned int>(0U,
+                                                                  n_vertices());
 }
 
 
@@ -7539,7 +7536,8 @@ template <int spacedim>
 std_cxx20::ranges::iota_view<unsigned int, unsigned int>
 TriaAccessor<0, 1, spacedim>::line_indices() const
 {
-  return {0U, n_lines()};
+  return std_cxx20::ranges::iota_view<unsigned int, unsigned int>(0U,
+                                                                  n_lines());
 }
 
 /*------------------ Functions: CellAccessor<dim,spacedim> ------------------*/
@@ -7858,125 +7856,91 @@ CellAccessor<dim, spacedim>::flag_for_line_refinement(
 
 
 
-template <>
-inline dealii::internal::SubfaceCase<1>
-CellAccessor<1>::subface_case(const unsigned int) const
-{
-  return dealii::internal::SubfaceCase<1>::case_none;
-}
-
-template <>
-inline dealii::internal::SubfaceCase<1>
-CellAccessor<1, 2>::subface_case(const unsigned int) const
-{
-  return dealii::internal::SubfaceCase<1>::case_none;
-}
-
-
-template <>
-inline dealii::internal::SubfaceCase<1>
-CellAccessor<1, 3>::subface_case(const unsigned int) const
-{
-  return dealii::internal::SubfaceCase<1>::case_none;
-}
-
-
-template <>
-inline dealii::internal::SubfaceCase<2>
-CellAccessor<2>::subface_case(const unsigned int face_no) const
+template <int dim, int spacedim>
+inline dealii::internal::SubfaceCase<dim>
+CellAccessor<dim, spacedim>::subface_case(const unsigned int face_no) const
 {
   Assert(is_active(), TriaAccessorExceptions::ExcCellNotActive());
   AssertIndexRange(face_no, this->n_faces());
-  return ((face(face_no)->has_children()) ?
-            dealii::internal::SubfaceCase<2>::case_x :
-            dealii::internal::SubfaceCase<2>::case_none);
-}
 
-template <>
-inline dealii::internal::SubfaceCase<2>
-CellAccessor<2, 3>::subface_case(const unsigned int face_no) const
-{
-  Assert(is_active(), TriaAccessorExceptions::ExcCellNotActive());
-  AssertIndexRange(face_no, this->n_faces());
-  return ((face(face_no)->has_children()) ?
-            dealii::internal::SubfaceCase<2>::case_x :
-            dealii::internal::SubfaceCase<2>::case_none);
-}
-
-
-template <>
-inline dealii::internal::SubfaceCase<3>
-CellAccessor<3>::subface_case(const unsigned int face_no) const
-{
-  Assert(is_active(), TriaAccessorExceptions::ExcCellNotActive());
-  AssertIndexRange(face_no, this->n_faces());
-  switch (static_cast<std::uint8_t>(face(face_no)->refinement_case()))
+  if constexpr (dim == 1)
+    return dealii::internal::SubfaceCase<1>::case_none;
+  else if constexpr (dim == 2)
+    return ((face(face_no)->has_children()) ?
+              dealii::internal::SubfaceCase<2>::case_x :
+              dealii::internal::SubfaceCase<2>::case_none);
+  else if constexpr (dim == 3)
     {
-      case RefinementCase<3>::no_refinement:
-        return dealii::internal::SubfaceCase<3>::case_none;
-      case RefinementCase<3>::cut_x:
-        if (face(face_no)->child(0)->has_children())
-          {
-            Assert(face(face_no)->child(0)->refinement_case() ==
-                     RefinementCase<2>::cut_y,
-                   ExcInternalError());
-            if (face(face_no)->child(1)->has_children())
+      switch (static_cast<std::uint8_t>(face(face_no)->refinement_case()))
+        {
+          case RefinementCase<3>::no_refinement:
+            return dealii::internal::SubfaceCase<3>::case_none;
+          case RefinementCase<3>::cut_x:
+            if (face(face_no)->child(0)->has_children())
               {
-                Assert(face(face_no)->child(1)->refinement_case() ==
+                Assert(face(face_no)->child(0)->refinement_case() ==
                          RefinementCase<2>::cut_y,
                        ExcInternalError());
-                return dealii::internal::SubfaceCase<3>::case_x1y2y;
+                if (face(face_no)->child(1)->has_children())
+                  {
+                    Assert(face(face_no)->child(1)->refinement_case() ==
+                             RefinementCase<2>::cut_y,
+                           ExcInternalError());
+                    return dealii::internal::SubfaceCase<3>::case_x1y2y;
+                  }
+                else
+                  return dealii::internal::SubfaceCase<3>::case_x1y;
               }
             else
-              return dealii::internal::SubfaceCase<3>::case_x1y;
-          }
-        else
-          {
-            if (face(face_no)->child(1)->has_children())
               {
-                Assert(face(face_no)->child(1)->refinement_case() ==
-                         RefinementCase<2>::cut_y,
-                       ExcInternalError());
-                return dealii::internal::SubfaceCase<3>::case_x2y;
+                if (face(face_no)->child(1)->has_children())
+                  {
+                    Assert(face(face_no)->child(1)->refinement_case() ==
+                             RefinementCase<2>::cut_y,
+                           ExcInternalError());
+                    return dealii::internal::SubfaceCase<3>::case_x2y;
+                  }
+                else
+                  return dealii::internal::SubfaceCase<3>::case_x;
               }
-            else
-              return dealii::internal::SubfaceCase<3>::case_x;
-          }
-      case RefinementCase<3>::cut_y:
-        if (face(face_no)->child(0)->has_children())
-          {
-            Assert(face(face_no)->child(0)->refinement_case() ==
-                     RefinementCase<2>::cut_x,
-                   ExcInternalError());
-            if (face(face_no)->child(1)->has_children())
+          case RefinementCase<3>::cut_y:
+            if (face(face_no)->child(0)->has_children())
               {
-                Assert(face(face_no)->child(1)->refinement_case() ==
+                Assert(face(face_no)->child(0)->refinement_case() ==
                          RefinementCase<2>::cut_x,
                        ExcInternalError());
-                return dealii::internal::SubfaceCase<3>::case_y1x2x;
+                if (face(face_no)->child(1)->has_children())
+                  {
+                    Assert(face(face_no)->child(1)->refinement_case() ==
+                             RefinementCase<2>::cut_x,
+                           ExcInternalError());
+                    return dealii::internal::SubfaceCase<3>::case_y1x2x;
+                  }
+                else
+                  return dealii::internal::SubfaceCase<3>::case_y1x;
               }
             else
-              return dealii::internal::SubfaceCase<3>::case_y1x;
-          }
-        else
-          {
-            if (face(face_no)->child(1)->has_children())
               {
-                Assert(face(face_no)->child(1)->refinement_case() ==
-                         RefinementCase<2>::cut_x,
-                       ExcInternalError());
-                return dealii::internal::SubfaceCase<3>::case_y2x;
+                if (face(face_no)->child(1)->has_children())
+                  {
+                    Assert(face(face_no)->child(1)->refinement_case() ==
+                             RefinementCase<2>::cut_x,
+                           ExcInternalError());
+                    return dealii::internal::SubfaceCase<3>::case_y2x;
+                  }
+                else
+                  return dealii::internal::SubfaceCase<3>::case_y;
               }
-            else
-              return dealii::internal::SubfaceCase<3>::case_y;
-          }
-      case RefinementCase<3>::cut_xy:
-        return dealii::internal::SubfaceCase<3>::case_xy;
-      default:
-        DEAL_II_ASSERT_UNREACHABLE();
+          case RefinementCase<3>::cut_xy:
+            return dealii::internal::SubfaceCase<3>::case_xy;
+          default:
+            DEAL_II_ASSERT_UNREACHABLE();
+        }
     }
+
   // we should never get here
-  return dealii::internal::SubfaceCase<3>::case_none;
+  DEAL_II_ASSERT_UNREACHABLE();
+  return dealii::internal::SubfaceCase<dim>::case_none;
 }
 
 

@@ -25,6 +25,9 @@
 
 #include <deal.II/grid/tria.h>
 
+#include <boost/container/small_vector.hpp>
+#include <boost/signals2/connection.hpp>
+
 
 DEAL_II_NAMESPACE_OPEN
 

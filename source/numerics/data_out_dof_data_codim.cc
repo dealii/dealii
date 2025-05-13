@@ -19,6 +19,7 @@
 #include <deal.II/lac/petsc_vector.h>
 #include <deal.II/lac/trilinos_epetra_vector.h>
 #include <deal.II/lac/trilinos_parallel_block_vector.h>
+#include <deal.II/lac/trilinos_tpetra_block_vector.h>
 #include <deal.II/lac/trilinos_tpetra_vector.h>
 #include <deal.II/lac/trilinos_vector.h>
 #include <deal.II/lac/vector.h>
@@ -28,6 +29,6 @@
 
 DEAL_II_NAMESPACE_OPEN
 
-#include "data_out_dof_data_codim.inst"
+#include "numerics/data_out_dof_data_codim.inst"
 
 DEAL_II_NAMESPACE_CLOSE

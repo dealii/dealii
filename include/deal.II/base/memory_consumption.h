@@ -18,6 +18,8 @@
 
 #include <deal.II/base/config.h>
 
+#include <deal.II/base/vectorization.h>
+
 #include <array>
 #include <complex>
 #include <cstddef>
@@ -284,7 +286,7 @@ namespace MemoryConsumption
       }
     else
       {
-        return sizeof(char) * (strlen(string) /*Remember the NUL*/ + 1);
+        return sizeof(char) * (std::strlen(string) /*Remember the NUL*/ + 1);
       }
   }
 

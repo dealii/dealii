@@ -44,14 +44,15 @@ DynamicSparsityPattern::Line::add_entries(ForwardIterator begin,
     {
       // in debug mode, check whether the
       // indices really are sorted.
-#ifdef DEBUG
-      {
-        ForwardIterator test = begin, test1 = begin;
-        ++test1;
-        for (; test1 != end; ++test, ++test1)
-          Assert(*test1 > *test, ExcInternalError());
-      }
-#endif
+      if constexpr (running_in_debug_mode())
+        {
+          {
+            ForwardIterator test = begin, test1 = begin;
+            ++test1;
+            for (; test1 != end; ++test, ++test1)
+              Assert(*test1 > *test, ExcInternalError());
+          }
+        }
 
       if (entries.empty() || entries.back() < *begin)
         {

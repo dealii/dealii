@@ -67,20 +67,23 @@ main()
 
   SD::Utilities::print_substitution_map(deallog, substitution_map);
 
-#ifdef DEBUG
-  // Check that exceptions are raised when duplicate symbols
-  // are found in a substitution map
-  deal_II_exceptions::disable_abort_on_exception();
-  try
+  if constexpr (running_in_debug_mode())
     {
-      SD::add_to_substitution_map(substitution_map,
-                                  std::make_pair(SD::Expression("x14"), 14));
+      // Check that exceptions are raised when duplicate symbols
+      // are found in a substitution map
+      deal_II_exceptions::disable_abort_on_exception();
+      try
+        {
+          SD::add_to_substitution_map(substitution_map,
+                                      std::make_pair(SD::Expression("x14"),
+                                                     14));
 
-      deallog << "Duplicate symbol in map did not raise an error." << std::endl;
+          deallog << "Duplicate symbol in map did not raise an error."
+                  << std::endl;
+        }
+      catch (const ExcMessage &)
+        {}
     }
-  catch (const ExcMessage &)
-    {}
-#endif
 
   deallog << "OK" << std::endl;
 }

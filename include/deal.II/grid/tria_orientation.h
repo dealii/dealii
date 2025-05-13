@@ -17,6 +17,7 @@
 
 #include <deal.II/base/config.h>
 
+#include <deal.II/base/types.h>
 #include <deal.II/base/utilities.h>
 
 #include <tuple>
@@ -33,7 +34,7 @@ namespace internal
                             const bool face_rotation,
                             const bool face_flip)
   {
-    return (face_orientation ? 1 : 0) + (face_rotation ? 2 : 0) +
+    return (face_orientation ? 0 : 1) + (face_rotation ? 2 : 0) +
            (face_flip ? 4 : 0);
   }
 
@@ -45,7 +46,7 @@ namespace internal
   split_face_orientation(
     const types::geometric_orientation combined_face_orientation)
   {
-    return {Utilities::get_bit(combined_face_orientation, 0),
+    return {!Utilities::get_bit(combined_face_orientation, 0),
             Utilities::get_bit(combined_face_orientation, 1),
             Utilities::get_bit(combined_face_orientation, 2)};
   }

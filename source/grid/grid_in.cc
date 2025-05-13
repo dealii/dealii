@@ -2848,17 +2848,19 @@ GridIn<dim, spacedim>::read_msh(const std::string &fname)
         AssertDimension(node_tags[i], i + 1);
         for (unsigned int d = 0; d < spacedim; ++d)
           vertices[i][d] = coord[i * 3 + d];
-#  ifdef DEBUG
-        // Make sure the embedded dimension is right
-        for (unsigned int d = spacedim; d < 3; ++d)
-          Assert(std::abs(coord[i * 3 + d]) < 1e-10,
-                 ExcMessage("The grid you are reading contains nodes that are "
-                            "nonzero in the coordinate with index " +
-                            std::to_string(d) +
-                            ", but you are trying to save "
-                            "it on a grid embedded in a " +
-                            std::to_string(spacedim) + " dimensional space."));
-#  endif
+        if constexpr (running_in_debug_mode())
+          {
+            // Make sure the embedded dimension is right
+            for (unsigned int d = spacedim; d < 3; ++d)
+              Assert(std::abs(coord[i * 3 + d]) < 1e-10,
+                     ExcMessage(
+                       "The grid you are reading contains nodes that are "
+                       "nonzero in the coordinate with index " +
+                       std::to_string(d) +
+                       ", but you are trying to save "
+                       "it on a grid embedded in a " +
+                       std::to_string(spacedim) + " dimensional space."));
+          }
       }
   }
 
@@ -3058,7 +3060,10 @@ GridIn<dim, spacedim>::parse_tecplot_header(
   blocked    = false;
 
   // convert the string to upper case
-  std::transform(header.begin(), header.end(), header.begin(), ::toupper);
+  std::transform(header.begin(),
+                 header.end(),
+                 header.begin(),
+                 static_cast<int (*)(int)>(std::toupper));
 
   // replace all tabs, commas, newlines by
   // whitespaces
@@ -3670,7 +3675,7 @@ namespace
     std::transform(type_name_2.begin(),
                    type_name_2.end(),
                    type_name_2.begin(),
-                   [](unsigned char c) { return std::toupper(c); });
+                   static_cast<int (*)(int)>(std::toupper));
     const std::string numbers = "0123456789";
     type_name_2.erase(std::find_first_of(type_name_2.begin(),
                                          type_name_2.end(),
@@ -3842,7 +3847,7 @@ namespace
                      ++j)
                   boundary_line.vertices[j] =
                     cell.vertices[cell_type.face_to_cell_vertices(
-                      deal_face_n, j, 0)];
+                      deal_face_n, j, numbers::default_geometric_orientation)];
 
                 subcelldata.boundary_lines.push_back(std::move(boundary_line));
               }
@@ -3857,7 +3862,7 @@ namespace
                      ++j)
                   boundary_quad.vertices[j] =
                     cell.vertices[cell_type.face_to_cell_vertices(
-                      deal_face_n, j, 0)];
+                      deal_face_n, j, numbers::default_geometric_orientation)];
 
                 subcelldata.boundary_quads.push_back(std::move(boundary_quad));
               }
@@ -4471,7 +4476,7 @@ namespace
     std::string tmp;
     for (const char c : s)
       {
-        if (isdigit(c) != 0)
+        if (std::isdigit(c) != 0)
           {
             tmp += c;
           }
@@ -4498,7 +4503,10 @@ namespace
     while (std::getline(input_stream, line))
       {
       cont:
-        std::transform(line.begin(), line.end(), line.begin(), ::toupper);
+        std::transform(line.begin(),
+                       line.end(),
+                       line.begin(),
+                       static_cast<int (*)(int)>(std::toupper));
 
         if (line.compare("*HEADING") == 0 || line.compare(0, 2, "**") == 0 ||
             line.compare(0, 5, "*PART") == 0)
@@ -4618,7 +4626,7 @@ namespace
                 std::transform(line.begin(),
                                line.end(),
                                line.begin(),
-                               ::toupper);
+                               static_cast<int (*)(int)>(std::toupper));
 
                 // Surface can be created from ELSET, or directly from cells
                 // If elsets_list contains a key with specific name - refers
@@ -5016,6 +5024,6 @@ namespace
 
 
 // explicit instantiations
-#include "grid_in.inst"
+#include "grid/grid_in.inst"
 
 DEAL_II_NAMESPACE_CLOSE

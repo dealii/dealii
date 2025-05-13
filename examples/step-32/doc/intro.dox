@@ -215,9 +215,9 @@ certain tolerance, i.e., until
 @f[
   \left\|
   \left(\begin{array}{c}
-    F_U - A U^{(k)} - B P^{(k)}
+    F_U - A U^{(k)} - B^TP^{(k)}
     \\
-    B^T U^{(k)}
+    -B U^{(k)}
   \end{array}\right)
   \right\|
   < \text{Tol}.

@@ -27,6 +27,7 @@
 #  include <deal.II/lac/petsc_sparse_matrix.h>
 
 #  include <cmath>
+#  include <cstddef>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -113,7 +114,7 @@ namespace PETScWrappers
       /**
        * Create a BlockSparseMatrix with an array of PETSc matrices.
        */
-      template <size_t block_rows, size_t block_columns>
+      template <std::size_t block_rows, std::size_t block_columns>
       explicit BlockSparseMatrix(
         const std::array<std::array<Mat, block_columns>, block_rows> &);
 
@@ -370,7 +371,7 @@ namespace PETScWrappers
 
 
 
-    template <size_t block_rows, size_t block_columns>
+    template <std::size_t block_rows, std::size_t block_columns>
     inline BlockSparseMatrix::BlockSparseMatrix(
       const std::array<std::array<Mat, block_columns>, block_rows> &arrayA)
       : BlockSparseMatrix()

@@ -1468,6 +1468,6 @@ const unsigned int FEValuesBase<dim, spacedim>::space_dimension;
 /*-------------------------- Explicit Instantiations -------------------------*/
 
 
-#include "fe_values_base.inst"
+#include "fe/fe_values_base.inst"
 
 DEAL_II_NAMESPACE_CLOSE

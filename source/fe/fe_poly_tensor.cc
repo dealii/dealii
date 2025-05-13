@@ -166,7 +166,8 @@ namespace internal
         const unsigned int k = fe.tensor_degree() - 1;
 
         for (unsigned int l = 0; l < GeometryInfo<2>::lines_per_cell; ++l)
-          if (!(cell->line_orientation(l)) &&
+          if (cell->line_orientation(l) !=
+                numbers::default_geometric_orientation &&
               mapping_kind[0] == mapping_nedelec)
             {
               if (k == 0)
@@ -236,7 +237,8 @@ namespace internal
         // Here we adjust only the line (edge) dofs. The line dofs need only
         // sign adjustment. That is, no permutation of the line dofs is needed.
         for (unsigned int l = 0; l < GeometryInfo<3>::lines_per_cell; ++l)
-          if (!(cell->line_orientation(l)) &&
+          if (cell->line_orientation(l) !=
+                numbers::default_geometric_orientation &&
               mapping_kind[0] == mapping_nedelec)
             {
               if (k == 0)
@@ -1178,12 +1180,21 @@ FE_PolyTensor<dim, spacedim>::fill_fe_face_values(
   // to take (all data sets for all
   // faces are stored contiguously)
 
-  const auto offset =
-    QProjector<dim>::DataSetDescriptor::face(this->reference_cell(),
-                                             face_no,
-                                             cell->combined_face_orientation(
-                                               face_no),
-                                             n_q_points);
+  // TODO: The same 'legacy' comments for 2d apply here as well: these classes
+  // do not handle non-standard orientations in 2d in a way consistent with the
+  // rest of the library, but are consistent with themselves (see, e.g., the
+  // fe_conformity_dim_2 tests).
+  //
+  // In this case: all of this code was written assuming that QProjector assumed
+  // that all faces were in the default orientation in 2d, but contains special
+  // workarounds in case that isn't the case. Hence, to keep those workarounds
+  // working, we still assume that all faces are in the default orientation.
+  const auto offset = QProjector<dim>::DataSetDescriptor::face(
+    this->reference_cell(),
+    face_no,
+    dim == 2 ? numbers::default_geometric_orientation :
+               cell->combined_face_orientation(face_no),
+    n_q_points);
 
   // TODO: Size assertions
 
@@ -1860,14 +1871,14 @@ FE_PolyTensor<dim, spacedim>::fill_fe_subface_values(
   // offset determines which data set
   // to take (all data sets for all
   // sub-faces are stored contiguously)
-  const auto offset =
-    QProjector<dim>::DataSetDescriptor::subface(this->reference_cell(),
-                                                face_no,
-                                                sub_no,
-                                                cell->combined_face_orientation(
-                                                  face_no),
-                                                n_q_points,
-                                                cell->subface_case(face_no));
+  const auto offset = QProjector<dim>::DataSetDescriptor::subface(
+    this->reference_cell(),
+    face_no,
+    sub_no,
+    dim == 2 ? numbers::default_geometric_orientation :
+               cell->combined_face_orientation(face_no),
+    n_q_points,
+    cell->subface_case(face_no));
 
   // TODO: Size assertions
 
@@ -2605,7 +2616,7 @@ FE_PolyTensor<dim, spacedim>::requires_update_flags(
 
 #endif
 // explicit instantiations
-#include "fe_poly_tensor.inst"
+#include "fe/fe_poly_tensor.inst"
 
 
 DEAL_II_NAMESPACE_CLOSE

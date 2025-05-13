@@ -18,6 +18,8 @@
 
 #include <deal.II/base/config.h>
 
+#include <deal.II/base/exception_macros.h>
+#include <deal.II/base/exceptions.h>
 #include <deal.II/base/graph_coloring.h>
 #include <deal.II/base/memory_space.h>
 
@@ -26,6 +28,8 @@
 #include <deal.II/fe/fe_dgq.h>
 #include <deal.II/fe/fe_values.h>
 #include <deal.II/fe/mapping_q1.h>
+
+#include <deal.II/lac/block_vector_base.h>
 
 #include <deal.II/matrix_free/portable_hanging_nodes_internal.h>
 #include <deal.II/matrix_free/portable_matrix_free.h>
@@ -164,8 +168,8 @@ namespace Portable
                      MemorySpace::Default::kokkos_space>(
           Kokkos::view_alloc("local_to_global_" + std::to_string(color),
                              Kokkos::WithoutInitializing),
-          n_cells,
-          dofs_per_cell);
+          dofs_per_cell,
+          n_cells);
 
       if (update_flags & update_quadrature_points)
         data->q_points[color] =
@@ -173,30 +177,30 @@ namespace Portable
                        MemorySpace::Default::kokkos_space>(
             Kokkos::view_alloc("q_points_" + std::to_string(color),
                                Kokkos::WithoutInitializing),
-            n_cells,
-            q_points_per_cell);
+            q_points_per_cell,
+            n_cells);
 
       if (update_flags & update_JxW_values)
         data->JxW[color] =
           Kokkos::View<Number **, MemorySpace::Default::kokkos_space>(
             Kokkos::view_alloc("JxW_" + std::to_string(color),
                                Kokkos::WithoutInitializing),
-            n_cells,
-            q_points_per_cell);
+            q_points_per_cell,
+            n_cells);
 
       if (update_flags & update_gradients)
         data->inv_jacobian[color] =
           Kokkos::View<Number **[dim][dim], MemorySpace::Default::kokkos_space>(
             Kokkos::view_alloc("inv_jacobian_" + std::to_string(color),
                                Kokkos::WithoutInitializing),
-            n_cells,
-            q_points_per_cell);
+            q_points_per_cell,
+            n_cells);
 
       // Initialize to zero, i.e., unconstrained cell
       data->constraint_mask[color] =
         Kokkos::View<dealii::internal::MatrixFreeFunctions::ConstraintKinds *,
                      MemorySpace::Default::kokkos_space>(
-          "constraint_mask_" + std::to_string(color), n_cells);
+          "constraint_mask_" + std::to_string(color), n_cells * n_components);
 
       // Create the host mirrow Views and fill them
       auto constraint_mask_host =
@@ -208,7 +212,7 @@ namespace Portable
         JxW_host;
       typename std::remove_reference_t<
         decltype(data->inv_jacobian[color])>::HostMirror inv_jacobian_host;
-#if KOKKOS_VERSION >= 30600
+#if DEAL_II_KOKKOS_VERSION_GTE(3, 6, 0)
       auto local_to_global_host =
         Kokkos::create_mirror_view(Kokkos::WithoutInitializing,
                                    data->local_to_global[color]);
@@ -251,7 +255,8 @@ namespace Portable
 
           const ArrayView<
             dealii::internal::MatrixFreeFunctions::ConstraintKinds>
-            cell_id_view(constraint_mask_host[cell_id]);
+            cell_id_view(&constraint_mask_host[cell_id * n_components],
+                         n_components);
 
           hanging_nodes.setup_constraints(*cell,
                                           partitioner,
@@ -260,7 +265,7 @@ namespace Portable
                                           cell_id_view);
 
           for (unsigned int i = 0; i < dofs_per_cell; ++i)
-            local_to_global_host(cell_id, i) = lexicographic_dof_indices[i];
+            local_to_global_host(i, cell_id) = lexicographic_dof_indices[i];
 
           fe_values.reinit(*cell);
 
@@ -268,13 +273,13 @@ namespace Portable
           if (update_flags & update_quadrature_points)
             {
               for (unsigned int i = 0; i < q_points_per_cell; ++i)
-                q_points_host(cell_id, i) = fe_values.quadrature_point(i);
+                q_points_host(i, cell_id) = fe_values.quadrature_point(i);
             }
 
           if (update_flags & update_JxW_values)
             {
               for (unsigned int i = 0; i < q_points_per_cell; ++i)
-                JxW_host(cell_id, i) = fe_values.JxW(i);
+                JxW_host(i, cell_id) = fe_values.JxW(i);
             }
 
           if (update_flags & update_gradients)
@@ -282,7 +287,7 @@ namespace Portable
               for (unsigned int i = 0; i < q_points_per_cell; ++i)
                 for (unsigned int d = 0; d < dim; ++d)
                   for (unsigned int e = 0; e < dim; ++e)
-                    inv_jacobian_host(cell_id, i, d, e) =
+                    inv_jacobian_host(i, cell_id, d, e) =
                       fe_values.inverse_jacobian(i)[d][e];
             }
         }
@@ -329,7 +334,7 @@ namespace Portable
 
 
 
-    template <int dim, typename Number, typename Functor>
+    template <int dim, typename Number, typename Functor, bool IsBlock>
     struct ApplyKernel
     {
       using TeamHandle = Kokkos::TeamPolicy<
@@ -344,33 +349,55 @@ namespace Portable
                      MemorySpace::Default::kokkos_space::execution_space::
                        scratch_memory_space,
                      Kokkos::MemoryTraits<Kokkos::Unmanaged>>;
+      using SharedViewScratchPad =
+        Kokkos::View<Number *,
+                     MemorySpace::Default::kokkos_space::execution_space::
+                       scratch_memory_space,
+                     Kokkos::MemoryTraits<Kokkos::Unmanaged>>;
 
-      ApplyKernel(Functor                                      func,
-                  const typename MatrixFree<dim, Number>::Data gpu_data,
-                  Number *const                                src,
-                  Number                                      *dst)
+      ApplyKernel(
+        Functor                                                 func,
+        const typename MatrixFree<dim, Number>::PrecomputedData gpu_data,
+        const LinearAlgebra::distributed::Vector<Number, MemorySpace::Default>
+                                                                         &src,
+        LinearAlgebra::distributed::Vector<Number, MemorySpace::Default> &dst)
+        : func(func)
+        , gpu_data(gpu_data)
+        , src(DeviceVector<Number>(src.get_values(), src.locally_owned_size()))
+        , dst(DeviceVector<Number>(dst.get_values(), dst.locally_owned_size()))
+      {}
+
+      ApplyKernel(
+        Functor                                                 func,
+        const typename MatrixFree<dim, Number>::PrecomputedData gpu_data,
+        const LinearAlgebra::distributed::BlockVector<Number,
+                                                      MemorySpace::Default>
+          &src,
+        LinearAlgebra::distributed::BlockVector<Number, MemorySpace::Default>
+          &dst)
         : func(func)
         , gpu_data(gpu_data)
         , src(src)
         , dst(dst)
       {}
 
-      Functor                                      func;
-      const typename MatrixFree<dim, Number>::Data gpu_data;
-      Number *const                                src;
-      Number                                      *dst;
+      Functor                                                 func;
+      const typename MatrixFree<dim, Number>::PrecomputedData gpu_data;
+      const DeviceBlockVector<Number>                         src;
+      DeviceBlockVector<Number>                               dst;
 
 
       // Provide the shared memory capacity. This function takes the team_size
       // as an argument, which allows team_size dependent allocations.
-      size_t
+      std::size_t
       team_shmem_size(int /*team_size*/) const
       {
-        return SharedViewValues::shmem_size(Functor::n_local_dofs,
+        return SharedViewValues::shmem_size(Functor::n_q_points,
                                             gpu_data.n_components) +
-               SharedViewGradients::shmem_size(Functor::n_local_dofs,
+               SharedViewGradients::shmem_size(Functor::n_q_points,
                                                dim,
-                                               gpu_data.n_components);
+                                               gpu_data.n_components) +
+               SharedViewScratchPad::shmem_size(gpu_data.scratch_pad_size);
       }
 
 
@@ -379,16 +406,36 @@ namespace Portable
       operator()(const TeamHandle &team_member) const
       {
         // Get the scratch memory
-        SharedViewValues    values(team_member.team_shmem(),
-                                Functor::n_local_dofs,
+        SharedViewValues     values(team_member.team_shmem(),
+                                Functor::n_q_points,
                                 gpu_data.n_components);
-        SharedViewGradients gradients(team_member.team_shmem(),
-                                      Functor::n_local_dofs,
+        SharedViewGradients  gradients(team_member.team_shmem(),
+                                      Functor::n_q_points,
                                       dim,
                                       gpu_data.n_components);
+        SharedViewScratchPad scratch_pad(team_member.team_shmem(),
+                                         gpu_data.scratch_pad_size);
 
-        SharedData<dim, Number> shared_data(team_member, values, gradients);
-        func(team_member.league_rank(), &gpu_data, &shared_data, src, dst);
+        SharedData<dim, Number> shared_data(values, gradients, scratch_pad);
+
+        const unsigned int cell_index = team_member.league_rank();
+
+        typename MatrixFree<dim, Number>::Data data{team_member,
+                                                    /* n_dofhandler */ 1,
+                                                    cell_index,
+                                                    &gpu_data,
+                                                    &shared_data};
+
+        if constexpr (IsBlock)
+          {
+            DeviceBlockVector<Number> nonconstdst = dst;
+            func(&data, src, nonconstdst);
+          }
+        else
+          {
+            DeviceVector<Number> nonconstdst = dst.block(0);
+            func(&data, src.block(0), nonconstdst);
+          }
       }
     };
   } // namespace internal
@@ -475,10 +522,10 @@ namespace Portable
 
 
   template <int dim, typename Number>
-  typename MatrixFree<dim, Number>::Data
+  typename MatrixFree<dim, Number>::PrecomputedData
   MatrixFree<dim, Number>::get_data(unsigned int color) const
   {
-    Data data_copy;
+    PrecomputedData data_copy;
     if (q_points.size() > 0)
       data_copy.q_points = q_points[color];
     if (inv_jacobian.size() > 0)
@@ -496,6 +543,8 @@ namespace Portable
     data_copy.padding_length     = padding_length;
     data_copy.row_start          = row_start[color];
     data_copy.use_coloring       = use_coloring;
+    data_copy.element_type       = element_type;
+    data_copy.scratch_pad_size   = scratch_pad_size;
 
     return data_copy;
   }
@@ -608,23 +657,38 @@ namespace Portable
   void
   MatrixFree<dim, Number>::evaluate_coefficients(Functor func) const
   {
+    const unsigned int n_q_points = Functor::n_q_points;
+
     for (unsigned int i = 0; i < n_colors; ++i)
       if (n_cells[i] > 0)
         {
-          MemorySpace::Default::kokkos_space::execution_space exec;
           auto color_data = get_data(i);
+
+          MemorySpace::Default::kokkos_space::execution_space exec;
+          Kokkos::TeamPolicy<
+            MemorySpace::Default::kokkos_space::execution_space>
+            team_policy(exec, n_cells[i], Kokkos::AUTO);
+
           Kokkos::parallel_for(
-            "dealii::MatrixFree::evaluate_coeff",
-            Kokkos::MDRangePolicy<
-              MemorySpace::Default::kokkos_space::execution_space,
-              Kokkos::Rank<2>>(
-#if KOKKOS_VERSION >= 20900
-              exec,
-#endif
-              {0, 0},
-              {n_cells[i], Functor::n_q_points}),
-            KOKKOS_LAMBDA(const int cell, const int q) {
-              func(&color_data, cell, q);
+            "dealii::MatrixFree::evaluate_coeff_cell_loop",
+            team_policy,
+            KOKKOS_LAMBDA(const Kokkos::TeamPolicy<
+                          MemorySpace::Default::kokkos_space::execution_space>::
+                            member_type &team_member) {
+              Kokkos::parallel_for(Kokkos::TeamVectorRange(team_member,
+                                                           n_q_points),
+                                   [&](const int q_point) {
+                                     const int cell_index =
+                                       team_member.league_rank();
+
+                                     Data data{team_member,
+                                               /* n_dofhandler */ 1,
+                                               cell_index,
+                                               &color_data,
+                                               /* shared_data */ nullptr};
+
+                                     func(&data, cell_index, q_point);
+                                   });
             });
         }
   }
@@ -653,6 +717,49 @@ namespace Portable
 
     return bytes;
   }
+
+
+
+  namespace internal
+  {
+    /**
+     * Helper function for determining the scratch pad size.
+     */
+    inline unsigned int
+    compute_scratch_pad_size(
+      const ::dealii::internal::MatrixFreeFunctions::ElementType element_type,
+      const int                                                  dim,
+      const int                                                  fe_degree,
+      const int                                                  n_q_points_1d)
+    {
+      using ElementType = ::dealii::internal::MatrixFreeFunctions::ElementType;
+
+      if (fe_degree >= 0 && element_type <= ElementType::tensor_symmetric)
+        {
+          // evaluate/integrate with FEEvaluationImplCollocation or
+          // FEEvaluationImplTransformToCollocation
+          return Utilities::pow(n_q_points_1d, dim);
+        }
+      else if (fe_degree >= 0 &&
+               element_type <= ElementType::tensor_symmetric_no_collocation)
+        {
+          // evaluate/integrate with FEEvaluationImpl
+          if (dim == 1)
+            return n_q_points_1d;
+          else if (dim == 2)
+            return (fe_degree + 1) * n_q_points_1d;
+          else if (dim == 3)
+            return (fe_degree + 1) * n_q_points_1d *
+                   (fe_degree + 1 + n_q_points_1d);
+          else
+            AssertThrow(false, ExcNotImplemented());
+        }
+      else
+        AssertThrow(false, ExcNotImplemented());
+
+      return numbers::invalid_unsigned_int;
+    }
+  } // namespace internal
 
 
 
@@ -687,13 +794,15 @@ namespace Portable
     const unsigned int n_dofs_1d     = fe_degree + 1;
     const unsigned int n_q_points_1d = quad.size();
 
-    Assert(n_dofs_1d == n_q_points_1d,
-           ExcMessage("n_q_points_1d must be equal to fe_degree+1."));
+    // TODO remove the limitation in the future
+    AssertThrow(n_dofs_1d <= n_q_points_1d,
+                ExcMessage("n_q_points_1d must be greater than or equal to "
+                           "fe_degree + 1."));
 
     // Set padding length to the closest power of two larger than or equal to
     // the number of threads.
-    padding_length = 1 << static_cast<unsigned int>(
-                       std::ceil(dim * std::log2(fe_degree + 1.)));
+    padding_length = 1 << static_cast<unsigned int>(std::ceil(
+                       dim * std::log2(static_cast<float>(n_q_points_1d))));
 
     dofs_per_cell        = fe.n_dofs_per_cell();
     n_components         = fe.n_components();
@@ -702,6 +811,10 @@ namespace Portable
 
     ::dealii::internal::MatrixFreeFunctions::ShapeInfo<Number> shape_info(quad,
                                                                           fe);
+
+    this->element_type     = shape_info.element_type;
+    this->scratch_pad_size = internal::compute_scratch_pad_size(
+      shape_info.element_type, dim, fe_degree, n_q_points_1d);
 
     unsigned int size_shape_values = n_dofs_1d * n_q_points_1d;
 
@@ -920,21 +1033,33 @@ namespace Portable
           MemorySpace::Default::kokkos_space::execution_space exec;
           Kokkos::TeamPolicy<
             MemorySpace::Default::kokkos_space::execution_space>
-            team_policy(
-#if KOKKOS_VERSION >= 20900
-              exec,
-#endif
-              n_cells[color],
-              Kokkos::AUTO);
+            team_policy(exec, n_cells[color], Kokkos::AUTO);
 
-          internal::ApplyKernel<dim, Number, Functor> apply_kernel(
-            func, get_data(color), src.get_values(), dst.get_values());
+
+          internal::
+            ApplyKernel<dim, Number, Functor, IsBlockVector<VectorType>::value>
+              apply_kernel(func, get_data(color), src, dst);
 
           Kokkos::parallel_for("dealii::MatrixFree::serial_cell_loop",
                                team_policy,
                                apply_kernel);
         }
     Kokkos::fence();
+  }
+
+
+
+  template <int dim, typename Number>
+  template <typename Functor>
+  void
+  MatrixFree<dim, Number>::distributed_cell_loop(
+    const Functor &,
+    const LinearAlgebra::distributed::BlockVector<Number, MemorySpace::Default>
+      &,
+    LinearAlgebra::distributed::BlockVector<Number, MemorySpace::Default> &)
+    const
+  {
+    Assert(false, ExcNotImplemented());
   }
 
 
@@ -965,15 +1090,10 @@ namespace Portable
               {
                 Kokkos::TeamPolicy<
                   MemorySpace::Default::kokkos_space::execution_space>
-                  team_policy(
-#if KOKKOS_VERSION >= 20900
-                    exec,
-#endif
-                    n_cells[0],
-                    Kokkos::AUTO);
+                  team_policy(exec, n_cells[0], Kokkos::AUTO);
 
-                internal::ApplyKernel<dim, Number, Functor> apply_kernel(
-                  func, get_data(0), src.get_values(), dst.get_values());
+                internal::ApplyKernel<dim, Number, Functor, false> apply_kernel(
+                  func, get_data(0), src, dst);
 
                 Kokkos::parallel_for(
                   "dealii::MatrixFree::distributed_cell_loop_0",
@@ -988,15 +1108,10 @@ namespace Portable
               {
                 Kokkos::TeamPolicy<
                   MemorySpace::Default::kokkos_space::execution_space>
-                  team_policy(
-#if KOKKOS_VERSION >= 20900
-                    exec,
-#endif
-                    n_cells[1],
-                    Kokkos::AUTO);
+                  team_policy(exec, n_cells[1], Kokkos::AUTO);
 
-                internal::ApplyKernel<dim, Number, Functor> apply_kernel(
-                  func, get_data(1), src.get_values(), dst.get_values());
+                internal::ApplyKernel<dim, Number, Functor, false> apply_kernel(
+                  func, get_data(1), src, dst);
 
                 Kokkos::parallel_for(
                   "dealii::MatrixFree::distributed_cell_loop_1",
@@ -1016,15 +1131,10 @@ namespace Portable
               {
                 Kokkos::TeamPolicy<
                   MemorySpace::Default::kokkos_space::execution_space>
-                  team_policy(
-#if KOKKOS_VERSION >= 20900
-                    exec,
-#endif
-                    n_cells[2],
-                    Kokkos::AUTO);
+                  team_policy(exec, n_cells[2], Kokkos::AUTO);
 
-                internal::ApplyKernel<dim, Number, Functor> apply_kernel(
-                  func, get_data(2), src.get_values(), dst.get_values());
+                internal::ApplyKernel<dim, Number, Functor, false> apply_kernel(
+                  func, get_data(2), src, dst);
 
                 Kokkos::parallel_for(
                   "dealii::MatrixFree::distributed_cell_loop_2",
@@ -1049,15 +1159,10 @@ namespace Portable
                 {
                   Kokkos::TeamPolicy<
                     MemorySpace::Default::kokkos_space::execution_space>
-                    team_policy(
-#if KOKKOS_VERSION >= 20900
-                      exec,
-#endif
-                      n_cells[i],
-                      Kokkos::AUTO);
+                    team_policy(exec, n_cells[i], Kokkos::AUTO);
 
-                  internal::ApplyKernel<dim, Number, Functor> apply_kernel(
-                    func, get_data(i), src.get_values(), dst.get_values());
+                  internal::ApplyKernel<dim, Number, Functor, false>
+                    apply_kernel(func, get_data(i), src, dst);
 
                   Kokkos::parallel_for(
                     "dealii::MatrixFree::distributed_cell_loop_" +
@@ -1086,18 +1191,10 @@ namespace Portable
             {
               Kokkos::TeamPolicy<
                 MemorySpace::Default::kokkos_space::execution_space>
-                team_policy(
-#if KOKKOS_VERSION >= 20900
-                  exec,
-#endif
-                  n_cells[i],
-                  Kokkos::AUTO);
+                team_policy(exec, n_cells[i], Kokkos::AUTO);
 
-              internal::ApplyKernel<dim, Number, Functor> apply_kernel(
-                func,
-                get_data(i),
-                ghosted_src.get_values(),
-                ghosted_dst.get_values());
+              internal::ApplyKernel<dim, Number, Functor, false> apply_kernel(
+                func, get_data(i), ghosted_src, ghosted_dst);
 
               Kokkos::parallel_for(
                 "dealii::MatrixFree::distributed_cell_loop_" +

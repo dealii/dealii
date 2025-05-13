@@ -1,6 +1,5 @@
 
 DEAL::Solve with PreconditionIdentity: 
-DEAL:GMRES::Starting value 5.47723
 DEAL:GMRES::   estimated residual at iteration 0: 5.47723
 DEAL:GMRES::   estimated residual at iteration 1: 2.67042
 DEAL:GMRES::   estimated residual at iteration 2: 1.70538
@@ -41,10 +40,8 @@ DEAL:GMRES::   estimated residual at iteration 31: 0.000307521
 DEAL:GMRES::   estimated residual at iteration 32: 0.000247031
 DEAL:GMRES::   estimated residual at iteration 33: 0.000183614
 DEAL:GMRES::   estimated residual at iteration 34: 0.000129847
-DEAL:GMRES::Convergence step 35 value 9.20930e-05
 DEAL:GMRES::   estimated residual at iteration 35: 9.20930e-05
 DEAL::Solve with diagonal preconditioner: 
-DEAL:GMRES::Starting value 5.47723
 DEAL:GMRES::   estimated residual at iteration 0: 5.47723
 DEAL:GMRES::   estimated residual at iteration 1: 2.67042
 DEAL:GMRES::   estimated residual at iteration 2: 1.70538
@@ -85,14 +82,10 @@ DEAL:GMRES::   estimated residual at iteration 31: 0.000307521
 DEAL:GMRES::   estimated residual at iteration 32: 0.000247031
 DEAL:GMRES::   estimated residual at iteration 33: 0.000183614
 DEAL:GMRES::   estimated residual at iteration 34: 0.000129847
-DEAL:GMRES::Convergence step 35 value 9.20930e-05
 DEAL:GMRES::   estimated residual at iteration 35: 9.20930e-05
 DEAL::Solve with PreconditionIdentity: 
-DEAL:GMRES::Starting value 9.20930e-05
-DEAL:GMRES::Convergence step 0 value 9.20930e-05
 DEAL:GMRES::   estimated residual at iteration 0: 9.20930e-05
 DEAL::Solve with diagonal preconditioner: 
-DEAL:GMRES::Starting value 5.47723
 DEAL:GMRES::   estimated residual at iteration 0: 5.47723
 DEAL:GMRES::   estimated residual at iteration 1: 2.67042
 DEAL:GMRES::   estimated residual at iteration 2: 1.70538
@@ -133,5 +126,4 @@ DEAL:GMRES::   estimated residual at iteration 31: 0.000307521
 DEAL:GMRES::   estimated residual at iteration 32: 0.000247031
 DEAL:GMRES::   estimated residual at iteration 33: 0.000183614
 DEAL:GMRES::   estimated residual at iteration 34: 0.000129847
-DEAL:GMRES::Convergence step 35 value 9.20930e-05
 DEAL:GMRES::   estimated residual at iteration 35: 9.20930e-05

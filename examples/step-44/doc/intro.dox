@@ -302,10 +302,24 @@ Thus, the incompressible response is obtained by removing the volumetric compone
 
 <h3>Elasticity tensors</h3>
 
-We will use a Newton-Raphson strategy to solve the nonlinear boundary value problem.
-Thus, we will need to linearise the constitutive relations.
+We will use a Newton-Raphson strategy to solve the nonlinear boundary
+value problem, as explained in more detail below. Since we are trying
+to minimize an energy that we can conceptually denote as
+$E(\mathbf{U})$, the minimizing deformation is a place where the
+derivative $\dfrac{\partial E(\mathbf{U})}{\partial \mathbf{U}} =
+0$. This is a nonlinear equation, to which we apply Newton's method
+and for that we need the derivative of the function we want to be
+zero, i.e., the second derivative $\dfrac{\partial^2
+E(\mathbf{U})}{\partial \mathbf{U}^2}$. Because the equation
+$\dfrac{\partial E(\mathbf{U})}{\partial \mathbf{U}} = 0$ that
+describes minimization of the energy corresponds to the force balance
+-- i.e., the (nonlinear) elasticity equation that relates the
+displacement to the stress to the external forces -- the step of
+computing one further derivative corresponds to a linearization of the
+stress-displacement (or stress-strain) relationship.
 
-The fourth-order elasticity tensor in the material description is defined by
+In practice, this will requires us to compute the fourth-order
+elasticity tensor in the material description, defined by
 @f[
 	\mathfrak{C}
 		= 2\dfrac{\partial \mathbf{S}(\mathbf{C})}{\partial \mathbf{C}}
@@ -374,8 +388,11 @@ The boundary of the current configuration  $\partial \Omega$ is composed into tw
 $\partial \Omega = \partial \Omega_{\mathbf{u}} \cup \partial \Omega_{\sigma}$,
 where
 $\partial \Omega_{\mathbf{u}} \cap \partial \Omega_{\boldsymbol{\sigma}} = \emptyset$.
-The prescribed Cauchy traction, denoted $\mathbf{t}^\text{p}$, is applied to $ \partial \Omega_{\boldsymbol{\sigma}}$ while the motion is prescribed on the remaining portion of the boundary $\partial \Omega_{\mathbf{u}}$.
+The externally prescribed Cauchy traction, denoted $\mathbf{t}^\text{p}$, is applied to $ \partial \Omega_{\boldsymbol{\sigma}}$ while the motion (displacement) is prescribed on the remaining portion of the boundary $\partial \Omega_{\mathbf{u}}$.
 The body force per unit current volume is denoted $\mathbf{b}^\text{p}$.
+(In these terms, the superscript $\text{p}$ is meant to suggest that a
+quantity is *prescribed*, not that it is related to the unknown pressure
+$\tilde p$.)
 
 
 
@@ -451,8 +468,11 @@ The third is the definition of the pressure $\widetilde{p}$.
 where
 $[\mathrm{grad}\delta\mathbf{u}]^{\text{sym}} = 1/2[ \mathrm{grad}\delta\mathbf{u} + [\mathrm{grad}\delta\mathbf{u}]^T] $.
 
-We will use an iterative Newton-Raphson method to solve the nonlinear residual equation $R$.
-For the sake of simplicity we assume dead loading, i.e. the loading does not change due to the deformation.
+We will use an iterative Newton-Raphson method to solve the nonlinear
+residual equation $R$. (If this is new to you, you may want to take a
+look at step-15 first to see how deriving a Newton iteration is done
+using a simpler problem.) For the sake of simplicity we assume dead
+loading, i.e. the loading does not change due to the deformation.
 
 The change in a quantity between the known state at $t_{\textrm{n}-1}$
 and the currently unknown state at $t_{\textrm{n}}$ is denoted
@@ -494,7 +514,7 @@ Thus,
 @f}
 where
 @f{align*}{
-	D_{d \mathbf{u}} R( \mathbf{\Xi}; \delta \mathbf{\Xi})
+	D_{d \mathbf{u}} R( \mathbf{\Xi}; \delta \mathbf{\Xi}) \cdot d \mathbf{u}
  	&=
  	\int_{\Omega_0} \bigl[ \textrm{grad}\ \delta \mathbf{u} :
  			\textrm{grad}\ d \mathbf{u} [\boldsymbol{\tau}_{\textrm{iso}} + \boldsymbol{\tau}_{\textrm{vol}}]
@@ -505,12 +525,12 @@ where
  		\\
  	&\quad + \int_{\Omega_0} \delta \widetilde{p} J \mathbf{I} : \textrm{grad}\ d \mathbf{u} ~\textrm{d}V
  	\\
- 	D_{d \widetilde{p}} R( \mathbf{\Xi}; \delta \mathbf{\Xi})
+ 	D_{d \widetilde{p}} R( \mathbf{\Xi}; \delta \mathbf{\Xi})  d \widetilde{p}
  	&=
  	\int_{\Omega_0} \textrm{grad}\ \delta \mathbf{u} : J \mathbf{I} d \widetilde{p} ~\textrm{d}V
  		-  \int_{\Omega_0} \delta \widetilde{J} d \widetilde{p}  ~\textrm{d}V \, ,
  	\\
- 	D_{d \widetilde{J}} R( \mathbf{\Xi}; \delta \mathbf{\Xi})
+ 	D_{d \widetilde{J}} R( \mathbf{\Xi}; \delta \mathbf{\Xi})  d \widetilde{J}
  	&=  -\int_{\Omega_0} \delta \widetilde{p} d \widetilde{J}~\textrm{d}V
  	 + \int_{\Omega_0} \delta \widetilde{J}  \dfrac{\textrm{d}^2 \Psi_{\textrm{vol}}(\widetilde{J})}{\textrm{d} \widetilde{J}\textrm{d}\widetilde{J}} d \widetilde{J} ~\textrm{d}V \, .
 @f}
@@ -527,6 +547,18 @@ Note that the following terms are termed the geometrical stress and  the materia
  		&& \quad {[\textrm{Material}]} \, .
 @f}
 
+
+@note The scheme outlined above explicitly computes Newton updates
+using the linearized (three-field) elasticity equations, and then
+takes a full step: We add the update to the previous solution without
+any damping factor. This is known not to be a great strategy. One
+should really be using a line search to find the energy minimizer
+faster; in fact, while there, one should really also only update the
+Newton matrix when necessary. These steps are not trivial to
+implement, and as a consequence the canonical nonlinear tutorial
+step-15 also does not do them. But it is not terribly difficult to get
+this right, and if you're interested in a better scheme than the one
+implemented here, head over to step-77 to see how this can be done!
 
 <h3> Discretization of governing equations </h3>
 

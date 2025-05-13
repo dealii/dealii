@@ -24,9 +24,22 @@
 #include <deal.II/lac/sparse_matrix.h>
 #include <deal.II/lac/vector.h>
 
+#ifdef DEAL_II_WITH_PETSC
+#  include <deal.II/lac/petsc_block_sparse_matrix.h>
+#  include <deal.II/lac/petsc_precondition.h>
+#  include <deal.II/lac/petsc_solver.h>
+#  include <deal.II/lac/petsc_sparse_matrix.h>
+#endif
+
+#ifdef DEAL_II_WITH_TRILINOS
+#  include <deal.II/lac/trilinos_block_sparse_matrix.h>
+#  include <deal.II/lac/trilinos_precondition.h>
+#  include <deal.II/lac/trilinos_solver.h>
+#  include <deal.II/lac/trilinos_sparse_matrix.h>
+#endif
+
 
 DEAL_II_NAMESPACE_OPEN
-
 
 /**
  * A namespace in which the deal.II linear algebra classes are aliased to
@@ -63,17 +76,7 @@ namespace LinearAlgebraDealII
 } // namespace LinearAlgebraDealII
 
 
-DEAL_II_NAMESPACE_CLOSE
-
-
 #ifdef DEAL_II_WITH_PETSC
-
-#  include <deal.II/lac/petsc_block_sparse_matrix.h>
-#  include <deal.II/lac/petsc_precondition.h>
-#  include <deal.II/lac/petsc_solver.h>
-#  include <deal.II/lac/petsc_sparse_matrix.h>
-
-DEAL_II_NAMESPACE_OPEN
 
 /**
  * A namespace in which the wrappers to the PETSc linear algebra classes are
@@ -154,19 +157,9 @@ namespace LinearAlgebraPETSc
   } // namespace MPI
 
 } // namespace LinearAlgebraPETSc
-DEAL_II_NAMESPACE_CLOSE
-
-
 #endif // DEAL_II_WITH_PETSC
 
 #ifdef DEAL_II_WITH_TRILINOS
-
-#  include <deal.II/lac/trilinos_block_sparse_matrix.h>
-#  include <deal.II/lac/trilinos_precondition.h>
-#  include <deal.II/lac/trilinos_solver.h>
-#  include <deal.II/lac/trilinos_sparse_matrix.h>
-
-DEAL_II_NAMESPACE_OPEN
 
 /**
  * A namespace in which the wrappers to the Trilinos linear algebra classes
@@ -250,11 +243,9 @@ namespace LinearAlgebraTrilinos
 
 } // namespace LinearAlgebraTrilinos
 
-DEAL_II_NAMESPACE_CLOSE
-
 
 #endif // DEAL_II_WITH_TRILINOS
 
-
+DEAL_II_NAMESPACE_CLOSE
 
 #endif

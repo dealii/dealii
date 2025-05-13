@@ -21,29 +21,9 @@
 
 #  include <deal.II/lac/block_indices.h>
 #  include <deal.II/lac/block_vector_base.h>
-#  include <deal.II/lac/trilinos_tpetra_block_sparse_matrix.h>
 #  include <deal.II/lac/trilinos_tpetra_vector.h>
 
 DEAL_II_NAMESPACE_OPEN
-
-// forward declaration
-#  ifndef DOXYGEN
-template <typename Number>
-class BlockVectorBase;
-
-namespace LinearAlgebra
-{
-  // forward declaration
-  namespace TpetraWrappers
-  {
-    template <typename Number, typename MemorySpace>
-    class BlockVector;
-
-    template <typename Number, typename MemorySpace>
-    class BlockSparseMatrix;
-  } // namespace TpetraWrappers
-} // namespace LinearAlgebra
-#  endif // DOXYGEN
 
 namespace LinearAlgebra
 {
@@ -247,6 +227,16 @@ namespace LinearAlgebra
   /** @} */
 
 } // namespace LinearAlgebra
+
+/**
+ * Declare dealii::LinearAlgebra::TpetraWrappers::BlockVector as distributed
+ * vector.
+ */
+template <typename Number, typename MemorySpace>
+struct is_serial_vector<
+  LinearAlgebra::TpetraWrappers::BlockVector<Number, MemorySpace>>
+  : std::false_type
+{};
 
 DEAL_II_NAMESPACE_CLOSE
 

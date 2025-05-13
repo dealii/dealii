@@ -290,6 +290,7 @@ PointValueHistory<dim>::add_point(const Point<dim> &location)
   // the GridTools function does not cater for
   // a vector of points, and does not seem to
   // be intrinsicly faster than this method.
+  new_solution_indices.reserve(dof_handler->get_fe(0).n_components());
   for (unsigned int component = 0;
        component < dof_handler->get_fe(0).n_components();
        component++)
@@ -423,6 +424,7 @@ PointValueHistory<dim>::add_points(const std::vector<Point<dim>> &locations)
       current_cell[point]->get_dof_indices(local_dof_indices);
       std::vector<types::global_dof_index> new_solution_indices;
 
+      new_solution_indices.reserve(dof_handler->get_fe(0).n_components());
       for (unsigned int component = 0;
            component < dof_handler->get_fe(0).n_components();
            component++)
@@ -1502,7 +1504,7 @@ PointValueHistory<dim>::tria_change_listener()
 
 
 // explicit instantiations
-#include "point_value_history.inst"
+#include "numerics/point_value_history.inst"
 
 
 DEAL_II_NAMESPACE_CLOSE

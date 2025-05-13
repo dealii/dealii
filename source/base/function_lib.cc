@@ -2604,11 +2604,11 @@ namespace Functions
     // above to accommodate points that may lie outside the range
     Point<dim> p_unit;
     for (unsigned int d = 0; d < dim; ++d)
-      p_unit[d] = std::max(std::min((p[d] - coordinate_values[d][ix[d]]) /
-                                      (coordinate_values[d][ix[d] + 1] -
-                                       coordinate_values[d][ix[d]]),
-                                    1.),
-                           0.);
+      p_unit[d] = std::clamp((p[d] - coordinate_values[d][ix[d]]) /
+                               (coordinate_values[d][ix[d] + 1] -
+                                coordinate_values[d][ix[d]]),
+                             0.,
+                             1.);
 
     return interpolate(data_values, ix, p_unit);
   }
@@ -2636,8 +2636,7 @@ namespace Functions
     Point<dim> p_unit;
     for (unsigned int d = 0; d < dim; ++d)
       p_unit[d] =
-        std::max(std::min((p[d] - coordinate_values[d][ix[d]]) / dx[d], 1.),
-                 0.0);
+        std::clamp((p[d] - coordinate_values[d][ix[d]]) / dx[d], 0., 1.);
 
     return gradient_interpolate(data_values, ix, p_unit, dx);
   }
@@ -2729,11 +2728,12 @@ namespace Functions
         const double delta_x =
           ((interval_endpoints[d].second - interval_endpoints[d].first) /
            n_subintervals[d]);
-        p_unit[d] = std::max(std::min((p[d] - interval_endpoints[d].first -
-                                       ix[d] * delta_x) /
-                                        delta_x,
-                                      1.),
-                             0.);
+
+        p_unit[d] =
+          std::clamp((p[d] - interval_endpoints[d].first - ix[d] * delta_x) /
+                       delta_x,
+                     0.,
+                     1.);
       }
 
     return interpolate(data_values, ix, p_unit);
@@ -2778,12 +2778,11 @@ namespace Functions
         delta_x[d] = ((this->interval_endpoints[d].second -
                        this->interval_endpoints[d].first) /
                       this->n_subintervals[d]);
-        p_unit[d] =
-          std::max(std::min((p[d] - this->interval_endpoints[d].first -
-                             ix[d] * delta_x[d]) /
-                              delta_x[d],
-                            1.),
-                   0.);
+        p_unit[d]  = std::clamp((p[d] - this->interval_endpoints[d].first -
+                                ix[d] * delta_x[d]) /
+                                 delta_x[d],
+                               0.,
+                               1.);
       }
 
     return gradient_interpolate(this->data_values, ix, p_unit, delta_x);

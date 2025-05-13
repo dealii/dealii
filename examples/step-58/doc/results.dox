@@ -200,6 +200,30 @@ know that we could do far better:
   @cite Liao2016 .
 
 
+<h4> Better time steppers and better operator splitting methods </h4>
+
+This program implements its own time stepper, and in each time step
+uses the Strang splitting approach discussed in the introduction. Both
+of these are easy to implement, but are not optimal. Among the reasons
+for not being optimal are that both the Crank-Nicolson time stepping
+scheme and the Strang splitting limits convergence to ${\cal O}(k^2)$
+(where $k$ is the length of the time step), and that we are using a
+strategy in which the length of the time step is chosen a priori,
+rather than adaptively.
+
+In both of these issues, this program is in good company: step-26 also
+implements its own time stepping and time step control strategies, for
+example. But we know how to address these things, and that it isn't
+even very much work: We should be working with external libraries such
+as SUNDIALS or PETSc TS to use their sophisticated time steppers --
+see for example step-86. SUNDIALS even has implementations of operator
+splitting methods that can achieve higher order convergence and in
+which one just has to provide *separate* descriptions of the two right
+hand side terms (the spatial Laplace operator and the local phase
+rotation terms), and from there both the splitting, the time stepping,
+and the time step choice is done automatically.
+
+
 <h4> Boundary conditions </h4>
 
 In order to be usable for actual, realistic problems, solvers for the

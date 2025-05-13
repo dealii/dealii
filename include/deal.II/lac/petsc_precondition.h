@@ -19,6 +19,7 @@
 #include <deal.II/base/config.h>
 
 #include <deal.II/base/enable_observer_pointer.h>
+#include <deal.II/base/mpi_stub.h>
 #include <deal.II/base/point.h>
 
 #ifdef DEAL_II_WITH_PETSC
@@ -612,8 +613,14 @@ namespace PETScWrappers
    * multigrid preconditioner from the HYPRE suite. Note that PETSc has to be
    * configured with HYPRE (e.g. with \--download-hypre=1).
    *
-   * The preconditioner does support parallel distributed computations. See
+   * This preconditioner does support parallel distributed computations. See
    * step-40 for an example.
+   *
+   * This class can be used as a preconditioner for linear solvers. It
+   * also provides a `vmult()` function (implemented in the
+   * PreconditionBase base class) that, when called, performs one
+   * multigrid cycle. By default, this is a V-cycle, but the
+   * AdditionalData class allows to also select a W-cycle.
    *
    * @ingroup PETScWrappers
    */

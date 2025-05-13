@@ -6,7 +6,7 @@ DEAL::DoFs of face_1:
 DEAL:: component 0: (2 - -1.000 3.000) (3 - 1.000 3.000)
 DEAL::DoFs of face_2:
 DEAL:: component 0: (4 - -1.000 -3.000) (8 - 1.000 -3.000)
-DEAL::Orientation: 100
+DEAL::Orientation: 000
 DEAL::Matching:
     4 2:  1.000
     5 2:  0.5000
@@ -22,7 +22,7 @@ DEAL::DoFs of face_1:
 DEAL:: component 0: (0 - 1.000 3.000) (1 - -1.000 3.000)
 DEAL::DoFs of face_2:
 DEAL:: component 0: (4 - -1.000 -3.000) (8 - 1.000 -3.000)
-DEAL::Orientation: 000
+DEAL::Orientation: 100
 DEAL::Matching:
     4 1:  1.000
     5 1:  0.5000
@@ -40,7 +40,7 @@ DEAL::DoFs of face_1:
 DEAL:: component 0: (2 - -1.000 3.000 0.000) (3 - 1.000 3.000 0.000)
 DEAL::DoFs of face_2:
 DEAL:: component 0: (4 - -1.000 -3.000 0.000) (8 - 1.000 -3.000 0.000)
-DEAL::Orientation: 100
+DEAL::Orientation: 000
 DEAL::Matching:
     4 2:  1.000
     5 2:  0.5000
@@ -56,7 +56,7 @@ DEAL::DoFs of face_1:
 DEAL:: component 0: (0 - 1.000 3.000 0.000) (1 - -1.000 3.000 0.000)
 DEAL::DoFs of face_2:
 DEAL:: component 0: (4 - -1.000 -3.000 0.000) (8 - 1.000 -3.000 0.000)
-DEAL::Orientation: 000
+DEAL::Orientation: 100
 DEAL::Matching:
     4 1:  1.000
     5 1:  0.5000
@@ -74,7 +74,7 @@ DEAL::DoFs of face_1:
 DEAL:: component 0: (4 - -1.000 -1.000 3.000) (5 - 1.000 -1.000 3.000) (6 - -1.000 1.000 3.000) (7 - 1.000 1.000 3.000)
 DEAL::DoFs of face_2:
 DEAL:: component 0: (8 - -1.000 -1.000 -3.000) (16 - 1.000 -1.000 -3.000) (20 - -1.000 1.000 -3.000) (24 - 1.000 1.000 -3.000)
-DEAL::Orientation: 100
+DEAL::Orientation: 000
 DEAL::Matching:
     8 4:  1.000
     9 4:  0.5000
@@ -114,7 +114,7 @@ DEAL::DoFs of face_1:
 DEAL:: component 0: (4 - 1.000 -1.000 3.000) (5 - 1.000 1.000 3.000) (6 - -1.000 -1.000 3.000) (7 - -1.000 1.000 3.000)
 DEAL::DoFs of face_2:
 DEAL:: component 0: (8 - -1.000 -1.000 -3.000) (16 - 1.000 -1.000 -3.000) (20 - -1.000 1.000 -3.000) (24 - 1.000 1.000 -3.000)
-DEAL::Orientation: 101
+DEAL::Orientation: 001
 DEAL::Matching:
     8 6:  1.000
     9 6:  0.5000
@@ -154,7 +154,7 @@ DEAL::DoFs of face_1:
 DEAL:: component 0: (4 - 1.000 1.000 3.000) (5 - -1.000 1.000 3.000) (6 - 1.000 -1.000 3.000) (7 - -1.000 -1.000 3.000)
 DEAL::DoFs of face_2:
 DEAL:: component 0: (8 - -1.000 -1.000 -3.000) (16 - 1.000 -1.000 -3.000) (20 - -1.000 1.000 -3.000) (24 - 1.000 1.000 -3.000)
-DEAL::Orientation: 110
+DEAL::Orientation: 010
 DEAL::Matching:
     8 7:  1.000
     9 7:  0.5000
@@ -194,7 +194,7 @@ DEAL::DoFs of face_1:
 DEAL:: component 0: (4 - -1.000 1.000 3.000) (5 - -1.000 -1.000 3.000) (6 - 1.000 1.000 3.000) (7 - 1.000 -1.000 3.000)
 DEAL::DoFs of face_2:
 DEAL:: component 0: (8 - -1.000 -1.000 -3.000) (16 - 1.000 -1.000 -3.000) (20 - -1.000 1.000 -3.000) (24 - 1.000 1.000 -3.000)
-DEAL::Orientation: 111
+DEAL::Orientation: 011
 DEAL::Matching:
     8 5:  1.000
     9 5:  0.5000
@@ -234,7 +234,7 @@ DEAL::DoFs of face_1:
 DEAL:: component 0: (0 - 1.000 -1.000 3.000) (1 - -1.000 -1.000 3.000) (2 - 1.000 1.000 3.000) (3 - -1.000 1.000 3.000)
 DEAL::DoFs of face_2:
 DEAL:: component 0: (8 - -1.000 -1.000 -3.000) (16 - 1.000 -1.000 -3.000) (20 - -1.000 1.000 -3.000) (24 - 1.000 1.000 -3.000)
-DEAL::Orientation: 011
+DEAL::Orientation: 111
 DEAL::Matching:
     8 1:  1.000
     9 1:  0.5000
@@ -274,7 +274,7 @@ DEAL::DoFs of face_1:
 DEAL:: component 0: (0 - -1.000 -1.000 3.000) (1 - -1.000 1.000 3.000) (2 - 1.000 -1.000 3.000) (3 - 1.000 1.000 3.000)
 DEAL::DoFs of face_2:
 DEAL:: component 0: (8 - -1.000 -1.000 -3.000) (16 - 1.000 -1.000 -3.000) (20 - -1.000 1.000 -3.000) (24 - 1.000 1.000 -3.000)
-DEAL::Orientation: 000
+DEAL::Orientation: 100
 DEAL::Matching:
     8 0:  1.000
     9 0:  0.5000
@@ -314,7 +314,7 @@ DEAL::DoFs of face_1:
 DEAL:: component 0: (0 - -1.000 1.000 3.000) (1 - 1.000 1.000 3.000) (2 - -1.000 -1.000 3.000) (3 - 1.000 -1.000 3.000)
 DEAL::DoFs of face_2:
 DEAL:: component 0: (8 - -1.000 -1.000 -3.000) (16 - 1.000 -1.000 -3.000) (20 - -1.000 1.000 -3.000) (24 - 1.000 1.000 -3.000)
-DEAL::Orientation: 001
+DEAL::Orientation: 101
 DEAL::Matching:
     8 2:  1.000
     9 2:  0.5000
@@ -354,7 +354,7 @@ DEAL::DoFs of face_1:
 DEAL:: component 0: (0 - 1.000 1.000 3.000) (1 - 1.000 -1.000 3.000) (2 - -1.000 1.000 3.000) (3 - -1.000 -1.000 3.000)
 DEAL::DoFs of face_2:
 DEAL:: component 0: (8 - -1.000 -1.000 -3.000) (16 - 1.000 -1.000 -3.000) (20 - -1.000 1.000 -3.000) (24 - 1.000 1.000 -3.000)
-DEAL::Orientation: 010
+DEAL::Orientation: 110
 DEAL::Matching:
     8 3:  1.000
     9 3:  0.5000
@@ -396,7 +396,7 @@ DEAL::DoFs of face_1:
 DEAL:: component 0: (18 - -1.000 -1.000 3.000) (22 - 1.000 -1.000 3.000) (24 - -1.000 1.000 3.000) (26 - 1.000 1.000 3.000)
 DEAL::DoFs of face_2:
 DEAL:: component 0: (27 - -1.000 -1.000 -3.000) (58 - 1.000 -1.000 -3.000) (78 - -1.000 1.000 -3.000) (96 - 1.000 1.000 -3.000)
-DEAL::Orientation: 100
+DEAL::Orientation: 000
 DEAL::Matching:
     27 18:  1.000
     28 18:  0.5000
@@ -502,7 +502,7 @@ DEAL::DoFs of face_1:
 DEAL:: component 0: (18 - 1.000 -1.000 3.000) (22 - 1.000 1.000 3.000) (24 - -1.000 -1.000 3.000) (26 - -1.000 1.000 3.000)
 DEAL::DoFs of face_2:
 DEAL:: component 0: (27 - -1.000 -1.000 -3.000) (58 - 1.000 -1.000 -3.000) (78 - -1.000 1.000 -3.000) (96 - 1.000 1.000 -3.000)
-DEAL::Orientation: 101
+DEAL::Orientation: 001
 DEAL::Matching:
     35 20:  1.000
     54 20:  0.5000
@@ -608,7 +608,7 @@ DEAL::DoFs of face_1:
 DEAL:: component 0: (18 - 1.000 1.000 3.000) (22 - -1.000 1.000 3.000) (24 - 1.000 -1.000 3.000) (26 - -1.000 -1.000 3.000)
 DEAL::DoFs of face_2:
 DEAL:: component 0: (27 - -1.000 -1.000 -3.000) (58 - 1.000 -1.000 -3.000) (78 - -1.000 1.000 -3.000) (96 - 1.000 1.000 -3.000)
-DEAL::Orientation: 110
+DEAL::Orientation: 010
 DEAL::Matching:
     43 21:  1.000
     62 21:  0.5000
@@ -714,7 +714,7 @@ DEAL::DoFs of face_1:
 DEAL:: component 0: (18 - -1.000 1.000 3.000) (22 - -1.000 -1.000 3.000) (24 - 1.000 1.000 3.000) (26 - 1.000 -1.000 3.000)
 DEAL::DoFs of face_2:
 DEAL:: component 0: (27 - -1.000 -1.000 -3.000) (58 - 1.000 -1.000 -3.000) (78 - -1.000 1.000 -3.000) (96 - 1.000 1.000 -3.000)
-DEAL::Orientation: 111
+DEAL::Orientation: 011
 DEAL::Matching:
     39 19:  1.000
     40 19:  0.5000
@@ -820,7 +820,7 @@ DEAL::DoFs of face_1:
 DEAL:: component 0: (0 - 1.000 -1.000 3.000) (8 - -1.000 -1.000 3.000) (12 - 1.000 1.000 3.000) (16 - -1.000 1.000 3.000)
 DEAL::DoFs of face_2:
 DEAL:: component 0: (27 - -1.000 -1.000 -3.000) (58 - 1.000 -1.000 -3.000) (78 - -1.000 1.000 -3.000) (96 - 1.000 1.000 -3.000)
-DEAL::Orientation: 011
+DEAL::Orientation: 111
 DEAL::Matching:
     35 1:  1.000
     54 1:  0.5000
@@ -926,7 +926,7 @@ DEAL::DoFs of face_1:
 DEAL:: component 0: (0 - -1.000 -1.000 3.000) (8 - -1.000 1.000 3.000) (12 - 1.000 -1.000 3.000) (16 - 1.000 1.000 3.000)
 DEAL::DoFs of face_2:
 DEAL:: component 0: (27 - -1.000 -1.000 -3.000) (58 - 1.000 -1.000 -3.000) (78 - -1.000 1.000 -3.000) (96 - 1.000 1.000 -3.000)
-DEAL::Orientation: 000
+DEAL::Orientation: 100
 DEAL::Matching:
     27 0:  1.000
     28 0:  0.5000
@@ -1032,7 +1032,7 @@ DEAL::DoFs of face_1:
 DEAL:: component 0: (0 - -1.000 1.000 3.000) (8 - 1.000 1.000 3.000) (12 - -1.000 -1.000 3.000) (16 - 1.000 -1.000 3.000)
 DEAL::DoFs of face_2:
 DEAL:: component 0: (27 - -1.000 -1.000 -3.000) (58 - 1.000 -1.000 -3.000) (78 - -1.000 1.000 -3.000) (96 - 1.000 1.000 -3.000)
-DEAL::Orientation: 001
+DEAL::Orientation: 101
 DEAL::Matching:
     39 2:  1.000
     40 2:  0.5000
@@ -1138,7 +1138,7 @@ DEAL::DoFs of face_1:
 DEAL:: component 0: (0 - 1.000 1.000 3.000) (8 - 1.000 -1.000 3.000) (12 - -1.000 1.000 3.000) (16 - -1.000 -1.000 3.000)
 DEAL::DoFs of face_2:
 DEAL:: component 0: (27 - -1.000 -1.000 -3.000) (58 - 1.000 -1.000 -3.000) (78 - -1.000 1.000 -3.000) (96 - 1.000 1.000 -3.000)
-DEAL::Orientation: 010
+DEAL::Orientation: 110
 DEAL::Matching:
     43 3:  1.000
     62 3:  0.5000

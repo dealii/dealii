@@ -29,6 +29,8 @@
 
 #include <deal.II/grid/tria_iterator.h>
 
+#include <boost/container/small_vector.hpp>
+
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -212,6 +214,13 @@ private:
    * A member variable holding the quadrature points in the right order.
    */
   const SupportQuadrature support_quadrature;
+
+  /**
+   * A MappingQ object, which is used by the fe_values
+   * member variable to compute the undeformed mapping support
+   * points, before adding any deformation.
+   */
+  const MappingQ<dim, spacedim> mapping_q;
 
   /**
    * FEValues object used to query the given finite element field at the

@@ -19,6 +19,7 @@
 #include <deal.II/base/config.h>
 
 #include <deal.II/lac/trilinos_epetra_vector.h>
+#include <deal.II/lac/trilinos_tpetra_block_vector.h>
 #include <deal.II/lac/trilinos_tpetra_vector.h>
 
 DEAL_II_NAMESPACE_OPEN

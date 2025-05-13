@@ -24,6 +24,7 @@
 #include <deal.II/fe/fe_system.h>
 #include <deal.II/fe/fe_tools.h>
 
+#include <deal.II/grid/filtered_iterator.h>
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/tria_iterator.h>
@@ -78,16 +79,17 @@ make_tria()
   typename parallel::distributed::Triangulation<dim>::active_cell_iterator cell;
   GridGenerator::hyper_cube(*tria, 0., 1.);
   tria->refine_global(2);
-  for (int i = 0; i < 2; ++i)
+  for (auto &cell :
+       tria->active_cell_iterators() | IteratorFilters::LocallyOwnedCell())
     {
-      cell = tria->begin_active();
-      cell->set_refine_flag();
-      ++cell;
-      if (cell != tria->end())
+      auto p           = cell->barycenter();
+      bool refine_cell = p[0] > 0.5 && p[1] > 0.5;
+      if (dim == 3)
+        refine_cell = refine_cell && p[2] > 0.75;
+      if (refine_cell)
         cell->set_refine_flag();
-
-      tria->execute_coarsening_and_refinement();
     }
+  tria->execute_coarsening_and_refinement();
   return tria;
 }
 

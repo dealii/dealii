@@ -962,7 +962,7 @@ namespace TrilinosWrappers
       /**
        * The number of rows in the multivector.
        */
-      virtual ptrdiff_t
+      virtual std::ptrdiff_t
       GetGlobalLength() const
       {
         AssertThrow(this->vectors.size() > 0, ExcInternalError());

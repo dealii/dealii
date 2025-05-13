@@ -29,9 +29,11 @@ set(_src
   coupling.inst.in
   )
 
-file(GLOB _header
+file(GLOB _header CONFIGURE_DEPENDS
   ${CMAKE_SOURCE_DIR}/include/deal.II/non_matching/*.h
   )
 
 define_object_library(object_non_matching OBJECT ${_src} ${_header} ${_inst})
 expand_instantiations(object_non_matching "${_inst}")
+
+collect_source_and_header_files("${_src}" "${_header}")

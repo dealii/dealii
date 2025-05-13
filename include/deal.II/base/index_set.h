@@ -22,6 +22,7 @@
 #include <deal.II/base/mpi_stub.h>
 #include <deal.II/base/mutex.h>
 #include <deal.II/base/trilinos_utilities.h>
+#include <deal.II/base/types.h>
 
 #include <deal.II/lac/trilinos_tpetra_types.h>
 
@@ -1953,12 +1954,13 @@ IndexSet::n_elements() const
       v              = r.nth_index_in_set + r.end - r.begin;
     }
 
-#ifdef DEBUG
-  size_type s = 0;
-  for (const auto &range : ranges)
-    s += (range.end - range.begin);
-  Assert(s == v, ExcInternalError());
-#endif
+  if constexpr (running_in_debug_mode())
+    {
+      size_type s = 0;
+      for (const auto &range : ranges)
+        s += (range.end - range.begin);
+      Assert(s == v, ExcInternalError());
+    }
 
   return v;
 }

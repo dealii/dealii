@@ -62,10 +62,10 @@ namespace MemorySpace
      * Kokkos View owning a host buffer used for MPI communication.
      */
     // FIXME Should we move this somewhere else?
-#if KOKKOS_VERSION < 40000
-    Kokkos::View<T *, Kokkos::HostSpace> values_host_buffer;
-#else
+#if DEAL_II_KOKKOS_VERSION_GTE(4, 0, 0)
     Kokkos::View<T *, Kokkos::SharedHostPinnedSpace> values_host_buffer;
+#else
+    Kokkos::View<T *, Kokkos::HostSpace> values_host_buffer;
 #endif
 
     /**
@@ -108,11 +108,11 @@ namespace MemorySpace
   MemorySpaceData<T, MemorySpace>::MemorySpaceData()
     : values_host_buffer(
         (dealii::internal::ensure_kokkos_initialized(),
-#  if KOKKOS_VERSION < 40000
-         Kokkos::View<T *, Kokkos::HostSpace>("host buffer", 0)))
-#  else
+#  if DEAL_II_KOKKOS_VERSION_GTE(4, 0, 0)
          Kokkos::View<T *, Kokkos::SharedHostPinnedSpace>("host pinned buffer",
                                                           0)))
+#  else
+         Kokkos::View<T *, Kokkos::HostSpace>("host buffer", 0)))
 #  endif
     , values(Kokkos::View<T *, typename MemorySpace::kokkos_space>(
         "memoryspace data",

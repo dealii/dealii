@@ -19,6 +19,8 @@
 
 #include <boost/serialization/utility.hpp>
 
+#include <Kokkos_Core.hpp>
+
 #include <limits>
 
 DEAL_II_NAMESPACE_OPEN
@@ -236,12 +238,13 @@ namespace Utilities
 
       types::global_dof_index my_shift = 0;
       {
-        const int ierr = MPI_Exscan(&my_size,
-                                    &my_shift,
-                                    1,
-                                    DEAL_II_DOF_INDEX_MPI_TYPE,
-                                    MPI_SUM,
-                                    communicator);
+        const int ierr = MPI_Exscan(
+          &my_size,
+          &my_shift,
+          1,
+          Utilities::MPI::mpi_type_id_for_type<types::global_dof_index>,
+          MPI_SUM,
+          communicator);
         AssertThrowMPI(ierr);
       }
 
@@ -321,55 +324,58 @@ namespace Utilities
                                                local_range_data.first);
         }
 
-#    ifdef DEBUG
+      if constexpr (running_in_debug_mode())
+        {
+          // simple check: the number of processors to which we want to send
+          // ghosts and the processors to which ghosts reference should be the
+          // same
+          AssertDimension(
+            Utilities::MPI::sum(import_targets_data.size(), communicator),
+            Utilities::MPI::sum(ghost_targets_data.size(), communicator));
 
-      // simple check: the number of processors to which we want to send
-      // ghosts and the processors to which ghosts reference should be the
-      // same
-      AssertDimension(
-        Utilities::MPI::sum(import_targets_data.size(), communicator),
-        Utilities::MPI::sum(ghost_targets_data.size(), communicator));
+          // simple check: the number of indices to exchange should match from
+          // the ghost indices side and the import indices side
+          AssertDimension(
+            Utilities::MPI::sum(n_import_indices_data, communicator),
+            Utilities::MPI::sum(n_ghost_indices_data, communicator));
 
-      // simple check: the number of indices to exchange should match from the
-      // ghost indices side and the import indices side
-      AssertDimension(Utilities::MPI::sum(n_import_indices_data, communicator),
-                      Utilities::MPI::sum(n_ghost_indices_data, communicator));
+          // expensive check that the communication channel is sane -> do a
+          // ghost exchange step and see whether the ghost indices sent to us by
+          // other processes (ghost_indices) are the same as we hold locally
+          // (ghost_indices_ref).
+          const std::vector<types::global_dof_index> ghost_indices_ref =
+            ghost_indices_data.get_index_vector();
+          AssertDimension(ghost_indices_ref.size(), n_ghost_indices());
+          std::vector<types::global_dof_index> indices_to_send(
+            n_import_indices());
+          std::vector<types::global_dof_index> ghost_indices(n_ghost_indices());
 
-      // expensive check that the communication channel is sane -> do a ghost
-      // exchange step and see whether the ghost indices sent to us by other
-      // processes (ghost_indices) are the same as we hold locally
-      // (ghost_indices_ref).
-      const std::vector<types::global_dof_index> ghost_indices_ref =
-        ghost_indices_data.get_index_vector();
-      AssertDimension(ghost_indices_ref.size(), n_ghost_indices());
-      std::vector<types::global_dof_index> indices_to_send(n_import_indices());
-      std::vector<types::global_dof_index> ghost_indices(n_ghost_indices());
+          const std::vector<types::global_dof_index> my_indices =
+            locally_owned_range_data.get_index_vector();
+          std::vector<MPI_Request> requests;
+          n_ghost_indices_in_larger_set = n_ghost_indices_data;
+          export_to_ghosted_array_start(
+            127,
+            ArrayView<const types::global_dof_index>(my_indices.data(),
+                                                     my_indices.size()),
+            make_array_view(indices_to_send),
+            make_array_view(ghost_indices),
+            requests);
+          export_to_ghosted_array_finish(make_array_view(ghost_indices),
+                                         requests);
+          int       flag = 0;
+          const int ierr = MPI_Testall(requests.size(),
+                                       requests.data(),
+                                       &flag,
+                                       MPI_STATUSES_IGNORE);
+          AssertThrowMPI(ierr);
+          Assert(flag == 1,
+                 ExcMessage(
+                   "MPI found unfinished requests. Check communication setup"));
 
-      const std::vector<types::global_dof_index> my_indices =
-        locally_owned_range_data.get_index_vector();
-      std::vector<MPI_Request> requests;
-      n_ghost_indices_in_larger_set = n_ghost_indices_data;
-      export_to_ghosted_array_start(127,
-                                    ArrayView<const types::global_dof_index>(
-                                      my_indices.data(), my_indices.size()),
-                                    make_array_view(indices_to_send),
-                                    make_array_view(ghost_indices),
-                                    requests);
-      export_to_ghosted_array_finish(make_array_view(ghost_indices), requests);
-      int       flag = 0;
-      const int ierr = MPI_Testall(requests.size(),
-                                   requests.data(),
-                                   &flag,
-                                   MPI_STATUSES_IGNORE);
-      AssertThrowMPI(ierr);
-      Assert(flag == 1,
-             ExcMessage(
-               "MPI found unfinished requests. Check communication setup"));
-
-      for (unsigned int i = 0; i < ghost_indices.size(); ++i)
-        AssertDimension(ghost_indices[i], ghost_indices_ref[i]);
-
-#    endif
+          for (unsigned int i = 0; i < ghost_indices.size(); ++i)
+            AssertDimension(ghost_indices[i], ghost_indices_ref[i]);
+        }
 
 #  endif // #ifdef DEAL_II_WITH_MPI
 
@@ -554,6 +560,6 @@ namespace Utilities
 #endif
 
 // explicit instantiations from .templates.h file
-#include "partitioner.inst"
+#include "base/partitioner.inst"
 
 DEAL_II_NAMESPACE_CLOSE

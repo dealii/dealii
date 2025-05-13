@@ -931,12 +931,13 @@ namespace DoFRenumbering
           local_dof_count[c] = component_to_dof_map[c].size();
 
         std::vector<types::global_dof_index> prefix_dof_count(n_buckets);
-        const int ierr = MPI_Exscan(local_dof_count.data(),
-                                    prefix_dof_count.data(),
-                                    n_buckets,
-                                    DEAL_II_DOF_INDEX_MPI_TYPE,
-                                    MPI_SUM,
-                                    tria->get_mpi_communicator());
+        const int                            ierr = MPI_Exscan(
+          local_dof_count.data(),
+          prefix_dof_count.data(),
+          n_buckets,
+          Utilities::MPI::mpi_type_id_for_type<types::global_dof_index>,
+          MPI_SUM,
+          tria->get_mpi_communicator());
         AssertThrowMPI(ierr);
 
         std::vector<types::global_dof_index> global_dof_count(n_buckets);
@@ -1192,12 +1193,13 @@ namespace DoFRenumbering
           local_dof_count[c] = block_to_dof_map[c].size();
 
         std::vector<types::global_dof_index> prefix_dof_count(n_buckets);
-        const int ierr = MPI_Exscan(local_dof_count.data(),
-                                    prefix_dof_count.data(),
-                                    n_buckets,
-                                    DEAL_II_DOF_INDEX_MPI_TYPE,
-                                    MPI_SUM,
-                                    tria->get_mpi_communicator());
+        const int                            ierr = MPI_Exscan(
+          local_dof_count.data(),
+          prefix_dof_count.data(),
+          n_buckets,
+          Utilities::MPI::mpi_type_id_for_type<types::global_dof_index>,
+          MPI_SUM,
+          tria->get_mpi_communicator());
         AssertThrowMPI(ierr);
 
         std::vector<types::global_dof_index> global_dof_count(n_buckets);
@@ -1384,12 +1386,13 @@ namespace DoFRenumbering
 #ifdef DEAL_II_WITH_MPI
         types::global_dof_index locally_owned_size =
           dof_handler.locally_owned_dofs().n_elements();
-        const int ierr = MPI_Exscan(&locally_owned_size,
-                                    &my_starting_index,
-                                    1,
-                                    DEAL_II_DOF_INDEX_MPI_TYPE,
-                                    MPI_SUM,
-                                    tria->get_mpi_communicator());
+        const int ierr = MPI_Exscan(
+          &locally_owned_size,
+          &my_starting_index,
+          1,
+          Utilities::MPI::mpi_type_id_for_type<types::global_dof_index>,
+          MPI_SUM,
+          tria->get_mpi_communicator());
         AssertThrowMPI(ierr);
 #endif
       }
@@ -2295,14 +2298,15 @@ namespace DoFRenumbering
                                           std::vector<unsigned int>(),
                                           false);
 
-#ifdef DEBUG
-    {
-      const std::vector<types::global_dof_index> dofs_per_component =
-        DoFTools::count_dofs_per_fe_component(dof_handler, true);
-      for (const auto &dpc : dofs_per_component)
-        Assert(dofs_per_component[0] == dpc, ExcNotImplemented());
-    }
-#endif
+    if constexpr (running_in_debug_mode())
+      {
+        {
+          const std::vector<types::global_dof_index> dofs_per_component =
+            DoFTools::count_dofs_per_fe_component(dof_handler, true);
+          for (const auto &dpc : dofs_per_component)
+            Assert(dofs_per_component[0] == dpc, ExcNotImplemented());
+        }
+      }
     const unsigned int n_components =
       dof_handler.get_fe_collection().n_components();
     Assert(dof_handler.n_dofs() % n_components == 0, ExcInternalError());
@@ -2338,15 +2342,16 @@ namespace DoFRenumbering
                                               component_dofs.end());
       }
     component_renumbered_dofs.compress();
-#ifdef DEBUG
-    {
-      IndexSet component_renumbered_dofs2(dof_handler.n_dofs());
-      component_renumbered_dofs2.add_indices(component_renumbering.begin(),
-                                             component_renumbering.end());
-      Assert(component_renumbered_dofs2 == component_renumbered_dofs,
-             ExcInternalError());
-    }
-#endif
+    if constexpr (running_in_debug_mode())
+      {
+        {
+          IndexSet component_renumbered_dofs2(dof_handler.n_dofs());
+          component_renumbered_dofs2.add_indices(component_renumbering.begin(),
+                                                 component_renumbering.end());
+          Assert(component_renumbered_dofs2 == component_renumbered_dofs,
+                 ExcInternalError());
+        }
+      }
     for (const FiniteElement<dim, spacedim> &fe :
          dof_handler.get_fe_collection())
       {
@@ -2905,7 +2910,7 @@ namespace DoFRenumbering
 
 
 /*-------------- Explicit Instantiations -------------------------------*/
-#include "dof_renumbering.inst"
+#include "dofs/dof_renumbering.inst"
 
 
 DEAL_II_NAMESPACE_CLOSE

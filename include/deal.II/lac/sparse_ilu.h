@@ -147,11 +147,30 @@ public:
   DeclException1(ExcZeroPivot,
                  size_type,
                  << "While computing the ILU decomposition, the algorithm "
-                    "found a zero pivot on the diagonal of row "
+                    "found a zero entry on the diagonal of row "
                  << arg1
-                 << ". This must stop the ILU algorithm because it means "
-                    "that the matrix for which you try to compute a "
-                    "decomposition is singular.");
+                 << ". The algorithm can not recover from this because it "
+                    "wants to divide by this diagonal entry."
+                    "\n\n"
+                    "There are several reasons why this could be happening. "
+                    "First, the matrix for which you try to compute a "
+                    "decomposition might be singular. Second, the order in "
+                    "which the algorithm considers might lead it to find "
+                    "a zero diagonal entry even though different pivoting "
+                    "strategies might not; the current implementation does "
+                    "not do any pivoting (i.e., it works on rows/columns "
+                    "in their natural order), and so you will trigger "
+                    "this error if, for example, you have a zero in the "
+                    "(0,0) entry of the matrix, even though this does "
+                    "not imply that the matrix is singular."
+                    "\n\n"
+                    "It is possible that you can avoid the error if "
+                    "you re-order degrees of freedom (using "
+                    "the functions in namespace DoFRenumbering). You may "
+                    "also want to consider \"strengthening the diagonal\", "
+                    "using the AdditionalData::strengthen_diagonal parameter "
+                    "you can set in the optional constructor argument of "
+                    "this class.");
   /** @} */
 };
 
