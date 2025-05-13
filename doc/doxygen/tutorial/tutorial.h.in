@@ -1377,13 +1377,16 @@
  *     </td>
  *     <td>step-46</td>
  *   </tr>
-
+ *
  *   <tr valign="top">
  *     <td> The curl-curl equation
  *     </td>
- *     <td>step-97</td>
+ *     <td>
+ *       step-81,
+ *       step-97
+ *     </td>
  *   </tr>
-
+ *
  * </table>
  *
  *
