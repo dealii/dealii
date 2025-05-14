@@ -39,6 +39,24 @@ macro(feature_sundials_find_external var)
         )
       set(${var} FALSE)
     endif()
+
+    #
+    # Sundials has to be configured with the same MPI configuration as
+    # deal.II.
+    #
+    if((SUNDIALS_WITH_MPI AND NOT DEAL_II_WITH_MPI) OR (NOT SUNDIALS_WITH_MPI AND DEAL_II_WITH_MPI))
+      message(STATUS "Could not find a sufficient Sundials installation: "
+        "If deal.II and Sundials must either both have MPI support enabled or none of them."
+      )
+      set(SUNDIALS_ADDITIONAL_ERROR_STRING
+        ${SUNDIALS_ADDITIONAL_ERROR_STRING}
+        "The Sundials installation (found at \"${SUNDIALS_DIR}\") has:\n"
+        "  SUNDIALS_WITH_MPI = ${SUNDIALS_WITH_MPI}\n"
+        " While deal.II has:\n"
+        "  DEAL_II_WITH_MPI = ${DEAL_II_WITH_MPI}\n"
+      )
+      set(${var} FALSE)
+    endif()
   endif()
 endmacro()
 
