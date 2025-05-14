@@ -22,7 +22,7 @@ to the complex data structures and algorithms required.
 For the impatient:
 ------------------
 
-Let's say you've unpacked the .tar.gz file into a directory /path/to/dealii/sources. 
+Let's say you've unpacked the .tar.gz file into a directory /path/to/dealii/sources.
 Then configure, compile, and install the deal.II library with:
 
     $ mkdir build
@@ -71,13 +71,13 @@ Docker Images:
 -------------
 
 Docker images based on the Ubuntu operating system are available on
-[Docker Hub](https://hub.docker.com/repository/docker/dealii/dealii). You can 
-use any of the available version 
-([list of available tags](https://hub.docker.com/repository/docker/dealii/dealii/tags)) 
+[Docker Hub](https://hub.docker.com/r/dealii/dealii). You can
+use any of the available version
+([list of available tags](https://hub.docker.com/r/dealii/dealii/tags))
 by running, for example:
 
     $ docker run --rm -t -i dealii/dealii:master-focal
 
-The above command would drop you into an isolated environment, in which you 
+The above command would drop you into an isolated environment, in which you
 will find the latest version of deal.II (master development branch) installed
 under `/usr/local`.
