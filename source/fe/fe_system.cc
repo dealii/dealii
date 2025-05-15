@@ -146,7 +146,7 @@ namespace internal
     const unsigned int n_dofs_per_cell =
       fe.base_element(base_no).n_dofs_per_cell();
 
-    auto copy_row = [](const auto row_in, auto row_out) {
+    auto copy_row = [](const auto &row_in, const auto &row_out) {
       std::copy(row_in.begin(), row_in.end(), row_out.begin());
     };
 

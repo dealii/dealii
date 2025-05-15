@@ -7581,8 +7581,8 @@ namespace GridGenerator
       100.0 * std::numeric_limits<double>::epsilon();
     auto assert_vertex_distance_within_tolerance =
       [center, radial_vertex_tolerance](
-        const TriaIterator<TriaAccessor<dim - 1, dim, dim>> face,
-        const double                                        radius) {
+        const TriaIterator<TriaAccessor<dim - 1, dim, dim>> &face,
+        const double                                         radius) {
         (void)center;
         (void)radial_vertex_tolerance;
         (void)face;
