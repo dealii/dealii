@@ -26,6 +26,7 @@
 #include <deal.II/grid/tria.h>
 
 #include <CGAL/IO/io.h>
+#include <CGAL/Polygon_mesh_processing/orientation.h>
 
 #include "../tests.h"
 
@@ -56,7 +57,24 @@ test()
       const auto cell = tria.begin_active();
       dealii_cell_to_cgal_surface_mesh(cell, *mapping, mesh);
 
-      Assert(mesh.is_valid(), dealii::ExcMessage("The CGAL mesh is not valid"));
+      Assert(mesh.is_valid(), ExcMessage("The CGAL mesh is not valid"));
+
+      if (dim == 3)
+        {
+          // is closed/oriented only for 3 dimensional objects important
+          Assert(CGAL::is_closed(mesh),
+                 ExcMessage("The CGAL mesh is not closed"));
+
+          // orientation not supported for wedges, this needs special treatment
+          if (r_cell != ref_cells[3][2])
+            {
+              Assert(
+                CGAL::Polygon_mesh_processing::is_outward_oriented(mesh),
+                ExcMessage(
+                  "The normal vectors of the CGAL mesh are not oriented outwards"));
+            }
+        }
+
       deallog << "deal vertices: " << cell->n_vertices() << ", cgal vertices "
               << mesh.num_vertices() << std::endl;
       deallog << "deal faces: " << cell->n_faces() << ", cgal faces "
