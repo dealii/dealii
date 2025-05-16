@@ -3123,15 +3123,15 @@ namespace
    * This is made particularly simple because the patch only needs to
    * contain geometry info and additional properties of cells
    */
-  template <int dim, int spacedim, typename ITERATOR, typename END>
+  template <int dim, int spacedim, typename IteratorType>
   void
   generate_triangulation_patches(
     std::vector<DataOutBase::Patch<dim, spacedim>> &patches,
-    ITERATOR                                        cell,
-    const END                                      &end)
+    const IteratorType                             &begin,
+    const std_cxx20::type_identity_t<IteratorType> &end)
   {
     // convert each of the active cells into a patch
-    for (; cell != end; ++cell)
+    for (auto cell = begin; cell != end; ++cell)
       {
         DataOutBase::Patch<dim, spacedim> patch;
         patch.reference_cell = cell->reference_cell();
