@@ -161,8 +161,19 @@ set(_inst
   )
 
 
+# Collect the header files inside the base/ header directory. There
+# are some headers in sub-folders as well that are not represented by
+# a corresponding directory under source/base/, so glob them here as
+# well.
+#
+# Finally, there are also header files in
+# include/deal.II/boost_adaptors/ that would be otherwise unaccounted
+# for, and we'll collect them here as well, in the absence of a better
+# place.
 file(GLOB _header CONFIGURE_DEPENDS
   ${CMAKE_SOURCE_DIR}/include/deal.II/base/*.h
+  ${CMAKE_SOURCE_DIR}/include/deal.II/base/std_cxx*/*.h
+  ${CMAKE_SOURCE_DIR}/include/deal.II/boost_adaptors/*.h
   )
 
 define_object_library(object_base OBJECT ${_src} ${_header} ${_inst}
