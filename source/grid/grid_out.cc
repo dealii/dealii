@@ -3128,7 +3128,7 @@ namespace
   generate_triangulation_patches(
     std::vector<DataOutBase::Patch<dim, spacedim>> &patches,
     ITERATOR                                        cell,
-    END                                             end)
+    const END                                      &end)
   {
     // convert each of the active cells into a patch
     for (; cell != end; ++cell)

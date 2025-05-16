@@ -160,14 +160,14 @@ namespace
   template <int dim, int spacedim, typename Number>
   void
   fill_internal(
-    const DoFHandler<dim, spacedim>            &mg_dof,
-    ObserverPointer<const MGConstrainedDoFs>    mg_constrained_dofs,
-    const MPI_Comm                              mpi_communicator,
-    const bool                                  transfer_solution_vectors,
-    std::vector<Table<2, unsigned int>>        &copy_indices,
-    std::vector<Table<2, unsigned int>>        &copy_indices_global_mine,
-    std::vector<Table<2, unsigned int>>        &copy_indices_level_mine,
-    LinearAlgebra::distributed::Vector<Number> &ghosted_global_vector,
+    const DoFHandler<dim, spacedim>                &mg_dof,
+    const ObserverPointer<const MGConstrainedDoFs> &mg_constrained_dofs,
+    const MPI_Comm                                  mpi_communicator,
+    const bool                                      transfer_solution_vectors,
+    std::vector<Table<2, unsigned int>>            &copy_indices,
+    std::vector<Table<2, unsigned int>>            &copy_indices_global_mine,
+    std::vector<Table<2, unsigned int>>            &copy_indices_level_mine,
+    LinearAlgebra::distributed::Vector<Number>     &ghosted_global_vector,
     MGLevelObject<LinearAlgebra::distributed::Vector<Number>>
       &ghosted_level_vector)
   {

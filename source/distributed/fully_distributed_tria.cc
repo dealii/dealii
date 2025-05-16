@@ -149,8 +149,8 @@ namespace parallel
           for (auto &cell_info : cell_infos)
             std::sort(cell_info.begin(),
                       cell_info.end(),
-                      [&](TriangulationDescription::CellData<dim> a,
-                          TriangulationDescription::CellData<dim> b) {
+                      [&](const TriangulationDescription::CellData<dim> &a,
+                          const TriangulationDescription::CellData<dim> &b) {
                         const CellId a_id(a.id);
                         const CellId b_id(b.id);
 
