@@ -57,8 +57,7 @@ from __future__ import print_function
 
 import argparse
 import time
-import distutils.spawn
-import distutils.file_util
+import shutil
 
 import filecmp
 import fnmatch
@@ -99,7 +98,7 @@ def parse_arguments():
         "-b",
         "--clang-format-binary",
         metavar="PATH",
-        default=distutils.spawn.find_executable("clang-format"),
+        default=shutil.which("clang-format"),
     )
 
     parser.add_argument(
@@ -321,9 +320,7 @@ if __name__ == "__main__":
         os.environ["PATH"] += (
             ":" + os.getcwd() + "/contrib/utilities/programs/clang-16/bin"
         )
-        PARSED_ARGUMENTS.clang_format_binary = distutils.spawn.find_executable(
-            "clang-format"
-        )
+        PARSED_ARGUMENTS.clang_format_binary = shutil.which("clang-format")
 
     #
     # Do not log verbose information on dry-run.
