@@ -22,6 +22,7 @@
 #include <deal.II/base/symmetric_tensor.h>
 
 #include <deal.II/differentiation/ad.h>
+#include <deal.II/differentiation/ad/sacado_number_types.h>
 
 #include <deal.II/physics/transformations.h>
 

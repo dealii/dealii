@@ -17,51 +17,9 @@
 
 #include <deal.II/base/config.h>
 
+#include <deal.II/base/numbers.h>
+
 #include <type_traits>
-
-
-DEAL_II_NAMESPACE_OPEN
-
-
-namespace Differentiation
-{
-  namespace AD
-  {
-    /**
-     * A struct to indicate whether a given @p NumberType is a
-     * Sacado number or not. By default, numbers are not considered to
-     * have the necessary characteristics to fulfill this condition.
-     */
-    template <typename NumberType, typename = void>
-    struct is_sacado_number : std::false_type
-    {};
-
-
-    /**
-     * A struct to indicate whether a given @p NumberType is a supported Sacado::Fad
-     * number or not. By default, numbers are not considered to have the
-     * necessary characteristics to fulfill this condition.
-     */
-    template <typename NumberType, typename = void>
-    struct is_sacado_dfad_number : std::false_type
-    {};
-
-
-    /**
-     * A struct to indicate whether a given @p NumberType is a supported Sacado::Rad
-     * number or not. By default, numbers are not considered to have the
-     * necessary characteristics to fulfill this condition.
-     */
-    template <typename NumberType, typename = void>
-    struct is_sacado_rad_number : std::false_type
-    {};
-
-  } // namespace AD
-} // namespace Differentiation
-
-
-DEAL_II_NAMESPACE_CLOSE
-
 
 
 #ifdef DEAL_II_TRILINOS_WITH_SACADO
@@ -81,13 +39,43 @@ DEAL_II_NAMESPACE_CLOSE
 
 #  include <complex>
 
-DEAL_II_NAMESPACE_OPEN
 
+DEAL_II_NAMESPACE_OPEN
 
 namespace Differentiation
 {
   namespace AD
   {
+    /**
+     * A struct to indicate whether a given @p NumberType is a
+     * Sacado number or not. By default, numbers are not considered to
+     * have the necessary characteristics to fulfill this condition.
+     */
+    template <typename NumberType, typename>
+    struct is_sacado_number : std::false_type
+    {};
+
+
+    /**
+     * A struct to indicate whether a given @p NumberType is a supported Sacado::Fad
+     * number or not. By default, numbers are not considered to have the
+     * necessary characteristics to fulfill this condition.
+     */
+    template <typename NumberType, typename>
+    struct is_sacado_dfad_number : std::false_type
+    {};
+
+
+    /**
+     * A struct to indicate whether a given @p NumberType is a supported Sacado::Rad
+     * number or not. By default, numbers are not considered to have the
+     * necessary characteristics to fulfill this condition.
+     */
+    template <typename NumberType, typename>
+    struct is_sacado_rad_number : std::false_type
+    {};
+
+
     namespace internal
     {
       /**
