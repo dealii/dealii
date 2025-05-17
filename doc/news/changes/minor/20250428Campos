@@ -1,0 +1,6 @@
+New: The templates of Utilities::MPI::compute_set_union for std::vector
+and std::set existed for "unsigned int" entries only. New templates for
+"double" entries were included. A related test "mpi/union_02" has also
+been added.
+<br>
+(Bruna Campos, 2025/04/28)
