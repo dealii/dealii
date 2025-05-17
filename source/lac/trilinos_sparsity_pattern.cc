@@ -49,8 +49,19 @@ namespace TrilinosWrappers
       if (!sparsity_pattern->is_compressed())
         sparsity_pattern->compress();
 
-      colnum_cache = std::make_shared<std::vector<size_type>>(
-        sparsity_pattern->row_length(this->a_row));
+      // Then replace the shared pointer to an object by a newly created
+      // vector (rather than re-sizing the vector and overwriting its
+      // content). This ensures that we simply break one link to a shared
+      // vector, and other accessors still pointing to this row's cache
+      // will continue to see the same values.
+      //
+      // We can optimize this, however, if we know that there is only a
+      // single shared pointer pointing to the array.
+      if (colnum_cache.use_count() > 1)
+        colnum_cache = std::make_shared<std::vector<size_type>>(
+          sparsity_pattern->row_length(this->a_row));
+      else
+        colnum_cache->resize(sparsity_pattern->row_length(this->a_row));
 
       if (colnum_cache->size() > 0)
         {
@@ -61,7 +72,7 @@ namespace TrilinosWrappers
             colnum_cache->size(),
             ncols,
             reinterpret_cast<TrilinosWrappers::types::int_type *>(
-              const_cast<size_type *>(colnum_cache->data())));
+              colnum_cache->data()));
           AssertThrow(ierr == 0, ExcTrilinosError(ierr));
           AssertThrow(static_cast<std::vector<size_type>::size_type>(ncols) ==
                         colnum_cache->size(),
