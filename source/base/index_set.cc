@@ -1128,7 +1128,12 @@ IndexSet::make_petsc_is(const MPI_Comm communicator) const
   size_type             i = 0;
   std::vector<PetscInt> petsc_indices(n_elements());
   for (const auto &index : *this)
-    petsc_indices[i] = static_cast<PetscInt>(index);
+    {
+      const auto petsc_index = static_cast<PetscInt>(index);
+      AssertIntegerConversion(petsc_index, index);
+      petsc_indices[i] = petsc_index;
+      ++i;
+    }
 
   IS             is;
   PetscErrorCode ierr = ISCreateGeneral(
