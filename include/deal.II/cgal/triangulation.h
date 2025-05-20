@@ -26,7 +26,6 @@
 #include <deal.II/grid/tria_description.h>
 
 #ifdef DEAL_II_WITH_CGAL
-
 #  include <deal.II/cgal/surface_mesh.h>
 
 #  include <boost/hana.hpp>
