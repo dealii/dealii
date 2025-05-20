@@ -1532,7 +1532,13 @@ namespace NonMatching
         const auto &cell_p =
           cell_m->at_boundary(f_m) ? cell_m : cell_m->neighbor(f_m);
         const auto f_p =
-          cell_m->at_boundary(f_m) ? f_m : cell_m->neighbor_of_neighbor(f_m);
+          cell_m->at_boundary(f_m) ? f_m : cell_m->neighbor_face_no(f_m);
+
+        Assert(
+          empty || (cell_m->level() == cell_p->level()),
+          ExcMessage(
+            "Intersected faces with quadrature points need to have the same "
+            "refinement level!"));
 
         face_number.emplace_back(f_m, f_p);
 
