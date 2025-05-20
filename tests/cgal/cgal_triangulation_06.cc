@@ -17,14 +17,15 @@
 
 #include <deal.II/base/config.h>
 
+#include <deal.II/cgal/surface_mesh.h>
+#include <deal.II/cgal/triangulation.h>
+#include <deal.II/cgal/utilities.h>
+
 #include <deal.II/grid/grid_out.h>
 #include <deal.II/grid/tria.h>
 
 #include <CGAL/Exact_predicates_inexact_constructions_kernel.h>
 #include <CGAL/IO/io.h>
-#include <deal.II/cgal/surface_mesh.h>
-#include <deal.II/cgal/triangulation.h>
-#include <deal.II/cgal/utilities.h>
 
 #include "../tests.h"
 

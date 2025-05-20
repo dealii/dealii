@@ -41,6 +41,8 @@
 DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
 #  include <CGAL/Polygon_mesh_processing/corefinement.h>
 DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
+#  include <deal.II/cgal/surface_mesh.h>
+
 #  include <CGAL/Polygon_mesh_processing/measure.h>
 #  include <CGAL/Polygon_mesh_processing/remesh.h>
 #  include <CGAL/Polygon_mesh_processing/triangulate_faces.h>
@@ -53,7 +55,6 @@ DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
 #  include <CGAL/convex_hull_3.h>
 #  include <CGAL/make_mesh_3.h>
 #  include <CGAL/make_surface_mesh.h>
-#  include <deal.II/cgal/surface_mesh.h>
 
 #  include <fstream>
 #  include <limits>

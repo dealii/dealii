@@ -16,9 +16,10 @@
 
 #include <deal.II/base/point.h>
 
+#include <deal.II/cgal/utilities.h>
+
 #include <CGAL/IO/io.h>
 #include <CGAL/Simple_cartesian.h>
-#include <deal.II/cgal/utilities.h>
 
 #include "../tests.h"
 

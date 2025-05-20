@@ -17,13 +17,14 @@
 
 #include <deal.II/base/config.h>
 
+#include <deal.II/cgal/utilities.h>
+
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/tria.h>
 
 #include <CGAL/IO/File_medit.h>
 #include <CGAL/IO/io.h>
 #include <CGAL/Polygon_mesh_processing/measure.h>
-#include <deal.II/cgal/utilities.h>
 
 #include "../tests.h"
 
