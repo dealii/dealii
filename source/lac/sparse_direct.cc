@@ -927,6 +927,9 @@ void
 SparseDirectMUMPS::initialize_matrix(const Matrix &matrix)
 {
   Assert(matrix.n() == matrix.m(), ExcMessage("Matrix needs to be square."));
+  // Here we should be checking if the matrix is respecting the symmetry given
+  //(I.E. sym = 0 for non-symmetric matrix, sym = 1 for posdef matrix, sym = 2
+  // for general symmetric).
 
   // Hand over matrix to MUMPS as centralized assembled matrix
   if (Utilities::MPI::this_mpi_process(mpi_communicator) == 0)
