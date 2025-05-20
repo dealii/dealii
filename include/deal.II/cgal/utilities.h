@@ -24,6 +24,8 @@
 #ifdef DEAL_II_WITH_CGAL
 #  include <deal.II/base/quadrature_lib.h>
 
+#  include <deal.II/cgal/surface_mesh.h>
+
 #  include <deal.II/grid/tria.h>
 
 #  include <boost/hana.hpp>
@@ -36,7 +38,7 @@
 #  include <CGAL/Mesh_complex_3_in_triangulation_3.h>
 #  include <CGAL/Mesh_criteria_3.h>
 #  include <CGAL/Mesh_triangulation_3.h>
-// Disable a warnung that we get with gcc-13 about a potential uninitialized
+// Disable a warning that we get with gcc-13 about a potential uninitialized
 // usage of an <anonymous> lambda function in this external CGAL header.
 DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
 #  include <CGAL/Polygon_mesh_processing/corefinement.h>
@@ -53,7 +55,6 @@ DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
 #  include <CGAL/convex_hull_3.h>
 #  include <CGAL/make_mesh_3.h>
 #  include <CGAL/make_surface_mesh.h>
-#  include <deal.II/cgal/surface_mesh.h>
 
 #  include <fstream>
 #  include <limits>

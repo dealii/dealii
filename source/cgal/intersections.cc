@@ -31,6 +31,8 @@ DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
 #  include <CGAL/Boolean_set_operations_2.h>
 DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
 
+#  include <deal.II/cgal/utilities.h>
+
 #  include <CGAL/Cartesian.h>
 #  include <CGAL/Circular_kernel_intersections.h>
 #  include <CGAL/Constrained_Delaunay_triangulation_2.h>
@@ -53,7 +55,6 @@ DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
 #  include <CGAL/Triangulation_3.h>
 #  include <CGAL/Triangulation_face_base_with_id_2.h>
 #  include <CGAL/Triangulation_face_base_with_info_2.h>
-#  include <deal.II/cgal/utilities.h>
 
 #  include <optional>
 #  include <variant>

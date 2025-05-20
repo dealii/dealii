@@ -23,10 +23,10 @@
 #include <deal.II/base/point.h>
 #include <deal.II/base/table.h>
 
+#include <deal.II/cgal/additional_data.h>
+
 #include <deal.II/grid/reference_cell.h>
 #include <deal.II/grid/tria.h>
-
-#include <deal.II/cgal/additional_data.h>
 
 #include <array>
 #include <limits>

@@ -20,12 +20,13 @@
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/function.h>
 
+#include <deal.II/cgal/utilities.h>
+
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/tria_description.h>
 
-#include <deal.II/cgal/utilities.h>
-
 #ifdef DEAL_II_WITH_CGAL
+#  include <deal.II/cgal/surface_mesh.h>
 
 #  include <boost/hana.hpp>
 
@@ -43,7 +44,6 @@
 #  include <CGAL/Triangulation_3.h>
 #  include <CGAL/make_mesh_3.h>
 #  include <CGAL/make_surface_mesh.h>
-#  include <deal.II/cgal/surface_mesh.h>
 
 DEAL_II_NAMESPACE_OPEN
 

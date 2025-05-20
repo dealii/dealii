@@ -19,10 +19,11 @@
 
 #ifdef DEAL_II_WITH_CGAL
 // Functions needed by the CGAL mesh generation utilities are inside
+#  include <deal.II/cgal/triangulation.h>
+
 #  include <CGAL/Exact_predicates_inexact_constructions_kernel.h>
 #  include <CGAL/Labeled_mesh_domain_3.h>
 #  include <CGAL/Mesh_triangulation_3.h>
-#  include <deal.II/cgal/triangulation.h>
 #endif
 
 

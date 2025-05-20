@@ -17,12 +17,13 @@
 
 #include <deal.II/base/config.h>
 
+#include <deal.II/cgal/triangulation.h>
+
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/grid_out.h>
 #include <deal.II/grid/tria.h>
 
 #include <CGAL/IO/io.h>
-#include <deal.II/cgal/triangulation.h>
 
 #include <fstream>
 
