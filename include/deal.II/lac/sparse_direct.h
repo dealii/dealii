@@ -458,6 +458,7 @@ public:
    */
   using size_type = types::global_dof_index;
 
+
   /**
    * The AdditionalData struct contains data for controlling the MUMPS
    * execution.
@@ -480,7 +481,6 @@ public:
        * algorithm, an algorithm with higher compression than the standard one.
        */
       bool blr_ucfs;
-
       /**
        * Threshold for the low-rank truncation of the blocks.
        */
@@ -510,13 +510,11 @@ public:
      * If true, the MUMPS solver will print out error statistics.
      */
     bool error_statistics;
-
     /*
      * If true, the MUMPS solver will use the symmetric factorization. This is
      * only possible if the matrix is symmetric.
      */
     bool symmetric;
-
     /*
      * If true, the MUMPS solver will use the positive definite factorization.
      * This is only possible if the matrix is symmetric and positive definite.
@@ -598,7 +596,7 @@ private:
    * a contains the actual values of the matrix. a[k] is the value of the matrix
    * entry (i,j) if irn[k] == i and jcn[k] == j.
    */
-  double *a;
+  std::unique_ptr<double[]> a;
 
   /**
    * The right-hand side vector. This is the right hand side of the system.
@@ -608,12 +606,12 @@ private:
   /**
    * irn contains the row indices of the non-zero entries of the matrix.
    */
-  int *irn;
+  std::unique_ptr<int[]> irn;
 
   /**
    * jcn contains the column indices of the non-zero entries of the matrix.
    */
-  int *jcn;
+  std::unique_ptr<int[]> jcn;
 
   /**
    * The number of rows of the matrix. The matrix is square.

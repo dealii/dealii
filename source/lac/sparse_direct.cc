@@ -884,7 +884,7 @@ SparseDirectMUMPS::SparseDirectMUMPS(const AdditionalData &data)
     id.sym = 0;
 
   // Use MPI_COMM_WORLD as communicator
-  id.comm_fortran = -987654;
+  id.comm_fortran = (MUMPS_INT)MPI_Comm_c2f(MPI_COMM_WORLD);
   dmumps_c(&id);
 
   if (additional_data.output_details == false)
@@ -914,16 +914,9 @@ SparseDirectMUMPS::SparseDirectMUMPS(const AdditionalData &data)
 
 SparseDirectMUMPS::~SparseDirectMUMPS()
 {
+  // MUMPS destructor
   id.job = -2;
   dmumps_c(&id);
-
-  // Do some cleaning
-  if (Utilities::MPI::this_mpi_process(MPI_COMM_WORLD) == 0)
-    {
-      delete[] a;
-      delete[] irn;
-      delete[] jcn;
-    }
 }
 
 
@@ -933,6 +926,9 @@ void
 SparseDirectMUMPS::initialize_matrix(const Matrix &matrix)
 {
   Assert(matrix.n() == matrix.m(), ExcMessage("Matrix needs to be square."));
+  // Here we should be checking if the matrix is respecting the symmetry given
+  //(I.E. sym = 0 for non-symmetric matrix, sym = 1 for posdef matrix, sym = 2
+  // for general symmetric).
 
   // Hand over matrix to MUMPS as centralized assembled matrix
   if (Utilities::MPI::this_mpi_process(MPI_COMM_WORLD) == 0)
@@ -944,13 +940,13 @@ SparseDirectMUMPS::initialize_matrix(const Matrix &matrix)
       nnz = matrix.n_actually_nonzero_elements();
 
       // representation of the matrix
-      a = new double[nnz];
+      a = std::make_unique<double[]>(nnz);
 
       // matrix indices pointing to the row and column dimensions
       // respectively of the matrix representation above (a): ie. a[k] is
       // the matrix element (irn[k], jcn[k])
-      irn = new int[nnz];
-      jcn = new int[nnz];
+      irn = std::make_unique<int[]>(nnz);
+      jcn = std::make_unique<int[]>(nnz);
 
       size_type n_non_zero_elements = 0;
 
@@ -991,9 +987,9 @@ SparseDirectMUMPS::initialize_matrix(const Matrix &matrix)
         }
       id.n   = n;
       id.nnz = n_non_zero_elements;
-      id.irn = irn;
-      id.jcn = jcn;
-      id.a   = a;
+      id.irn = irn.get();
+      id.jcn = jcn.get();
+      id.a   = a.get();
     }
 }
 
@@ -1049,14 +1045,11 @@ SparseDirectMUMPS::initialize(const Matrix &matrix)
   dmumps_c(&id);
 }
 
-
-
 void
 SparseDirectMUMPS::vmult(Vector<double> &dst, const Vector<double> &src) const
 {
   // and that the matrix has at least one nonzero element:
   Assert(nnz != 0, ExcNotInitialized());
-
   Assert(n == dst.size(), ExcMessage("Destination vector has the wrong size."));
   Assert(n == src.size(), ExcMessage("Source vector has the wrong size."));
 
