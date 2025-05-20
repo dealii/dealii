@@ -13,7 +13,7 @@
 // ------------------------------------------------------------------------
 
 // test the mumps sparse direct solver on a mass matrix
-// - check ways to solve
+// - check several ways to solve, also using block low rank preconditioning
 
 #include <deal.II/base/function.h>
 #include <deal.II/base/quadrature_lib.h>
@@ -26,10 +26,13 @@
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/tria.h>
 
+#include <deal.II/lac/solver_cg.h>
+#include <deal.II/lac/solver_control.h>
 #include <deal.II/lac/sparse_direct.h>
 #include <deal.II/lac/sparse_matrix.h>
 #include <deal.II/lac/sparsity_pattern.h>
 #include <deal.II/lac/vector.h>
+#include <deal.II/lac/vector_memory.h>
 
 #include <deal.II/numerics/matrix_tools.h>
 #include <deal.II/numerics/vector_tools.h>
@@ -47,7 +50,13 @@ solve_and_check(const SparseMatrix<double> &M,
                 const Vector<double>       &solution)
 {
   {
-    SparseDirectMUMPS solver;
+    int                              *icntl = nullptr;
+    SparseDirectMUMPS::AdditionalData data;
+    data.output_details = false;
+    SparseDirectMUMPS solver(data);
+    icntl = solver.get_icntl();
+    std::cout << "Elementi di icntl " << icntl[7] << " " << icntl[8] << " "
+              << icntl[9] << std::endl;
     solver.initialize(M);
     Vector<double> dst(rhs.size());
     solver.vmult(dst, rhs);
@@ -55,6 +64,8 @@ solve_and_check(const SparseMatrix<double> &M,
     Assert(dst.l2_norm() < 1e-9, ExcInternalError());
   }
 }
+
+
 
 template <int dim>
 void
@@ -92,7 +103,15 @@ test()
   MatrixTools::create_mass_matrix(dof_handler, qr, B);
 
   // compute a decomposition of the matrix
-  SparseDirectMUMPS Binv;
+  SparseDirectMUMPS::AdditionalData data;
+  data.blr_factorization = true;
+  SparseDirectMUMPS::AdditionalData::BlockLowRank blr;
+  blr.blr_ucfs          = false;
+  blr.lowrank_threshold = 1e-8;
+  data.output_details   = false;
+  data.error_statistics = false;
+  SparseDirectMUMPS Binv(data);
+
   Binv.initialize(B);
 
   // for a number of different solution
@@ -109,7 +128,13 @@ test()
 
       B.vmult(b, solution);
 
-      Binv.vmult(x, b);
+      SolverControl            solver_control(1000, 1e-8);
+      SolverCG<Vector<double>> solver(solver_control);
+
+      solver.solve(B, x, b, Binv);
+
+      deallog << "Number of preconditioned CG iterations = "
+              << solver_control.last_step() << std::endl;
 
       x -= solution;
       deallog << "relative norm distance = " << x.l2_norm() / solution.l2_norm()
@@ -118,8 +143,6 @@ test()
               << std::endl;
       Assert(x.l2_norm() / solution.l2_norm() < 1e-8, ExcInternalError());
 
-
-      // also check solving in different ways:
       solve_and_check(B, b, solution);
     }
 }
