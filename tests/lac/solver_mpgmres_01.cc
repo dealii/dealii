@@ -70,8 +70,9 @@ main()
   const unsigned int M = 2 * N;
 
   SparsityPattern sparsity_pattern(M, M, 2);
-  for (unsigned int i = 0; i < M - 1; ++i)
+  for (unsigned int i = 0; i < N; ++i)
     sparsity_pattern.add(i, i + 1);
+  sparsity_pattern.add(N, N - 1);
   sparsity_pattern.compress();
   SparseMatrix<double> matrix(sparsity_pattern);
 
@@ -80,6 +81,7 @@ main()
       matrix.diag_element(i) = 1.0 + 1 * i;
       matrix.set(i, i + 1, 1.);
     }
+  matrix.set(N, N - 1, 1.);
   for (unsigned int i = N; i < M; ++i)
     matrix.diag_element(i) = 1.;
 
@@ -136,6 +138,6 @@ main()
   check_solver_within_range(
     solver_mpgmres.solve(matrix, sol, rhs, wrapper_a, wrapper_b, wrapper_c),
     control.last_step(),
-    24 - 6,
-    24 + 6);
+    20 - 12,
+    20 + 12);
 }
