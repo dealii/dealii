@@ -103,23 +103,6 @@ namespace internal
   }
 #endif
 
-  namespace
-  {
-    // Test whether a vector is a deal.II vector
-    template <typename VectorType>
-    constexpr bool is_dealii_vector =
-      std::is_same_v<VectorType,
-                     dealii::Vector<typename VectorType::value_type>> ||
-      std::is_same_v<VectorType,
-                     dealii::BlockVector<typename VectorType::value_type>> ||
-      std::is_same_v<VectorType,
-                     dealii::LinearAlgebra::distributed::Vector<
-                       typename VectorType::value_type>> ||
-      std::is_same_v<VectorType,
-                     dealii::LinearAlgebra::distributed::BlockVector<
-                       typename VectorType::value_type>>;
-  } // namespace
-
 
   /**
    * Helper function that sets the values on a cell, but also checks if the
@@ -140,7 +123,15 @@ namespace internal
 
     if constexpr (running_in_debug_mode())
       {
-        if (perform_check && is_dealii_vector<OutputVector>)
+        using VectorNumber = typename OutputVector::value_type;
+        constexpr bool is_dealii_vector =
+          std::is_same_v<OutputVector, Vector<VectorNumber>> ||
+          std::is_same_v<OutputVector, BlockVector<VectorNumber>> ||
+          std::is_same_v<OutputVector,
+                         LinearAlgebra::distributed::Vector<VectorNumber>> ||
+          std::is_same_v<OutputVector,
+                         LinearAlgebra::distributed::BlockVector<VectorNumber>>;
+        if (perform_check && is_dealii_vector)
           {
             const bool old_ghost_state = values.has_ghost_elements();
             set_ghost_state(values, true);
