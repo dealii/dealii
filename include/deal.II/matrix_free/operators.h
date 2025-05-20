@@ -1034,7 +1034,10 @@ namespace MatrixFreeOperators
                              false,
                              VectorizedArrayType> &fe_eval)
     : fe_eval(fe_eval)
-  {}
+  {
+    AssertDimension(fe_eval.get_shape_info().dofs_per_component_on_cell,
+                    fe_eval.get_shape_info().n_q_points);
+  }
 
 
 
