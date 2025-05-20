@@ -491,7 +491,6 @@ public:
        * algorithm, an algorithm with higher compression than the standard one.
        */
       bool blr_ucfs;
-
       /**
        * Threshold for the low-rank truncation of the blocks.
        */
@@ -521,13 +520,11 @@ public:
      * If true, the MUMPS solver will print out error statistics.
      */
     bool error_statistics;
-
     /*
      * If true, the MUMPS solver will use the symmetric factorization. This is
      * only possible if the matrix is symmetric.
      */
     bool symmetric;
-
     /*
      * If true, the MUMPS solver will use the positive definite factorization.
      * This is only possible if the matrix is symmetric and positive definite.
@@ -621,12 +618,20 @@ private:
   /**
    * irn contains the row indices of the non-zero entries of the matrix.
    */
+<<<<<<< HEAD
   std::unique_ptr<types::mumps_index[]> irn;
+=======
+  std::unique_ptr<int[]> irn;
+>>>>>>> 3caf1bb907 (Avoid raw pointers in SparseDirectMUMPS)
 
   /**
    * jcn contains the column indices of the non-zero entries of the matrix.
    */
+<<<<<<< HEAD
   std::unique_ptr<types::mumps_index[]> jcn;
+=======
+  std::unique_ptr<int[]> jcn;
+>>>>>>> 3caf1bb907 (Avoid raw pointers in SparseDirectMUMPS)
 
   /**
    * The number of rows of the matrix. The matrix is square.
