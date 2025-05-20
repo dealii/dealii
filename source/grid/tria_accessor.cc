@@ -2686,10 +2686,9 @@ CellAccessor<dim, spacedim>::has_periodic_neighbor(
   AssertIndexRange(i_face, this->n_faces());
   using cell_iterator = TriaIterator<CellAccessor<dim, spacedim>>;
 
-  cell_iterator current_cell(*this);
-  if (this->tria->periodic_face_map.find(
-        std::make_pair(current_cell, i_face)) !=
-      this->tria->periodic_face_map.end())
+  if (at_boundary(i_face) && this->tria->periodic_face_map.find(
+                               std::make_pair(cell_iterator(*this), i_face)) !=
+                               this->tria->periodic_face_map.end())
     return true;
   return false;
 }
