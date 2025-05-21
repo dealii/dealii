@@ -19,7 +19,6 @@
 #include <deal.II/base/config.h>
 
 #include <deal.II/lac/full_matrix.h>
-#include <deal.II/lac/vector_memory.h>
 
 #include <cmath>
 #include <vector>
