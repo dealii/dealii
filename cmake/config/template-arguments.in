@@ -194,11 +194,6 @@ VECTORS_WITHOUT_LAVEC := { Vector<double>;
                          @DEAL_II_EXPAND_TPETRA_VECTOR_COMPLEX_DOUBLE@;
                          @DEAL_II_EXPAND_TPETRA_VECTOR_COMPLEX_FLOAT@;
                          @DEAL_II_EXPAND_PETSC_MPI_VECTOR@;
-
-                         @DEAL_II_EXPAND_TPETRA_BLOCKVECTOR_DOUBLE@;
-                         @DEAL_II_EXPAND_TPETRA_BLOCKVECTOR_FLOAT@;
-                         @DEAL_II_EXPAND_TPETRA_BLOCKVECTOR_COMPLEX_DOUBLE@;
-                         @DEAL_II_EXPAND_TPETRA_BLOCKVECTOR_COMPLEX_FLOAT@;
                        }
 
 // Matrices
