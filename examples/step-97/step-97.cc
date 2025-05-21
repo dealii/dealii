@@ -154,15 +154,15 @@ class MainOutputTable : public ConvergenceTable
 {
 public:
   MainOutputTable() = delete;
-  MainOutputTable(int dimensions)
+  MainOutputTable(const unsigned int dimensions)
     : ConvergenceTable()
     , dimensions(dimensions)
   {}
-  void set_new_order(std::vector<std::string> new_order_in)
+  void set_new_order(const std::vector<std::string> &new_order_in)
   {
     new_order = new_order_in;
   }
-  void append_new_order(std::string new_clmn)
+  void append_new_order(const std::string &new_clmn)
   {
     new_order.push_back(new_clmn);
   }
@@ -187,7 +187,7 @@ public:
     set_column_order(new_order);
   }
 
-  void save(std::string fname)
+  void save(const std::string &fname)
   {
     format();
 
@@ -196,7 +196,7 @@ public:
   }
 
 private:
-  int                      dimensions;
+  const unsigned int                      dimensions;
   std::vector<std::string> new_order = {"p", "r", "ncells", "ndofs", "L2"};
 };
 
@@ -232,36 +232,16 @@ namespace ExactSolutions
                                           double a2,
                                           double b2)
   {
-    double cos_theta;
-    double sin_theta;
+    const double r = sqrt(pow(x, 2) + pow(y, 2) + pow(z, 2));
 
-    double cos_phi;
-    double sin_phi;
+    const double cos_theta = z / r;
+    const double sin_theta = sqrt(pow(x, 2) + pow(y, 2)) / r;
 
-    Tensor<1, 3> r_hat;
-    Tensor<1, 3> theta_hat;
+    const double cos_phi = x / sqrt(pow(x, 2) + pow(y, 2));
+    const double sin_phi = y / sqrt(pow(x, 2) + pow(y, 2));
 
-    Tensor<1, 3> F1;
-    Tensor<1, 3> F2;
-    Tensor<1, 3> Bj;
-
-    double r;
-
-    r = sqrt(pow(x, 2) + pow(y, 2) + pow(z, 2));
-
-    cos_theta = z / r;
-    sin_theta = sqrt(pow(x, 2) + pow(y, 2)) / r;
-
-    cos_phi = x / sqrt(pow(x, 2) + pow(y, 2));
-    sin_phi = y / sqrt(pow(x, 2) + pow(y, 2));
-
-    r_hat[0] = x / r;
-    r_hat[1] = y / r;
-    r_hat[2] = z / r;
-
-    theta_hat[0] = cos_theta * cos_phi;
-    theta_hat[1] = cos_theta * sin_phi;
-    theta_hat[2] = -sin_theta;
+    const Tensor<1, 3> r_hat = { x / r, y / r, z/r };
+    const Tensor<1,3> theta_hat = { cos_theta * cos_phi, cos_theta * sin_phi, -sin_theta};
 
     F1 = (2.0 / 3.0) * mu_0 * K0 * (cos_theta * r_hat - sin_theta * theta_hat);
     F2 = (2.0 / 3.0) * mu_0 * K0 *
@@ -371,7 +351,7 @@ namespace ExactSolutions
 
       for (unsigned int i = 0; i < values.size(); i++)
         {
-          r = sqrt(pow(p[i][0], 2) + pow(p[i][1], 2) + pow(p[i][2], 2));
+          r = p[i].norm();
 
           if ((r >= a2) && (r <= b2))
             {
