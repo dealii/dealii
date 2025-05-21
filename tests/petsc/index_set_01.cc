@@ -18,6 +18,8 @@
 #include <deal.II/base/index_set.h>
 #include <deal.II/base/mpi.h>
 
+#include <deal.II/lac/petsc_compatibility.h>
+
 #include <iostream>
 
 #include "../tests.h"
