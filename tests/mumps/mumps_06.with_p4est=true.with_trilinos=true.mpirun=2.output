@@ -1,0 +1,71 @@
+
+DEAL:0::Trilinos matrices
+DEAL:0::2d
+DEAL:0::Number of dofs = 1889
+DEAL:0::relative norm distance = 4.64308e-16
+DEAL:0::absolute norms = 4.39998e-11 94764.3
+DEAL:0::relative norm distance = 4.65027e-16
+DEAL:0::absolute norms = 1.10170e-10 236911.
+DEAL:0::relative norm distance = 4.65027e-16
+DEAL:0::absolute norms = 2.20340e-10 473822.
+DEAL:0::3d
+DEAL:0::Number of dofs = 1333
+DEAL:0::relative norm distance = 1.48787e-15
+DEAL:0::absolute norms = 8.35670e-11 56165.6
+DEAL:0::relative norm distance = 1.29809e-15
+DEAL:0::absolute norms = 1.82269e-10 140414.
+DEAL:0::relative norm distance = 1.29623e-15
+DEAL:0::absolute norms = 3.64018e-10 280828.
+DEAL:0::PETSc matrices
+DEAL:0::2d
+DEAL:0::Number of dofs = 1889
+DEAL:0::relative norm distance = 4.02650e-16
+DEAL:0::absolute norms = 3.81568e-11 94764.3
+DEAL:0::relative norm distance = 4.10886e-16
+DEAL:0::absolute norms = 9.73433e-11 236911.
+DEAL:0::relative norm distance = 4.10886e-16
+DEAL:0::absolute norms = 1.94687e-10 473822.
+DEAL:0::3d
+DEAL:0::Number of dofs = 1333
+DEAL:0::relative norm distance = 9.32100e-16
+DEAL:0::absolute norms = 5.23519e-11 56165.6
+DEAL:0::relative norm distance = 9.01192e-16
+DEAL:0::absolute norms = 1.26540e-10 140414.
+DEAL:0::relative norm distance = 9.01192e-16
+DEAL:0::absolute norms = 2.53080e-10 280828.
+
+DEAL:1::Trilinos matrices
+DEAL:1::2d
+DEAL:1::Number of dofs = 1889
+DEAL:1::relative norm distance = 4.64308e-16
+DEAL:1::absolute norms = 4.39998e-11 94764.3
+DEAL:1::relative norm distance = 4.65027e-16
+DEAL:1::absolute norms = 1.10170e-10 236911.
+DEAL:1::relative norm distance = 4.65027e-16
+DEAL:1::absolute norms = 2.20340e-10 473822.
+DEAL:1::3d
+DEAL:1::Number of dofs = 1333
+DEAL:1::relative norm distance = 1.48787e-15
+DEAL:1::absolute norms = 8.35670e-11 56165.6
+DEAL:1::relative norm distance = 1.29809e-15
+DEAL:1::absolute norms = 1.82269e-10 140414.
+DEAL:1::relative norm distance = 1.29623e-15
+DEAL:1::absolute norms = 3.64018e-10 280828.
+DEAL:1::PETSc matrices
+DEAL:1::2d
+DEAL:1::Number of dofs = 1889
+DEAL:1::relative norm distance = 4.02650e-16
+DEAL:1::absolute norms = 3.81568e-11 94764.3
+DEAL:1::relative norm distance = 4.10886e-16
+DEAL:1::absolute norms = 9.73433e-11 236911.
+DEAL:1::relative norm distance = 4.10886e-16
+DEAL:1::absolute norms = 1.94687e-10 473822.
+DEAL:1::3d
+DEAL:1::Number of dofs = 1333
+DEAL:1::relative norm distance = 9.32100e-16
+DEAL:1::absolute norms = 5.23519e-11 56165.6
+DEAL:1::relative norm distance = 9.01192e-16
+DEAL:1::absolute norms = 1.26540e-10 140414.
+DEAL:1::relative norm distance = 9.01192e-16
+DEAL:1::absolute norms = 2.53080e-10 280828.
+

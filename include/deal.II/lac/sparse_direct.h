@@ -35,6 +35,16 @@
 #  include <dmumps_c.h>
 #endif
 
+#ifdef DEAL_II_WITH_TRILINOS
+#  include <deal.II/lac/trilinos_sparse_matrix.h>
+#  include <deal.II/lac/trilinos_vector.h>
+#endif
+
+#ifdef DEAL_II_WITH_PETSC
+#  include <deal.II/lac/petsc_sparse_matrix.h>
+#  include <deal.II/lac/petsc_vector.h>
+#endif
+
 DEAL_II_NAMESPACE_OPEN
 
 namespace types
@@ -469,10 +479,8 @@ public:
    */
   using size_type = types::global_dof_index;
 
-
   /**
-   * The AdditionalData struct contains data for controlling the MUMPS
-   * execution.
+   * The AdditionalData contains data for controlling the MUMPS execution.
    */
   struct AdditionalData
   {
@@ -512,12 +520,12 @@ public:
     {}
 
     /*
-     * If true, the MUMPS solver will print out details of the execution.
+     * If true, the MUMPS solver will print out details of the execution
      */
     bool output_details;
 
     /*
-     * If true, the MUMPS solver will print out error statistics.
+     * If true, the MUMPS solver will print out error statistics
      */
     bool error_statistics;
     /*
@@ -532,30 +540,25 @@ public:
     bool posdef;
 
     /*
-     * If true, the MUMPS solver will use the Block Low-Rank factorization.
+     * If true, the MUMPS solver will use the Block Low-Rank factorization
      */
-    bool blr_factorization;
-
-    /*
-     * Stores Block Low-Rank approximation settings to be used in MUMPS
-     * factorization, if enabled.
-     */
+    bool         blr_factorization;
     BlockLowRank blr;
   };
-
   /**
-   * Constructor, takes <tt>AdditionalData</tt> to control MUMPS execution.
+   * Constructor, takes an MPI_Comm which defaults to MPI_COMM_WORLD and an
+   * <tt>AdditionalData</tt> to control MUMPS execution.
    */
   SparseDirectMUMPS(const AdditionalData &additional_data = AdditionalData(),
                     const MPI_Comm       &communicator    = MPI_COMM_WORLD);
 
   /**
-   * Destructor.
+   * Destructor
    */
   ~SparseDirectMUMPS();
 
   /**
-   * Exception.
+   * Exception
    */
   DeclException0(ExcInitializeAlreadyCalled);
 
@@ -573,24 +576,27 @@ public:
    * vector <tt>src</tt> and the solution is written into the output vector
    * <tt>dst</tt>.
    */
+  template <typename VectorType>
   void
-  vmult(Vector<double> &dst, const Vector<double> &src) const;
+  vmult(VectorType &dst, const VectorType &src) const;
+
 
   /**
    * A function in which the inverse of the transposed matrix is applied to the
    * input vector <tt>src</tt> and the solution is written into the output
    * vector <tt>dst</tt>.
    */
+  template <typename VectorType>
   void
-  Tvmult(Vector<double> &dst, const Vector<double> &src) const;
+  Tvmult(VectorType &, const VectorType &src) const;
 
   /**
    * A function that returns the ICNTL integer array from MUMPS.
    * The ICNTL array contains integer control parameters for the MUMPS solver.
    * Keep in mind that MUMPS is a fortran library and the documentation refers
-   * to indices into this array starting from one rather than from zero. To
-   * select the correct index one can use a macro like this:
-   * `#define ICNTL(I) icntl[(I)-1]`. In the MUMPS documentation there is the
+   * to indices into this array into this array starting from one rather than
+   * from zero. To select the correct index one can use a macro like this:
+   * #define ICNTL(I) icntl[(I)-1]. In the MUMPS documentation there is the
    * description of each parameter of the array. Be aware that ownership of the
    * array remains in the current class rather than with the caller of this
    * function.
@@ -616,22 +622,19 @@ private:
   mutable std::vector<double> rhs;
 
   /**
+   * Local to global index mapping for the right-hand side vector.
+   */
+  mutable std::vector<int> irhs_loc;
+
+  /**
    * irn contains the row indices of the non-zero entries of the matrix.
    */
-<<<<<<< HEAD
   std::unique_ptr<types::mumps_index[]> irn;
-=======
-  std::unique_ptr<int[]> irn;
->>>>>>> 3caf1bb907 (Avoid raw pointers in SparseDirectMUMPS)
 
   /**
    * jcn contains the column indices of the non-zero entries of the matrix.
    */
-<<<<<<< HEAD
   std::unique_ptr<types::mumps_index[]> jcn;
-=======
-  std::unique_ptr<int[]> jcn;
->>>>>>> 3caf1bb907 (Avoid raw pointers in SparseDirectMUMPS)
 
   /**
    * The number of rows of the matrix. The matrix is square.
@@ -639,12 +642,18 @@ private:
   types::global_dof_index n;
 
   /**
-   * The number of non-zero entries in the matrix.
+   * Number of non-zero entries in the matrix.
    */
   types::mumps_nnz nnz;
 
   /**
-   * This function hands over to MUMPS the system's <tt>matrix</tt>.
+   * IndexSet storing the locally owned rows of the matrix.
+   */
+  IndexSet row_range;
+
+  /**
+   * This function initializes a MUMPS instance and hands over the system's
+   * matrix <tt>matrix</tt>.
    */
   template <class Matrix>
   void
