@@ -53,10 +53,6 @@
 #include <string>
 #include <ostream>
 
-#define VE scratch_data.ve
-
-#define TMR(__name) TimerOutput::Scope timer_section(timer, __name)
-
 using namespace dealii;
 
 // This enumeration is used to switch between boundary conditions when solving
@@ -95,11 +91,8 @@ enum BoundaryConditionType
 // solutions. If the projected exact solution and the numerical solution look
 // alike, it is a good sign. In case of problems with the convergence of the
 // CG solver the parameter $\eta^2$ must be increased just a bit.
-class Settings
+namespace Settings
 {
-public:
-  Settings(){};
-
   const double permeability_fs = 1.2566370614359172954e-6;
   const double mu_0            = permeability_fs; // Permeability of free space.
 
@@ -131,17 +124,17 @@ public:
   const bool   log_cg_convergence = false; // Save the CG convergence data.
   const bool print_time_tables = false; // Print the time tables on the screen.
   const bool project_exact_solution = false; // Save the exact solution.
-};
+} // namespace Settings
 
 // Next comes the weight function used to limit the region in which the $L^2$
 // error norms are computed. The error norms are computed if $r < d2$.
-class Weight : public Function<3>, private Settings
+class Weight : public Function<3>
 {
 public:
   virtual double value(const Point<3> &p,
                        const unsigned int) const override final
   {
-    if (p.norm() > d2)
+    if (p.norm() > Settings::d2)
       return 0.0;
 
     return 1.0;
@@ -162,9 +155,9 @@ public:
   {
     new_order = new_order_in;
   }
-  void append_new_order(const std::string &new_clmn)
+  void append_new_order(const std::string &new_column)
   {
-    new_order.push_back(new_clmn);
+    new_order.push_back(new_column);
   }
 
   void format()
@@ -209,132 +202,111 @@ namespace ExactSolutions
 
   // This function describes the free-current density, $\vec{J}_f$, inside the
   // current region.
-  inline Tensor<1, 3>
-  volume_free_current_density(double x, double y, double z, double K0)
+  inline Tensor<1, 3> volume_free_current_density(const Point<3> &p,
+                                                  const double    K0)
   {
-    Tensor<1, 3> Jf;
-
-    Jf[0] = -K0 * y;
-    Jf[1] = K0 * x;
-    Jf[2] = 0.0 * z;
-
-    return Jf;
+    return Tensor<1, 3>({-K0 * p[1], K0 * p[0], 0.0});
   }
 
   // This function computes the magnetic field induced by the free current in
   // absence of the magnetic core, see the expression for $\vec{B}_J$ in the
   // introduction.
-  inline Tensor<1, 3> magnetic_field_coil(double x,
-                                          double y,
-                                          double z,
-                                          double K0,
-                                          double mu_0,
-                                          double a2,
-                                          double b2)
+  inline Tensor<1, 3> magnetic_field_coil(const Point<3> &p,
+                                          const double    K0,
+                                          const double    mu_0,
+                                          const double    a2,
+                                          const double    b2)
   {
-    const double r = sqrt(pow(x, 2) + pow(y, 2) + pow(z, 2));
+    const double r = p.norm();
 
-    const double cos_theta = z / r;
-    const double sin_theta = sqrt(pow(x, 2) + pow(y, 2)) / r;
+    const double cos_theta = p[2] / r;
+    const double sin_theta = sqrt(pow(p[0], 2) + pow(p[1], 2)) / r;
 
-    const double cos_phi = x / sqrt(pow(x, 2) + pow(y, 2));
-    const double sin_phi = y / sqrt(pow(x, 2) + pow(y, 2));
+    const double cos_phi = p[0] / sqrt(pow(p[0], 2) + pow(p[1], 2));
+    const double sin_phi = p[1] / sqrt(pow(p[0], 2) + pow(p[1], 2));
 
-    const Tensor<1, 3> r_hat     = {x / r, y / r, z / r};
-    const Tensor<1, 3> theta_hat = {cos_theta * cos_phi,
-                                    cos_theta * sin_phi,
-                                    -sin_theta};
+    const Tensor<1, 3> r_hat({p[0] / r, p[1] / r, p[2] / r});
+    const Tensor<1, 3> theta_hat(
+      {cos_theta * cos_phi, cos_theta * sin_phi, -sin_theta});
 
-    F1 = (2.0 / 3.0) * mu_0 * K0 * (cos_theta * r_hat - sin_theta * theta_hat);
-    F2 = (2.0 / 3.0) * mu_0 * K0 *
-         (cos_theta * r_hat + 0.5 * sin_theta * theta_hat) / pow(r, 3);
+    const Tensor<1, 3> F1 =
+      (2.0 / 3.0) * mu_0 * K0 * (cos_theta * r_hat - sin_theta * theta_hat);
+    const Tensor<1, 3> F2 = (2.0 / 3.0) * mu_0 * K0 *
+                            (cos_theta * r_hat + 0.5 * sin_theta * theta_hat) /
+                            pow(r, 3);
 
     if (r <= a2)
       {
-        Bj = 0.5 * (pow(b2, 2) - pow(a2, 2)) * F1;
+        return 0.5 * (pow(b2, 2) - pow(a2, 2)) * F1;
       }
     else if (r >= b2)
       {
-        Bj = 0.2 * (pow(b2, 5) - pow(a2, 5)) * F2;
+        return 0.2 * (pow(b2, 5) - pow(a2, 5)) * F2;
       }
     else
       {
-        Bj = 0.5 * (pow(b2, 2) - pow(r, 2)) * F1 +
-             0.2 * (pow(r, 5) - pow(a2, 5)) * F2;
+        return 0.5 * (pow(b2, 2) - pow(r, 2)) * F1 +
+               0.2 * (pow(r, 5) - pow(a2, 5)) * F2;
       }
 
-    return Bj;
+    return Tensor<1, 3>({0.404, 0.404, 0.404});
   }
 
   // This function computes the magnetic field induced by the magnetic core, see
   // the expression for $\vec{B}_{\mu}$ in the introduction.
-  inline Tensor<1, 3> magnetic_field_core(double x,
-                                          double y,
-                                          double z,
-                                          double H0,
-                                          double mur,
-                                          double mu0,
-                                          double a1,
-                                          double b1)
+  inline Tensor<1, 3> magnetic_field_core(const Point<3> &p,
+                                          const double    H0,
+                                          const double    mur,
+                                          const double    mu0,
+                                          const double    a1,
+                                          const double    b1)
   {
-    double a3 = std::pow(a1, 3);
-    double b3 = std::pow(b1, 3);
+    const double a3 = std::pow(a1, 3);
+    const double b3 = std::pow(b1, 3);
 
-    double OMEGA   = ((mur - 1.0) / (mur + 2.0)) * (a3 / b3);
-    double gamma_1 = (-3.0 * b3 * H0 * OMEGA) /
-                     ((2.0 * mur + 1.0) - 2.0 * (mur - 1.0) * OMEGA);
-    double beta_1  = ((2.0 * mur + 1.0) * gamma_1) / ((mur - 1.0) * a3);
-    double alpha_1 = (-b3 * H0 + 2.0 * mur * gamma_1 - mur * b3 * beta_1) / 2.0;
-    double delta_1 = (mur * a3 * beta_1 - 2.0 * mur * gamma_1) / a3;
+    const double OMEGA   = ((mur - 1.0) / (mur + 2.0)) * (a3 / b3);
+    const double gamma_1 = (-3.0 * b3 * H0 * OMEGA) /
+                           ((2.0 * mur + 1.0) - 2.0 * (mur - 1.0) * OMEGA);
+    const double beta_1 = ((2.0 * mur + 1.0) * gamma_1) / ((mur - 1.0) * a3);
+    const double alpha_1 =
+      (-b3 * H0 + 2.0 * mur * gamma_1 - mur * b3 * beta_1) / 2.0;
+    const double delta_1 = (mur * a3 * beta_1 - 2.0 * mur * gamma_1) / a3;
 
-    double r  = sqrt(pow(x, 2) + pow(y, 2) + pow(z, 2));
-    double r3 = std::pow(r, 3);
-    double r5 = std::pow(r, 5);
+    const double r  = p.norm();
+    const double r3 = std::pow(r, 3);
+    const double r5 = std::pow(r, 5);
 
-    double zz = -3.0 * z * z / r5;
-    double xz = -3.0 * x * z / r5;
-    double yz = -3.0 * y * z / r5;
-
-    double mu;
-
-    Tensor<1, 3> grad_psi;
-    Tensor<1, 3> Bmu;
-    Tensor<1, 3> Happl;
+    const double zz = -3.0 * p[2] * p[2] / r5;
+    const double xz = -3.0 * p[0] * p[2] / r5;
+    const double yz = -3.0 * p[1] * p[2] / r5;
 
     if (r <= a1)
       {
-        grad_psi[0] = 0.0;
-        grad_psi[1] = 0.0;
-        grad_psi[2] = delta_1;
-        mu          = mu0;
+        return -mu0 * (Tensor<1, 3>({0.0, 0.0, delta_1}) +
+                       Tensor<1, 3>({0.0, 0.0, H0}));
       }
     else if (r >= b1)
       {
-        grad_psi[0] = alpha_1 * xz;
-        grad_psi[1] = alpha_1 * yz;
-        grad_psi[2] = -H0 + alpha_1 / r3 + alpha_1 * zz;
-        mu          = mu0;
+        return -mu0 * (Tensor<1, 3>({alpha_1 * xz,
+                                     alpha_1 * yz,
+                                     -H0 + alpha_1 / r3 + alpha_1 * zz}) +
+                       Tensor<1, 3>({0.0, 0.0, H0}));
       }
     else
       {
-        grad_psi[0] = gamma_1 * xz;
-        grad_psi[1] = gamma_1 * yz;
-        grad_psi[2] = beta_1 + gamma_1 / r3 + gamma_1 * zz;
-        mu          = mur * mu0;
+        return -mu0 *
+               (mur * Tensor<1, 3>({gamma_1 * xz,
+                                    gamma_1 * yz,
+                                    beta_1 + gamma_1 / r3 + gamma_1 * zz}) +
+                Tensor<1, 3>({0.0, 0.0, H0}));
       }
 
-    Happl[0] = 0.0;
-    Happl[1] = 0.0;
-    Happl[2] = H0;
-
-    Bmu = -mu * grad_psi - mu0 * Happl;
-
-    return Bmu;
+    return Tensor<1, 3>({0.404, 0.404, 0.404});
   }
 
   // This class implements the closed-form analytical expression for the
   // free-current density, $\vec{J}_f$, in the entire domain.
-  class FreeCurrentDensity : public Function<3>, public Settings
+  class FreeCurrentDensity : public Function<3>
   {
   public:
     FreeCurrentDensity()
@@ -348,16 +320,16 @@ namespace ExactSolutions
       Assert(values.size() == p.size(),
              ExcDimensionMismatch(values.size(), p.size()));
 
-      Tensor<1, 3> Jf;
-      double       r;
+      double r;
 
       for (unsigned int i = 0; i < values.size(); i++)
         {
           r = p[i].norm();
 
-          if ((r >= a2) && (r <= b2))
+          if ((r >= Settings::a2) && (r <= Settings::b2))
             {
-              Jf = volume_free_current_density(p[i][0], p[i][1], p[i][2], K0);
+              const Tensor<1, 3> Jf =
+                volume_free_current_density(p[i], Settings::K0);
 
               values[i][0] = Jf[0];
               values[i][1] = Jf[1];
@@ -376,7 +348,7 @@ namespace ExactSolutions
   // This class implements the closed-form analytical expression for the
   // magnetic field induced by the coil, $\vec{B} = \vec{B}_J + \vec{B}_{\mu}$,
   // see the introduction.
-  class MagneticField : public Function<3>, public Settings
+  class MagneticField : public Function<3>
   {
   public:
     MagneticField()
@@ -394,9 +366,9 @@ namespace ExactSolutions
 
       for (unsigned int i = 0; i < values.size(); i++)
         {
-          B = magnetic_field_coil(p[i][0], p[i][1], p[i][2], K0, mu_0, a2, b2) +
-              magnetic_field_core(
-                p[i][0], p[i][1], p[i][2], H0, mu_r, mu_0, a1, b1);
+          using namespace Settings;
+          B = magnetic_field_coil(p[i], K0, mu_0, a2, b2) +
+              magnetic_field_core(p[i], H0, mu_r, mu_0, a1, b1);
 
           values[i][0] = B[0];
           values[i][1] = B[1];
@@ -417,55 +389,39 @@ namespace SolverT
   // right-hand side of the curl-curl equation, see equation (i) in the
   // boundary value problem for $\vec{T}$. The free-current density is given as
   // a closed-form analytical expression by the definition of the problem.
-  class FreeCurrentDensity : public Settings
+  class FreeCurrentDensity
   {
   public:
     void value_list(const std::vector<Point<3>> &p, // Quadrature points.
-                    types::material_id         mid, // Material ID of the cell.
+                    const types::material_id   mid, // Material ID of the cell.
                     std::vector<Tensor<1, 3>> &values) const
     {
       Assert(p.size() == values.size(),
              ExcDimensionMismatch(p.size(), values.size()));
 
-      if ((mid == mid_1) || (mid == mid_2))
+      if ((mid == Settings::mid_1) || (mid == Settings::mid_2))
         for (unsigned int i = 0; i < values.size(); i++)
-          {
-            values[i][0] = 0.0;
-            values[i][1] = 0.0;
-            values[i][2] = 0.0;
-          }
+          values[i] = Tensor<1, 3>({0.0, 0.0, 0.0});
 
-      if (mid == mid_3)
-        {
-          Tensor<1, 3> Jf;
-
-          for (unsigned int i = 0; i < values.size(); i++)
-            {
-              Jf = ExactSolutions::volume_free_current_density(p[i][0],
-                                                               p[i][1],
-                                                               p[i][2],
-                                                               K0);
-
-              values[i][0] = Jf[0];
-              values[i][1] = Jf[1];
-              values[i][2] = Jf[2];
-            }
-        }
+      if (mid == Settings::mid_3)
+        for (unsigned int i = 0; i < values.size(); i++)
+          values[i] =
+            ExactSolutions::volume_free_current_density(p[i], Settings::K0);
     }
   };
 
   // This class implements the solver that minimizes the functional
   // $F(\vec{T})$, see the introduction. The mesh is loaded in this class.
   // All other solvers use a reference to this mesh.
-  class Solver : public Settings
+  class Solver
   {
   public:
     Solver() = delete;
-    Solver(unsigned int p, // Degree of the Nedelec finite elements.
-           unsigned int r, // The mesh refinement parameter.
-           unsigned int mapping_degree,
-           double       eta_squared = 0.0,
-           std::string  fname       = "data");
+    Solver(const unsigned int p, // Degree of the Nedelec finite elements.
+           const unsigned int r, // The mesh refinement parameter.
+           const unsigned int mapping_degree,
+           const double       eta_squared = 0.0,
+           const std::string &fname       = "data");
 
     void make_mesh();  // Loads the mesh. Assigns mat. IDs. Attaches manifold.
     void setup();      // Initializes dofs, vectors, matrices.
@@ -525,8 +481,8 @@ namespace SolverT
     struct AssemblyScratchData
     {
       AssemblyScratchData(const FiniteElement<3> &fe,
-                          double                  eta_squared,
-                          unsigned int            mapping_degree);
+                          const double            eta_squared,
+                          const unsigned int      mapping_degree);
 
       AssemblyScratchData(const AssemblyScratchData &scratch_data);
 
@@ -565,11 +521,11 @@ namespace SolverT
   // functions that implement the functionality of the solver in the correct
   // order. The brackets around the functions such as `{ TMR("Save"); ...}` are
   // needed for a proper operation of the timer.
-  Solver::Solver(unsigned int p,
-                 unsigned int r,
-                 unsigned int mapping_degree,
-                 double       eta_squared,
-                 std::string  fname)
+  Solver::Solver(const unsigned int p,
+                 const unsigned int r,
+                 const unsigned int mapping_degree,
+                 const double       eta_squared,
+                 const std::string &fname)
     : fe(p)
     , refinement_parameter(r)
     , mapping_degree(mapping_degree)
@@ -577,28 +533,28 @@ namespace SolverT
     , fname(fname)
   {
     TimerOutput::OutputFrequency tf =
-      (print_time_tables) ? TimerOutput::summary : TimerOutput::never;
+      (Settings::print_time_tables) ? TimerOutput::summary : TimerOutput::never;
 
     TimerOutput timer(std::cout, tf, TimerOutput::cpu_and_wall_times_grouped);
 
     {
-      TMR("Make mesh");
+      TimerOutput::Scope timer_section(timer, "Make mesh");
       make_mesh();
     }
     {
-      TMR("Setup");
+      TimerOutput::Scope timer_section(timer, "Setup");
       setup();
     }
     {
-      TMR("Assemble");
+      TimerOutput::Scope timer_section(timer, "Assemble");
       assemble();
     }
     {
-      TMR("Solve");
+      TimerOutput::Scope timer_section(timer, "Solve");
       solve();
     }
     {
-      TMR("Save");
+      TimerOutput::Scope timer_section(timer, "Save");
       save();
     }
   }
@@ -623,13 +579,17 @@ namespace SolverT
 
     for (auto cell : Solver::triangulation.active_cell_iterators())
       {
-        cell->set_material_id(mid_1); // The cell is in free space.
+        cell->set_material_id(Settings::mid_1); // The cell is in free space.
 
-        if ((cell->center().norm() > a1) && (cell->center().norm() < b1))
-          cell->set_material_id(mid_2); // The cell is inside the core.
+        if ((cell->center().norm() > Settings::a1) &&
+            (cell->center().norm() < Settings::b1))
+          cell->set_material_id(
+            Settings::mid_2); // The cell is inside the core.
 
-        if ((cell->center().norm() > a2) && (cell->center().norm() < b2))
-          cell->set_material_id(mid_3); // The cell is inside the Jf region.
+        if ((cell->center().norm() > Settings::a2) &&
+            (cell->center().norm() < Settings::b2))
+          cell->set_material_id(
+            Settings::mid_3); // The cell is inside the Jf region.
 
         for (unsigned int f = 0; f < GeometryInfo<3>::faces_per_cell; f++)
           {
@@ -639,7 +599,8 @@ namespace SolverT
               dif_norm += std::abs(cell->face(f)->vertex(0).norm() -
                                    cell->face(f)->vertex(v).norm());
 
-            if ((dif_norm < eps) && (cell->center().norm() > d1))
+            if ((dif_norm < Settings::eps) &&
+                (cell->center().norm() > Settings::d1))
               cell->face(f)->set_all_manifold_ids(1);
           }
       }
@@ -667,7 +628,7 @@ namespace SolverT
       dof_handler,
       0,
       Functions::ZeroFunction<3>(3),
-      bid,
+      Settings::bid,
       constraints,
       MappingQ<3>(mapping_degree));
 
@@ -771,21 +732,25 @@ namespace SolverT
             for (unsigned int j = 0; j < scratch_data.dofs_per_cell; ++j)
               {
                 copy_data.cell_matrix(i, j) += // Integral I_a1+I_a3.
-                  (scratch_data.fe_values[VE].curl(i, q_index) * // curl N_i
-                     scratch_data.fe_values[VE].curl(j, q_index) // curl N_j
-                   + scratch_data.eta_squared *                  // eta^2
-                       scratch_data.fe_values[VE].value(i, q_index) * // N_i
-                       scratch_data.fe_values[VE].value(j, q_index)   // N_j
+                  (scratch_data.fe_values[scratch_data.ve].curl(
+                     i, q_index) * // curl N_i
+                     scratch_data.fe_values[scratch_data.ve].curl(
+                       j, q_index)              // curl N_j
+                   + scratch_data.eta_squared * // eta^2
+                       scratch_data.fe_values[scratch_data.ve].value(
+                         i, q_index) * // N_i
+                       scratch_data.fe_values[scratch_data.ve].value(
+                         j, q_index) // N_j
                    ) *
                   scratch_data.fe_values.JxW(q_index); // dV
               }
             copy_data.cell_rhs(i) += // Integral I_b3-1.
               (scratch_data.Jf_list[q_index][0] *
-                 scratch_data.fe_values[VE].curl(i, q_index)[0] +
+                 scratch_data.fe_values[scratch_data.ve].curl(i, q_index)[0] +
                scratch_data.Jf_list[q_index][1] *
-                 scratch_data.fe_values[VE].curl(i, q_index)[1] +
+                 scratch_data.fe_values[scratch_data.ve].curl(i, q_index)[1] +
                scratch_data.Jf_list[q_index][2] *
-                 scratch_data.fe_values[VE].curl(i, q_index)[2]) *
+                 scratch_data.fe_values[scratch_data.ve].curl(i, q_index)[2]) *
               scratch_data.fe_values.JxW(q_index); // J_f.(curl N_i)dV.
           }
       }
@@ -831,7 +796,7 @@ namespace SolverT
                           false,
                           false);
 
-    if (log_cg_convergence)
+    if (Settings::log_cg_convergence)
       control.enable_history_data();
 
     GrowingVectorMemory<Vector<double>> memory;
@@ -844,7 +809,7 @@ namespace SolverT
 
     constraints.distribute(solution);
 
-    if (log_cg_convergence)
+    if (Settings::log_cg_convergence)
       {
         const std::vector<double> history_data = control.get_history_data();
 
@@ -909,18 +874,19 @@ namespace SolverA
   // This class describes the permeability in the entire problem domain. The
   // permeability is given by the definition of the problem, see the
   // introduction.
-  class Permeability : private Settings
+  class Permeability
   {
   public:
-    void value_list(types::material_id mid, std::vector<double> &values) const
+    void value_list(const types::material_id mid,
+                    std::vector<double>     &values) const
     {
-      if ((mid == mid_1) || (mid == mid_3))
+      if ((mid == Settings::mid_1) || (mid == Settings::mid_3))
         for (unsigned int i = 0; i < values.size(); i++)
-          values[i] = mu_0;
+          values[i] = Settings::mu_0;
 
-      if (mid == mid_2)
+      if (mid == Settings::mid_2)
         for (unsigned int i = 0; i < values.size(); i++)
-          values[i] = mu_1;
+          values[i] = Settings::mu_1;
     }
   };
 
@@ -930,7 +896,7 @@ namespace SolverA
   // \f[
   // \gamma = \dfrac{1}{\mu_0 r}.
   // \f]
-  class Gamma : private Settings
+  class Gamma
   {
   public:
     void value_list(const std::vector<Point<3>> &r,
@@ -940,7 +906,7 @@ namespace SolverA
              ExcDimensionMismatch(r.size(), values.size()));
 
       for (unsigned int i = 0; i < values.size(); i++)
-        values[i] = 1.0 / (mu_0 * r[i].norm());
+        values[i] = 1.0 / (Settings::mu_0 * r[i].norm());
     }
   };
 
@@ -950,17 +916,17 @@ namespace SolverA
   // `solution_T`. Moreover, this solver reuses the mesh on which $\vec{T}$ has
   // been computed. The reference to the mesh is passed via the input parameter
   // `triangulation_T`.
-  class Solver : Settings
+  class Solver
   {
   public:
     Solver() = delete;
-    Solver(unsigned int            p, // Degree of the Nedelec finite elements.
-           unsigned int            mapping_degree,
+    Solver(const unsigned int      p, // Degree of the Nedelec finite elements.
+           const unsigned int      mapping_degree,
            const Triangulation<3> &triangulation_T,
            const DoFHandler<3>    &dof_handler_T,
            const Vector<double>   &solution_T,
-           double                  eta_squared = 0.0,
-           std::string             fname       = "data");
+           const double            eta_squared = 0.0,
+           const std::string      &fname       = "data");
 
     void setup();      // Initializes dofs, vectors, matrices.
     void assemble();   // Assembles the system of linear equations.
@@ -1021,12 +987,12 @@ namespace SolverA
     // The following structures and functions are related to WorkStream.
     struct AssemblyScratchData
     {
-      AssemblyScratchData(const FiniteElement<3> &fe,
-                          const DoFHandler<3>    &dof_hand_T,
-                          const Vector<double>   &dofs_T,
-                          unsigned int            mapping_degree,
-                          double                  eta_squared,
-                          BoundaryConditionType   boundary_condition_type);
+      AssemblyScratchData(const FiniteElement<3>     &fe,
+                          const DoFHandler<3>        &dof_hand_T,
+                          const Vector<double>       &dofs_T,
+                          const unsigned int          mapping_degree,
+                          const double                eta_squared,
+                          const BoundaryConditionType boundary_condition_type);
 
       AssemblyScratchData(const AssemblyScratchData &scratch_data);
 
@@ -1076,13 +1042,13 @@ namespace SolverA
   // functions that implement the functionality of the solver in the correct
   // order. The brackets around the functions such as `{ TMR("Save"); ...}` are
   // needed for a proper operation of the timer.
-  Solver::Solver(unsigned int            p,
-                 unsigned int            mapping_degree,
+  Solver::Solver(const unsigned int      p,
+                 const unsigned int      mapping_degree,
                  const Triangulation<3> &triangulation_T,
                  const DoFHandler<3>    &dof_handler_T,
                  const Vector<double>   &solution_T,
-                 double                  eta_squared,
-                 std::string             fname)
+                 const double            eta_squared,
+                 const std::string      &fname)
     : triangulation_T(triangulation_T)
     , dof_handler_T(dof_handler_T)
     , solution_T(solution_T)
@@ -1092,24 +1058,24 @@ namespace SolverA
     , fname(fname)
   {
     TimerOutput::OutputFrequency tf =
-      (print_time_tables) ? TimerOutput::summary : TimerOutput::never;
+      (Settings::print_time_tables) ? TimerOutput::summary : TimerOutput::never;
 
     TimerOutput timer(std::cout, tf, TimerOutput::cpu_and_wall_times_grouped);
 
     {
-      TMR("Setup");
+      TimerOutput::Scope timer_section(timer, "Setup");
       setup();
     }
     {
-      TMR("Assemble");
+      TimerOutput::Scope timer_section(timer, "Assemble");
       assemble();
     }
     {
-      TMR("Solve");
+      TimerOutput::Scope timer_section(timer, "Solve");
       solve();
     }
     {
-      TMR("Save");
+      TimerOutput::Scope timer_section(timer, "Save");
       save();
     }
   }
@@ -1130,12 +1096,12 @@ namespace SolverA
 
     DoFTools::make_hanging_node_constraints(dof_handler, constraints);
 
-    if (boundary_condition_type_A == Dirichlet)
+    if (Settings::boundary_condition_type_A == Dirichlet)
       VectorTools::project_boundary_values_curl_conforming_l2(
         dof_handler,
         0,
         Functions::ZeroFunction<3>(3),
-        bid,
+        Settings::bid,
         constraints,
         MappingQ<3>(mapping_degree));
 
@@ -1175,7 +1141,7 @@ namespace SolverA
                                         solution_T,
                                         mapping_degree,
                                         eta_squared,
-                                        boundary_condition_type_A),
+                                        Settings::boundary_condition_type_A),
                     AssemblyCopyData());
   }
 
@@ -1183,12 +1149,12 @@ namespace SolverA
   // parameters and from another object of the same type, i.e., a copy
   // constructor.
   Solver::AssemblyScratchData::AssemblyScratchData(
-    const FiniteElement<3> &fe,
-    const DoFHandler<3>    &dof_hand_T,
-    const Vector<double>   &dofs_T,
-    unsigned int            mapping_degree,
-    double                  eta_squared,
-    BoundaryConditionType   boundary_condition_type)
+    const FiniteElement<3>     &fe,
+    const DoFHandler<3>        &dof_hand_T,
+    const Vector<double>       &dofs_T,
+    const unsigned int          mapping_degree,
+    const double                eta_squared,
+    const BoundaryConditionType boundary_condition_type)
     : mapping(mapping_degree)
     , fe_values(mapping,
                 fe,
@@ -1276,8 +1242,8 @@ namespace SolverA
     scratch_data.permeability.value_list(cell->material_id(),
                                          scratch_data.permeability_list);
 
-    scratch_data.fe_values_T[VE].get_function_values(scratch_data.dofs_T,
-                                                     scratch_data.T_values);
+    scratch_data.fe_values_T[scratch_data.ve].get_function_values(
+      scratch_data.dofs_T, scratch_data.T_values);
 
     // Fourth, we compute the components of the cell matrix and cell right-hand
     // side. The labels of the integrals are the same as in the introduction to
@@ -1290,21 +1256,25 @@ namespace SolverA
               {
                 copy_data.cell_matrix(i, j) += // Integral I_a1+I_a3.
                   (1.0 / scratch_data.permeability_list[q_index]) * // 1 / mu
-                  (scratch_data.fe_values[VE].curl(i, q_index) *    // curl N_i
-                     scratch_data.fe_values[VE].curl(j, q_index)    // curl N_j
-                   + scratch_data.eta_squared *                     // eta^2
-                       scratch_data.fe_values[VE].value(i, q_index) * // N_i
-                       scratch_data.fe_values[VE].value(j, q_index)   // N_j
+                  (scratch_data.fe_values[scratch_data.ve].curl(
+                     i, q_index) * // curl N_i
+                     scratch_data.fe_values[scratch_data.ve].curl(
+                       j, q_index)              // curl N_j
+                   + scratch_data.eta_squared * // eta^2
+                       scratch_data.fe_values[scratch_data.ve].value(
+                         i, q_index) * // N_i
+                       scratch_data.fe_values[scratch_data.ve].value(
+                         j, q_index) // N_j
                    ) *
                   scratch_data.fe_values.JxW(q_index); // dV
               }
             copy_data.cell_rhs(i) += // Integral I_b3-1.
               (scratch_data.T_values[q_index][0] *
-                 scratch_data.fe_values[VE].curl(i, q_index)[0] +
+                 scratch_data.fe_values[scratch_data.ve].curl(i, q_index)[0] +
                scratch_data.T_values[q_index][1] *
-                 scratch_data.fe_values[VE].curl(i, q_index)[1] +
+                 scratch_data.fe_values[scratch_data.ve].curl(i, q_index)[1] +
                scratch_data.T_values[q_index][2] *
-                 scratch_data.fe_values[VE].curl(
+                 scratch_data.fe_values[scratch_data.ve].curl(
                    i, q_index)[2]) *               // T . (curl N_i)
               scratch_data.fe_values.JxW(q_index); // dV
           }
@@ -1338,53 +1308,54 @@ namespace SolverA
                               scratch_data.gamma_list[q_index_face] * // gamma
                               ((scratch_data.fe_face_values.normal_vector(
                                   q_index_face)[1] *
-                                  scratch_data.fe_face_values[VE].value(
-                                    i, q_index_face)[2] -
+                                  scratch_data.fe_face_values[scratch_data.ve]
+                                    .value(i, q_index_face)[2] -
                                 scratch_data.fe_face_values.normal_vector(
                                   q_index_face)[2] *
-                                  scratch_data.fe_face_values[VE].value(
-                                    i, q_index_face)[1]) *
+                                  scratch_data.fe_face_values[scratch_data.ve]
+                                    .value(i, q_index_face)[1]) *
                                  (scratch_data.fe_face_values.normal_vector(
                                     q_index_face)[1] *
-                                    scratch_data.fe_face_values[VE].value(
-                                      j, q_index_face)[2] -
+                                    scratch_data.fe_face_values[scratch_data.ve]
+                                      .value(j, q_index_face)[2] -
                                   scratch_data.fe_face_values.normal_vector(
                                     q_index_face)[2] *
-                                    scratch_data.fe_face_values[VE].value(
-                                      j, q_index_face)[1]) +
+                                    scratch_data.fe_face_values[scratch_data.ve]
+                                      .value(j, q_index_face)[1]) +
                                (scratch_data.fe_face_values.normal_vector(
                                   q_index_face)[0] *
-                                  scratch_data.fe_face_values[VE].value(
-                                    i, q_index_face)[2] -
+                                  scratch_data.fe_face_values[scratch_data.ve]
+                                    .value(i, q_index_face)[2] -
                                 scratch_data.fe_face_values.normal_vector(
                                   q_index_face)[2] *
-                                  scratch_data.fe_face_values[VE].value(
-                                    i, q_index_face)[0]) *
+                                  scratch_data.fe_face_values[scratch_data.ve]
+                                    .value(i, q_index_face)[0]) *
                                  (scratch_data.fe_face_values.normal_vector(
                                     q_index_face)[0] *
-                                    scratch_data.fe_face_values[VE].value(
-                                      j, q_index_face)[2] -
+                                    scratch_data.fe_face_values[scratch_data.ve]
+                                      .value(j, q_index_face)[2] -
                                   scratch_data.fe_face_values.normal_vector(
                                     q_index_face)[2] *
-                                    scratch_data.fe_face_values[VE].value(
-                                      j, q_index_face)[0]) +
+                                    scratch_data.fe_face_values[scratch_data.ve]
+                                      .value(j, q_index_face)[0]) +
                                (scratch_data.fe_face_values.normal_vector(
                                   q_index_face)[0] *
-                                  scratch_data.fe_face_values[VE].value(
-                                    i, q_index_face)[1] -
+                                  scratch_data.fe_face_values[scratch_data.ve]
+                                    .value(i, q_index_face)[1] -
                                 scratch_data.fe_face_values.normal_vector(
                                   q_index_face)[1] *
-                                  scratch_data.fe_face_values[VE].value(
-                                    i, q_index_face)[0]) *
+                                  scratch_data.fe_face_values[scratch_data.ve]
+                                    .value(i, q_index_face)[0]) *
                                  (scratch_data.fe_face_values.normal_vector(
                                     q_index_face)[0] *
-                                    scratch_data.fe_face_values[VE].value(
-                                      j, q_index_face)[1] -
+                                    scratch_data.fe_face_values[scratch_data.ve]
+                                      .value(j, q_index_face)[1] -
                                   scratch_data.fe_face_values.normal_vector(
                                     q_index_face)[1] *
-                                    scratch_data.fe_face_values[VE].value(
-                                      j, q_index_face)[0])) // (n x N_i) . (n x
-                                                            // N_j)
+                                    scratch_data.fe_face_values[scratch_data.ve]
+                                      .value(j,
+                                             q_index_face)[0])) // (n x N_i) .
+                                                                // (n x N_j)
                               * scratch_data.fe_face_values.JxW(
                                   q_index_face); // dS
                           }                      // for j
@@ -1436,7 +1407,7 @@ namespace SolverA
                           false,
                           false);
 
-    if (log_cg_convergence)
+    if (Settings::log_cg_convergence)
       control.enable_history_data();
 
     GrowingVectorMemory<Vector<double>> memory;
@@ -1449,7 +1420,7 @@ namespace SolverA
 
     constraints.distribute(solution);
 
-    if (log_cg_convergence)
+    if (Settings::log_cg_convergence)
       {
         const std::vector<double> history_data = control.get_history_data();
 
@@ -1518,16 +1489,16 @@ namespace ProjectorHcurlToHdiv
   // reference to the mesh is passed via the input parameter
   // `triangulation_Hcurl`. There is no constraints this time around as we are
   // not going to apply the Dirichlet boundary condition.
-  class Solver : public Settings
+  class Solver
   {
   public:
     Solver() = delete;
-    Solver(unsigned int p, // Degree of the Raviart-Thomas finite elements
-           unsigned int mapping_degree,
+    Solver(const unsigned int p, // Degree of the Raviart-Thomas finite elements
+           const unsigned int mapping_degree,
            const Triangulation<3> &triangulation_Hcurl,
            const DoFHandler<3>    &dof_handler_Hcurl,
            const Vector<double>   &solution_Hcurl,
-           std::string             fname          = "data",
+           const std::string      &fname          = "data",
            const Function<3>      *exact_solution = nullptr);
 
     double get_L2_norm()
@@ -1610,7 +1581,7 @@ namespace ProjectorHcurlToHdiv
       AssemblyScratchData(const FiniteElement<3> &fe,
                           const DoFHandler<3>    &dof_handr_Hcurl,
                           const Vector<double>   &dofs_Hcurl,
-                          unsigned int            mapping_degree);
+                          const unsigned int      mapping_degree);
 
       AssemblyScratchData(const AssemblyScratchData &scratch_data);
 
@@ -1650,12 +1621,12 @@ namespace ProjectorHcurlToHdiv
   // functions that implement the functionality of the solver in the correct
   // order. The brackets around the functions such as `{ TMR("Save"); ...}` are
   // needed for a proper operation of the timer.
-  Solver::Solver(unsigned int            p,
-                 unsigned int            mapping_degree,
+  Solver::Solver(const unsigned int      p,
+                 const unsigned int      mapping_degree,
                  const Triangulation<3> &triangulation_Hcurl,
                  const DoFHandler<3>    &dof_handler_Hcurl,
                  const Vector<double>   &solution_Hcurl,
-                 std::string             fname,
+                 const std::string      &fname,
                  const Function<3>      *exact_solution)
     : fname(fname)
     , triangulation_Hcurl(triangulation_Hcurl)
@@ -1669,40 +1640,40 @@ namespace ProjectorHcurlToHdiv
            ExcMessage("The exact solution is missing."));
 
     TimerOutput::OutputFrequency tf =
-      (print_time_tables) ? TimerOutput::summary : TimerOutput::never;
+      (Settings::print_time_tables) ? TimerOutput::summary : TimerOutput::never;
 
     TimerOutput timer(std::cout, tf, TimerOutput::cpu_and_wall_times_grouped);
 
     {
-      TMR("Setup");
+      TimerOutput::Scope timer_section(timer, "Setup");
       setup();
     }
     {
-      TMR("Assemble");
+      TimerOutput::Scope timer_section(timer, "Assemble");
       assemble();
     }
     {
-      TMR("Solve");
+      TimerOutput::Scope timer_section(timer, "Solve");
       solve();
     }
 
     if (exact_solution)
       {
         {
-          TMR("Compute error norms");
+          TimerOutput::Scope timer_section(timer, "Compute error norms");
           compute_error_norms();
         }
 
-        if (project_exact_solution)
+        if (Settings::project_exact_solution)
           {
             {
-              TMR("Project exact solution");
+              TimerOutput::Scope timer_section(timer, "Project exact solution");
               project_exact_solution_fcn();
             }
           }
       }
     {
-      TMR("Save");
+      TimerOutput::Scope timer_section(timer, "Save");
       save();
     }
   }
@@ -1725,14 +1696,12 @@ namespace ProjectorHcurlToHdiv
     solution_Hdiv.reinit(dof_handler_Hdiv.n_dofs());
     system_rhs.reinit(dof_handler_Hdiv.n_dofs());
 
-    if ((project_exact_solution) && (exact_solution))
+    if ((Settings::project_exact_solution) && (exact_solution))
       projected_exact_solution.reinit(dof_handler_Hdiv.n_dofs());
 
     if (exact_solution)
       L2_per_cell.reinit(triangulation_Hcurl.n_active_cells());
   }
-
-
 
   // Formally, this function assembles the system of linear equations. In
   // reality, however, it just spells all the magic words to get the WorkStream
@@ -1763,7 +1732,7 @@ namespace ProjectorHcurlToHdiv
     const FiniteElement<3> &fe,
     const DoFHandler<3>    &dof_hand_Hcurl,
     const Vector<double>   &dofs_Hcurl,
-    unsigned int            mapping_degree)
+    const unsigned int      mapping_degree)
     : mapping(mapping_degree)
     , fe_values_Hdiv(mapping,
                      fe,
@@ -1835,8 +1804,10 @@ namespace ProjectorHcurlToHdiv
             for (unsigned int j = 0; j < scratch_data.dofs_per_cell; ++j)
               {
                 copy_data.cell_matrix(i, j) += // Integral I_a
-                  scratch_data.fe_values_Hdiv[VE].value(i, q_index) *
-                  scratch_data.fe_values_Hdiv[VE].value(j, q_index) *
+                  scratch_data.fe_values_Hdiv[scratch_data.ve].value(i,
+                                                                     q_index) *
+                  scratch_data.fe_values_Hdiv[scratch_data.ve].value(j,
+                                                                     q_index) *
                   scratch_data.fe_values_Hdiv.JxW(q_index);
               }
 
@@ -1857,7 +1828,7 @@ namespace ProjectorHcurlToHdiv
 
             copy_data.cell_rhs(i) += // Integral I_b
               scratch_data.curl_vec_in_Hcurl *
-              scratch_data.fe_values_Hdiv[VE].value(i, q_index) *
+              scratch_data.fe_values_Hdiv[scratch_data.ve].value(i, q_index) *
               scratch_data.fe_values_Hdiv.JxW(q_index);
           }
       }
@@ -1930,7 +1901,7 @@ namespace ProjectorHcurlToHdiv
                           false,
                           false);
 
-    if (log_cg_convergence)
+    if (Settings::log_cg_convergence)
       control.enable_history_data();
 
     GrowingVectorMemory<Vector<double>> memory;
@@ -1941,7 +1912,7 @@ namespace ProjectorHcurlToHdiv
 
     cg.solve(system_matrix, solution_Hdiv, system_rhs, preconditioner);
 
-    if (log_cg_convergence)
+    if (Settings::log_cg_convergence)
       {
         const std::vector<double> history_data = control.get_history_data();
 
@@ -1974,7 +1945,7 @@ namespace ProjectorHcurlToHdiv
                              solution_names,
                              interpretation);
 
-    if (project_exact_solution)
+    if (Settings::project_exact_solution)
       {
         std::vector<std::string> solution_names_ex(3, "VectorFieldExact");
 
@@ -2012,7 +1983,7 @@ namespace ProjectorHcurlToHdiv
 // @sect3{The main loop}
 
 // This class contains the main loop of the program.
-class Batch : public Settings
+class Batch
 {
 public:
   void run()
