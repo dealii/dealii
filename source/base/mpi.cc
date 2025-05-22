@@ -27,6 +27,12 @@
 
 #include <boost/serialization/utility.hpp>
 
+// In this file, we use offsetof, which is a macro. When compiling
+// with C++20 modules, this presents a problem because we wrap all of
+// namespace std -- and then don't have access to macros. As a
+// consequence, we really do need the following #include, even when
+// building modules:
+#include <cstddef> // Do not convert for module purposes
 #include <iostream>
 #include <limits>
 #include <numeric>
