@@ -13,7 +13,7 @@
 // ------------------------------------------------------------------------
 
 // test the mumps sparse direct solver on a mass matrix
-// - check ways to solve
+// tests of all the symmetric matrix options
 
 #include <deal.II/base/function.h>
 #include <deal.II/base/quadrature_lib.h>
@@ -40,20 +40,21 @@
 
 #include "../tests.h"
 
-
 void
 solve_and_check(const SparseMatrix<double> &M,
                 const Vector<double>       &rhs,
                 const Vector<double>       &solution)
 {
-  {
-    SparseDirectMUMPS solver;
-    solver.initialize(M);
-    Vector<double> dst(rhs.size());
-    solver.vmult(dst, rhs);
-    dst -= solution;
-    Assert(dst.l2_norm() < 1e-9, ExcInternalError());
-  }
+  SparseDirectMUMPS::AdditionalData data;
+  data.output_details = false;
+  data.symmetric      = true;
+  data.posdef         = true;
+  SparseDirectMUMPS solver(data);
+  solver.initialize(M);
+  Vector<double> dst(rhs.size());
+  solver.vmult(dst, rhs);
+  dst -= solution;
+  Assert(dst.l2_norm() < 1e-8, ExcInternalError());
 }
 
 template <int dim>
@@ -63,7 +64,7 @@ test()
   deallog << dim << 'd' << std::endl;
 
   Triangulation<dim> tria;
-  GridGenerator::hyper_cube(tria, 0, 1);
+  GridGenerator::hyper_cube(tria, -1, 1);
   tria.refine_global(1);
 
   // destroy the uniformity of the matrix by
@@ -92,7 +93,13 @@ test()
   MatrixTools::create_mass_matrix(dof_handler, qr, B);
 
   // compute a decomposition of the matrix
-  SparseDirectMUMPS Binv;
+
+  SparseDirectMUMPS::AdditionalData data;
+  data.output_details   = true;
+  data.error_statistics = true;
+  data.symmetric        = true;
+  data.posdef           = false;
+  SparseDirectMUMPS Binv(data);
   Binv.initialize(B);
 
   // for a number of different solution
@@ -118,8 +125,7 @@ test()
               << std::endl;
       Assert(x.l2_norm() / solution.l2_norm() < 1e-8, ExcInternalError());
 
-
-      // also check solving in different ways:
+      // check with also the posdef option
       solve_and_check(B, b, solution);
     }
 }

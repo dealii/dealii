@@ -12,8 +12,10 @@
 //
 // ------------------------------------------------------------------------
 
+
 // test the mumps sparse direct solver on a mass matrix
-// - check ways to solve
+// test of the transpose option
+// test of other options
 
 #include <deal.II/base/function.h>
 #include <deal.II/base/quadrature_lib.h>
@@ -47,10 +49,12 @@ solve_and_check(const SparseMatrix<double> &M,
                 const Vector<double>       &solution)
 {
   {
-    SparseDirectMUMPS solver;
+    SparseDirectMUMPS::AdditionalData data;
+    SparseDirectMUMPS                 solver(data);
+    data.output_details = false;
     solver.initialize(M);
     Vector<double> dst(rhs.size());
-    solver.vmult(dst, rhs);
+    solver.Tvmult(dst, rhs);
     dst -= solution;
     Assert(dst.l2_norm() < 1e-9, ExcInternalError());
   }
@@ -92,7 +96,11 @@ test()
   MatrixTools::create_mass_matrix(dof_handler, qr, B);
 
   // compute a decomposition of the matrix
-  SparseDirectMUMPS Binv;
+
+  SparseDirectMUMPS::AdditionalData data;
+  data.output_details   = true;
+  data.error_statistics = true;
+  SparseDirectMUMPS Binv(data);
   Binv.initialize(B);
 
   // for a number of different solution
@@ -107,9 +115,9 @@ test()
       for (unsigned int j = 0; j < dof_handler.n_dofs(); ++j)
         solution(j) = j + j * (i + 1) * (i + 1);
 
-      B.vmult(b, solution);
+      B.Tvmult(b, solution);
 
-      Binv.vmult(x, b);
+      Binv.Tvmult(x, b);
 
       x -= solution;
       deallog << "relative norm distance = " << x.l2_norm() / solution.l2_norm()
