@@ -104,9 +104,8 @@ namespace Settings
   const double a2   = 0.9; // Inner radius of the free-current region.
   const double b2   = 1.2; // Outer radius of the free-current region.
   const double d2   = 2.0; // Error norms are computed if r < d2.
-  const double d3 = 3.0; // Radius of the outer boundary of the problem domain.
-  const double K0 = 1.0; // Magnitude of the free-current density.
-  const double H0 =      // Magnitude of H-field inside the coil, core removed.
+  const double K0   = 1.0; // Magnitude of the free-current density.
+  const double H0   = // Magnitude of H-field inside the coil, core removed.
     (1.0 / 3.0) * K0 * (pow(b2, 2) - pow(a2, 2));
   const types::material_id mid_1 = 1; // Material ID of the free space.
   const types::material_id mid_2 = 2; // Material ID of the magnetic core.
