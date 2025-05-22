@@ -196,7 +196,7 @@ public:
   }
 
 private:
-  const unsigned int                      dimensions;
+  const unsigned int       dimensions;
   std::vector<std::string> new_order = {"p", "r", "ncells", "ndofs", "L2"};
 };
 
@@ -240,8 +240,10 @@ namespace ExactSolutions
     const double cos_phi = x / sqrt(pow(x, 2) + pow(y, 2));
     const double sin_phi = y / sqrt(pow(x, 2) + pow(y, 2));
 
-    const Tensor<1, 3> r_hat = { x / r, y / r, z/r };
-    const Tensor<1,3> theta_hat = { cos_theta * cos_phi, cos_theta * sin_phi, -sin_theta};
+    const Tensor<1, 3> r_hat     = {x / r, y / r, z / r};
+    const Tensor<1, 3> theta_hat = {cos_theta * cos_phi,
+                                    cos_theta * sin_phi,
+                                    -sin_theta};
 
     F1 = (2.0 / 3.0) * mu_0 * K0 * (cos_theta * r_hat - sin_theta * theta_hat);
     F2 = (2.0 / 3.0) * mu_0 * K0 *
