@@ -680,6 +680,10 @@
 #  define AssertNothrow(cond, exc) \
     do                             \
       {                            \
+        if (false)                 \
+          if (!(cond))             \
+            {                      \
+            }                      \
       }                            \
     while (false)
 #endif
