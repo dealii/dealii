@@ -64,8 +64,6 @@ namespace SLEPcWrappers
       {
         // Destroy the solver object.
         const PetscErrorCode ierr = EPSDestroy(&eps);
-
-        (void)ierr;
         AssertNothrow(ierr == 0, ExcSLEPcError(ierr));
       }
   }

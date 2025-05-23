@@ -39,7 +39,6 @@ namespace SLEPcWrappers
     if (st != nullptr)
       {
         const PetscErrorCode ierr = STDestroy(&st);
-        (void)ierr;
         AssertNothrow(ierr == 0, SolverBase::ExcSLEPcError(ierr));
       }
   }

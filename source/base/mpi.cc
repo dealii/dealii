@@ -241,10 +241,8 @@ namespace Utilities
       auto deleter = [](MPI_Datatype *p) {
         if (p != nullptr)
           {
-            [[maybe_unused]] const int ierr = MPI_Type_free(p);
-
+            const int ierr = MPI_Type_free(p);
             AssertNothrow(ierr == MPI_SUCCESS, ExcMPI(ierr));
-
             delete p;
           }
       };

@@ -427,8 +427,7 @@ InitFinalize::finalize()
             }
           else
             {
-              [[maybe_unused]] const int ierr = MPI_Finalize();
-
+              const int ierr = MPI_Finalize();
               AssertNothrow(ierr == MPI_SUCCESS, dealii::ExcMPI(ierr));
             }
         }

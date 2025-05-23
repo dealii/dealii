@@ -1310,7 +1310,6 @@ namespace HDF5
               // Release the HDF5 resource
               const herr_t ret = H5Tclose(*pointer);
               AssertNothrow(ret >= 0, ExcInternalError());
-              (void)ret;
               delete pointer;
             });
 
@@ -1333,7 +1332,6 @@ namespace HDF5
               // Release the HDF5 resource
               const herr_t ret = H5Tclose(*pointer);
               AssertNothrow(ret >= 0, ExcInternalError());
-              (void)ret;
               delete pointer;
             });
           *t_type = H5Tcreate(H5T_COMPOUND, sizeof(std::complex<double>));

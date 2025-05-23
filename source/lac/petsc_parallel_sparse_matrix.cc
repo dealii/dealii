@@ -48,7 +48,6 @@ namespace PETScWrappers
     SparseMatrix::~SparseMatrix()
     {
       PetscErrorCode ierr = MatDestroy(&matrix);
-      (void)ierr;
       AssertNothrow(ierr == 0, ExcPETScError(ierr));
     }
 
