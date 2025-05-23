@@ -382,10 +382,8 @@ namespace internal
     template <int dim>
     inline void
     HangingNodes<dim>::setup_line_to_cell(
-      const Triangulation<dim> &triangulation)
-    {
-      (void)triangulation;
-    }
+      const Triangulation<dim> & /*triangulation*/)
+    {}
 
 
 
