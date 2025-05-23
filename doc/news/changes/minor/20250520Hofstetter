@@ -1,0 +1,6 @@
+Fixed: CGALWrappers dealii_cell_to_cgal_surface_mesh
+and dealii_tria_to_cgal_surface_mesh now consistently
+return closed and oriented surface meshes for tets
+and hex. This avoids errors in boolean operations.
+<br>
+(Sascha Hofstetter, 2025/05/20)

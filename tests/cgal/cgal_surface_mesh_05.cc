@@ -57,10 +57,14 @@ test()
   dealii_tria_to_cgal_surface_mesh(tria0, surface_mesh0);
   dealii_tria_to_cgal_surface_mesh(tria1, surface_mesh1);
 
-  // close the surfaces
-  CGAL::Polygon_mesh_processing::stitch_borders(surface_mesh0);
-  CGAL::Polygon_mesh_processing::stitch_borders(surface_mesh1);
+  // Ensure the meshes are closed
+  Assert(CGAL::is_closed(surface_mesh0),
+         ExcMessage("The CGAL mesh 0 is not closed"));
+  Assert(CGAL::is_closed(surface_mesh1),
+         ExcMessage("The CGAL mesh 1 is not closed"));
 
+  // Surfaces automatically closed but still need to be triangulated
+  // before using compute_boolean_operation
   CGAL::Polygon_mesh_processing::triangulate_faces(surface_mesh0);
   CGAL::Polygon_mesh_processing::triangulate_faces(surface_mesh1);
 
@@ -93,10 +97,14 @@ test()
   dealii_tria_to_cgal_surface_mesh(tria0, surface_mesh0);
   dealii_tria_to_cgal_surface_mesh(tria1, surface_mesh1);
 
-  // close the surfaces
-  CGAL::Polygon_mesh_processing::stitch_borders(surface_mesh0);
-  CGAL::Polygon_mesh_processing::stitch_borders(surface_mesh1);
+  // Ensure the meshes are closed
+  Assert(CGAL::is_closed(surface_mesh0),
+         ExcMessage("The CGAL mesh 0 is not closed"));
+  Assert(CGAL::is_closed(surface_mesh1),
+         ExcMessage("The CGAL mesh 1 is not closed"));
 
+  // Surfaces automatically closed but still need to be triangulated
+  // before using compute_boolean_operation
   CGAL::Polygon_mesh_processing::triangulate_faces(surface_mesh0);
   CGAL::Polygon_mesh_processing::triangulate_faces(surface_mesh1);
 

@@ -27,6 +27,7 @@
 #include <deal.II/grid/grid_out.h>
 #include <deal.II/grid/tria.h>
 
+#include <CGAL/Polygon_mesh_processing/orientation.h>
 #include <string.h>
 
 #include "../tests.h"
@@ -75,6 +76,16 @@ test()
       dealii_tria_to_cgal_surface_mesh(tria_in, surface_mesh);
       Assert(surface_mesh.is_valid(),
              ExcMessage("The CGAL surface mesh is not valid."));
+
+      if (dim == 3)
+        {
+          Assert(CGAL::is_closed(surface_mesh),
+                 ExcMessage("The CGAL mesh is not closed"));
+          Assert(
+            CGAL::Polygon_mesh_processing::is_outward_oriented(surface_mesh),
+            ExcMessage(
+              "The normal vectors of the CGAL mesh are not oriented outwards"));
+        }
 
       // Now back to the original dealii tria.
       cgal_surface_mesh_to_dealii_triangulation(surface_mesh, tria_out);
