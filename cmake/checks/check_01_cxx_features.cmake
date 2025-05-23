@@ -421,7 +421,6 @@ if (DEAL_II_BUILD_CXX20_MODULE)
       AND
       ${CMAKE_GENERATOR} STREQUAL "Ninja")
     message(STATUS "Enabling building a C++20 module")
-    set(DEAL_II_BUILD_CXX20_MODULE TRUE)
   else()
     message(STATUS "Cannot build a C++20 module:")
 
@@ -445,8 +444,6 @@ if (DEAL_II_BUILD_CXX20_MODULE)
     endif()
 
     message(FATAL_ERROR "You asked for a C++20 module, but this is not possible.")
-
-    set(DEAL_II_BUILD_CXX20_MODULE FALSE)
   endif()
 endif()
 
