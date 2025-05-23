@@ -106,7 +106,7 @@ namespace Settings
   const double d2   = 2.0; // Error norms are computed if r < d2.
   const double K0   = 1.0; // Magnitude of the free-current density.
   const double H0   = // Magnitude of H-field inside the coil, core removed.
-    (1.0 / 3.0) * K0 * (pow(b2, 2) - pow(a2, 2));
+    (1.0 / 3.0) * K0 * (std::pow(b2, 2) - std::pow(a2, 2));
   const types::material_id mid_1 = 1; // Material ID of the free space.
   const types::material_id mid_2 = 2; // Material ID of the magnetic core.
   const types::material_id mid_3 = 3; // Material ID of the free-current region.
@@ -219,10 +219,13 @@ namespace ExactSolutions
     const double r = p.norm();
 
     const double cos_theta = p[2] / r;
-    const double sin_theta = sqrt(pow(p[0], 2) + pow(p[1], 2)) / r;
+    const double sin_theta =
+      std::sqrt(std::pow(p[0], 2) + std::pow(p[1], 2)) / r;
 
-    const double cos_phi = p[0] / sqrt(pow(p[0], 2) + pow(p[1], 2));
-    const double sin_phi = p[1] / sqrt(pow(p[0], 2) + pow(p[1], 2));
+    const double cos_phi =
+      p[0] / std::sqrt(std::pow(p[0], 2) + std::pow(p[1], 2));
+    const double sin_phi =
+      p[1] / std::sqrt(std::pow(p[0], 2) + std::pow(p[1], 2));
 
     const Tensor<1, 3> r_hat({p[0] / r, p[1] / r, p[2] / r});
     const Tensor<1, 3> theta_hat(
@@ -232,20 +235,20 @@ namespace ExactSolutions
       (2.0 / 3.0) * mu_0 * K0 * (cos_theta * r_hat - sin_theta * theta_hat);
     const Tensor<1, 3> F2 = (2.0 / 3.0) * mu_0 * K0 *
                             (cos_theta * r_hat + 0.5 * sin_theta * theta_hat) /
-                            pow(r, 3);
+                            std::pow(r, 3);
 
     if (r <= a2)
       {
-        return 0.5 * (pow(b2, 2) - pow(a2, 2)) * F1;
+        return 0.5 * (std::pow(b2, 2) - std::pow(a2, 2)) * F1;
       }
     else if (r >= b2)
       {
-        return 0.2 * (pow(b2, 5) - pow(a2, 5)) * F2;
+        return 0.2 * (std::pow(b2, 5) - std::pow(a2, 5)) * F2;
       }
     else
       {
-        return 0.5 * (pow(b2, 2) - pow(r, 2)) * F1 +
-               0.2 * (pow(r, 5) - pow(a2, 5)) * F2;
+        return 0.5 * (std::pow(b2, 2) - std::pow(r, 2)) * F1 +
+               0.2 * (std::pow(r, 5) - std::pow(a2, 5)) * F2;
       }
 
     return Tensor<1, 3>({0.404, 0.404, 0.404});

@@ -1,10 +1,10 @@
-573,574c573,574
+576,577c576,577
 <     std::ifstream ifs("sphere_r" + std::to_string(refinement_parameter) +
 <                       ".msh");
 ---
 >     std::ifstream ifs("../../../source/step-97/sphere_r" +
 >     std::to_string(refinement_parameter) + ".msh");
-2005c2005
+2008c2008
 <     for (unsigned int r = 6; r < 10; r++) // Mesh refinement parameter.
 ---
 >     for (unsigned int r = 6; r < 7; r++) // Mesh refinement parameter.
