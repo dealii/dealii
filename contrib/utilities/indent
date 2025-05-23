@@ -60,7 +60,7 @@ checks
 # Process all source and header files:
 #
 
-process_changed "tests include source examples cmake/scripts contrib/python-bindings" ".*\.(cc|h)" format_file
+process_changed "tests include source module examples cmake/scripts contrib/python-bindings" ".*\.(cc|ccm|h)" format_file
 process_changed "source" ".*\.inst.in" format_inst
 
 #
