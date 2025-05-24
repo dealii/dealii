@@ -93,10 +93,8 @@ namespace internal
      */
     template <int dim>
     inline std::vector<Point<dim>>
-    generate_simplex_evaluation_points(const unsigned int n_subdivisions)
+    generate_simplex_evaluation_points(const unsigned int /*n_subdivisions*/)
     {
-      (void)n_subdivisions;
-
       DEAL_II_NOT_IMPLEMENTED();
 
       return {};
@@ -1636,13 +1634,11 @@ namespace internal
     template <int dim, int spacedim, typename ScalarType>
     double
     MGDataEntry<dim, spacedim, ScalarType>::get_cell_data_value(
-      const unsigned int       cell_number,
-      const ComponentExtractor extract_component) const
+      const unsigned int /*cell_number*/,
+      const ComponentExtractor /*extract_component*/) const
     {
       DEAL_II_NOT_IMPLEMENTED();
 
-      (void)cell_number;
-      (void)extract_component;
       return 0.0;
     }
 

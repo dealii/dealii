@@ -175,14 +175,10 @@ namespace internal
                              VectorType> * = nullptr>
   inline void
   check_vector_compatibility(
-    const VectorType                                   &vec,
-    const MatrixFree<dim, Number, VectorizedArrayType> &matrix_free,
-    const internal::MatrixFreeFunctions::DoFInfo       &dof_info)
+    const VectorType &vec,
+    const MatrixFree<dim, Number, VectorizedArrayType> & /*matrix_free*/,
+    const internal::MatrixFreeFunctions::DoFInfo &dof_info)
   {
-    (void)vec;
-    (void)matrix_free;
-    (void)dof_info;
-
     AssertDimension(vec.size(), dof_info.vector_partitioner->size());
   }
 

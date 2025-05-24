@@ -3699,10 +3699,9 @@ namespace internal
     template <typename MatrixType, typename PreconditionerType>
     inline void
     initialize_preconditioner(
-      const MatrixType                    &matrix,
+      const MatrixType & /*matrix*/,
       std::shared_ptr<PreconditionerType> &preconditioner)
     {
-      (void)matrix;
       (void)preconditioner;
       AssertThrow(preconditioner.get() != nullptr, ExcNotInitialized());
     }

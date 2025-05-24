@@ -1047,10 +1047,9 @@ namespace TrilinosWrappers
        * Scale each element of the i-th vector in *this with alpha[i].
        */
       virtual void
-      MvScale(const std::vector<value_type> &alpha)
+      MvScale(const std::vector<value_type> & /*alpha*/)
       {
         AssertThrow(false, ExcNotImplemented());
-        (void)alpha;
       }
 
       /**
@@ -1115,12 +1114,10 @@ namespace TrilinosWrappers
        * Copy the vectors in A to a set of vectors in *this.
        */
       virtual void
-      SetBlock(const Belos::MultiVec<value_type> &A,
-               const std::vector<int>            &index)
+      SetBlock(const Belos::MultiVec<value_type> & /*A*/,
+               const std::vector<int> & /*index*/)
       {
         AssertThrow(false, ExcNotImplemented());
-        (void)A;
-        (void)index;
       }
 
       /**
@@ -1136,20 +1133,18 @@ namespace TrilinosWrappers
        * Replace each element of the vectors in *this with alpha.
        */
       virtual void
-      MvInit(const value_type alpha)
+      MvInit(const value_type /*alpha*/)
       {
         AssertThrow(false, ExcNotImplemented());
-        (void)alpha;
       }
 
       /**
        * Print *this multivector to the os output stream.
        */
       virtual void
-      MvPrint(std::ostream &os) const
+      MvPrint(std::ostream & /*os*/) const
       {
         AssertThrow(false, ExcNotImplemented());
-        (void)os;
       }
 
       /**
