@@ -112,7 +112,6 @@ namespace PETScWrappers
   MatrixBase::~MatrixBase()
   {
     PetscErrorCode ierr = MatDestroy(&matrix);
-    (void)ierr;
     AssertNothrow(ierr == 0, ExcPETScError(ierr));
   }
 

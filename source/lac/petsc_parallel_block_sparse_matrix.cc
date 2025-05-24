@@ -79,7 +79,6 @@ namespace PETScWrappers
     BlockSparseMatrix::~BlockSparseMatrix()
     {
       PetscErrorCode ierr = MatDestroy(&petsc_nest_matrix);
-      (void)ierr;
       AssertNothrow(ierr == 0, ExcPETScError(ierr));
     }
 

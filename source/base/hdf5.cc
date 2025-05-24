@@ -95,7 +95,6 @@ namespace HDF5
       // Release the HDF5 resource
       const herr_t ret = H5Dclose(*pointer);
       AssertNothrow(ret >= 0, ExcInternalError());
-      (void)ret;
       delete pointer;
     });
     dataspace      = std::shared_ptr<hid_t>(new hid_t, [](hid_t *pointer) {
@@ -104,7 +103,6 @@ namespace HDF5
       // Release the HDF5 resource
       const herr_t ret = H5Sclose(*pointer);
       AssertNothrow(ret >= 0, ExcInternalError());
-      (void)ret;
       delete pointer;
     });
 
@@ -154,7 +152,6 @@ namespace HDF5
       // Release the HDF5 resource
       const herr_t ret = H5Dclose(*pointer);
       AssertNothrow(ret >= 0, ExcInternalError());
-      (void)ret;
       delete pointer;
     });
     dataspace      = std::shared_ptr<hid_t>(new hid_t, [](hid_t *pointer) {
@@ -163,7 +160,6 @@ namespace HDF5
       // Release the HDF5 resource
       const herr_t ret = H5Sclose(*pointer);
       AssertNothrow(ret >= 0, ExcInternalError());
-      (void)ret;
       delete pointer;
     });
 
@@ -331,7 +327,6 @@ namespace HDF5
       // Release the HDF5 resource
       const herr_t ret = H5Gclose(*pointer);
       AssertNothrow(ret >= 0, ExcInternalError());
-      (void)ret;
       delete pointer;
     });
     switch (mode)
@@ -420,7 +415,6 @@ namespace HDF5
       // Release the HDF5 resource
       const herr_t err = H5Fclose(*pointer);
       AssertNothrow(err >= 0, ExcInternalError());
-      (void)err;
       delete pointer;
     });
 

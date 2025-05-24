@@ -149,7 +149,6 @@ namespace PETScWrappers
     const PetscErrorCode ierr =
       PetscObjectReference(reinterpret_cast<PetscObject>(vector));
     AssertNothrow(ierr == 0, ExcPETScError(ierr));
-    (void)ierr;
     this->determine_ghost_indices();
   }
 
@@ -159,7 +158,6 @@ namespace PETScWrappers
   {
     const PetscErrorCode ierr = VecDestroy(&vector);
     AssertNothrow(ierr == 0, ExcPETScError(ierr));
-    (void)ierr;
   }
 
 
