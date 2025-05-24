@@ -70,8 +70,7 @@ class DeprecatedDeclaration(object):
             self.deprecation_line = line[line_number_range[1] + 1 :].strip()
         else:
             raise ValueError(
-                "The given line does not contain a line number of "
-                "the form, e.g., :42:."
+                "The given line does not contain a line number of the form, e.g., :42:."
             )
 
         git_log_output = subprocess.check_output(
