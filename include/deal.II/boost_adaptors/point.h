@@ -29,7 +29,10 @@ DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
 DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
 
 
-namespace boost
+DEAL_II_NAMESPACE_OPEN
+DEAL_II_NAMESPACE_CLOSE // Do not convert for module purposes
+
+  namespace boost
 {
   namespace geometry
   {
@@ -95,6 +98,8 @@ namespace boost
   }   // namespace geometry
 } // namespace boost
 
+DEAL_II_NAMESPACE_OPEN // Do not convert for module purposes
+  DEAL_II_NAMESPACE_CLOSE
 
 
 #endif

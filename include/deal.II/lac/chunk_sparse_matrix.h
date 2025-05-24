@@ -408,9 +408,9 @@ namespace ChunkSparseMatrixIterators
 
 } // namespace ChunkSparseMatrixIterators
 
-DEAL_II_NAMESPACE_CLOSE
+DEAL_II_NAMESPACE_CLOSE // Do not convert for module purposes
 
-namespace std
+  namespace std
 {
   template <typename number, bool Constness>
   struct iterator_traits<
@@ -424,28 +424,28 @@ namespace std
   };
 } // namespace std
 
-DEAL_II_NAMESPACE_OPEN
+DEAL_II_NAMESPACE_OPEN // Do not convert for module purposes
 
 
 
-/**
- * Sparse matrix. This class implements the function to store values in the
- * locations of a sparse matrix denoted by a SparsityPattern. The separation
- * of sparsity pattern and values is done since one can store data elements of
- * different type in these locations without the SparsityPattern having to
- * know this, and more importantly one can associate more than one matrix with
- * the same sparsity pattern.
- *
- * The use of this class is demonstrated in step-51.
- *
- * @note Instantiations for this template are provided for <tt>@<float@> and
- * @<double@></tt>; others can be generated in application programs (see the
- * section on
- * @ref Instantiations
- * in the manual).
- */
-template <typename number>
-class ChunkSparseMatrix : public virtual EnableObserverPointer
+  /**
+   * Sparse matrix. This class implements the function to store values in the
+   * locations of a sparse matrix denoted by a SparsityPattern. The separation
+   * of sparsity pattern and values is done since one can store data elements of
+   * different type in these locations without the SparsityPattern having to
+   * know this, and more importantly one can associate more than one matrix with
+   * the same sparsity pattern.
+   *
+   * The use of this class is demonstrated in step-51.
+   *
+   * @note Instantiations for this template are provided for <tt>@<float@> and
+   * @<double@></tt>; others can be generated in application programs (see the
+   * section on
+   * @ref Instantiations
+   * in the manual).
+   */
+  template <typename number>
+  class ChunkSparseMatrix : public virtual EnableObserverPointer
 {
 public:
   /**
