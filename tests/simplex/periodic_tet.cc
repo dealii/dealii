@@ -13,9 +13,7 @@
  * ------------------------------------------------------------------------
  */
 
-// Test that the function
-// GridGenerator::subdivided_hyper_rectable_with_simplices() can give a mesh
-// which is suitible for periodicity with tetrahedra.
+// Test tetrahedra + periodicity.
 
 #include <deal.II/base/types.h>
 
@@ -38,23 +36,154 @@
 
 #include "../tests.h"
 
-void
-check()
+namespace
 {
-  Triangulation<3>          tria;
-  Point<3>                  corner_p1     = {-0.5, 1.0, 0.0};
-  Point<3>                  corner_p2     = {0.5, 2.0, 1.2};
-  std::vector<unsigned int> sub_divisions = {2, 2, 2};
-  GridGenerator::subdivided_hyper_rectangle_with_simplices(
-    tria, sub_divisions, corner_p1, corner_p2, true, true);
+  void
+  subdivided_hyper_rectangle_with_simplices_periodic(
+    Triangulation<3>                &tria,
+    const std::vector<unsigned int> &repetitions,
+    const Point<3>                  &p1,
+    const Point<3>                  &p2,
+    const bool                       colorize)
+  {
+    std::vector<Point<3>>    vertices;
+    std::vector<CellData<3>> cells;
 
-  // Check that we have made a grid with the expected number of cells and only
-  // one level of refinement.
-  if (tria.n_cells() != 48)
-    {
-      deallog << "FAIL! Wrong number of cells." << std::endl;
-    }
+    // determine cell sizes
+    const Point<3> dx((p2[0] - p1[0]) / repetitions[0],
+                      (p2[1] - p1[1]) / repetitions[1],
+                      (p2[2] - p1[2]) / repetitions[2]);
 
+    // create vertices
+    for (unsigned int k = 0; k <= repetitions[2]; ++k)
+      for (unsigned int j = 0; j <= repetitions[1]; ++j)
+        for (unsigned int i = 0; i <= repetitions[0]; ++i)
+          vertices.push_back(
+            Point<3>(p1[0] + dx[0] * i, p1[1] + dx[1] * j, p1[2] + dx[2] * k));
+
+    // create cells
+    for (unsigned int k = 0; k < repetitions[2]; ++k)
+      for (unsigned int j = 0; j < repetitions[1]; ++j)
+        for (unsigned int i = 0; i < repetitions[0]; ++i)
+          {
+            // create reference HEX cell
+            std::array<unsigned int, 8> quad{
+              {(k + 0) * (repetitions[0] + 1) * (repetitions[1] + 1) +
+                 (j + 0) * (repetitions[0] + 1) + i + 0,
+               (k + 0) * (repetitions[0] + 1) * (repetitions[1] + 1) +
+                 (j + 0) * (repetitions[0] + 1) + i + 1,
+               (k + 0) * (repetitions[0] + 1) * (repetitions[1] + 1) +
+                 (j + 1) * (repetitions[0] + 1) + i + 0,
+               (k + 0) * (repetitions[0] + 1) * (repetitions[1] + 1) +
+                 (j + 1) * (repetitions[0] + 1) + i + 1,
+               (k + 1) * (repetitions[0] + 1) * (repetitions[1] + 1) +
+                 (j + 0) * (repetitions[0] + 1) + i + 0,
+               (k + 1) * (repetitions[0] + 1) * (repetitions[1] + 1) +
+                 (j + 0) * (repetitions[0] + 1) + i + 1,
+               (k + 1) * (repetitions[0] + 1) * (repetitions[1] + 1) +
+                 (j + 1) * (repetitions[0] + 1) + i + 0,
+               (k + 1) * (repetitions[0] + 1) * (repetitions[1] + 1) +
+                 (j + 1) * (repetitions[0] + 1) + i + 1}};
+
+            // TET cell 0
+            {
+              CellData<3> cell;
+              cell.vertices = {{quad[0], quad[1], quad[3], quad[7]}};
+              cells.push_back(cell);
+            }
+
+            // TET cell 1
+            {
+              CellData<3> cell;
+              cell.vertices = {{quad[0], quad[1], quad[7], quad[5]}};
+              cells.push_back(cell);
+            }
+
+            // TET cell 2
+            {
+              CellData<3> cell;
+              cell.vertices = {{quad[0], quad[7], quad[3], quad[2]}};
+              cells.push_back(cell);
+            }
+
+            // TET cell 3
+            {
+              CellData<3> cell;
+              cell.vertices = {{quad[2], quad[6], quad[0], quad[7]}};
+              cells.push_back(cell);
+            }
+
+            // TET cell 4
+            {
+              CellData<3> cell;
+              cell.vertices = {{quad[4], quad[7], quad[5], quad[0]}};
+              cells.push_back(cell);
+            }
+
+            // TET cell 5
+            {
+              CellData<3> cell;
+              cell.vertices = {{quad[4], quad[6], quad[7], quad[0]}};
+              cells.push_back(cell);
+            }
+          }
+
+    // actually create triangulation
+    tria.create_triangulation(vertices, cells, SubCellData());
+
+    if (colorize)
+      {
+        // to colorize, run through all faces of all cells and set boundary
+        // indicator to the correct value if it was 0.
+
+        // use a large epsilon to compare numbers to avoid roundoff problems.
+        double epsilon = std::numeric_limits<double>::max();
+        for (unsigned int i = 0; i < 3; ++i)
+          epsilon = std::min(epsilon,
+                             0.01 * (std::abs(p2[i] - p1[i]) / repetitions[i]));
+        Assert(epsilon > 0,
+               ExcMessage(
+                 "The distance between corner points must be positive."));
+
+        // run through all faces and check
+        // if one of their center coordinates matches
+        // one of the corner points. Comparisons
+        // are made using an epsilon which
+        // should be smaller than the smallest cell
+        // diameter.
+        auto face = tria.begin_face(), endface = tria.end_face();
+        for (; face != endface; ++face)
+          if (face->at_boundary())
+            if (face->boundary_id() == 0)
+              {
+                const Point<3> center(face->center());
+
+                if (std::abs(center[0] - p1[0]) < epsilon)
+                  face->set_boundary_id(0);
+                else if (std::abs(center[0] - p2[0]) < epsilon)
+                  face->set_boundary_id(1);
+                else if (std::abs(center[1] - p1[1]) < epsilon)
+                  face->set_boundary_id(2);
+                else if (std::abs(center[1] - p2[1]) < epsilon)
+                  face->set_boundary_id(3);
+                else if (std::abs(center[2] - p1[2]) < epsilon)
+                  face->set_boundary_id(4);
+                else if (std::abs(center[2] - p2[2]) < epsilon)
+                  face->set_boundary_id(5);
+                else
+                  // triangulation says it
+                  // is on the boundary,
+                  // but we could not find
+                  // on which boundary.
+                  DEAL_II_ASSERT_UNREACHABLE();
+              }
+      }
+  }
+} // namespace
+
+void
+check(Triangulation<3> &tria)
+{
   if (tria.n_levels() != 1)
     {
       deallog << "FAIL! Mesh has more than one refinement level." << std::endl;
@@ -86,74 +215,40 @@ check()
   tria.add_periodicity(pairs[1]);
   tria.add_periodicity(pairs[2]);
 
-  // To enable periodicity the easy way, we need each boundary pair to be in
-  // default orientation. Check that this holds.
   {
-    IteratorFilters::AtBoundary        filter;
-    const types::geometric_orientation default_orientation =
-      numbers::default_geometric_orientation;
-    const types::geometric_orientation default_mirror_orientation =
-      internal::combined_face_orientation(false, false, false);
-    for (const auto &pair : pairs)
-      {
-        for (const auto &match : pair)
-          {
-            if (match.orientation != default_orientation &&
-                match.orientation != default_mirror_orientation)
-              {
-                deallog << "FAIL! Found a face pair which is not in default "
-                        << "orientation." << std::endl;
-                deallog << "Orientation is "
-                        << static_cast<unsigned int>(match.orientation)
-                        << " vs default "
-                        << static_cast<unsigned int>(default_orientation)
-                        << std::endl;
-                deallog << "Cells " << match.cell[0]->active_cell_index()
-                        << " and " << match.cell[1]->active_cell_index()
-                        << std::endl;
-                deallog << "Faces " << match.face_idx[0] << " and "
-                        << match.face_idx[1] << std::endl;
-                return;
-              }
-          }
-      }
-  }
-
-  {
-    // Check that we have gotten all the periodicity.
-    bool         mismatched_faces   = false;
+    // Check that the vertices we found match in all but one coordinate
+    // direction:
     unsigned int changing_direction = 0;
     for (const auto &pair : pairs)
       {
-        if (pair.size() != 8)
+        for (const auto &face_pair : pair)
           {
-            deallog << "FAIL! There should be 8 matches on each face."
-                    << std::endl;
-            return;
-          }
-        for (int face = 0; face < static_cast<int>(pair.size()); ++face)
-          {
-            Point<3> p1(
-              pair[face].cell[0]->face(pair[face].face_idx[0])->center());
-            Point<3> p2(
-              pair[face].cell[1]->face(pair[face].face_idx[1])->center());
-            const std::array<bool, 3> results = {
-              {std::abs(p1[0] - p2[0]) > 1e-10,
-               std::abs(p1[1] - p2[1]) > 1e-10,
-               std::abs(p1[2] - p2[2]) > 1e-10}};
-            bool fail = false;
-
+            std::array<Point<3>, 3> face_1_vertices, face_2_vertices;
             for (unsigned int i = 0; i < 3; ++i)
               {
-                if (i == changing_direction)
-                  {
-                    continue;
-                  }
-                else
-                  {
-                    fail = fail || results[i];
-                  }
+                face_1_vertices[i] =
+                  face_pair.cell[0]->face(face_pair.face_idx[0])->vertex(i);
+                face_2_vertices[i] =
+                  face_pair.cell[1]->face(face_pair.face_idx[1])->vertex(i);
               }
+            const auto permuted_face_1_vertices =
+              ReferenceCells::Triangle.permute_by_combined_orientation(
+                make_const_array_view(face_1_vertices), face_pair.orientation);
+
+            deallog << "periodic face_pair:" << std::endl
+                    << "    first  = (" << face_pair.cell[0]->index() << ", "
+                    << face_pair.face_idx[0] << ")" << std::endl
+                    << "    second = (" << face_pair.cell[1]->index() << ", "
+                    << face_pair.face_idx[1] << ")" << std::endl
+                    << "    relative orientation = "
+                    << int(face_pair.orientation) << std::endl;
+
+            bool fail = false;
+            for (unsigned int i = 0; i < 3; ++i)
+              for (unsigned int d = 0; d < 3; ++d)
+                if (d != changing_direction)
+                  fail = fail || std::abs(permuted_face_1_vertices[i][d] -
+                                          face_2_vertices[i][d]) > 1e-10;
 
             if (fail)
               {
@@ -165,29 +260,8 @@ check()
       }
   }
 
-  // write 2 outputs (total mesh and only surface mesh)
-  const auto grid_out = [](const auto &tria, const bool surface_mesh_only) {
-    GridOutFlags::Vtk flags;
-
-    if (surface_mesh_only)
-      {
-        flags.output_cells         = false;
-        flags.output_faces         = true;
-        flags.output_edges         = false;
-        flags.output_only_relevant = false;
-      }
-
-    GridOut grid_out;
-    grid_out.set_flags(flags);
-
-    grid_out.write_vtk(tria, deallog.get_file_stream());
-  };
-
-  grid_out(tria, false); // total mesh
-  grid_out(tria, true);  // only surface mesh
-
   // If we got this far, we have a mesh which supports periodicity.
-  // Let's see if we can proscribe periodicity with actual DoFs now.
+  // Let's see if we can prescribe periodicity with actual DoFs now.
   // Check for C0 tetrahedra up to degree 3. (Highest implemented at the time of
   // writing.)
   for (const unsigned int degree : {1, 2, 3})
@@ -220,10 +294,8 @@ check()
       for (const auto &cons : constraints)
         {
           // Check the total number of constraints.
-          if (cons.n_constraints() != (2 * degree + 1) * (2 * degree + 1))
-            {
-              deallog << "FAIL! Wrong number of constraints!" << std::endl;
-            }
+          deallog << "Number of constraints = " << cons.n_constraints()
+                  << std::endl;
 
           // Loop through the constraints and verify that the correct components
           // of the DoF's support points are equal.
@@ -296,5 +368,25 @@ main()
 {
   initlog();
 
-  check();
+  const Point<3>                  corner_p1(-0.5, 1.0, 0.0);
+  const Point<3>                  corner_p2(0.5, 2.0, 1.2);
+  const std::vector<unsigned int> sub_divisions{2, 2, 2};
+
+  {
+    Triangulation<3> tria;
+    subdivided_hyper_rectangle_with_simplices_periodic(
+      tria, sub_divisions, corner_p1, corner_p2, true);
+
+    check(tria);
+  }
+
+  {
+    Triangulation<3> hex_tria, tria;
+
+    GridGenerator::subdivided_hyper_rectangle(
+      hex_tria, sub_divisions, corner_p1, corner_p2, true);
+    GridGenerator::convert_hypercube_to_simplex_mesh(hex_tria, tria);
+
+    check(tria);
+  }
 }
