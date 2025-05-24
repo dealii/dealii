@@ -861,9 +861,11 @@ SparseDirectUMFPACK::n() const
 
 #ifdef DEAL_II_WITH_MUMPS
 
-SparseDirectMUMPS::SparseDirectMUMPS(const AdditionalData &data)
+SparseDirectMUMPS::SparseDirectMUMPS(const AdditionalData &data,
+                                     const MPI_Comm       &communicator)
+  : additional_data(data)
+  , mpi_communicator(communicator)
 {
-  this->additional_data = data;
   // Initialize MUMPS instance:
   id.job = -1;
   id.par = 1;
@@ -883,8 +885,7 @@ SparseDirectMUMPS::SparseDirectMUMPS(const AdditionalData &data)
   else
     id.sym = 0;
 
-  // Use MPI_COMM_WORLD as communicator
-  id.comm_fortran = (MUMPS_INT)MPI_Comm_c2f(MPI_COMM_WORLD);
+  id.comm_fortran = (MUMPS_INT)MPI_Comm_c2f(mpi_communicator);
   dmumps_c(&id);
 
   if (additional_data.output_details == false)
@@ -926,12 +927,9 @@ void
 SparseDirectMUMPS::initialize_matrix(const Matrix &matrix)
 {
   Assert(matrix.n() == matrix.m(), ExcMessage("Matrix needs to be square."));
-  // Here we should be checking if the matrix is respecting the symmetry given
-  //(I.E. sym = 0 for non-symmetric matrix, sym = 1 for posdef matrix, sym = 2
-  // for general symmetric).
 
   // Hand over matrix to MUMPS as centralized assembled matrix
-  if (Utilities::MPI::this_mpi_process(MPI_COMM_WORLD) == 0)
+  if (Utilities::MPI::this_mpi_process(mpi_communicator) == 0)
     {
       // Set number of unknowns
       n = matrix.n();
@@ -945,8 +943,8 @@ SparseDirectMUMPS::initialize_matrix(const Matrix &matrix)
       // matrix indices pointing to the row and column dimensions
       // respectively of the matrix representation above (a): ie. a[k] is
       // the matrix element (irn[k], jcn[k])
-      irn = std::make_unique<int[]>(nnz);
-      jcn = std::make_unique<int[]>(nnz);
+      irn = std::make_unique<MUMPS_INT[]>(nnz);
+      jcn = std::make_unique<MUMPS_INT[]>(nnz);
 
       size_type n_non_zero_elements = 0;
 
@@ -1001,7 +999,7 @@ SparseDirectMUMPS::copy_rhs_to_mumps(const Vector<double> &new_rhs) const
   Assert(n == new_rhs.size(),
          ExcMessage("Matrix size and rhs length must be equal."));
 
-  if (Utilities::MPI::this_mpi_process(MPI_COMM_WORLD) == 0)
+  if (Utilities::MPI::this_mpi_process(mpi_communicator) == 0)
     {
       rhs.resize(n);
       for (size_type i = 0; i < n; ++i)
@@ -1022,7 +1020,7 @@ SparseDirectMUMPS::copy_solution(Vector<double> &vector) const
          ExcMessage("Class not initialized with a rhs vector."));
 
   // Copy solution into the given vector
-  if (Utilities::MPI::this_mpi_process(MPI_COMM_WORLD) == 0)
+  if (Utilities::MPI::this_mpi_process(mpi_communicator) == 0)
     {
       for (size_type i = 0; i < n; ++i)
         vector(i) = rhs[i];

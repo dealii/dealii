@@ -48,6 +48,16 @@ namespace types
 #else
   using suitesparse_index = long int;
 #endif
+
+#ifdef DEAL_II_WITH_MUMPS
+  using mumps_index = MUMPS_INT;
+  using mumps_nnz   = MUMPS_INT8;
+#else
+  using mumps_index       = int;
+  using mumps_nnz         = std::size_t;
+#endif
+
+
 } // namespace types
 
 /**
@@ -475,12 +485,12 @@ public:
         : blr_ucfs(blr_ucfs)
         , lowrank_threshold(lowrank_threshold)
       {}
-
       /**
        * If true, the Block Low-Rank approximation is used with the UCFS
        * algorithm, an algorithm with higher compression than the standard one.
        */
       bool blr_ucfs;
+
       /**
        * Threshold for the low-rank truncation of the blocks.
        */
@@ -510,11 +520,13 @@ public:
      * If true, the MUMPS solver will print out error statistics.
      */
     bool error_statistics;
+
     /*
      * If true, the MUMPS solver will use the symmetric factorization. This is
      * only possible if the matrix is symmetric.
      */
     bool symmetric;
+
     /*
      * If true, the MUMPS solver will use the positive definite factorization.
      * This is only possible if the matrix is symmetric and positive definite.
@@ -536,7 +548,8 @@ public:
   /**
    * Constructor, takes <tt>AdditionalData</tt> to control MUMPS execution.
    */
-  SparseDirectMUMPS(const AdditionalData &additional_data = AdditionalData());
+  SparseDirectMUMPS(const AdditionalData &additional_data = AdditionalData(),
+                    const MPI_Comm       &communicator    = MPI_COMM_WORLD);
 
   /**
    * Destructor.
@@ -590,6 +603,7 @@ public:
 private:
 #ifdef DEAL_II_WITH_MUMPS
   mutable DMUMPS_STRUC_C id;
+
 #endif // DEAL_II_WITH_MUMPS
 
   /**
@@ -606,12 +620,12 @@ private:
   /**
    * irn contains the row indices of the non-zero entries of the matrix.
    */
-  std::unique_ptr<int[]> irn;
+  std::unique_ptr<types::mumps_index[]> irn;
 
   /**
    * jcn contains the column indices of the non-zero entries of the matrix.
    */
-  std::unique_ptr<int[]> jcn;
+  std::unique_ptr<types::mumps_index[]> jcn;
 
   /**
    * The number of rows of the matrix. The matrix is square.
@@ -621,7 +635,7 @@ private:
   /**
    * The number of non-zero entries in the matrix.
    */
-  std::size_t nnz;
+  types::mumps_nnz nnz;
 
   /**
    * This function hands over to MUMPS the system's <tt>matrix</tt>.
@@ -646,6 +660,11 @@ private:
    * Struct that holds the additional data for the MUMPS solver.
    */
   AdditionalData additional_data;
+
+  /**
+   * MPI_Comm object for the MUMPS solver.
+   */
+  const MPI_Comm mpi_communicator;
 };
 
 DEAL_II_NAMESPACE_CLOSE
