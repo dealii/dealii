@@ -12,5 +12,13 @@
 //
 // ------------------------------------------------------------------------
 
+#include <deal.II/matrix_free/evaluation_template_face_factory.templates.h>
+
+DEAL_II_NAMESPACE_OPEN
+
+#define SPLIT_INSTANTIATIONS_COUNT 6
 #define SPLIT_INSTANTIATIONS_INDEX 5
-#include "evaluation_template_face_factory.cc"
+
+#include "matrix_free/evaluation_template_face_factory.inst"
+
+DEAL_II_NAMESPACE_CLOSE

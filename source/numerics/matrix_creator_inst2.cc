@@ -12,8 +12,15 @@
 //
 // ------------------------------------------------------------------------
 
-// This file compiles a part of the instantiations from matrix_creator.cc
-// to reduce the compilation unit (and memory consumption)
+#include <deal.II/numerics/matrix_creator.templates.h>
 
+
+DEAL_II_NAMESPACE_OPEN
+
+// explicit instantiations
+#define SPLIT_INSTANTIATIONS_COUNT 3
 #define SPLIT_INSTANTIATIONS_INDEX 1
-#include "matrix_creator.cc"
+
+#include "numerics/matrix_creator.inst"
+
+DEAL_II_NAMESPACE_CLOSE

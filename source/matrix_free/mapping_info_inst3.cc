@@ -12,5 +12,18 @@
 //
 // ------------------------------------------------------------------------
 
+#include <deal.II/base/conditional_ostream.h>
+#include <deal.II/base/utilities.h>
+
+#include <deal.II/matrix_free/mapping_info.templates.h>
+
+#include <iostream>
+
+DEAL_II_NAMESPACE_OPEN
+
+#define SPLIT_INSTANTIATIONS_COUNT 3
 #define SPLIT_INSTANTIATIONS_INDEX 2
-#include "mapping_info.cc"
+
+#include "matrix_free/mapping_info.inst"
+
+DEAL_II_NAMESPACE_CLOSE
