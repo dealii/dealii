@@ -190,67 +190,6 @@ namespace internal
              MemoryConsumption::memory_consumption(quadrature_points);
     }
 
-
-
-    template <int structdim, int spacedim, typename Number>
-    template <typename StreamType>
-    void
-    MappingInfoStorage<structdim, spacedim, Number>::print_memory_consumption(
-      StreamType     &out,
-      const TaskInfo &task_info) const
-    {
-      // print_memory_statistics involves global communication, so we can
-      // disable the check here only if no processor has any such data
-      const std::size_t size =
-        Utilities::MPI::sum(jacobians[0].size(), task_info.communicator);
-      if (size > 0)
-        {
-          out << "      Memory JxW data:               ";
-          task_info.print_memory_statistics(
-            out,
-            MemoryConsumption::memory_consumption(data_index_offsets) +
-              MemoryConsumption::memory_consumption(JxW_values));
-          out << "      Memory Jacobian data:          ";
-          task_info.print_memory_statistics(
-            out,
-            MemoryConsumption::memory_consumption(jacobians[0]) +
-              MemoryConsumption::memory_consumption(jacobians[1]));
-          out << "      Memory second derivative data: ";
-          task_info.print_memory_statistics(
-            out,
-            MemoryConsumption::memory_consumption(jacobian_gradients[0]) +
-              MemoryConsumption::memory_consumption(jacobian_gradients[1]) +
-              MemoryConsumption::memory_consumption(
-                jacobian_gradients_non_inverse[0]) +
-              MemoryConsumption::memory_consumption(
-                jacobian_gradients_non_inverse[1]));
-        }
-      const std::size_t normal_size =
-        Utilities::MPI::sum(normal_vectors.size(), task_info.communicator);
-      if (normal_size > 0)
-        {
-          out << "      Memory normal vectors data:    ";
-          task_info.print_memory_statistics(
-            out,
-            MemoryConsumption::memory_consumption(normal_vectors) +
-              MemoryConsumption::memory_consumption(
-                normals_times_jacobians[0]) +
-              MemoryConsumption::memory_consumption(
-                normals_times_jacobians[1]));
-        }
-
-      const std::size_t quad_size =
-        Utilities::MPI::sum(quadrature_points.size(), task_info.communicator);
-      if (quad_size > 0)
-        {
-          out << "      Memory quadrature points:      ";
-          task_info.print_memory_statistics(
-            out,
-            MemoryConsumption::memory_consumption(quadrature_point_offsets) +
-              MemoryConsumption::memory_consumption(quadrature_points));
-        }
-    }
-
   } // namespace MatrixFreeFunctions
 } // end of namespace internal
 

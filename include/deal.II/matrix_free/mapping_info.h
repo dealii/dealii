@@ -33,12 +33,12 @@
 
 #include <deal.II/matrix_free/face_info.h>
 #include <deal.II/matrix_free/mapping_info_storage.h>
+#include <deal.II/matrix_free/task_info.h>
 
 #include <memory>
 
 
 DEAL_II_NAMESPACE_OPEN
-
 
 namespace internal
 {
@@ -306,6 +306,39 @@ namespace internal
     {
       AssertIndexRange(cell_no, cell_type.size());
       return cell_type[cell_no];
+    }
+
+
+
+    template <int dim, typename Number, typename VectorizedArrayType>
+    template <typename StreamType>
+    void
+    MappingInfo<dim, Number, VectorizedArrayType>::print_memory_consumption(
+      StreamType     &out,
+      const TaskInfo &task_info) const
+    {
+      out << "    Cell types:                      ";
+      task_info.print_memory_statistics(out,
+                                        cell_type.capacity() *
+                                          sizeof(GeometryType));
+      out << "    Face types:                      ";
+      task_info.print_memory_statistics(out,
+                                        face_type.capacity() *
+                                          sizeof(GeometryType));
+
+      out << "    Faces by cells types:            ";
+      task_info.print_memory_statistics(out,
+                                        faces_by_cells_type.capacity() *
+                                          ReferenceCells::max_n_faces<dim>() *
+                                          sizeof(GeometryType));
+
+      for (unsigned int j = 0; j < cell_data.size(); ++j)
+        {
+          out << "    Data component " << j << std::endl;
+          cell_data[j].print_memory_consumption(out, task_info);
+          face_data[j].print_memory_consumption(out, task_info);
+          face_data_by_cells[j].print_memory_consumption(out, task_info);
+        }
     }
 
   } // end of namespace MatrixFreeFunctions

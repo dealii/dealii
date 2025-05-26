@@ -24,6 +24,7 @@
 
 #include <deal.II/matrix_free/face_info.h>
 #include <deal.II/matrix_free/shape_info.h>
+#include <deal.II/matrix_free/task_info.h>
 
 #include <array>
 #include <memory>
@@ -785,6 +786,32 @@ namespace internal
         if (fe_index_conversion[i][first_selected_component] == fe_degree)
           return i;
       return numbers::invalid_unsigned_int;
+    }
+
+
+    template <typename StreamType>
+    void
+    DoFInfo::print_memory_consumption(StreamType     &out,
+                                      const TaskInfo &task_info) const
+    {
+      out << "       Memory row starts indices:    ";
+      task_info.print_memory_statistics(out,
+                                        (row_starts.capacity() *
+                                         sizeof(*row_starts.begin())));
+      out << "       Memory dof indices:           ";
+      task_info.print_memory_statistics(
+        out, MemoryConsumption::memory_consumption(dof_indices));
+      out << "       Memory constraint indicators: ";
+      task_info.print_memory_statistics(
+        out, MemoryConsumption::memory_consumption(constraint_indicator));
+      out << "       Memory plain indices:         ";
+      task_info.print_memory_statistics(
+        out,
+        MemoryConsumption::memory_consumption(row_starts_plain_indices) +
+          MemoryConsumption::memory_consumption(plain_dof_indices));
+      out << "       Memory vector partitioner:    ";
+      task_info.print_memory_statistics(
+        out, MemoryConsumption::memory_consumption(*vector_partitioner));
     }
 
 #endif // ifndef DOXYGEN
