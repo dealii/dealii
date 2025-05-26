@@ -13,5 +13,16 @@
 // ------------------------------------------------------------------------
 
 
+#include <deal.II/fe/mapping_fe_field.templates.h>
+
+
+DEAL_II_NAMESPACE_OPEN
+
+// explicit instantiations
+#define SPLIT_INSTANTIATIONS_COUNT 2
 #define SPLIT_INSTANTIATIONS_INDEX 1
-#include "mapping_fe_field.cc"
+
+#include "fe/mapping_fe_field.inst"
+
+
+DEAL_II_NAMESPACE_CLOSE

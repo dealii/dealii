@@ -19,9 +19,8 @@ DEAL_II_NAMESPACE_OPEN
 
 // explicit instantiations
 #define SPLIT_INSTANTIATIONS_COUNT 2
-#ifndef SPLIT_INSTANTIATIONS_INDEX
-#  define SPLIT_INSTANTIATIONS_INDEX 0
-#endif
+#define SPLIT_INSTANTIATIONS_INDEX 0
+
 #include "fe/mapping_fe_field.inst"
 
 
