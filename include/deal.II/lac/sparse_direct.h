@@ -48,6 +48,16 @@ namespace types
 #else
   using suitesparse_index = long int;
 #endif
+
+#ifdef DEAL_II_WITH_MUMPS
+  using mumps_index = MUMPS_INT;
+  using mumps_nnz   = MUMPS_INT8;
+#else
+  using mumps_index       = int;
+  using mumps_nnz         = std::size_t;
+#endif
+
+
 } // namespace types
 
 /**
@@ -458,6 +468,7 @@ public:
    */
   using size_type = types::global_dof_index;
 
+
   /**
    * The AdditionalData struct contains data for controlling the MUMPS
    * execution.
@@ -474,7 +485,6 @@ public:
         : blr_ucfs(blr_ucfs)
         , lowrank_threshold(lowrank_threshold)
       {}
-
       /**
        * If true, the Block Low-Rank approximation is used with the UCFS
        * algorithm, an algorithm with higher compression than the standard one.
@@ -538,7 +548,8 @@ public:
   /**
    * Constructor, takes <tt>AdditionalData</tt> to control MUMPS execution.
    */
-  SparseDirectMUMPS(const AdditionalData &additional_data = AdditionalData());
+  SparseDirectMUMPS(const AdditionalData &additional_data = AdditionalData(),
+                    const MPI_Comm       &communicator    = MPI_COMM_WORLD);
 
   /**
    * Destructor.
@@ -592,13 +603,14 @@ public:
 private:
 #ifdef DEAL_II_WITH_MUMPS
   mutable DMUMPS_STRUC_C id;
+
 #endif // DEAL_II_WITH_MUMPS
 
   /**
    * a contains the actual values of the matrix. a[k] is the value of the matrix
    * entry (i,j) if irn[k] == i and jcn[k] == j.
    */
-  double *a;
+  std::unique_ptr<double[]> a;
 
   /**
    * The right-hand side vector. This is the right hand side of the system.
@@ -608,12 +620,12 @@ private:
   /**
    * irn contains the row indices of the non-zero entries of the matrix.
    */
-  int *irn;
+  std::unique_ptr<types::mumps_index[]> irn;
 
   /**
    * jcn contains the column indices of the non-zero entries of the matrix.
    */
-  int *jcn;
+  std::unique_ptr<types::mumps_index[]> jcn;
 
   /**
    * The number of rows of the matrix. The matrix is square.
@@ -623,7 +635,7 @@ private:
   /**
    * The number of non-zero entries in the matrix.
    */
-  std::size_t nnz;
+  types::mumps_nnz nnz;
 
   /**
    * This function hands over to MUMPS the system's <tt>matrix</tt>.
@@ -648,6 +660,11 @@ private:
    * Struct that holds the additional data for the MUMPS solver.
    */
   AdditionalData additional_data;
+
+  /**
+   * MPI_Comm object for the MUMPS solver.
+   */
+  const MPI_Comm mpi_communicator;
 };
 
 DEAL_II_NAMESPACE_CLOSE
