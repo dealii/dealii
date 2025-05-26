@@ -53,68 +53,72 @@
 DEAL_II_NAMESPACE_OPEN
 
 
-namespace
+namespace internal
 {
-  /**
-   * Optimized pack function for values assigned on degrees of freedom.
-   *
-   * Given that the elements of @p dof_values are stored in consecutive
-   * locations, we can just memcpy them. Since floating point values don't
-   * compress well, we also waive the compression that the default
-   * Utilities::pack() and Utilities::unpack() functions offer.
-   */
-  template <typename value_type>
-  std::vector<char>
-  pack_dof_values(std::vector<Vector<value_type>> &dof_values,
-                  const unsigned int               dofs_per_cell)
+  namespace SolutionTransferImplementation
   {
-    for (const auto &values : dof_values)
-      {
-        AssertDimension(values.size(), dofs_per_cell);
-        (void)values;
-      }
+    /**
+     * Optimized pack function for values assigned on degrees of freedom.
+     *
+     * Given that the elements of @p dof_values are stored in consecutive
+     * locations, we can just memcpy them. Since floating point values don't
+     * compress well, we also waive the compression that the default
+     * Utilities::pack() and Utilities::unpack() functions offer.
+     */
+    template <typename value_type>
+    std::vector<char>
+    pack_dof_values(std::vector<Vector<value_type>> &dof_values,
+                    const unsigned int               dofs_per_cell)
+    {
+      for (const auto &values : dof_values)
+        {
+          AssertDimension(values.size(), dofs_per_cell);
+          (void)values;
+        }
 
-    const std::size_t bytes_per_entry = sizeof(value_type) * dofs_per_cell;
+      const std::size_t bytes_per_entry = sizeof(value_type) * dofs_per_cell;
 
-    std::vector<char> buffer(dof_values.size() * bytes_per_entry);
-    for (unsigned int i = 0; i < dof_values.size(); ++i)
-      std::memcpy(&buffer[i * bytes_per_entry],
-                  &dof_values[i](0),
-                  bytes_per_entry);
-
-    return buffer;
-  }
-
-
-
-  /**
-   * Optimized unpack function for values assigned on degrees of freedom.
-   */
-  template <typename value_type>
-  std::vector<Vector<value_type>>
-  unpack_dof_values(
-    const boost::iterator_range<std::vector<char>::const_iterator> &data_range,
-    const unsigned int dofs_per_cell)
-  {
-    const std::size_t  bytes_per_entry = sizeof(value_type) * dofs_per_cell;
-    const unsigned int n_elements      = data_range.size() / bytes_per_entry;
-
-    Assert((data_range.size() % bytes_per_entry == 0), ExcInternalError());
-
-    std::vector<Vector<value_type>> unpacked_data;
-    unpacked_data.reserve(n_elements);
-    for (unsigned int i = 0; i < n_elements; ++i)
-      {
-        Vector<value_type> dof_values(dofs_per_cell);
-        std::memcpy(&dof_values(0),
-                    &(*std::next(data_range.begin(), i * bytes_per_entry)),
+      std::vector<char> buffer(dof_values.size() * bytes_per_entry);
+      for (unsigned int i = 0; i < dof_values.size(); ++i)
+        std::memcpy(&buffer[i * bytes_per_entry],
+                    &dof_values[i](0),
                     bytes_per_entry);
-        unpacked_data.emplace_back(std::move(dof_values));
-      }
 
-    return unpacked_data;
-  }
-} // namespace
+      return buffer;
+    }
+
+
+
+    /**
+     * Optimized unpack function for values assigned on degrees of freedom.
+     */
+    template <typename value_type>
+    std::vector<Vector<value_type>>
+    unpack_dof_values(
+      const boost::iterator_range<std::vector<char>::const_iterator>
+                        &data_range,
+      const unsigned int dofs_per_cell)
+    {
+      const std::size_t  bytes_per_entry = sizeof(value_type) * dofs_per_cell;
+      const unsigned int n_elements      = data_range.size() / bytes_per_entry;
+
+      Assert((data_range.size() % bytes_per_entry == 0), ExcInternalError());
+
+      std::vector<Vector<value_type>> unpacked_data;
+      unpacked_data.reserve(n_elements);
+      for (unsigned int i = 0; i < n_elements; ++i)
+        {
+          Vector<value_type> dof_values(dofs_per_cell);
+          std::memcpy(&dof_values(0),
+                      &(*std::next(data_range.begin(), i * bytes_per_entry)),
+                      bytes_per_entry);
+          unpacked_data.emplace_back(std::move(dof_values));
+        }
+
+      return unpacked_data;
+    }
+  } // namespace SolutionTransferImplementation
+} // namespace internal
 
 
 
@@ -404,8 +408,8 @@ SolutionTransfer<dim, VectorType, spacedim>::pack_callback(
       cell->get_interpolated_dof_values(*(*it_input), *it_output, fe_index);
     }
 
-  return pack_dof_values<typename VectorType::value_type>(dof_values,
-                                                          dofs_per_cell);
+  return internal::SolutionTransferImplementation::pack_dof_values<
+    typename VectorType::value_type>(dof_values, dofs_per_cell);
 }
 
 
@@ -462,9 +466,8 @@ SolutionTransfer<dim, VectorType, spacedim>::unpack_callback(
     return; // nothing to do for FE_Nothing
 
   const std::vector<::dealii::Vector<typename VectorType::value_type>>
-    dof_values =
-      unpack_dof_values<typename VectorType::value_type>(data_range,
-                                                         dofs_per_cell);
+    dof_values = internal::SolutionTransferImplementation::unpack_dof_values<
+      typename VectorType::value_type>(data_range, dofs_per_cell);
 
   // check if sizes match
   AssertDimension(dof_values.size(), all_out.size());
