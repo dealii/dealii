@@ -12,8 +12,14 @@
 //
 // ------------------------------------------------------------------------
 
-// This file compiles the last quarter of the instantiations from
-// solution_transfer.cc to reduce the compilation unit (and memory consumption)
+#include <deal.II/numerics/solution_transfer.templates.h>
 
+
+DEAL_II_NAMESPACE_OPEN
+
+#define SPLIT_INSTANTIATIONS_COUNT 4
 #define SPLIT_INSTANTIATIONS_INDEX 3
-#include "solution_transfer.cc"
+
+#include "numerics/solution_transfer.inst"
+
+DEAL_II_NAMESPACE_CLOSE
