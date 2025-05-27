@@ -618,7 +618,10 @@ void
 BoundingBox<spacedim, Number>::serialize(Archive &ar,
                                          const unsigned int /*version*/)
 {
-  ar &boundary_points;
+  // Avoid including boost/serialization/utility.hpp by unpacking the pair
+  // ourselves
+  ar &boundary_points.first;
+  ar &boundary_points.second;
 }
 
 
