@@ -29,7 +29,7 @@ import re
 import convert_to_module_units_common as header_to_partition_maps
 
 
-header_file                = sys.argv[1]
+header_file = sys.argv[1]
 interface_module_unit_file = sys.argv[2]
 
 assert header_file, "No input file name given."
@@ -43,7 +43,6 @@ interface_module_partition_name = "interface_partition_" + m.group(1).replace("/
 input = open(header_file, "r")
 lines = input.readlines()
 input.close()
-
 
 
 # Regular expressions that match the preprocessor defines that we use
@@ -77,7 +76,7 @@ output.write("module;\n")
 output.write("#include <deal.II/macros.h>\n\n")
 
 # Then go through the lines of the input file again:
-for line in lines :
+for line in lines:
 
     # If this was an '#include' directive for a deal.II header, or an
     # external project that we wrap, then just ignore/remove this
@@ -92,11 +91,12 @@ for line in lines :
     # specifically marked with a comment. But we do not allow this
     # in interface units (header files) and so error out if someone
     # tries this.
-    if (header_to_partition_maps.match_dealii_includes.match(line) or
-        header_to_partition_maps.matches_external_header_include(line)) :
-        if "Do not convert for module purposes" in line :
+    if header_to_partition_maps.match_dealii_includes.match(
+        line
+    ) or header_to_partition_maps.matches_external_header_include(line):
+        if "Do not convert for module purposes" in line:
             raise "It is not allowed to escape the conversion of include statements in header files."
-        else :
+        else:
             pass
 
     # If this line contained the text DEAL_II_NAMESPACE_OPEN, then
@@ -112,13 +112,15 @@ for line in lines :
     # header files by not only importing partitions, but re-exporting
     # them as well via the 'export import :interface_partition;'
     # statement.
-    elif match_dealii_open.match(line) :
-        output.write("\nexport module dealii : " + interface_module_partition_name + ";\n\n")
+    elif match_dealii_open.match(line):
+        output.write(
+            "\nexport module dealii : " + interface_module_partition_name + ";\n\n"
+        )
 
-        for external_project in used_external_projects :
+        for external_project in used_external_projects:
             output.write("import :interface_partition_" + external_project + ";\n")
 
-        for inc in dealii_include_list :
+        for inc in dealii_include_list:
             module_partition = "interface_partition_" + inc.replace("/", "_")
             output.write("import :" + module_partition + ";\n")
 
@@ -127,10 +129,10 @@ for line in lines :
 
     # If this line contained the text DEAL_II_NAMESPACE_CLODE, then
     # close the previous 'export {' statement:
-    elif match_dealii_close.match(line) :
+    elif match_dealii_close.match(line):
         output.write(line)  # Copy the previous line
         output.write("\n} // close previous 'export' statement\n\n")
 
     # Otherwise just copy the previous line:
-    else :
+    else:
         output.write(line)

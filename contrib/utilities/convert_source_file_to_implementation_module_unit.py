@@ -30,14 +30,16 @@ import re
 import convert_to_module_units_common as header_to_partition_maps
 
 
-source_file                = sys.argv[1]
+source_file = sys.argv[1]
 implementation_module_unit_file = sys.argv[2]
 
 assert source_file, "No input file name given."
 assert implementation_module_unit_file, "No output file name given."
 
 m = re.search(r".*source/(.*).cc", source_file)
-implementation_module_partition_name = "implementation_partition_" + m.group(1).replace("/", "_")
+implementation_module_partition_name = "implementation_partition_" + m.group(1).replace(
+    "/", "_"
+)
 
 
 # Read the entire source file into memory:
@@ -71,7 +73,7 @@ output.write("#include <deal.II/macros.h>\n\n")
 
 
 # Then go through the lines of the input file again:
-for line in lines :
+for line in lines:
 
     # If this was an '#include' directive for a deal.II header, or an
     # external project that we wrap, then just ignore/remove this
@@ -84,29 +86,32 @@ for line in lines :
     # dozens or hundreds of (transitive) includes. As a consequence,
     # we do allow #includes in specific circumstances, when they are
     # specifically marked with a comment.
-    if (header_to_partition_maps.match_dealii_includes.match(line) or
-        header_to_partition_maps.matches_external_header_include(line)) :
-        if "Do not convert for module purposes" in line :
+    if header_to_partition_maps.match_dealii_includes.match(
+        line
+    ) or header_to_partition_maps.matches_external_header_include(line):
+        if "Do not convert for module purposes" in line:
             output.write(line)
-        else :
+        else:
             pass
 
     # If this line contained the text DEAL_II_NAMESPACE_OPEN, then
     # prefix this text by the implementation module unit start, the import
     # statements that correspond to the previously '#include'd header
     # files, but importantly no 'export {' statement:
-    elif match_dealii_open.match(line) :
-        output.write("module dealii : " + implementation_module_partition_name + ";\n\n")
+    elif match_dealii_open.match(line):
+        output.write(
+            "module dealii : " + implementation_module_partition_name + ";\n\n"
+        )
 
-        for external_project in used_external_projects :
+        for external_project in used_external_projects:
             output.write("import :interface_partition_" + external_project + ";\n")
 
-        for inc in dealii_include_list :
+        for inc in dealii_include_list:
             module_partition = "interface_partition_" + inc.replace("/", "_")
             output.write("import :" + module_partition + ";\n")
         output.write("\n")
         output.write(line)  # Copy the previous line
 
     # Otherwise just copy the previous line:
-    else :
+    else:
         output.write(line)
