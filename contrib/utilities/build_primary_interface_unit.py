@@ -35,16 +35,16 @@ print("module;")
 print("export module dealii;")
 
 # Go through all input files and check their exported module partitions:
-for module_input_file in sys.argv[1:] :
+for module_input_file in sys.argv[1:]:
     input = open(module_input_file, "r")
 
     # Read through the lines of the file and see where it exports a
     # module partition. Then 'export import' that partition:
-    for line in input :
+    for line in input:
         m = match_export.match(line)
-        if m :
+        if m:
             print("export import :" + m.group(1) + ";")
-            
+
             # A file can only contain a single interface module
             # partition. So once we found one, we can stop parsing.
-            break;
+            break
