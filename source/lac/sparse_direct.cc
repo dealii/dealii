@@ -1091,9 +1091,12 @@ SparseDirectMUMPS::get_icntl()
 }
 
 
+
 #else
 
-SparseDirectMUMPS::SparseDirectMUMPS(const AdditionalData &)
+
+SparseDirectMUMPS::SparseDirectMUMPS(const AdditionalData &, const MPI_Comm &)
+  : mpi_communicator(MPI_COMM_SELF)
 {
   AssertThrow(
     false,
@@ -1102,6 +1105,7 @@ SparseDirectMUMPS::SparseDirectMUMPS(const AdditionalData &)
       "without passing the necessary switch to 'cmake'. Please consult the "
       "installation instructions at https://dealii.org/current/readme.html"));
 }
+
 
 
 SparseDirectMUMPS::~SparseDirectMUMPS()
