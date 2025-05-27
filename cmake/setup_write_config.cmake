@@ -86,6 +86,8 @@ endif()
 if(DEAL_II_HAVE_CXX23 OR DEAL_II_HAVE_CXX20)
   if(DEAL_II_BUILD_CXX20_MODULE)
     _both("#        Building C++20 module:  ON\n")
+  else()
+    _both("#        Building C++20 module:  OFF\n")
   endif()
 endif()
 
