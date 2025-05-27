@@ -42,30 +42,30 @@ match_exports = re.compile(r"(export )?module dealii *: *(.*);")
 # For a given source file, read through all the lines and extract the
 # ones that correspond to export or import statements. For those, add
 # a link to the graph.
-def add_imports_for_file(module_partition_file, G) :
+def add_imports_for_file(module_partition_file, G):
     f = open(module_partition_file)
     lines = f.readlines()
     f.close()
 
     module_partition = ""
-    for line in lines :
+    for line in lines:
         m = match_exports.match(line)
-        if m :
+        if m:
             module_partition = m.group(2)
             # There can only be one 'export' statement per file, so
             # stop reading after recording the mapping from partition
             # name to file name:
             partition_to_filename[module_partition] = module_partition_file
             break
-    assert module_partition != "", f"File <{module_partition_file} does not seem to export a module partition!"
+    assert (
+        module_partition != ""
+    ), f"File <{module_partition_file} does not seem to export a module partition!"
 
-    for line in lines :
+    for line in lines:
         m = match_imports.match(line)
-        if m :
+        if m:
             imported_partition = m.group(2)
-            G.add_edge(module_partition,
-                       imported_partition)
-
+            G.add_edge(module_partition, imported_partition)
 
 
 # Create a list of all source files in the build folder
@@ -76,22 +76,27 @@ assert filelist, "Please call the script from the top-level build directory."
 # For each header file, add the imports as the edges of a directed graph.
 G = nx.DiGraph()
 G.add_node(module_partition_name)  # Make sure the graph has at least one node
-for module_partition_file in filelist :
+for module_partition_file in filelist:
     add_imports_for_file(module_partition_file, G)
 
-assert module_partition_name in partition_to_filename, \
-    "The module partition given as argument could not be found in the module units found"
-    
+assert (
+    module_partition_name in partition_to_filename
+), "The module partition given as argument could not be found in the module units found"
+
 
 # Now find everything that is upstream of the module partition
 # specified on the command line:
 print(f"The dependencies of module partition '{module_partition_name}' are:")
-for node in nx.dfs_postorder_nodes(G, source=module_partition_name) :
-    if node != module_partition_name :
-        if node in partition_to_filename :
+for node in nx.dfs_postorder_nodes(G, source=module_partition_name):
+    if node != module_partition_name:
+        if node in partition_to_filename:
             print(f"  {node}, implemented in {partition_to_filename[node]}")
-        else :
+        else:
             print(f"  {node}, implemented in unknown file")
 
-n_dependencies = sum(1 for _ in nx.dfs_postorder_nodes(G, source=module_partition_name))-1
-print(f"{n_dependencies} partitions are upstream dependencies for '{module_partition_name}'")
+n_dependencies = (
+    sum(1 for _ in nx.dfs_postorder_nodes(G, source=module_partition_name)) - 1
+)
+print(
+    f"{n_dependencies} partitions are upstream dependencies for '{module_partition_name}'"
+)

@@ -35,26 +35,24 @@ match_exports = re.compile(r"export module dealii *: *(.*);")
 # For a given .cc file, read through all the lines and extract the
 # ones that correspond to export or import statements. For those, add
 # a link to the graph.
-def add_imports_for_file(interface_module_partition_file, G) :
+def add_imports_for_file(interface_module_partition_file, G):
     f = open(interface_module_partition_file)
     lines = f.readlines()
     f.close()
-    
-    for line in lines :
+
+    for line in lines:
         m = match_exports.match(line)
-        if m :
+        if m:
             module_partition = m.group(1)
             # There can only be one 'export' statement per file, so
             # stop reading:
             break
 
-    for line in lines :
+    for line in lines:
         m = match_imports.match(line)
-        if m :
+        if m:
             imported_partition = m.group(1)
-            G.add_edge(module_partition,
-                       imported_partition)
-
+            G.add_edge(module_partition, imported_partition)
 
 
 # Create a list of all source files in the build folder
@@ -63,14 +61,14 @@ assert filelist, "Please call the script from the top-level directory."
 
 # For each header file, add the imports as the edges of a directed graph.
 G = nx.DiGraph()
-for interface_module_partition_file in filelist :
+for interface_module_partition_file in filelist:
     add_imports_for_file(interface_module_partition_file, G)
 
 # Then figure out whether there are cycles and if so, print them:
 cycles = nx.simple_cycles(G)
 cycles_as_list = list(cycles)
-if (len(cycles_as_list) > 0) :
-    print (f"Cycles in the module partition graph detected!")
-    for cycle in cycles_as_list :
+if len(cycles_as_list) > 0:
+    print(f"Cycles in the module partition graph detected!")
+    for cycle in cycles_as_list:
         print(cycle)
     exit(1)
