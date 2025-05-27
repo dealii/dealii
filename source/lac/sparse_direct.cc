@@ -1086,6 +1086,13 @@ SparseDirectMUMPS::initialize_matrix(const Matrix &matrix)
       id.jcn_loc  = jcn.get();
       id.a_loc    = a.get();
       id.irhs_loc = irhs_loc.data();
+
+      // rhs parameters
+      id.icntl[19] = 10; // distributed rhs
+      id.icntl[20] = 0;  // centralized solution, stored on rank 0 by MUMPS
+      id.nrhs      = 1;
+      id.lrhs_loc  = n;
+      id.nloc_rhs  = row_range.n_elements();
     }
   else
     {
@@ -1173,13 +1180,6 @@ SparseDirectMUMPS::vmult(VectorType &dst, const VectorType &src) const
                                     TrilinosWrappers::MPI::Vector> ||
                      std::is_same_v<VectorType, PETScWrappers::MPI::Vector>)
     {
-      id.icntl[19] = 10; // distributed rhs
-      id.icntl[20] = 0;  // centralized solution, stored on rank 0 by MUMPS
-      id.nrhs      = 1;
-      id.lrhs_loc  = n;
-      id.nloc_rhs  = row_range.n_elements();
-
-
       if constexpr (std::is_same_v<VectorType, TrilinosWrappers::MPI::Vector>)
         id.rhs_loc = const_cast<double *>(src.begin());
       else if constexpr (std::is_same_v<VectorType, PETScWrappers::MPI::Vector>)
