@@ -18,9 +18,7 @@
 DEAL_II_NAMESPACE_OPEN
 
 #define SPLIT_INSTANTIATIONS_COUNT 6
-#ifndef SPLIT_INSTANTIATIONS_INDEX
-#  define SPLIT_INSTANTIATIONS_INDEX 0
-#endif
+#define SPLIT_INSTANTIATIONS_INDEX 0
 
 #include "matrix_free/evaluation_template_factory.inst"
 
