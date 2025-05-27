@@ -179,7 +179,7 @@ option(DEAL_II_UNITY_BUILD
 mark_as_advanced(DEAL_II_UNITY_BUILD)
 
 option(DEAL_II_BUILD_CXX20_MODULE
-  "If set to ON, and if compiler, cmake, and build system are suitable, build a C++20 style module that can be imported instead of using \#include directives."
+  "If set to ON, and if compiler, cmake, and build system are suitable, also build a C++20 style module that can be imported instead of using \#include directives. This will increase build time significantly."
   OFF)
 mark_as_advanced(DEAL_II_BUILD_CXX20_MODULE)
 
