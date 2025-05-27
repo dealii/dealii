@@ -494,17 +494,23 @@ public:
         : blr_ucfs(blr_ucfs)
         , lowrank_threshold(lowrank_threshold)
       {}
+
+
       /**
        * If true, the Block Low-Rank approximation is used with the UCFS
        * algorithm, an algorithm with higher compression than the standard one.
        */
       bool blr_ucfs;
+
       /**
        * Threshold for the low-rank truncation of the blocks.
        */
       double lowrank_threshold;
     };
 
+    /**
+     * Construct a new Additional Data object with the given parameters.
+     */
     AdditionalData(const bool          output_details    = false,
                    const bool          error_statistics  = false,
                    const bool          symmetric         = false,
@@ -519,32 +525,47 @@ public:
       , blr(blr)
     {}
 
-    /*
-     * If true, the MUMPS solver will print out details of the execution
+    /**
+     * Print details of the execution
      */
     bool output_details;
 
-    /*
-     * If true, the MUMPS solver will print out error statistics
+    /**
+     * Print error statistics
      */
     bool error_statistics;
-    /*
-     * If true, the MUMPS solver will use the symmetric factorization. This is
-     * only possible if the matrix is symmetric.
+
+    /**
+     * Use symmetric factorization.
+     *
+     * This is only possible if the matrix is symmetric, but no checks are
+     * performed to ensure that this is actually the case. The solver will
+     * likely break or produce incorrect results if the matrix is not symmetric,
+     * and this option is set to true.
      */
     bool symmetric;
-    /*
-     * If true, the MUMPS solver will use the positive definite factorization.
-     * This is only possible if the matrix is symmetric and positive definite.
+
+    /**
+     * Use the positive definite factorization.
+     *
+     * This is only possible if the matrix is symmetric and positive definite,
+     * but no checks are performed to ensure that this is actually the case. The
+     * solver will likely break or produce incorrect results if the matrix is
+     * not symmetric and positive definite, and this option is set to true.
      */
     bool posdef;
 
-    /*
-     * If true, the MUMPS solver will use the Block Low-Rank factorization
+    /**
+     * Use the Block Low-Rank factorization.
      */
-    bool         blr_factorization;
+    bool blr_factorization;
+
+    /**
+     * Data for the Block Low-Rank approximation.
+     */
     BlockLowRank blr;
   };
+
   /**
    * Constructor, takes an MPI_Comm which defaults to MPI_COMM_WORLD and an
    * <tt>AdditionalData</tt> to control MUMPS execution.
@@ -558,7 +579,7 @@ public:
   ~SparseDirectMUMPS();
 
   /**
-   * Exception
+   * Exception raised if the initialize() function is called more than once.
    */
   DeclException0(ExcInitializeAlreadyCalled);
 
@@ -572,9 +593,8 @@ public:
   initialize(const Matrix &matrix);
 
   /**
-   * A function in which the inverse of the matrix is applied to the input
-   * vector <tt>src</tt> and the solution is written into the output vector
-   * <tt>dst</tt>.
+   * Apply the inverse of the matrix to the input vector <tt>src</tt> and store
+   * the solution in the output vector <tt>dst</tt>.
    */
   template <typename VectorType>
   void
@@ -582,24 +602,26 @@ public:
 
 
   /**
-   * A function in which the inverse of the transposed matrix is applied to the
-   * input vector <tt>src</tt> and the solution is written into the output
-   * vector <tt>dst</tt>.
+   * Apply the inverse of the transposed matrix to the input vector <tt>src</tt>
+   * and store the solution in the output vector <tt>dst</tt>.
    */
   template <typename VectorType>
   void
   Tvmult(VectorType &, const VectorType &src) const;
 
   /**
-   * A function that returns the ICNTL integer array from MUMPS.
+   * Return the ICNTL integer array from MUMPS.
+   *
    * The ICNTL array contains integer control parameters for the MUMPS solver.
    * Keep in mind that MUMPS is a fortran library and the documentation refers
-   * to indices into this array into this array starting from one rather than
-   * from zero. To select the correct index one can use a macro like this:
-   * #define ICNTL(I) icntl[(I)-1]. In the MUMPS documentation there is the
-   * description of each parameter of the array. Be aware that ownership of the
-   * array remains in the current class rather than with the caller of this
-   * function.
+   * to indices into this array starting from one rather than from zero. To
+   * select the correct index one can use a macro like this:
+   *
+   * `#define ICNTL(I) icntl[(I)-1]`
+   *
+   * The MUMPS documentation describes each parameter of the array. Be aware
+   * that ownership of the array remains in the current class rather than with
+   * the caller of this function.
    */
   int *
   get_icntl();
@@ -611,13 +633,14 @@ private:
 #endif // DEAL_II_WITH_MUMPS
 
   /**
-   * a contains the actual values of the matrix. a[k] is the value of the matrix
-   * entry (i,j) if irn[k] == i and jcn[k] == j.
+   * The actual values of the matrix.
+   *
+   * a[k] is the value of the matrix entry (i,j) if irn[k] == i and jcn[k] == j.
    */
   std::unique_ptr<double[]> a;
 
   /**
-   * The right-hand side vector. This is the right hand side of the system.
+   * The right-hand side vector.
    */
   mutable std::vector<double> rhs;
 
