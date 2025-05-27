@@ -647,7 +647,7 @@ private:
   /**
    * Local to global index mapping for the right-hand side vector.
    */
-  mutable std::vector<int> irhs_loc;
+  mutable std::vector<types::mumps_index> irhs_loc;
 
   /**
    * irn contains the row indices of the non-zero entries of the matrix.
