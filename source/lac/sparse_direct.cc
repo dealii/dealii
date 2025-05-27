@@ -1090,6 +1090,24 @@ SparseDirectMUMPS::get_icntl()
   return id.icntl;
 }
 
+
+#else
+
+SparseDirectMUMPS::SparseDirectMUMPS(const AdditionalData &)
+{
+  AssertThrow(
+    false,
+    ExcMessage(
+      "To call this function you need MUMPS, but you configured deal.II "
+      "without passing the necessary switch to 'cmake'. Please consult the "
+      "installation instructions at https://dealii.org/current/readme.html"));
+}
+
+
+SparseDirectMUMPS::~SparseDirectMUMPS()
+{}
+
+
 #endif // DEAL_II_WITH_MUMPS
 
 
