@@ -26,10 +26,14 @@
 #  include <cfenv>
 #endif
 
+DEAL_II_NAMESPACE_OPEN
+DEAL_II_NAMESPACE_CLOSE // Do not convert for module purposes
+
+
 // DEAL_II_FORTRAN_MANGLE confuses doxygen a lot and these functions aren't part
 // of our public API anyway, so don't generate any doxygen for them
 #ifndef DOXYGEN
-extern "C"
+  extern "C"
 {
   void DEAL_II_FORTRAN_MANGLE(saxpy,
                               SAXPY)(const dealii::types::blas_int *n,
@@ -1397,18 +1401,18 @@ extern "C"
 }
 #endif
 
-DEAL_II_NAMESPACE_OPEN
+DEAL_II_NAMESPACE_OPEN // Do not convert for module purposes
 
 
 
-template <typename number1, typename number2, typename number3>
-inline void
-axpy(const dealii::types::blas_int *,
-     const number1 *,
-     const number2 *,
-     const dealii::types::blas_int *,
-     number3 *,
-     const dealii::types::blas_int *)
+  template <typename number1, typename number2, typename number3>
+  inline void
+  axpy(const dealii::types::blas_int *,
+       const number1 *,
+       const number2 *,
+       const dealii::types::blas_int *,
+       number3 *,
+       const dealii::types::blas_int *)
 {
   DEAL_II_NOT_IMPLEMENTED();
 }
