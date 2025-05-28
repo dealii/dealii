@@ -334,7 +334,8 @@ protected:
    *
    * The degree of these polynomials is <tt>polynomials.size()-1</tt>.
    */
-  FE_DGQ(const std::vector<Polynomials::Polynomial<double>> &polynomials);
+  explicit FE_DGQ(
+    const std::vector<Polynomials::Polynomial<double>> &polynomials);
 
 private:
   /**
