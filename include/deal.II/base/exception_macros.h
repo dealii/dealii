@@ -653,39 +653,21 @@
  * @note Active in both DEBUG and RELEASE modes
  * @ingroup Exceptions
  */
-#ifdef DEAL_II_HAVE_BUILTIN_EXPECT
-#  define AssertThrow(cond, exc)                                         \
-    do                                                                   \
-      {                                                                  \
-        if (__builtin_expect(!(cond), false))                            \
-          ::dealii::deal_II_exceptions::internals::issue_error_noreturn( \
-            ::dealii::deal_II_exceptions::internals::ExceptionHandling:: \
-              throw_on_exception,                                        \
-            __FILE__,                                                    \
-            __LINE__,                                                    \
-            __PRETTY_FUNCTION__,                                         \
-            #cond,                                                       \
-            #exc,                                                        \
-            exc);                                                        \
-      }                                                                  \
-    while (false)
-#else /*ifdef DEAL_II_HAVE_BUILTIN_EXPECT*/
-#  define AssertThrow(cond, exc)                                         \
-    do                                                                   \
-      {                                                                  \
-        if (!(cond))                                                     \
-          ::dealii::deal_II_exceptions::internals::issue_error_noreturn( \
-            ::dealii::deal_II_exceptions::internals::ExceptionHandling:: \
-              throw_on_exception,                                        \
-            __FILE__,                                                    \
-            __LINE__,                                                    \
-            __PRETTY_FUNCTION__,                                         \
-            #cond,                                                       \
-            #exc,                                                        \
-            exc);                                                        \
-      }                                                                  \
-    while (false)
-#endif /*ifdef DEAL_II_HAVE_BUILTIN_EXPECT*/
+#define AssertThrow(cond, exc)                                         \
+  do                                                                   \
+    {                                                                  \
+      if (DEAL_II_BUILTIN_EXPECT(!(cond), false))                      \
+        ::dealii::deal_II_exceptions::internals::issue_error_noreturn( \
+          ::dealii::deal_II_exceptions::internals::ExceptionHandling:: \
+            throw_on_exception,                                        \
+          __FILE__,                                                    \
+          __LINE__,                                                    \
+          __PRETTY_FUNCTION__,                                         \
+          #cond,                                                       \
+          #exc,                                                        \
+          exc);                                                        \
+    }                                                                  \
+  while (false)
 
 
 /**
