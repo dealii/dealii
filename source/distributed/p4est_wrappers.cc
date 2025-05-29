@@ -16,12 +16,14 @@
 #include <deal.II/distributed/p4est_wrappers.h>
 #include <deal.II/distributed/tria.h>
 
+#ifdef DEAL_II_WITH_P4EST
+#  include <sc_containers.h>
+#endif
+
+
 DEAL_II_NAMESPACE_OPEN
 
 #ifdef DEAL_II_WITH_P4EST
-
-#  include <sc_containers.h>
-
 
 namespace internal
 {
