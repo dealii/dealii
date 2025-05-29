@@ -17,7 +17,27 @@
 #include <deal.II/distributed/tria.h>
 
 #ifdef DEAL_II_WITH_P4EST
+#  include <p4est.h>
+#  include <p8est.h>
 #  include <sc_containers.h>
+
+// Below, we will use the P4EST_QUADRANT_INIT and P8EST_QUADRANT_INIT
+// function-like macros. If we are building the library based on
+// header files, we get these from the <p4est.h> and <p8est.h> header
+// inclusions. But if we build a C++20 module, we only import
+// declarations, not preprocessor macros. As a consequence, let us
+// duplicate these macros here, hoping that at some point, the p4est
+// library folks add regular functions that can do the job.
+#  ifndef P4EST_QUADRANT_INIT
+#    define P4EST_QUADRANT_INIT(q) \
+      ((void)std::memset((q), -1, sizeof(p4est_quadrant_t)))
+#  endif
+
+#  ifndef P8EST_QUADRANT_INIT
+#    define P8EST_QUADRANT_INIT(q) \
+      ((void)std::memset((q), -1, sizeof(p8est_quadrant_t)))
+#  endif
+
 #endif
 
 
