@@ -120,11 +120,17 @@ namespace internal
 
 
     /**
-     * A structure whose explicit specializations contain pointers to the
+     * A structure whose explicit specializations represent the
      * relevant p4est_* and p8est_* functions. Using this structure, for
-     * example by saying functions<dim>::quadrant_compare, we can write code
-     * in a dimension independent way, either calling p4est_quadrant_compare
-     * or p8est_quadrant_compare, depending on template argument.
+     * example by saying functions<dim>::quadrant_compare(...), we can write
+     * code in a dimension independent way, either calling
+     * p4est_quadrant_compare or p8est_quadrant_compare, depending on template
+     * argument.
+     *
+     * In most cases, the members of this class are simply pointers to
+     * p4est_* or p8est_* functions. In one case, it's simply a static
+     * member function that dispatches to things p4est chooses to
+     * implement via a macro.
      */
     template <int dim>
     struct functions;
@@ -143,6 +149,9 @@ namespace internal
       static void (&quadrant_set_morton)(types<2>::quadrant *quadrant,
                                          int                 level,
                                          std::uint64_t       id);
+
+      static void
+      quadrant_init(types<2>::quadrant &q);
 
       static int (&quadrant_is_equal)(const types<2>::quadrant *q1,
                                       const types<2>::quadrant *q2);
@@ -344,6 +353,9 @@ namespace internal
       static void (&quadrant_set_morton)(types<3>::quadrant *quadrant,
                                          int                 level,
                                          std::uint64_t       id);
+
+      static void
+      quadrant_init(types<3>::quadrant &q);
 
       static int (&quadrant_is_equal)(const types<3>::quadrant *q1,
                                       const types<3>::quadrant *q2);
