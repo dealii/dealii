@@ -517,87 +517,45 @@
  */
 #ifdef DEBUG
 #  if DEAL_II_KOKKOS_VERSION_GTE(3, 6, 0)
-#    ifdef DEAL_II_HAVE_BUILTIN_EXPECT
-#      define Assert(cond, exc)                                                \
-        do                                                                     \
-          {                                                                    \
-            KOKKOS_IF_ON_HOST(({                                               \
-              if (__builtin_expect(!(cond), false))                            \
-                ::dealii::deal_II_exceptions::internals::issue_error_noreturn( \
-                  ::dealii::deal_II_exceptions::internals::ExceptionHandling:: \
-                    abort_or_throw_on_exception,                               \
-                  __FILE__,                                                    \
-                  __LINE__,                                                    \
-                  __PRETTY_FUNCTION__,                                         \
-                  #cond,                                                       \
-                  #exc,                                                        \
-                  exc);                                                        \
-            }))                                                                \
-            KOKKOS_IF_ON_DEVICE(({                                             \
-              if (!(cond))                                                     \
-                Kokkos::abort(#cond);                                          \
-            }))                                                                \
-          }                                                                    \
-        while (false)
-#    else /*ifdef DEAL_II_HAVE_BUILTIN_EXPECT*/
-#      define Assert(cond, exc)                                                \
-        do                                                                     \
-          {                                                                    \
-            KOKKOS_IF_ON_HOST(({                                               \
-              if (!(cond))                                                     \
-                ::dealii::deal_II_exceptions::internals::issue_error_noreturn( \
-                  ::dealii::deal_II_exceptions::internals::ExceptionHandling:: \
-                    abort_or_throw_on_exception,                               \
-                  __FILE__,                                                    \
-                  __LINE__,                                                    \
-                  __PRETTY_FUNCTION__,                                         \
-                  #cond,                                                       \
-                  #exc,                                                        \
-                  exc);                                                        \
-            }))                                                                \
-            KOKKOS_IF_ON_DEVICE(({                                             \
-              if (!(cond))                                                     \
-                Kokkos::abort(#cond);                                          \
-            }))                                                                \
-          }                                                                    \
-        while (false)
-#    endif /*ifdef DEAL_II_HAVE_BUILTIN_EXPECT*/
-#  else    /*if DEAL_II_KOKKOS_VERSION_GTE(3,6,0)*/
+#    define Assert(cond, exc)                                                \
+      do                                                                     \
+        {                                                                    \
+          KOKKOS_IF_ON_HOST(({                                               \
+            if (DEAL_II_BUILTIN_EXPECT(!(cond), false))                      \
+              ::dealii::deal_II_exceptions::internals::issue_error_noreturn( \
+                ::dealii::deal_II_exceptions::internals::ExceptionHandling:: \
+                  abort_or_throw_on_exception,                               \
+                __FILE__,                                                    \
+                __LINE__,                                                    \
+                __PRETTY_FUNCTION__,                                         \
+                #cond,                                                       \
+                #exc,                                                        \
+                exc);                                                        \
+          }))                                                                \
+          KOKKOS_IF_ON_DEVICE(({                                             \
+            if (!(cond))                                                     \
+              Kokkos::abort(#cond);                                          \
+          }))                                                                \
+        }                                                                    \
+      while (false)
+#  else /*if DEAL_II_KOKKOS_VERSION_GTE(3,6,0)*/
 #    ifdef KOKKOS_ACTIVE_EXECUTION_MEMORY_SPACE_HOST
-#      ifdef DEAL_II_HAVE_BUILTIN_EXPECT
-#        define Assert(cond, exc)                                              \
-          do                                                                   \
-            {                                                                  \
-              if (__builtin_expect(!(cond), false))                            \
-                ::dealii::deal_II_exceptions::internals::issue_error_noreturn( \
-                  ::dealii::deal_II_exceptions::internals::ExceptionHandling:: \
-                    abort_or_throw_on_exception,                               \
-                  __FILE__,                                                    \
-                  __LINE__,                                                    \
-                  __PRETTY_FUNCTION__,                                         \
-                  #cond,                                                       \
-                  #exc,                                                        \
-                  exc);                                                        \
-            }                                                                  \
-          while (false)
-#      else /*ifdef DEAL_II_HAVE_BUILTIN_EXPECT*/
-#        define Assert(cond, exc)                                              \
-          do                                                                   \
-            {                                                                  \
-              if (!(cond))                                                     \
-                ::dealii::deal_II_exceptions::internals::issue_error_noreturn( \
-                  ::dealii::deal_II_exceptions::internals::ExceptionHandling:: \
-                    abort_or_throw_on_exception,                               \
-                  __FILE__,                                                    \
-                  __LINE__,                                                    \
-                  __PRETTY_FUNCTION__,                                         \
-                  #cond,                                                       \
-                  #exc,                                                        \
-                  exc);                                                        \
-            }                                                                  \
-          while (false)
-#      endif /*ifdef DEAL_II_HAVE_BUILTIN_EXPECT*/
-#    else    /*#ifdef KOKKOS_ACTIVE_EXECUTION_MEMORY_SPACE_HOST*/
+#      define Assert(cond, exc)                                              \
+        do                                                                   \
+          {                                                                  \
+            if (DEAL_II_BUILTIN_EXPECT(!(cond), false))                      \
+              ::dealii::deal_II_exceptions::internals::issue_error_noreturn( \
+                ::dealii::deal_II_exceptions::internals::ExceptionHandling:: \
+                  abort_or_throw_on_exception,                               \
+                __FILE__,                                                    \
+                __LINE__,                                                    \
+                __PRETTY_FUNCTION__,                                         \
+                #cond,                                                       \
+                #exc,                                                        \
+                exc);                                                        \
+          }                                                                  \
+        while (false)
+#    else /*#ifdef KOKKOS_ACTIVE_EXECUTION_MEMORY_SPACE_HOST*/
 #      define Assert(cond, exc)     \
         do                          \
           {                         \
