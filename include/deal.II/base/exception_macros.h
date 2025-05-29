@@ -606,25 +606,14 @@
  * @ingroup Exceptions
  */
 #ifdef DEBUG
-#  ifdef DEAL_II_HAVE_BUILTIN_EXPECT
-#    define AssertNothrow(cond, exc)                                      \
-      do                                                                  \
-        {                                                                 \
-          if (__builtin_expect(!(cond), false))                           \
-            ::dealii::deal_II_exceptions::internals::issue_error_nothrow( \
-              __FILE__, __LINE__, __PRETTY_FUNCTION__, #cond, #exc, exc); \
-        }                                                                 \
-      while (false)
-#  else /*ifdef DEAL_II_HAVE_BUILTIN_EXPECT*/
-#    define AssertNothrow(cond, exc)                                      \
-      do                                                                  \
-        {                                                                 \
-          if (!(cond))                                                    \
-            ::dealii::deal_II_exceptions::internals::issue_error_nothrow( \
-              __FILE__, __LINE__, __PRETTY_FUNCTION__, #cond, #exc, exc); \
-        }                                                                 \
-      while (false)
-#  endif /*ifdef DEAL_II_HAVE_BUILTIN_EXPECT*/
+#  define AssertNothrow(cond, exc)                                      \
+    do                                                                  \
+      {                                                                 \
+        if (DEAL_II_BUILTIN_EXPECT(!(cond), false))                     \
+          ::dealii::deal_II_exceptions::internals::issue_error_nothrow( \
+            __FILE__, __LINE__, __PRETTY_FUNCTION__, #cond, #exc, exc); \
+      }                                                                 \
+    while (false)
 #else
 #  define AssertNothrow(cond, exc) \
     do                             \
