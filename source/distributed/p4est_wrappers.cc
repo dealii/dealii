@@ -354,6 +354,12 @@ namespace internal
                                               std::uint64_t       id) =
       p4est_quadrant_set_morton;
 
+    void
+    functions<2>::quadrant_init(types<2>::quadrant &q)
+    {
+      P4EST_QUADRANT_INIT(&q);
+    }
+
     int (&functions<2>::quadrant_is_equal)(const types<2>::quadrant *q1,
                                            const types<2>::quadrant *q2) =
       p4est_quadrant_is_equal;
@@ -566,6 +572,12 @@ namespace internal
                                               int                 level,
                                               std::uint64_t       id) =
       p8est_quadrant_set_morton;
+
+    void
+    functions<3>::quadrant_init(types<3>::quadrant &q)
+    {
+      P8EST_QUADRANT_INIT(&q);
+    }
 
     int (&functions<3>::quadrant_is_equal)(const types<3>::quadrant *q1,
                                            const types<3>::quadrant *q2) =
@@ -782,18 +794,7 @@ namespace internal
       for (unsigned int c = 0;
            c < dealii::GeometryInfo<dim>::max_children_per_cell;
            ++c)
-        switch (dim)
-          {
-            case 2:
-              P4EST_QUADRANT_INIT(&p4est_children[c]);
-              break;
-            case 3:
-              P8EST_QUADRANT_INIT(&p4est_children[c]);
-              break;
-            default:
-              DEAL_II_NOT_IMPLEMENTED();
-          }
-
+        functions<dim>::quadrant_init(p4est_children[c]);
 
       functions<dim>::quadrant_childrenv(&p4est_cell, p4est_children);
     }
@@ -802,17 +803,7 @@ namespace internal
     void
     init_coarse_quadrant(typename types<dim>::quadrant &quad)
     {
-      switch (dim)
-        {
-          case 2:
-            P4EST_QUADRANT_INIT(&quad);
-            break;
-          case 3:
-            P8EST_QUADRANT_INIT(&quad);
-            break;
-          default:
-            DEAL_II_NOT_IMPLEMENTED();
-        }
+      functions<dim>::quadrant_init(quad);
       functions<dim>::quadrant_set_morton(&quad,
                                           /*level=*/0,
                                           /*index=*/0);
