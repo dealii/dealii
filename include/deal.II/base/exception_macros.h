@@ -480,6 +480,17 @@
  */
 
 /**
+ * Wrapper macro around __builtin_expect(). Only used in the assertion macros
+ * (Assert(), AssertNothrow(), and AssertThrow()).
+ */
+#ifdef DEAL_II_HAVE_BUILTIN_EXPECT
+#  define DEAL_II_BUILTIN_EXPECT(a, b) __builtin_expect((a), (b))
+#else
+#  define DEAL_II_BUILTIN_EXPECT(a, b) (a)
+#endif
+
+
+/**
  * A macro that serves as the main routine in the exception mechanism for debug
  * mode error checking. It asserts that a certain condition is fulfilled,
  * otherwise issues an error and aborts the program.
@@ -1151,6 +1162,5 @@
  */
 #  define AssertIDA(code) Assert(code >= 0, ExcIDAError(code))
 #endif
-
 
 #endif
