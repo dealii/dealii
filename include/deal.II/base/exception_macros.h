@@ -480,6 +480,17 @@
  */
 
 /**
+ * Wrapper macro around __builtin_expect(). Only used in the assertion macros
+ * (Assert(), AssertNothrow(), and AssertThrow()).
+ */
+#ifdef DEAL_II_HAVE_BUILTIN_EXPECT
+#  define DEAL_II_BUILTIN_EXPECT(a, b) __builtin_expect((a), (b))
+#else
+#  define DEAL_II_BUILTIN_EXPECT(a, b) (a)
+#endif
+
+
+/**
  * A macro that serves as the main routine in the exception mechanism for debug
  * mode error checking. It asserts that a certain condition is fulfilled,
  * otherwise issues an error and aborts the program.
@@ -506,87 +517,45 @@
  */
 #ifdef DEBUG
 #  if DEAL_II_KOKKOS_VERSION_GTE(3, 6, 0)
-#    ifdef DEAL_II_HAVE_BUILTIN_EXPECT
-#      define Assert(cond, exc)                                                \
-        do                                                                     \
-          {                                                                    \
-            KOKKOS_IF_ON_HOST(({                                               \
-              if (__builtin_expect(!(cond), false))                            \
-                ::dealii::deal_II_exceptions::internals::issue_error_noreturn( \
-                  ::dealii::deal_II_exceptions::internals::ExceptionHandling:: \
-                    abort_or_throw_on_exception,                               \
-                  __FILE__,                                                    \
-                  __LINE__,                                                    \
-                  __PRETTY_FUNCTION__,                                         \
-                  #cond,                                                       \
-                  #exc,                                                        \
-                  exc);                                                        \
-            }))                                                                \
-            KOKKOS_IF_ON_DEVICE(({                                             \
-              if (!(cond))                                                     \
-                Kokkos::abort(#cond);                                          \
-            }))                                                                \
-          }                                                                    \
-        while (false)
-#    else /*ifdef DEAL_II_HAVE_BUILTIN_EXPECT*/
-#      define Assert(cond, exc)                                                \
-        do                                                                     \
-          {                                                                    \
-            KOKKOS_IF_ON_HOST(({                                               \
-              if (!(cond))                                                     \
-                ::dealii::deal_II_exceptions::internals::issue_error_noreturn( \
-                  ::dealii::deal_II_exceptions::internals::ExceptionHandling:: \
-                    abort_or_throw_on_exception,                               \
-                  __FILE__,                                                    \
-                  __LINE__,                                                    \
-                  __PRETTY_FUNCTION__,                                         \
-                  #cond,                                                       \
-                  #exc,                                                        \
-                  exc);                                                        \
-            }))                                                                \
-            KOKKOS_IF_ON_DEVICE(({                                             \
-              if (!(cond))                                                     \
-                Kokkos::abort(#cond);                                          \
-            }))                                                                \
-          }                                                                    \
-        while (false)
-#    endif /*ifdef DEAL_II_HAVE_BUILTIN_EXPECT*/
-#  else    /*if DEAL_II_KOKKOS_VERSION_GTE(3,6,0)*/
+#    define Assert(cond, exc)                                                \
+      do                                                                     \
+        {                                                                    \
+          KOKKOS_IF_ON_HOST(({                                               \
+            if (DEAL_II_BUILTIN_EXPECT(!(cond), false))                      \
+              ::dealii::deal_II_exceptions::internals::issue_error_noreturn( \
+                ::dealii::deal_II_exceptions::internals::ExceptionHandling:: \
+                  abort_or_throw_on_exception,                               \
+                __FILE__,                                                    \
+                __LINE__,                                                    \
+                __PRETTY_FUNCTION__,                                         \
+                #cond,                                                       \
+                #exc,                                                        \
+                exc);                                                        \
+          }))                                                                \
+          KOKKOS_IF_ON_DEVICE(({                                             \
+            if (!(cond))                                                     \
+              Kokkos::abort(#cond);                                          \
+          }))                                                                \
+        }                                                                    \
+      while (false)
+#  else /*if DEAL_II_KOKKOS_VERSION_GTE(3,6,0)*/
 #    ifdef KOKKOS_ACTIVE_EXECUTION_MEMORY_SPACE_HOST
-#      ifdef DEAL_II_HAVE_BUILTIN_EXPECT
-#        define Assert(cond, exc)                                              \
-          do                                                                   \
-            {                                                                  \
-              if (__builtin_expect(!(cond), false))                            \
-                ::dealii::deal_II_exceptions::internals::issue_error_noreturn( \
-                  ::dealii::deal_II_exceptions::internals::ExceptionHandling:: \
-                    abort_or_throw_on_exception,                               \
-                  __FILE__,                                                    \
-                  __LINE__,                                                    \
-                  __PRETTY_FUNCTION__,                                         \
-                  #cond,                                                       \
-                  #exc,                                                        \
-                  exc);                                                        \
-            }                                                                  \
-          while (false)
-#      else /*ifdef DEAL_II_HAVE_BUILTIN_EXPECT*/
-#        define Assert(cond, exc)                                              \
-          do                                                                   \
-            {                                                                  \
-              if (!(cond))                                                     \
-                ::dealii::deal_II_exceptions::internals::issue_error_noreturn( \
-                  ::dealii::deal_II_exceptions::internals::ExceptionHandling:: \
-                    abort_or_throw_on_exception,                               \
-                  __FILE__,                                                    \
-                  __LINE__,                                                    \
-                  __PRETTY_FUNCTION__,                                         \
-                  #cond,                                                       \
-                  #exc,                                                        \
-                  exc);                                                        \
-            }                                                                  \
-          while (false)
-#      endif /*ifdef DEAL_II_HAVE_BUILTIN_EXPECT*/
-#    else    /*#ifdef KOKKOS_ACTIVE_EXECUTION_MEMORY_SPACE_HOST*/
+#      define Assert(cond, exc)                                              \
+        do                                                                   \
+          {                                                                  \
+            if (DEAL_II_BUILTIN_EXPECT(!(cond), false))                      \
+              ::dealii::deal_II_exceptions::internals::issue_error_noreturn( \
+                ::dealii::deal_II_exceptions::internals::ExceptionHandling:: \
+                  abort_or_throw_on_exception,                               \
+                __FILE__,                                                    \
+                __LINE__,                                                    \
+                __PRETTY_FUNCTION__,                                         \
+                #cond,                                                       \
+                #exc,                                                        \
+                exc);                                                        \
+          }                                                                  \
+        while (false)
+#    else /*#ifdef KOKKOS_ACTIVE_EXECUTION_MEMORY_SPACE_HOST*/
 #      define Assert(cond, exc)     \
         do                          \
           {                         \
@@ -597,35 +566,15 @@
 #    endif /*ifdef KOKKOS_ACTIVE_EXECUTION_MEMORY_SPACE_HOST*/
 #  endif   /*KOKKOS_ACTIVE_EXECUTION_MEMORY_SPACE_HOST*/
 #else      /*ifdef DEBUG*/
-#  ifdef DEAL_II_HAVE_CXX20
-/*
- * In order to avoid unused parameters (etc.) warnings we need to use cond
- * and exc without actually evaluating the expression and generating code.
- * We accomplish this by using decltype(...) and create a dummy pointer
- * with these signatures. Notably, this approach works with C++20 onwards.
- */
-#    define Assert(cond, exc)                                                 \
-      do                                                                      \
-        {                                                                     \
-          std::remove_reference_t<decltype(cond)> *dealii_assert_variable_a = \
-            nullptr;                                                          \
-          std::remove_reference_t<decltype(exc)> *dealii_assert_variable_b =  \
-            nullptr;                                                          \
-          (void)dealii_assert_variable_a;                                     \
-          (void)dealii_assert_variable_b;                                     \
-        }                                                                     \
-      while (false)
-#  else
-#    define Assert(cond, exc) \
-      do                      \
-        {                     \
-          if (false)          \
-            if (!(cond))      \
-              {               \
-              }               \
-        }                     \
-      while (false)
-#  endif
+#  define Assert(cond, exc) \
+    do                      \
+      {                     \
+        if (false)          \
+          if (!(cond))      \
+            {               \
+            }               \
+      }                     \
+    while (false)
 #endif /*ifdef DEBUG*/
 
 
@@ -657,25 +606,14 @@
  * @ingroup Exceptions
  */
 #ifdef DEBUG
-#  ifdef DEAL_II_HAVE_BUILTIN_EXPECT
-#    define AssertNothrow(cond, exc)                                      \
-      do                                                                  \
-        {                                                                 \
-          if (__builtin_expect(!(cond), false))                           \
-            ::dealii::deal_II_exceptions::internals::issue_error_nothrow( \
-              __FILE__, __LINE__, __PRETTY_FUNCTION__, #cond, #exc, exc); \
-        }                                                                 \
-      while (false)
-#  else /*ifdef DEAL_II_HAVE_BUILTIN_EXPECT*/
-#    define AssertNothrow(cond, exc)                                      \
-      do                                                                  \
-        {                                                                 \
-          if (!(cond))                                                    \
-            ::dealii::deal_II_exceptions::internals::issue_error_nothrow( \
-              __FILE__, __LINE__, __PRETTY_FUNCTION__, #cond, #exc, exc); \
-        }                                                                 \
-      while (false)
-#  endif /*ifdef DEAL_II_HAVE_BUILTIN_EXPECT*/
+#  define AssertNothrow(cond, exc)                                      \
+    do                                                                  \
+      {                                                                 \
+        if (DEAL_II_BUILTIN_EXPECT(!(cond), false))                     \
+          ::dealii::deal_II_exceptions::internals::issue_error_nothrow( \
+            __FILE__, __LINE__, __PRETTY_FUNCTION__, #cond, #exc, exc); \
+      }                                                                 \
+    while (false)
 #else
 #  define AssertNothrow(cond, exc) \
     do                             \
@@ -715,39 +653,21 @@
  * @note Active in both DEBUG and RELEASE modes
  * @ingroup Exceptions
  */
-#ifdef DEAL_II_HAVE_BUILTIN_EXPECT
-#  define AssertThrow(cond, exc)                                         \
-    do                                                                   \
-      {                                                                  \
-        if (__builtin_expect(!(cond), false))                            \
-          ::dealii::deal_II_exceptions::internals::issue_error_noreturn( \
-            ::dealii::deal_II_exceptions::internals::ExceptionHandling:: \
-              throw_on_exception,                                        \
-            __FILE__,                                                    \
-            __LINE__,                                                    \
-            __PRETTY_FUNCTION__,                                         \
-            #cond,                                                       \
-            #exc,                                                        \
-            exc);                                                        \
-      }                                                                  \
-    while (false)
-#else /*ifdef DEAL_II_HAVE_BUILTIN_EXPECT*/
-#  define AssertThrow(cond, exc)                                         \
-    do                                                                   \
-      {                                                                  \
-        if (!(cond))                                                     \
-          ::dealii::deal_II_exceptions::internals::issue_error_noreturn( \
-            ::dealii::deal_II_exceptions::internals::ExceptionHandling:: \
-              throw_on_exception,                                        \
-            __FILE__,                                                    \
-            __LINE__,                                                    \
-            __PRETTY_FUNCTION__,                                         \
-            #cond,                                                       \
-            #exc,                                                        \
-            exc);                                                        \
-      }                                                                  \
-    while (false)
-#endif /*ifdef DEAL_II_HAVE_BUILTIN_EXPECT*/
+#define AssertThrow(cond, exc)                                         \
+  do                                                                   \
+    {                                                                  \
+      if (DEAL_II_BUILTIN_EXPECT(!(cond), false))                      \
+        ::dealii::deal_II_exceptions::internals::issue_error_noreturn( \
+          ::dealii::deal_II_exceptions::internals::ExceptionHandling:: \
+            throw_on_exception,                                        \
+          __FILE__,                                                    \
+          __LINE__,                                                    \
+          __PRETTY_FUNCTION__,                                         \
+          #cond,                                                       \
+          #exc,                                                        \
+          exc);                                                        \
+    }                                                                  \
+  while (false)
 
 
 /**
@@ -1151,6 +1071,5 @@
  */
 #  define AssertIDA(code) Assert(code >= 0, ExcIDAError(code))
 #endif
-
 
 #endif
