@@ -1346,7 +1346,7 @@ namespace internal
     template <typename Number>
     struct Inverse<2, 1, Number>
     {
-      constexpr static inline DEAL_II_ALWAYS_INLINE
+      DEAL_II_HOST_DEVICE constexpr static inline DEAL_II_ALWAYS_INLINE
         dealii::SymmetricTensor<2, 1, Number>
         value(const dealii::SymmetricTensor<2, 1, Number> &t)
       {
@@ -1362,7 +1362,7 @@ namespace internal
     template <typename Number>
     struct Inverse<2, 2, Number>
     {
-      constexpr static inline DEAL_II_ALWAYS_INLINE
+      DEAL_II_HOST_DEVICE constexpr static inline DEAL_II_ALWAYS_INLINE
         dealii::SymmetricTensor<2, 2, Number>
         value(const dealii::SymmetricTensor<2, 2, Number> &t)
       {
@@ -1389,7 +1389,7 @@ namespace internal
     template <typename Number>
     struct Inverse<2, 3, Number>
     {
-      constexpr static dealii::SymmetricTensor<2, 3, Number>
+      DEAL_II_HOST_DEVICE constexpr static dealii::SymmetricTensor<2, 3, Number>
       value(const dealii::SymmetricTensor<2, 3, Number> &t)
       {
         dealii::SymmetricTensor<2, 3, Number> tmp;
@@ -1456,8 +1456,9 @@ namespace internal
     template <typename Number>
     struct Inverse<4, 1, Number>
     {
-      constexpr static inline dealii::SymmetricTensor<4, 1, Number>
-      value(const dealii::SymmetricTensor<4, 1, Number> &t)
+      DEAL_II_HOST_DEVICE constexpr static inline dealii::
+        SymmetricTensor<4, 1, Number>
+        value(const dealii::SymmetricTensor<4, 1, Number> &t)
       {
         dealii::SymmetricTensor<4, 1, Number> tmp;
         tmp.data[0][0] = 1.0 / t.data[0][0];
@@ -1469,8 +1470,9 @@ namespace internal
     template <typename Number>
     struct Inverse<4, 2, Number>
     {
-      constexpr static inline dealii::SymmetricTensor<4, 2, Number>
-      value(const dealii::SymmetricTensor<4, 2, Number> &t)
+      DEAL_II_HOST_DEVICE constexpr static inline dealii::
+        SymmetricTensor<4, 2, Number>
+        value(const dealii::SymmetricTensor<4, 2, Number> &t)
       {
         dealii::SymmetricTensor<4, 2, Number> tmp;
 
@@ -1536,7 +1538,7 @@ namespace internal
     template <typename Number>
     struct Inverse<4, 3, Number>
     {
-      static dealii::SymmetricTensor<4, 3, Number>
+      DEAL_II_HOST_DEVICE static dealii::SymmetricTensor<4, 3, Number>
       value(const dealii::SymmetricTensor<4, 3, Number> &t)
       {
         dealii::SymmetricTensor<4, 3, Number> tmp = t;
