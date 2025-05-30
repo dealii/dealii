@@ -1994,7 +1994,8 @@ namespace internal
               constexpr unsigned int table[3][3] = {{0, 3, 4},
                                                     {3, 1, 5},
                                                     {4, 5, 2}};
-              return table[indices[0]][indices[1]];
+              const unsigned int     j           = indices[1];
+              return table[indices[0]][j];
             }
           case 4:
             {
