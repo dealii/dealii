@@ -40,7 +40,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [windows-2019, windows-2022]
+        os: [windows-2022, windows-2025]
 
     steps:
     - uses: actions/checkout@v4
@@ -67,7 +67,7 @@ jobs:
         ctest --test-dir build --build-config Debug --extra-verbose
     - name: upload library
       # run only if a PR is merged into master
-      if: ${{ github.ref == 'refs/heads/master' && matrix.os == 'windows-2022' }}
+      if: ${{ github.ref == 'refs/heads/master' && matrix.os == 'windows-2025' }}
       uses: actions/upload-artifact@v4
       with:
         name: dealii-${{ matrix.os }}
