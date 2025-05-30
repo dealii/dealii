@@ -52,7 +52,6 @@ jobs:
       run: |
         patch --version
         cmake --version
-        wmic logicaldisk get size, freespace, caption
     - name: configure
       run: |
         cmake -B build -DCMAKE_BUILD_TYPE=Debug -DCMAKE_INSTALL_PREFIX=c:/project -DDEAL_II_CXX_FLAGS="-WX /D FE_EVAL_FACTORY_DEGREE_MAX=2" -T host=x64 -A x64
