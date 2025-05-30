@@ -642,17 +642,18 @@ namespace Step93
   template <int dim>
   void Step93<dim>::solve()
   {
+    Timer timer;
+    timer.start();
+
     std::cout << "Beginning solve..." << std::endl;
-    {
-      Timer timer;
 
-      SolverControl solver_control(1'000'000, 1e-6 * system_rhs.l2_norm());
-      SolverMinRes<Vector<double>> solver(solver_control);
+    SolverControl solver_control(1'000'000, 1e-6 * system_rhs.l2_norm());
+    SolverMinRes<Vector<double>> solver(solver_control);
 
-      solver.solve(system_matrix, solution, system_rhs, PreconditionIdentity());
+    solver.solve(system_matrix, solution, system_rhs, PreconditionIdentity());
 
-      timer.stop();
-    }
+    timer.stop();
+
     std::cout << "Wall time: " << timer.wall_time() << "s" << std::endl;
     std::cout << "Solved in " << solver_control.last_step()
               << " MINRES iterations." << std::endl;
