@@ -43,9 +43,12 @@
 // further down below.
 #include <deal.II/lac/dynamic_sparsity_pattern.h>
 
-// We will make use of the std::find algorithm of the C++ standard library, so
-// we have to include the following file for its declaration:
+// We will make use of the `std::find` algorithm of the C++ standard
+// library, so we have to include the following file for its
+// declaration, along with the other standard header files we will
+// use:
 #include <algorithm>
+#include <fstream>
 #include <iostream>
 #include <iomanip>
 #include <cmath>

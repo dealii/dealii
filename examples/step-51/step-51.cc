@@ -72,6 +72,7 @@
 // the simulation.
 #include <deal.II/numerics/data_out_faces.h>
 
+#include <fstream>
 #include <iostream>
 
 
