@@ -440,7 +440,7 @@ DEAL_II_NAMESPACE_OPEN // Do not convert for module purposes
     /**
      * Return the absolute value of a number.
      */
-    static real_type
+    static DEAL_II_HOST_DEVICE real_type
     abs(const number &x);
   };
 
@@ -555,8 +555,8 @@ DEAL_II_NAMESPACE_OPEN // Do not convert for module purposes
 
 
   template <typename number>
-  typename NumberTraits<number>::real_type NumberTraits<number>::abs(
-    const number &x)
+  DEAL_II_HOST_DEVICE typename NumberTraits<number>::real_type
+  NumberTraits<number>::abs(const number &x)
   {
     // Make things work with AD types
     using std::abs;
