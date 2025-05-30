@@ -711,16 +711,9 @@
  * running the program in 3d, execution will abort in the location with an
  * error message that indicates where this happened and why.
  */
-#define DEAL_II_NOT_IMPLEMENTED()                                \
-  ::dealii::deal_II_exceptions::internals::issue_error_noreturn( \
-    ::dealii::deal_II_exceptions::internals::ExceptionHandling:: \
-      abort_or_throw_on_exception,                               \
-    __FILE__,                                                    \
-    __LINE__,                                                    \
-    __PRETTY_FUNCTION__,                                         \
-    nullptr,                                                     \
-    nullptr,                                                     \
-    ::dealii::StandardExceptions::ExcNotImplemented())
+#define DEAL_II_NOT_IMPLEMENTED()                              \
+  ::dealii::deal_II_exceptions::internals::do_not_implemented( \
+    __FILE__, __LINE__, __PRETTY_FUNCTION__)
 
 
 /**
