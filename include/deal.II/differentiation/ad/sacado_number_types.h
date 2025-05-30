@@ -17,6 +17,23 @@
 
 #include <deal.II/base/config.h>
 
+#include <deal.II/base/exceptions.h>
+#include <deal.II/base/numbers.h>
+
+#include <deal.II/differentiation/ad/ad_number_traits.h>
+#include <deal.II/differentiation/ad/ad_number_types.h>
+
+#ifdef DEAL_II_TRILINOS_WITH_SACADO
+// It appears that some versions of Trilinos do not directly or indirectly
+// include all the headers for all forward and reverse Sacado AD types
+// in Sacado.hpp, so we also directly include these here as a precaution:
+#  include <Sacado.hpp>
+#  include <Sacado_Fad_DFad.hpp>
+#  include <Sacado_trad.hpp>
+
+#  include <complex>
+#endif
+
 #include <type_traits>
 
 
@@ -60,28 +77,8 @@ namespace Differentiation
 } // namespace Differentiation
 
 
-DEAL_II_NAMESPACE_CLOSE
-
-
 
 #ifdef DEAL_II_TRILINOS_WITH_SACADO
-
-#  include <deal.II/base/exceptions.h>
-#  include <deal.II/base/numbers.h>
-
-#  include <deal.II/differentiation/ad/ad_number_traits.h>
-#  include <deal.II/differentiation/ad/ad_number_types.h>
-
-// It appears that some versions of Trilinos do not directly or indirectly
-// include all the headers for all forward and reverse Sacado AD types
-// in Sacado.hpp, so we also directly include these here as a precaution:
-#  include <Sacado.hpp>
-#  include <Sacado_Fad_DFad.hpp>
-#  include <Sacado_trad.hpp>
-
-#  include <complex>
-
-DEAL_II_NAMESPACE_OPEN
 
 
 namespace Differentiation
@@ -901,10 +898,9 @@ namespace Differentiation
 #  endif // DOXYGEN
 
 
+#endif // DEAL_II_TRILINOS_WITH_SACADO
+
 
 DEAL_II_NAMESPACE_CLOSE
-
-
-#endif // DEAL_II_TRILINOS_WITH_SACADO
 
 #endif
