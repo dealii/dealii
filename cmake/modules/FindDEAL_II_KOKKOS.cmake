@@ -33,7 +33,7 @@ set_if_empty(KOKKOS_DIR "$ENV{KOKKOS_DIR}")
 set(CMAKE_CXX_EXTENSIONS OFF)
 
 # The minimal Kokkos version we support
-set(KOKKOS_MINIMUM_REQUIRED_VERSION 3.7.0)
+set(KOKKOS_MINIMUM_REQUIRED_VERSION 3.4.0)
 
 #
 # Make sure that we prioritize Kokkos bundled with Trilinos or PETSc.
@@ -51,7 +51,6 @@ endif()
 
 if(DEAL_II_WITH_TRILINOS AND TRILINOS_WITH_KOKKOS)
   message(STATUS "Found Trilinos with bundled Kokkos library. Overriding search path.")
-  set(KOKKOS_MINIMUM_REQUIRED_VERSION 3.4.0)
   find_package(Kokkos ${KOKKOS_MINIMUM_REQUIRED_VERSION} QUIET
     PATHS ${TRILINOS_KOKKOS_DIR} NO_DEFAULT_PATH
     )
@@ -66,7 +65,6 @@ if(DEAL_II_WITH_TRILINOS AND TRILINOS_WITH_KOKKOS)
 
 elseif(DEAL_II_WITH_PETSC AND PETSC_WITH_KOKKOS)
   message(STATUS "Found PETSc with bundled Kokkos library. Overriding search path.")
-  set(KOKKOS_MINIMUM_REQUIRED_VERSION 3.4.0)
   find_package(Kokkos ${KOKKOS_MINIMUM_REQUIRED_VERSION} QUIET
     PATHS ${PETSC_KOKKOS_DIR} NO_DEFAULT_PATH
     )
