@@ -63,18 +63,18 @@ for (deal_II_dimension : DIMENSIONS; number : COMPLEX_SCALARS)
 
 for (number : REAL_SCALARS)
   {
-    template SymmetricTensor<4, 3, number> invert(
+    template DEAL_II_HOST_DEVICE SymmetricTensor<4, 3, number> invert(
       const SymmetricTensor<4, 3, number> &t);
   }
 
 for (number : DIFFERENTIABLE_ADOLC_REAL_SCALARS)
   {
-    template SymmetricTensor<4, 3, number> invert(
+    template DEAL_II_HOST_DEVICE SymmetricTensor<4, 3, number> invert(
       const SymmetricTensor<4, 3, number> &t);
   }
 
 for (number : DIFFERENTIABLE_TRILINOS_SACADO_REAL_SCALARS)
   {
-    template SymmetricTensor<4, 3, number> invert(
+    template DEAL_II_HOST_DEVICE SymmetricTensor<4, 3, number> invert(
       const SymmetricTensor<4, 3, number> &t);
   }
