@@ -311,7 +311,7 @@ namespace Step49
   {
     double trans(const double y) const
     {
-      return std::tanh(2 * y) / tanh(2);
+      return std::tanh(2 * y) / std::tanh(2);
     }
 
     Point<2> operator()(const Point<2> &in) const
