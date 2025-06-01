@@ -186,7 +186,7 @@ Householder<number>::initialize(const FullMatrix<number2> &M)
         sigma += storage(i, j) * storage(i, j);
       // We are ready if the column is
       // empty. Are we?
-      if (std::fabs(sigma) < 1.e-15)
+      if (std::abs(sigma) < 1.e-15)
         return;
 
       number2 s;
