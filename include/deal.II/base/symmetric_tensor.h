@@ -1535,6 +1535,22 @@ namespace internal
     };
 
 
+
+    /**
+     * Replacement of std::swap for numbers that
+     * also runs on device.
+     */
+    template <class NumberType>
+    DEAL_II_HOST_DEVICE void
+    swap(NumberType &x, NumberType &y)
+    {
+      NumberType tmp = x;
+      x              = y;
+      y              = tmp;
+    }
+
+
+
     template <typename Number>
     struct Inverse<4, 3, Number>
     {
@@ -1586,9 +1602,9 @@ namespace internal
             if (r > j)
               {
                 for (unsigned int k = 0; k < N; ++k)
-                  std::swap(tmp.data[j][k], tmp.data[r][k]);
+                  swap(tmp.data[j][k], tmp.data[r][k]);
 
-                std::swap(p[j], p[r]);
+                swap(p[j], p[r]);
               }
 
             // Transformation
