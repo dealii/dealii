@@ -225,23 +225,19 @@ protected:
 
   /**
    * For faces with non-standard face_orientation in 3d, the dofs on faces
-   * (quads) have to be permuted in order to be combined with the correct
-   * shape functions and additionally can change the sign. Given a local
-   * dof @p index on a quad, return the
-   * sign of the permuted shape function, if the face has non-standard
-   * face_orientation, face_flip or face_rotation. In 2d and 1d there is no need
-   * for permutation and consequently it does nothing in this case.
+   * (quads) have to be permuted in order to be combined with the correct shape
+   * functions and additionally can change the sign. Given a local dof @p index
+   * on a quad, return the sign of the permuted shape function.
    *
    * The permutation itself is returned by
    * adjust_quad_dof_index_for_face_orientation implemented in the interface
    * class FiniteElement<dim>.
    */
   bool
-  adjust_quad_dof_sign_for_face_orientation(const unsigned int index,
-                                            const unsigned int face_no,
-                                            const bool         face_orientation,
-                                            const bool         face_flip,
-                                            const bool face_rotation) const;
+  adjust_quad_dof_sign_for_face_orientation(
+    const unsigned int                 index,
+    const unsigned int                 face_no,
+    const types::geometric_orientation combined_orientation) const;
 
   /**
    * For faces with non-standard face_orientation in 3d, the dofs on faces
