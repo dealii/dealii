@@ -2728,7 +2728,6 @@ namespace DataOutBase
                          StreamType                              &out,
                          const bool                               legacy_format)
   {
-    Assert(dim <= 3 && dim > 1, ExcNotImplemented());
     unsigned int first_vertex_of_patch = 0;
     // Array to hold all the node numbers of a cell
     std::vector<unsigned> connectivity;
@@ -5675,8 +5674,8 @@ namespace DataOutBase
                                     /* use VTU, not VTK: */ false);
                               local_vertex_order[connectivity_index] =
                                 local_index;
-                              flush_current_cell();
                             }
+                          flush_current_cell();
 
                           break;
                         }

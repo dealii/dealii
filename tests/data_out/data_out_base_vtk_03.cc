@@ -47,6 +47,7 @@ main()
   initlog();
 
   unsigned cell_order = 4;
+  check<1>(deallog.get_file_stream(), cell_order);
   check<2>(deallog.get_file_stream(), cell_order);
   check<3>(deallog.get_file_stream(), cell_order);
 }

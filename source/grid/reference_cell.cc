@@ -484,15 +484,30 @@ ReferenceCell::vtk_lexicographic_to_node_index<0>(
 
 
 
+/**
+ * Modified from
+ * https://github.com/Kitware/VTK/blob/265ca48a79a36538c95622c237da11133608bbe5/Common/DataModel/vtkLagrangeCurve.cxx#L478
+ */
 template <>
 unsigned int
 ReferenceCell::vtk_lexicographic_to_node_index<1>(
-  const std::array<unsigned, 1> &,
-  const std::array<unsigned, 1> &,
+  const std::array<unsigned, 1> &node_indices,
+  const std::array<unsigned, 1> &nodes_per_direction,
   const bool) const
 {
-  DEAL_II_NOT_IMPLEMENTED();
-  return 0;
+  const unsigned int i = node_indices[0];
+
+  const bool ibdy = (i == 0 || i == nodes_per_direction[0]);
+  // How many boundaries do we lie on at once?
+  const int nbdy = (ibdy ? 1 : 0);
+
+  if (nbdy == 1) // Vertex DOF
+    { // ijk is a corner node. Return the proper index (somewhere in [0,7]):
+      return i ? 1 : 0;
+    }
+
+  const int offset = 2;
+  return (i - 1) + offset;
 }
 
 
