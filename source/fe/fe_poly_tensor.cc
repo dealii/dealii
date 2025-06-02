@@ -341,11 +341,9 @@ FE_PolyTensor<dim, spacedim>::single_mapping_kind() const
 template <int dim, int spacedim>
 bool
 FE_PolyTensor<dim, spacedim>::adjust_quad_dof_sign_for_face_orientation(
-  const unsigned int index,
-  const unsigned int face,
-  const bool         face_orientation,
-  const bool         face_flip,
-  const bool         face_rotation) const
+  const unsigned int                 index,
+  const unsigned int                 face,
+  const types::geometric_orientation combined_orientation) const
 {
   // do nothing in 1d and 2d
   if (dim < 3)
@@ -366,11 +364,8 @@ FE_PolyTensor<dim, spacedim>::adjust_quad_dof_sign_for_face_orientation(
          ExcInternalError());
 
   return adjust_quad_dof_sign_for_face_orientation_table
-    [this->n_unique_2d_subobjects() == 1 ? 0 : face](
-      index,
-      internal::combined_face_orientation(face_orientation,
-                                          face_rotation,
-                                          face_flip));
+    [this->n_unique_2d_subobjects() == 1 ? 0 : face](index,
+                                                     combined_orientation);
 }
 
 
@@ -630,9 +625,7 @@ FE_PolyTensor<dim, spacedim>::fill_fe_values(
           if (adjust_quad_dof_sign_for_face_orientation(
                 local_quad_dof_index,
                 face_index_from_dof_index,
-                cell->face_orientation(face_index_from_dof_index),
-                cell->face_flip(face_index_from_dof_index),
-                cell->face_rotation(face_index_from_dof_index)))
+                cell->combined_face_orientation(face_index_from_dof_index)))
             dof_sign = -1.0;
         }
 
@@ -1267,9 +1260,7 @@ FE_PolyTensor<dim, spacedim>::fill_fe_face_values(
           if (adjust_quad_dof_sign_for_face_orientation(
                 local_quad_dof_index,
                 face_index_from_dof_index,
-                cell->face_orientation(face_index_from_dof_index),
-                cell->face_flip(face_index_from_dof_index),
-                cell->face_rotation(face_index_from_dof_index)))
+                cell->combined_face_orientation(face_index_from_dof_index)))
             dof_sign = -1.0;
         }
 
@@ -1951,9 +1942,7 @@ FE_PolyTensor<dim, spacedim>::fill_fe_subface_values(
           if (adjust_quad_dof_sign_for_face_orientation(
                 local_quad_dof_index,
                 face_index_from_dof_index,
-                cell->face_orientation(face_index_from_dof_index),
-                cell->face_flip(face_index_from_dof_index),
-                cell->face_rotation(face_index_from_dof_index)))
+                cell->combined_face_orientation(face_index_from_dof_index)))
             dof_sign = -1.0;
         }
 
