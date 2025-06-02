@@ -26,6 +26,8 @@
 #include <deal.II/base/tensor.h>
 #include <deal.II/base/types.h>
 
+#include <Kokkos_Array.hpp>
+
 #include <array>
 
 DEAL_II_NAMESPACE_OPEN
@@ -1985,11 +1987,9 @@ namespace internal
             }
           case 3:
             {
-              constexpr unsigned int table[3][3] = {{0, 3, 4},
-                                                    {3, 1, 5},
-                                                    {4, 5, 2}};
-              const unsigned int     j           = indices[1];
-              return table[indices[0]][j];
+              constexpr Kokkos::Array<Kokkos::Array<unsigned int, 3>, 3> table =
+                {{{{0, 3, 4}}, {{3, 1, 5}}, {{4, 5, 2}}}};
+              return table[indices[0]][indices[1]];
             }
           case 4:
             {
