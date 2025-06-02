@@ -450,14 +450,8 @@ FE_SimplexPoly<dim, spacedim>::face_to_cell_index(
   AssertIndexRange(face_dof_index, this->n_dofs_per_face(face));
   AssertIndexRange(face, this->reference_cell().n_faces());
 
-  // TODO: once the default orientation is switched to 0 then we can remove this
-  // special case for 1D.
-  if (dim == 1)
-    Assert(combined_orientation == numbers::default_geometric_orientation,
-           ExcMessage("In 1D, all faces must have the default orientation."));
-  else
-    AssertIndexRange(combined_orientation,
-                     this->reference_cell().n_face_orientations(face));
+  AssertIndexRange(combined_orientation,
+                   this->reference_cell().n_face_orientations(face));
 
   // we need to distinguish between DoFs on vertices, lines and in 3d quads.
   // do so in a sequence of if-else statements
@@ -507,38 +501,45 @@ FE_SimplexPoly<dim, spacedim>::face_to_cell_index(
             break;
 
           case 3:
-            // in 3d, things are difficult. someone will have to think
-            // about how this code here should look like, by drawing a bunch
-            // of pictures of how all the faces can look like with the various
-            // flips and rotations.
-            //
-            // that said, we can implement a couple other situations easily:
-            // if the face orientation is
-            // numbers::default_combined_face_orientation then things are
-            // simple. Likewise if the face orientation is
-            // internal::combined_face_orientation(false,false,false) then we
-            // just know we need to reverse the DoF order on each line.
-            //
-            // this at least allows for tetrahedral meshes where periodic face
-            // pairs are each in one of the two above configurations. Doing so
-            // may turn out to be always possible or it may not, but at least
-            // this is less restrictive.
-            Assert((this->n_dofs_per_line() <= 1) ||
-                     combined_orientation ==
-                       numbers::default_geometric_orientation ||
-                     combined_orientation ==
-                       internal::combined_face_orientation(false, false, false),
-                   ExcNotImplemented());
+            {
+              // Line orientations are not consistent between faces of
+              // tetrahedra: e.g., the cell's first line is (0, 1) on face 0 and
+              // (1, 0) on face 1. Hence we have to determine the relative line
+              // orientation to determine how to index dofs along lines.
+              //
+              // face_to_cell_line_orientation() may only be called with
+              // canonical (face, line) pairs. Extract that information and then
+              // also the new canonical face_line_index.
+              const auto cell_line_index =
+                this->reference_cell().face_to_cell_lines(face,
+                                                          face_line,
+                                                          combined_orientation);
+              const auto [canonical_face, canonical_line] =
+                this->reference_cell().standard_line_to_face_and_line_index(
+                  cell_line_index);
+              // Here we don't take into account what the actual orientation of
+              // the line is: that's usually handled inside, e.g.,
+              // face->get_dof_indices().
+              const auto face_line_orientation =
+                this->reference_cell().face_to_cell_line_orientation(
+                  canonical_line,
+                  canonical_face,
+                  combined_orientation,
+                  /*combined_line_orientation =*/
+                  numbers::default_geometric_orientation);
 
-            if (combined_orientation == numbers::default_geometric_orientation)
-              {
+              if (face_line_orientation ==
+                  numbers::default_geometric_orientation)
                 adjusted_dof_index_on_line = dof_index_on_line;
-              }
-            else
-              {
-                adjusted_dof_index_on_line =
-                  this->n_dofs_per_line() - dof_index_on_line - 1;
-              }
+              else
+                {
+                  Assert(face_line_orientation ==
+                           numbers::reverse_line_orientation,
+                         ExcInternalError());
+                  adjusted_dof_index_on_line =
+                    this->n_dofs_per_line() - dof_index_on_line - 1;
+                }
+            }
             break;
 
           default:
@@ -561,9 +562,15 @@ FE_SimplexPoly<dim, spacedim>::face_to_cell_index(
       const unsigned int index =
         face_dof_index - this->get_first_face_quad_index(face);
 
-      // the same is true here as above for the 3d case -- someone will
-      // just have to draw a bunch of pictures. in the meantime,
-      // we can implement the degree <= 3 case in which it is simple
+      // Since polynomials on simplices are typically defined in barycentric
+      // coordinates, handling higher degree elements is not that hard: if the
+      // DoFs come in triples then they simply need to be rotated in the correct
+      // way (as though they were the vertices). However, we don't implement
+      // higher than cubic elements, so that is not yet done here. For example,
+      // for a P4 element a quad will have 3 DoFs, and each of those DoFs will
+      // be on its corresponding vertex's bisector. Hence they can be rotated by
+      // simply calling
+      // ReferenceCells::Triangle::permute_by_combined_orientation().
       Assert((this->n_dofs_per_quad(face) <= 1) ||
                combined_orientation == numbers::default_geometric_orientation,
              ExcNotImplemented());
