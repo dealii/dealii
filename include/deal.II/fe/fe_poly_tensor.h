@@ -20,6 +20,7 @@
 
 #include <deal.II/base/derivative_form.h>
 #include <deal.II/base/mutex.h>
+#include <deal.II/base/qprojector.h>
 #include <deal.II/base/quadrature.h>
 #include <deal.II/base/tensor_polynomials_base.h>
 
@@ -207,6 +208,27 @@ public:
                             const unsigned int component) const override;
 
 protected:
+#ifndef DOXYGEN
+  class InternalData;
+#endif
+
+  /**
+   * Internal function called by fill_fe_values(), fill_fe_face_values(),
+   * and fill_fe_subface_values().
+   */
+  void
+  compute_fill(
+    const typename Triangulation<dim, spacedim>::cell_iterator &cell,
+    const typename QProjector<dim>::DataSetDescriptor          &offset,
+    const unsigned int                                          n_q_points,
+    const Mapping<dim, spacedim>                               &mapping,
+    const typename Mapping<dim, spacedim>::InternalDataBase &mapping_internal,
+    const internal::FEValuesImplementation::MappingRelatedData<dim, spacedim>
+                                                              &mapping_data,
+    const typename FE_PolyTensor<dim, spacedim>::InternalData &fe_internal,
+    internal::FEValuesImplementation::FiniteElementRelatedData<dim, spacedim>
+      &output_data) const;
+
   /**
    * The mapping type to be used to map shape functions from the reference
    * cell to the mesh cell. If this vector is length one, the same mapping
