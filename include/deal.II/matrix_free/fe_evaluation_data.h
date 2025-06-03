@@ -1710,7 +1710,7 @@ namespace internal
     AssertDimension(indices.size(), out.size());
     AssertDimension(indices.size(), array[0].size());
     // set all entries in array to a valid element
-    int index = 0;
+    std::size_t index = 0;
     for (; index < N; ++index)
       if (indices[index] != numbers::invalid_unsigned_int)
         break;
