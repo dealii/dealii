@@ -418,7 +418,7 @@ namespace Portable
 
         SharedData<dim, Number> shared_data(values, gradients, scratch_pad);
 
-        const unsigned int cell_index = team_member.league_rank();
+        const int cell_index = team_member.league_rank();
 
         typename MatrixFree<dim, Number>::Data data{team_member,
                                                     /* n_dofhandler */ 1,
