@@ -59,8 +59,8 @@ namespace Portable
       const ViewTypeIn src,
       const int        N)
     {
-      Assert(dst.size() >= N, ExcInternalError());
-      Assert(src.size() >= N, ExcInternalError());
+      Assert(dst.size() >= static_cast<unsigned int>(N), ExcInternalError());
+      Assert(src.size() >= static_cast<unsigned int>(N), ExcInternalError());
       Kokkos::parallel_for(Kokkos::TeamVectorRange(team_member, N),
                            [&](const int i) {
                              if constexpr (add)
