@@ -546,7 +546,16 @@ namespace GridGenerator
                         const unsigned int  n_shells           = 2,
                         const double        skewness           = 2.0,
                         const bool          colorize           = false);
-
+  template <int dim>
+  void
+  custom_channel_with_cylinder(Triangulation<dim> &tria,
+    const double       half_height,
+    const double       length_pre,
+    const double       length_post,
+    const unsigned int  n_shells           = 2,
+    const double        skewness           = 2.0,
+    const bool          colorize           = false);
+                      
   /**
    * A general @p dim -dimensional cell (a segment if dim is 1, a quadrilateral
    * if @p dim is 2, or a hexahedron if @p dim is 3) immersed in a
