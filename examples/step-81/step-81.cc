@@ -224,9 +224,10 @@ namespace Step81
     const auto distance = (dipole_position - point).norm() / dipole_radius;
     if (distance > 1.)
       return J_a;
-    double scale = std::cos(distance * M_PI / 2.) *
-                   std::cos(distance * M_PI / 2.) / (M_PI / 2. - 2. / M_PI) /
-                   dipole_radius / dipole_radius;
+    double scale = std::cos(distance * numbers::PI / 2.) *
+                   std::cos(distance * numbers::PI / 2.) /
+                   (numbers::PI / 2. - 2. / numbers::PI) / dipole_radius /
+                   dipole_radius;
     J_a = dipole_strength * dipole_orientation * scale;
     return J_a;
   }
