@@ -1420,7 +1420,7 @@ namespace MatrixFreeTools
             Kokkos::parallel_for(
               Kokkos::TeamThreadRange(data->team_member,
                                       dofs_per_cell / n_components),
-              [&](int j) {
+              [&](unsigned int j) {
                 typename decltype(fe_eval)::value_type val = {};
 
                 if constexpr (n_components == 1)

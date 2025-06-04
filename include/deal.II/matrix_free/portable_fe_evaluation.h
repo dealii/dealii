@@ -519,7 +519,8 @@ namespace Portable
   FEEvaluation<dim, fe_degree, n_q_points_1d, n_components_, Number>::
     get_dof_value(int dof) const
   {
-    Assert(dof >= 0 && dof < tensor_dofs_per_component, ExcInternalError());
+    Assert(dof >= 0 && dof < static_cast<int>(tensor_dofs_per_component),
+           ExcInternalError());
     if constexpr (n_components_ == 1)
       {
         return shared_data->values(dof, 0);
