@@ -224,7 +224,6 @@ namespace MeshWorker
     // We permit different numbers of matrices, vectors and DoF index vectors.
     // So we have to be a bit permissive here.
     constexpr int max_index = std::max({n_matrices, n_vectors, n_dof_indices});
-    (void)max_index;
     Assert(index < max_index, ExcIndexRange(index, 0, max_index));
 
     if (index < n_matrices)

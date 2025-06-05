@@ -551,7 +551,6 @@ namespace PETScWrappers
 #  ifdef DEAL_II_PETSC_WITH_HYPRE
     initialize();
 #  else // DEAL_II_PETSC_WITH_HYPRE
-    (void)pc;
     Assert(false,
            ExcMessage("Your PETSc installation does not include a copy of "
                       "the hypre package necessary for this preconditioner."));

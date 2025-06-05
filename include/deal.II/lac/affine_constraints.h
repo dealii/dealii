@@ -2833,7 +2833,6 @@ AffineConstraints<number>::merge(
   const MergeConflictBehavior            merge_conflict_behavior,
   const bool                             allow_different_local_lines)
 {
-  (void)allow_different_local_lines;
   Assert(allow_different_local_lines ||
            local_lines == other_constraints.local_lines,
          ExcMessage(

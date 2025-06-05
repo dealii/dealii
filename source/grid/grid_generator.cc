@@ -1432,7 +1432,6 @@ namespace GridGenerator
                 cell->face(5)->set_all_boundary_ids(1);
                 ++count;
               }
-          (void)count;
           Assert(count == 48, ExcInternalError());
         }
       else
@@ -2322,7 +2321,6 @@ namespace GridGenerator
         default:
           DEAL_II_ASSERT_UNREACHABLE();
       }
-    (void)twisted_data; // make the static analyzer happy
     Assert(
       !twisted_data,
       ExcInvalidInputOrientation(
@@ -7519,8 +7517,6 @@ namespace GridGenerator
                           const bool          colorize)
   {
     Assert(dim == 2 || dim == 3, ExcNotImplemented());
-    (void)colorize;
-    (void)n_cells;
     Assert(inner_radius < outer_radius,
            ExcMessage("outer_radius has to be bigger than inner_radius."));
     if (n_shells == 0)
@@ -7584,8 +7580,6 @@ namespace GridGenerator
         const double                                         radius) {
         (void)center;
         (void)radial_vertex_tolerance;
-        (void)face;
-        (void)radius;
         for (unsigned int vertex_n = 0;
              vertex_n < GeometryInfo<dim>::vertices_per_face;
              ++vertex_n)

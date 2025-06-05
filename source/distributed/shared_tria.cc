@@ -55,7 +55,6 @@ namespace parallel
         (partition_zoltan | partition_metis | partition_zorder |
          partition_custom_signal) &
         settings;
-      (void)partition_settings;
       Assert(partition_settings == partition_auto ||
                partition_settings == partition_metis ||
                partition_settings == partition_zoltan ||

@@ -1352,7 +1352,6 @@ namespace PETScWrappers
            ExcMessage("The serialized value of size (" + std::to_string(size) +
                       ") does not match the current size (" +
                       std::to_string(this->size()) + ")"));
-    (void)size;
     ar &local_range;
     Assert(local_range == this->local_range(),
            ExcMessage("The serialized value of local_range (" +
@@ -1361,7 +1360,6 @@ namespace PETScWrappers
                       ") does not match the current local_range (" +
                       std::to_string(this->local_range().first) + ", " +
                       std::to_string(this->local_range().second) + ")"));
-    (void)local_range;
 
     PetscScalar *array = nullptr;
     int          ierr  = VecGetArray(petsc_vector(), &array);

@@ -267,7 +267,6 @@ namespace Portable
     , shared_data(data->shared_data)
     , cell_id(data->team_member.league_rank())
   {
-    (void)dof_index;
     AssertIndexRange(dof_index, data->n_dofhandler);
   }
 

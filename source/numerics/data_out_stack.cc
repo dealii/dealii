@@ -184,7 +184,6 @@ DataOutStack<dim, spacedim>::add_data_vector(
            names.size(), dof_handler->get_fe(0).n_components()));
   for (const auto &name : names)
     {
-      (void)name;
       Assert(name.find_first_not_of("abcdefghijklmnopqrstuvwxyz"
                                     "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
                                     "0123456789_<>()") == std::string::npos,

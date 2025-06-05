@@ -800,8 +800,6 @@ namespace PETScWrappers
         "the MUMPS package necessary for this solver. You will need to configure "
         "PETSc so that it includes MUMPS, recompile it, and then re-configure "
         "and recompile deal.II as well."));
-
-    // Cast to void to silence compiler warnings
     (void)A;
     (void)x;
     (void)b;

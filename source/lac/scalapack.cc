@@ -444,7 +444,6 @@ ScaLAPACKMatrix<NumberType>::copy_from(const LAPACKFullMatrix<NumberType> &B,
                                    &n_proc_cols_B);
       Assert(n_local_rows_B == n_rows, ExcInternalError());
       Assert(n_local_cols_B == n_columns, ExcInternalError());
-      (void)n_local_cols_B;
 
       int lda  = std::max(1, n_local_rows_B);
       int info = 0;
@@ -618,7 +617,6 @@ ScaLAPACKMatrix<NumberType>::copy_to(LAPACKFullMatrix<NumberType> &B,
                                    &n_proc_cols_B);
       Assert(n_local_rows_B == n_rows, ExcInternalError());
       Assert(n_local_cols_B == n_columns, ExcInternalError());
-      (void)n_local_cols_B;
 
       int lda  = std::max(1, n_local_rows_B);
       int info = 0;

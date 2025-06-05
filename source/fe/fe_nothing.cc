@@ -207,7 +207,6 @@ FE_Nothing<dim, spacedim>::compare_for_domination(
   const unsigned int                  codim) const
 {
   Assert(codim <= dim, ExcImpossibleInDim(dim));
-  (void)codim;
 
   if (!dominate)
     // if FE_Nothing does not dominate, there are no requirements
@@ -279,8 +278,6 @@ FE_Nothing<dim, spacedim>::get_interpolation_matrix(
 {
   // Since this element has no dofs,
   // the interpolation matrix is necessarily empty.
-  (void)interpolation_matrix;
-
   Assert(interpolation_matrix.m() == 0,
          ExcDimensionMismatch(interpolation_matrix.m(), 0));
   Assert(interpolation_matrix.n() == 0,
@@ -298,8 +295,6 @@ FE_Nothing<dim, spacedim>::get_face_interpolation_matrix(
 {
   // since this element has no face dofs, the
   // interpolation matrix is necessarily empty
-  (void)interpolation_matrix;
-
   Assert(interpolation_matrix.m() == 0,
          ExcDimensionMismatch(interpolation_matrix.m(), 0));
   Assert(interpolation_matrix.n() == 0,
@@ -318,8 +313,6 @@ FE_Nothing<dim, spacedim>::get_subface_interpolation_matrix(
 {
   // since this element has no face dofs, the
   // interpolation matrix is necessarily empty
-
-  (void)interpolation_matrix;
   Assert(interpolation_matrix.m() == 0,
          ExcDimensionMismatch(interpolation_matrix.m(), 0));
   Assert(interpolation_matrix.n() == 0,

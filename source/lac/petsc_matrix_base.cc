@@ -137,7 +137,6 @@ namespace PETScWrappers
   MatrixBase &
   MatrixBase::operator=(const value_type d)
   {
-    (void)d;
     Assert(d == value_type(), ExcScalarAssignmentOnlyForZeroValue());
 
     assert_is_compressed();

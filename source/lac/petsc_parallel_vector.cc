@@ -270,7 +270,6 @@ namespace PETScWrappers
                           const size_type n,
                           const size_type locally_owned_size)
     {
-      (void)n;
       AssertIndexRange(locally_owned_size, n + 1);
       ghosted = false;
 
@@ -291,7 +290,6 @@ namespace PETScWrappers
                           const size_type locally_owned_size,
                           const IndexSet &ghostnodes)
     {
-      (void)n;
       AssertIndexRange(locally_owned_size, n + 1);
       // If the size of the index set can be converted to a PetscInt then every
       // index can also be converted

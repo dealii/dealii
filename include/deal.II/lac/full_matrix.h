@@ -1185,7 +1185,6 @@ FullMatrix<number> &
 FullMatrix<number>::operator=(const number d)
 {
   Assert(d == number(0), ExcScalarAssignmentOnlyForZeroValue());
-  (void)d; // removes -Wunused-parameter warning in optimized mode
 
   if (this->n_elements() != 0)
     this->reset_values();

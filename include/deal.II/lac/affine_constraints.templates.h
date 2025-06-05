@@ -2410,7 +2410,6 @@ namespace internal
       size_type shift = 0)
     {
       Assert(shift == 0, ExcNotImplemented());
-      (void)shift;
       std::vector<size_type> constrained_local_dofs_host;
       constrained_local_dofs_host.reserve(cm.size());
 
@@ -3672,7 +3671,6 @@ namespace internal
                 const size_type       column,
                 SparseMatrixIterator &matrix_values)
       {
-        (void)row;
         if (value != LocalType())
           {
             while (matrix_values->column() < column)

@@ -692,7 +692,6 @@ namespace VectorTools
                     for (unsigned int d = 0; d < dim; ++d)
                       Assert(vector_dofs.dof_indices[d] < n_dofs,
                              ExcInternalError());
-                    (void)n_dofs;
 
                     // we need the normal vector on this face. we know that
                     // it is a vector of length 1 but at least with higher
@@ -1567,7 +1566,6 @@ namespace VectorTools
       }
     AssertDimension(n_total_constraints_found,
                     no_normal_flux_constraints.n_constraints());
-    (void)n_total_constraints_found;
   }
 
 

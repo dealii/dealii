@@ -450,7 +450,6 @@ namespace LinearAlgebra
     Vector<Number, MemorySpace> &
     Vector<Number, MemorySpace>::operator=(const Number s)
     {
-      (void)s;
       Assert(s == Number(0.0),
              ExcMessage("Only 0 can be assigned to a vector."));
 

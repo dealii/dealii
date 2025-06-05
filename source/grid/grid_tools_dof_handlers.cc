@@ -2131,7 +2131,6 @@ namespace GridTools
     const double              abs_tol = 1e-10)
   {
     static const int space_dim = CellIterator::AccessorType::space_dimension;
-    (void)space_dim;
     AssertIndexRange(direction, space_dim);
 
     if constexpr (running_in_debug_mode())
@@ -2230,10 +2229,7 @@ namespace GridTools
   {
     static const int dim       = MeshType::dimension;
     static const int space_dim = MeshType::space_dimension;
-    (void)dim;
-    (void)space_dim;
     AssertIndexRange(direction, space_dim);
-
     Assert(dim == space_dim, ExcNotImplemented());
 
     // Loop over all cells on the highest level and collect all boundary
@@ -2313,8 +2309,6 @@ namespace GridTools
   {
     static const int dim       = MeshType::dimension;
     static const int space_dim = MeshType::space_dimension;
-    (void)dim;
-    (void)space_dim;
     AssertIndexRange(direction, space_dim);
 
     // Loop over all cells on the highest level and collect all boundary

@@ -187,7 +187,6 @@ namespace internal
     // for a serial computation (don't!), or nobody implemented, instantiated,
     // and tested the parallel version for your vector type.
     Assert(other == nullptr, ExcNotImplemented());
-    (void)other;
     return prev;
   }
 

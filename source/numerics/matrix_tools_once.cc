@@ -248,8 +248,6 @@ namespace MatrixTools
                             const bool                      eliminate_columns)
       {
         Assert(eliminate_columns == false, ExcNotImplemented());
-        (void)eliminate_columns;
-
         Assert(matrix.n() == right_hand_side.size(),
                ExcDimensionMismatch(matrix.n(), right_hand_side.size()));
         Assert(matrix.n() == solution.size(),

@@ -928,9 +928,6 @@ namespace internal
                        VectorizedArrayType             &res,
                        std::bool_constant<true>) const
     {
-      (void)vec_ptr;
-      (void)constant_offset;
-      (void)vec;
       Assert(vec_ptr == vec.begin() + constant_offset, ExcInternalError());
       res.scatter(indices, vec_ptr);
     }

@@ -524,7 +524,6 @@ PointValueHistory<dim>::add_component_names(
     component_mask.find(vector_name);
   Assert(mask != component_mask.end(), ExcMessage("vector_name not in class"));
   unsigned int n_stored = mask->second.n_selected_components();
-  (void)n_stored;
   Assert(component_names.size() == n_stored,
          ExcDimensionMismatch(component_names.size(), n_stored));
 

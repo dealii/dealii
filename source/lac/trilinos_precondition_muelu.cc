@@ -148,9 +148,6 @@ namespace TrilinosWrappers
                                     TrilinosWrappers::global_length(
                                       distributed_constant_modes)));
 
-        (void)n_relevant_rows;
-        (void)global_length;
-
         // Reshape null space as a contiguous vector of doubles so that
         // Trilinos can read from it.
         for (size_type d = 0; d < constant_modes_dimension; ++d)
