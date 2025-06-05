@@ -307,7 +307,6 @@ namespace SparsityTools
         cell_weights.empty(),
         ExcMessage(
           "The cell weighting functionality for Zoltan has not yet been implemented."));
-      (void)cell_weights;
 
       // MPI environment must have been initialized by this point.
       std::unique_ptr<Zoltan> zz = std::make_unique<Zoltan>(MPI_COMM_SELF);
@@ -375,7 +374,6 @@ namespace SparsityTools
                                       export_local_ids,
                                       export_procs,
                                       export_to_part);
-      (void)rc;
 
       // check for error code in partitioner
       Assert(rc == ZOLTAN_OK, ExcInternalError());
@@ -501,8 +499,6 @@ namespace SparsityTools
                        num_objects,
                        global_ids.data(),
                        color_exp.data());
-
-    (void)rc;
     // Check for error code
     Assert(rc == ZOLTAN_OK, ExcInternalError());
 

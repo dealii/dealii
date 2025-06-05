@@ -963,7 +963,6 @@ namespace DynamicSparsityPatternIterators
   inline int
   Iterator::operator-(const Iterator &other) const
   {
-    (void)other;
     Assert(accessor.sparsity_pattern == other.accessor.sparsity_pattern,
            ExcInternalError());
     DEAL_II_NOT_IMPLEMENTED();

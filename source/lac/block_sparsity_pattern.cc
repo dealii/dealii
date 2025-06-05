@@ -44,7 +44,6 @@ BlockSparsityPatternBase<SparsityPatternType>::BlockSparsityPatternBase(
   const BlockSparsityPatternBase &s)
   : BlockSparsityPatternBase()
 {
-  (void)s;
   Assert(s.n_block_rows() == 0 && s.n_block_cols() == 0,
          ExcMessage(
            "This constructor can only be called if the provided argument "

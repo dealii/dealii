@@ -261,7 +261,6 @@ namespace internal
     block(VectorType &vector, const unsigned int b)
     {
       AssertDimension(b, 0);
-      (void)b;
       return vector;
     }
 

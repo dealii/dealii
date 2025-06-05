@@ -50,7 +50,6 @@ SparsityPattern::SparsityPattern()
 SparsityPattern::SparsityPattern(const SparsityPattern &s)
   : SparsityPattern()
 {
-  (void)s;
   Assert(s.empty(),
          ExcMessage(
            "This constructor can only be called if the provided argument "
@@ -182,7 +181,6 @@ SparsityPattern::SparsityPattern(const SparsityPattern &original,
 SparsityPattern &
 SparsityPattern::operator=(const SparsityPattern &s)
 {
-  (void)s;
   Assert(s.empty(),
          ExcMessage(
            "This operator can only be called if the provided argument "

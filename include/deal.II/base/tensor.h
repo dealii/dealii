@@ -1195,7 +1195,6 @@ template <class Iterator>
 inline void
 Tensor<0, dim, Number>::unroll(const Iterator begin, const Iterator end) const
 {
-  (void)end;
   AssertDimension(std::distance(begin, end), n_independent_components);
   Assert(dim != 0,
          ExcMessage("Cannot unroll an object of type Tensor<0,0,Number>"));
@@ -1580,7 +1579,6 @@ constexpr DEAL_II_HOST_DEVICE inline DEAL_II_ALWAYS_INLINE
   Tensor<rank_, dim, Number>::operator=(const Number &d) &
 {
   Assert(numbers::value_is_zero(d), ExcScalarAssignmentOnlyForZeroValue());
-  (void)d;
 
   for (unsigned int i = 0; i < dim; ++i)
     values[i] = internal::NumberType<Number>::value(0.0);
@@ -1820,7 +1818,6 @@ Tensor<rank_, dim, Number>::unroll(const Iterator begin,
     {
       // For rank-1 tensors, we can simply copy the current elements from
       // our linear array into the output range:
-      (void)end;
       Assert(std::distance(begin, end) >= dim,
              ExcMessage(
                "The provided iterator range must contain at least 'dim' "
@@ -1852,7 +1849,6 @@ Tensor<rank_, dim, Number>::unrolled_to_component_indices(const unsigned int i)
   // Work-around nvcc warning
   unsigned int dummy = n_independent_components;
   AssertIndexRange(i, dummy);
-  (void)dummy;
 
   if constexpr (dim == 0)
     {

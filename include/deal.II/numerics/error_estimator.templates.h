@@ -756,8 +756,7 @@ namespace internal
     dealii::hp::FESubfaceValues<dim, spacedim> &fe_subface_values,
     const typename KellyErrorEstimator<dim, spacedim>::Strategy strategy)
   {
-    const auto neighbor = cell->neighbor(face_no);
-    (void)neighbor;
+    const auto         neighbor           = cell->neighbor(face_no);
     const unsigned int n_solution_vectors = solutions.size();
     const auto         face               = cell->face(face_no);
 
@@ -1171,7 +1170,6 @@ KellyErrorEstimator<dim, spacedim>::estimate(
     }
 
   const unsigned int n_components = dof_handler.get_fe(0).n_components();
-  (void)n_components;
 
   // sanity checks
   Assert(solutions.size() > 0, ExcNoSolutions());

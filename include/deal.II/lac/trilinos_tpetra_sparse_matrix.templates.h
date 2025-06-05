@@ -850,7 +850,6 @@ namespace LinearAlgebra
     SparseMatrix<Number, MemorySpace> &
     SparseMatrix<Number, MemorySpace>::operator=(const double d)
     {
-      (void)d;
       Assert(d == 0, ExcScalarAssignmentOnlyForZeroValue());
 
       if (compressed)

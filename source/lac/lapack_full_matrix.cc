@@ -416,7 +416,6 @@ template <typename number>
 LAPACKFullMatrix<number> &
 LAPACKFullMatrix<number>::operator=(const number d)
 {
-  (void)d;
   Assert(d == number(0), ExcScalarAssignmentOnlyForZeroValue());
 
   if (this->n_elements() != 0)
@@ -1504,7 +1503,6 @@ LAPACKFullMatrix<number>::compute_cholesky_factorization()
 
   const types::blas_int mm = this->m();
   const types::blas_int nn = this->n();
-  (void)mm;
   Assert(mm == nn, ExcDimensionMismatch(mm, nn));
 
   number *const         values = this->values.data();

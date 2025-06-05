@@ -584,7 +584,6 @@ namespace internal
           std::array<AlignedVector<Number>, dim>  &eigenvalues)
     {
       const unsigned int n_rows_1d = mass_matrix[0].n_cols();
-      (void)n_rows_1d;
 
       for (unsigned int dir = 0; dir < dim; ++dir)
         {

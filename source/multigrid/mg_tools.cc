@@ -581,7 +581,6 @@ namespace MGTools
                         const bool                       keep_constrained_dofs)
   {
     const types::global_dof_index n_dofs = dof.n_dofs(level);
-    (void)n_dofs;
 
     Assert(sparsity.n_rows() == n_dofs,
            ExcDimensionMismatch(sparsity.n_rows(), n_dofs));
@@ -611,7 +610,6 @@ namespace MGTools
                              const bool keep_constrained_dofs)
   {
     const types::global_dof_index n_dofs = dof.n_dofs(level);
-    (void)n_dofs;
 
     Assert(sparsity.n_rows() == n_dofs,
            ExcDimensionMismatch(sparsity.n_rows(), n_dofs));
@@ -687,11 +685,8 @@ namespace MGTools
 
     const types::global_dof_index fine_dofs   = dof.n_dofs(level);
     const types::global_dof_index coarse_dofs = dof.n_dofs(level - 1);
-    (void)fine_dofs;
-    (void)coarse_dofs;
 
     // Matrix maps from fine level to coarse level
-
     Assert(sparsity.n_rows() == coarse_dofs,
            ExcDimensionMismatch(sparsity.n_rows(), coarse_dofs));
     Assert(sparsity.n_cols() == fine_dofs,
@@ -749,8 +744,6 @@ namespace MGTools
     const FiniteElement<dim>     &fe     = dof.get_fe();
     const types::global_dof_index n_dofs = dof.n_dofs(level);
     const unsigned int            n_comp = fe.n_components();
-    (void)n_dofs;
-    (void)n_comp;
 
     Assert(sparsity.n_rows() == n_dofs,
            ExcDimensionMismatch(sparsity.n_rows(), n_dofs));
@@ -932,11 +925,8 @@ namespace MGTools
 
     const types::global_dof_index fine_dofs   = dof.n_dofs(level);
     const types::global_dof_index coarse_dofs = dof.n_dofs(level - 1);
-    (void)fine_dofs;
-    (void)coarse_dofs;
 
     // Matrix maps from fine level to coarse level
-
     Assert(sparsity.n_rows() == coarse_dofs,
            ExcDimensionMismatch(sparsity.n_rows(), coarse_dofs));
     Assert(sparsity.n_cols() == fine_dofs,
@@ -1018,8 +1008,6 @@ namespace MGTools
                                   const unsigned int       level)
   {
     const types::global_dof_index n_dofs = dof.n_dofs(level);
-    (void)n_dofs;
-
     Assert(sparsity.n_rows() == n_dofs,
            ExcDimensionMismatch(sparsity.n_rows(), n_dofs));
     Assert(sparsity.n_cols() == n_dofs,

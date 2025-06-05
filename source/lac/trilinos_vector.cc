@@ -236,9 +236,7 @@ namespace TrilinosWrappers
             {
               // old and new vectors have exactly the same map, i.e. size and
               // parallel distribution
-              int ierr;
-              ierr = vector->GlobalAssemble(last_action);
-              (void)ierr;
+              int ierr = vector->GlobalAssemble(last_action);
               Assert(ierr == 0, ExcTrilinosError(ierr));
 
               ierr = vector->PutScalar(0.0);
@@ -391,7 +389,6 @@ namespace TrilinosWrappers
           else
             {
               const int ierr = vector->PutScalar(0.);
-              (void)ierr;
               Assert(ierr == 0, ExcTrilinosError(ierr));
             }
 

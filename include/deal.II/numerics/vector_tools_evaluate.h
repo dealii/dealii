@@ -527,7 +527,6 @@ namespace VectorTools
       const Vector<Number>                                              &vector,
       const typename Triangulation<dim, spacedim>::active_cell_iterator &cell)
     {
-      (void)tria;
       AssertDimension(tria.n_active_cells(), vector.size());
       return vector[cell->active_cell_index()];
     }
@@ -616,9 +615,6 @@ namespace VectorTools
                                           spacedim,
                                           typename VectorType::value_type>>> &)
     {
-      (void)evaluation_flags;
-      (void)first_selected_component;
-
       Assert(n_components == 1 && first_selected_component == 0,
              ExcMessage(
                "A cell-data vector can only have a single component."));

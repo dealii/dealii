@@ -90,7 +90,6 @@ namespace VectorTools
     std::enable_if_t<dealii::is_serial_vector<VectorType>::value == false>
     subtract_mean_value(VectorType &v, const std::vector<bool> &p_select)
     {
-      (void)p_select;
       Assert(p_select.empty(), ExcNotImplemented());
       // In case of an empty boolean mask operate on the whole vector:
       v.add(-v.mean_value());

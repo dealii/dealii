@@ -2096,7 +2096,6 @@ namespace Utilities
                       &process_answer,
         const MPI_Comm comm)
       {
-        (void)comm;
         Assert(Utilities::MPI::n_mpi_processes(comm) == 1,
                ExcMessage("You shouldn't use the 'Serial' class on "
                           "communicators that have more than one process "

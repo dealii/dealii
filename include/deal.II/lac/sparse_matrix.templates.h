@@ -88,7 +88,6 @@ template <typename number>
 SparseMatrix<number> &
 SparseMatrix<number>::operator=(const SparseMatrix<number> &m)
 {
-  (void)m;
   Assert(m.cols == nullptr && m.val == nullptr && m.max_len == 0,
          ExcMessage("This operator can only be called if the provided right "
                     "hand side is an empty matrix. This operator can not be "
@@ -138,7 +137,6 @@ SparseMatrix<number>::SparseMatrix(const SparsityPattern &c,
   , val(nullptr)
   , max_len(0)
 {
-  (void)id;
   Assert(c.n_rows() == id.m(), ExcDimensionMismatch(c.n_rows(), id.m()));
   Assert(c.n_cols() == id.n(), ExcDimensionMismatch(c.n_cols(), id.n()));
 
@@ -164,7 +162,6 @@ template <typename number>
 SparseMatrix<number> &
 SparseMatrix<number>::operator=(const double d)
 {
-  (void)d;
   Assert(d == 0, ExcScalarAssignmentOnlyForZeroValue());
 
   Assert(cols != nullptr, ExcNeedsSparsityPattern());
@@ -204,7 +201,6 @@ template <typename number>
 SparseMatrix<number> &
 SparseMatrix<number>::operator=(const IdentityMatrix &id)
 {
-  (void)id;
   Assert(cols->n_rows() == id.m(),
          ExcDimensionMismatch(cols->n_rows(), id.m()));
   Assert(cols->n_cols() == id.n(),
@@ -407,7 +403,6 @@ SparseMatrix<number>::copy_from(const TrilinosWrappers::SparseMatrix &matrix)
         value_cache.data(),
         reinterpret_cast<TrilinosWrappers::types::int_type *>(
           colnum_cache.data()));
-      (void)ierr;
       Assert(ierr == 0, ExcTrilinosError(ierr));
 
       // resize arrays to the size actually used

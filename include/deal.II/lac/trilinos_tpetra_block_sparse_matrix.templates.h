@@ -116,8 +116,6 @@ namespace LinearAlgebra
                                       block_sparsity_pattern.n_block_cols()));
 
           const size_type n_block_rows = tpetra_maps.size();
-          (void)n_block_rows;
-
           Assert(n_block_rows == block_sparsity_pattern.n_block_rows(),
                  ExcDimensionMismatch(n_block_rows,
                                       block_sparsity_pattern.n_block_rows()));

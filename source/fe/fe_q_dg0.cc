@@ -69,8 +69,6 @@ FE_Q_DG0<dim, spacedim>::FE_Q_DG0(const Quadrature<1> &points)
       get_riaf_vector(points.size() - 1))
 {
   const int degree = points.size() - 1;
-  (void)degree;
-
   Assert(degree > 0,
          ExcMessage("This element can only be used for polynomial degrees "
                     "at least zero"));

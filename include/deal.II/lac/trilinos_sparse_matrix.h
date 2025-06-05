@@ -2010,9 +2010,6 @@ DEAL_II_NAMESPACE_OPEN // Do not convert for module purposes
           Assert(dst.Map().SameAs(mtrx.DomainMap()) == true,
                  ExcMessage("Row map of matrix does not fit with vector map!"));
         }
-      (void)mtrx; // removes -Wunused-variable in optimized mode
-      (void)src;
-      (void)dst;
     }
 
     inline void
@@ -2039,9 +2036,6 @@ DEAL_II_NAMESPACE_OPEN // Do not convert for module purposes
                  ExcMessage(
                    "Row map of operator does not fit with vector map!"));
         }
-      (void)op; // removes -Wunused-variable in optimized mode
-      (void)src;
-      (void)dst;
     }
 
 

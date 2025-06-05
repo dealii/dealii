@@ -168,7 +168,6 @@ namespace parallel
     Assert(&triangulation == &(dof_handler.get_triangulation()),
            ExcMessage(
              "Triangulation associated with the DoFHandler has changed!"));
-    (void)triangulation;
 
     // Skip if the DoFHandler has not been initialized yet.
     if (dof_handler.get_fe_collection().empty())

@@ -135,7 +135,6 @@ namespace TrilinosWrappers
     , graph(
         new Epetra_FECrsGraph(View, *column_space_map, *column_space_map, 0))
   {
-    (void)input_sparsity;
     Assert(input_sparsity.n_rows() == 0,
            ExcMessage(
              "Copy constructor only works for empty sparsity patterns."));
@@ -828,7 +827,6 @@ namespace TrilinosWrappers
             int ierr = graph->ExtractGlobalRowView(trilinos_i,
                                                    nnz_extracted,
                                                    col_indices);
-            (void)ierr;
             Assert(ierr == 0, ExcTrilinosError(ierr));
             Assert(nnz_present == nnz_extracted,
                    ExcDimensionMismatch(nnz_present, nnz_extracted));
@@ -854,7 +852,6 @@ namespace TrilinosWrappers
             // an error.
             int ierr =
               graph->ExtractMyRowView(trilinos_i, nnz_extracted, col_indices);
-            (void)ierr;
             Assert(ierr == 0, ExcTrilinosError(ierr));
 
             Assert(nnz_present == nnz_extracted,
