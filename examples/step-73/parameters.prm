@@ -1,0 +1,73 @@
+# Listing of Parameters
+# ---------------------
+subsection Assembly method
+  # The automatic differentiation order to be used in the assembly of the linear system.
+  # Order = 0: Both the residual and linearisation are computed manually.
+  # Order = 1: The residual is computed manually but the linearisation is performed using AD.
+  # Order = 2: Both the residual and linearisation are computed using AD. 
+  set Automatic differentiation order = 0
+end
+
+subsection Finite element system
+  # Displacement system polynomial order
+  set Polynomial degree = 1
+
+  # Gauss quadrature order
+  set Quadrature order  = 2
+end
+
+
+subsection Geometry
+  # Number of elements per long edge of the beam
+  set Elements per edge  = 32
+
+  # Global grid scaling factor
+  set Grid scale         = 1e-3
+end
+
+
+subsection Linear solver
+  # Linear solver residual (scaled by residual norm)
+  set Residual                  = 1e-6
+
+  # Preconditioner type
+  set Preconditioner type        = ssor
+
+  # Preconditioner relaxation value
+  set Preconditioner relaxation  = 0.65
+
+  # Type of solver used to solve the linear system
+  set Solver type               = Direct
+end
+
+
+subsection Material properties
+  # Poisson's ratio
+  set Poisson's ratio = 0.3
+
+  # Shear modulus
+  set Shear modulus   = 0.4225e6
+end
+
+
+subsection Nonlinear solver
+  # Number of Newton-Raphson iterations allowed
+  set Max iterations Newton-Raphson = 10
+
+  # Displacement error tolerance
+  set Tolerance displacement        = 1.0e-6
+
+  # Force residual tolerance
+  set Tolerance force               = 1.0e-9
+end
+
+
+subsection Time
+  # End time
+  set End time       = 1
+
+  # Time step size
+  set Time step size = 0.1
+end
+
+
