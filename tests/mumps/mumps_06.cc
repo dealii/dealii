@@ -56,7 +56,7 @@ solve_and_check(const MatrixType &M,
   data.output_details = false;
   data.symmetric      = true;
   data.posdef         = true;
-  SparseDirectMUMPS solver(data);
+  SparseDirectMUMPS solver(data, M.get_mpi_communicator());
   solver.initialize(M);
   VectorType dst(rhs);
   solver.vmult(dst, rhs);
@@ -110,7 +110,7 @@ test()
   SparseDirectMUMPS::AdditionalData data;
   data.output_details   = true;
   data.error_statistics = true;
-  SparseDirectMUMPS Binv(data);
+  SparseDirectMUMPS Binv(data, B.get_mpi_communicator());
   Binv.initialize(B);
 
   // for a number of different solution

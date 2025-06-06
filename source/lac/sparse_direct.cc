@@ -931,15 +931,14 @@ SparseDirectMUMPS::initialize_matrix(const Matrix &matrix)
   n    = matrix.n();
   id.n = n;
 
-  if constexpr (std::is_same_v<SparseMatrix<double>, Matrix>)
+  if constexpr (std::is_same_v<Matrix, SparseMatrix<double>>)
     {
       // Serial matrix: hand over matrix to MUMPS as centralized assembled
       // matrix
       if (Utilities::MPI::this_mpi_process(mpi_communicator) == 0)
         {
           // number of nonzero elements in matrix
-          if constexpr (std::is_same_v<Matrix, SparseMatrix<double>>)
-            nnz = matrix.n_actually_nonzero_elements();
+          nnz = matrix.n_actually_nonzero_elements();
 
           // representation of the matrix
           a = std::make_unique<double[]>(nnz);
@@ -994,9 +993,17 @@ SparseDirectMUMPS::initialize_matrix(const Matrix &matrix)
           id.a   = a.get();
         }
     }
-  else if constexpr (std::is_same_v<TrilinosWrappers::SparseMatrix, Matrix> ||
-                     std::is_same_v<PETScWrappers::MPI::SparseMatrix, Matrix>)
+  else if constexpr (std::is_same_v<Matrix, TrilinosWrappers::SparseMatrix> ||
+                     std::is_same_v<Matrix, PETScWrappers::MPI::SparseMatrix>)
     {
+      int result;
+      MPI_Comm_compare(mpi_communicator,
+                       matrix.get_mpi_communicator(),
+                       &result);
+      AssertThrow(result == MPI_IDENT,
+                  ExcMessage("The matrix communicator must match the MUMPS "
+                             "communicator."));
+
       // Distributed matrix case
       id.icntl[17]               = 3; // distributed matrix assembly
       id.nnz                     = matrix.n_nonzero_elements();
@@ -1004,34 +1011,36 @@ SparseDirectMUMPS::initialize_matrix(const Matrix &matrix)
       size_type n_non_zero_local = 0;
 
       // Get the range of rows owned by this process
-      row_range                 = matrix.locally_owned_range_indices();
+      locally_owned_rows        = matrix.locally_owned_range_indices();
       size_type local_non_zeros = 0;
 
-      if constexpr (std::is_same_v<TrilinosWrappers::SparseMatrix, Matrix>)
+      if constexpr (std::is_same_v<Matrix, TrilinosWrappers::SparseMatrix>)
         {
           const auto &trilinos_matrix = matrix.trilinos_matrix();
           local_non_zeros             = trilinos_matrix.NumMyNonzeros();
         }
-      else if constexpr (std::is_same_v<PETScWrappers::MPI::SparseMatrix,
-                                        Matrix>)
+      else if constexpr (std::is_same_v<Matrix,
+                                        PETScWrappers::MPI::SparseMatrix>)
         {
           Mat &petsc_matrix =
             const_cast<PETScWrappers::MPI::SparseMatrix &>(matrix)
               .petsc_matrix();
           MatInfo info;
           MatGetInfo(petsc_matrix, MAT_LOCAL, &info);
-          local_non_zeros = (PetscInt)info.nz_used;
+          local_non_zeros = (size_type)info.nz_used;
         }
 
 
+      // We allocate enough entries for the general, nonsymmetric, case. If case
+      // of a symmetric matrix, we will end up with fewer entries.
       irn = std::make_unique<MUMPS_INT[]>(local_non_zeros);
       jcn = std::make_unique<MUMPS_INT[]>(local_non_zeros);
       a   = std::make_unique<double[]>(local_non_zeros);
-      irhs_loc.resize(row_range.n_elements());
+      irhs_loc.resize(locally_owned_rows.n_elements());
 
       if (additional_data.symmetric == true)
         {
-          for (const auto &row : row_range)
+          for (const auto &row : locally_owned_rows)
             {
               for (auto it = matrix.begin(row); it != matrix.end(row); ++it)
                 if (std::abs(it->value()) > 0.0 && it->column() >= row)
@@ -1049,13 +1058,13 @@ SparseDirectMUMPS::initialize_matrix(const Matrix &matrix)
                   }
 
               const types::global_cell_index local_index =
-                row_range.index_within_set(row);
+                locally_owned_rows.index_within_set(row);
               irhs_loc[local_index] = row + 1;
             }
         }
       else
         {
-          for (const auto &row : row_range)
+          for (const auto &row : locally_owned_rows)
             {
               // Loop over columns
               for (auto it = matrix.begin(row); it != matrix.end(row); ++it)
@@ -1075,7 +1084,7 @@ SparseDirectMUMPS::initialize_matrix(const Matrix &matrix)
                 }
 
               const types::global_cell_index local_index =
-                row_range.index_within_set(row);
+                locally_owned_rows.index_within_set(row);
               irhs_loc[local_index] = row + 1;
             }
         }
@@ -1092,7 +1101,7 @@ SparseDirectMUMPS::initialize_matrix(const Matrix &matrix)
       id.icntl[20] = 0;  // centralized solution, stored on rank 0 by MUMPS
       id.nrhs      = 1;
       id.lrhs_loc  = n;
-      id.nloc_rhs  = row_range.n_elements();
+      id.nloc_rhs  = locally_owned_rows.n_elements();
     }
   else
     {
@@ -1219,6 +1228,10 @@ SparseDirectMUMPS::vmult(VectorType &dst, const VectorType &src) const
       dst.compress(VectorOperation::insert);
 
       rhs.resize(0); // remove rhs again
+    }
+  else
+    {
+      DEAL_II_NOT_IMPLEMENTED();
     }
 }
 

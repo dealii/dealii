@@ -526,12 +526,12 @@ public:
     {}
 
     /**
-     * Print details of the execution
+     * If true, the MUMPS solver will print out details of the execution.
      */
     bool output_details;
 
     /**
-     * Print error statistics
+     * If true, the MUMPS solver will print out error statistics.
      */
     bool error_statistics;
 
@@ -672,7 +672,7 @@ private:
   /**
    * IndexSet storing the locally owned rows of the matrix.
    */
-  IndexSet row_range;
+  IndexSet locally_owned_rows;
 
   /**
    * This function initializes a MUMPS instance and hands over the system's
