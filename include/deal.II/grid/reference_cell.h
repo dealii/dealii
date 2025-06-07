@@ -411,6 +411,18 @@ public:
   isotropic_child_indices() const;
 
   /**
+   * Convert an internal::SubfaceCase into its equivalent RefinementCase. For
+   * example, SubfacePossibilities<3>::Possibilities::y1x2x is is geometrically
+   * equivalent to RefinementPossibilities<3>::cut_xy.
+   */
+  template <int dim>
+  std::pair<unsigned int, RefinementCase<dim - 1>>
+  equivalent_refinement_case(
+    const types::geometric_orientation combined_face_orientation,
+    const internal::SubfaceCase<dim>   subface_case,
+    const unsigned int                 subface_no) const;
+
+  /**
    * Return the reference-cell type of face @p face_no of the current
    * object. For example, if the current object is
    * ReferenceCells::Tetrahedron, then `face_no` must be between
