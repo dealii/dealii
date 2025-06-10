@@ -553,7 +553,7 @@ namespace GridGenerator
    * a generalized version of GridGenerator::channel_with_cylinder. It can be
    * used for benchmarking Navier-Stokes solvers for various flows around a
    * cylinder cases in 2D or 3D. The main limitation of this generator is that
-   * the diameter of the cylindre is fixed at one and that the dimensions of the
+   * the diameter of the cylinder is fixed at one and that the dimensions of the
    * channel must be an integer multiple of this diameter. Consequently, the
    * length before the cylinder
    * @length_pre, the length after the cylinder @length_post and the half height
