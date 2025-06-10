@@ -570,7 +570,7 @@ namespace GridGenerator
    *   <li>a bulk region consisting of Cartesian cells.</li>
    * </ol>
    * Here is an example of a grid (without additional global refinement)
-   * where the arguments were @length_pre=8, @length_post=16, @half_height=8 and
+   * where the arguments were length_pre=8, length_post=16, half_height=8 and
    * the default arguments are used for the number of shells and skewness:
    *
    * @image html custom_channel_with_cylinder.png
