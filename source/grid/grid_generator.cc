@@ -3831,29 +3831,28 @@ namespace GridGenerator
 
   template <>
   void
-  custom_channel_with_cylinder(
-    [[maybe_unused]] Triangulation<1>  &tria,
-    [[maybe_unused]] const unsigned int half_height,
-    [[maybe_unused]] const unsigned int length_pre,
-    [[maybe_unused]] const unsigned int length_post,
-    [[maybe_unused]] const double       depth,
-    [[maybe_unused]] unsigned int       depth_division,
-    [[maybe_unused]] const double       shell_region_radius,
-    [[maybe_unused]] const unsigned int n_shells,
-    [[maybe_unused]] const double       skewness,
-    [[maybe_unused]] const bool         colorize)
+  custom_channel_with_cylinder(Triangulation<1> &,
+                               const unsigned int,
+                               const unsigned int,
+                               const unsigned int,
+                               const double,
+                               unsigned int,
+                               const double,
+                               const unsigned,
+                               const double,
+                               const bool)
   {
     DEAL_II_NOT_IMPLEMENTED();
   }
 
   template <>
   void
-  custom_channel_with_cylinder(Triangulation<2>             &tria,
-                               const unsigned int            half_height,
-                               const unsigned int            length_pre,
-                               const unsigned int            length_post,
-                               [[maybe_unused]] const double depth,
-                               [[maybe_unused]] unsigned int depth_division,
+  custom_channel_with_cylinder(Triangulation<2>  &tria,
+                               const unsigned int half_height,
+                               const unsigned int length_pre,
+                               const unsigned int length_post,
+                               const double,
+                               unsigned int,
                                const double       shell_region_radius,
                                const unsigned int n_shells,
                                const double       skewness,
