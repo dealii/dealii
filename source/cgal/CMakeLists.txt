@@ -31,12 +31,14 @@ if(DEAL_II_WITH_CGAL)
     ${_src}
     surface_mesh.cc
     intersections.cc
+    polygon.cc
   )
 
   set(_inst
       ${_inst}
   surface_mesh.inst.in
   intersections.inst.in
+  polygon.inst.in
   )
 endif()
 

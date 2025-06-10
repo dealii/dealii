@@ -1,0 +1,161 @@
+
+DEAL::name: hyper_cube
+DEAL::Intersection: 1 polygons
+DEAL::With volumes: 1.00000 
+DEAL::Difference: 0 polygons
+DEAL::With volumes: 
+DEAL::Union: 1 polygons
+DEAL::With volumes: 1.00000 
+DEAL::
+DEAL::name: hyper_cube
+DEAL::Intersection: 1 polygons
+DEAL::With volumes: 0.810000 
+DEAL::Difference: 1 polygons
+DEAL::With volumes: 0.190000 
+DEAL::Union: 1 polygons
+DEAL::With volumes: 1.19000 
+DEAL::
+DEAL::name: hyper_rectangle
+DEAL::Intersection: 1 polygons
+DEAL::With volumes: 0.500000 
+DEAL::Difference: 1 polygons
+DEAL::With volumes: 0.500000 
+DEAL::Union: 1 polygons
+DEAL::With volumes: 1.10000 
+DEAL::
+DEAL::name: hyper_rectangle
+DEAL::Intersection: 1 polygons
+DEAL::With volumes: 0.500000 
+DEAL::Difference: 1 polygons
+DEAL::With volumes: 0.500000 
+DEAL::Union: 1 polygons
+DEAL::With volumes: 1.22000 
+DEAL::
+DEAL::name: hyper_rectangle
+DEAL::Intersection: 0 polygons
+DEAL::With volumes: 
+DEAL::Difference: 1 polygons
+DEAL::With volumes: 1.00000 
+DEAL::Union: 1 polygons
+DEAL::With volumes: 1.06000 
+DEAL::
+DEAL::name: simplex
+DEAL::Intersection: 1 polygons
+DEAL::With volumes: 0.500000 
+DEAL::Difference: 1 polygons
+DEAL::With volumes: 0.500000 
+DEAL::Union: 1 polygons
+DEAL::With volumes: 1.00000 
+DEAL::
+DEAL::name: simplex
+DEAL::Intersection: 1 polygons
+DEAL::With volumes: 0.320000 
+DEAL::Difference: 1 polygons
+DEAL::With volumes: 0.680000 
+DEAL::Union: 1 polygons
+DEAL::With volumes: 1.18000 
+DEAL::
+DEAL::name: simplex
+DEAL::Intersection: 1 polygons
+DEAL::With volumes: 0.250000 
+DEAL::Difference: 1 polygons
+DEAL::With volumes: 0.750000 
+DEAL::Union: 1 polygons
+DEAL::With volumes: 1.75000 
+DEAL::
+DEAL::name: hyper_ball_balanced
+DEAL::Intersection: 1 polygons
+DEAL::With volumes: 0.707107 
+DEAL::Difference: 1 polygons
+DEAL::With volumes: 0.292893 
+DEAL::Union: 1 polygons
+DEAL::With volumes: 3.12132 
+DEAL::
+DEAL::name: hyper_ball_balanced
+DEAL::Intersection: 1 polygons
+DEAL::With volumes: 0.128848 
+DEAL::Difference: 1 polygons
+DEAL::With volumes: 0.871152 
+DEAL::Union: 1 polygons
+DEAL::With volumes: 1.57826 
+DEAL::
+DEAL::name: hyper_cube
+DEAL::Intersection: 1 polygons
+DEAL::With volumes: 1.00000 
+DEAL::Difference: 0 polygons
+DEAL::With volumes: 
+DEAL::Union: 1 polygons
+DEAL::With volumes: 1.00000 
+DEAL::
+DEAL::name: hyper_cube
+DEAL::Intersection: 1 polygons
+DEAL::With volumes: 0.810000 
+DEAL::Difference: 1 polygons
+DEAL::With volumes: 0.190000 
+DEAL::Union: 1 polygons
+DEAL::With volumes: 1.19000 
+DEAL::
+DEAL::name: hyper_rectangle
+DEAL::Intersection: 1 polygons
+DEAL::With volumes: 0.500000 
+DEAL::Difference: 1 polygons
+DEAL::With volumes: 0.500000 
+DEAL::Union: 1 polygons
+DEAL::With volumes: 1.10000 
+DEAL::
+DEAL::name: hyper_rectangle
+DEAL::Intersection: 1 polygons
+DEAL::With volumes: 0.500000 
+DEAL::Difference: 1 polygons
+DEAL::With volumes: 0.500000 
+DEAL::Union: 1 polygons
+DEAL::With volumes: 1.22000 
+DEAL::
+DEAL::name: hyper_rectangle
+DEAL::Intersection: 0 polygons
+DEAL::With volumes: 
+DEAL::Difference: 1 polygons
+DEAL::With volumes: 1.00000 
+DEAL::Union: 1 polygons
+DEAL::With volumes: 1.06000 
+DEAL::
+DEAL::name: simplex
+DEAL::Intersection: 1 polygons
+DEAL::With volumes: 0.500000 
+DEAL::Difference: 1 polygons
+DEAL::With volumes: 0.500000 
+DEAL::Union: 1 polygons
+DEAL::With volumes: 1.00000 
+DEAL::
+DEAL::name: simplex
+DEAL::Intersection: 1 polygons
+DEAL::With volumes: 0.320000 
+DEAL::Difference: 1 polygons
+DEAL::With volumes: 0.680000 
+DEAL::Union: 1 polygons
+DEAL::With volumes: 1.18000 
+DEAL::
+DEAL::name: simplex
+DEAL::Intersection: 1 polygons
+DEAL::With volumes: 0.250000 
+DEAL::Difference: 1 polygons
+DEAL::With volumes: 0.750000 
+DEAL::Union: 1 polygons
+DEAL::With volumes: 1.75000 
+DEAL::
+DEAL::name: hyper_ball_balanced
+DEAL::Intersection: 1 polygons
+DEAL::With volumes: 0.780361 
+DEAL::Difference: 1 polygons
+DEAL::With volumes: 0.219639 
+DEAL::Union: 1 polygons
+DEAL::With volumes: 3.34108 
+DEAL::
+DEAL::name: hyper_ball_balanced
+DEAL::Intersection: 1 polygons
+DEAL::With volumes: 0.145583 
+DEAL::Difference: 1 polygons
+DEAL::With volumes: 0.854417 
+DEAL::Union: 1 polygons
+DEAL::With volumes: 1.63478 
+DEAL::
