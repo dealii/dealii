@@ -3995,7 +3995,7 @@ namespace GridGenerator
           {
             const Point<2> center = face->center();
             // left side
-            if (std::abs(center[0] - length_pre) < 1e-10)
+            if (std::abs(center[0] - (-length_pre)) < 1e-10)
               face->set_boundary_id(0);
             // right side
             else if (std::abs(center[0] - length_post) < 1e-10)
@@ -4003,11 +4003,12 @@ namespace GridGenerator
             // cylinder boundary
             else if (face->manifold_id() == polar_manifold_id)
               face->set_boundary_id(2);
-            // Top and bottom of channel
-            else
-              {
-                face->set_boundary_id(3);
-              }
+            // bottom side
+            else if (std::abs(center[1] - (-half_height)) < 1e-10)
+              face->set_boundary_id(3);
+            // top side
+            else if (std::abs(center[1] - (half_height)) < 1e-10)
+              face->set_boundary_id(4);
           }
   }
 
