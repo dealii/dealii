@@ -607,6 +607,10 @@ namespace GridGenerator
    *
    * @param n_shells Number of shells to use in the shell layer.
    *
+   * @param depth The depth of the simulation domaine (in 3D, the z axis)
+   *
+   * @param depth_division The number of division along the z axis
+   *
    * @param skewness Parameter controlling how close the shells are
    * to the cylinder: see the mathematical definition given in
    * GridGenerator::concentric_hyper_shells.
