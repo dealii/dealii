@@ -3831,38 +3831,39 @@ namespace GridGenerator
 
   template <>
   void
-  custom_channel_with_cylinder([[maybe_unused]] Triangulation<1>  &tria,
-                        [[maybe_unused]] const unsigned int       half_height,
-                        [[maybe_unused]] const unsigned int       length_pre,
-                        [[maybe_unused]] const unsigned int       length_post,
-                        [[maybe_unused]] const double       depth,
-                        [[maybe_unused]] unsigned int  depth_division,
-                        [[maybe_unused]] const double       shell_region_radius,
-                        [[maybe_unused]] const unsigned int n_shells,
-                        [[maybe_unused]] const double       skewness,
-                        [[maybe_unused]] const bool         colorize)
+  custom_channel_with_cylinder(
+    [[maybe_unused]] Triangulation<1>  &tria,
+    [[maybe_unused]] const unsigned int half_height,
+    [[maybe_unused]] const unsigned int length_pre,
+    [[maybe_unused]] const unsigned int length_post,
+    [[maybe_unused]] const double       depth,
+    [[maybe_unused]] unsigned int       depth_division,
+    [[maybe_unused]] const double       shell_region_radius,
+    [[maybe_unused]] const unsigned int n_shells,
+    [[maybe_unused]] const double       skewness,
+    [[maybe_unused]] const bool         colorize)
   {
     DEAL_II_NOT_IMPLEMENTED();
   }
 
   template <>
   void
-  custom_channel_with_cylinder(Triangulation<2>  &tria,
-                        const unsigned int       half_height,
-                        const unsigned int       length_pre,
-                        const unsigned int       length_post,
-                        [[maybe_unused]] const double       depth,
-                        [[maybe_unused]] unsigned int  depth_division,
-                        const double       shell_region_radius,
-                        const unsigned int n_shells,
-                        const double       skewness,
-                        const bool         colorize)
+  custom_channel_with_cylinder(Triangulation<2>             &tria,
+                               const unsigned int            half_height,
+                               const unsigned int            length_pre,
+                               const unsigned int            length_post,
+                               [[maybe_unused]] const double depth,
+                               [[maybe_unused]] unsigned int depth_division,
+                               const double       shell_region_radius,
+                               const unsigned int n_shells,
+                               const double       skewness,
+                               const bool         colorize)
   {
-     const types::manifold_id polar_manifold_id = 0;
+    const types::manifold_id polar_manifold_id = 0;
     const types::manifold_id tfi_manifold_id   = 1;
 
     // The radius of the cylinder is 0.5, so the diameter is 1.
-    const double radius = 0.5;
+    const double radius     = 0.5;
     const double box_radius = 1;
 
     // We assume that the cylinder is centered at (0,0) and has a diameter of 1.
@@ -3870,16 +3871,17 @@ namespace GridGenerator
     // The number of repetitions is chosen to ensure that the cylinder
     // occupies four cells.
 
-    const unsigned int length_repetitions =length_pre+length_post;
-    const unsigned int height_repetitions =2*half_height;
+    const unsigned int length_repetitions = length_pre + length_post;
+    const unsigned int height_repetitions = 2 * half_height;
 
-    // We begin by setting up a grid that is length_repetition by height_repetitions cells.
-    // These cells are all square
+    // We begin by setting up a grid that is length_repetition by
+    // height_repetitions cells. These cells are all square
     Triangulation<2> bulk_tria;
-    GridGenerator::subdivided_hyper_rectangle(bulk_tria,
-                                              {(length_repetitions), height_repetitions},
-                                              Point<2>(-double(length_pre), -double(half_height)),
-                                              Point<2>(double(length_post), double(half_height)));
+    GridGenerator::subdivided_hyper_rectangle(
+      bulk_tria,
+      {(length_repetitions), height_repetitions},
+      Point<2>(-double(length_pre), -double(half_height)),
+      Point<2>(double(length_post), double(half_height)));
 
     // bulk_tria now looks like this:
     //
@@ -3894,12 +3896,13 @@ namespace GridGenerator
     //   +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
     //
     // The next step is to remove the cells marked with XXs: we will place
-    // the grid around the cylinder there later. The following loop determines which cells need to be removed from the Triangulation
+    // the grid around the cylinder there later. The following loop determines
+    // which cells need to be removed from the Triangulation
     //    (i.e., find the cells marked with XX in the picture).
     std::set<Triangulation<2>::active_cell_iterator> cells_to_remove;
     for (const auto &cell : bulk_tria.active_cell_iterators())
       {
-        if ((cell->center() - Point<2>(0., 0.)).norm() < 1.1*box_radius)
+        if ((cell->center() - Point<2>(0., 0.)).norm() < 1.1 * box_radius)
           cells_to_remove.insert(cell);
       }
 
@@ -3924,8 +3927,9 @@ namespace GridGenerator
             cell->face(face_n)->set_manifold_id(tfi_manifold_id);
       }
 
-    // The shell region should have a radius that is larger than the radius of the cylinder
-    if (radius < shell_region_radius )
+    // The shell region should have a radius that is larger than the radius of
+    // the cylinder
+    if (radius < shell_region_radius)
       {
         Assert(0 < n_shells,
                ExcMessage("If the shell region has positive width then "
@@ -3934,7 +3938,7 @@ namespace GridGenerator
         GridGenerator::concentric_hyper_shells(shell_tria,
                                                Point<2>(),
                                                radius,
-                                                shell_region_radius,
+                                               shell_region_radius,
                                                n_shells,
                                                skewness,
                                                8);
@@ -4010,27 +4014,27 @@ namespace GridGenerator
   template <>
   void
   custom_channel_with_cylinder(Triangulation<3>  &tria,
-                        const unsigned int       half_height,
-                        const unsigned int       length_pre,
-                        const unsigned int       length_post,
-                        const double       depth,
-                         unsigned int  depth_division,
-                        const double       shell_region_radius,
-                        const unsigned int n_shells,
-                        const double       skewness,
-                        const bool         colorize) {
-
+                               const unsigned int half_height,
+                               const unsigned int length_pre,
+                               const unsigned int length_post,
+                               const double       depth,
+                               unsigned int       depth_division,
+                               const double       shell_region_radius,
+                               const unsigned int n_shells,
+                               const double       skewness,
+                               const bool         colorize)
+  {
     Triangulation<2> tria_2;
     custom_channel_with_cylinder(tria_2,
-                      half_height,
-                      length_pre,
-                      length_post,
-                      depth,
-                      depth_division,
-                      shell_region_radius,
-                      n_shells,
-                      skewness,
-                      colorize);
+                                 half_height,
+                                 length_pre,
+                                 length_post,
+                                 depth,
+                                 depth_division,
+                                 shell_region_radius,
+                                 n_shells,
+                                 skewness,
+                                 colorize);
 
     // extrude to 3d
     extrude_triangulation(tria_2, depth_division, depth, tria, true);

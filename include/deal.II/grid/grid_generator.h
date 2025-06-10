@@ -547,19 +547,20 @@ namespace GridGenerator
                         const double        skewness           = 2.0,
                         const bool          colorize           = false);
 
-    /**
+  /**
    * Generate a grid consisting of a channel with a cylinder where the length
    * and the height of the channel can be defined by the user. This generator is
-   * a generalized version of GridGenerator::channel_with_cylinder. It can be used
-   * for benchmarking Navier-Stokes solvers for various flows around a cylinder cases
-   * in 2D or 3D. The main limitation of this generator is that the diameter of the cylindre is
-   * fixed at one and that the dimensions of the channel must be an integer multiple of this diameter.
-   * Consequently, the length before the cylinder
-   * @length_pre, the length after the cylinder @length_post and the half height of the channel @half_height
-   * must be integer values. The geometry consists of a channel
-   * of size $[-L_{pre}, -H] \times [L_{post}, H] \times [0, W] $ (where the $z$
-   * dimension is omitted in 2d) with a cylinder, parallel to the $z$ axis
-   * with diameter $1$, centered at $(0, 0, 0)$. The channel has three
+   * a generalized version of GridGenerator::channel_with_cylinder. It can be
+   * used for benchmarking Navier-Stokes solvers for various flows around a
+   * cylinder cases in 2D or 3D. The main limitation of this generator is that
+   * the diameter of the cylindre is fixed at one and that the dimensions of the
+   * channel must be an integer multiple of this diameter. Consequently, the
+   * length before the cylinder
+   * @length_pre, the length after the cylinder @length_post and the half height
+   * of the channel @half_height must be integer values. The geometry consists
+   * of a channel of size $[-L_{pre}, -H] \times [L_{post}, H] \times [0, W] $
+   * (where the $z$ dimension is omitted in 2d) with a cylinder, parallel to the
+   * $z$ axis with diameter $1$, centered at $(0, 0, 0)$. The channel has three
    * distinct regions:
    * <ol>
    *   <li>If @p n_shells is greater than zero, then there are that many shells
@@ -569,8 +570,8 @@ namespace GridGenerator
    *   <li>a bulk region consisting of Cartesian cells.</li>
    * </ol>
    * Here is an example of a grid (without additional global refinement)
-   * where the arguments were @length_pre=8, @length_post=16, @half_height=8 and the
-   * default arguments are used for the number of shells and skewness:
+   * where the arguments were @length_pre=8, @length_post=16, @half_height=8 and
+   * the default arguments are used for the number of shells and skewness:
    *
    * @image html custom_channel_with_cylinder.png
    *
@@ -601,7 +602,8 @@ namespace GridGenerator
    * @param length_post The length of the channel from the cylinder (0) to the right side (x+)
    *
    * @param shell_region_radius Radius of the layer of shells around the cylinder.
-   * This value should be between larger than 0.5 (the radius of the cylinder) and smaller than 1 (the half-length of the box around the cylinder).
+   * This value should be between larger than 0.5 (the radius of the cylinder)
+   * and smaller than 1 (the half-length of the box around the cylinder).
    *
    * @param n_shells Number of shells to use in the shell layer.
    *
@@ -616,23 +618,24 @@ namespace GridGenerator
    * The left boundary (at $x = -L_{pre}$) is assigned an id of $0$, the right
    * boundary (at $x = L_{post}$) is assigned an id of $1$; the boundary of
    * the obstacle in the middle (i.e., the circle in 2d or the cylinder
-   * walls in 3d) is assigned an id of $2$, the bottom wall (at $y=-H$) is assigned and id of $/$, the top wall (at $y=H$)
-   * is assigned an id of $4$. In 3D, the front wall ($z=0$) is assigned an id of $5$ and the back wall ($z=W$) is assigned
-   * an id of $6$.
+   * walls in 3d) is assigned an id of $2$, the bottom wall (at $y=-H$) is
+   * assigned and id of $/$, the top wall (at $y=H$) is assigned an id of $4$.
+   * In 3D, the front wall ($z=0$) is assigned an id of $5$ and the back wall
+   * ($z=W$) is assigned an id of $6$.
    */
   template <int dim>
   void
   custom_channel_with_cylinder(Triangulation<dim> &tria,
-    const unsigned int       half_height,
-    const unsigned int       length_pre,
-    const unsigned int       length_post,
-    const double       depth=1,
-    const unsigned int  depth_division=1,
-    const double       shell_region_radius = 0.75,
-    const unsigned int  n_shells           = 2,
-    const double        skewness           = 2.0,
-    const bool          colorize           = false);
-                      
+                               const unsigned int  half_height,
+                               const unsigned int  length_pre,
+                               const unsigned int  length_post,
+                               const double        depth               = 1,
+                               const unsigned int  depth_division      = 1,
+                               const double        shell_region_radius = 0.75,
+                               const unsigned int  n_shells            = 2,
+                               const double        skewness            = 2.0,
+                               const bool          colorize            = false);
+
   /**
    * A general @p dim -dimensional cell (a segment if dim is 1, a quadrilateral
    * if @p dim is 2, or a hexahedron if @p dim is 3) immersed in a
