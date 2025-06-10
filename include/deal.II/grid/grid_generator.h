@@ -556,13 +556,12 @@ namespace GridGenerator
    * the diameter of the cylinder is fixed at one and that the dimensions of the
    * channel must be an integer multiple of this diameter. Consequently, the
    * length before the cylinder
-   * (length_pre, $L_{pre}$), the length after the cylinder (length_post, $L_{post}$) and the half height
-   * of the channel (half_height, $H$) must be integer values. The geometry consists
-   * of a channel of size $[-L_{pre}, -H] \times [L_{post}, H] \times [0, W] $
-   * (where the $z$ dimension is omitted in 2d) with a cylinder, parallel to the
-   * $z$ axis with diameter $1$, centered at $(0, 0, 0)$. The channel has three
-   * distinct regions:
-   * <ol>
+   * (length_pre, $L_{pre}$), the length after the cylinder (length_post,
+   * $L_{post}$) and the half height of the channel (half_height, $H$) must be
+   * integer values. The geometry consists of a channel of size $[-L_{pre}, -H]
+   * \times [L_{post}, H] \times [0, W] $ (where the $z$ dimension is omitted in
+   * 2d) with a cylinder, parallel to the $z$ axis with diameter $1$, centered
+   * at $(0, 0, 0)$. The channel has three distinct regions: <ol>
    *   <li>If @p n_shells is greater than zero, then there are that many shells
    *   centered around the cylinder,</li>
    *   <li>a blending region between the shells and the rest of the
