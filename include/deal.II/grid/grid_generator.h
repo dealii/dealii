@@ -546,12 +546,91 @@ namespace GridGenerator
                         const unsigned int  n_shells           = 2,
                         const double        skewness           = 2.0,
                         const bool          colorize           = false);
+
+    /**
+   * Generate a grid consisting of a channel with a cylinder where the length
+   * and the height of the channel can be defined by the user. This generator is
+   * a generalized version of GridGenerator::channel_with_cylinder. It can be used
+   * for benchmarking Navier-Stokes solvers for various flows around a cylinder cases
+   * in 2D or 3D. The main limitation of this generator is that the diameter of the cylindre is
+   * fixed at one and that the dimensions of the channel must be an integer multiple of this diameter.
+   * Consequently, the length before the cylinder
+   * @length_pre, the length after the cylinder @length_post and the half height of the channel @half_height
+   * must be integer values. The geometry consists of a channel
+   * of size $[-L_{pre}, -H] \times [L_{post}, H] \times [0, W] $ (where the $z$
+   * dimension is omitted in 2d) with a cylinder, parallel to the $z$ axis
+   * with diameter $1$, centered at $(0, 0, 0)$. The channel has three
+   * distinct regions:
+   * <ol>
+   *   <li>If @p n_shells is greater than zero, then there are that many shells
+   *   centered around the cylinder,</li>
+   *   <li>a blending region between the shells and the rest of the
+   *   triangulation, and</li>
+   *   <li>a bulk region consisting of Cartesian cells.</li>
+   * </ol>
+   * Here is the grid (without additional global refinement) in 2d:
+   *
+   * @image html channel_with_cylinder_2d.png
+   *
+   * and in 3d:
+   *
+   * @image html channel_with_cylinder_3d.png
+   *
+   * The resulting Triangulation uses three manifolds: a PolarManifold (in 2d)
+   * or CylindricalManifold (in 3d) with manifold id $0$, a
+   * TransfiniteInterpolationManifold with manifold id $1$, and a FlatManifold
+   * everywhere else. For more information on this topic see
+   * @ref GlossManifoldIndicator "the glossary entry on manifold indicators".
+   * The
+   * cell faces on the cylinder and surrounding shells have manifold ids of
+   * $0$, while the cell volumes adjacent to the shells (or, if they do not
+   * exist, the cylinder) have a manifold id of $1$. Put another way: this
+   * grid uses TransfiniteInterpolationManifold to smoothly transition from
+   * the shells (generated with GridGenerator::concentric_hyper_shells) to the
+   * bulk region. All other cell volumes and faces have manifold id
+   * numbers::flat_manifold_id and use FlatManifold. All cells with id
+   * numbers::flat_manifold_id are rectangular prisms aligned with the
+   * coordinate axes.
+   *
+   *
+   * @param tria Triangulation to be created. Must be empty upon calling this
+   * function.
+   *
+   * @param half_height The half height of the channel (y- to 0 or 0 to y+).
+   *
+   * @param length_pre The length of the channel from the left side (x-) to the center of the cylinder (0)
+   *
+   * @param length_post The length of the channel from the cylinder (0) to the right side (x+)
+   *
+   * @param shell_region_radius Radius of the layer of shells around the cylinder.
+   * This value should be between larger than 0.5 (the radius of the cylinder) and smaller than 1 (the half-length of the box around the cylinder).
+   *
+   * @param n_shells Number of shells to use in the shell layer.
+   *
+   * @param skewness Parameter controlling how close the shells are
+   * to the cylinder: see the mathematical definition given in
+   * GridGenerator::concentric_hyper_shells.
+   *
+   * @param colorize If `true`, then assign different boundary ids to
+   * different parts of the boundary. For more
+   * information on boundary indicators see
+   * @ref GlossBoundaryIndicator "this glossary entry".
+   * The left boundary (at $x = -L_{pre}$) is assigned an id of $0$, the right
+   * boundary (at $x = L_{post}$) is assigned an id of $1$; the boundary of
+   * the obstacle in the middle (i.e., the circle in 2d or the cylinder
+   * walls in 3d) is assigned an id of $2$, the bottom wall (at $y=-H$) is assigned and id of $/$, the top wall (at $y=H$)
+   * is assigned an id of $4$. In 3D, the front wall ($z=0$) is assigned an id of $5$ and the back wall ($z=W$) is assigned
+   * an id of $6$.
+   */
   template <int dim>
   void
   custom_channel_with_cylinder(Triangulation<dim> &tria,
-    const double       half_height,
-    const double       length_pre,
-    const double       length_post,
+    const unsigned int       half_height,
+    const unsigned int       length_pre,
+    const unsigned int       length_post,
+    const double       depth=1,
+    const unsigned int  depth_division=1,
+    const double       shell_region_radius = 0.75,
     const unsigned int  n_shells           = 2,
     const double        skewness           = 2.0,
     const bool          colorize           = false);

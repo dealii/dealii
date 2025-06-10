@@ -3832,39 +3832,41 @@ namespace GridGenerator
   template <>
   void
   custom_channel_with_cylinder(Triangulation<2>  &tria,
-                        const double       half_height,
-                        const double       length_pre,
-                        const double       length_post,
+                        const unsigned int       half_height,
+                        const unsigned int       length_pre,
+                        const unsigned int       length_post,
+                        [[maybe_unused]] const double       depth,
+                        [[maybe_unused]] unsigned int  depth_division,
+                        const double       shell_region_radius,
                         const unsigned int n_shells,
                         const double       skewness,
                         const bool         colorize)
   {
-    const types::manifold_id polar_manifold_id = 0;
+     const types::manifold_id polar_manifold_id = 0;
     const types::manifold_id tfi_manifold_id   = 1;
 
     // The radius of the cylinder is 0.5, so the diameter is 1.
     const double radius = 0.5;
-    const double shell_region_width =radius;
+    const double box_radius = 1;
 
-    // We assume that the cylinder, centered at (0,0), with a diameter of 1
-    // is the characteristic length of the channel.
-    // The number of repetitions is chosen to ensure that the cylinder 
-    // occupies four cells.    
+    // We assume that the cylinder is centered at (0,0) and has a diameter of 1.
+    // We use the cylinder diameter as the characteristic length of the channel.
+    // The number of repetitions is chosen to ensure that the cylinder
+    // occupies four cells.
 
+    const unsigned int length_repetitions =length_pre+length_post;
+    const unsigned int height_repetitions =2*half_height;
 
-    const unsigned int length_repetitions =
-      2*static_cast<unsigned int>(std::ceil((length_pre + length_post)));
-    const unsigned int height_repetitions =
-      2*static_cast<unsigned int>(std::ceil(2.0 * half_height));
+    const double x_length = -double(length_pre);
 
-
-    // We begin by setting up a grid that is 4 by 22 cells. While not
-    // squares, these have pretty good aspect ratios.
+    // We begin by setting up a grid that is length_repetition by height_repetitions cells.
+    // These cells are all square
     Triangulation<2> bulk_tria;
     GridGenerator::subdivided_hyper_rectangle(bulk_tria,
-                                              {length_repetitions, height_repetitions},
-                                              Point<2>(length_pre, -half_height),
-                                              Point<2>(length_pre+length_post, half_height));
+                                              {(length_repetitions), height_repetitions},
+                                              Point<2>(-double(length_pre), -double(half_height)),
+                                              Point<2>(double(length_post), double(half_height)));
+
     // bulk_tria now looks like this:
     //
     //   +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
@@ -3878,42 +3880,26 @@ namespace GridGenerator
     //   +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
     //
     // The next step is to remove the cells marked with XXs: we will place
-    // the grid around the cylinder there later. The next loop does two
-    // things:
-    // 1. Determines which cells need to be removed from the Triangulation
+    // the grid around the cylinder there later. The following loop determines which cells need to be removed from the Triangulation
     //    (i.e., find the cells marked with XX in the picture).
-    // 2. Finds the location of the vertex marked with 'O' and uses that to
-    //    calculate the shift vector for aligning cylinder_tria with
-    //    tria_without_cylinder.
     std::set<Triangulation<2>::active_cell_iterator> cells_to_remove;
-    Tensor<1, 2> cylinder_triangulation_offset;
     for (const auto &cell : bulk_tria.active_cell_iterators())
       {
-        if ((cell->center() - Point<2>(0., 0.)).norm() < radius)
+        if ((cell->center() - Point<2>(0., 0.)).norm() < 1.1*box_radius)
           cells_to_remove.insert(cell);
       }
+
     Triangulation<2> tria_without_cylinder;
     GridGenerator::create_triangulation_with_removed_cells(
       bulk_tria, cells_to_remove, tria_without_cylinder);
 
-    // set up the cylinder triangulation. Note that this function sets the
+    // Set up the cylinder triangulation. Note that this function sets the
     // manifold ids of the interior boundary cells to 0
     // (polar_manifold_id).
     Triangulation<2> cylinder_tria;
     GridGenerator::hyper_cube_with_cylindrical_hole(cylinder_tria,
-                                                    0.5 + 0.5,
-                                                    0.41 / 4.0);
-    // The bulk cells are not quite squares, so we need to move the left
-    // and right sides of cylinder_tria inwards so that it fits in
-    // bulk_tria:
-    for (const auto &cell : cylinder_tria.active_cell_iterators())
-      for (const unsigned int vertex_n : GeometryInfo<2>::vertex_indices())
-        {
-          if (std::abs(cell->vertex(vertex_n)[0] - -0.41 / 4.0) < 1e-10)
-            cell->vertex(vertex_n)[0] = -0.1;
-          else if (std::abs(cell->vertex(vertex_n)[0] - 0.41 / 4.0) < 1e-10)
-            cell->vertex(vertex_n)[0] = 0.1;
-        }
+                                                    shell_region_radius,
+                                                    box_radius);
 
     // Assign interior manifold ids to be the TFI id.
     for (const auto &cell : cylinder_tria.active_cell_iterators())
@@ -3923,7 +3909,9 @@ namespace GridGenerator
           if (!cell->face(face_n)->at_boundary())
             cell->face(face_n)->set_manifold_id(tfi_manifold_id);
       }
-    if (0.0 < shell_region_width)
+
+    // The shell region should have a radius that is larger than the radius of the cylinder
+    if (radius < shell_region_radius )
       {
         Assert(0 < n_shells,
                ExcMessage("If the shell region has positive width then "
@@ -3932,7 +3920,7 @@ namespace GridGenerator
         GridGenerator::concentric_hyper_shells(shell_tria,
                                                Point<2>(),
                                                radius,
-                                               radius + radius,
+                                                shell_region_radius,
                                                n_shells,
                                                skewness,
                                                8);
@@ -3950,7 +3938,6 @@ namespace GridGenerator
           shell_tria, cylinder_tria, temp, vertex_tolerance, true);
         cylinder_tria = std::move(temp);
       }
-    GridTools::shift(cylinder_triangulation_offset, cylinder_tria);
 
     // Compute the tolerance again, since the shells may be very close to
     // each-other:
@@ -3958,33 +3945,9 @@ namespace GridGenerator
       std::min(internal::minimal_vertex_distance(tria_without_cylinder),
                internal::minimal_vertex_distance(cylinder_tria)) /
       10;
+
     GridGenerator::merge_triangulations(
       tria_without_cylinder, cylinder_tria, tria, vertex_tolerance, true);
-
-    // Move the vertices in the middle of the faces of cylinder_tria slightly
-    // to give a better mesh quality. We have to balance the quality of these
-    // cells with the quality of the outer cells (initially rectangles). For
-    // constant radial distance, we would place them at the distance 0.1 *
-    // sqrt(2.) from the center. In case the shell region width is more than
-    // 0.1/6., we choose to place them at 0.1 * 4./3. from the center, which
-    // ensures that the shortest edge of the outer cells is 2./3. of the
-    // original length. If the shell region width is less, we make the edge
-    // length of the inner part and outer part (in the shorter x direction)
-    // the same.
-    {
-      const double shift =
-        std::min(0.125 + shell_region_width * 0.5, 0.1 * 4. / 3.);
-      for (const auto &cell : tria.active_cell_iterators())
-        for (const unsigned int v : GeometryInfo<2>::vertex_indices())
-          if (cell->vertex(v).distance(Point<2>(0.1, 0.205)) < 1e-10)
-            cell->vertex(v) = Point<2>(0.2 - shift, 0.205);
-          else if (cell->vertex(v).distance(Point<2>(0.3, 0.205)) < 1e-10)
-            cell->vertex(v) = Point<2>(0.2 + shift, 0.205);
-          else if (cell->vertex(v).distance(Point<2>(0.2, 0.1025)) < 1e-10)
-            cell->vertex(v) = Point<2>(0.2, 0.2 - shift);
-          else if (cell->vertex(v).distance(Point<2>(0.2, 0.3075)) < 1e-10)
-            cell->vertex(v) = Point<2>(0.2, 0.2 + shift);
-    }
 
     // Ensure that all manifold ids on a polar cell really are set to the
     // polar manifold id:
@@ -3999,32 +3962,8 @@ namespace GridGenerator
           cell->manifold_id() != tfi_manifold_id)
         cell->set_all_manifold_ids(numbers::flat_manifold_id);
 
-    // We need to calculate the current center so that we can move it later:
-    // to start get a unique list of (points to) vertices on the cylinder
-    std::vector<Point<2> *> cylinder_pointers;
-    for (const auto &face : tria.active_face_iterators())
-      if (face->manifold_id() == polar_manifold_id)
-        {
-          cylinder_pointers.push_back(&face->vertex(0));
-          cylinder_pointers.push_back(&face->vertex(1));
-        }
-    // de-duplicate
-    std::sort(cylinder_pointers.begin(), cylinder_pointers.end());
-    cylinder_pointers.erase(std::unique(cylinder_pointers.begin(),
-                                        cylinder_pointers.end()),
-                            cylinder_pointers.end());
-
-    // find the current center...
-    Point<2> center;
-    for (const Point<2> *const ptr : cylinder_pointers)
-      center += *ptr / double(cylinder_pointers.size());
-
-    // and recenter at (0.2, 0.2)
-    for (Point<2> *const ptr : cylinder_pointers)
-      *ptr += Point<2>(0.2, 0.2) - center;
-
     // attach manifolds
-    PolarManifold<2> polar_manifold(Point<2>(0.2, 0.2));
+    PolarManifold<2> polar_manifold(Point<2>(0., 0.));
     tria.set_manifold(polar_manifold_id, polar_manifold);
 
     tria.set_manifold(tfi_manifold_id, FlatManifold<2>());
@@ -4038,23 +3977,70 @@ namespace GridGenerator
           {
             const Point<2> center = face->center();
             // left side
-            if (std::abs(center[0] - 0.0) < 1e-10)
+            if (std::abs(center[0] - length_pre) < 1e-10)
               face->set_boundary_id(0);
             // right side
-            else if (std::abs(center[0] - 2.2) < 1e-10)
+            else if (std::abs(center[0] - length_post) < 1e-10)
               face->set_boundary_id(1);
             // cylinder boundary
             else if (face->manifold_id() == polar_manifold_id)
               face->set_boundary_id(2);
-            // sides of channel
+            // Top and bottom of channel
             else
               {
-                Assert(std::abs(center[1] - 0.00) < 1.0e-10 ||
-                         std::abs(center[1] - 0.41) < 1.0e-10,
-                       ExcInternalError());
                 face->set_boundary_id(3);
               }
           }
+  }
+
+  template <>
+  void
+  custom_channel_with_cylinder(Triangulation<3>  &tria,
+                        const unsigned int       half_height,
+                        const unsigned int       length_pre,
+                        const unsigned int       length_post,
+                        const double       depth,
+                         unsigned int  depth_division,
+                        const double       shell_region_radius,
+                        const unsigned int n_shells,
+                        const double       skewness,
+                        const bool         colorize) {
+
+    Triangulation<2> tria_2;
+    custom_channel_with_cylinder(tria_2,
+                      half_height,
+                      length_pre,
+                      length_post,
+                      depth,
+                      depth_division,
+                      shell_region_radius,
+                      n_shells,
+                      skewness,
+                      colorize);
+
+    // extrude to 3d
+    extrude_triangulation(tria_2, depth_division, depth, tria, true);
+
+    // set up the new 3d manifolds
+    const types::manifold_id      cylindrical_manifold_id = 0;
+    const types::manifold_id      tfi_manifold_id         = 1;
+    const PolarManifold<2> *const m_ptr =
+      dynamic_cast<const PolarManifold<2> *>(
+        &tria_2.get_manifold(cylindrical_manifold_id));
+    Assert(m_ptr != nullptr, ExcInternalError());
+    const Point<3>     axial_point(m_ptr->center[0], m_ptr->center[1], 0.0);
+    const Tensor<1, 3> direction{{0.0, 0.0, 1.0}};
+
+    tria.set_manifold(cylindrical_manifold_id, FlatManifold<3>());
+    tria.set_manifold(tfi_manifold_id, FlatManifold<3>());
+    const CylindricalManifold<3> cylindrical_manifold(direction, axial_point);
+    TransfiniteInterpolationManifold<3> inner_manifold;
+    inner_manifold.initialize(tria);
+    tria.set_manifold(cylindrical_manifold_id, cylindrical_manifold);
+    tria.set_manifold(tfi_manifold_id, inner_manifold);
+
+    // From extrude_triangulation: since the maximum boundary id of tria_2 was
+    // 4, the front boundary id is 4 and the back is 5. They remain unchanged.
   }
 
   template <int dim, int spacedim>
