@@ -3831,7 +3831,7 @@ namespace GridGenerator
 
   template <>
   void
-  custom_channel_with_cylinder(Triangulation<1>  &tria,
+  custom_channel_with_cylinder([[maybe_unused]] Triangulation<1>  &tria,
                         [[maybe_unused]] const unsigned int       half_height,
                         [[maybe_unused]] const unsigned int       length_pre,
                         [[maybe_unused]] const unsigned int       length_post,
