@@ -572,7 +572,7 @@ namespace GridGenerator
    * where the arguments were @length_pre=8, @length_post=16, @half_height=8 and the
    * default arguments are used for the number of shells and skewness:
    *
-   * @image html channel_with_cylinder_2d.png
+   * @image html custom_channel_with_cylinder.png
    *
    * The resulting Triangulation uses three manifolds: a PolarManifold (in 2d)
    * or CylindricalManifold (in 3d) with manifold id $0$, a
