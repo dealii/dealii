@@ -1156,7 +1156,7 @@ namespace Utilities
      *  communicator.
      */
     template <typename T>
-    std::vector<T>
+    [[nodiscard]] std::vector<T>
     all_gather(const MPI_Comm comm, const T &object_to_send);
 
     /**
@@ -1175,7 +1175,7 @@ namespace Utilities
      *  communicator. All other processes receive an empty vector.
      */
     template <typename T>
-    std::vector<T>
+    [[nodiscard]] std::vector<T>
     gather(const MPI_Comm     comm,
            const T           &object_to_send,
            const unsigned int root_process = 0);
@@ -1195,7 +1195,7 @@ namespace Utilities
      * @return Every process receives an object from the root_process.
      */
     template <typename T>
-    T
+    [[nodiscard]] T
     scatter(const MPI_Comm        comm,
             const std::vector<T> &objects_to_send,
             const unsigned int    root_process = 0);
@@ -1239,7 +1239,7 @@ namespace Utilities
      * `MPI_Bcast` and return the result.
      */
     template <typename T>
-    T
+    [[nodiscard]] T
     broadcast(const MPI_Comm     comm,
               const T           &object_to_send,
               const unsigned int root_process = 0);
@@ -1280,7 +1280,7 @@ namespace Utilities
      * single rank. On all other processes, the returned value is undefined.
      */
     template <typename T>
-    T
+    [[nodiscard]] T
     reduce(const T                                      &local_value,
            const MPI_Comm                                comm,
            const std::function<T(const T &, const T &)> &combiner,
@@ -1299,7 +1299,7 @@ namespace Utilities
      * by MPI.
      */
     template <typename T, typename = std::enable_if_t<is_mpi_type<T> == true>>
-    std::pair<T, T>
+    [[nodiscard]] std::pair<T, T>
     partial_and_total_sum(const T &value, const MPI_Comm comm);
 
 
@@ -1313,7 +1313,7 @@ namespace Utilities
      * can be handled.
      */
     template <typename T>
-    T
+    [[nodiscard]] T
     all_reduce(const T                                      &local_value,
                const MPI_Comm                                comm,
                const std::function<T(const T &, const T &)> &combiner);
