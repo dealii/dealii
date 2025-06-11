@@ -614,6 +614,10 @@ namespace GridGenerator
    * to the cylinder: see the mathematical definition given in
    * GridGenerator::concentric_hyper_shells.
    *
+   * @param use_transfinite_region If `true`, then a tranfinite manifold is used
+   * in the intermediary region between the cylindrical hypershell and the
+   * channel.
+   *
    * @param colorize If `true`, then assign different boundary ids to
    * different parts of the boundary. For more
    * information on boundary indicators see
@@ -637,7 +641,8 @@ namespace GridGenerator
                                const double        shell_region_radius = 0.75,
                                const unsigned int  n_shells            = 2,
                                const double        skewness            = 2.0,
-                               const bool          colorize            = false);
+                               const bool use_transfinite_region       = false,
+                               const bool colorize                     = false);
 
   /**
    * A general @p dim -dimensional cell (a segment if dim is 1, a quadrilateral
