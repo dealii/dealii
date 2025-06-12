@@ -45,7 +45,19 @@ namespace Utilities
   namespace MPI
   {
     /**
-     * Helper class to access values on non-matching grids.
+     * @brief Communicate values between a mesh and arbitrary points
+     *
+     * This class enables evaluation of finite element functions defined
+     * on a Triangulation at arbitrary points inside the mesh. The underlying
+     * finite element mesh can be distributed among processes, which makes
+     * the operations more involved due to communication.
+     *
+     * The following helper functions for this class exist:
+     * VectorTools::point_values, VectorTools::point_gradients (the
+     * overloads taking an instance of RemotePointEvaluation).     *
+     *
+     * @note Usage and implementation details of this class and the
+     *   helper functions above are explained in detail in step-87.
      *
      * @note The name of the fields are chosen with the method
      *   evaluate_and_process() in mind. Here, quantities are
