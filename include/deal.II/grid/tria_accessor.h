@@ -3703,7 +3703,7 @@ public:
    * refinement situation including possible refinement of the face's
    * children. This function may only be called for active cells in 2d and 3d.
    */
-  dealii::internal::SubfaceCase<dim>
+  internal::SubfaceCase<dim>
   subface_case(const unsigned int face_no) const;
 
   /**
@@ -7857,24 +7857,24 @@ CellAccessor<dim, spacedim>::flag_for_line_refinement(
 
 
 template <int dim, int spacedim>
-inline dealii::internal::SubfaceCase<dim>
+inline internal::SubfaceCase<dim>
 CellAccessor<dim, spacedim>::subface_case(const unsigned int face_no) const
 {
   Assert(is_active(), TriaAccessorExceptions::ExcCellNotActive());
   AssertIndexRange(face_no, this->n_faces());
 
   if constexpr (dim == 1)
-    return dealii::internal::SubfaceCase<1>::case_none;
+    return internal::SubfaceCase<1>::case_none;
   else if constexpr (dim == 2)
     return ((face(face_no)->has_children()) ?
-              dealii::internal::SubfaceCase<2>::case_x :
-              dealii::internal::SubfaceCase<2>::case_none);
+              internal::SubfaceCase<2>::case_x :
+              internal::SubfaceCase<2>::case_none);
   else if constexpr (dim == 3)
     {
       switch (static_cast<std::uint8_t>(face(face_no)->refinement_case()))
         {
           case RefinementCase<3>::no_refinement:
-            return dealii::internal::SubfaceCase<3>::case_none;
+            return internal::SubfaceCase<3>::case_none;
           case RefinementCase<3>::cut_x:
             if (face(face_no)->child(0)->has_children())
               {
@@ -7886,10 +7886,10 @@ CellAccessor<dim, spacedim>::subface_case(const unsigned int face_no) const
                     Assert(face(face_no)->child(1)->refinement_case() ==
                              RefinementCase<2>::cut_y,
                            ExcInternalError());
-                    return dealii::internal::SubfaceCase<3>::case_x1y2y;
+                    return internal::SubfaceCase<3>::case_x1y2y;
                   }
                 else
-                  return dealii::internal::SubfaceCase<3>::case_x1y;
+                  return internal::SubfaceCase<3>::case_x1y;
               }
             else
               {
@@ -7898,10 +7898,10 @@ CellAccessor<dim, spacedim>::subface_case(const unsigned int face_no) const
                     Assert(face(face_no)->child(1)->refinement_case() ==
                              RefinementCase<2>::cut_y,
                            ExcInternalError());
-                    return dealii::internal::SubfaceCase<3>::case_x2y;
+                    return internal::SubfaceCase<3>::case_x2y;
                   }
                 else
-                  return dealii::internal::SubfaceCase<3>::case_x;
+                  return internal::SubfaceCase<3>::case_x;
               }
           case RefinementCase<3>::cut_y:
             if (face(face_no)->child(0)->has_children())
@@ -7914,10 +7914,10 @@ CellAccessor<dim, spacedim>::subface_case(const unsigned int face_no) const
                     Assert(face(face_no)->child(1)->refinement_case() ==
                              RefinementCase<2>::cut_x,
                            ExcInternalError());
-                    return dealii::internal::SubfaceCase<3>::case_y1x2x;
+                    return internal::SubfaceCase<3>::case_y1x2x;
                   }
                 else
-                  return dealii::internal::SubfaceCase<3>::case_y1x;
+                  return internal::SubfaceCase<3>::case_y1x;
               }
             else
               {
@@ -7926,13 +7926,13 @@ CellAccessor<dim, spacedim>::subface_case(const unsigned int face_no) const
                     Assert(face(face_no)->child(1)->refinement_case() ==
                              RefinementCase<2>::cut_x,
                            ExcInternalError());
-                    return dealii::internal::SubfaceCase<3>::case_y2x;
+                    return internal::SubfaceCase<3>::case_y2x;
                   }
                 else
-                  return dealii::internal::SubfaceCase<3>::case_y;
+                  return internal::SubfaceCase<3>::case_y;
               }
           case RefinementCase<3>::cut_xy:
-            return dealii::internal::SubfaceCase<3>::case_xy;
+            return internal::SubfaceCase<3>::case_xy;
           default:
             DEAL_II_ASSERT_UNREACHABLE();
         }
@@ -7940,7 +7940,7 @@ CellAccessor<dim, spacedim>::subface_case(const unsigned int face_no) const
 
   // we should never get here
   DEAL_II_ASSERT_UNREACHABLE();
-  return dealii::internal::SubfaceCase<dim>::case_none;
+  return internal::SubfaceCase<dim>::case_none;
 }
 
 
