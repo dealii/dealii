@@ -2525,7 +2525,10 @@ CellAccessor<dim, spacedim>::neighbor_of_coarser_neighbor(
           // in the table provided by
           // GeometryInfo and try it
           const unsigned int face_no_guess =
-            GeometryInfo<2>::opposite_face[neighbor];
+            (this->reference_cell() == ReferenceCells::Triangle ||
+             neighbor_cell->reference_cell() == ReferenceCells::Triangle) ?
+              0 :
+              GeometryInfo<2>::opposite_face[neighbor];
 
           const TriaIterator<TriaAccessor<dim - 1, dim, spacedim>> face_guess =
             neighbor_cell->face(face_no_guess);
@@ -3019,26 +3022,22 @@ CellAccessor<dim, spacedim>::neighbor_child_on_subface(
     {
       case 2:
         {
-          if (this->reference_cell() == ReferenceCells::Triangle)
+          const auto neighbor = this->neighbor(face);
+          if (this->reference_cell() == ReferenceCells::Triangle ||
+              neighbor->reference_cell() == ReferenceCells::Triangle)
             {
               const unsigned int neighbor_neighbor =
                 this->neighbor_of_neighbor(face);
-              const auto neighbor = this->neighbor(face);
               // Triangles do not support anisotropic refinement
               Assert(neighbor->refinement_case() ==
                        RefinementCase<2>::isotropic_refinement,
                      ExcNotImplemented());
-              // Since we are looking at two faces at once, we need to check if
-              // they have the same or opposing orientations rather than one
-              // individual face orientation value.
-              const auto relative_orientation =
-                neighbor->combined_face_orientation(neighbor_neighbor) ==
-                    this->combined_face_orientation(face) ?
-                  numbers::default_geometric_orientation :
-                  numbers::reverse_line_orientation;
+
               const unsigned int neighbor_child_index =
                 neighbor->reference_cell().child_cell_on_face(
-                  neighbor_neighbor, subface, relative_orientation);
+                  neighbor_neighbor,
+                  subface,
+                  neighbor->combined_face_orientation(neighbor_neighbor));
               auto child = neighbor->child(neighbor_child_index);
               Assert(!child->has_children(), ExcInternalError());
               return child;
