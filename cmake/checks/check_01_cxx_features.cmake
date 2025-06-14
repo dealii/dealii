@@ -21,6 +21,8 @@
 #   DEAL_II_HAVE_CXX20
 #   DEAL_II_HAVE_CXX23
 #
+#   DEAL_II_BUILD_CXX20_MODULE
+#
 #   DEAL_II_HAVE_FP_EXCEPTIONS
 #   DEAL_II_HAVE_COMPLEX_OPERATOR_OVERLOADS
 #   DEAL_II_HAVE_CXX17_BESSEL_FUNCTIONS
@@ -389,6 +391,60 @@ if(NOT "${CMAKE_CXX_STANDARD}" STREQUAL "${_cxx_standard}")
     "version \"${_cxx_standard}\". Either unset the CMake variable "
     "CMAKE_CXX_STANDARD, or ensure that it is at most set to \"${_cxx_standard}\".\n\n"
     )
+endif()
+
+
+########################################################################
+#                                                                      #
+#                   Check whether we want to build C++20 modules:      #
+#                                                                      #
+########################################################################
+
+if (DEAL_II_BUILD_CXX20_MODULE)
+  # Empirically, we can build C++20 modules if
+  # - C++20 is enabled and supported
+  # - We have Clang 20 or later, or GCC 15 or later
+  # - We have CMake 3.28 or later
+  # - We use Ninja as the build system
+  # If so, say that we want to build modules.
+  if (DEAL_II_HAVE_CXX20
+      AND
+      ((${CMAKE_CXX_COMPILER_ID} STREQUAL "Clang"
+        AND
+        ${CMAKE_CXX_COMPILER_VERSION} VERSION_GREATER_EQUAL 20)
+       OR
+       (${CMAKE_CXX_COMPILER_ID} STREQUAL "GNU"
+        AND
+        ${CMAKE_CXX_COMPILER_VERSION} VERSION_GREATER_EQUAL 15))
+      AND
+      ${CMAKE_VERSION} VERSION_GREATER_EQUAL "3.28"
+      AND
+      ${CMAKE_GENERATOR} STREQUAL "Ninja")
+    message(STATUS "Enabling building a C++20 module")
+  else()
+    message(STATUS "Cannot build a C++20 module:")
+
+    if (NOT
+        ((${CMAKE_CXX_COMPILER_ID} STREQUAL "Clang"
+          AND
+          ${CMAKE_CXX_COMPILER_VERSION} VERSION_GREATER_EQUAL 20)
+        OR
+          (${CMAKE_CXX_COMPILER_ID} STREQUAL "GNU"
+          AND
+          ${CMAKE_CXX_COMPILER_VERSION} VERSION_GREATER_EQUAL 15)))
+      message(STATUS "  Reason: Compiler version is too old")
+    endif()
+    if (NOT
+        (${CMAKE_VERSION} VERSION_GREATER_EQUAL "3.28"))
+      message(STATUS "  Reason: CMake version is not at least 3.28")
+    endif()
+    if (NOT
+        (${CMAKE_GENERATOR} STREQUAL "Ninja"))
+      message(STATUS "  Reason: Only the Ninja generator can create C++20 modules")
+    endif()
+
+    message(FATAL_ERROR "You asked for a C++20 module, but this is not possible.")
+  endif()
 endif()
 
 
