@@ -3076,12 +3076,44 @@ namespace DoFTools
   } // namespace internal
 
 
+  namespace internal
+  {
+    template <int dim, int spacedim>
+    void check_if_fe_supports_hanging_nodes(const FiniteElement<dim,spacedim> &fe)
+    {
+      Assert(fe.constraints_are_implemented(),
+             ExcNotImplemented("This finite element does not support hanging node constraints!"));
+    }
+
+
+    template <int dim, int spacedim>
+    void check_if_fe_supports_hanging_nodes(const DoFHandler<dim,spacedim> &dof_handler)
+    {
+      check_if_fe_supports_hanging_nodes(dof_handler.get_fe());
+    }
+
+    template <int dim, int spacedim>
+    void check_if_fe_supports_hanging_nodes(const hp::DoFHandler<dim,spacedim> &dof_handler)
+    {
+      for (unsigned int idx = 0; idx < dof_handler.get_fe().size(); ++idx)
+        {
+          check_if_fe_supports_hanging_nodes(dof_handler.get_fe()[idx]);
+        }
+    }
+  }
+
 
   template <int dim, int spacedim, typename number>
   void
   make_hanging_node_constraints(const DoFHandler<dim, spacedim> &dof_handler,
                                 AffineConstraints<number>       &constraints)
   {
+#ifdef DEBUG
+    {
+      internal::check_if_fe_supports_hanging_nodes (dof_handler);
+    }
+#endif
+
     Assert(dof_handler.has_active_dofs(),
            ExcMessage(
              "The given DoFHandler does not have any DoFs. Did you forget to "
