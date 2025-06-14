@@ -1743,7 +1743,7 @@ public:
    */
 
   /**
-   * @name Access to shape functions
+   * @name Access to shape functions and their derivatives
    * @{
    */
 
@@ -1773,6 +1773,21 @@ public:
               const unsigned int interface_dof_index,
               const unsigned int q_point,
               const unsigned int component = 0) const;
+
+  /**
+   * Return component @p component of the gradient of the shape function
+   * with interface dof index @p interface_dof_index in
+   * quadrature point @p q_point.
+   *
+   * Similar to @p shape_value() , the argument @p here_or_there selects between
+   * the gradient on cell 0 (here, @p true) and cell 1 (there, @p false)
+   * at this quadrature point.
+   */
+  Tensor<1, spacedim>
+  shape_grad(const bool         here_or_there,
+             const unsigned int interface_dof_index,
+             const unsigned int q_point,
+             const unsigned int component = 0) const;
 
   /**
    * @}
@@ -2958,6 +2973,29 @@ FEInterfaceValues<dim, spacedim>::shape_value(
 }
 
 
+template <int dim, int spacedim>
+Tensor<1, spacedim>
+FEInterfaceValues<dim, spacedim>::shape_grad(
+  const bool         here_or_there,
+  const unsigned int interface_dof_index,
+  const unsigned int q_point,
+  const unsigned int component) const
+{
+  const auto dof_pair = dofmap[interface_dof_index];
+
+  Tensor<1, dim> value;
+
+  if (here_or_there && dof_pair[0] != numbers::invalid_unsigned_int)
+    value = get_fe_face_values(0).shape_grad_component(dof_pair[0],
+                                                       q_point,
+                                                       component);
+  if (!here_or_there && dof_pair[1] != numbers::invalid_unsigned_int)
+    value = get_fe_face_values(1).shape_grad_component(dof_pair[1],
+                                                       q_point,
+                                                       component);
+
+  return value;
+}
 
 template <int dim, int spacedim>
 double
