@@ -1,0 +1,3 @@
+Fixed: TriaAccessor::measure() now returns 1 for all `structdim == 0` objects.
+<br>
+(David Wells, 2025/06/25)
