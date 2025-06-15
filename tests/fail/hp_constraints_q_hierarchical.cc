@@ -14,7 +14,7 @@
 
 
 
-// check that computation of hp-constraints works for DGP_Monomial elements
+// check that computation of hp-constraints works for FE_Q_Hierarchical elements
 // correctly
 
 char logname[] = "output";
