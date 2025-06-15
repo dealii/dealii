@@ -1,0 +1,25 @@
+
+DEAL:04225:Chebyshev:cg::Starting value 21.8299
+DEAL:04225:Chebyshev:cg::Convergence step 28 value 3.57806e-11
+DEAL:04225:SGS:cg::Starting value 21.8299
+DEAL:04225:SGS:cg::Convergence step 33 value 6.80234e-13
+DEAL:04225:Measles::Error: 
+    You tried to select the smoother type <Measles>
+but this is not supported by our interface
+due to one of the following reasons:
+* This smoother does not exist
+* This smoother is not (yet) supported by our interface
+* This smoother is not (yet) supported by MueLu.
+
+DEAL:16641:Chebyshev:cg::Starting value 30.8770
+DEAL:16641:Chebyshev:cg::Convergence step 35 value 6.33864e-11
+DEAL:16641:SGS:cg::Starting value 30.8770
+DEAL:16641:SGS:cg::Convergence step 64 value 7.47061e-13
+DEAL:16641:Measles::Error: 
+    You tried to select the smoother type <Measles>
+but this is not supported by our interface
+due to one of the following reasons:
+* This smoother does not exist
+* This smoother is not (yet) supported by our interface
+* This smoother is not (yet) supported by MueLu.
+
