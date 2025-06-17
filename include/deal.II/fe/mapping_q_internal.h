@@ -2364,37 +2364,12 @@ namespace internal
                     data.output_data->inverse_jacobians[q].transpose();
                   const DerivativeForm<1, dim, spacedim> contravariant =
                     data.output_data->jacobians[q];
-
-                  for (unsigned int i = 0; i < spacedim; ++i)
-                    {
-                      double tmp1[dim][dim];
-                      for (unsigned int J = 0; J < dim; ++J)
-                        for (unsigned int K = 0; K < dim; ++K)
-                          {
-                            tmp1[J][K] =
-                              contravariant[i][0] * input[q][0][J][K];
-                            for (unsigned int I = 1; I < dim; ++I)
-                              tmp1[J][K] +=
-                                contravariant[i][I] * input[q][I][J][K];
-                          }
-                      for (unsigned int j = 0; j < spacedim; ++j)
-                        {
-                          double tmp2[dim];
-                          for (unsigned int K = 0; K < dim; ++K)
-                            {
-                              tmp2[K] = covariant[j][0] * tmp1[0][K];
-                              for (unsigned int J = 1; J < dim; ++J)
-                                tmp2[K] += covariant[j][J] * tmp1[J][K];
-                            }
-                          for (unsigned int k = 0; k < spacedim; ++k)
-                            {
-                              output[q][i][j][k] = covariant[k][0] * tmp2[0];
-                              for (unsigned int K = 1; K < dim; ++K)
-                                output[q][i][j][k] += covariant[k][K] * tmp2[K];
-                            }
-                        }
-                    }
+                  output[q] =
+                    internal::apply_contravariant_hessian(covariant,
+                                                          contravariant,
+                                                          input[q]);
                 }
+
               return;
             }
 

@@ -28,6 +28,18 @@ DEAL_II_NAMESPACE_OPEN
 namespace internal
 {
   /**
+   * Map the Hessian of a contravariant vector field. For more information see
+   * the overload of Mapping::transform() which maps 3-differential forms from
+   * the reference cell to the physical cell.
+   */
+  template <int dim, int spacedim, typename Number>
+  Tensor<3, spacedim, Number>
+  apply_contravariant_hessian(
+    const DerivativeForm<1, dim, spacedim, Number> &covariant,
+    const DerivativeForm<1, dim, spacedim, Number> &contravariant,
+    const Tensor<3, dim, Number>                   &input);
+
+  /**
    * Map the Hessian of a covariant vector field. For more information see the
    * overload of Mapping::transform() which maps 3-differential forms from the
    * reference cell to the physical cell.
@@ -41,6 +53,47 @@ namespace internal
 
 namespace internal
 {
+  template <int dim, int spacedim, typename Number>
+  inline Tensor<3, spacedim, Number>
+  apply_contravariant_hessian(
+    const DerivativeForm<1, dim, spacedim, Number> &covariant,
+    const DerivativeForm<1, dim, spacedim, Number> &contravariant,
+    const Tensor<3, dim, Number>                   &input)
+  {
+    Tensor<3, spacedim, Number> output;
+    for (unsigned int i = 0; i < spacedim; ++i)
+      {
+        Number tmp1[dim][dim];
+        for (unsigned int J = 0; J < dim; ++J)
+          for (unsigned int K = 0; K < dim; ++K)
+            {
+              tmp1[J][K] = contravariant[i][0] * input[0][J][K];
+              for (unsigned int I = 1; I < dim; ++I)
+                tmp1[J][K] += contravariant[i][I] * input[I][J][K];
+            }
+        for (unsigned int j = 0; j < spacedim; ++j)
+          {
+            Number tmp2[dim];
+            for (unsigned int K = 0; K < dim; ++K)
+              {
+                tmp2[K] = covariant[j][0] * tmp1[0][K];
+                for (unsigned int J = 1; J < dim; ++J)
+                  tmp2[K] += covariant[j][J] * tmp1[J][K];
+              }
+            for (unsigned int k = 0; k < spacedim; ++k)
+              {
+                output[i][j][k] = covariant[k][0] * tmp2[0];
+                for (unsigned int K = 1; K < dim; ++K)
+                  output[i][j][k] += covariant[k][K] * tmp2[K];
+              }
+          }
+      }
+
+    return output;
+  }
+
+
+
   template <int dim, int spacedim, typename Number>
   inline Tensor<3, spacedim, Number>
   apply_covariant_hessian(
