@@ -45,7 +45,11 @@ test_1d()
   query_bounding_boxes.emplace_back(std::make_pair(point_a, point_b));
   query_bounding_boxes.emplace_back(std::make_pair(point_c, point_d));
 
-  ArborXWrappers::BVH                           bvh(bounding_boxes);
+#if ARBORX_VERSION_MAJOR < 2
+  ArborXWrappers::BVH bvh(bounding_boxes);
+#else
+  ArborXWrappers::BVH<BoundingBox<1>> bvh(bounding_boxes);
+#endif
   ArborXWrappers::BoundingBoxIntersectPredicate bb_intersect(
     query_bounding_boxes);
   auto             indices_offset = bvh.query(bb_intersect);
@@ -115,7 +119,11 @@ test_2d()
   query_bounding_boxes.emplace_back(std::make_pair(point_a, point_b));
   query_bounding_boxes.emplace_back(std::make_pair(point_c, point_d));
 
-  ArborXWrappers::BVH                           bvh(bounding_boxes);
+#if ARBORX_VERSION_MAJOR < 2
+  ArborXWrappers::BVH bvh(bounding_boxes);
+#else
+  ArborXWrappers::BVH<BoundingBox<2>> bvh(bounding_boxes);
+#endif
   ArborXWrappers::BoundingBoxIntersectPredicate bb_intersect(
     query_bounding_boxes);
   auto             indices_offset = bvh.query(bb_intersect);
@@ -193,7 +201,11 @@ test_3d()
   query_bounding_boxes.emplace_back(std::make_pair(point_a, point_b));
   query_bounding_boxes.emplace_back(std::make_pair(point_c, point_d));
 
-  ArborXWrappers::BVH                           bvh(bounding_boxes);
+#if ARBORX_VERSION_MAJOR < 2
+  ArborXWrappers::BVH bvh(bounding_boxes);
+#else
+  ArborXWrappers::BVH<BoundingBox<3>> bvh(bounding_boxes);
+#endif
   ArborXWrappers::BoundingBoxIntersectPredicate bb_intersect(
     query_bounding_boxes);
   auto             indices_offset = bvh.query(bb_intersect);
