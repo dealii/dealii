@@ -23,7 +23,7 @@
 #include <deal.II/base/polynomial.h>
 #include <deal.II/base/polynomial_space.h>
 #include <deal.II/base/tensor.h>
-#include <deal.II/base/tensor_polynomials_base.h>
+#include <deal.II/base/polynomials_vector_anisotropic.h>
 #include <deal.II/base/tensor_product_polynomials.h>
 
 #include <mutex>
@@ -46,7 +46,7 @@ DEAL_II_NAMESPACE_OPEN
  * @ingroup Polynomials
  */
 template <int dim>
-class PolynomialsRaviartThomas : public TensorPolynomialsBase<dim>
+class PolynomialsRaviartThomas : public PolynomialsVectorAnisotropic<dim>
 {
 public:
   /**
@@ -80,19 +80,6 @@ public:
    * The size of the vectors must either be zero or equal <tt>n()</tt>. In
    * the first case, the function will not compute these values.
    */
-  void
-  evaluate(const Point<dim>            &unit_point,
-           std::vector<Tensor<1, dim>> &values,
-           std::vector<Tensor<2, dim>> &grads,
-           std::vector<Tensor<3, dim>> &grad_grads,
-           std::vector<Tensor<4, dim>> &third_derivatives,
-           std::vector<Tensor<5, dim>> &fourth_derivatives) const override;
-
-  /**
-   * Return the name of the space, which is <tt>PolynomialsRaviartThomas</tt>.
-   */
-  std::string
-  name() const override;
 
   /**
    * Return the number of polynomials in the space without requiring to
@@ -102,7 +89,7 @@ public:
   static unsigned int
   n_polynomials(const unsigned int normal_degree,
                 const unsigned int tangential_degree);
-
+                
   /**
    * Variant of the n_polynomials() function taking only a single argument
    * `degree`, assuming `degree + 1` in the normal direction and `degree` in
@@ -124,49 +111,6 @@ public:
    */
   virtual std::unique_ptr<TensorPolynomialsBase<dim>>
   clone() const override;
-
-  /**
-   * Compute the generalized support points in the ordering used by the
-   * polynomial shape functions. Note that these points are not support points
-   * in the classical sense as the Lagrange polynomials of the different
-   * components have different points, which need to be combined in terms of
-   * Piola transforms.
-   */
-  std::vector<Point<dim>>
-  get_polynomial_support_points() const;
-
-private:
-  /**
-   * The given degree in the normal direction.
-   */
-  const unsigned int normal_degree;
-
-  /**
-   * The given degree in the tangential direction.
-   */
-  const unsigned int tangential_degree;
-
-  /**
-   * An object representing the polynomial space for a single component. We
-   * can re-use it by rotating the coordinates of the evaluation point.
-   */
-  const AnisotropicPolynomials<dim> polynomial_space;
-
-  /**
-   * Renumbering from lexicographic to hierarchic order.
-   */
-  std::vector<unsigned int> lexicographic_to_hierarchic;
-
-  /**
-   * Renumbering from hierarchic to lexicographic order. Inverse of
-   * lexicographic_to_hierarchic.
-   */
-  std::vector<unsigned int> hierarchic_to_lexicographic;
-
-  /**
-   * Renumbering from shifted polynomial spaces to lexicographic one.
-   */
-  std::array<std::vector<unsigned int>, dim> renumber_aniso;
 };
 
 
