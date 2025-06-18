@@ -1454,74 +1454,66 @@ namespace GridGenerator
       if (tria.n_cells() != 3)
         AssertThrow(false, ExcNotImplemented());
 
-      double middle = (outer_radius - inner_radius) / 2e0 + inner_radius;
-      double eps    = 1e-3 * middle;
-      Triangulation<3>::cell_iterator cell = tria.begin();
+      const double middle_radius =
+        (outer_radius - inner_radius) / 2e0 + inner_radius;
+      const double eps = 1e-3 * middle_radius;
 
-      for (; cell != tria.end(); ++cell)
-        for (const unsigned int f : GeometryInfo<3>::face_indices())
+      for (const auto &cell : tria.cell_iterators())
+        for (const unsigned int f : cell->face_indices())
           {
-            if (!cell->face(f)->at_boundary())
+            const auto face = cell->face(f);
+            if (!face->at_boundary())
               continue;
 
-            double radius = cell->face(f)->center().norm() - center.norm();
-            if (std::fabs(cell->face(f)->center()[0]) <
-                eps) // x = 0 set boundary 2
+            const double face_center_radius =
+              (face->center(true) - center).norm();
+
+            if (std::fabs(face->center()[0]) < eps) // x = 0 set boundary 2
               {
-                cell->face(f)->set_boundary_id(2);
-                for (unsigned int j = 0; j < GeometryInfo<3>::lines_per_face;
-                     ++j)
-                  if (cell->face(f)->line(j)->at_boundary())
-                    if (std::fabs(cell->face(f)->line(j)->vertex(0).norm() -
-                                  cell->face(f)->line(j)->vertex(1).norm()) >
-                        eps)
-                      cell->face(f)->line(j)->set_boundary_id(2);
+                face->set_boundary_id(2);
+                for (const unsigned int line_no : face->line_indices())
+                  if (face->line(line_no)->at_boundary())
+                    if (std::fabs(face->line(line_no)->vertex(0).norm() -
+                                  face->line(line_no)->vertex(1).norm()) > eps)
+                      face->line(line_no)->set_boundary_id(2);
               }
-            else if (std::fabs(cell->face(f)->center()[1]) <
-                     eps) // y = 0 set boundary 3
+            else if (std::fabs(face->center()[1]) < eps) // y = 0 set boundary 3
               {
-                cell->face(f)->set_boundary_id(3);
-                for (unsigned int j = 0; j < GeometryInfo<3>::lines_per_face;
-                     ++j)
-                  if (cell->face(f)->line(j)->at_boundary())
-                    if (std::fabs(cell->face(f)->line(j)->vertex(0).norm() -
-                                  cell->face(f)->line(j)->vertex(1).norm()) >
-                        eps)
-                      cell->face(f)->line(j)->set_boundary_id(3);
+                face->set_boundary_id(3);
+                for (const unsigned int line_no : face->line_indices())
+                  if (face->line(line_no)->at_boundary())
+                    if (std::fabs(face->line(line_no)->vertex(0).norm() -
+                                  face->line(line_no)->vertex(1).norm()) > eps)
+                      face->line(line_no)->set_boundary_id(3);
               }
-            else if (std::fabs(cell->face(f)->center()[2]) <
-                     eps) // z = 0 set boundary 4
+            else if (std::fabs(face->center()[2]) < eps) // z = 0 set boundary 4
               {
-                cell->face(f)->set_boundary_id(4);
-                for (unsigned int j = 0; j < GeometryInfo<3>::lines_per_face;
-                     ++j)
-                  if (cell->face(f)->line(j)->at_boundary())
-                    if (std::fabs(cell->face(f)->line(j)->vertex(0).norm() -
-                                  cell->face(f)->line(j)->vertex(1).norm()) >
-                        eps)
-                      cell->face(f)->line(j)->set_boundary_id(4);
+                face->set_boundary_id(4);
+                for (const unsigned int line_no : face->line_indices())
+                  if (face->line(line_no)->at_boundary())
+                    if (std::fabs(face->line(line_no)->vertex(0).norm() -
+                                  face->line(line_no)->vertex(1).norm()) > eps)
+                      face->line(line_no)->set_boundary_id(4);
               }
-            else if (radius < middle) // inner radius set boundary 0
+            else if (face_center_radius <
+                     middle_radius) // inner radius set boundary 0
               {
-                cell->face(f)->set_boundary_id(0);
-                for (unsigned int j = 0; j < GeometryInfo<3>::lines_per_face;
-                     ++j)
-                  if (cell->face(f)->line(j)->at_boundary())
-                    if (std::fabs(cell->face(f)->line(j)->vertex(0).norm() -
-                                  cell->face(f)->line(j)->vertex(1).norm()) <
-                        eps)
-                      cell->face(f)->line(j)->set_boundary_id(0);
+                face->set_boundary_id(0);
+                for (const unsigned int line_no : face->line_indices())
+                  if (face->line(line_no)->at_boundary())
+                    if (std::fabs(face->line(line_no)->vertex(0).norm() -
+                                  face->line(line_no)->vertex(1).norm()) < eps)
+                      face->line(line_no)->set_boundary_id(0);
               }
-            else if (radius > middle) // outer radius set boundary 1
+            else if (face_center_radius >
+                     middle_radius) // outer radius set boundary 1
               {
-                cell->face(f)->set_boundary_id(1);
-                for (unsigned int j = 0; j < GeometryInfo<3>::lines_per_face;
-                     ++j)
-                  if (cell->face(f)->line(j)->at_boundary())
-                    if (std::fabs(cell->face(f)->line(j)->vertex(0).norm() -
-                                  cell->face(f)->line(j)->vertex(1).norm()) <
-                        eps)
-                      cell->face(f)->line(j)->set_boundary_id(1);
+                face->set_boundary_id(1);
+                for (const unsigned int line_no : face->line_indices())
+                  if (face->line(line_no)->at_boundary())
+                    if (std::fabs(face->line(line_no)->vertex(0).norm() -
+                                  face->line(line_no)->vertex(1).norm()) < eps)
+                      face->line(line_no)->set_boundary_id(1);
               }
             else
               DEAL_II_ASSERT_UNREACHABLE();
@@ -6408,11 +6400,11 @@ namespace GridGenerator
         AssertThrow(false, ExcNotImplemented());
       }
 
-    if (colorize)
-      colorize_quarter_hyper_shell(tria, center, inner_radius, outer_radius);
-
     tria.set_all_manifold_ids(0);
     tria.set_manifold(0, SphericalManifold<3>(center));
+
+    if (colorize)
+      colorize_quarter_hyper_shell(tria, center, inner_radius, outer_radius);
   }
 
 
