@@ -22,8 +22,8 @@
 #include <deal.II/base/point.h>
 #include <deal.II/base/polynomial.h>
 #include <deal.II/base/polynomial_space.h>
-#include <deal.II/base/tensor.h>
 #include <deal.II/base/polynomials_vector_anisotropic.h>
+#include <deal.II/base/tensor.h>
 #include <deal.II/base/tensor_product_polynomials.h>
 
 #include <mutex>
@@ -33,7 +33,7 @@
 DEAL_II_NAMESPACE_OPEN
 
 /**
- * This class implements the <i>H<sup>div</sup></i>-conforming, 
+ * This class implements the <i>H<sup>div</sup></i>-conforming,
  * Raviart-Thomas polynomials as described in the book by Brezzi and Fortin.
  * Most of the functionality comes from the vector-valued anisotropic
  * polynomials class .

@@ -30,8 +30,10 @@ template <int dim>
 PolynomialsRaviartThomas<dim>::PolynomialsRaviartThomas(
   const unsigned int normal_degree,
   const unsigned int tangential_degree)
-  : PolynomialsVectorAnisotropic<dim>(normal_degree, tangential_degree,
-                               get_lexicographic_numbering(normal_degree, tangential_degree))
+  : PolynomialsVectorAnisotropic<dim>(
+      normal_degree,
+      tangential_degree,
+      get_lexicographic_numbering(normal_degree, tangential_degree))
 {}
 
 
@@ -49,7 +51,8 @@ PolynomialsRaviartThomas<dim>::n_polynomials(
   const unsigned int normal_degree,
   const unsigned int tangential_degree)
 {
-  return PolynomialsVectorAnisotropic<dim>::n_polynomials(normal_degree, tangential_degree);
+  return PolynomialsVectorAnisotropic<dim>::n_polynomials(normal_degree,
+                                                          tangential_degree);
 }
 
 
