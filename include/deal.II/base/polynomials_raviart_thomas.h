@@ -33,8 +33,10 @@
 DEAL_II_NAMESPACE_OPEN
 
 /**
- * This class implements the <i>H<sup>div</sup></i>-conforming, vector-valued
+ * This class implements the <i>H<sup>div</sup></i>-conforming, 
  * Raviart-Thomas polynomials as described in the book by Brezzi and Fortin.
+ * Most of the functionality comes from the vector-valued anisotropic
+ * polynomials class .
  *
  * The Raviart-Thomas polynomials are constructed such that the divergence is
  * in the tensor product polynomial space <i>Q<sub>k</sub></i>. Therefore, the
@@ -74,14 +76,6 @@ public:
   PolynomialsRaviartThomas(const PolynomialsRaviartThomas &other) = default;
 
   /**
-   * Compute the value and derivatives of each Raviart-Thomas polynomial at
-   * @p unit_point.
-   *
-   * The size of the vectors must either be zero or equal <tt>n()</tt>. In
-   * the first case, the function will not compute these values.
-   */
-
-  /**
    * Return the number of polynomials in the space without requiring to
    * build an object of PolynomialsRaviartThomas. This is required by the
    * FiniteElement classes.
@@ -89,7 +83,7 @@ public:
   static unsigned int
   n_polynomials(const unsigned int normal_degree,
                 const unsigned int tangential_degree);
-                
+
   /**
    * Variant of the n_polynomials() function taking only a single argument
    * `degree`, assuming `degree + 1` in the normal direction and `degree` in
