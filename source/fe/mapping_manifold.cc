@@ -26,6 +26,7 @@
 #include <deal.II/fe/fe.h>
 #include <deal.II/fe/fe_tools.h>
 #include <deal.II/fe/fe_values.h>
+#include <deal.II/fe/mapping_internal.h>
 #include <deal.II/fe/mapping_manifold.h>
 
 #include <deal.II/grid/manifold.h>
@@ -1059,37 +1060,11 @@ namespace internal
                     "update_contravariant_transformation"));
 
                 for (unsigned int q = 0; q < output.size(); ++q)
-                  for (unsigned int i = 0; i < spacedim; ++i)
-                    {
-                      double tmp1[dim][dim];
-                      for (unsigned int J = 0; J < dim; ++J)
-                        for (unsigned int K = 0; K < dim; ++K)
-                          {
-                            tmp1[J][K] =
-                              data.contravariant[q][i][0] * input[q][0][J][K];
-                            for (unsigned int I = 1; I < dim; ++I)
-                              tmp1[J][K] +=
-                                data.contravariant[q][i][I] * input[q][I][J][K];
-                          }
-                      for (unsigned int j = 0; j < spacedim; ++j)
-                        {
-                          double tmp2[dim];
-                          for (unsigned int K = 0; K < dim; ++K)
-                            {
-                              tmp2[K] = data.covariant[q][j][0] * tmp1[0][K];
-                              for (unsigned int J = 1; J < dim; ++J)
-                                tmp2[K] += data.covariant[q][j][J] * tmp1[J][K];
-                            }
-                          for (unsigned int k = 0; k < spacedim; ++k)
-                            {
-                              output[q][i][j][k] =
-                                data.covariant[q][k][0] * tmp2[0];
-                              for (unsigned int K = 1; K < dim; ++K)
-                                output[q][i][j][k] +=
-                                  data.covariant[q][k][K] * tmp2[K];
-                            }
-                        }
-                    }
+                  output[q] =
+                    internal::apply_contravariant_hessian(data.covariant[q],
+                                                          data.contravariant[q],
+                                                          input[q]);
+
                 return;
               }
 
@@ -1101,37 +1076,9 @@ namespace internal
                     "update_covariant_transformation"));
 
                 for (unsigned int q = 0; q < output.size(); ++q)
-                  for (unsigned int i = 0; i < spacedim; ++i)
-                    {
-                      double tmp1[dim][dim];
-                      for (unsigned int J = 0; J < dim; ++J)
-                        for (unsigned int K = 0; K < dim; ++K)
-                          {
-                            tmp1[J][K] =
-                              data.covariant[q][i][0] * input[q][0][J][K];
-                            for (unsigned int I = 1; I < dim; ++I)
-                              tmp1[J][K] +=
-                                data.covariant[q][i][I] * input[q][I][J][K];
-                          }
-                      for (unsigned int j = 0; j < spacedim; ++j)
-                        {
-                          double tmp2[dim];
-                          for (unsigned int K = 0; K < dim; ++K)
-                            {
-                              tmp2[K] = data.covariant[q][j][0] * tmp1[0][K];
-                              for (unsigned int J = 1; J < dim; ++J)
-                                tmp2[K] += data.covariant[q][j][J] * tmp1[J][K];
-                            }
-                          for (unsigned int k = 0; k < spacedim; ++k)
-                            {
-                              output[q][i][j][k] =
-                                data.covariant[q][k][0] * tmp2[0];
-                              for (unsigned int K = 1; K < dim; ++K)
-                                output[q][i][j][k] +=
-                                  data.covariant[q][k][K] * tmp2[K];
-                            }
-                        }
-                    }
+                  output[q] =
+                    internal::apply_covariant_hessian(data.covariant[q],
+                                                      input[q]);
 
                 return;
               }
@@ -1152,39 +1099,11 @@ namespace internal
                     "update_volume_elements"));
 
                 for (unsigned int q = 0; q < output.size(); ++q)
-                  for (unsigned int i = 0; i < spacedim; ++i)
-                    {
-                      double factor[dim];
-                      for (unsigned int I = 0; I < dim; ++I)
-                        factor[I] =
-                          data.contravariant[q][i][I] / data.volume_elements[q];
-                      double tmp1[dim][dim];
-                      for (unsigned int J = 0; J < dim; ++J)
-                        for (unsigned int K = 0; K < dim; ++K)
-                          {
-                            tmp1[J][K] = factor[0] * input[q][0][J][K];
-                            for (unsigned int I = 1; I < dim; ++I)
-                              tmp1[J][K] += factor[I] * input[q][I][J][K];
-                          }
-                      for (unsigned int j = 0; j < spacedim; ++j)
-                        {
-                          double tmp2[dim];
-                          for (unsigned int K = 0; K < dim; ++K)
-                            {
-                              tmp2[K] = data.covariant[q][j][0] * tmp1[0][K];
-                              for (unsigned int J = 1; J < dim; ++J)
-                                tmp2[K] += data.covariant[q][j][J] * tmp1[J][K];
-                            }
-                          for (unsigned int k = 0; k < spacedim; ++k)
-                            {
-                              output[q][i][j][k] =
-                                data.covariant[q][k][0] * tmp2[0];
-                              for (unsigned int K = 1; K < dim; ++K)
-                                output[q][i][j][k] +=
-                                  data.covariant[q][k][K] * tmp2[K];
-                            }
-                        }
-                    }
+                  output[q] =
+                    internal::apply_piola_hessian(data.covariant[q],
+                                                  data.contravariant[q],
+                                                  data.volume_elements[q],
+                                                  input[q]);
 
                 return;
               }
