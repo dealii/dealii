@@ -24,6 +24,7 @@ for (S : REAL_SCALARS; dim : SPACE_DIMENSIONS)
     template class VectorFunctionFromScalarFunctionObject<dim, S>;
     template class FunctionFromFunctionObjects<dim, S>;
     template class VectorFunctionFromTensorFunction<dim, S>;
+    template class VectorFunctionFromTensorFunctionObject<dim, S>;
   }
 
 for (S : COMPLEX_SCALARS; dim : SPACE_DIMENSIONS)
@@ -37,4 +38,5 @@ for (S : COMPLEX_SCALARS; dim : SPACE_DIMENSIONS)
     template class VectorFunctionFromScalarFunctionObject<dim, S>;
     template class FunctionFromFunctionObjects<dim, S>;
     template class VectorFunctionFromTensorFunction<dim, S>;
+    template class VectorFunctionFromTensorFunctionObject<dim, S>;
   }
