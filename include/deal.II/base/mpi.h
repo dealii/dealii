@@ -419,7 +419,7 @@ namespace Utilities
      * An object that acts like a
      * [std::future](https://en.cppreference.com/w/cpp/thread/future)
      * object except that it does not encode the operation of waiting
-     * for an operation to finish that may be happening on a different
+     * for an operation to finish what may be happening on a different
      * thread, but for an "immediate" MPI operation such as
      * `MPI_Isend` or `MPI_Irecv`. An object of this kind is returned,
      * for example, by the isend() and irecv() functions in this
@@ -486,6 +486,34 @@ namespace Utilities
 
       /**
        * Destructor.
+       *
+       * If the current object has not been the right hand side of a move
+       * operation, and if get() has not been called on the current object,
+       * then the destructor blocks until the operation is completed so that
+       * the clean-up operations can be performed. As a consequence, if you
+       * write code such as
+       * @code
+       *   Utilities::MPI::isend(data, mpi_communicator, receiver, tag);
+       * @endcode
+       * where you do not capture the isend() functions' returned object,
+       * then the destructor of the returned object will run immediately at the
+       * end of executing this line, and this implies waiting for the isend()
+       * function's operations to finish -- in other words, you are turning
+       * the "immediate send" into a "waiting send" where the line only
+       * terminates once the data has been sent and the send buffer is no
+       * longer needed. (Note, however, that that is not the same as MPI's
+       * concept of a "synchronous send" in which the function only returns
+       * once the data has been *received*.)
+       *
+       * Of course, the same happens if you write
+       * @code
+       * {
+       *   Utilities::MPI::Future<void> future
+       *     = Utilities::MPI::isend(data, mpi_communicator, receiver, tag);
+       * }
+       * @endcode
+       * where you do capture the returned object, but the destructor is run
+       * at the closing brace -- also immediately after returning from isend().
        */
       ~Future();
 
