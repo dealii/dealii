@@ -1445,7 +1445,12 @@ ParameterHandler::print_parameters(std::ostream     &out,
       boost::property_tree::ptree single_node_tree;
       single_node_tree.add_child("ParameterHandler", current_entries);
 
-      write_xml(out, single_node_tree);
+      // set indentation character and indentation length
+      boost::property_tree::xml_writer_settings<
+        boost::property_tree::ptree::key_type>
+        settings(' ', 2);
+
+      write_xml(out, single_node_tree, settings);
       return out;
     }
 
