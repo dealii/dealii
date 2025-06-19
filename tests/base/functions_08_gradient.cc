@@ -13,7 +13,7 @@
 // ------------------------------------------------------------------------
 
 
-// Test VectorFunctionTensorFunction gradient
+// Test VectorFunctionFromTensorFunction gradient
 
 #include <deal.II/base/function.h>
 #include <deal.II/base/tensor_function.h>
