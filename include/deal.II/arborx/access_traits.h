@@ -312,21 +312,30 @@ namespace ArborXWrappers
     {
       template <int dim, typename Number>
       ArborX::Point<dim, Number>
-      operator()(const ArborX::PairValueIndex<dealii::Point<dim, Number>,
-                                              unsigned int> &pair) const
+      to_arborx_point(const dealii::Point<dim, Number> &p) const
       {
         if constexpr (dim == 1)
           {
-            return {pair.value[0]};
+            return {p[0]};
           }
+
         if constexpr (dim == 2)
           {
-            return {pair.value[0], pair.value[1]};
+            return {p[0], p[1]};
           }
+
         if constexpr (dim == 3)
           {
-            return {pair.value[0], pair.value[1], pair.value[2]};
+            return {p[0], p[1], p[2]};
           }
+      }
+
+      template <int dim, typename Number>
+      ArborX::Point<dim, Number>
+      operator()(const ArborX::PairValueIndex<dealii::Point<dim, Number>,
+                                              unsigned int> &pair) const
+      {
+        return to_arborx_point(pair.value);
       }
 
 
@@ -339,20 +348,7 @@ namespace ArborXWrappers
         const auto boundary_points = pair.value.get_boundary_points();
         const dealii::Point<dim, Number> min_corner = boundary_points.first;
         const dealii::Point<dim, Number> max_corner = boundary_points.second;
-        if constexpr (dim == 1)
-          {
-            return {{min_corner[0]}, {max_corner[0]}};
-          }
-        if constexpr (dim == 2)
-          {
-            return {{min_corner[0], min_corner[1]},
-                    {max_corner[0], max_corner[1]}};
-          }
-        if constexpr (dim == 3)
-          {
-            return {{min_corner[0], min_corner[1], min_corner[2]},
-                    {max_corner[0], max_corner[1], max_corner[2]}};
-          }
+        return {to_arborx_point(min_corner), to_arborx_point(max_corner)};
       }
 
 
@@ -363,22 +359,7 @@ namespace ArborXWrappers
                  std::pair<dealii::Point<dim, Number>, Number>,
                  unsigned int> &pair) const
       {
-        if constexpr (dim == 1)
-          {
-            return {{pair.value.first[0]}, pair.value.second};
-          }
-        if constexpr (dim == 2)
-          {
-            return {{pair.value.first[0], pair.value.first[1]},
-                    pair.value.second};
-          }
-        if constexpr (dim == 3)
-          {
-            return {{pair.value.first[0],
-                     pair.value.first[1],
-                     pair.value.first[2]},
-                    pair.value.second};
-          }
+        return {to_arborx_point(pair.value.first), pair.value.second};
       }
     };
 
