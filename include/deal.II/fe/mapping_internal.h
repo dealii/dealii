@@ -28,6 +28,17 @@ DEAL_II_NAMESPACE_OPEN
 namespace internal
 {
   /**
+   * Map the gradient of a covariant vector field. For more information see the
+   * overload of Mapping::transform() which maps 2-differential forms from the
+   * reference cell to the physical cell.
+   */
+  template <int dim, int spacedim, typename Number>
+  Tensor<3, spacedim, Number>
+  apply_covariant_gradient(
+    const DerivativeForm<1, dim, spacedim, Number> &covariant,
+    const DerivativeForm<2, dim, spacedim, Number> &input);
+
+  /**
    * Map the Hessian of a contravariant vector field. For more information see
    * the overload of Mapping::transform() which maps 3-differential forms from
    * the reference cell to the physical cell.
@@ -66,6 +77,36 @@ namespace internal
 
 namespace internal
 {
+  template <int dim, int spacedim, typename Number>
+  Tensor<3, spacedim, Number>
+  apply_covariant_gradient(
+    const DerivativeForm<1, dim, spacedim, Number> &covariant,
+    const DerivativeForm<2, dim, spacedim, Number> &input)
+  {
+    Tensor<3, spacedim, Number> output;
+    for (unsigned int i = 0; i < spacedim; ++i)
+      for (unsigned int j = 0; j < spacedim; ++j)
+        {
+          double tmp[dim];
+          for (unsigned int K = 0; K < dim; ++K)
+            {
+              tmp[K] = covariant[j][0] * input[i][0][K];
+              for (unsigned int J = 1; J < dim; ++J)
+                tmp[K] += covariant[j][J] * input[i][J][K];
+            }
+          for (unsigned int k = 0; k < spacedim; ++k)
+            {
+              output[i][j][k] = covariant[k][0] * tmp[0];
+              for (unsigned int K = 1; K < dim; ++K)
+                output[i][j][k] += covariant[k][K] * tmp[K];
+            }
+        }
+
+    return output;
+  }
+
+
+
   template <int dim, int spacedim, typename Number>
   inline Tensor<3, spacedim, Number>
   apply_contravariant_hessian(
