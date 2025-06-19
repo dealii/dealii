@@ -6309,28 +6309,30 @@ namespace GridGenerator
                               cells,
                               SubCellData()); // no boundary information
 
+    tria.set_all_manifold_ids(0);
+    tria.set_manifold(0, SphericalManifold<3>(center));
+
     if (colorize)
       {
-        // We want to use a standard boundary description where
-        // the boundary is not curved. Hence set boundary id 2 to
+        // We want to use a flat boundary description where
+        // the boundary is not curved. Hence set boundary id 2
         // to all faces in a first step.
-        Triangulation<3>::cell_iterator cell = tria.begin();
-        for (; cell != tria.end(); ++cell)
-          for (const unsigned int i : GeometryInfo<3>::face_indices())
-            if (cell->at_boundary(i))
-              cell->face(i)->set_all_boundary_ids(2);
+        for (const auto &cell : tria.cell_iterators())
+          for (const unsigned int f : cell->face_indices())
+            if (cell->at_boundary(f))
+              cell->face(f)->set_all_boundary_ids(2);
 
         // Next look for the curved boundaries. If the x value of the
         // center of the face is not equal to center(0), we're on a curved
         // boundary. Then decide whether the center is nearer to the inner
         // or outer boundary to set the correct boundary id.
-        for (cell = tria.begin(); cell != tria.end(); ++cell)
-          for (const unsigned int i : GeometryInfo<3>::face_indices())
-            if (cell->at_boundary(i))
+        for (const auto &cell : tria.cell_iterators())
+          for (const unsigned int f : cell->face_indices())
+            if (cell->at_boundary(f))
               {
-                const Triangulation<3>::face_iterator face = cell->face(i);
+                const Triangulation<3>::face_iterator face = cell->face(f);
+                const Point<3> face_center(face->center(true));
 
-                const Point<3> face_center(face->center());
                 if (std::abs(face_center[0] - center[0]) >
                     1.e-6 * face_center.norm())
                   {
@@ -6342,8 +6344,6 @@ namespace GridGenerator
                   }
               }
       }
-    tria.set_all_manifold_ids(0);
-    tria.set_manifold(0, SphericalManifold<3>(center));
   }
 
 
