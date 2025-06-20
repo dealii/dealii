@@ -1,0 +1,19 @@
+
+DEAL::Quadrilateral: 
+DEAL::Simple polygon: true
+DEAL::Counterclockwise oriented polygon: true
+DEAL::deal vertices: 4, cgal vertices 4
+DEAL::deal measure: 1.00000, cgal measure: 1.00000
+DEAL::Polygon vertex 0: 0.00000 0.00000
+DEAL::Polygon vertex 1: 1.00000 0.00000
+DEAL::Polygon vertex 2: 1.00000 1.00000
+DEAL::Polygon vertex 3: 0.00000 1.00000
+DEAL::
+DEAL::Triangle: 
+DEAL::Simple polygon: true
+DEAL::Counterclockwise oriented polygon: true
+DEAL::deal vertices: 3, cgal vertices 3
+DEAL::deal measure: 0.500000, cgal measure: 0.500000
+DEAL::Polygon vertex 0: 0.00000 0.00000
+DEAL::Polygon vertex 1: 1.00000 0.00000
+DEAL::Polygon vertex 2: 0.00000 1.00000
