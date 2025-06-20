@@ -14,7 +14,7 @@
 
 
 #include <deal.II/base/polynomial.h>
-#include <deal.II/base/polynomials_raviart_thomas.h>
+#include <deal.II/base/polynomials_vector_anisotropic.h>
 #include <deal.II/base/qprojector.h>
 #include <deal.II/base/quadrature_lib.h>
 
@@ -67,24 +67,30 @@ namespace
 template <int dim>
 FE_RaviartThomasNodal<dim>::FE_RaviartThomasNodal(const unsigned int degree)
   : FE_PolyTensor<dim>(
-      PolynomialsRaviartThomas<dim>(degree + 1, degree),
+      PolynomialsVectorAnisotropic<dim>(degree + 1,
+                                        degree,
+                                        get_lexicographic_numbering(degree + 1,
+                                                                    degree)),
       FiniteElementData<dim>(get_rt_dpo_vector(dim, degree),
                              dim,
                              degree + 1,
                              FiniteElementData<dim>::Hdiv),
       std::vector<bool>(1, false),
       std::vector<ComponentMask>(
-        PolynomialsRaviartThomas<dim>::n_polynomials(degree + 1, degree),
+        PolynomialsVectorAnisotropic<dim>::n_polynomials(degree + 1, degree),
         ComponentMask(std::vector<bool>(dim, true))))
 {
   Assert(dim >= 2, ExcImpossibleInDim(dim));
 
   this->mapping_kind = {mapping_raviart_thomas};
 
+  const std::vector<unsigned int> numbering =
+    get_lexicographic_numbering(degree + 1, degree);
+
   // First, initialize the generalized support points and quadrature weights,
   // since they are required for interpolation.
   this->generalized_support_points =
-    PolynomialsRaviartThomas<dim>(degree + 1, degree)
+    PolynomialsVectorAnisotropic<dim>(degree + 1, degree, numbering)
       .get_polynomial_support_points();
   AssertDimension(this->generalized_support_points.size(),
                   this->n_dofs_per_cell());
@@ -232,6 +238,71 @@ FE_RaviartThomasNodal<dim>::has_support_on_face(
 
   // In all other cases, return true, which is safe
   return true;
+}
+
+
+
+template <int dim>
+std::vector<unsigned int>
+FE_RaviartThomasNodal<dim>::get_lexicographic_numbering(
+  const unsigned int normal_degree,
+  const unsigned int tangential_degree) const
+{
+  const unsigned int n_dofs_face =
+    Utilities::pow(tangential_degree + 1, dim - 1);
+  std::vector<unsigned int> lexicographic_numbering;
+  // component 1
+  for (unsigned int j = 0; j < n_dofs_face; ++j)
+    {
+      lexicographic_numbering.push_back(j);
+      if (normal_degree > 1)
+        for (unsigned int i = n_dofs_face * 2 * dim;
+             i < n_dofs_face * 2 * dim + normal_degree - 1;
+             ++i)
+          lexicographic_numbering.push_back(i + j * (normal_degree - 1));
+      lexicographic_numbering.push_back(n_dofs_face + j);
+    }
+
+  // component 2
+  unsigned int layers = (dim == 3) ? tangential_degree + 1 : 1;
+  for (unsigned int k = 0; k < layers; ++k)
+    {
+      unsigned int k_add = k * (tangential_degree + 1);
+      for (unsigned int j = n_dofs_face * 2;
+           j < n_dofs_face * 2 + tangential_degree + 1;
+           ++j)
+        lexicographic_numbering.push_back(j + k_add);
+
+      if (normal_degree > 1)
+        for (unsigned int i = n_dofs_face * (2 * dim + (normal_degree - 1));
+             i < n_dofs_face * (2 * dim + (normal_degree - 1)) +
+                   (normal_degree - 1) * (tangential_degree + 1);
+             ++i)
+          {
+            lexicographic_numbering.push_back(i + k_add * tangential_degree);
+          }
+      for (unsigned int j = n_dofs_face * 3;
+           j < n_dofs_face * 3 + tangential_degree + 1;
+           ++j)
+        lexicographic_numbering.push_back(j + k_add);
+    }
+
+  // component 3
+  if (dim == 3)
+    {
+      for (unsigned int i = 4 * n_dofs_face; i < 5 * n_dofs_face; ++i)
+        lexicographic_numbering.push_back(i);
+      if (normal_degree > 1)
+        for (unsigned int i =
+               6 * n_dofs_face + n_dofs_face * 2 * (normal_degree - 1);
+             i < 6 * n_dofs_face + n_dofs_face * 3 * (normal_degree - 1);
+             ++i)
+          lexicographic_numbering.push_back(i);
+      for (unsigned int i = 5 * n_dofs_face; i < 6 * n_dofs_face; ++i)
+        lexicographic_numbering.push_back(i);
+    }
+
+  return lexicographic_numbering;
 }
 
 
