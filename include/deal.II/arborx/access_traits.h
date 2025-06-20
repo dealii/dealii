@@ -304,32 +304,32 @@ namespace ArborXWrappers
 #  else
   namespace internal
   {
+    template <int dim, typename Number>
+    ArborX::Point<dim, Number>
+    to_arborx_point(const dealii::Point<dim, Number> &p)
+    {
+      if constexpr (dim == 1)
+        {
+          return {p[0]};
+        }
+
+      if constexpr (dim == 2)
+        {
+          return {p[0], p[1]};
+        }
+
+      if constexpr (dim == 3)
+        {
+          return {p[0], p[1], p[2]};
+        }
+    }
+
     /**
      * This structure returns the ArborX object associated with the deal.II
      * object stored in a PairValueIndex.
      */
     struct IndexableGetter
     {
-      template <int dim, typename Number>
-      ArborX::Point<dim, Number>
-      to_arborx_point(const dealii::Point<dim, Number> &p) const
-      {
-        if constexpr (dim == 1)
-          {
-            return {p[0]};
-          }
-
-        if constexpr (dim == 2)
-          {
-            return {p[0], p[1]};
-          }
-
-        if constexpr (dim == 3)
-          {
-            return {p[0], p[1], p[2]};
-          }
-      }
-
       template <int dim, typename Number>
       ArborX::Point<dim, Number>
       operator()(const ArborX::PairValueIndex<dealii::Point<dim, Number>,
@@ -1272,20 +1272,8 @@ namespace ArborX
                    &pt_intersect,
         std::size_t i)
   {
-    const auto dealii_point = pt_intersect.get(i);
-    if constexpr (dim == 1)
-      {
-        return intersects(Point{dealii_point[0]});
-      }
-    if constexpr (dim == 2)
-      {
-        return intersects(Point{dealii_point[0], dealii_point[1]});
-      }
-    if constexpr (dim == 3)
-      {
-        return intersects(
-          Point{dealii_point[0], dealii_point[1], dealii_point[2]});
-      }
+    return intersects(
+      dealii::ArborXWrappers::internal::to_arborx_point(pt_intersect.get(i)));
   }
 
 
@@ -1308,22 +1296,9 @@ namespace ArborX
                &pt_nearest,
     std::size_t i)
   {
-    const auto dealii_point = pt_nearest.get(i);
-    if constexpr (dim == 1)
-      {
-        return nearest(Point{dealii_point[0]},
-                       pt_nearest.get_n_nearest_neighbors());
-      }
-    if constexpr (dim == 2)
-      {
-        return nearest(Point{dealii_point[0], dealii_point[1]},
-                       pt_nearest.get_n_nearest_neighbors());
-      }
-    if constexpr (dim == 3)
-      {
-        return nearest(Point{dealii_point[0], dealii_point[1], dealii_point[2]},
-                       pt_nearest.get_n_nearest_neighbors());
-      }
+    return nearest(dealii::ArborXWrappers::internal::to_arborx_point(
+                     pt_nearest.get(i)),
+                   pt_nearest.get_n_nearest_neighbors());
   }
 
 
@@ -1353,20 +1328,9 @@ namespace ArborX
     const dealii::Point<dim, Number> min_corner = boundary_points.first;
     const dealii::Point<dim, Number> max_corner = boundary_points.second;
 
-    if constexpr (dim == 1)
-      {
-        return intersects(Box{{min_corner[0]}, {max_corner[0]}});
-      }
-    if constexpr (dim == 2)
-      {
-        return intersects(
-          Box{{min_corner[0], min_corner[1]}, {max_corner[0], max_corner[1]}});
-      }
-    if constexpr (dim == 3)
-      {
-        return intersects(Box{{min_corner[0], min_corner[1], min_corner[2]},
-                              {max_corner[0], max_corner[1], max_corner[2]}});
-      }
+    return intersects(
+      Box{dealii::ArborXWrappers::internal::to_arborx_point(min_corner),
+          dealii::ArborXWrappers::internal::to_arborx_point(max_corner)});
   }
 
 
@@ -1395,23 +1359,10 @@ namespace ArborX
     const dealii::Point<dim, Number> min_corner = boundary_points.first;
     const dealii::Point<dim, Number> max_corner = boundary_points.second;
 
-    if constexpr (dim == 1)
-      {
-        return nearest(Box{{min_corner[0]}, {max_corner[0]}},
-                       bb_nearest.get_n_nearest_neighbors());
-      }
-    if constexpr (dim == 2)
-      {
-        return nearest(Box{{min_corner[0], min_corner[1]},
-                           {max_corner[0], max_corner[1]}},
-                       bb_nearest.get_n_nearest_neighbors());
-      }
-    if constexpr (dim == 3)
-      {
-        return nearest(Box{{min_corner[0], min_corner[1], min_corner[2]},
-                           {max_corner[0], max_corner[1], max_corner[2]}},
-                       bb_nearest.get_n_nearest_neighbors());
-      }
+    return nearest(
+      Box{dealii::ArborXWrappers::internal::to_arborx_point(min_corner),
+          dealii::ArborXWrappers::internal::to_arborx_point(max_corner)},
+      bb_nearest.get_n_nearest_neighbors());
   }
 
 
@@ -1435,21 +1386,9 @@ namespace ArborX
         std::size_t i)
   {
     const auto sphere = sph_intersect.get(i);
-    if constexpr (dim == 1)
-      {
-        return intersects(Sphere{{sphere.first[0]}, sphere.second});
-      }
-    if constexpr (dim == 2)
-      {
-        return intersects(
-          Sphere{{sphere.first[0], sphere.first[1]}, sphere.second});
-      }
-    if constexpr (dim == 3)
-      {
-        return intersects(
-          Sphere{{sphere.first[0], sphere.first[1], sphere.first[2]},
-                 sphere.second});
-      }
+    return intersects(
+      Sphere{dealii::ArborXWrappers::internal::to_arborx_point(sphere.first),
+             sphere.second});
   }
 
 
@@ -1473,24 +1412,10 @@ namespace ArborX
         std::size_t i)
   {
     const auto sphere = sph_nearest.get(i);
-    if constexpr (dim == 1)
-      {
-        return nearest(Sphere{{sphere.first[0]}, sphere.second},
-                       sph_nearest.get_n_nearest_neighbors());
-      }
-    if constexpr (dim == 2)
-      {
-        return nearest(Sphere{{sphere.first[0], sphere.first[1]},
-                              sphere.second},
-                       sph_nearest.get_n_nearest_neighbors());
-      }
-    if constexpr (dim == 3)
-      {
-        return nearest(
-          Sphere{{sphere.first[0], sphere.first[1], sphere.first[2]},
-                 sphere.second},
-          sph_nearest.get_n_nearest_neighbors());
-      }
+    return nearest(Sphere{dealii::ArborXWrappers::internal::to_arborx_point(
+                            sphere.first),
+                          sphere.second},
+                   sph_nearest.get_n_nearest_neighbors());
   }
 #  endif
 } // namespace ArborX
