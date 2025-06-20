@@ -749,7 +749,16 @@ namespace ArborX
    * This struct allows ArborX to use std::vector<T> as primitive.
    */
   template <typename T>
-  struct AccessTraits<std::vector<T>>
+  struct AccessTraits<
+    std::vector<T>,
+    std::enable_if_t<
+      std::is_same_v<T, dealii::Point<T::dimension, float>> ||
+      std::is_same_v<T, dealii::Point<T::dimension, double>> ||
+      std::is_same_v<T, dealii::BoundingBox<T::dimension, float>> ||
+      std::is_same_v<T, dealii::BoundingBox<T::dimension, double>> ||
+      std::is_same_v<T, std::pair<dealii::Point<T::dimension, float>, float>> ||
+      std::is_same_v<T,
+                     std::pair<dealii::Point<T::dimension, double>, double>>>>
   {
     using memory_space = Kokkos::HostSpace;
 

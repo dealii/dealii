@@ -504,7 +504,17 @@ namespace ArborX
 #  else
   template <typename T>
   std::size_t
-  AccessTraits<std::vector<T>>::size(const std::vector<T> &v)
+  AccessTraits<
+    std::vector<T>,
+    std::enable_if_t<
+      std::is_same_v<T, dealii::Point<T::dimension, float>> ||
+      std::is_same_v<T, dealii::Point<T::dimension, double>> ||
+      std::is_same_v<T, dealii::BoundingBox<T::dimension, float>> ||
+      std::is_same_v<T, dealii::BoundingBox<T::dimension, double>> ||
+      std::is_same_v<T, std::pair<dealii::Point<T::dimension, float>, float>> ||
+      std::is_same_v<T,
+                     std::pair<dealii::Point<T::dimension, double>, double>>>>::
+    size(const std::vector<T> &v)
   {
     return v.size();
   }
@@ -513,7 +523,17 @@ namespace ArborX
 
   template <typename T>
   T
-  AccessTraits<std::vector<T>>::get(const std::vector<T> &v, std::size_t i)
+  AccessTraits<
+    std::vector<T>,
+    std::enable_if_t<
+      std::is_same_v<T, dealii::Point<T::dimension, float>> ||
+      std::is_same_v<T, dealii::Point<T::dimension, double>> ||
+      std::is_same_v<T, dealii::BoundingBox<T::dimension, float>> ||
+      std::is_same_v<T, dealii::BoundingBox<T::dimension, double>> ||
+      std::is_same_v<T, std::pair<dealii::Point<T::dimension, float>, float>> ||
+      std::is_same_v<T,
+                     std::pair<dealii::Point<T::dimension, double>, double>>>>::
+    get(const std::vector<T> &v, std::size_t i)
   {
     return v[i];
   }
