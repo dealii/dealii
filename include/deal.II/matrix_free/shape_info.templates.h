@@ -270,7 +270,7 @@ namespace internal
 
           lexicographic_numbering =
             PolynomialsRaviartThomas<dim>::get_lexicographic_numbering(
-              fe_in.degree, fe_in.degree - 1);
+              fe_in.degree - 1);
 
           // To get the right shape_values of the RT element
           std::vector<unsigned int> lex_normal, lex_tangent;
