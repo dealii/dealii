@@ -145,6 +145,14 @@ public:
   clone() const override;
 
   /**
+   * Compute the lexicographic to hierarchic numbering underlying this class,
+   * necessary for the creation of the respective vector polynomial space.
+   */
+  std::vector<unsigned int>
+  get_lexicographic_numbering(const unsigned int normal_degree,
+                              const unsigned int tangential_degree) const;
+
+  /**
    * This function returns @p true, if the shape function @p shape_index has
    * non-zero function values somewhere on the face @p face_index.
    *
@@ -351,6 +359,14 @@ public:
   // documentation inherited from the base class
   virtual std::unique_ptr<FiniteElement<dim, dim>>
   clone() const override;
+
+  /**
+   * Compute the lexicographic to hierarchic numbering underlying this class,
+   * necessary for the creation of the respective vector polynomial space.
+   */
+  std::vector<unsigned int>
+  get_lexicographic_numbering(const unsigned int normal_degree,
+                              const unsigned int tangential_degree) const;
 
   virtual void
   get_face_interpolation_matrix(const FiniteElement<dim> &source,
