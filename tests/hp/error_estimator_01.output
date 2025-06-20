@@ -1,0 +1,7 @@
+
+DEAL:2d::MappingQ1  : global error estimate=0.585534
+DEAL:2d::MappingQ2  : global error estimate=0.465513
+DEAL:2d::MappingQ1&2: global error estimate=0.465513
+DEAL:3d::MappingQ1  : global error estimate=0.922872
+DEAL:3d::MappingQ2  : global error estimate=0.603987
+DEAL:3d::MappingQ1&2: global error estimate=0.603987
