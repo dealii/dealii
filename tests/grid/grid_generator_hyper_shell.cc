@@ -62,7 +62,7 @@ test(const Point<dim> origin = Point<dim>())
             }
         }
 
-  if (dim > 2)
+    if (dim > 2)
       {
         deallog << std::endl << std::endl << "Boundary ids of boundary lines:";
 
@@ -81,7 +81,7 @@ test(const Point<dim> origin = Point<dim>())
       }
 
     deallog << std::endl;
-    
+
     if (found_top_boundary)
       deallog << "Ok. Found top boundary." << std::endl;
     else
