@@ -66,16 +66,15 @@ namespace
 
 template <int dim>
 FE_RaviartThomasNodal<dim>::FE_RaviartThomasNodal(const unsigned int degree)
-  : FE_PolyTensor<dim>(
-      PolynomialsRaviartThomas<dim>(degree + 1, degree),
-      FiniteElementData<dim>(get_rt_dpo_vector(dim, degree),
-                             dim,
-                             degree + 1,
-                             FiniteElementData<dim>::Hdiv),
-      std::vector<bool>(1, false),
-      std::vector<ComponentMask>(
-        PolynomialsRaviartThomas<dim>::n_polynomials(degree + 1, degree),
-        ComponentMask(std::vector<bool>(dim, true))))
+  : FE_PolyTensor<dim>(PolynomialsRaviartThomas<dim>(degree),
+                       FiniteElementData<dim>(get_rt_dpo_vector(dim, degree),
+                                              dim,
+                                              degree + 1,
+                                              FiniteElementData<dim>::Hdiv),
+                       std::vector<bool>(1, false),
+                       std::vector<ComponentMask>(
+                         PolynomialsRaviartThomas<dim>::n_polynomials(degree),
+                         ComponentMask(std::vector<bool>(dim, true))))
 {
   Assert(dim >= 2, ExcImpossibleInDim(dim));
 
@@ -84,8 +83,7 @@ FE_RaviartThomasNodal<dim>::FE_RaviartThomasNodal(const unsigned int degree)
   // First, initialize the generalized support points and quadrature weights,
   // since they are required for interpolation.
   this->generalized_support_points =
-    PolynomialsRaviartThomas<dim>(degree + 1, degree)
-      .get_polynomial_support_points();
+    PolynomialsRaviartThomas<dim>(degree).get_polynomial_support_points();
   AssertDimension(this->generalized_support_points.size(),
                   this->n_dofs_per_cell());
 

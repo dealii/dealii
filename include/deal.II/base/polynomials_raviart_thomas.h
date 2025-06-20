@@ -36,7 +36,7 @@ DEAL_II_NAMESPACE_OPEN
  * This class implements the <i>H<sup>div</sup></i>-conforming,
  * Raviart-Thomas polynomials as described in the book by Brezzi and Fortin.
  * Most of the functionality comes from the vector-valued anisotropic
- * polynomials class .
+ * polynomials class PolynomialsVectorAnisotropic.
  *
  * The Raviart-Thomas polynomials are constructed such that the divergence is
  * in the tensor product polynomial space <i>Q<sub>k</sub></i>. Therefore, the
@@ -52,15 +52,6 @@ class PolynomialsRaviartThomas : public PolynomialsVectorAnisotropic<dim>
 {
 public:
   /**
-   * Constructor. Creates all basis functions for Raviart-Thomas polynomials
-   * of given degree in normal and tangential directions. The usual
-   * FE_RaviartThomas and FE_RaviartThomasNodal classes will use `degree + 1`
-   * and `degree` in the two directions, respectively.
-   */
-  PolynomialsRaviartThomas(const unsigned int degree_normal,
-                           const unsigned int degree_tangential);
-
-  /**
    * Constructor, using the common Raviart-Thomas space of degree `k + 1` in
    * normal direction and `k` in the tangential directions.
    *
@@ -71,20 +62,6 @@ public:
   PolynomialsRaviartThomas(const unsigned int k);
 
   /**
-   * Copy constructor.
-   */
-  PolynomialsRaviartThomas(const PolynomialsRaviartThomas &other) = default;
-
-  /**
-   * Return the number of polynomials in the space without requiring to
-   * build an object of PolynomialsRaviartThomas. This is required by the
-   * FiniteElement classes.
-   */
-  static unsigned int
-  n_polynomials(const unsigned int normal_degree,
-                const unsigned int tangential_degree);
-
-  /**
    * Variant of the n_polynomials() function taking only a single argument
    * `degree`, assuming `degree + 1` in the normal direction and `degree` in
    * the tangential directions.
@@ -92,13 +69,15 @@ public:
   static unsigned int
   n_polynomials(const unsigned int degree);
 
+  // Make respective two-argument method from base class available
+  using PolynomialsVectorAnisotropic<dim>::n_polynomials;
+
   /**
    * Compute the lexicographic to hierarchic numbering underlying this class,
    * computed as a free function.
    */
   static std::vector<unsigned int>
-  get_lexicographic_numbering(const unsigned int normal_degree,
-                              const unsigned int tangential_degree);
+  get_lexicographic_numbering(const unsigned int degree);
 
   /**
    * @copydoc TensorPolynomialsBase::clone()
