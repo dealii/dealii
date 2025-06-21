@@ -1040,52 +1040,171 @@ SparseDirectMUMPS::initialize_matrix(const Matrix &matrix)
 
       if (additional_data.symmetric == true)
         {
-          for (const auto &row : locally_owned_rows)
+          if constexpr (std::is_same_v<Matrix,
+                                       PETScWrappers::MPI::SparseMatrix>)
             {
-              for (auto it = matrix.begin(row); it != matrix.end(row); ++it)
-                if (std::abs(it->value()) > 0.0 && it->column() >= row)
-                  {
-                    const int global_row = row + 1;
-                    const int global_col = it->column() + 1;
+              Mat &petsc_matrix =
+                const_cast<PETScWrappers::MPI::SparseMatrix &>(matrix)
+                  .petsc_matrix();
 
-                    // Store this non-zero entry
-                    irn[n_non_zero_local] = global_row;
-                    jcn[n_non_zero_local] = global_col;
-                    a[n_non_zero_local]   = it->value();
+              PetscInt rstart, rend;
+              MatGetOwnershipRange(petsc_matrix, &rstart, &rend);
+              for (PetscInt i = rstart; i < rend; i++)
+                {
+                  PetscInt           n_cols;
+                  const PetscInt    *cols;
+                  const PetscScalar *values;
+                  MatGetRow(petsc_matrix, i, &n_cols, &cols, &values);
 
-                    // Count local non-zeros
-                    n_non_zero_local++;
-                  }
+                  for (PetscInt j = 0; j < n_cols; j++)
+                    {
+                      if (cols[j] >= i)
+                        {
+                          irn[n_non_zero_local] = i + 1;
+                          jcn[n_non_zero_local] = cols[j] + 1;
+                          a[n_non_zero_local]   = values[j];
 
-              const types::global_cell_index local_index =
-                locally_owned_rows.index_within_set(row);
-              irhs_loc[local_index] = row + 1;
+                          // Count local non-zeros
+                          n_non_zero_local++;
+                        }
+                    }
+                  MatRestoreRow(petsc_matrix, i, &n_cols, &cols, &values);
+
+                  // Store the row index for the rhs vector
+                  const types::global_cell_index local_index =
+                    locally_owned_rows.index_within_set(i);
+                  irhs_loc[local_index] = i + 1;
+                }
+
+              id.a_loc = a.get();
+            }
+          else if constexpr (std::is_same_v<Matrix,
+                                            TrilinosWrappers::SparseMatrix>)
+            {
+              const auto &trilinos_matrix = matrix.trilinos_matrix();
+              for (int local_row = 0; local_row < trilinos_matrix.NumMyRows();
+                   ++local_row)
+                {
+                  int     num_entries;
+                  double *values;
+                  int    *local_cols;
+                  int     ierr = trilinos_matrix.ExtractMyRowView(local_row,
+                                                              num_entries,
+                                                              values,
+                                                              local_cols);
+                  (void)ierr;
+                  Assert(
+                    ierr == 0,
+                    ExcMessage(
+                      "Error extracting global row view from Trilinos matrix. Error code " +
+                      std::to_string(ierr) + "."));
+
+                  int global_row = trilinos_matrix.GRID(local_row);
+
+                  for (int j = 0; j < num_entries; ++j)
+                    {
+                      if (trilinos_matrix.GCID(local_cols[j]) >= global_row)
+                        {
+                          irn[n_non_zero_local] = global_row + 1;
+                          jcn[n_non_zero_local] =
+                            trilinos_matrix.GCID(local_cols[j]) + 1;
+                          a[n_non_zero_local] = values[j];
+
+                          // Count local non-zeros
+                          n_non_zero_local++;
+                        }
+                    }
+
+                  // Store the row index for the rhs vector
+                  irhs_loc[local_row] = global_row + 1;
+                }
+              id.a_loc = a.get();
+            }
+          else
+            {
+              DEAL_II_NOT_IMPLEMENTED();
             }
         }
       else
         {
-          for (const auto &row : locally_owned_rows)
+          // Unsymmetric case
+          if constexpr (std::is_same_v<Matrix,
+                                       PETScWrappers::MPI::SparseMatrix>)
             {
-              // Loop over columns
-              for (auto it = matrix.begin(row); it != matrix.end(row); ++it)
-                {
-                  if (std::abs(it->value()) > 0.0)
-                    {
-                      const int global_row = row + 1;
-                      const int global_col = it->column() + 1;
+              Mat &petsc_matrix =
+                const_cast<PETScWrappers::MPI::SparseMatrix &>(matrix)
+                  .petsc_matrix();
 
-                      irn[n_non_zero_local] = global_row;
-                      jcn[n_non_zero_local] = global_col;
-                      a[n_non_zero_local]   = it->value();
+              PetscInt rstart, rend;
+              MatGetOwnershipRange(petsc_matrix, &rstart, &rend);
+              for (PetscInt i = rstart; i < rend; i++)
+                {
+                  PetscInt           n_cols;
+                  const PetscInt    *cols;
+                  const PetscScalar *values;
+                  MatGetRow(petsc_matrix, i, &n_cols, &cols, &values);
+
+                  for (PetscInt j = 0; j < n_cols; j++)
+                    {
+                      irn[n_non_zero_local] = i + 1;
+                      jcn[n_non_zero_local] = cols[j] + 1;
+                      a[n_non_zero_local]   = values[j];
 
                       // Count local non-zeros
                       n_non_zero_local++;
                     }
+                  MatRestoreRow(petsc_matrix, i, &n_cols, &cols, &values);
+
+                  // Store the row index for the rhs vector
+                  const types::global_cell_index local_index =
+                    locally_owned_rows.index_within_set(i);
+                  irhs_loc[local_index] = i + 1;
                 }
 
-              const types::global_cell_index local_index =
-                locally_owned_rows.index_within_set(row);
-              irhs_loc[local_index] = row + 1;
+              id.a_loc = a.get();
+            }
+          else if constexpr (std::is_same_v<Matrix,
+                                            TrilinosWrappers::SparseMatrix>)
+            {
+              const auto &trilinos_matrix = matrix.trilinos_matrix();
+              for (int local_row = 0; local_row < trilinos_matrix.NumMyRows();
+                   ++local_row)
+                {
+                  int     num_entries;
+                  double *values;
+                  int    *local_cols;
+                  int     ierr = trilinos_matrix.ExtractMyRowView(local_row,
+                                                              num_entries,
+                                                              values,
+                                                              local_cols);
+                  (void)ierr;
+                  Assert(
+                    ierr == 0,
+                    ExcMessage(
+                      "Error extracting global row view from Trilinos matrix. Error code " +
+                      std::to_string(ierr) + "."));
+
+                  int global_row = trilinos_matrix.GRID(local_row);
+
+                  for (int j = 0; j < num_entries; ++j)
+                    {
+                      irn[n_non_zero_local] = global_row + 1;
+                      jcn[n_non_zero_local] =
+                        trilinos_matrix.GCID(local_cols[j]) + 1;
+                      a[n_non_zero_local] = values[j];
+
+                      // Count local non-zeros
+                      n_non_zero_local++;
+                    }
+
+                  // Store the row index for the rhs vector
+                  irhs_loc[local_row] = global_row + 1;
+                }
+              id.a_loc = a.get();
+            }
+          else
+            {
+              DEAL_II_NOT_IMPLEMENTED();
             }
         }
 
