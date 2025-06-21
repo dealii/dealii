@@ -928,66 +928,303 @@ SparseDirectMUMPS::initialize_matrix(const Matrix &matrix)
 {
   Assert(matrix.n() == matrix.m(), ExcMessage("Matrix needs to be square."));
 
-  // Hand over matrix to MUMPS as centralized assembled matrix
-  if (Utilities::MPI::this_mpi_process(mpi_communicator) == 0)
+  n    = matrix.n();
+  id.n = n;
+
+  if constexpr (std::is_same_v<Matrix, SparseMatrix<double>>)
     {
-      // Set number of unknowns
-      n = matrix.n();
+      // Serial matrix: hand over matrix to MUMPS as centralized assembled
+      // matrix
+      if (Utilities::MPI::this_mpi_process(mpi_communicator) == 0)
+        {
+          // number of nonzero elements in matrix
+          nnz = matrix.n_actually_nonzero_elements();
 
-      // number of nonzero elements in matrix
-      nnz = matrix.n_actually_nonzero_elements();
+          // representation of the matrix
+          a = std::make_unique<double[]>(nnz);
 
-      // representation of the matrix
-      a = std::make_unique<double[]>(nnz);
+          // matrix indices pointing to the row and column dimensions
+          // respectively of the matrix representation above (a): ie. a[k] is
+          // the matrix element (irn[k], jcn[k])
+          irn = std::make_unique<MUMPS_INT[]>(nnz);
+          jcn = std::make_unique<MUMPS_INT[]>(nnz);
 
-      // matrix indices pointing to the row and column dimensions
-      // respectively of the matrix representation above (a): ie. a[k] is
-      // the matrix element (irn[k], jcn[k])
-      irn = std::make_unique<MUMPS_INT[]>(nnz);
-      jcn = std::make_unique<MUMPS_INT[]>(nnz);
+          size_type n_non_zero_elements = 0;
 
-      size_type n_non_zero_elements = 0;
+          // loop over the elements of the matrix row by row, as suggested in
+          // the documentation of the sparse matrix iterator class
+          if (additional_data.symmetric == true)
+            {
+              for (size_type row = 0; row < matrix.m(); ++row)
+                {
+                  for (typename Matrix::const_iterator ptr = matrix.begin(row);
+                       ptr != matrix.end(row);
+                       ++ptr)
+                    if (std::abs(ptr->value()) > 0.0 && ptr->column() >= row)
+                      {
+                        a[n_non_zero_elements]   = ptr->value();
+                        irn[n_non_zero_elements] = row + 1;
+                        jcn[n_non_zero_elements] = ptr->column() + 1;
 
-      // loop over the elements of the matrix row by row, as suggested in
-      // the documentation of the sparse matrix iterator class
+                        ++n_non_zero_elements;
+                      }
+                }
+            }
+          else
+            {
+              for (size_type row = 0; row < matrix.m(); ++row)
+                {
+                  for (typename Matrix::const_iterator ptr = matrix.begin(row);
+                       ptr != matrix.end(row);
+                       ++ptr)
+                    if (std::abs(ptr->value()) > 0.0)
+                      {
+                        a[n_non_zero_elements]   = ptr->value();
+                        irn[n_non_zero_elements] = row + 1;
+                        jcn[n_non_zero_elements] = ptr->column() + 1;
+                        ++n_non_zero_elements;
+                      }
+                }
+            }
+          id.n   = n;
+          id.nnz = n_non_zero_elements;
+          id.irn = irn.get();
+          id.jcn = jcn.get();
+          id.a   = a.get();
+        }
+    }
+  else if constexpr (std::is_same_v<Matrix, TrilinosWrappers::SparseMatrix> ||
+                     std::is_same_v<Matrix, PETScWrappers::MPI::SparseMatrix>)
+    {
+      int result;
+      MPI_Comm_compare(mpi_communicator,
+                       matrix.get_mpi_communicator(),
+                       &result);
+      AssertThrow(result == MPI_IDENT,
+                  ExcMessage("The matrix communicator must match the MUMPS "
+                             "communicator."));
+
+      // Distributed matrix case
+      id.icntl[17]               = 3; // distributed matrix assembly
+      id.nnz                     = matrix.n_nonzero_elements();
+      nnz                        = id.nnz;
+      size_type n_non_zero_local = 0;
+
+      // Get the range of rows owned by this process
+      locally_owned_rows        = matrix.locally_owned_range_indices();
+      size_type local_non_zeros = 0;
+
+      if constexpr (std::is_same_v<Matrix, TrilinosWrappers::SparseMatrix>)
+        {
+          const auto &trilinos_matrix = matrix.trilinos_matrix();
+          local_non_zeros             = trilinos_matrix.NumMyNonzeros();
+        }
+      else if constexpr (std::is_same_v<Matrix,
+                                        PETScWrappers::MPI::SparseMatrix>)
+        {
+          Mat &petsc_matrix =
+            const_cast<PETScWrappers::MPI::SparseMatrix &>(matrix)
+              .petsc_matrix();
+          MatInfo info;
+          MatGetInfo(petsc_matrix, MAT_LOCAL, &info);
+          local_non_zeros = (size_type)info.nz_used;
+        }
+
+
+      // We allocate enough entries for the general, nonsymmetric, case. If case
+      // of a symmetric matrix, we will end up with fewer entries.
+      irn = std::make_unique<MUMPS_INT[]>(local_non_zeros);
+      jcn = std::make_unique<MUMPS_INT[]>(local_non_zeros);
+      a   = std::make_unique<double[]>(local_non_zeros);
+      irhs_loc.resize(locally_owned_rows.n_elements());
+
       if (additional_data.symmetric == true)
         {
-          for (size_type row = 0; row < matrix.m(); ++row)
+          if constexpr (std::is_same_v<Matrix,
+                                       PETScWrappers::MPI::SparseMatrix>)
             {
-              for (typename Matrix::const_iterator ptr = matrix.begin(row);
-                   ptr != matrix.end(row);
-                   ++ptr)
-                if (std::abs(ptr->value()) > 0.0 && ptr->column() >= row)
-                  {
-                    a[n_non_zero_elements]   = ptr->value();
-                    irn[n_non_zero_elements] = row + 1;
-                    jcn[n_non_zero_elements] = ptr->column() + 1;
+              Mat &petsc_matrix =
+                const_cast<PETScWrappers::MPI::SparseMatrix &>(matrix)
+                  .petsc_matrix();
 
-                    ++n_non_zero_elements;
-                  }
+              PetscInt rstart, rend;
+              MatGetOwnershipRange(petsc_matrix, &rstart, &rend);
+              for (PetscInt i = rstart; i < rend; i++)
+                {
+                  PetscInt           n_cols;
+                  const PetscInt    *cols;
+                  const PetscScalar *values;
+                  MatGetRow(petsc_matrix, i, &n_cols, &cols, &values);
+
+                  for (PetscInt j = 0; j < n_cols; j++)
+                    {
+                      if (cols[j] >= i)
+                        {
+                          irn[n_non_zero_local] = i + 1;
+                          jcn[n_non_zero_local] = cols[j] + 1;
+                          a[n_non_zero_local]   = values[j];
+
+                          // Count local non-zeros
+                          n_non_zero_local++;
+                        }
+                    }
+                  MatRestoreRow(petsc_matrix, i, &n_cols, &cols, &values);
+
+                  // Store the row index for the rhs vector
+                  const types::global_cell_index local_index =
+                    locally_owned_rows.index_within_set(i);
+                  irhs_loc[local_index] = i + 1;
+                }
+
+              id.a_loc = a.get();
+            }
+          else if constexpr (std::is_same_v<Matrix,
+                                            TrilinosWrappers::SparseMatrix>)
+            {
+              const auto &trilinos_matrix = matrix.trilinos_matrix();
+              for (int local_row = 0; local_row < trilinos_matrix.NumMyRows();
+                   ++local_row)
+                {
+                  int     num_entries;
+                  double *values;
+                  int    *local_cols;
+                  int     ierr = trilinos_matrix.ExtractMyRowView(local_row,
+                                                              num_entries,
+                                                              values,
+                                                              local_cols);
+                  (void)ierr;
+                  Assert(
+                    ierr == 0,
+                    ExcMessage(
+                      "Error extracting global row view from Trilinos matrix. Error code " +
+                      std::to_string(ierr) + "."));
+
+                  int global_row = trilinos_matrix.GRID(local_row);
+
+                  for (int j = 0; j < num_entries; ++j)
+                    {
+                      if (trilinos_matrix.GCID(local_cols[j]) >= global_row)
+                        {
+                          irn[n_non_zero_local] = global_row + 1;
+                          jcn[n_non_zero_local] =
+                            trilinos_matrix.GCID(local_cols[j]) + 1;
+                          a[n_non_zero_local] = values[j];
+
+                          // Count local non-zeros
+                          n_non_zero_local++;
+                        }
+                    }
+
+                  // Store the row index for the rhs vector
+                  irhs_loc[local_row] = global_row + 1;
+                }
+              id.a_loc = a.get();
+            }
+          else
+            {
+              DEAL_II_NOT_IMPLEMENTED();
             }
         }
       else
         {
-          for (size_type row = 0; row < matrix.m(); ++row)
+          // Unsymmetric case
+          if constexpr (std::is_same_v<Matrix,
+                                       PETScWrappers::MPI::SparseMatrix>)
             {
-              for (typename Matrix::const_iterator ptr = matrix.begin(row);
-                   ptr != matrix.end(row);
-                   ++ptr)
-                if (std::abs(ptr->value()) > 0.0)
-                  {
-                    a[n_non_zero_elements]   = ptr->value();
-                    irn[n_non_zero_elements] = row + 1;
-                    jcn[n_non_zero_elements] = ptr->column() + 1;
-                    ++n_non_zero_elements;
-                  }
+              Mat &petsc_matrix =
+                const_cast<PETScWrappers::MPI::SparseMatrix &>(matrix)
+                  .petsc_matrix();
+
+              PetscInt rstart, rend;
+              MatGetOwnershipRange(petsc_matrix, &rstart, &rend);
+              for (PetscInt i = rstart; i < rend; i++)
+                {
+                  PetscInt           n_cols;
+                  const PetscInt    *cols;
+                  const PetscScalar *values;
+                  MatGetRow(petsc_matrix, i, &n_cols, &cols, &values);
+
+                  for (PetscInt j = 0; j < n_cols; j++)
+                    {
+                      irn[n_non_zero_local] = i + 1;
+                      jcn[n_non_zero_local] = cols[j] + 1;
+                      a[n_non_zero_local]   = values[j];
+
+                      // Count local non-zeros
+                      n_non_zero_local++;
+                    }
+                  MatRestoreRow(petsc_matrix, i, &n_cols, &cols, &values);
+
+                  // Store the row index for the rhs vector
+                  const types::global_cell_index local_index =
+                    locally_owned_rows.index_within_set(i);
+                  irhs_loc[local_index] = i + 1;
+                }
+
+              id.a_loc = a.get();
+            }
+          else if constexpr (std::is_same_v<Matrix,
+                                            TrilinosWrappers::SparseMatrix>)
+            {
+              const auto &trilinos_matrix = matrix.trilinos_matrix();
+              for (int local_row = 0; local_row < trilinos_matrix.NumMyRows();
+                   ++local_row)
+                {
+                  int     num_entries;
+                  double *values;
+                  int    *local_cols;
+                  int     ierr = trilinos_matrix.ExtractMyRowView(local_row,
+                                                              num_entries,
+                                                              values,
+                                                              local_cols);
+                  (void)ierr;
+                  Assert(
+                    ierr == 0,
+                    ExcMessage(
+                      "Error extracting global row view from Trilinos matrix. Error code " +
+                      std::to_string(ierr) + "."));
+
+                  int global_row = trilinos_matrix.GRID(local_row);
+
+                  for (int j = 0; j < num_entries; ++j)
+                    {
+                      irn[n_non_zero_local] = global_row + 1;
+                      jcn[n_non_zero_local] =
+                        trilinos_matrix.GCID(local_cols[j]) + 1;
+                      a[n_non_zero_local] = values[j];
+
+                      // Count local non-zeros
+                      n_non_zero_local++;
+                    }
+
+                  // Store the row index for the rhs vector
+                  irhs_loc[local_row] = global_row + 1;
+                }
+              id.a_loc = a.get();
+            }
+          else
+            {
+              DEAL_II_NOT_IMPLEMENTED();
             }
         }
-      id.n   = n;
-      id.nnz = n_non_zero_elements;
-      id.irn = irn.get();
-      id.jcn = jcn.get();
-      id.a   = a.get();
+
+      // Hand over local arrays to MUMPS
+      id.nnz_loc  = n_non_zero_local;
+      id.irn_loc  = irn.get();
+      id.jcn_loc  = jcn.get();
+      id.a_loc    = a.get();
+      id.irhs_loc = irhs_loc.data();
+
+      // rhs parameters
+      id.icntl[19] = 10; // distributed rhs
+      id.icntl[20] = 0;  // centralized solution, stored on rank 0 by MUMPS
+      id.nrhs      = 1;
+      id.lrhs_loc  = n;
+      id.nloc_rhs  = locally_owned_rows.n_elements();
+    }
+  else
+    {
+      DEAL_II_NOT_IMPLEMENTED();
     }
 }
 
@@ -1043,42 +1280,92 @@ SparseDirectMUMPS::initialize(const Matrix &matrix)
   dmumps_c(&id);
 }
 
+
+
+template <typename VectorType>
 void
-SparseDirectMUMPS::vmult(Vector<double> &dst, const Vector<double> &src) const
+SparseDirectMUMPS::vmult(VectorType &dst, const VectorType &src) const
 {
-  // and that the matrix has at least one nonzero element:
+  // Check that the matrix has at least one nonzero element:
   Assert(nnz != 0, ExcNotInitialized());
   Assert(n == dst.size(), ExcMessage("Destination vector has the wrong size."));
   Assert(n == src.size(), ExcMessage("Source vector has the wrong size."));
 
-  // Hand over right-hand side
-  copy_rhs_to_mumps(src);
 
-  // Start solver
-  id.job = 3;
-  dmumps_c(&id);
-  copy_solution(dst);
+  if constexpr (std::is_same_v<VectorType, Vector<double>>)
+    {
+      // Centralized assembly for serial vectors.
+
+      // Hand over right-hand side
+      copy_rhs_to_mumps(src);
+
+      // Start solver
+      id.job = 3;
+      dmumps_c(&id);
+      copy_solution(dst);
+    }
+  else if constexpr (std::is_same_v<VectorType,
+                                    TrilinosWrappers::MPI::Vector> ||
+                     std::is_same_v<VectorType, PETScWrappers::MPI::Vector>)
+    {
+      if constexpr (std::is_same_v<VectorType, TrilinosWrappers::MPI::Vector>)
+        id.rhs_loc = const_cast<double *>(src.begin());
+      else if constexpr (std::is_same_v<VectorType, PETScWrappers::MPI::Vector>)
+        {
+          PetscScalar *local_array;
+          VecGetArray(
+            const_cast<PETScWrappers::MPI::Vector &>(src).petsc_vector(),
+            &local_array);
+          id.rhs_loc = local_array;
+          VecRestoreArray(
+            const_cast<PETScWrappers::MPI::Vector &>(src).petsc_vector(),
+            &local_array);
+        }
+
+
+      if (Utilities::MPI::this_mpi_process(mpi_communicator) == 0)
+        {
+          rhs.resize(id.lrhs_loc);
+          id.rhs = rhs.data();
+        }
+
+      // Start solver
+      id.job = 3;
+      dmumps_c(&id);
+
+      // Copy solution into the given vector
+      // For MUMPS with centralized solution (icntl[20]=0), the solution is only
+      // on the root process (0) and needs to be distributed to all processes
+      if (Utilities::MPI::this_mpi_process(mpi_communicator) == 0)
+        {
+          // Set all the values in the dst vector
+          for (size_type i = 0; i < n; ++i)
+            dst[i] = rhs[i];
+        }
+
+      // Ensure the distributed vector has the correct values everywhere
+      dst.compress(VectorOperation::insert);
+
+      rhs.resize(0); // remove rhs again
+    }
+  else
+    {
+      DEAL_II_NOT_IMPLEMENTED();
+    }
 }
 
 
-
+template <typename VectorType>
 void
-SparseDirectMUMPS::Tvmult(Vector<double> &dst, const Vector<double> &src) const
+SparseDirectMUMPS::Tvmult(VectorType &dst, const VectorType &src) const
 {
   // The matrix has at least one nonzero element:
   Assert(nnz != 0, ExcNotInitialized());
-
   Assert(n == dst.size(), ExcMessage("Destination vector has the wrong size."));
   Assert(n == src.size(), ExcMessage("Source vector has the wrong size."));
 
   id.icntl[8] = 2; // transpose
-  // Hand over right-hand side
-  copy_rhs_to_mumps(src);
-
-  // Start solver
-  id.job = 3;
-  dmumps_c(&id);
-  copy_solution(dst);
+  vmult(dst, src);
   id.icntl[8] = 1; // reset to default
 }
 
@@ -1151,10 +1438,23 @@ InstantiateUMFPACK(BlockSparseMatrix<std::complex<float>>);
 
 // explicit instantiations for SparseDirectMUMPS
 #ifdef DEAL_II_WITH_MUMPS
+
+#  define InstantiateMUMPSMatVec(VECTOR)                                    \
+    template void SparseDirectMUMPS::vmult(VECTOR &, const VECTOR &) const; \
+    template void SparseDirectMUMPS::Tvmult(VECTOR &, const VECTOR &) const;
+
+InstantiateMUMPSMatVec(TrilinosWrappers::MPI::Vector)
+  InstantiateMUMPSMatVec(PETScWrappers::MPI::Vector)
+    InstantiateMUMPSMatVec(Vector<double>)
+
 #  define InstantiateMUMPS(MATRIX) \
     template void SparseDirectMUMPS::initialize(const MATRIX &);
 
-InstantiateMUMPS(SparseMatrix<double>) InstantiateMUMPS(SparseMatrix<float>)
+      InstantiateMUMPS(SparseMatrix<double>)
+        InstantiateMUMPS(SparseMatrix<float>)
+          InstantiateMUMPS(TrilinosWrappers::SparseMatrix)
+            InstantiateMUMPS(PETScWrappers::SparseMatrix)
+              InstantiateMUMPS(PETScWrappers::MPI::SparseMatrix)
   // InstantiateMUMPS(SparseMatrixEZ<double>)
   // InstantiateMUMPS(SparseMatrixEZ<float>)
   InstantiateMUMPS(BlockSparseMatrix<double>)
