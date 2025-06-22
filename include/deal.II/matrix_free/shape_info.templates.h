@@ -268,8 +268,8 @@ namespace internal
           const unsigned int dofs_per_face_normal = fe_in.n_dofs_per_face();
 
           lexicographic_numbering =
-            PolynomialsRaviartThomas<dim>::get_lexicographic_numbering(
-              fe_in.degree - 1);
+            FE_RaviartThomas<dim>::get_lexicographic_numbering(fe_in.degree -
+                                                               1);
 
           // To get the right shape_values of the RT element
           std::vector<unsigned int> lex_normal, lex_tangent;

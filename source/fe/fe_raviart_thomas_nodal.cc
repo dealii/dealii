@@ -67,10 +67,10 @@ namespace
 template <int dim>
 FE_RaviartThomasNodal<dim>::FE_RaviartThomasNodal(const unsigned int degree)
   : FE_PolyTensor<dim>(
-      PolynomialsVectorAnisotropic<dim>(degree + 1,
-                                        degree,
-                                        get_lexicographic_numbering(degree + 1,
-                                                                    degree)),
+      PolynomialsVectorAnisotropic<dim>(
+        degree + 1,
+        degree,
+        FE_RaviartThomas<dim>::get_lexicographic_numbering(degree)),
       FiniteElementData<dim>(get_rt_dpo_vector(dim, degree),
                              dim,
                              degree + 1,
@@ -85,7 +85,7 @@ FE_RaviartThomasNodal<dim>::FE_RaviartThomasNodal(const unsigned int degree)
   this->mapping_kind = {mapping_raviart_thomas};
 
   const std::vector<unsigned int> numbering =
-    get_lexicographic_numbering(degree + 1, degree);
+    FE_RaviartThomas<dim>::get_lexicographic_numbering(degree);
 
   // First, initialize the generalized support points and quadrature weights,
   // since they are required for interpolation.
@@ -238,71 +238,6 @@ FE_RaviartThomasNodal<dim>::has_support_on_face(
 
   // In all other cases, return true, which is safe
   return true;
-}
-
-
-
-template <int dim>
-std::vector<unsigned int>
-FE_RaviartThomasNodal<dim>::get_lexicographic_numbering(
-  const unsigned int normal_degree,
-  const unsigned int tangential_degree) const
-{
-  const unsigned int n_dofs_face =
-    Utilities::pow(tangential_degree + 1, dim - 1);
-  std::vector<unsigned int> lexicographic_numbering;
-  // component 1
-  for (unsigned int j = 0; j < n_dofs_face; ++j)
-    {
-      lexicographic_numbering.push_back(j);
-      if (normal_degree > 1)
-        for (unsigned int i = n_dofs_face * 2 * dim;
-             i < n_dofs_face * 2 * dim + normal_degree - 1;
-             ++i)
-          lexicographic_numbering.push_back(i + j * (normal_degree - 1));
-      lexicographic_numbering.push_back(n_dofs_face + j);
-    }
-
-  // component 2
-  unsigned int layers = (dim == 3) ? tangential_degree + 1 : 1;
-  for (unsigned int k = 0; k < layers; ++k)
-    {
-      unsigned int k_add = k * (tangential_degree + 1);
-      for (unsigned int j = n_dofs_face * 2;
-           j < n_dofs_face * 2 + tangential_degree + 1;
-           ++j)
-        lexicographic_numbering.push_back(j + k_add);
-
-      if (normal_degree > 1)
-        for (unsigned int i = n_dofs_face * (2 * dim + (normal_degree - 1));
-             i < n_dofs_face * (2 * dim + (normal_degree - 1)) +
-                   (normal_degree - 1) * (tangential_degree + 1);
-             ++i)
-          {
-            lexicographic_numbering.push_back(i + k_add * tangential_degree);
-          }
-      for (unsigned int j = n_dofs_face * 3;
-           j < n_dofs_face * 3 + tangential_degree + 1;
-           ++j)
-        lexicographic_numbering.push_back(j + k_add);
-    }
-
-  // component 3
-  if (dim == 3)
-    {
-      for (unsigned int i = 4 * n_dofs_face; i < 5 * n_dofs_face; ++i)
-        lexicographic_numbering.push_back(i);
-      if (normal_degree > 1)
-        for (unsigned int i =
-               6 * n_dofs_face + n_dofs_face * 2 * (normal_degree - 1);
-             i < 6 * n_dofs_face + n_dofs_face * 3 * (normal_degree - 1);
-             ++i)
-          lexicographic_numbering.push_back(i);
-      for (unsigned int i = 5 * n_dofs_face; i < 6 * n_dofs_face; ++i)
-        lexicographic_numbering.push_back(i);
-    }
-
-  return lexicographic_numbering;
 }
 
 
