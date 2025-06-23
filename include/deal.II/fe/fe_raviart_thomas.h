@@ -145,6 +145,13 @@ public:
   clone() const override;
 
   /**
+   * Compute the lexicographic to hierarchic numbering underlying this class,
+   * necessary for the creation of the respective vector polynomial space.
+   */
+  static std::vector<unsigned int>
+  get_lexicographic_numbering(const unsigned int degree);
+
+  /**
    * This function returns @p true, if the shape function @p shape_index has
    * non-zero function values somewhere on the face @p face_index.
    *
