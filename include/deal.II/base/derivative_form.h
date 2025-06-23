@@ -165,6 +165,16 @@ public:
   DerivativeForm<1, dim, spacedim, Number>
   covariant_form() const;
 
+
+  /**
+   * Compute the first fundamental form. This is the tensor of dot products of
+   * the columns of the current object.
+   *
+   * @note This function is only defined for `order == 1`.
+   */
+  Tensor<2, dim, Number>
+  first_fundamental_form() const;
+
   /**
    * Determine an estimate for the memory consumption (in bytes) of this
    * object.
@@ -387,14 +397,25 @@ DerivativeForm<order, dim, spacedim, Number>::determinant() const
   else
     {
       Assert(spacedim > dim, ExcMessage("Only for spacedim>dim."));
-      const DerivativeForm<1, spacedim, dim, Number> DF_t = this->transpose();
-      Tensor<2, dim, Number> G; // First fundamental form
-      for (unsigned int i = 0; i < dim; ++i)
-        for (unsigned int j = 0; j < dim; ++j)
-          G[i][j] = DF_t[i] * DF_t[j];
-
-      return (std::sqrt(dealii::determinant(G)));
+      return (std::sqrt(dealii::determinant(first_fundamental_form())));
     }
+}
+
+
+
+template <int order, int dim, int spacedim, typename Number>
+inline Tensor<2, dim, Number>
+DerivativeForm<order, dim, spacedim, Number>::first_fundamental_form() const
+{
+  Assert(order == 1, ExcMessage("Only for order == 1."));
+  const DerivativeForm<1, spacedim, dim, Number> DF_t = this->transpose();
+
+  Tensor<2, dim, Number> G;
+  for (unsigned int i = 0; i < dim; ++i)
+    for (unsigned int j = 0; j < dim; ++j)
+      G[i][j] = DF_t[i] * DF_t[j];
+
+  return G;
 }
 
 
@@ -411,13 +432,7 @@ DerivativeForm<order, dim, spacedim, Number>::covariant_form() const
     }
   else
     {
-      const DerivativeForm<1, spacedim, dim, Number> DF_t = this->transpose();
-      Tensor<2, dim, Number> G; // First fundamental form
-      for (unsigned int i = 0; i < dim; ++i)
-        for (unsigned int j = 0; j < dim; ++j)
-          G[i][j] = DF_t[i] * DF_t[j];
-
-      return (this->times_T_t(invert(G)));
+      return (this->times_T_t(invert(first_fundamental_form())));
     }
 }
 
