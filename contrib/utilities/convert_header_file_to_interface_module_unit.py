@@ -118,7 +118,7 @@ for line in lines:
         )
 
         for external_project in used_external_projects:
-            output.write("import :interface_partition_" + external_project + ";\n")
+            output.write("import dealii.external." + external_project + ";\n")
 
         for inc in dealii_include_list:
             module_partition = "interface_partition_" + inc.replace("/", "_")
