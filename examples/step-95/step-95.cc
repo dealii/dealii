@@ -121,164 +121,34 @@ namespace Step95
              *mapping_info_surface_in,
            const NonMatching::MappingInfo<dim, dim, VectorizedArrayType>
                      *mapping_info_faces_in,
-           const bool is_dg_in)
-    {
-      matrix_free          = &matrix_free_in;
-      mapping_info_cell    = mapping_info_cell_in;
-      mapping_info_surface = mapping_info_surface_in;
-      mapping_info_faces   = mapping_info_faces_in;
-      is_dg                = is_dg_in;
-
-      const auto &fe = matrix_free->get_dof_handler().get_fe();
-
-      evaluator_cell =
-        std::make_unique<GenericCellEvaluator>(*mapping_info_cell, fe, 0, true);
-      evaluator_surface = std::make_unique<GenericCellEvaluator>(
-        *mapping_info_surface, fe, 0, true);
-      if (is_dg)
-        {
-          evaluator_face_m =
-            std::make_unique<GenericFaceEvaluator>(*mapping_info_faces,
-                                                   fe,
-                                                   true);
-          evaluator_face_p =
-            std::make_unique<GenericFaceEvaluator>(*mapping_info_faces,
-                                                   fe,
-                                                   false);
-        }
-
-      matrix_free->initialize_cell_data_vector(cell_diameter);
-      for (unsigned int cell_batch_index = 0;
-           cell_batch_index <
-           matrix_free->n_cell_batches() + matrix_free->n_ghost_cell_batches();
-           ++cell_batch_index)
-        {
-          auto &diameter = cell_diameter[cell_batch_index];
-          for (unsigned int v = 0;
-               v <
-               matrix_free->n_active_entries_per_cell_batch(cell_batch_index);
-               ++v)
-            {
-              const auto cell_accessor_inside =
-                matrix_free->get_cell_iterator(cell_batch_index, v);
-
-              diameter[v] = cell_accessor_inside->minimum_vertex_distance();
-            }
-        }
-    }
+           const bool is_dg_in);
 
     // This function is the interface function for linear solvers that applies
     // the operator evaluation which is an abstraction of a matrix-vector
     // product by executing loops over cells and faces.
-    void vmult(VectorType &dst, const VectorType &src) const
-    {
-      matrix_free->loop(&PoissonOperator::local_apply_cell,
-                        &PoissonOperator::local_apply_face,
-                        &PoissonOperator::local_apply_boundary_face,
-                        this,
-                        dst,
-                        src,
-                        true);
-    }
+    void vmult(VectorType &dst, const VectorType &src) const;
 
     // The right-hand-side is assembled with a loop over the cells.
-    void rhs(VectorType &rhs, const Function<dim> &rhs_function)
-    {
-      const unsigned int dummy = 0;
-      matrix_free->template cell_loop<VectorType, unsigned int>(
-        [&](const MatrixFree<dim, Number, VectorizedArrayType> &,
-            VectorType &dst,
-            const VectorType &,
-            const std::pair<unsigned int, unsigned int> &cell_range) {
-          CellEvaluator evaluator(*matrix_free, dof_index, quad_index);
-
-          const auto cell_range_category =
-            matrix_free->get_cell_range_category(cell_range);
-
-          if (is_inside(cell_range_category))
-            {
-              for (unsigned int cell_batch_index = cell_range.first;
-                   cell_batch_index < cell_range.second;
-                   ++cell_batch_index)
-                {
-                  evaluator.reinit(cell_batch_index);
-                  for (unsigned int q : evaluator.quadrature_point_indices())
-                    do_rhs_cell_term(evaluator, rhs_function, q);
-                  evaluator.integrate(EvaluationFlags::values);
-                  evaluator.distribute_local_to_global(dst);
-                }
-            }
-          else if (is_intersected(cell_range_category))
-            {
-              const auto dofs_per_cell = evaluator.dofs_per_cell;
-
-              for (unsigned int cell_batch_index = cell_range.first;
-                   cell_batch_index < cell_range.second;
-                   ++cell_batch_index)
-                {
-                  evaluator.reinit(cell_batch_index);
-
-                  for (unsigned int v = 0; v < n_lanes; ++v)
-                    {
-                      const unsigned int cell_index =
-                        cell_batch_index * n_lanes + v;
-
-                      evaluator_cell->reinit(cell_index);
-
-                      for (const auto q :
-                           evaluator_cell->quadrature_point_indices())
-                        do_rhs_cell_term(*evaluator_cell, rhs_function, q);
-
-                      evaluator_cell->integrate(
-                        StridedArrayView<Number, n_lanes>(
-                          &evaluator.begin_dof_values()[0][v], dofs_per_cell),
-                        EvaluationFlags::values);
-                    }
-
-                  evaluator.distribute_local_to_global(dst);
-                }
-            }
-        },
-        rhs,
-        dummy);
-    }
+    void rhs(VectorType &rhs, const Function<dim> &rhs_function);
 
     // This functions partitions a vector with matrix-free functionality.
-    void initialize_dof_vector(VectorType &vec) const
-    {
-      matrix_free->initialize_dof_vector(vec);
-    }
+    void initialize_dof_vector(VectorType &vec) const;
 
     // With this function, we can assemble the diagonal of the operator instead
     // of applying the matrix-vector product. It uses the same function as the
     // operator evaluation for the local operation on cells and faces but sets
     // the template argument assemble to true.
-    void compute_diagonal(VectorType &diagonal) const
-    {
-      matrix_free->loop(&PoissonOperator::local_apply_cell<true>,
-                        &PoissonOperator::local_apply_face<true>,
-                        &PoissonOperator::local_apply_boundary_face,
-                        this,
-                        diagonal,
-                        diagonal);
-    }
+    void compute_diagonal(VectorType &diagonal) const;
 
   private:
     // We define two helper functions needed for matrix-free assembly
     // operations.
     template <typename Evaluator>
-    void create_zero_basis(Evaluator &evaluator) const
-    {
-      for (unsigned int i = 0; i < evaluator.dofs_per_cell; ++i)
-        evaluator.begin_dof_values()[i] = VectorizedArrayType(0.);
-    }
+    void create_zero_basis(Evaluator &evaluator) const;
 
     template <typename Evaluator>
-    void create_standard_basis(const unsigned int j, Evaluator &evaluator) const
-    {
-      create_zero_basis(evaluator);
-      evaluator.begin_dof_values()[j] = VectorizedArrayType(1.);
-    }
+    void create_standard_basis(const unsigned int j,
+                               Evaluator         &evaluator) const;
 
     // This function implements the local cell operation.
     template <bool assemble = false>
@@ -286,119 +156,7 @@ namespace Step95
       const MatrixFree<dim, Number, VectorizedArrayType> &,
       VectorType                                  &dst,
       const VectorType                            &src,
-      const std::pair<unsigned int, unsigned int> &cell_range) const
-    {
-      CellEvaluator evaluator(*matrix_free, dof_index, quad_index);
-
-      const auto dofs_per_cell = evaluator.dofs_per_cell;
-
-      AlignedVector<VectorizedArrayType> dof_buffer(assemble ? dofs_per_cell :
-                                                               0);
-
-      const unsigned int cell_range_category =
-        matrix_free->get_cell_range_category(cell_range);
-
-      // We define the cell_operation for inside cells as the standard Poisson
-      // term.
-      auto inside_cell_operation = [&](CellEvaluator &evaluator) {
-        evaluator.evaluate(EvaluationFlags::gradients);
-        for (unsigned int q : evaluator.quadrature_point_indices())
-          do_poisson_cell_term(evaluator, q);
-        evaluator.integrate(EvaluationFlags::gradients);
-      };
-
-      // We define the cell_operation for intersected cells as the standard
-      // Poisson term in the cut volume and the Nitsche term for weak Dirichlet
-      // boundary enforcement on the cut surface.
-      auto intersected_cell_operation = [&](CellEvaluator &evaluator) {
-        const unsigned int cell_batch_index =
-          evaluator.get_cell_or_face_batch_id();
-        const VectorizedArrayType diameter = cell_diameter[cell_batch_index];
-
-        const auto tau = compute_interior_penalty_parameter(diameter);
-
-        for (unsigned int v = 0; v < n_lanes; ++v)
-          {
-            const unsigned int cell_index = cell_batch_index * n_lanes + v;
-
-            evaluator_cell->reinit(cell_index);
-            evaluator_surface->reinit(cell_index);
-
-            evaluator_cell->evaluate(StridedArrayView<const Number, n_lanes>(
-                                       &evaluator.begin_dof_values()[0][v],
-                                       dofs_per_cell),
-                                     EvaluationFlags::gradients);
-
-            evaluator_surface->evaluate(StridedArrayView<const Number, n_lanes>(
-                                          &evaluator.begin_dof_values()[0][v],
-                                          dofs_per_cell),
-                                        EvaluationFlags::values |
-                                          EvaluationFlags::gradients);
-
-            for (const auto q : evaluator_cell->quadrature_point_indices())
-              do_poisson_cell_term(*evaluator_cell, q);
-
-            for (const auto q : evaluator_surface->quadrature_point_indices())
-              do_boundary_flux_term_homogeneous(*evaluator_surface, tau[v], q);
-
-            evaluator_cell->integrate(StridedArrayView<Number, n_lanes>(
-                                        &evaluator.begin_dof_values()[0][v],
-                                        dofs_per_cell),
-                                      EvaluationFlags::gradients);
-
-            evaluator_surface->integrate(StridedArrayView<Number, n_lanes>(
-                                           &evaluator.begin_dof_values()[0][v],
-                                           dofs_per_cell),
-                                         EvaluationFlags::values |
-                                           EvaluationFlags::gradients,
-                                         true);
-          }
-      };
-
-      // Depending on the active_fe_index of the cell_range we select the
-      // cell_operation to execute.
-      std::function<void(CellEvaluator &)> cell_operation;
-      if (is_inside(cell_range_category))
-        cell_operation = inside_cell_operation;
-      else if (is_intersected(cell_range_category))
-        cell_operation = intersected_cell_operation;
-      else
-        return;
-
-      // We loop over the cell batches of the current cell_range and apply the
-      // cell_operation. For a vmult() we only apply once, for diagonal assembly
-      // we apply the cell_operation to the respective unit vector for every
-      // local cell DoF.
-      for (unsigned int cell_batch_index = cell_range.first;
-           cell_batch_index < cell_range.second;
-           ++cell_batch_index)
-        {
-          evaluator.reinit(cell_batch_index);
-
-          if (assemble)
-            {
-              for (unsigned int j = 0; j < evaluator.dofs_per_cell; ++j)
-                {
-                  create_standard_basis(j, evaluator);
-
-                  cell_operation(evaluator);
-
-                  dof_buffer[j] = evaluator.begin_dof_values()[j];
-                }
-
-              for (unsigned int j = 0; j < evaluator.dofs_per_cell; ++j)
-                evaluator.begin_dof_values()[j] = dof_buffer[j];
-            }
-          else
-            {
-              evaluator.read_dof_values(src);
-
-              cell_operation(evaluator);
-            }
-
-          evaluator.distribute_local_to_global(dst);
-        }
-    }
+      const std::pair<unsigned int, unsigned int> &cell_range) const;
 
     // This function implements the local face operation.
     template <bool assemble = false>
@@ -406,237 +164,7 @@ namespace Step95
       const MatrixFree<dim, Number, VectorizedArrayType> &,
       VectorType                                  &dst,
       const VectorType                            &src,
-      const std::pair<unsigned int, unsigned int> &face_range) const
-    {
-      FaceEvaluator evaluator_m(*matrix_free, true, dof_index, quad_index);
-      FaceEvaluator evaluator_p(*matrix_free, false, dof_index, quad_index);
-
-      AlignedVector<VectorizedArrayType> dof_buffer_m(
-        evaluator_m.dofs_per_cell);
-      AlignedVector<VectorizedArrayType> dof_buffer_p(
-        evaluator_p.dofs_per_cell);
-
-      AlignedVector<VectorizedArrayType> local_diagonal_m(
-        assemble ? evaluator_m.dofs_per_cell : 0);
-      AlignedVector<VectorizedArrayType> local_diagonal_p(
-        assemble ? evaluator_p.dofs_per_cell : 0);
-
-      const std::pair<unsigned int, unsigned int> face_range_category =
-        matrix_free->get_face_range_category(face_range);
-
-      // We start with the face operations for the DG case.
-      // We define the face_operation for an inside face as the SIPG term.
-      auto inside_face_operation_dg = [&](FaceEvaluator &evaluator_m,
-                                          FaceEvaluator &evaluator_p) {
-        const unsigned int face_batch_index =
-          evaluator_m.get_cell_or_face_batch_id();
-
-        const auto diameter =
-          compute_diameter_of_inner_face_batch(face_batch_index);
-
-        do_local_apply_sipg_term(evaluator_m,
-                                 evaluator_p,
-                                 evaluator_m.begin_dof_values(),
-                                 evaluator_p.begin_dof_values(),
-                                 diameter);
-      };
-
-      // We define the face_operation for a mixed face (between an inside and an
-      // intersected cell) as the SIPG term plus the ghost penalty term.
-      auto mixed_face_operation_dg = [&](FaceEvaluator &evaluator_m,
-                                         FaceEvaluator &evaluator_p) {
-        const unsigned int face_batch_index =
-          evaluator_m.get_cell_or_face_batch_id();
-
-        const auto diameter =
-          compute_diameter_of_inner_face_batch(face_batch_index);
-
-        do_local_apply_sipg_term(evaluator_m,
-                                 evaluator_p,
-                                 dof_buffer_m.data(),
-                                 dof_buffer_p.data(),
-                                 diameter);
-
-        do_local_apply_gp_face_term<true>(evaluator_m,
-                                          evaluator_p,
-                                          dof_buffer_m.data(),
-                                          dof_buffer_p.data(),
-                                          diameter,
-                                          true);
-      };
-
-      // We define the face_operation for an intersected face (between two
-      // intersected cells) as the SIPG term plus the ghost penalty term.
-      auto intersected_face_operation_dg = [&](FaceEvaluator &evaluator_m,
-                                               FaceEvaluator &evaluator_p) {
-        const unsigned int face_batch_index =
-          evaluator_m.get_cell_or_face_batch_id();
-
-        const auto diameter =
-          compute_diameter_of_inner_face_batch(face_batch_index);
-        const auto tau = compute_interior_penalty_parameter(diameter);
-
-        evaluator_m.project_to_face(dof_buffer_m.data(),
-                                    EvaluationFlags::values |
-                                      EvaluationFlags::gradients);
-        evaluator_p.project_to_face(dof_buffer_p.data(),
-                                    EvaluationFlags::values |
-                                      EvaluationFlags::gradients);
-
-        for (unsigned int v = 0; v < n_lanes; ++v)
-          {
-            const unsigned int face_index = face_batch_index * n_lanes + v;
-
-            evaluator_face_m->reinit(face_index);
-            evaluator_face_p->reinit(face_index);
-
-            evaluator_face_m->evaluate_in_face(
-              &evaluator_m.get_scratch_data().begin()[0][v],
-              EvaluationFlags::values | EvaluationFlags::gradients);
-            evaluator_face_p->evaluate_in_face(
-              &evaluator_p.get_scratch_data().begin()[0][v],
-              EvaluationFlags::values | EvaluationFlags::gradients);
-
-            for (const auto q : evaluator_face_m->quadrature_point_indices())
-              do_flux_term(*evaluator_face_m, *evaluator_face_p, tau[v], q);
-
-            evaluator_face_m->integrate_in_face(
-              &evaluator_m.get_scratch_data().begin()[0][v],
-              EvaluationFlags::values | EvaluationFlags::gradients);
-            evaluator_face_p->integrate_in_face(
-              &evaluator_p.get_scratch_data().begin()[0][v],
-              EvaluationFlags::values | EvaluationFlags::gradients);
-          }
-
-        evaluator_m.collect_from_face(EvaluationFlags::values |
-                                      EvaluationFlags::gradients);
-        evaluator_p.collect_from_face(EvaluationFlags::values |
-                                      EvaluationFlags::gradients);
-
-        do_local_apply_gp_face_term<true>(evaluator_m,
-                                          evaluator_p,
-                                          dof_buffer_m.data(),
-                                          dof_buffer_p.data(),
-                                          diameter,
-                                          true);
-      };
-
-      // For the CG case we only need to define the ghost penalty term for mixed
-      // and intersected faces.
-      auto intersected_mixed_face_operation_cg =
-        [&](FaceEvaluator &evaluator_m, FaceEvaluator &evaluator_p) {
-          const unsigned int face_batch_index =
-            evaluator_m.get_cell_or_face_batch_id();
-
-          const VectorizedArrayType diameter =
-            compute_diameter_of_inner_face_batch(face_batch_index);
-
-          do_local_apply_gp_face_term<false>(evaluator_m,
-                                             evaluator_p,
-                                             evaluator_m.begin_dof_values(),
-                                             evaluator_p.begin_dof_values(),
-                                             diameter,
-                                             false);
-        };
-
-      // Depending on the active_fe_index of the two cells sharing the current
-      // face we select the face_operation.
-      std::function<void(FaceEvaluator &, FaceEvaluator &)> face_operation;
-      bool buffer_dof_values = false;
-      if (is_dg)
-        {
-          if (is_inside_face(face_range_category))
-            face_operation = inside_face_operation_dg;
-          else if (is_mixed_face(face_range_category))
-            {
-              face_operation    = mixed_face_operation_dg;
-              buffer_dof_values = true;
-            }
-          else if (is_intersected_face(face_range_category))
-            {
-              face_operation    = intersected_face_operation_dg;
-              buffer_dof_values = true;
-            }
-          else
-            return;
-        }
-      else
-        {
-          if (is_mixed_face(face_range_category) ||
-              is_intersected_face(face_range_category))
-            face_operation = intersected_mixed_face_operation_cg;
-          else
-            return;
-        }
-
-      // We loop over the face batches of the current face_range and apply the
-      // face_operation. Again, for the vmult() the face_operation is executed
-      // once, for diagonal assembly for every unit DoF vector of the two
-      // face-sharing cells.
-      for (unsigned int face_batch_index = face_range.first;
-           face_batch_index < face_range.second;
-           ++face_batch_index)
-        {
-          evaluator_m.reinit(face_batch_index);
-          evaluator_p.reinit(face_batch_index);
-
-          if (assemble)
-            {
-              for (unsigned int j = 0; j < evaluator_m.dofs_per_cell; ++j)
-                for (unsigned int p = 0; p < 2; ++p)
-                  {
-                    if (p == 0)
-                      {
-                        create_standard_basis(j, evaluator_m);
-                        create_zero_basis(evaluator_p);
-                      }
-                    else
-                      {
-                        create_zero_basis(evaluator_m);
-                        create_standard_basis(j, evaluator_p);
-                      }
-
-                    if (buffer_dof_values)
-                      for (unsigned int i = 0; i < evaluator_m.dofs_per_cell;
-                           ++i)
-                        {
-                          dof_buffer_m[i] = evaluator_m.begin_dof_values()[i];
-                          dof_buffer_p[i] = evaluator_p.begin_dof_values()[i];
-                        }
-
-                    face_operation(evaluator_m, evaluator_p);
-
-                    if (p == 0)
-                      local_diagonal_m[j] = evaluator_m.begin_dof_values()[j];
-                    else
-                      local_diagonal_p[j] = evaluator_p.begin_dof_values()[j];
-                  }
-
-              for (unsigned int j = 0; j < evaluator_m.dofs_per_cell; ++j)
-                {
-                  evaluator_m.begin_dof_values()[j] = local_diagonal_m[j];
-                  evaluator_p.begin_dof_values()[j] = local_diagonal_p[j];
-                }
-            }
-          else
-            {
-              evaluator_m.read_dof_values(src);
-              evaluator_p.read_dof_values(src);
-
-              if (buffer_dof_values)
-                for (unsigned int i = 0; i < evaluator_m.dofs_per_cell; ++i)
-                  {
-                    dof_buffer_m[i] = evaluator_m.begin_dof_values()[i];
-                    dof_buffer_p[i] = evaluator_p.begin_dof_values()[i];
-                  }
-
-              face_operation(evaluator_m, evaluator_p);
-            }
-
-          evaluator_m.distribute_local_to_global(dst);
-          evaluator_p.distribute_local_to_global(dst);
-        }
-    }
+      const std::pair<unsigned int, unsigned int> &face_range) const;
 
     // We do not need a local operation of the fitted boundary for this tutorial
     // as the whole Dirichlet boundary is immersed in the volume of the domain.
@@ -654,10 +182,7 @@ namespace Step95
     // type to be usable by FEEvaluation as well as FEPointEvaluation.
     template <typename Evaluator>
     inline void do_poisson_cell_term(Evaluator         &evaluator,
-                                     const unsigned int q) const
-    {
-      evaluator.submit_gradient(evaluator.get_gradient(q), q);
-    }
+                                     const unsigned int q) const;
 
     // The implementation for the SIPG term (needed for DG). Again, templated
     // over the Evaluator type to be usable by FEFaceEvaluation and
@@ -666,45 +191,13 @@ namespace Step95
     inline void do_flux_term(Evaluator         &evaluator_m,
                              Evaluator         &evaluator_p,
                              const Number2     &tau,
-                             const unsigned int q) const
-    {
-      const auto normal_gradient_m = evaluator_m.get_normal_derivative(q);
-      const auto normal_gradient_p = evaluator_p.get_normal_derivative(q);
-
-      const auto value_m = evaluator_m.get_value(q);
-      const auto value_p = evaluator_p.get_value(q);
-
-      const auto jump_value = value_m - value_p;
-
-      const auto central_flux_gradient =
-        0.5 * (normal_gradient_m + normal_gradient_p);
-
-      const auto value_terms = central_flux_gradient - tau * jump_value;
-
-      evaluator_m.submit_value(-value_terms, q);
-      evaluator_p.submit_value(value_terms, q);
-
-      const auto gradient_terms = -0.5 * jump_value;
-
-      evaluator_m.submit_normal_derivative(gradient_terms, q);
-      evaluator_p.submit_normal_derivative(gradient_terms, q);
-    }
+                             const unsigned int q) const;
 
     // The implementation of the Nitsche term.
     template <typename Evaluator, typename Number2>
     inline void do_boundary_flux_term_homogeneous(Evaluator     &evaluator_m,
                                                   const Number2 &tau,
-                                                  const unsigned int q) const
-    {
-      const auto value           = evaluator_m.get_value(q);
-      const auto normal_gradient = evaluator_m.get_normal_derivative(q);
-
-      const auto value_term           = 2. * tau * value - normal_gradient;
-      const auto normal_gradient_term = -value;
-
-      evaluator_m.submit_value(value_term, q);
-      evaluator_m.submit_normal_derivative(normal_gradient_term, q);
-    }
+                                                  const unsigned int q) const;
 
     // The implementation of the face-based ghost penalty term (up to degree 2 /
     // normal hessians).
@@ -715,47 +208,7 @@ namespace Step95
       const typename Evaluator::NumberType &masked_factor_value,
       const typename Evaluator::NumberType &masked_factor_gradient,
       const typename Evaluator::NumberType &masked_factor_hessian,
-      const unsigned int                    q) const
-    {
-      if (do_values)
-        {
-          const auto value_m = evaluator_m.get_value(q);
-          const auto value_p = evaluator_p.get_value(q);
-
-          const auto jump_value = value_m - value_p;
-
-          const auto value_term = masked_factor_value * jump_value;
-
-          evaluator_m.submit_value(value_term, q);
-          evaluator_p.submit_value(-value_term, q);
-        }
-
-      {
-        const auto normal_gradient_m = evaluator_m.get_normal_derivative(q);
-        const auto normal_gradient_p = evaluator_p.get_normal_derivative(q);
-
-        const auto jump_normal_gradient = normal_gradient_m - normal_gradient_p;
-
-        const auto gradient_term =
-          masked_factor_gradient * jump_normal_gradient;
-
-        evaluator_m.submit_normal_derivative(gradient_term, q);
-        evaluator_p.submit_normal_derivative(-gradient_term, q);
-      }
-
-      if (do_normal_hessians)
-        {
-          const auto normal_hessian_m = evaluator_m.get_normal_hessian(q);
-          const auto normal_hessian_p = evaluator_p.get_normal_hessian(q);
-
-          const auto jump_normal_hessian = normal_hessian_m - normal_hessian_p;
-
-          const auto hessian_term = masked_factor_hessian * jump_normal_hessian;
-
-          evaluator_m.submit_normal_hessian(hessian_term, q);
-          evaluator_p.submit_normal_hessian(-hessian_term, q);
-        }
-    }
+      const unsigned int                    q) const;
 
     // The implementation of the right-hand-side term evaluating the rhs
     // function (unfortunately, we cannot evaluate a Function vectorized, so we
@@ -763,23 +216,7 @@ namespace Step95
     template <typename Evaluator>
     inline void do_rhs_cell_term(Evaluator           &evaluator,
                                  const Function<dim> &rhs_function,
-                                 const unsigned int   q) const
-    {
-      const auto q_points = evaluator.quadrature_point(q);
-
-      VectorizedArrayType value = 0.;
-
-      for (unsigned int v = 0; v < n_lanes; ++v)
-        {
-          Point<dim> q_point;
-          for (unsigned int d = 0; d < dim; ++d)
-            q_point[d] = q_points[d][v];
-
-          value[v] = rhs_function.value(q_point);
-        }
-
-      evaluator.submit_value(value, q);
-    }
+                                 const unsigned int   q) const;
 
     // This implements the face_operation of the SIPG term (setting values in
     // integrate()).
@@ -787,25 +224,7 @@ namespace Step95
                                   FaceEvaluator             &evaluator_p,
                                   const VectorizedArrayType *dof_ptr_m,
                                   const VectorizedArrayType *dof_ptr_p,
-                                  const VectorizedArrayType &diameter) const
-    {
-      const auto tau = compute_interior_penalty_parameter(diameter);
-
-      evaluator_m.evaluate(dof_ptr_m,
-                           EvaluationFlags::values |
-                             EvaluationFlags::gradients);
-      evaluator_p.evaluate(dof_ptr_p,
-                           EvaluationFlags::values |
-                             EvaluationFlags::gradients);
-
-      for (const auto q : evaluator_m.quadrature_point_indices())
-        do_flux_term(evaluator_m, evaluator_p, tau, q);
-
-      evaluator_m.integrate(EvaluationFlags::values |
-                            EvaluationFlags::gradients);
-      evaluator_p.integrate(EvaluationFlags::values |
-                            EvaluationFlags::gradients);
-    }
+                                  const VectorizedArrayType &diameter) const;
 
     // This implements the face_operation of the ghost penalty term (potentially
     // adding into the values in integrate() depending on sum_into_values).
@@ -815,113 +234,27 @@ namespace Step95
                                      const VectorizedArrayType *dof_ptr_m,
                                      const VectorizedArrayType *dof_ptr_p,
                                      const VectorizedArrayType &diameter,
-                                     const bool sum_into_values) const
-    {
-      EvaluationFlags::EvaluationFlags evaluation_flags =
-        EvaluationFlags::gradients;
-      if (is_dg_)
-        evaluation_flags |= EvaluationFlags::values;
-
-      const unsigned int degree =
-        matrix_free->get_dof_handler(dof_index).get_fe().degree;
-      const bool do_hessians = degree > 1;
-      if (do_hessians)
-        evaluation_flags |= EvaluationFlags::hessians;
-
-      Assert(degree <= 2,
-             ExcMessage(
-               "Face-based stabilization only implemented up to degree 2!"));
-
-      evaluator_m.evaluate(dof_ptr_m, evaluation_flags);
-      evaluator_p.evaluate(dof_ptr_p, evaluation_flags);
-
-      const VectorizedArrayType factor_values   = 0.5 / diameter;
-      const VectorizedArrayType factor_gradient = 0.5 * diameter;
-      const VectorizedArrayType factor_hessians =
-        0.5 * diameter * diameter * diameter;
-
-      if (do_hessians)
-        for (const auto q : evaluator_m.quadrature_point_indices())
-          do_gp_face_term<true, is_dg_>(evaluator_m,
-                                        evaluator_p,
-                                        factor_values,
-                                        factor_gradient,
-                                        factor_hessians,
-                                        q);
-      else
-        for (const auto q : evaluator_m.quadrature_point_indices())
-          do_gp_face_term<false, is_dg_>(evaluator_m,
-                                         evaluator_p,
-                                         factor_values,
-                                         factor_gradient,
-                                         factor_hessians,
-                                         q);
-
-      evaluator_m.integrate(evaluation_flags, sum_into_values);
-      evaluator_p.integrate(evaluation_flags, sum_into_values);
-    }
+                                     const bool sum_into_values) const;
 
     // Three helper functions to determine the category of face based on the
     // active_fe_index of the face-sharing cells.
     inline bool
-    is_inside_face(std::pair<unsigned int, unsigned int> face_category) const
-    {
-      return is_inside(face_category.first) && is_inside(face_category.second);
-    }
+    is_inside_face(std::pair<unsigned int, unsigned int> face_category) const;
 
     inline bool
-    is_mixed_face(std::pair<unsigned int, unsigned int> face_category) const
-    {
-      return (is_inside(face_category.first) &&
-              is_intersected(face_category.second)) ||
-             (is_intersected(face_category.first) &&
-              is_inside(face_category.second));
-    }
+    is_mixed_face(std::pair<unsigned int, unsigned int> face_category) const;
 
     inline bool is_intersected_face(
-      std::pair<unsigned int, unsigned int> face_category) const
-    {
-      return is_intersected(face_category.first) &&
-             is_intersected(face_category.second);
-    }
+      std::pair<unsigned int, unsigned int> face_category) const;
 
     // Helper function to determine the relevant cell lengths of a face batch;
     VectorizedArrayType
-    compute_diameter_of_inner_face_batch(unsigned int face_batch_index) const
-    {
-      const auto &face_info = matrix_free->get_face_info(face_batch_index);
-
-      VectorizedArrayType diameter = 0.;
-      for (unsigned int v = 0;
-           v < matrix_free->n_active_entries_per_face_batch(face_batch_index);
-           ++v)
-        {
-          const auto cell_batch_index_interior =
-            face_info.cells_interior[v] / n_lanes;
-          const auto cell_lane_index_interior =
-            face_info.cells_interior[v] % n_lanes;
-          const auto cell_batch_index_exterior =
-            face_info.cells_exterior[v] / n_lanes;
-          const auto cell_lane_index_exterior =
-            face_info.cells_exterior[v] % n_lanes;
-
-          diameter[v] = std::max(
-            cell_diameter[cell_batch_index_interior][cell_lane_index_interior],
-            cell_diameter[cell_batch_index_exterior][cell_lane_index_exterior]);
-        }
-
-      return diameter;
-    }
+    compute_diameter_of_inner_face_batch(unsigned int face_batch_index) const;
 
     // Helper function which computes the interior penalty parameter for the
     // SIPG flux.
     VectorizedArrayType compute_interior_penalty_parameter(
-      const VectorizedArrayType &diameter) const
-    {
-      const auto k = matrix_free->get_dof_handler(dof_index).get_fe().degree;
-
-      return 2. * Utilities::fixed_power<2>(k + 1) / diameter;
-    }
+      const VectorizedArrayType &diameter) const;
 
     // ObserverPointer of the MatrixFree and the NonMatching::MappingInfo
     // objects.
@@ -949,6 +282,827 @@ namespace Step95
 
     bool is_dg = false;
   };
+
+
+
+  template <int dim>
+  void PoissonOperator<dim>::reinit(
+    const MatrixFree<dim, Number, VectorizedArrayType> &matrix_free_in,
+    const NonMatching::MappingInfo<dim, dim, VectorizedArrayType>
+      *mapping_info_cell_in,
+    const NonMatching::MappingInfo<dim, dim, VectorizedArrayType>
+      *mapping_info_surface_in,
+    const NonMatching::MappingInfo<dim, dim, VectorizedArrayType>
+              *mapping_info_faces_in,
+    const bool is_dg_in)
+  {
+    matrix_free          = &matrix_free_in;
+    mapping_info_cell    = mapping_info_cell_in;
+    mapping_info_surface = mapping_info_surface_in;
+    mapping_info_faces   = mapping_info_faces_in;
+    is_dg                = is_dg_in;
+
+    const auto &fe = matrix_free->get_dof_handler().get_fe();
+
+    evaluator_cell =
+      std::make_unique<GenericCellEvaluator>(*mapping_info_cell, fe, 0, true);
+    evaluator_surface = std::make_unique<GenericCellEvaluator>(
+      *mapping_info_surface, fe, 0, true);
+    if (is_dg)
+      {
+        evaluator_face_m =
+          std::make_unique<GenericFaceEvaluator>(*mapping_info_faces, fe, true);
+        evaluator_face_p =
+          std::make_unique<GenericFaceEvaluator>(*mapping_info_faces,
+                                                 fe,
+                                                 false);
+      }
+
+    matrix_free->initialize_cell_data_vector(cell_diameter);
+    for (unsigned int cell_batch_index = 0;
+         cell_batch_index <
+         matrix_free->n_cell_batches() + matrix_free->n_ghost_cell_batches();
+         ++cell_batch_index)
+      {
+        auto &diameter = cell_diameter[cell_batch_index];
+        for (unsigned int v = 0;
+             v < matrix_free->n_active_entries_per_cell_batch(cell_batch_index);
+             ++v)
+          {
+            const auto cell_accessor_inside =
+              matrix_free->get_cell_iterator(cell_batch_index, v);
+
+            diameter[v] = cell_accessor_inside->minimum_vertex_distance();
+          }
+      }
+  }
+
+
+
+  template <int dim>
+  void PoissonOperator<dim>::vmult(PoissonOperator::VectorType       &dst,
+                                   const PoissonOperator::VectorType &src) const
+  {
+    matrix_free->loop(&PoissonOperator::local_apply_cell,
+                      &PoissonOperator::local_apply_face,
+                      &PoissonOperator::local_apply_boundary_face,
+                      this,
+                      dst,
+                      src,
+                      true);
+  }
+
+
+
+  template <int dim>
+  void PoissonOperator<dim>::rhs(PoissonOperator::VectorType &rhs,
+                                 const Function<dim>         &rhs_function)
+  {
+    const unsigned int dummy = 0;
+    matrix_free->template cell_loop<VectorType, unsigned int>(
+      [&](const MatrixFree<dim, Number, VectorizedArrayType> &,
+          VectorType &dst,
+          const VectorType &,
+          const std::pair<unsigned int, unsigned int> &cell_range) {
+        CellEvaluator evaluator(*matrix_free, dof_index, quad_index);
+
+        const auto cell_range_category =
+          matrix_free->get_cell_range_category(cell_range);
+
+        if (is_inside(cell_range_category))
+          {
+            for (unsigned int cell_batch_index = cell_range.first;
+                 cell_batch_index < cell_range.second;
+                 ++cell_batch_index)
+              {
+                evaluator.reinit(cell_batch_index);
+                for (unsigned int q : evaluator.quadrature_point_indices())
+                  do_rhs_cell_term(evaluator, rhs_function, q);
+                evaluator.integrate(EvaluationFlags::values);
+                evaluator.distribute_local_to_global(dst);
+              }
+          }
+        else if (is_intersected(cell_range_category))
+          {
+            const auto dofs_per_cell = evaluator.dofs_per_cell;
+
+            for (unsigned int cell_batch_index = cell_range.first;
+                 cell_batch_index < cell_range.second;
+                 ++cell_batch_index)
+              {
+                evaluator.reinit(cell_batch_index);
+
+                for (unsigned int v = 0; v < n_lanes; ++v)
+                  {
+                    const unsigned int cell_index =
+                      cell_batch_index * n_lanes + v;
+
+                    evaluator_cell->reinit(cell_index);
+
+                    for (const auto q :
+                         evaluator_cell->quadrature_point_indices())
+                      do_rhs_cell_term(*evaluator_cell, rhs_function, q);
+
+                    evaluator_cell->integrate(
+                      StridedArrayView<Number, n_lanes>(
+                        &evaluator.begin_dof_values()[0][v], dofs_per_cell),
+                      EvaluationFlags::values);
+                  }
+
+                evaluator.distribute_local_to_global(dst);
+              }
+          }
+      },
+      rhs,
+      dummy);
+  }
+
+
+
+  template <int dim>
+  void PoissonOperator<dim>::initialize_dof_vector(
+    PoissonOperator::VectorType &vec) const
+  {
+    matrix_free->initialize_dof_vector(vec);
+  }
+
+
+
+  template <int dim>
+  void PoissonOperator<dim>::compute_diagonal(
+    PoissonOperator::VectorType &diagonal) const
+  {
+    matrix_free->loop(&PoissonOperator::local_apply_cell<true>,
+                      &PoissonOperator::local_apply_face<true>,
+                      &PoissonOperator::local_apply_boundary_face,
+                      this,
+                      diagonal,
+                      diagonal);
+  }
+
+
+
+  template <int dim>
+  template <typename Evaluator>
+  void PoissonOperator<dim>::create_zero_basis(Evaluator &evaluator) const
+  {
+    for (unsigned int i = 0; i < evaluator.dofs_per_cell; ++i)
+      evaluator.begin_dof_values()[i] = VectorizedArrayType(0.);
+  }
+
+
+
+  template <int dim>
+  template <typename Evaluator>
+  void PoissonOperator<dim>::create_standard_basis(const unsigned int j,
+                                                   Evaluator &evaluator) const
+  {
+    create_zero_basis(evaluator);
+    evaluator.begin_dof_values()[j] = VectorizedArrayType(1.);
+  }
+
+
+
+  template <int dim>
+  template <bool assemble>
+  void PoissonOperator<dim>::local_apply_cell(
+    const MatrixFree<dim, Number, VectorizedArrayType> &,
+    PoissonOperator::VectorType                 &dst,
+    const PoissonOperator::VectorType           &src,
+    const std::pair<unsigned int, unsigned int> &cell_range) const
+  {
+    CellEvaluator evaluator(*matrix_free, dof_index, quad_index);
+
+    const auto dofs_per_cell = evaluator.dofs_per_cell;
+
+    AlignedVector<VectorizedArrayType> dof_buffer(assemble ? dofs_per_cell : 0);
+
+    const unsigned int cell_range_category =
+      matrix_free->get_cell_range_category(cell_range);
+
+    // We define the cell_operation for inside cells as the standard Poisson
+    // term.
+    auto inside_cell_operation = [&](CellEvaluator &evaluator) {
+      evaluator.evaluate(EvaluationFlags::gradients);
+      for (unsigned int q : evaluator.quadrature_point_indices())
+        do_poisson_cell_term(evaluator, q);
+      evaluator.integrate(EvaluationFlags::gradients);
+    };
+
+    // We define the cell_operation for intersected cells as the standard
+    // Poisson term in the cut volume and the Nitsche term for weak Dirichlet
+    // boundary enforcement on the cut surface.
+    auto intersected_cell_operation = [&](CellEvaluator &evaluator) {
+      const unsigned int cell_batch_index =
+        evaluator.get_cell_or_face_batch_id();
+      const VectorizedArrayType diameter = cell_diameter[cell_batch_index];
+
+      const auto tau = compute_interior_penalty_parameter(diameter);
+
+      for (unsigned int v = 0; v < n_lanes; ++v)
+        {
+          const unsigned int cell_index = cell_batch_index * n_lanes + v;
+
+          evaluator_cell->reinit(cell_index);
+          evaluator_surface->reinit(cell_index);
+
+          evaluator_cell->evaluate(StridedArrayView<const Number, n_lanes>(
+                                     &evaluator.begin_dof_values()[0][v],
+                                     dofs_per_cell),
+                                   EvaluationFlags::gradients);
+
+          evaluator_surface->evaluate(StridedArrayView<const Number, n_lanes>(
+                                        &evaluator.begin_dof_values()[0][v],
+                                        dofs_per_cell),
+                                      EvaluationFlags::values |
+                                        EvaluationFlags::gradients);
+
+          for (const auto q : evaluator_cell->quadrature_point_indices())
+            do_poisson_cell_term(*evaluator_cell, q);
+
+          for (const auto q : evaluator_surface->quadrature_point_indices())
+            do_boundary_flux_term_homogeneous(*evaluator_surface, tau[v], q);
+
+          evaluator_cell->integrate(StridedArrayView<Number, n_lanes>(
+                                      &evaluator.begin_dof_values()[0][v],
+                                      dofs_per_cell),
+                                    EvaluationFlags::gradients);
+
+          evaluator_surface->integrate(StridedArrayView<Number, n_lanes>(
+                                         &evaluator.begin_dof_values()[0][v],
+                                         dofs_per_cell),
+                                       EvaluationFlags::values |
+                                         EvaluationFlags::gradients,
+                                       true);
+        }
+    };
+
+    // Depending on the active_fe_index of the cell_range we select the
+    // cell_operation to execute.
+    std::function<void(CellEvaluator &)> cell_operation;
+    if (is_inside(cell_range_category))
+      cell_operation = inside_cell_operation;
+    else if (is_intersected(cell_range_category))
+      cell_operation = intersected_cell_operation;
+    else
+      return;
+
+    // We loop over the cell batches of the current cell_range and apply the
+    // cell_operation. For a vmult() we only apply once, for diagonal assembly
+    // we apply the cell_operation to the respective unit vector for every
+    // local cell DoF.
+    for (unsigned int cell_batch_index = cell_range.first;
+         cell_batch_index < cell_range.second;
+         ++cell_batch_index)
+      {
+        evaluator.reinit(cell_batch_index);
+
+        if (assemble)
+          {
+            for (unsigned int j = 0; j < evaluator.dofs_per_cell; ++j)
+              {
+                create_standard_basis(j, evaluator);
+
+                cell_operation(evaluator);
+
+                dof_buffer[j] = evaluator.begin_dof_values()[j];
+              }
+
+            for (unsigned int j = 0; j < evaluator.dofs_per_cell; ++j)
+              evaluator.begin_dof_values()[j] = dof_buffer[j];
+          }
+        else
+          {
+            evaluator.read_dof_values(src);
+
+            cell_operation(evaluator);
+          }
+
+        evaluator.distribute_local_to_global(dst);
+      }
+  }
+
+  template <int dim>
+  template <bool assemble>
+  void PoissonOperator<dim>::local_apply_face(
+    const MatrixFree<dim, Number, VectorizedArrayType> &,
+    PoissonOperator::VectorType                 &dst,
+    const PoissonOperator::VectorType           &src,
+    const std::pair<unsigned int, unsigned int> &face_range) const
+  {
+    FaceEvaluator evaluator_m(*matrix_free, true, dof_index, quad_index);
+    FaceEvaluator evaluator_p(*matrix_free, false, dof_index, quad_index);
+
+    AlignedVector<VectorizedArrayType> dof_buffer_m(evaluator_m.dofs_per_cell);
+    AlignedVector<VectorizedArrayType> dof_buffer_p(evaluator_p.dofs_per_cell);
+
+    AlignedVector<VectorizedArrayType> local_diagonal_m(
+      assemble ? evaluator_m.dofs_per_cell : 0);
+    AlignedVector<VectorizedArrayType> local_diagonal_p(
+      assemble ? evaluator_p.dofs_per_cell : 0);
+
+    const std::pair<unsigned int, unsigned int> face_range_category =
+      matrix_free->get_face_range_category(face_range);
+
+    // We start with the face operations for the DG case.
+    // We define the face_operation for an inside face as the SIPG term.
+    auto inside_face_operation_dg = [&](FaceEvaluator &evaluator_m,
+                                        FaceEvaluator &evaluator_p) {
+      const unsigned int face_batch_index =
+        evaluator_m.get_cell_or_face_batch_id();
+
+      const auto diameter =
+        compute_diameter_of_inner_face_batch(face_batch_index);
+
+      do_local_apply_sipg_term(evaluator_m,
+                               evaluator_p,
+                               evaluator_m.begin_dof_values(),
+                               evaluator_p.begin_dof_values(),
+                               diameter);
+    };
+
+    // We define the face_operation for a mixed face (between an inside and an
+    // intersected cell) as the SIPG term plus the ghost penalty term.
+    auto mixed_face_operation_dg = [&](FaceEvaluator &evaluator_m,
+                                       FaceEvaluator &evaluator_p) {
+      const unsigned int face_batch_index =
+        evaluator_m.get_cell_or_face_batch_id();
+
+      const auto diameter =
+        compute_diameter_of_inner_face_batch(face_batch_index);
+
+      do_local_apply_sipg_term(evaluator_m,
+                               evaluator_p,
+                               dof_buffer_m.data(),
+                               dof_buffer_p.data(),
+                               diameter);
+
+      do_local_apply_gp_face_term<true>(evaluator_m,
+                                        evaluator_p,
+                                        dof_buffer_m.data(),
+                                        dof_buffer_p.data(),
+                                        diameter,
+                                        true);
+    };
+
+    // We define the face_operation for an intersected face (between two
+    // intersected cells) as the SIPG term plus the ghost penalty term.
+    auto intersected_face_operation_dg = [&](FaceEvaluator &evaluator_m,
+                                             FaceEvaluator &evaluator_p) {
+      const unsigned int face_batch_index =
+        evaluator_m.get_cell_or_face_batch_id();
+
+      const auto diameter =
+        compute_diameter_of_inner_face_batch(face_batch_index);
+      const auto tau = compute_interior_penalty_parameter(diameter);
+
+      evaluator_m.project_to_face(dof_buffer_m.data(),
+                                  EvaluationFlags::values |
+                                    EvaluationFlags::gradients);
+      evaluator_p.project_to_face(dof_buffer_p.data(),
+                                  EvaluationFlags::values |
+                                    EvaluationFlags::gradients);
+
+      for (unsigned int v = 0; v < n_lanes; ++v)
+        {
+          const unsigned int face_index = face_batch_index * n_lanes + v;
+
+          evaluator_face_m->reinit(face_index);
+          evaluator_face_p->reinit(face_index);
+
+          evaluator_face_m->evaluate_in_face(
+            &evaluator_m.get_scratch_data().begin()[0][v],
+            EvaluationFlags::values | EvaluationFlags::gradients);
+          evaluator_face_p->evaluate_in_face(
+            &evaluator_p.get_scratch_data().begin()[0][v],
+            EvaluationFlags::values | EvaluationFlags::gradients);
+
+          for (const auto q : evaluator_face_m->quadrature_point_indices())
+            do_flux_term(*evaluator_face_m, *evaluator_face_p, tau[v], q);
+
+          evaluator_face_m->integrate_in_face(
+            &evaluator_m.get_scratch_data().begin()[0][v],
+            EvaluationFlags::values | EvaluationFlags::gradients);
+          evaluator_face_p->integrate_in_face(
+            &evaluator_p.get_scratch_data().begin()[0][v],
+            EvaluationFlags::values | EvaluationFlags::gradients);
+        }
+
+      evaluator_m.collect_from_face(EvaluationFlags::values |
+                                    EvaluationFlags::gradients);
+      evaluator_p.collect_from_face(EvaluationFlags::values |
+                                    EvaluationFlags::gradients);
+
+      do_local_apply_gp_face_term<true>(evaluator_m,
+                                        evaluator_p,
+                                        dof_buffer_m.data(),
+                                        dof_buffer_p.data(),
+                                        diameter,
+                                        true);
+    };
+
+    // For the CG case we only need to define the ghost penalty term for mixed
+    // and intersected faces.
+    auto intersected_mixed_face_operation_cg = [&](FaceEvaluator &evaluator_m,
+                                                   FaceEvaluator &evaluator_p) {
+      const unsigned int face_batch_index =
+        evaluator_m.get_cell_or_face_batch_id();
+
+      const VectorizedArrayType diameter =
+        compute_diameter_of_inner_face_batch(face_batch_index);
+
+      do_local_apply_gp_face_term<false>(evaluator_m,
+                                         evaluator_p,
+                                         evaluator_m.begin_dof_values(),
+                                         evaluator_p.begin_dof_values(),
+                                         diameter,
+                                         false);
+    };
+
+    // Depending on the active_fe_index of the two cells sharing the current
+    // face we select the face_operation.
+    std::function<void(FaceEvaluator &, FaceEvaluator &)> face_operation;
+    bool buffer_dof_values = false;
+    if (is_dg)
+      {
+        if (is_inside_face(face_range_category))
+          face_operation = inside_face_operation_dg;
+        else if (is_mixed_face(face_range_category))
+          {
+            face_operation    = mixed_face_operation_dg;
+            buffer_dof_values = true;
+          }
+        else if (is_intersected_face(face_range_category))
+          {
+            face_operation    = intersected_face_operation_dg;
+            buffer_dof_values = true;
+          }
+        else
+          return;
+      }
+    else
+      {
+        if (is_mixed_face(face_range_category) ||
+            is_intersected_face(face_range_category))
+          face_operation = intersected_mixed_face_operation_cg;
+        else
+          return;
+      }
+
+    // We loop over the face batches of the current face_range and apply the
+    // face_operation. Again, for the vmult() the face_operation is executed
+    // once, for diagonal assembly for every unit DoF vector of the two
+    // face-sharing cells.
+    for (unsigned int face_batch_index = face_range.first;
+         face_batch_index < face_range.second;
+         ++face_batch_index)
+      {
+        evaluator_m.reinit(face_batch_index);
+        evaluator_p.reinit(face_batch_index);
+
+        if (assemble)
+          {
+            for (unsigned int j = 0; j < evaluator_m.dofs_per_cell; ++j)
+              for (unsigned int p = 0; p < 2; ++p)
+                {
+                  if (p == 0)
+                    {
+                      create_standard_basis(j, evaluator_m);
+                      create_zero_basis(evaluator_p);
+                    }
+                  else
+                    {
+                      create_zero_basis(evaluator_m);
+                      create_standard_basis(j, evaluator_p);
+                    }
+
+                  if (buffer_dof_values)
+                    for (unsigned int i = 0; i < evaluator_m.dofs_per_cell; ++i)
+                      {
+                        dof_buffer_m[i] = evaluator_m.begin_dof_values()[i];
+                        dof_buffer_p[i] = evaluator_p.begin_dof_values()[i];
+                      }
+
+                  face_operation(evaluator_m, evaluator_p);
+
+                  if (p == 0)
+                    local_diagonal_m[j] = evaluator_m.begin_dof_values()[j];
+                  else
+                    local_diagonal_p[j] = evaluator_p.begin_dof_values()[j];
+                }
+
+            for (unsigned int j = 0; j < evaluator_m.dofs_per_cell; ++j)
+              {
+                evaluator_m.begin_dof_values()[j] = local_diagonal_m[j];
+                evaluator_p.begin_dof_values()[j] = local_diagonal_p[j];
+              }
+          }
+        else
+          {
+            evaluator_m.read_dof_values(src);
+            evaluator_p.read_dof_values(src);
+
+            if (buffer_dof_values)
+              for (unsigned int i = 0; i < evaluator_m.dofs_per_cell; ++i)
+                {
+                  dof_buffer_m[i] = evaluator_m.begin_dof_values()[i];
+                  dof_buffer_p[i] = evaluator_p.begin_dof_values()[i];
+                }
+
+            face_operation(evaluator_m, evaluator_p);
+          }
+
+        evaluator_m.distribute_local_to_global(dst);
+        evaluator_p.distribute_local_to_global(dst);
+      }
+  }
+
+
+
+  template <int dim>
+  template <typename Evaluator>
+  void PoissonOperator<dim>::do_poisson_cell_term(Evaluator         &evaluator,
+                                                  const unsigned int q) const
+  {
+    evaluator.submit_gradient(evaluator.get_gradient(q), q);
+  }
+
+  template <int dim>
+  template <typename Evaluator, typename Number2>
+  void PoissonOperator<dim>::do_flux_term(Evaluator         &evaluator_m,
+                                          Evaluator         &evaluator_p,
+                                          const Number2     &tau,
+                                          const unsigned int q) const
+  {
+    const auto normal_gradient_m = evaluator_m.get_normal_derivative(q);
+    const auto normal_gradient_p = evaluator_p.get_normal_derivative(q);
+
+    const auto value_m = evaluator_m.get_value(q);
+    const auto value_p = evaluator_p.get_value(q);
+
+    const auto jump_value = value_m - value_p;
+
+    const auto central_flux_gradient =
+      0.5 * (normal_gradient_m + normal_gradient_p);
+
+    const auto value_terms = central_flux_gradient - tau * jump_value;
+
+    evaluator_m.submit_value(-value_terms, q);
+    evaluator_p.submit_value(value_terms, q);
+
+    const auto gradient_terms = -0.5 * jump_value;
+
+    evaluator_m.submit_normal_derivative(gradient_terms, q);
+    evaluator_p.submit_normal_derivative(gradient_terms, q);
+  }
+
+
+
+  template <int dim>
+  template <typename Evaluator, typename Number2>
+  void PoissonOperator<dim>::do_boundary_flux_term_homogeneous(
+    Evaluator         &evaluator_m,
+    const Number2     &tau,
+    const unsigned int q) const
+  {
+    const auto value           = evaluator_m.get_value(q);
+    const auto normal_gradient = evaluator_m.get_normal_derivative(q);
+
+    const auto value_term           = 2. * tau * value - normal_gradient;
+    const auto normal_gradient_term = -value;
+
+    evaluator_m.submit_value(value_term, q);
+    evaluator_m.submit_normal_derivative(normal_gradient_term, q);
+  }
+
+
+
+  template <int dim>
+  template <bool do_normal_hessians, bool do_values, typename Evaluator>
+  void PoissonOperator<dim>::do_gp_face_term(
+    Evaluator                            &evaluator_m,
+    Evaluator                            &evaluator_p,
+    const typename Evaluator::NumberType &masked_factor_value,
+    const typename Evaluator::NumberType &masked_factor_gradient,
+    const typename Evaluator::NumberType &masked_factor_hessian,
+    const unsigned int                    q) const
+  {
+    if (do_values)
+      {
+        const auto value_m = evaluator_m.get_value(q);
+        const auto value_p = evaluator_p.get_value(q);
+
+        const auto jump_value = value_m - value_p;
+
+        const auto value_term = masked_factor_value * jump_value;
+
+        evaluator_m.submit_value(value_term, q);
+        evaluator_p.submit_value(-value_term, q);
+      }
+
+    {
+      const auto normal_gradient_m = evaluator_m.get_normal_derivative(q);
+      const auto normal_gradient_p = evaluator_p.get_normal_derivative(q);
+
+      const auto jump_normal_gradient = normal_gradient_m - normal_gradient_p;
+
+      const auto gradient_term = masked_factor_gradient * jump_normal_gradient;
+
+      evaluator_m.submit_normal_derivative(gradient_term, q);
+      evaluator_p.submit_normal_derivative(-gradient_term, q);
+    }
+
+    if (do_normal_hessians)
+      {
+        const auto normal_hessian_m = evaluator_m.get_normal_hessian(q);
+        const auto normal_hessian_p = evaluator_p.get_normal_hessian(q);
+
+        const auto jump_normal_hessian = normal_hessian_m - normal_hessian_p;
+
+        const auto hessian_term = masked_factor_hessian * jump_normal_hessian;
+
+        evaluator_m.submit_normal_hessian(hessian_term, q);
+        evaluator_p.submit_normal_hessian(-hessian_term, q);
+      }
+  }
+
+
+
+  template <int dim>
+  template <typename Evaluator>
+  void PoissonOperator<dim>::do_rhs_cell_term(Evaluator           &evaluator,
+                                              const Function<dim> &rhs_function,
+                                              const unsigned int   q) const
+  {
+    const auto q_points = evaluator.quadrature_point(q);
+
+    VectorizedArrayType value = 0.;
+
+    for (unsigned int v = 0; v < n_lanes; ++v)
+      {
+        Point<dim> q_point;
+        for (unsigned int d = 0; d < dim; ++d)
+          q_point[d] = q_points[d][v];
+
+        value[v] = rhs_function.value(q_point);
+      }
+
+    evaluator.submit_value(value, q);
+  }
+
+
+
+  template <int dim>
+  void PoissonOperator<dim>::do_local_apply_sipg_term(
+    PoissonOperator::FaceEvaluator             &evaluator_m,
+    PoissonOperator::FaceEvaluator             &evaluator_p,
+    const PoissonOperator::VectorizedArrayType *dof_ptr_m,
+    const PoissonOperator::VectorizedArrayType *dof_ptr_p,
+    const PoissonOperator::VectorizedArrayType &diameter) const
+  {
+    const auto tau = compute_interior_penalty_parameter(diameter);
+
+    evaluator_m.evaluate(dof_ptr_m,
+                         EvaluationFlags::values | EvaluationFlags::gradients);
+    evaluator_p.evaluate(dof_ptr_p,
+                         EvaluationFlags::values | EvaluationFlags::gradients);
+
+    for (const auto q : evaluator_m.quadrature_point_indices())
+      do_flux_term(evaluator_m, evaluator_p, tau, q);
+
+    evaluator_m.integrate(EvaluationFlags::values | EvaluationFlags::gradients);
+    evaluator_p.integrate(EvaluationFlags::values | EvaluationFlags::gradients);
+  }
+
+
+
+  template <int dim>
+  template <bool is_dg_>
+  void PoissonOperator<dim>::do_local_apply_gp_face_term(
+    PoissonOperator::FaceEvaluator             &evaluator_m,
+    PoissonOperator::FaceEvaluator             &evaluator_p,
+    const PoissonOperator::VectorizedArrayType *dof_ptr_m,
+    const PoissonOperator::VectorizedArrayType *dof_ptr_p,
+    const PoissonOperator::VectorizedArrayType &diameter,
+    const bool                                  sum_into_values) const
+  {
+    EvaluationFlags::EvaluationFlags evaluation_flags =
+      EvaluationFlags::gradients;
+    if (is_dg_)
+      evaluation_flags |= EvaluationFlags::values;
+
+    const unsigned int degree =
+      matrix_free->get_dof_handler(dof_index).get_fe().degree;
+    const bool do_hessians = degree > 1;
+    if (do_hessians)
+      evaluation_flags |= EvaluationFlags::hessians;
+
+    Assert(degree <= 2,
+           ExcMessage(
+             "Face-based stabilization only implemented up to degree 2!"));
+
+    evaluator_m.evaluate(dof_ptr_m, evaluation_flags);
+    evaluator_p.evaluate(dof_ptr_p, evaluation_flags);
+
+    const VectorizedArrayType factor_values   = 0.5 / diameter;
+    const VectorizedArrayType factor_gradient = 0.5 * diameter;
+    const VectorizedArrayType factor_hessians =
+      0.5 * diameter * diameter * diameter;
+
+    if (do_hessians)
+      for (const auto q : evaluator_m.quadrature_point_indices())
+        do_gp_face_term<true, is_dg_>(evaluator_m,
+                                      evaluator_p,
+                                      factor_values,
+                                      factor_gradient,
+                                      factor_hessians,
+                                      q);
+    else
+      for (const auto q : evaluator_m.quadrature_point_indices())
+        do_gp_face_term<false, is_dg_>(evaluator_m,
+                                       evaluator_p,
+                                       factor_values,
+                                       factor_gradient,
+                                       factor_hessians,
+                                       q);
+
+    evaluator_m.integrate(evaluation_flags, sum_into_values);
+    evaluator_p.integrate(evaluation_flags, sum_into_values);
+  }
+
+
+
+  template <int dim>
+  bool PoissonOperator<dim>::is_inside_face(
+    std::pair<unsigned int, unsigned int> face_category) const
+  {
+    return is_inside(face_category.first) && is_inside(face_category.second);
+  }
+
+
+
+  template <int dim>
+  bool PoissonOperator<dim>::is_mixed_face(
+    std::pair<unsigned int, unsigned int> face_category) const
+  {
+    return (is_inside(face_category.first) &&
+            is_intersected(face_category.second)) ||
+           (is_intersected(face_category.first) &&
+            is_inside(face_category.second));
+  }
+
+
+
+  template <int dim>
+  bool PoissonOperator<dim>::is_intersected_face(
+    std::pair<unsigned int, unsigned int> face_category) const
+  {
+    return is_intersected(face_category.first) &&
+           is_intersected(face_category.second);
+  }
+
+
+
+  template <int dim>
+  typename PoissonOperator<dim>::VectorizedArrayType
+  PoissonOperator<dim>::compute_diameter_of_inner_face_batch(
+    unsigned int face_batch_index) const
+  {
+    const auto &face_info = matrix_free->get_face_info(face_batch_index);
+
+    VectorizedArrayType diameter = 0.;
+    for (unsigned int v = 0;
+         v < matrix_free->n_active_entries_per_face_batch(face_batch_index);
+         ++v)
+      {
+        const auto cell_batch_index_interior =
+          face_info.cells_interior[v] / n_lanes;
+        const auto cell_lane_index_interior =
+          face_info.cells_interior[v] % n_lanes;
+        const auto cell_batch_index_exterior =
+          face_info.cells_exterior[v] / n_lanes;
+        const auto cell_lane_index_exterior =
+          face_info.cells_exterior[v] % n_lanes;
+
+        diameter[v] = std::max(
+          cell_diameter[cell_batch_index_interior][cell_lane_index_interior],
+          cell_diameter[cell_batch_index_exterior][cell_lane_index_exterior]);
+      }
+
+    return diameter;
+  }
+
+
+
+  template <int dim>
+  typename PoissonOperator<dim>::VectorizedArrayType
+  PoissonOperator<dim>::compute_interior_penalty_parameter(
+    const PoissonOperator::VectorizedArrayType &diameter) const
+  {
+    const auto k = matrix_free->get_dof_handler(dof_index).get_fe().degree;
+
+    return 2. * Utilities::fixed_power<2>(k + 1) / diameter;
+  }
 
 
 
