@@ -10,7 +10,7 @@ Solving system
 Computing L2 error
 
 Cycle Mesh size   L2-Error   
-    0    0.3025 7.5708e-05 - 
+    0    0.3025 1.2442e-04 - 
 
 Refinement cycle 1
 Setting up discrete level set function
@@ -22,8 +22,8 @@ Solving system
 Computing L2 error
 
 Cycle Mesh size    L2-Error     
-    0    0.3025 7.5708e-05    - 
-    1    0.1513 5.7502e-06 3.72 
+    0    0.3025 1.2442e-04    - 
+    1    0.1513 9.6514e-06 3.69 
 
 Refinement cycle 2
 Setting up discrete level set function
@@ -35,9 +35,9 @@ Solving system
 Computing L2 error
 
 Cycle Mesh size    L2-Error     
-    0    0.3025 7.5708e-05    - 
-    1    0.1513 5.7502e-06 3.72 
-    2    0.0756 4.2204e-07 3.77 
+    0    0.3025 1.2442e-04    - 
+    1    0.1513 9.6514e-06 3.69 
+    2    0.0756 8.3693e-07 3.53 
 
 Refinement cycle 3
 Setting up discrete level set function
@@ -50,10 +50,10 @@ Writing vtu file
 Computing L2 error
 
 Cycle Mesh size    L2-Error     
-    0    0.3025 7.5708e-05    - 
-    1    0.1513 5.7502e-06 3.72 
-    2    0.0756 4.2204e-07 3.77 
-    3    0.0378 3.5284e-08 3.58 
+    0    0.3025 1.2442e-04    - 
+    1    0.1513 9.6514e-06 3.69 
+    2    0.0756 8.3693e-07 3.53 
+    3    0.0378 7.4062e-08 3.50 
 
 Run DG convergence study with degree 2
 Creating background mesh
@@ -67,7 +67,7 @@ Solving system
 Computing L2 error
 
 Cycle Mesh size   L2-Error   
-    0    0.3025 1.4659e-04 - 
+    0    0.3025 1.5622e-04 - 
 
 Refinement cycle 1
 Setting up discrete level set function
@@ -79,8 +79,8 @@ Solving system
 Computing L2 error
 
 Cycle Mesh size    L2-Error     
-    0    0.3025 1.4659e-04    - 
-    1    0.1513 8.4858e-06 4.11 
+    0    0.3025 1.5622e-04    - 
+    1    0.1513 1.0739e-05 3.86 
 
 Refinement cycle 2
 Setting up discrete level set function
@@ -92,9 +92,9 @@ Solving system
 Computing L2 error
 
 Cycle Mesh size    L2-Error     
-    0    0.3025 1.4659e-04    - 
-    1    0.1513 8.4858e-06 4.11 
-    2    0.0756 8.6715e-07 3.29 
+    0    0.3025 1.5622e-04    - 
+    1    0.1513 1.0739e-05 3.86 
+    2    0.0756 1.0044e-06 3.42 
 
 Refinement cycle 3
 Setting up discrete level set function
@@ -107,8 +107,8 @@ Writing vtu file
 Computing L2 error
 
 Cycle Mesh size    L2-Error     
-    0    0.3025 1.4659e-04    - 
-    1    0.1513 8.4858e-06 4.11 
-    2    0.0756 8.6715e-07 3.29 
-    3    0.0378 6.4098e-08 3.76 
+    0    0.3025 1.5622e-04    - 
+    1    0.1513 1.0739e-05 3.86 
+    2    0.0756 1.0044e-06 3.42 
+    3    0.0378 7.9919e-08 3.65 
 
