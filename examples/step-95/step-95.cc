@@ -181,28 +181,27 @@ namespace Step95
     // the Poisson term in the weak form. It is templated over the Evaluator
     // type to be usable by FEEvaluation as well as FEPointEvaluation.
     template <typename Evaluator>
-    inline void do_poisson_cell_term(Evaluator         &evaluator,
-                                     const unsigned int q) const;
+    void do_poisson_cell_term(Evaluator &evaluator, const unsigned int q) const;
 
     // The implementation for the SIPG term (needed for DG). Again, templated
     // over the Evaluator type to be usable by FEFaceEvaluation and
     // FEFacePointEvaluation.
     template <typename Evaluator, typename Number2>
-    inline void do_flux_term(Evaluator         &evaluator_m,
-                             Evaluator         &evaluator_p,
-                             const Number2     &tau,
-                             const unsigned int q) const;
+    void do_flux_term(Evaluator         &evaluator_m,
+                      Evaluator         &evaluator_p,
+                      const Number2     &tau,
+                      const unsigned int q) const;
 
     // The implementation of the Nitsche term.
     template <typename Evaluator, typename Number2>
-    inline void do_boundary_flux_term_homogeneous(Evaluator     &evaluator_m,
-                                                  const Number2 &tau,
-                                                  const unsigned int q) const;
+    void do_boundary_flux_term_homogeneous(Evaluator         &evaluator_m,
+                                           const Number2     &tau,
+                                           const unsigned int q) const;
 
     // The implementation of the face-based ghost penalty term (up to degree 2 /
     // normal hessians).
     template <bool do_normal_hessians, bool do_values, typename Evaluator>
-    inline void do_gp_face_term(
+    void do_gp_face_term(
       Evaluator                            &evaluator_m,
       Evaluator                            &evaluator_p,
       const typename Evaluator::NumberType &masked_factor_value,
@@ -215,9 +214,9 @@ namespace Step95
     // vectorized types directly, so we have to reshuffle the quadrature point
     // data).
     template <typename Evaluator>
-    inline void do_rhs_cell_term(Evaluator           &evaluator,
-                                 const Function<dim> &rhs_function,
-                                 const unsigned int   q) const;
+    void do_rhs_cell_term(Evaluator           &evaluator,
+                          const Function<dim> &rhs_function,
+                          const unsigned int   q) const;
 
     // This implements the face_operation of the SIPG term (setting values in
     // integrate()).
@@ -239,13 +238,12 @@ namespace Step95
 
     // Three helper functions to determine the category of face based on the
     // active_fe_index of the face-sharing cells.
-    inline bool
+    bool
     is_inside_face(std::pair<unsigned int, unsigned int> face_category) const;
-
-    inline bool
+    bool
     is_mixed_face(std::pair<unsigned int, unsigned int> face_category) const;
 
-    inline bool is_intersected_face(
+    bool is_intersected_face(
       std::pair<unsigned int, unsigned int> face_category) const;
 
     // Helper function to determine the relevant cell lengths of a face batch;
