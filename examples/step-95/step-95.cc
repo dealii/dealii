@@ -249,9 +249,9 @@ namespace Step95
       matrix_free->initialize_dof_vector(vec);
     }
 
-    // With this function we can assemble the diagonal of the operator instead
-    // of applying the matrix-vector product. It uses the same function than the
-    // operator evalaution for the local operation on cells and faces but sets
+    // With this function, we can assemble the diagonal of the operator instead
+    // of applying the matrix-vector product. It uses the same function as the
+    // operator evaluation for the local operation on cells and faces but sets
     // the template argument assemble to true.
     void compute_diagonal(VectorType &diagonal) const
     {
@@ -367,8 +367,8 @@ namespace Step95
 
       // We loop over the cell batches of the current cell_range and apply the
       // cell_operation. For a vmult() we only apply once, for diagonal assembly
-      // we apply the cell_operation for every local cell DoF on a cell DoF unit
-      // vector.
+      // we apply the cell_operation to the respective unit vector for every
+      // local cell DoF.
       for (unsigned int cell_batch_index = cell_range.first;
            cell_batch_index < cell_range.second;
            ++cell_batch_index)
@@ -425,7 +425,7 @@ namespace Step95
         matrix_free->get_face_range_category(face_range);
 
       // We start with the face operations for the DG case.
-      // We define the face_operation for inside face as the SIPG term.
+      // We define the face_operation for an inside face as the SIPG term.
       auto inside_face_operation_dg = [&](FaceEvaluator &evaluator_m,
                                           FaceEvaluator &evaluator_p) {
         const unsigned int face_batch_index =
@@ -441,7 +441,7 @@ namespace Step95
                                  diameter);
       };
 
-      // We define the face_operation for mixed face (between an inside and an
+      // We define the face_operation for a mixed face (between an inside and an
       // intersected cell) as the SIPG term plus the ghost penalty term.
       auto mixed_face_operation_dg = [&](FaceEvaluator &evaluator_m,
                                          FaceEvaluator &evaluator_p) {
@@ -465,7 +465,7 @@ namespace Step95
                                           true);
       };
 
-      // We define the face_operation for intersected face (between two
+      // We define the face_operation for an intersected face (between two
       // intersected cells) as the SIPG term plus the ghost penalty term.
       auto intersected_face_operation_dg = [&](FaceEvaluator &evaluator_m,
                                                FaceEvaluator &evaluator_p) {
