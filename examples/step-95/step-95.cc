@@ -95,13 +95,13 @@ namespace Step95
     // We also define types for the matrix-free evaluation classes for cells and
     // faces and for structured and unstructured quadrature to keep the
     // definition of the template arguments for those at a central place.
-    using CellIntegrator =
+    using CellEvaluator =
       FEEvaluation<dim, -1, 0, 1, Number, VectorizedArrayType>;
-    using FaceIntegrator =
+    using FaceEvaluator =
       FEFaceEvaluation<dim, -1, 0, 1, Number, VectorizedArrayType>;
-    using GenericCellIntegrator =
+    using GenericCellEvaluator =
       FEPointEvaluation<1, dim, dim, VectorizedArrayType>;
-    using GenericFaceIntegrator =
+    using GenericFaceEvaluator =
       FEFacePointEvaluation<1, dim, dim, VectorizedArrayType>;
 
     // And finally, we introduce a shortcut for the width of the detected SIMD
@@ -131,20 +131,20 @@ namespace Step95
 
       const auto &fe = matrix_free->get_dof_handler().get_fe();
 
-      evaluator_cell = std::make_unique<GenericCellIntegrator>(
-        *mapping_info_cell, fe, 0, true);
-      evaluator_surface = std::make_unique<GenericCellIntegrator>(
+      evaluator_cell =
+        std::make_unique<GenericCellEvaluator>(*mapping_info_cell, fe, 0, true);
+      evaluator_surface = std::make_unique<GenericCellEvaluator>(
         *mapping_info_surface, fe, 0, true);
       if (is_dg)
         {
           evaluator_face_m =
-            std::make_unique<GenericFaceIntegrator>(*mapping_info_faces,
-                                                    fe,
-                                                    true);
+            std::make_unique<GenericFaceEvaluator>(*mapping_info_faces,
+                                                   fe,
+                                                   true);
           evaluator_face_p =
-            std::make_unique<GenericFaceIntegrator>(*mapping_info_faces,
-                                                    fe,
-                                                    false);
+            std::make_unique<GenericFaceEvaluator>(*mapping_info_faces,
+                                                   fe,
+                                                   false);
         }
 
       matrix_free->initialize_cell_data_vector(cell_diameter);
@@ -190,7 +190,7 @@ namespace Step95
             VectorType &dst,
             const VectorType &,
             const std::pair<unsigned int, unsigned int> &cell_range) {
-          CellIntegrator evaluator(*matrix_free, dof_index, quad_index);
+          CellEvaluator evaluator(*matrix_free, dof_index, quad_index);
 
           const auto cell_range_category =
             matrix_free->get_cell_range_category(cell_range);
@@ -266,16 +266,15 @@ namespace Step95
   private:
     // We define two helper functions needed for matrix-free assembly
     // operations.
-    template <typename Integrator>
-    void create_zero_basis(Integrator &evaluator) const
+    template <typename Evaluator>
+    void create_zero_basis(Evaluator &evaluator) const
     {
       for (unsigned int i = 0; i < evaluator.dofs_per_cell; ++i)
         evaluator.begin_dof_values()[i] = VectorizedArrayType(0.);
     }
 
-    template <typename Integrator>
-    void create_standard_basis(const unsigned int j,
-                               Integrator        &evaluator) const
+    template <typename Evaluator>
+    void create_standard_basis(const unsigned int j, Evaluator &evaluator) const
     {
       create_zero_basis(evaluator);
       evaluator.begin_dof_values()[j] = VectorizedArrayType(1.);
@@ -289,7 +288,7 @@ namespace Step95
       const VectorType                            &src,
       const std::pair<unsigned int, unsigned int> &cell_range) const
     {
-      CellIntegrator evaluator(*matrix_free, dof_index, quad_index);
+      CellEvaluator evaluator(*matrix_free, dof_index, quad_index);
 
       const auto dofs_per_cell = evaluator.dofs_per_cell;
 
@@ -301,7 +300,7 @@ namespace Step95
 
       // We define the cell_operation for inside cells as the standard Poisson
       // term.
-      auto inside_cell_operation = [&](CellIntegrator &evaluator) {
+      auto inside_cell_operation = [&](CellEvaluator &evaluator) {
         evaluator.evaluate(EvaluationFlags::gradients);
         for (unsigned int q : evaluator.quadrature_point_indices())
           do_poisson_cell_term(evaluator, q);
@@ -311,7 +310,7 @@ namespace Step95
       // We define the cell_operation for intersected cells as the standard
       // Poisson term in the cut volume and the Nitsche term for weak Dirichlet
       // boundary enforcement on the cut surface.
-      auto intersected_cell_operation = [&](CellIntegrator &evaluator) {
+      auto intersected_cell_operation = [&](CellEvaluator &evaluator) {
         const unsigned int cell_batch_index =
           evaluator.get_cell_or_face_batch_id();
         const VectorizedArrayType diameter = cell_diameter[cell_batch_index];
@@ -358,7 +357,7 @@ namespace Step95
 
       // Depending on the active_fe_index of the cell_range we select the
       // cell_operation to execute.
-      std::function<void(CellIntegrator &)> cell_operation;
+      std::function<void(CellEvaluator &)> cell_operation;
       if (is_inside(cell_range_category))
         cell_operation = inside_cell_operation;
       else if (is_intersected(cell_range_category))
@@ -409,8 +408,8 @@ namespace Step95
       const VectorType                            &src,
       const std::pair<unsigned int, unsigned int> &face_range) const
     {
-      FaceIntegrator evaluator_m(*matrix_free, true, dof_index, quad_index);
-      FaceIntegrator evaluator_p(*matrix_free, false, dof_index, quad_index);
+      FaceEvaluator evaluator_m(*matrix_free, true, dof_index, quad_index);
+      FaceEvaluator evaluator_p(*matrix_free, false, dof_index, quad_index);
 
       AlignedVector<VectorizedArrayType> dof_buffer_m(
         evaluator_m.dofs_per_cell);
@@ -427,8 +426,8 @@ namespace Step95
 
       // We start with the face operations for the DG case.
       // We define the face_operation for inside face as the SIPG term.
-      auto inside_face_operation_dg = [&](FaceIntegrator &evaluator_m,
-                                          FaceIntegrator &evaluator_p) {
+      auto inside_face_operation_dg = [&](FaceEvaluator &evaluator_m,
+                                          FaceEvaluator &evaluator_p) {
         const unsigned int face_batch_index =
           evaluator_m.get_cell_or_face_batch_id();
 
@@ -444,8 +443,8 @@ namespace Step95
 
       // We define the face_operation for mixed face (between an inside and an
       // intersected cell) as the SIPG term plus the ghost penalty term.
-      auto mixed_face_operation_dg = [&](FaceIntegrator &evaluator_m,
-                                         FaceIntegrator &evaluator_p) {
+      auto mixed_face_operation_dg = [&](FaceEvaluator &evaluator_m,
+                                         FaceEvaluator &evaluator_p) {
         const unsigned int face_batch_index =
           evaluator_m.get_cell_or_face_batch_id();
 
@@ -468,8 +467,8 @@ namespace Step95
 
       // We define the face_operation for intersected face (between two
       // intersected cells) as the SIPG term plus the ghost penalty term.
-      auto intersected_face_operation_dg = [&](FaceIntegrator &evaluator_m,
-                                               FaceIntegrator &evaluator_p) {
+      auto intersected_face_operation_dg = [&](FaceEvaluator &evaluator_m,
+                                               FaceEvaluator &evaluator_p) {
         const unsigned int face_batch_index =
           evaluator_m.get_cell_or_face_batch_id();
 
@@ -525,7 +524,7 @@ namespace Step95
       // For the CG case we only need to define the ghost penalty term for mixed
       // and intersected faces.
       auto intersected_mixed_face_operation_cg =
-        [&](FaceIntegrator &evaluator_m, FaceIntegrator &evaluator_p) {
+        [&](FaceEvaluator &evaluator_m, FaceEvaluator &evaluator_p) {
           const unsigned int face_batch_index =
             evaluator_m.get_cell_or_face_batch_id();
 
@@ -542,7 +541,7 @@ namespace Step95
 
       // Depending on the active_fe_index of the two cells sharing the current
       // face we select the face_operation.
-      std::function<void(FaceIntegrator &, FaceIntegrator &)> face_operation;
+      std::function<void(FaceEvaluator &, FaceEvaluator &)> face_operation;
       bool buffer_dof_values = false;
       if (is_dg)
         {
@@ -651,21 +650,21 @@ namespace Step95
     {}
 
     // This is the actual implementation of the quadrature point operation of
-    // the Poisson term in the weak form. It is templated over the Integrator
+    // the Poisson term in the weak form. It is templated over the Evaluator
     // type to be usable by FEEvaluation as well as FEPointEvaluation.
-    template <typename Integrator>
-    inline void do_poisson_cell_term(Integrator        &evaluator,
+    template <typename Evaluator>
+    inline void do_poisson_cell_term(Evaluator         &evaluator,
                                      const unsigned int q) const
     {
       evaluator.submit_gradient(evaluator.get_gradient(q), q);
     }
 
     // The implementation for the SIPG term (needed for DG). Again, templated
-    // over the Integrator type to be usable by FEFaceEvaluation and
+    // over the Evaluator type to be usable by FEFaceEvaluation and
     // FEFacePointEvaluation.
-    template <typename Integrator, typename Number2>
-    inline void do_flux_term(Integrator        &evaluator_m,
-                             Integrator        &evaluator_p,
+    template <typename Evaluator, typename Number2>
+    inline void do_flux_term(Evaluator         &evaluator_m,
+                             Evaluator         &evaluator_p,
                              const Number2     &tau,
                              const unsigned int q) const
     {
@@ -692,8 +691,8 @@ namespace Step95
     }
 
     // The implementation of the Nitsche term.
-    template <typename Integrator, typename Number2>
-    inline void do_boundary_flux_term_homogeneous(Integrator    &evaluator_m,
+    template <typename Evaluator, typename Number2>
+    inline void do_boundary_flux_term_homogeneous(Evaluator     &evaluator_m,
                                                   const Number2 &tau,
                                                   const unsigned int q) const
     {
@@ -709,14 +708,14 @@ namespace Step95
 
     // The implementation of the face-based ghost penalty term (up to degree 2 /
     // normal hessians).
-    template <bool do_normal_hessians, bool do_values, typename Integrator>
+    template <bool do_normal_hessians, bool do_values, typename Evaluator>
     inline void do_gp_face_term(
-      Integrator                            &evaluator_m,
-      Integrator                            &evaluator_p,
-      const typename Integrator::NumberType &masked_factor_value,
-      const typename Integrator::NumberType &masked_factor_gradient,
-      const typename Integrator::NumberType &masked_factor_hessian,
-      const unsigned int                     q) const
+      Evaluator                            &evaluator_m,
+      Evaluator                            &evaluator_p,
+      const typename Evaluator::NumberType &masked_factor_value,
+      const typename Evaluator::NumberType &masked_factor_gradient,
+      const typename Evaluator::NumberType &masked_factor_hessian,
+      const unsigned int                    q) const
     {
       if (do_values)
         {
@@ -761,8 +760,8 @@ namespace Step95
     // The implementation of the right-hand-side term evaluating the rhs
     // function (unfortunately we cannot evaluate a Function vectorized, so we
     // have to reshuffle the quadrature point data).
-    template <typename Integrator>
-    inline void do_rhs_cell_term(Integrator          &evaluator,
+    template <typename Evaluator>
+    inline void do_rhs_cell_term(Evaluator           &evaluator,
                                  const Function<dim> &rhs_function,
                                  const unsigned int   q) const
     {
@@ -784,8 +783,8 @@ namespace Step95
 
     // This implements the face_operation of the SIPG term (setting values in
     // integrate()).
-    void do_local_apply_sipg_term(FaceIntegrator            &evaluator_m,
-                                  FaceIntegrator            &evaluator_p,
+    void do_local_apply_sipg_term(FaceEvaluator             &evaluator_m,
+                                  FaceEvaluator             &evaluator_p,
                                   const VectorizedArrayType *dof_ptr_m,
                                   const VectorizedArrayType *dof_ptr_p,
                                   const VectorizedArrayType &diameter) const
@@ -811,8 +810,8 @@ namespace Step95
     // This implements the face_operation of the ghost penalty term (potentially
     // adding into the values in integrate() depending on sum_into_values).
     template <bool is_dg_>
-    void do_local_apply_gp_face_term(FaceIntegrator            &evaluator_m,
-                                     FaceIntegrator            &evaluator_p,
+    void do_local_apply_gp_face_term(FaceEvaluator             &evaluator_m,
+                                     FaceEvaluator             &evaluator_p,
                                      const VectorizedArrayType *dof_ptr_m,
                                      const VectorizedArrayType *dof_ptr_p,
                                      const VectorizedArrayType &diameter,
@@ -936,10 +935,10 @@ namespace Step95
       const NonMatching::MappingInfo<dim, dim, VectorizedArrayType>>
       mapping_info_faces;
 
-    std::unique_ptr<GenericCellIntegrator> evaluator_cell;
-    std::unique_ptr<GenericCellIntegrator> evaluator_surface;
-    std::unique_ptr<GenericFaceIntegrator> evaluator_face_m;
-    std::unique_ptr<GenericFaceIntegrator> evaluator_face_p;
+    std::unique_ptr<GenericCellEvaluator> evaluator_cell;
+    std::unique_ptr<GenericCellEvaluator> evaluator_surface;
+    std::unique_ptr<GenericFaceEvaluator> evaluator_face_m;
+    std::unique_ptr<GenericFaceEvaluator> evaluator_face_p;
 
     AlignedVector<VectorizedArrayType> cell_diameter;
 
@@ -998,9 +997,9 @@ namespace Step95
     using VectorizedArrayType = VectorizedArray<Number>;
     using VectorType          = LinearAlgebra::distributed::Vector<Number>;
 
-    using CellIntegrator =
+    using CellEvaluator =
       FEEvaluation<dim, -1, 0, 1, Number, VectorizedArrayType>;
-    using GenericCellIntegrator =
+    using GenericCellEvaluator =
       FEPointEvaluation<1, dim, dim, VectorizedArrayType>;
 
     static constexpr unsigned int n_lanes = VectorizedArrayType::size();
@@ -1533,11 +1532,11 @@ namespace Step95
           unsigned int &,
           const VectorType                            &src,
           const std::pair<unsigned int, unsigned int> &cell_range) {
-        CellIntegrator evaluator(matrix_free, dof_index, quad_index);
+        CellEvaluator evaluator(matrix_free, dof_index, quad_index);
 
         FE_DGQ<dim> fe_dgq(fe_degree);
 
-        GenericCellIntegrator evaluator_cell(*mapping_info_cell, fe_dgq);
+        GenericCellEvaluator evaluator_cell(*mapping_info_cell, fe_dgq);
 
         const auto cell_range_category =
           matrix_free.get_cell_range_category(cell_range);
