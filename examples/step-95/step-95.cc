@@ -1176,6 +1176,15 @@ namespace Step95
 
 
   // @sect3{The PoissonSolver class template}
+  // The PoissonSolver runs the solver in the run() function. First, it sets up
+  // necessary data structures: the parallel::distributed::Triangulation, the
+  // discrete level-set with its DoFHandler, the DoFHandler of the solution, and
+  // the MatrixFree and NonMatching::MappingInfo objects. With these
+  // ingredients, the PoissonOperator is set up. Then the Jacobi preconditioner
+  // and the right-hand-side are assembled using the PoissonOperator. Now, we
+  // solve the problem with a preconditioned iterative SolverCG, calculate the
+  // errors compared to the analytical solution, and output the results in .vtu
+  // format via DataOut.
   template <int dim>
   class PoissonSolver
   {
@@ -1224,15 +1233,10 @@ namespace Step95
 
     PoissonOperator<dim> poisson_operator;
 
-    // We need two separate DoFHandler objects. The first manages the DoFs for
-    // the discrete level set function that describes the geometry of the
-    // domain.
     std::unique_ptr<FE_Q<dim>> fe_level_set;
     DoFHandler<dim>            level_set_dof_handler;
     VectorType                 level_set;
 
-    // The second DoFHandler manages the DoFs for the solution of the Poisson
-    // equation.
     DoFHandler<dim> dof_handler;
     VectorType      solution;
 
