@@ -2,7 +2,7 @@
 
 The results of the convergence studies are shown in the tables below.
 
-For $p=1$ we get (for continuous elements):
+For $p=1$ we get (for continuous elements, FE_Q):
 
 | Cycle | Mesh size | $L^2$-Error | EOC  |
 |:-----:|:---------:|:-----------:|:----:|
