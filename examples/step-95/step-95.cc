@@ -295,7 +295,7 @@ namespace Step95
       AlignedVector<VectorizedArrayType> dof_buffer(assemble ? dofs_per_cell :
                                                                0);
 
-      const auto cell_range_category =
+      const unsigned int cell_range_category =
         matrix_free->get_cell_range_category(cell_range);
 
       // We define the cell_operation for inside cells as the standard Poisson
@@ -421,7 +421,7 @@ namespace Step95
       AlignedVector<VectorizedArrayType> local_diagonal_p(
         assemble ? evaluator_p.dofs_per_cell : 0);
 
-      const auto face_range_category =
+      const std::pair<unsigned int, unsigned int> face_range_category =
         matrix_free->get_face_range_category(face_range);
 
       // We start with the face operations for the DG case.
