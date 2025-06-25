@@ -582,6 +582,8 @@ namespace Step95
       }
   }
 
+
+
   template <int dim>
   template <bool assemble>
   void PoissonOperator<dim>::local_apply_face(
@@ -826,6 +828,8 @@ namespace Step95
   {
     evaluator.submit_gradient(evaluator.get_gradient(q), q);
   }
+
+
 
   template <int dim>
   template <typename Evaluator, typename Number2>
@@ -1115,37 +1119,50 @@ namespace Step95
   public:
     using VectorType = LinearAlgebra::distributed::Vector<double>;
 
-    JacobiPreconditioner(const PoissonOperator<dim> &poisson_operator)
-    {
-      poisson_operator.initialize_dof_vector(inverse_diagonal);
-      poisson_operator.compute_diagonal(inverse_diagonal);
-      for (unsigned int i = 0; i < inverse_diagonal.locally_owned_size(); ++i)
-        {
-          if (std::abs(inverse_diagonal.local_element(i)) > 1.0e-10)
-            inverse_diagonal.local_element(i) =
-              1.0 / inverse_diagonal.local_element(i);
-          else
-            inverse_diagonal.local_element(i) = 1.0;
-        }
-    }
+    JacobiPreconditioner(const PoissonOperator<dim> &poisson_operator);
 
-    void vmult(VectorType &dst, const VectorType &src) const
-    {
-      if (PointerComparison::equal(&dst, &src))
-        {
-          dst.scale(inverse_diagonal);
-        }
-      else
-        {
-          for (unsigned int i = 0; i < dst.locally_owned_size(); ++i)
-            dst.local_element(i) =
-              inverse_diagonal.local_element(i) * src.local_element(i);
-        }
-    }
+    void vmult(VectorType &dst, const VectorType &src) const;
 
   private:
     VectorType inverse_diagonal;
   };
+
+
+
+  template <int dim>
+  JacobiPreconditioner<dim>::JacobiPreconditioner(
+    const PoissonOperator<dim> &poisson_operator)
+  {
+    poisson_operator.initialize_dof_vector(inverse_diagonal);
+    poisson_operator.compute_diagonal(inverse_diagonal);
+    for (unsigned int i = 0; i < inverse_diagonal.locally_owned_size(); ++i)
+      {
+        if (std::abs(inverse_diagonal.local_element(i)) > 1.0e-10)
+          inverse_diagonal.local_element(i) =
+            1.0 / inverse_diagonal.local_element(i);
+        else
+          inverse_diagonal.local_element(i) = 1.0;
+      }
+  }
+
+
+
+  template <int dim>
+  void JacobiPreconditioner<dim>::vmult(
+    JacobiPreconditioner::VectorType       &dst,
+    const JacobiPreconditioner::VectorType &src) const
+  {
+    if (PointerComparison::equal(&dst, &src))
+      {
+        dst.scale(inverse_diagonal);
+      }
+    else
+      {
+        for (unsigned int i = 0; i < dst.locally_owned_size(); ++i)
+          dst.local_element(i) =
+            inverse_diagonal.local_element(i) * src.local_element(i);
+      }
+  }
 
 
 
