@@ -110,7 +110,7 @@ namespace Step95
 
   public:
     // In the reinit() function the PoissonOperator receives the necessary
-    // information for matrix-free evaluation, i.e. the MatrixFree object for
+    // information for matrix-free evaluation, i.e., the MatrixFree object for
     // inside cells and the NonMatching::MappingInfo objects for intersected
     // cells.
     void
@@ -124,7 +124,7 @@ namespace Step95
            const bool is_dg_in);
 
     // This function is the interface function for linear solvers that applies
-    // the operator evaluation which is an abstraction of a matrix-vector
+    // the operator evaluation, which is an abstraction of a matrix-vector
     // product by executing loops over cells and faces.
     void vmult(VectorType &dst, const VectorType &src) const;
 
