@@ -116,11 +116,11 @@ namespace Step95
     void
     reinit(const MatrixFree<dim, Number, VectorizedArrayType> &matrix_free_in,
            const NonMatching::MappingInfo<dim, dim, VectorizedArrayType>
-             *mapping_info_cell_in,
+             &mapping_info_cell_in,
            const NonMatching::MappingInfo<dim, dim, VectorizedArrayType>
-             *mapping_info_surface_in,
+             &mapping_info_surface_in,
            const NonMatching::MappingInfo<dim, dim, VectorizedArrayType>
-                     *mapping_info_faces_in,
+                     &mapping_info_faces_in,
            const bool is_dg_in);
 
     // This function is the interface function for linear solvers that applies
@@ -289,17 +289,17 @@ namespace Step95
   void PoissonOperator<dim>::reinit(
     const MatrixFree<dim, Number, VectorizedArrayType> &matrix_free_in,
     const NonMatching::MappingInfo<dim, dim, VectorizedArrayType>
-      *mapping_info_cell_in,
+      &mapping_info_cell_in,
     const NonMatching::MappingInfo<dim, dim, VectorizedArrayType>
-      *mapping_info_surface_in,
+      &mapping_info_surface_in,
     const NonMatching::MappingInfo<dim, dim, VectorizedArrayType>
-              *mapping_info_faces_in,
+              &mapping_info_faces_in,
     const bool is_dg_in)
   {
     matrix_free          = &matrix_free_in;
-    mapping_info_cell    = mapping_info_cell_in;
-    mapping_info_surface = mapping_info_surface_in;
-    mapping_info_faces   = mapping_info_faces_in;
+    mapping_info_cell    = &mapping_info_cell_in;
+    mapping_info_surface = &mapping_info_surface_in;
+    mapping_info_faces   = &mapping_info_faces_in;
     is_dg                = is_dg_in;
 
     const auto &fe = matrix_free->get_dof_handler().get_fe();
@@ -1825,9 +1825,9 @@ namespace Step95
         setup_mapping_data();
 
         poisson_operator.reinit(matrix_free,
-                                mapping_info_cell.get(),
-                                mapping_info_surface.get(),
-                                mapping_info_faces.get(),
+                                *mapping_info_cell,
+                                *mapping_info_surface,
+                                *mapping_info_faces,
                                 is_dg);
 
         matrix_free.initialize_dof_vector(solution);
