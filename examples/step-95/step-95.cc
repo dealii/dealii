@@ -595,16 +595,20 @@ namespace Step95
     FaceEvaluator evaluator_m(*matrix_free, true, dof_index, quad_index);
     FaceEvaluator evaluator_p(*matrix_free, false, dof_index, quad_index);
 
-    AlignedVector<VectorizedArrayType> dof_buffer_m(evaluator_m.dofs_per_cell);
-    AlignedVector<VectorizedArrayType> dof_buffer_p(evaluator_p.dofs_per_cell);
+    const std::pair<unsigned int, unsigned int> face_range_category =
+      matrix_free->get_face_range_category(face_range);
+
+    const bool need_buffer = is_dg && !is_inside_face(face_range_category);
+
+    AlignedVector<VectorizedArrayType> dof_buffer_m(
+      need_buffer ? evaluator_m.dofs_per_cell : 0);
+    AlignedVector<VectorizedArrayType> dof_buffer_p(
+      need_buffer ? evaluator_p.dofs_per_cell : 0);
 
     AlignedVector<VectorizedArrayType> local_diagonal_m(
       assemble ? evaluator_m.dofs_per_cell : 0);
     AlignedVector<VectorizedArrayType> local_diagonal_p(
       assemble ? evaluator_p.dofs_per_cell : 0);
-
-    const std::pair<unsigned int, unsigned int> face_range_category =
-      matrix_free->get_face_range_category(face_range);
 
     // We start with the face operations for the DG case.
     // We define the face_operation for an inside face as the SIPG term.
@@ -1216,8 +1220,9 @@ namespace Step95
 
     PoissonOperator<dim> poisson_operator;
 
-    // We need two separate DoFHandlers. The first manages the DoFs for the
-    // discrete level set function that describes the geometry of the domain.
+    // We need two separate DoFHandler objects. The first manages the DoFs for
+    // the discrete level set function that describes the geometry of the
+    // domain.
     std::unique_ptr<FE_Q<dim>> fe_level_set;
     DoFHandler<dim>            level_set_dof_handler;
     VectorType                 level_set;
