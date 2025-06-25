@@ -1827,7 +1827,8 @@ namespace Step95
         poisson_operator.reinit(matrix_free,
                                 *mapping_info_cell,
                                 *mapping_info_surface,
-                                *mapping_info_faces,
+                                is_dg ? *mapping_info_faces :
+                                        *mapping_info_cell,
                                 is_dg);
 
         matrix_free.initialize_dof_vector(solution);
