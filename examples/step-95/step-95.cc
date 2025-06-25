@@ -149,16 +149,11 @@ namespace Step95
       const VectorType                            &src,
       const std::pair<unsigned int, unsigned int> &face_range) const;
 
-    // We do not need a local operation of the fitted boundary for this tutorial
-    // as the whole Dirichlet boundary is immersed in the volume of the domain.
-    // However, this tutorial is easily extendable to the case with fitted and
-    // unfitted boundaries.
     void local_apply_boundary_face(
       const MatrixFree<dim, Number, VectorizedArrayType> &,
       VectorType &,
       const VectorType &,
-      const std::pair<unsigned int, unsigned int> &) const
-    {}
+      const std::pair<unsigned int, unsigned int> &) const;
 
     template <typename Evaluator>
     void do_poisson_cell_term(Evaluator &evaluator, const unsigned int q) const;
@@ -796,6 +791,20 @@ namespace Step95
         evaluator_p.distribute_local_to_global(dst);
       }
   }
+
+
+
+  // We do not need a local operation of the fitted boundary for this tutorial
+  // as the whole Dirichlet boundary is immersed in the volume of the domain.
+  // However, this tutorial is easily extendable to the case with fitted and
+  // unfitted boundaries.
+  template <int dim>
+  void PoissonOperator<dim>::local_apply_boundary_face(
+    const MatrixFree<dim, Number, VectorizedArrayType> &,
+    PoissonOperator::VectorType &,
+    const PoissonOperator::VectorType &,
+    const std::pair<unsigned int, unsigned int> &) const
+  {}
 
 
 
