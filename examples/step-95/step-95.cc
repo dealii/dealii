@@ -109,10 +109,6 @@ namespace Step95
     static constexpr unsigned int n_lanes = VectorizedArrayType::size();
 
   public:
-    // In the reinit() function the PoissonOperator receives the necessary
-    // information for matrix-free evaluation, i.e., the MatrixFree object for
-    // inside cells and the NonMatching::MappingInfo objects for intersected
-    // cells.
     void
     reinit(const MatrixFree<dim, Number, VectorizedArrayType> &matrix_free_in,
            const NonMatching::MappingInfo<dim, dim, VectorizedArrayType>
@@ -123,26 +119,15 @@ namespace Step95
                      &mapping_info_faces_in,
            const bool is_dg_in);
 
-    // This function is the interface function for linear solvers that applies
-    // the operator evaluation, which is an abstraction of a matrix-vector
-    // product by executing loops over cells and faces.
     void vmult(VectorType &dst, const VectorType &src) const;
 
-    // The right-hand-side is assembled with a loop over the cells.
     void rhs(VectorType &rhs, const Function<dim> &rhs_function);
 
-    // This functions partitions a vector with matrix-free functionality.
     void initialize_dof_vector(VectorType &vec) const;
 
-    // With this function, we can assemble the diagonal of the operator instead
-    // of applying the matrix-vector product. It uses the same function as the
-    // operator evaluation for the local operation on cells and faces but sets
-    // the template argument assemble to true.
     void compute_diagonal(VectorType &diagonal) const;
 
   private:
-    // We define two helper functions needed for matrix-free assembly
-    // operations.
     template <typename Evaluator>
     void create_zero_basis(Evaluator &evaluator) const;
 
@@ -150,7 +135,6 @@ namespace Step95
     void create_standard_basis(const unsigned int j,
                                Evaluator         &evaluator) const;
 
-    // This function implements the local cell operation.
     template <bool assemble = false>
     void local_apply_cell(
       const MatrixFree<dim, Number, VectorizedArrayType> &,
@@ -158,7 +142,6 @@ namespace Step95
       const VectorType                            &src,
       const std::pair<unsigned int, unsigned int> &cell_range) const;
 
-    // This function implements the local face operation.
     template <bool assemble = false>
     void local_apply_face(
       const MatrixFree<dim, Number, VectorizedArrayType> &,
@@ -177,29 +160,20 @@ namespace Step95
       const std::pair<unsigned int, unsigned int> &) const
     {}
 
-    // This is the actual implementation of the quadrature point operation of
-    // the Poisson term in the weak form. It is templated over the Evaluator
-    // type to be usable by FEEvaluation as well as FEPointEvaluation.
     template <typename Evaluator>
     void do_poisson_cell_term(Evaluator &evaluator, const unsigned int q) const;
 
-    // The implementation for the SIPG term (needed for DG). Again, templated
-    // over the Evaluator type to be usable by FEFaceEvaluation and
-    // FEFacePointEvaluation.
     template <typename Evaluator, typename Number2>
     void do_flux_term(Evaluator         &evaluator_m,
                       Evaluator         &evaluator_p,
                       const Number2     &tau,
                       const unsigned int q) const;
 
-    // The implementation of the Nitsche term.
     template <typename Evaluator, typename Number2>
     void do_boundary_flux_term_homogeneous(Evaluator         &evaluator_m,
                                            const Number2     &tau,
                                            const unsigned int q) const;
 
-    // The implementation of the face-based ghost penalty term (up to degree 2 /
-    // normal hessians).
     template <bool do_normal_hessians, bool do_values, typename Evaluator>
     void do_gp_face_term(
       Evaluator                            &evaluator_m,
@@ -209,25 +183,17 @@ namespace Step95
       const typename Evaluator::NumberType &masked_factor_hessian,
       const unsigned int                    q) const;
 
-    // The implementation of the right-hand-side term evaluating the rhs
-    // function (unfortunately, we cannot evaluate a Function object with
-    // vectorized types directly, so we have to reshuffle the quadrature point
-    // data).
     template <typename Evaluator>
     void do_rhs_cell_term(Evaluator           &evaluator,
                           const Function<dim> &rhs_function,
                           const unsigned int   q) const;
 
-    // This implements the face_operation of the SIPG term (setting values in
-    // integrate()).
     void do_local_apply_sipg_term(FaceEvaluator             &evaluator_m,
                                   FaceEvaluator             &evaluator_p,
                                   const VectorizedArrayType *dof_ptr_m,
                                   const VectorizedArrayType *dof_ptr_p,
                                   const VectorizedArrayType &diameter) const;
 
-    // This implements the face_operation of the ghost penalty term (potentially
-    // adding into the values in integrate() depending on sum_into_values).
     template <bool is_dg_>
     void do_local_apply_gp_face_term(FaceEvaluator             &evaluator_m,
                                      FaceEvaluator             &evaluator_p,
@@ -236,8 +202,6 @@ namespace Step95
                                      const VectorizedArrayType &diameter,
                                      const bool sum_into_values) const;
 
-    // Three helper functions to determine the category of face based on the
-    // active_fe_index of the face-sharing cells.
     bool
     is_inside_face(std::pair<unsigned int, unsigned int> face_category) const;
     bool
@@ -246,12 +210,9 @@ namespace Step95
     bool is_intersected_face(
       std::pair<unsigned int, unsigned int> face_category) const;
 
-    // Helper function to determine the relevant cell lengths of a face batch;
     VectorizedArrayType
     compute_diameter_of_inner_face_batch(unsigned int face_batch_index) const;
 
-    // Helper function which computes the interior penalty parameter for the
-    // SIPG flux.
     VectorizedArrayType compute_interior_penalty_parameter(
       const VectorizedArrayType &diameter) const;
 
@@ -281,7 +242,10 @@ namespace Step95
   };
 
 
-
+  // In the reinit() function the PoissonOperator receives the necessary
+  // information for matrix-free evaluation, i.e., the MatrixFree object for
+  // inside cells and the NonMatching::MappingInfo objects for intersected
+  // cells.
   template <int dim>
   void PoissonOperator<dim>::reinit(
     const MatrixFree<dim, Number, VectorizedArrayType> &matrix_free_in,
@@ -336,6 +300,9 @@ namespace Step95
 
 
 
+  // This function is the interface function for linear solvers that applies
+  // the operator evaluation, which is an abstraction of a matrix-vector
+  // product by executing loops over cells and faces.
   template <int dim>
   void PoissonOperator<dim>::vmult(PoissonOperator::VectorType       &dst,
                                    const PoissonOperator::VectorType &src) const
@@ -351,6 +318,7 @@ namespace Step95
 
 
 
+  // The right-hand-side is assembled with a loop over the cells.
   template <int dim>
   void PoissonOperator<dim>::rhs(PoissonOperator::VectorType &rhs,
                                  const Function<dim>         &rhs_function)
@@ -416,6 +384,7 @@ namespace Step95
 
 
 
+  // This functions partitions a vector with matrix-free functionality.
   template <int dim>
   void PoissonOperator<dim>::initialize_dof_vector(
     PoissonOperator::VectorType &vec) const
@@ -425,6 +394,10 @@ namespace Step95
 
 
 
+  // With this function, we can assemble the diagonal of the operator instead
+  // of applying the matrix-vector product. It uses the same function as the
+  // operator evaluation for the local operation on cells and faces but sets
+  // the template argument assemble to true.
   template <int dim>
   void PoissonOperator<dim>::compute_diagonal(
     PoissonOperator::VectorType &diagonal) const
@@ -439,6 +412,8 @@ namespace Step95
 
 
 
+  // We define two helper functions needed for matrix-free assembly
+  // operations.
   template <int dim>
   template <typename Evaluator>
   void PoissonOperator<dim>::create_zero_basis(Evaluator &evaluator) const
@@ -460,6 +435,7 @@ namespace Step95
 
 
 
+  // This function implements the local cell operation.
   template <int dim>
   template <bool assemble>
   void PoissonOperator<dim>::local_apply_cell(
@@ -581,6 +557,7 @@ namespace Step95
 
 
 
+  // This function implements the local face operation.
   template <int dim>
   template <bool assemble>
   void PoissonOperator<dim>::local_apply_face(
@@ -822,6 +799,9 @@ namespace Step95
 
 
 
+  // This is the actual implementation of the quadrature point operation of
+  // the Poisson term in the weak form. It is templated over the Evaluator
+  // type to be usable by FEEvaluation as well as FEPointEvaluation.
   template <int dim>
   template <typename Evaluator>
   void PoissonOperator<dim>::do_poisson_cell_term(Evaluator         &evaluator,
@@ -832,6 +812,9 @@ namespace Step95
 
 
 
+  // The implementation for the SIPG term (needed for DG). Again, templated
+  // over the Evaluator type to be usable by FEFaceEvaluation and
+  // FEFacePointEvaluation.
   template <int dim>
   template <typename Evaluator, typename Number2>
   void PoissonOperator<dim>::do_flux_term(Evaluator         &evaluator_m,
@@ -863,6 +846,7 @@ namespace Step95
 
 
 
+  // The implementation of the Nitsche term.
   template <int dim>
   template <typename Evaluator, typename Number2>
   void PoissonOperator<dim>::do_boundary_flux_term_homogeneous(
@@ -882,6 +866,8 @@ namespace Step95
 
 
 
+  // The implementation of the face-based ghost penalty term (up to degree 2 /
+  // normal hessians).
   template <int dim>
   template <bool do_normal_hessians, bool do_values, typename Evaluator>
   void PoissonOperator<dim>::do_gp_face_term(
@@ -933,6 +919,10 @@ namespace Step95
 
 
 
+  // The implementation of the right-hand-side term evaluating the rhs
+  // function (unfortunately, we cannot evaluate a Function object with
+  // vectorized types directly, so we have to reshuffle the quadrature point
+  // data).
   template <int dim>
   template <typename Evaluator>
   void PoissonOperator<dim>::do_rhs_cell_term(Evaluator           &evaluator,
@@ -957,6 +947,8 @@ namespace Step95
 
 
 
+  // This implements the face_operation of the SIPG term (setting values in
+  // integrate()).
   template <int dim>
   void PoissonOperator<dim>::do_local_apply_sipg_term(
     PoissonOperator::FaceEvaluator             &evaluator_m,
@@ -981,6 +973,8 @@ namespace Step95
 
 
 
+  // This implements the face_operation of the ghost penalty term (potentially
+  // adding into the values in integrate() depending on sum_into_values).
   template <int dim>
   template <bool is_dg_>
   void PoissonOperator<dim>::do_local_apply_gp_face_term(
@@ -1037,6 +1031,8 @@ namespace Step95
 
 
 
+  // Three helper functions to determine the category of face based on the
+  // active_fe_index of the face-sharing cells.
   template <int dim>
   bool PoissonOperator<dim>::is_inside_face(
     std::pair<unsigned int, unsigned int> face_category) const
@@ -1068,6 +1064,7 @@ namespace Step95
 
 
 
+  // Helper function to determine the relevant cell lengths of a face batch;
   template <int dim>
   typename PoissonOperator<dim>::VectorizedArrayType
   PoissonOperator<dim>::compute_diameter_of_inner_face_batch(
@@ -1099,6 +1096,8 @@ namespace Step95
 
 
 
+  // Helper function which computes the interior penalty parameter for the
+  // SIPG flux.
   template <int dim>
   typename PoissonOperator<dim>::VectorizedArrayType
   PoissonOperator<dim>::compute_interior_penalty_parameter(
