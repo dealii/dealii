@@ -2080,28 +2080,14 @@ MappingFE<dim, spacedim>::transform(
     {
       case mapping_covariant_gradient:
         {
-          Assert(data.update_each & update_contravariant_transformation,
+          Assert(data.update_each & update_covariant_transformation,
                  typename FEValuesBase<dim>::ExcAccessToUninitializedField(
                    "update_covariant_transformation"));
 
           for (unsigned int q = 0; q < output.size(); ++q)
-            for (unsigned int i = 0; i < spacedim; ++i)
-              for (unsigned int j = 0; j < spacedim; ++j)
-                {
-                  double tmp[dim];
-                  for (unsigned int K = 0; K < dim; ++K)
-                    {
-                      tmp[K] = data.covariant[q][j][0] * input[q][i][0][K];
-                      for (unsigned int J = 1; J < dim; ++J)
-                        tmp[K] += data.covariant[q][j][J] * input[q][i][J][K];
-                    }
-                  for (unsigned int k = 0; k < spacedim; ++k)
-                    {
-                      output[q][i][j][k] = data.covariant[q][k][0] * tmp[0];
-                      for (unsigned int K = 1; K < dim; ++K)
-                        output[q][i][j][k] += data.covariant[q][k][K] * tmp[K];
-                    }
-                }
+            output[q] =
+              internal::apply_covariant_gradient(data.covariant[q], input[q]);
+
           return;
         }
 

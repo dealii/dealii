@@ -32,6 +32,7 @@
 #include <deal.II/fe/fe_values.h>
 #include <deal.II/fe/mapping.h>
 #include <deal.II/fe/mapping_fe_field.h>
+#include <deal.II/fe/mapping_internal.h>
 
 #include <deal.II/grid/tria_iterator.h>
 
@@ -2123,27 +2124,14 @@ MappingFEField<dim, spacedim, VectorType>::transform(
     {
       case mapping_covariant_gradient:
         {
-          Assert(data.update_each & update_contravariant_transformation,
+          Assert(data.update_each & update_covariant_transformation,
                  typename FEValuesBase<dim>::ExcAccessToUninitializedField(
                    "update_covariant_transformation"));
 
           for (unsigned int q = 0; q < output.size(); ++q)
-            for (unsigned int i = 0; i < spacedim; ++i)
-              for (unsigned int j = 0; j < spacedim; ++j)
-                for (unsigned int k = 0; k < spacedim; ++k)
-                  {
-                    output[q][i][j][k] = data.covariant[q][j][0] *
-                                         data.covariant[q][k][0] *
-                                         input[q][i][0][0];
-                    for (unsigned int J = 0; J < dim; ++J)
-                      {
-                        const unsigned int K0 = (0 == J) ? 1 : 0;
-                        for (unsigned int K = K0; K < dim; ++K)
-                          output[q][i][j][k] += data.covariant[q][j][J] *
-                                                data.covariant[q][k][K] *
-                                                input[q][i][J][K];
-                      }
-                  }
+            output[q] =
+              internal::apply_covariant_gradient(data.covariant[q], input[q]);
+
           return;
         }
 

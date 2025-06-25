@@ -1497,25 +1497,12 @@ MappingQ<dim, spacedim>::transform(
                    "update_covariant_transformation"));
 
           for (unsigned int q = 0; q < output.size(); ++q)
-            for (unsigned int i = 0; i < spacedim; ++i)
-              for (unsigned int j = 0; j < spacedim; ++j)
-                {
-                  double                                 tmp[dim];
-                  const DerivativeForm<1, dim, spacedim> covariant =
-                    data.inverse_jacobians[q].transpose();
-                  for (unsigned int K = 0; K < dim; ++K)
-                    {
-                      tmp[K] = covariant[j][0] * input[q][i][0][K];
-                      for (unsigned int J = 1; J < dim; ++J)
-                        tmp[K] += covariant[j][J] * input[q][i][J][K];
-                    }
-                  for (unsigned int k = 0; k < spacedim; ++k)
-                    {
-                      output[q][i][j][k] = covariant[k][0] * tmp[0];
-                      for (unsigned int K = 1; K < dim; ++K)
-                        output[q][i][j][k] += covariant[k][K] * tmp[K];
-                    }
-                }
+            {
+              const DerivativeForm<1, dim, spacedim> covariant =
+                data.inverse_jacobians[q].transpose();
+              output[q] =
+                internal::apply_covariant_gradient(covariant, input[q]);
+            }
           return;
         }
 
