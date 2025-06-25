@@ -211,8 +211,9 @@ namespace Step95
       const unsigned int                    q) const;
 
     // The implementation of the right-hand-side term evaluating the rhs
-    // function (unfortunately, we cannot evaluate a Function vectorized, so we
-    // have to reshuffle the quadrature point data).
+    // function (unfortunately, we cannot evaluate a Function object with
+    // vectorized types directly, so we have to reshuffle the quadrature point
+    // data).
     template <typename Evaluator>
     inline void do_rhs_cell_term(Evaluator           &evaluator,
                                  const Function<dim> &rhs_function,
