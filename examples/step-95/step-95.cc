@@ -918,7 +918,9 @@ namespace Step95
     VectorizedArrayType compute_interior_penalty_parameter(
       const VectorizedArrayType &diameter) const
     {
-      return 5. / diameter;
+      const auto k = matrix_free->get_dof_handler(dof_index).get_fe().degree;
+
+      return 2. * Utilities::fixed_power<2>(k + 1) / diameter;
     }
 
     // ObserverPointer of the MatrixFree and the NonMatching::MappingInfo
