@@ -26,8 +26,7 @@
 #include <deal.II/base/quadrature_lib.h>
 #include <deal.II/base/conditional_ostream.h>
 #include <deal.II/base/timer.h>
-
-#include <deal.II/lac/la_parallel_vector.h>
+#include <deal.II/base/function_signed_distance.h>
 
 #include <deal.II/dofs/dof_tools.h>
 
@@ -39,32 +38,21 @@
 
 #include <deal.II/hp/fe_collection.h>
 
-#include <deal.II/lac/dynamic_sparsity_pattern.h>
-#include <deal.II/lac/precondition.h>
 #include <deal.II/lac/solver_cg.h>
 #include <deal.II/lac/solver_control.h>
-#include <deal.II/lac/sparse_matrix.h>
-#include <deal.II/lac/sparsity_pattern.h>
-#include <deal.II/lac/vector.h>
+#include <deal.II/lac/la_parallel_vector.h>
 
 #include <deal.II/matrix_free/matrix_free.h>
 #include <deal.II/matrix_free/fe_evaluation.h>
+
+#include <deal.II/non_matching/mesh_classifier.h>
+#include <deal.II/non_matching/quadrature_generator.h>
 
 #include <deal.II/numerics/data_out.h>
 #include <deal.II/numerics/vector_tools.h>
 
 #include <fstream>
 #include <vector>
-
-// This header contains some common level set functions.
-// For example, the spherical geometry that we use here (the same as in
-// step-85).
-#include <deal.II/base/function_signed_distance.h>
-
-// We also need 2 already used headers in step-85 from the NonMatching
-// namespace.
-#include <deal.II/non_matching/mesh_classifier.h>
-#include <deal.II/non_matching/quadrature_generator.h>
 
 // Compared to the matrix-based tutorial step-85 we need this new header for
 // precomputation of mapping information.
@@ -78,15 +66,15 @@ namespace Step95
 {
   using namespace dealii;
 
-  // Helper functions to determine if a cell (batch) is inside or intersected
-  // depending on the active_fe_index.
-  inline bool is_inside(unsigned int active_fe_index)
+  // Helper functions to determine if a cell (or a batch of cells) is inside or
+  // intersected depending on the active_fe_index.
+  inline bool is_inside(const unsigned int active_fe_index)
   {
     return active_fe_index ==
            (unsigned int)NonMatching::LocationToLevelSet::inside;
   }
 
-  inline bool is_intersected(unsigned int active_fe_index)
+  inline bool is_intersected(const unsigned int active_fe_index)
   {
     return active_fe_index ==
            (unsigned int)NonMatching::LocationToLevelSet::intersected;
