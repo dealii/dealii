@@ -255,8 +255,6 @@ namespace Step95
     VectorizedArrayType compute_interior_penalty_parameter(
       const VectorizedArrayType &diameter) const;
 
-    // ObserverPointer of the MatrixFree and the NonMatching::MappingInfo
-    // objects.
     ObserverPointer<const MatrixFree<dim, Number, VectorizedArrayType>>
       matrix_free;
     ObserverPointer<
@@ -1214,7 +1212,6 @@ namespace Step95
 
     ConditionalOStream pcout;
 
-    // MatrixFree object
     MatrixFree<dim, double> matrix_free;
 
     PoissonOperator<dim> poisson_operator;
@@ -1237,7 +1234,6 @@ namespace Step95
 
     const MappingQ<dim> mapping;
 
-    // NonMatching::MappingInfo objects
     std::unique_ptr<NonMatching::MappingInfo<dim, dim, VectorizedArrayType>>
       mapping_info_cell;
     std::unique_ptr<NonMatching::MappingInfo<dim, dim, VectorizedArrayType>>
