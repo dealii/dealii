@@ -1813,9 +1813,9 @@ AlignedVector<T>::replicate_across_communicator(const MPI_Comm     communicator,
           // deadlock. So we just send the result of the broadcast() call to
           // nirvana on the root process and keep our current state.
           if (Utilities::MPI::this_mpi_process(shmem_roots_communicator) == 0)
-            Utilities::MPI::broadcast(shmem_roots_communicator,
-                                      *this,
-                                      shmem_roots_root_rank);
+            std::ignore = Utilities::MPI::broadcast(shmem_roots_communicator,
+                                                    *this,
+                                                    shmem_roots_root_rank);
           else
             *this = Utilities::MPI::broadcast(shmem_roots_communicator,
                                               *this,
