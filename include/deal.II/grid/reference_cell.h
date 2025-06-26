@@ -3261,12 +3261,21 @@ inline Tensor<1, dim>
 ReferenceCell::face_tangent_vector(const unsigned int face_no,
                                    const unsigned int i) const
 {
+  AssertIndexRange(face_no, n_faces());
   Assert(dim == get_dimension(),
          ExcMessage("You can only call this function with arguments for "
                     "which 'dim' equals the dimension of the space in which "
                     "the current reference cell lives. You have dim=" +
                     std::to_string(dim) + " but the reference cell is " +
                     std::to_string(get_dimension()) + " dimensional."));
+
+  // Simplify the 1d case by setting tangents (which are used for boundary forms
+  // and thus Jacobians) equal to the unit vector
+  if constexpr (dim == 1)
+    {
+      return Tensor<1, dim>{{1.0}};
+    }
+
   AssertIndexRange(i, dim - 1);
 
   switch (this->kind)
