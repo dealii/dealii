@@ -22,6 +22,7 @@
 #include <deal.II/fe/fe_simplex_p_bubbles.h>
 #include <deal.II/fe/fe_wedge_p.h>
 #include <deal.II/fe/mapping_fe.h>
+#include <deal.II/fe/mapping_p1.h>
 #include <deal.II/fe/mapping_q.h>
 #include <deal.II/fe/mapping_q1.h>
 
@@ -295,8 +296,7 @@ ReferenceCell::get_default_linear_mapping() const
     }
   else if (is_simplex())
     {
-      static const MappingFE<dim, spacedim> mapping(
-        FE_SimplexP<dim, spacedim>(1));
+      static const MappingP1<dim, spacedim> mapping;
       return mapping;
     }
   else if (*this == ReferenceCells::Pyramid)
