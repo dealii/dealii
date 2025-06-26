@@ -697,7 +697,7 @@ private:
        * as well as a pointer to the memory being de-allocated.
        */
       virtual void
-      delete_array(const AlignedVector<T> *aligned_vector, T *ptr);
+      delete_array(const AlignedVector<T> *aligned_vector, T *ptr) override;
 
     private:
       /**
