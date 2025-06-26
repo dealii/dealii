@@ -23,6 +23,30 @@ We choose the same problem like step-85, Poisson's equation:
 @f{align*}{
   -\Delta u &= f \qquad && \text{in }\, \Omega,
   \\
-  u &= u_D       \qquad && \text{on }\, \Gamma = \partial \Omega,
+  u &= u_D       \qquad && \text{on }\, \Gamma_D = \partial \Omega,
 @f}
 where we choose $f(x) = 4$ and $u_D(x) = 0$.
+
+With CutFEM/CutDG this leads to the following weak formulation:
+Find $u_h \in V_\Omega^h$ such that
+@f{equation*}{
+  a_h(u_h, v_h) = L_h(v_h), \quad \forall v_h \in V_\Omega^h,
+@f}
+where
+@f{align*}{
+  a_{h,CG}(u_h, v_h) &=  (\nabla u_h, \nabla v_h)_\Omega
+                       - (u_h, \partial_n v_h)_{\Gamma_D}
+                       - \left (\partial_n u_h - \gamma_D h^{-1} u_h, v_h \right )_{\Gamma_D}
+                       + g_h(u_h, v_h),
+  \\
+  L_h(v_h)      &=  (f,v)_\Omega
+                  + \left (u_D, \gamma_D h^{-1} v_h -\partial_n v_h \right )_{\Gamma_D}.
+@f}
+where $g_h$ is the ghost penalty stabilization that circumvents the small cut cell problem.
+
+For the discontinuous Galerkin variant (CutDG) we get an additional SIPG flux term on interior faces:
+@f{equation*}{
+  a_{h,DG}(u_h, v_h) = a_{h,CG}(u_h, v_h)
+  - (\jump{u_h}, \average{\partial_n v_h})_{\Gamma_{int}} -
+  (\average{\partial_n u_h} - \gamma_{SIPG}h^{-1}\jump{u_h}, \jump{v_h})_{\Gamma_{int}}
+@f}
