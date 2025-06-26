@@ -49,6 +49,7 @@ if(DEAL_II_WITH_CXX20_MODULE)
     OUTPUT ${_dealii_macros_header}
     DEPENDS
       "${CMAKE_CURRENT_BINARY_DIR}/../include/deal.II/base/config.h"
+      "${CMAKE_CURRENT_BINARY_DIR}/../include/deal.II/base/revision.h"
       "${CMAKE_CURRENT_SOURCE_DIR}/../include/deal.II/base/exception_macros.h"
       "${CMAKE_CURRENT_SOURCE_DIR}/include/deal.II/boost_macros.h"
       "${CMAKE_CURRENT_SOURCE_DIR}/include/deal.II/petsc_macros.h"
@@ -56,6 +57,7 @@ if(DEAL_II_WITH_CXX20_MODULE)
       ${CMAKE_COMMAND}
       ARGS -E cat
       "${CMAKE_CURRENT_BINARY_DIR}/../include/deal.II/base/config.h"
+      "${CMAKE_CURRENT_BINARY_DIR}/../include/deal.II/base/revision.h"
       "${CMAKE_CURRENT_SOURCE_DIR}/../include/deal.II/base/exception_macros.h"
       "${CMAKE_CURRENT_SOURCE_DIR}/include/deal.II/boost_macros.h"
       "${CMAKE_CURRENT_SOURCE_DIR}/include/deal.II/petsc_macros.h"
