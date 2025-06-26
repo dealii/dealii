@@ -53,7 +53,7 @@ For the discontinuous Galerkin variant (CutDG) we get an additional SIPG flux te
 
 The ghost penalty is defined as:
 @f{equation*}{
-  g_h(u_h,v_h) = \sum_{F \in \mathcal{F}_h} \sum_{j=0}^k \gamma_{GP,j} \left(h_F^{2j-1}[\partial_n^j u_h], [\partial_n^j v_h] \right)_F
+  g_h(u_h,v_h) = \sum_{F \in \mathcal{F}_h} \sum_{j=0}^p \gamma_{GP,j} \left(h_F^{2j-1}[\partial_n^j u_h], [\partial_n^j v_h] \right)_F
 @f}
 over faces $F\in\mathcal{F}_h$ between intersected cells and intersected and inside cells.
 

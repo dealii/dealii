@@ -16,7 +16,7 @@ For $p=1$ we get (for continuous elements, FE_Q):
 We see that the $L^2$ error decreases as we refine and that the estimated
 order of convergence, EOC, is close to 2.
 
-For $p=2$ we get (for CG):
+For $p=2$ we get (again for continuous elements):
 
 | Cycle | Mesh size | $L^2$-Error | EOC  |
 |:-----:|:---------:|:-----------:|:----:|
