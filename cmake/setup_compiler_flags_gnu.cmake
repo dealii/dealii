@@ -189,7 +189,7 @@ if (CMAKE_BUILD_TYPE MATCHES "Debug")
 
   list(APPEND DEAL_II_DEFINITIONS_DEBUG "DEBUG")
 
-  # Enable invalid element access and other checks in the c++ standard libray:
+  # Enable invalid element access and other checks in the c++ standard library:
   list(APPEND DEAL_II_DEFINITIONS_DEBUG "_GLIBCXX_ASSERTIONS")
   if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
     if (CMAKE_CXX_COMPILER_VERSION VERSION_LESS 19)

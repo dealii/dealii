@@ -13,7 +13,7 @@
 ## ------------------------------------------------------------------------
 
 #
-# collect_source_and_header_files("<souce files>" "<header files>")
+# collect_source_and_header_files("<source files>" "<header files>")
 #
 # This macro appends a list of sources and header files to the global
 # properties DEAL_II_SOURCE_FILES and DEAL_II_HEADER_FILES.
