@@ -51,7 +51,7 @@ deal_ii_find_library(MUMPS_COMMON_LIBRARY
   )
 
 #
-# If we can find libpord.so (or similiar), link it in as well:
+# If we can find libpord.so (or similar), link it in as well:
 #
 deal_ii_find_library(PORD_LIBRARY
   NAMES pord

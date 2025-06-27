@@ -53,7 +53,7 @@ if(NOT MPIEXEC_EXECUTABLE)
   elseif(DEFINED ENV{MPIEXEC})
     find_program(MPIEXEC_EXECUTABLE $ENV{MPIEXEC})
   endif()
-  # For backwards compatbility with old cmake versions:
+  # For backwards compatibility with old cmake versions:
   set(MPIEXEC "${MPIEXEC_EXECUTABLE}")
 endif()
 
