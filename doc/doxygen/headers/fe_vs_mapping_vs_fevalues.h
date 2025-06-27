@@ -59,7 +59,7 @@
  * only need to know the values of a finite element field at the vertices
  * of a mesh, and this too can be written as evaluating everything at
  * quadrature points -- these quadrature points are then simply the vertices
- * of the cells (provided, for example, by QTrapez).
+ * of the cells (provided, for example, by QTrapezoid).
  *
  * FEValues' role is to provide a user the values of shape functions, their
  * gradients, etc, at quadrature points. The same is true with some geometric
@@ -88,10 +88,11 @@
  * <h3>Mappings</h3>
  *
  * Mappings (i.e., classes derived from the Mapping base class) are responsible
- * for everything that has to do with the mapping from the reference (unit) cell
- * $[0,1]^\text{dim}$ to each of the actual cells
- * $K\subset{\mathbb R}^\text{spacedim}$. This is facilitated by a mapping function
- * $\mathbf F_K:[0,1]^\text{dim} \mapsto K$. The mapping classes therefore
+ * for everything that has to do with the mapping from the relevant
+ * ReferenceCell's domain to each of the actual cells
+ * $K\subset{\mathbb R}^\text{spacedim}$. This is facilitated by a mapping
+ * function, e.g., for hypercubes, $\mathbf F_K:[0,1]^\text{dim} \mapsto K$.
+ * The mapping classes therefore
  * implement interfaces that allow evaluating $\mathbf F_K$ to map forward
  * points $\hat{\mathbf x}$ from the reference cell to $K$, and to map backward
  * from the real cell to the reference cell using $\mathbf F_K^{-1}$.
