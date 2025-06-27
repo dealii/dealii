@@ -71,7 +71,7 @@ set(_separate_src
   fe_values_base.cc
   fe_values_views.cc
   fe_values_views_internal.cc
-  mapping_fe_field.cc
+  mapping_fe_field_inst1.cc
   mapping_fe_field_inst2.cc
   fe_tools.cc
   fe_tools_interpolate.cc
