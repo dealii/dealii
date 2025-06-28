@@ -46,7 +46,7 @@ macro(feature_sundials_find_external var)
     #
     if((SUNDIALS_WITH_MPI AND NOT DEAL_II_WITH_MPI) OR (NOT SUNDIALS_WITH_MPI AND DEAL_II_WITH_MPI))
       message(STATUS "Could not find a sufficient Sundials installation: "
-        "If deal.II and Sundials must either both have MPI support enabled or none of them."
+        "deal.II and Sundials must have MPI support either both enabled or both disabled."
       )
       set(SUNDIALS_ADDITIONAL_ERROR_STRING
         ${SUNDIALS_ADDITIONAL_ERROR_STRING}
