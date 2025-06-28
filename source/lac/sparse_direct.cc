@@ -36,6 +36,24 @@
 
 DEAL_II_NAMESPACE_OPEN
 
+namespace TrilinosWrappers
+{
+  class SparseMatrix;
+  namespace MPI
+  {
+    class SparseMatrix;
+    class Vector;
+  } // namespace MPI
+} // namespace TrilinosWrappers
+namespace PETScWrappers
+{
+  namespace MPI
+  {
+    class SparseMatrix;
+    class Vector;
+  } // namespace MPI
+} // namespace PETScWrappers
+
 namespace
 {
   /**
@@ -1442,9 +1460,12 @@ InstantiateUMFPACK(BlockSparseMatrix<std::complex<float>>);
 #  define InstantiateMUMPSMatVec(VECTOR)                                    \
     template void SparseDirectMUMPS::vmult(VECTOR &, const VECTOR &) const; \
     template void SparseDirectMUMPS::Tvmult(VECTOR &, const VECTOR &) const;
-
+#  ifdef DEAL_II_WITH_TRILINOS
 InstantiateMUMPSMatVec(TrilinosWrappers::MPI::Vector)
+#  endif
+#  ifdef DEAL_II_WITH_PETSC
   InstantiateMUMPSMatVec(PETScWrappers::MPI::Vector)
+#  endif
     InstantiateMUMPSMatVec(Vector<double>)
 
 #  define InstantiateMUMPS(MATRIX) \
@@ -1452,9 +1473,13 @@ InstantiateMUMPSMatVec(TrilinosWrappers::MPI::Vector)
 
       InstantiateMUMPS(SparseMatrix<double>)
         InstantiateMUMPS(SparseMatrix<float>)
+#  ifdef DEAL_II_WITH_TRILINOS
           InstantiateMUMPS(TrilinosWrappers::SparseMatrix)
+#  endif
+#  ifdef DEAL_II_WITH_PETSC
             InstantiateMUMPS(PETScWrappers::SparseMatrix)
               InstantiateMUMPS(PETScWrappers::MPI::SparseMatrix)
+#  endif
   // InstantiateMUMPS(SparseMatrixEZ<double>)
   // InstantiateMUMPS(SparseMatrixEZ<float>)
   InstantiateMUMPS(BlockSparseMatrix<double>)
