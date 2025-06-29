@@ -1,0 +1,25 @@
+
+DEAL::name: hyper_cube
+DEAL::Simple polygon: true
+DEAL::Counterclockwise oriented polygon: true
+DEAL::deal measure: 1.00000, cgal measure: 1.00000
+DEAL::
+DEAL::name: hyper_ball_balanced
+DEAL::Simple polygon: true
+DEAL::Counterclockwise oriented polygon: true
+DEAL::deal measure: 3.12145, cgal measure: 3.12145
+DEAL::
+DEAL::name: hyper_L
+DEAL::Simple polygon: true
+DEAL::Counterclockwise oriented polygon: true
+DEAL::deal measure: 0.750000, cgal measure: 0.750000
+DEAL::
+DEAL::name: simplex
+DEAL::Simple polygon: true
+DEAL::Counterclockwise oriented polygon: true
+DEAL::deal measure: 0.500000, cgal measure: 0.500000
+DEAL::
+DEAL::name: hyper_cube converted to simplex mesh
+DEAL::Simple polygon: true
+DEAL::Counterclockwise oriented polygon: true
+DEAL::deal measure: 1.00000, cgal measure: 1.00000
