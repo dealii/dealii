@@ -838,8 +838,8 @@ namespace Step39
     // and use it to solve the system.
     solver.solve(matrix, solution, right_hand_side, preconditioner);
 
-    deallog << "Converged in " << control.last_step() << " iterations"
-            << std::endl;
+    std::cout << "Converged in " << control.last_step() << " iterations"
+              << std::endl;
   }
 
 
@@ -977,8 +977,8 @@ namespace Step39
                                assembler);
     triangulation.load_user_indices(old_user_indices);
 
-    deallog << "energy-error: " << errors.block(0).l2_norm() << std::endl;
-    deallog << "L2-error:     " << errors.block(1).l2_norm() << std::endl;
+    std::cout << "energy-error: " << errors.block(0).l2_norm() << std::endl;
+    std::cout << "L2-error:     " << errors.block(1).l2_norm() << std::endl;
   }
 
 
@@ -992,8 +992,8 @@ namespace Step39
     const std::string filename =
       "sol-" + Utilities::int_to_string(cycle, 2) + ".gnuplot";
 
-    deallog << "Writing solution to <" << filename << ">..." << std::endl
-            << std::endl;
+    std::cout << "Writing solution to <" << filename << ">..." << std::endl
+              << std::endl;
     std::ofstream gnuplot_output(filename);
 
     DataOut<dim> data_out;
@@ -1010,10 +1010,10 @@ namespace Step39
   template <int dim>
   void InteriorPenaltyProblem<dim>::run(unsigned int n_steps)
   {
-    deallog << "Element: " << fe.get_name() << std::endl;
+    std::cout << "Element: " << fe.get_name() << std::endl;
     for (unsigned int s = 0; s < n_steps; ++s)
       {
-        deallog << "Step " << s << std::endl;
+        std::cout << "Step " << s << std::endl;
         if (estimates.block(0).empty())
           triangulation.refine_global(1);
         else
@@ -1023,26 +1023,27 @@ namespace Step39
             triangulation.execute_coarsening_and_refinement();
           }
 
-        deallog << "Triangulation " << triangulation.n_active_cells()
-                << " cells, " << triangulation.n_levels() << " levels"
-                << std::endl;
+        std::cout << "Triangulation " << triangulation.n_active_cells()
+                  << " cells, " << triangulation.n_levels() << " levels"
+                  << std::endl;
 
         setup_system();
-        deallog << "DoFHandler " << dof_handler.n_dofs() << " dofs, level dofs";
+        std::cout << "DoFHandler " << dof_handler.n_dofs()
+                  << " dofs, level dofs";
         for (unsigned int l = 0; l < triangulation.n_levels(); ++l)
-          deallog << ' ' << dof_handler.n_dofs(l);
-        deallog << std::endl;
+          std::cout << ' ' << dof_handler.n_dofs(l);
+        std::cout << std::endl;
 
-        deallog << "Assemble matrix" << std::endl;
+        std::cout << "Assemble matrix" << std::endl;
         assemble_matrix();
-        deallog << "Assemble multilevel matrix" << std::endl;
+        std::cout << "Assemble multilevel matrix" << std::endl;
         assemble_mg_matrix();
-        deallog << "Assemble right hand side" << std::endl;
+        std::cout << "Assemble right hand side" << std::endl;
         assemble_right_hand_side();
-        deallog << "Solve" << std::endl;
+        std::cout << "Solve" << std::endl;
         solve();
         error();
-        deallog << "Estimate " << estimate() << std::endl;
+        std::cout << "Estimate " << estimate() << std::endl;
         output_results(s);
       }
   }
@@ -1054,12 +1055,7 @@ int main()
 {
   try
     {
-      using namespace dealii;
       using namespace Step39;
-
-      deallog.depth_console(2);
-      std::ofstream logfile("deallog");
-      deallog.attach(logfile);
 
       InteriorPenaltyProblem<2> test1;
       test1.run(12);
