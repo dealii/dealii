@@ -1,0 +1,2211 @@
+
+DEAL::MappingP1<1, 1>
+DEAL::
+DEAL::cell vertices
+DEAL::  1.00000
+DEAL::  2.00000
+DEAL::
+DEAL::JxW
+DEAL::  1.00000
+DEAL::
+DEAL::quadrature points
+DEAL::  0.00000 -> 1.00000
+DEAL::
+DEAL::boundary forms
+DEAL::-1.00000
+DEAL::
+DEAL::normal vectors
+DEAL::-1.00000
+DEAL::
+DEAL::Jacobians
+DEAL::  1.00000
+DEAL::
+DEAL::Jacobian gradients
+DEAL::  all zero = 1
+DEAL::
+DEAL::inverse jacobians
+DEAL::  1.00000
+DEAL::
+DEAL::Jacobian push forward gradients
+DEAL::  all zero = 1
+DEAL::
+DEAL::Jacobian 2nd derivatives
+DEAL::  all zero = 1
+DEAL::
+DEAL::Jacobian push forward 2nd derivatives
+DEAL::  all zero = 1
+DEAL::
+DEAL::Jacobian 3rd derivatives
+DEAL::  all zero = 1
+DEAL::
+DEAL::Jacobian push forward 3rd derivatives
+DEAL::  all zero = 1
+DEAL::
+DEAL::JxW
+DEAL::  1.00000
+DEAL::
+DEAL::quadrature points
+DEAL::  1.00000 -> 2.00000
+DEAL::
+DEAL::boundary forms
+DEAL::1.00000
+DEAL::
+DEAL::normal vectors
+DEAL::1.00000
+DEAL::
+DEAL::Jacobians
+DEAL::  1.00000
+DEAL::
+DEAL::Jacobian gradients
+DEAL::  all zero = 1
+DEAL::
+DEAL::inverse jacobians
+DEAL::  1.00000
+DEAL::
+DEAL::Jacobian push forward gradients
+DEAL::  all zero = 1
+DEAL::
+DEAL::Jacobian 2nd derivatives
+DEAL::  all zero = 1
+DEAL::
+DEAL::Jacobian push forward 2nd derivatives
+DEAL::  all zero = 1
+DEAL::
+DEAL::Jacobian 3rd derivatives
+DEAL::  all zero = 1
+DEAL::
+DEAL::Jacobian push forward 3rd derivatives
+DEAL::  all zero = 1
+DEAL::
+DEAL::
+DEAL::MappingP1<1, 2>
+DEAL::
+DEAL::cell vertices
+DEAL::  1.00000 0.00000
+DEAL::  2.00000 0.00000
+DEAL::
+DEAL::JxW
+DEAL::  1.00000
+DEAL::
+DEAL::quadrature points
+DEAL::  0.00000 -> 1.00000 0.00000
+DEAL::
+DEAL::boundary forms
+DEAL::-1.00000 -0.00000
+DEAL::
+DEAL::Jacobians
+DEAL::  1.00000  0.00000
+DEAL::
+DEAL::Jacobian gradients
+DEAL::  all zero = 1
+DEAL::
+DEAL::inverse jacobians
+DEAL::  1.00000 0.00000
+DEAL::
+DEAL::Jacobian push forward gradients
+DEAL::  all zero = 1
+DEAL::
+DEAL::Jacobian 2nd derivatives
+DEAL::  all zero = 1
+DEAL::
+DEAL::Jacobian push forward 2nd derivatives
+DEAL::  all zero = 1
+DEAL::
+DEAL::Jacobian 3rd derivatives
+DEAL::  all zero = 1
+DEAL::
+DEAL::Jacobian push forward 3rd derivatives
+DEAL::  all zero = 1
+DEAL::
+DEAL::JxW
+DEAL::  1.00000
+DEAL::
+DEAL::quadrature points
+DEAL::  1.00000 -> 2.00000 0.00000
+DEAL::
+DEAL::boundary forms
+DEAL::1.00000 0.00000
+DEAL::
+DEAL::Jacobians
+DEAL::  1.00000  0.00000
+DEAL::
+DEAL::Jacobian gradients
+DEAL::  all zero = 1
+DEAL::
+DEAL::inverse jacobians
+DEAL::  1.00000 0.00000
+DEAL::
+DEAL::Jacobian push forward gradients
+DEAL::  all zero = 1
+DEAL::
+DEAL::Jacobian 2nd derivatives
+DEAL::  all zero = 1
+DEAL::
+DEAL::Jacobian push forward 2nd derivatives
+DEAL::  all zero = 1
+DEAL::
+DEAL::Jacobian 3rd derivatives
+DEAL::  all zero = 1
+DEAL::
+DEAL::Jacobian push forward 3rd derivatives
+DEAL::  all zero = 1
+DEAL::
+DEAL::
+DEAL::MappingP1<2, 2>
+DEAL::
+DEAL::cell vertices
+DEAL::  1.00000 1.00000
+DEAL::  2.00000 1.00000
+DEAL::  1.00000 2.00000
+DEAL::
+DEAL::JxW
+DEAL::  0.500000
+DEAL::  0.500000
+DEAL::
+DEAL::quadrature points
+DEAL::  0.211325 0.00000 -> 1.21132 1.00000
+DEAL::  0.788675 0.00000 -> 1.78868 1.00000
+DEAL::
+DEAL::boundary forms
+DEAL::0.00000 -1.00000
+DEAL::0.00000 -1.00000
+DEAL::
+DEAL::normal vectors
+DEAL::0.00000 -1.00000
+DEAL::0.00000 -1.00000
+DEAL::
+DEAL::Jacobians
+DEAL::  1.00000 0.00000  0.00000 1.00000
+DEAL::  1.00000 0.00000  0.00000 1.00000
+DEAL::
+DEAL::Jacobian gradients
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::
+DEAL::inverse jacobians
+DEAL::  1.00000 -0.00000  -0.00000 1.00000
+DEAL::  1.00000 -0.00000  -0.00000 1.00000
+DEAL::
+DEAL::Jacobian push forward gradients
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::
+DEAL::Jacobian 2nd derivatives
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::
+DEAL::Jacobian push forward 2nd derivatives
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::
+DEAL::Jacobian 3rd derivatives
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::
+DEAL::Jacobian push forward 3rd derivatives
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::
+DEAL::JxW
+DEAL::  0.707107
+DEAL::  0.707107
+DEAL::
+DEAL::quadrature points
+DEAL::  0.788675 0.211325 -> 1.78868 1.21132
+DEAL::  0.211325 0.788675 -> 1.21132 1.78868
+DEAL::
+DEAL::boundary forms
+DEAL::0.707107 0.707107
+DEAL::0.707107 0.707107
+DEAL::
+DEAL::normal vectors
+DEAL::0.707107 0.707107
+DEAL::0.707107 0.707107
+DEAL::
+DEAL::Jacobians
+DEAL::  1.00000 0.00000  0.00000 1.00000
+DEAL::  1.00000 0.00000  0.00000 1.00000
+DEAL::
+DEAL::Jacobian gradients
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::
+DEAL::inverse jacobians
+DEAL::  1.00000 -0.00000  -0.00000 1.00000
+DEAL::  1.00000 -0.00000  -0.00000 1.00000
+DEAL::
+DEAL::Jacobian push forward gradients
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::
+DEAL::Jacobian 2nd derivatives
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::
+DEAL::Jacobian push forward 2nd derivatives
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::
+DEAL::Jacobian 3rd derivatives
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::
+DEAL::Jacobian push forward 3rd derivatives
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::
+DEAL::JxW
+DEAL::  0.500000
+DEAL::  0.500000
+DEAL::
+DEAL::quadrature points
+DEAL::  0.00000 0.788675 -> 1.00000 1.78868
+DEAL::  0.00000 0.211325 -> 1.00000 1.21132
+DEAL::
+DEAL::boundary forms
+DEAL::-1.00000 0.00000
+DEAL::-1.00000 0.00000
+DEAL::
+DEAL::normal vectors
+DEAL::-1.00000 0.00000
+DEAL::-1.00000 0.00000
+DEAL::
+DEAL::Jacobians
+DEAL::  1.00000 0.00000  0.00000 1.00000
+DEAL::  1.00000 0.00000  0.00000 1.00000
+DEAL::
+DEAL::Jacobian gradients
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::
+DEAL::inverse jacobians
+DEAL::  1.00000 -0.00000  -0.00000 1.00000
+DEAL::  1.00000 -0.00000  -0.00000 1.00000
+DEAL::
+DEAL::Jacobian push forward gradients
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::
+DEAL::Jacobian 2nd derivatives
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::
+DEAL::Jacobian push forward 2nd derivatives
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::
+DEAL::Jacobian 3rd derivatives
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::
+DEAL::Jacobian push forward 3rd derivatives
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::
+DEAL::
+DEAL::cell vertices
+DEAL::  2.00000 2.00000
+DEAL::  1.00000 2.00000
+DEAL::  2.00000 1.00000
+DEAL::
+DEAL::JxW
+DEAL::  0.500000
+DEAL::  0.500000
+DEAL::
+DEAL::quadrature points
+DEAL::  0.211325 0.00000 -> 1.78868 2.00000
+DEAL::  0.788675 0.00000 -> 1.21132 2.00000
+DEAL::
+DEAL::boundary forms
+DEAL::0.00000 1.00000
+DEAL::0.00000 1.00000
+DEAL::
+DEAL::normal vectors
+DEAL::0.00000 1.00000
+DEAL::0.00000 1.00000
+DEAL::
+DEAL::Jacobians
+DEAL::  -1.00000 0.00000  0.00000 -1.00000
+DEAL::  -1.00000 0.00000  0.00000 -1.00000
+DEAL::
+DEAL::Jacobian gradients
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::
+DEAL::inverse jacobians
+DEAL::  -1.00000 -0.00000  -0.00000 -1.00000
+DEAL::  -1.00000 -0.00000  -0.00000 -1.00000
+DEAL::
+DEAL::Jacobian push forward gradients
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::
+DEAL::Jacobian 2nd derivatives
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::
+DEAL::Jacobian push forward 2nd derivatives
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::
+DEAL::Jacobian 3rd derivatives
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::
+DEAL::Jacobian push forward 3rd derivatives
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::
+DEAL::JxW
+DEAL::  0.707107
+DEAL::  0.707107
+DEAL::
+DEAL::quadrature points
+DEAL::  0.211325 0.788675 -> 1.78868 1.21132
+DEAL::  0.788675 0.211325 -> 1.21132 1.78868
+DEAL::
+DEAL::boundary forms
+DEAL::-0.707107 -0.707107
+DEAL::-0.707107 -0.707107
+DEAL::
+DEAL::normal vectors
+DEAL::-0.707107 -0.707107
+DEAL::-0.707107 -0.707107
+DEAL::
+DEAL::Jacobians
+DEAL::  -1.00000 0.00000  0.00000 -1.00000
+DEAL::  -1.00000 0.00000  0.00000 -1.00000
+DEAL::
+DEAL::Jacobian gradients
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::
+DEAL::inverse jacobians
+DEAL::  -1.00000 -0.00000  -0.00000 -1.00000
+DEAL::  -1.00000 -0.00000  -0.00000 -1.00000
+DEAL::
+DEAL::Jacobian push forward gradients
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::
+DEAL::Jacobian 2nd derivatives
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::
+DEAL::Jacobian push forward 2nd derivatives
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::
+DEAL::Jacobian 3rd derivatives
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::
+DEAL::Jacobian push forward 3rd derivatives
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::
+DEAL::JxW
+DEAL::  0.500000
+DEAL::  0.500000
+DEAL::
+DEAL::quadrature points
+DEAL::  0.00000 0.788675 -> 2.00000 1.21132
+DEAL::  0.00000 0.211325 -> 2.00000 1.78868
+DEAL::
+DEAL::boundary forms
+DEAL::1.00000 0.00000
+DEAL::1.00000 0.00000
+DEAL::
+DEAL::normal vectors
+DEAL::1.00000 0.00000
+DEAL::1.00000 0.00000
+DEAL::
+DEAL::Jacobians
+DEAL::  -1.00000 0.00000  0.00000 -1.00000
+DEAL::  -1.00000 0.00000  0.00000 -1.00000
+DEAL::
+DEAL::Jacobian gradients
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::
+DEAL::inverse jacobians
+DEAL::  -1.00000 -0.00000  -0.00000 -1.00000
+DEAL::  -1.00000 -0.00000  -0.00000 -1.00000
+DEAL::
+DEAL::Jacobian push forward gradients
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::
+DEAL::Jacobian 2nd derivatives
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::
+DEAL::Jacobian push forward 2nd derivatives
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::
+DEAL::Jacobian 3rd derivatives
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::
+DEAL::Jacobian push forward 3rd derivatives
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::
+DEAL::
+DEAL::MappingP1<2, 3>
+DEAL::
+DEAL::cell vertices
+DEAL::  1.00000 1.00000 3.00000
+DEAL::  2.00000 1.00000 6.00000
+DEAL::  1.00000 2.00000 6.00000
+DEAL::
+DEAL::JxW
+DEAL::  1.58114
+DEAL::  1.58114
+DEAL::
+DEAL::quadrature points
+DEAL::  0.211325 0.00000 -> 1.21132 1.00000 3.63397
+DEAL::  0.788675 1.11022e-16 -> 1.78868 1.00000 5.36603
+DEAL::
+DEAL::boundary forms
+DEAL::0.652929 -0.725476 -0.217643
+DEAL::0.652929 -0.725476 -0.217643
+DEAL::
+DEAL::Jacobians
+DEAL::  1.00000 0.00000  0.00000 1.00000  3.00000 3.00000
+DEAL::  1.00000 0.00000  0.00000 1.00000  3.00000 3.00000
+DEAL::
+DEAL::Jacobian gradients
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::
+DEAL::inverse jacobians
+DEAL::  0.526316 -0.473684 0.157895  -0.473684 0.526316 0.157895
+DEAL::  0.526316 -0.473684 0.157895  -0.473684 0.526316 0.157895
+DEAL::
+DEAL::Jacobian push forward gradients
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::
+DEAL::Jacobian 2nd derivatives
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::
+DEAL::Jacobian push forward 2nd derivatives
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::
+DEAL::Jacobian 3rd derivatives
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::
+DEAL::Jacobian push forward 3rd derivatives
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::
+DEAL::JxW
+DEAL::  0.707107
+DEAL::  0.707107
+DEAL::
+DEAL::quadrature points
+DEAL::  0.788675 0.211325 -> 1.78868 1.21132 6.00000
+DEAL::  0.211325 0.788675 -> 1.21132 1.78868 6.00000
+DEAL::
+DEAL::boundary forms
+DEAL::0.162221 0.162221 0.973329
+DEAL::0.162221 0.162221 0.973329
+DEAL::
+DEAL::Jacobians
+DEAL::  1.00000 0.00000  0.00000 1.00000  3.00000 3.00000
+DEAL::  1.00000 0.00000  0.00000 1.00000  3.00000 3.00000
+DEAL::
+DEAL::Jacobian gradients
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::
+DEAL::inverse jacobians
+DEAL::  0.526316 -0.473684 0.157895  -0.473684 0.526316 0.157895
+DEAL::  0.526316 -0.473684 0.157895  -0.473684 0.526316 0.157895
+DEAL::
+DEAL::Jacobian push forward gradients
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::
+DEAL::Jacobian 2nd derivatives
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::
+DEAL::Jacobian push forward 2nd derivatives
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::
+DEAL::Jacobian 3rd derivatives
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::
+DEAL::Jacobian push forward 3rd derivatives
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::
+DEAL::JxW
+DEAL::  1.58114
+DEAL::  1.58114
+DEAL::
+DEAL::quadrature points
+DEAL::  1.11022e-16 0.788675 -> 1.00000 1.78868 5.36603
+DEAL::  6.93889e-17 0.211325 -> 1.00000 1.21132 3.63397
+DEAL::
+DEAL::boundary forms
+DEAL::-0.725476 0.652929 -0.217643
+DEAL::-0.725476 0.652929 -0.217643
+DEAL::
+DEAL::Jacobians
+DEAL::  1.00000 0.00000  0.00000 1.00000  3.00000 3.00000
+DEAL::  1.00000 0.00000  0.00000 1.00000  3.00000 3.00000
+DEAL::
+DEAL::Jacobian gradients
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::
+DEAL::inverse jacobians
+DEAL::  0.526316 -0.473684 0.157895  -0.473684 0.526316 0.157895
+DEAL::  0.526316 -0.473684 0.157895  -0.473684 0.526316 0.157895
+DEAL::
+DEAL::Jacobian push forward gradients
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::
+DEAL::Jacobian 2nd derivatives
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::
+DEAL::Jacobian push forward 2nd derivatives
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::
+DEAL::Jacobian 3rd derivatives
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::
+DEAL::Jacobian push forward 3rd derivatives
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::
+DEAL::
+DEAL::cell vertices
+DEAL::  2.00000 2.00000 9.00000
+DEAL::  1.00000 2.00000 6.00000
+DEAL::  2.00000 1.00000 6.00000
+DEAL::
+DEAL::JxW
+DEAL::  1.58114
+DEAL::  1.58114
+DEAL::
+DEAL::quadrature points
+DEAL::  0.211325 -6.93889e-17 -> 1.78868 2.00000 8.36603
+DEAL::  0.788675 1.11022e-16 -> 1.21132 2.00000 6.63397
+DEAL::
+DEAL::boundary forms
+DEAL::-0.652929 0.725476 0.217643
+DEAL::-0.652929 0.725476 0.217643
+DEAL::
+DEAL::Jacobians
+DEAL::  -1.00000 0.00000  0.00000 -1.00000  -3.00000 -3.00000
+DEAL::  -1.00000 0.00000  0.00000 -1.00000  -3.00000 -3.00000
+DEAL::
+DEAL::Jacobian gradients
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::
+DEAL::inverse jacobians
+DEAL::  -0.526316 0.473684 -0.157895  0.473684 -0.526316 -0.157895
+DEAL::  -0.526316 0.473684 -0.157895  0.473684 -0.526316 -0.157895
+DEAL::
+DEAL::Jacobian push forward gradients
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::
+DEAL::Jacobian 2nd derivatives
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::
+DEAL::Jacobian push forward 2nd derivatives
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::
+DEAL::Jacobian 3rd derivatives
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::
+DEAL::Jacobian push forward 3rd derivatives
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::
+DEAL::JxW
+DEAL::  0.707107
+DEAL::  0.707107
+DEAL::
+DEAL::quadrature points
+DEAL::  0.211325 0.788675 -> 1.78868 1.21132 6.00000
+DEAL::  0.788675 0.211325 -> 1.21132 1.78868 6.00000
+DEAL::
+DEAL::boundary forms
+DEAL::-0.162221 -0.162221 -0.973329
+DEAL::-0.162221 -0.162221 -0.973329
+DEAL::
+DEAL::Jacobians
+DEAL::  -1.00000 0.00000  0.00000 -1.00000  -3.00000 -3.00000
+DEAL::  -1.00000 0.00000  0.00000 -1.00000  -3.00000 -3.00000
+DEAL::
+DEAL::Jacobian gradients
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::
+DEAL::inverse jacobians
+DEAL::  -0.526316 0.473684 -0.157895  0.473684 -0.526316 -0.157895
+DEAL::  -0.526316 0.473684 -0.157895  0.473684 -0.526316 -0.157895
+DEAL::
+DEAL::Jacobian push forward gradients
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::
+DEAL::Jacobian 2nd derivatives
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::
+DEAL::Jacobian push forward 2nd derivatives
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::
+DEAL::Jacobian 3rd derivatives
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::
+DEAL::Jacobian push forward 3rd derivatives
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::
+DEAL::JxW
+DEAL::  1.58114
+DEAL::  1.58114
+DEAL::
+DEAL::quadrature points
+DEAL::  1.11022e-16 0.788675 -> 2.00000 1.21132 6.63397
+DEAL::  -6.93889e-17 0.211325 -> 2.00000 1.78868 8.36603
+DEAL::
+DEAL::boundary forms
+DEAL::0.725476 -0.652929 0.217643
+DEAL::0.725476 -0.652929 0.217643
+DEAL::
+DEAL::Jacobians
+DEAL::  -1.00000 0.00000  0.00000 -1.00000  -3.00000 -3.00000
+DEAL::  -1.00000 0.00000  0.00000 -1.00000  -3.00000 -3.00000
+DEAL::
+DEAL::Jacobian gradients
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::
+DEAL::inverse jacobians
+DEAL::  -0.526316 0.473684 -0.157895  0.473684 -0.526316 -0.157895
+DEAL::  -0.526316 0.473684 -0.157895  0.473684 -0.526316 -0.157895
+DEAL::
+DEAL::Jacobian push forward gradients
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::
+DEAL::Jacobian 2nd derivatives
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::
+DEAL::Jacobian push forward 2nd derivatives
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::
+DEAL::Jacobian 3rd derivatives
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::
+DEAL::Jacobian push forward 3rd derivatives
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::
+DEAL::
+DEAL::MappingP1<3, 3>
+DEAL::
+DEAL::cell vertices
+DEAL::  1.00000 1.00000 1.00000
+DEAL::  2.00000 1.00000 1.00000
+DEAL::  1.00000 2.00000 1.00000
+DEAL::  1.00000 1.00000 2.00000
+DEAL::
+DEAL::JxW
+DEAL::  0.159021
+DEAL::  0.0909793
+DEAL::  0.159021
+DEAL::  0.0909793
+DEAL::
+DEAL::quadrature points
+DEAL::  0.178559 0.155051 0.00000 -> 1.17856 1.15505 1.00000
+DEAL::  0.0750311 0.644949 0.00000 -> 1.07503 1.64495 1.00000
+DEAL::  0.666390 0.155051 0.00000 -> 1.66639 1.15505 1.00000
+DEAL::  0.280020 0.644949 0.00000 -> 1.28002 1.64495 1.00000
+DEAL::
+DEAL::boundary forms
+DEAL::0.00000 0.00000 -1.00000
+DEAL::0.00000 0.00000 -1.00000
+DEAL::0.00000 0.00000 -1.00000
+DEAL::0.00000 0.00000 -1.00000
+DEAL::
+DEAL::normal vectors
+DEAL::0.00000 0.00000 -1.00000
+DEAL::0.00000 0.00000 -1.00000
+DEAL::0.00000 0.00000 -1.00000
+DEAL::0.00000 0.00000 -1.00000
+DEAL::
+DEAL::Jacobians
+DEAL::  1.00000 0.00000 0.00000  0.00000 1.00000 0.00000  0.00000 0.00000 1.00000
+DEAL::  1.00000 0.00000 0.00000  0.00000 1.00000 0.00000  0.00000 0.00000 1.00000
+DEAL::  1.00000 0.00000 0.00000  0.00000 1.00000 0.00000  0.00000 0.00000 1.00000
+DEAL::  1.00000 0.00000 0.00000  0.00000 1.00000 0.00000  0.00000 0.00000 1.00000
+DEAL::
+DEAL::Jacobian gradients
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::
+DEAL::inverse jacobians
+DEAL::  1.00000 0.00000 0.00000  0.00000 1.00000 0.00000  0.00000 0.00000 1.00000
+DEAL::  1.00000 0.00000 0.00000  0.00000 1.00000 0.00000  0.00000 0.00000 1.00000
+DEAL::  1.00000 0.00000 0.00000  0.00000 1.00000 0.00000  0.00000 0.00000 1.00000
+DEAL::  1.00000 0.00000 0.00000  0.00000 1.00000 0.00000  0.00000 0.00000 1.00000
+DEAL::
+DEAL::Jacobian push forward gradients
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::
+DEAL::Jacobian 2nd derivatives
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::
+DEAL::Jacobian push forward 2nd derivatives
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::
+DEAL::Jacobian 3rd derivatives
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::
+DEAL::Jacobian push forward 3rd derivatives
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::
+DEAL::JxW
+DEAL::  0.159021
+DEAL::  0.0909793
+DEAL::  0.159021
+DEAL::  0.0909793
+DEAL::
+DEAL::quadrature points
+DEAL::  0.666390 0.00000 0.155051 -> 1.66639 1.00000 1.15505
+DEAL::  0.280020 0.00000 0.644949 -> 1.28002 1.00000 1.64495
+DEAL::  0.178559 0.00000 0.155051 -> 1.17856 1.00000 1.15505
+DEAL::  0.0750311 0.00000 0.644949 -> 1.07503 1.00000 1.64495
+DEAL::
+DEAL::boundary forms
+DEAL::0.00000 -1.00000 0.00000
+DEAL::0.00000 -1.00000 0.00000
+DEAL::0.00000 -1.00000 0.00000
+DEAL::0.00000 -1.00000 0.00000
+DEAL::
+DEAL::normal vectors
+DEAL::0.00000 -1.00000 0.00000
+DEAL::0.00000 -1.00000 0.00000
+DEAL::0.00000 -1.00000 0.00000
+DEAL::0.00000 -1.00000 0.00000
+DEAL::
+DEAL::Jacobians
+DEAL::  1.00000 0.00000 0.00000  0.00000 1.00000 0.00000  0.00000 0.00000 1.00000
+DEAL::  1.00000 0.00000 0.00000  0.00000 1.00000 0.00000  0.00000 0.00000 1.00000
+DEAL::  1.00000 0.00000 0.00000  0.00000 1.00000 0.00000  0.00000 0.00000 1.00000
+DEAL::  1.00000 0.00000 0.00000  0.00000 1.00000 0.00000  0.00000 0.00000 1.00000
+DEAL::
+DEAL::Jacobian gradients
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::
+DEAL::inverse jacobians
+DEAL::  1.00000 0.00000 0.00000  0.00000 1.00000 0.00000  0.00000 0.00000 1.00000
+DEAL::  1.00000 0.00000 0.00000  0.00000 1.00000 0.00000  0.00000 0.00000 1.00000
+DEAL::  1.00000 0.00000 0.00000  0.00000 1.00000 0.00000  0.00000 0.00000 1.00000
+DEAL::  1.00000 0.00000 0.00000  0.00000 1.00000 0.00000  0.00000 0.00000 1.00000
+DEAL::
+DEAL::Jacobian push forward gradients
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::
+DEAL::Jacobian 2nd derivatives
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::
+DEAL::Jacobian push forward 2nd derivatives
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::
+DEAL::Jacobian 3rd derivatives
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::
+DEAL::Jacobian push forward 3rd derivatives
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::
+DEAL::JxW
+DEAL::  0.159021
+DEAL::  0.0909793
+DEAL::  0.159021
+DEAL::  0.0909793
+DEAL::
+DEAL::quadrature points
+DEAL::  0.00000 0.178559 0.155051 -> 1.00000 1.17856 1.15505
+DEAL::  0.00000 0.0750311 0.644949 -> 1.00000 1.07503 1.64495
+DEAL::  0.00000 0.666390 0.155051 -> 1.00000 1.66639 1.15505
+DEAL::  0.00000 0.280020 0.644949 -> 1.00000 1.28002 1.64495
+DEAL::
+DEAL::boundary forms
+DEAL::-1.00000 0.00000 0.00000
+DEAL::-1.00000 0.00000 0.00000
+DEAL::-1.00000 0.00000 0.00000
+DEAL::-1.00000 0.00000 0.00000
+DEAL::
+DEAL::normal vectors
+DEAL::-1.00000 0.00000 0.00000
+DEAL::-1.00000 0.00000 0.00000
+DEAL::-1.00000 0.00000 0.00000
+DEAL::-1.00000 0.00000 0.00000
+DEAL::
+DEAL::Jacobians
+DEAL::  1.00000 0.00000 0.00000  0.00000 1.00000 0.00000  0.00000 0.00000 1.00000
+DEAL::  1.00000 0.00000 0.00000  0.00000 1.00000 0.00000  0.00000 0.00000 1.00000
+DEAL::  1.00000 0.00000 0.00000  0.00000 1.00000 0.00000  0.00000 0.00000 1.00000
+DEAL::  1.00000 0.00000 0.00000  0.00000 1.00000 0.00000  0.00000 0.00000 1.00000
+DEAL::
+DEAL::Jacobian gradients
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::
+DEAL::inverse jacobians
+DEAL::  1.00000 0.00000 0.00000  0.00000 1.00000 0.00000  0.00000 0.00000 1.00000
+DEAL::  1.00000 0.00000 0.00000  0.00000 1.00000 0.00000  0.00000 0.00000 1.00000
+DEAL::  1.00000 0.00000 0.00000  0.00000 1.00000 0.00000  0.00000 0.00000 1.00000
+DEAL::  1.00000 0.00000 0.00000  0.00000 1.00000 0.00000  0.00000 0.00000 1.00000
+DEAL::
+DEAL::Jacobian push forward gradients
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::
+DEAL::Jacobian 2nd derivatives
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::
+DEAL::Jacobian push forward 2nd derivatives
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::
+DEAL::Jacobian 3rd derivatives
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::
+DEAL::Jacobian push forward 3rd derivatives
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::
+DEAL::JxW
+DEAL::  0.275432
+DEAL::  0.157581
+DEAL::  0.275432
+DEAL::  0.157581
+DEAL::
+DEAL::quadrature points
+DEAL::  0.178559 0.666390 0.155051 -> 1.17856 1.66639 1.15505
+DEAL::  0.0750311 0.280020 0.644949 -> 1.07503 1.28002 1.64495
+DEAL::  0.666390 0.178559 0.155051 -> 1.66639 1.17856 1.15505
+DEAL::  0.280020 0.0750311 0.644949 -> 1.28002 1.07503 1.64495
+DEAL::
+DEAL::boundary forms
+DEAL::0.577350 0.577350 0.577350
+DEAL::0.577350 0.577350 0.577350
+DEAL::0.577350 0.577350 0.577350
+DEAL::0.577350 0.577350 0.577350
+DEAL::
+DEAL::normal vectors
+DEAL::0.577350 0.577350 0.577350
+DEAL::0.577350 0.577350 0.577350
+DEAL::0.577350 0.577350 0.577350
+DEAL::0.577350 0.577350 0.577350
+DEAL::
+DEAL::Jacobians
+DEAL::  1.00000 0.00000 0.00000  0.00000 1.00000 0.00000  0.00000 0.00000 1.00000
+DEAL::  1.00000 0.00000 0.00000  0.00000 1.00000 0.00000  0.00000 0.00000 1.00000
+DEAL::  1.00000 0.00000 0.00000  0.00000 1.00000 0.00000  0.00000 0.00000 1.00000
+DEAL::  1.00000 0.00000 0.00000  0.00000 1.00000 0.00000  0.00000 0.00000 1.00000
+DEAL::
+DEAL::Jacobian gradients
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::
+DEAL::inverse jacobians
+DEAL::  1.00000 0.00000 0.00000  0.00000 1.00000 0.00000  0.00000 0.00000 1.00000
+DEAL::  1.00000 0.00000 0.00000  0.00000 1.00000 0.00000  0.00000 0.00000 1.00000
+DEAL::  1.00000 0.00000 0.00000  0.00000 1.00000 0.00000  0.00000 0.00000 1.00000
+DEAL::  1.00000 0.00000 0.00000  0.00000 1.00000 0.00000  0.00000 0.00000 1.00000
+DEAL::
+DEAL::Jacobian push forward gradients
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::
+DEAL::Jacobian 2nd derivatives
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::
+DEAL::Jacobian push forward 2nd derivatives
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::
+DEAL::Jacobian 3rd derivatives
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::
+DEAL::Jacobian push forward 3rd derivatives
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::
+DEAL::
+DEAL::cell vertices
+DEAL::  1.00000 2.00000 1.00000
+DEAL::  2.00000 1.00000 1.00000
+DEAL::  2.00000 2.00000 1.00000
+DEAL::  2.00000 2.00000 2.00000
+DEAL::
+DEAL::JxW
+DEAL::  0.159021
+DEAL::  0.0909793
+DEAL::  0.159021
+DEAL::  0.0909793
+DEAL::
+DEAL::quadrature points
+DEAL::  0.178559 0.155051 0.00000 -> 1.33361 1.82144 1.00000
+DEAL::  0.0750311 0.644949 0.00000 -> 1.71998 1.92497 1.00000
+DEAL::  0.666390 0.155051 0.00000 -> 1.82144 1.33361 1.00000
+DEAL::  0.280020 0.644949 0.00000 -> 1.92497 1.71998 1.00000
+DEAL::
+DEAL::boundary forms
+DEAL::0.00000 0.00000 -1.00000
+DEAL::0.00000 0.00000 -1.00000
+DEAL::0.00000 0.00000 -1.00000
+DEAL::0.00000 0.00000 -1.00000
+DEAL::
+DEAL::normal vectors
+DEAL::0.00000 0.00000 -1.00000
+DEAL::0.00000 0.00000 -1.00000
+DEAL::0.00000 0.00000 -1.00000
+DEAL::0.00000 0.00000 -1.00000
+DEAL::
+DEAL::Jacobians
+DEAL::  1.00000 1.00000 1.00000  -1.00000 0.00000 0.00000  0.00000 0.00000 1.00000
+DEAL::  1.00000 1.00000 1.00000  -1.00000 0.00000 0.00000  0.00000 0.00000 1.00000
+DEAL::  1.00000 1.00000 1.00000  -1.00000 0.00000 0.00000  0.00000 0.00000 1.00000
+DEAL::  1.00000 1.00000 1.00000  -1.00000 0.00000 0.00000  0.00000 0.00000 1.00000
+DEAL::
+DEAL::Jacobian gradients
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::
+DEAL::inverse jacobians
+DEAL::  0.00000 -1.00000 0.00000  1.00000 1.00000 -1.00000  -0.00000 0.00000 1.00000
+DEAL::  0.00000 -1.00000 0.00000  1.00000 1.00000 -1.00000  -0.00000 0.00000 1.00000
+DEAL::  0.00000 -1.00000 0.00000  1.00000 1.00000 -1.00000  -0.00000 0.00000 1.00000
+DEAL::  0.00000 -1.00000 0.00000  1.00000 1.00000 -1.00000  -0.00000 0.00000 1.00000
+DEAL::
+DEAL::Jacobian push forward gradients
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::
+DEAL::Jacobian 2nd derivatives
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::
+DEAL::Jacobian push forward 2nd derivatives
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::
+DEAL::Jacobian 3rd derivatives
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::
+DEAL::Jacobian push forward 3rd derivatives
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::
+DEAL::JxW
+DEAL::  0.275432
+DEAL::  0.157581
+DEAL::  0.275432
+DEAL::  0.157581
+DEAL::
+DEAL::quadrature points
+DEAL::  0.666390 2.22045e-16 0.155051 -> 1.82144 1.33361 1.15505
+DEAL::  0.280020 0.00000 0.644949 -> 1.92497 1.71998 1.64495
+DEAL::  0.178559 2.22045e-16 0.155051 -> 1.33361 1.82144 1.15505
+DEAL::  0.0750311 0.00000 0.644949 -> 1.71998 1.92497 1.64495
+DEAL::
+DEAL::boundary forms
+DEAL::-0.577350 -0.577350 0.577350
+DEAL::-0.577350 -0.577350 0.577350
+DEAL::-0.577350 -0.577350 0.577350
+DEAL::-0.577350 -0.577350 0.577350
+DEAL::
+DEAL::normal vectors
+DEAL::-0.577350 -0.577350 0.577350
+DEAL::-0.577350 -0.577350 0.577350
+DEAL::-0.577350 -0.577350 0.577350
+DEAL::-0.577350 -0.577350 0.577350
+DEAL::
+DEAL::Jacobians
+DEAL::  1.00000 1.00000 1.00000  -1.00000 0.00000 0.00000  0.00000 0.00000 1.00000
+DEAL::  1.00000 1.00000 1.00000  -1.00000 0.00000 0.00000  0.00000 0.00000 1.00000
+DEAL::  1.00000 1.00000 1.00000  -1.00000 0.00000 0.00000  0.00000 0.00000 1.00000
+DEAL::  1.00000 1.00000 1.00000  -1.00000 0.00000 0.00000  0.00000 0.00000 1.00000
+DEAL::
+DEAL::Jacobian gradients
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::
+DEAL::inverse jacobians
+DEAL::  0.00000 -1.00000 0.00000  1.00000 1.00000 -1.00000  -0.00000 0.00000 1.00000
+DEAL::  0.00000 -1.00000 0.00000  1.00000 1.00000 -1.00000  -0.00000 0.00000 1.00000
+DEAL::  0.00000 -1.00000 0.00000  1.00000 1.00000 -1.00000  -0.00000 0.00000 1.00000
+DEAL::  0.00000 -1.00000 0.00000  1.00000 1.00000 -1.00000  -0.00000 0.00000 1.00000
+DEAL::
+DEAL::Jacobian push forward gradients
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::
+DEAL::Jacobian 2nd derivatives
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::
+DEAL::Jacobian push forward 2nd derivatives
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::
+DEAL::Jacobian 3rd derivatives
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::
+DEAL::Jacobian push forward 3rd derivatives
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::
+DEAL::JxW
+DEAL::  0.159021
+DEAL::  0.0909793
+DEAL::  0.159021
+DEAL::  0.0909793
+DEAL::
+DEAL::quadrature points
+DEAL::  0.00000 0.178559 0.155051 -> 1.33361 2.00000 1.15505
+DEAL::  0.00000 0.0750311 0.644949 -> 1.71998 2.00000 1.64495
+DEAL::  0.00000 0.666390 0.155051 -> 1.82144 2.00000 1.15505
+DEAL::  0.00000 0.280020 0.644949 -> 1.92497 2.00000 1.64495
+DEAL::
+DEAL::boundary forms
+DEAL::0.00000 1.00000 0.00000
+DEAL::0.00000 1.00000 0.00000
+DEAL::0.00000 1.00000 0.00000
+DEAL::0.00000 1.00000 0.00000
+DEAL::
+DEAL::normal vectors
+DEAL::0.00000 1.00000 0.00000
+DEAL::0.00000 1.00000 0.00000
+DEAL::0.00000 1.00000 0.00000
+DEAL::0.00000 1.00000 0.00000
+DEAL::
+DEAL::Jacobians
+DEAL::  1.00000 1.00000 1.00000  -1.00000 0.00000 0.00000  0.00000 0.00000 1.00000
+DEAL::  1.00000 1.00000 1.00000  -1.00000 0.00000 0.00000  0.00000 0.00000 1.00000
+DEAL::  1.00000 1.00000 1.00000  -1.00000 0.00000 0.00000  0.00000 0.00000 1.00000
+DEAL::  1.00000 1.00000 1.00000  -1.00000 0.00000 0.00000  0.00000 0.00000 1.00000
+DEAL::
+DEAL::Jacobian gradients
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::
+DEAL::inverse jacobians
+DEAL::  0.00000 -1.00000 0.00000  1.00000 1.00000 -1.00000  -0.00000 0.00000 1.00000
+DEAL::  0.00000 -1.00000 0.00000  1.00000 1.00000 -1.00000  -0.00000 0.00000 1.00000
+DEAL::  0.00000 -1.00000 0.00000  1.00000 1.00000 -1.00000  -0.00000 0.00000 1.00000
+DEAL::  0.00000 -1.00000 0.00000  1.00000 1.00000 -1.00000  -0.00000 0.00000 1.00000
+DEAL::
+DEAL::Jacobian push forward gradients
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::
+DEAL::Jacobian 2nd derivatives
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::
+DEAL::Jacobian push forward 2nd derivatives
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::
+DEAL::Jacobian 3rd derivatives
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::
+DEAL::Jacobian push forward 3rd derivatives
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::
+DEAL::JxW
+DEAL::  0.159021
+DEAL::  0.0909793
+DEAL::  0.159021
+DEAL::  0.0909793
+DEAL::
+DEAL::quadrature points
+DEAL::  0.178559 0.666390 0.155051 -> 2.00000 1.82144 1.15505
+DEAL::  0.0750311 0.280020 0.644949 -> 2.00000 1.92497 1.64495
+DEAL::  0.666390 0.178559 0.155051 -> 2.00000 1.33361 1.15505
+DEAL::  0.280020 0.0750311 0.644949 -> 2.00000 1.71998 1.64495
+DEAL::
+DEAL::boundary forms
+DEAL::1.00000 0.00000 0.00000
+DEAL::1.00000 0.00000 0.00000
+DEAL::1.00000 0.00000 0.00000
+DEAL::1.00000 0.00000 0.00000
+DEAL::
+DEAL::normal vectors
+DEAL::1.00000 0.00000 0.00000
+DEAL::1.00000 0.00000 0.00000
+DEAL::1.00000 0.00000 0.00000
+DEAL::1.00000 0.00000 0.00000
+DEAL::
+DEAL::Jacobians
+DEAL::  1.00000 1.00000 1.00000  -1.00000 0.00000 0.00000  0.00000 0.00000 1.00000
+DEAL::  1.00000 1.00000 1.00000  -1.00000 0.00000 0.00000  0.00000 0.00000 1.00000
+DEAL::  1.00000 1.00000 1.00000  -1.00000 0.00000 0.00000  0.00000 0.00000 1.00000
+DEAL::  1.00000 1.00000 1.00000  -1.00000 0.00000 0.00000  0.00000 0.00000 1.00000
+DEAL::
+DEAL::Jacobian gradients
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::
+DEAL::inverse jacobians
+DEAL::  0.00000 -1.00000 0.00000  1.00000 1.00000 -1.00000  -0.00000 0.00000 1.00000
+DEAL::  0.00000 -1.00000 0.00000  1.00000 1.00000 -1.00000  -0.00000 0.00000 1.00000
+DEAL::  0.00000 -1.00000 0.00000  1.00000 1.00000 -1.00000  -0.00000 0.00000 1.00000
+DEAL::  0.00000 -1.00000 0.00000  1.00000 1.00000 -1.00000  -0.00000 0.00000 1.00000
+DEAL::
+DEAL::Jacobian push forward gradients
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::
+DEAL::Jacobian 2nd derivatives
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::
+DEAL::Jacobian push forward 2nd derivatives
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::
+DEAL::Jacobian 3rd derivatives
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::
+DEAL::Jacobian push forward 3rd derivatives
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::
+DEAL::
+DEAL::cell vertices
+DEAL::  2.00000 1.00000 1.00000
+DEAL::  1.00000 1.00000 2.00000
+DEAL::  2.00000 1.00000 2.00000
+DEAL::  2.00000 2.00000 2.00000
+DEAL::
+DEAL::JxW
+DEAL::  0.159021
+DEAL::  0.0909793
+DEAL::  0.159021
+DEAL::  0.0909793
+DEAL::
+DEAL::quadrature points
+DEAL::  0.178559 0.155051 0.00000 -> 1.82144 1.00000 1.33361
+DEAL::  0.0750311 0.644949 0.00000 -> 1.92497 1.00000 1.71998
+DEAL::  0.666390 0.155051 0.00000 -> 1.33361 1.00000 1.82144
+DEAL::  0.280020 0.644949 0.00000 -> 1.71998 1.00000 1.92497
+DEAL::
+DEAL::boundary forms
+DEAL::0.00000 -1.00000 0.00000
+DEAL::0.00000 -1.00000 0.00000
+DEAL::0.00000 -1.00000 0.00000
+DEAL::0.00000 -1.00000 0.00000
+DEAL::
+DEAL::normal vectors
+DEAL::0.00000 -1.00000 0.00000
+DEAL::0.00000 -1.00000 0.00000
+DEAL::0.00000 -1.00000 0.00000
+DEAL::0.00000 -1.00000 0.00000
+DEAL::
+DEAL::Jacobians
+DEAL::  -1.00000 0.00000 0.00000  0.00000 0.00000 1.00000  1.00000 1.00000 1.00000
+DEAL::  -1.00000 0.00000 0.00000  0.00000 0.00000 1.00000  1.00000 1.00000 1.00000
+DEAL::  -1.00000 0.00000 0.00000  0.00000 0.00000 1.00000  1.00000 1.00000 1.00000
+DEAL::  -1.00000 0.00000 0.00000  0.00000 0.00000 1.00000  1.00000 1.00000 1.00000
+DEAL::
+DEAL::Jacobian gradients
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::
+DEAL::inverse jacobians
+DEAL::  -1.00000 0.00000 0.00000  1.00000 -1.00000 1.00000  0.00000 1.00000 -0.00000
+DEAL::  -1.00000 0.00000 0.00000  1.00000 -1.00000 1.00000  0.00000 1.00000 -0.00000
+DEAL::  -1.00000 0.00000 0.00000  1.00000 -1.00000 1.00000  0.00000 1.00000 -0.00000
+DEAL::  -1.00000 0.00000 0.00000  1.00000 -1.00000 1.00000  0.00000 1.00000 -0.00000
+DEAL::
+DEAL::Jacobian push forward gradients
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::
+DEAL::Jacobian 2nd derivatives
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::
+DEAL::Jacobian push forward 2nd derivatives
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::
+DEAL::Jacobian 3rd derivatives
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::
+DEAL::Jacobian push forward 3rd derivatives
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::
+DEAL::JxW
+DEAL::  0.275432
+DEAL::  0.157581
+DEAL::  0.275432
+DEAL::  0.157581
+DEAL::
+DEAL::quadrature points
+DEAL::  0.666390 2.22045e-16 0.155051 -> 1.33361 1.15505 1.82144
+DEAL::  0.280020 0.00000 0.644949 -> 1.71998 1.64495 1.92497
+DEAL::  0.178559 2.22045e-16 0.155051 -> 1.82144 1.15505 1.33361
+DEAL::  0.0750311 0.00000 0.644949 -> 1.92497 1.64495 1.71998
+DEAL::
+DEAL::boundary forms
+DEAL::-0.577350 0.577350 -0.577350
+DEAL::-0.577350 0.577350 -0.577350
+DEAL::-0.577350 0.577350 -0.577350
+DEAL::-0.577350 0.577350 -0.577350
+DEAL::
+DEAL::normal vectors
+DEAL::-0.577350 0.577350 -0.577350
+DEAL::-0.577350 0.577350 -0.577350
+DEAL::-0.577350 0.577350 -0.577350
+DEAL::-0.577350 0.577350 -0.577350
+DEAL::
+DEAL::Jacobians
+DEAL::  -1.00000 0.00000 0.00000  0.00000 0.00000 1.00000  1.00000 1.00000 1.00000
+DEAL::  -1.00000 0.00000 0.00000  0.00000 0.00000 1.00000  1.00000 1.00000 1.00000
+DEAL::  -1.00000 0.00000 0.00000  0.00000 0.00000 1.00000  1.00000 1.00000 1.00000
+DEAL::  -1.00000 0.00000 0.00000  0.00000 0.00000 1.00000  1.00000 1.00000 1.00000
+DEAL::
+DEAL::Jacobian gradients
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::
+DEAL::inverse jacobians
+DEAL::  -1.00000 0.00000 0.00000  1.00000 -1.00000 1.00000  0.00000 1.00000 -0.00000
+DEAL::  -1.00000 0.00000 0.00000  1.00000 -1.00000 1.00000  0.00000 1.00000 -0.00000
+DEAL::  -1.00000 0.00000 0.00000  1.00000 -1.00000 1.00000  0.00000 1.00000 -0.00000
+DEAL::  -1.00000 0.00000 0.00000  1.00000 -1.00000 1.00000  0.00000 1.00000 -0.00000
+DEAL::
+DEAL::Jacobian push forward gradients
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::
+DEAL::Jacobian 2nd derivatives
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::
+DEAL::Jacobian push forward 2nd derivatives
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::
+DEAL::Jacobian 3rd derivatives
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::
+DEAL::Jacobian push forward 3rd derivatives
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::
+DEAL::JxW
+DEAL::  0.159021
+DEAL::  0.0909793
+DEAL::  0.159021
+DEAL::  0.0909793
+DEAL::
+DEAL::quadrature points
+DEAL::  0.00000 0.178559 0.155051 -> 2.00000 1.15505 1.33361
+DEAL::  0.00000 0.0750311 0.644949 -> 2.00000 1.64495 1.71998
+DEAL::  0.00000 0.666390 0.155051 -> 2.00000 1.15505 1.82144
+DEAL::  0.00000 0.280020 0.644949 -> 2.00000 1.64495 1.92497
+DEAL::
+DEAL::boundary forms
+DEAL::1.00000 0.00000 0.00000
+DEAL::1.00000 0.00000 0.00000
+DEAL::1.00000 0.00000 0.00000
+DEAL::1.00000 0.00000 0.00000
+DEAL::
+DEAL::normal vectors
+DEAL::1.00000 0.00000 0.00000
+DEAL::1.00000 0.00000 0.00000
+DEAL::1.00000 0.00000 0.00000
+DEAL::1.00000 0.00000 0.00000
+DEAL::
+DEAL::Jacobians
+DEAL::  -1.00000 0.00000 0.00000  0.00000 0.00000 1.00000  1.00000 1.00000 1.00000
+DEAL::  -1.00000 0.00000 0.00000  0.00000 0.00000 1.00000  1.00000 1.00000 1.00000
+DEAL::  -1.00000 0.00000 0.00000  0.00000 0.00000 1.00000  1.00000 1.00000 1.00000
+DEAL::  -1.00000 0.00000 0.00000  0.00000 0.00000 1.00000  1.00000 1.00000 1.00000
+DEAL::
+DEAL::Jacobian gradients
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::
+DEAL::inverse jacobians
+DEAL::  -1.00000 0.00000 0.00000  1.00000 -1.00000 1.00000  0.00000 1.00000 -0.00000
+DEAL::  -1.00000 0.00000 0.00000  1.00000 -1.00000 1.00000  0.00000 1.00000 -0.00000
+DEAL::  -1.00000 0.00000 0.00000  1.00000 -1.00000 1.00000  0.00000 1.00000 -0.00000
+DEAL::  -1.00000 0.00000 0.00000  1.00000 -1.00000 1.00000  0.00000 1.00000 -0.00000
+DEAL::
+DEAL::Jacobian push forward gradients
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::
+DEAL::Jacobian 2nd derivatives
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::
+DEAL::Jacobian push forward 2nd derivatives
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::
+DEAL::Jacobian 3rd derivatives
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::
+DEAL::Jacobian push forward 3rd derivatives
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::
+DEAL::JxW
+DEAL::  0.159021
+DEAL::  0.0909793
+DEAL::  0.159021
+DEAL::  0.0909793
+DEAL::
+DEAL::quadrature points
+DEAL::  0.178559 0.666390 0.155051 -> 1.82144 1.15505 2.00000
+DEAL::  0.0750311 0.280020 0.644949 -> 1.92497 1.64495 2.00000
+DEAL::  0.666390 0.178559 0.155051 -> 1.33361 1.15505 2.00000
+DEAL::  0.280020 0.0750311 0.644949 -> 1.71998 1.64495 2.00000
+DEAL::
+DEAL::boundary forms
+DEAL::0.00000 0.00000 1.00000
+DEAL::0.00000 0.00000 1.00000
+DEAL::0.00000 0.00000 1.00000
+DEAL::0.00000 0.00000 1.00000
+DEAL::
+DEAL::normal vectors
+DEAL::0.00000 0.00000 1.00000
+DEAL::0.00000 0.00000 1.00000
+DEAL::0.00000 0.00000 1.00000
+DEAL::0.00000 0.00000 1.00000
+DEAL::
+DEAL::Jacobians
+DEAL::  -1.00000 0.00000 0.00000  0.00000 0.00000 1.00000  1.00000 1.00000 1.00000
+DEAL::  -1.00000 0.00000 0.00000  0.00000 0.00000 1.00000  1.00000 1.00000 1.00000
+DEAL::  -1.00000 0.00000 0.00000  0.00000 0.00000 1.00000  1.00000 1.00000 1.00000
+DEAL::  -1.00000 0.00000 0.00000  0.00000 0.00000 1.00000  1.00000 1.00000 1.00000
+DEAL::
+DEAL::Jacobian gradients
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::
+DEAL::inverse jacobians
+DEAL::  -1.00000 0.00000 0.00000  1.00000 -1.00000 1.00000  0.00000 1.00000 -0.00000
+DEAL::  -1.00000 0.00000 0.00000  1.00000 -1.00000 1.00000  0.00000 1.00000 -0.00000
+DEAL::  -1.00000 0.00000 0.00000  1.00000 -1.00000 1.00000  0.00000 1.00000 -0.00000
+DEAL::  -1.00000 0.00000 0.00000  1.00000 -1.00000 1.00000  0.00000 1.00000 -0.00000
+DEAL::
+DEAL::Jacobian push forward gradients
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::
+DEAL::Jacobian 2nd derivatives
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::
+DEAL::Jacobian push forward 2nd derivatives
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::
+DEAL::Jacobian 3rd derivatives
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::
+DEAL::Jacobian push forward 3rd derivatives
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::
+DEAL::
+DEAL::cell vertices
+DEAL::  1.00000 2.00000 1.00000
+DEAL::  1.00000 1.00000 2.00000
+DEAL::  2.00000 2.00000 2.00000
+DEAL::  1.00000 2.00000 2.00000
+DEAL::
+DEAL::JxW
+DEAL::  0.275432
+DEAL::  0.157581
+DEAL::  0.275432
+DEAL::  0.157581
+DEAL::
+DEAL::quadrature points
+DEAL::  0.178559 0.155051 0.00000 -> 1.15505 1.82144 1.33361
+DEAL::  0.0750311 0.644949 -2.22045e-16 -> 1.64495 1.92497 1.71998
+DEAL::  0.666390 0.155051 2.22045e-16 -> 1.15505 1.33361 1.82144
+DEAL::  0.280020 0.644949 -2.22045e-16 -> 1.64495 1.71998 1.92497
+DEAL::
+DEAL::boundary forms
+DEAL::0.577350 -0.577350 -0.577350
+DEAL::0.577350 -0.577350 -0.577350
+DEAL::0.577350 -0.577350 -0.577350
+DEAL::0.577350 -0.577350 -0.577350
+DEAL::
+DEAL::normal vectors
+DEAL::0.577350 -0.577350 -0.577350
+DEAL::0.577350 -0.577350 -0.577350
+DEAL::0.577350 -0.577350 -0.577350
+DEAL::0.577350 -0.577350 -0.577350
+DEAL::
+DEAL::Jacobians
+DEAL::  0.00000 1.00000 0.00000  -1.00000 0.00000 0.00000  1.00000 1.00000 1.00000
+DEAL::  0.00000 1.00000 0.00000  -1.00000 0.00000 0.00000  1.00000 1.00000 1.00000
+DEAL::  0.00000 1.00000 0.00000  -1.00000 0.00000 0.00000  1.00000 1.00000 1.00000
+DEAL::  0.00000 1.00000 0.00000  -1.00000 0.00000 0.00000  1.00000 1.00000 1.00000
+DEAL::
+DEAL::Jacobian gradients
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::
+DEAL::inverse jacobians
+DEAL::  0.00000 -1.00000 0.00000  1.00000 0.00000 -0.00000  -1.00000 1.00000 1.00000
+DEAL::  0.00000 -1.00000 0.00000  1.00000 0.00000 -0.00000  -1.00000 1.00000 1.00000
+DEAL::  0.00000 -1.00000 0.00000  1.00000 0.00000 -0.00000  -1.00000 1.00000 1.00000
+DEAL::  0.00000 -1.00000 0.00000  1.00000 0.00000 -0.00000  -1.00000 1.00000 1.00000
+DEAL::
+DEAL::Jacobian push forward gradients
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::
+DEAL::Jacobian 2nd derivatives
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::
+DEAL::Jacobian push forward 2nd derivatives
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::
+DEAL::Jacobian 3rd derivatives
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::
+DEAL::Jacobian push forward 3rd derivatives
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::
+DEAL::JxW
+DEAL::  0.159021
+DEAL::  0.0909793
+DEAL::  0.159021
+DEAL::  0.0909793
+DEAL::
+DEAL::quadrature points
+DEAL::  0.666390 0.00000 0.155051 -> 1.00000 1.33361 1.82144
+DEAL::  0.280020 0.00000 0.644949 -> 1.00000 1.71998 1.92497
+DEAL::  0.178559 0.00000 0.155051 -> 1.00000 1.82144 1.33361
+DEAL::  0.0750311 0.00000 0.644949 -> 1.00000 1.92497 1.71998
+DEAL::
+DEAL::boundary forms
+DEAL::-1.00000 0.00000 0.00000
+DEAL::-1.00000 0.00000 0.00000
+DEAL::-1.00000 0.00000 0.00000
+DEAL::-1.00000 0.00000 0.00000
+DEAL::
+DEAL::normal vectors
+DEAL::-1.00000 0.00000 0.00000
+DEAL::-1.00000 0.00000 0.00000
+DEAL::-1.00000 0.00000 0.00000
+DEAL::-1.00000 0.00000 0.00000
+DEAL::
+DEAL::Jacobians
+DEAL::  0.00000 1.00000 0.00000  -1.00000 0.00000 0.00000  1.00000 1.00000 1.00000
+DEAL::  0.00000 1.00000 0.00000  -1.00000 0.00000 0.00000  1.00000 1.00000 1.00000
+DEAL::  0.00000 1.00000 0.00000  -1.00000 0.00000 0.00000  1.00000 1.00000 1.00000
+DEAL::  0.00000 1.00000 0.00000  -1.00000 0.00000 0.00000  1.00000 1.00000 1.00000
+DEAL::
+DEAL::Jacobian gradients
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::
+DEAL::inverse jacobians
+DEAL::  0.00000 -1.00000 0.00000  1.00000 0.00000 -0.00000  -1.00000 1.00000 1.00000
+DEAL::  0.00000 -1.00000 0.00000  1.00000 0.00000 -0.00000  -1.00000 1.00000 1.00000
+DEAL::  0.00000 -1.00000 0.00000  1.00000 0.00000 -0.00000  -1.00000 1.00000 1.00000
+DEAL::  0.00000 -1.00000 0.00000  1.00000 0.00000 -0.00000  -1.00000 1.00000 1.00000
+DEAL::
+DEAL::Jacobian push forward gradients
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::
+DEAL::Jacobian 2nd derivatives
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::
+DEAL::Jacobian push forward 2nd derivatives
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::
+DEAL::Jacobian 3rd derivatives
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::
+DEAL::Jacobian push forward 3rd derivatives
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::
+DEAL::JxW
+DEAL::  0.159021
+DEAL::  0.0909793
+DEAL::  0.159021
+DEAL::  0.0909793
+DEAL::
+DEAL::quadrature points
+DEAL::  0.00000 0.178559 0.155051 -> 1.17856 2.00000 1.33361
+DEAL::  0.00000 0.0750311 0.644949 -> 1.07503 2.00000 1.71998
+DEAL::  0.00000 0.666390 0.155051 -> 1.66639 2.00000 1.82144
+DEAL::  0.00000 0.280020 0.644949 -> 1.28002 2.00000 1.92497
+DEAL::
+DEAL::boundary forms
+DEAL::0.00000 1.00000 0.00000
+DEAL::0.00000 1.00000 0.00000
+DEAL::0.00000 1.00000 0.00000
+DEAL::0.00000 1.00000 0.00000
+DEAL::
+DEAL::normal vectors
+DEAL::0.00000 1.00000 0.00000
+DEAL::0.00000 1.00000 0.00000
+DEAL::0.00000 1.00000 0.00000
+DEAL::0.00000 1.00000 0.00000
+DEAL::
+DEAL::Jacobians
+DEAL::  0.00000 1.00000 0.00000  -1.00000 0.00000 0.00000  1.00000 1.00000 1.00000
+DEAL::  0.00000 1.00000 0.00000  -1.00000 0.00000 0.00000  1.00000 1.00000 1.00000
+DEAL::  0.00000 1.00000 0.00000  -1.00000 0.00000 0.00000  1.00000 1.00000 1.00000
+DEAL::  0.00000 1.00000 0.00000  -1.00000 0.00000 0.00000  1.00000 1.00000 1.00000
+DEAL::
+DEAL::Jacobian gradients
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::
+DEAL::inverse jacobians
+DEAL::  0.00000 -1.00000 0.00000  1.00000 0.00000 -0.00000  -1.00000 1.00000 1.00000
+DEAL::  0.00000 -1.00000 0.00000  1.00000 0.00000 -0.00000  -1.00000 1.00000 1.00000
+DEAL::  0.00000 -1.00000 0.00000  1.00000 0.00000 -0.00000  -1.00000 1.00000 1.00000
+DEAL::  0.00000 -1.00000 0.00000  1.00000 0.00000 -0.00000  -1.00000 1.00000 1.00000
+DEAL::
+DEAL::Jacobian push forward gradients
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::
+DEAL::Jacobian 2nd derivatives
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::
+DEAL::Jacobian push forward 2nd derivatives
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::
+DEAL::Jacobian 3rd derivatives
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::
+DEAL::Jacobian push forward 3rd derivatives
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::
+DEAL::JxW
+DEAL::  0.159021
+DEAL::  0.0909793
+DEAL::  0.159021
+DEAL::  0.0909793
+DEAL::
+DEAL::quadrature points
+DEAL::  0.178559 0.666390 0.155051 -> 1.66639 1.82144 2.00000
+DEAL::  0.0750311 0.280020 0.644949 -> 1.28002 1.92497 2.00000
+DEAL::  0.666390 0.178559 0.155051 -> 1.17856 1.33361 2.00000
+DEAL::  0.280020 0.0750311 0.644949 -> 1.07503 1.71998 2.00000
+DEAL::
+DEAL::boundary forms
+DEAL::0.00000 0.00000 1.00000
+DEAL::0.00000 0.00000 1.00000
+DEAL::0.00000 0.00000 1.00000
+DEAL::0.00000 0.00000 1.00000
+DEAL::
+DEAL::normal vectors
+DEAL::0.00000 0.00000 1.00000
+DEAL::0.00000 0.00000 1.00000
+DEAL::0.00000 0.00000 1.00000
+DEAL::0.00000 0.00000 1.00000
+DEAL::
+DEAL::Jacobians
+DEAL::  0.00000 1.00000 0.00000  -1.00000 0.00000 0.00000  1.00000 1.00000 1.00000
+DEAL::  0.00000 1.00000 0.00000  -1.00000 0.00000 0.00000  1.00000 1.00000 1.00000
+DEAL::  0.00000 1.00000 0.00000  -1.00000 0.00000 0.00000  1.00000 1.00000 1.00000
+DEAL::  0.00000 1.00000 0.00000  -1.00000 0.00000 0.00000  1.00000 1.00000 1.00000
+DEAL::
+DEAL::Jacobian gradients
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::
+DEAL::inverse jacobians
+DEAL::  0.00000 -1.00000 0.00000  1.00000 0.00000 -0.00000  -1.00000 1.00000 1.00000
+DEAL::  0.00000 -1.00000 0.00000  1.00000 0.00000 -0.00000  -1.00000 1.00000 1.00000
+DEAL::  0.00000 -1.00000 0.00000  1.00000 0.00000 -0.00000  -1.00000 1.00000 1.00000
+DEAL::  0.00000 -1.00000 0.00000  1.00000 0.00000 -0.00000  -1.00000 1.00000 1.00000
+DEAL::
+DEAL::Jacobian push forward gradients
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::
+DEAL::Jacobian 2nd derivatives
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::
+DEAL::Jacobian push forward 2nd derivatives
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::
+DEAL::Jacobian 3rd derivatives
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::
+DEAL::Jacobian push forward 3rd derivatives
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::
+DEAL::
+DEAL::cell vertices
+DEAL::  2.00000 1.00000 1.00000
+DEAL::  1.00000 2.00000 1.00000
+DEAL::  1.00000 1.00000 2.00000
+DEAL::  2.00000 2.00000 2.00000
+DEAL::
+DEAL::JxW
+DEAL::  0.275432
+DEAL::  0.157581
+DEAL::  0.275432
+DEAL::  0.157581
+DEAL::
+DEAL::quadrature points
+DEAL::  0.666390 0.155051 -1.11022e-16 -> 1.17856 1.66639 1.15505
+DEAL::  0.280020 0.644949 0.00000 -> 1.07503 1.28002 1.64495
+DEAL::  0.178559 0.155051 -1.11022e-16 -> 1.66639 1.17856 1.15505
+DEAL::  0.0750311 0.644949 0.00000 -> 1.28002 1.07503 1.64495
+DEAL::
+DEAL::boundary forms
+DEAL::-0.577350 -0.577350 -0.577350
+DEAL::-0.577350 -0.577350 -0.577350
+DEAL::-0.577350 -0.577350 -0.577350
+DEAL::-0.577350 -0.577350 -0.577350
+DEAL::
+DEAL::normal vectors
+DEAL::-0.577350 -0.577350 -0.577350
+DEAL::-0.577350 -0.577350 -0.577350
+DEAL::-0.577350 -0.577350 -0.577350
+DEAL::-0.577350 -0.577350 -0.577350
+DEAL::
+DEAL::Jacobians
+DEAL::  -1.00000 -1.00000 0.00000  1.00000 0.00000 1.00000  0.00000 1.00000 1.00000
+DEAL::  -1.00000 -1.00000 0.00000  1.00000 0.00000 1.00000  0.00000 1.00000 1.00000
+DEAL::  -1.00000 -1.00000 0.00000  1.00000 0.00000 1.00000  0.00000 1.00000 1.00000
+DEAL::  -1.00000 -1.00000 0.00000  1.00000 0.00000 1.00000  0.00000 1.00000 1.00000
+DEAL::
+DEAL::Jacobian gradients
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::
+DEAL::inverse jacobians
+DEAL::  -0.500000 0.500000 -0.500000  -0.500000 -0.500000 0.500000  0.500000 0.500000 0.500000
+DEAL::  -0.500000 0.500000 -0.500000  -0.500000 -0.500000 0.500000  0.500000 0.500000 0.500000
+DEAL::  -0.500000 0.500000 -0.500000  -0.500000 -0.500000 0.500000  0.500000 0.500000 0.500000
+DEAL::  -0.500000 0.500000 -0.500000  -0.500000 -0.500000 0.500000  0.500000 0.500000 0.500000
+DEAL::
+DEAL::Jacobian push forward gradients
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::
+DEAL::Jacobian 2nd derivatives
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::
+DEAL::Jacobian push forward 2nd derivatives
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::
+DEAL::Jacobian 3rd derivatives
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::
+DEAL::Jacobian push forward 3rd derivatives
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::
+DEAL::JxW
+DEAL::  0.275432
+DEAL::  0.157581
+DEAL::  0.275432
+DEAL::  0.157581
+DEAL::
+DEAL::quadrature points
+DEAL::  0.178559 0.00000 0.155051 -> 1.82144 1.33361 1.15505
+DEAL::  0.0750311 1.11022e-16 0.644949 -> 1.92497 1.71998 1.64495
+DEAL::  0.666390 -1.11022e-16 0.155051 -> 1.33361 1.82144 1.15505
+DEAL::  0.280020 1.11022e-16 0.644949 -> 1.71998 1.92497 1.64495
+DEAL::
+DEAL::boundary forms
+DEAL::0.577350 0.577350 -0.577350
+DEAL::0.577350 0.577350 -0.577350
+DEAL::0.577350 0.577350 -0.577350
+DEAL::0.577350 0.577350 -0.577350
+DEAL::
+DEAL::normal vectors
+DEAL::0.577350 0.577350 -0.577350
+DEAL::0.577350 0.577350 -0.577350
+DEAL::0.577350 0.577350 -0.577350
+DEAL::0.577350 0.577350 -0.577350
+DEAL::
+DEAL::Jacobians
+DEAL::  -1.00000 -1.00000 0.00000  1.00000 0.00000 1.00000  0.00000 1.00000 1.00000
+DEAL::  -1.00000 -1.00000 0.00000  1.00000 0.00000 1.00000  0.00000 1.00000 1.00000
+DEAL::  -1.00000 -1.00000 0.00000  1.00000 0.00000 1.00000  0.00000 1.00000 1.00000
+DEAL::  -1.00000 -1.00000 0.00000  1.00000 0.00000 1.00000  0.00000 1.00000 1.00000
+DEAL::
+DEAL::Jacobian gradients
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::
+DEAL::inverse jacobians
+DEAL::  -0.500000 0.500000 -0.500000  -0.500000 -0.500000 0.500000  0.500000 0.500000 0.500000
+DEAL::  -0.500000 0.500000 -0.500000  -0.500000 -0.500000 0.500000  0.500000 0.500000 0.500000
+DEAL::  -0.500000 0.500000 -0.500000  -0.500000 -0.500000 0.500000  0.500000 0.500000 0.500000
+DEAL::  -0.500000 0.500000 -0.500000  -0.500000 -0.500000 0.500000  0.500000 0.500000 0.500000
+DEAL::
+DEAL::Jacobian push forward gradients
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::
+DEAL::Jacobian 2nd derivatives
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::
+DEAL::Jacobian push forward 2nd derivatives
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::
+DEAL::Jacobian 3rd derivatives
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::
+DEAL::Jacobian push forward 3rd derivatives
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::
+DEAL::JxW
+DEAL::  0.275432
+DEAL::  0.157581
+DEAL::  0.275432
+DEAL::  0.157581
+DEAL::
+DEAL::quadrature points
+DEAL::  -1.11022e-16 0.666390 0.155051 -> 1.33361 1.15505 1.82144
+DEAL::  0.00000 0.280020 0.644949 -> 1.71998 1.64495 1.92497
+DEAL::  -1.11022e-16 0.178559 0.155051 -> 1.82144 1.15505 1.33361
+DEAL::  0.00000 0.0750311 0.644949 -> 1.92497 1.64495 1.71998
+DEAL::
+DEAL::boundary forms
+DEAL::0.577350 -0.577350 0.577350
+DEAL::0.577350 -0.577350 0.577350
+DEAL::0.577350 -0.577350 0.577350
+DEAL::0.577350 -0.577350 0.577350
+DEAL::
+DEAL::normal vectors
+DEAL::0.577350 -0.577350 0.577350
+DEAL::0.577350 -0.577350 0.577350
+DEAL::0.577350 -0.577350 0.577350
+DEAL::0.577350 -0.577350 0.577350
+DEAL::
+DEAL::Jacobians
+DEAL::  -1.00000 -1.00000 0.00000  1.00000 0.00000 1.00000  0.00000 1.00000 1.00000
+DEAL::  -1.00000 -1.00000 0.00000  1.00000 0.00000 1.00000  0.00000 1.00000 1.00000
+DEAL::  -1.00000 -1.00000 0.00000  1.00000 0.00000 1.00000  0.00000 1.00000 1.00000
+DEAL::  -1.00000 -1.00000 0.00000  1.00000 0.00000 1.00000  0.00000 1.00000 1.00000
+DEAL::
+DEAL::Jacobian gradients
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::
+DEAL::inverse jacobians
+DEAL::  -0.500000 0.500000 -0.500000  -0.500000 -0.500000 0.500000  0.500000 0.500000 0.500000
+DEAL::  -0.500000 0.500000 -0.500000  -0.500000 -0.500000 0.500000  0.500000 0.500000 0.500000
+DEAL::  -0.500000 0.500000 -0.500000  -0.500000 -0.500000 0.500000  0.500000 0.500000 0.500000
+DEAL::  -0.500000 0.500000 -0.500000  -0.500000 -0.500000 0.500000  0.500000 0.500000 0.500000
+DEAL::
+DEAL::Jacobian push forward gradients
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::
+DEAL::Jacobian 2nd derivatives
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::
+DEAL::Jacobian push forward 2nd derivatives
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::
+DEAL::Jacobian 3rd derivatives
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::
+DEAL::Jacobian push forward 3rd derivatives
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::
+DEAL::JxW
+DEAL::  0.275432
+DEAL::  0.157581
+DEAL::  0.275432
+DEAL::  0.157581
+DEAL::
+DEAL::quadrature points
+DEAL::  0.666390 0.178559 0.155051 -> 1.15505 1.82144 1.33361
+DEAL::  0.280020 0.0750311 0.644949 -> 1.64495 1.92497 1.71998
+DEAL::  0.178559 0.666390 0.155051 -> 1.15505 1.33361 1.82144
+DEAL::  0.0750311 0.280020 0.644949 -> 1.64495 1.71998 1.92497
+DEAL::
+DEAL::boundary forms
+DEAL::-0.577350 0.577350 0.577350
+DEAL::-0.577350 0.577350 0.577350
+DEAL::-0.577350 0.577350 0.577350
+DEAL::-0.577350 0.577350 0.577350
+DEAL::
+DEAL::normal vectors
+DEAL::-0.577350 0.577350 0.577350
+DEAL::-0.577350 0.577350 0.577350
+DEAL::-0.577350 0.577350 0.577350
+DEAL::-0.577350 0.577350 0.577350
+DEAL::
+DEAL::Jacobians
+DEAL::  -1.00000 -1.00000 0.00000  1.00000 0.00000 1.00000  0.00000 1.00000 1.00000
+DEAL::  -1.00000 -1.00000 0.00000  1.00000 0.00000 1.00000  0.00000 1.00000 1.00000
+DEAL::  -1.00000 -1.00000 0.00000  1.00000 0.00000 1.00000  0.00000 1.00000 1.00000
+DEAL::  -1.00000 -1.00000 0.00000  1.00000 0.00000 1.00000  0.00000 1.00000 1.00000
+DEAL::
+DEAL::Jacobian gradients
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::
+DEAL::inverse jacobians
+DEAL::  -0.500000 0.500000 -0.500000  -0.500000 -0.500000 0.500000  0.500000 0.500000 0.500000
+DEAL::  -0.500000 0.500000 -0.500000  -0.500000 -0.500000 0.500000  0.500000 0.500000 0.500000
+DEAL::  -0.500000 0.500000 -0.500000  -0.500000 -0.500000 0.500000  0.500000 0.500000 0.500000
+DEAL::  -0.500000 0.500000 -0.500000  -0.500000 -0.500000 0.500000  0.500000 0.500000 0.500000
+DEAL::
+DEAL::Jacobian push forward gradients
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::
+DEAL::Jacobian 2nd derivatives
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::
+DEAL::Jacobian push forward 2nd derivatives
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::
+DEAL::Jacobian 3rd derivatives
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::
+DEAL::Jacobian push forward 3rd derivatives
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::
+DEAL::
+DEAL::OK

@@ -1,0 +1,961 @@
+
+DEAL::MappingP1<1, 1>
+DEAL::
+DEAL::cell vertices
+DEAL::  1.00000
+DEAL::  2.00000
+DEAL::
+DEAL::transform_unit_to_real_cell
+DEAL::  1.21132
+DEAL::  1.78868
+DEAL::
+DEAL::transform_real_to_unit_cell
+DEAL::  0.211325
+DEAL::  0.788675
+DEAL::
+DEAL::JxW
+DEAL::  0.500000
+DEAL::  0.500000
+DEAL::
+DEAL::quadrature points
+DEAL::  0.211325 -> 1.21132
+DEAL::  0.788675 -> 1.78868
+DEAL::
+DEAL::Jacobians
+DEAL::  1.00000
+DEAL::  1.00000
+DEAL::
+DEAL::Jacobian gradients
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::
+DEAL::inverse jacobians
+DEAL::  1.00000
+DEAL::  1.00000
+DEAL::
+DEAL::Jacobian push forward gradients
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::
+DEAL::Jacobian 2nd derivatives
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::
+DEAL::Jacobian push forward 2nd derivatives
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::
+DEAL::Jacobian 3rd derivatives
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::
+DEAL::Jacobian push forward 3rd derivatives
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::
+DEAL::
+DEAL::MappingP1<1, 2>
+DEAL::
+DEAL::cell vertices
+DEAL::  1.00000 0.00000
+DEAL::  2.00000 0.00000
+DEAL::
+DEAL::transform_unit_to_real_cell
+DEAL::  1.21132 0.00000
+DEAL::  1.78868 0.00000
+DEAL::
+DEAL::transform_real_to_unit_cell
+DEAL::  0.211325
+DEAL::  0.788675
+DEAL::
+DEAL::JxW
+DEAL::  0.500000
+DEAL::  0.500000
+DEAL::
+DEAL::quadrature points
+DEAL::  0.211325 -> 1.21132 0.00000
+DEAL::  0.788675 -> 1.78868 0.00000
+DEAL::
+DEAL::normal vectors
+DEAL::-0.00000 1.00000
+DEAL::-0.00000 1.00000
+DEAL::
+DEAL::Jacobians
+DEAL::  1.00000  0.00000
+DEAL::  1.00000  0.00000
+DEAL::
+DEAL::Jacobian gradients
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::
+DEAL::inverse jacobians
+DEAL::  1.00000 0.00000
+DEAL::  1.00000 0.00000
+DEAL::
+DEAL::Jacobian push forward gradients
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::
+DEAL::Jacobian 2nd derivatives
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::
+DEAL::Jacobian push forward 2nd derivatives
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::
+DEAL::Jacobian 3rd derivatives
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::
+DEAL::Jacobian push forward 3rd derivatives
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::
+DEAL::
+DEAL::MappingP1<2, 2>
+DEAL::
+DEAL::cell vertices
+DEAL::  1.00000 1.00000
+DEAL::  2.00000 1.00000
+DEAL::  1.00000 2.00000
+DEAL::
+DEAL::transform_unit_to_real_cell
+DEAL::  1.17856 1.15505
+DEAL::  1.07503 1.64495
+DEAL::  1.66639 1.15505
+DEAL::  1.28002 1.64495
+DEAL::
+DEAL::transform_real_to_unit_cell
+DEAL::  0.178559 0.155051
+DEAL::  0.0750311 0.644949
+DEAL::  0.666390 0.155051
+DEAL::  0.280020 0.644949
+DEAL::
+DEAL::JxW
+DEAL::  0.159021
+DEAL::  0.0909793
+DEAL::  0.159021
+DEAL::  0.0909793
+DEAL::
+DEAL::quadrature points
+DEAL::  0.178559 0.155051 -> 1.17856 1.15505
+DEAL::  0.0750311 0.644949 -> 1.07503 1.64495
+DEAL::  0.666390 0.155051 -> 1.66639 1.15505
+DEAL::  0.280020 0.644949 -> 1.28002 1.64495
+DEAL::
+DEAL::Jacobians
+DEAL::  1.00000 0.00000  0.00000 1.00000
+DEAL::  1.00000 0.00000  0.00000 1.00000
+DEAL::  1.00000 0.00000  0.00000 1.00000
+DEAL::  1.00000 0.00000  0.00000 1.00000
+DEAL::
+DEAL::Jacobian gradients
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::
+DEAL::inverse jacobians
+DEAL::  1.00000 -0.00000  -0.00000 1.00000
+DEAL::  1.00000 -0.00000  -0.00000 1.00000
+DEAL::  1.00000 -0.00000  -0.00000 1.00000
+DEAL::  1.00000 -0.00000  -0.00000 1.00000
+DEAL::
+DEAL::Jacobian push forward gradients
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::
+DEAL::Jacobian 2nd derivatives
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::
+DEAL::Jacobian push forward 2nd derivatives
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::
+DEAL::Jacobian 3rd derivatives
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::
+DEAL::Jacobian push forward 3rd derivatives
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::
+DEAL::
+DEAL::cell vertices
+DEAL::  2.00000 2.00000
+DEAL::  1.00000 2.00000
+DEAL::  2.00000 1.00000
+DEAL::
+DEAL::transform_unit_to_real_cell
+DEAL::  1.82144 1.84495
+DEAL::  1.92497 1.35505
+DEAL::  1.33361 1.84495
+DEAL::  1.71998 1.35505
+DEAL::
+DEAL::transform_real_to_unit_cell
+DEAL::  0.178559 0.155051
+DEAL::  0.0750311 0.644949
+DEAL::  0.666390 0.155051
+DEAL::  0.280020 0.644949
+DEAL::
+DEAL::JxW
+DEAL::  0.159021
+DEAL::  0.0909793
+DEAL::  0.159021
+DEAL::  0.0909793
+DEAL::
+DEAL::quadrature points
+DEAL::  0.178559 0.155051 -> 1.82144 1.84495
+DEAL::  0.0750311 0.644949 -> 1.92497 1.35505
+DEAL::  0.666390 0.155051 -> 1.33361 1.84495
+DEAL::  0.280020 0.644949 -> 1.71998 1.35505
+DEAL::
+DEAL::Jacobians
+DEAL::  -1.00000 0.00000  0.00000 -1.00000
+DEAL::  -1.00000 0.00000  0.00000 -1.00000
+DEAL::  -1.00000 0.00000  0.00000 -1.00000
+DEAL::  -1.00000 0.00000  0.00000 -1.00000
+DEAL::
+DEAL::Jacobian gradients
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::
+DEAL::inverse jacobians
+DEAL::  -1.00000 -0.00000  -0.00000 -1.00000
+DEAL::  -1.00000 -0.00000  -0.00000 -1.00000
+DEAL::  -1.00000 -0.00000  -0.00000 -1.00000
+DEAL::  -1.00000 -0.00000  -0.00000 -1.00000
+DEAL::
+DEAL::Jacobian push forward gradients
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::
+DEAL::Jacobian 2nd derivatives
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::
+DEAL::Jacobian push forward 2nd derivatives
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::
+DEAL::Jacobian 3rd derivatives
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::
+DEAL::Jacobian push forward 3rd derivatives
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::
+DEAL::
+DEAL::MappingP1<2, 3>
+DEAL::
+DEAL::cell vertices
+DEAL::  1.00000 1.00000 3.00000
+DEAL::  2.00000 1.00000 6.00000
+DEAL::  1.00000 2.00000 6.00000
+DEAL::
+DEAL::transform_unit_to_real_cell
+DEAL::  1.17856 1.15505 4.00083
+DEAL::  1.07503 1.64495 5.15994
+DEAL::  1.66639 1.15505 5.46432
+DEAL::  1.28002 1.64495 5.77491
+DEAL::
+DEAL::transform_real_to_unit_cell
+DEAL::  0.178559 0.155051
+DEAL::  0.0750311 0.644949
+DEAL::  0.666390 0.155051
+DEAL::  0.280020 0.644949
+DEAL::
+DEAL::JxW
+DEAL::  0.693155
+DEAL::  0.396570
+DEAL::  0.693155
+DEAL::  0.396570
+DEAL::
+DEAL::quadrature points
+DEAL::  0.178559 0.155051 -> 1.17856 1.15505 4.00083
+DEAL::  0.0750311 0.644949 -> 1.07503 1.64495 5.15994
+DEAL::  0.666390 0.155051 -> 1.66639 1.15505 5.46432
+DEAL::  0.280020 0.644949 -> 1.28002 1.64495 5.77491
+DEAL::
+DEAL::normal vectors
+DEAL::-0.688247 -0.688247 0.229416
+DEAL::-0.688247 -0.688247 0.229416
+DEAL::-0.688247 -0.688247 0.229416
+DEAL::-0.688247 -0.688247 0.229416
+DEAL::
+DEAL::Jacobians
+DEAL::  1.00000 0.00000  0.00000 1.00000  3.00000 3.00000
+DEAL::  1.00000 0.00000  0.00000 1.00000  3.00000 3.00000
+DEAL::  1.00000 0.00000  0.00000 1.00000  3.00000 3.00000
+DEAL::  1.00000 0.00000  0.00000 1.00000  3.00000 3.00000
+DEAL::
+DEAL::Jacobian gradients
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::
+DEAL::inverse jacobians
+DEAL::  0.526316 -0.473684 0.157895  -0.473684 0.526316 0.157895
+DEAL::  0.526316 -0.473684 0.157895  -0.473684 0.526316 0.157895
+DEAL::  0.526316 -0.473684 0.157895  -0.473684 0.526316 0.157895
+DEAL::  0.526316 -0.473684 0.157895  -0.473684 0.526316 0.157895
+DEAL::
+DEAL::Jacobian push forward gradients
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::
+DEAL::Jacobian 2nd derivatives
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::
+DEAL::Jacobian push forward 2nd derivatives
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::
+DEAL::Jacobian 3rd derivatives
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::
+DEAL::Jacobian push forward 3rd derivatives
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::
+DEAL::
+DEAL::cell vertices
+DEAL::  2.00000 2.00000 9.00000
+DEAL::  1.00000 2.00000 6.00000
+DEAL::  2.00000 1.00000 6.00000
+DEAL::
+DEAL::transform_unit_to_real_cell
+DEAL::  1.82144 1.84495 7.99917
+DEAL::  1.92497 1.35505 6.84006
+DEAL::  1.33361 1.84495 6.53568
+DEAL::  1.71998 1.35505 6.22509
+DEAL::
+DEAL::transform_real_to_unit_cell
+DEAL::  0.178559 0.155051
+DEAL::  0.0750311 0.644949
+DEAL::  0.666390 0.155051
+DEAL::  0.280020 0.644949
+DEAL::
+DEAL::JxW
+DEAL::  0.693155
+DEAL::  0.396570
+DEAL::  0.693155
+DEAL::  0.396570
+DEAL::
+DEAL::quadrature points
+DEAL::  0.178559 0.155051 -> 1.82144 1.84495 7.99917
+DEAL::  0.0750311 0.644949 -> 1.92497 1.35505 6.84006
+DEAL::  0.666390 0.155051 -> 1.33361 1.84495 6.53568
+DEAL::  0.280020 0.644949 -> 1.71998 1.35505 6.22509
+DEAL::
+DEAL::normal vectors
+DEAL::-0.688247 -0.688247 0.229416
+DEAL::-0.688247 -0.688247 0.229416
+DEAL::-0.688247 -0.688247 0.229416
+DEAL::-0.688247 -0.688247 0.229416
+DEAL::
+DEAL::Jacobians
+DEAL::  -1.00000 0.00000  0.00000 -1.00000  -3.00000 -3.00000
+DEAL::  -1.00000 0.00000  0.00000 -1.00000  -3.00000 -3.00000
+DEAL::  -1.00000 0.00000  0.00000 -1.00000  -3.00000 -3.00000
+DEAL::  -1.00000 0.00000  0.00000 -1.00000  -3.00000 -3.00000
+DEAL::
+DEAL::Jacobian gradients
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::
+DEAL::inverse jacobians
+DEAL::  -0.526316 0.473684 -0.157895  0.473684 -0.526316 -0.157895
+DEAL::  -0.526316 0.473684 -0.157895  0.473684 -0.526316 -0.157895
+DEAL::  -0.526316 0.473684 -0.157895  0.473684 -0.526316 -0.157895
+DEAL::  -0.526316 0.473684 -0.157895  0.473684 -0.526316 -0.157895
+DEAL::
+DEAL::Jacobian push forward gradients
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::
+DEAL::Jacobian 2nd derivatives
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::
+DEAL::Jacobian push forward 2nd derivatives
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::
+DEAL::Jacobian 3rd derivatives
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::
+DEAL::Jacobian push forward 3rd derivatives
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::
+DEAL::
+DEAL::MappingP1<3, 3>
+DEAL::
+DEAL::cell vertices
+DEAL::  1.00000 1.00000 1.00000
+DEAL::  2.00000 1.00000 1.00000
+DEAL::  1.00000 2.00000 1.00000
+DEAL::  1.00000 1.00000 2.00000
+DEAL::
+DEAL::transform_unit_to_real_cell
+DEAL::  1.16200 1.18385 1.01272
+DEAL::  1.01091 1.28152 1.36213
+DEAL::  1.19012 1.01140 1.35862
+DEAL::  1.17082 1.15282 1.63849
+DEAL::  1.15869 1.58566 1.13085
+DEAL::  1.57123 1.14692 1.14037
+DEAL::
+DEAL::transform_real_to_unit_cell
+DEAL::  0.162001 0.183850 0.0127184
+DEAL::  0.0109052 0.281524 0.362127
+DEAL::  0.190117 0.0114033 0.358621
+DEAL::  0.170817 0.152818 0.638493
+DEAL::  0.158685 0.585663 0.130847
+DEAL::  0.571226 0.146918 0.140373
+DEAL::
+DEAL::JxW
+DEAL::  0.0203870
+DEAL::  0.0213444
+DEAL::  0.0220947
+DEAL::  0.0234374
+DEAL::  0.0374025
+DEAL::  0.0420007
+DEAL::
+DEAL::quadrature points
+DEAL::  0.162001 0.183850 0.0127184 -> 1.16200 1.18385 1.01272
+DEAL::  0.0109052 0.281524 0.362127 -> 1.01091 1.28152 1.36213
+DEAL::  0.190117 0.0114033 0.358621 -> 1.19012 1.01140 1.35862
+DEAL::  0.170817 0.152818 0.638493 -> 1.17082 1.15282 1.63849
+DEAL::  0.158685 0.585663 0.130847 -> 1.15869 1.58566 1.13085
+DEAL::  0.571226 0.146918 0.140373 -> 1.57123 1.14692 1.14037
+DEAL::
+DEAL::Jacobians
+DEAL::  1.00000 0.00000 0.00000  0.00000 1.00000 0.00000  0.00000 0.00000 1.00000
+DEAL::  1.00000 0.00000 0.00000  0.00000 1.00000 0.00000  0.00000 0.00000 1.00000
+DEAL::  1.00000 0.00000 0.00000  0.00000 1.00000 0.00000  0.00000 0.00000 1.00000
+DEAL::  1.00000 0.00000 0.00000  0.00000 1.00000 0.00000  0.00000 0.00000 1.00000
+DEAL::  1.00000 0.00000 0.00000  0.00000 1.00000 0.00000  0.00000 0.00000 1.00000
+DEAL::  1.00000 0.00000 0.00000  0.00000 1.00000 0.00000  0.00000 0.00000 1.00000
+DEAL::
+DEAL::Jacobian gradients
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::
+DEAL::inverse jacobians
+DEAL::  1.00000 0.00000 0.00000  0.00000 1.00000 0.00000  0.00000 0.00000 1.00000
+DEAL::  1.00000 0.00000 0.00000  0.00000 1.00000 0.00000  0.00000 0.00000 1.00000
+DEAL::  1.00000 0.00000 0.00000  0.00000 1.00000 0.00000  0.00000 0.00000 1.00000
+DEAL::  1.00000 0.00000 0.00000  0.00000 1.00000 0.00000  0.00000 0.00000 1.00000
+DEAL::  1.00000 0.00000 0.00000  0.00000 1.00000 0.00000  0.00000 0.00000 1.00000
+DEAL::  1.00000 0.00000 0.00000  0.00000 1.00000 0.00000  0.00000 0.00000 1.00000
+DEAL::
+DEAL::Jacobian push forward gradients
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::
+DEAL::Jacobian 2nd derivatives
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::
+DEAL::Jacobian push forward 2nd derivatives
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::
+DEAL::Jacobian 3rd derivatives
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::
+DEAL::Jacobian push forward 3rd derivatives
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::
+DEAL::
+DEAL::cell vertices
+DEAL::  1.00000 2.00000 1.00000
+DEAL::  2.00000 1.00000 1.00000
+DEAL::  2.00000 2.00000 1.00000
+DEAL::  2.00000 2.00000 2.00000
+DEAL::
+DEAL::transform_unit_to_real_cell
+DEAL::  1.35857 1.83800 1.01272
+DEAL::  1.65456 1.98909 1.36213
+DEAL::  1.56014 1.80988 1.35862
+DEAL::  1.96213 1.82918 1.63849
+DEAL::  1.87520 1.84131 1.13085
+DEAL::  1.85852 1.42877 1.14037
+DEAL::
+DEAL::transform_real_to_unit_cell
+DEAL::  0.162001 0.183850 0.0127184
+DEAL::  0.0109052 0.281524 0.362127
+DEAL::  0.190117 0.0114033 0.358621
+DEAL::  0.170817 0.152818 0.638493
+DEAL::  0.158685 0.585663 0.130847
+DEAL::  0.571226 0.146918 0.140373
+DEAL::
+DEAL::JxW
+DEAL::  0.0203870
+DEAL::  0.0213444
+DEAL::  0.0220947
+DEAL::  0.0234374
+DEAL::  0.0374025
+DEAL::  0.0420007
+DEAL::
+DEAL::quadrature points
+DEAL::  0.162001 0.183850 0.0127184 -> 1.35857 1.83800 1.01272
+DEAL::  0.0109052 0.281524 0.362127 -> 1.65456 1.98909 1.36213
+DEAL::  0.190117 0.0114033 0.358621 -> 1.56014 1.80988 1.35862
+DEAL::  0.170817 0.152818 0.638493 -> 1.96213 1.82918 1.63849
+DEAL::  0.158685 0.585663 0.130847 -> 1.87520 1.84131 1.13085
+DEAL::  0.571226 0.146918 0.140373 -> 1.85852 1.42877 1.14037
+DEAL::
+DEAL::Jacobians
+DEAL::  1.00000 1.00000 1.00000  -1.00000 0.00000 0.00000  0.00000 0.00000 1.00000
+DEAL::  1.00000 1.00000 1.00000  -1.00000 0.00000 0.00000  0.00000 0.00000 1.00000
+DEAL::  1.00000 1.00000 1.00000  -1.00000 0.00000 0.00000  0.00000 0.00000 1.00000
+DEAL::  1.00000 1.00000 1.00000  -1.00000 0.00000 0.00000  0.00000 0.00000 1.00000
+DEAL::  1.00000 1.00000 1.00000  -1.00000 0.00000 0.00000  0.00000 0.00000 1.00000
+DEAL::  1.00000 1.00000 1.00000  -1.00000 0.00000 0.00000  0.00000 0.00000 1.00000
+DEAL::
+DEAL::Jacobian gradients
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::
+DEAL::inverse jacobians
+DEAL::  0.00000 -1.00000 0.00000  1.00000 1.00000 -1.00000  -0.00000 0.00000 1.00000
+DEAL::  0.00000 -1.00000 0.00000  1.00000 1.00000 -1.00000  -0.00000 0.00000 1.00000
+DEAL::  0.00000 -1.00000 0.00000  1.00000 1.00000 -1.00000  -0.00000 0.00000 1.00000
+DEAL::  0.00000 -1.00000 0.00000  1.00000 1.00000 -1.00000  -0.00000 0.00000 1.00000
+DEAL::  0.00000 -1.00000 0.00000  1.00000 1.00000 -1.00000  -0.00000 0.00000 1.00000
+DEAL::  0.00000 -1.00000 0.00000  1.00000 1.00000 -1.00000  -0.00000 0.00000 1.00000
+DEAL::
+DEAL::Jacobian push forward gradients
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::
+DEAL::Jacobian 2nd derivatives
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::
+DEAL::Jacobian push forward 2nd derivatives
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::
+DEAL::Jacobian 3rd derivatives
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::
+DEAL::Jacobian push forward 3rd derivatives
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::
+DEAL::
+DEAL::cell vertices
+DEAL::  2.00000 1.00000 1.00000
+DEAL::  1.00000 1.00000 2.00000
+DEAL::  2.00000 1.00000 2.00000
+DEAL::  2.00000 2.00000 2.00000
+DEAL::
+DEAL::transform_unit_to_real_cell
+DEAL::  1.83800 1.01272 1.35857
+DEAL::  1.98909 1.36213 1.65456
+DEAL::  1.80988 1.35862 1.56014
+DEAL::  1.82918 1.63849 1.96213
+DEAL::  1.84131 1.13085 1.87520
+DEAL::  1.42877 1.14037 1.85852
+DEAL::
+DEAL::transform_real_to_unit_cell
+DEAL::  0.162001 0.183850 0.0127184
+DEAL::  0.0109052 0.281524 0.362127
+DEAL::  0.190117 0.0114033 0.358621
+DEAL::  0.170817 0.152818 0.638493
+DEAL::  0.158685 0.585663 0.130847
+DEAL::  0.571226 0.146918 0.140373
+DEAL::
+DEAL::JxW
+DEAL::  0.0203870
+DEAL::  0.0213444
+DEAL::  0.0220947
+DEAL::  0.0234374
+DEAL::  0.0374025
+DEAL::  0.0420007
+DEAL::
+DEAL::quadrature points
+DEAL::  0.162001 0.183850 0.0127184 -> 1.83800 1.01272 1.35857
+DEAL::  0.0109052 0.281524 0.362127 -> 1.98909 1.36213 1.65456
+DEAL::  0.190117 0.0114033 0.358621 -> 1.80988 1.35862 1.56014
+DEAL::  0.170817 0.152818 0.638493 -> 1.82918 1.63849 1.96213
+DEAL::  0.158685 0.585663 0.130847 -> 1.84131 1.13085 1.87520
+DEAL::  0.571226 0.146918 0.140373 -> 1.42877 1.14037 1.85852
+DEAL::
+DEAL::Jacobians
+DEAL::  -1.00000 0.00000 0.00000  0.00000 0.00000 1.00000  1.00000 1.00000 1.00000
+DEAL::  -1.00000 0.00000 0.00000  0.00000 0.00000 1.00000  1.00000 1.00000 1.00000
+DEAL::  -1.00000 0.00000 0.00000  0.00000 0.00000 1.00000  1.00000 1.00000 1.00000
+DEAL::  -1.00000 0.00000 0.00000  0.00000 0.00000 1.00000  1.00000 1.00000 1.00000
+DEAL::  -1.00000 0.00000 0.00000  0.00000 0.00000 1.00000  1.00000 1.00000 1.00000
+DEAL::  -1.00000 0.00000 0.00000  0.00000 0.00000 1.00000  1.00000 1.00000 1.00000
+DEAL::
+DEAL::Jacobian gradients
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::
+DEAL::inverse jacobians
+DEAL::  -1.00000 0.00000 0.00000  1.00000 -1.00000 1.00000  0.00000 1.00000 -0.00000
+DEAL::  -1.00000 0.00000 0.00000  1.00000 -1.00000 1.00000  0.00000 1.00000 -0.00000
+DEAL::  -1.00000 0.00000 0.00000  1.00000 -1.00000 1.00000  0.00000 1.00000 -0.00000
+DEAL::  -1.00000 0.00000 0.00000  1.00000 -1.00000 1.00000  0.00000 1.00000 -0.00000
+DEAL::  -1.00000 0.00000 0.00000  1.00000 -1.00000 1.00000  0.00000 1.00000 -0.00000
+DEAL::  -1.00000 0.00000 0.00000  1.00000 -1.00000 1.00000  0.00000 1.00000 -0.00000
+DEAL::
+DEAL::Jacobian push forward gradients
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::
+DEAL::Jacobian 2nd derivatives
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::
+DEAL::Jacobian push forward 2nd derivatives
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::
+DEAL::Jacobian 3rd derivatives
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::
+DEAL::Jacobian push forward 3rd derivatives
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::
+DEAL::
+DEAL::cell vertices
+DEAL::  1.00000 2.00000 1.00000
+DEAL::  1.00000 1.00000 2.00000
+DEAL::  2.00000 2.00000 2.00000
+DEAL::  1.00000 2.00000 2.00000
+DEAL::
+DEAL::transform_unit_to_real_cell
+DEAL::  1.18385 1.83800 1.35857
+DEAL::  1.28152 1.98909 1.65456
+DEAL::  1.01140 1.80988 1.56014
+DEAL::  1.15282 1.82918 1.96213
+DEAL::  1.58566 1.84131 1.87520
+DEAL::  1.14692 1.42877 1.85852
+DEAL::
+DEAL::transform_real_to_unit_cell
+DEAL::  0.162001 0.183850 0.0127184
+DEAL::  0.0109052 0.281524 0.362127
+DEAL::  0.190117 0.0114033 0.358621
+DEAL::  0.170817 0.152818 0.638493
+DEAL::  0.158685 0.585663 0.130847
+DEAL::  0.571226 0.146918 0.140373
+DEAL::
+DEAL::JxW
+DEAL::  0.0203870
+DEAL::  0.0213444
+DEAL::  0.0220947
+DEAL::  0.0234374
+DEAL::  0.0374025
+DEAL::  0.0420007
+DEAL::
+DEAL::quadrature points
+DEAL::  0.162001 0.183850 0.0127184 -> 1.18385 1.83800 1.35857
+DEAL::  0.0109052 0.281524 0.362127 -> 1.28152 1.98909 1.65456
+DEAL::  0.190117 0.0114033 0.358621 -> 1.01140 1.80988 1.56014
+DEAL::  0.170817 0.152818 0.638493 -> 1.15282 1.82918 1.96213
+DEAL::  0.158685 0.585663 0.130847 -> 1.58566 1.84131 1.87520
+DEAL::  0.571226 0.146918 0.140373 -> 1.14692 1.42877 1.85852
+DEAL::
+DEAL::Jacobians
+DEAL::  0.00000 1.00000 0.00000  -1.00000 0.00000 0.00000  1.00000 1.00000 1.00000
+DEAL::  0.00000 1.00000 0.00000  -1.00000 0.00000 0.00000  1.00000 1.00000 1.00000
+DEAL::  0.00000 1.00000 0.00000  -1.00000 0.00000 0.00000  1.00000 1.00000 1.00000
+DEAL::  0.00000 1.00000 0.00000  -1.00000 0.00000 0.00000  1.00000 1.00000 1.00000
+DEAL::  0.00000 1.00000 0.00000  -1.00000 0.00000 0.00000  1.00000 1.00000 1.00000
+DEAL::  0.00000 1.00000 0.00000  -1.00000 0.00000 0.00000  1.00000 1.00000 1.00000
+DEAL::
+DEAL::Jacobian gradients
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::
+DEAL::inverse jacobians
+DEAL::  0.00000 -1.00000 0.00000  1.00000 0.00000 -0.00000  -1.00000 1.00000 1.00000
+DEAL::  0.00000 -1.00000 0.00000  1.00000 0.00000 -0.00000  -1.00000 1.00000 1.00000
+DEAL::  0.00000 -1.00000 0.00000  1.00000 0.00000 -0.00000  -1.00000 1.00000 1.00000
+DEAL::  0.00000 -1.00000 0.00000  1.00000 0.00000 -0.00000  -1.00000 1.00000 1.00000
+DEAL::  0.00000 -1.00000 0.00000  1.00000 0.00000 -0.00000  -1.00000 1.00000 1.00000
+DEAL::  0.00000 -1.00000 0.00000  1.00000 0.00000 -0.00000  -1.00000 1.00000 1.00000
+DEAL::
+DEAL::Jacobian push forward gradients
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::
+DEAL::Jacobian 2nd derivatives
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::
+DEAL::Jacobian push forward 2nd derivatives
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::
+DEAL::Jacobian 3rd derivatives
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::
+DEAL::Jacobian push forward 3rd derivatives
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::
+DEAL::
+DEAL::cell vertices
+DEAL::  2.00000 1.00000 1.00000
+DEAL::  1.00000 2.00000 1.00000
+DEAL::  1.00000 1.00000 2.00000
+DEAL::  2.00000 2.00000 2.00000
+DEAL::
+DEAL::transform_unit_to_real_cell
+DEAL::  1.65415 1.17472 1.19657
+DEAL::  1.70757 1.37303 1.64365
+DEAL::  1.79848 1.54874 1.37002
+DEAL::  1.67636 1.80931 1.79131
+DEAL::  1.25565 1.28953 1.71651
+DEAL::  1.28186 1.71160 1.28729
+DEAL::
+DEAL::transform_real_to_unit_cell
+DEAL::  0.162001 0.183850 0.0127184
+DEAL::  0.0109052 0.281524 0.362127
+DEAL::  0.190117 0.0114033 0.358621
+DEAL::  0.170817 0.152818 0.638493
+DEAL::  0.158685 0.585663 0.130847
+DEAL::  0.571226 0.146918 0.140373
+DEAL::
+DEAL::JxW
+DEAL::  0.0407740
+DEAL::  0.0426888
+DEAL::  0.0441893
+DEAL::  0.0468748
+DEAL::  0.0748051
+DEAL::  0.0840013
+DEAL::
+DEAL::quadrature points
+DEAL::  0.162001 0.183850 0.0127184 -> 1.65415 1.17472 1.19657
+DEAL::  0.0109052 0.281524 0.362127 -> 1.70757 1.37303 1.64365
+DEAL::  0.190117 0.0114033 0.358621 -> 1.79848 1.54874 1.37002
+DEAL::  0.170817 0.152818 0.638493 -> 1.67636 1.80931 1.79131
+DEAL::  0.158685 0.585663 0.130847 -> 1.25565 1.28953 1.71651
+DEAL::  0.571226 0.146918 0.140373 -> 1.28186 1.71160 1.28729
+DEAL::
+DEAL::Jacobians
+DEAL::  -1.00000 -1.00000 0.00000  1.00000 0.00000 1.00000  0.00000 1.00000 1.00000
+DEAL::  -1.00000 -1.00000 0.00000  1.00000 0.00000 1.00000  0.00000 1.00000 1.00000
+DEAL::  -1.00000 -1.00000 0.00000  1.00000 0.00000 1.00000  0.00000 1.00000 1.00000
+DEAL::  -1.00000 -1.00000 0.00000  1.00000 0.00000 1.00000  0.00000 1.00000 1.00000
+DEAL::  -1.00000 -1.00000 0.00000  1.00000 0.00000 1.00000  0.00000 1.00000 1.00000
+DEAL::  -1.00000 -1.00000 0.00000  1.00000 0.00000 1.00000  0.00000 1.00000 1.00000
+DEAL::
+DEAL::Jacobian gradients
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::
+DEAL::inverse jacobians
+DEAL::  -0.500000 0.500000 -0.500000  -0.500000 -0.500000 0.500000  0.500000 0.500000 0.500000
+DEAL::  -0.500000 0.500000 -0.500000  -0.500000 -0.500000 0.500000  0.500000 0.500000 0.500000
+DEAL::  -0.500000 0.500000 -0.500000  -0.500000 -0.500000 0.500000  0.500000 0.500000 0.500000
+DEAL::  -0.500000 0.500000 -0.500000  -0.500000 -0.500000 0.500000  0.500000 0.500000 0.500000
+DEAL::  -0.500000 0.500000 -0.500000  -0.500000 -0.500000 0.500000  0.500000 0.500000 0.500000
+DEAL::  -0.500000 0.500000 -0.500000  -0.500000 -0.500000 0.500000  0.500000 0.500000 0.500000
+DEAL::
+DEAL::Jacobian push forward gradients
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::
+DEAL::Jacobian 2nd derivatives
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::
+DEAL::Jacobian push forward 2nd derivatives
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::
+DEAL::Jacobian 3rd derivatives
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::
+DEAL::Jacobian push forward 3rd derivatives
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::  all zero = 1
+DEAL::
+DEAL::
+DEAL::OK

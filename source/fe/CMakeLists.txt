@@ -59,6 +59,7 @@ set(_unity_include_src
   mapping_cartesian.cc
   mapping.cc
   mapping_fe.cc
+  mapping_p1.cc
   mapping_q1.cc
   mapping_q.cc
   mapping_q_cache.cc
@@ -137,6 +138,7 @@ set(_inst
   mapping.inst.in
   mapping_fe.inst.in
   mapping_fe_field.inst.in
+  mapping_p1.inst.in
   mapping_q1_eulerian.inst.in
   mapping_q1.inst.in
   mapping_q_cache.inst.in
