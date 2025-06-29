@@ -28,20 +28,29 @@
 void
 test_1d()
 {
-  std::vector<Point<1>> points;
+  std::vector<Point<1, float>> points;
 
   unsigned int n_points_1d = 5;
   for (unsigned int i = 0; i < n_points_1d; ++i)
     points.emplace_back(i);
 
-  std::vector<std::pair<Point<1>, double>> query_spheres;
-  query_spheres.emplace_back(Point<1>(0.5), 0.1);
-  query_spheres.emplace_back(Point<1>(1.5), 0.1);
-  query_spheres.emplace_back(Point<1>(2.2), 0.1);
-  query_spheres.emplace_back(Point<1>(2.6), 0.1);
+  std::vector<std::pair<Point<1, float>, float>> query_spheres;
+  query_spheres.emplace_back(Point<1, float>(0.5), 0.1);
+  query_spheres.emplace_back(Point<1, float>(1.5), 0.1);
+  query_spheres.emplace_back(Point<1, float>(2.2), 0.1);
+  query_spheres.emplace_back(Point<1, float>(2.6), 0.1);
 
 
-  ArborXWrappers::BVH                    bvh(points);
+#if ARBORX_VERSION_MAJOR < 2
+  ArborXWrappers::BVH bvh(points);
+#else
+  std::vector<BoundingBox<1, float>> bounding_boxes;
+  for (const auto &p : points)
+    {
+      bounding_boxes.emplace_back(std::pair(p, p));
+    }
+  ArborXWrappers::BVH<BoundingBox<1, float>> bvh(bounding_boxes);
+#endif
   ArborXWrappers::SphereNearestPredicate sph_nearest(query_spheres, 1);
   auto             indices_offsets = bvh.query(sph_nearest);
   std::vector<int> indices         = indices_offsets.first;
@@ -79,7 +88,7 @@ test_1d()
 void
 test_2d()
 {
-  std::vector<Point<2>> points;
+  std::vector<Point<2, float>> points;
 
   unsigned int n_points_1d = 5;
   for (unsigned int i = 0; i < n_points_1d; ++i)
@@ -91,14 +100,23 @@ test_2d()
     }
 
 
-  std::vector<std::pair<Point<2>, double>> query_spheres;
-  query_spheres.push_back(std::make_pair(Point<2>(0.5, 0.5), 0.1));
-  query_spheres.push_back(std::make_pair(Point<2>(1.5, 1.5), 0.1));
-  query_spheres.push_back(std::make_pair(Point<2>(2.2, 2.2), 0.1));
-  query_spheres.push_back(std::make_pair(Point<2>(2.6, 2.6), 0.1));
+  std::vector<std::pair<Point<2, float>, float>> query_spheres;
+  query_spheres.push_back(std::make_pair(Point<2, float>(0.5, 0.5), 0.1));
+  query_spheres.push_back(std::make_pair(Point<2, float>(1.5, 1.5), 0.1));
+  query_spheres.push_back(std::make_pair(Point<2, float>(2.2, 2.2), 0.1));
+  query_spheres.push_back(std::make_pair(Point<2, float>(2.6, 2.6), 0.1));
 
 
-  ArborXWrappers::BVH                    bvh(points);
+#if ARBORX_VERSION_MAJOR < 2
+  ArborXWrappers::BVH bvh(points);
+#else
+  std::vector<BoundingBox<2, float>>         bounding_boxes;
+  for (const auto &p : points)
+    {
+      bounding_boxes.emplace_back(std::pair(p, p));
+    }
+  ArborXWrappers::BVH<BoundingBox<2, float>> bvh(bounding_boxes);
+#endif
   ArborXWrappers::SphereNearestPredicate sph_nearest(query_spheres, 1);
   auto             indices_offsets = bvh.query(sph_nearest);
   std::vector<int> indices         = indices_offsets.first;
@@ -136,7 +154,7 @@ test_2d()
 void
 test_3d()
 {
-  std::vector<Point<3>> points;
+  std::vector<Point<3, float>> points;
 
   unsigned int n_points_1d = 5;
   for (unsigned int i = 0; i < n_points_1d; ++i)
@@ -150,14 +168,23 @@ test_3d()
         }
     }
 
-  std::vector<std::pair<Point<3>, double>> query_spheres;
-  query_spheres.push_back(std::make_pair(Point<3>(0.5, 0.5, 0.5), 0.1));
-  query_spheres.push_back(std::make_pair(Point<3>(1.5, 1.5, 1.5), 0.1));
-  query_spheres.push_back(std::make_pair(Point<3>(2.2, 2.2, 2.2), 0.1));
-  query_spheres.push_back(std::make_pair(Point<3>(2.6, 2.6, 2.6), 0.1));
+  std::vector<std::pair<Point<3, float>, float>> query_spheres;
+  query_spheres.push_back(std::make_pair(Point<3, float>(0.5, 0.5, 0.5), 0.1));
+  query_spheres.push_back(std::make_pair(Point<3, float>(1.5, 1.5, 1.5), 0.1));
+  query_spheres.push_back(std::make_pair(Point<3, float>(2.2, 2.2, 2.2), 0.1));
+  query_spheres.push_back(std::make_pair(Point<3, float>(2.6, 2.6, 2.6), 0.1));
 
 
-  ArborXWrappers::BVH                    bvh(points);
+#if ARBORX_VERSION_MAJOR < 2
+  ArborXWrappers::BVH bvh(points);
+#else
+  std::vector<BoundingBox<3, float>>         bounding_boxes;
+  for (const auto &p : points)
+    {
+      bounding_boxes.emplace_back(std::pair(p, p));
+    }
+  ArborXWrappers::BVH<BoundingBox<3, float>> bvh(bounding_boxes);
+#endif
   ArborXWrappers::SphereNearestPredicate sph_nearest(query_spheres, 1);
   auto             indices_offsets = bvh.query(sph_nearest);
   std::vector<int> indices         = indices_offsets.first;
@@ -198,7 +225,14 @@ main(int argc, char **argv)
   // Initialize ArborX
   Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv);
 
-  // tests
+  // The 1D test hits a bug in clang:
+  // https://github.com/llvm/llvm-project/issues/18060
+#if defined(DEAL_II_HAVE_FP_EXCEPTIONS)
+  {
+    const int current_fe_except = fegetexcept();
+    fedisableexcept(current_fe_except);
+  }
+#endif
   test_1d();
   test_2d();
   test_3d();
