@@ -26,15 +26,14 @@
 
 using namespace CGALWrappers;
 
-using K           = CGAL::Exact_predicates_exact_constructions_kernel;
-using CGALPoint2  = CGAL::Point_2<K>;
-using CGALPolygon = CGAL::Polygon_2<K>;
+using K          = CGAL::Exact_predicates_exact_constructions_kernel;
+using CGALPoint2 = CGAL::Point_2<K>;
 
 void
 test_quadrilaterals()
 {
   Triangulation<2, 2> tria_in;
-  CGALPolygon         poly;
+  MappingQ<2, 2>      mapping(1);
 
   std::vector<std::pair<std::string, std::string>> names_and_args;
 
@@ -53,7 +52,7 @@ test_quadrilaterals()
       deallog << "name: " << name << std::endl;
       GridGenerator::generate_from_name_and_arguments(tria_in, name, args);
       tria_in.refine_global(2);
-      dealii_tria_to_cgal_polygon(tria_in, poly);
+      auto poly = dealii_tria_to_cgal_polygon<K>(tria_in, mapping);
 
       deallog << "Simple polygon: " << std::boolalpha << poly.is_simple()
               << std::endl;
@@ -76,7 +75,6 @@ test_quadrilaterals()
         }
 
       tria_in.clear();
-      poly.clear();
       deallog << std::endl;
     }
 }
@@ -88,13 +86,13 @@ test_triangles()
 {
   Triangulation<2, 2> tria_quad;
   Triangulation<2, 2> tria_simplex;
-  CGALPolygon         poly;
+  MappingQ<2, 2>      mapping(1);
 
   deallog << "name: hyper_cube converted to simplex mesh" << std::endl;
   GridGenerator::hyper_cube(tria_quad, 0., 1., false);
   tria_quad.refine_global(2);
   GridGenerator::convert_hypercube_to_simplex_mesh(tria_quad, tria_simplex);
-  dealii_tria_to_cgal_polygon(tria_simplex, poly);
+  auto poly = dealii_tria_to_cgal_polygon<K>(tria_simplex, mapping);
 
   deallog << "Simple polygon: " << std::boolalpha << poly.is_simple()
           << std::endl;

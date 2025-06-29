@@ -31,14 +31,14 @@ DEAL_II_NAMESPACE_OPEN
 namespace CGALWrappers
 {
   template <typename KernelType>
-  void
+  CGAL::Polygon_2<KernelType>
   dealii_cell_to_cgal_polygon(
     const typename Triangulation<2, 2>::cell_iterator &cell,
-    const Mapping<2, 2>                               &mapping,
-    CGAL::Polygon_2<KernelType>                       &polygon)
+    const Mapping<2, 2>                               &mapping)
   {
-    const auto &vertices = mapping.get_vertices(cell);
-    polygon.clear();
+    CGAL::Polygon_2<KernelType> polygon;
+    const auto                 &vertices = mapping.get_vertices(cell);
+
     if (cell->reference_cell() == ReferenceCells::Triangle)
       {
         polygon.push_back(
@@ -70,14 +70,15 @@ namespace CGALWrappers
       {
         DEAL_II_ASSERT_UNREACHABLE();
       }
+    return polygon;
   }
 
 
 
   template <typename KernelType>
-  void
-  dealii_tria_to_cgal_polygon(const Triangulation<2, 2>   &tria,
-                              CGAL::Polygon_2<KernelType> &polygon)
+  CGAL::Polygon_2<KernelType>
+  dealii_tria_to_cgal_polygon(const Triangulation<2, 2> &tria,
+                              const Mapping<2, 2>       &mapping)
   {
     // This map holds the two vertex indices of each face.
     // Counterclockwise first vertex index on first position,
@@ -110,8 +111,8 @@ namespace CGALWrappers
           }
       }
 
-    const auto &vertices = tria.get_vertices();
-    polygon.clear();
+    CGAL::Polygon_2<KernelType> polygon;
+    const auto                 &vertices = tria.get_vertices();
 
     // Vertex to start counterclockwise insertion
     const unsigned int start_index   = face_vertex_indices.begin()->first;
@@ -141,22 +142,22 @@ namespace CGALWrappers
           ExcMessage(
             "This should not occur, reasons might be a non closed boundary or a bug in this function"));
       }
+
+    return polygon;
   }
 
 
 
   template <typename KernelType>
-  void
-  compute_boolean_operation(
-    const CGAL::Polygon_2<KernelType>                   &polygon_1,
-    const CGAL::Polygon_2<KernelType>                   &polygon_2,
-    const BooleanOperation                              &boolean_operation,
-    std::vector<CGAL::Polygon_with_holes_2<KernelType>> &polygon_out)
+  std::vector<CGAL::Polygon_with_holes_2<KernelType>>
+  compute_boolean_operation(const CGAL::Polygon_2<KernelType> &polygon_1,
+                            const CGAL::Polygon_2<KernelType> &polygon_2,
+                            const BooleanOperation &boolean_operation)
   {
     Assert(!(boolean_operation == BooleanOperation::compute_corefinement),
            ExcMessage("Corefinement has no usecase for 2D polygons"));
 
-    polygon_out.clear();
+    std::vector<CGAL::Polygon_with_holes_2<KernelType>> polygon_out;
 
     if (boolean_operation == BooleanOperation::compute_intersection)
       {
@@ -173,6 +174,8 @@ namespace CGALWrappers
         polygon_out.resize(1);
         CGAL::join(polygon_1, polygon_2, polygon_out[0]);
       }
+
+    return polygon_out;
   }
 
 // Explicit instantiations.

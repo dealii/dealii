@@ -26,9 +26,7 @@
 
 using namespace CGALWrappers;
 
-using K           = CGAL::Exact_predicates_exact_constructions_kernel;
-using CGALPoint2  = CGAL::Point_2<K>;
-using CGALPolygon = CGAL::Polygon_2<K>;
+using K = CGAL::Exact_predicates_exact_constructions_kernel;
 
 void
 test_quadrilateral()
@@ -41,10 +39,8 @@ test_quadrilateral()
 
   GridGenerator::reference_cell(tria, r_cell);
 
-  CGALPolygon poly;
-
   const auto cell = tria.begin_active();
-  dealii_cell_to_cgal_polygon(cell, *mapping, poly);
+  auto       poly = dealii_cell_to_cgal_polygon<K>(cell, *mapping);
 
   deallog << "Quadrilateral: " << std::endl;
   deallog << "Simple polygon: " << std::boolalpha << poly.is_simple()
@@ -76,10 +72,8 @@ test_triangle()
 
   GridGenerator::reference_cell(tria, r_cell);
 
-  CGALPolygon poly;
-
   const auto cell = tria.begin_active();
-  dealii_cell_to_cgal_polygon(cell, *mapping, poly);
+  auto       poly = dealii_cell_to_cgal_polygon<K>(cell, *mapping);
 
   deallog << "Triangle: " << std::endl;
   deallog << "Simple polygon: " << std::boolalpha << poly.is_simple()

@@ -26,9 +26,8 @@
 
 using namespace CGALWrappers;
 
-using K                    = CGAL::Exact_predicates_exact_constructions_kernel;
-using CGALPoint2           = CGAL::Point_2<K>;
-using CGALPolygon          = CGAL::Polygon_2<K>;
+using K = CGAL::Exact_predicates_exact_constructions_kernel;
+
 using CGALPolygonWithHoles = CGAL::Polygon_with_holes_2<K>;
 
 void
@@ -54,11 +53,9 @@ write_volumes(std::vector<CGALPolygonWithHoles> &poly_vec)
 void
 test(unsigned int refinement_1, unsigned int refinement_2)
 {
-  Triangulation<2, 2>               tria_1;
-  Triangulation<2, 2>               tria_2;
-  CGALPolygon                       poly_1;
-  CGALPolygon                       poly_2;
-  std::vector<CGALPolygonWithHoles> poly_out_vec;
+  Triangulation<2, 2> tria_1;
+  Triangulation<2, 2> tria_2;
+  MappingQ<2, 2>      mapping(1);
 
   std::vector<std::pair<std::string, std::string>> names_and_args;
 
@@ -79,7 +76,7 @@ test(unsigned int refinement_1, unsigned int refinement_2)
                                                   names_and_args[0].first,
                                                   names_and_args[0].second);
   tria_1.refine_global(refinement_1);
-  dealii_tria_to_cgal_polygon(tria_1, poly_1);
+  auto poly_1 = dealii_tria_to_cgal_polygon<K>(tria_1, mapping);
 
   for (const auto &info_pair : names_and_args)
     {
@@ -88,29 +85,28 @@ test(unsigned int refinement_1, unsigned int refinement_2)
       deallog << "name: " << name << std::endl;
       GridGenerator::generate_from_name_and_arguments(tria_2, name, args);
       tria_2.refine_global(refinement_2);
-      dealii_tria_to_cgal_polygon(tria_2, poly_2);
+      auto poly_2 = dealii_tria_to_cgal_polygon<K>(tria_2, mapping);
 
-      compute_boolean_operation(poly_1,
-                                poly_2,
-                                BooleanOperation::compute_intersection,
-                                poly_out_vec);
+      auto poly_out_vec =
+        compute_boolean_operation(poly_1,
+                                  poly_2,
+                                  BooleanOperation::compute_intersection);
       deallog << "Intersection: " << poly_out_vec.size() << " polygons"
               << std::endl;
       write_volumes(poly_out_vec);
 
-      compute_boolean_operation(poly_1,
-                                poly_2,
-                                BooleanOperation::compute_difference,
-                                poly_out_vec);
+      poly_out_vec =
+        compute_boolean_operation(poly_1,
+                                  poly_2,
+                                  BooleanOperation::compute_difference);
       deallog << "Difference: " << poly_out_vec.size() << " polygons"
               << std::endl;
       write_volumes(poly_out_vec);
 
 
-      compute_boolean_operation(poly_1,
-                                poly_2,
-                                BooleanOperation::compute_union,
-                                poly_out_vec);
+      poly_out_vec = compute_boolean_operation(poly_1,
+                                               poly_2,
+                                               BooleanOperation::compute_union);
       deallog << "Union: " << poly_out_vec.size() << " polygons" << std::endl;
       write_volumes(poly_out_vec);
 

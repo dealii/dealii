@@ -16,17 +16,17 @@
 
 for (cgal_kernel : CGAL_KERNELS)
   {
-    template void dealii_cell_to_cgal_polygon<cgal_kernel>(
-      const typename Triangulation<2, 2>::cell_iterator &cell,
-      const Mapping<2, 2>                               &mapping,
-      CGAL::Polygon_2<cgal_kernel>                      &polygon);
+    template CGAL::Polygon_2<cgal_kernel> dealii_cell_to_cgal_polygon<
+      cgal_kernel>(const typename Triangulation<2, 2>::cell_iterator &cell,
+                   const Mapping<2, 2>                               &mapping);
 
-    template void dealii_tria_to_cgal_polygon<cgal_kernel>(
-      const Triangulation<2, 2> &tria, CGAL::Polygon_2<cgal_kernel> &polygon);
+    template CGAL::Polygon_2<cgal_kernel>
+    dealii_tria_to_cgal_polygon<cgal_kernel>(const Triangulation<2, 2> &tria,
+                                             const Mapping<2, 2> &mapping);
 
-    template void compute_boolean_operation<cgal_kernel>(
-      const CGAL::Polygon_2<cgal_kernel>                   &polygon_1,
-      const CGAL::Polygon_2<cgal_kernel>                   &polygon_2,
-      const BooleanOperation                               &boolean_operation,
-      std::vector<CGAL::Polygon_with_holes_2<cgal_kernel>> &polygon_out);
+    template std::vector<CGAL::Polygon_with_holes_2<cgal_kernel>>
+    compute_boolean_operation<cgal_kernel>(
+      const CGAL::Polygon_2<cgal_kernel> &polygon_1,
+      const CGAL::Polygon_2<cgal_kernel> &polygon_2,
+      const BooleanOperation             &boolean_operation);
   }

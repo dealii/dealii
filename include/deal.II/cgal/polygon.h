@@ -47,14 +47,12 @@ namespace CGALWrappers
    *
    * @param[in] cell The input deal.II cell iterator
    * @param[in] mapping The mapping used to map the vertices of the cell
-   * @param[out] polygon The output CGAL::Polygon_2
    */
   template <typename KernelType>
-  void
+  CGAL::Polygon_2<KernelType>
   dealii_cell_to_cgal_polygon(
     const typename Triangulation<2, 2>::cell_iterator &cell,
-    const Mapping<2, 2>                               &mapping,
-    CGAL::Polygon_2<KernelType>                       &polygon);
+    const Mapping<2, 2>                               &mapping);
 
 
 
@@ -64,12 +62,12 @@ namespace CGALWrappers
    * Triangulations that have holes are not supported.
    *
    * @param[in] tria The input deal.II triangulation
-   * @param[out] polygon The output CGAL::Polygon_2
+   * @param[in] mapping The mapping used to map the vertices of cells
    */
   template <typename KernelType>
-  void
-  dealii_tria_to_cgal_polygon(const Triangulation<2, 2>   &tria,
-                              CGAL::Polygon_2<KernelType> &polygon);
+  CGAL::Polygon_2<KernelType>
+  dealii_tria_to_cgal_polygon(const Triangulation<2, 2> &tria,
+                              const Mapping<2, 2>       &mapping);
 
 
 
@@ -91,15 +89,12 @@ namespace CGALWrappers
    * @param[in] polygon_1 The first input CGAL::Polygon_2
    * @param[in] polygon_2 The second input CGAL::Polygon_2
    * @param[in] boolean_operation The input BooleanOperation
-   * @param[out] polygon_out The output CGAL::Polygon_2_with_holes
    */
   template <typename KernelType>
-  void
-  compute_boolean_operation(
-    const CGAL::Polygon_2<KernelType>                   &polygon_1,
-    const CGAL::Polygon_2<KernelType>                   &polygon_2,
-    const BooleanOperation                              &boolean_operation,
-    std::vector<CGAL::Polygon_with_holes_2<KernelType>> &polygon_out);
+  std::vector<CGAL::Polygon_with_holes_2<KernelType>>
+  compute_boolean_operation(const CGAL::Polygon_2<KernelType> &polygon_1,
+                            const CGAL::Polygon_2<KernelType> &polygon_2,
+                            const BooleanOperation &boolean_operation);
 } // namespace CGALWrappers
 
 DEAL_II_NAMESPACE_CLOSE
