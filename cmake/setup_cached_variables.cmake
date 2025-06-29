@@ -34,6 +34,7 @@
 #     DEAL_II_USE_LTO
 #     DEAL_II_SETUP_COVERAGE
 #     DEAL_II_UNITY_BUILD
+#     DEAL_II_BUILD_CXX20_MODULE
 #     DEAL_II_EARLY_DEPRECATIONS
 #     BUILD_SHARED_LIBS
 #     CMAKE_INSTALL_RPATH_USE_LINK_PATH
@@ -176,6 +177,11 @@ option(DEAL_II_UNITY_BUILD
   "Compile the library by concatenating together source files to form a few large targets instead of many small ones. This lowers total compilation wall time by about 25%."
   OFF)
 mark_as_advanced(DEAL_II_UNITY_BUILD)
+
+option(DEAL_II_BUILD_CXX20_MODULE
+  "If set to ON, and if compiler, cmake, and build system are suitable, also build a C++20 style module that can be imported instead of using \#include directives. This will increase build time significantly."
+  OFF)
+mark_as_advanced(DEAL_II_BUILD_CXX20_MODULE)
 
 option(DEAL_II_EARLY_DEPRECATIONS
   "Enable deprecation warnings for features deprecated since the last release."
