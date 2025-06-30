@@ -65,9 +65,27 @@ namespace CGALWrappers
    * @param[in] mapping The mapping used to map the vertices of cells
    */
   template <typename KernelType>
-  CGAL::Polygon_2<KernelType>
+  CGAL::Polygon_with_holes_2<KernelType>
   dealii_tria_to_cgal_polygon(const Triangulation<2, 2> &tria,
                               const Mapping<2, 2>       &mapping);
+
+
+
+  /**
+   * Constructs a Polygon_with_holes_2 from the input Polygon_2.
+   * Further polygons for holes are optional.
+   *
+   * Polygon_with_holes_2 has function .outer_boundary() as well as
+   * .holes() or .holes_begin() and .holes_end()
+   *
+   * @param[in] boundary_outside Polygon for the outer boundary
+   * @param[in] boundary_holes Polygons for the holes
+   */
+  template <typename KernelType>
+  CGAL::Polygon_with_holes_2<KernelType>
+  polygon_to_polygon_with_holes(
+    const CGAL::Polygon_2<KernelType>              &boundary_outside,
+    const std::vector<CGAL::Polygon_2<KernelType>> &boundary_holes = {});
 
 
 
@@ -92,9 +110,10 @@ namespace CGALWrappers
    */
   template <typename KernelType>
   std::vector<CGAL::Polygon_with_holes_2<KernelType>>
-  compute_boolean_operation(const CGAL::Polygon_2<KernelType> &polygon_1,
-                            const CGAL::Polygon_2<KernelType> &polygon_2,
-                            const BooleanOperation &boolean_operation);
+  compute_boolean_operation(
+    const CGAL::Polygon_with_holes_2<KernelType> &polygon_1,
+    const CGAL::Polygon_with_holes_2<KernelType> &polygon_2,
+    const BooleanOperation                       &boolean_operation);
 } // namespace CGALWrappers
 
 DEAL_II_NAMESPACE_CLOSE
