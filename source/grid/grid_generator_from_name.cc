@@ -122,9 +122,7 @@ namespace GridGenerator
       else if (name == "custom_channel_with_cylinder")
         parse_and_create<dim,
                          dim,
-                         unsigned int,
-                         unsigned int,
-                         unsigned int,
+                         std::vector<unsigned int>,
                          double,
                          unsigned int,
                          double,

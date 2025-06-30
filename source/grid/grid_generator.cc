@@ -3832,9 +3832,7 @@ namespace GridGenerator
   template <>
   void
   custom_channel_with_cylinder(Triangulation<1> &,
-                               const unsigned int,
-                               const unsigned int,
-                               const unsigned int,
+                               const std::vector<unsigned int>,
                                const double,
                                unsigned int,
                                const double,
@@ -3848,17 +3846,16 @@ namespace GridGenerator
 
   template <>
   void
-  custom_channel_with_cylinder(Triangulation<2>  &tria,
-                               const unsigned int half_height,
-                               const unsigned int length_pre,
-                               const unsigned int length_post,
-                               const double,
-                               unsigned int,
-                               const double       shell_region_radius,
-                               const unsigned int n_shells,
-                               const double       skewness,
-                               const bool         use_transfinite_region,
-                               const bool         colorize)
+  custom_channel_with_cylinder(
+    Triangulation<2>               &tria,
+    const std::vector<unsigned int> lengths_and_heights,
+    const double,
+    unsigned int,
+    const double       shell_region_radius,
+    const unsigned int n_shells,
+    const double       skewness,
+    const bool         use_transfinite_region,
+    const bool         colorize)
   {
     const types::manifold_id polar_manifold_id = 0;
     const types::manifold_id tfi_manifold_id   = 1;
@@ -3872,8 +3869,13 @@ namespace GridGenerator
     // The number of repetitions is chosen to ensure that the cylinder
     // occupies four cells.
 
+    const unsigned int length_pre   = lengths_and_heights[0];
+    const unsigned int length_post  = lengths_and_heights[1];
+    const unsigned int height_below = lengths_and_heights[2];
+    const unsigned int height_above = lengths_and_heights[3];
+
     const unsigned int length_repetitions = length_pre + length_post;
-    const unsigned int height_repetitions = 2 * half_height;
+    const unsigned int height_repetitions = height_above + height_below;
 
     // We begin by setting up a grid that is length_repetition by
     // height_repetitions cells. These cells are all square
@@ -3881,8 +3883,8 @@ namespace GridGenerator
     GridGenerator::subdivided_hyper_rectangle(
       bulk_tria,
       {(length_repetitions), height_repetitions},
-      Point<2>(-double(length_pre), -double(half_height)),
-      Point<2>(double(length_post), double(half_height)));
+      Point<2>(-double(length_pre), -double(height_below)),
+      Point<2>(double(length_post), double(height_above)));
 
     // bulk_tria now looks like this:
     //
@@ -4010,8 +4012,8 @@ namespace GridGenerator
             else if (face->manifold_id() == polar_manifold_id)
               face->set_boundary_id(2);
             // bottom side
-            else if (std::abs(center[1] - (-static_cast<double>(half_height))) <
-                     1e-10)
+            else if (std::abs(center[1] -
+                              (-static_cast<double>(height_below))) < 1e-10)
               face->set_boundary_id(3);
             // top side
             else
@@ -4021,23 +4023,20 @@ namespace GridGenerator
 
   template <>
   void
-  custom_channel_with_cylinder(Triangulation<3>  &tria,
-                               const unsigned int half_height,
-                               const unsigned int length_pre,
-                               const unsigned int length_post,
-                               const double       depth,
-                               unsigned int       depth_division,
-                               const double       shell_region_radius,
-                               const unsigned int n_shells,
-                               const double       skewness,
-                               const bool         use_transfinite_region,
-                               const bool         colorize)
+  custom_channel_with_cylinder(
+    Triangulation<3>               &tria,
+    const std::vector<unsigned int> lengths_and_heights,
+    const double                    depth,
+    unsigned int                    depth_division,
+    const double                    shell_region_radius,
+    const unsigned int              n_shells,
+    const double                    skewness,
+    const bool                      use_transfinite_region,
+    const bool                      colorize)
   {
     Triangulation<2> tria_2;
     custom_channel_with_cylinder(tria_2,
-                                 half_height,
-                                 length_pre,
-                                 length_post,
+                                 lengths_and_heights,
                                  depth,
                                  depth_division,
                                  shell_region_radius,

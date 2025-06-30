@@ -548,20 +548,22 @@ namespace GridGenerator
                         const bool          colorize           = false);
 
   /**
-   * Generate a grid consisting of a channel with a cylinder where the length
-   * and the height of the channel can be defined by the user. This generator is
-   * a generalized version of GridGenerator::channel_with_cylinder. It can be
-   * used for benchmarking Navier-Stokes solvers for various flows around a
-   * cylinder cases in 2D or 3D. The main limitation of this generator is that
-   * the diameter of the cylinder is fixed at one and that the dimensions of the
-   * channel must be an integer multiple of this diameter. Consequently, the
-   * length before the cylinder
-   * (length_pre, $L_{pre}$), the length after the cylinder (length_post,
-   * $L_{post}$) and the half height of the channel (half_height, $H$) must be
-   * integer values. The geometry consists of a channel of size $[-L_{pre}, -H]
-   * \times [L_{post}, H] \times [0, W] $ (where the $z$ dimension is omitted in
-   * 2d) with a cylinder, parallel to the $z$ axis with diameter $1$, centered
-   * at $(0, 0, 0)$. The channel has three distinct regions: <ol>
+   * Generate a grid consisting of a channel with a cylinder where the length,
+   * the height and the depth (in 3D) of the channel can be defined by the user.
+   * This generator is a generalized version of
+   * GridGenerator::channel_with_cylinder. It can be used for benchmarking
+   * Navier-Stokes solvers for various flows around a cylinder cases in 2D or
+   * 3D. The main limitation of this generator is that the diameter of the
+   * cylinder is fixed at one and that the dimensions of the channel along the x
+   * and y dimensions must be an integer multiple of this diameter.
+   * Consequently, the length before the cylinder
+   * ($L_{pre}$), the length after the cylinder ($L_{post}$), the height below
+   * ($H_{below}$) and the height above ($H_{above}$) must be integer values.
+   * The depth of the channel ($W$) can be any real positive number. The
+   * geometry consists of a channel of size $[-L_{pre}, -H_{below}] \times
+   * [L_{post}, H_{above}] \times [0, W] $ (where the $z$ dimension is omitted
+   * in 2d) with a cylinder, parallel to the $z$ axis with diameter $1$,
+   * centered at $(0, 0, 0)$. The channel has three distinct regions: <ol>
    *   <li>If @p n_shells is greater than zero, then there are that many shells
    *   centered around the cylinder,</li>
    *   <li>a blending region between the shells and the rest of the
@@ -569,7 +571,7 @@ namespace GridGenerator
    *   <li>a bulk region consisting of Cartesian cells.</li>
    * </ol>
    * Here is an example of a grid (without additional global refinement)
-   * where the arguments were length_pre=8, length_post=16, half_height=8 and
+   * where the arguments were {8,16,8,8} and
    * the default arguments are used for the number of shells and skewness:
    *
    * @image html custom_channel_with_cylinder.png
@@ -594,21 +596,20 @@ namespace GridGenerator
    * @param tria Triangulation to be created. Must be empty upon calling this
    * function.
    *
-   * @param half_height The half height of the channel (y- to 0 or 0 to y+).
+   * @param lengths_and_heights  A vector containing the distance of the domain to the center of the cylinder.
+   * The vector must contain 4 unsigned integers which consist in the length (in
+   * number of cylinder diameter) before the cylinder, after the cylinder, below
+   * the cylinder and above the cylinder.
    *
-   * @param length_pre The length of the channel from the left side (x-) to the center of the cylinder (0)
+   * @param depth The depth of the simulation domain (in 3D, the z axis)
    *
-   * @param length_post The length of the channel from the cylinder (0) to the right side (x+)
+   * @param depth_division The number of division along the z axis
    *
    * @param shell_region_radius Radius of the layer of shells around the cylinder.
    * This value should be between larger than 0.5 (the radius of the cylinder)
    * and smaller than 1 (the half-length of the box around the cylinder).
    *
    * @param n_shells Number of shells to use in the shell layer.
-   *
-   * @param depth The depth of the simulation domaine (in 3D, the z axis)
-   *
-   * @param depth_division The number of division along the z axis
    *
    * @param skewness Parameter controlling how close the shells are
    * to the cylinder: see the mathematical definition given in
@@ -632,17 +633,16 @@ namespace GridGenerator
    */
   template <int dim>
   void
-  custom_channel_with_cylinder(Triangulation<dim> &tria,
-                               const unsigned int  half_height,
-                               const unsigned int  length_pre,
-                               const unsigned int  length_post,
-                               const double        depth               = 1,
-                               const unsigned int  depth_division      = 1,
-                               const double        shell_region_radius = 0.75,
-                               const unsigned int  n_shells            = 2,
-                               const double        skewness            = 2.0,
-                               const bool use_transfinite_region       = false,
-                               const bool colorize                     = false);
+  custom_channel_with_cylinder(
+    Triangulation<dim>             &tria,
+    const std::vector<unsigned int> lengths_and_heights,
+    const double                    depth                  = 1,
+    const unsigned int              depth_division         = 1,
+    const double                    shell_region_radius    = 0.75,
+    const unsigned int              n_shells               = 2,
+    const double                    skewness               = 2.0,
+    const bool                      use_transfinite_region = false,
+    const bool                      colorize               = false);
 
   /**
    * A general @p dim -dimensional cell (a segment if dim is 1, a quadrilateral
