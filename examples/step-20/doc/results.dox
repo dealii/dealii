@@ -176,25 +176,25 @@ this:
 @code
 template <int dim>
 void
-KInverse<dim>::value_list (const std::vector<Point<dim> > &points,
-                           std::vector<Tensor<2,dim> >    &values) const
+KInverse<dim>::value_list(const std::vector<Point<dim>> &points,
+                          std::vector<Tensor<2,dim>>    &values) const
 {
-  AssertDimension (points.size(), values.size());
+  AssertDimension(points.size(), values.size());
 
-  for (unsigned int p=0; p<points.size(); ++p)
+  for (unsigned int p = 0; p < points.size(); ++p)
     {
-      values[p].clear ();
+      values[p].clear();
 
       const double distance_to_flowline
         = std::fabs(points[p][1]-0.2*std::sin(10*points[p][0]));
 
-      const double permeability = std::max(std::exp(-(distance_to_flowline*
+      const double permeability = std::max(std::exp(-(distance_to_flowline *
                                                       distance_to_flowline)
                                                     / (0.1 * 0.1)),
                                            0.001);
 
-      for (unsigned int d=0; d<dim; ++d)
-	values[p][d][d] = 1./permeability;
+      for (unsigned int d = 0; d < dim; ++d)
+        values[p][d][d] = 1./permeability;
     }
 }
 @endcode
@@ -226,50 +226,51 @@ describing a random medium, but one possibility to implement this behavior
 would look like this:
 @code
 template <int dim>
-class KInverse : public TensorFunction<2,dim>
+class KInverse : public TensorFunction<2, dim>
 {
   public:
-    KInverse ();
+    KInverse();
 
-    virtual void value_list (const std::vector<Point<dim> > &points,
-			     std::vector<Tensor<2,dim> >    &values) const;
+    virtual void
+    value_list(const std::vector<Point<dim>> &points,
+               std::vector<Tensor<2, dim>>   &values) const;
 
   private:
-    std::vector<Point<dim> > centers;
+    std::vector<Point<dim>> centers;
 };
 
 
 template <int dim>
-KInverse<dim>::KInverse ()
+KInverse<dim>::KInverse()
 {
   const unsigned int N = 40;
-  centers.resize (N);
-  for (unsigned int i=0; i<N; ++i)
-    for (unsigned int d=0; d<dim; ++d)
-      centers[i][d] = 2.*rand()/RAND_MAX-1;
+  centers.resize(N);
+  for (unsigned int i = 0; i < N; ++i)
+    for (unsigned int d = 0; d < dim; ++d)
+      centers[i][d] = (2.0 * std::rand()) / RAND_MAX - 1.0;
 }
 
 
 template <int dim>
 void
-KInverse<dim>::value_list (const std::vector<Point<dim> > &points,
-                           std::vector<Tensor<2,dim> >    &values) const
+KInverse<dim>::value_list(const std::vector<Point<dim>> &points,
+                          std::vector<Tensor<2, dim>>   &values) const
 {
-  AssertDimension (points.size(), values.size());
+  AssertDimension(points.size(), values.size());
 
-  for (unsigned int p=0; p<points.size(); ++p)
+  for (unsigned int p = 0; p < points.size(); ++p)
     {
-      values[p].clear ();
+      values[p].clear();
 
       double permeability = 0;
-      for (unsigned int i=0; i<centers.size(); ++i)
+      for (unsigned int i = 0; i < centers.size(); ++i)
         permeability += std::exp(-(points[p] - centers[i]).norm_square() / (0.1 * 0.1));
 
       const double normalized_permeability
         = std::max(permeability, 0.005);
 
-      for (unsigned int d=0; d<dim; ++d)
-	values[p][d][d] = 1./normalized_permeability;
+      for (unsigned int d = 0; d < dim; ++d)
+        values[p][d][d] = 1.0 / normalized_permeability;
     }
 }
 @endcode
