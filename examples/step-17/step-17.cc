@@ -251,16 +251,18 @@ namespace Step17
   // for the global linear system to be solved needs to be implemented.
   //
   // However, before we proceed with this, there is one thing to do for a
-  // parallel program: we need to determine which MPI process is
-  // responsible for each of the cells. Splitting cells among
-  // processes, commonly called "partitioning the mesh", is done by
-  // assigning a @ref GlossSubdomainId "subdomain id" to each cell. We
-  // do so by calling into the METIS library that does this in a very
-  // efficient way, trying to minimize the number of nodes on the
-  // interfaces between subdomains. Rather than trying to call METIS
-  // directly, we do this by calling the
-  // GridTools::partition_triangulation() function that does this at a
-  // much higher level of programming.
+  // parallel program: we need to determine which MPI process is responsible for
+  // each of the cells. Splitting cells among processes, commonly called
+  // "partitioning the mesh", is done by assigning a @ref GlossSubdomainId
+  // "subdomain id" to each cell. In this case, we partition the mesh either via
+  // the METIS library or, if deal.II was not set up with support for METIS, via
+  // the built-in zorder partitioner. In general, external packages like METIS
+  // and Zoltan do a better job (meaning that they minimize the number of
+  // elements on subdomain interfaces) than the simple zorder partitioner
+  // implemented in GridTools::partition_triangulation_zorder(), but they have
+  // the disadvantage of requiring an external dependency. Rather than directly
+  // using METIS' API, we use it via GridTools::partition_triangulation() which
+  // does this at a much higher level of programming.
   //
   // @note As mentioned in the introduction, we could avoid this manual
   //   partitioning step if we used the parallel::shared::Triangulation
@@ -316,7 +318,11 @@ namespace Step17
   template <int dim>
   void ElasticProblem<dim>::setup_system()
   {
+#ifdef DEAL_II_WITH_METIS
     GridTools::partition_triangulation(n_mpi_processes, triangulation);
+#else
+    GridTools::partition_triangulation_zorder(n_mpi_processes, triangulation);
+#endif
 
     dof_handler.distribute_dofs(fe);
     DoFRenumbering::subdomain_wise(dof_handler);
