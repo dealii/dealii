@@ -399,7 +399,7 @@ namespace Step55
     void setup_system();
 
     void interpolate_initial_elevation();
-    void compute_initial_constraints();
+    void compute_initial_waterflow_constraints();
     void assemble_initial_waterflow_system();
     void solve_initial_waterflow_system();
     void check_conservation_for_waterflow_system(const VectorType &solution);
@@ -485,9 +485,15 @@ namespace Step55
   {}
 
 
+  // @sect3{StreamPowerErosionProblem::make_grid()}
+  // The first non-constructor function is the one that sets up the
+  // mesh. There is really nothing particularly complicated about this
+  // function that you haven't already seen.
+  // TODO: Update to discuss curved mesh
   void StreamPowerErosionProblem::make_grid()
   {
-    pcout << "Make grid... " << std::flush;
+    TimerOutput::Scope t(computing_timer, "Make grid");
+    pcout << "Make grid... " << std::endl;
 
 // Recall:
 // BENCHMARK 0 // the 1d benchmark with the linear ramp, using m=0, n=1
@@ -537,14 +543,27 @@ namespace Step55
       triangulation);
 #endif
 
-    pcout << "done. " << std::endl;
+    pcout << "   Number of cells: " << triangulation.n_global_active_cells()
+          << std::endl;
   }
 
 
+  // @sect3{StreamPowerErosionProblem::setup_system()}
+  // The next function also is not something that is new in any particular
+  // way. Conceptually, all we have to do is set up block vectors and matrices
+  // for the linear systems we want to solve. This really is quite
+  // straightforward with the only complication that we have to account for
+  // the fact that we are working in a parallel program where we have to
+  // keep track which process owns which degrees of freedom.
+  //
+  // We start out by enumerating all degrees of freedom, and then re-enumerate
+  // them in such a way that the elevation DoFs all come before all of the
+  // water flow rate DoFs. Because the two use the same finite element, this
+  // splits the total number of DoFs neatly into two halves.
   void StreamPowerErosionProblem::setup_system()
   {
-    TimerOutput::Scope t(computing_timer, "setup");
-    pcout << "Setup system... " << std::flush;
+    TimerOutput::Scope t(computing_timer, "Setup system");
+    pcout << "Setup system... " << std::endl;
 
     dof_handler.distribute_dofs(fe);
     DoFRenumbering::component_wise(dof_handler);
@@ -552,23 +571,31 @@ namespace Step55
     const std::vector<types::global_dof_index> dofs_per_block =
       DoFTools::count_dofs_per_fe_block(dof_handler);
 
-    const unsigned int n_elevation      = dofs_per_block[0];
-    const unsigned int n_waterflow_rate = dofs_per_block[1];
+    const unsigned int n_elevation_dofs      = dofs_per_block[0];
+    const unsigned int n_waterflow_rate_dofs = dofs_per_block[1];
 
-    pcout << "   Number of degrees of freedom: " << dof_handler.n_dofs() << " ("
-          << n_elevation << '+' << n_waterflow_rate << ')' << std::endl;
-
+    // We then create index sets that for the current process track which DoFs
+    // are locally owned, and among these which correspond to the two variables.
+    // Once done with the locally owned DoFs, we do the same for the locally
+    // relevant DoFs. (The concepts of locally owned and locally relevant
+    // DoFs are discussed in the step-40 and
+    // @ref GlossLocallyOwnedDof "this" as well as
+    // @ref GlossLocallyRelevantDof "this" glossary entry.)
     const IndexSet &locally_owned_dofs = dof_handler.locally_owned_dofs();
-    owned_partitioning                 = {
-      locally_owned_dofs.get_view(0, n_elevation),
-      locally_owned_dofs.get_view(n_elevation, n_elevation + n_waterflow_rate)};
+    owned_partitioning = {locally_owned_dofs.get_view(0, n_elevation_dofs),
+                          locally_owned_dofs.get_view(n_elevation_dofs,
+                                                      n_elevation_dofs +
+                                                        n_waterflow_rate_dofs)};
 
     const IndexSet locally_relevant_dofs =
       DoFTools::extract_locally_relevant_dofs(dof_handler);
-    relevant_partitioning = {locally_relevant_dofs.get_view(0, n_elevation),
-                             locally_relevant_dofs.get_view(
-                               n_elevation, n_elevation + n_waterflow_rate)};
+    relevant_partitioning = {
+      locally_relevant_dofs.get_view(0, n_elevation_dofs),
+      locally_relevant_dofs.get_view(n_elevation_dofs,
+                                     n_elevation_dofs + n_waterflow_rate_dofs)};
 
+    // Finally, with these objects in place, we can set up the system matrix
+    // and the various vectors:
     {
       system_matrix.clear();
 
@@ -592,43 +619,83 @@ namespace Step55
                                          mpi_communicator);
     system_rhs.reinit(owned_partitioning, mpi_communicator);
 
-    pcout << "done. " << std::endl;
+    pcout << "   Number of degrees of freedom: " << dof_handler.n_dofs()
+          << " (elevation: " << n_elevation_dofs
+          << ", waterflow: " << n_waterflow_rate_dofs << ')' << std::endl;
   }
 
 
+  // @sect3{StreamPowerErosionProblem::interpolate_initial_elevation()}
+  // The following function then interpolates the initial elevation onto the
+  // mesh. We need this as initial conditions for the elevation variable --
+  // erosion then starts to eat into this elevation field.
+  //
+  // The way this function works is that given a scalar function object (derived
+  // from the Function class), we first create a function object that covers
+  // all solution variables, returns the elevation in one vector component
+  // (specifically, in vector component zero) and zeros in all others. This
+  // "extension" of a scalar to a vector function is done by the
+  // VectorFunctionFromScalarFunctionObject class. We can then use this
+  // extended function object to interpolate these initial conditions onto
+  // all degrees of freedom, which correctly sets the initial elevation
+  // variables to their initial values and sets the water flow rate to
+  // zero. It is then the DAE solver's job (or, one of the other function's
+  // job, as discussed in the introduction) to compute the initial values
+  // of the water flow rate from the initial elevation field.
   void StreamPowerErosionProblem::interpolate_initial_elevation()
   {
     TimerOutput::Scope t(computing_timer,
-                         "initial conditions: interpolate elevation");
-    pcout << "Interpolate elevation... " << std::flush;
+                         "Initial conditions: interpolate elevation");
+    pcout << "  Interpolate elevation... " << std::endl;
 
-    // Use a vector initial condition for which the zero'th component is
-    // the elevation and all other components (out of a total of 2) are
-    // zero.
     const ColoradoTopography colorado_topography(mpi_communicator);
     const VectorFunctionFromScalarFunctionObject<spacedim> initial_values(
       [&](const Point<spacedim> &p) { return colorado_topography.value(p); },
       /* elevation vector component = */ 0,
       /* total number of vector components = */ 2);
 
-    // Interpolate into a fully distributed vector
     VectorType interpolated_initial_condition(owned_partitioning,
                                               MPI_COMM_WORLD);
     VectorTools::interpolate(dof_handler,
                              initial_values,
                              interpolated_initial_condition);
 
-    // Copy into a ghosted vector
+    // The vector we have just interpolated into is a "fully distributed
+    // vector", i.e., every element is uniquely owned by one of the MPI
+    // processes and these are the only ones we store on the current process.
+    // On the other hand, we will also have to access values for nodes that
+    // are owned by other processes (for example on ghost cells), so we copy
+    // the vector into one that also has these ghost entries:
     locally_relevant_solution = interpolated_initial_condition;
-
-    pcout << "done. " << std::endl;
   }
 
 
-
-  void StreamPowerErosionProblem::compute_initial_constraints()
+  // @sect3{StreamPowerErosionProblem::compute_initial_waterflow_constraints()}
+  // In order to compute the initial conditions for the water flow rate,
+  // we have to solve the equations that transport water from uphill to
+  // downstream. These are conceptually one-dimensional ODEs where we
+  // accumulate water along one-dimensional flow lines, and they need
+  // (zero) initial conditions at the upstream end. These upstream
+  // points can come in two ways: First, they may be local high points in
+  // the elevation -- points at the top of a hill or mountain receive no
+  // water from uphill, just from the sky. Our first job is therefore to
+  // find out which node points in the mesh correspond to local high
+  // points. To find this out, we loop over all cells owned by the current
+  // process as well as the surrounding layer of ghost cells, and query
+  // whether the nodal value corresponding to the elevation at that point
+  // is lower than any of the nodal values at the remaining nodes on this
+  // cell. If so, this node is not a local high point, and we record
+  // this by setting a flag for this node to `false`. Once we are through
+  // all ghost and locally owned cells, only those among the locally owned
+  // nodes that have never had that flag set to `false` are known to be
+  // high points.
+  void StreamPowerErosionProblem::compute_initial_waterflow_constraints()
   {
-    pcout << "Compute initial constraints... " << std::flush;
+    TimerOutput::Scope t(computing_timer,
+                         "Initial conditions: initial constraints");
+
+    pcout << "  Compute constraints for the initial water flow rate... "
+          << std::endl;
 
     const IndexSet &locally_owned_dofs = dof_handler.locally_owned_dofs();
     const IndexSet  locally_relevant_dofs =
@@ -640,6 +707,10 @@ namespace Step55
 
     std::vector<bool> locally_relevant_elevation_dofs_that_are_maxima(
       locally_relevant_dofs.n_elements(), true);
+
+    // TODO: Do this via cell->get_dof_values(), rather than fiddling
+    // with component indices. Also start with an IndexSet that contains
+    // all of the locally owned waterflow dofs
     std::vector<types::global_dof_index> local_dof_indices(fe.dofs_per_cell);
     for (const auto &cell : dof_handler.active_cell_iterators())
       if (cell->is_locally_owned() || cell->is_ghost())
@@ -682,7 +753,21 @@ namespace Step55
                   }
               }
         }
+    pcout << "    Found "
+          << std::count(locally_relevant_elevation_dofs_that_are_maxima.begin(),
+                        locally_relevant_elevation_dofs_that_are_maxima.end(),
+                        true)
+          << " local high points." << std::endl;
 
+    // The second possibility for how a node is at the upstream end of a flow
+    // line is if it is at the boundary and it goes downhill in the direction
+    // away from the boundary into the domain. In these cases, the flow line
+    // will start at that point, and that is even the case if along the boundary
+    // there are other neighboring points that are located higher in elevation:
+    // They are all start points for flow lines. So we have to find out which
+    // boundary nodes are located at points in which the elevation slopes into
+    // the domain. To do this, we evaluate the gradient of the elevation field
+    // at the node points of the finite element field along boundary faces:
     IndexSet locally_relevant_water_dofs_at_inflow_boundaries(
       dof_handler.n_dofs());
     {
@@ -713,7 +798,12 @@ namespace Step55
                         local_dof_indices[i];
 
                       // If we haven't already determined that this water dof is
-                      // at an inflow boundary, then check so:
+                      // at an inflow boundary, then check so. Note that we
+                      // are at an inflow boundary node if the gradient of the
+                      // elevation field (i.e., the direction of
+                      // steepest *ascent* points out of the domain) has
+                      // a positive dot product with the normal vector at the
+                      // boundary:
                       if (locally_relevant_water_dofs_at_inflow_boundaries
                             .is_element(water_dof_index) == false)
                         {
@@ -728,6 +818,10 @@ namespace Step55
                     }
               }
     }
+
+    pcout << "    Found "
+          << locally_relevant_water_dofs_at_inflow_boundaries.n_elements()
+          << " boundary inflow points." << std::endl;
 
     // Convert the maps above into an AffineConstraints object.
     VectorType distributed_solution(owned_partitioning, mpi_communicator);
@@ -768,8 +862,6 @@ namespace Step55
 
     // For debugging
     locally_relevant_solution.block(1) = distributed_solution.block(1);
-
-    pcout << "done. " << std::endl;
   }
 
 
@@ -1510,6 +1602,7 @@ namespace Step55
   {
     (void)time; // TODO: Incorporate this into the PVTU data?
     TimerOutput::Scope t(computing_timer, "output");
+    pcout << "Writing output... " << std::flush;
 
     const std::vector<std::string> solution_names     = {"elevation",
                                                          "water_flow_rate"};
@@ -1553,8 +1646,11 @@ namespace Step55
   {
     make_grid();
     setup_system();
+
+    pcout << std::endl << "Setting up initial conditions:" << std::endl;
+
     interpolate_initial_elevation();
-    compute_initial_constraints();
+    compute_initial_waterflow_constraints();
 
     // Get rid of these three lines eventually (?):
     constexpr bool compute_water_initial_values = true;
@@ -1562,6 +1658,9 @@ namespace Step55
                    locally_relevant_solution,
                    locally_relevant_solution_dot,
                    /*cycle*/ 0);
+    computing_timer.print_summary();
+    return;
+
     if (compute_water_initial_values)
       {
         assemble_initial_waterflow_system();
