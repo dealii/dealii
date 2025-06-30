@@ -777,13 +777,6 @@ protected:
    * @return A pointer to a newly created object of type InternalDataBase (or
    * a derived class). Ownership of this object passes to the calling
    * function.
-   *
-   * @note C++ allows that virtual functions in derived classes may return
-   * pointers to objects not of type InternalDataBase but in fact pointers to
-   * objects of classes <i>derived</i> from InternalDataBase. (This feature is
-   * called "covariant return types".) This is useful in some contexts where
-   * the calling is within the derived class and will immediately make use of
-   * the returned object, knowing its real (derived) type.
    */
   virtual std::unique_ptr<InternalDataBase>
   get_data(const UpdateFlags      update_flags,
@@ -808,13 +801,6 @@ protected:
    * @return A pointer to a newly created object of type InternalDataBase (or
    * a derived class). Ownership of this object passes to the calling
    * function.
-   *
-   * @note C++ allows that virtual functions in derived classes may return
-   * pointers to objects not of type InternalDataBase but in fact pointers to
-   * objects of classes <i>derived</i> from InternalDataBase. (This feature is
-   * called "covariant return types".) This is useful in some contexts where
-   * the calling is within the derived class and will immediately make use of
-   * the returned object, knowing its real (derived) type.
    */
   virtual std::unique_ptr<InternalDataBase>
   get_face_data(const UpdateFlags               update_flags,
@@ -847,13 +833,6 @@ protected:
    * @return A pointer to a newly created object of type InternalDataBase (or
    * a derived class). Ownership of this object passes to the calling
    * function.
-   *
-   * @note C++ allows that virtual functions in derived classes may return
-   * pointers to objects not of type InternalDataBase but in fact pointers to
-   * objects of classes <i>derived</i> from InternalDataBase. (This feature is
-   * called "covariant return types".) This is useful in some contexts where
-   * the calling is within the derived class and will immediately make use of
-   * the returned object, knowing its real (derived) type.
    */
   virtual std::unique_ptr<InternalDataBase>
   get_subface_data(const UpdateFlags          update_flags,
