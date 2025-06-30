@@ -30,7 +30,7 @@ dim_2(std::ostream &os)
   const unsigned int d = 2;
   Triangulation<d>   tr;
 
-  GridGenerator::custom_channel_with_cylinder(
+  GridGenerator::uniform_channel_with_cylinder(
     tr, {3, 5, 4, 4}, 1, 2, 0.75, 4, 2, true, true);
 
   GridOut gout;
@@ -42,7 +42,7 @@ dim_3(std::ostream &os)
 {
   const unsigned int d = 3;
   Triangulation<d>   tr;
-  GridGenerator::custom_channel_with_cylinder(
+  GridGenerator::uniform_channel_with_cylinder(
     tr, {3, 5, 4, 4}, 1, 2, 0.75, 4, 2, true, true);
   GridOut gout;
   gout.write_vtk(tr, os);

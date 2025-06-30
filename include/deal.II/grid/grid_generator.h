@@ -633,7 +633,7 @@ namespace GridGenerator
    */
   template <int dim>
   void
-  custom_channel_with_cylinder(
+  uniform_channel_with_cylinder(
     Triangulation<dim>             &tria,
     const std::vector<unsigned int> lengths_and_heights,
     const double                    depth                  = 1,

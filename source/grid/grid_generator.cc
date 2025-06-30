@@ -3831,22 +3831,22 @@ namespace GridGenerator
 
   template <>
   void
-  custom_channel_with_cylinder(Triangulation<1> &,
-                               const std::vector<unsigned int>,
-                               const double,
-                               unsigned int,
-                               const double,
-                               const unsigned,
-                               const double,
-                               const bool,
-                               const bool)
+  uniform_channel_with_cylinder(Triangulation<1> &,
+                                const std::vector<unsigned int>,
+                                const double,
+                                unsigned int,
+                                const double,
+                                const unsigned,
+                                const double,
+                                const bool,
+                                const bool)
   {
     DEAL_II_NOT_IMPLEMENTED();
   }
 
   template <>
   void
-  custom_channel_with_cylinder(
+  uniform_channel_with_cylinder(
     Triangulation<2>               &tria,
     const std::vector<unsigned int> lengths_and_heights,
     const double,
@@ -4023,7 +4023,7 @@ namespace GridGenerator
 
   template <>
   void
-  custom_channel_with_cylinder(
+  uniform_channel_with_cylinder(
     Triangulation<3>               &tria,
     const std::vector<unsigned int> lengths_and_heights,
     const double                    depth,
@@ -4035,15 +4035,15 @@ namespace GridGenerator
     const bool                      colorize)
   {
     Triangulation<2> tria_2;
-    custom_channel_with_cylinder(tria_2,
-                                 lengths_and_heights,
-                                 depth,
-                                 depth_division,
-                                 shell_region_radius,
-                                 n_shells,
-                                 skewness,
-                                 use_transfinite_region,
-                                 colorize);
+    uniform_channel_with_cylinder(tria_2,
+                                  lengths_and_heights,
+                                  depth,
+                                  depth_division,
+                                  shell_region_radius,
+                                  n_shells,
+                                  skewness,
+                                  use_transfinite_region,
+                                  colorize);
 
     // extrude to 3d
     extrude_triangulation(tria_2, depth_division, depth, tria, true);

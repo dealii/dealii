@@ -129,7 +129,7 @@ namespace GridGenerator
                          unsigned int,
                          double,
                          bool,
-                         bool>(custom_channel_with_cylinder, arguments, tria);
+                         bool>(uniform_channel_with_cylinder, arguments, tria);
       else if (name == "enclosed_hyper_cube")
         parse_and_create<dim, dim, double, double, double, bool>(
           enclosed_hyper_cube, arguments, tria);
