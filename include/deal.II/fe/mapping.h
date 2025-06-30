@@ -429,7 +429,7 @@ public:
   /**
    * Return whether the mapping preserves vertex locations. In other words,
    * this function returns whether the mapped location of the reference cell
-   * vertices (given by GeometryInfo::unit_cell_vertex()) equals the result of
+   * vertices (given by ReferenceCell::vertex()) equals the result of
    * <code>cell-@>vertex()</code> (i.e., information stored by the
    * triangulation).
    *
@@ -485,7 +485,7 @@ public:
    * throws an exception of type Mapping::ExcTransformationFailed . Whether
    * the given point @p p lies outside the cell can therefore be determined by
    * checking whether the returned reference coordinates lie inside or outside
-   * the reference cell (e.g., using GeometryInfo::is_inside_unit_cell()) or
+   * the reference cell (e.g., using ReferenceCell::contains_point()) or
    * whether the exception mentioned above has been thrown.
    *
    * @param cell Iterator to the cell that will be used to define the mapping.
