@@ -65,15 +65,10 @@ test(const ReferenceCell &reference_cell)
       deallog << "  self-reported face measure = "
               << reference_cell.face_measure(face_no) << std::endl;
 
-      // TriaAccessor<0, 1, 1>::measure() does not yet exist
-      if constexpr (dim > 1)
-        {
-          Assert(std::fabs(
-                   measure -
-                   triangulation.begin_active()->face(face_no)->measure()) <
-                   1e-12,
-                 ExcInternalError());
-        }
+      Assert(std::fabs(measure -
+                       triangulation.begin_active()->face(face_no)->measure()) <
+               1e-12,
+             ExcInternalError());
       Assert(std::fabs(measure - reference_cell.face_measure(face_no)) < 1e-12,
              ExcInternalError());
     }
