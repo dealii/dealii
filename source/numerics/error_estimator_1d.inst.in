@@ -82,6 +82,24 @@ for (S : REAL_AND_COMPLEX_SCALARS; deal_II_dimension : DIMENSIONS;
 
     template void
     KellyErrorEstimator<deal_II_dimension, deal_II_space_dimension>::estimate<
+      S>(
+      const hp::MappingCollection<deal_II_dimension, deal_II_space_dimension> &,
+      const DoFHandler<deal_II_dimension, deal_II_space_dimension> &,
+      const hp::QCollection<deal_II_dimension - 1> &,
+      const std::map<types::boundary_id,
+                     const Function<deal_II_space_dimension, S> *> &,
+      const ReadVector<S> &,
+      Vector<float> &,
+      const ComponentMask &,
+      const Function<deal_II_space_dimension> *,
+      const unsigned int,
+      const types::subdomain_id,
+      const types::material_id,
+      const Strategy);
+
+    // DEPRECATED
+    template void
+    KellyErrorEstimator<deal_II_dimension, deal_II_space_dimension>::estimate<
       S>(const Mapping<deal_II_dimension, deal_II_space_dimension> &,
          const DoFHandler<deal_II_dimension, deal_II_space_dimension> &,
          const hp::QCollection<deal_II_dimension - 1> &,
@@ -111,6 +129,24 @@ for (S : REAL_AND_COMPLEX_SCALARS; deal_II_dimension : DIMENSIONS;
          const types::material_id,
          const Strategy);
 
+    template void
+    KellyErrorEstimator<deal_II_dimension, deal_II_space_dimension>::estimate<
+      S>(
+      const hp::MappingCollection<deal_II_dimension, deal_II_space_dimension> &,
+      const DoFHandler<deal_II_dimension, deal_II_space_dimension> &,
+      const hp::QCollection<deal_II_dimension - 1> &,
+      const std::map<types::boundary_id,
+                     const Function<deal_II_space_dimension, S> *> &,
+      const ArrayView<const ReadVector<S> *> &,
+      ArrayView<Vector<float> *> &,
+      const ComponentMask &,
+      const Function<deal_II_space_dimension> *,
+      const unsigned int,
+      const types::subdomain_id,
+      const types::material_id,
+      const Strategy);
+
+    // DEPRECATED
     template void
     KellyErrorEstimator<deal_II_dimension, deal_II_space_dimension>::estimate<
       S>(const Mapping<deal_II_dimension, deal_II_space_dimension> &,
