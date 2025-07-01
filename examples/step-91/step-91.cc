@@ -236,7 +236,8 @@ namespace Step91
 // BENCHMARK 3  // the Colorado elevation map, but on a 2d domain
 // BENCHMARK 4  // the Colorado elevation map on a curved domain
 #if BENCHMARK == 0 || BENCHMARK == 1
-      return ModelParameters::solution_a * p[0] + ModelParameters::solution_b;
+      return ModelParameters::solution_a * p[0] + ModelParameters::solution_b +
+             0 * ModelParameters::solution_a * p[1];
 #elif BENCHMARK == 2
       return ModelParameters::solution_a * p.norm() +
              ModelParameters::solution_b;
@@ -695,6 +696,10 @@ namespace Step91
   // DoF indices we have previously marked as "not a highpoint". This index set
   // then only contains those locally owned nodes that have not been removed,
   // and so are known to be high points.
+  //
+  // For efficiency reasons, we store the "not a high point" indices in an
+  // object of type `std::set`, which we later convert to an IndexSet for
+  // the subtraction operation at the end of the block.)
   void StreamPowerErosionProblem::compute_initial_waterflow_constraints()
   {
     TimerOutput::Scope t(computing_timer,
@@ -747,8 +752,12 @@ namespace Step91
     IndexSet locally_owned_waterflow_dofs_at_maxima =
       (dof_handler.locally_owned_dofs() &
        DoFTools::extract_dofs(dof_handler, fe.component_mask(water_flow_rate)));
+    IndexSet not_a_waterflow_dof_at_highpoint_is(dof_handler.n_dofs());
+    not_a_waterflow_dof_at_highpoint_is.add_indices(
+      not_a_waterflow_dof_at_highpoint.begin(),
+      not_a_waterflow_dof_at_highpoint.end());
     locally_owned_waterflow_dofs_at_maxima.subtract_set(
-      IndexSet(not_a_waterflow_dof_at_highpoint.begin(), not_a_waterflow_dof_at_highpoint.end());
+      not_a_waterflow_dof_at_highpoint_is);
 
     pcout << "    Found " << locally_owned_waterflow_dofs_at_maxima.n_elements()
           << " local high points." << std::endl;
@@ -818,43 +827,18 @@ namespace Step91
           << " boundary inflow points." << std::endl;
 
     // Convert the maps above into an AffineConstraints object.
-    VectorType distributed_solution(owned_partitioning, mpi_communicator);
     for (const auto index : locally_owned_waterflow_dofs_at_maxima)
-      {
       if (constraints.is_constrained(index) == false)
-        {
-          constraints.add_constraint(index, {}, 0.);
-          // For debugging: Set the value of the solution vector
-          // to a value that can be visualized if
-          // we don't overwrite this vector during solving linear systems.
-          distributed_solution(index) = 2;
-        }
-      else
-        distributed_solution(index) = 3;
-      }
+        constraints.add_constraint(index, {}, 0.);
     for (const auto index : locally_relevant_water_dofs_at_inflow_boundaries)
-      {
       if (constraints.is_constrained(index) == false)
-        {
-          constraints.add_constraint(index, {}, 0.);
-          // For debugging: Set the value of the solution vector
-          // to a value that can be visualized if
-          // we don't overwrite this vector during solving linear systems.
-          distributed_solution(index) = 2;
-        }
-      else
-        distributed_solution(index) = 3;
-      }
+        constraints.add_constraint(index, {}, 0.);
     constraints.close();
+
     constraints.make_consistent_in_parallel(
       dof_handler.locally_owned_dofs(),
       DoFTools::extract_locally_relevant_dofs(dof_handler),
       mpi_communicator);
-
-    distributed_solution.compress(VectorOperation::insert);
-
-    // For debugging
-    locally_relevant_solution.block(1) = distributed_solution.block(1);
   }
 
 
@@ -862,8 +846,8 @@ namespace Step91
   void StreamPowerErosionProblem::assemble_initial_waterflow_system()
   {
     TimerOutput::Scope t(computing_timer,
-                         "initial conditions: assemble waterflow system");
-    pcout << "Assemble initial waterflow system... " << std::flush;
+                         "Initial conditions: assemble waterflow system");
+    pcout << "  Assembling initial waterflow system... " << std::endl;
 
     system_matrix = 0;
     system_rhs    = 0;
@@ -983,16 +967,14 @@ namespace Step91
 
     system_matrix.compress(VectorOperation::add);
     system_rhs.compress(VectorOperation::add);
-
-    pcout << "done. " << std::endl;
   }
 
 
   void StreamPowerErosionProblem::solve_initial_waterflow_system()
   {
     TimerOutput::Scope t(computing_timer,
-                         "initial conditions: solve waterflow system");
-    pcout << "Solve initial waterflow system... " << std::endl;
+                         "Initial conditions: solve waterflow system");
+    pcout << "  Solving initial waterflow system... " << std::endl;
 
     pcout << "    Initial residual=" << system_rhs.block(1).l2_norm()
           << std::endl;
@@ -1018,8 +1000,6 @@ namespace Step91
     constraints.distribute(distributed_solution);
 
     locally_relevant_solution.block(1) = distributed_solution.block(1);
-
-    pcout << "    Solve done." << std::endl;
   }
 
 
@@ -1645,15 +1625,7 @@ namespace Step91
     interpolate_initial_elevation();
     compute_initial_waterflow_constraints();
 
-    // Get rid of these three lines eventually (?):
     constexpr bool compute_water_initial_values = true;
-    output_results(/* time= */ 0,
-                   locally_relevant_solution,
-                   locally_relevant_solution_dot,
-                   /*cycle*/ 0);
-    computing_timer.print_summary();
-    return;
-
     if (compute_water_initial_values)
       {
         assemble_initial_waterflow_system();
@@ -1662,8 +1634,10 @@ namespace Step91
         output_results(/* time= */ 0,
                        locally_relevant_solution,
                        locally_relevant_solution_dot,
-                       /*cycle*/ 1);
+                       /*cycle*/ 0);
       }
+    computing_timer.print_summary();
+    return;
 
     const SUNDIALS::IDA<VectorType>::AdditionalData time_integrator_parameters(
       /* initial_time     */ 0.0, // Initial time is today
