@@ -378,9 +378,10 @@ if(DEAL_II_BUILD_CXX20_MODULE)
 
     if(${CMAKE_VERSION} VERSION_GREATER_EQUAL "3.30")
       #
-      # Create alias targets "dealii::dealii_release" and "dealii::dealii_debug"
-      # to have the exported target names available when populating the link
-      # interface for our "dealii::dealii" convenience target:
+      # Create alias targets "dealii::dealii_module_release" and
+      # "dealii::dealii_module_debug" to have the exported target
+      # names available when populating the link interface of
+      # downstream targets:
       #
       add_library(${DEAL_II_TARGET_NAME}::${DEAL_II_TARGET_NAME}_module_${build_lowercase}
         ALIAS ${DEAL_II_TARGET_NAME}_module_${build_lowercase}
