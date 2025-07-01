@@ -12,8 +12,8 @@
  *
  * ------------------------------------------------------------------------
  *
- * Author: Wolfgang Bangerth, Colorado State University, 2024
- *         Jean-Paul Pelteret, 2024.
+ * Author: Wolfgang Bangerth, Colorado State University, 2025
+ *         Jean-Paul Pelteret, 2025.
  */
 
 #include <deal.II/base/quadrature_lib.h>
@@ -78,7 +78,7 @@
 // #define BENCHMARK 4  // the Colorado elevation map on a curved domain
 
 
-namespace Step55
+namespace Step91
 {
   using namespace dealii;
 
@@ -493,7 +493,7 @@ namespace Step55
   void StreamPowerErosionProblem::make_grid()
   {
     TimerOutput::Scope t(computing_timer, "Make grid");
-    pcout << "Make grid... " << std::endl;
+    pcout << "Making grid... " << std::endl;
 
 // Recall:
 // BENCHMARK 0 // the 1d benchmark with the linear ramp, using m=0, n=1
@@ -563,7 +563,7 @@ namespace Step55
   void StreamPowerErosionProblem::setup_system()
   {
     TimerOutput::Scope t(computing_timer, "Setup system");
-    pcout << "Setup system... " << std::endl;
+    pcout << "Setting up system... " << std::endl;
 
     dof_handler.distribute_dofs(fe);
     DoFRenumbering::component_wise(dof_handler);
@@ -646,7 +646,7 @@ namespace Step55
   {
     TimerOutput::Scope t(computing_timer,
                          "Initial conditions: interpolate elevation");
-    pcout << "  Interpolate elevation... " << std::endl;
+    pcout << "  Interpolating elevation... " << std::endl;
 
     const ColoradoTopography colorado_topography(mpi_communicator);
     const VectorFunctionFromScalarFunctionObject<spacedim> initial_values(
@@ -680,83 +680,77 @@ namespace Step55
   // the elevation -- points at the top of a hill or mountain receive no
   // water from uphill, just from the sky. Our first job is therefore to
   // find out which node points in the mesh correspond to local high
-  // points. To find this out, we loop over all cells owned by the current
+  // points. To do so, we loop over all cells owned by the current
   // process as well as the surrounding layer of ghost cells, and query
   // whether the nodal value corresponding to the elevation at that point
   // is lower than any of the nodal values at the remaining nodes on this
   // cell. If so, this node is not a local high point, and we record
-  // this by setting a flag for this node to `false`. Once we are through
-  // all ghost and locally owned cells, only those among the locally owned
-  // nodes that have never had that flag set to `false` are known to be
-  // high points.
+  // this by adding this node to an index set that records which waterflow
+  // DoFs are *not* high points on at least one cell. At the end of the
+  // following code block, we then create an index set that contains all
+  // indices of locally owned waterflow degrees of freedom (the
+  // intersection -- using `operator&` -- between the
+  // locally owned degrees of freedom and an index set that corresponds to
+  // all waterflow degrees of freedom), and we subtract from that set those
+  // DoF indices we have previously marked as "not a highpoint". This index set
+  // then only contains those locally owned nodes that have not been removed,
+  // and so are known to be high points.
   void StreamPowerErosionProblem::compute_initial_waterflow_constraints()
   {
     TimerOutput::Scope t(computing_timer,
                          "Initial conditions: initial constraints");
 
-    pcout << "  Compute constraints for the initial water flow rate... "
+    pcout << "  Computing constraints for the initial water flow rate... "
           << std::endl;
-
-    const IndexSet &locally_owned_dofs = dof_handler.locally_owned_dofs();
-    const IndexSet  locally_relevant_dofs =
-      DoFTools::extract_locally_relevant_dofs(dof_handler);
-    constraints.reinit(locally_owned_dofs, locally_relevant_dofs);
 
     Assert(Utilities::MPI::n_mpi_processes(mpi_communicator) == 1,
            ExcNotImplemented());
 
-    std::vector<bool> locally_relevant_elevation_dofs_that_are_maxima(
-      locally_relevant_dofs.n_elements(), true);
+    const FEValuesExtractors::Scalar elevation(0);
+    const FEValuesExtractors::Scalar water_flow_rate(1);
 
-    // TODO: Do this via cell->get_dof_values(), rather than fiddling
-    // with component indices. Also start with an IndexSet that contains
-    // all of the locally owned waterflow dofs
+    std::set<types::global_dof_index> not_a_waterflow_dof_at_highpoint;
+
     std::vector<types::global_dof_index> local_dof_indices(fe.dofs_per_cell);
+    Vector<double> local_solution_values(fe.dofs_per_cell);
     for (const auto &cell : dof_handler.active_cell_iterators())
       if (cell->is_locally_owned() || cell->is_ghost())
         {
           cell->get_dof_indices(local_dof_indices);
+          cell->get_dof_values(locally_relevant_solution,
+                               local_solution_values);
 
+          /* Find the largest elevation on this cell: */
+          double highpoint_on_cell = std::numeric_limits<double>::lowest();
           for (unsigned int i = 0; i < fe.dofs_per_cell; ++i)
-            if (fe.system_to_component_index(i).first == 0) // is elevation
+            if (fe.shape_function_belongs_to(i, elevation))
+              highpoint_on_cell =
+                std::max(highpoint_on_cell, local_solution_values[i]);
+
+          /* Loop over waterflow DoFs and check whether the corresponding */
+          /* elevation DoF is a highpoint or not: */
+          for (unsigned int i = 0; i < fe.dofs_per_cell; ++i)
+            if (fe.shape_function_belongs_to(i, water_flow_rate))
               {
-                const types::global_dof_index elevation_dof_index =
-                  local_dof_indices[i];
+                const unsigned int corresponding_elevation_dof_index =
+                  fe.component_to_system_index(
+                    /* elevation= */ 0, fe.system_to_component_index(i).second);
 
-                // Test this DoF if we haven't already determined that it is
-                // not a high point
-                if (locally_relevant_elevation_dofs_that_are_maxima
-                      [locally_relevant_dofs.nth_index_in_set(
-                        elevation_dof_index)] == true)
-                  {
-                    const double elevation =
-                      locally_relevant_solution(elevation_dof_index);
+                const double corresponding_elevation =
+                  local_solution_values(corresponding_elevation_dof_index);
 
-                    for (unsigned int j = 0; j < fe.dofs_per_cell; ++j)
-                      if (j != i)
-                        if (fe.system_to_component_index(j).first ==
-                            0) // is also elevation
-                          {
-                            const types::global_dof_index
-                              other_elevation_dof_index = local_dof_indices[j];
-                            const double other_elevation =
-                              locally_relevant_solution(
-                                other_elevation_dof_index);
-                            if (other_elevation > elevation)
-                              {
-                                locally_relevant_elevation_dofs_that_are_maxima
-                                  [locally_relevant_dofs.nth_index_in_set(
-                                    elevation_dof_index)] = false;
-                                break;
-                              }
-                          }
-                  }
+                if (corresponding_elevation < highpoint_on_cell)
+                  not_a_waterflow_dof_at_highpoint.insert(local_dof_indices[i]);
               }
         }
-    pcout << "    Found "
-          << std::count(locally_relevant_elevation_dofs_that_are_maxima.begin(),
-                        locally_relevant_elevation_dofs_that_are_maxima.end(),
-                        true)
+
+    IndexSet locally_owned_waterflow_dofs_at_maxima =
+      (dof_handler.locally_owned_dofs() &
+       DoFTools::extract_dofs(dof_handler, fe.component_mask(water_flow_rate)));
+    locally_owned_waterflow_dofs_at_maxima.subtract_set(
+      IndexSet(not_a_waterflow_dof_at_highpoint.begin(), not_a_waterflow_dof_at_highpoint.end());
+
+    pcout << "    Found " << locally_owned_waterflow_dofs_at_maxima.n_elements()
           << " local high points." << std::endl;
 
     // The second possibility for how a node is at the upstream end of a flow
@@ -825,36 +819,35 @@ namespace Step55
 
     // Convert the maps above into an AffineConstraints object.
     VectorType distributed_solution(owned_partitioning, mpi_communicator);
-    for (unsigned int i = 0; i < dof_handler.n_dofs() / 2;
-         ++i) // could be done better
-      if (locally_relevant_elevation_dofs_that_are_maxima
-            [locally_owned_dofs.nth_index_in_set(i)])
+    for (const auto index : locally_owned_waterflow_dofs_at_maxima)
+      {
+      if (constraints.is_constrained(index) == false)
         {
-          constraints.add_constraint(system_rhs.block(0).size() + i,
-                                     {},
-                                     0.); // could probably do better
-          // For debugging: Set the value of the solution vector for the second
-          // component (water) for constrained DoFs to a value that can be
-          // visualized if we don't overwrite this vector during solving linear
-          // systems.
-          distributed_solution(i + system_rhs.block(0).size()) = 1;
+          constraints.add_constraint(index, {}, 0.);
+          // For debugging: Set the value of the solution vector
+          // to a value that can be visualized if
+          // we don't overwrite this vector during solving linear systems.
+          distributed_solution(index) = 2;
         }
+      else
+        distributed_solution(index) = 3;
+      }
     for (const auto index : locally_relevant_water_dofs_at_inflow_boundaries)
       {
-        if (constraints.is_constrained(index) == false)
-          {
-            constraints.add_constraint(index, {}, 0.);
-            // For debugging: Set the value of the solution vector
-            // to a value that can be visualized if
-            // we don't overwrite this vector during solving linear systems.
-            distributed_solution(index) = 2;
-          }
-        else
-          distributed_solution(index) = 3;
+      if (constraints.is_constrained(index) == false)
+        {
+          constraints.add_constraint(index, {}, 0.);
+          // For debugging: Set the value of the solution vector
+          // to a value that can be visualized if
+          // we don't overwrite this vector during solving linear systems.
+          distributed_solution(index) = 2;
+        }
+      else
+        distributed_solution(index) = 3;
       }
     constraints.close();
     constraints.make_consistent_in_parallel(
-      locally_owned_dofs,
+      dof_handler.locally_owned_dofs(),
       DoFTools::extract_locally_relevant_dofs(dof_handler),
       mpi_communicator);
 
@@ -1783,7 +1776,7 @@ namespace Step55
 
     computing_timer.print_summary();
   }
-} // namespace Step55
+} // namespace Step91
 
 
 
@@ -1792,7 +1785,7 @@ int main(int argc, char *argv[])
   try
     {
       using namespace dealii;
-      using namespace Step55;
+      using namespace Step91;
 
       Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
 
