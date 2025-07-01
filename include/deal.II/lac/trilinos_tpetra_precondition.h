@@ -935,7 +935,7 @@ namespace LinearAlgebra
          * @param ilu_fill Amount of additional fill-in.
          * @param ilu_atol Constant to be to each diagonal entry before factorization.
          * @param ilu_rtol Factor to scale all diagonal entries by before factorization.
-         * @param overlapOverlap between processor local matrices.
+         * @param overlap Overlap between processor local matrices.
          */
         AdditionalData(const int    ilu_fill = 0,
                        const double ilu_atol = 0.,
@@ -1020,7 +1020,7 @@ namespace LinearAlgebra
          * @param ilut_fill Amount of additional fill-in.
          * @param ilut_atol Constant to be to each diagonal entry before factorization.
          * @param ilut_rtol Factor to scale all diagonal entries by before factorization.
-         * @param overlapOverlap between processor local matrices.
+         * @param overlap Overlap between processor local matrices.
          */
         AdditionalData(const double ilut_drop = 0.,
                        const double ilut_fill = 0.,

@@ -245,6 +245,7 @@ PREDEFINED             = DOXYGEN=1 \
                          DEAL_II_WITH_TRILINOS=1 \
                          DEAL_II_TRILINOS_WITH_AMESOS2=1 \
                          DEAL_II_TRILINOS_WITH_EPETRAEXT=1 \
+                         DEAL_II_TRILINOS_WITH_IFPACK2=1 \
                          DEAL_II_TRILINOS_WITH_MUELU=1 \
                          DEAL_II_TRILINOS_WITH_NOX=1 \
                          DEAL_II_TRILINOS_WITH_ROL=1 \
