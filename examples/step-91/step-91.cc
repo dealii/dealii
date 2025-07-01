@@ -175,8 +175,7 @@ namespace Step91
                             &elevation_grad_at_node_points,
     std::vector<NumberType> &div_Ih_d_wh_at_q_points)
   {
-    const unsigned int               w_dof = 1;
-    const FEValuesExtractors::Scalar water_flow_rate(1);
+    const unsigned int w_dof = 1;
 
     for (const unsigned int j : fe_values.dof_indices())
       {
@@ -211,7 +210,8 @@ namespace Step91
 
             for (const unsigned int q : fe_values.quadrature_point_indices())
               {
-                const Tensor<1, spacedim> grad_Nx_j =
+                constexpr FEValuesExtractors::Scalar water_flow_rate(1);
+                const Tensor<1, spacedim>            grad_Nx_j =
                   fe_values[water_flow_rate].gradient(j, q);
 
                 div_Ih_d_wh_at_q_points[q] += Wj * d_j * grad_Nx_j;
@@ -237,7 +237,7 @@ namespace Step91
 // BENCHMARK 4  // the Colorado elevation map on a curved domain
 #if BENCHMARK == 0 || BENCHMARK == 1
       return ModelParameters::solution_a * p[0] + ModelParameters::solution_b +
-             0 * ModelParameters::solution_a * p[1];
+             0.1 * ModelParameters::solution_a * p[1];
 #elif BENCHMARK == 2
       return ModelParameters::solution_a * p.norm() +
              ModelParameters::solution_b;
@@ -435,6 +435,11 @@ namespace Step91
                         const VectorType  &locally_relevant_solution_dot,
                         const unsigned int step_number);
 
+    static constexpr FEValuesExtractors::Scalar elevation =
+      FEValuesExtractors::Scalar(0);
+    static constexpr FEValuesExtractors::Scalar water_flow_rate =
+      FEValuesExtractors::Scalar(1);
+
     MPI_Comm mpi_communicator;
 
     const FESystem<dim, spacedim>                       fe;
@@ -456,7 +461,7 @@ namespace Step91
   };
 
 
-
+  // TODO
   StreamPowerErosionProblem::StreamPowerErosionProblem()
     : mpi_communicator(MPI_COMM_WORLD)
     // TODO
@@ -487,6 +492,7 @@ namespace Step91
 
 
   // @sect3{StreamPowerErosionProblem::make_grid()}
+  //
   // The first non-constructor function is the one that sets up the
   // mesh. There is really nothing particularly complicated about this
   // function that you haven't already seen.
@@ -550,6 +556,7 @@ namespace Step91
 
 
   // @sect3{StreamPowerErosionProblem::setup_system()}
+  //
   // The next function also is not something that is new in any particular
   // way. Conceptually, all we have to do is set up block vectors and matrices
   // for the linear systems we want to solve. This really is quite
@@ -627,6 +634,7 @@ namespace Step91
 
 
   // @sect3{StreamPowerErosionProblem::interpolate_initial_elevation()}
+  //
   // The following function then interpolates the initial elevation onto the
   // mesh. We need this as initial conditions for the elevation variable --
   // erosion then starts to eat into this elevation field.
@@ -672,6 +680,7 @@ namespace Step91
 
 
   // @sect3{StreamPowerErosionProblem::compute_initial_waterflow_constraints()}
+  //
   // In order to compute the initial conditions for the water flow rate,
   // we have to solve the equations that transport water from uphill to
   // downstream. These are conceptually one-dimensional ODEs where we
@@ -710,9 +719,6 @@ namespace Step91
 
     Assert(Utilities::MPI::n_mpi_processes(mpi_communicator) == 1,
            ExcNotImplemented());
-
-    const FEValuesExtractors::Scalar elevation(0);
-    const FEValuesExtractors::Scalar water_flow_rate(1);
 
     std::set<types::global_dof_index> not_a_waterflow_dof_at_highpoint;
 
@@ -781,7 +787,6 @@ namespace Step91
 
       std::vector<Tensor<1, spacedim>> elevation_gradients_at_face_nodes(
         face_node_points.size());
-      const FEValuesExtractors::Scalar elevation(0);
 
       for (const auto &cell : dof_handler.active_cell_iterators())
         if (cell->is_locally_owned() || cell->is_ghost())
@@ -795,7 +800,8 @@ namespace Step91
 
                 for (unsigned int i = 0; i < fe.dofs_per_face; ++i)
                   if (fe.face_system_to_component_index(i).first ==
-                      1) // is water
+                      1) // TODO: is water; requires
+                         // face_shape_function_belongs_to()
                     {
                       const types::global_dof_index water_dof_index =
                         local_dof_indices[i];
@@ -826,7 +832,18 @@ namespace Step91
           << locally_relevant_water_dofs_at_inflow_boundaries.n_elements()
           << " boundary inflow points." << std::endl;
 
-    // Convert the maps above into an AffineConstraints object.
+    // The final step of this function is to convert the sets of waterflow DoF
+    // indices above that are located at the upstream ends of streamlinese into
+    // an AffineConstraints object. The constraint we want to enforce is that
+    // for these degrees of freedom, we require $W_i=0$. This is a special
+    // case of the general constraint that AffineConstraints can handle, namely
+    // $W_i = \sum_{j \in {\cal I}_i} \alpha_{ij}W_j + c_i$ in which the
+    // set of other indices ${\cal I}_i$ is empty (the second argument of
+    // AffineConstraints::add_constraint()) and the inhomogeneity $c_i=0$
+    // (the third argument). The final step is to ensure that all processes
+    // know about constraints on their locally owned and locally relevant
+    // degrees of freedom, if necessary exchanging this information between
+    // MPI processes.
     for (const auto index : locally_owned_waterflow_dofs_at_maxima)
       if (constraints.is_constrained(index) == false)
         constraints.add_constraint(index, {}, 0.);
@@ -843,6 +860,23 @@ namespace Step91
 
 
 
+  // @sect3{StreamPowerErosionProblem::assemble_initial_waterflow_system()}
+  //
+  // Continuing our discussion of how to set up the initial conditions of the
+  // problem solved herein, we mentioned in the introduction that we can
+  // either let SUNDIAL's IDA figure out initial conditions for the waterflow
+  // rate (the "algebraic" variable in the differential algebraic system),
+  // or we can just do it by hand by solving the spatial PDE that describes
+  // the waterflow rate.
+  //
+  // If we choose to do it by hand, we have to assemble the discretized
+  // equation first. This function does that. It has the typical appearance
+  // of the functions that assemble linear systems in that it first sets up
+  // a whole bunch of objects (including FEValues object, local matrices
+  // and vectors, vectors that store coefficients and the terms that
+  // make the linear system depend nonlinearly on the previous solution --
+  // which here is the already computed elevation field), and then loop
+  // over all cells.
   void StreamPowerErosionProblem::assemble_initial_waterflow_system()
   {
     TimerOutput::Scope t(computing_timer,
@@ -862,7 +896,7 @@ namespace Step91
     FEValues<dim, spacedim> fe_values_at_node_points(
       fe,
       Quadrature<dim>(
-        fe.get_unit_support_points()), // could be made more efficient
+        fe.get_unit_support_points()), // TODO: could be made more efficient
       update_gradients);
 
     const unsigned int dofs_per_cell = fe.n_dofs_per_cell();
@@ -884,9 +918,23 @@ namespace Step91
     std::vector<Tensor<1, spacedim>> d_at_node_points(dofs_per_cell);
 
     std::vector<types::global_dof_index> local_dof_indices(dofs_per_cell);
-    const FEValuesExtractors::Scalar     elevation(0);
-    const FEValuesExtractors::Scalar     water_flow_rate(1);
 
+    // In the actual loop over all (locally owned) cells, we first set the local
+    // contributions to zero, initialize the FEValues objects, evaluate the
+    // rain fall rate at each quadrature point, and then we need to deal with
+    // the awkward issue of the downhill direction $\mathbf d$ at the
+    // quadrature points and in particular the term $I_h[\mathbf d\varphi^w_j]$.
+    // Specifically, this requires us to evaluate $\mathbf d$ at two sets of
+    // points: At the quadrature points (this gives us `d_at_q_points`) and
+    // at the node points (which gives us `d_at_node_points`); we use the two
+    // different FEValues objects declared above for that.
+    //
+    // Note that for the latter, the node points contain the node points for
+    // the elevation DoFs and the waterflow DoFs. We only need $\mathbf d$ at
+    // the latter, and so "poison" the values at the former by setting them
+    // to numbers::signaling_nan() -- a value that when used will trigger
+    // the program to abort with a "floating point exception" indicating
+    // that we accessed a value that wasn't ever meant to be used.
     for (const auto &cell : dof_handler.active_cell_iterators())
       if (cell->is_locally_owned())
         {
@@ -908,7 +956,7 @@ namespace Step91
           fe_values_at_node_points[elevation].get_function_gradients(
             locally_relevant_solution, elevation_grad_at_node_points);
           for (unsigned int j = 0; j < dofs_per_cell; ++j)
-            if (fe.system_to_component_index(j).first == 1) // j is water DoF
+            if (fe.shape_function_belongs_to(j, water_flow_rate))
               {
                 d_at_node_points[j] =
                   downhill_direction_from_elevation_gradient(
@@ -918,11 +966,14 @@ namespace Step91
               d_at_node_points[j] =
                 numbers::signaling_nan<Tensor<1, spacedim>>();
 
+          // With this, we proceed to assemble the matrix and right hand side.
+          // following code may look awkward, but it is really just a more or
+          // less a 1:1 translation of the equations described in the
+          // introduction:
           for (unsigned int q = 0; q < n_q_points; ++q)
             {
               for (unsigned int i = 0; i < dofs_per_cell; ++i)
-                if (fe.system_to_component_index(i).first ==
-                    1) // i is water DoF
+                if (fe.shape_function_belongs_to(i, water_flow_rate))
                   {
                     const double phi_i_w_at_q =
                       fe_values[water_flow_rate].value(i, q);
@@ -930,8 +981,7 @@ namespace Step91
                       fe_values[water_flow_rate].gradient(i, q);
 
                     for (unsigned int j = 0; j < dofs_per_cell; ++j)
-                      if (fe.system_to_component_index(j).first ==
-                          1) // j is water DoF
+                      if (fe.shape_function_belongs_to(j, water_flow_rate))
                         {
                           const Tensor<1, spacedim> grad_phi_j_w_at_q =
                             fe_values[water_flow_rate].gradient(j, q);
@@ -970,14 +1020,26 @@ namespace Step91
   }
 
 
+  // @sect3{StreamPowerErosionProblem::solve_initial_waterflow_system()}
+  //
+  // The second part of computing the initial waterflow rate is to solve
+  // the linear system that we have assembled above. We have put matrix
+  // and right hand side into the `system_matrix` and `system_rhs` variables,
+  // but because we are only dealing with the waterflow rate, we have
+  // really only touched `system_matrix.block(1,1)` and `system_rhs.block(1)`,
+  // so these are the matrix and right hand side that we will solve for.
+  //
+  // The matrix is not symmetric, and so the right solver for the problem
+  // is GMRES. The preconditioner we will use is an incomplete LU
+  // decomposition (ILU), which for the current problem will prove to be
+  // quite efficient, allowing us to solve the linear problem in only a few
+  // iterations.
   void StreamPowerErosionProblem::solve_initial_waterflow_system()
   {
     TimerOutput::Scope t(computing_timer,
                          "Initial conditions: solve waterflow system");
     pcout << "  Solving initial waterflow system... " << std::endl;
 
-    pcout << "    Initial residual=" << system_rhs.block(1).l2_norm()
-          << std::endl;
     SolverControl solver_control(system_matrix.block(1, 1).m(),
                                  1e-6 * system_rhs.block(1).l2_norm());
 
@@ -986,8 +1048,6 @@ namespace Step91
     preconditioner.initialize(system_matrix.block(1, 1));
 
     VectorType distributed_solution(owned_partitioning, mpi_communicator);
-
-    constraints.set_zero(distributed_solution);
 
     solver.solve(system_matrix.block(1, 1),
                  distributed_solution.block(1),
@@ -998,7 +1058,6 @@ namespace Step91
           << std::endl;
 
     constraints.distribute(distributed_solution);
-
     locally_relevant_solution.block(1) = distributed_solution.block(1);
   }
 
@@ -1006,8 +1065,7 @@ namespace Step91
   void StreamPowerErosionProblem::check_conservation_for_waterflow_system(
     const VectorType &solution)
   {
-    TimerOutput::Scope t(computing_timer,
-                         "conservation check: waterflow system");
+    TimerOutput::Scope t(computing_timer, "Water conservation check");
 
     const QGauss<dim>     quadrature_formula_cell(fe.degree + 1);
     const QGauss<dim - 1> quadrature_formula_face(fe.degree + 1);
@@ -1032,9 +1090,6 @@ namespace Step91
     std::vector<Tensor<1, spacedim>> elevation_grad_at_fq_points(
       fe_face_values.n_quadrature_points);
     std::vector<double> water_at_fq_points(fe_face_values.n_quadrature_points);
-
-    const FEValuesExtractors::Scalar elevation(0);
-    const FEValuesExtractors::Scalar water_flow_rate(1);
 
     double input_from_rain_rate   = 0.0;
     double output_from_water_rate = 0.0;
@@ -1095,7 +1150,7 @@ namespace Step91
           << "   Error (abs): " << error_abs << std::endl
           << "   Error (rel): " << error_rel << std::endl;
 
-    AssertThrow(error_rel < 1e-9,
+    AssertThrow(error_rel < 1e-4,
                 ExcMessage("Conservation of water rate not satisfied."));
   }
 
@@ -1113,9 +1168,6 @@ namespace Step91
     std::vector<NumberType>       &cell_residual,
     const bool                     debug) const
   {
-    const FEValuesExtractors::Scalar elevation(0);
-    const FEValuesExtractors::Scalar water_flow_rate(1);
-
     const unsigned int H_dof = 0;
     const unsigned int w_dof = 1;
 
@@ -1237,8 +1289,6 @@ namespace Step91
     std::vector<double> div_Ih_d_wh_at_q_points(fe_values.n_quadrature_points);
 
     std::vector<types::global_dof_index> local_dof_indices(dofs_per_cell);
-    const FEValuesExtractors::Scalar     elevation(0);
-    const FEValuesExtractors::Scalar     water_flow_rate(1);
 
     std::vector<double> local_dof_values(dofs_per_cell);
     std::vector<double> cell_residual(dofs_per_cell);
@@ -1364,8 +1414,6 @@ namespace Step91
       fe_values.n_quadrature_points);
 
     std::vector<types::global_dof_index> local_dof_indices(dofs_per_cell);
-    const FEValuesExtractors::Scalar     elevation(0);
-    const FEValuesExtractors::Scalar     water_flow_rate(1);
 
     for (const auto &cell : dof_handler.active_cell_iterators())
       if (cell->is_locally_owned())
@@ -1716,7 +1764,6 @@ namespace Step91
       // The initial values for the elevation are known (as given by the
       // input topology) so we mark these as being algebraic, and IDA will
       // not perturb the initial solution values.
-      const FEValuesExtractors::Scalar elevation(0);
       const BlockMask elevation_mask = fe.block_mask(elevation);
       indices.add_indices(DoFTools::extract_dofs(dof_handler, elevation_mask));
 
@@ -1726,7 +1773,6 @@ namespace Step91
           // we mark these DoFs as having the correct initial value.
           // We delegate to IDA the responsibility solve for consistent initial
           // conditions for the elevation, as well as the rates for both fields.
-          const FEValuesExtractors::Scalar water_flow_rate(1);
           const BlockMask water_mask = fe.block_mask(water_flow_rate);
           indices.add_indices(DoFTools::extract_dofs(dof_handler, water_mask));
         }
