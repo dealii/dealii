@@ -272,6 +272,11 @@ namespace LinearAlgebra
           std::is_same_v<MemorySpace, ::dealii::MemorySpace::Default>,
         "MemorySpace should be Host or Default");
 
+      static_assert(
+        (!std::is_same_v<MemorySpace, ::dealii::MemorySpace::Default>) ||
+          std::is_same_v<Number, float> || std::is_same_v<Number, double>,
+        "Number should be float or double for Default memory space");
+
       /**
        * @name 1: Basic Object-handling
        */
