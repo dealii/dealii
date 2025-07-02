@@ -26,7 +26,7 @@ set_if_empty(MAGIC_ENUM_DIR "$ENV{MAGIC_ENUM_DIR}")
 
 deal_ii_find_path(MAGIC_ENUM_INCLUDE_DIR magic_enum.hpp
   HINTS ${MAGIC_ENUM_DIR}
-  PATH_SUFFIXES include
+  PATH_SUFFIXES include include/magic_enum
   )
 
 process_feature(MAGIC_ENUM
