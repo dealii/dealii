@@ -396,13 +396,14 @@ namespace TriangulationDescription
      * Construct a TriangulationDescription::Description. In contrast
      * to the function above, this function is also responsible for creating
      * a serial triangulation and for its partitioning (by calling the
-     * provided `std::function` objects). Internally only selected processes (
-     * every n-th/each root of a group of size group_size) create a serial
+     * provided `std::function` objects). Internally only selected processes
+     * (every n-th/each root of a group of size `group_size`) create a serial
      * triangulation and the TriangulationDescription::Description for all
-     * processes in its group, which is communicated.
+     * processes in its group, which is then communicated.
      *
      * This function can also be used to read an external mesh only once (by
-     * the root process and a group consisting all processes). The following
+     * the root process), by setting `group_size` to the number of MPI ranks
+     * and therefore creating a single group. The following
      * code snippet shows a modified version of the example provided in the
      * documentation of create_description_from_triangulation().
      * Function calls that only need to be performed by the root process
