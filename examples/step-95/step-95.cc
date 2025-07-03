@@ -1850,8 +1850,8 @@ int main(int argc, char **argv)
   const unsigned int fe_degree = 2;
 
   Step95::PoissonSolver<dim> poisson_solver;
-  // run CG
+  // First, we run the poisson solver with continuous elements (FE_Q).
   poisson_solver.run(false /* is_dg */, fe_degree);
-  // run DG
+  // Then we do a second run with discontinuous elements (FE_DGQ).
   poisson_solver.run(true /* is_dg */, fe_degree);
 }
