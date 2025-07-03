@@ -893,7 +893,8 @@ namespace Step95
 
 
   // The implementation of the face-based ghost penalty term (up to degree 2 /
-  // normal hessians).
+  // normal hessians). For continuous elements, we have value_m = value_p thanks
+  // to continuity, which allows us to skip this term.
   template <int dim>
   template <bool do_normal_hessians, bool do_values, typename Evaluator>
   void PoissonOperator<dim>::do_gp_face_term(
