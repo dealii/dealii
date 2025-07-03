@@ -1,1 +1,2 @@
-Solving Poisson's equation using the cut finite element method.
+Using the matrix-free framework for solving Poisson's equation using the cut finite element method (CutFEM)
+and the cut discontinuous Galerkin method (CutDG).
