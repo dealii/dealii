@@ -57,3 +57,7 @@ Another option would be to implement a different ghost penalty like the volume b
 stabilization for arbitrary polynomial degree of the shape functions.
 
 Also, the preconditioner could be extended to a more robust scheme like multigrid.
+
+If you are interested in the mentioned possibilities for extensions we recommend our paper "High-performance matrix-free
+unfitted finite element operator evaluation" where volume ghost-penalty and multigrid preconditioning  already have been
+addressed.
