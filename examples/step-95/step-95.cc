@@ -145,12 +145,12 @@ namespace Step95
     void compute_diagonal(VectorType &diagonal) const;
 
   private:
-    template <typename Evaluator>
-    void create_zero_basis(Evaluator &evaluator) const;
+    template <typename EvaluatorType>
+    void create_zero_basis(EvaluatorType &evaluator) const;
 
-    template <typename Evaluator>
+    template <typename EvaluatorType>
     void create_standard_basis(const unsigned int j,
-                               Evaluator         &evaluator) const;
+                               EvaluatorType     &evaluator) const;
 
     template <bool assemble = false>
     void local_apply_cell(
@@ -172,31 +172,32 @@ namespace Step95
       const VectorType &,
       const std::pair<unsigned int, unsigned int> &) const;
 
-    template <typename Evaluator>
-    void do_poisson_cell_term(Evaluator &evaluator, const unsigned int q) const;
+    template <typename EvaluatorType>
+    void do_poisson_cell_term(EvaluatorType     &evaluator,
+                              const unsigned int q) const;
 
-    template <typename Evaluator, typename Number2>
-    void do_flux_term(Evaluator         &evaluator_m,
-                      Evaluator         &evaluator_p,
+    template <typename EvaluatorType, typename Number2>
+    void do_flux_term(EvaluatorType     &evaluator_m,
+                      EvaluatorType     &evaluator_p,
                       const Number2     &tau,
                       const unsigned int q) const;
 
-    template <typename Evaluator, typename Number2>
-    void do_boundary_flux_term_homogeneous(Evaluator         &evaluator_m,
+    template <typename EvaluatorType, typename Number2>
+    void do_boundary_flux_term_homogeneous(EvaluatorType     &evaluator_m,
                                            const Number2     &tau,
                                            const unsigned int q) const;
 
-    template <bool do_normal_hessians, bool do_values, typename Evaluator>
+    template <bool do_normal_hessians, bool do_values, typename EvaluatorType>
     void do_gp_face_term(
-      Evaluator                            &evaluator_m,
-      Evaluator                            &evaluator_p,
-      const typename Evaluator::NumberType &masked_factor_value,
-      const typename Evaluator::NumberType &masked_factor_gradient,
-      const typename Evaluator::NumberType &masked_factor_hessian,
-      const unsigned int                    q) const;
+      EvaluatorType                            &evaluator_m,
+      EvaluatorType                            &evaluator_p,
+      const typename EvaluatorType::NumberType &masked_factor_value,
+      const typename EvaluatorType::NumberType &masked_factor_gradient,
+      const typename EvaluatorType::NumberType &masked_factor_hessian,
+      const unsigned int                        q) const;
 
-    template <typename Evaluator>
-    void do_rhs_cell_term(Evaluator           &evaluator,
+    template <typename EvaluatorType>
+    void do_rhs_cell_term(EvaluatorType       &evaluator,
                           const Function<dim> &rhs_function,
                           const unsigned int   q) const;
 
@@ -427,8 +428,8 @@ namespace Step95
   // We define two helper functions needed for matrix-free assembly
   // operations.
   template <int dim>
-  template <typename Evaluator>
-  void PoissonOperator<dim>::create_zero_basis(Evaluator &evaluator) const
+  template <typename EvaluatorType>
+  void PoissonOperator<dim>::create_zero_basis(EvaluatorType &evaluator) const
   {
     for (unsigned int i = 0; i < evaluator.dofs_per_cell; ++i)
       evaluator.begin_dof_values()[i] = VectorizedArrayType(0.);
@@ -437,9 +438,10 @@ namespace Step95
 
 
   template <int dim>
-  template <typename Evaluator>
-  void PoissonOperator<dim>::create_standard_basis(const unsigned int j,
-                                                   Evaluator &evaluator) const
+  template <typename EvaluatorType>
+  void
+  PoissonOperator<dim>::create_standard_basis(const unsigned int j,
+                                              EvaluatorType &evaluator) const
   {
     create_zero_basis(evaluator);
     evaluator.begin_dof_values()[j] = VectorizedArrayType(1.);
@@ -826,11 +828,11 @@ namespace Step95
 
 
   // This is the actual implementation of the quadrature point operation of
-  // the Poisson term in the weak form. It is templated over the Evaluator
+  // the Poisson term in the weak form. It is templated over the EvaluatorType
   // type to be usable by FEEvaluation as well as FEPointEvaluation.
   template <int dim>
-  template <typename Evaluator>
-  void PoissonOperator<dim>::do_poisson_cell_term(Evaluator         &evaluator,
+  template <typename EvaluatorType>
+  void PoissonOperator<dim>::do_poisson_cell_term(EvaluatorType     &evaluator,
                                                   const unsigned int q) const
   {
     evaluator.submit_gradient(evaluator.get_gradient(q), q);
@@ -839,12 +841,12 @@ namespace Step95
 
 
   // The implementation for the SIPG term (needed for DG). Again, templated
-  // over the Evaluator type to be usable by FEFaceEvaluation and
+  // over the EvaluatorType type to be usable by FEFaceEvaluation and
   // FEFacePointEvaluation.
   template <int dim>
-  template <typename Evaluator, typename Number2>
-  void PoissonOperator<dim>::do_flux_term(Evaluator         &evaluator_m,
-                                          Evaluator         &evaluator_p,
+  template <typename EvaluatorType, typename Number2>
+  void PoissonOperator<dim>::do_flux_term(EvaluatorType     &evaluator_m,
+                                          EvaluatorType     &evaluator_p,
                                           const Number2     &tau,
                                           const unsigned int q) const
   {
@@ -874,9 +876,9 @@ namespace Step95
 
   // The implementation of the Nitsche term.
   template <int dim>
-  template <typename Evaluator, typename Number2>
+  template <typename EvaluatorType, typename Number2>
   void PoissonOperator<dim>::do_boundary_flux_term_homogeneous(
-    Evaluator         &evaluator_m,
+    EvaluatorType     &evaluator_m,
     const Number2     &tau,
     const unsigned int q) const
   {
@@ -896,14 +898,14 @@ namespace Step95
   // normal hessians). For continuous elements, we have value_m = value_p thanks
   // to continuity, which allows us to skip this term.
   template <int dim>
-  template <bool do_normal_hessians, bool do_values, typename Evaluator>
+  template <bool do_normal_hessians, bool do_values, typename EvaluatorType>
   void PoissonOperator<dim>::do_gp_face_term(
-    Evaluator                            &evaluator_m,
-    Evaluator                            &evaluator_p,
-    const typename Evaluator::NumberType &masked_factor_value,
-    const typename Evaluator::NumberType &masked_factor_gradient,
-    const typename Evaluator::NumberType &masked_factor_hessian,
-    const unsigned int                    q) const
+    EvaluatorType                            &evaluator_m,
+    EvaluatorType                            &evaluator_p,
+    const typename EvaluatorType::NumberType &masked_factor_value,
+    const typename EvaluatorType::NumberType &masked_factor_gradient,
+    const typename EvaluatorType::NumberType &masked_factor_hessian,
+    const unsigned int                        q) const
   {
     if (do_values)
       {
@@ -951,8 +953,8 @@ namespace Step95
   // vectorized types directly, so we have to reshuffle the quadrature point
   // data).
   template <int dim>
-  template <typename Evaluator>
-  void PoissonOperator<dim>::do_rhs_cell_term(Evaluator           &evaluator,
+  template <typename EvaluatorType>
+  void PoissonOperator<dim>::do_rhs_cell_term(EvaluatorType       &evaluator,
                                               const Function<dim> &rhs_function,
                                               const unsigned int   q) const
   {
