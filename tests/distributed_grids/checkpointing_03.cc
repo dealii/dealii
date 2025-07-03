@@ -27,7 +27,6 @@ const bool run_big = false;
 #include <deal.II/base/utilities.h>
 
 #include <deal.II/distributed/grid_refinement.h>
-#include <deal.II/distributed/solution_transfer.h>
 #include <deal.II/distributed/tria.h>
 
 #include <deal.II/dofs/dof_accessor.h>
@@ -48,6 +47,7 @@ const bool run_big = false;
 
 #include <deal.II/numerics/data_out.h>
 #include <deal.II/numerics/error_estimator.h>
+#include <deal.II/numerics/solution_transfer.h>
 #include <deal.II/numerics/vector_tools.h>
 
 #include <fstream>
@@ -188,10 +188,8 @@ LaplaceProblem<dim>::run(unsigned int n_cycles_global,
 
         // To be sure, use two SolutionTransfer objects, because the second one
         // will get a large offset
-        parallel::distributed::SolutionTransfer<dim, VectorType> system_trans(
-          dof_handler);
-        parallel::distributed::SolutionTransfer<dim, VectorType> trans2(
-          dof_handler);
+        SolutionTransfer<dim, VectorType> system_trans(dof_handler);
+        SolutionTransfer<dim, VectorType> trans2(dof_handler);
 
 
         dof_handler.prepare_for_serialization_of_active_fe_indices();
@@ -219,10 +217,8 @@ LaplaceProblem<dim>::run(unsigned int n_cycles_global,
         triangulation.coarsen_global(99);
         triangulation.load("restart.mesh");
 
-        parallel::distributed::SolutionTransfer<dim, VectorType> system_trans(
-          dof_handler);
-        parallel::distributed::SolutionTransfer<dim, VectorType> trans2(
-          dof_handler);
+        SolutionTransfer<dim, VectorType> system_trans(dof_handler);
+        SolutionTransfer<dim, VectorType> trans2(dof_handler);
 
         dof_handler.deserialize_active_fe_indices();
         system_trans.deserialize(x_system);

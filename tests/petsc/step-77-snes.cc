@@ -54,7 +54,6 @@
 #include <deal.II/base/conditional_ostream.h>
 
 #include <deal.II/distributed/grid_refinement.h>
-#include <deal.II/distributed/solution_transfer.h>
 #include <deal.II/distributed/tria.h>
 
 #include <deal.II/grid/grid_tools.h>
@@ -437,8 +436,8 @@ namespace Step77
 
     triangulation.prepare_coarsening_and_refinement();
 
-    parallel::distributed::SolutionTransfer<dim, PETScWrappers::MPI::Vector>
-      solution_transfer(dof_handler);
+    SolutionTransfer<dim, PETScWrappers::MPI::Vector> solution_transfer(
+      dof_handler);
 
     PETScWrappers::MPI::Vector current_solution_tmp(locally_relevant_solution);
     solution_transfer.prepare_for_coarsening_and_refinement(

@@ -41,7 +41,6 @@
 #include <deal.II/lac/sparsity_tools.h>
 #include <deal.II/distributed/tria.h>
 #include <deal.II/distributed/grid_refinement.h>
-#include <deal.II/distributed/solution_transfer.h>
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/grid_out.h>
 #include <deal.II/dofs/dof_handler.h>
@@ -864,8 +863,8 @@ namespace Step86
     const std::vector<PETScWrappers::MPI::Vector> &all_in,
     std::vector<PETScWrappers::MPI::Vector>       &all_out)
   {
-    parallel::distributed::SolutionTransfer<dim, PETScWrappers::MPI::Vector>
-      solution_trans(dof_handler);
+    SolutionTransfer<dim, PETScWrappers::MPI::Vector> solution_trans(
+      dof_handler);
 
     std::vector<PETScWrappers::MPI::Vector> all_in_ghosted(all_in.size());
     std::vector<const PETScWrappers::MPI::Vector *> all_in_ghosted_ptr(

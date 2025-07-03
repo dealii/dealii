@@ -17,7 +17,6 @@
 // Test distributed solution transfer with fullydistributed triangulations.
 
 #include <deal.II/distributed/fully_distributed_tria.h>
-#include <deal.II/distributed/solution_transfer.h>
 #include <deal.II/distributed/tria.h>
 
 #include <deal.II/dofs/dof_handler.h>
@@ -30,6 +29,7 @@
 
 #include <deal.II/lac/la_parallel_vector.h>
 
+#include <deal.II/numerics/solution_transfer.h>
 #include <deal.II/numerics/vector_tools.h>
 
 #include "../grid/tests.h"
@@ -77,8 +77,7 @@ test(TriangulationType &triangulation)
     "solution_transfer_" + std::to_string(dim) + "d_out";
 
   {
-    parallel::distributed::SolutionTransfer<dim, VectorType> solution_transfer(
-      dof_handler);
+    SolutionTransfer<dim, VectorType> solution_transfer(dof_handler);
     solution_transfer.prepare_for_serialization(vector);
 
     triangulation.save(filename);
@@ -90,8 +89,7 @@ test(TriangulationType &triangulation)
     triangulation.load(filename);
     dof_handler.distribute_dofs(FE_Q<dim>(2));
 
-    parallel::distributed::SolutionTransfer<dim, VectorType> solution_transfer(
-      dof_handler);
+    SolutionTransfer<dim, VectorType> solution_transfer(dof_handler);
     solution_transfer.deserialize(vector_loaded);
 
     vector_loaded.update_ghost_values();

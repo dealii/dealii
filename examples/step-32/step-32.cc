@@ -71,13 +71,6 @@
 #include <locale>
 #include <string>
 
-// This is the only include file that is new: It introduces the
-// parallel::distributed::SolutionTransfer equivalent of the
-// SolutionTransfer class to take a solution from on mesh to the next
-// one upon mesh refinement, but in the case of parallel distributed
-// triangulations:
-#include <deal.II/distributed/solution_transfer.h>
-
 // The following classes are used in parallel distributed computations and
 // have all already been introduced in step-40:
 #include <deal.II/base/index_set.h>
@@ -3249,11 +3242,10 @@ namespace Step32
   void
   BoussinesqFlowProblem<dim>::refine_mesh(const unsigned int max_grid_level)
   {
-    parallel::distributed::SolutionTransfer<dim, TrilinosWrappers::MPI::Vector>
-      temperature_trans(temperature_dof_handler);
-    parallel::distributed::SolutionTransfer<dim,
-                                            TrilinosWrappers::MPI::BlockVector>
-      stokes_trans(stokes_dof_handler);
+    SolutionTransfer<dim, TrilinosWrappers::MPI::Vector> temperature_trans(
+      temperature_dof_handler);
+    SolutionTransfer<dim, TrilinosWrappers::MPI::BlockVector> stokes_trans(
+      stokes_dof_handler);
 
     {
       TimerOutput::Scope timer_section(computing_timer,
@@ -3283,9 +3275,8 @@ namespace Step32
           cell->clear_refine_flag();
 
       // With all flags marked as necessary, we can then tell the
-      // parallel::distributed::SolutionTransfer objects to get ready to
-      // transfer data from one mesh to the next, which they will do when
-      // notified by
+      // SolutionTransfer objects to get ready to transfer data from one mesh to
+      // the next, which they will do when notified by
       // Triangulation as part of the @p execute_coarsening_and_refinement() call.
       // The syntax is similar to the non-%parallel solution transfer (with the
       // exception that here a pointer to the vector entries is enough). The

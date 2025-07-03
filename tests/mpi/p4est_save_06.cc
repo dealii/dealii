@@ -20,7 +20,6 @@
 #include <deal.II/base/tensor.h>
 #include <deal.II/base/utilities.h>
 
-#include <deal.II/distributed/solution_transfer.h>
 #include <deal.II/distributed/tria.h>
 
 #include <deal.II/dofs/dof_handler.h>
@@ -35,6 +34,8 @@
 #include <deal.II/grid/tria_accessor.h>
 
 #include <deal.II/lac/petsc_vector.h>
+
+#include <deal.II/numerics/solution_transfer.h>
 
 #include "../tests.h"
 
@@ -91,8 +92,7 @@ test()
                                        locally_relevant_dofs,
                                        com_small);
 
-      parallel::distributed::SolutionTransfer<dim, PETScWrappers::MPI::Vector>
-        soltrans(dh);
+      SolutionTransfer<dim, PETScWrappers::MPI::Vector> soltrans(dh);
 
       for (unsigned int i = 0; i < locally_owned_dofs.n_elements(); ++i)
         {
@@ -143,8 +143,7 @@ test()
     PETScWrappers::MPI::Vector solution(locally_owned_dofs, com_all);
     solution = PetscScalar();
 
-    parallel::distributed::SolutionTransfer<dim, PETScWrappers::MPI::Vector>
-      soltrans(dh);
+    SolutionTransfer<dim, PETScWrappers::MPI::Vector> soltrans(dh);
 
     soltrans.deserialize(solution);
 
