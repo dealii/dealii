@@ -716,6 +716,11 @@ namespace Step95
     // Depending on the active_fe_index of the two cells sharing the current
     // face we select the face_operation.
     std::function<void(FaceEvaluator &, FaceEvaluator &)> face_operation;
+
+    // For cases where we need to call evaluate twice on the same cell DoFs, we
+    // introduce an option to save the DoF values to a buffer such that we can
+    // reuse them. This way, we don't have to read them from the global vector
+    // again.
     bool buffer_dof_values = false;
     if (is_dg)
       {
