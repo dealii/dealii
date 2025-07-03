@@ -28,6 +28,26 @@ For $p=2$ we get (again for continuous elements):
 If we increase the degree of the finite element for both the level-set and
 the solution we observe EOC close to 3.
 
+We repeat the experiment for for discontinuous elements (FE_DGQ), where we get for $p=1$:
+
+| Cycle | Mesh size | $L^2$-Error | EOC  |
+|:-----:|:---------:|:-----------:|:----:|
+|   0   |  0.3025   | 7.8706e-02  |  -   |
+|   1   |  0.1513   | 1.8413e-02  | 2.10 |
+|   2   |  0.0756   | 4.0863e-03  | 2.17 |
+|   3   |  0.0378   | 9.3191e-04  | 2.13 |
+
+For $p=2$ we get (again for discontinuous elements):
+
+| Cycle | Mesh size | $L^2$-Error | EOC  |
+|:-----:|:---------:|:-----------:|:----:|
+|   0   |  0.3025   | 1.5622e-04  |  -   |
+|   1   |  0.1513   | 1.0739e-05  | 3.86 |
+|   2   |  0.0756   | 1.0044e-06  | 3.42 |
+|   3   |  0.0378   | 7.9919e-08  | 3.65 |
+
+We observe optimal order convergence also for DG.
+
 <h3>Possibilities for extension</h3>
 
 This tutorial could be easily extended to time dependent problems like the heat equation by adding a mass operator and a
