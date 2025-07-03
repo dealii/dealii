@@ -40,7 +40,9 @@ DEAL_II_NAMESPACE_OPEN
 template <int dim>
 FE_RT_Bubbles<dim>::FE_RT_Bubbles(const unsigned int deg)
   : FE_PolyTensor<dim>(
-      PolynomialsRT_Bubbles<dim>(deg),
+      PolynomialsRT_Bubbles<dim>(
+        deg,
+        FE_RaviartThomas<dim>::get_lexicographic_numbering(deg - 1)),
       FiniteElementData<dim>(get_dpo_vector(deg),
                              dim,
                              deg + 1,

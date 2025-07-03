@@ -24,6 +24,7 @@
 
 #include <deal.II/fe/fe.h>
 #include <deal.II/fe/fe_poly_tensor.h>
+#include <deal.II/fe/fe_raviart_thomas.h>
 
 #include <vector>
 
