@@ -1011,9 +1011,10 @@ namespace Step95
     if (do_hessians)
       evaluation_flags |= EvaluationFlags::hessians;
 
-    Assert(degree <= 2,
-           ExcMessage(
-             "Face-based stabilization only implemented up to degree 2!"));
+    Assert(
+      degree <= 2,
+      ExcMessage(
+        "Face-based ghost-penalty stabilization only implemented up to degree 2!"));
 
     evaluator_m.evaluate(dof_ptr_m, evaluation_flags);
     evaluator_p.evaluate(dof_ptr_p, evaluation_flags);
