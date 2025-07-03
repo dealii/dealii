@@ -1328,7 +1328,10 @@ namespace Step95
   // We then use the NonMatching::MeshClassifier to check
   // NonMatching::LocationToLevelSet for each cell in the mesh and tell the
   // DoFHandler to use FE_Q or FE_DGQ on elements that are inside or
-  // intersected, and FE_Nothing on the elements that are outside.
+  // intersected, and FE_Nothing on the elements that are outside. Here, we fill
+  // the hp::FECollection and set the active_fe_index in a way that the
+  // active_fe_index corresponds to the unsigned int value of
+  // NonMatching::LocationToLevelSet.
   template <int dim>
   void PoissonSolver<dim>::distribute_dofs()
   {
@@ -1391,7 +1394,11 @@ namespace Step95
     if (dof_handler.get_fe().degree > 1)
       additional_data.mapping_update_flags_inner_faces |= update_hessians;
 
-    // setup MatrixFree object
+    // This reinit() call sets up the MatrixFree object in hp mode by using the
+    // hp::FECollection object from the DoFHandler. This sorts cells and faces
+    // into batches with the same active_fe_index or the same pair of active fe
+    // indices of the neighbors for faces, respectively. We use this sorting in
+    // our cell and face loops.
     matrix_free.reinit(
       mapping, dof_handler, affine_constraints, quadrature, additional_data);
   }
