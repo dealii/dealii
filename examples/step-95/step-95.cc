@@ -493,6 +493,16 @@ namespace Step95
           evaluator_cell->reinit(cell_index);
           evaluator_surface->reinit(cell_index);
 
+          // Here, we make use of the read local from global DoF vector
+          // facilities of the MatrixFree framework. Since with
+          // FEPointEvaluation we switch from vectorization over cells to
+          // vectorization over quadrature points, we are only interested in the
+          // DoF values of a single cell out of a batch. To achieve that, we
+          // need to access the DoF values from a specific lane `v` with a
+          // stride `n_lanes` which is as wide as the vectorization width of the
+          // respective FEEvaluation object. The same logic applies for the
+          // integrate() calls where we later use the distribute local to global
+          // DoF facilities of FEEvaluation, respectively.
           evaluator_cell->evaluate(StridedArrayView<const Number, n_lanes>(
                                      &evaluator.begin_dof_values()[0][v],
                                      dofs_per_cell),
