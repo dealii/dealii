@@ -50,7 +50,6 @@
 
 #include <deal.II/distributed/tria.h>
 #include <deal.II/distributed/grid_refinement.h>
-#include <deal.II/distributed/solution_transfer.h>
 
 #include <deal.II/dofs/dof_handler.h>
 #include <deal.II/dofs/dof_renumbering.h>
@@ -64,6 +63,7 @@
 #include <deal.II/numerics/data_out.h>
 #include <deal.II/numerics/error_estimator.h>
 #include <deal.II/numerics/fe_field_function.h>
+#include <deal.II/numerics/solution_transfer.h>
 
 #include <fstream>
 #include <iostream>
@@ -1874,8 +1874,8 @@ namespace Step42
 
     triangulation.prepare_coarsening_and_refinement();
 
-    parallel::distributed::SolutionTransfer<dim, TrilinosWrappers::MPI::Vector>
-      solution_transfer(dof_handler);
+    SolutionTransfer<dim, TrilinosWrappers::MPI::Vector> solution_transfer(
+      dof_handler);
     if (transfer_solution)
       solution_transfer.prepare_for_coarsening_and_refinement(solution);
 

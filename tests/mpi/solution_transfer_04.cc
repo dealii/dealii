@@ -18,7 +18,6 @@
 // This tests is based on mpi/feindices_transfer.cc
 
 
-#include <deal.II/distributed/solution_transfer.h>
 #include <deal.II/distributed/tria.h>
 
 #include <deal.II/dofs/dof_handler.h>
@@ -29,6 +28,8 @@
 #include <deal.II/grid/grid_generator.h>
 
 #include <deal.II/lac/trilinos_vector.h>
+
+#include <deal.II/numerics/solution_transfer.h>
 
 #include "../tests.h"
 
@@ -97,8 +98,7 @@ test()
 
 
   // ----- transfer -----
-  parallel::distributed::SolutionTransfer<dim, TrilinosWrappers::MPI::Vector>
-    soltrans(dh);
+  SolutionTransfer<dim, TrilinosWrappers::MPI::Vector> soltrans(dh);
 
   soltrans.prepare_for_coarsening_and_refinement(old_solution);
   tria.execute_coarsening_and_refinement();

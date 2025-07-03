@@ -21,7 +21,6 @@
 #include <deal.II/base/function.h>
 #include <deal.II/base/tensor.h>
 
-#include <deal.II/distributed/solution_transfer.h>
 #include <deal.II/distributed/tria.h>
 
 #include <deal.II/dofs/dof_accessor.h>
@@ -42,6 +41,7 @@
 #include <deal.II/lac/trilinos_vector.h>
 
 #include <deal.II/numerics/data_out.h>
+#include <deal.II/numerics/solution_transfer.h>
 #include <deal.II/numerics/vector_tools.h>
 
 #include "../tests.h"
@@ -182,9 +182,7 @@ test()
 
 
 
-      parallel::distributed::SolutionTransfer<dim,
-                                              TrilinosWrappers::MPI::Vector>
-        trans(dofh);
+      SolutionTransfer<dim, TrilinosWrappers::MPI::Vector> trans(dofh);
       tr.prepare_coarsening_and_refinement();
 
 

@@ -52,7 +52,6 @@ namespace LA
 #include <deal.II/base/utilities.h>
 
 #include <deal.II/distributed/grid_refinement.h>
-#include <deal.II/distributed/solution_transfer.h>
 #include <deal.II/distributed/tria.h>
 
 #include <deal.II/dofs/dof_handler.h>
@@ -87,6 +86,7 @@ namespace LA
 #include <deal.II/numerics/data_out.h>
 #include <deal.II/numerics/error_estimator.h>
 #include <deal.II/numerics/vector_tools.h>
+#include <deal.II/numerics/solution_transfer.h>
 
 // These are the only new include files with regard to step-60. In this
 // tutorial, the non-matching coupling between the solid and the fluid is
@@ -1664,8 +1664,7 @@ namespace Step70
           cell->clear_coarsen_flag();
       }
 
-    parallel::distributed::SolutionTransfer<spacedim, LA::MPI::BlockVector>
-      transfer(fluid_dh);
+    SolutionTransfer<spacedim, LA::MPI::BlockVector> transfer(fluid_dh);
 
     fluid_tria.prepare_coarsening_and_refinement();
     transfer.prepare_for_coarsening_and_refinement(locally_relevant_solution);

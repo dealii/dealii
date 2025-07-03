@@ -19,7 +19,6 @@
 #include <deal.II/base/function.h>
 #include <deal.II/base/tensor.h>
 
-#include <deal.II/distributed/solution_transfer.h>
 #include <deal.II/distributed/tria.h>
 
 #include <deal.II/fe/fe_q.h>
@@ -33,6 +32,7 @@
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_iterator.h>
 
+#include <deal.II/numerics/solution_transfer.h>
 #include <deal.II/numerics/vector_tools.h>
 
 #include "../tests.h"
@@ -72,7 +72,7 @@ test(std::ostream & /*out*/)
   static const FE_Q<dim> fe(1);
   dofh.distribute_dofs(fe);
 
-  parallel::distributed::SolutionTransfer<dim, Vector<double>> soltrans(dofh);
+  SolutionTransfer<dim, Vector<double>> soltrans(dofh);
 
   for (int i = 0; i < 4; ++i)
     {
