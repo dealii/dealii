@@ -80,6 +80,23 @@ namespace Step95
                                 NonMatching::LocationToLevelSet::intersected);
   }
 
+  template <int dim, typename Number>
+  VectorizedArray<Number>
+  evaluate_function(const Function<dim>                       &function,
+                    const Point<dim, VectorizedArray<Number>> &p_vectorized,
+                    const unsigned int                         component = 0)
+  {
+    VectorizedArray<Number> result;
+    for (unsigned int v = 0; v < VectorizedArray<Number>::size(); ++v)
+      {
+        Point<dim> p;
+        for (unsigned int d = 0; d < dim; ++d)
+          p[d] = p_vectorized[d][v];
+        result[v] = function.value(p, component);
+      }
+    return result;
+  }
+
   // @sect3{The PoissonOperator class Template}
   // This operator applies the matrix-free operator evaluation with the vmult()
   // function.
@@ -938,20 +955,9 @@ namespace Step95
                                               const Function<dim> &rhs_function,
                                               const unsigned int   q) const
   {
-    const auto q_points = evaluator.quadrature_point(q);
-
-    VectorizedArrayType value = 0.;
-
-    for (unsigned int v = 0; v < n_lanes; ++v)
-      {
-        Point<dim> q_point;
-        for (unsigned int d = 0; d < dim; ++d)
-          q_point[d] = q_points[d][v];
-
-        value[v] = rhs_function.value(q_point);
-      }
-
-    evaluator.submit_value(value, q);
+    evaluator.submit_value(evaluate_function(rhs_function,
+                                             evaluator.quadrature_point(q)),
+                           q);
   }
 
 
@@ -1670,18 +1676,9 @@ namespace Step95
     auto l2_kernel = [](auto                &evaluator,
                         const Function<dim> &analytical_solution_function,
                         const unsigned int   q) {
-      const auto q_points = evaluator.quadrature_point(q);
-
-      VectorizedArrayType value = 0.;
-
-      for (unsigned int v = 0; v < n_lanes; ++v)
-        {
-          Point<dim> q_point;
-          for (unsigned int d = 0; d < dim; ++d)
-            q_point[d] = q_points[d][v];
-
-          value[v] = analytical_solution_function.value(q_point);
-        }
+      const VectorizedArrayType value =
+        evaluate_function(analytical_solution_function,
+                          evaluator.quadrature_point(q));
 
       const auto difference = evaluator.get_value(q) - value;
 
