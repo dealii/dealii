@@ -103,7 +103,6 @@ already. For example, here are two ideas:
       triangulation.set_manifold(i, triangulation_quad.get_manifold(i));
   @endcode
   This results in this picture:
-  This produces the following mesh:
   <img src="https://www.dealii.org/images/steps/developer/step-1.grid-2-triangle.png" alt="">
 
 
