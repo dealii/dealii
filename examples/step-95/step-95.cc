@@ -121,7 +121,7 @@ namespace Step95
     using GenericFaceEvaluator =
       FEFacePointEvaluation<1, dim, dim, VectorizedArrayType>;
 
-    // And finally, we introduce a shortcut for the width of the detected SIMD
+    // Finally, we introduce a shortcut for the width of the detected SIMD
     // vectorization.
     static constexpr unsigned int n_lanes = VectorizedArrayType::size();
 
@@ -331,7 +331,7 @@ namespace Step95
 
 
 
-  // The right-hand-side is assembled with a loop over the cells.
+  // The right-hand-side vector is assembled with a loop over the cells.
   template <int dim>
   void PoissonOperator<dim>::rhs(PoissonOperator::VectorType &rhs,
                                  const Function<dim>         &rhs_function)
