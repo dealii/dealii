@@ -115,23 +115,26 @@ namespace Step39
   namespace MatrixIntegrator
   {
     template <int dim>
-    double ip_penalty_factor(const MeshWorker::DoFInfo<dim> &dinfo1,
-                             const MeshWorker::DoFInfo<dim> &dinfo2,
-                             unsigned int                    deg1,
-                             unsigned int                    deg2)
+    double
+    ip_penalty_factor(const typename Triangulation<dim>::cell_iterator &cell1,
+                      const unsigned int                                face1,
+                      const unsigned int                                deg1,
+                      const typename Triangulation<dim>::cell_iterator &cell2,
+                      const unsigned int                                face2,
+                      const unsigned int                                deg2)
     {
       const unsigned int normal1 =
-        GeometryInfo<dim>::unit_normal_direction[dinfo1.face_number];
+        GeometryInfo<dim>::unit_normal_direction[face1];
       const unsigned int normal2 =
-        GeometryInfo<dim>::unit_normal_direction[dinfo2.face_number];
+        GeometryInfo<dim>::unit_normal_direction[face2];
       const unsigned int deg1sq = (deg1 == 0) ? 1 : deg1 * (deg1 + 1);
       const unsigned int deg2sq = (deg2 == 0) ? 1 : deg2 * (deg2 + 1);
 
-      double penalty1 = deg1sq / dinfo1.cell->extent_in_direction(normal1);
-      double penalty2 = deg2sq / dinfo2.cell->extent_in_direction(normal2);
-      if (dinfo1.cell->has_children() && !dinfo2.cell->has_children())
+      double penalty1 = deg1sq / cell1->extent_in_direction(normal1);
+      double penalty2 = deg2sq / cell2->extent_in_direction(normal2);
+      if (cell1->has_children() && !cell2->has_children())
         penalty1 *= 2;
-      else if (!dinfo1.cell->has_children() && dinfo2.cell->has_children())
+      else if (!cell1->has_children() && cell2->has_children())
         penalty2 *= 2;
 
       const double penalty = 0.5 * (penalty1 + penalty2);
@@ -184,8 +187,12 @@ namespace Step39
       const unsigned int polynomial_degree =
         info.fe_values(0).get_fe().tensor_degree();
 
-      const double ip_penalty =
-        ip_penalty_factor(dinfo, dinfo, polynomial_degree, polynomial_degree);
+      const double ip_penalty = ip_penalty_factor<dim>(dinfo.cell,
+                                                       dinfo.face_number,
+                                                       polynomial_degree,
+                                                       dinfo.cell,
+                                                       dinfo.face_number,
+                                                       polynomial_degree);
 
       for (unsigned int k = 0; k < fe_face_values.n_quadrature_points; ++k)
         {
@@ -230,8 +237,12 @@ namespace Step39
 
       const unsigned int polynomial_degree =
         info1.fe_values(0).get_fe().tensor_degree();
-      const double ip_penalty =
-        ip_penalty_factor(dinfo1, dinfo2, polynomial_degree, polynomial_degree);
+      const double ip_penalty = ip_penalty_factor<dim>(dinfo1.cell,
+                                                       dinfo1.face_number,
+                                                       polynomial_degree,
+                                                       dinfo2.cell,
+                                                       dinfo2.face_number,
+                                                       polynomial_degree);
 
       const double nui = 1.;
       const double nue = 1.;
