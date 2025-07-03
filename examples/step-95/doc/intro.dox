@@ -40,7 +40,7 @@ where
                        + g_h(u_h, v_h),
   \\
   L_h(v_h)      &=  (f,v)_\Omega
-                  + \left (u_D, \gamma_D h^{-1} v_h -\partial_n v_h \right )_{\Gamma_D}.
+                  + \left (u_D, \gamma_D h^{-1} v_h -\partial_n v_h \right )_{\Gamma_D},
 @f}
 where $g_h$ is the ghost penalty stabilization that circumvents the small cut cell problem.
 
@@ -55,7 +55,8 @@ The ghost penalty is defined as:
 @f{equation*}{
   g_h(u_h,v_h) = \sum_{F \in \mathcal{F}_h} \sum_{j=0}^p \gamma_{GP,j} \left(h_F^{2j-1}[\partial_n^j u_h], [\partial_n^j v_h] \right)_F
 @f}
-over faces $F\in\mathcal{F}_h$ between intersected cells and intersected and inside cells.
+over faces $F\in\mathcal{F}_h$ between intersected cells and intersected and inside cells. In this tutorial it is
+implemented for degree $p\leq 2$.
 
 The terms arising in the weak form are implemented matrix-free
 @f{equation*}{
