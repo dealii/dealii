@@ -66,18 +66,18 @@ namespace Step95
 {
   using namespace dealii;
 
-  // Helper functions to determine if a cell (or a batch of cells) is inside or
-  // intersected depending on the active_fe_index.
+  // We define helper functions to determine if a cell (or a batch of cells) is
+  // inside or intersected depending on the active_fe_index.
   inline bool is_inside(const unsigned int active_fe_index)
   {
     return active_fe_index ==
-           (unsigned int)NonMatching::LocationToLevelSet::inside;
+           static_cast<unsigned int>(NonMatching::LocationToLevelSet::inside);
   }
 
   inline bool is_intersected(const unsigned int active_fe_index)
   {
-    return active_fe_index ==
-           (unsigned int)NonMatching::LocationToLevelSet::intersected;
+    return active_fe_index == static_cast<unsigned int>(
+                                NonMatching::LocationToLevelSet::intersected);
   }
 
   // @sect3{The PoissonOperator class Template}
@@ -450,7 +450,7 @@ namespace Step95
 
     // We define the cell_operation for inside cells as the standard Poisson
     // term.
-    auto inside_cell_operation = [&](CellEvaluator &evaluator) {
+    const auto inside_cell_operation = [&](CellEvaluator &evaluator) {
       evaluator.evaluate(EvaluationFlags::gradients);
       for (unsigned int q : evaluator.quadrature_point_indices())
         do_poisson_cell_term(evaluator, q);
@@ -460,7 +460,7 @@ namespace Step95
     // We define the cell_operation for intersected cells as the standard
     // Poisson term in the cut volume and the Nitsche term for weak Dirichlet
     // boundary enforcement on the cut surface.
-    auto intersected_cell_operation = [&](CellEvaluator &evaluator) {
+    const auto intersected_cell_operation = [&](CellEvaluator &evaluator) {
       const unsigned int cell_batch_index =
         evaluator.get_cell_or_face_batch_id();
       const VectorizedArrayType diameter = cell_diameter[cell_batch_index];
@@ -581,8 +581,8 @@ namespace Step95
 
     // We start with the face operations for the DG case.
     // We define the face_operation for an inside face as the SIPG term.
-    auto inside_face_operation_dg = [&](FaceEvaluator &evaluator_m,
-                                        FaceEvaluator &evaluator_p) {
+    const auto inside_face_operation_dg = [&](FaceEvaluator &evaluator_m,
+                                              FaceEvaluator &evaluator_p) {
       const unsigned int face_batch_index =
         evaluator_m.get_cell_or_face_batch_id();
 
@@ -598,8 +598,8 @@ namespace Step95
 
     // We define the face_operation for a mixed face (between an inside and an
     // intersected cell) as the SIPG term plus the ghost penalty term.
-    auto mixed_face_operation_dg = [&](FaceEvaluator &evaluator_m,
-                                       FaceEvaluator &evaluator_p) {
+    const auto mixed_face_operation_dg = [&](FaceEvaluator &evaluator_m,
+                                             FaceEvaluator &evaluator_p) {
       const unsigned int face_batch_index =
         evaluator_m.get_cell_or_face_batch_id();
 
@@ -622,8 +622,8 @@ namespace Step95
 
     // We define the face_operation for an intersected face (between two
     // intersected cells) as the SIPG term plus the ghost penalty term.
-    auto intersected_face_operation_dg = [&](FaceEvaluator &evaluator_m,
-                                             FaceEvaluator &evaluator_p) {
+    const auto intersected_face_operation_dg = [&](FaceEvaluator &evaluator_m,
+                                                   FaceEvaluator &evaluator_p) {
       const unsigned int face_batch_index =
         evaluator_m.get_cell_or_face_batch_id();
 
@@ -678,21 +678,21 @@ namespace Step95
 
     // For the CG case we only need to define the ghost penalty term for mixed
     // and intersected faces.
-    auto intersected_mixed_face_operation_cg = [&](FaceEvaluator &evaluator_m,
-                                                   FaceEvaluator &evaluator_p) {
-      const unsigned int face_batch_index =
-        evaluator_m.get_cell_or_face_batch_id();
+    const auto intersected_mixed_face_operation_cg =
+      [&](FaceEvaluator &evaluator_m, FaceEvaluator &evaluator_p) {
+        const unsigned int face_batch_index =
+          evaluator_m.get_cell_or_face_batch_id();
 
-      const VectorizedArrayType diameter =
-        compute_diameter_of_inner_face_batch(face_batch_index);
+        const VectorizedArrayType diameter =
+          compute_diameter_of_inner_face_batch(face_batch_index);
 
-      do_local_apply_gp_face_term<false>(evaluator_m,
-                                         evaluator_p,
-                                         evaluator_m.begin_dof_values(),
-                                         evaluator_p.begin_dof_values(),
-                                         diameter,
-                                         false);
-    };
+        do_local_apply_gp_face_term<false>(evaluator_m,
+                                           evaluator_p,
+                                           evaluator_m.begin_dof_values(),
+                                           evaluator_p.begin_dof_values(),
+                                           diameter,
+                                           false);
+      };
 
     // Depending on the active_fe_index of the two cells sharing the current
     // face we select the face_operation.
@@ -1353,16 +1353,16 @@ namespace Step95
 
         if (cell_location == NonMatching::LocationToLevelSet::inside)
           cell->set_active_fe_index(
-            (unsigned int)NonMatching::LocationToLevelSet::inside);
+            static_cast<unsigned int>(NonMatching::LocationToLevelSet::inside));
         else if (cell_location == NonMatching::LocationToLevelSet::outside)
-          cell->set_active_fe_index(
-            (unsigned int)NonMatching::LocationToLevelSet::outside);
+          cell->set_active_fe_index(static_cast<unsigned int>(
+            NonMatching::LocationToLevelSet::outside));
         else if (cell_location == NonMatching::LocationToLevelSet::intersected)
-          cell->set_active_fe_index(
-            (unsigned int)NonMatching::LocationToLevelSet::intersected);
+          cell->set_active_fe_index(static_cast<unsigned int>(
+            NonMatching::LocationToLevelSet::intersected));
         else
-          cell->set_active_fe_index(
-            (unsigned int)NonMatching::LocationToLevelSet::outside);
+          cell->set_active_fe_index(static_cast<unsigned int>(
+            NonMatching::LocationToLevelSet::outside));
       }
 
     dof_handler.distribute_dofs(fe_collection);
@@ -1402,7 +1402,7 @@ namespace Step95
   void PoissonSolver<dim>::setup_mapping_data()
   {
     pcout << "Setting up non matching mapping info" << std::endl;
-    auto is_intersected_cell =
+    const auto is_intersected_cell =
       [&](const TriaIterator<CellAccessor<dim, dim>> &cell) {
         return mesh_classifier.location_to_level_set(cell) ==
                NonMatching::LocationToLevelSet::intersected;
@@ -1484,16 +1484,14 @@ namespace Step95
 
         std::vector<Quadrature<dim - 1>> quad_vec_faces;
         quad_vec_faces.reserve((matrix_free.n_inner_face_batches() +
-                                matrix_free.n_boundary_face_batches() +
-                                matrix_free.n_ghost_inner_face_batches()) *
+                                matrix_free.n_boundary_face_batches()) *
                                n_lanes);
         std::vector<
           std::pair<typename DoFHandler<dim>::cell_iterator, unsigned int>>
           vector_face_accessors_m;
         vector_face_accessors_m.reserve(
           (matrix_free.n_inner_face_batches() +
-           matrix_free.n_boundary_face_batches() +
-           matrix_free.n_ghost_inner_face_batches()) *
+           matrix_free.n_boundary_face_batches()) *
           n_lanes);
         // Fill container for inner face batches,
         unsigned int face_batch = 0;
@@ -1525,35 +1523,6 @@ namespace Step95
         // then for boundary face batches,
         for (; face_batch < (matrix_free.n_inner_face_batches() +
                              matrix_free.n_boundary_face_batches());
-             ++face_batch)
-          {
-            for (unsigned int v = 0; v < n_lanes; ++v)
-              {
-                if (v < matrix_free.n_active_entries_per_face_batch(face_batch))
-                  vector_face_accessors_m.push_back(
-                    matrix_free.get_face_iterator(face_batch, v, true));
-                else
-                  vector_face_accessors_m.push_back(
-                    matrix_free.get_face_iterator(face_batch, 0, true));
-
-                const auto &cell_m = vector_face_accessors_m.back().first;
-
-                const unsigned int f = vector_face_accessors_m.back().second;
-
-                if (is_intersected_cell(cell_m))
-                  {
-                    face_quadrature_generator.generate(cell_m, f);
-                    quad_vec_faces.push_back(
-                      face_quadrature_generator.get_inside_quadrature());
-                  }
-                else
-                  quad_vec_faces.emplace_back();
-              }
-          }
-        // and finally for ghost inner face batches.
-        for (; face_batch < (matrix_free.n_inner_face_batches() +
-                             matrix_free.n_boundary_face_batches() +
-                             matrix_free.n_ghost_inner_face_batches());
              ++face_batch)
           {
             for (unsigned int v = 0; v < n_lanes; ++v)
@@ -1844,7 +1813,7 @@ namespace Step95
         poisson_operator.rhs(rhs, rhs_function);
 
         solve();
-        if (cycle == 3)
+        if (cycle == n_refinements)
           output_results();
         const double error_L2 = compute_L2_error();
         const double cell_side_length =
