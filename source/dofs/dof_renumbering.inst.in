@@ -258,6 +258,9 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
         const unsigned int,
         const bool,
         const std::vector<types::global_dof_index> &);
+
+      template void
+      lexicographic(DoFHandler<deal_II_dimension> &, const double);
     \}
 #endif
   }
