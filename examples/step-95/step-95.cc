@@ -278,6 +278,14 @@ namespace Step95
 
     const auto &fe = matrix_free->get_dof_handler().get_fe();
 
+    // Currently, the constructor of FEPointEvaluation and FEFacePointEvaluation
+    // is too expensive to set those objects up on the fly. Hence, we set the
+    // objects up once when we reinitialize the operator. We need the
+    // `evaluator_cell` for evaluation of quadrature on cut cells,
+    // `evaluator_surface` for evaluation of quadrature on the unfitted
+    // boundary. Additionally, for discontinuous Galerkin discretizations, we
+    // also need two `evaluator_face` objects (interior/exterior) for the flux
+    // calculation on cut faces.
     evaluator_cell =
       std::make_unique<GenericCellEvaluator>(*mapping_info_cell, fe, 0, true);
     evaluator_surface = std::make_unique<GenericCellEvaluator>(
@@ -292,6 +300,10 @@ namespace Step95
                                                  false);
       }
 
+    // For the SIPG flux, the Nitsche term, and the ghost-penalty terms, we need
+    // a scaling by a characteristic element length. To quickly access these
+    // values, we precompute the characteristic element length and store it
+    // vectorized in a vector.
     matrix_free->initialize_cell_data_vector(cell_diameter);
     for (unsigned int cell_batch_index = 0;
          cell_batch_index <
@@ -344,6 +356,13 @@ namespace Step95
           const std::pair<unsigned int, unsigned int> &cell_range) {
         CellEvaluator evaluator(*matrix_free, dof_index, quad_index);
 
+        // In the `cell_loop()` we ask for the `cell_range_category` that
+        // encodes the `active_fe_index` of the cell batches int the current
+        // `cell_range`. Depending on the `active_fe_index` we can decide by
+        // using our helper functions from above, which path to choose for
+        // inside or intersected (cut) elements. On inside elements we use
+        // FEEvaluation for the quadrature evaluation, for cut elements we have
+        // to use FEPointEvaluation.
         const auto cell_range_category =
           matrix_free->get_cell_range_category(cell_range);
 
