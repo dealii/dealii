@@ -32,7 +32,7 @@ test()
 
   AffineConstraints<double> cm;
   cm.clear();
-  cm.reinit(rel);
+  cm.reinit(rel, rel);
 
   unsigned int inhoms[] = {8385,  8386,  8391,  17886, 17892, 17895, 18066,
                            18069, 18072, 18075, 18086, 18089, 18092, 18095,

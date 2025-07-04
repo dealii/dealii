@@ -38,7 +38,7 @@ test()
   local_active_together.add_range(0, 3);
   // local_active_together.compress();
 
-  AffineConstraints<double> cm(local_active_together);
+  AffineConstraints<double> cm(local_active_together, local_active_together);
   cm.constrain_dof_to_zero(1);
   cm.close();
   deallog << "OK" << std::endl;

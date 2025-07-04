@@ -40,7 +40,7 @@ test()
   deallog
     << "Create AffineConstraints<double> with constraints u(2)=.5*u(5), u(5)=.7*u(8)"
     << std::endl;
-  dealii::AffineConstraints<double> constraints1(index_set);
+  dealii::AffineConstraints<double> constraints1(index_set, index_set);
   constraints1.add_line(5);
   constraints1.add_entry(5, 8, .7);
   constraints1.add_line(2);

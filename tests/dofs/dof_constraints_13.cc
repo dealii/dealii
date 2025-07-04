@@ -33,9 +33,9 @@ main()
   auto local_lines  = complete_index_set(n1 + n2);
 
   // Fake two independent constraints on two independent dofs.
-  AffineConstraints<double> constraints1(local_lines1);
-  AffineConstraints<double> constraints2(local_lines2);
-  AffineConstraints<double> constraints(local_lines);
+  AffineConstraints<double> constraints1(local_lines1, local_lines1);
+  AffineConstraints<double> constraints2(local_lines2, local_lines2);
+  AffineConstraints<double> constraints(local_lines, local_lines);
 
   constraints1.add_line(1);
   constraints1.add_entry(1, 2, 1.0);
@@ -56,7 +56,7 @@ main()
   // Since in applications you usually need also the second constraints,
   // do this on a copy.
   {
-    AffineConstraints<double> tmp(local_lines2);
+    AffineConstraints<double> tmp(local_lines2, local_lines2);
     tmp.merge(constraints2);
     tmp.shift(n1);
     deallog << "constraints2 shifted:" << std::endl;
