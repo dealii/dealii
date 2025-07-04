@@ -23,7 +23,6 @@
 
 #include <deal.II/base/function.h>
 
-#include <deal.II/distributed/solution_transfer.h>
 #include <deal.II/distributed/tria.h>
 
 #include <deal.II/dofs/dof_accessor.h>
@@ -39,6 +38,7 @@
 
 #include <deal.II/lac/la_parallel_vector.h>
 
+#include <deal.II/numerics/solution_transfer.h>
 #include <deal.II/numerics/vector_tools.h>
 
 #include "../tests.h"
@@ -81,11 +81,10 @@ test()
                            dgq_solution);
   dgq_solution.update_ghost_values();
 
-  parallel::distributed::
-    SolutionTransfer<dim, LinearAlgebra::distributed::Vector<double>>
+  SolutionTransfer<dim, LinearAlgebra::distributed::Vector<double>>
 
 
-      dgq_soltrans(dgq_dof_handler);
+    dgq_soltrans(dgq_dof_handler);
   dgq_soltrans.prepare_for_coarsening_and_refinement(dgq_solution);
 
   // refine and transfer

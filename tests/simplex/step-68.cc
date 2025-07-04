@@ -34,7 +34,6 @@
 
 #include <deal.II/distributed/cell_weights.h>
 #include <deal.II/distributed/fully_distributed_tria.h>
-#include <deal.II/distributed/solution_transfer.h>
 #include <deal.II/distributed/tria.h>
 
 #include <deal.II/dofs/dof_handler.h>

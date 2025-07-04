@@ -19,7 +19,6 @@
 #include <deal.II/base/tensor.h>
 #include <deal.II/base/utilities.h>
 
-#include <deal.II/distributed/solution_transfer.h>
 #include <deal.II/distributed/tria.h>
 
 #include <deal.II/dofs/dof_handler.h>
