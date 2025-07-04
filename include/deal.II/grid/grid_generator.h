@@ -634,15 +634,15 @@ namespace GridGenerator
   template <int dim>
   void
   uniform_channel_with_cylinder(
-    Triangulation<dim>             &tria,
+    Triangulation<dim>              &tria,
     const std::vector<unsigned int> &lengths_and_heights,
-    const double                    depth                  = 1,
-    const unsigned int              depth_division         = 1,
-    const double                    shell_region_radius    = 0.75,
-    const unsigned int              n_shells               = 2,
-    const double                    skewness               = 2.0,
-    const bool                      use_transfinite_region = false,
-    const bool                      colorize               = false);
+    const double                     depth                  = 1,
+    const unsigned int               depth_division         = 1,
+    const double                     shell_region_radius    = 0.75,
+    const unsigned int               n_shells               = 2,
+    const double                     skewness               = 2.0,
+    const bool                       use_transfinite_region = false,
+    const bool                       colorize               = false);
 
   /**
    * A general @p dim -dimensional cell (a segment if dim is 1, a quadrilateral
