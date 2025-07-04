@@ -635,7 +635,7 @@ namespace GridGenerator
   void
   uniform_channel_with_cylinder(
     Triangulation<dim>             &tria,
-    const std::vector<unsigned int> lengths_and_heights,
+    const std::vector<unsigned int> &lengths_and_heights,
     const double                    depth                  = 1,
     const unsigned int              depth_division         = 1,
     const double                    shell_region_radius    = 0.75,

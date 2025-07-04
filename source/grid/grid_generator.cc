@@ -3832,7 +3832,7 @@ namespace GridGenerator
   template <>
   void
   uniform_channel_with_cylinder(Triangulation<1> &,
-                                const std::vector<unsigned int>,
+                                const std::vector<unsigned int>&,
                                 const double,
                                 unsigned int,
                                 const double,
@@ -3848,7 +3848,7 @@ namespace GridGenerator
   void
   uniform_channel_with_cylinder(
     Triangulation<2>               &tria,
-    const std::vector<unsigned int> lengths_and_heights,
+    const std::vector<unsigned int> &lengths_and_heights,
     const double,
     unsigned int,
     const double       shell_region_radius,
@@ -4025,7 +4025,7 @@ namespace GridGenerator
   void
   uniform_channel_with_cylinder(
     Triangulation<3>               &tria,
-    const std::vector<unsigned int> lengths_and_heights,
+    const std::vector<unsigned int> &lengths_and_heights,
     const double                    depth,
     unsigned int                    depth_division,
     const double                    shell_region_radius,
