@@ -1247,7 +1247,7 @@ namespace Step70
     fluid_relevant_dofs[1] = locally_relevant_dofs.get_view(n_u, n_u + n_p);
 
     {
-      constraints.reinit(locally_relevant_dofs);
+      constraints.reinit(fluid_dh.locally_owned_dofs(), locally_relevant_dofs);
 
       const FEValuesExtractors::Vector velocities(0);
       DoFTools::make_hanging_node_constraints(fluid_dh, constraints);

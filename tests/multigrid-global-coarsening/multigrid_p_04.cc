@@ -87,7 +87,8 @@ test(const unsigned int n_refinements,
   AffineConstraints<Number> fine_constraints;
   const IndexSet            locally_relevant_dofs =
     DoFTools::extract_locally_relevant_dofs(fine_dof_handler);
-  fine_constraints.reinit(locally_relevant_dofs);
+  fine_constraints.reinit(fine_dof_handler.locally_owned_dofs(),
+                          locally_relevant_dofs);
   VectorTools::interpolate_boundary_values(*mapping,
                                            fine_dof_handler,
                                            0,

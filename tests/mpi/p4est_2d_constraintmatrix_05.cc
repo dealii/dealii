@@ -68,7 +68,7 @@ test()
   // AffineConstraints<double>::distribute should not do
   // anything
   x1 = x_ref;
-  AffineConstraints<double> cm(relevant_set);
+  AffineConstraints<double> cm(owned_set, relevant_set);
   DoFTools::make_hanging_node_constraints(dofh, cm);
   cm.close();
   cm.distribute(x1);

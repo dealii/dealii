@@ -1116,7 +1116,8 @@ namespace StokesClass
         const IndexSet relevant_dofs =
           DoFTools::extract_locally_relevant_level_dofs(dof_handler_u, level);
         AffineConstraints<double> level_constraints;
-        level_constraints.reinit(relevant_dofs);
+        level_constraints.reinit(dof_handler_u.locally_owned_dofs(),
+                                 relevant_dofs);
         level_constraints.add_lines(
           mg_constrained_dofs.get_boundary_indices(level));
         level_constraints.close();

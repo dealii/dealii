@@ -182,7 +182,7 @@ namespace Step77
     // Specifically, we need two types of AffineConstraints.
     // One to handle homogeneous boundary conditions for the update step.
     zero_constraints.clear();
-    zero_constraints.reinit(locally_relevant_dofs);
+    zero_constraints.reinit(locally_owned_dofs, locally_relevant_dofs);
     DoFTools::make_hanging_node_constraints(dof_handler, zero_constraints);
     VectorTools::interpolate_boundary_values(dof_handler,
                                              0,
@@ -193,7 +193,7 @@ namespace Step77
     // And another one to handle non-homogeneous boundary conditions
     // when computing the residual function.
     bc_constraints.clear();
-    bc_constraints.reinit(locally_relevant_dofs);
+    bc_constraints.reinit(locally_owned_dofs, locally_relevant_dofs);
     DoFTools::make_hanging_node_constraints(dof_handler, bc_constraints);
     VectorTools::interpolate_boundary_values(dof_handler,
                                              0,

@@ -301,7 +301,8 @@ do_test(const std::vector<const DoFHandler<dim> *> &dof)
         // this is to make it consistent with parallel_multigrid_adaptive.cc
         AffineConstraints<double> hanging_node_constraints;
 
-        hanging_node_constraints.reinit(locally_relevant_dofs[b]);
+        hanging_node_constraints.reinit(dof[b]->locally_owned_dofs(),
+                                        locally_relevant_dofs[b]);
         DoFTools::make_hanging_node_constraints(*dof[b],
                                                 hanging_node_constraints);
         hanging_node_constraints.close();

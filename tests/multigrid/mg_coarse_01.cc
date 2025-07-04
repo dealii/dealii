@@ -205,7 +205,8 @@ namespace Step50
 
     solution.reinit(mg_dof_handler.locally_owned_dofs(), MPI_COMM_WORLD);
     system_rhs.reinit(mg_dof_handler.locally_owned_dofs(), MPI_COMM_WORLD);
-    constraints.reinit(locally_relevant_set);
+    constraints.reinit(mg_dof_handler.locally_owned_dofs(),
+                       locally_relevant_set);
     DoFTools::make_hanging_node_constraints(mg_dof_handler, constraints);
 
     std::map<types::boundary_id, const Function<dim> *> dirichlet_boundary;

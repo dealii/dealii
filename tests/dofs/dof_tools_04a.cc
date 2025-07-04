@@ -55,7 +55,8 @@ check_this(const DoFHandler<dim> &dof_handler)
   const IndexSet is_hanging_node_constrained =
     DoFTools::extract_hanging_node_dofs(dof_handler);
 
-  AffineConstraints<double> constraints(locally_relevant_dofs);
+  AffineConstraints<double> constraints(dof_handler.locally_owned_dofs(),
+                                        locally_relevant_dofs);
   DoFTools::make_hanging_node_constraints(dof_handler, constraints);
   constraints.close();
 

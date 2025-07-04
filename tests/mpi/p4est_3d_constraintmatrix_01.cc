@@ -72,7 +72,7 @@ test()
 
   AffineConstraints<double> cm;
   DoFTools::make_hanging_node_constraints(dofh, cm);
-  AffineConstraints<double> cm2(dof_set);
+  AffineConstraints<double> cm2(dofh.locally_owned_dofs(), dof_set);
   DoFTools::make_hanging_node_constraints(dofh, cm2);
 
   {

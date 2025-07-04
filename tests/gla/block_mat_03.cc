@@ -103,7 +103,8 @@ test()
 
   using number = typename LA::MPI::BlockSparseMatrix::value_type;
 
-  AffineConstraints<number> constraints(locally_relevant_dofs);
+  AffineConstraints<number> constraints(locally_owned_dofs,
+                                        locally_relevant_dofs);
   constraints.close();
 
   BlockDynamicSparsityPattern bcsp(locally_relevant_partitioning);
@@ -207,7 +208,8 @@ test_alt()
   locally_relevant_dofs.print(deallog);
 
 
-  AffineConstraints<double> constraints(locally_relevant_dofs);
+  AffineConstraints<double> constraints(locally_owned_dofs,
+                                        locally_relevant_dofs);
   constraints.close();
 
   TrilinosWrappers::BlockSparsityPattern sp(locally_owned_partitioning,

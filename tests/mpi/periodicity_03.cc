@@ -267,7 +267,7 @@ namespace Step22
         locally_relevant_dofs.get_view(n_u, n_u + n_p));
 
       constraints.clear();
-      constraints.reinit(locally_relevant_dofs);
+      constraints.reinit(locally_owned_dofs, locally_relevant_dofs);
 
       const FEValuesExtractors::Vector velocities(0);
       const FEValuesExtractors::Scalar pressure(dim);

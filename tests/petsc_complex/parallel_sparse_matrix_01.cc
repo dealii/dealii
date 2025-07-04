@@ -84,7 +84,7 @@ test(const unsigned int poly_degree = 1)
   vector.reinit(locally_owned_dofs, mpi_communicator);
 
   AffineConstraints<PetscScalar> constraints;
-  constraints.reinit(locally_relevant_dofs);
+  constraints.reinit(locally_owned_dofs, locally_relevant_dofs);
   DoFTools::make_hanging_node_constraints(dof_handler, constraints);
   constraints.close();
 

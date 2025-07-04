@@ -66,7 +66,8 @@ test()
     std::max<int>(100 * myid - 50, 0),
     std::min(static_cast<types::global_dof_index>(100 * myid + 150),
              vec.size()));
-  AffineConstraints<PetscScalar> cm(locally_relevant_range);
+  AffineConstraints<PetscScalar> cm(vec.locally_owned_elements(),
+                                    locally_relevant_range);
 
   // add constraints that constrain an element in the middle of the
   // local range of each processor against an element outside, both in

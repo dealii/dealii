@@ -52,7 +52,8 @@ test()
 
   AffineConstraints<double> constraints;
 
-  constraints.reinit(DoFTools::extract_locally_relevant_dofs(dof_handler));
+  constraints.reinit(dof_handler.locally_owned_dofs(),
+                     DoFTools::extract_locally_relevant_dofs(dof_handler));
   for (unsigned int d = 0; d < dim; ++d)
     DoFTools::make_periodicity_constraints(
       dof_handler, 2 * d, 2 * d + 1, d, constraints);

@@ -133,7 +133,7 @@ test(const unsigned int n_glob_ref = 2, const unsigned int n_ref = 0)
 
   // constraints:
   AffineConstraints<double> constraints;
-  constraints.reinit(locally_relevant_dofs);
+  constraints.reinit(locally_owned_dofs, locally_relevant_dofs);
   DoFTools::make_hanging_node_constraints(dof_handler, constraints);
   constraints.close();
 
