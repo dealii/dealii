@@ -2,7 +2,7 @@
 This program was contributed by Maximilian Bergbauer. Many ideas presented here are the result of common code
 development with Martin Kronbichler and Peter Munch.
 
-The material is based upon the work "High-performance matrix-free unfitted finite element operator evaluation"
+The material is based upon the work "High-performance matrix-free unfitted finite element operator evaluation" @cite bergbauer2024
 by Maximilian Bergbauer, Peter Munch, Wolfgang A. Wall, and Martin Kronbichler supported by the German Research
 Foundation (DFG) under the project
 “High-Performance Cut Discontinuous Galerkin Methods for Flow Problems and Surface-Coupled Multiphysics Problems”
