@@ -66,7 +66,7 @@ namespace Operators
   /**
    *
    * This class implements the Laplace operator $-\Delta u$ as in step-37 using
-   * matrix-free techniques based on the deal.II::MatrixFree framework. It
+   * matrix-free techniques based on deal.II's MatrixFree framework. It
    * derives from MatrixFreeOperators::Base, providing the necessary interface
    * for matrix-vector products (`vmult`, `Tvmult`) and diagonal computation.
    *
