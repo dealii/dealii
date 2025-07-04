@@ -88,7 +88,7 @@ test()
   TrilinosWrappers::MPI::Vector x_rel;
   x_rel.reinit(relevant_set, MPI_COMM_WORLD);
 
-  AffineConstraints<double> cm(relevant_set);
+  AffineConstraints<double> cm(owned_set, relevant_set);
   DoFTools::make_hanging_node_constraints(dofh, cm);
   ComponentMask velocity_mask(dim + 1, true);
 

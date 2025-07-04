@@ -150,7 +150,7 @@ namespace Step40
 
     // Periodic Conditions
     constraints.clear();
-    constraints.reinit(locally_relevant_dofs);
+    constraints.reinit(locally_owned_dofs, locally_relevant_dofs);
     DoFTools::make_hanging_node_constraints(dof_handler, constraints);
     for (int i = 1; i < dim; ++i)
       DoFTools::make_periodicity_constraints(dof_handler,

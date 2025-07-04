@@ -122,7 +122,7 @@ test(const unsigned int degree_center,
 
   AffineConstraints<double> constraints;
   constraints.clear();
-  constraints.reinit(locally_relevant_dofs);
+  constraints.reinit(dh.locally_owned_dofs(), locally_relevant_dofs);
 
   DoFTools::make_hanging_node_constraints(dh, constraints);
 

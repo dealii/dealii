@@ -185,7 +185,8 @@ check_fe(FiniteElement<dim> &fe)
 
         const IndexSet relevant =
           DoFTools::extract_locally_relevant_level_dofs(dofh, level);
-        mg_boundary_constraints[level].reinit(relevant);
+        mg_boundary_constraints[level].reinit(dofh.locally_owned_mg_dofs(level),
+                                              relevant);
         mg_boundary_constraints[level].add_lines(boundary_indices[level]);
 
         mg_constrained_dofs_1.add_boundary_indices(dofh,

@@ -58,8 +58,8 @@ test()
   const IndexSet &owned_set    = dof.locally_owned_dofs();
   const IndexSet  relevant_set = DoFTools::extract_locally_relevant_dofs(dof);
 
-  AffineConstraints<double> constraints_0(relevant_set),
-    constraints_1(relevant_set);
+  AffineConstraints<double> constraints_0(owned_set, relevant_set),
+    constraints_1(owned_set, relevant_set);
   VectorTools::interpolate_boundary_values(dof,
                                            0,
                                            Functions::ZeroFunction<dim>(),

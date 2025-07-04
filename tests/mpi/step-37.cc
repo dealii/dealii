@@ -216,7 +216,7 @@ namespace Step37
       DoFTools::extract_locally_relevant_dofs(dof_handler);
 
     constraints.clear();
-    constraints.reinit(locally_relevant_dofs);
+    constraints.reinit(dof_handler.locally_owned_dofs(), locally_relevant_dofs);
     DoFTools::make_hanging_node_constraints(dof_handler, constraints);
     VectorTools::interpolate_boundary_values(dof_handler,
                                              0,
@@ -258,7 +258,8 @@ namespace Step37
         const IndexSet relevant_dofs =
           DoFTools::extract_locally_relevant_level_dofs(dof_handler, level);
         AffineConstraints<double> level_constraints;
-        level_constraints.reinit(relevant_dofs);
+        level_constraints.reinit(dof_handler.locally_owned_mg_dofs(level),
+                                 relevant_dofs);
         level_constraints.add_lines(
           mg_constrained_dofs.get_boundary_indices(level));
         level_constraints.close();
@@ -322,8 +323,10 @@ namespace Step37
     non_homogeneous_constraints.clear();
     {
       AffineConstraints<double> hanging_nodes_laplace_constraints;
-      hanging_nodes_laplace_constraints.reinit(locally_relevant_dofs);
-      non_homogeneous_constraints.reinit(locally_relevant_dofs);
+      hanging_nodes_laplace_constraints.reinit(dof_handler.locally_owned_dofs(),
+                                               locally_relevant_dofs);
+      non_homogeneous_constraints.reinit(dof_handler.locally_owned_dofs(),
+                                         locally_relevant_dofs);
       DoFTools::make_hanging_node_constraints(
         dof_handler, hanging_nodes_laplace_constraints);
 

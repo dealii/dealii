@@ -147,7 +147,7 @@ test()
       AffineConstraints<double> level_constraints;
       const IndexSet            relevant_dofs =
         DoFTools::extract_locally_relevant_level_dofs(dof, level);
-      level_constraints.reinit(relevant_dofs);
+      level_constraints.reinit(dof.locally_owned_mg_dofs(level), relevant_dofs);
       level_constraints.add_lines(
         mg_constrained_dofs.get_boundary_indices(level));
       level_constraints.close();
