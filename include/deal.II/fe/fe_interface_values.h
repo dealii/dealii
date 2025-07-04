@@ -1611,6 +1611,8 @@ public:
    * The normal points in outwards direction as seen from the first cell of
    * this interface.
    *
+   * @deprecated Use the function normal_vector().
+   *
    * @dealiiRequiresUpdateFlags{update_normal_vectors}
    */
   DEAL_II_DEPRECATED_EARLY_WITH_COMMENT("Use the function normal_vector().")
