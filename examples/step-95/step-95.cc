@@ -67,7 +67,7 @@ namespace Step95
   using namespace dealii;
 
   // We define helper functions to determine if a cell (or a batch of cells) is
-  // inside or intersected depending on the active_fe_index.
+  // inside or intersected depending on the `active_fe_index`.
   inline bool is_inside(const unsigned int active_fe_index)
   {
     return active_fe_index ==
@@ -98,8 +98,8 @@ namespace Step95
   }
 
   // @sect3{The PoissonOperator class Template}
-  // This operator applies the matrix-free operator evaluation with the vmult()
-  // function.
+  // This operator applies the matrix-free operator evaluation with the
+  // `vmult()` function.
   template <int dim>
   class PoissonOperator
   {
@@ -255,7 +255,7 @@ namespace Step95
   };
 
 
-  // In the reinit() function the PoissonOperator receives the necessary
+  // In the `reinit()` function the `PoissonOperator` receives the necessary
   // information for matrix-free evaluation, i.e., the MatrixFree object for
   // inside cells and the NonMatching::MappingInfo objects for intersected
   // cells.
@@ -410,7 +410,7 @@ namespace Step95
   // With this function, we can assemble the diagonal of the operator instead
   // of applying the matrix-vector product. It uses the same function as the
   // operator evaluation for the local operation on cells and faces but sets
-  // the template argument assemble to true.
+  // the template argument `assemble` to true.
   template <int dim>
   void PoissonOperator<dim>::compute_diagonal(
     PoissonOperator::VectorType &diagonal) const
@@ -476,7 +476,7 @@ namespace Step95
       evaluator.integrate(EvaluationFlags::gradients);
     };
 
-    // We define the cell_operation for intersected cells as the standard
+    // We define the `cell_operation` for intersected cells as the standard
     // Poisson term in the cut volume and the Nitsche term for weak Dirichlet
     // boundary enforcement on the cut surface.
     const auto intersected_cell_operation = [&](CellEvaluator &evaluator) {
@@ -534,8 +534,8 @@ namespace Step95
         }
     };
 
-    // Depending on the active_fe_index of the cell_range we select the
-    // cell_operation to execute.
+    // Depending on the `active_fe_index` of the `cell_range` we select the
+    // `cell_operation` to execute.
     std::function<void(CellEvaluator &)> cell_operation;
     if (is_inside(cell_range_category))
       cell_operation = inside_cell_operation;
@@ -544,10 +544,10 @@ namespace Step95
     else
       return;
 
-    // We loop over the cell batches of the current cell_range and apply the
-    // cell_operation. For a vmult() we only apply once, for diagonal assembly
-    // we apply the cell_operation to the respective unit vector for every
-    // local cell DoF.
+    // We loop over the cell batches of the current `cell_range` and apply the
+    // `cell_operation`. For a `vmult()` we only apply once, for diagonal
+    // assembly we apply the cell_operation to the respective unit vector for
+    // every local cell DoF.
     for (unsigned int cell_batch_index = cell_range.first;
          cell_batch_index < cell_range.second;
          ++cell_batch_index)
@@ -609,7 +609,7 @@ namespace Step95
       assemble ? evaluator_p.dofs_per_cell : 0);
 
     // We start with the face operations for the DG case.
-    // We define the face_operation for an inside face as the SIPG term.
+    // We define the `face_operation` for an inside face as the SIPG term.
     const auto inside_face_operation_dg = [&](FaceEvaluator &evaluator_m,
                                               FaceEvaluator &evaluator_p) {
       const unsigned int face_batch_index =
@@ -625,7 +625,7 @@ namespace Step95
                                diameter);
     };
 
-    // We define the face_operation for a mixed face (between an inside and an
+    // We define the `face_operation` for a mixed face (between an inside and an
     // intersected cell) as the SIPG term plus the ghost penalty term.
     const auto mixed_face_operation_dg = [&](FaceEvaluator &evaluator_m,
                                              FaceEvaluator &evaluator_p) {
@@ -649,7 +649,7 @@ namespace Step95
                                         true);
     };
 
-    // We define the face_operation for an intersected face (between two
+    // We define the `face_operation` for an intersected face (between two
     // intersected cells) as the SIPG term plus the ghost penalty term.
     const auto intersected_face_operation_dg = [&](FaceEvaluator &evaluator_m,
                                                    FaceEvaluator &evaluator_p) {
@@ -723,7 +723,7 @@ namespace Step95
                                            false);
       };
 
-    // Depending on the active_fe_index of the two cells sharing the current
+    // Depending on the `active_fe_index` of the two cells sharing the current
     // face we select the face_operation.
     std::function<void(FaceEvaluator &, FaceEvaluator &)> face_operation;
 
@@ -758,9 +758,9 @@ namespace Step95
           return;
       }
 
-    // We loop over the face batches of the current face_range and apply the
-    // face_operation. Again, for the vmult() the face_operation is executed
-    // once, for diagonal assembly for every unit DoF vector of the two
+    // We loop over the face batches of the current `face_range` and apply the
+    // `face_operation`. Again, for the `vmult()` the `face_operation` is
+    // executed once, for diagonal assembly for every unit DoF vector of the two
     // face-sharing cells.
     for (unsigned int face_batch_index = face_range.first;
          face_batch_index < face_range.second;
@@ -843,8 +843,8 @@ namespace Step95
 
 
   // This is the actual implementation of the quadrature point operation of
-  // the Poisson term in the weak form. It is templated over the EvaluatorType
-  // type to be usable by FEEvaluation as well as FEPointEvaluation.
+  // the Poisson term in the weak form. It is templated over the `EvaluatorType`
+  // to be usable by FEEvaluation as well as FEPointEvaluation.
   template <int dim>
   template <typename EvaluatorType>
   void PoissonOperator<dim>::do_poisson_cell_term(EvaluatorType     &evaluator,
@@ -856,7 +856,7 @@ namespace Step95
 
 
   // The implementation for the SIPG term (needed for DG). Again, templated
-  // over the EvaluatorType type to be usable by FEFaceEvaluation and
+  // over the `EvaluatorType` to be usable by FEFaceEvaluation and
   // FEFacePointEvaluation.
   template <int dim>
   template <typename EvaluatorType, typename Number2>
@@ -910,8 +910,8 @@ namespace Step95
 
 
   // The implementation of the face-based ghost penalty term (up to degree 2 /
-  // normal hessians). For continuous elements, we have value_m = value_p thanks
-  // to continuity, which allows us to skip this term.
+  // normal hessians). For continuous elements, we have `value_m = value_p`
+  // thanks to continuity, which allows us to skip this term.
   template <int dim>
   template <bool do_normal_hessians, bool do_values, typename EvaluatorType>
   void PoissonOperator<dim>::do_gp_face_term(
@@ -980,7 +980,7 @@ namespace Step95
 
 
 
-  // This implements the face_operation of the SIPG term (setting values in
+  // This implements the `face_operation` of the SIPG term (setting values in
   // integrate()).
   template <int dim>
   void PoissonOperator<dim>::do_local_apply_sipg_term(
@@ -1006,8 +1006,8 @@ namespace Step95
 
 
 
-  // This implements the face_operation of the ghost penalty term (potentially
-  // adding into the values in integrate() depending on sum_into_values).
+  // This implements the `face_operation` of the ghost penalty term (potentially
+  // adding into the values in `integrate()` depending on `sum_into_values`).
   template <int dim>
   template <bool is_dg_>
   void PoissonOperator<dim>::do_local_apply_gp_face_term(
@@ -1066,7 +1066,7 @@ namespace Step95
 
 
   // Three helper functions to determine the category of face based on the
-  // active_fe_index of the face-sharing cells.
+  // `active_fe_index` of the face-sharing cells.
   template <int dim>
   bool PoissonOperator<dim>::is_inside_face(
     std::pair<unsigned int, unsigned int> face_category) const
@@ -1145,7 +1145,7 @@ namespace Step95
 
 
   // @sect3{The Jacobi preconditioner}
-  // Assembly is done in the constructor by calling the compute_diagonal()
+  // Assembly is done in the constructor by calling the `compute_diagonal()`
   // function of the operator.
   template <int dim>
   class JacobiPreconditioner
@@ -1201,15 +1201,15 @@ namespace Step95
 
 
   // @sect3{The PoissonSolver class template}
-  // The PoissonSolver runs the solver in the run() function. First, it sets up
-  // necessary data structures: the parallel::distributed::Triangulation, the
+  // The `PoissonSolver` runs the solver in the `run()` function. First, it sets
+  // up necessary data structures: the parallel::distributed::Triangulation, the
   // discrete level-set with its DoFHandler, the DoFHandler of the solution, and
   // the MatrixFree and NonMatching::MappingInfo objects. With these
-  // ingredients, the PoissonOperator is set up. Then the Jacobi preconditioner
-  // and the right-hand-side are assembled using the PoissonOperator. Now, we
-  // solve the problem with a preconditioned iterative SolverCG, calculate the
-  // errors compared to the analytical solution, and output the results in .vtu
-  // format via DataOut.
+  // ingredients, the `PoissonOperator` is set up. Then the Jacobi
+  // preconditioner and the right-hand-side are assembled using the
+  // `PoissonOperator`. Now, we solve the problem with a preconditioned
+  // iterative SolverCG, calculate the errors compared to the analytical
+  // solution, and output the results in `.vtu` format via DataOut.
   template <int dim>
   class PoissonSolver
   {
@@ -1354,8 +1354,8 @@ namespace Step95
   // NonMatching::LocationToLevelSet for each cell in the mesh and tell the
   // DoFHandler to use FE_Q or FE_DGQ on elements that are inside or
   // intersected, and FE_Nothing on the elements that are outside. Here, we fill
-  // the hp::FECollection and set the active_fe_index in a way that the
-  // active_fe_index corresponds to the unsigned int value of
+  // the hp::FECollection and set the `active_fe_index` in a way that the
+  // `active_fe_index` corresponds to the `unsigned int` value of
   // NonMatching::LocationToLevelSet.
   template <int dim>
   void PoissonSolver<dim>::distribute_dofs()
@@ -1581,7 +1581,7 @@ namespace Step95
               }
           }
 
-        // And finally, initialize the NonMatching::MappingInfo object for the
+        // and finally, initialize the NonMatching::MappingInfo object for the
         // cut faces.
         mapping_info_faces = std::make_unique<
           NonMatching::MappingInfo<dim, dim, VectorizedArray<Number>>>(
