@@ -37,12 +37,12 @@ test_quadrilaterals()
 
   std::vector<std::pair<std::string, std::string>> names_and_args;
 
-  // only for meshes that have no holes
-  // extension to CGAL::Polygon_with_holes possible
   names_and_args = {{"hyper_cube", "0.0 : 1.0 : false"},
                     {"hyper_ball_balanced", "0.,0. : 1. "},
                     {"hyper_L", "0.0 : 1.0 : false"},
-                    {"simplex", "0.0, 0.0 ; 1.0 , 0.0 ; 0.0, 1.0"}};
+                    {"simplex", "0.0, 0.0 ; 1.0 , 0.0 ; 0.0, 1.0"},
+                    {"channel_with_cylinder", "0.03 : 2 : 2.0 : false"},
+                    {"cheese", "2 , 2"}};
 
 
   for (const auto &info_pair : names_and_args)
@@ -52,7 +52,8 @@ test_quadrilaterals()
       deallog << "name: " << name << std::endl;
       GridGenerator::generate_from_name_and_arguments(tria_in, name, args);
       tria_in.refine_global(2);
-      auto poly = dealii_tria_to_cgal_polygon<K>(tria_in, mapping);
+      auto poly_w_h = dealii_tria_to_cgal_polygon<K>(tria_in, mapping);
+      auto poly     = poly_w_h.outer_boundary();
 
       deallog << "Simple polygon: " << std::boolalpha << poly.is_simple()
               << std::endl;
@@ -60,6 +61,16 @@ test_quadrilaterals()
               << poly.is_counterclockwise_oriented() << std::endl;
       deallog << "deal measure: " << GridTools::volume(tria_in)
               << ", cgal measure: " << poly.area() << std::endl;
+
+      for (const auto &hole : poly_w_h.holes())
+        {
+          deallog << "Hole is simple polygon: " << std::boolalpha
+                  << hole.is_simple() << std::endl;
+          deallog << "Hole is counterclockwise oriented polygon: "
+                  << std::boolalpha << hole.is_counterclockwise_oriented()
+                  << std::endl;
+          deallog << "Hole has measure: " << hole.area() << std::endl;
+        }
 
       // every vertex of the tria should be inside or on the boundary
       const auto &vertices = tria_in.get_vertices();
@@ -92,7 +103,8 @@ test_triangles()
   GridGenerator::hyper_cube(tria_quad, 0., 1., false);
   tria_quad.refine_global(2);
   GridGenerator::convert_hypercube_to_simplex_mesh(tria_quad, tria_simplex);
-  auto poly = dealii_tria_to_cgal_polygon<K>(tria_simplex, mapping);
+  auto poly_w_h = dealii_tria_to_cgal_polygon<K>(tria_simplex, mapping);
+  auto poly     = poly_w_h.outer_boundary();
 
   deallog << "Simple polygon: " << std::boolalpha << poly.is_simple()
           << std::endl;
