@@ -17,7 +17,6 @@
 // Test distributed SolutionTransfer with hp-refinement and manually set flags.
 
 
-#include <deal.II/distributed/solution_transfer.h>
 #include <deal.II/distributed/tria.h>
 
 #include <deal.II/dofs/dof_handler.h>
@@ -30,6 +29,8 @@
 #include <deal.II/hp/fe_collection.h>
 
 #include <deal.II/lac/la_parallel_vector.h>
+
+#include <deal.II/numerics/solution_transfer.h>
 
 #include "../tests.h"
 
@@ -108,9 +109,8 @@ test()
       }
 
   // initiate refinement and transfer
-  parallel::distributed::
-    SolutionTransfer<dim, LinearAlgebra::distributed::Vector<double>>
-      soltrans(dofh);
+  SolutionTransfer<dim, LinearAlgebra::distributed::Vector<double>> soltrans(
+    dofh);
   soltrans.prepare_for_coarsening_and_refinement(solution);
 
   tria.execute_coarsening_and_refinement();

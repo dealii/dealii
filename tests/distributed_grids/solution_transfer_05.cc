@@ -19,7 +19,6 @@
 
 #include <deal.II/base/mpi.h>
 
-#include <deal.II/distributed/solution_transfer.h>
 #include <deal.II/distributed/tria.h>
 
 #include <deal.II/dofs/dof_handler.h>
@@ -30,6 +29,8 @@
 #include <deal.II/grid/grid_generator.h>
 
 #include <deal.II/lac/la_parallel_vector.h>
+
+#include <deal.II/numerics/solution_transfer.h>
 
 #include "../tests.h"
 
@@ -74,9 +75,8 @@ main(int argc, char **argv)
 
   v.print(deallog.get_file_stream());
 
-  parallel::distributed::
-    SolutionTransfer<dim, LinearAlgebra::distributed::Vector<Number>>
-      solution_trans(dof_handler, true /*enabling averaging*/);
+  SolutionTransfer<dim, LinearAlgebra::distributed::Vector<Number>>
+    solution_trans(dof_handler, true /*enabling averaging*/);
 
   v.update_ghost_values();
   solution_trans.prepare_for_coarsening_and_refinement(v);
