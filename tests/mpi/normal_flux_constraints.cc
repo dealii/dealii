@@ -105,7 +105,7 @@ test()
   const IndexSet relevant_set = DoFTools::extract_locally_relevant_dofs(dofh);
 
   AffineConstraints<double> constraints;
-  constraints.reinit(relevant_set);
+  constraints.reinit(dofh.locally_owned_dofs(), relevant_set);
   DoFTools::make_hanging_node_constraints(dofh, constraints);
   std::set<types::boundary_id> no_normal_flux_boundaries;
   no_normal_flux_boundaries.insert(1);

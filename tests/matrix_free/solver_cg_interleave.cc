@@ -194,7 +194,7 @@ test(const unsigned int fe_degree)
 
   IndexSet                  owned_set = dof.locally_owned_dofs();
   IndexSet                  relevant_set;
-  AffineConstraints<double> constraints(relevant_set);
+  AffineConstraints<double> constraints(owned_set, relevant_set);
   typename MatrixFree<dim, number>::AdditionalData addit_data;
   addit_data.tasks_parallel_scheme =
     MatrixFree<dim, number>::AdditionalData::none;

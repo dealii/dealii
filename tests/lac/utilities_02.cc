@@ -96,7 +96,7 @@ test()
   const IndexSet locally_relevant_dofs =
     DoFTools::extract_locally_relevant_dofs(dof_handler);
   AffineConstraints<double> constraints;
-  constraints.reinit(locally_relevant_dofs);
+  constraints.reinit(dof_handler.locally_owned_dofs(), locally_relevant_dofs);
   DoFTools::make_hanging_node_constraints(dof_handler, constraints);
   VectorTools::interpolate_boundary_values(dof_handler,
                                            0,

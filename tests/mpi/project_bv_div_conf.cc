@@ -197,7 +197,8 @@ namespace ResFlow
           << std::endl;
 
     {
-      constraints.reinit(locally_relevant_dofs);
+      constraints.reinit(dof_handler.locally_owned_dofs(),
+                         locally_relevant_dofs);
 
       const FEValuesExtractors::Vector velocities(0);
       DoFTools::make_hanging_node_constraints(dof_handler, constraints);

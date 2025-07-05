@@ -63,7 +63,7 @@ test()
   const IndexSet &owned_set    = dof.locally_owned_dofs();
   const IndexSet  relevant_set = DoFTools::extract_locally_relevant_dofs(dof);
 
-  AffineConstraints<double> constraints(relevant_set);
+  AffineConstraints<double> constraints(owned_set, relevant_set);
   DoFTools::make_hanging_node_constraints(dof, constraints);
   constraints.close();
 

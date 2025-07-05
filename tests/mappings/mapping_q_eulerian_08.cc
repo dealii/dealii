@@ -171,7 +171,7 @@ test(const unsigned int n_ref = 0)
   constraints_euler.close();
 
   AffineConstraints<double> constraints;
-  constraints.reinit(locally_relevant_dofs);
+  constraints.reinit(locally_owned_dofs, locally_relevant_dofs);
   DoFTools::make_hanging_node_constraints(dof_handler, constraints);
   constraints_euler.close();
 
@@ -292,7 +292,7 @@ test(const unsigned int n_ref = 0)
       AffineConstraints<double> level_constraints;
       const IndexSet            relevant_dofs =
         DoFTools::extract_locally_relevant_level_dofs(dof_handler, level);
-      level_constraints.reinit(relevant_dofs);
+      level_constraints.reinit(dof_handler.locally_owned_dofs(), relevant_dofs);
       level_constraints.add_lines(
         mg_constrained_dofs.get_boundary_indices(level));
       level_constraints.close();
