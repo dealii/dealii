@@ -286,7 +286,11 @@ macro(feature_trilinos_find_external var)
       endif()
     endif()
 
+    set(DEAL_II_TRILINOS_WITH_TPETRA_MUELU OFF)
     if(TRILINOS_WITH_MUELU)
+        if(TRILINOS_WITH_TPETRA)
+            set(DEAL_II_TRILINOS_WITH_TPETRA_MUELU ON)
+        endif()
       #
       # Check if MueLu is actually usable.
       #
