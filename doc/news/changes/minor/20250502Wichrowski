@@ -1,0 +1,4 @@
+New: A new function FETools::cell_to_face_lexicographic() to generate a
+mapping from cell-local DoFs to lexicographic ordering of DoFs on two adjacent cells
+has been added.
+(Michał Wichrowski, 2025/05/03)

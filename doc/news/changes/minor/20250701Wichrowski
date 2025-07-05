@@ -1,0 +1,2 @@
+New: The ordering strategy DoFRenumbering::lexicographic() has been added.
+(Michał Wichrowski, 2025/07/01)
