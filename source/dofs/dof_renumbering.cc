@@ -746,6 +746,172 @@ namespace DoFRenumbering
   }
 
 
+  namespace
+  {
+    // Utility function used to fill a given `component_order` vector by
+    // processing an `order` of FEValuesExtractors. Supported extractors are
+    // listed in FEValueExtractors::ExtractorVariant. The function is used in
+    // the implementation of component_wise(DoFHandler<dim, spacedim>&, const
+    // std::vector<FEValueExtractors::ExtractorVariant> &).
+    template <int dim, int spacedim>
+    std::vector<unsigned int>
+    generate_component_order(
+      const std::vector<FEValuesExtractors::ExtractorVariant> &order,
+      const unsigned int                                       fe_n_components)
+    {
+      // Initialize `component_order` with invalid unsigned ints representing
+      // unassigned state.
+      std::vector<unsigned int> component_order(fe_n_components,
+                                                numbers::invalid_unsigned_int);
+
+      // Extract the start component index and determine the number of
+      // components for each extractor.
+      unsigned int block_index = 0;
+      for (const auto &extractor : order)
+        {
+          auto start_component_index = numbers::invalid_unsigned_int;
+          auto n_components          = numbers::invalid_unsigned_int;
+
+          if (std::holds_alternative<FEValuesExtractors::Scalar>(extractor))
+            {
+              start_component_index =
+                std::get<FEValuesExtractors::Scalar>(extractor).component;
+              n_components = 1;
+            }
+          else if (std::holds_alternative<FEValuesExtractors::Vector>(
+                     extractor))
+            {
+              start_component_index =
+                std::get<FEValuesExtractors::Vector>(extractor)
+                  .first_vector_component;
+              n_components = FEValuesViews::Vector<dim, spacedim>::value_type::
+                n_independent_components;
+            }
+          else if (std::holds_alternative<FEValuesExtractors::Tensor<2>>(
+                     extractor))
+            {
+              start_component_index =
+                std::get<FEValuesExtractors::Tensor<2>>(extractor)
+                  .first_tensor_component;
+              n_components = FEValuesViews::Tensor<2, dim, spacedim>::
+                value_type::n_independent_components;
+            }
+          else if (std::holds_alternative<
+                     FEValuesExtractors::SymmetricTensor<2>>(extractor))
+            {
+              start_component_index =
+                std::get<FEValuesExtractors::SymmetricTensor<2>>(extractor)
+                  .first_tensor_component;
+              n_components = FEValuesViews::SymmetricTensor<2, dim, spacedim>::
+                value_type::n_independent_components;
+            }
+          else
+            {
+              Assert(
+                false,
+                ExcNotImplemented(
+                  "An unsupported ExtractorVariant was passed in the component_wise extractor_order argument."));
+            }
+
+          // Fill `component_order` vector with `n_components` starting at
+          // `start_component_index`. Set the values to `block_index`.
+          for (unsigned int i = start_component_index;
+               i < start_component_index + n_components;
+               ++i)
+            {
+              Assert(
+                component_order[i] == numbers::invalid_unsigned_int,
+                ExcMessage(
+                  "A component which has already been assigned a block "
+                  "index is trying to be overwritten. This indicates that the "
+                  "component_wise function is being called with an invalid set "
+                  "of extractors in the extractor_order argument "
+                  "that overlap in component indices."));
+
+              component_order[i] = block_index;
+            }
+          // Increment block index
+          block_index++;
+        }
+      return component_order;
+    }
+  } // namespace
+
+  template <int dim, int spacedim>
+  void
+  component_wise(DoFHandler<dim, spacedim> &dof_handler,
+                 const std::vector<FEValuesExtractors::ExtractorVariant> &order)
+  {
+    // The function acts as a wrapper around the above-implemented function.
+
+    // Generate component order argument from extractors.
+    std::vector<unsigned int> component_order =
+      generate_component_order<dim, spacedim>(
+        order, dof_handler.get_fe().n_components());
+
+    // Size of `component_order` must be equal
+    // to the number of finite element system components
+    Assert(component_order.size() == dof_handler.get_fe().n_components(),
+           ExcDimensionMismatch(component_order.size(),
+                                dof_handler.get_fe().n_components()));
+
+    // All entries must be assigned
+    Assert(
+      std::none_of(component_order.begin(),
+                   component_order.end(),
+                   [](unsigned int value) {
+                     return value == numbers::invalid_unsigned_int;
+                   }),
+      ExcMessage(
+        "All entries in component_order must contain valid indices, no "
+        "numbers::invalid_unsigned_int must be present after processing all given "
+        "extractors. This error typically occurs when the component_wise function "
+        "is passed fewer extractors than needed or when the set of extractors "
+        "provided in the extractor_order argument doesn't cover all required components."));
+
+    // Wrapped function
+    component_wise(dof_handler, component_order);
+  }
+
+
+  template <int dim, int spacedim>
+  void
+  component_wise(DoFHandler<dim, spacedim> &dof_handler,
+                 const unsigned int         level,
+                 const std::vector<FEValuesExtractors::ExtractorVariant> &order)
+  {
+    // The function acts as a wrapper around the above-implemented function.
+
+    // Generate component order argument from extractors.
+    std::vector<unsigned int> component_order =
+      generate_component_order<dim, spacedim>(
+        order, dof_handler.get_fe().n_components());
+
+    // Size of `component_order` must be equal
+    // to the number of finite element system components
+    Assert(component_order.size() == dof_handler.get_fe().n_components(),
+           ExcDimensionMismatch(component_order.size(),
+                                dof_handler.get_fe().n_components()));
+
+    // All entries must be assigned.
+    Assert(
+      std::none_of(component_order.begin(),
+                   component_order.end(),
+                   [](unsigned int value) {
+                     return value == numbers::invalid_unsigned_int;
+                   }),
+      ExcMessage(
+        "All entries in component_order must contain valid indices, no "
+        "numbers::invalid_unsigned_int must be present after processing all given "
+        "extractors. This error typically occurs when the component_wise function "
+        "is passed fewer extractors than needed or when the set of extractors "
+        "provided in the extractor_order argument doesn't cover all required components. "));
+
+    // Wrapped function
+    component_wise(dof_handler, level, component_order);
+  }
+
+
 
   template <int dim, int spacedim, typename CellIterator>
   types::global_dof_index
