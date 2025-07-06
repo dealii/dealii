@@ -1,0 +1,7 @@
+New: GridTools::extract_ordered_boundary_vertices.
+The function returns a vector with all closed boundaries.
+Each closed boundary is a vector with vertices.
+The outer boundary is ordered counter clockwise,
+inner boundaries are ordered clockwise.
+<br>
+(Sascha Hofstetter, 2025/07/06)

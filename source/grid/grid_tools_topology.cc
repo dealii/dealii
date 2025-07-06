@@ -1675,16 +1675,17 @@ namespace GridTools
 
 
 
-  template <>
-  std::vector<std::vector<std::pair<unsigned int, Point<2>>>>
-  extract_ordered_boundary_vertices<2, 2>(const Triangulation<2, 2> &tria,
-                                          const Mapping<2, 2>       &mapping)
+  template <int dim, int spacedim>
+  std::vector<std::vector<std::pair<unsigned int, Point<spacedim>>>>
+  extract_ordered_boundary_vertices(const Triangulation<dim, spacedim> &tria,
+                                    const Mapping<dim, spacedim>       &mapping)
   {
+    Assert(dim == 2, ExcMessage("Only implemented for 2D triangulations"));
     // This map holds the two vertex indices of each face.
     // Counterclockwise first vertex index on first position,
     // counterclockwise second vertex index on second position.
-    std::map<unsigned int, unsigned int> face_vertex_indices;
-    std::map<unsigned int, Point<2>>     vertex_to_point;
+    std::map<unsigned int, unsigned int>    face_vertex_indices;
+    std::map<unsigned int, Point<spacedim>> vertex_to_point;
 
     // Iterate over all active cells at the boundary
     for (const auto &cell : tria.active_cell_iterators())
@@ -1734,8 +1735,9 @@ namespace GridTools
           }
       }
 
-    std::vector<std::vector<std::pair<unsigned int, Point<2>>>> boundaries;
-    std::vector<std::pair<unsigned int, Point<2>>> current_boundary;
+    std::vector<std::vector<std::pair<unsigned int, Point<spacedim>>>>
+                                                          boundaries;
+    std::vector<std::pair<unsigned int, Point<spacedim>>> current_boundary;
 
     // Vertex to start counterclockwise insertion
     unsigned int start_index   = face_vertex_indices.begin()->first;
