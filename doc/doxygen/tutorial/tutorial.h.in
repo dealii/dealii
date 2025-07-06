@@ -718,6 +718,13 @@
  *       Solving the curl-curl equation.
  *       <br/> Keywords: FE_Nedelec, FE_RaviartThomas, WorkStream::run()
  *       </td></tr>
+
+ *   <tr valign="top">
+ *       <td>step-98</td>
+ *       <td> A two-dimensional version of step-97. Solving the curl-curl equation in two spatial
+ *       dimensions.
+ *       <br/> Keywords: FE_Nedelec, FE_RaviartThomas, FE_Q, FE_DGQ, WorkStream::run()
+ *       </td></tr>
  * </table>
  *
  *
@@ -1396,7 +1403,8 @@
  *     </td>
  *     <td>
  *       step-81,
- *       step-97
+ *       step-97,
+ *       step-98
  *     </td>
  *   </tr>
  *
@@ -1469,7 +1477,10 @@
  *   <tr valign="top">
  *     <td> The magnetic vector potential and current vector potential
  *     </td>
- *     <td>step-97</td>
+ *     <td>
+ *       step-97,
+ *       step-98
+ *     </td>
  *   </tr>
  *
  * </table>

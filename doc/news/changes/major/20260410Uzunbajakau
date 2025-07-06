@@ -1,0 +1,5 @@
+New: The step-98 tutorial program illustrates application of the
+FE_Q, FE_Nedelec, FE_RaviartThomas, and FE_DGQ finite elements to
+two-dimensional problems in magnetostatics.
+<br>
+(Siarhei Uzunbajakau, 2026/04/10)

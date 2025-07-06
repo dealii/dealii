@@ -1,0 +1,556 @@
+<h1>Results</h1>
+
+The program generates the following output in the command line interface by
+default.
+
+@code
+Solving for (p' = 1; p = 0): T Jf A B T Jf A B T Jf A B T Jf A B
+@endcode
+
+The program assumes the finite elements of the lowermost degree, i.e., $p' = 1$
+for the FE_Q finite elements and $p=0$ for other finite elements. To change the
+degree of the finite elements, say $p' = 3$ and $p = 2$, one needs to change
+the setting `Settings::fe_degree = 2` and rebuild the program. The degree of the
+FE_Q finite elements will be computed automatically as $p'= p + 1$.
+
+The program dumps a number of files in the current directory. In the default
+configuration these files are:
+- `.vtu` files. They contain the computed vector fields. Recall that the spherical
+  manifold and transfinite interpolation manifold are attached to many cell faces.
+  Consequently, these cell faces are curved. Furthermore, the shape functions are
+  mapped from the reference cell to the real mesh cells by the second-order mapping
+  to accommodate the cells with curved faces. For these reasons, one needs to use a
+  visualization software that can deal with curved faces and the higher-order mapping.
+  A fresh version of ParaView is recommended. Visit did not have this feature
+  at the time this tutorial was written (in early 2026). The
+  <a href="https://github.com/dealii/dealii/wiki/Notes-on-visualizing-high-order-output"> Notes on visualizing high order output</a>
+  provide more information on this topic.
+- `.tex` files. These files contain the convergence tables.
+
+The following provides examples of the convergence tables simulated with the
+default settings for three different degrees of the finite elements,
+$p = 0, 1, 2$ (recall that $p' = p + 1$).
+
+<table>
+<caption>Convergence table $T$.</caption>
+    <tr>
+        <th>p'</th>
+        <th>r</th>
+        <th>cells</th>
+        <th>dofs</th>
+        <th>$\|e\|_{L^2}$</th>
+        <th>$\alpha_{L^2}$</th>
+    </tr>
+    <tr>
+        <td>1</td>
+        <td>1</td>
+        <td>144</td>
+        <td>153</td>
+        <td>7.47e-04</td>
+        <td>-</td>
+    </tr>
+    <tr>
+        <td>1</td>
+        <td>2</td>
+        <td>576</td>
+        <td>593</td>
+        <td>1.86e-04</td>
+        <td>2.01</td>
+    </tr>
+    <tr>
+        <td>1</td>
+        <td>3</td>
+        <td>2304</td>
+        <td>2337</td>
+        <td>4.64e-05</td>
+        <td>2.00</td>
+    </tr>
+    <tr>
+        <td>1</td>
+        <td>4</td>
+        <td>9216</td>
+        <td>9281</td>
+        <td>1.16e-05</td>
+        <td>2.00</td>
+    </tr>
+    <tr>
+        <td>2</td>
+        <td>1</td>
+        <td>144</td>
+        <td>593</td>
+        <td>1.38e-05</td>
+        <td>-</td>
+    </tr>
+    <tr>
+        <td>2</td>
+        <td>2</td>
+        <td>576</td>
+        <td>2337</td>
+        <td>8.72e-07</td>
+        <td>3.98</td>
+    </tr>
+    <tr>
+        <td>2</td>
+        <td>3</td>
+        <td>2304</td>
+        <td>9281</td>
+        <td>5.48e-08</td>
+        <td>3.99</td>
+    </tr>
+    <tr>
+        <td>2</td>
+        <td>4</td>
+        <td>9216</td>
+        <td>36993</td>
+        <td>3.45e-09</td>
+        <td>3.99</td>
+    </tr>
+    <tr>
+        <td>3</td>
+        <td>1</td>
+        <td>144</td>
+        <td>1321</td>
+        <td>1.38e-05</td>
+        <td>-</td>
+    </tr>
+    <tr>
+        <td>3</td>
+        <td>2</td>
+        <td>576</td>
+        <td>5233</td>
+        <td>8.72e-07</td>
+        <td>3.98</td>
+    </tr>
+    <tr>
+        <td>3</td>
+        <td>3</td>
+        <td>2304</td>
+        <td>20833</td>
+        <td>5.48e-08</td>
+        <td>3.99</td>
+    </tr>
+    <tr>
+        <td>3</td>
+        <td>4</td>
+        <td>9216</td>
+        <td>83137</td>
+        <td>3.51e-09</td>
+        <td>3.97</td>
+    </tr>
+</table>
+<br>
+<table>
+<caption>Convergence table $\vec{J}_f$.</caption>
+    <tr>
+        <th>p</th>
+        <th>r</th>
+        <th>cells</th>
+        <th>dofs</th>
+        <th>$\|e\|_{L^2}$</th>
+        <th>$\alpha_{L^2}$</th>
+    </tr>
+    <tr>
+        <td>0</td>
+        <td>1</td>
+        <td>144</td>
+        <td>296</td>
+        <td>2.50e-02</td>
+        <td>-</td>
+    </tr>
+    <tr>
+        <td>0</td>
+        <td>2</td>
+        <td>576</td>
+        <td>1168</td>
+        <td>1.25e-02</td>
+        <td>1.00</td>
+    </tr>
+    <tr>
+        <td>0</td>
+        <td>3</td>
+        <td>2304</td>
+        <td>4640</td>
+        <td>6.27e-03</td>
+        <td>1.00</td>
+    </tr>
+    <tr>
+        <td>0</td>
+        <td>4</td>
+        <td>9216</td>
+        <td>18496</td>
+        <td>3.13e-03</td>
+        <td>1.00</td>
+    </tr>
+    <tr>
+        <td>1</td>
+        <td>1</td>
+        <td>144</td>
+        <td>1168</td>
+        <td>3.04e-04</td>
+        <td>-</td>
+    </tr>
+    <tr>
+        <td>1</td>
+        <td>2</td>
+        <td>576</td>
+        <td>4640</td>
+        <td>3.80e-05</td>
+        <td>3.00</td>
+    </tr>
+    <tr>
+        <td>1</td>
+        <td>3</td>
+        <td>2304</td>
+        <td>18496</td>
+        <td>4.74e-06</td>
+        <td>3.00</td>
+    </tr>
+    <tr>
+        <td>1</td>
+        <td>4</td>
+        <td>9216</td>
+        <td>73856</td>
+        <td>5.91e-07</td>
+        <td>3.00</td>
+    </tr>
+    <tr>
+        <td>2</td>
+        <td>1</td>
+        <td>144</td>
+        <td>2616</td>
+        <td>3.04e-04</td>
+        <td>-</td>
+    </tr>
+    <tr>
+        <td>2</td>
+        <td>2</td>
+        <td>576</td>
+        <td>10416</td>
+        <td>3.79e-05</td>
+        <td>3.00</td>
+    </tr>
+    <tr>
+        <td>2</td>
+        <td>3</td>
+        <td>2304</td>
+        <td>41568</td>
+        <td>4.74e-06</td>
+        <td>3.00</td>
+    </tr>
+    <tr>
+        <td>2</td>
+        <td>4</td>
+        <td>9216</td>
+        <td>166080</td>
+        <td>5.91e-07</td>
+        <td>3.00</td>
+    </tr>
+</table>
+<br>
+<table>
+<caption> Convergence table $B$.</caption>
+    <tr>
+        <th>p</th>
+        <th>r</th>
+        <th>cells</th>
+        <th>dofs</th>
+        <th>$\|e\|_{L^2}$</th>
+        <th>$\alpha_{L^2}$</th>
+    </tr>
+    <tr>
+        <td>0</td>
+        <td>1</td>
+        <td>144</td>
+        <td>144</td>
+        <td>2.01e-08</td>
+        <td>-</td>
+    </tr>
+    <tr>
+        <td>0</td>
+        <td>2</td>
+        <td>576</td>
+        <td>576</td>
+        <td>9.72e-09</td>
+        <td>1.05</td>
+    </tr>
+    <tr>
+        <td>0</td>
+        <td>3</td>
+        <td>2304</td>
+        <td>2304</td>
+        <td>4.81e-09</td>
+        <td>1.02</td>
+    </tr>
+    <tr>
+        <td>0</td>
+        <td>4</td>
+        <td>9216</td>
+        <td>9216</td>
+        <td>2.40e-09</td>
+        <td>1.00</td>
+    </tr>
+    <tr>
+        <td>1</td>
+        <td>1</td>
+        <td>144</td>
+        <td>576</td>
+        <td>4.15e-10</td>
+        <td>-</td>
+    </tr>
+    <tr>
+        <td>1</td>
+        <td>2</td>
+        <td>576</td>
+        <td>2304</td>
+        <td>1.02e-10</td>
+        <td>2.02</td>
+    </tr>
+    <tr>
+        <td>1</td>
+        <td>3</td>
+        <td>2304</td>
+        <td>9216</td>
+        <td>2.54e-11</td>
+        <td>2.01</td>
+    </tr>
+    <tr>
+        <td>1</td>
+        <td>4</td>
+        <td>9216</td>
+        <td>36864</td>
+        <td>6.36e-12</td>
+        <td>2.00</td>
+    </tr>
+    <tr>
+        <td>2</td>
+        <td>1</td>
+        <td>144</td>
+        <td>1296</td>
+        <td>2.32e-11</td>
+        <td>-</td>
+    </tr>
+    <tr>
+        <td>2</td>
+        <td>2</td>
+        <td>576</td>
+        <td>5184</td>
+        <td>1.46e-12</td>
+        <td>3.99</td>
+    </tr>
+    <tr>
+        <td>2</td>
+        <td>3</td>
+        <td>2304</td>
+        <td>20736</td>
+        <td>9.15e-14</td>
+        <td>3.99</td>
+    </tr>
+    <tr>
+        <td>2</td>
+        <td>4</td>
+        <td>9216</td>
+        <td>82944</td>
+        <td>5.94e-15</td>
+        <td>3.95</td>
+    </tr>
+</table>
+
+The following notations were used in the headers of the tables:
+
+- p', p - the degree of the finite elements.
+
+- r - the mesh refinement parameter, i.e., the number of global mesh
+  refinements.
+
+- cells - the total number of active cells.
+
+- dofs - the number of degrees of freedom.
+
+-$\|e\|_{L^2}$ - the $L^2$ error norm.
+
+-$\alpha_{L^2}$ - the order of convergence of the $L^2$ error norm.
+
+Let us contemplate these convergence tables for a brief moment. The first table
+illustrates convergence of the numerically computed current vector potential,
+$T$. In this particular case we can expect the order of the convergence rate of
+$\alpha_{L^2} \le p' + 1$ (@dealiiVideoLectureSeeAlso{3.95}) If the finite
+elements of the lowermost degree are used, $p'=1$, the order of
+convergence rate is at the upper boundary of the expected values,
+$\alpha_{L^2} \approx 2.0$. If the finite elements of the second degree are
+used, $p'=2$, the order of the convergence rate is higher than expected,
+$\alpha_{L^2} \approx 4.0$. This means that the $L^2$ error norm converges to
+zero at a rate higher than theoretically possible. Most likely this is due to
+the fact that the current vector potential has a particularly simple form,
+[Equation 3](@ref Step98_Equation_3_T). It is either constant or changes as
+the second-order monomial,
+\f[
+T \sim r^2.
+\f]
+The second order polynomial approximates this behavior exactly. That is to
+say, in this particular case we have a lucky situation in which the shape
+functions can approximate the numerical solution exactly within each mesh
+cell. This, most likely, explains the extra rapid convergence of the $L^2$
+norm. Note also that the error norms, $\|e\|_{L^2}$, at $p'=2$ and $p'=3$
+are the same for the same values of the mesh refinement parameter, $r$. This
+is, most likely, due to the fact that the second-order shape functions,
+$p'=2$, approximate the solution exactly within each mesh cell and the
+third-order monomials of the shape function at $p'=3$ have absolutely
+nothing to contribute to the quality of approximation.
+
+The second table illustrates convergence of the numerically computed
+free-current density, $\vec{J}_f$. The free-current density has been
+computed as a derivative of current vector potential,
+\f[
+\vec{J}_f = \vec{\nabla}\overset{V} {\times} T.
+\f]
+The derivative reduces the order of the convergence rate by one. Most
+likely in this particular case the error made in computing $\vec{J}_f$
+is defined by the error made in computing $T$. For this reason, the order
+of convergence in the second table equals the order of convergence in
+the first table minus one.
+
+Due to the implicit gauge we cannot observe the convergence of the magnetic
+vector potential, $\vec{A}$. Instead, we can observe the convergence on the
+magnetic field, $B$, given in the third table. It follows the same pattern:
+The rate of convergence at the lower degrees of the finite elements is at
+the best expected value, $\alpha_{L^2} = p + 1$; the rate of convergence at
+the higher degrees of the finite elements is better than expected. The extra
+rapid convergence at the higher degrees of the finite elements is explained
+by the relatively simple form of the field being approximated.
+
+The figures below illustrate the current vector potential, $T$, the free-current
+density, $\vec{J}_f$, and magnetic field, $B$, computed with the following
+settings: $p = 2$ and $r = 4$. Visual inspection of the magnetic vector
+potential, $\vec{A}$, is not very informative as its conservative portion is
+unknown.
+
+@htmlonly
+<p align="center">
+  <img src="https://dealii.org/images/steps/developer/step-98-result-T.svg"
+  alt="The result - current vector potential" height="531">
+</p>
+@endhtmlonly
+
+@htmlonly
+<p align="center">
+  <img src="https://dealii.org/images/steps/developer/step-98-result-Jf.svg"
+  alt="The result - free current density" height="531">
+</p>
+@endhtmlonly
+
+@htmlonly
+<p align="center">
+  <img src="https://dealii.org/images/steps/developer/step-98-result-B.svg"
+  alt="The result - magnetic field" height="531">
+</p>
+@endhtmlonly
+
+The images above suggest that the computed fields do not exhibit any irregular
+behavior (the first image in the table below illustrates how irregular
+behavior can look like). The fields on these images closely resemble the
+corresponding closed-form analytical expressions given in the introduction.
+From the first glans the convergence tables above may appear somewhat strange
+due to extra rapid convergence at the higher degrees of the finite elements.
+One, however, can argue that the extra rapid convergence can be explained by
+the simple polynomial form of the fields being approximated. One thing is
+certain - the convergence rates presented in these tables are at the best
+theoretically expected values or better.
+
+@anchor Step98_PossibilitiesForExtensions
+<h3>Possibilities for extensions</h3>
+Let us consider the two-dimensional curl-curl partial differential equation
+again,
+\f{equation}
+\vec{\nabla}\overset{V}{\times}\bigg(\dfrac{1}{\mu} \vec{\nabla}\overset{S}{\times}\vec{A}\bigg)
++ \eta^2 \vec{A} =  \vec{\nabla}\overset{V}{\times} T.
+\f}
+We can compute the divergence of this expression and rearrange the terms as the
+following:
+\f{equation}
+\vec{\nabla}\cdot \vec{A} = \frac{1}{\eta^2} \vec{\nabla}\cdot
+\bigg[\vec{\nabla}\overset{V}{\times} T -
+\vec{\nabla}\overset{V}{\times}\bigg(\dfrac{1}{\mu}
+\vec{\nabla}\overset{S}{\times}\vec{A}\bigg)\bigg].
+\f}
+The divergence of the vector curl equals zero, see the introduction. Therefore,
+the right-hand side of the last equation equals zero,
+\f{equation}
+\vec{\nabla}\cdot \vec{A} = 0.
+\f}
+That is to say, the $\eta^2$ gauging term can be considered to be the Coulomb
+gauge at least in theory. In practice the situation is a bit more complicated.
+What the $\eta^2$ gauging term does depends on the value of $\eta^2$. The table
+below attempts to express this very point.
+@htmlonly
+<p align="center">
+  <img src="https://dealii.org/images/steps/developer/step-98-eta.svg"
+  alt="The result - eta-squared table" height="1062">
+</p>
+@endhtmlonly
+
+This table presents four simulations for four different values of $\eta^2$. In
+all four simulations the degree of the finite elements and the mesh refinement
+parameter were $p=2$ and $r=1$, respectively. The setting
+`Settings::project_exact_solution` was set to `true`.
+
+At the setting $\eta^2=\dfrac{10^{-10}}{\mu_0}$ the computed magnetic vector
+potential (the orange curve on the $|\vec{A}(x,0)|$ plot) looks exactly the same
+as the projected exact solution gauged by the Coulomb gauge (the blue curve). At
+this value of $\eta^2$ the term $\eta^2\vec{A}$ acts like the Coulomb gauge.
+At the default setting, $\eta^2=0$, the solution, $\vec{A}$, is contaminated by
+an unknown conservative vector field. The computed magnetic field, $B$, at this
+setting looks exactly as the corresponding exact solution because the
+conservative portion of $\vec{A}$ is filtered out by the process of computing
+the magnetic field, $B = \vec{\nabla}\overset{S}{\times}\vec{A}$. At the setting
+$\eta^2=\dfrac{10^{-6}}{\mu_0}$ the solenoidal part of the computed magnetic
+vector potential deviates from the exact solution. We can deduce this from the
+fact that the computed magnetic
+field deviates from the exact expression for the magnetic field on the $B(x,0)$
+plot. The error in the solenoidal part of the computed $\vec{A}$ is due to
+the fact that introduction of the gauging term, $\eta^2\vec{A}$, modifies the
+initial
+curl-curl equation. So, strictly speaking, we are solving a different partial
+differential equation. If $\eta^2$ is small, the difference between the initial
+curl-curl equation and the curl-curl equation modified by adding the gauging
+term is negligible. Consequently, the error in the solenoidal part of the
+computed $\vec{A}$ is negligible as well. Evidently, in this particular case
+"small" means $\eta^2 \ll \dfrac{10^{-6}}{\mu_0}$.
+
+Normally, we are interested in measurable fields such as magnetic field and
+consider the magnetic vector potential as a useful tool for computing measurable
+fields. We can tolerate the presence of an unknown conservative component in the
+magnetic vector potential, i.e., the situation illustrated by the first two rows
+in the table above. In such disposition we need to keep $\eta^2$ as small as
+possible, i.e., as far away as possible from the situation shown in last row of
+the table. In this tutorial program we set $\eta^2$ to zero and increase it just
+a bit in if the conjugate gradient algorithm cannot converge.
+
+Suppose for a moment that we would like to have the solution to the curl-curl
+equation in terms of a purely solenoidal magnetic vector potential, $\vec{A}$,
+that is, a solution gauged by the Coulomb gauge. To get such a solution we need
+to tweak the $\eta^2$ parameter. By contemplating
+the table above one can hypothesize that there exists an optimal value of the
+gauging parameter, $\eta^2_\text{opt}$, at which the $L^2$ error norm computed for
+$\vec{A}$ is minimal. The optimal value should be somewhere in between
+$\eta^2=\dfrac{10^{-12}}{\mu_0}$ and $\eta^2=\dfrac{10^{-6}}{\mu_0}$, based on the
+experiments above. Try to
+verify this hypothesis by finding the exact value of $\eta^2_\text{opt}$.
+
+In this instance we have a close-form analytical expression of the exact
+solution, i.e., the expression of $\vec{A}$ given in the introduction. In a
+real-life simulation there is no expression of the exact solution. Try to
+think of a method of blind (meaning without the exact solution) estimation of
+$\eta^2_\text{opt}$. Try to implement and test your ideas.
+
+Adding the gauging term, $\eta^2\vec{A}$, to the curl-curl equation converts
+a positive semidefinite system matrix into a positive definite matrix. Strictly
+speaking, adding the gauging term modifies the initial curl-curl equation. For
+this reason, it is important to keep $\eta^2$ small so the solution is not
+afflicted by the error induced by adding the gauging term. The definition of
+"small" here is a bit fuzzy. In absence of the exact solution setting $\eta^2$
+at the acceptable level of the error in the solenoidal component of $\vec{A}$
+is difficult. It is better to discard the gauging term and use a more
+sophisticated linear solver. The hypre AMS @cite hypre1998b can solve the
+systems of linear equations yielded by the curl-curl equation without the
+$\eta^2$ gauging term, ($\beta=0$ in @cite hypre1998b). Try to implement the
+hypre AMS.
