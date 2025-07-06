@@ -193,8 +193,8 @@ namespace GridTools
    * The vertices are in clockwise ordering for inner boundaries (holes).
    *
    * It is generally not guaranteed that the first entry of the vector is the
-   * outer boundary. However, when cell 0 is located on the outer boundary it is
-   * the case.
+   * outer boundary. However, when cell 0 is located on the outer boundary this
+   * is the case.
    *
    * The mapping argument enables the use of e.g. MappingQEulerian.
    *

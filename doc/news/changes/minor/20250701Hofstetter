@@ -1,6 +1,7 @@
 New: Implementation of CGAL functionalities for 2D.
-Convert a dealii cell to a CGAL::Polygon_2
-Convert a dealii triangulation to a CGAL::Polygon_2
-Perform boolean operation on two CGAL::Polygon_2
+They allow to convert a dealii cell or a
+dealii triangulation to CGAL::Polygon_with_holes_2.
+Moreover, boolean operations can be performed
+on two CGAL::Polygon_with_holes_2.
 <br>
 (Sascha Hofstetter, 2025/07/01)

@@ -40,10 +40,8 @@ test()
                     {"channel_with_cylinder", "0.03 : 2 : 2.0 : false"},
                     {"cheese", "2 , 2"}};
 
-  for (const auto &info_pair : names_and_args)
+  for (const auto &[name, args] : names_and_args)
     {
-      auto name = info_pair.first;
-      auto args = info_pair.second;
       deallog << "Name: " << name << std::endl;
       GridGenerator::generate_from_name_and_arguments(tria_in, name, args);
 
