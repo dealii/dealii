@@ -21,6 +21,7 @@
 #include <deal.II/base/types.h>
 
 #include <string>
+#include <variant>
 
 
 DEAL_II_NAMESPACE_OPEN
@@ -309,6 +310,16 @@ namespace FEValuesExtractors
      */
     const Extractor extractor;
   };
+
+  /**
+   * Convenience alias for variant type of supported FEValuesExtractors structs.
+   * In other words, an object of this type can be initialized with a scalar,
+   * vector, tensor, or any other of the `FEValuesExtractors` data types.
+   */
+  using ExtractorVariant = std::variant<FEValuesExtractors::Scalar,
+                                        FEValuesExtractors::Vector,
+                                        FEValuesExtractors::Tensor<2>,
+                                        FEValuesExtractors::SymmetricTensor<2>>;
 } // namespace FEValuesExtractors
 
 
