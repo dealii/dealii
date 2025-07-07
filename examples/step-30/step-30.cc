@@ -711,8 +711,8 @@ namespace Step30
       // We only need to consider cells which are flagged for refinement.
       if (cell->refine_flag_set())
         {
-          std::array<double, dim> jump_in_coordinate_direction;
-          std::array<double, dim> face_area_in_coordinate_direction;
+          std::array<double, dim> jump_in_coordinate_direction      = {};
+          std::array<double, dim> face_area_in_coordinate_direction = {};
 
           for (const auto face_no : cell->face_indices())
             {
