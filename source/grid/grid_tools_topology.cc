@@ -1676,6 +1676,115 @@ namespace GridTools
 
 
   template <int dim, int spacedim>
+  std::vector<std::vector<std::pair<unsigned int, Point<spacedim>>>>
+  extract_ordered_boundary_vertices(const Triangulation<dim, spacedim> &tria,
+                                    const Mapping<dim, spacedim>       &mapping)
+  {
+    Assert(dim == 2, ExcMessage("Only implemented for 2D triangulations"));
+    // This map holds the two vertex indices of each face.
+    // Counterclockwise first vertex index on first position,
+    // counterclockwise second vertex index on second position.
+    std::map<unsigned int, unsigned int>    face_vertex_indices;
+    std::map<unsigned int, Point<spacedim>> vertex_to_point;
+
+    // Iterate over all active cells at the boundary
+    for (const auto &cell : tria.active_cell_iterators())
+      {
+        for (const unsigned int f : cell->face_indices())
+          {
+            if (cell->face(f)->at_boundary())
+              {
+                // get mapped vertices of the cell
+                const auto         v_mapped = mapping.get_vertices(cell);
+                const unsigned int v0       = cell->face(f)->vertex_index(0);
+                const unsigned int v1       = cell->face(f)->vertex_index(1);
+
+                if (cell->reference_cell() == ReferenceCells::Triangle)
+                  {
+                    // add indices and first mapped vertex of the face
+                    vertex_to_point[v0]     = v_mapped[f];
+                    face_vertex_indices[v0] = v1;
+                  }
+                else if (cell->reference_cell() ==
+                         ReferenceCells::Quadrilateral)
+                  {
+                    // Ensure that vertex indices of the face are in
+                    // counterclockwise order inserted in the map.
+                    if (f == 0 || f == 3)
+                      {
+                        // add indices and first mapped vertex of the face
+                        vertex_to_point[v1] =
+                          v_mapped[GeometryInfo<2>::face_to_cell_vertices(f,
+                                                                          1)];
+                        face_vertex_indices[v1] = v0;
+                      }
+                    else
+                      {
+                        // add indices and first mapped vertex of the face
+                        vertex_to_point[v0] =
+                          v_mapped[GeometryInfo<2>::face_to_cell_vertices(f,
+                                                                          0)];
+                        face_vertex_indices[v0] = v1;
+                      }
+                  }
+                else
+                  {
+                    DEAL_II_ASSERT_UNREACHABLE();
+                  }
+              }
+          }
+      }
+
+    std::vector<std::vector<std::pair<unsigned int, Point<spacedim>>>>
+                                                          boundaries;
+    std::vector<std::pair<unsigned int, Point<spacedim>>> current_boundary;
+
+    // Vertex to start counterclockwise insertion
+    unsigned int start_index   = face_vertex_indices.begin()->first;
+    unsigned int current_index = start_index;
+
+    // As long as still entries in the map, use last vertex index to
+    // find next vertex index
+    while (face_vertex_indices.size() > 0)
+      {
+        const auto vertex_it = vertex_to_point.find(current_index);
+        Assert(vertex_it != vertex_to_point.end(),
+               ExcMessage("This should not occur, please report bug"));
+        current_boundary.emplace_back(vertex_it->first, vertex_it->second);
+        vertex_to_point.erase(vertex_it);
+
+        const auto it = face_vertex_indices.find(current_index);
+        // If the boundary is one closed loop, the next vertex index
+        // must exist as key until the map is empty.
+        Assert(it != face_vertex_indices.end(),
+               ExcMessage("Triangulation might contain holes"));
+
+        current_index = it->second;
+        face_vertex_indices.erase(it);
+
+        // traversed one closed boundary loop
+        if (current_index == start_index)
+          {
+            boundaries.push_back(current_boundary);
+            current_boundary.clear();
+
+            if (face_vertex_indices.size() == 0)
+              {
+                break;
+              }
+
+            // Take arbitrary remaining vertex as new start
+            // for next boundary loop
+            start_index   = face_vertex_indices.begin()->first;
+            current_index = start_index;
+          }
+      }
+    return boundaries;
+  }
+
+
+
+  template <int dim, int spacedim>
   void
   remove_hanging_nodes(Triangulation<dim, spacedim> &tria,
                        const bool                    isotropic,
