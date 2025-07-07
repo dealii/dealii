@@ -1696,7 +1696,7 @@ namespace Step42
                                                        mpi_communicator);
 
     double residual_norm;
-    double previous_residual_norm = -std::numeric_limits<double>::max();
+    double previous_residual_norm = std::numeric_limits<double>::lowest();
 
     const double correct_sigma = sigma_0;
 
