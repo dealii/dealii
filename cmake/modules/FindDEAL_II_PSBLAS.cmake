@@ -24,7 +24,7 @@
 set(PSBLAS_DIR "" CACHE PATH "An optional hint to a PSBLAS installation containing the PSBLAS include directory and libraries")
 set_if_empty(PSBLAS_DIR "$ENV{PSBLAS_DIR}")
 
-set(_psblas_libs "psb_base;psb_cbind;psb_krylov;psb_prec;psb_util")
+set(_psblas_libs "psb_base;psb_cbind;psb_linsolve;psb_prec;psb_util")
 set(_psblas_library_variables "")
 
 foreach(_lib ${_psblas_libs})
