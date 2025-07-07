@@ -1,0 +1,6 @@
+Added: A new mesh generator (uniform_channel_with_cylinder) for a channel
+in which there is a cylindrical obstacle. All dimensions of the
+channel can be customized by the user at the moment of the grid
+generation.
+<br>
+(Bruno Blais, 2025/06/10)
