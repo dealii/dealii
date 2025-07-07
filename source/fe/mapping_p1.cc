@@ -84,6 +84,7 @@ MappingP1<dim, spacedim>::InternalData::memory_consumption() const
   return (Mapping<dim, spacedim>::InternalDataBase::memory_consumption() +
           MemoryConsumption::memory_consumption(affine_component) +
           MemoryConsumption::memory_consumption(linear_component) +
+          MemoryConsumption::memory_consumption(covariant) +
           MemoryConsumption::memory_consumption(determinant) +
           MemoryConsumption::memory_consumption(quadrature));
 }
@@ -202,6 +203,7 @@ MappingP1<dim, spacedim>::update_transformation(
 {
   data.affine_component = cell->vertex(0);
   data.linear_component = compute_linear_transformation<dim, spacedim>(cell);
+  data.covariant        = data.linear_component.covariant_form();
   data.determinant      = data.linear_component.determinant();
 }
 
@@ -236,8 +238,7 @@ MappingP1<dim, spacedim>::maybe_update_normal_vectors(
     ReferenceCells::get_simplex<dim>().template unit_normal_vectors<dim>(
       face_no);
   Tensor<1, spacedim> normal_vector =
-    apply_transformation(data.linear_component.covariant_form(),
-                         ref_normal_vector);
+    apply_transformation(data.covariant, ref_normal_vector);
   normal_vector /= normal_vector.norm();
 
   std::fill(normal_vectors.begin(), normal_vectors.end(), normal_vector);
@@ -320,7 +321,7 @@ MappingP1<dim, spacedim>::maybe_update_inverse_jacobians(
   if (data.update_each & update_inverse_jacobians)
     if (cell_similarity != CellSimilarity::translation)
       {
-        const auto inverse = data.linear_component.covariant_form().transpose();
+        const auto inverse = data.covariant.transpose();
         std::fill(output_data.inverse_jacobians.begin(),
                   output_data.inverse_jacobians.end(),
                   inverse);
@@ -561,9 +562,8 @@ MappingP1<dim, spacedim>::transform(
     {
       case mapping_covariant:
         {
-          const auto covariant = data.linear_component.covariant_form();
           for (unsigned int i = 0; i < output.size(); ++i)
-            output[i] = apply_transformation(covariant, input[i]);
+            output[i] = apply_transformation(data.covariant, input[i]);
           return;
         }
 
@@ -607,9 +607,8 @@ MappingP1<dim, spacedim>::transform(
     {
       case mapping_covariant:
         {
-          const auto covariant = data.linear_component.covariant_form();
           for (unsigned int i = 0; i < output.size(); ++i)
-            output[i] = apply_transformation(covariant, input[i]);
+            output[i] = apply_transformation(data.covariant, input[i]);
 
           return;
         }
@@ -641,9 +640,8 @@ MappingP1<dim, spacedim>::transform(
                  typename FEValuesBase<dim>::ExcAccessToUninitializedField(
                    "update_covariant_transformation"));
 
-          const auto covariant = data.linear_component.covariant_form();
           for (unsigned int i = 0; i < output.size(); ++i)
-            output[i] = apply_transformation(covariant, input[i]);
+            output[i] = apply_transformation(data.covariant, input[i]);
           return;
         }
 
@@ -664,12 +662,11 @@ MappingP1<dim, spacedim>::transform(
                  typename FEValuesBase<dim>::ExcAccessToUninitializedField(
                    "update_covariant_transformation"));
 
-          const auto covariant = data.linear_component.covariant_form();
           for (unsigned int i = 0; i < output.size(); ++i)
             {
               const DerivativeForm<1, spacedim, dim> A =
-                apply_transformation(covariant, transpose(input[i]));
-              output[i] = apply_transformation(covariant, A.transpose());
+                apply_transformation(data.covariant, transpose(input[i]));
+              output[i] = apply_transformation(data.covariant, A.transpose());
             }
           return;
         }
@@ -680,13 +677,12 @@ MappingP1<dim, spacedim>::transform(
                  typename FEValuesBase<dim>::ExcAccessToUninitializedField(
                    "update_covariant_transformation"));
 
-          const auto covariant = data.linear_component.covariant_form();
           for (unsigned int i = 0; i < output.size(); ++i)
             {
               const DerivativeForm<1, spacedim, dim> A =
                 apply_transformation(data.linear_component,
                                      transpose(input[i]));
-              output[i] = apply_transformation(covariant, A.transpose());
+              output[i] = apply_transformation(data.covariant, A.transpose());
             }
 
           return;
@@ -698,14 +694,13 @@ MappingP1<dim, spacedim>::transform(
                  typename FEValuesBase<dim>::ExcAccessToUninitializedField(
                    "update_contravariant_transformation"));
 
-          const auto covariant = data.linear_component.covariant_form();
-          auto       scaled_contravariant = data.linear_component;
+          auto scaled_contravariant = data.linear_component;
           for (unsigned int d = 0; d < spacedim; ++d)
             scaled_contravariant[d] /= data.determinant;
           for (unsigned int i = 0; i < output.size(); ++i)
             {
               const DerivativeForm<1, spacedim, dim> A =
-                apply_transformation(covariant, input[i]);
+                apply_transformation(data.covariant, input[i]);
               const Tensor<2, spacedim> T =
                 apply_transformation(scaled_contravariant, A.transpose());
 
@@ -743,9 +738,9 @@ MappingP1<dim, spacedim>::transform(
                  typename FEValuesBase<dim>::ExcAccessToUninitializedField(
                    "update_covariant_transformation"));
 
-          const auto covariant = data.linear_component.covariant_form();
           for (unsigned int i = 0; i < output.size(); ++i)
-            output[i] = internal::apply_covariant_gradient(covariant, input[i]);
+            output[i] =
+              internal::apply_covariant_gradient(data.covariant, input[i]);
 
           return;
         }
@@ -780,10 +775,9 @@ MappingP1<dim, spacedim>::transform(
                  typename FEValuesBase<dim>::ExcAccessToUninitializedField(
                    "update_contravariant_transformation"));
 
-          const auto covariant = data.linear_component.covariant_form();
           for (unsigned int i = 0; i < output.size(); ++i)
             output[i] =
-              internal::apply_contravariant_hessian(covariant,
+              internal::apply_contravariant_hessian(data.covariant,
                                                     data.linear_component,
                                                     input[i]);
 
@@ -796,9 +790,9 @@ MappingP1<dim, spacedim>::transform(
                  typename FEValuesBase<dim>::ExcAccessToUninitializedField(
                    "update_covariant_transformation"));
 
-          const auto covariant = data.linear_component.covariant_form();
           for (unsigned int i = 0; i < output.size(); ++i)
-            output[i] = internal::apply_covariant_hessian(covariant, input[i]);
+            output[i] =
+              internal::apply_covariant_hessian(data.covariant, input[i]);
 
           return;
         }
@@ -812,9 +806,8 @@ MappingP1<dim, spacedim>::transform(
                  typename FEValuesBase<dim>::ExcAccessToUninitializedField(
                    "update_contravariant_transformation"));
 
-          const auto covariant = data.linear_component.covariant_form();
           for (unsigned int i = 0; i < output.size(); ++i)
-            output[i] = internal::apply_piola_hessian(covariant,
+            output[i] = internal::apply_piola_hessian(data.covariant,
                                                       data.linear_component,
                                                       data.determinant,
                                                       input[i]);

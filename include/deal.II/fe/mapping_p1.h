@@ -221,9 +221,14 @@ public:
     mutable Tensor<1, spacedim> affine_component;
 
     /**
-     * Linear component of the transformation.
+     * Linear component of the transformation (the contravariant).
      */
     mutable DerivativeForm<1, dim, spacedim> linear_component;
+
+    /**
+     * Covariant form of the linear transformation.
+     */
+    mutable DerivativeForm<1, dim, spacedim> covariant;
 
     /**
      * Determinant of linear_component.
