@@ -2442,6 +2442,72 @@ namespace DoFRenumbering
 
 
 
+  template <int dim>
+  void
+  lexicographic(DoFHandler<dim> &dof_handler, const double tolerance)
+  {
+    std::vector<types::global_dof_index> renumbering;
+    compute_lexicographic(renumbering, dof_handler, tolerance);
+    dof_handler.renumber_dofs(renumbering);
+  }
+
+
+  template <int dim>
+  void
+  compute_lexicographic(std::vector<types::global_dof_index> &new_dof_indices,
+                        const DoFHandler<dim>                &dof_handler,
+                        const double                          tolerance)
+  {
+    Assert(dynamic_cast<const parallel::distributed::Triangulation<dim> *>(
+             &dof_handler.get_triangulation()) == nullptr,
+           ExcMessage(
+             "Lexicographic renumbering is not implemented for distributed "
+             "triangulations."));
+
+    std::map<types::global_dof_index, Point<dim>> dof_location_map;
+    DoFTools::map_dofs_to_support_points(MappingQ1<dim>(),
+                                         dof_handler,
+                                         dof_location_map);
+    std::vector<std::pair<types::global_dof_index, Point<dim>>>
+      dof_location_vector;
+
+    dof_location_vector.reserve(dof_location_map.size());
+    for (const auto &s : dof_location_map)
+      dof_location_vector.push_back(s);
+
+    std::sort(
+      dof_location_vector.begin(),
+      dof_location_vector.end(),
+      [&](const std::pair<types::global_dof_index, Point<dim>> &p1,
+          const std::pair<types::global_dof_index, Point<dim>> &p2) -> bool {
+        for (int i = dim - 1; i >= 0; --i)
+          {
+            const double diff = p1.second(i) - p2.second(i);
+            // Check if p1 is significantly smaller than p2 in this dimension
+            if (diff < -tolerance)
+              return true;
+            // Check if p1 is significantly larger than p2 in this dimension
+            if (diff > tolerance)
+              return false;
+            // Otherwise, coordinates are considered equal within tolerance for
+            // this dimension, continue to the next dimension.
+          }
+        // All coordinates are within tolerance, points are considered
+        // equivalent. Use the original DoF index as a tie-breaker to preserve
+        // relative order.
+        return p1.first < p2.first;
+      });
+
+    new_dof_indices.resize(dof_location_vector.size(),
+                           numbers::invalid_dof_index);
+
+    for (types::global_dof_index dof = 0; dof < dof_location_vector.size();
+         ++dof)
+      new_dof_indices[dof_location_vector[dof].first] = dof;
+  }
+
+
+
   template <int dim,
             int spacedim,
             typename Number,
