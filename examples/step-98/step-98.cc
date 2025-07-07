@@ -52,7 +52,8 @@
 #include <deal.II/matrix_free/patch_distributors.h>
 #include <deal.II/matrix_free/patch_smoother_base.h>
 
-
+// Assembly of 1D matrices needed for local inverse
+#include <deal.II/numerics/tensor_product_matrix_creator.h>
 
 #include <fstream>
 #include <iostream>
@@ -471,10 +472,29 @@ namespace Operators
      * @brief Type alias for the storage managing patch data (DoF indices, etc.).
      */
     using PatchStorageType = PatchStorage<MatrixFreeType>;
+
+    using VectorizedNumber = VectorizedArray<number>;
+    /**
+     * @brief The size (number of rows/columns) of the 1D matrices that form
+     * the tensor product patch matrix. For a patch of $2^d$ cells with FE_Q
+     * elements of degree `fe_degree`, this corresponds to the number of unique
+     * 1D basis functions on the two adjacent reference cells along one axis.
+     */
+    const constexpr static unsigned int n_rows_1d = 2 * fe_degree - 1;
+
+    const constexpr static unsigned int n_dofs_interior =
+      Utilities::pow<unsigned int>(n_rows_1d, dim);
+
     /**
      * @brief Type alias for the class providing the local patch inverse.
      */
-    using InverseType = PatchTensorInverse<dim, fe_degree, number, number>;
+    using InverseType = TensorProductMatrixSymmetricSum<dim, number, n_rows_1d>;
+
+    /**
+     * @brief Type alias for the standard FEEvaluation on a single cell batch.
+     */
+    using FEEval = FEEvaluation<dim, fe_degree, fe_degree + 1, 1, number>;
+
 
     /**
      * @brief Type alias for additional data required by the smoother (the patch storage).
@@ -530,10 +550,10 @@ namespace Operators
 
   private:
     /**
-     * @brief The object responsible for applying the inverse of the operator
-     * on a single patch.
+     * @brief The tensor product matrix representing the patch operator.
+     * Provides the `apply_inverse` method.
      */
-    InverseType inverse;
+    InverseType patch_inverse_operator;
   };
 
   /**
@@ -547,8 +567,68 @@ namespace Operators
     std::shared_ptr<PatchStorageType> &patch_storage)
   {
     BaseType::initialize(patch_storage);
-    if (patch_storage->n_patches() != 0)
-      inverse.initialize(patch_storage->get_matrix_free());
+
+    if (patch_storage->n_patches() == 0)
+      return;
+
+    FEEval                    fe_eval(*patch_storage->get_matrix_free());
+    std::vector<unsigned int> numbering =
+      FETools::hierarchic_to_lexicographic_numbering<1>(fe_degree);
+
+    const auto &fe =
+      patch_storage->get_matrix_free()->get_dof_handler().get_fe();
+
+
+    std::string name = fe.get_name();
+    name.replace(name.find('<') + 1, 1, "1");
+    // std::unique_ptr<FiniteElement<1>> fe_1d =
+    // FETools::get_fe_by_name<1>(name);
+    std::unique_ptr<FiniteElement<1>> fe_1d =
+      std::make_unique<FE_DGQ<1>>(fe_degree);
+    fe_eval.reinit(0);
+
+    auto inverse_jacobian = fe_eval.inverse_jacobian(0);
+
+    std::array<Table<2, number>, dim> patch_mass_matrices;
+    std::array<Table<2, number>, dim> patch_laplace_matrices;
+
+    for (unsigned int d = 0; d < dim; ++d)
+      for (unsigned int e = 0; e < dim; ++e)
+        if (d != e)
+          AssertThrow(inverse_jacobian[d][e][0] == 0., ExcNotImplemented());
+
+    const number h = inverse_jacobian[0][0][0];
+
+    // Initialize the local patch inverse operator.
+    FullMatrix<number> cell_mass_matrix =
+      TensorProductMatrixCreator::create_1d_cell_mass_matrix<number>(
+        *fe_1d, h, {true, true});
+    FullMatrix<number> cell_laplace_matrix =
+      TensorProductMatrixCreator::create_1d_cell_laplace_matrix<number>(
+        *fe_1d, h, {true, true});
+
+    for (unsigned int d = 0; d < dim; ++d)
+      {
+        patch_mass_matrices[d] =
+          TensorProductMatrixCreator::create_1D_discretization_matrix<number>(
+            cell_mass_matrix, 2, 1, {false, false});
+
+        patch_laplace_matrices[d] =
+          TensorProductMatrixCreator::create_1D_discretization_matrix<number>(
+            cell_laplace_matrix, 2, 1, {false, false});
+      }
+
+    // Print the patch mass matrix for the first dimension
+    // std::cout << "Patch mass matrix [0]:" << std::endl;
+    // for (unsigned int i = 0; i < patch_mass_matrices[0].n_rows(); ++i)
+    //   {
+    //     for (unsigned int j = 0; j < patch_mass_matrices[0].n_cols(); ++j)
+    //       std::cout << patch_mass_matrices[0](i, j) << " ";
+    //     std::cout << std::endl;
+    //   }
+
+
+    patch_inverse_operator.reinit(patch_mass_matrices, patch_laplace_matrices);
   }
 
   /**
@@ -560,7 +640,7 @@ namespace Operators
   void LaplacePatchSmoother<dim, fe_degree, number>::clear()
   {
     BaseType::clear();
-    inverse.clear();
+    // inverse.clear();
   }
 
   /**
@@ -586,10 +666,6 @@ namespace Operators
                &patch_range,      // Range of patches to process
     const bool &do_forward) const // Direction of iteration
   {
-    // Type alias for the standard FEEvaluation on a single cell batch.
-    using FEEval = FEEvaluation<dim, fe_degree, fe_degree + 1, 1, number>;
-
-
     // Type alias for the FEPatchEvaluation, which handles operations across
     // the cells within a patch, including data gathering and scattering.
     // Moving values between patches vector and individual cell vectors, handled
@@ -692,7 +768,12 @@ namespace Operators
         // Solve the local system A_patch * correction = residual for the
         // correction. 'inverse' is the PatchTensorInverse object initialized
         // earlier.
-        inverse.vmult(local_correction, local_residual);
+
+        patch_inverse_operator.apply_inverse(
+          ArrayView<number>(local_correction.data(), n_dofs_interior),
+          ArrayView<const number>(local_residual.data(), n_dofs_interior));
+
+        // inverse.vmult(local_correction, local_residual);
 
         // --- Step 5: Update the solution ---
         // The standard smoother update is: u_new = u_old + correction
