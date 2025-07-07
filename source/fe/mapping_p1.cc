@@ -578,7 +578,7 @@ MappingP1<dim, spacedim>::transform(
           auto transformation = data.linear_component;
           Assert(data.determinant > 0.0, ExcDivideByZero());
           for (unsigned int d = 0; d < spacedim; ++d)
-            transformation[d] /= data.determinant;
+            transformation[d] *= 1.0 / data.determinant;
           for (unsigned int i = 0; i < output.size(); ++i)
             output[i] = apply_transformation(transformation, input[i]);
           return;
@@ -696,7 +696,7 @@ MappingP1<dim, spacedim>::transform(
 
           auto scaled_contravariant = data.linear_component;
           for (unsigned int d = 0; d < spacedim; ++d)
-            scaled_contravariant[d] /= data.determinant;
+            scaled_contravariant[d] *= 1.0 / data.determinant;
           for (unsigned int i = 0; i < output.size(); ++i)
             {
               const DerivativeForm<1, spacedim, dim> A =
