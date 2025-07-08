@@ -504,7 +504,7 @@ LaplaceProblem<dim>::setup_dofs()
 
       IndexSet relevant_dofs = DoFTools::extract_locally_relevant_dofs(dof_h);
       AffineConstraints<float> &constraints = level_constraints[level];
-      constraints.reinit(relevant_dofs);
+      constraints.reinit(dof_h.locally_owned_dofs(), relevant_dofs);
       DoFTools::make_hanging_node_constraints(dof_h, constraints);
       constraints.close();
       typename MatrixFree<dim, float>::AdditionalData additional_data;
@@ -518,7 +518,7 @@ LaplaceProblem<dim>::setup_dofs()
       // now create the final constraints object
       relevant_dofs = DoFTools::extract_locally_relevant_dofs(dof_h);
       constraints.clear();
-      constraints.reinit(relevant_dofs);
+      constraints.reinit(dof_h.locally_owned_dofs(), relevant_dofs);
       DoFTools::make_hanging_node_constraints(dof_h, constraints);
       constraints.close();
     }

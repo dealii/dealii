@@ -188,7 +188,7 @@ check(const unsigned int orientation, bool reverse)
   const IndexSet  locally_relevant_dofs =
     DoFTools::extract_locally_relevant_dofs(dof_handler);
 
-  constraints.reinit(locally_relevant_dofs);
+  constraints.reinit(locally_owned_dofs, locally_relevant_dofs);
   {
     std::vector<
       GridTools::PeriodicFacePair<typename DoFHandler<dim>::cell_iterator>>

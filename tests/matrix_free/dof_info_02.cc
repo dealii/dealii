@@ -77,7 +77,7 @@ test(const bool adaptive_ref = true)
   const IndexSet &owned_set    = dof.locally_owned_dofs();
   const IndexSet  relevant_set = DoFTools::extract_locally_relevant_dofs(dof);
 
-  AffineConstraints<double> constraints(relevant_set);
+  AffineConstraints<double> constraints(owned_set, relevant_set);
   DoFTools::make_hanging_node_constraints(dof, constraints);
   // constrain bottom part of the boundary (lower in y direction)
   VectorTools::interpolate_boundary_values(dof,

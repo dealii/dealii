@@ -54,7 +54,7 @@ check()
   const IndexSet relevant_dofs =
     DoFTools::extract_locally_relevant_level_dofs(mgdof, 0);
   AffineConstraints<double> user_constraints;
-  user_constraints.reinit(relevant_dofs);
+  user_constraints.reinit(mgdof.locally_owned_mg_dofs(0), relevant_dofs);
 
   typename DoFHandler<dim>::level_face_iterator face0 = mgdof.begin(0)->face(0);
   std::vector<types::global_dof_index>          face_dofs(fe.dofs_per_face);

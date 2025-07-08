@@ -45,7 +45,8 @@ merge_check()
   local_lines2.print(deallog.get_file_stream());
 
   // works correctly
-  AffineConstraints<double> c1(local_lines1), c2(local_lines2);
+  AffineConstraints<double> c1(local_lines1, local_lines1),
+    c2(local_lines2, local_lines2);
 
   // now merge the two and print the
   // results

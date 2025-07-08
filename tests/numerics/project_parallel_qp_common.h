@@ -114,7 +114,7 @@ do_project(const parallel::distributed::Triangulation<dim> &triangulation,
     DoFTools::extract_locally_relevant_dofs(dof_handler);
 
   AffineConstraints<double> constraints;
-  constraints.reinit(locally_relevant_dofs);
+  constraints.reinit(dof_handler.locally_owned_dofs(), locally_relevant_dofs);
   DoFTools::make_hanging_node_constraints(dof_handler, constraints);
   constraints.close();
 

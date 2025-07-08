@@ -70,7 +70,7 @@ test()
   deallog << "locally relevant dofs :" << std::endl;
   relevant_set.print(deallog.get_file_stream());
 
-  AffineConstraints<double> constraints(relevant_set);
+  AffineConstraints<double> constraints(owned_set, relevant_set);
   constraints.close();
 
   MappingQ<dim>                     mapping(fe_degree);

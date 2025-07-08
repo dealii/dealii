@@ -170,7 +170,7 @@ namespace MPI_nonlinear_solver_selector_test
 
         {
           nonzero_constraints.clear();
-          nonzero_constraints.reinit(locally_relevant_dofs);
+          nonzero_constraints.reinit(locally_owned_dofs, locally_relevant_dofs);
           DoFTools::make_hanging_node_constraints(dof_handler,
                                                   nonzero_constraints);
 
@@ -192,7 +192,7 @@ namespace MPI_nonlinear_solver_selector_test
 
         {
           zero_constraints.clear();
-          zero_constraints.reinit(locally_relevant_dofs);
+          zero_constraints.reinit(locally_owned_dofs, locally_relevant_dofs);
           DoFTools::make_hanging_node_constraints(dof_handler,
                                                   zero_constraints);
           VectorTools::interpolate_boundary_values(

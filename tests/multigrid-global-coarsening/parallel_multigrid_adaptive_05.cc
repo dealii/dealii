@@ -83,7 +83,7 @@ public:
       {
         const IndexSet relevant_dofs =
           DoFTools::extract_locally_relevant_dofs(dof_handler);
-        constraints.reinit(relevant_dofs);
+        constraints.reinit(dof_handler.locally_owned_dofs(), relevant_dofs);
         DoFTools::make_hanging_node_constraints(dof_handler, constraints);
         VectorTools::interpolate_boundary_values(dof_handler,
                                                  dirichlet_boundary,
@@ -91,9 +91,11 @@ public:
       }
     else
       {
+        const IndexSet &locally_owned =
+          dof_handler.locally_owned_mg_dofs(level);
         const IndexSet relevant_dofs =
           DoFTools::extract_locally_relevant_level_dofs(dof_handler, level);
-        constraints.reinit(relevant_dofs);
+        constraints.reinit(locally_owned, relevant_dofs);
         constraints.add_lines(mg_constrained_dofs.get_boundary_indices(level));
 
         const std::vector<types::global_dof_index> interface_indices =
@@ -102,8 +104,6 @@ public:
         edge_constrained_indices.clear();
         edge_constrained_indices.reserve(interface_indices.size());
         edge_constrained_values.resize(interface_indices.size());
-        const IndexSet &locally_owned =
-          dof_handler.locally_owned_mg_dofs(level);
         for (unsigned int i = 0; i < interface_indices.size(); ++i)
           if (locally_owned.is_element(interface_indices[i]))
             edge_constrained_indices.push_back(
@@ -479,7 +479,8 @@ do_test(const DoFHandler<dim> &dof, const bool threaded)
   AffineConstraints<double> hanging_node_constraints;
   const IndexSet            locally_relevant_dofs =
     DoFTools::extract_locally_relevant_dofs(dof);
-  hanging_node_constraints.reinit(locally_relevant_dofs);
+  hanging_node_constraints.reinit(dof.locally_owned_dofs(),
+                                  locally_relevant_dofs);
   DoFTools::make_hanging_node_constraints(dof, hanging_node_constraints);
   hanging_node_constraints.close();
 
