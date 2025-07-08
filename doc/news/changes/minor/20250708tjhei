@@ -1,0 +1,7 @@
+Changed: The Intel Threading Building Blocks (TBB) library is no
+longer bundled as part of deal.II. Instead, the taskflow library is
+bundled and used for multithreaded tasks by default. TBB functionality
+is still being used if taskflow is explicitly disabled, but this will
+likely be removed in the future.
+<br>
+(Timo Heister, 2025/07/08)
