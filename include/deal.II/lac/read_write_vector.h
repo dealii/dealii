@@ -39,7 +39,9 @@
 #  include <deal.II/lac/trilinos_tpetra_block_vector.h>
 #  include <deal.II/lac/trilinos_tpetra_vector.h>
 
+DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
 #  include <Epetra_MultiVector.h>
+DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
 
 #endif
 

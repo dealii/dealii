@@ -20,6 +20,8 @@
 #include <deal.II/base/exceptions.h>
 
 #ifdef DEAL_II_WITH_TRILINOS
+
+DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
 #  include <Epetra_Comm.h>
 #  include <Epetra_Map.h>
 #  include <Teuchos_Comm.hpp>
@@ -34,6 +36,7 @@
 #  ifdef DEAL_II_TRILINOS_WITH_TPETRA
 #    include <Teuchos_RCPDecl.hpp>
 #  endif // DEAL_II_TRILINOS_WITH_TPETRA
+DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
 #endif
 
 

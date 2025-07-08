@@ -21,6 +21,8 @@
 #  include <deal.II/lac/trilinos_sparse_matrix.h>
 #  include <deal.II/lac/vector.h>
 
+DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
+
 #  include <Epetra_MultiVector.h>
 #  include <Ifpack.h>
 #  include <Ifpack_Chebyshev.h>
@@ -28,6 +30,8 @@
 #  include <Teuchos_RCP.hpp>
 #  include <ml_MultiLevelPreconditioner.h>
 #  include <ml_include.h>
+
+DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
 
 DEAL_II_NAMESPACE_OPEN
 

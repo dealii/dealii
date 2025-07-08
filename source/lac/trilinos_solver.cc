@@ -22,11 +22,15 @@
 #  include <deal.II/lac/trilinos_sparse_matrix.h>
 #  include <deal.II/lac/trilinos_vector.h>
 
+DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
+
 #  include <AztecOO_StatusTest.h>
 #  include <AztecOO_StatusTestCombo.h>
 #  include <AztecOO_StatusTestMaxIters.h>
 #  include <AztecOO_StatusTestResNorm.h>
 #  include <AztecOO_StatusType.h>
+
+DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
 
 #  include <cmath>
 #  include <limits>

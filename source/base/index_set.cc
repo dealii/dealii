@@ -24,6 +24,7 @@
 #include <vector>
 
 #ifdef DEAL_II_WITH_TRILINOS
+DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
 #  ifdef DEAL_II_WITH_MPI
 #    include <Epetra_MpiComm.h>
 #  endif
@@ -32,6 +33,7 @@
 #  ifdef DEAL_II_TRILINOS_WITH_TPETRA
 #    include <Tpetra_Map.hpp>
 #  endif
+DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
 #endif
 
 DEAL_II_NAMESPACE_OPEN

@@ -33,6 +33,7 @@
 #    include <deal.II/lac/vector_memory.h>
 #    include <deal.II/lac/vector_operation.h>
 
+DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
 #    include <Epetra_Comm.h>
 #    include <Epetra_CrsGraph.h>
 #    include <Epetra_Export.h>
@@ -41,6 +42,7 @@
 #    include <Epetra_MpiComm.h>
 #    include <Epetra_MultiVector.h>
 #    include <Epetra_Operator.h>
+DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
 
 #    include <cmath>
 #    include <iterator>
