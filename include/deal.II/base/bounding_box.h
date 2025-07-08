@@ -136,6 +136,12 @@ class BoundingBox
 {
 public:
   /**
+   * Provide a way to get the dimension of an object without explicit
+   * knowledge of it's data type.
+   */
+  static constexpr unsigned int dimension = spacedim;
+
+  /**
    * Standard constructor. Creates an object that corresponds to an empty box,
    * i.e. a degenerate box with both points being the origin.
    */
