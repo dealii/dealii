@@ -190,8 +190,8 @@ namespace ArborXWrappers
   DistributedTree<Value>::query(const QueryType &queries)
   {
     Kokkos::View<int *, Kokkos::HostSpace> offsets("offsets", 0);
-    Kokkos::View<Kokkos::pair<int, int> *, Kokkos::HostSpace> indices_ranks(
-      "indices_ranks", 0);
+    Kokkos::View<Kokkos::pair<unsigned int, unsigned int> *, Kokkos::HostSpace>
+      indices_ranks("indices_ranks", 0);
     if constexpr (QueryType::is_nearest)
       {
         distributed_tree.query(
