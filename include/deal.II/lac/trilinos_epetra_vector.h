@@ -28,7 +28,9 @@
 #  include <deal.II/lac/vector_operation.h>
 #  include <deal.II/lac/vector_type_traits.h>
 
+DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
 #  include <Epetra_FEVector.h>
+DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
 
 #  include <memory>
 

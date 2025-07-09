@@ -29,11 +29,13 @@
 #  include <deal.II/lac/vector_operation.h>
 #  include <deal.II/lac/vector_type_traits.h>
 
+DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
 #  include <Epetra_ConfigDefs.h>
 #  include <Epetra_FEVector.h>
 #  include <Epetra_LocalMap.h>
 #  include <Epetra_Map.h>
 #  include <Epetra_MpiComm.h>
+DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
 
 #  include <memory>
 #  include <utility>

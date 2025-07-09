@@ -26,9 +26,11 @@
 
 #  include <boost/io/ios_state.hpp>
 
+DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
 #  include <Epetra_Export.h>
 #  include <Epetra_Import.h>
 #  include <Epetra_Vector.h>
+DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
 
 #  include <cmath>
 #  include <memory>

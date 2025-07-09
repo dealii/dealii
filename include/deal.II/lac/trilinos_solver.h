@@ -27,6 +27,8 @@
 #  include <deal.II/lac/solver_control.h>
 #  include <deal.II/lac/vector.h>
 
+DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
+
 // for AztecOO solvers
 #  include <Amesos.h>
 #  include <AztecOO.h>
@@ -43,6 +45,9 @@
 #    include <BelosOperator.hpp>
 #    include <BelosSolverManager.hpp>
 #  endif
+
+DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
+
 
 #  include <memory>
 
