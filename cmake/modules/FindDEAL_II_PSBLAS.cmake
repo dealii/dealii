@@ -43,7 +43,7 @@ deal_ii_find_path(PSBLAS_INCLUDE_DIR psb_c_base.h
   PATH_SUFFIXES include
   )
 
-set(_additional_libraries "")
+set(_additional_libraries ${_interface_lapack} ${_interface_blas})
 set(_fortran_libs ${CMAKE_Fortran_IMPLICIT_LINK_LIBRARIES})
 # Arbitrarily set this to gfortran and m, if they are not found, the user will
 # have to set them manually
@@ -59,8 +59,13 @@ process_feature(PSBLAS
     REQUIRED 
       ${_psblas_library_variables}
       ${_additional_libraries}
+      LAPACK_LIBRARIES
+      MPI_CXX_LIBRARIES
+      MPI_Fortran_LIBRARIES
   INCLUDE_DIRS 
     REQUIRED PSBLAS_INCLUDE_DIR
+  LINKER_FLAGS
+    REQUIRED ${_interface_lapack} ${_interface_blas}
   CLEAR
     ${_psblas_library_variables} ${_additional_libraries} PSBLAS_INCLUDE_DIR
   )
