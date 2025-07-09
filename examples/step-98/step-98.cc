@@ -322,43 +322,87 @@ namespace Operators
   void LaplacePatchSmoother<dim, fe_degree, number>::initialize(
     std::shared_ptr<PatchStorageType> &patch_storage)
   {
+    // First, call the initialize function of the base class. This sets up
+    // the connection to the patch storage object.
     BaseType::initialize(patch_storage);
 
+    // If there are no patches on the current processor, there is nothing to
+    // initialize, so we can exit early.
     if (patch_storage->n_patches() == 0)
       return;
 
-    FEEval                    fe_eval(*patch_storage->get_matrix_free());
+    // To build the local patch operator, we need information about the finite
+    // element and the geometry of the cells. We start by creating an
+    // FEEvaluation object, which gives us access to this information.
+    FEEval fe_eval(*patch_storage->get_matrix_free());
+
+    // The patch operator is constructed using a tensor product of 1D matrices.
+    // The deal.II FE_Q elements use a hierarchical basis, but the tensor
+    // product construction assumes a lexicographic ordering of degrees of
+    // freedom. We compute a permutation vector that maps from
+    // the lexicographic ordering (used for the matrix) to the hierarchical
+    // ordering (used by the FE_Q element). This vector is then passed to the
+    // matrix creation functions.
     std::vector<unsigned int> numbering =
       FETools::lexicographic_to_hierarchic_numbering<1>(fe_degree);
 
+    // Get the finite element being used on the full-dimensional mesh.
     const auto &fe =
       patch_storage->get_matrix_free()->get_dof_handler().get_fe();
 
+    // From the full-dimensional FE, we create its 1D equivalent. For example,
+    // if the original is FE_Q<dim>, this creates an FE_Q<1>. This is done by
+    // getting the name of the FE as a string and replacing the dimension.
     std::string name = fe.get_name();
     name.replace(name.find('<') + 1, 1, "1");
     std::unique_ptr<FiniteElement<1>> fe_1d = FETools::get_fe_by_name<1>(name);
+
+    // Reinitialize the FEEvaluation object for the first cell (index 0) to
+    // access its geometric properties. We assume the mesh is uniform, so the
+    // properties of one cell are representative of all others.
     fe_eval.reinit(0);
 
+    // Get the inverse of the Jacobian matrix for this cell. The Jacobian maps
+    // from the reference cell to the real cell in physical space.
     auto inverse_jacobian = fe_eval.inverse_jacobian(0);
-
-    Table<2, number> patch_mass_matrix;
-    Table<2, number> patch_laplace_matrix;
-
+    // This implementation assumes a simple Cartesian grid where the coordinate
+    // axes are aligned with the grid lines. We verify this by checking that
+    // the off-diagonal entries of the inverse Jacobian are zero.
     for (unsigned int d = 0; d < dim; ++d)
       for (unsigned int e = 0; e < dim; ++e)
         if (d != e)
           AssertThrow(inverse_jacobian[d][e][0] == 0., ExcNotImplemented());
 
+    // Assuming a uniform mesh, we can determine the mesh size 'h' from the
+    // first diagonal element of the inverse Jacobian.
     const number h = inverse_jacobian[0][0][0];
 
-    // Initialize the local patch inverse operator.
+    // Declare tables (deal.II's dynamic 2D array) to store the 1D mass and
+    // Laplace matrices that will form the patch operator.
+    Table<2, number> patch_mass_matrix;
+    Table<2, number> patch_laplace_matrix;
+
+
+    // Now, we create the 1D matrices for a
+    // single cell. These are the fundamental building blocks.
+    // `create_1d_cell_mass_matrix` assembles the matrix for int(v*u) dx.
+    // {true true} indicates that we want to include the right and left boundary
+    // DoFs in the matrix.
     FullMatrix<number> cell_mass_matrix =
       TensorProductMatrixCreator::create_1d_cell_mass_matrix<number>(
         *fe_1d, h, {true, true}, numbering);
+    // `create_1d_cell_laplace_matrix` assembles the matrix for
+    // int(grad(v)*grad(u)) dx.
     FullMatrix<number> cell_laplace_matrix =
       TensorProductMatrixCreator::create_1d_cell_laplace_matrix<number>(
         *fe_1d, h, {true, true}, numbering);
 
+    // A patch consists of 2x1 cells in 1D. We now assemble the 1D *patch*
+    // matrices from the 1D *cell* matrices we just created. This helper
+    // function combines the cell matrices to form the larger matrix that
+    // represents the operator over the entire 1D patch.
+    // The patch inverse operator only acts on the interior DoFs, so we
+    // create the patch matrices with `false` for the boundary DoFs.
     patch_mass_matrix =
       TensorProductMatrixCreator::create_1D_discretization_matrix<number>(
         cell_mass_matrix, 2, 1, {false, false});
@@ -367,7 +411,11 @@ namespace Operators
       TensorProductMatrixCreator::create_1D_discretization_matrix<number>(
         cell_laplace_matrix, 2, 1, {false, false});
 
-
+    // Finally, we initialize the patch inverse operator. This object will be
+    // used during the smoothing steps to solve the local problem on each
+    // patch. It takes the 1D mass and Laplace matrices and uses them to
+    // construct the full `dim`-dimensional inverse operator via tensor
+    // products.
     patch_inverse_operator.reinit(patch_mass_matrix, patch_laplace_matrix);
   }
 
