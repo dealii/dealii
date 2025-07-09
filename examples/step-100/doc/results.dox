@@ -1,0 +1,45 @@
+<h1>Results</h1>
+The solutions of the above program are written to .vtk files for both the interior solution and the skeleton one. Each file contains four components, the real and imaginary part of the pressure and velocity field. With degree $p=2$ polynomial space, a difference of $\Delta p =1$ degree between the test and the trial space, a plane wave propagating in the direction $\theta = \pi/4$ and an angular frequency $\omega =  20 \pi$, the program should output the following table at the end :  
+
+@code
+Convergence table:
+cycle n_cells cell_size dofs_interior dofs_skeleton dofs_test n_iter   eL2_u_r     eL2_u_i      eL2_p_r     eL2_p_i    eL2_u_hat_r  eL2_u_hat_i  eL2_p_hat_r  eL2_p_hat_i  
+    0       4    0.7071           216           138       450     78 0.8139    - 0.5738     - 0.8061    - 0.5736     - 0.8489     - 1.2310     - 1.3819     - 1.9864     - 
+    1      16    0.3536           864           450      1666    102 0.7118 0.19 0.7097 -0.31 0.7106 0.18 0.7087 -0.31 1.4091 -0.73 1.4210 -0.21 2.3013 -0.74 2.3266 -0.23 
+    2      64    0.1768          3456          1602      6402    208 0.6600 0.11 0.6641  0.10 0.6618 0.10 0.6597  0.10 1.8172 -0.37 1.7966 -0.34 2.7158 -0.24 2.7309 -0.23 
+    3     256    0.0884         13824          6018     25090   1547 0.1334 2.31 0.1091  2.61 0.1093 2.60 0.1337  2.30 0.5128  1.83 0.4169  2.11 0.5232  2.38 0.6859  1.99 
+    4    1024    0.0442         55296         23298     99330   2233 0.0087 3.94 0.0086  3.66 0.0085 3.69 0.0086  3.96 0.0370  3.79 0.0365  3.51 0.0179  4.87 0.0204  5.07 
+    5    4096    0.0221        221184         91650    395266   5297 0.0011 3.02 0.0011  3.00 0.0011 3.01 0.0011  3.02 0.0061  2.59 0.0061  2.57 0.0015  3.58 0.0015  3.74 
+    6   16384    0.0110        884736        363522   1576962  10166 0.0001 3.00 0.0001  3.00 0.0001 3.00 0.0001  3.00 0.0011  2.53 0.0011  2.52 0.0001  3.50 0.0001  3.54 
+    7   65536    0.0055       3538944       1447938   6299650  19647 0.0000 3.00 0.0000  3.00 0.0000 3.00 0.0000  3.00 0.0002  2.51 0.0002  2.51 0.0000  3.47 0.0000  3.47 
+@endcode
+
+The most refined solution should look similar to the following figure where we present the pressure field solution -- the velocity fields have basically the same profile but it is vector valued so we do not show them here-- depending on your visualization tool (here we used Paraview). We cropped the domain in 4 to show both the real and imaginary components for the interior and the mesh skeleton.
+
+<img src="https://www.dealii.org/images/steps/developer/step-100-pressure.png" style="width:80%" alt="">
+
+
+<h3>Convergence</h3>
+
+To validate that the code falls back on the analytical solution of the plane wave with the expected order, we did a convergence plot for all the different fields which are presented below. As expected for degree $p=2$ polynomial DGQ element in the interior, all field converge to the order 3. On the faces, it is expected that we lose half an order compared to the interior and that is what we observe for the normal velocity component. However, for the pressure skeleton unknowns, they are associated to the trace of Q elements and for the same sequence of energy space the Q elements are one degree higher than the DGQ element. It follows that for DGQ of order 2 as used here, the corresponding Q element would be order 3 so the trace of those elements should converge with a slop of 3.5 as observed.
+
+<img src="https://www.dealii.org/images/steps/developer/step-100-error.svg" style="width:80%" alt="">
+
+
+<h3>Linear solver iterations</h3>
+
+In time-harmonic problem, the number of iterations to solve the system increase as the resolution of the wave increase (we have more dofs in our linear system). The DPG method is no exception to this. To show this, we recorded the number of iterations as we refined the mesh for 3 different angular frequency and we present the result in the last figure below. In it, we show the number of iterations as a function of the number of dofs along with the total error of the interior fields. From it, we can see that the error does not start converging before the Nyquist criteria is respected and that at that same moment there is a jump in the number of iterations to achieve convergence. After that the number of iterations approximately doubles each time we double the resolution.
+
+<img src="https://www.dealii.org/images/steps/developer/step-100-iteration.svg" style="width:80%" alt="">
+
+<h3>Possibilities for extension </h3>
+
+As an extension to get a feeling of the method, one could first try to implement the 3D version of the plane wave problem in the unit cube by adding a second angle $\phi$. The analytical solution to this problem is also known and is described by :
+@f{align*}{
+    p^*        & = e^{-i k (x \cos(\theta) \sin{\phi} + y \sin(\theta) \sin(\phi) + z \cos(\phi))},                                                                                                                                                    \\
+    \mathbf{u} & = \frac{1}{c_s} \begin{pmatrix} \cos(\theta) \sin(\phi)  \\ \sin(\theta) \sin(\phi) \\ \cos(\phi) \end{pmatrix} e^{-i k (x \cos(\theta) \sin{\phi} + y \sin(\theta) \sin(\phi) + z \cos(\phi))}.
+@f}
+Another interesting extension would be to reconstruct the residual $\Psi^r$ when the solutions on the faces and interior dofs are known and use it to build an error estimator that can be utilized for adaptive hp-refinement. Finally, if one is interested more specifically in time-harmonic problems, the implementation of an adequate preconditioner to improve the algorithm convergence of the linear solver would  remedy to one of the inherent difficulties for this type of problem. 
+
+
+
