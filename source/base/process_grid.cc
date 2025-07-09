@@ -18,6 +18,8 @@
 
 #  include <deal.II/lac/scalapack.templates.h>
 
+#  include <algorithm>
+
 DEAL_II_NAMESPACE_OPEN
 
 namespace
@@ -72,7 +74,7 @@ namespace
     // but this affects the grid shape dramatically, i.e. 10 cores 3x3 becomes
     // 2x5.
     // limit our estimate to be in [2, Np]
-    int n_process_columns = std::min(Np, std::max(2, Pc));
+    int n_process_columns = std::clamp(Pc, 2, Np);
     // finally, get the rows:
     int n_process_rows = Np / n_process_columns;
 
