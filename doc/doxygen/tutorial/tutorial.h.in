@@ -720,6 +720,12 @@
  *       Solving the curl-curl equation.
  *       <br/> Keywords: FE_Nedelec, FE_RaviartThomas, WorkStream::run()
  *       </td></tr>
+ *
+ *   <tr valign="top">
+ *       <td>step-100</td>
+ *       <td> Application of Discontinuous Petrov-Galerkin method to the solution of the time-harmonic Helholtz equation.
+ *       <br/> Keywords: FE_FaceQ, FE_TraceQ, FE_RaviartThomas, FE_DGQ
+ *       </td></tr>
  * </table>
  *
  *
@@ -975,10 +981,11 @@
  *       step-61,
  *       step-67,
  *       step-74,
- *       step-82
+ *       step-82,
+ *       step-100
  *     </td>
  *   </tr>
- *
+ * 
  *   <tr valign="top">
  *     <td> hp-finite elements
  *     </td>
