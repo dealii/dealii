@@ -78,17 +78,6 @@ if(DEAL_II_FEATURE_TASKFLOW_BUNDLED_CONFIGURED)
 endif()
 
 
-if(DEAL_II_FEATURE_TBB_BUNDLED_CONFIGURED)
-  add_subdirectory(${TBB_FOLDER}/src)
-
-  install(DIRECTORY ${TBB_FOLDER}/include/tbb
-    DESTINATION ${DEAL_II_INCLUDE_RELDIR}/deal.II/bundled
-    COMPONENT library
-    FILES_MATCHING PATTERN "*.h"
-    )
-endif()
-
-
 if(DEAL_II_FEATURE_UMFPACK_BUNDLED_CONFIGURED)
   add_subdirectory(${UMFPACK_FOLDER}/UMFPACK/Source)
   add_subdirectory(${UMFPACK_FOLDER}/AMD/Source)

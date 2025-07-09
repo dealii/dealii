@@ -46,17 +46,6 @@ A full version of the MuParser project can be downloaded at
 http://muparser.beltoforion.de/.
 
 
-tbb*
-----
-
-Contains parts of the Intel Threading Building Blocks library copyrighted
-by the respective authors and licensed under the Apache License Version 2.0
-. See `tbb*/README.md` or http://threadingbuildingblocks.org/.
-
-A full version of the tbb project can be downloaded at
-http://threadingbuildingblocks.org/.
-
-
 umfpack  (UMFPACK 5.0.2, AMD 2.2, UFCONFIG)
 -------------------------------------------
 

@@ -115,45 +115,6 @@ endmacro()
 
 
 #
-# Threading Building Blocks library
-#
-
-if( NOT CMAKE_SYSTEM_NAME MATCHES "CYGWIN"
-    AND NOT CMAKE_SYSTEM_NAME MATCHES "Windows" )
-  #
-  # Cygwin is unsupported by tbb, Windows due to the way we compile tbb...
-  #
-  set(FEATURE_TBB_HAVE_BUNDLED TRUE)
-
-  option(DEAL_II_FORCE_BUNDLED_TBB
-    "Always use the bundled tbb library instead of an external one."
-    OFF)
-
-  set(TBB_FOLDER "${CMAKE_SOURCE_DIR}/bundled/tbb-2018_U2")
-endif()
-
-macro(feature_tbb_configure_bundled)
-  set(TBB_VERSION "2018.0")
-  set(TBB_VERSION_MAJOR "2018")
-  set(TBB_VERSION_MINOR "0")
-
-  #
-  # We have to disable a bunch of warnings:
-  #
-  enable_if_supported(DEAL_II_WARNING_FLAGS "-Wno-parentheses")
-
-  #
-  # tbb uses dlopen/dlclose, so link against libdl.so as well:
-  #
-  list(APPEND DEAL_II_LIBRARIES ${CMAKE_DL_LIBS})
-
-  list(APPEND DEAL_II_BUNDLED_INCLUDE_DIRS ${TBB_FOLDER}/include)
-
-  set(DEAL_II_TBB_WITH_ONEAPI FALSE)
-endmacro()
-
-
-#
 # UMFPACK, AMD and UFCONFIG:
 #
 
