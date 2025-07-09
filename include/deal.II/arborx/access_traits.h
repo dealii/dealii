@@ -1261,7 +1261,6 @@ namespace ArborX
                           sphere.second},
                    sph_nearest.get_n_nearest_neighbors());
   }
-} // namespace ArborX
 #  else
   template <int dim, typename Number>
   inline std::size_t
