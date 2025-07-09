@@ -2411,18 +2411,24 @@ namespace SAND
 
         // At the end of the outer loop, we have to update the
         // barrier parameter, for which we use the following
-        // formula. The rest of the function is then simply about
-        // checking the outer loop convergence condition, and if
+        // algorithm: First we reduce the barrier parameter
+        // to the smaller of two potential values (causing first a
+        // linear and later an exponential decrease), then
+        // we ensure we do not reduce the barrier parameter
+        // below a lower limit.
+        // Once we reach the lower limit for the barrier parameter
+        // the rest of the function is simply about
+        // checking the outer loop convergence condition, and when
         // we decide to terminate computations, about writing the
         // final "design" as an STL file for use in 3d printing,
         // and to output some timing information.
         const double barrier_size_multiplier = .8;
         const double barrier_size_exponent   = 1.2;
 
-        barrier_size =
-          std::clamp(barrier_size * barrier_size_multiplier,
-                     min_barrier_size,
-                     std::pow(barrier_size, barrier_size_exponent));
+        barrier_size = std::min(barrier_size * barrier_size_multiplier,
+                                std::pow(barrier_size, barrier_size_exponent));
+
+        barrier_size = std::max(barrier_size, min_barrier_size);
 
         std::cout << std::endl;
       }
