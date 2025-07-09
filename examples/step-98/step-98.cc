@@ -341,8 +341,8 @@ namespace Operators
 
     auto inverse_jacobian = fe_eval.inverse_jacobian(0);
 
-    std::array<Table<2, number>, dim> patch_mass_matrices;
-    std::array<Table<2, number>, dim> patch_laplace_matrices;
+    Table<2, number> patch_mass_matrix;
+    Table<2, number> patch_laplace_matrix;
 
     for (unsigned int d = 0; d < dim; ++d)
       for (unsigned int e = 0; e < dim; ++e)
@@ -359,18 +359,16 @@ namespace Operators
       TensorProductMatrixCreator::create_1d_cell_laplace_matrix<number>(
         *fe_1d, h, {true, true}, numbering);
 
-    for (unsigned int d = 0; d < dim; ++d)
-      {
-        patch_mass_matrices[d] =
-          TensorProductMatrixCreator::create_1D_discretization_matrix<number>(
-            cell_mass_matrix, 2, 1, {false, false});
+    patch_mass_matrix =
+      TensorProductMatrixCreator::create_1D_discretization_matrix<number>(
+        cell_mass_matrix, 2, 1, {false, false});
 
-        patch_laplace_matrices[d] =
-          TensorProductMatrixCreator::create_1D_discretization_matrix<number>(
-            cell_laplace_matrix, 2, 1, {false, false});
-      }
+    patch_laplace_matrix =
+      TensorProductMatrixCreator::create_1D_discretization_matrix<number>(
+        cell_laplace_matrix, 2, 1, {false, false});
 
-    patch_inverse_operator.reinit(patch_mass_matrices, patch_laplace_matrices);
+
+    patch_inverse_operator.reinit(patch_mass_matrix, patch_laplace_matrix);
   }
 
   /**
@@ -382,7 +380,6 @@ namespace Operators
   void LaplacePatchSmoother<dim, fe_degree, number>::clear()
   {
     BaseType::clear();
-    // inverse.clear();
   }
 
   /**
