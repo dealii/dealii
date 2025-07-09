@@ -329,18 +329,14 @@ namespace Operators
 
     FEEval                    fe_eval(*patch_storage->get_matrix_free());
     std::vector<unsigned int> numbering =
-      FETools::hierarchic_to_lexicographic_numbering<1>(fe_degree);
+      FETools::lexicographic_to_hierarchic_numbering<1>(fe_degree);
 
     const auto &fe =
       patch_storage->get_matrix_free()->get_dof_handler().get_fe();
 
-
     std::string name = fe.get_name();
     name.replace(name.find('<') + 1, 1, "1");
-    // std::unique_ptr<FiniteElement<1>> fe_1d =
-    // FETools::get_fe_by_name<1>(name);
-    std::unique_ptr<FiniteElement<1>> fe_1d =
-      std::make_unique<FE_DGQ<1>>(fe_degree);
+    std::unique_ptr<FiniteElement<1>> fe_1d = FETools::get_fe_by_name<1>(name);
     fe_eval.reinit(0);
 
     auto inverse_jacobian = fe_eval.inverse_jacobian(0);
@@ -358,10 +354,10 @@ namespace Operators
     // Initialize the local patch inverse operator.
     FullMatrix<number> cell_mass_matrix =
       TensorProductMatrixCreator::create_1d_cell_mass_matrix<number>(
-        *fe_1d, h, {true, true});
+        *fe_1d, h, {true, true}, numbering);
     FullMatrix<number> cell_laplace_matrix =
       TensorProductMatrixCreator::create_1d_cell_laplace_matrix<number>(
-        *fe_1d, h, {true, true});
+        *fe_1d, h, {true, true}, numbering);
 
     for (unsigned int d = 0; d < dim; ++d)
       {
@@ -373,16 +369,6 @@ namespace Operators
           TensorProductMatrixCreator::create_1D_discretization_matrix<number>(
             cell_laplace_matrix, 2, 1, {false, false});
       }
-
-    // Print the patch mass matrix for the first dimension
-    // std::cout << "Patch mass matrix [0]:" << std::endl;
-    // for (unsigned int i = 0; i < patch_mass_matrices[0].n_rows(); ++i)
-    //   {
-    //     for (unsigned int j = 0; j < patch_mass_matrices[0].n_cols(); ++j)
-    //       std::cout << patch_mass_matrices[0](i, j) << " ";
-    //     std::cout << std::endl;
-    //   }
-
 
     patch_inverse_operator.reinit(patch_mass_matrices, patch_laplace_matrices);
   }
