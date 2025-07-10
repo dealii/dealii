@@ -30,6 +30,10 @@
 
 #  include <boost/hana.hpp>
 
+#  include <CGAL/version.h>
+#  if CGAL_VERSION_MAJOR >= 6
+#    include <CGAL/Installation/internal/disable_deprecation_warnings_and_errors.h>
+#  endif
 #  include <CGAL/Complex_2_in_triangulation_3.h>
 #  include <CGAL/IO/facets_in_complex_2_to_triangle_mesh.h>
 #  include <CGAL/Implicit_surface_3.h>

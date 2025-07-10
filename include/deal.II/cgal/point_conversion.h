@@ -21,6 +21,10 @@
 
 #ifdef DEAL_II_WITH_CGAL
 
+#  include <CGAL/version.h>
+#  if CGAL_VERSION_MAJOR >= 6
+#    include <CGAL/Installation/internal/disable_deprecation_warnings_and_errors.h>
+#  endif
 #  include <CGAL/Cartesian.h>
 #  include <CGAL/Exact_predicates_exact_constructions_kernel.h>
 #  include <CGAL/Exact_predicates_inexact_constructions_kernel.h>
