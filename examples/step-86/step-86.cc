@@ -310,15 +310,15 @@ namespace Step86
   // `homogeneous_constraints` object for this purpose.
   //
   // Note one detail here: The function
-  // AffineConstraints::make_consistent_in_parallel() might change the
-  // underlying field for locally stored lines of the
+  // AffineConstraints::make_consistent_in_parallel() might expand the
+  // underlying IndexSet for locally stored lines of the
   // `hanging_node_constraints` object depending on how constraints are set up
   // in parallel. Thus, at the point where we want to create a second affine
   // constraints object that gets the information from the hanging node
   // constraints, we need to make sure to use the local lines stored in the
-  // hanging node constraints, not the `locally_relevant_dofs` it was
+  // hanging node constraints, not the `locally_relevant_dofs` that object was
   // originally initialized to. If this is not respected, errors might appear
-  // later on.
+  // during the course of the simulation.
   //
   // Finally, we create the actual non-homogeneous `current_constraints` by
   // calling `update_current_constraints). These are also used during the
