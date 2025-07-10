@@ -163,7 +163,7 @@ namespace Step87
 
     const MappingQ1<dim> mapping;
     Triangulation<dim>   tria;
-    GridGenerator::subdivided_hyper_cube(tria, 7);
+    GridGenerator::subdivided_hyper_cube(tria, 5);
 
     const FE_Q<dim> fe(fe_degree);
     DoFHandler<dim> dof_handler(tria);
