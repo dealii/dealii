@@ -30,7 +30,7 @@ foreach(_step ${_steps})
 
   # Create symbolic links to the output files:
   file(GLOB _output_files
-    "${_base_directory}/${_step}*.output*" "${_base_directory}/${_step}*.run_only"
+    "${_base_directory}/${_step}.*output*" "${_base_directory}/${_step}.*run_only"
     )
   foreach(_file ${_output_files})
     get_filename_component(_destination "${_file}" NAME)
