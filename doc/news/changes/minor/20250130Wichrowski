@@ -1,2 +1,0 @@
-New: Matrix-Free now can build data structures for ghosted cells. The functionality can be accessed  by AdditionalData::store_ghost_cells.
-(Michał Wichrowski, 2025/01/30)

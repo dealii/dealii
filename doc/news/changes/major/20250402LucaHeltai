@@ -1,7 +1,0 @@
-New: Re-introduced an interface for the MUMPS (Multifrontal Massively Parallel
-Sparse Direct Solver) library. MUMPS support had been removed in 2015, since we
-opted for its use through Trilinos and PETSc. As part of the dealii-X project,
-we plan to integrate the new features of MUMPS (i.e., CUDA support, currently
-under development) within deal.II, enabling its use with native deal.II objects
-and classes.
-<br> (Luca Heltai, Martin Kronbichler, Alfredo Buttari, 2025/04/02)

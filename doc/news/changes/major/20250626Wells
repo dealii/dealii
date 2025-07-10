@@ -1,7 +1,0 @@
-New: Added a new class MappingP1, which is now the default linear simplex mapping
-(i.e., it is the mapping returned by ReferenceCell::get_default_linear_mapping()).
-This mapping is significantly more efficient than MappingFE for linear simplex
-elements: e.g., Mapping::fill_fe_values() is about 6x faster in a simple load
-vector benchmark.
-<br>
-(David Wells, 2025/06/26)

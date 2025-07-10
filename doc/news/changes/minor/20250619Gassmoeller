@@ -1,6 +1,0 @@
-Fixed: The function GridGenerator::half_hyper_shell would colorize
-the boundary ids of the triangulation incorrectly if the created shell
-was too thin. In particular the top and bottom boundary ids would
-be set incorrectly. This is fixed now.
-<br>
-(Rene Gassmoeller, 2025/06/19)

@@ -1,3 +1,0 @@
-New: Added support for magic_enum.hpp. Now PatternsTools::Convert<T> works also when T is an enum type.
-<br>
-(Luca Heltai, 2024/08/12)

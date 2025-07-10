@@ -1,3 +1,0 @@
-New: VectorTools::interpolate() can now also used on multigrid levels.
-<br>
-(Peter Munch, Richard Schussnig, 2024/07/26)

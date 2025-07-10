@@ -1,4 +1,0 @@
-Improved: The class ScalarFunctionFromFunctionObject can now
-also handle time-dependent functions.
-<br>
-(Peter Munch, 2024/09/26)

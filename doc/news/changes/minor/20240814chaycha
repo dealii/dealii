@@ -1,4 +1,0 @@
-New: Added SparseVanka::Tvmult() and SparseVanka::clear()
-SparseVanka can now be passed to MGSmootherPrecondition to be used as a multigrid smoother.
-<br>
-(Chayapol Chaoveeraprasit, 2024/08/14)

@@ -1,9 +1,0 @@
-Removed: The CMake option `DEAL_II_COMPILE_EXAMPLES` has been removed.
-As a consequence, examples will no longer be compiled if
-`DEAL_II_COMPONENT_EXAMPLES` is set to true.
-<br>
-You can use the testsuite to compile all examples at once. First, set up
-the `setup_tests_examples` target, i.e., with `make setup_tests_examples`.
-Then compile and run the examples with `ctest -R examples`.
-<br>
-(Marc Fehling, 2024/08/12)

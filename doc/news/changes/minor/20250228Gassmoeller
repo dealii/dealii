@@ -1,6 +1,0 @@
-Fixed: The particle generator function 'probabilistic_locations' could
-under certain conditions cause a division by zero if the user-provided
-probability density function evaluated to 0 everywhere in a local domain,
-but not globally. This has been fixed.
-<br>
-(Rene Gassmoeller, 2025/02/28)

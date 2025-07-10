@@ -1,5 +1,0 @@
-Changed: The hp-variants of KellyErrorEstimator::estimate now take
-hp::MappingCollection objects. The versions that require Mapping objects
-are now deprecated.
-<br>
-(Marc Fehling, 2025/06/20)

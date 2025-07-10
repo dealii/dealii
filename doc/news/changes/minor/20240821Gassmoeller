@@ -1,5 +1,0 @@
-New: deal.II now contains a python script to indent ParameterHandler .prm
-files. The script is located in contrib/utilities/prm_tools.py and can be
-used to update .prm file in-place or write the output into a new file.
-<br>
-(Rene Gassmoeller, 2024/08/21)
