@@ -22,7 +22,7 @@ All entries are signed with the names of the authors.
 </p>
 <!-- ----------- INCOMPATIBILITIES ----------------- -->
 
-<a name="incompatible"></a>
+<a name="960-970-incompatible"></a>
 <h3 style="color:red">Incompatibilities</h3>
 
 <p style="color:red">
@@ -251,9 +251,6 @@ inconvenience this causes.
  </li>
 
  <li>
- </li>
-
- <li>
   Deprecated: The classes SolutionTransfer and parallel::distributed::SolutionTransfer
   have been unified to SolutionTransfer. The class now supports both serial and parallel
   meshes. The class has lost some functions: the function SolutionTransfer::interpolate()
@@ -271,7 +268,7 @@ inconvenience this causes.
 
 <!-- ----------- GENERAL IMPROVEMENTS ----------------- -->
 
-<a name="general"></a>
+<a name="960-970-general"></a>
 <h3>General</h3>
 <ol>
 
@@ -350,15 +347,12 @@ inconvenience this causes.
   (Wolfgang Bangerth, 2024/08/30)
  </li>
 
- <li>
- </li>
-
 </ol>
 
 
 <!-- ----------- SPECIFIC IMPROVEMENTS ----------------- -->
 
-<a name="specific"></a>
+<a name="960-970-specific"></a>
 <h3>Specific improvements</h3>
 <ol>
 
@@ -1123,9 +1117,6 @@ inconvenience this causes.
   New: Made `mapping` variables `const` in example files.
   <br>
   (L&oacute;r&aacute;nt Hadnagy, 2024/07/25)
- </li>
-
- <li>
  </li>
 
 </ol>
