@@ -712,7 +712,12 @@ namespace Step93
     // interpolate the target function $\bar u$ onto the mesh, then
     // add the data to our data_out object.
     Vector<double> target(new_dof_handler.n_dofs());
-    VectorTools::interpolate(new_dof_handler, target_function, target);
+    VectorTools::interpolate(new_dof_handler,
+                             ScalarFunctionFromFunctionObject<dim, double>(
+                               [&](const Point<dim> &x) {
+                                 return target_function.value(x, 0);
+                               }),
+                             target);
     data_out.add_data_vector(new_dof_handler, target, "u_bar");
 
     // In order to visualize the sum of the heat sources $\sum_k C^k
