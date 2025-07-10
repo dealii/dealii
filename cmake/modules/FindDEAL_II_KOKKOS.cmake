@@ -124,13 +124,14 @@ if(KOKKOS_FOUND)
   set(KOKKOS_VERSION ${Kokkos_VERSION})
 
   if (Kokkos_ENABLE_CUDA OR Kokkos_ENABLE_HIP)
-    # In version older than 3.7.0, Kokkos::Array::operator[] is not constexpr,
-    # so we use std::array instead.
-    if (Kokkos_VERSION VERSION_LESS 3.7.0)
-      # We are using std::array in device code which calls the host-only function
-      # __glibcxx_requires_subscript when defining _GLIBCXX_ASSERTIONS 
-      list(REMOVE_ITEM DEAL_II_DEFINITIONS_DEBUG "_GLIBCXX_ASSERTIONS")
-    endif()
+    # In versions older than 3.7.0, we would need several workarounds if
+    # device support is enabled:
+    # - Kokkos::Array::operator[] is not constexpr
+    # - std::array uses __glibcxx_requires_subscript (host-only)
+    # - KOKKOS_IF_ON_DEVICE doesn't exist
+    #
+    # So, to simplify our work, require a more modern version:
+    message(ERROR "Device support (CUDA/HIP) requires Kokkos version 3.7 or newer!")
   endif()
 
   if(Kokkos_ENABLE_CUDA)
