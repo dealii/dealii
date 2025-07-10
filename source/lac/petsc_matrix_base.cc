@@ -810,7 +810,10 @@ namespace PETScWrappers
     const PetscErrorCode ierr = MatGetInfo(matrix, MAT_LOCAL, &info);
     AssertThrow(ierr == 0, ExcPETScError(ierr));
 
-    return sizeof(*this) + static_cast<size_type>(info.memory);
+    return (sizeof(*this) +
+            static_cast<size_type>(
+              ((info.nz_allocated * (sizeof(PetscScalar) + sizeof(PetscInt))) +
+               local_size() * sizeof(PetscInt))));
   }
 
 } // namespace PETScWrappers
