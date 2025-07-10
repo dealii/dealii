@@ -25,6 +25,10 @@
 #ifdef DEAL_II_WITH_CGAL
 #  include <deal.II/cgal/point_conversion.h>
 
+#  include <CGAL/version.h>
+#  if CGAL_VERSION_MAJOR >= 6
+#    include <CGAL/Installation/internal/disable_deprecation_warnings_and_errors.h>
+#  endif
 #  include <CGAL/Polygon_mesh_processing/stitch_borders.h>
 #  include <CGAL/Surface_mesh.h>
 
