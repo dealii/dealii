@@ -14,15 +14,18 @@
 
 
 if(DEAL_II_BUILD_CXX20_MODULE)
-  message(STATUS "Setting up a C++20 module")
+  message(STATUS "Setting up the C++20 module")
 
-  # The scripts used below are all written in Python. Ensure that we
-  # have it available.
+  #
+  # The scripts used below are all written in Python. Ensure that we have
+  # it available.
+  #
+
   find_package (Python3 COMPONENTS Interpreter)
   if (NOT Python3_FOUND)
     message(FATAL_ERROR
-            "To build a C++20 module, you need to have the Python3 "
-            "interpreter available")
+      "To build a C++20 module, you need to have the Python3 interpreter available"
+      )
   endif()
 
   #
@@ -40,6 +43,7 @@ if(DEAL_II_BUILD_CXX20_MODULE)
   # (We will later also mark this file as a PUBLIC header file of the
   # module libraries, so that it will be installed.)
   #
+
   set(_dealii_macros_header "${CMAKE_CURRENT_BINARY_DIR}/../include/deal.II/macros.h")
   add_custom_command(
     OUTPUT ${_dealii_macros_header}
@@ -62,16 +66,18 @@ if(DEAL_II_BUILD_CXX20_MODULE)
 
   #
   # Next, we need to set up interface module partitions for each of deal.II's
-  # header files.
+  # header files. We query the list of all header files from the
+  # DEAL_II_HEADER_FILES property (which includes everything we picked up
+  # from the include/ directory, but not config.h which resided in the
+  # build directory).
   #
+
   set(_interface_module_partition_units)
   get_property(_header_files GLOBAL PROPERTY DEAL_II_HEADER_FILES)
   foreach (_header_file ${_header_files})
-    # We loop over all files that already exist in the include/
-    # directory, which excludes config.h (only created in the build
-    # directory) but includes exception_macros.h. The latter file only
-    # #defines preprocessor stuff, and so we do not want to build a
-    # module out of it. So exclude it.
+
+    # exceptions_macros.h only #defines preprocessor stuff, and so we do
+    # not want to build a module out of it. So exclude it.
     if (${_header_file} STREQUAL "${CMAKE_SOURCE_DIR}/include/base/exception_macros.h")
       continue()
     endif()
@@ -91,9 +97,9 @@ if(DEAL_II_BUILD_CXX20_MODULE)
     # .ccm -- in fact, some compilers seem to require that the suffix is
     # .ccm or .cppm or something else that ends in 'm':
     string(REGEX REPLACE
-             ".*/deal.II/(.*)\.h$"
-             "${CMAKE_CURRENT_BINARY_DIR}/interface_module_partitions/\\1.ccm"
-           _module_file ${_header_file})
+      ".*/deal.II/(.*)\.h$" "${CMAKE_CURRENT_BINARY_DIR}/interface_module_partitions/\\1.ccm"
+      _module_file ${_header_file}
+      )
 
     # Create an interface module partition file from the header file:
     add_custom_command(
@@ -112,11 +118,10 @@ if(DEAL_II_BUILD_CXX20_MODULE)
     # Compiling this file will require access to the deal.II/macros.h header:
     set_property(SOURCE _module_file APPEND PROPERTY OBJECT_DEPENDS ${_dealii_macros_header})
 
-    # Then add the created file to the list of interface units:
     list(APPEND _interface_module_partition_units "${_module_file}")
   endforeach()
 
-
+  #
   # We have some other interface units that we need to add to the list,
   # namely the ones that were written by hand instead of created via
   # script above. We need to add these to the list of interface units
@@ -130,43 +135,45 @@ if(DEAL_II_BUILD_CXX20_MODULE)
   # old-style #include system. We deal with this by wrapping all of
   # our external dependencies into partitions that we can 'import'
   # wherever we need.
+  #
   list(APPEND _interface_module_partition_units
-       "${CMAKE_CURRENT_SOURCE_DIR}/interface_module_partitions/adolc.ccm"
-       "${CMAKE_CURRENT_SOURCE_DIR}/interface_module_partitions/boost.ccm"
-       "${CMAKE_CURRENT_SOURCE_DIR}/interface_module_partitions/cgal.ccm"
-       "${CMAKE_CURRENT_SOURCE_DIR}/interface_module_partitions/hdf5.ccm"
-       "${CMAKE_CURRENT_SOURCE_DIR}/interface_module_partitions/kokkos.ccm"
-       "${CMAKE_CURRENT_SOURCE_DIR}/interface_module_partitions/metis.ccm"
-       "${CMAKE_CURRENT_SOURCE_DIR}/interface_module_partitions/mumps.ccm"
-       "${CMAKE_CURRENT_SOURCE_DIR}/interface_module_partitions/mpi.ccm"
-       "${CMAKE_CURRENT_SOURCE_DIR}/interface_module_partitions/muparser.ccm"
-       "${CMAKE_CURRENT_SOURCE_DIR}/interface_module_partitions/opencascade.ccm"
-       "${CMAKE_CURRENT_SOURCE_DIR}/interface_module_partitions/p4est.ccm"
-       "${CMAKE_CURRENT_SOURCE_DIR}/interface_module_partitions/petsc.ccm"
-       "${CMAKE_CURRENT_SOURCE_DIR}/interface_module_partitions/slepc.ccm"
-       "${CMAKE_CURRENT_SOURCE_DIR}/interface_module_partitions/std.ccm"
-       "${CMAKE_CURRENT_SOURCE_DIR}/interface_module_partitions/sundials.ccm"
-       "${CMAKE_CURRENT_SOURCE_DIR}/interface_module_partitions/taskflow.ccm"
-       "${CMAKE_CURRENT_SOURCE_DIR}/interface_module_partitions/tbb.ccm"
-       "${CMAKE_CURRENT_SOURCE_DIR}/interface_module_partitions/trilinos.ccm"
-       "${CMAKE_CURRENT_SOURCE_DIR}/interface_module_partitions/umfpack.ccm"
-       "${CMAKE_CURRENT_SOURCE_DIR}/interface_module_partitions/vtk.ccm"
-       "${CMAKE_CURRENT_SOURCE_DIR}/interface_module_partitions/zlib.ccm"
-  )
+    "${CMAKE_CURRENT_SOURCE_DIR}/interface_module_partitions/adolc.ccm"
+    "${CMAKE_CURRENT_SOURCE_DIR}/interface_module_partitions/boost.ccm"
+    "${CMAKE_CURRENT_SOURCE_DIR}/interface_module_partitions/cgal.ccm"
+    "${CMAKE_CURRENT_SOURCE_DIR}/interface_module_partitions/hdf5.ccm"
+    "${CMAKE_CURRENT_SOURCE_DIR}/interface_module_partitions/kokkos.ccm"
+    "${CMAKE_CURRENT_SOURCE_DIR}/interface_module_partitions/metis.ccm"
+    "${CMAKE_CURRENT_SOURCE_DIR}/interface_module_partitions/mumps.ccm"
+    "${CMAKE_CURRENT_SOURCE_DIR}/interface_module_partitions/mpi.ccm"
+    "${CMAKE_CURRENT_SOURCE_DIR}/interface_module_partitions/muparser.ccm"
+    "${CMAKE_CURRENT_SOURCE_DIR}/interface_module_partitions/opencascade.ccm"
+    "${CMAKE_CURRENT_SOURCE_DIR}/interface_module_partitions/p4est.ccm"
+    "${CMAKE_CURRENT_SOURCE_DIR}/interface_module_partitions/petsc.ccm"
+    "${CMAKE_CURRENT_SOURCE_DIR}/interface_module_partitions/slepc.ccm"
+    "${CMAKE_CURRENT_SOURCE_DIR}/interface_module_partitions/std.ccm"
+    "${CMAKE_CURRENT_SOURCE_DIR}/interface_module_partitions/sundials.ccm"
+    "${CMAKE_CURRENT_SOURCE_DIR}/interface_module_partitions/taskflow.ccm"
+    "${CMAKE_CURRENT_SOURCE_DIR}/interface_module_partitions/tbb.ccm"
+    "${CMAKE_CURRENT_SOURCE_DIR}/interface_module_partitions/trilinos.ccm"
+    "${CMAKE_CURRENT_SOURCE_DIR}/interface_module_partitions/umfpack.ccm"
+    "${CMAKE_CURRENT_SOURCE_DIR}/interface_module_partitions/vtk.ccm"
+    "${CMAKE_CURRENT_SOURCE_DIR}/interface_module_partitions/zlib.ccm"
+    )
 
   #
   # Next, we also need to set up implementation module partitions for
   # each of deal.II's source files.
   #
+
   set(_implementation_module_partition_units)
   get_property(_source_files GLOBAL PROPERTY DEAL_II_SOURCE_FILES)
   foreach (_source_file ${_source_files})
     # Check whether the file actually exports anything into namespace
-    # dealii.  Unlike for header files, this realy shouldn't be the
-    # case, so check here and error out if we find such a file --
-    # that's because if that happened, the script would produce an
-    # implementation unit that does not actually have a partition and
-    # the compiler will error anyway.
+    # dealii. Unlike for header files, this realy shouldn't be the case, so
+    # check here and error out if we find such a file -- that's because if
+    # that happened, the script would produce an implementation unit that
+    # does not actually have a partition and the compiler will error
+    # anyway.
     file(READ "${_source_file}" _source_file_as_string)
     string(FIND "${_source_file_as_string}" "DEAL_II_NAMESPACE_OPEN" _match)
     if(${_match} EQUAL -1)
@@ -177,9 +184,9 @@ if(DEAL_II_BUILD_CXX20_MODULE)
     # From the name of the source, construct the name of an implementation module
     # partition file:
     string(REGEX REPLACE
-             ".*/source/(.*)\.cc$"
-             "${CMAKE_CURRENT_BINARY_DIR}/implementation_module_partitions/\\1.cc"
-           _module_file ${_source_file})
+      ".*/source/(.*)\.cc$" "${CMAKE_CURRENT_BINARY_DIR}/implementation_module_partitions/\\1.cc"
+      _module_file ${_source_file}
+      )
 
     # Create an interface module partition file from the source file:
     add_custom_command(
@@ -198,19 +205,19 @@ if(DEAL_II_BUILD_CXX20_MODULE)
     # Compiling this file will require access to the deal.II/macros.h header:
     set_property(SOURCE _module_file APPEND PROPERTY OBJECT_DEPENDS ${_dealii_macros_header})
 
-    # Append this file to the list of implementation units:
     list(APPEND _implementation_module_partition_units "${_module_file}")
   endforeach()
 
-
-
-  # For every module, there must be exactly one module interface unit
-  # that does not itself specify a module partition; instead, this unit
-  # (the "primary module interface unit") imports all of the partitions
-  # and then re-exports them.
   #
-  # Build this file via a script from the list of all of the other
-  # module input files:
+  # For every module, there must be exactly one module interface unit that
+  # does not itself specify a module partition; instead, this unit (the
+  # "primary module interface unit") imports all of the partitions and then
+  # re-exports them.
+  #
+  # Build this file via a script from the list of all of the other module
+  # input files:
+  #
+
   set(_primary_module_interface_unit
     "${CMAKE_CURRENT_BINARY_DIR}/dealii.ccm")
   add_custom_command(
@@ -244,7 +251,8 @@ if(DEAL_II_BUILD_CXX20_MODULE)
     add_library(${DEAL_II_TARGET_NAME}_module_${build_lowercase} SHARED)
     populate_target_properties(${DEAL_II_TARGET_NAME}_module_${build_lowercase} ${build})
     target_compile_definitions(${DEAL_II_TARGET_NAME}_module_${build_lowercase}
-                               PRIVATE "DEAL_II_BUILDING_CXX20_MODULE")
+      PRIVATE "DEAL_II_BUILDING_CXX20_MODULE"
+      )
 
     # Say what the source files for the library are. These are all of
     # the interface and implementation partition units we have created
@@ -265,44 +273,43 @@ if(DEAL_II_BUILD_CXX20_MODULE)
     # CMAKE_CURRENT_SOURCE_DIR) because absolute paths to these files are
     # provided.
     target_sources(${DEAL_II_TARGET_NAME}_module_${build_lowercase}
-                   PUBLIC
-                     FILE_SET ${DEAL_II_TARGET_NAME}_module_${build_lowercase}_sources
-                       TYPE CXX_MODULES
-                       FILES
-                         ${_interface_module_partition_units}
-                         ${_primary_module_interface_unit}
-                       BASE_DIRS
-                         ${CMAKE_CURRENT_SOURCE_DIR}
-                         ${CMAKE_CURRENT_BINARY_DIR}
-    )
-    target_sources(${DEAL_II_TARGET_NAME}_module_${build_lowercase}
-                   PRIVATE
-                     FILE_SET ${DEAL_II_TARGET_NAME}_module_${build_lowercase}_sources_private
-                       TYPE CXX_MODULES
-                       FILES
-                         ${_implementation_module_partition_units}
-                       BASE_DIRS
-                         ${CMAKE_CURRENT_SOURCE_DIR}
-                         ${CMAKE_CURRENT_BINARY_DIR}
-    )
-    target_sources(${DEAL_II_TARGET_NAME}_module_${build_lowercase}
-                   PUBLIC
-                     FILE_SET ${DEAL_II_TARGET_NAME}_module_${build_lowercase}_headers
-                       TYPE HEADERS
-                       FILES
-                         ${_dealii_macros_header}
-                       BASE_DIRS
-                         ${CMAKE_CURRENT_BINARY_DIR}/../include/deal.II
-    )
+      PUBLIC
+      FILE_SET ${DEAL_II_TARGET_NAME}_module_${build_lowercase}_sources
+      TYPE CXX_MODULES
+      FILES
+        ${_interface_module_partition_units}
+        ${_primary_module_interface_unit}
+      BASE_DIRS
+        ${CMAKE_CURRENT_SOURCE_DIR}
+        ${CMAKE_CURRENT_BINARY_DIR}
+      )
 
-    # In order to compile the .cc files (or the transformed module
-    # input files), we need all of the .inst files. So add a
-    # dependency to all of the .inst files. We also need access to the
-    # file that encapsulates all of deal.II's macro #defines, so add
-    # a dependency to that as well.
+    target_sources(${DEAL_II_TARGET_NAME}_module_${build_lowercase}
+      PRIVATE
+      FILE_SET ${DEAL_II_TARGET_NAME}_module_${build_lowercase}_sources_private
+      TYPE CXX_MODULES
+      FILES
+        ${_implementation_module_partition_units}
+      BASE_DIRS
+        ${CMAKE_CURRENT_SOURCE_DIR}
+        ${CMAKE_CURRENT_BINARY_DIR}
+      )
+
+    target_sources(${DEAL_II_TARGET_NAME}_module_${build_lowercase}
+      PUBLIC
+      FILE_SET ${DEAL_II_TARGET_NAME}_module_${build_lowercase}_headers
+      TYPE HEADERS
+      FILES
+        ${_dealii_macros_header}
+      BASE_DIRS
+        ${CMAKE_CURRENT_BINARY_DIR}/../include/deal.II
+      )
+
+    # Ensure that all .inst files and the macro headers are in place
     add_dependencies(${DEAL_II_TARGET_NAME}_module_${build_lowercase}
-                     expand_all_instantiations
-                     build_macros_header)
+      expand_all_instantiations
+      build_macros_header
+      )
 
     # There are other sources that go into our libraries, namely the
     # files in the bundled/ directories that we compile. We could add
@@ -312,33 +319,21 @@ if(DEAL_II_BUILD_CXX20_MODULE)
     # non-module compile flags, and consequently mangled as non-module
     # symbols, but that's ok -- these are all symbols that are not
     # part of the module anyway.
-    get_property(_bundled_object_targets
-      GLOBAL PROPERTY DEAL_II_BUNDLED_TARGETS_${build}
-      )
+    get_property(_bundled_object_targets GLOBAL PROPERTY DEAL_II_BUNDLED_TARGETS_${build})
     target_link_libraries(${DEAL_II_TARGET_NAME}_module_${build_lowercase}
-                          PRIVATE ${_bundled_object_targets})
+      PRIVATE ${_bundled_object_targets}
+      )
 
-
-    # TODO:
-    # Clang versions >20 want to make -fmodules-reduced-bmi the default. The
-    # following code enables it also for earlier versions -- except that leads
-    # to errors and so it is commented out.
-    if (${CMAKE_CXX_COMPILER_ID} STREQUAL "Clang")
-      #target_compile_options(${DEAL_II_TARGET_NAME}_module_${build_lowercase}
-      #                       PRIVATE
-      #                       "-fmodules-reduced-bmi")
-    endif()
-
-
+    #
     # Record the expected C++ standard as a compile feature. This target
     # property ensures that support for our expected C++ standard is always
     # enabled in client user code irrespective of what compile flags/options
     # they have set.
+    #
     target_compile_features(${DEAL_II_TARGET_NAME}_module_${build_lowercase}
       INTERFACE cxx_std_${CMAKE_CXX_STANDARD}
       )
 
-    # Then also set soname properties on the library:
     set_target_properties(${DEAL_II_TARGET_NAME}_module_${build_lowercase}
       PROPERTIES
       LINKER_LANGUAGE "CXX"
@@ -404,18 +399,18 @@ if(DEAL_II_BUILD_CXX20_MODULE)
     # (MIU). While we're installing things, also install the macros.h
     # header.
     install(TARGETS ${DEAL_II_TARGET_NAME}_module_${build_lowercase}
-            EXPORT  ${DEAL_II_TARGET_NAME}_module_${build_lowercase}_exports
-            FILE_SET ${DEAL_II_TARGET_NAME}_module_${build_lowercase}_headers
-              DESTINATION "${CMAKE_INSTALL_PREFIX}/include/deal.II"
-            FILE_SET ${DEAL_II_TARGET_NAME}_module_${build_lowercase}_sources
-              DESTINATION "${CMAKE_INSTALL_PREFIX}/lib/cmake/${DEAL_II_TARGET_NAME}_module_${build_lowercase}/miu"
-            CXX_MODULES_BMI
-              DESTINATION "${CMAKE_INSTALL_PREFIX}/lib/cmake/${DEAL_II_TARGET_NAME}_module_${build_lowercase}/bmi"
-           )
+      EXPORT  ${DEAL_II_TARGET_NAME}_module_${build_lowercase}_exports
+      FILE_SET ${DEAL_II_TARGET_NAME}_module_${build_lowercase}_headers
+        DESTINATION "${CMAKE_INSTALL_PREFIX}/include/deal.II"
+      FILE_SET ${DEAL_II_TARGET_NAME}_module_${build_lowercase}_sources
+        DESTINATION "${CMAKE_INSTALL_PREFIX}/lib/cmake/${DEAL_II_TARGET_NAME}_module_${build_lowercase}/miu"
+      CXX_MODULES_BMI
+        DESTINATION "${CMAKE_INSTALL_PREFIX}/lib/cmake/${DEAL_II_TARGET_NAME}_module_${build_lowercase}/bmi"
+      )
 
     # Finally, let the top-level 'library' target depend on this module:
     add_dependencies(library ${DEAL_II_TARGET_NAME}_module_${build_lowercase})
   endforeach()
 
-  message(STATUS "Setting up a C++20 module - Done")
+  message(STATUS "Setting up the C++20 module - Done")
 endif()
