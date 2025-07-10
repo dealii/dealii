@@ -261,9 +261,11 @@ namespace internal
       insert_constraint(const size_type constrained_local_dof);
 
       /**
-       * Return the number of constrained dofs in the structure. Constrained
-       * dofs do not contribute directly to the matrix, but are needed in order
-       * to set matrix diagonals and resolve inhomogeneities.
+       * Return the number of degrees of freedom for which this object
+       * stores constraints. Note that this is the number of degrees
+       * of freedom for which the *current* MPI process stores
+       * constraints, not the total number of constrained degrees of
+       * freedom across all processes.
        */
       size_type
       n_constraints() const;
