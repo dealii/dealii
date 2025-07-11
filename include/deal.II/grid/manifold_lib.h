@@ -1268,7 +1268,7 @@ template <int dim, int spacedim>
 inline const Point<spacedim> &
 SphericalManifold<dim, spacedim>::get_center() const
 {
-  return center;
+  return p_center;
 }
 
 

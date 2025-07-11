@@ -3798,7 +3798,9 @@ namespace GridGenerator
       dynamic_cast<const PolarManifold<2> *>(
         &tria_2.get_manifold(cylindrical_manifold_id));
     Assert(m_ptr != nullptr, ExcInternalError());
-    const Point<3>     axial_point(m_ptr->center[0], m_ptr->center[1], 0.0);
+    const Point<3>     axial_point(m_ptr->get_center()[0],
+                               m_ptr->get_center()[1],
+                               0.0);
     const Tensor<1, 3> direction{{0.0, 0.0, 1.0}};
 
     tria.set_manifold(cylindrical_manifold_id, FlatManifold<3>());
@@ -4044,7 +4046,9 @@ namespace GridGenerator
       dynamic_cast<const PolarManifold<2> *>(
         &tria_2.get_manifold(cylindrical_manifold_id));
     Assert(m_ptr != nullptr, ExcInternalError());
-    const Point<3>     axial_point(m_ptr->center[0], m_ptr->center[1], 0.0);
+    const Point<3>     axial_point(m_ptr->get_center()[0],
+                               m_ptr->get_center()[1],
+                               0.0);
     const Tensor<1, 3> direction{{0.0, 0.0, 1.0}};
 
     tria.set_manifold(cylindrical_manifold_id, FlatManifold<3>());
