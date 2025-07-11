@@ -812,7 +812,11 @@ namespace PETScWrappers
 
     return (sizeof(*this) +
             static_cast<size_type>(
+              // In a typical CSR format, one needs one scalar and one int to
+              // represent each nonzero in the matrix:
               ((info.nz_allocated * (sizeof(PetscScalar) + sizeof(PetscInt))) +
+               // Plus one integer to store the row-start index for each
+               // (locally stored) row:
                local_size() * sizeof(PetscInt))));
   }
 
