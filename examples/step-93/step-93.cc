@@ -447,8 +447,6 @@ namespace Step93
                                    quadrature_collection,
                                    update_quadrature_points);
 
-    const FEValuesExtractors::Scalar lambda(1);
-
     // Then, we loop over the cells, then over the quadrature points, and
     // finally over the indices, as if we were constructing a mass matrix.
     // However, what we instead do here is check two things. First, we check if
@@ -522,7 +520,6 @@ namespace Step93
 
     const FEValuesExtractors::Scalar u(0);
     const FEValuesExtractors::Scalar lambda(1);
-    const FEValuesExtractors::Scalar c(2);
 
     for (const auto &cell : dof_handler.active_cell_iterators())
       {
