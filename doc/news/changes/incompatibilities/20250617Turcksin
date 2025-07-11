@@ -1,4 +1,0 @@
-Changed: Template parameters for ArborXWrappers::BVH and
-ArborXWrappers::DistributedTree vary between the ArborX 1.X and 2.X series
-<br>
-(Bruno Turcksin, 2025/06/17)

@@ -1,6 +1,0 @@
-Fixed: The AffineConstraints::make_consistent_in_parallel() function
-made sure that constraints for a degree of freedom stored on different
-processes were the same, but they were occasionally wrong. This has
-now been fixed.
-<br>
-(Wolfgang Bangerth, 2024/08/30)

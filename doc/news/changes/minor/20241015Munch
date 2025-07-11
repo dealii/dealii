@@ -1,5 +1,0 @@
-Improved: FunctionFromFunctionObjects can now accept
-a single function within which individual components need
-to be handled.
-<br>
-(Peter Munch, 2024/10/15)

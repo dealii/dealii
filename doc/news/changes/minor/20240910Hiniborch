@@ -1,6 +1,0 @@
-Patched: GridTools::transform() now supports 3D
-anisotropically refined grids. Note that FEValues
-still do not support hanging node constraints for
-anisotropically refined grids.
-<br>
-(Robin Hiniborch, 2024/09/10)

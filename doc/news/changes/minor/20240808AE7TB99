@@ -1,4 +1,0 @@
-New: Apply the 'dealii' namespace import change to step-49 and step-50,
-ensuring consistency with the other tutorial programs.
-<br>
-(L&oacute;r&aacute;nt Hadnagy, 2024/08/08)
