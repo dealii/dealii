@@ -1,7 +1,7 @@
 // ------------------------------------------------------------------------
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
-// Copyright (C) 2002 - 2023 by the deal.II authors
+// Copyright (C) 2002 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -163,7 +163,7 @@ public:
      */
     unsigned short length;
     /**
-     * Position of the diagonal element relative tor the start index.
+     * Position of the diagonal element relative to the start index.
      */
     unsigned short diagonal;
     /**

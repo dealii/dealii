@@ -1,7 +1,7 @@
 // ------------------------------------------------------------------------
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
-// Copyright (C) 2005 - 2020 by the deal.II authors
+// Copyright (C) 2005 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -16,6 +16,7 @@
 // Tests Householder class for QR-decomposition
 
 #include <deal.II/lac/full_matrix.h>
+#include <deal.II/lac/full_matrix.templates.h>
 #include <deal.II/lac/householder.h>
 #include <deal.II/lac/vector.h>
 
@@ -36,11 +37,29 @@ main()
   FullMatrix<double>  A(4, 3, &rect[0][0]);
   Householder<double> H(A);
 
-  Vector<double> u(4);
-  Vector<double> v1(3);
-  Vector<double> v2(3);
+  {
+    Vector<double> u(4);
+    Vector<double> v1(3);
 
-  for (unsigned int i = 0; i < u.size(); ++i)
-    u(i) = i * i;
-  deallog << "Distance " << H.least_squares(v1, u) << std::endl;
+    for (unsigned int i = 0; i < u.size(); ++i)
+      u(i) = i * i;
+    deallog << "Distance " << H.least_squares(v1, u) << std::endl;
+  }
+
+  // make a rudimentary complex test
+  FullMatrix<std::complex<double>> B(A.m(), A.n());
+  for (unsigned int i = 0; i < A.m(); ++i)
+    for (unsigned int j = 0; j < A.n(); ++j)
+      B(i, j) = A(i, j);
+
+  Householder<std::complex<double>> HB(B);
+
+  {
+    Vector<std::complex<double>> u(4);
+    Vector<std::complex<double>> v1(3);
+
+    for (unsigned int i = 0; i < u.size(); ++i)
+      u(i) = i * i;
+    deallog << "Distance " << H.least_squares(v1, u) << std::endl;
+  }
 }

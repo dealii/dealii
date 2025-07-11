@@ -1,7 +1,7 @@
 // ------------------------------------------------------------------------
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
-// Copyright (C) 1998 - 2024 by the deal.II authors
+// Copyright (C) 1998 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -4937,12 +4937,24 @@ bool
 Triangulation<1, 3>::prepare_coarsening_and_refinement();
 
 
+// Declare the existence of explicit instantiations of the class
+// above. This is not strictly necessary, but tells the compiler to
+// avoid instantiating templates that we know are instantiated in
+// .cc files and so can be referenced without implicit
+// instantiations.
+//
+// Unfortunately, this does not seem to work when building modules
+// because the compiler (well, Clang at least) then just doesn't
+// instantiate these classes at all, even though their members are
+// defined and explicitly instantiated in a .cc file.
+#  ifndef DEAL_II_BUILDING_CXX20_MODULE
 extern template class Triangulation<1, 1>;
 extern template class Triangulation<1, 2>;
 extern template class Triangulation<1, 3>;
 extern template class Triangulation<2, 2>;
 extern template class Triangulation<2, 3>;
 extern template class Triangulation<3, 3>;
+#  endif
 
 #endif // DOXYGEN
 

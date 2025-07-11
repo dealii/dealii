@@ -1,7 +1,7 @@
 // ------------------------------------------------------------------------
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
-// Copyright (C) 2019 - 2024 by the deal.II authors
+// Copyright (C) 2019 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -175,14 +175,10 @@ namespace internal
                              VectorType> * = nullptr>
   inline void
   check_vector_compatibility(
-    const VectorType                                   &vec,
-    const MatrixFree<dim, Number, VectorizedArrayType> &matrix_free,
-    const internal::MatrixFreeFunctions::DoFInfo       &dof_info)
+    const VectorType &vec,
+    const MatrixFree<dim, Number, VectorizedArrayType> & /*matrix_free*/,
+    const internal::MatrixFreeFunctions::DoFInfo &dof_info)
   {
-    (void)vec;
-    (void)matrix_free;
-    (void)dof_info;
-
     AssertDimension(vec.size(), dof_info.vector_partitioner->size());
   }
 
@@ -932,9 +928,6 @@ namespace internal
                        VectorizedArrayType             &res,
                        std::bool_constant<true>) const
     {
-      (void)vec_ptr;
-      (void)constant_offset;
-      (void)vec;
       Assert(vec_ptr == vec.begin() + constant_offset, ExcInternalError());
       res.scatter(indices, vec_ptr);
     }

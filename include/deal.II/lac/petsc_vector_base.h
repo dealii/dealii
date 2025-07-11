@@ -1,7 +1,7 @@
 // ------------------------------------------------------------------------
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
-// Copyright (C) 2004 - 2024 by the deal.II authors
+// Copyright (C) 2004 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -1352,7 +1352,6 @@ namespace PETScWrappers
            ExcMessage("The serialized value of size (" + std::to_string(size) +
                       ") does not match the current size (" +
                       std::to_string(this->size()) + ")"));
-    (void)size;
     ar &local_range;
     Assert(local_range == this->local_range(),
            ExcMessage("The serialized value of local_range (" +
@@ -1361,7 +1360,6 @@ namespace PETScWrappers
                       ") does not match the current local_range (" +
                       std::to_string(this->local_range().first) + ", " +
                       std::to_string(this->local_range().second) + ")"));
-    (void)local_range;
 
     PetscScalar *array = nullptr;
     int          ierr  = VecGetArray(petsc_vector(), &array);
@@ -1377,6 +1375,14 @@ namespace PETScWrappers
 #  endif // DOXYGEN
 } // namespace PETScWrappers
 
+DEAL_II_NAMESPACE_CLOSE
+
+#else
+
+// Make sure the scripts that create the C++20 module input files have
+// something to latch on if the preprocessor #ifdef above would
+// otherwise lead to an empty content of the file.
+DEAL_II_NAMESPACE_OPEN
 DEAL_II_NAMESPACE_CLOSE
 
 #endif // DEAL_II_WITH_PETSC

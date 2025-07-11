@@ -1,7 +1,7 @@
 // ------------------------------------------------------------------------
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
-// Copyright (C) 2004 - 2024 by the deal.II authors
+// Copyright (C) 2004 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -800,8 +800,6 @@ namespace PETScWrappers
         "the MUMPS package necessary for this solver. You will need to configure "
         "PETSc so that it includes MUMPS, recompile it, and then re-configure "
         "and recompile deal.II as well."));
-
-    // Cast to void to silence compiler warnings
     (void)A;
     (void)x;
     (void)b;

@@ -1,7 +1,7 @@
 // ------------------------------------------------------------------------
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
-// Copyright (C) 2015 - 2021 by the deal.II authors
+// Copyright (C) 2015 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -24,6 +24,7 @@ for (S : REAL_SCALARS; dim : SPACE_DIMENSIONS)
     template class VectorFunctionFromScalarFunctionObject<dim, S>;
     template class FunctionFromFunctionObjects<dim, S>;
     template class VectorFunctionFromTensorFunction<dim, S>;
+    template class VectorFunctionFromTensorFunctionObject<dim, S>;
   }
 
 for (S : COMPLEX_SCALARS; dim : SPACE_DIMENSIONS)
@@ -37,4 +38,5 @@ for (S : COMPLEX_SCALARS; dim : SPACE_DIMENSIONS)
     template class VectorFunctionFromScalarFunctionObject<dim, S>;
     template class FunctionFromFunctionObjects<dim, S>;
     template class VectorFunctionFromTensorFunction<dim, S>;
+    template class VectorFunctionFromTensorFunctionObject<dim, S>;
   }

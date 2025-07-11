@@ -1,7 +1,7 @@
 // ------------------------------------------------------------------------
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
-// Copyright (C) 2018 - 2024 by the deal.II authors
+// Copyright (C) 2018 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -382,10 +382,8 @@ namespace internal
     template <int dim>
     inline void
     HangingNodes<dim>::setup_line_to_cell(
-      const Triangulation<dim> &triangulation)
-    {
-      (void)triangulation;
-    }
+      const Triangulation<dim> & /*triangulation*/)
+    {}
 
 
 

@@ -1,7 +1,7 @@
 // ------------------------------------------------------------------------
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
-// Copyright (C) 1999 - 2024 by the deal.II authors
+// Copyright (C) 1999 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -1185,7 +1185,6 @@ FullMatrix<number> &
 FullMatrix<number>::operator=(const number d)
 {
   Assert(d == number(0), ExcScalarAssignmentOnlyForZeroValue());
-  (void)d; // removes -Wunused-parameter warning in optimized mode
 
   if (this->n_elements() != 0)
     this->reset_values();

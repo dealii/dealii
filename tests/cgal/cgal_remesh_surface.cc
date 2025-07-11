@@ -1,7 +1,7 @@
 // ------------------------------------------------------------------------
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
-// Copyright (C) 2022 - 2023 by the deal.II authors
+// Copyright (C) 2022 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -19,13 +19,15 @@
 
 #include <deal.II/base/point.h>
 
+#include <deal.II/cgal/surface_mesh.h>
+#include <deal.II/cgal/triangulation.h>
+
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/grid_out.h>
 #include <deal.II/grid/grid_tools.h>
 #include <deal.II/grid/tria.h>
 
-#include <deal.II/cgal/surface_mesh.h>
-#include <deal.II/cgal/triangulation.h>
+#include <CGAL/Polygon_mesh_processing/orientation.h>
 #include <string.h>
 
 #include "../tests.h"
@@ -65,9 +67,18 @@ test()
   dealii_tria_to_cgal_surface_mesh(tria0, surface_mesh0);
   dealii_tria_to_cgal_surface_mesh(tria1, surface_mesh1);
 
-  // close the surfaces
-  CGAL::Polygon_mesh_processing::stitch_borders(surface_mesh0);
-  CGAL::Polygon_mesh_processing::stitch_borders(surface_mesh1);
+  Assert(surface_mesh0.is_valid() && surface_mesh1.is_valid(),
+         ExcMessage("The CGAL surface mesh is not valid."));
+  if (dim == 3)
+    {
+      Assert(CGAL::is_closed(surface_mesh0) && CGAL::is_closed(surface_mesh1),
+             dealii::ExcMessage("The CGAL mesh is not closed"));
+      Assert(
+        CGAL::Polygon_mesh_processing::is_outward_oriented(surface_mesh0) &&
+          CGAL::Polygon_mesh_processing::is_outward_oriented(surface_mesh1),
+        dealii::ExcMessage(
+          "The normal vectors of the CGAL mesh are not oriented outwards"));
+    }
 
   CGAL::Polygon_mesh_processing::triangulate_faces(surface_mesh0);
   CGAL::Polygon_mesh_processing::triangulate_faces(surface_mesh1);

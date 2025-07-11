@@ -1,7 +1,7 @@
 // ------------------------------------------------------------------------
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
-// Copyright (C) 2022 by the deal.II authors
+// Copyright (C) 2022 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -19,14 +19,15 @@
 
 #include <deal.II/base/point.h>
 
+#include <deal.II/cgal/surface_mesh.h>
+#include <deal.II/cgal/triangulation.h>
+#include <deal.II/cgal/utilities.h>
+
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/grid_out.h>
 #include <deal.II/grid/grid_tools.h>
 #include <deal.II/grid/tria.h>
 
-#include <deal.II/cgal/surface_mesh.h>
-#include <deal.II/cgal/triangulation.h>
-#include <deal.II/cgal/utilities.h>
 #include <string.h>
 
 #include "../tests.h"
@@ -56,10 +57,14 @@ test()
   dealii_tria_to_cgal_surface_mesh(tria0, surface_mesh0);
   dealii_tria_to_cgal_surface_mesh(tria1, surface_mesh1);
 
-  // close the surfaces
-  CGAL::Polygon_mesh_processing::stitch_borders(surface_mesh0);
-  CGAL::Polygon_mesh_processing::stitch_borders(surface_mesh1);
+  // Ensure the meshes are closed
+  Assert(CGAL::is_closed(surface_mesh0),
+         ExcMessage("The CGAL mesh 0 is not closed"));
+  Assert(CGAL::is_closed(surface_mesh1),
+         ExcMessage("The CGAL mesh 1 is not closed"));
 
+  // Surfaces automatically closed but still need to be triangulated
+  // before using compute_boolean_operation
   CGAL::Polygon_mesh_processing::triangulate_faces(surface_mesh0);
   CGAL::Polygon_mesh_processing::triangulate_faces(surface_mesh1);
 
@@ -92,10 +97,14 @@ test()
   dealii_tria_to_cgal_surface_mesh(tria0, surface_mesh0);
   dealii_tria_to_cgal_surface_mesh(tria1, surface_mesh1);
 
-  // close the surfaces
-  CGAL::Polygon_mesh_processing::stitch_borders(surface_mesh0);
-  CGAL::Polygon_mesh_processing::stitch_borders(surface_mesh1);
+  // Ensure the meshes are closed
+  Assert(CGAL::is_closed(surface_mesh0),
+         ExcMessage("The CGAL mesh 0 is not closed"));
+  Assert(CGAL::is_closed(surface_mesh1),
+         ExcMessage("The CGAL mesh 1 is not closed"));
 
+  // Surfaces automatically closed but still need to be triangulated
+  // before using compute_boolean_operation
   CGAL::Polygon_mesh_processing::triangulate_faces(surface_mesh0);
   CGAL::Polygon_mesh_processing::triangulate_faces(surface_mesh1);
 

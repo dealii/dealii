@@ -1,7 +1,7 @@
 // ------------------------------------------------------------------------
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
-// Copyright (C) 2020 - 2024 by the deal.II authors
+// Copyright (C) 2020 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -1048,7 +1048,6 @@ namespace TriangulationDescription
           const unsigned int n_mpi_ranks =
             dealii::Utilities::MPI::n_mpi_processes(
               partition.get_mpi_communicator());
-          (void)n_mpi_ranks;
 
           for (unsigned int i = 0; i < partition.locally_owned_size(); ++i)
             {

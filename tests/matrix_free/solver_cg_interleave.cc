@@ -1,7 +1,7 @@
 // ------------------------------------------------------------------------
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
-// Copyright (C) 2022 - 2023 by the deal.II authors
+// Copyright (C) 2022 - 2024 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -192,23 +192,27 @@ test(const unsigned int fe_degree)
   DoFHandler<dim> dof(tria);
   dof.distribute_dofs(fe);
 
-  IndexSet                  owned_set = dof.locally_owned_dofs();
-  IndexSet                  relevant_set;
-  AffineConstraints<double> constraints(relevant_set);
   typename MatrixFree<dim, number>::AdditionalData addit_data;
   addit_data.tasks_parallel_scheme =
     MatrixFree<dim, number>::AdditionalData::none;
 
+  IndexSet                  relevant_set;
+  AffineConstraints<double> constraints;
   {
+    constraints.clear();
     relevant_set = DoFTools::extract_locally_relevant_dofs(dof);
+    constraints.reinit(dof.locally_owned_dofs(), relevant_set);
     constraints.close();
-
-    DoFRenumbering::matrix_free_data_locality(dof, constraints, addit_data);
   }
 
-  constraints.clear();
-  relevant_set = DoFTools::extract_locally_relevant_dofs(dof);
-  constraints.close();
+  DoFRenumbering::matrix_free_data_locality(dof, constraints, addit_data);
+
+  {
+    constraints.clear();
+    relevant_set = DoFTools::extract_locally_relevant_dofs(dof);
+    constraints.reinit(dof.locally_owned_dofs(), relevant_set);
+    constraints.close();
+  }
 
   const QGauss<1>         quadrature(dof.get_fe().degree + 1);
   MatrixFree<dim, number> mf_data;

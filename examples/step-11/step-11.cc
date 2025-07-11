@@ -1,7 +1,7 @@
 /* ------------------------------------------------------------------------
  *
  * SPDX-License-Identifier: LGPL-2.1-or-later
- * Copyright (C) 2001 - 2024 by the deal.II authors
+ * Copyright (C) 2001 - 2025 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
@@ -43,9 +43,12 @@
 // further down below.
 #include <deal.II/lac/dynamic_sparsity_pattern.h>
 
-// We will make use of the std::find algorithm of the C++ standard library, so
-// we have to include the following file for its declaration:
+// We will make use of the `std::find` algorithm of the C++ standard
+// library, so we have to include the following file for its
+// declaration, along with the other standard header files we will
+// use:
 #include <algorithm>
+#include <fstream>
 #include <iostream>
 #include <iomanip>
 #include <cmath>

@@ -1,7 +1,7 @@
 ## ------------------------------------------------------------------------
 ##
 ## SPDX-License-Identifier: LGPL-2.1-or-later
-## Copyright (C) 2012 - 2024 by the deal.II authors
+## Copyright (C) 2012 - 2025 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -436,7 +436,7 @@ unset_if_changed(CHECK_CXX_FEATURES_FLAGS_SAVED
 # Check that we can use feenableexcept through the C++11 header file cfenv:
 #
 # The test is a bit more complicated because we also check that no garbage
-# exception is thrown if we convert -std::numeric_limits<double>::max to a
+# exception is thrown if we convert std::numeric_limits<double>::lowest to a
 # string. This sadly happens with some compiler support libraries :-(
 #
 # - Timo Heister, 2015
@@ -451,7 +451,7 @@ set(_snippet
   {
     feenableexcept(FE_DIVBYZERO|FE_INVALID);
     std::ostringstream description;
-    const double lower_bound = -std::numeric_limits<double>::max();
+    const double lower_bound = std::numeric_limits<double>::lowest();
 
     description << lower_bound;
 

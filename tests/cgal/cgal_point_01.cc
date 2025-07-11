@@ -1,7 +1,7 @@
 // ------------------------------------------------------------------------
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
-// Copyright (C) 2022 by the deal.II authors
+// Copyright (C) 2022 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -16,9 +16,10 @@
 
 #include <deal.II/base/point.h>
 
+#include <deal.II/cgal/utilities.h>
+
 #include <CGAL/IO/io.h>
 #include <CGAL/Simple_cartesian.h>
-#include <deal.II/cgal/utilities.h>
 
 #include "../tests.h"
 

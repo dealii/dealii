@@ -1,7 +1,7 @@
 // ------------------------------------------------------------------------
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
-// Copyright (C) 1998 - 2024 by the deal.II authors
+// Copyright (C) 1998 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -1195,7 +1195,6 @@ template <class Iterator>
 inline void
 Tensor<0, dim, Number>::unroll(const Iterator begin, const Iterator end) const
 {
-  (void)end;
   AssertDimension(std::distance(begin, end), n_independent_components);
   Assert(dim != 0,
          ExcMessage("Cannot unroll an object of type Tensor<0,0,Number>"));
@@ -1580,7 +1579,6 @@ constexpr DEAL_II_HOST_DEVICE inline DEAL_II_ALWAYS_INLINE
   Tensor<rank_, dim, Number>::operator=(const Number &d) &
 {
   Assert(numbers::value_is_zero(d), ExcScalarAssignmentOnlyForZeroValue());
-  (void)d;
 
   for (unsigned int i = 0; i < dim; ++i)
     values[i] = internal::NumberType<Number>::value(0.0);
@@ -1820,7 +1818,6 @@ Tensor<rank_, dim, Number>::unroll(const Iterator begin,
     {
       // For rank-1 tensors, we can simply copy the current elements from
       // our linear array into the output range:
-      (void)end;
       Assert(std::distance(begin, end) >= dim,
              ExcMessage(
                "The provided iterator range must contain at least 'dim' "
@@ -1852,7 +1849,6 @@ Tensor<rank_, dim, Number>::unrolled_to_component_indices(const unsigned int i)
   // Work-around nvcc warning
   unsigned int dummy = n_independent_components;
   AssertIndexRange(i, dummy);
-  (void)dummy;
 
   if constexpr (dim == 0)
     {
@@ -2680,14 +2676,12 @@ constexpr inline DEAL_II_ALWAYS_INLINE
 
   Tensor<1, dim, typename ProductType<Number1, Number2>::type> result;
 
-  // avoid compiler warnings
-  constexpr int s0 = 0 % dim;
-  constexpr int s1 = 1 % dim;
-  constexpr int s2 = 2 % dim;
-
-  result[s0] = src1[s1] * src2[s2] - src1[s2] * src2[s1];
-  result[s1] = src1[s2] * src2[s0] - src1[s0] * src2[s2];
-  result[s2] = src1[s0] * src2[s1] - src1[s1] * src2[s0];
+  if constexpr (dim == 3)
+    {
+      result[0] = src1[1] * src2[2] - src1[2] * src2[1];
+      result[1] = src1[2] * src2[0] - src1[0] * src2[2];
+      result[2] = src1[0] * src2[1] - src1[1] * src2[0];
+    }
 
   return result;
 }

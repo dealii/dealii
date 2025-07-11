@@ -1,7 +1,7 @@
 // ------------------------------------------------------------------------
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
-// Copyright (C) 2015 - 2023 by the deal.II authors
+// Copyright (C) 2015 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -21,6 +21,8 @@
 #  include <deal.II/lac/trilinos_sparse_matrix.h>
 #  include <deal.II/lac/vector.h>
 
+DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
+
 #  include <Epetra_MultiVector.h>
 #  include <Ifpack.h>
 #  include <Ifpack_Chebyshev.h>
@@ -28,6 +30,8 @@
 #  include <Teuchos_RCP.hpp>
 #  include <ml_MultiLevelPreconditioner.h>
 #  include <ml_include.h>
+
+DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -141,8 +145,6 @@ namespace TrilinosWrappers
       if (constant_modes_dimension > 0)
         {
           const size_type global_size = TrilinosWrappers::n_global_rows(matrix);
-          (void)global_length; // work around compiler warning about unused
-                               // function in release mode
           Assert(global_size ==
                    static_cast<size_type>(TrilinosWrappers::global_length(
                      distributed_constant_modes)),
@@ -172,7 +174,6 @@ namespace TrilinosWrappers
                     static_cast<double>(constant_modes[d][mode_index]);
                 }
             }
-          (void)expected_mode_size;
 
           parameter_list.set("null space: type", "pre-computed");
           parameter_list.set("null space: dimension",

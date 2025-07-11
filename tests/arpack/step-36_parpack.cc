@@ -1,7 +1,7 @@
 /* ------------------------------------------------------------------------
  *
  * SPDX-License-Identifier: LGPL-2.1-or-later
- * Copyright (C) 2015 - 2023 by the deal.II authors
+ * Copyright (C) 2015 - 2025 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
@@ -192,7 +192,7 @@ test()
     dealii::DoFTools::extract_locally_relevant_dofs(dof_handler);
 
   constraints.clear();
-  constraints.reinit(locally_relevant_dofs);
+  constraints.reinit(locally_owned_dofs, locally_relevant_dofs);
   dealii::DoFTools::make_hanging_node_constraints(dof_handler, constraints);
   dealii::VectorTools::interpolate_boundary_values(
     dof_handler, 0, dealii::Functions::ZeroFunction<dim>(), constraints);

@@ -1,7 +1,7 @@
 // ------------------------------------------------------------------------
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
-// Copyright (C) 1999 - 2024 by the deal.II authors
+// Copyright (C) 1999 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -2728,7 +2728,6 @@ namespace DataOutBase
                          StreamType                              &out,
                          const bool                               legacy_format)
   {
-    Assert(dim <= 3 && dim > 1, ExcNotImplemented());
     unsigned int first_vertex_of_patch = 0;
     // Array to hold all the node numbers of a cell
     std::vector<unsigned> connectivity;
@@ -5675,8 +5674,8 @@ namespace DataOutBase
                                     /* use VTU, not VTK: */ false);
                               local_vertex_order[connectivity_index] =
                                 local_index;
-                              flush_current_cell();
                             }
+                          flush_current_cell();
 
                           break;
                         }

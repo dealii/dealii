@@ -1,7 +1,7 @@
 // ------------------------------------------------------------------------
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
-// Copyright (C) 2004 - 2023 by the deal.II authors
+// Copyright (C) 2004 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -22,8 +22,8 @@
 #include <deal.II/base/point.h>
 #include <deal.II/base/polynomial.h>
 #include <deal.II/base/polynomial_space.h>
+#include <deal.II/base/polynomials_vector_anisotropic.h>
 #include <deal.II/base/tensor.h>
-#include <deal.II/base/tensor_polynomials_base.h>
 #include <deal.II/base/tensor_product_polynomials.h>
 
 #include <mutex>
@@ -33,8 +33,10 @@
 DEAL_II_NAMESPACE_OPEN
 
 /**
- * This class implements the <i>H<sup>div</sup></i>-conforming, vector-valued
+ * This class implements the <i>H<sup>div</sup></i>-conforming,
  * Raviart-Thomas polynomials as described in the book by Brezzi and Fortin.
+ * Most of the functionality comes from the vector-valued anisotropic
+ * polynomials class PolynomialsVectorAnisotropic.
  *
  * The Raviart-Thomas polynomials are constructed such that the divergence is
  * in the tensor product polynomial space <i>Q<sub>k</sub></i>. Therefore, the
@@ -46,18 +48,9 @@ DEAL_II_NAMESPACE_OPEN
  * @ingroup Polynomials
  */
 template <int dim>
-class PolynomialsRaviartThomas : public TensorPolynomialsBase<dim>
+class PolynomialsRaviartThomas : public PolynomialsVectorAnisotropic<dim>
 {
 public:
-  /**
-   * Constructor. Creates all basis functions for Raviart-Thomas polynomials
-   * of given degree in normal and tangential directions. The usual
-   * FE_RaviartThomas and FE_RaviartThomasNodal classes will use `degree + 1`
-   * and `degree` in the two directions, respectively.
-   */
-  PolynomialsRaviartThomas(const unsigned int degree_normal,
-                           const unsigned int degree_tangential);
-
   /**
    * Constructor, using the common Raviart-Thomas space of degree `k + 1` in
    * normal direction and `k` in the tangential directions.
@@ -69,41 +62,6 @@ public:
   PolynomialsRaviartThomas(const unsigned int k);
 
   /**
-   * Copy constructor.
-   */
-  PolynomialsRaviartThomas(const PolynomialsRaviartThomas &other) = default;
-
-  /**
-   * Compute the value and derivatives of each Raviart-Thomas polynomial at
-   * @p unit_point.
-   *
-   * The size of the vectors must either be zero or equal <tt>n()</tt>. In
-   * the first case, the function will not compute these values.
-   */
-  void
-  evaluate(const Point<dim>            &unit_point,
-           std::vector<Tensor<1, dim>> &values,
-           std::vector<Tensor<2, dim>> &grads,
-           std::vector<Tensor<3, dim>> &grad_grads,
-           std::vector<Tensor<4, dim>> &third_derivatives,
-           std::vector<Tensor<5, dim>> &fourth_derivatives) const override;
-
-  /**
-   * Return the name of the space, which is <tt>PolynomialsRaviartThomas</tt>.
-   */
-  std::string
-  name() const override;
-
-  /**
-   * Return the number of polynomials in the space without requiring to
-   * build an object of PolynomialsRaviartThomas. This is required by the
-   * FiniteElement classes.
-   */
-  static unsigned int
-  n_polynomials(const unsigned int normal_degree,
-                const unsigned int tangential_degree);
-
-  /**
    * Variant of the n_polynomials() function taking only a single argument
    * `degree`, assuming `degree + 1` in the normal direction and `degree` in
    * the tangential directions.
@@ -111,62 +69,21 @@ public:
   static unsigned int
   n_polynomials(const unsigned int degree);
 
+  // Make respective two-argument method from base class available
+  using PolynomialsVectorAnisotropic<dim>::n_polynomials;
+
   /**
    * Compute the lexicographic to hierarchic numbering underlying this class,
    * computed as a free function.
    */
   static std::vector<unsigned int>
-  get_lexicographic_numbering(const unsigned int normal_degree,
-                              const unsigned int tangential_degree);
+  get_lexicographic_numbering(const unsigned int degree);
 
   /**
    * @copydoc TensorPolynomialsBase::clone()
    */
   virtual std::unique_ptr<TensorPolynomialsBase<dim>>
   clone() const override;
-
-  /**
-   * Compute the generalized support points in the ordering used by the
-   * polynomial shape functions. Note that these points are not support points
-   * in the classical sense as the Lagrange polynomials of the different
-   * components have different points, which need to be combined in terms of
-   * Piola transforms.
-   */
-  std::vector<Point<dim>>
-  get_polynomial_support_points() const;
-
-private:
-  /**
-   * The given degree in the normal direction.
-   */
-  const unsigned int normal_degree;
-
-  /**
-   * The given degree in the tangential direction.
-   */
-  const unsigned int tangential_degree;
-
-  /**
-   * An object representing the polynomial space for a single component. We
-   * can re-use it by rotating the coordinates of the evaluation point.
-   */
-  const AnisotropicPolynomials<dim> polynomial_space;
-
-  /**
-   * Renumbering from lexicographic to hierarchic order.
-   */
-  std::vector<unsigned int> lexicographic_to_hierarchic;
-
-  /**
-   * Renumbering from hierarchic to lexicographic order. Inverse of
-   * lexicographic_to_hierarchic.
-   */
-  std::vector<unsigned int> hierarchic_to_lexicographic;
-
-  /**
-   * Renumbering from shifted polynomial spaces to lexicographic one.
-   */
-  std::array<std::vector<unsigned int>, dim> renumber_aniso;
 };
 
 

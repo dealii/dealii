@@ -1,7 +1,7 @@
 // ------------------------------------------------------------------------
 
 // SPDX-License-Identifier: LGPL-2.1-or-later
-// Copyright (C) 2023 by the deal.II authors
+// Copyright (C) 2023 - 2025 by the deal.II authors
 
 // This file is part of the deal.II library.
 //
@@ -15,14 +15,14 @@
 // Compute intersection of two 3D cells. This additional test is added because
 // intersections are not found with inexact kernels.
 
+#include <deal.II/cgal/intersections.h>
+#include <deal.II/cgal/utilities.h>
+
 #include <deal.II/fe/mapping_q1.h>
 
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/grid_out.h>
 #include <deal.II/grid/tria.h>
-
-#include <deal.II/cgal/intersections.h>
-#include <deal.II/cgal/utilities.h>
 
 #include "../tests.h"
 

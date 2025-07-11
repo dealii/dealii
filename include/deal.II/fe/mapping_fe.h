@@ -323,7 +323,7 @@ public:
      * Filled once.
      */
     std::array<std::vector<Tensor<1, dim>>,
-               GeometryInfo<dim>::faces_per_cell *(dim - 1)>
+               ReferenceCells::max_n_faces<dim>() * 2>
       unit_tangentials;
 
     /**

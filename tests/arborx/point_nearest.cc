@@ -57,7 +57,11 @@ test_bounding_box_2d()
   query_points.emplace_back(2.6, 2.6);
 
 
-  ArborXWrappers::BVH                   bvh(bounding_boxes);
+#if ARBORX_VERSION_MAJOR < 2
+  ArborXWrappers::BVH bvh(bounding_boxes);
+#else
+  ArborXWrappers::BVH<BoundingBox<2>> bvh(bounding_boxes);
+#endif
   ArborXWrappers::PointNearestPredicate pt_nearest(query_points, 1);
   auto                                  indices_offset = bvh.query(pt_nearest);
   std::vector<int>                      indices        = indices_offset.first;
@@ -113,7 +117,11 @@ test_points_2d()
   query_points.emplace_back(2.6, 2.6);
 
 
-  ArborXWrappers::BVH                   bvh(points);
+#if ARBORX_VERSION_MAJOR < 2
+  ArborXWrappers::BVH bvh(points);
+#else
+  ArborXWrappers::BVH<Point<2>>       bvh(points);
+#endif
   ArborXWrappers::PointNearestPredicate pt_nearest(query_points, 1);
   auto                                  indices_offset = bvh.query(pt_nearest);
   std::vector<int>                      indices        = indices_offset.first;
@@ -188,7 +196,11 @@ test_bounding_box_3d()
   query_points.emplace_back(2.6, 2.6, 2.6);
 
 
-  ArborXWrappers::BVH                   bvh(bounding_boxes);
+#if ARBORX_VERSION_MAJOR < 2
+  ArborXWrappers::BVH bvh(bounding_boxes);
+#else
+  ArborXWrappers::BVH<BoundingBox<3>> bvh(bounding_boxes);
+#endif
   ArborXWrappers::PointNearestPredicate pt_nearest(query_points, 1);
   auto                                  indices_offset = bvh.query(pt_nearest);
   std::vector<int>                      indices        = indices_offset.first;

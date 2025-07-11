@@ -1,7 +1,7 @@
 ## ------------------------------------------------------------------------
 ##
 ## SPDX-License-Identifier: LGPL-2.1-or-later
-## Copyright (C) 2012 - 2023 by the deal.II authors
+## Copyright (C) 2012 - 2025 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -173,6 +173,12 @@ endforeach()
 #
 
 set(CONFIG_BUILD_DIR TRUE)
+
+#
+# Filter out -Wno-deprecated-decarations so that user projects actually see
+# deprecation warnings:
+#
+string(REPLACE "-Wno-deprecated-declarations" "" DEAL_II_WARNING_FLAGS "${DEAL_II_WARNING_FLAGS}")
 
 configure_file(
   ${CMAKE_CURRENT_SOURCE_DIR}/Config.cmake.in

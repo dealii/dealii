@@ -1,7 +1,7 @@
 // ------------------------------------------------------------------------
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
-// Copyright (C) 2002 - 2023 by the deal.II authors
+// Copyright (C) 2002 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -463,9 +463,9 @@ namespace SparseMatrixIterators
 
 } // namespace SparseMatrixIterators
 
-DEAL_II_NAMESPACE_CLOSE
+DEAL_II_NAMESPACE_CLOSE // Do not convert for module purposes
 
-namespace std
+  namespace std
 {
   template <typename number, bool Constness>
   struct iterator_traits<
@@ -480,43 +480,43 @@ namespace std
   };
 } // namespace std
 
-DEAL_II_NAMESPACE_OPEN
+DEAL_II_NAMESPACE_OPEN // Do not convert for module purposes
 
-/**
- * @}
- */
+  /**
+   * @}
+   */
 
 
-// TODO: Add multithreading to the other vmult functions.
+  // TODO: Add multithreading to the other vmult functions.
 
-/**
- * Sparse matrix. This class implements the functionality to store matrix
- * entry values in the locations denoted by a SparsityPattern. See
- * @ref Sparsity
- * for a discussion about the separation between sparsity patterns and
- * matrices.
- *
- * The elements of a SparseMatrix are stored in the same order in which the
- * SparsityPattern class stores its entries. Within each row, elements are
- * generally stored left-to-right in increasing column index order; the
- * exception to this rule is that if the matrix is square (m() == n()), then
- * the diagonal entry is stored as the first element in each row to make
- * operations like applying a Jacobi or SSOR preconditioner faster. As a
- * consequence, if you traverse the elements of a row of a SparseMatrix with
- * the help of iterators into this object (using SparseMatrix::begin and
- * SparseMatrix::end) you will find that the elements are not sorted by column
- * index within each row whenever the matrix is square.
- *
- * @note Instantiations for this template are provided for <tt>@<float@> and
- * @<double@></tt>; others can be generated in application programs (see the
- * section on
- * @ref Instantiations
- * in the manual).
- *
- * @ingroup Matrix1
- */
-template <typename number>
-class SparseMatrix : public virtual EnableObserverPointer
+  /**
+   * Sparse matrix. This class implements the functionality to store matrix
+   * entry values in the locations denoted by a SparsityPattern. See
+   * @ref Sparsity
+   * for a discussion about the separation between sparsity patterns and
+   * matrices.
+   *
+   * The elements of a SparseMatrix are stored in the same order in which the
+   * SparsityPattern class stores its entries. Within each row, elements are
+   * generally stored left-to-right in increasing column index order; the
+   * exception to this rule is that if the matrix is square (m() == n()), then
+   * the diagonal entry is stored as the first element in each row to make
+   * operations like applying a Jacobi or SSOR preconditioner faster. As a
+   * consequence, if you traverse the elements of a row of a SparseMatrix with
+   * the help of iterators into this object (using SparseMatrix::begin and
+   * SparseMatrix::end) you will find that the elements are not sorted by column
+   * index within each row whenever the matrix is square.
+   *
+   * @note Instantiations for this template are provided for <tt>@<float@> and
+   * @<double@></tt>; others can be generated in application programs (see the
+   * section on
+   * @ref Instantiations
+   * in the manual).
+   *
+   * @ingroup Matrix1
+   */
+  template <typename number>
+  class SparseMatrix : public virtual EnableObserverPointer
 {
 public:
   /**

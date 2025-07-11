@@ -1,7 +1,7 @@
 // ------------------------------------------------------------------------
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
-// Copyright (C) 1998 - 2024 by the deal.II authors
+// Copyright (C) 1998 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -1668,11 +1668,14 @@ public:
   barycenter() const;
 
   /**
-   * Compute the dim-dimensional measure of the object. For a dim-dimensional
-   * cell in dim-dimensional space, this equals its volume. On the other hand,
-   * for a 2d cell in 3d space, or if the current object pointed to is a 2d
-   * face of a 3d cell in 3d space, then the function computes the area the
-   * object occupies. For a one-dimensional object, return its length.
+   * Compute the `structdim`-dimensional measure of the object. For a
+   * `dim`-dimensional cell in `dim`-dimensional space, this equals its volume.
+   * On the other hand, for a 2d cell in 3d space, or if the current object
+   * pointed to is a 2d face of a 3d cell in 3d space, then the function
+   * computes the area the object occupies. For a one-dimensional (i.e.,
+   * `structdim = 1`) object, regardless of `dim` and `spacedim`, return its
+   * length. Similarly, the measure of any vertex (i.e., `structdim = 0`
+   * objects) is 1.
    *
    * The function only computes the measure of cells, faces or edges assumed
    * to be represented by (bi-/tri-)linear mappings. In other words, it only
@@ -2123,12 +2126,11 @@ public:
          const bool interpolate_from_surrounding = false) const;
 
   /**
-   * Compute the dim-dimensional measure of the object. For a dim-dimensional
-   * cell in dim-dimensional space, this equals its volume. On the other hand,
-   * for a 2d cell in 3d space, or if the current object pointed to is a 2d
-   * face of a 3d cell in 3d space, then the function computes the area the
-   * object occupies. For a one-dimensional object, return its length. For a
-   * zero-dimensional object, return zero.
+   * Compute the `structdim`-dimensional measure of the present object. Since,
+   * in this context, `structdim = 0`, this function always returns 1.
+   *
+   * @note This is consistent with what ReferenceCells::Vertex::volume()
+   * returns.
    */
   double
   measure() const;
@@ -2569,6 +2571,25 @@ public:
    * @}
    */
 
+  /**
+   * @name Geometric information about an object
+   */
+  /**
+   * @{
+   */
+
+  /**
+   * Return 1.
+   *
+   * @note This is consistent with what ReferenceCells::Vertex::volume()
+   * returns.
+   */
+  static double
+  measure();
+
+  /**
+   * @}
+   */
 
   /**
    * Return whether this point is at the boundary of the one-dimensional
@@ -3703,7 +3724,7 @@ public:
    * refinement situation including possible refinement of the face's
    * children. This function may only be called for active cells in 2d and 3d.
    */
-  dealii::internal::SubfaceCase<dim>
+  internal::SubfaceCase<dim>
   subface_case(const unsigned int face_no) const;
 
   /**
@@ -6859,7 +6880,7 @@ template <int dim, int spacedim>
 inline double
 TriaAccessor<0, dim, spacedim>::measure() const
 {
-  return 0.;
+  return 1.0;
 }
 
 
@@ -7258,6 +7279,16 @@ TriaAccessor<0, 1, spacedim>::quad_index(const unsigned int)
   Assert(false, ExcImpossibleInDim(0));
   return numbers::invalid_unsigned_int;
 }
+
+
+
+template <int spacedim>
+inline double
+TriaAccessor<0, 1, spacedim>::measure()
+{
+  return 1.0;
+}
+
 
 
 template <int spacedim>
@@ -7857,24 +7888,24 @@ CellAccessor<dim, spacedim>::flag_for_line_refinement(
 
 
 template <int dim, int spacedim>
-inline dealii::internal::SubfaceCase<dim>
+inline internal::SubfaceCase<dim>
 CellAccessor<dim, spacedim>::subface_case(const unsigned int face_no) const
 {
   Assert(is_active(), TriaAccessorExceptions::ExcCellNotActive());
   AssertIndexRange(face_no, this->n_faces());
 
   if constexpr (dim == 1)
-    return dealii::internal::SubfaceCase<1>::case_none;
+    return internal::SubfaceCase<1>::case_none;
   else if constexpr (dim == 2)
     return ((face(face_no)->has_children()) ?
-              dealii::internal::SubfaceCase<2>::case_x :
-              dealii::internal::SubfaceCase<2>::case_none);
+              internal::SubfaceCase<2>::case_x :
+              internal::SubfaceCase<2>::case_none);
   else if constexpr (dim == 3)
     {
       switch (static_cast<std::uint8_t>(face(face_no)->refinement_case()))
         {
           case RefinementCase<3>::no_refinement:
-            return dealii::internal::SubfaceCase<3>::case_none;
+            return internal::SubfaceCase<3>::case_none;
           case RefinementCase<3>::cut_x:
             if (face(face_no)->child(0)->has_children())
               {
@@ -7886,10 +7917,10 @@ CellAccessor<dim, spacedim>::subface_case(const unsigned int face_no) const
                     Assert(face(face_no)->child(1)->refinement_case() ==
                              RefinementCase<2>::cut_y,
                            ExcInternalError());
-                    return dealii::internal::SubfaceCase<3>::case_x1y2y;
+                    return internal::SubfaceCase<3>::case_x1y2y;
                   }
                 else
-                  return dealii::internal::SubfaceCase<3>::case_x1y;
+                  return internal::SubfaceCase<3>::case_x1y;
               }
             else
               {
@@ -7898,10 +7929,10 @@ CellAccessor<dim, spacedim>::subface_case(const unsigned int face_no) const
                     Assert(face(face_no)->child(1)->refinement_case() ==
                              RefinementCase<2>::cut_y,
                            ExcInternalError());
-                    return dealii::internal::SubfaceCase<3>::case_x2y;
+                    return internal::SubfaceCase<3>::case_x2y;
                   }
                 else
-                  return dealii::internal::SubfaceCase<3>::case_x;
+                  return internal::SubfaceCase<3>::case_x;
               }
           case RefinementCase<3>::cut_y:
             if (face(face_no)->child(0)->has_children())
@@ -7914,10 +7945,10 @@ CellAccessor<dim, spacedim>::subface_case(const unsigned int face_no) const
                     Assert(face(face_no)->child(1)->refinement_case() ==
                              RefinementCase<2>::cut_x,
                            ExcInternalError());
-                    return dealii::internal::SubfaceCase<3>::case_y1x2x;
+                    return internal::SubfaceCase<3>::case_y1x2x;
                   }
                 else
-                  return dealii::internal::SubfaceCase<3>::case_y1x;
+                  return internal::SubfaceCase<3>::case_y1x;
               }
             else
               {
@@ -7926,13 +7957,13 @@ CellAccessor<dim, spacedim>::subface_case(const unsigned int face_no) const
                     Assert(face(face_no)->child(1)->refinement_case() ==
                              RefinementCase<2>::cut_x,
                            ExcInternalError());
-                    return dealii::internal::SubfaceCase<3>::case_y2x;
+                    return internal::SubfaceCase<3>::case_y2x;
                   }
                 else
-                  return dealii::internal::SubfaceCase<3>::case_y;
+                  return internal::SubfaceCase<3>::case_y;
               }
           case RefinementCase<3>::cut_xy:
-            return dealii::internal::SubfaceCase<3>::case_xy;
+            return internal::SubfaceCase<3>::case_xy;
           default:
             DEAL_II_ASSERT_UNREACHABLE();
         }
@@ -7940,7 +7971,7 @@ CellAccessor<dim, spacedim>::subface_case(const unsigned int face_no) const
 
   // we should never get here
   DEAL_II_ASSERT_UNREACHABLE();
-  return dealii::internal::SubfaceCase<dim>::case_none;
+  return internal::SubfaceCase<dim>::case_none;
 }
 
 

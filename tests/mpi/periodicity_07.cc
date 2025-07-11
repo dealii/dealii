@@ -148,7 +148,7 @@ test(const unsigned numRefinementLevels = 2)
   /// creating combined hanging node and periodic constraint matrix
   AffineConstraints<double> constraints;
   constraints.clear();
-  constraints.reinit(locally_relevant_dofs);
+  constraints.reinit(dof_handler.locally_owned_dofs(), locally_relevant_dofs);
 
   std::vector<
     GridTools::PeriodicFacePair<typename DoFHandler<dim>::cell_iterator>>

@@ -1,7 +1,7 @@
 ## ------------------------------------------------------------------------
 ##
 ## SPDX-License-Identifier: LGPL-2.1-or-later
-## Copyright (C) 2017 - 2024 by the deal.II authors
+## Copyright (C) 2017 - 2025 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -20,6 +20,7 @@
 #   SUNDIALS_LIBRARIES
 #   SUNDIALS_INCLUDE_DIR
 #   SUNDIALS_WITH_IDAS
+#   SUNDIALS_WITH_MPI
 #   SUNDIALS_VERSION
 #   SUNDIALS_VERSION_MAJOR
 #   SUNDIALS_VERSION_MINOR
@@ -124,6 +125,17 @@ if(NOT SUNDIALS_CONFIG_H MATCHES "-NOTFOUND")
   set(SUNDIALS_VERSION
     "${SUNDIALS_VERSION_MAJOR}.${SUNDIALS_VERSION_MINOR}.${SUNDIALS_VERSION_PATCH}"
     )
+
+  #
+  # Determine whether Sundials was configured with MPI:
+  #
+  file(STRINGS "${SUNDIALS_CONFIG_H}" SUNDIALS_MPI_STRING
+    REGEX "^[ \t]*#[ \t]*define[ \t]+SUNDIALS_MPI_ENABLED[ \t]1")
+  if("${SUNDIALS_MPI_STRING}" STREQUAL "")
+    set(SUNDIALS_WITH_MPI FALSE)
+  else()
+    set(SUNDIALS_WITH_MPI TRUE)
+  endif()
 endif()
 
 #

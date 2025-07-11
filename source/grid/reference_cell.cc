@@ -1,7 +1,7 @@
 // ------------------------------------------------------------------------
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
-// Copyright (C) 2020 - 2024 by the deal.II authors
+// Copyright (C) 2020 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -22,6 +22,7 @@
 #include <deal.II/fe/fe_simplex_p_bubbles.h>
 #include <deal.II/fe/fe_wedge_p.h>
 #include <deal.II/fe/mapping_fe.h>
+#include <deal.II/fe/mapping_p1.h>
 #include <deal.II/fe/mapping_q.h>
 #include <deal.II/fe/mapping_q1.h>
 
@@ -116,6 +117,146 @@ ReferenceCell::to_string() const
 
 
 
+template <int dim>
+std::pair<unsigned int, RefinementCase<dim - 1>>
+ReferenceCell::equivalent_refinement_case(
+  const types::geometric_orientation combined_face_orientation,
+  const internal::SubfaceCase<dim>   subface_case,
+  const unsigned int                 subface_no) const
+{
+  if constexpr (dim == 3)
+    {
+      static const RefinementCase<dim - 1>
+        equivalent_refine_case[internal::SubfaceCase<dim>::case_isotropic + 1]
+                              [GeometryInfo<3>::max_children_per_face] = {
+                                // case_none. there should be only
+                                // invalid values here. However, as
+                                // this function is also called (in
+                                // tests) for cells which have no
+                                // refined faces, use isotropic
+                                // refinement instead
+                                {RefinementCase<dim - 1>::cut_xy,
+                                 RefinementCase<dim - 1>::cut_xy,
+                                 RefinementCase<dim - 1>::cut_xy,
+                                 RefinementCase<dim - 1>::cut_xy},
+                                // case_x
+                                {RefinementCase<dim - 1>::cut_x,
+                                 RefinementCase<dim - 1>::cut_x,
+                                 RefinementCase<dim - 1>::no_refinement,
+                                 RefinementCase<dim - 1>::no_refinement},
+                                // case_x1y
+                                {RefinementCase<dim - 1>::cut_xy,
+                                 RefinementCase<dim - 1>::cut_xy,
+                                 RefinementCase<dim - 1>::cut_x,
+                                 RefinementCase<dim - 1>::no_refinement},
+                                // case_x2y
+                                {RefinementCase<dim - 1>::cut_x,
+                                 RefinementCase<dim - 1>::cut_xy,
+                                 RefinementCase<dim - 1>::cut_xy,
+                                 RefinementCase<dim - 1>::no_refinement},
+                                // case_x1y2y
+                                {RefinementCase<dim - 1>::cut_xy,
+                                 RefinementCase<dim - 1>::cut_xy,
+                                 RefinementCase<dim - 1>::cut_xy,
+                                 RefinementCase<dim - 1>::cut_xy},
+                                // case_y
+                                {RefinementCase<dim - 1>::cut_y,
+                                 RefinementCase<dim - 1>::cut_y,
+                                 RefinementCase<dim - 1>::no_refinement,
+                                 RefinementCase<dim - 1>::no_refinement},
+                                // case_y1x
+                                {RefinementCase<dim - 1>::cut_xy,
+                                 RefinementCase<dim - 1>::cut_xy,
+                                 RefinementCase<dim - 1>::cut_y,
+                                 RefinementCase<dim - 1>::no_refinement},
+                                // case_y2x
+                                {RefinementCase<dim - 1>::cut_y,
+                                 RefinementCase<dim - 1>::cut_xy,
+                                 RefinementCase<dim - 1>::cut_xy,
+                                 RefinementCase<dim - 1>::no_refinement},
+                                // case_y1x2x
+                                {RefinementCase<dim - 1>::cut_xy,
+                                 RefinementCase<dim - 1>::cut_xy,
+                                 RefinementCase<dim - 1>::cut_xy,
+                                 RefinementCase<dim - 1>::cut_xy},
+                                // case_xy (case_isotropic)
+                                {RefinementCase<dim - 1>::cut_xy,
+                                 RefinementCase<dim - 1>::cut_xy,
+                                 RefinementCase<dim - 1>::cut_xy,
+                                 RefinementCase<dim - 1>::cut_xy}};
+
+      constexpr unsigned int X = numbers::invalid_unsigned_int;
+      static const unsigned int
+        equivalent_subface_number[internal::SubfaceCase<dim>::case_isotropic +
+                                  1][GeometryInfo<3>::max_children_per_face] = {
+          // case_none, see above
+          {0, 1, 2, 3},
+          // case_x
+          {0, 1, X, X},
+          // case_x1y
+          {0, 2, 1, X},
+          // case_x2y
+          {0, 1, 3, X},
+          // case_x1y2y
+          {0, 2, 1, 3},
+          // case_y
+          {0, 1, X, X},
+          // case_y1x
+          {0, 1, 1, X},
+          // case_y2x
+          {0, 2, 3, X},
+          // case_y1x2x
+          {0, 1, 2, 3},
+          // case_xy (case_isotropic)
+          {0, 1, 2, 3}};
+
+      static const RefinementCase<dim - 1> rotated_refinement_case[4] = {
+        RefinementCase<dim - 1>::no_refinement,
+        RefinementCase<dim - 1>::cut_y,
+        RefinementCase<dim - 1>::cut_x,
+        RefinementCase<dim - 1>::cut_xy};
+      const auto [face_orientation, face_rotation, face_flip] =
+        internal::split_face_orientation(combined_face_orientation);
+
+      const auto equivalent_refinement_case =
+        equivalent_refine_case[subface_case][subface_no];
+      const unsigned int equivalent_subface_no =
+        equivalent_subface_number[subface_case][subface_no];
+      // make sure, that we got a valid subface and RefineCase
+      Assert(equivalent_refinement_case != RefinementCase<dim>::no_refinement,
+             ExcInternalError());
+      Assert(equivalent_subface_no != X, ExcInternalError());
+      // now, finally respect non-standard faces
+      const RefinementCase<dim - 1> final_refinement_case =
+        (face_orientation == face_rotation ?
+           rotated_refinement_case[equivalent_refinement_case] :
+           equivalent_refinement_case);
+
+      const unsigned int final_subface_no =
+        GeometryInfo<dim>::child_cell_on_face(RefinementCase<dim>(
+                                                final_refinement_case),
+                                              /*face_no = */ 4,
+                                              equivalent_subface_no,
+                                              face_orientation,
+                                              face_flip,
+                                              face_rotation,
+                                              equivalent_refinement_case);
+
+      return std::make_pair(final_subface_no, final_refinement_case);
+    }
+  else
+    {
+      (void)combined_face_orientation;
+      (void)subface_case;
+      (void)subface_no;
+
+      DEAL_II_NOT_IMPLEMENTED();
+      return {};
+    }
+}
+
+
+
 template <int dim, int spacedim>
 std::unique_ptr<Mapping<dim, spacedim>>
 ReferenceCell::get_default_mapping(const unsigned int degree) const
@@ -155,8 +296,7 @@ ReferenceCell::get_default_linear_mapping() const
     }
   else if (is_simplex())
     {
-      static const MappingFE<dim, spacedim> mapping(
-        FE_SimplexP<dim, spacedim>(1));
+      static const MappingP1<dim, spacedim> mapping;
       return mapping;
     }
   else if (*this == ReferenceCells::Pyramid)
@@ -484,15 +624,30 @@ ReferenceCell::vtk_lexicographic_to_node_index<0>(
 
 
 
+/**
+ * Modified from
+ * https://github.com/Kitware/VTK/blob/265ca48a79a36538c95622c237da11133608bbe5/Common/DataModel/vtkLagrangeCurve.cxx#L478
+ */
 template <>
 unsigned int
 ReferenceCell::vtk_lexicographic_to_node_index<1>(
-  const std::array<unsigned, 1> &,
-  const std::array<unsigned, 1> &,
+  const std::array<unsigned, 1> &node_indices,
+  const std::array<unsigned, 1> &nodes_per_direction,
   const bool) const
 {
-  DEAL_II_NOT_IMPLEMENTED();
-  return 0;
+  const unsigned int i = node_indices[0];
+
+  const bool ibdy = (i == 0 || i == nodes_per_direction[0]);
+  // How many boundaries do we lie on at once?
+  const int nbdy = (ibdy ? 1 : 0);
+
+  if (nbdy == 1) // Vertex DOF
+    { // ijk is a corner node. Return the proper index (somewhere in [0,7]):
+      return i ? 1 : 0;
+    }
+
+  const int offset = 2;
+  return (i - 1) + offset;
 }
 
 

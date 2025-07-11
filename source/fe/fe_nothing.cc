@@ -1,7 +1,7 @@
 // ------------------------------------------------------------------------
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
-// Copyright (C) 2009 - 2022 by the deal.II authors
+// Copyright (C) 2009 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -207,7 +207,6 @@ FE_Nothing<dim, spacedim>::compare_for_domination(
   const unsigned int                  codim) const
 {
   Assert(codim <= dim, ExcImpossibleInDim(dim));
-  (void)codim;
 
   if (!dominate)
     // if FE_Nothing does not dominate, there are no requirements
@@ -279,8 +278,6 @@ FE_Nothing<dim, spacedim>::get_interpolation_matrix(
 {
   // Since this element has no dofs,
   // the interpolation matrix is necessarily empty.
-  (void)interpolation_matrix;
-
   Assert(interpolation_matrix.m() == 0,
          ExcDimensionMismatch(interpolation_matrix.m(), 0));
   Assert(interpolation_matrix.n() == 0,
@@ -298,8 +295,6 @@ FE_Nothing<dim, spacedim>::get_face_interpolation_matrix(
 {
   // since this element has no face dofs, the
   // interpolation matrix is necessarily empty
-  (void)interpolation_matrix;
-
   Assert(interpolation_matrix.m() == 0,
          ExcDimensionMismatch(interpolation_matrix.m(), 0));
   Assert(interpolation_matrix.n() == 0,
@@ -318,8 +313,6 @@ FE_Nothing<dim, spacedim>::get_subface_interpolation_matrix(
 {
   // since this element has no face dofs, the
   // interpolation matrix is necessarily empty
-
-  (void)interpolation_matrix;
   Assert(interpolation_matrix.m() == 0,
          ExcDimensionMismatch(interpolation_matrix.m(), 0));
   Assert(interpolation_matrix.n() == 0,

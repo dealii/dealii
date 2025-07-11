@@ -1,7 +1,7 @@
 // ------------------------------------------------------------------------
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
-// Copyright (C) 2008 - 2023 by the deal.II authors
+// Copyright (C) 2008 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -25,12 +25,14 @@
 #  include <deal.II/lac/la_parallel_vector.h>
 #  include <deal.II/lac/trilinos_vector.h>
 
+DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
 #  include <Epetra_Map.h>
 #  include <Epetra_MpiComm.h>
 #  include <Epetra_MultiVector.h>
 #  include <Epetra_RowMatrix.h>
 #  include <Epetra_Vector.h>
 #  include <Teuchos_ParameterList.hpp>
+DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
 
 #  include <memory>
 
@@ -1877,7 +1879,7 @@ namespace TrilinosWrappers
      * Let Trilinos compute a multilevel hierarchy for the solution of a
      * linear system with the given matrix. As opposed to the other initialize
      * function above, this function uses an object of type
-     * Epetra_CrsMatrixCrs.
+     * Epetra_CrsMatrix.
      */
     void
     initialize(const Epetra_CrsMatrix &matrix,
@@ -2185,6 +2187,14 @@ namespace TrilinosWrappers
 /** @} */
 
 
+DEAL_II_NAMESPACE_CLOSE
+
+#else
+
+// Make sure the scripts that create the C++20 module input files have
+// something to latch on if the preprocessor #ifdef above would
+// otherwise lead to an empty content of the file.
+DEAL_II_NAMESPACE_OPEN
 DEAL_II_NAMESPACE_CLOSE
 
 #endif // DEAL_II_WITH_TRILINOS

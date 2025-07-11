@@ -1,7 +1,7 @@
 /* ------------------------------------------------------------------------
  *
  * SPDX-License-Identifier: LGPL-2.1-or-later
- * Copyright (C) 2010 - 2024 by the deal.II authors
+ * Copyright (C) 2010 - 2025 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
@@ -115,23 +115,26 @@ namespace Step39
   namespace MatrixIntegrator
   {
     template <int dim>
-    double ip_penalty_factor(const MeshWorker::DoFInfo<dim> &dinfo1,
-                             const MeshWorker::DoFInfo<dim> &dinfo2,
-                             unsigned int                    deg1,
-                             unsigned int                    deg2)
+    double
+    ip_penalty_factor(const typename Triangulation<dim>::cell_iterator &cell1,
+                      const unsigned int                                face1,
+                      const unsigned int                                deg1,
+                      const typename Triangulation<dim>::cell_iterator &cell2,
+                      const unsigned int                                face2,
+                      const unsigned int                                deg2)
     {
       const unsigned int normal1 =
-        GeometryInfo<dim>::unit_normal_direction[dinfo1.face_number];
+        GeometryInfo<dim>::unit_normal_direction[face1];
       const unsigned int normal2 =
-        GeometryInfo<dim>::unit_normal_direction[dinfo2.face_number];
+        GeometryInfo<dim>::unit_normal_direction[face2];
       const unsigned int deg1sq = (deg1 == 0) ? 1 : deg1 * (deg1 + 1);
       const unsigned int deg2sq = (deg2 == 0) ? 1 : deg2 * (deg2 + 1);
 
-      double penalty1 = deg1sq / dinfo1.cell->extent_in_direction(normal1);
-      double penalty2 = deg2sq / dinfo2.cell->extent_in_direction(normal2);
-      if (dinfo1.cell->has_children() && !dinfo2.cell->has_children())
+      double penalty1 = deg1sq / cell1->extent_in_direction(normal1);
+      double penalty2 = deg2sq / cell2->extent_in_direction(normal2);
+      if (cell1->has_children() && !cell2->has_children())
         penalty1 *= 2;
-      else if (!dinfo1.cell->has_children() && dinfo2.cell->has_children())
+      else if (!cell1->has_children() && cell2->has_children())
         penalty2 *= 2;
 
       const double penalty = 0.5 * (penalty1 + penalty2);
@@ -184,8 +187,12 @@ namespace Step39
       const unsigned int polynomial_degree =
         info.fe_values(0).get_fe().tensor_degree();
 
-      const double ip_penalty =
-        ip_penalty_factor(dinfo, dinfo, polynomial_degree, polynomial_degree);
+      const double ip_penalty = ip_penalty_factor<dim>(dinfo.cell,
+                                                       dinfo.face_number,
+                                                       polynomial_degree,
+                                                       dinfo.cell,
+                                                       dinfo.face_number,
+                                                       polynomial_degree);
 
       for (unsigned int k = 0; k < fe_face_values.n_quadrature_points; ++k)
         {
@@ -230,8 +237,12 @@ namespace Step39
 
       const unsigned int polynomial_degree =
         info1.fe_values(0).get_fe().tensor_degree();
-      const double ip_penalty =
-        ip_penalty_factor(dinfo1, dinfo2, polynomial_degree, polynomial_degree);
+      const double ip_penalty = ip_penalty_factor<dim>(dinfo1.cell,
+                                                       dinfo1.face_number,
+                                                       polynomial_degree,
+                                                       dinfo2.cell,
+                                                       dinfo2.face_number,
+                                                       polynomial_degree);
 
       const double nui = 1.;
       const double nue = 1.;
@@ -838,8 +849,8 @@ namespace Step39
     // and use it to solve the system.
     solver.solve(matrix, solution, right_hand_side, preconditioner);
 
-    deallog << "Converged in " << control.last_step() << " iterations"
-            << std::endl;
+    std::cout << "Converged in " << control.last_step() << " iterations"
+              << std::endl;
   }
 
 
@@ -977,8 +988,8 @@ namespace Step39
                                assembler);
     triangulation.load_user_indices(old_user_indices);
 
-    deallog << "energy-error: " << errors.block(0).l2_norm() << std::endl;
-    deallog << "L2-error:     " << errors.block(1).l2_norm() << std::endl;
+    std::cout << "energy-error: " << errors.block(0).l2_norm() << std::endl;
+    std::cout << "L2-error:     " << errors.block(1).l2_norm() << std::endl;
   }
 
 
@@ -992,8 +1003,8 @@ namespace Step39
     const std::string filename =
       "sol-" + Utilities::int_to_string(cycle, 2) + ".gnuplot";
 
-    deallog << "Writing solution to <" << filename << ">..." << std::endl
-            << std::endl;
+    std::cout << "Writing solution to <" << filename << ">..." << std::endl
+              << std::endl;
     std::ofstream gnuplot_output(filename);
 
     DataOut<dim> data_out;
@@ -1010,10 +1021,10 @@ namespace Step39
   template <int dim>
   void InteriorPenaltyProblem<dim>::run(unsigned int n_steps)
   {
-    deallog << "Element: " << fe.get_name() << std::endl;
+    std::cout << "Element: " << fe.get_name() << std::endl;
     for (unsigned int s = 0; s < n_steps; ++s)
       {
-        deallog << "Step " << s << std::endl;
+        std::cout << "Step " << s << std::endl;
         if (estimates.block(0).empty())
           triangulation.refine_global(1);
         else
@@ -1023,26 +1034,27 @@ namespace Step39
             triangulation.execute_coarsening_and_refinement();
           }
 
-        deallog << "Triangulation " << triangulation.n_active_cells()
-                << " cells, " << triangulation.n_levels() << " levels"
-                << std::endl;
+        std::cout << "Triangulation " << triangulation.n_active_cells()
+                  << " cells, " << triangulation.n_levels() << " levels"
+                  << std::endl;
 
         setup_system();
-        deallog << "DoFHandler " << dof_handler.n_dofs() << " dofs, level dofs";
+        std::cout << "DoFHandler " << dof_handler.n_dofs()
+                  << " dofs, level dofs";
         for (unsigned int l = 0; l < triangulation.n_levels(); ++l)
-          deallog << ' ' << dof_handler.n_dofs(l);
-        deallog << std::endl;
+          std::cout << ' ' << dof_handler.n_dofs(l);
+        std::cout << std::endl;
 
-        deallog << "Assemble matrix" << std::endl;
+        std::cout << "Assemble matrix" << std::endl;
         assemble_matrix();
-        deallog << "Assemble multilevel matrix" << std::endl;
+        std::cout << "Assemble multilevel matrix" << std::endl;
         assemble_mg_matrix();
-        deallog << "Assemble right hand side" << std::endl;
+        std::cout << "Assemble right hand side" << std::endl;
         assemble_right_hand_side();
-        deallog << "Solve" << std::endl;
+        std::cout << "Solve" << std::endl;
         solve();
         error();
-        deallog << "Estimate " << estimate() << std::endl;
+        std::cout << "Estimate " << estimate() << std::endl;
         output_results(s);
       }
   }
@@ -1054,12 +1066,7 @@ int main()
 {
   try
     {
-      using namespace dealii;
       using namespace Step39;
-
-      deallog.depth_console(2);
-      std::ofstream logfile("deallog");
-      deallog.attach(logfile);
 
       InteriorPenaltyProblem<2> test1;
       test1.run(12);

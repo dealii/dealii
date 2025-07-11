@@ -55,7 +55,6 @@ namespace LA
 #include <deal.II/base/utilities.h>
 
 #include <deal.II/distributed/grid_refinement.h>
-#include <deal.II/distributed/solution_transfer.h>
 #include <deal.II/distributed/tria.h>
 
 #include <deal.II/dofs/dof_handler.h>
@@ -89,6 +88,7 @@ namespace LA
 
 #include <deal.II/numerics/data_out.h>
 #include <deal.II/numerics/error_estimator.h>
+#include <deal.II/numerics/solution_transfer.h>
 #include <deal.II/numerics/vector_tools.h>
 
 // These are the only new include files with regard to step-60. In this
@@ -1247,7 +1247,7 @@ namespace Step70
     fluid_relevant_dofs[1] = locally_relevant_dofs.get_view(n_u, n_u + n_p);
 
     {
-      constraints.reinit(locally_relevant_dofs);
+      constraints.reinit(fluid_dh.locally_owned_dofs(), locally_relevant_dofs);
 
       const FEValuesExtractors::Vector velocities(0);
       DoFTools::make_hanging_node_constraints(fluid_dh, constraints);
@@ -1659,8 +1659,7 @@ namespace Step70
           cell->clear_coarsen_flag();
       }
 
-    parallel::distributed::SolutionTransfer<spacedim, LA::MPI::BlockVector>
-      transfer(fluid_dh);
+    SolutionTransfer<spacedim, LA::MPI::BlockVector> transfer(fluid_dh);
 
     fluid_tria.prepare_coarsening_and_refinement();
     transfer.prepare_for_coarsening_and_refinement(locally_relevant_solution);

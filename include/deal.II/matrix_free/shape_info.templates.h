@@ -1,7 +1,7 @@
 // ------------------------------------------------------------------------
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
-// Copyright (C) 2012 - 2024 by the deal.II authors
+// Copyright (C) 2012 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -21,7 +21,6 @@
 #include <deal.II/base/memory_consumption.h>
 #include <deal.II/base/polynomial.h>
 #include <deal.II/base/polynomials_piecewise.h>
-#include <deal.II/base/polynomials_raviart_thomas.h>
 #include <deal.II/base/qprojector.h>
 #include <deal.II/base/tensor_product_polynomials.h>
 #include <deal.II/base/utilities.h>
@@ -269,8 +268,8 @@ namespace internal
           const unsigned int dofs_per_face_normal = fe_in.n_dofs_per_face();
 
           lexicographic_numbering =
-            PolynomialsRaviartThomas<dim>::get_lexicographic_numbering(
-              fe_in.degree, fe_in.degree - 1);
+            FE_RaviartThomas<dim>::get_lexicographic_numbering(fe_in.degree -
+                                                               1);
 
           // To get the right shape_values of the RT element
           std::vector<unsigned int> lex_normal, lex_tangent;

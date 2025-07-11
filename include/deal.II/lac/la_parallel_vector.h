@@ -1,7 +1,7 @@
 // ------------------------------------------------------------------------
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
-// Copyright (C) 2012 - 2024 by the deal.II authors
+// Copyright (C) 2012 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -271,6 +271,11 @@ namespace LinearAlgebra
         std::is_same_v<MemorySpace, ::dealii::MemorySpace::Host> ||
           std::is_same_v<MemorySpace, ::dealii::MemorySpace::Default>,
         "MemorySpace should be Host or Default");
+
+      static_assert(
+        (!std::is_same_v<MemorySpace, ::dealii::MemorySpace::Default>) ||
+          std::is_same_v<Number, float> || std::is_same_v<Number, double>,
+        "Number should be float or double for Default memory space");
 
       /**
        * @name 1: Basic Object-handling

@@ -1,7 +1,7 @@
 // ------------------------------------------------------------------------
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
-// Copyright (C) 2020 - 2024 by the deal.II authors
+// Copyright (C) 2020 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -28,6 +28,7 @@
 #include <deal.II/fe/fe_tools.h>
 #include <deal.II/fe/fe_update_flags.h>
 #include <deal.II/fe/fe_values.h>
+#include <deal.II/fe/mapping_internal.h>
 #include <deal.II/fe/mapping_q.h>
 
 #include <deal.II/grid/grid_tools_geometry.h>
@@ -2363,37 +2364,12 @@ namespace internal
                     data.output_data->inverse_jacobians[q].transpose();
                   const DerivativeForm<1, dim, spacedim> contravariant =
                     data.output_data->jacobians[q];
-
-                  for (unsigned int i = 0; i < spacedim; ++i)
-                    {
-                      double tmp1[dim][dim];
-                      for (unsigned int J = 0; J < dim; ++J)
-                        for (unsigned int K = 0; K < dim; ++K)
-                          {
-                            tmp1[J][K] =
-                              contravariant[i][0] * input[q][0][J][K];
-                            for (unsigned int I = 1; I < dim; ++I)
-                              tmp1[J][K] +=
-                                contravariant[i][I] * input[q][I][J][K];
-                          }
-                      for (unsigned int j = 0; j < spacedim; ++j)
-                        {
-                          double tmp2[dim];
-                          for (unsigned int K = 0; K < dim; ++K)
-                            {
-                              tmp2[K] = covariant[j][0] * tmp1[0][K];
-                              for (unsigned int J = 1; J < dim; ++J)
-                                tmp2[K] += covariant[j][J] * tmp1[J][K];
-                            }
-                          for (unsigned int k = 0; k < spacedim; ++k)
-                            {
-                              output[q][i][j][k] = covariant[k][0] * tmp2[0];
-                              for (unsigned int K = 1; K < dim; ++K)
-                                output[q][i][j][k] += covariant[k][K] * tmp2[K];
-                            }
-                        }
-                    }
+                  output[q] =
+                    internal::apply_contravariant_hessian(covariant,
+                                                          contravariant,
+                                                          input[q]);
                 }
+
               return;
             }
 
@@ -2407,34 +2383,8 @@ namespace internal
                 {
                   const DerivativeForm<1, dim, spacedim> covariant =
                     data.output_data->inverse_jacobians[q].transpose();
-
-                  for (unsigned int i = 0; i < spacedim; ++i)
-                    {
-                      double tmp1[dim][dim];
-                      for (unsigned int J = 0; J < dim; ++J)
-                        for (unsigned int K = 0; K < dim; ++K)
-                          {
-                            tmp1[J][K] = covariant[i][0] * input[q][0][J][K];
-                            for (unsigned int I = 1; I < dim; ++I)
-                              tmp1[J][K] += covariant[i][I] * input[q][I][J][K];
-                          }
-                      for (unsigned int j = 0; j < spacedim; ++j)
-                        {
-                          double tmp2[dim];
-                          for (unsigned int K = 0; K < dim; ++K)
-                            {
-                              tmp2[K] = covariant[j][0] * tmp1[0][K];
-                              for (unsigned int J = 1; J < dim; ++J)
-                                tmp2[K] += covariant[j][J] * tmp1[J][K];
-                            }
-                          for (unsigned int k = 0; k < spacedim; ++k)
-                            {
-                              output[q][i][j][k] = covariant[k][0] * tmp2[0];
-                              for (unsigned int K = 1; K < dim; ++K)
-                                output[q][i][j][k] += covariant[k][K] * tmp2[K];
-                            }
-                        }
-                    }
+                  output[q] =
+                    internal::apply_covariant_hessian(covariant, input[q]);
                 }
 
               return;
@@ -2458,37 +2408,11 @@ namespace internal
                     data.output_data->inverse_jacobians[q].transpose();
                   const DerivativeForm<1, dim, spacedim> contravariant =
                     data.output_data->jacobians[q];
-                  for (unsigned int i = 0; i < spacedim; ++i)
-                    {
-                      double factor[dim];
-                      for (unsigned int I = 0; I < dim; ++I)
-                        factor[I] =
-                          contravariant[i][I] * (1. / data.volume_elements[q]);
-                      double tmp1[dim][dim];
-                      for (unsigned int J = 0; J < dim; ++J)
-                        for (unsigned int K = 0; K < dim; ++K)
-                          {
-                            tmp1[J][K] = factor[0] * input[q][0][J][K];
-                            for (unsigned int I = 1; I < dim; ++I)
-                              tmp1[J][K] += factor[I] * input[q][I][J][K];
-                          }
-                      for (unsigned int j = 0; j < spacedim; ++j)
-                        {
-                          double tmp2[dim];
-                          for (unsigned int K = 0; K < dim; ++K)
-                            {
-                              tmp2[K] = covariant[j][0] * tmp1[0][K];
-                              for (unsigned int J = 1; J < dim; ++J)
-                                tmp2[K] += covariant[j][J] * tmp1[J][K];
-                            }
-                          for (unsigned int k = 0; k < spacedim; ++k)
-                            {
-                              output[q][i][j][k] = covariant[k][0] * tmp2[0];
-                              for (unsigned int K = 1; K < dim; ++K)
-                                output[q][i][j][k] += covariant[k][K] * tmp2[K];
-                            }
-                        }
-                    }
+                  output[q] =
+                    internal::apply_piola_hessian(covariant,
+                                                  contravariant,
+                                                  data.volume_elements[q],
+                                                  input[q]);
                 }
 
               return;

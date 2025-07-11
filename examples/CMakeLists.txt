@@ -1,7 +1,7 @@
 ## ------------------------------------------------------------------------
 ##
 ## SPDX-License-Identifier: LGPL-2.1-or-later
-## Copyright (C) 2012 - 2022 by the deal.II authors
+## Copyright (C) 2012 - 2025 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -44,6 +44,14 @@ if(DEAL_II_COMPONENT_EXAMPLES)
     PATTERN "topography.txt.gz"                 # step-53
     PATTERN "input/initial_mesh_3d.vtk"         # step-54
     PATTERN "input/DTMB-5415_bulbous_bow.iges"  # step-54
+    PATTERN "sphere_r6.geo"                     # step-97
+    PATTERN "sphere_r6.msh"                     # step-97
+    PATTERN "sphere_r7.geo"                     # step-97
+    PATTERN "sphere_r7.msh"                     # step-97
+    PATTERN "sphere_r8.geo"                     # step-97
+    PATTERN "sphere_r8.msh"                     # step-97
+    PATTERN "sphere_r9.geo"                     # step-97
+    PATTERN "sphere_r9.msh"                     # step-97
     )
 
   message(STATUS "Setting up examples - Done")

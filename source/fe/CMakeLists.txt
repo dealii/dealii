@@ -1,7 +1,7 @@
 ## ------------------------------------------------------------------------
 ##
 ## SPDX-License-Identifier: LGPL-2.1-or-later
-## Copyright (C) 2012 - 2023 by the deal.II authors
+## Copyright (C) 2012 - 2025 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -59,6 +59,7 @@ set(_unity_include_src
   mapping_cartesian.cc
   mapping.cc
   mapping_fe.cc
+  mapping_p1.cc
   mapping_q1.cc
   mapping_q.cc
   mapping_q_cache.cc
@@ -71,7 +72,7 @@ set(_separate_src
   fe_values_base.cc
   fe_values_views.cc
   fe_values_views_internal.cc
-  mapping_fe_field.cc
+  mapping_fe_field_inst1.cc
   mapping_fe_field_inst2.cc
   fe_tools.cc
   fe_tools_interpolate.cc
@@ -137,6 +138,7 @@ set(_inst
   mapping.inst.in
   mapping_fe.inst.in
   mapping_fe_field.inst.in
+  mapping_p1.inst.in
   mapping_q1_eulerian.inst.in
   mapping_q1.inst.in
   mapping_q_cache.inst.in
@@ -146,9 +148,11 @@ set(_inst
   mapping_related_data.inst.in
   )
 
-file(GLOB _header
+file(GLOB _header CONFIGURE_DEPENDS
   ${CMAKE_SOURCE_DIR}/include/deal.II/fe/*.h
   )
 
 define_object_library(object_fe OBJECT ${_src} ${_header} ${_inst})
 expand_instantiations(object_fe "${_inst}")
+
+collect_source_and_header_files("${_unity_include_src};${_separate_src}" "${_header}")

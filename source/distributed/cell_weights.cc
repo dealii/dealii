@@ -1,7 +1,7 @@
 // ------------------------------------------------------------------------
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
-// Copyright (C) 2018 - 2024 by the deal.II authors
+// Copyright (C) 2018 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -168,7 +168,6 @@ namespace parallel
     Assert(&triangulation == &(dof_handler.get_triangulation()),
            ExcMessage(
              "Triangulation associated with the DoFHandler has changed!"));
-    (void)triangulation;
 
     // Skip if the DoFHandler has not been initialized yet.
     if (dof_handler.get_fe_collection().empty())

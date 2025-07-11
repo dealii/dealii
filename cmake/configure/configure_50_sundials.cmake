@@ -1,7 +1,7 @@
 ## ------------------------------------------------------------------------
 ##
 ## SPDX-License-Identifier: LGPL-2.1-or-later
-## Copyright (C) 2017 - 2022 by the deal.II authors
+## Copyright (C) 2017 - 2025 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -37,6 +37,24 @@ macro(feature_sundials_find_external var)
         "with version ${SUNDIALS_VERSION} is too old.\n"
         "deal.II requires at least version ${_version_required}.\n\n"
         )
+      set(${var} FALSE)
+    endif()
+
+    #
+    # Sundials has to be configured with the same MPI configuration as
+    # deal.II.
+    #
+    if((SUNDIALS_WITH_MPI AND NOT DEAL_II_WITH_MPI) OR (NOT SUNDIALS_WITH_MPI AND DEAL_II_WITH_MPI))
+      message(STATUS "Could not find a sufficient Sundials installation: "
+        "deal.II and Sundials must have MPI support either both enabled or both disabled."
+      )
+      set(SUNDIALS_ADDITIONAL_ERROR_STRING
+        ${SUNDIALS_ADDITIONAL_ERROR_STRING}
+        "The Sundials installation (found at \"${SUNDIALS_DIR}\") has:\n"
+        "  SUNDIALS_WITH_MPI = ${SUNDIALS_WITH_MPI}\n"
+        " While deal.II has:\n"
+        "  DEAL_II_WITH_MPI = ${DEAL_II_WITH_MPI}\n"
+      )
       set(${var} FALSE)
     endif()
   endif()

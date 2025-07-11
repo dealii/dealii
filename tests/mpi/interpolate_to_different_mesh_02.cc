@@ -16,7 +16,6 @@
 #include <deal.II/base/conditional_ostream.h>
 
 #include <deal.II/distributed/grid_refinement.h>
-#include <deal.II/distributed/solution_transfer.h>
 #include <deal.II/distributed/tria.h>
 
 #include <deal.II/dofs/dof_tools.h>
@@ -140,7 +139,7 @@ SeventhProblem<dim>::setup_system()
   system_rhs.reinit(locally_owned_dofs, mpi_communicator);
   system_rhs = 0;
   constraints.clear();
-  constraints.reinit(locally_relevant_dofs);
+  constraints.reinit(locally_owned_dofs, locally_relevant_dofs);
   DoFTools::make_hanging_node_constraints(dof_handler, constraints);
   VectorTools::interpolate_boundary_values(dof_handler,
                                            0,

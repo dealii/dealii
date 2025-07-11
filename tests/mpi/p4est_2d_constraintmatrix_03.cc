@@ -1,7 +1,7 @@
 // ------------------------------------------------------------------------
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
-// Copyright (C) 2010 - 2023 by the deal.II authors
+// Copyright (C) 2010 - 2024 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -97,7 +97,7 @@ test(const bool use_manifold_for_normal, const Mapping<dim> &mapping)
   TrilinosWrappers::MPI::Vector x_rel;
   x_rel.reinit(relevant_set, MPI_COMM_WORLD);
 
-  AffineConstraints<double> cm(relevant_set);
+  AffineConstraints<double> cm(owned_set, relevant_set);
   DoFTools::make_hanging_node_constraints(dofh, cm);
   ComponentMask velocity_mask(dim + 1, true);
 

@@ -1,7 +1,7 @@
 // ------------------------------------------------------------------------
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
-// Copyright (C) 2000 - 2023 by the deal.II authors
+// Copyright (C) 2000 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -44,7 +44,6 @@ BlockSparsityPatternBase<SparsityPatternType>::BlockSparsityPatternBase(
   const BlockSparsityPatternBase &s)
   : BlockSparsityPatternBase()
 {
-  (void)s;
   Assert(s.n_block_rows() == 0 && s.n_block_cols() == 0,
          ExcMessage(
            "This constructor can only be called if the provided argument "

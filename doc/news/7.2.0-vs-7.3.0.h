@@ -1,7 +1,7 @@
 // ------------------------------------------------------------------------
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
-// Copyright (C) 2013 - 2023 by the deal.II authors
+// Copyright (C) 2013 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -500,7 +500,7 @@ was inconsistent. This is now fixed.
 <br>
 (Timo Heister, 2012/09/16)
 
-<li> Changed: Due to incompatibilties with some hdf5 packages installed from
+<li> Changed: Due to incompatibilities with some hdf5 packages installed from
 repositories we disable auto-detection of hdf5. Use --with-hdf if you need it.
 <br>
 (Timo Heister, 2012/09/14)

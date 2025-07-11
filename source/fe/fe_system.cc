@@ -1,7 +1,7 @@
 // ------------------------------------------------------------------------
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
-// Copyright (C) 1999 - 2024 by the deal.II authors
+// Copyright (C) 1999 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -146,7 +146,7 @@ namespace internal
     const unsigned int n_dofs_per_cell =
       fe.base_element(base_no).n_dofs_per_cell();
 
-    auto copy_row = [](const auto row_in, auto row_out) {
+    auto copy_row = [](const auto &row_in, const auto &row_out) {
       std::copy(row_in.begin(), row_in.end(), row_out.begin());
     };
 

@@ -1,7 +1,7 @@
 // ------------------------------------------------------------------------
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
-// Copyright (C) 2001 - 2024 by the deal.II authors
+// Copyright (C) 2001 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -2358,11 +2358,13 @@ namespace GridTools
    * If no such relation exists then the returned std::optional object is empty
    * (i.e., has_value() will return `false`).
    *
-   * Here, two vertices <tt>v_1</tt> and <tt>v_2</tt> are considered equal, if
-   * $M\cdot v_1 + offset - v_2$ is parallel to the unit vector in unit
-   * direction @p direction. If the parameter @p matrix is a reference to a
-   * spacedim x spacedim matrix, $M$ is set to @p matrix, otherwise $M$ is the
-   * identity matrix.
+   * Here, two vertices <tt>v_1</tt> and <tt>v_2</tt> are considered equal, to
+   * the nearest tolerance, e.g. distance < abs_tol, if $M\cdot v_1 + offset -
+   * v_2$ is parallel to the
+   * unit vector in unit direction @p direction. Note that this tolerance is not
+   * scaled with the mesh, it's an absolute tolerance. If the parameter @p matrix
+   * is a reference to a spacedim x spacedim matrix, $M$ is set to @p matrix,
+   * otherwise $M$ is the identity matrix.
    *
    * If the matching was successful, the _relative_ orientation of @p face1 with
    * respect to @p face2 is returned a
@@ -2379,7 +2381,8 @@ namespace GridTools
     const unsigned int                                            direction,
     const Tensor<1, FaceIterator::AccessorType::space_dimension> &offset =
       Tensor<1, FaceIterator::AccessorType::space_dimension>(),
-    const FullMatrix<double> &matrix = FullMatrix<double>());
+    const FullMatrix<double> &matrix  = FullMatrix<double>(),
+    const double              abs_tol = 1e-10);
 
   /**
    * This function will collect periodic face pairs on the coarsest mesh level
@@ -2403,8 +2406,9 @@ namespace GridTools
    *
    * The @p offset is a vector tangential to the faces that is added to the
    * location of vertices of the 'first' boundary when attempting to match
-   * them to the corresponding vertices of the 'second' boundary. This can be
-   * used to implement conditions such as $u(0,y)=u(1,y+1)$.
+   * them (to the nearest absolute tolerance, distance < abs_tol) to the
+   * corresponding vertices of the 'second' boundary. This can be used to
+   * implement conditions such as $u(0,y)=u(1,y+1)$.
    *
    * Optionally, a $dim\times dim$ rotation @p matrix can be specified that
    * describes how vector valued DoFs of the first face should be modified
@@ -2450,7 +2454,8 @@ namespace GridTools
                                                &matched_pairs,
     const Tensor<1, MeshType::space_dimension> &offset =
       dealii::Tensor<1, MeshType::space_dimension>(),
-    const FullMatrix<double> &matrix = FullMatrix<double>());
+    const FullMatrix<double> &matrix  = FullMatrix<double>(),
+    const double              abs_tol = 1e-10);
 
 
   /**
@@ -2483,7 +2488,8 @@ namespace GridTools
                                                        &matched_pairs,
     const dealii::Tensor<1, MeshType::space_dimension> &offset =
       dealii::Tensor<1, MeshType::space_dimension>(),
-    const FullMatrix<double> &matrix = FullMatrix<double>());
+    const FullMatrix<double> &matrix  = FullMatrix<double>(),
+    const double              abs_tol = 1e-10);
 
   /** @} */
   /**

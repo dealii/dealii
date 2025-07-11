@@ -1,7 +1,7 @@
 // ------------------------------------------------------------------------
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
-// Copyright (C) 2019 - 2024 by the deal.II authors
+// Copyright (C) 2019 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -1310,7 +1310,6 @@ namespace HDF5
               // Release the HDF5 resource
               const herr_t ret = H5Tclose(*pointer);
               AssertNothrow(ret >= 0, ExcInternalError());
-              (void)ret;
               delete pointer;
             });
 
@@ -1333,7 +1332,6 @@ namespace HDF5
               // Release the HDF5 resource
               const herr_t ret = H5Tclose(*pointer);
               AssertNothrow(ret >= 0, ExcInternalError());
-              (void)ret;
               delete pointer;
             });
           *t_type = H5Tcreate(H5T_COMPOUND, sizeof(std::complex<double>));
@@ -1655,7 +1653,7 @@ namespace HDF5
     std::string string_value(string_out);
     // The memory of the variable length string has to be freed.
     // H5Dvlen_reclaim could be also used
-    free(string_out);
+    std::free(string_out);
     ret = H5Tclose(type);
     Assert(ret >= 0, ExcInternalError());
 
@@ -2251,6 +2249,14 @@ namespace HDF5
 
 DEAL_II_NAMESPACE_CLOSE
 
+
+#else
+
+// Make sure the scripts that create the C++20 module input files have
+// something to latch on if the preprocessor #ifdef above would
+// otherwise lead to an empty content of the file.
+DEAL_II_NAMESPACE_OPEN
+DEAL_II_NAMESPACE_CLOSE
 
 #endif // DEAL_II_WITH_HDF5
 

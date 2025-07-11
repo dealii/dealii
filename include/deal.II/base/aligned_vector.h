@@ -1,7 +1,7 @@
 // ------------------------------------------------------------------------
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
-// Copyright (C) 2014 - 2024 by the deal.II authors
+// Copyright (C) 2014 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -697,7 +697,7 @@ private:
        * as well as a pointer to the memory being de-allocated.
        */
       virtual void
-      delete_array(const AlignedVector<T> *aligned_vector, T *ptr);
+      delete_array(const AlignedVector<T> *aligned_vector, T *ptr) override;
 
     private:
       /**
@@ -1813,9 +1813,9 @@ AlignedVector<T>::replicate_across_communicator(const MPI_Comm     communicator,
           // deadlock. So we just send the result of the broadcast() call to
           // nirvana on the root process and keep our current state.
           if (Utilities::MPI::this_mpi_process(shmem_roots_communicator) == 0)
-            Utilities::MPI::broadcast(shmem_roots_communicator,
-                                      *this,
-                                      shmem_roots_root_rank);
+            std::ignore = Utilities::MPI::broadcast(shmem_roots_communicator,
+                                                    *this,
+                                                    shmem_roots_root_rank);
           else
             *this = Utilities::MPI::broadcast(shmem_roots_communicator,
                                               *this,

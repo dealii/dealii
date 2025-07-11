@@ -1,7 +1,7 @@
 // ------------------------------------------------------------------------
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
-// Copyright (C) 2016 - 2023 by the deal.II authors
+// Copyright (C) 2016 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -353,7 +353,6 @@ DiagonalMatrix<VectorType>::operator()(const size_type i,
                                        const size_type j) const
 {
   Assert(i == j, ExcIndexRange(j, i, i + 1));
-  (void)j;
   return diagonal(i);
 }
 
@@ -364,7 +363,6 @@ typename VectorType::value_type &
 DiagonalMatrix<VectorType>::operator()(const size_type i, const size_type j)
 {
   Assert(i == j, ExcIndexRange(j, i, i + 1));
-  (void)j;
   return diagonal(i);
 }
 

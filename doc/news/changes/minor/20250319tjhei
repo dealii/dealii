@@ -1,5 +1,0 @@
-New: Portable::FEEvaluation::get_current_cell_index() and
-Portable::FEEvaluation::get_matrix_free_data() allow querying
-the current Portable::MatrixFree::Data object and the current cell index respectively.
-<br>
-(Daniel Arndt, Timo Heister, 2025/03/19)

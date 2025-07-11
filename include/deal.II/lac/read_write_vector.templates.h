@@ -1,7 +1,7 @@
 // ------------------------------------------------------------------------
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
-// Copyright (C) 2015 - 2024 by the deal.II authors
+// Copyright (C) 2015 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -34,7 +34,9 @@
 #  include <deal.II/lac/trilinos_epetra_communication_pattern.h>
 #  include <deal.II/lac/trilinos_vector.h>
 
+DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
 #  include <Epetra_Import.h>
+DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
 #endif
 
 #include <boost/io/ios_state.hpp>
@@ -92,16 +94,11 @@ namespace LinearAlgebra
       static void
       import_elements(
         const std::shared_ptr<const ::dealii::Utilities::MPI::Partitioner>
-                                                         &communication_pattern,
-        const Number                                     *values,
-        const VectorOperation::values                     operation,
-        ::dealii::LinearAlgebra::ReadWriteVector<Number> &rw_vector)
+          & /*communication_pattern*/,
+        const Number * /*values*/,
+        const VectorOperation::values /*operation*/,
+        ::dealii::LinearAlgebra::ReadWriteVector<Number> & /*rw_vector*/)
       {
-        (void)communication_pattern;
-        (void)values;
-        (void)operation;
-        (void)rw_vector;
-
         static_assert(
           std::is_same_v<MemorySpace, ::dealii::MemorySpace::Host> ||
             std::is_same_v<MemorySpace, ::dealii::MemorySpace::Default>,
@@ -342,7 +339,6 @@ namespace LinearAlgebra
   {
     Assert(s == static_cast<Number>(0),
            ExcMessage("Only 0 can be assigned to a vector."));
-    (void)s;
 
     const size_type this_size = locally_owned_size();
     if (this_size > 0)
@@ -396,10 +392,8 @@ namespace LinearAlgebra
     const dealii::Vector<Number> &vec,
     VectorOperation::values       operation,
     const std::shared_ptr<const Utilities::MPI::CommunicationPatternBase>
-      &communication_pattern)
+      & /*communication_pattern*/)
   {
-    (void)communication_pattern;
-
     internal::import_serial_vector(vec, operation, *this);
   }
 

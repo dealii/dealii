@@ -1,7 +1,7 @@
 // ------------------------------------------------------------------------
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
-// Copyright (C) 2020 by the deal.II authors
+// Copyright (C) 2020 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -12,5 +12,13 @@
 //
 // ------------------------------------------------------------------------
 
+#include <deal.II/matrix_free/evaluation_template_factory.templates.h>
+
+DEAL_II_NAMESPACE_OPEN
+
+#define SPLIT_INSTANTIATIONS_COUNT 6
 #define SPLIT_INSTANTIATIONS_INDEX 1
-#include "evaluation_template_factory.cc"
+
+#include "matrix_free/evaluation_template_factory.inst"
+
+DEAL_II_NAMESPACE_CLOSE

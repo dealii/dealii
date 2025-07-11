@@ -1,7 +1,7 @@
 // ------------------------------------------------------------------------
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
-// Copyright (C) 2013 - 2024 by the deal.II authors
+// Copyright (C) 2013 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -313,19 +313,8 @@ FE_Nedelec<dim>::initialize_quad_dof_index_permutation_and_sign_change()
   // swap_table = {swap_0, swap_1, ... swap_7};
   //
   // Each swap table contains eight swaps - one swap for each possible quad
-  // orientation. The deal.II encodes the orientation of a quad using
-  // three boolean parameters:
-  // face_orientation - true if face is in standard orientation
-  // and false otherwise;
-  // face_rotation - rotation by 90 deg counterclockwise if true;
-  // face_flip - rotation by 180 deg counterclockwise if true.
-  // See the documentation of GeometryInfo<dim>.
-  //
-  // The combined face orientation is computes as
-  // orientation_no = face_flip*4 + face_rotation*2 + face_orientation*1;
-  // See tria_orientation.h.
-  //
-  // The parameter orientation_no (0...7) indexes the swaps in a swap table.
+  // orientation. These are encoded in the standard way (i.e., orientation,
+  // rotation, flip). See the orientation module for more information.
   //
   // Nedelec elements of order k have their own swap table, swap_table_k.
   // Recall, the swap_table_0 is empty as the Nedelec finite elements of the
@@ -503,72 +492,60 @@ FE_Nedelec<dim>::initialize_quad_dof_index_permutation_and_sign_change()
   const unsigned int half_dofs = k * (k + 1); // see below;
 
   const int rl = row_length[k];
+  for (types::geometric_orientation combined_orientation = 0;
+       combined_orientation <
+       this->reference_cell().n_face_orientations(face_no);
+       ++combined_orientation)
+    {
+      // The dofs on a quad are indexed as the following:
+      //
+      // | x0, x1, x2, x3, ..., xk  | y0, y1, y2, y3 ..., yk  |
+      // |                          |                         |
+      // |-- half_ dofs = k*(k+1) --|-- half_dofs = k*(k+1) --|
+      // |                                                    |
+      // |-------------------- 2*k*(k+1) ---------------------|
 
-  int offset = table_size[0];
-  // The assignment above is to prevent the compiler from complaining about the
-  // unused table_size.
-
-  int value = 0;
-
-  for (const bool face_orientation : {false, true})
-    for (const bool face_rotation : {false, true})
-      for (const bool face_flip : {false, true})
+      for (unsigned int indx_x = 0; indx_x < half_dofs; indx_x++)
         {
-          const auto case_no =
-            internal::combined_face_orientation(face_orientation,
-                                                face_rotation,
-                                                face_flip);
+          int offset = 3 * rl * combined_orientation + 0 * rl + indx_x;
+          Assert(offset < table_size[k], ExcInternalError());
+          int value = *(swap_table + offset);
+          Assert(value < table_size[k], ExcInternalError());
+          Assert(value > -2, ExcInternalError());
 
-          // The dofs on a quad are indexed as the following:
-          //
-          // | x0, x1, x2, x3, ..., xk  | y0, y1, y2, y3 ..., yk  |
-          // |                          |                         |
-          // |-- half_ dofs = k*(k+1) --|-- half_dofs = k*(k+1) --|
-          // |                                                    |
-          // |-------------------- 2*k*(k+1) ---------------------|
-
-          for (unsigned int indx_x = 0; indx_x < half_dofs; indx_x++)
+          if (value != -1)
             {
-              offset = 3 * rl * case_no + 0 * rl + indx_x;
-              Assert(offset < table_size[k], ExcInternalError());
-              value = *(swap_table + offset);
-              Assert(value < table_size[k], ExcInternalError());
-              Assert(value > -2, ExcInternalError());
+              const unsigned int indx_y =
+                half_dofs + static_cast<unsigned int>(value);
 
-              if (value != -1)
-                {
-                  const unsigned int indx_y =
-                    half_dofs + static_cast<unsigned int>(value);
+              // dofs swap
+              this->adjust_quad_dof_index_for_face_orientation_table[face_no](
+                indx_x, combined_orientation) = indx_y - indx_x;
 
-                  // dofs swap
-                  this
-                    ->adjust_quad_dof_index_for_face_orientation_table[face_no](
-                      indx_x, case_no) = indx_y - indx_x;
-
-                  this
-                    ->adjust_quad_dof_index_for_face_orientation_table[face_no](
-                      indx_y, case_no) = indx_x - indx_y;
-                }
-
-              // dof sign change
-              offset = 3 * rl * case_no + 1 * rl + indx_x;
-              Assert(offset < table_size[k], ExcInternalError());
-              value = *(swap_table + offset);
-              Assert((value == 0) || (value == 1), ExcInternalError());
-
-              this->adjust_quad_dof_sign_for_face_orientation_table[face_no](
-                indx_x, case_no) = static_cast<bool>(value);
-
-
-              offset = 3 * rl * case_no + 2 * rl + indx_x;
-              Assert(offset < table_size[k], ExcInternalError());
-              value = *(swap_table + offset);
-              Assert((value == 0) || (value == 1), ExcInternalError());
-
-              this->adjust_quad_dof_sign_for_face_orientation_table[face_no](
-                indx_x + half_dofs, case_no) = static_cast<bool>(value);
+              this->adjust_quad_dof_index_for_face_orientation_table[face_no](
+                indx_y, combined_orientation) = indx_x - indx_y;
             }
+
+          // dof sign change
+          offset = 3 * rl * combined_orientation + 1 * rl + indx_x;
+          Assert(offset < table_size[k], ExcInternalError());
+          value = *(swap_table + offset);
+          Assert((value == 0) || (value == 1), ExcInternalError());
+
+          this->adjust_quad_dof_sign_for_face_orientation_table[face_no](
+            indx_x, combined_orientation) = static_cast<bool>(value);
+
+
+          offset = 3 * rl * combined_orientation + 2 * rl + indx_x;
+          Assert(offset < table_size[k], ExcInternalError());
+          value = *(swap_table + offset);
+          Assert((value == 0) || (value == 1), ExcInternalError());
+
+          this->adjust_quad_dof_sign_for_face_orientation_table[face_no](
+            indx_x + half_dofs, combined_orientation) =
+            static_cast<bool>(value);
         }
+    }
 
   return;
 }

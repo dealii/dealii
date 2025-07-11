@@ -1,7 +1,7 @@
 // ------------------------------------------------------------------------
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
-// Copyright (C) 2019 - 2023 by the deal.II authors
+// Copyright (C) 2019 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -224,7 +224,6 @@ namespace MeshWorker
     // We permit different numbers of matrices, vectors and DoF index vectors.
     // So we have to be a bit permissive here.
     constexpr int max_index = std::max({n_matrices, n_vectors, n_dof_indices});
-    (void)max_index;
     Assert(index < max_index, ExcIndexRange(index, 0, max_index));
 
     if (index < n_matrices)

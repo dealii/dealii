@@ -110,12 +110,13 @@ test()
 
   // constraints:
   AffineConstraints<double> constraints_euler;
-  constraints_euler.reinit(locally_relevant_dofs_euler);
+  constraints_euler.reinit(locally_owned_dofs_euler,
+                           locally_relevant_dofs_euler);
   DoFTools::make_hanging_node_constraints(dof_handler_euler, constraints_euler);
   constraints_euler.close();
 
   AffineConstraints<double> constraints;
-  constraints.reinit(locally_relevant_dofs);
+  constraints.reinit(locally_owned_dofs, locally_relevant_dofs);
   DoFTools::make_hanging_node_constraints(dof_handler, constraints);
   constraints_euler.close();
 

@@ -1,7 +1,7 @@
 // ------------------------------------------------------------------------
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
-// Copyright (C) 2019 - 2024 by the deal.II authors
+// Copyright (C) 2019 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -222,7 +222,7 @@ public:
    * @note Currently this function always returns <code>true</code>.
    */
   virtual bool
-  append_column(const VectorType &column);
+  append_column(const VectorType &column) override;
 
   /**
    * Remove first column and update QR factorization.
@@ -257,19 +257,19 @@ public:
    * $\tilde R$ can be obtained by Cholesky decomposition.
    */
   virtual void
-  remove_column(const unsigned int k = 0);
+  remove_column(const unsigned int k = 0) override;
 
   virtual void
-  multiply_with_Q(VectorType &y, const Vector<Number> &x) const;
+  multiply_with_Q(VectorType &y, const Vector<Number> &x) const override;
 
   virtual void
-  multiply_with_QT(Vector<Number> &y, const VectorType &x) const;
+  multiply_with_QT(Vector<Number> &y, const VectorType &x) const override;
 
   virtual void
-  multiply_with_A(VectorType &y, const Vector<Number> &x) const;
+  multiply_with_A(VectorType &y, const Vector<Number> &x) const override;
 
   virtual void
-  multiply_with_AT(Vector<Number> &y, const VectorType &x) const;
+  multiply_with_AT(Vector<Number> &y, const VectorType &x) const override;
 
 private:
   /**

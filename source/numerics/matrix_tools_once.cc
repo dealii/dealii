@@ -1,7 +1,7 @@
 // ------------------------------------------------------------------------
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
-// Copyright (C) 2016 - 2024 by the deal.II authors
+// Copyright (C) 2016 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -248,8 +248,6 @@ namespace MatrixTools
                             const bool                      eliminate_columns)
       {
         Assert(eliminate_columns == false, ExcNotImplemented());
-        (void)eliminate_columns;
-
         Assert(matrix.n() == right_hand_side.size(),
                ExcDimensionMismatch(matrix.n(), right_hand_side.size()));
         Assert(matrix.n() == solution.size(),

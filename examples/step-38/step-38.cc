@@ -1,7 +1,7 @@
 /* ------------------------------------------------------------------------
  *
  * SPDX-License-Identifier: LGPL-2.1-or-later
- * Copyright (C) 2010 - 2024 by the deal.II authors
+ * Copyright (C) 2010 - 2025 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
@@ -172,7 +172,7 @@ namespace Step38
   double Solution<3>::value(const Point<3> &p, const unsigned int) const
   {
     return (std::sin(numbers::PI * p[0]) * std::cos(numbers::PI * p[1]) *
-            exp(p[2]));
+            std::exp(p[2]));
   }
 
 
@@ -184,9 +184,12 @@ namespace Step38
 
     Tensor<1, 3> return_value;
 
-    return_value[0] = PI * cos(PI * p[0]) * cos(PI * p[1]) * exp(p[2]);
-    return_value[1] = -PI * sin(PI * p[0]) * sin(PI * p[1]) * exp(p[2]);
-    return_value[2] = sin(PI * p[0]) * cos(PI * p[1]) * exp(p[2]);
+    return_value[0] =
+      PI * std::cos(PI * p[0]) * std::cos(PI * p[1]) * std::exp(p[2]);
+    return_value[1] =
+      -PI * std::sin(PI * p[0]) * std::sin(PI * p[1]) * std::exp(p[2]);
+    return_value[2] =
+      std::sin(PI * p[0]) * std::cos(PI * p[1]) * std::exp(p[2]);
 
     return return_value;
   }
@@ -217,23 +220,33 @@ namespace Step38
 
     Tensor<2, 3> hessian;
 
-    hessian[0][0] = -PI * PI * sin(PI * p[0]) * cos(PI * p[1]) * exp(p[2]);
-    hessian[1][1] = -PI * PI * sin(PI * p[0]) * cos(PI * p[1]) * exp(p[2]);
-    hessian[2][2] = sin(PI * p[0]) * cos(PI * p[1]) * exp(p[2]);
+    hessian[0][0] =
+      -PI * PI * std::sin(PI * p[0]) * std::cos(PI * p[1]) * std::exp(p[2]);
+    hessian[1][1] =
+      -PI * PI * std::sin(PI * p[0]) * std::cos(PI * p[1]) * std::exp(p[2]);
+    hessian[2][2] = std::sin(PI * p[0]) * std::cos(PI * p[1]) * std::exp(p[2]);
 
-    hessian[0][1] = -PI * PI * cos(PI * p[0]) * sin(PI * p[1]) * exp(p[2]);
-    hessian[1][0] = -PI * PI * cos(PI * p[0]) * sin(PI * p[1]) * exp(p[2]);
+    hessian[0][1] =
+      -PI * PI * std::cos(PI * p[0]) * std::sin(PI * p[1]) * std::exp(p[2]);
+    hessian[1][0] =
+      -PI * PI * std::cos(PI * p[0]) * std::sin(PI * p[1]) * std::exp(p[2]);
 
-    hessian[0][2] = PI * cos(PI * p[0]) * cos(PI * p[1]) * exp(p[2]);
-    hessian[2][0] = PI * cos(PI * p[0]) * cos(PI * p[1]) * exp(p[2]);
+    hessian[0][2] =
+      PI * std::cos(PI * p[0]) * std::cos(PI * p[1]) * std::exp(p[2]);
+    hessian[2][0] =
+      PI * std::cos(PI * p[0]) * std::cos(PI * p[1]) * std::exp(p[2]);
 
-    hessian[1][2] = -PI * sin(PI * p[0]) * sin(PI * p[1]) * exp(p[2]);
-    hessian[2][1] = -PI * sin(PI * p[0]) * sin(PI * p[1]) * exp(p[2]);
+    hessian[1][2] =
+      -PI * std::sin(PI * p[0]) * std::sin(PI * p[1]) * std::exp(p[2]);
+    hessian[2][1] =
+      -PI * std::sin(PI * p[0]) * std::sin(PI * p[1]) * std::exp(p[2]);
 
     Tensor<1, 3> gradient;
-    gradient[0] = PI * cos(PI * p[0]) * cos(PI * p[1]) * exp(p[2]);
-    gradient[1] = -PI * sin(PI * p[0]) * sin(PI * p[1]) * exp(p[2]);
-    gradient[2] = sin(PI * p[0]) * cos(PI * p[1]) * exp(p[2]);
+    gradient[0] =
+      PI * std::cos(PI * p[0]) * std::cos(PI * p[1]) * std::exp(p[2]);
+    gradient[1] =
+      -PI * std::sin(PI * p[0]) * std::sin(PI * p[1]) * std::exp(p[2]);
+    gradient[2] = std::sin(PI * p[0]) * std::cos(PI * p[1]) * std::exp(p[2]);
 
     Point<3> normal = p;
     normal /= p.norm();

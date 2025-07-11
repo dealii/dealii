@@ -1,7 +1,7 @@
 /* ------------------------------------------------------------------------
  *
  * SPDX-License-Identifier: LGPL-2.1-or-later
- * Copyright (C) 2012 - 2024 by the deal.II authors
+ * Copyright (C) 2012 - 2025 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
@@ -50,7 +50,6 @@
 
 #include <deal.II/distributed/tria.h>
 #include <deal.II/distributed/grid_refinement.h>
-#include <deal.II/distributed/solution_transfer.h>
 
 #include <deal.II/dofs/dof_handler.h>
 #include <deal.II/dofs/dof_renumbering.h>
@@ -64,6 +63,7 @@
 #include <deal.II/numerics/data_out.h>
 #include <deal.II/numerics/error_estimator.h>
 #include <deal.II/numerics/fe_field_function.h>
+#include <deal.II/numerics/solution_transfer.h>
 
 #include <fstream>
 #include <iostream>
@@ -1696,7 +1696,7 @@ namespace Step42
                                                        mpi_communicator);
 
     double residual_norm;
-    double previous_residual_norm = -std::numeric_limits<double>::max();
+    double previous_residual_norm = std::numeric_limits<double>::lowest();
 
     const double correct_sigma = sigma_0;
 
@@ -1874,8 +1874,8 @@ namespace Step42
 
     triangulation.prepare_coarsening_and_refinement();
 
-    parallel::distributed::SolutionTransfer<dim, TrilinosWrappers::MPI::Vector>
-      solution_transfer(dof_handler);
+    SolutionTransfer<dim, TrilinosWrappers::MPI::Vector> solution_transfer(
+      dof_handler);
     if (transfer_solution)
       solution_transfer.prepare_for_coarsening_and_refinement(solution);
 

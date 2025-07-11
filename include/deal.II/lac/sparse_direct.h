@@ -1,7 +1,7 @@
 // ------------------------------------------------------------------------
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
-// Copyright (C) 2001 - 2024 by the deal.II authors
+// Copyright (C) 2001 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -35,6 +35,16 @@
 #  include <dmumps_c.h>
 #endif
 
+#ifdef DEAL_II_WITH_TRILINOS
+#  include <deal.II/lac/trilinos_sparse_matrix.h>
+#  include <deal.II/lac/trilinos_vector.h>
+#endif
+
+#ifdef DEAL_II_WITH_PETSC
+#  include <deal.II/lac/petsc_sparse_matrix.h>
+#  include <deal.II/lac/petsc_vector.h>
+#endif
+
 DEAL_II_NAMESPACE_OPEN
 
 namespace types
@@ -48,6 +58,16 @@ namespace types
 #else
   using suitesparse_index = long int;
 #endif
+
+#ifdef DEAL_II_WITH_MUMPS
+  using mumps_index = MUMPS_INT;
+  using mumps_nnz   = MUMPS_INT8;
+#else
+  using mumps_index       = int;
+  using mumps_nnz         = std::size_t;
+#endif
+
+
 } // namespace types
 
 /**
@@ -433,6 +453,7 @@ private:
 };
 
 
+
 /**
  * This class provides an interface to the parallel sparse direct solver <a
  * href="https://mumps-solver.org">MUMPS</a>. MUMPS is direct method based on
@@ -452,17 +473,206 @@ private:
  */
 class SparseDirectMUMPS : public EnableObserverPointer
 {
+public:
+  /**
+   * Declare type for container size.
+   */
+  using size_type = types::global_dof_index;
+
+  /**
+   * The AdditionalData contains data for controlling the MUMPS execution.
+   */
+  struct AdditionalData
+  {
+    /**
+     * Struct that contains the data for the Block Low-Rank approximation.
+     */
+    struct BlockLowRank
+    {
+      BlockLowRank(const bool   blr_ucfs          = false,
+                   const double lowrank_threshold = 1e-8)
+        : blr_ucfs(blr_ucfs)
+        , lowrank_threshold(lowrank_threshold)
+      {}
+
+
+      /**
+       * If true, the Block Low-Rank approximation is used with the UCFS
+       * algorithm, an algorithm with higher compression than the standard one.
+       */
+      bool blr_ucfs;
+
+      /**
+       * Threshold for the low-rank truncation of the blocks.
+       */
+      double lowrank_threshold;
+    };
+
+    /**
+     * Construct a new Additional Data object with the given parameters.
+     */
+    AdditionalData(const bool          output_details    = false,
+                   const bool          error_statistics  = false,
+                   const bool          symmetric         = false,
+                   const bool          posdef            = false,
+                   const bool          blr_factorization = false,
+                   const BlockLowRank &blr               = BlockLowRank())
+      : output_details(output_details)
+      , error_statistics(error_statistics)
+      , symmetric(symmetric)
+      , posdef(posdef)
+      , blr_factorization(blr_factorization)
+      , blr(blr)
+    {}
+
+    /**
+     * If true, the MUMPS solver will print out details of the execution.
+     */
+    bool output_details;
+
+    /**
+     * If true, the MUMPS solver will print out error statistics.
+     */
+    bool error_statistics;
+
+    /**
+     * Use symmetric factorization.
+     *
+     * This is only possible if the matrix is symmetric, but no checks are
+     * performed to ensure that this is actually the case. The solver will
+     * likely break or produce incorrect results if the matrix is not symmetric,
+     * and this option is set to true.
+     */
+    bool symmetric;
+
+    /**
+     * Use the positive definite factorization.
+     *
+     * This is only possible if the matrix is symmetric and positive definite,
+     * but no checks are performed to ensure that this is actually the case. The
+     * solver will likely break or produce incorrect results if the matrix is
+     * not symmetric and positive definite, and this option is set to true.
+     */
+    bool posdef;
+
+    /**
+     * Use the Block Low-Rank factorization.
+     */
+    bool blr_factorization;
+
+    /**
+     * Data for the Block Low-Rank approximation.
+     */
+    BlockLowRank blr;
+  };
+
+  /**
+   * Constructor, takes an MPI_Comm which defaults to MPI_COMM_WORLD and an
+   * <tt>AdditionalData</tt> to control MUMPS execution.
+   */
+  SparseDirectMUMPS(const AdditionalData &additional_data = AdditionalData(),
+                    const MPI_Comm       &communicator    = MPI_COMM_WORLD);
+
+  /**
+   * Destructor
+   */
+  ~SparseDirectMUMPS();
+
+  /**
+   * Exception raised if the initialize() function is called more than once.
+   */
+  DeclException0(ExcInitializeAlreadyCalled);
+
+  /**
+   * This function computes the LU factorization
+   * of the system's matrix <tt>matrix</tt> with the options given in the
+   * constructor's <tt>AdditionalData</tt>.
+   */
+  template <class Matrix>
+  void
+  initialize(const Matrix &matrix);
+
+  /**
+   * Apply the inverse of the matrix to the input vector <tt>src</tt> and store
+   * the solution in the output vector <tt>dst</tt>.
+   */
+  template <typename VectorType>
+  void
+  vmult(VectorType &dst, const VectorType &src) const;
+
+
+  /**
+   * Apply the inverse of the transposed matrix to the input vector <tt>src</tt>
+   * and store the solution in the output vector <tt>dst</tt>.
+   */
+  template <typename VectorType>
+  void
+  Tvmult(VectorType &, const VectorType &src) const;
+
+  /**
+   * Return the ICNTL integer array from MUMPS.
+   *
+   * The ICNTL array contains integer control parameters for the MUMPS solver.
+   * Keep in mind that MUMPS is a fortran library and the documentation refers
+   * to indices into this array starting from one rather than from zero. To
+   * select the correct index one can use a macro like this:
+   *
+   * `#define ICNTL(I) icntl[(I)-1]`
+   *
+   * The MUMPS documentation describes each parameter of the array. Be aware
+   * that ownership of the array remains in the current class rather than with
+   * the caller of this function.
+   */
+  int *
+  get_icntl();
+
 private:
 #ifdef DEAL_II_WITH_MUMPS
-  DMUMPS_STRUC_C id;
+  mutable DMUMPS_STRUC_C id;
+
 #endif // DEAL_II_WITH_MUMPS
 
-  double                 *a;
-  std::vector<double>     rhs;
-  int                    *irn;
-  int                    *jcn;
+  /**
+   * The actual values of the matrix.
+   *
+   * a[k] is the value of the matrix entry (i,j) if irn[k] == i and jcn[k] == j.
+   */
+  std::unique_ptr<double[]> a;
+
+  /**
+   * The right-hand side vector.
+   */
+  mutable std::vector<double> rhs;
+
+  /**
+   * Local to global index mapping for the right-hand side vector.
+   */
+  mutable std::vector<types::mumps_index> irhs_loc;
+
+  /**
+   * irn contains the row indices of the non-zero entries of the matrix.
+   */
+  std::unique_ptr<types::mumps_index[]> irn;
+
+  /**
+   * jcn contains the column indices of the non-zero entries of the matrix.
+   */
+  std::unique_ptr<types::mumps_index[]> jcn;
+
+  /**
+   * The number of rows of the matrix. The matrix is square.
+   */
   types::global_dof_index n;
-  types::global_dof_index nz;
+
+  /**
+   * Number of non-zero entries in the matrix.
+   */
+  types::mumps_nnz nnz;
+
+  /**
+   * IndexSet storing the locally owned rows of the matrix.
+   */
+  IndexSet locally_owned_rows;
 
   /**
    * This function initializes a MUMPS instance and hands over the system's
@@ -476,73 +686,23 @@ private:
    * Copy the computed solution into the solution vector.
    */
   void
-  copy_solution(Vector<double> &vector);
+  copy_solution(Vector<double> &vector) const;
 
   /**
-   *
+   * Copy the right-hand side vector into the MUMPS instance.
    */
   void
-  copy_rhs_to_mumps(const Vector<double> &rhs);
+  copy_rhs_to_mumps(const Vector<double> &rhs) const;
 
   /**
-   * Flags storing whether the function <tt>initialize ()</tt> has already
-   * been called.
+   * Struct that holds the additional data for the MUMPS solver.
    */
-  bool initialize_called;
-
-public:
-  /**
-   * Declare type for container size.
-   */
-  using size_type = types::global_dof_index;
+  AdditionalData additional_data;
 
   /**
-   * Constructor
+   * MPI_Comm object for the MUMPS solver.
    */
-  SparseDirectMUMPS();
-
-  /**
-   * Destructor
-   */
-  ~SparseDirectMUMPS();
-
-  /**
-   * Exception
-   */
-  DeclException0(ExcInitializeAlreadyCalled);
-
-  /**
-   * This function initializes a MUMPS instance and hands over the system's
-   * matrix <tt>matrix</tt> and right-hand side <tt>rhs_vector</tt> to the
-   * solver.
-   */
-  template <class Matrix>
-  void
-  initialize(const Matrix &matrix, const Vector<double> &rhs_vector);
-
-  /**
-   * This function initializes a MUMPS instance and computes the factorization
-   * of the system's matrix <tt>matrix</tt>.
-   */
-  template <class Matrix>
-  void
-  initialize(const Matrix &matrix);
-
-  /**
-   * A function in which the linear system is solved and the solution vector
-   * is copied into the given <tt>vector</tt>. The right-hand side need to be
-   * supplied in initialize(matrix, vector);
-   */
-  void
-  solve(Vector<double> &vector);
-
-  /**
-   * A function in which the inverse of the matrix is applied to the input
-   * vector <tt>src</tt> and the solution is written into the output vector
-   * <tt>dst</tt>.
-   */
-  void
-  vmult(Vector<double> &dst, const Vector<double> &src);
+  const MPI_Comm mpi_communicator;
 };
 
 DEAL_II_NAMESPACE_CLOSE

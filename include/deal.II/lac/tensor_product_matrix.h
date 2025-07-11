@@ -1,7 +1,7 @@
 // ------------------------------------------------------------------------
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
-// Copyright (C) 2017 - 2024 by the deal.II authors
+// Copyright (C) 2017 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -584,7 +584,6 @@ namespace internal
           std::array<AlignedVector<Number>, dim>  &eigenvalues)
     {
       const unsigned int n_rows_1d = mass_matrix[0].n_cols();
-      (void)n_rows_1d;
 
       for (unsigned int dir = 0; dir < dim; ++dir)
         {

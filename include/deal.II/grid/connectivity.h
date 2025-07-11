@@ -1,7 +1,7 @@
 // ------------------------------------------------------------------------
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
-// Copyright (C) 2020 - 2024 by the deal.II authors
+// Copyright (C) 2020 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -1059,7 +1059,7 @@ namespace internal
           ptr_d[c + 1] = ptr_d[c] + cell_type->n_entities(face_dimensionality);
 
           // ... collect vertices of cell
-          const dealii::ArrayView<const unsigned int> cell_vertice(
+          const dealii::ArrayView<const unsigned int> local_vertices(
             cell_vertices.data() + cell_ptr[c], cell_ptr[c + 1] - cell_ptr[c]);
 
           // ... loop over all its entities
@@ -1076,7 +1076,7 @@ namespace internal
 
               for (unsigned int i = 0; i < local_entity_vertices.size(); ++i)
                 entity_vertices[i] =
-                  cell_vertice[local_entity_vertices[i]] + offset;
+                  local_vertices[local_entity_vertices[i]] + offset;
 
               // ... create key
               std::array<unsigned int, max_n_vertices> key = entity_vertices;

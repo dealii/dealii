@@ -1,7 +1,7 @@
 // ------------------------------------------------------------------------
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
-// Copyright (C) 2000 - 2024 by the deal.II authors
+// Copyright (C) 2000 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -842,12 +842,8 @@ namespace FETools
    * treated patches if the mesh had been refined adaptively (this cannot
    * happen if the  mesh has been refined globally because there the children
    * of a patch are all active). We also perform the operation described above
-   * on these patches, but it is easy to see that on patches that are children
-   * of previously treated patches, the operation is now the identity operation
-   * (since it interpolates from the children of the current patch a function
-   * that had previously been interpolated to these children from an even
-   * coarser patch). Consequently, this does not alter the solution vector any
-   * more.
+   * on these patches, which means that the final DoF values will always
+   * originate from the most refined patches.
    *
    * The name of the function originates from the fact that it can be used to
    * construct a representation of a function of higher polynomial degree on a
@@ -930,6 +926,34 @@ namespace FETools
   template <int dim>
   std::vector<unsigned int>
   lexicographic_to_hierarchic_numbering(unsigned int degree);
+
+  /**
+   * Given the polynomial degree, direction, and numbering options, this
+   * function returns a pair of vectors mapping cell DoFs to face patch DoFs
+   * in lexicographic order.
+   *
+   * This function works for scalar finite elements, specifically those derived
+   * from FE_Q and FE_DGQ. It computes the mapping from the DoFs of
+   * two adjacent cells sharing a face perpendicular to @p direction in
+   * reference space, to the DoFs on the face patch. The result is a pair of
+   * vectors: the first for the DoFs on the first cell, the second for the
+   * DoFs on the second cell. The @p cell_hierarchical_numbering flag
+   * determines whether hierarchical or lexicographic numbering is assumed for
+   * the cell DoFs. The @p is_continuous flag indicates whether the finite
+   * element space is continuous (i.e., FE_Q).
+   *
+   * @param degree Polynomial degree of the finite element.
+   * @param direction Axis perpendicular to the considered face.
+   * @param cell_hierarchical_numbering If true, use hierarchical numbering for cell DoFs.
+   * @param is_continuous If true, assumes the finite element space is continuous (FE_Q).
+   * @return A pair of vectors mapping cell DoFs to face patch DoFs in lexicographic order.
+   */
+  template <int dim>
+  std::pair<std::vector<unsigned int>, std::vector<unsigned int>>
+  cell_to_face_patch(const unsigned int &degree,
+                     const unsigned int &direction,
+                     const bool         &cell_hierarchical_numbering,
+                     const bool         &is_continuous);
 
   /**
    * A namespace that contains functions that help setting up internal

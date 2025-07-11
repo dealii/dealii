@@ -1,7 +1,7 @@
 // ------------------------------------------------------------------------
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
-// Copyright (C) 2020 - 2024 by the deal.II authors
+// Copyright (C) 2020 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -170,14 +170,11 @@ namespace VectorTools
                                                  &function,
       LinearAlgebra::distributed::Vector<Number> &work_result,
       const bool                                  enforce_zero_boundary,
-      const Quadrature<dim - 1>                  &q_boundary,
-      const bool                                  project_to_boundary_first)
+      const Quadrature<dim - 1> & /*q_boundary*/,
+      const bool project_to_boundary_first)
     {
       Assert(project_to_boundary_first == false, ExcNotImplemented());
       Assert(enforce_zero_boundary == false, ExcNotImplemented());
-      (void)enforce_zero_boundary;
-      (void)project_to_boundary_first;
-      (void)q_boundary;
 
       AssertDimension(dof.get_fe_collection().size(), 1);
       AssertDimension(dof.get_fe(0).n_components(), function.n_components);

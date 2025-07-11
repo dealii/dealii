@@ -1,7 +1,7 @@
 // ------------------------------------------------------------------------
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
-// Copyright (C) 2018 by the deal.II authors
+// Copyright (C) 2018 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -47,6 +47,7 @@ main()
   initlog();
 
   unsigned cell_order = 4;
+  check<1>(deallog.get_file_stream(), cell_order);
   check<2>(deallog.get_file_stream(), cell_order);
   check<3>(deallog.get_file_stream(), cell_order);
 }

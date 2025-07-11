@@ -1,0 +1,122 @@
+<h1>Results</h1>
+
+The program generates the following output in the command line interface by
+default.
+
+@code
+Solving for (p = 0): T Jf A B T Jf A B T Jf A B T Jf A B
+@endcode
+
+The program assumes the finite elements of the lowermost degree, $p = 0$.
+To change the degree of the finite elements, say $p = 2$, one needs to change
+the setting `Settings::fe_degree = 2` and rebuild the program.
+
+The program also dumps a number of files in the current directory. In the default
+configuration these files are:
+- vtu files. They contain the computed vector fields. Recall that the spherical
+  manifold is attached to many cell faces. Consequently, these cell faces are
+  curved. They look more like patches of a sphere. Furthermore, the shape
+  functions are mapped from the reference cell to the real mesh cells by the
+  second-order mapping to accommodate the cells with curved faces. For these
+  reasons, one needs to use a visualization software that can deal with curved
+  faces and the higher-order mapping. A fresh version of ParaView is recommended.
+  Visit will not do. The <a href="https://github.com/dealii/dealii/wiki/Notes-on-visualizing-high-order-output">
+  Notes on visualizing high order output</a> provide more information on this topic.
+- tex files. These files contain the convergence tables.
+
+The following provides examples of the convergence tables simulated with the
+default settings for three different degrees of the finite elements,
+$p = 0, 1, 2$.
+
+| p | r | cells |  dofs   |$\|e\|_{L^2}$|$\alpha_{L^2}$|
+|-- |---|-------|---------|----------|------|
+| 0 | 6 |  4625 |   13950 | 1.66e-01 | -    |
+| 0 | 7 |  7992 |   24084 | 1.38e-01 | 0.99 |
+| 0 | 8 | 12691 |   38220 | 1.19e-01 | 0.99 |
+| 0 | 9 | 18944 |   57024 | 1.04e-01 | 0.99 |
+| 1 | 6 |  4625 |  111300 | 8.12e-04 | -    |
+| 1 | 7 |  7992 |  192240 | 4.97e-04 | 2.69 |
+| 1 | 8 | 12691 |  305172 | 3.32e-04 | 2.61 |
+| 1 | 9 | 18944 |  455424 | 2.37e-04 | 2.54 |
+| 2 | 6 |  4625 |  375300 | 6.78e-04 | -    |
+| 2 | 7 |  7992 |  648324 | 3.94e-04 | 2.97 |
+| 2 | 8 | 12691 | 1029294 | 2.49e-04 | 2.98 |
+| 2 | 9 | 18944 | 1536192 | 1.67e-04 | 2.99 |
+
+**Table 1. Convergence table. Free-current density, $\vec{J}_f$.
+
+| p | r | cells |  dofs   |$\|e\|_{L^2}$|$\alpha_{L^2}$|
+|-- |---|-------|---------|----------|------|
+| 0 | 6 |  4625 |   13950 | 8.84e-08 | -    |
+| 0 | 7 |  7992 |   24084 | 7.36e-08 | 1.00 |
+| 0 | 8 | 12691 |   38220 | 6.30e-08 | 1.01 |
+| 0 | 9 | 18944 |   57024 | 5.51e-08 | 1.00 |
+| 1 | 6 |  4625 |  111300 | 4.41e-09 | -    |
+| 1 | 7 |  7992 |  192240 | 3.11e-09 | 1.91 |
+| 1 | 8 | 12691 |  305172 | 2.23e-09 | 2.18 |
+| 1 | 9 | 18944 |  455424 | 1.71e-09 | 1.96 |
+| 2 | 6 |  4625 |  375300 | 1.84e-10 | -    |
+| 2 | 7 |  7992 |  648324 | 1.03e-10 | 3.21 |
+| 2 | 8 | 12691 | 1029294 | 6.08e-11 | 3.40 |
+| 2 | 9 | 18944 | 1536192 | 4.04e-11 | 3.07 |
+
+**Table 2. Convergence table. Magnetic field, $\vec{B}$.
+
+The following notations were used in the headers of the tables:
+
+- p - the degree of the finite elements.
+
+- r - the mesh refinement parameter, i.e., the number of nodes on the transfinite
+lines.
+
+- cells - the total amount of active cells.
+
+- dofs - the amount of degrees of freedom.
+
+-$\|e\|_{L^2}$ - the $L^2$ error norm.
+
+-$\alpha_{L^2}$ - the order of convergence of the $L^2$ error norm.
+
+If `Settings::log_cg_convergence = true`, the program saves the convergence data
+of the CG solver into csv files.
+
+The vector representations of the calculated vector fields, $\vec{J}_f$ and
+$\vec{B}$, are illustrated above by the first figure on this page. The figures
+below illustrate slices of the magnitudes of these fields. The figures below
+were simulated with $p = 2$ and $r = 9$. Visual inspection of the vector
+potentials is not very informative as their conservative portions are unknown.
+
+@htmlonly
+<p align="center">
+  <img src="https://www.dealii.org/images/steps/developer/step-97-Jf.svg" alt="The result - free-current
+ density" height="531">
+</p>
+@endhtmlonly
+
+@htmlonly
+<p align="center">
+  <img src="https://www.dealii.org/images/steps/developer/step-97-B.svg" alt="The result - magnetic field
+ density" height="531">
+</p>
+@endhtmlonly
+
+<h3>Possibilities for extensions</h3>
+
+Repeat the simulations for the three types of the boundary conditions,
+Dirichlet, Neumann, and Robin. The Robin boundary condition is supposed to be
+superior to the other two. Look at the simulated data to see that this is indeed
+the case. You can save the projected exact solution next to the simulated
+solutions into the vtu files, just set `Settings::project_exact_solution = true`.
+ParaView has "Plot Over Line" filter. You can use this filter to visualize the
+difference between the exact solution and a solution simulated with a particular
+boundary condition. You can also draw conclusions by observing the convergence
+tables. Keep in mind the $\eta^2$ parameter. Increase it if the CG solver chokes
+while you are experimenting. Note that the benefits offered by the Robin
+boundary condition are observed the best when higher-order finite elements are
+used, i.e., $p = 1$ and $p = 2$.
+
+The Robin boundary condition as described above is also called the first-order
+asymptotic boundary condition (ABC). There exist ABCs of higher orders
+@cite gratkowski2010p. Implement and test the second-order ABC to see if it
+performs any better. There exist improvised asymptotic boundary conditions, IABCs,
+@cite meeker2013a. Try to implement the first order IABC.

@@ -1,7 +1,7 @@
 // ------------------------------------------------------------------------
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
-// Copyright (C) 2020 - 2023 by the deal.II authors
+// Copyright (C) 2020 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -304,8 +304,6 @@ namespace internal
       const std::vector<unsigned int>  &constraint_pool_row_index,
       const std::vector<unsigned char> &irregular_cells)
     {
-      (void)constraint_pool_row_index;
-
       // first reorder the active FE index.
       const bool have_hp = dofs_per_cell.size() > 1;
       if (cell_active_fe_index.size() > 0)

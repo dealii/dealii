@@ -1,7 +1,7 @@
 // ------------------------------------------------------------------------
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
-// Copyright (C) 2022 - 2023 by the deal.II authors
+// Copyright (C) 2022 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -22,9 +22,14 @@
 // e.g., MPI_Comm in the API.
 
 #if defined(DEAL_II_WITH_MPI)
+
 DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
 #  include <mpi.h>
 DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
+
+DEAL_II_NAMESPACE_OPEN
+DEAL_II_NAMESPACE_CLOSE
+
 #else
 
 // Without MPI, we would still like to use some constructs with MPI

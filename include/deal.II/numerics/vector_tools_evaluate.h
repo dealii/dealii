@@ -1,7 +1,7 @@
 // ------------------------------------------------------------------------
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
-// Copyright (C) 2021 - 2024 by the deal.II authors
+// Copyright (C) 2021 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -527,7 +527,6 @@ namespace VectorTools
       const Vector<Number>                                              &vector,
       const typename Triangulation<dim, spacedim>::active_cell_iterator &cell)
     {
-      (void)tria;
       AssertDimension(tria.n_active_cells(), vector.size());
       return vector[cell->active_cell_index()];
     }
@@ -616,9 +615,6 @@ namespace VectorTools
                                           spacedim,
                                           typename VectorType::value_type>>> &)
     {
-      (void)evaluation_flags;
-      (void)first_selected_component;
-
       Assert(n_components == 1 && first_selected_component == 0,
              ExcMessage(
                "A cell-data vector can only have a single component."));

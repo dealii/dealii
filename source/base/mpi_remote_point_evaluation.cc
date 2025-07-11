@@ -1,7 +1,7 @@
 // ------------------------------------------------------------------------
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
-// Copyright (C) 2021 - 2024 by the deal.II authors
+// Copyright (C) 2021 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -166,9 +166,9 @@ namespace Utilities
           this->point_ptrs[std::get<1>(data.recv_components[i]) + 1]++;
         }
 
-      std::tuple<unsigned int, unsigned int> n_owning_processes_default{
+      std::pair<unsigned int, unsigned int> n_owning_processes_default{
         numbers::invalid_unsigned_int, 0};
-      std::tuple<unsigned int, unsigned int> n_owning_processes_local =
+      std::pair<unsigned int, unsigned int> n_owning_processes_local =
         n_owning_processes_default;
 
       for (unsigned int i = 0; i < data.n_searched_points; ++i)
@@ -184,18 +184,18 @@ namespace Utilities
         }
 
       const auto n_owning_processes_global =
-        Utilities::MPI::all_reduce<std::tuple<unsigned int, unsigned int>>(
+        Utilities::MPI::all_reduce<std::pair<unsigned int, unsigned int>>(
           n_owning_processes_local,
           tria.get_mpi_communicator(),
           [&](const auto &a,
-              const auto &b) -> std::tuple<unsigned int, unsigned int> {
+              const auto &b) -> std::pair<unsigned int, unsigned int> {
             if (a == n_owning_processes_default)
               return b;
 
             if (b == n_owning_processes_default)
               return a;
 
-            return std::tuple<unsigned int, unsigned int>{
+            return std::pair<unsigned int, unsigned int>{
               std::min(std::get<0>(a), std::get<0>(b)),
               std::max(std::get<1>(a), std::get<1>(b))};
           });

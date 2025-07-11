@@ -1,7 +1,7 @@
 /* ------------------------------------------------------------------------
  *
  * SPDX-License-Identifier: LGPL-2.1-or-later
- * Copyright (C) 2010 - 2024 by the deal.II authors
+ * Copyright (C) 2010 - 2025 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
@@ -1989,7 +1989,7 @@ namespace Step43
     if (timestep_number != 0)
       {
         double min_saturation = std::numeric_limits<double>::max(),
-               max_saturation = -std::numeric_limits<double>::max();
+               max_saturation = std::numeric_limits<double>::lowest();
 
         for (const auto &cell : saturation_dof_handler.active_cell_iterators())
           {
@@ -2015,7 +2015,7 @@ namespace Step43
     else
       {
         double min_saturation = std::numeric_limits<double>::max(),
-               max_saturation = -std::numeric_limits<double>::max();
+               max_saturation = std::numeric_limits<double>::lowest();
 
         for (const auto &cell : saturation_dof_handler.active_cell_iterators())
           {

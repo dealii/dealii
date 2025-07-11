@@ -1,7 +1,7 @@
 // ------------------------------------------------------------------------
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
-// Copyright (C) 2008 - 2023 by the deal.II authors
+// Copyright (C) 2008 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -232,7 +232,6 @@ DynamicSparsityPattern::DynamicSparsityPattern(const DynamicSparsityPattern &s)
   , have_entries(false)
   , rowset(0)
 {
-  (void)s;
   Assert(s.rows == 0 && s.cols == 0,
          ExcMessage(
            "This constructor can only be called if the provided argument "
@@ -271,7 +270,6 @@ DynamicSparsityPattern::DynamicSparsityPattern(const size_type n)
 DynamicSparsityPattern &
 DynamicSparsityPattern::operator=(const DynamicSparsityPattern &s)
 {
-  (void)s;
   Assert(s.n_rows() == 0 && s.n_cols() == 0,
          ExcMessage(
            "This operator can only be called if the provided argument "

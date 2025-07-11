@@ -1,7 +1,7 @@
 // ------------------------------------------------------------------------
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
-// Copyright (C) 2023 by the deal.II authors
+// Copyright (C) 2023 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -308,7 +308,7 @@ namespace internal
     const dealii::Table<2, double>                   &shape_values,
     const FiniteElement<dim, spacedim>               &fe,
     const std::vector<unsigned int> &shape_function_to_row_table,
-    ArrayView<VectorType>            values,
+    const ArrayView<VectorType>     &values,
     const bool                       quadrature_points_fastest = false,
     const unsigned int               component_multiple        = 1)
   {
@@ -459,7 +459,7 @@ namespace internal
     const dealii::Table<2, Tensor<order, spacedim>> &shape_derivatives,
     const FiniteElement<dim, spacedim>              &fe,
     const std::vector<unsigned int> &shape_function_to_row_table,
-    ArrayView<std::vector<Tensor<order, spacedim, Number>>> derivatives,
+    const ArrayView<std::vector<Tensor<order, spacedim, Number>>> &derivatives,
     const bool         quadrature_points_fastest = false,
     const unsigned int component_multiple        = 1)
   {

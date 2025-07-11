@@ -1,7 +1,7 @@
 // ------------------------------------------------------------------------
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
-// Copyright (C) 2010 - 2024 by the deal.II authors
+// Copyright (C) 2010 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -463,17 +463,7 @@ namespace
           p4est_child[GeometryInfo<dim>::max_children_per_cell];
         for (unsigned int c = 0; c < GeometryInfo<dim>::max_children_per_cell;
              ++c)
-          switch (dim)
-            {
-              case 2:
-                P4EST_QUADRANT_INIT(&p4est_child[c]);
-                break;
-              case 3:
-                P8EST_QUADRANT_INIT(&p4est_child[c]);
-                break;
-              default:
-                DEAL_II_NOT_IMPLEMENTED();
-            }
+          internal::p4est::functions<dim>::quadrant_init(p4est_child[c]);
 
 
         internal::p4est::functions<dim>::quadrant_childrenv(&p4est_cell,
@@ -531,18 +521,7 @@ namespace
             for (unsigned int c = 0;
                  c < GeometryInfo<dim>::max_children_per_cell;
                  ++c)
-              switch (dim)
-                {
-                  case 2:
-                    P4EST_QUADRANT_INIT(&p4est_child[c]);
-                    break;
-                  case 3:
-                    P8EST_QUADRANT_INIT(&p4est_child[c]);
-                    break;
-                  default:
-                    DEAL_II_NOT_IMPLEMENTED();
-                }
-
+              internal::p4est::functions<dim>::quadrant_init(p4est_child[c]);
 
             internal::p4est::functions<dim>::quadrant_childrenv(&p4est_cell,
                                                                 p4est_child);
@@ -1353,17 +1332,7 @@ namespace
           p4est_child[GeometryInfo<dim>::max_children_per_cell];
         for (unsigned int c = 0; c < GeometryInfo<dim>::max_children_per_cell;
              ++c)
-          switch (dim)
-            {
-              case 2:
-                P4EST_QUADRANT_INIT(&p4est_child[c]);
-                break;
-              case 3:
-                P8EST_QUADRANT_INIT(&p4est_child[c]);
-                break;
-              default:
-                DEAL_II_NOT_IMPLEMENTED();
-            }
+          internal::p4est::functions<dim>::quadrant_init(p4est_child[c]);
         internal::p4est::functions<dim>::quadrant_childrenv(&p4est_cell,
                                                             p4est_child);
         for (unsigned int c = 0; c < GeometryInfo<dim>::max_children_per_cell;
@@ -1643,17 +1612,7 @@ namespace
 
         for (unsigned int c = 0; c < GeometryInfo<dim>::max_children_per_cell;
              ++c)
-          switch (dim)
-            {
-              case 2:
-                P4EST_QUADRANT_INIT(&p4est_child[c]);
-                break;
-              case 3:
-                P8EST_QUADRANT_INIT(&p4est_child[c]);
-                break;
-              default:
-                DEAL_II_NOT_IMPLEMENTED();
-            }
+          internal::p4est::functions<dim>::quadrant_init(p4est_child[c]);
 
         dealii::internal::p4est::functions<dim>::quadrant_childrenv(
           &p4est_cell, p4est_child);
@@ -1684,17 +1643,7 @@ namespace
           p4est_child[GeometryInfo<dim>::max_children_per_cell];
         for (unsigned int c = 0; c < GeometryInfo<dim>::max_children_per_cell;
              ++c)
-          switch (dim)
-            {
-              case 2:
-                P4EST_QUADRANT_INIT(&p4est_child[c]);
-                break;
-              case 3:
-                P8EST_QUADRANT_INIT(&p4est_child[c]);
-                break;
-              default:
-                DEAL_II_NOT_IMPLEMENTED();
-            }
+          internal::p4est::functions<dim>::quadrant_init(p4est_child[c]);
 
         dealii::internal::p4est::functions<dim>::quadrant_childrenv(
           &p4est_cell, p4est_child);

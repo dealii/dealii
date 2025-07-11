@@ -1,7 +1,7 @@
 // ------------------------------------------------------------------------
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
-// Copyright (C) 2004 - 2024 by the deal.II authors
+// Copyright (C) 2004 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -551,7 +551,6 @@ namespace PETScWrappers
 #  ifdef DEAL_II_PETSC_WITH_HYPRE
     initialize();
 #  else // DEAL_II_PETSC_WITH_HYPRE
-    (void)pc;
     Assert(false,
            ExcMessage("Your PETSc installation does not include a copy of "
                       "the hypre package necessary for this preconditioner."));

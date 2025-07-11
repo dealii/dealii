@@ -1,7 +1,7 @@
 // ------------------------------------------------------------------------
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
-// Copyright (C) 2020 - 2024 by the deal.II authors
+// Copyright (C) 2020 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -5579,10 +5579,6 @@ MGTwoLevelTransferNonNested<dim, VectorType>::restrict_and_add_internal_comp(
   VectorType       &dst,
   const VectorType &src) const
 {
-  using Traits = internal::FEPointEvaluation::
-    EvaluatorTypeTraits<dim, dim, n_components, Number>;
-  using value_type = typename Traits::value_type;
-
   std::vector<Number> &evaluation_point_results = this->rpe_input_output;
   std::vector<Number> &buffer                   = this->rpe_buffer;
 

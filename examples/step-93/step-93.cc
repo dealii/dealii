@@ -1,7 +1,7 @@
 /* ------------------------------------------------------------------------
  *
  * SPDX-License-Identifier: LGPL-2.1-or-later
- * Copyright (C) 2024 by the deal.II authors
+ * Copyright (C) 2024 - 2025 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
@@ -447,8 +447,6 @@ namespace Step93
                                    quadrature_collection,
                                    update_quadrature_points);
 
-    const FEValuesExtractors::Scalar lambda(1);
-
     // Then, we loop over the cells, then over the quadrature points, and
     // finally over the indices, as if we were constructing a mass matrix.
     // However, what we instead do here is check two things. First, we check if
@@ -522,7 +520,6 @@ namespace Step93
 
     const FEValuesExtractors::Scalar u(0);
     const FEValuesExtractors::Scalar lambda(1);
-    const FEValuesExtractors::Scalar c(2);
 
     for (const auto &cell : dof_handler.active_cell_iterators())
       {
@@ -642,17 +639,18 @@ namespace Step93
   template <int dim>
   void Step93<dim>::solve()
   {
+    Timer timer;
+    timer.start();
+
     std::cout << "Beginning solve..." << std::endl;
-    {
-      Timer timer;
 
-      SolverControl solver_control(1'000'000, 1e-6 * system_rhs.l2_norm());
-      SolverMinRes<Vector<double>> solver(solver_control);
+    SolverControl solver_control(1'000'000, 1e-6 * system_rhs.l2_norm());
+    SolverMinRes<Vector<double>> solver(solver_control);
 
-      solver.solve(system_matrix, solution, system_rhs, PreconditionIdentity());
+    solver.solve(system_matrix, solution, system_rhs, PreconditionIdentity());
 
-      timer.stop();
-    }
+    timer.stop();
+
     std::cout << "Wall time: " << timer.wall_time() << "s" << std::endl;
     std::cout << "Solved in " << solver_control.last_step()
               << " MINRES iterations." << std::endl;
@@ -711,7 +709,12 @@ namespace Step93
     // interpolate the target function $\bar u$ onto the mesh, then
     // add the data to our data_out object.
     Vector<double> target(new_dof_handler.n_dofs());
-    VectorTools::interpolate(new_dof_handler, target_function, target);
+    VectorTools::interpolate(new_dof_handler,
+                             ScalarFunctionFromFunctionObject<dim, double>(
+                               [&](const Point<dim> &x) {
+                                 return target_function.value(x, 0);
+                               }),
+                             target);
     data_out.add_data_vector(new_dof_handler, target, "u_bar");
 
     // In order to visualize the sum of the heat sources $\sum_k C^k

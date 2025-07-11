@@ -112,7 +112,7 @@ build_matrix_vector(TrilinosWrappers::BlockSparseMatrix &matrix,
                                    dofs_per_block[0] + dofs_per_block[1]));
 
   constraints.clear();
-  constraints.reinit(locally_relevant_dofs);
+  constraints.reinit(locally_owned_dofs, locally_relevant_dofs);
   constraints.close();
 
   // See

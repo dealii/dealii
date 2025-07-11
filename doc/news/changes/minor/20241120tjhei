@@ -1,7 +1,0 @@
-New: FiniteElement::get_local_dof_sparsity_pattern() can be used to
-provide the coupling between DoFs within a cell and is used in
-make_sparsity_pattern() to generate matrices with fewer nonzero
-entries depending on the element. FE_Q_iso_Q1 now provides this
-coupling information.
-<br>
-(Timo Heister, Luca Heltai, 2024/11/20)

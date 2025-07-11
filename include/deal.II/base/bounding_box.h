@@ -1,7 +1,7 @@
 // ------------------------------------------------------------------------
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
-// Copyright (C) 2017 - 2023 by the deal.II authors
+// Copyright (C) 2017 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -135,6 +135,12 @@ template <int spacedim, typename Number = double>
 class BoundingBox
 {
 public:
+  /**
+   * Provide a way to get the dimension of an object without explicit
+   * knowledge of it's data type.
+   */
+  static constexpr unsigned int dimension = spacedim;
+
   /**
    * Standard constructor. Creates an object that corresponds to an empty box,
    * i.e. a degenerate box with both points being the origin.
@@ -618,7 +624,10 @@ void
 BoundingBox<spacedim, Number>::serialize(Archive &ar,
                                          const unsigned int /*version*/)
 {
-  ar &boundary_points;
+  // Avoid including boost/serialization/utility.hpp by unpacking the pair
+  // ourselves
+  ar &boundary_points.first;
+  ar &boundary_points.second;
 }
 
 

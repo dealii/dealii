@@ -1,7 +1,7 @@
 // ------------------------------------------------------------------------
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
-// Copyright (C) 2018 - 2023 by the deal.II authors
+// Copyright (C) 2018 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -30,7 +30,11 @@ DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
 #include <boost/geometry/strategies/strategies.hpp>
 DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
 
-namespace boost
+
+DEAL_II_NAMESPACE_OPEN
+DEAL_II_NAMESPACE_CLOSE // Do not convert for module purposes
+
+  namespace boost
 {
   namespace geometry
   {
@@ -59,7 +63,18 @@ namespace boost
        * dealii::BoundingBox.
        */
       template <int dim, class Number, std::size_t D>
-      struct indexed_access<dealii::BoundingBox<dim, Number>, min_corner, D>
+      struct indexed_access<dealii::BoundingBox<dim, Number>,
+#if DEAL_II_BOOST_VERSION_GTE(1, 89, 0)
+                            min_corner,
+#else
+                            // Until Boost 1.88, max_corner was a
+                            // static variable in a header file, which
+                            // we can't export in the module wrapper
+                            // for Boost. Use the variable's numeric
+                            // value instead.
+                            /*min_corner*/ 0,
+#endif
+                            D>
       {
         /**
          * Getter function for the D-th coordinate of the lower left corner of
@@ -87,7 +102,18 @@ namespace boost
        * dealii::BoundingBox.
        */
       template <int dim, class Number, std::size_t D>
-      struct indexed_access<dealii::BoundingBox<dim, Number>, max_corner, D>
+      struct indexed_access<dealii::BoundingBox<dim, Number>,
+#if DEAL_II_BOOST_VERSION_GTE(1, 89, 0)
+                            max_corner,
+#else
+                            // Until Boost 1.88, max_corner was a
+                            // static variable in a header file, which
+                            // we can't export in the module wrapper
+                            // for Boost. Use the variable's numeric
+                            // value instead.
+                            /*max_corner*/ 1,
+#endif
+                            D>
       {
         /**
          * Getter function for the D-th coordinate of the upper right corner of
@@ -112,5 +138,8 @@ namespace boost
     } // namespace traits
   }   // namespace geometry
 } // namespace boost
+
+DEAL_II_NAMESPACE_OPEN // Do not convert for module purposes
+  DEAL_II_NAMESPACE_CLOSE
 
 #endif

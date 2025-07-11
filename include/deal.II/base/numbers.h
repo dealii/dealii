@@ -1,7 +1,7 @@
 // ------------------------------------------------------------------------
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
-// Copyright (C) 2006 - 2024 by the deal.II authors
+// Copyright (C) 2006 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -152,62 +152,62 @@ abs(const adtl::adouble &x);
 #  endif
 #endif
 
-DEAL_II_NAMESPACE_CLOSE
+DEAL_II_NAMESPACE_CLOSE // Do not convert for module purposes
 
-namespace std
+  namespace std
 {
   template <typename Number, std::size_t width>
-  DEAL_II_ALWAYS_INLINE ::dealii::VectorizedArray<Number, width>
-  sqrt(const ::dealii::VectorizedArray<Number, width> &);
+  DEAL_II_ALWAYS_INLINE ::dealii::VectorizedArray<Number, width> sqrt(
+    const ::dealii::VectorizedArray<Number, width> &);
   template <typename Number, std::size_t width>
-  DEAL_II_ALWAYS_INLINE ::dealii::VectorizedArray<Number, width>
-  abs(const ::dealii::VectorizedArray<Number, width> &);
+  DEAL_II_ALWAYS_INLINE ::dealii::VectorizedArray<Number, width> abs(
+    const ::dealii::VectorizedArray<Number, width> &);
   template <typename Number, std::size_t width>
-  DEAL_II_ALWAYS_INLINE ::dealii::VectorizedArray<Number, width>
-  max(const ::dealii::VectorizedArray<Number, width> &,
-      const ::dealii::VectorizedArray<Number, width> &);
+  DEAL_II_ALWAYS_INLINE ::dealii::VectorizedArray<Number, width> max(
+    const ::dealii::VectorizedArray<Number, width> &,
+    const ::dealii::VectorizedArray<Number, width> &);
   template <typename Number, std::size_t width>
-  DEAL_II_ALWAYS_INLINE ::dealii::VectorizedArray<Number, width>
-  min(const ::dealii::VectorizedArray<Number, width> &,
-      const ::dealii::VectorizedArray<Number, width> &);
+  DEAL_II_ALWAYS_INLINE ::dealii::VectorizedArray<Number, width> min(
+    const ::dealii::VectorizedArray<Number, width> &,
+    const ::dealii::VectorizedArray<Number, width> &);
   template <typename Number, size_t width>
-  ::dealii::VectorizedArray<Number, width>
-  pow(const ::dealii::VectorizedArray<Number, width> &, const Number p);
+  ::dealii::VectorizedArray<Number, width> pow(
+    const ::dealii::VectorizedArray<Number, width> &, const Number p);
   template <typename Number, size_t width>
-  ::dealii::VectorizedArray<Number, width>
-  sin(const ::dealii::VectorizedArray<Number, width> &);
+  ::dealii::VectorizedArray<Number, width> sin(
+    const ::dealii::VectorizedArray<Number, width> &);
   template <typename Number, size_t width>
-  ::dealii::VectorizedArray<Number, width>
-  cos(const ::dealii::VectorizedArray<Number, width> &);
+  ::dealii::VectorizedArray<Number, width> cos(
+    const ::dealii::VectorizedArray<Number, width> &);
   template <typename Number, size_t width>
-  ::dealii::VectorizedArray<Number, width>
-  tan(const ::dealii::VectorizedArray<Number, width> &);
+  ::dealii::VectorizedArray<Number, width> tan(
+    const ::dealii::VectorizedArray<Number, width> &);
   template <typename Number, size_t width>
-  ::dealii::VectorizedArray<Number, width>
-  exp(const ::dealii::VectorizedArray<Number, width> &);
+  ::dealii::VectorizedArray<Number, width> exp(
+    const ::dealii::VectorizedArray<Number, width> &);
   template <typename Number, size_t width>
-  ::dealii::VectorizedArray<Number, width>
-  log(const ::dealii::VectorizedArray<Number, width> &);
+  ::dealii::VectorizedArray<Number, width> log(
+    const ::dealii::VectorizedArray<Number, width> &);
 } // namespace std
 
-DEAL_II_NAMESPACE_OPEN
+DEAL_II_NAMESPACE_OPEN // Do not convert for module purposes
 
-/**
- * Namespace for the declaration of universal constants. Since the
- * availability in <tt>math.h</tt> is not always guaranteed, we put them here.
- * Since this file is included by <tt>base/config.h</tt>, they are available
- * to the whole library.
- *
- * The constants defined here are a subset of the <tt>M_XXX</tt> constants
- * sometimes declared in the system include file <tt>math.h</tt>, but without
- * the prefix <tt>M_</tt>.
- *
- * In addition to that, we declare  <tt>invalid_unsigned_int</tt> to be the
- * largest unsigned integer representable; this value is widely used in the
- * library as a marker for an invalid index, an invalid size of an array, and
- * similar purposes.
- */
-namespace numbers
+  /**
+   * Namespace for the declaration of universal constants. Since the
+   * availability in <tt>math.h</tt> is not always guaranteed, we put them here.
+   * Since this file is included by <tt>base/config.h</tt>, they are available
+   * to the whole library.
+   *
+   * The constants defined here are a subset of the <tt>M_XXX</tt> constants
+   * sometimes declared in the system include file <tt>math.h</tt>, but without
+   * the prefix <tt>M_</tt>.
+   *
+   * In addition to that, we declare  <tt>invalid_unsigned_int</tt> to be the
+   * largest unsigned integer representable; this value is widely used in the
+   * library as a marker for an invalid index, an invalid size of an array, and
+   * similar purposes.
+   */
+  namespace numbers
 {
   /**
    * e
@@ -268,22 +268,19 @@ namespace numbers
    * double</code>, this function may return <code>false</code> even if the
    * number is finite with respect to type <code>long double</code>.
    */
-  bool
-  is_finite(const double x);
+  bool is_finite(const double x);
 
   /**
    * Return @p true if real and imaginary parts of the given complex number
    * are finite.
    */
-  bool
-  is_finite(const std::complex<double> &x);
+  bool is_finite(const std::complex<double> &x);
 
   /**
    * Return @p true if real and imaginary parts of the given complex number
    * are finite.
    */
-  bool
-  is_finite(const std::complex<float> &x);
+  bool is_finite(const std::complex<float> &x);
 
   /**
    * Return @p true if real and imaginary parts of the given complex number
@@ -293,8 +290,7 @@ namespace numbers
    * numbers that are infinite in terms of <code>double</code>, but finite
    * with respect to <code>long double</code>.
    */
-  bool
-  is_finite(const std::complex<long double> &x);
+  bool is_finite(const std::complex<long double> &x);
 
   /**
    * Return whether two numbers are equal to one another.
@@ -307,8 +303,8 @@ namespace numbers
    * of @p value_1.
    */
   template <typename Number1, typename Number2>
-  constexpr DEAL_II_HOST_DEVICE bool
-  values_are_equal(const Number1 &value_1, const Number2 &value_2);
+  constexpr DEAL_II_HOST_DEVICE bool values_are_equal(const Number1 &value_1,
+                                                      const Number2 &value_2);
 
   /**
    * Return whether two numbers are not equal to one another.
@@ -321,8 +317,8 @@ namespace numbers
    * of @p value_1.
    */
   template <typename Number1, typename Number2>
-  constexpr bool
-  values_are_not_equal(const Number1 &value_1, const Number2 &value_2);
+  constexpr bool values_are_not_equal(const Number1 &value_1,
+                                      const Number2 &value_2);
 
   /**
    * Return whether or not a value is equal to zero.
@@ -332,8 +328,7 @@ namespace numbers
    * by the input arguments.
    */
   template <typename Number>
-  constexpr DEAL_II_HOST_DEVICE bool
-  value_is_zero(const Number &value);
+  constexpr DEAL_II_HOST_DEVICE bool value_is_zero(const Number &value);
 
   /**
    * Return whether @p value_1 is less than that of @p value_2.
@@ -346,8 +341,7 @@ namespace numbers
    * of @p value_1.
    */
   template <typename Number1, typename Number2>
-  bool
-  value_is_less_than(const Number1 &value_1, const Number2 &value_2);
+  bool value_is_less_than(const Number1 &value_1, const Number2 &value_2);
 
   /**
    * Return whether @p value_1 is less than or equal to that of @p value_2.
@@ -360,9 +354,8 @@ namespace numbers
    * of @p value_1.
    */
   template <typename Number1, typename Number2>
-  bool
-  value_is_less_than_or_equal_to(const Number1 &value_1,
-                                 const Number2 &value_2);
+  bool value_is_less_than_or_equal_to(const Number1 &value_1,
+                                      const Number2 &value_2);
 
 
 
@@ -377,8 +370,7 @@ namespace numbers
    * of @p value_1.
    */
   template <typename Number1, typename Number2>
-  bool
-  value_is_greater_than(const Number1 &value_1, const Number2 &value_2);
+  bool value_is_greater_than(const Number1 &value_1, const Number2 &value_2);
 
   /**
    * Return whether @p value_1 is greater than or equal to that of @p value_2.
@@ -391,9 +383,8 @@ namespace numbers
    * of @p value_1.
    */
   template <typename Number1, typename Number2>
-  bool
-  value_is_greater_than_or_equal_to(const Number1 &value_1,
-                                    const Number2 &value_2);
+  bool value_is_greater_than_or_equal_to(const Number1 &value_1,
+                                         const Number2 &value_2);
 
   /**
    * A structure that, together with its partial specializations
@@ -507,24 +498,21 @@ namespace numbers
 
   // --------------- inline and template functions ---------------- //
 
-  inline bool
-  is_nan(const double x)
+  inline bool is_nan(const double x)
   {
     return std::isnan(x);
   }
 
 
 
-  inline bool
-  is_finite(const double x)
+  inline bool is_finite(const double x)
   {
     return std::isfinite(x);
   }
 
 
 
-  inline bool
-  is_finite(const std::complex<double> &x)
+  inline bool is_finite(const std::complex<double> &x)
   {
     // Check complex numbers for infinity
     // by testing real and imaginary part
@@ -533,8 +521,7 @@ namespace numbers
 
 
 
-  inline bool
-  is_finite(const std::complex<float> &x)
+  inline bool is_finite(const std::complex<float> &x)
   {
     // Check complex numbers for infinity
     // by testing real and imaginary part
@@ -543,8 +530,7 @@ namespace numbers
 
 
 
-  inline bool
-  is_finite(const std::complex<long double> &x)
+  inline bool is_finite(const std::complex<long double> &x)
   {
     // Same for std::complex<long double>
     return (is_finite(x.real()) && is_finite(x.imag()));
@@ -552,8 +538,8 @@ namespace numbers
 
 
   template <typename number>
-  constexpr DEAL_II_HOST_DEVICE const number &
-  NumberTraits<number>::conjugate(const number &x)
+  constexpr DEAL_II_HOST_DEVICE const number &NumberTraits<number>::conjugate(
+    const number &x)
   {
     return x;
   }
@@ -570,8 +556,8 @@ namespace numbers
 
 
   template <typename number>
-  typename NumberTraits<number>::real_type
-  NumberTraits<number>::abs(const number &x)
+  typename NumberTraits<number>::real_type NumberTraits<number>::abs(
+    const number &x)
   {
     // Make things work with AD types
     using std::abs;
@@ -588,8 +574,8 @@ namespace numbers
 
 
   template <typename number>
-  constexpr std::complex<number>
-  NumberTraits<std::complex<number>>::conjugate(const std::complex<number> &x)
+  constexpr std::complex<number> NumberTraits<std::complex<number>>::conjugate(
+    const std::complex<number> &x)
   {
     return std::conj(x);
   }

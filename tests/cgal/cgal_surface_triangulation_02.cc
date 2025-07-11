@@ -1,7 +1,7 @@
 // ------------------------------------------------------------------------
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
-// Copyright (C) 2022 by the deal.II authors
+// Copyright (C) 2022 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -17,12 +17,13 @@
 
 #include <deal.II/base/config.h>
 
+#include <deal.II/cgal/triangulation.h>
+
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/grid_out.h>
 #include <deal.II/grid/tria.h>
 
 #include <CGAL/IO/io.h>
-#include <deal.II/cgal/triangulation.h>
 
 #include <fstream>
 

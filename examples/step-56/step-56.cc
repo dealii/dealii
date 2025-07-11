@@ -1,7 +1,7 @@
 /* ------------------------------------------------------------------------
  *
  * SPDX-License-Identifier: LGPL-2.1-or-later
- * Copyright (C) 2016 - 2024 by the deal.II authors
+ * Copyright (C) 2016 - 2025 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
@@ -117,11 +117,11 @@ namespace Step56
     const double y = p[1];
 
     if (component == 0)
-      return sin(PI * x);
+      return std::sin(PI * x);
     if (component == 1)
-      return -PI * y * cos(PI * x);
+      return -PI * y * std::cos(PI * x);
     if (component == 2)
-      return sin(PI * x) * cos(PI * y);
+      return std::sin(PI * x) * std::cos(PI * y);
 
     return 0;
   }
@@ -138,13 +138,13 @@ namespace Step56
     const double z = p[2];
 
     if (component == 0)
-      return 2.0 * sin(PI * x);
+      return 2.0 * std::sin(PI * x);
     if (component == 1)
-      return -PI * y * cos(PI * x);
+      return -PI * y * std::cos(PI * x);
     if (component == 2)
-      return -PI * z * cos(PI * x);
+      return -PI * z * std::cos(PI * x);
     if (component == 3)
-      return sin(PI * x) * cos(PI * y) * sin(PI * z);
+      return std::sin(PI * x) * std::cos(PI * y) * std::sin(PI * z);
 
     return 0;
   }
@@ -163,18 +163,18 @@ namespace Step56
     Tensor<1, 2> return_value;
     if (component == 0)
       {
-        return_value[0] = PI * cos(PI * x);
+        return_value[0] = PI * std::cos(PI * x);
         return_value[1] = 0.0;
       }
     else if (component == 1)
       {
-        return_value[0] = y * PI * PI * sin(PI * x);
-        return_value[1] = -PI * cos(PI * x);
+        return_value[0] = y * PI * PI * std::sin(PI * x);
+        return_value[1] = -PI * std::cos(PI * x);
       }
     else if (component == 2)
       {
-        return_value[0] = PI * cos(PI * x) * cos(PI * y);
-        return_value[1] = -PI * sin(PI * x) * sin(PI * y);
+        return_value[0] = PI * std::cos(PI * x) * std::cos(PI * y);
+        return_value[1] = -PI * std::sin(PI * x) * std::sin(PI * y);
       }
 
     return return_value;
@@ -194,27 +194,30 @@ namespace Step56
     Tensor<1, 3> return_value;
     if (component == 0)
       {
-        return_value[0] = 2 * PI * cos(PI * x);
+        return_value[0] = 2 * PI * std::cos(PI * x);
         return_value[1] = 0.0;
         return_value[2] = 0.0;
       }
     else if (component == 1)
       {
-        return_value[0] = y * PI * PI * sin(PI * x);
-        return_value[1] = -PI * cos(PI * x);
+        return_value[0] = y * PI * PI * std::sin(PI * x);
+        return_value[1] = -PI * std::cos(PI * x);
         return_value[2] = 0.0;
       }
     else if (component == 2)
       {
-        return_value[0] = z * PI * PI * sin(PI * x);
+        return_value[0] = z * PI * PI * std::sin(PI * x);
         return_value[1] = 0.0;
-        return_value[2] = -PI * cos(PI * x);
+        return_value[2] = -PI * std::cos(PI * x);
       }
     else if (component == 3)
       {
-        return_value[0] = PI * cos(PI * x) * cos(PI * y) * sin(PI * z);
-        return_value[1] = -PI * sin(PI * x) * sin(PI * y) * sin(PI * z);
-        return_value[2] = PI * sin(PI * x) * cos(PI * y) * cos(PI * z);
+        return_value[0] =
+          PI * std::cos(PI * x) * std::cos(PI * y) * std::sin(PI * z);
+        return_value[1] =
+          -PI * std::sin(PI * x) * std::sin(PI * y) * std::sin(PI * z);
+        return_value[2] =
+          PI * std::sin(PI * x) * std::cos(PI * y) * std::cos(PI * z);
       }
 
     return return_value;
@@ -243,9 +246,11 @@ namespace Step56
     const double x = p[0];
     const double y = p[1];
     if (component == 0)
-      return PI * PI * sin(PI * x) + PI * cos(PI * x) * cos(PI * y);
+      return PI * PI * std::sin(PI * x) +
+             PI * std::cos(PI * x) * std::cos(PI * y);
     if (component == 1)
-      return -PI * PI * PI * y * cos(PI * x) - PI * sin(PI * y) * sin(PI * x);
+      return -PI * PI * PI * y * std::cos(PI * x) -
+             PI * std::sin(PI * y) * std::sin(PI * x);
     if (component == 2)
       return 0;
 
@@ -263,14 +268,14 @@ namespace Step56
     const double y = p[1];
     const double z = p[2];
     if (component == 0)
-      return 2 * PI * PI * sin(PI * x) +
-             PI * cos(PI * x) * cos(PI * y) * sin(PI * z);
+      return 2 * PI * PI * std::sin(PI * x) +
+             PI * std::cos(PI * x) * std::cos(PI * y) * std::sin(PI * z);
     if (component == 1)
-      return -PI * PI * PI * y * cos(PI * x) +
-             PI * (-1) * sin(PI * y) * sin(PI * x) * sin(PI * z);
+      return -PI * PI * PI * y * std::cos(PI * x) +
+             PI * (-1) * std::sin(PI * y) * std::sin(PI * x) * std::sin(PI * z);
     if (component == 2)
-      return -PI * PI * PI * z * cos(PI * x) +
-             PI * cos(PI * z) * sin(PI * x) * cos(PI * y);
+      return -PI * PI * PI * z * std::cos(PI * x) +
+             PI * std::cos(PI * z) * std::sin(PI * x) * std::cos(PI * y);
     if (component == 3)
       return 0;
 

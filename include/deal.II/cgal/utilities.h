@@ -1,7 +1,7 @@
 // ------------------------------------------------------------------------
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
-// Copyright (C) 2022 - 2024 by the deal.II authors
+// Copyright (C) 2022 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -24,10 +24,16 @@
 #ifdef DEAL_II_WITH_CGAL
 #  include <deal.II/base/quadrature_lib.h>
 
+#  include <deal.II/cgal/surface_mesh.h>
+
 #  include <deal.II/grid/tria.h>
 
 #  include <boost/hana.hpp>
 
+#  include <CGAL/version.h>
+#  if CGAL_VERSION_MAJOR >= 6
+#    include <CGAL/Installation/internal/disable_deprecation_warnings_and_errors.h>
+#  endif
 #  include <CGAL/Cartesian.h>
 #  include <CGAL/Complex_2_in_triangulation_3.h>
 #  include <CGAL/Exact_predicates_exact_constructions_kernel.h>
@@ -36,7 +42,7 @@
 #  include <CGAL/Mesh_complex_3_in_triangulation_3.h>
 #  include <CGAL/Mesh_criteria_3.h>
 #  include <CGAL/Mesh_triangulation_3.h>
-// Disable a warnung that we get with gcc-13 about a potential uninitialized
+// Disable a warning that we get with gcc-13 about a potential uninitialized
 // usage of an <anonymous> lambda function in this external CGAL header.
 DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
 #  include <CGAL/Polygon_mesh_processing/corefinement.h>
@@ -53,7 +59,6 @@ DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
 #  include <CGAL/convex_hull_3.h>
 #  include <CGAL/make_mesh_3.h>
 #  include <CGAL/make_surface_mesh.h>
-#  include <deal.II/cgal/surface_mesh.h>
 
 #  include <fstream>
 #  include <limits>
@@ -690,6 +695,14 @@ namespace CGALWrappers
 } // namespace CGALWrappers
 #  endif
 
+DEAL_II_NAMESPACE_CLOSE
+
+#else
+
+// Make sure the scripts that create the C++20 module input files have
+// something to latch on if the preprocessor #ifdef above would
+// otherwise lead to an empty content of the file.
+DEAL_II_NAMESPACE_OPEN
 DEAL_II_NAMESPACE_CLOSE
 
 #endif

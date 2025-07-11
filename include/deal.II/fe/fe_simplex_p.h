@@ -1,7 +1,7 @@
 // ------------------------------------------------------------------------
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
-// Copyright (C) 2021 - 2024 by the deal.II authors
+// Copyright (C) 2021 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -68,13 +68,6 @@ public:
 
   /**
    * @see FiniteElement::face_to_cell_index()
-   *
-   * @note This function has some limitations in 3D. If @p dim is 3, this
-   * function works if either:
-   * 1. @p combined_orientation is the default orientation.
-   * 2. @p combined_orientation is `(false, false, false)` and the triangular
-   * face has no more than one degree of freedom in its interior.
-   * Otherwise this function throws an error.
    */
   virtual unsigned int
   face_to_cell_index(const unsigned int                 face_dof_index,

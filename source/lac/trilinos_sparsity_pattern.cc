@@ -1,7 +1,7 @@
 // ------------------------------------------------------------------------
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
-// Copyright (C) 2008 - 2024 by the deal.II authors
+// Copyright (C) 2008 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -23,7 +23,9 @@
 #  include <deal.II/lac/dynamic_sparsity_pattern.h>
 #  include <deal.II/lac/sparsity_pattern.h>
 
+DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
 #  include <Epetra_Export.h>
+DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
 
 #  include <limits>
 
@@ -135,7 +137,6 @@ namespace TrilinosWrappers
     , graph(
         new Epetra_FECrsGraph(View, *column_space_map, *column_space_map, 0))
   {
-    (void)input_sparsity;
     Assert(input_sparsity.n_rows() == 0,
            ExcMessage(
              "Copy constructor only works for empty sparsity patterns."));
@@ -828,7 +829,6 @@ namespace TrilinosWrappers
             int ierr = graph->ExtractGlobalRowView(trilinos_i,
                                                    nnz_extracted,
                                                    col_indices);
-            (void)ierr;
             Assert(ierr == 0, ExcTrilinosError(ierr));
             Assert(nnz_present == nnz_extracted,
                    ExcDimensionMismatch(nnz_present, nnz_extracted));
@@ -854,7 +854,6 @@ namespace TrilinosWrappers
             // an error.
             int ierr =
               graph->ExtractMyRowView(trilinos_i, nnz_extracted, col_indices);
-            (void)ierr;
             Assert(ierr == 0, ExcTrilinosError(ierr));
 
             Assert(nnz_present == nnz_extracted,

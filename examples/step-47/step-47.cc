@@ -542,7 +542,7 @@ namespace Step47
            qpoint < fe_interface_values.n_quadrature_points;
            ++qpoint)
         {
-          const auto &n = fe_interface_values.normal(qpoint);
+          const auto &n = fe_interface_values.normal_vector(qpoint);
 
           for (unsigned int i = 0; i < n_interface_dofs; ++i)
             {

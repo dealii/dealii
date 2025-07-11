@@ -1,7 +1,7 @@
 // ------------------------------------------------------------------------
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
-// Copyright (C) 2008 - 2024 by the deal.II authors
+// Copyright (C) 2008 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -29,11 +29,13 @@
 #  include <deal.II/lac/vector_operation.h>
 #  include <deal.II/lac/vector_type_traits.h>
 
+DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
 #  include <Epetra_ConfigDefs.h>
 #  include <Epetra_FEVector.h>
 #  include <Epetra_LocalMap.h>
 #  include <Epetra_Map.h>
 #  include <Epetra_MpiComm.h>
+DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
 
 #  include <memory>
 #  include <utility>
@@ -717,7 +719,7 @@ namespace TrilinosWrappers
       /**
        * Another copy function. This one takes a deal.II vector and copies it
        * into a TrilinosWrapper vector. Note that since we do not provide any
-       * Epetra_map that tells about the partitioning of the vector among the
+       * Epetra_Map that tells about the partitioning of the vector among the
        * MPI processes, the size of the TrilinosWrapper vector has to be the
        * same as the size of the input vector.
        */
@@ -2325,6 +2327,14 @@ struct is_serial_vector<TrilinosWrappers::MPI::Vector> : std::false_type
 {};
 
 
+DEAL_II_NAMESPACE_CLOSE
+
+#else
+
+// Make sure the scripts that create the C++20 module input files have
+// something to latch on if the preprocessor #ifdef above would
+// otherwise lead to an empty content of the file.
+DEAL_II_NAMESPACE_OPEN
 DEAL_II_NAMESPACE_CLOSE
 
 #endif

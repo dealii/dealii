@@ -2,7 +2,7 @@
 ## ------------------------------------------------------------------------
 ##
 ## SPDX-License-Identifier: LGPL-2.1-or-later
-## Copyright (C) 2018 - 2024 by the deal.II authors
+## Copyright (C) 2018 - 2025 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -159,6 +159,38 @@ format_file()
   rm -f "${tmpfile}"
 }
 export -f format_file
+
+
+#
+# Also format Python files, assuming that we have the 'black'
+# autoindenter available. Black is better than clang-format at not
+# changing the time stamp of a file if the file wasn't actually
+# changed. But, for simplicity, just use the same scheme above
+# so we can use the same reporting mechanism.
+#
+# If 'black' isn't available, just don't do anything.
+#
+# (There is one file, contrib/utilities/dotgdbinit.py, that contains
+# some Python code, but starts with some GDB instruction that confuses
+# the indenter. Exclude that file.)
+#
+format_python_file()
+{
+  if which black > /dev/null ; then
+    file="${1}"
+    if test "$file" = "contrib/utilities/dotgdbinit.py" ; then
+      return ;
+    fi
+      
+    tmpfile="$(mktemp "${TMPDIR}/$(basename "$1").tmp.XXXXXXXX")"
+    cp "${file}" "${tmpfile}"
+    black -q "${tmpfile}"
+    fix_or_report "${file}" "${tmpfile}" "file indented incorrectly"
+    rm -f "${tmpfile}"
+  fi
+}
+export -f format_python_file
+
 
 #
 # Remove trailing whitespace.

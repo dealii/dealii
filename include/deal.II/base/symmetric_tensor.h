@@ -1,7 +1,7 @@
 // ------------------------------------------------------------------------
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
-// Copyright (C) 2005 - 2024 by the deal.II authors
+// Copyright (C) 2005 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -76,6 +76,34 @@ DEAL_II_HOST DEAL_II_CONSTEXPR inline DEAL_II_ALWAYS_INLINE
  * \f[
  *   \frac{\partial \text{dev}\mathbf{T}}{\partial \mathbf T} = \mathbb P.
  * \f]
+ *
+ * @note This function uses $\frac{1}{\text{dim}}$ as the factor in the
+ *   definition of the deviator, and that is unquestionably correct for
+ *   three-dimensional models. However, whether this is the correct choice
+ *   for two-dimensional models is something that depends on how one thinks
+ *   about two-dimensional models. For example, in elasticity, one often
+ *   does two-dimensional simulations that are thought of as cross sections
+ *   of three-dimensional objects that are infinite in $z$-direction,
+ *   with the assumption that the $z$-displacements are zero and that
+ *   the $x$- and $y$-displacements do not vary in $z$-direction. Such
+ *   models are often described as
+ *   "<a
+ * href="https://en.wikipedia.org/wiki/Infinitesimal_strain_theory#Plane_strain">plane
+ * strain</a>", indicating that nonzero strain components are all in the $x$-$y$
+ * plane. The important point here is that while we only model two spatial
+ *   variables, in the background *the model really is three-dimensional*.
+ *   In these cases, the deviator should really contain $\frac{1}{3}$
+ *   as the factor in front of the divergence, and in those cases you will
+ *   not want to use the current function. On the other hand,
+ *   there are of course also models that truly are two-dimensional --
+ *   say the simulation of transport on the earth surface, or of the
+ *   deformation of monolayers of
+ *   [graphene](https://en.wikipedia.org/wiki/Graphene) (an inherently
+ *   two-dimensional material). In those cases, the factor
+ *   $\frac{1}{2}$ chosen in the definition of this function when using
+ *   `dim==2` is correct. Whether or not the current function is right for
+ *   you in two dimensions is therefore a question of what your model
+ *   represents.
  *
  * @relatesalso SymmetricTensor
  */
@@ -154,6 +182,34 @@ trace(const SymmetricTensor<2, dim2, Number> &);
  * is the identity operator. This
  * quantity equals the original tensor minus its contractive or dilative
  * component and refers to the shear in, for example, elasticity.
+ *
+ * @note This function uses $\frac{1}{\text{dim}}$ as the factor in the
+ *   definition of the deviator, and that is unquestionably correct for
+ *   three-dimensional models. However, whether this is the correct choice
+ *   for two-dimensional models is something that depends on how one thinks
+ *   about two-dimensional models. For example, in elasticity, one often
+ *   does two-dimensional simulations that are thought of as cross sections
+ *   of three-dimensional objects that are infinite in $z$-direction,
+ *   with the assumption that the $z$-displacements are zero and that
+ *   the $x$- and $y$-displacements do not vary in $z$-direction. Such
+ *   models are often described as
+ *   "<a
+ * href="https://en.wikipedia.org/wiki/Infinitesimal_strain_theory#Plane_strain">plane
+ * strain</a>", indicating that nonzero strain components are all in the $x$-$y$
+ * plane. The important point here is that while we only model two spatial
+ *   variables, in the background *the model really is three-dimensional*.
+ *   In these cases, the deviator should really contain $\frac{1}{3}$
+ *   as the factor in front of the divergence, and in those cases you will
+ *   not want to use the current function. On the other hand,
+ *   there are of course also models that truly are two-dimensional --
+ *   say the simulation of transport on the earth surface, or of the
+ *   deformation of monolayers of
+ *   [graphene](https://en.wikipedia.org/wiki/Graphene) (an inherently
+ *   two-dimensional material). In those cases, the factor
+ *   $\frac{1}{2}$ chosen in the definition of this function when using
+ *   `dim==2` is correct. Whether or not the current function is right for
+ *   you in two dimensions is therefore a question of what your model
+ *   represents.
  *
  * @relatesalso SymmetricTensor
  */

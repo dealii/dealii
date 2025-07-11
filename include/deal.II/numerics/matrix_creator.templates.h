@@ -1,7 +1,7 @@
 // ------------------------------------------------------------------------
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
-// Copyright (C) 2016 - 2024 by the deal.II authors
+// Copyright (C) 2016 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -581,8 +581,6 @@ namespace MatrixCreator
         return;
 
       const unsigned int dofs_per_cell = data.dof_indices.size();
-      (void)dofs_per_cell;
-
       Assert(data.cell_matrix.m() == dofs_per_cell, ExcInternalError());
       Assert(data.cell_matrix.n() == dofs_per_cell, ExcInternalError());
       Assert((right_hand_side == nullptr) ||
@@ -1364,7 +1362,6 @@ namespace MatrixCreator
     Assert(fe_is_hermite ||
              matrix.n() == dof.n_boundary_dofs(boundary_functions),
            ExcInternalError());
-    (void)fe_is_hermite;
 
     Assert(matrix.n() == matrix.m(), ExcInternalError());
     Assert(matrix.n() == rhs_vector.size(), ExcInternalError());

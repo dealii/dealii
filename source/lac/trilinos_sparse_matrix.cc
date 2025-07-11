@@ -1,7 +1,7 @@
 // ------------------------------------------------------------------------
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
-// Copyright (C) 2008 - 2024 by the deal.II authors
+// Copyright (C) 2008 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -29,6 +29,7 @@
 
 #  include <boost/container/small_vector.hpp>
 
+DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
 #  ifdef DEAL_II_TRILINOS_WITH_EPETRAEXT
 #    include <EpetraExt_MatrixMatrix.h>
 #  endif
@@ -36,6 +37,7 @@
 #  include <Teuchos_RCP.hpp>
 #  include <ml_epetra_utils.h>
 #  include <ml_struct.h>
+DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
 
 #  include <memory>
 
@@ -399,7 +401,6 @@ namespace TrilinosWrappers
                                                     rhs_n_entries,
                                                     rhs_value_ptr,
                                                     rhs_index_ptr);
-            (void)ierr;
             Assert(ierr == 0, ExcTrilinosError(ierr));
 
             ierr = matrix->ExtractMyRowView(row_local,
@@ -565,7 +566,6 @@ namespace TrilinosWrappers
       // check whether we got the number of columns right.
       AssertDimension(sparsity_pattern.n_cols(),
                       TrilinosWrappers::n_global_cols(*graph));
-      (void)n_global_cols;
 
       // And now finally generate the matrix.
       matrix = std::make_unique<Epetra_FECrsMatrix>(Copy, *graph, false);
@@ -758,7 +758,6 @@ namespace TrilinosWrappers
             {
               Epetra_Export exporter(nonlocal_graph->RowMap(), row_space_map);
               int ierr = graph->Export(*nonlocal_graph, exporter, Add);
-              (void)ierr;
               Assert(ierr == 0, ExcTrilinosError(ierr));
             }
 
@@ -1131,7 +1130,6 @@ namespace TrilinosWrappers
         int             num_entries;
         const int       ierr =
           matrix->ExtractMyRowView(local_row, num_entries, values, col_indices);
-        (void)ierr;
 
         Assert(ierr == 0, ExcTrilinosError(ierr));
 
@@ -1205,7 +1203,6 @@ namespace TrilinosWrappers
                                             nnz_extracted,
                                             values,
                                             col_indices);
-        (void)ierr;
         Assert(ierr == 0, ExcTrilinosError(ierr));
 
         Assert(nnz_present == nnz_extracted,
@@ -1280,7 +1277,6 @@ namespace TrilinosWrappers
                                             nnz_extracted,
                                             values,
                                             col_indices);
-        (void)ierr;
         Assert(ierr == 0, ExcTrilinosError(ierr));
 
         Assert(nnz_present == nnz_extracted,
@@ -1772,7 +1768,6 @@ namespace TrilinosWrappers
   SparseMatrix &
   SparseMatrix::operator=(const double d)
   {
-    (void)d;
     Assert(d == 0, ExcScalarAssignmentOnlyForZeroValue());
     compress(VectorOperation::unknown); // TODO: why do we do this? Should we
                                         // not check for is_compressed?
@@ -1827,7 +1822,6 @@ namespace TrilinosWrappers
                                                 rhs_n_entries,
                                                 rhs_value_ptr,
                                                 rhs_index_ptr);
-        (void)ierr;
         Assert(ierr == 0, ExcTrilinosError(ierr));
 
         ierr =
@@ -1905,7 +1899,6 @@ namespace TrilinosWrappers
   {
     const int ierr = matrix->Scale(a);
     Assert(ierr == 0, ExcTrilinosError(ierr));
-    (void)ierr; // removes -Wunused-variable in optimized mode
 
     return *this;
   }
@@ -1921,7 +1914,6 @@ namespace TrilinosWrappers
 
     const int ierr = matrix->Scale(factor);
     Assert(ierr == 0, ExcTrilinosError(ierr));
-    (void)ierr; // removes -Wunused-variable in optimized mode
 
     return *this;
   }
@@ -1983,9 +1975,6 @@ namespace TrilinosWrappers
                           "Are you trying to put the product of the "
                           "matrix with a vector into a vector that has "
                           "ghost elements?"));
-        (void)m;
-        (void)in;
-        (void)out;
       }
     } // namespace SparseMatrixImplementation
   }   // namespace internal
@@ -1998,8 +1987,6 @@ namespace TrilinosWrappers
   {
     Assert(&src != &dst, ExcSourceEqualsDestination());
     Assert(matrix->Filled(), ExcMatrixNotCompressed());
-    (void)src;
-    (void)dst;
 
     internal::SparseMatrixImplementation::check_vector_map_equality(*matrix,
                                                                     src,
@@ -2020,7 +2007,6 @@ namespace TrilinosWrappers
 
     const int ierr = matrix->Multiply(false, tril_src, tril_dst);
     Assert(ierr == 0, ExcTrilinosError(ierr));
-    (void)ierr; // removes -Wunused-variable in optimized mode
   }
 
 
@@ -2061,7 +2047,6 @@ namespace TrilinosWrappers
 
     const int ierr = matrix->Multiply(true, tril_src, tril_dst);
     Assert(ierr == 0, ExcTrilinosError(ierr));
-    (void)ierr; // removes -Wunused-variable in optimized mode
   }
 
 
@@ -2282,7 +2267,6 @@ namespace TrilinosWrappers
           {
             const int ierr =
               matrix->ExtractMyRowView(i, num_entries, values, indices);
-            (void)ierr;
             Assert(ierr == 0, ExcTrilinosError(ierr));
 
             for (TrilinosWrappers::types::int_type j = 0; j < num_entries; ++j)
@@ -2700,7 +2684,6 @@ namespace TrilinosWrappers
           AssertDimension(i_local_size, first_op_init_map.NumMyPoints());
           const Epetra_Map &second_op_init_map = second_op.OperatorDomainMap();
           AssertDimension(i_local_size, second_op_init_map.NumMyPoints());
-          (void)second_op_init_map;
           Intermediate tril_int(View,
                                 first_op_init_map,
                                 const_cast<TrilinosScalar *>(i->begin()),
@@ -2740,7 +2723,6 @@ namespace TrilinosWrappers
           AssertDimension(i_local_size, first_op_init_map.NumMyPoints());
           const Epetra_Map &second_op_init_map = second_op.OperatorRangeMap();
           AssertDimension(i_local_size, second_op_init_map.NumMyPoints());
-          (void)second_op_init_map;
           Intermediate tril_int(View,
                                 first_op_init_map,
                                 const_cast<TrilinosScalar *>(i->begin()),
@@ -2777,7 +2759,6 @@ namespace TrilinosWrappers
           AssertDimension(i_local_size, first_op_init_map.NumMyPoints());
           const Epetra_Map &second_op_init_map = second_op.OperatorRangeMap();
           AssertDimension(i_local_size, second_op_init_map.NumMyPoints());
-          (void)second_op_init_map;
           Intermediate tril_int(View,
                                 first_op_init_map,
                                 const_cast<TrilinosScalar *>(i->begin()),
@@ -2817,7 +2798,6 @@ namespace TrilinosWrappers
           AssertDimension(i_local_size, first_op_init_map.NumMyPoints());
           const Epetra_Map &second_op_init_map = second_op.OperatorDomainMap();
           AssertDimension(i_local_size, second_op_init_map.NumMyPoints());
-          (void)second_op_init_map;
           Intermediate tril_int(View,
                                 first_op_init_map,
                                 const_cast<TrilinosScalar *>(i->begin()),
@@ -2876,7 +2856,6 @@ namespace TrilinosWrappers
           AssertDimension(i_local_size, first_op_init_map.NumMyPoints());
           const Epetra_Map &second_op_init_map = second_op.OperatorRangeMap();
           AssertDimension(i_local_size, second_op_init_map.NumMyPoints());
-          (void)second_op_init_map;
           Intermediate tril_int(View,
                                 first_op_init_map,
                                 const_cast<TrilinosScalar *>(i->begin()),
@@ -2914,7 +2893,6 @@ namespace TrilinosWrappers
           AssertDimension(i_local_size, first_op_init_map.NumMyPoints());
           const Epetra_Map &second_op_init_map = second_op.OperatorDomainMap();
           AssertDimension(i_local_size, second_op_init_map.NumMyPoints());
-          (void)second_op_init_map;
           Intermediate tril_int(View,
                                 first_op_init_map,
                                 const_cast<TrilinosScalar *>(i->begin()),
@@ -2948,7 +2926,6 @@ namespace TrilinosWrappers
           AssertDimension(i_local_size, first_op_init_map.NumMyPoints());
           const Epetra_Map &second_op_init_map = second_op.OperatorDomainMap();
           AssertDimension(i_local_size, second_op_init_map.NumMyPoints());
-          (void)second_op_init_map;
           Intermediate tril_int(View,
                                 first_op_init_map,
                                 const_cast<TrilinosScalar *>(i->begin()),
@@ -2986,7 +2963,6 @@ namespace TrilinosWrappers
           AssertDimension(i_local_size, first_op_init_map.NumMyPoints());
           const Epetra_Map &second_op_init_map = second_op.OperatorRangeMap();
           AssertDimension(i_local_size, second_op_init_map.NumMyPoints());
-          (void)second_op_init_map;
           Intermediate tril_int(View,
                                 first_op_init_map,
                                 const_cast<TrilinosScalar *>(i->begin()),

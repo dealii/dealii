@@ -1,7 +1,7 @@
 // ------------------------------------------------------------------------
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
-// Copyright (C) 2005 - 2024 by the deal.II authors
+// Copyright (C) 2005 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -14,7 +14,7 @@
 
 
 #include <deal.II/base/polynomial.h>
-#include <deal.II/base/polynomials_raviart_thomas.h>
+#include <deal.II/base/polynomials_vector_anisotropic.h>
 #include <deal.II/base/qprojector.h>
 #include <deal.II/base/quadrature_lib.h>
 
@@ -67,24 +67,30 @@ namespace
 template <int dim>
 FE_RaviartThomasNodal<dim>::FE_RaviartThomasNodal(const unsigned int degree)
   : FE_PolyTensor<dim>(
-      PolynomialsRaviartThomas<dim>(degree + 1, degree),
+      PolynomialsVectorAnisotropic<dim>(
+        degree + 1,
+        degree,
+        FE_RaviartThomas<dim>::get_lexicographic_numbering(degree)),
       FiniteElementData<dim>(get_rt_dpo_vector(dim, degree),
                              dim,
                              degree + 1,
                              FiniteElementData<dim>::Hdiv),
       std::vector<bool>(1, false),
       std::vector<ComponentMask>(
-        PolynomialsRaviartThomas<dim>::n_polynomials(degree + 1, degree),
+        PolynomialsVectorAnisotropic<dim>::n_polynomials(degree + 1, degree),
         ComponentMask(std::vector<bool>(dim, true))))
 {
   Assert(dim >= 2, ExcImpossibleInDim(dim));
 
   this->mapping_kind = {mapping_raviart_thomas};
 
+  const std::vector<unsigned int> numbering =
+    FE_RaviartThomas<dim>::get_lexicographic_numbering(degree);
+
   // First, initialize the generalized support points and quadrature weights,
   // since they are required for interpolation.
   this->generalized_support_points =
-    PolynomialsRaviartThomas<dim>(degree + 1, degree)
+    PolynomialsVectorAnisotropic<dim>(degree + 1, degree, numbering)
       .get_polynomial_support_points();
   AssertDimension(this->generalized_support_points.size(),
                   this->n_dofs_per_cell());

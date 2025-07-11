@@ -54,7 +54,8 @@ test()
   force.reinit(locally_owned_dofs, mpi_communicator);
   Assert(!force.has_ghost_elements(), ExcInternalError());
 
-  AffineConstraints<PetscScalar> constraints(locally_relevant_dofs);
+  AffineConstraints<PetscScalar> constraints(locally_owned_dofs,
+                                             locally_relevant_dofs);
   constraints.clear();
   {
     const IndexSet boundary_dofs =

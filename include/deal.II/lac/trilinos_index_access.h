@@ -1,7 +1,7 @@
 // ------------------------------------------------------------------------
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
-// Copyright (C) 2017 - 2023 by the deal.II authors
+// Copyright (C) 2017 - 2024 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -21,10 +21,13 @@
 
 #  include <deal.II/base/types.h>
 
+
+DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
 #  include <Epetra_BlockMap.h>
 #  include <Epetra_CrsGraph.h>
 #  include <Epetra_CrsMatrix.h>
 #  include <Epetra_MultiVector.h>
+DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -197,5 +200,14 @@ namespace TrilinosWrappers
 } // namespace TrilinosWrappers
 
 DEAL_II_NAMESPACE_CLOSE
+
+#else
+
+// Make sure the scripts that create the C++20 module input files have
+// something to latch on if the preprocessor #ifdef above would
+// otherwise lead to an empty content of the file.
+DEAL_II_NAMESPACE_OPEN
+DEAL_II_NAMESPACE_CLOSE
+
 #endif // DEAL_II_WITH_TRILINOS
 #endif // dealii_trilinos_index_access_h

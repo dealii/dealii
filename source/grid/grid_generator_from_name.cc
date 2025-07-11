@@ -1,7 +1,7 @@
 // ------------------------------------------------------------------------
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
-// Copyright (C) 2019 - 2024 by the deal.II authors
+// Copyright (C) 2019 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -119,7 +119,17 @@ namespace GridGenerator
       else if (name == "channel_with_cylinder")
         parse_and_create<dim, dim, double, unsigned int, double, bool>(
           channel_with_cylinder, arguments, tria);
-
+      else if (name == "uniform_channel_with_cylinder")
+        parse_and_create<dim,
+                         dim,
+                         const std::vector<unsigned int> &,
+                         double,
+                         unsigned int,
+                         double,
+                         unsigned int,
+                         double,
+                         bool,
+                         bool>(uniform_channel_with_cylinder, arguments, tria);
       else if (name == "enclosed_hyper_cube")
         parse_and_create<dim, dim, double, double, double, bool>(
           enclosed_hyper_cube, arguments, tria);
@@ -232,7 +242,7 @@ namespace GridGenerator
                          bool>(concentric_hyper_shells, arguments, tria);
 
       else if (name == "subdivided_hyper_cube_with_simplices")
-        parse_and_create<dim, dim, unsigned int, double, double, bool, bool>(
+        parse_and_create<dim, dim, unsigned int, double, double, bool>(
           subdivided_hyper_cube_with_simplices, arguments, tria);
 
       else if (name == "subdivided_hyper_rectangle_with_simplices")
@@ -241,7 +251,6 @@ namespace GridGenerator
                          const std::vector<unsigned int> &,
                          const Point<dim> &,
                          const Point<dim> &,
-                         bool,
                          bool>(subdivided_hyper_rectangle_with_simplices,
                                arguments,
                                tria);

@@ -1,7 +1,7 @@
 // ------------------------------------------------------------------------
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
-// Copyright (C) 2021 - 2024 by the deal.II authors
+// Copyright (C) 2021 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -45,7 +45,32 @@ namespace Utilities
   namespace MPI
   {
     /**
-     * Helper class to access values on non-matching grids.
+     * @brief Communicate values between a mesh and arbitrary points
+     *
+     * This class enables evaluation of finite element functions defined
+     * on a Triangulation at arbitrary points inside the mesh. The underlying
+     * finite element mesh can be distributed among processes, which makes
+     * the operations more involved due to communication.
+     *
+     * Once initialized, the data exchange is handled by the functions
+     * process_and_evaluate(), that transfers data from the Triangulation
+     * to the set of points, and evaluate_and_process(), that performs
+     * the inverse operation (taking data defined at each point and making
+     * it available in the corresponding cell of the Triangulation).
+     *
+     * The helper functions VectorTools::point_values() and
+     * VectorTools::point_gradients (the overloads taking an instance
+     * of RemotePointEvaluation) can be used in place of
+     * process_and_evaluate() and perform the evaluation of a finite
+     * element function.
+     *
+     * The template argument `DataType` of the process_and_evaluate() and
+     * evaluate_and_process() functions can be a scalar (`float`, `double`),
+     * `Tensor<rank,dim>`, or `Point<dim>`. Additionally, one can specify
+     * the number of components (in case `DataType` is a scalar).
+     *
+     * @note Usage and implementation details of this class and the
+     *   helper functions above are explained in detail in step-87.
      *
      * @note The name of the fields are chosen with the method
      *   evaluate_and_process() in mind. Here, quantities are
@@ -243,10 +268,10 @@ namespace Utilities
         /**
          * Return local view of the processed cell @p cell for the vector @p values.
          */
-        template <typename T>
-        ArrayView<T>
-        get_data_view(const unsigned int  cell,
-                      const ArrayView<T> &values) const;
+        template <typename DataType>
+        ArrayView<DataType>
+        get_data_view(const unsigned int         cell,
+                      const ArrayView<DataType> &values) const;
 
         /**
          * Level and index of processed cells.
@@ -280,8 +305,11 @@ namespace Utilities
       get_cell_data() const;
 
       /**
-       * Evaluate function @p evaluation_function in the given  points and
+       * Evaluate function @p evaluation_function in the given points and
        * triangulation. The result is stored in @p output.
+       *
+       * @p buffer is a temporary buffer than can be used to avoid extra
+       * allocations.
        *
        * @note If the map of points to cells is not a
        *   one-to-one relation (is_map_unique()==false), the result needs to be
@@ -299,12 +327,12 @@ namespace Utilities
        *   provide unrolled tensors, which is useful, e.g., if its dimension
        *   and its rank is not known at compile time.
        */
-      template <typename T, unsigned int n_components = 1>
+      template <typename DataType, unsigned int n_components = 1>
       void
       evaluate_and_process(
-        std::vector<T> &output,
-        std::vector<T> &buffer,
-        const std::function<void(const ArrayView<T> &, const CellData &)>
+        std::vector<DataType> &output,
+        std::vector<DataType> &buffer,
+        const std::function<void(const ArrayView<DataType> &, const CellData &)>
                   &evaluation_function,
         const bool sort_data = true) const;
 
@@ -312,10 +340,10 @@ namespace Utilities
        * Same as above but with the result provided as return value and
        * without external allocation of a user-provided buffer.
        */
-      template <typename T, unsigned int n_components = 1>
-      std::vector<T>
+      template <typename DataType, unsigned int n_components = 1>
+      std::vector<DataType>
       evaluate_and_process(
-        const std::function<void(const ArrayView<T> &, const CellData &)>
+        const std::function<void(const ArrayView<DataType> &, const CellData &)>
                   &evaluation_function,
         const bool sort_data = true) const;
 
@@ -333,26 +361,26 @@ namespace Utilities
        *   provide unrolled tensors, which is useful, e.g., if its dimension
        *   and its rank is not known at compile time.
        */
-      template <typename T, unsigned int n_components = 1>
+      template <typename DataType, unsigned int n_components = 1>
       void
       process_and_evaluate(
-        const std::vector<T> &input,
-        std::vector<T>       &buffer,
-        const std::function<void(const ArrayView<const T> &, const CellData &)>
-                  &evaluation_function,
-        const bool sort_data = true) const;
+        const std::vector<DataType>                 &input,
+        std::vector<DataType>                       &buffer,
+        const std::function<void(const ArrayView<const DataType> &,
+                                 const CellData &)> &evaluation_function,
+        const bool                                   sort_data = true) const;
 
       /**
        * Same as above but without external allocation of a user-provided
        * buffer.
        */
-      template <typename T, unsigned int n_components = 1>
+      template <typename DataType, unsigned int n_components = 1>
       void
       process_and_evaluate(
-        const std::vector<T> &input,
-        const std::function<void(const ArrayView<const T> &, const CellData &)>
-                  &evaluation_function,
-        const bool sort_data = true) const;
+        const std::vector<DataType>                 &input,
+        const std::function<void(const ArrayView<const DataType> &,
+                                 const CellData &)> &evaluation_function,
+        const bool                                   sort_data = true) const;
 
       /**
        * Return a CRS-like data structure to determine the position of the
@@ -693,11 +721,11 @@ namespace Utilities
 
 
     template <int dim, int spacedim>
-    template <typename T>
-    ArrayView<T>
+    template <typename DataType>
+    ArrayView<DataType>
     RemotePointEvaluation<dim, spacedim>::CellData::get_data_view(
-      const unsigned int  cell,
-      const ArrayView<T> &values) const
+      const unsigned int         cell,
+      const ArrayView<DataType> &values) const
     {
       AssertIndexRange(cell, cells.size());
       return {values.data() + reference_point_ptrs[cell],
@@ -707,12 +735,12 @@ namespace Utilities
 
 
     template <int dim, int spacedim>
-    template <typename T, unsigned int n_components>
+    template <typename DataType, unsigned int n_components>
     void
     RemotePointEvaluation<dim, spacedim>::evaluate_and_process(
-      std::vector<T> &output,
-      std::vector<T> &buffer,
-      const std::function<void(const ArrayView<T> &, const CellData &)>
+      std::vector<DataType> &output,
+      std::vector<DataType> &buffer,
+      const std::function<void(const ArrayView<DataType> &, const CellData &)>
                 &evaluation_function,
       const bool sort_data) const
     {
@@ -737,15 +765,14 @@ namespace Utilities
         n_components);
 
       // ... for evaluation
-      ArrayView<T> buffer_eval(buffer.data(),
-                               send_permutation.size() * n_components);
+      ArrayView<DataType> buffer_eval(buffer.data(),
+                                      send_permutation.size() * n_components);
 
       // ... for communication (send)
-      ArrayView<T> buffer_send(sort_data ?
-                                 (buffer.data() +
-                                  send_permutation.size() * n_components) :
-                                 buffer.data(),
-                               send_permutation.size() * n_components);
+      ArrayView<DataType> buffer_send(
+        sort_data ? (buffer.data() + send_permutation.size() * n_components) :
+                    buffer.data(),
+        send_permutation.size() * n_components);
 
       // more arrays
       std::vector<MPI_Request>       send_requests;
@@ -807,7 +834,7 @@ namespace Utilities
             continue;
 
           internal::pack_and_isend(
-            ArrayView<const T>(
+            ArrayView<const DataType>(
               buffer_send.begin() + send_ptrs[i] * n_components,
               (send_ptrs[i + 1] - send_ptrs[i]) * n_components),
             send_ranks[i],
@@ -863,7 +890,7 @@ namespace Utilities
           const unsigned int j = std::distance(recv_ranks.begin(), ptr);
 
           // ... for communication (recv)
-          ArrayView<T> recv_buffer(
+          ArrayView<DataType> recv_buffer(
             sort_data ?
               (buffer.data() + send_permutation.size() * 2 * n_components) :
               (output.data() + recv_ptrs[j] * n_components),
@@ -898,20 +925,20 @@ namespace Utilities
 
 
     template <int dim, int spacedim>
-    template <typename T, unsigned int n_components>
-    std::vector<T>
+    template <typename DataType, unsigned int n_components>
+    std::vector<DataType>
     RemotePointEvaluation<dim, spacedim>::evaluate_and_process(
-      const std::function<void(const ArrayView<T> &, const CellData &)>
+      const std::function<void(const ArrayView<DataType> &, const CellData &)>
                 &evaluation_function,
       const bool sort_data) const
     {
-      std::vector<T> output;
-      std::vector<T> buffer;
+      std::vector<DataType> output;
+      std::vector<DataType> buffer;
 
-      this->evaluate_and_process<T, n_components>(output,
-                                                  buffer,
-                                                  evaluation_function,
-                                                  sort_data);
+      this->evaluate_and_process<DataType, n_components>(output,
+                                                         buffer,
+                                                         evaluation_function,
+                                                         sort_data);
 
       return output;
     }
@@ -919,14 +946,14 @@ namespace Utilities
 
 
     template <int dim, int spacedim>
-    template <typename T, unsigned int n_components>
+    template <typename DataType, unsigned int n_components>
     void
     RemotePointEvaluation<dim, spacedim>::process_and_evaluate(
-      const std::vector<T> &input,
-      std::vector<T>       &buffer,
-      const std::function<void(const ArrayView<const T> &, const CellData &)>
-                &evaluation_function,
-      const bool sort_data) const
+      const std::vector<DataType>                 &input,
+      std::vector<DataType>                       &buffer,
+      const std::function<void(const ArrayView<const DataType> &,
+                               const CellData &)> &evaluation_function,
+      const bool                                   sort_data) const
     {
 #ifndef DEAL_II_WITH_MPI
       Assert(false, ExcNeedsMPI());
@@ -952,15 +979,14 @@ namespace Utilities
         n_components);
 
       // ... for evaluation
-      ArrayView<T> buffer_eval(buffer.data(),
-                               send_permutation.size() * n_components);
+      ArrayView<DataType> buffer_eval(buffer.data(),
+                                      send_permutation.size() * n_components);
 
       // ... for communication (send)
-      ArrayView<T> buffer_send(sort_data ?
-                                 (buffer.data() +
-                                  send_permutation.size() * n_components) :
-                                 const_cast<T *>(input.data()),
-                               point_ptrs.back() * n_components);
+      ArrayView<DataType> buffer_send(
+        sort_data ? (buffer.data() + send_permutation.size() * n_components) :
+                    const_cast<DataType *>(input.data()),
+        point_ptrs.back() * n_components);
 
       // more arrays
       std::vector<MPI_Request>       send_requests;
@@ -1029,7 +1055,7 @@ namespace Utilities
             continue;
 
           internal::pack_and_isend(
-            ArrayView<const T>(
+            ArrayView<const DataType>(
               buffer_send.begin() + recv_ptrs[i] * n_components,
               (recv_ptrs[i + 1] - recv_ptrs[i]) * n_components),
             recv_ranks[i],
@@ -1084,7 +1110,7 @@ namespace Utilities
 
           const unsigned int j = std::distance(send_ranks.begin(), ptr);
 
-          ArrayView<T> recv_buffer(
+          ArrayView<DataType> recv_buffer(
             sort_data ?
               (buffer.data() +
                (point_ptrs.back() + send_permutation.size()) * n_components) :
@@ -1122,19 +1148,19 @@ namespace Utilities
 
 
     template <int dim, int spacedim>
-    template <typename T, unsigned int n_components>
+    template <typename DataType, unsigned int n_components>
     void
     RemotePointEvaluation<dim, spacedim>::process_and_evaluate(
-      const std::vector<T> &input,
-      const std::function<void(const ArrayView<const T> &, const CellData &)>
-                &evaluation_function,
-      const bool sort_data) const
+      const std::vector<DataType>                 &input,
+      const std::function<void(const ArrayView<const DataType> &,
+                               const CellData &)> &evaluation_function,
+      const bool                                   sort_data) const
     {
-      std::vector<T> buffer;
-      this->process_and_evaluate<T, n_components>(input,
-                                                  buffer,
-                                                  evaluation_function,
-                                                  sort_data);
+      std::vector<DataType> buffer;
+      this->process_and_evaluate<DataType, n_components>(input,
+                                                         buffer,
+                                                         evaluation_function,
+                                                         sort_data);
     }
 
   } // end of namespace MPI

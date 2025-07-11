@@ -1,7 +1,7 @@
 // ------------------------------------------------------------------------
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
-// Copyright (C) 2004 - 2023 by the deal.II authors
+// Copyright (C) 2004 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -149,7 +149,6 @@ namespace PETScWrappers
     const PetscErrorCode ierr =
       PetscObjectReference(reinterpret_cast<PetscObject>(vector));
     AssertNothrow(ierr == 0, ExcPETScError(ierr));
-    (void)ierr;
     this->determine_ghost_indices();
   }
 
@@ -159,7 +158,6 @@ namespace PETScWrappers
   {
     const PetscErrorCode ierr = VecDestroy(&vector);
     AssertNothrow(ierr == 0, ExcPETScError(ierr));
-    (void)ierr;
   }
 
 

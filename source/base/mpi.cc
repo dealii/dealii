@@ -1,7 +1,7 @@
 // ------------------------------------------------------------------------
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
-// Copyright (C) 2012 - 2024 by the deal.II authors
+// Copyright (C) 2012 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -27,6 +27,12 @@
 
 #include <boost/serialization/utility.hpp>
 
+// In this file, we use offsetof, which is a macro. When compiling
+// with C++20 modules, this presents a problem because we wrap all of
+// namespace std -- and then don't have access to macros. As a
+// consequence, we really do need the following #include, even when
+// building modules:
+#include <cstddef> // Do not convert for module purposes
 #include <iostream>
 #include <limits>
 #include <numeric>
@@ -241,10 +247,8 @@ namespace Utilities
       auto deleter = [](MPI_Datatype *p) {
         if (p != nullptr)
           {
-            [[maybe_unused]] const int ierr = MPI_Type_free(p);
-
+            const int ierr = MPI_Type_free(p);
             AssertNothrow(ierr == MPI_SUCCESS, ExcMPI(ierr));
-
             delete p;
           }
       };

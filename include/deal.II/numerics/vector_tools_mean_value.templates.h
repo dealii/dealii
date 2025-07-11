@@ -1,7 +1,7 @@
 // ------------------------------------------------------------------------
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
-// Copyright (C) 2020 - 2023 by the deal.II authors
+// Copyright (C) 2020 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -90,7 +90,6 @@ namespace VectorTools
     std::enable_if_t<dealii::is_serial_vector<VectorType>::value == false>
     subtract_mean_value(VectorType &v, const std::vector<bool> &p_select)
     {
-      (void)p_select;
       Assert(p_select.empty(), ExcNotImplemented());
       // In case of an empty boolean mask operate on the whole vector:
       v.add(-v.mean_value());

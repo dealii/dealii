@@ -1,7 +1,7 @@
 // ------------------------------------------------------------------------
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
-// Copyright (C) 2012 - 2024 by the deal.II authors
+// Copyright (C) 2012 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -419,7 +419,7 @@ namespace Utilities
      * An object that acts like a
      * [std::future](https://en.cppreference.com/w/cpp/thread/future)
      * object except that it does not encode the operation of waiting
-     * for an operation to finish that may be happening on a different
+     * for an operation to finish what may be happening on a different
      * thread, but for an "immediate" MPI operation such as
      * `MPI_Isend` or `MPI_Irecv`. An object of this kind is returned,
      * for example, by the isend() and irecv() functions in this
@@ -486,6 +486,34 @@ namespace Utilities
 
       /**
        * Destructor.
+       *
+       * If the current object has not been the right hand side of a move
+       * operation, and if get() has not been called on the current object,
+       * then the destructor blocks until the operation is completed so that
+       * the clean-up operations can be performed. As a consequence, if you
+       * write code such as
+       * @code
+       *   Utilities::MPI::isend(data, mpi_communicator, receiver, tag);
+       * @endcode
+       * where you do not capture the isend() functions' returned object,
+       * then the destructor of the returned object will run immediately at the
+       * end of executing this line, and this implies waiting for the isend()
+       * function's operations to finish -- in other words, you are turning
+       * the "immediate send" into a "waiting send" where the line only
+       * terminates once the data has been sent and the send buffer is no
+       * longer needed. (Note, however, that that is not the same as MPI's
+       * concept of a "synchronous send" in which the function only returns
+       * once the data has been *received*.)
+       *
+       * Of course, the same happens if you write
+       * @code
+       * {
+       *   Utilities::MPI::Future<void> future
+       *     = Utilities::MPI::isend(data, mpi_communicator, receiver, tag);
+       * }
+       * @endcode
+       * where you do capture the returned object, but the destructor is run
+       * at the closing brace -- also immediately after returning from isend().
        */
       ~Future();
 
@@ -1156,7 +1184,7 @@ namespace Utilities
      *  communicator.
      */
     template <typename T>
-    std::vector<T>
+    [[nodiscard]] std::vector<T>
     all_gather(const MPI_Comm comm, const T &object_to_send);
 
     /**
@@ -1175,7 +1203,7 @@ namespace Utilities
      *  communicator. All other processes receive an empty vector.
      */
     template <typename T>
-    std::vector<T>
+    [[nodiscard]] std::vector<T>
     gather(const MPI_Comm     comm,
            const T           &object_to_send,
            const unsigned int root_process = 0);
@@ -1195,7 +1223,7 @@ namespace Utilities
      * @return Every process receives an object from the root_process.
      */
     template <typename T>
-    T
+    [[nodiscard]] T
     scatter(const MPI_Comm        comm,
             const std::vector<T> &objects_to_send,
             const unsigned int    root_process = 0);
@@ -1239,7 +1267,7 @@ namespace Utilities
      * `MPI_Bcast` and return the result.
      */
     template <typename T>
-    T
+    [[nodiscard]] T
     broadcast(const MPI_Comm     comm,
               const T           &object_to_send,
               const unsigned int root_process = 0);
@@ -1280,7 +1308,7 @@ namespace Utilities
      * single rank. On all other processes, the returned value is undefined.
      */
     template <typename T>
-    T
+    [[nodiscard]] T
     reduce(const T                                      &local_value,
            const MPI_Comm                                comm,
            const std::function<T(const T &, const T &)> &combiner,
@@ -1299,7 +1327,7 @@ namespace Utilities
      * by MPI.
      */
     template <typename T, typename = std::enable_if_t<is_mpi_type<T> == true>>
-    std::pair<T, T>
+    [[nodiscard]] std::pair<T, T>
     partial_and_total_sum(const T &value, const MPI_Comm comm);
 
 
@@ -1313,7 +1341,7 @@ namespace Utilities
      * can be handled.
      */
     template <typename T>
-    T
+    [[nodiscard]] T
     all_reduce(const T                                      &local_value,
                const MPI_Comm                                comm,
                const std::function<T(const T &, const T &)> &combiner);

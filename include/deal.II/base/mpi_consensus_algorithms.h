@@ -1,7 +1,7 @@
 // ------------------------------------------------------------------------
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
-// Copyright (C) 2020 - 2023 by the deal.II authors
+// Copyright (C) 2020 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -2096,7 +2096,6 @@ namespace Utilities
                       &process_answer,
         const MPI_Comm comm)
       {
-        (void)comm;
         Assert(Utilities::MPI::n_mpi_processes(comm) == 1,
                ExcMessage("You shouldn't use the 'Serial' class on "
                           "communicators that have more than one process "

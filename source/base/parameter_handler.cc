@@ -1,7 +1,7 @@
 // ------------------------------------------------------------------------
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
-// Copyright (C) 1998 - 2024 by the deal.II authors
+// Copyright (C) 1998 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -641,37 +641,30 @@ namespace
         if (p.second.empty())
           {
             // set the found parameter in the destination argument
-            if (skip_undefined)
+            try
               {
-                try
-                  {
-                    prm.set(demangle(p.first), p.second.data());
-                  }
-                catch (const ParameterHandler::ExcEntryUndeclared &)
-                  {
-                    // ignore undeclared entry assert
-                  }
+                prm.set(demangle(p.first), p.second.data());
               }
-            else
-              prm.set(demangle(p.first), p.second.data());
+            catch (const ParameterHandler::ExcEntryUndeclared &entry_string)
+              {
+                // ignore undeclared entry assert
+                AssertThrow(skip_undefined,
+                            ParameterHandler::ExcEntryUndeclared(entry_string));
+              }
           }
         else if (p.second.get_optional<std::string>("value"))
           {
             // set the found parameter in the destination argument
-            if (skip_undefined)
+            try
               {
-                try
-                  {
-                    prm.set(demangle(p.first),
-                            p.second.get<std::string>("value"));
-                  }
-                catch (const ParameterHandler::ExcEntryUndeclared &)
-                  {
-                    // ignore undeclared entry assert
-                  }
+                prm.set(demangle(p.first), p.second.get<std::string>("value"));
               }
-            else
-              prm.set(demangle(p.first), p.second.get<std::string>("value"));
+            catch (const ParameterHandler::ExcEntryUndeclared &entry_string)
+              {
+                // ignore undeclared entry assert
+                AssertThrow(skip_undefined,
+                            ParameterHandler::ExcEntryUndeclared(entry_string));
+              }
 
             // this node might have sub-nodes in addition to "value", such as
             // "default_value", "documentation", etc. we might at some point
@@ -701,9 +694,11 @@ namespace
                                      prm);
                 prm.leave_subsection();
               }
-            catch (const ParameterHandler::ExcEntryUndeclared &)
+            catch (const ParameterHandler::ExcEntryUndeclared &entry_string)
               {
                 // ignore undeclared entry assert
+                AssertThrow(skip_undefined,
+                            ParameterHandler::ExcEntryUndeclared(entry_string));
               }
           }
       }
@@ -1450,7 +1445,12 @@ ParameterHandler::print_parameters(std::ostream     &out,
       boost::property_tree::ptree single_node_tree;
       single_node_tree.add_child("ParameterHandler", current_entries);
 
-      write_xml(out, single_node_tree);
+      // set indentation character and indentation length
+      boost::property_tree::xml_writer_settings<
+        boost::property_tree::ptree::key_type>
+        settings(' ', 2);
+
+      write_xml(out, single_node_tree, settings);
       return out;
     }
 

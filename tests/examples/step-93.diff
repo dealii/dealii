@@ -1,8 +1,8 @@
 diff --git a/examples/step-93/step-93.cc b/examples/step-93/step-93.cc
-index 2e7944c2b7..a0aac6263b 100644
+index f7b73cfd24..cd3392a9a5 100644
 --- a/examples/step-93/step-93.cc
 +++ b/examples/step-93/step-93.cc
-@@ -374,7 +374,7 @@ namespace Step93
+@@ -312,7 +312,7 @@ namespace Step93
    void Step93<dim>::make_grid()
    {
      GridGenerator::hyper_cube(triangulation, -1, 1);
@@ -11,23 +11,26 @@ index 2e7944c2b7..a0aac6263b 100644
  
      std::cout << "Number of active cells: " << triangulation.n_active_cells()
                << std::endl;
-@@ -655,7 +655,7 @@ namespace Step93
+@@ -642,8 +642,8 @@ namespace Step93
+   template <int dim>
+   void Step93<dim>::solve()
    {
-     // Notice that we also time how long this process takes.
-     std::cout << "Beginning solve" << std::endl;
 -    Timer timer;
+-    timer.start();
 +    //Timer timer;
++    //timer.start();
  
-     SolverControl solver_control(5000000, 1e-6 * system_rhs.l2_norm());
-     SolverCG<Vector<double>> solver(solver_control);
-@@ -665,8 +665,8 @@ namespace Step93
-     /* SparseDirectUMFPACK direct_solver;
-     direct_solver.initialize(system_matrix);
-     direct_solver.vmult(solution, system_rhs); */
+     std::cout << "Beginning solve..." << std::endl;
+ 
+@@ -652,9 +652,9 @@ namespace Step93
+ 
+     solver.solve(system_matrix, solution, system_rhs, PreconditionIdentity());
+ 
 -    timer.stop();
--    std::cout << "Wall time: " << timer.wall_time() << "s" << std::endl;
 +    //timer.stop();
-+    //std::cout << "Wall time: " << timer.wall_time() << "s" << std::endl;
-   }
  
-   // The output_results() function is a bit more robust for this program than
+-    std::cout << "Wall time: " << timer.wall_time() << "s" << std::endl;
++    //std::cout << "Wall time: " << timer.wall_time() << "s" << std::endl;
+     std::cout << "Solved in " << solver_control.last_step()
+               << " MINRES iterations." << std::endl;
+   }

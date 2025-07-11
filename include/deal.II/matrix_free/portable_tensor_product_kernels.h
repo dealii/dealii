@@ -1,7 +1,7 @@
 // ------------------------------------------------------------------------
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
-// Copyright (C) 2017 - 2024 by the deal.II authors
+// Copyright (C) 2017 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -59,8 +59,8 @@ namespace Portable
       const ViewTypeIn src,
       const int        N)
     {
-      Assert(dst.size() >= N, ExcInternalError());
-      Assert(src.size() >= N, ExcInternalError());
+      Assert(dst.size() >= static_cast<unsigned int>(N), ExcInternalError());
+      Assert(src.size() >= static_cast<unsigned int>(N), ExcInternalError());
       Kokkos::parallel_for(Kokkos::TeamVectorRange(team_member, N),
                            [&](const int i) {
                              if constexpr (add)

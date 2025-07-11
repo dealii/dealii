@@ -1,7 +1,7 @@
 // ------------------------------------------------------------------------
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
-// Copyright (C) 2005 - 2023 by the deal.II authors
+// Copyright (C) 2005 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -20,6 +20,7 @@
 
 #include <deal.II/base/derivative_form.h>
 #include <deal.II/base/mutex.h>
+#include <deal.II/base/qprojector.h>
 #include <deal.II/base/quadrature.h>
 #include <deal.II/base/tensor_polynomials_base.h>
 
@@ -207,6 +208,27 @@ public:
                             const unsigned int component) const override;
 
 protected:
+#ifndef DOXYGEN
+  class InternalData;
+#endif
+
+  /**
+   * Internal function called by fill_fe_values(), fill_fe_face_values(),
+   * and fill_fe_subface_values().
+   */
+  void
+  compute_fill(
+    const typename Triangulation<dim, spacedim>::cell_iterator &cell,
+    const typename QProjector<dim>::DataSetDescriptor          &offset,
+    const unsigned int                                          n_q_points,
+    const Mapping<dim, spacedim>                               &mapping,
+    const typename Mapping<dim, spacedim>::InternalDataBase &mapping_internal,
+    const internal::FEValuesImplementation::MappingRelatedData<dim, spacedim>
+                                                              &mapping_data,
+    const typename FE_PolyTensor<dim, spacedim>::InternalData &fe_internal,
+    internal::FEValuesImplementation::FiniteElementRelatedData<dim, spacedim>
+      &output_data) const;
+
   /**
    * The mapping type to be used to map shape functions from the reference
    * cell to the mesh cell. If this vector is length one, the same mapping
@@ -225,23 +247,19 @@ protected:
 
   /**
    * For faces with non-standard face_orientation in 3d, the dofs on faces
-   * (quads) have to be permuted in order to be combined with the correct
-   * shape functions and additionally can change the sign. Given a local
-   * dof @p index on a quad, return the
-   * sign of the permuted shape function, if the face has non-standard
-   * face_orientation, face_flip or face_rotation. In 2d and 1d there is no need
-   * for permutation and consequently it does nothing in this case.
+   * (quads) have to be permuted in order to be combined with the correct shape
+   * functions and additionally can change the sign. Given a local dof @p index
+   * on a quad, return the sign of the permuted shape function.
    *
    * The permutation itself is returned by
    * adjust_quad_dof_index_for_face_orientation implemented in the interface
    * class FiniteElement<dim>.
    */
   bool
-  adjust_quad_dof_sign_for_face_orientation(const unsigned int index,
-                                            const unsigned int face_no,
-                                            const bool         face_orientation,
-                                            const bool         face_flip,
-                                            const bool face_rotation) const;
+  adjust_quad_dof_sign_for_face_orientation(
+    const unsigned int                 index,
+    const unsigned int                 face_no,
+    const types::geometric_orientation combined_orientation) const;
 
   /**
    * For faces with non-standard face_orientation in 3d, the dofs on faces

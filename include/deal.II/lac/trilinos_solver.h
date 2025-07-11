@@ -1,7 +1,7 @@
 // ------------------------------------------------------------------------
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
-// Copyright (C) 2008 - 2024 by the deal.II authors
+// Copyright (C) 2008 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -27,6 +27,8 @@
 #  include <deal.II/lac/solver_control.h>
 #  include <deal.II/lac/vector.h>
 
+DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
+
 // for AztecOO solvers
 #  include <Amesos.h>
 #  include <AztecOO.h>
@@ -43,6 +45,9 @@
 #    include <BelosOperator.hpp>
 #    include <BelosSolverManager.hpp>
 #  endif
+
+DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
+
 
 #  include <memory>
 
@@ -962,7 +967,7 @@ namespace TrilinosWrappers
       /**
        * The number of rows in the multivector.
        */
-      virtual ptrdiff_t
+      virtual std::ptrdiff_t
       GetGlobalLength() const
       {
         AssertThrow(this->vectors.size() > 0, ExcInternalError());
@@ -1047,10 +1052,9 @@ namespace TrilinosWrappers
        * Scale each element of the i-th vector in *this with alpha[i].
        */
       virtual void
-      MvScale(const std::vector<value_type> &alpha)
+      MvScale(const std::vector<value_type> & /*alpha*/)
       {
         AssertThrow(false, ExcNotImplemented());
-        (void)alpha;
       }
 
       /**
@@ -1115,12 +1119,10 @@ namespace TrilinosWrappers
        * Copy the vectors in A to a set of vectors in *this.
        */
       virtual void
-      SetBlock(const Belos::MultiVec<value_type> &A,
-               const std::vector<int>            &index)
+      SetBlock(const Belos::MultiVec<value_type> & /*A*/,
+               const std::vector<int> & /*index*/)
       {
         AssertThrow(false, ExcNotImplemented());
-        (void)A;
-        (void)index;
       }
 
       /**
@@ -1136,20 +1138,18 @@ namespace TrilinosWrappers
        * Replace each element of the vectors in *this with alpha.
        */
       virtual void
-      MvInit(const value_type alpha)
+      MvInit(const value_type /*alpha*/)
       {
         AssertThrow(false, ExcNotImplemented());
-        (void)alpha;
       }
 
       /**
        * Print *this multivector to the os output stream.
        */
       virtual void
-      MvPrint(std::ostream &os) const
+      MvPrint(std::ostream & /*os*/) const
       {
         AssertThrow(false, ExcNotImplemented());
-        (void)os;
       }
 
       /**
@@ -1413,6 +1413,14 @@ namespace TrilinosWrappers
 
 #  endif
 
+DEAL_II_NAMESPACE_CLOSE
+
+#else
+
+// Make sure the scripts that create the C++20 module input files have
+// something to latch on if the preprocessor #ifdef above would
+// otherwise lead to an empty content of the file.
+DEAL_II_NAMESPACE_OPEN
 DEAL_II_NAMESPACE_CLOSE
 
 #endif // DEAL_II_WITH_TRILINOS

@@ -14,12 +14,11 @@
 
 
 
-// Test parallel::distributed::SolutionTransfer for FE_Nothing
+// Test parallel distributed SolutionTransfer for FE_Nothing
 // (see also https://github.com/dealii/dealii/issues/10570).
 
 #include <deal.II/base/function.h>
 
-#include <deal.II/distributed/solution_transfer.h>
 #include <deal.II/distributed/tria.h>
 
 #include <deal.II/dofs/dof_accessor.h>
@@ -36,6 +35,8 @@
 #include <deal.II/grid/tria_iterator.h>
 
 #include <deal.II/lac/la_parallel_vector.h>
+
+#include <deal.II/numerics/solution_transfer.h>
 
 #include <iostream>
 #include <vector>
@@ -76,9 +77,8 @@ transfer(const MPI_Comm comm)
   for (unsigned int i = 0; i < solution.size(); ++i)
     solution(i) = i;
 
-  parallel::distributed::
-    SolutionTransfer<dim, LinearAlgebra::distributed::Vector<double>>
-      soltrans(dof_handler);
+  SolutionTransfer<dim, LinearAlgebra::distributed::Vector<double>> soltrans(
+    dof_handler);
 
   for (const auto &cell : tria.active_cell_iterators())
     cell->set_refine_flag();

@@ -1,7 +1,7 @@
 // ------------------------------------------------------------------------
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
-// Copyright (C) 2009 - 2024 by the deal.II authors
+// Copyright (C) 2009 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -24,6 +24,7 @@
 #include <vector>
 
 #ifdef DEAL_II_WITH_TRILINOS
+DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
 #  ifdef DEAL_II_WITH_MPI
 #    include <Epetra_MpiComm.h>
 #  endif
@@ -32,6 +33,7 @@
 #  ifdef DEAL_II_TRILINOS_WITH_TPETRA
 #    include <Tpetra_Map.hpp>
 #  endif
+DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
 #endif
 
 DEAL_II_NAMESPACE_OPEN
@@ -1128,7 +1130,12 @@ IndexSet::make_petsc_is(const MPI_Comm communicator) const
   size_type             i = 0;
   std::vector<PetscInt> petsc_indices(n_elements());
   for (const auto &index : *this)
-    petsc_indices[i] = static_cast<PetscInt>(index);
+    {
+      const auto petsc_index = static_cast<PetscInt>(index);
+      AssertIntegerConversion(petsc_index, index);
+      petsc_indices[i] = petsc_index;
+      ++i;
+    }
 
   IS             is;
   PetscErrorCode ierr = ISCreateGeneral(

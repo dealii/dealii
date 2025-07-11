@@ -1,7 +1,7 @@
 ## ------------------------------------------------------------------------
 ##
 ## SPDX-License-Identifier: LGPL-2.1-or-later
-## Copyright (C) 2014 - 2023 by the deal.II authors
+## Copyright (C) 2014 - 2025 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -53,7 +53,7 @@ if(NOT MPIEXEC_EXECUTABLE)
   elseif(DEFINED ENV{MPIEXEC})
     find_program(MPIEXEC_EXECUTABLE $ENV{MPIEXEC})
   endif()
-  # For backwards compatbility with old cmake versions:
+  # For backwards compatibility with old cmake versions:
   set(MPIEXEC "${MPIEXEC_EXECUTABLE}")
 endif()
 

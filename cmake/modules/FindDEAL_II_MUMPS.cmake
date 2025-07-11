@@ -1,7 +1,7 @@
 ## ------------------------------------------------------------------------
 ##
 ## SPDX-License-Identifier: LGPL-2.1-or-later
-## Copyright (C) 2012 - 2022 by the deal.II authors
+## Copyright (C) 2012 - 2025 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -51,7 +51,7 @@ deal_ii_find_library(MUMPS_COMMON_LIBRARY
   )
 
 #
-# If we can find libpord.so (or similiar), link it in as well:
+# If we can find libpord.so (or similar), link it in as well:
 #
 deal_ii_find_library(PORD_LIBRARY
   NAMES pord

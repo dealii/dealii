@@ -79,6 +79,8 @@ IncludeCategories:
     Priority: 120
   - Regex:    "deal.II/boost_adaptors/.*\\.h"
     Priority: 125
+  - Regex:    "deal.II/cgal/.*\\.h"
+    Priority: 127
   - Regex:    "deal.II/differentiation/.*\\.h"
     Priority: 130
   - Regex:    "deal.II/distributed/.*\\.h"
@@ -119,6 +121,8 @@ IncludeCategories:
     Priority: 310
   - Regex:    "deal.II/trilinos/.*\\.h"
     Priority: 320
+  - Regex:    "deal.II/vtk/.*\\.h"
+    Priority: 330
 # put boost right after deal:
   - Regex: "<boost.*>"
     Priority: 500

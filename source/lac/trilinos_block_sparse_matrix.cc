@@ -1,7 +1,7 @@
 // ------------------------------------------------------------------------
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
-// Copyright (C) 2008 - 2023 by the deal.II authors
+// Copyright (C) 2008 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -88,15 +88,12 @@ namespace TrilinosWrappers
                                 block_sparsity_pattern.n_block_cols()));
 
     const size_type n_block_rows = epetra_maps.size();
-    (void)n_block_rows;
-
     Assert(n_block_rows == block_sparsity_pattern.n_block_rows(),
            ExcDimensionMismatch(n_block_rows,
                                 block_sparsity_pattern.n_block_rows()));
     Assert(n_block_rows == block_sparsity_pattern.n_block_cols(),
            ExcDimensionMismatch(n_block_rows,
                                 block_sparsity_pattern.n_block_cols()));
-
 
     // Call the other basic reinit function, ...
     reinit(block_sparsity_pattern.n_block_rows(),

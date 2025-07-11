@@ -1,7 +1,7 @@
 // ------------------------------------------------------------------------
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
-// Copyright (C) 1999 - 2024 by the deal.II authors
+// Copyright (C) 1999 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -2183,7 +2183,7 @@ namespace DataOutBase
    * This function is documented in the "Creating a master file for parallel"
    * section (section 5.7) of the "Getting data into VisIt" report that can be
    * found here:
-   * https://wci.llnl.gov/codes/visit/2.0.0/GettingDataIntoVisIt2.0.0.pdf
+   * https://visit-dav.github.io/visit-website/pdfs/GettingDataIntoVisIt2.0.0.pdf
    */
   void
   write_visit_record(std::ostream                   &out,
@@ -2214,7 +2214,7 @@ namespace DataOutBase
    * This function is documented in the "Creating a master file for parallel"
    * section (section 5.7) of the "Getting data into VisIt" report that can be
    * found here:
-   * https://wci.llnl.gov/codes/visit/2.0.0/GettingDataIntoVisIt2.0.0.pdf
+   * https://visit-dav.github.io/visit-website/pdfs/GettingDataIntoVisIt2.0.0.pdf
    */
   void
   write_visit_record(std::ostream                                &out,
@@ -2250,7 +2250,7 @@ namespace DataOutBase
    * This function is documented in the "Creating a master file for parallel"
    * section (section 5.7) of the "Getting data into VisIt" report that can be
    * found here:
-   * https://wci.llnl.gov/codes/visit/2.0.0/GettingDataIntoVisIt2.0.0.pdf
+   * https://visit-dav.github.io/visit-website/pdfs/GettingDataIntoVisIt2.0.0.pdf
    */
   void
   write_visit_record(

@@ -1,7 +1,7 @@
 // ------------------------------------------------------------------------
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
-// Copyright (C) 2008 - 2024 by the deal.II authors
+// Copyright (C) 2008 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -298,7 +298,6 @@ template <typename number>
 ChunkSparseMatrix<number> &
 ChunkSparseMatrix<number>::operator=(const ChunkSparseMatrix<number> &m)
 {
-  (void)m;
   Assert(m.cols == nullptr && m.val == nullptr && m.max_len == 0,
          ExcMessage(
            "This operator can only be called if the provided right "
@@ -332,7 +331,6 @@ ChunkSparseMatrix<number>::ChunkSparseMatrix(const ChunkSparsityPattern &c,
   , val(nullptr)
   , max_len(0)
 {
-  (void)id;
   Assert(c.n_rows() == id.m(), ExcDimensionMismatch(c.n_rows(), id.m()));
   Assert(c.n_cols() == id.n(), ExcDimensionMismatch(c.n_cols(), id.n()));
 
@@ -373,7 +371,6 @@ template <typename number>
 ChunkSparseMatrix<number> &
 ChunkSparseMatrix<number>::operator=(const double d)
 {
-  (void)d;
   Assert(d == 0, ExcScalarAssignmentOnlyForZeroValue());
 
   Assert(cols != nullptr, ExcNeedsSparsityPattern());
@@ -414,7 +411,6 @@ template <typename number>
 ChunkSparseMatrix<number> &
 ChunkSparseMatrix<number>::operator=(const IdentityMatrix &id)
 {
-  (void)id;
   Assert(cols->n_rows() == id.m(),
          ExcDimensionMismatch(cols->n_rows(), id.m()));
   Assert(cols->n_cols() == id.n(),
@@ -595,7 +591,6 @@ ChunkSparseMatrix<number>::extract_row_copy(const size_type row,
                                             size_type      *column_indices,
                                             number         *values) const
 {
-  (void)array_length;
   AssertIndexRange(cols->row_length(row), array_length + 1);
   AssertIndexRange(row, m());
   const unsigned int chunk_size  = cols->get_chunk_size();
@@ -1211,8 +1206,6 @@ ChunkSparseMatrix<number>::precondition_Jacobi(Vector<somenumber>       &dst,
                                                const Vector<somenumber> &src,
                                                const number /*om*/) const
 {
-  (void)dst;
-  (void)src;
   Assert(cols != nullptr, ExcNeedsSparsityPattern());
   Assert(val != nullptr, ExcNotInitialized());
   Assert(m() == n(),
@@ -1235,8 +1228,6 @@ ChunkSparseMatrix<number>::precondition_SSOR(Vector<somenumber>       &dst,
 {
   // to understand how this function works you may want to take a look at the
   // CVS archives to see the original version which is much clearer...
-  (void)dst;
-  (void)src;
   Assert(cols != nullptr, ExcNeedsSparsityPattern());
   Assert(val != nullptr, ExcNotInitialized());
   Assert(m() == n(),
@@ -1291,7 +1282,6 @@ void
 ChunkSparseMatrix<number>::SOR(Vector<somenumber> &dst,
                                const number /*om*/) const
 {
-  (void)dst;
   Assert(cols != nullptr, ExcNeedsSparsityPattern());
   Assert(val != nullptr, ExcNotInitialized());
   Assert(m() == n(),
@@ -1308,7 +1298,6 @@ void
 ChunkSparseMatrix<number>::TSOR(Vector<somenumber> &dst,
                                 const number /*om*/) const
 {
-  (void)dst;
   Assert(cols != nullptr, ExcNeedsSparsityPattern());
   Assert(val != nullptr, ExcNotInitialized());
   Assert(m() == n(),
@@ -1328,9 +1317,6 @@ ChunkSparseMatrix<number>::PSOR(
   const std::vector<size_type> &inverse_permutation,
   const number /*om*/) const
 {
-  (void)dst;
-  (void)permutation;
-  (void)inverse_permutation;
   Assert(cols != nullptr, ExcNeedsSparsityPattern());
   Assert(val != nullptr, ExcNotInitialized());
   Assert(m() == n(),
@@ -1355,9 +1341,6 @@ ChunkSparseMatrix<number>::TPSOR(
   const std::vector<size_type> &inverse_permutation,
   const number /*om*/) const
 {
-  (void)dst;
-  (void)permutation;
-  (void)inverse_permutation;
   Assert(cols != nullptr, ExcNeedsSparsityPattern());
   Assert(val != nullptr, ExcNotInitialized());
   Assert(m() == n(),
@@ -1381,8 +1364,6 @@ ChunkSparseMatrix<number>::SOR_step(Vector<somenumber>       &v,
                                     const Vector<somenumber> &b,
                                     const number /*om*/) const
 {
-  (void)v;
-  (void)b;
   Assert(cols != nullptr, ExcNeedsSparsityPattern());
   Assert(val != nullptr, ExcNotInitialized());
   Assert(m() == n(),
@@ -1403,8 +1384,6 @@ ChunkSparseMatrix<number>::TSOR_step(Vector<somenumber>       &v,
                                      const Vector<somenumber> &b,
                                      const number /*om*/) const
 {
-  (void)v;
-  (void)b;
   Assert(cols != nullptr, ExcNeedsSparsityPattern());
   Assert(val != nullptr, ExcNotInitialized());
   Assert(m() == n(),
@@ -1437,7 +1416,6 @@ void
 ChunkSparseMatrix<number>::SSOR(Vector<somenumber> &dst,
                                 const number /*om*/) const
 {
-  (void)dst;
   Assert(cols != nullptr, ExcNeedsSparsityPattern());
   Assert(val != nullptr, ExcNotInitialized());
   Assert(m() == n(),

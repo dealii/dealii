@@ -1,7 +1,7 @@
 ## ------------------------------------------------------------------------
 ##
 ## SPDX-License-Identifier: LGPL-2.1-or-later
-## Copyright (C) 2012 - 2022 by the deal.II authors
+## Copyright (C) 2012 - 2025 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -12,22 +12,16 @@
 ##
 ## ------------------------------------------------------------------------
 
-#
-# Configure config.h and revision.h
-#
-configure_file(
-  ${CMAKE_CURRENT_SOURCE_DIR}/deal.II/base/config.h.in
-  ${CMAKE_CURRENT_BINARY_DIR}/deal.II/base/config.h
-  )
-configure_file(
-  ${CMAKE_CURRENT_SOURCE_DIR}/deal.II/base/revision.h.in
-  ${CMAKE_CURRENT_BINARY_DIR}/deal.II/base/revision.h
-  )
 
 #
-# Add a rule for how to install the header files:
+# Recurse into the sub-directories:
 #
-install(DIRECTORY deal.II
+add_subdirectory(deal.II)
+
+#
+# Add a rule for how to install the header files that are part of the source tree:
+#
+install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/deal.II
   DESTINATION ${DEAL_II_INCLUDE_RELDIR}
   COMPONENT library
   FILES_MATCHING PATTERN "*.h"

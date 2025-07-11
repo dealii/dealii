@@ -1,7 +1,7 @@
 /* ------------------------------------------------------------------------
  *
  * SPDX-License-Identifier: LGPL-2.1-or-later
- * Copyright (C) 2020 - 2023 by the deal.II authors
+ * Copyright (C) 2020 - 2024 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
@@ -44,7 +44,7 @@
 #include <deal.II/base/timer.h>
 #include <deal.II/base/work_stream.h>
 
-#include <deal.II/distributed/solution_transfer.h>
+#include <deal.II/numerics/solution_transfer.h>
 #include <deal.II/distributed/tria.h>
 
 #include <deal.II/dofs/dof_handler.h>
@@ -2535,9 +2535,8 @@ namespace Step69
       {
         print_head(pcout, "resume interrupted computation");
 
-        parallel::distributed::
-          SolutionTransfer<dim, LinearAlgebra::distributed::Vector<double>>
-            solution_transfer(offline_data.dof_handler);
+        SolutionTransfer<dim, LinearAlgebra::distributed::Vector<double>>
+          solution_transfer(offline_data.dof_handler);
 
         std::vector<LinearAlgebra::distributed::Vector<double> *> vectors;
         std::transform(U.begin(),
@@ -2673,9 +2672,8 @@ namespace Step69
   {
     print_head(pcout, "checkpoint computation");
 
-    parallel::distributed::
-      SolutionTransfer<dim, LinearAlgebra::distributed::Vector<double>>
-        solution_transfer(offline_data.dof_handler);
+    SolutionTransfer<dim, LinearAlgebra::distributed::Vector<double>>
+      solution_transfer(offline_data.dof_handler);
 
     std::vector<const LinearAlgebra::distributed::Vector<double> *> vectors;
     std::transform(U.begin(),

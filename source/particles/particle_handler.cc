@@ -1,7 +1,7 @@
 // ------------------------------------------------------------------------
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
-// Copyright (C) 2017 - 2024 by the deal.II authors
+// Copyright (C) 2017 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -1297,8 +1297,6 @@ namespace Particles
     // approximate sizes for these vectors. If more space is needed an
     // automatic and relatively fast (compared to other parts of this
     // algorithm) re-allocation will happen.
-    using vector_size = typename std::vector<particle_iterator>::size_type;
-
     std::set<types::subdomain_id> ghost_owners;
     if (const auto parallel_triangulation =
           dynamic_cast<const parallel::TriangulationBase<dim, spacedim> *>(

@@ -1,7 +1,7 @@
 // ------------------------------------------------------------------------
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
-// Copyright (C) 2023 - 2024 by the deal.II authors
+// Copyright (C) 2023 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -267,7 +267,6 @@ namespace Portable
     , shared_data(data->shared_data)
     , cell_id(data->team_member.league_rank())
   {
-    (void)dof_index;
     AssertIndexRange(dof_index, data->n_dofhandler);
   }
 
@@ -519,7 +518,8 @@ namespace Portable
   FEEvaluation<dim, fe_degree, n_q_points_1d, n_components_, Number>::
     get_dof_value(int dof) const
   {
-    Assert(dof >= 0 && dof < tensor_dofs_per_component, ExcInternalError());
+    Assert(dof >= 0 && dof < static_cast<int>(tensor_dofs_per_component),
+           ExcInternalError());
     if constexpr (n_components_ == 1)
       {
         return shared_data->values(dof, 0);

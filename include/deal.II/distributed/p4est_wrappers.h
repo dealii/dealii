@@ -1,7 +1,7 @@
 // ------------------------------------------------------------------------
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
-// Copyright (C) 2016 - 2023 by the deal.II authors
+// Copyright (C) 2016 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -120,11 +120,17 @@ namespace internal
 
 
     /**
-     * A structure whose explicit specializations contain pointers to the
+     * A structure whose explicit specializations represent the
      * relevant p4est_* and p8est_* functions. Using this structure, for
-     * example by saying functions<dim>::quadrant_compare, we can write code
-     * in a dimension independent way, either calling p4est_quadrant_compare
-     * or p8est_quadrant_compare, depending on template argument.
+     * example by saying functions<dim>::quadrant_compare(...), we can write
+     * code in a dimension independent way, either calling
+     * p4est_quadrant_compare or p8est_quadrant_compare, depending on template
+     * argument.
+     *
+     * In most cases, the members of this class are simply pointers to
+     * p4est_* or p8est_* functions. In one case, it's simply a static
+     * member function that dispatches to things p4est chooses to
+     * implement via a macro.
      */
     template <int dim>
     struct functions;
@@ -143,6 +149,9 @@ namespace internal
       static void (&quadrant_set_morton)(types<2>::quadrant *quadrant,
                                          int                 level,
                                          std::uint64_t       id);
+
+      static void
+      quadrant_init(types<2>::quadrant &q);
 
       static int (&quadrant_is_equal)(const types<2>::quadrant *q1,
                                       const types<2>::quadrant *q2);
@@ -344,6 +353,9 @@ namespace internal
       static void (&quadrant_set_morton)(types<3>::quadrant *quadrant,
                                          int                 level,
                                          std::uint64_t       id);
+
+      static void
+      quadrant_init(types<3>::quadrant &q);
 
       static int (&quadrant_is_equal)(const types<3>::quadrant *q1,
                                       const types<3>::quadrant *q2);
@@ -636,6 +648,14 @@ namespace internal
   } // namespace p4est
 } // namespace internal
 
+DEAL_II_NAMESPACE_CLOSE
+
+#else
+
+// Make sure the scripts that create the C++20 module input files have
+// something to latch on if the preprocessor #ifdef above would
+// otherwise lead to an empty content of the file.
+DEAL_II_NAMESPACE_OPEN
 DEAL_II_NAMESPACE_CLOSE
 
 #endif // DEAL_II_WITH_P4EST

@@ -1,7 +1,7 @@
 ## ------------------------------------------------------------------------
 ##
 ## SPDX-License-Identifier: LGPL-2.1-or-later
-## Copyright (C) 2012 - 2023 by the deal.II authors
+## Copyright (C) 2012 - 2025 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -32,21 +32,21 @@ set(_unity_include_src
 
 set(_separate_src
   cell_data_transfer.cc
-  data_out_dof_data.cc
+  data_out_dof_data_inst1.cc
   data_out_dof_data_inst2.cc
   data_out_dof_data_codim.cc
   data_out_resample.cc
   derivative_approximation.cc
   error_estimator_1d.cc
-  error_estimator.cc
+  error_estimator_inst1.cc
   error_estimator_inst2.cc
   fe_field_function.cc
-  matrix_creator.cc
+  matrix_creator_inst1.cc
   matrix_creator_inst2.cc
   matrix_creator_inst3.cc
   point_value_history.cc
   smoothness_estimator.cc
-  solution_transfer.cc
+  solution_transfer_inst1.cc
   solution_transfer_inst2.cc
   solution_transfer_inst3.cc
   solution_transfer_inst4.cc
@@ -105,9 +105,11 @@ set(_inst
   vector_tools_rhs.inst.in
   )
 
-file(GLOB _header
+file(GLOB _header CONFIGURE_DEPENDS
   ${CMAKE_SOURCE_DIR}/include/deal.II/numerics/*.h
   )
 
 define_object_library(object_numerics OBJECT ${_src} ${_header} ${_inst})
 expand_instantiations(object_numerics "${_inst}")
+
+collect_source_and_header_files("${_unity_include_src};${_separate_src}" "${_header}")

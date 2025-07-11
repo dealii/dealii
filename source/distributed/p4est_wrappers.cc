@@ -1,7 +1,7 @@
 // ------------------------------------------------------------------------
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
-// Copyright (C) 2016 - 2024 by the deal.II authors
+// Copyright (C) 2016 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -15,6 +15,31 @@
 
 #include <deal.II/distributed/p4est_wrappers.h>
 #include <deal.II/distributed/tria.h>
+
+#ifdef DEAL_II_WITH_P4EST
+#  include <p4est.h>
+#  include <p8est.h>
+#  include <sc_containers.h>
+
+// Below, we will use the P4EST_QUADRANT_INIT and P8EST_QUADRANT_INIT
+// function-like macros. If we are building the library based on
+// header files, we get these from the <p4est.h> and <p8est.h> header
+// inclusions. But if we build a C++20 module, we only import
+// declarations, not preprocessor macros. As a consequence, let us
+// duplicate these macros here, hoping that at some point, the p4est
+// library folks add regular functions that can do the job.
+#  ifndef P4EST_QUADRANT_INIT
+#    define P4EST_QUADRANT_INIT(q) \
+      ((void)std::memset((q), -1, sizeof(p4est_quadrant_t)))
+#  endif
+
+#  ifndef P8EST_QUADRANT_INIT
+#    define P8EST_QUADRANT_INIT(q) \
+      ((void)std::memset((q), -1, sizeof(p8est_quadrant_t)))
+#  endif
+
+#endif
+
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -351,6 +376,12 @@ namespace internal
                                               std::uint64_t       id) =
       p4est_quadrant_set_morton;
 
+    void
+    functions<2>::quadrant_init(types<2>::quadrant &q)
+    {
+      P4EST_QUADRANT_INIT(&q);
+    }
+
     int (&functions<2>::quadrant_is_equal)(const types<2>::quadrant *q1,
                                            const types<2>::quadrant *q2) =
       p4est_quadrant_is_equal;
@@ -563,6 +594,12 @@ namespace internal
                                               int                 level,
                                               std::uint64_t       id) =
       p8est_quadrant_set_morton;
+
+    void
+    functions<3>::quadrant_init(types<3>::quadrant &q)
+    {
+      P8EST_QUADRANT_INIT(&q);
+    }
 
     int (&functions<3>::quadrant_is_equal)(const types<3>::quadrant *q1,
                                            const types<3>::quadrant *q2) =
@@ -779,18 +816,7 @@ namespace internal
       for (unsigned int c = 0;
            c < dealii::GeometryInfo<dim>::max_children_per_cell;
            ++c)
-        switch (dim)
-          {
-            case 2:
-              P4EST_QUADRANT_INIT(&p4est_children[c]);
-              break;
-            case 3:
-              P8EST_QUADRANT_INIT(&p4est_children[c]);
-              break;
-            default:
-              DEAL_II_NOT_IMPLEMENTED();
-          }
-
+        functions<dim>::quadrant_init(p4est_children[c]);
 
       functions<dim>::quadrant_childrenv(&p4est_cell, p4est_children);
     }
@@ -799,17 +825,7 @@ namespace internal
     void
     init_coarse_quadrant(typename types<dim>::quadrant &quad)
     {
-      switch (dim)
-        {
-          case 2:
-            P4EST_QUADRANT_INIT(&quad);
-            break;
-          case 3:
-            P8EST_QUADRANT_INIT(&quad);
-            break;
-          default:
-            DEAL_II_NOT_IMPLEMENTED();
-        }
+      functions<dim>::quadrant_init(quad);
       functions<dim>::quadrant_set_morton(&quad,
                                           /*level=*/0,
                                           /*index=*/0);

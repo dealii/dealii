@@ -1,7 +1,7 @@
 // ------------------------------------------------------------------------
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
-// Copyright (C) 1999 - 2024 by the deal.II authors
+// Copyright (C) 1999 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -2410,7 +2410,6 @@ namespace internal
       size_type shift = 0)
     {
       Assert(shift == 0, ExcNotImplemented());
-      (void)shift;
       std::vector<size_type> constrained_local_dofs_host;
       constrained_local_dofs_host.reserve(cm.size());
 
@@ -2795,8 +2794,14 @@ namespace internal
       Assert(vec.n_blocks() > 0, ExcInternalError());
       return vec.block(0).get_mpi_communicator();
     }
+
+
+
+    template <typename V>
+    using is_compressed_op = decltype(std::declval<V>().is_compressed());
   } // namespace AffineConstraints
 } // namespace internal
+
 
 
 template <typename number>
@@ -2805,6 +2810,18 @@ void
 AffineConstraints<number>::distribute(VectorType &vec) const
 {
   Assert(sorted == true, ExcMatrixNotClosed());
+
+  if constexpr (internal::is_supported_operation<
+                  internal::AffineConstraints::is_compressed_op,
+                  VectorType>)
+    Assert(
+      vec.is_compressed(),
+      ExcMessage(
+        "To distribute a parallel vector, the vector must "
+        "not contain any previously written-to or added-to entries that "
+        "have not already been sent to these entries' owners. But "
+        "the vector you passed in has such entries. You need to call "
+        "compress() on the vector first, before passing it to this function."));
 
   // if the vector type supports parallel storage and if the vector actually
   // does store only part of the vector, distributing is slightly more
@@ -3654,7 +3671,6 @@ namespace internal
                 const size_type       column,
                 SparseMatrixIterator &matrix_values)
       {
-        (void)row;
         if (value != LocalType())
           {
             while (matrix_values->column() < column)

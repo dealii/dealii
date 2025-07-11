@@ -1,7 +1,7 @@
 // ------------------------------------------------------------------------
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
-// Copyright (C) 2020 - 2024 by the deal.II authors
+// Copyright (C) 2020 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -422,7 +422,6 @@ namespace VectorTools
                               /* starting_offset = */ 0,
                               fe_values,
                               function_values);
-            (void)offset;
             Assert(offset == n_components, ExcInternalError());
 
             FETools::convert_generalized_support_point_values_to_dof_values(
@@ -992,7 +991,6 @@ namespace VectorTools
       intergridmap.get_source_grid();
     const DoFHandler<dim, spacedim> &dof_handler_2 =
       intergridmap.get_destination_grid();
-    (void)dof_handler_2;
 
     Assert(
       dof_handler_1.get_fe_collection() == dof_handler_2.get_fe_collection(),

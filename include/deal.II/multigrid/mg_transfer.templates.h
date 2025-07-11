@@ -1,7 +1,7 @@
 // ------------------------------------------------------------------------
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
-// Copyright (C) 2003 - 2023 by the deal.II authors
+// Copyright (C) 2003 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -240,9 +240,6 @@ MGLevelGlobalTransfer<VectorType>::copy_to_mg(
       AssertThrowMPI(ierr);
 #endif
 
-      using dof_pair_iterator =
-        std::vector<std::pair<types::global_dof_index,
-                              types::global_dof_index>>::const_iterator;
       VectorType &dst_level = dst[level];
 
       // first copy local unknowns
@@ -303,9 +300,6 @@ MGLevelGlobalTransfer<VectorType>::copy_from_mg(
       AssertThrowMPI(ierr);
 #endif
 
-      using dof_pair_iterator =
-        std::vector<std::pair<types::global_dof_index,
-                              types::global_dof_index>>::const_iterator;
       const VectorType &src_level = src[level];
 
       // First copy all indices local to this process
@@ -351,9 +345,6 @@ MGLevelGlobalTransfer<VectorType>::copy_from_mg_add(
   // basis functions
   for (unsigned int level = src.min_level(); level <= src.max_level(); ++level)
     {
-      using dof_pair_iterator =
-        std::vector<std::pair<types::global_dof_index,
-                              types::global_dof_index>>::const_iterator;
       const VectorType &src_level = src[level];
 
       // First add all indices local to this process

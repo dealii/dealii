@@ -68,7 +68,8 @@ test()
   // build constraint matrix
   const IndexSet locally_relevant =
     DoFTools::extract_locally_relevant_dofs(dof);
-  AffineConstraints<double> constraints(locally_relevant);
+  AffineConstraints<double> constraints(dof.locally_owned_dofs(),
+                                        locally_relevant);
   DoFTools::make_hanging_node_constraints(dof, constraints);
   constraints.close();
 

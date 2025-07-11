@@ -1,7 +1,7 @@
 // ------------------------------------------------------------------------
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
-// Copyright (C) 2004 - 2023 by the deal.II authors
+// Copyright (C) 2004 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -1116,7 +1116,6 @@ namespace BlockMatrixIterators
     : matrix(matrix)
     , base_iterator(matrix->block(0, 0).begin())
   {
-    (void)col;
     Assert(col == 0, ExcNotImplemented());
 
     // check if this is a regular row or
@@ -1316,7 +1315,6 @@ namespace BlockMatrixIterators
     : matrix(matrix)
     , base_iterator(matrix->block(0, 0).begin())
   {
-    (void)col;
     Assert(col == 0, ExcNotImplemented());
     // check if this is a regular row or
     // the end of the matrix

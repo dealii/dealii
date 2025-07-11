@@ -1,7 +1,7 @@
 ## ------------------------------------------------------------------------
 ##
 ## SPDX-License-Identifier: LGPL-2.1-or-later
-## Copyright (C) 2013 - 2024 by the deal.II authors
+## Copyright (C) 2013 - 2025 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -14,21 +14,21 @@
 
 set(_src
   dof_info.cc
-  evaluation_template_factory.cc
+  evaluation_template_factory_inst1.cc
   evaluation_template_factory_inst2.cc
   evaluation_template_factory_inst3.cc
   evaluation_template_factory_inst4.cc
   evaluation_template_factory_inst5.cc
   evaluation_template_factory_inst6.cc
   evaluation_template_factory_hanging_nodes.cc
-  evaluation_template_face_factory.cc
+  evaluation_template_face_factory_inst1.cc
   evaluation_template_face_factory_inst2.cc
   evaluation_template_face_factory_inst3.cc
   evaluation_template_face_factory_inst4.cc
   evaluation_template_face_factory_inst5.cc
   evaluation_template_face_factory_inst6.cc
   fe_point_evaluation.cc
-  mapping_info.cc
+  mapping_info_inst1.cc
   mapping_info_inst2.cc
   mapping_info_inst3.cc
   matrix_free.cc
@@ -48,9 +48,11 @@ set(_inst
   shape_info.inst.in
   )
 
-file(GLOB _header
+file(GLOB _header CONFIGURE_DEPENDS
   ${CMAKE_SOURCE_DIR}/include/deal.II/matrix_free/*.h
   )
 
 define_object_library(object_matrix_free OBJECT ${_src} ${_header} ${_inst})
 expand_instantiations(object_matrix_free "${_inst}")
+
+collect_source_and_header_files("${_src}" "${_header}")

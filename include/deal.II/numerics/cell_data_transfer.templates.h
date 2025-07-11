@@ -1,7 +1,7 @@
 // ------------------------------------------------------------------------
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
-// Copyright (C) 2019 - 2023 by the deal.II authors
+// Copyright (C) 2019 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -127,14 +127,7 @@ CellDataTransfer<dim, spacedim, VectorType>::
         }
     }
 
-  if constexpr (running_in_debug_mode())
-    {
-      n_active_cells_pre = triangulation->n_active_cells();
-    }
-  else
-    {
-      (void)n_active_cells_pre;
-    }
+  n_active_cells_pre = triangulation->n_active_cells();
 }
 
 
@@ -150,10 +143,6 @@ CellDataTransfer<dim, spacedim, VectorType>::unpack(const VectorType &in,
              ExcDimensionMismatch(in.size(), n_active_cells_pre));
       Assert(out.size() == triangulation->n_active_cells(),
              ExcDimensionMismatch(out.size(), triangulation->n_active_cells()));
-    }
-  else
-    {
-      (void)n_active_cells_pre;
     }
 
   // Transfer data of persisting cells.

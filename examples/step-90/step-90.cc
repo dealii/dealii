@@ -1,7 +1,7 @@
 /* ------------------------------------------------------------------------
  *
  * SPDX-License-Identifier: LGPL-2.1-or-later
- * Copyright (C) 2024 by the deal.II authors
+ * Copyright (C) 2024 - 2025 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
@@ -666,7 +666,8 @@ namespace Step90
     level_set_constraints.clear();
     const IndexSet level_set_locally_relevant_dofs =
       DoFTools::extract_locally_relevant_dofs(level_set_dof_handler);
-    level_set_constraints.reinit(level_set_locally_relevant_dofs);
+    level_set_constraints.reinit(level_set_dof_handler.locally_owned_dofs(),
+                                 level_set_locally_relevant_dofs);
     DoFTools::make_hanging_node_constraints(level_set_dof_handler,
                                             level_set_constraints);
     level_set_constraints.close();

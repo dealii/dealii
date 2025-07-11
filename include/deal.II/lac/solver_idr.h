@@ -1,7 +1,7 @@
 // ------------------------------------------------------------------------
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
-// Copyright (C) 2019 - 2024 by the deal.II authors
+// Copyright (C) 2019 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -261,7 +261,6 @@ namespace internal
     block(VectorType &vector, const unsigned int b)
     {
       AssertDimension(b, 0);
-      (void)b;
       return vector;
     }
 

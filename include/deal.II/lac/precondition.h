@@ -1,7 +1,7 @@
 // ------------------------------------------------------------------------
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
-// Copyright (C) 1999 - 2024 by the deal.II authors
+// Copyright (C) 1999 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -3699,10 +3699,9 @@ namespace internal
     template <typename MatrixType, typename PreconditionerType>
     inline void
     initialize_preconditioner(
-      const MatrixType                    &matrix,
+      const MatrixType & /*matrix*/,
       std::shared_ptr<PreconditionerType> &preconditioner)
     {
-      (void)matrix;
       (void)preconditioner;
       AssertThrow(preconditioner.get() != nullptr, ExcNotInitialized());
     }

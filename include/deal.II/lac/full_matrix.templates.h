@@ -1,7 +1,7 @@
 // ------------------------------------------------------------------------
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
-// Copyright (C) 1999 - 2024 by the deal.II authors
+// Copyright (C) 1999 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -1835,7 +1835,6 @@ FullMatrix<number>::gauss_jordan()
   for (size_type i = 0; i < N; ++i)
     diagonal_sum += std::abs((*this)(i, i));
   const double typical_diagonal_element = diagonal_sum / N;
-  (void)typical_diagonal_element;
 
   // initialize the array that holds
   // the permutations that we find

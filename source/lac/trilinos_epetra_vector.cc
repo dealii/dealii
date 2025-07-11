@@ -1,7 +1,7 @@
 // ------------------------------------------------------------------------
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
-// Copyright (C) 2016 - 2024 by the deal.II authors
+// Copyright (C) 2016 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -114,7 +114,6 @@ namespace LinearAlgebra
         {
           const int ierr = vector->PutScalar(0.);
           Assert(ierr == 0, ExcTrilinosError(ierr));
-          (void)ierr;
         }
     }
 
@@ -169,7 +168,6 @@ namespace LinearAlgebra
               const int ierr =
                 vector->Import(V.trilinos_vector(), data_exchange, Insert);
               Assert(ierr == 0, ExcTrilinosError(ierr));
-              (void)ierr;
             }
           else
             vector = std::make_unique<Epetra_FEVector>(V.trilinos_vector());
@@ -187,7 +185,6 @@ namespace LinearAlgebra
 
       const int ierr = vector->PutScalar(s);
       Assert(ierr == 0, ExcTrilinosError(ierr));
-      (void)ierr;
 
       return *this;
     }
@@ -280,7 +277,6 @@ namespace LinearAlgebra
         {
           const int ierr = vector->Update(1., V.trilinos_vector(), 1.);
           Assert(ierr == 0, ExcTrilinosError(ierr));
-          (void)ierr;
         }
       else
         {
@@ -292,7 +288,6 @@ namespace LinearAlgebra
                                           data_exchange,
                                           Epetra_AddLocalAlso);
           Assert(ierr == 0, ExcTrilinosError(ierr));
-          (void)ierr;
         }
 
       return *this;
@@ -321,7 +316,6 @@ namespace LinearAlgebra
       double    result(0.);
       const int ierr = vector->Dot(V.trilinos_vector(), &result);
       Assert(ierr == 0, ExcTrilinosError(ierr));
-      (void)ierr;
 
       return result;
     }
@@ -348,7 +342,6 @@ namespace LinearAlgebra
 
       const int ierr = vector->Update(a, V.trilinos_vector(), 1.);
       Assert(ierr == 0, ExcTrilinosError(ierr));
-      (void)ierr;
     }
 
 
@@ -369,7 +362,6 @@ namespace LinearAlgebra
       const int ierr =
         vector->Update(a, V.trilinos_vector(), b, W.trilinos_vector(), 1.);
       Assert(ierr == 0, ExcTrilinosError(ierr));
-      (void)ierr;
     }
 
 
@@ -394,7 +386,6 @@ namespace LinearAlgebra
       const int ierr =
         vector->Multiply(1.0, scaling_factors.trilinos_vector(), *vector, 0.0);
       Assert(ierr == 0, ExcTrilinosError(ierr));
-      (void)ierr;
     }
 
 
@@ -410,7 +401,6 @@ namespace LinearAlgebra
           // Otherwise, just update
           int ierr = vector->Update(a, V.trilinos_vector(), 0.);
           Assert(ierr == 0, ExcTrilinosError(ierr));
-          (void)ierr;
         }
     }
 
@@ -452,7 +442,6 @@ namespace LinearAlgebra
 
       int ierr = vector->MeanValue(&mean_value);
       Assert(ierr == 0, ExcTrilinosError(ierr));
-      (void)ierr;
 
       return mean_value;
     }
@@ -465,7 +454,6 @@ namespace LinearAlgebra
       double norm(0.);
       int    ierr = vector->Norm1(&norm);
       Assert(ierr == 0, ExcTrilinosError(ierr));
-      (void)ierr;
 
       return norm;
     }
@@ -478,7 +466,6 @@ namespace LinearAlgebra
       double norm(0.);
       int    ierr = vector->Norm2(&norm);
       Assert(ierr == 0, ExcTrilinosError(ierr));
-      (void)ierr;
 
       return norm;
     }
@@ -491,7 +478,6 @@ namespace LinearAlgebra
       double norm(0.);
       int    ierr = vector->NormInf(&norm);
       Assert(ierr == 0, ExcTrilinosError(ierr));
-      (void)ierr;
 
       return norm;
     }
@@ -610,7 +596,6 @@ namespace LinearAlgebra
       int     ierr = vector->ExtractView(&val, &leading_dimension);
 
       Assert(ierr == 0, ExcTrilinosError(ierr));
-      (void)ierr;
       out.precision(precision);
       if (scientific)
         out.setf(std::ios::scientific, std::ios::floatfield);

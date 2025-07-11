@@ -1,7 +1,7 @@
 // ------------------------------------------------------------------------
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
-// Copyright (C) 2008 - 2024 by the deal.II authors
+// Copyright (C) 2008 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -22,11 +22,15 @@
 #  include <deal.II/lac/trilinos_sparse_matrix.h>
 #  include <deal.II/lac/trilinos_vector.h>
 
+DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
+
 #  include <AztecOO_StatusTest.h>
 #  include <AztecOO_StatusTestCombo.h>
 #  include <AztecOO_StatusTestMaxIters.h>
 #  include <AztecOO_StatusTestResNorm.h>
 #  include <AztecOO_StatusType.h>
+
+DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
 
 #  include <cmath>
 #  include <limits>

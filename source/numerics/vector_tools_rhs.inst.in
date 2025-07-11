@@ -1,7 +1,7 @@
 // ------------------------------------------------------------------------
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
-// Copyright (C) 2013 - 2020 by the deal.II authors
+// Copyright (C) 2013 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -35,6 +35,24 @@ for (VEC : REAL_VECTOR_TYPES; deal_II_dimension : DIMENSIONS;
         const Function<deal_II_space_dimension, VEC::value_type> &,
         VEC &,
         const AffineConstraints<VEC::value_type> &);
+
+      template void
+      create_right_hand_side<deal_II_dimension, deal_II_space_dimension, VEC>(
+        const hp::MappingCollection<deal_II_dimension, deal_II_space_dimension>
+          &,
+        const DoFHandler<deal_II_dimension, deal_II_space_dimension> &,
+        const hp::QCollection<deal_II_dimension> &,
+        const Function<deal_II_space_dimension, VEC::value_type> &,
+        VEC &,
+        const AffineConstraints<VEC::value_type> &);
+
+      template void
+      create_right_hand_side<deal_II_dimension, deal_II_space_dimension, VEC>(
+        const DoFHandler<deal_II_dimension, deal_II_space_dimension> &,
+        const hp::QCollection<deal_II_dimension> &,
+        const Function<deal_II_space_dimension, VEC::value_type> &,
+        VEC &,
+        const AffineConstraints<VEC::value_type> &);
     \}
 #endif
   }
@@ -48,27 +66,6 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
     \{
 
 #if deal_II_dimension == deal_II_space_dimension
-      template void
-      create_right_hand_side<deal_II_dimension,
-                             deal_II_space_dimension,
-                             Vector<double>>(
-        const hp::MappingCollection<deal_II_dimension> &,
-        const DoFHandler<deal_II_dimension> &,
-        const hp::QCollection<deal_II_dimension> &,
-        const Function<deal_II_space_dimension, Vector<double>::value_type> &,
-        Vector<double> &,
-        const AffineConstraints<double> &);
-
-      template void
-      create_right_hand_side<deal_II_dimension,
-                             deal_II_space_dimension,
-                             Vector<double>>(
-        const DoFHandler<deal_II_dimension> &,
-        const hp::QCollection<deal_II_dimension> &,
-        const Function<deal_II_space_dimension, Vector<double>::value_type> &,
-        Vector<double> &,
-        const AffineConstraints<double> &);
-
 #  if deal_II_dimension > 1
       template void
       create_boundary_right_hand_side<deal_II_dimension,

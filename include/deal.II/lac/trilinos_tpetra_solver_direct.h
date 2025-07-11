@@ -1,7 +1,7 @@
 // ------------------------------------------------------------------------
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
-// Copyright (C) 2024 by the deal.II authors
+// Copyright (C) 2024 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -32,11 +32,12 @@
 #    include <deal.II/lac/solver_control.h>
 #    include <deal.II/lac/trilinos_tpetra_sparse_matrix.h>
 
+DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
 #    include <Amesos2.hpp>
 #    include <Teuchos_ConfigDefs.hpp>
 #    include <Teuchos_ParameterList.hpp>
 #    include <Teuchos_RCPDecl.hpp>
-
+DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -312,6 +313,14 @@ namespace LinearAlgebra
 DEAL_II_NAMESPACE_CLOSE
 
 #  endif // DEAL_II_TRILINOS_WITH_AMESOS2
-#endif   // DEAL_II_TRILINOS_WITH_TPETRA
+#else
+
+// Make sure the scripts that create the C++20 module input files have
+// something to latch on if the preprocessor #ifdef above would
+// otherwise lead to an empty content of the file.
+DEAL_II_NAMESPACE_OPEN
+DEAL_II_NAMESPACE_CLOSE
+
+#endif // DEAL_II_TRILINOS_WITH_TPETRA
 
 #endif

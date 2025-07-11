@@ -1,7 +1,7 @@
 // ------------------------------------------------------------------------
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
-// Copyright (C) 2009 - 2024 by the deal.II authors
+// Copyright (C) 2009 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -33,10 +33,14 @@
 
 
 #ifdef DEAL_II_WITH_TRILINOS
+
+DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
 #  include <Epetra_Map.h>
 #  ifdef DEAL_II_TRILINOS_WITH_TPETRA
 #    include <Tpetra_Map.hpp>
 #  endif
+DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
+
 #endif
 
 #ifdef DEAL_II_WITH_PETSC

@@ -1,7 +1,0 @@
-New: Configuration and CI job for pre-commit.
-The tool pre-commit can install hooks into the local git repo.
-These will be run on every call to git commit and perform some quick checks
-on the changeset.
-The CI job runs these checks on the whole codebase.
-<br>
-(Jan Philipp Thiele, 2024/11/27)

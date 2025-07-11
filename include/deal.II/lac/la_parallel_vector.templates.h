@@ -1,7 +1,7 @@
 // ------------------------------------------------------------------------
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
-// Copyright (C) 2012 - 2024 by the deal.II authors
+// Copyright (C) 2012 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -334,11 +334,9 @@ namespace LinearAlgebra
           types::global_dof_index      &allocated_size,
           ::dealii::MemorySpace::MemorySpaceData<Number,
                                                  ::dealii::MemorySpace::Default>
-                        &data,
-          const MPI_Comm comm_sm)
+            &data,
+          const MPI_Comm /*comm_sm*/)
         {
-          (void)comm_sm;
-
           static_assert(
             std::is_same_v<Number, float> || std::is_same_v<Number, double>,
             "Number should be float or double for Default memory space");

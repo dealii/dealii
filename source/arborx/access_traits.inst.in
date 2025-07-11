@@ -18,6 +18,7 @@ for (DIM : DIMENSIONS; SCALAR : REAL_SCALARS)
     DEAL_II_NAMESPACE_OPEN
     namespace ArborXWrappers
     {
+#if ARBORX_VERSION_MAJOR < 2
       template PointIntersectPredicate::PointIntersectPredicate(
         const std::vector<dealii::Point<DIM, SCALAR>> &points);
       template PointNearestPredicate::PointNearestPredicate(
@@ -37,11 +38,23 @@ for (DIM : DIMENSIONS; SCALAR : REAL_SCALARS)
         const std::vector<std::pair<dealii::Point<DIM, SCALAR>, SCALAR>>
                           &spheres,
         const unsigned int n_nearest_neighbors);
+#else
+      template class PointIntersectPredicate<DIM, SCALAR>;
+      template class PointNearestPredicate<DIM, SCALAR>;
+
+      template class BoundingBoxIntersectPredicate<DIM, SCALAR>;
+      template class BoundingBoxNearestPredicate<DIM, SCALAR>;
+
+      template class SphereIntersectPredicate<DIM, SCALAR>;
+      template class SphereNearestPredicate<DIM, SCALAR>;
+#endif
     \}
     DEAL_II_NAMESPACE_CLOSE
 
     namespace ArborX
     {
+
+#if ARBORX_VERSION_MAJOR < 2
       template struct AccessTraits<std::vector<dealii::Point<DIM, SCALAR>>,
                                    PrimitivesTag>;
 
@@ -52,5 +65,14 @@ for (DIM : DIMENSIONS; SCALAR : REAL_SCALARS)
       template struct AccessTraits<
         std::vector<std::pair<dealii::Point<DIM, SCALAR>, SCALAR>>,
         PrimitivesTag>;
+#else
+      template struct AccessTraits<std::vector<dealii::Point<DIM, SCALAR>>>;
+
+      template struct AccessTraits<
+        std::vector<dealii::BoundingBox<DIM, SCALAR>>>;
+
+      template struct AccessTraits<
+        std::vector<std::pair<dealii::Point<DIM, SCALAR>, SCALAR>>>;
+#endif
     \}
   }

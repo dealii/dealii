@@ -1,7 +1,7 @@
 // ------------------------------------------------------------------------
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
-// Copyright (C) 1998 - 2024 by the deal.II authors
+// Copyright (C) 1998 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -756,8 +756,7 @@ namespace internal
     dealii::hp::FESubfaceValues<dim, spacedim> &fe_subface_values,
     const typename KellyErrorEstimator<dim, spacedim>::Strategy strategy)
   {
-    const auto neighbor = cell->neighbor(face_no);
-    (void)neighbor;
+    const auto         neighbor           = cell->neighbor(face_no);
     const unsigned int n_solution_vectors = solutions.size();
     const auto         face               = cell->face(face_no);
 
@@ -1068,9 +1067,9 @@ template <int dim, int spacedim>
 template <typename Number>
 void
 KellyErrorEstimator<dim, spacedim>::estimate(
-  const Mapping<dim, spacedim>    &mapping,
-  const DoFHandler<dim, spacedim> &dof_handler,
-  const hp::QCollection<dim - 1>  &quadrature,
+  const hp::MappingCollection<dim, spacedim> &mapping,
+  const DoFHandler<dim, spacedim>            &dof_handler,
+  const hp::QCollection<dim - 1>             &quadrature,
   const std::map<types::boundary_id, const Function<spacedim, Number> *>
                            &neumann_bc,
   const ReadVector<Number> &solution,
@@ -1105,6 +1104,7 @@ template <int dim, int spacedim>
 template <typename Number>
 void
 KellyErrorEstimator<dim, spacedim>::estimate(
+  const Mapping<dim, spacedim>    &mapping,
   const DoFHandler<dim, spacedim> &dof_handler,
   const hp::QCollection<dim - 1>  &quadrature,
   const std::map<types::boundary_id, const Function<spacedim, Number> *>
@@ -1118,7 +1118,47 @@ KellyErrorEstimator<dim, spacedim>::estimate(
   const types::material_id  material_id,
   const Strategy            strategy)
 {
-  estimate(get_default_linear_mapping(dof_handler.get_triangulation()),
+  // DEPRECATED
+  // just pass on to the other function
+  std::vector<const ReadVector<Number> *> solutions(1, &solution);
+  std::vector<Vector<float> *>            errors(1, &error);
+  ArrayView<Vector<float> *>              error_view = make_array_view(errors);
+  const hp::MappingCollection<dim, spacedim> mapping_collection(mapping);
+  estimate(mapping_collection,
+           dof_handler,
+           quadrature,
+           neumann_bc,
+           make_array_view(solutions),
+           error_view,
+           component_mask,
+           coefficients,
+           n_threads,
+           subdomain_id,
+           material_id,
+           strategy);
+}
+
+
+template <int dim, int spacedim>
+template <typename Number>
+void
+KellyErrorEstimator<dim, spacedim>::estimate(
+  const DoFHandler<dim, spacedim> &dof_handler,
+  const hp::QCollection<dim - 1>  &quadrature,
+  const std::map<types::boundary_id, const Function<spacedim, Number> *>
+                           &neumann_bc,
+  const ReadVector<Number> &solution,
+  Vector<float>            &error,
+  const ComponentMask      &component_mask,
+  const Function<spacedim> *coefficients,
+  const unsigned int        n_threads,
+  const types::subdomain_id subdomain_id,
+  const types::material_id  material_id,
+  const Strategy            strategy)
+{
+  const hp::MappingCollection<dim, spacedim> mapping(
+    get_default_linear_mapping(dof_handler.get_triangulation()));
+  estimate(mapping,
            dof_handler,
            quadrature,
            neumann_bc,
@@ -1138,9 +1178,9 @@ template <int dim, int spacedim>
 template <typename Number>
 void
 KellyErrorEstimator<dim, spacedim>::estimate(
-  const Mapping<dim, spacedim>    &mapping,
-  const DoFHandler<dim, spacedim> &dof_handler,
-  const hp::QCollection<dim - 1>  &face_quadratures,
+  const hp::MappingCollection<dim, spacedim> &mapping,
+  const DoFHandler<dim, spacedim>            &dof_handler,
+  const hp::QCollection<dim - 1>             &face_quadratures,
   const std::map<types::boundary_id, const Function<spacedim, Number> *>
                                               &neumann_bc,
   const ArrayView<const ReadVector<Number> *> &solutions,
@@ -1171,7 +1211,6 @@ KellyErrorEstimator<dim, spacedim>::estimate(
     }
 
   const unsigned int n_components = dof_handler.get_fe(0).n_components();
-  (void)n_components;
 
   // sanity checks
   Assert(solutions.size() > 0, ExcNoSolutions());
@@ -1213,11 +1252,10 @@ KellyErrorEstimator<dim, spacedim>::estimate(
 
   // all the data needed in the error estimator by each of the threads is
   // gathered in the following structures
-  const hp::MappingCollection<dim, spacedim> mapping_collection(mapping);
   const internal::ParallelData<dim, spacedim, Number> parallel_data(
     dof_handler.get_fe_collection(),
     face_quadratures,
-    mapping_collection,
+    mapping,
     (!neumann_bc.empty() || (coefficients != nullptr)),
     solutions.size(),
     subdomain_id,
@@ -1307,6 +1345,43 @@ void
 KellyErrorEstimator<dim, spacedim>::estimate(
   const Mapping<dim, spacedim>    &mapping,
   const DoFHandler<dim, spacedim> &dof_handler,
+  const hp::QCollection<dim - 1>  &quadrature,
+  const std::map<types::boundary_id, const Function<spacedim, Number> *>
+                                              &neumann_bc,
+  const ArrayView<const ReadVector<Number> *> &solutions,
+  ArrayView<Vector<float> *>                  &errors,
+  const ComponentMask                         &component_mask,
+  const Function<spacedim>                    *coefficients,
+  const unsigned int                           n_threads,
+  const types::subdomain_id                    subdomain_id,
+  const types::material_id                     material_id,
+  const Strategy                               strategy)
+{
+  // DEPRECATED
+  // just pass on to the other function
+  const hp::MappingCollection<dim, spacedim> mapping_collection(mapping);
+  estimate(mapping_collection,
+           dof_handler,
+           quadrature,
+           neumann_bc,
+           solutions,
+           errors,
+           component_mask,
+           coefficients,
+           n_threads,
+           subdomain_id,
+           material_id,
+           strategy);
+}
+
+
+
+template <int dim, int spacedim>
+template <typename Number>
+void
+KellyErrorEstimator<dim, spacedim>::estimate(
+  const Mapping<dim, spacedim>    &mapping,
+  const DoFHandler<dim, spacedim> &dof_handler,
   const Quadrature<dim - 1>       &quadrature,
   const std::map<types::boundary_id, const Function<spacedim, Number> *>
                                               &neumann_bc,
@@ -1319,10 +1394,11 @@ KellyErrorEstimator<dim, spacedim>::estimate(
   const types::material_id                     material_id,
   const Strategy                               strategy)
 {
-  // forward to the function with the QCollection
-  estimate(mapping,
+  const hp::MappingCollection<dim, spacedim> mapping_collection(mapping);
+  const hp::QCollection<dim - 1>             quadrature_collection(quadrature);
+  estimate(mapping_collection,
            dof_handler,
-           hp::QCollection<dim - 1>(quadrature),
+           quadrature_collection,
            neumann_bc,
            solutions,
            errors,
@@ -1385,7 +1461,9 @@ KellyErrorEstimator<dim, spacedim>::estimate(
   const types::material_id                     material_id,
   const Strategy                               strategy)
 {
-  estimate(get_default_linear_mapping(dof_handler.get_triangulation()),
+  const hp::MappingCollection<dim, spacedim> mapping(
+    get_default_linear_mapping(dof_handler.get_triangulation()));
+  estimate(mapping,
            dof_handler,
            quadrature,
            neumann_bc,

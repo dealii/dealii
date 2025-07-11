@@ -31,7 +31,7 @@ functions and that, after discretization of the whole problem, are not
 tied to one of the cells of the mesh. As a consequence, we call these
 unknowns *non-local degrees of freedom* to represent that they are not
 tied to a specific locality: They represent something that does not
-depend to the spatial variable $\mathbf x$ at all, and is not the
+depend on the spatial variable $\mathbf x$ at all, and is not the
 result of a discretization process.
 
 Before going into how we solve this issue, let us first state the concrete set of equations.
@@ -197,7 +197,7 @@ unknowns come last. However, the fact that we need to spell out such
 a convention should give you a hint that something with this kind of
 design is wrong. Most codes which would use a convention like this
 will, almost certainly, leave this convention implicit (something
-for the programer to know about) rather than enforcing it
+for the programmer to know about) rather than enforcing it
 explicitly (say, in the form of a function `mesh_dof_to_linear_system_index()`).
 It is then very easy for a number of bugs to emerge.
 For example, we can not renumber all degrees of freedom with the

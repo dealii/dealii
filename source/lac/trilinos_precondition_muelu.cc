@@ -1,7 +1,7 @@
 // ------------------------------------------------------------------------
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
-// Copyright (C) 2015 - 2023 by the deal.II authors
+// Copyright (C) 2015 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -147,9 +147,6 @@ namespace TrilinosWrappers
                ExcDimensionMismatch(n_rows,
                                     TrilinosWrappers::global_length(
                                       distributed_constant_modes)));
-
-        (void)n_relevant_rows;
-        (void)global_length;
 
         // Reshape null space as a contiguous vector of doubles so that
         // Trilinos can read from it.

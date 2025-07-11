@@ -1,7 +1,7 @@
 // ------------------------------------------------------------------------
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
-// Copyright (C) 1998 - 2024 by the deal.II authors
+// Copyright (C) 1998 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -261,9 +261,11 @@ namespace internal
       insert_constraint(const size_type constrained_local_dof);
 
       /**
-       * Return the number of constrained dofs in the structure. Constrained
-       * dofs do not contribute directly to the matrix, but are needed in order
-       * to set matrix diagonals and resolve inhomogeneities.
+       * Return the number of degrees of freedom for which this object
+       * stores constraints. Note that this is the number of degrees
+       * of freedom for which the *current* MPI process stores
+       * constraints, not the total number of constrained degrees of
+       * freedom across all processes.
        */
       size_type
       n_constraints() const;
@@ -2833,7 +2835,6 @@ AffineConstraints<number>::merge(
   const MergeConflictBehavior            merge_conflict_behavior,
   const bool                             allow_different_local_lines)
 {
-  (void)allow_different_local_lines;
   Assert(allow_different_local_lines ||
            local_lines == other_constraints.local_lines,
          ExcMessage(

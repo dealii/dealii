@@ -1,7 +1,7 @@
 ## ------------------------------------------------------------------------
 ##
 ## SPDX-License-Identifier: LGPL-2.1-or-later
-## Copyright (C) 2021 - 2023 by the deal.II authors
+## Copyright (C) 2021 - 2025 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -27,11 +27,27 @@ set_if_empty(ARBORX_DIR "$ENV{ARBORX_DIR}")
 
 # silence a warning when including FindKOKKOS.cmake
 set(CMAKE_CXX_EXTENSIONS OFF)
-find_package(ArborX 1.3 QUIET
+find_package(ArborX QUIET
   HINTS ${ARBORX_DIR} ${ArborX_DIR} $ENV{ArborX_DIR}
   )
 
+#
+# ArborX's compatibility mode is set to SameMajorVersion. Therefore if we
+# want to support both the 1.X and the 2.X, we cannot set a minimum
+# version in find_package. Instead we need to check the minimum version
+# ourselves.
+#
 if(ArborX_FOUND)
+  if(ArborX_VERSION VERSION_LESS 1.3)
+    message(STATUS "Found ArborX version ${ArborX_VERSION} but the minimum version supported is 1.3")
+    unset(ArborX_FOUND)
+  endif()
+endif()
+
+
+if(ArborX_FOUND)
+  set(ARBORX_VERSION ${ArborX_VERSION})
+
   get_property(ARBORX_INSTALL_INCLUDE_DIR TARGET ArborX::ArborX PROPERTY INTERFACE_INCLUDE_DIRECTORIES)
 
   #

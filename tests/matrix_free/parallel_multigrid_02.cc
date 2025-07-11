@@ -107,7 +107,7 @@ do_test(const DoFHandler<dim> &dof)
 
   // fine-level constraints
   AffineConstraints<double> constraints;
-  constraints.reinit(locally_relevant_dofs);
+  constraints.reinit(dof.locally_owned_dofs(), locally_relevant_dofs);
   DoFTools::make_hanging_node_constraints(dof, constraints);
   VectorTools::interpolate_boundary_values(dof,
                                            dirichlet_boundary,
@@ -174,7 +174,7 @@ do_test(const DoFHandler<dim> &dof)
       AffineConstraints<double> level_constraints;
       const IndexSet            relevant_dofs =
         DoFTools::extract_locally_relevant_level_dofs(dof, level);
-      level_constraints.reinit(relevant_dofs);
+      level_constraints.reinit(dof.locally_owned_mg_dofs(level), relevant_dofs);
       level_constraints.add_lines(
         mg_constrained_dofs.get_boundary_indices(level));
       level_constraints.close();

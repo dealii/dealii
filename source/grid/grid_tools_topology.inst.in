@@ -60,6 +60,14 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
       get_all_vertices_at_boundary(
         const Triangulation<deal_II_dimension, deal_II_space_dimension> &tria);
 
+#  if deal_II_dimension == 2
+      template std::vector<
+        std::vector<std::pair<unsigned int, Point<deal_II_space_dimension>>>>
+      extract_ordered_boundary_vertices(
+        const Triangulation<deal_II_dimension, deal_II_space_dimension> &tria,
+        const Mapping<deal_II_dimension, deal_II_space_dimension> &mapping);
+#  endif
+
       template std::vector<
         std::set<Triangulation<deal_II_dimension,
                                deal_II_space_dimension>::active_cell_iterator>>

@@ -58,6 +58,12 @@ if(POLICY CMP0167)
   cmake_policy(SET CMP0167 NEW)
 endif()
 
+if(POLICY CMP0177)
+  # Introduced in CMAKE 3:31: Normalize DESTINATION paths so that they do
+  # not contain "." or "..".
+  cmake_policy(SET CMP0177 NEW)
+endif()
+
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/modules/)
 
 #

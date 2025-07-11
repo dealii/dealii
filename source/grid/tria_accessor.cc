@@ -1,7 +1,7 @@
 // ------------------------------------------------------------------------
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
-// Copyright (C) 1998 - 2024 by the deal.II authors
+// Copyright (C) 1998 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -1584,7 +1584,10 @@ template <>
 double
 TriaAccessor<2, 2, 2>::extent_in_direction(const unsigned int axis) const
 {
-  const unsigned int lines[2][2] = {
+  Assert(this->reference_cell() == ReferenceCells::Quadrilateral,
+         ExcNotImplemented());
+
+  constexpr unsigned int lines[2][2] = {
     {2, 3},  //  Lines along x-axis, see GeometryInfo
     {0, 1}}; //  Lines along y-axis
 
@@ -1598,7 +1601,10 @@ template <>
 double
 TriaAccessor<2, 2, 3>::extent_in_direction(const unsigned int axis) const
 {
-  const unsigned int lines[2][2] = {
+  Assert(this->reference_cell() == ReferenceCells::Quadrilateral,
+         ExcNotImplemented());
+
+  constexpr unsigned int lines[2][2] = {
     {2, 3},  //  Lines along x-axis, see GeometryInfo
     {0, 1}}; //  Lines along y-axis
 
@@ -1613,17 +1619,20 @@ template <>
 double
 TriaAccessor<3, 3, 3>::extent_in_direction(const unsigned int axis) const
 {
-  const unsigned int lines[3][4] = {
+  Assert(this->reference_cell() == ReferenceCells::Hexahedron,
+         ExcNotImplemented());
+
+  constexpr unsigned int lines[3][4] = {
     {2, 3, 6, 7},    // Lines along x-axis, see GeometryInfo
     {0, 1, 4, 5},    // Lines along y-axis
     {8, 9, 10, 11}}; // Lines along z-axis
 
   AssertIndexRange(axis, 3);
 
-  double lengths[4] = {this->line(lines[axis][0])->diameter(),
-                       this->line(lines[axis][1])->diameter(),
-                       this->line(lines[axis][2])->diameter(),
-                       this->line(lines[axis][3])->diameter()};
+  const double lengths[4] = {this->line(lines[axis][0])->diameter(),
+                             this->line(lines[axis][1])->diameter(),
+                             this->line(lines[axis][2])->diameter(),
+                             this->line(lines[axis][3])->diameter()};
 
   return std::max({lengths[0], lengths[1], lengths[2], lengths[3]});
 }
@@ -2686,10 +2695,9 @@ CellAccessor<dim, spacedim>::has_periodic_neighbor(
   AssertIndexRange(i_face, this->n_faces());
   using cell_iterator = TriaIterator<CellAccessor<dim, spacedim>>;
 
-  cell_iterator current_cell(*this);
-  if (this->tria->periodic_face_map.find(
-        std::make_pair(current_cell, i_face)) !=
-      this->tria->periodic_face_map.end())
+  if (at_boundary(i_face) && this->tria->periodic_face_map.find(
+                               std::make_pair(cell_iterator(*this), i_face)) !=
+                               this->tria->periodic_face_map.end())
     return true;
   return false;
 }

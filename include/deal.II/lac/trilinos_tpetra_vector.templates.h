@@ -1,7 +1,7 @@
 // ------------------------------------------------------------------------
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
-// Copyright (C) 2018 - 2024 by the deal.II authors
+// Copyright (C) 2018 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -338,6 +338,12 @@ namespace LinearAlgebra
       //  - First case: both vectors have the same layout.
       //  - Second case: both vectors have the same size but different layout.
       //  - Third case: the vectors have different size.
+
+      AssertThrow(V.compressed,
+                  ExcMessage("Cannot copy-assign from a vector that has not "
+                             "been compressed. Please call compress() on the "
+                             "source vector before using operator=()."));
+
       if (vector->getMap()->isSameAs(*V.vector->getMap()))
         {
           // Create a read-only Kokkos view from the source vector
@@ -444,7 +450,6 @@ namespace LinearAlgebra
     Vector<Number, MemorySpace> &
     Vector<Number, MemorySpace>::operator=(const Number s)
     {
-      (void)s;
       Assert(s == Number(0.0),
              ExcMessage("Only 0 can be assigned to a vector."));
 
@@ -1215,6 +1220,14 @@ namespace LinearAlgebra
   } // namespace TpetraWrappers
 } // namespace LinearAlgebra
 
+DEAL_II_NAMESPACE_CLOSE
+
+#else
+
+// Make sure the scripts that create the C++20 module input files have
+// something to latch on if the preprocessor #ifdef above would
+// otherwise lead to an empty content of the file.
+DEAL_II_NAMESPACE_OPEN
 DEAL_II_NAMESPACE_CLOSE
 
 #endif

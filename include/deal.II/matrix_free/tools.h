@@ -1,7 +1,7 @@
 // ------------------------------------------------------------------------
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
-// Copyright (C) 2020 - 2024 by the deal.II authors
+// Copyright (C) 2020 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -1420,7 +1420,7 @@ namespace MatrixFreeTools
             Kokkos::parallel_for(
               Kokkos::TeamThreadRange(data->team_member,
                                       dofs_per_cell / n_components),
-              [&](int j) {
+              [&](unsigned int j) {
                 typename decltype(fe_eval)::value_type val = {};
 
                 if constexpr (n_components == 1)

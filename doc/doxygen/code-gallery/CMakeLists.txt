@@ -1,6 +1,6 @@
 ## ------------------------------------------------------------------------
 ##
-## Copyright (C) 2015 - 2023 by the deal.II Authors
+## Copyright (C) 2015 - 2024 by the deal.II Authors
 ##
 ## This file is part of the deal.II library.
 ##

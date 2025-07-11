@@ -1,7 +1,7 @@
 /* ------------------------------------------------------------------------
  *
  * SPDX-License-Identifier: LGPL-2.1-or-later
- * Copyright (C) 2008 - 2024 by the deal.II authors
+ * Copyright (C) 2008 - 2025 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
@@ -390,7 +390,7 @@ namespace Step22
   // the vector-valued velocity components and of order <code>degree</code>
   // for the pressure.  This gives the LBB-stable element pair
   // $Q_{degree+1}^d\times Q_{degree}$, often referred to as the Taylor-Hood
-  // element.
+  // element for degree$\geq 1$.
   //
   // Note that we initialize the triangulation with a MeshSmoothing argument,
   // which ensures that the refinement of cells is done in a way that the

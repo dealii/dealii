@@ -1,0 +1,4 @@
+
+DEAL::ParameterHandler::ExcEntryUndeclared(entry_string)
+DEAL::ParameterHandler threw an exception with the following message:
+    You can't ask for entry <undefined double 1> you have not yet declared.

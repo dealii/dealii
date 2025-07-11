@@ -1,5 +1,0 @@
-Fix: Add the missing `compressed = false` in TpetraWrappers::Vector::add()
-function to ensure distributed Tpetra vector with writable nonlocal
-entries will always be non-compressed after any entry addition.
-<br>
-(Qingyuan Shi, 2024/08/28)

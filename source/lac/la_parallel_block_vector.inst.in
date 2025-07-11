@@ -1,7 +1,7 @@
 // ------------------------------------------------------------------------
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
-// Copyright (C) 2011 - 2023 by the deal.II authors
+// Copyright (C) 2011 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -23,12 +23,9 @@ for (SCALAR : REAL_AND_COMPLEX_SCALARS)
 #ifdef DEAL_II_HAVE_CXX20
         static_assert(concepts::is_vector_space_vector<
                       BlockVector<SCALAR, ::dealii::MemorySpace::Host>>);
-        static_assert(concepts::is_vector_space_vector<
-                      BlockVector<SCALAR, ::dealii::MemorySpace::Default>>);
 #endif
 
         template class BlockVector<SCALAR, ::dealii::MemorySpace::Host>;
-        template class BlockVector<SCALAR, ::dealii::MemorySpace::Default>;
 
         template void
         BlockVector<SCALAR, ::dealii::MemorySpace::Host>::
@@ -69,6 +66,26 @@ for (SCALAR : REAL_AND_COMPLEX_SCALARS)
       \}
     \}
   }
+
+
+
+for (SCALAR : REAL_SCALARS)
+  {
+    namespace LinearAlgebra
+    \{
+      namespace distributed
+      \{
+#ifdef DEAL_II_HAVE_CXX20
+        static_assert(concepts::is_vector_space_vector<
+                      BlockVector<SCALAR, ::dealii::MemorySpace::Default>>);
+#endif
+
+        template class BlockVector<SCALAR, ::dealii::MemorySpace::Default>;
+      \}
+    \}
+  }
+
+
 
 for (S1 : REAL_AND_COMPLEX_SCALARS; S2 : REAL_SCALARS)
   {
