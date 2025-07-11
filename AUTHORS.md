@@ -1,0 +1,459 @@
+deal.II Authors
+===============
+
+deal.II is a global project: It is run by a group of principal developers,
+and a very large number of contributors have provided substantial patches
+over the years.
+
+Principal developers
+--------------------
+
+ - Daniel Arndt, Oak Ridge National Laboratory, USA
+ - Wolfgang Bangerth, Colorado State University, CO, USA
+ - Bruno Blais, Polytechnique Montréal, Canada
+ - Marc Fehling, Charles University, Czech Republic
+ - Rene Gassmoeller, GEOMAR Helmholtz Centre for Ocean Research, Kiel, Germany
+ - Timo Heister, Clemson University, SC, USA
+ - Luca Heltai, University of Pisa, Italy
+ - Martin Kronbichler, Ruhr University Bochum, Germany
+ - Matthias Maier, Texas A&M University, College Station, TX, USA
+ - Peter Munch, Technical University of Berlin, Germany
+ - Jean-Paul Pelteret, Independent Researcher, Germany
+ - Bruno Turcksin, Oak Ridge National Laboratory, USA
+ - David Wells, University of North Carolina, Chapel Hill, NC, USA
+
+Developers emeriti
+------------------
+
+ - Denis Davydov, Independent Researcher, Germany
+ - Ralf Hartmann, DLR, Germany
+ - Guido Kanschat, Heidelberg University, Germany
+ - Toby D. Young, Polish Academy of Sciences, Poland
+
+Contributors
+------------
+
+Many people have contributed to deal.II over the years, many of them very
+substantial parts of the library. Their work is greatly appreciated: No
+open source project can survice without a community. The following people
+(in alphabetical order) have contributed to the library, with many more who
+have sent in fixes and small enhancements -- thank you!
+
+ - Laryssa Abdala
+ - Pasquale Africa
+ - Ashna Aggarwal
+ - Mihai Alexe
+ - Moritz Allmaras
+ - Fahad Alrashed
+ - Giovanni Alzetta
+ - Ilona Ambartsumyan
+ - Michael Anderson
+ - Julian Andrej
+ - Mathias Anselmann
+ - Daniel Appel
+ - Juan Carlos Araujo Cabarcas
+ - Henry Arhin
+ - Daniel Arndt
+ - Rajat Arora
+ - Arpit Babbar
+ - Andrew Baker
+ - Abbas Ballout
+ - Wolfgang Bangerth
+ - Mauro Bardelloni
+ - Nicolas Barnafi
+ - Alistair Bentley
+ - Maximilian Bergbauer
+ - Kirana Bergstrom
+ - Manaswinee Bezbaruah
+ - Nistha Bhawsinka
+ - Bruno Blais
+ - Alexander Blank
+ - Vishal Boddu
+ - Andrea Bonito
+ - Marco Borelli
+ - Benjamin Brands
+ - Julian Brotz
+ - Claire Bruna-Rosso
+ - Michele Bucelli
+ - Till Budde
+ - John Burnell
+ - Alfredo Buttari
+ - Krysztof Bzowski
+ - Markus Bürg
+ - Yong-Yong Cai
+ - Marcus Calhoun-Lopez
+ - Bruna Campos
+ - Lucas Campos
+ - Nicholas Cantrell
+ - Xiaoming Cao
+ - Brian Carnes
+ - Daniel Castanon Quiroz
+ - David F. Castellanos
+ - Fabian Castelli
+ - Nicola Cavallini
+ - Jordan Cazamias
+ - Praveen Chandrashekar
+ - Chayapol Chaoveeraprasit
+ - Huimin Chen
+ - Jie Cheng
+ - Jerett Cherry
+ - Joshua Christopher
+ - Ivan Christov
+ - Pi-Yueh Chuang
+ - Chih-Che Chueh
+ - Emma Cinatl
+ - Thomas C. Clevenger
+ - Terry Cojean
+ - Ester Comellas
+ - Katherine Cosburn
+ - Dario Coscia
+ - John Coughlin
+ - Sam Cox
+ - Cu Cui
+ - Nikita Daniliuk
+ - Juliane Dannberg
+ - Sambit Das
+ - Andrew Davis
+ - Denis Davydov
+ - Elias Dejene
+ - Nicola Demo
+ - Chaitanya Dev
+ - Ginkgo developers
+ - Giovanni Di Ilio
+ - Minh Do-Quang
+ - Stefano Dominici
+ - Nivesh Dommaraju
+ - Brett Dong
+ - Kevin Drzycimski
+ - Kevin Dugan
+ - Toni El Geitani Nehme
+ - Luel Emishaw
+ - Marco Engelhard
+ - Anton Ermakov
+ - Patrick Esser
+ - Anton Evgrafov
+ - Crystal Farris
+ - Marco Feder
+ - Marc Fehling
+ - Niklas Fehn
+ - Emmanuel Ferdman
+ - Federico Fernandez
+ - Isuru Fernando
+ - Rebecca Fildes
+ - Andreas Fink
+ - Salvador Flores
+ - Corbin Foucart
+ - Menno Fraters
+ - Johannes Friedlein
+ - Jörg Frohne
+ - Roger Fu
+ - Anian Fuchs
+ - Sebastian Fuchs
+ - Ivan Fumagalli
+ - Olivier Gaboriault
+ - Andres Galindo
+ - Vadim Gallyamov
+ - Daniel Garcia-Sanchez
+ - Rene Gassmoeller
+ - Joscha Gedicke
+ - Thomas Geenen
+ - Martin Genet
+ - Melanie Gerault
+ - Mohamad Ghadban
+ - Mahdi Gharehbaygloo
+ - Arezou Ghesmati
+ - Seyed Shahram Ghorashi
+ - Nicola Giuliani
+ - Brandon Gleeson
+ - Anne Glerum
+ - Christoph Goering
+ - Robin Goermer
+ - Christian Goll
+ - Sebastian Gonzalez-Pintor
+ - Krishnakumar Gopalakrishnan
+ - Robin Görmer
+ - Alexander Grayver
+ - Ryan Grove
+ - Felix Gruber
+ - Olivier Guevremont
+ - Diane Guignard
+ - Davit Gyulamiryan
+ - Lóránt Hadnagy
+ - Tim Hamann
+ - Maien Hamed
+ - Joshua Hanophy
+ - Logan Harbour
+ - Jake Harmon
+ - Michael Harmon
+ - Graham Harper
+ - Mohammed Hassan
+ - Nicole Hayes
+ - Bang He
+ - Eric Heien
+ - Christoph Heiniger
+ - Johannes Heinz
+ - Timo Heister
+ - Luca Heltai
+ - Michael F. Herbst
+ - Fernando Herrera
+ - Robin Hiniborch
+ - Quang Hoang
+ - Jordan Hoffart
+ - Sascha Hofstetter
+ - Jiuhua Hu
+ - Umair Hussain
+ - Dakshina Ilangovan
+ - Lise-Marie Imbert-Gerard
+ - Samuel Imfeld
+ - Sean Ingimarson
+ - Tatiana E. Itina
+ - Vladimir Ivannikov
+ - Bärbel Janssen
+ - Manu Jayadharan
+ - Armin Ghajar Jazi
+ - Pengfei Jia
+ - Tao Jin
+ - Xing Jin
+ - Yimin Jin
+ - Yann Jobic
+ - Daniel Jodlbauer
+ - Sean Johnson
+ - Stefan Kaessmair
+ - Marie Kajan
+ - Vaishnavi Kale
+ - Christoph Kammer
+ - Guido Kanschat
+ - Justin Kauffman
+ - Oliver Kayser-Herold
+ - Vishal Kenchan
+ - Andreas Kergassner
+ - Eldar Khattatov
+ - Seungil Kim
+ - Sebastian Kinnewig
+ - Benjamin Shelton Kirk
+ - Angela Klewinghaus
+ - Ingo Kligge
+ - Alexander Knieps
+ - Andreas Koch
+ - Alex Kokomov
+ - Joachim Kopp
+ - Katharina Kormann
+ - Lukas Korous
+ - Aslan Kosakian
+ - Adam Kosik
+ - Giorgos Kourakos
+ - Oleh Krehel
+ - Kurt Kremitzki
+ - Martin Kronbichler
+ - Paul Kuberry
+ - Paras Kumar
+ - Dustin Kumor
+ - Ross Kynch
+ - Uwe Köcher
+ - Konstantin Ladutenko
+ - Jason Landini
+ - Charu Lata
+ - Damien Lebrun-Grandie
+ - Adam Lee
+ - Wenyu Lei
+ - Zhou Lei
+ - Tobias Leicht
+ - Yan Li
+ - Yingli Li
+ - Tulio Ligneul
+ - Karl Ljungkvist
+ - Sébastien Loriot
+ - Hongfeng Ma
+ - Shamil Magomedov
+ - Vijay Mahadevan
+ - Matthias Maier
+ - Katrin Mang
+ - Cataldo Manigrasso
+ - Nils Margenberg
+ - Mae Markowski
+ - Oreste Marquis
+ - Alberto F. Martin
+ - Andre Massing
+ - Jonathan Matthews
+ - Andrew McBride
+ - Stefan Meggendorfer
+ - Mathias Mentler
+ - Craig Michoski
+ - Franco Milicchio
+ - Scott Miller
+ - Phillip Mobley
+ - Andrea Mola
+ - Adriana Morales Miranda
+ - Ryan Moulday
+ - Nils Much
+ - Abdullah Mujahid
+ - Tileuzhan Mukhamet
+ - Peter Munch
+ - Jose Javier Munoz Criollo
+ - Wasim Niyaz Munshi
+ - Bob Myhill
+ - Helmut Müller
+ - Stefan Nauber
+ - Pratik Nayak
+ - Natalia Nebulishvili
+ - David Neckels
+ - Dragan Nikolic
+ - Emily Novak
+ - Justin O'Connor
+ - Omotayo Omosebi
+ - Giuseppe Orlando
+ - Santiago Ospina
+ - Alexey Ozeritskiy
+ - Vaibhav Palkar
+ - Paul A. Patience
+ - Spencer Patty
+ - Judith Pauen
+ - Daniel Paukner
+ - M. Sebastian Pauletti
+ - Luz Paz
+ - David Pecoraro
+ - Jean-Paul Pelteret
+ - Rebecca Pereira
+ - Jonathan Perry-Houts
+ - Dirk Peschka
+ - Jan Philipp
+ - Jonathan Pitt
+ - Giuseppe Pitton
+ - Davide Polverino
+ - Geneva Porter
+ - Fernando Posada
+ - Vachan Potluri
+ - Sanjeeb Poudel
+ - Adam Powell
+ - Guilhem Poy
+ - Raghunandan Pratoori
+ - Laura Prieto Saavedra
+ - Florian Prill
+ - Sebastian Proell
+ - Simon Puchert
+ - E. Gerry Puckett
+ - Andreas Putz
+ - Lei Qiao
+ - Ce Qin
+ - Manuel Quezada de Luna
+ - Hendrik Ranocha
+ - Michael Rapson
+ - Reza Rastak
+ - Johannes Resch
+ - Roland Richter
+ - Thomas Richter
+ - Gennadiy Rishin
+ - Andreas Ritthaler
+ - Jonathan Robey
+ - Angel Rodriguez
+ - Oleg Rogozin
+ - Jose E. Roman
+ - Irabiel Romero
+ - Ian Rose
+ - Julian Roth
+ - Shiva Rudraraju
+ - Matthew Russell
+ - Mayank Sabharwal
+ - Abner Salgado-Gonzalez
+ - Andrew Salmon
+ - Ali Samii
+ - Tonatiuh Sanchez-Vizuet
+ - Alberto Sartori
+ - Malik Scheifinger
+ - Sam Scheuerman
+ - Samuel Scheuerman
+ - Michael Schlottke-Lakemper
+ - Christoph Schmidt
+ - Anna Schneebeli
+ - David Schneider
+ - Svenja Schoeder
+ - Raphael Schoof
+ - Jan Schrage
+ - Magdalena Schreter
+ - Ralf B. Schulz
+ - Richard Schussnig
+ - Nils Schween
+ - Kyle Schwiebert
+ - Marc Secanell
+ - Ahmad Shahba
+ - Daniel Shapero
+ - Natasha S. Sharma
+ - Jason Sheldon
+ - Qingyuan Shi
+ - Doug Shi-Dong
+ - Ben Shields
+ - Konrad Simon
+ - Simranjeet Singh
+ - Wyatt Smith
+ - Dominic Soldner
+ - Florian Sonner
+ - Stephanie Sparks
+ - Michael Stadler
+ - Sebastian Stark
+ - Jan Stebel
+ - Martin Steigemann
+ - Simon Sticko
+ - Dominik Still
+ - Franz-Theo Suttmeier
+ - Oliver Sutton
+ - Narasimhan Swaminathan
+ - Habib Talavatifard
+ - Zhen Tao
+ - Buğrahan Temür
+ - Edward Terrell
+ - Marco Tezzele
+ - Jan Philipp Thiele
+ - Thierry Thomas
+ - Ben Thompson
+ - Jihuan Tian
+ - Xiaochuan Tian
+ - Malhar Tidke
+ - Ignacio Tomas
+ - Sara Tro
+ - Christophe Trophime
+ - Bruno Turcksin
+ - Benjamin Uekermann
+ - Siarhei Uzunbajakau
+ - Mikael Vaillant
+ - Ferdinand Vanmaele
+ - Antoni Vidal
+ - Vinayak Vijay
+ - Vinayak Vijay
+ - Kuljit S. Virk
+ - Heikki Virtanen
+ - Stephan Voss
+ - Jiaxin Wang
+ - Kainan Wang
+ - Yaqi Wang
+ - Yuxiang Wang
+ - Zhuoran Wang
+ - Ivy Weber
+ - Xiaoyu Wei
+ - David Wells
+ - Peter Westerbaan
+ - Sven Wetterauer
+ - Daniel Weygand
+ - Joshua White
+ - Michał Wichrowski
+ - Thomas Wick
+ - Simon Wiesheier
+ - Niklas Wik
+ - Julius Witte
+ - Winnifried Wollner
+ - Christian Wülker
+ - Ming Yang
+ - Yi-Yung Yang
+ - Jaeryun Yim
+ - Chengjiang Yin
+ - Toby D. Young
+ - Feimi Yu
+ - Vladimir Yushutin
+ - Stefano Zampini
+ - Mario Zepeda Aguilar
+ - Jiaqi Zhang
+ - Wenjuan Zhang
+ - Liang Zhao
+ - Victor Zheng
+ - Weixiong Zheng
+ - Yuhan Zhou
+ - Valentin Zingan
