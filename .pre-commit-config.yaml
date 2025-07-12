@@ -53,3 +53,8 @@ repos:
     entry: python contrib/utilities/detect_include_cycles.py
     pass_filenames: false
     language: system
+  - id: detect-merges-in-feature-branch
+    name: Detect merge commits in current feature branch
+    entry: bash contrib/utilities/detect_merges_in_feature_branch.sh
+    pass_filenames: false
+    language: system
