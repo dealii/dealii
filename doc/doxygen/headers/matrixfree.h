@@ -585,14 +585,17 @@ digraph G
  * At this point, it is useful to clarify the concept of a homogeneous
  * operator, which is the basic case discussed in the step-37 tutorial program
  * with homogeneous Dirichlet boundary conditions, and where a matrix-free
- * operator can be easily set up. In the form discussed in there, it relies on
- * a linear representation of the solution $u_h$ in a finite element problem
- * from the basis function. A more general problem would be to have non-zero
- * boundary values, leading to constraints that are inhomogeneous. Let us
- * discuss this case for both continuous finite elements, where those
- * inhomogeneous boundary values are typically imposed strongly, and for
- * discontinuous elements with a weak imposition of data in two separate
- * subsections.
+ * operator can be easily set up. In the form discussed there, the solution
+ * $u_h$ is represented by a linear combination of the basis functions using
+ * only the unknown coefficients $u_i$. A more general finite element problem
+ * might involve non-zero boundary values, which include an affine
+ * contribution in the solution $u_h$ and represented by inhomogeneous
+ * constraints. The affine contribution ends up at the right-hand side of the
+ * linear system, whereas the actually unknown coefficients are determined by
+ * solving a linear system. Let us discuss this case for both continuous
+ * finite elements, where those inhomogeneous boundary values are typically
+ * imposed strongly, and for discontinuous elements with a weak imposition of
+ * data separately in next two subsections.
  *
  * <h4>Representation of inhomogeneous Dirichlet boundary conditions for
  * continuous finite elements</h4>
