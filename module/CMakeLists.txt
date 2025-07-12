@@ -13,7 +13,7 @@
 ## ------------------------------------------------------------------------
 
 
-if(DEAL_II_BUILD_CXX20_MODULE)
+if(DEAL_II_WITH_CXX20_MODULE)
   message(STATUS "Setting up the C++20 module")
 
   #
@@ -248,6 +248,13 @@ if(DEAL_II_BUILD_CXX20_MODULE)
     # preprocessor variable for a small number of cases where we need to
     # work around things that work differently between module and non-module
     # builds.
+    #
+    # Note that we call the preprocessor variable
+    # ..._BUILDING_... instead of the overarching
+    # ..._WITH_... variable because we build the same set of files
+    # twice, but only one of these is build *built* for modules,
+    # whereas both sets are being build in a set-up in which we have
+    # modules ("with").
     add_library(${DEAL_II_TARGET_NAME}_module_${build_lowercase} SHARED)
     populate_target_properties(${DEAL_II_TARGET_NAME}_module_${build_lowercase} ${build})
     target_compile_definitions(${DEAL_II_TARGET_NAME}_module_${build_lowercase}
