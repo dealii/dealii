@@ -24,6 +24,7 @@
 #include <deal.II/base/std_cxx20/iota_view.h>
 #include <deal.II/base/tensor.h>
 
+#include <algorithm>
 #include <array>
 #include <cstdint>
 
@@ -4771,7 +4772,7 @@ GeometryInfo<dim>::project_to_unit_cell(const Point<dim, Number> &q)
 {
   Point<dim, Number> p;
   for (unsigned int i = 0; i < dim; ++i)
-    p[i] = std::min(std::max(q[i], Number(0.)), Number(1.));
+    p[i] = std::clamp(q[i], Number(0.), Number(1.));
 
   return p;
 }
