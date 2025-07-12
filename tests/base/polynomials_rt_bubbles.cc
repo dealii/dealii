@@ -23,6 +23,9 @@
 
 #include "../tests.h"
 
+template <int dim>
+std::vector<unsigned int>
+get_lexicographic_numbering_RT(const unsigned int degree);
 
 template <int dim>
 void
@@ -62,19 +65,77 @@ main()
   initlog();
   deallog << std::setprecision(3);
 
-  PolynomialsRT_Bubbles<2> p20(1);
-  PolynomialsRT_Bubbles<2> p21(2);
-  PolynomialsRT_Bubbles<2> p22(3);
+  PolynomialsRT_Bubbles<2> p20(1, get_lexicographic_numbering_RT<2>(0));
+  PolynomialsRT_Bubbles<2> p21(2, get_lexicographic_numbering_RT<2>(1));
+  PolynomialsRT_Bubbles<2> p22(3, get_lexicographic_numbering_RT<2>(2));
 
   plot(p20);
   plot(p21);
   plot(p22);
 
-  PolynomialsRT_Bubbles<3> p30(1);
-  PolynomialsRT_Bubbles<3> p31(2);
-  PolynomialsRT_Bubbles<3> p32(3);
+  PolynomialsRT_Bubbles<3> p30(1, get_lexicographic_numbering_RT<3>(0));
+  PolynomialsRT_Bubbles<3> p31(2, get_lexicographic_numbering_RT<3>(1));
+  PolynomialsRT_Bubbles<3> p32(3, get_lexicographic_numbering_RT<3>(2));
 
   plot(p30);
   plot(p31);
   plot(p32);
+}
+
+
+
+template <int dim>
+std::vector<unsigned int>
+get_lexicographic_numbering_RT(const unsigned int degree)
+{
+  const unsigned int        n_dofs_face = Utilities::pow(degree + 1, dim - 1);
+  std::vector<unsigned int> lexicographic_numbering;
+  // component 1
+  for (unsigned int j = 0; j < n_dofs_face; ++j)
+    {
+      lexicographic_numbering.push_back(j);
+      if (degree + 1 > 1)
+        for (unsigned int i = n_dofs_face * 2 * dim;
+             i < n_dofs_face * 2 * dim + degree;
+             ++i)
+          lexicographic_numbering.push_back(i + j * degree);
+      lexicographic_numbering.push_back(n_dofs_face + j);
+    }
+
+  // component 2
+  unsigned int layers = (dim == 3) ? degree + 1 : 1;
+  for (unsigned int k = 0; k < layers; ++k)
+    {
+      unsigned int k_add = k * (degree + 1);
+      for (unsigned int j = n_dofs_face * 2; j < n_dofs_face * 2 + degree + 1;
+           ++j)
+        lexicographic_numbering.push_back(j + k_add);
+
+      if (degree + 1 > 1)
+        for (unsigned int i = n_dofs_face * (2 * dim + degree);
+             i < n_dofs_face * (2 * dim + degree) + degree * (degree + 1);
+             ++i)
+          {
+            lexicographic_numbering.push_back(i + k_add * degree);
+          }
+      for (unsigned int j = n_dofs_face * 3; j < n_dofs_face * 3 + degree + 1;
+           ++j)
+        lexicographic_numbering.push_back(j + k_add);
+    }
+
+  // component 3
+  if (dim == 3)
+    {
+      for (unsigned int i = 4 * n_dofs_face; i < 5 * n_dofs_face; ++i)
+        lexicographic_numbering.push_back(i);
+      if (degree + 1 > 1)
+        for (unsigned int i = 6 * n_dofs_face + n_dofs_face * 2 * degree;
+             i < 6 * n_dofs_face + n_dofs_face * 3 * degree;
+             ++i)
+          lexicographic_numbering.push_back(i);
+      for (unsigned int i = 5 * n_dofs_face; i < 6 * n_dofs_face; ++i)
+        lexicographic_numbering.push_back(i);
+    }
+
+  return lexicographic_numbering;
 }

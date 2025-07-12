@@ -25,9 +25,11 @@ DEAL_II_NAMESPACE_OPEN
 
 
 template <int dim>
-PolynomialsRT_Bubbles<dim>::PolynomialsRT_Bubbles(const unsigned int k)
+PolynomialsRT_Bubbles<dim>::PolynomialsRT_Bubbles(
+  const unsigned int               k,
+  const std::vector<unsigned int> &polynomial_ordering)
   : TensorPolynomialsBase<dim>(k, n_polynomials(k))
-  , raviart_thomas_space(k - 1)
+  , raviart_thomas_space(k, k - 1, polynomial_ordering)
   , monomials(k + 2)
 {
   Assert(dim >= 2, ExcImpossibleInDim(dim));
