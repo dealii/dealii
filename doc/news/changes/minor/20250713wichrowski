@@ -1,0 +1,3 @@
+New: ClosestSurfacePoint class for computing closest points on a surface defined by a level set function.
+<br>
+(Michał Wichrowski, 2025/07/13)
