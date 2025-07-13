@@ -123,6 +123,7 @@ namespace internal
 // PolarManifold
 // ============================================================
 
+DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
 template <int dim, int spacedim>
 PolarManifold<dim, spacedim>::PolarManifold(const Point<spacedim> center)
   : ChartManifold<dim, spacedim, spacedim>(
@@ -130,6 +131,7 @@ PolarManifold<dim, spacedim>::PolarManifold(const Point<spacedim> center)
   , center(center)
   , p_center(center)
 {}
+DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
 
 
 
@@ -331,12 +333,12 @@ PolarManifold<dim, spacedim>::normal_vector(
   // (tangential to the sphere).  In this case, the normal vector is
   // easy to compute since it is proportional to the vector from the
   // center to the point 'p'.
-  if (spherical_face_is_horizontal<dim, spacedim>(face, center))
+  if (spherical_face_is_horizontal<dim, spacedim>(face, p_center))
     {
       // So, if this is a "horizontal" face, then just compute the normal
       // vector as the one from the center to the point 'p', adequately
       // scaled.
-      const Tensor<1, spacedim> unnormalized_spherical_normal = p - center;
+      const Tensor<1, spacedim> unnormalized_spherical_normal = p - p_center;
       const Tensor<1, spacedim> normalized_spherical_normal =
         unnormalized_spherical_normal / unnormalized_spherical_normal.norm();
       return normalized_spherical_normal;
@@ -355,6 +357,7 @@ PolarManifold<dim, spacedim>::normal_vector(
 // SphericalManifold
 // ============================================================
 
+DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
 template <int dim, int spacedim>
 SphericalManifold<dim, spacedim>::SphericalManifold(
   const Point<spacedim> center)
@@ -362,6 +365,7 @@ SphericalManifold<dim, spacedim>::SphericalManifold(
   , p_center(center)
   , polar_manifold(center)
 {}
+DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
 
 
 
