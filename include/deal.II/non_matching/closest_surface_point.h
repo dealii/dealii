@@ -151,10 +151,10 @@ namespace NonMatching
      * @param[out] closest_point The computed closest point on the surface
      */
     void
-    newton_monolithic(const Point<dim>         &point,
-                      const FiniteElement<dim> &fe,
-                      const std::vector<double> dof_values,
-                      Point<dim>               &closest_point) const;
+    newton_monolithic(const Point<dim>          &point,
+                      const FiniteElement<dim>  &fe,
+                      const std::vector<double> &dof_values,
+                      Point<dim>                &closest_point) const;
   };
 
 
@@ -240,10 +240,10 @@ namespace NonMatching
   template <int dim, class VECTOR>
   void
   ClosestSurfacePoint<dim, VECTOR>::newton_monolithic(
-    const Point<dim>         &point,
-    const FiniteElement<dim> &fe,
-    const std::vector<double> dof_values,
-    Point<dim>               &closest_point) const
+    const Point<dim>          &point,
+    const FiniteElement<dim>  &fe,
+    const std::vector<double> &dof_values,
+    Point<dim>                &closest_point) const
   {
     AssertDimension(dof_values.size(), fe.dofs_per_cell);
 
