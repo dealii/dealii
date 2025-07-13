@@ -163,6 +163,8 @@ test()
               const Point<dim> &original_point = face_points[q];
               const Point<dim> &closest_point  = closest_real_points[q];
 
+              // Calculate the true closest point on the unit sphere (normalized
+              // original point)
               const Point<dim> &true_closest_point =
                 original_point / original_point.norm();
 

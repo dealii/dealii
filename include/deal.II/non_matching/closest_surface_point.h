@@ -46,10 +46,9 @@ namespace NonMatching
    * by minimizing the distance function subject to the constraint that the
    * point lies on the zero level set.
    *
-   * The implementation supports:
    * - Level set functions discretized on DoFHandler with cartesian grid.
    * - Configurable Newton iteration parameters (tolerance, maximum iterations)
-   * - Multi-level support for adaptive mesh refinement scenarios
+   * - Supports active cells and MG cells
    *
    * @tparam dim The spatial dimension of the problem
    * @tparam VECTOR The vector type used to store the level set function values
@@ -94,6 +93,7 @@ namespace NonMatching
                         const AdditionalData  &data = AdditionalData());
 
 
+
     /**
      * @brief Computes closest points to given set of points.
      *
@@ -119,12 +119,45 @@ namespace NonMatching
 
 
 
+    /**
+     * Find the closest point on a surface using Newton's method with a
+     * monolithic approach.
+     *
+     * This function implements Newton's method to find the point on the surface
+     * defined by the finite element and DOF values that is closest to the given
+     * input point. The monolithic approach solves the constrained optimization
+     * problem:
+     *
+     * @f[
+     * \min_{x} \frac{1}{2} \|x - x_0 \|^2 \quad \text{subject to} \quad \phi(x)
+     * = 0
+     * @f]
+     *
+     * where @f$\phi(x)@f$ is the level set function. Using Lagrange
+     * multipliers, this becomes the unconstrained problem:
+     *
+     * @f[
+     * \min_{x, \lambda} L(x, \lambda) = \frac{1}{2} \|x - x_0\|^2 + \lambda
+     * \phi(x)
+     * @f]
+     *
+     * Newton's method iteratively solves this system using the Hessian.
+     *
+     * @param[in] point The reference point for which to find the closest
+     * surface point
+     * @param[in] fe The finite element used to define the surface geometry
+     * @param[in] dof_values The degrees of freedom values that define the
+     * surface
+     * @param[out] closest_point The computed closest point on the surface
+     */
     void
     newton_monolithic(const Point<dim>         &point,
                       const FiniteElement<dim> &fe,
                       const std::vector<double> dof_values,
                       Point<dim>               &closest_point) const;
   };
+
+
 
   template <int dim, class VECTOR>
   ClosestSurfacePoint<dim, VECTOR>::ClosestSurfacePoint(
@@ -143,6 +176,8 @@ namespace NonMatching
                                        "in the triangulation"));
       }
   }
+
+
 
   template <int dim, class VECTOR>
   std::pair<std::vector<Point<dim>>, std::vector<Point<dim>>>
