@@ -7,7 +7,7 @@ Infrastructure in Geodynamics initiative (CIG), through the NSF under Award
 EAR-0949446, EAR-1550901, EAR-2149126 via the University of California -- Davis.
 </i>
 
-<a name="step-90-Intro"></a>
+<a name="step_90-Intro"></a>
 <h1>Introduction</h1>
 
 In this tutorial, we implement the trace finite element method (TraceFEM) in deal.II. TraceFEM solves PDEs posed on a

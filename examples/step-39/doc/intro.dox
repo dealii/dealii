@@ -1,4 +1,4 @@
-<a name="step-39-Intro"></a>
+<a name="step_39-Intro"></a>
 
 In this program, we use the interior penalty method and Nitsche's weak
 boundary conditions to solve Poisson's equation. We use multigrid
