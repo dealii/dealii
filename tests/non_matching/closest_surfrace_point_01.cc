@@ -91,6 +91,8 @@ test()
   unsigned int n_tested_points    = 0;
   unsigned int n_points_on_sphere = 0;
 
+  MappingCartesian<dim> mapping;
+
   // Limit the number of test cells to cut down on test time
   int n_test_cells = 20;
 
@@ -194,6 +196,19 @@ test()
                           << ", Closest point: " << closest_point
                           << ", True closest point: " << true_closest_point
                           << ", Distance: " << distance_to_true << std::endl;
+                }
+
+              // Check if the real point corresponds with the unit point
+              const Point<dim> unit_closest_point =
+                mapping.transform_real_to_unit_cell(cell, closest_point);
+              if ((unit_closest_point - closest_unit_reference_points[q])
+                    .norm() > 1e-8)
+                {
+                  deallog << "Closest point does not correspond to unit point: "
+                          << "Original point: " << original_point
+                          << ", Closest point: " << closest_point
+                          << ", Unit closest point: " << unit_closest_point
+                          << std::endl;
                 }
             }
         }
