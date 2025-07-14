@@ -51,7 +51,7 @@ module;
 #endif
 
 
-export module dealii:interface_partition_tbb;
+export module dealii.external.tbb;
 
 #ifdef DEAL_II_WITH_TBB
 

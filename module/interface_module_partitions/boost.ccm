@@ -106,7 +106,7 @@ module;
 #include <boost/version.hpp>
 
 
-export module dealii:interface_partition_boost;
+export module dealii.external.boost;
 export
 {
   namespace boost

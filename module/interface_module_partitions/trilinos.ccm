@@ -136,7 +136,7 @@ module;
 #endif
 
 
-export module dealii:interface_partition_trilinos;
+export module dealii.external.trilinos;
 
 #ifdef DEAL_II_WITH_TRILINOS
 

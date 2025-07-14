@@ -42,7 +42,7 @@ module;
 #endif
 
 
-export module dealii:interface_partition_adolc;
+export module dealii.external.adolc;
 
 #ifdef DEAL_II_WITH_ADOLC
 

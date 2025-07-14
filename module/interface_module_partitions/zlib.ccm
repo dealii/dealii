@@ -35,7 +35,7 @@ module;
 #endif
 
 
-export module dealii:interface_partition_zlib;
+export module dealii.external.zlib;
 
 #ifdef DEAL_II_WITH_ZLIB
 
