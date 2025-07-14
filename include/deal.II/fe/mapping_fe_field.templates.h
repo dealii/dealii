@@ -59,6 +59,62 @@
 
 DEAL_II_NAMESPACE_OPEN
 
+namespace internal
+{
+  template <int dim, int spacedim>
+  ComponentDoFs<dim, spacedim>::ComponentDoFs(
+    const FiniteElement<dim, spacedim> &fe,
+    const ComponentMask                &mask)
+    : all_components_primitive(true)
+  {
+    AssertDimension(mask.size(), fe.n_components());
+    AssertDimension(mask.n_selected_components(fe.n_components()), spacedim);
+
+    offsets.fill(0u);
+    unsigned int d = 0;
+    for (unsigned int component_no = 0; component_no < mask.size();
+         ++component_no)
+      if (mask[component_no])
+        {
+          const auto base_no = fe.component_to_base_index(component_no).first;
+          all_components_primitive &= fe.base_element(base_no).is_primitive();
+          unsigned int n_component_dofs = 0;
+          for (unsigned int dof = 0; dof < fe.n_dofs_per_cell(); ++dof)
+            if (fe.get_nonzero_components(dof)[component_no])
+              {
+                component_dofs.push_back(dof);
+                ++n_component_dofs;
+              }
+          ++d;
+          offsets[d] = offsets[d - 1] + n_component_dofs;
+        }
+    AssertDimension(d, spacedim);
+  }
+
+
+
+  template <int dim, int spacedim>
+  bool
+  ComponentDoFs<dim, spacedim>::all_components_are_primitive() const
+  {
+    return all_components_primitive;
+  }
+
+
+
+  template <int dim, int spacedim>
+  ArrayView<const unsigned int>
+  ComponentDoFs<dim, spacedim>::operator[](const unsigned int component) const
+  {
+    AssertIndexRange(component, spacedim);
+    Assert(component_dofs.cbegin() + offsets[component + 1] <=
+             component_dofs.end(),
+           ExcInternalError());
+    return make_array_view(component_dofs.cbegin() + offsets[component],
+                           component_dofs.cbegin() + offsets[component + 1]);
+  }
+} // namespace internal
+
 
 template <int dim, int spacedim, typename VectorType>
 MappingFEField<dim, spacedim, VectorType>::InternalData::InternalData(
@@ -291,19 +347,12 @@ MappingFEField<dim, spacedim, VectorType>::MappingFEField(
               ComponentMask(
                 euler_dof_handler.get_fe().get_nonzero_components(0).size(),
                 true))
-  , fe_to_real(fe_mask.size(), numbers::invalid_unsigned_int)
+  , component_dofs(euler_dof_handler.get_fe(), fe_mask)
   , fe_values(this->euler_dof_handler->get_fe(),
               reference_cell.template get_nodal_type_quadrature<dim>(),
               update_values)
 {
   AssertDimension(euler_dof_handler.n_dofs(), euler_vector.size());
-  unsigned int size = 0;
-  for (unsigned int i = 0; i < fe_mask.size(); ++i)
-    {
-      if (fe_mask[i])
-        fe_to_real[i] = size++;
-    }
-  AssertDimension(size, spacedim);
 }
 
 
@@ -321,19 +370,11 @@ MappingFEField<dim, spacedim, VectorType>::MappingFEField(
               ComponentMask(
                 euler_dof_handler.get_fe().get_nonzero_components(0).size(),
                 true))
-  , fe_to_real(fe_mask.size(), numbers::invalid_unsigned_int)
+  , component_dofs(euler_dof_handler.get_fe(), fe_mask)
   , fe_values(this->euler_dof_handler->get_fe(),
               reference_cell.template get_nodal_type_quadrature<dim>(),
               update_values)
 {
-  unsigned int size = 0;
-  for (unsigned int i = 0; i < fe_mask.size(); ++i)
-    {
-      if (fe_mask[i])
-        fe_to_real[i] = size++;
-    }
-  AssertDimension(size, spacedim);
-
   Assert(euler_dof_handler.has_level_dofs(),
          ExcMessage("The underlying DoFHandler object did not call "
                     "distribute_mg_dofs(). In this case, the construction via "
@@ -364,19 +405,11 @@ MappingFEField<dim, spacedim, VectorType>::MappingFEField(
               ComponentMask(
                 euler_dof_handler.get_fe().get_nonzero_components(0).size(),
                 true))
-  , fe_to_real(fe_mask.size(), numbers::invalid_unsigned_int)
+  , component_dofs(euler_dof_handler.get_fe(), fe_mask)
   , fe_values(this->euler_dof_handler->get_fe(),
               reference_cell.template get_nodal_type_quadrature<dim>(),
               update_values)
 {
-  unsigned int size = 0;
-  for (unsigned int i = 0; i < fe_mask.size(); ++i)
-    {
-      if (fe_mask[i])
-        fe_to_real[i] = size++;
-    }
-  AssertDimension(size, spacedim);
-
   Assert(euler_dof_handler.has_level_dofs(),
          ExcMessage("The underlying DoFHandler object did not call "
                     "distribute_mg_dofs(). In this case, the construction via "
@@ -404,7 +437,7 @@ MappingFEField<dim, spacedim, VectorType>::MappingFEField(
   , euler_vector(mapping.euler_vector)
   , euler_dof_handler(mapping.euler_dof_handler)
   , fe_mask(mapping.fe_mask)
-  , fe_to_real(mapping.fe_to_real)
+  , component_dofs(euler_dof_handler->get_fe(), fe_mask)
   , fe_values(mapping.euler_dof_handler->get_fe(),
               reference_cell.template get_nodal_type_quadrature<dim>(),
               update_values)
@@ -468,8 +501,6 @@ MappingFEField<dim, spacedim, VectorType>::get_vertices(
 
   Assert(uses_level_dofs || dof_cell->is_active() == true, ExcInactiveCell());
   AssertDimension(cell->n_vertices(), fe_values.n_quadrature_points);
-  AssertDimension(fe_to_real.size(),
-                  euler_dof_handler->get_fe().n_components());
   if (uses_level_dofs)
     {
       AssertIndexRange(cell->level(), euler_vector.size());
@@ -502,21 +533,19 @@ MappingFEField<dim, spacedim, VectorType>::get_vertices(
 #endif
                                  >
     vertices(cell->n_vertices());
-  for (unsigned int i = 0; i < dofs_per_cell; ++i)
-    {
-      const unsigned int comp = fe_to_real
-        [euler_dof_handler->get_fe().system_to_component_index(i).first];
-      if (comp != numbers::invalid_unsigned_int)
-        {
-          typename VectorType::value_type value =
-            internal::ElementAccess<VectorType>::get(vector, dof_indices[i]);
-          if (euler_dof_handler->get_fe().is_primitive(i))
-            for (const unsigned int v : cell->vertex_indices())
-              vertices[v][comp] += fe_values.shape_value(i, v) * value;
-          else
-            DEAL_II_NOT_IMPLEMENTED();
-        }
-    }
+
+  for (unsigned int d = 0; d < spacedim; ++d)
+    for (const auto &i : component_dofs[d])
+      {
+        const auto value =
+          internal::ElementAccess<VectorType>::get(vector, dof_indices[i]);
+        if (component_dofs.all_components_are_primitive())
+          for (const unsigned int v : cell->vertex_indices())
+            vertices[v][d] += fe_values.shape_value(i, v) * value;
+        else
+          for (const unsigned int v : cell->vertex_indices())
+            vertices[v][d] += fe_values.shape_value_component(i, v, d) * value;
+      }
 
   return vertices;
 }
@@ -699,11 +728,9 @@ namespace internal
     maybe_compute_q_points(
       const typename QProjector<dim>::DataSetDescriptor data_set,
       const typename MappingFEField<dim, spacedim, VectorType>::InternalData
-                                         &data,
-      const FiniteElement<dim, spacedim> &fe,
-      const ComponentMask                &fe_mask,
-      const std::vector<unsigned int>    &fe_to_real,
-      std::vector<Point<spacedim>>       &quadrature_points)
+                                                   &data,
+      const internal::ComponentDoFs<dim, spacedim> &component_dofs,
+      std::vector<Point<spacedim>>                 &quadrature_points)
     {
       const UpdateFlags update_flags = data.update_each;
 
@@ -715,14 +742,9 @@ namespace internal
               Point<spacedim> result;
               const double   *shape = &data.shape(point + data_set, 0);
 
-              for (unsigned int k = 0; k < data.n_shape_functions; ++k)
-                {
-                  const unsigned int comp_k =
-                    fe.system_to_component_index(k).first;
-                  if (fe_mask[comp_k])
-                    result[fe_to_real[comp_k]] +=
-                      data.local_dof_values[k] * shape[k];
-                }
+              for (unsigned int d = 0; d < spacedim; ++d)
+                for (const auto &i : component_dofs[d])
+                  result[d] += data.local_dof_values[i] * shape[i];
 
               quadrature_points[point] = result;
             }
@@ -739,12 +761,10 @@ namespace internal
     template <int dim, int spacedim, typename VectorType>
     void
     maybe_update_Jacobians(
-      typename QProjector<dim>::DataSetDescriptor data_set,
+      const typename QProjector<dim>::DataSetDescriptor data_set,
       const typename MappingFEField<dim, spacedim, VectorType>::InternalData
-                                         &data,
-      const FiniteElement<dim, spacedim> &fe,
-      const ComponentMask                &fe_mask,
-      const std::vector<unsigned int>    &fe_to_rea) const
+                                                   &data,
+      const internal::ComponentDoFs<dim, spacedim> &component_dofs)
     {
       const UpdateFlags update_flags = data.update_each;
 
@@ -762,20 +782,13 @@ namespace internal
 
               Tensor<1, dim> result[spacedim];
 
-              for (unsigned int k = 0; k < data.n_shape_functions; ++k)
-                {
-                  const unsigned int comp_k =
-                    fe.system_to_component_index(k).first;
-                  if (fe_mask[comp_k])
-                    result[fe_to_real[comp_k]] +=
-                      data.local_dof_values[k] * data_derv[k];
-                }
+              for (unsigned int d = 0; d < spacedim; ++d)
+                for (const auto &i : component_dofs[d])
+                  result[d] += data.local_dof_values[i] * data_derv[i];
 
               // write result into contravariant data
               for (unsigned int i = 0; i < spacedim; ++i)
-                {
-                  data.contravariant[point][i] = result[i];
-                }
+                data.contravariant[point][i] = result[i];
             }
         }
 
@@ -811,8 +824,7 @@ namespace internal
       const typename QProjector<dim>::DataSetDescriptor data_set,
       const typename MappingFEField<dim, spacedim, VectorType>::InternalData
                                                     &data,
-      const FiniteElement<dim, spacedim>            &fe,
-      const std::vector<unsigned int>               &fe_to_real,
+      const internal::ComponentDoFs<dim, spacedim>  &component_dofs,
       std::vector<DerivativeForm<2, dim, spacedim>> &jacobian_grads)
     {
       const UpdateFlags update_flags = data.update_each;
@@ -827,16 +839,12 @@ namespace internal
 
               DerivativeForm<2, dim, spacedim> result;
 
-              for (unsigned int k = 0; k < data.n_shape_functions; ++k)
-                {
-                  const unsigned int comp_k =
-                    fe.system_to_component_index(k).first;
-                  if (fe_mask[comp_k])
-                    for (unsigned int j = 0; j < dim; ++j)
-                      for (unsigned int l = 0; l < dim; ++l)
-                        result[fe_to_real[comp_k]][j][l] +=
-                          (second[k][j][l] * data.local_dof_values[k]);
-                }
+              for (unsigned int d = 0; d < spacedim; ++d)
+                for (const auto &i : component_dofs[d])
+                  for (unsigned int j = 0; j < dim; ++j)
+                    for (unsigned int l = 0; l < dim; ++l)
+                      result[d][j][l] +=
+                        (second[i][j][l] * data.local_dof_values[i]);
 
               // never touch any data for j=dim in case dim<spacedim, so
               // it will always be zero as it was initialized
@@ -859,11 +867,9 @@ namespace internal
     maybe_update_jacobian_pushed_forward_grads(
       const typename QProjector<dim>::DataSetDescriptor data_set,
       const typename MappingFEField<dim, spacedim, VectorType>::InternalData
-                                         &data,
-      const FiniteElement<dim, spacedim> &fe,
-      const ComponentMask                &fe_mask,
-      const std::vector<unsigned int>    &fe_to_real,
-      std::vector<Tensor<3, spacedim>>   &jacobian_pushed_forward_grads)
+                                                   &data,
+      const internal::ComponentDoFs<dim, spacedim> &component_dofs,
+      std::vector<Tensor<3, spacedim>> &jacobian_pushed_forward_grads)
     {
       const UpdateFlags update_flags = data.update_each;
       if (update_flags & update_jacobian_pushed_forward_grads)
@@ -878,16 +884,12 @@ namespace internal
 
               DerivativeForm<2, dim, spacedim> result;
 
-              for (unsigned int k = 0; k < data.n_shape_functions; ++k)
-                {
-                  const unsigned int comp_k =
-                    fe.system_to_component_index(k).first;
-                  if (fe_mask[comp_k])
-                    for (unsigned int j = 0; j < dim; ++j)
-                      for (unsigned int l = 0; l < dim; ++l)
-                        result[fe_to_real[comp_k]][j][l] +=
-                          (second[k][j][l] * data.local_dof_values[k]);
-                }
+              for (unsigned int d = 0; d < spacedim; ++d)
+                for (const auto &i : component_dofs[d])
+                  for (unsigned int j = 0; j < dim; ++j)
+                    for (unsigned int l = 0; l < dim; ++l)
+                      result[d][j][l] +=
+                        (second[i][j][l] * data.local_dof_values[i]);
 
               // first push forward the j-components
               for (unsigned int i = 0; i < spacedim; ++i)
@@ -932,9 +934,7 @@ namespace internal
       const typename QProjector<dim>::DataSetDescriptor data_set,
       const typename MappingFEField<dim, spacedim, VectorType>::InternalData
                                                     &data,
-      const FiniteElement<dim, spacedim>            &fe,
-      const ComponentMask                           &fe_mask,
-      const std::vector<unsigned int>               &fe_to_real,
+      const internal::ComponentDoFs<dim, spacedim>  &component_dofs,
       std::vector<DerivativeForm<3, dim, spacedim>> &jacobian_2nd_derivatives)
     {
       const UpdateFlags update_flags = data.update_each;
@@ -949,17 +949,13 @@ namespace internal
 
               DerivativeForm<3, dim, spacedim> result;
 
-              for (unsigned int k = 0; k < data.n_shape_functions; ++k)
-                {
-                  const unsigned int comp_k =
-                    fe.system_to_component_index(k).first;
-                  if (fe_mask[comp_k])
-                    for (unsigned int j = 0; j < dim; ++j)
-                      for (unsigned int l = 0; l < dim; ++l)
-                        for (unsigned int m = 0; m < dim; ++m)
-                          result[fe_to_real[comp_k]][j][l][m] +=
-                            (third[k][j][l][m] * data.local_dof_values[k]);
-                }
+              for (unsigned int d = 0; d < spacedim; ++d)
+                for (const auto &i : component_dofs[d])
+                  for (unsigned int j = 0; j < dim; ++j)
+                    for (unsigned int l = 0; l < dim; ++l)
+                      for (unsigned int m = 0; m < dim; ++m)
+                        result[d][j][l][m] +=
+                          (third[i][j][l][m] * data.local_dof_values[i]);
 
               // never touch any data for j=dim in case dim<spacedim, so
               // it will always be zero as it was initialized
@@ -985,10 +981,8 @@ namespace internal
     maybe_update_jacobian_pushed_forward_2nd_derivatives(
       const typename QProjector<dim>::DataSetDescriptor data_set,
       const typename MappingFEField<dim, spacedim, VectorType>::InternalData
-                                         &data,
-      const FiniteElement<dim, spacedim> &fe,
-      const ComponentMask                &fe_mask,
-      const std::vector<unsigned int>    &fe_to_real,
+                                                   &data,
+      const internal::ComponentDoFs<dim, spacedim> &component_dofs,
       std::vector<Tensor<4, spacedim>> &jacobian_pushed_forward_2nd_derivatives)
     {
       const UpdateFlags update_flags = data.update_each;
@@ -1005,17 +999,13 @@ namespace internal
 
               DerivativeForm<3, dim, spacedim> result;
 
-              for (unsigned int k = 0; k < data.n_shape_functions; ++k)
-                {
-                  const unsigned int comp_k =
-                    fe.system_to_component_index(k).first;
-                  if (fe_mask[comp_k])
-                    for (unsigned int j = 0; j < dim; ++j)
-                      for (unsigned int l = 0; l < dim; ++l)
-                        for (unsigned int m = 0; m < dim; ++m)
-                          result[fe_to_real[comp_k]][j][l][m] +=
-                            (third[k][j][l][m] * data.local_dof_values[k]);
-                }
+              for (unsigned int d = 0; d < spacedim; ++d)
+                for (const auto &i : component_dofs[d])
+                  for (unsigned int j = 0; j < dim; ++j)
+                    for (unsigned int l = 0; l < dim; ++l)
+                      for (unsigned int m = 0; m < dim; ++m)
+                        result[d][j][l][m] +=
+                          (third[i][j][l][m] * data.local_dof_values[i]);
 
               // push forward the j-coordinate
               for (unsigned int i = 0; i < spacedim; ++i)
@@ -1079,9 +1069,7 @@ namespace internal
       const typename QProjector<dim>::DataSetDescriptor data_set,
       const typename MappingFEField<dim, spacedim, VectorType>::InternalData
                                                     &data,
-      const FiniteElement<dim, spacedim>            &fe,
-      const ComponentMask                           &fe_mask,
-      const std::vector<unsigned int>               &fe_to_real,
+      const internal::ComponentDoFs<dim, spacedim>  &component_dofs,
       std::vector<DerivativeForm<4, dim, spacedim>> &jacobian_3rd_derivatives)
     {
       const UpdateFlags update_flags = data.update_each;
@@ -1096,19 +1084,14 @@ namespace internal
 
               DerivativeForm<4, dim, spacedim> result;
 
-              for (unsigned int k = 0; k < data.n_shape_functions; ++k)
-                {
-                  const unsigned int comp_k =
-                    fe.system_to_component_index(k).first;
-                  if (fe_mask[comp_k])
-                    for (unsigned int j = 0; j < dim; ++j)
-                      for (unsigned int l = 0; l < dim; ++l)
-                        for (unsigned int m = 0; m < dim; ++m)
-                          for (unsigned int n = 0; n < dim; ++n)
-                            result[fe_to_real[comp_k]][j][l][m][n] +=
-                              (fourth[k][j][l][m][n] *
-                               data.local_dof_values[k]);
-                }
+              for (unsigned int d = 0; d < spacedim; ++d)
+                for (const auto &i : component_dofs[d])
+                  for (unsigned int j = 0; j < dim; ++j)
+                    for (unsigned int l = 0; l < dim; ++l)
+                      for (unsigned int m = 0; m < dim; ++m)
+                        for (unsigned int n = 0; n < dim; ++n)
+                          result[d][j][l][m][n] +=
+                            (fourth[i][j][l][m][n] * data.local_dof_values[i]);
 
               // never touch any data for j,l,m,n=dim in case
               // dim<spacedim, so it will always be zero as it was
@@ -1136,10 +1119,8 @@ namespace internal
     maybe_update_jacobian_pushed_forward_3rd_derivatives(
       const typename QProjector<dim>::DataSetDescriptor data_set,
       const typename MappingFEField<dim, spacedim, VectorType>::InternalData
-                                         &data,
-      const FiniteElement<dim, spacedim> &fe,
-      const ComponentMask                &fe_mask,
-      const std::vector<unsigned int>    &fe_to_real,
+                                                   &data,
+      const internal::ComponentDoFs<dim, spacedim> &component_dofs,
       std::vector<Tensor<5, spacedim>> &jacobian_pushed_forward_3rd_derivatives)
     {
       const UpdateFlags update_flags = data.update_each;
@@ -1156,19 +1137,14 @@ namespace internal
 
               DerivativeForm<4, dim, spacedim> result;
 
-              for (unsigned int k = 0; k < data.n_shape_functions; ++k)
-                {
-                  const unsigned int comp_k =
-                    fe.system_to_component_index(k).first;
-                  if (fe_mask[comp_k])
-                    for (unsigned int j = 0; j < dim; ++j)
-                      for (unsigned int l = 0; l < dim; ++l)
-                        for (unsigned int m = 0; m < dim; ++m)
-                          for (unsigned int n = 0; n < dim; ++n)
-                            result[fe_to_real[comp_k]][j][l][m][n] +=
-                              (fourth[k][j][l][m][n] *
-                               data.local_dof_values[k]);
-                }
+              for (unsigned int d = 0; d < spacedim; ++d)
+                for (const auto &i : component_dofs[d])
+                  for (unsigned int j = 0; j < dim; ++j)
+                    for (unsigned int l = 0; l < dim; ++l)
+                      for (unsigned int m = 0; m < dim; ++m)
+                        for (unsigned int n = 0; n < dim; ++n)
+                          result[d][j][l][m][n] +=
+                            (fourth[i][j][l][m][n] * data.local_dof_values[i]);
 
               // push-forward the j-coordinate
               for (unsigned int i = 0; i < spacedim; ++i)
@@ -1402,18 +1378,17 @@ namespace internal
       const unsigned int                                          subface_no,
       const typename QProjector<dim>::DataSetDescriptor           data_set,
       const typename MappingFEField<dim, spacedim, VectorType>::InternalData
-                                         &data,
-      const FiniteElement<dim, spacedim> &fe,
-      const ComponentMask                &fe_mask,
-      const std::vector<unsigned int>    &fe_to_real,
+                                                   &data,
+      const internal::ComponentDoFs<dim, spacedim> &component_dofs,
       internal::FEValuesImplementation::MappingRelatedData<dim, spacedim>
         &output_data)
     {
       maybe_compute_q_points<dim, spacedim, VectorType>(
-        data_set, data, fe, fe_mask, fe_to_real, output_data.quadrature_points);
+        data_set, data, component_dofs, output_data.quadrature_points);
 
-      maybe_update_Jacobians<dim, spacedim, VectorType>(
-        data_set, data, fe, fe_mask, fe_to_real);
+      maybe_update_Jacobians<dim, spacedim, VectorType>(data_set,
+                                                        data,
+                                                        component_dofs);
 
       const UpdateFlags  update_flags = data.update_each;
       const unsigned int n_q_points   = data.contravariant.size();
@@ -1428,50 +1403,34 @@ namespace internal
             data.covariant[point].transpose();
 
       maybe_update_jacobian_grads<dim, spacedim, VectorType>(
-        data_set, data, fe, fe_mask, fe_to_real, output_data.jacobian_grads);
+        data_set, data, component_dofs, output_data.jacobian_grads);
 
       maybe_update_jacobian_pushed_forward_grads<dim, spacedim, VectorType>(
         data_set,
         data,
-        fe,
-        fe_mask,
-        fe_to_real,
+        component_dofs,
         output_data.jacobian_pushed_forward_grads);
 
       maybe_update_jacobian_2nd_derivatives<dim, spacedim, VectorType>(
-        data_set,
-        data,
-        fe,
-        fe_mask,
-        fe_to_real,
-        output_data.jacobian_2nd_derivatives);
+        data_set, data, component_dofs, output_data.jacobian_2nd_derivatives);
 
       maybe_update_jacobian_pushed_forward_2nd_derivatives<dim,
                                                            spacedim,
                                                            VectorType>(
         data_set,
         data,
-        fe,
-        fe_mask,
-        fe_to_real,
+        component_dofs,
         output_data.jacobian_pushed_forward_2nd_derivatives);
 
       maybe_update_jacobian_3rd_derivatives<dim, spacedim, VectorType>(
-        data_set,
-        data,
-        fe,
-        fe_mask,
-        fe_to_real,
-        output_data.jacobian_3rd_derivatives);
+        data_set, data, component_dofs, output_data.jacobian_3rd_derivatives);
 
       maybe_update_jacobian_pushed_forward_3rd_derivatives<dim,
                                                            spacedim,
                                                            VectorType>(
         data_set,
         data,
-        fe,
-        fe_mask,
-        fe_to_real,
+        component_dofs,
         output_data.jacobian_pushed_forward_3rd_derivatives);
 
       maybe_compute_face_data<dim, spacedim, VectorType>(
@@ -1507,18 +1466,12 @@ MappingFEField<dim, spacedim, VectorType>::fill_fe_values(
     maybe_compute_q_points<dim, spacedim, VectorType>(
       QProjector<dim>::DataSetDescriptor::cell(),
       data,
-      euler_dof_handler->get_fe(),
-      fe_mask,
-      fe_to_real,
+      component_dofs,
       output_data.quadrature_points);
 
   internal::MappingFEFieldImplementation::
     maybe_update_Jacobians<dim, spacedim, VectorType>(
-      QProjector<dim>::DataSetDescriptor::cell(),
-      data,
-      euler_dof_handler->get_fe(),
-      fe_mask,
-      fe_to_real);
+      QProjector<dim>::DataSetDescriptor::cell(), data, component_dofs);
 
   const UpdateFlags          update_flags = data.update_each;
   const std::vector<double> &weights      = quadrature.get_weights();
@@ -1621,9 +1574,7 @@ MappingFEField<dim, spacedim, VectorType>::fill_fe_values(
     maybe_update_jacobian_grads<dim, spacedim, VectorType>(
       QProjector<dim>::DataSetDescriptor::cell(),
       data,
-      euler_dof_handler->get_fe(),
-      fe_mask,
-      fe_to_real,
+      component_dofs,
       output_data.jacobian_grads);
 
   // calculate derivatives of the Jacobians pushed forward to real cell
@@ -1632,9 +1583,7 @@ MappingFEField<dim, spacedim, VectorType>::fill_fe_values(
     maybe_update_jacobian_pushed_forward_grads<dim, spacedim, VectorType>(
       QProjector<dim>::DataSetDescriptor::cell(),
       data,
-      euler_dof_handler->get_fe(),
-      fe_mask,
-      fe_to_real,
+      component_dofs,
       output_data.jacobian_pushed_forward_grads);
 
   // calculate hessians of the Jacobians
@@ -1642,9 +1591,7 @@ MappingFEField<dim, spacedim, VectorType>::fill_fe_values(
     maybe_update_jacobian_2nd_derivatives<dim, spacedim, VectorType>(
       QProjector<dim>::DataSetDescriptor::cell(),
       data,
-      euler_dof_handler->get_fe(),
-      fe_mask,
-      fe_to_real,
+      component_dofs,
       output_data.jacobian_2nd_derivatives);
 
   // calculate hessians of the Jacobians pushed forward to real cell coordinates
@@ -1654,9 +1601,7 @@ MappingFEField<dim, spacedim, VectorType>::fill_fe_values(
                                                          VectorType>(
       QProjector<dim>::DataSetDescriptor::cell(),
       data,
-      euler_dof_handler->get_fe(),
-      fe_mask,
-      fe_to_real,
+      component_dofs,
       output_data.jacobian_pushed_forward_2nd_derivatives);
 
   // calculate gradients of the hessians of the Jacobians
@@ -1664,9 +1609,7 @@ MappingFEField<dim, spacedim, VectorType>::fill_fe_values(
     maybe_update_jacobian_3rd_derivatives<dim, spacedim, VectorType>(
       QProjector<dim>::DataSetDescriptor::cell(),
       data,
-      euler_dof_handler->get_fe(),
-      fe_mask,
-      fe_to_real,
+      component_dofs,
       output_data.jacobian_3rd_derivatives);
 
   // calculate gradients of the hessians of the Jacobians pushed forward to real
@@ -1677,9 +1620,7 @@ MappingFEField<dim, spacedim, VectorType>::fill_fe_values(
                                                          VectorType>(
       QProjector<dim>::DataSetDescriptor::cell(),
       data,
-      euler_dof_handler->get_fe(),
-      fe_mask,
-      fe_to_real,
+      component_dofs,
       output_data.jacobian_pushed_forward_3rd_derivatives);
 
   return CellSimilarity::invalid_next_cell;
@@ -1719,9 +1660,7 @@ MappingFEField<dim, spacedim, VectorType>::fill_fe_face_values(
                                                  face_no),
                                                quadrature[0].size()),
       data,
-      euler_dof_handler->get_fe(),
-      fe_mask,
-      fe_to_real,
+      component_dofs,
       output_data);
 }
 
@@ -1760,9 +1699,7 @@ MappingFEField<dim, spacedim, VectorType>::fill_fe_subface_values(
                                                 quadrature.size(),
                                                 cell->subface_case(face_no)),
     data,
-    euler_dof_handler->get_fe(),
-    fe_mask,
-    fe_to_real,
+    component_dofs,
     output_data);
 }
 
@@ -1790,18 +1727,12 @@ MappingFEField<dim, spacedim, VectorType>::fill_fe_immersed_surface_values(
     maybe_compute_q_points<dim, spacedim, VectorType>(
       QProjector<dim>::DataSetDescriptor::cell(),
       data,
-      euler_dof_handler->get_fe(),
-      fe_mask,
-      fe_to_real,
+      component_dofs,
       output_data.quadrature_points);
 
   internal::MappingFEFieldImplementation::
     maybe_update_Jacobians<dim, spacedim, VectorType>(
-      QProjector<dim>::DataSetDescriptor::cell(),
-      data,
-      euler_dof_handler->get_fe(),
-      fe_mask,
-      fe_to_real);
+      QProjector<dim>::DataSetDescriptor::cell(), data, component_dofs);
 
   const UpdateFlags          update_flags = data.update_each;
   const std::vector<double> &weights      = quadrature.get_weights();
@@ -1867,9 +1798,7 @@ MappingFEField<dim, spacedim, VectorType>::fill_fe_immersed_surface_values(
         maybe_update_jacobian_grads<dim, spacedim, VectorType>(
           QProjector<dim>::DataSetDescriptor::cell(),
           data,
-          euler_dof_handler->get_fe(),
-          fe_mask,
-          fe_to_real,
+          component_dofs,
           output_data.jacobian_grads);
 
       // calculate derivatives of the Jacobians pushed forward to real cell
@@ -1878,9 +1807,7 @@ MappingFEField<dim, spacedim, VectorType>::fill_fe_immersed_surface_values(
         maybe_update_jacobian_pushed_forward_grads<dim, spacedim, VectorType>(
           QProjector<dim>::DataSetDescriptor::cell(),
           data,
-          euler_dof_handler->get_fe(),
-          fe_mask,
-          fe_to_real,
+          component_dofs,
           output_data.jacobian_pushed_forward_grads);
 
       // calculate hessians of the Jacobians
@@ -1888,9 +1815,7 @@ MappingFEField<dim, spacedim, VectorType>::fill_fe_immersed_surface_values(
         maybe_update_jacobian_2nd_derivatives<dim, spacedim, VectorType>(
           QProjector<dim>::DataSetDescriptor::cell(),
           data,
-          euler_dof_handler->get_fe(),
-          fe_mask,
-          fe_to_real,
+          component_dofs,
           output_data.jacobian_2nd_derivatives);
 
       // calculate hessians of the Jacobians pushed forward to real cell
@@ -1901,9 +1826,7 @@ MappingFEField<dim, spacedim, VectorType>::fill_fe_immersed_surface_values(
                                                              VectorType>(
           QProjector<dim>::DataSetDescriptor::cell(),
           data,
-          euler_dof_handler->get_fe(),
-          fe_mask,
-          fe_to_real,
+          component_dofs,
           output_data.jacobian_pushed_forward_2nd_derivatives);
 
       // calculate gradients of the hessians of the Jacobians
@@ -1911,9 +1834,7 @@ MappingFEField<dim, spacedim, VectorType>::fill_fe_immersed_surface_values(
         maybe_update_jacobian_3rd_derivatives<dim, spacedim, VectorType>(
           QProjector<dim>::DataSetDescriptor::cell(),
           data,
-          euler_dof_handler->get_fe(),
-          fe_mask,
-          fe_to_real,
+          component_dofs,
           output_data.jacobian_3rd_derivatives);
 
       // calculate gradients of the hessians of the Jacobians pushed forward to
@@ -1924,9 +1845,7 @@ MappingFEField<dim, spacedim, VectorType>::fill_fe_immersed_surface_values(
                                                              VectorType>(
           QProjector<dim>::DataSetDescriptor::cell(),
           data,
-          euler_dof_handler->get_fe(),
-          fe_mask,
-          fe_to_real,
+          component_dofs,
           output_data.jacobian_pushed_forward_3rd_derivatives);
     }
 }
@@ -2185,14 +2104,9 @@ MappingFEField<dim, spacedim, VectorType>::do_transform_unit_to_real_cell(
 {
   Point<spacedim> p_real;
 
-  for (unsigned int i = 0; i < data.n_shape_functions; ++i)
-    {
-      unsigned int comp_i =
-        euler_dof_handler->get_fe().system_to_component_index(i).first;
-      if (fe_mask[comp_i])
-        p_real[fe_to_real[comp_i]] +=
-          data.local_dof_values[i] * data.shape(0, i);
-    }
+  for (unsigned int d = 0; d < spacedim; ++d)
+    for (const auto &i : component_dofs[d])
+      p_real[d] += data.local_dof_values[i] * data.shape(0, i);
 
   return p_real;
 }
@@ -2278,16 +2192,13 @@ MappingFEField<dim, spacedim, VectorType>::do_transform_real_to_unit_cell(
       // f'(x)
       Point<spacedim> DF[dim];
       Tensor<2, dim>  df;
-      for (unsigned int k = 0; k < mdata.n_shape_functions; ++k)
-        {
-          const Tensor<1, dim> &grad_k = mdata.derivative(0, k);
-          const unsigned int    comp_k =
-            euler_dof_handler->get_fe().system_to_component_index(k).first;
-          if (fe_mask[comp_k])
+      for (unsigned int d = 0; d < spacedim; ++d)
+        for (const auto &i : component_dofs[d])
+          {
+            const Tensor<1, dim> &grad_i = mdata.derivative(0, i);
             for (unsigned int j = 0; j < dim; ++j)
-              DF[j][fe_to_real[comp_k]] +=
-                mdata.local_dof_values[k] * grad_k[j];
-        }
+              DF[j][d] += mdata.local_dof_values[i] * grad_i[j];
+          }
       for (unsigned int j = 0; j < dim; ++j)
         {
           f[j] = DF[j] * p_minus_F;
