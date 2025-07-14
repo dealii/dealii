@@ -36,7 +36,7 @@ module;
 #endif
 
 
-export module dealii:interface_partition_taskflow;
+export module dealii.external.taskflow;
 
 #ifdef DEAL_II_WITH_TASKFLOW
 

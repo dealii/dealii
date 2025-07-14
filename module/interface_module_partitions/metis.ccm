@@ -38,7 +38,7 @@ extern "C"
 #endif
 
 
-export module dealii:interface_partition_metis;
+export module dealii.external.metis;
 
 #ifdef DEAL_II_WITH_METIS
 

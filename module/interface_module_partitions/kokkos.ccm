@@ -40,7 +40,7 @@ module;
 #include <Kokkos_DualView.hpp>
 #include <Kokkos_Macros.hpp>
 
-export module dealii:interface_partition_kokkos;
+export module dealii.external.kokkos;
 export
 {
   namespace Kokkos

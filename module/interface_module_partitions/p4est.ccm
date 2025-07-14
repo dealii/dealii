@@ -47,7 +47,7 @@ module;
 #endif
 
 
-export module dealii:interface_partition_p4est;
+export module dealii.external.p4est;
 
 #ifdef DEAL_II_WITH_P4EST
 

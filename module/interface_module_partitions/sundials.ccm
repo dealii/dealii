@@ -52,7 +52,7 @@ module;
 #endif
 
 
-export module dealii:interface_partition_sundials;
+export module dealii.external.sundials;
 
 #ifdef DEAL_II_WITH_SUNDIALS
 

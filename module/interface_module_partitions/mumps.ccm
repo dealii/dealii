@@ -35,7 +35,7 @@ module;
 #endif
 
 
-export module dealii:interface_partition_mumps;
+export module dealii.external.mumps;
 
 #ifdef DEAL_II_WITH_MUMPS
 

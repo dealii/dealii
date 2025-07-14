@@ -35,7 +35,7 @@ module;
 #endif
 
 
-export module dealii:interface_partition_hdf5;
+export module dealii.external.hdf5;
 
 #ifdef DEAL_II_WITH_HDF5
 

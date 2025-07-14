@@ -36,7 +36,7 @@ module;
 #endif
 
 
-export module dealii:interface_partition_slepc;
+export module dealii.external.slepc;
 
 #ifdef DEAL_II_WITH_SLEPC
 

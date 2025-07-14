@@ -98,7 +98,7 @@ module;
 #endif
 
 
-export module dealii:interface_partition_cgal;
+export module dealii.external.cgal;
 
 
 #ifdef DEAL_II_WITH_CGAL

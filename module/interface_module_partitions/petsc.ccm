@@ -50,7 +50,7 @@ module;
 #endif
 
 
-export module dealii:interface_partition_petsc;
+export module dealii.external.petsc;
 
 #ifdef DEAL_II_WITH_PETSC
 
