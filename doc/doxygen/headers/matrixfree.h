@@ -587,15 +587,17 @@ digraph G
  * with homogeneous Dirichlet boundary conditions, and where a matrix-free
  * operator can be easily set up. In the form discussed there, the solution
  * $u_h$ is represented by a linear combination of the basis functions using
- * only the unknown coefficients $u_i$. A more general finite element problem
+ * only the unknown coefficients $U_j$. A more general finite element problem
  * might involve non-zero boundary values, which include an affine
  * contribution in the solution $u_h$ and represented by inhomogeneous
- * constraints. The affine contribution ends up at the right-hand side of the
- * linear system, whereas the actually unknown coefficients are determined by
- * solving a linear system. Let us discuss this case for both continuous
- * finite elements, where those inhomogeneous boundary values are typically
- * imposed strongly, and for discontinuous elements with a weak imposition of
- * data separately in next two subsections.
+ * constraints. For a more detailed explanation of constraints, see also the
+ * introduction of AffineConstraints.  The affine contribution ends up at the
+ * right-hand side of the linear system, whereas the actually unknown
+ * coefficients are determined by solving a linear system. Let us discuss this
+ * case for both continuous finite elements, where those inhomogeneous
+ * boundary values are typically imposed strongly, and for discontinuous
+ * elements with a weak imposition of data separately in the next two
+ * subsections.
  *
  * <h4>Representation of inhomogeneous Dirichlet boundary conditions for
  * continuous finite elements</h4>
@@ -606,40 +608,41 @@ digraph G
  * split the contributions, let us start by looking at a solution
  * representation of the form
  * @f{eqnarray*}{
- * u_h(\mathbf{x}) = \sum_{i\in \mathcal N} \varphi_i(\mathbf{x}) u_i =
- * \sum_{i\in \mathcal N \setminus \mathcal N_D} \varphi_i(\mathbf{x}) u_i +
- * \sum_{i\in \mathcal N_D} \varphi_i(\mathbf{x}) g_i.
+ * u_h(\mathbf{x}) = \sum_{j\in \mathcal N} \varphi_i(\mathbf{x}) U_j =
+ * \sum_{j\in \mathcal N \setminus \mathcal N_D} \varphi_j(\mathbf{x}) U_j +
+ * \sum_{j\in \mathcal N_D} \varphi_j(\mathbf{x}) g_j.
  * @f}
- * Here, $u_i$ denotes the nodal values of the solution and $\mathcal N$
+ * Here, $U_j$ denotes the nodal values of the solution and $\mathcal N$
  * denotes the set of all nodes. The set $\mathcal N_D\subset \mathcal N$ is
  * the subset of the nodes that are subject to Dirichlet boundary conditions
- * where the solution is forced to equal $u_i = g_i = g(\mathbf{x}_i)$ as the
+ * where the solution is forced to equal $U_j = g_j = g(\mathbf{x}_j)$ as the
  * interpolation of boundary values on the Dirichlet-constrained node points
- * $i\in \mathcal N_D$.
+ * $j\in \mathcal N_D$.
  *
  * This form of the solution can be inserted into a general PDE system with
  * bilinear form $b(\varphi, u)$ and linear form $f(\varphi)$ (for the
  * Laplacian considered in step-37, we have $b(\varphi, u) = (\nabla \varphi,
  * \nabla u)_\Omega$ and $f(\varphi) = (\varphi, f)_\Omega$), which needs to
  * be fulfilled for all basis function $\varphi$ in some discrete function
- * space. We separate the unknown coefficients $u_i$ from known quantities,
+ * space. We separate the unknown coefficients $U_j$ from known quantities,
  * which are moved to the right-hand side. A finite element problem seeks for
- * the coefficients $(u_j)_{j \in \mathcal N \setminus \mathcal N_D}$ such
- * that holds for all test functions $\varphi_i,\ i \in \mathcal N \setminus
- * \mathcal N_D$
+ * the coefficients $(U_j)_{j \in \mathcal N \setminus \mathcal N_D}$ such
+ * that there holds for all test functions $\varphi_i,\ i \in \mathcal N
+ * \setminus \mathcal N_D$
  * @f{eqnarray*}{
  * b(\varphi_i, u_h) &=& f(\varphi_i) \quad \Rightarrow \                \
- * \sum_{j\in \mathcal N \setminus \mathcal N_D}b(\varphi_i, \varphi_j) \, u_j &=&
- * f(\varphi_i) -\sum_{j\in \mathcal N_D} b(\varphi_i,\varphi_j)_\Omega\, g_j.
+ * \sum_{j\in \mathcal N \setminus \mathcal N_D}b(\varphi_i, \varphi_j) \, U_j &=&
+ * f(\varphi_i) -\sum_{j\in \mathcal N_D} b(\varphi_i,\varphi_j)\, g_j.
  * @f}
  *
  * For matrix-based methods, the contributions resulting from inhomogeneous
  * constraints are inserted into the right-hand side vector by the function
- * AffineConstraints::distribute_local_to_global(). More precisely, the
+ * AffineConstraints::distribute_local_to_global(). A similar operation is
+ * performed by MatrixTools::apply_boundary_values(). More precisely, the
  * contribution from the cell matrix associated with unknown coefficients
- * $u_j$ end up in the matrix, whereas the information from an inhomogeneous
- * constraint $g_j$ is added to the row $i$ in the vector, multiplied by the
- * local $(i,j)$ entry of the cell matrix as the weight.  However, a
+ * $U_j$ end up in the matrix, whereas the information from an inhomogeneous
+ * constraint $g_j$ is subtracted from the entry $i$ of the vector, multiplied
+ * by the local $(i,j)$ entry of the cell matrix as the weight.  However, a
  * matrix-free operator cannot make use of this infrastructure. This is the
  * result of the main architecture of matrix-free methods, which evaluate the
  * operator action, i.e., the left-hand side represented by the weak form
@@ -663,9 +666,9 @@ digraph G
  * inhomogeneous conditions ends up, different evaluation functions compared
  * to the above setting are necessary, and we need to explicitly generate the
  * data that enters the right-hand side rather than using a byproduct of the
- * matrix assembly. A straight-forward approach to use the evaluators already
- * defined is to apply the operator on a vector that only contains the
- * Dirichlet values:
+ * matrix assembly. The generic approach is to evaluate the differential
+ * operator using the terms involving $g_j$ in the equation above, using a
+ * vector that only contains the Dirichlet values and zeros elsewhere:
  *
  * @code
  * // interpolate boundary values on vector solution
@@ -674,9 +677,9 @@ digraph G
  *                                          dof_handler,
  *                                          map_of_boundary_ids_and_functions,
  *                                          boundary_values);
- * for (const std::pair<const types::global_dof_index, double> &pair : boundary_values)
- *   if (solution.locally_owned_elements().is_element(pair.first))
- *     solution(pair.first) = pair.second;
+ * for (const auto [boundary_dof_index, boundary_value] : boundary_values)
+ *   if (solution.locally_owned_elements().is_element(boundary_dof_index))
+ *     solution(boundary_dof_index) = boundary_value;
  * @endcode
  * or, equivalently, if the inhomogeneous constraints are contained in
  * an AffineConstraints object,
@@ -686,8 +689,10 @@ digraph G
  *@endcode
  *
  * Note, however, that this step only sets entries in constrained DoFs, which
- * would be ignored by FEEvaluation::read_dof_values(). There are therefore
- * two general options to solve this situation:
+ * would be ignored by FEEvaluation::read_dof_values() that gets used to
+ * define the terms in $\sum_{j\in \mathcal N_D} b(\varphi_i,\varphi_j)\, g_j$
+ * with the chosen vector `solution`. There are therefore two general options
+ * to solve this situation:
  *
  * <h5> Using FEEvaluation::read_dof_values_plain() that does not resolve
  * constraints </h5>
@@ -728,25 +733,25 @@ digraph G
  *
  * Notice the use of FEEvaluation::read_dof_values_plain() in this function,
  * which ignores all constraints. Due to this setup, the code must make sure
- * that other constraints, e.g. by hanging nodes or periodicity, are correctly
- * distributed to the input vector already because none of the constraints is
- * considered in FEEvaluation::read_dof_values_plain().
+ * that other (homogeneous) constraints, e.g. by hanging nodes or periodicity,
+ * are correctly distributed to the input vector already because none of the
+ * constraints is considered in FEEvaluation::read_dof_values_plain().
  *
- * Note that the negative sign that needs to be considered as opposed to the
- * actual matrix-free operator in order to reflect the negative sign for the
- * $g_j$ terms as in the formula at the beginning of this subsection is
- * following a more general concept, namely Newton's method for nonlinear
- * equations applied to a linear system. As an initial guess for the variable
- * @p solution, the inhomogeneous Dirichlet boundary conditions has been used,
- * leading to the residual $r = f - Au_0$. The linear system would then be
- * solved as $\Delta u = A^{-1} (f-Au)$, and we would conclude the step by
- * computing the actual solution $u = u_0 + \Delta u$. For a linear system, we
- * reach the exact solution after a single iteration. For a general non-linear
- * system, the code described above would be part of a @p assemble_residual()
- * function, where the residual is computed for a complete representation of a
- * solution field (with initially un-converged state but correct value for the
- * inhomogeneously constrained unknowns), which gets updated increments with
- * zero boundary data, i.e., a homogeneous operator.
+ * Note that the negative sign for the terms containing the $g_j$ terms
+ * (representing a subtraction of boundary data) according to the formula at
+ * the beginning of this subsection is following a more general concept,
+ * namely Newton's method for nonlinear equations applied to a linear
+ * system. As an initial guess for the variable @p solution, the inhomogeneous
+ * Dirichlet boundary conditions has been used, leading to the residual $r = f
+ * - Au_0$. The linear system would then be solved as $\Delta u = A^{-1}
+ * (f-Au)$, and we would conclude the step by computing the actual solution $u
+ * = u_0 + \Delta u$. For a linear system, we reach the exact solution after a
+ * single iteration. For a general non-linear system, the code described above
+ * would be part of a @p assemble_residual() function, where the residual is
+ * computed for a complete representation of a solution field (with initially
+ * un-converged state but correct value for the inhomogeneously constrained
+ * unknowns), which gets updated increments with zero boundary data, i.e., a
+ * homogeneous operator.
  *
  * This scenario is explained in the step-50 and step-66 tutorial programs.
  *
