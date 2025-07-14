@@ -92,10 +92,9 @@ class PolynomialsRT_Bubbles : public TensorPolynomialsBase<dim>
 public:
   /**
    * Constructor. Creates all basis functions for RT_bubbles polynomials of
-   * given degree with the given lexicographic orders of polynomials
+   * given degree using the lexicographic order from FE_RaviartThomas.
    */
-  PolynomialsRT_Bubbles(const unsigned int               k,
-                        const std::vector<unsigned int> &polynomial_ordering);
+  PolynomialsRT_Bubbles(const unsigned int k);
 
   /**
    * Computes the value and the first and second derivatives of each RT_bubbles

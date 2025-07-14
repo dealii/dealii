@@ -17,6 +17,8 @@
 #include <deal.II/base/quadrature_lib.h>
 #include <deal.II/base/thread_management.h>
 
+#include <deal.II/fe/fe_raviart_thomas.h>
+
 #include <iomanip>
 #include <iostream>
 #include <memory>
@@ -25,11 +27,12 @@ DEAL_II_NAMESPACE_OPEN
 
 
 template <int dim>
-PolynomialsRT_Bubbles<dim>::PolynomialsRT_Bubbles(
-  const unsigned int               k,
-  const std::vector<unsigned int> &polynomial_ordering)
+PolynomialsRT_Bubbles<dim>::PolynomialsRT_Bubbles(const unsigned int k)
   : TensorPolynomialsBase<dim>(k, n_polynomials(k))
-  , raviart_thomas_space(k, k - 1, polynomial_ordering)
+  , raviart_thomas_space(k,
+                         k - 1,
+                         FE_RaviartThomas<dim>::get_lexicographic_numbering(k -
+                                                                            1))
   , monomials(k + 2)
 {
   Assert(dim >= 2, ExcImpossibleInDim(dim));
