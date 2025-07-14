@@ -697,9 +697,9 @@ namespace internal
     template <int dim, int spacedim, typename VectorType>
     void
     maybe_compute_q_points(
-      const typename dealii::QProjector<dim>::DataSetDescriptor data_set,
-      const typename dealii::MappingFEField<dim, spacedim, VectorType>::
-        InternalData                     &data,
+      const typename QProjector<dim>::DataSetDescriptor data_set,
+      const typename MappingFEField<dim, spacedim, VectorType>::InternalData
+                                         &data,
       const FiniteElement<dim, spacedim> &fe,
       const ComponentMask                &fe_mask,
       const std::vector<unsigned int>    &fe_to_real,
@@ -739,12 +739,12 @@ namespace internal
     template <int dim, int spacedim, typename VectorType>
     void
     maybe_update_Jacobians(
-      const typename dealii::QProjector<dim>::DataSetDescriptor data_set,
-      const typename dealii::MappingFEField<dim, spacedim, VectorType>::
-        InternalData                     &data,
+      typename QProjector<dim>::DataSetDescriptor data_set,
+      const typename MappingFEField<dim, spacedim, VectorType>::InternalData
+                                         &data,
       const FiniteElement<dim, spacedim> &fe,
       const ComponentMask                &fe_mask,
-      const std::vector<unsigned int>    &fe_to_real)
+      const std::vector<unsigned int>    &fe_to_rea) const
     {
       const UpdateFlags update_flags = data.update_each;
 
@@ -808,11 +808,10 @@ namespace internal
     template <int dim, int spacedim, typename VectorType>
     void
     maybe_update_jacobian_grads(
-      const typename dealii::QProjector<dim>::DataSetDescriptor data_set,
-      const typename dealii::MappingFEField<dim, spacedim, VectorType>::
-        InternalData                                &data,
+      const typename QProjector<dim>::DataSetDescriptor data_set,
+      const typename MappingFEField<dim, spacedim, VectorType>::InternalData
+                                                    &data,
       const FiniteElement<dim, spacedim>            &fe,
-      const ComponentMask                           &fe_mask,
       const std::vector<unsigned int>               &fe_to_real,
       std::vector<DerivativeForm<2, dim, spacedim>> &jacobian_grads)
     {
@@ -858,9 +857,9 @@ namespace internal
     template <int dim, int spacedim, typename VectorType>
     void
     maybe_update_jacobian_pushed_forward_grads(
-      const typename dealii::QProjector<dim>::DataSetDescriptor data_set,
-      const typename dealii::MappingFEField<dim, spacedim, VectorType>::
-        InternalData                     &data,
+      const typename QProjector<dim>::DataSetDescriptor data_set,
+      const typename MappingFEField<dim, spacedim, VectorType>::InternalData
+                                         &data,
       const FiniteElement<dim, spacedim> &fe,
       const ComponentMask                &fe_mask,
       const std::vector<unsigned int>    &fe_to_real,
@@ -930,9 +929,9 @@ namespace internal
     template <int dim, int spacedim, typename VectorType>
     void
     maybe_update_jacobian_2nd_derivatives(
-      const typename dealii::QProjector<dim>::DataSetDescriptor data_set,
-      const typename dealii::MappingFEField<dim, spacedim, VectorType>::
-        InternalData                                &data,
+      const typename QProjector<dim>::DataSetDescriptor data_set,
+      const typename MappingFEField<dim, spacedim, VectorType>::InternalData
+                                                    &data,
       const FiniteElement<dim, spacedim>            &fe,
       const ComponentMask                           &fe_mask,
       const std::vector<unsigned int>               &fe_to_real,
@@ -984,9 +983,9 @@ namespace internal
     template <int dim, int spacedim, typename VectorType>
     void
     maybe_update_jacobian_pushed_forward_2nd_derivatives(
-      const typename dealii::QProjector<dim>::DataSetDescriptor data_set,
-      const typename dealii::MappingFEField<dim, spacedim, VectorType>::
-        InternalData                     &data,
+      const typename QProjector<dim>::DataSetDescriptor data_set,
+      const typename MappingFEField<dim, spacedim, VectorType>::InternalData
+                                         &data,
       const FiniteElement<dim, spacedim> &fe,
       const ComponentMask                &fe_mask,
       const std::vector<unsigned int>    &fe_to_real,
@@ -1077,9 +1076,9 @@ namespace internal
     template <int dim, int spacedim, typename VectorType>
     void
     maybe_update_jacobian_3rd_derivatives(
-      const typename dealii::QProjector<dim>::DataSetDescriptor data_set,
-      const typename dealii::MappingFEField<dim, spacedim, VectorType>::
-        InternalData                                &data,
+      const typename QProjector<dim>::DataSetDescriptor data_set,
+      const typename MappingFEField<dim, spacedim, VectorType>::InternalData
+                                                    &data,
       const FiniteElement<dim, spacedim>            &fe,
       const ComponentMask                           &fe_mask,
       const std::vector<unsigned int>               &fe_to_real,
@@ -1135,9 +1134,9 @@ namespace internal
     template <int dim, int spacedim, typename VectorType>
     void
     maybe_update_jacobian_pushed_forward_3rd_derivatives(
-      const typename dealii::QProjector<dim>::DataSetDescriptor data_set,
-      const typename dealii::MappingFEField<dim, spacedim, VectorType>::
-        InternalData                     &data,
+      const typename QProjector<dim>::DataSetDescriptor data_set,
+      const typename MappingFEField<dim, spacedim, VectorType>::InternalData
+                                         &data,
       const FiniteElement<dim, spacedim> &fe,
       const ComponentMask                &fe_mask,
       const std::vector<unsigned int>    &fe_to_real,
@@ -1254,13 +1253,13 @@ namespace internal
     template <int dim, int spacedim, typename VectorType>
     void
     maybe_compute_face_data(
-      const dealii::Mapping<dim, spacedim> &mapping,
-      const typename dealii::Triangulation<dim, spacedim>::cell_iterator &cell,
-      const unsigned int                                face_no,
-      const unsigned int                                subface_no,
-      const typename QProjector<dim>::DataSetDescriptor data_set,
-      const typename dealii::MappingFEField<dim, spacedim, VectorType>::
-        InternalData &data,
+      const Mapping<dim, spacedim>                               &mapping,
+      const typename Triangulation<dim, spacedim>::cell_iterator &cell,
+      const unsigned int                                          face_no,
+      const unsigned int                                          subface_no,
+      const typename QProjector<dim>::DataSetDescriptor           data_set,
+      const typename MappingFEField<dim, spacedim, VectorType>::InternalData
+        &data,
       internal::FEValuesImplementation::MappingRelatedData<dim, spacedim>
         &output_data)
     {
@@ -1397,13 +1396,13 @@ namespace internal
     template <int dim, int spacedim, typename VectorType>
     void
     do_fill_fe_face_values(
-      const dealii::Mapping<dim, spacedim> &mapping,
-      const typename dealii::Triangulation<dim, spacedim>::cell_iterator &cell,
-      const unsigned int                                        face_no,
-      const unsigned int                                        subface_no,
-      const typename dealii::QProjector<dim>::DataSetDescriptor data_set,
-      const typename dealii::MappingFEField<dim, spacedim, VectorType>::
-        InternalData                     &data,
+      const Mapping<dim, spacedim>                               &mapping,
+      const typename Triangulation<dim, spacedim>::cell_iterator &cell,
+      const unsigned int                                          face_no,
+      const unsigned int                                          subface_no,
+      const typename QProjector<dim>::DataSetDescriptor           data_set,
+      const typename MappingFEField<dim, spacedim, VectorType>::InternalData
+                                         &data,
       const FiniteElement<dim, spacedim> &fe,
       const ComponentMask                &fe_mask,
       const std::vector<unsigned int>    &fe_to_real,
@@ -1945,15 +1944,14 @@ namespace internal
       const ArrayView<Tensor<rank, spacedim>>                 &output)
     {
       AssertDimension(input.size(), output.size());
-      Assert((dynamic_cast<
-                const typename dealii::
-                  MappingFEField<dim, spacedim, VectorType>::InternalData *>(
-                &mapping_data) != nullptr),
-             ExcInternalError());
-      const typename dealii::MappingFEField<dim, spacedim, VectorType>::
-        InternalData &data = static_cast<
-          const typename dealii::MappingFEField<dim, spacedim, VectorType>::
-            InternalData &>(mapping_data);
+      Assert(
+        (dynamic_cast<const typename MappingFEField<dim, spacedim, VectorType>::
+                        InternalData *>(&mapping_data) != nullptr),
+        ExcInternalError());
+      const typename MappingFEField<dim, spacedim, VectorType>::InternalData
+        &data =
+          static_cast<const typename MappingFEField<dim, spacedim, VectorType>::
+                        InternalData &>(mapping_data);
 
       switch (mapping_kind)
         {
@@ -2019,15 +2017,14 @@ namespace internal
       const ArrayView<Tensor<rank + 1, spacedim>>                &output)
     {
       AssertDimension(input.size(), output.size());
-      Assert((dynamic_cast<
-                const typename dealii::
-                  MappingFEField<dim, spacedim, VectorType>::InternalData *>(
-                &mapping_data) != nullptr),
-             ExcInternalError());
-      const typename dealii::MappingFEField<dim, spacedim, VectorType>::
-        InternalData &data = static_cast<
-          const typename dealii::MappingFEField<dim, spacedim, VectorType>::
-            InternalData &>(mapping_data);
+      Assert(
+        (dynamic_cast<const typename MappingFEField<dim, spacedim, VectorType>::
+                        InternalData *>(&mapping_data) != nullptr),
+        ExcInternalError());
+      const typename MappingFEField<dim, spacedim, VectorType>::InternalData
+        &data =
+          static_cast<const typename MappingFEField<dim, spacedim, VectorType>::
+                        InternalData &>(mapping_data);
 
       switch (mapping_kind)
         {
