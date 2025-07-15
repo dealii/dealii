@@ -33,7 +33,7 @@ module;
 #endif
 
 
-export module dealii:interface_partition_mpi;
+export module dealii.external.mpi;
 
 #ifdef DEAL_II_WITH_MPI
 

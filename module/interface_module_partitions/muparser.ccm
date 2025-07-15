@@ -35,7 +35,7 @@ module;
 #endif
 
 
-export module dealii:interface_partition_muparser;
+export module dealii.external.muparser;
 
 #ifdef DEAL_II_WITH_MUPARSER
 

@@ -36,7 +36,7 @@ module;
 #endif
 
 
-export module dealii:interface_partition_vtk;
+export module dealii.external.vtk;
 
 #ifdef DEAL_II_WITH_VTK
 

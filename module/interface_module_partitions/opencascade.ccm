@@ -112,7 +112,7 @@ module;
 #endif
 
 
-export module dealii:interface_partition_opencascade;
+export module dealii.external.opencascade;
 
 #ifdef DEAL_II_WITH_OPENCASCADE
 

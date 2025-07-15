@@ -151,7 +151,7 @@ module;
 #include <version>
 
 
-export module dealii:interface_partition_std;
+export module dealii.external.std;
 
 export
 {

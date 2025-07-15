@@ -35,7 +35,7 @@ module;
 #endif
 
 
-export module dealii:interface_partition_umfpack;
+export module dealii.external.umfpack;
 
 #ifdef DEAL_II_WITH_UMFPACK
 
