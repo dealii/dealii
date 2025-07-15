@@ -21,7 +21,7 @@
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/point.h>
 #include <deal.II/base/polynomial.h>
-#include <deal.II/base/polynomials_raviart_thomas.h>
+#include <deal.II/base/polynomials_vector_anisotropic.h>
 #include <deal.II/base/tensor.h>
 #include <deal.II/base/tensor_polynomials_base.h>
 
@@ -92,7 +92,7 @@ class PolynomialsRT_Bubbles : public TensorPolynomialsBase<dim>
 public:
   /**
    * Constructor. Creates all basis functions for RT_bubbles polynomials of
-   * given degree.
+   * given degree using the lexicographic order from FE_RaviartThomas.
    */
   PolynomialsRT_Bubbles(const unsigned int k);
 
@@ -135,7 +135,7 @@ private:
   /**
    * An object representing the Raviart-Thomas part of the space
    */
-  const PolynomialsRaviartThomas<dim> raviart_thomas_space;
+  const PolynomialsVectorAnisotropic<dim> raviart_thomas_space;
 
   /**
    * Storage for monomials, we need all polynomials from degree zero
