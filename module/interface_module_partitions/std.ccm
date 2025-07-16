@@ -425,7 +425,7 @@ export
     using std::plus;
     using std::ref;
 
-#if DEAL_II_HAVE_CXX23
+#ifdef DEAL_II_HAVE_CXX23
     using std::to_underlying;
     using std::unreachable;
 #endif
