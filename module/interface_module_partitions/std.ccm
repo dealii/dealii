@@ -670,7 +670,6 @@ export
     using std::setfill;
     using std::setprecision;
     using std::setw;
-    using std::sprintf;
     using std::streambuf;
     using std::streampos;
     using std::streamsize;
