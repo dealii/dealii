@@ -1,0 +1,377 @@
+// ------------------------------------------------------------------------
+//
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2025 by the deal.II authors
+//
+// This file is part of the deal.II library.
+//
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
+//
+// ------------------------------------------------------------------------
+
+
+// It is very inefficient in the module system to have repeated
+// #includes in many module partition files because when you 'import'
+// those partitions, you also have to load everything they
+// #included. In other words, you get the same content *many times*,
+// once from each imported partition, rather than only once via the
+// old-style #include system. We deal with this by wrapping all of
+// BOOST into one partition that we can 'import' wherever we need.
+// This is the file that wraps everything we need from BOOST into one
+// module partition.
+
+
+module;
+
+#include <deal.II/base/config.h>
+
+#include <boost/algorithm/string.hpp>
+#include <boost/algorithm/string/join.hpp>
+#include <boost/any.hpp>
+#include <boost/archive/basic_archive.hpp>
+#include <boost/archive/binary_iarchive.hpp>
+#include <boost/archive/binary_oarchive.hpp>
+#include <boost/archive/iterators/base64_from_binary.hpp>
+#include <boost/archive/iterators/binary_from_base64.hpp>
+#include <boost/archive/iterators/transform_width.hpp>
+#include <boost/archive/text_iarchive.hpp>
+#include <boost/archive/text_oarchive.hpp>
+#include <boost/config.hpp>
+#include <boost/container/small_vector.hpp>
+#include <boost/core/demangle.hpp>
+#include <boost/geometry.hpp>
+#include <boost/geometry/algorithms/distance.hpp>
+#include <boost/geometry/core/coordinate_dimension.hpp>
+#include <boost/geometry/core/coordinate_system.hpp>
+#include <boost/geometry/core/coordinate_type.hpp>
+#include <boost/geometry/core/cs.hpp>
+#include <boost/geometry/core/tag.hpp>
+#include <boost/geometry/geometries/point.hpp>
+#include <boost/geometry/geometries/segment.hpp>
+#include <boost/geometry/index/rtree.hpp>
+#include <boost/geometry/strategies/strategies.hpp>
+#include <boost/graph/adjacency_list.hpp>
+#include <boost/graph/bandwidth.hpp>
+#include <boost/graph/cuthill_mckee_ordering.hpp>
+#include <boost/graph/king_ordering.hpp>
+#include <boost/graph/minimum_degree_ordering.hpp>
+#include <boost/graph/properties.hpp>
+#include <boost/hana.hpp>
+#include <boost/io/ios_state.hpp>
+#include <boost/iostreams/copy.hpp>
+#include <boost/iostreams/device/array.hpp>
+#include <boost/iostreams/device/back_inserter.hpp>
+#include <boost/iostreams/device/file.hpp>
+#include <boost/iostreams/filter/gzip.hpp>
+#include <boost/iostreams/filter/zlib.hpp>
+#include <boost/iostreams/filtering_stream.hpp>
+#include <boost/iostreams/filtering_streambuf.hpp>
+#include <boost/iostreams/stream.hpp>
+#include <boost/iostreams/tee.hpp>
+#include <boost/lexical_cast.hpp>
+#include <boost/math/special_functions/bessel.hpp>
+#include <boost/math/special_functions/binomial.hpp>
+#include <boost/math/special_functions/legendre.hpp>
+#include <boost/math/special_functions/relative_difference.hpp>
+#include <boost/math/special_functions/sign.hpp>
+#include <boost/math/tools/roots.hpp>
+#include <boost/property_tree/json_parser.hpp>
+#include <boost/property_tree/ptree.hpp>
+#include <boost/property_tree/ptree_fwd.hpp>
+#include <boost/property_tree/ptree_serialization.hpp>
+#include <boost/property_tree/xml_parser.hpp>
+#include <boost/random.hpp>
+#include <boost/random/mersenne_twister.hpp>
+#include <boost/random/uniform_int_distribution.hpp>
+#include <boost/random/uniform_real_distribution.hpp>
+#include <boost/range/irange.hpp>
+#include <boost/range/iterator_range.hpp>
+#include <boost/range/iterator_range_core.hpp>
+#include <boost/serialization/array.hpp>
+#include <boost/serialization/array_wrapper.hpp>
+#include <boost/serialization/complex.hpp>
+#include <boost/serialization/map.hpp>
+#include <boost/serialization/serialization.hpp>
+#include <boost/serialization/split_member.hpp>
+#include <boost/serialization/string.hpp>
+#include <boost/serialization/unique_ptr.hpp>
+#include <boost/serialization/utility.hpp>
+#include <boost/serialization/vector.hpp>
+#include <boost/signals2.hpp>
+#include <boost/signals2/connection.hpp>
+#include <boost/signals2/signal.hpp>
+#include <boost/type_traits.hpp>
+#include <boost/variant.hpp>
+#include <boost/version.hpp>
+
+
+export module dealii.external.boost;
+export
+{
+  namespace boost
+  {
+    namespace algorithm
+    {
+      using boost::algorithm::join;
+      using boost::algorithm::to_lower;
+      using boost::algorithm::trim;
+    } // namespace algorithm
+
+    namespace archive
+    {
+      using boost::archive::binary_iarchive;
+      using boost::archive::binary_oarchive;
+      using boost::archive::text_iarchive;
+      using boost::archive::text_oarchive;
+
+      namespace iterators
+      {
+        using boost::archive::iterators::base64_from_binary;
+        using boost::archive::iterators::binary_from_base64;
+        using boost::archive::iterators::transform_width;
+      } // namespace iterators
+    }   // namespace archive
+
+    namespace container
+    {
+      using boost::container::small_vector;
+    }
+
+    namespace core
+    {
+      using boost::core::demangle;
+    }
+
+    namespace geometry
+    {
+      namespace cs
+      {
+        using boost::geometry::cs::cartesian;
+      }
+
+      namespace index
+      {
+        using boost::geometry::index::indexable;
+        using boost::geometry::index::intersects;
+        using boost::geometry::index::linear;
+        using boost::geometry::index::nearest;
+        using boost::geometry::index::query;
+        using boost::geometry::index::rtree;
+        using boost::geometry::index::satisfies;
+
+        namespace adaptors
+        {
+          using boost::geometry::index::adaptors::queried;
+
+          namespace detail
+          {
+            using boost::geometry::index::adaptors::detail::operator|;
+          }
+        } // namespace adaptors
+
+        namespace detail
+        {
+          namespace predicates
+          {
+            using boost::geometry::index::detail::predicates::operator!;
+            using boost::geometry::index::detail::predicates::operator&&;
+          } // namespace predicates
+
+          namespace rtree
+          {
+            using boost::geometry::index::detail::rtree::apply_visitor;
+            using boost::geometry::index::detail::rtree::elements;
+            using boost::geometry::index::detail::rtree::elements_type;
+            using boost::geometry::index::detail::rtree::internal_node;
+            using boost::geometry::index::detail::rtree::leaf;
+            using boost::geometry::index::detail::rtree::visitor;
+
+            namespace utilities
+            {
+              using boost::geometry::index::detail::rtree::utilities::view;
+            }
+          } // namespace rtree
+        }   // namespace detail
+      }     // namespace index
+
+      namespace model
+      {
+        using boost::geometry::model::point;
+        using boost::geometry::model::segment;
+      } // namespace model
+
+      namespace traits
+      {
+        using boost::geometry::traits::access;
+        using boost::geometry::traits::coordinate_system;
+        using boost::geometry::traits::coordinate_type;
+        using boost::geometry::traits::dimension;
+        using boost::geometry::traits::indexed_access;
+        using boost::geometry::traits::point_type;
+        using boost::geometry::traits::tag;
+      } // namespace traits
+
+      using boost::geometry::box_tag;
+      using boost::geometry::convert;
+      using boost::geometry::dimension;
+      using boost::geometry::get;
+      using boost::geometry::point_tag;
+
+      // The following two we would like to export, but can't: They have
+      // internal linkage until we fixed it after Boost 1.88.0.
+#if DEAL_II_BOOST_VERSION_GTE(1, 89, 0)
+      using boost::geometry::max_corner;
+      using boost::geometry::min_corner;
+#endif
+    } // namespace geometry
+
+
+    // Things from the boost graph library that end up in the boost namespace
+    using boost::add_edge;
+    using boost::adjacency_list;
+    using boost::cuthill_mckee_ordering;
+    using boost::default_color_type;
+    using boost::degree;
+    using boost::directedS;
+    using boost::get;
+    using boost::graph_traits;
+    using boost::king_ordering;
+    using boost::make_degree_map;
+    using boost::make_iterator_property_map;
+    using boost::minimum_degree_ordering;
+    using boost::num_vertices;
+    using boost::property;
+    using boost::property_map;
+    using boost::tie;
+    using boost::undirectedS;
+    using boost::vecS;
+    using boost::vertex_color;
+    using boost::vertex_color_t;
+    using boost::vertex_degree_t;
+    using boost::vertex_in_degree;
+    using boost::vertex_index_t;
+    using boost::vertices;
+
+    namespace hana
+    {
+      using boost::hana::is_valid;
+    }
+
+    namespace io
+    {
+      using boost::io::basic_ios_fill_saver;
+      using boost::io::ios_base_all_saver;
+      using boost::io::ios_flags_saver;
+    } // namespace io
+
+    namespace iostreams
+    {
+      using boost::iostreams::array_source;
+      using boost::iostreams::back_insert_device;
+      using boost::iostreams::back_inserter;
+      using boost::iostreams::basic_array_source;
+      using boost::iostreams::basic_gzip_decompressor;
+      using boost::iostreams::copy;
+      using boost::iostreams::file_source;
+      using boost::iostreams::filtering_istream;
+      using boost::iostreams::filtering_istreambuf;
+      using boost::iostreams::filtering_ostream;
+      using boost::iostreams::filtering_ostreambuf;
+      using boost::iostreams::filtering_streambuf;
+      using boost::iostreams::gzip_compressor;
+      using boost::iostreams::gzip_decompressor;
+      using boost::iostreams::input;
+      using boost::iostreams::stream;
+      using boost::iostreams::tee_device;
+
+#ifdef DEAL_II_WITH_ZLIB
+      using boost::iostreams::zlib_compressor;
+      using boost::iostreams::zlib_decompressor;
+
+      namespace zlib
+      {
+        using boost::iostreams::zlib::best_compression;
+        using boost::iostreams::zlib::best_speed;
+        using boost::iostreams::zlib::default_compression;
+        using boost::iostreams::zlib::no_compression;
+      } // namespace zlib
+#endif
+    } // namespace iostreams
+
+    namespace iterators
+    {
+      using boost::iterators::operator==;
+      using boost::iterators::operator!=;
+    } // namespace iterators
+
+    namespace math
+    {
+      using boost::math::binomial_coefficient;
+      using boost::math::cyl_bessel_j;
+      using boost::math::epsilon_difference;
+      using boost::math::legendre_p;
+      using boost::math::sign;
+      using boost::math::spherical_harmonic;
+
+      namespace tools
+      {
+        using boost::math::tools::toms748_solve;
+      }
+    } // namespace math
+
+    namespace mpl
+    {
+      using boost::mpl::int_;
+    }
+
+    namespace property_tree
+    {
+      using boost::property_tree::ptree;
+      using boost::property_tree::read_json;
+      using boost::property_tree::read_xml;
+      using boost::property_tree::write_json;
+      using boost::property_tree::write_xml;
+      using boost::property_tree::xml_writer_settings;
+    } // namespace property_tree
+
+    namespace random
+    {
+      using boost::random::mt19937;
+      using boost::random::normal_distribution;
+      using boost::random::uniform_int_distribution;
+      using boost::random::uniform_real_distribution;
+    } // namespace random
+
+    namespace serialization
+    {
+      using boost::serialization::access;
+      using boost::serialization::array_wrapper;
+      using boost::serialization::base_object;
+      using boost::serialization::make_array;
+      using boost::serialization::split_member;
+      using boost::serialization::tracking_type;
+    } // namespace serialization
+
+    namespace signals2
+    {
+      using boost::signals2::connection;
+      using boost::signals2::signal;
+    } // namespace signals2
+
+    using boost::apply_visitor;
+    using boost::bad_lexical_cast;
+    using boost::is_complex;
+    using boost::iterator_range;
+    using boost::lexical_cast;
+    using boost::make_iterator_range;
+    using boost::mt19937;
+    using boost::normal_distribution;
+    using boost::optional;
+    using boost::static_visitor;
+    using boost::uintmax_t;
+    using boost::variant;
+  } // namespace boost
+}
