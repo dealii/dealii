@@ -1,3 +1,4 @@
+@anchor step_21-Results
 <h1>Results</h1>
 
 The code as presented here does not actually compute the results
@@ -109,7 +110,7 @@ saturation less than 0.5. However, it appears that most visualization programs
 are not equipped to do this kind of transformation.
 
 
-<a name="step-21-extensions"></a>
+@anchor step_21-Extensions
 <h3>Possibilities for extensions</h3>
 
 There are a number of areas where this program can be improved. Three of them

@@ -185,7 +185,7 @@ other parts of the program scale very nicely.
 
 
 
-<a name="step-29-extensions"></a>
+@anchor step_29-Extensions
 <h3>Possibilities for extensions</h3>
 
 An obvious possible extension for this program is to run it in 3d
