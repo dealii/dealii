@@ -1377,7 +1377,7 @@ namespace DoFTools
    * @deprecated
    */
   template <int dim, int spacedim>
-  DEAL_II_DEPRECATED_EARLY_WITH_COMMENT(
+  DEAL_II_DEPRECATED_WITH_COMMENT(
     "Use the other function that returns the constant modes by value, rather than via an argument.")
   void extract_constant_modes(const DoFHandler<dim, spacedim> &dof_handler,
                               const ComponentMask             &component_mask,
@@ -1398,7 +1398,7 @@ namespace DoFTools
    * @deprecated
    */
   template <int dim, int spacedim>
-  DEAL_II_DEPRECATED_EARLY_WITH_COMMENT(
+  DEAL_II_DEPRECATED_WITH_COMMENT(
     "Use the other function that returns the constant modes by value, rather than via an argument.")
   void extract_level_constant_modes(
     const unsigned int               level,

@@ -189,7 +189,7 @@ namespace types
    * @deprecated This type was previously only used in library internals and is
    * deprecated without replacement.
    */
-  using geometric_entity_type DEAL_II_DEPRECATED_EARLY = std::uint8_t;
+  using geometric_entity_type DEAL_II_DEPRECATED = std::uint8_t;
 } // namespace types
 
 /**

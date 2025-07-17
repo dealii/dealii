@@ -19,10 +19,8 @@
 
 #include <optional>
 
-#ifdef DEAL_II_EARLY_DEPRECATIONS
 DEAL_II_WARNING("This file is deprecated."
                 "Use the corresponding C++17 header optional instead.")
-#endif
 
 DEAL_II_NAMESPACE_OPEN
 namespace std_cxx17

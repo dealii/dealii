@@ -494,7 +494,7 @@ public:
    *   set; it should not be seen as a sorted container in which it is clear
    *   what element is stored "last".
    */
-  DEAL_II_DEPRECATED_EARLY
+  DEAL_II_DEPRECATED
   size_type
   pop_back();
 
@@ -506,7 +506,7 @@ public:
    *   set; it should not be seen as a sorted container in which it is clear
    *   what element is stored "first".
    */
-  DEAL_II_DEPRECATED_EARLY
+  DEAL_II_DEPRECATED
   size_type
   pop_front();
 

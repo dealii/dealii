@@ -452,7 +452,7 @@ public:
    *
    * @deprecated Use numbers::default_geometric_orientation instead.
    */
-  DEAL_II_DEPRECATED_EARLY_WITH_COMMENT(
+  DEAL_II_DEPRECATED_WITH_COMMENT(
     "Use numbers::default_geometric_orientation instead.")
   static constexpr types::geometric_orientation
   default_combined_face_orientation();
@@ -465,7 +465,7 @@ public:
    *
    * @deprecated Use numbers::reverse_line_orientation instead.
    */
-  DEAL_II_DEPRECATED_EARLY_WITH_COMMENT(
+  DEAL_II_DEPRECATED_WITH_COMMENT(
     "Use numbers::reverse_line_orientation instead.")
   static constexpr types::geometric_orientation
   reversed_combined_line_orientation();
@@ -477,7 +477,7 @@ public:
    * @deprecated Use the version of this function which takes the orientation as
    * the third parameter instead.
    */
-  DEAL_II_DEPRECATED_EARLY_WITH_COMMENT(
+  DEAL_II_DEPRECATED_WITH_COMMENT(
     "Use the version of this function which takes the orientation as the third "
     "parameter instead.")
   unsigned int
@@ -635,7 +635,7 @@ public:
    *
    * @deprecated Use face_to_cell_line_orientation() instead.
    */
-  DEAL_II_DEPRECATED_EARLY_WITH_COMMENT(
+  DEAL_II_DEPRECATED_WITH_COMMENT(
     "Use face_to_cell_line_orientation() instead.")
   types::geometric_orientation
   standard_vs_true_line_orientation(
@@ -805,7 +805,7 @@ public:
    * @deprecated Use face_tangent_vector() instead.
    */
   template <int dim>
-  DEAL_II_DEPRECATED_EARLY_WITH_COMMENT("Use face_tangent_vector() instead.")
+  DEAL_II_DEPRECATED_WITH_COMMENT("Use face_tangent_vector() instead.")
   Tensor<1, dim> unit_tangential_vectors(const unsigned int face_no,
                                          const unsigned int i) const;
 
@@ -830,7 +830,7 @@ public:
    * @deprecated Use face_normal_vector() instead.
    */
   template <int dim>
-  DEAL_II_DEPRECATED_EARLY_WITH_COMMENT("Use face_normal_vector() instead.")
+  DEAL_II_DEPRECATED_WITH_COMMENT("Use face_normal_vector() instead.")
   Tensor<1, dim> unit_normal_vectors(const unsigned int face_no) const;
 
   /**
