@@ -410,7 +410,7 @@ public:
    * Reinit this class to the state that it has directly after calling the
    * constructor.
    */
-  DEAL_II_DEPRECATED_EARLY void
+  DEAL_II_DEPRECATED void
   clear();
 
 private:

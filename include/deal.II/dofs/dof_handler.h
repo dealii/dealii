@@ -1233,7 +1233,7 @@ public:
    *
    * @deprecated Use get_mpi_communicator() instead.
    */
-  DEAL_II_DEPRECATED_EARLY_WITH_COMMENT(
+  DEAL_II_DEPRECATED_WITH_COMMENT(
     "Access the MPI communicator with get_mpi_communicator() instead.")
   MPI_Comm
   get_communicator() const;
