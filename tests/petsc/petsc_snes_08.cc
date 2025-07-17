@@ -48,7 +48,8 @@ main(int argc, char *argv[])
     NonlinearSolverSelector<VectorType>::AdditionalData::SolverType::petsc_snes;
   additional_data.maximum_non_linear_iterations = 1;
 
-  NonlinearSolverSelector<VectorType> nonlinear_solver(additional_data);
+  NonlinearSolverSelector<VectorType> nonlinear_solver(additional_data,
+                                                       MPI_COMM_WORLD);
 
   nonlinear_solver.reinit_vector = [N](VectorType &v) {
     v.reinit(MPI_COMM_WORLD, N, N);
