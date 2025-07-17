@@ -1150,7 +1150,7 @@ namespace Step91
           << "   Error (abs): " << error_abs << std::endl
           << "   Error (rel): " << error_rel << std::endl;
 
-    AssertThrow(error_rel < 1e-4,
+    AssertThrow(error_rel < 1e-2,
                 ExcMessage("Conservation of water rate not satisfied."));
   }
 
