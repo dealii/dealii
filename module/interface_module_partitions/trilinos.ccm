@@ -60,10 +60,6 @@ module;
 #  include <Epetra_RowMatrix.h>
 #  include <Epetra_SerialComm.h>
 #  include <Epetra_Vector.h>
-#  include <Ifpack2_Factory.hpp>
-#  include <Ifpack2_IdentitySolver.hpp>
-#  include <Ifpack2_IdentitySolver_decl.hpp>
-#  include <Ifpack2_Preconditioner.hpp>
 #  include <Ifpack_Chebyshev.h>
 #  include <NOX_Abstract_Group.H>
 #  include <NOX_Abstract_Vector.H>
@@ -128,6 +124,14 @@ module;
 #    ifdef DEAL_II_TRILINOS_WITH_AMESOS2
 #      include <Amesos2.hpp>
 #    endif
+
+#    ifdef DEAL_II_TRILINOS_WITH_IFPACK2
+#      include <Ifpack2_Factory.hpp>
+#      include <Ifpack2_IdentitySolver.hpp>
+#      include <Ifpack2_IdentitySolver_decl.hpp>
+#      include <Ifpack2_Preconditioner.hpp>
+#    endif
+
 #  endif
 #endif
 
