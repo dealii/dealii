@@ -44,6 +44,8 @@ export
   using ::Bytef;
   using ::compress2;
   using ::compressBound;
+  using ::uLongf;
+  using ::uncompress;
 }
 
 // Zlib also defines quite a lot of symbols that are either
