@@ -64,11 +64,13 @@ module;
 #include <boost/iostreams/copy.hpp>
 #include <boost/iostreams/device/array.hpp>
 #include <boost/iostreams/device/back_inserter.hpp>
+#include <boost/iostreams/device/file.hpp>
 #include <boost/iostreams/filter/gzip.hpp>
 #include <boost/iostreams/filter/zlib.hpp>
 #include <boost/iostreams/filtering_stream.hpp>
 #include <boost/iostreams/filtering_streambuf.hpp>
 #include <boost/iostreams/stream.hpp>
+#include <boost/iostreams/tee.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/math/special_functions/bessel.hpp>
 #include <boost/math/special_functions/binomial.hpp>
@@ -271,7 +273,10 @@ export
       using boost::iostreams::back_insert_device;
       using boost::iostreams::back_inserter;
       using boost::iostreams::basic_array_source;
+      using boost::iostreams::basic_gzip_decompressor;
       using boost::iostreams::copy;
+      using boost::iostreams::file_source;
+      using boost::iostreams::filtering_istream;
       using boost::iostreams::filtering_istreambuf;
       using boost::iostreams::filtering_ostream;
       using boost::iostreams::filtering_ostreambuf;
@@ -279,6 +284,8 @@ export
       using boost::iostreams::gzip_compressor;
       using boost::iostreams::gzip_decompressor;
       using boost::iostreams::input;
+      using boost::iostreams::stream;
+      using boost::iostreams::tee_device;
 
 #ifdef DEAL_II_WITH_ZLIB
       using boost::iostreams::zlib_compressor;
@@ -307,6 +314,7 @@ export
       using boost::math::epsilon_difference;
       using boost::math::legendre_p;
       using boost::math::sign;
+      using boost::math::spherical_harmonic;
 
       namespace tools
       {
@@ -326,6 +334,7 @@ export
       using boost::property_tree::read_xml;
       using boost::property_tree::write_json;
       using boost::property_tree::write_xml;
+      using boost::property_tree::xml_writer_settings;
     } // namespace property_tree
 
     namespace random
@@ -338,10 +347,12 @@ export
 
     namespace serialization
     {
+      using boost::serialization::access;
       using boost::serialization::array_wrapper;
       using boost::serialization::base_object;
       using boost::serialization::make_array;
       using boost::serialization::split_member;
+      using boost::serialization::tracking_type;
     } // namespace serialization
 
     namespace signals2
@@ -351,6 +362,7 @@ export
     } // namespace signals2
 
     using boost::apply_visitor;
+    using boost::bad_lexical_cast;
     using boost::is_complex;
     using boost::iterator_range;
     using boost::lexical_cast;

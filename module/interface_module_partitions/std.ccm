@@ -207,6 +207,7 @@ export
     using std::is_arithmetic_v;
     using std::is_array_v;
     using std::is_assignable_v;
+    using std::is_base_of;
     using std::is_base_of_v;
     using std::is_const_v;
     using std::is_constant_evaluated;
@@ -289,6 +290,7 @@ export
     using std::conj;
     using std::copysign;
     using std::cos;
+    using std::cosh;
 #ifdef DEAL_II_HAVE_CXX17_BESSEL_FUNCTIONS
     using std::cyl_bessel_j;
     using std::cyl_bessel_jf;
@@ -296,13 +298,16 @@ export
     using std::erf;
     using std::erfc;
     using std::exp;
+    using std::exp2;
     using std::fabs;
     using std::floor;
     using std::fmax;
     using std::fmin;
+    using std::fmod;
     using std::hypot;
     using std::imag;
     using std::isfinite;
+    using std::isinf;
     using std::isnan;
     using std::llround;
     using std::log;
@@ -318,10 +323,18 @@ export
     using std::round;
     using std::signbit;
     using std::sin;
+    using std::sinh;
     using std::sqrt;
     using std::tan;
     using std::tanh;
     using std::trunc;
+
+    inline namespace complex_literals
+    {
+      using literals::complex_literals::operator""i;
+      using literals::complex_literals::operator""if;
+      using literals::complex_literals::operator""il;
+    } // namespace complex_literals
 
     // Exceptions
     using std::bad_alloc;
@@ -425,6 +438,13 @@ export
     using std::plus;
     using std::ref;
 
+    namespace placeholders
+    {
+      using std::placeholders::_1;
+      using std::placeholders::_2;
+      using std::placeholders::_3;
+    } // namespace placeholders
+
 #ifdef DEAL_II_HAVE_CXX23
     using std::to_underlying;
     using std::unreachable;
@@ -445,6 +465,11 @@ export
     using std::getline;
     using std::isalnum;
     using std::isdigit;
+    using std::regex;
+    using std::regex_match;
+    using std::regex_search;
+    using std::snprintf;
+    using std::sscanf;
     using std::stod;
     using std::stoi;
     using std::stoull;
@@ -456,6 +481,7 @@ export
     using std::strtod;
     using std::strtol;
     using std::to_string;
+    using std::tolower;
     using std::toupper;
 
 
@@ -511,7 +537,9 @@ export
     using std::reverse;
     using std::rotate;
     using std::search;
+    using std::set_difference;
     using std::set_intersection;
+    using std::set_union;
     using std::shuffle;
     using std::sort;
     using std::sort_heap;
@@ -538,6 +566,7 @@ export
 
     // Time stuff
     using std::ctime;
+    using std::difftime;
     using std::localtime;
     using std::time;
     using std::time_t;
@@ -626,10 +655,12 @@ export
     // Files and file systems
     namespace filesystem
     {
+      using std::filesystem::begin;
       using std::filesystem::create_directories;
       using std::filesystem::create_directory;
       using std::filesystem::directory_entry;
       using std::filesystem::directory_iterator;
+      using std::filesystem::end;
       using std::filesystem::exists;
       using std::filesystem::file_size;
       using std::filesystem::is_directory;
@@ -638,7 +669,6 @@ export
       using std::filesystem::remove;
       using std::filesystem::remove_all;
       using std::filesystem::temp_directory_path;
-
     } // namespace filesystem
 
     // Input and output streams, files
@@ -650,6 +680,7 @@ export
     using std::endl;
     using std::fclose;
     using std::FILE;
+    using std::fixed;
     using std::flush;
     using std::fopen;
     using std::fstream;
@@ -666,14 +697,23 @@ export
     using std::ostream;
     using std::ostream_iterator;
     using std::ostringstream;
+    using std::rename;
     using std::right;
+    using std::scientific;
     using std::setfill;
+    using std::setiosflags;
     using std::setprecision;
     using std::setw;
     using std::streambuf;
     using std::streampos;
     using std::streamsize;
     using std::stringstream;
+
+    namespace filesystem
+    {
+      using filesystem::directory_iterator;
+      using filesystem::rename;
+    } // namespace filesystem
 
     // Locales
     using std::locale;
@@ -769,7 +809,9 @@ export
   using ::fabs;
   using ::int8_t;
   using ::mkdtemp;
+  using ::mkstemp;
   using ::posix_memalign;
+  using ::rand;
   using ::size_t;
   using ::strcmp;
 
