@@ -468,7 +468,6 @@ export
     using std::regex;
     using std::regex_match;
     using std::regex_search;
-    using std::snprintf;
     using std::sscanf;
     using std::stod;
     using std::stoi;
