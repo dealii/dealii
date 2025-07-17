@@ -1,3 +1,4 @@
+@anchor step_15-Results
 <h1>Results</h1>
 
 
@@ -96,7 +97,7 @@ solution and mesh are shown here:
 
 
 
-<a name="step-15-extensions"></a>
+@anchor step_15-Extensions
 <h3>Possibilities for extensions</h3>
 
 The program shows the basic structure of a solver for a nonlinear, stationary
