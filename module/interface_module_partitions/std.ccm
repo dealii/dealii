@@ -289,7 +289,7 @@ export
     using std::conj;
     using std::copysign;
     using std::cos;
-#if defined(DEAL_II_HAVE_CXX17_BESSEL_FUNCTIONS)
+#ifdef DEAL_II_HAVE_CXX17_BESSEL_FUNCTIONS
     using std::cyl_bessel_j;
     using std::cyl_bessel_jf;
 #endif
@@ -361,7 +361,7 @@ export
     using std::random_access_iterator_tag;
     using std::reverse_iterator;
 
-#if DEAL_II_HAVE_CXX23
+#ifdef DEAL_II_HAVE_CXX23
     using std::from_range;
     using std::from_range_t;
 #endif
@@ -425,7 +425,7 @@ export
     using std::plus;
     using std::ref;
 
-#if DEAL_II_HAVE_CXX23
+#ifdef DEAL_II_HAVE_CXX23
     using std::to_underlying;
     using std::unreachable;
 #endif
@@ -670,7 +670,6 @@ export
     using std::setfill;
     using std::setprecision;
     using std::setw;
-    using std::sprintf;
     using std::streambuf;
     using std::streampos;
     using std::streamsize;
