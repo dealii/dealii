@@ -422,8 +422,8 @@ anything useful once we have negative saturations or ones larger than one.
 Note that we will have similar restrictions on the time step also in
 step-23 and step-24 where we solve the time dependent
 wave equation, another hyperbolic problem. We will also come back to the issue
-of time step choice below in the section on <a href="#extensions">possible
-extensions to this program</a>.
+of time step choice below in the section on
+@ref step_21-Extensions "possible extensions to this program".
 
 
 <h3>The test case</h3>
@@ -503,7 +503,7 @@ infinitesimal amounts of wetting fluid also only move at infinitesimal speeds
 (i.e., they stick to the medium more than the non-wetting phase in which they
 are embedded). That said, how can we square this with the knowledge that
 wetting fluid is invading from the left, leading to the flow patterns seen in
-the <a href="#Results">results section</a>? That's where we get into
+the @ref step_21-Results "results section"? That's where we get into
 mathematics: Equations like the transport equation we are considering here
 have infinitely many solutions, but only one of them is physical: the one that
 results from the so-called viscosity limit, called the <a
