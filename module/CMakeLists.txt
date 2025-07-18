@@ -147,7 +147,7 @@ if(DEAL_II_WITH_CXX20_MODULE)
   # our external dependencies into partitions that we can 'import'
   # wherever we need.
   #
-  list(APPEND _interface_module_partition_units
+  set(_external_interface_module_partition_units
     "${CMAKE_CURRENT_SOURCE_DIR}/interface_module_partitions/adolc.ccm"
     "${CMAKE_CURRENT_SOURCE_DIR}/interface_module_partitions/boost.ccm"
     "${CMAKE_CURRENT_SOURCE_DIR}/interface_module_partitions/cgal.ccm"
@@ -276,16 +276,13 @@ if(DEAL_II_WITH_CXX20_MODULE)
       PRIVATE "DEAL_II_BUILDING_CXX20_MODULE"
       )
 
+    #
     # Say what the source files for the library are. These are all of
     # the interface and implementation partition units we have created
     # above (including the ones that wrap external libraries), plus
-    # the primary interface unit. Some of these will have to be
-    # installed -- specifically, the interface and primary interface
-    # units -- and so need to be PUBLIC.  On the other hand,
-    # downstream projects do not need access to our implementation,
-    # and consequently the implementation units can be marked as
-    # PRIVATE. Finally, the macros.h header is also a PUBLIC source
-    # that needs to be installed.
+    # the primary interface unit.
+    #
+
     target_sources(${DEAL_II_TARGET_NAME}_module_${build_lowercase}
       PUBLIC
       FILE_SET module_interface_units
@@ -293,9 +290,17 @@ if(DEAL_II_WITH_CXX20_MODULE)
       FILES
         ${_interface_module_partition_units}
         ${_primary_module_interface_unit}
-      BASE_DIRS
-        ${CMAKE_CURRENT_SOURCE_DIR}/interface_module_partitions
-        ${CMAKE_CURRENT_BINARY_DIR}/interface_module_partitions
+      BASE_DIRS "${CMAKE_CURRENT_BINARY_DIR}/interface_module_partitions"
+      )
+    # Work around an issue with CMake 3.28.3 ... 4.0.3 (and possible later) where the
+    # export() logic loses one of the BASE_DIRS. Thus, record the following
+    # files separately
+    target_sources(${DEAL_II_TARGET_NAME}_module_${build_lowercase}
+      PUBLIC
+      FILE_SET external_module_interface_units
+      TYPE CXX_MODULES
+      FILES ${_external_interface_module_partition_units}
+      BASE_DIRS "${CMAKE_CURRENT_SOURCE_DIR}/interface_module_partitions"
       )
 
     target_sources(${DEAL_II_TARGET_NAME}_module_${build_lowercase}
@@ -304,19 +309,15 @@ if(DEAL_II_WITH_CXX20_MODULE)
       TYPE CXX_MODULES
       FILES
         ${_implementation_module_partition_units}
-      BASE_DIRS
-        ${CMAKE_CURRENT_SOURCE_DIR}
-        ${CMAKE_CURRENT_BINARY_DIR}
+      BASE_DIRS ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_BINARY_DIR}
       )
 
     target_sources(${DEAL_II_TARGET_NAME}_module_${build_lowercase}
       PUBLIC
       FILE_SET headers
       TYPE HEADERS
-      FILES
-        ${_dealii_macros_header}
-      BASE_DIRS
-        ${CMAKE_CURRENT_BINARY_DIR}/../include/
+      FILES ${_dealii_macros_header}
+      BASE_DIRS ${CMAKE_CURRENT_BINARY_DIR}/../include/
       )
 
     # Ensure that all .inst files and the macro headers are in place
