@@ -60,7 +60,7 @@ test()
 
   // Create DoFHandler with FE_Q(2)
   DoFHandler<dim> dof_handler(triangulation);
-  // Use high order FE so that the points the points are close to unit sphere
+  // Use high order FE so that the points are close to unit sphere
   FE_Q<dim> fe(4);
   dof_handler.distribute_dofs(fe);
 
