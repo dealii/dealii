@@ -250,7 +250,7 @@ namespace NonMatching
     Assert(fe.degree > 1,
            dealii::ExcMessage(
              " The Newton iteration to find closest surface points "
-             "requires hessians that are not available degree = 1."));
+             "requires hessians that are not available when the finite element degree is 1."));
 
     // X, Y, Z, lambda
     Vector<double> current_solution(dim + 1);
