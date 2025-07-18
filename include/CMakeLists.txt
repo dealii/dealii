@@ -19,19 +19,27 @@
 add_subdirectory(deal.II)
 
 #
-# Add a rule for how to install the header files that are part of the source tree:
+# For CMake versions >= 3.28 onwards, we attach the header files as a
+# FILE_SET to the target directly, which is then installed in
+# cmake/config/CMakeLists.txt alongside the target. For older CMake
+# versions we need to install headers by hand:
 #
-install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/deal.II
-  DESTINATION ${DEAL_II_INCLUDE_RELDIR}
-  COMPONENT library
-  FILES_MATCHING PATTERN "*.h"
-  )
+if(CMAKE_VERSION VERSION_LESS 3.28)
+  #
+  # Add a rule for how to install the header files that are part of the source tree:
+  #
+  install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/deal.II
+    DESTINATION ${DEAL_II_INCLUDE_RELDIR}
+    COMPONENT library
+    FILES_MATCHING PATTERN "*.h"
+    )
 
-#
-# and don't forget to install all generated header files, too:
-#
-install(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/deal.II
-  DESTINATION ${DEAL_II_INCLUDE_RELDIR}
-  COMPONENT library
-  FILES_MATCHING PATTERN "*.h"
-  )
+  #
+  # and don't forget to install all generated header files, too:
+  #
+  install(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/deal.II
+    DESTINATION ${DEAL_II_INCLUDE_RELDIR}
+    COMPONENT library
+    FILES_MATCHING PATTERN "*.h"
+    )
+endif()
