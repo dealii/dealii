@@ -173,7 +173,7 @@ namespace NonMatching
         AssertThrow(data.level <
                       dof_handler.get_triangulation().n_global_levels(),
                     dealii::ExcMessage("Level is larger than number of levels "
-                                       "in the triangulation"));
+                                       "in the Triangulation"));
       }
   }
 
