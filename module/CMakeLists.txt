@@ -288,19 +288,19 @@ if(DEAL_II_WITH_CXX20_MODULE)
     # that needs to be installed.
     target_sources(${DEAL_II_TARGET_NAME}_module_${build_lowercase}
       PUBLIC
-      FILE_SET ${DEAL_II_TARGET_NAME}_module_${build_lowercase}_sources
+      FILE_SET module_interface_units
       TYPE CXX_MODULES
       FILES
         ${_interface_module_partition_units}
         ${_primary_module_interface_unit}
       BASE_DIRS
-        ${CMAKE_CURRENT_SOURCE_DIR}
-        ${CMAKE_CURRENT_BINARY_DIR}
+        ${CMAKE_CURRENT_SOURCE_DIR}/interface_module_partitions
+        ${CMAKE_CURRENT_BINARY_DIR}/interface_module_partitions
       )
 
     target_sources(${DEAL_II_TARGET_NAME}_module_${build_lowercase}
       PRIVATE
-      FILE_SET ${DEAL_II_TARGET_NAME}_module_${build_lowercase}_sources_private
+      FILE_SET module_implementation_units
       TYPE CXX_MODULES
       FILES
         ${_implementation_module_partition_units}
@@ -311,12 +311,12 @@ if(DEAL_II_WITH_CXX20_MODULE)
 
     target_sources(${DEAL_II_TARGET_NAME}_module_${build_lowercase}
       PUBLIC
-      FILE_SET ${DEAL_II_TARGET_NAME}_module_${build_lowercase}_headers
+      FILE_SET headers
       TYPE HEADERS
       FILES
         ${_dealii_macros_header}
       BASE_DIRS
-        ${CMAKE_CURRENT_BINARY_DIR}/../include/deal.II
+        ${CMAKE_CURRENT_BINARY_DIR}/../include/
       )
 
     # Ensure that all .inst files and the macro headers are in place
@@ -396,31 +396,6 @@ if(DEAL_II_WITH_CXX20_MODULE)
         ALIAS ${DEAL_II_TARGET_NAME}_module_${build_lowercase}
         )
     endif()
-
-    # We need to install the built module interface (BMI) of the
-    # library so that downstream projects can do 'import dealii;'. In
-    # general, *using* the installed BMI requires using the exact same
-    # compiler, compiler version, C++ standard, and compiler flags. In
-    # most projects, this cannot be guaranteed and so the right
-    # approach is to also export the interface module partition units
-    # (i.e., converted header files) to let downstream projects
-    # re-compile them into a BMI that matches the compiler and flags
-    # used downstream. An overview of this can be found at
-    # https://crascit.com/2024/04/04/cxx-modules-cmake-shared-libraries/
-    # . That said, CMake does not provide great support for this, and
-    # because we generally control the compiler and flags, for now let
-    # us export both the BMI and the module interface units
-    # (MIU). While we're installing things, also install the macros.h
-    # header.
-    install(TARGETS ${DEAL_II_TARGET_NAME}_module_${build_lowercase}
-      EXPORT  ${DEAL_II_TARGET_NAME}_module_${build_lowercase}_exports
-      FILE_SET ${DEAL_II_TARGET_NAME}_module_${build_lowercase}_headers
-        DESTINATION "${CMAKE_INSTALL_PREFIX}/include/deal.II"
-      FILE_SET ${DEAL_II_TARGET_NAME}_module_${build_lowercase}_sources
-        DESTINATION "${CMAKE_INSTALL_PREFIX}/lib/cmake/${DEAL_II_TARGET_NAME}_module_${build_lowercase}/miu"
-      CXX_MODULES_BMI
-        DESTINATION "${CMAKE_INSTALL_PREFIX}/lib/cmake/${DEAL_II_TARGET_NAME}_module_${build_lowercase}/bmi"
-      )
 
     # Finally, let the top-level 'library' target depend on this module:
     add_dependencies(library ${DEAL_II_TARGET_NAME}_module_${build_lowercase})
