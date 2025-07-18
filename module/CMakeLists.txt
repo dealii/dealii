@@ -16,6 +16,9 @@
 if(DEAL_II_WITH_CXX20_MODULE)
   message(STATUS "Setting up the C++20 module")
 
+  # First version with proper module support
+  cmake_minimum_required(VERSION 3.28)
+
   #
   # The scripts used below are all written in Python. Ensure that we have
   # it available.
