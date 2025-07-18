@@ -883,8 +883,8 @@ algorithm chosen below.
 As for the linear solver: as mentioned above, our implementation here uses a
 Schur complement formulation. This is not necessarily the very best choice
 but demonstrates various important techniques available in deal.II. The
-question of which solver is best is again discussed in the <a
-href="#improved-solver">section on improved solvers in the results part</a>
+question of which solver is best is again discussed in the
+@ref step_22-ImprovedSolver "section on improved solvers in the results part"
 of this program, along with code showing alternative solvers and a
 comparison of their results.
 
