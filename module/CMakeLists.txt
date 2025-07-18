@@ -180,7 +180,9 @@ if(DEAL_II_WITH_CXX20_MODULE)
   # Build this file via a script from the list of all of the other module
   # input files:
   #
-  set(_primary_module_interface_unit "${CMAKE_CURRENT_BINARY_DIR}/dealii.ccm")
+  set(_primary_module_interface_unit
+    "${CMAKE_CURRENT_BINARY_DIR}/interface_module_partitions/dealii.ccm"
+    )
   add_custom_command(
     OUTPUT ${_primary_module_interface_unit}
     DEPENDS
