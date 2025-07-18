@@ -190,6 +190,7 @@ export
   using ::sc_array_new_count;
   using ::sc_array_t;
   using ::sc_finalize;
+  using ::sc_init;
 
   // The following functions are declared as a 'static inline'
   // function and so can't be exported. Wrap them via a function
