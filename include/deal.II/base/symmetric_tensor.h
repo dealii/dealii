@@ -807,7 +807,7 @@ public:
   /**
    * Default constructor. Creates a tensor with all entries equal to zero.
    */
-  DEAL_II_HOST
+  DEAL_II_HOST_DEVICE
   constexpr DEAL_II_ALWAYS_INLINE
   SymmetricTensor() = default;
 
@@ -1598,7 +1598,7 @@ namespace internal
      */
     template <class NumberType>
     DEAL_II_HOST_DEVICE void
-    swap(NumberType &x, NumberType &y)
+    swap(NumberType &x, NumberType &y) noexcept
     {
       NumberType tmp = x;
       x              = y;
