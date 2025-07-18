@@ -173,8 +173,8 @@ ${\cal O}(N)$: a simple experiment shows that as we keep refining the mesh, the
 average number of ILU-preconditioned CG iterations to invert the
 velocity-velocity block $A$ increases.
 
-We will address the question of how possibly to improve our solver <a
-href="#improved-solver">below</a>.
+We will address the question of how possibly to improve our solver
+@ref step_22-ImprovedSolver "below".
 
 As for the graphical output, the grids generated during the solution
 look as follow:
@@ -280,7 +280,7 @@ is not a good choice in 3D - a full decomposition needs many new entries that
 
 <h3>Possibilities for extensions</h3>
 
-<a name="step-22-improved-solver">
+@anchor step_22-ImprovedSolver
 <h4>Improved linear solver in 3D</h4>
 </a>
 

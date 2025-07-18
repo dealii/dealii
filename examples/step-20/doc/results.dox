@@ -303,7 +303,7 @@ the best one conceivable (nor is it intended to be a particularly good
 one). Better ones can be found in the literature and can be built using the
 same block matrix techniques that were introduced here. We pick up on this
 theme again in step-22, where we first build a Schur complement solver for the
-Stokes equation as we did here, and then in the <a
-href="step_22.html#improved-solver">Improved Solvers</a> section discuss better
+Stokes equation as we did here, and then in the
+@ref step_22-ImprovedSolver "Improved Solvers" section discuss better
 ways based on solving the system as a whole but preconditioning based on
 individual blocks. We will also come back to this in step-43.
