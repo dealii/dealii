@@ -2510,7 +2510,6 @@ namespace Step69
     for (auto &it : U)
       it.reinit(offline_data.partitioner);
 
-    // @anchor step_69-Resume
     // @sect5{Resume}
     //
     // By default the boolean <code>resume</code> is set to false, i.e. the
