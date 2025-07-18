@@ -29,6 +29,8 @@ if(DEAL_II_WITH_CXX20_MODULE)
   endif()
 
   #
+  # Create deal.II/macros.h:
+  #
   # Modules cannot export macros. So we need to still provide a way to
   # export the macros that are part of deal.II, which includes
   # specifically the configuration stuff in config.h and the exception
@@ -39,9 +41,6 @@ if(DEAL_II_WITH_CXX20_MODULE)
   # file deal.II/macros.h that we can rely on in all of the module
   # files. Define how to build this file first, so that we can let
   # other things depend on it later on.
-  #
-  # (We will later also mark this file as a PUBLIC header file of the
-  # module libraries, so that it will be installed.)
   #
 
   set(_dealii_macros_header "${CMAKE_CURRENT_BINARY_DIR}/../include/deal.II/macros.h")
@@ -66,20 +65,30 @@ if(DEAL_II_WITH_CXX20_MODULE)
     )
   add_custom_target(build_macros_header DEPENDS ${_dealii_macros_header})
 
+
+  ########################################################################
+  #                                                                      #
+  #                        interface module units:                       #
+  #                                                                      #
+  ########################################################################
+
   #
-  # Next, we need to set up interface module partitions for each of deal.II's
-  # header files. We query the list of all header files from the
+  # First, convert header files into *.ccm module partitions:
+  #
+  # Next, we need to set up interface module partitions for each of
+  # deal.II's header files. We query the list of all header files from the
   # DEAL_II_HEADER_FILES property (which includes everything we picked up
   # from the include/ directory, but not config.h which resided in the
-  # build directory).
+  # build directory). From the name of the header we construct the name of
+  # an interface module partition file. These files, by convention, have
+  # suffix .ccm (or .cppm).
   #
 
   set(_interface_module_partition_units)
   get_property(_header_files GLOBAL PROPERTY DEAL_II_HEADER_FILES)
   foreach (_header_file ${_header_files})
 
-    # exceptions_macros.h only #defines preprocessor stuff, and so we do
-    # not want to build a module out of it. So exclude it.
+    # Exclude preprocessor #defines only headers already inlucded in macros.h:
     if (${_header_file} STREQUAL "${CMAKE_SOURCE_DIR}/include/base/exception_macros.h")
       continue()
     endif()
@@ -94,10 +103,6 @@ if(DEAL_II_WITH_CXX20_MODULE)
       continue()
     endif()
 
-    # From the name of the header, construct the name of an interface
-    # module partition file. These files, by convention, have suffix
-    # .ccm -- in fact, some compilers seem to require that the suffix is
-    # .ccm or .cppm or something else that ends in 'm':
     string(REGEX REPLACE
       ".*/deal.II/(.*)\.h$" "${CMAKE_CURRENT_BINARY_DIR}/interface_module_partitions/\\1.ccm"
       _module_file ${_header_file}
@@ -118,11 +123,15 @@ if(DEAL_II_WITH_CXX20_MODULE)
       )
 
     # Compiling this file will require access to the deal.II/macros.h header:
-    set_property(SOURCE _module_file APPEND PROPERTY OBJECT_DEPENDS ${_dealii_macros_header})
+    set_property(SOURCE _module_file APPEND PROPERTY
+      OBJECT_DEPENDS ${_dealii_macros_header}
+      )
 
     list(APPEND _interface_module_partition_units "${_module_file}")
   endforeach()
 
+  #
+  # Append interface units for external libraries:
   #
   # We have some other interface units that we need to add to the list,
   # namely the ones that were written by hand instead of created via
@@ -161,6 +170,35 @@ if(DEAL_II_WITH_CXX20_MODULE)
     "${CMAKE_CURRENT_SOURCE_DIR}/interface_module_partitions/vtk.ccm"
     "${CMAKE_CURRENT_SOURCE_DIR}/interface_module_partitions/zlib.ccm"
     )
+
+  #
+  # And finally, generate the primary module interface unit.
+  #
+  # This unit (the "primary module interface unit") simply imports all of
+  # the partitions and then re-exports them.
+  #
+  # Build this file via a script from the list of all of the other module
+  # input files:
+  #
+  set(_primary_module_interface_unit "${CMAKE_CURRENT_BINARY_DIR}/dealii.ccm")
+  add_custom_command(
+    OUTPUT ${_primary_module_interface_unit}
+    DEPENDS
+      "${_interface_module_partition_units}"
+      "${CMAKE_CURRENT_SOURCE_DIR}/../contrib/utilities/build_primary_interface_unit.py"
+
+    COMMAND ${Python3_EXECUTABLE}
+    ARGS "${CMAKE_CURRENT_SOURCE_DIR}/../contrib/utilities/build_primary_interface_unit.py"
+         ${_interface_module_partition_units}
+         ">" "${_primary_module_interface_unit}"
+    )
+
+
+  ########################################################################
+  #                                                                      #
+  #                   Implementation module partitions:                  #
+  #                                                                      #
+  ########################################################################
 
   #
   # Next, we also need to set up implementation module partitions for
@@ -205,38 +243,18 @@ if(DEAL_II_WITH_CXX20_MODULE)
       )
 
     # Compiling this file will require access to the deal.II/macros.h header:
-    set_property(SOURCE _module_file APPEND PROPERTY OBJECT_DEPENDS ${_dealii_macros_header})
+    set_property(SOURCE _module_file APPEND PROPERTY
+      OBJECT_DEPENDS ${_dealii_macros_header}
+      )
 
     list(APPEND _implementation_module_partition_units "${_module_file}")
   endforeach()
 
   #
-  # For every module, there must be exactly one module interface unit that
-  # does not itself specify a module partition; instead, this unit (the
-  # "primary module interface unit") imports all of the partitions and then
-  # re-exports them.
-  #
-  # Build this file via a script from the list of all of the other module
-  # input files:
+  # Generate two top-level targets for compiling the implementation module
+  # partitions into a shared library:
   #
 
-  set(_primary_module_interface_unit
-    "${CMAKE_CURRENT_BINARY_DIR}/dealii.ccm")
-  add_custom_command(
-    OUTPUT ${_primary_module_interface_unit}
-    DEPENDS
-      "${_interface_module_partition_units}"
-      "${CMAKE_CURRENT_SOURCE_DIR}/../contrib/utilities/build_primary_interface_unit.py"
-
-    COMMAND ${Python3_EXECUTABLE}
-    ARGS "${CMAKE_CURRENT_SOURCE_DIR}/../contrib/utilities/build_primary_interface_unit.py"
-         ${_interface_module_partition_units}
-         ">"
-         "${_primary_module_interface_unit}"
-    )
-
-  # Finally, set up the cmake targets that define how compiling the module
-  # is supposed to work. Do this for Debug and Release builds:
   foreach(build ${DEAL_II_BUILD_TYPES})
     string(TOLOWER ${build} build_lowercase)
     if("${build}" MATCHES "DEBUG")
@@ -245,18 +263,11 @@ if(DEAL_II_WITH_CXX20_MODULE)
       set(build_camelcase "Release")
     endif()
 
-    # Define the library. Compile it with the usual flags we also
-    # use for all other targets, but do set the DEAL_II_BUILDING_CXX20_MODULE
+    # Define the library. Compile it with the usual flags we also use for
+    # all other targets, but do set the DEAL_II_BUILDING_CXX20_MODULE
     # preprocessor variable for a small number of cases where we need to
-    # work around things that work differently between module and non-module
-    # builds.
-    #
-    # Note that we call the preprocessor variable
-    # ..._BUILDING_... instead of the overarching
-    # ..._WITH_... variable because we build the same set of files
-    # twice, but only one of these is build *built* for modules,
-    # whereas both sets are being build in a set-up in which we have
-    # modules ("with").
+    # work around things that work differently between module and
+    # non-module builds.
     add_library(${DEAL_II_TARGET_NAME}_module_${build_lowercase} SHARED)
     populate_target_properties(${DEAL_II_TARGET_NAME}_module_${build_lowercase} ${build})
     target_compile_definitions(${DEAL_II_TARGET_NAME}_module_${build_lowercase}
@@ -273,14 +284,6 @@ if(DEAL_II_WITH_CXX20_MODULE)
     # and consequently the implementation units can be marked as
     # PRIVATE. Finally, the macros.h header is also a PUBLIC source
     # that needs to be installed.
-    #
-    # TODO: It should not be necessary to list BASE_DIRS here. The module
-    # files are create in the build directory, and are all listed as absolute
-    # paths, not relative to a base dir. But cmake still complains when one
-    # omits the BASE_DIRS part, even though there is no reason for it to
-    # check whether these files can be found in the implicit BASE_DIRS (namely,
-    # CMAKE_CURRENT_SOURCE_DIR) because absolute paths to these files are
-    # provided.
     target_sources(${DEAL_II_TARGET_NAME}_module_${build_lowercase}
       PUBLIC
       FILE_SET ${DEAL_II_TARGET_NAME}_module_${build_lowercase}_sources
