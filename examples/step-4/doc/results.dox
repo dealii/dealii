@@ -313,9 +313,9 @@ should expect (and obtain!) a negative value.
 
 There are many ways with which one can play with this program. The simpler
 ones include essentially all the possibilities already discussed in the
-<a href="step_3.html#extensions" target="body">Possibilities for extensions in the documentation of step 3</a>,
-except that you will have to think about whether something now also applies
-to the 3d case discussed in the current program.
+@ref step_3-Extensions "Possibilities for extensions" in the documentation of
+step-3, except that you will have to think about whether something now also
+applies to the 3d case discussed in the current program.
 
 It is also worthwhile considering the postprocessing options discussed
 above. The documentation states two numbers (the mean value and the
