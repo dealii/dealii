@@ -95,7 +95,7 @@ namespace NonMatching
 
 
     /**
-     * @brief Computes closest points to given set of points.
+     * @brief Compute closest points to given set of points.
      *
      * @return A pair of vectors, where the first vector contains the shifted quadrature points in absolute
      * coordinates, and the second vector contains the corresponding shifted
