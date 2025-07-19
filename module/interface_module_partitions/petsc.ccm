@@ -312,6 +312,9 @@ export
   using ::TSSetPostStage;
   using ::TSSetPostStep;
   using ::TSSetPreStage;
+#  if DEAL_II_PETSC_VERSION_GTE(3, 20, 0)
+  using ::TSSetResize;
+#  endif
   using ::TSSetRHSFunction;
   using ::TSSetRHSJacobian;
   using ::TSSetSolution;

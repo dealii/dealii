@@ -157,6 +157,10 @@ export
   using ::SUNPSetupFn;
   using ::SUNPSolveFn;
 
+#  if DEAL_II_SUNDIALS_VERSION_GTE(7, 0, 0)
+  using ::SUNComm;
+#  endif
+
   // These following are all macros, and so we use the same approach
   // as we do for the MPI macros:
   namespace SUNDIALS_Macros
@@ -183,6 +187,10 @@ export
 
     const auto sun_false = SUNFALSE;
     const auto sun_true  = SUNTRUE;
+
+#  if DEAL_II_SUNDIALS_VERSION_GTE(7, 0, 0)
+    const auto comm_null = SUN_COMM_NULL;
+#  endif
   } // namespace SUNDIALS_Macros
 
 #  undef ARK_NORMAL
@@ -199,6 +207,10 @@ export
 #  undef SUNFALSE
 #  undef SUNTRUE
 
+#  if DEAL_II_SUNDIALS_VERSION_GTE(7, 0, 0)
+#    undef SUN_COMM_NULL
+#  endif
+
   const auto &ARK_NORMAL = SUNDIALS_Macros::ARKode::normal;
 
   const auto &IDA_NORMAL      = SUNDIALS_Macros::IDA::normal;
@@ -212,6 +224,10 @@ export
 
   const auto &SUNFALSE = SUNDIALS_Macros::sun_false;
   const auto &SUNTRUE  = SUNDIALS_Macros::sun_true;
+
+#  if DEAL_II_SUNDIALS_VERSION_GTE(7, 0, 0)
+  const auto &SUN_COMM_NULL = SUNDIALS_Macros::comm_null;
+#  endif
 }
 
 #endif
