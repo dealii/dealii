@@ -100,15 +100,6 @@ check()
     {
       deallog << "Found " << dcv.distorted_cells.size() << " distorted cells"
               << std::endl;
-
-      Assert(dcv.distorted_cells.size() == 2, ExcInternalError());
-
-      typename Triangulation<dim>::DistortedCellList subset =
-        GridTools::fix_up_distorted_child_cells(dcv, coarse_grid);
-      deallog << "Found " << subset.distorted_cells.size()
-              << " cells that are still distorted" << std::endl;
-
-      Assert(subset.distorted_cells.size() == 0, ExcInternalError());
     }
 
   Assert(coarse_grid.n_levels() == 2, ExcInternalError());

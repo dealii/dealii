@@ -1002,7 +1002,7 @@ namespace step62
       locally_owned_dofs, mpi_communicator);
 
     SolverControl                    solver_control;
-    PETScWrappers::SparseDirectMUMPS solver(solver_control, mpi_communicator);
+    PETScWrappers::SparseDirectMUMPS solver(solver_control);
     solver.solve(system_matrix, completely_distributed_solution, system_rhs);
 
     pcout << "   Solved in " << solver_control.last_step() << " iterations."

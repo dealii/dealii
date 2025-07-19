@@ -245,7 +245,7 @@ namespace Step40
       dof_handler.n_locally_owned_dofs());
 
     SolverControl solver_control(dof_handler.n_dofs(), 1e-12);
-    PETScWrappers::SparseDirectMUMPS solver(solver_control, mpi_communicator);
+    PETScWrappers::SparseDirectMUMPS solver(solver_control);
     solver.set_symmetric_mode(true);
     solver.solve(system_matrix, completely_distributed_solution, system_rhs);
 

@@ -537,18 +537,6 @@ namespace LinearAlgebra
     void
     Vector<Number, MemorySpace>::import_elements(
       const ReadWriteVector<Number> &V,
-      VectorOperation::values        operation,
-      const std::shared_ptr<const Utilities::MPI::CommunicationPatternBase> &)
-    {
-      import_elements(V, operation);
-    }
-
-
-
-    template <typename Number, typename MemorySpace>
-    void
-    Vector<Number, MemorySpace>::import_elements(
-      const ReadWriteVector<Number> &V,
       VectorOperation::values        operation)
     {
       // Create an empty CommunicationPattern

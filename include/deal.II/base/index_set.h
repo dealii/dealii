@@ -522,16 +522,6 @@ public:
   get_index_vector() const;
 
   /**
-   * Fill the given vector with all indices contained in this IndexSet.
-   *
-   * This function is equivalent to calling get_index_vector() and
-   * assigning the result to the @p indices argument.
-   */
-  DEAL_II_DEPRECATED
-  void
-  fill_index_vector(std::vector<size_type> &indices) const;
-
-  /**
    * Fill the given vector with either zero or one elements, providing a
    * binary representation of this index set. The given vector is assumed to
    * already have the correct size.

@@ -40,14 +40,6 @@
  * describing run-time parameters to a program that one doesn't want to
  * hard-code within the program source.
  *
- *
- * <h3>The PathSearch class</h3>
- *
- * The PathSearch class is a helper class in input handling. It is
- * used to find a file in a list of directories, in much the same way
- * as unix systems find executables among the directories listed in
- * the <code>PATH</code> environment variable.
- *
  * @ingroup IO
  */
 
