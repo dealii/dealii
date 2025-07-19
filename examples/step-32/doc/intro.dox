@@ -896,7 +896,7 @@ the following quantities:
   start with something and let things run for a while that the exact initial
   conditions don't matter that much any more &mdash; as is in fact suggested
   by looking at the pictures shown in the
-  @ref step_32-Results "results section below". The initial temperature field
+  @ref step_32-ResultsSection "results section below". The initial temperature field
   we use here is given in terms of the radius by
   @f{align*}{
     s &= \frac{\|\mathbf x\|-R_0}{R_1-R_0}, \\
