@@ -6,55 +6,85 @@ This program was contributed by Michał Wichrowski in collaboration with Gugliel
 <a name="step-101-Intro"></a>
 <h1>Introduction</h1>
 
-This tutorial program is an extension of step-85. We will again use an
-immersed method to solve a Poisson problem on a domain that is not aligned
-with the mesh. As in step-85, we will use a level set function to describe the
-geometry and the NonMatching::MeshClassifier class to classify cells with
-respect to the domain. We recommend that you familiarize yourself with step-85
-before reading on.
+This tutorial program, like step-85, solves a Poisson problem on a domain that is not aligned
+with the computational mesh. We use an unfitted method, where the geometry is described by a
+level set function and the NonMatching::MeshClassifier class is used to identify cells relative
+to this geometry.
 
 <h3>The Shifted Boundary Method</h3>
 
-The main difference to step-85 is that we will use the Shifted Boundary Method
-(SBM) to impose boundary conditions. For a detailed description of the method,
-we refer to @cite main_scovazzi_2018.
+The main difference from step-85 is the use of the Shifted Boundary Method (SBM) to impose
+boundary conditions. For a detailed description of the method, we refer to @cite main2018shifted.
 
-We consider the same Poisson problem as in step-85:
+We consider the Poisson problem:
 @f{align*}{
-  -\Delta u &= f \qquad && \text{in }\, \Omega,
-  \\
-  u &= u_D       \qquad && \text{on }\, \Gamma = \partial \Omega,
+    -\Delta u &= f \qquad && \text{in }\, \Omega,
+    \\
+    u &= g       \qquad && \text{on }\, \Gamma = \partial \Omega.
 @f}
-where we choose $f(x) = 4$ and $u_D(x) = 1$. The domain $\Omega$ is a disk
-described by the level set function $\psi(x) = \| x \| - 1$.
-
-In SBM, the finite element solution is sought on a collection of cells
-$\mathcal{T}_\Omega^h$ that are strictly inside the domain $\Omega$:
+SBM solves this problem on a surrogate computational domain, $\tilde{\Omega}$, which is
+constructed from a union of cells from a fixed background mesh. In this tutorial, we define
+$\tilde{\Omega}$ as the set of all cells that lie strictly inside the true domain $\Omega$:
 @f{equation*}{
-  \mathcal{T}_\Omega^h = \{ T \in \mathcal{T}^{h} : T \subset \Omega \}.
+    \tilde{\Omega} = \bigcup_{T \in \mathcal{T}^{h}, T \subset \Omega} T.
 @f}
-This is a key difference from step-85, where the active mesh also included
-cells that were intersected by the boundary.
+This approach avoids the need for complex body-fitted mesh generation. The boundary of this
+surrogate domain, $\tilde{\Gamma} = \partial\tilde{\Omega}$, is composed of faces from the
+background mesh.
 @image html step-101-active-mesh.svg
+Boundary conditions are transferred from the true boundary $\Gamma$ to the surrogate boundary
+$\tilde{\Gamma}$. For each point $\tilde{\mathbf{x}} \in \tilde{\Gamma}$, we find its
+corresponding closest point $\mathbf{x} \in \Gamma$. The boundary condition is then enforced
+weakly on $\tilde{\Gamma}$ using a Nitsche-type formulation. The value of the solution on the
+true boundary $g(\mathbf{x})$ is related to the value on the surrogate boundary
+$u_h(\tilde{\mathbf{x}})$ via a Taylor expansion. Let
+$\mathbf{d} = \mathbf{x} - \tilde{\mathbf{x}}$ be the shift vector. Then we have:
+@f{equation*}{
+    g(\mathbf{x}) = u(\mathbf{x}) \approx u(\tilde{\mathbf{x}}) + \mathbf{d} \cdot \nabla u(\tilde{\mathbf{x}}).
+@f}
+We define an extension operator $\mathcal{E}u_h$ that approximates the solution on the true
+boundary by extrapolating from the surrogate boundary:
+@f{equation*}{
+    \mathcal{E}u_h(\tilde{\mathbf{x}}) = u_h(\tilde{\mathbf{x}}) 
+    + (\mathbf{x} - \tilde{\mathbf{x}}) \cdot \nabla u_h(\tilde{\mathbf{x}}).
+@f}
+Since our finite element basis functions are polynomials, the discrete solution $u_h$ is a
+piecewise polynomial. Its Taylor expansion is simply the function itself, so we can evaluate
+$u_h$ directly at the required points.
 
-The boundary condition is then transferred from the true boundary $\Gamma$ to the
-boundary of the active mesh, $\Gamma_h = \partial (\cup_{T \in
-\mathcal{T}_\Omega^h} T)$, which is composed of faces of the background grid.
-This is done using a Taylor expansion, which leads to the following weak form:
+The SBM weak formulation seeks $u_h \in V_h$ such
+that for all test functions $v_h \in V_h$:
+@f{align*}{
+    \int_{\tilde{\Omega}} \nabla u_h \cdot \nabla v_h \, d\boldsymbol{x}
+    - \int_{\tilde{\Gamma}} (\nabla u_h \cdot \tilde{\mathbf{n}}) v_h \, ds
+    - \int_{\tilde{\Gamma}} (\nabla v_h \cdot \tilde{\mathbf{n}}) \; \mathcal{E}u_h \, ds
+    + \int_{\tilde{\Gamma}} \sigma_\Gamma \; \mathcal{E} u_h  \; v_h \, ds
+    = \int_{\tilde{\Omega}} f v_h \, dx
+    - \int_{\tilde{\Gamma}} (\nabla v_h \cdot \tilde{\mathbf{n}}) g \, ds
+    + \int_{\tilde{\Gamma}} \sigma_\Gamma g v_h \, ds,
+@f}
+where $\tilde{\mathbf{n}}$ is the outward normal to $\tilde{\Gamma}$, $\sigma_\Gamma$ is a penalty parameter,
+ and $\mathcal{E}u_h$ is the value of the solution extrapolated from $\tilde{\Gamma}$ to $\Gamma$.
 
-A major advantage of SBM is its simplicity: we only need to integrate over cells and faces of
-the background mesh, avoiding the complexity of generating quadrature rules for cut cells.
+A major advantage of SBM is its simplicity: all integrals are computed over
+standard cells and faces of the background mesh, avoiding the complexity of generating
+quadrature rules for arbitrarily cut cells, which is a common challenge in other unfitted
+methods like CutFEM.
 
-<h3>Using the MeshClassifier</h3>
+For our test case, the domain $\Omega$ is a unit disk described by the level set function
+$\psi(\mathbf{x}) = \| \mathbf{x} \| - 1$. For this simple geometry, the closest point
+projection can be computed analytically: for any point $\tilde{\mathbf{x}}$, its closest point
+on the boundary $\Gamma$ is $\mathbf{x} = \tilde{\mathbf{x}} / \| \tilde{\mathbf{x}} \|$. This
+allows for an exact computation of the geometric shift required by the method.
 
-As in step-85, we use the NonMatching::MeshClassifier class to determine the
-position of each cell relative to the domain $\Omega$. The class is initialized
-with a discrete level set function and, after calling `reclassify()`, we can
-query the location of each cell.
+<h3>Implementation of the surrogate domain</h3>
 
-The main difference in this tutorial is how we use this information. We define
-our finite element space only on cells that are classified as `inside`, i.e.,
-cells that are completely contained in $\Omega$. We will again use the
-hp-framework to accomplish this, setting the `active_fe_index` to 1 for
-`FE_Nothing` on all cells that are `outside` or `intersected`.
+As in step-85, we use the NonMatching::MeshClassifier class to determine the position of each
+cell relative to the domain $\Omega$. The class is initialized with a discrete level set
+function and, after calling `reclassify()`, we can query the location of each cell.
 
+The main difference in this tutorial is how we use this information. We define our finite
+element space only on cells that are classified as `inside`, i.e., cells that are completely
+contained in $\Omega$. We will again use the hp-framework to accomplish this, setting the
+`active_fe_index` to a `FE_Nothing` instance for all cells that are `outside` or
+`intersected`.
