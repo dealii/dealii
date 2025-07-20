@@ -34,8 +34,13 @@ module;
 #include <any>
 #include <array>
 #include <atomic>
+#include <bit>
 #include <bitset>
 #include <cctype>
+#ifdef DEAL_II_HAVE_FP_EXCEPTIONS
+#  include <cfenv>
+#endif
+#include <charconv>
 #include <chrono>
 #include <cmath>
 #include <complex>
@@ -48,6 +53,7 @@ module;
 #include <deque>
 #include <exception>
 #include <filesystem>
+#include <forward_list>
 #include <fstream>
 #include <functional>
 #include <future>
@@ -67,6 +73,7 @@ module;
 // #include <queue> // See https://github.com/llvm/llvm-project/issues/138558
 #include <random>
 #include <ranges>
+#include <regex>
 #include <set>
 #include <shared_mutex>
 #include <sstream>
