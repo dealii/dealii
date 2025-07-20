@@ -1,0 +1,60 @@
+<i>
+This program was contributed by Michał Wichrowski in collaboration with Guglielmo Scovazzi.
+
+</i>
+
+<a name="step-101-Intro"></a>
+<h1>Introduction</h1>
+
+This tutorial program is an extension of step-85. We will again use an
+immersed method to solve a Poisson problem on a domain that is not aligned
+with the mesh. As in step-85, we will use a level set function to describe the
+geometry and the NonMatching::MeshClassifier class to classify cells with
+respect to the domain. We recommend that you familiarize yourself with step-85
+before reading on.
+
+<h3>The Shifted Boundary Method</h3>
+
+The main difference to step-85 is that we will use the Shifted Boundary Method
+(SBM) to impose boundary conditions. For a detailed description of the method,
+we refer to @cite main_scovazzi_2018.
+
+We consider the same Poisson problem as in step-85:
+@f{align*}{
+  -\Delta u &= f \qquad && \text{in }\, \Omega,
+  \\
+  u &= u_D       \qquad && \text{on }\, \Gamma = \partial \Omega,
+@f}
+where we choose $f(x) = 4$ and $u_D(x) = 1$. The domain $\Omega$ is a disk
+described by the level set function $\psi(x) = \| x \| - 1$.
+
+In SBM, the finite element solution is sought on a collection of cells
+$\mathcal{T}_\Omega^h$ that are strictly inside the domain $\Omega$:
+@f{equation*}{
+  \mathcal{T}_\Omega^h = \{ T \in \mathcal{T}^{h} : T \subset \Omega \}.
+@f}
+This is a key difference from step-85, where the active mesh also included
+cells that were intersected by the boundary.
+@image html step-101-active-mesh.svg
+
+The boundary condition is then transferred from the true boundary $\Gamma$ to the
+boundary of the active mesh, $\Gamma_h = \partial (\cup_{T \in
+\mathcal{T}_\Omega^h} T)$, which is composed of faces of the background grid.
+This is done using a Taylor expansion, which leads to the following weak form:
+
+A major advantage of SBM is its simplicity: we only need to integrate over cells and faces of
+the background mesh, avoiding the complexity of generating quadrature rules for cut cells.
+
+<h3>Using the MeshClassifier</h3>
+
+As in step-85, we use the NonMatching::MeshClassifier class to determine the
+position of each cell relative to the domain $\Omega$. The class is initialized
+with a discrete level set function and, after calling `reclassify()`, we can
+query the location of each cell.
+
+The main difference in this tutorial is how we use this information. We define
+our finite element space only on cells that are classified as `inside`, i.e.,
+cells that are completely contained in $\Omega$. We will again use the
+hp-framework to accomplish this, setting the `active_fe_index` to 1 for
+`FE_Nothing` on all cells that are `outside` or `intersected`.
+
