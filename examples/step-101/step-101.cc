@@ -169,9 +169,10 @@ namespace Step101
 
 
   // @sect4{Setting up the discrete level set function}
-  // The level set function φ(x) describes the geometry: φ < 0 inside Ω,
-  // φ = 0 on the boundary Γ, and φ > 0 outside Ω. We use a signed
-  // distance function to the unit sphere for this purpose.
+  // The level set function @f$\phi(x)@f$ describes the geometry: @f$\phi < 0@f$
+  // inside @f$\Omega@f$, @f$\phi = 0@f$ on the boundary @f$\Gamma@f$, and
+  // @f$\phi > 0@f$ outside @f$\Omega@f$. We use a signed distance function to
+  // the unit sphere for this purpose.
   template <int dim>
   void LaplaceSolver<dim>::setup_discrete_level_set()
   {
