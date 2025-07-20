@@ -20,7 +20,6 @@
 #include <deal.II/base/point.h>
 
 #include <deal.II/numerics/data_out.h>
-#include <deal.II/numerics/vector_tools.h>
 
 
 DEAL_II_NAMESPACE_OPEN
@@ -61,26 +60,25 @@ export_line_segments(
   std::vector<PointOutData> patches_output;
   patches_output.reserve(point_pairs.size());
 
-  std::vector<std::string> data_names;
-  // data_names.emplace_back("index");
 
 
-  // const unsigned n_datasets = 1;
+  Triangulation<1, dim> tria_dummy;
   Triangulation<1, dim> tria_dummy;
   GridGenerator::hyper_cube(tria_dummy, -1., 1.);
+  const ReferenceCell reference_cell =
+    tria_dummy.begin_active()->reference_cell();
 
-  for (unsigned int shift_index = 0; shift_index < point_pairs.size();
-       ++shift_index)
+  for (unsigned int segment_index = 0; segment_index < point_pairs.size();
+       ++segment_index)
     {
       PointOutData link_out;
-      link_out.patch_index    = shift_index;
-      link_out.reference_cell = tria_dummy.begin_active()->reference_cell();
+      link_out.patch_index    = segment_index;
+      link_out.reference_cell = reference_cell;
 
-      link_out.vertices[0] = point_pairs[shift_index].first;
-      link_out.vertices[1] = point_pairs[shift_index].second;
+      link_out.vertices[0] = point_pairs[segment_index].first;
+      link_out.vertices[1] = point_pairs[segment_index].second;
       patches_output.push_back(link_out);
     }
-
   std::vector<std::string> piece_names(n_mpi_process);
   for (unsigned int i = 0; i < n_mpi_process; ++i)
     piece_names[i] = filename_without_extension + ".proc" +
@@ -100,14 +98,18 @@ export_line_segments(
 
   DataOutBase::VtkFlags vtu_flags;
 
+  std::vector<std::string> data_names;
   DataOutBase::write_vtu(
     patches_output, data_names, vector_data_ranges, vtu_flags, out);
   if (this_mpi_process == 0)
     {
       std::ofstream pvtu_output(out_pvtu);
-      std::ostream &pvtu_out_steam = pvtu_output;
-      DataOutBase::write_pvtu_record(
-        pvtu_out_steam, piece_names, data_names, vector_data_ranges, vtu_flags);
+      std::ostream &pvtu_out_stream = pvtu_output;
+      DataOutBase::write_pvtu_record(pvtu_out_stream,
+                                     piece_names,
+                                     data_names,
+                                     vector_data_ranges,
+                                     vtu_flags);
     }
 }
 
