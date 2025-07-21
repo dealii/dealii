@@ -556,7 +556,8 @@ jobs:
         cd build
         export CXXFLAGS="-std=c++20 -stdlib=libc++"
         export LDFLAGS="-std=c++20 -stdlib=libc++"
-        cmake -D CMAKE_CXX_STANDARD=20 \
+        cmake -D CMAKE_BUILD_TYPE=Debug \
+              -D CMAKE_CXX_STANDARD=20 \
               -D CMAKE_C_COMPILER=clang-20 \
               -D CMAKE_CXX_COMPILER=clang++-20 \
               -D DEAL_II_EARLY_DEPRECATIONS=ON \
@@ -569,5 +570,4 @@ jobs:
     - name: build deal.II
       run: |
         cd build
-        ninja --verbose dealii_module_debug dealii_module_release
-        ninja --verbose
+        ninja --verbose dealii_module_debug
