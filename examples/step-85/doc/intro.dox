@@ -164,11 +164,80 @@ Since we include all normal derivatives up to the polynomial degree,
 we weakly force the piecewise polynomial to behave as a single polynomial over $\overline{T}_+ \cup \overline{T}_-$.
 Hand-wavingly speaking,
 this is the reason why we obtain a cut-independent method when we enforce $g_F(u_h, v_h) = 0$ over the faces in $\mathcal{F}_h$.
-Here, we shall use a continuous space of $Q_1$-elements,
+
+In case of a continuous space of $Q_1$-elements,
 so the ghost penalty is reduced to
 @f{equation*}{
   g_h(u_h,v_h) = \gamma_A \sum_{F \in \mathcal{F}_h} (h_F [\partial_n u_h], [\partial_n v_h])_F.
 @f}
+ 
+The actual assembly can be done using FEInterfaceValues:
+@code
+const QGauss<dim - 1>  face_quadrature(fe_degree + 1);
+FEInterfaceValues<dim> fe_interface_values(fe_collection[0],
+                                            face_quadrature,
+                                            update_gradients |
+                                              update_JxW_values |
+                                              update_normal_vectors);
+@endcode
+
+ As we iterate over the local faces, we first check if the current face belongs to the set $\mathcal{F}_h$.
+Assembling in this we will traverse each internal face in the mesh twice, so in order to get the penalty
+constant we expect, we multiply the penalty term with a factor 1/2.
+
+ @code
+  for (const unsigned int f : cell->face_indices())
+    if (face_has_ghost_penalty(cell, f))
+      {
+        const unsigned int invalid_subface =
+          numbers::invalid_unsigned_int;
+
+        fe_interface_values.reinit(cell,
+                                    f,
+                                    invalid_subface,
+                                    cell->neighbor(f),
+                                    cell->neighbor_of_neighbor(f),
+                                    invalid_subface);
+
+        const unsigned int n_interface_dofs =
+          fe_interface_values.n_current_interface_dofs();
+        FullMatrix<double> local_stabilization(n_interface_dofs,
+                                                n_interface_dofs);
+        for (unsigned int q = 0;
+              q < fe_interface_values.n_quadrature_points;
+              ++q)
+          {
+            const Tensor<1, dim> normal =
+              fe_interface_values.normal_vector(q);
+            for (unsigned int i = 0; i < n_interface_dofs; ++i)
+              for (unsigned int j = 0; j < n_interface_dofs; ++j)
+                {
+                  local_stabilization(i, j) +=
+                    .5 * ghost_parameter * cell_side_length * normal *
+                    fe_interface_values.jump_in_shape_gradients(i, q) *
+                    normal *
+                    fe_interface_values.jump_in_shape_gradients(j, q) *
+                    fe_interface_values.JxW(q);
+                }
+          }
+
+        const std::vector<types::global_dof_index>
+          local_interface_dof_indices =
+            fe_interface_values.get_interface_dof_indices();
+
+        stiffness_matrix.add(local_interface_dof_indices,
+                              local_stabilization);
+      }
+@endcode
+
+For higher order elements things get more complicated as the ghost penalty requires computing higher derivatives.
+Although the implementation is more involved, deal.II provides the necessary functionality to compute up to third
+order derivatives. Instead of implementing the integration of the penalty terms directly,
+ we can exploit the fact that the mesh is Cartesian. On tensor product elements,
+  the local ghost penalty can be computed as a Kronecker product of 1D matrices:
+   $G \otimes M$ in 2D or $G \otimes M \otimes M$ in 3D, where $G$ is a 1D penalty matrix and $M$ is a 1D mass matrix.
+This representation requires that the degrees of freedom on the patch of the two cells adjacent
+to the face are ordered lexicographically.
 
 <h3>Discrete Level Set Function</h3>
 A typical use case of a level set method is a problem where the domain is advected in a velocity field,

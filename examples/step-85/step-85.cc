@@ -13,6 +13,7 @@
  * ------------------------------------------------------------------------
  *
  * Author: Simon Sticko, Uppsala University, 2021
+ * Updated to high order by Michał Wichrowski, Heidelberg University, 2025
  */
 
 // @sect3{Include files}
@@ -66,6 +67,12 @@
 #include <deal.II/non_matching/fe_immersed_values.h>
 #include <deal.II/non_matching/fe_values.h>
 #include <deal.II/non_matching/mesh_classifier.h>
+
+// We need to assemble the 1D matrices for the ghost penalty terms
+#include <deal.II/numerics/tensor_product_matrix_creator.h>
+
+// The DoF on the ghost faces require lexicographic ordering.
+#include <deal.II/fe/fe_tools.h>
 
 // @sect3{The LaplaceSolver class Template}
 // We then define the main class that solves the Laplace problem.
@@ -307,17 +314,66 @@ namespace Step85
     Vector<double>     local_rhs(n_dofs_per_cell);
     std::vector<types::global_dof_index> local_dof_indices(n_dofs_per_cell);
 
+
+
     const double ghost_parameter   = 0.5;
     const double nitsche_parameter = 5 * (fe_degree + 1) * fe_degree;
 
-    // Since the ghost penalty is similar to a DG flux term, the simplest way to
-    // assemble it is to use an FEInterfaceValues object.
-    const QGauss<dim - 1>  face_quadrature(fe_degree + 1);
-    FEInterfaceValues<dim> fe_interface_values(fe_collection[0],
-                                               face_quadrature,
-                                               update_gradients |
-                                                 update_JxW_values |
-                                                 update_normal_vectors);
+
+    const double cell_side_length =
+      triangulation.begin_active()->minimum_vertex_distance();
+    FullMatrix<double> mass_1d =
+      TensorProductMatrixCreator::create_1d_cell_mass_matrix<double>(
+        FE_Q<1>(fe_degree),
+        cell_side_length,
+        {true, true},
+        FETools::hierarchic_to_lexicographic_numbering<1>(fe_degree));
+
+    FullMatrix<double> penalty_1d =
+      TensorProductMatrixCreator::create_1d_ghost_penalty_matrix<double>(
+        FE_Q<1>(fe_degree), cell_side_length);
+
+    std::array<FullMatrix<double>, dim> face_ghost_penalty_matrices;
+    switch (dim)
+      {
+        case 2:
+          {
+            face_ghost_penalty_matrices[0].kronecker_product(mass_1d,
+                                                             penalty_1d);
+
+            face_ghost_penalty_matrices[1].kronecker_product(penalty_1d,
+                                                             mass_1d);
+            break;
+          }
+        case 3:
+          {
+            FullMatrix<double> tmp;
+            tmp.kronecker_product(penalty_1d, mass_1d);
+            face_ghost_penalty_matrices[0].kronecker_product(tmp, mass_1d);
+
+            tmp.kronecker_product(mass_1d, penalty_1d);
+            face_ghost_penalty_matrices[1].kronecker_product(tmp, mass_1d);
+
+            tmp.kronecker_product(mass_1d, mass_1d);
+            face_ghost_penalty_matrices[2].kronecker_product(tmp, penalty_1d);
+            break;
+          }
+      }
+    for (unsigned int d = 0; d < dim; ++d)
+      face_ghost_penalty_matrices[d] *= ghost_parameter;
+
+    using CellFaceNumberingType =
+      std::pair<std::vector<unsigned int>, std::vector<unsigned int>>;
+
+    std::array<CellFaceNumberingType, dim> cells_to_face_patch_numberings;
+    for (unsigned int d = 0; d < dim; ++d)
+      cells_to_face_patch_numberings[d] =
+        FETools::cell_to_face_patch<dim>(fe_degree, d, false, true);
+
+    // We need to store the local DoF indices of the neighbor cells, so that we
+    // can distribute the local ghost penalty terms to the correct DoFs.
+    std::vector<types::global_dof_index> neighbor_dof_indices(n_dofs_per_cell);
+
 
 
     // As we iterate over the cells in the mesh, we would in principle have to
@@ -476,54 +532,34 @@ namespace Step85
         stiffness_matrix.add(local_dof_indices, local_stiffness);
         rhs.add(local_dof_indices, local_rhs);
 
-        // The assembly of the ghost penalty term is straight forward. As we
-        // iterate over the local faces, we first check if the current face
-        // belongs to the set $\mathcal{F}_h$. The actual assembly is simple
-        // using FEInterfaceValues. Assembling in this we will traverse each
-        // internal face in the mesh twice, so in order to get the penalty
-        // constant we expect, we multiply the penalty term with a factor 1/2.
-        for (const unsigned int f : cell->face_indices())
-          if (face_has_ghost_penalty(cell, f))
-            {
-              const unsigned int invalid_subface =
-                numbers::invalid_unsigned_int;
+        for (unsigned int d = 0; d < dim; ++d)
+          {
+            const unsigned int face_index = d * 2 + 1;
+            if (!face_has_ghost_penalty(cell, face_index))
+              continue;
+            cell->neighbor(face_index)->get_dof_indices(neighbor_dof_indices);
 
-              fe_interface_values.reinit(cell,
-                                         f,
-                                         invalid_subface,
-                                         cell->neighbor(f),
-                                         cell->neighbor_of_neighbor(f),
-                                         invalid_subface);
+            std::vector<types::global_dof_index> combined_dof_indices(
+              Utilities::fixed_power<dim - 1>(fe_degree + 1) *
+                (2 * fe_degree + 1),
+              numbers::invalid_dof_index);
 
-              const unsigned int n_interface_dofs =
-                fe_interface_values.n_current_interface_dofs();
-              FullMatrix<double> local_stabilization(n_interface_dofs,
-                                                     n_interface_dofs);
-              for (unsigned int q = 0;
-                   q < fe_interface_values.n_quadrature_points;
-                   ++q)
-                {
-                  const Tensor<1, dim> normal =
-                    fe_interface_values.normal_vector(q);
-                  for (unsigned int i = 0; i < n_interface_dofs; ++i)
-                    for (unsigned int j = 0; j < n_interface_dofs; ++j)
-                      {
-                        local_stabilization(i, j) +=
-                          .5 * ghost_parameter * cell_side_length * normal *
-                          fe_interface_values.jump_in_shape_gradients(i, q) *
-                          normal *
-                          fe_interface_values.jump_in_shape_gradients(j, q) *
-                          fe_interface_values.JxW(q);
-                      }
-                }
+            for (unsigned int i = 0; i < local_dof_indices.size(); ++i)
+              combined_dof_indices[cells_to_face_patch_numberings[d].first[i]] =
+                local_dof_indices[i];
 
-              const std::vector<types::global_dof_index>
-                local_interface_dof_indices =
-                  fe_interface_values.get_interface_dof_indices();
+            for (unsigned int i = 0; i < neighbor_dof_indices.size(); ++i)
+              combined_dof_indices[cells_to_face_patch_numberings[d]
+                                     .second[i]] = neighbor_dof_indices[i];
 
-              stiffness_matrix.add(local_interface_dof_indices,
-                                   local_stabilization);
-            }
+            for (unsigned int index : combined_dof_indices)
+              Assert(index < dof_handler.n_dofs(),
+                     ExcMessage("Invalid DoF index in combined_dof_indices"));
+
+
+            stiffness_matrix.add(combined_dof_indices,
+                                 face_ghost_penalty_matrices[d]);
+          }
       }
   }
 
