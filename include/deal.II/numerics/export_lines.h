@@ -36,8 +36,8 @@ DEAL_II_NAMESPACE_OPEN
  * set as a single entity.
  *
  * The function is intended for visualizing geometric entities like shift
- * vectors for SBM or other line-based data. No data is associated with the
- * lines; only their geometry is exported.
+ * vectors for Shifted Boundary Method or other line-based data. No data is
+ * associated with the lines; only their geometry is exported.
  *
  * @param filename_without_extension The base name for the output files. The
  *        function will append suffixes like `.procXXXX.vtu` and `.pvtu`.
@@ -49,10 +49,11 @@ template <int dim>
 void
 export_line_segments(
   const std::string &filename_without_extension,
-  const std::vector<std::pair<Point<dim>, Point<dim>>> &point_pairs)
+  const std::vector<std::pair<Point<dim>, Point<dim>>> &point_pairs,
+  const MPI_Comm &mpi_communicator = MPI_COMM_WORLD)
 {
   const unsigned int n_mpi_process =
-    Utilities::MPI::n_mpi_processes(MPI_COMM_WORLD);
+    Utilities::MPI::n_mpi_processes(mpi_communicator);
   const unsigned int this_mpi_process =
     Utilities::MPI::this_mpi_process(MPI_COMM_WORLD);
 
@@ -77,15 +78,15 @@ export_line_segments(
 
       link_out.vertices[0] = point_pairs[segment_index].first;
       link_out.vertices[1] = point_pairs[segment_index].second;
-      patches_output.push_back(link_out);
+      patches_output.emplace_back(std::move(link_out));
     }
   std::vector<std::string> piece_names(n_mpi_process);
   for (unsigned int i = 0; i < n_mpi_process; ++i)
     piece_names[i] = filename_without_extension + ".proc" +
                      Utilities::int_to_string(i, 4) + ".vtu";
-  std::string new_file = piece_names[this_mpi_process];
+  const std::string new_file = piece_names[this_mpi_process];
 
-  std::string out_pvtu = filename_without_extension + ".pvtu";
+  const std::string out_pvtu = filename_without_extension + ".pvtu";
 
 
   std::ofstream out(new_file);
@@ -96,11 +97,9 @@ export_line_segments(
                DataComponentInterpretation::DataComponentInterpretation>>
     vector_data_ranges;
 
-  DataOutBase::VtkFlags vtu_flags;
-
-  std::vector<std::string> data_names;
   DataOutBase::write_vtu(
-    patches_output, data_names, vector_data_ranges, vtu_flags, out);
+    patches_output, {}, vector_data_ranges, vtu_flags, out);
+
   if (this_mpi_process == 0)
     {
       std::ofstream pvtu_output(out_pvtu);
