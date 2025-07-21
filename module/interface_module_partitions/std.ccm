@@ -28,127 +28,66 @@
 // use so many more functions than are exported in David Stone's
 // example.
 
-// The concrete list of C++ header files is from here:
-// https://stackoverflow.com/questions/2027991/list-of-standard-header-files-in-c-and-c
-
 module;
-
-#include <assert.h>
-#include <ctype.h>
-#include <deal.II/macros.h>
-#include <errno.h>
-#include <float.h>
-#include <limits.h>
-#include <locale.h>
-#include <math.h>
-#include <setjmp.h>
-#include <signal.h>
-#include <stdarg.h>
-#include <stddef.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <time.h>
 
 #include <algorithm>
 #include <any>
 #include <array>
 #include <atomic>
-#include <barrier>
 #include <bit>
 #include <bitset>
-#include <cassert>
 #include <cctype>
-#include <cerrno>
-#include <cfenv>
-#include <cfloat>
+#ifdef DEAL_II_HAVE_FP_EXCEPTIONS
+#  include <cfenv>
+#endif
 #include <charconv>
 #include <chrono>
-#include <cinttypes>
-#include <climits>
-#include <clocale>
 #include <cmath>
-#include <codecvt>
-#include <compare>
 #include <complex>
-#include <concepts>
-#include <condition_variable>
-#include <coroutine>
-#include <csetjmp>
-#include <csignal>
-#include <cstdarg>
 #include <cstddef>
 #include <cstdint>
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
 #include <ctime>
-#include <cuchar>
-#include <cwchar>
-#include <cwctype>
 #include <deque>
 #include <exception>
-#include <execution>
-#include <expected>
 #include <filesystem>
-#include <format>
 #include <forward_list>
 #include <fstream>
 #include <functional>
 #include <future>
 #include <initializer_list>
 #include <iomanip>
-#include <ios>
 #include <iosfwd>
 #include <iostream>
-#include <istream>
 #include <iterator>
-#include <latch>
 #include <limits>
 #include <list>
-#include <locale>
 #include <map>
 #include <memory>
-#include <memory_resource>
 #include <mutex>
-#include <new>
-#include <numbers>
 #include <numeric>
 #include <optional>
 #include <ostream>
-#include <print>
 // #include <queue> // See https://github.com/llvm/llvm-project/issues/138558
 #include <random>
 #include <ranges>
-#include <ratio>
 #include <regex>
-#include <scoped_allocator>
-#include <semaphore>
 #include <set>
 #include <shared_mutex>
-#include <source_location>
-#include <span>
 #include <sstream>
 // #include <stack> // See https://github.com/llvm/llvm-project/issues/138558
-#include <stdexcept>
-#include <stop_token>
-#include <streambuf>
 #include <string>
-#include <string_view>
-#include <syncstream>
-#include <system_error>
 #include <thread>
 #include <tuple>
 #include <type_traits>
-#include <typeindex>
 #include <typeinfo>
 #include <unordered_map>
 #include <unordered_set>
 #include <utility>
-#include <valarray>
 #include <variant>
 #include <vector>
-#include <version>
 
 
 export module dealii.external.std;
@@ -604,7 +543,6 @@ export
     using std::allocator;
     using std::atomic;
     using std::atomic_flag;
-    using std::condition_variable_any;
     using std::dynamic_pointer_cast;
     using std::free;
     using std::make_shared;
