@@ -268,12 +268,25 @@ if(DEAL_II_WITH_CXX20_MODULE)
       set(build_camelcase "Release")
     endif()
 
+    #
     # Define the library. Compile it with the usual flags we also use for
     # all other targets, but do set the DEAL_II_BUILDING_CXX20_MODULE
     # preprocessor variable for a small number of cases where we need to
     # work around things that work differently between module and
-    # non-module builds.
-    add_library(${DEAL_II_TARGET_NAME}_module_${build_lowercase} SHARED)
+    # non-module builds. In addition, make sure that we link in all object
+    # files from bundled targets:
+    #
+
+    get_property(_bundled_object_targets GLOBAL PROPERTY DEAL_II_BUNDLED_TARGETS_${build})
+    set(_object_files "")
+    foreach(_target ${_bundled_object_targets})
+      list(APPEND _object_files "$<TARGET_OBJECTS:${_target}>")
+    endforeach()
+
+    add_library(${DEAL_II_TARGET_NAME}_module_${build_lowercase} SHARED
+      ${_object_files}
+      )
+
     populate_target_properties(${DEAL_II_TARGET_NAME}_module_${build_lowercase} ${build})
     target_compile_definitions(${DEAL_II_TARGET_NAME}_module_${build_lowercase}
       PRIVATE "DEAL_II_BUILDING_CXX20_MODULE"
@@ -327,19 +340,6 @@ if(DEAL_II_WITH_CXX20_MODULE)
     add_dependencies(${DEAL_II_TARGET_NAME}_module_${build_lowercase}
       expand_all_instantiations
       build_macros_header
-      )
-
-    # There are other sources that go into our libraries, namely the
-    # files in the bundled/ directories that we compile. We could add
-    # those to the list of sources, but perhaps simpler is to just
-    # link in the object library we create from them to link into the
-    # non-module library. This implies that they are compiled with the
-    # non-module compile flags, and consequently mangled as non-module
-    # symbols, but that's ok -- these are all symbols that are not
-    # part of the module anyway.
-    get_property(_bundled_object_targets GLOBAL PROPERTY DEAL_II_BUNDLED_TARGETS_${build})
-    target_link_libraries(${DEAL_II_TARGET_NAME}_module_${build_lowercase}
-      PRIVATE ${_bundled_object_targets}
       )
 
     #
