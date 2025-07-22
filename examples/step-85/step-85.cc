@@ -364,17 +364,16 @@ namespace Step85
           break;
 
         case 3:
-          {
-            FullMatrix<double> tmp;
-            tmp.kronecker_product(penalty_1d, mass_1d);
-            face_ghost_penalty_matrices[0].kronecker_product(tmp, mass_1d);
-            tmp.kronecker_product(mass_1d, penalty_1d);
-            face_ghost_penalty_matrices[1].kronecker_product(tmp, mass_1d);
+          FullMatrix<double> mass_2d;
+          mass_2d.kronecker_product(mass_1d, mass_1d);
+          face_ghost_penalty_matrices[0].kronecker_product(mass_2d, penalty_1d);
+          face_ghost_penalty_matrices[2].kronecker_product(penalty_1d, mass_2d);
 
-            tmp.kronecker_product(mass_1d, mass_1d);
-            face_ghost_penalty_matrices[2].kronecker_product(tmp, penalty_1d);
-            break;
-          }
+          FullMatrix<double> tmp;
+          tmp.kronecker_product(mass_1d, penalty_1d);
+          face_ghost_penalty_matrices[1].kronecker_product(tmp, mass_1d);
+
+          break;
       }
     // Finally, we scale the penalty matrices by the ghost penalty parameter.
     for (unsigned int d = 0; d < dim; ++d)
