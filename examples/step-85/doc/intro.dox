@@ -4,6 +4,8 @@ This program was contributed by Simon Sticko.
 The material is based upon work partially supported by
 eSSENCE of e-Science and the Swedish Research Council
 under grants 2014-6088 (Kreiss) and 2017-05038 (Massing).
+
+The tutorial was updated to high order by Michał Wichrowski, Heidelberg University.
 </i>
 
 <a name="step_85-Intro"></a>
@@ -257,9 +259,16 @@ constant we expect, we multiply the penalty term with a factor 1/2.
 For higher order elements things get more complicated as the ghost penalty requires computing higher derivatives.
 Although the implementation is more involved, deal.II provides the necessary functionality to compute up to third
 order derivatives. Instead of implementing the integration of the penalty terms directly,
- we can exploit the fact that the mesh is Cartesian. On tensor product elements,
-  the local ghost penalty can be computed as a Kronecker product of 1D matrices:
-   $G \otimes M$ in 2D or $G \otimes M \otimes M$ in 3D, where $G$ is a 1D penalty matrix and $M$ is a 1D mass matrix.
+we can exploit the fact that the mesh is Cartesian. On tensor product elements,
+the local ghost penalty $G$ can be computed as a Kronecker product of 1D matrices:
+@f{equation*}{
+G= G_x \otimes M_y
+@f}
+in 2D or
+@f{equation*}{
+G = G_x \otimes M_y \otimes M_y
+@f}
+in 3D, where $G_x$ is a 1D penalty matrix and $M_y, M_z$ are a 1D mass matrices.
 This representation requires that the degrees of freedom on the patch of the two cells adjacent
 to the face are ordered lexicographically. Details and derivation could be found in https://arxiv.org/abs/2503.00246.
 

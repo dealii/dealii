@@ -349,12 +349,12 @@ namespace Step85
 
     // Now we can create the face ghost penalty matrices for each spatial
     // direction using Kronecker products. In 2D, the penalty
-    // matrix for a face oriented in the x-direction is given by M_y ⊗ G_x,
-    // where M_y is the 1D mass matrix in the y-direction and G_x is the 1D
-    // penalty matrix in the x-direction. In 3D, the penalty matrix for a
-    // face oriented in the x-direction is given by M_yz ⊗ G_x, where M_yz
-    // is the 2D mass matrix in the yz-directions and G_x is the 1D penalty
-    // matrix in the x-direction. The 2D mass matrix is given by the
+    // matrix for a face oriented in the x-direction is given by $M_y \otimes
+    // G_x$, where $M_y$ is the 1D mass matrix in the y-direction and $G_x$ is
+    // the 1D penalty matrix in the x-direction. In 3D, the penalty matrix for a
+    // face oriented in the x-direction is given by $M_{yz} \otimes G_x$, where
+    // $M_{yz}$ is the 2D mass matrix in the yz-directions and $G_x$ is the 1D
+    // penalty matrix in the x-direction. The 2D mass matrix is given by the
     // Kronecker product of the 1D mass matrices.
     // Since our cells are hypercubes we can use the
     // same mass matrix in each direction.
@@ -588,7 +588,7 @@ namespace Step85
                 (2 * fe_degree + 1),
               numbers::invalid_dof_index);
 
-            // Using the precomputed mapping, we place the local DoF indices
+            // Using the precomputed numbering, we place the local DoF indices
             // of the current cell into the correct positions in the combined
             // vector.
             for (unsigned int i = 0; i < local_dof_indices.size(); ++i)
