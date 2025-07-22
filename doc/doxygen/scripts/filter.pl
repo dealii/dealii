@@ -75,9 +75,9 @@ while (<>)
     # this rule, we actually had to write this sequence out in our
     # documentation. Unfortunately, as a consequence, there are vestiges
     # of this style, so we can't substitute things that look like
-    # "step-xx". We therefore not substitute if step-xx is preceded or
-    # followed by quotation marks, or if the text is explicitly
-    # preceded by a backslash for escaping.
+    # "step-xx" (with the quotes). We therefore do not substitute
+    # if step-xx is preceded or followed by quotation marks, or if
+    # the text is explicitly preceded by a backslash for escaping.
     #
     # There are other exceptions:
     # - the scripts in doc/doxygen/tutorial produce files that have
@@ -89,8 +89,11 @@ while (<>)
     s/(?<![\"\\\/])step-(\d\w*)(?!\")/\@ref step_\1 \"step-\1\"/gi
         if !m/(\@page|\<img|\@image|<h\d>)/i;
 
-    # If step-xx was explicitly escaped with a backslash, remove the
-    # latter
+    # Now that we have substituted things that involve step-xx text
+    # that was supposed to be expanded, we no longer need to guard
+    # text that shouldn't be expanded by backslashes. So, if we have
+    # \step-xx that was explicitly escaped with a backslash, remove the
+    # latter.
     s/\\(step-\d\w*)/\1/g;
 
     # doxygen version 1.7.1 and later have the habit of thinking that
