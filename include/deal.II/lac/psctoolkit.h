@@ -16,6 +16,7 @@
 #define dealii_psctoolkit_h
 
 #include <deal.II/base/config.h>
+#include <deal.II/lac/full_matrix.h>
 
 #ifdef DEAL_II_WITH_PSBLAS
 
@@ -113,9 +114,19 @@ namespace PSCToolkit
          */
         int InsertValue(psb_i_t nz, const psb_l_t *irw, const psb_l_t *icl, const psb_d_t *val, psb_c_dspmat *mh, psb_c_descriptor *cdh);
         /**
+        * Distribute local indices and values to the PSBLAS sparse matrix.
+        *
+        * @param local_dof_indices Vector of local dof indices (in global numbering).
+        * @param cell_matrix FullMatrix containing the local matrix values.
+        * @param mh Pointer to the PSBLAS sparse matrix.
+        * @param cdh Pointer to the PSBLAS descriptor.
+        * @return 0 on success, non-zero on failure.
+        */
+        int distribute_local_to_global(const std::vector<types::global_dof_index>& local_dof_indices, const FullMatrix<double>& cell_matrix,psb_c_dspmat *mh, psb_c_descriptor *cdh);
+        /**
          * Assemble the PSBLAS sparse matrix.
          * @param mh Pointer to the PSBLAS sparse matrix to be assembled.
-         * @param c dh Pointer to the PSBLAS descriptor.
+         * @param cdh Pointer to the PSBLAS descriptor.
          * @return 0 on success, non-zero on failure.
          **/
         int AssembleSparseMatrix(psb_c_dspmat *mh, psb_c_descriptor *cdh);
@@ -128,6 +139,10 @@ namespace PSCToolkit
          */
         int FreeSparseMatrix(psb_c_dspmat *mh, psb_c_descriptor *cdh);
     } // namespace Matrix
+
+    namespace Vector {
+
+    } // namespace Vector   
 
 } // namespace PSCToolkit
 

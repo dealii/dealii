@@ -231,6 +231,48 @@ namespace PSCToolkit
       }
 
       /**
+       * Distribute local indices and values to the PSBLAS sparse matrix.
+       *
+       * @param local_dof_indices Vector of local dof indices (in global numbering).
+       * @param cell_matrix FullMatrix containing the local matrix values.
+       * @param mh Pointer to the PSBLAS sparse matrix.
+       * @param cdh Pointer to the PSBLAS descriptor.
+       * @return 0 on success, non-zero on failure.
+       */
+      int distribute_local_to_global(const std::vector<types::global_dof_index>& local_dof_indices, const FullMatrix<double>& cell_matrix,psb_c_dspmat *mh, psb_c_descriptor *cdh)
+      {
+        // Get the number of local dofs
+        const unsigned int dofs_per_cell = local_dof_indices.size();
+        psb_i_t nz = dofs_per_cell * dofs_per_cell; // Number of non-zero entries
+
+        // Allocate memory for row and column indices and values
+        psb_l_t *irw = (psb_l_t *)malloc(nz * sizeof(psb_l_t));
+        psb_l_t *icl = (psb_l_t *)malloc(nz * sizeof(psb_l_t));
+        psb_d_t *val = (psb_d_t *)malloc(nz * sizeof(psb_d_t));
+
+        // Fill the arrays with local indices and values
+        for (unsigned int i = 0; i < dofs_per_cell; ++i)  
+        {
+          for (unsigned int j = 0; j < dofs_per_cell; ++j)
+          {
+            irw[i * dofs_per_cell + j] = local_dof_indices[i];
+            icl[i * dofs_per_cell + j] = local_dof_indices[j];
+            val[i * dofs_per_cell + j] = cell_matrix(i, j);
+          }
+        }
+
+        // Insert the values into the sparse matrix
+        int info = psb_c_dspins(nz,irw,icl,val,mh,cdh);
+
+        // Free allocated memory
+        free(irw);
+        free(icl);
+        free(val);
+
+        return info;
+      }
+
+      /**
        * Assemble the PSBLAS sparse matrix.
        *
        * @param mh Pointer to the PSBLAS sparse matrix to be assembled.
@@ -273,8 +315,12 @@ namespace PSCToolkit
           return -1; // Failure
         }
       }
+    
+    } // namespace Matrix
 
-    }
+  namespace Vector {
+
+  } // namespace Vector
 
 } // namespace PSCToolkit
 
