@@ -337,20 +337,6 @@ namespace LinearAlgebra
         const std::shared_ptr<const Utilities::MPI::CommunicationPatternBase>
           &communication_pattern = {});
 
-      /**
-       * @deprecated Use import_elements() instead.
-       */
-      DEAL_II_DEPRECATED
-      void
-      import(
-        const ReadWriteVector<double> &V,
-        const VectorOperation::values  operation,
-        const std::shared_ptr<const Utilities::MPI::CommunicationPatternBase>
-          &communication_pattern = {})
-      {
-        import_elements(V, operation, communication_pattern);
-      }
-
       /** @} */
 
 

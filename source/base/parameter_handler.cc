@@ -16,7 +16,6 @@
 #include <deal.II/base/logstream.h>
 #include <deal.II/base/memory_consumption.h>
 #include <deal.II/base/parameter_handler.h>
-#include <deal.II/base/path_search.h>
 #include <deal.II/base/utilities.h>
 
 #define BOOST_BIND_GLOBAL_PLACEHOLDERS

@@ -1,0 +1,126 @@
+// ------------------------------------------------------------------------
+//
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2025 by the deal.II authors
+//
+// This file is part of the deal.II library.
+//
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
+//
+// ------------------------------------------------------------------------
+
+
+// It is very inefficient in the module system to have repeated
+// #includes in many module partition files because when you 'import'
+// those partitions, you also have to load everything they
+// #included. In other words, you get the same content *many times*,
+// once from each imported partition, rather than only once via the
+// old-style #include system. We deal with this by wrapping all of
+// Kokkos into one partition that we can 'import' wherever we need.
+// This is the file that wraps everything we need from Kokkos into one
+// module partition.
+
+
+module;
+
+#include <deal.II/base/config.h>
+
+#include <Kokkos_Macros.hpp>
+#if DEAL_II_KOKKOS_VERSION_GTE(4, 2, 0)
+#  include <Kokkos_Abort.hpp>
+#else
+#  include <Kokkos_Core.hpp>
+#endif
+#include <Kokkos_Array.hpp>
+#include <Kokkos_Core.hpp>
+#include <Kokkos_Core_fwd.hpp>
+#include <Kokkos_DualView.hpp>
+#include <Kokkos_Macros.hpp>
+
+export module dealii.external.kokkos;
+export
+{
+  namespace Kokkos
+  {
+    using ::Kokkos::abort;
+    using ::Kokkos::abs;
+#if DEAL_II_KOKKOS_VERSION_GTE(4, 0, 0)
+    using ::Kokkos::ALL;
+#endif
+    using ::Kokkos::Array;
+    using ::Kokkos::atomic_add;
+#if DEAL_II_KOKKOS_VERSION_GTE(4, 0, 0)
+    using ::Kokkos::AUTO;
+#endif
+    using ::Kokkos::finalize;
+
+    using ::Kokkos::MemoryTraits;
+
+    using ::Kokkos::complex;
+    using ::Kokkos::create_mirror;
+    using ::Kokkos::create_mirror_view;
+    using ::Kokkos::create_mirror_view_and_copy;
+    using ::Kokkos::deep_copy;
+    using ::Kokkos::DefaultExecutionSpace;
+    using ::Kokkos::DefaultHostExecutionSpace;
+    using ::Kokkos::DualView;
+
+    using ::Kokkos::fence;
+    using ::Kokkos::finalize;
+#if DEAL_II_KOKKOS_VERSION_GTE(4, 0, 0)
+    using ::Kokkos::fmax;
+#endif
+    using ::Kokkos::HostSpace;
+    using ::Kokkos::IndexType;
+#if DEAL_II_KOKKOS_VERSION_GTE(4, 0, 0)
+    using ::Kokkos::InitializationSettings;
+#endif
+    using ::Kokkos::initialize;
+#if DEAL_II_KOKKOS_VERSION_GTE(4, 0, 0)
+    using ::Kokkos::is_finalized;
+#endif
+    using ::Kokkos::is_initialized;
+    using ::Kokkos::make_pair;
+    using ::Kokkos::Max;
+    using ::Kokkos::MDRangePolicy;
+    //    using ::Kokkos::Nodes;
+    using ::Kokkos::pair;
+    using ::Kokkos::parallel_for;
+    using ::Kokkos::parallel_reduce;
+    using ::Kokkos::PerTeam;
+    using ::Kokkos::pow;
+    using ::Kokkos::push_finalize_hook;
+    using ::Kokkos::RangePolicy;
+    using ::Kokkos::Rank;
+    using ::Kokkos::realloc;
+    using ::Kokkos::resize;
+    using ::Kokkos::single;
+    using ::Kokkos::subview;
+    using ::Kokkos::TeamPolicy;
+    using ::Kokkos::TeamThreadRange;
+    using ::Kokkos::TeamVectorRange;
+    using ::Kokkos::Unmanaged;
+    using ::Kokkos::View;
+    using ::Kokkos::view_alloc;
+#if DEAL_II_KOKKOS_VERSION_GTE(4, 0, 0)
+    using ::Kokkos::WithoutInitializing;
+#endif
+
+#if DEAL_II_KOKKOS_VERSION_GTE(4, 0, 0)
+    using ::Kokkos::SharedHostPinnedSpace;
+    using ::Kokkos::TeamThreadMDRange;
+#else
+    using ::Kokkos::InitArguments;
+
+    namespace Experimental
+    {
+      using ::Kokkos::Experimental::fabs;
+      using ::Kokkos::Experimental::fmax;
+      using ::Kokkos::Experimental::pow;
+    } // namespace Experimental
+#endif
+  } // namespace Kokkos
+}

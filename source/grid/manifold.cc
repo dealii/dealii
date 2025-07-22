@@ -93,9 +93,10 @@ Manifold<dim, spacedim>::get_new_point(
             });
 
   // Now loop over points in the order of their associated weight
+  DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
   Point<spacedim> p = surrounding_points[permutation[0]];
-  double          w = weights[permutation[0]];
-
+  DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
+  double w = weights[permutation[0]];
   for (unsigned int i = 1; i < n_points; ++i)
     {
       double weight = 0.0;

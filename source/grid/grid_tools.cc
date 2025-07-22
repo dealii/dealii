@@ -2750,48 +2750,6 @@ namespace GridTools
 
 
   template <int dim, int spacedim>
-  typename Triangulation<dim, spacedim>::DistortedCellList
-  fix_up_distorted_child_cells(
-    const typename Triangulation<dim, spacedim>::DistortedCellList
-      &distorted_cells,
-    Triangulation<dim, spacedim> & /*triangulation*/)
-  {
-    static_assert(
-      dim != 1 && spacedim != 1,
-      "This function is only valid when dim != 1 or spacedim != 1.");
-    typename Triangulation<dim, spacedim>::DistortedCellList unfixable_subset;
-
-    // loop over all cells that we have to fix up
-    for (typename std::list<
-           typename Triangulation<dim, spacedim>::cell_iterator>::const_iterator
-           cell_ptr = distorted_cells.distorted_cells.begin();
-         cell_ptr != distorted_cells.distorted_cells.end();
-         ++cell_ptr)
-      {
-        const typename Triangulation<dim, spacedim>::cell_iterator &cell =
-          *cell_ptr;
-
-        Assert(!cell->is_active(),
-               ExcMessage(
-                 "This function is only valid for a list of cells that "
-                 "have children (i.e., no cell in the list may be active)."));
-
-        internal::FixUpDistortedChildCells::fix_up_faces(
-          cell,
-          std::integral_constant<int, dim>(),
-          std::integral_constant<int, spacedim>());
-
-        // If possible, fix up the object.
-        if (!internal::FixUpDistortedChildCells::fix_up_object(cell))
-          unfixable_subset.distorted_cells.push_back(cell);
-      }
-
-    return unfixable_subset;
-  }
-
-
-
-  template <int dim, int spacedim>
   void
   copy_boundary_to_manifold_id(Triangulation<dim, spacedim> &tria,
                                const bool                    reset_boundary_ids)

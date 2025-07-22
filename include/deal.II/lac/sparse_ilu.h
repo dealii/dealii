@@ -46,7 +46,7 @@ DEAL_II_NAMESPACE_OPEN
  *
  * Refer to SparseLUDecomposition documentation for suggested usage and state
  * management. This class is used in the
- * @ref step_22 "step-22"
+ * step-22
  * tutorial program.
  *
  * @note Instantiations for this template are provided for <tt>@<float@> and

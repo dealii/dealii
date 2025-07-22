@@ -178,6 +178,22 @@ foreach(build ${DEAL_II_BUILD_TYPES})
       ALIAS ${DEAL_II_TARGET_NAME}_${build_lowercase}
       )
   endif()
+
+  if(${CMAKE_VERSION} VERSION_GREATER_EQUAL "3.28")
+    get_property(_header_files GLOBAL PROPERTY DEAL_II_HEADER_FILES)
+    target_sources(${DEAL_II_TARGET_NAME}_${build_lowercase}
+      PUBLIC
+      FILE_SET headers
+      TYPE HEADERS
+      FILES
+        ${_header_files}
+        ${CMAKE_BINARY_DIR}/include/deal.II/base/config.h
+        ${CMAKE_BINARY_DIR}/include/deal.II/base/revision.h
+      BASE_DIRS
+        ${CMAKE_SOURCE_DIR}/include/
+        ${CMAKE_BINARY_DIR}/include/
+      )
+  endif()
 endforeach()
 
 #

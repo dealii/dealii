@@ -1,0 +1,217 @@
+// ------------------------------------------------------------------------
+//
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2025 by the deal.II authors
+//
+// This file is part of the deal.II library.
+//
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
+//
+// ------------------------------------------------------------------------
+
+
+// It is very inefficient in the module system to have repeated
+// #includes in many module partition files because when you 'import'
+// those partitions, you also have to load everything they
+// #included. In other words, you get the same content *many times*,
+// once from each imported partition, rather than only once via the
+// old-style #include system. We deal with this by wrapping all of our
+// external packages into partitions that we can 'import' wherever we
+// need.
+
+// This is the file that wraps everything we need from VTK into one
+// module partition.
+
+
+module;
+
+#include <deal.II/base/config.h>
+
+#ifdef DEAL_II_WITH_HDF5
+#  include <hdf5.h>
+#endif
+
+
+export module dealii.external.hdf5;
+
+#ifdef DEAL_II_WITH_HDF5
+
+export
+{
+  using ::H5Aclose;
+  using ::H5Acreate2;
+  using ::H5Aopen;
+  using ::H5Aread;
+  using ::H5Awrite;
+  using ::H5D_mpio_actual_io_mode_t;
+  using ::H5Dclose;
+  using ::H5Dcreate2;
+  using ::H5Dget_space;
+  using ::H5Dget_type;
+  using ::H5Dopen2;
+  using ::H5Dread;
+  using ::H5Dwrite;
+  using ::H5Fclose;
+  using ::H5Fcreate;
+  using ::H5Fopen;
+  using ::H5Gclose;
+  using ::H5Gcreate2;
+  using ::H5Gopen2;
+  using ::H5Pclose;
+  using ::H5Pcreate;
+  using ::H5Pget_mpio_actual_io_mode;
+  using ::H5Pget_mpio_no_collective_cause;
+  using ::H5Pset_chunk;
+  using ::H5Pset_deflate;
+  using ::H5Pset_dxpl_mpio;
+  using ::H5Pset_fapl_mpio;
+  using ::H5Sclose;
+  using ::H5Screate;
+  using ::H5Screate_simple;
+  using ::H5Sget_simple_extent_dims;
+  using ::H5Sget_simple_extent_ndims;
+  using ::H5Sselect_hyperslab;
+  using ::H5Sselect_none;
+  using ::H5T_class_t;
+  using ::H5Tclose;
+  using ::H5Tcopy;
+  using ::H5Tcreate;
+  using ::H5Tenum_insert;
+  using ::H5Tget_class;
+  using ::H5Tinsert;
+  using ::H5Tset_cset;
+  using ::H5Tset_size;
+  using ::herr_t;
+  using ::hid_t;
+  using ::hsize_t;
+}
+
+
+// HDF5 also defines quite a lot of symbols that are either
+// implemented as macros, or perhaps as constants in header
+// files. In the former case, they cannot be referenced in 'using'
+// expressions, and so we need to work around things by creating
+// *variables* of the same names. In the latter case, they are often
+// implemented as constants with internal linkage that we can't
+// re-export them (e.g., if they are members of anonymous enums).
+//
+// Dealing with this situation requires creating some other set of
+// variable, undefining the macro names, and then creating variables
+// with the same names as the macro names. Because we would end up
+// with name clashes if these new variables were in the global
+// namespace for those MPI implementations that implement things as
+// variables in the global namespace, we put everything into the
+// dealii namespace.
+//
+// We put the exportable symbols into namespace 'dealii'. This is
+// necessary for cases where the symbol we create is derived not from
+// a preprocessor macro, but for example as a member of an anonymous
+// enum. Such symbols can't be exported, so we declare a variable that
+// we *can* export, but it will not have the type of the enum, but of
+// the underlying int. The compiler will therefore complain that the
+// variable we're creating here redeclares another one but with a
+// different type. We can avoid this by putting things into our own
+// namespace.
+#  define CREATE_EXPORTABLE_PREPROCESSOR_SYMBOL(sym)        \
+    namespace dealii                                        \
+    {                                                       \
+      namespace HDF5_Macros                                 \
+      {                                                     \
+        [[maybe_unused]] const auto exportable_##sym = sym; \
+      }                                                     \
+    } // namespace dealii
+
+#  define EXPORT_PREPROCESSOR_SYMBOL(sym)                     \
+    namespace dealii                                          \
+    {                                                         \
+      export const auto &sym = HDF5_Macros::exportable_##sym; \
+    }
+
+// H5F symbols
+CREATE_EXPORTABLE_PREPROCESSOR_SYMBOL(H5F_ACC_RDWR)
+#  undef H5F_ACC_RDWR
+EXPORT_PREPROCESSOR_SYMBOL(H5F_ACC_RDWR)
+
+CREATE_EXPORTABLE_PREPROCESSOR_SYMBOL(H5F_ACC_RDONLY)
+#  undef H5F_ACC_RDONLY
+EXPORT_PREPROCESSOR_SYMBOL(H5F_ACC_RDONLY)
+
+CREATE_EXPORTABLE_PREPROCESSOR_SYMBOL(H5F_ACC_TRUNC)
+#  undef H5F_ACC_TRUNC
+EXPORT_PREPROCESSOR_SYMBOL(H5F_ACC_TRUNC)
+
+// H5T symbols
+CREATE_EXPORTABLE_PREPROCESSOR_SYMBOL(H5T_NATIVE_DOUBLE)
+#  undef H5T_NATIVE_DOUBLE
+EXPORT_PREPROCESSOR_SYMBOL(H5T_NATIVE_DOUBLE)
+
+CREATE_EXPORTABLE_PREPROCESSOR_SYMBOL(H5T_NATIVE_FLOAT)
+#  undef H5T_NATIVE_FLOAT
+EXPORT_PREPROCESSOR_SYMBOL(H5T_NATIVE_FLOAT)
+
+CREATE_EXPORTABLE_PREPROCESSOR_SYMBOL(H5T_NATIVE_HBOOL)
+#  undef H5T_NATIVE_HBOOL
+EXPORT_PREPROCESSOR_SYMBOL(H5T_NATIVE_HBOOL)
+
+CREATE_EXPORTABLE_PREPROCESSOR_SYMBOL(H5T_NATIVE_CHAR)
+#  undef H5T_NATIVE_CHAR
+EXPORT_PREPROCESSOR_SYMBOL(H5T_NATIVE_CHAR)
+
+CREATE_EXPORTABLE_PREPROCESSOR_SYMBOL(H5T_NATIVE_INT)
+#  undef H5T_NATIVE_INT
+EXPORT_PREPROCESSOR_SYMBOL(H5T_NATIVE_INT)
+
+CREATE_EXPORTABLE_PREPROCESSOR_SYMBOL(H5T_NATIVE_UINT)
+#  undef H5T_NATIVE_UINT
+EXPORT_PREPROCESSOR_SYMBOL(H5T_NATIVE_UINT)
+
+CREATE_EXPORTABLE_PREPROCESSOR_SYMBOL(H5T_C_S1)
+#  undef H5T_C_S1
+EXPORT_PREPROCESSOR_SYMBOL(H5T_C_S1)
+
+CREATE_EXPORTABLE_PREPROCESSOR_SYMBOL(H5T_VARIABLE)
+#  undef H5T_VARIABLE
+EXPORT_PREPROCESSOR_SYMBOL(H5T_VARIABLE)
+
+// H5S symbols
+CREATE_EXPORTABLE_PREPROCESSOR_SYMBOL(H5S_NULL)
+#  undef H5S_NULL
+EXPORT_PREPROCESSOR_SYMBOL(H5S_NULL)
+
+CREATE_EXPORTABLE_PREPROCESSOR_SYMBOL(H5S_ALL)
+#  undef H5S_ALL
+EXPORT_PREPROCESSOR_SYMBOL(H5S_ALL)
+
+// H5P symbols
+CREATE_EXPORTABLE_PREPROCESSOR_SYMBOL(H5P_DEFAULT)
+#  undef H5P_DEFAULT
+EXPORT_PREPROCESSOR_SYMBOL(H5P_DEFAULT)
+
+CREATE_EXPORTABLE_PREPROCESSOR_SYMBOL(H5P_DATASET_CREATE)
+#  undef H5P_DATASET_CREATE
+EXPORT_PREPROCESSOR_SYMBOL(H5P_DATASET_CREATE)
+
+CREATE_EXPORTABLE_PREPROCESSOR_SYMBOL(H5P_DATASET_XFER)
+#  undef H5P_DATASET_XFER
+EXPORT_PREPROCESSOR_SYMBOL(H5P_DATASET_XFER)
+
+CREATE_EXPORTABLE_PREPROCESSOR_SYMBOL(H5P_FILE_ACCESS)
+#  undef H5P_FILE_ACCESS
+EXPORT_PREPROCESSOR_SYMBOL(H5P_FILE_ACCESS)
+
+
+// There is also the case that HDF5 has the following:
+//   #define H5Dcreate H5Dcreate2
+// We deal with this by exporting a symbol H5DCreate that simply
+// aliases H5DCreate2:
+#  undef H5Dcreate
+export
+{
+  auto H5Dcreate = &::H5Dcreate2;
+}
+
+
+#endif

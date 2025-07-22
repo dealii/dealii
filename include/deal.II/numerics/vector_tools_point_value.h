@@ -367,7 +367,7 @@ namespace VectorTools
    *
    * This function is used in the "Possibilities for extensions" part of the
    * results section of
-   * @ref step_3 "step-3".
+   * step-3.
    *
    * @note If the cell in which the point is found is not locally owned, an
    * exception of type VectorTools::ExcPointNotAvailableHere is thrown.

@@ -60,7 +60,6 @@ set(_unity_include_src
   parsed_function.cc
   partitioner.cc
   patterns.cc
-  path_search.cc
   polynomial.cc
   polynomials_abf.cc
   polynomials_adini.cc

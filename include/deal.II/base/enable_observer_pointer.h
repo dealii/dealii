@@ -305,7 +305,7 @@ private:
  *
  * @deprecated Use the new name of the class, ObserverPointer, instead.
  */
-using Subscriptor DEAL_II_DEPRECATED_EARLY_WITH_COMMENT(
+using Subscriptor DEAL_II_DEPRECATED_WITH_COMMENT(
   "Use the new name of the class, EnableObserverPointer.") =
   EnableObserverPointer;
 

@@ -804,15 +804,6 @@ protected:
 
 
 
-// backward compatibility
-template <int dim,
-          int n_components_,
-          typename Number,
-          bool is_face,
-          typename VectorizedArrayType = VectorizedArray<Number>>
-using FEEvaluationAccess DEAL_II_DEPRECATED =
-  FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>;
-
 /**
  * The class that provides all functions necessary to evaluate functions at
  * quadrature points and cell integrations. In functionality, this class is

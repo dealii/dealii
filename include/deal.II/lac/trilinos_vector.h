@@ -760,18 +760,6 @@ namespace TrilinosWrappers
                       const VectorOperation::values                 operation);
 
       /**
-       * @deprecated Use import_elements() instead.
-       */
-      DEAL_II_DEPRECATED
-      void
-      import(const LinearAlgebra::ReadWriteVector<double> &rwv,
-             const VectorOperation::values                 operation)
-      {
-        import_elements(rwv, operation);
-      }
-
-
-      /**
        * Test for equality. This function assumes that the present vector and
        * the one to compare with have the same size already, since comparing
        * vectors of different sizes makes not much sense anyway.

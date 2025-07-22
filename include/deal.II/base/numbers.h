@@ -18,8 +18,9 @@
 
 #include <deal.II/base/config.h>
 
-#include <deal.II/base/exceptions.h>
 #include <deal.II/base/types.h>
+
+#include <Kokkos_MathematicalFunctions.hpp>
 
 #include <cmath>
 #include <complex>
@@ -441,7 +442,7 @@ DEAL_II_NAMESPACE_OPEN // Do not convert for module purposes
     /**
      * Return the absolute value of a number.
      */
-    static real_type
+    static DEAL_II_HOST_DEVICE real_type
     abs(const number &x);
   };
 
@@ -556,16 +557,28 @@ DEAL_II_NAMESPACE_OPEN // Do not convert for module purposes
 
 
   template <typename number>
-  typename NumberTraits<number>::real_type NumberTraits<number>::abs(
-    const number &x)
+  DEAL_II_HOST_DEVICE typename NumberTraits<number>::real_type
+  NumberTraits<number>::abs(const number &x)
   {
-    // Make things work with AD types
+    // Make things work with AD types and device code
+
+#if DEAL_II_KOKKOS_VERSION_GTE(3, 7, 0)
+    if constexpr (std::is_same_v<number, double> ||
+                  std::is_same_v<number, float>)
+      {
+        // Supported since Kokkos 3.7 and required for device support
+        // with SYCL.
+        return Kokkos::abs(x);
+      }
+#endif
+
     using std::abs;
+
 #ifdef DEAL_II_WITH_ADOLC
-    // This one is a little tricky - we have our own abs function in dealii::,
-    // prototyped with forward-declared types in this file, but it only exists
-    // if we have ADOL-C: hence we only add this using statement in that
-    // situation
+    // This one is a little tricky - we have our own abs function in
+    // dealii::, prototyped with forward-declared types in this file, but it
+    // only exists if we have ADOL-C: hence we only add this using statement
+    // in that situation
     using dealii::abs;
 #endif
     return abs(x);

@@ -1,4 +1,4 @@
-<a name="step-8-Intro"></a>
+<a name="step_8-Intro"></a>
 <h1>Introduction</h1>
 
 
@@ -396,8 +396,8 @@ As a final note: in the step-17 example program, we will
 revisit the elastic problem laid out here, and will show how to solve it in
 %parallel on a cluster of computers. The resulting program will thus be able to
 solve this problem to significantly higher accuracy, and more efficiently if
-this is required. In addition, in step-20, @ref step_21
-"step-21", as well as a few other of the later tutorial programs, we will
+this is required. In addition, in step-20, step-21,
+as well as a few other of the later tutorial programs, we will
 revisit some vector-valued problems and show a few techniques that may make it
 simpler to actually go through all the stuff shown above, with
 FiniteElement::system_to_component_index etc.

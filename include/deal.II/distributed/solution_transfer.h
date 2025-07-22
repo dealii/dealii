@@ -30,7 +30,7 @@ namespace parallel
      * @deprecated Use dealii::SolutionTransfer instead.
      */
     template <int dim, typename VectorType, int spacedim = dim>
-    using SolutionTransfer DEAL_II_DEPRECATED_EARLY =
+    using SolutionTransfer DEAL_II_DEPRECATED =
       dealii::SolutionTransfer<dim, VectorType, spacedim>;
   } // namespace distributed
 } // namespace parallel

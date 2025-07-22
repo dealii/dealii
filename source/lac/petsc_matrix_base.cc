@@ -810,7 +810,14 @@ namespace PETScWrappers
     const PetscErrorCode ierr = MatGetInfo(matrix, MAT_LOCAL, &info);
     AssertThrow(ierr == 0, ExcPETScError(ierr));
 
-    return sizeof(*this) + static_cast<size_type>(info.memory);
+    return (sizeof(*this) +
+            static_cast<size_type>(
+              // In a typical CSR format, one needs one scalar and one int to
+              // represent each nonzero in the matrix:
+              ((info.nz_allocated * (sizeof(PetscScalar) + sizeof(PetscInt))) +
+               // Plus one integer to store the row-start index for each
+               // (locally stored) row:
+               local_size() * sizeof(PetscInt))));
   }
 
 } // namespace PETScWrappers

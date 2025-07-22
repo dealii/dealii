@@ -330,8 +330,8 @@ run(const unsigned int n_refinements, ConvergenceTable &table)
 
         LinearAlgebra::ReadWriteVector<Number> rw_vector(
           src.get_partitioner()->locally_owned_range());
-        rw_vector.import(src_host, VectorOperation::insert);
-        src.import(rw_vector, VectorOperation::insert);
+        rw_vector.import_elements(src_host, VectorOperation::insert);
+        src.import_elements(rw_vector, VectorOperation::insert);
 
         dst = 0.0;
       }

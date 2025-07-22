@@ -297,19 +297,6 @@ namespace LinearAlgebra
         &communication_pattern = {});
 
     /**
-     * @deprecated Use import_elements() instead.
-     */
-    DEAL_II_DEPRECATED
-    void
-    import(const dealii::Vector<Number> &V,
-           VectorOperation::values       operation,
-           const std::shared_ptr<const Utilities::MPI::CommunicationPatternBase>
-             &communication_pattern = {})
-    {
-      import_elements(V, operation, communication_pattern);
-    }
-
-    /**
      * Imports all the elements present in the vector's IndexSet from the
      * input vector @p vec. VectorOperation::values @p operation
      * is used to decide if the elements in @p V should be added to the
@@ -324,20 +311,6 @@ namespace LinearAlgebra
       VectorOperation::values                         operation,
       const std::shared_ptr<const Utilities::MPI::CommunicationPatternBase>
         &communication_pattern = {});
-
-    /**
-     * @deprecated Use import_elements() instead.
-     */
-    template <typename MemorySpace>
-    DEAL_II_DEPRECATED void
-    import(const distributed::Vector<Number, MemorySpace> &V,
-           VectorOperation::values                         operation,
-           const std::shared_ptr<const Utilities::MPI::CommunicationPatternBase>
-             &communication_pattern = {})
-    {
-      import_elements(V, operation, communication_pattern);
-    }
-
 
 #ifdef DEAL_II_WITH_PETSC
     /**
@@ -354,19 +327,6 @@ namespace LinearAlgebra
       VectorOperation::values           operation,
       const std::shared_ptr<const Utilities::MPI::CommunicationPatternBase>
         &communication_pattern = {});
-
-    /**
-     * @deprecated Use import_elements() instead.
-     */
-    DEAL_II_DEPRECATED
-    void
-    import(const PETScWrappers::MPI::Vector &V,
-           VectorOperation::values           operation,
-           const std::shared_ptr<const Utilities::MPI::CommunicationPatternBase>
-             &communication_pattern = {})
-    {
-      import_elements(V, operation, communication_pattern);
-    }
 #endif
 
 #ifdef DEAL_II_WITH_TRILINOS
@@ -387,19 +347,6 @@ namespace LinearAlgebra
       const std::shared_ptr<const Utilities::MPI::CommunicationPatternBase>
         &communication_pattern = {});
 
-    /**
-     * @deprecated Use import_elements() instead.
-     */
-    DEAL_II_DEPRECATED
-    void
-    import(const TrilinosWrappers::MPI::Vector &V,
-           VectorOperation::values              operation,
-           const std::shared_ptr<const Utilities::MPI::CommunicationPatternBase>
-             &communication_pattern = {})
-    {
-      import_elements(V, operation, communication_pattern);
-    }
-
 #  ifdef DEAL_II_TRILINOS_WITH_TPETRA
     /**
      * Imports all the elements present in the vector's IndexSet from the input
@@ -418,19 +365,6 @@ namespace LinearAlgebra
       const std::shared_ptr<const Utilities::MPI::CommunicationPatternBase>
         &communication_pattern = {});
 
-    /**
-     * @deprecated Use import_elements() instead.
-     */
-    template <typename MemorySpace, typename Dummy = Number>
-    DEAL_II_DEPRECATED std::enable_if_t<std::is_same_v<Dummy, Number> &&
-                                        dealii::is_tpetra_type<Number>::value>
-    import(const TpetraWrappers::Vector<Number, MemorySpace> &V,
-           VectorOperation::values                            operation,
-           const std::shared_ptr<const Utilities::MPI::CommunicationPatternBase>
-             &communication_pattern = {})
-    {
-      import_elements(V, operation, communication_pattern);
-    }
 #  endif
 
     /**
@@ -448,18 +382,6 @@ namespace LinearAlgebra
       const std::shared_ptr<const Utilities::MPI::CommunicationPatternBase>
         &communication_pattern = {});
 
-    /**
-     * @deprecated Use import_elements() instead.
-     */
-    DEAL_II_DEPRECATED
-    void
-    import(const EpetraWrappers::Vector &V,
-           VectorOperation::values       operation,
-           const std::shared_ptr<const Utilities::MPI::CommunicationPatternBase>
-             &communication_pattern = {})
-    {
-      import_elements(V, operation, communication_pattern);
-    }
 #endif
 
     /**

@@ -1,0 +1,247 @@
+// ------------------------------------------------------------------------
+//
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2025 by the deal.II authors
+//
+// This file is part of the deal.II library.
+//
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
+//
+// ------------------------------------------------------------------------
+
+
+// It is very inefficient in the module system to have repeated
+// #includes in many module partition files because when you 'import'
+// those partitions, you also have to load everything they
+// #included. In other words, you get the same content *many times*,
+// once from each imported partition, rather than only once via the
+// old-style #include system. We deal with this by wrapping all of
+// PETSc into one partition that we can 'import' wherever we need.
+// This is the file that wraps everything we need from PETSc into one
+// module partition.
+
+
+module;
+
+#include <deal.II/base/config.h>
+
+#ifdef DEAL_II_WITH_P4EST
+#  include <p4est_bits.h>
+#  include <p4est_communication.h>
+#  include <p4est_extended.h>
+#  include <p4est_ghost.h>
+#  include <p4est_iterate.h>
+#  include <p4est_search.h>
+#  include <p4est_vtk.h>
+#  include <p8est_bits.h>
+#  include <p8est_communication.h>
+#  include <p8est_extended.h>
+#  include <p8est_ghost.h>
+#  include <p8est_iterate.h>
+#  include <p8est_search.h>
+#  include <p8est_vtk.h>
+#  include <sc_containers.h>
+#endif
+
+
+export module dealii.external.p4est;
+
+#ifdef DEAL_II_WITH_P4EST
+
+export
+{
+  using ::p4est_balance;
+  using ::p4est_checksum;
+  using ::p4est_coarsen;
+  using ::p4est_coarsen_t;
+  using ::p4est_comm_find_owner;
+  using ::p4est_connect_type_t;
+  using ::p4est_connectivity_destroy;
+  using ::p4est_connectivity_is_valid;
+  using ::p4est_connectivity_join_faces;
+  using ::p4est_connectivity_load;
+  using ::p4est_connectivity_memory_used;
+  using ::p4est_connectivity_new;
+  using ::p4est_connectivity_new_copy;
+  using ::p4est_connectivity_save;
+  using ::p4est_connectivity_t;
+  using ::p4est_copy;
+  using ::p4est_destroy;
+  using ::p4est_face_corners;
+  using ::p4est_geometry_t;
+  using ::p4est_ghost_destroy;
+  using ::p4est_ghost_new;
+  using ::p4est_ghost_t;
+  using ::p4est_gloidx_t;
+  using ::p4est_init;
+  using ::p4est_init_t;
+  using ::p4est_iter_corner_info_t;
+  using ::p4est_iter_corner_side_t;
+  using ::p4est_iter_corner_t;
+  using ::p4est_iter_face_info_t;
+  using ::p4est_iter_face_side_t;
+  using ::p4est_iter_face_t;
+  using ::p4est_iterate;
+  using ::p4est_load_ext;
+  using ::p4est_locidx_t;
+  using ::p4est_memory_used;
+  using ::p4est_new_ext;
+  using ::p4est_partition_ext;
+  using ::p4est_qcoord_t;
+  using ::p4est_qcoord_to_vertex;
+  using ::p4est_quadrant_ancestor_id;
+  using ::p4est_quadrant_childrenv;
+  using ::p4est_quadrant_compare;
+  using ::p4est_quadrant_is_ancestor;
+  using ::p4est_quadrant_is_equal;
+  using ::p4est_quadrant_is_sibling;
+  using ::p4est_quadrant_overlaps_tree;
+  using ::p4est_quadrant_set_morton;
+  using ::p4est_quadrant_t;
+  using ::p4est_refine;
+  using ::p4est_refine_t;
+  using ::p4est_reset_data;
+  using ::p4est_save;
+  using ::p4est_search_partition;
+  using ::p4est_search_partition_t;
+  using ::p4est_t;
+  using ::p4est_topidx_t;
+  using ::p4est_transfer_context_t;
+  using ::p4est_transfer_custom;
+  using ::p4est_transfer_custom_begin;
+  using ::p4est_transfer_custom_end;
+  using ::p4est_transfer_fixed;
+  using ::p4est_transfer_fixed_begin;
+  using ::p4est_transfer_fixed_end;
+  using ::p4est_tree_t;
+  using ::p4est_vtk_write_file;
+  using ::p4est_weight_t;
+  using ::p8est_balance;
+  using ::p8est_checksum;
+  using ::p8est_coarsen;
+  using ::p8est_coarsen_t;
+  using ::p8est_comm_find_owner;
+  using ::p8est_connect_type_t;
+  using ::p8est_connectivity_destroy;
+  using ::p8est_connectivity_is_valid;
+  using ::p8est_connectivity_join_faces;
+  using ::p8est_connectivity_load;
+  using ::p8est_connectivity_memory_used;
+  using ::p8est_connectivity_new;
+  using ::p8est_connectivity_new_copy;
+  using ::p8est_connectivity_save;
+  using ::p8est_connectivity_t;
+  using ::p8est_copy;
+  using ::p8est_corner_face_corners;
+  using ::p8est_destroy;
+  using ::p8est_edge_corners;
+  using ::p8est_face_corners;
+  using ::p8est_geometry_t;
+  using ::p8est_ghost_destroy;
+  using ::p8est_ghost_new;
+  using ::p8est_ghost_t;
+  using ::p8est_init_t;
+  using ::p8est_iter_corner_info_t;
+  using ::p8est_iter_corner_side_t;
+  using ::p8est_iter_corner_t;
+  using ::p8est_iter_edge_info_t;
+  using ::p8est_iter_edge_side_t;
+  using ::p8est_iter_edge_t;
+  using ::p8est_iter_face_info_t;
+  using ::p8est_iter_face_side_t;
+  using ::p8est_iter_face_t;
+  using ::p8est_load_ext;
+  using ::p8est_memory_used;
+  using ::p8est_new_ext;
+  using ::p8est_partition_ext;
+  using ::p8est_qcoord_to_vertex;
+  using ::p8est_quadrant_ancestor_id;
+  using ::p8est_quadrant_childrenv;
+  using ::p8est_quadrant_compare;
+  using ::p8est_quadrant_is_ancestor;
+  using ::p8est_quadrant_is_equal;
+  using ::p8est_quadrant_is_sibling;
+  using ::p8est_quadrant_overlaps_tree;
+  using ::p8est_quadrant_set_morton;
+  using ::p8est_quadrant_t;
+  using ::p8est_refine;
+  using ::p8est_refine_t;
+  using ::p8est_reset_data;
+  using ::p8est_save;
+  using ::p8est_search_partition;
+  using ::p8est_search_partition_t;
+  using ::p8est_t;
+  using ::p8est_transfer_context_t;
+  using ::p8est_transfer_custom;
+  using ::p8est_transfer_custom_begin;
+  using ::p8est_transfer_custom_end;
+  using ::p8est_transfer_fixed;
+  using ::p8est_transfer_fixed_begin;
+  using ::p8est_transfer_fixed_end;
+  using ::p8est_tree_t;
+  using ::p8est_vtk_write_file;
+  using ::p8est_weight_t;
+
+  using ::sc_array_bsearch;
+  using ::sc_array_destroy_null;
+  using ::sc_array_new_count;
+  using ::sc_array_t;
+  using ::sc_finalize;
+  using ::sc_init;
+
+  // The following functions are declared as a 'static inline'
+  // function and so can't be exported. Wrap them via a function
+  // implemented in namespace dealii:
+  namespace dealii
+  {
+    inline void *
+    sc_array_index(sc_array_t *array, size_t iz)
+    {
+      return ::sc_array_index(array, iz);
+    }
+
+    inline void *
+    sc_array_index_ssize_t(sc_array_t *array, ssize_t iz)
+    {
+      return ::sc_array_index_ssize_t(array, iz);
+    }
+
+
+    inline void *
+    sc_array_push(::sc_array_t *array)
+    {
+      return ::sc_array_push(array);
+    }
+  } // namespace dealii
+}
+
+
+#  define CREATE_EXPORTABLE_PREPROCESSOR_SYMBOL(sym)        \
+    namespace dealii                                        \
+    {                                                       \
+      namespace p4est_Macros                                \
+      {                                                     \
+        [[maybe_unused]] const auto exportable_##sym = sym; \
+      }                                                     \
+    } // namespace dealii
+
+#  define EXPORT_PREPROCESSOR_SYMBOL(sym) \
+    export const auto &sym = dealii::p4est_Macros::exportable_##sym;
+
+
+CREATE_EXPORTABLE_PREPROCESSOR_SYMBOL(P4EST_MAXLEVEL)
+#  undef P4EST_MAXLEVEL
+EXPORT_PREPROCESSOR_SYMBOL(P4EST_MAXLEVEL)
+
+CREATE_EXPORTABLE_PREPROCESSOR_SYMBOL(P8EST_MAXLEVEL)
+#  undef P8EST_MAXLEVEL
+EXPORT_PREPROCESSOR_SYMBOL(P8EST_MAXLEVEL)
+
+CREATE_EXPORTABLE_PREPROCESSOR_SYMBOL(SC_LP_SILENT)
+#  undef SC_LP_SILENT
+EXPORT_PREPROCESSOR_SYMBOL(SC_LP_SILENT)
+
+#endif

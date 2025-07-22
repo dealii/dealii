@@ -418,8 +418,8 @@ what direction it may be extended:
  The most obvious extension is to use a more
 realistic material model for large-scale quasistatic deformation. The natural
 choice for this would be plasticity, in which a nonlinear relationship between
-stress and strain replaces equation <a href="#step_18.stress-strain">[stress-strain]</a>. Plasticity
-models are usually rather complicated to program since the stress-strain
+stress and strain replaces equation @ref step_18-StressStrain "[stress-strain]".
+Plasticity models are usually rather complicated to program since the stress-strain
 dependence is generally non-smooth. The material can be thought of being able
 to withstand only a maximal stress (the yield stress) after which it starts to
 &ldquo;flow&rdquo;. A mathematical description to this can be given in the form of a

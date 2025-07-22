@@ -1,0 +1,4 @@
+Removed: Deprecations from the 9.6 release have been removed.
+See https://github.com/dealii/dealii/pull/18709 for details.
+<br>
+(Daniel Arndt, 2025/07/17)

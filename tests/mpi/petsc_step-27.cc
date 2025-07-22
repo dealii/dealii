@@ -335,7 +335,7 @@ namespace Step27
       // Loss of precision with a factor of 1e-12 with Trilinos
       false,
       false);
-    LA::SolverCG cg(solver_control, mpi_communicator);
+    LA::SolverCG cg(solver_control);
 
     LA::MPI::PreconditionAMG                 preconditioner;
     LA::MPI::PreconditionAMG::AdditionalData data;

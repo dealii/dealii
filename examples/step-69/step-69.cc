@@ -2661,8 +2661,8 @@ namespace Step69
   // @sect5{Output and checkpointing}
 
   // We checkpoint the current state by doing the precise inverse
-  // operation to what we discussed for the <a href="Resume">resume
-  // logic</a>:
+  // operation to what we discussed for the
+  // @ref step_69-Resume "resume logic":
 
   template <int dim>
   void MainLoop<dim>::checkpoint(const typename MainLoop<dim>::vector_type &U,

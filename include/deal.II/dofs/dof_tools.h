@@ -734,7 +734,7 @@ namespace DoFTools
    * global system matrix and right hand side, and to extend the solution
    * vectors from the true degrees of freedom also to the constraint nodes.
    * This function is explained in detail in the
-   * @ref step_6 "step-6"
+   * step-6
    * tutorial program and is used in almost all following programs as well.
    *
    * This function does not clear the AffineConstraints object before use, in
@@ -1377,7 +1377,7 @@ namespace DoFTools
    * @deprecated
    */
   template <int dim, int spacedim>
-  DEAL_II_DEPRECATED_EARLY_WITH_COMMENT(
+  DEAL_II_DEPRECATED_WITH_COMMENT(
     "Use the other function that returns the constant modes by value, rather than via an argument.")
   void extract_constant_modes(const DoFHandler<dim, spacedim> &dof_handler,
                               const ComponentMask             &component_mask,
@@ -1398,7 +1398,7 @@ namespace DoFTools
    * @deprecated
    */
   template <int dim, int spacedim>
-  DEAL_II_DEPRECATED_EARLY_WITH_COMMENT(
+  DEAL_II_DEPRECATED_WITH_COMMENT(
     "Use the other function that returns the constant modes by value, rather than via an argument.")
   void extract_level_constant_modes(
     const unsigned int               level,

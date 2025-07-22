@@ -161,7 +161,7 @@ namespace Utilities
        *   objects as arguments.
        */
       template <typename RequestType, typename AnswerType>
-      class DEAL_II_DEPRECATED_EARLY Process
+      class DEAL_II_DEPRECATED Process
       {
       public:
         /**
@@ -263,7 +263,7 @@ namespace Utilities
          *   use the other run() function in this class that takes function
          *   objects as arguments.
          */
-        DEAL_II_DEPRECATED_EARLY
+        DEAL_II_DEPRECATED
         std::vector<unsigned int>
         run(Process<RequestType, AnswerType> &process, const MPI_Comm comm);
 

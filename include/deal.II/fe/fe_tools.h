@@ -1351,7 +1351,7 @@ namespace FETools
    * Note also that this table exists once for each space dimension. If you
    * have a program that works with finite elements in different space
    * dimensions (for example,
-   * @ref step_4 "step-4"
+   * step-4
    * does something like this), then you should call this function for each
    * space dimension for which you want your finite element added to the map.
    */

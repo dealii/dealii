@@ -1615,7 +1615,7 @@ public:
    *
    * @dealiiRequiresUpdateFlags{update_normal_vectors}
    */
-  DEAL_II_DEPRECATED_EARLY_WITH_COMMENT("Use the function normal_vector().")
+  DEAL_II_DEPRECATED_WITH_COMMENT("Use the function normal_vector().")
   Tensor<1, spacedim>
   normal(const unsigned int q_point_index) const;
 

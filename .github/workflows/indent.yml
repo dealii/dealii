@@ -1,6 +1,11 @@
 name: indent
 
-on: [push, pull_request]
+on:
+  push:
+    branches:
+      - 'master'
+      - 'dealii-*'
+  pull_request:
 
 concurrency:
   group: ${{ github.event_name }}-${{ github.workflow }}-${{ github.ref }}

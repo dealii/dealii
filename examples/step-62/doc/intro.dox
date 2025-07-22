@@ -7,6 +7,7 @@ and the p4est libraries installed. The installation of deal.II
 together with these additional libraries is described in the <a
 href="../../readme.html" target="body">README</a> file.
 
+<a name="step_62-Intro"></a>
 <h1>Introduction</h1>
 A phononic crystal is a periodic nanostructure that modifies the motion of
 mechanical vibrations or [phonons](https://en.wikipedia.org/wiki/Phonon).

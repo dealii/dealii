@@ -1,0 +1,393 @@
+// ------------------------------------------------------------------------
+//
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2025 by the deal.II authors
+//
+// This file is part of the deal.II library.
+//
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
+//
+// ------------------------------------------------------------------------
+
+
+// It is very inefficient in the module system to have repeated
+// #includes in many module partition files because when you 'import'
+// those partitions, you also have to load everything they
+// #included. In other words, you get the same content *many times*,
+// once from each imported partition, rather than only once via the
+// old-style #include system. We deal with this by wrapping all of
+// MPI into one partition that we can 'import' wherever we need.
+// This is the file that wraps everything we need from MPI into one
+// module partition.
+
+
+module;
+
+#include <deal.II/base/config.h>
+
+#ifdef DEAL_II_WITH_MPI
+#  include <mpi.h>
+#endif
+
+
+export module dealii.external.mpi;
+
+#ifdef DEAL_II_WITH_MPI
+
+// If we are using MPI, export some symbols. If we aren't, the
+// include/deal.II/base/mpi_stub.h file (or its transformed version)
+// exports some stubs.
+export
+{
+  using ::MPI_Abort;
+  using ::MPI_Aint;
+  using ::MPI_Allgather;
+  using ::MPI_Allgatherv;
+  using ::MPI_Allreduce;
+  using ::MPI_Barrier;
+  using ::MPI_Bcast;
+  using ::MPI_Comm;
+  using ::MPI_Comm_c2f;
+  using ::MPI_Comm_compare;
+  using ::MPI_Comm_create_group;
+  using ::MPI_Comm_dup;
+  using ::MPI_Comm_free;
+  using ::MPI_Comm_group;
+  using ::MPI_Comm_rank;
+  using ::MPI_Comm_size;
+  using ::MPI_Comm_split;
+  using ::MPI_Comm_split_type;
+  using ::MPI_Count;
+  using ::MPI_Datatype;
+  using ::MPI_Error_class;
+  using ::MPI_Error_string;
+  using ::MPI_Exscan;
+  using ::MPI_File;
+  using ::MPI_File_close;
+  using ::MPI_File_open;
+  using ::MPI_File_read_at;
+  using ::MPI_File_read_at_all;
+  using ::MPI_File_set_size;
+  using ::MPI_File_sync;
+  using ::MPI_File_write_at;
+  using ::MPI_File_write_at_all;
+  using ::MPI_File_write_ordered;
+  using ::MPI_Finalize;
+  using ::MPI_Gather;
+  using ::MPI_Gatherv;
+  using ::MPI_Get_count;
+  using ::MPI_Group;
+  using ::MPI_Group_free;
+  using ::MPI_Group_incl;
+  using ::MPI_Group_union;
+  using ::MPI_Ibarrier;
+  using ::MPI_Info;
+  using ::MPI_Info_create;
+  using ::MPI_Info_free;
+  using ::MPI_Info_set;
+  using ::MPI_Init_thread;
+  using ::MPI_Initialized;
+  using ::MPI_Iprobe;
+  using ::MPI_Irecv;
+  using ::MPI_Isend;
+  using ::MPI_Message;
+  using ::MPI_Mprobe;
+  using ::MPI_Mrecv;
+  using ::MPI_Offset;
+  using ::MPI_Op;
+  using ::MPI_Op_create;
+  using ::MPI_Op_free;
+  using ::MPI_Probe;
+  using ::MPI_Recv;
+  using ::MPI_Reduce;
+  using ::MPI_Reduce_scatter_block;
+  using ::MPI_Request;
+  using ::MPI_Request_free;
+  using ::MPI_Scan;
+  using ::MPI_Scatter;
+  using ::MPI_Scatterv;
+  using ::MPI_Send;
+  using ::MPI_Sendrecv;
+  using ::MPI_Status;
+  using ::MPI_Test;
+  using ::MPI_Testall;
+  using ::MPI_Type_commit;
+  using ::MPI_Type_contiguous;
+  using ::MPI_Type_create_struct;
+  using ::MPI_Type_free;
+  using ::MPI_Type_size_x;
+  using ::MPI_Type_vector;
+  using ::MPI_User_function;
+  using ::MPI_Wait;
+  using ::MPI_Waitall;
+  using ::MPI_Waitany;
+  using ::MPI_Win;
+  using ::MPI_Win_allocate_shared;
+  using ::MPI_Win_free;
+  using ::MPI_Win_shared_query;
+}
+
+
+// MPI also defines quite a lot of symbols that are either
+// implemented as macros, or perhaps as constants in header
+// files. In the former case, they cannot be referenced in 'using'
+// expressions, and so we need to work around things by creating
+// *variables* of the same names. In the latter case, they are often
+// implemented as constants with internal linkage that we can't
+// re-export them (e.g., if they are members of anonymous enums).
+//
+// Dealing with this situation requires creating some other set of
+// variable, undefining the macro names, and then creating variables
+// with the same names as the macro names. Because we would end up
+// with name clashes if these new variables were in the global
+// namespace for those MPI implementations that implement things as
+// variables in the global namespace, we put everything into the
+// dealii namespace.
+//
+// We put the exportable symbols into namespace 'dealii'. This is
+// necessary for cases where the symbol we create is derived not from
+// a preprocessor macro, but for example as a member of an anonymous
+// enum. Such symbols can't be exported, so we declare a variable that
+// we *can* export, but it will not have the type of the enum, but of
+// the underlying int. The compiler will therefore complain that the
+// variable we're creating here redeclares another one but with a
+// different type. We can avoid this by putting things into our own
+// namespace.
+#  define CREATE_EXPORTABLE_PREPROCESSOR_SYMBOL(sym)        \
+    namespace dealii                                        \
+    {                                                       \
+      namespace MPI_Macros                                  \
+      {                                                     \
+        [[maybe_unused]] const auto exportable_##sym = sym; \
+      }                                                     \
+    } // namespace dealii
+
+#  define EXPORT_PREPROCESSOR_SYMBOL(sym)                    \
+    namespace dealii                                         \
+    {                                                        \
+      export const auto &sym = MPI_Macros::exportable_##sym; \
+    }
+
+CREATE_EXPORTABLE_PREPROCESSOR_SYMBOL(MPI_SUCCESS)
+#  undef MPI_SUCCESS
+EXPORT_PREPROCESSOR_SYMBOL(MPI_SUCCESS)
+
+CREATE_EXPORTABLE_PREPROCESSOR_SYMBOL(MPI_INFO_NULL)
+#  undef MPI_INFO_NULL
+EXPORT_PREPROCESSOR_SYMBOL(MPI_INFO_NULL)
+
+CREATE_EXPORTABLE_PREPROCESSOR_SYMBOL(MPI_PROC_NULL)
+#  undef MPI_PROC_NULL
+EXPORT_PREPROCESSOR_SYMBOL(MPI_PROC_NULL)
+
+CREATE_EXPORTABLE_PREPROCESSOR_SYMBOL(MPI_COMM_NULL)
+#  undef MPI_COMM_NULL
+EXPORT_PREPROCESSOR_SYMBOL(MPI_COMM_NULL)
+
+CREATE_EXPORTABLE_PREPROCESSOR_SYMBOL(MPI_COMM_SELF)
+#  undef MPI_COMM_SELF
+EXPORT_PREPROCESSOR_SYMBOL(MPI_COMM_SELF)
+
+CREATE_EXPORTABLE_PREPROCESSOR_SYMBOL(MPI_COMM_WORLD)
+#  undef MPI_COMM_WORLD
+EXPORT_PREPROCESSOR_SYMBOL(MPI_COMM_WORLD)
+
+CREATE_EXPORTABLE_PREPROCESSOR_SYMBOL(MPI_BYTE)
+#  undef MPI_BYTE
+EXPORT_PREPROCESSOR_SYMBOL(MPI_BYTE)
+
+CREATE_EXPORTABLE_PREPROCESSOR_SYMBOL(MPI_CXX_BOOL)
+#  undef MPI_CXX_BOOL
+EXPORT_PREPROCESSOR_SYMBOL(MPI_CXX_BOOL)
+
+CREATE_EXPORTABLE_PREPROCESSOR_SYMBOL(MPI_INT)
+#  undef MPI_INT
+EXPORT_PREPROCESSOR_SYMBOL(MPI_INT)
+
+CREATE_EXPORTABLE_PREPROCESSOR_SYMBOL(MPI_SHORT)
+#  undef MPI_SHORT
+EXPORT_PREPROCESSOR_SYMBOL(MPI_SHORT)
+
+CREATE_EXPORTABLE_PREPROCESSOR_SYMBOL(MPI_CHAR)
+#  undef MPI_CHAR
+EXPORT_PREPROCESSOR_SYMBOL(MPI_CHAR)
+
+CREATE_EXPORTABLE_PREPROCESSOR_SYMBOL(MPI_SIGNED_CHAR)
+#  undef MPI_SIGNED_CHAR
+EXPORT_PREPROCESSOR_SYMBOL(MPI_SIGNED_CHAR)
+
+CREATE_EXPORTABLE_PREPROCESSOR_SYMBOL(MPI_UNSIGNED_CHAR)
+#  undef MPI_UNSIGNED_CHAR
+EXPORT_PREPROCESSOR_SYMBOL(MPI_UNSIGNED_CHAR)
+
+CREATE_EXPORTABLE_PREPROCESSOR_SYMBOL(MPI_WCHAR)
+#  undef MPI_WCHAR
+EXPORT_PREPROCESSOR_SYMBOL(MPI_WCHAR)
+
+CREATE_EXPORTABLE_PREPROCESSOR_SYMBOL(MPI_FLOAT)
+#  undef MPI_FLOAT
+EXPORT_PREPROCESSOR_SYMBOL(MPI_FLOAT)
+
+CREATE_EXPORTABLE_PREPROCESSOR_SYMBOL(MPI_DOUBLE)
+#  undef MPI_DOUBLE
+EXPORT_PREPROCESSOR_SYMBOL(MPI_DOUBLE)
+
+CREATE_EXPORTABLE_PREPROCESSOR_SYMBOL(MPI_LONG_DOUBLE)
+#  undef MPI_LONG_DOUBLE
+EXPORT_PREPROCESSOR_SYMBOL(MPI_LONG_DOUBLE)
+
+CREATE_EXPORTABLE_PREPROCESSOR_SYMBOL(MPI_UINT64_T)
+#  undef MPI_UINT64_T
+EXPORT_PREPROCESSOR_SYMBOL(MPI_UINT64_T)
+
+CREATE_EXPORTABLE_PREPROCESSOR_SYMBOL(MPI_UNSIGNED)
+#  undef MPI_UNSIGNED
+EXPORT_PREPROCESSOR_SYMBOL(MPI_UNSIGNED)
+
+CREATE_EXPORTABLE_PREPROCESSOR_SYMBOL(MPI_UNSIGNED_SHORT)
+#  undef MPI_UNSIGNED_SHORT
+EXPORT_PREPROCESSOR_SYMBOL(MPI_UNSIGNED_SHORT)
+
+CREATE_EXPORTABLE_PREPROCESSOR_SYMBOL(MPI_UNSIGNED_LONG)
+#  undef MPI_UNSIGNED_LONG
+EXPORT_PREPROCESSOR_SYMBOL(MPI_UNSIGNED_LONG)
+
+CREATE_EXPORTABLE_PREPROCESSOR_SYMBOL(MPI_UNSIGNED_LONG_LONG)
+#  undef MPI_UNSIGNED_LONG_LONG
+EXPORT_PREPROCESSOR_SYMBOL(MPI_UNSIGNED_LONG_LONG)
+
+CREATE_EXPORTABLE_PREPROCESSOR_SYMBOL(MPI_LONG)
+#  undef MPI_LONG
+EXPORT_PREPROCESSOR_SYMBOL(MPI_LONG)
+
+CREATE_EXPORTABLE_PREPROCESSOR_SYMBOL(MPI_LONG_LONG)
+#  undef MPI_LONG_LONG
+EXPORT_PREPROCESSOR_SYMBOL(MPI_LONG_LONG)
+
+CREATE_EXPORTABLE_PREPROCESSOR_SYMBOL(MPI_COMPLEX)
+#  undef MPI_COMPLEX
+EXPORT_PREPROCESSOR_SYMBOL(MPI_COMPLEX)
+
+CREATE_EXPORTABLE_PREPROCESSOR_SYMBOL(MPI_DOUBLE_COMPLEX)
+#  undef MPI_DOUBLE_COMPLEX
+EXPORT_PREPROCESSOR_SYMBOL(MPI_DOUBLE_COMPLEX)
+
+CREATE_EXPORTABLE_PREPROCESSOR_SYMBOL(MPI_SUM)
+#  undef MPI_SUM
+EXPORT_PREPROCESSOR_SYMBOL(MPI_SUM)
+
+CREATE_EXPORTABLE_PREPROCESSOR_SYMBOL(MPI_MIN)
+#  undef MPI_MIN
+EXPORT_PREPROCESSOR_SYMBOL(MPI_MIN)
+
+CREATE_EXPORTABLE_PREPROCESSOR_SYMBOL(MPI_MAX)
+#  undef MPI_MAX
+EXPORT_PREPROCESSOR_SYMBOL(MPI_MAX)
+
+CREATE_EXPORTABLE_PREPROCESSOR_SYMBOL(MPI_LAND)
+#  undef MPI_LAND
+EXPORT_PREPROCESSOR_SYMBOL(MPI_LAND)
+
+CREATE_EXPORTABLE_PREPROCESSOR_SYMBOL(MPI_LOR)
+#  undef MPI_LOR
+EXPORT_PREPROCESSOR_SYMBOL(MPI_LOR)
+
+CREATE_EXPORTABLE_PREPROCESSOR_SYMBOL(MPI_BOR)
+#  undef MPI_BOR
+EXPORT_PREPROCESSOR_SYMBOL(MPI_BOR)
+
+CREATE_EXPORTABLE_PREPROCESSOR_SYMBOL(MPI_HOST)
+#  undef MPI_HOST
+EXPORT_PREPROCESSOR_SYMBOL(MPI_HOST)
+
+CREATE_EXPORTABLE_PREPROCESSOR_SYMBOL(MPI_STATUS_IGNORE)
+#  undef MPI_STATUS_IGNORE
+EXPORT_PREPROCESSOR_SYMBOL(MPI_STATUS_IGNORE)
+
+CREATE_EXPORTABLE_PREPROCESSOR_SYMBOL(MPI_STATUSES_IGNORE)
+#  undef MPI_STATUSES_IGNORE
+EXPORT_PREPROCESSOR_SYMBOL(MPI_STATUSES_IGNORE)
+
+CREATE_EXPORTABLE_PREPROCESSOR_SYMBOL(MPI_REQUEST_NULL)
+#  undef MPI_REQUEST_NULL
+EXPORT_PREPROCESSOR_SYMBOL(MPI_REQUEST_NULL)
+
+CREATE_EXPORTABLE_PREPROCESSOR_SYMBOL(MPI_IO)
+#  undef MPI_IO
+EXPORT_PREPROCESSOR_SYMBOL(MPI_IO)
+
+CREATE_EXPORTABLE_PREPROCESSOR_SYMBOL(MPI_IN_PLACE)
+#  undef MPI_IN_PLACE
+EXPORT_PREPROCESSOR_SYMBOL(MPI_IN_PLACE)
+
+CREATE_EXPORTABLE_PREPROCESSOR_SYMBOL(MPI_REPLACE)
+#  undef MPI_REPLACE
+EXPORT_PREPROCESSOR_SYMBOL(MPI_REPLACE)
+
+CREATE_EXPORTABLE_PREPROCESSOR_SYMBOL(MPI_WIN_BASE)
+#  undef MPI_WIN_BASE
+EXPORT_PREPROCESSOR_SYMBOL(MPI_WIN_BASE)
+
+CREATE_EXPORTABLE_PREPROCESSOR_SYMBOL(MPI_ANY_SOURCE)
+#  undef MPI_ANY_SOURCE
+EXPORT_PREPROCESSOR_SYMBOL(MPI_ANY_SOURCE)
+
+CREATE_EXPORTABLE_PREPROCESSOR_SYMBOL(MPI_MODE_CREATE)
+#  undef MPI_MODE_CREATE
+EXPORT_PREPROCESSOR_SYMBOL(MPI_MODE_CREATE)
+
+CREATE_EXPORTABLE_PREPROCESSOR_SYMBOL(MPI_MODE_RDONLY)
+#  undef MPI_MODE_RDONLY
+EXPORT_PREPROCESSOR_SYMBOL(MPI_MODE_RDONLY)
+
+CREATE_EXPORTABLE_PREPROCESSOR_SYMBOL(MPI_MODE_WRONLY)
+#  undef MPI_MODE_WRONLY
+EXPORT_PREPROCESSOR_SYMBOL(MPI_MODE_WRONLY)
+
+CREATE_EXPORTABLE_PREPROCESSOR_SYMBOL(MPI_ERR_INTERN)
+#  undef MPI_ERR_INTERN
+EXPORT_PREPROCESSOR_SYMBOL(MPI_ERR_INTERN)
+
+CREATE_EXPORTABLE_PREPROCESSOR_SYMBOL(MPI_MAX_ERROR_STRING)
+#  undef MPI_MAX_ERROR_STRING
+EXPORT_PREPROCESSOR_SYMBOL(MPI_MAX_ERROR_STRING)
+
+CREATE_EXPORTABLE_PREPROCESSOR_SYMBOL(MPI_ERR_LASTCODE)
+#  undef MPI_ERR_LASTCODE
+EXPORT_PREPROCESSOR_SYMBOL(MPI_ERR_LASTCODE)
+
+
+// There is also the issue of MPI_Fint, the Fortran integer data
+// type. The MPI standard does not say how it is declared. If it a
+// typedef, we should export it, but at least OpenMPI simply #defines
+// it to int, which means we can't export it. The following allows for
+// both:
+#  ifdef MPI_Fint
+namespace dealii
+{
+  namespace MPI_Macros
+  {
+    using MPI_Fint_alias = MPI_Fint;
+  }
+} // namespace dealii
+#    undef MPI_Fint
+export
+{
+  using MPI_Fint = dealii::MPI_Macros::MPI_Fint_alias;
+}
+
+#  else
+
+// The implementation does not use the preprocessor to #define MPI_Fint
+export
+{
+  using ::MPI_Fint;
+}
+#  endif
+
+
+
+#endif

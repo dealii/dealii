@@ -522,7 +522,7 @@ namespace internal
  * independent scalar field, or whether some of them together form logically a
  * vector-field (see the
  * DataComponentInterpretation::DataComponentInterpretation enum, and the
- * @ref step_22 "step-22"
+ * step-22
  * tutorial program).
  *
  * After adding all data vectors, you need to call a function which generates

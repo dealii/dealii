@@ -25,7 +25,7 @@ more flexible in solving many kinds of related problems.
 </i>
 
 
-<a name="step-32-Intro"></a>
+<a name="step_32-Intro"></a>
 <h1>Introduction</h1>
 
 This program does pretty much exactly what step-31 already does: it
@@ -895,9 +895,9 @@ the following quantities:
   don't really have anything useful to offer here, but we can hope that if we
   start with something and let things run for a while that the exact initial
   conditions don't matter that much any more &mdash; as is in fact suggested
-  by looking at the pictures shown in the <a href="#Results">results section
-  below</a>. The initial temperature field we use here is given in terms of
-  the radius by
+  by looking at the pictures shown in the
+  @ref step_32-Results "results section below". The initial temperature field
+  we use here is given in terms of the radius by
   @f{align*}{
     s &= \frac{\|\mathbf x\|-R_0}{R_1-R_0}, \\
     \varphi &= \arctan \frac{y}{x}, \\

@@ -470,6 +470,8 @@ private:
  * There are instantiations of this class for SparseMatrix<double>,
  * SparseMatrix<float>, BlockSparseMatrix<double>, and
  * BlockSparseMatrix<float>.
+ *
+ * @ingroup Solvers Preconditioners
  */
 class SparseDirectMUMPS : public EnableObserverPointer
 {
