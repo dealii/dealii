@@ -318,9 +318,20 @@ namespace Step85
     const double ghost_parameter   = 0.5;
     const double nitsche_parameter = 5 * (fe_degree + 1) * fe_degree;
 
-
     const double cell_side_length =
       triangulation.begin_active()->minimum_vertex_distance();
+    // As mentioned in the introduction, for higher-order elements, the ghost
+    // penalty can be assembled using tensor products of 1D matrices. This is
+    // what we will do here. We first need to create the 1D mass and penalty
+    // matrices.
+    // The tensor product structure requires us to use the
+    // lexicographic numbering of the DoFs. Since DoFs in FE_Q are ordered
+    // hierarchically, we need to convert the hierarchical numbering to
+    // lexicographic numbering. The function
+    // FETools::hierarchic_to_lexicographic_numbering<1>(fe_degree) does
+    // this for us. It returns a vector of indices that maps the
+    // hierarchical numbering to the lexicographic numbering for a 1D
+    // polynomial of degree `fe_degree`.
     FullMatrix<double> mass_1d =
       TensorProductMatrixCreator::create_1d_cell_mass_matrix<double>(
         FE_Q<1>(fe_degree),
@@ -328,10 +339,19 @@ namespace Step85
         {true, true},
         FETools::hierarchic_to_lexicographic_numbering<1>(fe_degree));
 
+    // The creation of the 1D penalty matrix is done using the
+    // TensorProductMatrixCreator::create_1d_ghost_penalty_matrix function that
+    // internally renumbers the DoFs to lexicographic ordering, hence providing
+    // the ordering is not required here.
     FullMatrix<double> penalty_1d =
       TensorProductMatrixCreator::create_1d_ghost_penalty_matrix<double>(
         FE_Q<1>(fe_degree), cell_side_length);
 
+    // Now we can create the face ghost penalty matrices for each spatial
+    // direction using Kronecker products. For example, in 2D, the penalty
+    // matrix for a face oriented in the x-direction is given by M_y ⊗ G_x,
+    // where M_y is the 1D mass matrix in the y-direction and G_x is the 1D
+    // penalty matrix in the x-direction.
     std::array<FullMatrix<double>, dim> face_ghost_penalty_matrices;
     switch (dim)
       {
@@ -340,24 +360,30 @@ namespace Step85
           break;
         case 2:
           face_ghost_penalty_matrices[0].kronecker_product(mass_1d, penalty_1d);
-
           face_ghost_penalty_matrices[1].kronecker_product(penalty_1d, mass_1d);
           break;
 
         case 3:
-          FullMatrix<double> tmp;
-          tmp.kronecker_product(penalty_1d, mass_1d);
-          face_ghost_penalty_matrices[0].kronecker_product(tmp, mass_1d);
-          tmp.kronecker_product(mass_1d, penalty_1d);
-          face_ghost_penalty_matrices[1].kronecker_product(tmp, mass_1d);
+          {
+            FullMatrix<double> tmp;
+            tmp.kronecker_product(penalty_1d, mass_1d);
+            face_ghost_penalty_matrices[0].kronecker_product(tmp, mass_1d);
+            tmp.kronecker_product(mass_1d, penalty_1d);
+            face_ghost_penalty_matrices[1].kronecker_product(tmp, mass_1d);
 
-          tmp.kronecker_product(mass_1d, mass_1d);
-          face_ghost_penalty_matrices[2].kronecker_product(tmp, penalty_1d);
-          break;
+            tmp.kronecker_product(mass_1d, mass_1d);
+            face_ghost_penalty_matrices[2].kronecker_product(tmp, penalty_1d);
+            break;
+          }
       }
+    // Finally, we scale the penalty matrices by the ghost penalty parameter.
     for (unsigned int d = 0; d < dim; ++d)
       face_ghost_penalty_matrices[d] *= ghost_parameter;
 
+    // The tensor product formulation requires a lexicographical ordering of the
+    // degrees of freedom on the patch of two cells adjacent to a face. The
+    // following lines create the necessary mappings from the cell-local DoF
+    // indices to the lexicographically ordered DoF indices on the face patch.
     using CellFaceNumberingType =
       std::pair<std::vector<unsigned int>, std::vector<unsigned int>>;
 
