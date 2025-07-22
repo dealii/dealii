@@ -7,7 +7,7 @@ we see that the numerical solution has a value also outside $\overline{\Omega}$.
 As mentioned earlier, this extension of the solution is artificial.
 
 The results of the convergence study is shown in the table below.
-For linear element we see that the $L^2$ error decreases as we refine 
+For linear element we see that the $L^2$ error decreases as we refine
 and that the estimated order of convergence, EOC, is close to 2.
 
 @image html step-85-solution.png

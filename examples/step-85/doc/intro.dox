@@ -170,7 +170,7 @@ so the ghost penalty is reduced to
 @f{equation*}{
   g_h(u_h,v_h) = \gamma_A \sum_{F \in \mathcal{F}_h} (h_F [\partial_n u_h], [\partial_n v_h])_F.
 @f}
- 
+
 The actual assembly can be done using FEInterfaceValues:
 @code
 const QGauss<dim - 1>  face_quadrature(fe_degree + 1);
@@ -237,7 +237,7 @@ order derivatives. Instead of implementing the integration of the penalty terms 
   the local ghost penalty can be computed as a Kronecker product of 1D matrices:
    $G \otimes M$ in 2D or $G \otimes M \otimes M$ in 3D, where $G$ is a 1D penalty matrix and $M$ is a 1D mass matrix.
 This representation requires that the degrees of freedom on the patch of the two cells adjacent
-to the face are ordered lexicographically.
+to the face are ordered lexicographically. Details and derivation could be found in https://arxiv.org/abs/2503.00246.
 
 <h3>Discrete Level Set Function</h3>
 A typical use case of a level set method is a problem where the domain is advected in a velocity field,

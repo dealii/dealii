@@ -568,8 +568,9 @@ namespace Step85
             if (!face_has_ghost_penalty(cell, face_index))
               continue;
 
-            //We already have dof indices for the current cell, so we can
-            // use them directly. We need to get the DoF indices of the neighbor cell.
+            // We already have dof indices for the current cell, so we can
+            //  use them directly. We need to get the DoF indices of the
+            //  neighbor cell.
             cell->neighbor(face_index)->get_dof_indices(neighbor_dof_indices);
 
             // The tensor product formulation requires a lexicographical
