@@ -167,6 +167,8 @@ if(KOKKOS_FOUND)
     enable_if_supported(DEAL_II_CXX_FLAGS "-Xcudafe --diag_suppress=550")
     # warning #940-D: missing return statement at end of non-void function
     enable_if_supported(DEAL_II_CXX_FLAGS "-Xcudafe --diag_suppress=940")
+    # warning #20012-D: __host__ annotation is ignored on a function that is explicitly defaulted on its first declaration
+    enable_if_supported(DEAL_II_CXX_FLAGS "-Xcudafe --diag_suppress=20012")
   endif()
 
   if(Kokkos_ENABLE_HIP)
