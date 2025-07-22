@@ -30,6 +30,8 @@
 
 module;
 
+#include <deal.II/macros.h>
+
 #include <algorithm>
 #include <any>
 #include <array>
