@@ -348,10 +348,16 @@ namespace Step85
         FE_Q<1>(fe_degree), cell_side_length);
 
     // Now we can create the face ghost penalty matrices for each spatial
-    // direction using Kronecker products. For example, in 2D, the penalty
+    // direction using Kronecker products. In 2D, the penalty
     // matrix for a face oriented in the x-direction is given by M_y ⊗ G_x,
     // where M_y is the 1D mass matrix in the y-direction and G_x is the 1D
-    // penalty matrix in the x-direction.
+    // penalty matrix in the x-direction. In 3D, the penalty matrix for a
+    // face oriented in the x-direction is given by M_yz ⊗ G_x, where M_yz
+    // is the 2D mass matrix in the yz-directions and G_x is the 1D penalty
+    // matrix in the x-direction. The 2D mass matrix is given by the
+    // Kronecker product of the 1D mass matrices.
+    // Since our cells are hypercubes we can use the
+    // same mass matrix in each direction.
     std::array<FullMatrix<double>, dim> face_ghost_penalty_matrices;
     switch (dim)
       {
@@ -375,6 +381,7 @@ namespace Step85
 
           break;
       }
+      
     // Finally, we scale the penalty matrices by the ghost penalty parameter.
     for (unsigned int d = 0; d < dim; ++d)
       face_ghost_penalty_matrices[d] *= ghost_parameter;
