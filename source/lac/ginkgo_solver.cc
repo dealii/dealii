@@ -21,6 +21,8 @@
 
 #  include <deal.II/lac/exceptions.h>
 
+#  include <ginkgo/ginkgo.hpp>
+
 #  include <cmath>
 #  include <memory>
 
