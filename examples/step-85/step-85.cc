@@ -381,7 +381,7 @@ namespace Step85
 
           break;
       }
-      
+
     // Finally, we scale the penalty matrices by the ghost penalty parameter.
     for (unsigned int d = 0; d < dim; ++d)
       face_ghost_penalty_matrices[d] *= ghost_parameter;
