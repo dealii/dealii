@@ -7,8 +7,8 @@ we see that the numerical solution has a value also outside $\overline{\Omega}$.
 As mentioned earlier, this extension of the solution is artificial.
 
 The results of the convergence study is shown in the table below.
-We see that the $L^2$ error decreases as we refine and that the estimated
-order of convergence, EOC, is close to 2.
+For linear element we see that the $L^2$ error decreases as we refine 
+and that the estimated order of convergence, EOC, is close to 2.
 
 @image html step-85-solution.png
 
@@ -18,3 +18,13 @@ order of convergence, EOC, is close to 2.
 |   1   |  0.1513   |  1.8711e-02 | 2.11 |
 |   2   |  0.0756   |  4.1624e-03 | 2.17 |
 |   3   |  0.0378   |  9.3979e-04 | 2.15 |
+
+For the quadratic quadratic element we get convergence rate close to 3
+
+| Cycle | Mesh size | $L^2$-Error | EOC  |
+|:-----:|:---------:|:-----------:|:----:|
+|   0   |  0.3025   |  1.3091e-04 |  -   |
+|   1   |  0.1513   |  9.4678e-06 | 3.79 |
+|   2   |  0.0756   |  8.3982e-07 | 3.49 |
+|   3   |  0.0378   |  7.0220e-08 | 3.58 |
+
