@@ -114,8 +114,8 @@ the <code>InitialValues</code> class, by replacing the call to the
 if $|x|,|y|\le \frac\pi 2$, and $u_0(x,y)=0$ outside this region.
 
 A second area would be to investigate whether the scheme is
-energy-preserving. For the pure wave equation, discussed in @ref
-step_23 "step-23", this is the case if we choose the time stepping
+energy-preserving. For the pure wave equation, discussed in
+step-23, this is the case if we choose the time stepping
 parameter such that we get the Crank-Nicolson scheme. One could do a
 similar thing here, noting that the energy in the sine-Gordon solution
 is defined as
@@ -133,7 +133,7 @@ Beyond this, there are two obvious areas:
 - Clearly, adaptivity (i.e. time-adaptive grids) would be of interest
   to problems like these. Their complexity leads us to leave this out
   of this program again, though the general comments in the
-  introduction of @ref step_23 "step-23" remain true.
+  introduction of step-23 remain true.
 
 - Faster schemes to solve this problem. While computers today are
   plenty fast enough to solve 2d and, frequently, even 3d stationary

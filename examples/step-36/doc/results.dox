@@ -165,8 +165,8 @@ can be particularly useful here since the generalized eigenspectrum
 problem is somewhat more expensive to solve than the standard problems
 considered in most of the earlier tutorials. Fortunately, modifying the above
 program to be MPI compliant is a relatively straightforward
-procedure. A sketch of how this can be done can be found in @ref
-step_17 "step-17".
+procedure. A sketch of how this can be done can be found in
+step-17.
 
 <li> Finally, there are alternatives to using the SLEPc eigenvalue
 solvers. deal.II has interfaces to one of them, ARPACK (see <a

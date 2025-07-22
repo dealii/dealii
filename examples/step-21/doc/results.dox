@@ -130,8 +130,8 @@ Second, we could do a lot better with the solver and
 preconditioners. Presently, we solve the Schur complement $B^TM^u(S)^{-1}B$
 with a CG method, using $[B^T (\textrm{diag}(M^u(S)))^{-1} B]^{-1}$ as a
 preconditioner. Applying this preconditioner is expensive, since it involves
-solving a linear system each time. This may have been appropriate for @ref
-step_20 "step-20", where we have to solve the entire problem only
+solving a linear system each time. This may have been appropriate for
+step-20, where we have to solve the entire problem only
 once. However, here we have to solve it hundreds of times, and in such cases
 it is worth considering a preconditioner that is more expensive to set up the
 first time, but cheaper to apply later on.

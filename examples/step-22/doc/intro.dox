@@ -396,8 +396,8 @@ that
   (\textbf{v}_h, \textbf g_N)_{\Gamma_N}
 @f}
 for all test functions $\textbf{v}_h, q_h$. Assembling the linear system
-associated with this problem follows the same lines used in @ref step_20
-"step-20", step-21, and explained in detail in the @ref
+associated with this problem follows the same lines used in
+step-20, step-21, and explained in detail in the @ref
 vector_valued topic.
 
 
