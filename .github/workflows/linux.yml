@@ -500,3 +500,74 @@ jobs:
         make setup_tests_matrix_free_kokkos
         cd tests/matrix_free_kokkos
         make compile_test_executables
+
+  ####################
+  # clang-20-modules #
+  ####################
+
+  clang-20-modules:
+    # simple build testing C++20 modules
+
+    name: debian bookworm clang-20 modules
+    runs-on: [ubuntu-latest]
+    container:
+      image: gcc:15-bookworm
+
+    # The following condition only runs the workflow on 'push' or if the
+    # 'pull_request' is not a draft. This is only useful for hackathons or
+    # other situations when the CI is massively overburdened with pull
+    # requests.
+    #
+    # if: ${{ github.event_name == 'push' || !github.event.pull_request.draft }}
+
+    steps:
+    - name: modules
+      run: |
+        apt-get update
+        apt-get install -yq --no-install-recommends \
+            ninja-build wget lsb-release software-properties-common gnupg
+        wget -qO- https://apt.llvm.org/llvm-snapshot.gpg.key | tee /etc/apt/trusted.gpg.d/apt.llvm.org.asc
+        echo "deb http://apt.llvm.org/bookworm/ llvm-toolchain-bookworm-20 main" | tee /etc/apt/sources.list.d/llvm.list
+        echo "deb-src http://apt.llvm.org/bookworm/ llvm-toolchain-bookworm-20 main" | tee -a /etc/apt/sources.list.d/llvm.list
+        apt-get update && apt-get install -yq --no-install-recommends \
+             libc++-20-dev clang-tools-20 clang-20
+    - uses: lukka/get-cmake@v3.28.3
+    - uses: actions/checkout@v4
+      with:
+        repository: kokkos/kokkos
+        ref: release-candidate-4.7.00
+        path: kokkos
+    - name: compile and install kokkos
+      working-directory: kokkos
+      run: |
+        mkdir build
+        cd build
+        cmake -GNinja \
+              -D BUILD_SHARED_LIBS=ON \
+              -D CMAKE_CXX_COMPILER=clang++-20 \
+              -D CMAKE_CXX_STANDARD=20 \
+              -D CMAKE_INSTALL_PREFIX=${GITHUB_WORKSPACE}/../kokkos-install \
+              ..
+        ninja install
+    - uses: actions/checkout@v4
+    - name: configure deal.II
+      run: |
+        mkdir build
+        cd build
+        export CXXFLAGS="-std=c++20 -stdlib=libc++"
+        export LDFLAGS="-std=c++20 -stdlib=libc++"
+        cmake -D CMAKE_BUILD_TYPE=Debug \
+              -D CMAKE_CXX_STANDARD=20 \
+              -D CMAKE_C_COMPILER=clang-20 \
+              -D CMAKE_CXX_COMPILER=clang++-20 \
+              -D DEAL_II_EARLY_DEPRECATIONS=ON \
+              -D DEAL_II_WITH_CXX20_MODULE=ON \
+              -D KOKKOS_DIR=${GITHUB_WORKSPACE}/../kokkos-install \
+              -G Ninja \
+              ..
+    - name: print detailed.log
+      run: cat build/detailed.log
+    - name: build deal.II
+      run: |
+        cd build
+        ninja --verbose dealii_module_debug
