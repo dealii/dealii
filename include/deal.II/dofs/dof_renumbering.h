@@ -718,9 +718,9 @@ namespace DoFRenumbering
    */
   template <int dim, int spacedim>
   void
-  component_wise(DoFHandler<dim, spacedim> &dof_handler,
-                 const std::vector<FEValuesExtractors::ExtractorVariant> &
-                   order = std::vector<FEValuesExtractors::ExtractorVariant>());
+  component_wise(
+    DoFHandler<dim, spacedim>                               &dof_handler,
+    const std::vector<FEValuesExtractors::ExtractorVariant> &order);
 
   /**
    * Sort the degrees of freedom by component. It does the same thing as the
@@ -730,10 +730,10 @@ namespace DoFRenumbering
    */
   template <int dim, int spacedim>
   void
-  component_wise(DoFHandler<dim, spacedim> &dof_handler,
-                 const unsigned int         level,
-                 const std::vector<FEValuesExtractors::ExtractorVariant> &
-                   order = std::vector<FEValuesExtractors::ExtractorVariant>());
+  component_wise(
+    DoFHandler<dim, spacedim>                               &dof_handler,
+    const unsigned int                                       level,
+    const std::vector<FEValuesExtractors::ExtractorVariant> &order);
 
 
   /**
