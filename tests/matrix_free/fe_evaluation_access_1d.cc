@@ -27,6 +27,7 @@ main()
 {
   initlog();
 
-  FEEvaluationAccess<1, 1, double, false> *test; // didn't compile before
+  FEEvaluationBase<1, 1, double, false, VectorizedArray<double>>
+    *test; // didn't compile before
   deallog << "OK" << std::endl;
 }

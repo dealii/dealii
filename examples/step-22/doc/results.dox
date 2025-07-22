@@ -172,8 +172,8 @@ ${\cal O}(N)$: a simple experiment shows that as we keep refining the mesh, the
 average number of ILU-preconditioned CG iterations to invert the
 velocity-velocity block $A$ increases.
 
-We will address the question of how possibly to improve our solver <a
-href="#improved-solver">below</a>.
+We will address the question of how possibly to improve our solver
+@ref step_22-ImprovedSolver "below".
 
 As for the graphical output, the grids generated during the solution
 look as follow:
@@ -279,7 +279,7 @@ is not a good choice in 3D - a full decomposition needs many new entries that
 
 <h3>Possibilities for extensions</h3>
 
-<a name="step-22-improved-solver">
+@anchor step_22-ImprovedSolver
 <h4>Improved linear solver in 3D</h4>
 </a>
 
@@ -317,7 +317,7 @@ size. Either way, we will introduce below a number of improvements to the
 linear solver, a discussion that we will re-consider again with additional
 options in the step-31 program.
 
-<a name="step-22-improved-ilu">
+@anchor step_22-ImprovedILU
 <h5>Better ILU decomposition by smart reordering</h5>
 </a>
 A first attempt to improve the speed of the linear solution process is to choose
@@ -344,8 +344,9 @@ preconditioner that makes CG for the (0,0) matrix $A$ converge in a
 mesh-independent number of iterations, say 10 to 30. We have seen such a
 candidate in step-16: multigrid.
 
+
+@anchor step_22-BlockSchur
 <h5>Block Schur complement preconditioner</h5>
-<a name="step-22-block-schur"></a>
 Even with a good preconditioner for $A$, we still
 need to solve of the same linear system repeatedly (with different
 right hand sides, though) in order to make the Schur complement solve

@@ -1,4 +1,4 @@
-<a name="step-1-Intro"></a>
+<a name="step_1-Intro"></a>
 <h1>Introduction</h1>
 
 <h3> About the tutorial </h3>
@@ -242,7 +242,7 @@ are worthwhile browsing through before you start any large-scale programming:
   [this more in-depth reference](https://www.learncpp.com/).
   If all you want is to look up a
   fact (say, the name of a member function of `std::vector`, or the
-  order of function arguments of `std::snprintf`, then
+  order of function arguments of `std::accumulate()`, then
   [cppreference.org](https://en.cppreference.com/) is the place many
   of us go to.
 

@@ -721,17 +721,6 @@ namespace LinearAlgebra
       import_elements(const Vector<Number, MemorySpace2> &src,
                       VectorOperation::values             operation);
 
-      /**
-       * @deprecated Use import_elements() instead.
-       */
-      template <typename MemorySpace2>
-      DEAL_II_DEPRECATED void
-      import(const Vector<Number, MemorySpace2> &src,
-             VectorOperation::values             operation)
-      {
-        import_elements(src, operation);
-      }
-
       /** @} */
 
       /**
@@ -780,18 +769,6 @@ namespace LinearAlgebra
         const VectorOperation::values                 operation,
         const std::shared_ptr<const Utilities::MPI::CommunicationPatternBase>
           &communication_pattern = {});
-
-      /**
-       * @deprecated Use import_elements() instead.
-       */
-      DEAL_II_DEPRECATED void
-      import(const LinearAlgebra::ReadWriteVector<Number> &V,
-             VectorOperation::values                       operation,
-             std::shared_ptr<const Utilities::MPI::CommunicationPatternBase>
-               communication_pattern = {})
-      {
-        import_elements(V, operation, communication_pattern);
-      }
 
       /**
        * Return the scalar product of two vectors.
