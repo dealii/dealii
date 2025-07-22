@@ -314,8 +314,7 @@ namespace Step85
     Vector<double>     local_rhs(n_dofs_per_cell);
     std::vector<types::global_dof_index> local_dof_indices(n_dofs_per_cell);
 
-
-
+    // Weak form parameters
     const double ghost_parameter   = 0.5;
     const double nitsche_parameter = 5 * (fe_degree + 1) * fe_degree;
 
@@ -336,28 +335,25 @@ namespace Step85
     std::array<FullMatrix<double>, dim> face_ghost_penalty_matrices;
     switch (dim)
       {
+        case 1:
+          face_ghost_penalty_matrices[0] = penalty_1d;
+          break;
         case 2:
-          {
-            face_ghost_penalty_matrices[0].kronecker_product(mass_1d,
-                                                             penalty_1d);
+          face_ghost_penalty_matrices[0].kronecker_product(mass_1d, penalty_1d);
 
-            face_ghost_penalty_matrices[1].kronecker_product(penalty_1d,
-                                                             mass_1d);
-            break;
-          }
+          face_ghost_penalty_matrices[1].kronecker_product(penalty_1d, mass_1d);
+          break;
+
         case 3:
-          {
-            FullMatrix<double> tmp;
-            tmp.kronecker_product(penalty_1d, mass_1d);
-            face_ghost_penalty_matrices[0].kronecker_product(tmp, mass_1d);
+          FullMatrix<double> tmp;
+          tmp.kronecker_product(penalty_1d, mass_1d);
+          face_ghost_penalty_matrices[0].kronecker_product(tmp, mass_1d);
+          tmp.kronecker_product(mass_1d, penalty_1d);
+          face_ghost_penalty_matrices[1].kronecker_product(tmp, mass_1d);
 
-            tmp.kronecker_product(mass_1d, penalty_1d);
-            face_ghost_penalty_matrices[1].kronecker_product(tmp, mass_1d);
-
-            tmp.kronecker_product(mass_1d, mass_1d);
-            face_ghost_penalty_matrices[2].kronecker_product(tmp, penalty_1d);
-            break;
-          }
+          tmp.kronecker_product(mass_1d, mass_1d);
+          face_ghost_penalty_matrices[2].kronecker_product(tmp, penalty_1d);
+          break;
       }
     for (unsigned int d = 0; d < dim; ++d)
       face_ghost_penalty_matrices[d] *= ghost_parameter;
@@ -368,7 +364,7 @@ namespace Step85
     std::array<CellFaceNumberingType, dim> cells_to_face_patch_numberings;
     for (unsigned int d = 0; d < dim; ++d)
       cells_to_face_patch_numberings[d] =
-        FETools::cell_to_face_patch<dim>(fe_degree, d, false, true);
+        FETools::cell_to_face_patch<dim>(fe_degree, d, true, true);
 
     // We need to store the local DoF indices of the neighbor cells, so that we
     // can distribute the local ghost penalty terms to the correct DoFs.
