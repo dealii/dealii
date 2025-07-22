@@ -273,19 +273,10 @@ if(DEAL_II_WITH_CXX20_MODULE)
     # all other targets, but do set the DEAL_II_BUILDING_CXX20_MODULE
     # preprocessor variable for a small number of cases where we need to
     # work around things that work differently between module and
-    # non-module builds. In addition, make sure that we link in all object
-    # files from bundled targets:
+    # non-module builds.
     #
 
-    get_property(_bundled_object_targets GLOBAL PROPERTY DEAL_II_BUNDLED_TARGETS_${build})
-    set(_object_files "")
-    foreach(_target ${_bundled_object_targets})
-      list(APPEND _object_files "$<TARGET_OBJECTS:${_target}>")
-    endforeach()
-
-    add_library(${DEAL_II_TARGET_NAME}_module_${build_lowercase} SHARED
-      ${_object_files}
-      )
+    add_library(${DEAL_II_TARGET_NAME}_module_${build_lowercase})
 
     populate_target_properties(${DEAL_II_TARGET_NAME}_module_${build_lowercase} ${build})
     target_compile_definitions(${DEAL_II_TARGET_NAME}_module_${build_lowercase}
@@ -334,6 +325,19 @@ if(DEAL_II_WITH_CXX20_MODULE)
       TYPE HEADERS
       FILES ${_dealii_macros_header}
       BASE_DIRS ${CMAKE_CURRENT_BINARY_DIR}/../include/
+      )
+
+    #
+    # In addition, link in all objects from the bundled object targets
+    # (listed in the DEAL_II_BUNDLED_TARGETS_* global property).
+    #
+    get_property(_bundled_object_targets GLOBAL PROPERTY DEAL_II_BUNDLED_TARGETS_${build})
+    set(_object_files "")
+    foreach(_target ${_bundled_object_targets})
+      list(APPEND _object_files "$<TARGET_OBJECTS:${_target}>")
+    endforeach()
+    target_sources(${DEAL_II_TARGET_NAME}_module_${build_lowercase}
+      PRIVATE ${_object_files}
       )
 
     # Ensure that all .inst files and the macro headers are in place
