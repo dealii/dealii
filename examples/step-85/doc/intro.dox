@@ -271,6 +271,42 @@ G = G_x \otimes M_y \otimes M_y
 in 3D, where $G_x$ is a 1D penalty matrix and $M_y, M_z$ are a 1D mass matrices.
 This representation requires that the degrees of freedom on the patch of the two cells adjacent
 to the face are ordered lexicographically. Details and derivation could be found in https://arxiv.org/abs/2503.00246.
+The assembly of the 1D matrices is handled by the helper class
+`TensorProductMatrixCreator`. Specifically, we use the functions
+`TensorProductMatrixCreator::create_1d_cell_mass_matrix` and
+`TensorProductMatrixCreator::create_1d_ghost_penalty_matrix`.
+These 1D matrices are then combined using `FullMatrix::kronecker_product`
+to form the full penalty matrix for a face.
+
+For example, the assembly of the 2D penalty matrix on a face perpendicular
+to the x-direction is done with the following code. Note that this corresponds
+to the formula $G = M_y \otimes G_x$, assuming a lexicographical ordering
+of the degrees of freedom where the x-index runs fastest.
+@code
+// Create the 1D mass matrix for the y-direction.
+FullMatrix<double> mass_1d =
+  TensorProductMatrixCreator::create_1d_cell_mass_matrix<double>(
+    FE_Q<1>(fe_degree),
+    cell_side_length,
+    {true, true},
+    FETools::hierarchic_to_lexicographic_numbering<1>(fe_degree));
+
+// Create the 1D penalty matrix for the x-direction.
+FullMatrix<double> penalty_1d =
+  TensorProductMatrixCreator::create_1d_ghost_penalty_matrix<double>(
+    FE_Q<1>(fe_degree), cell_side_length);
+
+// Combine them into the 2D face penalty matrix.
+FullMatrix<double> face_ghost_penalty_matrix;
+face_ghost_penalty_matrix.kronecker_product(mass_1d, penalty_1d);
+@endcode
+The `FE_Q` elements uses a
+hierarchic numbering scheme for the degrees of freedom by default.
+The reordeing is provided by `FETools::hierarchic_to_lexicographic_numbering`.
+The lexicographical ordering of degrees of freedom on the patch, which is
+required for this Kronecker product representation to be valid, can be
+obtained from `FETools::cell_to_face_patch`.
+
 
 <h3>Discrete Level Set Function</h3>
 A typical use case of a level set method is a problem where the domain is advected in a velocity field,
