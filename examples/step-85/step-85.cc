@@ -554,31 +554,57 @@ namespace Step85
         stiffness_matrix.add(local_dof_indices, local_stiffness);
         rhs.add(local_dof_indices, local_rhs);
 
+        // Now we add the ghost penalty terms. We only need to consider faces
+        // in the positive coordinate directions, since we visit each cell.
+        // This way, each interior face is visited exactly once. The `d`
+        // variable denotes the direction normal to the face.
         for (unsigned int d = 0; d < dim; ++d)
           {
+            // In deal.II, for standard Cartesian cells, faces are numbered
+            // lexicographically. The face with an outward normal in direction
+            // `d` has index `2*d+1`. For example, in 2D, d=0 corresponds to
+            // face 1 (right), and d=1 corresponds to face 3 (top).
             const unsigned int face_index = d * 2 + 1;
             if (!face_has_ghost_penalty(cell, face_index))
               continue;
+
+            //We already have dof indices for the current cell, so we can
+            // use them directly. We need to get the DoF indices of the neighbor cell.
             cell->neighbor(face_index)->get_dof_indices(neighbor_dof_indices);
 
+            // The tensor product formulation requires a lexicographical
+            // ordering of the degrees of freedom on the patch of the two cells
+            // adjacent to the face. We create a vector to hold the combined
+            // DoF indices from the current cell and its neighbor.
             std::vector<types::global_dof_index> combined_dof_indices(
               Utilities::fixed_power<dim - 1>(fe_degree + 1) *
                 (2 * fe_degree + 1),
               numbers::invalid_dof_index);
 
+            // Using the precomputed mapping, we place the local DoF indices
+            // of the current cell into the correct positions in the combined
+            // vector.
             for (unsigned int i = 0; i < local_dof_indices.size(); ++i)
               combined_dof_indices[cells_to_face_patch_numberings[d].first[i]] =
                 local_dof_indices[i];
 
+            // We do the same for the neighbor's DoF indices.
             for (unsigned int i = 0; i < neighbor_dof_indices.size(); ++i)
               combined_dof_indices[cells_to_face_patch_numberings[d]
                                      .second[i]] = neighbor_dof_indices[i];
 
+
+            // Check if filling the combined_dof_indices vector was successful.
+            // This is a sanity check to ensure that
+            // cells_to_face_patch_numberings was correctly computed and that
+            // the indices are valid.
             for (unsigned int index : combined_dof_indices)
               Assert(index < dof_handler.n_dofs(),
                      ExcMessage("Invalid DoF index in combined_dof_indices"));
 
-
+            // Finally, we add the pre-computed ghost penalty matrix for the
+            // face in direction `d` to the global stiffness matrix, using the
+            // lexicographically ordered combined DoF indices.
             stiffness_matrix.add(combined_dof_indices,
                                  face_ghost_penalty_matrices[d]);
           }
