@@ -250,6 +250,15 @@ namespace PSCToolkit
         void PrintSolverOptions(const psb_c_SolverOptions *opt, psb_c_ctxt *cctxt);
 
         /**
+         * Print the current solver options to an output file.
+         *
+         * @param opt Pointer to the PSBLAS solver options structure.
+         * @param cctxt Pointer to the PSBLAS context for logging.
+         * @param output_file Output file stream to write the options.
+         */
+        void PrintSolverOptions(const psb_c_SolverOptions *opt, psb_c_ctxt *cctxt, std::ofstream &output_file);
+
+        /**
          * Free the PSBLAS solver options structure.
          *
          * @param opt Pointer to the PSBLAS solver options structure to be freed.

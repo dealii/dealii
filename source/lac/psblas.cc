@@ -38,6 +38,7 @@ namespace PSCToolkit
       {
         psb_c_ctxt *cctxt = psb_c_new_ctxt();
         psb_c_init(cctxt);
+        psb_c_set_index_base(0); // Set index base to 0
         return cctxt;
       }
 
@@ -66,6 +67,7 @@ namespace PSCToolkit
         MPI_Fint f_comm = MPI_Comm_c2f(comm);
         psb_c_ctxt *cctxt = psb_c_new_ctxt();
         psb_c_init_from_fint(cctxt, f_comm);
+        psb_c_set_index_base(0); // Set index base to 0
         
         return cctxt;
       }
@@ -584,7 +586,7 @@ namespace PSCToolkit
       // Initialize with default values
       opt->iter = 0;          // Initial iteration count
       opt->itmax = 1000;      // Maximum iterations
-      opt->itrace = 0;        // No trace output by default
+      opt->itrace = 1;        // Trace output enabled by default
       opt->irst = 30;         // Restart depth for GMRES
       opt->istop = 2;         // Use relative residual norm ||r||_2/||b||_2
       opt->eps = 1.0e-6;      // Convergence tolerance
@@ -645,6 +647,36 @@ namespace PSCToolkit
         deallog << "  Tolerance (eps): " << opt->eps << std::endl;
         deallog << "  Iterations performed (iter): " << opt->iter << std::endl;
         deallog << "  Final error (err): " << opt->err << std::endl;
+      }
+    }
+
+    /**
+     * Print the current solver options to an output file.
+     *
+     * @param opt Pointer to the PSBLAS solver options structure.
+     * @param cctxt Pointer to the PSBLAS context for logging.
+     * @param output_file Output file stream to write the options.
+     */
+    void PrintSolverOptions(const psb_c_SolverOptions *opt, psb_c_ctxt *cctxt, std::ofstream &output_file)
+    {
+      if (opt == nullptr)
+      {
+        deallog << "Error: null pointer passed to PrintSolverOptions." << std::endl;
+        return;
+      }
+      
+      int iam, nproc;
+      psb_c_info(*cctxt, &iam, &nproc);
+      if (iam == 0) // Only print from rank 0
+      {
+        output_file << "PSBLAS Solver Options:" << std::endl;
+        output_file << "  Maximum iterations (itmax): " << opt->itmax << std::endl;
+        output_file << "  Trace frequency (itrace): " << opt->itrace << std::endl;
+        output_file << "  Restart depth (irst): " << opt->irst << std::endl;
+        output_file << "  Stopping criterion (istop): " << opt->istop << std::endl;
+        output_file << "  Tolerance (eps): " << opt->eps << std::endl;
+        output_file << "  Iterations performed (iter): " << opt->iter << std::endl;
+        output_file << "  Final error (err): " << opt->err << std::endl;
       }
     }
 
