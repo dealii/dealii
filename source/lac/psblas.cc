@@ -320,7 +320,282 @@ namespace PSCToolkit
 
   namespace Vector {
 
+      /**
+       * Create a new PSBLAS vector and initialize it with the given descriptor.
+       *
+       * @param cd Pointer to the PSBLAS descriptor to initialize the vector.
+       * @return Pointer to the created PSBLAS vector.
+       */
+      psb_c_dvector* CreateVector(psb_c_descriptor *cd)
+      {
+        // Create a new PSBLAS vector
+        psb_c_dvector *vector = psb_c_new_dvector();
+        if (vector == nullptr)
+        {
+          deallog << "Error creating PSBLAS vector." << std::endl;
+        }
+        // Initialize the vector with the descriptor
+        int info = psb_c_dgeall_remote(vector, cd);
+        if (info != 0)
+        {
+          deallog << "Error initializing PSBLAS vector: " << info << std::endl;
+        }
+        return vector;
+      }
+
+      /** 
+       * Assemble the PSBLAS vector.
+       * @param vector Pointer to the PSBLAS vector to be assembled.
+       * @param cd Pointer to the PSBLAS descriptor.
+       * @return 0 on success, non-zero on failure.
+       */
+      int AssembleVector(psb_c_dvector *vector, psb_c_descriptor *cd)
+      {
+        if (vector == nullptr || cd == nullptr)
+        {
+          deallog << "Error assembling PSBLAS vector: null pointer." << std::endl;
+          return -1;
+        }
+        int info = psb_c_dgeasb(vector, cd);
+        if (info != 0)
+        {
+          deallog << "Error assembling PSBLAS vector: " << info << std::endl;
+        }
+        return info;
+      }
+
+      /**
+       * Free the PSBLAS vector.
+       *
+       * @param vector Pointer to the PSBLAS vector to be freed.
+       * @param cd Pointer to the PSBLAS descriptor.
+       * @return 0 on success, non-zero on failure.
+       */
+      int FreeVector(psb_c_dvector *vector, psb_c_descriptor *cd)
+      {
+        if (vector != nullptr && cd != nullptr)
+        {
+          int result = psb_c_dgefree(vector, cd);
+          if (result != 0)
+          {
+            deallog << "Error freeing PSBLAS vector: " << result << std::endl;
+          }
+          return result; // Success
+        }
+        else
+        {
+          deallog << "Warning: Attempted to free a null PSBLAS vector." << std::endl;
+          return -1; // Failure
+        }
+      }
+
   } // namespace Vector
+
+  namespace Solvers
+  {
+
+    /**
+     * Create and init a new PSBLAS preconditioner.
+     *
+     * @param cctxt PSBLAS context.
+     * @param ptype Type of the preconditioner
+     * @return Pointer to the created PSBLAS preconditioner.
+     */
+    psb_c_dprec* CreateBasePreconditioner(psb_c_ctxt cctxt, const char *ptype)
+    {
+      psb_c_dprec *ph = psb_c_new_dprec();
+      if (ph == nullptr)
+      {
+        deallog << "Error allocating memory for PSBLAS preconditioner." << std::endl;
+        return nullptr;
+      }
+      // Initialize the preconditioner with default values
+      int info = psb_c_dprecinit(cctxt,ph,ptype);
+      if (info != 0)
+      {
+        deallog << "Error initializing PSBLAS preconditioner: " << info << std::endl;
+        free(ph);
+        return nullptr;
+      }
+      return ph;
+    }
+
+    /**
+     * Build the PSBLAS preconditioner.
+     *
+     * @param ph Pointer to the PSBLAS preconditioner to be built.
+     * @param mh Pointer to the PSBLAS sparse matrix.
+     * @param cdh Pointer to the PSBLAS descriptor.
+     * @return 0 on success, non-zero on failure.
+     */
+    int BasePrecBuild(psb_c_dprec *ph, psb_c_dspmat *mh, psb_c_descriptor *cdh)
+    {
+      if (ph == nullptr || mh == nullptr || cdh == nullptr)
+      {
+        deallog << "Error building PSBLAS preconditioner: null pointer." << std::endl;
+        return -1; // Failure
+      }
+      int info = psb_c_dprecbld(mh, cdh, ph);
+      if (info != 0)
+      {
+        deallog << "Error building PSBLAS preconditioner: " << info << std::endl;
+      }
+      return info; // Success or failure
+    }
+
+    /**
+     * Free the PSBLAS preconditioner.
+     *
+     * @param ph Pointer to the PSBLAS preconditioner to be freed.
+     * @return 0 on success, non-zero on failure.
+     */
+    int FreeBasePreconditioner(psb_c_dprec *ph)
+    {
+      if (ph != nullptr)
+      {
+        int result = psb_c_dprecfree(ph);
+        if (result != 0)
+        {
+          deallog << "Error freeing PSBLAS preconditioner: " << result << std::endl;
+        }
+        return result; // Success
+      }
+      else
+      {
+        deallog << "Warning: Attempted to free a null PSBLAS preconditioner." << std::endl;
+        return -1; // Failure
+      }
+    }
+
+    /**
+     * Create and initialize a PSBLAS solver options structure with default values.
+     *
+     * @return Pointer to the initialized PSBLAS solver options structure.
+     */
+    psb_c_SolverOptions* CreateSolverOptions()
+    {
+      psb_c_SolverOptions *opt = (psb_c_SolverOptions*)malloc(sizeof(psb_c_SolverOptions));
+      if (opt == nullptr)
+      {
+        deallog << "Error allocating memory for PSBLAS solver options." << std::endl;
+        return nullptr;
+      }
+      
+      // Initialize with default values
+      opt->iter = 0;          // Initial iteration count
+      opt->itmax = 1000;      // Maximum iterations
+      opt->itrace = 0;        // No trace output by default
+      opt->irst = 30;         // Restart depth for GMRES
+      opt->istop = 2;         // Use relative residual norm ||r||_2/||b||_2
+      opt->eps = 1.0e-6;      // Convergence tolerance
+      opt->err = 0.0;         // Initial error
+      
+      return opt;
+    }
+
+    /**
+     * Set solver options with custom values.
+     *
+     * @param opt Pointer to the PSBLAS solver options structure.
+     * @param itmax Maximum number of iterations.
+     * @param itrace Print info every itrace iterations (0 for no output).
+     * @param irst Restart depth for GMRES or BiCGSTAB(L).
+     * @param istop Stopping criterion (1: backward error, 2: relative residual).
+     * @param eps Stopping tolerance.
+     */
+    void SetSolverOptions(psb_c_SolverOptions *opt, int itmax, int itrace, 
+                          int irst, int istop, double eps)
+    {
+      if (opt == nullptr)
+      {
+        deallog << "Error: null pointer passed to SetSolverOptions." << std::endl;
+        return;
+      }
+      
+      opt->itmax = itmax;
+      opt->itrace = itrace;
+      opt->irst = irst;
+      opt->istop = istop;
+      opt->eps = eps;
+    }
+
+    /**
+     * Print the current solver options to the log.
+     *
+     * @param opt Pointer to the PSBLAS solver options structure.
+     * @param cctxt Pointer to the PSBLAS context for logging.
+     */
+    void PrintSolverOptions(const psb_c_SolverOptions *opt, psb_c_ctxt *cctxt)
+    {
+      if (opt == nullptr)
+      {
+        deallog << "Error: null pointer passed to PrintSolverOptions." << std::endl;
+        return;
+      }
+      
+      int iam, nproc;
+      psb_c_info(*cctxt, &iam, &nproc);
+      if (iam == 0) // Only print from rank 0
+      {
+        deallog << "PSBLAS Solver Options:" << std::endl;
+        deallog << "  Maximum iterations (itmax): " << opt->itmax << std::endl;
+        deallog << "  Trace frequency (itrace): " << opt->itrace << std::endl;
+        deallog << "  Restart depth (irst): " << opt->irst << std::endl;
+        deallog << "  Stopping criterion (istop): " << opt->istop << std::endl;
+        deallog << "  Tolerance (eps): " << opt->eps << std::endl;
+        deallog << "  Iterations performed (iter): " << opt->iter << std::endl;
+        deallog << "  Final error (err): " << opt->err << std::endl;
+      }
+    }
+
+    /**
+     * Free the PSBLAS solver options structure.
+     *
+     * @param opt Pointer to the PSBLAS solver options structure to be freed.
+     */
+    void FreeSolverOptions(psb_c_SolverOptions *opt)
+    {
+      if (opt != nullptr)
+      {
+        free(opt);
+      }
+      else
+      {
+        deallog << "Warning: Attempted to free a null PSBLAS solver options structure." << std::endl;
+      }
+    }
+
+    /**
+     * Solve a linear system using the PSBLAS Krylov solver.
+     *
+     * @param method The name of the Krylov method to use (e.g., "cg", "gmres").
+     * @param ah Pointer to the PSBLAS sparse matrix.
+     * @param ph Pointer to the PSBLAS preconditioner.
+     * @param bh Pointer to the right-hand side vector.
+     * @param xh Pointer to the solution vector.
+     * @param cdh Pointer to the PSBLAS descriptor.
+     * @param opt Pointer to the PSBLAS solver options.
+     * @return 0 on success, non-zero on failure.
+     */
+    int BaseKrylov(const char *method, psb_c_dspmat *ah, psb_c_dprec *ph, 
+		  psb_c_dvector *bh, psb_c_dvector *xh,
+		  psb_c_descriptor *cdh, psb_c_SolverOptions *opt)
+    {
+    if (method == nullptr || ah == nullptr || bh == nullptr || xh == nullptr || cdh == nullptr || opt == nullptr)
+    {
+      deallog << "Error: null pointer passed to Krylov solver." << std::endl;
+      return -1; // Failure
+    }
+    // Call the PSBLAS Krylov solver
+    int info = psb_c_dkrylov(method, ah, ph, bh, xh, cdh, opt);
+    if (info != 0)
+    {
+      deallog << "Error solving linear system with PSBLAS Krylov solver: " << info << std::endl;
+    }
+    return info; // Success or failure
+    }
+
+  } // namespace Solvers
 
 } // namespace PSCToolkit
 

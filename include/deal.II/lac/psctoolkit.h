@@ -21,6 +21,8 @@
 #ifdef DEAL_II_WITH_PSBLAS
 
 #include "psb_base_cbind.h"
+#include "psb_krylov_cbind.h"
+#include "psb_prec_cbind.h"
 #include "psb_config.h"
 
 DEAL_II_NAMESPACE_OPEN
@@ -141,8 +143,114 @@ namespace PSCToolkit
     } // namespace Matrix
 
     namespace Vector {
+        /**
+         * Create a new PSBLAS vector and initialize it with the given descriptor.
+         *
+         * @param cd Pointer to the PSBLAS descriptor to initialize the vector.
+         * @return Pointer to the created PSBLAS vector.
+         */
+        psb_c_dvector *CreateVector(psb_c_descriptor *cd);
+        /**
+         * Assemble the PSBLAS vector.
+         *
+         * @param vector Pointer to the PSBLAS vector to be assembled.
+         * @param cd Pointer to the PSBLAS descriptor.
+         * @return 0 on success, non-zero on failure.
+         */
+        int AssembleVector(psb_c_dvector *vector, psb_c_descriptor *cd);
+        /**
+         * Free the PSBLAS vector.
+         *
+         * @param vector Pointer to the PSBLAS vector to be freed.
+         * @param cd Pointer to the PSBLAS descriptor.
+         * @return 0 on success, non-zero on failure.
+         */
+        int FreeVector(psb_c_dvector *vector, psb_c_descriptor *cd);
 
     } // namespace Vector   
+
+    namespace Solvers 
+    {
+        
+        /**
+         * Create and init a new PSBLAS preconditioner.
+         *
+         * @param cctxt PSBLAS context.
+         * @param ptype Type of the preconditioner
+         * @return Pointer to the created PSBLAS preconditioner.
+         */
+        psb_c_dprec* CreateBasePreconditioner(psb_c_ctxt cctxt, const char *ptype);
+        
+        /**
+        * Build the PSBLAS preconditioner.
+        *
+        * @param ph Pointer to the PSBLAS preconditioner to be built.
+        * @param mh Pointer to the PSBLAS sparse matrix.
+        * @param cdh Pointer to the PSBLAS descriptor.
+        * @return 0 on success, non-zero on failure.
+        */
+        int BasePrecBuild(psb_c_dprec *ph, psb_c_dspmat *mh, psb_c_descriptor *cdh);
+
+        /**
+         * Free the PSBLAS preconditioner.
+         *
+         * @param ph Pointer to the PSBLAS preconditioner to be freed.
+         * @return 0 on success, non-zero on failure.
+         */
+        int FreeBasePreconditioner(psb_c_dprec *ph);
+  
+        /**
+         * Create a new PSBLAS solver options structure.
+         *
+         * @return Pointer to the created PSBLAS solver options structure.
+         */
+        psb_c_SolverOptions *CreateSolverOptions();
+
+        /**
+         * Set solver options with custom values.
+         *
+         * @param opt Pointer to the PSBLAS solver options structure.
+         * @param itmax Maximum number of iterations.
+         * @param itrace Print info every itrace iterations (0 for no output).
+         * @param irst Restart depth for GMRES or BiCGSTAB(L).
+         * @param istop Stopping criterion (1: backward error, 2: relative residual).
+         * @param eps Stopping tolerance.
+         */
+        void SetSolverOptions(psb_c_SolverOptions *opt, int itmax, int itrace, 
+                            int irst, int istop, double eps);
+
+        /**
+         * Print the current solver options to the log.
+         *
+         * @param opt Pointer to the PSBLAS solver options structure.
+         * @param cctxt Pointer to the PSBLAS context for logging.
+         */
+        void PrintSolverOptions(const psb_c_SolverOptions *opt, psb_c_ctxt *cctxt);
+
+        /**
+         * Free the PSBLAS solver options structure.
+         *
+         * @param opt Pointer to the PSBLAS solver options structure to be freed.
+         */
+        void FreeSolverOptions(psb_c_SolverOptions *opt);
+
+        /**
+         * Solve a linear system using the PSBLAS Krylov solver.
+         *
+         * @param method The name of the Krylov method to use (e.g., "cg", "gmres").
+         * @param ah Pointer to the PSBLAS sparse matrix.
+         * @param ph Pointer to the PSBLAS preconditioner.
+         * @param bh Pointer to the right-hand side vector.
+         * @param xh Pointer to the solution vector.
+         * @param cdh Pointer to the PSBLAS descriptor.
+         * @param opt Pointer to the PSBLAS solver options.
+         * @return 0 on success, non-zero on failure.
+         */
+        int BaseKrylov(const char *method, psb_c_dspmat *ah, psb_c_dprec *ph, 
+            psb_c_dvector *bh, psb_c_dvector *xh,
+            psb_c_descriptor *cdh, psb_c_SolverOptions *opt);
+
+    }
 
 } // namespace PSCToolkit
 
