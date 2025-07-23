@@ -207,7 +207,7 @@ FEInterfaceValues<dim> fe_interface_values(fe_collection[0],
                                               update_normal_vectors);
 @endcode
 
- As we iterate over the local faces, we first check if the current face belongs to the set $\mathcal{F}_h$.
+As we iterate over the local faces, we first check if the current face belongs to the set $\mathcal{F}_h$.
 Assembling in this way, we will traverse each internal face in the mesh twice, so in order to get the penalty
 constant we expect, we multiply the penalty term with a factor 1/2.
 
