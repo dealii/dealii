@@ -12,7 +12,7 @@
 #include <deal.II/distributed/fully_distributed_tria.h>
 
 #include <deal.II/grid/grid_generator.h>
- #include <deal.II/grid/grid_tools.h>
+#include <deal.II/grid/grid_tools.h>
 
 #include <deal.II/fe/fe_q.h>
 #include <deal.II/fe/fe_values.h>
@@ -73,6 +73,9 @@ int main(int argc, char **argv)
   // Create a PSBLAS Sparse matrix on the descriptor and communicator
   psb_c_dspmat *psblas_sparse_matrix = PSCToolkit::Matrix::CreateSparseMatrix(descriptor);
 
+  // Create a PSBLAS vector for the right-hand side 
+  psb_c_dvector *psblas_rhs_vector = PSCToolkit::PSBVector::CreateVector(descriptor);
+
   // Assemble system
   QGauss<dim> quadrature_formula(fe.degree + 1);
   FEValues<dim> fe_values(fe, quadrature_formula, update_values | update_gradients | update_quadrature_points | update_JxW_values);
@@ -81,33 +84,56 @@ int main(int argc, char **argv)
   const unsigned int n_q_points = quadrature_formula.size();
 
   FullMatrix<double> cell_matrix(dofs_per_cell, dofs_per_cell);
+  Vector<double>     cell_rhs(dofs_per_cell);
   std::vector<types::global_dof_index> local_dof_indices(dofs_per_cell);
 
-  for (const auto &cell : dof_handler.active_cell_iterators())
-  {
+  for (const auto &cell : dof_handler.active_cell_iterators()){
     if (cell->is_locally_owned())
-    {
-      fe_values.reinit(cell);
-      cell_matrix = 0;
+      {
+        fe_values.reinit(cell);
 
-    for (unsigned int q = 0; q < n_q_points; ++q)
-    for (unsigned int i = 0; i < dofs_per_cell; ++i)
-        for (unsigned int j = 0; j < dofs_per_cell; ++j)
-        cell_matrix(i, j) += fe_values.shape_grad(i, q) *
-                                fe_values.shape_grad(j, q) *
-                                fe_values.JxW(q);
+        cell_matrix = 0.;
+        cell_rhs    = 0.;
 
-    cell->get_dof_indices(local_dof_indices);
-    // Distribute local indices and values to the PSBLAS sparse matrix
-    info = PSCToolkit::Matrix::distribute_local_to_global(local_dof_indices, cell_matrix, psblas_sparse_matrix, descriptor);
-    
-    if (info != 0) deallog << "Error distributing local to global: " << info << std::endl;  
-    
+        for (unsigned int q_point = 0; q_point < n_q_points; ++q_point)
+          {
+            const double rhs_value =
+              (fe_values.quadrature_point(q_point)[1] >
+                    0.5 +
+                      0.25 * std::sin(4.0 * numbers::PI *
+                                      fe_values.quadrature_point(q_point)[0]) ?
+                  1. :
+                  -1.);
+
+            for (unsigned int i = 0; i < dofs_per_cell; ++i)
+              {
+                for (unsigned int j = 0; j < dofs_per_cell; ++j)
+                  cell_matrix(i, j) += fe_values.shape_grad(i, q_point) *
+                                        fe_values.shape_grad(j, q_point) *
+                                        fe_values.JxW(q_point);
+
+                cell_rhs(i) += rhs_value *                         
+                                fe_values.shape_value(i, q_point) * 
+                                fe_values.JxW(q_point);
+              }
+          }
+
+        cell->get_dof_indices(local_dof_indices);
+        // Distribute local indices and values to the PSBLAS sparse matrix and vector
+
+        info = PSCToolkit::Matrix::distribute_local_to_global(local_dof_indices,
+                                                        cell_matrix,
+                                                        cell_rhs,
+                                                        psblas_sparse_matrix,
+                                                        psblas_rhs_vector,
+                                                        descriptor);
+        if (info != 0)
+          deallog << "Error distributing local to global: " << info << std::endl;
+      }
     }
-    
-  }
 
-// Assemble the Descriptor and the PSBLAS sparse matrix
+
+// Assemble the Descriptor, the PSBLAS sparse matrix and the PSBLAS vector
 info = PSCToolkit::Communicator::DescriptorAssembly(descriptor);
 if (info != 0) {
   deallog << "Error assembling PSBLAS descriptor: " << info << std::endl;
@@ -115,6 +141,10 @@ if (info != 0) {
 info = PSCToolkit::Matrix::AssembleSparseMatrix(psblas_sparse_matrix, descriptor);
 if (info != 0) {
   deallog << "Error assembling PSBLAS sparse matrix: " << info << std::endl;
+}
+info = PSCToolkit::PSBVector::AssembleVector(psblas_rhs_vector, descriptor);
+if (info != 0) {
+  deallog << "Error assembling PSBLAS vector: " << info << std::endl;
 }
 
 output << "Process " << iam << " of  " << nproc
@@ -124,6 +154,7 @@ output << "Process " << iam << " of  " << nproc
        << " The locally owned dofs are: " << locally_owned_dofs.n_elements()
        << " and the locally relevant dofs are: " << locally_relevant_dofs.n_elements() << std::endl;
 output.close();
+
 
 // Concatenate output_i to the file "output"
 if (iam == 0)
@@ -143,6 +174,10 @@ if (iam == 0)
   info = PSCToolkit::Matrix::FreeSparseMatrix(psblas_sparse_matrix, descriptor);
   if (info != 0) {
     deallog << "Error freeing PSBLAS sparse matrix: " << info << std::endl;
+  }
+  info = PSCToolkit::PSBVector::FreeVector(psblas_rhs_vector, descriptor);
+  if (info != 0) {
+    deallog << "Error freeing PSBLAS vector: " << info << std::endl;
   }
   // Free the PSBLAS descriptor
   info = PSCToolkit::Communicator::DescriptorFree(descriptor);
