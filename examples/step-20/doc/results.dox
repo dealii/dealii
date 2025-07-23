@@ -30,9 +30,9 @@ pressure:
 
 <table style="width:60%" align="center">
   <tr>
-    <td><img src="https://www.dealii.org/images/steps/developer/step-20.u_new.jpg" width="400" alt=""></td>
-    <td><img src="https://www.dealii.org/images/steps/developer/step-20.v_new.jpg" width="400" alt=""></td>
-    <td><img src="https://www.dealii.org/images/steps/developer/step-20.p_new.jpg" width="400" alt=""></td>
+    <td><img src="https://dealii.org/images/steps/developer/step-20.u_new.jpg" width="400" alt=""></td>
+    <td><img src="https://dealii.org/images/steps/developer/step-20.v_new.jpg" width="400" alt=""></td>
+    <td><img src="https://dealii.org/images/steps/developer/step-20.p_new.jpg" width="400" alt=""></td>
   </tr>
 </table>
 
@@ -207,8 +207,8 @@ x- and y-velocity:
 
 <table style="width:60%" align="center">
   <tr>
-    <td><img src="https://www.dealii.org/images/steps/developer/step-20.u-wiggle.png" alt=""></td>
-    <td><img src="https://www.dealii.org/images/steps/developer/step-20.v-wiggle.png" alt=""></td>
+    <td><img src="https://dealii.org/images/steps/developer/step-20.u-wiggle.png" alt=""></td>
+    <td><img src="https://dealii.org/images/steps/developer/step-20.v-wiggle.png" alt=""></td>
   </tr>
 </table>
 
@@ -279,7 +279,7 @@ A piecewise constant interpolation of the diagonal elements of the
 inverse of this tensor (i.e., of <code>normalized_permeability</code>)
 looks as follows:
 
-<img src="https://www.dealii.org/images/steps/developer/step-20.k-random.png" alt="">
+<img src="https://dealii.org/images/steps/developer/step-20.k-random.png" alt="">
 
 
 With a permeability field like this, we would get x-velocities and pressures as
@@ -287,8 +287,8 @@ follows:
 
 <table style="width:60%" align="center">
   <tr>
-    <td><img src="https://www.dealii.org/images/steps/developer/step-20.u-random.png" alt=""></td>
-    <td><img src="https://www.dealii.org/images/steps/developer/step-20.p-random.png" alt=""></td>
+    <td><img src="https://dealii.org/images/steps/developer/step-20.u-random.png" alt=""></td>
+    <td><img src="https://dealii.org/images/steps/developer/step-20.p-random.png" alt=""></td>
   </tr>
 </table>
 

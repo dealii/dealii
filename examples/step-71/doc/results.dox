@@ -29,13 +29,13 @@ response.
 <table align="center" class="tutorial" cellspacing="3" cellpadding="3">
   <tr>
      <td align="center">
-        <img src="https://www.dealii.org/images/steps/developer/step-71.lissajous_plot-me.png" alt="" width="400">
+        <img src="https://dealii.org/images/steps/developer/step-71.lissajous_plot-me.png" alt="" width="400">
 	<p align="center">
         Lissajous plot for the magneto-elastic material.
 	</p>
     </td>
     <td align="center">
-        <img src="https://www.dealii.org/images/steps/developer/step-71.lissajous_plot-mve.png" alt="" width="400">
+        <img src="https://dealii.org/images/steps/developer/step-71.lissajous_plot-mve.png" alt="" width="400">
 	<p align="center">
         Lissajous plot for the magneto-viscoelastic material.
 	</p>
