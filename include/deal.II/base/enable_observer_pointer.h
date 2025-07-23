@@ -160,7 +160,7 @@ public:
                  << "\n\n"
                  << "(Additional information: " << arg3 << ")\n\n"
                  << "See the entry in the Frequently Asked Questions of "
-                 << "deal.II (linked to from http://www.dealii.org/) for "
+                 << "deal.II (linked to from http://dealii.org/) for "
                  << "a lot more information on what this error means and "
                  << "how to fix programs in which it happens.");
 

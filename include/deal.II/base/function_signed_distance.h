@@ -273,7 +273,7 @@ namespace Functions
      * Contour surfaces of the signed distance function of a 3D Zalesak's disk
      * are illustrated below:
      *
-     * @image html https://www.dealii.org/images/grids/signed_distance_zalesak_disk.png
+     * @image html https://dealii.org/images/grids/signed_distance_zalesak_disk.png
      *
      * @ingroup functions
      */
