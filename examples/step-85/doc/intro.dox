@@ -197,7 +197,7 @@ the ghost penalty is reduced to
   g_h(u_h,v_h) = \gamma_A \sum_{F \in \mathcal{F}_h} (h_F [\partial_n u_h], [\partial_n v_h])_F.
 @f}
 
-The actual assembly can be done using FEInterfaceValues:
+The actual assembly could be done using FEInterfaceValues:
 @code
 const QGauss<dim - 1>  face_quadrature(fe_degree + 1);
 FEInterfaceValues<dim> fe_interface_values(fe_collection[0],
