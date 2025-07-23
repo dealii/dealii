@@ -192,7 +192,7 @@ Hand-wavingly speaking,
 this is the reason why we obtain a cut-independent method when we enforce $g_F(u_h, v_h) = 0$ over the faces in $\mathcal{F}_h$.
 
 In case of a continuous space of $Q_1$-elements,
-so the ghost penalty is reduced to
+the ghost penalty is reduced to
 @f{equation*}{
   g_h(u_h,v_h) = \gamma_A \sum_{F \in \mathcal{F}_h} (h_F [\partial_n u_h], [\partial_n v_h])_F.
 @f}
