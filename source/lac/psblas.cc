@@ -273,6 +273,67 @@ namespace PSCToolkit
       }
 
       /**
+       * Distribute local indices and values to the PSBLAS sparse matrix.
+       *
+       * @param local_dof_indices Vector of local dof indices (in global numbering).
+       * @param cell_matrix FullMatrix containing the local matrix values.
+       * @param cell_rhs Vector containing the local right-hand side values.
+       * @param mh Pointer to the PSBLAS sparse matrix.
+       * @param vec Pointer to the PSBLAS vector.
+       * @param cdh Pointer to the PSBLAS descriptor.
+       * @return 0 on success, non-zero on failure.
+       */
+      int distribute_local_to_global(const std::vector<types::global_dof_index>& local_dof_indices, const FullMatrix<double>& cell_matrix, const Vector<double>& cell_rhs, psb_c_dspmat *mh, psb_c_dvector *vec, psb_c_descriptor *cdh)
+      {
+        // Get the number of local dofs
+        const unsigned int dofs_per_cell = local_dof_indices.size();
+        psb_i_t nz = dofs_per_cell * dofs_per_cell; // Number of non-zero entries
+
+        // Allocate memory for row and column indices and values
+        psb_l_t *irw_vec = (psb_l_t *)malloc(nz * sizeof(psb_l_t));
+        psb_l_t *irw = (psb_l_t *)malloc(nz * sizeof(psb_l_t));
+        psb_l_t *icl = (psb_l_t *)malloc(nz * sizeof(psb_l_t));
+        psb_d_t *val = (psb_d_t *)malloc(nz * sizeof(psb_d_t));
+        psb_d_t *vec_val = (psb_d_t *)malloc(dofs_per_cell * sizeof(psb_d_t));
+
+        // Fill the arrays with local indices and values
+        for (unsigned int i = 0; i < dofs_per_cell; ++i)  
+        {
+          for (unsigned int j = 0; j < dofs_per_cell; ++j)
+          {
+            irw[i * dofs_per_cell + j] = local_dof_indices[i];
+            icl[i * dofs_per_cell + j] = local_dof_indices[j];
+            val[i * dofs_per_cell + j] = cell_matrix(i, j);
+          }
+          // Fill the vector values
+          irw_vec[i] = local_dof_indices[i];
+          vec_val[i] = cell_rhs(i);
+        }
+
+        // Insert the values into the sparse matrix
+        int info = psb_c_dspins(nz,irw,icl,val,mh,cdh);
+        if (info != 0)
+        {
+          deallog << "Error inserting values into PSBLAS sparse matrix: " << info << std::endl;
+        }
+
+        // Insert the values into the vector
+        info = psb_c_dgeins(dofs_per_cell, irw_vec, vec_val, vec, cdh);
+        if (info != 0)
+        {
+          deallog << "Error inserting values into PSBLAS vector: " << info << std::endl;
+        }
+
+        // Free allocated memory
+        free(irw);
+        free(icl);
+        free(val);
+        free(irw_vec);
+        free(vec_val);
+
+        return info;
+      }
+      /**
        * Assemble the PSBLAS sparse matrix.
        *
        * @param mh Pointer to the PSBLAS sparse matrix to be assembled.
@@ -318,7 +379,7 @@ namespace PSCToolkit
     
     } // namespace Matrix
 
-  namespace Vector {
+  namespace PSBVector {
 
       /**
        * Create a new PSBLAS vector and initialize it with the given descriptor.
@@ -362,6 +423,45 @@ namespace PSCToolkit
           deallog << "Error assembling PSBLAS vector: " << info << std::endl;
         }
         return info;
+      }
+
+      /**
+       * Distribute local indices and values to the PSBLAS vector.
+       *
+       * @param local_dof_indices Vector of local dof indices (in global numbering).
+       * @param cell_rhs Vector containing the local vector values.
+       * @param vec Pointer to the PSBLAS vector.
+       * @param cdh Pointer to the PSBLAS descriptor.
+       */
+      void distribute_local_to_global(const std::vector<types::global_dof_index>& local_dof_indices,  const Vector<double> &cell_rhs, psb_c_dvector *vec, psb_c_descriptor *cdh)
+      {
+        // Get the number of local dofs
+        const unsigned int dofs_per_cell = local_dof_indices.size();
+        psb_i_t nz = dofs_per_cell; // Number of non-zero entries
+
+        // Allocate memory for row indices and values
+        psb_l_t *irw = (psb_l_t *)malloc(nz * sizeof(psb_l_t));
+        psb_d_t *val = (psb_d_t *)malloc(nz * sizeof(psb_d_t));
+
+        // Fill the arrays with local indices and values
+        for (unsigned int i = 0; i < dofs_per_cell; ++i)
+        {
+          irw[i] = local_dof_indices[i];
+          val[i] = cell_rhs(i);
+        }
+
+        // Insert the values into the vector
+        int info = psb_c_dgeins(nz,irw,val,vec,cdh);
+
+        // Free allocated memory
+        free(irw);
+        free(val);
+
+        if (info != 0)
+        {
+          deallog << "Error inserting values into PSBLAS vector: " << info << std::endl;
+        }
+                                   
       }
 
       /**

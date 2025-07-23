@@ -17,6 +17,7 @@
 
 #include <deal.II/base/config.h>
 #include <deal.II/lac/full_matrix.h>
+#include <deal.II/lac/vector.h>
 
 #ifdef DEAL_II_WITH_PSBLAS
 
@@ -126,6 +127,18 @@ namespace PSCToolkit
         */
         int distribute_local_to_global(const std::vector<types::global_dof_index>& local_dof_indices, const FullMatrix<double>& cell_matrix,psb_c_dspmat *mh, psb_c_descriptor *cdh);
         /**
+         * Distribute local indices and values to the PSBLAS sparse matrix.
+         *
+         * @param local_dof_indices Vector of local dof indices (in global numbering).
+         * @param cell_matrix FullMatrix containing the local matrix values.
+         * @param cell_rhs Vector containing the local right-hand side values.
+         * @param mh Pointer to the PSBLAS sparse matrix.
+         * @param vec Pointer to the PSBLAS vector.
+         * @param cdh Pointer to the PSBLAS descriptor.
+         * @return 0 on success, non-zero on failure.
+         */
+        int distribute_local_to_global(const std::vector<types::global_dof_index>& local_dof_indices, const FullMatrix<double>& cell_matrix, const Vector<double>& cell_rhs, psb_c_dspmat *mh, psb_c_dvector *vec, psb_c_descriptor *cdh);
+        /**
          * Assemble the PSBLAS sparse matrix.
          * @param mh Pointer to the PSBLAS sparse matrix to be assembled.
          * @param cdh Pointer to the PSBLAS descriptor.
@@ -142,7 +155,7 @@ namespace PSCToolkit
         int FreeSparseMatrix(psb_c_dspmat *mh, psb_c_descriptor *cdh);
     } // namespace Matrix
 
-    namespace Vector {
+    namespace PSBVector {
         /**
          * Create a new PSBLAS vector and initialize it with the given descriptor.
          *
@@ -151,6 +164,15 @@ namespace PSCToolkit
          */
         psb_c_dvector *CreateVector(psb_c_descriptor *cd);
         /**
+        * Distribute local indices and values to the PSBLAS vector.
+        *
+        * @param local_dof_indices Vector of local dof indices (in global numbering).
+        * @param cell_rhs Vector containing the local vector values.
+        * @param vector Pointer to the PSBLAS vector.
+        * @param cdh Pointer to the PSBLAS descriptor.
+        */
+        void distribute_local_to_global(const std::vector<types::global_dof_index>& local_dof_indices,  const Vector<double>& cell_rhs, psb_c_dvector *vec, psb_c_descriptor *cdh);
+         /**
          * Assemble the PSBLAS vector.
          *
          * @param vector Pointer to the PSBLAS vector to be assembled.
