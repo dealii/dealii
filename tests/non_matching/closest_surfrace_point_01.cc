@@ -74,7 +74,7 @@ test()
   VectorTools::interpolate(dof_handler, signed_distance_sphere, level_set);
 
   // Create ClosestSurfacePoint object
-  typename NonMatching::ClosestSurfacePoint<dim, Vector<double>>::AdditionalData
+  typename NonMatching::ClosestSurfacePoint<dim, double>::AdditionalData
     data;
   data.tolerance    = 1e-10;
   data.n_iterations = 20;
