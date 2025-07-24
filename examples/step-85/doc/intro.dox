@@ -262,7 +262,7 @@ order derivatives. Instead of implementing the integration of the penalty terms 
 we can exploit the fact that the mesh is Cartesian. On tensor product elements,
 the local ghost penalty $G$ can be computed as a Kronecker product of 1D matrices:
 @f{equation*}{
-G= G_x \otimes M_y
+G = G_{1d} \otimes M_{1d}
 @f}
 in 2D or
 @f{equation*}{
