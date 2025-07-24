@@ -79,7 +79,7 @@ test()
   data.tolerance    = 1e-10;
   data.n_iterations = 20;
 
-  NonMatching::ClosestSurfacePoint<dim, Vector<double>> closest_point_finder(
+  NonMatching::ClosestSurfacePoint<dim, double> closest_point_finder(
     level_set, dof_handler, data);
 
   NonMatching::MeshClassifier<dim> mesh_classifier(dof_handler, level_set);
