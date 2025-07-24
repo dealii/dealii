@@ -43,29 +43,40 @@ template <int dim, int fe_degree>
 void
 test()
 {
+  if constexpr (dim == 2)
+    if (Utilities::MPI::n_mpi_processes(MPI_COMM_WORLD) == 1)
+      test<1, fe_degree>();
+
   if (fe_degree > 1)
     return;
 
-  parallel::distributed::Triangulation<dim> tria(MPI_COMM_WORLD);
-  GridGenerator::hyper_cube(tria, 0, 1);
+  std::shared_ptr<Triangulation<dim>> tria;
+
+  if (dim == 1)
+    tria = std::make_shared<Triangulation<dim>>();
+  else
+    tria = std::make_shared<parallel::distributed::Triangulation<dim>>(
+      MPI_COMM_WORLD);
+
+  GridGenerator::hyper_cube(*tria, 0, 1);
 
   // set boundary ids on boundaries to the number of the face
   for (unsigned int face = 2; face < GeometryInfo<dim>::faces_per_cell; ++face)
-    tria.begin()->face(face)->set_all_boundary_ids(face);
+    tria->begin()->face(face)->set_all_boundary_ids(face);
 
   std::vector<
     GridTools::PeriodicFacePair<typename Triangulation<dim>::cell_iterator>>
     periodic_faces;
   for (unsigned int d = 1; d < dim; ++d)
     GridTools::collect_periodic_faces(
-      tria, 2 * d, 2 * d + 1, d, periodic_faces);
+      *tria, 2 * d, 2 * d + 1, d, periodic_faces);
   deallog << "Periodic faces: " << periodic_faces.size() << std::endl;
-  tria.add_periodicity(periodic_faces);
+  tria->add_periodicity(periodic_faces);
 
-  tria.refine_global(8 - 2 * dim);
+  tria->refine_global(8 - 2 * dim);
 
   FE_DGQ<dim>     fe(0);
-  DoFHandler<dim> dof(tria);
+  DoFHandler<dim> dof(*tria);
   dof.distribute_dofs(fe);
   AffineConstraints<double> constraints;
   constraints.close();
