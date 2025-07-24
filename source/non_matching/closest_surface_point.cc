@@ -176,7 +176,7 @@ namespace NonMatching
       }
 
     // Check if the Newton iteration converged
-    Assert(residual.l2_norm() > data.tolerance,
+    Assert(residual.l2_norm() < data.tolerance,
            dealii::ExcMessage("Newton iteration did not converge"));
   }
 

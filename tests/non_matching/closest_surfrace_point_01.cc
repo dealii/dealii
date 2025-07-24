@@ -58,7 +58,7 @@ test()
   deallog << "Number of active cells: " << triangulation.n_active_cells()
           << std::endl;
 
-  // Create DoFHandler with FE_Q(2)
+  // Create DoFHandler with FE_Q(4)
   DoFHandler<dim> dof_handler(triangulation);
   // Use high order FE so that the points are close to unit sphere
   FE_Q<dim> fe(4);
@@ -78,8 +78,9 @@ test()
   data.tolerance    = 1e-10;
   data.n_iterations = 20;
 
+  MappingCartesian<dim>                         mapping;
   NonMatching::ClosestSurfacePoint<dim, double> closest_point_finder(
-    level_set, dof_handler, data);
+    level_set, dof_handler, mapping, data);
 
   NonMatching::MeshClassifier<dim> mesh_classifier(dof_handler, level_set);
   mesh_classifier.reclassify();
@@ -89,8 +90,6 @@ test()
     dof_handler.begin_active()->minimum_vertex_distance() * 1e-2;
   unsigned int n_tested_points    = 0;
   unsigned int n_points_on_sphere = 0;
-
-  MappingCartesian<dim> mapping;
 
   // Limit the number of test cells to cut down on test time
   int n_test_cells = 20;
