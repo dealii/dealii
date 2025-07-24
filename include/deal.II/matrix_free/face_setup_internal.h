@@ -885,82 +885,13 @@ namespace internal
                                   }
                               }
                           }
-                        else if (dim == 1)
+                        else if (dim != 1 || !neighbor->has_children())
                           {
-                            // Follow much the same procedure of dim > 1 with
-                            // one large exception: Face is created on first
+                            // dim==1: Face is created on first
                             // visitation as long as neighbor has no children
                             // face_visited is used as a flag that a face has
                             // already been created
 
-                            if (neighbor->has_children())
-                              continue;
-
-                            const types::subdomain_id my_domain =
-                              use_active_cells ? dcell->subdomain_id() :
-                                                 dcell->level_subdomain_id();
-                            const types::subdomain_id neigh_domain =
-                              use_active_cells ? neighbor->subdomain_id() :
-                                                 neighbor->level_subdomain_id();
-                            if (neigh_domain != my_domain ||
-                                face_visited[dcell->face(f)->index()] == 1)
-                              {
-                                std::pair<unsigned int, unsigned int>
-                                  level_index(neighbor->level(),
-                                              neighbor->index());
-                                if (face_is_owned[dcell->face(f)->index()] ==
-                                    FaceCategory::locally_active_done_here)
-                                  {
-                                    Assert(use_active_cells ||
-                                             dcell->level() ==
-                                               neighbor->level(),
-                                           ExcInternalError());
-                                    ++inner_counter;
-                                    inner_faces.push_back(create_face(
-                                      f,
-                                      dcell,
-                                      cell,
-                                      neighbor,
-                                      map_to_vectorized[level_index],
-                                      is_mixed_mesh));
-                                  }
-                                else if (face_is_owned[dcell->face(f)
-                                                         ->index()] ==
-                                         FaceCategory::ghosted)
-                                  {
-                                    inner_ghost_faces.push_back(create_face(
-                                      f,
-                                      dcell,
-                                      cell,
-                                      neighbor,
-                                      map_to_vectorized[level_index],
-                                      is_mixed_mesh));
-                                  }
-                              }
-                            else
-                              {
-                                face_visited[dcell->face(f)->index()] = 1;
-                                if (dcell->has_periodic_neighbor(f))
-                                  face_visited
-                                    [neighbor
-                                       ->face(
-                                         dcell->periodic_neighbor_face_no(f))
-                                       ->index()] = 1;
-                              }
-                            if (face_is_owned[dcell->face(f)->index()] ==
-                                FaceCategory::multigrid_refinement_edge)
-                              {
-                                refinement_edge_faces.push_back(
-                                  create_face(f,
-                                              dcell,
-                                              cell,
-                                              neighbor,
-                                              refinement_edge_faces.size(),
-                                              is_mixed_mesh));
-                              }
-                          }
-                        else
-                          {
                             const types::subdomain_id my_domain =
                               use_active_cells ? dcell->subdomain_id() :
                                                  dcell->level_subdomain_id();
