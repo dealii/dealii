@@ -892,8 +892,18 @@ namespace internal
                             // visitation as long as neighbor has no children
                             // face_visited is used as a flag that a face has
                             // already been created
-                            if (face_visited[dcell->face(f)->index()] == 0 &&
-                                !(neighbor->has_children()))
+
+                            if (neighbor->has_children())
+                              continue;
+
+                            const types::subdomain_id my_domain =
+                              use_active_cells ? dcell->subdomain_id() :
+                                                 dcell->level_subdomain_id();
+                            const types::subdomain_id neigh_domain =
+                              use_active_cells ? neighbor->subdomain_id() :
+                                                 neighbor->level_subdomain_id();
+                            if (neigh_domain != my_domain ||
+                                face_visited[dcell->face(f)->index()] == 1)
                               {
                                 std::pair<unsigned int, unsigned int>
                                   level_index(neighbor->level(),
@@ -913,7 +923,6 @@ namespace internal
                                       neighbor,
                                       map_to_vectorized[level_index],
                                       is_mixed_mesh));
-                                    face_visited[dcell->face(f)->index()] = 1;
                                   }
                                 else if (face_is_owned[dcell->face(f)
                                                          ->index()] ==
@@ -926,8 +935,17 @@ namespace internal
                                       neighbor,
                                       map_to_vectorized[level_index],
                                       is_mixed_mesh));
-                                    face_visited[dcell->face(f)->index()] = 1;
                                   }
+                              }
+                            else
+                              {
+                                face_visited[dcell->face(f)->index()] = 1;
+                                if (dcell->has_periodic_neighbor(f))
+                                  face_visited
+                                    [neighbor
+                                       ->face(
+                                         dcell->periodic_neighbor_face_no(f))
+                                       ->index()] = 1;
                               }
                             if (face_is_owned[dcell->face(f)->index()] ==
                                 FaceCategory::multigrid_refinement_edge)
