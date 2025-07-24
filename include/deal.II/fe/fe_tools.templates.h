@@ -3341,6 +3341,21 @@ namespace FETools
     return std::make_pair(results[0], results[1]);
   }
 
+
+
+  template <int dim>
+  std::pair<std::vector<unsigned int>, std::vector<unsigned int>>
+  cell_to_face_patch(const unsigned int &degree,
+                     const unsigned int &direction,
+                     const bool         &cell_hierarchical_numbering,
+                     const bool         &is_continuous)
+  {
+    return cell_to_face_patch_numbering<dim>(degree,
+                                             direction,
+                                             cell_hierarchical_numbering,
+                                             is_continuous);
+  }
+
 } // namespace FETools
 
 

@@ -956,6 +956,17 @@ namespace FETools
                                const bool         &is_continuous);
 
   /**
+   * Deprecated version of cell_to_face_patch_numbering, use the one above.
+   */
+  template <int dim>
+  DEAL_II_DEPRECATED
+    std::pair<std::vector<unsigned int>, std::vector<unsigned int>>
+    cell_to_face_patch(const unsigned int &degree,
+                       const unsigned int &direction,
+                       const bool         &cell_hierarchical_numbering,
+                       const bool         &is_continuous);
+
+  /**
    * A namespace that contains functions that help setting up internal
    * data structures when implementing FiniteElement which are build
    * from simpler ("base") elements, for example FESystem. The things
