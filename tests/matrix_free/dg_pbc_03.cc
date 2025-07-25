@@ -35,7 +35,7 @@
 
 template <int dim>
 void
-test(const bool periodicity)
+test(const bool periodicity, const bool adaptive)
 {
   deallog.push(std::to_string(dim) + "d");
   Triangulation<dim> tria(
@@ -67,8 +67,14 @@ test(const bool periodicity)
 
   tria.refine_global(8 - 2 * dim);
 
-  tria.begin_active()->set_refine_flag();
-  tria.execute_coarsening_and_refinement();
+  if (adaptive)
+    {
+      tria.begin_active()->set_refine_flag();
+      tria.execute_coarsening_and_refinement();
+      deallog.push("adaptive");
+    }
+  else
+    deallog.push("uniform ");
 
   FE_DGQ<dim>     fe(1);
   DoFHandler<dim> dof(tria);
@@ -126,6 +132,7 @@ test(const bool periodicity)
   deallog << std::endl;
   deallog.pop();
   deallog.pop();
+  deallog.pop();
   deallog << std::endl;
 }
 
@@ -135,11 +142,17 @@ int
 main()
 {
   initlog();
-  test<1>(false);
-  test<1>(true);
-  test<2>(false);
-  test<2>(true);
-  test<3>(false);
-  test<3>(true);
+  test<1>(false, false);
+  test<1>(true, false);
+  test<1>(false, true);
+  test<1>(true, true);
+  test<2>(false, false);
+  test<2>(true, false);
+  test<2>(false, true);
+  test<2>(true, true);
+  test<3>(false, false);
+  test<3>(true, false);
+  test<3>(false, true);
+  test<3>(true, true);
   return 0;
 }
