@@ -1,0 +1,14 @@
+
+DEAL::Testing ClosestSurfacePoint in 2D
+DEAL::Number of active cells: 64
+DEAL::Number of DoFs: 1089
+DEAL::Tested 60 points
+DEAL::Points on unit sphere (within tolerance): 60
+DEAL::Success rate: 100.00000%
+DEAL::Testing ClosestSurfacePoint in 3D
+DEAL::Number of active cells: 512
+DEAL::Number of DoFs: 35937
+DEAL::Tested 180 points
+DEAL::Points on unit sphere (within tolerance): 180
+DEAL::Success rate: 100.00000%
+DEAL::OK
