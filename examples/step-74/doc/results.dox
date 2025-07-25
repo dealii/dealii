@@ -142,7 +142,7 @@ test case, but one can certainly hope. Indeed, from the figure, we see
 that the SIPG with adaptive mesh refinement produces asymptotically
 the kinds of hoped-for results:
 
-<img width="600px" src="https://www.dealii.org/images/steps/developer/step-74.log-log-plot.png" alt="">
+<img width="600px" src="https://dealii.org/images/steps/developer/step-74.log-log-plot.png" alt="">
 
 In addition, we observe that the error estimator decreases
 at almost the same rate as the errors in the energy norm and $H^1$ seminorm,

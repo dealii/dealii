@@ -20,8 +20,8 @@ Version 3.0  of the deal.II object-oriented finite  element library is
 available on the deal.II home-page at
 </p>
 <p align="center">
-<a href="https://www.dealii.org" target="_top">
-      https://www.dealii.org
+<a href="https://dealii.org" target="_top">
+      https://dealii.org
 </a>
 </p>
 

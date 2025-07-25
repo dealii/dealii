@@ -5,7 +5,7 @@ This directory contains the deal.II library.
 
 The deal.II library is copyrighted by the deal.II authors. This term refers
 to the people listed in the file `AUTHORS` and in the [authors
-list](https://www.dealii.org/authors.html) on the webpage.
+list](https://dealii.org/authors.html) on the webpage.
 
 The deal.II library is free software; it is licensed under the <b>GNU
 Lesser General Public License v2.1 or later</b>. The deal.II authors are in
@@ -41,7 +41,7 @@ courtesy:
  -  Every publication presenting numerical results obtained with the help
     of deal.II should state the name of the library and cite appropriate
     deal.II references listed at the top of the [publications
-    page](https://www.dealii.org/publications.html).
+    page](https://dealii.org/publications.html).
 
 This is the usual, fair way of giving credit to contributors to a
 scientific result. In addition, it helps us justify our effort in
@@ -50,7 +50,7 @@ developing deal.II as an academic undertaking.
 We keep a list of publications using deal.II. Let us know about your
 publications so that we can add them to the aforementioned list. You can do
 this by emailing the reference information to one of the [Principal
-Developers of deal.II](https://www.dealii.org/authors.html).
+Developers of deal.II](https://dealii.org/authors.html).
 
 
 Bundled third party software in the deal.II repository
@@ -79,7 +79,7 @@ Contact
 
 For further questions regarding licensing and commercial use please contact
 (one of) the
-[deal.II principal developers](https://www.dealii.org/authors.html) directly.
+[deal.II principal developers](https://dealii.org/authors.html) directly.
 
 
 Full text of the [Developer Certificate of Origin version 1.1](https://developercertificate.org/)

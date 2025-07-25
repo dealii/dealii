@@ -4926,7 +4926,7 @@ namespace
   Abaqus_to_UCD<dim, spacedim>::write_out_avs_ucd(std::ostream &output) const
   {
     // References:
-    // http://www.dealii.org/developer/doxygen/deal.II/structGeometryInfo.html
+    // http://dealii.org/developer/doxygen/deal.II/structGeometryInfo.html
     // http://people.scs.fsu.edu/~burkardt/data/ucd/ucd.html
 
     AssertThrow(output.fail() == false, ExcIO());

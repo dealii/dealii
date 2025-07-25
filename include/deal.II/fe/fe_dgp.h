@@ -111,7 +111,7 @@ DEAL_II_NAMESPACE_OPEN
  * <h4>$P_0$ element</h4>
  *
  * <table> <tr> <td align="center">
- * @image html http://www.dealii.org/images/shape-functions/DGP/P1/P1_DGP_shape0000.png
+ * @image html http://dealii.org/images/shape-functions/DGP/P1/P1_DGP_shape0000.png
  * </td>
  *
  * <td align="center"> </td> </tr> <tr> <td align="center"> $P_0$ element,
@@ -122,17 +122,17 @@ DEAL_II_NAMESPACE_OPEN
  * <h4>$P_1$ element</h4>
  *
  * <table> <tr> <td align="center">
- * @image html http://www.dealii.org/images/shape-functions/DGP/P1/P1_DGP_shape0000.png
+ * @image html http://dealii.org/images/shape-functions/DGP/P1/P1_DGP_shape0000.png
  * </td>
  *
  * <td align="center">
- * @image html http://www.dealii.org/images/shape-functions/DGP/P1/P1_DGP_shape0001.png
+ * @image html http://dealii.org/images/shape-functions/DGP/P1/P1_DGP_shape0001.png
  * </td> </tr> <tr> <td align="center"> $P_1$ element, shape function 0 </td>
  *
  * <td align="center"> $P_1$ element, shape function 1 </td> </tr>
  *
  * <tr> <td align="center">
- * @image html http://www.dealii.org/images/shape-functions/DGP/P1/P1_DGP_shape0002.png
+ * @image html http://dealii.org/images/shape-functions/DGP/P1/P1_DGP_shape0002.png
  * </td>
  *
  * <td align="center"> </td> </tr> <tr> <td align="center"> $P_1$ element,
@@ -144,31 +144,31 @@ DEAL_II_NAMESPACE_OPEN
  * <h4>$P_2$ element</h4>
  *
  * <table> <tr> <td align="center">
- * @image html http://www.dealii.org/images/shape-functions/DGP/P2/P2_DGP_shape0000.png
+ * @image html http://dealii.org/images/shape-functions/DGP/P2/P2_DGP_shape0000.png
  * </td>
  *
  * <td align="center">
- * @image html http://www.dealii.org/images/shape-functions/DGP/P2/P2_DGP_shape0001.png
+ * @image html http://dealii.org/images/shape-functions/DGP/P2/P2_DGP_shape0001.png
  * </td> </tr> <tr> <td align="center"> $P_2$ element, shape function 0 </td>
  *
  * <td align="center"> $P_2$ element, shape function 1 </td> </tr>
  *
  * <tr> <td align="center">
- * @image html http://www.dealii.org/images/shape-functions/DGP/P2/P2_DGP_shape0002.png
+ * @image html http://dealii.org/images/shape-functions/DGP/P2/P2_DGP_shape0002.png
  * </td>
  *
  * <td align="center">
- * @image html http://www.dealii.org/images/shape-functions/DGP/P2/P2_DGP_shape0003.png
+ * @image html http://dealii.org/images/shape-functions/DGP/P2/P2_DGP_shape0003.png
  * </td> </tr> <tr> <td align="center"> $P_2$ element, shape function 2 </td>
  *
  * <td align="center"> $P_2$ element, shape function 3 </td> </tr>
  *
  * <tr> <td align="center">
- * @image html http://www.dealii.org/images/shape-functions/DGP/P2/P2_DGP_shape0004.png
+ * @image html http://dealii.org/images/shape-functions/DGP/P2/P2_DGP_shape0004.png
  * </td>
  *
  * <td align="center">
- * @image html http://www.dealii.org/images/shape-functions/DGP/P2/P2_DGP_shape0005.png
+ * @image html http://dealii.org/images/shape-functions/DGP/P2/P2_DGP_shape0005.png
  * </td> </tr> <tr> <td align="center"> $P_2$ element, shape function 4 </td>
  *
  * <td align="center"> $P_2$ element, shape function 5 </td> </tr> </table>
@@ -177,128 +177,128 @@ DEAL_II_NAMESPACE_OPEN
  * <h4>$P_3$ element</h4>
  *
  * <table> <tr> <td align="center">
- * @image html http://www.dealii.org/images/shape-functions/DGP/P3/P3_DGP_shape0000.png
+ * @image html http://dealii.org/images/shape-functions/DGP/P3/P3_DGP_shape0000.png
  * </td>
  *
  * <td align="center">
- * @image html http://www.dealii.org/images/shape-functions/DGP/P3/P3_DGP_shape0001.png
+ * @image html http://dealii.org/images/shape-functions/DGP/P3/P3_DGP_shape0001.png
  * </td> </tr> <tr> <td align="center"> $P_3$ element, shape function 0 </td>
  *
  * <td align="center"> $P_3$ element, shape function 1 </td> </tr>
  *
  * <tr> <td align="center">
- * @image html http://www.dealii.org/images/shape-functions/DGP/P3/P3_DGP_shape0002.png
+ * @image html http://dealii.org/images/shape-functions/DGP/P3/P3_DGP_shape0002.png
  * </td>
  *
  * <td align="center">
- * @image html http://www.dealii.org/images/shape-functions/DGP/P3/P3_DGP_shape0003.png
+ * @image html http://dealii.org/images/shape-functions/DGP/P3/P3_DGP_shape0003.png
  * </td> </tr> <tr> <td align="center"> $P_3$ element, shape function 2 </td>
  *
  * <td align="center"> $P_3$ element, shape function 3 </td> </tr>
  *
  * <tr> <td align="center">
- * @image html http://www.dealii.org/images/shape-functions/DGP/P3/P3_DGP_shape0004.png
+ * @image html http://dealii.org/images/shape-functions/DGP/P3/P3_DGP_shape0004.png
  * </td>
  *
  * <td align="center">
- * @image html http://www.dealii.org/images/shape-functions/DGP/P3/P3_DGP_shape0005.png
+ * @image html http://dealii.org/images/shape-functions/DGP/P3/P3_DGP_shape0005.png
  * </td> </tr> <tr> <td align="center"> $P_3$ element, shape function 4 </td>
  *
  * <td align="center"> $P_3$ element, shape function 5 </td> </tr>
  *
  * <tr> <td align="center">
- * @image html http://www.dealii.org/images/shape-functions/DGP/P3/P3_DGP_shape0006.png
+ * @image html http://dealii.org/images/shape-functions/DGP/P3/P3_DGP_shape0006.png
  * </td>
  *
  * <td align="center">
- * @image html http://www.dealii.org/images/shape-functions/DGP/P3/P3_DGP_shape0007.png
+ * @image html http://dealii.org/images/shape-functions/DGP/P3/P3_DGP_shape0007.png
  * </td> </tr> <tr> <td align="center"> $P_3$ element, shape function 6 </td>
  *
  * <td align="center"> $P_3$ element, shape function 7 </td> </tr>
  *
  * <tr> <td align="center">
- * @image html http://www.dealii.org/images/shape-functions/DGP/P3/P3_DGP_shape0008.png
+ * @image html http://dealii.org/images/shape-functions/DGP/P3/P3_DGP_shape0008.png
  * </td>
  *
  * <td align="center">
- * @image html http://www.dealii.org/images/shape-functions/DGP/P3/P3_DGP_shape0009.png
+ * @image html http://dealii.org/images/shape-functions/DGP/P3/P3_DGP_shape0009.png
  * </td> </tr> <tr> <td align="center"> $P_3$ element, shape function 8 </td>
  *
  * <td align="center"> $P_3$ element, shape function 9 </td> </tr> </table>
  *
  *
  * <h4>$P_4$ element</h4> <table> <tr> <td align="center">
- * @image html http://www.dealii.org/images/shape-functions/DGP/P4/P4_DGP_shape0000.png
+ * @image html http://dealii.org/images/shape-functions/DGP/P4/P4_DGP_shape0000.png
  * </td>
  *
  * <td align="center">
- * @image html http://www.dealii.org/images/shape-functions/DGP/P4/P4_DGP_shape0001.png
+ * @image html http://dealii.org/images/shape-functions/DGP/P4/P4_DGP_shape0001.png
  * </td> </tr> <tr> <td align="center"> $P_4$ element, shape function 0 </td>
  *
  * <td align="center"> $P_4$ element, shape function 1 </td> </tr>
  *
  * <tr> <td align="center">
- * @image html http://www.dealii.org/images/shape-functions/DGP/P4/P4_DGP_shape0002.png
+ * @image html http://dealii.org/images/shape-functions/DGP/P4/P4_DGP_shape0002.png
  * </td>
  *
  * <td align="center">
- * @image html http://www.dealii.org/images/shape-functions/DGP/P4/P4_DGP_shape0003.png
+ * @image html http://dealii.org/images/shape-functions/DGP/P4/P4_DGP_shape0003.png
  * </td> </tr> <tr> <td align="center"> $P_4$ element, shape function 2 </td>
  *
  * <td align="center"> $P_4$ element, shape function 3 </td> </tr>
  *
  * <tr> <td align="center">
- * @image html http://www.dealii.org/images/shape-functions/DGP/P4/P4_DGP_shape0004.png
+ * @image html http://dealii.org/images/shape-functions/DGP/P4/P4_DGP_shape0004.png
  * </td>
  *
  * <td align="center">
- * @image html http://www.dealii.org/images/shape-functions/DGP/P4/P4_DGP_shape0005.png
+ * @image html http://dealii.org/images/shape-functions/DGP/P4/P4_DGP_shape0005.png
  * </td> </tr> <tr> <td align="center"> $P_4$ element, shape function 4 </td>
  *
  * <td align="center"> $P_4$ element, shape function 5 </td> </tr>
  *
  * <tr> <td align="center">
- * @image html http://www.dealii.org/images/shape-functions/DGP/P4/P4_DGP_shape0006.png
+ * @image html http://dealii.org/images/shape-functions/DGP/P4/P4_DGP_shape0006.png
  * </td>
  *
  * <td align="center">
- * @image html http://www.dealii.org/images/shape-functions/DGP/P4/P4_DGP_shape0007.png
+ * @image html http://dealii.org/images/shape-functions/DGP/P4/P4_DGP_shape0007.png
  * </td> </tr> <tr> <td align="center"> $P_4$ element, shape function 6 </td>
  *
  * <td align="center"> $P_4$ element, shape function 7 </td> </tr>
  *
  * <tr> <td align="center">
- * @image html http://www.dealii.org/images/shape-functions/DGP/P4/P4_DGP_shape0008.png
+ * @image html http://dealii.org/images/shape-functions/DGP/P4/P4_DGP_shape0008.png
  * </td>
  *
  * <td align="center">
- * @image html http://www.dealii.org/images/shape-functions/DGP/P4/P4_DGP_shape0009.png
+ * @image html http://dealii.org/images/shape-functions/DGP/P4/P4_DGP_shape0009.png
  * </td> </tr> <tr> <td align="center"> $P_4$ element, shape function 8 </td>
  *
  * <td align="center"> $P_4$ element, shape function 9 </td> </tr>
  *
  * <tr> <td align="center">
- * @image html http://www.dealii.org/images/shape-functions/DGP/P4/P4_DGP_shape0010.png
+ * @image html http://dealii.org/images/shape-functions/DGP/P4/P4_DGP_shape0010.png
  * </td>
  *
  * <td align="center">
- * @image html http://www.dealii.org/images/shape-functions/DGP/P4/P4_DGP_shape0011.png
+ * @image html http://dealii.org/images/shape-functions/DGP/P4/P4_DGP_shape0011.png
  * </td> </tr> <tr> <td align="center"> $P_4$ element, shape function 10 </td>
  *
  * <td align="center"> $P_4$ element, shape function 11 </td> </tr>
  *
  * <tr> <td align="center">
- * @image html http://www.dealii.org/images/shape-functions/DGP/P4/P4_DGP_shape0012.png
+ * @image html http://dealii.org/images/shape-functions/DGP/P4/P4_DGP_shape0012.png
  * </td>
  *
  * <td align="center">
- * @image html http://www.dealii.org/images/shape-functions/DGP/P4/P4_DGP_shape0013.png
+ * @image html http://dealii.org/images/shape-functions/DGP/P4/P4_DGP_shape0013.png
  * </td> </tr> <tr> <td align="center"> $P_4$ element, shape function 12 </td>
  *
  * <td align="center"> $P_4$ element, shape function 13 </td> </tr>
  *
  * <tr> <td align="center">
- * @image html http://www.dealii.org/images/shape-functions/DGP/P4/P4_DGP_shape0014.png
+ * @image html http://dealii.org/images/shape-functions/DGP/P4/P4_DGP_shape0014.png
  * </td>
  *
  * <td align="center"> </td> </tr> <tr> <td align="center"> $P_4$ element,

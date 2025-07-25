@@ -250,7 +250,7 @@ u_\text{sol} = r^{2/3} \sin(2/3 \varphi).
 See also @cite brenner2008 or @cite mitchell2014hp. The solution looks as follows:
 
 <div style="text-align:center;">
-  <img src="https://www.dealii.org/images/steps/developer/step-75.solution.svg"
+  <img src="https://dealii.org/images/steps/developer/step-75.solution.svg"
        alt="Analytic solution.">
 </div>
 

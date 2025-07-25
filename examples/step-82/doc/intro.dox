@@ -145,7 +145,7 @@ As customary, we assemble the matrix $A$ and the right-hand side $\boldsymbol{F}
 
 <table align="center">
   <tr>
-    <td><img src="https://www.dealii.org/images/steps/developer/step-82.schema_cells.png" width="250px" height="250px" alt=""></td>
+    <td><img src="https://dealii.org/images/steps/developer/step-82.schema_cells.png" width="250px" height="250px" alt=""></td>
     <td>&nbsp;</td>
     <td>
       <table  align="center">

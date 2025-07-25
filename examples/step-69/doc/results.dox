@@ -93,7 +93,7 @@ flux $f(U)$ is the expensive operation. The preset default resolution is
 about 37k gridpoints, which amounts to about 148k spatial degrees of
 freedom in 2D. An animated schlieren plot of the solution looks as follows:
 
-<img src="https://www.dealii.org/images/steps/developer/step-69.coarse.gif" alt="" height="300">
+<img src="https://dealii.org/images/steps/developer/step-69.coarse.gif" alt="" height="300">
 
 It is evident that 37k gridpoints for the first-order method is nowhere
 near the resolution needed to resolve any flow features. For comparison,
@@ -101,7 +101,7 @@ here is a "reference" computation with a second-order method and about 9.5M
 gridpoints (<a href="https://github.com/conservation-laws/ryujin">github
 project page</a>):
 
-<img src="https://www.dealii.org/images/steps/developer/step-69.2nd-order.t400.jpg" alt="" height="300">
+<img src="https://dealii.org/images/steps/developer/step-69.2nd-order.t400.jpg" alt="" height="300">
 
 So, we give the first-order method a second chance and run it with about
 2.4M gridpoints on a small compute server:
@@ -147,7 +147,7 @@ TimeLoop<dim>::output(t = 4.00006, checkpoint = 1)
 
 And with the following result:
 
-<img src="https://www.dealii.org/images/steps/developer/step-69.fine.gif" alt="" height="300">
+<img src="https://dealii.org/images/steps/developer/step-69.fine.gif" alt="" height="300">
 
 That's substantially better, although of course at the price of having run
 the code for roughly 2 hours on 16 cores.

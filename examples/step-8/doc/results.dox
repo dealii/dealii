@@ -9,10 +9,10 @@ the $x$- and $y$-displacements as scalar components:
 <table width="100%">
 <tr>
 <td>
-<img src="https://www.dealii.org/images/steps/developer/step-8.x.png" alt="">
+<img src="https://dealii.org/images/steps/developer/step-8.x.png" alt="">
 </td>
 <td>
-<img src="https://www.dealii.org/images/steps/developer/step-8.y.png" alt="">
+<img src="https://dealii.org/images/steps/developer/step-8.y.png" alt="">
 </td>
 </tr>
 </table>
@@ -79,7 +79,7 @@ the displacement vector field that is then output then looks like this
 hundred vertices from which to draw the vectors; drawing them from each
 individual vertex would make the picture unreadable):
 
-<img src="https://www.dealii.org/images/steps/developer/step-8.vectors.png" alt="">
+<img src="https://dealii.org/images/steps/developer/step-8.vectors.png" alt="">
 
 We note that one may have intuitively expected the
 solution to be symmetric about the $x$- and $y$-axes since the $x$- and

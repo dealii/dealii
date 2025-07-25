@@ -9,10 +9,10 @@ The same field using point-to-point interpolation is depicted on the right.
 <table align="center" class="doxtable">
   <tr>
     <td>
-        @image html https://www.dealii.org/images/steps/developer/step_89_membrane_test_case_mortaring_velocity_Y.png "" width=60%
+        @image html https://dealii.org/images/steps/developer/step_89_membrane_test_case_mortaring_velocity_Y.png "" width=60%
     </td>
     <td>
-        @image html https://www.dealii.org/images/steps/developer/step_89_membrane_test_case_point_to_point_velocity_Y.png "" width=60%
+        @image html https://dealii.org/images/steps/developer/step_89_membrane_test_case_point_to_point_velocity_Y.png "" width=60%
     </td>
   </tr>
 </table>
@@ -23,10 +23,10 @@ are plotted along the horizontal line that spans from (0,0.69) to (1,0.69).
 <table align="center" class="doxtable">
   <tr>
     <td>
-        @image html https://www.dealii.org/images/steps/developer/step_89_membrane_test_case_mortaring_vs_point_to_point_pressure.svg "" width=150%
+        @image html https://dealii.org/images/steps/developer/step_89_membrane_test_case_mortaring_vs_point_to_point_pressure.svg "" width=150%
     </td>
     <td>
-        @image html https://www.dealii.org/images/steps/developer/step_89_membrane_test_case_mortaring_vs_point_to_point_velocity_Y.svg "" width=150%
+        @image html https://dealii.org/images/steps/developer/step_89_membrane_test_case_mortaring_vs_point_to_point_velocity_Y.svg "" width=150%
     </td>
   </tr>
 </table>
@@ -47,7 +47,7 @@ test case are shown in multiple publications. As before, we slightly adapted the
 test case to be able to use the same mesh for all simulations. The pressure field
 at $t=0.3$ is depicted below.
 
-@image html https://www.dealii.org/images/steps/developer/step_89_inhomogenous_test_case_pressure.png "" width=30%
+@image html https://dealii.org/images/steps/developer/step_89_inhomogenous_test_case_pressure.png "" width=30%
 
 As expected, we can easily see that the wave length in the right domain is roughly
 three times times the wave length in the left domain. Hence, the wave can be
@@ -59,7 +59,7 @@ for both sub-domains, i.e. @c subdiv_right = 11. In this particular example the
 reference result uses $92,928$ DoFs, while the non-matching result uses $52,608$ DoFs.
 The pressure result is plotted along the horizontal line that spans from (0,0.5) to (1,0.5).
 
-@image html https://www.dealii.org/images/steps/developer/step_89_inhomogenous_test_case_conforming_vs_nonmatching.svg "" width=60%
+@image html https://dealii.org/images/steps/developer/step_89_inhomogenous_test_case_conforming_vs_nonmatching.svg "" width=60%
 
 The results computed using the non-matching discretization are clearly in good agreement with
 the reference result.
