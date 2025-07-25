@@ -1,0 +1,37 @@
+
+DEAL:1d:boundary::Active cells: 65
+DEAL:1d:boundary::Cell batches: 65
+DEAL:1d:boundary::Interior faces: 0 64 
+DEAL:1d:boundary::Exterior faces: 64 0 
+DEAL:1d:boundary::Boundary faces: 1 1 
+DEAL::
+DEAL:1d:periodic::Active cells: 65
+DEAL:1d:periodic::Cell batches: 65
+DEAL:1d:periodic::Interior faces: 1 64 
+DEAL:1d:periodic::Exterior faces: 64 1 
+DEAL:1d:periodic::Boundary faces: 0 0 
+DEAL::
+DEAL:2d:boundary::Active cells: 259
+DEAL:2d:boundary::Cell batches: 259
+DEAL:2d:boundary::Interior faces: 241 2 241 2 
+DEAL:2d:boundary::Exterior faces: 2 241 2 241 
+DEAL:2d:boundary::Boundary faces: 17 16 17 16 
+DEAL::
+DEAL:2d:periodic::Active cells: 259
+DEAL:2d:periodic::Cell batches: 259
+DEAL:2d:periodic::Interior faces: 241 17 241 2 
+DEAL:2d:periodic::Exterior faces: 17 241 2 241 
+DEAL:2d:periodic::Boundary faces: 0 0 17 16 
+DEAL::
+DEAL:3d:boundary::Active cells: 71
+DEAL:3d:boundary::Cell batches: 71
+DEAL:3d:boundary::Interior faces: 51 4 51 4 51 4 
+DEAL:3d:boundary::Exterior faces: 4 51 4 51 4 51 
+DEAL:3d:boundary::Boundary faces: 19 16 19 16 19 16 
+DEAL::
+DEAL:3d:periodic::Active cells: 71
+DEAL:3d:periodic::Cell batches: 71
+DEAL:3d:periodic::Interior faces: 51 19 51 4 51 19 
+DEAL:3d:periodic::Exterior faces: 19 51 4 51 19 51 
+DEAL:3d:periodic::Boundary faces: 0 0 19 16 0 0 
+DEAL::
