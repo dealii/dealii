@@ -8,6 +8,7 @@
 
 import sys
 
+
 # have matching @{ @} pairs? (doxygen groups)
 def check_doxygen_groups(lines):
     count = 0
