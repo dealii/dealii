@@ -966,37 +966,8 @@ namespace Utilities
   constexpr DEAL_II_HOST_DEVICE T
   pow(const T base, const int iexp)
   {
-#if defined(DEBUG) && !defined(DEAL_II_CXX14_CONSTEXPR_BUG)
-    // Up to __builtin_expect this is the same code as in the 'Assert' macro.
-    // The call to __builtin_expect turns out to be problematic.
-#  if DEAL_II_KOKKOS_VERSION_GTE(3, 6, 0)
-    KOKKOS_IF_ON_HOST(({
-      if (!(iexp >= 0))
-        ::dealii::deal_II_exceptions::internals::issue_error_noreturn(
-          ::dealii::deal_II_exceptions::internals::ExceptionHandling::
-            abort_or_throw_on_exception,
-          __FILE__,
-          __LINE__,
-          __PRETTY_FUNCTION__,
-          "iexp>=0",
-          "ExcMessage(\"The exponent must not be negative!\")",
-          ExcMessage("The exponent must not be negative!"));
-    }))
-#  else
-#    ifdef KOKKOS_ACTIVE_EXECUTION_MEMORY_SPACE_HOST
-    if (!(iexp >= 0))
-      ::dealii::deal_II_exceptions::internals::issue_error_noreturn(
-        ::dealii::deal_II_exceptions::internals::ExceptionHandling::
-          abort_or_throw_on_exception,
-        __FILE__,
-        __LINE__,
-        __PRETTY_FUNCTION__,
-        "iexp>=0",
-        "ExcMessage(\"The exponent must not be negative!\")",
-        ExcMessage("The exponent must not be negative!"));
-#    endif
-#  endif
-#endif
+    Assert(iexp >= 0, ExcMessage("The exponent must not be negative!"));
+
     // The "exponentiation by squaring" algorithm used below has to be expressed
     // in an iterative version since SYCL doesn't allow recursive functions used
     // in device code.

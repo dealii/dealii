@@ -1114,14 +1114,8 @@ namespace internal
           "This function is not implemented for std::complex<Number>!\n");
       }))
 #  else
-#    ifdef KOKKOS_ACTIVE_EXECUTION_MEMORY_SPACE_HOST
+      // We do not support device code for Kokkos < 3.7:
       val *= s;
-#    else
-      (void)val;
-      (void)s;
-      Kokkos::abort(
-        "This function is not implemented for std::complex<Number>!\n");
-#    endif
 #  endif
     }
   } // namespace ComplexWorkaround
