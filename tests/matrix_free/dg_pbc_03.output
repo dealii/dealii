@@ -11,10 +11,10 @@ DEAL:1d:periodic:uniform ::Interior faces: 63 1
 DEAL:1d:periodic:uniform ::Exterior faces: 1 63 
 DEAL:1d:periodic:uniform ::Boundary faces: 0 0 
 DEAL::
-DEAL:1d:boundary:adaptive::Active cells: 65
-DEAL:1d:boundary:adaptive::Cell batches: 65
-DEAL:1d:boundary:adaptive::Interior faces: 63 1 
-DEAL:1d:boundary:adaptive::Exterior faces: 1 63 
+DEAL:1d:boundary:adaptive::Active cells: 66
+DEAL:1d:boundary:adaptive::Cell batches: 66
+DEAL:1d:boundary:adaptive::Interior faces: 64 1 
+DEAL:1d:boundary:adaptive::Exterior faces: 1 64 
 DEAL:1d:boundary:adaptive::Boundary faces: 1 1 
 DEAL::
 DEAL:1d:periodic:adaptive::Active cells: 65

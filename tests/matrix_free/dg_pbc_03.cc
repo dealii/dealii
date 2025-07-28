@@ -38,8 +38,7 @@ void
 test(const bool periodicity, const bool adaptive)
 {
   deallog.push(std::to_string(dim) + "d");
-  Triangulation<dim> tria(
-    Triangulation<dim>::limit_level_difference_at_vertices);
+  Triangulation<dim> tria;
   GridGenerator::hyper_cube(tria);
 
   if (periodicity)
@@ -71,6 +70,12 @@ test(const bool periodicity, const bool adaptive)
     {
       tria.begin_active()->set_refine_flag();
       tria.execute_coarsening_and_refinement();
+      if (dim == 1 && !periodicity)
+        {
+          // create a cell that differs by two levels
+          tria.last()->set_refine_flag();
+          tria.execute_coarsening_and_refinement();
+        }
       deallog.push("adaptive");
     }
   else
@@ -79,7 +84,6 @@ test(const bool periodicity, const bool adaptive)
   FE_DGQ<dim>     fe(1);
   DoFHandler<dim> dof(tria);
   dof.distribute_dofs(fe);
-  dof.distribute_mg_dofs();
   AffineConstraints<double> constraints;
   constraints.close();
 
