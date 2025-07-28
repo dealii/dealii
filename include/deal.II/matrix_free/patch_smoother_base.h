@@ -1,6 +1,6 @@
 
-#ifndef local_smoother_base_h
-#define local_smoother_base_h
+#ifndef dealii__patch_smoother_base_h
+#define dealii__patch_smoother_base_h
 
 
 #include <deal.II/matrix_free/fe_patch_evaluation.h>
@@ -253,4 +253,4 @@ PatchSmootherBase<dim, number>::Tvmult(VectorType       &dst,
 DEAL_II_NAMESPACE_CLOSE
 
 
-#endif // local_smoother_base_h
+#endif // dealii__patch_smoother_base_h

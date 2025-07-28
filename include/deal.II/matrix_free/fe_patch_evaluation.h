@@ -1,5 +1,5 @@
-#ifndef FE_PATCH_EVALUATION_H
-#define FE_PATCH_EVALUATION_H
+#ifndef dealii__fe_patch_evaluation_h
+#define dealii__fe_patch_evaluation_h
 
 #include <deal.II/matrix_free/fe_evaluation.h>
 #include <deal.II/matrix_free/patch_storage.h>
@@ -464,4 +464,4 @@ FEPatchEvaluation<FEEval, Distributor, vectorizaton>::
 
 DEAL_II_NAMESPACE_CLOSE
 
-#endif // FE_PATCH_EVALUATION_H
+#endif // dealii__fe_patch_evaluation_h

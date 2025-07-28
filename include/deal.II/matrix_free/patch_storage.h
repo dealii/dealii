@@ -1,5 +1,7 @@
-#ifndef __PATCH_OPERATOR_H__
-#define __PATCH_OPERATOR_H__
+#ifndef dealii__patch_storage_h
+#define dealii__patch_storage_h
+
+
 
 #include <deal.II/base/data_out_base.h>
 #include <deal.II/base/enable_observer_pointer.h>
@@ -15,7 +17,6 @@
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_iterator.h>
 
-// #include "deal.II/lac/gauss_seidel.h"
 #include <deal.II/lac/vector.h>
 
 #include <deal.II/matrix_free/matrix_free.h>
@@ -1459,4 +1460,5 @@ PatchStorage<MFType>::output_centerpoints(
 DEAL_II_NAMESPACE_CLOSE
 
 
-#endif // __PATCH_OPERATOR_H__
+
+#endif // dealii__patch_storage_h

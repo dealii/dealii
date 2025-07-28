@@ -1,3 +1,6 @@
+#ifndef __PATCH_DISTRIBUTORS_H__
+#define __PATCH_DISTRIBUTORS_H__
+
 #include <deal.II/base/config.h>
 
 #include <array>
@@ -778,3 +781,5 @@ namespace PatchDistributors
 
 
 DEAL_II_NAMESPACE_CLOSE
+
+#endif // __PATCH_DISTRIBUTORS_H__
