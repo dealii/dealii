@@ -57,7 +57,7 @@ jobs:
         cmake --version
     - name: configure
       run: |
-        cmake -B build -DCMAKE_BUILD_TYPE=Debug -DCMAKE_INSTALL_PREFIX=c:/project -DDEAL_II_CXX_FLAGS="-WX /D FE_EVAL_FACTORY_DEGREE_MAX=2" -T host=x64 -A x64
+        cmake -B build -DCMAKE_BUILD_TYPE=Debug -DCMAKE_INSTALL_PREFIX=c:/project -DDEAL_II_CXX_FLAGS="/WX /std:c++20 /D FE_EVAL_FACTORY_DEGREE_MAX=2" -T host=x64 -A x64
     - name: print detailed.log
       run: type build/detailed.log
     - name: build
