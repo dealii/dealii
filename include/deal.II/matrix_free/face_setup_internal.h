@@ -821,15 +821,22 @@ namespace internal
                             for (unsigned int c = 0; c < n_children; ++c)
                               {
                                 typename dealii::Triangulation<
-                                  dim>::cell_iterator neighbor_c =
-                                  (dim > 1 ?
-                                     (dcell->at_boundary(f) ?
-                                        dcell
-                                          ->periodic_neighbor_child_on_subface(
-                                            f, c) :
-                                        dcell->neighbor_child_on_subface(f,
-                                                                         c)) :
-                                     neighbor->child(1 - f));
+                                  dim>::cell_iterator neighbor_c;
+                                if (dim > 1)
+                                  neighbor_c =
+                                    (dcell->at_boundary(f) ?
+                                       dcell
+                                         ->periodic_neighbor_child_on_subface(
+                                           f, c) :
+                                       dcell->neighbor_child_on_subface(f, c));
+                                else
+                                  {
+                                    // in 1D, adjacent cells can differ by
+                                    // more than 1 level
+                                    neighbor_c = neighbor->child(1 - f);
+                                    while (!neighbor_c->is_active())
+                                      neighbor_c = neighbor_c->child(1 - f);
+                                  }
                                 const types::subdomain_id neigh_domain =
                                   neighbor_c->subdomain_id();
                                 const unsigned int neighbor_face_no =
