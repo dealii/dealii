@@ -545,7 +545,7 @@ jobs:
         cmake -GNinja \
               -D BUILD_SHARED_LIBS=ON \
               -D CMAKE_CXX_COMPILER=clang++-20 \
-              -D CMAKE_CXX_STANDARD=20 \
+              -D CMAKE_CXX_STANDARD=23 \
               -D CMAKE_INSTALL_PREFIX=${GITHUB_WORKSPACE}/../kokkos-install \
               ..
         ninja install
@@ -554,10 +554,10 @@ jobs:
       run: |
         mkdir build
         cd build
-        export CXXFLAGS="-std=c++20 -stdlib=libc++"
-        export LDFLAGS="-std=c++20 -stdlib=libc++"
+        export CXXFLAGS="-stdlib=libc++"
+        export LDFLAGS="-stdlib=libc++"
         cmake -D CMAKE_BUILD_TYPE=Debug \
-              -D CMAKE_CXX_STANDARD=20 \
+              -D CMAKE_CXX_STANDARD=23 \
               -D CMAKE_C_COMPILER=clang-20 \
               -D CMAKE_CXX_COMPILER=clang++-20 \
               -D DEAL_II_EARLY_DEPRECATIONS=ON \
