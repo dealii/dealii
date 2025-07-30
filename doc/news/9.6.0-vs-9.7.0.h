@@ -640,8 +640,8 @@ inconvenience this causes.
  </li>
 
  <li>
-  Fixed: The geometry subdivided_hyper_L could not be generated using grid_generator_from_name. This has been fixed by adding this geometry case in said function. A test has also been added.
-  <br>
+  Fixed: GridGenerator::subdivided_hyper_L() may now be used via
+  GridGenerator::generate_from_name_and_arguments().
   (Bruna Campos, 2025/03/20)
  </li>
 
