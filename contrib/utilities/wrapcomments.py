@@ -45,6 +45,7 @@ import sys, re
 # (inadvertently) split across two lines.
 wrapper = textwrap.TextWrapper(break_on_hyphens=False)
 
+
 # Take an array of lines and return them with @p startwith prepended
 def wrap_block(lines, startwith):
     # We used to rewrap the text to 78 columns in this function (hence
