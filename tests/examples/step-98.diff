@@ -1,0 +1,8 @@
+583c583
+<     std::ifstream ifs("circle.msh");
+---
+>     std::ifstream ifs("../../../source/step-98/circle.msh");
+2459c2459
+<     for (unsigned int r = 0; r < 4; r++) // Mesh refinement parameter.
+---
+>     for (unsigned int r = 0; r < 1; r++) // Mesh refinement parameter.
