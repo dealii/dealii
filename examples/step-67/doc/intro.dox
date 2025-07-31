@@ -712,7 +712,7 @@ a cost similar to the forward application of a mass matrix, which is cheaper
 than the evaluation of the spatial operator $\mathcal L_h$
 with over-integration and face integrals. (We
 will demonstrate this with detailed timing information in the
-@ref step_67-Results "results section".) In fact, it
+@ref step_67-ResultsSection "results section".) In fact, it
 is so cheap that it is limited by the bandwidth of reading the source vector,
 reading the diagonal, and writing into the destination vector on most modern
 architectures. The hardware used for the result section allows to do the
@@ -738,4 +738,4 @@ discontinuity in density and pressure. In downstream direction, the transport
 is faster as sound propagation and fluid flow go in the same direction, which smears
 out the discontinuity somewhat. Once the sound wave hits the upper and lower
 walls, the sound is reflected back, creating some nice shapes as illustrated
-in the @ref step_67-Results "results section" below.
+in the @ref step_67-ResultsSection "results section" below.

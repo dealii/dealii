@@ -800,5 +800,5 @@ hand side equals $f=0$, and as boundary values we have to choose
 $g=p|_{\partial\Omega}$.
 
 For the computations in this program, we choose $\alpha=0.3,\beta=1$. You can
-find the resulting solution in the @ref step_20-Results "results section below",
+find the resulting solution in the @ref step_20-ResultsSection "results section below",
 after the commented program.
