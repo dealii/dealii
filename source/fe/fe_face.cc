@@ -951,7 +951,7 @@ FE_FaceP<dim, spacedim>::get_subface_interpolation_matrix(
                     face_quadrature.point(k), subface);
               v_in(k) = this->poly_space.compute_value(i, p);
             }
-          [[maybe_unused]] const double result = H.least_squares(v_out, v_in);
+          const double result = H.least_squares(v_out, v_in);
           Assert(result < 1e-12, FETools::ExcLeastSquaresError(result));
 
           for (unsigned int j = 0; j < source_fe->n_dofs_per_face(face_no); ++j)
