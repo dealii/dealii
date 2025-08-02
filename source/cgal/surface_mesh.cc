@@ -76,7 +76,7 @@ namespace
     else
       DEAL_II_ASSERT_UNREACHABLE();
 
-    [[maybe_unused]] const auto new_face = mesh.add_face(indices);
+    const auto new_face = mesh.add_face(indices);
     Assert(new_face != mesh.null_face(),
            ExcInternalError("While trying to build a CGAL facet, "
                             "CGAL encountered a orientation problem that it "

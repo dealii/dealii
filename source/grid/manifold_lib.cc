@@ -450,7 +450,7 @@ SphericalManifold<dim, spacedim>::get_tangent_vector(
   const Point<spacedim> &p1,
   const Point<spacedim> &p2) const
 {
-  [[maybe_unused]] const double tol = 1e-10;
+  const double tol = 1e-10;
 
   Assert(p1 != p2, ExcMessage("p1 and p2 should not concide."));
 
@@ -628,11 +628,10 @@ namespace internal
 
       template <>
       Point<3>
-      do_get_new_point(
-        const ArrayView<const Tensor<1, 3>>            &directions,
-        [[maybe_unused]] const ArrayView<const double> &distances,
-        const ArrayView<const double>                  &weights,
-        const Point<3>                                 &candidate_point)
+      do_get_new_point(const ArrayView<const Tensor<1, 3>> &directions,
+                       const ArrayView<const double>       &distances,
+                       const ArrayView<const double>       &weights,
+                       const Point<3>                      &candidate_point)
       {
         AssertDimension(directions.size(), distances.size());
         AssertDimension(directions.size(), weights.size());

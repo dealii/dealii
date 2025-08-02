@@ -714,8 +714,8 @@ namespace OpenCASCADE
     double minDistance = 1e7;
     gp_Pnt tmp_proj(0.0, 0.0, 0.0);
 
-    [[maybe_unused]] unsigned int counter      = 0;
-    unsigned int                  face_counter = 0;
+    unsigned int counter      = 0;
+    unsigned int face_counter = 0;
 
     TopoDS_Shape out_shape;
     double       u = 0;
