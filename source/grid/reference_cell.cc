@@ -115,6 +115,114 @@ ReferenceCell::to_string() const
   return "Invalid";
 }
 
+namespace
+{
+  // Return vertex_no-th vertex of the child_no-ith child cell.
+  //
+  // @note This function is not yet implemented in 3d since it is only called on
+  // faces of cells.
+  template <int dim>
+  Point<dim>
+  child_vertex(const ReferenceCell       reference_cell,
+               const unsigned int        child_no,
+               const unsigned int        vertex_no,
+               const RefinementCase<dim> refinement_case)
+  {
+    AssertDimension(dim, reference_cell.get_dimension());
+    AssertIndexRange(child_no, reference_cell.n_children(refinement_case));
+    AssertIndexRange(vertex_no, reference_cell.n_vertices());
+
+    const auto V0 = Point<dim>();
+    const auto V  = [](const unsigned int d) {
+      return Point<dim>::unit_vector(d);
+    };
+
+    switch (reference_cell)
+      {
+        case ReferenceCells::Vertex:
+          return V0;
+        case ReferenceCells::Line:
+          {
+            Assert(refinement_case == RefinementCase<dim>::isotropic_refinement,
+                   ExcNotImplemented());
+            static const ndarray<Point<dim>, 2, 2> isotropic_child_vertices = {{
+              {{V0, 0.5 * V(0)}},
+              {{0.5 * V(0), V(0)}},
+            }};
+            return isotropic_child_vertices[child_no][vertex_no];
+          }
+        case ReferenceCells::Triangle:
+          {
+            Assert(refinement_case == RefinementCase<dim>::isotropic_refinement,
+                   ExcNotImplemented());
+            static const ndarray<Point<dim>, 4, 3> isotropic_child_vertices = {{
+              {{V0, 0.5 * V(0), 0.5 * V(1)}},
+              {{0.5 * V(0), V(0), 0.5 * (V(0) + V(1))}},
+              {{0.5 * V(1), 0.5 * V(0) + 0.5 * V(1), V(1)}},
+              {{0.5 * V(0), 0.5 * V(0) + 0.5 * V(1), 0.5 * V(1)}},
+            }};
+            return isotropic_child_vertices[child_no][vertex_no];
+          }
+        case ReferenceCells::Quadrilateral:
+          {
+            // TODO: anisotropic refinement has a lot of cases
+            Assert(refinement_case == RefinementCase<dim>::isotropic_refinement,
+                   ExcNotImplemented());
+            static const auto M = 0.5 * (V(0) + V(1));
+
+            static const ndarray<Point<dim>, 4, 4> isotropic_child_vertices = {{
+              {{V0, 0.5 * V(0), 0.5 * V(1), M}},
+              {{0.5 * V(0), V(0), M, V(0) + 0.5 * V(1)}},
+              {{0.5 * V(1), M, V(1), V(1) + 0.5 * V(0)}},
+              {{M, V(0) + 0.5 * V(1), V(1) + 0.5 * V(0), V(0) + V(1)}},
+            }};
+            return isotropic_child_vertices[child_no][vertex_no];
+          }
+        case ReferenceCells::Tetrahedron:
+        case ReferenceCells::Pyramid:
+        case ReferenceCells::Wedge:
+        case ReferenceCells::Hexahedron:
+          DEAL_II_NOT_IMPLEMENTED();
+          return {};
+        default:
+          DEAL_II_ASSERT_UNREACHABLE();
+          return {};
+      }
+  }
+} // namespace
+
+
+
+template <int dim>
+Point<dim>
+ReferenceCell::subface_vertex_location(
+  const unsigned int            face_no,
+  const unsigned int            subface_no,
+  const unsigned int            subface_vertex_no,
+  const RefinementCase<dim - 1> face_refinement_case) const
+{
+  AssertIndexRange(face_no, n_faces());
+  AssertIndexRange(
+    subface_no, face_reference_cell(face_no).n_children(face_refinement_case));
+  AssertIndexRange(subface_vertex_no,
+                   face_reference_cell(face_no).n_vertices());
+  Assert(face_refinement_case != RefinementCase<dim - 1>::no_refinement,
+         ExcMessage("This function may only be called for subfaces."));
+
+  Point<dim> p;
+  for (const unsigned int vertex_no :
+       face_reference_cell(face_no).vertex_indices())
+    p += face_vertex_location<dim>(face_no, vertex_no) *
+         face_reference_cell(face_no).d_linear_shape_function(
+           child_vertex(face_reference_cell(face_no),
+                        subface_no,
+                        subface_vertex_no,
+                        face_refinement_case),
+           vertex_no);
+
+  return p;
+}
+
 
 
 template <int dim>

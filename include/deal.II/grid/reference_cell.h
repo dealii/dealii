@@ -611,6 +611,27 @@ public:
                        const unsigned int vertex) const;
 
   /**
+   * For a given subface, in standard orientation, return the location of one of
+   * its vertices.
+   *
+   * @param[in] face_no Index of the face.
+   *
+   * @param[in] subface_no Index of the subface within that face.
+   *
+   * @param[in] subface_vertex_no Index of the vertex within the subface.
+   *
+   * @param[in] face_refinement_case The way in which the current face is
+   * refined.
+   */
+  template <int dim>
+  Point<dim>
+  subface_vertex_location(
+    const unsigned int            face_no,
+    const unsigned int            subface_no,
+    const unsigned int            subface_vertex_no,
+    const RefinementCase<dim - 1> face_refinement_case) const;
+
+  /**
    * Correct vertex index depending on face orientation.
    */
   unsigned int
