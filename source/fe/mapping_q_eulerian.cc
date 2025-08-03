@@ -130,11 +130,9 @@ MappingQEulerian<dim, VectorType, spacedim>::compute_mapping_support_points(
 {
   const bool mg_vector = level != numbers::invalid_unsigned_int;
 
-  [[maybe_unused]] const types::global_dof_index n_dofs =
+  const types::global_dof_index n_dofs =
     mg_vector ? euler_dof_handler->n_dofs(level) : euler_dof_handler->n_dofs();
-  [[maybe_unused]] const types::global_dof_index vector_size =
-    euler_vector->size();
-
+  const types::global_dof_index vector_size = euler_vector->size();
   AssertDimension(vector_size, n_dofs);
 
   // we then transform our tria iterator into a dof iterator so we can access

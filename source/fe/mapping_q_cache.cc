@@ -162,7 +162,7 @@ MappingQCache<dim, spacedim>::initialize(
       // Do not use `this` in Assert because nvcc when using C++20 assumes that
       // `this` is an integer and we get the following error: invalid type
       // argument of unary '*' (have 'int')
-      [[maybe_unused]] const unsigned int d = this->get_degree() + 1;
+      const unsigned int d = this->get_degree() + 1;
       AssertDimension(
         (*support_point_cache)[cell->level()][cell->index()].size(),
         Utilities::pow(d, dim));
