@@ -19,8 +19,8 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
       Mapping<deal_II_dimension, deal_II_space_dimension>>
     ReferenceCell::get_default_mapping(const unsigned int degree) const;
 
-    template const Mapping<deal_II_dimension, deal_II_space_dimension>
-      &ReferenceCell::get_default_linear_mapping() const;
+    template const Mapping<deal_II_dimension, deal_II_space_dimension> &
+    ReferenceCell::get_default_linear_mapping() const;
 #endif
   }
 
@@ -35,8 +35,8 @@ for (deal_II_dimension : DIMENSIONS)
     template Quadrature<deal_II_dimension>
     ReferenceCell::get_gauss_type_quadrature(const unsigned n_points_1D) const;
 
-    template const Quadrature<deal_II_dimension>
-      &ReferenceCell::get_nodal_type_quadrature() const;
+    template const Quadrature<deal_II_dimension> &
+    ReferenceCell::get_nodal_type_quadrature() const;
 
     template std::pair<unsigned int, RefinementCase<deal_II_dimension - 1>>
     ReferenceCell::equivalent_refinement_case(

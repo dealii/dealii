@@ -434,3 +434,447 @@ DEAL:3D::    0.500000 0.500000 1.00000
 DEAL:3D::    1.00000 0.500000 1.00000
 DEAL:3D::    0.500000 1.00000 1.00000
 DEAL:3D::    1.00000 1.00000 1.00000
+DEAL:2D anisotropic::cut_x
+DEAL:2D anisotropic::Quad
+DEAL:2D anisotropic::face_no = 0
+DEAL:2D anisotropic::face_no = 1
+DEAL:2D anisotropic::face_no = 2
+DEAL:2D anisotropic::  subface_no = 0
+DEAL:2D anisotropic::    0.00000 0.00000
+DEAL:2D anisotropic::    0.500000 0.00000
+DEAL:2D anisotropic::  subface_no = 1
+DEAL:2D anisotropic::    0.500000 0.00000
+DEAL:2D anisotropic::    1.00000 0.00000
+DEAL:2D anisotropic::face_no = 3
+DEAL:2D anisotropic::  subface_no = 0
+DEAL:2D anisotropic::    0.00000 1.00000
+DEAL:2D anisotropic::    0.500000 1.00000
+DEAL:2D anisotropic::  subface_no = 1
+DEAL:2D anisotropic::    0.500000 1.00000
+DEAL:2D anisotropic::    1.00000 1.00000
+DEAL:2D anisotropic::cut_y
+DEAL:2D anisotropic::Quad
+DEAL:2D anisotropic::face_no = 0
+DEAL:2D anisotropic::  subface_no = 0
+DEAL:2D anisotropic::    0.00000 0.00000
+DEAL:2D anisotropic::    0.00000 0.500000
+DEAL:2D anisotropic::  subface_no = 1
+DEAL:2D anisotropic::    0.00000 0.500000
+DEAL:2D anisotropic::    0.00000 1.00000
+DEAL:2D anisotropic::face_no = 1
+DEAL:2D anisotropic::  subface_no = 0
+DEAL:2D anisotropic::    1.00000 0.00000
+DEAL:2D anisotropic::    1.00000 0.500000
+DEAL:2D anisotropic::  subface_no = 1
+DEAL:2D anisotropic::    1.00000 0.500000
+DEAL:2D anisotropic::    1.00000 1.00000
+DEAL:2D anisotropic::face_no = 2
+DEAL:2D anisotropic::face_no = 3
+DEAL:3D anisotropic::cut_x
+DEAL:3D anisotropic::Hex
+DEAL:3D anisotropic::face_no = 0
+DEAL:3D anisotropic::face_no = 1
+DEAL:3D anisotropic::face_no = 2
+DEAL:3D anisotropic::  subface_no = 0
+DEAL:3D anisotropic::    0.00000 0.00000 0.00000
+DEAL:3D anisotropic::    0.00000 0.00000 1.00000
+DEAL:3D anisotropic::    0.500000 0.00000 0.00000
+DEAL:3D anisotropic::    0.500000 0.00000 1.00000
+DEAL:3D anisotropic::  subface_no = 1
+DEAL:3D anisotropic::    0.500000 0.00000 0.00000
+DEAL:3D anisotropic::    0.500000 0.00000 1.00000
+DEAL:3D anisotropic::    1.00000 0.00000 0.00000
+DEAL:3D anisotropic::    1.00000 0.00000 1.00000
+DEAL:3D anisotropic::face_no = 3
+DEAL:3D anisotropic::  subface_no = 0
+DEAL:3D anisotropic::    0.00000 1.00000 0.00000
+DEAL:3D anisotropic::    0.00000 1.00000 1.00000
+DEAL:3D anisotropic::    0.500000 1.00000 0.00000
+DEAL:3D anisotropic::    0.500000 1.00000 1.00000
+DEAL:3D anisotropic::  subface_no = 1
+DEAL:3D anisotropic::    0.500000 1.00000 0.00000
+DEAL:3D anisotropic::    0.500000 1.00000 1.00000
+DEAL:3D anisotropic::    1.00000 1.00000 0.00000
+DEAL:3D anisotropic::    1.00000 1.00000 1.00000
+DEAL:3D anisotropic::face_no = 4
+DEAL:3D anisotropic::  subface_no = 0
+DEAL:3D anisotropic::    0.00000 0.00000 0.00000
+DEAL:3D anisotropic::    0.500000 0.00000 0.00000
+DEAL:3D anisotropic::    0.00000 1.00000 0.00000
+DEAL:3D anisotropic::    0.500000 1.00000 0.00000
+DEAL:3D anisotropic::  subface_no = 1
+DEAL:3D anisotropic::    0.500000 0.00000 0.00000
+DEAL:3D anisotropic::    1.00000 0.00000 0.00000
+DEAL:3D anisotropic::    0.500000 1.00000 0.00000
+DEAL:3D anisotropic::    1.00000 1.00000 0.00000
+DEAL:3D anisotropic::face_no = 5
+DEAL:3D anisotropic::  subface_no = 0
+DEAL:3D anisotropic::    0.00000 0.00000 1.00000
+DEAL:3D anisotropic::    0.500000 0.00000 1.00000
+DEAL:3D anisotropic::    0.00000 1.00000 1.00000
+DEAL:3D anisotropic::    0.500000 1.00000 1.00000
+DEAL:3D anisotropic::  subface_no = 1
+DEAL:3D anisotropic::    0.500000 0.00000 1.00000
+DEAL:3D anisotropic::    1.00000 0.00000 1.00000
+DEAL:3D anisotropic::    0.500000 1.00000 1.00000
+DEAL:3D anisotropic::    1.00000 1.00000 1.00000
+DEAL:3D anisotropic::cut_y
+DEAL:3D anisotropic::Hex
+DEAL:3D anisotropic::face_no = 0
+DEAL:3D anisotropic::  subface_no = 0
+DEAL:3D anisotropic::    0.00000 0.00000 0.00000
+DEAL:3D anisotropic::    0.00000 0.500000 0.00000
+DEAL:3D anisotropic::    0.00000 0.00000 1.00000
+DEAL:3D anisotropic::    0.00000 0.500000 1.00000
+DEAL:3D anisotropic::  subface_no = 1
+DEAL:3D anisotropic::    0.00000 0.500000 0.00000
+DEAL:3D anisotropic::    0.00000 1.00000 0.00000
+DEAL:3D anisotropic::    0.00000 0.500000 1.00000
+DEAL:3D anisotropic::    0.00000 1.00000 1.00000
+DEAL:3D anisotropic::face_no = 1
+DEAL:3D anisotropic::  subface_no = 0
+DEAL:3D anisotropic::    1.00000 0.00000 0.00000
+DEAL:3D anisotropic::    1.00000 0.500000 0.00000
+DEAL:3D anisotropic::    1.00000 0.00000 1.00000
+DEAL:3D anisotropic::    1.00000 0.500000 1.00000
+DEAL:3D anisotropic::  subface_no = 1
+DEAL:3D anisotropic::    1.00000 0.500000 0.00000
+DEAL:3D anisotropic::    1.00000 1.00000 0.00000
+DEAL:3D anisotropic::    1.00000 0.500000 1.00000
+DEAL:3D anisotropic::    1.00000 1.00000 1.00000
+DEAL:3D anisotropic::face_no = 2
+DEAL:3D anisotropic::face_no = 3
+DEAL:3D anisotropic::face_no = 4
+DEAL:3D anisotropic::  subface_no = 0
+DEAL:3D anisotropic::    0.00000 0.00000 0.00000
+DEAL:3D anisotropic::    1.00000 0.00000 0.00000
+DEAL:3D anisotropic::    0.00000 0.500000 0.00000
+DEAL:3D anisotropic::    1.00000 0.500000 0.00000
+DEAL:3D anisotropic::  subface_no = 1
+DEAL:3D anisotropic::    0.00000 0.500000 0.00000
+DEAL:3D anisotropic::    1.00000 0.500000 0.00000
+DEAL:3D anisotropic::    0.00000 1.00000 0.00000
+DEAL:3D anisotropic::    1.00000 1.00000 0.00000
+DEAL:3D anisotropic::face_no = 5
+DEAL:3D anisotropic::  subface_no = 0
+DEAL:3D anisotropic::    0.00000 0.00000 1.00000
+DEAL:3D anisotropic::    1.00000 0.00000 1.00000
+DEAL:3D anisotropic::    0.00000 0.500000 1.00000
+DEAL:3D anisotropic::    1.00000 0.500000 1.00000
+DEAL:3D anisotropic::  subface_no = 1
+DEAL:3D anisotropic::    0.00000 0.500000 1.00000
+DEAL:3D anisotropic::    1.00000 0.500000 1.00000
+DEAL:3D anisotropic::    0.00000 1.00000 1.00000
+DEAL:3D anisotropic::    1.00000 1.00000 1.00000
+DEAL:3D anisotropic::cut_xy
+DEAL:3D anisotropic::Hex
+DEAL:3D anisotropic::face_no = 0
+DEAL:3D anisotropic::  subface_no = 0
+DEAL:3D anisotropic::    0.00000 0.00000 0.00000
+DEAL:3D anisotropic::    0.00000 0.500000 0.00000
+DEAL:3D anisotropic::    0.00000 0.00000 1.00000
+DEAL:3D anisotropic::    0.00000 0.500000 1.00000
+DEAL:3D anisotropic::  subface_no = 1
+DEAL:3D anisotropic::    0.00000 0.500000 0.00000
+DEAL:3D anisotropic::    0.00000 1.00000 0.00000
+DEAL:3D anisotropic::    0.00000 0.500000 1.00000
+DEAL:3D anisotropic::    0.00000 1.00000 1.00000
+DEAL:3D anisotropic::face_no = 1
+DEAL:3D anisotropic::  subface_no = 0
+DEAL:3D anisotropic::    1.00000 0.00000 0.00000
+DEAL:3D anisotropic::    1.00000 0.500000 0.00000
+DEAL:3D anisotropic::    1.00000 0.00000 1.00000
+DEAL:3D anisotropic::    1.00000 0.500000 1.00000
+DEAL:3D anisotropic::  subface_no = 1
+DEAL:3D anisotropic::    1.00000 0.500000 0.00000
+DEAL:3D anisotropic::    1.00000 1.00000 0.00000
+DEAL:3D anisotropic::    1.00000 0.500000 1.00000
+DEAL:3D anisotropic::    1.00000 1.00000 1.00000
+DEAL:3D anisotropic::face_no = 2
+DEAL:3D anisotropic::  subface_no = 0
+DEAL:3D anisotropic::    0.00000 0.00000 0.00000
+DEAL:3D anisotropic::    0.00000 0.00000 1.00000
+DEAL:3D anisotropic::    0.500000 0.00000 0.00000
+DEAL:3D anisotropic::    0.500000 0.00000 1.00000
+DEAL:3D anisotropic::  subface_no = 1
+DEAL:3D anisotropic::    0.500000 0.00000 0.00000
+DEAL:3D anisotropic::    0.500000 0.00000 1.00000
+DEAL:3D anisotropic::    1.00000 0.00000 0.00000
+DEAL:3D anisotropic::    1.00000 0.00000 1.00000
+DEAL:3D anisotropic::face_no = 3
+DEAL:3D anisotropic::  subface_no = 0
+DEAL:3D anisotropic::    0.00000 1.00000 0.00000
+DEAL:3D anisotropic::    0.00000 1.00000 1.00000
+DEAL:3D anisotropic::    0.500000 1.00000 0.00000
+DEAL:3D anisotropic::    0.500000 1.00000 1.00000
+DEAL:3D anisotropic::  subface_no = 1
+DEAL:3D anisotropic::    0.500000 1.00000 0.00000
+DEAL:3D anisotropic::    0.500000 1.00000 1.00000
+DEAL:3D anisotropic::    1.00000 1.00000 0.00000
+DEAL:3D anisotropic::    1.00000 1.00000 1.00000
+DEAL:3D anisotropic::face_no = 4
+DEAL:3D anisotropic::  subface_no = 0
+DEAL:3D anisotropic::    0.00000 0.00000 0.00000
+DEAL:3D anisotropic::    0.500000 0.00000 0.00000
+DEAL:3D anisotropic::    0.00000 0.500000 0.00000
+DEAL:3D anisotropic::    0.500000 0.500000 0.00000
+DEAL:3D anisotropic::  subface_no = 1
+DEAL:3D anisotropic::    0.500000 0.00000 0.00000
+DEAL:3D anisotropic::    1.00000 0.00000 0.00000
+DEAL:3D anisotropic::    0.500000 0.500000 0.00000
+DEAL:3D anisotropic::    1.00000 0.500000 0.00000
+DEAL:3D anisotropic::  subface_no = 2
+DEAL:3D anisotropic::    0.00000 0.500000 0.00000
+DEAL:3D anisotropic::    0.500000 0.500000 0.00000
+DEAL:3D anisotropic::    0.00000 1.00000 0.00000
+DEAL:3D anisotropic::    0.500000 1.00000 0.00000
+DEAL:3D anisotropic::  subface_no = 3
+DEAL:3D anisotropic::    0.500000 0.500000 0.00000
+DEAL:3D anisotropic::    1.00000 0.500000 0.00000
+DEAL:3D anisotropic::    0.500000 1.00000 0.00000
+DEAL:3D anisotropic::    1.00000 1.00000 0.00000
+DEAL:3D anisotropic::face_no = 5
+DEAL:3D anisotropic::  subface_no = 0
+DEAL:3D anisotropic::    0.00000 0.00000 1.00000
+DEAL:3D anisotropic::    0.500000 0.00000 1.00000
+DEAL:3D anisotropic::    0.00000 0.500000 1.00000
+DEAL:3D anisotropic::    0.500000 0.500000 1.00000
+DEAL:3D anisotropic::  subface_no = 1
+DEAL:3D anisotropic::    0.500000 0.00000 1.00000
+DEAL:3D anisotropic::    1.00000 0.00000 1.00000
+DEAL:3D anisotropic::    0.500000 0.500000 1.00000
+DEAL:3D anisotropic::    1.00000 0.500000 1.00000
+DEAL:3D anisotropic::  subface_no = 2
+DEAL:3D anisotropic::    0.00000 0.500000 1.00000
+DEAL:3D anisotropic::    0.500000 0.500000 1.00000
+DEAL:3D anisotropic::    0.00000 1.00000 1.00000
+DEAL:3D anisotropic::    0.500000 1.00000 1.00000
+DEAL:3D anisotropic::  subface_no = 3
+DEAL:3D anisotropic::    0.500000 0.500000 1.00000
+DEAL:3D anisotropic::    1.00000 0.500000 1.00000
+DEAL:3D anisotropic::    0.500000 1.00000 1.00000
+DEAL:3D anisotropic::    1.00000 1.00000 1.00000
+DEAL:3D anisotropic::cut_z
+DEAL:3D anisotropic::Hex
+DEAL:3D anisotropic::face_no = 0
+DEAL:3D anisotropic::  subface_no = 0
+DEAL:3D anisotropic::    0.00000 0.00000 0.00000
+DEAL:3D anisotropic::    0.00000 1.00000 0.00000
+DEAL:3D anisotropic::    0.00000 0.00000 0.500000
+DEAL:3D anisotropic::    0.00000 1.00000 0.500000
+DEAL:3D anisotropic::  subface_no = 1
+DEAL:3D anisotropic::    0.00000 0.00000 0.500000
+DEAL:3D anisotropic::    0.00000 1.00000 0.500000
+DEAL:3D anisotropic::    0.00000 0.00000 1.00000
+DEAL:3D anisotropic::    0.00000 1.00000 1.00000
+DEAL:3D anisotropic::face_no = 1
+DEAL:3D anisotropic::  subface_no = 0
+DEAL:3D anisotropic::    1.00000 0.00000 0.00000
+DEAL:3D anisotropic::    1.00000 1.00000 0.00000
+DEAL:3D anisotropic::    1.00000 0.00000 0.500000
+DEAL:3D anisotropic::    1.00000 1.00000 0.500000
+DEAL:3D anisotropic::  subface_no = 1
+DEAL:3D anisotropic::    1.00000 0.00000 0.500000
+DEAL:3D anisotropic::    1.00000 1.00000 0.500000
+DEAL:3D anisotropic::    1.00000 0.00000 1.00000
+DEAL:3D anisotropic::    1.00000 1.00000 1.00000
+DEAL:3D anisotropic::face_no = 2
+DEAL:3D anisotropic::  subface_no = 0
+DEAL:3D anisotropic::    0.00000 0.00000 0.00000
+DEAL:3D anisotropic::    0.00000 0.00000 0.500000
+DEAL:3D anisotropic::    1.00000 0.00000 0.00000
+DEAL:3D anisotropic::    1.00000 0.00000 0.500000
+DEAL:3D anisotropic::  subface_no = 1
+DEAL:3D anisotropic::    0.00000 0.00000 0.500000
+DEAL:3D anisotropic::    0.00000 0.00000 1.00000
+DEAL:3D anisotropic::    1.00000 0.00000 0.500000
+DEAL:3D anisotropic::    1.00000 0.00000 1.00000
+DEAL:3D anisotropic::face_no = 3
+DEAL:3D anisotropic::  subface_no = 0
+DEAL:3D anisotropic::    0.00000 1.00000 0.00000
+DEAL:3D anisotropic::    0.00000 1.00000 0.500000
+DEAL:3D anisotropic::    1.00000 1.00000 0.00000
+DEAL:3D anisotropic::    1.00000 1.00000 0.500000
+DEAL:3D anisotropic::  subface_no = 1
+DEAL:3D anisotropic::    0.00000 1.00000 0.500000
+DEAL:3D anisotropic::    0.00000 1.00000 1.00000
+DEAL:3D anisotropic::    1.00000 1.00000 0.500000
+DEAL:3D anisotropic::    1.00000 1.00000 1.00000
+DEAL:3D anisotropic::face_no = 4
+DEAL:3D anisotropic::face_no = 5
+DEAL:3D anisotropic::cut_xz
+DEAL:3D anisotropic::Hex
+DEAL:3D anisotropic::face_no = 0
+DEAL:3D anisotropic::  subface_no = 0
+DEAL:3D anisotropic::    0.00000 0.00000 0.00000
+DEAL:3D anisotropic::    0.00000 1.00000 0.00000
+DEAL:3D anisotropic::    0.00000 0.00000 0.500000
+DEAL:3D anisotropic::    0.00000 1.00000 0.500000
+DEAL:3D anisotropic::  subface_no = 1
+DEAL:3D anisotropic::    0.00000 0.00000 0.500000
+DEAL:3D anisotropic::    0.00000 1.00000 0.500000
+DEAL:3D anisotropic::    0.00000 0.00000 1.00000
+DEAL:3D anisotropic::    0.00000 1.00000 1.00000
+DEAL:3D anisotropic::face_no = 1
+DEAL:3D anisotropic::  subface_no = 0
+DEAL:3D anisotropic::    1.00000 0.00000 0.00000
+DEAL:3D anisotropic::    1.00000 1.00000 0.00000
+DEAL:3D anisotropic::    1.00000 0.00000 0.500000
+DEAL:3D anisotropic::    1.00000 1.00000 0.500000
+DEAL:3D anisotropic::  subface_no = 1
+DEAL:3D anisotropic::    1.00000 0.00000 0.500000
+DEAL:3D anisotropic::    1.00000 1.00000 0.500000
+DEAL:3D anisotropic::    1.00000 0.00000 1.00000
+DEAL:3D anisotropic::    1.00000 1.00000 1.00000
+DEAL:3D anisotropic::face_no = 2
+DEAL:3D anisotropic::  subface_no = 0
+DEAL:3D anisotropic::    0.00000 0.00000 0.00000
+DEAL:3D anisotropic::    0.00000 0.00000 0.500000
+DEAL:3D anisotropic::    0.500000 0.00000 0.00000
+DEAL:3D anisotropic::    0.500000 0.00000 0.500000
+DEAL:3D anisotropic::  subface_no = 1
+DEAL:3D anisotropic::    0.00000 0.00000 0.500000
+DEAL:3D anisotropic::    0.00000 0.00000 1.00000
+DEAL:3D anisotropic::    0.500000 0.00000 0.500000
+DEAL:3D anisotropic::    0.500000 0.00000 1.00000
+DEAL:3D anisotropic::  subface_no = 2
+DEAL:3D anisotropic::    0.500000 0.00000 0.00000
+DEAL:3D anisotropic::    0.500000 0.00000 0.500000
+DEAL:3D anisotropic::    1.00000 0.00000 0.00000
+DEAL:3D anisotropic::    1.00000 0.00000 0.500000
+DEAL:3D anisotropic::  subface_no = 3
+DEAL:3D anisotropic::    0.500000 0.00000 0.500000
+DEAL:3D anisotropic::    0.500000 0.00000 1.00000
+DEAL:3D anisotropic::    1.00000 0.00000 0.500000
+DEAL:3D anisotropic::    1.00000 0.00000 1.00000
+DEAL:3D anisotropic::face_no = 3
+DEAL:3D anisotropic::  subface_no = 0
+DEAL:3D anisotropic::    0.00000 1.00000 0.00000
+DEAL:3D anisotropic::    0.00000 1.00000 0.500000
+DEAL:3D anisotropic::    0.500000 1.00000 0.00000
+DEAL:3D anisotropic::    0.500000 1.00000 0.500000
+DEAL:3D anisotropic::  subface_no = 1
+DEAL:3D anisotropic::    0.00000 1.00000 0.500000
+DEAL:3D anisotropic::    0.00000 1.00000 1.00000
+DEAL:3D anisotropic::    0.500000 1.00000 0.500000
+DEAL:3D anisotropic::    0.500000 1.00000 1.00000
+DEAL:3D anisotropic::  subface_no = 2
+DEAL:3D anisotropic::    0.500000 1.00000 0.00000
+DEAL:3D anisotropic::    0.500000 1.00000 0.500000
+DEAL:3D anisotropic::    1.00000 1.00000 0.00000
+DEAL:3D anisotropic::    1.00000 1.00000 0.500000
+DEAL:3D anisotropic::  subface_no = 3
+DEAL:3D anisotropic::    0.500000 1.00000 0.500000
+DEAL:3D anisotropic::    0.500000 1.00000 1.00000
+DEAL:3D anisotropic::    1.00000 1.00000 0.500000
+DEAL:3D anisotropic::    1.00000 1.00000 1.00000
+DEAL:3D anisotropic::face_no = 4
+DEAL:3D anisotropic::  subface_no = 0
+DEAL:3D anisotropic::    0.00000 0.00000 0.00000
+DEAL:3D anisotropic::    0.500000 0.00000 0.00000
+DEAL:3D anisotropic::    0.00000 1.00000 0.00000
+DEAL:3D anisotropic::    0.500000 1.00000 0.00000
+DEAL:3D anisotropic::  subface_no = 1
+DEAL:3D anisotropic::    0.500000 0.00000 0.00000
+DEAL:3D anisotropic::    1.00000 0.00000 0.00000
+DEAL:3D anisotropic::    0.500000 1.00000 0.00000
+DEAL:3D anisotropic::    1.00000 1.00000 0.00000
+DEAL:3D anisotropic::face_no = 5
+DEAL:3D anisotropic::  subface_no = 0
+DEAL:3D anisotropic::    0.00000 0.00000 1.00000
+DEAL:3D anisotropic::    0.500000 0.00000 1.00000
+DEAL:3D anisotropic::    0.00000 1.00000 1.00000
+DEAL:3D anisotropic::    0.500000 1.00000 1.00000
+DEAL:3D anisotropic::  subface_no = 1
+DEAL:3D anisotropic::    0.500000 0.00000 1.00000
+DEAL:3D anisotropic::    1.00000 0.00000 1.00000
+DEAL:3D anisotropic::    0.500000 1.00000 1.00000
+DEAL:3D anisotropic::    1.00000 1.00000 1.00000
+DEAL:3D anisotropic::cut_yz
+DEAL:3D anisotropic::Hex
+DEAL:3D anisotropic::face_no = 0
+DEAL:3D anisotropic::  subface_no = 0
+DEAL:3D anisotropic::    0.00000 0.00000 0.00000
+DEAL:3D anisotropic::    0.00000 0.500000 0.00000
+DEAL:3D anisotropic::    0.00000 0.00000 0.500000
+DEAL:3D anisotropic::    0.00000 0.500000 0.500000
+DEAL:3D anisotropic::  subface_no = 1
+DEAL:3D anisotropic::    0.00000 0.500000 0.00000
+DEAL:3D anisotropic::    0.00000 1.00000 0.00000
+DEAL:3D anisotropic::    0.00000 0.500000 0.500000
+DEAL:3D anisotropic::    0.00000 1.00000 0.500000
+DEAL:3D anisotropic::  subface_no = 2
+DEAL:3D anisotropic::    0.00000 0.00000 0.500000
+DEAL:3D anisotropic::    0.00000 0.500000 0.500000
+DEAL:3D anisotropic::    0.00000 0.00000 1.00000
+DEAL:3D anisotropic::    0.00000 0.500000 1.00000
+DEAL:3D anisotropic::  subface_no = 3
+DEAL:3D anisotropic::    0.00000 0.500000 0.500000
+DEAL:3D anisotropic::    0.00000 1.00000 0.500000
+DEAL:3D anisotropic::    0.00000 0.500000 1.00000
+DEAL:3D anisotropic::    0.00000 1.00000 1.00000
+DEAL:3D anisotropic::face_no = 1
+DEAL:3D anisotropic::  subface_no = 0
+DEAL:3D anisotropic::    1.00000 0.00000 0.00000
+DEAL:3D anisotropic::    1.00000 0.500000 0.00000
+DEAL:3D anisotropic::    1.00000 0.00000 0.500000
+DEAL:3D anisotropic::    1.00000 0.500000 0.500000
+DEAL:3D anisotropic::  subface_no = 1
+DEAL:3D anisotropic::    1.00000 0.500000 0.00000
+DEAL:3D anisotropic::    1.00000 1.00000 0.00000
+DEAL:3D anisotropic::    1.00000 0.500000 0.500000
+DEAL:3D anisotropic::    1.00000 1.00000 0.500000
+DEAL:3D anisotropic::  subface_no = 2
+DEAL:3D anisotropic::    1.00000 0.00000 0.500000
+DEAL:3D anisotropic::    1.00000 0.500000 0.500000
+DEAL:3D anisotropic::    1.00000 0.00000 1.00000
+DEAL:3D anisotropic::    1.00000 0.500000 1.00000
+DEAL:3D anisotropic::  subface_no = 3
+DEAL:3D anisotropic::    1.00000 0.500000 0.500000
+DEAL:3D anisotropic::    1.00000 1.00000 0.500000
+DEAL:3D anisotropic::    1.00000 0.500000 1.00000
+DEAL:3D anisotropic::    1.00000 1.00000 1.00000
+DEAL:3D anisotropic::face_no = 2
+DEAL:3D anisotropic::  subface_no = 0
+DEAL:3D anisotropic::    0.00000 0.00000 0.00000
+DEAL:3D anisotropic::    0.00000 0.00000 0.500000
+DEAL:3D anisotropic::    1.00000 0.00000 0.00000
+DEAL:3D anisotropic::    1.00000 0.00000 0.500000
+DEAL:3D anisotropic::  subface_no = 1
+DEAL:3D anisotropic::    0.00000 0.00000 0.500000
+DEAL:3D anisotropic::    0.00000 0.00000 1.00000
+DEAL:3D anisotropic::    1.00000 0.00000 0.500000
+DEAL:3D anisotropic::    1.00000 0.00000 1.00000
+DEAL:3D anisotropic::face_no = 3
+DEAL:3D anisotropic::  subface_no = 0
+DEAL:3D anisotropic::    0.00000 1.00000 0.00000
+DEAL:3D anisotropic::    0.00000 1.00000 0.500000
+DEAL:3D anisotropic::    1.00000 1.00000 0.00000
+DEAL:3D anisotropic::    1.00000 1.00000 0.500000
+DEAL:3D anisotropic::  subface_no = 1
+DEAL:3D anisotropic::    0.00000 1.00000 0.500000
+DEAL:3D anisotropic::    0.00000 1.00000 1.00000
+DEAL:3D anisotropic::    1.00000 1.00000 0.500000
+DEAL:3D anisotropic::    1.00000 1.00000 1.00000
+DEAL:3D anisotropic::face_no = 4
+DEAL:3D anisotropic::  subface_no = 0
+DEAL:3D anisotropic::    0.00000 0.00000 0.00000
+DEAL:3D anisotropic::    1.00000 0.00000 0.00000
+DEAL:3D anisotropic::    0.00000 0.500000 0.00000
+DEAL:3D anisotropic::    1.00000 0.500000 0.00000
+DEAL:3D anisotropic::  subface_no = 1
+DEAL:3D anisotropic::    0.00000 0.500000 0.00000
+DEAL:3D anisotropic::    1.00000 0.500000 0.00000
+DEAL:3D anisotropic::    0.00000 1.00000 0.00000
+DEAL:3D anisotropic::    1.00000 1.00000 0.00000
+DEAL:3D anisotropic::face_no = 5
+DEAL:3D anisotropic::  subface_no = 0
+DEAL:3D anisotropic::    0.00000 0.00000 1.00000
+DEAL:3D anisotropic::    1.00000 0.00000 1.00000
+DEAL:3D anisotropic::    0.00000 0.500000 1.00000
+DEAL:3D anisotropic::    1.00000 0.500000 1.00000
+DEAL:3D anisotropic::  subface_no = 1
+DEAL:3D anisotropic::    0.00000 0.500000 1.00000
+DEAL:3D anisotropic::    1.00000 0.500000 1.00000
+DEAL:3D anisotropic::    0.00000 1.00000 1.00000
+DEAL:3D anisotropic::    1.00000 1.00000 1.00000

@@ -165,10 +165,17 @@ namespace
           }
         case ReferenceCells::Quadrilateral:
           {
-            // TODO: anisotropic refinement has a lot of cases
-            Assert(refinement_case == RefinementCase<dim>::isotropic_refinement,
-                   ExcNotImplemented());
             static const auto M = 0.5 * (V(0) + V(1));
+
+            static const ndarray<Point<dim>, 2, 4> cut_x_child_vertices = {{
+              {{V0, 0.5 * V(0), V(1), V(1) + 0.5 * V(0)}},
+              {{0.5 * V(0), V(0), 0.5 * V(0) + V(1), V(0) + V(1)}},
+            }};
+
+            static const ndarray<Point<dim>, 2, 4> cut_y_child_vertices = {{
+              {{V0, V(0), 0.5 * V(1), V(0) + 0.5 * V(1)}},
+              {{0.5 * V(1), V(0) + 0.5 * V(1), V(1), V(0) + V(1)}},
+            }};
 
             static const ndarray<Point<dim>, 4, 4> isotropic_child_vertices = {{
               {{V0, 0.5 * V(0), 0.5 * V(1), M}},
@@ -176,7 +183,18 @@ namespace
               {{0.5 * V(1), M, V(1), V(1) + 0.5 * V(0)}},
               {{M, V(0) + 0.5 * V(1), V(1) + 0.5 * V(0), V(0) + V(1)}},
             }};
-            return isotropic_child_vertices[child_no][vertex_no];
+
+            switch (refinement_case)
+              {
+                case RefinementCase<2>::cut_x:
+                  return cut_x_child_vertices[child_no][vertex_no];
+                case RefinementCase<2>::cut_y:
+                  return cut_y_child_vertices[child_no][vertex_no];
+                case RefinementCase<2>::isotropic_refinement:
+                  return isotropic_child_vertices[child_no][vertex_no];
+                default:
+                  DEAL_II_ASSERT_UNREACHABLE();
+              }
           }
         case ReferenceCells::Tetrahedron:
         case ReferenceCells::Pyramid:
