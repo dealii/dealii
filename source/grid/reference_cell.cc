@@ -132,8 +132,9 @@ namespace
     AssertIndexRange(child_no, reference_cell.n_children(refinement_case));
     AssertIndexRange(vertex_no, reference_cell.n_vertices());
 
-    const auto V0 = Point<dim>();
-    const auto V  = [](const unsigned int d) {
+    constexpr Point<dim> V0;
+    // V isn't used for dim == 0
+    [[maybe_unused]] const auto V = [](const unsigned int d) {
       return Point<dim>::unit_vector(d);
     };
 
@@ -145,56 +146,76 @@ namespace
           {
             Assert(refinement_case == RefinementCase<dim>::isotropic_refinement,
                    ExcNotImplemented());
-            static const ndarray<Point<dim>, 2, 2> isotropic_child_vertices = {{
-              {{V0, 0.5 * V(0)}},
-              {{0.5 * V(0), V(0)}},
-            }};
-            return isotropic_child_vertices[child_no][vertex_no];
+            if constexpr (dim == 1)
+              {
+                static constexpr ndarray<Point<1>, 2, 2>
+                  isotropic_child_vertices = {{
+                    {{V0, 0.5 * V(0)}},
+                    {{0.5 * V(0), V(0)}},
+                  }};
+                return isotropic_child_vertices[child_no][vertex_no];
+              }
+            else
+              DEAL_II_ASSERT_UNREACHABLE();
           }
         case ReferenceCells::Triangle:
           {
             Assert(refinement_case == RefinementCase<dim>::isotropic_refinement,
                    ExcNotImplemented());
-            static const ndarray<Point<dim>, 4, 3> isotropic_child_vertices = {{
-              {{V0, 0.5 * V(0), 0.5 * V(1)}},
-              {{0.5 * V(0), V(0), 0.5 * (V(0) + V(1))}},
-              {{0.5 * V(1), 0.5 * V(0) + 0.5 * V(1), V(1)}},
-              {{0.5 * V(0), 0.5 * V(0) + 0.5 * V(1), 0.5 * V(1)}},
-            }};
-            return isotropic_child_vertices[child_no][vertex_no];
+            if constexpr (dim == 2)
+              {
+                static constexpr ndarray<Point<2>, 4, 3>
+                  isotropic_child_vertices = {{
+                    {{V0, 0.5 * V(0), 0.5 * V(1)}},
+                    {{0.5 * V(0), V(0), 0.5 * (V(0) + V(1))}},
+                    {{0.5 * V(1), 0.5 * V(0) + 0.5 * V(1), V(1)}},
+                    {{0.5 * V(0), 0.5 * V(0) + 0.5 * V(1), 0.5 * V(1)}},
+                  }};
+                return isotropic_child_vertices[child_no][vertex_no];
+              }
+            else
+              DEAL_II_ASSERT_UNREACHABLE();
           }
         case ReferenceCells::Quadrilateral:
           {
-            static const auto M = 0.5 * (V(0) + V(1));
-
-            static const ndarray<Point<dim>, 2, 4> cut_x_child_vertices = {{
-              {{V0, 0.5 * V(0), V(1), V(1) + 0.5 * V(0)}},
-              {{0.5 * V(0), V(0), 0.5 * V(0) + V(1), V(0) + V(1)}},
-            }};
-
-            static const ndarray<Point<dim>, 2, 4> cut_y_child_vertices = {{
-              {{V0, V(0), 0.5 * V(1), V(0) + 0.5 * V(1)}},
-              {{0.5 * V(1), V(0) + 0.5 * V(1), V(1), V(0) + V(1)}},
-            }};
-
-            static const ndarray<Point<dim>, 4, 4> isotropic_child_vertices = {{
-              {{V0, 0.5 * V(0), 0.5 * V(1), M}},
-              {{0.5 * V(0), V(0), M, V(0) + 0.5 * V(1)}},
-              {{0.5 * V(1), M, V(1), V(1) + 0.5 * V(0)}},
-              {{M, V(0) + 0.5 * V(1), V(1) + 0.5 * V(0), V(0) + V(1)}},
-            }};
-
-            switch (refinement_case)
+            if constexpr (dim == 2)
               {
-                case RefinementCase<2>::cut_x:
-                  return cut_x_child_vertices[child_no][vertex_no];
-                case RefinementCase<2>::cut_y:
-                  return cut_y_child_vertices[child_no][vertex_no];
-                case RefinementCase<2>::isotropic_refinement:
-                  return isotropic_child_vertices[child_no][vertex_no];
-                default:
-                  DEAL_II_ASSERT_UNREACHABLE();
+                static constexpr Point<2> M = 0.5 * (V(0) + V(1));
+
+                static constexpr ndarray<Point<2>, 2, 4> cut_x_child_vertices =
+                  {{
+                    {{V0, 0.5 * V(0), V(1), V(1) + 0.5 * V(0)}},
+                    {{0.5 * V(0), V(0), 0.5 * V(0) + V(1), V(0) + V(1)}},
+                  }};
+
+                static constexpr ndarray<Point<2>, 2, 4> cut_y_child_vertices =
+                  {{
+                    {{V0, V(0), 0.5 * V(1), V(0) + 0.5 * V(1)}},
+                    {{0.5 * V(1), V(0) + 0.5 * V(1), V(1), V(0) + V(1)}},
+                  }};
+
+                static constexpr ndarray<Point<2>, 4, 4>
+                  isotropic_child_vertices = {{
+                    {{V0, 0.5 * V(0), 0.5 * V(1), M}},
+                    {{0.5 * V(0), V(0), M, V(0) + 0.5 * V(1)}},
+                    {{0.5 * V(1), M, V(1), V(1) + 0.5 * V(0)}},
+                    {{M, V(0) + 0.5 * V(1), V(1) + 0.5 * V(0), V(0) + V(1)}},
+                  }};
+
+                switch (refinement_case)
+                  {
+                    case RefinementCase<2>::cut_x:
+                      return cut_x_child_vertices[child_no][vertex_no];
+                    case RefinementCase<2>::cut_y:
+                      return cut_y_child_vertices[child_no][vertex_no];
+                    case RefinementCase<2>::isotropic_refinement:
+                      return isotropic_child_vertices[child_no][vertex_no];
+                    default:
+                      DEAL_II_ASSERT_UNREACHABLE();
+                  }
               }
+            else
+              DEAL_II_ASSERT_UNREACHABLE();
           }
         case ReferenceCells::Tetrahedron:
         case ReferenceCells::Pyramid:
