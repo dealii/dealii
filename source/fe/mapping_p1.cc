@@ -694,18 +694,12 @@ MappingP1<dim, spacedim>::transform(
                  typename FEValuesBase<dim>::ExcAccessToUninitializedField(
                    "update_contravariant_transformation"));
 
-          auto scaled_contravariant = data.linear_component;
-          for (unsigned int d = 0; d < spacedim; ++d)
-            scaled_contravariant[d] *= 1.0 / data.determinant;
           for (unsigned int i = 0; i < output.size(); ++i)
-            {
-              const DerivativeForm<1, spacedim, dim> A =
-                apply_transformation(data.covariant, input[i]);
-              const Tensor<2, spacedim> T =
-                apply_transformation(scaled_contravariant, A.transpose());
+            output[i] = internal::apply_piola_gradient(data.covariant,
+                                                       data.linear_component,
+                                                       data.determinant,
+                                                       input[i]);
 
-              output[i] = transpose(T);
-            }
 
           return;
         }
