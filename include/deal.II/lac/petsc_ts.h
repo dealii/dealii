@@ -58,6 +58,7 @@ namespace PETScWrappers
      *
      * @param options_prefix The string indicating the options prefix for command line customization.
      * @param ts_type The string indicating the PETSc solver type.
+     * @param problem_type The string indicating the PETSc problem type.
      * @param initial_time Initial simulation time.
      * @param final_time Final simulation time.
      * @param initial_step_size Initial step size.
