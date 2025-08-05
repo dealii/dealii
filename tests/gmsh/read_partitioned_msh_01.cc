@@ -21,8 +21,7 @@
 
 #include <deal.II/distributed/fully_distributed_tria.h>
 
-#include <deal.II/gmsh/utilities.h>
-
+#include <deal.II/grid/grid_in.h>
 #include <deal.II/grid/grid_out.h>
 
 #include <fstream>
@@ -37,6 +36,8 @@ using namespace dealii;
  * Initializes MPI, creates a fully distributed triangulation, reads a
  * partitioned Gmsh mesh for each rank, and reports ownership stats.
  */
+
+
 int
 main(int argc, char **argv)
 {
@@ -52,13 +53,13 @@ main(int argc, char **argv)
   MPI_Comm_size(mpi_comm, &size);
 
   // Create fully distributed triangulation
+  // Create fully distributed triangulation
   parallel::fullydistributed::Triangulation<2, 2> tria(mpi_comm);
 
-  // Read the partitioned Gmsh mesh for this rank
-  Gmsh::read_partitioned_msh(tria,
-                             mpi_comm,
-                             SOURCE_DIR "/../grid/grids/unit-square");
-
+  // Use GridIn to read the mesh
+  GridIn<2, 2> grid_in;
+  grid_in.attach_triangulation(tria);
+  grid_in.read_partitioned_msh(SOURCE_DIR "/../grid/grids/unit-square");
   // Output ownership information
   deallog << "Rank " << rank << " owns " << tria.n_active_cells() << " cells "
           << "and " << tria.n_vertices() << " vertices." << std::endl;
