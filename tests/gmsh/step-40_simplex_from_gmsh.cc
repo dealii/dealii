@@ -54,9 +54,8 @@
 #include <deal.II/fe/fe_values.h>
 #include <deal.II/fe/mapping_fe.h>
 
-#include <deal.II/gmsh/utilities.h>
-
 #include <deal.II/grid/grid_generator.h>
+#include <deal.II/grid/grid_in.h>
 #include <deal.II/grid/grid_tools.h>
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_iterator.h>
@@ -310,10 +309,9 @@ namespace Step40
     deallog << "Running on "
             << Utilities::MPI::n_mpi_processes(mpi_communicator)
             << " MPI rank(s)..." << std::endl;
-
-    Gmsh::read_partitioned_msh(triangulation,
-                               mpi_communicator,
-                               SOURCE_DIR "/../grid/grids/unit-square");
+    GridIn<2, 2> grid_in;
+    grid_in.attach_triangulation(triangulation);
+    grid_in.read_partitioned_msh(SOURCE_DIR "/../grid/grids/unit-square");
 
 
     deallog << "Triangulation has " << triangulation.n_active_cells()
