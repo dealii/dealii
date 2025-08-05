@@ -89,6 +89,7 @@ namespace PETScWrappers
       // Running parameters
       const std::string &options_prefix    = "",
       const std::string &ts_type           = "",
+      const std::string &problem_type      = "nonlinear",
       const real_type    initial_time      = 0.0,
       const real_type    final_time        = 0.0,
       const real_type    initial_step_size = 0.0,
@@ -104,6 +105,7 @@ namespace PETScWrappers
       const bool         ignore_algebraic_lte = true)
       : options_prefix(options_prefix)
       , ts_type(ts_type)
+      , problem_type(problem_type)
       , initial_time(initial_time)
       , final_time(final_time)
       , initial_step_size(initial_step_size)
@@ -133,6 +135,11 @@ namespace PETScWrappers
      * PETSc solver type.
      */
     std::string ts_type;
+
+    /**
+     * PETSc problem type.
+     */
+    std::string problem_type;
 
     /**
      * Initial time for the DAE.
