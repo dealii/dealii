@@ -39,6 +39,19 @@ namespace internal
     const DerivativeForm<2, dim, spacedim, Number> &input);
 
   /**
+   * Map the gradient of a Piola vector field. For more information see the
+   * overload of Mapping::transform() which maps rank 2 Tensor objects from the
+   * reference cell to the physical cell.
+   */
+  template <int dim, int spacedim, typename Number>
+  Tensor<2, spacedim, Number>
+  apply_piola_gradient(
+    const DerivativeForm<1, dim, spacedim, Number> &covariant,
+    const DerivativeForm<1, dim, spacedim, Number> &contravariant,
+    const Number                                   &volume_element,
+    const Tensor<2, dim, Number>                   &input);
+
+  /**
    * Map the Hessian of a contravariant vector field. For more information see
    * the overload of Mapping::transform() which maps 3-differential forms from
    * the reference cell to the physical cell.
@@ -102,6 +115,26 @@ namespace internal
             }
         }
 
+    return output;
+  }
+
+
+
+  template <int dim, int spacedim, typename Number>
+  Tensor<2, spacedim, Number>
+  apply_piola_gradient(
+    const DerivativeForm<1, dim, spacedim, Number> &covariant,
+    const DerivativeForm<1, dim, spacedim, Number> &contravariant,
+    const Number                                   &volume_element,
+    const Tensor<2, dim, Number>                   &input)
+  {
+    const DerivativeForm<1, spacedim, dim> A =
+      apply_transformation(covariant, input);
+    const Tensor<2, spacedim> T =
+      apply_transformation(contravariant, A.transpose());
+
+    Tensor<2, spacedim, Number> output = transpose(T);
+    output *= 1.0 / volume_element;
     return output;
   }
 

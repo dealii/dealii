@@ -2303,18 +2303,11 @@ namespace internal
               Assert(rank == 2, ExcMessage("Only for rank 2"));
 
               for (unsigned int i = 0; i < output.size(); ++i)
-                {
-                  const DerivativeForm<1, dim, spacedim> covariant =
-                    data.output_data->inverse_jacobians[i].transpose();
-                  const DerivativeForm<1, spacedim, dim> A =
-                    apply_transformation(covariant, input[i]);
-                  const Tensor<2, spacedim> T =
-                    apply_transformation(data.output_data->jacobians[i],
-                                         A.transpose());
-
-                  output[i] = transpose(T);
-                  output[i] /= data.volume_elements[i];
-                }
+                output[i] = internal::apply_piola_gradient(
+                  data.output_data->inverse_jacobians[i].transpose(),
+                  data.output_data->jacobians[i],
+                  data.volume_elements[i],
+                  input[i]);
 
               return;
             }
