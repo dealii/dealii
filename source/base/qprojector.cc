@@ -225,12 +225,15 @@ namespace internal
         std::vector<Point<dim>>           &points,
         std::vector<double>               &weights)
       {
+        AssertDimension(points.size(), weights.size());
+        points.reserve(points.size() + quadrature.size());
+        weights.reserve(weights.size() + quadrature.size());
+
         const auto support_points =
           face_reference_cell.permute_by_combined_orientation(
             make_const_array_view(vertices),
             face_reference_cell.get_inverse_combined_orientation(
               combined_orientation));
-
         for (unsigned int j = 0; j < quadrature.size(); ++j)
           {
             Point<dim> mapped_point;
