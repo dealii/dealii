@@ -26,6 +26,12 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
 
 for (deal_II_dimension : DIMENSIONS)
   {
+    template Point<deal_II_dimension> ReferenceCell::subface_vertex_location(
+      const unsigned int,
+      const unsigned int,
+      const unsigned int,
+      const RefinementCase<deal_II_dimension - 1>) const;
+
     template Quadrature<deal_II_dimension>
     ReferenceCell::get_gauss_type_quadrature(const unsigned n_points_1D) const;
 
