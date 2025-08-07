@@ -408,8 +408,8 @@ inconvenience this causes.
 
  <li>
   New: The ordering strategy DoFRenumbering::lexicographic() has been added.
-  (Micha
-   Wichrowski, 2025/07/01)
+  <br>
+  (Michał Wichrowski, 2025/07/01)
  </li>
 
  <li>
@@ -554,16 +554,15 @@ inconvenience this causes.
   New: A new function FETools::cell_to_face_lexicographic() to generate a
   mapping from cell-local DoFs to lexicographic ordering of DoFs on two adjacent cells
   has been added.
-  (Micha
-   Wichrowski, 2025/05/03)
+  <br>
+  (Michał Wichrowski, 2025/05/03)
  </li>
 
  <li>
   Added: 1D matrices: mass, laplace, ghost penalty.
   FullMatrix::kronecker_product.
   <br>
-  (Micha
-   Wichrowski, 2025/05/01)
+  (Michał Wichrowski, 2025/05/01)
  </li>
 
  <li>
@@ -674,9 +673,10 @@ inconvenience this causes.
  </li>
 
  <li>
-  New: Matrix-Free now can build data structures for ghosted cells. The functionality can be accessed  by AdditionalData::store_ghost_cells.
-  (Micha
-   Wichrowski, 2025/01/30)
+  New: Matrix-Free now can build data structures for ghosted cells. The
+  functionality can be accessed  by AdditionalData::store_ghost_cells.
+  <br>
+  (Michał Wichrowski, 2025/01/30)
  </li>
 
  <li>
