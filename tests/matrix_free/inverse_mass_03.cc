@@ -17,7 +17,6 @@
 // Tests CellwiseInverseMassMatrix on vector DG elements, similar test as
 // inverse_mass_02 but using different coefficients on different components
 
-#include <deal.II/base/function.h>
 
 #include <deal.II/dofs/dof_handler.h>
 

@@ -16,7 +16,6 @@
 
 // Similar to matrix_vector_faces_36 but with FE_DGP.
 
-#include <deal.II/base/function.h>
 
 #include <deal.II/fe/fe_dgp.h>
 

@@ -19,7 +19,6 @@
 // different vector entries, plain DG index numbering) but when not using the
 // polynomial degree as template argument
 
-#include <deal.II/base/function.h>
 #include <deal.II/base/quadrature_lib.h>
 
 #include <deal.II/distributed/tria.h>

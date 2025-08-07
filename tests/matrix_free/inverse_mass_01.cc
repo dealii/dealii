@@ -17,7 +17,6 @@
 // Tests CellwiseInverseMassMatrix on DG elements by comparing its action on a
 // random vector to a CG solver
 
-#include <deal.II/base/function.h>
 
 #include <deal.II/dofs/dof_handler.h>
 

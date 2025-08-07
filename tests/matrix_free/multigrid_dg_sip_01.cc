@@ -17,7 +17,6 @@
 // test of a multigrid solver including face integration (DG case, symmetric
 // interior penalty + Nitsche).
 
-#include <deal.II/base/function.h>
 #include <deal.II/base/logstream.h>
 #include <deal.II/base/utilities.h>
 

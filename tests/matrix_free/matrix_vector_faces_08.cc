@@ -18,7 +18,6 @@
 // polynomial degree, i.e., we use the path "-1" of FEEvaluation that does
 // runtime expansion of loops
 
-#include <deal.II/base/function.h>
 #include <deal.II/base/quadrature_lib.h>
 
 #include <deal.II/fe/fe_dgq.h>

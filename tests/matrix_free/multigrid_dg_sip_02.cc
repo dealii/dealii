@@ -18,7 +18,6 @@
 // interior penalty + Nitsche). As opposed to multigrid_dg_sip_01, this test
 // computes the diagonal using the alternative reinit(cell_index, face_number)
 
-#include <deal.II/base/function.h>
 #include <deal.II/base/logstream.h>
 #include <deal.II/base/utilities.h>
 

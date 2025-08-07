@@ -20,7 +20,6 @@
 // using FE_DGQ rather than FE_DGQHermite, i.e., accessing all data of
 // neighboring cells
 
-#include <deal.II/base/function.h>
 #include <deal.II/base/quadrature_lib.h>
 
 #include <deal.II/distributed/tria.h>

@@ -20,8 +20,6 @@
 // (no symmetry in transformation). The test case includes hanging node
 // constraints, but no constraints from boundary conditions
 
-#include <deal.II/base/function.h>
-
 #include <deal.II/fe/fe_q_hierarchical.h>
 #include <deal.II/fe/mapping_q.h>
 

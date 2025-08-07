@@ -18,7 +18,6 @@
 // the same implementation with MeshWorker. This example uses a hyperball mesh
 // with both hanging nodes and curved boundaries
 
-#include <deal.II/base/function.h>
 
 #include <deal.II/fe/fe_dgq.h>
 

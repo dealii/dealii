@@ -17,7 +17,6 @@
 // Tests CellwiseInverseMassMatrix on vector DG elements, otherwise the same
 // as inverse_mass_01.cc
 
-#include <deal.II/base/function.h>
 
 #include <deal.II/dofs/dof_handler.h>
 
