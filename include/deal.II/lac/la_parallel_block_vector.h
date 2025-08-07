@@ -49,8 +49,14 @@ namespace TrilinosWrappers
 {
   namespace MPI
   {
+#    ifdef DEAL_II_TRILINOS_WITH_TPETRA
+    using BlockVector =
+      ::dealii::LinearAlgebra::TpetraWrappers::BlockVector<double,
+                                                           MemorySpace::Host>;
+#    else
     class BlockVector;
-  }
+#    endif
+  } // namespace MPI
 } // namespace TrilinosWrappers
 #  endif
 #endif

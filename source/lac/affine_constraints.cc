@@ -119,7 +119,7 @@ dealii::AffineConstraints<double>::distribute<
 #endif
 
 #ifdef DEAL_II_WITH_TRILINOS
-INSTANTIATE_DLTG_VECTOR(TrilinosWrappers::MPI::Vector);
+// INSTANTIATE_DLTG_VECTOR(TrilinosWrappers::MPI::Vector);
 
 INSTANTIATE_DLTG_VECTORMATRIX(TrilinosWrappers::SparseMatrix, Vector<double>);
 INSTANTIATE_DLTG_VECTORMATRIX(TrilinosWrappers::SparseMatrix,
