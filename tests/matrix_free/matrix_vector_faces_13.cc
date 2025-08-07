@@ -17,7 +17,6 @@
 // similar to matrix_vector_faces_11 but using a renumbering of degrees of
 // freedom for better vectorized access
 
-#include <deal.II/base/function.h>
 #include <deal.II/base/quadrature_lib.h>
 
 #include <deal.II/distributed/tria.h>

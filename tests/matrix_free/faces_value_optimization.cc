@@ -16,7 +16,6 @@
 
 // tests matrix-free face evaluation with the option to compress
 
-#include <deal.II/base/function.h>
 
 #include <deal.II/fe/fe_dgq.h>
 

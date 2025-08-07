@@ -18,8 +18,6 @@
 // boundary conditions by counting the number of faces in the different
 // categories
 
-#include <deal.II/base/function.h>
-
 #include <deal.II/distributed/tria.h>
 
 #include <deal.II/fe/fe_dgq.h>
@@ -27,9 +25,6 @@
 
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/grid_tools.h>
-
-#include <deal.II/lac/precondition.h>
-#include <deal.II/lac/solver_cg.h>
 
 #include <deal.II/matrix_free/matrix_free.h>
 

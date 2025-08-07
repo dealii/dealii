@@ -20,7 +20,6 @@
 // contributions from interior faces but the algorithm should have get them to
 // zero)
 
-#include <deal.II/base/function.h>
 
 #include <deal.II/fe/fe_q.h>
 

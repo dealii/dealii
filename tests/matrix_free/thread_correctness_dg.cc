@@ -17,7 +17,6 @@
 // this function tests the correctness of the thread parallelization of the
 // matrix-free class extensively
 
-#include <deal.II/base/function.h>
 
 #include <deal.II/fe/fe_dgq.h>
 

@@ -17,7 +17,6 @@
 // check the setup of ghost faces and elements in case the flag
 // MatrixFree::AdditionalData::hold_all_faces_to_owned_cells is set to true
 
-#include <deal.II/base/function.h>
 #include <deal.II/base/quadrature_lib.h>
 
 #include <deal.II/distributed/tria.h>

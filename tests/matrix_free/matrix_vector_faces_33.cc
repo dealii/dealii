@@ -18,7 +18,6 @@
 // faces are enabled. Otherwise the same test as matrix_vector_faces_05 (FE_Q,
 // Laplacian, weak imposition of Dirichlet boundary condition)
 
-#include <deal.II/base/function.h>
 
 #include <deal.II/fe/fe_q.h>
 

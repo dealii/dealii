@@ -16,7 +16,6 @@
 
 // same as matrix_vector_faces_15 except for a larger mesh
 
-#include <deal.II/base/function.h>
 #include <deal.II/base/quadrature_lib.h>
 
 #include <deal.II/distributed/tria.h>
