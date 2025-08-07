@@ -619,6 +619,14 @@ inconvenience this causes.
  </li>
 
  <li>
+  Improved: Portable::MatrixFree now uses a more beneficial indexing into
+  multi-dimensional arrays for the cell degrees of freedom and quadrature
+  data, leading to more coalesced access on GPUs.
+  <br>
+  (Martin Kronbichler, Urvij Saroliya, 2025/04/04)
+ </li>
+
+ <li>
   New: FE_SimplexPoly now implements FiniteElement::face_to_cell_index(),
   enabling periodicity for derived classes, with restrictions similar to the
   implementation in FE_Q_Base.
