@@ -136,7 +136,7 @@ INSTANTIATE_DLTG_BLOCK_VECTORMATRIX(TrilinosWrappers::BlockSparseMatrix,
                                     TrilinosWrappers::MPI::BlockVector);
 
 INSTANTIATE_DLTG_MATRIX(TrilinosWrappers::SparseMatrix);
-INSTANTIATE_DLTG_MATRIX(TrilinosWrappers::BlockSparseMatrix);
+// INSTANTIATE_DLTG_MATRIX(TrilinosWrappers::BlockSparseMatrix);
 
 #  ifndef DOXYGEN
 #    if defined(DEAL_II_TRILINOS_WITH_TPETRA) && \

@@ -27,6 +27,7 @@
 #  include <deal.II/lac/full_matrix.h>
 #  include <deal.II/lac/trilinos_parallel_block_vector.h>
 #  include <deal.II/lac/trilinos_sparse_matrix.h>
+#  include <deal.II/lac/trilinos_tpetra_block_sparse_matrix.h>
 
 #  include <cmath>
 
@@ -39,6 +40,13 @@ template <typename number>
 class BlockSparseMatrix;
 #  endif
 
+namespace TrilinosWrappers
+{
+  using BlockSparseMatrix = ::dealii::LinearAlgebra::TpetraWrappers::
+    BlockSparseMatrix<double, MemorySpace::Host>;
+}
+
+#  ifdef DEAL_II_TRILINOS_WITH_TPETRA
 namespace TrilinosWrappers
 {
   /**
@@ -612,7 +620,7 @@ namespace TrilinosWrappers
 
 
 } /* namespace TrilinosWrappers */
-
+#  endif
 
 DEAL_II_NAMESPACE_CLOSE
 

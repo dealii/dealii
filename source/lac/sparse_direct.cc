@@ -38,7 +38,9 @@ DEAL_II_NAMESPACE_OPEN
 
 namespace TrilinosWrappers
 {
-  class SparseMatrix;
+  using SparseMatrix =
+    ::dealii::LinearAlgebra::TpetraWrappers::SparseMatrix<double,
+                                                          MemorySpace::Host>;
   namespace MPI
   {
     class SparseMatrix;

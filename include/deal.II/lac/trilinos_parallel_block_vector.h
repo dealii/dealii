@@ -41,7 +41,8 @@ namespace TrilinosWrappers
   {
     class BlockVector;
   }
-  class BlockSparseMatrix;
+  using BlockSparseMatrix = ::dealii::LinearAlgebra::TpetraWrappers::
+    BlockSparseMatrix<double, MemorySpace::Host>;
 } // namespace TrilinosWrappers
 #  endif
 

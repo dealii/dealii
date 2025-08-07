@@ -65,8 +65,11 @@ class SparsityPattern;
 namespace TrilinosWrappers
 {
   // forward declarations
-  class SparseMatrix;
-  class BlockSparseMatrix;
+  using SparseMatrix =
+    ::dealii::LinearAlgebra::TpetraWrappers::SparseMatrix<double,
+                                                          MemorySpace::Host>;
+  using BlockSparseMatrix = ::dealii::LinearAlgebra::TpetraWrappers::
+    BlockSparseMatrix<double, MemorySpace::Host>;
   class SolverBase;
 
   /**
