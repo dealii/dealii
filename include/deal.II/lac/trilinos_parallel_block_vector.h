@@ -23,14 +23,24 @@
 #  include <deal.II/lac/block_indices.h>
 #  include <deal.II/lac/block_vector_base.h>
 #  include <deal.II/lac/exceptions.h>
+#  include <deal.II/lac/trilinos_tpetra_block_vector.h>
 #  include <deal.II/lac/trilinos_vector.h>
 
 #  include <functional>
 
 DEAL_II_NAMESPACE_OPEN
 
+#  ifdef DEAL_II_TRILINOS_WITH_TPETRA
+namespace TrilinosWrappers::MPI
+{
+  using BlockVector =
+    ::dealii::LinearAlgebra::TpetraWrappers::BlockVector<double,
+                                                         MemorySpace::Host>;
+}
+#  else
+
 // forward declaration
-#  ifndef DOXYGEN
+#    ifndef DOXYGEN
 template <typename Number>
 class BlockVectorBase;
 
@@ -39,12 +49,22 @@ namespace TrilinosWrappers
   // forward declaration
   namespace MPI
   {
+#      ifdef DEAL_II_TRILINOS_WITH_TPETRA
+    using BlockVector =
+      ::dealii::LinearAlgebra::TpetraWrappers::BlockVector<double,
+                                                           MemorySpace::Host>;
+#      else
     class BlockVector;
-  }
+#      endif
+  } // namespace MPI
+#      ifdef DEAL_II_TRILINOS_WITH_TPETRA
   using BlockSparseMatrix = ::dealii::LinearAlgebra::TpetraWrappers::
     BlockSparseMatrix<double, MemorySpace::Host>;
+#      else
+  class BlockSparseMatrix;
+#      endif
 } // namespace TrilinosWrappers
-#  endif
+#    endif
 
 /**
  * @addtogroup TrilinosWrappers
@@ -55,6 +75,7 @@ namespace TrilinosWrappers
 {
   namespace MPI
   {
+#    ifndef DEAL_II_TRILINOS_WITH_TPETRA
     /**
      * An implementation of block vectors based on the vector class
      * implemented in TrilinosWrappers. While the base class provides for most
@@ -451,7 +472,7 @@ namespace TrilinosWrappers
     {
       u.swap(v);
     }
-
+#    endif
   } /* namespace MPI */
 
 } /* namespace TrilinosWrappers */
@@ -507,6 +528,8 @@ namespace internal
 template <>
 struct is_serial_vector<TrilinosWrappers::MPI::BlockVector> : std::false_type
 {};
+
+#  endif
 
 DEAL_II_NAMESPACE_CLOSE
 

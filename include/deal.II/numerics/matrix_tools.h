@@ -90,8 +90,12 @@ namespace TrilinosWrappers
     BlockSparseMatrix<double, MemorySpace::Host>;
   namespace MPI
   {
-    class Vector;
-    class BlockVector;
+    using Vector =
+      ::dealii::LinearAlgebra::TpetraWrappers::Vector<double,
+                                                      MemorySpace::Host>;
+    using BlockVector =
+      ::dealii::LinearAlgebra::TpetraWrappers::BlockVector<double,
+                                                           MemorySpace::Host>;
   } // namespace MPI
 } // namespace TrilinosWrappers
 #  endif

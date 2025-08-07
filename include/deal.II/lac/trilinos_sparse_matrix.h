@@ -65,9 +65,12 @@ class DynamicSparsityPattern;
 
 namespace TrilinosWrappers
 {
+#      ifdef DEAL_II_TRILINOS_WITH_TPETRA
   using SparseMatrix =
     ::dealii::LinearAlgebra::TpetraWrappers::SparseMatrix<double,
                                                           MemorySpace::Host>;
+#      else
+  class SparseMatrix;
   class SparsityPattern;
 
   namespace SparseMatrixIterators
@@ -75,9 +78,11 @@ namespace TrilinosWrappers
     template <bool Constness>
     class Iterator;
   }
+#      endif
 } // namespace TrilinosWrappers
 #    endif
-#    ifdef DEAL_II_TRILINOS_WITH_TPETRA
+
+#    ifndef DEAL_II_TRILINOS_WITH_TPETRA
 namespace TrilinosWrappers
 {
   /**
@@ -1527,7 +1532,7 @@ DEAL_II_NAMESPACE_OPEN // Do not convert for module purposes
      * Obviously, the matrix needs to be quadratic for this operation.
      *
      * The implementation of this function is not as efficient as the one in
-     * the @p SparseMatrixclass used in deal.II (i.e. the original one, not
+     * the @p SparseMatrix class used in deal.II (i.e. the original one, not
      * the Trilinos wrapper class) since Trilinos doesn't support this
      * operation and needs a temporary vector.
      *
@@ -1545,7 +1550,7 @@ DEAL_II_NAMESPACE_OPEN // Do not convert for module purposes
      * Compute the matrix scalar product $\left(u,Mv\right)$.
      *
      * The implementation of this function is not as efficient as the one in
-     * the @p SparseMatrixclass used in deal.II (i.e. the original one, not
+     * the @p SparseMatrix class used in deal.II (i.e. the original one, not
      * the Trilinos wrapper class) since Trilinos doesn't support this
      * operation and needs a temporary vector.
      *
@@ -3299,12 +3304,15 @@ DEAL_II_NAMESPACE_OPEN // Do not convert for module purposes
                                          const size_type      *col_indices,
                                          const TrilinosScalar *values,
                                          const bool elide_zero_values);
+
 #      endif // DOXYGEN
 
 } /* namespace TrilinosWrappers */
 
 #    endif
+
 DEAL_II_NAMESPACE_CLOSE
+
 
 #  else
 
