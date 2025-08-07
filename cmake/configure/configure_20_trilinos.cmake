@@ -281,6 +281,7 @@ macro(feature_trilinos_find_external var)
             " or rebuild Trilinos with -DTpetra_INST_INT_INT=ON"
             )
         endif()
+        message(FATAL_ERROR "bla")
 
         reset_cmake_required()
       endif()

@@ -25,6 +25,7 @@
 
 #  include <deal.II/lac/exceptions.h>
 #  include <deal.II/lac/read_vector.h>
+#  include <deal.II/lac/trilinos_tpetra_sparse_matrix.h>
 #  include <deal.II/lac/vector.h>
 #  include <deal.II/lac/vector_operation.h>
 #  include <deal.II/lac/vector_type_traits.h>
@@ -63,9 +64,17 @@ namespace LinearAlgebra
  *
  * @ingroup TrilinosWrappers
  */
+namespace TpetraWrappers
+{
+  template <typename Number, typename MemorySpace>
+  class SparseMatrix;
+}
+
 namespace TrilinosWrappers
 {
-  class SparseMatrix;
+  using SparseMatrix =
+    ::dealii::LinearAlgebra::TpetraWrappers::SparseMatrix<double,
+                                                          MemorySpace::Host>;
 
   /**
    * This class defines type aliases that are used in vector classes

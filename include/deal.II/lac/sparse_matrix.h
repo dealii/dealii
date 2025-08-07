@@ -55,9 +55,17 @@ namespace Utilities
 #  endif
 
 #  ifdef DEAL_II_WITH_TRILINOS
+namespace LinearAlgebra::TpetraWrappers
+{
+  template <typename Number, typename MemorySpace>
+  class SparseMatrix;
+}
+
 namespace TrilinosWrappers
 {
-  class SparseMatrix;
+  using SparseMatrix =
+    ::dealii::LinearAlgebra::TpetraWrappers::SparseMatrix<double,
+                                                          MemorySpace::Host>;
 }
 #  endif
 #endif

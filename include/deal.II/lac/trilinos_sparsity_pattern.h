@@ -48,7 +48,9 @@ class DynamicSparsityPattern;
 namespace TrilinosWrappers
 {
   class SparsityPattern;
-  class SparseMatrix;
+  using SparseMatrix =
+    ::dealii::LinearAlgebra::TpetraWrappers::SparseMatrix<double,
+                                                          MemorySpace::Host>;
 
   namespace SparsityPatternIterators
   {
@@ -993,7 +995,8 @@ namespace TrilinosWrappers
      */
     std::unique_ptr<Epetra_CrsGraph> nonlocal_graph;
 
-    friend class TrilinosWrappers::SparseMatrix;
+    friend class ::dealii::LinearAlgebra::TpetraWrappers::
+      SparseMatrix<double, MemorySpace::Host>;
     friend class SparsityPatternIterators::Accessor;
     friend class SparsityPatternIterators::Iterator;
   };

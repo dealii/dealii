@@ -379,40 +379,42 @@ template <typename number>
 SparseMatrix<number> &
 SparseMatrix<number>::copy_from(const TrilinosWrappers::SparseMatrix &matrix)
 {
-  Assert(m() == matrix.m(), ExcDimensionMismatch(m(), matrix.m()));
-  Assert(n() == matrix.n(), ExcDimensionMismatch(n(), matrix.n()));
+  Assert(false, ExcNotImplemented());
+  /*
+    Assert(m() == matrix.m(), ExcDimensionMismatch(m(), matrix.m()));
+    Assert(n() == matrix.n(), ExcDimensionMismatch(n(), matrix.n()));
 
-  // first delete previous content
-  *this = 0;
+    // first delete previous content
+    *this = 0;
 
-  std::vector<TrilinosScalar> value_cache;
-  std::vector<size_type>      colnum_cache;
+    std::vector<TrilinosScalar> value_cache;
+    std::vector<size_type>      colnum_cache;
 
-  for (size_type row = 0; row < matrix.m(); ++row)
-    {
-      value_cache.resize(matrix.n());
-      colnum_cache.resize(matrix.n());
+    for (size_type row = 0; row < matrix.m(); ++row)
+      {
+        value_cache.resize(matrix.n());
+        colnum_cache.resize(matrix.n());
 
-      // copy column indices and values and at the same time enquire about the
-      // length of the row
-      int ncols;
-      int ierr = matrix.trilinos_matrix().ExtractGlobalRowCopy(
-        row,
-        matrix.row_length(row),
-        ncols,
-        value_cache.data(),
-        reinterpret_cast<TrilinosWrappers::types::int_type *>(
-          colnum_cache.data()));
-      Assert(ierr == 0, ExcTrilinosError(ierr));
+        // copy column indices and values and at the same time enquire about the
+        // length of the row
+        int ncols;
+        int ierr = matrix.trilinos_matrix().ExtractGlobalRowCopy(
+          row,
+          matrix.row_length(row),
+          ncols,
+          value_cache.data(),
+          reinterpret_cast<TrilinosWrappers::types::int_type *>(
+            colnum_cache.data()));
+        Assert(ierr == 0, ExcTrilinosError(ierr));
 
-      // resize arrays to the size actually used
-      value_cache.resize(ncols);
-      colnum_cache.resize(ncols);
+        // resize arrays to the size actually used
+        value_cache.resize(ncols);
+        colnum_cache.resize(ncols);
 
-      // then copy everything in one swoop
-      this->set(row, colnum_cache, value_cache);
-    }
-
+        // then copy everything in one swoop
+        this->set(row, colnum_cache, value_cache);
+      }
+  */
   return *this;
 }
 
