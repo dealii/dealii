@@ -902,7 +902,11 @@ namespace LinearAlgebra
       locally_owned_elements() const;
 
       /**
-       * Print the vector to the output stream @p out.
+       * Print the vector to the output stream @p out. @p precision denotes the
+       * desired precision with which values shall be printed, @p scientific
+       * whether scientific notation shall be used. If @p across is @p true
+       * then the vector is printed in a line, while if @p false then the
+       * elements are printed on a separate line each.
        */
       void
       print(std::ostream      &out,
