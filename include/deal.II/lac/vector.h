@@ -231,6 +231,7 @@ public:
 #endif
 
 #ifdef DEAL_II_WITH_TRILINOS
+#  ifndef DEAL_II_TRILINOS_WITH_TPETRA
   /**
    * Another copy constructor: copy the values from a Trilinos wrapper vector.
    * This copy constructor is only available if Trilinos was detected during
@@ -246,9 +247,8 @@ public:
    * that needs to be executed by all MPI processes that jointly share @p v.
    */
   explicit Vector(const TrilinosWrappers::MPI::Vector &v);
-#endif
 
-#ifdef DEAL_II_TRILINOS_WITH_TPETRA
+#  else
   /**
    * Another copy constructor: copy the values from a Trilinos wrapper vector.
    * This copy constructor is only available if Trilinos was detected during
@@ -266,6 +266,7 @@ public:
   template <typename OtherNumber, typename MemorySpace>
   explicit Vector(
     const LinearAlgebra::TpetraWrappers::Vector<OtherNumber, MemorySpace> &v);
+#  endif
 #endif
 
   /**

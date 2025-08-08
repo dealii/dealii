@@ -628,11 +628,11 @@ namespace LinearAlgebra
            const Number                       a,
            const Vector<Number, MemorySpace> &V);
 
-       void
-      sadd(const Number                       s,
-           const Vector<Number, MemorySpace> &V) {
-      sadd(s, 1., V);
-       }
+      void
+      sadd(const Number s, const Vector<Number, MemorySpace> &V)
+      {
+        sadd(s, 1., V);
+      }
 
 
       /**
@@ -645,6 +645,14 @@ namespace LinearAlgebra
       set(const size_type  n_elements,
           const size_type *indices,
           const Number    *values);
+
+      void
+      set(const std::vector<size_type> &indices,
+          const std::vector<Number>    &values)
+      {
+        AssertDimension(indices.size(), values.size());
+        set(indices.size(), indices.data(), values.data());
+      }
 
       /**
        * Scale each element of this vector by the corresponding element in the

@@ -831,7 +831,7 @@ namespace internal
       }
 
 #ifdef DEAL_II_WITH_TRILINOS
-#ifndef DEAL_II_TRILINOS_WITH_TPETRA
+#  ifndef DEAL_II_TRILINOS_WITH_TPETRA
       template <typename Number>
       void
       copy_locally_owned_data_from(
@@ -844,7 +844,7 @@ namespace internal
         for (const auto i : dst.locally_owned_elements())
           dst[i] = src[i];
       }
-#else
+#  else
       template <typename Number, typename MemorySpace>
       void
       copy_locally_owned_data_from(
@@ -857,7 +857,7 @@ namespace internal
         for (const auto i : dst.locally_owned_elements())
           dst[i] = src[i];
       }
-#endif
+#  endif
 #endif
 
       /**

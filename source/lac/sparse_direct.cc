@@ -47,8 +47,9 @@ namespace TrilinosWrappers
   namespace MPI
   {
 #ifdef DEAL_II_TRILINOS_WITH_TPETRA
- using Vector =
-    ::dealii::LinearAlgebra::TpetraWrappers::Vector<double, MemorySpace::Host>;
+    using Vector =
+      ::dealii::LinearAlgebra::TpetraWrappers::Vector<double,
+                                                      MemorySpace::Host>;
 #else
     class Vector;
 #endif
