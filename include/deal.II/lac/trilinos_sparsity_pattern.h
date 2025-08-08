@@ -26,6 +26,7 @@
 
 #  include <deal.II/lac/exceptions.h>
 #  include <deal.II/lac/sparsity_pattern_base.h>
+#  include <deal.II/lac/trilinos_tpetra_sparsity_pattern.h>
 
 DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
 #  include <Epetra_FECrsGraph.h>
@@ -40,14 +41,15 @@ DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
 
 DEAL_II_NAMESPACE_OPEN
 
-#ifdef DEAL_II_TRILINOS_WITH_TPETRA
+#  ifdef DEAL_II_TRILINOS_WITH_TPETRA
 namespace TrilinosWrappers
 {
-  using SparsityPattern = ::dealii::LinearAlgebra::TpetraWrappers::SparsityPattern<MemorySpace::Host>;
+  using SparsityPattern =
+    ::dealii::LinearAlgebra::TpetraWrappers::SparsityPattern<MemorySpace::Host>;
 }
-#else
+#  else
 // forward declarations
-#  ifndef DOXYGEN
+#    ifndef DOXYGEN
 class SparsityPattern;
 class DynamicSparsityPattern;
 
@@ -63,7 +65,7 @@ namespace TrilinosWrappers
     class Iterator;
   }
 } // namespace TrilinosWrappers
-#  endif
+#    endif
 
 namespace TrilinosWrappers
 {
@@ -1012,7 +1014,7 @@ namespace TrilinosWrappers
   // ----------------------- inline and template functions --------------------
 
 
-#  ifndef DOXYGEN
+#    ifndef DOXYGEN
 
   namespace SparsityPatternIterators
   {
@@ -1211,13 +1213,13 @@ namespace TrilinosWrappers
   SparsityPattern::in_local_range(const size_type index) const
   {
     TrilinosWrappers::types::int_type begin, end;
-#    ifndef DEAL_II_WITH_64BIT_INDICES
+#      ifndef DEAL_II_WITH_64BIT_INDICES
     begin = graph->RowMap().MinMyGID();
     end   = graph->RowMap().MaxMyGID() + 1;
-#    else
+#      else
     begin = graph->RowMap().MinMyGID64();
     end   = graph->RowMap().MaxMyGID64() + 1;
-#    endif
+#      endif
 
     return ((index >= static_cast<size_type>(begin)) &&
             (index < static_cast<size_type>(end)));
@@ -1330,10 +1332,10 @@ namespace TrilinosWrappers
     return IndexSet(graph->RangeMap());
   }
 
-#  endif // DOXYGEN
+#    endif // DOXYGEN
 } // namespace TrilinosWrappers
 
-#endif
+#  endif
 
 DEAL_II_NAMESPACE_CLOSE
 

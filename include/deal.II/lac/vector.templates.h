@@ -143,7 +143,7 @@ Vector<Number>::Vector(const PETScWrappers::VectorBase &v)
 
 #ifdef DEAL_II_WITH_TRILINOS
 
-#ifndef DEAL_II_TRILINOS_WITH_TPETRA
+#  ifndef DEAL_II_TRILINOS_WITH_TPETRA
 
 template <typename Number>
 Vector<Number>::Vector(const TrilinosWrappers::MPI::Vector &v)
@@ -179,7 +179,7 @@ Vector<Number>::Vector(const TrilinosWrappers::MPI::Vector &v)
     }
 }
 
-#else
+#  else
 
 template <typename Number>
 template <typename OtherNumber, typename MemorySpace>
@@ -213,15 +213,15 @@ Vector<Number>::Vector(
       localized_vector.doImport(v.trilinos_vector(), *importer, Tpetra::INSERT);
 
       // get a kokkos view from the localized_vector
-#  if DEAL_II_TRILINOS_VERSION_GTE(13, 2, 0)
+#    if DEAL_II_TRILINOS_VERSION_GTE(13, 2, 0)
       auto localized_vector_2d =
         localized_vector.template getLocalView<Kokkos::HostSpace>(
           Tpetra::Access::ReadOnly);
-#  else
+#    else
       localized_vector.template sync<Kokkos::HostSpace>();
       auto localized_vector_2d =
         localized_vector.template getLocalView<Kokkos::HostSpace>();
-#  endif
+#    endif
       auto localized_vector_1d =
         Kokkos::subview(localized_vector_2d, Kokkos::ALL(), 0);
       const size_t local_length = localized_vector.getLocalLength();
@@ -234,7 +234,7 @@ Vector<Number>::Vector(
     }
 }
 
-#endif
+#  endif
 #endif
 
 template <typename Number>
@@ -829,7 +829,7 @@ Vector<Number>::operator=(const PETScWrappers::VectorBase &v)
 
 
 #ifdef DEAL_II_WITH_TRILINOS
-#ifndef DEAL_II_TRILINOS_WITH_TPETRA
+#  ifndef DEAL_II_TRILINOS_WITH_TPETRA
 
 template <typename Number>
 Vector<Number> &
@@ -867,7 +867,7 @@ Vector<Number>::operator=(const TrilinosWrappers::MPI::Vector &v)
   return *this;
 }
 
-#else
+#  else
 
 template <typename Number>
 template <typename OtherNumber, typename MemorySpace>
@@ -904,15 +904,15 @@ Vector<Number>::operator=(
       localized_vector.doImport(v.trilinos_vector(), *importer, Tpetra::INSERT);
 
       // get a kokkos view from the localized_vector
-#  if DEAL_II_TRILINOS_VERSION_GTE(13, 2, 0)
+#    if DEAL_II_TRILINOS_VERSION_GTE(13, 2, 0)
       auto localized_vector_2d =
         localized_vector.template getLocalView<Kokkos::HostSpace>(
           Tpetra::Access::ReadOnly);
-#  else
+#    else
       localized_vector.template sync<Kokkos::HostSpace>();
       auto localized_vector_2d =
         localized_vector.template getLocalView<Kokkos::HostSpace>();
-#  endif
+#    endif
       auto localized_vector_1d =
         Kokkos::subview(localized_vector_2d, Kokkos::ALL(), 0);
       const size_t local_length = localized_vector.getLocalLength();
@@ -927,7 +927,7 @@ Vector<Number>::operator=(
   return *this;
 }
 
-#endif
+#  endif
 #endif
 
 
