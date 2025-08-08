@@ -213,6 +213,7 @@ namespace LinearAlgebraTrilinos
     using BlockCompressedSparsityPattern =
       TrilinosWrappers::BlockSparsityPattern;
 
+#  ifndef DEAL_II_TRILINOS_WITH_TPETRA
     /**
      * Typedef for the AMG preconditioner type.
      */
@@ -222,7 +223,7 @@ namespace LinearAlgebraTrilinos
      * Typedef for the Incomplete Cholesky preconditioner.
      */
     using PreconditionIC = TrilinosWrappers::PreconditionIC;
-
+#  endif
     /**
      * Typedef for the Incomplete LU decomposition preconditioner.
      */
