@@ -261,6 +261,8 @@ namespace LinearAlgebra
   ReadWriteVector<Number>::reinit(
     const TrilinosWrappers::MPI::Vector &trilinos_vec)
   {
+    Assert(false, ExcNotImplemented());
+/*
     // TODO: We could avoid copying the data by just using a view into the
     // trilinos data but only if Number=double. Also update documentation that
     // the argument's lifetime needs to be longer then. If we do this, we need
@@ -274,6 +276,7 @@ namespace LinearAlgebra
     AssertThrow(ierr == 0, ExcTrilinosError(ierr));
 
     std::copy(start_ptr, start_ptr + leading_dimension, values.data());
+*/
   }
 #endif
 

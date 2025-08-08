@@ -143,6 +143,8 @@ Vector<Number>::Vector(const PETScWrappers::VectorBase &v)
 
 #ifdef DEAL_II_WITH_TRILINOS
 
+#ifndef DEAL_II_TRILINOS_WITH_TPETRA
+
 template <typename Number>
 Vector<Number>::Vector(const TrilinosWrappers::MPI::Vector &v)
   : values(v.size())
@@ -177,10 +179,7 @@ Vector<Number>::Vector(const TrilinosWrappers::MPI::Vector &v)
     }
 }
 
-#endif
-
-
-#ifdef DEAL_II_TRILINOS_WITH_TPETRA
+#else
 
 template <typename Number>
 template <typename OtherNumber, typename MemorySpace>
@@ -236,7 +235,7 @@ Vector<Number>::Vector(
 }
 
 #endif
-
+#endif
 
 template <typename Number>
 inline Vector<Number> &
@@ -827,6 +826,7 @@ Vector<Number>::operator=(const PETScWrappers::VectorBase &v)
 
 
 #ifdef DEAL_II_WITH_TRILINOS
+#ifndef DEAL_II_TRILINOS_WITH_TPETRA
 
 template <typename Number>
 Vector<Number> &
@@ -864,11 +864,7 @@ Vector<Number>::operator=(const TrilinosWrappers::MPI::Vector &v)
   return *this;
 }
 
-#endif
-
-
-
-#ifdef DEAL_II_TRILINOS_WITH_TPETRA
+#else
 
 template <typename Number>
 template <typename OtherNumber, typename MemorySpace>
@@ -929,7 +925,7 @@ Vector<Number>::operator=(
 }
 
 #endif
-
+#endif
 
 
 template <typename Number>

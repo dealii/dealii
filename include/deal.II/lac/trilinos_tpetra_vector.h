@@ -628,6 +628,13 @@ namespace LinearAlgebra
            const Number                       a,
            const Vector<Number, MemorySpace> &V);
 
+       void
+      sadd(const Number                       s,
+           const Vector<Number, MemorySpace> &V) {
+      sadd(s, 1., V);
+       }
+
+
       /**
        * A collective set operation: instead of setting individual elements of a
        * vector, this function allows to set a whole set of elements at once.

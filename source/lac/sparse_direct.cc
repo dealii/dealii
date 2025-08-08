@@ -38,13 +38,20 @@ DEAL_II_NAMESPACE_OPEN
 
 namespace TrilinosWrappers
 {
+#ifdef DEAL_II_TRILINOS_WITH_TPETRA
   using SparseMatrix =
     ::dealii::LinearAlgebra::TpetraWrappers::SparseMatrix<double,
                                                           MemorySpace::Host>;
+#else
+#endif
   namespace MPI
   {
-    class SparseMatrix;
+#ifdef DEAL_II_TRILINOS_WITH_TPETRA
+ using Vector =
+    ::dealii::LinearAlgebra::TpetraWrappers::Vector<double, MemorySpace::Host>;
+#else
     class Vector;
+#endif
   } // namespace MPI
 } // namespace TrilinosWrappers
 namespace PETScWrappers

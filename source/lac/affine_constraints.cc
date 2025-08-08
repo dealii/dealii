@@ -124,16 +124,16 @@ dealii::AffineConstraints<double>::distribute<
 INSTANTIATE_DLTG_VECTORMATRIX(TrilinosWrappers::SparseMatrix, Vector<double>);
 INSTANTIATE_DLTG_VECTORMATRIX(TrilinosWrappers::SparseMatrix,
                               LinearAlgebra::distributed::Vector<double>);
-INSTANTIATE_DLTG_VECTORMATRIX(TrilinosWrappers::SparseMatrix,
-                              TrilinosWrappers::MPI::Vector);
+//INSTANTIATE_DLTG_VECTORMATRIX(TrilinosWrappers::SparseMatrix,
+//                              TrilinosWrappers::MPI::Vector);
 
 INSTANTIATE_DLTG_BLOCK_VECTORMATRIX(TrilinosWrappers::BlockSparseMatrix,
                                     Vector<double>);
 INSTANTIATE_DLTG_BLOCK_VECTORMATRIX(
   TrilinosWrappers::BlockSparseMatrix,
   LinearAlgebra::distributed::BlockVector<double>);
-INSTANTIATE_DLTG_BLOCK_VECTORMATRIX(TrilinosWrappers::BlockSparseMatrix,
-                                    TrilinosWrappers::MPI::BlockVector);
+//INSTANTIATE_DLTG_BLOCK_VECTORMATRIX(TrilinosWrappers::BlockSparseMatrix,
+//                                    TrilinosWrappers::MPI::BlockVector);
 
 INSTANTIATE_DLTG_MATRIX(TrilinosWrappers::SparseMatrix);
 // INSTANTIATE_DLTG_MATRIX(TrilinosWrappers::BlockSparseMatrix);

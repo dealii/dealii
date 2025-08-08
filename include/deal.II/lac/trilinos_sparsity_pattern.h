@@ -40,6 +40,12 @@ DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
 
 DEAL_II_NAMESPACE_OPEN
 
+#ifdef DEAL_II_TRILINOS_WITH_TPETRA
+namespace TrilinosWrappers
+{
+  using SparsityPattern = ::dealii::LinearAlgebra::TpetraWrappers::SparsityPattern<MemorySpace::Host>;
+}
+#else
 // forward declarations
 #  ifndef DOXYGEN
 class SparsityPattern;
@@ -1327,6 +1333,7 @@ namespace TrilinosWrappers
 #  endif // DOXYGEN
 } // namespace TrilinosWrappers
 
+#endif
 
 DEAL_II_NAMESPACE_CLOSE
 

@@ -336,6 +336,7 @@ namespace LinearAlgebra
 #endif
 
 #ifdef DEAL_II_WITH_TRILINOS
+#  ifndef DEAL_II_TRILINOS_WITH_TPETRA
     /**
      * Imports all the elements present in the vector's IndexSet from the input
      * vector @p trilinos_vec. VectorOperation::values @p operation is used to
@@ -353,7 +354,7 @@ namespace LinearAlgebra
       const std::shared_ptr<const Utilities::MPI::CommunicationPatternBase>
         &communication_pattern = {});
 
-#  ifdef DEAL_II_TRILINOS_WITH_TPETRA
+#  else
     /**
      * Imports all the elements present in the vector's IndexSet from the input
      * vector @p tpetra_vec. VectorOperation::values @p operation is used to
