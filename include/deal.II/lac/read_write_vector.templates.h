@@ -261,24 +261,23 @@ namespace LinearAlgebra
   ReadWriteVector<Number>::reinit(
     const TrilinosWrappers::MPI::Vector &trilinos_vec)
   {
+#  ifdef DEAL_II_TRILINOS_WITH_TPETRA
     Assert(false, ExcNotImplemented());
-    /*
-        // TODO: We could avoid copying the data by just using a view into the
-        // trilinos data but only if Number=double. Also update documentation
-       that
-        // the argument's lifetime needs to be longer then. If we do this, we
-       need
-        // to think about whether the view should be read/write.
-        reinit(IndexSet(trilinos_vec.trilinos_partitioner()), true);
+#  else
+    // TODO: We could avoid copying the data by just using a view into the
+    // trilinos data but only if Number=double. Also update documentation that
+    // the argument's lifetime needs to be longer then. If we do this, we need
+    // to think about whether the view should be read/write.
+    reinit(IndexSet(trilinos_vec.trilinos_partitioner()), true);
 
-        TrilinosScalar *start_ptr;
-        int             leading_dimension;
-        int ierr = trilinos_vec.trilinos_vector().ExtractView(&start_ptr,
-                                                              &leading_dimension);
-        AssertThrow(ierr == 0, ExcTrilinosError(ierr));
+    TrilinosScalar *start_ptr;
+    int             leading_dimension;
+    int ierr = trilinos_vec.trilinos_vector().ExtractView(&start_ptr,
+                                                          &leading_dimension);
+    AssertThrow(ierr == 0, ExcTrilinosError(ierr));
 
-        std::copy(start_ptr, start_ptr + leading_dimension, values.data());
-    */
+    std::copy(start_ptr, start_ptr + leading_dimension, values.data());
+#  endif
   }
 #endif
 

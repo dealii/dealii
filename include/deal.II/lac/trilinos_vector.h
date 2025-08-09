@@ -74,17 +74,9 @@ namespace LinearAlgebra
  *
  * @ingroup TrilinosWrappers
  */
-namespace TpetraWrappers
-{
-  template <typename Number, typename MemorySpace>
-  class SparseMatrix;
-}
-
 namespace TrilinosWrappers
 {
-  using SparseMatrix =
-    ::dealii::LinearAlgebra::TpetraWrappers::SparseMatrix<double,
-                                                          MemorySpace::Host>;
+  class SparseMatrix;
 
   /**
    * This class defines type aliases that are used in vector classes
