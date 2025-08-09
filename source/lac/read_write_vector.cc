@@ -25,21 +25,23 @@ namespace LinearAlgebra
   // two template arguments that need to be different (the case of same
   // arguments is covered by the default copy constructor and copy operator that
   // is declared separately)
+#ifndef DOXYGEN
 
-#define TEMPL_COPY_CONSTRUCTOR(S1, S2)                         \
-  template ReadWriteVector<S1> &ReadWriteVector<S1>::operator= \
-    <S2>(const ReadWriteVector<S2> &)
+#  define TEMPL_COPY_CONSTRUCTOR(S1, S2)                         \
+    template ReadWriteVector<S1> &ReadWriteVector<S1>::operator= \
+      <S2>(const ReadWriteVector<S2> &)
 
   TEMPL_COPY_CONSTRUCTOR(double, float);
   TEMPL_COPY_CONSTRUCTOR(float, double);
-#ifdef DEAL_II_WITH_COMPLEX_VALUES
+#  ifdef DEAL_II_WITH_COMPLEX_VALUES
   TEMPL_COPY_CONSTRUCTOR(std::complex<double>, std::complex<float>);
   TEMPL_COPY_CONSTRUCTOR(std::complex<float>, std::complex<double>);
-#endif
+#  endif
 
-#undef TEMPL_COPY_CONSTRUCTOR
+#  undef TEMPL_COPY_CONSTRUCTOR
 
-#ifndef DOXYGEN
+
+
   template void
   ReadWriteVector<float>::import_elements(
     const distributed::Vector<float, ::dealii::MemorySpace::Host> &,
