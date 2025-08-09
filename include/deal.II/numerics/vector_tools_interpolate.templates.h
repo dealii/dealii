@@ -1134,6 +1134,7 @@ namespace VectorTools
     }
 
 #ifdef DEAL_II_WITH_TRILINOS
+#  ifndef DEAL_II_TRILINOS_WITH_TPETRA
     template <typename Number>
     void
     copy_locally_owned_data_from(
@@ -1146,9 +1147,7 @@ namespace VectorTools
       for (const auto i : dst.locally_owned_elements())
         dst[i] = src[i];
     }
-#endif
-
-#ifdef DEAL_II_TRILINOS_WITH_TPETRA
+#  else
     template <typename Number, typename MemorySpace>
     void
     copy_locally_owned_data_from(
@@ -1161,6 +1160,7 @@ namespace VectorTools
       for (const auto i : dst.locally_owned_elements())
         dst[i] = src[i];
     }
+#  endif
 #endif
   } // namespace InterpolateBetweenMeshes
 
