@@ -58,9 +58,7 @@ namespace TrilinosWrappers
 {
   // forward declarations
 #  ifndef DOXYGEN
-  using SparseMatrix =
-    ::dealii::LinearAlgebra::TpetraWrappers::SparseMatrix<double,
-                                                          MemorySpace::Host>;
+  class SparseMatrix;
   class PreconditionBase;
 #  endif
 

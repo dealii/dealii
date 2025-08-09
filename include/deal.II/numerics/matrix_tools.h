@@ -83,6 +83,7 @@ namespace PETScWrappers
 #  ifdef DEAL_II_WITH_TRILINOS
 namespace TrilinosWrappers
 {
+#    ifdef DEAL_II_TRILINOS_WITH_TPETRA
   using SparseMatrix =
     ::dealii::LinearAlgebra::TpetraWrappers::SparseMatrix<double,
                                                           MemorySpace::Host>;
@@ -97,6 +98,15 @@ namespace TrilinosWrappers
       ::dealii::LinearAlgebra::TpetraWrappers::BlockVector<double,
                                                            MemorySpace::Host>;
   } // namespace MPI
+#    else
+  class SparseMatrix;
+  class BlockSparseMatrix;
+  namespace MPI
+  {
+    class Vector;
+    class BlockVector;
+  } // namespace MPI
+#    endif
 } // namespace TrilinosWrappers
 #  endif
 #endif

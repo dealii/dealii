@@ -96,15 +96,19 @@ Vector<float>::operator=<float>(
   const LinearAlgebra::TpetraWrappers::Vector<float, MemorySpace::Default> &);
 #  endif
 
-template Vector<double>& Vector<double>::operator=<double>(dealii::LinearAlgebra::TpetraWrappers::Vector<double, dealii::MemorySpace::Host> const&);
+template Vector<double> &
+Vector<double>::operator=<double>(
+  const dealii::LinearAlgebra::TpetraWrappers::Vector<double,
+                                                      dealii::MemorySpace::Host>
+    &);
 #  ifdef HAVE_TPETRA_INST_DOUBLE
 template Vector<double>::Vector(
   const LinearAlgebra::TpetraWrappers::Vector<double, MemorySpace::Host> &);
 template Vector<double>::Vector(
   const LinearAlgebra::TpetraWrappers::Vector<double, MemorySpace::Default> &);
-//template Vector<double> &
-//Vector<double>::operator=<double>(
-//  const LinearAlgebra::TpetraWrappers::Vector<double, MemorySpace::Host> &);
+// template Vector<double> &
+// Vector<double>::operator=<double>(
+//   const LinearAlgebra::TpetraWrappers::Vector<double, MemorySpace::Host> &);
 template Vector<double> &
 Vector<double>::operator=<double>(
   const LinearAlgebra::TpetraWrappers::Vector<double, MemorySpace::Default> &);

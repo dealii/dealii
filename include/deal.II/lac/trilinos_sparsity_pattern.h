@@ -26,7 +26,9 @@
 
 #  include <deal.II/lac/exceptions.h>
 #  include <deal.II/lac/sparsity_pattern_base.h>
-#  include <deal.II/lac/trilinos_tpetra_sparsity_pattern.h>
+#  ifdef DEAL_II_TRILINOS_WITH_TPETRA
+#    include <deal.II/lac/trilinos_tpetra_sparsity_pattern.h>
+#  endif
 
 DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
 #  include <Epetra_FECrsGraph.h>
@@ -56,9 +58,7 @@ class DynamicSparsityPattern;
 namespace TrilinosWrappers
 {
   class SparsityPattern;
-  using SparseMatrix =
-    ::dealii::LinearAlgebra::TpetraWrappers::SparseMatrix<double,
-                                                          MemorySpace::Host>;
+  class SparseMatrix;
 
   namespace SparsityPatternIterators
   {
@@ -1003,8 +1003,7 @@ namespace TrilinosWrappers
      */
     std::unique_ptr<Epetra_CrsGraph> nonlocal_graph;
 
-    friend class ::dealii::LinearAlgebra::TpetraWrappers::
-      SparseMatrix<double, MemorySpace::Host>;
+    friend class TrilinosWrappers::SparseMatrix;
     friend class SparsityPatternIterators::Accessor;
     friend class SparsityPatternIterators::Iterator;
   };
