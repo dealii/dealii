@@ -1035,6 +1035,11 @@ namespace LinearAlgebra
       dealii::IndexSet source_stored_elements;
 
       /**
+       * IndexSet of the nonlocal_entries that are relevant for this vector.
+       */
+      dealii::IndexSet nonlocal_entries;
+
+      /**
        * CommunicationPattern for the communication between the
        * source_stored_elements IndexSet and the current vector.
        */
