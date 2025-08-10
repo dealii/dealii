@@ -67,6 +67,13 @@ namespace LinearAlgebra
       Vector<double, MemorySpace::Host>       &dst,
       const Vector<double, MemorySpace::Host> &src) const;
 
+template void dealii::LinearAlgebra::TpetraWrappers::SparseMatrix<double, dealii::MemorySpace::Host>::vmult<dealii::LinearAlgebra::TpetraWrappers::Vector<float, dealii::MemorySpace::Host>>(dealii::LinearAlgebra::TpetraWrappers::Vector<float, dealii::MemorySpace::Host>&, dealii::LinearAlgebra::TpetraWrappers::Vector<float, dealii::MemorySpace::Host> const&) const;
+
+template void dealii::LinearAlgebra::TpetraWrappers::SparseMatrix<double, dealii::MemorySpace::Host>::vmult<dealii::LinearAlgebra::TpetraWrappers::Vector<float, dealii::MemorySpace::Default>>(dealii::LinearAlgebra::TpetraWrappers::Vector<float, dealii::MemorySpace::Default>&, dealii::LinearAlgebra::TpetraWrappers::Vector<float, dealii::MemorySpace::Default> const&) const;
+
+template void dealii::LinearAlgebra::TpetraWrappers::SparseMatrix<double, dealii::MemorySpace::Host>::Tvmult_add<dealii::LinearAlgebra::TpetraWrappers::Vector<float, dealii::MemorySpace::Host>>(dealii::LinearAlgebra::TpetraWrappers::Vector<float, dealii::MemorySpace::Host>&, dealii::LinearAlgebra::TpetraWrappers::Vector<float, dealii::MemorySpace::Host> const&) const;
+
+template void dealii::LinearAlgebra::TpetraWrappers::SparseMatrix<double, dealii::MemorySpace::Host>::Tvmult_add<dealii::LinearAlgebra::TpetraWrappers::Vector<float, dealii::MemorySpace::Default>>(dealii::LinearAlgebra::TpetraWrappers::Vector<float, dealii::MemorySpace::Default>&, dealii::LinearAlgebra::TpetraWrappers::Vector<float, dealii::MemorySpace::Default> const&) const;
 
     template void
     dealii::LinearAlgebra::TpetraWrappers::
