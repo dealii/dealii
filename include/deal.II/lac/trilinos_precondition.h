@@ -25,7 +25,7 @@
 DEAL_II_NAMESPACE_OPEN
 namespace TrilinosWrappers
 {
-  using PreconditonBase = ::dealii::LinearAlgebra::TpetraWrappers::
+  using PreconditionBase = ::dealii::LinearAlgebra::TpetraWrappers::
     PreconditionBase<double, MemorySpace::Host>;
   using PreconditionIdentity = ::dealii::LinearAlgebra::TpetraWrappers::
     PreconditionIdentity<double, MemorySpace::Host>;
