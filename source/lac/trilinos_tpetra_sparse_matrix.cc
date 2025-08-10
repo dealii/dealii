@@ -67,6 +67,101 @@ namespace LinearAlgebra
       Vector<double, MemorySpace::Host>       &dst,
       const Vector<double, MemorySpace::Host> &src) const;
 
+
+    template void
+    dealii::LinearAlgebra::TpetraWrappers::
+      SparseMatrix<double, dealii::MemorySpace::Host>::Tvmult_add<
+        dealii::LinearAlgebra::distributed::Vector<double,
+                                                   dealii::MemorySpace::Host>>(
+        dealii::LinearAlgebra::distributed::Vector<double,
+                                                   dealii::MemorySpace::Host> &,
+        const dealii::LinearAlgebra::distributed::
+          Vector<double, dealii::MemorySpace::Host> &) const;
+
+    template void
+    dealii::LinearAlgebra::TpetraWrappers::
+      SparseMatrix<double, dealii::MemorySpace::Host>::Tvmult_add<
+        dealii::LinearAlgebra::distributed::Vector<float,
+                                                   dealii::MemorySpace::Host>>(
+        dealii::LinearAlgebra::distributed::Vector<float,
+                                                   dealii::MemorySpace::Host> &,
+        const dealii::LinearAlgebra::distributed::
+          Vector<float, dealii::MemorySpace::Host> &) const;
+
+    template void
+    dealii::LinearAlgebra::TpetraWrappers::
+      SparseMatrix<double, dealii::MemorySpace::Host>::Tvmult_add<
+        dealii::LinearAlgebra::EpetraWrappers::Vector>(
+        dealii::LinearAlgebra::EpetraWrappers::Vector &,
+        const dealii::LinearAlgebra::EpetraWrappers::Vector &) const;
+
+    template void
+    dealii::LinearAlgebra::TpetraWrappers::
+      SparseMatrix<double, dealii::MemorySpace::Host>::Tvmult_add<
+        dealii::LinearAlgebra::TpetraWrappers::
+          Vector<double, dealii::MemorySpace::Default>>(
+        dealii::LinearAlgebra::TpetraWrappers::
+          Vector<double, dealii::MemorySpace::Default> &,
+        const dealii::LinearAlgebra::TpetraWrappers::
+          Vector<double, dealii::MemorySpace::Default> &) const;
+
+    template void
+    dealii::LinearAlgebra::TpetraWrappers::
+      SparseMatrix<double, dealii::MemorySpace::Host>::vmult<
+        dealii::LinearAlgebra::distributed::Vector<double,
+                                                   dealii::MemorySpace::Host>>(
+        dealii::LinearAlgebra::distributed::Vector<double,
+                                                   dealii::MemorySpace::Host> &,
+        const dealii::LinearAlgebra::distributed::
+          Vector<double, dealii::MemorySpace::Host> &) const;
+
+    template void
+    dealii::LinearAlgebra::TpetraWrappers::
+      SparseMatrix<double, dealii::MemorySpace::Host>::vmult<
+        dealii::LinearAlgebra::distributed::Vector<float,
+                                                   dealii::MemorySpace::Host>>(
+        dealii::LinearAlgebra::distributed::Vector<float,
+                                                   dealii::MemorySpace::Host> &,
+        const dealii::LinearAlgebra::distributed::
+          Vector<float, dealii::MemorySpace::Host> &) const;
+
+    template void
+    dealii::LinearAlgebra::TpetraWrappers::
+      SparseMatrix<double, dealii::MemorySpace::Host>::vmult<
+        dealii::LinearAlgebra::EpetraWrappers::Vector>(
+        dealii::LinearAlgebra::EpetraWrappers::Vector &,
+        const dealii::LinearAlgebra::EpetraWrappers::Vector &) const;
+
+    template void
+    dealii::LinearAlgebra::TpetraWrappers::
+      SparseMatrix<double, dealii::MemorySpace::Host>::vmult<
+        dealii::LinearAlgebra::TpetraWrappers::
+          BlockVector<double, dealii::MemorySpace::Host>>(
+        dealii::LinearAlgebra::TpetraWrappers::
+          BlockVector<double, dealii::MemorySpace::Host> &,
+        const dealii::LinearAlgebra::TpetraWrappers::
+          BlockVector<double, dealii::MemorySpace::Host> &) const;
+
+    template void
+    dealii::LinearAlgebra::TpetraWrappers::
+      SparseMatrix<double, dealii::MemorySpace::Host>::vmult<
+        dealii::LinearAlgebra::TpetraWrappers::
+          Vector<double, dealii::MemorySpace::Default>>(
+        dealii::LinearAlgebra::TpetraWrappers::
+          Vector<double, dealii::MemorySpace::Default> &,
+        const dealii::LinearAlgebra::TpetraWrappers::
+          Vector<double, dealii::MemorySpace::Default> &) const;
+
+    template void
+    dealii::LinearAlgebra::TpetraWrappers::
+      SparseMatrix<double, dealii::MemorySpace::Host>::Tvmult<
+        dealii::LinearAlgebra::TpetraWrappers::
+          BlockVector<double, dealii::MemorySpace::Host>>(
+        dealii::LinearAlgebra::TpetraWrappers::
+          BlockVector<double, dealii::MemorySpace::Host> &,
+        const dealii::LinearAlgebra::TpetraWrappers::
+          BlockVector<double, dealii::MemorySpace::Host> &) const;
+
     template void
     SparseMatrix<double, MemorySpace::Host>::vmult(
       ::dealii::Vector<double>       &dst,
