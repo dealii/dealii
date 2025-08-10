@@ -463,7 +463,7 @@ public:
 
 
 #ifdef DEAL_II_WITH_TRILINOS
-#ifndef DEAL_II_TRILINOS_WITH_TPETRA
+#  ifndef DEAL_II_TRILINOS_WITH_TPETRA
   /**
    * Another copy operator: copy the values from a (sequential or parallel,
    * depending on the underlying compiler) Trilinos wrapper vector class. This
@@ -481,7 +481,7 @@ public:
    */
   Vector<Number> &
   operator=(const TrilinosWrappers::MPI::Vector &v);
-#else
+#  else
   /**
    * Another copy operator: copy the values from a (sequential or parallel,
    * depending on the underlying compiler) Trilinos wrapper vector class. This
@@ -501,7 +501,7 @@ public:
   Vector<Number> &
   operator=(
     const LinearAlgebra::TpetraWrappers::Vector<OtherNumber, MemorySpace> &v);
-#endif
+#  endif
 #endif
 
   /**

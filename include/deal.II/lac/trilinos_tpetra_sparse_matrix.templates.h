@@ -40,53 +40,57 @@ namespace LinearAlgebra
       template <typename Number, typename OtherNumber, typename MemorySpace>
       void
       apply(const SparseMatrix<Number, MemorySpace> &M,
-            const Vector<OtherNumber, MemorySpace>       &src,
-            Vector<OtherNumber, MemorySpace>             &dst,
+            const Vector<OtherNumber, MemorySpace>  &src,
+            Vector<OtherNumber, MemorySpace>        &dst,
             Teuchos::ETransp                         mode = Teuchos::NO_TRANS,
             Number alpha = Teuchos::ScalarTraits<Number>::one(),
             Number beta  = Teuchos::ScalarTraits<Number>::zero())
       {
-if constexpr(!std::is_same_v<OtherNumber, Number>){
-        DEAL_II_NOT_IMPLEMENTED();
-}
-else{
-        Assert(
-          &src != &dst,
-          (typename SparseMatrix<double,
-                                 MemorySpace>::ExcSourceEqualsDestination()));
-        Assert(M.trilinos_matrix().isFillComplete(),
-               (typename SparseMatrix<double,
-                                      MemorySpace>::ExcMatrixNotCompressed()));
-
-        if (mode == Teuchos::NO_TRANS)
+        if constexpr (!std::is_same_v<OtherNumber, Number>)
           {
-            Assert(src.trilinos_vector().getMap()->isSameAs(
-                     *M.trilinos_matrix().getDomainMap()),
-                   (typename SparseMatrix<double,
-                                          MemorySpace>::ExcColMapMismatch()));
-            Assert(
-              dst.trilinos_vector().getMap()->isSameAs(
-                *M.trilinos_matrix().getRangeMap()),
-              (typename SparseMatrix<double,
-                                     MemorySpace>::ExcDomainMapMismatch()));
+            DEAL_II_NOT_IMPLEMENTED();
           }
         else
           {
-            Assert(dst.trilinos_vector().getMap()->isSameAs(
-                     *M.trilinos_matrix().getDomainMap()),
-                   (typename SparseMatrix<double,
-                                          MemorySpace>::ExcColMapMismatch()));
+            Assert(&src != &dst,
+                   (typename SparseMatrix<double, MemorySpace>::
+                      ExcSourceEqualsDestination()));
             Assert(
-              src.trilinos_vector().getMap()->isSameAs(
-                *M.trilinos_matrix().getRangeMap()),
+              M.trilinos_matrix().isFillComplete(),
               (typename SparseMatrix<double,
-                                     MemorySpace>::ExcDomainMapMismatch()));
-          }
+                                     MemorySpace>::ExcMatrixNotCompressed()));
 
-        M.trilinos_matrix().apply(
-          src.trilinos_vector(), dst.trilinos_vector(), mode, alpha, beta);
+            if (mode == Teuchos::NO_TRANS)
+              {
+                Assert(
+                  src.trilinos_vector().getMap()->isSameAs(
+                    *M.trilinos_matrix().getDomainMap()),
+                  (typename SparseMatrix<double,
+                                         MemorySpace>::ExcColMapMismatch()));
+                Assert(
+                  dst.trilinos_vector().getMap()->isSameAs(
+                    *M.trilinos_matrix().getRangeMap()),
+                  (typename SparseMatrix<double,
+                                         MemorySpace>::ExcDomainMapMismatch()));
+              }
+            else
+              {
+                Assert(
+                  dst.trilinos_vector().getMap()->isSameAs(
+                    *M.trilinos_matrix().getDomainMap()),
+                  (typename SparseMatrix<double,
+                                         MemorySpace>::ExcColMapMismatch()));
+                Assert(
+                  src.trilinos_vector().getMap()->isSameAs(
+                    *M.trilinos_matrix().getRangeMap()),
+                  (typename SparseMatrix<double,
+                                         MemorySpace>::ExcDomainMapMismatch()));
+              }
+
+            M.trilinos_matrix().apply(
+              src.trilinos_vector(), dst.trilinos_vector(), mode, alpha, beta);
+          }
       }
-}
 
 
       template <typename Number, typename MemorySpace>
@@ -140,7 +144,7 @@ else{
           M.trilinos_matrix().getDomainMap(), kokkos_dual_view_src);
 
         M.trilinos_matrix().apply(tpetra_src, tpetra_dst, mode, alpha, beta);
-     }
+      }
 
 
 
@@ -150,8 +154,8 @@ else{
             const VectorType &,
             VectorType &,
             Teuchos::ETransp /* mode */ = Teuchos::NO_TRANS,
-            Number /* alpha */ = Teuchos::ScalarTraits<Number>::one(),
-            Number /* beta */  = Teuchos::ScalarTraits<Number>::zero())     
+            Number /* alpha */          = Teuchos::ScalarTraits<Number>::one(),
+            Number /* beta */           = Teuchos::ScalarTraits<Number>::zero())
       {
         DEAL_II_NOT_IMPLEMENTED();
       }

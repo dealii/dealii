@@ -262,7 +262,7 @@ namespace LinearAlgebra
     const TrilinosWrappers::MPI::Vector &trilinos_vec)
   {
 #  ifdef DEAL_II_TRILINOS_WITH_TPETRA
-    (void) trilinos_vec;
+    (void)trilinos_vec;
     Assert(false, ExcNotImplemented());
 #  else
     // TODO: We could avoid copying the data by just using a view into the
