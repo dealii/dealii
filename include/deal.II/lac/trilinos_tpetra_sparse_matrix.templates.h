@@ -37,11 +37,11 @@ namespace LinearAlgebra
   {
     namespace internal
     {
-      template <typename Number, typename MemorySpace>
+      template <typename Number, typename OtherNumber, typename MemorySpace>
       void
       apply(const SparseMatrix<Number, MemorySpace> &M,
-            const Vector<Number, MemorySpace>       &src,
-            Vector<Number, MemorySpace>             &dst,
+            const Vector<OtherNumber, MemorySpace>       &src,
+            Vector<OtherNumber, MemorySpace>             &dst,
             Teuchos::ETransp                         mode = Teuchos::NO_TRANS,
             Number alpha = Teuchos::ScalarTraits<Number>::one(),
             Number beta  = Teuchos::ScalarTraits<Number>::zero())
@@ -142,12 +142,12 @@ namespace LinearAlgebra
 
       template <typename Number, typename MemorySpace, typename VectorType>
       void
-      apply(SparseMatrix<Number, MemorySpace> &,
+      apply(const SparseMatrix<Number, MemorySpace> &,
             const VectorType &,
             VectorType &,
-            Teuchos::ETransp,
-            Number,
-            Number)
+            Teuchos::ETransp /* mode */ = Teuchos::NO_TRANS,
+            Number /* alpha */ = Teuchos::ScalarTraits<Number>::one(),
+            Number /* beta */  = Teuchos::ScalarTraits<Number>::zero())     
       {
         DEAL_II_NOT_IMPLEMENTED();
       }
