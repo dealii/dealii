@@ -94,9 +94,12 @@ template Vector<float> &
 Vector<float>::operator=<float>(
   const LinearAlgebra::TpetraWrappers::Vector<float, MemorySpace::Host> &);
 template Vector<float> &
+Vector<float>::operator=<double>(
+  const LinearAlgebra::TpetraWrappers::Vector<double, MemorySpace::Host> &);
+template Vector<float> &
 Vector<float>::operator=<float>(
   const LinearAlgebra::TpetraWrappers::Vector<float, MemorySpace::Default> &);
-#endif
+#  endif
 
 #  ifdef DEAL_II_TRILINOS_WITH_TPETRA_INST_DOUBLE
 template Vector<double>::Vector(
