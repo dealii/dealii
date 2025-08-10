@@ -96,6 +96,7 @@ Vector<float>::operator=<float>(
 template Vector<float> &
 Vector<float>::operator=<float>(
   const LinearAlgebra::TpetraWrappers::Vector<float, MemorySpace::Default> &);
+template dealii::Vector<float>& dealii::Vector<float>::operator=<double, dealii::MemorySpace::Host>(dealii::LinearAlgebra::TpetraWrappers::Vector<double, dealii::MemorySpace::Host> const&);
 #endif
 
 #  ifdef HAVE_TPETRA_INST_DOUBLE

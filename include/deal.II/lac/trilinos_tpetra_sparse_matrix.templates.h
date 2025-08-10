@@ -46,6 +46,10 @@ namespace LinearAlgebra
             Number alpha = Teuchos::ScalarTraits<Number>::one(),
             Number beta  = Teuchos::ScalarTraits<Number>::zero())
       {
+if constexpr(!std::is_same_v<OtherNumber, Number>){
+        DEAL_II_NOT_IMPLEMENTED();
+}
+else{
         Assert(
           &src != &dst,
           (typename SparseMatrix<double,
@@ -82,7 +86,7 @@ namespace LinearAlgebra
         M.trilinos_matrix().apply(
           src.trilinos_vector(), dst.trilinos_vector(), mode, alpha, beta);
       }
-
+}
 
 
       template <typename Number, typename MemorySpace>
@@ -136,7 +140,7 @@ namespace LinearAlgebra
           M.trilinos_matrix().getDomainMap(), kokkos_dual_view_src);
 
         M.trilinos_matrix().apply(tpetra_src, tpetra_dst, mode, alpha, beta);
-      }
+     }
 
 
 
