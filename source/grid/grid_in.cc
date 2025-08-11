@@ -629,7 +629,7 @@ GridIn<dim, spacedim>::read_vtk(std::istream &in)
 
       in >> n_ints;
 
-      bool condition;
+      bool condition = false;
       if (vtk_version == "5.1")
         condition = n_ints == n_points_per_cell.size();
       else if (vtk_version == "3.0")
@@ -663,7 +663,7 @@ GridIn<dim, spacedim>::read_vtk(std::istream &in)
               unsigned int n_ids;
               in >> n_ids;
 
-              bool condition;
+              condition = false;
               if (vtk_version == "5.1")
                 condition = n_ids == n_points_per_cell.size();
               else if (vtk_version == "3.0")
@@ -836,7 +836,7 @@ GridIn<dim, spacedim>::read_vtk(std::istream &in)
                   in >> temp;
                   in >> n_ids;
 
-                  bool condition;
+                  condition = false;
                   if (vtk_version == "5.1")
                     condition = n_ids == n_points_per_cell.size();
                   else if (vtk_version == "3.0")
