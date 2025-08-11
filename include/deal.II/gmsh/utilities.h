@@ -11,11 +11,10 @@
 // LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
 // ------------------------------------------------------------------------
+#ifndef dealii_gmsh_utilities_h
+#define dealii_gmsh_utilities_h
 
-
-#ifndef dealii_gmsh_parameters_h
-#define dealii_gmsh_parameters_h
-
+#include <deal.II/base/config.h>
 
 #ifdef DEAL_II_WITH_GMSH
 
@@ -29,8 +28,6 @@
 #  endif
 
 #  include <deal.II/grid/tria.h>
-
-
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -95,8 +92,8 @@ namespace Gmsh
     Triangulation<2, spacedim> &tria,
     const AdditionalParameters &prm = AdditionalParameters());
 #  endif
-
 } // namespace Gmsh
+
 DEAL_II_NAMESPACE_CLOSE
 
 #else

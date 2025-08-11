@@ -301,7 +301,7 @@ namespace Step40
 
     GridIn<2, 2> grid_in;
     grid_in.attach_triangulation(triangulation);
-    grid_in.read_partitioned_msh(SOURCE_DIR "/../grid/grids/unit-square");
+    grid_in.read_partitioned_msh(SOURCE_DIR "/../grid/grids/square-quad");
 
     deallog << "Triangulation has " << triangulation.n_active_cells()
             << " active cells." << std::endl;
