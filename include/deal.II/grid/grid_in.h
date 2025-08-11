@@ -624,15 +624,9 @@ public:
    * - For multiple processors: `{file_prefix}_{rank+1}.{file_suffix}` where
    *   rank goes from 1 to number of processors
    *
-   * @tparam dim       The dimension of the triangulation (1, 2, or 3).
-   * @tparam spacedim  The spatial dimension in which the triangulation lives.
-   *
-   * @param[out] tria         The distributed triangulation to be populated.
-   * @param[in]  mpi_comm     The MPI communicator.
-   * @param[in]  file_prefix  Prefix of mesh files.
+   * @param[in]  file_prefix  User-defined prefix of mesh files (not fixed).
    * @param[in]  file_suffix  Suffix of mesh files.
    *
-   * @pre  Triangulation must be empty.
    * @pre  Mesh files must match the number of MPI ranks. An exception is thrown
    * if there are more (or less) files than ranks.
    *
