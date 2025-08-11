@@ -1045,7 +1045,11 @@ SparseDirectMUMPS::initialize_matrix(const Matrix &matrix)
       if constexpr (std::is_same_v<Matrix, TrilinosWrappers::SparseMatrix>)
         {
           const auto &trilinos_matrix = matrix.trilinos_matrix();
-          local_non_zeros             = trilinos_matrix.NumMyNonzeros();
+#  ifdef DEAL_II_TRILINOS_WITH_TPETRA
+          local_non_zeros = trilinos_matrix.getLocalNumEntries();
+#  else
+          local_non_zeros = trilinos_matrix.NumMyNonzeros();
+#  endif
         }
       else if constexpr (std::is_same_v<Matrix,
                                         PETScWrappers::MPI::SparseMatrix>)
@@ -1114,13 +1118,31 @@ SparseDirectMUMPS::initialize_matrix(const Matrix &matrix)
                                             TrilinosWrappers::SparseMatrix>)
             {
               const auto &trilinos_matrix = matrix.trilinos_matrix();
-              for (int local_row = 0; local_row < trilinos_matrix.NumMyRows();
-                   ++local_row)
+#  ifdef DEAL_II_TRILINOS_WITH_TPETRA
+              const auto n_local_rows = trilinos_matrix.getLocalNumRows();
+#  else
+              const auto n_local_rows = trilinos_matrix.NumMyRows();
+#  endif
+              for (int local_row = 0; local_row < n_local_rows; ++local_row)
                 {
                   int     num_entries;
                   double *values;
                   int    *local_cols;
-                  int     ierr = trilinos_matrix.ExtractMyRowView(local_row,
+#  ifdef DEAL_II_TRILINOS_WITH_TPETRA
+                  Kokkos::View<int *, Kokkos::HostSpace>    indices_view;
+                  Kokkos::View<double *, Kokkos::HostSpace> values_view;
+
+                  trilinos_matrix.getLocalRowView(local_row,
+                                                  indices_view,
+                                                  values_view);
+                  num_entries = indices_view.size();
+                  values      = values_view.data();
+                  local_cols  = indices_view.size();
+
+                  int global_row =
+                    trilinos_matrix.getRowMap()->getGlobalElement(local_row);
+#  else
+                  int ierr = trilinos_matrix.ExtractMyRowView(local_row,
                                                               num_entries,
                                                               values,
                                                               local_cols);
@@ -1132,15 +1154,31 @@ SparseDirectMUMPS::initialize_matrix(const Matrix &matrix)
                       std::to_string(ierr) + "."));
 
                   int global_row = trilinos_matrix.GRID(local_row);
+#  endif
 
                   for (int j = 0; j < num_entries; ++j)
                     {
-                      if (trilinos_matrix.GCID(local_cols[j]) >= global_row)
+#  ifdef DEAL_II_TRILINOS_WITH_TPETRA
+                      const auto global_column_id =
+                        trilinos_matrix.getColMap()->getGlobalElement(
+                          local_cols[j]);
+#  else
+                      const auto global_column_id =
+                        trilinos_matrix.GCID(local_cols[j]);
+#  endif
+                      if (global_column_id >= global_row)
                         {
                           irn[n_non_zero_local] = global_row + 1;
+#  ifdef DEAL_II_TRILINOS_WITH_TPETRA
+                          jcn[n_non_zero_local] =
+                            trilinos_matrix.getColMap()->getGlobalElement(
+                              local_cols[j]) +
+                            1;
+#  else
                           jcn[n_non_zero_local] =
                             trilinos_matrix.GCID(local_cols[j]) + 1;
                           a[n_non_zero_local] = values[j];
+#  endif
 
                           // Count local non-zeros
                           n_non_zero_local++;
@@ -1201,13 +1239,28 @@ SparseDirectMUMPS::initialize_matrix(const Matrix &matrix)
                                             TrilinosWrappers::SparseMatrix>)
             {
               const auto &trilinos_matrix = matrix.trilinos_matrix();
-              for (int local_row = 0; local_row < trilinos_matrix.NumMyRows();
-                   ++local_row)
+#  ifdef DEAL_II_TRILINOS_WITH_TPETRA
+              const auto n_local_rows = trilinos_matrix.getLocalNumRows();
+#  else
+              const auto n_local_rows = trilinos_matrix.NumMyRows();
+#  endif
+              for (int local_row = 0; local_row < n_local_rows; ++local_row)
                 {
                   int     num_entries;
                   double *values;
                   int    *local_cols;
-                  int     ierr = trilinos_matrix.ExtractMyRowView(local_row,
+#  ifdef DEAL_II_TRILINOS_WITH_TPETRA
+                  Kokkos::View<int *, Kokkos::HostSpace>    indices_view;
+                  Kokkos::View<double *, Kokkos::HostSpace> values_view;
+
+                  trilinos_matrix.getLocalRowView(local_row,
+                                                  indices_view,
+                                                  values_view);
+                  num_entries = indices_view.size();
+                  values      = values_view.data();
+                  local_cols  = indices_view.size();
+#  else
+                  int ierr = trilinos_matrix.ExtractMyRowView(local_row,
                                                               num_entries,
                                                               values,
                                                               local_cols);
@@ -1217,14 +1270,26 @@ SparseDirectMUMPS::initialize_matrix(const Matrix &matrix)
                     ExcMessage(
                       "Error extracting global row view from Trilinos matrix. Error code " +
                       std::to_string(ierr) + "."));
+#  endif
 
+#  ifdef DEAL_II_TRILINOS_WITH_TPETRA
+                  int global_row =
+                    trilinos_matrix.getRowMap()->getGlobalElement(local_row);
+#  else
                   int global_row = trilinos_matrix.GRID(local_row);
-
+#  endif
                   for (int j = 0; j < num_entries; ++j)
                     {
                       irn[n_non_zero_local] = global_row + 1;
+#  ifdef DEAL_II_TRILINOS_WITH_TPETRA
+                      jcn[n_non_zero_local] =
+                        trilinos_matrix.getColMap()->getGlobalElement(
+                          local_cols[j]) +
+                        1;
+#  else
                       jcn[n_non_zero_local] =
                         trilinos_matrix.GCID(local_cols[j]) + 1;
+#  endif
                       a[n_non_zero_local] = values[j];
 
                       // Count local non-zeros
