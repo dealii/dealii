@@ -29,6 +29,11 @@
 #include <boost/serialization/serialization.hpp>
 
 #ifdef DEAL_II_GMSH_WITH_API
+#  include <deal.II/base/config.h>
+
+#  include <deal.II/grid/cell_id.h>
+#  include <deal.II/grid/tria_description.h>
+
 #  include <gmsh.h>
 #endif
 
@@ -3027,17 +3032,9 @@ GridIn<dim, spacedim>::read_msh(const std::string &fname)
 
 #ifdef DEAL_II_GMSH_WITH_API
 template <int dim, int spacedim>
-// void
-// GridIn<dim, spacedim>::read_partitioned_msh(
-//   parallel::fullydistributed::Triangulation<dim, spacedim> &tria,
-//   const std::string                                        &file_prefix,
-//   const std::string                                        &file_suffix)
-
 void
-GridIn<dim, spacedim>::read_partitioned_msh(
-
-  const std::string &file_prefix,
-  const std::string &file_suffix)
+GridIn<dim, spacedim>::read_partitioned_msh(const std::string &file_prefix,
+                                            const std::string &file_suffix)
 {
   auto *parallel_tria =
     dynamic_cast<parallel::fullydistributed::Triangulation<dim, spacedim> *>(
@@ -3058,8 +3055,9 @@ GridIn<dim, spacedim>::read_partitioned_msh(
   if (nprocs == 1)
     {
       fname = file_prefix + "." + file_suffix;
-      std::ifstream f(fname);
-      AssertThrow(f.good(), ExcMessage("Missing mesh file: " + fname));
+
+      AssertThrow(std::filesystem::exists(fname),
+                  ExcMessage("Missing mesh file: " + fname));
     }
   else
     {
@@ -3067,8 +3065,8 @@ GridIn<dim, spacedim>::read_partitioned_msh(
         {
           const std::string check_fname =
             file_prefix + "_" + std::to_string(i) + "." + file_suffix;
-          std::ifstream f(check_fname);
-          AssertThrow(f.good(),
+
+          AssertThrow(std::filesystem::exists(check_fname),
                       ExcMessage("Missing mesh file: " + check_fname));
         }
 
@@ -3076,7 +3074,8 @@ GridIn<dim, spacedim>::read_partitioned_msh(
         file_prefix + "_" + std::to_string(nprocs + 1) + "." + file_suffix;
       std::ifstream f(extra_fname);
       AssertThrow(!f.good(),
-                  ExcMessage("Unexpected extra mesh file(s): " + extra_fname));
+                  ExcMessage("Expected " + std::to_string(nprocs) +
+                             " mesh files, but found extra: " + extra_fname));
     }
 
   const std::map<int, std::uint8_t> gmsh_to_dealii_type = {
