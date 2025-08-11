@@ -24,17 +24,4 @@ for (deal_II_dimension : DIMENSIONS)
 #endif
   }
 
-for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : DIMENSIONS)
-  {
-#if deal_II_space_dimension >= deal_II_dimension
-#  ifdef DEAL_II_GMSH_WITH_API
-    template void read_partitioned_msh(
-      dealii::parallel::fullydistributed::
-          Triangulation<deal_II_dimension, deal_II_space_dimension> &
-        tria,
-      const MPI_Comm     mpi_comm,
-      const std::string &file_prefix,
-      const std::string &file_suffix);
-#  endif // DEAL_II_GMSH_WITH_API
-#endif
-  }
+
