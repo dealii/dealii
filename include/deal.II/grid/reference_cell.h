@@ -423,6 +423,17 @@ public:
     const unsigned int                 subface_no) const;
 
   /**
+   * Return an ArrayView of the possible refinements (e.g.,
+   * `RefinementPossibilities<2>::cut_x`) of the current ReferenceCell. This
+   * ArrayView will not include `RefinementPossibilities<dim>::no_refinement`:
+   * instead, for elements which do not yet support refinement (e.g.,
+   * ReferenceCell::Pyramid) the ArrayView will be empty.
+   */
+  template <int dim>
+  ArrayView<const RefinementCase<dim>>
+  refinement_cases() const;
+
+  /**
    * Return the reference-cell type of face @p face_no of the current
    * object. For example, if the current object is
    * ReferenceCells::Tetrahedron, then `face_no` must be between
@@ -2123,6 +2134,84 @@ ReferenceCell::line_indices() const
 {
   return std_cxx20::ranges::iota_view<unsigned int, unsigned int>(0U,
                                                                   n_lines());
+}
+
+
+
+template <int dim>
+inline ArrayView<const RefinementCase<dim>>
+ReferenceCell::refinement_cases() const
+{
+  AssertDimension(dim, get_dimension());
+
+  if constexpr (dim == 0)
+    {
+      // vertices cannot be refined
+      return ArrayView<const RefinementCase<0>>();
+    }
+  else if constexpr (dim == 1)
+    {
+      static constexpr std::array<RefinementCase<1>, 1> possibilities{
+        {RefinementPossibilities<1>::isotropic_refinement}};
+      return make_array_view(possibilities);
+    }
+  else if constexpr (dim == 2)
+    {
+      switch (this->kind)
+        {
+          case ReferenceCells::Triangle:
+            {
+              static constexpr std::array<RefinementCase<2>, 1> possibilities{
+                {RefinementPossibilities<2>::isotropic_refinement}};
+              return make_array_view(possibilities);
+            }
+          case ReferenceCells::Quadrilateral:
+            {
+              static constexpr std::array<RefinementCase<2>, 3> possibilities{
+                {RefinementPossibilities<2>::cut_x,
+                 RefinementPossibilities<2>::cut_y,
+                 RefinementPossibilities<2>::isotropic_refinement}};
+              return make_array_view(possibilities);
+            }
+          default:
+            DEAL_II_ASSERT_UNREACHABLE();
+        }
+    }
+  else if constexpr (dim == 3)
+    {
+      switch (this->kind)
+        {
+          case ReferenceCells::Tetrahedron:
+            {
+              static constexpr std::array<RefinementCase<3>, 1> possibilities{
+                {RefinementPossibilities<3>::isotropic_refinement}};
+              return make_array_view(possibilities);
+            }
+          case ReferenceCells::Pyramid:
+          case ReferenceCells::Wedge:
+            {
+              // Pyramids and Wedges cannot yet be refined
+              return ArrayView<const RefinementCase<3>>();
+            }
+          case ReferenceCells::Hexahedron:
+            {
+              static constexpr std::array<RefinementCase<3>, 7> possibilities{
+                {RefinementPossibilities<3>::cut_x,
+                 RefinementPossibilities<3>::cut_y,
+                 RefinementPossibilities<3>::cut_xy,
+                 RefinementPossibilities<3>::cut_z,
+                 RefinementPossibilities<3>::cut_xz,
+                 RefinementPossibilities<3>::cut_yz,
+                 RefinementPossibilities<3>::isotropic_refinement}};
+              return make_array_view(possibilities);
+            }
+          default:
+            DEAL_II_ASSERT_UNREACHABLE();
+        }
+    }
+
+  DEAL_II_ASSERT_UNREACHABLE();
+  return ArrayView<RefinementCase<dim>>();
 }
 
 
