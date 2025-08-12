@@ -26,6 +26,7 @@
 #  include <deal.II/lac/la_parallel_vector.h>
 #  include <deal.II/lac/solver_control.h>
 #  include <deal.II/lac/vector.h>
+# include <deal.II/lac/trilinos_tpetra_precondition.h>
 
 DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
 

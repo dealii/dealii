@@ -928,6 +928,8 @@ namespace LinearAlgebra
       Number
       frobenius_norm() const;
 
+      Number l1_norm() const {return matrix->getNorm1();}
+
       /** @} */
 
       /**
