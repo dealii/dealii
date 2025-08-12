@@ -34,15 +34,14 @@ namespace NonMatching
       {
         AssertThrow(data.level <
                       dof_handler.get_triangulation().n_global_levels(),
-                    dealii::ExcMessage("Level is larger than number of levels "
-                                       "in the Triangulation"));
+                    ExcMessage("Level is larger than number of levels in the "
+                               "Triangulation"));
       }
     // The only search algorithm that is implemented is for
     // MappingCartesian, so we assert that the mapping is of this type.
-    AssertThrow(dynamic_cast<const MappingCartesian<dim> *>(&mapping) !=
-                  nullptr,
-                dealii::ExcMessage(
-                  "This class is only implemented with MappingCartesian."));
+    AssertThrow(
+      dynamic_cast<const MappingCartesian<dim> *>(&mapping) != nullptr,
+      ExcMessage("This class is only implemented with MappingCartesian."));
   }
 
 
@@ -115,9 +114,9 @@ namespace NonMatching
 
     Assert(
       fe.degree > 1,
-      dealii::ExcMessage(
-        "The Newton iteration to find closest surface points "
-        "requires hessians that are not available when the finite element degree is 1."));
+      ExcMessage(
+        "The Newton iteration to find closest surface points requires hessians "
+        "that are not available when the finite element degree is 1."));
 
     // X, Y, Z, lambda
     Vector<double> current_solution(dim + 1);
@@ -177,7 +176,7 @@ namespace NonMatching
 
     // Check if the Newton iteration converged
     Assert(residual.l2_norm() < data.tolerance,
-           dealii::ExcMessage("Newton iteration did not converge"));
+           ExcMessage("Newton iteration did not converge"));
   }
 
 #ifndef DOXYGEN
