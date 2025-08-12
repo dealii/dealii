@@ -104,10 +104,10 @@ namespace NonMatching
       const std::vector<Point<dim>> &quadrature_points) const;
 
   private:
-    AdditionalData            data;
-    const DoFHandler<dim>    &dof_handler;
-    const ReadVector<Number> &level_set;
-    Mapping<dim>             &mapping;
+    AdditionalData                            data;
+    ObserverPointer<const DoFHandler<dim>>    dof_handler;
+    ObserverPointer<const ReadVector<Number>> level_set;
+    ObserverPointer<Mapping<dim>>             mapping;
 
 
 

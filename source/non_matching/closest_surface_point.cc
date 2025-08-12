@@ -26,9 +26,9 @@ namespace NonMatching
     Mapping<dim>             &mapping,
     const AdditionalData     &data)
     : data(data)
-    , dof_handler(dof_handler)
-    , level_set(level_set)
-    , mapping(mapping)
+    , dof_handler(&dof_handler)
+    , level_set(&level_set)
+    , mapping(&mapping)
   {
     if (data.level != numbers::invalid_unsigned_int)
       {
@@ -56,30 +56,31 @@ namespace NonMatching
     std::vector<Point<dim>> closest_unit_search_points(quadrature_points);
     for (unsigned int q = 0; q < quadrature_points.size(); ++q)
       closest_unit_search_points[q] =
-        mapping.transform_real_to_unit_cell(search_cell, quadrature_points[q]);
+        mapping->transform_real_to_unit_cell(search_cell, quadrature_points[q]);
 
     std::vector<Number> dof_values_level_set(
-      dof_handler.get_fe().dofs_per_cell);
+      dof_handler->get_fe().dofs_per_cell);
     std::vector<types::global_dof_index> level_set_dof_indices(
-      dof_handler.get_fe().dofs_per_cell);
+      dof_handler->get_fe().dofs_per_cell);
 
     typename DoFHandler<dim>::cell_iterator dof_cell(
       &search_cell->get_triangulation(),
       search_cell->level(),
       search_cell->index(),
-      &dof_handler);
+      dof_handler.get());
 
     if (data.level != numbers::invalid_unsigned_int)
       dof_cell->get_mg_dof_indices(level_set_dof_indices);
     else
       dof_cell->get_dof_indices(level_set_dof_indices);
 
-    level_set.extract_subvector_to(level_set_dof_indices, dof_values_level_set);
+    level_set->extract_subvector_to(level_set_dof_indices,
+                                    dof_values_level_set);
 
     for (size_t i = 0; i < closest_unit_search_points.size(); ++i)
       {
         newton_monolithic(closest_unit_search_points[i],
-                          dof_handler.get_fe(),
+                          dof_handler->get_fe(),
                           dof_values_level_set,
                           closest_unit_search_points[i]);
       }
@@ -89,13 +90,13 @@ namespace NonMatching
     // back to absolute coordinates
     for (unsigned int q = 0; q < quadrature_points.size(); ++q)
       closest_real_points[q] =
-        mapping.transform_unit_to_real_cell(search_cell,
-                                            closest_unit_search_points[q]);
+        mapping->transform_unit_to_real_cell(search_cell,
+                                             closest_unit_search_points[q]);
 
     for (unsigned int q = 0; q < quadrature_points.size(); ++q)
       closest_unit_reference_points[q] =
-        mapping.transform_real_to_unit_cell(reference_cell,
-                                            closest_real_points[q]);
+        mapping->transform_real_to_unit_cell(reference_cell,
+                                             closest_real_points[q]);
 
     return {closest_real_points, closest_unit_reference_points};
   }
