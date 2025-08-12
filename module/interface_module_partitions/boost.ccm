@@ -245,6 +245,8 @@ export
     using boost::num_vertices;
     using boost::property;
     using boost::property_map;
+    using boost::source;
+    using boost::target;
     using boost::tie;
     using boost::undirectedS;
     using boost::vecS;
