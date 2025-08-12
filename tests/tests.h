@@ -895,6 +895,19 @@ struct EnableFPE
     feenableexcept(FE_DIVBYZERO | FE_INVALID);
 #endif
   }
+
+  ~EnableFPE()
+  {
+#if defined(DEBUG) && defined(DEAL_II_HAVE_FP_EXCEPTIONS)
+    // Disable floating point exceptions again at the end of the
+    // program run. One would think that this isn't actually
+    // necessary, but CGAL on Mac seems to check at program end that
+    // FP exception flags have been reset to their default values --
+    // see https://github.com/dealii/dealii/issues/18450
+    fedisableexcept(FE_DIVBYZERO | FE_INVALID);
+#endif
+  }
+
 } deal_II_enable_fpe;
 
 
