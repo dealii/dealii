@@ -12,9 +12,9 @@
 //
 // ------------------------------------------------------------------------
 
+#include <deal.II/fe/mapping_cartesian.h>
 
 #include <deal.II/non_matching/closest_surface_point.h>
-
 
 DEAL_II_NAMESPACE_OPEN
 namespace NonMatching
