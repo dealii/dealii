@@ -414,6 +414,20 @@ public:
    * Convert an internal::SubfaceCase into its equivalent RefinementCase. For
    * example, SubfacePossibilities<3>::Possibilities::y1x2x is is geometrically
    * equivalent to RefinementPossibilities<3>::cut_xy.
+   *
+   * @return A pair consisting of the equivalent subface number and refinement
+   * case.
+   *
+   * @note In 1d faces cannot be refined - however, to enable dimension-independent
+   * programming, this function always returns `(0, isotropic_refinement)`.
+   *
+   * @note In 2d, since there is only one possible kind of refinement
+   * (isotropic), deal.II has historically ignored @p subface_case in this
+   * context and only read @p subface_no. Hence, in 2d, this function does the
+   * same thing and returns `(subface_no, isotropic_refinement)`.
+   *
+   * @note In 3d, for backwards compatibility, we treat
+   * internal::SubfaceCase::case_none as internal::SubfaceCase::case_isotropic.
    */
   template <int dim>
   std::pair<unsigned int, RefinementCase<dim - 1>>

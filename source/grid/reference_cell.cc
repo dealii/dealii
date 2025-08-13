@@ -271,8 +271,42 @@ ReferenceCell::equivalent_refinement_case(
   const internal::SubfaceCase<dim>   subface_case,
   const unsigned int                 subface_no) const
 {
-  if constexpr (dim == 3)
+  AssertDimension(dim, get_dimension());
+  // 1. in 1d subfaces don't exist, but we still support some subface code
+  //    (such as QProjector's functions) to enable dimension-independent
+  //    programming. To match the convention used by 3d this will always return
+  //    (0, isotropic_refinement).
+  //
+  // 2. historically we have permitted subface calculations in 2d for unrefined
+  //    faces. In that case we don't actually need the value of subface_case
+  //    since there is only one possible refinement - the returned value has to
+  //    be isotropic_refinement.
+  //
+  // 3. Similarly, in 3d we treat case_none as case_isotropic.
+  if constexpr (dim == 1)
     {
+      (void)subface_case;
+      AssertIndexRange(combined_face_orientation, n_face_orientations(0));
+      AssertIndexRange(subface_no, 1);
+      return std::make_pair(0, RefinementCase<dim - 1>::isotropic_refinement);
+    }
+
+  if constexpr (dim == 2)
+    {
+      (void)subface_case;
+      AssertIndexRange(combined_face_orientation, n_face_orientations(0));
+      AssertIndexRange(subface_no,
+                       face_reference_cell(0).n_isotropic_children());
+      return std::make_pair(combined_face_orientation ==
+                                numbers::reverse_line_orientation ?
+                              1 - subface_no :
+                              subface_no,
+                            RefinementCase<dim - 1>::isotropic_refinement);
+    }
+  else if constexpr (dim == 3)
+    {
+      Assert(*this == ReferenceCells::Hexahedron, ExcNotImplemented());
+
       static const RefinementCase<dim - 1>
         equivalent_refine_case[internal::SubfaceCase<dim>::case_isotropic + 1]
                               [GeometryInfo<3>::max_children_per_face] = {
