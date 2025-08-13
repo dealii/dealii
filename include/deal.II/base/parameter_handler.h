@@ -626,7 +626,7 @@ class MultipleParameterLoop;
  *     prm.parse_input ("prmtest.prm");
  *     // print parameters to std::cout as ASCII text
  *     std::cout << "\n\n";
- *     prm.print_parameters (std::cout, ParameterHandler::Text);
+ *     prm.print_parameters (std::cout, ParameterHandler::PRM);
  *     // get parameters into the program
  *     std::cout << "\n\n" << "Getting parameters:" << std::endl;
  *     p.get_parameters (prm);
