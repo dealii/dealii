@@ -340,7 +340,7 @@ GridIn<dim, spacedim>::read_vtk(std::istream &in)
               if (vtk_version == "3.0")
                 in >> n_vertices;
               else if (vtk_version == "5.1") // If version 5.1, n_vertices is
-                                             // not gien explicitly in the file
+                                             // not given explicitly in the file
                 n_vertices = n_points_per_cell[count];
               else
                 AssertThrow(
@@ -419,7 +419,7 @@ GridIn<dim, spacedim>::read_vtk(std::istream &in)
               if (vtk_version == "3.0")
                 in >> n_vertices;
               else if (vtk_version == "5.1") // If version 5.1, n_vertices is
-                                             // not gien explicitly in the file
+                                             // not given explicitly in the file
                 n_vertices = n_points_per_cell[count];
               else
                 AssertThrow(
