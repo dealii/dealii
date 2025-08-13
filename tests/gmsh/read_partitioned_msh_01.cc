@@ -53,13 +53,13 @@ main(int argc, char **argv)
   MPI_Comm_size(mpi_comm, &size);
 
   // Create fully distributed triangulation
-  // Create fully distributed triangulation
   parallel::fullydistributed::Triangulation<2, 2> tria(mpi_comm);
 
   // Use GridIn to read the mesh
   GridIn<2, 2> grid_in;
   grid_in.attach_triangulation(tria);
   grid_in.read_partitioned_msh(SOURCE_DIR "/../grid/grids/unit-square");
+
   // Output ownership information
   deallog << "Rank " << rank << " owns " << tria.n_active_cells() << " cells "
           << "and " << tria.n_vertices() << " vertices." << std::endl;
