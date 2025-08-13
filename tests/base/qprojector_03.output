@@ -1,4 +1,8 @@
 
+DEAL:Line::face_no = 0
+DEAL:Line::0.00000
+DEAL:Line::face_no = 1
+DEAL:Line::1.00000
 DEAL:Tri::face_no = 0
 DEAL:Tri::0.0250000 0.00000
 DEAL:Tri::0.0750000 0.00000

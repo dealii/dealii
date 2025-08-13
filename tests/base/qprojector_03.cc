@@ -30,15 +30,16 @@ test(const ReferenceCell reference_cell)
 {
   deallog.push(reference_cell.to_string());
 
-  std::vector<Point<dim - 1>> points(2);
-  std::vector<double>         weights(2,
+  std::vector<Point<dim - 1>> points(dim == 1 ? 1 : 2);
+  std::vector<double>         weights(dim == 1 ? 1 : 2,
                               reference_cell.face_reference_cell(0).volume() /
-                                2.0);
-  for (unsigned int d = 0; d < dim - 1; ++d)
-    {
-      points[0][d] = 0.05 + 0.05 * d;
-      points[1][d] = 0.15 - 0.075 * d;
-    }
+                                (dim == 1 ? 1.0 : 2.0));
+  if constexpr (dim > 1)
+    for (unsigned int d = 0; d < dim - 1; ++d)
+      {
+        points[0][d] = 0.05 + 0.05 * d;
+        points[1][d] = 0.15 - 0.075 * d;
+      }
 
   const Quadrature<dim - 1> face_quadrature(points, weights);
   const auto                quadratures =
@@ -86,7 +87,7 @@ test(const ReferenceCell reference_cell)
         {
           const auto n_subfaces =
             reference_cell.is_hyper_cube() ?
-              GeometryInfo<dim>::n_subfaces(subface_case) :
+              (dim == 1 ? 1 : GeometryInfo<dim>::n_subfaces(subface_case)) :
               reference_cell.face_reference_cell(face_no)
                 .n_isotropic_children();
           for (types::geometric_orientation combined_orientation = 0;
@@ -142,6 +143,8 @@ int
 main()
 {
   initlog();
+
+  test<1>(ReferenceCells::Line);
 
   test<2>(ReferenceCells::Triangle);
   test<2>(ReferenceCells::Quadrilateral);

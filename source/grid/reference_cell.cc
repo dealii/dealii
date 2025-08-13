@@ -129,7 +129,8 @@ namespace
                const RefinementCase<dim> refinement_case)
   {
     AssertDimension(dim, reference_cell.get_dimension());
-    AssertIndexRange(child_no, reference_cell.n_children(refinement_case));
+    if (dim > 1)
+      AssertIndexRange(child_no, reference_cell.n_children(refinement_case));
     AssertIndexRange(vertex_no, reference_cell.n_vertices());
 
     constexpr Point<dim> V0;
@@ -240,13 +241,18 @@ ReferenceCell::subface_vertex_location(
   const unsigned int            subface_vertex_no,
   const RefinementCase<dim - 1> face_refinement_case) const
 {
+  AssertDimension(dim, get_dimension());
   AssertIndexRange(face_no, n_faces());
-  AssertIndexRange(
-    subface_no, face_reference_cell(face_no).n_children(face_refinement_case));
+  if (dim > 1)
+    {
+      AssertIndexRange(subface_no,
+                       face_reference_cell(face_no).n_children(
+                         face_refinement_case));
+      Assert(face_refinement_case != RefinementCase<dim - 1>::no_refinement,
+             ExcMessage("This function may only be called for subfaces."));
+    }
   AssertIndexRange(subface_vertex_no,
                    face_reference_cell(face_no).n_vertices());
-  Assert(face_refinement_case != RefinementCase<dim - 1>::no_refinement,
-         ExcMessage("This function may only be called for subfaces."));
 
   Point<dim> p;
   for (const unsigned int vertex_no :

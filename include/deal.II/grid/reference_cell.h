@@ -2160,8 +2160,12 @@ ReferenceCell::refinement_cases() const
 
   if constexpr (dim == 0)
     {
-      // vertices cannot be refined
-      return ArrayView<const RefinementCase<0>>();
+      // Like equivalent_refinement_case(), to better enable generic
+      // programming, return a value implying vertices can be refined since 1d
+      // Triangulations can be refined.
+      static constexpr std::array<RefinementCase<0>, 1> possibilities{
+        {RefinementPossibilities<0>::isotropic_refinement}};
+      return make_array_view(possibilities);
     }
   else if constexpr (dim == 1)
     {
