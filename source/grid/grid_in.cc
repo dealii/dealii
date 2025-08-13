@@ -37,6 +37,7 @@
 #  include <gmsh.h>
 #endif
 
+
 #include <algorithm>
 #include <cctype>
 #include <filesystem>
@@ -3030,6 +3031,8 @@ GridIn<dim, spacedim>::read_msh(const std::string &fname)
 }
 #endif
 
+
+
 #ifdef DEAL_II_GMSH_WITH_API
 template <int dim, int spacedim>
 void
@@ -3039,6 +3042,7 @@ GridIn<dim, spacedim>::read_partitioned_msh(const std::string &file_prefix,
   auto *parallel_tria =
     dynamic_cast<parallel::fullydistributed::Triangulation<dim, spacedim> *>(
       tria.get());
+
   // Check that the cast succeeded
   AssertThrow(parallel_tria != nullptr,
               ExcMessage("Triangulation is not fully distributed!"));
@@ -3130,21 +3134,17 @@ GridIn<dim, spacedim>::read_partitioned_msh(const std::string &file_prefix,
     triangulation_description;
   triangulation_description.comm = mpi_comm;
 
-  auto &vertices = triangulation_description.coarse_cell_vertices;
-  auto &cells    = triangulation_description.coarse_cells;
-  auto &coarse_cell_ids =
-    triangulation_description.coarse_cell_index_to_coarse_cell_id;
-  auto &cell_infos = triangulation_description.cell_infos;
-
-  cell_infos.resize(1);
-  vertices.resize(node_tags.size(), Point<spacedim>());
+  triangulation_description.cell_infos.resize(1);
+  triangulation_description.coarse_cell_vertices.resize(node_tags.size(),
+                                                        Point<spacedim>());
 
   std::map<std::size_t, unsigned int> node_tag_to_index;
   for (unsigned int i = 0; i < node_tags.size(); ++i)
     {
       node_tag_to_index[node_tags[i]] = i;
       for (unsigned int d = 0; d < spacedim; ++d)
-        vertices[i][d] = coords[3 * i + d];
+        triangulation_description.coarse_cell_vertices[i][d] =
+          coords[3 * i + d];
     }
 
   for (const auto &e : entities)
@@ -3191,8 +3191,9 @@ GridIn<dim, spacedim>::read_partitioned_msh(const std::string &file_prefix,
                       cell.vertices[v] = node_tag_to_index[node_tag];
                     }
 
-                  cells.push_back(cell);
-                  coarse_cell_ids.push_back(element_ids[i][j]);
+                  triangulation_description.coarse_cells.push_back(cell);
+                  triangulation_description.coarse_cell_index_to_coarse_cell_id
+                    .push_back(element_ids[i][j]);
 
                   TriangulationDescription::CellData<dim> cell_info;
                   cell_info.id =
@@ -3206,7 +3207,7 @@ GridIn<dim, spacedim>::read_partitioned_msh(const std::string &file_prefix,
 
                   cell_info.level_subdomain_id = cell_info.subdomain_id;
 
-                  cell_infos[0].push_back(cell_info);
+                  triangulation_description.cell_infos[0].push_back(cell_info);
                 }
             }
         }
@@ -3224,7 +3225,6 @@ GridIn<dim, spacedim>::read_partitioned_msh(const std::string &file_prefix,
   gmsh::finalize();
 }
 #endif // DEAL_II_GMSH_WITH_API
-
 
 
 template <int dim, int spacedim>
