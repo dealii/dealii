@@ -14,7 +14,7 @@ Additional information:
 DEAL::
 DEAL::* parse_input with missing 'end':
 DEAL::ExcUnbalancedSubsections(filename, paths_message.str())
-    There are unequal numbers of 'subsection' and 'end' statements in the parameter file <input string>.
+    There are unequal numbers of 'subsection' and 'end' statements in the parameter file.
 DEAL::
 DEAL::Exception 
 --------------------------------------------------------
@@ -32,7 +32,7 @@ DEAL::* Check non empty path before parse_input()
 DEAL::
 DEAL::* Check parse_input() catches messing with path:
 DEAL::ExcUnbalancedSubsections(filename, paths_message.str())
-    There are unequal numbers of 'subsection' and 'end' statements in the parameter file <input string>.
+    There are unequal numbers of 'subsection' and 'end' statements in the parameter file.
 Path before loading input:
     subsection test
 Current path:
