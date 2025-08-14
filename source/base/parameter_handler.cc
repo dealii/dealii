@@ -2142,12 +2142,18 @@ ParameterHandler::scan_line(std::string        line,
         }
       else
         {
-          AssertThrow(
-            skip_undefined,
-            ExcCannotParseLine(current_line_n,
-                               input_filename,
-                               ("No entry with name <" + entry_name +
-                                "> was declared in the current subsection.")));
+          AssertThrow(skip_undefined,
+                      ExcCannotParseLine(
+                        current_line_n,
+                        input_filename,
+                        ("You are trying to set a value for parameter <" +
+                         entry_name +
+                         ">, but no such parameter was declared in the "
+                         "current subsection. Did you mis-spell the name "
+                         "of the parameter, or are trying to set a parameter "
+                         "that has been removed in a previous version of the "
+                         "program? Or does the parameter belong to a different "
+                         "subsection?")));
         }
     }
   // an include statement?
