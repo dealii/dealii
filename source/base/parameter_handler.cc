@@ -613,7 +613,10 @@ ParameterHandler::parse_input_from_string(const std::string &s,
                                           const bool         skip_undefined)
 {
   std::istringstream input_stream(s);
-  parse_input(input_stream, "input string", last_line, skip_undefined);
+  parse_input(input_stream,
+              /* filename is unknown: */ "",
+              last_line,
+              skip_undefined);
 }
 
 
@@ -2065,9 +2068,11 @@ ParameterHandler::scan_line(std::string        line,
           if (entries->get<std::string>(path + path_separator +
                                         "deprecation_status") == "true")
             {
-              std::cerr << "Warning in line <" << current_line_n
-                        << "> of file <" << input_filename
-                        << ">: You are using the deprecated spelling <"
+              std::cerr << "Warning in line <" << current_line_n << ">"
+                        << (input_filename.empty() ?
+                              "" :
+                              (" of file <" + input_filename + ">"))
+                        << ": You are using the deprecated spelling <"
                         << entry_name << "> of the parameter <"
                         << entries->get<std::string>(path + path_separator +
                                                      "alias")
