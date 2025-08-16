@@ -1,0 +1,256 @@
+
+#ifndef dealii__patch_smoother_base_h
+#define dealii__patch_smoother_base_h
+
+
+#include <deal.II/matrix_free/fe_patch_evaluation.h>
+#include <deal.II/matrix_free/patch_storage.h>
+
+
+DEAL_II_NAMESPACE_OPEN
+
+#ifndef DOXYGEN
+// Ensure PatchSmootherBase is a template class
+template <int dim, typename number>
+class PatchSmootherBase;
+#endif // DOXYGEN
+
+/**
+ * @brief Base class for patch-based smoothers operating on MatrixFree data.
+ *
+ * This class provides the interface and common functionality for implementing
+ * local smoothing operations on patches of cells. Derived classes must
+ * implement the `local_apply` method, which defines the specific smoothing
+ * operation on a single patch.
+ *
+ * The smoother operates on distributed vectors (`VectorType`) and utilizes
+ * `PatchStorageType` to manage patch data and parallel execution via
+ * `patch_loop`.
+ *
+ * @tparam dim The spatial dimension.
+ * @tparam number The underlying floating-point type (e.g., float, double).
+ */
+template <int dim, typename number>
+class PatchSmootherBase
+{
+public:
+  /**
+   * @brief Alias for the distributed vector type used for source and destination.
+   */
+  using VectorType = LinearAlgebra::distributed::Vector<number>;
+  /**
+   * @brief Alias for the MatrixFree type associated with the smoother.
+   */
+  using MatrixFreeType = MatrixFree<dim, number>;
+  /**
+   * @brief Alias for the PatchStorage type used to manage patch data.
+   */
+  using PatchStorageType = PatchStorage<MatrixFreeType>;
+
+  /**
+   * @brief Alias for additional data, typically the PatchStorage itself.
+   */
+  using AdditionalData = std::shared_ptr<PatchStorageType>;
+
+  /**
+   * @brief Pure virtual function defining the local smoothing operation on a patch.
+   *
+   * Derived classes must implement this method to perform the actual smoothing
+   * computation for a given range of patches.
+   *
+   * @param patch_storage The PatchStorage object containing patch data.
+   * @param dst The destination vector where the result is accumulated.
+   * @param src The source vector providing the input data.
+   * @param patch_range The range of patches to process in this call.
+   * @param do_forward Flag indicating the direction of the operation (true for
+   * forward/step, false for backward/Tstep).
+   */
+  virtual void
+  local_apply(const PatchStorageType                      &patch_storage,
+              VectorType                                  &dst,
+              const VectorType                            &src,
+              const typename PatchStorageType::PatchRange &patch_range,
+              const bool &do_forward) const = 0;
+
+
+  /**
+   * @brief Initializes the smoother with the necessary PatchStorage data.
+   *
+   * This method typically stores the provided `patch_storage` shared pointer
+   * for later use in the smoothing operations.
+   *
+   * @param patch_storage A shared pointer to the PatchStorage object.
+   */
+  virtual void
+  initialize(std::shared_ptr<PatchStorageType> &patch_storage);
+
+
+  /**
+   * @brief Performs the forward smoothing operation (vmult).
+   *
+   * This method applies the forward smoothing step defined by `step` and
+   * initializes the destination vector `dst` to zero beforehand.
+   * Equivalent to `dst = S * src`, where S is the smoother operator.
+   *
+   * @param dst The destination vector.
+   * @param src The source vector.
+   */
+  void
+  vmult(VectorType &dst, const VectorType &src) const;
+
+  /**
+   * @brief Performs the transpose smoothing operation (Tvmult).
+   *
+   * This method applies the transpose smoothing step defined by `Tstep` and
+   * initializes the destination vector `dst` to zero beforehand.
+   * Equivalent to `dst = S^T * src`, where S is the smoother operator.
+   *
+   * @param dst The destination vector.
+   * @param src The source vector.
+   */
+  void
+  Tvmult(VectorType &dst, const VectorType &src) const;
+
+  /**
+   * @brief Performs one forward smoothing step.
+   *
+   * This method orchestrates the parallel execution of `local_apply` over all
+   * patches using `patch_storage->patch_loop`. The `do_forward` flag passed
+   * to `local_apply` is set to `true`. The result is accumulated in `dst`.
+   * Equivalent to `dst += S * src`.
+   *
+   * @param dst The destination vector (result is added to it).
+   * @param src The source vector.
+   */
+  void
+  step(VectorType &dst, const VectorType &src) const;
+
+  /**
+   * @brief Performs one transpose smoothing step.
+   *
+   * This method orchestrates the parallel execution of `local_apply` over all
+   * patches using `patch_storage->patch_loop`. The `do_forward` flag passed
+   * to `local_apply` is set to `false`. The result is accumulated in `dst`.
+   * Equivalent to `dst += S^T * src`.
+   *
+   * @param dst The destination vector (result is added to it).
+   * @param src The source vector.
+   */
+  void
+  Tstep(VectorType &dst, const VectorType &src) const;
+
+
+  /**
+   * @brief Clears the internal state, primarily releasing the PatchStorage.
+   */
+  virtual void
+  clear();
+
+  /**
+   * @brief Returns a reference to the shared pointer holding the PatchStorage.
+   *
+   * @return A reference to the internal `patch_storage` shared pointer.
+   */
+  std::shared_ptr<PatchStorageType> &
+  get_storage();
+
+protected:
+  /**
+   * @brief Shared pointer to the PatchStorage object containing patch data and
+   *        methods for parallel execution.
+   */
+  std::shared_ptr<PatchStorageType> patch_storage;
+};
+
+
+#ifndef DOXYGEN
+
+template <int dim, typename number>
+void
+PatchSmootherBase<dim, number>::initialize(
+  std::shared_ptr<PatchStorageType> &patch_storage)
+{
+  this->patch_storage = patch_storage;
+}
+
+
+
+template <int dim, typename number>
+void
+PatchSmootherBase<dim, number>::clear()
+{
+  patch_storage.reset();
+}
+
+template <int dim, typename number>
+std::shared_ptr<typename PatchSmootherBase<dim, number>::PatchStorageType> &
+PatchSmootherBase<dim, number>::get_storage()
+{
+  return patch_storage;
+}
+
+template <int dim, typename number>
+void
+PatchSmootherBase<dim, number>::step(VectorType       &dst,
+                                     const VectorType &src) const
+{
+  const std::function<void(const PatchStorageType &,
+                           VectorType &,
+                           const VectorType &,
+                           const typename PatchStorageType::PatchRange &)>
+    patch_worker =
+      [&](const PatchStorageType                      &patch_storage,
+          VectorType                                  &dst,
+          const VectorType                            &src,
+          const typename PatchStorageType::PatchRange &patch_range) {
+        local_apply(patch_storage, dst, src, patch_range, true);
+      };
+
+  patch_storage->patch_loop(patch_worker, dst, src, true);
+}
+
+template <int dim, typename number>
+void
+PatchSmootherBase<dim, number>::vmult(VectorType       &dst,
+                                      const VectorType &src) const
+{
+  dst = 0;
+  step(dst, src);
+}
+
+
+template <int dim, typename number>
+void
+PatchSmootherBase<dim, number>::Tstep(VectorType       &dst,
+                                      const VectorType &src) const
+{
+  const std::function<void(const PatchStorageType &,
+                           VectorType &,
+                           const VectorType &,
+                           const typename PatchStorageType::PatchRange &)>
+    patch_worker =
+      [&](const PatchStorageType                      &patch_storage,
+          VectorType                                  &dst,
+          const VectorType                            &src,
+          const typename PatchStorageType::PatchRange &patch_range) {
+        local_apply(patch_storage, dst, src, patch_range, false);
+      };
+
+  patch_storage->patch_loop(patch_worker, dst, src, false);
+}
+
+template <int dim, typename number>
+void
+PatchSmootherBase<dim, number>::Tvmult(VectorType       &dst,
+                                       const VectorType &src) const
+{
+  dst = 0;
+  Tstep(dst, src);
+}
+
+#endif // DOXYGEN
+
+DEAL_II_NAMESPACE_CLOSE
+
+
+#endif // dealii__patch_smoother_base_h
