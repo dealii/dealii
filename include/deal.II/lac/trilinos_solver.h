@@ -51,18 +51,28 @@ DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
 
 #  include <memory>
 
-
 DEAL_II_NAMESPACE_OPEN
+
+#  ifndef DOXYGEN
+namespace TrilinosWrappers
+{
+#    ifdef DEAL_II_TRILINOS_WITH_TPETRA
+  // forward declarations
+  using SparseMatrix =
+    ::dealii::LinearAlgebra::TpetraWrappers::SparseMatrix<double,
+                                                          MemorySpace::Host>;
+  using PreconditionBase = ::dealii::LinearAlgebra::TpetraWrappers::
+    PreconditionBase<double, MemorySpace::Host>;
+#    else
+  // forward declarations
+  class SparseMatrix;
+  class PreconditionBase;
+#    endif
+} // namespace TrilinosWrappers
+#  endif
 
 namespace TrilinosWrappers
 {
-  // forward declarations
-#  ifndef DOXYGEN
-  class SparseMatrix;
-  class PreconditionBase;
-#  endif
-
-
   /**
    * Base class for solver classes using the Trilinos solvers. Since solvers
    * in Trilinos are selected based on flags passed to a generic solver

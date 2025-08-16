@@ -88,12 +88,19 @@ template Vector<float>::Vector(
   const LinearAlgebra::TpetraWrappers::Vector<float, MemorySpace::Host> &);
 template Vector<float>::Vector(
   const LinearAlgebra::TpetraWrappers::Vector<float, MemorySpace::Default> &);
+template Vector<float>::Vector(
+  const LinearAlgebra::TpetraWrappers::Vector<double, MemorySpace::Host> &);
 template Vector<float> &
 Vector<float>::operator=<float>(
   const LinearAlgebra::TpetraWrappers::Vector<float, MemorySpace::Host> &);
 template Vector<float> &
 Vector<float>::operator=<float>(
   const LinearAlgebra::TpetraWrappers::Vector<float, MemorySpace::Default> &);
+template dealii::Vector<float> &
+dealii::Vector<float>::operator=<double, dealii::MemorySpace::Host>(
+  const dealii::LinearAlgebra::TpetraWrappers::Vector<double,
+                                                      dealii::MemorySpace::Host>
+    &);
 #  endif
 
 #  ifdef HAVE_TPETRA_INST_DOUBLE

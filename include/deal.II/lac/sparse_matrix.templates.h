@@ -379,6 +379,10 @@ template <typename number>
 SparseMatrix<number> &
 SparseMatrix<number>::copy_from(const TrilinosWrappers::SparseMatrix &matrix)
 {
+#  ifdef DEAL_II_TRILINOS_WITH_TPETRA
+  (void)matrix;
+  Assert(false, ExcNotImplemented());
+#  else
   Assert(m() == matrix.m(), ExcDimensionMismatch(m(), matrix.m()));
   Assert(n() == matrix.n(), ExcDimensionMismatch(n(), matrix.n()));
 
@@ -412,7 +416,7 @@ SparseMatrix<number>::copy_from(const TrilinosWrappers::SparseMatrix &matrix)
       // then copy everything in one swoop
       this->set(row, colnum_cache, value_cache);
     }
-
+#  endif
   return *this;
 }
 

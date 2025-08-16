@@ -28,6 +28,7 @@
 #    include <deal.II/lac/full_matrix.h>
 #    include <deal.II/lac/trilinos_epetra_vector.h>
 #    include <deal.II/lac/trilinos_index_access.h>
+#    include <deal.II/lac/trilinos_tpetra_sparse_matrix.h>
 #    include <deal.II/lac/trilinos_tpetra_vector.h>
 #    include <deal.II/lac/trilinos_vector.h>
 #    include <deal.II/lac/vector_memory.h>
@@ -64,6 +65,11 @@ class DynamicSparsityPattern;
 
 namespace TrilinosWrappers
 {
+#      ifdef DEAL_II_TRILINOS_WITH_TPETRA
+  using SparseMatrix =
+    ::dealii::LinearAlgebra::TpetraWrappers::SparseMatrix<double,
+                                                          MemorySpace::Host>;
+#      else
   class SparseMatrix;
   class SparsityPattern;
 
@@ -72,9 +78,11 @@ namespace TrilinosWrappers
     template <bool Constness>
     class Iterator;
   }
+#      endif
 } // namespace TrilinosWrappers
 #    endif
 
+#    ifndef DEAL_II_TRILINOS_WITH_TPETRA
 namespace TrilinosWrappers
 {
   /**
@@ -2498,7 +2506,7 @@ DEAL_II_NAMESPACE_OPEN // Do not convert for module purposes
 
   // ----------------------- inline and template functions --------------------
 
-#    ifndef DOXYGEN
+#      ifndef DOXYGEN
 
   namespace SparseMatrixIterators
   {
@@ -2845,13 +2853,13 @@ DEAL_II_NAMESPACE_OPEN // Do not convert for module purposes
   inline bool SparseMatrix::in_local_range(const size_type index) const
   {
     TrilinosWrappers::types::int_type begin, end;
-#      ifndef DEAL_II_WITH_64BIT_INDICES
+#        ifndef DEAL_II_WITH_64BIT_INDICES
     begin = matrix->RowMap().MinMyGID();
     end   = matrix->RowMap().MaxMyGID() + 1;
-#      else
+#        else
     begin = matrix->RowMap().MinMyGID64();
     end   = matrix->RowMap().MaxMyGID64() + 1;
-#      endif
+#        endif
 
     return ((index >= static_cast<size_type>(begin)) &&
             (index < static_cast<size_type>(end)));
@@ -2959,11 +2967,11 @@ DEAL_II_NAMESPACE_OPEN // Do not convert for module purposes
   // a call to some Trilinos function.
   inline SparseMatrix::size_type SparseMatrix::m() const
   {
-#      ifndef DEAL_II_WITH_64BIT_INDICES
+#        ifndef DEAL_II_WITH_64BIT_INDICES
     return matrix->NumGlobalRows();
-#      else
+#        else
     return matrix->NumGlobalRows64();
-#      endif
+#        endif
   }
 
 
@@ -2990,13 +2998,13 @@ DEAL_II_NAMESPACE_OPEN // Do not convert for module purposes
   SparseMatrix::local_range() const
   {
     size_type begin, end;
-#      ifndef DEAL_II_WITH_64BIT_INDICES
+#        ifndef DEAL_II_WITH_64BIT_INDICES
     begin = matrix->RowMap().MinMyGID();
     end   = matrix->RowMap().MaxMyGID() + 1;
-#      else
+#        else
     begin = matrix->RowMap().MinMyGID64();
     end   = matrix->RowMap().MaxMyGID64() + 1;
-#      endif
+#        endif
 
     return std::make_pair(begin, end);
   }
@@ -3296,10 +3304,12 @@ DEAL_II_NAMESPACE_OPEN // Do not convert for module purposes
                                          const size_type      *col_indices,
                                          const TrilinosScalar *values,
                                          const bool elide_zero_values);
-#    endif // DOXYGEN
+
+#      endif // DOXYGEN
 
 } /* namespace TrilinosWrappers */
 
+#    endif
 
 DEAL_II_NAMESPACE_CLOSE
 
