@@ -248,7 +248,7 @@ full step lengths we forego the rapid, quadratic convergence that
 makes Newton's method so appealing. Obviously, this is a point one
 eventually has to address if the program was made into one that is
 meant to solve more realistic problems. We will comment on this issue
-some more in the @ref step_15-Results "results section", and use an
+some more in the @ref step_15-ResultsSection "results section", and use an
 even better approach in step-77.
 
 
