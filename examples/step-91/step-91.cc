@@ -446,8 +446,8 @@ namespace Step91
     parallel::distributed::Triangulation<dim, spacedim> triangulation;
     DoFHandler<dim, spacedim>                           dof_handler;
 
-    std::vector<IndexSet> owned_partitioning;
-    std::vector<IndexSet> relevant_partitioning;
+    std::vector<IndexSet> locally_owned_partitioning;
+    std::vector<IndexSet> locally_relevant_partitioning;
 
     AffineConstraints<double> constraints;
 
@@ -590,14 +590,14 @@ namespace Step91
     // @ref GlossLocallyOwnedDof "this" as well as
     // @ref GlossLocallyRelevantDof "this" glossary entry.)
     const IndexSet &locally_owned_dofs = dof_handler.locally_owned_dofs();
-    owned_partitioning = {locally_owned_dofs.get_view(0, n_elevation_dofs),
+    locally_owned_partitioning = {locally_owned_dofs.get_view(0, n_elevation_dofs),
                           locally_owned_dofs.get_view(n_elevation_dofs,
                                                       n_elevation_dofs +
                                                         n_waterflow_rate_dofs)};
 
     const IndexSet locally_relevant_dofs =
       DoFTools::extract_locally_relevant_dofs(dof_handler);
-    relevant_partitioning = {
+    locally_relevant_partitioning = {
       locally_relevant_dofs.get_view(0, n_elevation_dofs),
       locally_relevant_dofs.get_view(n_elevation_dofs,
                                      n_elevation_dofs + n_waterflow_rate_dofs)};
@@ -607,7 +607,7 @@ namespace Step91
     {
       system_matrix.clear();
 
-      BlockDynamicSparsityPattern dsp(relevant_partitioning);
+      BlockDynamicSparsityPattern dsp(locally_relevant_partitioning);
       DoFTools::make_sparsity_pattern(dof_handler, dsp, constraints);
 
       SparsityTools::distribute_sparsity_pattern(
@@ -616,16 +616,16 @@ namespace Step91
         mpi_communicator,
         locally_relevant_dofs);
 
-      system_matrix.reinit(owned_partitioning, dsp, mpi_communicator);
+      system_matrix.reinit(locally_owned_partitioning, dsp, mpi_communicator);
     }
 
-    locally_relevant_solution.reinit(owned_partitioning,
-                                     relevant_partitioning,
+    locally_relevant_solution.reinit(locally_owned_partitioning,
+                                     locally_relevant_partitioning,
                                      mpi_communicator);
-    locally_relevant_solution_dot.reinit(owned_partitioning,
-                                         relevant_partitioning,
+    locally_relevant_solution_dot.reinit(locally_owned_partitioning,
+                                         locally_relevant_partitioning,
                                          mpi_communicator);
-    system_rhs.reinit(owned_partitioning, mpi_communicator);
+    system_rhs.reinit(locally_owned_partitioning, mpi_communicator);
 
     pcout << "   Number of degrees of freedom: " << dof_handler.n_dofs()
           << " (elevation: " << n_elevation_dofs
@@ -663,7 +663,7 @@ namespace Step91
       /* elevation vector component = */ 0,
       /* total number of vector components = */ 2);
 
-    VectorType interpolated_initial_condition(owned_partitioning,
+    VectorType interpolated_initial_condition(locally_owned_partitioning,
                                               MPI_COMM_WORLD);
     VectorTools::interpolate(dof_handler,
                              initial_values,
@@ -1047,7 +1047,7 @@ namespace Step91
     LA::MPI::PreconditionILU     preconditioner;
     preconditioner.initialize(system_matrix.block(1, 1));
 
-    VectorType distributed_solution(owned_partitioning, mpi_communicator);
+    VectorType distributed_solution(locally_owned_partitioning, mpi_communicator);
 
     solver.solve(system_matrix.block(1, 1),
                  distributed_solution.block(1),
@@ -1556,7 +1556,7 @@ namespace Step91
         std::array<LinearOperator<typename LA::MPI::BlockVector::BlockType>, 2>{
           {lo_prec_H, lo_prec_w}});
 
-    VectorType distributed_solution(owned_partitioning, mpi_communicator);
+    VectorType distributed_solution(locally_owned_partitioning, mpi_communicator);
 
     constraints.set_zero(distributed_solution);
 
@@ -1712,7 +1712,7 @@ namespace Step91
 
 
     time_integrator.reinit_vector = [this](VectorType &vector) {
-      vector.reinit(owned_partitioning, mpi_communicator);
+      vector.reinit(locally_owned_partitioning, mpi_communicator);
     };
 
     time_integrator.residual =
@@ -1786,8 +1786,8 @@ namespace Step91
     pcout << "Solve time-dependent system... " << std::flush;
     VectorType solution;
     VectorType solution_dot;
-    solution.reinit(owned_partitioning, mpi_communicator);
-    solution_dot.reinit(owned_partitioning, mpi_communicator);
+    solution.reinit(locally_owned_partitioning, mpi_communicator);
+    solution_dot.reinit(locally_owned_partitioning, mpi_communicator);
 
     solution = locally_relevant_solution;
 
