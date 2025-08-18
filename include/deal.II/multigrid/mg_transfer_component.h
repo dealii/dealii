@@ -198,6 +198,8 @@ public:
    * This function is a front-end for the same function in
    * MGTransferComponentBase.
    *
+   * @param dof The DoFHandler on which to perform the operation.
+   *
    * @param selected Number of the block of the global vector to be copied from
    * and to the multilevel vector. This number refers to the renumbering by
    * <tt>target_component</tt>.

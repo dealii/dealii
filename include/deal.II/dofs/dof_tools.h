@@ -1955,6 +1955,8 @@ namespace DoFTools
    * @param dof_handler The multilevel dof handler providing the
    * topology operated on.
    *
+   * @param level The multigrid level of the DoFHandler on which to operate.
+   *
    * @param interior_dofs_only for each patch of cells around a
    * vertex, collect only the interior degrees of freedom of the patch and
    * disregard those on the boundary of the patch. This is for instance the
@@ -2036,6 +2038,8 @@ namespace DoFTools
    *
    * @param dof_handler The multilevel dof handler providing the
    * topology operated on.
+   *
+   * @param level The multigrid level of the DoFHandler on which to operate.
    *
    * @param interior_dofs_only for each patch of cells around a
    * vertex, collect only the interior degrees of freedom of the patch and
