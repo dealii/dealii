@@ -1,0 +1,4 @@
+New: Integration of Gmsh api utilities for parallel distributed mesh handling: the
+function GridIn::read_partitioned_msh() can now be used to read partitioned mesh files in parallel.
+<br>
+(Raksha Devi, Luca Heltai, 2025/07/25)

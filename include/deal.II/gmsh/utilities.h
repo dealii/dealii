@@ -11,10 +11,8 @@
 // LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
 // ------------------------------------------------------------------------
-
-
-#ifndef dealii_gmsh_parameters_h
-#define dealii_gmsh_parameters_h
+#ifndef dealii_gmsh_utilities_h
+#define dealii_gmsh_utilities_h
 
 #include <deal.II/base/config.h>
 
