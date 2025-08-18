@@ -208,7 +208,7 @@ namespace MGTools
    * the function object that is part of the function_map argument are
    * ignored.
    *
-   * @arg <tt>boundary_indices</tt> is a vector which on return contains all
+   * @param boundary_indices A vector which on return contains all
    * indices of degrees of freedom for each level that are at the part of the
    * boundary identified by the function_map argument. Its length has to match
    * the number of levels in the dof handler object.

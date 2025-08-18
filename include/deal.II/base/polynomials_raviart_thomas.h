@@ -55,7 +55,7 @@ public:
    * Constructor, using the common Raviart-Thomas space of degree `k + 1` in
    * normal direction and `k` in the tangential directions.
    *
-   * @arg k: the degree of the Raviart-Thomas-space, which is the degree of
+   * @param k The degree of the Raviart-Thomas-space, which is the degree of
    * the largest tensor product polynomial space <i>Q<sub>k</sub></i>
    * contains.
    */

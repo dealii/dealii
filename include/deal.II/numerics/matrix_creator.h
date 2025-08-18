@@ -362,13 +362,13 @@ namespace MatrixCreator
    * If the library is configured to use multithreading, this function works
    * in parallel.
    *
-   * @arg @p weight: an optional weight for the computation of the mass
+   * @param weight an optional weight for the computation of the mass
    * matrix. If no weight is given, it is set to one.
    * In case you want to specify @p component_mapping and use the default argument
    * for the coefficient you have to specify the (unused) coefficient argument
    * as <code>(const Function <spacedim,number> *const)nullptr</code>.
    *
-   * @arg @p component_mapping: if the components in @p boundary_functions and
+   * @param component_mapping if the components in @p boundary_functions and
    * @p dof do not coincide, this vector allows them to be remapped. If the
    * vector is not empty, it has to have one entry for each component in @p
    * dof. This entry is the component number in @p boundary_functions that

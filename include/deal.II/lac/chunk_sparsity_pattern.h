@@ -306,7 +306,7 @@ public:
   /**
    * Initialize a rectangular matrix.
    *
-   * @arg m number of rows @arg n number of columns @arg max_per_row maximum
+   * @param m number of rows @param n number of columns @param max_per_row maximum
    * number of nonzero entries per row
    */
   ChunkSparsityPattern(const size_type m,
@@ -317,7 +317,7 @@ public:
   /**
    * Initialize a rectangular matrix.
    *
-   * @arg m number of rows @arg n number of columns @arg row_lengths possible
+   * @param m number of rows @param n number of columns @param row_lengths possible
    * number of nonzero entries for each row.  This vector must have one entry
    * for each row.
    */
@@ -341,7 +341,7 @@ public:
   /**
    * Initialize a quadratic matrix.
    *
-   * @arg m number of rows and columns @arg row_lengths possible number of
+   * @param m number of rows and columns @param row_lengths possible number of
    * nonzero entries for each row.  This vector must have one entry for each
    * row.
    */

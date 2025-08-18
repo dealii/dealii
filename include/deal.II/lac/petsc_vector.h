@@ -176,10 +176,10 @@ namespace PETScWrappers
        * Constructor. Set dimension to @p n and initialize all elements with
        * zero.
        *
-       * @arg locally_owned_size denotes the size of the chunk that shall be
+       * @param locally_owned_size denotes the size of the chunk that shall be
        * stored on the present process.
        *
-       * @arg communicator denotes the MPI communicator over which the
+       * @param communicator denotes the MPI communicator over which the
        * different parts of the vector shall communicate
        *
        * The constructor is made explicit to avoid accidents like this:
@@ -196,10 +196,10 @@ namespace PETScWrappers
        * Copy-constructor from deal.II vectors. Sets the dimension to that of
        * the given vector, and copies all elements.
        *
-       * @arg locally_owned_size denotes the size of the chunk that shall be
+       * @param locally_owned_size denotes the size of the chunk that shall be
        * stored on the present process.
        *
-       * @arg communicator denotes the MPI communicator over which the
+       * @param communicator denotes the MPI communicator over which the
        * different parts of the vector shall communicate
        */
       template <typename Number>

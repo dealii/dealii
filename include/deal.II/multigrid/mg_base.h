@@ -180,10 +180,10 @@ public:
    * Prolongate a vector from level <tt>to_level-1</tt> to level
    * <tt>to_level</tt>. The previous content of <tt>dst</tt> is overwritten.
    *
-   * @arg src is a vector with as many elements as there are degrees of
+   * @param src A vector with as many elements as there are degrees of
    * freedom on the coarser level involved.
    *
-   * @arg dst has as many elements as there are degrees of freedom on the
+   * @param dst as many elements as there are degrees of freedom on the
    * finer level.
    */
   virtual void
@@ -195,10 +195,10 @@ public:
    * Prolongate a vector from level <tt>to_level-1</tt> to level
    * <tt>to_level</tt>, summing into the previous content of <tt>dst</tt>.
    *
-   * @arg src is a vector with as many elements as there are degrees of
+   * @param src A vector with as many elements as there are degrees of
    * freedom on the coarser level involved.
    *
-   * @arg dst has as many elements as there are degrees of freedom on the
+   * @param dst as many elements as there are degrees of freedom on the
    * finer level.
    */
   virtual void
@@ -214,10 +214,10 @@ public:
    * freedom in <tt>dst</tt> are active and will not be altered. For the other
    * degrees of freedom, the result of the restriction is added.
    *
-   * @arg src is a vector with as many elements as there are degrees of
+   * @param src A vector with as many elements as there are degrees of
    * freedom on the finer level
    *
-   * @arg dst has as many elements as there are degrees of freedom on the
+   * @param dst as many elements as there are degrees of freedom on the
    * coarser level.
    */
   virtual void

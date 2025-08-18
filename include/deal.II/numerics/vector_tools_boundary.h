@@ -537,7 +537,7 @@ namespace VectorTools
    * In 1d, projection equals interpolation. Therefore,
    * interpolate_boundary_values is called.
    *
-   * @arg @p component_mapping: if the components in @p boundary_functions and
+   * @param component_mapping if the components in @p boundary_functions and
    * @p dof do not coincide, this vector allows them to be remapped. If the
    * vector is not empty, it has to have one entry for each component in @p
    * dof. This entry is the component number in @p boundary_functions that
