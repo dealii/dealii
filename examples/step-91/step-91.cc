@@ -582,13 +582,13 @@ namespace Step91
     const unsigned int n_elevation_dofs      = dofs_per_block[0];
     const unsigned int n_waterflow_rate_dofs = dofs_per_block[1];
 
-    // We then create index sets that for the current process track which DoFs
-    // are locally owned, and among these which correspond to the two variables.
-    // Once done with the locally owned DoFs, we do the same for the locally
-    // relevant DoFs. (The concepts of locally owned and locally relevant
-    // DoFs are discussed in the step-40 and
-    // @ref GlossLocallyOwnedDof "this" as well as
-    // @ref GlossLocallyRelevantDof "this" glossary entry.)
+    // We then create index sets that for the current process that
+    // track which DoFs are locally owned, and among these which
+    // correspond to the two variables.  Once done with the locally
+    // owned DoFs, we do the same for the locally relevant DoFs. (The
+    // concepts of locally owned and locally relevant DoFs are
+    // discussed in the step-40 and @ref GlossLocallyOwnedDof "this"
+    // as well as @ref GlossLocallyRelevantDof "this" glossary entry.)
     const IndexSet &locally_owned_dofs = dof_handler.locally_owned_dofs();
     locally_owned_partitioning = {locally_owned_dofs.get_view(0, n_elevation_dofs),
                           locally_owned_dofs.get_view(n_elevation_dofs,
