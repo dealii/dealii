@@ -214,6 +214,10 @@ namespace LinearAlgebra
          */
         operator Number() const;
 
+        void
+        update_ghost_values()
+        {}
+
         /**
          * Exception
          */

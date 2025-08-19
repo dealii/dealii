@@ -928,7 +928,14 @@ namespace LinearAlgebra
       Number
       frobenius_norm() const;
 
-      Number l1_norm() const {return matrix->getNorm1();}
+      Number
+      l1_norm() const
+      {
+        DEAL_II_NOT_IMPLEMENTED();
+        // recent Trilinos has
+        // matrix->getNorm1();
+        return {};
+      }
 
       /** @} */
 
