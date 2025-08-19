@@ -192,41 +192,54 @@ PolynomialsVectorAnisotropic<dim>::evaluate(
                                 p_fourth_derivatives);
 
       for (unsigned int i = 0; i < p_values.size(); ++i)
-        values[lexicographic_to_hierarchic[i + d * n_sub]][d] =
-          p_values[renumber_aniso[d][i]];
+        {
+          // Only the d-th entry is non-zero, the others get the value zero
+          Tensor<1, dim> val;
+          val[d] = p_values[renumber_aniso[d][i]];
+          values[lexicographic_to_hierarchic[i + d * n_sub]] = val;
+        }
 
       for (unsigned int i = 0; i < p_grads.size(); ++i)
-        for (unsigned int d1 = 0; d1 < dim; ++d1)
-          grads[lexicographic_to_hierarchic[i + d * n_sub]][d][(d1 + d) % dim] =
-            p_grads[renumber_aniso[d][i]][d1];
+        {
+          Tensor<2, dim> out;
+          for (unsigned int d1 = 0; d1 < dim; ++d1)
+            out[d][(d1 + d) % dim] = p_grads[renumber_aniso[d][i]][d1];
+          grads[lexicographic_to_hierarchic[i + d * n_sub]] = out;
+        }
 
       for (unsigned int i = 0; i < p_grad_grads.size(); ++i)
-        for (unsigned int d1 = 0; d1 < dim; ++d1)
-          for (unsigned int d2 = 0; d2 < dim; ++d2)
-            grad_grads[lexicographic_to_hierarchic[i + d * n_sub]][d]
-                      [(d1 + d) % dim][(d2 + d) % dim] =
-                        p_grad_grads[renumber_aniso[d][i]][d1][d2];
+        {
+          Tensor<3, dim> out;
+          for (unsigned int d1 = 0; d1 < dim; ++d1)
+            for (unsigned int d2 = 0; d2 < dim; ++d2)
+              out[d][(d1 + d) % dim][(d2 + d) % dim] =
+                p_grad_grads[renumber_aniso[d][i]][d1][d2];
+          grad_grads[lexicographic_to_hierarchic[i + d * n_sub]] = out;
+        }
 
       for (unsigned int i = 0; i < p_third_derivatives.size(); ++i)
-        for (unsigned int d1 = 0; d1 < dim; ++d1)
-          for (unsigned int d2 = 0; d2 < dim; ++d2)
-            for (unsigned int d3 = 0; d3 < dim; ++d3)
-              third_derivatives[lexicographic_to_hierarchic[i + d * n_sub]][d]
-                               [(d1 + d) % dim][(d2 + d) % dim]
-                               [(d3 + d) % dim] =
-                                 p_third_derivatives[renumber_aniso[d][i]][d1]
-                                                    [d2][d3];
+        {
+          Tensor<4, dim> out;
+          for (unsigned int d1 = 0; d1 < dim; ++d1)
+            for (unsigned int d2 = 0; d2 < dim; ++d2)
+              for (unsigned int d3 = 0; d3 < dim; ++d3)
+                out[d][(d1 + d) % dim][(d2 + d) % dim][(d3 + d) % dim] =
+                  p_third_derivatives[renumber_aniso[d][i]][d1][d2][d3];
+          third_derivatives[lexicographic_to_hierarchic[i + d * n_sub]] = 0;
+        }
 
       for (unsigned int i = 0; i < p_fourth_derivatives.size(); ++i)
-        for (unsigned int d1 = 0; d1 < dim; ++d1)
-          for (unsigned int d2 = 0; d2 < dim; ++d2)
-            for (unsigned int d3 = 0; d3 < dim; ++d3)
-              for (unsigned int d4 = 0; d4 < dim; ++d4)
-                fourth_derivatives[lexicographic_to_hierarchic[i + d * n_sub]]
-                                  [d][(d1 + d) % dim][(d2 + d) % dim]
-                                  [(d3 + d) % dim][(d4 + d) % dim] =
-                                    p_fourth_derivatives[renumber_aniso[d][i]]
-                                                        [d1][d2][d3][d4];
+        {
+          Tensor<5, dim> out;
+          for (unsigned int d1 = 0; d1 < dim; ++d1)
+            for (unsigned int d2 = 0; d2 < dim; ++d2)
+              for (unsigned int d3 = 0; d3 < dim; ++d3)
+                for (unsigned int d4 = 0; d4 < dim; ++d4)
+                  out[d][(d1 + d) % dim][(d2 + d) % dim][(d3 + d) %
+                                                         dim][(d4 + d) % dim] =
+                    p_fourth_derivatives[renumber_aniso[d][i]][d1][d2][d3][d4];
+          fourth_derivatives[lexicographic_to_hierarchic[i + d * n_sub]] = out;
+        }
     }
 }
 
