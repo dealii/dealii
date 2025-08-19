@@ -54,7 +54,7 @@ public:
    * Constructor. Creates all basis functions for Nédélec polynomials of
    * given degree.
    *
-   * @arg k: the degree of the Nédélec space, which is the degree of the
+   * @param k The degree of the Nédélec space, which is the degree of the
    * largest tensor product polynomial space <i>Q<sub>k</sub></i> contained.
    */
   PolynomialsNedelec(const unsigned int k);

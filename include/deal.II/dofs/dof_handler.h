@@ -747,7 +747,7 @@ public:
    * computing a new ordering of the degree of freedom indices. However, it
    * can of course also be called from user code.
    *
-   * @arg new_number This array must have a size equal to the number of
+   * @param[in] new_numbers This array must have a size equal to the number of
    * degrees of freedom owned by the current processor, i.e. the size must be
    * equal to what n_locally_owned_dofs() returns. If only one processor
    * participates in storing the current mesh, then this equals the total

@@ -56,7 +56,7 @@ public:
    * Constructor. Creates all basis functions for Raviart-Thomas polynomials
    * of given degree.
    *
-   * @arg k: the degree of the Raviart-Thomas-space, which is the degree of
+   * @param k The degree of the Raviart-Thomas-space, which is the degree of
    * the largest tensor product polynomial space <i>Q<sub>k</sub></i>
    * contained.
    */

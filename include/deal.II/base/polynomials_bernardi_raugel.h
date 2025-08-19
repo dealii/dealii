@@ -88,7 +88,7 @@ public:
    * Constructor. Creates all basis functions for Bernardi-Raugel polynomials
    * of given degree.
    *
-   * @arg k The degree of the Bernardi-Raugel-space, which is currently
+   * @param k The degree of the Bernardi-Raugel-space, which is currently
    * limited to the case <tt>k=1</tt>.
    */
   PolynomialsBernardiRaugel(const unsigned int k);
