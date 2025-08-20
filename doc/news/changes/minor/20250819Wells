@@ -1,0 +1,6 @@
+Fixed: Polynomials derived from the class PolynomialsVectorAnisotropic would
+previously not overwrite all previous content in the `values`, `grads` and
+higher derivative fields that are designated as output. The behavior has been
+fixed, making sure that all content is explicitly written in the function.
+<br>
+(David Wells, Martin Kronbichler, 2025/08/19)
