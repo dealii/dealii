@@ -312,7 +312,7 @@ where $\nabla S_h(\mathbf x_K)$ is the gradient of the discrete saturation
 variable evaluated at the center $\mathbf x_K$ of cell $K$. This approach is
 analogous to ones frequently used in compressible flow problems, where density
 gradients are used to indicate refinement. That said, as we will
-discuss at the end of the @ref step_43-Results "results section", this turns
+discuss at the end of the @ref step_43-ResultsSection "results section", this turns
 out to not be a very useful criterion since it leads to refinement basically
 everywhere. We only show it here for illustrative purposes.
 
