@@ -72,6 +72,11 @@ template <int dim, int spacedim = dim>
 class MappingP1 : public Mapping<dim, spacedim>
 {
 public:
+  /**
+   * Default constructor.
+   */
+  MappingP1() = default;
+
   virtual std::unique_ptr<Mapping<dim, spacedim>>
   clone() const override;
 
