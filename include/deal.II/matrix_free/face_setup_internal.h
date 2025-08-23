@@ -640,7 +640,8 @@ namespace internal
                     {
                       face_is_owned[dcell->face(f)->index()] =
                         FaceCategory::locally_active_done_here;
-                      if (dcell->level() == neighbor->level())
+                      if (dcell->level() == neighbor->level() ||
+                          dcell->has_periodic_neighbor(f))
                         face_is_owned
                           [neighbor
                              ->face(dcell->has_periodic_neighbor(f) ?
@@ -813,37 +814,45 @@ namespace internal
                       {
                         typename dealii::Triangulation<dim>::cell_iterator
                           neighbor = dcell->neighbor_or_periodic_neighbor(f);
-                        if (use_active_cells && neighbor->has_children() &&
-                            dim > 1)
+                        if (use_active_cells && neighbor->has_children())
                           {
-                            // dim > 1 because face()->n_children() = 0 when dim
-                            // == 1
-                            for (unsigned int c = 0;
-                                 c < dcell->face(f)->n_children();
-                                 ++c)
+                            const unsigned int n_children =
+                              (dim == 1) ? 1 : dcell->face(f)->n_children();
+                            for (unsigned int c = 0; c < n_children; ++c)
                               {
                                 typename dealii::Triangulation<
-                                  dim>::cell_iterator neighbor_c =
-                                  dcell->at_boundary(f) ?
-                                    dcell->periodic_neighbor_child_on_subface(
-                                      f, c) :
-                                    dcell->neighbor_child_on_subface(f, c);
+                                  dim>::cell_iterator neighbor_c;
+                                if (dim > 1)
+                                  neighbor_c =
+                                    (dcell->at_boundary(f) ?
+                                       dcell
+                                         ->periodic_neighbor_child_on_subface(
+                                           f, c) :
+                                       dcell->neighbor_child_on_subface(f, c));
+                                else
+                                  {
+                                    // in 1D, adjacent cells can differ by
+                                    // more than 1 level
+                                    neighbor_c = neighbor->child(1 - f);
+                                    while (!neighbor_c->is_active())
+                                      neighbor_c = neighbor_c->child(1 - f);
+                                  }
                                 const types::subdomain_id neigh_domain =
                                   neighbor_c->subdomain_id();
                                 const unsigned int neighbor_face_no =
                                   dcell->has_periodic_neighbor(f) ?
                                     dcell->periodic_neighbor_face_no(f) :
                                     dcell->neighbor_face_no(f);
+                                const unsigned int child_face_index =
+                                  dim > 1 ? dcell->face(f)->child(c)->index() :
+                                            dcell->face(f)->index();
                                 if (neigh_domain != dcell->subdomain_id() ||
-                                    face_visited
-                                        [dcell->face(f)->child(c)->index()] ==
-                                      1)
+                                    face_visited[child_face_index] == 1)
                                   {
                                     std::pair<unsigned int, unsigned int>
                                       level_index(neighbor_c->level(),
                                                   neighbor_c->index());
-                                    if (face_is_owned
-                                          [dcell->face(f)->child(c)->index()] ==
+                                    if (face_is_owned[child_face_index] ==
                                         FaceCategory::locally_active_done_here)
                                       {
                                         ++inner_counter;
@@ -855,9 +864,7 @@ namespace internal
                                           cell,
                                           is_mixed_mesh));
                                       }
-                                    else if (face_is_owned[dcell->face(f)
-                                                             ->child(c)
-                                                             ->index()] ==
+                                    else if (face_is_owned[child_face_index] ==
                                                FaceCategory::ghosted ||
                                              face_is_owned[dcell->face(f)
                                                              ->index()] ==
@@ -880,65 +887,10 @@ namespace internal
                                   }
                                 else
                                   {
-                                    face_visited
-                                      [dcell->face(f)->child(c)->index()] = 1;
+                                    face_visited[child_face_index] = 1;
+                                    if (dcell->has_periodic_neighbor(f))
+                                      face_visited[dcell->face(f)->index()] = 1;
                                   }
-                              }
-                          }
-                        else if (dim == 1)
-                          {
-                            // Follow much the same procedure of dim > 1 with
-                            // one large exception: Face is created on first
-                            // visitation as long as neighbor has no children
-                            // face_visited is used as a flag that a face has
-                            // already been created
-                            if (face_visited[dcell->face(f)->index()] == 0 &&
-                                !(neighbor->has_children()))
-                              {
-                                std::pair<unsigned int, unsigned int>
-                                  level_index(neighbor->level(),
-                                              neighbor->index());
-                                if (face_is_owned[dcell->face(f)->index()] ==
-                                    FaceCategory::locally_active_done_here)
-                                  {
-                                    Assert(use_active_cells ||
-                                             dcell->level() ==
-                                               neighbor->level(),
-                                           ExcInternalError());
-                                    ++inner_counter;
-                                    inner_faces.push_back(create_face(
-                                      f,
-                                      dcell,
-                                      cell,
-                                      neighbor,
-                                      map_to_vectorized[level_index],
-                                      is_mixed_mesh));
-                                    face_visited[dcell->face(f)->index()] = 1;
-                                  }
-                                else if (face_is_owned[dcell->face(f)
-                                                         ->index()] ==
-                                         FaceCategory::ghosted)
-                                  {
-                                    inner_ghost_faces.push_back(create_face(
-                                      f,
-                                      dcell,
-                                      cell,
-                                      neighbor,
-                                      map_to_vectorized[level_index],
-                                      is_mixed_mesh));
-                                    face_visited[dcell->face(f)->index()] = 1;
-                                  }
-                              }
-                            if (face_is_owned[dcell->face(f)->index()] ==
-                                FaceCategory::multigrid_refinement_edge)
-                              {
-                                refinement_edge_faces.push_back(
-                                  create_face(f,
-                                              dcell,
-                                              cell,
-                                              neighbor,
-                                              refinement_edge_faces.size(),
-                                              is_mixed_mesh));
                               }
                           }
                         else
@@ -949,8 +901,10 @@ namespace internal
                             const types::subdomain_id neigh_domain =
                               use_active_cells ? neighbor->subdomain_id() :
                                                  neighbor->level_subdomain_id();
+                            const unsigned int face_index =
+                              dcell->face(f)->index();
                             if (neigh_domain != my_domain ||
-                                face_visited[dcell->face(f)->index()] == 1)
+                                face_visited[face_index] == 1)
                               {
                                 std::pair<unsigned int, unsigned int>
                                   level_index(neighbor->level(),
@@ -971,8 +925,7 @@ namespace internal
                                       map_to_vectorized[level_index],
                                       is_mixed_mesh));
                                   }
-                                else if (face_is_owned[dcell->face(f)
-                                                         ->index()] ==
+                                else if (face_is_owned[face_index] ==
                                          FaceCategory::ghosted)
                                   {
                                     inner_ghost_faces.push_back(create_face(
@@ -986,7 +939,7 @@ namespace internal
                               }
                             else
                               {
-                                face_visited[dcell->face(f)->index()] = 1;
+                                face_visited[face_index] = 1;
                                 if (dcell->has_periodic_neighbor(f))
                                   face_visited
                                     [neighbor
@@ -994,7 +947,7 @@ namespace internal
                                          dcell->periodic_neighbor_face_no(f))
                                        ->index()] = 1;
                               }
-                            if (face_is_owned[dcell->face(f)->index()] ==
+                            if (face_is_owned[face_index] ==
                                 FaceCategory::multigrid_refinement_edge)
                               {
                                 refinement_edge_faces.push_back(

@@ -35,6 +35,15 @@ All entries are signed with the names of the authors.
   (Arthur Bawin, David Wells, 2025/08/20)
  </li>
 
+ <li>
+  Fixed: The setup of faces of MatrixFree for `dim = 1` across
+  periodic boundaries added some faces twice. This is
+  now fixed.
+  <br>
+  (Martin Kronbichler, Peter Munch, Magdalena Schreter-Fleischhacker,
+  Andreas Koch, 2025/07/25)
+ </li>
+
 </ol>
 
 */

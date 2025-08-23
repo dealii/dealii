@@ -751,6 +751,14 @@ inconvenience this causes.
  </li>
 
  <li>
+  Fixed: For `dim = 1`, the setup of MatrixFree did not correctly
+  identify faces between cells of different refinement level. This is
+  now fixed.
+  <br>
+  (Sean Johnson, 2024/12/12)
+ </li>
+
+ <li>
   New: Configuration and CI job for pre-commit.
   The tool pre-commit can install hooks into the local git repo.
   These will be run on every call to git commit and perform some quick checks
