@@ -40,10 +40,10 @@ test(unsigned int degree,
      bool         is_continuous)
 {
   std::pair<std::vector<unsigned int>, std::vector<unsigned int>> result =
-    FETools::cell_to_face_patch<dim>(degree,
-                                     direction,
-                                     cell_hierarchical_numbering,
-                                     is_continuous);
+    FETools::cell_to_face_patch_numbering<dim>(degree,
+                                               direction,
+                                               cell_hierarchical_numbering,
+                                               is_continuous);
 
   deallog << "Results for degree = " << degree << ", dim = " << dim
           << ", direction = " << direction
