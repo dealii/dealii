@@ -24,7 +24,7 @@
 set(PSBLAS_DIR "" CACHE PATH "An optional hint to a PSBLAS installation containing the PSBLAS include directory and libraries")
 set_if_empty(PSBLAS_DIR "$ENV{PSBLAS_DIR}")
 
-set(_psblas_libs "psb_base;psb_cbind;psb_krylov;psb_prec;psb_util")
+set(_psblas_libs "psb_base;psb_cbind;psb_linsolve;psb_prec;psb_util")
 set(_psblas_library_variables "")
 
 foreach(_lib ${_psblas_libs})
@@ -43,7 +43,7 @@ deal_ii_find_path(PSBLAS_INCLUDE_DIR psb_c_base.h
   PATH_SUFFIXES include
   )
 
-set(_additional_libraries "")
+set(_additional_libraries ${_interface_lapack} ${_interface_blas})
 set(_fortran_libs ${CMAKE_Fortran_IMPLICIT_LINK_LIBRARIES})
 # Arbitrarily set this to gfortran and m, if they are not found, the user will
 # have to set them manually
@@ -59,8 +59,13 @@ process_feature(PSBLAS
     REQUIRED 
       ${_psblas_library_variables}
       ${_additional_libraries}
+      LAPACK_LIBRARIES
+      MPI_CXX_LIBRARIES
+      MPI_Fortran_LIBRARIES
   INCLUDE_DIRS 
     REQUIRED PSBLAS_INCLUDE_DIR
+  LINKER_FLAGS
+    REQUIRED ${_interface_lapack} ${_interface_blas}
   CLEAR
     ${_psblas_library_variables} ${_additional_libraries} PSBLAS_INCLUDE_DIR
   )
