@@ -646,8 +646,9 @@ public:
    *
    * @pre  Mesh files must match the number of MPI ranks. An exception is thrown
    * if there are more (or less) files than ranks.
-   * @note The function uses GMSH's API to read the mesh and requires GMSH to be
-   * initialized before calling this function.
+   * @note This function internally calls `gmsh::initialize()` (and
+   * `gmsh::finalize()` when finished), so users do *not* need to
+   * initialize or finalize Gmsh themselves before or after calling it.
    */
 
   void
