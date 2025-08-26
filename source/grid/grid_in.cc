@@ -3076,8 +3076,7 @@ GridIn<dim, spacedim>::read_partitioned_msh(const std::string &file_prefix,
 
       const std::string extra_fname =
         file_prefix + "_" + std::to_string(nprocs + 1) + "." + file_suffix;
-      std::ifstream f(extra_fname);
-      AssertThrow(!f.good(),
+      AssertThrow(!std::filesystem::exists(extra_fname),
                   ExcMessage("Expected " + std::to_string(nprocs) +
                              " mesh files, but found extra: " + extra_fname));
     }
@@ -3147,6 +3146,32 @@ GridIn<dim, spacedim>::read_partitioned_msh(const std::string &file_prefix,
           coords[3 * i + d];
     }
 
+  // Count total volume elements and reserave space
+  std::size_t total_volume_elements = 0;
+  for (const auto &e : entities)
+    {
+      if (e.first == dim)
+        {
+          std::vector<int>                      count_element_types;
+          std::vector<std::vector<std::size_t>> count_element_ids,
+            count_element_nodes;
+          gmsh::model::mesh::getElements(count_element_types,
+                                         count_element_ids,
+                                         count_element_nodes,
+                                         e.first,
+                                         e.second);
+
+          for (unsigned int i = 0; i < count_element_ids.size(); ++i)
+            total_volume_elements += count_element_ids[i].size();
+        }
+    }
+
+  // Reserve space for all vectors that will grow during processing
+  triangulation_description.coarse_cells.reserve(total_volume_elements);
+  triangulation_description.coarse_cell_index_to_coarse_cell_id.reserve(
+    total_volume_elements);
+  triangulation_description.cell_infos[0].reserve(total_volume_elements);
+
   for (const auto &e : entities)
     {
       const int entity_dim = e.first;
@@ -3160,13 +3185,10 @@ GridIn<dim, spacedim>::read_partitioned_msh(const std::string &file_prefix,
           gmsh::model::mesh::getElements(
             element_types, element_ids, element_nodes, entity_dim, entity_tag);
 
-
-
           for (unsigned int i = 0; i < element_types.size(); ++i)
             {
               if (element_ids[i].empty())
                 continue;
-
 
               const unsigned int n_vertices =
                 element_nodes[i].size() / element_ids[i].size();
