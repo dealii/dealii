@@ -8625,7 +8625,7 @@ namespace GridGenerator
         const auto material_id_cell = cell->material_id();
 
         // create cells one by one
-        if (dim == 2)
+        if constexpr (dim == 2)
           {
             // get cell-manifold id from current quad cell
             const auto manifold_id_cell = cell->manifold_id();
@@ -8643,7 +8643,7 @@ namespace GridGenerator
                        numbers::internal_face_boundary_id,
                        manifold_id_cell);
           }
-        else if (dim == 3)
+        else if constexpr (dim == 3)
           {
             // get cell-manifold id from current quad cell
             const auto manifold_id_cell = cell->manifold_id();
@@ -8671,7 +8671,7 @@ namespace GridGenerator
           DEAL_II_NOT_IMPLEMENTED();
 
         // Set up sub-cell data.
-        if (dim == 2)
+        if constexpr (dim == 2)
           {
             for (const auto &[quad_face_no, tri_face_vertices] :
                  vertex_ids_for_boundary_faces_2d)
@@ -8683,7 +8683,7 @@ namespace GridGenerator
                          face->manifold_id());
               }
           }
-        else if (dim == 3)
+        else if constexpr (dim == 3)
           {
             for (const auto &[hex_face_no, tet_face_vertices] :
                  vertex_ids_for_boundary_faces_3d)
@@ -8710,7 +8710,7 @@ namespace GridGenerator
 
         // set manifold ids of edges that were already present in the
         // triangulation.
-        if (dim == 3)
+        if constexpr (dim == 3)
           {
             for (const auto e : cell->line_indices())
               {
