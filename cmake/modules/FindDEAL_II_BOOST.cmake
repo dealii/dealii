@@ -48,11 +48,11 @@ endif()
 set(Boost_NO_WARN_NEW_VERSIONS TRUE)
 if(DEAL_II_WITH_ZLIB)
   find_package(Boost ${BOOST_VERSION_REQUIRED} COMPONENTS
-    iostreams serialization system thread
+    iostreams serialization
     )
 else()
   find_package(Boost ${BOOST_VERSION_REQUIRED} COMPONENTS
-    serialization system thread
+    serialization
     )
 endif()
 
@@ -71,8 +71,6 @@ process_feature(BOOST
     Boost_DIR Boost_INCLUDE_DIRS Boost_IOSTREAMS_LIBRARY_DEBUG
     Boost_IOSTREAMS_LIBRARY_RELEASE Boost_LIBRARY_DIR
     Boost_SERIALIZATION_LIBRARY_DEBUG Boost_SERIALIZATION_LIBRARY_RELEASE
-    Boost_SYSTEM_LIBRARY_DEBUG Boost_SYSTEM_LIBRARY_RELEASE
-    Boost_THREAD_LIBRARY_DEBUG Boost_THREAD_LIBRARY_RELEASE
     Boost_LIBRARY_DIR_DEBUG Boost_LIBRARY_DIR_RELEASE
     _Boost_COMPONENTS_SEARCHED _Boost_INCLUDE_DIR_LAST
     _Boost_LIBRARY_DIR_LAST _Boost_USE_MULTITHREADED_LAST
