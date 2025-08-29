@@ -3146,7 +3146,7 @@ GridIn<dim, spacedim>::read_partitioned_msh(const std::string &file_prefix,
           coords[3 * i + d];
     }
 
-  // Count total volume elements and reserave space
+  // Count total volume elements and reserve space
   std::size_t total_volume_elements = 0;
   for (const auto &e : entities)
     {
