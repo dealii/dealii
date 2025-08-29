@@ -1,0 +1,60 @@
+This tutorial program, step-98, demonstrates the implementation and application of geometric multigrid (GMG) methods
+combined with patch smoothers with localized residual computations. It builds upon the concepts introduced in step-37.
+
+The work is based on the algorithms described in the following paper:
+<br>
+<i>
+Smoothers with localized residual computations for geometric multigrid methods
+<br>
+Michał Wichrowski, Peter Munch, Martin Kronbichler, Guido Kanschat
+<br>
+https://arxiv.org/abs/2407.02100
+</i>
+
+<a name="Motivation"></a>
+<h1>Motivation</h1>
+
+Geometric multigrid methods are highly efficient solvers for the large linear systems arising from the discretization of
+partial differential equations. A key component of GMG is the smoother, typically an iterative method like Jacobi
+or Chebyshev iteration, which damps high-frequency error components on each level of the multigrid hierarchy.
+However, these methods  rely on global operations: such as computing residuals or multipying with diagonal.
+These operations can lead to poor CPU cache utilization due to the non-local memory access patterns, especially for
+large-scale problems. Furthermore, the number of iterations typically grows significantly with the polynomial degree ($p$) of the finite
+element space.
+
+
+To address this challenge, this program explores a specific type of localized smoother: a **patch smoother**. The core
+idea is to avoid global residual computations within the smoother step. Instead, the smoother operates on small,
+overlapping vertex-patches of cells (consisting of $2^d$ cells). For each patch, the residual is computed using only the
+solution values within that patch, and an approximate inverse of the operator restricted to that patch is applied to the
+local residual to compute a correction. This localization significantly reduces the cache overhead during the
+smoothing process compared to standard smoothers relying on global matrix-vector products. For structured
+patches (like those arising from uniform refinement), the local patch operator often exhibits a tensor product structure,
+allowing for highly efficient computation and inversion using specialized techniques.
+
+<a name="WhatTheProgramDoes"></a>
+<h1>What the program does</h1>
+
+This program solves a simple Poisson equation (<code>-Δu = 1</code> with zero Dirichlet boundary conditions) on a hypercube
+domain using a continuous Galerkin (CG) finite element method of potentially high polynomial degree (`FE_Q`). It employs
+a geometric multigrid (GMG) preconditioner within an iterative solver.
+
+The main focus is to implement and demonstrate a specific **patch smoother** (`Operators::LaplacePatchSmoother`) within
+the GMG framework, leveraging deal.II's matrix-free infrastructure. This smoother aims to reduce communication overhead
+compared to traditional smoothers.
+
+The implementation leverages deal.II's matrix-free infrastructure (`MatrixFree`, `FEEvaluation`) and its support for
+geometric multigrid (`MGLevelObject`, `MGTransferMatrixFree`, `PreconditionMG`). Specifically, it demonstrates how to:
+- Set up the `MatrixFree` data structures for a multigrid hierarchy (`Operators::LaplaceOperator` for level matrices).
+- Implement the `Operators::LaplacePatchSmoother` based on the `PatchOperator::SmootherBase` framework. This involves:
+    - Using `PatchOperator::PatchStorage` to define and manage the overlapping patches of cells and the associated
+      degrees of freedom.
+    - Using `PatchOperator::FEPatchEvaluation` to efficiently gather data from the global solution vector to local patch
+      vectors, perform local operator evaluations (for residual computation), and scatter local corrections back to the
+      global vector.
+- Implement an efficient inverse for the local operator on each patch (`Operators::PatchTensorInverse`). This class
+  utilizes the `TensorProductMatrixSymmetricSum` class to exploit the tensor product structure of the local Laplace
+  operator on the $2^d$ cell patch, allowing for fast computation and application of the inverse.
+- Integrate this custom patch smoother into the `PreconditionMG` framework using `mg::SmootherRelaxation` and
+  `MGCoarseGridApplySmoother`.
+- Solve the linear system using CG preconditioned by the matrix-free GMG method featuring the patch smoother.
