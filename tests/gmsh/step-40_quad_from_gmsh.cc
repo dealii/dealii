@@ -166,7 +166,7 @@ namespace Step40
     constraints.reinit(locally_owned_dofs, locally_relevant_dofs);
     DoFTools::make_hanging_node_constraints(dof_handler, constraints);
     VectorTools::interpolate_boundary_values(
-      mapping, dof_handler, 0, Functions::ZeroFunction<dim>(), constraints);
+      mapping, dof_handler, 11, Functions::ZeroFunction<dim>(), constraints);
     constraints.close();
 
     DynamicSparsityPattern dsp(locally_relevant_dofs);

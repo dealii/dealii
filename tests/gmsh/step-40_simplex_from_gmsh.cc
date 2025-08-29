@@ -156,7 +156,7 @@ namespace Step40
     constraints.reinit(locally_owned_dofs, locally_relevant_dofs);
     DoFTools::make_hanging_node_constraints(dof_handler, constraints);
     VectorTools::interpolate_boundary_values(
-      mapping, dof_handler, 0, Functions::ZeroFunction<dim>(), constraints);
+      mapping, dof_handler, 11, Functions::ZeroFunction<dim>(), constraints);
     constraints.close();
 
     DynamicSparsityPattern dsp(locally_relevant_dofs);
@@ -264,23 +264,6 @@ namespace Step40
 
     constraints.distribute(completely_distributed_solution);
     locally_relevant_solution = completely_distributed_solution;
-
-    Vector<double> difference(triangulation.n_active_cells());
-
-    const QGaussSimplex<dim> quadrature_formula(fe.degree + 1);
-
-    VectorTools::integrate_difference(mapping,
-                                      dof_handler,
-                                      locally_relevant_solution,
-                                      Functions::ZeroFunction<dim>(),
-                                      difference,
-                                      quadrature_formula,
-                                      VectorTools::L2_norm);
-
-    deallog << VectorTools::compute_global_error(triangulation,
-                                                 difference,
-                                                 VectorTools::L2_norm)
-            << std::endl;
   }
 
   template <int dim>
