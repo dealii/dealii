@@ -28,6 +28,7 @@
 #  ifdef DEAL_II_WITH_TRILINOS
 #    include <deal.II/lac/trilinos_parallel_block_vector.h>
 #    include <deal.II/lac/trilinos_vector.h>
+
 #  endif
 #  ifdef DEAL_II_WITH_PETSC
 #    include <deal.II/lac/petsc_block_vector.h>
