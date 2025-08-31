@@ -21,7 +21,7 @@ machine as long as you have PETSc installed. Information on how to tell
 deal.II about a PETSc installation on your system can be found in the deal.II
 README file, which is linked to from the <a href="../../index.html">main
 documentation page</a>
-in your installation of deal.II, or on <a href="http://www.dealii.org/">the
+in your installation of deal.II, or on <a href="http://dealii.org/">the
 deal.II webpage</a>.
 
 

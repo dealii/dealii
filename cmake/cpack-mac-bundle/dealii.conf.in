@@ -65,7 +65,7 @@ If you are new to Deal.II you probably want to have a look at
 
 For more information please visit the project website:
 
-http://www.dealii.org
+http://dealii.org
 
 If you want to set up your daily Terminal to work with deal.II, add
 these lines to your ~/.profile file (the first line turns off this message):

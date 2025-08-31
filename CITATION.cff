@@ -9,7 +9,7 @@ message: >-
 type: software
 authors:
   - name: The deal.II authors
-    website: 'https://www.dealii.org/authors.html'
+    website: 'https://dealii.org/authors.html'
 identifiers:
   - type: url
     value: 'https://dealii.org/publications.html'

@@ -107,50 +107,50 @@ anisotropic ones (colors indicate the refinement level of cells):
 <table width="80%" align="center">
   <tr>
     <td align="center">
-      <img src="https://www.dealii.org/images/steps/developer/step-30.grid-0.iso.9.2.png" alt="">
+      <img src="https://dealii.org/images/steps/developer/step-30.grid-0.iso.9.2.png" alt="">
     </td>
     <td align="center">
-      <img src="https://www.dealii.org/images/steps/developer/step-30.grid-0.aniso.9.2.png" alt="">
-    </td>
-  </tr>
-  <tr>
-    <td align="center">
-      <img src="https://www.dealii.org/images/steps/developer/step-30.grid-1.iso.9.2.png" alt="">
-    </td>
-    <td align="center">
-      <img src="https://www.dealii.org/images/steps/developer/step-30.grid-1.aniso.9.2.png" alt="">
+      <img src="https://dealii.org/images/steps/developer/step-30.grid-0.aniso.9.2.png" alt="">
     </td>
   </tr>
   <tr>
     <td align="center">
-      <img src="https://www.dealii.org/images/steps/developer/step-30.grid-2.iso.9.2.png" alt="">
+      <img src="https://dealii.org/images/steps/developer/step-30.grid-1.iso.9.2.png" alt="">
     </td>
     <td align="center">
-      <img src="https://www.dealii.org/images/steps/developer/step-30.grid-2.aniso.9.2.png" alt="">
-    </td>
-  </tr>
-  <tr>
-    <td align="center">
-      <img src="https://www.dealii.org/images/steps/developer/step-30.grid-3.iso.9.2.png" alt="">
-    </td>
-    <td align="center">
-      <img src="https://www.dealii.org/images/steps/developer/step-30.grid-3.aniso.9.2.png" alt="">
+      <img src="https://dealii.org/images/steps/developer/step-30.grid-1.aniso.9.2.png" alt="">
     </td>
   </tr>
   <tr>
     <td align="center">
-      <img src="https://www.dealii.org/images/steps/developer/step-30.grid-4.iso.9.2.png" alt="">
+      <img src="https://dealii.org/images/steps/developer/step-30.grid-2.iso.9.2.png" alt="">
     </td>
     <td align="center">
-      <img src="https://www.dealii.org/images/steps/developer/step-30.grid-4.aniso.9.2.png" alt="">
+      <img src="https://dealii.org/images/steps/developer/step-30.grid-2.aniso.9.2.png" alt="">
     </td>
   </tr>
   <tr>
     <td align="center">
-      <img src="https://www.dealii.org/images/steps/developer/step-30.grid-5.iso.9.2.png" alt="">
+      <img src="https://dealii.org/images/steps/developer/step-30.grid-3.iso.9.2.png" alt="">
     </td>
     <td align="center">
-      <img src="https://www.dealii.org/images/steps/developer/step-30.grid-5.aniso.9.2.png" alt="">
+      <img src="https://dealii.org/images/steps/developer/step-30.grid-3.aniso.9.2.png" alt="">
+    </td>
+  </tr>
+  <tr>
+    <td align="center">
+      <img src="https://dealii.org/images/steps/developer/step-30.grid-4.iso.9.2.png" alt="">
+    </td>
+    <td align="center">
+      <img src="https://dealii.org/images/steps/developer/step-30.grid-4.aniso.9.2.png" alt="">
+    </td>
+  </tr>
+  <tr>
+    <td align="center">
+      <img src="https://dealii.org/images/steps/developer/step-30.grid-5.iso.9.2.png" alt="">
+    </td>
+    <td align="center">
+      <img src="https://dealii.org/images/steps/developer/step-30.grid-5.aniso.9.2.png" alt="">
     </td>
   </tr>
 </table>
@@ -164,18 +164,18 @@ polynomials:
 <table width="60%" align="center">
   <tr>
     <td align="center">
-      <img src="https://www.dealii.org/images/steps/developer/step-30.sol-1.iso.9.2.png" alt="">
+      <img src="https://dealii.org/images/steps/developer/step-30.sol-1.iso.9.2.png" alt="">
     </td>
     <td align="center">
-      <img src="https://www.dealii.org/images/steps/developer/step-30.sol-1.aniso.9.2.png" alt="">
+      <img src="https://dealii.org/images/steps/developer/step-30.sol-1.aniso.9.2.png" alt="">
     </td>
   </tr>
   <tr>
     <td align="center">
-      <img src="https://www.dealii.org/images/steps/developer/step-30.sol-4.iso.9.2.png" alt="">
+      <img src="https://dealii.org/images/steps/developer/step-30.sol-4.iso.9.2.png" alt="">
     </td>
     <td align="center">
-      <img src="https://www.dealii.org/images/steps/developer/step-30.sol-4.aniso.9.2.png" alt="">
+      <img src="https://dealii.org/images/steps/developer/step-30.sol-4.aniso.9.2.png" alt="">
     </td>
   </tr>
 </table>

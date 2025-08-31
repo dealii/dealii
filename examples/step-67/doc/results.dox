@@ -1,3 +1,4 @@
+@anchor step_67-ResultsSection
 <h1>Results</h1>
 
 <h3>Program output</h3>
@@ -426,18 +427,18 @@ many sound waves all over the place.
 <table align="center" class="doxtable" style="width:85%">
   <tr>
     <td>
-        <img src="https://www.dealii.org/images/steps/developer/step-67.pressure_010.png" alt="" width="100%">
+        <img src="https://dealii.org/images/steps/developer/step-67.pressure_010.png" alt="" width="100%">
     </td>
     <td>
-        <img src="https://www.dealii.org/images/steps/developer/step-67.pressure_025.png" alt="" width="100%">
+        <img src="https://dealii.org/images/steps/developer/step-67.pressure_025.png" alt="" width="100%">
     </td>
   </tr>
   <tr>
     <td>
-        <img src="https://www.dealii.org/images/steps/developer/step-67.pressure_050.png" alt="" width="100%">
+        <img src="https://dealii.org/images/steps/developer/step-67.pressure_050.png" alt="" width="100%">
     </td>
     <td>
-        <img src="https://www.dealii.org/images/steps/developer/step-67.pressure_100.png" alt="" width="100%">
+        <img src="https://dealii.org/images/steps/developer/step-67.pressure_100.png" alt="" width="100%">
     </td>
   </tr>
 </table>
@@ -454,7 +455,7 @@ travels through elements with high-order polynomials. This effect can be cured
 by increasing resolution. Apart from this effect, the rich wave structure is
 the result of the transport accuracy of the high-order DG method.
 
-<img src="https://www.dealii.org/images/steps/developer/step-67.pressure_elevated.jpg" alt="" width="40%">
+<img src="https://dealii.org/images/steps/developer/step-67.pressure_elevated.jpg" alt="" width="40%">
 
 If we run the program with degree 2 and 6 levels of global refinements (410k
 cells, 14.7M unknowns), we get the following evolution of the pressure
@@ -473,7 +474,7 @@ cells, 14.7M unknowns), we get the following evolution of the pressure
 With 2 levels of global refinement with 1,600 cells, the mesh and its
 partitioning on 40 MPI processes looks as follows:
 
-<img src="https://www.dealii.org/images/steps/developer/step-67.grid-owner.png" alt="" width="70%">
+<img src="https://dealii.org/images/steps/developer/step-67.grid-owner.png" alt="" width="70%">
 
 When we run the code with 4 levels of global refinements on 40 cores, we get
 the following output:

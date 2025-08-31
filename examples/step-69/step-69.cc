@@ -2510,6 +2510,7 @@ namespace Step69
     for (auto &it : U)
       it.reinit(offline_data.partitioner);
 
+    // @anchor step_69-ResumeSection
     // @sect5{Resume}
     //
     // By default the boolean <code>resume</code> is set to false, i.e. the
@@ -2662,7 +2663,7 @@ namespace Step69
 
   // We checkpoint the current state by doing the precise inverse
   // operation to what we discussed for the
-  // @ref step_69-Resume "resume logic":
+  // @ref step_69-ResumeSection "resume logic":
 
   template <int dim>
   void MainLoop<dim>::checkpoint(const typename MainLoop<dim>::vector_type &U,

@@ -362,13 +362,34 @@ namespace MatrixCreator
    * If the library is configured to use multithreading, this function works
    * in parallel.
    *
-   * @arg @p weight: an optional weight for the computation of the mass
+   * @param[in] mapping The mapping to be used for each cell during integration.
+   *
+   * @param[in] dof The DoFHandler that describes the cells and the degrees of
+   *   freedom on them.
+   *
+   * @param[in] q The quadrature to be used for integration.
+   *
+   * @param[out] matrix The matrix object into which to write one part
+   * of the result.
+   *
+   * @param[in] boundary_functions the right hand side functions to be
+   * used to create the right hand side vector of the linear system
+   * described by the output arguments of this function.
+   *
+   * @param[out] rhs_vector The vector object into which to write the
+   * other part of the result.
+   *
+   * @param dof_to_boundary_mapping This object maps global DoF numbers to a
+   * numbering of the degrees of freedom located on the boundary, and can be
+   * obtained using the function DoFTools::map_dof_to_boundary_indices().
+   *
+   * @param[in] weight an optional weight for the computation of the mass
    * matrix. If no weight is given, it is set to one.
    * In case you want to specify @p component_mapping and use the default argument
    * for the coefficient you have to specify the (unused) coefficient argument
    * as <code>(const Function <spacedim,number> *const)nullptr</code>.
    *
-   * @arg @p component_mapping: if the components in @p boundary_functions and
+   * @param[in] component_mapping if the components in @p boundary_functions and
    * @p dof do not coincide, this vector allows them to be remapped. If the
    * vector is not empty, it has to have one entry for each component in @p
    * dof. This entry is the component number in @p boundary_functions that

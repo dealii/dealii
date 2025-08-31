@@ -409,7 +409,7 @@ that use particles.
 The following picture shows the geometry that we're going to use:
 
 <p align="center">
-  <img src="https://www.dealii.org/images/steps/developer/step-19.geometry.png"
+  <img src="https://dealii.org/images/steps/developer/step-19.geometry.png"
        alt="The geometry used in this program"
        width="600">
 </p>

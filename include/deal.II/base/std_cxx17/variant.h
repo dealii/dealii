@@ -19,8 +19,10 @@
 
 #include <variant>
 
+#ifndef DEAL_II_BUILDING_CXX20_MODULE
 DEAL_II_WARNING("This file is deprecated."
                 "Use the corresponding C++17 header variant instead.")
+#endif
 
 DEAL_II_NAMESPACE_OPEN
 namespace std_cxx17

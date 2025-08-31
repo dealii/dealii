@@ -53,7 +53,7 @@ public:
   static constexpr unsigned int dimension = dim;
 
   /**
-   * Constructor. Creates all basis functions of $P_p$. @arg p: the degree of
+   * Constructor. Creates all basis functions of $P_p$. @param p The degree of
    * the polynomial space
    */
   PolynomialsP(const unsigned int p);

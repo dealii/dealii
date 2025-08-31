@@ -1,3 +1,4 @@
+@anchor step_32-ResultsSection
 <h1>Results</h1>
 
 When run, the program simulates convection in 3d in much the same way
@@ -22,12 +23,12 @@ magnitude more than we had available in step-31:
 <table align="center" class="doxtable">
   <tr>
     <td>
-        <img src="https://www.dealii.org/images/steps/developer/step-32.3d.cube.0.png" alt="">
+        <img src="https://dealii.org/images/steps/developer/step-32.3d.cube.0.png" alt="">
     </td>
   </tr>
   <tr>
     <td>
-        <img src="https://www.dealii.org/images/steps/developer/step-32.3d.cube.1.png" alt="">
+        <img src="https://dealii.org/images/steps/developer/step-32.3d.cube.1.png" alt="">
     </td>
   </tr>
 </table>
@@ -174,57 +175,57 @@ To demonstrate the output we show the output from every 1250th time step here:
 <table>
   <tr>
     <td>
-      <img src="https://www.dealii.org/images/steps/developer/step-32-2d-time-000.png" alt="">
+      <img src="https://dealii.org/images/steps/developer/step-32-2d-time-000.png" alt="">
     </td>
     <td>
-      <img src="https://www.dealii.org/images/steps/developer/step-32-2d-time-050.png" alt="">
+      <img src="https://dealii.org/images/steps/developer/step-32-2d-time-050.png" alt="">
     </td>
     <td>
-      <img src="https://www.dealii.org/images/steps/developer/step-32-2d-time-100.png" alt="">
-    </td>
-  </tr>
-  <tr>
-    <td>
-      <img src="https://www.dealii.org/images/steps/developer/step-32-2d-time-150.png" alt="">
-    </td>
-    <td>
-      <img src="https://www.dealii.org/images/steps/developer/step-32-2d-time-200.png" alt="">
-    </td>
-    <td>
-      <img src="https://www.dealii.org/images/steps/developer/step-32-2d-time-250.png" alt="">
+      <img src="https://dealii.org/images/steps/developer/step-32-2d-time-100.png" alt="">
     </td>
   </tr>
   <tr>
     <td>
-      <img src="https://www.dealii.org/images/steps/developer/step-32-2d-time-300.png" alt="">
+      <img src="https://dealii.org/images/steps/developer/step-32-2d-time-150.png" alt="">
     </td>
     <td>
-      <img src="https://www.dealii.org/images/steps/developer/step-32-2d-time-350.png" alt="">
+      <img src="https://dealii.org/images/steps/developer/step-32-2d-time-200.png" alt="">
     </td>
     <td>
-      <img src="https://www.dealii.org/images/steps/developer/step-32-2d-time-400.png" alt="">
-    </td>
-  </tr>
-  <tr>
-    <td>
-      <img src="https://www.dealii.org/images/steps/developer/step-32-2d-time-450.png" alt="">
-    </td>
-    <td>
-      <img src="https://www.dealii.org/images/steps/developer/step-32-2d-time-500.png" alt="">
-    </td>
-    <td>
-      <img src="https://www.dealii.org/images/steps/developer/step-32-2d-time-550.png" alt="">
+      <img src="https://dealii.org/images/steps/developer/step-32-2d-time-250.png" alt="">
     </td>
   </tr>
   <tr>
     <td>
-      <img src="https://www.dealii.org/images/steps/developer/step-32-2d-time-600.png" alt="">
+      <img src="https://dealii.org/images/steps/developer/step-32-2d-time-300.png" alt="">
     </td>
     <td>
-      <img src="https://www.dealii.org/images/steps/developer/step-32-2d-cells.png" alt="">
+      <img src="https://dealii.org/images/steps/developer/step-32-2d-time-350.png" alt="">
     </td>
     <td>
-      <img src="https://www.dealii.org/images/steps/developer/step-32-2d-partition.png" alt="">
+      <img src="https://dealii.org/images/steps/developer/step-32-2d-time-400.png" alt="">
+    </td>
+  </tr>
+  <tr>
+    <td>
+      <img src="https://dealii.org/images/steps/developer/step-32-2d-time-450.png" alt="">
+    </td>
+    <td>
+      <img src="https://dealii.org/images/steps/developer/step-32-2d-time-500.png" alt="">
+    </td>
+    <td>
+      <img src="https://dealii.org/images/steps/developer/step-32-2d-time-550.png" alt="">
+    </td>
+  </tr>
+  <tr>
+    <td>
+      <img src="https://dealii.org/images/steps/developer/step-32-2d-time-600.png" alt="">
+    </td>
+    <td>
+      <img src="https://dealii.org/images/steps/developer/step-32-2d-cells.png" alt="">
+    </td>
+    <td>
+      <img src="https://dealii.org/images/steps/developer/step-32-2d-partition.png" alt="">
     </td>
   </tr>
 </table>
@@ -233,7 +234,7 @@ The last two images show the grid as well as the partitioning of the mesh for
 the same computation with 16 subdomains and 16 processors. The full dynamics of
 this simulation are really only visible by looking at an animation, for example
 the one <a
-href="https://www.dealii.org/images/steps/developer/step-32-2d-temperature.webm">shown
+href="https://dealii.org/images/steps/developer/step-32-2d-temperature.webm">shown
 on this site</a>. This image is well worth watching due to its artistic quality
 and entrancing depiction of the evolution of the magma plumes.
 
@@ -252,7 +253,7 @@ continues to dominate flow.
 These different phases can also be identified if we look at the
 maximal velocity as a function of time in the simulation:
 
-<img src="https://www.dealii.org/images/steps/developer/step-32.2d.t_vs_vmax.png" alt="">
+<img src="https://dealii.org/images/steps/developer/step-32.2d.t_vs_vmax.png" alt="">
 
 Here, the velocity (shown in centimeters per year) becomes very large,
 to the order of several meters per year) at the beginning when the
@@ -277,9 +278,9 @@ isocontours of the temperature and the partition of the domain (along
 with the mesh) onto 512 processors:
 
 <p align="center">
-<img src="https://www.dealii.org/images/steps/developer/step-32.3d-sphere.solution.png" alt="">
+<img src="https://dealii.org/images/steps/developer/step-32.3d-sphere.solution.png" alt="">
 
-<img src="https://www.dealii.org/images/steps/developer/step-32.3d-sphere.partition.png" alt="">
+<img src="https://dealii.org/images/steps/developer/step-32.3d-sphere.partition.png" alt="">
 </p>
 
 

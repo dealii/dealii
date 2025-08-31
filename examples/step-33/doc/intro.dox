@@ -189,7 +189,7 @@ $\mathbf z$, we arrive at a linear system for $\delta \mathbf W$:
 This linear system is, in general, neither symmetric nor has any
 particular definiteness properties. We will either use a direct solver
 or Trilinos' GMRES implementation to solve it. As will become apparent from
-the @ref step_33-Results "results shown below", this fully implicit iteration
+the @ref step_33-ResultsSection "results shown below", this fully implicit iteration
 converges very rapidly (typically in 3 steps) and with the quadratic
 convergence order expected from a Newton method.
 
@@ -344,7 +344,7 @@ if the author's advisor heard about it, the author would likely be exiled foreve
 
 We use an input file deck to drive the simulation.  In this way, we can alter the boundary conditions
 and other important properties of the simulation without having to recompile.  For more information on
-the format, look at the @ref step_33-Results "results section", where we
+the format, look at the @ref step_33-ResultsSection "results section", where we
 describe an example input file in more detail.
 
 In previous example programs, we have usually hard-coded the initial
@@ -390,5 +390,5 @@ would have to be modified.
 
 Similarly, if we wanted to improve on the linear or nonlinear solvers, or on
 the time stepping scheme (as hinted at the end of the
-@ref step_33-Results "results section"), then this would not require changes in
+@ref step_33-ResultsSection "results section"), then this would not require changes in
 the <code>EulerEquations</code> at all.

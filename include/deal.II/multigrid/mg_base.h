@@ -180,11 +180,11 @@ public:
    * Prolongate a vector from level <tt>to_level-1</tt> to level
    * <tt>to_level</tt>. The previous content of <tt>dst</tt> is overwritten.
    *
-   * @arg src is a vector with as many elements as there are degrees of
+   * @param[in] to_level The destination level of the operation.
+   * @param[in] src A vector with as many elements as there are degrees of
    * freedom on the coarser level involved.
-   *
-   * @arg dst has as many elements as there are degrees of freedom on the
-   * finer level.
+   * @param[out] dst The output vector. It must have as many elements as
+   *   there are degrees of freedom on the finer level.
    */
   virtual void
   prolongate(const unsigned int to_level,
@@ -195,11 +195,11 @@ public:
    * Prolongate a vector from level <tt>to_level-1</tt> to level
    * <tt>to_level</tt>, summing into the previous content of <tt>dst</tt>.
    *
-   * @arg src is a vector with as many elements as there are degrees of
+   * @param[in] to_level The destination level of the operation.
+   * @param[in] src A vector with as many elements as there are degrees of
    * freedom on the coarser level involved.
-   *
-   * @arg dst has as many elements as there are degrees of freedom on the
-   * finer level.
+   * @param[out] dst The output vector. It must have as many elements as
+   *   there are degrees of freedom on the finer level.
    */
   virtual void
   prolongate_and_add(const unsigned int to_level,
@@ -214,11 +214,11 @@ public:
    * freedom in <tt>dst</tt> are active and will not be altered. For the other
    * degrees of freedom, the result of the restriction is added.
    *
-   * @arg src is a vector with as many elements as there are degrees of
-   * freedom on the finer level
-   *
-   * @arg dst has as many elements as there are degrees of freedom on the
-   * coarser level.
+   * @param[in] from_level The level of the source vector of the operation.
+   * @param[in] src A vector with as many elements as there are degrees of
+   * freedom on the finer level.
+   * @param[out] dst A vector with as many elements as there are degrees of
+   * freedom on the coarser level.
    */
   virtual void
   restrict_and_add(const unsigned int from_level,

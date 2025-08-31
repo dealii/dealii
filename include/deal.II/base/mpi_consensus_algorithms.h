@@ -250,6 +250,7 @@ namespace Utilities
          */
         virtual ~Interface() = default;
 
+        DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
         /**
          * Run the consensus algorithm and return a vector of process ranks
          * that have requested answers from the current process.
@@ -266,6 +267,7 @@ namespace Utilities
         DEAL_II_DEPRECATED
         std::vector<unsigned int>
         run(Process<RequestType, AnswerType> &process, const MPI_Comm comm);
+        DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
 
         /**
          * Run the consensus algorithm and return a vector of process ranks

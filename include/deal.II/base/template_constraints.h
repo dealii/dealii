@@ -603,12 +603,6 @@ class BlockVector;
 
 namespace LinearAlgebra
 {
-  template <typename Number>
-  class Vector;
-
-  template <typename Number>
-  class BlockVector;
-
   namespace distributed
   {
     template <typename Number, typename MemorySpace>
@@ -733,10 +727,6 @@ namespace concepts
     template <typename Number>
     inline constexpr bool is_dealii_vector_type<dealii::BlockVector<Number>> =
       true;
-
-    template <typename Number>
-    inline constexpr bool
-      is_dealii_vector_type<dealii::LinearAlgebra::BlockVector<Number>> = true;
 
     template <typename Number, typename MemorySpace>
     inline constexpr bool is_dealii_vector_type<

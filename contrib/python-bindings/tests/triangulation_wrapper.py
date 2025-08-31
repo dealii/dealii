@@ -502,7 +502,7 @@ class TestTriangulationWrapper(unittest.TestCase):
             else:
                 offset = Point([1.0, 1.0])
 
-            for (cell_1, cell_2) in zip(
+            for cell_1, cell_2 in zip(
                 triangulation_1.active_cells(), triangulation_2.active_cells()
             ):
                 self.assertTrue(

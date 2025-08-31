@@ -39,6 +39,9 @@ module;
 #include <Kokkos_Core_fwd.hpp>
 #include <Kokkos_DualView.hpp>
 #include <Kokkos_Macros.hpp>
+#if DEAL_II_KOKKOS_VERSION_GTE(4, 3, 0)
+#  include <Kokkos_Swap.hpp>
+#endif
 
 export module dealii.external.kokkos;
 export
@@ -83,6 +86,9 @@ export
     using ::Kokkos::is_finalized;
 #endif
     using ::Kokkos::is_initialized;
+#if DEAL_II_KOKKOS_VERSION_GTE(4, 3, 0)
+    using ::Kokkos::kokkos_swap;
+#endif
     using ::Kokkos::make_pair;
     using ::Kokkos::Max;
     using ::Kokkos::MDRangePolicy;

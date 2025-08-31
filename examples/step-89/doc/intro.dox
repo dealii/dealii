@@ -139,7 +139,7 @@ mortaring.
 
 <h4>%Point-to-point interpolation</h4>
 
-@image html https://www.dealii.org/images/steps/developer/step_89_intro_point_to_point.svg "" width=25%
+@image html https://dealii.org/images/steps/developer/step_89_intro_point_to_point.svg "" width=25%
 
 Point-to-point interpolation is a naive approach. Whenever you need to compute
 integrals over the boundary of the cell at the left, for a coupled problem you
@@ -154,7 +154,7 @@ cases.
 
 <h4>%Nitsche-type mortaring</h4>
 
-@image html https://www.dealii.org/images/steps/developer/step_89_intro_mortaring.svg "" width=25%
+@image html https://dealii.org/images/steps/developer/step_89_intro_mortaring.svg "" width=25%
 
 Mortaring is the process of computing intersections and is not related to the
 Mortar method which enforces the coupling via Lagrange multipliers. Instead, in

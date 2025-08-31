@@ -1,3 +1,4 @@
+@anchor step_33-ResultsSection
 <h1>Results</h1>
 
 We run the problem with the mesh <code>slide.inp</code> (this file is in the
@@ -193,7 +194,7 @@ The result of running these computations is a bunch of output files that we
 can pass to our visualization program of choice. When we collate them into a
 movie, the results of last several time steps looks like this:
 
-<img src="https://www.dealii.org/images/steps/developer/step-33.oscillation.gif " alt="" height="300">
+<img src="https://dealii.org/images/steps/developer/step-33.oscillation.gif " alt="" height="300">
 
 As we see, when the heavy mass of fluid hits the left bottom corner,
 some oscillation occurs and lead to the divergence of the iteration. A lazy solution to
@@ -201,7 +202,7 @@ this issue is add more viscosity. If we set the diffusion power $\eta = 1.5$ ins
 the simulation would be able to survive this crisis. Then, the result looks like this:
 
 
-<img src="https://www.dealii.org/images/steps/developer/step-33.slide.ed2.gif " alt="" height="300">
+<img src="https://dealii.org/images/steps/developer/step-33.slide.ed2.gif " alt="" height="300">
 
 The heavy mass of fluid is drawn down the slope by gravity, where
 it collides with the ski lodge and is flung into the air!  Hopefully everyone
@@ -210,7 +211,7 @@ due to the artificial viscosity.
 
 We can also visualize the evolution of the adaptively refined grid:
 
-<img src="https://www.dealii.org/images/steps/developer/step-33.slide.adapt.ed2.gif " alt="" height="300">
+<img src="https://dealii.org/images/steps/developer/step-33.slide.adapt.ed2.gif " alt="" height="300">
 
 The adaptivity follows and precedes the flow pattern, based on the heuristic
 refinement scheme discussed above.

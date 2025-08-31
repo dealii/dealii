@@ -18,7 +18,6 @@
 // FEEvaluationBase::JxW() for vector DG elements, otherwise the same as
 // inverse_mass_02
 
-#include <deal.II/base/function.h>
 
 #include <deal.II/dofs/dof_handler.h>
 

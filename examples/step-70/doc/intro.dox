@@ -401,7 +401,7 @@ transforms the reference element $\hat T$ into the element $T$: $\hat y_i = G^{-
 
 
 <p align="center"> <img
-  src="https://www.dealii.org/images/steps/developer/step-60.C_interpolation.png"
+  src="https://dealii.org/images/steps/developer/step-60.C_interpolation.png"
   alt=""> </p>
 
 In step-60, the second through fourth steps above were computed by calling, in turn,

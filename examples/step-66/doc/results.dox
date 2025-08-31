@@ -139,12 +139,12 @@ following figure.
 
 <div class="twocolumn" style="width: 80%; text-align: center;">
   <div>
-    <img src = "https://www.dealii.org/images/steps/developer/step-66.solution-2d.png"
+    <img src = "https://dealii.org/images/steps/developer/step-66.solution-2d.png"
      alt     = "Solution of the two-dimensional Gelfand problem."
      width   = "100%">
   </div>
   <div>
-    <img src = "https://www.dealii.org/images/steps/developer/step-66.solution-3d.png"
+    <img src = "https://dealii.org/images/steps/developer/step-66.solution-3d.png"
      alt     = "Solution of the three-dimensional Gelfand problem."
      width   = "100%">
   </div>

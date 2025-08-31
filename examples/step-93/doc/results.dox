@@ -46,12 +46,12 @@ let's see what these targets look like:
   </tr>
   <tr>
     <td>
-      <img src="https://www.dealii.org/images/steps/developer/step-93.target_step.png"
+      <img src="https://dealii.org/images/steps/developer/step-93.target_step.png"
          alt="Step target function"
          width="90%">
     </td>
     <td>
-      <img src="https://www.dealii.org/images/steps/developer/step-93.target_gauss.png"
+      <img src="https://dealii.org/images/steps/developer/step-93.target_gauss.png"
          alt="Gaussian target function"
          width="90%">
     </td>
@@ -72,12 +72,12 @@ look like this:
   </tr>
   <tr>
     <td>
-    <img src="https://www.dealii.org/images/steps/developer/step-93.U_step.png"
+    <img src="https://dealii.org/images/steps/developer/step-93.U_step.png"
          alt="Solution for step shaped target function"
          width="90%">
     </td>
     <td>
-    <img src="https://www.dealii.org/images/steps/developer/step-93.U_gauss.png"
+    <img src="https://dealii.org/images/steps/developer/step-93.U_gauss.png"
          alt="Solution for Gaussian target function"
          width="90%">
     </td>
@@ -102,12 +102,12 @@ profiles.
   </tr>
   <tr>
     <td>
-      <img src="https://www.dealii.org/images/steps/developer/step-93.heat_profile_step.png"
+      <img src="https://dealii.org/images/steps/developer/step-93.heat_profile_step.png"
          alt="Heat plate settings for matching step function"
          width="90%">
     </td>
     <td>
-      <img src="https://www.dealii.org/images/steps/developer/step-93.heat_profile_gauss.png"
+      <img src="https://dealii.org/images/steps/developer/step-93.heat_profile_gauss.png"
          alt="Heat plate settings for matching Gaussian"
          width="90%">
     </td>
@@ -129,12 +129,12 @@ While it does not contain much useful information, we can also plot the Lagrange
   </tr>
   <tr>
     <td>
-      <img src="https://www.dealii.org/images/steps/developer/step-93.L_step.png"
+      <img src="https://dealii.org/images/steps/developer/step-93.L_step.png"
          alt="Lagrange multiplier for step target function"
          width="90%">
     </td>
     <td>
-      <img src="https://www.dealii.org/images/steps/developer/step-93.L_gauss.png"
+      <img src="https://dealii.org/images/steps/developer/step-93.L_gauss.png"
          alt="Lagrange multiplier for Gaussian target function"
          width="90%">
     </td>

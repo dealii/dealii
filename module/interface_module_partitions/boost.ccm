@@ -245,6 +245,8 @@ export
     using boost::num_vertices;
     using boost::property;
     using boost::property_map;
+    using boost::source;
+    using boost::target;
     using boost::tie;
     using boost::undirectedS;
     using boost::vecS;
@@ -353,6 +355,10 @@ export
       using boost::serialization::make_array;
       using boost::serialization::split_member;
       using boost::serialization::tracking_type;
+
+      using boost::serialization::load;
+      using boost::serialization::save;
+      using boost::serialization::serialize;
     } // namespace serialization
 
     namespace signals2
@@ -374,4 +380,14 @@ export
     using boost::uintmax_t;
     using boost::variant;
   } // namespace boost
+
+
+  // C++ says that one can overload operator new/delete in the global
+  // namespace, and BOOST does exactly this (for example in
+  // container/detail/placement_new.hpp, which we get through the
+  // various boost.container headers). We need to make sure that these
+  // overloads are also exported so that we can access them through
+  // imports:
+  using ::operator new;
+  using ::operator delete;
 }

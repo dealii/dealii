@@ -31,18 +31,18 @@ and the following visual output, which was taken from step-67 (for a slightly di
 <table align="center" class="doxtable" style="width:85%">
   <tr>
     <td>
-        <img src="https://www.dealii.org/images/steps/developer/step-67.pressure_010.png" alt="" width="100%">
+        <img src="https://dealii.org/images/steps/developer/step-67.pressure_010.png" alt="" width="100%">
     </td>
     <td>
-        <img src="https://www.dealii.org/images/steps/developer/step-67.pressure_025.png" alt="" width="100%">
+        <img src="https://dealii.org/images/steps/developer/step-67.pressure_025.png" alt="" width="100%">
     </td>
   </tr>
   <tr>
     <td>
-        <img src="https://www.dealii.org/images/steps/developer/step-67.pressure_050.png" alt="" width="100%">
+        <img src="https://dealii.org/images/steps/developer/step-67.pressure_050.png" alt="" width="100%">
     </td>
     <td>
-        <img src="https://www.dealii.org/images/steps/developer/step-67.pressure_100.png" alt="" width="100%">
+        <img src="https://dealii.org/images/steps/developer/step-67.pressure_100.png" alt="" width="100%">
     </td>
   </tr>
 </table>

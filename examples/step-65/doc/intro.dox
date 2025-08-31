@@ -432,7 +432,7 @@ inclusion has different material properties that require that the
 interface between the two materials needs to be tracked by element interfaces. A
 visualization of the grid is given here:
 
-<img src="https://www.dealii.org/images/steps/developer/step-65-mesh.png" alt="">
+<img src="https://dealii.org/images/steps/developer/step-65-mesh.png" alt="">
 
 For this case, we want to attach a spherical description to the surface inside
 the domain and use the transfinite interpolation to smoothly switch to the

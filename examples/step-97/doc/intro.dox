@@ -54,7 +54,7 @@ in the Cartesian coordinate system.
 
 @htmlonly
 <p align="center">
-  <img src="https://www.dealii.org/images/steps/developer/step-97-coil.svg" alt="The coil" height="425">
+  <img src="https://dealii.org/images/steps/developer/step-97-coil.svg" alt="The coil" height="425">
 </p>
 @endhtmlonly
 
@@ -87,7 +87,7 @@ $\hat{\theta}$, and $\hat{\phi}$.
 
 @htmlonly
 <p align="center">
-  <img src="https://www.dealii.org/images/steps/developer/step-97-domain.svg" alt="The domain" height="496">
+  <img src="https://dealii.org/images/steps/developer/step-97-domain.svg" alt="The domain" height="496">
 </p>
 @endhtmlonly
 
@@ -861,7 +861,7 @@ can be captured by this diagram.
 
 @htmlonly
 <p align="center">
-  <img src="https://www.dealii.org/images/steps/developer/step-97-diagram.svg" alt="The Bossavit's diagram" height="283">
+  <img src="https://dealii.org/images/steps/developer/step-97-diagram.svg" alt="The Bossavit's diagram" height="283">
 </p>
 @endhtmlonly
 
@@ -925,7 +925,7 @@ Dirichlet boundary condition.
 
 @htmlonly
 <p align="center">
-  <img src="https://www.dealii.org/images/steps/developer/step-97-mesh.svg" alt="The mesh" height="531">
+  <img src="https://dealii.org/images/steps/developer/step-97-mesh.svg" alt="The mesh" height="531">
 </p>
 @endhtmlonly
 

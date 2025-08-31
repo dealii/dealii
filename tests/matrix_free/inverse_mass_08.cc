@@ -18,7 +18,6 @@
 // FEEvaluationBase::JxW() and implicit template argument fe_degree=-1 in
 // FEEvaluation, otherwise the same as inverse_mass_06 and inverse_mass_01
 
-#include <deal.II/base/function.h>
 
 #include <deal.II/dofs/dof_handler.h>
 

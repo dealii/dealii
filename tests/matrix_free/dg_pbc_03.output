@@ -1,0 +1,73 @@
+
+DEAL:1d:boundary:uniform ::Active cells: 64
+DEAL:1d:boundary:uniform ::Cell batches: 64
+DEAL:1d:boundary:uniform ::Interior faces: 63 0 
+DEAL:1d:boundary:uniform ::Exterior faces: 0 63 
+DEAL:1d:boundary:uniform ::Boundary faces: 1 1 
+DEAL::
+DEAL:1d:periodic:uniform ::Active cells: 64
+DEAL:1d:periodic:uniform ::Cell batches: 64
+DEAL:1d:periodic:uniform ::Interior faces: 63 1 
+DEAL:1d:periodic:uniform ::Exterior faces: 1 63 
+DEAL:1d:periodic:uniform ::Boundary faces: 0 0 
+DEAL::
+DEAL:1d:boundary:adaptive::Active cells: 66
+DEAL:1d:boundary:adaptive::Cell batches: 66
+DEAL:1d:boundary:adaptive::Interior faces: 64 1 
+DEAL:1d:boundary:adaptive::Exterior faces: 1 64 
+DEAL:1d:boundary:adaptive::Boundary faces: 1 1 
+DEAL::
+DEAL:1d:periodic:adaptive::Active cells: 65
+DEAL:1d:periodic:adaptive::Cell batches: 65
+DEAL:1d:periodic:adaptive::Interior faces: 64 1 
+DEAL:1d:periodic:adaptive::Exterior faces: 1 64 
+DEAL:1d:periodic:adaptive::Boundary faces: 0 0 
+DEAL::
+DEAL:2d:boundary:uniform ::Active cells: 256
+DEAL:2d:boundary:uniform ::Cell batches: 256
+DEAL:2d:boundary:uniform ::Interior faces: 240 0 240 0 
+DEAL:2d:boundary:uniform ::Exterior faces: 0 240 0 240 
+DEAL:2d:boundary:uniform ::Boundary faces: 16 16 16 16 
+DEAL::
+DEAL:2d:periodic:uniform ::Active cells: 256
+DEAL:2d:periodic:uniform ::Cell batches: 256
+DEAL:2d:periodic:uniform ::Interior faces: 240 16 240 0 
+DEAL:2d:periodic:uniform ::Exterior faces: 16 240 0 240 
+DEAL:2d:periodic:uniform ::Boundary faces: 0 0 16 16 
+DEAL::
+DEAL:2d:boundary:adaptive::Active cells: 259
+DEAL:2d:boundary:adaptive::Cell batches: 259
+DEAL:2d:boundary:adaptive::Interior faces: 241 2 241 2 
+DEAL:2d:boundary:adaptive::Exterior faces: 2 241 2 241 
+DEAL:2d:boundary:adaptive::Boundary faces: 17 16 17 16 
+DEAL::
+DEAL:2d:periodic:adaptive::Active cells: 259
+DEAL:2d:periodic:adaptive::Cell batches: 259
+DEAL:2d:periodic:adaptive::Interior faces: 241 17 241 2 
+DEAL:2d:periodic:adaptive::Exterior faces: 17 241 2 241 
+DEAL:2d:periodic:adaptive::Boundary faces: 0 0 17 16 
+DEAL::
+DEAL:3d:boundary:uniform ::Active cells: 64
+DEAL:3d:boundary:uniform ::Cell batches: 64
+DEAL:3d:boundary:uniform ::Interior faces: 48 0 48 0 48 0 
+DEAL:3d:boundary:uniform ::Exterior faces: 0 48 0 48 0 48 
+DEAL:3d:boundary:uniform ::Boundary faces: 16 16 16 16 16 16 
+DEAL::
+DEAL:3d:periodic:uniform ::Active cells: 64
+DEAL:3d:periodic:uniform ::Cell batches: 64
+DEAL:3d:periodic:uniform ::Interior faces: 48 16 48 0 48 16 
+DEAL:3d:periodic:uniform ::Exterior faces: 16 48 0 48 16 48 
+DEAL:3d:periodic:uniform ::Boundary faces: 0 0 16 16 0 0 
+DEAL::
+DEAL:3d:boundary:adaptive::Active cells: 71
+DEAL:3d:boundary:adaptive::Cell batches: 71
+DEAL:3d:boundary:adaptive::Interior faces: 51 4 51 4 51 4 
+DEAL:3d:boundary:adaptive::Exterior faces: 4 51 4 51 4 51 
+DEAL:3d:boundary:adaptive::Boundary faces: 19 16 19 16 19 16 
+DEAL::
+DEAL:3d:periodic:adaptive::Active cells: 71
+DEAL:3d:periodic:adaptive::Cell batches: 71
+DEAL:3d:periodic:adaptive::Interior faces: 51 19 51 4 51 19 
+DEAL:3d:periodic:adaptive::Exterior faces: 19 51 4 51 19 51 
+DEAL:3d:periodic:adaptive::Boundary faces: 0 0 19 16 0 0 
+DEAL::

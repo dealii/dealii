@@ -37,7 +37,7 @@ namespace types
    * @ref GlossCombinedOrientation "glossary"
    * for more information.
    */
-  using geometric_orientation = unsigned char;
+  using geometric_orientation = std::uint8_t;
 
   /**
    * The type used to denote subdomain_ids of cells.

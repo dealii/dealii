@@ -133,13 +133,13 @@ from iteration to iteration.
 <table align="center" class="doxtable">
   <tr>
     <td>
-        @image html https://www.dealii.org/images/steps/developer/step_87_ex_2_p_0.png
+        @image html https://dealii.org/images/steps/developer/step_87_ex_2_p_0.png
     </td>
     <td>
-        @image html https://www.dealii.org/images/steps/developer/step_87_ex_2_p_1.png
+        @image html https://dealii.org/images/steps/developer/step_87_ex_2_p_1.png
     </td>
     <td>
-        @image html https://www.dealii.org/images/steps/developer/step_87_ex_2_p_2.png
+        @image html https://dealii.org/images/steps/developer/step_87_ex_2_p_2.png
     </td>
   </tr>
 </table>
@@ -155,10 +155,10 @@ solution from the interface is shown.
 <table align="center" class="doxtable">
   <tr>
     <td>
-        @image html https://www.dealii.org/images/steps/developer/step_87_ex_2_res_0.png
+        @image html https://dealii.org/images/steps/developer/step_87_ex_2_res_0.png
     </td>
     <td>
-        @image html https://www.dealii.org/images/steps/developer/step_87_ex_2_res_1.png
+        @image html https://dealii.org/images/steps/developer/step_87_ex_2_res_1.png
     </td>
   </tr>
 </table>
@@ -207,13 +207,13 @@ the immersed mesh.
 <table align="center" class="doxtable">
   <tr>
     <td>
-        @image html https://www.dealii.org/images/steps/developer/step_87_ex_3_force.0000.png
+        @image html https://dealii.org/images/steps/developer/step_87_ex_3_force.0000.png
     </td>
     <td>
-        @image html https://www.dealii.org/images/steps/developer/step_87_ex_3_force.0010.png
+        @image html https://dealii.org/images/steps/developer/step_87_ex_3_force.0010.png
     </td>
     <td>
-        @image html https://www.dealii.org/images/steps/developer/step_87_ex_3_force.0020.png
+        @image html https://dealii.org/images/steps/developer/step_87_ex_3_force.0020.png
     </td>
   </tr>
 </table>

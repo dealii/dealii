@@ -81,12 +81,12 @@ Quite a number of cells are used on the finest level to resolve the features of
 the solution. Here are the fourth and tenth grids:
 <div class="twocolumn" style="width: 80%">
   <div>
-    <img src="https://www.dealii.org/images/steps/developer/step-9-grid-3.png"
+    <img src="https://dealii.org/images/steps/developer/step-9-grid-3.png"
          alt="Fourth grid in the refinement cycle, showing some adaptivity to features."
          width="400" height="400">
   </div>
   <div>
-    <img src="https://www.dealii.org/images/steps/developer/step-9-grid-9.png"
+    <img src="https://dealii.org/images/steps/developer/step-9-grid-9.png"
          alt="Tenth grid in the refinement cycle, showing that the waves are fully captured."
          width="400" height="400">
   </div>
@@ -94,13 +94,13 @@ the solution. Here are the fourth and tenth grids:
 and the fourth and tenth solutions:
 <div class="twocolumn" style="width: 80%">
   <div>
-    <img src="https://www.dealii.org/images/steps/developer/step-9-solution-3.png"
+    <img src="https://dealii.org/images/steps/developer/step-9-solution-3.png"
          alt="Fourth solution, showing that we resolve most features but some
          are sill unresolved and appear blury."
          width="400" height="400">
   </div>
   <div>
-    <img src="https://www.dealii.org/images/steps/developer/step-9-solution-9.png"
+    <img src="https://dealii.org/images/steps/developer/step-9-solution-9.png"
          alt="Tenth solution, showing a fully resolved flow."
          width="400" height="400">
   </div>
@@ -108,14 +108,14 @@ and the fourth and tenth solutions:
 and both the grid and solution zoomed in:
 <div class="twocolumn" style="width: 80%">
   <div>
-    <img src="https://www.dealii.org/images/steps/developer/step-9-solution-3-zoom.png"
+    <img src="https://dealii.org/images/steps/developer/step-9-solution-3-zoom.png"
          alt="Detail of the fourth solution, showing that we resolve most
          features but some are sill unresolved and appear blury. In particular,
          the larger cells need to be refined."
          width="400" height="400">
   </div>
   <div>
-    <img src="https://www.dealii.org/images/steps/developer/step-9-solution-9-zoom.png"
+    <img src="https://dealii.org/images/steps/developer/step-9-solution-9-zoom.png"
          alt="Detail of the tenth solution, showing that we needed a lot more
          cells than were present in the fourth solution."
          width="400" height="400">

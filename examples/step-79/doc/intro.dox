@@ -177,7 +177,7 @@ define an effective minimal beam width for the optimal structures we seek to
 find.
 
 <div style="text-align:center;">
-  <img src="https://www.dealii.org/images/steps/developer/step-79.checkerboard.png"
+  <img src="https://dealii.org/images/steps/developer/step-79.checkerboard.png"
        alt="Checkerboarding occurring in an MBB Beam">
 </div>
 

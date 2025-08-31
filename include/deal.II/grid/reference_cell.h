@@ -414,6 +414,20 @@ public:
    * Convert an internal::SubfaceCase into its equivalent RefinementCase. For
    * example, SubfacePossibilities<3>::Possibilities::y1x2x is is geometrically
    * equivalent to RefinementPossibilities<3>::cut_xy.
+   *
+   * @return A pair consisting of the equivalent subface number and refinement
+   * case.
+   *
+   * @note In 1d faces cannot be refined - however, to enable dimension-independent
+   * programming, this function always returns `(0, isotropic_refinement)`.
+   *
+   * @note In 2d, since there is only one possible kind of refinement
+   * (isotropic), deal.II has historically ignored @p subface_case in this
+   * context and only read @p subface_no. Hence, in 2d, this function does the
+   * same thing and returns `(subface_no, isotropic_refinement)`.
+   *
+   * @note In 3d, for backwards compatibility, we treat
+   * internal::SubfaceCase::case_none as internal::SubfaceCase::case_isotropic.
    */
   template <int dim>
   std::pair<unsigned int, RefinementCase<dim - 1>>
@@ -421,6 +435,17 @@ public:
     const types::geometric_orientation combined_face_orientation,
     const internal::SubfaceCase<dim>   subface_case,
     const unsigned int                 subface_no) const;
+
+  /**
+   * Return an ArrayView of the possible refinements (e.g.,
+   * `RefinementPossibilities<2>::cut_x`) of the current ReferenceCell. This
+   * ArrayView will not include `RefinementPossibilities<dim>::no_refinement`:
+   * instead, for elements which do not yet support refinement (e.g.,
+   * ReferenceCell::Pyramid) the ArrayView will be empty.
+   */
+  template <int dim>
+  ArrayView<const RefinementCase<dim>>
+  refinement_cases() const;
 
   /**
    * Return the reference-cell type of face @p face_no of the current
@@ -609,6 +634,27 @@ public:
   Point<dim>
   face_vertex_location(const unsigned int face,
                        const unsigned int vertex) const;
+
+  /**
+   * For a given subface, in standard orientation, return the location of one of
+   * its vertices.
+   *
+   * @param[in] face_no Index of the face.
+   *
+   * @param[in] subface_no Index of the subface within that face.
+   *
+   * @param[in] subface_vertex_no Index of the vertex within the subface.
+   *
+   * @param[in] face_refinement_case The way in which the current face is
+   * refined.
+   */
+  template <int dim>
+  Point<dim>
+  subface_vertex_location(
+    const unsigned int            face_no,
+    const unsigned int            subface_no,
+    const unsigned int            subface_vertex_no,
+    const RefinementCase<dim - 1> face_refinement_case) const;
 
   /**
    * Correct vertex index depending on face orientation.
@@ -2102,6 +2148,88 @@ ReferenceCell::line_indices() const
 {
   return std_cxx20::ranges::iota_view<unsigned int, unsigned int>(0U,
                                                                   n_lines());
+}
+
+
+
+template <int dim>
+inline ArrayView<const RefinementCase<dim>>
+ReferenceCell::refinement_cases() const
+{
+  AssertDimension(dim, get_dimension());
+
+  if constexpr (dim == 0)
+    {
+      // Like equivalent_refinement_case(), to better enable generic
+      // programming, return a value implying vertices can be refined since 1d
+      // Triangulations can be refined.
+      static constexpr std::array<RefinementCase<0>, 1> possibilities{
+        {RefinementPossibilities<0>::isotropic_refinement}};
+      return make_array_view(possibilities);
+    }
+  else if constexpr (dim == 1)
+    {
+      static constexpr std::array<RefinementCase<1>, 1> possibilities{
+        {RefinementPossibilities<1>::isotropic_refinement}};
+      return make_array_view(possibilities);
+    }
+  else if constexpr (dim == 2)
+    {
+      switch (this->kind)
+        {
+          case ReferenceCells::Triangle:
+            {
+              static constexpr std::array<RefinementCase<2>, 1> possibilities{
+                {RefinementPossibilities<2>::isotropic_refinement}};
+              return make_array_view(possibilities);
+            }
+          case ReferenceCells::Quadrilateral:
+            {
+              static constexpr std::array<RefinementCase<2>, 3> possibilities{
+                {RefinementPossibilities<2>::cut_x,
+                 RefinementPossibilities<2>::cut_y,
+                 RefinementPossibilities<2>::isotropic_refinement}};
+              return make_array_view(possibilities);
+            }
+          default:
+            DEAL_II_ASSERT_UNREACHABLE();
+        }
+    }
+  else if constexpr (dim == 3)
+    {
+      switch (this->kind)
+        {
+          case ReferenceCells::Tetrahedron:
+            {
+              static constexpr std::array<RefinementCase<3>, 1> possibilities{
+                {RefinementPossibilities<3>::isotropic_refinement}};
+              return make_array_view(possibilities);
+            }
+          case ReferenceCells::Pyramid:
+          case ReferenceCells::Wedge:
+            {
+              // Pyramids and Wedges cannot yet be refined
+              return ArrayView<const RefinementCase<3>>();
+            }
+          case ReferenceCells::Hexahedron:
+            {
+              static constexpr std::array<RefinementCase<3>, 7> possibilities{
+                {RefinementPossibilities<3>::cut_x,
+                 RefinementPossibilities<3>::cut_y,
+                 RefinementPossibilities<3>::cut_xy,
+                 RefinementPossibilities<3>::cut_z,
+                 RefinementPossibilities<3>::cut_xz,
+                 RefinementPossibilities<3>::cut_yz,
+                 RefinementPossibilities<3>::isotropic_refinement}};
+              return make_array_view(possibilities);
+            }
+          default:
+            DEAL_II_ASSERT_UNREACHABLE();
+        }
+    }
+
+  DEAL_II_ASSERT_UNREACHABLE();
+  return ArrayView<RefinementCase<dim>>();
 }
 
 

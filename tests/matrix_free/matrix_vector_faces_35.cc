@@ -18,7 +18,6 @@
 // with different orientations and refinements from both sides, system of
 // equations), but for the advection operation with FE_DGQ.
 
-#include <deal.II/base/function.h>
 
 #include <deal.II/fe/fe_dgq.h>
 #include <deal.II/fe/fe_system.h>
