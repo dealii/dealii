@@ -1115,98 +1115,10 @@ FE_Q_Base<dim, spacedim>::face_to_cell_index(
   const unsigned int                 face,
   const types::geometric_orientation combined_orientation) const
 {
-  AssertIndexRange(face_index, this->n_dofs_per_face(face));
-  AssertIndexRange(face, GeometryInfo<dim>::faces_per_cell);
-
-  // we need to distinguish between DoFs on vertices, lines and in 3d quads.
-  // do so in a sequence of if-else statements
-  if (face_index < this->get_first_face_line_index(face))
-    // DoF is on a vertex
-    {
-      // get the number of the vertex on the face that corresponds to this DoF,
-      // along with the number of the DoF on this vertex
-      const unsigned int face_vertex = face_index / this->n_dofs_per_vertex();
-      const unsigned int dof_index_on_vertex =
-        face_index % this->n_dofs_per_vertex();
-
-      // then get the number of this vertex on the cell and translate
-      // this to a DoF number on the cell
-      return this->reference_cell().face_to_cell_vertices(
-               face, face_vertex, combined_orientation) *
-               this->n_dofs_per_vertex() +
-             dof_index_on_vertex;
-    }
-  else if (face_index < this->get_first_face_quad_index(face))
-    // DoF is on a face
-    {
-      // do the same kind of translation as before. we need to only consider
-      // DoFs on the lines, i.e., ignoring those on the vertices
-      const unsigned int index =
-        face_index - this->get_first_face_line_index(face);
-
-      const unsigned int face_line         = index / this->n_dofs_per_line();
-      const unsigned int dof_index_on_line = index % this->n_dofs_per_line();
-
-      // we now also need to adjust the line index for the case of
-      // face orientation, face flips, etc
-      unsigned int adjusted_dof_index_on_line = 0;
-      switch (dim)
-        {
-          case 1:
-            DEAL_II_ASSERT_UNREACHABLE();
-            break;
-
-          case 2:
-            if (combined_orientation == numbers::default_geometric_orientation)
-              adjusted_dof_index_on_line = dof_index_on_line;
-            else
-              adjusted_dof_index_on_line =
-                this->n_dofs_per_line() - dof_index_on_line - 1;
-            break;
-
-          case 3:
-            // in 3d, things are difficult. someone will have to think
-            // about how this code here should look like, by drawing a bunch
-            // of pictures of how all the faces can look like with the various
-            // flips and rotations.
-            //
-            // that said, the Q2 case is easy enough to implement, as is the
-            // case where everything is in standard orientation
-            Assert((this->n_dofs_per_line() <= 1) ||
-                     combined_orientation ==
-                       numbers::default_geometric_orientation,
-                   ExcNotImplemented());
-            adjusted_dof_index_on_line = dof_index_on_line;
-            break;
-
-          default:
-            DEAL_II_ASSERT_UNREACHABLE();
-        }
-
-      return (this->get_first_line_index() +
-              this->reference_cell().face_to_cell_lines(face,
-                                                        face_line,
-                                                        combined_orientation) *
-                this->n_dofs_per_line() +
-              adjusted_dof_index_on_line);
-    }
-  else
-    // DoF is on a quad
-    {
-      Assert(dim >= 3, ExcInternalError());
-
-      // ignore vertex and line dofs
-      const unsigned int index =
-        face_index - this->get_first_face_quad_index(face);
-
-      // the same is true here as above for the 3d case -- someone will
-      // just have to draw a bunch of pictures. in the meantime,
-      // we can implement the Q2 case in which it is simple
-      Assert((this->n_dofs_per_quad(face) <= 1) ||
-               combined_orientation == numbers::default_geometric_orientation,
-             ExcNotImplemented());
-      return (this->get_first_quad_index(face) + index);
-    }
+  return FETools::face_to_cell_index(*this,
+                                     face_index,
+                                     face,
+                                     combined_orientation);
 }
 
 
