@@ -16,7 +16,6 @@
 
 // tests MatrixFreeTools::categorize_by_boundary_ids()
 
-#include <deal.II/base/function.h>
 #include <deal.II/base/quadrature_lib.h>
 
 #include <deal.II/dofs/dof_handler.h>

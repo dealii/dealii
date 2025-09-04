@@ -478,7 +478,7 @@ public:
 
     /**
      * Flag to force re-orthogonalization of orthonormal basis in every step.
-     * If set to false, the solver automatically checks for loss of
+     * If set to `false`, the solver automatically checks for loss of
      * orthogonality every 5 iterations and enables re-orthogonalization only
      * if necessary.
      */
@@ -486,9 +486,14 @@ public:
 
     /**
      * Flag to control whether a reduced mode of the solver should be
-     * run. This is necessary when running (several) SolverGMRES instances
-     * involving very small and cheap linear systems where the feedback from
-     * all signals, eigenvalue computations, and log stream are disabled.
+     * run. If set to `true`, all signals set by the users are ignored,
+     * eigenvalue computation is disabled, and no output to the log
+     * `deallog` is produced.
+     *
+     * This is useful when running SolverGMRES instances
+     * involving very small and cheap linear systems where the additional
+     * checks, like checking if any of the signals has a connection,
+     * would cause a noticeable performance overhead.
      */
     bool batched_mode;
 
@@ -692,7 +697,7 @@ protected:
  *
  * This method is a variant of the flexible GMRES, utilizing $N$
  * preconditioners to search for a solution within a multi-Krylov space.
- * These spaces are characterized by by all possible $N$-variate,
+ * These spaces are characterized by all possible $N$-variate,
  * non-commuting polynomials of the preconditioners and system matrix
  * applied to a residual up to some fixed degree. In contrast, the flexible
  * GMRES method implemented in SolverFGMRES constructs only one "Krylov"

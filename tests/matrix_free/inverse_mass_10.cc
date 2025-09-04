@@ -17,7 +17,6 @@
 // Tests CellwiseInverseMassMatrix with random dyadic coefficients, otherwise
 // the same as inverse_mass_02.cc
 
-#include <deal.II/base/function.h>
 
 #include <deal.II/dofs/dof_handler.h>
 

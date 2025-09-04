@@ -846,7 +846,7 @@ FiniteElement<dim, spacedim>::constraints(
   // TODO: the implementation makes the assumption that all faces have the
   // same number of dofs
   AssertDimension(this->n_unique_faces(), 1);
-  [[maybe_unused]] const unsigned int face_no = 0;
+  const unsigned int face_no = 0;
 
   Assert(subface_case == internal::SubfaceCase<dim>::case_isotropic,
          ExcMessage("Constraints for this element are only implemented "

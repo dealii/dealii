@@ -503,7 +503,7 @@ infinitesimal amounts of wetting fluid also only move at infinitesimal speeds
 (i.e., they stick to the medium more than the non-wetting phase in which they
 are embedded). That said, how can we square this with the knowledge that
 wetting fluid is invading from the left, leading to the flow patterns seen in
-the @ref step_21-Results "results section"? That's where we get into
+the @ref step_21-ResultsSection "results section"? That's where we get into
 mathematics: Equations like the transport equation we are considering here
 have infinitely many solutions, but only one of them is physical: the one that
 results from the so-called viscosity limit, called the <a

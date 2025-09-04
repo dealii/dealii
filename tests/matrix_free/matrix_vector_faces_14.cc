@@ -18,7 +18,6 @@
 // better vectorized access, gather_evaluate and integrate_scatter) but on a
 // different mesh that can trigger different element types
 
-#include <deal.II/base/function.h>
 #include <deal.II/base/quadrature_lib.h>
 
 #include <deal.II/distributed/tria.h>

@@ -17,8 +17,6 @@
 // Tests CellwiseInverseMassMatrix::apply() with implicit definition from
 // FEEvaluationBase::JxW(), otherwise the same as inverse_mass_01
 
-#include <deal.II/base/function.h>
-
 #include <deal.II/dofs/dof_handler.h>
 
 #include <deal.II/fe/fe_dgq.h>

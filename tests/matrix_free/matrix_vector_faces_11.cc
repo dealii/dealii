@@ -18,7 +18,6 @@
 // matrix_vector_faces_common.h to zero the vector rather than doing it
 // outside.
 
-#include <deal.II/base/function.h>
 #include <deal.II/base/quadrature_lib.h>
 
 #include <deal.II/distributed/tria.h>

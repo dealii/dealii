@@ -408,8 +408,8 @@ inconvenience this causes.
 
  <li>
   New: The ordering strategy DoFRenumbering::lexicographic() has been added.
-  (Micha
-   Wichrowski, 2025/07/01)
+  <br>
+  (Michał Wichrowski, 2025/07/01)
  </li>
 
  <li>
@@ -554,16 +554,15 @@ inconvenience this causes.
   New: A new function FETools::cell_to_face_lexicographic() to generate a
   mapping from cell-local DoFs to lexicographic ordering of DoFs on two adjacent cells
   has been added.
-  (Micha
-   Wichrowski, 2025/05/03)
+  <br>
+  (Michał Wichrowski, 2025/05/03)
  </li>
 
  <li>
   Added: 1D matrices: mass, laplace, ghost penalty.
   FullMatrix::kronecker_product.
   <br>
-  (Micha
-   Wichrowski, 2025/05/01)
+  (Michał Wichrowski, 2025/05/01)
  </li>
 
  <li>
@@ -620,13 +619,17 @@ inconvenience this causes.
  </li>
 
  <li>
-  New: FE_Simplex_Poly now implements FiniteElement::face_to_cell_index(),
+  Improved: Portable::MatrixFree now uses a more beneficial indexing into
+  multi-dimensional arrays for the cell degrees of freedom and quadrature
+  data, leading to more coalesced access on GPUs.
+  <br>
+  (Martin Kronbichler, Urvij Saroliya, 2025/04/04)
+ </li>
+
+ <li>
+  New: FE_SimplexPoly now implements FiniteElement::face_to_cell_index(),
   enabling periodicity for derived classes, with restrictions similar to the
-  implementation in FE_Q_Base. Additionally,
-  GridGenerator::hyper_rectangle_with_simplicies() now accepts an additional
-  boolean argument which, in 3D, breaks each cubical cell into six tetrahedra
-  instead of five.  This mesh meets the restrictions of
-  FE_Simplex_Poly::face_to_cell_index().
+  implementation in FE_Q_Base.
   <br>
   (Kyle Schwiebert, 2025/04/04)
  </li>
@@ -640,8 +643,8 @@ inconvenience this causes.
  </li>
 
  <li>
-  Fixed: The geometry subdivided_hyper_L could not be generated using grid_generator_from_name. This has been fixed by adding this geometry case in said function. A test has also been added.
-  <br>
+  Fixed: GridGenerator::subdivided_hyper_L() may now be used via
+  GridGenerator::generate_from_name_and_arguments().
   (Bruna Campos, 2025/03/20)
  </li>
 
@@ -678,9 +681,10 @@ inconvenience this causes.
  </li>
 
  <li>
-  New: Matrix-Free now can build data structures for ghosted cells. The functionality can be accessed  by AdditionalData::store_ghost_cells.
-  (Micha
-   Wichrowski, 2025/01/30)
+  New: Matrix-Free now can build data structures for ghosted cells. The
+  functionality can be accessed  by AdditionalData::store_ghost_cells.
+  <br>
+  (Michał Wichrowski, 2025/01/30)
  </li>
 
  <li>
@@ -744,6 +748,14 @@ inconvenience this causes.
   Deprecated: The function parallel::transform() has been deprecated.
   <br>
   (Wolfgang Bangerth, 2024/12/18)
+ </li>
+
+ <li>
+  Fixed: For `dim = 1`, the setup of MatrixFree did not correctly
+  identify faces between cells of different refinement level. This is
+  now fixed.
+  <br>
+  (Sean Johnson, 2024/12/12)
  </li>
 
  <li>

@@ -18,7 +18,6 @@
 // integrate_scatter) to the vector-valued case in form of multiple components
 // with different vector entries but otherwise similar setup.
 
-#include <deal.II/base/function.h>
 #include <deal.II/base/quadrature_lib.h>
 
 #include <deal.II/distributed/tria.h>

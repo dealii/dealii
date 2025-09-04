@@ -306,8 +306,12 @@ public:
   /**
    * Initialize a rectangular matrix.
    *
-   * @arg m number of rows @arg n number of columns @arg max_per_row maximum
-   * number of nonzero entries per row
+   * @param[in] m The number of rows.
+   * @param[in] n The number of columns.
+   * @param[in] max_chunks_per_row The maximum number of nonzero chunks per row
+   *   that is to be allocated.
+   * @param[in] chunk_size The number of rows/columns that should be chunked
+   *   together.
    */
   ChunkSparsityPattern(const size_type m,
                        const size_type n,
@@ -317,9 +321,12 @@ public:
   /**
    * Initialize a rectangular matrix.
    *
-   * @arg m number of rows @arg n number of columns @arg row_lengths possible
-   * number of nonzero entries for each row.  This vector must have one entry
-   * for each row.
+   * @param[in] m The number of rows.
+   * @param[in] n The number of columns.
+   * @param[in] row_lengths The possible number of nonzero entries for each row.
+   *   This vector must have one entry for each row.
+   * @param[in] chunk_size The number of rows/columns that should be chunked
+   *   together.
    */
   ChunkSparsityPattern(const size_type               m,
                        const size_type               n,
@@ -341,9 +348,11 @@ public:
   /**
    * Initialize a quadratic matrix.
    *
-   * @arg m number of rows and columns @arg row_lengths possible number of
-   * nonzero entries for each row.  This vector must have one entry for each
-   * row.
+   * @param[in] m The number of rows and columns.
+   * @param[in] row_lengths The possible number of nonzero entries for each row.
+   *   This vector must have one entry for each row.
+   * @param[in] chunk_size The number of rows/columns that should be chunked
+   *   together.
    */
   ChunkSparsityPattern(const size_type               m,
                        const std::vector<size_type> &row_lengths,

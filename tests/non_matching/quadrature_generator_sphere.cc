@@ -54,7 +54,7 @@ calculate_volume_and_surface_area()
 
   // Go over all cells and compute the volume and surface area.
   double surface_area = 0, volume = 0;
-  for (const auto cell : triangulation.active_cell_iterators())
+  for (const auto &cell : triangulation.active_cell_iterators())
     {
       // Create a box corresponding to the cell.
       std::pair<Point<dim>, Point<dim>> lower_upper_corner;

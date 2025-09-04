@@ -2294,7 +2294,7 @@ namespace Step32
     const QGauss<dim> quadrature_formula(parameters.stokes_velocity_degree + 1);
 
     using CellFilter =
-      FilteredIterator<typename DoFHandler<2>::active_cell_iterator>;
+      FilteredIterator<typename DoFHandler<dim>::active_cell_iterator>;
 
     WorkStream::run(
       CellFilter(IteratorFilters::LocallyOwnedCell(),
@@ -2407,7 +2407,7 @@ namespace Step32
     const QGauss<dim> quadrature_formula(parameters.temperature_degree + 2);
 
     using CellFilter =
-      FilteredIterator<typename DoFHandler<2>::active_cell_iterator>;
+      FilteredIterator<typename DoFHandler<dim>::active_cell_iterator>;
 
     WorkStream::run(
       CellFilter(IteratorFilters::LocallyOwnedCell(),
@@ -2674,7 +2674,7 @@ namespace Step32
       get_entropy_variation(average_temperature);
 
     using CellFilter =
-      FilteredIterator<typename DoFHandler<2>::active_cell_iterator>;
+      FilteredIterator<typename DoFHandler<dim>::active_cell_iterator>;
 
     auto worker =
       [this, global_T_range, maximal_velocity, global_entropy_variation](

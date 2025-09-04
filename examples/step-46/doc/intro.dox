@@ -591,7 +591,7 @@ physics in different parts of the domain, and how to implement such
 models in deal.II. As a consequence, we won't bother coming up with a
 good solver: we'll just use the SparseDirectUMFPACK class which always
 works, even if not with optimal complexity. We will, however, comment
-on possible other solvers in the @ref step_46-Results "results" section.
+on possible other solvers in the @ref step_46-ResultsSection "results" section.
 
 
 <h4>Mesh refinement</h4>

@@ -18,7 +18,6 @@
 // boundary conditions by solving a simple linear system and outputting the
 // solution for FE_DGQ(0)
 
-#include <deal.II/base/function.h>
 
 #include <deal.II/distributed/tria.h>
 
