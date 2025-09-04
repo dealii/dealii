@@ -8,17 +8,18 @@ Smoothers with localized residual computations for geometric multigrid methods
 <br>
 Michał Wichrowski, Peter Munch, Martin Kronbichler, Guido Kanschat
 <br>
-https://arxiv.org/abs/2407.02100
+https://epubs.siam.org/doi/abs/10.1137/23M1625962 (arxiv preprint: https://arxiv.org/abs/2407.02100)
 </i>
 
 <a name="Motivation"></a>
 <h1>Motivation</h1>
 
-Geometric multigrid methods are highly efficient solvers for the large linear systems arising from the discretization of
+Geometric multigrid (GMG) methods are highly efficient solvers for the large linear systems arising from the discretization of
 partial differential equations. A key component of GMG is the smoother, typically an iterative method like Jacobi
 or Chebyshev iteration, which damps high-frequency error components on each level of the multigrid hierarchy.
 However, these methods  rely on global operations: such as computing residuals or multipying with diagonal.
 These operations can lead to poor CPU cache utilization due to the non-local memory access patterns, especially for
+
 large-scale problems. Furthermore, the number of iterations typically grows significantly with the polynomial degree ($p$) of the finite
 element space.
 
@@ -31,6 +32,11 @@ local residual to compute a correction. This localization significantly reduces 
 smoothing process compared to standard smoothers relying on global matrix-vector products. For structured
 patches (like those arising from uniform refinement), the local patch operator often exhibits a tensor product structure,
 allowing for highly efficient computation and inversion using specialized techniques.
+
+As a related, simpler approach, one can refer to the step-59 tutorial program, which uses a block-Jacobi method with
+element-wise patches on DG discretizations. That method does not employ overlapping patches and is additive rather than
+multiplicative, so it is not as sophisticated as the multiplicative, overlapping patch-smoother presented here; nevertheless,
+step-59 can be viewed as a first step toward employing more sophisticated local inverses.
 
 <a name="WhatTheProgramDoes"></a>
 <h1>What the program does</h1>
