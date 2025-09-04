@@ -128,6 +128,7 @@ namespace PatchDistributors
      * is useful when preparing local cell storage for operations where only
      * non-overlapping contributions should be considered initially, i.e.
      * preparing to scatter contributions to global vector.
+     * The degrees of freedom not present in the patch vector are set to zero.
      *
      * @tparam CellDofsView Type representing the view/accessor for a single
      * cell's local DoF storage. Must support `operator[]` for assignment.

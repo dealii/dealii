@@ -1,10 +1,21 @@
 /* ------------------------------------------------------------------------
  *
+ * SPDX-License-Identifier: LGPL-2.1-or-later
+ * Copyright (C) 2022 - 2025 by the deal.II authors
  *
- * Authors: Michal Wichrowski, Heidelberg University,
- * 2025
+ * This file is part of the deal.II library.
+ *
+ * Part of the source code is dual licensed under Apache-2.0 WITH
+ * LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+ * governing the source code and code contributions can be found in
+ * LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
+ *
+ * ------------------------------------------------------------------------
+ *
+ * Author: Michał Wichrowski, Heidelberg University, 2025
  */
 
+// @sect3{Include files}
 
 // First include the necessary files from the deal.II library.
 
@@ -60,6 +71,8 @@
 
 
 
+// @sect3{Operators}
+
 namespace Operators
 {
   using namespace dealii;
@@ -89,7 +102,7 @@ namespace Operators
     /**
      * @brief Constructor.
      */
-    LaplaceOperator();
+    LaplaceOperator() = default;
 
     /**
      * Clears internal data structures, including the diagonal entries and the
@@ -142,9 +155,14 @@ namespace Operators
 
 
   /**
-   * @brief Clear implementation.
    *
-   * Calls the base class clear function.
+   * Calls the base class clear function. We intentionally keep this
+   * trivial override as an obvious placeholder so users extending the
+   * operator (for example by adding more advanced local solvers,
+   * internal buffers, or other per-operator state) remember to call
+   * the base-class clear(). You can remove this override if you prefer,
+   * but keeping it here acts as a convenient reminder when building on
+   * this code.
    */
   template <int dim, int fe_degree, typename number>
   void LaplaceOperator<dim, fe_degree, number>::clear()
@@ -160,8 +178,8 @@ namespace Operators
    * 1. Reinitialize FEEvaluation for the current cell batch.
    * 2. Read DoF values from the source vector `src`.
    * 3. Evaluate gradients at quadrature points.
-   * 4. Submit the gradients (multiplied by coefficient, if any - here just 1.0)
-   *    back for integration.
+   * 4. Submit the gradients (multiplied by coefficient, if any -- here
+   * just 1.0) back for integration.
    * 5. Integrate the gradients against test function gradients.
    * 6. Distribute the local results to the global destination vector `dst`.
    */
@@ -224,17 +242,22 @@ namespace Operators
     using BaseType       = PatchSmootherBase<dim, number>;
     using VectorType     = LinearAlgebra::distributed::Vector<number>;
     using MatrixFreeType = MatrixFree<dim, number>;
+
     /**
-     * @brief Type alias for the storage managing patch data (DoF indices, etc.).
+     * @brief Type alias for the storage of managing patch data (DoF indices, etc.).
      */
     using PatchStorageType = PatchStorage<MatrixFreeType>;
 
     using VectorizedNumber = VectorizedArray<number>;
+
     /**
      * @brief The size (number of rows/columns) of the 1D matrices that form
-     * the tensor product patch matrix. For a patch of $2^d$ cells with FE_Q
-     * elements of degree `fe_degree`, this corresponds to the number of unique
-     * 1D basis functions on the two adjacent reference cells along one axis.
+     * the tensor product patch matrix. For a patch of two adjacent reference
+     * cells in 1D and FE_Q elements of degree `fe_degree`, we consider the
+     * unique 1D basis functions after imposing Dirichlet boundary conditions
+     * on the ends of the patch. Imposing Dirichlet conditions on both patch
+     * ends removes the two boundary degrees of freedom, yielding
+     * 2*fe_degree - 1 unknown interior basis functions per axis.
      */
     const constexpr static unsigned int n_rows_1d = 2 * fe_degree - 1;
 
@@ -242,14 +265,11 @@ namespace Operators
       Utilities::pow<unsigned int>(n_rows_1d, dim);
 
     /**
-     * @brief Type alias for the class providing the local patch inverse.
+     * @brief Type aliases for the class providing the local patch inverse
+     * and standard FEEvaluation on a single cell batch
      */
     using InverseType = TensorProductMatrixSymmetricSum<dim, number, n_rows_1d>;
-
-    /**
-     * @brief Type alias for the standard FEEvaluation on a single cell batch.
-     */
-    using FEEval = FEEvaluation<dim, fe_degree, fe_degree + 1, 1, number>;
+    using FEEval      = FEEvaluation<dim, fe_degree, fe_degree + 1, 1, number>;
 
 
     /**
@@ -263,17 +283,18 @@ namespace Operators
      * This function is called by the base class framework (e.g., within a
      * patch loop). For each patch in the given range, it performs the
      * following steps:
-     * 1. Gathers the relevant portion of the global right-hand side vector
+     * 1. Gather the relevant portion of the global right-hand side vector
+
      * `src` to a local patch vector `local_rhs`.
-     * 2. Applies the global operator (implicitly via FEEvaluation) to the
+     * 2. Apply the global operator (implicitly via FEEvaluation) to the
      *    current global solution estimate `dst` and gathers the result to a
      *    local patch vector `local_residual`.
-     * 3. Computes the actual residual on the patch: `local_residual = local_rhs
+     * 3. Compute the actual residual on the patch: `local_residual = local_rhs
      * - A_patch * current_solution_on_patch`.
-     * 4. Applies the inverse patch operator (`inverse.vmult`) to the residual
+     * 4. Apply the inverse patch operator (`inverse.vmult`) to the residual
      *    to get a local correction: `local_correction = A_patch^{-1} *
      * local_residual`.
-     * 5. Updates the global solution `dst` by distributing the negative of the
+     * 5. Update the global solution `dst` by distributing the negative of the
      *    local correction.
      *
      * @param patch_storage The storage object containing patch information.
@@ -289,9 +310,8 @@ namespace Operators
                      const bool &do_forward) const override;
 
     /**
-     * @brief Initialize the smoother.
      *
-     * Initializes the base class and the local patch inverse operator.
+     * Initialize the base class and the local patch inverse operator.
      *
      * @param patch_storage Shared pointer to the patch storage object.
      */
@@ -322,27 +342,25 @@ namespace Operators
   void LaplacePatchSmoother<dim, fe_degree, number>::initialize(
     std::shared_ptr<PatchStorageType> &patch_storage)
   {
-    // First, call the initialize function of the base class. This sets up
-    // the connection to the patch storage object.
+    // After calling the initialize function of the base class to set up
+    // the connection to the patch storage object, we check whether there
+    // are any patches to be worked on the currrent processor. Then, we
+    // construct an FEEvaluation object to provide access to the finite element
+    // and the geometry of the cell.
     BaseType::initialize(patch_storage);
 
-    // If there are no patches on the current processor, there is nothing to
-    // initialize, so we can exit early.
     if (patch_storage->n_patches() == 0)
       return;
 
-    // To build the local patch operator, we need information about the finite
-    // element and the geometry of the cells. We start by creating an
-    // FEEvaluation object, which gives us access to this information.
     FEEval fe_eval(*patch_storage->get_matrix_free());
 
     // The patch operator is constructed using a tensor product of 1D matrices.
-    // The deal.II FE_Q elements use a hierarchical basis, but the tensor
-    // product construction assumes a lexicographic ordering of degrees of
-    // freedom. We compute a permutation vector that maps from
-    // the lexicographic ordering (used for the matrix) to the hierarchical
-    // ordering (used by the FE_Q element). This vector is then passed to the
-    // matrix creation functions.
+    // The deal.II FE_Q elements use a hierarchical ordering of the Lagrangian
+    // basis functions, but the tensor product construction assumes a
+    // lexicographic ordering of degrees of freedom. We compute a permutation
+    // vector that maps from the lexicographic ordering (used for the matrix) to
+    // the hierarchical ordering (used by the FE_Q element). This vector is then
+    // passed to the matrix creation functions.
     std::vector<unsigned int> numbering =
       FETools::lexicographic_to_hierarchic_numbering<1>(fe_degree);
 
@@ -377,10 +395,6 @@ namespace Operators
     // first diagonal element of the inverse Jacobian.
     const number h = inverse_jacobian[0][0][0];
 
-    // Declare tables (deal.II's dynamic 2D array) to store the 1D mass and
-    // Laplace matrices that will form the patch operator.
-    Table<2, number> patch_mass_matrix;
-    Table<2, number> patch_laplace_matrix;
 
 
     // Now, we create the 1D matrices for a
@@ -397,17 +411,18 @@ namespace Operators
       TensorProductMatrixCreator::create_1d_cell_laplace_matrix<number>(
         *fe_1d, h, {true, true}, numbering);
 
+
     // A patch consists of 2x1 cells in 1D. We now assemble the 1D *patch*
     // matrices from the 1D *cell* matrices we just created. This helper
     // function combines the cell matrices to form the larger matrix that
     // represents the operator over the entire 1D patch.
     // The patch inverse operator only acts on the interior DoFs, so we
     // create the patch matrices with `false` for the boundary DoFs.
-    patch_mass_matrix =
+    Table<2, number> patch_mass_matrix =
       TensorProductMatrixCreator::create_1D_discretization_matrix<number>(
         cell_mass_matrix, 2, 1, {false, false});
 
-    patch_laplace_matrix =
+    Table<2, number> patch_laplace_matrix =
       TensorProductMatrixCreator::create_1D_discretization_matrix<number>(
         cell_laplace_matrix, 2, 1, {false, false});
 
@@ -477,7 +492,7 @@ namespace Operators
 
 
 
-    // Instantiate the FEPatchEvaluation object. It takes the patch storage
+    // Set up the FEPatchEvaluation object. It takes the patch storage
     // and a configured FEEvaluation object (based on the MatrixFree data
     // associated with the patch storage).
     PatchEval patch_eval(patch_storage,
@@ -586,13 +601,14 @@ namespace Operators
 
 } // namespace Operators
 
+// @sect3{The main class}
 
 namespace LaplaceSolver
 {
   using namespace dealii;
 
   /**
-   * Implements a Laplace solver using matrix-free techniques.
+   * This class implements a Laplace solver using matrix-free techniques.
    * There are two main differences between this class and the one from step-37:
    *  - MatrixFree object for level operators  have to enable evalution on
    * ghosted cells
@@ -648,11 +664,6 @@ namespace LaplaceSolver
     double             setup_time;
     ConditionalOStream pcout;
     ConditionalOStream time_details;
-
-
-    mutable std::vector<std::vector<
-      std::pair<double, std::chrono::time_point<std::chrono::system_clock>>>>
-      all_mg_timers;
   };
 
 
