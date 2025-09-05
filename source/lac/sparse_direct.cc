@@ -1049,7 +1049,7 @@ SparseDirectMUMPS::initialize_matrix(const Matrix &matrix)
 #    if DEAL_II_TRILINOS_VERSION_GTE(13, 4, 0)
           local_non_zeros = trilinos_matrix.getLocalNumEntries();
 #    else
-          local_non_zeros = trilinos_matrix.getNodeNumElements();
+          local_non_zeros = trilinos_matrix.getNodeNumEntries();
 #    endif
 #  else
           local_non_zeros = trilinos_matrix.NumMyNonzeros();
