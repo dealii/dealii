@@ -1120,7 +1120,11 @@ SparseDirectMUMPS::initialize_matrix(const Matrix &matrix)
             {
               const auto &trilinos_matrix = matrix.trilinos_matrix();
 #  ifdef DEAL_II_TRILINOS_WITH_TPETRA
+#    if DEAL_II_TRILINOS_VERSION_GTE(13, 4, 0)
               const auto n_local_rows = trilinos_matrix.getLocalNumRows();
+#    else
+              const auto n_local_rows = trilinos_matrix.getNodeNumRows();
+#    endif
 #  else
               const auto n_local_rows = trilinos_matrix.NumMyRows();
 #  endif
@@ -1241,7 +1245,11 @@ SparseDirectMUMPS::initialize_matrix(const Matrix &matrix)
             {
               const auto &trilinos_matrix = matrix.trilinos_matrix();
 #  ifdef DEAL_II_TRILINOS_WITH_TPETRA
+#    if DEAL_II_TRILINOS_VERSION_GTE(13, 4, 0)
               const auto n_local_rows = trilinos_matrix.getLocalNumRows();
+#    else
+              const auto n_local_rows = trilinos_matrix.getNodeNumRows();
+#    endif
 #  else
               const auto n_local_rows = trilinos_matrix.NumMyRows();
 #  endif
