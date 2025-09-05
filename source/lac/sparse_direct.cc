@@ -1413,10 +1413,17 @@ SparseDirectMUMPS::vmult(VectorType &dst, const VectorType &src) const
                      std::is_same_v<VectorType,
                                     LinearAlgebra::distributed::Vector<double>>)
     {
-      if constexpr (std::is_same_v<VectorType, TrilinosWrappers::MPI::Vector> ||
-                    std::is_same_v<VectorType,
-                                   LinearAlgebra::distributed::Vector<double>>)
-        id.rhs_loc = const_cast<double *>(src.begin());
+      if constexpr (std::is_same_v<VectorType, TrilinosWrappers::MPI::Vector>)
+{
+#  ifdef DEAL_II_TRILINOS_WITH_TPETRA
+ Assert(false, ExcNotImplemented()); 
+#else    
+    id.rhs_loc = const_cast<double *>(src.begin());
+#endif
+} else if constexpr(
+    std::is_same_v<VectorType,                                                                                                                                                                   
+                                    LinearAlgebra::distributed::Vector<double>>)
+         id.rhs_loc = const_cast<double *>(src.begin());
       else if constexpr (std::is_same_v<VectorType, PETScWrappers::MPI::Vector>)
         {
 #  ifdef DEAL_II_WITH_PETSC
