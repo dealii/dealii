@@ -1043,11 +1043,11 @@ SparseDirectMUMPS::initialize_matrix(const Matrix &matrix)
         {
           const auto &trilinos_matrix = matrix.trilinos_matrix();
 #  ifdef DEAL_II_TRILINOS_WITH_TPETRA
-#if DEAL_II_TRILINOS_VERSION_GTE(13, 4, 0)
+#    if DEAL_II_TRILINOS_VERSION_GTE(13, 4, 0)
           local_non_zeros = trilinos_matrix.getLocalNumEntries();
-#else
+#    else
           local_non_zeros = trilinos_matrix.getNodeNumElements();
-#endif
+#    endif
 #  else
           local_non_zeros = trilinos_matrix.NumMyNonzeros();
 #  endif
@@ -1409,13 +1409,13 @@ SparseDirectMUMPS::vmult(VectorType &dst, const VectorType &src) const
                      std::is_same_v<VectorType, PETScWrappers::MPI::Vector>)
     {
       if constexpr (std::is_same_v<VectorType, TrilinosWrappers::MPI::Vector>)
-{
+        {
 #  ifdef DEAL_II_TRILINOS_WITH_TPETRA
- Assert(false, ExcNotImplemented()); 
-#else    
-    id.rhs_loc = const_cast<double *>(src.begin());
-#endif
-}
+          Assert(false, ExcNotImplemented());
+#  else
+          id.rhs_loc = const_cast<double *>(src.begin());
+#  endif
+        }
       else if constexpr (std::is_same_v<VectorType, PETScWrappers::MPI::Vector>)
         {
 #  ifdef DEAL_II_WITH_PETSC
