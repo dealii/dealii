@@ -1558,7 +1558,7 @@ InstantiateUMFPACK(BlockSparseMatrix<std::complex<float>>);
 #  define InstantiateMUMPSMatVec(VECTOR)                                    \
     template void SparseDirectMUMPS::vmult(VECTOR &, const VECTOR &) const; \
     template void SparseDirectMUMPS::Tvmult(VECTOR &, const VECTOR &) const;
-#  ifdef DEAL_II_WITH_TRILINOS
+#  if defined(DEAL_II_WITH_TRILINOS) && !defined(DEAL_II_TRILINOS_WITH_TPETRA)
 InstantiateMUMPSMatVec(TrilinosWrappers::MPI::Vector)
 #  endif
 #  ifdef DEAL_II_WITH_PETSC
@@ -1571,7 +1571,7 @@ InstantiateMUMPSMatVec(TrilinosWrappers::MPI::Vector)
 
       InstantiateMUMPS(SparseMatrix<double>)
         InstantiateMUMPS(SparseMatrix<float>)
-#  ifdef DEAL_II_WITH_TRILINOS
+#  if defined(DEAL_II_WITH_TRILINOS) && !defined(DEAL_II_TRILINOS_WITH_TPETRA)
           InstantiateMUMPS(TrilinosWrappers::SparseMatrix)
 #  endif
 #  ifdef DEAL_II_WITH_PETSC
