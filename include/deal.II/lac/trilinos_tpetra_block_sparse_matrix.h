@@ -26,7 +26,7 @@
 #  include <deal.II/lac/block_sparse_matrix.h>
 #  include <deal.II/lac/exceptions.h>
 #  include <deal.II/lac/full_matrix.h>
-#  include <deal.II/lac/trilinos_tpetra_block_vector.h>
+#  include <deal.II/lac/trilinos_tpetra_block_sparse_matrix.h>
 #  include <deal.II/lac/trilinos_tpetra_sparse_matrix.h>
 
 #  include <cmath>
@@ -71,15 +71,19 @@ namespace LinearAlgebra
      * @ingroup Matrix1
      * @see @ref GlossBlockLA "Block (linear algebra)"
      */
-    template <typename Number, typename MemorySpace = dealii::MemorySpace::Host>
+    template <typename Number,
+              typename MemorySpace = ::dealii::MemorySpace::Host>
     class BlockSparseMatrix
-      : public BlockMatrixBase<SparseMatrix<Number, MemorySpace>>
+      : public BlockMatrixBase<::dealii::LinearAlgebra::TpetraWrappers::
+                                 SparseMatrix<Number, MemorySpace>>
     {
     public:
       /**
        * Typedef the base class for simpler access to its own alias.
        */
-      using BaseClass = BlockMatrixBase<SparseMatrix<Number, MemorySpace>>;
+      using BaseClass =
+        BlockMatrixBase<::dealii::LinearAlgebra::TpetraWrappers::
+                          SparseMatrix<Number, MemorySpace>>;
 
       /**
        * Typedef the type of the underlying matrix.
@@ -292,7 +296,7 @@ namespace LinearAlgebra
        * Make the clear() function in the base class visible, though it is
        * protected.
        */
-      using BlockMatrixBase<SparseMatrix<Number, MemorySpace>>::clear;
+      using BaseClass::clear;
 
     private:
       /**
