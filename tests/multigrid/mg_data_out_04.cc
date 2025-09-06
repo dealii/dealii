@@ -80,18 +80,24 @@ do_test(const bool interpolate_with_vector_tools)
   }
 
   {
-    MGLevelObject<VectorType>         dof_vector(0,
+    MGLevelObject<VectorType> dof_vector(0,
                                          triangulation.n_global_levels() - 1);
-    MGTransferMatrixFree<dim, double> transfer;
-
-    transfer.build(dof_handler);
-    transfer.interpolate_to_mg(dof_handler, dof_vector, global_dof_vector);
 
     if (interpolate_with_vector_tools)
+      {
+        MGTransferMatrixFree<dim, double> transfer;
+
+        transfer.build(dof_handler);
+        transfer.interpolate_to_mg(dof_handler, dof_vector, global_dof_vector);
+      }
+    else
       for (unsigned int level = 0; level < triangulation.n_global_levels();
            ++level)
         {
-          dof_vector[level] = 0.0;
+          dof_vector[level].reinit(
+            dof_handler.locally_owned_mg_dofs(level),
+            DoFTools::extract_locally_active_level_dofs(dof_handler, level),
+            dof_handler.get_mpi_communicator());
 
           VectorTools::interpolate(dof_handler,
                                    Functions::SquareFunction<dim>(),
@@ -129,7 +135,7 @@ main(int argc, char **argv)
   MPILogInitAll                    log;
 
   do_test<2>(true);
-  do_test<2>(true);
+  do_test<2>(false);
 
   //  do_test<3>();
   return 0;
