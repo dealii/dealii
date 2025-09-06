@@ -3184,7 +3184,6 @@ GridIn<dim, spacedim>::read_partitioned_msh(const std::string &file_prefix,
 
           gmsh::model::mesh::getElements(
             element_types, element_ids, element_nodes, entity_dim, entity_tag);
-
           for (unsigned int i = 0; i < element_types.size(); ++i)
             {
               if (element_ids[i].empty())
