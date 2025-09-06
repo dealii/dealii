@@ -1035,14 +1035,51 @@ TimerOutput::reset()
   timer_all.restart();
 }
 
+
+
 TimerOutput::Scope::~Scope()
 {
+  // avoid communicating with other processes if there is an uncaught
+  // exception
+#ifdef DEAL_II_WITH_MPI
+#  if __cpp_lib_uncaught_exceptions >= 201411
+  // std::uncaught_exception() is deprecated in c++17
+  if (std::uncaught_exceptions() > 0 && timer.mpi_communicator != MPI_COMM_SELF)
+#  else
+  if (std::uncaught_exception() == true &&
+      timer.mpi_communicator != MPI_COMM_SELF)
+#  endif
+    {
+      const unsigned int myid =
+        Utilities::MPI::this_mpi_process(timer.mpi_communicator);
+      if (myid == 0)
+        std::cerr
+          << "---------------------------------------------------------\n"
+          << "TimerOutput objects finalize timed values printed to the\n"
+          << "screen by communicating over MPI in their destructors.\n"
+          << "Since an exception is currently uncaught, this\n"
+          << "synchronization (and subsequent output) will be skipped\n"
+          << "to avoid a possible deadlock.\n"
+          << "---------------------------------------------------------"
+          << std::endl;
+    }
+  else
+    {
+      try
+        {
+          stop();
+        }
+      catch (...)
+        {}
+    }
+#else
   try
     {
       stop();
     }
   catch (...)
     {}
+#endif
 }
 
 
