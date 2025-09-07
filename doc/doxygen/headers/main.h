@@ -181,7 +181,7 @@
  *   these iterators is the geometric and topological information that
  *   can already be gotten from the triangulation iterators (they are
  *   in fact derived classes) as well as things like the global
- *   numbers of the degrees of freedom on the present cell. On can
+ *   numbers of the degrees of freedom on the present cell. One can
  *   also ask an iterator to extract the values corresponding to the
  *   degrees of freedom on the present cell from a data vector that
  *   stores values for all degrees of freedom associated with a
