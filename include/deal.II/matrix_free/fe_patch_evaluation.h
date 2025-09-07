@@ -416,6 +416,8 @@ FEPatchEvaluation<FEEval, Distributor, vectorizaton>::distribute_patch_to_local(
   const bool                         copy_duplicates)
 {
   AssertDimension(patch_vector.size(), distributor.n_patch_dofs());
+  Assert(current_patch_index != numbers::invalid_unsigned_int,
+         ExcNotInitialized());
 
   distributor.distribute_patch_to_local(cell_dofs_view_raw,
                                         patch_vector,
@@ -430,6 +432,8 @@ FEPatchEvaluation<FEEval, Distributor, vectorizaton>::gather_local_to_patch(
   const bool                   sum_overlapping) const
 {
   AssertDimension(patch_vector.size(), distributor.n_patch_dofs());
+  Assert(current_patch_index != numbers::invalid_unsigned_int,
+         ExcNotInitialized());
 
   distributor.gather_local_to_patch(cell_dofs_view_raw,
                                     patch_vector,
@@ -442,6 +446,8 @@ void
 FEPatchEvaluation<FEEval, Distributor, vectorizaton>::read_dof_values(
   const VECTOR &src)
 {
+  Assert(current_patch_index != numbers::invalid_unsigned_int,
+         ExcNotInitialized());
   Assert(current_patch_index != numbers::invalid_unsigned_int,
          ExcNotInitialized());
   for (auto &fe_eval : fe_evaluations)
