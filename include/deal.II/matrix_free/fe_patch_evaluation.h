@@ -121,6 +121,19 @@ public:
   FEPatchEvaluation(const PatchStorageType &storage, const FEEval &fe_eval);
 
   /**
+   * Construct a new FEPatchEvaluation by taking ownership of the internal
+   * resources held by @p other. All internal handles, buffers and cached
+   * metadata are transferred to the new object rather than deep-copied.
+   * After the move, @p other is left in a valid but unspecified state and may
+   * be safely destroyed or assigned to.
+   *
+   * Thread safety: Not safe to call concurrently with other non-const
+   * operations
+   * on @p other.
+   */
+  FEPatchEvaluation(FEPatchEvaluation &&other) noexcept;
+
+  /**
    * @brief Reinitializes the FEPatchEvaluation for a specific patch.
    *
    * This function prepares the FEPatchEvaluation object to work with the
@@ -337,6 +350,23 @@ FEPatchEvaluation<FEEval, Distributor, vectorizaton>::FEPatchEvaluation(
   static_assert(n_evaluators == 1, "Only one evaluator is supported for now");
   Assert(storage.get_matrix_free().get() == &fe_eval.get_matrix_free(),
          ExcMessage("MatrixFree objects do not match!"));
+}
+
+template <typename FEEval, typename Distributor, VectorizationType vectorizaton>
+FEPatchEvaluation<FEEval, Distributor, vectorizaton>::FEPatchEvaluation(
+  FEPatchEvaluation &&other)
+  : fe_evaluations(std::move(other.fe_evaluations))
+  , cell_dofs_view_raw(
+      internal::
+        create_cell_dofs_view_array<FEEvaluationType, n_cells, Number, n_lanes>(
+          fe_evaluations[0],
+          n_dofs_per_cell))
+  , storage(other.storage)
+  , current_patch_index(other.current_patch_index)
+  , distributor(std::move(other.distributor))
+{
+  static_assert(n_evaluators == 1, "Only one evaluator is supported for now");
+  other.current_patch_index = numbers::invalid_unsigned_int;
 }
 
 
