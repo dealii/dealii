@@ -1335,7 +1335,7 @@ class MGTransferBlockMatrixFreeBase
   : public MGTransferBase<LinearAlgebra::distributed::BlockVector<Number>>
 {
 public:
-  MGTransferBlockMatrixFreeBase(const bool same_for_all)
+  explicit MGTransferBlockMatrixFreeBase(const bool same_for_all)
     : same_for_all(same_for_all)
   {}
 
@@ -1481,7 +1481,7 @@ class MGTransferBlockMF
 {
 public:
   /**
-   Constructor.
+   * Constructor.
    */
   MGTransferBlockMF(const MGTransferMF<dim, Number, ::dealii::MemorySpace::Host>
                       &transfer_operator);
