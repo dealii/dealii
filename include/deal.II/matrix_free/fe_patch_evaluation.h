@@ -426,7 +426,7 @@ template <typename FEEval,
           typename Distributor,
           VectorizationType vectorization>
 FEPatchEvaluation<FEEval, Distributor, vectorization>::FEPatchEvaluation(
-  FEPatchEvaluation &&other)
+  FEPatchEvaluation &&other) noexcept
   : fe_evaluations(std::move(other.fe_evaluations))
   , cell_dofs_view_raw(
       internal::

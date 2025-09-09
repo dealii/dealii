@@ -117,7 +117,7 @@ test()
       Assert(
         mf_cell_iterator->index() == child_cell->index(),
         ExcMessage(
-          "Cell index mismatch -- most likely patch contruction went wrong."));
+          "Cell index mismatch -- most likely patch construction went wrong."));
     }
 }
 

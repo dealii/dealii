@@ -239,7 +239,7 @@ public:
      * an invalid index.
      */
     AdditionalData()
-      : excluded_vertices({{numbers::invalid_unsigned_int}})
+      : excluded_vertices{numbers::invalid_unsigned_int}
     {}
 
     /**
@@ -665,7 +665,7 @@ private:
 
 
 
-  // patches[paralell cat][patch_index]
+  // patches[parallel cat][patch_index]
   std::array<std::vector<RegularPatch>, TaskInfoType::n_categories>
 
     regular_patches;
@@ -755,7 +755,7 @@ PatchStorage<MFType>::RegularPatch::RegularPatch(
           Assert(
             used_cell[cell__inpatch_index] == false,
             ExcMessage(
-              "You have tried to contruct patch from rotated cells, that is currently not implemented"));
+              "You have tried to construct patch from rotated cells, that is currently not implemented"));
           used_cell[cell__inpatch_index] = true;
           cells[cell__inpatch_index]     = cell_index;
         }
@@ -1010,19 +1010,19 @@ PatchStorage<MFType>::push_back_patch(
         task_infos[component].determine_minimum_category_of_patch(
           local_dofs, process_colors));
     }
-  const unsigned int parition =
+  const unsigned int partition =
     TaskInfoType::determine_cell_partition(category);
 
   if (RegularPatch::is_constructible(patch, vertex_index, index2cell_local))
     {
       RegularPatch ordered_patch(patch, vertex_index, index2cell_local);
-      regular_patches[parition].push_back(ordered_patch);
+      regular_patches[partition].push_back(ordered_patch);
     }
   else
     {
       // Construct and push back a GeneralPatch
       GeneralPatch general_patch(patch, vertex_index, index2cell_local);
-      other_patches[parition].push_back(general_patch);
+      other_patches[partition].push_back(general_patch);
     }
 }
 

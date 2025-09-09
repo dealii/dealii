@@ -334,7 +334,7 @@ namespace Operators
   {
     // After calling the initialize function of the base class to set up
     // the connection to the patch storage object, we check whether there
-    // are any patches to be worked on the currrent processor. Then, we
+    // are any patches to be worked on the current processor. Then, we
     // construct an FEEvaluation object to provide access to the finite element
     // and the geometry of the cell.
     BaseType::initialize(patch_storage);
@@ -575,7 +575,7 @@ namespace Operators
         // once, we need zero out the "duplicates".
         //
         // Distribute the patch correction vector back to the individual cells'
-        // FEEvaluation objects. 'false' indicates that DoFs shared beteween
+        // FEEvaluation objects. 'false' indicates that DoFs shared between
         // multiple cell are only written the first owning cell, not
         // accumulated. The values of shared DoFs in subsequent cells will be
         // set to 0.
@@ -600,10 +600,10 @@ namespace LaplaceSolver
   /**
    * This class implements a Laplace solver using matrix-free techniques.
    * There are two main differences between this class and the one from step-37:
-   *  - MatrixFree object for level operators  have to enable evalution on
+   *  - MatrixFree object for level operators  have to enable evaluation on
    * ghosted cells
    *  - The smoother is a patch smoother, which is more efficient for high order
-   * elements.  It requires building PatchStorage to store infomration necessary
+   * elements.  It requires building PatchStorage to store information necessary
    * for loops. The smoother is good enough on its own, there is no need to
    * combine it with PreconditionChebyshev
    *
