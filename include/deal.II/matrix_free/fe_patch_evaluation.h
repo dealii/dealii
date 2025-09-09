@@ -628,8 +628,6 @@ FEPatchEvaluation<FEEval, Distributor, vectorization>::read_dof_values(
 {
   Assert(current_patch_index != numbers::invalid_unsigned_int,
          ExcNotInitialized());
-  Assert(current_patch_index != numbers::invalid_unsigned_int,
-         ExcNotInitialized());
   for (auto &fe_eval : fe_evaluations)
     fe_eval.read_dof_values(src);
 }
