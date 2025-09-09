@@ -130,7 +130,11 @@ test()
     FEPatchEvaluation<FEEval,
                       PatchDistributors::DistributorLookup<dim, fe_degree>>;
 
-  PatchEval patch_eval(patch_storage, FEEval(*mf_level_storage));
+  // Test constructor and  move constructor: consistency of cell_dofs_view_raw
+  // can fail. If so, it will be detected in reinit(). PatchEval
+  // patch_eval(patch_storage, FEEval(*mf_level_storage));
+  PatchEval patch_eval(
+    [&]() { return PatchEval(patch_storage, FEEval(*mf_level_storage)); }());
 
   // Checks: there should only one patch
 

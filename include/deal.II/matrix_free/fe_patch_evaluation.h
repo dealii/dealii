@@ -418,7 +418,7 @@ FEPatchEvaluation<FEEval, Distributor, vectorization>::FEPatchEvaluation(
           ArrayView<FEEvaluationType>(fe_evaluations),
           n_dofs_per_cell))
   , storage(other.storage)
-  , current_patch_index(other.current_patch_index)
+  , current_patch_index(numbers::invalid_unsigned_int)
   , distributor(std::move(other.distributor))
 {
   other.current_patch_index = numbers::invalid_unsigned_int;
@@ -432,23 +432,88 @@ void
 FEPatchEvaluation<FEEval, Distributor, vectorization>::reinit(
   const std::size_t patch_index)
 {
-  static_assert(n_evaluators == 1, "Only one evaluator is supported for now");
-  fe_evaluations[0].reinit(storage.get_regular_patch(patch_index).get_cells());
-  current_patch_index = patch_index;
+  // static_assert(n_evaluators == 1, "Only one evaluator is supported for
+  // now");
+  static_assert(vectorization == within_patch,
+                "Only vectorization within_patch is supported");
 
-  for (unsigned int i = 0; i < n_cells; ++i)
+  if constexpr (n_evaluators == 1 && vectorization == within_patch)
     {
-      // Assert that the view points to the correct memory location by
-      // checking the address of the first element accessible through the
-      // view's operator[].
-      Assert(
-        &cell_dofs_view_raw[i][0] ==
-          &(fe_evaluations[0].begin_dof_values()[0][i]),
-        ExcInternalError(
-          "cell_dofs_view_raw does not point to the expected memory location after reinit."));
+      const auto &patch_cells =
+        storage.get_regular_patch(patch_index).get_cells();
+
+      if constexpr (n_lanes > n_cells)
+        {
+          std::array<typename PatchStorageType::CellIndex, n_lanes>
+            padded_cells;
+          for (unsigned int i = 0; i < n_cells; ++i)
+            padded_cells[i] = patch_cells[i];
+          for (unsigned int i = n_cells; i < n_lanes; ++i)
+            padded_cells[i] = numbers::invalid_unsigned_int;
+
+          fe_evaluations[0].reinit(padded_cells);
+        }
+      else
+        {
+          fe_evaluations[0].reinit(patch_cells);
+        }
+
+      current_patch_index = patch_index;
+
+      // Check consistency of cell_dofs_view_raw with fe_evaluations.
+      // This is a debug-only check.
+      for (unsigned int i = 0; i < n_cells; ++i)
+        {
+          // Assert that the view points to the correct memory location by
+          // checking the address of the first element accessible through the
+          // view's operator[].
+          Assert(
+            &cell_dofs_view_raw[i][0] ==
+              &(fe_evaluations[0].begin_dof_values()[0][i]),
+            ExcInternalError(
+              "cell_dofs_view_raw does not point to the expected memory location after reinit."));
+        }
+      // The lexicographic view uses the updated cell_dofs_view_raw, so it
+      // should reflect the changes.
+      return;
     }
-  // The lexicographic view uses the updated cell_dofs_view_raw, so it should
-  // reflect the changes.
+
+  if constexpr (n_evaluators > 1 && vectorization == within_patch)
+    {
+      {
+        const auto &patch_cells =
+          storage.get_regular_patch(patch_index).get_cells();
+
+        // Partition patch_cells into chunks of size n_lanes and reinit each
+        // evaluator.
+        for (unsigned int eval = 0; eval < n_evaluators; ++eval)
+          {
+            std::array<typename PatchStorageType::CellIndex, n_lanes> chunk;
+            const unsigned int offset = eval * n_lanes;
+            for (unsigned int lane = 0; lane < n_lanes; ++lane)
+              chunk[lane] = patch_cells[offset + lane];
+
+            fe_evaluations[eval].reinit(chunk);
+          }
+
+        current_patch_index = patch_index;
+
+        // Debug-only consistency check of cell_dofs_view_raw against
+        // fe_evaluations.
+        for (unsigned int i = 0; i < n_cells; ++i)
+          {
+            const unsigned int eval_idx = i / n_lanes;
+            const unsigned int lane     = i % n_lanes;
+            Assert(
+              &cell_dofs_view_raw[i][0] ==
+                &(fe_evaluations[eval_idx].begin_dof_values()[0][lane]),
+              ExcInternalError(
+                "cell_dofs_view_raw does not point to the expected memory location after reinit."));
+          }
+
+        return;
+      }
+    }
 }
 
 
@@ -480,11 +545,10 @@ FEPatchEvaluation<FEEval, Distributor, vectorization>::get_dof_value(
   const unsigned int &cell,
   const unsigned int &dof)
 {
-  static_assert(n_evaluators == 1, "Only one evaluator is supported for now");
   static_assert(vectorization == within_patch,
                 "Only one evaluator is supported for now");
 
-  return fe_evaluations[0].begin_dof_values()[dof][cell];
+  return cell_dofs_view_raw[cell][dof];
 }
 
 
@@ -496,11 +560,10 @@ FEPatchEvaluation<FEEval, Distributor, vectorization>::get_dof_value(
   const unsigned int &cell,
   const unsigned int &dof) const
 {
-  static_assert(n_evaluators == 1, "Only one evaluator is supported for now");
   static_assert(vectorization == within_patch,
                 "Only one evaluator is supported for now");
 
-  return fe_evaluations[0].begin_dof_values()[dof][cell];
+  return cell_dofs_view_raw[cell][dof];
 }
 
 template <typename FEEval,
