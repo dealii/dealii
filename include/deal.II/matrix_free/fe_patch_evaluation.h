@@ -323,36 +323,65 @@ private:
 
 namespace internal
 {
-  // Helper using index_sequence to initialize std::array elements in-place
+  // Helper using index_sequence to initialize std::array elements in-place.
+  // This version accepts a pointer to the first FEEvaluation in an array of
+  // evaluators (fe_evals). It supports the "within_patch" vectorization:
+  // if there are more cells than lanes, multiple evaluators are used and
+  // the views are filled by iterating lanes of evaluator 0, then lanes of
+  // evaluator 1, etc.
   template <typename FEEval,
             typename Number,
             unsigned int NLanes,
             std::size_t... Is>
   std::array<StridedArrayView<Number, NLanes>, sizeof...(Is)>
-  create_cell_dofs_view_array_impl(
-    FEEval      &fe_eval,
-    unsigned int NDofsPerCell, // Pass non-const reference
-    std::index_sequence<Is...>)
+  create_cell_dofs_view_array_impl(const ArrayView<FEEval> &fe_evals,
+                                   unsigned int             NDofsPerCell,
+                                   std::index_sequence<Is...>)
   {
-    // Assumes StridedArrayView constructor takes (pointer, count)
-    // Uses logic inspired by the commented-out code in reinit.
-    return {
-      {StridedArrayView<Number, NLanes>(&(fe_eval.begin_dof_values()[0][Is]),
-                                        NDofsPerCell)...}};
+    // Number of cells we are creating views for.
+    constexpr std::size_t NCells = sizeof...(Is);
+
+    // Number of evaluators required for within_patch vectorization.
+    constexpr unsigned int n_evaluators_required =
+      n_evaluators_v<NLanes, static_cast<unsigned int>(NCells), within_patch>();
+
+    Assert(fe_evals.size() >= n_evaluators_required,
+           ExcMessage("Wrong size of FEEvaluation objects provided!"));
+
+    // Helper to create a single StridedArrayView for cell index `cell_index`.
+    auto make_view =
+      [&fe_evals, NDofsPerCell](
+        std::size_t cell_index) -> StridedArrayView<Number, NLanes> {
+      const unsigned int eval_idx =
+        static_cast<unsigned int>(cell_index / NLanes);
+      const unsigned int lane = static_cast<unsigned int>(cell_index % NLanes);
+
+      // Create view pointing to the lane-th entry of the evaluator eval_idx.
+      // We assume fe_evals references at least `n_evaluators_required`
+      // elements.
+      return StridedArrayView<Number, NLanes>(
+        &(fe_evals[eval_idx].begin_dof_values()[0][lane]), NDofsPerCell);
+    };
+
+    // Build the std::array by expanding over the index sequence.
+    return {{make_view(Is)...}};
   }
 
-  // Helper function to create the array of StridedArrayViews
+  // Top-level factory. Caller should pass an ArrayView referencing the
+  // fe_evaluations container (e.g., ArrayView(fe_evaluations)).
   template <typename FEEval,
             unsigned int NCells,
             typename Number,
             unsigned int NLanes>
   std::array<StridedArrayView<Number, NLanes>, NCells>
-  create_cell_dofs_view_array(
-    FEEval      &fe_eval,
-    unsigned int NDofsPerCell) // Pass non-const reference
+  create_cell_dofs_view_array(const ArrayView<FEEval> &fe_evals,
+                              unsigned int             NDofsPerCell)
   {
+    static_assert(NCells > 0, "NCells must be > 0");
+    static_assert(NLanes > 0, "NLanes must be > 0");
+
     return create_cell_dofs_view_array_impl<FEEval, Number, NLanes>(
-      fe_eval, NDofsPerCell, std::make_index_sequence<NCells>());
+      fe_evals, NDofsPerCell, std::make_index_sequence<NCells>());
   }
 
 } // namespace internal
@@ -368,12 +397,11 @@ FEPatchEvaluation<FEEval, Distributor, vectorization>::FEPatchEvaluation(
   , cell_dofs_view_raw(
       internal::
         create_cell_dofs_view_array<FEEvaluationType, n_cells, Number, n_lanes>(
-          fe_evaluations[0],
+          ArrayView<FEEvaluationType>(fe_evaluations),
           n_dofs_per_cell))
   , storage(storage)
   , current_patch_index(numbers::invalid_unsigned_int)
 {
-  static_assert(n_evaluators == 1, "Only one evaluator is supported for now");
   Assert(storage.get_matrix_free().get() == &fe_eval.get_matrix_free(),
          ExcMessage("MatrixFree objects do not match!"));
 }
@@ -387,13 +415,12 @@ FEPatchEvaluation<FEEval, Distributor, vectorization>::FEPatchEvaluation(
   , cell_dofs_view_raw(
       internal::
         create_cell_dofs_view_array<FEEvaluationType, n_cells, Number, n_lanes>(
-          fe_evaluations[0],
+          ArrayView<FEEvaluationType>(fe_evaluations),
           n_dofs_per_cell))
   , storage(other.storage)
   , current_patch_index(other.current_patch_index)
   , distributor(std::move(other.distributor))
 {
-  static_assert(n_evaluators == 1, "Only one evaluator is supported for now");
   other.current_patch_index = numbers::invalid_unsigned_int;
 }
 
