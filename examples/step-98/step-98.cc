@@ -474,11 +474,10 @@ namespace Operators
     // comparable to a standard copy operation of the same data size. With GCC,
     // an index-computing implementation (not included here) outperforms lookup
     // tables, though it's still significantly slower than Clang. Using
-    // `DistributorLookup` is crucial for efficiency, as it provides the
+    // `PatchDistributors::Lookup` is crucial for efficiency, as it provides the
     // mapping between patch DoFs and cell DoFs.
     using PatchEval =
-      FEPatchEvaluation<FEEval,
-                        PatchDistributors::DistributorLookup<dim, fe_degree>>;
+      FEPatchEvaluation<FEEval, PatchDistributors::Lookup<dim, fe_degree>>;
 
 
 

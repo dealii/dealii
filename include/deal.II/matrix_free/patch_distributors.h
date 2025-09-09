@@ -56,7 +56,7 @@ namespace PatchDistributors
    * @tparam degree The polynomial degree of the finite element.
    */
   template <int dim, int degree>
-  struct DistributorLookup
+  struct Lookup
   {
     using Cell2Patch = CellPatchLookup<dim, degree>;
 

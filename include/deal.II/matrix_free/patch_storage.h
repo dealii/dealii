@@ -163,7 +163,7 @@ namespace internal
 #endif // DOXYGEN
 
 /**
- * @brief Manages the storage and categorization of cell patches centered around
+ * Manages the storage and categorization of cell patches centered around
  * vertices.
  *
  * This class identifies patches of cells surrounding each vertex in a mesh
@@ -185,57 +185,68 @@ class PatchStorage : EnableObserverPointer
 {
 public:
   /**
-   * @brief Alias for the template parameter `MFType`.
+   * Alias for the template parameter `MFType`.
    */
   using MatrixFreeType = MFType;
+
+
   /**
-   * @brief The spatial dimension.
+   * The spatial dimension.
    */
   const static constexpr unsigned int dim = MatrixFreeType::dimension;
 
   /**
-   * @brief The scalar value type used by the MatrixFree object (e.g., float,
+   * The scalar value type used by the MatrixFree object (e.g., float,
    * double).
    */
   using value_type = typename MatrixFreeType::value_type;
+
+
   /**
-   * @brief The vectorized value type used by the MatrixFree object.
+   * The vectorized value type used by the MatrixFree object.
    */
   using vectorized_value_type = typename MatrixFreeType::vectorized_value_type;
+
+
   /**
-   * @brief The number of lanes in the vectorized type.
+   * The number of lanes in the vectorized type.
    */
   const static constexpr unsigned int n_lanes = vectorized_value_type::size();
+
+
   /**
-   * @brief The expected number of cells in a regular patch (2^dim).
+   * The expected number of cells in a regular patch (2^dim).
    */
   const static constexpr unsigned int n_patch_cells = 1 << dim;
 
+
   /**
-   * @brief Type used to represent a unique index for each cell within the
+   * Type used to represent a unique index for each cell within the
    * context of the associated MatrixFree object. This is typically calculated
    * as `batch_index * n_lanes + lane_index`.
    */
   using CellIndex = unsigned int;
+
+
   /**
-   * @brief Alias for the cell iterator type of the underlying Triangulation.
+   * Alias for the cell iterator type of the underlying Triangulation.
    */
   using CellIterator = typename Triangulation<dim>::cell_iterator;
 
   /**
-   * @brief Type used to represent the orientation of a cell within a regular
+   * Type used to represent the orientation of a cell within a regular
    * patch (currently unused).
    */
   using CellOrientation = unsigned int;
 
   /**
-   * @brief Structure to hold additional data for patch generation, such as
+   * Structure to hold additional data for patch generation, such as
    * vertices to exclude.
    */
   struct AdditionalData
   {
     /**
-     * @brief Default constructor. Initializes the excluded vertices set with
+     * Default constructor. Initializes the excluded vertices set with
      * an invalid index.
      */
     AdditionalData()
@@ -243,7 +254,7 @@ public:
     {}
 
     /**
-     * @brief A set of global vertex indices that should be excluded during
+     * A set of global vertex indices that should be excluded during
      * patch generation.
      */
     std::set<types::global_vertex_index> excluded_vertices;
@@ -251,7 +262,7 @@ public:
 
 
   /**
-   * @brief Represents a regular patch, i.e., a patch centered at a vertex
+   * Represents a regular patch, i.e., a patch centered at a vertex
    * with exactly 2^dim cells.
    *
    * Stores the cell indices and potentially orientation information. Provides
@@ -262,9 +273,10 @@ public:
     const static constexpr int dimension        = dim;
     const static bool          is_constant_size = true;
     const static unsigned int  n_cells          = 1 << dim;
-    // Constructor: orders cells, generates orientation information
+
+
     /**
-     * @brief Constructor for a RegularPatch.
+     *  Constructor for a RegularPatch.
      *
      * Orders the cells within the patch based on the central vertex index and
      * potentially generates orientation information. Asserts that the input
@@ -284,7 +296,7 @@ public:
 
 
     /**
-     * @brief Returns the number of cells in the patch (always `n_cells`).
+     *  Returns the number of cells in the patch (always `n_cells`).
      */
     constexpr unsigned int
     size() const
@@ -292,7 +304,7 @@ public:
       return n_cells;
     }
     /**
-     * @brief Checks if this patch conflicts with another patch for parallel
+     *  Checks if this patch conflicts with another patch for parallel
      * processing (e.g., based on shared DoFs).
      * @param other The other RegularPatch to check against.
      * @return `true` if there is no conflict, `false` otherwise.
@@ -302,7 +314,7 @@ public:
 
 
     /**
-     * @brief Provides read-only access to the array of cell indices forming
+     *  Provides read-only access to the array of cell indices forming
      * the patch.
      * @return A constant reference to the array of `CellIndex`.
      */
@@ -312,8 +324,9 @@ public:
       return cells;
     }
 
+
     /**
-     * @brief Gets the orientation information for a specific cell within the
+     *  Gets the orientation information for a specific cell within the
      * patch.
      * @param cell_index The local index of the cell within the patch (0 to
      * n_cells-1).
@@ -328,7 +341,7 @@ public:
 
 
     /**
-     * @brief Static method to check if a given set of cells can form a
+     *  Static method to check if a given set of cells can form a
      * regular patch.
      *
      * Currently, this simply checks if the number of cells in the input `patch`
@@ -355,8 +368,9 @@ public:
       return false;
     }
 
+
     /**
-     * @brief Checks if any cell within this patch is a ghost cell on the
+     *  Checks if any cell within this patch is a ghost cell on the
      * current MPI process.
      * @return `true` if the patch contains at least one ghost cell, `false`
      * otherwise.
@@ -376,7 +390,7 @@ public:
   };
 
   /**
-   * @brief Represents a general patch, i.e., a patch that is not regular
+   *  Represents a general patch, i.e., a patch that is not regular
    * (typically near boundaries or excluded vertices).
    *
    * Stores a variable number of cell indices.
@@ -387,7 +401,7 @@ public:
     const static bool          is_constant_size = false;
 
     /**
-     * @brief Constructor for a GeneralPatch.
+     *  Constructor for a GeneralPatch.
      *
      * @param patch A set of `CellIndex` objects representing the cells in the
      * patch.
@@ -402,7 +416,7 @@ public:
       const std::function<CellIterator(const CellIndex &)> &index2cell);
 
     /**
-     * @brief Returns the number of cells in the patch.
+     *  Returns the number of cells in the patch.
      */
     unsigned int
     size() const
@@ -411,7 +425,7 @@ public:
     }
 
     /**
-     * @brief Provides read-only access to the vector of cell indices forming
+     *  Provides read-only access to the vector of cell indices forming
      * the patch.
      * @return A constant reference to the vector of `CellIndex`.
      */
@@ -433,18 +447,18 @@ public:
 
 
   /**
-   * @brief Alias for the task information type used for parallel scheduling
+   *  Alias for the task information type used for parallel scheduling
    * (e.g., Gauss-Seidel coloring). At the moment MPI is disabled.
    */
   using TaskInfoType = internal::GaussSeidel::TaskInfoDummy;
   // LinearAlgebra::GaussSeidel::TaskInfo<value_type, vectorized_value_type>;
 
   /**
-   * @brief Type representing a range of patch indices [begin, end).
+   *  Type representing a range of patch indices [begin, end).
    */
   using PatchRange = const std::pair<std::size_t, std::size_t>;
   /**
-   * @brief Type representing a category assigned to a patch, often used for
+   *  Type representing a category assigned to a patch, often used for
    * grouping or identification.
    */
   using PatchCategory = unsigned int;
@@ -452,13 +466,14 @@ public:
 
 
   /**
-   * @brief Constructor.
+   *  Constructor.
    * @param mf A shared pointer to the constant MatrixFree object.
    */
   PatchStorage(const std::shared_ptr<const MatrixFreeType> &mf);
 
+
   /**
-   * @brief Initializes the PatchStorage by generating and storing patches.
+   *  Initializes the PatchStorage by generating and storing patches.
    *
    * Identifies all vertex-centered patches on the specified level of the
    * MatrixFree object. Filters patches based on ownership and MPI rank.
@@ -468,6 +483,7 @@ public:
    */
   void
   initialize(const AdditionalData &data = AdditionalData());
+
 
   /**
    * Assigns a category to each regular patch based on a user-provided
@@ -482,7 +498,7 @@ public:
 
 
   /**
-   * @brief Clears all stored patch data and resets the state to
+   *  Clears all stored patch data and resets the state to
    * uninitialized.
    */
   void
@@ -490,7 +506,7 @@ public:
 
 
   /**
-   * @brief Executes a given function (`patch_worker`) over ranges of patches,
+   *  Executes a given function (`patch_worker`) over ranges of patches,
    * handling parallel communication.
    *
    * This function iterates through the parallel categories determined by the
@@ -522,7 +538,7 @@ public:
 
 
   /**
-   * @brief Helper function to adjusts the partitioner of a
+   *  Helper function to adjusts the partitioner of a
    * distributed vector if it doesn't match the internal partitioner for the
    * given component.
    *
@@ -541,6 +557,7 @@ public:
     const unsigned int                                component,
     const LinearAlgebra::distributed::Vector<number> &vec) const;
 
+
   /**
    * Gets a constant reference to the regular patch at the given global
    * index `i`. Used by FEPatchEvaluation
@@ -552,8 +569,9 @@ public:
   const RegularPatch &
   get_regular_patch(const std::size_t &i) const;
 
+
   /**
-   * @brief Gets the category assigned to the regular patch at the given global
+   *  Gets the category assigned to the regular patch at the given global
    * index `i`.
    *
    * Requires `categorize_patches()` to have been called first.
@@ -563,15 +581,17 @@ public:
   const PatchCategory &
   get_regular_patch_category(const std::size_t &i) const;
 
+
   /**
-   * @brief Returns the total number of regular patches stored on the current
+   *  Returns the total number of regular patches stored on the current
    * MPI process.
    */
   std::size_t
   n_patches() const;
 
+
   /**
-   * @brief Gets a constant reference to the shared pointer holding the
+   *  Gets a constant reference to the shared pointer holding the
    * MatrixFree object.
    */
   const std::shared_ptr<const MatrixFreeType> &
@@ -579,15 +599,16 @@ public:
 
 
   /**
-   * @brief Converts a `CellIndex` back to a `CellIterator`.
+   *  Converts a `CellIndex` back to a `CellIterator`.
    * @param index The `CellIndex` to convert.
    * @return The corresponding `CellIterator`.
    */
   inline CellIterator
   index2cell(const CellIndex &index) const;
 
+
   /**
-   * @brief Converts a MatrixFree batch index and lane index into a unique
+   *  Converts a MatrixFree batch index and lane index into a unique
    * `CellIndex`.
    * @param cell_batch_index The index of the cell batch in the MatrixFree
    * object.
@@ -598,8 +619,9 @@ public:
   batch2index(const unsigned int &cell_batch_index,
               const unsigned int &lane_index) const;
 
+
   /**
-   * @brief Converts a `CellIndex` back into its corresponding MatrixFree batch
+   *  Converts a `CellIndex` back into its corresponding MatrixFree batch
    * index and lane index.
    * @param cell_index The `CellIndex` to convert.
    * @return A pair containing the batch index (first) and lane index (second).
@@ -607,8 +629,9 @@ public:
   inline std::pair<unsigned int, unsigned int>
   index2batch(const CellIndex &cell_index) const;
 
+
   /**
-   * @brief Outputs the geometry of all stored regular patches to VTU/PVTU
+   *  Outputs the geometry of all stored regular patches to VTU/PVTU
    * files.
    *
    * Each cell within each patch is written as a separate element in the VTU
@@ -622,8 +645,9 @@ public:
   void
   output_patches(const std::string &filename_without_extension) const;
 
+
   /**
-   * @brief Outputs the center points (approximated by one vertex) of all
+   *  Outputs the center points (approximated by one vertex) of all
    * stored regular patches to VTU/PVTU files.
    *
    * Each patch is represented by a single point (vertex) in the output file.
@@ -658,11 +682,9 @@ private:
                   const types::global_vertex_index &vertex_index);
 
 
-  // TODO: rename to collect_patch_dof_indices
   inline std::set<types::global_dof_index>
-  get_patch_dof_indices(const std::set<CellIndex> &patch_cells,
-                        const unsigned int        &component) const;
-
+  collect_patch_dof_indices(const std::set<CellIndex> &patch_cells,
+                            const unsigned int        &component) const;
 
 
   // patches[parallel cat][patch_index]
@@ -778,7 +800,7 @@ PatchStorage<MFType>::GeneralPatch::GeneralPatch(
 {
   // Example implementation: just copy the cell indices
   cells.assign(patch.begin(), patch.end());
-  // Add logic to determine if partially ghosted, etc.
+  // TODO: Add logic to determine if partially ghosted, etc.
 }
 
 
@@ -808,6 +830,8 @@ PatchStorage<MFType>::PatchStorage(
   Assert(level != numbers::invalid_unsigned_int, ExcInternalError());
 }
 
+
+
 template <class MFType>
 inline typename PatchStorage<MFType>::CellIterator
 PatchStorage<MFType>::index2cell(const CellIndex &index) const
@@ -817,6 +841,8 @@ PatchStorage<MFType>::index2cell(const CellIndex &index) const
   return matrix_free->get_cell_iterator(cell_batch_index, lane_index);
 }
 
+
+
 template <class MFType>
 inline typename PatchStorage<MFType>::CellIndex
 PatchStorage<MFType>::batch2index(const unsigned int &cell_batch_index,
@@ -824,6 +850,8 @@ PatchStorage<MFType>::batch2index(const unsigned int &cell_batch_index,
 {
   return cell_batch_index * n_lanes + lane_index;
 }
+
+
 
 template <class MFType>
 inline std::pair<unsigned int, unsigned int>
@@ -833,6 +861,7 @@ PatchStorage<MFType>::index2batch(const CellIndex &cell_index) const
   const unsigned int lane_index       = cell_index % n_lanes;
   return std::make_pair(cell_batch_index, lane_index);
 }
+
 
 
 template <class MFType>
@@ -910,7 +939,7 @@ PatchStorage<MFType>::initialize(const AdditionalData &data)
       std::set<types::global_dof_index> locally_relevant_dofs_set;
       for (auto [vertex_index, patch] : vertex_to_cell_map)
         {
-          const auto local_dofs = get_patch_dof_indices(patch, component);
+          const auto local_dofs = collect_patch_dof_indices(patch, component);
           locally_relevant_dofs_set.insert(local_dofs.begin(),
                                            local_dofs.end());
         }
@@ -989,6 +1018,7 @@ PatchStorage<MFType>::generate_patches()
 }
 
 
+
 template <class MFType>
 inline void
 PatchStorage<MFType>::push_back_patch(
@@ -1003,7 +1033,7 @@ PatchStorage<MFType>::push_back_patch(
   unsigned int category = TaskInfoType::invalid_category;
   for (unsigned int component = 0; component < n_components; ++component)
     {
-      const auto local_dofs = get_patch_dof_indices(patch, component);
+      const auto local_dofs = collect_patch_dof_indices(patch, component);
 
       category = internal::GaussSeidel::min_category(
         category,
@@ -1030,7 +1060,7 @@ PatchStorage<MFType>::push_back_patch(
 
 template <class MFType>
 inline std::set<types::global_dof_index>
-PatchStorage<MFType>::get_patch_dof_indices(
+PatchStorage<MFType>::collect_patch_dof_indices(
   const std::set<typename PatchStorage<MFType>::CellIndex> &patch_cells,
   const unsigned int                                       &component) const
 {
@@ -1053,6 +1083,8 @@ PatchStorage<MFType>::get_patch_dof_indices(
   return local_dofs;
 }
 
+
+
 template <class MFType>
 void
 PatchStorage<MFType>::categorize_patches(
@@ -1070,6 +1102,7 @@ PatchStorage<MFType>::categorize_patches(
     }
   are_patches_categorized = true;
 }
+
 
 
 template <class MFType>
@@ -1150,6 +1183,7 @@ PatchStorage<MFType>::patch_loop(
   solution.zero_out_ghost_values();
   //    solution.compress(VectorOperation::insert);
 }
+
 
 
 template <class MFType>
@@ -1307,6 +1341,8 @@ PatchStorage<MFType>::output_patches(
         pvtu_out_steam, piece_names, data_names, vector_data_ranges, vtu_flags);
     }
 }
+
+
 
 template <class MFType>
 void
