@@ -1205,7 +1205,7 @@ PatchStorage<MFType>::get_regular_patch_category(const std::size_t &i) const
                       regular_patch_categories[cat_index].size());
       const auto &patch_cat = regular_patch_categories[cat_index];
       if (ii < patch_cat.size())
-        return patch_cat[i];
+        return patch_cat[ii];
       else
         ii -= patch_cat.size();
     }

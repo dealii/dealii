@@ -13,7 +13,7 @@
 // ------------------------------------------------------------------------
 
 // check FEPatchEvaluation by comparing A*x computed locally with A*x computed
-// globally via FEEvalaution
+// globally via FEEvaluation
 
 #include <deal.II/base/function.h>
 #include <deal.II/base/quadrature_lib.h>
