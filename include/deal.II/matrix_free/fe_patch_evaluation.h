@@ -56,6 +56,29 @@ namespace internal
     return degree;
   }
 
+  template <unsigned int      NLanes,
+            unsigned int      NCells,
+            VectorizationType vectorization>
+  constexpr unsigned int
+  n_evaluators_v()
+  {
+    static_assert(NLanes > 0 && NCells > 0, "n_lanes and n_cells must be > 0");
+    if constexpr (vectorization == within_patch)
+      {
+        if constexpr (NLanes >= NCells)
+          return 1;
+
+        static_assert(
+          NCells % NLanes == 0,
+          "n_cells must be divisible by n_lanes for within_patch vectorization");
+        return NCells / NLanes;
+      }
+    else
+      {
+        return NCells;
+      }
+  }
+
 
 } // namespace internal
 
@@ -82,7 +105,7 @@ namespace internal
  */
 template <typename FEEval,
           typename Distributor,
-          VectorizationType vectorizaton = within_patch>
+          VectorizationType vectorization = within_patch>
 class FEPatchEvaluation
 {
 public:
@@ -98,7 +121,8 @@ public:
     internal::extract_degree(static_cast<FEEvaluationType *>(nullptr));
   const static unsigned int n_dofs_per_cell = std::pow(fe_degree + 1, dim);
 
-  const static unsigned int n_evaluators = 1;
+  const static unsigned int n_evaluators =
+    internal::n_evaluators_v<n_lanes, n_cells, vectorization>();
 
   using PatchStorageType = PatchStorage<MatrixFree<dim, Number>>;
   using CellDofsViewRaw  = StridedArrayView<Number, n_lanes>;
@@ -253,7 +277,7 @@ public:
    *
    * Allows direct modification of the value associated with a specific DoF
    * (`dof`) on a specific cell (`cell`) within the patch's local data
-   * representation. Assumes `vectorizaton == within_patch`.
+   * representation. Assumes `vectorization == within_patch`.
    *
    * @param cell The local index of the cell within the patch (0 to n_cells-1).
    * @param dof The local index of the DoF within the cell.
@@ -268,7 +292,7 @@ public:
    *
    * Allows reading the value associated with a specific DoF (`dof`) on a
    * specific cell (`cell`) within the patch's local data representation.
-   * Assumes `vectorizaton == within_patch`.
+   * Assumes `vectorization == within_patch`.
    *
    * @param cell The local index of the cell within the patch (0 to n_cells-1).
    * @param dof The local index of the DoF within the cell.
@@ -334,8 +358,10 @@ namespace internal
 } // namespace internal
 
 
-template <typename FEEval, typename Distributor, VectorizationType vectorizaton>
-FEPatchEvaluation<FEEval, Distributor, vectorizaton>::FEPatchEvaluation(
+template <typename FEEval,
+          typename Distributor,
+          VectorizationType vectorization>
+FEPatchEvaluation<FEEval, Distributor, vectorization>::FEPatchEvaluation(
   const PatchStorageType &storage,
   const FEEval           &fe_eval)
   : fe_evaluations(internal::make_array<n_evaluators>(fe_eval))
@@ -352,8 +378,10 @@ FEPatchEvaluation<FEEval, Distributor, vectorizaton>::FEPatchEvaluation(
          ExcMessage("MatrixFree objects do not match!"));
 }
 
-template <typename FEEval, typename Distributor, VectorizationType vectorizaton>
-FEPatchEvaluation<FEEval, Distributor, vectorizaton>::FEPatchEvaluation(
+template <typename FEEval,
+          typename Distributor,
+          VectorizationType vectorization>
+FEPatchEvaluation<FEEval, Distributor, vectorization>::FEPatchEvaluation(
   FEPatchEvaluation &&other)
   : fe_evaluations(std::move(other.fe_evaluations))
   , cell_dofs_view_raw(
@@ -370,9 +398,11 @@ FEPatchEvaluation<FEEval, Distributor, vectorizaton>::FEPatchEvaluation(
 }
 
 
-template <typename FEEval, typename Distributor, VectorizationType vectorizaton>
+template <typename FEEval,
+          typename Distributor,
+          VectorizationType vectorization>
 void
-FEPatchEvaluation<FEEval, Distributor, vectorizaton>::reinit(
+FEPatchEvaluation<FEEval, Distributor, vectorization>::reinit(
   const std::size_t patch_index)
 {
   static_assert(n_evaluators == 1, "Only one evaluator is supported for now");
@@ -395,55 +425,65 @@ FEPatchEvaluation<FEEval, Distributor, vectorizaton>::reinit(
 }
 
 
-template <typename FEEval, typename Distributor, VectorizationType vectorizaton>
+template <typename FEEval,
+          typename Distributor,
+          VectorizationType vectorization>
 inline constexpr unsigned int
-FEPatchEvaluation<FEEval, Distributor, vectorizaton>::n_patch_dofs() const
+FEPatchEvaluation<FEEval, Distributor, vectorization>::n_patch_dofs() const
 {
   return distributor.n_patch_dofs();
 }
 
-template <typename FEEval, typename Distributor, VectorizationType vectorizaton>
+template <typename FEEval,
+          typename Distributor,
+          VectorizationType vectorization>
 const unsigned int &
-FEPatchEvaluation<FEEval, Distributor, vectorizaton>::get_current_patch_index()
+FEPatchEvaluation<FEEval, Distributor, vectorization>::get_current_patch_index()
   const
 {
   return current_patch_index;
 }
 
 
-template <typename FEEval, typename Distributor, VectorizationType vectorizaton>
+template <typename FEEval,
+          typename Distributor,
+          VectorizationType vectorization>
 auto &
-FEPatchEvaluation<FEEval, Distributor, vectorizaton>::get_dof_value(
+FEPatchEvaluation<FEEval, Distributor, vectorization>::get_dof_value(
   const unsigned int &cell,
   const unsigned int &dof)
 {
   static_assert(n_evaluators == 1, "Only one evaluator is supported for now");
-  static_assert(vectorizaton == within_patch,
+  static_assert(vectorization == within_patch,
                 "Only one evaluator is supported for now");
 
   return fe_evaluations[0].begin_dof_values()[dof][cell];
 }
 
 
-template <typename FEEval, typename Distributor, VectorizationType vectorizaton>
+template <typename FEEval,
+          typename Distributor,
+          VectorizationType vectorization>
 const auto &
-FEPatchEvaluation<FEEval, Distributor, vectorizaton>::get_dof_value(
+FEPatchEvaluation<FEEval, Distributor, vectorization>::get_dof_value(
   const unsigned int &cell,
   const unsigned int &dof) const
 {
   static_assert(n_evaluators == 1, "Only one evaluator is supported for now");
-  static_assert(vectorizaton == within_patch,
+  static_assert(vectorization == within_patch,
                 "Only one evaluator is supported for now");
 
   return fe_evaluations[0].begin_dof_values()[dof][cell];
 }
 
-template <typename FEEval, typename Distributor, VectorizationType vectorizaton>
+template <typename FEEval,
+          typename Distributor,
+          VectorizationType vectorization>
 template <typename NumberType>
 inline void
-FEPatchEvaluation<FEEval, Distributor, vectorizaton>::distribute_patch_to_local(
-  const ArrayView<const NumberType> &patch_vector,
-  const bool                         copy_duplicates)
+FEPatchEvaluation<FEEval, Distributor, vectorization>::
+  distribute_patch_to_local(const ArrayView<const NumberType> &patch_vector,
+                            const bool                         copy_duplicates)
 {
   AssertDimension(patch_vector.size(), distributor.n_patch_dofs());
   Assert(current_patch_index != numbers::invalid_unsigned_int,
@@ -454,10 +494,12 @@ FEPatchEvaluation<FEEval, Distributor, vectorizaton>::distribute_patch_to_local(
                                         copy_duplicates);
 }
 
-template <typename FEEval, typename Distributor, VectorizationType vectorizaton>
+template <typename FEEval,
+          typename Distributor,
+          VectorizationType vectorization>
 template <typename NumberType>
 inline void
-FEPatchEvaluation<FEEval, Distributor, vectorizaton>::gather_local_to_patch(
+FEPatchEvaluation<FEEval, Distributor, vectorization>::gather_local_to_patch(
   const ArrayView<NumberType> &patch_vector,
   const bool                   sum_overlapping) const
 {
@@ -470,10 +512,12 @@ FEPatchEvaluation<FEEval, Distributor, vectorizaton>::gather_local_to_patch(
                                     sum_overlapping);
 }
 
-template <typename FEEval, typename Distributor, VectorizationType vectorizaton>
+template <typename FEEval,
+          typename Distributor,
+          VectorizationType vectorization>
 template <typename VECTOR>
 void
-FEPatchEvaluation<FEEval, Distributor, vectorizaton>::read_dof_values(
+FEPatchEvaluation<FEEval, Distributor, vectorization>::read_dof_values(
   const VECTOR &src)
 {
   Assert(current_patch_index != numbers::invalid_unsigned_int,
@@ -484,10 +528,12 @@ FEPatchEvaluation<FEEval, Distributor, vectorizaton>::read_dof_values(
     fe_eval.read_dof_values(src);
 }
 
-template <typename FEEval, typename Distributor, VectorizationType vectorizaton>
+template <typename FEEval,
+          typename Distributor,
+          VectorizationType vectorization>
 template <typename VECTOR>
 void
-FEPatchEvaluation<FEEval, Distributor, vectorizaton>::
+FEPatchEvaluation<FEEval, Distributor, vectorization>::
   distribute_local_to_global(VECTOR &dst) const
 {
   Assert(current_patch_index != numbers::invalid_unsigned_int,
