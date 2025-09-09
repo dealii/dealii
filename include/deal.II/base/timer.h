@@ -76,7 +76,10 @@ struct CPUClock
  * (i.e., the amount of time elapsed on a wall clock) and the amount of CPU
  * time that certain sections of an application have used. This class also
  * offers facilities for synchronizing the elapsed time across an MPI
- * communicator.
+ * communicator. Note that if the class is constructed with an MPI
+ * communicator all of the operations of this class are collective operations
+ * that have to be performed on all MPI ranks. It is impossible to query a
+ * timer object on only some of the MPI ranks.
  *
  * <h3>Usage</h3>
  *
@@ -90,7 +93,7 @@ struct CPUClock
  *   // do some complicated computations here
  *   // ...
  *
- *   timer.stop();
+ *   timer.stop_lap();
  *
  *   std::cout << "Elapsed CPU time: " << timer.cpu_time() << " seconds.\n";
  *   std::cout << "Elapsed wall time: " << timer.wall_time() << " seconds.\n";
@@ -100,8 +103,8 @@ struct CPUClock
  * @endcode
  *
  * Alternatively, you can also restart the timer instead of resetting it. The
- * times between successive calls to start() and stop() (i.e., the laps) will
- * then be accumulated. The usage of this class is also explained in the
+ * times between successive calls to start() and stop_lap() (i.e., the laps)
+ * will then be accumulated. The usage of this class is also explained in the
  * step-28 tutorial program.
  *
  * @note The TimerOutput (combined with TimerOutput::Scope) class provide a
@@ -126,8 +129,8 @@ public:
    * communicator. If @p sync_lap_times is <code>true</code> then the Timer
    * will set the elapsed wall and CPU times over the last lap to their
    * maximum values across the provided communicator. This synchronization is
-   * only performed if Timer::stop() is called before the timer is queried for
-   * time duration values.
+   * only performed if Timer::stop_lap() is called before the timer is queried
+   * for time duration values.
    *
    * This constructor calls Timer::start().
    *
@@ -180,10 +183,16 @@ public:
   start();
 
   /**
-   * Stop the timer. This updates the lap times and accumulated times. If
-   * <code>sync_lap_times</code> is <code>true</code> then the lap times are
-   * synchronized over all processors in the communicator (i.e., the lap times
-   * are set to the maximum lap time).
+   * Stop the timer for the current lap. This updates the lap times
+   * and accumulated times on the current processor.
+   */
+  void
+  stop_lap();
+
+  /**
+   * Stop the timer and return the accumulated CPU times in seconds.
+   * This function combines the functionality of the function stop_lap(),
+   * and the functionality of cpu_time().
    *
    * Return the accumulated CPU time in seconds.
    */
@@ -308,17 +317,26 @@ private:
   /**
    * Collection of wall time measurements.
    */
-  ClockMeasurements<wall_clock_type> wall_times;
+  mutable ClockMeasurements<wall_clock_type> wall_times;
 
   /**
    * Collection of CPU time measurements.
    */
-  ClockMeasurements<cpu_clock_type> cpu_times;
+  mutable ClockMeasurements<cpu_clock_type> cpu_times;
 
   /**
    * Whether or not the timer is presently running.
    */
   bool running;
+
+  /**
+   * Synchronize results across MPI ranks before
+   * producing output.
+   */
+  void
+  synchronize() const;
+
+  mutable bool is_synchronized;
 
   /**
    * The communicator over which various time values are synchronized and
@@ -338,7 +356,7 @@ private:
    * maximum, and average over all processors known to the MPI communicator of
    * the last lap time.
    */
-  Utilities::MPI::MinMaxAvg last_lap_wall_time_data;
+  mutable Utilities::MPI::MinMaxAvg last_lap_wall_time_data;
 
   /**
    * A structure for parallel wall time measurement that includes the minimum
@@ -346,7 +364,7 @@ private:
    * average time defined as the sum of all individual times divided by the
    * number of MPI processes in the MPI_Comm for the total run time.
    */
-  Utilities::MPI::MinMaxAvg accumulated_wall_time_data;
+  mutable Utilities::MPI::MinMaxAvg accumulated_wall_time_data;
 };
 
 
@@ -566,56 +584,6 @@ public:
      * Destructor calls stop().
      */
     ~Scope();
-
-    /**
-     * In case you want to exit the scope before the destructor is executed,
-     * call this function.
-     */
-    void
-    stop();
-
-  private:
-    /**
-     * Reference to the TimerOutput object
-     */
-    dealii::TimerOutput &timer;
-
-    /**
-     * Name of the section we need to exit
-     */
-    const std::string section_name;
-
-    /**
-     * Do we still need to exit the section we are in?
-     */
-    bool in;
-  };
-
-  /**
-   * Helper class to enter/exit sections in TimerOutput by constructing a
-   * simple scope-based object. The purpose of this class is explained in the
-   * documentation of TimerOutput. This class works just like the Scope class
-   * above, except in MPI programs it will abort the program when an exception
-   * is pending during scope destruction. This behavior avoids MPI communication
-   * deadlocks, which can happen if not all of the MPI ranks throw an
-   * exception. In the Scope class only the ranks throwing the exception would
-   * then initiate MPI communication, all other ranks would proceed and
-   * therefore cause a deadlock.
-   */
-  class MPISafeScope
-  {
-  public:
-    /**
-     * Enter the given section in the timer. Exit automatically when calling
-     * stop() or destructor runs.
-     */
-    MPISafeScope(dealii::TimerOutput &timer_, const std::string &section_name);
-
-    /**
-     * Destructor calls stop() except if there is an uncaught exception in which
-     * case it safely aborts the program with an error message.
-     */
-    ~MPISafeScope();
 
     /**
      * In case you want to exit the scope before the destructor is executed,
@@ -904,7 +872,7 @@ private:
   /**
    * A list of all the sections and their information.
    */
-  std::map<std::string, Section> sections;
+  mutable std::map<std::string, Section> sections;
 
   /**
    * The stream object to which we are to output.
@@ -934,7 +902,12 @@ private:
    * A lock that makes sure that this class gives reasonable results even when
    * used with several threads.
    */
-  Threads::Mutex mutex;
+  mutable Threads::Mutex mutex;
+
+  mutable bool is_synchronized;
+
+  void
+  synchronize() const;
 };
 
 
@@ -1004,29 +977,6 @@ inline TimerOutput::Scope::Scope(dealii::TimerOutput &timer_,
 
 inline void
 TimerOutput::Scope::stop()
-{
-  if (!in)
-    return;
-  in = false;
-
-  timer.leave_subsection(section_name);
-}
-
-
-
-inline TimerOutput::MPISafeScope::MPISafeScope(dealii::TimerOutput &timer_,
-                                               const std::string &section_name_)
-  : timer(timer_)
-  , section_name(section_name_)
-  , in(true)
-{
-  timer.enter_subsection(section_name);
-}
-
-
-
-inline void
-TimerOutput::MPISafeScope::stop()
 {
   if (!in)
     return;

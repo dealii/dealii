@@ -163,6 +163,7 @@ Timer::Timer()
 
 Timer::Timer(const MPI_Comm mpi_communicator, const bool sync_lap_times_)
   : running(false)
+  , is_synchronized(true)
   , mpi_communicator(mpi_communicator)
   , sync_lap_times(sync_lap_times_)
 {
@@ -192,15 +193,98 @@ Timer::start()
 double
 Timer::stop()
 {
+  stop_lap();
+  return cpu_time();
+}
+
+
+
+void
+Timer::stop_lap()
+{
   if (running)
     {
-      running = false;
+      running         = false;
+      is_synchronized = false;
 
       wall_times.last_lap_time =
         wall_clock_type::now() - wall_times.current_lap_start_time;
       cpu_times.last_lap_time =
         cpu_clock_type::now() - cpu_times.current_lap_start_time;
+    }
+}
 
+
+
+double
+Timer::cpu_time() const
+{
+  if (running)
+    {
+      const double running_time = internal::TimerImplementation::to_seconds(
+        cpu_clock_type::now() - cpu_times.current_lap_start_time +
+        cpu_times.accumulated_time);
+      return Utilities::MPI::sum(running_time, mpi_communicator);
+    }
+  else
+    {
+      if (is_synchronized == false)
+        synchronize();
+
+      return Utilities::MPI::sum(internal::TimerImplementation::to_seconds(
+                                   cpu_times.accumulated_time),
+                                 mpi_communicator);
+    }
+}
+
+
+
+double
+Timer::last_cpu_time() const
+{
+  if (is_synchronized == false)
+    synchronize();
+
+  return internal::TimerImplementation::to_seconds(cpu_times.last_lap_time);
+}
+
+
+
+double
+Timer::wall_time() const
+{
+  if (is_synchronized == false)
+    synchronize();
+
+  wall_clock_type::duration current_elapsed_wall_time;
+  if (running)
+    current_elapsed_wall_time = wall_clock_type::now() -
+                                wall_times.current_lap_start_time +
+                                wall_times.accumulated_time;
+  else
+    current_elapsed_wall_time = wall_times.accumulated_time;
+
+  return internal::TimerImplementation::to_seconds(current_elapsed_wall_time);
+}
+
+
+
+double
+Timer::last_wall_time() const
+{
+  if (is_synchronized == false)
+    synchronize();
+
+  return internal::TimerImplementation::to_seconds(wall_times.last_lap_time);
+}
+
+
+
+void
+Timer::synchronize() const
+{
+  if (is_synchronized == false)
+    {
       last_lap_wall_time_data =
         Utilities::MPI::min_max_avg(internal::TimerImplementation::to_seconds(
                                       wall_times.last_lap_time),
@@ -224,60 +308,9 @@ Timer::stop()
         Utilities::MPI::min_max_avg(internal::TimerImplementation::to_seconds(
                                       wall_times.accumulated_time),
                                     mpi_communicator);
+
+      is_synchronized = true;
     }
-  return internal::TimerImplementation::to_seconds(cpu_times.accumulated_time);
-}
-
-
-
-double
-Timer::cpu_time() const
-{
-  if (running)
-    {
-      const double running_time = internal::TimerImplementation::to_seconds(
-        cpu_clock_type::now() - cpu_times.current_lap_start_time +
-        cpu_times.accumulated_time);
-      return Utilities::MPI::sum(running_time, mpi_communicator);
-    }
-  else
-    {
-      return Utilities::MPI::sum(internal::TimerImplementation::to_seconds(
-                                   cpu_times.accumulated_time),
-                                 mpi_communicator);
-    }
-}
-
-
-
-double
-Timer::last_cpu_time() const
-{
-  return internal::TimerImplementation::to_seconds(cpu_times.last_lap_time);
-}
-
-
-
-double
-Timer::wall_time() const
-{
-  wall_clock_type::duration current_elapsed_wall_time;
-  if (running)
-    current_elapsed_wall_time = wall_clock_type::now() -
-                                wall_times.current_lap_start_time +
-                                wall_times.accumulated_time;
-  else
-    current_elapsed_wall_time = wall_times.accumulated_time;
-
-  return internal::TimerImplementation::to_seconds(current_elapsed_wall_time);
-}
-
-
-
-double
-Timer::last_wall_time() const
-{
-  return internal::TimerImplementation::to_seconds(wall_times.last_lap_time);
 }
 
 
@@ -287,7 +320,8 @@ Timer::reset()
 {
   wall_times.reset();
   cpu_times.reset();
-  running = false;
+  running         = false;
+  is_synchronized = true;
   internal::TimerImplementation::clear_timing_data(last_lap_wall_time_data);
   internal::TimerImplementation::clear_timing_data(accumulated_wall_time_data);
 }
@@ -304,6 +338,7 @@ TimerOutput::TimerOutput(std::ostream         &stream,
   , out_stream(stream, true)
   , output_is_enabled(true)
   , mpi_communicator(MPI_COMM_SELF)
+  , is_synchronized(true)
 {}
 
 
@@ -316,6 +351,7 @@ TimerOutput::TimerOutput(ConditionalOStream   &stream,
   , out_stream(stream)
   , output_is_enabled(true)
   , mpi_communicator(MPI_COMM_SELF)
+  , is_synchronized(true)
 {}
 
 
@@ -329,6 +365,7 @@ TimerOutput::TimerOutput(const MPI_Comm        mpi_communicator,
   , out_stream(stream, true)
   , output_is_enabled(true)
   , mpi_communicator(mpi_communicator)
+  , is_synchronized(true)
 {}
 
 
@@ -342,6 +379,7 @@ TimerOutput::TimerOutput(const MPI_Comm        mpi_communicator,
   , out_stream(stream)
   , output_is_enabled(true)
   , mpi_communicator(mpi_communicator)
+  , is_synchronized(true)
 {}
 
 
@@ -457,24 +495,21 @@ TimerOutput::leave_subsection(const std::string &section_name)
   const std::string actual_section_name =
     (section_name.empty() ? active_sections.back() : section_name);
 
-  sections[actual_section_name].timer.stop();
-  sections[actual_section_name].total_wall_time +=
-    sections[actual_section_name].timer.last_wall_time();
+  sections[actual_section_name].timer.stop_lap();
+  is_synchronized = false;
 
-  // Get cpu time. On MPI systems, if constructed with an mpi_communicator
-  // like MPI_COMM_WORLD, then the Timer will sum up the CPU time between
-  // processors among the provided mpi_communicator. Therefore, no
-  // communication is needed here.
-  const double cpu_time = sections[actual_section_name].timer.last_cpu_time();
-  sections[actual_section_name].total_cpu_time += cpu_time;
-
-  // in case we have to print out something, do that here...
+  // in case we have to print out something, do that here
+  // do not output if there are uncaught exceptions, since we
+  // cannot know if all MPI ranks threw the exception and we require
+  // communication to synchronize the results between ranks.
   if ((output_frequency == every_call ||
        output_frequency == every_call_and_summary) &&
-      output_is_enabled == true)
+      output_is_enabled == true && std::uncaught_exceptions() == 0)
     {
       std::string        output_time;
       std::ostringstream cpu;
+      const double       cpu_time =
+        sections[actual_section_name].timer.last_cpu_time();
       cpu << cpu_time << "s";
       std::ostringstream wall;
       wall << sections[actual_section_name].timer.last_wall_time() << "s";
@@ -498,9 +533,35 @@ TimerOutput::leave_subsection(const std::string &section_name)
 
 
 
+void
+TimerOutput::synchronize() const
+{
+  std::lock_guard<std::mutex> lock(mutex);
+
+  for (auto &section_name_and_section : sections)
+    {
+      auto &section = section_name_and_section.second;
+      section.total_wall_time += section.timer.last_wall_time();
+
+      // Get cpu time. On MPI systems, if constructed with an mpi_communicator
+      // like MPI_COMM_WORLD, then the Timer will sum up the CPU time between
+      // processors among the provided mpi_communicator. Therefore, no
+      // communication is needed here.
+      const double cpu_time = section.timer.last_cpu_time();
+      section.total_cpu_time += cpu_time;
+    }
+
+  is_synchronized = true;
+}
+
+
+
 std::map<std::string, double>
 TimerOutput::get_summary_data(const OutputData kind) const
 {
+  if (is_synchronized == false)
+    synchronize();
+
   std::map<std::string, double> output;
   for (const auto &section : sections)
     {
@@ -527,6 +588,9 @@ TimerOutput::get_summary_data(const OutputData kind) const
 void
 TimerOutput::print_summary() const
 {
+  if (is_synchronized == false)
+    synchronize();
+
   // we are going to change the precision and width of output below. store the
   // old values so the get restored when exiting this function
   const boost::io::ios_base_all_saver restore_stream(out_stream.get_stream());
@@ -836,6 +900,9 @@ void
 TimerOutput::print_wall_time_statistics(const MPI_Comm mpi_comm,
                                         const double   quantile) const
 {
+  if (is_synchronized == false)
+    synchronize();
+
   // we are going to change the precision and width of output below. store the
   // old values so the get restored when exiting this function
   const boost::io::ios_base_all_saver restore_stream(out_stream.get_stream());
@@ -1033,44 +1100,13 @@ TimerOutput::reset()
   sections.clear();
   active_sections.clear();
   timer_all.restart();
+  is_synchronized = true;
 }
 
 
 
 TimerOutput::Scope::~Scope()
 {
-  try
-    {
-      stop();
-    }
-  catch (...)
-    {}
-}
-
-
-
-TimerOutput::MPISafeScope::~MPISafeScope()
-{
-#ifdef DEAL_II_WITH_MPI
-  if (std::uncaught_exceptions() > 0 &&
-      timer.mpi_communicator != MPI_COMM_SELF &&
-      Utilities::MPI::n_mpi_processes(timer.mpi_communicator) > 1)
-    {
-      std::cerr << "---------------------------------------------------------\n"
-                << "The timer scope named <" << section_name
-                << "> is destroyed, but this \n"
-                << "requires MPI synchronization. Since an exception is\n"
-                << "currently uncaught, this synchronization would likely\n"
-                << "deadlock because only the current process is trying to\n"
-                << "destroy the object. As a consequence, the program will be\n"
-                << "aborted.\n"
-                << "---------------------------------------------------------"
-                << std::endl;
-
-      MPI_Abort(timer.mpi_communicator, 1);
-    }
-#endif
-
   try
     {
       stop();
