@@ -956,6 +956,24 @@ namespace FETools
                      const bool         &is_continuous);
 
   /**
+   * Given an index of a face DoF, compute the cell DoF index. This function is
+   * intended for use with single-component interpolatory elements like
+   * FE_SimplexP and FE_Q_Base in which DoFs defined on lines or quadrilaterals
+   * are rotated along with the face.
+   *
+   * @note Most applications should call FiniteElement::face_to_cell_index()
+   * instead, which may use this function in its implementation.
+   *
+   * @see FiniteElement::face_to_cell_index()
+   */
+  template <int dim, int spacedim>
+  unsigned int
+  face_to_cell_index(const FiniteElement<dim, spacedim> &fe,
+                     const unsigned int                  face_dof_index,
+                     const unsigned int                  face_no,
+                     const types::geometric_orientation  combined_orientation);
+
+  /**
    * A namespace that contains functions that help setting up internal
    * data structures when implementing FiniteElement which are build
    * from simpler ("base") elements, for example FESystem. The things

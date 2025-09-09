@@ -3341,6 +3341,140 @@ namespace FETools
     return std::make_pair(results[0], results[1]);
   }
 
+  template <int dim, int spacedim>
+  unsigned int
+  face_to_cell_index(const FiniteElement<dim, spacedim> &fe,
+                     const unsigned int                  face_dof_index,
+                     const unsigned int                  face_no,
+                     const types::geometric_orientation  combined_orientation)
+  {
+    const auto reference_cell = fe.reference_cell();
+
+    Assert(fe.n_blocks() == 1, ExcNotImplemented());
+    Assert(fe.n_components() == 1, ExcNotImplemented());
+
+    AssertIndexRange(face_dof_index, fe.n_dofs_per_face(face_no));
+    AssertIndexRange(face_no, reference_cell.n_faces());
+    AssertIndexRange(combined_orientation,
+                     reference_cell.n_face_orientations(face_no));
+
+    if (face_dof_index < fe.get_first_face_line_index(face_no))
+      // DoF is on a vertex
+      {
+        // get the number of the vertex on the face that corresponds to this
+        // DoF, along with the number of the DoF on this vertex
+        const unsigned int face_vertex =
+          face_dof_index / fe.n_dofs_per_vertex();
+        const unsigned int dof_index_on_vertex =
+          face_dof_index % fe.n_dofs_per_vertex();
+
+        // then get the number of this vertex on the cell and translate
+        // this to a DoF number on the cell
+        return reference_cell.face_to_cell_vertices(face_no,
+                                                    face_vertex,
+                                                    combined_orientation) *
+                 fe.n_dofs_per_vertex() +
+               dof_index_on_vertex;
+      }
+    else if (face_dof_index < fe.get_first_face_quad_index(face_no))
+      // DoF is on a line
+      {
+        // do the same kind of translation as before. we need to only consider
+        // DoFs on the lines, i.e., ignoring those on the vertices
+        const unsigned int index =
+          face_dof_index - fe.get_first_face_line_index(face_no);
+
+        const unsigned int face_line         = index / fe.n_dofs_per_line();
+        const unsigned int dof_index_on_line = index % fe.n_dofs_per_line();
+
+        unsigned int adjusted_dof_index_on_line = 0;
+        switch (dim)
+          {
+            case 1:
+              DEAL_II_ASSERT_UNREACHABLE();
+              break;
+
+            case 2:
+              if (combined_orientation ==
+                  numbers::default_geometric_orientation)
+                adjusted_dof_index_on_line = dof_index_on_line;
+              else
+                adjusted_dof_index_on_line =
+                  fe.n_dofs_per_line() - dof_index_on_line - 1;
+              break;
+
+            case 3:
+              {
+                // Line orientations are not consistent between faces of some
+                // reference cells (such as tetrahedra): e.g., a tet's first
+                // line is (0, 1) on face 0 and (1, 0) on face 1. Hence we have
+                // to determine the relative line orientation to determine how
+                // to index dofs along lines.
+                //
+                // face_to_cell_line_orientation() may only be called with
+                // canonical (face, line) pairs. Extract that information and
+                // then also the new canonical face_line_index.
+                const auto cell_line_index =
+                  reference_cell.face_to_cell_lines(face_no,
+                                                    face_line,
+                                                    combined_orientation);
+                const auto [canonical_face, canonical_line] =
+                  reference_cell.standard_line_to_face_and_line_index(
+                    cell_line_index);
+                // Here we don't take into account what the actual orientation
+                // of the line is: that's usually handled inside, e.g.,
+                // face->get_dof_indices().
+                const auto face_line_orientation =
+                  reference_cell.face_to_cell_line_orientation(
+                    canonical_line,
+                    canonical_face,
+                    combined_orientation,
+                    /*combined_line_orientation =*/
+                    numbers::default_geometric_orientation);
+
+                if (face_line_orientation ==
+                    numbers::default_geometric_orientation)
+                  adjusted_dof_index_on_line = dof_index_on_line;
+                else
+                  {
+                    Assert(face_line_orientation ==
+                             numbers::reverse_line_orientation,
+                           ExcInternalError());
+                    adjusted_dof_index_on_line =
+                      fe.n_dofs_per_line() - dof_index_on_line - 1;
+                  }
+              }
+              break;
+
+            default:
+              DEAL_II_ASSERT_UNREACHABLE();
+          }
+
+        return (fe.get_first_line_index() +
+                reference_cell.face_to_cell_lines(face_no,
+                                                  face_line,
+                                                  combined_orientation) *
+                  fe.n_dofs_per_line() +
+                adjusted_dof_index_on_line);
+      }
+    else
+      // DoF is on a quad
+      {
+        Assert(dim >= 3, ExcInternalError());
+
+        // ignore vertex and line dofs
+        const unsigned int index =
+          face_dof_index - fe.get_first_face_quad_index(face_no);
+
+        // Rotating DoFs defined on quadrilateral or triangular faces may
+        // require additional information about how those elements distribute
+        // DoFs on their faces: no elements actually support this yet
+        Assert((fe.n_dofs_per_quad(face_no) <= 1) ||
+                 combined_orientation == numbers::default_geometric_orientation,
+               ExcNotImplemented());
+        return fe.get_first_quad_index(face_no) + index;
+      }
+  }
 } // namespace FETools
 
 
