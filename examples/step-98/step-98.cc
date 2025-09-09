@@ -143,16 +143,6 @@ namespace Operators
                 const std::pair<unsigned int, unsigned int> &cell_range) const;
   };
 
-  /**
-   * @brief Constructor implementation.
-   *
-   * Initializes the base class.
-   */
-  template <int dim, int fe_degree, typename number>
-  LaplaceOperator<dim, fe_degree, number>::LaplaceOperator()
-    : MatrixFreeOperators::Base<dim, VectorType>()
-  {}
-
 
   /**
    *
@@ -705,11 +695,12 @@ namespace LaplaceSolver
     pcout << "Number of degrees of freedom: " << dof_handler.n_dofs()
           << std::endl;
 
-    IndexSet locally_relevant_dofs;
-    DoFTools::extract_locally_relevant_dofs(dof_handler, locally_relevant_dofs);
+    IndexSet locally_owned_dofs = dof_handler.locally_owned_dofs();
+    IndexSet locally_relevant_dofs =
+      DoFTools::extract_locally_relevant_dofs(dof_handler);
 
     constraints.clear();
-    constraints.reinit(locally_relevant_dofs);
+    constraints.reinit(locally_relevant_dofs, locally_owned_dofs);
     DoFTools::make_hanging_node_constraints(dof_handler, constraints);
     VectorTools::interpolate_boundary_values(
       mapping, dof_handler, 0, Functions::ZeroFunction<dim>(), constraints);
@@ -762,12 +753,11 @@ namespace LaplaceSolver
 
     for (unsigned int level = 0; level < nlevels; ++level)
       {
-        IndexSet relevant_dofs;
-        DoFTools::extract_locally_relevant_level_dofs(dof_handler,
-                                                      level,
-                                                      relevant_dofs);
+        IndexSet locally_owned_dofs = dof_handler.locally_owned_mg_dofs(level);
+        IndexSet relevant_dofs =
+          DoFTools::extract_locally_relevant_level_dofs(dof_handler, level);
         AffineConstraints<Number> level_constraints;
-        level_constraints.reinit(relevant_dofs);
+        level_constraints.reinit(locally_owned_dofs, relevant_dofs);
         level_constraints.add_lines(
           mg_constrained_dofs.get_boundary_indices(level));
         level_constraints.close();
