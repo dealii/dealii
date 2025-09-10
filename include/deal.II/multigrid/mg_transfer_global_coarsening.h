@@ -15,6 +15,8 @@
 #ifndef dealii_mg_transfer_global_coarsening_h
 #define dealii_mg_transfer_global_coarsening_h
 
+#include <deal.II/base/config.h>
+
 #include <deal.II/base/memory_space.h>
 #include <deal.II/base/mg_level_object.h>
 #include <deal.II/base/mpi_remote_point_evaluation.h>
@@ -23,6 +25,7 @@
 #include <deal.II/dofs/dof_handler.h>
 
 #include <deal.II/lac/affine_constraints.h>
+#include <deal.II/lac/la_parallel_block_vector.h>
 #include <deal.II/lac/la_parallel_vector.h>
 
 #include <deal.II/matrix_free/constraint_info.h>
@@ -30,10 +33,11 @@
 #include <deal.II/matrix_free/shape_info.h>
 
 #include <deal.II/multigrid/mg_base.h>
-#include <deal.II/multigrid/mg_transfer_matrix_free.h>
+#include <deal.II/multigrid/mg_constrained_dofs.h>
+#include <deal.II/multigrid/mg_transfer.h>
+#include <deal.II/multigrid/mg_transfer_internal.h>
 
 #include <deal.II/non_matching/mapping_info.h>
-
 
 
 DEAL_II_NAMESPACE_OPEN
@@ -971,9 +975,15 @@ private:
 
 
 /**
- * Implementation of the MGTransferBase. In contrast to
- * other multigrid transfer operators, the user can provide separate
- * transfer operators of type MGTwoLevelTransfer between each level. The
+ * Implementation of the MGTransferBase interface for which the transfer
+ * operations is implemented in a matrix-free way based on the interpolation
+ * matrices of the underlying finite element. This requires considerably less
+ * memory than MGTransferPrebuilt and can also be considerably faster than
+ * that variant.
+ *
+ * The user can provide separate
+ * transfer operators of type MGTwoLevelTransfer between each level to
+ * implement a global-coarsening multigrid algorithm. The
  * sequence of functions calls for setup is:
  * @code
  * MGTransferGlobalCoarsening mg_transfer;
@@ -981,15 +991,13 @@ private:
  * mg_transfer.build(partitioners);
  * @endcode
  *
- * Alternatively, this class can also be set up as in the case of
- * MGTransferMatrixFree:
+ * Alternatively, this class can also be set up with:
  * @code
  * MGTransferGlobalCoarsening mg_transfer;
  * mg_transfer.initialize_constraints(mg_constrained_dofs);
  * mg_transfer.build(dof_handler, partitioners);
  * @endcode
- * However, this is way to set up is currently only working for globally
- * refined meshes.
+ * This allows local-smoothing multigrid.
  *
  * This class currently only works for the tensor-product finite elements
  * FE_Q, FE_DGQ, and FE_DGP and simplex elements FE_SimplexP and FE_SimplexDGP
@@ -1072,15 +1080,11 @@ public:
   /**
    * Constructor with constraints. Equivalent to the default constructor
    * followed by initialize_constraints().
-   *
-   * @note See also MGTransferMatrixFree.
    */
   MGTransferMF(const MGConstrainedDoFs &mg_constrained_dofs);
 
   /**
    * Initialize the constraints to be used in build().
-   *
-   * @note See also MGTransferMatrixFree.
    */
   void
   initialize_constraints(const MGConstrainedDoFs &mg_constrained_dofs);
@@ -1256,9 +1260,7 @@ public:
 
 private:
   /**
-   * Initial internal transfer operator.
-   *
-   * @note See also MGTransferMatrixFree.
+   * Initial internal transfer operator for local smoothing.
    */
   void
   initialize_internal_transfer(
@@ -1307,9 +1309,7 @@ private:
   assert_dof_handler(const DoFHandler<dim> &dof_handler_out) const;
 
   /**
-   * Internal transfer operator.
-   *
-   * @note See also MGTransferMatrixFree.
+   * Internal transfer operator for local smoothing.
    */
   MGLevelObject<MGTwoLevelTransfer<dim, VectorType>> internal_transfer;
 
@@ -1325,12 +1325,152 @@ private:
     external_partitioners;
 };
 
+/**
+ * Base class of MGTransferBlockMatrixFree. While MGTransferBlockMatrixFree
+ * contains all the setup routines of the transfer operators for the blocks,
+ * this class simply applies them, e.g., for restricting and prolongating.
+ */
+template <int dim, typename Number, typename TransferType>
+class MGTransferBlockMatrixFreeBase
+  : public MGTransferBase<LinearAlgebra::distributed::BlockVector<Number>>
+{
+public:
+  explicit MGTransferBlockMatrixFreeBase(const bool same_for_all)
+    : same_for_all(same_for_all)
+  {}
 
+  /**
+   * Prolongate a vector from level <tt>to_level-1</tt> to level
+   * <tt>to_level</tt> using the embedding matrices of the underlying finite
+   * element. The previous content of <tt>dst</tt> is overwritten.
+   *
+   * @param to_level The index of the level to prolongate to, which is the
+   * level of @p dst.
+   *
+   * @param src is a vector with as many elements as there are degrees of
+   * freedom on the coarser level involved.
+   *
+   * @param dst has as many elements as there are degrees of freedom on the
+   * finer level.
+   */
+  virtual void
+  prolongate(
+    const unsigned int                                     to_level,
+    LinearAlgebra::distributed::BlockVector<Number>       &dst,
+    const LinearAlgebra::distributed::BlockVector<Number> &src) const override;
+
+  virtual void
+  prolongate_and_add(
+    const unsigned int                                     to_level,
+    LinearAlgebra::distributed::BlockVector<Number>       &dst,
+    const LinearAlgebra::distributed::BlockVector<Number> &src) const override;
+
+  /**
+   * Restrict a vector from level <tt>from_level</tt> to level
+   * <tt>from_level-1</tt> using the transpose operation of the prolongate()
+   * method. If the region covered by cells on level <tt>from_level</tt> is
+   * smaller than that of level <tt>from_level-1</tt> (local refinement), then
+   * some degrees of freedom in <tt>dst</tt> are active and will not be
+   * altered. For the other degrees of freedom, the result of the restriction
+   * is added.
+   *
+   * @param from_level The index of the level to restrict from, which is the
+   * level of @p src.
+   *
+   * @param src is a vector with as many elements as there are degrees of
+   * freedom on the finer level involved.
+   *
+   * @param dst has as many elements as there are degrees of freedom on the
+   * coarser level.
+   */
+  virtual void
+  restrict_and_add(
+    const unsigned int                                     from_level,
+    LinearAlgebra::distributed::BlockVector<Number>       &dst,
+    const LinearAlgebra::distributed::BlockVector<Number> &src) const override;
+
+  /**
+   * Transfer from a block-vector on the global grid to block-vectors defined
+   * on each of the levels separately for active degrees of freedom.
+   * In particular, for a globally refined mesh only the finest level in @p dst
+   * is filled as a plain copy of @p src. All the other level objects are left
+   * untouched.
+   *
+   * This function will initialize @p dst accordingly if needed as required by
+   * the Multigrid class.
+   */
+  template <typename BlockVectorType2>
+  void
+  copy_to_mg(
+    const DoFHandler<dim>                                          &dof_handler,
+    MGLevelObject<LinearAlgebra::distributed::BlockVector<Number>> &dst,
+    const BlockVectorType2                                         &src) const;
+
+  /**
+   * Same as above for the case that each block has its own DoFHandler.
+   */
+  template <typename BlockVectorType2>
+  void
+  copy_to_mg(
+    const std::vector<const DoFHandler<dim> *>                     &dof_handler,
+    MGLevelObject<LinearAlgebra::distributed::BlockVector<Number>> &dst,
+    const BlockVectorType2                                         &src) const;
+
+  /**
+   * Transfer from multi-level block-vector to normal vector.
+   */
+  template <typename BlockVectorType2>
+  void
+  copy_from_mg(
+    const DoFHandler<dim> &dof_handler,
+    BlockVectorType2      &dst,
+    const MGLevelObject<LinearAlgebra::distributed::BlockVector<Number>> &src)
+    const;
+
+  /**
+   * Same as above for the case that each block has its own DoFHandler.
+   */
+  template <typename BlockVectorType2>
+  void
+  copy_from_mg(
+    const std::vector<const DoFHandler<dim> *> &dof_handler,
+    BlockVectorType2                           &dst,
+    const MGLevelObject<LinearAlgebra::distributed::BlockVector<Number>> &src)
+    const;
+
+  /**
+   * This class can both be used with a single DoFHandler
+   * or a separate DoFHandler for each block.
+   */
+  static const bool supports_dof_handler_vector = true;
+
+protected:
+  /**
+   * Return the right non-block transfer operator. Has to be implemented by
+   * the derived class.
+   */
+  virtual const TransferType &
+  get_matrix_free_transfer(const unsigned int b) const = 0;
+
+  /**
+   * A flag to indicate whether the same DoFHandler is used for all
+   * the components or if each block has its own DoFHandler.
+   */
+  const bool same_for_all;
+};
 
 /**
+ * Implementation of the MGTransferBase interface for which the transfer
+ * operations is implemented in a matrix-free way based on the interpolation
+ * matrices of the underlying finite element. This requires considerably less
+ * memory than MGTransferPrebuilt and can also be considerably faster than
+ * that variant.
+ *
  * This class works with LinearAlgebra::distributed::BlockVector and
  * performs exactly the same transfer operations for each block as
- * MGTransferMF.
+ * MGTransferMatrixFree.
+ * Both the cases that the same DoFHandler is used for all the blocks
+ * and that each block uses its own DoFHandler are supported.
  */
 template <int dim, typename Number>
 class MGTransferBlockMF
@@ -1347,38 +1487,30 @@ public:
                       &transfer_operator);
 
   /**
-   * Constructor.
-   *
-   * @note See also MGTransferBlockMatrixFree.
+   * Constructor without constraint matrices. Use this constructor only with
+   * discontinuous finite elements or with no local refinement.
    */
   MGTransferBlockMF() = default;
 
   /**
-   * Constructor.
-   *
-   * @note See also MGTransferBlockMatrixFree.
+   * Constructor with constraints. Equivalent to the default constructor
+   * followed by initialize_constraints().
    */
   MGTransferBlockMF(const MGConstrainedDoFs &mg_constrained_dofs);
 
   /**
-   * Constructor.
-   *
-   * @note See also MGTransferBlockMatrixFree.
+   * Same as above for the case that each block has its own DoFHandler.
    */
   MGTransferBlockMF(const std::vector<MGConstrainedDoFs> &mg_constrained_dofs);
 
   /**
    * Initialize the constraints to be used in build().
-   *
-   * @note See also MGTransferBlockMatrixFree.
    */
   void
   initialize_constraints(const MGConstrainedDoFs &mg_constrained_dofs);
 
   /**
    * Same as above for the case that each block has its own DoFHandler.
-   *
-   * @note See also MGTransferBlockMatrixFree.
    */
   void
   initialize_constraints(
@@ -1386,16 +1518,12 @@ public:
 
   /**
    * Actually build the information for the prolongation for each level.
-   *
-   * @note See also MGTransferBlockMatrixFree.
    */
   void
   build(const DoFHandler<dim> &dof_handler);
 
   /**
    * Same as above for the case that each block has its own DoFHandler.
-   *
-   * @note See also MGTransferBlockMatrixFree.
    */
   void
   build(const std::vector<const DoFHandler<dim> *> &dof_handler);
@@ -1728,6 +1856,126 @@ MGTransferMF<dim, Number, MemorySpace>::interpolate_to_mg(
           if (l != min_level)
             this->transfer[l]->interpolate(dst[l - 1], dst[l]);
         }
+    }
+}
+
+
+
+template <int dim, typename Number, typename TransferType>
+template <typename BlockVectorType2>
+void
+MGTransferBlockMatrixFreeBase<dim, Number, TransferType>::copy_to_mg(
+  const DoFHandler<dim>                                          &dof_handler,
+  MGLevelObject<LinearAlgebra::distributed::BlockVector<Number>> &dst,
+  const BlockVectorType2                                         &src) const
+{
+  Assert(same_for_all,
+         ExcMessage(
+           "This object was initialized with support for usage with one "
+           "DoFHandler for each block, but this method assumes that "
+           "the same DoFHandler is used for all the blocks!"));
+  const std::vector<const DoFHandler<dim> *> mg_dofs(src.n_blocks(),
+                                                     &dof_handler);
+
+  copy_to_mg(mg_dofs, dst, src);
+}
+
+
+
+template <int dim, typename Number, typename TransferType>
+template <typename BlockVectorType2>
+void
+MGTransferBlockMatrixFreeBase<dim, Number, TransferType>::copy_to_mg(
+  const std::vector<const DoFHandler<dim> *>                     &dof_handler,
+  MGLevelObject<LinearAlgebra::distributed::BlockVector<Number>> &dst,
+  const BlockVectorType2                                         &src) const
+{
+  const unsigned int n_blocks = src.n_blocks();
+  AssertDimension(dof_handler.size(), n_blocks);
+
+  if (n_blocks == 0)
+    return;
+
+  const unsigned int min_level = dst.min_level();
+  const unsigned int max_level = dst.max_level();
+
+  for (unsigned int level = min_level; level <= max_level; ++level)
+    if (dst[level].n_blocks() != n_blocks)
+      dst[level].reinit(n_blocks);
+
+  // FIXME: this a quite ugly as we need a temporary object:
+  MGLevelObject<LinearAlgebra::distributed::Vector<Number>> dst_non_block(
+    min_level, max_level);
+
+  for (unsigned int b = 0; b < n_blocks; ++b)
+    {
+      const unsigned int data_block = same_for_all ? 0 : b;
+      get_matrix_free_transfer(data_block)
+        .copy_to_mg(*dof_handler[b], dst_non_block, src.block(b));
+
+      for (unsigned int l = min_level; l <= max_level; ++l)
+        dst[l].block(b) = dst_non_block[l];
+    }
+
+  for (unsigned int level = min_level; level <= max_level; ++level)
+    dst[level].collect_sizes();
+}
+
+template <int dim, typename Number, typename TransferType>
+template <typename BlockVectorType2>
+void
+MGTransferBlockMatrixFreeBase<dim, Number, TransferType>::copy_from_mg(
+  const DoFHandler<dim> &dof_handler,
+  BlockVectorType2      &dst,
+  const MGLevelObject<LinearAlgebra::distributed::BlockVector<Number>> &src)
+  const
+{
+  Assert(same_for_all,
+         ExcMessage(
+           "This object was initialized with support for usage with one "
+           "DoFHandler for each block, but this method assumes that "
+           "the same DoFHandler is used for all the blocks!"));
+  const std::vector<const DoFHandler<dim> *> mg_dofs(dst.n_blocks(),
+                                                     &dof_handler);
+
+  copy_from_mg(mg_dofs, dst, src);
+}
+
+template <int dim, typename Number, typename TransferType>
+template <typename BlockVectorType2>
+void
+MGTransferBlockMatrixFreeBase<dim, Number, TransferType>::copy_from_mg(
+  const std::vector<const DoFHandler<dim> *> &dof_handler,
+  BlockVectorType2                           &dst,
+  const MGLevelObject<LinearAlgebra::distributed::BlockVector<Number>> &src)
+  const
+{
+  const unsigned int n_blocks = dst.n_blocks();
+  AssertDimension(dof_handler.size(), n_blocks);
+
+  if (n_blocks == 0)
+    return;
+
+  const unsigned int min_level = src.min_level();
+  const unsigned int max_level = src.max_level();
+
+  for (unsigned int l = min_level; l <= max_level; ++l)
+    AssertDimension(src[l].n_blocks(), dst.n_blocks());
+
+  // FIXME: this a quite ugly as we need a temporary object:
+  MGLevelObject<LinearAlgebra::distributed::Vector<Number>> src_non_block(
+    min_level, max_level);
+
+  for (unsigned int b = 0; b < n_blocks; ++b)
+    {
+      for (unsigned int l = min_level; l <= max_level; ++l)
+        {
+          src_non_block[l].reinit(src[l].block(b));
+          src_non_block[l] = src[l].block(b);
+        }
+      const unsigned int data_block = same_for_all ? 0 : b;
+      get_matrix_free_transfer(data_block)
+        .copy_from_mg(*dof_handler[b], dst.block(b), src_non_block);
     }
 }
 
