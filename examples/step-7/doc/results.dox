@@ -217,8 +217,8 @@ sufficiently small; you need a finer mesh.
 
 In other words, when we look at these sorts of numbers, we generally
 need to compare against a "scale". One way to do that is to not look
-at the *absolute* error $\|u-u_h\|$ in whatever norm, but at the
-*relative* error $\|u-u_h\|/\|u\|$. If this ratio is $10^{-5}$, then
+at the *absolute* error $\|u-u_h\|$ in whatever norm, but at the *relative*
+error $\|u-u_h\|/\|u\|$. If this ratio is $10^{-5}$, then
 you know that *on average*, the difference between $u$ and $u_h$ is
 0.001 per cent -- probably small enough for engineering purposes.
 
