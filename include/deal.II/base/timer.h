@@ -117,7 +117,7 @@ class Timer
 {
 public:
   /**
-   * Constructor. Sets the accumulated times at zero and calls Timer::start().
+   * Constructor. Sets the accumulated times to zero and calls Timer::start().
    */
   Timer();
 
