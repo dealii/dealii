@@ -63,10 +63,10 @@ DataOutResample<dim, patch_dim, spacedim>::update_mapping(
 
   std::vector<types::global_dof_index> dof_indices(fe.n_dofs_per_cell());
 
-  const IndexSet active_dofs =
-    DoFTools::extract_locally_active_dofs(patch_dof_handler);
   partitioner = std::make_shared<Utilities::MPI::Partitioner>(
-    patch_dof_handler.locally_owned_dofs(), active_dofs, MPI_COMM_WORLD);
+    patch_dof_handler.locally_owned_dofs(),
+    DoFTools::extract_locally_active_dofs(patch_dof_handler),
+    patch_dof_handler.get_mpi_communicator());
 
   for (const auto &cell : patch_dof_handler.active_cell_iterators() |
                             IteratorFilters::LocallyOwnedCell())
