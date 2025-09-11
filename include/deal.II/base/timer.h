@@ -260,7 +260,7 @@ public:
 
   /**
    * Return the number of laps that have been timed by calling
-   * stop() since creation of the timer or the last
+   * start() since creation of the timer or the last
    * call to reset(). If a timer is currently running
    * the current lap is included in the count.
    */
@@ -879,21 +879,9 @@ private:
   Timer timer_all;
 
   /**
-   * A structure that groups all information that we collect about each of the
-   * sections.
-   */
-  struct Section
-  {
-    Timer        timer;
-    double       total_cpu_time;
-    double       total_wall_time;
-    unsigned int n_calls;
-  };
-
-  /**
    * A list of all the sections and their information.
    */
-  std::map<std::string, Section> sections;
+  std::map<std::string, Timer> sections;
 
   /**
    * The stream object to which we are to output.
