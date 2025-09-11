@@ -262,14 +262,14 @@ norms into one global norm as we already do in the program, by calling
 
 <h3> Possibilities for extensions </h3>
 
-<h4> Higher Order Elements </h4>
+<h4> Higher order elements </h4>
 
 Go ahead and run the program with higher order elements ($Q_3$, $Q_4$, ...). You
 will notice that assertions in several parts of the code will trigger (for
 example in the generation of the filename for the data output). You might have to address these,
 but it should not be very hard to get the program to work!
 
-<h4> Convergence Comparison </h4>
+<h4> Convergence comparison </h4>
 
 Is $Q_1$ or $Q_2$ better? What about adaptive versus global refinement? A (somewhat
 unfair but typical) metric to compare them, is to look at the error as a
