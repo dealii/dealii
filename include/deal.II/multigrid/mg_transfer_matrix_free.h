@@ -1685,10 +1685,9 @@ MGTransferMatrixFree<dim, Number, MemorySpace>::interpolate_to_mg(
 {
   assert_dof_handler(dof_handler);
 
-  const unsigned int min_level = transfer.min_level();
+  const unsigned int min_level = dst.min_level();
   const unsigned int max_level = transfer.max_level();
 
-  AssertDimension(min_level, dst.min_level());
   AssertDimension(max_level, dst.max_level());
 
   for (unsigned int level = min_level; level <= max_level; ++level)
