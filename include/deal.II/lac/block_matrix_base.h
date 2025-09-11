@@ -1350,8 +1350,8 @@ namespace BlockMatrixIterators
       {
         // we were asked to create the end
         // iterator for this matrix
-        this->row_block = numbers::invalid_size_type;
-        this->col_block = numbers::invalid_size_type;
+        this->row_block = numbers::invalid_unsigned_int;
+        this->col_block = numbers::invalid_unsigned_int;
       }
   }
 
