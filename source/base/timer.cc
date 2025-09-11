@@ -163,6 +163,7 @@ Timer::Timer()
 
 Timer::Timer(const MPI_Comm mpi_communicator, const bool sync_lap_times_)
   : running(false)
+  , n_timed_laps(0)
   , mpi_communicator(mpi_communicator)
   , sync_lap_times(sync_lap_times_)
 {
@@ -175,6 +176,9 @@ Timer::Timer(const MPI_Comm mpi_communicator, const bool sync_lap_times_)
 void
 Timer::start()
 {
+  if (running == false)
+    ++n_timed_laps;
+
   running = true;
 #ifdef DEAL_II_WITH_MPI
   if (sync_lap_times)
@@ -287,9 +291,18 @@ Timer::reset()
 {
   wall_times.reset();
   cpu_times.reset();
-  running = false;
+  running      = false;
+  n_timed_laps = 0;
   internal::TimerImplementation::clear_timing_data(last_lap_wall_time_data);
   internal::TimerImplementation::clear_timing_data(accumulated_wall_time_data);
+}
+
+
+
+unsigned int
+Timer::n_laps() const
+{
+  return n_timed_laps;
 }
 
 
@@ -301,6 +314,8 @@ TimerOutput::TimerOutput(std::ostream         &stream,
                          const OutputType      output_type)
   : output_frequency(output_frequency)
   , output_type(output_type)
+  , timer_all()
+  , sections()
   , out_stream(stream, true)
   , output_is_enabled(true)
   , mpi_communicator(MPI_COMM_SELF)
@@ -313,6 +328,8 @@ TimerOutput::TimerOutput(ConditionalOStream   &stream,
                          const OutputType      output_type)
   : output_frequency(output_frequency)
   , output_type(output_type)
+  , timer_all()
+  , sections()
   , out_stream(stream)
   , output_is_enabled(true)
   , mpi_communicator(MPI_COMM_SELF)
@@ -326,6 +343,8 @@ TimerOutput::TimerOutput(const MPI_Comm        mpi_communicator,
                          const OutputType      output_type)
   : output_frequency(output_frequency)
   , output_type(output_type)
+  , timer_all(mpi_communicator, false)
+  , sections()
   , out_stream(stream, true)
   , output_is_enabled(true)
   , mpi_communicator(mpi_communicator)
@@ -339,6 +358,8 @@ TimerOutput::TimerOutput(const MPI_Comm        mpi_communicator,
                          const OutputType      output_type)
   : output_frequency(output_frequency)
   , output_type(output_type)
+  , timer_all(mpi_communicator, false)
+  , sections()
   , out_stream(stream)
   , output_is_enabled(true)
   , mpi_communicator(mpi_communicator)
@@ -407,27 +428,16 @@ TimerOutput::enter_subsection(const std::string &section_name)
 
   if (sections.find(section_name) == sections.end())
     {
+      // Ensure MPI operations only happen if an MPI communicator was
+      // initialized. No need to call start() for the timers, since
+      // the constructor already starts them.
       if (mpi_communicator != MPI_COMM_SELF)
-        {
-          // create a new timer for this section. the second argument
-          // will ensure that we have an MPI barrier before starting
-          // and stopping a timer, and this ensures that we get the
-          // maximum run time for this section over all processors.
-          // The mpi_communicator from TimerOutput is passed to the
-          // Timer here, so this Timer will collect timing information
-          // among all processes inside mpi_communicator.
-          sections[section_name].timer = Timer(mpi_communicator, true);
-        }
-
-
-      sections[section_name].total_cpu_time  = 0;
-      sections[section_name].total_wall_time = 0;
-      sections[section_name].n_calls         = 0;
+        sections[section_name] = Timer(mpi_communicator, true);
+      else
+        sections[section_name] = Timer(mpi_communicator, false);
     }
-
-  sections[section_name].timer.reset();
-  sections[section_name].timer.start();
-  ++sections[section_name].n_calls;
+  else
+    sections[section_name].start();
 
   active_sections.push_back(section_name);
 }
@@ -457,16 +467,7 @@ TimerOutput::leave_subsection(const std::string &section_name)
   const std::string actual_section_name =
     (section_name.empty() ? active_sections.back() : section_name);
 
-  sections[actual_section_name].timer.stop();
-  sections[actual_section_name].total_wall_time +=
-    sections[actual_section_name].timer.last_wall_time();
-
-  // Get cpu time. On MPI systems, if constructed with an mpi_communicator
-  // like MPI_COMM_WORLD, then the Timer will sum up the CPU time between
-  // processors among the provided mpi_communicator. Therefore, no
-  // communication is needed here.
-  const double cpu_time = sections[actual_section_name].timer.last_cpu_time();
-  sections[actual_section_name].total_cpu_time += cpu_time;
+  sections[actual_section_name].stop();
 
   // in case we have to print out something, do that here...
   if ((output_frequency == every_call ||
@@ -475,9 +476,9 @@ TimerOutput::leave_subsection(const std::string &section_name)
     {
       std::string        output_time;
       std::ostringstream cpu;
-      cpu << cpu_time << "s";
+      cpu << sections[actual_section_name].last_cpu_time() << "s";
       std::ostringstream wall;
-      wall << sections[actual_section_name].timer.last_wall_time() << "s";
+      wall << sections[actual_section_name].last_wall_time() << "s";
       if (output_type == cpu_times)
         output_time = ", CPU time: " + cpu.str();
       else if (output_type == wall_times)
@@ -507,13 +508,13 @@ TimerOutput::get_summary_data(const OutputData kind) const
       switch (kind)
         {
           case TimerOutput::OutputData::total_cpu_time:
-            output[section.first] = section.second.total_cpu_time;
+            output[section.first] = section.second.cpu_time();
             break;
           case TimerOutput::OutputData::total_wall_time:
-            output[section.first] = section.second.total_wall_time;
+            output[section.first] = section.second.wall_time();
             break;
           case TimerOutput::OutputData::n_calls:
-            output[section.first] = section.second.n_calls;
+            output[section.first] = section.second.n_laps();
             break;
           default:
             DEAL_II_NOT_IMPLEMENTED();
@@ -546,19 +547,19 @@ TimerOutput::print_summary() const
       // in case we want to write CPU times
       if (output_type != wall_times)
         {
-          double total_cpu_time =
-            Utilities::MPI::sum(timer_all.cpu_time(), mpi_communicator);
+          double total_cpu_time = timer_all.cpu_time();
 
-          // check that the sum of all times is less or equal than the total
-          // time. otherwise, we might have generated a lot of overhead in this
-          // function.
-          double check_time = 0.;
+          // check that the sum of all section times is less or equal than the
+          // total time. otherwise, we might have generated a lot of overhead in
+          // this function.
+          double total_sections_cpu_time = 0.;
           for (const auto &i : sections)
-            check_time += i.second.total_cpu_time;
+            total_sections_cpu_time += i.second.cpu_time();
 
-          const double time_gap = check_time - total_cpu_time;
-          if (time_gap > 0.0)
-            total_cpu_time = check_time;
+          const double section_overhead =
+            total_sections_cpu_time - total_cpu_time;
+          if (section_overhead > 0.0)
+            total_cpu_time = total_sections_cpu_time;
 
           // generate a nice table
           out_stream << "\n\n"
@@ -593,18 +594,17 @@ TimerOutput::print_summary() const
               out_stream << "| " << name_out;
               out_stream << "| ";
               out_stream << std::setw(9);
-              out_stream << i.second.n_calls << " |";
+              out_stream << i.second.n_laps() << " |";
               out_stream << std::setw(10);
               out_stream << std::setprecision(3);
-              out_stream << i.second.total_cpu_time << "s |";
+              out_stream << i.second.cpu_time() << "s |";
               out_stream << std::setw(10);
               if (total_cpu_time != 0)
                 {
                   // if run time was less than 0.1%, just print a zero to avoid
                   // printing silly things such as "2.45e-6%". otherwise print
                   // the actual percentage
-                  const double fraction =
-                    i.second.total_cpu_time / total_cpu_time;
+                  const double fraction = i.second.cpu_time() / total_cpu_time;
                   if (fraction > 0.001)
                     {
                       out_stream << std::setprecision(2);
@@ -624,10 +624,10 @@ TimerOutput::print_summary() const
                      << "------------+------------+\n"
                      << std::endl;
 
-          if (time_gap > 0.0)
+          if (section_overhead > 0.0)
             out_stream
               << std::endl
-              << "Note: The sum of counted times is " << time_gap
+              << "Note: The sum of counted times is " << section_overhead
               << " seconds larger than the total time.\n"
               << "(Timer function may have introduced too much overhead, or different\n"
               << "section timers may have run at the same time.)" << std::endl;
@@ -670,10 +670,10 @@ TimerOutput::print_summary() const
               out_stream << "| " << name_out;
               out_stream << "| ";
               out_stream << std::setw(9);
-              out_stream << i.second.n_calls << " |";
+              out_stream << i.second.n_laps() << " |";
               out_stream << std::setw(10);
               out_stream << std::setprecision(3);
-              out_stream << i.second.total_wall_time << "s |";
+              out_stream << i.second.wall_time() << "s |";
               out_stream << std::setw(10);
 
               if (total_wall_time != 0)
@@ -682,7 +682,7 @@ TimerOutput::print_summary() const
                   // printing silly things such as "2.45e-6%". otherwise print
                   // the actual percentage
                   const double fraction =
-                    i.second.total_wall_time / total_wall_time;
+                    i.second.wall_time() / total_wall_time;
                   if (fraction > 0.001)
                     {
                       out_stream << std::setprecision(2);
@@ -707,19 +707,18 @@ TimerOutput::print_summary() const
     // output_type == cpu_and_wall_times_grouped
     {
       const double total_wall_time = timer_all.wall_time();
-      double       total_cpu_time =
-        Utilities::MPI::sum(timer_all.cpu_time(), mpi_communicator);
+
+      double total_cpu_time = timer_all.cpu_time();
 
       // check that the sum of all times is less or equal than the total time.
       // otherwise, we might have generated a lot of overhead in this function.
-      double check_time = 0.;
-
+      double total_sections_cpu_time = 0.;
       for (const auto &i : sections)
-        check_time += i.second.total_cpu_time;
+        total_sections_cpu_time += i.second.cpu_time();
 
-      const double time_gap = check_time - total_cpu_time;
-      if (time_gap > 0.0)
-        total_cpu_time = check_time;
+      const double section_overhead = total_sections_cpu_time - total_cpu_time;
+      if (section_overhead > 0.0)
+        total_cpu_time = total_sections_cpu_time;
 
       // generate a nice table
       out_stream << "\n\n+---------------------------------------------"
@@ -755,21 +754,20 @@ TimerOutput::print_summary() const
           out_stream << "| " << name_out << "| ";
 
           out_stream << std::setw(9);
-          out_stream << i.second.n_calls << " |";
+          out_stream << i.second.n_laps() << " |";
 
           if (output_type != wall_times)
             {
               out_stream << std::setw(10);
               out_stream << std::setprecision(3);
-              out_stream << i.second.total_cpu_time << "s |";
+              out_stream << i.second.cpu_time() << "s |";
               out_stream << std::setw(10);
               if (total_cpu_time != 0)
                 {
                   // if run time was less than 0.1%, just print a zero to avoid
                   // printing silly things such as "2.45e-6%". otherwise print
                   // the actual percentage
-                  const double fraction =
-                    i.second.total_cpu_time / total_cpu_time;
+                  const double fraction = i.second.cpu_time() / total_cpu_time;
                   if (fraction > 0.001)
                     {
                       out_stream << std::setprecision(2);
@@ -788,7 +786,7 @@ TimerOutput::print_summary() const
             {
               out_stream << std::setw(10);
               out_stream << std::setprecision(3);
-              out_stream << i.second.total_wall_time << "s |";
+              out_stream << i.second.wall_time() << "s |";
               out_stream << std::setw(10);
 
               if (total_wall_time != 0)
@@ -797,7 +795,7 @@ TimerOutput::print_summary() const
                   // printing silly things such as "2.45e-6%". otherwise print
                   // the actual percentage
                   const double fraction =
-                    i.second.total_wall_time / total_wall_time;
+                    i.second.wall_time() / total_wall_time;
                   if (fraction > 0.001)
                     {
                       out_stream << std::setprecision(2);
@@ -820,10 +818,10 @@ TimerOutput::print_summary() const
                  << "------------+------------+" << std::endl
                  << std::endl;
 
-      if (output_type != wall_times && time_gap > 0.0)
+      if (output_type != wall_times && section_overhead > 0.0)
         out_stream
           << std::endl
-          << "Note: The sum of counted times is " << time_gap
+          << "Note: The sum of counted times is " << section_overhead
           << " seconds larger than the total time.\n"
           << "(Timer function may have introduced too much overhead, or different\n"
           << "section timers may have run at the same time.)" << std::endl;
@@ -995,9 +993,9 @@ TimerOutput::print_wall_time_statistics(const MPI_Comm mpi_comm,
         out_stream << "| " << name_out;
         out_stream << "| ";
         out_stream << std::setw(9);
-        out_stream << i.second.n_calls << " |";
+        out_stream << i.second.n_laps() << " |";
 
-        print_statistics(i.second.total_wall_time);
+        print_statistics(i.second.wall_time());
       }
     out_stream << "+------------------------------" << extra_dash << "+"
                << time_rank_column
