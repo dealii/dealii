@@ -76,10 +76,7 @@ struct CPUClock
  * (i.e., the amount of time elapsed on a wall clock) and the amount of CPU
  * time that certain sections of an application have used. This class also
  * offers facilities for synchronizing the elapsed time across an MPI
- * communicator. Note that if the class is constructed with an MPI
- * communicator all of the operations of this class are collective operations
- * that have to be performed on all MPI ranks. It is impossible to query a
- * timer object on only some of the MPI ranks.
+ * communicator.
  *
  * <h3>Usage</h3>
  *
@@ -114,6 +111,17 @@ struct CPUClock
  * times are accumulated from summing across all threads and will usually
  * exceed the wall times.
  *
+ * @note If this class is constructed with an MPI communicator
+ * all of the operations of this class are collective operations
+ * that have to be performed on all MPI ranks. It is impossible to query a
+ * timer object on only some of the MPI ranks. This in particular means that
+ * you should not query information from this class in destructors of other
+ * objects, because destructors may be triggered during exception handling.
+ * If only some of the MPI ranks threw an exception the communication will
+ * cause a deadlock and your program will hang without output. The only two safe
+ * operations you can do with this class in a destructor are to 
+ * destroy the object or to call stop_lap().
+ *
  * @ingroup utilities
  */
 class Timer
@@ -144,7 +152,7 @@ public:
    * Return a reference to the data structure containing basic statistics on
    * the last lap's wall time measured across all MPI processes in the given
    * communicator. This structure does not contain meaningful values until
-   * Timer::stop() has been called.
+   * Timer::stop() or Timer::stop_lap() has been called.
    */
   const Utilities::MPI::MinMaxAvg &
   get_last_lap_wall_time_data() const;
@@ -190,7 +198,7 @@ public:
   stop_lap();
 
   /**
-   * Stop the timer and return the accumulated CPU times in seconds.
+   * Stop the timer and return the accumulated CPU time in seconds.
    * This function combines the functionality of the function stop_lap(),
    * and the functionality of cpu_time().
    *
@@ -576,18 +584,19 @@ public:
   public:
     /**
      * Enter the given section in the timer. Exit automatically when calling
-     * stop() or destructor runs.
+     * stop() or when the destructor runs.
      */
     Scope(dealii::TimerOutput &timer_, const std::string &section_name);
 
     /**
-     * Destructor calls stop().
+     * Destructor calls Scope::stop().
      */
     ~Scope();
 
     /**
      * In case you want to exit the scope before the destructor is executed,
-     * call this function.
+     * call this function. The function leaves the current subsection of
+     * the stored timer object.
      */
     void
     stop();
@@ -904,8 +913,15 @@ private:
    */
   mutable Threads::Mutex mutex;
 
+  /**
+   * Whether MPI communication is necessary to synchronize the results between
+   * different MPI ranks.
+   */
   mutable bool is_synchronized;
 
+  /**
+   * Synchronize the results between MPI ranks.
+   */
   void
   synchronize() const;
 };

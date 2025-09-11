@@ -541,14 +541,10 @@ TimerOutput::synchronize() const
   for (auto &section_name_and_section : sections)
     {
       auto &section = section_name_and_section.second;
-      section.total_wall_time += section.timer.last_wall_time();
 
-      // Get cpu time. On MPI systems, if constructed with an mpi_communicator
-      // like MPI_COMM_WORLD, then the Timer will sum up the CPU time between
-      // processors among the provided mpi_communicator. Therefore, no
-      // communication is needed here.
-      const double cpu_time = section.timer.last_cpu_time();
-      section.total_cpu_time += cpu_time;
+      // Add wall time and cpu time. 
+      section.total_wall_time += section.timer.last_wall_time();
+      section.total_cpu_time += section.timer.last_cpu_time();
     }
 
   is_synchronized = true;
