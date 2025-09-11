@@ -124,7 +124,7 @@ check(const unsigned int fe_degree)
         }
 
       // build reference non-block
-      std::vector<MGTransferMF<dim, Number>> transfer_ref;
+      std::vector<MGTransferMatrixFree<dim, Number>> transfer_ref;
       for (unsigned int b = 0; b < nb; ++b)
         {
           transfer_ref.emplace_back(mg_constrained_dofs_vector[b]);
@@ -132,7 +132,8 @@ check(const unsigned int fe_degree)
         }
 
       // build matrix-free block transfer
-      MGTransferBlockMF<dim, Number> transfer(mg_constrained_dofs_vector);
+      MGTransferBlockMatrixFree<dim, Number> transfer(
+        mg_constrained_dofs_vector);
       transfer.build(mgdof_ptr);
 
       MGLevelObject<LinearAlgebra::distributed::BlockVector<Number>> lbv(

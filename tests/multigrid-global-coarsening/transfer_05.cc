@@ -108,11 +108,11 @@ check(const unsigned int fe_degree)
       mg_constrained_dofs.make_zero_boundary_constraints(mgdof, {0});
 
       // build reference non-block
-      MGTransferMF<dim, Number> transfer_ref(mg_constrained_dofs);
+      MGTransferMatrixFree<dim, Number> transfer_ref(mg_constrained_dofs);
       transfer_ref.build(mgdof);
 
       // build matrix-free block transfer
-      MGTransferBlockMF<dim, Number> transfer(mg_constrained_dofs);
+      MGTransferBlockMatrixFree<dim, Number> transfer(mg_constrained_dofs);
       transfer.build(mgdof);
 
       const unsigned int nb = 3;

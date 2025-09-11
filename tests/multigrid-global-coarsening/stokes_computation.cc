@@ -1272,7 +1272,7 @@ namespace StokesClass
                                        false,
                                        false);
 
-    using Transfer = MGTransferMF<dim, double>;
+    using Transfer = MGTransferMatrixFree<dim, double>;
 
     Transfer mg_transfer(mg_constrained_dofs);
     mg_transfer.initialize_constraints(mg_constrained_dofs);

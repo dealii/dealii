@@ -69,7 +69,7 @@ check(const FiniteElement<dim> &fe)
   mgdof.distribute_mg_dofs();
 
   // build matrix-free transfer
-  MGTransferMF<dim, Number> transfer;
+  MGTransferMatrixFree<dim, Number> transfer;
   transfer.build(mgdof);
 
   LinearAlgebra::distributed::Vector<double> vrefdouble;

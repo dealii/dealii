@@ -100,7 +100,7 @@ check(const unsigned int fe_degree)
       transfer_ref.build(mgdof);
 
       // build matrix-free transfer
-      MGTransferMF<dim, Number> transfer;
+      MGTransferMatrixFree<dim, Number> transfer;
       transfer.build(mgdof);
 
       // check prolongation for all levels using random vector

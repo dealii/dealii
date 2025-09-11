@@ -80,9 +80,9 @@ do_test()
   }
 
   {
-    MGLevelObject<VectorType>                          dof_vector(0,
+    MGLevelObject<VectorType>                                  dof_vector(0,
                                          triangulation.n_global_levels() - 1);
-    MGTransferMF<dim, typename VectorType::value_type> transfer;
+    MGTransferMatrixFree<dim, typename VectorType::value_type> transfer;
 
     transfer.build(dof_handler);
     transfer.interpolate_to_mg(dof_handler, dof_vector, global_dof_vector);

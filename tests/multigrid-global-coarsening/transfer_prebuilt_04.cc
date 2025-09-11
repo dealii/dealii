@@ -94,7 +94,7 @@ check()
 #endif
       {
         // but the matrix free transfer will work without Trilinos
-        MGTransferMF<dim, double> transfer_ref(mg_constrained_dofs);
+        MGTransferMatrixFree<dim, double> transfer_ref(mg_constrained_dofs);
         transfer_ref.build(mgdof);
       }
     }

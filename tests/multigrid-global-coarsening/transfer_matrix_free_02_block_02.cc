@@ -119,7 +119,7 @@ check(const unsigned int fe_degree)
         }
 
       // build reference
-      std::vector<MGTransferMF<dim, Number>> transfer_ref;
+      std::vector<MGTransferMatrixFree<dim, Number>> transfer_ref;
       for (unsigned int b = 0; b < nb; ++b)
         {
           transfer_ref.emplace_back(mg_constrained_dofs_vector[b]);
@@ -127,7 +127,8 @@ check(const unsigned int fe_degree)
         }
 
       // build matrix-free transfer
-      MGTransferBlockMF<dim, Number> transfer(mg_constrained_dofs_vector);
+      MGTransferBlockMatrixFree<dim, Number> transfer(
+        mg_constrained_dofs_vector);
       transfer.build(mgdof_ptr);
 
       // check prolongation for all levels using random vector

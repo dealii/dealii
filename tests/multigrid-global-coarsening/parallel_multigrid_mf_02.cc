@@ -178,7 +178,7 @@ do_test(const DoFHandler<dim> &dof)
       mg_matrices[level].compute_diagonal();
     }
 
-  MGTransferMF<dim, number>                                       mg_transfer;
+  MGTransferMatrixFree<dim, number>                               mg_transfer;
   std::vector<std::shared_ptr<const Utilities::MPI::Partitioner>> partitioners(
     dof.get_triangulation().n_global_levels());
   for (unsigned int level = 0; level < partitioners.size(); ++level)
@@ -220,7 +220,7 @@ do_test(const DoFHandler<dim> &dof)
     mg_matrix, mg_coarse, mg_transfer, mg_smoother, mg_smoother);
   PreconditionMG<dim,
                  LinearAlgebra::distributed::Vector<number>,
-                 MGTransferMF<dim, number>>
+                 MGTransferMatrixFree<dim, number>>
     preconditioner(dof, mg, mg_transfer);
 
   {

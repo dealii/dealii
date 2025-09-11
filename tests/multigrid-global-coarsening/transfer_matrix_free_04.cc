@@ -75,7 +75,7 @@ check(const unsigned int fe_degree)
       transfer_ref.build(mgdof);
 
       // build matrix-free transfer
-      MGTransferMF<dim, Number> transfer;
+      MGTransferMatrixFree<dim, Number> transfer;
       transfer.build(mgdof);
 
       const Number tolerance = 1000. * std::numeric_limits<Number>::epsilon();

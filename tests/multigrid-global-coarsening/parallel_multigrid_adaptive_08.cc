@@ -327,7 +327,7 @@ do_test(const DoFHandler<dim> &dof)
        ++level)
     partitioners.push_back(mg_level_data[level].get_vector_partitioner());
 
-  MGTransferMF<dim, number> mg_transfer(mg_constrained_dofs);
+  MGTransferMatrixFree<dim, number> mg_transfer(mg_constrained_dofs);
   mg_transfer.build(dof, partitioners);
 
   MGCoarseIterative<LevelMatrixType, number> mg_coarse;
@@ -364,7 +364,7 @@ do_test(const DoFHandler<dim> &dof)
   mg.set_edge_matrices(mg_interface, mg_interface);
   PreconditionMG<dim,
                  LinearAlgebra::distributed::Vector<number>,
-                 MGTransferMF<dim, number>>
+                 MGTransferMatrixFree<dim, number>>
     preconditioner(dof, mg, mg_transfer);
 
   {

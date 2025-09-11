@@ -66,9 +66,9 @@ check()
 
   tr.execute_coarsening_and_refinement();
 
-  FE_Q<dim>                 fe(1);
-  DoFHandler<dim>           mgdof(tr);
-  MGTransferMF<dim, double> transfer_mf;
+  FE_Q<dim>                         fe(1);
+  DoFHandler<dim>                   mgdof(tr);
+  MGTransferMatrixFree<dim, double> transfer_mf;
 
   mgdof.distribute_dofs(fe);
   mgdof.distribute_mg_dofs();

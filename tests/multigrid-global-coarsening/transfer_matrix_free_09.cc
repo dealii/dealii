@@ -39,8 +39,8 @@ check(const FiniteElement<dim> &fe)
 {
   deallog << "FE: " << fe.get_name() << std::endl;
 
-  MGConstrainedDoFs         mg_constrained_dofs;
-  MGTransferMF<dim, Number> transfer;
+  MGConstrainedDoFs                 mg_constrained_dofs;
+  MGTransferMatrixFree<dim, Number> transfer;
   Triangulation<dim> tr(Triangulation<dim>::limit_level_difference_at_vertices);
   GridGenerator::hyper_cube(tr);
   tr.refine_global(6 - dim);
@@ -82,7 +82,7 @@ check(const FiniteElement<dim> &fe)
       transfer.clear();
       transfer.initialize_constraints(mg_constrained_dofs);
       transfer.build(mgdof);
-      MGTransferMF<dim, Number> transfer_ref(mg_constrained_dofs);
+      MGTransferMatrixFree<dim, Number> transfer_ref(mg_constrained_dofs);
       transfer_ref.build(mgdof);
       MGLevelObject<LinearAlgebra::distributed::Vector<Number>> vectors(
         0, tr.n_global_levels() - 1);

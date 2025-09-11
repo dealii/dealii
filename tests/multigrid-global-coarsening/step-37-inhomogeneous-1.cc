@@ -512,7 +512,7 @@ namespace Step37
   void
   LaplaceProblem<dim>::solve()
   {
-    MGTransferMF<dim, float> mg_transfer(mg_constrained_dofs);
+    MGTransferMatrixFree<dim, float> mg_transfer(mg_constrained_dofs);
     mg_transfer.build(dof_handler);
 
     using SmootherType =
@@ -566,7 +566,7 @@ namespace Step37
 
     PreconditionMG<dim,
                    LinearAlgebra::distributed::Vector<float>,
-                   MGTransferMF<dim, float>>
+                   MGTransferMatrixFree<dim, float>>
       preconditioner(dof_handler, mg, mg_transfer);
 
     SolverControl solver_control(100, 1e-12 * system_rhs.l2_norm());

@@ -106,7 +106,7 @@ test()
 
   MGLevelObject<LinearAlgebra::distributed::Vector<double>> mg_qsol;
   MGConstrainedDoFs                                         mg_constrained_dofs;
-  MGTransferMF<dim, double>                                 mg_transfer;
+  MGTransferMatrixFree<dim, double>                         mg_transfer;
 
   unsigned int n_tria_levels = tria.n_global_levels();
   mg_qsol.resize(0, n_tria_levels - 1);

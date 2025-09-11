@@ -179,7 +179,7 @@ test(const unsigned int n_glob_ref = 2, const unsigned int n_ref = 0)
   mg_constrained_dofs.initialize(dof_handler);
 
   // MG transfer:
-  MGTransferMF<dim, LevelNumberType> mg_transfer(mg_constrained_dofs);
+  MGTransferMatrixFree<dim, LevelNumberType> mg_transfer(mg_constrained_dofs);
   mg_transfer.build(dof_handler);
 
   // now the core of the test:
