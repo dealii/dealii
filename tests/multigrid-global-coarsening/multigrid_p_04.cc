@@ -171,7 +171,7 @@ test(const unsigned int n_refinements,
                             constraints[l + 1],
                             constraints[l]);
 
-  MGTransferGlobalCoarsening<dim, VectorType> transfer;
+  MGTransferMatrixFree<dim, Number> transfer;
   transfer.initialize_two_level_transfers(transfers);
   transfer.build(fine_dof_handler, [&](const auto l, auto &vec) {
     operators[l].initialize_dof_vector(vec);

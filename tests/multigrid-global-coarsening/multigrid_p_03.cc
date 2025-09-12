@@ -103,7 +103,7 @@ test(const unsigned int n_refinements,
                             level,
                             level);
 
-  MGTransferGlobalCoarsening<dim, VectorType> transfer(
+  MGTransferMatrixFree<dim, Number> transfer(
     transfers,
     [&](const auto l, auto &vec) { operators[l].initialize_dof_vector(vec); });
 
