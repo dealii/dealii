@@ -36,6 +36,7 @@ set(_src
   shape_info.cc
   task_info.cc
   vector_data_exchange.cc
+  patch_storage.cc
   )
 
 set(_inst
