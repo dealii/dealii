@@ -600,13 +600,14 @@ namespace Step7
                   // equation, including the coefficient $\alpha=1$:
                   const double alpha = 1;
                   cell_matrix(i, j) +=
-                    ((fe_values.shape_grad(i, q_point) * // (grad phi_i(x_q)
-                        fe_values.shape_grad(j, q_point) //  * grad phi_j(x_q)
-                      +                                  //
-                      alpha *                            //  alpha
-                        fe_values.shape_value(i, q_point) *  //  * phi_i(x_q)
-                        fe_values.shape_value(j, q_point)) * //  * phi_j(x_q))
-                     fe_values.JxW(q_point));                // *dx
+                    (fe_values.shape_grad(i, q_point)      // [grad phi_i(x_q)
+                       * fe_values.shape_grad(j, q_point)  //  * grad phi_j(x_q)
+                     +                                     //
+                     alpha                                 //  alpha
+                       * fe_values.shape_value(i, q_point) //  * phi_i(x_q)
+                       * fe_values.shape_value(j, q_point) //  * phi_j(x_q)]
+                     ) *
+                    fe_values.JxW(q_point); // * dx
                 }
 
               cell_rhs(i) += (fe_values.shape_value(i, q_point) * // phi_i(x_q)
