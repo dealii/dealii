@@ -174,7 +174,9 @@ public:
   /**
    * Begin measuring a new lap. If <code>sync_lap_times</code> is
    * <code>true</code> then an MPI barrier is used to ensure that all
-   * processes begin the lap at the same wall time.
+   * processes begin the lap at the same wall time. If the timer is
+   * already running, the start time of the current lap is reset
+   * to the current time, no new lap is started.
    */
   void
   start();
@@ -185,7 +187,7 @@ public:
    * synchronized over all processors in the communicator (i.e., the lap times
    * are set to the maximum lap time).
    *
-   * Return the accumulated CPU time in seconds.
+   * Return the accumulated CPU time on the current processor in seconds.
    */
   double
   stop();
@@ -231,9 +233,21 @@ public:
   /**
    * Return the CPU time of the last lap in seconds. The timer is not stopped
    * by this function.
+   *
+   * No matter if an MPI communicator is provided to the constructor the
+   * returned value is only the  CPU time of the current processors.
    */
   double
   last_cpu_time() const;
+
+  /**
+   * Return the number of laps that have been timed by calling
+   * start() / stop_lap() since creation or the last
+   * call to reset(). If a timer is currently running
+   * the current lap is included in the count.
+   */
+  unsigned int
+  n_laps() const;
 
 private:
   /**
@@ -319,6 +333,13 @@ private:
    * Whether or not the timer is presently running.
    */
   bool running;
+
+  /**
+   * The number of laps that have been timed. If
+   * the timer is currently running
+   * the current lap is included in the count.
+   */
+  unsigned int n_timed_laps;
 
   /**
    * The communicator over which various time values are synchronized and
@@ -840,21 +861,9 @@ private:
   Timer timer_all;
 
   /**
-   * A structure that groups all information that we collect about each of the
-   * sections.
-   */
-  struct Section
-  {
-    Timer        timer;
-    double       total_cpu_time;
-    double       total_wall_time;
-    unsigned int n_calls;
-  };
-
-  /**
    * A list of all the sections and their information.
    */
-  std::map<std::string, Section> sections;
+  std::map<std::string, Timer> sections;
 
   /**
    * The stream object to which we are to output.
