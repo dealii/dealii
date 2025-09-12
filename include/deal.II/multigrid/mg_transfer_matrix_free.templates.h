@@ -4229,9 +4229,11 @@ MGTransferMatrixFree<dim, Number, MemorySpace>::build(
       AssertDimension(this->external_partitioners.size(), transfer.n_levels());
 
       for (unsigned int l = min_level + 1; l <= max_level; ++l)
-        transfer[l]->enable_inplace_operations_if_possible(
-          this->external_partitioners[l - 1 - min_level],
-          this->external_partitioners[l - min_level]);
+        if (this->external_partitioners[l - 1 - min_level] &&
+            this->external_partitioners[l - min_level])
+          transfer[l]->enable_inplace_operations_if_possible(
+            this->external_partitioners[l - 1 - min_level],
+            this->external_partitioners[l - min_level]);
     }
   else
     {
