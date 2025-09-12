@@ -187,7 +187,7 @@ public:
    * synchronized over all processors in the communicator (i.e., the lap times
    * are set to the maximum lap time).
    *
-   * Return the accumulated CPU time in seconds.
+   * Return the accumulated CPU time on the current processor in seconds.
    */
   double
   stop();
@@ -233,6 +233,9 @@ public:
   /**
    * Return the CPU time of the last lap in seconds. The timer is not stopped
    * by this function.
+   *
+   * No matter if an MPI communicator is provided to the constructor the
+   * returned value is only the  CPU time of the current processors.
    */
   double
   last_cpu_time() const;
