@@ -594,17 +594,20 @@ namespace Step7
           for (unsigned int i = 0; i < dofs_per_cell; ++i)
             {
               for (unsigned int j = 0; j < dofs_per_cell; ++j)
-                // The first thing that has changed is the bilinear form. It
-                // now contains the additional term from the Helmholtz
-                // equation:
-                cell_matrix(i, j) +=
-                  ((fe_values.shape_grad(i, q_point) *     // grad phi_i(x_q)
-                      fe_values.shape_grad(j, q_point)     // grad phi_j(x_q)
-                    +                                      //
-                    fe_values.shape_value(i, q_point) *    // phi_i(x_q)
-                      fe_values.shape_value(j, q_point)) * // phi_j(x_q)
-                   fe_values.JxW(q_point));                // dx
-
+                {
+                  // The first thing that has changed is the bilinear form. It
+                  // now contains the additional term from the Helmholtz
+                  // equation, including the coefficient $\alpha=1$:
+                  const double alpha = 1;
+                  cell_matrix(i, j) +=
+                    ((fe_values.shape_grad(i, q_point) * // (grad phi_i(x_q)
+                        fe_values.shape_grad(j, q_point) //  * grad phi_j(x_q)
+                      +                                  //
+                      alpha *                            //  alpha
+                        fe_values.shape_value(i, q_point) *  //  * phi_i(x_q)
+                        fe_values.shape_value(j, q_point)) * //  * phi_j(x_q))
+                     fe_values.JxW(q_point));                // *dx
+                }
 
               cell_rhs(i) += (fe_values.shape_value(i, q_point) * // phi_i(x_q)
                               rhs_values[q_point] *               // f(x_q)
