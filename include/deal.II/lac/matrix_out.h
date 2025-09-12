@@ -25,6 +25,8 @@
 #  ifdef DEAL_II_WITH_TRILINOS
 #    include <deal.II/lac/trilinos_block_sparse_matrix.h>
 #    include <deal.II/lac/trilinos_sparse_matrix.h>
+#    include <deal.II/lac/trilinos_tpetra_block_sparse_matrix.h>
+#    include <deal.II/lac/trilinos_tpetra_sparse_matrix.h>
 #  endif
 
 
