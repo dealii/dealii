@@ -148,7 +148,7 @@ namespace FEInterfaceViews
            const unsigned int                      component);
 
     /**
-     * @name Access to shape functions
+     * @name Access to shape functions and their derivatives
      */
     /** @{ */
 
@@ -175,6 +175,25 @@ namespace FEInterfaceViews
     value(const bool         here_or_there,
           const unsigned int interface_dof_index,
           const unsigned int q_point) const;
+
+    /**
+     * Return the gradient of the shape function
+     * with interface dof index @p interface_dof_index in
+     * quadrature point @p q_point of the component selected by this view.
+     *
+     * The argument @p here_or_there selects between the upstream gradient and
+     * the downstream gradient as defined by the direction of the normal vector
+     * in this quadrature point. If @p here_or_there is true, the gradient of the
+     * shape functions from the first cell of the interface is used.
+     *
+     * In other words, this function returns the limit of the gradient of the
+     * shape function in the given quadrature point when approaching it from one
+     * of the two cells of the interface.
+     */
+    gradient_type
+    gradient(const bool         here_or_there,
+             const unsigned int interface_dof_index,
+             const unsigned int q_point) const;
 
     /** @} */
 
@@ -701,7 +720,7 @@ namespace FEInterfaceViews
            const unsigned int                      first_vector_component);
 
     /**
-     * @name Access to shape functions
+     * @name Access to shape functions and their derivatives
      */
     /** @{ */
 
@@ -728,6 +747,26 @@ namespace FEInterfaceViews
     value(const bool         here_or_there,
           const unsigned int interface_dof_index,
           const unsigned int q_point) const;
+
+    /**
+     * Return the gradient of the shape function
+     * with interface dof index @p interface_dof_index in
+     * quadrature point @p q_point of the component selected by this view.
+     *
+     * The argument @p here_or_there selects between the upstream gradient and
+     * the downstream gradient as defined by the direction of the normal vector
+     * in this quadrature point. If @p here_or_there is true, the gradient of the
+     * shape functions from the first cell of the interface is used.
+     *
+     * In other words, this function returns the limit of the gradient of the
+     * shape function in the given quadrature point when approaching it from one
+     * of the two cells of the interface.
+     */
+    gradient_type
+    gradient(const bool         here_or_there,
+             const unsigned int interface_dof_index,
+             const unsigned int q_point) const;
+
 
     /** @} */
 
@@ -3414,6 +3453,29 @@ namespace FEInterfaceViews
 
 
   template <int dim, int spacedim>
+  typename Scalar<dim, spacedim>::gradient_type
+  Scalar<dim, spacedim>::gradient(const bool         here_or_there,
+                                  const unsigned int interface_dof_index,
+                                  const unsigned int q_point) const
+  {
+    const auto dof_pair = this->fe_interface->dofmap[interface_dof_index];
+
+    gradient_type value;
+
+    if (here_or_there && dof_pair[0] != numbers::invalid_unsigned_int)
+      return (*(this->fe_interface->fe_face_values))[extractor].gradient(
+        dof_pair[0], q_point);
+
+    if (!here_or_there && dof_pair[1] != numbers::invalid_unsigned_int)
+      return (*(this->fe_interface->fe_face_values_neighbor))[extractor]
+        .gradient(dof_pair[1], q_point);
+
+    return value;
+  }
+
+
+
+  template <int dim, int spacedim>
   typename Scalar<dim, spacedim>::value_type
   Scalar<dim, spacedim>::jump_in_values(const unsigned int interface_dof_index,
                                         const unsigned int q_point) const
@@ -3974,6 +4036,29 @@ namespace FEInterfaceViews
         dof_pair[1], q_point);
 
     return value_type();
+  }
+
+
+
+  template <int dim, int spacedim>
+  typename Vector<dim, spacedim>::gradient_type
+  Vector<dim, spacedim>::gradient(const bool         here_or_there,
+                                  const unsigned int interface_dof_index,
+                                  const unsigned int q_point) const
+  {
+    const auto dof_pair = this->fe_interface->dofmap[interface_dof_index];
+
+    gradient_type value;
+
+    if (here_or_there && dof_pair[0] != numbers::invalid_unsigned_int)
+      return (*(this->fe_interface->fe_face_values))[extractor].gradient(
+        dof_pair[0], q_point);
+
+    if (!here_or_there && dof_pair[1] != numbers::invalid_unsigned_int)
+      return (*(this->fe_interface->fe_face_values_neighbor))[extractor]
+        .gradient(dof_pair[1], q_point);
+
+    return value;
   }
 
 
