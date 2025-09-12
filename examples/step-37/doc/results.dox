@@ -684,7 +684,7 @@ one hand, increasing the polynomial degree to three or four will further
 improve the time per unknown. (Even higher degrees typically get slower again,
 because the multigrid iteration counts increase slightly with the chosen
 simple smoother. One could then use hybrid multigrid algorithms to use
-polynomial coarsening through MGTransferGlobalCoarsening, to reduce the impact
+polynomial coarsening through MGTransferMatrixFree, to reduce the impact
 of the coarser level on the communication latency.) A more significant
 improvement can be obtained by data-locality optimizations. The class
 PreconditionChebyshev, when combined with a `DiagonalMatrix` inner
