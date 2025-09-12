@@ -56,7 +56,7 @@ jobs:
         mkdir build
         cd build
         cmake -D CMAKE_BUILD_TYPE=Debug \
-              -D DEAL_II_CXX_FLAGS='-Werror' \
+              -D DEAL_II_CXX_FLAGS='-Werror -std=c++20' \
               -D DEAL_II_EARLY_DEPRECATIONS=ON \
               ..
     - name: print detailed.log
@@ -111,7 +111,7 @@ jobs:
         cd build
         cmake -D CMAKE_BUILD_TYPE=Debug \
               -D DEAL_II_WITH_64BIT_INDICES=ON \
-              -D DEAL_II_CXX_FLAGS='-Werror' \
+              -D DEAL_II_CXX_FLAGS='-Werror -std=c++20' \
               -D DEAL_II_EARLY_DEPRECATIONS=ON \
               -D DEAL_II_WITH_MPI=ON \
               ..
