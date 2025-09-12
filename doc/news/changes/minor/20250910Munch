@@ -1,0 +1,4 @@
+Improved: TimeStepping::LowStorageRungeKutta now also supports
+TimeStepping::FORWARD_EULER and TimeStepping::HEUN_EULER.
+<br>
+(Peter Munch, 2025/09/10)
