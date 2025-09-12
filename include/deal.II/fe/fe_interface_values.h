@@ -2652,7 +2652,7 @@ FEInterfaceValues<dim, spacedim>::reinit(const CellIteratorType &cell,
     {
       internal_hp_fe_face_values->reinit(
         cell, face_no, q_index, mapping_index, fe_index);
-      fe_face_values = &const_cast<FEFaceValues<dim> &>(
+      fe_face_values = &const_cast<FEFaceValues<dim, spacedim> &>(
         internal_hp_fe_face_values->get_present_fe_values());
       fe_face_values_neighbor = nullptr;
     }
