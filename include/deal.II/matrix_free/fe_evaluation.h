@@ -7477,9 +7477,10 @@ FEFaceEvaluation<dim,
 
           if (face_index == numbers::invalid_unsigned_int)
             {
-              this->cell_ids[i]          = numbers::invalid_unsigned_int;
-              this->face_numbers[i]      = static_cast<std::uint8_t>(-1);
-              this->face_orientations[i] = static_cast<std::uint8_t>(-1);
+              this->cell_ids[i]     = numbers::invalid_unsigned_int;
+              this->face_numbers[i] = static_cast<std::uint8_t>(-1);
+              this->face_orientations[i] =
+                numbers::invalid_geometric_orientation;
               continue; // invalid face ID: no neighbor on boundary
             }
 
