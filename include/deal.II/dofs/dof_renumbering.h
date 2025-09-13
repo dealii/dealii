@@ -715,6 +715,11 @@ namespace DoFRenumbering
    * while calling with `{pressure, velocities}` would result in a call to above
    * function with `std::vector<unsigned int>{1, 1, 0}` as the
    * `target_component` argument.
+   *
+   * The initializer list of extractors must cover all finite-element
+   * components, and each component must be covered by exactly one extractor.
+   * Any missing or duplicate assignment to finite-element components will
+   * produce an error.
    */
   template <int dim, int spacedim>
   void

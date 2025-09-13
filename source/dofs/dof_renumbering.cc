@@ -813,7 +813,7 @@ namespace DoFRenumbering
                   "An unsupported ExtractorVariant was passed in the component_wise extractor_order argument."));
             }
 
-          // Fill `component_order` vector with `num_components` starting at
+          // Fill `component_order` vector with `n_components` starting at
           // `start_component_index`. Set the values to `block_index`.
           for (unsigned int i = start_component_index;
                i < start_component_index + n_components;
