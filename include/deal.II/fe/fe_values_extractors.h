@@ -312,7 +312,9 @@ namespace FEValuesExtractors
   };
 
   /**
-   * Convenience alias for variant type of supported FEValuesExtractors structs.
+   * Convenience alias for variant type of supported FEValuesExtractors structs. In
+   * other words, an object of this type can be initialized with a scalar, vector, tensor,
+   * or any other of the `FEValuesExtractors` data types.
    */
   using ExtractorVariant = std::variant<FEValuesExtractors::Scalar,
                                         FEValuesExtractors::Vector,

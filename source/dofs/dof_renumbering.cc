@@ -808,19 +808,16 @@ namespace DoFRenumbering
 
           else
             {
-              throw ExcNotImplemented(
-                "An unsupported ExtractorVariant was passed in the component_wise extractor_order argument.");
+              Assert (false, ExcNotImplemented(
+                "An unsupported ExtractorVariant was passed in the component_wise extractor_order argument."));
             }
 
           // Fill `component_order` vector with `num_components` starting at
           // `start_component_index`. Set the values to `block_index`.
-          std::transform(
-            component_order.begin() + start_component_index,
-            component_order.begin() + start_component_index + num_components,
-            component_order.begin() + start_component_index,
-            [block_index, unassigned_value](auto current_value) {
+          for (unsigned int i=start_component_index; i<start_component_index + num_components; ++i)
+         { 
               Assert(
-                current_value == unassigned_value,
+                component_order[i] == unassigned_value,
                 ExcMessage(
                   "A component which has already been assigned a block "
                   "index is trying to be overwritten. This indicates that the "
@@ -828,8 +825,8 @@ namespace DoFRenumbering
                   "of extractors in the extractor_order argument "
                   "that overlap in component indices."));
 
-              return block_index; // Insert block index
-            });
+              component_order[i] = block_index;
+            }
 
           // Increment block index
           block_index++;
