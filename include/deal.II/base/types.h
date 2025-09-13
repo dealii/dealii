@@ -37,7 +37,7 @@ namespace types
    * @ref GlossCombinedOrientation "glossary"
    * for more information.
    */
-  using geometric_orientation = unsigned char;
+  using geometric_orientation = std::uint8_t;
 
   /**
    * The type used to denote subdomain_ids of cells.
@@ -189,7 +189,7 @@ namespace types
    * @deprecated This type was previously only used in library internals and is
    * deprecated without replacement.
    */
-  using geometric_entity_type DEAL_II_DEPRECATED_EARLY = std::uint8_t;
+  using geometric_entity_type DEAL_II_DEPRECATED = std::uint8_t;
 } // namespace types
 
 /**

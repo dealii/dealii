@@ -1,0 +1,120 @@
+// ------------------------------------------------------------------------
+//
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2025 by the deal.II authors
+//
+// This file is part of the deal.II library.
+//
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
+//
+// ------------------------------------------------------------------------
+
+
+// It is very inefficient in the module system to have repeated
+// #includes in many module partition files because when you 'import'
+// those partitions, you also have to load everything they
+// #included. In other words, you get the same content *many times*,
+// once from each imported partition, rather than only once via the
+// old-style #include system. We deal with this by wrapping all of our
+// external packages into partitions that we can 'import' wherever we
+// need.
+
+// This is the file that wraps everything we need from UMFPACK into one
+// module partition.
+
+
+module;
+
+#include <deal.II/base/config.h>
+
+#ifdef DEAL_II_WITH_UMFPACK
+#  include <umfpack.h>
+#endif
+
+
+export module dealii.external.umfpack;
+
+#ifdef DEAL_II_WITH_UMFPACK
+
+export
+{
+  using ::umfpack_dl_defaults;
+  using ::umfpack_dl_free_numeric;
+  using ::umfpack_dl_free_symbolic;
+  using ::umfpack_dl_numeric;
+  using ::umfpack_dl_solve;
+  using ::umfpack_dl_symbolic;
+  using ::umfpack_zl_numeric;
+  using ::umfpack_zl_solve;
+  using ::umfpack_zl_symbolic;
+}
+
+// Umfpack also defines quite a lot of symbols that are either
+// implemented as macros, or perhaps as constants in header
+// files. In the former case, they cannot be referenced in 'using'
+// expressions, and so we need to work around things by creating
+// *variables* of the same names. In the latter case, they are often
+// implemented as constants with internal linkage that we can't
+// re-export (e.g., if they are members of anonymous enums).
+//
+// Dealing with this situation requires creating some other set of
+// variable, undefining the macro names, and then creating variables
+// with the same names as the macro names. Because we would end up
+// with name clashes if these new variables were in the global
+// namespace for those MPI implementations that implement things as
+// variables in the global namespace, we put everything into the
+// dealii namespace.
+//
+// We put the exportable symbols into namespace 'dealii'. This is
+// necessary for cases where the symbol we create is derived not from
+// a preprocessor macro, but for example as a member of an anonymous
+// enum. Such symbols can't be exported, so we declare a variable that
+// we *can* export, but it will not have the type of the enum, but of
+// the underlying int. The compiler will therefore complain that the
+// variable we're creating here redeclares another one but with a
+// different type. We can avoid this by putting things into our own
+// namespace.
+#  define CREATE_EXPORTABLE_PREPROCESSOR_SYMBOL(sym)        \
+    namespace dealii                                        \
+    {                                                       \
+      namespace Umfpack_Macros                              \
+      {                                                     \
+        [[maybe_unused]] const auto exportable_##sym = sym; \
+      }                                                     \
+    } // namespace dealii
+
+#  define EXPORT_PREPROCESSOR_SYMBOL(sym)                                \
+    namespace dealii                                                     \
+    {                                                                    \
+      export const auto &sym = dealii::Umfpack_Macros::exportable_##sym; \
+    }
+
+
+CREATE_EXPORTABLE_PREPROCESSOR_SYMBOL(UMFPACK_CONTROL)
+#  undef UMFPACK_CONTROL
+EXPORT_PREPROCESSOR_SYMBOL(UMFPACK_CONTROL)
+
+CREATE_EXPORTABLE_PREPROCESSOR_SYMBOL(UMFPACK_OK)
+#  undef UMFPACK_OK
+EXPORT_PREPROCESSOR_SYMBOL(UMFPACK_OK)
+
+CREATE_EXPORTABLE_PREPROCESSOR_SYMBOL(UMFPACK_A)
+#  undef UMFPACK_A
+EXPORT_PREPROCESSOR_SYMBOL(UMFPACK_A)
+
+CREATE_EXPORTABLE_PREPROCESSOR_SYMBOL(UMFPACK_At)
+#  undef UMFPACK_At
+EXPORT_PREPROCESSOR_SYMBOL(UMFPACK_At)
+
+CREATE_EXPORTABLE_PREPROCESSOR_SYMBOL(UMFPACK_Aat)
+#  undef UMFPACK_Aat
+EXPORT_PREPROCESSOR_SYMBOL(UMFPACK_Aat)
+
+CREATE_EXPORTABLE_PREPROCESSOR_SYMBOL(UMFPACK_WARNING_singular_matrix)
+#  undef UMFPACK_WARNING_singular_matrix
+EXPORT_PREPROCESSOR_SYMBOL(UMFPACK_WARNING_singular_matrix)
+
+#endif

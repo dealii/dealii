@@ -38,13 +38,13 @@ look like this:
 
 <table width="80%">
 <tr>
-<td><img src="https://www.dealii.org/images/steps/developer/step-36.default.eigenfunction.0.png" alt=""></td>
-<td><img src="https://www.dealii.org/images/steps/developer/step-36.default.eigenfunction.1.png" alt=""></td>
-<td><img src="https://www.dealii.org/images/steps/developer/step-36.default.eigenfunction.2.png" alt=""></td>
+<td><img src="https://dealii.org/images/steps/developer/step-36.default.eigenfunction.0.png" alt=""></td>
+<td><img src="https://dealii.org/images/steps/developer/step-36.default.eigenfunction.1.png" alt=""></td>
+<td><img src="https://dealii.org/images/steps/developer/step-36.default.eigenfunction.2.png" alt=""></td>
 </tr>
 <tr>
-<td><img src="https://www.dealii.org/images/steps/developer/step-36.default.eigenfunction.3.png" alt=""></td>
-<td><img src="https://www.dealii.org/images/steps/developer/step-36.default.eigenfunction.4.png" alt=""></td>
+<td><img src="https://dealii.org/images/steps/developer/step-36.default.eigenfunction.3.png" alt=""></td>
+<td><img src="https://dealii.org/images/steps/developer/step-36.default.eigenfunction.4.png" alt=""></td>
 <td></td>
 </tr>
 </table>
@@ -102,19 +102,19 @@ probability densities $|\Psi(\mathbf x)|^2$ that are significant only where the
 potential is the lowest, i.e. in the top right and bottom left sector of inner
 circle of the potential):
 
-<img src="https://www.dealii.org/images/steps/developer/step-36.mod.potential.png" alt="">
+<img src="https://dealii.org/images/steps/developer/step-36.mod.potential.png" alt="">
 
 The first five eigenfunctions are now like this:
 
 <table width="80%">
 <tr>
-<td><img src="https://www.dealii.org/images/steps/developer/step-36.mod.eigenfunction.0.png" alt=""></td>
-<td><img src="https://www.dealii.org/images/steps/developer/step-36.mod.eigenfunction.1.png" alt=""></td>
-<td><img src="https://www.dealii.org/images/steps/developer/step-36.mod.eigenfunction.2.png" alt=""></td>
+<td><img src="https://dealii.org/images/steps/developer/step-36.mod.eigenfunction.0.png" alt=""></td>
+<td><img src="https://dealii.org/images/steps/developer/step-36.mod.eigenfunction.1.png" alt=""></td>
+<td><img src="https://dealii.org/images/steps/developer/step-36.mod.eigenfunction.2.png" alt=""></td>
 </tr>
 <tr>
-<td><img src="https://www.dealii.org/images/steps/developer/step-36.mod.eigenfunction.3.png" alt=""></td>
-<td><img src="https://www.dealii.org/images/steps/developer/step-36.mod.eigenfunction.4.png" alt=""></td>
+<td><img src="https://dealii.org/images/steps/developer/step-36.mod.eigenfunction.3.png" alt=""></td>
+<td><img src="https://dealii.org/images/steps/developer/step-36.mod.eigenfunction.4.png" alt=""></td>
 <td></td>
 </tr>
 </table>
@@ -165,8 +165,8 @@ can be particularly useful here since the generalized eigenspectrum
 problem is somewhat more expensive to solve than the standard problems
 considered in most of the earlier tutorials. Fortunately, modifying the above
 program to be MPI compliant is a relatively straightforward
-procedure. A sketch of how this can be done can be found in @ref
-step_17 "step-17".
+procedure. A sketch of how this can be done can be found in
+step-17.
 
 <li> Finally, there are alternatives to using the SLEPc eigenvalue
 solvers. deal.II has interfaces to one of them, ARPACK (see <a

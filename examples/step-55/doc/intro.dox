@@ -18,7 +18,7 @@ and the p4est library installed. The installation of deal.II together with
 these additional libraries is described in the <a href="../../readme.html"
 target="body">README</a> file.
 
-<a name="step-55-Intro"></a>
+<a name="step_55-Intro"></a>
 <h1>Introduction</h1>
 
 Building on step-40, this tutorial shows how to solve linear PDEs with several
@@ -154,7 +154,7 @@ see @cite kovasznay1948laminar. Here
 is an image of the solution colored by the x velocity including
 streamlines of the velocity:
 
- <img src="https://www.dealii.org/images/steps/developer/step-55.solution.png" alt="">
+ <img src="https://dealii.org/images/steps/developer/step-55.solution.png" alt="">
 
 We have to cheat here, though, because we are not solving the non-linear
 Navier-Stokes equations, but the linear Stokes system without convective

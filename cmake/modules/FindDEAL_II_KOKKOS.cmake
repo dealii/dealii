@@ -123,16 +123,6 @@ if(KOKKOS_FOUND)
   endif()
   set(KOKKOS_VERSION ${Kokkos_VERSION})
 
-  if (Kokkos_ENABLE_CUDA OR Kokkos_ENABLE_HIP)
-    # In version older than 3.7.0, Kokkos::Array::operator[] is not constexpr,
-    # so we use std::array instead.
-    if (Kokkos_VERSION VERSION_LESS 3.7.0)
-      # We are using std::array in device code which calls the host-only function
-      # __glibcxx_requires_subscript when defining _GLIBCXX_ASSERTIONS 
-      list(REMOVE_ITEM DEAL_II_DEFINITIONS_DEBUG "_GLIBCXX_ASSERTIONS")
-    endif()
-  endif()
-
   if(Kokkos_ENABLE_CUDA)
     if (NOT CMAKE_CXX_COMPILER_ID MATCHES Clang)
       # We need to disable SIMD vectorization for CUDA device code with nvcc.
@@ -167,6 +157,8 @@ if(KOKKOS_FOUND)
     enable_if_supported(DEAL_II_CXX_FLAGS "-Xcudafe --diag_suppress=550")
     # warning #940-D: missing return statement at end of non-void function
     enable_if_supported(DEAL_II_CXX_FLAGS "-Xcudafe --diag_suppress=940")
+    # warning #20012-D: __host__ annotation is ignored on a function that is explicitly defaulted on its first declaration
+    enable_if_supported(DEAL_II_CXX_FLAGS "-Xcudafe --diag_suppress=20012")
   endif()
 
   if(Kokkos_ENABLE_HIP)

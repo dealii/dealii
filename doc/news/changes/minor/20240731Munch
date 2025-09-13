@@ -1,6 +1,0 @@
-New: TrilinosWrappers::SolverDirect can now also
-be used for a matrix of type Epetra_Operator and
-vectors of type Epetra_MultiVector. In addition,
-FullMatrix objects can be used as multi vectors.
-<br>
-(Peter Munch, 2024/07/31)

@@ -504,16 +504,35 @@ namespace FETools
     template <int dim, int spacedim, typename Number, typename MemorySpace>
     void
     back_interpolate(
-      const DoFHandler<dim, spacedim> &,
+      const DoFHandler<dim, spacedim> &dof1,
       const AffineConstraints<typename LinearAlgebra::TpetraWrappers::
-                                Vector<Number, MemorySpace>::value_type> &,
-      const LinearAlgebra::TpetraWrappers::Vector<Number, MemorySpace> &,
-      const DoFHandler<dim, spacedim> &,
+                                Vector<Number, MemorySpace>::value_type>
+        &constraints1,
+      const LinearAlgebra::TpetraWrappers::Vector<Number, MemorySpace> &u1,
+      const DoFHandler<dim, spacedim>                                  &dof2,
       const AffineConstraints<typename LinearAlgebra::TpetraWrappers::
-                                Vector<Number, MemorySpace>::value_type> &,
-      LinearAlgebra::TpetraWrappers::Vector<Number, MemorySpace> &)
+                                Vector<Number, MemorySpace>::value_type>
+        &constraints2,
+      LinearAlgebra::TpetraWrappers::Vector<Number, MemorySpace>
+        &u1_interpolated)
     {
-      AssertThrow(false, ExcNotImplemented());
+      // if u1 is a parallel distributed Trilinos vector, we create a
+      // vector u2 with based on the sets of locally owned and relevant
+      // dofs of dof2
+      const IndexSet &dof2_locally_owned_dofs = dof2.locally_owned_dofs();
+      const IndexSet  dof2_locally_relevant_dofs =
+        DoFTools::extract_locally_relevant_dofs(dof2);
+
+      LinearAlgebra::TpetraWrappers::Vector<Number, MemorySpace> u2_out(
+        dof2_locally_owned_dofs, u1.get_mpi_communicator());
+      interpolate(dof1, u1, dof2, constraints2, u2_out);
+
+      LinearAlgebra::TpetraWrappers::Vector<Number, MemorySpace> u2(
+        dof2_locally_owned_dofs,
+        dof2_locally_relevant_dofs,
+        u1.get_mpi_communicator());
+      u2 = u2_out;
+      interpolate(dof2, u2, dof1, constraints1, u1_interpolated);
     }
 
     template <int dim, int spacedim, typename Number, typename MemorySpace>

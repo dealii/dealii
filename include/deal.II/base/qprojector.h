@@ -82,7 +82,7 @@ public:
    * @deprecated Use the version of this function which takes a
    * combined_orientation argument instead.
    */
-  DEAL_II_DEPRECATED_EARLY_WITH_COMMENT(
+  DEAL_II_DEPRECATED_WITH_COMMENT(
     "Use the version of this function which takes a combined_orientation "
     "argument instead.")
   static void
@@ -99,7 +99,7 @@ public:
    * @deprecated Use the version of this function which takes a
    * combined_orientation argument instead.
    */
-  DEAL_II_DEPRECATED_EARLY_WITH_COMMENT(
+  DEAL_II_DEPRECATED_WITH_COMMENT(
     "Use the version of this function which takes a combined_orientation "
     "argument instead.")
   static Quadrature<dim>
@@ -116,7 +116,7 @@ public:
    * @deprecated Use the version of project_to_face() which takes a
    * combined_orientation argument instead.
    */
-  DEAL_II_DEPRECATED_EARLY_WITH_COMMENT(
+  DEAL_II_DEPRECATED_WITH_COMMENT(
     "Use the version of project_to_face() which takes a combined_orientation "
     "argument instead.")
   static Quadrature<dim>
@@ -150,7 +150,7 @@ public:
    * @deprecated Use the version of project_to_subface() which takes a
    * combined_orientation argument instead.
    */
-  DEAL_II_DEPRECATED_EARLY_WITH_COMMENT(
+  DEAL_II_DEPRECATED_WITH_COMMENT(
     "Use the version of project_to_subface() which takes a "
     "combined_orientation argument instead.")
   static void
@@ -178,7 +178,7 @@ public:
    * @deprecated Use the version of project_to_subface() which takes a
    * combined_orientation argument instead.
    */
-  DEAL_II_DEPRECATED_EARLY_WITH_COMMENT(
+  DEAL_II_DEPRECATED_WITH_COMMENT(
     "Use the version of project_to_subface() which takes a "
     "combined_orientation argument instead.")
   static Quadrature<dim>
@@ -201,7 +201,7 @@ public:
    * @deprecated Use the version of project_to_subface() which takes a
    * combined_orientation argument instead.
    */
-  DEAL_II_DEPRECATED_EARLY_WITH_COMMENT(
+  DEAL_II_DEPRECATED_WITH_COMMENT(
     "Use the version of project_to_subface() which takes a "
     "combined_orientation argument instead.")
   static Quadrature<dim>
@@ -586,11 +586,6 @@ QProjector<3>::project_to_subface(const ReferenceCell     &reference_cell,
                                   const unsigned int       subface_no,
                                   std::vector<Point<3>>   &q_points,
                                   const RefinementCase<2> &face_ref_case);
-
-template <>
-Quadrature<1>
-QProjector<1>::project_to_all_subfaces(const ReferenceCell &reference_cell,
-                                       const Quadrature<0> &quadrature);
 
 
 #endif // DOXYGEN

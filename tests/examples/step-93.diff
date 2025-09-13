@@ -1,8 +1,25 @@
 diff --git a/examples/step-93/step-93.cc b/examples/step-93/step-93.cc
-index 2e7944c2b7..a0aac6263b 100644
+index e0d3978560..ff524aa602 100644
 --- a/examples/step-93/step-93.cc
 +++ b/examples/step-93/step-93.cc
-@@ -374,7 +374,7 @@ namespace Step93
+@@ -20,7 +20,6 @@
+ 
+ #include <deal.II/base/function.h>
+ #include <deal.II/base/quadrature_lib.h>
+-#include <deal.II/base/timer.h>
+ 
+ #include <deal.II/dofs/dof_handler.h>
+ #include <deal.II/dofs/dof_tools.h>
+@@ -49,6 +48,8 @@
+ #include <fstream>
+ #include <iostream>
+ 
++#include "../example_test.h"
++
+ 
+ namespace Step93
+ {
+@@ -312,7 +313,7 @@ namespace Step93
    void Step93<dim>::make_grid()
    {
      GridGenerator::hyper_cube(triangulation, -1, 1);
@@ -11,23 +28,30 @@ index 2e7944c2b7..a0aac6263b 100644
  
      std::cout << "Number of active cells: " << triangulation.n_active_cells()
                << std::endl;
-@@ -655,7 +655,7 @@ namespace Step93
+@@ -639,21 +640,14 @@ namespace Step93
+   template <int dim>
+   void Step93<dim>::solve()
    {
-     // Notice that we also time how long this process takes.
-     std::cout << "Beginning solve" << std::endl;
 -    Timer timer;
-+    //Timer timer;
+-    timer.start();
+-
+-    std::cout << "Beginning solve..." << std::endl;
+-
+     SolverControl solver_control(1'000'000, 1e-6 * system_rhs.l2_norm());
+     SolverMinRes<Vector<double>> solver(solver_control);
  
-     SolverControl solver_control(5000000, 1e-6 * system_rhs.l2_norm());
-     SolverCG<Vector<double>> solver(solver_control);
-@@ -665,8 +665,8 @@ namespace Step93
-     /* SparseDirectUMFPACK direct_solver;
-     direct_solver.initialize(system_matrix);
-     direct_solver.vmult(solution, system_rhs); */
+-    solver.solve(system_matrix, solution, system_rhs, PreconditionIdentity());
+-
 -    timer.stop();
+-
 -    std::cout << "Wall time: " << timer.wall_time() << "s" << std::endl;
-+    //timer.stop();
-+    //std::cout << "Wall time: " << timer.wall_time() << "s" << std::endl;
+-    std::cout << "Solved in " << solver_control.last_step()
+-              << " MINRES iterations." << std::endl;
++    check_solver_within_range(std::cout,
++                              solver.solve(system_matrix, solution, system_rhs, PreconditionIdentity()),
++                              solver_control.last_step(),
++                              245,
++                              260);
    }
  
-   // The output_results() function is a bit more robust for this program than
+ 

@@ -52,6 +52,7 @@
 #
 #     DEAL_II_WITH_64BIT_INDICES
 #     DEAL_II_WITH_COMPLEX_VALUES
+#     DEAL_II_WITH_CXX20_MODULE
 #     DEAL_II_DOXYGEN_USE_MATHJAX
 #     DEAL_II_DOXYGEN_USE_ONLINE_MATHJAX
 #     DEAL_II_CPACK_EXTERNAL_LIBS
@@ -357,6 +358,11 @@ option(DEAL_II_WITH_COMPLEX_VALUES
   OFF
   )
 list(APPEND DEAL_II_FEATURES COMPLEX_VALUES)
+
+option(DEAL_II_WITH_CXX20_MODULE
+  "If set to ON, and if compiler, cmake, and build system are suitable, also build a C++20 style module that can be imported instead of using \#include directives. This will increase build time significantly."
+  OFF)
+mark_as_advanced(DEAL_II_WITH_CXX20_MODULE)
 
 option(DEAL_II_DOXYGEN_USE_MATHJAX
   "If set to ON, doxygen documentation is generated using mathjax"

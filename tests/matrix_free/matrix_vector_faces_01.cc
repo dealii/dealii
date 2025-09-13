@@ -18,7 +18,6 @@
 // the same implementation with MeshWorker. This example uses a hypercube mesh
 // without any hanging nodes
 
-#include <deal.II/base/function.h>
 
 #include <deal.II/fe/fe_dgq.h>
 

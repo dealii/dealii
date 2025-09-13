@@ -387,11 +387,7 @@ namespace MPI_nonlinear_solver_selector_test
 
     SolverControl solver_control(dof_handler.n_dofs(), 1e-12);
 
-#ifdef USE_PETSC_LA
-    LA::SolverCG solver(solver_control, mpi_communicator);
-#else
     LA::SolverCG solver(solver_control);
-#endif
 
     LA::MPI::PreconditionAMG preconditioner;
 

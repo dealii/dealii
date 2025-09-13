@@ -8,7 +8,7 @@ reflect the views of the National Science Foundation or of The University of
 California &ndash; Davis.  </i>
 
 
-<a name="step-46-Intro"></a>
+<a name="step_46-Intro"></a>
 <h1>Introduction</h1>
 
 This program deals with the problem of coupling different physics in different
@@ -530,7 +530,7 @@ introduction.
 
 We will consider the following situation as a testcase:
 
-<img src="https://www.dealii.org/images/steps/developer/step-46.layout.png" alt="">
+<img src="https://dealii.org/images/steps/developer/step-46.layout.png" alt="">
 
 As discussed at the top of this document, we need to assume in a few places
 that a cell is either entirely in the fluid or solid part of the domain and,
@@ -591,7 +591,7 @@ physics in different parts of the domain, and how to implement such
 models in deal.II. As a consequence, we won't bother coming up with a
 good solver: we'll just use the SparseDirectUMFPACK class which always
 works, even if not with optimal complexity. We will, however, comment
-on possible other solvers in the <a href="#Results">results</a> section.
+on possible other solvers in the @ref step_46-ResultsSection "results" section.
 
 
 <h4>Mesh refinement</h4>

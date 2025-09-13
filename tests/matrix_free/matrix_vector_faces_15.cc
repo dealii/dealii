@@ -17,7 +17,6 @@
 // similar to matrix_vector_faces_13 but for advection operator rather than
 // Poisson
 
-#include <deal.II/base/function.h>
 #include <deal.II/base/quadrature_lib.h>
 
 #include <deal.II/distributed/tria.h>

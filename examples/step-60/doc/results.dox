@@ -313,14 +313,14 @@ as boundary of the portion of $\Omega$ inside $\Gamma$. Similarly on $\partial
 <div class="twocolumn" style="width: 80%">
   <div class="parent">
     <div class="img" align="center">
-      <img src="https://www.dealii.org/images/steps/developer/step-60.1_no_grid.png"
+      <img src="https://dealii.org/images/steps/developer/step-60.1_no_grid.png"
            alt = ""
            width="500">
     </div>
   </div>
   <div class="parent">
     <div class="img" align="center">
-      <img src="https://www.dealii.org/images/steps/developer/step-60.1_grid.png"
+      <img src="https://dealii.org/images/steps/developer/step-60.1_grid.png"
            alt = ""
            width="500">
     </div>
@@ -442,14 +442,14 @@ produces the saddle on the right.
 <div class="twocolumn" style="width: 80%">
   <div class="parent">
     <div class="img" align="center">
-      <img src="https://www.dealii.org/images/steps/developer/step-60.3_grid.png"
+      <img src="https://dealii.org/images/steps/developer/step-60.3_grid.png"
            alt = ""
            width="500">
     </div>
   </div>
   <div class="parent">
     <div class="img" align="center">
-      <img src="https://www.dealii.org/images/steps/developer/step-60.4_grid.png"
+      <img src="https://dealii.org/images/steps/developer/step-60.4_grid.png"
            alt = ""
            width="500">
     </div>

@@ -1,3 +1,4 @@
+@anchor step_46-ResultsSection
 <h1>Results</h1>
 
 <h3>2d results</h3>
@@ -53,13 +54,13 @@ The results are easily visualized:
 <table width="80%" align="center">
   <tr valign="top">
     <td valign="top" align="center">
-      <img src="https://www.dealii.org/images/steps/developer/step-46.9.2.velocity-2d.png" alt="">
+      <img src="https://dealii.org/images/steps/developer/step-46.9.2.velocity-2d.png" alt="">
       <p align="center">
         Magnitude and vectors for the fluid velocity.
       </p>
     </td>
     <td valign="top" align="center">
-      <img src="https://www.dealii.org/images/steps/developer/step-46.9.2.pressure-2d.png" alt="">
+      <img src="https://dealii.org/images/steps/developer/step-46.9.2.pressure-2d.png" alt="">
       <p align="center">
         Fluid pressure. The dynamic range has been truncated to cut off the
         pressure singularities at the top left and right corners of the domain
@@ -68,7 +69,7 @@ The results are easily visualized:
       </p>
     </td>
     <td valign="top" align="center">
-      <img src="https://www.dealii.org/images/steps/developer/step-46.9.2.displacement-2d.png" alt="">
+      <img src="https://dealii.org/images/steps/developer/step-46.9.2.displacement-2d.png" alt="">
       <p align="center">
         Magnitude and vectors for the solid displacement.
       </p>
@@ -118,7 +119,7 @@ well. Here is one, showing both a vector plot for the velocity (in
 oranges), the solid displacement (in blues), and shading the solid region:
 
 <p align="center">
-  <img src="https://www.dealii.org/images/steps/developer/step-46.9.2.3d.png" alt="">
+  <img src="https://dealii.org/images/steps/developer/step-46.9.2.3d.png" alt="">
 </p>
 
 In addition to the lack of a good solver, the mesh is a bit

@@ -30,8 +30,14 @@ foreach(_step ${_steps})
 
   # Create symbolic links to the output files:
   file(GLOB _output_files
-    "${_base_directory}/${_step}*.output*" "${_base_directory}/${_step}*.run_only"
+    "${_base_directory}/${_step}.*output*" "${_base_directory}/${_step}.*run_only"
     )
+  if(NOT _output_files)
+    message(FATAL_ERROR
+      "\nMissing ${_step}.output file for example ${_step}.\n"
+      "Consult tests/examples/README.md for instructions.\n"
+      )
+  endif()
   foreach(_file ${_output_files})
     get_filename_component(_destination "${_file}" NAME)
     set(_destination "${CMAKE_CURRENT_SOURCE_DIR}/${_destination}")

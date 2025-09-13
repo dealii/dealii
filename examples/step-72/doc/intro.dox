@@ -8,6 +8,7 @@ Award No. EAR-1550901 and The University of California-Davis.
 </i>
 
 
+<a name="step_72-Intro"></a>
 <h1>Introduction</h1>
 
 <h3>Motivation</h3>
@@ -23,7 +24,7 @@ for the
   @f}
 
 Among the issues we had identified there (see the
-<a href="step_15#extensions">Possibilities for extensions</a> section)
+@ref step_15-Extensions "Possibilities for extensions" section)
 was that when wanting to use
 a Newton iteration, we needed to compute the derivative of the
 residual of the equation with regard to the solution $u$ (here,

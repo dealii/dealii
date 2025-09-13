@@ -123,6 +123,7 @@ namespace internal
 // PolarManifold
 // ============================================================
 
+DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
 template <int dim, int spacedim>
 PolarManifold<dim, spacedim>::PolarManifold(const Point<spacedim> center)
   : ChartManifold<dim, spacedim, spacedim>(
@@ -130,6 +131,7 @@ PolarManifold<dim, spacedim>::PolarManifold(const Point<spacedim> center)
   , center(center)
   , p_center(center)
 {}
+DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
 
 
 
@@ -331,12 +333,12 @@ PolarManifold<dim, spacedim>::normal_vector(
   // (tangential to the sphere).  In this case, the normal vector is
   // easy to compute since it is proportional to the vector from the
   // center to the point 'p'.
-  if (spherical_face_is_horizontal<dim, spacedim>(face, center))
+  if (spherical_face_is_horizontal<dim, spacedim>(face, p_center))
     {
       // So, if this is a "horizontal" face, then just compute the normal
       // vector as the one from the center to the point 'p', adequately
       // scaled.
-      const Tensor<1, spacedim> unnormalized_spherical_normal = p - center;
+      const Tensor<1, spacedim> unnormalized_spherical_normal = p - p_center;
       const Tensor<1, spacedim> normalized_spherical_normal =
         unnormalized_spherical_normal / unnormalized_spherical_normal.norm();
       return normalized_spherical_normal;
@@ -355,6 +357,7 @@ PolarManifold<dim, spacedim>::normal_vector(
 // SphericalManifold
 // ============================================================
 
+DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
 template <int dim, int spacedim>
 SphericalManifold<dim, spacedim>::SphericalManifold(
   const Point<spacedim> center)
@@ -362,6 +365,7 @@ SphericalManifold<dim, spacedim>::SphericalManifold(
   , p_center(center)
   , polar_manifold(center)
 {}
+DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
 
 
 
@@ -446,7 +450,7 @@ SphericalManifold<dim, spacedim>::get_tangent_vector(
   const Point<spacedim> &p1,
   const Point<spacedim> &p2) const
 {
-  [[maybe_unused]] const double tol = 1e-10;
+  const double tol = 1e-10;
 
   Assert(p1 != p2, ExcMessage("p1 and p2 should not concide."));
 
@@ -624,11 +628,10 @@ namespace internal
 
       template <>
       Point<3>
-      do_get_new_point(
-        const ArrayView<const Tensor<1, 3>>            &directions,
-        [[maybe_unused]] const ArrayView<const double> &distances,
-        const ArrayView<const double>                  &weights,
-        const Point<3>                                 &candidate_point)
+      do_get_new_point(const ArrayView<const Tensor<1, 3>> &directions,
+                       const ArrayView<const double>       &distances,
+                       const ArrayView<const double>       &weights,
+                       const Point<3>                      &candidate_point)
       {
         AssertDimension(directions.size(), distances.size());
         AssertDimension(directions.size(), weights.size());

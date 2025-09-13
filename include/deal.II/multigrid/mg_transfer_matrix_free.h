@@ -15,29 +15,857 @@
 #ifndef dealii_mg_transfer_matrix_free_h
 #define dealii_mg_transfer_matrix_free_h
 
-#include <deal.II/base/config.h>
-
+#include <deal.II/base/memory_space.h>
 #include <deal.II/base/mg_level_object.h>
+#include <deal.II/base/mpi_remote_point_evaluation.h>
 #include <deal.II/base/vectorization.h>
 
 #include <deal.II/dofs/dof_handler.h>
 
+#include <deal.II/lac/affine_constraints.h>
 #include <deal.II/lac/la_parallel_block_vector.h>
 #include <deal.II/lac/la_parallel_vector.h>
+
+#include <deal.II/matrix_free/constraint_info.h>
+#include <deal.II/matrix_free/matrix_free.h>
+#include <deal.II/matrix_free/shape_info.h>
 
 #include <deal.II/multigrid/mg_base.h>
 #include <deal.II/multigrid/mg_constrained_dofs.h>
 #include <deal.II/multigrid/mg_transfer.h>
 #include <deal.II/multigrid/mg_transfer_internal.h>
 
+#include <deal.II/non_matching/mapping_info.h>
+
 
 DEAL_II_NAMESPACE_OPEN
+
+// Forward declarations
+#ifndef DOXYGEN
+namespace internal
+{
+  class MGTwoLevelTransferImplementation;
+}
+
+template <int dim,
+          typename Number,
+          typename MemorySpace = ::dealii::MemorySpace::Host>
+class MGTransferMatrixFree;
+#endif
 
 
 /**
  * @addtogroup mg
  * @{
  */
+
+namespace mg
+{
+  /**
+   * A structure with boost::signal objects for optional processing in a
+   * non-nested multigrid solver.
+   *
+   * Similarly to mg::Signals, each signal is called twice: once before and
+   * once after the action is performed. The two calls only differ in the
+   * booleanargument @p before, which is true the first time and false the
+   * second.
+   *
+   */
+  struct SignalsNonNested
+  {
+    /**
+     * This signal is triggered before and after the call to the actual
+     * evaluation function inside RemotePointEvaluation::evaluate_and_process()
+     * during prolongation.
+     */
+    boost::signals2::signal<void(const bool before)> prolongation_cell_loop;
+
+    /**
+     * This signal is triggered before and after the call to the actual
+     * evaluation function inside RemotePointEvaluation::process_and_evaluate()
+     * during restriction.
+     */
+    boost::signals2::signal<void(const bool before)> restriction_cell_loop;
+
+    /**
+     * This signal is triggered before and after the call to
+     * RemotePointEvaluation::evaluate_and_process() used in
+     * MGTwoLevelTransferNonNested::prolongate_and_add(). The difference
+     * with the @p prolongation_cell_loop signal is that also the
+     * communication phase is included.
+     */
+    boost::signals2::signal<void(const bool before)> prolongation;
+
+    /**
+     * This signal is triggered before and after the call to
+     * RemotePointEvaluation::process_and_evaluate() used in
+     * MGTwoLevelTransferNonNested::restrict_and_add(). Similarly to
+     * the @p restriction_cell_loop signal, also the communication phase is
+     * included.
+     */
+    boost::signals2::signal<void(const bool before)> restriction;
+  };
+} // namespace mg
+
+
+
+/**
+ * An abstract base class for transfer operators between two multigrid levels.
+ * The implementation of
+ * restriction and prolongation between levels is delegated to derived classes,
+ * which implement prolongate_and_add_internal() and restrict_and_add_internal()
+ * accordingly.
+ */
+template <typename VectorType>
+class MGTwoLevelTransferBase : public EnableObserverPointer
+{
+public:
+  static_assert(
+    std::is_same_v<
+      VectorType,
+      LinearAlgebra::distributed::Vector<typename VectorType::value_type,
+                                         MemorySpace::Host>> ||
+      std::is_same_v<
+        VectorType,
+        LinearAlgebra::distributed::Vector<typename VectorType::value_type,
+                                           MemorySpace::Default>>,
+    "This class is currently only implemented for vectors of "
+    "type LinearAlgebra::distributed::Vector.");
+
+  /**
+   * The scalar type used by the vector-type template argument.
+   */
+  using Number = typename VectorType::value_type;
+
+  /**
+   * Default constructor.
+   */
+  MGTwoLevelTransferBase();
+
+  /**
+   * Perform prolongation on a solution vector.
+   */
+  void
+  prolongate_and_add(VectorType &dst, const VectorType &src) const;
+
+  /**
+   * Perform restriction on a residual vector.
+   */
+  void
+  restrict_and_add(VectorType &dst, const VectorType &src) const;
+
+  /**
+   * Perform interpolation of a solution vector from the fine level to the
+   * coarse level. This function is different from restriction, where a
+   * weighted residual is transferred to a coarser level (transposition of
+   * prolongation matrix). In other words, restriction acts on right hand
+   * side vectors, whereas interpolation acts on solution vectors.
+   */
+  virtual void
+  interpolate(VectorType &dst, const VectorType &src) const = 0;
+
+  /**
+   * Enable inplace vector operations if external and internal vectors
+   * are compatible. The returned pair indicates if the operation
+   * was successful on the coarse and the fine level.
+   */
+  virtual std::pair<bool, bool>
+  enable_inplace_operations_if_possible(
+    const std::shared_ptr<const Utilities::MPI::Partitioner>
+      &partitioner_coarse,
+    const std::shared_ptr<const Utilities::MPI::Partitioner>
+      &partitioner_fine) = 0;
+
+  /**
+   * Return the memory consumption of the allocated memory in this class.
+   */
+  virtual std::size_t
+  memory_consumption() const = 0;
+
+protected:
+  /**
+   * Perform prolongation on vectors with correct ghosting.
+   */
+  virtual void
+  prolongate_and_add_internal(VectorType &dst, const VectorType &src) const = 0;
+
+  /**
+   * Perform restriction on vectors with correct ghosting.
+   */
+  virtual void
+  restrict_and_add_internal(VectorType &dst, const VectorType &src) const = 0;
+
+  /**
+   * A wrapper around update_ghost_values() optimized in case the
+   * present vector has the same parallel layout of one of the external
+   * partitioners.
+   */
+  void
+  update_ghost_values(const VectorType &vec) const;
+
+  /**
+   * A wrapper around compress() optimized in case the
+   * present vector has the same parallel layout of one of the external
+   * partitioners.
+   */
+  void
+  compress(VectorType &vec, const VectorOperation::values op) const;
+
+  /**
+   * A wrapper around zero_out_ghost_values() optimized in case the
+   * present vector has the same parallel layout of one of the external
+   * partitioners.
+   */
+  void
+  zero_out_ghost_values(const VectorType &vec) const;
+
+  /**
+   * Enable inplace vector operations if external and internal vectors
+   * are compatible.
+   */
+  template <int dim, std::size_t width, typename IndexType>
+  std::pair<bool, bool>
+  internal_enable_inplace_operations_if_possible(
+    const std::shared_ptr<const Utilities::MPI::Partitioner>
+      &partitioner_coarse,
+    const std::shared_ptr<const Utilities::MPI::Partitioner> &partitioner_fine,
+    bool &vec_fine_needs_ghost_update,
+    internal::MatrixFreeFunctions::
+      ConstraintInfo<dim, VectorizedArray<Number, width>, IndexType>
+                              &constraint_info_coarse,
+    std::vector<unsigned int> &dof_indices_fine);
+
+  /**
+   * Flag if the finite elements on the fine cells are continuous. If yes,
+   * the multiplicity of DoF sharing a vertex/line as well as constraints have
+   * to be taken into account via weights.
+   */
+  bool fine_element_is_continuous;
+
+public:
+  /**
+   * Partitioner needed by the intermediate vector.
+   */
+  std::shared_ptr<const Utilities::MPI::Partitioner> partitioner_coarse;
+
+  /**
+   * Partitioner needed by the intermediate vector.
+   */
+  std::shared_ptr<const Utilities::MPI::Partitioner> partitioner_fine;
+
+protected:
+  /**
+   * Internal vector on which the actual prolongation/restriction is performed.
+   */
+  mutable VectorType vec_coarse;
+
+  /**
+   * Internal vector needed for collecting all degrees of freedom of the fine
+   * cells. It is only initialized if the fine-level DoF indices touch DoFs
+   * other than the locally active ones (which we always assume can be
+   * accessed by the given vectors in the prolongate/restrict functions),
+   * otherwise it is left at size zero.
+   */
+  mutable VectorType vec_fine;
+
+  /**
+   * Bool indicating whether fine vector has relevant ghost values.
+   */
+  bool vec_fine_needs_ghost_update;
+
+  /**
+   * Embedded partitioner for efficient communication if locally relevant DoFs
+   * are a subset of an external Partitioner object.
+   */
+  std::shared_ptr<const Utilities::MPI::Partitioner>
+    partitioner_coarse_embedded;
+
+  /**
+   * Embedded partitioner for efficient communication if locally relevant DoFs
+   * are a subset of an external Partitioner object.
+   */
+  std::shared_ptr<const Utilities::MPI::Partitioner> partitioner_fine_embedded;
+
+  /**
+   * Buffer for efficient communication if locally relevant DoFs
+   * are a subset of an external Partitioner object.
+   */
+  mutable AlignedVector<Number> buffer_coarse_embedded;
+
+  /**
+   * Buffer for efficient communication if locally relevant DoFs
+   * are a subset of an external Partitioner object.
+   */
+  mutable AlignedVector<Number> buffer_fine_embedded;
+};
+
+
+
+/**
+ * Class for transfer between two multigrid levels for p- or global
+ * coarsening. It relies on a list of DoF indices associated with the cells on
+ * the coarse and fine side of the transfer, and implements a cell-by-cell
+ * (matrix-free) interpolation setup with the reference-cell embedding
+ * matrices.
+ *
+ * The implementation of this class is explained in detail in @cite munch2022gc.
+ *
+ * There are two possible ways to use this class. In the first option, the
+ * transfer is built from the underlying DoFHandler and AffineConstraints
+ * objects on the coarse and fine side, collecting an explicit copy of all
+ * indices on both sides. This works for a relatively wide set of
+ * FiniteElement combinations, including p-adaptive schemes using
+ * hp::FECollection. The second, more setup-efficient approach is to build the
+ * transfer between two multigrid levels for polynomial coarsening
+ * (p-coarsening) from two MatrixFree objects that might already exist from
+ * other parts of the code. In this case, we require that both objects share
+ * the same triangulation (but differ through their DoFHandler descriptions)
+ * and are described by the respective DoFHandler/AffineConstraints pair. This
+ * second variant is more efficient because no queries to the DoFHandler need
+ * to be made, reducing both the setup time and the overall memory
+ * consumption. Note that not all options are supported for the second entry
+ * point, and we fall back to the first option in such a case.
+ */
+template <int dim, typename VectorType>
+class MGTwoLevelTransfer : public MGTwoLevelTransferBase<VectorType>
+{
+public:
+  static_assert(
+    std::is_same_v<
+      VectorType,
+      LinearAlgebra::distributed::Vector<typename VectorType::value_type,
+                                         MemorySpace::Host>> ||
+      std::is_same_v<
+        VectorType,
+        LinearAlgebra::distributed::Vector<typename VectorType::value_type,
+                                           MemorySpace::Default>>,
+    "This class is currently only implemented for vectors of "
+    "type LinearAlgebra::distributed::Vector.");
+
+  /**
+   * The scalar type used by the vector-type template argument.
+   */
+  using Number = typename VectorType::value_type;
+
+  /**
+   * A data type representing a vectorized array of the same kind of objects
+   * stored in the `VectorType`.
+   */
+  using VectorizedArrayType = VectorizedArray<Number>;
+
+  /**
+   * Set up global coarsening between the given DoFHandler objects (
+   * @p dof_handler_fine and @p dof_handler_coarse). The transfer
+   * can be only performed on active levels.
+   */
+  void
+  reinit_geometric_transfer(
+    const DoFHandler<dim>           &dof_handler_fine,
+    const DoFHandler<dim>           &dof_handler_coarse,
+    const AffineConstraints<Number> &constraint_fine =
+      AffineConstraints<Number>(),
+    const AffineConstraints<Number> &constraint_coarse =
+      AffineConstraints<Number>(),
+    const unsigned int mg_level_fine   = numbers::invalid_unsigned_int,
+    const unsigned int mg_level_coarse = numbers::invalid_unsigned_int);
+
+  /**
+   * Set up polynomial coarsening between the given DoFHandler objects (
+   * @p dof_handler_fine and @p dof_handler_coarse). Polynomial transfers
+   * can be only performed on active levels (`numbers::invalid_unsigned_int`)
+   * or on coarse-grid levels, i.e., levels without hanging nodes.
+   *
+   * @note The function polynomial_transfer_supported() can be used to
+   *   check if the given polynomial coarsening strategy is supported.
+   */
+  void
+  reinit_polynomial_transfer(
+    const DoFHandler<dim>           &dof_handler_fine,
+    const DoFHandler<dim>           &dof_handler_coarse,
+    const AffineConstraints<Number> &constraint_fine =
+      AffineConstraints<Number>(),
+    const AffineConstraints<Number> &constraint_coarse =
+      AffineConstraints<Number>(),
+    const unsigned int mg_level_fine   = numbers::invalid_unsigned_int,
+    const unsigned int mg_level_coarse = numbers::invalid_unsigned_int);
+
+  /**
+   * Set up the transfer operator between the given DoFHandler objects (
+   * @p dof_handler_fine and @p dof_handler_coarse). Depending on the
+   * underlying Triangulation objects polynomial or geometrical global
+   * coarsening is performed.
+   *
+   * @note While geometric transfer can be only performed on active levels
+   *   (`numbers::invalid_unsigned_int`), polynomial transfers can also be
+   *   performed on coarse-grid levels, i.e., levels without hanging nodes.
+   *
+   * @note The function polynomial_transfer_supported() can be used to
+   *   check if the given polynomial coarsening strategy is supported.
+   */
+  void
+  reinit(const DoFHandler<dim>           &dof_handler_fine,
+         const DoFHandler<dim>           &dof_handler_coarse,
+         const AffineConstraints<Number> &constraint_fine =
+           AffineConstraints<Number>(),
+         const AffineConstraints<Number> &constraint_coarse =
+           AffineConstraints<Number>(),
+         const unsigned int mg_level_fine   = numbers::invalid_unsigned_int,
+         const unsigned int mg_level_coarse = numbers::invalid_unsigned_int);
+
+  /**
+   * Set up polynomial coarsening between the DoFHandler objects underlying
+   * two MatrixFree objects and the respective numbers for the DoFHandler
+   * objects within MatrixFree. This reinit() function allows for a more
+   * efficient setup of the transfer operator and reduces the overall memory
+   * consumption of a multigrid cycle in case the same MatrixFree objects are
+   * also used for smoothers and residual evaluation on the two involved
+   * levels.
+   */
+  void
+  reinit(const MatrixFree<dim, Number> &matrix_free_fine,
+         const unsigned int             dof_no_fine,
+         const MatrixFree<dim, Number> &matrix_free_coarse,
+         const unsigned int             dof_no_coarse);
+
+  /**
+   * Check if a fast templated version of the polynomial transfer between
+   * @p fe_degree_fine and @p fe_degree_coarse is available.
+   *
+   * @note Currently, the polynomial coarsening strategies: 1) go-to-one,
+   *   2) bisect, and 3) decrease-by-one are precompiled with templates for
+   *   degrees up to 9.
+   */
+  static bool
+  fast_polynomial_transfer_supported(const unsigned int fe_degree_fine,
+                                     const unsigned int fe_degree_coarse);
+
+  /**
+   * @copydoc MGTwoLevelTransferBase::interpolate
+   */
+  void
+  interpolate(VectorType &dst, const VectorType &src) const override;
+
+  /**
+   * Enable inplace vector operations if external and internal vectors
+   * are compatible.
+   */
+  std::pair<bool, bool>
+  enable_inplace_operations_if_possible(
+    const std::shared_ptr<const Utilities::MPI::Partitioner>
+      &partitioner_coarse,
+    const std::shared_ptr<const Utilities::MPI::Partitioner> &partitioner_fine)
+    override;
+
+  /**
+   * Return the memory consumption of the allocated memory in this class.
+   */
+  std::size_t
+  memory_consumption() const override;
+
+protected:
+  void
+  prolongate_and_add_internal(VectorType       &dst,
+                              const VectorType &src) const override;
+
+  void
+  restrict_and_add_internal(VectorType       &dst,
+                            const VectorType &src) const override;
+
+private:
+  /**
+   * A multigrid transfer scheme. A multrigrid transfer class can have different
+   * transfer schemes to enable p-adaptivity (one transfer scheme per
+   * polynomial degree pair) and to enable global coarsening (one transfer
+   * scheme for transfer between children and parent cells, as well as, one
+   * transfer scheme for cells that are not refined).
+   */
+  struct MGTransferScheme
+  {
+    /**
+     * Number of coarse cells.
+     */
+    unsigned int n_coarse_cells;
+
+    /**
+     * Number of degrees of freedom of a coarse cell.
+     *
+     * @note For tensor-product elements, the value equals
+     *   `n_components * (degree_coarse + 1)^dim`.
+     */
+    unsigned int n_dofs_per_cell_coarse;
+
+    /**
+     * Number of degrees of freedom of fine cell.
+     *
+     * @note For tensor-product elements, the value equals
+     *   `n_components * (n_dofs_per_cell_fine + 1)^dim`.
+     */
+    unsigned int n_dofs_per_cell_fine;
+
+    /**
+     * Polynomial degree of the finite element of a coarse cell.
+     */
+    unsigned int degree_coarse;
+
+    /**
+     * "Polynomial degree" of the finite element of the union of all children
+     * of a coarse cell, i.e., actually `degree_fine * 2 + 1` if a cell is
+     * refined.
+     */
+    unsigned int degree_fine;
+
+    /**
+     * Prolongation matrix used for the prolongate_and_add() and
+     * restrict_and_add() functions.
+     */
+    AlignedVector<double> prolongation_matrix;
+
+    /**
+     * Restriction matrix used for the interpolate() function.
+     */
+    AlignedVector<double> restriction_matrix;
+
+    /**
+     * ShapeInfo description of the coarse cell. Needed during the
+     * fast application of hanging-node constraints.
+     */
+    internal::MatrixFreeFunctions::ShapeInfo<double> shape_info_coarse;
+  };
+
+  /**
+   * Transfer schemes.
+   */
+  std::vector<MGTransferScheme> schemes;
+
+  /**
+   * Helper class for reading from and writing to global coarse vectors and for
+   * applying constraints.
+   */
+  internal::MatrixFreeFunctions::
+    ConstraintInfo<dim, VectorizedArrayType, types::global_dof_index>
+      constraint_info_coarse;
+
+  /**
+   * Helper class for reading from and writing to global fine vectors.
+   */
+  internal::MatrixFreeFunctions::
+    ConstraintInfo<dim, VectorizedArrayType, types::global_dof_index>
+      constraint_info_fine;
+
+  struct MatrixFreeRelatedData
+  {
+    /**
+     * Matrix-free object on the fine side.
+     */
+    ObserverPointer<const MatrixFree<dim, Number>> matrix_free_fine;
+
+    /**
+     * Index within the list of DoFHandler objects in the matrix_free_fine
+     * object.
+     */
+    unsigned int dof_handler_index_fine;
+
+    /**
+     * Matrix-free object on the coarse side.
+     */
+    ObserverPointer<const MatrixFree<dim, Number>> matrix_free_coarse;
+
+    /**
+     * Index within the list of DoFHandler objects in the matrix_free_coarse
+     * object.
+     */
+    unsigned int dof_handler_index_coarse;
+
+    /**
+     * The two matrix-free objects will in general not agree on the order the
+     * cells are traversed. Thus, the loop will be run by the matrix-free object
+     * on the fine side, and the coarse side will adapt to those cell indices.
+     */
+    std::vector<std::array<unsigned int, VectorizedArrayType::size()>>
+      cell_list_fine_to_coarse;
+  };
+
+  /**
+   * In case this class is built with MatrixFree objects (see the respective
+   * reinit() function), we set up this data structure and skip the other
+   * fields of the class.
+   */
+  std::unique_ptr<MatrixFreeRelatedData> matrix_free_data;
+
+  /**
+   * CRS-like pointer to the start into the weights array, as that array can
+   * be compressed or in full format.
+   */
+  std::vector<unsigned int> weights_start;
+
+  /**
+   * Weights for continuous elements, either in full format or compressed into
+   * 3^dim doubles per cell if possible.
+   */
+  AlignedVector<VectorizedArrayType> weights;
+
+  /**
+   * Store whether the weights are in compressed format or not, in the
+   * ordering of the weights_start array.
+   */
+  std::vector<unsigned char> weights_are_compressed;
+
+  /**
+   * Number of components.
+   */
+  unsigned int n_components;
+
+  /**
+   * Pointer to the DoFHandler object used during initialization.
+   */
+  ObserverPointer<const DoFHandler<dim>> dof_handler_fine;
+
+  /**
+   * Multigrid level used during initialization.
+   */
+  unsigned int mg_level_fine;
+
+  friend class internal::MGTwoLevelTransferImplementation;
+
+  friend class MGTransferMatrixFree<dim,
+                                    Number,
+                                    typename VectorType::memory_space>;
+};
+
+
+
+/**
+ * Class for transfer between two non-nested multigrid levels.
+ */
+template <int dim, typename VectorType>
+class MGTwoLevelTransferNonNested : public MGTwoLevelTransferBase<VectorType>
+{
+private:
+  static_assert(
+    std::is_same_v<
+      VectorType,
+      LinearAlgebra::distributed::Vector<typename VectorType::value_type>>,
+    "This class is currently only implemented for vectors of "
+    "type LinearAlgebra::distributed::Vector.");
+
+  using Number              = typename VectorType::value_type;
+  using VectorizedArrayType = VectorizedArray<Number, 1>;
+
+  mg::SignalsNonNested signals_non_nested;
+
+public:
+  /**
+   * AdditionalData structure that can be used to tweak parameters
+   * related to the search procedure (used internally by RemotePointEvaluation)
+   * or, in the future, transfer operators needed by the non-nested multigrid
+   * algorithm.
+   */
+  struct AdditionalData
+  {
+    /**
+     * Constructor. By default, the @p tolerance and @p rtree_level parameters
+     * are set to the default values used in the constructor of
+     * RemotePointEvaluation, i.e. 1e-6 and 0, respectively. The last Boolean
+     * parameter @p enforce_all_points_found is true by default and checks
+     * that all points submitted internally to RemotePointEvaluation::reinit()
+     * have been found.
+     *
+     */
+    AdditionalData(const double       tolerance                = 1e-6,
+                   const unsigned int rtree_level              = 0,
+                   const bool         enforce_all_points_found = true)
+      : tolerance(tolerance)
+      , rtree_level(rtree_level)
+      , enforce_all_points_found(enforce_all_points_found)
+    {}
+
+    /**
+     * Tolerance parameter. See the constructor of RemotePointEvaluation for
+     * more details.
+     */
+    double tolerance;
+
+    /**
+     * RTree level parameter. See the constructor of RemotePointEvaluation for
+     * more details.
+     *
+     */
+    unsigned int rtree_level;
+
+    /**
+     * If set to true, it checks if RemotePointEvaluation::all_points_found()
+     * evaluates to true internally during the each call to reinit() from one
+     * level to the next one, ensuring that all submitted points have been found
+     * inside the domain.
+     *
+     */
+    bool enforce_all_points_found;
+  };
+
+  /**
+   * Constructor.
+   */
+  MGTwoLevelTransferNonNested(const AdditionalData &data = AdditionalData());
+
+  /**
+   * Set up transfer operator between the given DoFHandler objects (
+   * @p dof_handler_fine and @p dof_handler_coarse).
+   */
+  void
+  reinit(const DoFHandler<dim>           &dof_handler_fine,
+         const DoFHandler<dim>           &dof_handler_coarse,
+         const Mapping<dim>              &mapping_fine,
+         const Mapping<dim>              &mapping_coarse,
+         const AffineConstraints<Number> &constraint_fine =
+           AffineConstraints<Number>(),
+         const AffineConstraints<Number> &constraint_coarse =
+           AffineConstraints<Number>());
+
+  /**
+   * Perform interpolation of a solution vector from the fine level to the
+   * coarse level. This function is different from restriction, where a
+   * weighted residual is transferred to a coarser level (transposition of
+   * prolongation matrix).
+   */
+  void
+  interpolate(VectorType &dst, const VectorType &src) const override;
+
+  /**
+   * Enable inplace vector operations if external and internal vectors
+   * are compatible.
+   */
+  std::pair<bool, bool>
+  enable_inplace_operations_if_possible(
+    const std::shared_ptr<const Utilities::MPI::Partitioner>
+      &partitioner_coarse,
+    const std::shared_ptr<const Utilities::MPI::Partitioner> &partitioner_fine)
+    override;
+
+  /**
+   * Return the memory consumption of the allocated memory in this class.
+   */
+  std::size_t
+  memory_consumption() const override;
+
+  /**
+   * Connect a function to mg::SignalsNonNested::prolongation_cell_loop.
+   */
+  boost::signals2::connection
+  connect_prolongation_cell_loop(const std::function<void(const bool)> &slot);
+
+  /**
+   * Connect a function to mg::SignalsNonNested::restriction_cell_loop.
+   */
+  boost::signals2::connection
+  connect_restriction_cell_loop(const std::function<void(const bool)> &slot);
+
+  /**
+   * Connect a function to mg::SignalsNonNested::prolongation.
+   */
+  boost::signals2::connection
+  connect_prolongation(const std::function<void(const bool)> &slot);
+
+  /**
+   * Connect a function to mg::SignalsNonNested::restriction.
+   */
+  boost::signals2::connection
+  connect_restriction(const std::function<void(const bool)> &slot);
+
+protected:
+  AdditionalData additional_data;
+  /**
+   * Perform prolongation.
+   */
+  void
+  prolongate_and_add_internal(VectorType       &dst,
+                              const VectorType &src) const override;
+
+  /**
+   * Perform restriction.
+   */
+  void
+  restrict_and_add_internal(VectorType       &dst,
+                            const VectorType &src) const override;
+
+private:
+  /**
+   * Perform prolongation for correct number of components.
+   */
+  template <int n_components>
+  void
+  prolongate_and_add_internal_comp(VectorType       &dst,
+                                   const VectorType &src) const;
+
+  /**
+   * Perform restriction for correct number of components.
+   */
+  template <int n_components>
+  void
+  restrict_and_add_internal_comp(VectorType &dst, const VectorType &src) const;
+
+  /**
+   * Pointer to the DoFHandler object used during initialization.
+   */
+  ObserverPointer<const DoFHandler<dim>> dof_handler_fine;
+
+  /**
+   * Multigrid level used during initialization.
+   */
+  unsigned int mg_level_fine;
+
+  /**
+   * Object to evaluate shape functions on one mesh on visited support points of
+   * the other mesh.
+   */
+  Utilities::MPI::RemotePointEvaluation<dim> rpe;
+
+  /**
+   * Vectors for input/output for rpe.
+   */
+  mutable std::vector<Number> rpe_input_output;
+
+  /**
+   * Buffers to be reused by rpe.
+   */
+  mutable std::vector<Number> rpe_buffer;
+
+  /**
+   * MappingInfo object needed as Mapping argument by FEPointEvaluation.
+   */
+  std::shared_ptr<NonMatching::MappingInfo<dim, dim, Number>> mapping_info;
+
+  /**
+   * Helper class for reading from and writing to global vectors and for
+   * applying constraints.
+   */
+  internal::MatrixFreeFunctions::
+    ConstraintInfo<dim, VectorizedArrayType, unsigned int>
+      constraint_info;
+
+  /**
+   * Finite element of the coarse DoFHandler passed to reinit().
+   */
+  std::unique_ptr<FiniteElement<dim>> fe_coarse;
+
+  /**
+   * DoF indices of the fine cells, expressed in indices local to the MPI
+   * rank.
+   */
+  std::vector<unsigned int> level_dof_indices_fine;
+
+  /**
+   * CRS like structure which points to DoFs associated with the same support
+   * point. The vector stays empty if only one DoF corresponds to one support
+   * point.
+   */
+  std::vector<unsigned int> level_dof_indices_fine_ptrs;
+
+  friend class MGTransferMatrixFree<dim,
+                                    Number,
+                                    typename VectorType::memory_space>;
+};
+
+
 
 /**
  * Implementation of the MGTransferBase interface for which the transfer
@@ -46,21 +874,103 @@ DEAL_II_NAMESPACE_OPEN
  * memory than MGTransferPrebuilt and can also be considerably faster than
  * that variant.
  *
- * This class currently only works for tensor-product finite elements based on
- * FE_Q and FE_DGQ elements, including systems involving multiple components
- * of one of these elements. Systems with different elements or other elements
- * are currently not implemented.
+ * The user can provide separate
+ * transfer operators of type MGTwoLevelTransfer between each level to
+ * implement a global-coarsening multigrid algorithm. The
+ * sequence of functions calls for setup is:
+ * @code
+ * MGTransferGlobalCoarsening mg_transfer;
+ * mg_transfer.initialize_two_level_transfers(two_level_transfers);
+ * mg_transfer.build(partitioners);
+ * @endcode
+ *
+ * Alternatively, this class can also be set up with:
+ * @code
+ * MGTransferGlobalCoarsening mg_transfer;
+ * mg_transfer.initialize_constraints(mg_constrained_dofs);
+ * mg_transfer.build(dof_handler, partitioners);
+ * @endcode
+ * This allows local-smoothing multigrid.
+ *
+ * This class currently only works for the tensor-product finite elements
+ * FE_Q, FE_DGQ, and FE_DGP and simplex elements FE_SimplexP and FE_SimplexDGP
+ * as well as for systems involving multiple components of one of these
+ * elements. Other elements are currently not implemented.
+ *
+ * The implementation of this class is explained in detail in @cite munch2022gc.
  */
-template <int dim, typename Number>
+template <int dim, typename Number, typename MemorySpace>
 class MGTransferMatrixFree
-  : public MGLevelGlobalTransfer<LinearAlgebra::distributed::Vector<Number>>
+  : public dealii::MGLevelGlobalTransfer<
+      LinearAlgebra::distributed::Vector<Number, MemorySpace>>
 {
 public:
   /**
-   * Constructor without constraint matrices. Use this constructor only with
-   * discontinuous finite elements or with no local refinement.
+   * Value type.
+   */
+  using VectorType = LinearAlgebra::distributed::Vector<Number, MemorySpace>;
+
+  /**
+   * Default constructor.
+   *
+   * @note See also MGTransferMatrixFree.
    */
   MGTransferMatrixFree();
+
+  /**
+   * @name Global coarsening.
+   */
+  /** @{ */
+
+  /**
+   * Constructor taking a collection of transfer operators (with the coarsest
+   * level kept empty in @p transfer) and an optional function that initializes the
+   * internal level vectors within the function call copy_to_mg() if used in the
+   * context of PreconditionMG. The template parameter @p MGTwoLevelTransferObject should derive from
+   * MGTwoLevelTransferBase and implement the transfer operation (see for
+   * instance MGTwoLevelTransfer). It can also be a std::shared_ptr or
+   * std::unique_ptr to the actual transfer operator.
+   */
+  template <typename MGTwoLevelTransferObject>
+  MGTransferMatrixFree(
+    const MGLevelObject<MGTwoLevelTransferObject> &transfer,
+    const std::function<void(const unsigned int, VectorType &)>
+      &initialize_dof_vector = {});
+
+  /**
+   * Set two-level transfers.
+   */
+  template <typename MGTwoLevelTransferObject>
+  void
+  initialize_two_level_transfers(
+    const MGLevelObject<MGTwoLevelTransferObject> &transfer);
+
+  /**
+   * Similar function to MGTransferMatrixFree::build() with the difference that
+   * the information for the prolongation for each level has already been built.
+   * So this function only tries to optimize the data structures of the
+   * two-level transfer operators, e.g., by enabling inplace vector operations,
+   * by checking if @p external_partitioners and the internal ones are
+   * compatible.
+   */
+  void
+  build(const std::vector<std::shared_ptr<const Utilities::MPI::Partitioner>>
+          &external_partitioners = {});
+
+  /**
+   * Same as above but taking a lambda for initializing vector instead of
+   * partitioners.
+   */
+  void
+  build(const std::function<void(const unsigned int, VectorType &)>
+          &initialize_dof_vector);
+
+  /** @} */
+
+  /**
+   * @name Local smoothing.
+   */
+  /** @{ */
 
   /**
    * Constructor with constraints. Equivalent to the default constructor
@@ -69,108 +979,113 @@ public:
   MGTransferMatrixFree(const MGConstrainedDoFs &mg_constrained_dofs);
 
   /**
-   * Destructor.
-   */
-  virtual ~MGTransferMatrixFree() override = default;
-
-  /**
    * Initialize the constraints to be used in build().
    */
   void
   initialize_constraints(const MGConstrainedDoFs &mg_constrained_dofs);
 
+  /** @} */
+
   /**
-   * Reset the object to the state it had right after the default constructor.
+   * @name Global coarsening and local smoothing.
    */
-  void
-  clear();
+  /** @{ */
 
   /**
    * Actually build the information for the prolongation for each level.
    *
-   * The optional second argument of external partitioners allows the user to
-   * suggest vector partitioning on the levels. In case the partitioners
-   * are found to contain all ghost unknowns that are visited through the
-   * transfer, the given partitioners are chosen. This ensures compatibility
-   * of vectors during prolongate and restrict with external partitioners as
-   * given by the user, which in turn saves some copy operations. However, in
-   * case there are unknowns missing -- and this is typically the case at some
-   * point during h-coarsening since processors will need to drop out and
-   * thus children's unknowns on some processor will be needed as ghosts to a
-   * parent cell on another processor -- the provided external partitioners are
-   * ignored and internal variants are used instead.
+   * @note In the case of global coarsening, you can pass a @p dof_handler
+   * with different DoF numbering as the one used within the provided
+   * two-level transfer objects  into this function. In this case, vector
+   * entries are permuted during copy_to_mg(), copy_from_mg(), and
+   * interpolate_to_mg().
    */
   void
   build(const DoFHandler<dim> &dof_handler,
         const std::vector<std::shared_ptr<const Utilities::MPI::Partitioner>>
-          &external_partitioners =
-            std::vector<std::shared_ptr<const Utilities::MPI::Partitioner>>());
+          &external_partitioners = {});
 
   /**
    * Same as above but taking a lambda for initializing vector instead of
    * partitioners.
+   *
+   * @note In the case of global coarsening, you can pass into this function
+   * a @p dof_handler with different DoF numbering as the one used within the
+   * provided two-level transfer objects. In this case, vector entries are
+   * permuted during copy_to_mg(), copy_from_mg(), and interpolate_to_mg().
    */
   void
   build(const DoFHandler<dim> &dof_handler,
-        const std::function<void(const unsigned int,
-                                 LinearAlgebra::distributed::Vector<Number> &)>
+        const std::function<void(const unsigned int, VectorType &)>
           &initialize_dof_vector);
 
+  /** @} */
+
   /**
-   * Prolongate a vector from level <tt>to_level-1</tt> to level
-   * <tt>to_level</tt> using the embedding matrices of the underlying finite
-   * element. The previous content of <tt>dst</tt> is overwritten.
-   *
-   * @param to_level The index of the level to prolongate to, which is the
-   * level of @p dst.
-   *
-   * @param src is a vector with as many elements as there are degrees of
-   * freedom on the coarser level involved.
-   *
-   * @param dst has as many elements as there are degrees of freedom on the
-   * finer level.
+   * @name Transfer functions.
+   */
+  /** @{ */
+
+  /**
+   * Perform prolongation.
+   */
+  void
+  prolongate(const unsigned int to_level,
+             VectorType        &dst,
+             const VectorType  &src) const override;
+
+  /**
+   * Perform prolongation.
+   */
+  void
+  prolongate_and_add(const unsigned int to_level,
+                     VectorType        &dst,
+                     const VectorType  &src) const override;
+
+  /**
+   * Perform restriction.
    */
   virtual void
-  prolongate(
-    const unsigned int                                to_level,
-    LinearAlgebra::distributed::Vector<Number>       &dst,
-    const LinearAlgebra::distributed::Vector<Number> &src) const override;
-
-  virtual void
-  prolongate_and_add(
-    const unsigned int                                to_level,
-    LinearAlgebra::distributed::Vector<Number>       &dst,
-    const LinearAlgebra::distributed::Vector<Number> &src) const override;
+  restrict_and_add(const unsigned int from_level,
+                   VectorType        &dst,
+                   const VectorType  &src) const override;
 
   /**
-   * Restrict a vector from level <tt>from_level</tt> to level
-   * <tt>from_level-1</tt> using the transpose operation of the prolongate()
-   * method. If the region covered by cells on level <tt>from_level</tt> is
-   * smaller than that of level <tt>from_level-1</tt> (local refinement), then
-   * some degrees of freedom in <tt>dst</tt> are active and will not be
-   * altered. For the other degrees of freedom, the result of the restriction
-   * is added.
+   * Initialize internal vectors and copy @p src vector
+   * (associated to @p dof_handler) to the finest multigrid level.
    *
-   * @param from_level The index of the level to restrict from, which is the
-   * level of @p src.
-   *
-   * @param src is a vector with as many elements as there are degrees of
-   * freedom on the finer level involved.
-   *
-   * @param dst has as many elements as there are degrees of freedom on the
-   * coarser level.
+   * @note The @p dof_handler object needs to be the same as the DoFHandler passed
+   * directly to the function build() or indirectly to the function
+   * initialize_two_level_transfers(). Alternatively, the numbering of the DoFs
+   * need to be same.
    */
-  virtual void
-  restrict_and_add(
-    const unsigned int                                from_level,
-    LinearAlgebra::distributed::Vector<Number>       &dst,
-    const LinearAlgebra::distributed::Vector<Number> &src) const override;
+  template <class InVector>
+  void
+  copy_to_mg(const DoFHandler<dim>     &dof_handler,
+             MGLevelObject<VectorType> &dst,
+             const InVector            &src) const;
 
   /**
-   * Interpolate fine-mesh field @p src to each multigrid level in
-   * @p dof_handler and store the result in @p dst. This function is different
-   * from restriction, where a weighted residual is
-   * transferred to a coarser level (transposition of prolongation matrix).
+   * Copy the values on the finest multigrid level to @p dst
+   * vector (associated to @p dof_handler).
+   *
+   * @note The @p dof_handler object needs to be the same as the DoFHandler passed
+   * directly to the function build() or indirectly to the function
+   * initialize_two_level_transfers(). Alternatively, the numbering of the DoFs
+   * need to be same.
+   */
+  template <class OutVector>
+  void
+  copy_from_mg(const DoFHandler<dim>           &dof_handler,
+               OutVector                       &dst,
+               const MGLevelObject<VectorType> &src) const;
+
+  /**
+   * Interpolate fine-mesh field @p src (associated to @p dof_handler)
+   * to each multigrid level and
+   * store the result in @p dst. This function is different from
+   * restriction, where a weighted residual is transferred to a coarser
+   * level (transposition of prolongation matrix).
    *
    * The argument @p dst has to be initialized with the correct size according
    * to the number of levels of the triangulation.
@@ -178,134 +1093,132 @@ public:
    * If an inner vector of @p dst is empty or has incorrect locally owned size,
    * it will be resized to locally relevant degrees of freedom on each level.
    *
-   * The use of this function is demonstrated in step-66.
+   * @note The @p dof_handler object needs to be the same as the DoFHandler passed
+   * directly to the function build() or indirectly to the function
+   * initialize_two_level_transfers(). Alternatively, the numbering of the DoFs
+   * need to be same.
    */
-  template <typename BlockVectorType2>
+  template <class InVector>
   void
-  interpolate_to_mg(
-    const DoFHandler<dim>                                     &dof_handler,
-    MGLevelObject<LinearAlgebra::distributed::Vector<Number>> &dst,
-    const BlockVectorType2                                    &src) const;
+  interpolate_to_mg(const DoFHandler<dim>     &dof_handler,
+                    MGLevelObject<VectorType> &dst,
+                    const InVector            &src) const;
 
   /**
-   * Memory used by this object.
+   * Interpolate fine-mesh field @p src to each multigrid level and
+   * store the result in @p dst.
+   *
+   * @note In contrast to the last function, no @p dof_handler object needs passed.
+   * This function used the DoFHandler passed directly to the function build()
+   * or indirectly to the function initialize_two_level_transfers().
+   */
+  template <class InVector>
+  void
+  interpolate_to_mg(MGLevelObject<VectorType> &dst, const InVector &src) const;
+
+  /** @} */
+
+  /**
+   * @name Utility functions.
+   */
+  /** @{ */
+
+  /**
+   * Return the memory consumption of the allocated memory in this class.
+   *
+   * @note Counts also the memory consumption of the underlying two-level
+   *   transfer operators.
    */
   std::size_t
   memory_consumption() const;
 
+  /**
+   * Minimum level.
+   */
+  unsigned int
+  min_level() const;
+
+  /**
+   * Maximum level.
+   */
+  unsigned int
+  max_level() const;
+
+  /**
+   * Clear all data fields and brings the class into a condition similar
+   * to after having called the default constructor.
+   */
+  void
+  clear();
+
+  /** @} */
+
 private:
   /**
-   * A variable storing the degree of the finite element contained in the
-   * DoFHandler passed to build(). The selection of the computational kernel is
-   * based on this number.
+   * Initial internal transfer operator for local smoothing.
    */
-  unsigned int fe_degree;
-
-  /**
-   * A variable storing whether the element is continuous and there is a joint
-   * degree of freedom in the center of the 1d line.
-   */
-  bool element_is_continuous;
-
-  /**
-   * A variable storing the number of components in the finite element contained
-   * in the DoFHandler passed to build().
-   */
-  unsigned int n_components;
-
-  /**
-   * A variable storing the number of degrees of freedom on all child cells. It
-   * is <tt>2<sup>dim</sup>*fe.n_dofs_per_cell()</tt> for DG elements and
-   * somewhat less for continuous elements.
-   */
-  unsigned int n_child_cell_dofs;
-
-  /**
-   * This variable holds the indices for cells on a given level, extracted from
-   * DoFHandler for fast access. All DoF indices on a given level are stored as
-   * a plain array (since this class assumes constant DoFs per cell). To index
-   * into this array, use the cell number times dofs_per_cell.
-   *
-   * This array first is arranged such that all locally owned level cells come
-   * first (found in the variable n_owned_level_cells) and then other cells
-   * necessary for the transfer to the next level.
-   */
-  std::vector<std::vector<unsigned int>> level_dof_indices;
-
-  /**
-   * A variable storing the connectivity from parent to child cell numbers for
-   * each level.
-   */
-  std::vector<std::vector<std::pair<unsigned int, unsigned int>>>
-    parent_child_connect;
-
-  /**
-   * A variable storing the number of cells owned on a given process (sets the
-   * bounds for the worker loops) for each level.
-   */
-  std::vector<unsigned int> n_owned_level_cells;
-
-  /**
-   * This variable holds the one-dimensional embedding (prolongation) matrix
-   * from parent element to all the children.
-   */
-  AlignedVector<VectorizedArray<Number>> prolongation_matrix_1d;
-
-  /**
-   * This variable holds the temporary values for the tensor evaluation
-   */
-  mutable AlignedVector<VectorizedArray<Number>> evaluation_data;
-
-  /**
-   * For continuous elements, restriction is not additive and we need to
-   * weight the result at the end of prolongation (and at the start of
-   * restriction) by the valence of the degrees of freedom, i.e., on how many
-   * elements they appear. We store the data in vectorized form to allow for
-   * cheap access. Moreover, we utilize the fact that we only need to store
-   * <tt>3<sup>dim</sup></tt> indices.
-   *
-   * Data is organized in terms of each level (outer vector) and the cells on
-   * each level (inner vector).
-   */
-  std::vector<AlignedVector<VectorizedArray<Number>>> weights_on_refined;
-
-  /**
-   * A variable storing the local indices of Dirichlet boundary conditions on
-   * cells for all levels (outer index), the cells within the levels (second
-   * index), and the indices on the cell (inner index).
-   */
-  std::vector<std::vector<std::vector<unsigned short>>> dirichlet_indices;
-
-  /**
-   * A vector that holds shared pointers to the partitioners of the
-   * transfer. These partitioners might be shared with what was passed in from
-   * the outside through build() or be shared with the level vectors inherited
-   * from MGLevelGlobalTransfer.
-   */
-  MGLevelObject<std::shared_ptr<const Utilities::MPI::Partitioner>>
-    vector_partitioners;
-
-  /**
-   * Perform the prolongation operation.
-   */
-  template <int degree>
   void
-  do_prolongate_add(
-    const unsigned int                                to_level,
-    LinearAlgebra::distributed::Vector<Number>       &dst,
-    const LinearAlgebra::distributed::Vector<Number> &src) const;
+  initialize_internal_transfer(
+    const DoFHandler<dim>                          &dof_handler,
+    const ObserverPointer<const MGConstrainedDoFs> &mg_constrained_dofs);
 
   /**
-   * Performs the restriction operation.
+   * Retrieve finest DoFHandler from two-level transfer objects.
    */
-  template <int degree>
+  std::pair<const DoFHandler<dim> *, unsigned int>
+  get_dof_handler_fine() const;
+
+  /**
+   * Initialize copy indices for MGTransferMatrixFree::copy_to_mg(),
+   * MGTransferMatrixFree::copy_to_mg(), and
+   * MGTransferMatrixFree::interpolate_to_mg() in the case of global coarsening.
+   */
   void
-  do_restrict_add(const unsigned int                                from_level,
-                  LinearAlgebra::distributed::Vector<Number>       &dst,
-                  const LinearAlgebra::distributed::Vector<Number> &src) const;
+  fill_and_communicate_copy_indices_global_coarsening(
+    const DoFHandler<dim> &dof_handler);
+
+  /**
+   * Set references to two-level transfer operators to be used.
+   */
+  template <typename MGTwoLevelTransferObject>
+  void
+  initialize_transfer_references(
+    const MGLevelObject<MGTwoLevelTransferObject> &transfer);
+
+  /**
+   * Function to initialize internal level vectors.
+   */
+  template <class InVector>
+  void
+  initialize_dof_vector(const unsigned int level,
+                        VectorType        &vector,
+                        const InVector    &vector_reference,
+                        const bool         omit_zeroing_entries) const;
+
+  /**
+   * Check that the internal DoFHandler is compatible with the external one
+   * provided by copy_to_mg(), copy_from_mg() and interpolate_to_mg()
+   * used, e.g., by PreconditionMG.
+   */
+  void
+  assert_dof_handler(const DoFHandler<dim> &dof_handler_out) const;
+
+  /**
+   * Internal transfer operator for local smoothing.
+   */
+  MGLevelObject<MGTwoLevelTransfer<dim, VectorType>> internal_transfer;
+
+  /**
+   * Collection of the two-level transfer operators.
+   */
+  MGLevelObject<ObserverPointer<MGTwoLevelTransferBase<VectorType>>> transfer;
+
+  /**
+   * External partitioners used during initialize_dof_vector().
+   */
+  std::vector<std::shared_ptr<const Utilities::MPI::Partitioner>>
+    external_partitioners;
 };
-
-
 
 /**
  * Base class of MGTransferBlockMatrixFree. While MGTransferBlockMatrixFree
@@ -317,7 +1230,7 @@ class MGTransferBlockMatrixFreeBase
   : public MGTransferBase<LinearAlgebra::distributed::BlockVector<Number>>
 {
 public:
-  MGTransferBlockMatrixFreeBase(const bool same_for_all)
+  explicit MGTransferBlockMatrixFreeBase(const bool same_for_all)
     : same_for_all(same_for_all)
   {}
 
@@ -441,8 +1354,6 @@ protected:
   const bool same_for_all;
 };
 
-
-
 /**
  * Implementation of the MGTransferBase interface for which the transfer
  * operations is implemented in a matrix-free way based on the interpolation
@@ -458,11 +1369,19 @@ protected:
  */
 template <int dim, typename Number>
 class MGTransferBlockMatrixFree
-  : public MGTransferBlockMatrixFreeBase<dim,
-                                         Number,
-                                         MGTransferMatrixFree<dim, Number>>
+  : public MGTransferBlockMatrixFreeBase<
+      dim,
+      Number,
+      MGTransferMatrixFree<dim, Number, ::dealii::MemorySpace::Host>>
 {
 public:
+  /**
+   * Constructor.
+   */
+  MGTransferBlockMatrixFree(
+    const MGTransferMatrixFree<dim, Number, ::dealii::MemorySpace::Host>
+      &transfer_operator);
+
   /**
    * Constructor without constraint matrices. Use this constructor only with
    * discontinuous finite elements or with no local refinement.
@@ -482,11 +1401,6 @@ public:
     const std::vector<MGConstrainedDoFs> &mg_constrained_dofs);
 
   /**
-   * Destructor.
-   */
-  virtual ~MGTransferBlockMatrixFree() override = default;
-
-  /**
    * Initialize the constraints to be used in build().
    */
   void
@@ -500,12 +1414,6 @@ public:
     const std::vector<MGConstrainedDoFs> &mg_constrained_dofs);
 
   /**
-   * Reset the object to the state it had right after the default constructor.
-   */
-  void
-  clear();
-
-  /**
    * Actually build the information for the prolongation for each level.
    */
   void
@@ -517,123 +1425,323 @@ public:
   void
   build(const std::vector<const DoFHandler<dim> *> &dof_handler);
 
-  /**
-   * Memory used by this object.
-   */
-  std::size_t
-  memory_consumption() const;
-
 protected:
-  const MGTransferMatrixFree<dim, Number> &
+  const MGTransferMatrixFree<dim, Number, ::dealii::MemorySpace::Host> &
   get_matrix_free_transfer(const unsigned int b) const override;
 
 private:
   /**
-   * Non-block matrix-free versions of transfer operation.
+   * Internal non-block version of transfer operation.
    */
-  std::vector<MGTransferMatrixFree<dim, Number>> matrix_free_transfer_vector;
+  std::vector<MGTransferMatrixFree<dim, Number, ::dealii::MemorySpace::Host>>
+    transfer_operators_internal;
+
+  /**
+   * Non-block version of transfer operation.
+   */
+  std::vector<ObserverPointer<
+    const MGTransferMatrixFree<dim, Number, ::dealii::MemorySpace::Host>>>
+    transfer_operators;
 };
 
 
 /** @} */
 
-
-//------------------------ templated functions -------------------------
 #ifndef DOXYGEN
 
+/* ----------------------- Inline functions --------------------------------- */
 
-template <int dim, typename Number>
-template <typename BlockVectorType2>
-void
-MGTransferMatrixFree<dim, Number>::interpolate_to_mg(
-  const DoFHandler<dim>                                     &dof_handler,
-  MGLevelObject<LinearAlgebra::distributed::Vector<Number>> &dst,
-  const BlockVectorType2                                    &src) const
+
+
+template <int dim, typename Number, typename MemorySpace>
+template <typename MGTwoLevelTransferObject>
+MGTransferMatrixFree<dim, Number, MemorySpace>::MGTransferMatrixFree(
+  const MGLevelObject<MGTwoLevelTransferObject> &transfer,
+  const std::function<void(const unsigned int, VectorType &)>
+    &initialize_dof_vector)
 {
-  const unsigned int min_level = dst.min_level();
-  const unsigned int max_level = dst.max_level();
+  this->transfer.clear();
+  this->internal_transfer.clear();
 
-  Assert(max_level == dof_handler.get_triangulation().n_global_levels() - 1,
-         ExcDimensionMismatch(
-           max_level, dof_handler.get_triangulation().n_global_levels() - 1));
+  this->initialize_transfer_references(transfer);
+  this->build(initialize_dof_vector);
+}
 
-  const auto &fe = dof_handler.get_fe();
 
-  for (unsigned int level = min_level; level <= max_level; ++level)
-    if (dst[level].size() != dof_handler.n_dofs(level) ||
-        dst[level].locally_owned_size() !=
-          dof_handler.locally_owned_mg_dofs(level).n_elements())
-      dst[level].reinit(this->vector_partitioners[level]);
 
-  // copy fine level vector to active cells in MG hierarchy
-  this->copy_to_mg(dof_handler, dst, src, true);
+template <int dim, typename Number, typename MemorySpace>
+template <typename MGTwoLevelTransferObject>
+void
+MGTransferMatrixFree<dim, Number, MemorySpace>::initialize_two_level_transfers(
+  const MGLevelObject<MGTwoLevelTransferObject> &transfer)
+{
+  this->initialize_transfer_references(transfer);
+}
 
-  // FIXME: maybe need to store hanging nodes constraints per level?
-  // MGConstrainedDoFs does NOT keep this info right now, only periodicity
-  // constraints...
 
-  // do the transfer from level to level-1:
-  dst[max_level].update_ghost_values();
 
-  for (unsigned int level = max_level; level > min_level; --level)
+template <int dim, typename Number, typename MemorySpace>
+template <typename MGTwoLevelTransferObject>
+void
+MGTransferMatrixFree<dim, Number, MemorySpace>::initialize_transfer_references(
+  const MGLevelObject<MGTwoLevelTransferObject> &transfer)
+{
+  const unsigned int min_level = transfer.min_level();
+  const unsigned int max_level = transfer.max_level();
+
+  this->transfer.resize(min_level, max_level);
+
+  // Note that transfer[min_level] is empty and never used:
+  for (unsigned int l = min_level + 1; l <= max_level; ++l)
+    this->transfer[l] = &const_cast<MGTwoLevelTransferBase<VectorType> &>(
+      static_cast<const MGTwoLevelTransferBase<VectorType> &>(
+        Utilities::get_underlying_value(transfer[l])));
+}
+
+
+
+template <int dim, typename Number, typename MemorySpace>
+template <class InVector>
+void
+MGTransferMatrixFree<dim, Number, MemorySpace>::initialize_dof_vector(
+  const unsigned int level,
+  VectorType        &vec,
+  const InVector    &vec_reference,
+  const bool         omit_zeroing_entries) const
+{
+  std::shared_ptr<const Utilities::MPI::Partitioner> partitioner;
+
+  if (external_partitioners.empty())
     {
-      // auxiliary vector which always has ghost elements
-      const LinearAlgebra::distributed::Vector<Number> *input = nullptr;
-      LinearAlgebra::distributed::Vector<Number>        ghosted_fine;
-      if (dst[level].get_partitioner().get() ==
-          this->vector_partitioners[level].get())
-        input = &dst[level];
-      else
-        {
-          ghosted_fine.reinit(this->vector_partitioners[level]);
-          ghosted_fine.copy_locally_owned_data_from(dst[level]);
-          ghosted_fine.update_ghost_values();
-          input = &ghosted_fine;
-        }
+      partitioner = vec_reference.get_partitioner();
+    }
+  else
+    {
+      Assert(transfer.min_level() <= level && level <= transfer.max_level(),
+             ExcInternalError());
 
-      std::vector<Number> dof_values_coarse(fe.n_dofs_per_cell());
-      Vector<Number>      dof_values_fine(fe.n_dofs_per_cell());
-      Vector<Number>      tmp(fe.n_dofs_per_cell());
-      std::vector<types::global_dof_index> dof_indices(fe.n_dofs_per_cell());
-      for (const auto &cell : dof_handler.cell_iterators_on_level(level - 1))
-        if (cell->is_locally_owned_on_level())
-          {
-            // if we get to a cell without children (== active), we can
-            // skip it as there values should be already set by the
-            // equivalent of copy_to_mg()
-            if (cell->is_active())
-              continue;
-
-            std::fill(dof_values_coarse.begin(), dof_values_coarse.end(), 0.);
-            for (unsigned int child = 0; child < cell->n_children(); ++child)
-              {
-                cell->child(child)->get_mg_dof_indices(dof_indices);
-
-                internal::MGTransfer::resolve_identity_constraints(
-                  this->mg_constrained_dofs, level, dof_indices);
-
-                for (unsigned int i = 0; i < fe.n_dofs_per_cell(); ++i)
-                  dof_values_fine(i) = (*input)(dof_indices[i]);
-                fe.get_restriction_matrix(child, cell->refinement_case())
-                  .vmult(tmp, dof_values_fine);
-                for (unsigned int i = 0; i < fe.n_dofs_per_cell(); ++i)
-                  if (fe.restriction_is_additive(i))
-                    dof_values_coarse[i] += tmp[i];
-                  else if (tmp(i) != 0.)
-                    dof_values_coarse[i] = tmp[i];
-              }
-            cell->get_mg_dof_indices(dof_indices);
-            for (unsigned int i = 0; i < fe.n_dofs_per_cell(); ++i)
-              if (dof_handler.locally_owned_mg_dofs(level - 1).is_element(
-                    dof_indices[i]))
-                dst[level - 1](dof_indices[i]) = dof_values_coarse[i];
-          }
-
-      dst[level - 1].update_ghost_values();
+      partitioner = external_partitioners[level - transfer.min_level()];
     }
 
+  // check if vectors are already correctly initialized
+
+  // yes: same partitioners are used
+  if (vec.get_partitioner().get() == partitioner.get())
+    {
+      if (omit_zeroing_entries == false)
+        vec = 0;
+      return; // nothing to do
+    }
+
+  // yes: vectors are compatible
+  if (vec.size() == partitioner->size() &&
+      vec.locally_owned_size() == partitioner->locally_owned_size())
+    {
+      if (omit_zeroing_entries == false)
+        vec = 0;
+      return; // nothing to do
+    }
+
+  // no
+  vec.reinit(partitioner, omit_zeroing_entries);
+}
+
+
+
+template <int dim, typename Number, typename MemorySpace>
+template <class InVector>
+void
+MGTransferMatrixFree<dim, Number, MemorySpace>::copy_to_mg(
+  const DoFHandler<dim>     &dof_handler,
+  MGLevelObject<VectorType> &dst,
+  const InVector            &src) const
+{
+  assert_dof_handler(dof_handler);
+
+  for (unsigned int level = dst.min_level(); level <= dst.max_level(); ++level)
+    {
+      const bool zero_out_values =
+        (this->perform_plain_copy == false &&
+         this->perform_renumbered_plain_copy == false) ||
+        level != dst.max_level();
+
+      this->initialize_dof_vector(level, dst[level], src, !zero_out_values);
+    }
+
+  if (this->perform_plain_copy)
+    {
+      dst[dst.max_level()].copy_locally_owned_data_from(src);
+    }
+  else if (this->perform_renumbered_plain_copy)
+    {
+      auto &dst_level = dst[dst.max_level()];
+
+      for (unsigned int i = 0; i < this->copy_indices.back().n_cols(); ++i)
+        dst_level.local_element(this->copy_indices.back()(1, i)) =
+          src.local_element(i);
+    }
+  else
+    {
+      this->ghosted_global_vector = src;
+      this->ghosted_global_vector.update_ghost_values();
+
+      for (unsigned int l = dst.max_level() + 1; l != dst.min_level();)
+        {
+          --l;
+
+          auto &dst_level = dst[l];
+
+          const auto copy_unknowns = [&](const auto &indices) {
+            for (unsigned int i = 0; i < indices.n_cols(); ++i)
+              dst_level.local_element(indices(1, i)) =
+                this->ghosted_global_vector.local_element(indices(0, i));
+          };
+
+          copy_unknowns(this->copy_indices[l]);
+          copy_unknowns(this->copy_indices_level_mine[l]);
+
+          dst_level.compress(VectorOperation::insert);
+        }
+    }
+}
+
+
+
+template <int dim, typename Number, typename MemorySpace>
+template <class OutVector>
+void
+MGTransferMatrixFree<dim, Number, MemorySpace>::copy_from_mg(
+  const DoFHandler<dim>           &dof_handler,
+  OutVector                       &dst,
+  const MGLevelObject<VectorType> &src) const
+{
+  assert_dof_handler(dof_handler);
+
+  if (this->perform_plain_copy)
+    {
+      dst.zero_out_ghost_values();
+      dst.copy_locally_owned_data_from(src[src.max_level()]);
+    }
+  else if (this->perform_renumbered_plain_copy)
+    {
+      const auto &src_level = src[src.max_level()];
+      dst.zero_out_ghost_values();
+      for (unsigned int i = 0; i < this->copy_indices.back().n_cols(); ++i)
+        dst.local_element(i) =
+          src_level.local_element(this->copy_indices.back()(1, i));
+    }
+  else
+    {
+      dst = 0;
+      for (unsigned int l = src.min_level(); l <= src.max_level(); ++l)
+        {
+          auto &ghosted_vector = this->ghosted_level_vector[l];
+
+          if (this->ghosted_level_vector[l].size() > 0)
+            ghosted_vector = src[l];
+
+          const auto *const ghosted_vector_ptr =
+            (this->ghosted_level_vector[l].size() > 0) ? &ghosted_vector :
+                                                         &src[l];
+
+          ghosted_vector_ptr->update_ghost_values();
+
+          const auto copy_unknowns = [&](const auto &indices) {
+            for (unsigned int i = 0; i < indices.n_cols(); ++i)
+              dst.local_element(indices(0, i)) =
+                ghosted_vector_ptr->local_element(indices(1, i));
+          };
+
+          copy_unknowns(this->copy_indices[l]);
+          copy_unknowns(this->copy_indices_global_mine[l]);
+        }
+      dst.compress(VectorOperation::insert);
+    }
+}
+
+
+
+template <int dim, typename Number, typename MemorySpace>
+template <class InVector>
+void
+MGTransferMatrixFree<dim, Number, MemorySpace>::interpolate_to_mg(
+  MGLevelObject<VectorType> &dst,
+  const InVector            &src) const
+{
+  DoFHandler<dim> dof_handler_dummy;
+
+  this->interpolate_to_mg(dof_handler_dummy, dst, src);
+}
+
+
+
+template <int dim, typename Number, typename MemorySpace>
+template <class InVector>
+void
+MGTransferMatrixFree<dim, Number, MemorySpace>::interpolate_to_mg(
+  const DoFHandler<dim>     &dof_handler,
+  MGLevelObject<VectorType> &dst,
+  const InVector            &src) const
+{
+  assert_dof_handler(dof_handler);
+
+  const unsigned int min_level = dst.min_level();
+  const unsigned int max_level = transfer.max_level();
+
+  AssertDimension(max_level, dst.max_level());
+
   for (unsigned int level = min_level; level <= max_level; ++level)
-    dst[level].zero_out_ghost_values();
+    {
+      const bool zero_out_values = false;
+      this->initialize_dof_vector(level, dst[level], src, !zero_out_values);
+    }
+
+  if (this->perform_plain_copy)
+    {
+      dst[max_level].copy_locally_owned_data_from(src);
+
+      for (unsigned int l = max_level; l > min_level; --l)
+        this->transfer[l]->interpolate(dst[l - 1], dst[l]);
+    }
+  else if (this->perform_renumbered_plain_copy)
+    {
+      auto &dst_level = dst[max_level];
+
+      for (unsigned int i = 0; i < this->solution_copy_indices.back().n_cols();
+           ++i)
+        dst_level.local_element(this->solution_copy_indices.back()(1, i)) =
+          src.local_element(i);
+
+      for (unsigned int l = max_level; l > min_level; --l)
+        this->transfer[l]->interpolate(dst[l - 1], dst[l]);
+    }
+  else
+    {
+      this->solution_ghosted_global_vector = src;
+      this->solution_ghosted_global_vector.update_ghost_values();
+
+      for (unsigned int l = max_level + 1; l != min_level;)
+        {
+          --l;
+
+          auto &dst_level = dst[l];
+
+          const auto copy_unknowns = [&](const auto &indices) {
+            for (unsigned int i = 0; i < indices.n_cols(); ++i)
+              dst_level.local_element(indices(1, i)) =
+                this->solution_ghosted_global_vector.local_element(
+                  indices(0, i));
+          };
+
+          copy_unknowns(this->solution_copy_indices[l]);
+          copy_unknowns(this->solution_copy_indices_level_mine[l]);
+
+          dst_level.compress(VectorOperation::insert);
+
+          if (l != min_level)
+            this->transfer[l]->interpolate(dst[l - 1], dst[l]);
+        }
+    }
 }
 
 
@@ -756,10 +1864,7 @@ MGTransferBlockMatrixFreeBase<dim, Number, TransferType>::copy_from_mg(
     }
 }
 
-
-
-#endif // DOXYGEN
-
+#endif
 
 DEAL_II_NAMESPACE_CLOSE
 

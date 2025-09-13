@@ -16,6 +16,7 @@ Grant Agreement No. [812719].
 
 @dealiiTutorialDOI{10.5281/zenodo.10033975,https://zenodo.org/badge/DOI/10.5281/zenodo.10033975.svg}
 
+<a name="step_89-Intro"></a>
 <h1>Introduction</h1>
 
 This tutorial presents one way how to apply non-matching and/or Chimera methods
@@ -138,7 +139,7 @@ mortaring.
 
 <h4>%Point-to-point interpolation</h4>
 
-@image html https://www.dealii.org/images/steps/developer/step_89_intro_point_to_point.svg "" width=25%
+@image html https://dealii.org/images/steps/developer/step_89_intro_point_to_point.svg "" width=25%
 
 Point-to-point interpolation is a naive approach. Whenever you need to compute
 integrals over the boundary of the cell at the left, for a coupled problem you
@@ -153,7 +154,7 @@ cases.
 
 <h4>%Nitsche-type mortaring</h4>
 
-@image html https://www.dealii.org/images/steps/developer/step_89_intro_mortaring.svg "" width=25%
+@image html https://dealii.org/images/steps/developer/step_89_intro_mortaring.svg "" width=25%
 
 Mortaring is the process of computing intersections and is not related to the
 Mortar method which enforces the coupling via Lagrange multipliers. Instead, in

@@ -24,7 +24,7 @@ is working as expected, so we solved the problem on the whole domain,
 as shown below. @cite Bendse2004
 
 <div style="text-align:center;">
-  <img src="https://www.dealii.org/images/steps/developer/step-79.mbbgeometry.png"
+  <img src="https://dealii.org/images/steps/developer/step-79.mbbgeometry.png"
        alt="The MBB problem domain and boundary conditions">
 </div>
 
@@ -34,11 +34,11 @@ individual components of the solution look as follows:
 
 <div class="onecolumn" style="width: 80%; text-align: center;">
   <div>
-    <img src="https://www.dealii.org/images/steps/developer/step-79.filtereddensity.png"
+    <img src="https://dealii.org/images/steps/developer/step-79.filtereddensity.png"
          alt="Filtered Density Solution">
   </div>
   <div>
-    <img src="https://www.dealii.org/images/steps/developer/step-79.unfiltereddensity.png"
+    <img src="https://dealii.org/images/steps/developer/step-79.unfiltereddensity.png"
          alt="Unfiltered Density Solution">
   </div>
 </div>

@@ -6,14 +6,38 @@ eSSENCE of e-Science and the Swedish Research Council
 under grants 2014-6088 (Kreiss) and 2017-05038 (Massing).
 </i>
 
-<a name="step-85-Intro"></a>
+<a name="step_85-Intro"></a>
 <h1>Introduction</h1>
 
 <h3>The Cut Finite Element Method</h3>
 
-In this example, we show how to use the cut finite element method (CutFEM) in deal.II.
-For illustration, we want to solve the simplest possible problem,
-so we again consider Poisson's equation:
+In this example, we show how to use the cut finite element method
+(CutFEM) in deal.II. The CutFEM method is a way to deal with solving
+partial differential equations on geometries that do not lend
+themselves easily to being meshed. This is in contrast to nearly all
+of the previous tutorial programs in which we consider relatively
+simple geometries for which it is straightforward to generate a mesh,
+either using deal.II's built-in functions in namespace GridGenerator,
+or using external mesh generators such as those mentioned in step-49
+and then reading these programs' output using the GridIn class. But
+there are many applied problems where it is not straightforward to
+create a mesh: Think, for example, of wanting to simulate the air flow
+around a helicopter, where not only is the domain (the air)
+geometrically quite complex even if you truncate it at some finite
+distance from the helicopter, but it also changes with time as the
+rotor blades spin. How would we deal with such a situation? We could,
+in each time step, run a mesh generator that in all likelihood would
+produce a mesh with millions of cells given that it has to resolve all
+of the small details of the helicopter's and blades' geometry; but
+this is clearly going to be very expensive, and we would still have to
+figure out a way to transfer the solution from one mesh at one time
+step to a different mesh at the next time step. Or we could come up
+with a way where we can use the same mesh -- perhaps just a uniformly
+subdivided box -- for all time steps and describe boundary values on a
+surface that is "embedded" or "immersed" in this mesh in some way
+
+For illustration, let us consider solving the simplest possible problem,
+the Poisson's equation:
 @f{align*}{
   -\Delta u &= f \qquad && \text{in }\, \Omega,
   \\

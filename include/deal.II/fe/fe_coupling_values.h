@@ -414,7 +414,7 @@ namespace FEValuesViews
  * When computing the approximation of double integrals of the form
  *
  * \f[
- * \int_{T_1} \int{T_2} K(x_1, x_2) f(x_1) g(x_2) dT_1 dT_2,
+ * \int_{T_1} \int_{T_2} K(x_1, x_2) f(x_1) g(x_2) dT_1 dT_2,
  * \f]
  *
  * where $T_1$ and $T_2$ are two arbitrary sets (cells, faces, edges, or any
@@ -494,7 +494,7 @@ enum class QuadratureCouplingType
  * When computing the approximation of double integrals of the form
  *
  * \f[
- * \int_{T_1} \int{T_2} K(x_1, x_2) v_i(x_1) w_j(x_2) dT_1 dT_2,
+ * \int_{T_1} \int_{T_2} K(x_1, x_2) v_i(x_1) w_j(x_2) dT_1 dT_2,
  * \f]
  *
  * where $T_1$ and $T_2$ are two arbitrary sets (cells, faces, edges, or any
@@ -566,7 +566,7 @@ enum class DoFCouplingType
  * abstract operation:
  *
  * \f[
- * \int_{T_1} \int{T_2} K(x_1, x_2) \phi^1_i(x_1) \phi^2_j(x_2) dT_1 dT_2
+ * \int_{T_1} \int_{T_2} K(x_1, x_2) \phi^1_i(x_1) \phi^2_j(x_2) dT_1 dT_2
  * \f]
  *
  * for three different types of Kernels $K$:
@@ -583,7 +583,7 @@ enum class DoFCouplingType
  * For the first case, one may think that the only natural way to proceed is to
  * compute the double integral by simply nesting two loops:
  * \f[
- * \int_{T_1} \int{T_2} K(x_1, x_2) \phi^1_i(x_1) \phi^2_j(x_2) dT_1 dT_2
+ * \int_{T_1} \int_{T_2} K(x_1, x_2) \phi^1_i(x_1) \phi^2_j(x_2) dT_1 dT_2
  * \approx \sum_{q_1} \sum_{q_2} K(x_1^{q_1}, x_2^{q_2}) \phi^1_i(x_1^{q_1})
  * \phi^2_j(x_2^{q_2}) w_1^{q_1} w_2^{q_2},
  * \f]
@@ -604,7 +604,7 @@ enum class DoFCouplingType
  * approximate the integral as follows:
  *
  * \f[
- * \int_{T_1} \int{T_2} K(x_1, x_2) \phi^1_i(x_1) \phi^2_j(x_2) dT_1 dT_2
+ * \int_{T_1} \int_{T_2} K(x_1, x_2) \phi^1_i(x_1) \phi^2_j(x_2) dT_1 dT_2
  * \approx \sum_{i=1}^{N_q} K(x_1^{i}, x_2^{i}) \phi^1_i(x_1^{i})
  * \phi^2_j(x_2^{i}) w_1^{i} w_2^i,
  * \f]
@@ -639,8 +639,8 @@ enum class DoFCouplingType
  *
  * As an example usage of this class, consider the a bilinear form of the form:
  * \f[
- * \int_{T_1} \int{T_2} K_1(x_1, x_2) v_i(x_1) u_j(x_2) dT_1 dT_2 +
- * \int_{T_1} \int{T_2} K_2(x_1, x_2) p_i(x_1) q_j(x_2) dT_1 dT_2
+ * \int_{T_1} \int_{T_2} K_1(x_1, x_2) v_i(x_1) u_j(x_2) dT_1 dT_2 +
+ * \int_{T_1} \int_{T_2} K_2(x_1, x_2) p_i(x_1) q_j(x_2) dT_1 dT_2
  * \f]
  * where the finite dimensional space has two scalar components. We indicate
  * with $v_i$ and $p_i$ the trial functions, and with $u_j$ and

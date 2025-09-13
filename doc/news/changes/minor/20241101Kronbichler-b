@@ -1,6 +1,0 @@
-Improved: The orthogonalization done within SolverGMRES and SolverFGMRES for
-the deal.II vectors would previously lead to data access pattern that are
-unfriendly to data prefetchers on modern CPUs. This has been addressed by
-implementing a suitable loop blocking.
-<br>
-(Martin Kronbichler, 2024/11/01)

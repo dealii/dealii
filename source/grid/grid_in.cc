@@ -162,7 +162,7 @@ void
 GridIn<dim, spacedim>::read_vtk(std::istream &in)
 {
   std::string line;
-
+  std::string vtk_version;
   // verify that the third and fourth lines match
   // expectations. the first line is not checked to allow use of
   // different vtk versions and the second line of the file may
@@ -170,7 +170,7 @@ GridIn<dim, spacedim>::read_vtk(std::istream &in)
   // identify what's in there, so we just ensure that we can read it.
   {
     std::string text[4];
-    text[0] = "# vtk DataFile Version 3.0";
+    // text[0] will contain the version string after reading the preamble.
     text[1] = "****";
     text[2] = "ASCII";
     text[3] = "DATASET UNSTRUCTURED_GRID";
@@ -178,6 +178,9 @@ GridIn<dim, spacedim>::read_vtk(std::istream &in)
     for (unsigned int i = 0; i < 4; ++i)
       {
         getline(in, line);
+
+        if (i == 0)
+          text[0] = line;
         if (i == 2 || i == 3)
           AssertThrow(
             line.compare(text[i]) == 0,
@@ -186,7 +189,11 @@ GridIn<dim, spacedim>::read_vtk(std::istream &in)
                 "While reading VTK file, failed to find a header line with text <") +
               text[i] + ">"));
       }
+
+    // Get the version of the VTK file
+    vtk_version = text[0].substr(23, 3);
   }
+
 
   //-----------------Declaring storage and mappings------------------
 
@@ -226,8 +233,9 @@ GridIn<dim, spacedim>::read_vtk(std::istream &in)
 
   in >> keyword;
 
-  unsigned int n_geometric_objects = 0;
-  unsigned int n_ints;
+  unsigned int              n_geometric_objects = 0;
+  unsigned int              n_ints;
+  std::vector<unsigned int> n_points_per_cell;
 
   if (keyword == "CELLS")
     {
@@ -256,12 +264,89 @@ GridIn<dim, spacedim>::read_vtk(std::istream &in)
       in >> n_geometric_objects;
       in >> n_ints; // Ignore this, since we don't need it.
 
+      if (vtk_version == "5.1") // we need to store OFFSETS and CONNECTIVITY
+                                // arrays which exist in VTK 5.1 file formats
+        {
+          in >> keyword;
+
+          Assert(
+            keyword == "OFFSETS",
+            ExcMessage(
+              "While reading VTK file, failed to find OFFSETS array which must exist in a VTK file with version 5.1."));
+
+          // If VTK 3.0, n_geometric_objects = number of cells
+          // If VTK 5.1, n_geometric_objects = number of cells + 1
+          unsigned int n_offsets = n_geometric_objects;
+          std::string
+            vtktype; // vtktypeint64, vtktypeint32, etc...we do not need this
+
+          in >> vtktype;
+
+          // The OFFSETS array contains the indices in the CONNECTIVITY array
+          // where new cells start
+          unsigned int new_index = 0;
+          unsigned int old_index = 0;
+
+          // Now store how many vertices make up each cell
+          for (unsigned int p = 0; p < n_offsets; ++p)
+            {
+              unsigned int n_points_per_cell_tmp;
+
+              in >> new_index;
+
+              if (p == 0)
+                AssertThrow(
+                  new_index == 0,
+                  ExcMessage(
+                    "While reading VTK file, the first index in the OFFSETS array should be 0"));
+              else
+                {
+                  n_points_per_cell_tmp = new_index - old_index;
+                  n_points_per_cell.push_back(n_points_per_cell_tmp);
+                }
+              old_index = new_index;
+            }
+
+          AssertThrow(
+            n_points_per_cell.size() == cell_types.size(),
+            ExcMessage(
+              "The number of cells inferred from the OFFSETS array (" +
+              std::to_string(n_points_per_cell.size()) +
+              ") does not match the number of entries in the CELL_TYPES array (" +
+              std::to_string(cell_types.size()) + ")"));
+
+          // Now that we know how many points correspond to each cell, we can
+          // read the CONNECTIVITY array
+          in >> keyword;
+          AssertThrow(
+            keyword == "CONNECTIVITY",
+            ExcMessage(
+              "While reading VTK file, failed to find CONNECTIVITY array which must exist in a VTK file containing an OFFSETS array."));
+
+          in >>
+            vtktype; // vtktypeint64, vtktypeint32, etc...we do not need this
+
+          // Update n_geometric_objects to be the number of cells
+          n_geometric_objects = n_points_per_cell.size();
+        }
+
+
       if (dim == 3)
         {
           for (unsigned int count = 0; count < n_geometric_objects; ++count)
             {
               unsigned int n_vertices;
-              in >> n_vertices;
+
+              if (vtk_version == "3.0")
+                in >> n_vertices;
+              else if (vtk_version == "5.1") // If version 5.1, n_vertices is
+                                             // not given explicitly in the file
+                n_vertices = n_points_per_cell[count];
+              else
+                AssertThrow(
+                  false,
+                  ExcMessage(
+                    "Unknown VTK version encountered...Only VTK versions 3.0 and 5.1 are supported."));
 
               // VTK_TETRA is 10, VTK_HEXAHEDRON is 12
               if (cell_types[count] == 10 || cell_types[count] == 12)
@@ -330,7 +415,17 @@ GridIn<dim, spacedim>::read_vtk(std::istream &in)
           for (unsigned int count = 0; count < n_geometric_objects; ++count)
             {
               unsigned int n_vertices;
-              in >> n_vertices;
+
+              if (vtk_version == "3.0")
+                in >> n_vertices;
+              else if (vtk_version == "5.1") // If version 5.1, n_vertices is
+                                             // not given explicitly in the file
+                n_vertices = n_points_per_cell[count];
+              else
+                AssertThrow(
+                  false,
+                  ExcMessage(
+                    "Unknown VTK version encountered...Only VTK versions 3.0 and 5.1 are supported."));
 
               // VTK_TRIANGLE is 5, VTK_QUAD is 9
               if (cell_types[count] == 5 || cell_types[count] == 9)
@@ -346,8 +441,8 @@ GridIn<dim, spacedim>::read_vtk(std::istream &in)
                        j++) // loop to feed data
                     in >> cells.back().vertices[j];
 
-                  // Quadrilaterals need a permutation to go from VTK numbering
-                  // to deal numbering
+                  // Quadrilaterals need a permutation to go from VTK
+                  // numbering to deal numbering
                   if (cell_types[count] == 9)
                     {
                       // Like Hexahedra - the last two vertices need to be
@@ -361,8 +456,8 @@ GridIn<dim, spacedim>::read_vtk(std::istream &in)
               // VTK_LINE is 3
               else if (cell_types[count] == 3)
                 {
-                  // If this is encountered, the pointer comes out of the loop
-                  // and starts processing boundaries.
+                  // If this is encountered, the pointer comes out of the
+                  // loop and starts processing boundaries.
                   subcelldata.boundary_lines.emplace_back(n_vertices);
 
                   for (unsigned int j = 0; j < n_vertices;
@@ -385,16 +480,25 @@ GridIn<dim, spacedim>::read_vtk(std::istream &in)
         {
           for (unsigned int count = 0; count < n_geometric_objects; ++count)
             {
-              unsigned int type;
-              in >> type;
+              unsigned int n_vertices;
+              if (vtk_version == "3.0")
+                in >> n_vertices;
+              else if (vtk_version == "5.1") // If version 5.1, n_vertices is
+                                             // not given explicitly in the file
+                n_vertices = n_points_per_cell[count];
+              else
+                AssertThrow(
+                  false,
+                  ExcMessage(
+                    "Unknown VTK version encountered...Only VTK versions 3.0 and 5.1 are supported."));
 
               AssertThrow(
-                cell_types[count] == 3 && type == 2,
+                cell_types[count] == 3 && n_vertices == 2,
                 ExcMessage(
                   "While reading VTK file, unknown cell type encountered"));
-              cells.emplace_back(type);
+              cells.emplace_back(n_vertices);
 
-              for (unsigned int j = 0; j < type; ++j) // loop to feed data
+              for (unsigned int j = 0; j < n_vertices; ++j) // loop to feed data
                 in >> cells.back().vertices[j];
 
               cells.back().material_id = 0;
@@ -416,6 +520,7 @@ GridIn<dim, spacedim>::read_vtk(std::istream &in)
           keyword + "> instead.")));
 
       in >> n_ints;
+
       AssertThrow(
         n_ints == n_geometric_objects,
         ExcMessage("The VTK reader found a CELL_DATA statement "
@@ -489,6 +594,7 @@ GridIn<dim, spacedim>::read_vtk(std::istream &in)
                       // (the last number is optional)
                       std::string line;
                       std::getline(in, line);
+
                       AssertThrow(
                         line.substr(1,
                                     std::min(static_cast<std::size_t>(3),
@@ -4926,7 +5032,7 @@ namespace
   Abaqus_to_UCD<dim, spacedim>::write_out_avs_ucd(std::ostream &output) const
   {
     // References:
-    // http://www.dealii.org/developer/doxygen/deal.II/structGeometryInfo.html
+    // http://dealii.org/developer/doxygen/deal.II/structGeometryInfo.html
     // http://people.scs.fsu.edu/~burkardt/data/ucd/ucd.html
 
     AssertThrow(output.fail() == false, ExcIO());

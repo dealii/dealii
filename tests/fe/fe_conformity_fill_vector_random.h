@@ -12,7 +12,8 @@
 //
 // ------------------------------------------------------------------------
 
-#pragma once
+#ifndef dealii_tests_fe_conformity_fill_vector_random_h
+#define dealii_tests_fe_conformity_fill_vector_random_h
 
 #include <deal.II/lac/vector.h>
 
@@ -84,3 +85,5 @@ namespace FEConforimityTest
       }
   }
 } // namespace FEConforimityTest
+
+#endif

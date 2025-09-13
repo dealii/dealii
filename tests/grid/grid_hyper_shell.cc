@@ -73,11 +73,6 @@ check(double r1, double r2, unsigned int n)
         {
           deallog << "Found " << dcv.distorted_cells.size()
                   << " distorted cells" << std::endl;
-
-          typename Triangulation<dim>::DistortedCellList subset =
-            GridTools::fix_up_distorted_child_cells(dcv, tria);
-          deallog << subset.distorted_cells.size()
-                  << " distorted cells remaining" << std::endl;
         }
     }
 

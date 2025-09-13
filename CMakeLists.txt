@@ -169,8 +169,10 @@ endif()
 
 # Now that we have collected information about the configuration
 # and the bundled directory, set up the compilation of the
-# library from the files in the source/ directory.
+# library from the files in the source/ directory, as well as the
+# C++20 module:
 add_subdirectory(source)
+add_subdirectory(module)
 
 # Then also set up installation and other targets.
 add_subdirectory(cmake/config)

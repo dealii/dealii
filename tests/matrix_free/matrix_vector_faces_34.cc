@@ -19,7 +19,6 @@
 // MeshWorker, gather_evaluate and integrate_scatter, go through all different
 // orientations), but for a system of equations and with local refinement
 
-#include <deal.II/base/function.h>
 
 #include <deal.II/fe/fe_dgq.h>
 #include <deal.II/fe/fe_system.h>

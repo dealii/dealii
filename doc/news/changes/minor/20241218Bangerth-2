@@ -1,6 +1,0 @@
-New: There are now functions
-FiniteElement::shape_function_belongs_to() that allow testing whether
-a given shape function corresponds to a vector component described by
-a FEValuesExtractors object.
-<br>
-(Wolfgang Bangerth, 2024/12/18)

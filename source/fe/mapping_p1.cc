@@ -83,9 +83,9 @@ MappingP1<dim, spacedim>::InternalData::memory_consumption() const
 {
   return (Mapping<dim, spacedim>::InternalDataBase::memory_consumption() +
           MemoryConsumption::memory_consumption(affine_component) +
-          MemoryConsumption::memory_consumption(linear_component) +
+          MemoryConsumption::memory_consumption(contravariant) +
           MemoryConsumption::memory_consumption(covariant) +
-          MemoryConsumption::memory_consumption(determinant) +
+          MemoryConsumption::memory_consumption(volume_element) +
           MemoryConsumption::memory_consumption(quadrature));
 }
 
@@ -202,9 +202,9 @@ MappingP1<dim, spacedim>::update_transformation(
   const InternalData                                         &data) const
 {
   data.affine_component = cell->vertex(0);
-  data.linear_component = compute_linear_transformation<dim, spacedim>(cell);
-  data.covariant        = data.linear_component.covariant_form();
-  data.determinant      = data.linear_component.determinant();
+  data.contravariant    = compute_linear_transformation<dim, spacedim>(cell);
+  data.covariant        = data.contravariant.covariant_form();
+  data.volume_element   = data.contravariant.determinant();
 }
 
 
@@ -221,7 +221,7 @@ MappingP1<dim, spacedim>::transform_quadrature_points(
   for (unsigned int i = 0; i < quadrature_points.size(); ++i)
     quadrature_points[i] =
       data.affine_component +
-      apply_transformation(data.linear_component,
+      apply_transformation(data.contravariant,
                            data.quadrature.point(offset + i));
 }
 
@@ -305,7 +305,7 @@ MappingP1<dim, spacedim>::maybe_update_jacobians(
     if (cell_similarity != CellSimilarity::translation)
       std::fill(output_data.jacobians.begin(),
                 output_data.jacobians.end(),
-                data.linear_component);
+                data.contravariant);
 }
 
 
@@ -357,7 +357,8 @@ MappingP1<dim, spacedim>::fill_fe_values(
     if (cell_similarity != CellSimilarity::translation)
       {
         for (unsigned int i = 0; i < output_data.JxW_values.size(); ++i)
-          output_data.JxW_values[i] = data.determinant * quadrature.weight(i);
+          output_data.JxW_values[i] =
+            data.volume_element * quadrature.weight(i);
       }
 
   maybe_update_jacobians(data, cell_similarity, output_data);
@@ -378,10 +379,10 @@ MappingP1<dim, spacedim>::fill_fe_values(
       Tensor<1, spacedim> normal;
       // avoid warnings by only computing cross products in supported dimensions
       if constexpr (dim == 1 && spacedim == 2)
-        normal = cross_product_2d(-data.linear_component.transpose()[0]);
+        normal = cross_product_2d(-data.contravariant.transpose()[0]);
       else if constexpr (dim == 2 && spacedim == 3)
         {
-          const auto transpose = data.linear_component.transpose();
+          const auto transpose = data.contravariant.transpose();
           normal               = cross_product_3d(transpose[0], transpose[1]);
         }
       else
@@ -570,15 +571,15 @@ MappingP1<dim, spacedim>::transform(
       case mapping_contravariant:
         {
           for (unsigned int i = 0; i < output.size(); ++i)
-            output[i] = apply_transformation(data.linear_component, input[i]);
+            output[i] = apply_transformation(data.contravariant, input[i]);
           return;
         }
       case mapping_piola:
         {
-          auto transformation = data.linear_component;
-          Assert(data.determinant > 0.0, ExcDivideByZero());
+          auto transformation = data.contravariant;
+          Assert(data.volume_element > 0.0, ExcDivideByZero());
           for (unsigned int d = 0; d < spacedim; ++d)
-            transformation[d] *= 1.0 / data.determinant;
+            transformation[d] *= 1.0 / data.volume_element;
           for (unsigned int i = 0; i < output.size(); ++i)
             output[i] = apply_transformation(transformation, input[i]);
           return;
@@ -652,7 +653,7 @@ MappingP1<dim, spacedim>::transform(
                    "update_contravariant_transformation"));
 
           for (unsigned int i = 0; i < output.size(); ++i)
-            output[i] = apply_transformation(data.linear_component, input[i]);
+            output[i] = apply_transformation(data.contravariant, input[i]);
           return;
         }
 
@@ -680,8 +681,7 @@ MappingP1<dim, spacedim>::transform(
           for (unsigned int i = 0; i < output.size(); ++i)
             {
               const DerivativeForm<1, spacedim, dim> A =
-                apply_transformation(data.linear_component,
-                                     transpose(input[i]));
+                apply_transformation(data.contravariant, transpose(input[i]));
               output[i] = apply_transformation(data.covariant, A.transpose());
             }
 
@@ -694,18 +694,12 @@ MappingP1<dim, spacedim>::transform(
                  typename FEValuesBase<dim>::ExcAccessToUninitializedField(
                    "update_contravariant_transformation"));
 
-          auto scaled_contravariant = data.linear_component;
-          for (unsigned int d = 0; d < spacedim; ++d)
-            scaled_contravariant[d] *= 1.0 / data.determinant;
           for (unsigned int i = 0; i < output.size(); ++i)
-            {
-              const DerivativeForm<1, spacedim, dim> A =
-                apply_transformation(data.covariant, input[i]);
-              const Tensor<2, spacedim> T =
-                apply_transformation(scaled_contravariant, A.transpose());
+            output[i] = internal::apply_piola_gradient(data.covariant,
+                                                       data.contravariant,
+                                                       data.volume_element,
+                                                       input[i]);
 
-              output[i] = transpose(T);
-            }
 
           return;
         }
@@ -778,7 +772,7 @@ MappingP1<dim, spacedim>::transform(
           for (unsigned int i = 0; i < output.size(); ++i)
             output[i] =
               internal::apply_contravariant_hessian(data.covariant,
-                                                    data.linear_component,
+                                                    data.contravariant,
                                                     input[i]);
 
           return;
@@ -808,8 +802,8 @@ MappingP1<dim, spacedim>::transform(
 
           for (unsigned int i = 0; i < output.size(); ++i)
             output[i] = internal::apply_piola_hessian(data.covariant,
-                                                      data.linear_component,
-                                                      data.determinant,
+                                                      data.contravariant,
+                                                      data.volume_element,
                                                       input[i]);
 
           return;
@@ -828,9 +822,9 @@ MappingP1<dim, spacedim>::transform_unit_to_real_cell(
   const typename Triangulation<dim, spacedim>::cell_iterator &cell,
   const Point<dim>                                           &p) const
 {
-  const DerivativeForm<1, dim, spacedim> linear_component =
+  const DerivativeForm<1, dim, spacedim> contravariant =
     compute_linear_transformation<dim, spacedim>(cell);
-  const Tensor<1, spacedim> sheared = apply_transformation(linear_component, p);
+  const Tensor<1, spacedim> sheared = apply_transformation(contravariant, p);
   return cell->vertex(0) + sheared;
 }
 
@@ -842,12 +836,12 @@ MappingP1<dim, spacedim>::transform_real_to_unit_cell(
   const typename Triangulation<dim, spacedim>::cell_iterator &cell,
   const Point<spacedim>                                      &p) const
 {
-  const DerivativeForm<1, spacedim, dim> linear_component =
+  const DerivativeForm<1, spacedim, dim> contravariant =
     compute_linear_transformation<dim, spacedim>(cell)
       .covariant_form()
       .transpose();
   const Tensor<1, spacedim> offset = cell->vertex(0);
-  return Point<dim>(apply_transformation(linear_component, p - offset));
+  return Point<dim>(apply_transformation(contravariant, p - offset));
 }
 
 
@@ -859,14 +853,14 @@ MappingP1<dim, spacedim>::transform_points_real_to_unit_cell(
   const ArrayView<const Point<spacedim>>                     &real_points,
   const ArrayView<Point<dim>>                                &unit_points) const
 {
-  const DerivativeForm<1, spacedim, dim> linear_component =
+  const DerivativeForm<1, spacedim, dim> contravariant =
     compute_linear_transformation<dim, spacedim>(cell)
       .covariant_form()
       .transpose();
   const Tensor<1, spacedim> offset = cell->vertex(0);
   for (unsigned int i = 0; i < real_points.size(); ++i)
-    unit_points[i] = Point<dim>(
-      apply_transformation(linear_component, real_points[i] - offset));
+    unit_points[i] =
+      Point<dim>(apply_transformation(contravariant, real_points[i] - offset));
 }
 
 

@@ -1,0 +1,4 @@
+Improved: MappingFEField now stores which DoFs are nonzero in each component,
+which makes subsequent calculations about 30-50\% faster.
+<br>
+(David Wells, 2025/07/14)

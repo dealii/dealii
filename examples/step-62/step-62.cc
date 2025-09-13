@@ -558,7 +558,7 @@ namespace step62
 
     // The density $\rho$ takes the following form
     // <img alt="Phononic superlattice cavity"
-    // src="https://www.dealii.org/images/steps/developer/step-62.04.svg"
+    // src="https://dealii.org/images/steps/developer/step-62.04.svg"
     // height="200" />
     // where the brown color represents material_a and the green color
     // represents material_b.
@@ -925,7 +925,7 @@ namespace step62
                                     // Note that the stiffness matrix is not
                                     // symmetric because of the PMLs. We use the
                                     // gradient function (see the
-                                    // [documentation](https://www.dealii.org/current/doxygen/deal.II/group__vector__valued.html))
+                                    // [documentation](https://dealii.org/current/doxygen/deal.II/group__vector__valued.html))
                                     // which is a <code>Tensor@<2,dim@></code>.
                                     // The matrix $G_{ij}$ consists of entries
                                     // @f[
@@ -1002,7 +1002,7 @@ namespace step62
       locally_owned_dofs, mpi_communicator);
 
     SolverControl                    solver_control;
-    PETScWrappers::SparseDirectMUMPS solver(solver_control, mpi_communicator);
+    PETScWrappers::SparseDirectMUMPS solver(solver_control);
     solver.solve(system_matrix, completely_distributed_solution, system_rhs);
 
     pcout << "   Solved in " << solver_control.last_step() << " iterations."

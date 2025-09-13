@@ -17,7 +17,6 @@
 // properly. There should only be a few different Jacobians also when there
 // are many cells as the weights should be identical
 
-#include <deal.II/base/function.h>
 #include <deal.II/base/utilities.h>
 
 #include <deal.II/dofs/dof_handler.h>

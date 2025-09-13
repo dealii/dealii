@@ -16,7 +16,6 @@
 // Test subsectioning within parameter acceptor itself
 
 #include <deal.II/base/parameter_acceptor.h>
-#include <deal.II/base/path_search.h>
 
 #include "../tests.h"
 

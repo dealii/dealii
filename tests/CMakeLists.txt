@@ -46,7 +46,7 @@ if(NOT DEFINED DEAL_II_HAVE_TESTS_DIRECTORY)
       )
   endif()
 
-  find_package(deal.II 9.5.0 REQUIRED HINTS ${DEAL_II_DIR})
+  find_package(deal.II 9.8.0 REQUIRED HINTS ${DEAL_II_DIR})
   deal_ii_initialize_cached_variables()
   project(TESTSUITE CXX)
   set(_options "-DDEAL_II_DIR=${DEAL_II_PATH}")

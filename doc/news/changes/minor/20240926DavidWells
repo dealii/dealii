@@ -1,4 +1,0 @@
-Improved: Added AlignedVector::insert(), which works the same way as
-std::vector::insert().
-<br>
-(David Wells, 2024/09/26)

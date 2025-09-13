@@ -1,0 +1,23 @@
+
+DEAL::Monitor called at t=0.00000 1.00000
+DEAL::Evaluating right hand side at t=0.00000 with y=1.00000
+DEAL::Evaluating right hand side at t=0.483000 with y=0.517000
+DEAL::Evaluating right hand side at t=0.981000 with y=0.505111
+DEAL::Evaluating right hand side at t=2.70000 with y=-4.43829
+DEAL::Reporting a recoverable error.
+DEAL::ARKODE did not succeed with the following error message:
+DEAL::
+--------------------------------------------------------
+An error occurred in line <0> of file <> in function
+    
+The violated condition was: 
+    
+Additional information: 
+    A user call-back function encountered a recoverable error, but the
+    underlying library that called the call-back did not manage to recover
+    from the error and aborted its operation.
+    
+    See the glossary entry on user call-back functions for more
+    information.
+--------------------------------------------------------
+

@@ -25,22 +25,22 @@ precise:
 
 <div class="twocolumn" style="width: 80%">
   <div>
-    <img src="https://www.dealii.org/images/steps/developer/step-58.re.png"
+    <img src="https://dealii.org/images/steps/developer/step-58.re.png"
          alt="Real part of the solution at t=0.242"
          width="400">
   </div>
   <div>
-    <img src="https://www.dealii.org/images/steps/developer/step-58.im.png"
+    <img src="https://dealii.org/images/steps/developer/step-58.im.png"
          alt="Imaginary part of the solution at t=0.242"
          width="400">
   </div>
   <div>
-    <img src="https://www.dealii.org/images/steps/developer/step-58.magnitude.png"
+    <img src="https://dealii.org/images/steps/developer/step-58.magnitude.png"
          alt="Amplitude of the solution at t=0.242"
          width="400">
   </div>
   <div>
-    <img src="https://www.dealii.org/images/steps/developer/step-58.phase.png"
+    <img src="https://dealii.org/images/steps/developer/step-58.phase.png"
          alt="Phase of the solution at t=0.242"
          width="400">
   </div>
@@ -91,7 +91,7 @@ The phase picture shown here clearly has some flaws:
 With these modifications, the phase plot now looks as follows:
 
 <p align="center">
-  <img src="https://www.dealii.org/images/steps/developer/step-58.phase-cyclic.png"
+  <img src="https://dealii.org/images/steps/developer/step-58.phase-cyclic.png"
          alt="Phase of the solution at t=0.242, with a cyclic color map"
          width="400">
 </p>
@@ -148,7 +148,7 @@ actually see the radiating waves that are easy to see at the beginning
 of the video.
 
 
-<a name="step-58-extensions"></a>
+@anchor step_58-Extensions
 <h3>Possibilities for extensions</h3>
 
 <h4> Better linear solvers </h4>

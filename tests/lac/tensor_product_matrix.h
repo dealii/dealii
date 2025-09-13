@@ -12,7 +12,8 @@
 //
 // ------------------------------------------------------------------------
 
-#pragma once
+#ifndef dealii_tests_tensor_produce_matrix_h
+#define dealii_tests_tensor_produce_matrix_h
 
 #include <deal.II/fe/fe_nothing.h>
 #include <deal.II/fe/fe_values.h>
@@ -130,3 +131,5 @@ namespace dealii
 
   } // namespace GridTools
 } // namespace dealii
+
+#endif

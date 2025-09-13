@@ -13,12 +13,12 @@
 // ------------------------------------------------------------------------
 
 
-// check that Tensor works on device
+// check that Tensor and SymmetricTensor work on device
 
 #include <deal.II/base/config.h>
 
-#include "deal.II/base/symmetric_tensor.h"
 #include <deal.II/base/exceptions.h>
+#include <deal.II/base/symmetric_tensor.h>
 
 #include <Kokkos_Core.hpp>
 
@@ -39,6 +39,25 @@ test_tensor()
   Assert(t1.norm() == 2.0, ExcInternalError());
 }
 
+DEAL_II_HOST_DEVICE
+void
+test_symmetric_tensor()
+{
+  constexpr const int dim = 2;
+
+  Tensor<2, dim> t1;
+  t1[0][0]                   = 1.0;
+  t1[0][1]                   = 1.0;
+  SymmetricTensor<2, dim> s1 = symmetrize(t1);
+  s1 *= 2.0;
+  Assert(s1[0][0] == 2.0, ExcInternalError());
+  Assert(abs(s1.norm() * s1.norm() - 6.0) < 1e-8, ExcInternalError());
+
+  SymmetricTensor<2, dim> s2 = s1;
+  Assert(s1[1][0] == s2[1][0], ExcInternalError());
+}
+
+
 class Functor
 {
 public:
@@ -46,6 +65,7 @@ public:
   operator()(const long n) const
   {
     test_tensor();
+    test_symmetric_tensor();
   }
 };
 

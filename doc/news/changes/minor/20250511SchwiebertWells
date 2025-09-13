@@ -1,6 +1,0 @@
-Improved: GridGenerator::convert_hypercube_to_simplex_mesh() can now split
-quadrilaterals into two triangles and hexahedra into six tetrahedra. These
-anisotropic splits are useful in contexts where it is important to add as few
-new elements as possible.
-<br>
-(Kyle Schwiebert, David Wells, 2025/05/11)

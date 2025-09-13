@@ -1,4 +1,4 @@
-<a name="step-25-Intro"></a> <h1>Introduction</h1>
+<a name="step_25-Intro"></a> <h1>Introduction</h1>
 
 This program grew out of a student project by Ivan Christov at Texas A&amp;M
 University. Most of the work for this program is by him.
@@ -199,8 +199,8 @@ linear systems, but it is also a slow one. Possibly better would be a solver
 that utilizes the symmetry, such as, for example, SymmLQ, which is also
 implemented in deal.II.
 
-This program uses a clever optimization over step-23 and @ref
-step_24 "step-24": If you read the above formulas closely, it becomes clear
+This program uses a clever optimization over step-23 and
+step-24: If you read the above formulas closely, it becomes clear
 that the velocity $V$ only ever appears in products with the mass matrix. In
 step-23 and step-24, we were, therefore, a bit
 wasteful: in each time step, we would solve a linear system with the mass

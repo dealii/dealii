@@ -1,0 +1,58 @@
+// ------------------------------------------------------------------------
+//
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2025 by the deal.II authors
+//
+// This file is part of the deal.II library.
+//
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
+//
+// ------------------------------------------------------------------------
+
+
+// It is very inefficient in the module system to have repeated
+// #includes in many module partition files because when you 'import'
+// those partitions, you also have to load everything they
+// #included. In other words, you get the same content *many times*,
+// once from each imported partition, rather than only once via the
+// old-style #include system. We deal with this by wrapping all of our
+// external packages into partitions that we can 'import' wherever we
+// need.
+
+// This is the file that wraps everything we need from VTK into one
+// module partition.
+
+
+module;
+
+#include <deal.II/base/config.h>
+
+#ifdef DEAL_II_WITH_MUPARSER
+#  include <muParser.h>
+#endif
+
+
+export module dealii.external.muparser;
+
+#ifdef DEAL_II_WITH_MUPARSER
+
+export
+{
+  namespace mu
+  {
+// bundled/muparser_v2_3_3/include/muParser.h declares its symbols in the dealii
+// namespace.
+#  ifdef DEAL_II_FEATURE_MUPARSER_BUNDLED_CONFIGURED
+    using ::dealii::mu::Parser;
+    using ::dealii::mu::ParserError;
+#  else
+    using ::mu::Parser;
+    using ::mu::ParserError;
+#  endif
+  } // namespace mu
+}
+
+#endif

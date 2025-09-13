@@ -1,4 +1,0 @@
-Improved: The deal_ii_invoke_autopilot CMake macro gained support for
-multi-configuration generators.
-<br>
-(Matthias Maier, 2024/10/12)

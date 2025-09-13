@@ -14,7 +14,7 @@ or Trilinos library installed. The installation of deal.II together with these a
 libraries is described in the <a href="../../readme.html" target="body">README</a> file.
 
 
-<a name="step-50-Intro"></a>
+<a name="step_50-Intro"></a>
 <h1>Introduction</h1>
 
 
@@ -75,16 +75,16 @@ to adaptively refine the mesh. (This is a generalization of the Kelly
 error estimator used in the KellyErrorEstimator class that drives mesh
 refinement in most of the other tutorial programs.)
 The following figure visualizes the solution and refinement for 2D:
-<img width="400px" src="https://www.dealii.org/images/steps/developer/step-50-2d-solution.png" alt="">
+<img width="400px" src="https://dealii.org/images/steps/developer/step-50-2d-solution.png" alt="">
 In 3D, the solution looks similar (see below). On the left you can see the solution and on the right we show a slice for $x$ close to the
 center of the domain showing the adaptively refined mesh.
 <table width="60%" align="center">
   <tr>
     <td align="center">
-      <img width="400px" src="https://www.dealii.org/images/steps/developer/step-50-3d-solution.png" alt="">
+      <img width="400px" src="https://dealii.org/images/steps/developer/step-50-3d-solution.png" alt="">
     </td>
     <td align="center">
-      <img width="400px" src="https://www.dealii.org/images/steps/developer/step-50-refinement.png" alt="">
+      <img width="400px" src="https://dealii.org/images/steps/developer/step-50-refinement.png" alt="">
     </td>
   </tr>
 </table>
@@ -122,7 +122,7 @@ of the active mesh; and the right image gives the multilevel hierarchy of cells.
 colors and numbers represent the different processors. The circular nodes in the tree
 are the non-active cells which are distributed using the "first-child rule".
 
-<img width="800px" src="https://www.dealii.org/images/steps/developer/step-50-workload-example.png" alt="">
+<img width="800px" src="https://dealii.org/images/steps/developer/step-50-workload-example.png" alt="">
 
 Included among the output to screen in this example is a value "Partition efficiency"
 given by one over MGTools::workload_imbalance(). This value, which will be denoted

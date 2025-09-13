@@ -1,5 +1,0 @@
-Changed: The configuration option DEAL_II_WITH_COMPLEX_VALUES that
-enables support for linear algebra classes to be used with std::complex
-is now disabled by default.
-<br>
-(Timo Heister, 2024/08/11)

@@ -20,7 +20,6 @@
 // somewhat related to the one in tests/grid/grid_tools_06.cc but with the
 // cubes patched together appropriately
 
-#include <deal.II/base/function.h>
 
 #include <deal.II/fe/fe_dgq.h>
 

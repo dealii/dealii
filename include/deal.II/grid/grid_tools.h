@@ -2064,41 +2064,6 @@ namespace GridTools
 
   /** @} */
   /**
-   * @name Dealing with distorted cells
-   */
-  /** @{ */
-
-  /**
-   * Given a triangulation and a list of cells whose children have become
-   * distorted as a result of mesh refinement, try to fix these cells up by
-   * moving the center node around.
-   *
-   * The function returns a list of cells with distorted children that
-   * couldn't be fixed up for whatever reason. The returned list is therefore
-   * a subset of the input argument.
-   *
-   * For a definition of the concept of distorted cells, see the
-   * @ref GlossDistorted "glossary entry".
-   * The first argument passed to the current function is typically the
-   * exception thrown by the Triangulation::execute_coarsening_and_refinement
-   * function.
-   *
-   * @deprecated This function predates deal.II's use of manifolds and use of
-   * cell-local transfinite interpolation to place new points and is no longer
-   * necessary. See Manifolds::get_default_points_and_weights() for more
-   * information.
-   */
-  template <int dim, int spacedim>
-  DEAL_II_DEPRECATED typename Triangulation<dim, spacedim>::DistortedCellList
-  fix_up_distorted_child_cells(
-    const typename Triangulation<dim, spacedim>::DistortedCellList
-                                 &distorted_cells,
-    Triangulation<dim, spacedim> &triangulation);
-
-
-
-  /** @} */
-  /**
    * @name Extracting and creating patches of cells
    *
    * These functions extract and create patches of cells surrounding a single
@@ -3081,19 +3046,6 @@ namespace GridTools
     const ArrayView<const unsigned int> view(
       indices, GeometryInfo<dim>::vertices_per_cell);
     return cell_measure(all_vertices, view);
-  }
-
-
-
-  // This specialization is defined here so that the general template in the
-  // source file doesn't need to have further 1d overloads for the internal
-  // functions it calls.
-  template <>
-  inline Triangulation<1, 1>::DistortedCellList
-  fix_up_distorted_child_cells(const Triangulation<1, 1>::DistortedCellList &,
-                               Triangulation<1, 1> &)
-  {
-    return {};
   }
 
 

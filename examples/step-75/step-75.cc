@@ -635,7 +635,7 @@ namespace Step75
   // The above function deals with the actual solution for a given sequence of
   // multigrid objects. This functions creates the actual multigrid levels, in
   // particular the operators, and the transfer operator as a
-  // MGTransferGlobalCoarsening object.
+  // MGTransferMatrixFree object.
   template <typename VectorType, typename OperatorType, int dim>
   void solve_with_gmg(SolverControl                    &solver_control,
                       const OperatorType               &system_matrix,
@@ -804,7 +804,7 @@ namespace Step75
                                   constraints[level + 1],
                                   constraints[level]);
 
-    MGTransferGlobalCoarsening<dim, VectorType> transfer(
+    MGTransferMatrixFree<dim, typename VectorType::value_type> transfer(
       transfers, [&](const auto l, auto &vec) {
         operators[l]->initialize_dof_vector(vec);
       });

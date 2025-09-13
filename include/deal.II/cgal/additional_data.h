@@ -21,6 +21,10 @@
 
 #ifdef DEAL_II_WITH_CGAL
 
+#  include <CGAL/version.h>
+#  if CGAL_VERSION_MAJOR >= 6
+#    include <CGAL/Installation/internal/disable_deprecation_warnings_and_errors.h>
+#  endif
 #  include <CGAL/Mesh_facet_topology.h>
 
 #  include <limits>

@@ -1,0 +1,178 @@
+// ------------------------------------------------------------------------
+//
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2025 by the deal.II authors
+//
+// This file is part of the deal.II library.
+//
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
+//
+// ------------------------------------------------------------------------
+
+
+// It is very inefficient in the module system to have repeated
+// #includes in many module partition files because when you 'import'
+// those partitions, you also have to load everything they
+// #included. In other words, you get the same content *many times*,
+// once from each imported partition, rather than only once via the
+// old-style #include system. We deal with this by wrapping all of our
+// external packages into partitions that we can 'import' wherever we
+// need.
+
+// This is the file that wraps everything we need from ADOL-C into one
+// module partition.
+
+
+module;
+
+#include <deal.II/base/config.h>
+
+#ifdef DEAL_II_WITH_OPENCASCADE
+// opencascade needs "HAVE_CONFIG_H" to be exported...
+#  define HAVE_CONFIG_H
+#  include <Adaptor3d_Curve.hxx>
+#  if !DEAL_II_OPENCASCADE_VERSION_GTE(7, 6, 0)
+#    include <Adaptor3d_HCurve.hxx>
+#  endif
+#  if !DEAL_II_OPENCASCADE_VERSION_GTE(7, 6, 0)
+#    include <BRepAdaptor_HCompCurve.hxx>
+#    include <BRepAdaptor_HCurve.hxx>
+#  endif
+#  if !DEAL_II_OPENCASCADE_VERSION_GTE(7, 0, 0)
+#    include <Handle_Adaptor3d_HCurve.hxx>
+#  endif
+#  if DEAL_II_OPENCASCADE_VERSION_GTE(7, 0, 0)
+#    include <Standard_Transient.hxx>
+#  else
+#    include <Handle_Standard_Transient.hxx>
+#  endif
+
+#  include <BRepAdaptor_Curve.hxx>
+#  if DEAL_II_OPENCASCADE_VERSION_GTE(7, 6, 0)
+#    include <BRepAlgoAPI_Section.hxx>
+#  else
+#    include <BRepAdaptor_HCompCurve.hxx>
+#    include <BRepAdaptor_HCurve.hxx>
+#    include <BRepAlgo_Section.hxx>
+#  endif
+#  include <BRepAdaptor_CompCurve.hxx>
+#  include <BRepAdaptor_Curve.hxx>
+#  include <BRepAdaptor_Surface.hxx>
+#  include <BRepBndLib.hxx>
+#  include <BRepBuilderAPI_MakeEdge.hxx>
+#  include <BRepBuilderAPI_Sewing.hxx>
+#  include <BRepBuilderAPI_Transform.hxx>
+#  include <BRepMesh_IncrementalMesh.hxx>
+#  include <BRepTools.hxx>
+#  include <BRep_Builder.hxx>
+#  include <BRep_Tool.hxx>
+#  include <GCPnts_AbscissaPoint.hxx>
+#  include <GeomAPI_Interpolate.hxx>
+#  include <GeomAPI_ProjectPointOnCurve.hxx>
+#  include <GeomAPI_ProjectPointOnSurf.hxx>
+#  include <GeomConvert_CompCurveToBSplineCurve.hxx>
+#  include <GeomLProp_SLProps.hxx>
+#  include <Geom_BoundedCurve.hxx>
+#  include <Geom_Plane.hxx>
+#  include <IFSelect_ReturnStatus.hxx>
+#  include <IGESControl_Controller.hxx>
+#  include <IGESControl_Reader.hxx>
+#  include <IGESControl_Writer.hxx>
+#  include <IntCurvesFace_ShapeIntersector.hxx>
+#  include <Poly_Triangulation.hxx>
+#  include <STEPControl_Controller.hxx>
+#  include <STEPControl_Reader.hxx>
+#  include <STEPControl_Writer.hxx>
+#  include <ShapeAnalysis_Curve.hxx>
+#  include <ShapeAnalysis_Surface.hxx>
+#  include <StlAPI_Reader.hxx>
+#  include <StlAPI_Writer.hxx>
+#  include <TColStd_HSequenceOfTransient.hxx>
+#  include <TColStd_SequenceOfTransient.hxx>
+#  include <TColgp_HArray1OfPnt.hxx>
+#  include <TopExp_Explorer.hxx>
+#  include <TopLoc_Location.hxx>
+#  include <TopoDS.hxx>
+#  include <TopoDS_CompSolid.hxx>
+#  include <TopoDS_Compound.hxx>
+#  include <TopoDS_Edge.hxx>
+#  include <TopoDS_Face.hxx>
+#  include <TopoDS_Shape.hxx>
+#  include <TopoDS_Shell.hxx>
+#  include <TopoDS_Solid.hxx>
+#  include <TopoDS_Vertex.hxx>
+#  include <TopoDS_Wire.hxx>
+#  include <gp_Lin.hxx>
+#  include <gp_Pnt.hxx>
+#  include <gp_Vec.hxx>
+#  undef HAVE_CONFIG_H
+#endif
+
+
+export module dealii.external.opencascade;
+
+#ifdef DEAL_II_WITH_OPENCASCADE
+
+export
+{
+  using ::BRep_Tool;
+  using ::BRepAdaptor_CompCurve;
+  using ::BRepAdaptor_Curve;
+  using ::BRepAdaptor_Surface;
+  using ::BRepAlgoAPI_Section;
+  using ::BRepBuilderAPI_MakeEdge;
+  using ::BRepBuilderAPI_Sewing;
+  using ::BRepBuilderAPI_Transform;
+  using ::BRepMesh_IncrementalMesh;
+  using ::BRepTools;
+  using ::Geom_BoundedCurve;
+  using ::Geom_BSplineCurve;
+  using ::Geom_Curve;
+  using ::Geom_Plane;
+  using ::Geom_Surface;
+  using ::GeomAPI_Interpolate;
+  using ::GeomAPI_ProjectPointOnCurve;
+  using ::GeomConvert_CompCurveToBSplineCurve;
+  using ::GeomLProp_SLProps;
+  using ::gp_Ax1;
+  using ::gp_Dir;
+  using ::gp_Lin;
+  using ::gp_Pnt;
+  using ::gp_Pnt2d;
+  using ::gp_Trsf;
+  using ::gp_Vec;
+  using ::Handle_Adaptor3d_Curve;
+  using ::Handle_Geom_BoundedCurve;
+  using ::IFSelect_PrintCount;
+  using ::IFSelect_ReturnStatus;
+  using ::IGESControl_Controller;
+  using ::IGESControl_Reader;
+  using ::IGESControl_Writer;
+  using ::IntCurvesFace_ShapeIntersector;
+  using ::Poly_Triangulation;
+  using ::ShapeAnalysis_Curve;
+  using ::ShapeAnalysis_Surface;
+  using ::STEPControl_Controller;
+  using ::STEPControl_Reader;
+  using ::STEPControl_Writer;
+  using ::StlAPI_Reader;
+  using ::StlAPI_Writer;
+  using ::TColgp_HArray1OfPnt;
+  using ::TopExp_Explorer;
+  using ::TopLoc_Location;
+  using ::TopoDS;
+  using ::TopoDS_Compound;
+  using ::TopoDS_CompSolid;
+  using ::TopoDS_Edge;
+  using ::TopoDS_Face;
+  using ::TopoDS_Shape;
+  using ::TopoDS_Shell;
+  using ::TopoDS_Solid;
+  using ::TopoDS_Vertex;
+  using ::TopoDS_Wire;
+}
+
+#endif

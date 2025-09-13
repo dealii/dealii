@@ -1,5 +1,0 @@
-Fixed: DoFTools::map_dofs_to_support_points() did not work when there
-were cells in the mesh that had no degrees of freedom (e.g., because
-the cell's finite element was FE_Nothing). This is now fixed.
-<br>
-(Davit Gyulamiryan, Wolfgang Bangerth, 2025/03/23)

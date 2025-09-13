@@ -10,7 +10,7 @@ Geodynamics initiative (CIG), through the National Science Foundation under
 Award No. EAR-1550901 and The University of California-Davis.
 </i>
 
-<a name="step-58-Intro"></a>
+<a name="step_58-Intro"></a>
 <h1>Introduction</h1>
 
 The <a
@@ -786,8 +786,8 @@ conjugation.
 
 Complex symmetry can be exploited for iterative solvers as a quick
 literature search indicates. We will here not try to become too
-sophisticated (and indeed leave this to the <a
-href="#extensions">Possibilities for extensions</a> section below) and
+sophisticated (and indeed leave this to the
+@ref step_58-Extensions "Possibilities for extensions" section below) and
 instead simply go with the good old standby for problems without
 properties: A direct solver. That's not optimal, especially for large
 problems, but it shall suffice for the purposes of a tutorial program.
@@ -856,7 +856,7 @@ form
 @f]
 This is not a realistic choice of boundary conditions but sufficient
 for what we want to demonstrate here. We will comment further on this
-in the <a href="#extensions">Possibilities for extensions</a> section below.
+in the @ref step_58-Extensions "Possibilities for extensions" section below.
 
 Finally, we choose $\kappa=1$, and the potential as
 @f[

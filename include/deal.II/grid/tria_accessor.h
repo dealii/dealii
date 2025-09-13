@@ -3760,7 +3760,7 @@ public:
    * Return the material id of this cell.
    *
    * For a typical use of this function, see the
-   * @ref step_28 "step-28"
+   * step-28
    * tutorial program.
    *
    * See the
@@ -3774,7 +3774,7 @@ public:
    * Set the material id of this cell.
    *
    * For a typical use of this function, see the
-   * @ref step_28 "step-28"
+   * step-28
    * tutorial program.
    *
    * See the

@@ -32,11 +32,12 @@
 #    include <deal.II/lac/solver_control.h>
 #    include <deal.II/lac/trilinos_tpetra_sparse_matrix.h>
 
+DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
 #    include <Amesos2.hpp>
 #    include <Teuchos_ConfigDefs.hpp>
 #    include <Teuchos_ParameterList.hpp>
 #    include <Teuchos_RCPDecl.hpp>
-
+DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
 
 DEAL_II_NAMESPACE_OPEN
 

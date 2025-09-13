@@ -163,7 +163,7 @@ dseupd_(int          *rvec,
  * get a single additional eigenvalue. But beware that some functions in
  * deal.II set these diagonals to rather arbitrary (from the point of view
  * of eigenvalue problems) values. See also
- * @ref step_36 "step-36"
+ * step-36
  * for an example.
  */
 class ArpackSolver : public EnableObserverPointer

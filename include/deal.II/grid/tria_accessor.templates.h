@@ -19,9 +19,7 @@
 
 #include <deal.II/grid/tria_accessor.h>
 
-#ifdef DEAL_II_EARLY_DEPRECATIONS
 DEAL_II_WARNING("This file is deprecated."
                 "Use deal.II/grid/tria_accessor.h instead.")
-#endif
 
 #endif

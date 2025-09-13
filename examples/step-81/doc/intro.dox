@@ -3,7 +3,7 @@
   and Matthias Maier (Texas A&M University).
 </i>
 
-<a name="step-81-Intro"></a>
+<a name="step_81-Intro"></a>
 
 <h1> Introduction </h1>
 
@@ -136,7 +136,7 @@ law</a>:
 
 @htmlonly
 <p align="center">
-  <img src="https://www.dealii.org/images/steps/developer/step-81-cartoon.png" alt="Visualization of Ohm's law and Ampère's law leading to a jump condition over the interface" height="200">
+  <img src="https://dealii.org/images/steps/developer/step-81-cartoon.png" alt="Visualization of Ohm's law and Ampère's law leading to a jump condition over the interface" height="200">
 </p>
 @endhtmlonly
 
@@ -403,7 +403,7 @@ $\mathbf{M}_a \equiv 0$ within the PML.
 
 @htmlonly
 <p align="center">
-  <img src = "https://www.dealii.org/images/steps/developer/step-81-PML.png">
+  <img src = "https://dealii.org/images/steps/developer/step-81-PML.png">
 </p>
 @endhtmlonly
 

@@ -38,6 +38,15 @@ if(NOT DEAL_II_WITH_KOKKOS)
   endif()
 endif()
 
+if(KOKKOS_VERSION VERSION_LESS 4.0.0 AND (Kokkos_ENABLE_CUDA OR Kokkos_ENABLE_HIP OR Kokkos_ENABLE_SYCL))
+  # In versions older than 4.0.0, we would need several workarounds if
+  # device support is enabled. So, to simplify our work, require a more
+  # modern version:
+  message(FATAL_ERROR "\n"
+    "We require Kokkos version 4.0.0 or newer to enable device support (CUDA/HIP/SYCL)."
+    )
+endif()
+
 #
 # Sanity check: Make sure we do not accidentally end up using bundled
 # Kokkos with Trilinos and PETSc built against an external Kokkos library.

@@ -1,3 +1,0 @@
-Fixed: FESystem now works correctly with cubic FE_SimplexP elements.
-<br>
-(David Wells, 2024/10/15)

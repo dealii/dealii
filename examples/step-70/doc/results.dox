@@ -265,7 +265,7 @@ tracer particles.
 
 <p align="center">
    <div class="img" align="center">
-      <img src="https://www.dealii.org/images/steps/developer/step-70.2d_tracing.gif"
+      <img src="https://dealii.org/images/steps/developer/step-70.2d_tracing.gif"
            alt = ""
            width="500">
     </div>
@@ -357,7 +357,7 @@ after one time unit of flow.
 
 <p align="center">
    <div class="img" align="center">
-      <img src="https://www.dealii.org/images/steps/developer/step-70.tracer_comparison.png"
+      <img src="https://dealii.org/images/steps/developer/step-70.tracer_comparison.png"
            alt = ""
            width="500">
     </div>

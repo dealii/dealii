@@ -17,7 +17,6 @@
 // this function tests the correctness of JxW values returned by FEEvaluation
 // when compared to FEValues
 
-#include <deal.II/base/function.h>
 
 #include <deal.II/dofs/dof_handler.h>
 #include <deal.II/dofs/dof_tools.h>

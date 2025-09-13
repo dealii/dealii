@@ -1,72 +1,85 @@
 <h1>Results</h1>
 
-Running the program with the default settings on a machine with 40 processes
-produces the following output:
+Running the program with the default settings on a machine with 24 processes
+in release mode and AVX2 vectorization produces the following output:
 
 @code
-Running with 40 MPI processes
-Vectorization over 8 doubles = 512 bits (AVX512)
-Number of degrees of freedom: 27.648.000 ( = 5 [vars] x 25.600 [cells] x 216 [dofs/cell/var] )
+Running with 24 MPI processes
+Vectorization over 4 doubles = 256 bits (AVX)
+Number of degrees of freedom: 230,400 ( = 4 [vars] x 1,600 [cells] x 36 [dofs/cell/var] )
 Time step size: 0.000295952, minimal h: 0.0075, initial transport scaling: 0.00441179
-Time:       0, dt:   0.0003, norm rho:  5.385e-16, rho * u:  1.916e-16, energy: 1.547e-15
-+--------------------------------------+------------------+------------+------------------+
-| Total wallclock time elapsed         |     17.52s    10 |     17.52s |     17.52s    11 |
-|                                      |                  |                               |
-| Section                  | no. calls |   min time  rank |   avg time |   max time  rank |
-+--------------------------------------+------------------+------------+------------------+
-| compute errors           |         1 |  0.009594s    16 |  0.009705s |  0.009819s     8 |
-| compute transport speed  |        22 |    0.1366s     0 |    0.1367s |    0.1368s    18 |
-| output                   |         1 |     1.233s     0 |     1.233s |     1.233s    32 |
-| rk time stepping total   |       100 |     8.746s    35 |     8.746s |     8.746s     0 |
-| rk_stage - integrals L_h |       500 |     8.742s    36 |     8.742s |     8.743s     2 |
-+--------------------------------------+------------------+------------+------------------+
+
+Time:       0, dt:   0.0003, norm rho:   4.17e-16, rho * u:  1.629e-16, energy: 1.381e-15
+Time:  0.0501, dt:  0.00025, norm rho:    0.02076, rho * u:      0.038, energy:   0.08774
+
+...
+
++-------------------------------------+------------------+------------+------------------+
+| Total wallclock time elapsed        |     8.231s     8 |     8.235s |     8.236s     5 |
+|                                     |                  |                               |
+| Section                 | no. calls |   min time  rank |   avg time |   max time  rank |
++-------------------------------------+------------------+------------+------------------+
+| compute errors          |        41 |  0.002513s    17 |  0.002564s |  0.002631s    13 |
+| compute transport speed |      1731 |    0.1581s    17 |    0.1608s |    0.1636s    11 |
+| output                  |        41 |    0.7818s     0 |    0.7832s |    0.7847s    17 |
+| rk time stepping total  |      8648 |      7.23s    23 |     7.233s |     7.237s    13 |
++-------------------------------------+------------------+------------+------------------+
 @endcode
 
-and the following visual output:
+and the following visual output, which was taken from step-67 (for a slightly different test case):
 
 <table align="center" class="doxtable" style="width:85%">
   <tr>
     <td>
-        <img src="https://www.dealii.org/images/steps/developer/step-67.pressure_010.png" alt="" width="100%">
+        <img src="https://dealii.org/images/steps/developer/step-67.pressure_010.png" alt="" width="100%">
     </td>
     <td>
-        <img src="https://www.dealii.org/images/steps/developer/step-67.pressure_025.png" alt="" width="100%">
+        <img src="https://dealii.org/images/steps/developer/step-67.pressure_025.png" alt="" width="100%">
     </td>
   </tr>
   <tr>
     <td>
-        <img src="https://www.dealii.org/images/steps/developer/step-67.pressure_050.png" alt="" width="100%">
+        <img src="https://dealii.org/images/steps/developer/step-67.pressure_050.png" alt="" width="100%">
     </td>
     <td>
-        <img src="https://www.dealii.org/images/steps/developer/step-67.pressure_100.png" alt="" width="100%">
+        <img src="https://dealii.org/images/steps/developer/step-67.pressure_100.png" alt="" width="100%">
     </td>
   </tr>
 </table>
 
-As a reference, the results of step-67 using FCL are:
+As a reference, the results of step-67 for test case 1 and the same resolution
+(note this is not the default test case nor the default resolution in step-67)
+using FCL are:
 
 @code
-Running with 40 MPI processes
-Vectorization over 8 doubles = 512 bits (AVX512)
-Number of degrees of freedom: 27.648.000 ( = 5 [vars] x 25.600 [cells] x 216 [dofs/cell/var] )
+Running with 24 MPI processes
+Vectorization over 4 doubles = 256 bits (AVX)
+Number of degrees of freedom: 230,400 ( = 4 [vars] x 1,600 [cells] x 36 [dofs/cell/var] )
 Time step size: 0.000295952, minimal h: 0.0075, initial transport scaling: 0.00441179
-Time:       0, dt:   0.0003, norm rho:  5.385e-16, rho * u:  1.916e-16, energy: 1.547e-15
+
+Time:       0, dt:   0.0003, norm rho:   4.17e-16, rho * u:  1.629e-16, energy: 1.381e-15
+Time:  0.0501, dt:  0.00025, norm rho:    0.02076, rho * u:    0.03801, energy:   0.08774
+
+...
+
 +-------------------------------------------+------------------+------------+------------------+
-| Total wallclock time elapsed              |     13.33s     0 |     13.34s |     13.35s    34 |
+| Total wallclock time elapsed              |     8.166s     4 |     8.168s |     8.169s    14 |
 |                                           |                  |                               |
 | Section                       | no. calls |   min time  rank |   avg time |   max time  rank |
 +-------------------------------------------+------------------+------------+------------------+
-| compute errors                |         1 |  0.007977s    10 |  0.008053s |  0.008161s    30 |
-| compute transport speed       |        22 |    0.1228s    34 |    0.2227s |    0.3845s     0 |
-| output                        |         1 |     1.255s     3 |     1.257s |     1.259s    27 |
-| rk time stepping total        |       100 |     11.15s     0 |     11.32s |     11.42s    34 |
-| rk_stage - integrals L_h      |       500 |     8.719s    10 |     8.932s |     9.196s     0 |
-| rk_stage - inv mass + vec upd |       500 |     1.944s     0 |     2.377s |      2.55s    10 |
+| compute errors                |        41 |  0.002265s    18 |  0.004323s |  0.006903s     0 |
+| compute transport speed       |      1731 |    0.1471s    18 |    0.2393s |    0.3772s     0 |
+| output                        |        41 |     0.791s     0 |    0.7925s |    0.7934s     1 |
+| rk time stepping total        |      8648 |     6.955s     0 |     7.096s |     7.189s    18 |
+| rk_stage - integrals L_h      |     43240 |     5.537s     5 |     5.833s |     6.171s    13 |
+| rk_stage - inv mass + vec upd |     43240 |    0.7758s     4 |      1.15s |     1.373s     5 |
 +-------------------------------------------+------------------+------------+------------------+
 @endcode
 
-By the modifications shown in this tutorial, we were able to achieve a speedup of
-27% for the Runge-Kutta stages.
+While the performance in this small test case is almost identical, the
+difference depends on the hardware and the dimension and size of the setup.
+In larger computations we have seen that the modifications shown in this
+tutorial were able to achieve a speedup of 27% for the Runge-Kutta stages.
 
 <h3>Possibilities for extensions</h3>
 

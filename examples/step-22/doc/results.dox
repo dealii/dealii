@@ -1,3 +1,4 @@
+@anchor step_22-ResultsSection
 <h1>Results</h1>
 
 <h3>Output of the program and graphical visualization</h3>
@@ -75,26 +76,26 @@ corners, so there is need for refinement there as well:
 <table width="60%" align="center">
   <tr>
     <td align="center">
-      <img src="https://www.dealii.org/images/steps/developer/step-22.2d.mesh-0.png" alt="">
+      <img src="https://dealii.org/images/steps/developer/step-22.2d.mesh-0.png" alt="">
     </td>
     <td align="center">
-      <img src="https://www.dealii.org/images/steps/developer/step-22.2d.mesh-1.png" alt="">
-    </td>
-  </tr>
-  <tr>
-    <td align="center">
-      <img src="https://www.dealii.org/images/steps/developer/step-22.2d.mesh-2.png" alt="">
-    </td>
-    <td align="center">
-      <img src="https://www.dealii.org/images/steps/developer/step-22.2d.mesh-3.png" alt="">
+      <img src="https://dealii.org/images/steps/developer/step-22.2d.mesh-1.png" alt="">
     </td>
   </tr>
   <tr>
     <td align="center">
-      <img src="https://www.dealii.org/images/steps/developer/step-22.2d.mesh-4.png" alt="">
+      <img src="https://dealii.org/images/steps/developer/step-22.2d.mesh-2.png" alt="">
     </td>
     <td align="center">
-      <img src="https://www.dealii.org/images/steps/developer/step-22.2d.mesh-5.png" alt="">
+      <img src="https://dealii.org/images/steps/developer/step-22.2d.mesh-3.png" alt="">
+    </td>
+  </tr>
+  <tr>
+    <td align="center">
+      <img src="https://dealii.org/images/steps/developer/step-22.2d.mesh-4.png" alt="">
+    </td>
+    <td align="center">
+      <img src="https://dealii.org/images/steps/developer/step-22.2d.mesh-5.png" alt="">
     </td>
   </tr>
 </table>
@@ -103,7 +104,7 @@ Finally, following is a plot of the flow field. It shows fluid
 transported along with the moving upper boundary and being replaced by
 material coming from below:
 
-<img src="https://www.dealii.org/images/steps/developer/step-22.2d.solution.png" alt="">
+<img src="https://dealii.org/images/steps/developer/step-22.2d.solution.png" alt="">
 
 This plot uses the capability of VTK-based visualization programs (in
 this case of VisIt) to show vector data; this is the result of us
@@ -172,8 +173,8 @@ ${\cal O}(N)$: a simple experiment shows that as we keep refining the mesh, the
 average number of ILU-preconditioned CG iterations to invert the
 velocity-velocity block $A$ increases.
 
-We will address the question of how possibly to improve our solver <a
-href="#improved-solver">below</a>.
+We will address the question of how possibly to improve our solver
+@ref step_22-ImprovedSolver "below".
 
 As for the graphical output, the grids generated during the solution
 look as follow:
@@ -181,26 +182,26 @@ look as follow:
 <table width="60%" align="center">
   <tr>
     <td align="center">
-      <img src="https://www.dealii.org/images/steps/developer/step-22.3d.mesh-0.png" alt="">
+      <img src="https://dealii.org/images/steps/developer/step-22.3d.mesh-0.png" alt="">
     </td>
     <td align="center">
-      <img src="https://www.dealii.org/images/steps/developer/step-22.3d.mesh-1.png" alt="">
-    </td>
-  </tr>
-  <tr>
-    <td align="center">
-      <img src="https://www.dealii.org/images/steps/developer/step-22.3d.mesh-2.png" alt="">
-    </td>
-    <td align="center">
-      <img src="https://www.dealii.org/images/steps/developer/step-22.3d.mesh-3.png" alt="">
+      <img src="https://dealii.org/images/steps/developer/step-22.3d.mesh-1.png" alt="">
     </td>
   </tr>
   <tr>
     <td align="center">
-      <img src="https://www.dealii.org/images/steps/developer/step-22.3d.mesh-4.png" alt="">
+      <img src="https://dealii.org/images/steps/developer/step-22.3d.mesh-2.png" alt="">
     </td>
     <td align="center">
-      <img src="https://www.dealii.org/images/steps/developer/step-22.3d.mesh-5.png" alt="">
+      <img src="https://dealii.org/images/steps/developer/step-22.3d.mesh-3.png" alt="">
+    </td>
+  </tr>
+  <tr>
+    <td align="center">
+      <img src="https://dealii.org/images/steps/developer/step-22.3d.mesh-4.png" alt="">
+    </td>
+    <td align="center">
+      <img src="https://dealii.org/images/steps/developer/step-22.3d.mesh-5.png" alt="">
     </td>
   </tr>
 </table>
@@ -209,7 +210,7 @@ Again, they show essentially the location of singularities introduced
 by boundary conditions. The vector field computed makes for an
 interesting graph:
 
-<img src="https://www.dealii.org/images/steps/developer/step-22.3d.solution.png" alt="">
+<img src="https://dealii.org/images/steps/developer/step-22.3d.solution.png" alt="">
 
 The isocontours shown here as well are those of the pressure
 variable, showing the singularity at the point of discontinuous
@@ -232,7 +233,7 @@ appropriately sorted into their corresponding blocks of the matrix and
 vector), then we get the following image after the first adaptive
 refinement in two dimensions:
 
-<img src="https://www.dealii.org/images/steps/developer/step-22.2d.sparsity-nor.png" alt="">
+<img src="https://dealii.org/images/steps/developer/step-22.2d.sparsity-nor.png" alt="">
 
 In order to generate such a graph, you have to insert a piece of
 code like the following to the end of the setup step.
@@ -253,7 +254,7 @@ In this program, we have thus chosen a more advanced renumbering of
 components.  The renumbering with DoFRenumbering::Cuthill_McKee and grouping
 the components into velocity and pressure yields the following output:
 
-<img src="https://www.dealii.org/images/steps/developer/step-22.2d.sparsity-ren.png" alt="">
+<img src="https://dealii.org/images/steps/developer/step-22.2d.sparsity-ren.png" alt="">
 
 It is apparent that the situation has improved a lot. Most of the elements are
 now concentrated around the diagonal in the (0,0) block in the matrix. Similar
@@ -273,13 +274,13 @@ considerable amount of tentative fill-in elements. This illustrates why UMFPACK
 is not a good choice in 3D - a full decomposition needs many new entries that
  eventually won't fit into the physical memory (RAM):
 
-<img src="https://www.dealii.org/images/steps/developer/step-22.3d.sparsity_uu-ren.png" alt="">
+<img src="https://dealii.org/images/steps/developer/step-22.3d.sparsity_uu-ren.png" alt="">
 
 
 
 <h3>Possibilities for extensions</h3>
 
-<a name="step-22-improved-solver">
+@anchor step_22-ImprovedSolver
 <h4>Improved linear solver in 3D</h4>
 </a>
 
@@ -317,7 +318,7 @@ size. Either way, we will introduce below a number of improvements to the
 linear solver, a discussion that we will re-consider again with additional
 options in the step-31 program.
 
-<a name="step-22-improved-ilu">
+@anchor step_22-ImprovedILU
 <h5>Better ILU decomposition by smart reordering</h5>
 </a>
 A first attempt to improve the speed of the linear solution process is to choose
@@ -344,8 +345,9 @@ preconditioner that makes CG for the (0,0) matrix $A$ converge in a
 mesh-independent number of iterations, say 10 to 30. We have seen such a
 candidate in step-16: multigrid.
 
+
+@anchor step_22-BlockSchur
 <h5>Block Schur complement preconditioner</h5>
-<a name="step-22-block-schur"></a>
 Even with a good preconditioner for $A$, we still
 need to solve of the same linear system repeatedly (with different
 right hand sides, though) in order to make the Schur complement solve
@@ -784,10 +786,10 @@ then we get images where the fault line is curved:
 <table width="60%" align="center">
   <tr>
     <td align="center">
-      <img src="https://www.dealii.org/images/steps/developer/step-22.3d-extension.png" alt="">
+      <img src="https://dealii.org/images/steps/developer/step-22.3d-extension.png" alt="">
     </td>
     <td align="center">
-      <img src="https://www.dealii.org/images/steps/developer/step-22.3d-grid-extension.png" alt="">
+      <img src="https://dealii.org/images/steps/developer/step-22.3d-grid-extension.png" alt="">
     </td>
   </tr>
 </table>

@@ -1,4 +1,4 @@
-<a name="step-18-Intro"></a>
+<a name="step_18-Intro"></a>
 <h1>Introduction</h1>
 
 
@@ -21,7 +21,7 @@ machine as long as you have PETSc installed. Information on how to tell
 deal.II about a PETSc installation on your system can be found in the deal.II
 README file, which is linked to from the <a href="../../index.html">main
 documentation page</a>
-in your installation of deal.II, or on <a href="http://www.dealii.org/">the
+in your installation of deal.II, or on <a href="http://dealii.org/">the
 deal.II webpage</a>.
 
 
@@ -145,7 +145,7 @@ changes with time, with the boundary moving according to the
 displacements $\mathbf{u}(\mathbf{x},t)$ of the points on the boundary. To
 complete this system, we have to specify the incremental relationship between
 the stress and the strain, as follows:
-<a name="step-18-stress-strain"></a>
+@anchor step_18-StressStrain
 @f[
   \dot\sigma = C \varepsilon (\dot{\mathbf{u}}),
   \qquad
@@ -189,7 +189,7 @@ The weak form of this set of equations, which as usual is the basis for the
 finite element formulation, reads as follows: find $\Delta \mathbf{u}^n \in
 \{v\in H^1(\Omega(t_{n-1}))^d: v|_{\Gamma_D}=\mathbf{d}(\cdot,t_n) - \mathbf{d}(\cdot,t_{n-1})\}$
 such that
-<a name="step-18-linear-system"></a>
+@anchor step_18-LinearSystem
 @f{align*}{
   (C \varepsilon(\Delta\mathbf{u}^n), \varepsilon(\varphi) )_{\Omega(t_{n-1})}
   &=
@@ -260,7 +260,7 @@ complicated and will be discussed in the next section.
 
 As indicated above, we need to have the stress variable $\sigma^n$ available
 when computing time step $n+1$, and we can compute it using
-<a name="step-18-stress-update"></a>
+@anchor step_18-StressUpdate
 @f[
   \sigma^n = \sigma^{n-1} + C \varepsilon (\Delta \mathbf{u}^n).
   \qquad
@@ -331,7 +331,7 @@ the increment describe translations, its divergence the dilational modes, and
 the curl the rotational modes). Since the exact form of $R$ is cumbersome, we
 only state it in the program code, and note that the correct updating formula
 for the stress variable is then
-<a name="step-18-stress-update+rot"></a>
+@anchor step_18-StressUpdatePlusRot
 @f[
   \sigma^n
   =
@@ -458,7 +458,7 @@ sequence of operations on the present mesh:
 <li> <code>assemble_system ()</code> [via <code>solve_timestep ()</code>]:
   This first function is also the most interesting one. It assembles the
   linear system corresponding to the discretized version of equation
-  <a href="#step_18.linear-system">[linear-system]</a>. This leads to a system matrix $A_{ij} = \sum_K
+  @ref step_18-LinearSystem "[linear-system]". This leads to a system matrix $A_{ij} = \sum_K
   A^K_{ij}$ built up of local contributions on each cell $K$ with entries
   @f[
     A^K_{ij} = (C \varepsilon(\varphi_j), \varepsilon(\varphi_i))_K;
@@ -540,7 +540,7 @@ for (unsigned int i=0; i<dofs_per_cell; ++i)
         \sigma^{n-1}_q : \varepsilon(\varphi_i(\mathbf{x}_q))
       \right\}
   @f}
-  to the right hand side of <a href="#step_18.linear-system">[linear-system]</a> is equally
+  to the right hand side of @ref step_18-LinearSystem "[linear-system]" is equally
   straightforward (note that we do not consider any boundary tractions $\mathbf{b}$ here). Remember that we only had to store the old stress in the
   quadrature points of cells. In the program, we will provide a variable
   <code>local_quadrature_points_data</code> that allows to access the stress
@@ -585,8 +585,10 @@ for (unsigned int i=0; i<dofs_per_cell; ++i)
   from step-17.
 
 <li> <code>update_quadrature_point_history ()</code> [via
-  <code>solve_timestep ()</code>]: Based on the displacement field $\Delta \mathbf{u}^n$ computed before, we update the stress values in all quadrature points
-  according to <a href="#step_18.stress-update">[stress-update]</a> and <a href="#step_18.stress-update+rot">[stress-update+rot]</a>,
+  <code>solve_timestep ()</code>]: Based on the displacement field $\Delta \mathbf{u}^n$
+  computed before, we update the stress values in all quadrature points
+  according to @ref step_18-StressUpdate "[stress-update]" and
+  @ref step_18-StressUpdatePlusRot "[stress-update+rot]",
   including the rotation of the coordinate system.
 
 <li> <code>move_mesh ()</code>: Given the solution computed before, in this

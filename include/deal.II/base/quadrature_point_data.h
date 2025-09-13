@@ -654,7 +654,7 @@ CellDataStorage<CellIteratorType, DataType>::erase(const CellIteratorType &cell)
   for (unsigned int i = 0; i < it->second.size(); ++i)
     {
       Assert(
-        it->second[i].unique(),
+        it->second[i].use_count() == 1,
         ExcMessage(
           "Can not erase the cell data multiple objects reference its data."));
     }
@@ -678,7 +678,7 @@ CellDataStorage<CellIteratorType, DataType>::clear()
       for (unsigned int i = 0; i < it->second.size(); ++i)
         {
           Assert(
-            it->second[i].unique(),
+            it->second[i].use_count() == 1,
             ExcMessage(
               "Can not erase the cell data, multiple objects reference it."));
         }

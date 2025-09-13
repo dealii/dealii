@@ -187,10 +187,10 @@ namespace internal
   template <int dim, int spacedim = dim>
   void
   copy_nonprimitive_base_element_values(
-    [[maybe_unused]] const FESystem<dim, spacedim> &fe,
-    [[maybe_unused]] const unsigned int             base_no,
-    const unsigned int                              n_q_points,
-    const UpdateFlags                               base_flags,
+    const FESystem<dim, spacedim> &fe,
+    const unsigned int             base_no,
+    const unsigned int             n_q_points,
+    const UpdateFlags              base_flags,
     const std::vector<typename FESystem<dim, spacedim>::BaseOffsets> &offsets,
     const FEValuesImplementation::FiniteElementRelatedData<dim, spacedim>
       &base_data,
@@ -1704,9 +1704,7 @@ FESystem<dim, spacedim>::initialize(
   Assert(count_nonzeros(multiplicities) > 0,
          ExcMessage("You only passed FiniteElements with multiplicity 0."));
 
-  [[maybe_unused]] const ReferenceCell reference_cell =
-    fes.front()->reference_cell();
-
+  const ReferenceCell reference_cell = fes.front()->reference_cell();
   Assert(std::all_of(fes.begin(),
                      fes.end(),
                      [reference_cell](const FiniteElement<dim, spacedim> *fe) {
@@ -1801,10 +1799,8 @@ FESystem<dim, spacedim>::initialize(
                            base_index = this->system_to_base_table[i].second;
         // Do not use `this` in Assert because nvcc when using C++20 assumes
         // that `this` is an integer and we get the following error: base
-        // operand of
-        // '->' is not a pointer
-        [[maybe_unused]] const unsigned int n_base_elements =
-          this->n_base_elements();
+        // operand of '->' is not a pointer
+        const unsigned int n_base_elements = this->n_base_elements();
         Assert(base < n_base_elements, ExcInternalError());
         Assert(base_index < base_element(base).unit_support_points.size(),
                ExcInternalError());
@@ -1967,13 +1963,12 @@ FESystem<dim, spacedim>::initialize(
           // Do not use `this` in Assert because nvcc when using C++20 assumes
           // that `this` is an integer and we get the following error: base
           // operand of '->' is not a pointer
-          [[maybe_unused]] const unsigned int n_elements =
+          const unsigned int n_elements =
             this->adjust_quad_dof_index_for_face_orientation_table[face_no]
               .n_elements();
-          [[maybe_unused]] const unsigned int n_face_orientations =
+          const unsigned int n_face_orientations =
             this->reference_cell().n_face_orientations(face_no);
-          [[maybe_unused]] const unsigned int n_dofs_per_quad =
-            this->n_dofs_per_quad(face_no);
+          const unsigned int n_dofs_per_quad = this->n_dofs_per_quad(face_no);
           Assert(n_elements == n_face_orientations * n_dofs_per_quad,
                  ExcInternalError());
 
@@ -1999,15 +1994,17 @@ FESystem<dim, spacedim>::initialize(
             }
           Assert(index == n_dofs_per_quad, ExcInternalError());
         }
+    });
 
+  if (dim > 1)
+    init_tasks += Threads::new_task([&]() {
       // additionally compose the permutation information for lines
       // Do not use `this` in Assert because nvcc when using C++20 assumes that
       // `this` is an integer and we get the following error: base operand of
       // '->' is not a pointer
-      [[maybe_unused]] const unsigned int table_size =
+      const unsigned int table_size =
         this->adjust_line_dof_index_for_line_orientation_table.size();
-      [[maybe_unused]] const unsigned int n_dofs_per_line =
-        this->n_dofs_per_line();
+      const unsigned int n_dofs_per_line = this->n_dofs_per_line();
       Assert(table_size == n_dofs_per_line, ExcInternalError());
       unsigned int index = 0;
       for (unsigned int b = 0; b < this->n_base_elements(); ++b)

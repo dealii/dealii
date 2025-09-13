@@ -17,7 +17,6 @@
 // similar to matrix_vector_faces_15 except FE_DGQArbitraryNodes rather than
 // FE_DGQ
 
-#include <deal.II/base/function.h>
 #include <deal.II/base/quadrature_lib.h>
 
 #include <deal.II/distributed/tria.h>

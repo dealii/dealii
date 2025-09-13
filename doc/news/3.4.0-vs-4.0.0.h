@@ -280,7 +280,7 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
        functions as a replacement.
        <br>
        For more information, read
-       <a href="https://www.dealii.org/mail/msg00638.html" target="body">this mail</a>.
+       <a href="https://dealii.org/mail/msg00638.html" target="body">this mail</a>.
        <br>
        (WB 2002/06/10)
        </p>

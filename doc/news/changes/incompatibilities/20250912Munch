@@ -1,0 +1,4 @@
+Removed: The classes MGTransferMF, MGTransferGlobalCoarsening, MGTransferBlockMF, and MGTransferBlockGlobalCoarsening
+have been deprecated. Their functionalities are now part of MGTransferMatrixFree and MGTransferBlockMatrixFree.
+<br>
+(Peter Munch, 2025/09/12)

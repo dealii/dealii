@@ -1,4 +1,4 @@
-find_package(deal.II 9.5.0 REQUIRED
+find_package(deal.II 9.8.0 REQUIRED
   HINTS
     ${DEAL_II_DIR} ../ ../../ $ENV{DEAL_II_DIR}
     # You can specify additional hints for search paths here, e.g.

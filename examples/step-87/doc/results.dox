@@ -52,13 +52,13 @@ values at those points.
 0.200     0.200     0.500     0.050
 0.250     0.250     0.500     0.000
 0.300     0.300     0.500    -0.050
-0.350     0.350     0.500    -0.100
-0.400     0.400     0.500    -0.149
-0.450     0.450     0.500    -0.200
-0.500     0.500     0.500    -0.222
-0.550     0.550     0.500    -0.200
-0.600     0.600     0.500    -0.149
-0.650     0.650     0.500    -0.100
+0.350     0.350     0.500    -0.099
+0.400     0.400     0.500    -0.148
+0.450     0.450     0.500    -0.195
+0.500     0.500     0.500    -0.211
+0.550     0.550     0.500    -0.195
+0.600     0.600     0.500    -0.148
+0.650     0.650     0.500    -0.099
 0.700     0.700     0.500    -0.050
 0.750     0.750     0.500     0.000
 0.800     0.800     0.500     0.050
@@ -133,13 +133,13 @@ from iteration to iteration.
 <table align="center" class="doxtable">
   <tr>
     <td>
-        @image html https://www.dealii.org/images/steps/developer/step_87_ex_2_p_0.png
+        @image html https://dealii.org/images/steps/developer/step_87_ex_2_p_0.png
     </td>
     <td>
-        @image html https://www.dealii.org/images/steps/developer/step_87_ex_2_p_1.png
+        @image html https://dealii.org/images/steps/developer/step_87_ex_2_p_1.png
     </td>
     <td>
-        @image html https://www.dealii.org/images/steps/developer/step_87_ex_2_p_2.png
+        @image html https://dealii.org/images/steps/developer/step_87_ex_2_p_2.png
     </td>
   </tr>
 </table>
@@ -155,10 +155,10 @@ solution from the interface is shown.
 <table align="center" class="doxtable">
   <tr>
     <td>
-        @image html https://www.dealii.org/images/steps/developer/step_87_ex_2_res_0.png
+        @image html https://dealii.org/images/steps/developer/step_87_ex_2_res_0.png
     </td>
     <td>
-        @image html https://www.dealii.org/images/steps/developer/step_87_ex_2_res_1.png
+        @image html https://dealii.org/images/steps/developer/step_87_ex_2_res_1.png
     </td>
   </tr>
 </table>
@@ -207,13 +207,13 @@ the immersed mesh.
 <table align="center" class="doxtable">
   <tr>
     <td>
-        @image html https://www.dealii.org/images/steps/developer/step_87_ex_3_force.0000.png
+        @image html https://dealii.org/images/steps/developer/step_87_ex_3_force.0000.png
     </td>
     <td>
-        @image html https://www.dealii.org/images/steps/developer/step_87_ex_3_force.0010.png
+        @image html https://dealii.org/images/steps/developer/step_87_ex_3_force.0010.png
     </td>
     <td>
-        @image html https://www.dealii.org/images/steps/developer/step_87_ex_3_force.0020.png
+        @image html https://dealii.org/images/steps/developer/step_87_ex_3_force.0020.png
     </td>
   </tr>
 </table>
@@ -257,7 +257,7 @@ the computational mesh. This is useful if one wants to output the results
 on a coarser mesh or one does not want to output 3D results but instead 2D
 slices. In addition, MGTwoLevelTransferNonNested allows to prolongate solutions
 and restrict residuals between two independent meshes. By passing a sequence
-of such two-level transfer operators to MGTransferMF and, finally, to Multigrid,
+of such two-level transfer operators to MGTransferMatrixFree and, finally, to Multigrid,
 non-nested multigrid can be computed.
 - Utilities::MPI::RemotePointEvaluation can be used to couple non-matching
 grids via surfaces (example: fluid-structure interaction, independently created

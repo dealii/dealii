@@ -234,7 +234,7 @@ namespace Step19
   // we want to solve. Recall how the domain looks like:
   //   <p align="center">
   //     <img
-  //     src="https://www.dealii.org/images/steps/developer/step-19.geometry.png"
+  //     src="https://dealii.org/images/steps/developer/step-19.geometry.png"
   //          alt="The geometry used in this program"
   //          width="600">
   //   </p>

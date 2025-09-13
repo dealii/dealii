@@ -1,4 +1,4 @@
-<a name="step-7-Intro"></a>
+<a name="step_7-Intro"></a>
 <h1>Introduction</h1>
 
 In this program, we will mainly consider two aspects:
@@ -87,7 +87,7 @@ right hand side vector.
 
 Before we go into programming, let's have a brief look at the mathematical
 formulation. The equation that we want to solve here is the Helmholtz equation
-"with the nice sign":
+"with the good sign":
 @f[
   -\Delta u + \alpha u = f,
 @f]
@@ -112,7 +112,9 @@ operator $-\Delta-\alpha I$ is not positive
 definite if $\alpha>0$ is large, and this leads to all sorts of issues
 we need not discuss here. The operator may also not be invertible --
 i.e., the equation does not have a unique solution -- if $\alpha$
-happens to be one of the eigenvalues of $-\Delta$.)
+happens to be one of the eigenvalues of $-\Delta$. We comment more on
+this equation in a @ref step_7-ResultsSection-bad-sign "sub-section of the Results section"
+of this program.)
 
 Using the above definitions, we can state the weak formulation of the
 equation, which reads: find $u\in H^1_g=\{v\in H^1: v|_{\Gamma_1}=g_1\}$ such

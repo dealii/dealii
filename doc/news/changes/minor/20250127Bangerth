@@ -1,8 +1,0 @@
-Fixed: When checking whether a particle is in a specific cell,
-ParticleHandler always assumed that the cell is a quadrilateral or
-hexahedron. This is of course correct if the mesh only contains such
-cells, but is wrong if you are working on simplex or mixed meshes and
-sometimes led to putting particles into the wrong cells. This is now
-fixed.
-<br>
-(Wolfgang Bangerth, Bruno Blais, 2025/01/27)

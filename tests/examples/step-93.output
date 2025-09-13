@@ -1,0 +1,9 @@
+Number of active cells: 64
+Number of degrees of freedom: 289+289+4 = 582
+Number of nonlocal dofs: 4
+Solver stopped within 245 - 260 iterations
+The c coefficients are 
+	c1: 26.8633
+	c2: -6.1351
+	c3: -6.1351
+	c4: -1.51215

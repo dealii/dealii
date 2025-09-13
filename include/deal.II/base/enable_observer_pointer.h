@@ -160,7 +160,7 @@ public:
                  << "\n\n"
                  << "(Additional information: " << arg3 << ")\n\n"
                  << "See the entry in the Frequently Asked Questions of "
-                 << "deal.II (linked to from http://www.dealii.org/) for "
+                 << "deal.II (linked to from http://dealii.org/) for "
                  << "a lot more information on what this error means and "
                  << "how to fix programs in which it happens.");
 
@@ -305,7 +305,7 @@ private:
  *
  * @deprecated Use the new name of the class, ObserverPointer, instead.
  */
-using Subscriptor DEAL_II_DEPRECATED_EARLY_WITH_COMMENT(
+using Subscriptor DEAL_II_DEPRECATED_WITH_COMMENT(
   "Use the new name of the class, EnableObserverPointer.") =
   EnableObserverPointer;
 

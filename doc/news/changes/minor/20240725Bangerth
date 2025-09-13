@@ -1,7 +1,0 @@
-Deprecated: ObserverPointer is clearly documented as not owning the
-object it points to. Yet, ObserverPointer::clear() deletes the object
-pointed to, thereby assuming that the ObserverPointer object actually
-owns the object. This must surely be confusing. As a consequence the
-function is now deprecated.
-<br>
-(Wolfgang Bangerth, 2024/07/25)

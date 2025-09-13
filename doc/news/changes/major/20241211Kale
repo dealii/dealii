@@ -1,3 +1,0 @@
-New: GridIn::read_vtk() was extended to read vtk meshes with field data defined at the cells, to enable importing and use of cell related data beyond a material ID or Manifold ID. The imported field data can be accessed using a new function get_cell_data(), which returns a map with a key containing the field data identifier and a vector containing the field data values associated with the cell indices of the imported mesh.
-<br>
-(Vaishnavi Kale, Marc Secanell, Mohamad Ghadban and Mayank Sabharwal, 2024/12/11)

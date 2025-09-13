@@ -20,7 +20,6 @@
 // vector entries but otherwise similar setup. this test differs from
 // matrix_vector_faces_22 only by applying a renumbering
 
-#include <deal.II/base/function.h>
 #include <deal.II/base/quadrature_lib.h>
 
 #include <deal.II/distributed/tria.h>

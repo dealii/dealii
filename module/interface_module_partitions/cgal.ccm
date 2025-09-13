@@ -1,0 +1,205 @@
+// ------------------------------------------------------------------------
+//
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2025 by the deal.II authors
+//
+// This file is part of the deal.II library.
+//
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
+//
+// ------------------------------------------------------------------------
+
+
+// It is very inefficient in the module system to have repeated
+// #includes in many module partition files because when you 'import'
+// those partitions, you also have to load everything they
+// #included. In other words, you get the same content *many times*,
+// once from each imported partition, rather than only once via the
+// old-style #include system. We deal with this by wrapping all of our
+// external packages into partitions that we can 'import' wherever we
+// need.
+
+// This is the file that wraps everything we need from ADOL-C into one
+// module partition.
+
+
+module;
+
+#include <deal.II/base/config.h>
+
+#ifdef DEAL_II_WITH_CGAL
+
+// This file does not compile with clang-19+ with CGAL versions
+// released prior to 5.6.2 because of this issue:
+// https://github.com/CGAL/cgal/issues/8313. This was fixed in 5.6.2,
+// as shown here:
+// https://github.com/CGAL/cgal/issues?q=sort%3Aupdated-desc+label%3AMerged_in_5.6.2+-label%3AMerged_in_5.6.1
+// But even then, CGAL has design issues that don't allow us to use it
+// via modules before version 6.1, see
+// https://github.com/CGAL/cgal/issues/8871 and
+// https://github.com/CGAL/cgal/issues/8874. Disallow things before
+// then.
+#  include <CGAL/version.h>
+#  if (CGAL_VERSION_NR < 1050602000)
+#    error \
+      "You can only use CGAL starting with version 6.1.0 when using the CLang compiler."
+#  endif
+
+#  include <CGAL/Boolean_set_operations_2.h>
+#  include <CGAL/Cartesian.h>
+#  include <CGAL/Circular_kernel_intersections.h>
+#  include <CGAL/Complex_2_in_triangulation_3.h>
+#  include <CGAL/Constrained_Delaunay_triangulation_2.h>
+#  include <CGAL/Delaunay_mesh_face_base_2.h>
+#  include <CGAL/Delaunay_mesh_size_criteria_2.h>
+#  include <CGAL/Delaunay_mesher_2.h>
+#  include <CGAL/Delaunay_triangulation_2.h>
+#  include <CGAL/Exact_predicates_exact_constructions_kernel.h>
+#  include <CGAL/Exact_predicates_exact_constructions_kernel_with_sqrt.h>
+#  include <CGAL/Exact_predicates_inexact_constructions_kernel.h>
+#  include <CGAL/IO/facets_in_complex_2_to_triangle_mesh.h>
+#  include <CGAL/Implicit_surface_3.h>
+#  include <CGAL/Kernel_traits.h>
+#  include <CGAL/Labeled_mesh_domain_3.h>
+#  include <CGAL/Mesh_complex_3_in_triangulation_3.h>
+#  include <CGAL/Mesh_criteria_3.h>
+#  include <CGAL/Mesh_facet_topology.h>
+#  include <CGAL/Mesh_triangulation_3.h>
+#  include <CGAL/Polygon_2.h>
+#  include <CGAL/Polygon_mesh_processing/corefinement.h>
+#  include <CGAL/Polygon_mesh_processing/measure.h>
+#  include <CGAL/Polygon_mesh_processing/remesh.h>
+#  include <CGAL/Polygon_mesh_processing/stitch_borders.h>
+#  include <CGAL/Polygon_mesh_processing/triangulate_faces.h>
+#  include <CGAL/Polygon_with_holes_2.h>
+#  include <CGAL/Polyhedral_mesh_domain_with_features_3.h>
+#  include <CGAL/Polyhedron_3.h>
+#  include <CGAL/Projection_traits_xy_3.h>
+#  include <CGAL/Segment_3.h>
+#  include <CGAL/Simple_cartesian.h>
+#  include <CGAL/Surface_mesh.h>
+#  include <CGAL/Surface_mesh/Surface_mesh.h>
+#  include <CGAL/Surface_mesh_default_triangulation_3.h>
+#  include <CGAL/Tetrahedron_3.h>
+#  include <CGAL/Triangle_2.h>
+#  include <CGAL/Triangle_3.h>
+#  include <CGAL/Triangulation_2.h>
+#  include <CGAL/Triangulation_3.h>
+#  include <CGAL/Triangulation_face_base_with_id_2.h>
+#  include <CGAL/Triangulation_face_base_with_info_2.h>
+#  include <CGAL/boost/graph/copy_face_graph.h>
+#  include <CGAL/boost/graph/selection.h>
+#  include <CGAL/convex_hull_3.h>
+#  include <CGAL/make_mesh_3.h>
+#  include <CGAL/make_surface_mesh.h>
+#endif
+
+
+export module dealii.external.cgal;
+
+
+#ifdef DEAL_II_WITH_CGAL
+
+export
+{
+  namespace CGAL
+  {
+    using ::CGAL::Complex_2_in_triangulation_3;
+    using ::CGAL::Constrained_Delaunay_triangulation_2;
+    using ::CGAL::Constrained_triangulation_face_base_2;
+    using ::CGAL::Default;
+    using ::CGAL::Delaunay_mesh_face_base_2;
+    using ::CGAL::Delaunay_mesh_size_criteria_2;
+    using ::CGAL::Exact_predicates_exact_constructions_kernel;
+    using ::CGAL::Exact_predicates_exact_constructions_kernel_with_sqrt;
+    using ::CGAL::Exact_predicates_inexact_constructions_kernel;
+    using ::CGAL::Exact_predicates_tag;
+    using ::CGAL::FACET_VERTICES_ON_SAME_SURFACE_PATCH;
+    using ::CGAL::FACET_VERTICES_ON_SAME_SURFACE_PATCH_WITH_ADJACENCY_CHECK;
+    using ::CGAL::FACET_VERTICES_ON_SURFACE;
+    using ::CGAL::Implicit_surface_3;
+    using ::CGAL::Kernel_traits;
+    using ::CGAL::Labeled_mesh_domain_3;
+    using ::CGAL::Mesh_complex_3_in_triangulation_3;
+    using ::CGAL::Mesh_criteria_3;
+    using ::CGAL::Mesh_facet_topology;
+    using ::CGAL::Mesh_polyhedron_3;
+    using ::CGAL::Mesh_triangulation_3;
+    using ::CGAL::Non_manifold_tag;
+    using ::CGAL::Parallel_tag;
+    using ::CGAL::Point_3;
+    using ::CGAL::Polygon_2;
+    namespace Polygon_mesh_processing
+    {
+      using ::CGAL::Polygon_mesh_processing::stitch_borders;
+      using ::CGAL::Polygon_mesh_processing::triangulate_faces;
+    } // namespace Polygon_mesh_processing
+    using ::CGAL::circulator_size;
+    using ::CGAL::convex_hull_3;
+    using ::CGAL::copy_face_graph;
+    using ::CGAL::do_intersect;
+    using ::CGAL::facets_in_complex_2_to_triangle_mesh;
+    using ::CGAL::facets_in_complex_3_to_triangle_mesh;
+    using ::CGAL::intersection;
+    using ::CGAL::is_closed;
+    using ::CGAL::is_triangle_mesh;
+    using ::CGAL::make_mesh_3;
+    using ::CGAL::make_surface_mesh;
+    using ::CGAL::make_tetrahedron;
+    using ::CGAL::Polygon_with_holes_2;
+    using ::CGAL::Polyhedral_mesh_domain_with_features_3;
+    using ::CGAL::Polyhedron_3;
+    using ::CGAL::Sequential_tag;
+    using ::CGAL::Simple_cartesian;
+    using ::CGAL::Surface_mesh;
+    using ::CGAL::Surface_mesh_default_criteria_3;
+    using ::CGAL::Surface_mesh_default_triangulation_3;
+    using ::CGAL::to_double;
+    using ::CGAL::Triangulation_2;
+    using ::CGAL::Triangulation_3;
+    using ::CGAL::Triangulation_data_structure_2;
+    using ::CGAL::Triangulation_face_base_with_info_2;
+    using ::CGAL::Triangulation_vertex_base_2;
+    using ::CGAL::vertices_around_face;
+    using ::CGAL::operator==;
+    using ::CGAL::operator!=;
+
+    namespace Polygon_mesh_processing
+    {
+      using ::CGAL::Polygon_mesh_processing::corefine;
+      using ::CGAL::Polygon_mesh_processing::corefine_and_compute_difference;
+      using ::CGAL::Polygon_mesh_processing::corefine_and_compute_intersection;
+      using ::CGAL::Polygon_mesh_processing::corefine_and_compute_union;
+      using ::CGAL::Polygon_mesh_processing::volume;
+    } // namespace Polygon_mesh_processing
+  }   // namespace CGAL
+
+
+  // In CGAL 5.6.1, the following are variables of types such as 'const
+  // Boost_parameter_compatibility_wrapper<internal_np::facet_size_param_t>',
+  // all with internal linkage because they are marked as 'const' and not
+  // 'inline const'. These cannot be exported with
+#  if (CGAL_VERSION_NR >= 1050601000)
+  namespace CGAL
+  {
+    namespace parameters
+    {
+      // The following all have internal linkage:
+      using ::CGAL::parameters::cell_radius_edge_ratio;
+      using ::CGAL::parameters::cell_size;
+      using ::CGAL::parameters::edge_size;
+      using ::CGAL::parameters::facet_angle;
+      using ::CGAL::parameters::facet_distance;
+      using ::CGAL::parameters::facet_size;
+      using ::CGAL::parameters::facet_topology;
+      using ::CGAL::parameters::no_exude;
+      using ::CGAL::parameters::no_perturb;
+    } // namespace parameters
+  }   // namespace CGAL
+#  endif
+}
+
+#endif

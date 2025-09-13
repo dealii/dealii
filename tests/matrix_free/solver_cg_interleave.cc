@@ -18,7 +18,6 @@
 // vector operations, making use of the data locality options available by
 // MatrixFree loops.
 
-#include <deal.II/base/function.h>
 #include <deal.II/base/utilities.h>
 
 #include <deal.II/distributed/tria.h>

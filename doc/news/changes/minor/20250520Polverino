@@ -1,4 +1,0 @@
-Improved: The SparseDirectMUMPS class now takes an AdditionalData to
-control the MUMPS execution.
-<br>
-(Davide Polverino, 2025/05/20)

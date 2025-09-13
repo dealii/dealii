@@ -1,4 +1,4 @@
-<a name="step-21-Intro"></a> <h1>Introduction</h1>
+<a name="step_21-Intro"></a> <h1>Introduction</h1>
 
 This program grew out of a student project by Yan Li at Texas A&amp;M
 University. Most of the work for this program is by her.
@@ -7,8 +7,8 @@ In this project, we propose a numerical simulation for two phase
 flow problems in porous media. This problem includes one
 elliptic equation and one nonlinear, time dependent transport
 equation. This is therefore also the first time-dependent tutorial
-program (besides the somewhat strange time-dependence of @ref step_18
-"step-18").
+program (besides the somewhat strange time-dependence of
+step-18).
 
 The equations covered here are an extension of the material already covered in
 step-20. In particular, they fall into the class of
@@ -261,8 +261,8 @@ final time.
 
 <h3>Space discretization</h3>
 
-In each time step, we then apply the mixed finite method of @ref step_20
-"step-20" to the velocity and pressure. To be well-posed, we choose
+In each time step, we then apply the mixed finite method of
+step-20 to the velocity and pressure. To be well-posed, we choose
 Raviart-Thomas spaces $RT_{k}$ for $\mathbf{u}$ and discontinuous elements of
 class $DGQ_{k}$ for $p$. For the saturation, we will also choose $DGQ_{k}$
 spaces.
@@ -422,8 +422,8 @@ anything useful once we have negative saturations or ones larger than one.
 Note that we will have similar restrictions on the time step also in
 step-23 and step-24 where we solve the time dependent
 wave equation, another hyperbolic problem. We will also come back to the issue
-of time step choice below in the section on <a href="#extensions">possible
-extensions to this program</a>.
+of time step choice below in the section on
+@ref step_21-Extensions "possible extensions to this program".
 
 
 <h3>The test case</h3>
@@ -503,7 +503,7 @@ infinitesimal amounts of wetting fluid also only move at infinitesimal speeds
 (i.e., they stick to the medium more than the non-wetting phase in which they
 are embedded). That said, how can we square this with the knowledge that
 wetting fluid is invading from the left, leading to the flow patterns seen in
-the <a href="#Results">results section</a>? That's where we get into
+the @ref step_21-ResultsSection "results section"? That's where we get into
 mathematics: Equations like the transport equation we are considering here
 have infinitely many solutions, but only one of them is physical: the one that
 results from the so-called viscosity limit, called the <a
@@ -521,8 +521,8 @@ that program.
 
 Finally, to come back to the description of the testcase, we will show results
 for computations with the two permeability
-functions introduced at the end of the results section of @ref step_20
-"step-20":
+functions introduced at the end of the results section of
+step-20:
 <ul>
   <li>A function that models a single, winding crack that snakes through the
   domain. In analogy to step-20, but taking care of the slightly

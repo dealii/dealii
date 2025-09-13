@@ -25,7 +25,7 @@ namespace Functions
 {
 #ifdef DEAL_II_WITH_SYMENGINE
 
-  namespace
+  namespace internal
   {
     inline std::vector<Differentiation::SD::Expression>
     to_expressions(const std::vector<std::string> &strings)
@@ -35,7 +35,7 @@ namespace Functions
         ret[i] = Differentiation::SD::Expression(strings[i], true);
       return ret;
     }
-  } // namespace
+  } // namespace internal
 
 
 
@@ -60,8 +60,8 @@ namespace Functions
     : Function<dim, RangeNumberType>(
         Utilities::split_string_list(expressions, ';').size(),
         0.0)
-    , user_function(
-        to_expressions(Utilities::split_string_list(expressions, ';')))
+    , user_function(internal::to_expressions(
+        Utilities::split_string_list(expressions, ';')))
     , coordinate_symbols(get_default_coordinate_symbols())
     , time_symbol(Differentiation::SD::make_symbol("t"))
   {}

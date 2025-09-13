@@ -21,6 +21,10 @@
 #  include <deal.II/cgal/point_conversion.h>
 #  include <deal.II/cgal/utilities.h>
 
+#  include <CGAL/version.h>
+#  if CGAL_VERSION_MAJOR >= 6
+#    include <CGAL/Installation/internal/disable_deprecation_warnings_and_errors.h>
+#  endif
 #  include <CGAL/Polygon_2.h>
 #  include <CGAL/Polygon_with_holes_2.h>
 

@@ -261,13 +261,6 @@ namespace PETScWrappers
 
 
 
-  SolverRichardson::SolverRichardson(SolverControl &cn,
-                                     const MPI_Comm,
-                                     const AdditionalData &data)
-    : SolverRichardson(cn, data)
-  {}
-
-
   void
   SolverRichardson::set_solver_type(KSP &ksp) const
   {
@@ -311,13 +304,6 @@ namespace PETScWrappers
   {}
 
 
-  SolverChebychev::SolverChebychev(SolverControl &cn,
-                                   const MPI_Comm,
-                                   const AdditionalData &data)
-    : SolverChebychev(cn, data)
-  {}
-
-
   void
   SolverChebychev::set_solver_type(KSP &ksp) const
   {
@@ -335,13 +321,6 @@ namespace PETScWrappers
   SolverCG::SolverCG(SolverControl &cn, const AdditionalData &data)
     : SolverBase(cn)
     , additional_data(data)
-  {}
-
-
-  SolverCG::SolverCG(SolverControl &cn,
-                     const MPI_Comm,
-                     const AdditionalData &data)
-    : SolverCG(cn, data)
   {}
 
 
@@ -364,12 +343,6 @@ namespace PETScWrappers
     , additional_data(data)
   {}
 
-
-  SolverBiCG::SolverBiCG(SolverControl &cn,
-                         const MPI_Comm,
-                         const AdditionalData &data)
-    : SolverBiCG(cn, data)
-  {}
 
 
   void
@@ -401,12 +374,6 @@ namespace PETScWrappers
   {}
 
 
-  SolverGMRES::SolverGMRES(SolverControl &cn,
-                           const MPI_Comm,
-                           const AdditionalData &data)
-    : SolverGMRES(cn, data)
-  {}
-
 
   void
   SolverGMRES::set_solver_type(KSP &ksp) const
@@ -436,13 +403,6 @@ namespace PETScWrappers
   {}
 
 
-  SolverBicgstab::SolverBicgstab(SolverControl &cn,
-                                 const MPI_Comm,
-                                 const AdditionalData &data)
-    : SolverBicgstab(cn, data)
-  {}
-
-
   void
   SolverBicgstab::set_solver_type(KSP &ksp) const
   {
@@ -460,13 +420,6 @@ namespace PETScWrappers
   SolverCGS::SolverCGS(SolverControl &cn, const AdditionalData &data)
     : SolverBase(cn)
     , additional_data(data)
-  {}
-
-
-  SolverCGS::SolverCGS(SolverControl &cn,
-                       const MPI_Comm,
-                       const AdditionalData &data)
-    : SolverCGS(cn, data)
   {}
 
 
@@ -490,13 +443,6 @@ namespace PETScWrappers
   {}
 
 
-  SolverTFQMR::SolverTFQMR(SolverControl &cn,
-                           const MPI_Comm,
-                           const AdditionalData &data)
-    : SolverTFQMR(cn, data)
-  {}
-
-
   void
   SolverTFQMR::set_solver_type(KSP &ksp) const
   {
@@ -514,13 +460,6 @@ namespace PETScWrappers
   SolverTCQMR::SolverTCQMR(SolverControl &cn, const AdditionalData &data)
     : SolverBase(cn)
     , additional_data(data)
-  {}
-
-
-  SolverTCQMR::SolverTCQMR(SolverControl &cn,
-                           const MPI_Comm,
-                           const AdditionalData &data)
-    : SolverTCQMR(cn, data)
   {}
 
 
@@ -544,13 +483,6 @@ namespace PETScWrappers
   {}
 
 
-  SolverCR::SolverCR(SolverControl &cn,
-                     const MPI_Comm,
-                     const AdditionalData &data)
-    : SolverCR(cn, data)
-  {}
-
-
   void
   SolverCR::set_solver_type(KSP &ksp) const
   {
@@ -568,14 +500,6 @@ namespace PETScWrappers
   SolverLSQR::SolverLSQR(SolverControl &cn, const AdditionalData &data)
     : SolverBase(cn)
     , additional_data(data)
-  {}
-
-
-
-  SolverLSQR::SolverLSQR(SolverControl &cn,
-                         const MPI_Comm,
-                         const AdditionalData &data)
-    : SolverLSQR(cn, data)
   {}
 
 
@@ -607,12 +531,6 @@ namespace PETScWrappers
   {}
 
 
-  SolverPreOnly::SolverPreOnly(SolverControl &cn,
-                               const MPI_Comm,
-                               const AdditionalData &data)
-    : SolverPreOnly(cn, data)
-  {}
-
 
   void
   SolverPreOnly::set_solver_type(KSP &ksp) const
@@ -643,14 +561,6 @@ namespace PETScWrappers
     : SolverBase(cn)
     , additional_data(data)
     , symmetric_mode(false)
-  {}
-
-
-
-  SparseDirectMUMPS::SparseDirectMUMPS(SolverControl &cn,
-                                       const MPI_Comm,
-                                       const AdditionalData &data)
-    : SparseDirectMUMPS(cn, data)
   {}
 
 

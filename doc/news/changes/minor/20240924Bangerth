@@ -1,5 +1,0 @@
-New: The constructors of the classes within namespace
-FEValuesExtractors are now all marked as `constexpr`. As a
-consequence, FEValuesExtractors objects can now also be `constexpr`.
-<br>
-(Wolfgang Bangerth, 2024/09/24)

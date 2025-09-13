@@ -2,6 +2,9 @@ name: osx
 
 on:
   push:
+    branches:
+      - 'master'
+      - 'dealii-*'
   pull_request:
     types:
     - opened
@@ -40,10 +43,10 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [macos-13, macos-14, macos-15]
+        os: [macos-14, macos-15]
 
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v5
     - name: info
       run: |
         g++ -v
@@ -87,10 +90,10 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [macos-13, macos-14, macos-15]
+        os: [macos-14, macos-15]
 
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v5
     - name: setup
       run: |
         brew install openmpi

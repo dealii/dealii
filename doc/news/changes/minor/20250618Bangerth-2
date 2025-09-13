@@ -1,5 +1,0 @@
-New: There is now a new class VectorFunctionFromTensorFunctionObject
-that can be used to convert between function objects returning a
-Tensor<1,dim>, and a vector-valued Function object.
-<br>
-(Wolfgang Bangerth, 2025/06/18)

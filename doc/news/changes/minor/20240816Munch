@@ -1,5 +1,0 @@
-Improved: MappingFE now supports the case that not
-all geometric objects of a cell have the same
-manifold id.
-<br>
-(Peter Munch, 2024/08/16)

@@ -222,9 +222,9 @@ namespace Step49
     // a circle centered at the origin. Fortunately,
     // GridGenerator::hyper_cube_with_cylindrical_hole already attaches a
     // Manifold object to the interior boundary, so we do not need to do
-    // anything but refine the mesh (see the <a href="#Results">results
-    // section</a> for a fully worked example where we <em>do</em> attach a
-    // Manifold object).
+    // anything but refine the mesh (see the
+    // @ref step_49-ResultsSection "results section" for a fully worked example where
+    // we <em>do</em> attach a Manifold object).
     triangulation.refine_global(2);
     print_mesh_info(triangulation, "grid-3.vtu");
   }

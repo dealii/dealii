@@ -45,26 +45,26 @@ format. They are depicted in the following:
 <table width="100%">
   <tr>
     <td>
-      <img src="https://www.dealii.org/images/steps/developer/step-5.solution-0-r9.2.png" alt="">
+      <img src="https://dealii.org/images/steps/developer/step-5.solution-0-r9.2.png" alt="">
     </td>
     <td>
-      <img src="https://www.dealii.org/images/steps/developer/step-5.solution-1-r9.2.png" alt="">
-    </td>
-  </tr>
-  <tr>
-    <td>
-      <img src="https://www.dealii.org/images/steps/developer/step-5.solution-2-r9.2.png" alt="">
-    </td>
-    <td>
-      <img src="https://www.dealii.org/images/steps/developer/step-5.solution-3-r9.2.png" alt="">
+      <img src="https://dealii.org/images/steps/developer/step-5.solution-1-r9.2.png" alt="">
     </td>
   </tr>
   <tr>
     <td>
-      <img src="https://www.dealii.org/images/steps/developer/step-5.solution-4-r9.2.png" alt="">
+      <img src="https://dealii.org/images/steps/developer/step-5.solution-2-r9.2.png" alt="">
     </td>
     <td>
-      <img src="https://www.dealii.org/images/steps/developer/step-5.solution-5-r9.2.png" alt="">
+      <img src="https://dealii.org/images/steps/developer/step-5.solution-3-r9.2.png" alt="">
+    </td>
+  </tr>
+  <tr>
+    <td>
+      <img src="https://dealii.org/images/steps/developer/step-5.solution-4-r9.2.png" alt="">
+    </td>
+    <td>
+      <img src="https://dealii.org/images/steps/developer/step-5.solution-5-r9.2.png" alt="">
     </td>
   </tr>
 </table>

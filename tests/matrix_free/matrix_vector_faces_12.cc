@@ -18,7 +18,6 @@
 // the same implementation with MeshWorker. This example uses a mesh described
 // through a complicated manifold
 
-#include <deal.II/base/function.h>
 
 #include <deal.II/fe/fe_dgq.h>
 

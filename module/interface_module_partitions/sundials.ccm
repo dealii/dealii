@@ -1,0 +1,233 @@
+// ------------------------------------------------------------------------
+//
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2025 by the deal.II authors
+//
+// This file is part of the deal.II library.
+//
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
+//
+// ------------------------------------------------------------------------
+
+
+// It is very inefficient in the module system to have repeated
+// #includes in many module partition files because when you 'import'
+// those partitions, you also have to load everything they
+// #included. In other words, you get the same content *many times*,
+// once from each imported partition, rather than only once via the
+// old-style #include system. We deal with this by wrapping all of
+// SUNDIALS into one partition that we can 'import' wherever we need.
+// This is the file that wraps everything we need from SUNDIALS into one
+// module partition.
+
+
+module;
+
+#include <deal.II/base/config.h>
+
+#ifdef DEAL_II_WITH_SUNDIALS
+#  include <arkode/arkode.h>
+#  include <arkode/arkode_arkstep.h>
+#  include <arkode/arkode_ls.h>
+#  include <ida/ida.h>
+#  include <idas/idas.h>
+#  include <idas/idas_ls.h>
+#  include <kinsol/kinsol.h>
+#  include <nvector/nvector_parallel.h>
+#  include <nvector/nvector_serial.h>
+#  include <sundials/sundials_config.h>
+#  include <sundials/sundials_iterative.h>
+#  include <sundials/sundials_linearsolver.h>
+#  include <sundials/sundials_math.h>
+#  include <sundials/sundials_matrix.h>
+#  include <sundials/sundials_nvector.h>
+#  include <sundials/sundials_types.h>
+#  include <sunlinsol/sunlinsol_dense.h>
+#  include <sunlinsol/sunlinsol_spgmr.h>
+#  include <sunmatrix/sunmatrix_dense.h>
+#  include <sunnonlinsol/sunnonlinsol_fixedpoint.h>
+#endif
+
+
+export module dealii.external.sundials;
+
+#ifdef DEAL_II_WITH_SUNDIALS
+
+export
+{
+#  if DEAL_II_SUNDIALS_VERSION_GTE(6, 0, 0)
+#    undef sunbooleantype
+  using sunbooleantype = int;
+  using ::sunrealtype;
+#  else
+  using booleantype;
+  using ::realtype;
+#  endif
+
+  using ::_generic_N_Vector;
+  using ::ARKLsJacTimesSetupFn;
+  using ::ARKLsMassPrecSetupFn;
+  using ::ARKLsMassTimesSetupFn;
+  using ::ARKLsPrecSetupFn;
+  using ::ARKRhsFn;
+  using ::ARKStepCreate;
+  using ::ARKStepEvolve;
+  using ::ARKStepFree;
+  using ::ARKStepGetNumSteps;
+  using ::ARKStepSetInitStep;
+  using ::ARKStepSetJacTimes;
+  using ::ARKStepSetLinear;
+  using ::ARKStepSetLinearSolver;
+  using ::ARKStepSetMassLinearSolver;
+  using ::ARKStepSetMassPreconditioner;
+  using ::ARKStepSetMassTimes;
+  using ::ARKStepSetMaxNonlinIters;
+  using ::ARKStepSetNonlinearSolver;
+  using ::ARKStepSetOrder;
+  using ::ARKStepSetPreconditioner;
+  using ::ARKStepSetStopTime;
+  using ::ARKStepSetUserData;
+  using ::ARKStepSStolerances;
+  using ::ARKStepSVtolerances;
+  using ::IDACalcIC;
+  using ::IDACreate;
+  using ::IDAFree;
+  using ::IDAGetConsistentIC;
+  using ::IDAGetLastStep;
+  using ::IDAGetNumSteps;
+  using ::IDAInit;
+  using ::IDASetId;
+  using ::IDASetInitStep;
+  using ::IDASetJacFn;
+  using ::IDASetLinearSolver;
+  using ::IDASetLSNormFactor;
+  using ::IDASetMaxNonlinIters;
+  using ::IDASetMaxNumItersIC;
+  using ::IDASetMaxOrd;
+  using ::IDASetStopTime;
+  using ::IDASetSuppressAlg;
+  using ::IDASetUserData;
+  using ::IDASolve;
+  using ::IDASStolerances;
+  using ::IDASVtolerances;
+  using ::KINCreate;
+  using ::KINFree;
+  using ::KINGetNumNonlinSolvIters;
+  using ::KINInit;
+  using ::KINSetFuncNormTol;
+  using ::KINSetJacFn;
+  using ::KINSetLinearSolver;
+  using ::KINSetMAA;
+  using ::KINSetMaxBetaFails;
+  using ::KINSetMaxNewtonStep;
+  using ::KINSetMaxSetupCalls;
+  using ::KINSetNoInitSetup;
+  using ::KINSetNumMaxIters;
+  using ::KINSetOrthAA;
+  using ::KINSetRelErrFunc;
+  using ::KINSetScaledStepTol;
+  using ::KINSetUserData;
+  using ::KINSol;
+  using ::N_VCopyOps;
+  using ::N_VDestroy;
+  using ::N_Vector;
+  using ::N_Vector_ID;
+  using ::N_VFreeEmpty;
+  using ::N_VNewEmpty;
+  using ::SUNATimesFn;
+  using ::SUNContext;
+  using ::SUNContext_Create;
+  using ::SUNContext_Free;
+  using ::sunindextype;
+  using ::SUNLinearSolver;
+  using ::SUNLinearSolver_Type;
+  using ::SUNLinSol_SPGMR;
+  using ::SUNLinSolFree;
+  using ::SUNLinSolFreeEmpty;
+  using ::SUNLinSolNewEmpty;
+  using ::SUNMatDestroy;
+  using ::SUNMatNewEmpty;
+  using ::SUNMatrix;
+  using ::SUNMatrix_ID;
+  using ::SUNNonlinearSolver;
+  using ::SUNNonlinSol_FixedPoint;
+  using ::SUNPSetupFn;
+  using ::SUNPSolveFn;
+
+#  if DEAL_II_SUNDIALS_VERSION_GTE(7, 0, 0)
+  using ::SUNComm;
+#  endif
+
+  // These following are all macros, and so we use the same approach
+  // as we do for the MPI macros:
+  namespace SUNDIALS_Macros
+  {
+    namespace ARKode
+    {
+      const auto normal = ARK_NORMAL;
+    }
+
+    namespace IDA
+    {
+      const auto normal      = IDA_NORMAL;
+      const auto y_init      = IDA_Y_INIT;
+      const auto ya_ydp_init = IDA_YA_YDP_INIT;
+    } // namespace IDA
+
+    namespace KINSOL
+    {
+      const auto fp         = KIN_FP;
+      const auto linesearch = KIN_LINESEARCH;
+      const auto none       = KIN_NONE;
+      const auto picard     = KIN_PICARD;
+    } // namespace KINSOL
+
+    const auto sun_false = SUNFALSE;
+    const auto sun_true  = SUNTRUE;
+
+#  if DEAL_II_SUNDIALS_VERSION_GTE(7, 0, 0)
+    const auto comm_null = SUN_COMM_NULL;
+#  endif
+  } // namespace SUNDIALS_Macros
+
+#  undef ARK_NORMAL
+
+#  undef IDA_NORMAL
+#  undef IDA_Y_INIT
+#  undef IDA_YA_YDP_INIT
+
+#  undef KIN_FP
+#  undef KIN_LINESEARCH
+#  undef KIN_NONE
+#  undef KIN_PICARD
+
+#  undef SUNFALSE
+#  undef SUNTRUE
+
+#  if DEAL_II_SUNDIALS_VERSION_GTE(7, 0, 0)
+#    undef SUN_COMM_NULL
+#  endif
+
+  const auto &ARK_NORMAL = SUNDIALS_Macros::ARKode::normal;
+
+  const auto &IDA_NORMAL      = SUNDIALS_Macros::IDA::normal;
+  const auto &IDA_Y_INIT      = SUNDIALS_Macros::IDA::y_init;
+  const auto &IDA_YA_YDP_INIT = SUNDIALS_Macros::IDA::ya_ydp_init;
+
+  const auto &KIN_FP         = SUNDIALS_Macros::KINSOL::fp;
+  const auto &KIN_LINESEARCH = SUNDIALS_Macros::KINSOL::linesearch;
+  const auto &KIN_NONE       = SUNDIALS_Macros::KINSOL::none;
+  const auto &KIN_PICARD     = SUNDIALS_Macros::KINSOL::picard;
+
+  const auto &SUNFALSE = SUNDIALS_Macros::sun_false;
+  const auto &SUNTRUE  = SUNDIALS_Macros::sun_true;
+
+#  if DEAL_II_SUNDIALS_VERSION_GTE(7, 0, 0)
+  const auto &SUN_COMM_NULL = SUNDIALS_Macros::comm_null;
+#  endif
+}
+
+#endif

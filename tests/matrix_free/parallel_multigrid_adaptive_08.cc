@@ -321,8 +321,14 @@ do_test(const DoFHandler<dim> &dof)
        ++level)
     mg_interface_matrices[level].initialize(mg_matrices[level]);
 
+  std::vector<std::shared_ptr<const Utilities::MPI::Partitioner>> partitioners;
+  for (unsigned int level = mg_matrices.min_level();
+       level <= mg_matrices.max_level();
+       ++level)
+    partitioners.push_back(mg_level_data[level].get_vector_partitioner());
+
   MGTransferMatrixFree<dim, number> mg_transfer(mg_constrained_dofs);
-  mg_transfer.build(dof);
+  mg_transfer.build(dof, partitioners);
 
   MGCoarseIterative<LevelMatrixType, number> mg_coarse;
   mg_coarse.initialize(mg_matrices[0]);

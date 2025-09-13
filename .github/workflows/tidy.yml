@@ -2,6 +2,9 @@ name: tidy
 
 on:
   push:
+    branches:
+      - 'master'
+      - 'dealii-*'
   pull_request:
     types:
     - opened
@@ -30,7 +33,7 @@ jobs:
     # if: ${{ github.event_name == 'push' || !github.event.pull_request.draft }}
 
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v5
     - name: modules
       run: |
         sudo apt-get update

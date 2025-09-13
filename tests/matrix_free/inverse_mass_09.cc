@@ -19,7 +19,6 @@
 // argument fe_degree=-1 in FEEvaluation, otherwise the same as
 // inverse_mass_07 and inverse_mass_02
 
-#include <deal.II/base/function.h>
 
 #include <deal.II/dofs/dof_handler.h>
 
