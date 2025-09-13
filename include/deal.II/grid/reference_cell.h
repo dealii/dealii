@@ -2079,7 +2079,7 @@ ReferenceCell::n_isotropic_children() const
   switch (this->kind)
     {
       case ReferenceCells::Vertex:
-        return 0;
+        return 1;
       case ReferenceCells::Line:
         return 2;
       case ReferenceCells::Triangle:
