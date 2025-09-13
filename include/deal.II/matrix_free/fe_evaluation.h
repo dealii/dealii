@@ -7508,7 +7508,8 @@ FEFaceEvaluation<dim,
             }
 
           const bool orientation_interior_face = faces.face_orientation >= 8;
-          auto       face_orientation          = faces.face_orientation % 8;
+          types::geometric_orientation face_orientation =
+            faces.face_orientation % 8;
           if (face_identifies_as_interior != orientation_interior_face)
             {
               Assert(this->matrix_free->get_cell_iterator(cell_index, i)
@@ -7524,7 +7525,7 @@ FEFaceEvaluation<dim,
     }
   else
     {
-      this->face_orientations[0] = 0;
+      this->face_orientations[0] = numbers::default_geometric_orientation;
       this->face_numbers[0]      = face_number;
       if (this->matrix_free->n_active_entries_per_cell_batch(this->cell) ==
           n_lanes)

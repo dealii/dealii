@@ -955,7 +955,7 @@ protected:
    * @note Only available for `dof_access_index == dof_access_cell` and
    * `is_interior_face == false`.
    */
-  std::array<std::uint8_t, n_lanes> face_orientations;
+  std::array<types::geometric_orientation, n_lanes> face_orientations;
 
   /**
    * Stores the subface index of the given face. Usually, this variable takes
@@ -1184,7 +1184,7 @@ FEEvaluationData<dim, Number, is_face>::operator=(const FEEvaluationData &other)
          internal::MatrixFreeFunctions::DoFInfo::dof_access_face_exterior) :
       internal::MatrixFreeFunctions::DoFInfo::dof_access_cell;
   face_numbers[0]         = 0;
-  face_orientations[0]    = 0;
+  face_orientations[0]    = numbers::default_geometric_orientation;
   subface_index           = 0;
   cell_type               = internal::MatrixFreeFunctions::general;
   divergence_is_requested = false;
@@ -1275,7 +1275,7 @@ FEEvaluationData<dim, Number, is_face>::reinit_face(
   // internal::MatrixFreeFunctions::FaceToCellTopology::face_orientation.
   face_orientations[0] = (is_interior_face() == (face.face_orientation >= 8)) ?
                            (face.face_orientation % 8) :
-                           0;
+                           numbers::default_geometric_orientation;
 
   if (is_interior_face())
     cell_ids = face.cells_interior;
