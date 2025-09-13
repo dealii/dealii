@@ -434,8 +434,9 @@ namespace Step22
   // comparison of the results we obtain with several of these algorithms
   // based on the testcase discussed here in this tutorial program. Here, we
   // will use the traditional Cuthill-McKee algorithm already used in some of
-  // the previous tutorial programs.  In the <a href="#improved-ilu">section
-  // on improved ILU</a> we're going to discuss this issue in more detail.
+  // the previous tutorial programs.  In the
+  // @ref step_22-ImprovedILU "section on improved ILU" we're going to discuss
+  // this issue in more detail.
 
   // There is one more change compared to previous tutorial programs: There is
   // no reason in sorting the <code>dim</code> velocity components
@@ -461,21 +462,7 @@ namespace Step22
 
     std::vector<unsigned int> block_component(dim + 1, 0);
     block_component[dim] = 1;
-
-    // [WIP] Either (1) remove, revert back the original function call, and only
-    // mention new function in the note below; or (2) keep, modify the above
-    // commentary, and move the `block_component` downward.
-    const FEValuesExtractors::Vector velocities(0);
-    const FEValuesExtractors::Scalar pressure(dim);
-
-    DoFRenumbering::component_wise(dof_handler, {velocities, pressure});
-
-    // @note Instead of manually constructing the <code>block_component</code>
-    // We can alternatively instantiate appropriate FEValuesExtractors and
-    // call DoFRenumbering::component_wise with a braced initializer list of
-    // extractors. For details, see DoFRenumbering::component_wise<dim,
-    // spacedim>(DoFHandler<dim, spacedim> &, const
-    // std::vector<ExtractorVariant> &).
+    DoFRenumbering::component_wise(dof_handler, block_component);
 
     // Now comes the implementation of Dirichlet boundary conditions, which
     // should be evident after the discussion in the introduction. All that

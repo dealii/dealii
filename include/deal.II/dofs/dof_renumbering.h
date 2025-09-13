@@ -693,9 +693,9 @@ namespace DoFRenumbering
 
   /**
    * Sort the degrees of freedom by vector component. It does the same thing as
-   * above function except the ordering argument can be a braced initializer list
-   * containing FEValuesExtractors (or anything else that can be converted into
-   * the required `std::vector` type).
+   * above function except the ordering argument can be a braced initializer
+   * list containing FEValuesExtractors (or anything else that can be converted
+   * into the required `std::vector` type).
    *
    * The following two snippets are equivalent:
    * @code{.cpp}
@@ -711,10 +711,10 @@ namespace DoFRenumbering
    * @endcode
    *
    * Calling the function with `{velocities, pressure}` is equivalent to calling
-   * the above function with `std::vector<unsigned int>{0, 0, 1}` for dim=2, while
-   * calling with {pressure, velocities} would result in a call to above
-   * function with std::vector<unsigned int>{1, 1, 0} as the target_component
-   * argument.
+   * the above function with `std::vector<unsigned int>{0, 0, 1}` for dim=2,
+   * while calling with `{pressure, velocities}` would result in a call to above
+   * function with `std::vector<unsigned int>{1, 1, 0}` as the
+   * `target_component` argument.
    */
   template <int dim, int spacedim>
   void
