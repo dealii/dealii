@@ -759,8 +759,8 @@ namespace DoFRenumbering
       const std::vector<FEValuesExtractors::ExtractorVariant> &order,
       const unsigned int                                       fe_n_components)
     {
-      // `component_order` is constructed from a given ExtractorVariant
-      // vector, and the wrapped function is called at the end.
+      // Initialize `component_order` with invalid unsigned ints representing
+      // unassigned state.
       std::vector<unsigned int> component_order(fe_n_components,
                                                 numbers::invalid_unsigned_int);
 
@@ -830,13 +830,11 @@ namespace DoFRenumbering
 
               component_order[i] = block_index;
             }
-
           // Increment block index
           block_index++;
         }
       return component_order;
     }
-
   } // namespace
 
   template <int dim, int spacedim>
@@ -857,7 +855,7 @@ namespace DoFRenumbering
            ExcDimensionMismatch(component_order.size(),
                                 dof_handler.get_fe().n_components()));
 
-    // All entries must be populated
+    // All entries must be assigned
     Assert(
       std::none_of(component_order.begin(),
                    component_order.end(),
@@ -895,7 +893,7 @@ namespace DoFRenumbering
            ExcDimensionMismatch(component_order.size(),
                                 dof_handler.get_fe().n_components()));
 
-    // All entries must be populated.
+    // All entries must be assigned.
     Assert(
       std::none_of(component_order.begin(),
                    component_order.end(),
