@@ -3248,10 +3248,10 @@ namespace FETools
 
   template <int dim>
   std::pair<std::vector<unsigned int>, std::vector<unsigned int>>
-  cell_to_face_patch(const unsigned int &degree,
-                     const unsigned int &direction,
-                     const bool         &cell_hierarchical_numbering,
-                     const bool         &is_continuous)
+  cell_to_face_patch_numbering(const unsigned int &degree,
+                               const unsigned int &direction,
+                               const bool         &cell_hierarchical_numbering,
+                               const bool         &is_continuous)
   {
     AssertThrow(dim > 1, ExcInvalidFEDimension(1, dim));
     AssertThrow(direction < dim, ExcInvalidFEDimension(direction, dim));
@@ -3339,6 +3339,21 @@ namespace FETools
         result = renumbered_result;
       }
     return std::make_pair(results[0], results[1]);
+  }
+
+
+
+  template <int dim>
+  std::pair<std::vector<unsigned int>, std::vector<unsigned int>>
+  cell_to_face_patch(const unsigned int &degree,
+                     const unsigned int &direction,
+                     const bool         &cell_hierarchical_numbering,
+                     const bool         &is_continuous)
+  {
+    return cell_to_face_patch_numbering<dim>(degree,
+                                             direction,
+                                             cell_hierarchical_numbering,
+                                             is_continuous);
   }
 
   template <int dim, int spacedim>
