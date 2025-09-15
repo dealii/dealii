@@ -294,7 +294,7 @@ CALL_GRAPH             = NO
 CALLER_GRAPH           = NO
 GRAPHICAL_HIERARCHY    = NO
 DIRECTORY_GRAPH        = YES
-DOT_IMAGE_FORMAT       = png
+DOT_IMAGE_FORMAT       = svg
 MAX_DOT_GRAPH_DEPTH    = 5
 DOT_EDGE_ATTR          = "color=cornflowerblue"
 GENERATE_LEGEND        = YES
