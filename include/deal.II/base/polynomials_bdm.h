@@ -102,7 +102,7 @@ public:
    * Constructor. Creates all basis functions for BDM polynomials of given
    * degree.
    *
-   * @arg k: the degree of the BDM-space, which is the degree of the largest
+   * @param k The degree of the BDM-space, which is the degree of the largest
    * complete polynomial space <i>P<sub>k</sub></i> contained in the BDM-
    * space.
    */

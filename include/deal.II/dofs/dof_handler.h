@@ -609,26 +609,6 @@ public:
   get_active_fe_indices() const;
 
   /**
-   * For each locally relevant cell, extract the active finite element index and
-   * fill the vector @p active_fe_indices in the order in which we iterate over
-   * active cells. This vector is resized, if necessary.
-   *
-   * As we do not know the active FE index on artificial cells, they are set to
-   * the invalid value numbers::invalid_fe_index.
-   *
-   * For DoFHandler objects without hp-capabilities, the vector will consist of
-   * zeros, indicating that all cells use the same finite element. In hp-mode,
-   * the values may be different, though.
-   *
-   * The returned vector has as many entries as there are active cells.
-   *
-   * @deprecated Use get_active_fe_indices() that returns the result vector.
-   */
-  DEAL_II_DEPRECATED
-  void
-  get_active_fe_indices(std::vector<unsigned int> &active_fe_indices) const;
-
-  /**
    * For each locally owned cell, set the future finite element index to the
    * corresponding value given in @p future_fe_indices.
    *
@@ -767,7 +747,7 @@ public:
    * computing a new ordering of the degree of freedom indices. However, it
    * can of course also be called from user code.
    *
-   * @arg new_number This array must have a size equal to the number of
+   * @param[in] new_numbers This array must have a size equal to the number of
    * degrees of freedom owned by the current processor, i.e. the size must be
    * equal to what n_locally_owned_dofs() returns. If only one processor
    * participates in storing the current mesh, then this equals the total
@@ -1233,7 +1213,7 @@ public:
    *
    * @deprecated Use get_mpi_communicator() instead.
    */
-  DEAL_II_DEPRECATED_EARLY_WITH_COMMENT(
+  DEAL_II_DEPRECATED_WITH_COMMENT(
     "Access the MPI communicator with get_mpi_communicator() instead.")
   MPI_Comm
   get_communicator() const;

@@ -17,7 +17,6 @@
 // similar to matrix_vector_faces_03 but we now compare against the combined
 // evaluation with gather_evaluate and integrate_scatter
 
-#include <deal.II/base/function.h>
 #include <deal.II/base/quadrature_lib.h>
 
 #include <deal.II/fe/fe_dgq.h>

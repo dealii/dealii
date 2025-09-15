@@ -6,7 +6,7 @@ is by him.
 <br>
 
 
-<a name="step-15-Intro"></a>
+<a name="step_15-Intro"></a>
 <h1>Introduction</h1>
 
 <h3>Foreword</h3>
@@ -97,9 +97,9 @@ u^{0}=g$ in the first step and with $\delta u^{n}=0$ in all the following steps.
   implements $F(u)$, it is duplicative to also have to implement
   $F'(u,\delta)$. As always, duplication tempts bugs and we would like
   to avoid it. While we do not explore this issue in this program, we
-  will come back to it at the end of the <a
-  href="#extensions">Possibilities for extensions</a> section below,
-  and specifically in step-72.
+  will come back to it at the end of the
+  @ref step_15-Extensions "Possibilities for extensions"
+  section below, and specifically in step-72.
 
 
 <h3>Weak formulation of the problem</h3>
@@ -248,7 +248,7 @@ full step lengths we forego the rapid, quadratic convergence that
 makes Newton's method so appealing. Obviously, this is a point one
 eventually has to address if the program was made into one that is
 meant to solve more realistic problems. We will comment on this issue
-some more in the <a href="#Results">results section</a>, and use an
+some more in the @ref step_15-ResultsSection "results section", and use an
 even better approach in step-77.
 
 

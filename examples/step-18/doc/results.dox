@@ -133,7 +133,7 @@ images encode the norm of the stress in the material):
 <div class="threecolumn" style="width: 80%">
   <div class="parent">
     <div class="img" align="center">
-      <img src="https://www.dealii.org/images/steps/developer/step-18.sequential-0002.0000.png"
+      <img src="https://dealii.org/images/steps/developer/step-18.sequential-0002.0000.png"
            alt="Time = 2"
            width="400">
     </div>
@@ -143,7 +143,7 @@ images encode the norm of the stress in the material):
   </div>
   <div class="parent">
     <div class="img" align="center">
-      <img src="https://www.dealii.org/images/steps/developer/step-18.sequential-0005.0000.png"
+      <img src="https://dealii.org/images/steps/developer/step-18.sequential-0005.0000.png"
            alt="Time = 5"
            width="400">
     </div>
@@ -153,7 +153,7 @@ images encode the norm of the stress in the material):
   </div>
   <div class="parent">
     <div class="img" align="center">
-      <img src="https://www.dealii.org/images/steps/developer/step-18.sequential-0007.0000.png"
+      <img src="https://dealii.org/images/steps/developer/step-18.sequential-0007.0000.png"
            alt="Time = 7"
            width="400">
     </div>
@@ -167,7 +167,7 @@ images encode the norm of the stress in the material):
 <div class="threecolumn" style="width: 80%">
   <div class="parent">
     <div class="img" align="center">
-      <img src="https://www.dealii.org/images/steps/developer/step-18.sequential-0008.0000.png"
+      <img src="https://dealii.org/images/steps/developer/step-18.sequential-0008.0000.png"
            alt="Time = 8"
            width="400">
     </div>
@@ -177,7 +177,7 @@ images encode the norm of the stress in the material):
   </div>
   <div class="parent">
     <div class="img" align="center">
-      <img src="https://www.dealii.org/images/steps/developer/step-18.sequential-0009.0000.png"
+      <img src="https://dealii.org/images/steps/developer/step-18.sequential-0009.0000.png"
            alt="Time = 9"
            width="400">
     </div>
@@ -187,7 +187,7 @@ images encode the norm of the stress in the material):
   </div>
   <div class="parent">
     <div class="img" align="center">
-      <img src="https://www.dealii.org/images/steps/developer/step-18.sequential-0010.0000.png"
+      <img src="https://dealii.org/images/steps/developer/step-18.sequential-0010.0000.png"
            alt="Time = 10"
            width="400">
     </div>
@@ -284,7 +284,7 @@ for the 16 processors:
 <div class="twocolumn" style="width: 80%">
   <div class="parent">
     <div class="img" align="center">
-      <img src="https://www.dealii.org/images/steps/developer/step-18.parallel-000mesh.png"
+      <img src="https://dealii.org/images/steps/developer/step-18.parallel-000mesh.png"
            alt="Discretization"
            width="400">
     </div>
@@ -294,7 +294,7 @@ for the 16 processors:
   </div>
   <div class="parent">
     <div class="img" align="center">
-      <img src="https://www.dealii.org/images/steps/developer/step-18.parallel-0002.p.png"
+      <img src="https://dealii.org/images/steps/developer/step-18.parallel-0002.p.png"
            alt="Parallel partitioning"
            width="400">
     </div>
@@ -311,7 +311,7 @@ sequential case:
 <div class="threecolumn" style="width: 80%">
   <div class="parent">
     <div class="img" align="center">
-      <img src="https://www.dealii.org/images/steps/developer/step-18.parallel-0002.s.png"
+      <img src="https://dealii.org/images/steps/developer/step-18.parallel-0002.s.png"
            alt="Time = 2"
            width="400">
     </div>
@@ -321,7 +321,7 @@ sequential case:
   </div>
   <div class="parent">
     <div class="img" align="center">
-      <img src="https://www.dealii.org/images/steps/developer/step-18.parallel-0005.s.png"
+      <img src="https://dealii.org/images/steps/developer/step-18.parallel-0005.s.png"
            alt="Time = 5"
            width="400">
     </div>
@@ -331,7 +331,7 @@ sequential case:
   </div>
   <div class="parent">
     <div class="img" align="center">
-      <img src="https://www.dealii.org/images/steps/developer/step-18.parallel-0007.s.png"
+      <img src="https://dealii.org/images/steps/developer/step-18.parallel-0007.s.png"
            alt="Time = 7"
            width="400">
     </div>
@@ -345,7 +345,7 @@ sequential case:
 <div class="threecolumn" style="width: 80%">
   <div class="parent">
     <div class="img" align="center">
-      <img src="https://www.dealii.org/images/steps/developer/step-18.parallel-0008.s.png"
+      <img src="https://dealii.org/images/steps/developer/step-18.parallel-0008.s.png"
            alt="Time = 8"
            width="400">
     </div>
@@ -355,7 +355,7 @@ sequential case:
   </div>
   <div class="parent">
     <div class="img" align="center">
-      <img src="https://www.dealii.org/images/steps/developer/step-18.parallel-0009.s.png"
+      <img src="https://dealii.org/images/steps/developer/step-18.parallel-0009.s.png"
            alt="Time = 9"
            width="400">
     </div>
@@ -365,7 +365,7 @@ sequential case:
   </div>
   <div class="parent">
     <div class="img" align="center">
-      <img src="https://www.dealii.org/images/steps/developer/step-18.parallel-0010.s.png"
+      <img src="https://dealii.org/images/steps/developer/step-18.parallel-0010.s.png"
            alt="Time = 10"
            width="400">
     </div>
@@ -418,8 +418,8 @@ what direction it may be extended:
  The most obvious extension is to use a more
 realistic material model for large-scale quasistatic deformation. The natural
 choice for this would be plasticity, in which a nonlinear relationship between
-stress and strain replaces equation <a href="#step_18.stress-strain">[stress-strain]</a>. Plasticity
-models are usually rather complicated to program since the stress-strain
+stress and strain replaces equation @ref step_18-StressStrain "[stress-strain]".
+Plasticity models are usually rather complicated to program since the stress-strain
 dependence is generally non-smooth. The material can be thought of being able
 to withstand only a maximal stress (the yield stress) after which it starts to
 &ldquo;flow&rdquo;. A mathematical description to this can be given in the form of a

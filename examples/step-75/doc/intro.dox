@@ -20,7 +20,7 @@ href="../../readme.html" target="body">README</a> file.
 
 
 
-<a name="step-75-Intro"></a>
+<a name="step_75-Intro"></a>
 <h1>Introduction</h1>
 
 In the finite element context, more degrees of freedom usually yield a
@@ -224,7 +224,7 @@ solver to a hybrid multigrid solver.
 We will create a custom hybrid multigrid preconditioner with the special
 level requirements as described above with the help of the existing
 global-coarsening infrastructure via the use of
-MGTransferGlobalCoarsening.
+MGTransferMatrixFree.
 
 
 <h3>The test case</h3>
@@ -250,7 +250,7 @@ u_\text{sol} = r^{2/3} \sin(2/3 \varphi).
 See also @cite brenner2008 or @cite mitchell2014hp. The solution looks as follows:
 
 <div style="text-align:center;">
-  <img src="https://www.dealii.org/images/steps/developer/step-75.solution.svg"
+  <img src="https://dealii.org/images/steps/developer/step-75.solution.svg"
        alt="Analytic solution.">
 </div>
 

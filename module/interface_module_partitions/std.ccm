@@ -1,0 +1,765 @@
+// ------------------------------------------------------------------------
+//
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2012 - 2024 by the deal.II authors
+//
+// This file is part of the deal.II library.
+//
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
+//
+// ------------------------------------------------------------------------
+
+
+// It is very inefficient in the module system to have repeated
+// #includes in many module partition files because when you 'import'
+// those partitions, you also have to load everything they
+// #included. In other words, you get the same content *many times*,
+// once from each imported partition, rather than only once via the
+// old-style #include system. We deal with this by wrapping all of
+// C++ headers into one partition that we can 'import' wherever we need.
+//
+// This file wraps 'namespace std'. It is loosely based on the
+// approach shown at
+//    https://github.com/davidstone/std_module
+// but it is a clean-room implementation in large part because we
+// use so many more functions than are exported in David Stone's
+// example.
+
+module;
+
+#include <deal.II/macros.h>
+
+#include <algorithm>
+#include <any>
+#include <array>
+#include <atomic>
+#include <bit>
+#include <bitset>
+#include <cctype>
+#ifdef DEAL_II_HAVE_FP_EXCEPTIONS
+#  include <cfenv>
+#endif
+#include <charconv>
+#include <chrono>
+#include <cmath>
+#include <complex>
+#include <cstddef>
+#include <cstdint>
+#include <cstdio>
+#include <cstdlib>
+#include <cstring>
+#include <ctime>
+#include <deque>
+#include <exception>
+#include <filesystem>
+#include <forward_list>
+#include <fstream>
+#include <functional>
+#include <future>
+#include <initializer_list>
+#include <iomanip>
+#include <iosfwd>
+#include <iostream>
+#include <iterator>
+#include <limits>
+#include <list>
+#include <map>
+#include <memory>
+#include <mutex>
+#include <numeric>
+#include <optional>
+#include <ostream>
+// #include <queue> // See https://github.com/llvm/llvm-project/issues/138558
+#include <random>
+#include <ranges>
+#include <regex>
+#include <set>
+#include <shared_mutex>
+#include <sstream>
+// #include <stack> // See https://github.com/llvm/llvm-project/issues/138558
+#include <string>
+#include <thread>
+#include <tuple>
+#include <type_traits>
+#include <typeinfo>
+#include <unordered_map>
+#include <unordered_set>
+#include <utility>
+#include <variant>
+#include <vector>
+
+
+export module dealii.external.std;
+
+export
+{
+  namespace std
+  {
+    // Some types
+    using std::int16_t;
+    using std::int32_t;
+    using std::int64_t;
+    using std::int8_t;
+    using std::intmax_t;
+    using std::ptrdiff_t;
+    using std::size_t;
+    using std::uint16_t;
+    using std::uint32_t;
+    using std::uint64_t;
+    using std::uint8_t;
+    using std::uint_least64_t;
+    using std::uintmax_t;
+    using std::uintptr_t;
+
+    // Types wrapping integers
+    using std::bool_constant;
+    using std::false_type;
+    using std::index_sequence;
+    using std::integer_sequence;
+    using std::integral_constant;
+    using std::make_index_sequence;
+    using std::make_integer_sequence;
+    using std::true_type;
+
+    // Type traits and concepts
+    using std::add_const_t;
+    using std::add_pointer_t;
+    using std::add_volatile_t;
+    using std::assignable_from;
+    using std::common_type;
+    using std::common_type_t;
+    using std::conditional_t;
+    using std::constructible_from;
+    using std::convertible_to;
+    using std::copy_constructible;
+    using std::decay_t;
+    using std::derived_from;
+    using std::destructible;
+    using std::enable_if;
+    using std::enable_if_t;
+    using std::extent_v;
+    using std::floating_point;
+    using std::integral;
+    using std::invocable;
+    using std::invoke_result_t;
+    using std::is_arithmetic_v;
+    using std::is_array_v;
+    using std::is_assignable_v;
+    using std::is_base_of;
+    using std::is_base_of_v;
+    using std::is_const_v;
+    using std::is_constant_evaluated;
+    using std::is_constructible_v;
+    using std::is_convertible;
+    using std::is_convertible_v;
+    using std::is_copy_assignable_v;
+    using std::is_copy_constructible_v;
+    using std::is_default_constructible_v;
+    using std::is_empty_v;
+    using std::is_enum_v;
+    using std::is_floating_point_v;
+    using std::is_function_v;
+    using std::is_fundamental_v;
+    using std::is_integral;
+    using std::is_integral_v;
+    using std::is_invocable_r_v;
+    using std::is_invocable_v;
+    using std::is_lvalue_reference_v;
+    using std::is_member_function_pointer_v;
+    using std::is_member_object_pointer_v;
+    using std::is_member_pointer_v;
+    using std::is_move_assignable_v;
+    using std::is_move_constructible_v;
+    using std::is_nothrow_constructible_v;
+    using std::is_nothrow_copy_assignable_v;
+    using std::is_nothrow_copy_constructible_v;
+    using std::is_nothrow_destructible_v;
+    using std::is_nothrow_move_assignable_v;
+    using std::is_nothrow_move_constructible_v;
+    using std::is_nothrow_swappable_v;
+    using std::is_null_pointer_v;
+    using std::is_pointer_v;
+    using std::is_reference_v;
+    using std::is_rvalue_reference_v;
+    using std::is_same;
+    using std::is_same_v;
+    using std::is_standard_layout_v;
+    using std::is_trivial_v;
+    using std::is_trivially_copy_assignable_v;
+    using std::is_trivially_copy_constructible_v;
+    using std::is_trivially_copyable;
+    using std::is_trivially_copyable_v;
+    using std::is_trivially_default_constructible_v;
+    using std::is_trivially_destructible_v;
+    using std::is_trivially_move_assignable_v;
+    using std::is_trivially_move_constructible_v;
+    using std::is_unsigned;
+    using std::is_unsigned_v;
+    using std::is_void_v;
+    using std::is_volatile_v;
+    using std::make_signed_t;
+    using std::make_unsigned_t;
+    using std::move_constructible;
+    using std::predicate;
+    using std::regular_invocable;
+    using std::remove_const_t;
+    using std::remove_cv_t;
+    using std::remove_cvref_t;
+    using std::remove_pointer_t;
+    using std::remove_reference;
+    using std::remove_reference_t;
+    using std::same_as;
+    using std::signed_integral;
+    using std::three_way_comparable;
+    using std::type_identity;
+    using std::type_identity_t;
+    using std::underlying_type_t;
+    using std::unsigned_integral;
+
+    // Numeric functions
+    using std::abs;
+    using std::acos;
+    using std::asin;
+    using std::atan;
+    using std::atan2;
+    using std::cbrt;
+    using std::ceil;
+    using std::clamp;
+    using std::conj;
+    using std::copysign;
+    using std::cos;
+    using std::cosh;
+#ifdef DEAL_II_HAVE_CXX17_BESSEL_FUNCTIONS
+    using std::cyl_bessel_j;
+    using std::cyl_bessel_jf;
+#endif
+    using std::erf;
+    using std::erfc;
+    using std::exp;
+    using std::exp2;
+    using std::fabs;
+    using std::floor;
+    using std::fmax;
+    using std::fmin;
+    using std::fmod;
+    using std::hypot;
+    using std::imag;
+    using std::isfinite;
+    using std::isinf;
+    using std::isnan;
+    using std::llround;
+    using std::log;
+    using std::log10;
+    using std::log2;
+    using std::lround;
+    using std::max;
+    using std::min;
+    using std::minmax;
+    using std::norm;
+    using std::pow;
+    using std::real;
+    using std::round;
+    using std::signbit;
+    using std::sin;
+    using std::sinh;
+    using std::sqrt;
+    using std::tan;
+    using std::tanh;
+    using std::trunc;
+
+    inline namespace complex_literals
+    {
+      using literals::complex_literals::operator""i;
+      using literals::complex_literals::operator""if;
+      using literals::complex_literals::operator""il;
+    } // namespace complex_literals
+
+    // Exceptions
+    using std::bad_alloc;
+    using std::bad_cast;
+    using std::current_exception;
+    using std::exception;
+    using std::exception_ptr;
+    using std::invalid_argument;
+    using std::length_error;
+    using std::out_of_range;
+    using std::range_error;
+    using std::rethrow_exception;
+    using std::runtime_error;
+    using std::uncaught_exceptions;
+
+    // Iterators and ranges
+    using std::advance;
+    using std::back_inserter;
+    using std::begin;
+    using std::data;
+    using std::distance;
+    using std::end;
+    using std::next;
+    using std::prev;
+    using std::size;
+
+    using std::iterator_traits;
+
+    using std::bidirectional_iterator_tag;
+    using std::contiguous_iterator_tag;
+    using std::default_sentinel;
+    using std::default_sentinel_t;
+    using std::forward_iterator_tag;
+    using std::input_iterator_tag;
+    using std::make_reverse_iterator;
+    using std::output_iterator_tag;
+    using std::random_access_iterator_tag;
+    using std::reverse_iterator;
+
+#ifdef DEAL_II_HAVE_CXX23
+    using std::from_range;
+    using std::from_range_t;
+#endif
+
+    namespace ranges
+    {
+      using std::ranges::data;
+      using std::ranges::iota_view;
+      using std::ranges::swap;
+    } // namespace ranges
+
+
+    // Containers and similar things
+    using std::any;
+    using std::any_cast;
+    using std::array;
+    using std::bitset;
+    using std::complex;
+    using std::deque;
+    using std::forward_list;
+    using std::initializer_list;
+    using std::list;
+    using std::make_optional;
+    using std::map;
+    using std::multimap;
+    using std::multiset;
+    using std::nullopt;
+    using std::optional;
+    // For now, don't export this class to work around a compiler bug:
+    // using std::queue;
+    using std::set;
+    using std::span;
+    // For now, don't export this class to work around a compiler bug:
+    // using std::stack;
+    using std::unordered_map;
+    using std::unordered_multimap;
+    using std::unordered_multiset;
+    using std::unordered_set;
+    using std::variant;
+    using std::vector;
+    using std::visit;
+
+    // Function objects, functors, and related concepts
+    using std::bind;
+    using std::bind_front;
+    using std::bit_and;
+    using std::cref;
+    using std::divides;
+    using std::equal_to;
+    using std::function;
+    using std::greater;
+    using std::greater_equal;
+    using std::identity;
+    using std::less;
+    using std::less_equal;
+    using std::minus;
+    using std::modulus;
+    using std::multiplies;
+    using std::not_equal_to;
+    using std::not_fn;
+    using std::plus;
+    using std::ref;
+
+    namespace placeholders
+    {
+      using std::placeholders::_1;
+      using std::placeholders::_2;
+      using std::placeholders::_3;
+    } // namespace placeholders
+
+#ifdef DEAL_II_HAVE_CXX23
+    using std::to_underlying;
+    using std::unreachable;
+#endif
+
+    // Strings
+    using std::basic_string;
+    using std::basic_string_view;
+    using std::string;
+    using std::string_view;
+
+    using std::atoi;
+    using std::char_traits;
+    using std::chars_format;
+    using std::errc;
+    using std::from_chars;
+    using std::from_chars_result;
+    using std::getline;
+    using std::isalnum;
+    using std::isdigit;
+    using std::regex;
+    using std::regex_match;
+    using std::regex_search;
+    using std::sscanf;
+    using std::stod;
+    using std::stoi;
+    using std::stoull;
+    using std::strcat;
+    using std::strcmp;
+    using std::strcpy;
+    using std::strlen;
+    using std::strstr;
+    using std::strtod;
+    using std::strtol;
+    using std::to_string;
+    using std::tolower;
+    using std::toupper;
+
+
+    inline namespace literals
+    {
+      inline namespace string_view_literals
+      {
+        using std::literals::string_view_literals::operator""sv;
+
+      } // namespace string_view_literals
+    }   // namespace literals
+
+    // Algorithms
+    using std::accumulate;
+    using std::adjacent_find;
+    using std::all_of;
+    using std::any_of;
+    using std::binary_search;
+    using std::compare_three_way;
+    using std::copy;
+    using std::copy_backward;
+    using std::copy_n;
+    using std::count;
+    using std::count_if;
+    using std::equal;
+    using std::fill;
+    using std::fill_n;
+    using std::find;
+    using std::find_if;
+    using std::for_each;
+    using std::inner_product;
+    using std::inplace_merge;
+    using std::iota;
+    using std::is_sorted;
+    using std::lexicographical_compare;
+    using std::lower_bound;
+    using std::make_heap;
+    using std::max_element;
+    using std::memcpy;
+    using std::min_element;
+    using std::minmax_element;
+    using std::mismatch;
+    using std::move_backward;
+    using std::next_permutation;
+    using std::none_of;
+    using std::nth_element;
+    using std::partial_sum;
+    using std::partition;
+    using std::reduce;
+    using std::remove;
+    using std::remove_if;
+    using std::replace;
+    using std::reverse;
+    using std::rotate;
+    using std::search;
+    using std::set_difference;
+    using std::set_intersection;
+    using std::set_union;
+    using std::shuffle;
+    using std::sort;
+    using std::sort_heap;
+    using std::stable_sort;
+    using std::transform;
+    using std::unique;
+    using std::upper_bound;
+
+    // Tuples and similar stuff
+    using std::apply;
+    using std::forward_as_tuple;
+    using std::get;
+    using std::get_if;
+    using std::holds_alternative;
+    using std::make_pair;
+    using std::make_tuple;
+    using std::pair;
+    using std::tie;
+    using std::tuple;
+    using std::tuple_element;
+    using std::tuple_element_t;
+    using std::tuple_size;
+    using std::tuple_size_v;
+
+    // Time stuff
+    using std::ctime;
+    using std::difftime;
+    using std::localtime;
+    using std::time;
+    using std::time_t;
+    using std::tm;
+
+    namespace chrono
+    {
+      using std::chrono::duration;
+      using std::chrono::duration_cast;
+      using std::chrono::high_resolution_clock;
+      using std::chrono::hours;
+      using std::chrono::microseconds;
+      using std::chrono::milliseconds;
+      using std::chrono::seconds;
+      using std::chrono::steady_clock;
+      using std::chrono::time_point;
+      using std::chrono::operator+;
+      using std::chrono::operator-;
+
+    } // namespace chrono
+
+    // Random generators
+    using std::discrete_distribution;
+    using std::geometric_distribution;
+    // For now, don't export these two to work around a compiler bug:
+    // using std::mt19937;
+    // using std::mt19937_64;
+    using std::normal_distribution;
+    using std::random_device;
+    using std::uniform_int_distribution;
+    using std::uniform_real_distribution;
+
+    // Memory, mutexes, and locking
+    using std::addressof;
+    using std::align;
+    using std::allocator;
+    using std::atomic;
+    using std::atomic_flag;
+    using std::dynamic_pointer_cast;
+    using std::free;
+    using std::make_shared;
+    using std::make_unique;
+    using std::malloc;
+    using std::memcmp;
+    using std::memcpy;
+    using std::memory_order;
+    using std::memory_order_acquire;
+    using std::memory_order_relaxed;
+    using std::memory_order_release;
+    using std::memset;
+    using std::pointer_traits;
+    using std::shared_ptr;
+    using std::unique_ptr;
+    using std::weak_ptr;
+
+    using std::lock_guard;
+    using std::mutex;
+    using std::scoped_lock;
+    using std::shared_lock;
+    using std::shared_mutex;
+    using std::try_to_lock;
+    using std::unique_lock;
+
+    // Threads, parallel, and asynchronous things, plus temporal stuff
+    using std::async;
+    using std::atexit;
+    using std::call_once;
+    using std::construct_at;
+    using std::destroy_at;
+    using std::future;
+    using std::future_status;
+    using std::launch;
+    using std::once_flag;
+    using std::promise;
+    using std::thread;
+
+    namespace this_thread
+    {
+      using std::this_thread::get_id;
+      using std::this_thread::sleep_for;
+      using std::this_thread::sleep_until;
+      using std::this_thread::yield;
+    } // namespace this_thread
+
+    // Files and file systems
+    namespace filesystem
+    {
+      using std::filesystem::begin;
+      using std::filesystem::create_directories;
+      using std::filesystem::create_directory;
+      using std::filesystem::directory_entry;
+      using std::filesystem::directory_iterator;
+      using std::filesystem::end;
+      using std::filesystem::exists;
+      using std::filesystem::file_size;
+      using std::filesystem::is_directory;
+      using std::filesystem::path;
+      using std::filesystem::recursive_directory_iterator;
+      using std::filesystem::remove;
+      using std::filesystem::remove_all;
+      using std::filesystem::temp_directory_path;
+    } // namespace filesystem
+
+    // Input and output streams, files
+    using std::basic_istream;
+    using std::basic_ostream;
+    using std::cerr;
+    using std::cout;
+    using std::dec;
+    using std::endl;
+    using std::fclose;
+    using std::FILE;
+    using std::fixed;
+    using std::flush;
+    using std::fopen;
+    using std::fstream;
+    using std::hex;
+    using std::ifstream;
+    using std::inserter;
+    using std::ios;
+    using std::ios_base;
+    using std::istream;
+    using std::istreambuf_iterator;
+    using std::istringstream;
+    using std::left;
+    using std::ofstream;
+    using std::ostream;
+    using std::ostream_iterator;
+    using std::ostringstream;
+    using std::rename;
+    using std::right;
+    using std::scientific;
+    using std::setfill;
+    using std::setiosflags;
+    using std::setprecision;
+    using std::setw;
+    using std::streambuf;
+    using std::streampos;
+    using std::streamsize;
+    using std::stringstream;
+
+    namespace filesystem
+    {
+      using filesystem::directory_iterator;
+      using filesystem::rename;
+    } // namespace filesystem
+
+    // Locales
+    using std::locale;
+
+    // Things and tools that don't seem to go into any of the other
+    // categories:
+    using std::abort;
+    using std::as_bytes;
+    using std::as_const;
+    using std::as_writable_bytes;
+    using std::bit_cast;
+    using std::byte;
+    using std::declval;
+    using std::denorm_absent;
+    using std::endian;
+    using std::exchange;
+    using std::forward;
+    using std::getenv;
+    using std::hash;
+    using std::ignore;
+    using std::in_place;
+    using std::in_place_index;
+    using std::in_place_index_t;
+    using std::in_place_t;
+    using std::in_place_type;
+    using std::in_place_type_t;
+    using std::invoke;
+    using std::isspace;
+    using std::max;
+    using std::monostate;
+    using std::move;
+    using std::nullptr_t;
+    using std::numeric_limits;
+    using std::ref;
+    using std::reference_wrapper;
+    using std::round_toward_zero;
+    using std::strong_ordering;
+    using std::swap;
+    using std::swap_ranges;
+    using std::system;
+    using std::type_info;
+
+    // Some operators. These may actually be overloaded for a variety
+    // of argument types.
+    using std::operator+;
+    using std::operator-;
+    using std::operator*;
+    using std::operator/;
+    using std::operator|;
+    using std::operator<<;
+    using std::operator>>;
+    using std::operator==;
+    using std::operator!=;
+    using std::operator<=;
+    using std::operator>=;
+    using std::operator<;
+    using std::operator>;
+  } // namespace std
+
+#if defined(__GLIBCXX__) // For GCC's support library
+
+  namespace __gnu_cxx
+  {
+    using __gnu_cxx::operator-;
+    using __gnu_cxx::operator==;
+    using __gnu_cxx::operator<=>;
+  } // namespace __gnu_cxx
+
+#elif defined(_LIBCPP_VERSION) // For CLang's support library
+
+  _LIBCPP_BEGIN_NAMESPACE_STD
+
+  using std::operator==;
+  using std::operator!=;
+  using std::operator<=>;
+  using std::operator<;
+  using std::operator>;
+  using std::operator<=;
+  using std::operator>=;
+
+  _LIBCPP_END_NAMESPACE_STD
+
+#endif
+
+  // C++ also declares a few functions in the global namespace:
+  using ::operator new;
+  using ::operator delete;
+
+  // Finally also export some C functions and types we build on, or
+  // that we need to use because some of our external libraries use
+  // these types in their interfaces and/or macros:
+  using ::erf;
+  using ::fabs;
+  using ::int8_t;
+  using ::mkdtemp;
+  using ::mkstemp;
+  using ::posix_memalign;
+  using ::rand;
+  using ::size_t;
+  using ::strcmp;
+
+  // And then also a couple of things that have to do with floating
+  // point exceptions:
+#ifdef DEAL_II_HAVE_FP_EXCEPTIONS
+  using ::feholdexcept;
+  using ::fenv_t;
+  using ::fesetenv;
+#endif
+
+} // export

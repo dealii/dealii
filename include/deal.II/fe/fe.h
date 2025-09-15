@@ -1440,7 +1440,7 @@ public:
    * typically used.
    *
    * The use of this function is explained extensively in the step-8 and
-   * @ref step_20 "step-20"
+   * step-20
    * tutorial programs as well as in the
    * @ref vector_valued
    * topic.

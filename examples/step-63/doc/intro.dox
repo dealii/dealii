@@ -9,7 +9,7 @@ Davis.
 
 @dealiiTutorialDOI{10.5281/zenodo.3382899,https://zenodo.org/badge/DOI/10.5281/zenodo.3382899.svg}
 
-<a name="step-63-Intro"></a>
+<a name="step_63-Intro"></a>
 <h1>Introduction</h1>
 
 This program solves an advection-diffusion problem using a geometric multigrid
@@ -259,10 +259,10 @@ of the standard Galerkin finite element method for this problem.
 <table width="60%" align="center">
   <tr>
     <td align="center">
-      <img src="https://www.dealii.org/images/steps/developer/step-63-solution.png" alt="">
+      <img src="https://dealii.org/images/steps/developer/step-63-solution.png" alt="">
     </td>
     <td align="center">
-      <img src="https://www.dealii.org/images/steps/developer/step-63-solution-no-sd.png" alt="">
+      <img src="https://dealii.org/images/steps/developer/step-63-solution-no-sd.png" alt="">
     </td>
   </tr>
 </table>

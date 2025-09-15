@@ -41,6 +41,15 @@ repos:
             \.cc |
             \.h
         )$
+- repo: https://github.com/psf/black-pre-commit-mirror
+  rev: 25.1.0
+  hooks:
+    - id: black
+      exclude: |
+        (?x)(
+            ^bundled/ |
+            ^contrib/utilities/dotgdbinit.py
+        )
 - repo: https://github.com/crate-ci/typos
   rev: v1.33.1
   hooks:
@@ -51,5 +60,10 @@ repos:
   - id: detect-include-cycles
     name: Detect '#include' cycles
     entry: python contrib/utilities/detect_include_cycles.py
+    pass_filenames: false
+    language: system
+  - id: detect-merges-in-feature-branch
+    name: Detect merge commits in current feature branch
+    entry: bash contrib/utilities/detect_merges_from_master_in_feature_branch.sh
     pass_filenames: false
     language: system

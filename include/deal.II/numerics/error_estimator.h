@@ -458,7 +458,7 @@ public:
    * hp::MappingCollection instead.
    */
   template <typename Number>
-  DEAL_II_DEPRECATED_EARLY_WITH_COMMENT(
+  DEAL_II_DEPRECATED_WITH_COMMENT(
     "Use the version of this function which takes a hp::MappingCollection instead.")
   static void estimate(
     const Mapping<dim, spacedim>    &mapping,
@@ -527,7 +527,7 @@ public:
    * hp::MappingCollection instead.
    */
   template <typename Number>
-  DEAL_II_DEPRECATED_EARLY_WITH_COMMENT(
+  DEAL_II_DEPRECATED_WITH_COMMENT(
     "Use the version of this function which takes a hp::MappingCollection instead.")
   static void estimate(
     const Mapping<dim, spacedim>    &mapping,
@@ -798,7 +798,7 @@ public:
    * hp::MappingCollection instead.
    */
   template <typename Number>
-  DEAL_II_DEPRECATED_EARLY_WITH_COMMENT(
+  DEAL_II_DEPRECATED_WITH_COMMENT(
     "Use the version of this function which takes a hp::MappingCollection instead.")
   static void estimate(
     const Mapping<1, spacedim>    &mapping,
@@ -870,7 +870,7 @@ public:
    * hp::MappingCollection instead.
    */
   template <typename Number>
-  DEAL_II_DEPRECATED_EARLY_WITH_COMMENT(
+  DEAL_II_DEPRECATED_WITH_COMMENT(
     "Use the version of this function which takes a hp::MappingCollection instead.")
   static void estimate(
     const Mapping<1, spacedim>    &mapping,

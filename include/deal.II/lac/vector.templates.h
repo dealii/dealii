@@ -998,27 +998,11 @@ Vector<Number>::block_write(std::ostream &out) const
 {
   AssertThrow(out.fail() == false, ExcIO());
 
-  // other version of the following
-  //  out << size() << std::endl << '[';
-
-  // reason: operator<< seems to use some resources that lead to problems in a
-  // multithreaded environment. We convert the size index to
-  // unsigned long long int that is at least 64 bits to be able to output it on
-  // all platforms, since std::uint64_t is not in C.
-  const unsigned long long int sz = size();
-  char                         buf[16];
-
-  std::sprintf(buf, "%llu", sz);
-  std::strcat(buf, "\n[");
-
-  out.write(buf, std::strlen(buf));
+  out << std::to_string(size()) << "\n[";
   out.write(reinterpret_cast<const char *>(begin()),
             reinterpret_cast<const char *>(end()) -
               reinterpret_cast<const char *>(begin()));
-
-  // out << ']';
-  const char outro = ']';
-  out.write(&outro, 1);
+  out << ']';
 
   AssertThrow(out.fail() == false, ExcIO());
 }
@@ -1044,7 +1028,6 @@ Vector<Number>::block_read(std::istream &in)
   reinit(sz, true);
 
   char c;
-  //  in >> c;
   in.read(&c, 1);
   AssertThrow(c == '[', ExcIO());
 
@@ -1052,7 +1035,6 @@ Vector<Number>::block_read(std::istream &in)
           reinterpret_cast<const char *>(end()) -
             reinterpret_cast<const char *>(begin()));
 
-  //  in >> c;
   in.read(&c, 1);
   AssertThrow(c == ']', ExcIO());
 }

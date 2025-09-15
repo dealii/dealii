@@ -51,6 +51,6 @@ of $\mathcal{O}(h^2)$ with respect to the $L^2$-norm.
 Below is the visualization of the solution.
 
 <div style="text-align:center;">
-  <img src="https://www.dealii.org/images/steps/developer/step-78.mms-solution.png"
+  <img src="https://dealii.org/images/steps/developer/step-78.mms-solution.png"
        alt="Solution of the MMS problem.">
 </div>

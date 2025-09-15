@@ -2711,9 +2711,9 @@ namespace GridGenerator
      *
      \htmlonly <style>div.image
      *
-     img[src="https://www.dealii.org/images/grids/airfoils_naca_joukowski.png"]{width:50%;}</style>
+     img[src="https://dealii.org/images/grids/airfoils_naca_joukowski.png"]{width:50%;}</style>
      \endhtmlonly
-     * @image html https://www.dealii.org/images/grids/airfoils_naca_joukowski.png
+     * @image html https://dealii.org/images/grids/airfoils_naca_joukowski.png
      */
     template <int dim>
     void

@@ -804,15 +804,6 @@ protected:
 
 
 
-// backward compatibility
-template <int dim,
-          int n_components_,
-          typename Number,
-          bool is_face,
-          typename VectorizedArrayType = VectorizedArray<Number>>
-using FEEvaluationAccess DEAL_II_DEPRECATED =
-  FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>;
-
 /**
  * The class that provides all functions necessary to evaluate functions at
  * quadrature points and cell integrations. In functionality, this class is
@@ -7486,9 +7477,10 @@ FEFaceEvaluation<dim,
 
           if (face_index == numbers::invalid_unsigned_int)
             {
-              this->cell_ids[i]          = numbers::invalid_unsigned_int;
-              this->face_numbers[i]      = static_cast<std::uint8_t>(-1);
-              this->face_orientations[i] = static_cast<std::uint8_t>(-1);
+              this->cell_ids[i]     = numbers::invalid_unsigned_int;
+              this->face_numbers[i] = static_cast<std::uint8_t>(-1);
+              this->face_orientations[i] =
+                numbers::invalid_geometric_orientation;
               continue; // invalid face ID: no neighbor on boundary
             }
 
@@ -7516,7 +7508,8 @@ FEFaceEvaluation<dim,
             }
 
           const bool orientation_interior_face = faces.face_orientation >= 8;
-          auto       face_orientation          = faces.face_orientation % 8;
+          types::geometric_orientation face_orientation =
+            faces.face_orientation % 8;
           if (face_identifies_as_interior != orientation_interior_face)
             {
               Assert(this->matrix_free->get_cell_iterator(cell_index, i)
@@ -7532,7 +7525,7 @@ FEFaceEvaluation<dim,
     }
   else
     {
-      this->face_orientations[0] = 0;
+      this->face_orientations[0] = numbers::default_geometric_orientation;
       this->face_numbers[0]      = face_number;
       if (this->matrix_free->n_active_entries_per_cell_batch(this->cell) ==
           n_lanes)

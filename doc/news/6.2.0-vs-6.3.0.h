@@ -194,7 +194,7 @@ inconvenience this causes.
    <li>
    <p>
    New: A report has been added on the
-   <a href="https://www.dealii.org/reports/codimension-one/desimone-heltai-manigrasso.pdf"
+   <a href="https://dealii.org/reports/codimension-one/desimone-heltai-manigrasso.pdf"
    target="body">codimension one</a> capabilities
    of the library (by Antonio DeSimone, Luca Heltai
    and Cataldo Manigrasso, SISSA, Trieste, Italy). It

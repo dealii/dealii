@@ -86,15 +86,15 @@ The graphical output of the program looks as follows:
 <table align="center" class="doxtable">
   <tr>
     <td>
-      <img src="https://www.dealii.org/images/steps/developer/step-29.v.png" alt="v = Re(u)">
+      <img src="https://dealii.org/images/steps/developer/step-29.v.png" alt="v = Re(u)">
     </td>
     <td>
-      <img src="https://www.dealii.org/images/steps/developer/step-29.w.png" alt="w = Im(u)">
+      <img src="https://dealii.org/images/steps/developer/step-29.w.png" alt="w = Im(u)">
     </td>
   </tr>
   <tr>
     <td colspan="2">
-      <img src="https://www.dealii.org/images/steps/developer/step-29.intensity.png" alt="|u|">
+      <img src="https://dealii.org/images/steps/developer/step-29.intensity.png" alt="|u|">
     </td>
   </tr>
 </table>
@@ -114,10 +114,10 @@ the intensity is actually focused in $x$-direction:
 <table align="center" class="doxtable">
   <tr>
     <td>
-      <img src="https://www.dealii.org/images/steps/developer/step-29.surface.png" alt="|u|">
+      <img src="https://dealii.org/images/steps/developer/step-29.surface.png" alt="|u|">
     </td>
     <td>
-      <img src="https://www.dealii.org/images/steps/developer/step-29.contours.png" alt="|u|">
+      <img src="https://dealii.org/images/steps/developer/step-29.contours.png" alt="|u|">
     </td>
   </tr>
 </table>
@@ -185,7 +185,7 @@ other parts of the program scale very nicely.
 
 
 
-<a name="step-29-extensions"></a>
+@anchor step_29-Extensions
 <h3>Possibilities for extensions</h3>
 
 An obvious possible extension for this program is to run it in 3d

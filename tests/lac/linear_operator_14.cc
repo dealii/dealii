@@ -116,7 +116,7 @@ build_matrix_vector(TrilinosWrappers::BlockSparseMatrix &matrix,
   constraints.close();
 
   // See
-  // https://www.dealii.org/developer/doxygen/deal.II/step_32.html#TheBoussinesqFlowProblemsetupfunctions
+  // https://dealii.org/developer/doxygen/deal.II/step_32.html#TheBoussinesqFlowProblemsetupfunctions
   Table<2, DoFTools::Coupling> coupling(n_blocks, n_blocks);
   coupling.fill(DoFTools::always);
   TrilinosWrappers::BlockSparsityPattern dsp(locally_owned_partitioning,

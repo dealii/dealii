@@ -737,7 +737,7 @@ namespace Step29
   // symmetric nor definite, and so it is not quite obvious how to come up
   // with an iterative solver and a preconditioner that do a good job on this
   // matrix. (For more on this topic, see also the
-  // <a href="#extensions">Possibilities for extensions</a> section below.)
+  // @ref step_29-Extensions "Possibilities for extensions" section below.)
   // We chose instead to go a different way and solve the linear
   // system with the sparse LU decomposition provided by UMFPACK. This is
   // often a good first choice for 2d problems and works reasonably well even

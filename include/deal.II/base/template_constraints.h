@@ -313,17 +313,6 @@ constexpr bool has_begin_and_end =
 
 
 /**
- * A `using` declaration to make the
- * [std::identity_type](https://en.cppreference.com/w/cpp/types/type_identity)
- * class available under the name that deal.II has used for a long time.
- *
- * @deprecated Use `std_cxx20::type_identity` instead.
- */
-template <typename T>
-using identity DEAL_II_DEPRECATED = std_cxx20::type_identity<T>;
-
-
-/**
  * A class that always returns a given value.
  * This is needed as a workaround for lambdas used as default parameters
  * some compilers struggle to deal with.
@@ -614,12 +603,6 @@ class BlockVector;
 
 namespace LinearAlgebra
 {
-  template <typename Number>
-  class Vector;
-
-  template <typename Number>
-  class BlockVector;
-
   namespace distributed
   {
     template <typename Number, typename MemorySpace>
@@ -744,10 +727,6 @@ namespace concepts
     template <typename Number>
     inline constexpr bool is_dealii_vector_type<dealii::BlockVector<Number>> =
       true;
-
-    template <typename Number>
-    inline constexpr bool
-      is_dealii_vector_type<dealii::LinearAlgebra::BlockVector<Number>> = true;
 
     template <typename Number, typename MemorySpace>
     inline constexpr bool is_dealii_vector_type<

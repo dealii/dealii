@@ -17,7 +17,6 @@
 // Tests the categorization of cells for vectorization
 
 
-#include <deal.II/base/function.h>
 
 #include <deal.II/distributed/tria.h>
 

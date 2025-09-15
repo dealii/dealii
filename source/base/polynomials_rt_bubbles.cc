@@ -17,6 +17,8 @@
 #include <deal.II/base/quadrature_lib.h>
 #include <deal.II/base/thread_management.h>
 
+#include <deal.II/fe/fe_raviart_thomas.h>
+
 #include <iomanip>
 #include <iostream>
 #include <memory>
@@ -27,7 +29,10 @@ DEAL_II_NAMESPACE_OPEN
 template <int dim>
 PolynomialsRT_Bubbles<dim>::PolynomialsRT_Bubbles(const unsigned int k)
   : TensorPolynomialsBase<dim>(k, n_polynomials(k))
-  , raviart_thomas_space(k - 1)
+  , raviart_thomas_space(k,
+                         k - 1,
+                         FE_RaviartThomas<dim>::get_lexicographic_numbering(k -
+                                                                            1))
   , monomials(k + 2)
 {
   Assert(dim >= 2, ExcImpossibleInDim(dim));
@@ -68,22 +73,12 @@ PolynomialsRT_Bubbles<dim>::evaluate(
   const unsigned int n_sub     = raviart_thomas_space.n();
   const unsigned int my_degree = this->degree();
 
-  // Guard access to the scratch arrays in the following block
-  // using a mutex to make sure they are not used by multiple threads
-  // at once
   {
-    static std::mutex           mutex;
-    std::lock_guard<std::mutex> lock(mutex);
-
-    static std::vector<Tensor<1, dim>> p_values;
-    static std::vector<Tensor<2, dim>> p_grads;
-    static std::vector<Tensor<3, dim>> p_grad_grads;
-    static std::vector<Tensor<4, dim>> p_third_derivatives;
-    static std::vector<Tensor<5, dim>> p_fourth_derivatives;
-
-    p_values.resize((values.empty()) ? 0 : n_sub);
-    p_grads.resize((grads.empty()) ? 0 : n_sub);
-    p_grad_grads.resize((grad_grads.empty()) ? 0 : n_sub);
+    std::vector<Tensor<1, dim>> p_values(values.empty() ? 0 : n_sub);
+    std::vector<Tensor<2, dim>> p_grads(grads.empty() ? 0 : n_sub);
+    std::vector<Tensor<3, dim>> p_grad_grads(grad_grads.empty() ? 0 : n_sub);
+    std::vector<Tensor<4, dim>> p_third_derivatives;
+    std::vector<Tensor<5, dim>> p_fourth_derivatives;
 
     // This is the Raviart-Thomas part of the space
     raviart_thomas_space.evaluate(unit_point,

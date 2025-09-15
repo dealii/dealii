@@ -16,7 +16,6 @@
 
 // like faces_value_optimization but mixed types
 
-#include <deal.II/base/function.h>
 
 #include <deal.II/fe/fe_dgq.h>
 

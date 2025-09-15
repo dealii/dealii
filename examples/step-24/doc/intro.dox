@@ -1,4 +1,4 @@
-<a name="step-24-Intro"></a>
+<a name="step_24-Intro"></a>
 <h1>Introduction</h1>
 
 This program grew out of a student project by Xing Jin at Texas A&amp;M
@@ -18,8 +18,8 @@ reconstruct the source distributions, which is indicative for the distribution
 of absorbers and therefore of different kinds of tissue. Part of this project
 is to compare simulated data with actual measurements, so one has to solve the
 "forward problem", i.e. the wave equation that describes the propagation of
-pressure waves in tissue. This program is therefore a continuation of @ref
-step_23 "step-23", where the wave equation was first introduced.
+pressure waves in tissue. This program is therefore a continuation of
+step-23, where the wave equation was first introduced.
 
 
 <h3>The problem</h3>

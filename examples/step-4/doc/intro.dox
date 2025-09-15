@@ -1,4 +1,4 @@
-<a name="step-4-Intro"></a>
+<a name="step_4-Intro"></a>
 <h1>Introduction</h1>
 
 @dealiiVideoLecture{12,13}
@@ -138,6 +138,6 @@ be written this way. A typical example is the need to use the keyword
 <code>typename</code> in so many places. If you are not entirely familiar with
 this already, then several of these difficulties are explained in the deal.II
 Frequently Asked Questions (FAQ) linked to from the <a
-href="http://www.dealii.org/">deal.II homepage</a>.
+href="http://dealii.org/">deal.II homepage</a>.
 
 <!--We need a blank line to end the above block properly.-->

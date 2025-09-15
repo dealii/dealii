@@ -948,14 +948,6 @@ IndexSet::get_index_vector() const
 
 
 
-void
-IndexSet::fill_index_vector(std::vector<size_type> &indices) const
-{
-  indices = get_index_vector();
-}
-
-
-
 #ifdef DEAL_II_WITH_TRILINOS
 #  ifdef DEAL_II_TRILINOS_WITH_TPETRA
 
@@ -1118,8 +1110,7 @@ IndexSet::make_trilinos_map(const MPI_Comm communicator,
 IS
 IndexSet::make_petsc_is(const MPI_Comm communicator) const
 {
-  std::vector<size_type> indices;
-  fill_index_vector(indices);
+  const std::vector<size_type> indices = get_index_vector();
 
   // If the size of the index set can be converted to a PetscInt then every
   // value can also be converted

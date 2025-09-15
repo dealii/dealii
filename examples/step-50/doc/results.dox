@@ -254,7 +254,7 @@ we solve the same problem on more and more processors. Specifically,
 we consider the problems after 16 mesh refinement cycles
 (32M DoFs) and 19 cycles (256M DoFs), on between 56 to 28,672 processors:
 
-<img width="600px" src="https://www.dealii.org/images/steps/developer/step-50-strong-scaling.png" alt="">
+<img width="600px" src="https://dealii.org/images/steps/developer/step-50-strong-scaling.png" alt="">
 
 While the matrix-based GMG solver and AMG scale similarly and have a
 similar time to solution (at least as long as there is a substantial

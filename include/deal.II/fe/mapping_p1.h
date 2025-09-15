@@ -72,6 +72,11 @@ template <int dim, int spacedim = dim>
 class MappingP1 : public Mapping<dim, spacedim>
 {
 public:
+  /**
+   * Default constructor.
+   */
+  MappingP1() = default;
+
   virtual std::unique_ptr<Mapping<dim, spacedim>>
   clone() const override;
 
@@ -223,7 +228,7 @@ public:
     /**
      * Linear component of the transformation (the contravariant).
      */
-    mutable DerivativeForm<1, dim, spacedim> linear_component;
+    mutable DerivativeForm<1, dim, spacedim> contravariant;
 
     /**
      * Covariant form of the linear transformation.
@@ -233,7 +238,7 @@ public:
     /**
      * Determinant of linear_component.
      */
-    mutable double determinant;
+    mutable double volume_element;
 
     /**
      * Quadrature. May be an amalgamation of rules created by, e.g.,

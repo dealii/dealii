@@ -21,7 +21,7 @@ solution like this:
 <table width="60%" align="center">
   <tr>
     <td align="center">
-      <img src="https://www.dealii.org/images/steps/developer/step-3.solution-3.png" alt="Visualization of the solution of step-3">
+      <img src="https://dealii.org/images/steps/developer/step-3.solution-3.png" alt="Visualization of the solution of step-3">
     </td>
   </tr>
 </table>
@@ -42,7 +42,7 @@ of the solution. Several video lectures show how to use these programs.
 
 
 
-<a name="step-3-extensions"></a>
+@anchor step_3-Extensions
 <h3>Possibilities for extensions</h3>
 
 If you want to play around a little bit with this program, here are a few
@@ -200,7 +200,7 @@ Additional information:
   QGaussSimplex in the code.
 
   With all of these steps, you then get the following solution:
-  <img src="https://www.dealii.org/images/steps/developer/step-3.solution-triangles.png" alt="Visualization of the solution of step-3 using triangles">
+  <img src="https://dealii.org/images/steps/developer/step-3.solution-triangles.png" alt="Visualization of the solution of step-3 using triangles">
 
   <li>
   Observe convergence: We will only discuss computing errors in norms in
@@ -454,7 +454,7 @@ you get the idea):
 <table width="60%" align="center">
   <tr>
    <td align="center">
-     <img src="https://www.dealii.org/images/steps/developer/step-3.extensions.grid_5.png" alt="Grid after 5 refinement steps of step-3">
+     <img src="https://dealii.org/images/steps/developer/step-3.extensions.grid_5.png" alt="Grid after 5 refinement steps of step-3">
    </td>
   </tr>
 </table>
@@ -481,7 +481,7 @@ This is now going to look as follows:
 <table width="60%" align="center">
  <tr>
    <td align="center">
-     <img src="https://www.dealii.org/images/steps/developer/step-3.extensions.pseudocolor_5.png" alt="Solution after 5 refinement steps of step-3">
+     <img src="https://dealii.org/images/steps/developer/step-3.extensions.pseudocolor_5.png" alt="Solution after 5 refinement steps of step-3">
    </td>
  </tr>
 </table>
@@ -543,8 +543,8 @@ mean value and the solution value at the chosen point nicely converge
 to zero:
 <table style="width:50%" align="center">
   <tr>
-    <td><img src="https://www.dealii.org/images/steps/developer/step-3.extensions.convergence_mean.png" alt=""></td>
-    <td><img src="https://www.dealii.org/images/steps/developer/step-3.extensions.convergence_point.png" alt=""></td>
+    <td><img src="https://dealii.org/images/steps/developer/step-3.extensions.convergence_mean.png" alt=""></td>
+    <td><img src="https://dealii.org/images/steps/developer/step-3.extensions.convergence_point.png" alt=""></td>
   </tr>
 </table>
 

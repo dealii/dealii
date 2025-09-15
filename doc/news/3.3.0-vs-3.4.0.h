@@ -39,7 +39,7 @@ All entries are signed with the names of the author.
        functions as a replacement.
        <br>
        For more information, read
-       <a href="https://www.dealii.org/mail/msg00638.html" target="body">this mail</a>.
+       <a href="https://dealii.org/mail/msg00638.html" target="body">this mail</a>.
        </strong>
        <br>
        (WB 2002/06/03)
