@@ -370,7 +370,7 @@ namespace Step101
               {
                 const Point<dim> &point = surface_fe_values.quadrature_point(q);
 
-                // @sect5{The key step: computing the shift}
+                // @sect5{Computing the shift}
                 // For a point on the mesh boundary, we find the closest point
                 // on the true boundary Γ. For a sphere, this is simply the
                 // point projected onto the unit circle/sphere.
@@ -427,6 +427,20 @@ namespace Step101
                 // at quadrature points while trial functions are evaluated
                 // at shifted points.
                 if (cell->center()(0) < 0.0)
+                // Dirichlet condition on left half of boundary.
+                // We assemble the Nitsche-type integrals over the surrogate boundary
+                // (tilde-Gamma), i.e., the mesh faces that lie between an active
+                // cell and a FE_Nothing neighbor. All face integrals are evaluated
+                // with the chosen face quadrature and multiplied by the usual JxW.
+                // Note the key SBM feature: test functions and their gradients
+                // are evaluated at the quadrature point on the mesh face, whereas
+                // trial functions are evaluated at the shifted (closest-point)
+                // location on the true boundary. This is why we precompute
+                // shifted_shape_value and shifted_shape_grad above and scale the
+                // gradients with the characteristic cell length. The penalty
+                // term uses nitsche_parameter/cell_side_length and enforces the
+                // Dirichlet data transferred from the true boundary (see the
+                // introduction doc for the mathematical formulation).
                   for (const unsigned int i : surface_fe_values.dof_indices())
                     {
                       for (const unsigned int j :
@@ -451,6 +465,7 @@ namespace Step101
                     }
                 else
                   {
+                    // Neumann condition on right half.
                     const double n_ntilde =
                       scalar_product(surface_normal, mesh_normal);
 

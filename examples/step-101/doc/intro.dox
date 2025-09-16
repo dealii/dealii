@@ -10,7 +10,7 @@ with the computational mesh. We use an unfitted method, where the geometry is de
 level set function and the NonMatching::MeshClassifier class is used to identify cells relative
 to this geometry.
 
-<h3>The Shifted Boundary Method</h3>
+<h3>The surrogate domain </h3>
 
 The main difference from step-85 is the use of the Shifted Boundary Method (SBM) to impose
 boundary conditions. For a detailed description of the method, we refer to @cite main2018shifted.
@@ -30,27 +30,74 @@ $\tilde{\Omega}$ as the set of all cells that lie strictly inside the true domai
 This approach avoids the need for complex body-fitted mesh generation. The boundary of this
 surrogate domain, $\tilde{\Gamma} = \partial\tilde{\Omega}$, is composed of faces from the
 background mesh.
+
 @image html step-101-active-mesh.svg
+
+<h3>Dirichlet boundary conditions</h3>
 Boundary conditions are transferred from the true boundary $\Gamma$ to the surrogate boundary
 $\tilde{\Gamma}$. For each point $\tilde{\mathbf{x}} \in \tilde{\Gamma}$, we find its
 corresponding closest point $\mathbf{x} \in \Gamma$. The boundary condition is then enforced
 weakly on $\tilde{\Gamma}$ using a Nitsche-type formulation. The value of the solution on the
 true boundary $g(\mathbf{x})$ is related to the value on the surrogate boundary
 $u_h(\tilde{\mathbf{x}})$ via a Taylor expansion. Let
-$\mathbf{d} = \mathbf{x} - \tilde{\mathbf{x}}$ be the shift vector. Then we have:
+$\mathbf{d} = \mathbf{x} - \tilde{\mathbf{x}}$ be the shift vector. Then, for linear elements we have:
 @f{equation*}{
     g(\mathbf{x}) = u(\mathbf{x}) \approx u(\tilde{\mathbf{x}}) + \mathbf{d} \cdot \nabla u(\tilde{\mathbf{x}}).
 @f}
-We define an extension operator $\mathcal{E}u_h$ that approximates the solution on the true
-boundary by extrapolating from the surrogate boundary:
-@f{equation*}{
-    \mathcal{E}u_h(\tilde{\mathbf{x}}) = u_h(\tilde{\mathbf{x}}) 
-    + (\mathbf{x} - \tilde{\mathbf{x}}) \cdot \nabla u_h(\tilde{\mathbf{x}}).
-@f}
-Since our finite element basis functions are polynomials, the discrete solution $u_h$ is a
-piecewise polynomial. Its Taylor expansion is simply the function itself, so we can evaluate
-$u_h$ directly at the required points.
+For higher‑order elements the Taylor expansion would formally
+require higher and higher derivatives, but we can avoid all of that by observing
+that the discrete solution u_h is a piecewise polynomial. Its Taylor series about any point inside 
+a cell is exactly the polynomial itself, so instead of expanding in derivatives we simply
+evaluate the finite element function (and, when needed, its polynomial gradient)
+ at the shifted / projected quadrature points.
 
+In practice implement this by setting the quadrature points to the projected locations on $\Gamma$
+(or by passing those points into FEValues), and then use FEValues (or VectorTools/DoFHandler helpers)
+to obtain shape function values and gradients and form u_h(P(tilde x)) directly from the DoF vector. 
+This removes the need to introduce higher‑order derivative terms into the weak form.
+
+<h3>Neumann boundary conditions</h3>
+
+In this tutorial the Neumann boundary condition is handled in a deliberately simple way.
+For each quadrature point on a surrogate face we find the closest point on the true
+boundary and evaluate the prescribed Neumann function at that projected location. The
+normal that appears in the surface integral is approximated by taking the dot product
+of the true boundary normal (computed analytically for the unit disk) with the mesh
+face normal and using this scalar to scale the flux contribution. Gradients of the
+trial functions that are needed for the consistency term are evaluated at the shifted
+(point-on-Γ) location and scaled by a characteristic cell length to account for the
+mapping.
+
+If the true Neumann condition is $\partial u/\partial n = q$ on $\Gamma$, we approximate the surface integral on the surrogate face as
+@f{equation*}{
+    \int_{\Gamma} q\, v \,ds
+    \;\approx\;
+    \int_{\tilde\Gamma} q\big(P(\tilde{\mathbf{x}})\big)\,
+        \big( \mathbf{n}\big(P(\tilde{\mathbf{x}})\big)\cdot\tilde{\mathbf{n}}(\tilde{\mathbf{x}})\big)\;
+        v_h(\tilde{\mathbf{x}})\, ds,
+@f}
+where P(·) denotes the closest-point projection from the surrogate boundary to the true boundary,
+and the scalar (n(P)·\tilde n) transfers the true flux onto the surrogate face. The consistency term
+that requires gradients is treated similarly, e.g.
+@f{equation*}{
+    \int_{\Gamma} (\nabla u\cdot n)\, v \,ds
+    \;\approx\;
+    \int_{\tilde\Gamma} \big(\nabla u_h\big(P(\tilde{\mathbf{x}})\big)\cdot \mathbf{n}\big(P(\tilde{\mathbf{x}})\big)\big)\;
+        h_T\; v_h(\tilde{\mathbf{x}})\, ds,
+@f}
+where $h_T$ is a characteristic cell length used to scale the gradient-based contribution.
+
+This approach is straightforward to implement and inexpensive, but it is only a
+first-order-accurate treatment of Neumann data: in practice it causes a loss of one
+order of convergence compared to a more accurate, higher-order reconstruction of the
+flux on the true boundary. For this reason the tutorial uses quadratic Lagrange
+elements to recover a second-order convergence rate in the L2 norm despite the
+naive Neumann treatment. More accurate treatments (e.g., higher-order normal and
+flux reconstructions or consistent transfer operators from Γ to the surrogate face)
+can restore the optimal convergence order.
+
+
+<h4>The shifted boundary method </h4>
 The SBM weak formulation seeks $u_h \in V_h$ such
 that for all test functions $v_h \in V_h$:
 @f{align*}{
