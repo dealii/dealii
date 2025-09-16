@@ -5,7 +5,18 @@ We see that the $L^2$ error decreases as we refine and that the estimated
 order of convergence, EOC, is close to 2.
 
 @image html step-85-solution.png
- 
+
+
+| Cycle | Mesh size | $L^2$-Error | EOC  |
+|:-----:|:---------:|:-----------:|:----:|
+|   0   |  0.3025   |  1.1071e-02 |  -   |
+|   1   |  0.1513   |  1.4254e-03 | 2.96 |
+|   2   |  0.0756   |  3.1824e-04 | 2.16 |
+|   3   |  0.0378   |  7.4940e-05 | 2.09 |
+|   4   |  0.0189   |  2.1273e-05 | 1.82 |
+
+
+With purerly Dirichlet boundary condition the formulation converges with optimal rates, as illustarated by tabels below.
 For $k=1$:
 | Cycle | Mesh size | $L^2$-Error | EOC  |
 |:-----:|:---------:|:-----------:|:----:|
@@ -14,7 +25,6 @@ For $k=1$:
 |   2   |  0.0756   |  6.5545e-04 | 2.57 |
 |   3   |  0.0378   |  1.7104e-04 | 1.94 |
 |   4   |  0.0189   |  4.7406e-05 | 1.85 |
-|   5   |  0.0095   |  1.0909e-05 | 2.12 |
 
 For $k=2$:
 | Cycle | Mesh size | $L^2$-Error | EOC  |
@@ -24,7 +34,6 @@ For $k=2$:
 |   2   |  0.0756   |  2.3631e-05 | 3.01 |
 |   3   |  0.0378   |  2.9069e-06 | 3.02 |
 |   4   |  0.0189   |  4.2935e-07 | 2.76 |
-|   5   |  0.0095   |  5.2059e-08 | 3.04 |
 
 For $k=3$:
 | Cycle | Mesh size | $L^2$-Error | EOC  |
@@ -34,4 +43,3 @@ For $k=3$:
 |   2   |  0.0756   |  8.0750e-07 | 3.31 |
 |   3   |  0.0378   |  4.4750e-08 | 4.17 |
 |   4   |  0.0189   |  4.4155e-09 | 3.34 |
-|   5   |  0.0095   |  2.4822e-10 | 4.15 |

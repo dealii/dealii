@@ -1,6 +1,5 @@
 <i>
-This program was contributed by Michał Wichrowski in collaboration with Guglielmo Scovazzi.
-
+This program was contributed by Michał Wichrowski and Guglielmo Scovazzi.
 </i>
 
 <a name="step-101-Intro"></a>
@@ -88,3 +87,14 @@ element space only on cells that are classified as `inside`, i.e., cells that ar
 contained in $\Omega$. We will again use the hp-framework to accomplish this, setting the
 `active_fe_index` to a `FE_Nothing` instance for all cells that are `outside` or
 `intersected`.
+
+
+ For this example, we solve:
+  @f[
+  \begin{cases}
+    -\Delta u &= 2 \cos(x) \sin(y) \quad \text{in } \Omega \\
+    u &= \cos(x) \sin(y) \quad \text{on } \Gamma
+  \end{cases}
+  @f]
+  where @f$\Omega@f$ is the unit disk, and the analytical solution is
+  @f$u(x,y) = \cos(x)\sin(y)@f$.

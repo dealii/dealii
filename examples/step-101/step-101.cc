@@ -94,56 +94,52 @@ namespace Step101
 
     double compute_L2_error() const;
 
-    // Member variables for finite element degree and problem functions
     const unsigned int fe_degree;
 
     // We use FunctionParser to define the right-hand side, boundary condition,
-    // and analytical solution. This allows for easy modification of the test
-    // problem without recompiling.
+    // and analytical solution. If combined with  parameter parsing, this
+    // allows for easy modification of the test problem without recompiling.
     FunctionParser<dim> rhs_function;
     FunctionParser<dim> boundary_condition;
+    FunctionParser<dim> neumann_condition;
     FunctionParser<dim> analytical_solution;
 
     // The triangulation and level set function setup (same as in step-85)
+    // followed by DoFHandler, finite element collection for the solution
+    // and standard linear algebra objects
     Triangulation<dim> triangulation;
 
     const FE_Q<dim> fe_level_set;
     DoFHandler<dim> level_set_dof_handler;
     Vector<double>  level_set;
 
-    // DoFHandler and finite element collection for the solution
     hp::FECollection<dim> fe_collection;
     DoFHandler<dim>       dof_handler;
     Vector<double>        solution;
 
-    // The mesh classifier helps us determine which cells are inside,
-    // outside, or intersected by the level set
-    NonMatching::MeshClassifier<dim> mesh_classifier;
 
-    // Standard linear algebra objects
     SparsityPattern      sparsity_pattern;
     SparseMatrix<double> stiffness_matrix;
     Vector<double>       rhs;
+
+    // The mesh classifier helps us determine which cells are inside,
+    // outside, or intersected by the level set
+    NonMatching::MeshClassifier<dim> mesh_classifier;
   };
 
 
 
   // @sect4{Constructor}
   // In the constructor, we set up the finite element degree and define
-  // the problem functions. For this example, we solve:
-  // @f[
-  // \begin{cases}
-  //   -\Delta u &= 2 \cos(x) \sin(y) \quad \text{in } \Omega \\
-  //           u &= \cos(x) \sin(y) \quad \text{on } \Gamma
-  // \end{cases}
-  // @f]
-  // where @f$\Omega@f$ is the unit disk, and the analytical solution is
-  // @f$u(x,y) = \cos(x)\sin(y)@f$.
+  // the problem functions. Due to the naive form of the Neumann condition,
+  // we loose one order of convergence, so we use a quadratic
+  // finite element space to achieve a second-order convergence rate.
   template <int dim>
   LaplaceSolver<dim>::LaplaceSolver()
-    : fe_degree(1)
+    : fe_degree(2)
     , rhs_function("2 * cos(x) * sin(y)")
     , boundary_condition("cos(x)*sin(y)")
+    , neumann_condition("y * cos(x)* cos(y) - x * sin(x) * sin(y)")
     , analytical_solution("cos(x)*sin(y)")
     , fe_level_set(fe_degree)
     , level_set_dof_handler(triangulation)
@@ -188,8 +184,7 @@ namespace Step101
   }
 
 
-
-  // @sect4{Active finite element indices}
+  // @sect4{Distributing degrees of freedom}
   // We use hp finite elements: FE_Q for cells inside the domain
   // and FE_Nothing for cells outside the domain.
   enum ActiveFEIndex
@@ -198,7 +193,6 @@ namespace Step101
     nothing  = 1
   };
 
-  // @sect4{Distributing degrees of freedom}
   // The key difference from step-85 is that we only use finite elements
   // on cells that are completely inside the domain. Cells that are
   // intersected or outside get FE_Nothing elements.
@@ -210,14 +204,11 @@ namespace Step101
     fe_collection.push_back(FE_Q<dim>(fe_degree));
     fe_collection.push_back(FE_Nothing<dim>());
 
-    // Assign finite elements based on the cell's location relative to the level
-    // set
     for (const auto &cell : dof_handler.active_cell_iterators())
       {
         const NonMatching::LocationToLevelSet cell_location =
           mesh_classifier.location_to_level_set(cell);
 
-        // Only cells completely inside the domain get actual finite elements
         if (cell_location != NonMatching::LocationToLevelSet::inside)
           cell->set_active_fe_index(ActiveFEIndex::nothing);
         else
@@ -268,19 +259,35 @@ namespace Step101
       fe_level_set.dofs_per_cell);
     std::vector<double> dof_values_level_set(fe_level_set.dofs_per_cell);
 
-    // Standard local assembly variables
+    // Standard local assembly variables and  Nitsche penalty parameter (similar
+    // to step-85)
     const unsigned int n_dofs_per_cell = fe_collection[0].dofs_per_cell;
     FullMatrix<double> local_stiffness(n_dofs_per_cell, n_dofs_per_cell);
     Vector<double>     local_rhs(n_dofs_per_cell);
     std::vector<types::global_dof_index> local_dof_indices(n_dofs_per_cell);
-
-    // Variables for computing shifted shape functions
-    std::vector<Point<dim>> face_quad_points(n_dofs_per_cell);
-    std::vector<Point<dim>> shifted_points(n_dofs_per_cell);
-    std::vector<double>     shifted_shape_value(n_dofs_per_cell);
-
-    // Nitsche penalty parameter (similar to step-85)
     const double nitsche_parameter = 5 * (fe_degree + 1) * fe_degree;
+
+
+    // In the Shifted Boundary Method trial quantities are evaluated at
+    // a shifted point on the true boundary while test functions remain
+    // evaluated at the mesh quadrature point. As a result, when assembling
+    // the Nitsche/penalty and flux terms we need shape-function values and
+    // their gradients at the shifted location. The arrays below store these
+    // precomputed values for all local dofs so they can be reused when
+    // accumulating the face contributions (consistency, symmetry and penalty
+    // terms). Gradients also need to be transformed appropriately for the
+    // mapping (here handled approximately by scaling with a characteristic
+    // cell length).
+    std::vector<Point<dim>>     face_quad_points(n_dofs_per_cell);
+    std::vector<Point<dim>>     shifted_points(n_dofs_per_cell);
+    std::vector<double>         shifted_shape_value(n_dofs_per_cell);
+    std::vector<Tensor<1, dim>> shifted_shape_grad(n_dofs_per_cell);
+
+    // For debugging: we collect the shifts to output them later.
+    // This allows us to verify that the shifting is working correctly.
+    std::vector<std::pair<Point<dim>, Point<dim>>> shifts;
+    std::vector<std::pair<Point<dim>, Point<dim>>> exact_shifts;
+
 
     // Quadrature rules and finite element objects
     const QGauss<dim - 1> face_quadrature(fe_degree + 1);
@@ -304,12 +311,7 @@ namespace Step101
                                           update_JxW_values |
                                           update_quadrature_points);
 
-    // For debugging: we collect the shifts to output them later.
-    // This allows us to verify that the shifting is working correctly.
-    std::vector<std::pair<Point<dim>, Point<dim>>> shifts;
-    std::vector<std::pair<Point<dim>, Point<dim>>> exact_shifts;
 
-    // Loop over all cells with active finite elements
     for (const auto &cell :
          dof_handler.active_cell_iterators() |
            IteratorFilters::ActiveFEIndexEqualTo(ActiveFEIndex::lagrange))
@@ -320,7 +322,6 @@ namespace Step101
         const double cell_side_length = cell->minimum_vertex_distance();
         fe_values.reinit(cell);
 
-        // @sect5{Volume integration}
         // Standard volume integration for the Laplace operator
         for (const unsigned int q : fe_values.quadrature_point_indices())
           {
@@ -338,7 +339,6 @@ namespace Step101
               }
           }
 
-        // @sect5{Boundary integration using the Shifted Boundary Method}
         // Now we loop over faces. If a face borders a cell with FE_Nothing
         // (i.e., a cell outside the domain), we apply shifted boundary
         // conditions.
@@ -370,7 +370,7 @@ namespace Step101
               {
                 const Point<dim> &point = surface_fe_values.quadrature_point(q);
 
-                // @sect6{The key step: computing the shift}
+                // @sect5{The key step: computing the shift}
                 // For a point on the mesh boundary, we find the closest point
                 // on the true boundary Γ. For a sphere, this is simply the
                 // point projected onto the unit circle/sphere.
@@ -396,43 +396,87 @@ namespace Step101
                 exact_shifts.push_back(
                   std::make_pair(point, point * (1. / point.norm())));
 
-                // @sect6{Evaluate shifted shape functions}
+                // @sect5{Evaluate shifted shape functions}
                 // The key ingredient of SBM: we evaluate shape functions at
                 // the shifted point rather than the quadrature point
+                // Since the mesh is cartesian, we have to scale the gradients
+                // with the mesh size.
+                // We will need both the mesh normal and  the normal to the true
+                // boundary (for Neumann BC). The Dirichlet BC follow the
+                // analysis in: https://doi.org/10.1016/j.cma.2022.114885,
+                // while the Neumann BC are treated as in: TODO
                 for (unsigned int j = 0; j < n_dofs_per_cell; ++j)
-                  shifted_shape_value[j] =
-                    fe_lagrange.shape_value(j, unit_shifted_point);
+                  {
+                    shifted_shape_value[j] =
+                      fe_lagrange.shape_value(j, unit_shifted_point);
+                    shifted_shape_grad[j] =
+                      fe_lagrange.shape_grad(j, unit_shifted_point);
 
-                // Use the mesh normal (not the normal to the true boundary)
-                // This follows the analysis in:
-                // https://doi.org/10.1016/j.cma.2022.114885
+                    shifted_shape_grad[j] /= cell_side_length;
+                  }
+
                 const Tensor<1, dim> &mesh_normal =
                   surface_fe_values.normal_vector(q);
 
-                // @sect6{Shifted Nitsche method assembly}
+                // fixme: this only work for unit spehre.
+                const Tensor<1, dim> &surface_normal = closest_boundary_point;
+
+                // @sect5{Shifted Nitsche method assembly}
                 // Assemble the shifted Nitsche penalty terms. The difference
                 // from standard Nitsche is that test functions are evaluated
                 // at quadrature points while trial functions are evaluated
                 // at shifted points.
-                for (const unsigned int i : surface_fe_values.dof_indices())
+                if (cell->center()(0) < 0.0)
+                  for (const unsigned int i : surface_fe_values.dof_indices())
+                    {
+                      for (const unsigned int j :
+                           surface_fe_values.dof_indices())
+                        {
+                          local_stiffness(i, j) +=
+                            (-mesh_normal * surface_fe_values.shape_grad(i, q) *
+                               shifted_shape_value[j] +
+                             -mesh_normal * surface_fe_values.shape_grad(j, q) *
+                               surface_fe_values.shape_value(i, q) +
+                             nitsche_parameter / cell_side_length *
+                               shifted_shape_value[i] *
+                               shifted_shape_value[j]) *
+                            surface_fe_values.JxW(q);
+                        }
+                      local_rhs(i) +=
+                        boundary_condition.value(closest_boundary_point) *
+                        (nitsche_parameter / cell_side_length *
+                           shifted_shape_value[i] -
+                         mesh_normal * surface_fe_values.shape_grad(i, q)) *
+                        surface_fe_values.JxW(q);
+                    }
+                else
                   {
-                    for (const unsigned int j : surface_fe_values.dof_indices())
+                    const double n_ntilde =
+                      scalar_product(surface_normal, mesh_normal);
+
+                    for (const unsigned int i : surface_fe_values.dof_indices())
                       {
-                        local_stiffness(i, j) +=
-                          (-mesh_normal * surface_fe_values.shape_grad(i, q) *
-                             shifted_shape_value[j] +
-                           -mesh_normal * surface_fe_values.shape_grad(j, q) *
-                             surface_fe_values.shape_value(i, q) +
-                           nitsche_parameter / cell_side_length *
-                             shifted_shape_value[i] * shifted_shape_value[j]) *
+                        for (const unsigned int j :
+                             surface_fe_values.dof_indices())
+                          {
+                            local_stiffness(i, j) +=
+                              (-mesh_normal *
+                                 surface_fe_values.shape_grad(j, q) *
+                                 surface_fe_values.shape_value(i, q)
+
+                               + n_ntilde * surface_normal *
+                                   shifted_shape_grad[j] *
+                                   surface_fe_values.shape_value(i, q)
+
+                                 ) *
+                              surface_fe_values.JxW(q);
+                          }
+                        local_rhs(i) +=
+                          n_ntilde *
+                          neumann_condition.value(closest_boundary_point) *
+                          surface_fe_values.shape_value(i, q) *
                           surface_fe_values.JxW(q);
                       }
-                    local_rhs(i) +=
-                      boundary_condition.value(closest_boundary_point) *
-                      (nitsche_parameter / cell_side_length *
-                         shifted_shape_value[i] -
-                       mesh_normal * surface_fe_values.shape_grad(i, q)) *
-                      surface_fe_values.JxW(q);
                   }
               }
           }
@@ -480,7 +524,6 @@ namespace Step101
     data_out.add_data_vector(dof_handler, solution, "solution");
     data_out.add_data_vector(level_set_dof_handler, level_set, "level_set");
 
-    // Only output cells that are inside or intersected
     data_out.set_cell_selection(
       [this](const typename Triangulation<dim>::cell_iterator &cell) {
         return cell->is_active() &&
@@ -497,6 +540,8 @@ namespace Step101
   // @sect4{Computing the L2 error}
   // We compute the L2 error only over cells that are inside the domain.
   // This gives us a measure of how well the SBM approximates the solution.
+  // Similarly as in step-85 we loop only over cells with active finite
+  // elements.
   template <int dim>
   double LaplaceSolver<dim>::compute_L2_error() const
   {
@@ -511,7 +556,6 @@ namespace Step101
 
     double error_L2_squared = 0;
 
-    // Loop only over cells with active finite elements
     for (const auto &cell :
          dof_handler.active_cell_iterators() |
            IteratorFilters::ActiveFEIndexEqualTo(ActiveFEIndex::lagrange))
@@ -543,7 +587,7 @@ namespace Step101
   void LaplaceSolver<dim>::run()
   {
     ConvergenceTable   convergence_table;
-    const unsigned int n_refinements = 5;
+    const unsigned int n_refinements = 4;
 
     make_grid();
     for (unsigned int cycle = 0; cycle <= n_refinements; cycle++)
