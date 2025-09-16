@@ -46,14 +46,14 @@ $\mathbf{d} = \mathbf{x} - \tilde{\mathbf{x}}$ be the shift vector. Then, for li
 @f}
 For higher‑order elements the Taylor expansion would formally
 require higher and higher derivatives, but we can avoid all of that by observing
-that the discrete solution u_h is a piecewise polynomial. Its Taylor series about any point inside 
+that the discrete solution u_h is a piecewise polynomial. Its Taylor series about any point inside
 a cell is exactly the polynomial itself, so instead of expanding in derivatives we simply
 evaluate the finite element function (and, when needed, its polynomial gradient)
  at the shifted / projected quadrature points.
 
 In practice implement this by setting the quadrature points to the projected locations on $\Gamma$
 (or by passing those points into FEValues), and then use FEValues (or VectorTools/DoFHandler helpers)
-to obtain shape function values and gradients and form u_h(P(tilde x)) directly from the DoF vector. 
+to obtain shape function values and gradients and form u_h(P(tilde x)) directly from the DoF vector.
 This removes the need to introduce higher‑order derivative terms into the weak form.
 
 <h3>Neumann boundary conditions</h3>
