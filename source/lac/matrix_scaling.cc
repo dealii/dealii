@@ -49,8 +49,7 @@ MatrixScaling::MatrixScaling(const ScalingControl &control)
 
 
 
-MatrixScaling::~MatrixScaling()
-{}
+MatrixScaling::~MatrixScaling() = default;
 
 
 
@@ -99,6 +98,7 @@ MatrixScaling::scale_matrix(Matrix &matrix)
     }
   else
     {
+      (void)matrix;
       Assert(false, ExcNotImplemented());
     }
 }
