@@ -90,7 +90,7 @@ struct CPUClock
  *   // do some complicated computations here
  *   // ...
  *
- *   timer.stop();
+ *   timer.stop_lap();
  *
  *   std::cout << "Elapsed CPU time: " << timer.cpu_time() << " seconds.\n";
  *   std::cout << "Elapsed wall time: " << timer.wall_time() << " seconds.\n";
@@ -100,8 +100,8 @@ struct CPUClock
  * @endcode
  *
  * Alternatively, you can also restart the timer instead of resetting it. The
- * times between successive calls to start() and stop() (i.e., the laps) will
- * then be accumulated. The usage of this class is also explained in the
+ * times between successive calls to start() and stop_lap() (i.e., the laps)
+ * will then be accumulated. The usage of this class is also explained in the
  * step-28 tutorial program.
  *
  * @note The TimerOutput (combined with TimerOutput::Scope) class provide a
@@ -110,6 +110,17 @@ struct CPUClock
  * @note Implementation of this class is system dependent. In particular, CPU
  * times are accumulated from summing across all threads and will usually
  * exceed the wall times.
+ *
+ * @note If this class is constructed with an MPI communicator
+ * all of the operations of this class are collective operations
+ * that have to be performed on all MPI ranks. It is impossible to query a
+ * timer object on only some of the MPI ranks. This in particular means that
+ * you should not query information from this class in destructors of other
+ * objects, because destructors may be triggered during exception handling.
+ * If only some of the MPI ranks threw an exception the communication will
+ * cause a deadlock and your program will hang without output. The only two safe
+ * operations you can do with this class in a destructor are to 
+ * destroy the object or to call stop_lap().
  *
  * @ingroup utilities
  */
@@ -128,8 +139,8 @@ public:
    * @p mpi_communicator. If @p sync_lap_times is <code>true</code> then the Timer
    * will set the elapsed wall and CPU times over the last lap to their
    * maximum values across the provided communicator. This synchronization is
-   * only performed if Timer::stop() is called before the timer is queried for
-   * time duration values.
+   * only performed if Timer::stop_lap() is called before the timer is queried
+   * for time duration values.
    *
    * @note The timer is stopped before the synchronization over the
    * communicator occurs; the extra cost of the synchronization is not
@@ -141,7 +152,7 @@ public:
    * Return a reference to the data structure containing basic statistics on
    * the last lap's wall time measured across all MPI processes in the given
    * communicator. This structure does not contain meaningful values until
-   * Timer::stop() has been called.
+   * Timer::stop() or Timer::stop_lap() has been called.
    */
   const Utilities::MPI::MinMaxAvg &
   get_last_lap_wall_time_data() const;
@@ -182,10 +193,16 @@ public:
   start();
 
   /**
-   * Stop the timer. This updates the lap times and accumulated times. If
-   * <code>sync_lap_times</code> is <code>true</code> then the lap times are
-   * synchronized over all processors in the communicator (i.e., the lap times
-   * are set to the maximum lap time).
+   * Stop the timer for the current lap. This updates the lap times
+   * and accumulated times on the current processor.
+   */
+  void
+  stop_lap();
+
+  /**
+   * Stop the timer and return the accumulated CPU time in seconds.
+   * This function combines the functionality of the function stop_lap(),
+   * and the functionality of cpu_time().
    *
    * @return Return the accumulated CPU time of the current processor in seconds.
    */
@@ -331,17 +348,26 @@ private:
   /**
    * Collection of wall time measurements.
    */
-  ClockMeasurements<wall_clock_type> wall_times;
+  mutable ClockMeasurements<wall_clock_type> wall_times;
 
   /**
    * Collection of CPU time measurements.
    */
-  ClockMeasurements<cpu_clock_type> cpu_times;
+  mutable ClockMeasurements<cpu_clock_type> cpu_times;
 
   /**
    * Whether or not the timer is presently running.
    */
   bool running;
+
+  /**
+   * Synchronize results across MPI ranks before
+   * producing output.
+   */
+  void
+  synchronize() const;
+
+  mutable bool is_synchronized;
 
   /**
    * The communicator over which various time values are synchronized and
@@ -361,7 +387,7 @@ private:
    * maximum, and average over all processors known to the MPI communicator of
    * the last lap time.
    */
-  Utilities::MPI::MinMaxAvg last_lap_wall_time_data;
+  mutable Utilities::MPI::MinMaxAvg last_lap_wall_time_data;
 
   /**
    * A structure for parallel wall time measurement that includes the minimum
@@ -369,7 +395,7 @@ private:
    * average time defined as the sum of all individual times divided by the
    * number of MPI processes in the MPI_Comm for the total run time.
    */
-  Utilities::MPI::MinMaxAvg accumulated_wall_time_data;
+  mutable Utilities::MPI::MinMaxAvg accumulated_wall_time_data;
 };
 
 
@@ -572,7 +598,7 @@ class TimerOutput
 {
 public:
   /**
-   * Helper class to enter/exit sections in TimerOutput be constructing a
+   * Helper class to enter/exit sections in TimerOutput by constructing a
    * simple scope-based object. The purpose of this class is explained in the
    * documentation of TimerOutput.
    */
@@ -581,18 +607,19 @@ public:
   public:
     /**
      * Enter the given section in the timer. Exit automatically when calling
-     * stop() or destructor runs.
+     * stop() or when the destructor runs.
      */
     Scope(dealii::TimerOutput &timer_, const std::string &section_name);
 
     /**
-     * Destructor calls stop()
+     * Destructor calls Scope::stop().
      */
     ~Scope();
 
     /**
      * In case you want to exit the scope before the destructor is executed,
-     * call this function.
+     * call this function. The function leaves the current subsection of
+     * the stored timer object.
      */
     void
     stop();
@@ -877,7 +904,7 @@ private:
   /**
    * A list of all the sections and their information.
    */
-  std::map<std::string, Section> sections;
+  mutable std::map<std::string, Section> sections;
 
   /**
    * The stream object to which we are to output.
@@ -907,7 +934,19 @@ private:
    * A lock that makes sure that this class gives reasonable results even when
    * used with several threads.
    */
-  Threads::Mutex mutex;
+  mutable Threads::Mutex mutex;
+
+  /**
+   * Whether MPI communication is necessary to synchronize the results between
+   * different MPI ranks.
+   */
+  mutable bool is_synchronized;
+
+  /**
+   * Synchronize the results between MPI ranks.
+   */
+  void
+  synchronize() const;
 };
 
 
