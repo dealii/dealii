@@ -117,19 +117,19 @@ class Timer
 {
 public:
   /**
-   * Constructor. Sets the accumulated times to zero and calls Timer::start().
+   * Constructor. Sets the accumulated times to zero and starts the timer.
    */
   Timer();
 
   /**
-   * Constructor specifying that CPU times should be summed over the given
-   * communicator. If @p sync_lap_times is <code>true</code> then the Timer
+   * Constructor. Sets the accumulated times to zero and starts the timer.
+   *
+   * This constructor specifies that CPU times should be summed over the given
+   * @p mpi_communicator. If @p sync_lap_times is <code>true</code> then the Timer
    * will set the elapsed wall and CPU times over the last lap to their
    * maximum values across the provided communicator. This synchronization is
    * only performed if Timer::stop() is called before the timer is queried for
    * time duration values.
-   *
-   * This constructor calls Timer::start().
    *
    * @note The timer is stopped before the synchronization over the
    * communicator occurs; the extra cost of the synchronization is not
@@ -174,7 +174,9 @@ public:
   /**
    * Begin measuring a new lap. If <code>sync_lap_times</code> is
    * <code>true</code> then an MPI barrier is used to ensure that all
-   * processes begin the lap at the same wall time.
+   * processes begin the lap at the same wall time. If the timer is
+   * already running, the start time of the current lap is reset
+   * to the current time.
    */
   void
   start();
@@ -185,13 +187,13 @@ public:
    * synchronized over all processors in the communicator (i.e., the lap times
    * are set to the maximum lap time).
    *
-   * Return the accumulated CPU time in seconds.
+   * @return Return the accumulated CPU time of the current processor in seconds.
    */
   double
   stop();
 
   /**
-   * Stop the timer, if it is running, and reset all measured values to their
+   * Stop the timer, if it is running. Reset all measured values to their
    * default states.
    */
   void
@@ -206,6 +208,13 @@ public:
   /**
    * Return the current accumulated wall time (including the current lap, if
    * the timer is running) in seconds without stopping the timer.
+   *
+   * If the timer is running, and an MPI communicator was provided to the
+   * constructor of this class and the lap times are synchronized,
+   * the portion of the wall time up to the end of the last lap is
+   * synchronized between processors. However, the currently running lap is
+   * not synchronized and can therefore vary between processors. This
+   * avoids introducing unnecessary synchronization in this function.
    */
   double
   wall_time() const;
@@ -213,6 +222,12 @@ public:
   /**
    * Return the wall time of the last lap in seconds. The timer is not stopped
    * by this function.
+   *
+   * If an MPI communicator was provided to the constructor and
+   * <code>sync_lap_times</code> is <code>true</code>,
+   * then the returned lap time is synchronized over all processors in the
+   * communicator (i.e., the lap time was set to the maximum wall time of
+   * all processors).
    */
   double
   last_wall_time() const;
@@ -221,7 +236,7 @@ public:
    * Return the accumulated CPU time (including the current lap, if the timer
    * is running) in seconds without stopping the timer.
    *
-   * If an MPI communicator is provided to the constructor then the returned
+   * If an MPI communicator was provided to the constructor then the returned
    * value is the sum of all accumulated CPU times over all processors in the
    * communicator.
    */
@@ -231,6 +246,14 @@ public:
   /**
    * Return the CPU time of the last lap in seconds. The timer is not stopped
    * by this function.
+   *
+   * If an MPI communicator was provided to the constructor and
+   * <code>sync_lap_times</code> is <code>true</code>, then the
+   * returned CPU time is synchronized across all processors (i.e.,
+   * the lap time was set to the maximum CPU time of all processors).
+   *
+   * Note, that unlike cpu_time() the result is not summed across
+   * processors.
    */
   double
   last_cpu_time() const;
