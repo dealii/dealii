@@ -49,10 +49,6 @@ MatrixScaling::MatrixScaling(const ScalingControl &control)
 
 
 
-MatrixScaling::~MatrixScaling() = default;
-
-
-
 template <class Matrix>
 void
 MatrixScaling::scale_matrix(Matrix &matrix)
@@ -109,8 +105,7 @@ template <class Matrix, class VectorType>
 void
 MatrixScaling::scale_linear_system(Matrix &matrix, VectorType &rhs)
 {
-  Assert(matrix.m() == rhs.size(),
-         ExcDimensionMismatch(matrix.m(), rhs.size()));
+  AssertDimension(matrix.m(), rhs.size());
 
   if constexpr (is_supported_matrix<Matrix>())
     {
@@ -127,10 +122,13 @@ template <class VectorType>
 void
 MatrixScaling::scale_system_solution(VectorType &sol) const
 {
-  Assert(sol.size() == column_scaling.size(),
-         ExcDimensionMismatch(sol.size(), column_scaling.size()));
+  AssertDimension(sol.size(), column_scaling.size());
 
-  sol.scale(column_scaling);
+  if constexpr (std::is_same_v<VectorType, dealii::Vector<double>> ||
+                std::is_same_v<VectorType, dealii::Vector<float>>)
+    sol.scale(column_scaling);
+  else
+    Assert(false, ExcNotImplemented());
 }
 
 

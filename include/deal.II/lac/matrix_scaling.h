@@ -175,7 +175,7 @@ public:
   /**
    * Destructor.
    */
-  ~MatrixScaling();
+  ~MatrixScaling() = default;
 
   /**
    * Scale the input <tt>matrix</tt> in place according to the selected

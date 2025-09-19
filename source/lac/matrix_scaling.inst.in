@@ -26,15 +26,16 @@ for (S : REAL_SCALARS)
 
     template void MatrixScaling::scale_matrix(BlockSparseMatrix<S> &);
     template void MatrixScaling::scale_linear_system(BlockSparseMatrix<S> &,
-                                                     Vector<S> &);
+                                                     BlockVector<S> &);
 
     template void MatrixScaling::scale_matrix(BlockSparseMatrixEZ<S> &);
     template void MatrixScaling::scale_linear_system(BlockSparseMatrixEZ<S> &,
-                                                     Vector<S> &);
+                                                     BlockVector<S> &);
 
     template void MatrixScaling::scale_matrix(FullMatrix<S> &);
     template void MatrixScaling::scale_linear_system(FullMatrix<S> &,
                                                      Vector<S> &);
 
     template void MatrixScaling::scale_system_solution(Vector<S> &) const;
+    template void MatrixScaling::scale_system_solution(BlockVector<S> &) const;
   }
