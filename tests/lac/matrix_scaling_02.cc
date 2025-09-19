@@ -64,7 +64,7 @@ main(int argc, char **argv)
 
   deallog << "Sparse Matrix: " << std::endl;
 
-  SparseDirectMUMPS Binv;
+  SparseDirectUMFPACK Binv;
   Binv.initialize(B);
   Binv.vmult(x, rhs);
   deallog << "Solution of Ax=b: " << std::endl;
