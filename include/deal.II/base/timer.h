@@ -258,6 +258,15 @@ public:
   double
   last_cpu_time() const;
 
+  /**
+   * Return the number of laps that have been timed by calling
+   * stop() since creation of the timer or the last
+   * call to reset(). If a timer is currently running
+   * the current lap is included in the count.
+   */
+  unsigned int
+  n_laps() const;
+
 private:
   /**
    * The Timer class stores timing information for two different clocks: a
@@ -370,6 +379,13 @@ private:
    * number of MPI processes in the MPI_Comm for the total run time.
    */
   Utilities::MPI::MinMaxAvg accumulated_wall_time_data;
+
+  /**
+   * The number of laps that have been timed. If
+   * the timer is currently running
+   * the current lap is included in the count.
+   */
+  unsigned int n_timed_laps;
 };
 
 
