@@ -931,19 +931,20 @@ namespace Step7
   // is as in previous examples, with the only difference that we want to have
   // part of the boundary marked as Neumann type, rather than Dirichlet.
   //
-  // For this, we will use the following convention: Faces belonging to Gamma1
-  // will have the boundary indicator <code>0</code> (which is the default, so
-  // we don't have to set it explicitly), and faces belonging to Gamma2 will
-  // use <code>1</code> as boundary indicator.  To set these values, we loop
-  // over all cells, then over all faces of a given cell, check whether it is
-  // part of the boundary that we want to denote by Gamma2, and if so set its
-  // boundary indicator to <code>1</code>. For the present program, we
-  // consider the left and bottom boundaries as Gamma2. We determine whether a
-  // face is part of that boundary by asking whether the x or y coordinates
-  // (i.e. vector components 0 and 1) of the midpoint of a face equals -1, up
-  // to some small wiggle room that we have to give since it is instable to
-  // compare floating point numbers that are subject to round off in
-  // intermediate computations.
+  // For this, we will use the following convention: Faces belonging to
+  // $\Gamma_1$ will have the boundary indicator <code>0</code> (which is the
+  // default, so we don't have to set it explicitly), and faces belonging to
+  // $\Gamma_2$ will use <code>1</code> as boundary indicator.  To set these
+  // values, we loop over all cells, then over all faces of a given cell, check
+  // whether it is at the boundary, and if so whether it is geometrically part
+  // of the boundary that we want to denote by $\Gamma_2$. If all of these
+  // conditions are true, we set its boundary indicator to <code>1</code>. For
+  // the present program, we consider the left and bottom boundaries as
+  // $\Gamma_2$. We determine whether a face is part of that boundary by asking
+  // whether the $x$ or $y$ coordinates (i.e. vector components 0 and 1) of the
+  // midpoint of a face equals $-1$, up to some small wiggle room that we have
+  // to give since it is unstable to compare floating point numbers for equality
+  // that are subject to round off in intermediate computations.
   //
   // It is worth noting that we have to loop over all cells here, not only the
   // active ones. The reason is that upon refinement, newly created faces
@@ -970,12 +971,13 @@ namespace Step7
 
             for (const auto &cell : triangulation.cell_iterators())
               for (const auto &face : cell->face_iterators())
-                {
-                  const auto center = face->center();
-                  if ((std::fabs(center[0] - (-1.0)) < 1e-12) ||
-                      (std::fabs(center[1] - (-1.0)) < 1e-12))
-                    face->set_boundary_id(1);
-                }
+                if (face->at_boundary())
+                  {
+                    const auto center = face->center();
+                    if ((std::fabs(center[0] - (-1.0)) < 1e-12) ||
+                        (std::fabs(center[1] - (-1.0)) < 1e-12))
+                      face->set_boundary_id(1);
+                  }
           }
         else
           refine_grid();
