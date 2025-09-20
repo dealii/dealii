@@ -399,7 +399,7 @@ namespace TimeStepping
             this->b.reserve(this->n_stages);
             this->b.push_back(1.0);
 
-            this->a = {{0.0}};
+            this->a = {{}};
             break;
           }
         case (HEUN_EULER):
@@ -409,7 +409,7 @@ namespace TimeStepping
             this->b.push_back(0.5);
             this->b.push_back(0.5);
 
-            this->a = {{1.0, 0.0}};
+            this->a = {{1.0}};
             break;
           }
         case (LOW_STORAGE_RK_STAGE3_ORDER3):
@@ -487,6 +487,9 @@ namespace TimeStepping
                           "Unimplemented low-storage Runge-Kutta method."));
           }
       }
+
+    AssertDimension(this->a[0].size() + 1, this->b.size());
+
     // compute ci
     this->c.reserve(this->n_stages);
     this->c.push_back(0.);
