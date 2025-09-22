@@ -6,7 +6,16 @@ order of convergence, EOC, is close to 2.
 
 @image html step-85-solution.png
 
+| Cycle | Mesh size | $L^2$-Error | EOC  |
+|:-----:|:---------:|:-----------:|:----:|
+|   0   |  0.3025   |  8.8179e-03 |  -   |
+|   1   |  0.1513   |  1.3474e-03 | 2.71 |
+|   2   |  0.0756   |  3.0377e-04 | 2.15 |
+|   3   |  0.0378   |  7.3996e-05 | 2.04 |
+|   4   |  0.0189   |  2.1011e-05 | 1.82 |
 
+
+When using shifts computed exactly, we obtain very similar convergence:
 | Cycle | Mesh size | $L^2$-Error | EOC  |
 |:-----:|:---------:|:-----------:|:----:|
 |   0   |  0.3025   |  1.1071e-02 |  -   |

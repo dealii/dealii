@@ -52,8 +52,8 @@
 
 // These headers are needed for the shifted boundary method implementation
 // There will be more once other PR get accepted.
+#include <deal.II/non_matching/closest_surface_point.h>
 #include <deal.II/non_matching/mesh_classifier.h>
-
 
 #include <deal.II/numerics/data_out.h>
 #include <deal.II/numerics/vector_tools.h>
@@ -254,11 +254,6 @@ namespace Step101
   {
     std::cout << "Assembling" << std::endl;
 
-    // Variables for working with the level set function
-    std::vector<types::global_dof_index> level_set_dof_indices(
-      fe_level_set.dofs_per_cell);
-    std::vector<double> dof_values_level_set(fe_level_set.dofs_per_cell);
-
     // Standard local assembly variables and  Nitsche penalty parameter (similar
     // to step-85)
     const unsigned int n_dofs_per_cell = fe_collection[0].dofs_per_cell;
@@ -311,6 +306,10 @@ namespace Step101
                                           update_JxW_values |
                                           update_quadrature_points);
 
+    MappingCartesian<dim>                         cartesian_mapping;
+    NonMatching::ClosestSurfacePoint<dim, double> closest_surface_point(
+      level_set, level_set_dof_handler, cartesian_mapping);
+
 
     for (const auto &cell :
          dof_handler.active_cell_iterators() |
@@ -351,18 +350,36 @@ namespace Step101
 
             surface_fe_values.reinit(cell, face);
 
-            // Get the neighboring cell for level set evaluation
+            // We need the neighboring cell as the "searching" cell for the
+            // closest-surface-point routine. In the SBM we handle faces that
+            // separate an active (inside-domain) cell from a FE_Nothing
+            // neighbor (outside-domain). To find the shifted (closest) points
+            // on the true boundary we call the closest_surface_point helper
+            // with three pieces of information:
+            //   - the cell to search from (here the neighbor, which typically
+            //     lies outside the domain and contains the level-set zero set),
+            //   - the reference cell that provides the face quadrature points
+            //     (the active cell), and
+            //   - the quadrature points on that face.
+            //
+            // The routine returns two arrays:
+            //   - real_points: physical coordinates of the closest points on
+            //   the
+            //                  true boundary corresponding to each face
+            //                  quadrature point, and
+            //   - unit_points: the corresponding coordinates in the reference
+            //                  cell of the searching cell (so we can evaluate
+            //                  shape values/gradients there).
+            //
+            // We then use these returned points to evaluate trial functions at
+            // the shifted locations and to transfer Dirichlet/Neumann data
+            // from the true boundary back to the surrogate mesh face.
             auto neighbour = cell->neighbor(face);
-            typename DoFHandler<dim>::cell_iterator neighbours_lvl_set_cell(
-              &neighbour->get_triangulation(),
-              neighbour->level(),
-              neighbour->index(),
-              &level_set_dof_handler);
-
-            neighbours_lvl_set_cell->get_dof_indices(level_set_dof_indices);
-            level_set.extract_subvector_to(level_set_dof_indices.begin(),
-                                           level_set_dof_indices.end(),
-                                           dof_values_level_set.begin());
+            auto [real_points, unit_points] =
+              closest_surface_point.compute_closest_surface_points(
+                neighbour, // searching cell
+                cell,      // reference cell for face quadrature points
+                surface_fe_values.get_quadrature_points());
 
             // Loop over quadrature points on the face
             for (const unsigned int q :
@@ -377,18 +394,11 @@ namespace Step101
                 const Point<dim> closest_boundary_point =
                   point * (1. / point.norm());
 
-                // Future work: Computing shifts from level set is being
-                // developed in PR #18680. This would allow for more general
-                // geometries.
 
                 // Transform the shifted point to the reference cell coordinates
-                const Point<dim> unit_shifted_point =
-                  surface_fe_values.get_mapping().transform_real_to_unit_cell(
-                    cell, closest_boundary_point);
+                const Point<dim> &unit_shifted_point = unit_points[q];
+                const Point<dim> &real_shifted_point = real_points[q];
 
-                const Point<dim> real_shifted_point =
-                  surface_fe_values.get_mapping().transform_unit_to_real_cell(
-                    cell, unit_shifted_point);
 
                 // Store shifts for debugging (will be exported using
                 // functionality in PR #18741)
@@ -419,6 +429,7 @@ namespace Step101
                   surface_fe_values.normal_vector(q);
 
                 // fixme: this only work for unit spehre.
+                // We need functionality to compute normals from the level set.
                 const Tensor<1, dim> &surface_normal = closest_boundary_point;
 
                 // @sect5{Shifted Nitsche method assembly}
