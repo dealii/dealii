@@ -361,15 +361,6 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
         Triangulation<deal_II_dimension>                       &triangulation,
         const Function<deal_II_dimension>                      *coefficient,
         const bool);
-
-      template Triangulation<deal_II_dimension,
-                             deal_II_space_dimension>::DistortedCellList
-      fix_up_distorted_child_cells(
-        const Triangulation<deal_II_dimension,
-                            deal_II_space_dimension>::DistortedCellList
-          &distorted_cells,
-        Triangulation<deal_II_dimension, deal_II_space_dimension>
-          &triangulation);
 #    endif
 #  endif
     \}

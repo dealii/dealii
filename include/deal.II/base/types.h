@@ -37,7 +37,7 @@ namespace types
    * @ref GlossCombinedOrientation "glossary"
    * for more information.
    */
-  using geometric_orientation = unsigned char;
+  using geometric_orientation = std::uint8_t;
 
   /**
    * The type used to denote subdomain_ids of cells.
@@ -189,7 +189,7 @@ namespace types
    * @deprecated This type was previously only used in library internals and is
    * deprecated without replacement.
    */
-  using geometric_entity_type DEAL_II_DEPRECATED_EARLY = std::uint8_t;
+  using geometric_entity_type DEAL_II_DEPRECATED = std::uint8_t;
 } // namespace types
 
 /**
@@ -364,6 +364,20 @@ namespace numbers
    */
   constexpr types::geometric_orientation reverse_line_orientation =
     static_cast<types::geometric_orientation>(0b001);
+
+  /**
+   * Value indicating an invalid or unset orientation.
+   *
+   * This value is an example of an
+   * @ref GlossInvalidValue "invalid value".
+   * See there for more information.
+   *
+   * See the
+   * @ref GlossCombinedOrientation "glossary"
+   * for more information.
+   */
+  constexpr types::geometric_orientation invalid_geometric_orientation =
+    static_cast<types::geometric_orientation>(-1);
 
   /**
    * A special id for an invalid subdomain id. This value may not be used as a

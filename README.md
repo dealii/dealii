@@ -40,7 +40,7 @@ Then continue as before.
 
 A detailed *ReadME* can be found at [./doc/readme.html](https://dealii.org/developer/readme.html),
 [./doc/users/cmake_user.html](https://dealii.org/developer/users/cmake_user.html),
-or at https://www.dealii.org/.
+or at https://dealii.org/.
 
 Getting started:
 ----------------
@@ -48,7 +48,7 @@ Getting started:
 The tutorial steps are located under examples/ of the installation.
 Information about the tutorial steps can be found at
 [./doc/doxygen/tutorial/index.html](https://dealii.org/developer/doxygen/deal.II/Tutorial.html)
-or at https://www.dealii.org/.
+or at https://dealii.org/.
 
 deal.II includes support for pretty-printing deal.II objects inside GDB.
 See [`contrib/utilities/dotgdbinit.py`](contrib/utilities/dotgdbinit.py) or
@@ -65,7 +65,7 @@ Further information:
 
 For further information have a look at
 [./doc/index.html](https://dealii.org/developer/index.html) or at
-https://www.dealii.org.
+https://dealii.org.
 
 Docker Images:
 -------------

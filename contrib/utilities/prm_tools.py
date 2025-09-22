@@ -15,7 +15,7 @@
 ##
 ## ------------------------------------------------------------------------
 
-""" Routines to read, format and write deal.II parameter input files (.prm files) """
+"""Routines to read, format and write deal.II parameter input files (.prm files)"""
 
 import sys
 import os

@@ -127,33 +127,33 @@ initial guess.
 <table align="center">
   <tr>
     <td align="center">
-      <img src="https://www.dealii.org/images/steps/developer/step-57.Re400_Mesh0.png" width="232px" alt="">
+      <img src="https://dealii.org/images/steps/developer/step-57.Re400_Mesh0.png" width="232px" alt="">
     </td>
     <td align="center">
-      <img src="https://www.dealii.org/images/steps/developer/step-57.Re400_Mesh1.png" width="232px" alt="">
+      <img src="https://dealii.org/images/steps/developer/step-57.Re400_Mesh1.png" width="232px" alt="">
     </td>
     <td align="center">
-      <img src="https://www.dealii.org/images/steps/developer/step-57.Re400_Mesh2.png" width="232px" alt="">
+      <img src="https://dealii.org/images/steps/developer/step-57.Re400_Mesh2.png" width="232px" alt="">
     </td>
   </tr>
   <tr>
     <td align="center">
-      <img src="https://www.dealii.org/images/steps/developer/step-57.Re400_Mesh3.png" width="232px" alt="">
+      <img src="https://dealii.org/images/steps/developer/step-57.Re400_Mesh3.png" width="232px" alt="">
     </td>
     <td align="center">
-      <img src="https://www.dealii.org/images/steps/developer/step-57.Re400_Mesh4.png" width="232px" alt="">
+      <img src="https://dealii.org/images/steps/developer/step-57.Re400_Mesh4.png" width="232px" alt="">
     </td>
   </tr>
 </table>
 
 This picture is the graphical streamline result of lid-driven cavity with
 $\mathrm{Re}=400$.
-<img src="https://www.dealii.org/images/steps/developer/step-57.Re400_Streamline.png" alt="">
+<img src="https://dealii.org/images/steps/developer/step-57.Re400_Streamline.png" alt="">
 
 Then the solution is compared with a reference solution
 from @cite Ghia1982 and the reference solution data can be found in the file "ref_2d_ghia_u.txt".
 
-<img src="https://www.dealii.org/images/steps/developer/step-57.compare-Re400.svg" style="width:50%" alt="">
+<img src="https://dealii.org/images/steps/developer/step-57.compare-Re400.svg" style="width:50%" alt="">
 
 
 
@@ -166,7 +166,7 @@ as the initial guess, the convergence will be lost. The following picture
 shows that the nonlinear iteration gets stuck and the residual no longer decreases
 in further iterations.
 
-<img src="https://www.dealii.org/images/steps/developer/step-57.Re7500_loss_convergence.svg" style="width:50%" alt="">
+<img src="https://dealii.org/images/steps/developer/step-57.Re7500_loss_convergence.svg" style="width:50%" alt="">
 
 The initial guess, therefore, has to be obtained via a continuation method
 which has been discussed in the introduction. Here the step size in the continuation method, that is $|\nu_{i}-\nu_{i+1}|$, is 2000 and the initial
@@ -175,7 +175,7 @@ refined as in the previous test case. The following picture shows that at each
 refinement Newton's iteration has quadratic convergence. 52 steps of Newton's
 iterations are executed for solving this test case.
 
-<img src="https://www.dealii.org/images/steps/developer/step-57.Re7500_get_convergence.svg" style="width:50%" alt="">
+<img src="https://dealii.org/images/steps/developer/step-57.Re7500_get_convergence.svg" style="width:50%" alt="">
 
 We also show the residual from each step of Newton's iteration on every
 mesh. The quadratic convergence is clearly visible in the table.
@@ -304,28 +304,28 @@ The sequence of generated grids looks like this:
 <table align="center">
   <tr>
     <td align="center">
-      <img src="https://www.dealii.org/images/steps/developer/step-57.Re7500_Mesh0.png" width="232px" alt="">
+      <img src="https://dealii.org/images/steps/developer/step-57.Re7500_Mesh0.png" width="232px" alt="">
     </td>
     <td align="center">
-      <img src="https://www.dealii.org/images/steps/developer/step-57.Re7500_Mesh1.png" width="232px" alt="">
+      <img src="https://dealii.org/images/steps/developer/step-57.Re7500_Mesh1.png" width="232px" alt="">
     </td>
     <td align="center">
-      <img src="https://www.dealii.org/images/steps/developer/step-57.Re7500_Mesh2.png" width="232px" alt="">
+      <img src="https://dealii.org/images/steps/developer/step-57.Re7500_Mesh2.png" width="232px" alt="">
     </td>
   </tr>
   <tr>
     <td align="center">
-      <img src="https://www.dealii.org/images/steps/developer/step-57.Re7500_Mesh3.png" width="232px" alt="">
+      <img src="https://dealii.org/images/steps/developer/step-57.Re7500_Mesh3.png" width="232px" alt="">
     </td>
     <td align="center">
-      <img src="https://www.dealii.org/images/steps/developer/step-57.Re7500_Mesh4.png" width="232px" alt="">
+      <img src="https://dealii.org/images/steps/developer/step-57.Re7500_Mesh4.png" width="232px" alt="">
     </td>
   </tr>
 </table>
 We compare our solution with the reference solution from @cite Erturk2005 .
-<img src="https://www.dealii.org/images/steps/developer/step-57.compare-Re7500.svg" style="width:50%" alt="">
+<img src="https://dealii.org/images/steps/developer/step-57.compare-Re7500.svg" style="width:50%" alt="">
 The following picture presents the graphical result.
-<img src="https://www.dealii.org/images/steps/developer/step-57.Re7500_Streamline.png" alt="">
+<img src="https://dealii.org/images/steps/developer/step-57.Re7500_Streamline.png" alt="">
 
 Furthermore, the error consists of the nonlinear error,
 which decreases as we perform Newton iterations, and the discretization error,
@@ -335,7 +335,7 @@ see that the final residual (nonlinear error) is below $10^{-12}$ on each mesh, 
 following picture shows us the difference between solutions on subsequently finer
 meshes:
 
-<img src="https://www.dealii.org/images/steps/developer/step-57.converge-Re7500.svg" style="width:50%" alt="">
+<img src="https://dealii.org/images/steps/developer/step-57.converge-Re7500.svg" style="width:50%" alt="">
 
 
 <a name="step-57-extensions"></a>
@@ -405,5 +405,5 @@ For larger computations, especially in 3d, it is necessary to implement MPI
 parallel solvers and preconditioners. A good starting point would be step-55,
 which uses algebraic multigrid for the velocity block for the Stokes
 equations. Another option would be to take a look at the list of codes
-in the <a href="https://www.dealii.org/code-gallery.html">deal.II code
+in the <a href="https://dealii.org/code-gallery.html">deal.II code
 gallery</a>, which already contains parallel Navier-Stokes solvers.

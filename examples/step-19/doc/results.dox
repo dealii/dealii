@@ -86,7 +86,7 @@ are no longer exact representations of the solution as currently
 computed -- but they are conceptually still correct):
 <div class="twocolumn" style="width: 80%">
   <div>
-    <img src="https://www.dealii.org/images/steps/developer/step-19.solution.0000.png"
+    <img src="https://dealii.org/images/steps/developer/step-19.solution.0000.png"
          alt="The solution at time step 0 (t=0 seconds)."
          width="500">
     <br>
@@ -94,7 +94,7 @@ computed -- but they are conceptually still correct):
     <br>
   </div>
   <div>
-    <img src="https://www.dealii.org/images/steps/developer/step-19.solution.1400.png"
+    <img src="https://dealii.org/images/steps/developer/step-19.solution.1400.png"
          alt="The solution at time step 1400 (t=0.000068 seconds)."
          width="500">
     <br>
@@ -102,7 +102,7 @@ computed -- but they are conceptually still correct):
     <br>
   </div>
   <div>
-    <img src="https://www.dealii.org/images/steps/developer/step-19.solution.0700.png"
+    <img src="https://dealii.org/images/steps/developer/step-19.solution.0700.png"
          alt="The solution at time step 700 (t=0.000035 seconds)."
          width="500">
     <br>
@@ -110,7 +110,7 @@ computed -- but they are conceptually still correct):
     <br>
   </div>
   <div>
-    <img src="https://www.dealii.org/images/steps/developer/step-19.solution.2092.png"
+    <img src="https://dealii.org/images/steps/developer/step-19.solution.2092.png"
          alt="The solution at time step 2092 (t=0.0001 seconds)."
          width="500">
     <br>
@@ -160,7 +160,7 @@ the magnitude exceeds the threshold necessary to draw an electron out of the
 electrode.
 
 
-<a name="step-19-extensions"></a>
+@anchor step_19-Extensions
 <h3>Possibilities for extensions</h3>
 
 

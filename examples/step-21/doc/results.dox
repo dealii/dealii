@@ -1,3 +1,4 @@
+@anchor step_21-ResultsSection
 <h1>Results</h1>
 
 The code as presented here does not actually compute the results
@@ -58,7 +59,7 @@ With all this, here are a few movies that show how the saturation progresses
 over time. First, this is for the single crack model, as implemented in the
 <code>SingleCurvingCrack::KInverse</code> class:
 
-<img src="https://www.dealii.org/images/steps/developer/step-21.centerline.gif" alt="">
+<img src="https://dealii.org/images/steps/developer/step-21.centerline.gif" alt="">
 
 As can be seen, the water rich fluid snakes its way mostly along the
 high-permeability zone in the middle of the domain, whereas the rest of the
@@ -72,14 +73,14 @@ The second movie shows the saturation for the random medium model of class
 centers of high permeability and fluid hops from one of these zones to
 the next:
 
-<img src="https://www.dealii.org/images/steps/developer/step-21.random2d.gif" alt="">
+<img src="https://dealii.org/images/steps/developer/step-21.random2d.gif" alt="">
 
 
 Finally, here is the same situation in three space dimensions, on a mesh with
 <code>n_refinement_steps=5</code>, which produces a mesh of some 32,000 cells
 and 167,000 degrees of freedom:
 
-<img src="https://www.dealii.org/images/steps/developer/step-21.random3d.gif" alt="">
+<img src="https://dealii.org/images/steps/developer/step-21.random3d.gif" alt="">
 
 To repeat these computations, all you have to do is to change the line
 @code
@@ -109,7 +110,7 @@ saturation less than 0.5. However, it appears that most visualization programs
 are not equipped to do this kind of transformation.
 
 
-<a name="step-21-extensions"></a>
+@anchor step_21-Extensions
 <h3>Possibilities for extensions</h3>
 
 There are a number of areas where this program can be improved. Three of them
@@ -130,8 +131,8 @@ Second, we could do a lot better with the solver and
 preconditioners. Presently, we solve the Schur complement $B^TM^u(S)^{-1}B$
 with a CG method, using $[B^T (\textrm{diag}(M^u(S)))^{-1} B]^{-1}$ as a
 preconditioner. Applying this preconditioner is expensive, since it involves
-solving a linear system each time. This may have been appropriate for @ref
-step_20 "step-20", where we have to solve the entire problem only
+solving a linear system each time. This may have been appropriate for
+step-20, where we have to solve the entire problem only
 once. However, here we have to solve it hundreds of times, and in such cases
 it is worth considering a preconditioner that is more expensive to set up the
 first time, but cheaper to apply later on.

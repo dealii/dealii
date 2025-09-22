@@ -14,7 +14,6 @@
 
 
 #include <deal.II/base/parameter_acceptor.h>
-#include <deal.II/base/path_search.h>
 #include <deal.II/base/utilities.h>
 
 #include "../tests.h"

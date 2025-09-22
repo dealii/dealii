@@ -1,0 +1,445 @@
+// ------------------------------------------------------------------------
+//
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2025 by the deal.II authors
+//
+// This file is part of the deal.II library.
+//
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
+//
+// ------------------------------------------------------------------------
+
+
+// It is very inefficient in the module system to have repeated
+// #includes in many module partition files because when you 'import'
+// those partitions, you also have to load everything they
+// #included. In other words, you get the same content *many times*,
+// once from each imported partition, rather than only once via the
+// old-style #include system. We deal with this by wrapping all of our
+// external packages into partitions that we can 'import' wherever we
+// need.
+
+// This is the file that wraps everything we need from TRILINOS into one
+// module partition.
+
+
+module;
+
+#include <deal.II/base/config.h>
+
+#ifdef DEAL_II_WITH_TRILINOS
+#  include <Amesos.h>
+#  include <AztecOO.h>
+#  include <BelosBlockCGSolMgr.hpp>
+#  include <BelosBlockGmresSolMgr.hpp>
+#  include <BelosEpetraAdapter.hpp>
+#  include <BelosIteration.hpp>
+#  include <BelosMultiVec.hpp>
+#  include <BelosOperator.hpp>
+#  include <BelosSolverManager.hpp>
+#  include <EpetraExt_MatrixMatrix.h>
+#  include <Epetra_BlockMap.h>
+#  include <Epetra_Comm.h>
+#  include <Epetra_ConfigDefs.h>
+#  include <Epetra_CrsGraph.h>
+#  include <Epetra_CrsMatrix.h>
+#  include <Epetra_Export.h>
+#  include <Epetra_FECrsGraph.h>
+#  include <Epetra_FECrsMatrix.h>
+#  include <Epetra_FEVector.h>
+#  include <Epetra_Import.h>
+#  include <Epetra_LinearProblem.h>
+#  include <Epetra_LocalMap.h>
+#  include <Epetra_Map.h>
+#  include <Epetra_MpiComm.h>
+#  include <Epetra_MultiVector.h>
+#  include <Epetra_Operator.h>
+#  include <Epetra_RowMatrix.h>
+#  include <Epetra_SerialComm.h>
+#  include <Epetra_Vector.h>
+#  include <Ifpack_Chebyshev.h>
+#  include <NOX_Abstract_Group.H>
+#  include <NOX_Abstract_Vector.H>
+#  include <NOX_Solver_Factory.H>
+#  include <NOX_Solver_Generic.H>
+#  include <NOX_StatusTest_Combo.H>
+#  include <NOX_StatusTest_MaxIters.H>
+#  include <NOX_StatusTest_NormF.H>
+#  include <NOX_StatusTest_RelativeNormF.H>
+#  include <Teuchos_BLAS_types.hpp>
+#  include <Teuchos_Comm.hpp>
+#  include <Teuchos_ConfigDefs.hpp>
+#  include <Teuchos_DefaultComm.hpp>
+#  include <Teuchos_DefaultMpiComm.hpp>
+#  include <Teuchos_OrdinalTraits.hpp>
+#  include <Teuchos_ParameterList.hpp>
+#  include <Teuchos_RCP.hpp>
+#  include <Teuchos_RCPDecl.hpp>
+
+#  include <functional>
+
+#  ifdef DEAL_II_TRILINOS_WITH_ROL
+#    include <ROL_Vector.hpp>
+#  endif
+
+#  ifdef DEAL_II_TRILINOS_WITH_SACADO
+#    include <Sacado.hpp>
+#    include <Sacado_Fad_DFad.hpp>
+#    include <Sacado_Fad_Ops.hpp>
+#    include <Sacado_trad.hpp>
+#  endif
+
+#  ifdef DEAL_II_TRILINOS_WITH_SEACAS
+#    include <exodusII.h>
+#  endif
+
+#  ifdef DEAL_II_TRILINOS_WITH_TPETRA
+#    include <Tpetra_Core.hpp>
+#    include <Tpetra_CrsGraph.hpp>
+#    include <Tpetra_CrsGraph_fwd.hpp>
+#    include <Tpetra_CrsMatrix.hpp>
+#    include <Tpetra_CrsMatrix_decl.hpp>
+#    include <Tpetra_CrsMatrix_fwd.hpp>
+#    include <Tpetra_Details_DefaultTypes.hpp>
+#    include <Tpetra_Export.hpp>
+#    include <Tpetra_Export_fwd.hpp>
+#    include <Tpetra_Import.hpp>
+#    include <Tpetra_Import_def.hpp>
+#    include <Tpetra_Import_fwd.hpp>
+#    include <Tpetra_Map.hpp>
+#    include <Tpetra_Map_def.hpp>
+#    include <Tpetra_Map_fwd.hpp>
+#    include <Tpetra_MultiVector_fwd.hpp>
+#    include <Tpetra_Operator.hpp>
+#    include <Tpetra_Operator_fwd.hpp>
+#    include <Tpetra_RowMatrix_fwd.hpp>
+#    include <Tpetra_Vector.hpp>
+#    include <Tpetra_Vector_decl.hpp>
+#    include <Tpetra_Vector_fwd.hpp>
+#    include <Tpetra_Version.hpp>
+
+#    ifdef DEAL_II_TRILINOS_WITH_AMESOS2
+#      include <Amesos2.hpp>
+#    endif
+
+#    ifdef DEAL_II_TRILINOS_WITH_IFPACK2
+#      include <Ifpack2_Factory.hpp>
+#      include <Ifpack2_IdentitySolver.hpp>
+#      include <Ifpack2_IdentitySolver_decl.hpp>
+#      include <Ifpack2_Preconditioner.hpp>
+#    endif
+
+#  endif
+#endif
+
+#ifdef DEAL_II_TRILINOS_WITH_ZOLTAN
+#  include <zoltan_cpp.h>
+#endif
+
+
+export module dealii.external.trilinos;
+
+#ifdef DEAL_II_WITH_TRILINOS
+
+export
+{
+  using ::Amesos;
+  using ::Amesos_BaseSolver;
+  using ::AztecOO;
+  using ::AztecOO_StatusTest;
+  using ::Epetra_AddLocalAlso;
+  using ::Epetra_BlockMap;
+  using ::Epetra_CombineMode;
+  using ::Epetra_Comm;
+  using ::Epetra_CrsGraph;
+  using ::Epetra_CrsMatrix;
+  using ::Epetra_Export;
+  using ::Epetra_FECrsGraph;
+  using ::Epetra_FECrsMatrix;
+  using ::Epetra_FEVector;
+  using ::Epetra_Import;
+  using ::Epetra_LinearProblem;
+  using ::Epetra_LocalMap;
+  using ::Epetra_Map;
+  using ::Epetra_Max;
+  using ::Epetra_Min;
+  using ::Epetra_MpiComm;
+  using ::Epetra_MultiVector;
+  using ::Epetra_Operator;
+  using ::Epetra_RowMatrix;
+  using ::Epetra_SerialComm;
+  using ::Epetra_Vector;
+  using ::Ifpack_Chebyshev;
+  using ::Ifpack_Preconditioner;
+
+  // Epetra declares the following operator for Epetra_FECrsMatrix
+  // objects:
+  using ::operator<<;
+
+  namespace Belos
+  {
+    using ::Belos::BlockCGSolMgr;
+    using ::Belos::BlockGmresSolMgr;
+    using ::Belos::ETrans;
+    using ::Belos::LinearProblem;
+    using ::Belos::MultiVec;
+    using ::Belos::NormType;
+    using ::Belos::Operator;
+    using ::Belos::ReturnType;
+    using ::Belos::SolverManager;
+  } // namespace Belos
+
+  namespace EpetraExt
+  {
+    using ::EpetraExt::MatrixMatrix;
+  }
+
+  namespace NOX
+  {
+    namespace Abstract
+    {
+      using ::NOX::Abstract::Group;
+      using ::NOX::Abstract::Vector;
+    } // namespace Abstract
+
+    namespace Solver
+    {
+      using ::NOX::Solver::buildSolver;
+      using ::NOX::Solver::Generic;
+    } // namespace Solver
+
+    namespace StatusTest
+    {
+      using ::NOX::StatusTest::CheckType;
+      using ::NOX::StatusTest::Combo;
+      using ::NOX::StatusTest::Generic;
+      using ::NOX::StatusTest::MaxIters;
+      using ::NOX::StatusTest::NormF;
+      using ::NOX::StatusTest::RelativeNormF;
+      using ::NOX::StatusTest::StatusType;
+    } // namespace StatusTest
+
+
+    using ::NOX::CopyType;
+    using ::NOX::size_type;
+  } // namespace NOX
+
+#  ifdef DEAL_II_TRILINOS_WITH_ROL
+  namespace ROL
+  {
+    using ::ROL::makePtr;
+    using ::ROL::Ptr;
+    using ::ROL::Vector;
+    namespace Elementwise
+    {
+      using ::ROL::Elementwise::BinaryFunction;
+      using ::ROL::Elementwise::ReductionOp;
+      using ::ROL::Elementwise::UnaryFunction;
+    } // namespace Elementwise
+  }   // namespace ROL
+#  endif
+
+#  ifdef DEAL_II_TRILINOS_WITH_SACADO
+  namespace Sacado
+  {
+    namespace Fad
+    {
+      using ::Sacado::Fad::DFad;
+      using ::Sacado::Fad::Expr;
+      using ::Sacado::Fad::operator*;
+      using ::Sacado::Fad::operator/;
+      using ::Sacado::Fad::operator+;
+      using ::Sacado::Fad::operator-;
+      using ::Sacado::Fad::operator==;
+      using ::Sacado::Fad::operator!=;
+
+      namespace Exp
+      {
+        using ::Sacado::Fad::Exp::DynamicStorage;
+        using ::Sacado::Fad::Exp::GeneralFad;
+        using ::Sacado::Fad::Exp::operator*;
+        using ::Sacado::Fad::Exp::operator/;
+        using ::Sacado::Fad::Exp::operator+;
+        using ::Sacado::Fad::Exp::operator-;
+        using ::Sacado::Fad::Exp::operator==;
+        using ::Sacado::Fad::Exp::operator!=;
+        using ::Sacado::Fad::Exp::operator<<;
+        using ::Sacado::Fad::Exp::operator<;
+        using ::Sacado::Fad::Exp::operator>;
+        using ::Sacado::Fad::Exp::operator<=;
+        using ::Sacado::Fad::Exp::operator>=;
+        using ::Sacado::Fad::Exp::abs;
+        using ::Sacado::Fad::Exp::acos;
+        using ::Sacado::Fad::Exp::cos;
+        using ::Sacado::Fad::Exp::fabs;
+        using ::Sacado::Fad::Exp::sqrt;
+      } // namespace Exp
+    }   // namespace Fad
+
+    namespace Rad
+    {
+      using ::Sacado::Rad::ADvar;
+      using ::Sacado::Rad::ADvari;
+      using ::Sacado::Rad::operator*;
+      using ::Sacado::Rad::operator/;
+      using ::Sacado::Rad::operator+;
+      using ::Sacado::Rad::operator-;
+      using ::Sacado::Rad::operator==;
+      using ::Sacado::Rad::operator!=;
+      using ::Sacado::Rad::operator<;
+      using ::Sacado::Rad::operator>;
+      using ::Sacado::Rad::operator<=;
+      using ::Sacado::Rad::operator>=;
+      using ::Sacado::Rad::abs;
+      using ::Sacado::Rad::acos;
+      using ::Sacado::Rad::cos;
+      using ::Sacado::Rad::fabs;
+      using ::Sacado::Rad::sqrt;
+    } // namespace Rad
+  }   // namespace Sacado
+#  endif
+
+  namespace Teuchos
+  {
+    using ::Teuchos::Array;
+    using ::Teuchos::ArrayRCP;
+    using ::Teuchos::ArrayView;
+    using ::Teuchos::Comm;
+    using ::Teuchos::Copy;
+    using ::Teuchos::ETransp;
+#  if DEAL_II_TRILINOS_VERSION_GTE(14, 0, 0)
+    using ::Teuchos::make_rcp;
+#  endif // !DEAL_II_TRILINOS_VERSION_GTE(14, 0, 0)
+    using ::Teuchos::MpiComm;
+    using ::Teuchos::NO_TRANS;
+    using ::Teuchos::null;
+    using ::Teuchos::OrdinalTraits;
+    using ::Teuchos::ParameterList;
+    using ::Teuchos::rcp;
+    using ::Teuchos::RCP;
+    using ::Teuchos::rcp_const_cast;
+    using ::Teuchos::rcp_dynamic_cast;
+    using ::Teuchos::rcpFromRef;
+    using ::Teuchos::rcpFromUndefRef;
+    using ::Teuchos::ScalarTraits;
+    using ::Teuchos::SerialDenseMatrix;
+    using ::Teuchos::TRANS;
+    using ::Teuchos::VERB_EXTREME;
+  } // namespace Teuchos
+
+
+#  ifdef DEAL_II_TRILINOS_WITH_ZOLTAN
+  using ::Zoltan;
+  using ::ZOLTAN_ID_PTR;
+  using ::ZOLTAN_ID_TYPE;
+  using ::Zoltan_Initialize;
+#  endif
+}
+
+
+
+// Trilinos also defines quite a lot of symbols that are either
+// implemented as macros, or perhaps as constants in header
+// files. In the former case, they cannot be referenced in 'using'
+// expressions, and so we need to work around things by creating
+// *variables* of the same names. In the latter case, they are often
+// implemented as constants with internal linkage that we can't
+// re-export (e.g., if they are members of anonymous enums).
+//
+// Dealing with this situation requires creating some other set of
+// variable, undefining the macro names, and then creating variables
+// with the same names as the macro names. Because we would end up
+// with name clashes if these new variables were in the global
+// namespace for those MPI implementations that implement things as
+// variables in the global namespace, we put everything into the
+// dealii namespace.
+//
+// We put the exportable symbols into namespace 'dealii'. This is
+// necessary for cases where the symbol we create is derived not from
+// a preprocessor macro, but for example as a member of an anonymous
+// enum. Such symbols can't be exported, so we declare a variable that
+// we *can* export, but it will not have the type of the enum, but of
+// the underlying int. The compiler will therefore complain that the
+// variable we're creating here redeclares another one but with a
+// different type. We can avoid this by putting things into our own
+// namespace.
+#  define CREATE_EXPORTABLE_PREPROCESSOR_SYMBOL(sym)        \
+    namespace dealii                                        \
+    {                                                       \
+      namespace Trilinos_Macros                             \
+      {                                                     \
+        [[maybe_unused]] const auto exportable_##sym = sym; \
+      }                                                     \
+    } // namespace dealii
+
+#  define EXPORT_PREPROCESSOR_SYMBOL(sym)                                 \
+    namespace dealii                                                      \
+    {                                                                     \
+      export const auto &sym = dealii::Trilinos_Macros::exportable_##sym; \
+    }
+
+CREATE_EXPORTABLE_PREPROCESSOR_SYMBOL(AZ_solver)
+#  undef AZ_solver
+EXPORT_PREPROCESSOR_SYMBOL(AZ_solver)
+
+CREATE_EXPORTABLE_PREPROCESSOR_SYMBOL(AZ_cg)
+#  undef AZ_cg
+EXPORT_PREPROCESSOR_SYMBOL(AZ_cg)
+
+CREATE_EXPORTABLE_PREPROCESSOR_SYMBOL(AZ_cgs)
+#  undef AZ_cgs
+EXPORT_PREPROCESSOR_SYMBOL(AZ_cgs)
+
+CREATE_EXPORTABLE_PREPROCESSOR_SYMBOL(AZ_gmres)
+#  undef AZ_gmres
+EXPORT_PREPROCESSOR_SYMBOL(AZ_gmres)
+
+CREATE_EXPORTABLE_PREPROCESSOR_SYMBOL(AZ_kspace)
+#  undef AZ_kspace
+EXPORT_PREPROCESSOR_SYMBOL(AZ_kspace)
+
+CREATE_EXPORTABLE_PREPROCESSOR_SYMBOL(AZ_bicgstab)
+#  undef AZ_bicgstab
+EXPORT_PREPROCESSOR_SYMBOL(AZ_bicgstab)
+
+CREATE_EXPORTABLE_PREPROCESSOR_SYMBOL(AZ_tfqmr)
+#  undef AZ_tfqmr
+EXPORT_PREPROCESSOR_SYMBOL(AZ_tfqmr)
+
+CREATE_EXPORTABLE_PREPROCESSOR_SYMBOL(AZ_output)
+#  undef AZ_output
+EXPORT_PREPROCESSOR_SYMBOL(AZ_output)
+
+CREATE_EXPORTABLE_PREPROCESSOR_SYMBOL(AZ_all)
+#  undef AZ_all
+EXPORT_PREPROCESSOR_SYMBOL(AZ_all)
+
+CREATE_EXPORTABLE_PREPROCESSOR_SYMBOL(AZ_none)
+#  undef AZ_none
+EXPORT_PREPROCESSOR_SYMBOL(AZ_none)
+
+CREATE_EXPORTABLE_PREPROCESSOR_SYMBOL(AZ_conv)
+#  undef AZ_conv
+EXPORT_PREPROCESSOR_SYMBOL(AZ_conv)
+
+CREATE_EXPORTABLE_PREPROCESSOR_SYMBOL(AZ_noscaled)
+#  undef AZ_noscaled
+EXPORT_PREPROCESSOR_SYMBOL(AZ_noscaled)
+
+CREATE_EXPORTABLE_PREPROCESSOR_SYMBOL(AZ_precond)
+#  undef AZ_precond
+EXPORT_PREPROCESSOR_SYMBOL(AZ_precond)
+
+
+
+#  ifdef DEAL_II_TRILINOS_WITH_ZOLTAN
+CREATE_EXPORTABLE_PREPROCESSOR_SYMBOL(ZOLTAN_OK)
+#    undef ZOLTAN_OK
+EXPORT_PREPROCESSOR_SYMBOL(ZOLTAN_OK)
+#  endif
+
+
+#endif

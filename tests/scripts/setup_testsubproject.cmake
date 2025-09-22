@@ -1,4 +1,4 @@
-find_package(deal.II 9.2.0 REQUIRED HINTS ${DEAL_II_DIR})
+find_package(deal.II 9.8.0 REQUIRED HINTS ${DEAL_II_DIR})
 
 set(CMAKE_BUILD_TYPE ${DEAL_II_BUILD_TYPE} CACHE STRING "" FORCE)
 deal_ii_initialize_cached_variables()

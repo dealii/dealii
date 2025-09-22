@@ -626,7 +626,7 @@ class MultipleParameterLoop;
  *     prm.parse_input ("prmtest.prm");
  *     // print parameters to std::cout as ASCII text
  *     std::cout << "\n\n";
- *     prm.print_parameters (std::cout, ParameterHandler::Text);
+ *     prm.print_parameters (std::cout, ParameterHandler::PRM);
  *     // get parameters into the program
  *     std::cout << "\n\n" << "Getting parameters:" << std::endl;
  *     p.get_parameters (prm);
@@ -1722,8 +1722,9 @@ public:
                  std::string,
                  std::string,
                  << "There are unequal numbers of 'subsection' and 'end' "
-                    "statements in the parameter file <"
-                 << arg1 << ">." << (arg2.size() > 0 ? "\n" + arg2 : ""));
+                    "statements in the parameter file"
+                 << (arg1.empty() ? "" : (" <" + arg1 + ">")) << "."
+                 << (arg2.empty() ? "" : ("\n" + arg2)));
 
   /**
    * Exception for when, during parsing of a parameter file, the parser
@@ -1733,8 +1734,9 @@ public:
                  int,
                  std::string,
                  std::string,
-                 << "Line <" << arg1 << "> of file <" << arg2
-                 << ">: You are trying to enter a subsection '" << arg3
+                 << "Line <" << arg1 << ">"
+                 << (arg2.empty() ? "" : (" of file <" + arg2 + ">"))
+                 << ": You are trying to enter a subsection '" << arg3
                  << "', but the ParameterHandler object does "
                  << "not know of any such subsection.");
 
@@ -1747,7 +1749,9 @@ public:
                  int,
                  std::string,
                  std::string,
-                 << "Line <" << arg1 << "> of file <" << arg2 << ">: " << arg3);
+                 << "Line <" << arg1 << ">"
+                 << (arg2.empty() ? "" : (" of file <" + arg2 + ">")) << ": "
+                 << arg3);
 
   /**
    * Exception for an entry in a parameter file that does not match the
@@ -1760,8 +1764,9 @@ public:
                  std::string,
                  std::string,
                  std::string,
-                 << "Line <" << arg1 << "> of file <" << arg2
-                 << ">:\n"
+                 << "Line <" << arg1 << ">"
+                 << (arg2.empty() ? "" : (" of file <" + arg2 + ">"))
+                 << ":\n"
                     "    The entry value \n"
                  << "        " << arg3 << '\n'
                  << "    for the entry named\n"
@@ -1789,8 +1794,9 @@ public:
     int,
     std::string,
     std::string,
-    << "Line <" << arg1 << "> of file <" << arg2
-    << ">: This line "
+    << "Line <" << arg1 << ">"
+    << (arg2.empty() ? "" : (" of file <" + arg2 + ">"))
+    << ": This line "
        "contains an 'include' or 'INCLUDE' statement, but the given "
        "file to include <"
     << arg3 << "> cannot be opened.");

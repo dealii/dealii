@@ -16,6 +16,11 @@
 #define dealii_config_h
 
 /***********************************************************************
+ * Some deal.II macros depends on Kokkos macros:
+ */
+#include <Kokkos_Macros.hpp>
+
+/***********************************************************************
  * Information about deal.II:
  */
 

@@ -2,6 +2,9 @@ name: windows
 
 on:
   push:
+    branches:
+      - 'master'
+      - 'dealii-*'
   pull_request:
     types:
     - opened
@@ -40,10 +43,10 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [windows-2022]
+        os: [windows-2022, windows-2025]
 
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v5
     - name: set up path
       # needed to use GNU patch instead of Strawberry Perl patch
       run: |
@@ -54,7 +57,7 @@ jobs:
         cmake --version
     - name: configure
       run: |
-        cmake -B build -DCMAKE_BUILD_TYPE=Debug -DCMAKE_INSTALL_PREFIX=c:/project -DDEAL_II_CXX_FLAGS="-WX /D FE_EVAL_FACTORY_DEGREE_MAX=2" -T host=x64 -A x64
+        cmake -B build -DCMAKE_BUILD_TYPE=Debug -DCMAKE_INSTALL_PREFIX=c:/project -DDEAL_II_CXX_FLAGS="/WX /std:c++20 /D FE_EVAL_FACTORY_DEGREE_MAX=2" -T host=x64 -A x64
     - name: print detailed.log
       run: type build/detailed.log
     - name: build
@@ -66,7 +69,7 @@ jobs:
         ctest --test-dir build --build-config Debug --extra-verbose
     - name: upload library
       # run only if a PR is merged into master
-      if: ${{ github.ref == 'refs/heads/master' && matrix.os == 'windows-2022' }}
+      if: ${{ github.ref == 'refs/heads/master' && matrix.os == 'windows-2025' }}
       uses: actions/upload-artifact@v4
       with:
         name: dealii-${{ matrix.os }}

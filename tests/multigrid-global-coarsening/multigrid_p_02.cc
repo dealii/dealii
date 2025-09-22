@@ -100,7 +100,7 @@ test(const unsigned int n_refinements, const unsigned int fe_degree_fine)
                             0 /*level*/,
                             0 /*level*/);
 
-  MGTransferGlobalCoarsening<dim, VectorType> transfer(
+  MGTransferMatrixFree<dim, Number> transfer(
     transfers,
     [&](const auto l, auto &vec) { operators[l].initialize_dof_vector(vec); });
 

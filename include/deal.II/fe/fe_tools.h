@@ -950,10 +950,45 @@ namespace FETools
    */
   template <int dim>
   std::pair<std::vector<unsigned int>, std::vector<unsigned int>>
-  cell_to_face_patch(const unsigned int &degree,
-                     const unsigned int &direction,
-                     const bool         &cell_hierarchical_numbering,
-                     const bool         &is_continuous);
+  cell_to_face_patch_numbering(const unsigned int &degree,
+                               const unsigned int &direction,
+                               const bool         &cell_hierarchical_numbering,
+                               const bool         &is_continuous);
+
+
+  /**
+   * @copydoc FETools::cell_to_face_patch_numbering()
+   *
+   * @deprecated Use FETools::cell_to_face_patch_numbering() instead.
+   */
+  template <int dim>
+  DEAL_II_DEPRECATED_EARLY_WITH_COMMENT(
+    "Use FETools::cell_to_face_patch_numbering() instead.")
+  std::pair<
+    std::vector<unsigned int>,
+    std::vector<unsigned int>> cell_to_face_patch(const unsigned int &degree,
+                                                  const unsigned int &direction,
+                                                  const bool &
+                                                    cell_hierarchical_numbering,
+                                                  const bool &is_continuous);
+
+  /**
+   * Given an index of a face DoF, compute the cell DoF index. This function is
+   * intended for use with single-component interpolatory elements like
+   * FE_SimplexP and FE_Q_Base in which DoFs defined on lines or quadrilaterals
+   * are rotated along with the face.
+   *
+   * @note Most applications should call FiniteElement::face_to_cell_index()
+   * instead, which may use this function in its implementation.
+   *
+   * @see FiniteElement::face_to_cell_index()
+   */
+  template <int dim, int spacedim>
+  unsigned int
+  face_to_cell_index(const FiniteElement<dim, spacedim> &fe,
+                     const unsigned int                  face_dof_index,
+                     const unsigned int                  face_no,
+                     const types::geometric_orientation  combined_orientation);
 
   /**
    * A namespace that contains functions that help setting up internal
@@ -1351,7 +1386,7 @@ namespace FETools
    * Note also that this table exists once for each space dimension. If you
    * have a program that works with finite elements in different space
    * dimensions (for example,
-   * @ref step_4 "step-4"
+   * step-4
    * does something like this), then you should call this function for each
    * space dimension for which you want your finite element added to the map.
    */

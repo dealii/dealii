@@ -29,8 +29,14 @@
 #include <boost/serialization/serialization.hpp>
 
 #ifdef DEAL_II_GMSH_WITH_API
+#  include <deal.II/base/config.h>
+
+#  include <deal.II/grid/cell_id.h>
+#  include <deal.II/grid/tria_description.h>
+
 #  include <gmsh.h>
 #endif
+
 
 #include <algorithm>
 #include <cctype>
@@ -162,7 +168,7 @@ void
 GridIn<dim, spacedim>::read_vtk(std::istream &in)
 {
   std::string line;
-
+  std::string vtk_version;
   // verify that the third and fourth lines match
   // expectations. the first line is not checked to allow use of
   // different vtk versions and the second line of the file may
@@ -170,7 +176,7 @@ GridIn<dim, spacedim>::read_vtk(std::istream &in)
   // identify what's in there, so we just ensure that we can read it.
   {
     std::string text[4];
-    text[0] = "# vtk DataFile Version 3.0";
+    // text[0] will contain the version string after reading the preamble.
     text[1] = "****";
     text[2] = "ASCII";
     text[3] = "DATASET UNSTRUCTURED_GRID";
@@ -178,6 +184,9 @@ GridIn<dim, spacedim>::read_vtk(std::istream &in)
     for (unsigned int i = 0; i < 4; ++i)
       {
         getline(in, line);
+
+        if (i == 0)
+          text[0] = line;
         if (i == 2 || i == 3)
           AssertThrow(
             line.compare(text[i]) == 0,
@@ -186,7 +195,11 @@ GridIn<dim, spacedim>::read_vtk(std::istream &in)
                 "While reading VTK file, failed to find a header line with text <") +
               text[i] + ">"));
       }
+
+    // Get the version of the VTK file
+    vtk_version = text[0].substr(23, 3);
   }
+
 
   //-----------------Declaring storage and mappings------------------
 
@@ -226,8 +239,9 @@ GridIn<dim, spacedim>::read_vtk(std::istream &in)
 
   in >> keyword;
 
-  unsigned int n_geometric_objects = 0;
-  unsigned int n_ints;
+  unsigned int              n_geometric_objects = 0;
+  unsigned int              n_ints;
+  std::vector<unsigned int> n_points_per_cell;
 
   if (keyword == "CELLS")
     {
@@ -256,12 +270,89 @@ GridIn<dim, spacedim>::read_vtk(std::istream &in)
       in >> n_geometric_objects;
       in >> n_ints; // Ignore this, since we don't need it.
 
+      if (vtk_version == "5.1") // we need to store OFFSETS and CONNECTIVITY
+                                // arrays which exist in VTK 5.1 file formats
+        {
+          in >> keyword;
+
+          Assert(
+            keyword == "OFFSETS",
+            ExcMessage(
+              "While reading VTK file, failed to find OFFSETS array which must exist in a VTK file with version 5.1."));
+
+          // If VTK 3.0, n_geometric_objects = number of cells
+          // If VTK 5.1, n_geometric_objects = number of cells + 1
+          unsigned int n_offsets = n_geometric_objects;
+          std::string
+            vtktype; // vtktypeint64, vtktypeint32, etc...we do not need this
+
+          in >> vtktype;
+
+          // The OFFSETS array contains the indices in the CONNECTIVITY array
+          // where new cells start
+          unsigned int new_index = 0;
+          unsigned int old_index = 0;
+
+          // Now store how many vertices make up each cell
+          for (unsigned int p = 0; p < n_offsets; ++p)
+            {
+              unsigned int n_points_per_cell_tmp;
+
+              in >> new_index;
+
+              if (p == 0)
+                AssertThrow(
+                  new_index == 0,
+                  ExcMessage(
+                    "While reading VTK file, the first index in the OFFSETS array should be 0"));
+              else
+                {
+                  n_points_per_cell_tmp = new_index - old_index;
+                  n_points_per_cell.push_back(n_points_per_cell_tmp);
+                }
+              old_index = new_index;
+            }
+
+          AssertThrow(
+            n_points_per_cell.size() == cell_types.size(),
+            ExcMessage(
+              "The number of cells inferred from the OFFSETS array (" +
+              std::to_string(n_points_per_cell.size()) +
+              ") does not match the number of entries in the CELL_TYPES array (" +
+              std::to_string(cell_types.size()) + ")"));
+
+          // Now that we know how many points correspond to each cell, we can
+          // read the CONNECTIVITY array
+          in >> keyword;
+          AssertThrow(
+            keyword == "CONNECTIVITY",
+            ExcMessage(
+              "While reading VTK file, failed to find CONNECTIVITY array which must exist in a VTK file containing an OFFSETS array."));
+
+          in >>
+            vtktype; // vtktypeint64, vtktypeint32, etc...we do not need this
+
+          // Update n_geometric_objects to be the number of cells
+          n_geometric_objects = n_points_per_cell.size();
+        }
+
+
       if (dim == 3)
         {
           for (unsigned int count = 0; count < n_geometric_objects; ++count)
             {
               unsigned int n_vertices;
-              in >> n_vertices;
+
+              if (vtk_version == "3.0")
+                in >> n_vertices;
+              else if (vtk_version == "5.1") // If version 5.1, n_vertices is
+                                             // not given explicitly in the file
+                n_vertices = n_points_per_cell[count];
+              else
+                AssertThrow(
+                  false,
+                  ExcMessage(
+                    "Unknown VTK version encountered...Only VTK versions 3.0 and 5.1 are supported."));
 
               // VTK_TETRA is 10, VTK_HEXAHEDRON is 12
               if (cell_types[count] == 10 || cell_types[count] == 12)
@@ -330,7 +421,17 @@ GridIn<dim, spacedim>::read_vtk(std::istream &in)
           for (unsigned int count = 0; count < n_geometric_objects; ++count)
             {
               unsigned int n_vertices;
-              in >> n_vertices;
+
+              if (vtk_version == "3.0")
+                in >> n_vertices;
+              else if (vtk_version == "5.1") // If version 5.1, n_vertices is
+                                             // not given explicitly in the file
+                n_vertices = n_points_per_cell[count];
+              else
+                AssertThrow(
+                  false,
+                  ExcMessage(
+                    "Unknown VTK version encountered...Only VTK versions 3.0 and 5.1 are supported."));
 
               // VTK_TRIANGLE is 5, VTK_QUAD is 9
               if (cell_types[count] == 5 || cell_types[count] == 9)
@@ -346,8 +447,8 @@ GridIn<dim, spacedim>::read_vtk(std::istream &in)
                        j++) // loop to feed data
                     in >> cells.back().vertices[j];
 
-                  // Quadrilaterals need a permutation to go from VTK numbering
-                  // to deal numbering
+                  // Quadrilaterals need a permutation to go from VTK
+                  // numbering to deal numbering
                   if (cell_types[count] == 9)
                     {
                       // Like Hexahedra - the last two vertices need to be
@@ -361,8 +462,8 @@ GridIn<dim, spacedim>::read_vtk(std::istream &in)
               // VTK_LINE is 3
               else if (cell_types[count] == 3)
                 {
-                  // If this is encountered, the pointer comes out of the loop
-                  // and starts processing boundaries.
+                  // If this is encountered, the pointer comes out of the
+                  // loop and starts processing boundaries.
                   subcelldata.boundary_lines.emplace_back(n_vertices);
 
                   for (unsigned int j = 0; j < n_vertices;
@@ -385,16 +486,25 @@ GridIn<dim, spacedim>::read_vtk(std::istream &in)
         {
           for (unsigned int count = 0; count < n_geometric_objects; ++count)
             {
-              unsigned int type;
-              in >> type;
+              unsigned int n_vertices;
+              if (vtk_version == "3.0")
+                in >> n_vertices;
+              else if (vtk_version == "5.1") // If version 5.1, n_vertices is
+                                             // not given explicitly in the file
+                n_vertices = n_points_per_cell[count];
+              else
+                AssertThrow(
+                  false,
+                  ExcMessage(
+                    "Unknown VTK version encountered...Only VTK versions 3.0 and 5.1 are supported."));
 
               AssertThrow(
-                cell_types[count] == 3 && type == 2,
+                cell_types[count] == 3 && n_vertices == 2,
                 ExcMessage(
                   "While reading VTK file, unknown cell type encountered"));
-              cells.emplace_back(type);
+              cells.emplace_back(n_vertices);
 
-              for (unsigned int j = 0; j < type; ++j) // loop to feed data
+              for (unsigned int j = 0; j < n_vertices; ++j) // loop to feed data
                 in >> cells.back().vertices[j];
 
               cells.back().material_id = 0;
@@ -416,6 +526,7 @@ GridIn<dim, spacedim>::read_vtk(std::istream &in)
           keyword + "> instead.")));
 
       in >> n_ints;
+
       AssertThrow(
         n_ints == n_geometric_objects,
         ExcMessage("The VTK reader found a CELL_DATA statement "
@@ -489,6 +600,7 @@ GridIn<dim, spacedim>::read_vtk(std::istream &in)
                       // (the last number is optional)
                       std::string line;
                       std::getline(in, line);
+
                       AssertThrow(
                         line.substr(1,
                                     std::min(static_cast<std::size_t>(3),
@@ -3027,6 +3139,235 @@ GridIn<dim, spacedim>::read_msh(const std::string &fname)
 
 
 
+#ifdef DEAL_II_GMSH_WITH_API
+template <int dim, int spacedim>
+void
+GridIn<dim, spacedim>::read_partitioned_msh(const std::string &file_prefix,
+                                            const std::string &file_suffix)
+{
+  auto *parallel_tria =
+    dynamic_cast<parallel::fullydistributed::Triangulation<dim, spacedim> *>(
+      tria.get());
+
+  // Check that the cast succeeded
+  AssertThrow(parallel_tria != nullptr,
+              ExcMessage("Triangulation is not fully distributed!"));
+
+  // Now it’s safe to call get_communicator()
+  MPI_Comm mpi_comm = parallel_tria->get_communicator();
+
+  const unsigned int nprocs = Utilities::MPI::n_mpi_processes(mpi_comm);
+  const unsigned int rank   = Utilities::MPI::this_mpi_process(mpi_comm);
+
+  std::string fname =
+    file_prefix + "_" + std::to_string(rank + 1) + "." + file_suffix;
+
+  if (nprocs == 1)
+    {
+      fname = file_prefix + "." + file_suffix;
+
+      AssertThrow(std::filesystem::exists(fname),
+                  ExcMessage("Missing mesh file: " + fname));
+    }
+  else
+    {
+      for (unsigned int i = 1; i <= nprocs; ++i)
+        {
+          const std::string check_fname =
+            file_prefix + "_" + std::to_string(i) + "." + file_suffix;
+
+          AssertThrow(std::filesystem::exists(check_fname),
+                      ExcMessage("Missing mesh file: " + check_fname));
+        }
+
+      const std::string extra_fname =
+        file_prefix + "_" + std::to_string(nprocs + 1) + "." + file_suffix;
+      AssertThrow(!std::filesystem::exists(extra_fname),
+                  ExcMessage("Expected " + std::to_string(nprocs) +
+                             " mesh files, but found extra: " + extra_fname));
+    }
+
+  const std::map<int, std::uint8_t> gmsh_to_dealii_type = {
+    {15, 0}, {1, 1}, {2, 2}, {3, 3}, {4, 4}, {7, 5}, {6, 6}, {5, 7}};
+
+  const std::array<std::vector<unsigned int>, 8> gmsh_to_dealii = {
+    {{0},
+     {0, 1},
+     {0, 1, 2},
+     {0, 1, 3, 2},
+     {0, 1, 2, 3},
+     {0, 1, 3, 2, 4},
+     {0, 1, 2, 3, 4, 5},
+     {0, 1, 3, 2, 4, 5, 7, 6}}};
+
+
+  gmsh::initialize();
+  gmsh::option::setNumber("General.Verbosity", 0);
+  gmsh::open(fname);
+
+  std::map<unsigned long, unsigned int> ghost_map;
+
+  std::vector<std::pair<int, int>> entities;
+  gmsh::model::getEntities(entities);
+
+  for (const auto &e : entities)
+    {
+      const int entity_dim = e.first;
+      const int entity_tag = e.second;
+
+      if (entity_dim == dim)
+        {
+          std::vector<std::size_t> element_tags;
+          std::vector<int>         partitions;
+
+          gmsh::model::mesh::getGhostElements(entity_dim,
+                                              entity_tag,
+                                              element_tags,
+                                              partitions);
+
+          for (std::size_t i = 0; i < element_tags.size(); ++i)
+            ghost_map[element_tags[i]] =
+              static_cast<unsigned int>(partitions[i] - 1);
+        }
+    }
+
+  std::vector<std::size_t> node_tags;
+  std::vector<double>      coords, parametric_coords;
+  gmsh::model::mesh::getNodes(node_tags, coords, parametric_coords);
+
+  TriangulationDescription::Description<dim, spacedim>
+    triangulation_description;
+  triangulation_description.comm = mpi_comm;
+
+  triangulation_description.cell_infos.resize(1);
+  triangulation_description.coarse_cell_vertices.resize(node_tags.size(),
+                                                        Point<spacedim>());
+
+  std::map<std::size_t, unsigned int> node_tag_to_index;
+  for (unsigned int i = 0; i < node_tags.size(); ++i)
+    {
+      node_tag_to_index[node_tags[i]] = i;
+      for (unsigned int d = 0; d < spacedim; ++d)
+        triangulation_description.coarse_cell_vertices[i][d] =
+          coords[3 * i + d];
+    }
+
+  // Count total volume elements and reserve space
+  std::size_t total_volume_elements = 0;
+  for (const auto &e : entities)
+    {
+      if (e.first == dim)
+        {
+          std::vector<int>                      count_element_types;
+          std::vector<std::vector<std::size_t>> count_element_ids,
+            count_element_nodes;
+          gmsh::model::mesh::getElements(count_element_types,
+                                         count_element_ids,
+                                         count_element_nodes,
+                                         e.first,
+                                         e.second);
+
+          for (unsigned int i = 0; i < count_element_ids.size(); ++i)
+            total_volume_elements += count_element_ids[i].size();
+        }
+    }
+
+  // Reserve space for all vectors that will grow during processing
+  triangulation_description.coarse_cells.reserve(total_volume_elements);
+  triangulation_description.coarse_cell_index_to_coarse_cell_id.reserve(
+    total_volume_elements);
+  triangulation_description.cell_infos[0].reserve(total_volume_elements);
+
+  for (const auto &e : entities)
+    {
+      const int entity_dim = e.first;
+      const int entity_tag = e.second;
+
+      if (entity_dim == dim)
+        {
+          std::vector<int>                      element_types;
+          std::vector<std::vector<std::size_t>> element_ids, element_nodes;
+
+          gmsh::model::mesh::getElements(
+            element_types, element_ids, element_nodes, entity_dim, entity_tag);
+          for (unsigned int i = 0; i < element_types.size(); ++i)
+            {
+              if (element_ids[i].empty())
+                continue;
+
+              const unsigned int n_vertices =
+                element_nodes[i].size() / element_ids[i].size();
+
+              for (unsigned int j = 0; j < element_ids[i].size(); ++j)
+                {
+                  CellData<dim> cell(n_vertices);
+                  cell.material_id = 0;
+
+                  const auto &type = gmsh_to_dealii_type.at(element_types[i]);
+
+                  for (unsigned int v = 0; v < n_vertices; ++v)
+                    {
+                      const std::size_t node_tag =
+                        element_nodes[i]
+                                     [j * n_vertices + gmsh_to_dealii[type][v]];
+                      AssertThrow(node_tag_to_index.find(node_tag) !=
+                                    node_tag_to_index.end(),
+                                  ExcMessage("Node tag " +
+                                             std::to_string(node_tag) +
+                                             " not found in node list!"));
+                      cell.vertices[v] = node_tag_to_index[node_tag];
+                    }
+
+                  triangulation_description.coarse_cells.push_back(cell);
+                  triangulation_description.coarse_cell_index_to_coarse_cell_id
+                    .push_back(element_ids[i][j]);
+
+                  TriangulationDescription::CellData<dim> cell_info;
+                  cell_info.id =
+                    CellId(element_ids[i][j], {}).template to_binary<dim>();
+
+                  auto it = ghost_map.find(element_ids[i][j]);
+                  if (it != ghost_map.end())
+                    cell_info.subdomain_id = it->second;
+                  else
+                    cell_info.subdomain_id = rank;
+
+                  cell_info.level_subdomain_id = cell_info.subdomain_id;
+
+                  triangulation_description.cell_infos[0].push_back(cell_info);
+                }
+            }
+        }
+    }
+
+  triangulation_description.settings =
+    TriangulationDescription::Settings::default_setting;
+
+  parallel_tria->create_triangulation(triangulation_description);
+
+
+#  ifdef DEAL_II_WITH_MPI
+  MPI_Barrier(mpi_comm);
+#  endif
+
+  gmsh::clear();
+  gmsh::finalize();
+}
+#else
+template <int dim, int spacedim>
+void
+GridIn<dim, spacedim>::read_partitioned_msh(const std::string &,
+                                            const std::string &)
+{
+  AssertThrow(
+    false,
+    ExcMessage(
+      "GridIn::read_partitioned_msh() requires the Gmsh API "
+      "to be installed, but it was not found when configuring deal.II."));
+}
+#endif // DEAL_II_GMSH_WITH_API
+
+
 template <int dim, int spacedim>
 void
 GridIn<dim, spacedim>::parse_tecplot_header(
@@ -4926,7 +5267,7 @@ namespace
   Abaqus_to_UCD<dim, spacedim>::write_out_avs_ucd(std::ostream &output) const
   {
     // References:
-    // http://www.dealii.org/developer/doxygen/deal.II/structGeometryInfo.html
+    // http://dealii.org/developer/doxygen/deal.II/structGeometryInfo.html
     // http://people.scs.fsu.edu/~burkardt/data/ucd/ucd.html
 
     AssertThrow(output.fail() == false, ExcIO());

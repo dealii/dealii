@@ -237,7 +237,7 @@ inconvenience this causes.
   <p>
   Changed: The subversion repository for deal.II development is now
   located on commercially hosted space at <a
-  href="https://www.dealii.org/svn/dealii/">https://www.dealii.org/svn/dealii/</a>.
+  href="https://dealii.org/svn/dealii/">https://dealii.org/svn/dealii/</a>.
   <br>
   (GK 2009/01/20)
   </p>

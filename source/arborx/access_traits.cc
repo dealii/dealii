@@ -16,6 +16,8 @@
 
 #ifdef DEAL_II_WITH_ARBORX
 
+#  include <ArborX.hpp>
+
 DEAL_II_NAMESPACE_OPEN
 
 namespace ArborXWrappers

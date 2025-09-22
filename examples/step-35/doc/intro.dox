@@ -3,7 +3,7 @@ This program grew out of a student project by Abner Salgado at Texas A&M
 University. Most of the work for this program is by him.
 </i>
 
-<a name="step-35-Intro"></a>
+<a name="step_35-Intro"></a>
 <h1> Introduction </h1>
 
 <h3> Motivation </h3>
@@ -243,7 +243,7 @@ vector-valued functions (e.g. divergences) becomes a little awkward, and others.
 The testcase that we use for this program consists of the flow around a square obstacle. The geometry is
 as follows:
 
-<img src="https://www.dealii.org/images/steps/developer/step-35.geometry.png" alt="">
+<img src="https://dealii.org/images/steps/developer/step-35.geometry.png" alt="">
 
 with $H=4.1$, making the geometry slightly non-symmetric.
 

@@ -68,11 +68,10 @@ namespace PETScWrappers
      */
     class const_iterator
     {
-#  ifdef __CUDA_ARCH__
-      // NVCC, at least until 12.6, fails to compile the
-      // implementations of the nested Accessor class if
-      // it is declared as private. Work around this by
-      // making it public.
+#  ifdef __CUDACC__
+      // NVCC, at least until 12.8, fails to compile the
+      // implementations of the nested Accessor class if it is
+      // declared as private. Work around this by making it public.
     public:
 #  else
     private:

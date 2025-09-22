@@ -82,7 +82,7 @@ If you need help with this problem, open a bug report on the issue tracker
 
                https://github.com/dealii/dealii/issues/new
 
-or write to the mailing list linked at https://www.dealii.org/mail.html
+or write to the mailing list linked at https://dealii.org/mail.html
 Please also add the files quick_tests.log , Testing/Temporary/LastTest.log
 to your bug report."
     )

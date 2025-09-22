@@ -166,8 +166,9 @@ public:
    * been built, you can use the functions of the base class to write the data
    * into a files, using one of the supported output formats.
    *
-   * You may give a structure holding various options. See the description of
-   * the fields of this structure for more information.
+   * The last argument provides customization choices for how output
+   * is to be produced. See the description of the fields of the
+   * Options structure for more information.
    *
    * Note that this function requires that we can extract elements of the
    * matrix, which is done using the get_element() function declared in an
@@ -181,7 +182,7 @@ public:
   void
   build_patches(const Matrix      &matrix,
                 const std::string &name,
-                const Options      options = Options(false, 1, false, false));
+                const Options      options = Options());
 
 private:
   /**

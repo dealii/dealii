@@ -21,9 +21,6 @@
 #include <deal.II/lac/vector.h>
 
 #include <complex>
-#include <iostream>
-#include <list>
-#include <typeinfo>
 #include <vector>
 
 #ifdef DEAL_II_WITH_UMFPACK
@@ -1040,12 +1037,14 @@ SparseDirectMUMPS::initialize_matrix(const Matrix &matrix)
       else if constexpr (std::is_same_v<Matrix,
                                         PETScWrappers::MPI::SparseMatrix>)
         {
+#  ifdef DEAL_II_WITH_PETSC
           Mat &petsc_matrix =
             const_cast<PETScWrappers::MPI::SparseMatrix &>(matrix)
               .petsc_matrix();
           MatInfo info;
           MatGetInfo(petsc_matrix, MAT_LOCAL, &info);
           local_non_zeros = (size_type)info.nz_used;
+#  endif
         }
 
 
@@ -1061,6 +1060,7 @@ SparseDirectMUMPS::initialize_matrix(const Matrix &matrix)
           if constexpr (std::is_same_v<Matrix,
                                        PETScWrappers::MPI::SparseMatrix>)
             {
+#  ifdef DEAL_II_WITH_PETSC
               Mat &petsc_matrix =
                 const_cast<PETScWrappers::MPI::SparseMatrix &>(matrix)
                   .petsc_matrix();
@@ -1095,6 +1095,7 @@ SparseDirectMUMPS::initialize_matrix(const Matrix &matrix)
                 }
 
               id.a_loc = a.get();
+#  endif
             }
           else if constexpr (std::is_same_v<Matrix,
                                             TrilinosWrappers::SparseMatrix>)
@@ -1149,6 +1150,7 @@ SparseDirectMUMPS::initialize_matrix(const Matrix &matrix)
           if constexpr (std::is_same_v<Matrix,
                                        PETScWrappers::MPI::SparseMatrix>)
             {
+#  ifdef DEAL_II_WITH_PETSC
               Mat &petsc_matrix =
                 const_cast<PETScWrappers::MPI::SparseMatrix &>(matrix)
                   .petsc_matrix();
@@ -1180,6 +1182,7 @@ SparseDirectMUMPS::initialize_matrix(const Matrix &matrix)
                 }
 
               id.a_loc = a.get();
+#  endif
             }
           else if constexpr (std::is_same_v<Matrix,
                                             TrilinosWrappers::SparseMatrix>)
@@ -1330,6 +1333,7 @@ SparseDirectMUMPS::vmult(VectorType &dst, const VectorType &src) const
         id.rhs_loc = const_cast<double *>(src.begin());
       else if constexpr (std::is_same_v<VectorType, PETScWrappers::MPI::Vector>)
         {
+#  ifdef DEAL_II_WITH_PETSC
           PetscScalar *local_array;
           VecGetArray(
             const_cast<PETScWrappers::MPI::Vector &>(src).petsc_vector(),
@@ -1338,6 +1342,7 @@ SparseDirectMUMPS::vmult(VectorType &dst, const VectorType &src) const
           VecRestoreArray(
             const_cast<PETScWrappers::MPI::Vector &>(src).petsc_vector(),
             &local_array);
+#  endif
         }
 
 

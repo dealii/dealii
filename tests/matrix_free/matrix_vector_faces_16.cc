@@ -17,7 +17,6 @@
 // similar to matrix_vector_faces_13 but using another mesh that triggers a
 // more difficult case in terms of the numbers in the mesh
 
-#include <deal.II/base/function.h>
 #include <deal.II/base/quadrature_lib.h>
 
 #include <deal.II/distributed/tria.h>

@@ -154,7 +154,7 @@ namespace VectorTools
    *
    * This function is used in the "Possibilities for extensions" part of the
    * results section of
-   * @ref step_3 "step-3".
+   * step-3.
    *
    * @note The function is most often used when solving a problem whose
    * solution is only defined up to a constant, for example a pure Neumann

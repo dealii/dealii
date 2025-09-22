@@ -1,4 +1,4 @@
-<a name="step-23-Intro"></a>
+<a name="step_23-Intro"></a>
 <h1>Introduction</h1>
 
 @dealiiVideoLecture{28}
@@ -7,8 +7,8 @@ This is the first of a number of tutorial programs that will finally
 cover "real" time-dependent problems, not the slightly odd form of time
 dependence found in step-18 or the DAE model of step-21. In particular, this program introduces
 the wave equation in a bounded domain. Later, step-24
-will consider an example of absorbing boundary conditions, and @ref
-step_25 "step-25" a kind of nonlinear wave equation producing
+will consider an example of absorbing boundary conditions, and
+step-25 a kind of nonlinear wave equation producing
 solutions called solitons.
 
 The wave equation in its prototypical form reads as follows: find
@@ -106,7 +106,7 @@ For all these reasons, for the present program, we choose to use the
 Rothe method for discretization, i.e. we first discretize in time and
 then in space. We will not actually use adaptive meshes at all, since
 this involves a large amount of additional code, but we will comment
-on this some more in the <a href="#Results">results section below</a>.
+on this some more in the @ref step_23-ResultsSection "results section below".
 
 
 <h4>Rothe's method!</h4>
@@ -318,8 +318,8 @@ detail in step-28.
 
 Under these conditions (i.e. a mesh that doesn't change), one can optimize the
 solution procedure a bit by basically eliminating the solution of the second
-linear system. We will discuss this in the introduction of the @ref step_25
-"step-25" program.
+linear system. We will discuss this in the introduction of the
+step-25 program.
 
 <h3>Energy conservation</h3>
 
@@ -389,8 +389,8 @@ In the program, we will refine the square
 $[-1,1]^2$ seven times uniformly, giving a mesh size of $h=\frac 1{64}$, which
 is what we set the time step to. The fact that we set the time step and mesh
 size individually in two different places is error prone: it is too easy to
-refine the mesh once more but forget to also adjust the time step. @ref
-step_24 "step-24" shows a better way how to keep these things in sync.
+refine the mesh once more but forget to also adjust the time step.
+step-24 shows a better way how to keep these things in sync.
 
 
 <h3>The test case</h3>

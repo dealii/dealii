@@ -2524,7 +2524,39 @@ namespace DoFTools
 
                   // insert the values into the map if it is a valid component
                   if (mask[dof_comp])
-                    support_points[local_dof_indices[i]] = points[i];
+                    {
+                      // For continuous elements, we encounter some DoFs more
+                      // than once, namely from each cell that is adjacent to a
+                      // DoF. If everything is alright then a DoF should have
+                      // the same support point on all elements over which it
+                      // has support.
+                      //
+                      // This assertion verifies exactly that: if a DoF is
+                      // encountered more than once in this function, then its
+                      // support point should be the same (up to a numerical
+                      // tolerance).
+                      if constexpr (running_in_debug_mode())
+                        {
+                          const auto it =
+                            support_points.find(local_dof_indices[i]);
+                          // if we have degree p Lagrange elements and width dx
+                          // cells, then points are approximately dx / (p ** 2)
+                          // apart. Make that tolerance stricter (we should
+                          // catch other errors), but not much stricter so that
+                          // we don't unnecessarily constrain huge elements
+                          // which may exhibit major roundoff problems when we
+                          // subtract
+                          if (it != support_points.end())
+                            {
+                              const auto p = cell->get_fe().tensor_degree();
+                              Assert((it->second - points[i]).norm() <
+                                       cell->diameter() / (4.0 * p * p),
+                                     ExcInternalError());
+                            }
+                        }
+
+                      support_points[local_dof_indices[i]] = points[i];
+                    }
                 }
             }
 

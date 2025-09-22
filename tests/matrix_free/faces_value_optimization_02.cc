@@ -17,8 +17,6 @@
 // tests matrix-free face evaluation with the option to compress
 // This is the same as face_value_optimization but uses fe_degree=-1
 
-#include <deal.II/base/function.h>
-
 #include <deal.II/fe/fe_dgq.h>
 
 #include <deal.II/grid/grid_generator.h>

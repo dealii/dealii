@@ -1,0 +1,4 @@
+Fixed: PetscWrappers::SparseMatrix::memory_consumption() previously
+always returned 0. This is now fixed.
+<br>
+(Anna Long, 2025/07/11)

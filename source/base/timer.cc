@@ -175,6 +175,9 @@ Timer::Timer(const MPI_Comm mpi_communicator, const bool sync_lap_times_)
 void
 Timer::start()
 {
+  if (running == false)
+    ++n_timed_laps;
+
   running = true;
 #ifdef DEAL_II_WITH_MPI
   if (sync_lap_times)
@@ -287,9 +290,18 @@ Timer::reset()
 {
   wall_times.reset();
   cpu_times.reset();
-  running = false;
+  running      = false;
+  n_timed_laps = 0;
   internal::TimerImplementation::clear_timing_data(last_lap_wall_time_data);
   internal::TimerImplementation::clear_timing_data(accumulated_wall_time_data);
+}
+
+
+
+unsigned int
+Timer::n_laps() const
+{
+  return n_timed_laps;
 }
 
 

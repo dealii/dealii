@@ -23,7 +23,6 @@
 
 #include "../tests.h"
 
-
 template <int dim>
 void
 plot(const PolynomialsRT_Bubbles<dim> &poly)

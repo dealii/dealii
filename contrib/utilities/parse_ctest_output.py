@@ -217,7 +217,7 @@ f.write('<th style="width:250px">&nbsp;</th>')
 
 for rev in revs:
     f.write(
-        '<th colspan="5"><a href="http://www.dealii.org/websvn/revision.php?repname=deal.II+Repository&rev=%s">r%s</th>'
+        '<th colspan="5"><a href="http://dealii.org/websvn/revision.php?repname=deal.II+Repository&rev=%s">r%s</th>'
         % (rev.number, rev.number)
     )
 f.write("</tr></thead>\n")

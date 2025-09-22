@@ -3798,7 +3798,9 @@ namespace GridGenerator
       dynamic_cast<const PolarManifold<2> *>(
         &tria_2.get_manifold(cylindrical_manifold_id));
     Assert(m_ptr != nullptr, ExcInternalError());
-    const Point<3>     axial_point(m_ptr->center[0], m_ptr->center[1], 0.0);
+    const Point<3>     axial_point(m_ptr->get_center()[0],
+                               m_ptr->get_center()[1],
+                               0.0);
     const Tensor<1, 3> direction{{0.0, 0.0, 1.0}};
 
     tria.set_manifold(cylindrical_manifold_id, FlatManifold<3>());
@@ -4044,7 +4046,9 @@ namespace GridGenerator
       dynamic_cast<const PolarManifold<2> *>(
         &tria_2.get_manifold(cylindrical_manifold_id));
     Assert(m_ptr != nullptr, ExcInternalError());
-    const Point<3>     axial_point(m_ptr->center[0], m_ptr->center[1], 0.0);
+    const Point<3>     axial_point(m_ptr->get_center()[0],
+                               m_ptr->get_center()[1],
+                               0.0);
     const Tensor<1, 3> direction{{0.0, 0.0, 1.0}};
 
     tria.set_manifold(cylindrical_manifold_id, FlatManifold<3>());
@@ -8269,7 +8273,7 @@ namespace GridGenerator
        {{8, 7, 4}},
        {{8, 5, 7}},
        {{3, 7, 5}}}};
-    const auto vertex_ids_for_cells_2d =
+    [[maybe_unused]] const auto vertex_ids_for_cells_2d =
       n_divisions == 2 ? make_array_view(vertex_ids_for_cells_2d_2) :
                          make_array_view(vertex_ids_for_cells_2d_8);
 
@@ -8291,7 +8295,7 @@ namespace GridGenerator
        {{13, 9, 11, 7}},  {{13, 11, 8, 6}},  {{10, 12, 9, 1}},
        {{9, 12, 11, 3}},  {{11, 12, 8, 2}},  {{8, 12, 10, 0}}}};
 
-    const auto vertex_ids_for_cells_3d =
+    [[maybe_unused]] const auto vertex_ids_for_cells_3d =
       n_divisions == 6 ? make_array_view(vertex_ids_for_cells_3d_6) :
                          make_array_view(vertex_ids_for_cells_3d_24);
 
@@ -8306,15 +8310,15 @@ namespace GridGenerator
     // the original face index and the second is the new line.
     static const std::
       array<std::pair<unsigned int, std::array<unsigned int, 2>>, 8>
-               vertex_ids_for_boundary_faces_2d_8 = {{{0, {{0, 4}}},
-                                                      {0, {{4, 2}}},
-                                                      {1, {{1, 5}}},
-                                                      {1, {{5, 3}}},
-                                                      {2, {{0, 6}}},
-                                                      {2, {{6, 1}}},
-                                                      {3, {{2, 7}}},
-                                                      {3, {{7, 3}}}}};
-    const auto vertex_ids_for_boundary_faces_2d =
+        vertex_ids_for_boundary_faces_2d_8 = {{{0, {{0, 4}}},
+                                               {0, {{4, 2}}},
+                                               {1, {{1, 5}}},
+                                               {1, {{5, 3}}},
+                                               {2, {{0, 6}}},
+                                               {2, {{6, 1}}},
+                                               {3, {{2, 7}}},
+                                               {3, {{7, 3}}}}};
+    [[maybe_unused]] const auto vertex_ids_for_boundary_faces_2d =
       n_divisions == 2 ? make_array_view(vertex_ids_for_boundary_faces_2d_2) :
                          make_array_view(vertex_ids_for_boundary_faces_2d_8);
 
@@ -8348,7 +8352,7 @@ namespace GridGenerator
            {3, {{2, 11, 6}}}, {4, {{0, 1, 12}}}, {4, {{1, 12, 3}}},
            {4, {{12, 3, 2}}}, {4, {{0, 12, 2}}}, {5, {{4, 5, 13}}},
            {5, {{5, 13, 7}}}, {5, {{13, 7, 6}}}, {5, {{4, 13, 6}}}}};
-    const auto vertex_ids_for_boundary_faces_3d =
+    [[maybe_unused]] const auto vertex_ids_for_boundary_faces_3d =
       n_divisions == 6 ? make_array_view(vertex_ids_for_boundary_faces_3d_6) :
                          make_array_view(vertex_ids_for_boundary_faces_3d_24);
 
@@ -8367,7 +8371,7 @@ namespace GridGenerator
        {{7, 4}},
        {{7, 8}},
        {{7, 5}}}};
-    const auto vertex_ids_for_inner_faces_2d =
+    [[maybe_unused]] const auto vertex_ids_for_inner_faces_2d =
       n_divisions == 2 ? make_array_view(vertex_ids_for_inner_faces_2d_2) :
                          make_array_view(vertex_ids_for_inner_faces_2d_8);
 
@@ -8405,7 +8409,7 @@ namespace GridGenerator
         {{12, 13, 9}},  {{12, 13, 11}}, {{9, 11, 13}}, {{9, 11, 12}},
         {{12, 13, 11}}, {{12, 13, 8}},  {{8, 11, 13}}, {{8, 11, 12}},
       }};
-    const auto vertex_ids_for_inner_faces_3d =
+    [[maybe_unused]] const auto vertex_ids_for_inner_faces_3d =
       n_divisions == 6 ? make_array_view(vertex_ids_for_inner_faces_3d_6) :
                          make_array_view(vertex_ids_for_inner_faces_3d_24);
 
@@ -8426,7 +8430,7 @@ namespace GridGenerator
         {{12, 13}}, {{10, 9}},  {{10, 13}}, {{9, 13}},  {{10, 12}}, {{9, 12}},
         {{12, 13}}, {{9, 11}},  {{9, 13}},  {{11, 13}}, {{9, 12}},  {{11, 12}},
         {{12, 13}}, {{11, 8}},  {{11, 13}}, {{8, 13}},  {{11, 12}}, {{8, 12}}}};
-    const auto vertex_ids_for_inner_edges_3d =
+    [[maybe_unused]] const auto vertex_ids_for_inner_edges_3d =
       n_divisions == 6 ? make_array_view(vertex_ids_for_inner_edges_3d_6) :
                          make_array_view(vertex_ids_for_inner_edges_3d_24);
 
@@ -8462,7 +8466,7 @@ namespace GridGenerator
            {3, {{6, 11}}}, {3, {{7, 11}}}, {3, {{2, 11}}}, {3, {{3, 11}}},
            {4, {{2, 12}}}, {4, {{3, 12}}}, {4, {{0, 12}}}, {4, {{1, 12}}},
            {5, {{6, 13}}}, {5, {{7, 13}}}, {5, {{4, 13}}}, {5, {{5, 13}}}}};
-    const auto vertex_ids_for_new_boundary_edges_3d =
+    [[maybe_unused]] const auto vertex_ids_for_new_boundary_edges_3d =
       n_divisions == 6 ?
         make_array_view(vertex_ids_for_new_boundary_edges_3d_6) :
         make_array_view(vertex_ids_for_new_boundary_edges_3d_24);
@@ -8539,92 +8543,93 @@ namespace GridGenerator
           }
 
         // helper function for creating cells and subcells
-        const auto add_cell = [&](const unsigned int struct_dim,
-                                  const auto        &index_vertices,
-                                  const unsigned int material_or_boundary_id,
-                                  const unsigned int manifold_id = 0) {
-          // sub-cell data only has to be stored if the information differs
-          // from the default
-          if (struct_dim < dim &&
-              (material_or_boundary_id == numbers::internal_face_boundary_id &&
-               manifold_id == numbers::flat_manifold_id))
-            return;
+        [[maybe_unused]] const auto add_cell =
+          [&](const unsigned int struct_dim,
+              const auto        &index_vertices,
+              const unsigned int material_or_boundary_id,
+              const unsigned int manifold_id = 0) {
+            // sub-cell data only has to be stored if the information differs
+            // from the default
+            if (struct_dim < dim && (material_or_boundary_id ==
+                                       numbers::internal_face_boundary_id &&
+                                     manifold_id == numbers::flat_manifold_id))
+              return;
 
-          if (struct_dim == dim) // cells
-            {
-              AssertDimension(index_vertices.size(), dim + 1);
+            if (struct_dim == dim) // cells
+              {
+                AssertDimension(index_vertices.size(), dim + 1);
 
-              CellData<dim> cell_data(index_vertices.size());
-              cell_data.material_id =
-                material_or_boundary_id;           // inherit material id
-              cell_data.manifold_id = manifold_id; // inherit cell-manifold id
-              for (unsigned int i = 0; i < index_vertices.size(); ++i)
-                {
-                  AssertIndexRange(index_vertices[i],
-                                   local_vertex_indices.size());
-                  cell_data.vertices[i] =
-                    local_vertex_indices[index_vertices[i]];
-                }
-              cells.push_back(cell_data);
-            }
-          else if (dim == 2 && struct_dim == 1) // an edge of a simplex
-            {
-              Assert(index_vertices.size() == 2, ExcInternalError());
-              CellData<1> boundary_line(2);
-              boundary_line.boundary_id = material_or_boundary_id;
-              boundary_line.manifold_id = manifold_id;
-              for (unsigned int i = 0; i < index_vertices.size(); ++i)
-                {
-                  AssertIndexRange(index_vertices[i],
-                                   local_vertex_indices.size());
-                  boundary_line.vertices[i] =
-                    local_vertex_indices[index_vertices[i]];
-                }
-              subcell_data.boundary_lines.push_back(boundary_line);
-            }
-          else if (dim == 3 && struct_dim == 2) // a face of a tetrahedron
-            {
-              Assert(index_vertices.size() == 3, ExcInternalError());
-              CellData<2> boundary_quad(3);
-              boundary_quad.material_id = material_or_boundary_id;
-              boundary_quad.manifold_id = manifold_id;
-              for (unsigned int i = 0; i < index_vertices.size(); ++i)
-                {
-                  AssertIndexRange(index_vertices[i],
-                                   local_vertex_indices.size());
-                  boundary_quad.vertices[i] =
-                    local_vertex_indices[index_vertices[i]];
-                }
-              subcell_data.boundary_quads.push_back(boundary_quad);
-            }
-          else if (dim == 3 && struct_dim == 1) // an edge of a tetrahedron
-            {
-              Assert(index_vertices.size() == 2, ExcInternalError());
-              CellData<1> boundary_line(2);
-              boundary_line.boundary_id = material_or_boundary_id;
-              boundary_line.manifold_id = manifold_id;
-              for (unsigned int i = 0; i < index_vertices.size(); ++i)
-                {
-                  AssertIndexRange(index_vertices[i],
-                                   local_vertex_indices.size());
-                  boundary_line.vertices[i] =
-                    local_vertex_indices[index_vertices[i]];
-                }
-              subcell_data.boundary_lines.push_back(boundary_line);
-            }
-          else
-            {
-              DEAL_II_NOT_IMPLEMENTED();
-            }
-        };
-
-        const auto material_id_cell = cell->material_id();
+                CellData<dim> cell_data(index_vertices.size());
+                cell_data.material_id =
+                  material_or_boundary_id;           // inherit material id
+                cell_data.manifold_id = manifold_id; // inherit cell-manifold id
+                for (unsigned int i = 0; i < index_vertices.size(); ++i)
+                  {
+                    AssertIndexRange(index_vertices[i],
+                                     local_vertex_indices.size());
+                    cell_data.vertices[i] =
+                      local_vertex_indices[index_vertices[i]];
+                  }
+                cells.push_back(cell_data);
+              }
+            else if (dim == 2 && struct_dim == 1) // an edge of a simplex
+              {
+                Assert(index_vertices.size() == 2, ExcInternalError());
+                CellData<1> boundary_line(2);
+                boundary_line.boundary_id = material_or_boundary_id;
+                boundary_line.manifold_id = manifold_id;
+                for (unsigned int i = 0; i < index_vertices.size(); ++i)
+                  {
+                    AssertIndexRange(index_vertices[i],
+                                     local_vertex_indices.size());
+                    boundary_line.vertices[i] =
+                      local_vertex_indices[index_vertices[i]];
+                  }
+                subcell_data.boundary_lines.push_back(boundary_line);
+              }
+            else if (dim == 3 && struct_dim == 2) // a face of a tetrahedron
+              {
+                Assert(index_vertices.size() == 3, ExcInternalError());
+                CellData<2> boundary_quad(3);
+                boundary_quad.material_id = material_or_boundary_id;
+                boundary_quad.manifold_id = manifold_id;
+                for (unsigned int i = 0; i < index_vertices.size(); ++i)
+                  {
+                    AssertIndexRange(index_vertices[i],
+                                     local_vertex_indices.size());
+                    boundary_quad.vertices[i] =
+                      local_vertex_indices[index_vertices[i]];
+                  }
+                subcell_data.boundary_quads.push_back(boundary_quad);
+              }
+            else if (dim == 3 && struct_dim == 1) // an edge of a tetrahedron
+              {
+                Assert(index_vertices.size() == 2, ExcInternalError());
+                CellData<1> boundary_line(2);
+                boundary_line.boundary_id = material_or_boundary_id;
+                boundary_line.manifold_id = manifold_id;
+                for (unsigned int i = 0; i < index_vertices.size(); ++i)
+                  {
+                    AssertIndexRange(index_vertices[i],
+                                     local_vertex_indices.size());
+                    boundary_line.vertices[i] =
+                      local_vertex_indices[index_vertices[i]];
+                  }
+                subcell_data.boundary_lines.push_back(boundary_line);
+              }
+            else
+              {
+                DEAL_II_NOT_IMPLEMENTED();
+              }
+          };
 
         // create cells one by one
-        if (dim == 2)
+        if constexpr (dim == 2)
           {
-            // get cell-manifold id from current quad cell
+            // get info from current quad cell:
             const auto manifold_id_cell = cell->manifold_id();
+            const auto material_id_cell = cell->material_id();
+
             // inherit cell manifold
             for (const auto &cell_vertices : vertex_ids_for_cells_2d)
               add_cell(dim, cell_vertices, material_id_cell, manifold_id_cell);
@@ -8639,11 +8644,12 @@ namespace GridGenerator
                        numbers::internal_face_boundary_id,
                        manifold_id_cell);
           }
-        else if (dim == 3)
+        else if constexpr (dim == 3)
           {
-            // get cell-manifold id from current quad cell
+            // get info from current quad cell:
             const auto manifold_id_cell = cell->manifold_id();
-            // inherit cell manifold
+            const auto material_id_cell = cell->material_id();
+
             for (const auto &cell_vertices : vertex_ids_for_cells_3d)
               add_cell(dim, cell_vertices, material_id_cell, manifold_id_cell);
 
@@ -8667,7 +8673,7 @@ namespace GridGenerator
           DEAL_II_NOT_IMPLEMENTED();
 
         // Set up sub-cell data.
-        if (dim == 2)
+        if constexpr (dim == 2)
           {
             for (const auto &[quad_face_no, tri_face_vertices] :
                  vertex_ids_for_boundary_faces_2d)
@@ -8679,7 +8685,7 @@ namespace GridGenerator
                          face->manifold_id());
               }
           }
-        else if (dim == 3)
+        else if constexpr (dim == 3)
           {
             for (const auto &[hex_face_no, tet_face_vertices] :
                  vertex_ids_for_boundary_faces_3d)
@@ -8706,7 +8712,7 @@ namespace GridGenerator
 
         // set manifold ids of edges that were already present in the
         // triangulation.
-        if (dim == 3)
+        if constexpr (dim == 3)
           {
             for (const auto e : cell->line_indices())
               {

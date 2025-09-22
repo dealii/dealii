@@ -484,17 +484,6 @@ namespace LinearAlgebra
         const Teuchos::RCP<const Utilities::MPI::CommunicationPatternBase>
           &communication_pattern);
 
-      /**
-       * @deprecated Use Teuchos::RCP<> instead of std::shared_ptr<>.
-       */
-      DEAL_II_DEPRECATED
-      void
-      import_elements(
-        const ReadWriteVector<Number> &V,
-        VectorOperation::values        operation,
-        const std::shared_ptr<const Utilities::MPI::CommunicationPatternBase>
-          &communication_pattern);
-
       /*
        * Imports all the elements present in the vector's IndexSet from the
        * input vector @p V. VectorOperation::values @p operation is used to decide if
@@ -504,19 +493,6 @@ namespace LinearAlgebra
       void
       import_elements(const ReadWriteVector<Number> &V,
                       VectorOperation::values        operation);
-
-      /**
-       * @deprecated Use import_elements() instead.
-       */
-      DEAL_II_DEPRECATED
-      void
-      import(const ReadWriteVector<Number> &V,
-             VectorOperation::values        operation,
-             std::shared_ptr<const Utilities::MPI::CommunicationPatternBase>
-               communication_pattern = {})
-      {
-        import_elements(V, operation, communication_pattern);
-      }
 
       /** @} */
 
@@ -1057,6 +1033,11 @@ namespace LinearAlgebra
        * IndexSet of the elements of the last imported vector.
        */
       dealii::IndexSet source_stored_elements;
+
+      /**
+       * IndexSet of the nonlocal_entries that are relevant for this vector.
+       */
+      dealii::IndexSet nonlocal_entries;
 
       /**
        * CommunicationPattern for the communication between the

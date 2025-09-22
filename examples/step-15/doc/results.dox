@@ -1,3 +1,4 @@
+@anchor step_15-ResultsSection
 <h1>Results</h1>
 
 
@@ -55,19 +56,19 @@ solution. This yields the following set of images:
 
 <div class="twocolumn" style="width: 80%">
   <div>
-    <img src="https://www.dealii.org/images/steps/developer/step_15_solution_1.png"
+    <img src="https://dealii.org/images/steps/developer/step_15_solution_1.png"
          alt="Solution after zero cycles with contour lines." width="230" height="273">
   </div>
   <div>
-    <img src="https://www.dealii.org/images/steps/developer/step_15_solution_2.png"
+    <img src="https://dealii.org/images/steps/developer/step_15_solution_2.png"
          alt="Solution after one cycle with contour lines." width="230" height="273">
   </div>
   <div>
-    <img src="https://www.dealii.org/images/steps/developer/step_15_solution_3.png"
+    <img src="https://dealii.org/images/steps/developer/step_15_solution_3.png"
          alt="Solution after two cycles with contour lines." width="230" height="273">
   </div>
   <div>
-    <img src="https://www.dealii.org/images/steps/developer/step_15_solution_4.png"
+    <img src="https://dealii.org/images/steps/developer/step_15_solution_4.png"
          alt="Solution after three cycles with contour lines." width="230" height="273">
   </div>
 </div>
@@ -89,14 +90,14 @@ solution and mesh are shown here:
 
 <div class="onecolumn" style="width: 60%">
   <div>
-    <img src="https://www.dealii.org/images/steps/developer/step_15_solution_9.png"
+    <img src="https://dealii.org/images/steps/developer/step_15_solution_9.png"
          alt="Grid and solution of the ninth cycle with contour lines." width="507" height="507">
   </div>
 </div>
 
 
 
-<a name="step-15-extensions"></a>
+@anchor step_15-Extensions
 <h3>Possibilities for extensions</h3>
 
 The program shows the basic structure of a solver for a nonlinear, stationary

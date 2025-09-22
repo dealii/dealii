@@ -149,7 +149,7 @@ foreach my $file (@src_files)
             }
 
             # update markdown links of the form "[text](./filename)"
-            $line =~ s/(\[.*\])\(.\//\1\(..\/code-gallery\/$gallery\//g;
+            $line =~ s/(\[.*?\])\(.\//\1\(..\/code-gallery\/$gallery\//g;
             print "$line";
         }
 
