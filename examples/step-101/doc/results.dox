@@ -25,7 +25,7 @@ When using shifts computed exactly, we obtain very similar convergence:
 |   4   |  0.0189   |  2.1273e-05 | 1.82 |
 
 
-With purerly Dirichlet boundary condition the formulation converges with optimal rates, as illustarated by tabels below.
+With purerly Dirichlet boundary condition the formulation converges with optimal rates, as illustarated by tables below.
 For $k=1$:
 | Cycle | Mesh size | $L^2$-Error | EOC  |
 |:-----:|:---------:|:-----------:|:----:|
