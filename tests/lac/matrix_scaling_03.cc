@@ -50,10 +50,10 @@ main(int argc, char **argv)
   FullMatrix<double> A(dim, dim);
   A.copy_from(B);
 
-  MatrixScaling::ScalingControl control;
+  MatrixScaling::AdditionalData control;
 
   control.algorithm =
-    MatrixScaling::ScalingControl::ScalingAlgorithm::sinkhorn_knopp;
+    MatrixScaling::AdditionalData::ScalingAlgorithm::sinkhorn_knopp;
   MatrixScaling scaler(control);
 
   deallog << "Sparse Matrix: " << std::endl;

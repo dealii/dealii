@@ -38,7 +38,7 @@ main(int argc, char **argv)
     B.set(i, i, 1.0 + i);
   ;
 
-  MatrixScaling::ScalingControl control;
+  MatrixScaling::AdditionalData control;
   MatrixScaling                 scaler(control);
 
   std::ostringstream oss1, oss2;

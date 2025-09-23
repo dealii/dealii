@@ -61,7 +61,7 @@ main(int argc, char **argv)
       B.block(block, block).set(1, 1, 2 * block + 2.0);
     }
 
-  MatrixScaling::ScalingControl control;
+  MatrixScaling::AdditionalData control;
   MatrixScaling                 scaler(control);
 
   deallog << "Block Sparse Matrix: " << std::endl;

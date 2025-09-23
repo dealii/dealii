@@ -59,7 +59,7 @@ main(int argc, char **argv)
   for (unsigned int i = 0; i < dim; i++)
     rhs[i] = 1.0;
 
-  MatrixScaling::ScalingControl control;
+  MatrixScaling::AdditionalData control;
   MatrixScaling                 scaler(control);
 
   deallog << "Sparse Matrix: " << std::endl;

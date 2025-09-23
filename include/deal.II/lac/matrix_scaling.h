@@ -48,10 +48,10 @@ class MatrixScaling : public EnableObserverPointer
 {
 public:
   /**
-   * ScalingControl allows to choose the scaling algorithm and contains
+   * AdditionalData allows to choose the scaling algorithm and contains
    * parameters for the scaling algorithms.
    */
-  struct ScalingControl
+  struct AdditionalData
   {
     /**
      * Supported scaling algorithms within <tt>MatrixScaling</tt>.
@@ -131,9 +131,9 @@ public:
     };
 
     /**
-     * Construct a new ScalingControl object with the given parameters.
+     * Construct a new AdditionalData object with the given parameters.
      */
-    explicit ScalingControl(
+    explicit AdditionalData(
       const double           scaling_tolerance = 1e-5,
       const ScalingAlgorithm alg =
         ScalingAlgorithm::l1_linf_symmetry_preserving,
@@ -169,11 +169,11 @@ public:
   };
 
   /**
-   * Constructor. The constructor takes a <tt>ScalingControl</tt> object that
+   * Constructor. The constructor takes a <tt>AdditionalData</tt> object that
    * contains the parameters for the scaling algorithms and the algorithm
    * selected.
    */
-  explicit MatrixScaling(const ScalingControl &control = ScalingControl());
+  explicit MatrixScaling(const AdditionalData &control = AdditionalData());
 
   /**
    * Destructor.
@@ -182,7 +182,7 @@ public:
 
   /**
    * Scale the input <tt>matrix</tt> in place according to the selected
-   * algorithm in <tt>ScalingControl</tt>.
+   * algorithm in <tt>AdditionalData</tt>.
    */
   template <class Matrix>
   void
@@ -190,7 +190,7 @@ public:
 
   /**
    * Scale the system <tt>matrix</tt> in place according to the selected
-   * algorithm in <tt>ScalingControl</tt> and scale in place the right hand side
+   * algorithm in <tt>AdditionalData</tt> and scale in place the right hand side
    * vector <tt>rhs</tt> according to the row scaling. The solution of the
    * scaled system can be scaled back to the original system by calling
    * <tt>scale_system_solution()</tt>.
@@ -234,7 +234,7 @@ private:
   /**
    * Struct that contains the parameters for the scaling algorithms.
    */
-  ScalingControl control;
+  AdditionalData control;
 
   /**
    * Vector that contains the row scaling (i.e. the diagonal of the row

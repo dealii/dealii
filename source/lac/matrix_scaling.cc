@@ -44,7 +44,7 @@ is_supported_matrix()
 }
 
 
-MatrixScaling::MatrixScaling(const ScalingControl &control)
+MatrixScaling::MatrixScaling(const AdditionalData &control)
   : control(control)
   , row_scaling()
   , column_scaling()
@@ -73,13 +73,13 @@ MatrixScaling::scale_matrix(Matrix &matrix)
 
       switch (control.algorithm)
         {
-          case MatrixScaling::ScalingControl::ScalingAlgorithm::sinkhorn_knopp:
+          case MatrixScaling::AdditionalData::ScalingAlgorithm::sinkhorn_knopp:
             {
               sk_scaling(matrix,
                          control.sinkhorn_knopp_parameters.max_iterations);
             }
             break;
-          case MatrixScaling::ScalingControl::ScalingAlgorithm::
+          case MatrixScaling::AdditionalData::ScalingAlgorithm::
             l1_linf_symmetry_preserving:
             {
               if (control.l1linf_parameters.start_inf_norm_steps > 0 &&
@@ -304,7 +304,7 @@ MatrixScaling::sk_scaling(Matrix &matrix, const unsigned int nsteps)
 
   switch (control.sinkhorn_knopp_parameters.norm_type)
     {
-      case MatrixScaling::ScalingControl::SKParameters::NormType::l1:
+      case MatrixScaling::AdditionalData::SKParameters::NormType::l1:
         {
           // Row_norms_0 to start the procedure
           row_norms = 0;
@@ -367,7 +367,7 @@ MatrixScaling::sk_scaling(Matrix &matrix, const unsigned int nsteps)
             }
         }
         break;
-      case MatrixScaling::ScalingControl::SKParameters::NormType::l_infinity:
+      case MatrixScaling::AdditionalData::SKParameters::NormType::l_infinity:
         {
           // Row_norms_0 to start the procedure
           row_norms = 0;

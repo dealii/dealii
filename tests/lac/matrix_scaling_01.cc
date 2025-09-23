@@ -49,7 +49,7 @@ main(int argc, char **argv)
   FullMatrix<double> A(dim, dim);
   A.copy_from(B);
 
-  MatrixScaling::ScalingControl control;
+  MatrixScaling::AdditionalData control;
   MatrixScaling                 scaler(control);
 
   deallog << "Sparse Matrix: " << std::endl;
