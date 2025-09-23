@@ -590,10 +590,12 @@ namespace Step80
                                                           1),
                                            1);
 
-
-    solid_fe = std::make_unique<FE_Q<dim, spacedim>>(1);
-    // solid_dh.distribute_dofs(*solid_fe); this has been moved to the
-    // setup_dofs since we are setting up a matrix also
+    // Solid displacement and Lagrange multiplier
+    solid_fe = std::make_unique<FESystem<spacedim>>(
+      FE_Q<dim, spacedim>(par.velocity_degree),
+      spacedim,
+      FE_Q<dim, spacedim>(par.velocity_degree),
+      spacedim);
   }
 
 
@@ -709,7 +711,7 @@ namespace Step80
       solid_dh.distribute_dofs(*solid_fe);
 
       std::vector<unsigned int> solid_sub_blocks(2 * spacedim, 0);
-      for (unsigned int d = dim; d < 2 * dim; ++d)
+      for (unsigned int d = spacedim; d < 2 * spacedim; ++d)
         solid_sub_blocks[d] = 1;
       DoFRenumbering::component_wise(solid_dh, solid_sub_blocks);
       solid_dofs_per_block =
@@ -728,12 +730,17 @@ namespace Step80
         solid_dh.locally_owned_dofs().get_view(n_disp, n_disp + n_lag);
 
       const IndexSet locally_relevant_solid_dofs =
-        DoFTools::extract_locally_relevant_dofs(fluid_dh);
+        DoFTools::extract_locally_relevant_dofs(solid_dh);
       solid_relevant_dofs.resize(2);
       solid_relevant_dofs[0] = locally_relevant_solid_dofs.get_view(0, n_disp);
       solid_relevant_dofs[1] =
         locally_relevant_solid_dofs.get_view(n_disp, n_disp + n_lag);
 
+      solid_constraints.reinit(locally_relevant_solid_dofs,
+                               locally_relevant_solid_dofs);
+
+      DoFTools::make_hanging_node_constraints(solid_dh, solid_constraints);
+      solid_constraints.close();
 
       BlockDynamicSparsityPattern dsp(solid_dofs_per_block,
                                       solid_dofs_per_block);
@@ -748,7 +755,7 @@ namespace Step80
         dsp,
         locally_owned_solid_dofs_per_processor,
         mpi_communicator,
-        locally_relevant_fluid_dofs);
+        locally_relevant_solid_dofs);
 
       solid_matrix.reinit(solid_owned_dofs, dsp, mpi_communicator);
     }
