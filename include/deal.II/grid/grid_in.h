@@ -457,12 +457,13 @@ public:
   read_unv(std::istream &in);
 
   /**
-   * Read grid data from an ucd file. Numerical data is ignored.
-   * It is not possible to use a ucd file to set both boundary_id and
-   * manifold_id for the same cell. Yet it is possible to use
-   * the flag apply_all_indicators_to_manifolds to decide if
-   * the indicators in the file refer to manifolds (flag set to true)
-   * or boundaries (flag set to false). If the flag is set, the
+   * Read grid data from an UCD file. Numerical data is ignored, and
+   * only the mesh part of the file is considered.
+   * It is not possible to use a UCD file to set both `boundary_id` and
+   * `manifold_id` for the same cell. Yet it is possible to use
+   * the flag `apply_all_indicators_to_manifolds` to decide if
+   * the indicators in the file refer to manifold (flag set to `true`)
+   * or boundary ids (flag set to `false`). If the flag is set, the
    * indicators are used for cells as manifold id, too.
    */
   void
