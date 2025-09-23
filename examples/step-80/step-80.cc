@@ -570,7 +570,7 @@ namespace Step80
       global_fluid_bounding_boxes,
       solid_particle_handler,
       StaticMappingQ1<spacedim>::mapping,
-      components);
+      ComponentMask(components));
 
     pcout << "Solid particles: " << solid_particle_handler.n_global_particles()
           << std::endl;
@@ -630,7 +630,8 @@ namespace Step80
       locally_relevant_fluid_dofs.get_view(n_u, n_u + n_p);
 
     {
-      fluid_constraints.reinit(locally_relevant_fluid_dofs);
+      fluid_constraints.reinit(locally_relevant_fluid_dofs,
+                               locally_relevant_fluid_dofs);
 
       DoFTools::make_hanging_node_constraints(fluid_dh, fluid_constraints);
       VectorTools::interpolate_boundary_values(
@@ -1296,8 +1297,7 @@ namespace Step80
           cell->clear_coarsen_flag();
       }
 
-    parallel::distributed::SolutionTransfer<spacedim, LA::MPI::BlockVector>
-      transfer(fluid_dh);
+    SolutionTransfer<spacedim, LA::MPI::BlockVector> transfer(fluid_dh);
 
     fluid_tria.prepare_coarsening_and_refinement();
     transfer.prepare_for_coarsening_and_refinement(locally_relevant_solution);
