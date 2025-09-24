@@ -207,10 +207,10 @@ namespace Step80
   template <int dim, int spacedim>
   NavierStokesImmersedProblemParameters<dim, spacedim>::
     NavierStokesImmersedProblemParameters()
-    : ParameterAcceptor("NavierStokes Immersed Problem/")
-    , navier_stokes_rhs("NavierStokes right hand side", spacedim + 1)
+    : ParameterAcceptor("Navier-Stokes Immersed Problem/")
+    , navier_stokes_rhs("Navier-Stokes right hand side", spacedim + 1)
     , solid_rhs("Solid right hand side", 2 * spacedim)
-    , navier_stokes_bc("NavierStokes boundary conditions", spacedim + 1)
+    , navier_stokes_bc("Navier-Stokes boundary conditions", spacedim + 1)
   {
     add_parameter(
       "Velocity degree", velocity_degree, "", this->prm, Patterns::Integer(1));
@@ -333,6 +333,7 @@ namespace Step80
     void setup_coupling();
 
     void assemble_navier_stokes_system(const double &time_step);
+    void assemble_navier_stokes_rhs(const double &time_step);
     void assemble_elasticity_system();
     void assemble_nitsche_restriction();
     void assemble_coupling_sparsity(BlockDynamicSparsityPattern &dsp);
@@ -389,10 +390,12 @@ namespace Step80
 
     LA::MPI::BlockVector fluid_solution;
     LA::MPI::BlockVector fluid_locally_relevant_solution;
+    LA::MPI::BlockVector fluid_locally_relevant_solution_old;
     LA::MPI::BlockVector fluid_system_rhs;
 
     LA::MPI::BlockVector solid_solution;
     LA::MPI::BlockVector solid_locally_relevant_solution;
+    LA::MPI::BlockVector solid_locally_relevant_solution_old;
     LA::MPI::BlockVector solid_system_rhs;
 
     Particles::ParticleHandler<spacedim> tracer_particle_handler;
@@ -704,6 +707,9 @@ namespace Step80
     fluid_locally_relevant_solution.reinit(fluid_owned_dofs,
                                            fluid_relevant_dofs,
                                            mpi_communicator);
+    fluid_locally_relevant_solution_old.reinit(fluid_owned_dofs,
+                                               fluid_relevant_dofs,
+                                               mpi_communicator);
     fluid_system_rhs.reinit(fluid_owned_dofs, mpi_communicator);
     fluid_solution.reinit(fluid_owned_dofs, mpi_communicator);
 
@@ -899,6 +905,100 @@ namespace Step80
   }
 
 
+  template <int dim, int spacedim>
+  void NavierStokesImmersedProblem<dim, spacedim>::assemble_navier_stokes_rhs(
+    const double &time_step)
+  {
+    fluid_system_rhs = 0;
+
+    TimerOutput::Scope t(computing_timer, "Assemble Navier-Stokes rhs terms");
+
+    QGauss<spacedim>   quadrature_formula(fluid_fe->degree + 1);
+    FEValues<spacedim> fe_values(*fluid_fe,
+                                 quadrature_formula,
+                                 update_values | update_gradients |
+                                   update_quadrature_points |
+                                   update_JxW_values);
+
+    const unsigned int dofs_per_cell = fluid_fe->n_dofs_per_cell();
+    const unsigned int n_q_points    = quadrature_formula.size();
+
+    FullMatrix<double> cell_matrix(dofs_per_cell, dofs_per_cell);
+    Vector<double>     cell_rhs(dofs_per_cell);
+
+    std::vector<Vector<double>> rhs_values(n_q_points,
+                                           Vector<double>(spacedim + 1));
+
+    std::vector<Tensor<1, spacedim>> phi_u(dofs_per_cell);
+    std::vector<Tensor<2, spacedim>> grad_phi_u(dofs_per_cell);
+    std::vector<double>              div_phi_u(dofs_per_cell);
+    std::vector<double>              phi_p(dofs_per_cell);
+    std::vector<Tensor<1, spacedim>> u(n_q_points);
+    std::vector<Tensor<2, spacedim>> grad_u(n_q_points);
+
+    std::vector<types::global_dof_index> local_dof_indices(dofs_per_cell);
+
+    for (const auto &cell : fluid_dh.active_cell_iterators())
+      if (cell->is_locally_owned())
+        {
+          cell_matrix = 0;
+          cell_rhs    = 0;
+
+          fe_values.reinit(cell);
+          par.navier_stokes_rhs.vector_value_list(
+            fe_values.get_quadrature_points(), rhs_values);
+          fe_values[velocity].get_function_values(
+            fluid_locally_relevant_solution_old, u);
+          fe_values[velocity].get_function_gradients(
+            fluid_locally_relevant_solution_old, grad_u);
+          for (unsigned int q = 0; q < n_q_points; ++q)
+            {
+              for (unsigned int k = 0; k < dofs_per_cell; ++k)
+                {
+                  phi_u[k]      = fe_values[velocity].value(k, q);
+                  grad_phi_u[k] = fe_values[velocity].gradient(k, q);
+                  div_phi_u[k]  = fe_values[velocity].divergence(k, q);
+
+                  phi_p[k] = fe_values[pressure].value(k, q);
+                }
+
+              for (unsigned int i = 0; i < dofs_per_cell; ++i)
+                {
+                  if (cell->at_boundary())
+                    {
+                      for (unsigned int j = 0; j < dofs_per_cell; ++j)
+                        {
+                          cell_matrix(i, j) +=
+                            (par.density * phi_u[i] * phi_u[j] +
+                             par.viscosity * time_step *
+                               scalar_product(grad_phi_u[i], grad_phi_u[j]) -
+                             time_step * div_phi_u[i] * phi_p[j] -
+                             time_step * phi_p[i] * div_phi_u[j]) *
+                            fe_values.JxW(q);
+                        }
+                    }
+
+                  const unsigned int component_i =
+                    fluid_fe->system_to_component_index(i).first;
+                  cell_rhs(i) +=
+                    (par.density *
+                     (fe_values.shape_value(i, q) * rhs_values[q](component_i) +
+                      (u[q] - time_step * grad_u[q] * u[q]) * phi_u[i])) *
+                    fe_values.JxW(q);
+                }
+            }
+
+
+          cell->get_dof_indices(local_dof_indices);
+          fluid_constraints.distribute_local_to_global(cell_rhs,
+                                                       local_dof_indices,
+                                                       fluid_system_rhs); //,
+          // cell_matrix); // This should be here [TBD]
+        }
+
+    fluid_system_rhs.compress(VectorOperation::add);
+  }
+
 
   template <int dim, int spacedim>
   void NavierStokesImmersedProblem<dim, spacedim>::assemble_elasticity_system()
@@ -958,9 +1058,13 @@ namespace Step80
                            scalar_product(grad_eps_phi_u[i],
                                           grad_eps_phi_u[j]) +
                          par.lame_lambda * div_phi_u[i] * div_phi_u[j] +
+                         // lagrange * disp
                          phi_lagrange[i] * phi_u[j] +
+                         // disp * lagrange
                          phi_u[i] * phi_lagrange[j] +
+                         // disp * disp
                          phi_lagrange[i] * phi_lagrange[j]) *
+                        // JxW
                         fe_values.JxW(q);
                     }
                 }
@@ -1227,10 +1331,11 @@ namespace Step80
     const auto Z4 = 0.0 * M;
 
     std::array<std::array<LinOp, 4>, 4> system_array = {
-      {{{A, Z1t, Bt, Ct * M}}, // vel
-       {{Z1, K, Z2t, Dt}},     // disp
-       {{B, Z2, Z6, Z3t}},     // pres
-       {{M * C, D, Z3, Z4}}}}; // lagr
+      {{{A, Z1t, Ct * M, Bt}}, // vel
+       {{Z1, K, Dt, Z2t}},     // disp
+       {{M * C, D, Z4, Z3}},   // lagr
+       {{B, Z2, Z3t, Z6}}}};   // pres
+
 
     std::array<std::array<LinOp, 2>, 2> BB_array = {{{{B, Z2}},      // pres
                                                      {{M * C, D}}}}; // lagr
@@ -1436,7 +1541,7 @@ namespace Step80
 
       static std::vector<std::pair<double, std::string>> times_and_names;
       times_and_names.emplace_back(std::make_pair(time, filename));
-      std::ofstream ofile(par.output_directory + "/" + "solution.pvd");
+      std::ofstream ofile(par.output_directory + "/" + "solution-solid.pvd");
       DataOutBase::write_pvd_record(ofile, times_and_names);
     }
   }
@@ -1517,7 +1622,9 @@ namespace Step80
 
         setup_coupling();
         assemble_coupling();
+        assemble_navier_stokes_rhs(time_step);
         solve();
+        fluid_locally_relevant_solution_old = fluid_solution;
 
         if (cycle % par.output_frequency == 0)
           {
