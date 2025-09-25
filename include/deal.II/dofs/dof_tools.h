@@ -21,6 +21,7 @@
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/index_set.h>
 #include <deal.II/base/point.h>
+#include <deal.II/base/types.h>
 
 #include <deal.II/dofs/dof_handler.h>
 
