@@ -4149,6 +4149,191 @@ GridIn<dim, spacedim>::read_assimp(const std::string &filename,
 #endif
 }
 
+
+
+template <int dim, int spacedim>
+void
+GridIn<dim, spacedim>::read_ugrid(std::istream &in)
+{
+  Assert(dim > 1,
+         ExcMessage("The ugrid format reader currently supports only 2- and "
+                    "3-dimensional meshes."));
+  Assert(tria != nullptr, ExcNoTriangulationSelected());
+  AssertThrow(in.fail() == false, ExcIO());
+
+  // Start with the header:
+  //  { Number_of_Nodes, Number_of_Surf_Trias, Number_of_Surf_Quads,
+  //     Number_of_Vol_Tets, Number_of_Vol_Pents_5, Number_of_Vol_Pents_6,
+  //     Number_of_Vol_Hexs }
+  unsigned int n_nodes, n_tris, n_quads, n_tets, n_pyramids, n_wedges, n_hexes;
+  in >> n_nodes >> n_tris >> n_quads >> n_tets >> n_pyramids >> n_wedges >>
+    n_hexes;
+  if (dim == 2)
+    AssertThrow(
+      n_tris + n_quads > 0,
+      ExcMessage(
+        "When reading a 2-dimensional triangulation, "
+        "there need to be more than zero triangles or quadrilaterals."));
+  else
+    AssertThrow(n_tets + n_pyramids + n_wedges + n_hexes > 0,
+                ExcMessage("When reading a 3-dimensional triangulation, "
+                           "there need to be more than zero tetrahedra, "
+                           "pyramids, wedges, or hexahedra."));
+
+  // Then first read the nodes:
+  std::vector<Point<spacedim>> vertices(n_nodes);
+  for (Point<spacedim> &vertex : vertices)
+    {
+      in >> vertex;
+
+      // Coordinates are always provided in 3d, so read any trailing
+      // coordinates. They need to be zero for this to make sense.
+      for (unsigned int d = spacedim; d < 3; ++d)
+        {
+          double dummy;
+          in >> dummy;
+          AssertThrow(
+            dummy == 0,
+            ExcMessage(
+              "You are reading a mesh in spacedim=" + std::to_string(spacedim) +
+              " but some of the vertex positions have trailing coordinates "
+              "that are not zero."));
+        }
+    }
+
+  // Then read the two-dimensional objects.
+  std::vector<CellData<2>> objects_2d;
+  objects_2d.reserve(n_tris + n_quads);
+  for (unsigned int i = 0; i < n_tris; ++i)
+    {
+      CellData<2> object(ReferenceCells::Triangle.n_vertices());
+
+      // Read the vertex indices from the file. In ugrid files, these are
+      // 1-based, so translate to 0-based next.
+      for (unsigned int &vertex_index : object.vertices)
+        {
+          in >> vertex_index;
+          --vertex_index;
+        }
+      objects_2d.emplace_back(object);
+    }
+  for (unsigned int i = 0; i < n_quads; ++i)
+    {
+      AssertThrow(
+        false,
+        ExcMessage(
+          "Reading quadrilaterals is not currently implemented by the ugrid "
+          "reader because we do not know the order of vertices and have no example "
+          "to look at. If you have a test file, please contact us and/or help us "
+          "implement this missing case."));
+    }
+
+  // ugrid files next store boundary ids for 2d objects, presumably
+  // under the assumption that all meshes are 3d and that consequently
+  // all 2d objects are at the boundary of the domain. We translate that
+  // to material ids if we are dealing with 2d meshes.
+  for (auto &object : objects_2d)
+    if (dim == 2)
+      in >> object.material_id;
+    else
+      in >> object.boundary_id;
+
+
+  // Next read the three-dimensional objects.
+  std::vector<CellData<3>> objects_3d;
+  objects_3d.reserve(n_tets + n_pyramids + n_wedges + n_hexes);
+  for (unsigned int i = 0; i < n_tets; ++i)
+    {
+      AssertThrow(
+        false,
+        ExcMessage(
+          "Reading tetrahedra is not currently implemented by the ugrid "
+          "reader because we do not know the order of vertices and have no example "
+          "to look at. If you have a test file, please contact us and/or help us "
+          "implement this missing case."));
+    }
+  for (unsigned int i = 0; i < n_pyramids; ++i)
+    {
+      AssertThrow(
+        false,
+        ExcMessage(
+          "Reading pyramids is not currently implemented by the ugrid "
+          "reader because we do not know the order of vertices and have no example "
+          "to look at. If you have a test file, please contact us and/or help us "
+          "implement this missing case."));
+    }
+  for (unsigned int i = 0; i < n_wedges; ++i)
+    {
+      AssertThrow(
+        false,
+        ExcMessage(
+          "Reading wedges is not currently implemented by the ugrid "
+          "reader because we do not know the order of vertices and have no example "
+          "to look at. If you have a test file, please contact us and/or help us "
+          "implement this missing case."));
+    }
+  for (unsigned int i = 0; i < n_hexes; ++i)
+    {
+      AssertThrow(
+        false,
+        ExcMessage(
+          "Reading hexahdrea is not currently implemented by the ugrid "
+          "reader because we do not know the order of vertices and have no example "
+          "to look at. If you have a test file, please contact us and/or help us "
+          "implement this missing case."));
+    }
+
+  // The next section in ugrid files concerns Number_of_BL_Vol_Tets, which
+  // I interpret as a way of specifying boundary layer cells that can be
+  // extruded. I don't know how to interpret this information, so assume that it
+  // isn't present in the current file.
+  //
+  // In fact, in the files we have this section simply doesn't exist. So the
+  // following block is commented out:
+
+  //  unsigned int n_BL_vol_tets;
+  //  in >> n_BL_vol_tets;
+  //  AssertThrow(n_BL_vol_tets == 0,
+  //              ExcMessage("Dealing with boundary layer descriptions in ugrid
+  //              "
+  //                         "files is not currently supported"));
+
+
+  // In the files we have, there is also a section that describes
+  // boundary ids for 1d lines. This section is not described in
+  // https://www.simcenter.msstate.edu/software/documentation/ug_io/3d_grid_file_type_ugrid.html,
+  // but we want to read that data anyway:
+  unsigned int n_lines;
+  in >> n_lines;
+  std::vector<CellData<1>> objects_1d(n_lines);
+  for (CellData<1> &line : objects_1d)
+    {
+      line.vertices.resize(2);
+
+      // Read vertex indices for the line. Then again translate to zero-based:
+      for (unsigned int &vertex_index : line.vertices)
+        {
+          in >> vertex_index;
+          --vertex_index;
+        }
+
+      // Then also read the boundary id of the line:
+      in >> line.boundary_id;
+    }
+
+  // Now that we have everything, create the triangulation with it:
+  if constexpr (dim == 2)
+    {
+      SubCellData face_data;
+      face_data.boundary_lines = std::move(objects_1d);
+      tria->create_triangulation(vertices, objects_2d, face_data);
+    }
+  else
+    DEAL_II_NOT_IMPLEMENTED();
+}
+
+
+
 #ifdef DEAL_II_TRILINOS_WITH_SEACAS
 // Namespace containing some extra functions for reading ExodusII files
 namespace
@@ -4814,6 +4999,10 @@ GridIn<dim, spacedim>::read(std::istream &in, Format format)
         read_tecplot(in);
         return;
 
+      case ugrid:
+        read_ugrid(in);
+        return;
+
       case assimp:
         Assert(false,
                ExcMessage("There is no read_assimp(istream &) function. "
@@ -4863,6 +5052,8 @@ GridIn<dim, spacedim>::default_suffix(const Format format)
         return ".xda";
       case tecplot:
         return ".dat";
+      case ugrid:
+        return ".txt";
       default:
         DEAL_II_NOT_IMPLEMENTED();
         return ".unknown_format";
@@ -4909,6 +5100,9 @@ GridIn<dim, spacedim>::parse_format(const std::string &format_name)
   if (format_name == "dat")
     return tecplot;
 
+  if (format_name == "ugrid")
+    return ugrid;
+
   if (format_name == "plt")
     // Actually, this is the extension for the
     // tecplot binary format, which we do not
@@ -4932,7 +5126,7 @@ template <int dim, int spacedim>
 std::string
 GridIn<dim, spacedim>::get_format_names()
 {
-  return "dbmesh|exodusii|msh|unv|vtk|vtu|ucd|abaqus|xda|tecplot|assimp";
+  return "dbmesh|exodusii|msh|unv|vtk|vtu|ucd|abaqus|xda|tecplot|assimp|ugrid";
 }
 
 
