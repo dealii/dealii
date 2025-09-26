@@ -330,6 +330,70 @@ namespace internal
     return cell_local_children_indices;
   }
 
+  template <int dim, typename VectorizedArrayType>
+  void
+  extract_dof_indices_from_cell_index(
+    unsigned int n_lanes_filled,
+    unsigned int vectorized_cell_index,
+    bool         apply_constraints,
+    const MatrixFreeFunctions::
+      ConstraintInfo<dim, VectorizedArrayType, types::global_dof_index>
+                                      &constraint_info,
+    const Utilities::MPI::Partitioner &partitioner,
+
+    std::vector<std::vector<types::global_dof_index>> &dof_indices)
+  {
+    for (unsigned int v = 0; v < n_lanes_filled; ++v)
+      {
+        const unsigned int cell_index = vectorized_cell_index + v;
+        // coarse dofs
+        std::vector<unsigned int>::const_iterator start_dof_indices_coarse;
+        if ((constraint_info.plain_dof_indices.empty() == false) &&
+            (apply_constraints == false))
+          {
+            start_dof_indices_coarse =
+              constraint_info.plain_dof_indices.begin() +
+              constraint_info.row_starts_plain_indices[cell_index];
+          }
+        else
+          {
+            start_dof_indices_coarse =
+              constraint_info.dof_indices.begin() +
+              constraint_info.row_starts[cell_index].first;
+          }
+        std::vector<unsigned int>::const_iterator end_dof_indices_coarse;
+        if ((constraint_info.plain_dof_indices.empty() == false) &&
+            (apply_constraints == false))
+          {
+            if (cell_index + 1 <
+                constraint_info.row_starts_plain_indices.size())
+              end_dof_indices_coarse =
+                constraint_info.plain_dof_indices.begin() +
+                constraint_info.row_starts_plain_indices[cell_index + 1];
+            else
+              end_dof_indices_coarse = constraint_info.plain_dof_indices.end();
+          }
+        else
+          {
+            if (cell_index + 1 < constraint_info.row_starts.size())
+              end_dof_indices_coarse =
+                constraint_info.dof_indices.begin() +
+                constraint_info.row_starts[cell_index + 1].first;
+            else
+              end_dof_indices_coarse = constraint_info.dof_indices.end();
+          }
+        auto len = end_dof_indices_coarse - start_dof_indices_coarse;
+        dof_indices[v].resize(len);
+        std::transform(start_dof_indices_coarse,
+                       end_dof_indices_coarse,
+                       dof_indices[v].begin(),
+                       [&](const unsigned int &local_index) {
+                         return partitioner.local_to_global(local_index);
+                       });
+      }
+  }
+
+
   template <int dim>
   std::vector<std::vector<unsigned int>>
   get_child_offsets_general(const unsigned int n_dofs_per_cell_coarse)
@@ -2588,6 +2652,101 @@ namespace internal
       if (transfer.fine_element_is_continuous)
         setup_weights(constraints_fine, transfer, is_feq);
     }
+
+    template <int dim, typename VectorType>
+    static void
+    add_sparsity_entries(
+      SparsityPatternBase &sparsity_pattern,
+      const std::vector<
+        typename MGTwoLevelTransfer<dim, VectorType>::MGTransferScheme>
+        &schemes,
+      const MatrixFreeFunctions::ConstraintInfo<
+        dim,
+        typename MGTwoLevelTransfer<dim, VectorType>::VectorizedArrayType,
+        types::global_dof_index> &constraint_info_fine,
+      const MatrixFreeFunctions::ConstraintInfo<
+        dim,
+        typename MGTwoLevelTransfer<dim, VectorType>::VectorizedArrayType,
+        types::global_dof_index>        &constraint_info_coarse,
+      const Utilities::MPI::Partitioner &partitioner_fine,
+      const Utilities::MPI::Partitioner &partitioner_coarse,
+      bool                               build_for_prolongation)
+    {
+      using VectorizedArrayType =
+        typename MGTwoLevelTransfer<dim, VectorType>::VectorizedArrayType;
+
+      const unsigned int n_lanes = VectorizedArrayType::size();
+
+      unsigned int cell_counter = 0;
+      for (const auto &scheme : schemes)
+        {
+          if (scheme.n_coarse_cells == 0)
+            continue;
+          const auto &constraint_info_row = build_for_prolongation ?
+                                              constraint_info_fine :
+                                              constraint_info_coarse;
+          const auto &constraint_info_col = build_for_prolongation ?
+                                              constraint_info_coarse :
+                                              constraint_info_fine;
+          const auto &partitioner_row =
+            build_for_prolongation ? partitioner_fine : partitioner_coarse;
+          const auto &partitioner_col =
+            build_for_prolongation ? partitioner_coarse : partitioner_fine;
+
+          std::vector<std::vector<types::global_dof_index>> dof_indices_row;
+          std::vector<std::vector<types::global_dof_index>> dof_indices_col;
+
+          // Loop over all coarse cells of the scheme
+          // note that the cells here are vectorized but the
+          for (unsigned int cell_in_scheme = 0;
+               cell_in_scheme < scheme.n_coarse_cells;
+               cell_in_scheme += n_lanes)
+            {
+              const unsigned int n_lanes_filled =
+                (cell_in_scheme + n_lanes > scheme.n_coarse_cells) ?
+                  (scheme.n_coarse_cells - cell_in_scheme) :
+                  n_lanes;
+
+              dof_indices_row.resize(n_lanes_filled);
+              dof_indices_col.resize(n_lanes_filled);
+              internal::extract_dof_indices_from_cell_index(
+                n_lanes_filled,
+                cell_counter,
+                not build_for_prolongation,
+                constraint_info_row,
+                partitioner_row,
+                dof_indices_row);
+
+              internal::extract_dof_indices_from_cell_index(
+                n_lanes_filled,
+                cell_counter,
+                build_for_prolongation,
+                constraint_info_col,
+                partitioner_col,
+                dof_indices_col);
+
+
+              for (unsigned int v = 0; v < n_lanes_filled; ++v)
+                {
+                  auto &row = dof_indices_row[v];
+                  auto &col = dof_indices_col[v];
+                  std::sort(row.begin(), row.end());
+                  std::sort(col.begin(), col.end());
+                  row.erase(std::unique(row.begin(), row.end()), row.end());
+                  col.erase(std::unique(col.begin(), col.end()), col.end());
+
+
+                  for (const auto &dof : row)
+                    {
+                      sparsity_pattern.add_row_entries(dof,
+                                                       make_array_view(col),
+                                                       true);
+                    }
+                }
+              cell_counter += n_lanes_filled;
+            }
+        }
+    }
   };
 
 
@@ -3279,6 +3438,352 @@ MGTwoLevelTransfer<dim, VectorType>::restrict_and_add_internal(
             }
         }
     }
+}
+
+
+
+template <int dim, typename VectorType>
+template <typename SparseMatrixType>
+void
+MGTwoLevelTransfer<dim, VectorType>::assemble_restriction_as_matrix(
+  SparseMatrixType &matrix) const
+{
+  if (matrix_free_data.get() != nullptr)
+    {
+      DEAL_II_NOT_IMPLEMENTED();
+    }
+  else
+    {
+      // case if we have not set up transfer using matrix free data
+
+      const unsigned int n_lanes = VectorizedArrayType::size();
+
+      AlignedVector<VectorizedArrayType> evaluation_data_fine;
+      AlignedVector<VectorizedArrayType> evaluation_data_coarse;
+
+      unsigned int cell_counter  = 0;
+      unsigned int batch_counter = 0;
+
+      for (const auto &scheme : schemes)
+        {
+          if (scheme.n_coarse_cells == 0)
+            continue;
+
+          const bool needs_interpolation =
+            scheme.prolongation_matrix.empty() == false;
+
+          evaluation_data_fine.clear();
+          evaluation_data_coarse.clear();
+
+          const unsigned int max_n_dofs_per_cell =
+            std::max(scheme.n_dofs_per_cell_fine,
+                     scheme.n_dofs_per_cell_coarse);
+          evaluation_data_fine.resize(max_n_dofs_per_cell);
+          evaluation_data_coarse.resize(max_n_dofs_per_cell);
+
+          internal::CellTransferFactory cell_transfer(scheme.degree_fine,
+                                                      scheme.degree_coarse);
+
+          const unsigned int n_scalar_dofs_fine =
+            scheme.n_dofs_per_cell_fine / n_components;
+          const unsigned int n_scalar_dofs_coarse =
+            scheme.n_dofs_per_cell_coarse / n_components;
+
+          for (unsigned int cell = 0; cell < scheme.n_coarse_cells;
+               cell += n_lanes, ++batch_counter)
+            {
+              const unsigned int n_lanes_filled =
+                (cell + n_lanes > scheme.n_coarse_cells) ?
+                  (scheme.n_coarse_cells - cell) :
+                  n_lanes;
+              // Now we fill the evaluation data with values corresponding to
+              // unit vectors and apply the operation on each such vector
+              for (unsigned int j = 0; j < scheme.n_dofs_per_cell_fine; ++j)
+                {
+                  for (unsigned int i = 0; i < scheme.n_dofs_per_cell_fine; ++i)
+                    evaluation_data_fine[i] = VectorizedArrayType(0.0);
+
+                  std::vector<unsigned int> col_indices(n_lanes_filled);
+                  for (unsigned int v = 0; v < n_lanes_filled; ++v)
+                    {
+                      VectorType dummy;
+                      col_indices[v] =
+                        constraint_info_fine.extract_vec_entry_or_constrained(
+                          cell_counter, false, j, v);
+                      if (col_indices[v] == numbers::invalid_unsigned_int)
+                        continue;
+                      internal::ReadUnitBasisFixedIndex<Number> reader(
+                        col_indices[v]);
+                      constraint_info_fine.read_write_operation(
+                        reader,
+                        dummy,
+                        evaluation_data_fine.data(),
+                        cell_counter,
+                        1,
+                        scheme.n_dofs_per_cell_fine,
+                        false,
+                        v);
+                    }
+
+                  // ----------------------------------------------------------
+                  // ----------------------------------------------------------
+                  // weight
+                  if (weights.size() > 0)
+                    {
+                      const VectorizedArrayType *cell_weights =
+                        weights.data() + weights_start[batch_counter];
+                      if (weights_are_compressed[batch_counter])
+                        internal::weight_fe_q_dofs_by_entity<
+                          dim,
+                          -1,
+                          VectorizedArrayType>(cell_weights,
+                                               n_components,
+                                               scheme.degree_fine + 1,
+                                               evaluation_data_fine.data());
+                      else
+                        for (unsigned int i = 0;
+                             i < scheme.n_dofs_per_cell_fine;
+                             ++i)
+                          evaluation_data_fine[i] *= cell_weights[i];
+                    }
+
+                  // ------------------------------ fine ----------------------
+                  if (needs_interpolation)
+                    for (int c = n_components - 1; c >= 0; --c)
+                      {
+                        internal::
+                          CellRestrictor<dim, double, VectorizedArrayType>
+                            cell_restrictor(scheme.prolongation_matrix,
+                                            evaluation_data_fine.begin() +
+                                              c * n_scalar_dofs_fine,
+                                            evaluation_data_coarse.begin() +
+                                              c * n_scalar_dofs_coarse);
+
+                        if (scheme.prolongation_matrix.size() <
+                            n_scalar_dofs_fine * n_scalar_dofs_coarse)
+                          cell_transfer.run(cell_restrictor);
+                        else
+                          cell_restrictor.run_full(n_scalar_dofs_fine,
+                                                   n_scalar_dofs_coarse);
+                      }
+                  else
+                    evaluation_data_coarse = evaluation_data_fine; // TODO
+
+                  // ----------------------------------------------------------
+                  // ----------------------------------------------------------
+                  constraint_info_coarse.apply_hanging_node_constraints(
+                    cell_counter, n_lanes_filled, true, evaluation_data_coarse);
+                  // we need to loop over all filled lanes by hand and can't
+                  // rely on the loop within the read_write_operation since
+                  // we need to write to different rows in the global matrix
+                  // for each lane, so we do the loop on the outside
+                  for (unsigned int v = 0; v < n_lanes_filled; ++v)
+                    {
+                      if (col_indices[v] == numbers::invalid_unsigned_int)
+                        continue;
+                      internal::MatrixAssembler<Number, false> matrix_assembler(
+                        this->partitioner_fine->local_to_global(col_indices[v]),
+                        *this->partitioner_coarse);
+                      constraint_info_coarse.read_write_operation(
+                        matrix_assembler,
+                        matrix,
+                        evaluation_data_coarse.data(),
+                        cell_counter,
+                        1,
+                        scheme.n_dofs_per_cell_coarse,
+                        true,
+                        v);
+                    }
+                } // end loop over fine dofs
+              cell_counter += n_lanes_filled;
+            } // end loop over cells
+        }
+    }
+}
+
+
+
+template <int dim, typename VectorType>
+template <typename SparseMatrixType>
+void
+MGTwoLevelTransfer<dim, VectorType>::assemble_prolongation_as_matrix(
+  SparseMatrixType &matrix) const
+{
+  if (matrix_free_data.get() != nullptr)
+    {
+      DEAL_II_NOT_IMPLEMENTED();
+    }
+  else
+    {
+      // case if we have not set up transfer using matrix free data
+
+      const unsigned int n_lanes = VectorizedArrayType::size();
+
+      AlignedVector<VectorizedArrayType> evaluation_data_fine;
+      AlignedVector<VectorizedArrayType> evaluation_data_coarse;
+
+      unsigned int cell_counter  = 0;
+      unsigned int batch_counter = 0;
+
+      for (const auto &scheme : schemes)
+        {
+          if (scheme.n_coarse_cells == 0)
+            continue;
+
+          const bool needs_interpolation =
+            scheme.prolongation_matrix.empty() == false;
+
+          evaluation_data_fine.clear();
+          evaluation_data_coarse.clear();
+
+          const unsigned int max_n_dofs_per_cell =
+            std::max(scheme.n_dofs_per_cell_fine,
+                     scheme.n_dofs_per_cell_coarse);
+          evaluation_data_fine.resize(max_n_dofs_per_cell);
+          evaluation_data_coarse.resize(max_n_dofs_per_cell);
+
+          internal::CellTransferFactory cell_transfer(scheme.degree_fine,
+                                                      scheme.degree_coarse);
+
+          const unsigned int n_scalar_dofs_fine =
+            scheme.n_dofs_per_cell_fine / n_components;
+          const unsigned int n_scalar_dofs_coarse =
+            scheme.n_dofs_per_cell_coarse / n_components;
+
+          for (unsigned int cell = 0; cell < scheme.n_coarse_cells;
+               cell += n_lanes, ++batch_counter)
+            {
+              const unsigned int n_lanes_filled =
+                (cell + n_lanes > scheme.n_coarse_cells) ?
+                  (scheme.n_coarse_cells - cell) :
+                  n_lanes;
+              // Now we fill the evaluation data with values corresponding to
+              // unit vectors and apply the operation on each such vector
+              for (unsigned int j = 0; j < scheme.n_dofs_per_cell_coarse; ++j)
+                {
+                  for (unsigned int i = 0; i < scheme.n_dofs_per_cell_coarse;
+                       ++i)
+                    evaluation_data_coarse[i] = VectorizedArrayType(0.0);
+
+                  std::vector<unsigned int> col_indices(n_lanes_filled);
+                  for (unsigned int v = 0; v < n_lanes_filled; ++v)
+                    {
+                      VectorType dummy;
+                      col_indices[v] =
+                        constraint_info_coarse.extract_vec_entry_or_constrained(
+                          cell_counter, true, j, v);
+                      if (col_indices[v] == numbers::invalid_unsigned_int)
+                        continue;
+                      internal::ReadUnitBasisFixedIndex<Number> reader(
+                        col_indices[v]);
+                      constraint_info_coarse.read_write_operation(
+                        reader,
+                        dummy,
+                        evaluation_data_coarse.data(),
+                        cell_counter,
+                        1,
+                        scheme.n_dofs_per_cell_coarse,
+                        true,
+                        v);
+                      constraint_info_coarse.apply_hanging_node_constraints(
+                        cell_counter,
+                        n_lanes_filled,
+                        false,
+                        evaluation_data_coarse);
+                    }
+                  // ------------------------- coarse --------------------------
+                  if (needs_interpolation)
+                    for (int c = n_components - 1; c >= 0; --c)
+                      {
+                        internal::
+                          CellProlongator<dim, double, VectorizedArrayType>
+                            cell_prolongator(scheme.prolongation_matrix,
+                                             evaluation_data_coarse.begin() +
+                                               c * n_scalar_dofs_coarse,
+                                             evaluation_data_fine.begin() +
+                                               c * n_scalar_dofs_fine);
+
+                        if (scheme.prolongation_matrix.size() <
+                            n_scalar_dofs_fine * n_scalar_dofs_coarse)
+                          cell_transfer.run(cell_prolongator);
+                        else
+                          cell_prolongator.run_full(n_scalar_dofs_fine,
+                                                    n_scalar_dofs_coarse);
+                      }
+                  else
+                    evaluation_data_fine = evaluation_data_coarse; // TODO
+                  // -------------------------- fine ---------------------------
+
+                  // weight
+                  if (weights.size() > 0)
+                    {
+                      const VectorizedArrayType *cell_weights =
+                        weights.data() + weights_start[batch_counter];
+                      if (weights_are_compressed[batch_counter])
+                        internal::weight_fe_q_dofs_by_entity<
+                          dim,
+                          -1,
+                          VectorizedArrayType>(cell_weights,
+                                               n_components,
+                                               scheme.degree_fine + 1,
+                                               evaluation_data_fine.begin());
+                      else
+                        for (unsigned int i = 0;
+                             i < scheme.n_dofs_per_cell_fine;
+                             ++i)
+                          evaluation_data_fine[i] *= cell_weights[i];
+                    }
+
+                  // we need to loop over all filled lanes by hand and can't
+                  // rely on the loop within the read_write_operation since
+                  // we need to write to different rows in the global matrix
+                  // for each lane, so we do the loop on the outside
+                  for (unsigned int v = 0; v < n_lanes_filled; ++v)
+                    {
+                      if (col_indices[v] == numbers::invalid_unsigned_int)
+                        continue;
+                      internal::MatrixAssembler<Number, false> matrix_assembler(
+                        this->partitioner_coarse->local_to_global(
+                          col_indices[v]),
+                        *this->partitioner_fine);
+                      constraint_info_fine.read_write_operation(
+                        matrix_assembler,
+                        matrix,
+                        evaluation_data_fine.data(),
+                        cell_counter,
+                        1,
+                        scheme.n_dofs_per_cell_fine,
+                        false,
+                        v);
+                    }
+                } // end loop over fine dofs
+              cell_counter += n_lanes_filled;
+            } // end loop over cells
+        }
+    }
+}
+
+
+
+template <int dim, typename VectorType>
+void
+MGTwoLevelTransfer<dim, VectorType>::make_transfer_sparsity_pattern(
+  SparsityPatternBase &sparsity_pattern,
+  bool                 build_for_prolongation) const
+{
+  if (matrix_free_data.get() != nullptr)
+    {
+      DEAL_II_NOT_IMPLEMENTED();
+    }
+  internal::MGTwoLevelTransferImplementation::add_sparsity_entries<dim,
+                                                                   VectorType>(
+    sparsity_pattern,
+    this->schemes,
+    this->constraint_info_fine,
+    this->constraint_info_coarse,
+    *this->partitioner_fine,
+    *this->partitioner_coarse,
+    build_for_prolongation);
 }
 
 

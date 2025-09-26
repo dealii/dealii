@@ -446,6 +446,40 @@ public:
   interpolate(VectorType &dst, const VectorType &src) const override;
 
   /**
+   * Assemble the restriction operator described by this object as a sparse
+   * matrix. It is assumed that the sparsity pattern of the matrix has been
+   * set up correctly beforehand (see make_transfer_sparsity_pattern()).
+   * Constraints are taken into account in the same way as in the
+   * prolongate_and_add() and restrict_and_add() functions.
+   * This feature is not available if the transfer was set up
+   * using MatrixFree objects.
+   */
+  template <class SparseMatrixType>
+  void
+  assemble_restriction_as_matrix(SparseMatrixType &matrix) const;
+
+  /**
+   * Same as above but for the prolongation operator.
+   */
+  template <class SparseMatrixType>
+  void
+  assemble_prolongation_as_matrix(SparseMatrixType &matrix) const;
+
+  /**
+   * Generate entries of a sparsity pattern for the transfer operator
+   * described by this object. All entries that this operator might write to
+   * during the assembly on this process will be added. It is thus necessary
+   * that the sparsity pattern is initialized in such a way that the writable
+   * rows on this process cover all dofs within the coarse-(restriction) or
+   * fine-(prolongation) level partitioner of this object.
+   * The @p build_for_prolongation flag indicates whether the sparsity
+   * should be built to assemble a prolongation or restriction matrix.
+   */
+  void
+  make_transfer_sparsity_pattern(SparsityPatternBase &sparsity_pattern,
+                                 bool build_for_prolongation) const;
+
+  /**
    * Enable inplace vector operations if external and internal vectors
    * are compatible.
    */
