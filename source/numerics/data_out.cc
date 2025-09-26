@@ -67,8 +67,7 @@ template <int dim, int spacedim>
 DataOut<dim, spacedim>::DataOut()
 {
   set_cell_selection(
-    [](
-      const Triangulation<dim, spacedim> &tria) {
+    [](const Triangulation<dim, spacedim> &tria) {
       typename Triangulation<dim, spacedim>::active_cell_iterator cell =
         tria.begin_active();
 
