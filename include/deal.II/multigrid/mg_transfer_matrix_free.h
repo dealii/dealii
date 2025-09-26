@@ -1533,15 +1533,6 @@ MGTransferMatrixFree<dim, Number, MemorySpace>::initialize_dof_vector(
       return; // nothing to do
     }
 
-  // yes: vectors are compatible
-  if (vec.size() == partitioner->size() &&
-      vec.locally_owned_size() == partitioner->locally_owned_size())
-    {
-      if (omit_zeroing_entries == false)
-        vec = 0;
-      return; // nothing to do
-    }
-
   // no
   vec.reinit(partitioner, omit_zeroing_entries);
 }
