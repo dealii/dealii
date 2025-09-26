@@ -67,7 +67,7 @@ template <int dim, int spacedim>
 DataOut<dim, spacedim>::DataOut()
 {
   set_cell_selection(
-    [/* do not capture `this`! pointer will dangle if object is copied/moved */](
+    [](
       const Triangulation<dim, spacedim> &tria) {
       typename Triangulation<dim, spacedim>::active_cell_iterator cell =
         tria.begin_active();
