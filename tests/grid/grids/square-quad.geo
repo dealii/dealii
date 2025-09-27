@@ -21,5 +21,11 @@ Transfinite Line {2, 4} = 10; // 10 divisions vertically
 Transfinite Surface {1};
 Recombine Surface {1}; // Make quads instead of triangles
 
+// Physical groups for deal.II
+Physical Curve(11) = {1, 2, 3, 4};
+
+// Material id for the domain
+Physical Surface(111) = {1};
+
 // Optional: force quad meshing globally
 Mesh.RecombineAll = 1;
