@@ -72,8 +72,8 @@ check_this(const DoFHandler<dim> &dof_handler,
   // this test checks whether DataOut can be copied/moved and used safely and
   // no dangling references/pointers to the copied-from object remain.
   // DataOut is created in functions to ensure the original object is destroyed.
-  // DataOut is wrapped to ensure copies on return, otherwise copies might be
-  // ellided.
+  // DataOut is wrapped to ensure it is copied on return, otherwise copies might
+  // be elided.
 
   DataOut<dim> data_out = make_data_out<dim>(dof_handler, v_node, v_cell);
   data_out.build_patches();
