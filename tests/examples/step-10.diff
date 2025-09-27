@@ -1,0 +1,16 @@
+272,273c272,273
+<         table.evaluate_all_convergence_rates(
+<           ConvergenceTable::reduction_rate_log2);
+---
+>         //table.evaluate_all_convergence_rates(
+>         //  ConvergenceTable::reduction_rate_log2);
+357,358c357,358
+<         table.evaluate_all_convergence_rates(
+<           ConvergenceTable::reduction_rate_log2);
+---
+>         //table.evaluate_all_convergence_rates(
+>         //  ConvergenceTable::reduction_rate_log2);
+360c360
+<         table.set_precision("eval.pi", 16);
+---
+>         table.set_precision("eval.pi", 14);

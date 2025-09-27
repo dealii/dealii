@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2011 - 2023 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2012 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 
 #ifndef dealii_vectorization_h
@@ -20,8 +19,10 @@
 #include <deal.II/base/config.h>
 
 #include <deal.II/base/exceptions.h>
+#include <deal.II/base/numbers.h>
 #include <deal.II/base/template_constraints.h>
 
+#include <algorithm>
 #include <array>
 #include <cmath>
 
@@ -105,7 +106,7 @@ public:
    * @param data The actual VectorizedArray.
    * @param lane A pointer to the current lane.
    */
-  VectorizedArrayIterator(T &data, const std::size_t lane)
+  constexpr VectorizedArrayIterator(T &data, const std::size_t lane)
     : data(&data)
     , lane(lane)
   {}
@@ -113,7 +114,7 @@ public:
   /**
    * Compare for equality.
    */
-  bool
+  constexpr bool
   operator==(const VectorizedArrayIterator<T> &other) const
   {
     Assert(this->data == other.data,
@@ -125,7 +126,7 @@ public:
   /**
    * Compare for inequality.
    */
-  bool
+  constexpr bool
   operator!=(const VectorizedArrayIterator<T> &other) const
   {
     Assert(this->data == other.data,
@@ -135,16 +136,10 @@ public:
   }
 
   /**
-   * Copy assignment.
-   */
-  VectorizedArrayIterator<T> &
-  operator=(const VectorizedArrayIterator<T> &other) = default;
-
-  /**
    * Dereferencing operator (const version): returns the value of the current
    * lane.
    */
-  const typename T::value_type &
+  constexpr const typename T::value_type &
   operator*() const
   {
     AssertIndexRange(lane, T::size());
@@ -157,7 +152,8 @@ public:
    * current lane.
    */
   template <typename U = T>
-  std::enable_if_t<!std::is_same_v<U, const U>, typename T::value_type> &
+  constexpr std::enable_if_t<!std::is_same_v<U, const U>,
+                             typename T::value_type> &
   operator*()
   {
     AssertIndexRange(lane, T::size());
@@ -169,11 +165,11 @@ public:
    * the iterator to the next lane and returns a reference to
    * <tt>*this</tt>.
    */
-  VectorizedArrayIterator<T> &
+  constexpr VectorizedArrayIterator<T> &
   operator++()
   {
     AssertIndexRange(lane + 1, T::size() + 1);
-    lane++;
+    ++lane;
     return *this;
   }
 
@@ -181,7 +177,7 @@ public:
    * This operator advances the iterator by @p offset lanes and returns a
    * reference to <tt>*this</tt>.
    */
-  VectorizedArrayIterator<T> &
+  constexpr VectorizedArrayIterator<T> &
   operator+=(const std::size_t offset)
   {
     AssertIndexRange(lane + offset, T::size() + 1);
@@ -194,7 +190,7 @@ public:
    * the iterator to the previous lane and returns a reference to
    * <tt>*this</tt>.
    */
-  VectorizedArrayIterator<T> &
+  constexpr VectorizedArrayIterator<T> &
   operator--()
   {
     Assert(
@@ -208,7 +204,7 @@ public:
   /**
    * Create new iterator, which is shifted by @p offset.
    */
-  VectorizedArrayIterator<T>
+  constexpr VectorizedArrayIterator<T>
   operator+(const std::size_t &offset) const
   {
     AssertIndexRange(lane + offset, T::size() + 1);
@@ -218,11 +214,11 @@ public:
   /**
    * Compute distance between this iterator and iterator @p other.
    */
-  std::ptrdiff_t
+  constexpr std::ptrdiff_t
   operator-(const VectorizedArrayIterator<T> &other) const
   {
     return static_cast<std::ptrdiff_t>(lane) -
-           static_cast<ptrdiff_t>(other.lane);
+           static_cast<std::ptrdiff_t>(other.lane);
   }
 
 private:
@@ -243,43 +239,44 @@ private:
  * A base class for the various VectorizedArray template specializations,
  * containing common functionalities.
  *
- * @tparam T Type of the actual vectorized array. We are using the
- *   Couriously Recurring Template Pattern (see
+ * @tparam VectorizedArrayType Type of the actual vectorized array this
+ *   class is operating on. We are using the
+ *   Curiously Recurring Template Pattern (see
  *   https://en.wikipedia.org/wiki/Curiously_recurring_template_pattern) in this
- *   class to avoid having to resort to `virtual` member functions.
+ *   class to avoid having to resort to `virtual` member functions. In
+ *   other words, `VectorizedArrayType` is a class derived from the
+ *   current class.
  */
-template <typename T, std::size_t width>
+template <typename VectorizedArrayType, std::size_t width>
 class VectorizedArrayBase
 {
 public:
   /**
    * Default constructor.
    */
-  VectorizedArrayBase() = default;
+  constexpr VectorizedArrayBase() = default;
 
   /**
    * Construct an array with the given initializer list.
+   *
+   * The initializer list must have at most as many elements as the
+   * vector length. Elements not listed in the initializer list are
+   * zero-initialized.
    */
   template <typename U>
-  VectorizedArrayBase(const std::initializer_list<U> &list)
+  constexpr VectorizedArrayBase(const std::initializer_list<U> &list)
   {
-    auto i0 = this->begin();
-    auto i1 = list.begin();
+    const unsigned int n_initializers = list.size();
+    Assert(n_initializers <= size(),
+           ExcMessage("The initializer list must have at most "
+                      "as many elements as the vector length."));
 
-    for (; i1 != list.end(); ++i0, ++i1)
-      {
-        Assert(
-          i0 != this->end(),
-          ExcMessage(
-            "Initializer list exceeds size of this VectorizedArray object."));
+    // Copy what's in the list.
+    std::copy_n(list.begin(), n_initializers, this->begin());
 
-        *i0 = *i1;
-      }
-
-    for (; i0 != this->end(); ++i0)
-      {
-        *i0 = 0.0;
-      }
+    // Then add zero padding where necessary.
+    if (n_initializers < size())
+      std::fill(this->begin() + n_initializers, this->end(), 0.0);
   }
 
   /**
@@ -294,40 +291,62 @@ public:
   /**
    * @return An iterator pointing to the beginning of the underlying data.
    */
-  VectorizedArrayIterator<T>
+  constexpr VectorizedArrayIterator<VectorizedArrayType>
   begin()
   {
-    return VectorizedArrayIterator<T>(static_cast<T &>(*this), 0);
+    return VectorizedArrayIterator<VectorizedArrayType>(
+      static_cast<VectorizedArrayType &>(*this), 0);
   }
 
   /**
    * @return An iterator pointing to the beginning of the underlying data (`const`
    * version).
    */
-  VectorizedArrayIterator<const T>
+  constexpr VectorizedArrayIterator<const VectorizedArrayType>
   begin() const
   {
-    return VectorizedArrayIterator<const T>(static_cast<const T &>(*this), 0);
+    return VectorizedArrayIterator<const VectorizedArrayType>(
+      static_cast<const VectorizedArrayType &>(*this), 0);
   }
 
   /**
    * @return An iterator pointing to the end of the underlying data.
    */
-  VectorizedArrayIterator<T>
+  constexpr VectorizedArrayIterator<VectorizedArrayType>
   end()
   {
-    return VectorizedArrayIterator<T>(static_cast<T &>(*this), width);
+    return VectorizedArrayIterator<VectorizedArrayType>(
+      static_cast<VectorizedArrayType &>(*this), width);
   }
 
   /**
    * @return An iterator pointing to the end of the underlying data (`const`
    * version).
    */
-  VectorizedArrayIterator<const T>
+  constexpr VectorizedArrayIterator<const VectorizedArrayType>
   end() const
   {
-    return VectorizedArrayIterator<const T>(static_cast<const T &>(*this),
-                                            width);
+    return VectorizedArrayIterator<const VectorizedArrayType>(
+      static_cast<const VectorizedArrayType &>(*this), width);
+  }
+
+  /**
+   * A default implementation for computing the dot product between two
+   * vectorized arrays. It first forms the lane-by-lane product between
+   * the current object and the argument, and then the across-lanes
+   * sum of the product. The function returns the kind of object that
+   * the VectorizedArray::sum() function returns.
+   *
+   * This function is inherited by all derived classes and provides
+   * the dot product to them unless they override it with their own
+   * implementation (presumably using a more efficient approach).
+   */
+  auto
+  dot_product(const VectorizedArrayType &v) const
+  {
+    VectorizedArrayType p = static_cast<const VectorizedArrayType &>(*this);
+    p *= v;
+    return p.sum();
   }
 };
 
@@ -344,20 +363,21 @@ public:
  * operations. For floats and doubles, an array of numbers are packed together
  * with the goal to be processed in a single-instruction/multiple-data (SIMD)
  * fashion. In the SIMD context, the elements of such a short vector are often
- * called lanes. The number of elements packed together, i.e., the number of
+ * called "lanes". The number of elements packed together, i.e., the number of
  * lanes, depends on the computer system and compiler flags that are used for
  * compilation of deal.II. The fundamental idea of these packed data types is
  * to use one single CPU instruction to perform arithmetic operations on the
  * whole array using the processor's vector (SIMD) units. Most computer
  * systems by 2010 standards will use an array of two doubles or four floats,
  * respectively (this corresponds to the SSE/SSE2 data sets) when compiling
- * deal.II on 64-bit operating systems. On Intel Sandy Bridge processors and
- * newer or AMD Bulldozer processors and newer, four doubles or eight floats
- * are used when deal.II is configured using gcc with \--with-cpu=native
- * or \--with-cpu=corei7-avx. On compilations with AVX-512 support (e.g.,
- * Intel Skylake Server from 2017), eight doubles or sixteen floats are used.
+ * deal.II on 64-bit operating systems. On later processors (such as Intel Sandy
+ * Bridge and newer, or AMD Bulldozer processors and newer), four
+ * doubles or eight floats are used when deal.II is configured using gcc with
+ * `--with-cpu=native` or `--with-cpu=corei7-avx`. On compilations with
+ * AVX-512 support (e.g., Intel Skylake Server from 2017), eight doubles
+ * or sixteen floats are used.
  *
- * This behavior of this class is made similar to the basic data types double
+ * The behavior of this class is made similar to the basic data types double
  * and float. The definition of a vectorized array does not initialize the
  * data field but rather leaves it undefined, as is the case for double and
  * float. However, when calling something like `VectorizedArray<double> a =
@@ -402,7 +422,7 @@ public:
  *  - VectorizedArray<double, 1>
  *  - VectorizedArray<double, 2>
  *
- * for older x86 processors or in case no processor-specific compilation flags
+ * For older x86 processors or in case no processor-specific compilation flags
  * were added (i.e., without `-D CMAKE_CXX_FLAGS=-march=native` or similar
  * flags):
  *  - VectorizedArray<double, 1> // no vectorization (auto-optimization)
@@ -411,11 +431,14 @@ public:
  * Similar considerations also apply to the data type `float`.
  *
  * Wrongly selecting the width, e.g., width=3 or width=8 on a processor which
- * does not support AVX-512 leads to a static assert.
+ * does not support AVX-512 leads to a failing `static_assert`, i.e., you cannot
+ * compile code using a VectorizedArray class with a number of lanes that
+ * is not supported by the platform you are on. In particular, all platforms
+ * we are aware of only ever support widths that are powers of two.
  *
- * @tparam Number underlying data type
- * @tparam width  vector length (optional; if not set, the maximal width of the
- *                architecture is used)
+ * @tparam Number The underlying scalar data type.
+ * @tparam width  Vector length. (Optional; if not set, the maximal width of the
+ *                architecture is used.)
  */
 template <typename Number, std::size_t width>
 class VectorizedArray
@@ -423,12 +446,19 @@ class VectorizedArray
 {
 public:
   /**
-   * This gives the type of the array elements.
+   * The scalar type of the array elements.
    */
   using value_type = Number;
 
-  static_assert(width == 1,
-                "You specified an illegal width that is not supported.");
+  /**
+   * A constexpr boolean indicating whether the VectorizedArray with the
+   * given choice of template parameters @p Number and @p width is indeed
+   * implemented. The generic implementation is only implemented for
+   * @p width equal to one. For specializations of this class (which are
+   * defined depending on the instruction sets available) the boolean is
+   * set to true as well.
+   */
+  static constexpr bool is_implemented = (width == 1);
 
   /**
    * Default empty constructor, leaving the data in an uninitialized state
@@ -441,6 +471,9 @@ public:
    */
   VectorizedArray(const Number scalar)
   {
+    static_assert(width == 1,
+                  "You specified an illegal width that is not supported.");
+
     this->operator=(scalar);
   }
 
@@ -450,7 +483,10 @@ public:
   template <typename U>
   VectorizedArray(const std::initializer_list<U> &list)
     : VectorizedArrayBase<VectorizedArray<Number, width>, 1>(list)
-  {}
+  {
+    static_assert(width == 1,
+                  "You specified an illegal width that is not supported.");
+  }
 
   /**
    * This function assigns a scalar to the current object.
@@ -498,7 +534,7 @@ public:
   }
 
   /**
-   * Addition
+   * Element-wise addition of two arrays of numbers.
    */
   DEAL_II_ALWAYS_INLINE
   VectorizedArray &
@@ -509,7 +545,7 @@ public:
   }
 
   /**
-   * Subtraction
+   * Element-wise subtraction of two arrays of numbers.
    */
   DEAL_II_ALWAYS_INLINE
   VectorizedArray &
@@ -520,7 +556,7 @@ public:
   }
 
   /**
-   * Multiplication
+   * Element-wise multiplication of two arrays of numbers.
    */
   DEAL_II_ALWAYS_INLINE
   VectorizedArray &
@@ -531,7 +567,7 @@ public:
   }
 
   /**
-   * Division
+   * Element-wise division of two arrays of numbers.
    */
   DEAL_II_ALWAYS_INLINE
   VectorizedArray &
@@ -881,10 +917,10 @@ vectorized_load_and_transpose(const unsigned int                 n_entries,
 /**
  * This method stores the vectorized arrays in transposed form into the given
  * output array @p out with the given offsets @p offsets. This operation
- * corresponds to a transformation of a struct-of-array (input) into an array-
- * of-struct (output). This method operates on plain array, so no checks for
- * valid data access are made. It is the user's responsibility to ensure that
- * the given arrays are valid according to the access layout below.
+ * corresponds to a transformation of a struct-of-array (input) into an
+ * array-of-struct (output). This method operates on plain array, so no checks
+ * for valid data access are made. It is the user's responsibility to ensure
+ * that the given arrays are valid according to the access layout below.
  *
  * This method assumes that the specified offsets do not overlap. Otherwise,
  * the behavior is undefined in the vectorized case. It is the user's
@@ -968,7 +1004,7 @@ vectorized_transpose_and_store(const bool                            add_into,
 
 #ifndef DOXYGEN
 
-#  if defined(DEAL_II_HAVE_ARM_NEON) && defined(__ARM_NEON)
+#  if DEAL_II_VECTORIZATION_WIDTH_IN_BITS >= 128 && defined(__ARM_NEON)
 
 /**
  * Specialization for double and ARM Neon.
@@ -982,6 +1018,12 @@ public:
    * This gives the type of the array elements.
    */
   using value_type = double;
+
+  /**
+   * Record the fact that the given specialization of VectorizedArray is
+   * indeed implemented.
+   */
+  static constexpr bool is_implemented = true;
 
   /**
    * Default empty constructor, leaving the data in an uninitialized state
@@ -1042,7 +1084,7 @@ public:
   }
 
   /**
-   * Addition.
+   * Element-wise addition of two arrays of numbers.
    */
   VectorizedArray &
   operator+=(const VectorizedArray &vec)
@@ -1052,7 +1094,7 @@ public:
   }
 
   /**
-   * Subtraction.
+   * Element-wise subtraction of two arrays of numbers.
    */
   VectorizedArray &
   operator-=(const VectorizedArray &vec)
@@ -1062,7 +1104,7 @@ public:
   }
 
   /**
-   * Multiplication.
+   * Element-wise multiplication of two arrays of numbers.
    */
   VectorizedArray &
   operator*=(const VectorizedArray &vec)
@@ -1072,7 +1114,7 @@ public:
   }
 
   /**
-   * Division.
+   * Element-wise division of two arrays of numbers.
    */
   VectorizedArray &
   operator/=(const VectorizedArray &vec)
@@ -1270,6 +1312,12 @@ public:
   using value_type = float;
 
   /**
+   * Record the fact that the given specialization of VectorizedArray is
+   * indeed implemented.
+   */
+  static constexpr bool is_implemented = true;
+
+  /**
    * Default empty constructor, leaving the data in an uninitialized state
    * similar to float/double.
    */
@@ -1328,7 +1376,7 @@ public:
   }
 
   /**
-   * Addition.
+   * Element-wise addition of two arrays of numbers.
    */
   VectorizedArray &
   operator+=(const VectorizedArray &vec)
@@ -1338,7 +1386,7 @@ public:
   }
 
   /**
-   * Subtraction.
+   * Element-wise subtraction of two arrays of numbers.
    */
   VectorizedArray &
   operator-=(const VectorizedArray &vec)
@@ -1348,7 +1396,7 @@ public:
   }
 
   /**
-   * Multiplication.
+   * Element-wise multiplication of two arrays of numbers.
    */
   VectorizedArray &
   operator*=(const VectorizedArray &vec)
@@ -1358,7 +1406,7 @@ public:
   }
 
   /**
-   * Division.
+   * Element-wise division of two arrays of numbers.
    */
   VectorizedArray &
   operator/=(const VectorizedArray &vec)
@@ -1543,6 +1591,12 @@ public:
   using value_type = double;
 
   /**
+   * Record the fact that the given specialization of VectorizedArray is
+   * indeed implemented.
+   */
+  static constexpr bool is_implemented = true;
+
+  /**
    * Default empty constructor, leaving the data in an uninitialized state
    * similar to float/double.
    */
@@ -1606,7 +1660,7 @@ public:
   }
 
   /**
-   * Addition.
+   * Element-wise addition of two arrays of numbers.
    */
   DEAL_II_ALWAYS_INLINE
   VectorizedArray &
@@ -1621,7 +1675,7 @@ public:
   }
 
   /**
-   * Subtraction.
+   * Element-wise subtraction of two arrays of numbers.
    */
   DEAL_II_ALWAYS_INLINE
   VectorizedArray &
@@ -1636,7 +1690,7 @@ public:
   }
 
   /**
-   * Multiplication.
+   * Element-wise multiplication of two arrays of numbers.
    */
   DEAL_II_ALWAYS_INLINE
   VectorizedArray &
@@ -1651,7 +1705,7 @@ public:
   }
 
   /**
-   * Division.
+   * Element-wise division of two arrays of numbers.
    */
   DEAL_II_ALWAYS_INLINE
   VectorizedArray &
@@ -2028,6 +2082,12 @@ public:
   using value_type = float;
 
   /**
+   * Record the fact that the given specialization of VectorizedArray is
+   * indeed implemented.
+   */
+  static constexpr bool is_implemented = true;
+
+  /**
    * Default empty constructor, leaving the data in an uninitialized state
    * similar to float/double.
    */
@@ -2091,7 +2151,7 @@ public:
   }
 
   /**
-   * Addition.
+   * Element-wise addition of two arrays of numbers.
    */
   DEAL_II_ALWAYS_INLINE
   VectorizedArray &
@@ -2106,7 +2166,7 @@ public:
   }
 
   /**
-   * Subtraction.
+   * Element-wise subtraction of two arrays of numbers.
    */
   DEAL_II_ALWAYS_INLINE
   VectorizedArray &
@@ -2121,7 +2181,7 @@ public:
   }
 
   /**
-   * Multiplication.
+   * Element-wise multiplication of two arrays of numbers.
    */
   DEAL_II_ALWAYS_INLINE
   VectorizedArray &
@@ -2136,7 +2196,7 @@ public:
   }
 
   /**
-   * Division.
+   * Element-wise division of two arrays of numbers.
    */
   DEAL_II_ALWAYS_INLINE
   VectorizedArray &
@@ -2536,6 +2596,12 @@ public:
   using value_type = double;
 
   /**
+   * Record the fact that the given specialization of VectorizedArray is
+   * indeed implemented.
+   */
+  static constexpr bool is_implemented = true;
+
+  /**
    * Default empty constructor, leaving the data in an uninitialized state
    * similar to float/double.
    */
@@ -2599,7 +2665,7 @@ public:
   }
 
   /**
-   * Addition.
+   * Element-wise addition of two arrays of numbers.
    */
   DEAL_II_ALWAYS_INLINE
   VectorizedArray &
@@ -2619,7 +2685,7 @@ public:
   }
 
   /**
-   * Subtraction.
+   * Element-wise subtraction of two arrays of numbers.
    */
   DEAL_II_ALWAYS_INLINE
   VectorizedArray &
@@ -2633,7 +2699,7 @@ public:
     return *this;
   }
   /**
-   * Multiplication.
+   * Element-wise multiplication of two arrays of numbers.
    */
   DEAL_II_ALWAYS_INLINE
   VectorizedArray &
@@ -2648,7 +2714,7 @@ public:
   }
 
   /**
-   * Division.
+   * Element-wise division of two arrays of numbers.
    */
   DEAL_II_ALWAYS_INLINE
   VectorizedArray &
@@ -3114,6 +3180,12 @@ public:
   using value_type = float;
 
   /**
+   * Record the fact that the given specialization of VectorizedArray is
+   * indeed implemented.
+   */
+  static constexpr bool is_implemented = true;
+
+  /**
    * Default empty constructor, leaving the data in an uninitialized state
    * similar to float/double.
    */
@@ -3177,7 +3249,7 @@ public:
   }
 
   /**
-   * Addition.
+   * Element-wise addition of two arrays of numbers.
    */
   DEAL_II_ALWAYS_INLINE
   VectorizedArray &
@@ -3197,7 +3269,7 @@ public:
   }
 
   /**
-   * Subtraction.
+   * Element-wise subtraction of two arrays of numbers.
    */
   DEAL_II_ALWAYS_INLINE
   VectorizedArray &
@@ -3211,7 +3283,7 @@ public:
     return *this;
   }
   /**
-   * Multiplication.
+   * Element-wise multiplication of two arrays of numbers.
    */
   DEAL_II_ALWAYS_INLINE
   VectorizedArray &
@@ -3226,7 +3298,7 @@ public:
   }
 
   /**
-   * Division.
+   * Element-wise division of two arrays of numbers.
    */
   DEAL_II_ALWAYS_INLINE
   VectorizedArray &
@@ -3715,6 +3787,12 @@ public:
   using value_type = double;
 
   /**
+   * Record the fact that the given specialization of VectorizedArray is
+   * indeed implemented.
+   */
+  static constexpr bool is_implemented = true;
+
+  /**
    * Default empty constructor, leaving the data in an uninitialized state
    * similar to float/double.
    */
@@ -3779,7 +3857,7 @@ public:
   }
 
   /**
-   * Addition.
+   * Element-wise addition of two arrays of numbers.
    */
   DEAL_II_ALWAYS_INLINE
   VectorizedArray &
@@ -3799,7 +3877,7 @@ public:
   }
 
   /**
-   * Subtraction.
+   * Element-wise subtraction of two arrays of numbers.
    */
   DEAL_II_ALWAYS_INLINE
   VectorizedArray &
@@ -3813,7 +3891,7 @@ public:
     return *this;
   }
   /**
-   * Multiplication.
+   * Element-wise multiplication of two arrays of numbers.
    */
   DEAL_II_ALWAYS_INLINE
   VectorizedArray &
@@ -3828,7 +3906,7 @@ public:
   }
 
   /**
-   * Division.
+   * Element-wise division of two arrays of numbers.
    */
   DEAL_II_ALWAYS_INLINE
   VectorizedArray &
@@ -4345,6 +4423,12 @@ public:
   using value_type = float;
 
   /**
+   * Record the fact that the given specialization of VectorizedArray is
+   * indeed implemented.
+   */
+  static constexpr bool is_implemented = true;
+
+  /**
    * Default empty constructor, leaving the data in an uninitialized state
    * similar to float/double.
    */
@@ -4408,7 +4492,7 @@ public:
   }
 
   /**
-   * Addition.
+   * Element-wise addition of two arrays of numbers.
    */
   DEAL_II_ALWAYS_INLINE
   VectorizedArray &
@@ -4428,7 +4512,7 @@ public:
   }
 
   /**
-   * Subtraction.
+   * Element-wise subtraction of two arrays of numbers.
    */
   DEAL_II_ALWAYS_INLINE
   VectorizedArray &
@@ -4442,7 +4526,7 @@ public:
     return *this;
   }
   /**
-   * Multiplication.
+   * Element-wise multiplication of two arrays of numbers.
    */
   DEAL_II_ALWAYS_INLINE
   VectorizedArray &
@@ -4457,7 +4541,7 @@ public:
   }
 
   /**
-   * Division.
+   * Element-wise division of two arrays of numbers.
    */
   DEAL_II_ALWAYS_INLINE
   VectorizedArray &
@@ -5054,6 +5138,12 @@ public:
   using value_type = double;
 
   /**
+   * Record the fact that the given specialization of VectorizedArray is
+   * indeed implemented.
+   */
+  static constexpr bool is_implemented = true;
+
+  /**
    * Default empty constructor, leaving the data in an uninitialized state
    * similar to float/double.
    */
@@ -5122,7 +5212,7 @@ public:
   }
 
   /**
-   * Addition.
+   * Element-wise addition of two arrays of numbers.
    */
   DEAL_II_ALWAYS_INLINE
   VectorizedArray &
@@ -5133,7 +5223,7 @@ public:
   }
 
   /**
-   * Subtraction.
+   * Element-wise subtraction of two arrays of numbers.
    */
   DEAL_II_ALWAYS_INLINE
   VectorizedArray &
@@ -5144,7 +5234,7 @@ public:
   }
 
   /**
-   * Multiplication.
+   * Element-wise multiplication of two arrays of numbers.
    */
   DEAL_II_ALWAYS_INLINE
   VectorizedArray &
@@ -5155,7 +5245,7 @@ public:
   }
 
   /**
-   * Division.
+   * Element-wise division of two arrays of numbers.
    */
   DEAL_II_ALWAYS_INLINE
   VectorizedArray &
@@ -5309,6 +5399,12 @@ public:
   using value_type = float;
 
   /**
+   * Record the fact that the given specialization of VectorizedArray is
+   * indeed implemented.
+   */
+  static constexpr bool is_implemented = true;
+
+  /**
    * Default empty constructor, leaving the data in an uninitialized state
    * similar to float/double.
    */
@@ -5377,7 +5473,7 @@ public:
   }
 
   /**
-   * Addition.
+   * Element-wise addition of two arrays of numbers.
    */
   DEAL_II_ALWAYS_INLINE
   VectorizedArray &
@@ -5388,7 +5484,7 @@ public:
   }
 
   /**
-   * Subtraction.
+   * Element-wise subtraction of two arrays of numbers.
    */
   DEAL_II_ALWAYS_INLINE
   VectorizedArray &
@@ -5399,7 +5495,7 @@ public:
   }
 
   /**
-   * Multiplication.
+   * Element-wise multiplication of two arrays of numbers.
    */
   DEAL_II_ALWAYS_INLINE
   VectorizedArray &
@@ -5410,7 +5506,7 @@ public:
   }
 
   /**
-   * Division.
+   * Element-wise division of two arrays of numbers.
    */
   DEAL_II_ALWAYS_INLINE
   VectorizedArray &
@@ -6218,7 +6314,7 @@ compare_and_apply_mask(const VectorizedArray<double, 2> &left,
 
 #  endif
 
-#  if defined(DEAL_II_HAVE_ARM_NEON) && defined(__ARM_NEON)
+#  if DEAL_II_VECTORIZATION_WIDTH_IN_BITS >= 128 && defined(__ARM_NEON)
 
 template <SIMDComparison predicate>
 DEAL_II_ALWAYS_INLINE inline VectorizedArray<float, 4>
@@ -6493,17 +6589,10 @@ namespace std
   inline ::dealii::VectorizedArray<Number, width>
   sin(const ::dealii::VectorizedArray<Number, width> &x)
   {
-    // put values in an array and later read in that array with an unaligned
-    // read. This should save some instructions as compared to directly
-    // setting the individual elements and also circumvents a compiler
-    // optimization bug in gcc-4.6 with SSE2 (see also deal.II developers list
-    // from April 2014, topic "matrix_free/step-48 Test").
-    Number values[::dealii::VectorizedArray<Number, width>::size()];
+    ::dealii::VectorizedArray<Number, width> out;
     for (unsigned int i = 0; i < dealii::VectorizedArray<Number, width>::size();
          ++i)
-      values[i] = std::sin(x[i]);
-    ::dealii::VectorizedArray<Number, width> out;
-    out.load(&values[0]);
+      out[i] = std::sin(x[i]);
     return out;
   }
 
@@ -6520,12 +6609,10 @@ namespace std
   inline ::dealii::VectorizedArray<Number, width>
   cos(const ::dealii::VectorizedArray<Number, width> &x)
   {
-    Number values[::dealii::VectorizedArray<Number, width>::size()];
+    ::dealii::VectorizedArray<Number, width> out;
     for (unsigned int i = 0; i < dealii::VectorizedArray<Number, width>::size();
          ++i)
-      values[i] = std::cos(x[i]);
-    ::dealii::VectorizedArray<Number, width> out;
-    out.load(&values[0]);
+      out[i] = std::cos(x[i]);
     return out;
   }
 
@@ -6542,12 +6629,190 @@ namespace std
   inline ::dealii::VectorizedArray<Number, width>
   tan(const ::dealii::VectorizedArray<Number, width> &x)
   {
-    Number values[::dealii::VectorizedArray<Number, width>::size()];
+    ::dealii::VectorizedArray<Number, width> out;
     for (unsigned int i = 0; i < dealii::VectorizedArray<Number, width>::size();
          ++i)
-      values[i] = std::tan(x[i]);
+      out[i] = std::tan(x[i]);
+    return out;
+  }
+
+
+
+  /**
+   * Compute the arc cosine of a vectorized data field. The result is
+   * returned as vectorized array in the form <tt>{acos(x[0]), acos(x[1]), ...,
+   * acos(x[size()-1])}</tt>.
+   *
+   * @relatesalso VectorizedArray
+   */
+  template <typename Number, std::size_t width>
+  inline ::dealii::VectorizedArray<Number, width>
+  acos(const ::dealii::VectorizedArray<Number, width> &x)
+  {
     ::dealii::VectorizedArray<Number, width> out;
-    out.load(&values[0]);
+    for (unsigned int i = 0; i < dealii::VectorizedArray<Number, width>::size();
+         ++i)
+      out[i] = std::acos(x[i]);
+    return out;
+  }
+
+
+
+  /**
+   * Compute the arc sine of a vectorized data field. The result is
+   * returned as vectorized array in the form <tt>{asin(x[0]), asin(x[1]), ...,
+   * asin(x[size()-1])}</tt>.
+   *
+   * @relatesalso VectorizedArray
+   */
+  template <typename Number, std::size_t width>
+  inline ::dealii::VectorizedArray<Number, width>
+  asin(const ::dealii::VectorizedArray<Number, width> &x)
+  {
+    ::dealii::VectorizedArray<Number, width> out;
+    for (unsigned int i = 0; i < dealii::VectorizedArray<Number, width>::size();
+         ++i)
+      out[i] = std::asin(x[i]);
+    return out;
+  }
+
+
+
+  /**
+   * Compute the arc tangent of a vectorized data field. The result is
+   * returned as vectorized array in the form <tt>{atan(x[0]), atan(x[1]), ...,
+   * atan(x[size()-1])}</tt>.
+   *
+   * @relatesalso VectorizedArray
+   */
+  template <typename Number, std::size_t width>
+  inline ::dealii::VectorizedArray<Number, width>
+  atan(const ::dealii::VectorizedArray<Number, width> &x)
+  {
+    ::dealii::VectorizedArray<Number, width> out;
+    for (unsigned int i = 0; i < dealii::VectorizedArray<Number, width>::size();
+         ++i)
+      out[i] = std::atan(x[i]);
+    return out;
+  }
+
+
+
+  /**
+   * Compute the hyperbolic cosine of a vectorized data field. The result is
+   * returned as vectorized array in the form <tt>{cosh(x[0]), cosh(x[1]), ...,
+   * cosh(x[size()-1])}</tt>.
+   *
+   * @relatesalso VectorizedArray
+   */
+  template <typename Number, std::size_t width>
+  inline ::dealii::VectorizedArray<Number, width>
+  cosh(const ::dealii::VectorizedArray<Number, width> &x)
+  {
+    ::dealii::VectorizedArray<Number, width> out;
+    for (unsigned int i = 0; i < dealii::VectorizedArray<Number, width>::size();
+         ++i)
+      out[i] = std::cosh(x[i]);
+    return out;
+  }
+
+
+
+  /**
+   * Compute the hyperbolic sine of a vectorized data field. The result is
+   * returned as vectorized array in the form <tt>{sinh(x[0]), sinh(x[1]), ...,
+   * sinh(x[size()-1])}</tt>.
+   *
+   * @relatesalso VectorizedArray
+   */
+  template <typename Number, std::size_t width>
+  inline ::dealii::VectorizedArray<Number, width>
+  sinh(const ::dealii::VectorizedArray<Number, width> &x)
+  {
+    ::dealii::VectorizedArray<Number, width> out;
+    for (unsigned int i = 0; i < dealii::VectorizedArray<Number, width>::size();
+         ++i)
+      out[i] = std::sinh(x[i]);
+    return out;
+  }
+
+
+
+  /**
+   * Compute the hyperbolic tangent of a vectorized data field. The result is
+   * returned as vectorized array in the form <tt>{tanh(x[0]), tanh(x[1]), ...,
+   * tanh(x[size()-1])}</tt>.
+   *
+   * @relatesalso VectorizedArray
+   */
+  template <typename Number, std::size_t width>
+  inline ::dealii::VectorizedArray<Number, width>
+  tanh(const ::dealii::VectorizedArray<Number, width> &x)
+  {
+    ::dealii::VectorizedArray<Number, width> out;
+    for (unsigned int i = 0; i < dealii::VectorizedArray<Number, width>::size();
+         ++i)
+      out[i] = std::tanh(x[i]);
+    return out;
+  }
+
+
+
+  /**
+   * Compute the area hyperbolic cosine of a vectorized data field. The result
+   * is returned as vectorized array in the form <tt>{acosh(x[0]), acosh(x[1]),
+   * ..., acosh(x[size()-1])}</tt>.
+   *
+   * @relatesalso VectorizedArray
+   */
+  template <typename Number, std::size_t width>
+  inline ::dealii::VectorizedArray<Number, width>
+  acosh(const ::dealii::VectorizedArray<Number, width> &x)
+  {
+    ::dealii::VectorizedArray<Number, width> out;
+    for (unsigned int i = 0; i < dealii::VectorizedArray<Number, width>::size();
+         ++i)
+      out[i] = std::acosh(x[i]);
+    return out;
+  }
+
+
+
+  /**
+   * Compute the area hyperbolic sine of a vectorized data field. The result is
+   * returned as vectorized array in the form <tt>{asinh(x[0]), asinh(x[1]),
+   * ..., asinh(x[size()-1])}</tt>.
+   *
+   * @relatesalso VectorizedArray
+   */
+  template <typename Number, std::size_t width>
+  inline ::dealii::VectorizedArray<Number, width>
+  asinh(const ::dealii::VectorizedArray<Number, width> &x)
+  {
+    ::dealii::VectorizedArray<Number, width> out;
+    for (unsigned int i = 0; i < dealii::VectorizedArray<Number, width>::size();
+         ++i)
+      out[i] = std::asinh(x[i]);
+    return out;
+  }
+
+
+
+  /**
+   * Compute the area hyperbolic tangent of a vectorized data field. The result
+   * is returned as vectorized array in the form <tt>{atanh(x[0]), atanh(x[1]),
+   * ..., atanh(x[size()-1])}</tt>.
+   *
+   * @relatesalso VectorizedArray
+   */
+  template <typename Number, std::size_t width>
+  inline ::dealii::VectorizedArray<Number, width>
+  atanh(const ::dealii::VectorizedArray<Number, width> &x)
+  {
+    ::dealii::VectorizedArray<Number, width> out;
+    for (unsigned int i = 0; i < dealii::VectorizedArray<Number, width>::size();
+         ++i)
+      out[i] = std::atanh(x[i]);
     return out;
   }
 
@@ -6564,12 +6829,10 @@ namespace std
   inline ::dealii::VectorizedArray<Number, width>
   exp(const ::dealii::VectorizedArray<Number, width> &x)
   {
-    Number values[::dealii::VectorizedArray<Number, width>::size()];
+    ::dealii::VectorizedArray<Number, width> out;
     for (unsigned int i = 0; i < dealii::VectorizedArray<Number, width>::size();
          ++i)
-      values[i] = std::exp(x[i]);
-    ::dealii::VectorizedArray<Number, width> out;
-    out.load(&values[0]);
+      out[i] = std::exp(x[i]);
     return out;
   }
 
@@ -6586,12 +6849,10 @@ namespace std
   inline ::dealii::VectorizedArray<Number, width>
   log(const ::dealii::VectorizedArray<Number, width> &x)
   {
-    Number values[::dealii::VectorizedArray<Number, width>::size()];
+    ::dealii::VectorizedArray<Number, width> out;
     for (unsigned int i = 0; i < dealii::VectorizedArray<Number, width>::size();
          ++i)
-      values[i] = std::log(x[i]);
-    ::dealii::VectorizedArray<Number, width> out;
-    out.load(&values[0]);
+      out[i] = std::log(x[i]);
     return out;
   }
 
@@ -6624,12 +6885,10 @@ namespace std
   inline ::dealii::VectorizedArray<Number, width>
   pow(const ::dealii::VectorizedArray<Number, width> &x, const Number p)
   {
-    Number values[::dealii::VectorizedArray<Number, width>::size()];
+    ::dealii::VectorizedArray<Number, width> out;
     for (unsigned int i = 0; i < dealii::VectorizedArray<Number, width>::size();
          ++i)
-      values[i] = std::pow(x[i], p);
-    ::dealii::VectorizedArray<Number, width> out;
-    out.load(&values[0]);
+      out[i] = std::pow(x[i], p);
     return out;
   }
 
@@ -6648,12 +6907,10 @@ namespace std
   pow(const ::dealii::VectorizedArray<Number, width> &x,
       const ::dealii::VectorizedArray<Number, width> &p)
   {
-    Number values[::dealii::VectorizedArray<Number, width>::size()];
+    ::dealii::VectorizedArray<Number, width> out;
     for (unsigned int i = 0; i < dealii::VectorizedArray<Number, width>::size();
          ++i)
-      values[i] = std::pow(x[i], p[i]);
-    ::dealii::VectorizedArray<Number, width> out;
-    out.load(&values[0]);
+      out[i] = std::pow(x[i], p[i]);
     return out;
   }
 

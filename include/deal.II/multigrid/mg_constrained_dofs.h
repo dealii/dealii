@@ -1,29 +1,28 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2010 - 2023 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2010 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 #ifndef dealii_mg_constrained_dofs_h
 #define dealii_mg_constrained_dofs_h
 
 #include <deal.II/base/config.h>
 
+#include <deal.II/base/enable_observer_pointer.h>
 #include <deal.II/base/mg_level_object.h>
-#include <deal.II/base/subscriptor.h>
+
+#include <deal.II/fe/component_mask.h>
 
 #include <deal.II/lac/affine_constraints.h>
-
-#include <deal.II/multigrid/mg_tools.h>
 
 #include <set>
 #include <vector>
@@ -44,7 +43,7 @@ class DoFHandler;
  *
  * @ingroup mg
  */
-class MGConstrainedDoFs : public Subscriptor
+class MGConstrainedDoFs : public EnableObserverPointer
 {
 public:
   using size_dof = std::vector<std::set<types::global_dof_index>>::size_type;
@@ -226,7 +225,7 @@ public:
   get_user_constraint_matrix(const unsigned int level) const;
 
   /**
-   * Merge selected constraints of a specifiedlevel into a given single
+   * Merge selected constraints of a specified @p level into a given single
    * AffineConstraints object.
    *
    * @param constraints AffineConstraints object to be filled.
@@ -234,7 +233,7 @@ public:
    * @param add_boundary_indices Add boundary indices.
    * @param add_refinement_edge_indices Add refinement-edge indices.
    * @param add_level_constraints Add level constraints including the one passed
-   *   during initialize() and periodicy constraints.
+   *   during initialize() and periodicity constraints.
    * @param add_user_constraints Add user constraints.
    */
   template <typename Number>
@@ -271,240 +270,6 @@ private:
 };
 
 
-template <int dim, int spacedim>
-inline void
-MGConstrainedDoFs::initialize(
-  const DoFHandler<dim, spacedim> &dof,
-  const MGLevelObject<IndexSet>   &level_relevant_dofs)
-{
-  boundary_indices.clear();
-  refinement_edge_indices.clear();
-  level_constraints.clear();
-  user_constraints.clear();
-
-  const unsigned int nlevels   = dof.get_triangulation().n_global_levels();
-  const unsigned int min_level = level_relevant_dofs.min_level();
-  const unsigned int max_level = (level_relevant_dofs.max_level() == 0) ?
-                                   nlevels - 1 :
-                                   level_relevant_dofs.max_level();
-  const bool         user_level_dofs =
-    (level_relevant_dofs.max_level() == 0) ? false : true;
-
-  // At this point level_constraint and refinement_edge_indices are empty.
-  refinement_edge_indices.resize(nlevels);
-  level_constraints.resize(nlevels);
-  user_constraints.resize(nlevels);
-  for (unsigned int l = min_level; l <= max_level; ++l)
-    {
-      if (user_level_dofs)
-        {
-          level_constraints[l].reinit(level_relevant_dofs[l]);
-        }
-      else
-        {
-          const IndexSet relevant_dofs =
-            DoFTools::extract_locally_relevant_level_dofs(dof, l);
-          level_constraints[l].reinit(relevant_dofs);
-        }
-
-      // Loop through relevant cells and faces finding those which are periodic
-      // neighbors.
-      typename DoFHandler<dim, spacedim>::cell_iterator cell = dof.begin(l),
-                                                        endc = dof.end(l);
-      for (; cell != endc; ++cell)
-        if (cell->level_subdomain_id() != numbers::artificial_subdomain_id)
-          {
-            for (auto f : cell->face_indices())
-              if (cell->has_periodic_neighbor(f) &&
-                  cell->periodic_neighbor(f)->level() == cell->level())
-                {
-                  if (cell->is_locally_owned_on_level())
-                    {
-                      Assert(
-                        cell->periodic_neighbor(f)->level_subdomain_id() !=
-                          numbers::artificial_subdomain_id,
-                        ExcMessage(
-                          "Periodic neighbor of a locally owned cell must either be owned or ghost."));
-                    }
-                  // Cell is a level-ghost and its neighbor is a
-                  // level-artificial cell nothing to do here
-                  else if (cell->periodic_neighbor(f)->level_subdomain_id() ==
-                           numbers::artificial_subdomain_id)
-                    {
-                      Assert(cell->is_locally_owned_on_level() == false,
-                             ExcInternalError());
-                      continue;
-                    }
-
-                  const unsigned int dofs_per_face =
-                    dof.get_fe(0).n_dofs_per_face(f);
-                  std::vector<types::global_dof_index> dofs_1(dofs_per_face);
-                  std::vector<types::global_dof_index> dofs_2(dofs_per_face);
-
-                  cell->periodic_neighbor(f)
-                    ->face(cell->periodic_neighbor_face_no(f))
-                    ->get_mg_dof_indices(l, dofs_1, 0);
-                  cell->face(f)->get_mg_dof_indices(l, dofs_2, 0);
-                  // Store periodicity information in the level
-                  // AffineConstraints object. Skip DoFs for which we've
-                  // previously entered periodicity constraints already; this
-                  // can happen, for example, for a vertex dof at a periodic
-                  // boundary that we visit from more than one cell
-                  for (unsigned int i = 0; i < dofs_per_face; ++i)
-                    if (level_constraints[l].can_store_line(dofs_2[i]) &&
-                        level_constraints[l].can_store_line(dofs_1[i]) &&
-                        !level_constraints[l].is_constrained(dofs_2[i]) &&
-                        !level_constraints[l].is_constrained(dofs_1[i]))
-                      {
-                        level_constraints[l].add_line(dofs_2[i]);
-                        level_constraints[l].add_entry(dofs_2[i],
-                                                       dofs_1[i],
-                                                       1.);
-                      }
-                }
-          }
-      level_constraints[l].close();
-
-      // Initialize with empty IndexSet of correct size
-      refinement_edge_indices[l] = IndexSet(dof.n_dofs(l));
-    }
-
-  MGTools::extract_inner_interface_dofs(dof, refinement_edge_indices);
-}
-
-
-template <int dim, int spacedim>
-inline void
-MGConstrainedDoFs::make_zero_boundary_constraints(
-  const DoFHandler<dim, spacedim>    &dof,
-  const std::set<types::boundary_id> &boundary_ids,
-  const ComponentMask                &component_mask)
-{
-  // allocate an IndexSet for each global level. Contents will be
-  // overwritten inside make_boundary_list.
-  const unsigned int n_levels = dof.get_triangulation().n_global_levels();
-  Assert(boundary_indices.empty() || boundary_indices.size() == n_levels,
-         ExcInternalError());
-  boundary_indices.resize(n_levels);
-
-  MGTools::make_boundary_list(dof,
-                              boundary_ids,
-                              boundary_indices,
-                              component_mask);
-}
-
-
-
-template <int dim, int spacedim>
-inline void
-MGConstrainedDoFs::add_boundary_indices(const DoFHandler<dim, spacedim> &dof,
-                                        const unsigned int               level,
-                                        const IndexSet &level_boundary_indices)
-{
-  const unsigned int n_levels = dof.get_triangulation().n_global_levels();
-  if (boundary_indices.empty())
-    {
-      boundary_indices.resize(n_levels);
-      for (unsigned int i = 0; i < n_levels; ++i)
-        boundary_indices[i] = IndexSet(dof.n_dofs(i));
-    }
-  AssertDimension(boundary_indices.size(), n_levels);
-  boundary_indices[level].add_indices(level_boundary_indices);
-}
-
-
-
-template <int dim, int spacedim>
-inline void
-MGConstrainedDoFs::make_no_normal_flux_constraints(
-  const DoFHandler<dim, spacedim> &dof,
-  const types::boundary_id         bid,
-  const unsigned int               first_vector_component)
-{
-  // For a given boundary id, find which vector component is on the boundary
-  // and set a zero boundary constraint for those degrees of freedom.
-  const unsigned int n_components = dof.get_fe_collection().n_components();
-  AssertIndexRange(first_vector_component + dim - 1, n_components);
-
-  ComponentMask comp_mask(n_components, false);
-
-
-  typename Triangulation<dim>::face_iterator
-    face = dof.get_triangulation().begin_face(),
-    endf = dof.get_triangulation().end_face();
-  for (; face != endf; ++face)
-    if (face->at_boundary() && face->boundary_id() == bid)
-      for (unsigned int d = 0; d < dim; ++d)
-        {
-          Tensor<1, dim, double> unit_vec;
-          unit_vec[d] = 1.0;
-
-          const Tensor<1, dim> normal_vec =
-            face->get_manifold().normal_vector(face, face->center());
-
-          if (std::abs(std::abs(unit_vec * normal_vec) - 1.0) < 1e-10)
-            comp_mask.set(d + first_vector_component, true);
-          else
-            Assert(
-              std::abs(unit_vec * normal_vec) < 1e-10,
-              ExcMessage(
-                "We can currently only support no normal flux conditions "
-                "for a specific boundary id if all faces are normal to the "
-                "x, y, or z axis."));
-        }
-
-  Assert(comp_mask.n_selected_components() == 1,
-         ExcMessage(
-           "We can currently only support no normal flux conditions "
-           "for a specific boundary id if all faces are facing in the "
-           "same direction, i.e., a boundary normal to the x-axis must "
-           "have a different boundary id than a boundary normal to the "
-           "y- or z-axis and so on. If the mesh here was produced using "
-           "GridGenerator::..., setting colorize=true during mesh generation "
-           "and calling make_no_normal_flux_constraints() for each no normal "
-           "flux boundary will fulfill the condition."));
-
-  this->make_zero_boundary_constraints(dof, {bid}, comp_mask);
-}
-
-
-inline void
-MGConstrainedDoFs::add_user_constraints(
-  const unsigned int               level,
-  const AffineConstraints<double> &constraints_on_level)
-{
-  AssertIndexRange(level, user_constraints.size());
-
-  // Get the relevant DoFs from level_constraints if
-  // the user constraint matrix has not been initialized
-  if (user_constraints[level].get_local_lines().size() == 0)
-    user_constraints[level].reinit(level_constraints[level].get_local_lines());
-
-  user_constraints[level].merge(
-    constraints_on_level,
-    AffineConstraints<double>::MergeConflictBehavior::right_object_wins);
-  user_constraints[level].close();
-}
-
-
-
-inline void
-MGConstrainedDoFs::clear_user_constraints()
-{
-  for (auto &constraint : user_constraints)
-    constraint.clear();
-}
-
-
-
-inline void
-MGConstrainedDoFs::clear()
-{
-  boundary_indices.clear();
-  refinement_edge_indices.clear();
-  user_constraints.clear();
-}
-
 
 inline bool
 MGConstrainedDoFs::is_boundary_index(const unsigned int            level,
@@ -517,6 +282,8 @@ MGConstrainedDoFs::is_boundary_index(const unsigned int            level,
   return boundary_indices[level].is_element(index);
 }
 
+
+
 inline bool
 MGConstrainedDoFs::at_refinement_edge(const unsigned int            level,
                                       const types::global_dof_index index) const
@@ -525,6 +292,8 @@ MGConstrainedDoFs::at_refinement_edge(const unsigned int            level,
 
   return refinement_edge_indices[level].is_element(index);
 }
+
+
 
 inline bool
 MGConstrainedDoFs::is_interface_matrix_entry(
@@ -583,57 +352,6 @@ MGConstrainedDoFs::get_user_constraint_matrix(const unsigned int level) const
 {
   AssertIndexRange(level, user_constraints.size());
   return user_constraints[level];
-}
-
-
-template <typename Number>
-inline void
-MGConstrainedDoFs::merge_constraints(AffineConstraints<Number> &constraints,
-                                     const unsigned int         level,
-                                     const bool add_boundary_indices,
-                                     const bool add_refinement_edge_indices,
-                                     const bool add_level_constraints,
-                                     const bool add_user_constraints) const
-{
-  constraints.clear();
-
-  // determine local lines
-  IndexSet index_set(this->get_refinement_edge_indices(level).size());
-
-  if (add_boundary_indices && this->have_boundary_indices())
-    index_set.add_indices(this->get_boundary_indices(level));
-
-  if (add_refinement_edge_indices)
-    index_set.add_indices(this->get_refinement_edge_indices(level));
-
-  if (add_level_constraints)
-    index_set.add_indices(this->get_level_constraints(level).get_local_lines());
-
-  if (add_user_constraints)
-    index_set.add_indices(
-      this->get_user_constraint_matrix(level).get_local_lines());
-
-  constraints.reinit(index_set);
-
-  // merge constraints
-  if (add_boundary_indices && this->have_boundary_indices())
-    constraints.add_lines(this->get_boundary_indices(level));
-
-  if (add_refinement_edge_indices)
-    constraints.add_lines(this->get_refinement_edge_indices(level));
-
-  if (add_level_constraints)
-    constraints.merge(this->get_level_constraints(level),
-                      AffineConstraints<Number>::left_object_wins,
-                      true);
-
-  if (add_user_constraints)
-    constraints.merge(this->get_user_constraint_matrix(level),
-                      AffineConstraints<Number>::left_object_wins,
-                      true);
-
-  // finalize setup
-  constraints.close();
 }
 
 

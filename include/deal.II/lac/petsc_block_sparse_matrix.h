@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2004 - 2023 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2004 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 #ifndef dealii_petsc_block_sparse_matrix_h
 #define dealii_petsc_block_sparse_matrix_h
@@ -28,6 +27,7 @@
 #  include <deal.II/lac/petsc_sparse_matrix.h>
 
 #  include <cmath>
+#  include <cstddef>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -61,8 +61,8 @@ namespace PETScWrappers
      * collect_sizes() function, for much the same reason as is documented
      * with the BlockSparsityPattern class.
      *
-     * @ingroup Matrix1 @see
-     * @ref GlossBlockLA "Block (linear algebra)"
+     * @ingroup Matrix1
+     * @see @ref GlossBlockLA "Block (linear algebra)"
      */
     class BlockSparseMatrix : public BlockMatrixBase<SparseMatrix>
     {
@@ -114,7 +114,7 @@ namespace PETScWrappers
       /**
        * Create a BlockSparseMatrix with an array of PETSc matrices.
        */
-      template <size_t block_rows, size_t block_columns>
+      template <std::size_t block_rows, std::size_t block_columns>
       explicit BlockSparseMatrix(
         const std::array<std::array<Mat, block_columns>, block_rows> &);
 
@@ -254,8 +254,7 @@ namespace PETScWrappers
        * This function collects the sizes of the sub-objects and stores them
        * in internal arrays, in order to be able to relay global indices into
        * the matrix to indices into the subobjects. You *must* call this
-       * function each time after you have changed the size of the sub-
-       * objects.
+       * function each time after you have changed the size of the sub-objects.
        */
       void
       collect_sizes();
@@ -372,7 +371,7 @@ namespace PETScWrappers
 
 
 
-    template <size_t block_rows, size_t block_columns>
+    template <std::size_t block_rows, std::size_t block_columns>
     inline BlockSparseMatrix::BlockSparseMatrix(
       const std::array<std::array<Mat, block_columns>, block_rows> &arrayA)
       : BlockSparseMatrix()
@@ -474,6 +473,14 @@ namespace PETScWrappers
 
 DEAL_II_NAMESPACE_CLOSE
 
+
+#else
+
+// Make sure the scripts that create the C++20 module input files have
+// something to latch on if the preprocessor #ifdef above would
+// otherwise lead to an empty content of the file.
+DEAL_II_NAMESPACE_OPEN
+DEAL_II_NAMESPACE_CLOSE
 
 #endif // DEAL_II_WITH_PETSC
 

@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2022 - 2023 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2022 - 2024 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 #ifndef dealii_cgal_intersections_h
 #define dealii_cgal_intersections_h
@@ -50,14 +49,14 @@ namespace CGALWrappers
    * @param tol Threshold to decide whether or not a simplex is included.
    * @return Vector of arrays, where each array identify a simplex by its vertices.
    */
-  template <int dim0, int dim1, int spacedim>
-  std::vector<std::array<Point<spacedim>, dim1 + 1>>
+  template <int structdim0, int structdim1, int spacedim>
+  std::vector<std::array<Point<spacedim>, structdim1 + 1>>
   compute_intersection_of_cells(
-    const typename Triangulation<dim0, spacedim>::cell_iterator &cell0,
-    const typename Triangulation<dim1, spacedim>::cell_iterator &cell1,
-    const Mapping<dim0, spacedim>                               &mapping0,
-    const Mapping<dim1, spacedim>                               &mapping1,
-    const double                                                 tol = 1e-9);
+    const typename Triangulation<structdim0, spacedim>::cell_iterator &cell0,
+    const typename Triangulation<structdim1, spacedim>::cell_iterator &cell1,
+    const Mapping<structdim0, spacedim>                               &mapping0,
+    const Mapping<structdim1, spacedim>                               &mapping1,
+    const double tol = 1e-9);
 
 
   /**
@@ -68,8 +67,8 @@ namespace CGALWrappers
    *
    * @note The vertices have to be given in CGAL order.
    */
-  template <int dim0, int dim1, int spacedim>
-  std::vector<std::array<Point<spacedim>, dim1 + 1>>
+  template <int structdim0, int structdim1, int spacedim>
+  std::vector<std::array<Point<spacedim>, structdim1 + 1>>
   compute_intersection_of_cells(
     const ArrayView<const Point<spacedim>> &vertices0,
     const ArrayView<const Point<spacedim>> &vertices1,

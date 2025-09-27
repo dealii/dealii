@@ -1,17 +1,16 @@
-/* ---------------------------------------------------------------------
+/* ------------------------------------------------------------------------
  *
- * Copyright (C) 2014 - 2020 by the deal.II authors
+ * SPDX-License-Identifier: LGPL-2.1-or-later
+ * Copyright (C) 2014 - 2024 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
- * The deal.II library is free software; you can use it, redistribute
- * it, and/or modify it under the terms of the GNU Lesser General
- * Public License as published by the Free Software Foundation; either
- * version 2.1 of the License, or (at your option) any later version.
- * The full text of the license can be found in the file LICENSE.md at
- * the top level directory of deal.II.
+ * Part of the source code is dual licensed under Apache-2.0 WITH
+ * LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+ * governing the source code and code contributions can be found in
+ * LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
  *
- * ---------------------------------------------------------------------
+ * ------------------------------------------------------------------------
  *
  * Authors: Wolfgang Bangerth, Texas A&M University, 2014
  *          Luca Heltai, SISSA, 2014
@@ -129,7 +128,7 @@ namespace Step53
   // just another input stream that, for all practical purposes, looks just like
   // the ones we always use.
   //
-  // When reading the data, we read the three columns but throw ignore the
+  // When reading the data, we read the three columns but ignore the
   // first two. The datum in the last column is appended to an array that we
   // the return and that will be copied into the table from which
   // <code>topography_data</code> is initialized. Since the BOOST.iostreams
@@ -147,7 +146,6 @@ namespace Step53
   {
     std::vector<double> data;
 
-    // create a stream where we read from gzipped data
     boost::iostreams::filtering_istream in;
     in.push(boost::iostreams::basic_gzip_decompressor<>());
     in.push(boost::iostreams::file_source("topography.txt.gz"));
@@ -259,13 +257,13 @@ namespace Step53
   {
     const double b   = std::sqrt(R * R * (1 - ellipticity * ellipticity));
     const double ep  = std::sqrt((R * R - b * b) / (b * b));
-    const double p   = std::sqrt(x(0) * x(0) + x(1) * x(1));
-    const double th  = std::atan2(R * x(2), b * p);
-    const double phi = std::atan2(x(1), x(0));
+    const double p   = std::sqrt(x[0] * x[0] + x[1] * x[1]);
+    const double th  = std::atan2(R * x[2], b * p);
+    const double phi = std::atan2(x[1], x[0]);
     const double theta =
-      std::atan2(x(2) + ep * ep * b * std::pow(std::sin(th), 3),
-                 (p -
-                  (ellipticity * ellipticity * R * std::pow(std::cos(th), 3))));
+      std::atan2(x[2] + ep * ep * b * Utilities::fixed_power<3>(std::sin(th)),
+                 (p - (ellipticity * ellipticity * R *
+                       Utilities::fixed_power<3>(std::cos(th)))));
     const double R_bar =
       R / (std::sqrt(1 - ellipticity * ellipticity * std::sin(theta) *
                            std::sin(theta)));

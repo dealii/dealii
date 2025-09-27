@@ -1,17 +1,16 @@
-/* ---------------------------------------------------------------------
+/* ------------------------------------------------------------------------
  *
- * Copyright (C) 2021 - 2022 by the deal.II authors
+ * SPDX-License-Identifier: LGPL-2.1-or-later
+ * Copyright (C) 2021 - 2023 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
- * The deal.II library is free software; you can use it, redistribute
- * it, and/or modify it under the terms of the GNU Lesser General
- * Public License as published by the Free Software Foundation; either
- * version 2.1 of the License, or (at your option) any later version.
- * The full text of the license can be found in the file LICENSE.md at
- * the top level directory of deal.II.
+ * Part of the source code is dual licensed under Apache-2.0 WITH
+ * LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+ * governing the source code and code contributions can be found in
+ * LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
  *
- * ---------------------------------------------------------------------
+ * ------------------------------------------------------------------------
  */
 
 // Test (de)serialization of Trilinos vectors with checkpointing files >4GB. The
@@ -31,7 +30,6 @@ const bool run_big = false;
 #include <deal.II/base/utilities.h>
 
 #include <deal.II/distributed/grid_refinement.h>
-#include <deal.II/distributed/solution_transfer.h>
 #include <deal.II/distributed/tria.h>
 
 #include <deal.II/dofs/dof_accessor.h>
@@ -52,6 +50,7 @@ const bool run_big = false;
 
 #include <deal.II/numerics/data_out.h>
 #include <deal.II/numerics/error_estimator.h>
+#include <deal.II/numerics/solution_transfer.h>
 #include <deal.II/numerics/vector_tools.h>
 
 #include <fstream>
@@ -190,10 +189,8 @@ LaplaceProblem<dim>::run(unsigned int n_cycles_global,
 
         // To be sure, use two SolutionTransfer objects, because the second one
         // will get a large offset
-        parallel::distributed::SolutionTransfer<dim, VectorType> system_trans(
-          dof_handler);
-        parallel::distributed::SolutionTransfer<dim, VectorType> trans2(
-          dof_handler);
+        SolutionTransfer<dim, VectorType> system_trans(dof_handler);
+        SolutionTransfer<dim, VectorType> trans2(dof_handler);
 
         system_trans.prepare_for_serialization(x_system);
         trans2.prepare_for_serialization(y);
@@ -219,10 +216,8 @@ LaplaceProblem<dim>::run(unsigned int n_cycles_global,
         triangulation.coarsen_global(99);
         triangulation.load("restart.mesh");
 
-        parallel::distributed::SolutionTransfer<dim, VectorType> system_trans(
-          dof_handler);
-        parallel::distributed::SolutionTransfer<dim, VectorType> trans2(
-          dof_handler);
+        SolutionTransfer<dim, VectorType> system_trans(dof_handler);
+        SolutionTransfer<dim, VectorType> trans2(dof_handler);
         system_trans.deserialize(x_system);
         trans2.deserialize(y);
 

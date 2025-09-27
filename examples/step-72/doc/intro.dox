@@ -1,5 +1,3 @@
-<br>
-
 <i>This program was contributed by Jean-Paul Pelteret and Wolfgang Bangerth.
 
 Wolfgang Bangerth's work is partially supported by National Science
@@ -10,6 +8,7 @@ Award No. EAR-1550901 and The University of California-Davis.
 </i>
 
 
+<a name="step_72-Intro"></a>
 <h1>Introduction</h1>
 
 <h3>Motivation</h3>
@@ -25,7 +24,7 @@ for the
   @f}
 
 Among the issues we had identified there (see the
-<a href="step_15#extensions">Possibilities for extensions</a> section)
+@ref step_15-Extensions "Possibilities for extensions" section)
 was that when wanting to use
 a Newton iteration, we needed to compute the derivative of the
 residual of the equation with regard to the solution $u$ (here,
@@ -115,8 +114,8 @@ using automatic differentiation
 to compute the linearization of the residual vector. To this end, let
 us change notation for a moment and denote by $F(U)$ not the residual
 of the differential equation, but in fact the *residual vector* --
-i.e., the *discrete residual*. We do so because that is what we
-*actually* do when we discretize the problem on a given mesh: We solve
+i.e., the *discrete residual*. We do so because that is what we *actually*
+do when we discretize the problem on a given mesh: We solve
 the problem $F(U)=0$ where $U$ is the vector of unknowns.
 
 More precisely, the $i$th component of the residual is given by
@@ -153,8 +152,8 @@ clear that they are distinct from each other and from $j$ above.
 Because in this formula, $F(U)$ only depends on the coefficients
 $U_j$, we can compute the derivative $J(U)_{ij}^K$ as a matrix via
 automatic differentiation of $F(U)_i^K$. By the same argument as we
-always use, it is clear that $F(U)^K$ does not actually depend on
-*all* unknowns $U_j$, but only on those unknowns for which $j$ is a
+always use, it is clear that $F(U)^K$ does not actually depend on *all*
+unknowns $U_j$, but only on those unknowns for which $j$ is a
 shape function that lives on cell $K$, and so in practice, we restrict
 $F(U)^K$ and $J(U)^K$ to that part of the vector and matrix that
 corresponds to the *local* DoF indices, and then distribute from the

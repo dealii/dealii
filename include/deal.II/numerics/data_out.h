@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 1999 - 2022 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 1999 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 #ifndef dealii_data_out_h
 #define dealii_data_out_h
@@ -247,9 +246,9 @@ public:
    * tri)quadratic elements, then what is written into the output file is just
    * a (bi-, tri)linear interpolation onto the current mesh, i.e., only the
    * values at the vertices. If this is not good enough, you can, for example,
-   * specify @p n_subdivisions equal to 2 to plot the solution on a once-
-   * refined mesh, or if set to 3, on a mesh where each cell is represented by
-   * 3-by-3 patches. On each of these smaller patches, given the limitations
+   * specify @p n_subdivisions equal to 2 to plot the solution on a
+   * once-refined mesh, or if set to 3, on a mesh where each cell is represented
+   * by 3-by-3 patches. On each of these smaller patches, given the limitations
    * of output formats, the data is still linearly interpolated, but a linear
    * interpolation of quadratic data on a finer mesh is still a better
    * representation of the actual quadratic surface than on the original mesh.

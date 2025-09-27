@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2020 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2015 - 2024 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 
 
@@ -113,7 +112,7 @@ check_quadrature(double *exact_monomials)
           long double f = 1.;
           for (unsigned int x = 0; x < quadrature.size(); ++x)
             {
-              f = std::pow(static_cast<long double>(points[x](0)), i * 1.0L);
+              f = std::pow(static_cast<long double>(points[x][0]), i * 1.0L);
               quadrature_int += f * static_cast<long double>(weights[x]);
             }
           err = std::fabs(quadrature_int - exact_monomials[i]);
@@ -134,7 +133,8 @@ check_GRC_right(double *exact_monomials)
 {
   for (unsigned int n = 1; n < 18; ++n)
     {
-      QGaussRadauChebyshev<1> quadrature(n, QGaussRadauChebyshev<1>::right);
+      QGaussRadauChebyshev<1> quadrature(
+        n, QGaussRadauChebyshev<1>::EndPoint::right);
       const std::vector<Point<1>> &points  = quadrature.get_points();
       const std::vector<double>   &weights = quadrature.get_weights();
 
@@ -149,7 +149,7 @@ check_GRC_right(double *exact_monomials)
           long double f = 1.;
           for (unsigned int x = 0; x < quadrature.size(); ++x)
             {
-              f = std::pow(static_cast<long double>(points[x](0)), i * 1.0L);
+              f = std::pow(static_cast<long double>(points[x][0]), i * 1.0L);
               quadrature_int += f * static_cast<long double>(weights[x]);
             }
           err = std::fabs(quadrature_int - exact_monomials[i]);

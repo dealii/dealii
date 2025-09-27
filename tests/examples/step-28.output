@@ -1,0 +1,12 @@
+Cycle 0:
+   Numbers of active cells:       1156 1156 
+   Numbers of degrees of freedom: 4761 4761 
+
+Iter number: 1 k_eff=491.320865054334 flux_ratio=9.802486617673 max_thermal=1.000000000000
+Iter number: 2 k_eff=427.846932667383 flux_ratio=0.022773665301 max_thermal=1.000000000000
+Iter number: 3 k_eff=427.844771219007 flux_ratio=0.022481398196 max_thermal=1.000000000000
+Iter number: 4 k_eff=427.844770953844 flux_ratio=0.022481387822 max_thermal=1.000000000000
+Iter number: 5 k_eff=427.844770953798 flux_ratio=0.022481387825 max_thermal=1.000000000000
+
+
+

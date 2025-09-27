@@ -1,0 +1,25 @@
+
+DEAL::i = 0, fv1_scalar = 0.622008
+DEAL::i = 1, fv1_scalar = 0.166667
+DEAL::i = 2, fv1_scalar = 0.166667
+DEAL::i = 3, fv1_scalar = 0.0446582
+DEAL::i = 0, fv1_scalar_trivial_renumber = 0.622008
+DEAL::i = 1, fv1_scalar_trivial_renumber = 0.166667
+DEAL::i = 2, fv1_scalar_trivial_renumber = 0.166667
+DEAL::i = 3, fv1_scalar_trivial_renumber = 0.0446582
+DEAL::i = 0, fv1_scalar_inverse_renumber = 0.0446582
+DEAL::i = 1, fv1_scalar_inverse_renumber = 0.166667
+DEAL::i = 2, fv1_scalar_inverse_renumber = 0.166667
+DEAL::i = 3, fv1_scalar_inverse_renumber = 0.622008
+DEAL::q = 0, fv1_scalar_0_q = 0.622008
+DEAL::q = 1, fv1_scalar_0_q = 0.166667
+DEAL::q = 2, fv1_scalar_0_q = 0.166667
+DEAL::q = 3, fv1_scalar_0_q = 0.0446582
+DEAL::q = 0, fv1_scalar_0_q_trivial_renumbering = 0.622008
+DEAL::q = 1, fv1_scalar_0_q_trivial_renumbering = 0.166667
+DEAL::q = 2, fv1_scalar_0_q_trivial_renumbering = 0.166667
+DEAL::q = 3, fv1_scalar_0_q_trivial_renumbering = 0.0446582
+DEAL::q = 0, fv1_scalar_0_q_inverse_renumbering = 0.0446582
+DEAL::q = 1, fv1_scalar_0_q_inverse_renumbering = 0.166667
+DEAL::q = 2, fv1_scalar_0_q_inverse_renumbering = 0.166667
+DEAL::q = 3, fv1_scalar_0_q_inverse_renumbering = 0.622008

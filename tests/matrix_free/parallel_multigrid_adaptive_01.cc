@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2014 - 2023 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2015 - 2024 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 
 
@@ -55,7 +54,7 @@ template <int dim,
           int fe_degree,
           int n_q_points_1d = fe_degree + 1,
           typename number   = double>
-class LaplaceOperator : public Subscriptor
+class LaplaceOperator : public EnableObserverPointer
 {
 public:
   LaplaceOperator(){};
@@ -80,7 +79,7 @@ public:
       {
         const IndexSet relevant_dofs =
           DoFTools::extract_locally_relevant_dofs(dof_handler);
-        constraints.reinit(relevant_dofs);
+        constraints.reinit(dof_handler.locally_owned_dofs(), relevant_dofs);
         DoFTools::make_hanging_node_constraints(dof_handler, constraints);
         VectorTools::interpolate_boundary_values(dof_handler,
                                                  dirichlet_boundary,
@@ -88,9 +87,11 @@ public:
       }
     else
       {
+        const IndexSet &locally_owned =
+          dof_handler.locally_owned_mg_dofs(level);
         const IndexSet relevant_dofs =
           DoFTools::extract_locally_relevant_level_dofs(dof_handler, level);
-        constraints.reinit(relevant_dofs);
+        constraints.reinit(locally_owned, relevant_dofs);
         constraints.add_lines(mg_constrained_dofs.get_boundary_indices(level));
 
         const std::vector<types::global_dof_index> interface_indices =
@@ -99,8 +100,6 @@ public:
         edge_constrained_indices.clear();
         edge_constrained_indices.reserve(interface_indices.size());
         edge_constrained_values.resize(interface_indices.size());
-        const IndexSet &locally_owned =
-          dof_handler.locally_owned_mg_dofs(level);
         for (unsigned int i = 0; i < interface_indices.size(); ++i)
           if (locally_owned.is_element(interface_indices[i]))
             edge_constrained_indices.push_back(
@@ -401,7 +400,7 @@ private:
 
 
 template <typename LAPLACEOPERATOR>
-class MGInterfaceMatrix : public Subscriptor
+class MGInterfaceMatrix : public EnableObserverPointer
 {
 public:
   void
@@ -425,7 +424,7 @@ public:
   }
 
 private:
-  SmartPointer<const LAPLACEOPERATOR> laplace;
+  ObserverPointer<const LAPLACEOPERATOR> laplace;
 };
 
 
@@ -479,7 +478,8 @@ do_test(const DoFHandler<dim> &dof)
   AffineConstraints<double> hanging_node_constraints;
   const IndexSet            locally_relevant_dofs =
     DoFTools::extract_locally_relevant_dofs(dof);
-  hanging_node_constraints.reinit(locally_relevant_dofs);
+  hanging_node_constraints.reinit(dof.locally_owned_dofs(),
+                                  locally_relevant_dofs);
   DoFTools::make_hanging_node_constraints(dof, hanging_node_constraints);
   hanging_node_constraints.close();
 

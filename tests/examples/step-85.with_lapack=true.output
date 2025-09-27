@@ -1,0 +1,56 @@
+Creating background mesh
+Refinement cycle 0
+Setting up discrete level set function
+Classifying cells
+Distributing degrees of freedom
+Initializing matrices
+Assembling
+Solving system
+Computing L2 error
+
+Cycle Mesh size   L2-Error   
+    0    0.3025 8.0657e-02 - 
+
+Refinement cycle 1
+Setting up discrete level set function
+Classifying cells
+Distributing degrees of freedom
+Initializing matrices
+Assembling
+Solving system
+Writing vtu file
+Computing L2 error
+
+Cycle Mesh size    L2-Error     
+    0    0.3025 8.0657e-02    - 
+    1    0.1513 1.8711e-02 2.11 
+
+Refinement cycle 2
+Setting up discrete level set function
+Classifying cells
+Distributing degrees of freedom
+Initializing matrices
+Assembling
+Solving system
+Computing L2 error
+
+Cycle Mesh size    L2-Error     
+    0    0.3025 8.0657e-02    - 
+    1    0.1513 1.8711e-02 2.11 
+    2    0.0756 4.1624e-03 2.17 
+
+Refinement cycle 3
+Setting up discrete level set function
+Classifying cells
+Distributing degrees of freedom
+Initializing matrices
+Assembling
+Solving system
+Computing L2 error
+
+Cycle Mesh size    L2-Error     
+    0    0.3025 8.0657e-02    - 
+    1    0.1513 1.8711e-02 2.11 
+    2    0.0756 4.1624e-03 2.17 
+    3    0.0378 9.3979e-04 2.15 
+

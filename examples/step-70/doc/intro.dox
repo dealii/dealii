@@ -1,5 +1,3 @@
-<br>
-
 <i>This program was contributed by Luca Heltai (International School for
 Advanced Studies, Trieste), Bruno Blais (Polytechnique Montréal),
 and Rene Gassmöller (University of California Davis)
@@ -8,6 +6,7 @@ and Rene Gassmöller (University of California Davis)
 @dealiiTutorialDOI{10.5281/zenodo.3829064,https://zenodo.org/badge/DOI/10.5281/zenodo.3829064.svg}
 
 
+<a name="step_70-Intro"></a>
 <h1>Introduction</h1>
 
 <h3>Massively parallel non-matching grid simulations of fluid structure interaction problems</h3>
@@ -402,7 +401,7 @@ transforms the reference element $\hat T$ into the element $T$: $\hat y_i = G^{-
 
 
 <p align="center"> <img
-  src="https://www.dealii.org/images/steps/developer/step-60.C_interpolation.png"
+  src="https://dealii.org/images/steps/developer/step-60.C_interpolation.png"
   alt=""> </p>
 
 In step-60, the second through fourth steps above were computed by calling, in turn,

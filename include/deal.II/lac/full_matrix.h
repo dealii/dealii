@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 1999 - 2023 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 1999 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 #ifndef dealii_full_matrix_h
 #define dealii_full_matrix_h
@@ -25,6 +24,7 @@
 
 #include <deal.II/lac/exceptions.h>
 #include <deal.II/lac/identity_matrix.h>
+#include <deal.II/lac/vector_operation.h>
 
 #include <cstring>
 #include <iomanip>
@@ -86,8 +86,7 @@ public:
    * std::complex.
    */
   static_assert(
-    std::is_arithmetic<
-      typename numbers::NumberTraits<number>::real_type>::value,
+    std::is_arithmetic_v<typename numbers::NumberTraits<number>::real_type>,
     "The FullMatrix class only supports basic numeric types. In particular, it "
     "does not support automatically differentiated numbers.");
 
@@ -498,22 +497,26 @@ public:
    *
    * The parameters allow for a flexible setting of the output format:
    *
-   * @arg <tt>precision</tt> denotes the number of trailing digits.
+   * @param out This specifies the stream to write to.
    *
-   * @arg <tt>scientific</tt> is used to determine the number format, where
-   * <tt>scientific</tt> = <tt>false</tt> means fixed point notation.
+   * @param precision denotes the number of trailing digits.
    *
-   * @arg <tt>width</tt> denotes the with of each column. A zero entry for
-   * <tt>width</tt> makes the function compute a width, but it may be changed
+   * @param scientific is used to determine the number format, where
+   * <code>scientific = false</code> means fixed point notation.
+   *
+   * @param width denotes the with of each column. A zero entry for
+   * @p width makes the function compute a width, but it may be changed
    * to a positive value, if output is crude.
    *
-   * @arg <tt>zero_string</tt> specifies a string printed for zero entries.
+   * @param zero_string specifies a string printed for zero entries.
    *
-   * @arg <tt>denominator</tt> Multiply the whole matrix by this common
+   * @param denominator Multiply the whole matrix by this common
    * denominator to get nicer numbers.
    *
-   * @arg <tt>threshold</tt>: all entries with absolute value smaller than
+   * @param threshold all entries with absolute value smaller than
    * this are considered zero.
+   *
+   * @param separator specifies a string printed to separate row entries.
    */
   void
   print_formatted(std::ostream      &out,
@@ -522,7 +525,8 @@ public:
                   const unsigned int width       = 0,
                   const char        *zero_string = " ",
                   const double       denominator = 1.,
-                  const double       threshold   = 0.) const;
+                  const double       threshold   = 0.,
+                  const char        *separator   = " ") const;
 
   /**
    * Determine an estimate for the memory consumption (in bytes) of this
@@ -971,6 +975,33 @@ public:
                  const bool                transpose_D = false,
                  const number              scaling     = number(1.));
 
+
+  /**
+   * @brief Compute the Kronecker product of two matrices.
+   *
+   * This function computes the Kronecker product of two matrices A and B, and
+   * stores the result in the current matrix. The Kronecker product of an
+   * m x n matrix A and a p x q matrix B is an (m*p) x (n*q) matrix defined as:
+   *
+   * ```
+   * A ⊗ B = | a11*B   a12*B   ...   a1n*B |
+   *         | a21*B   a22*B   ...   a2n*B |
+   *         | ...     ...     ...   ...   |
+   *         | am1*B   am2*B   ...   amn*B |
+   * ```
+   *
+   * where aij are the elements of the matrix A.
+   *
+   * @param A The first matrix (m x n).
+   * @param B The second matrix (p x q).
+   * @param adding If `true`, the result is added to the current matrix. If
+   *               `false` (default), the current matrix is overwritten.
+   */
+  void
+  kronecker_product(const FullMatrix<number> &A,
+                    const FullMatrix<number> &B,
+                    const bool                adding = false);
+
   /**
    * Matrix-vector-multiplication.
    *
@@ -1075,6 +1106,11 @@ public:
   void
   backward(Vector<number2> &dst, const Vector<number2> &src) const;
 
+  /**
+   * Dummy function for compatibility with distributed, parallel matrices.
+   */
+  void compress(VectorOperation::values);
+
   /** @} */
 
   /**
@@ -1149,7 +1185,6 @@ FullMatrix<number> &
 FullMatrix<number>::operator=(const number d)
 {
   Assert(d == number(0), ExcScalarAssignmentOnlyForZeroValue());
-  (void)d; // removes -Wunused-parameter warning in optimized mode
 
   if (this->n_elements() != 0)
     this->reset_values();

@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2018 - 2022 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2018 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 
 
@@ -97,27 +96,30 @@ test()
     deallog << "  Cumulative dofs per cell: " << dof_counter << std::endl;
   }
 
-#ifdef DEBUG
-  parallel::distributed::Triangulation<dim> other_tria(MPI_COMM_WORLD);
-  GridGenerator::hyper_cube(other_tria);
-  other_tria.refine_global(3);
-
-  dh.reinit(other_tria);
-  dh.distribute_dofs(fe_collection);
-
-  try
+  if constexpr (running_in_debug_mode())
     {
-      tria.repartition();
+      parallel::distributed::Triangulation<dim> other_tria(MPI_COMM_WORLD);
+      GridGenerator::hyper_cube(other_tria);
+      other_tria.refine_global(3);
+
+      dh.reinit(other_tria);
+      dh.distribute_dofs(fe_collection);
+
+      try
+        {
+          tria.repartition();
+        }
+      catch (const ExceptionBase &e)
+        {
+          deallog << e.get_exc_name() << std::endl;
+        }
     }
-  catch (const ExceptionBase &e)
+  else
     {
-      deallog << e.get_exc_name() << std::endl;
+      deallog
+        << "ExcMessage(\"Triangulation associated with the DoFHandler has changed!\")"
+        << std::endl;
     }
-#else
-  deallog
-    << "ExcMessage(\"Triangulation associated with the DoFHandler has changed!\")"
-    << std::endl;
-#endif
 
   // make sure no processor is hanging
   MPI_Barrier(MPI_COMM_WORLD);

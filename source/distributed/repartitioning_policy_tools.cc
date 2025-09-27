@@ -1,21 +1,19 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2021 - 2022 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2021 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 
-#include <deal.II/base/mpi_compute_index_owner_internal.h>
-#include <deal.II/base/mpi_consensus_algorithms.h>
+#include <deal.II/base/mpi.h>
 
 #include <deal.II/distributed/repartitioning_policy_tools.h>
 #include <deal.II/distributed/tria_base.h>
@@ -72,7 +70,7 @@ namespace RepartitioningPolicyTools
     return {};
 #else
 
-    const auto comm = tria->get_communicator();
+    const auto comm = tria->get_mpi_communicator();
 
     const unsigned int process_has_active_locally_owned_cells =
       tria->n_locally_owned_active_cells() > 0;
@@ -115,10 +113,10 @@ namespace RepartitioningPolicyTools
     Assert(
       tria_fine.all_reference_cells_are_hyper_cube(),
       ExcMessage(
-        "FirstChildPolicy is only working for pure hex meshes at the moment."))
+        "FirstChildPolicy is only working for pure hex meshes at the moment."));
 
-      const internal::CellIDTranslator<dim>
-        cell_id_translator(n_coarse_cells, n_global_levels);
+    const internal::CellIDTranslator<dim> cell_id_translator(n_coarse_cells,
+                                                             n_global_levels);
     is_level_partitions.set_size(cell_id_translator.size());
 
     for (const auto &cell : tria_fine.active_cell_iterators())
@@ -135,7 +133,7 @@ namespace RepartitioningPolicyTools
   FirstChildPolicy<dim, spacedim>::partition(
     const Triangulation<dim, spacedim> &tria_coarse_in) const
   {
-    const auto communicator = tria_coarse_in.get_communicator();
+    const auto communicator = tria_coarse_in.get_mpi_communicator();
 
     const internal::CellIDTranslator<dim> cell_id_translator(n_coarse_cells,
                                                              n_global_levels);
@@ -146,28 +144,14 @@ namespace RepartitioningPolicyTools
       if (cell->is_locally_owned())
         is_coarse.add_index(cell_id_translator.translate(cell));
 
-    std::vector<unsigned int> owning_ranks_of_coarse_cells(
-      is_coarse.n_elements());
-    {
-      Utilities::MPI::internal::ComputeIndexOwner::ConsensusAlgorithmsPayload
-        process(is_level_partitions,
-                is_coarse,
-                communicator,
-                owning_ranks_of_coarse_cells,
-                false);
-
-      Utilities::MPI::ConsensusAlgorithms::Selector<
-        std::vector<
-          std::pair<types::global_cell_index, types::global_cell_index>>,
-        std::vector<unsigned int>>
-        consensus_algorithm;
-      consensus_algorithm.run(process, communicator);
-    }
+    const std::vector<unsigned int> owning_ranks_of_coarse_cells =
+      Utilities::MPI::compute_index_owner(is_level_partitions,
+                                          is_coarse,
+                                          communicator);
 
     const auto tria =
       dynamic_cast<const parallel::TriangulationBase<dim, spacedim> *>(
         &tria_coarse_in);
-
     Assert(tria, ExcNotImplemented());
 
     LinearAlgebra::distributed::Vector<double> partition(
@@ -213,7 +197,7 @@ namespace RepartitioningPolicyTools
                       tria_in.end()),
                     [](const auto &cell) { return cell.is_locally_owned(); });
 
-    const auto comm = tria_in.get_communicator();
+    const auto comm = tria_in.get_mpi_communicator();
 
     if (Utilities::MPI::min(n_locally_owned_active_cells, comm) >= n_min_cells)
       return {}; // all processes have enough cells
@@ -290,7 +274,7 @@ namespace RepartitioningPolicyTools
 
     std::vector<unsigned int> weights(partitioner->locally_owned_size());
 
-    const auto mpi_communicator = tria_in.get_communicator();
+    const auto mpi_communicator = tria_in.get_mpi_communicator();
     const auto n_subdomains = Utilities::MPI::n_mpi_processes(mpi_communicator);
 
     // determine weight of each cell
@@ -304,29 +288,11 @@ namespace RepartitioningPolicyTools
     for (const auto &weight : weights)
       process_local_weight += weight;
 
-    // determine partial sum of weights of this process
-    std::uint64_t process_local_weight_offset = 0;
-
-    int ierr = MPI_Exscan(
-      &process_local_weight,
-      &process_local_weight_offset,
-      1,
-      Utilities::MPI::mpi_type_id_for_type<decltype(process_local_weight)>,
-      MPI_SUM,
-      tria->get_communicator());
-    AssertThrowMPI(ierr);
-
-    // total weight of all processes
-    std::uint64_t total_weight =
-      process_local_weight_offset + process_local_weight;
-
-    ierr =
-      MPI_Bcast(&total_weight,
-                1,
-                Utilities::MPI::mpi_type_id_for_type<decltype(total_weight)>,
-                n_subdomains - 1,
-                mpi_communicator);
-    AssertThrowMPI(ierr);
+    // determine partial sum of weights of this process, as well as the total
+    // weight
+    const auto [process_local_weight_offset, total_weight] =
+      Utilities::MPI::partial_and_total_sum(process_local_weight,
+                                            tria->get_mpi_communicator());
 
     // set up partition
     LinearAlgebra::distributed::Vector<double> partition(partitioner);
@@ -347,6 +313,6 @@ namespace RepartitioningPolicyTools
 
 
 /*-------------- Explicit Instantiations -------------------------------*/
-#include "repartitioning_policy_tools.inst"
+#include "distributed/repartitioning_policy_tools.inst"
 
 DEAL_II_NAMESPACE_CLOSE

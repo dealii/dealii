@@ -1,17 +1,16 @@
-## ---------------------------------------------------------------------
+## ------------------------------------------------------------------------
 ##
-## Copyright (C) 2013 - 2023 by the deal.II authors
+## SPDX-License-Identifier: LGPL-2.1-or-later
+## Copyright (C) 2013 - 2025 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
-## The deal.II library is free software; you can use it, redistribute
-## it, and/or modify it under the terms of the GNU Lesser General
-## Public License as published by the Free Software Foundation; either
-## version 2.1 of the License, or (at your option) any later version.
-## The full text of the license can be found in the file LICENSE.md at
-## the top level directory of deal.II.
+## Part of the source code is dual licensed under Apache-2.0 WITH
+## LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+## governing the source code and code contributions can be found in
+## LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 ##
-## ---------------------------------------------------------------------
+## ------------------------------------------------------------------------
 
 #
 # A Macro to set up tests for the testsuite
@@ -65,7 +64,7 @@
 #
 # The following variables must be set:
 #
-#  BASH
+#   BASH
 #     - Complete path to the bash shell.
 #
 #   NUMDIFF_EXECUTABLE
@@ -92,8 +91,7 @@
 #       to 0.
 #
 #   ENABLE_PERFORMANCE_TESTS
-#     - If defined and set to true the execution of performance tests will
-#       be enabled.
+#     - If set to true the execution of performance tests will be enabled.
 #
 #   TESTING_ENVIRONMENT
 #     - Specifies the performance test testing environment. Valid options
@@ -161,6 +159,8 @@ function(deal_ii_add_test _category _test_name _comparison_file)
   # ranks used for the test to the maximum number of allowed ranks. If no
   # limit has been specified, i.e., TEST_MPI_RANK_LIMIT is 0, skip defining
   # the test.
+  #
+  # This mechanism is specifically used in the performance test suite.
   #
   if("${_n_cpu}" STREQUAL "max")
     if(TEST_MPI_RANK_LIMIT EQUAL 0)
@@ -408,6 +408,10 @@ function(deal_ii_add_test _category _test_name _comparison_file)
       set(_test_full      ${_category}/${_test_name}) # full test name
       set(_test_directory ${CMAKE_CURRENT_BINARY_DIR}/${_test_name}.${_build_lowercase}) # directory to run the test in
 
+      if("${_n_cpu}" STREQUAL "0" AND "${_n_threads}" STREQUAL "0")
+        string(APPEND _test_directory "/serial")
+      endif()
+
       if(NOT "${_n_cpu}" STREQUAL "0")
         string(APPEND _test_target   ".mpirun${_n_cpu}")
         string(APPEND _test_full     ".mpirun=${_n_cpu}")
@@ -559,6 +563,8 @@ function(deal_ii_add_test _category _test_name _comparison_file)
         DEPENDS
           ${_target}
           ${DEAL_II_PATH}/${DEAL_II_SHARE_RELDIR}/scripts/normalize.pl
+        COMMENT
+          "Normalizing test output file ${_test_directory}/output"
         VERBATIM
         )
 

@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2005 - 2023 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2022 - 2024 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 #ifndef dealii_trilinos_utilities_h
 #define dealii_trilinos_utilities_h
@@ -21,16 +20,25 @@
 #include <deal.II/base/exceptions.h>
 
 #ifdef DEAL_II_WITH_TRILINOS
+
+DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
 #  include <Epetra_Comm.h>
 #  include <Epetra_Map.h>
 #  include <Teuchos_Comm.hpp>
 #  include <Teuchos_RCP.hpp>
+
 #  ifdef DEAL_II_WITH_MPI
 #    include <Epetra_MpiComm.h>
 #  else
 #    include <Epetra_SerialComm.h>
 #  endif
+
+#  ifdef DEAL_II_TRILINOS_WITH_TPETRA
+#    include <Teuchos_RCPDecl.hpp>
+#  endif // DEAL_II_TRILINOS_WITH_TPETRA
+DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
 #endif
+
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -180,6 +188,61 @@ namespace Utilities
     duplicate_map(const Epetra_BlockMap &map, const Epetra_Comm &comm);
   } // namespace Trilinos
 #endif
+
+
+#ifdef DEAL_II_TRILINOS_WITH_TPETRA
+  namespace Trilinos
+  {
+    /**
+     * Return the underlying MPI_Comm communicator from the
+     * <a
+     * href="https://docs.trilinos.org/dev/packages/teuchos/doc/html/classTeuchos_1_1Comm.html">Teuchos::Comm</a>
+     * communicator.
+     */
+    MPI_Comm
+    teuchos_comm_to_mpi_comm(
+      const Teuchos::RCP<const Teuchos::Comm<int>> &teuchos_comm);
+
+    namespace internal
+    {
+      /**
+       * Creates and returns a
+       * <a
+       * href="https://docs.trilinos.org/dev/packages/teuchos/doc/html/classTeuchos_1_1RCP.html">Teuchos::RCP</a>
+       * object for type T.
+       *
+       * @note In Trilinos 14.0.0, the function
+       * <a
+       * href="https://docs.trilinos.org/dev/packages/teuchos/doc/html/namespaceTeuchos.html#a280c0ab8c9ee8d0481114d4edf5a3393">Teuchos::make_rcp()</a>
+       * was introduced, which should be preferred to this function.
+       */
+#  if defined(DOXYGEN) || !DEAL_II_TRILINOS_VERSION_GTE(14, 0, 0)
+      template <class T, class... Args>
+      Teuchos::RCP<T>
+      make_rcp(Args &&...args);
+#  else
+      using Teuchos::make_rcp;
+#  endif // defined DOXYGEN || !DEAL_II_TRILINOS_VERSION_GTE(14, 0, 0)
+    }    // namespace internal
+
+
+
+    /* ------------------------- Inline functions ---------------------- */
+    namespace internal
+    {
+#  if !DEAL_II_TRILINOS_VERSION_GTE(14, 0, 0)
+      template <class T, class... Args>
+      inline Teuchos::RCP<T>
+      make_rcp(Args &&...args)
+      {
+        return Teuchos::RCP<T>(new T(std::forward<Args>(args)...));
+      }
+#  endif // !DEAL_II_TRILINOS_VERSION_GTE(14, 0, 0)
+    }    // namespace internal
+
+  }    // namespace Trilinos
+#endif // DEAL_II_TRILINOS_WITH_TPETRA
+
 } // namespace Utilities
 
 DEAL_II_NAMESPACE_CLOSE

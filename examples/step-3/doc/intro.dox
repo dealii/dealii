@@ -1,4 +1,4 @@
-<a name="Intro"></a>
+<a name="step_3-Intro"></a>
 <h1>Introduction</h1>
 
 @dealiiVideoLecture{10}
@@ -232,8 +232,8 @@ be visualized using one of the common visualization programs.
 
 @note The preceding overview of all the important steps of any finite element
 implementation has its counterpart in deal.II: The library can naturally be
-grouped into a number of "modules" that cover the basic concepts just
-outlined. You can access these modules through the tab at the top of this
+grouped into a number of "topics" that cover the basic concepts just
+outlined. You can access these topics through the "Topics" tab at the top of this
 page. An overview of the most fundamental groups of concepts is also available
 on the <a href="index.html">front page of the deal.II manual</a>.
 

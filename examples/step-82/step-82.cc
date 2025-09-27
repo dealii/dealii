@@ -1,17 +1,16 @@
-/* ---------------------------------------------------------------------
+/* ------------------------------------------------------------------------
  *
- * Copyright (C) 2021 - 2023 by the deal.II authors
+ * SPDX-License-Identifier: LGPL-2.1-or-later
+ * Copyright (C) 2021 - 2024 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
- * The deal.II library is free software; you can use it, redistribute
- * it, and/or modify it under the terms of the GNU Lesser General
- * Public License as published by the Free Software Foundation; either
- * version 2.1 of the License, or (at your option) any later version.
- * The full text of the license can be found in the file LICENSE.md at
- * the top level directory of deal.II.
+ * Part of the source code is dual licensed under Apache-2.0 WITH
+ * LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+ * governing the source code and code contributions can be found in
+ * LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
  *
- * ---------------------------------------------------------------------
+ * ------------------------------------------------------------------------
  *
  * Authors: Andrea Bonito and Diane Guignard, 2021.
  */
@@ -35,8 +34,6 @@
 #include <deal.II/base/quadrature_lib.h>
 #include <deal.II/base/function.h>
 
-#include <deal.II/numerics/vector_tools.h>
-#include <deal.II/numerics/matrix_tools.h>
 #include <deal.II/numerics/data_out.h>
 
 #include <deal.II/lac/vector.h>
@@ -120,14 +117,14 @@ namespace Step82
 
     const unsigned int n_refinements;
 
-    FE_DGQ<dim>     fe;
-    DoFHandler<dim> dof_handler;
+    const FE_DGQ<dim> fe;
+    DoFHandler<dim>   dof_handler;
 
     // We also need a variable that describes the finite element space
     // $[\mathbb{V}_h]^{d\times d}$ used for the two lifting
     // operators. The other member variables below are as in most of the other
     // tutorial programs.
-    FESystem<dim> fe_lift;
+    const FESystem<dim> fe_lift;
 
     SparsityPattern      sparsity_pattern;
     SparseMatrix<double> matrix;
@@ -169,29 +166,31 @@ namespace Step82
 
     if (dim == 2)
       {
-        return_value = 24.0 * std::pow(p(1) * (1.0 - p(1)), 2) +
-                       +24.0 * std::pow(p(0) * (1.0 - p(0)), 2) +
-                       2.0 * (2.0 - 12.0 * p(0) + 12.0 * p(0) * p(0)) *
-                         (2.0 - 12.0 * p(1) + 12.0 * p(1) * p(1));
+        return_value = 24.0 * Utilities::fixed_power<2>(p[1] * (1.0 - p[1])) +
+                       +24.0 * Utilities::fixed_power<2>(p[0] * (1.0 - p[0])) +
+                       2.0 * (2.0 - 12.0 * p[0] + 12.0 * p[0] * p[0]) *
+                         (2.0 - 12.0 * p[1] + 12.0 * p[1] * p[1]);
       }
     else if (dim == 3)
       {
-        return_value =
-          24.0 * std::pow(p(1) * (1.0 - p(1)) * p(2) * (1.0 - p(2)), 2) +
-          24.0 * std::pow(p(0) * (1.0 - p(0)) * p(2) * (1.0 - p(2)), 2) +
-          24.0 * std::pow(p(0) * (1.0 - p(0)) * p(1) * (1.0 - p(1)), 2) +
-          2.0 * (2.0 - 12.0 * p(0) + 12.0 * p(0) * p(0)) *
-            (2.0 - 12.0 * p(1) + 12.0 * p(1) * p(1)) *
-            std::pow(p(2) * (1.0 - p(2)), 2) +
-          2.0 * (2.0 - 12.0 * p(0) + 12.0 * p(0) * p(0)) *
-            (2.0 - 12.0 * p(2) + 12.0 * p(2) * p(2)) *
-            std::pow(p(1) * (1.0 - p(1)), 2) +
-          2.0 * (2.0 - 12.0 * p(1) + 12.0 * p(1) * p(1)) *
-            (2.0 - 12.0 * p(2) + 12.0 * p(2) * p(2)) *
-            std::pow(p(0) * (1.0 - p(0)), 2);
+        return_value = 24.0 * Utilities::fixed_power<2>(p[1] * (1.0 - p[1]) *
+                                                        p[2] * (1.0 - p[2])) +
+                       24.0 * Utilities::fixed_power<2>(p[0] * (1.0 - p[0]) *
+                                                        p[2] * (1.0 - p[2])) +
+                       24.0 * Utilities::fixed_power<2>(p[0] * (1.0 - p[0]) *
+                                                        p[1] * (1.0 - p[1])) +
+                       2.0 * (2.0 - 12.0 * p[0] + 12.0 * p[0] * p[0]) *
+                         (2.0 - 12.0 * p[1] + 12.0 * p[1] * p[1]) *
+                         Utilities::fixed_power<2>(p[2] * (1.0 - p[2])) +
+                       2.0 * (2.0 - 12.0 * p[0] + 12.0 * p[0] * p[0]) *
+                         (2.0 - 12.0 * p[2] + 12.0 * p[2] * p[2]) *
+                         Utilities::fixed_power<2>(p[1] * (1.0 - p[1])) +
+                       2.0 * (2.0 - 12.0 * p[1] + 12.0 * p[1] * p[1]) *
+                         (2.0 - 12.0 * p[2] + 12.0 * p[2] * p[2]) *
+                         Utilities::fixed_power<2>(p[0] * (1.0 - p[0]));
       }
     else
-      Assert(false, ExcNotImplemented());
+      DEAL_II_NOT_IMPLEMENTED();
 
     return return_value;
   }
@@ -230,16 +229,16 @@ namespace Step82
 
     if (dim == 2)
       {
-        return_value = std::pow(p(0) * (1.0 - p(0)) * p(1) * (1.0 - p(1)), 2);
+        return_value =
+          Utilities::fixed_power<2>(p[0] * (1.0 - p[0]) * p[1] * (1.0 - p[1]));
       }
     else if (dim == 3)
       {
-        return_value = std::pow(p(0) * (1.0 - p(0)) * p(1) * (1.0 - p(1)) *
-                                  p(2) * (1.0 - p(2)),
-                                2);
+        return_value = Utilities::fixed_power<2>(
+          p[0] * (1.0 - p[0]) * p[1] * (1.0 - p[1]) * p[2] * (1.0 - p[2]));
       }
     else
-      Assert(false, ExcNotImplemented());
+      DEAL_II_NOT_IMPLEMENTED();
 
     return return_value;
   }
@@ -256,26 +255,31 @@ namespace Step82
     if (dim == 2)
       {
         return_gradient[0] =
-          (2.0 * p(0) - 6.0 * std::pow(p(0), 2) + 4.0 * std::pow(p(0), 3)) *
-          std::pow(p(1) * (1.0 - p(1)), 2);
+          (2.0 * p[0] - 6.0 * Utilities::fixed_power<2>(p[0]) +
+           4.0 * Utilities::fixed_power<3>(p[0])) *
+          Utilities::fixed_power<2>(p[1] * (1.0 - p[1]));
         return_gradient[1] =
-          (2.0 * p(1) - 6.0 * std::pow(p(1), 2) + 4.0 * std::pow(p(1), 3)) *
-          std::pow(p(0) * (1.0 - p(0)), 2);
+          (2.0 * p[1] - 6.0 * Utilities::fixed_power<2>(p[1]) +
+           4.0 * Utilities::fixed_power<3>(p[1])) *
+          Utilities::fixed_power<2>(p[0] * (1.0 - p[0]));
       }
     else if (dim == 3)
       {
         return_gradient[0] =
-          (2.0 * p(0) - 6.0 * std::pow(p(0), 2) + 4.0 * std::pow(p(0), 3)) *
-          std::pow(p(1) * (1.0 - p(1)) * p(2) * (1.0 - p(2)), 2);
+          (2.0 * p[0] - 6.0 * Utilities::fixed_power<2>(p[0]) +
+           4.0 * Utilities::fixed_power<3>(p[0])) *
+          Utilities::fixed_power<2>(p[1] * (1.0 - p[1]) * p[2] * (1.0 - p[2]));
         return_gradient[1] =
-          (2.0 * p(1) - 6.0 * std::pow(p(1), 2) + 4.0 * std::pow(p(1), 3)) *
-          std::pow(p(0) * (1.0 - p(0)) * p(2) * (1.0 - p(2)), 2);
+          (2.0 * p[1] - 6.0 * Utilities::fixed_power<2>(p[1]) +
+           4.0 * Utilities::fixed_power<3>(p[1])) *
+          Utilities::fixed_power<2>(p[0] * (1.0 - p[0]) * p[2] * (1.0 - p[2]));
         return_gradient[2] =
-          (2.0 * p(2) - 6.0 * std::pow(p(2), 2) + 4.0 * std::pow(p(2), 3)) *
-          std::pow(p(0) * (1.0 - p(0)) * p(1) * (1.0 - p(1)), 2);
+          (2.0 * p[2] - 6.0 * Utilities::fixed_power<2>(p[2]) +
+           4.0 * Utilities::fixed_power<3>(p[2])) *
+          Utilities::fixed_power<2>(p[0] * (1.0 - p[0]) * p[1] * (1.0 - p[1]));
       }
     else
-      Assert(false, ExcNotImplemented());
+      DEAL_II_NOT_IMPLEMENTED();
 
     return return_gradient;
   }
@@ -291,40 +295,48 @@ namespace Step82
 
     if (dim == 2)
       {
-        return_hessian[0][0] = (2.0 - 12.0 * p(0) + 12.0 * p(0) * p(0)) *
-                               std::pow(p(1) * (1.0 - p(1)), 2);
+        return_hessian[0][0] = (2.0 - 12.0 * p[0] + 12.0 * p[0] * p[0]) *
+                               Utilities::fixed_power<2>(p[1] * (1.0 - p[1]));
         return_hessian[0][1] =
-          (2.0 * p(0) - 6.0 * std::pow(p(0), 2) + 4.0 * std::pow(p(0), 3)) *
-          (2.0 * p(1) - 6.0 * std::pow(p(1), 2) + 4.0 * std::pow(p(1), 3));
-        return_hessian[1][1] = (2.0 - 12.0 * p(1) + 12.0 * p(1) * p(1)) *
-                               std::pow(p(0) * (1.0 - p(0)), 2);
+          (2.0 * p[0] - 6.0 * Utilities::fixed_power<2>(p[0]) +
+           4.0 * Utilities::fixed_power<3>(p[0])) *
+          (2.0 * p[1] - 6.0 * Utilities::fixed_power<2>(p[1]) +
+           4.0 * Utilities::fixed_power<3>(p[1]));
+        return_hessian[1][1] = (2.0 - 12.0 * p[1] + 12.0 * p[1] * p[1]) *
+                               Utilities::fixed_power<2>(p[0] * (1.0 - p[0]));
       }
     else if (dim == 3)
       {
         return_hessian[0][0] =
-          (2.0 - 12.0 * p(0) + 12.0 * p(0) * p(0)) *
-          std::pow(p(1) * (1.0 - p(1)) * p(2) * (1.0 - p(2)), 2);
+          (2.0 - 12.0 * p[0] + 12.0 * p[0] * p[0]) *
+          Utilities::fixed_power<2>(p[1] * (1.0 - p[1]) * p[2] * (1.0 - p[2]));
         return_hessian[0][1] =
-          (2.0 * p(0) - 6.0 * std::pow(p(0), 2) + 4.0 * std::pow(p(0), 3)) *
-          (2.0 * p(1) - 6.0 * std::pow(p(1), 2) + 4.0 * std::pow(p(1), 3)) *
-          std::pow(p(2) * (1.0 - p(2)), 2);
+          (2.0 * p[0] - 6.0 * Utilities::fixed_power<2>(p[0]) +
+           4.0 * Utilities::fixed_power<3>(p[0])) *
+          (2.0 * p[1] - 6.0 * Utilities::fixed_power<2>(p[1]) +
+           4.0 * Utilities::fixed_power<3>(p[1])) *
+          Utilities::fixed_power<2>(p[2] * (1.0 - p[2]));
         return_hessian[0][2] =
-          (2.0 * p(0) - 6.0 * std::pow(p(0), 2) + 4.0 * std::pow(p(0), 3)) *
-          (2.0 * p(2) - 6.0 * std::pow(p(2), 2) + 4.0 * std::pow(p(2), 3)) *
-          std::pow(p(1) * (1.0 - p(1)), 2);
+          (2.0 * p[0] - 6.0 * Utilities::fixed_power<2>(p[0]) +
+           4.0 * Utilities::fixed_power<3>(p[0])) *
+          (2.0 * p[2] - 6.0 * Utilities::fixed_power<2>(p[2]) +
+           4.0 * Utilities::fixed_power<3>(p[2])) *
+          Utilities::fixed_power<2>(p[1] * (1.0 - p[1]));
         return_hessian[1][1] =
-          (2.0 - 12.0 * p(1) + 12.0 * p(1) * p(1)) *
-          std::pow(p(0) * (1.0 - p(0)) * p(2) * (1.0 - p(2)), 2);
+          (2.0 - 12.0 * p[1] + 12.0 * p[1] * p[1]) *
+          Utilities::fixed_power<2>(p[0] * (1.0 - p[0]) * p[2] * (1.0 - p[2]));
         return_hessian[1][2] =
-          (2.0 * p(1) - 6.0 * std::pow(p(1), 2) + 4.0 * std::pow(p(1), 3)) *
-          (2.0 * p(2) - 6.0 * std::pow(p(2), 2) + 4.0 * std::pow(p(2), 3)) *
-          std::pow(p(0) * (1.0 - p(0)), 2);
+          (2.0 * p[1] - 6.0 * Utilities::fixed_power<2>(p[1]) +
+           4.0 * Utilities::fixed_power<3>(p[1])) *
+          (2.0 * p[2] - 6.0 * Utilities::fixed_power<2>(p[2]) +
+           4.0 * Utilities::fixed_power<3>(p[2])) *
+          Utilities::fixed_power<2>(p[0] * (1.0 - p[0]));
         return_hessian[2][2] =
-          (2.0 - 12.0 * p(2) + 12.0 * p(2) * p(2)) *
-          std::pow(p(0) * (1.0 - p(0)) * p(1) * (1.0 - p(1)), 2);
+          (2.0 - 12.0 * p[2] + 12.0 * p[2] * p[2]) *
+          Utilities::fixed_power<2>(p[0] * (1.0 - p[0]) * p[1] * (1.0 - p[1]));
       }
     else
-      Assert(false, ExcNotImplemented());
+      DEAL_II_NOT_IMPLEMENTED();
 
     return return_hessian;
   }
@@ -468,8 +480,8 @@ namespace Step82
   {
     matrix = 0;
 
-    QGauss<dim>     quad(fe.degree + 1);
-    QGauss<dim - 1> quad_face(fe.degree + 1);
+    const QGauss<dim>     quad(fe.degree + 1);
+    const QGauss<dim - 1> quad_face(fe.degree + 1);
 
     const unsigned int n_q_points      = quad.size();
     const unsigned int n_q_points_face = quad_face.size();
@@ -711,7 +723,7 @@ namespace Step82
 
             const double mesh_inv = 1.0 / face->diameter(); // h_e^{-1}
             const double mesh3_inv =
-              1.0 / std::pow(face->diameter(), 3); // ĥ_e^{-3}
+              1.0 / Utilities::fixed_power<3>(face->diameter()); // h_e^{-3}
 
             fe_face.reinit(cell, face_no);
 
@@ -917,8 +929,8 @@ namespace Step82
     double error_H1 = 0;
     double error_L2 = 0;
 
-    QGauss<dim>     quad(fe.degree + 1);
-    QGauss<dim - 1> quad_face(fe.degree + 1);
+    const QGauss<dim>     quad(fe.degree + 1);
+    const QGauss<dim - 1> quad_face(fe.degree + 1);
 
     FEValues<dim> fe_values(fe,
                             quad,
@@ -971,9 +983,9 @@ namespace Step82
                          solution_gradients_cell[q])
                           .norm_square() *
                         dx;
-            error_L2 += std::pow(u_exact.value(fe_values.quadrature_point(q)) -
-                                   solution_values_cell[q],
-                                 2) *
+            error_L2 += Utilities::fixed_power<2>(
+                          u_exact.value(fe_values.quadrature_point(q)) -
+                          solution_values_cell[q]) *
                         dx;
           } // for quadrature points
 
@@ -985,7 +997,7 @@ namespace Step82
 
             const double mesh_inv = 1.0 / face->diameter(); // h^{-1}
             const double mesh3_inv =
-              1.0 / std::pow(face->diameter(), 3); // h^{-3}
+              1.0 / Utilities::fixed_power<3>(face->diameter()); // h^{-3}
 
             fe_face.reinit(cell, face_no);
 
@@ -1008,10 +1020,12 @@ namespace Step82
                       (u_exact_grad_q - solution_gradients[q]).norm_square() *
                       dx;
                     error_H2 += mesh3_inv *
-                                std::pow(u_exact_q - solution_values[q], 2) *
+                                Utilities::fixed_power<2>(u_exact_q -
+                                                          solution_values[q]) *
                                 dx;
                     error_H1 += mesh_inv *
-                                std::pow(u_exact_q - solution_values[q], 2) *
+                                Utilities::fixed_power<2>(u_exact_q -
+                                                          solution_values[q]) *
                                 dx;
                   }
               }
@@ -1052,16 +1066,16 @@ namespace Step82
                           (solution_gradients_neigh[q] - solution_gradients[q])
                             .norm_square() *
                           dx;
-                        error_H2 += mesh3_inv *
-                                    std::pow(solution_values_neigh[q] -
-                                               solution_values[q],
-                                             2) *
-                                    dx;
-                        error_H1 += mesh_inv *
-                                    std::pow(solution_values_neigh[q] -
-                                               solution_values[q],
-                                             2) *
-                                    dx;
+                        error_H2 +=
+                          mesh3_inv *
+                          Utilities::fixed_power<2>(solution_values_neigh[q] -
+                                                    solution_values[q]) *
+                          dx;
+                        error_H1 +=
+                          mesh_inv *
+                          Utilities::fixed_power<2>(solution_values_neigh[q] -
+                                                    solution_values[q]) *
+                          dx;
                       }
                   } // face not visited yet
 
@@ -1175,8 +1189,8 @@ namespace Step82
     const typename Triangulation<dim>::cell_iterator cell_lift =
       static_cast<typename Triangulation<dim>::cell_iterator>(cell);
 
-    QGauss<dim>     quad(fe.degree + 1);
-    QGauss<dim - 1> quad_face(fe.degree + 1);
+    const QGauss<dim>     quad(fe.degree + 1);
+    const QGauss<dim - 1> quad_face(fe.degree + 1);
 
     const unsigned int n_q_points      = quad.size();
     const unsigned int n_q_points_face = quad_face.size();

@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2016 - 2022 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2016 - 2024 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 
 // check that TrilinosWrappers(::MPI)::Vector::reinit does not carry over any
@@ -21,6 +20,7 @@
 
 #include <deal.II/base/mpi.h>
 
+#include <deal.II/lac/trilinos_tpetra_vector.h>
 #include <deal.II/lac/trilinos_vector.h>
 #include <deal.II/lac/vector_memory.h>
 
@@ -41,6 +41,7 @@ do_test()
     v1.reinit(set, communicator);
     deallog << "reinit: " << v1.size() << ' ';
 
+    v1.clear();
 #ifdef DEAL_II_WITH_MPI
     MPI_Comm_free(&communicator);
 #endif
@@ -55,6 +56,8 @@ do_test()
     v1.reinit(v2);
     deallog << v1.size() << std::endl;
 
+    v1.clear();
+    v2.clear();
 #ifdef DEAL_II_WITH_MPI
     MPI_Comm_free(&communicator);
 #endif
@@ -69,6 +72,8 @@ do_test()
     v1 = v2;
     deallog << v1.size() << std::endl;
 
+    v1.clear();
+    v2.clear();
 #ifdef DEAL_II_WITH_MPI
     MPI_Comm_free(&communicator);
 #endif
@@ -83,6 +88,8 @@ do_test()
     v3->reinit(v1);
     deallog << "reinit pool " << v1.size() << ' ' << v3->size() << ' ';
 
+    v1.clear();
+    v3->clear();
 #ifdef DEAL_II_WITH_MPI
     MPI_Comm_free(&communicator);
 #endif
@@ -97,6 +104,8 @@ do_test()
     v3->reinit(v1);
     deallog << "reinit pool " << v3->size() << std::endl;
 
+    v1.clear();
+    v3->clear();
 #ifdef DEAL_II_WITH_MPI
     MPI_Comm_free(&communicator);
 #endif
@@ -113,4 +122,9 @@ main(int argc, char **argv)
 
   do_test<TrilinosWrappers::MPI::Vector>();
   do_test<TrilinosWrappers::MPI::Vector>();
+
+#ifdef DEAL_II_TRILINOS_WITH_TPETRA
+  do_test<LinearAlgebra::TpetraWrappers::Vector<double>>();
+  do_test<LinearAlgebra::TpetraWrappers::Vector<double>>();
+#endif
 }

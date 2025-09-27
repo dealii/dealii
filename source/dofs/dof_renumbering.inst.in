@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2022 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2010 - 2024 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 
 for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
@@ -67,6 +66,11 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
       template void
       support_point_wise(
         DoFHandler<deal_II_dimension, deal_II_space_dimension> &);
+
+      template void
+      compute_support_point_wise(
+        std::vector<types::global_dof_index> &,
+        const DoFHandler<deal_II_dimension, deal_II_space_dimension> &);
 
     \}
 #endif
@@ -162,6 +166,15 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
         const bool);
 
       template void
+      compute_downstream<deal_II_dimension>(
+        std::vector<types::global_dof_index> &,
+        std::vector<types::global_dof_index> &,
+        const DoFHandler<deal_II_dimension> &,
+        const unsigned int,
+        const Tensor<1, DoFHandler<deal_II_dimension>::space_dimension> &,
+        const bool);
+
+      template void
       clockwise_dg<deal_II_dimension>(DoFHandler<deal_II_dimension> &,
                                       const Point<deal_II_dimension> &,
                                       bool);
@@ -221,10 +234,23 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
         const std::vector<bool> &);
 
       template void
+      sort_selected_dofs_back<deal_II_dimension>(
+        DoFHandler<deal_II_dimension> &,
+        const std::vector<bool> &,
+        const unsigned int);
+
+      template void
       compute_sort_selected_dofs_back<deal_II_dimension>(
         std::vector<types::global_dof_index> &,
         const DoFHandler<deal_II_dimension> &,
         const std::vector<bool> &);
+
+      template void
+      compute_sort_selected_dofs_back<deal_II_dimension>(
+        std::vector<types::global_dof_index> &,
+        const DoFHandler<deal_II_dimension> &,
+        const std::vector<bool> &,
+        const unsigned int);
 
       template void
       Cuthill_McKee<deal_II_dimension>(
@@ -232,6 +258,9 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
         const unsigned int,
         const bool,
         const std::vector<types::global_dof_index> &);
+
+      template void
+      lexicographic(DoFHandler<deal_II_dimension> &, const double);
     \}
 #endif
   }

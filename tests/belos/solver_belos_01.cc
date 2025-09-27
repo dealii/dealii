@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2022 - 2023 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2022 - 2024 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 
 
@@ -67,7 +66,7 @@ main(int argc, char *argv[])
   affine_constraints.close();
 
   TrilinosWrappers::SparsityPattern dsp(dof_handler.locally_owned_dofs(),
-                                        dof_handler.get_communicator());
+                                        dof_handler.get_mpi_communicator());
   DoFTools::make_sparsity_pattern(dof_handler, dsp, affine_constraints);
   dsp.compress();
 
@@ -112,15 +111,15 @@ main(int argc, char *argv[])
                      false);
       Teuchos::RCP<Epetra_MultiVector> B, X;
 
-      LinearAlgebra::EpetraWrappers::Vector x_(dof_handler.locally_owned_dofs(),
-                                               dof_handler.get_communicator());
+      LinearAlgebra::EpetraWrappers::Vector x_(
+        dof_handler.locally_owned_dofs(), dof_handler.get_mpi_communicator());
       LinearAlgebra::ReadWriteVector<Number> x_temp(
         dof_handler.locally_owned_dofs());
       x_temp.import_elements(x, VectorOperation::insert);
       x_.import_elements(x_temp, VectorOperation::insert);
 
-      LinearAlgebra::EpetraWrappers::Vector r_(dof_handler.locally_owned_dofs(),
-                                               dof_handler.get_communicator());
+      LinearAlgebra::EpetraWrappers::Vector r_(
+        dof_handler.locally_owned_dofs(), dof_handler.get_mpi_communicator());
       LinearAlgebra::ReadWriteVector<Number> r_temp(
         dof_handler.locally_owned_dofs());
       r_temp.import_elements(r, VectorOperation::insert);

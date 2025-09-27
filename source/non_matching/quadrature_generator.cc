@@ -1,22 +1,21 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2021 - 2023 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2020 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 #include <deal.II/base/function_tools.h>
 
-#include "deal.II/fe/fe_q.h"
-#include "deal.II/fe/fe_q_iso_q1.h"
+#include <deal.II/fe/fe_q.h>
+#include <deal.II/fe/fe_q_iso_q1.h>
 
 #include <deal.II/grid/reference_cell.h>
 
@@ -27,6 +26,7 @@
 #include <deal.II/lac/petsc_vector.h>
 #include <deal.II/lac/trilinos_epetra_vector.h>
 #include <deal.II/lac/trilinos_parallel_block_vector.h>
+#include <deal.II/lac/trilinos_tpetra_block_vector.h>
 #include <deal.II/lac/trilinos_tpetra_vector.h>
 #include <deal.II/lac/trilinos_vector.h>
 #include <deal.II/lac/vector.h>
@@ -604,14 +604,14 @@ namespace NonMatching
             // Since we already know the function values at the interval ends we
             // might as well check these for min/max too.
             const double function_min =
-              std::min(std::min(left_value, right_value), value_bounds.first);
+              std::min({left_value, right_value, value_bounds.first});
 
             // If the functions is positive there are no roots.
             if (function_min > 0)
               return;
 
             const double function_max =
-              std::max(std::max(left_value, right_value), value_bounds.second);
+              std::max({left_value, right_value, value_bounds.second});
 
             // If the function is negative there are no roots.
             if (function_max < 0)
@@ -1332,7 +1332,7 @@ namespace NonMatching
        * function must be called to specify which cell the function should be
        * evaluated on.
        */
-      template <int dim, typename VectorType = Vector<double>>
+      template <int dim, typename Number>
       class RefSpaceFEFieldFunction : public CellWiseFunction<dim>
       {
       public:
@@ -1343,8 +1343,8 @@ namespace NonMatching
          * have a longer lifetime than the created RefSpaceFEFieldFunction
          * object.
          */
-        RefSpaceFEFieldFunction(const DoFHandler<dim> &dof_handler,
-                                const VectorType      &dof_values);
+        RefSpaceFEFieldFunction(const DoFHandler<dim>    &dof_handler,
+                                const ReadVector<Number> &dof_values);
 
         /**
          * @copydoc CellWiseFunction::set_active_cell()
@@ -1415,19 +1415,19 @@ namespace NonMatching
         /**
          * Pointer to the DoFHandler passed to the constructor.
          */
-        const SmartPointer<const DoFHandler<dim>> dof_handler;
+        const ObserverPointer<const DoFHandler<dim>> dof_handler;
 
         /**
          * Pointer to the vector of solution coefficients passed to the
          * constructor.
          */
-        const SmartPointer<const VectorType> global_dof_values;
+        const ObserverPointer<const ReadVector<Number>> global_dof_values;
 
         /**
          * Pointer to the element associated with the cell in the last call to
          * set_active_cell().
          */
-        SmartPointer<const FiniteElement<dim>> element;
+        ObserverPointer<const FiniteElement<dim>> element;
 
         /**
          * DOF-indices of the cell in the last call to set_active_cell().
@@ -1438,13 +1438,13 @@ namespace NonMatching
          * Local solution values of the cell in the last call to
          * set_active_cell().
          */
-        std::vector<typename VectorType::value_type> local_dof_values;
+        std::vector<Number> local_dof_values;
 
         /**
          * Local solution values of the subcell after the last call to
          * set_subcell().
          */
-        std::vector<typename VectorType::value_type> local_dof_values_subcell;
+        std::vector<Number> local_dof_values_subcell;
 
         /**
          * Bounding box of the subcell after the last call to set_subcell().
@@ -1473,14 +1473,19 @@ namespace NonMatching
          * Check whether the shape functions are linear.
          */
         bool polynomials_are_hat_functions;
+
+        /**
+         * Linear FE_Q object for FE_Q_iso_Q1 path.
+         */
+        Lazy<std::unique_ptr<FE_Q<dim>>> fe_q1;
       };
 
 
 
-      template <int dim, typename VectorType>
-      RefSpaceFEFieldFunction<dim, VectorType>::RefSpaceFEFieldFunction(
-        const DoFHandler<dim> &dof_handler,
-        const VectorType      &dof_values)
+      template <int dim, typename Number>
+      RefSpaceFEFieldFunction<dim, Number>::RefSpaceFEFieldFunction(
+        const DoFHandler<dim>    &dof_handler,
+        const ReadVector<Number> &dof_values)
         : dof_handler(&dof_handler)
         , global_dof_values(&dof_values)
         , n_subdivisions_per_line(numbers::invalid_unsigned_int)
@@ -1491,9 +1496,9 @@ namespace NonMatching
 
 
 
-      template <int dim, typename VectorType>
+      template <int dim, typename Number>
       void
-      RefSpaceFEFieldFunction<dim, VectorType>::set_active_cell(
+      RefSpaceFEFieldFunction<dim, Number>::set_active_cell(
         const typename Triangulation<dim>::active_cell_iterator &cell)
       {
         Assert(
@@ -1504,8 +1509,6 @@ namespace NonMatching
 
         const auto dof_handler_cell =
           cell->as_dof_handler_iterator(*dof_handler);
-
-        const FE_Q<dim> fe_q1(1);
 
         // Save the element and the local dof values, since this is what we need
         // to evaluate the function.
@@ -1525,8 +1528,13 @@ namespace NonMatching
                     &dof_handler_cell->get_fe()))
               {
                 this->n_subdivisions_per_line = fe_q_iso_q1->get_degree();
-                fe                            = &fe_q1;
-                local_dof_values_subcell.resize(fe_q1.n_dofs_per_cell());
+
+                fe = fe_q1
+                       .value_or_initialize(
+                         []() { return std::make_unique<FE_Q<dim>>(1); })
+                       .get();
+                local_dof_values_subcell.resize(
+                  fe_q1.value()->n_dofs_per_cell());
               }
             else
               this->n_subdivisions_per_line = numbers::invalid_unsigned_int;
@@ -1558,17 +1566,15 @@ namespace NonMatching
 
         local_dof_values.resize(element->dofs_per_cell);
 
-        for (unsigned int i = 0; i < local_dof_indices.size(); ++i)
-          local_dof_values[i] =
-            dealii::internal::ElementAccess<VectorType>::get(
-              *global_dof_values, local_dof_indices[i]);
+        global_dof_values->extract_subvector_to(local_dof_indices,
+                                                local_dof_values);
       }
 
 
 
-      template <int dim, typename VectorType>
+      template <int dim, typename Number>
       void
-      RefSpaceFEFieldFunction<dim, VectorType>::set_subcell(
+      RefSpaceFEFieldFunction<dim, Number>::set_subcell(
         const std::vector<unsigned int> &mask,
         const BoundingBox<dim>          &subcell_box)
       {
@@ -1580,27 +1586,27 @@ namespace NonMatching
 
 
 
-      template <int dim, typename VectorType>
+      template <int dim, typename Number>
       bool
-      RefSpaceFEFieldFunction<dim, VectorType>::is_fe_q_iso_q1() const
+      RefSpaceFEFieldFunction<dim, Number>::is_fe_q_iso_q1() const
       {
         return n_subdivisions_per_line != numbers::invalid_unsigned_int;
       }
 
 
 
-      template <int dim, typename VectorType>
+      template <int dim, typename Number>
       unsigned int
-      RefSpaceFEFieldFunction<dim, VectorType>::n_subdivisions() const
+      RefSpaceFEFieldFunction<dim, Number>::n_subdivisions() const
       {
         return n_subdivisions_per_line;
       }
 
 
 
-      template <int dim, typename VectorType>
+      template <int dim, typename Number>
       bool
-      RefSpaceFEFieldFunction<dim, VectorType>::cell_is_set() const
+      RefSpaceFEFieldFunction<dim, Number>::cell_is_set() const
       {
         // If set cell hasn't been called the size of local_dof_values will be
         // zero.
@@ -1609,9 +1615,9 @@ namespace NonMatching
 
 
 
-      template <int dim, typename VectorType>
+      template <int dim, typename Number>
       double
-      RefSpaceFEFieldFunction<dim, VectorType>::value(
+      RefSpaceFEFieldFunction<dim, Number>::value(
         const Point<dim>  &point,
         const unsigned int component) const
       {
@@ -1621,13 +1627,18 @@ namespace NonMatching
         if (!poly.empty() && component == 0)
           {
             // TODO: this could be extended to a component that is not zero
-            return dealii::internal::evaluate_tensor_product_value(
-              poly,
-              this->is_fe_q_iso_q1() ? local_dof_values_subcell :
-                                       local_dof_values,
-              this->is_fe_q_iso_q1() ? subcell_box.real_to_unit(point) : point,
-              polynomials_are_hat_functions,
-              this->is_fe_q_iso_q1() ? std::vector<unsigned int>() : renumber);
+            return this->is_fe_q_iso_q1() ?
+                     dealii::internal::evaluate_tensor_product_value(
+                       poly,
+                       make_array_view(local_dof_values_subcell),
+                       subcell_box.real_to_unit(point),
+                       polynomials_are_hat_functions) :
+                     dealii::internal::evaluate_tensor_product_value(
+                       poly,
+                       make_array_view(local_dof_values),
+                       point,
+                       polynomials_are_hat_functions,
+                       renumber);
           }
         else
           {
@@ -1642,9 +1653,9 @@ namespace NonMatching
 
 
 
-      template <int dim, typename VectorType>
+      template <int dim, typename Number>
       Tensor<1, dim>
-      RefSpaceFEFieldFunction<dim, VectorType>::gradient(
+      RefSpaceFEFieldFunction<dim, Number>::gradient(
         const Point<dim>  &point,
         const unsigned int component) const
       {
@@ -1654,15 +1665,20 @@ namespace NonMatching
         if (!poly.empty() && component == 0)
           {
             // TODO: this could be extended to a component that is not zero
-            return dealii::internal::evaluate_tensor_product_value_and_gradient(
-                     poly,
-                     this->is_fe_q_iso_q1() ? local_dof_values_subcell :
-                                              local_dof_values,
-                     this->is_fe_q_iso_q1() ? subcell_box.real_to_unit(point) :
-                                              point,
-                     polynomials_are_hat_functions,
-                     this->is_fe_q_iso_q1() ? std::vector<unsigned int>() :
-                                              renumber)
+            return (this->is_fe_q_iso_q1() ?
+                      dealii::internal::
+                        evaluate_tensor_product_value_and_gradient(
+                          poly,
+                          make_array_view(local_dof_values_subcell),
+                          subcell_box.real_to_unit(point),
+                          polynomials_are_hat_functions) :
+                      dealii::internal::
+                        evaluate_tensor_product_value_and_gradient(
+                          poly,
+                          make_array_view(local_dof_values),
+                          point,
+                          polynomials_are_hat_functions,
+                          renumber))
               .second;
           }
         else
@@ -1678,9 +1694,9 @@ namespace NonMatching
 
 
 
-      template <int dim, typename VectorType>
+      template <int dim, typename Number>
       SymmetricTensor<2, dim>
-      RefSpaceFEFieldFunction<dim, VectorType>::hessian(
+      RefSpaceFEFieldFunction<dim, Number>::hessian(
         const Point<dim>  &point,
         const unsigned int component) const
       {
@@ -1690,12 +1706,16 @@ namespace NonMatching
         if (!poly.empty() && component == 0)
           {
             // TODO: this could be extended to a component that is not zero
-            return dealii::internal::evaluate_tensor_product_hessian(
-              poly,
-              this->is_fe_q_iso_q1() ? local_dof_values_subcell :
-                                       local_dof_values,
-              this->is_fe_q_iso_q1() ? subcell_box.real_to_unit(point) : point,
-              this->is_fe_q_iso_q1() ? std::vector<unsigned int>() : renumber);
+            return this->is_fe_q_iso_q1() ?
+                     dealii::internal::evaluate_tensor_product_hessian(
+                       poly,
+                       make_array_view(local_dof_values_subcell),
+                       subcell_box.real_to_unit(point)) :
+                     dealii::internal::evaluate_tensor_product_hessian(
+                       poly,
+                       make_array_view(local_dof_values),
+                       point,
+                       renumber);
           }
         else
           {
@@ -1927,7 +1947,7 @@ namespace NonMatching
 
     const Point<dim> vertex0 =
       box.vertex(GeometryInfo<dim>::face_to_cell_vertices(face_index, 0));
-    const double coordinate_value = vertex0(face_normal_direction);
+    const double coordinate_value = vertex0[face_normal_direction];
 
     const Functions::CoordinateRestriction<dim - 1> face_restriction(
       level_set, face_normal_direction, coordinate_value);
@@ -2097,18 +2117,17 @@ namespace NonMatching
 
 
   template <int dim>
-  template <typename VectorType>
+  template <typename Number>
   DiscreteQuadratureGenerator<dim>::DiscreteQuadratureGenerator(
     const hp::QCollection<1> &quadratures1D,
     const DoFHandler<dim>    &dof_handler,
-    const VectorType         &level_set,
+    const ReadVector<Number> &level_set,
     const AdditionalData     &additional_data)
     : QuadratureGenerator<dim>(quadratures1D, additional_data)
     , reference_space_level_set(
         std::make_unique<internal::DiscreteQuadratureGeneratorImplementation::
-                           RefSpaceFEFieldFunction<dim, VectorType>>(
-          dof_handler,
-          level_set))
+                           RefSpaceFEFieldFunction<dim, Number>>(dof_handler,
+                                                                 level_set))
   {}
 
 
@@ -2190,18 +2209,17 @@ namespace NonMatching
 
 
   template <int dim>
-  template <typename VectorType>
+  template <typename Number>
   DiscreteFaceQuadratureGenerator<dim>::DiscreteFaceQuadratureGenerator(
     const hp::QCollection<1> &quadratures1D,
     const DoFHandler<dim>    &dof_handler,
-    const VectorType         &level_set,
+    const ReadVector<Number> &level_set,
     const AdditionalData     &additional_data)
     : FaceQuadratureGenerator<dim>(quadratures1D, additional_data)
     , reference_space_level_set(
         std::make_unique<internal::DiscreteQuadratureGeneratorImplementation::
-                           RefSpaceFEFieldFunction<dim, VectorType>>(
-          dof_handler,
-          level_set))
+                           RefSpaceFEFieldFunction<dim, Number>>(dof_handler,
+                                                                 level_set))
   {}
 
 
@@ -2291,5 +2309,5 @@ namespace NonMatching
                                              face_index);
   }
 } // namespace NonMatching
-#include "quadrature_generator.inst"
+#include "non_matching/quadrature_generator.inst"
 DEAL_II_NAMESPACE_CLOSE

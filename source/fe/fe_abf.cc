@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2003 - 2023 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2003 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 
 #include <deal.II/base/qprojector.h>
@@ -170,7 +169,7 @@ template <int dim>
 void
 FE_ABF<dim>::initialize_support_points(const unsigned int deg)
 {
-  QGauss<dim>        cell_quadrature(deg + 2);
+  const QGauss<dim>  cell_quadrature(deg + 2);
   const unsigned int n_interior_points = cell_quadrature.size();
 
   // TODO: the implementation makes the assumption that all faces have the
@@ -208,7 +207,7 @@ FE_ABF<dim>::initialize_support_points(const unsigned int deg)
 
   if (dim > 1)
     {
-      QGauss<dim - 1>                   face_points(deg + 1);
+      const QGauss<dim - 1>             face_points(deg + 1);
       TensorProductPolynomials<dim - 1> legendre =
         Polynomials::Legendre::generate_complete_basis(deg);
 
@@ -235,12 +234,23 @@ FE_ABF<dim>::initialize_support_points(const unsigned int deg)
       Quadrature<dim> faces =
         QProjector<dim>::project_to_all_faces(this->reference_cell(),
                                               face_points);
-      for (; current < GeometryInfo<dim>::faces_per_cell * n_face_points;
-           ++current)
+      for (unsigned int face_no = 0;
+           face_no < GeometryInfo<dim>::faces_per_cell;
+           ++face_no)
         {
-          // Enter the support point
-          // into the vector
-          this->generalized_support_points[current] = faces.point(current);
+          const auto offset = QProjector<dim>::DataSetDescriptor::face(
+            this->reference_cell(),
+            face_no,
+            numbers::default_geometric_orientation,
+            n_face_points);
+          for (unsigned int face_point = 0; face_point < n_face_points;
+               ++face_point)
+            {
+              // Enter the support point into the vector
+              this->generalized_support_points[current] =
+                faces.point(offset + face_point);
+              ++current;
+            }
         }
 
 
@@ -349,9 +359,9 @@ FE_ABF<dim>::initialize_restriction()
         this->restriction[iso][i].reinit(0, 0);
       return;
     }
-  unsigned int       iso = RefinementCase<dim>::isotropic_refinement - 1;
-  QGauss<dim - 1>    q_base(rt_order + 1);
-  const unsigned int n_face_points = q_base.size();
+  unsigned int          iso = RefinementCase<dim>::isotropic_refinement - 1;
+  const QGauss<dim - 1> q_base(rt_order + 1);
+  const unsigned int    n_face_points = q_base.size();
   // First, compute interpolation on
   // subfaces
   for (const unsigned int face : GeometryInfo<dim>::face_indices())
@@ -360,8 +370,11 @@ FE_ABF<dim>::initialize_restriction()
       // child cell are evaluated
       // in the quadrature points
       // of a full face.
-      Quadrature<dim> q_face =
-        QProjector<dim>::project_to_face(this->reference_cell(), q_base, face);
+      Quadrature<dim> q_face = QProjector<dim>::project_to_face(
+        this->reference_cell(),
+        q_base,
+        face,
+        numbers::default_geometric_orientation);
       // Store shape values, since the
       // evaluation suffers if not
       // ordered by point
@@ -380,7 +393,12 @@ FE_ABF<dim>::initialize_restriction()
           // evaluated on the subface
           // only.
           Quadrature<dim> q_sub = QProjector<dim>::project_to_subface(
-            this->reference_cell(), q_base, face, sub);
+            this->reference_cell(),
+            q_base,
+            face,
+            sub,
+            numbers::default_geometric_orientation,
+            RefinementCase<dim - 1>::isotropic_refinement);
           const unsigned int child = GeometryInfo<dim>::child_cell_on_face(
             RefinementCase<dim>::isotropic_refinement, face, sub);
 
@@ -442,7 +460,7 @@ FE_ABF<dim>::initialize_restriction()
   AssertDimension(this->n_unique_faces(), 1);
   const unsigned int face_no = 0;
 
-  QGauss<dim>        q_cell(rt_order + 1);
+  const QGauss<dim>  q_cell(rt_order + 1);
   const unsigned int start_cell_dofs =
     GeometryInfo<dim>::faces_per_cell * this->n_dofs_per_face(face_no);
 
@@ -624,7 +642,10 @@ FE_ABF<dim>::convert_generalized_support_point_values_to_dof_values(
           // TODO: Check what the face_orientation, face_flip and face_rotation
           // have to be in 3d
           unsigned int k = QProjector<dim>::DataSetDescriptor::face(
-            this->reference_cell(), face, false, false, false, n_face_points);
+            this->reference_cell(),
+            face,
+            numbers::default_geometric_orientation,
+            n_face_points);
           for (unsigned int i = 0; i < boundary_weights_abf.size(1); ++i)
             nodal_values[start_abf_dofs + i] +=
               n_orient * boundary_weights_abf(k + fp, i) *
@@ -645,13 +666,13 @@ template <int dim>
 std::size_t
 FE_ABF<dim>::memory_consumption() const
 {
-  Assert(false, ExcNotImplemented());
+  DEAL_II_NOT_IMPLEMENTED();
   return 0;
 }
 
 
 
 /*-------------- Explicit Instantiations -------------------------------*/
-#include "fe_abf.inst"
+#include "fe/fe_abf.inst"
 
 DEAL_II_NAMESPACE_CLOSE

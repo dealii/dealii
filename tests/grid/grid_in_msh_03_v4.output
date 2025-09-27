@@ -1,5 +1,5 @@
 
-DEAL::grid_in_msh_03_v4/mesh	100	81
+DEAL::grid_in_msh_03_v4/mesh.msh	100	81
 0 0 0 2
 2.2 0 0 2
 2.2 1.1 0 2

@@ -1,21 +1,20 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2020 - 2022 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2022 - 2024 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 
 /**
- * Test MGTransferGlobalCoarsening::interpolate_to_mg() for FE_Q and FE_DGQ.
+ * Test MGTransferMatrixFree::interpolate_to_mg() for FE_Q and FE_DGQ.
  */
 
 #include <deal.II/base/conditional_ostream.h>
@@ -26,6 +25,7 @@
 #include <deal.II/distributed/tria.h>
 
 #include <deal.II/dofs/dof_handler.h>
+#include <deal.II/dofs/dof_tools.h>
 
 #include <deal.II/fe/fe_dgq.h>
 #include <deal.II/fe/fe_q.h>
@@ -85,7 +85,7 @@ create_partitioner(const DoFHandler<dim> &dof_handler)
   return std::make_shared<Utilities::MPI::Partitioner>(
     dof_handler.locally_owned_dofs(),
     DoFTools::extract_locally_active_dofs(dof_handler),
-    dof_handler.get_communicator());
+    dof_handler.get_mpi_communicator());
 }
 
 
@@ -145,7 +145,7 @@ test(const unsigned int n_refinements,
   for (unsigned int l = min_level; l < max_level; ++l)
     transfers[l + 1].reinit(dof_handlers[l + 1], dof_handlers[l]);
 
-  MGTransferGlobalCoarsening<dim, VectorType> transfer(
+  MGTransferMatrixFree<dim, Number> transfer(
     transfers, [&](const auto l, auto &vec) {
       vec.reinit(create_partitioner(dof_handlers[l]));
     });

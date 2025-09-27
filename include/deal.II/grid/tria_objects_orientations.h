@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2022 - 2023 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2023 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 #ifndef dealii_tria_objects_orientations_h
 #define dealii_tria_objects_orientations_h
@@ -81,7 +80,7 @@ namespace internal
        * Get the combined orientation of the object, as described in the class
        * documentation.
        */
-      unsigned char
+      types::geometric_orientation
       get_combined_orientation(const unsigned int object) const;
 
       /**
@@ -107,26 +106,8 @@ namespace internal
        * documentation.
        */
       void
-      set_combined_orientation(const unsigned int  object,
-                               const unsigned char value);
-
-      /**
-       * Set the orientation bit of the object.
-       */
-      void
-      set_orientation(const unsigned int object, const bool value);
-
-      /**
-       * Set the rotate bit of the object.
-       */
-      void
-      set_rotation(const unsigned int object, const bool value);
-
-      /**
-       * Set the flip bit of the object.
-       */
-      void
-      set_flip(const unsigned int object, const bool value);
+      set_combined_orientation(const unsigned int                 object,
+                               const types::geometric_orientation value);
 
       /**
        * Read or write the data of this object to or from a stream for the
@@ -144,9 +125,9 @@ namespace internal
       unsigned int n_stored_objects;
 
       /**
-       * Flags.
+       * Orientations.
        */
-      std::vector<unsigned char> flags;
+      std::vector<types::geometric_orientation> object_orientations;
     };
 
     //----------------------------------------------------------------------//
@@ -170,9 +151,8 @@ namespace internal
     TriaObjectsOrientations::reinit(const unsigned int n_objects)
     {
       n_stored_objects = n_objects;
-      // Assign to the default orientation
-      flags.assign(n_objects,
-                   ReferenceCell::default_combined_face_orientation());
+      object_orientations.assign(n_objects,
+                                 numbers::default_geometric_orientation);
     }
 
 
@@ -180,8 +160,8 @@ namespace internal
     inline void
     TriaObjectsOrientations::resize(const unsigned int n_objects)
     {
-      flags.resize(n_objects,
-                   ReferenceCell::default_combined_face_orientation());
+      object_orientations.resize(n_objects,
+                                 numbers::default_geometric_orientation);
       n_stored_objects = n_objects;
     }
 
@@ -191,7 +171,7 @@ namespace internal
     TriaObjectsOrientations::memory_consumption() const
     {
       return MemoryConsumption::memory_consumption(n_stored_objects) +
-             MemoryConsumption::memory_consumption(flags);
+             MemoryConsumption::memory_consumption(object_orientations);
     }
 
 
@@ -204,12 +184,12 @@ namespace internal
 
 
 
-    inline unsigned char
+    inline types::geometric_orientation
     TriaObjectsOrientations::get_combined_orientation(
       const unsigned int object) const
     {
       AssertIndexRange(object, n_stored_objects);
-      return flags[object];
+      return object_orientations[object];
     }
 
 
@@ -218,7 +198,7 @@ namespace internal
     TriaObjectsOrientations::get_orientation(const unsigned int object) const
     {
       AssertIndexRange(object, n_stored_objects);
-      return Utilities::get_bit(flags[object], 0);
+      return !Utilities::get_bit(object_orientations[object], 0);
     }
 
 
@@ -227,7 +207,7 @@ namespace internal
     TriaObjectsOrientations::get_rotation(const unsigned int object) const
     {
       AssertIndexRange(object, n_stored_objects);
-      return Utilities::get_bit(flags[object], 1);
+      return Utilities::get_bit(object_orientations[object], 1);
     }
 
 
@@ -236,47 +216,18 @@ namespace internal
     TriaObjectsOrientations::get_flip(const unsigned int object) const
     {
       AssertIndexRange(object, n_stored_objects);
-      return Utilities::get_bit(flags[object], 2);
+      return Utilities::get_bit(object_orientations[object], 2);
     }
 
 
 
     inline void
-    TriaObjectsOrientations::set_combined_orientation(const unsigned int object,
-                                                      const unsigned char value)
+    TriaObjectsOrientations::set_combined_orientation(
+      const unsigned int                 object,
+      const types::geometric_orientation value)
     {
       AssertIndexRange(object, n_stored_objects);
-      flags[object] = value;
-    }
-
-
-
-    inline void
-    TriaObjectsOrientations::set_orientation(const unsigned int object,
-                                             const bool         value)
-    {
-      AssertIndexRange(object, n_stored_objects);
-      Utilities::set_bit(flags[object], 0, value);
-    }
-
-
-
-    inline void
-    TriaObjectsOrientations::set_rotation(const unsigned int object,
-                                          const bool         value)
-    {
-      AssertIndexRange(object, n_stored_objects);
-      Utilities::set_bit(flags[object], 1, value);
-    }
-
-
-
-    inline void
-    TriaObjectsOrientations::set_flip(const unsigned int object,
-                                      const bool         value)
-    {
-      AssertIndexRange(object, n_stored_objects);
-      Utilities::set_bit(flags[object], 2, value);
+      object_orientations[object] = value;
     }
 
 
@@ -285,7 +236,7 @@ namespace internal
     void
     TriaObjectsOrientations::serialize(Archive &ar, const unsigned int)
     {
-      ar &n_stored_objects &flags;
+      ar &n_stored_objects &object_orientations;
     }
   } // namespace TriangulationImplementation
 } // namespace internal

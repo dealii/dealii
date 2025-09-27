@@ -1,21 +1,20 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 1999 - 2023 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 1999 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 #include <deal.II/base/logstream.h>
 #include <deal.II/base/mg_level_object.h>
-#include <deal.II/base/mpi_compute_index_owner_internal.h>
+#include <deal.II/base/mpi.h>
 #include <deal.II/base/thread_management.h>
 
 #include <deal.II/distributed/tria_base.h>
@@ -44,7 +43,9 @@
 
 #include <algorithm>
 #include <numeric>
+#include <set>
 #include <vector>
+
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -59,7 +60,7 @@ namespace MGTools
                             std::vector<unsigned int> &,
                             const DoFTools::Coupling)
   {
-    Assert(false, ExcNotImplemented());
+    DEAL_II_NOT_IMPLEMENTED();
   }
 
 
@@ -72,7 +73,7 @@ namespace MGTools
                             const Table<2, DoFTools::Coupling> &,
                             const Table<2, DoFTools::Coupling> &)
   {
-    Assert(false, ExcNotImplemented());
+    DEAL_II_NOT_IMPLEMENTED();
   }
 
 
@@ -84,7 +85,7 @@ namespace MGTools
                             std::vector<unsigned int> &,
                             const DoFTools::Coupling)
   {
-    Assert(false, ExcNotImplemented());
+    DEAL_II_NOT_IMPLEMENTED();
   }
 
 
@@ -96,7 +97,7 @@ namespace MGTools
                             const Table<2, DoFTools::Coupling> &,
                             const Table<2, DoFTools::Coupling> &)
   {
-    Assert(false, ExcNotImplemented());
+    DEAL_II_NOT_IMPLEMENTED();
   }
 
 
@@ -201,7 +202,7 @@ namespace MGTools
 
         // At this point, we have
         // counted all dofs
-        // contributiong from cells
+        // contributing from cells
         // coupled topologically to the
         // adjacent cells, but we
         // subtracted some faces.
@@ -458,7 +459,7 @@ namespace MGTools
 
         // At this point, we have
         // counted all dofs
-        // contributiong from cells
+        // contributing from cells
         // coupled topologically to the
         // adjacent cells, but we
         // subtracted some faces.
@@ -580,7 +581,6 @@ namespace MGTools
                         const bool                       keep_constrained_dofs)
   {
     const types::global_dof_index n_dofs = dof.n_dofs(level);
-    (void)n_dofs;
 
     Assert(sparsity.n_rows() == n_dofs,
            ExcDimensionMismatch(sparsity.n_rows(), n_dofs));
@@ -610,7 +610,6 @@ namespace MGTools
                              const bool keep_constrained_dofs)
   {
     const types::global_dof_index n_dofs = dof.n_dofs(level);
-    (void)n_dofs;
 
     Assert(sparsity.n_rows() == n_dofs,
            ExcDimensionMismatch(sparsity.n_rows(), n_dofs));
@@ -686,11 +685,8 @@ namespace MGTools
 
     const types::global_dof_index fine_dofs   = dof.n_dofs(level);
     const types::global_dof_index coarse_dofs = dof.n_dofs(level - 1);
-    (void)fine_dofs;
-    (void)coarse_dofs;
 
     // Matrix maps from fine level to coarse level
-
     Assert(sparsity.n_rows() == coarse_dofs,
            ExcDimensionMismatch(sparsity.n_rows(), coarse_dofs));
     Assert(sparsity.n_cols() == fine_dofs,
@@ -748,8 +744,6 @@ namespace MGTools
     const FiniteElement<dim>     &fe     = dof.get_fe();
     const types::global_dof_index n_dofs = dof.n_dofs(level);
     const unsigned int            n_comp = fe.n_components();
-    (void)n_dofs;
-    (void)n_comp;
 
     Assert(sparsity.n_rows() == n_dofs,
            ExcDimensionMismatch(sparsity.n_rows(), n_dofs));
@@ -931,11 +925,8 @@ namespace MGTools
 
     const types::global_dof_index fine_dofs   = dof.n_dofs(level);
     const types::global_dof_index coarse_dofs = dof.n_dofs(level - 1);
-    (void)fine_dofs;
-    (void)coarse_dofs;
 
     // Matrix maps from fine level to coarse level
-
     Assert(sparsity.n_rows() == coarse_dofs,
            ExcDimensionMismatch(sparsity.n_rows(), coarse_dofs));
     Assert(sparsity.n_cols() == fine_dofs,
@@ -1017,8 +1008,6 @@ namespace MGTools
                                   const unsigned int       level)
   {
     const types::global_dof_index n_dofs = dof.n_dofs(level);
-    (void)n_dofs;
-
     Assert(sparsity.n_rows() == n_dofs,
            ExcDimensionMismatch(sparsity.n_rows(), n_dofs));
     Assert(sparsity.n_cols() == n_dofs,
@@ -1549,7 +1538,7 @@ namespace MGTools
     if (const parallel::TriangulationBase<dim, spacedim> *tr =
           dynamic_cast<const parallel::TriangulationBase<dim, spacedim> *>(
             &tria))
-      global_min = Utilities::MPI::min(min_level, tr->get_communicator());
+      global_min = Utilities::MPI::min(min_level, tr->get_mpi_communicator());
 
     AssertIndexRange(global_min, tria.n_global_levels());
 
@@ -1675,7 +1664,7 @@ namespace MGTools
   workload_imbalance(const Triangulation<dim, spacedim> &tria)
   {
     return internal::workload_imbalance(local_workload(tria),
-                                        tria.get_communicator());
+                                        tria.get_mpi_communicator());
   }
 
 
@@ -1687,7 +1676,7 @@ namespace MGTools
       &trias)
   {
     return internal::workload_imbalance(local_workload(trias),
-                                        trias.back()->get_communicator());
+                                        trias.back()->get_mpi_communicator());
   }
 
 
@@ -1701,7 +1690,7 @@ namespace MGTools
     std::vector<std::pair<types::global_dof_index, types::global_dof_index>>
       cells(n_global_levels);
 
-    const MPI_Comm communicator = tria.get_communicator();
+    const MPI_Comm communicator = tria.get_mpi_communicator();
 
     const unsigned int my_rank = Utilities::MPI::this_mpi_process(communicator);
 
@@ -1737,7 +1726,7 @@ namespace MGTools
     std::vector<std::pair<types::global_dof_index, types::global_dof_index>>
       cells(n_global_levels);
 
-    const MPI_Comm communicator = trias.back()->get_communicator();
+    const MPI_Comm communicator = trias.back()->get_mpi_communicator();
 
     const unsigned int my_rank = Utilities::MPI::this_mpi_process(communicator);
 
@@ -1772,22 +1761,10 @@ namespace MGTools
                   cell_id_translator.translate(cell, i));
             }
 
-        std::vector<unsigned int> is_fine_required_ranks(
-          is_fine_required.n_elements());
-
-        Utilities::MPI::internal::ComputeIndexOwner::ConsensusAlgorithmsPayload
-          process(is_fine_owned,
-                  is_fine_required,
-                  communicator,
-                  is_fine_required_ranks,
-                  false);
-
-        Utilities::MPI::ConsensusAlgorithms::Selector<
-          std::vector<
-            std::pair<types::global_cell_index, types::global_cell_index>>,
-          std::vector<unsigned int>>
-          consensus_algorithm;
-        consensus_algorithm.run(process, communicator);
+        const std::vector<unsigned int> is_fine_required_ranks =
+          Utilities::MPI::compute_index_owner(is_fine_owned,
+                                              is_fine_required,
+                                              communicator);
 
         for (unsigned i = 0; i < is_fine_required.n_elements(); ++i)
           if (is_fine_required_ranks[i] == my_rank)
@@ -1806,7 +1783,7 @@ namespace MGTools
   vertical_communication_efficiency(const Triangulation<dim, spacedim> &tria)
   {
     return internal::vertical_communication_efficiency(
-      local_vertical_communication_cost(tria), tria.get_communicator());
+      local_vertical_communication_cost(tria), tria.get_mpi_communicator());
   }
 
 
@@ -1819,13 +1796,13 @@ namespace MGTools
   {
     return internal::vertical_communication_efficiency(
       local_vertical_communication_cost(trias),
-      trias.back()->get_communicator());
+      trias.back()->get_mpi_communicator());
   }
 
 } // namespace MGTools
 
 
 // explicit instantiations
-#include "mg_tools.inst"
+#include "multigrid/mg_tools.inst"
 
 DEAL_II_NAMESPACE_CLOSE

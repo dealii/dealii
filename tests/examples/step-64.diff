@@ -1,0 +1,16 @@
+22c22
+< 
+---
+> #include "../example_test.h"
+519,522c519,524
+<     cg.solve(*system_matrix_dev, solution_dev, system_rhs_dev, preconditioner);
+< 
+<     pcout << "  Solved in " << solver_control.last_step() << " iterations."
+<           << std::endl;
+---
+>     //cg.solve(*system_matrix_dev, solution_dev, system_rhs_dev, preconditioner);
+>     check_solver_within_range(pcout,cg.solve(*system_matrix_dev, solution_dev, system_rhs_dev, preconditioner),
+>                            solver_control.last_step(),
+>                              8, 60);
+> //    pcout << "  Solved in " << solver_control.last_step() << " iterations."
+> //          << std::endl;

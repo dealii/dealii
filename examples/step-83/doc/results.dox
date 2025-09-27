@@ -1,0 +1,226 @@
+<h1>Results</h1>
+
+When you run this program, it produces the following output that is
+almost exactly identical to what you get from step-19:
+@code
+Timestep 1
+  Field degrees of freedom:                 4989
+  Total number of particles in simulation:  20
+  Number of particles lost this time step:  0
+
+  Now at t=2.12647e-07, dt=2.12647e-07.
+
+Timestep 2
+  Field degrees of freedom:                 4989
+  Total number of particles in simulation:  40
+  Number of particles lost this time step:  0
+
+  Now at t=4.14362e-07, dt=2.01715e-07.
+
+Timestep 3
+  Field degrees of freedom:                 4989
+  Total number of particles in simulation:  60
+  Number of particles lost this time step:  0
+
+  Now at t=5.23066e-07, dt=1.08704e-07.
+
+Timestep 4
+  Field degrees of freedom:                 4989
+  Total number of particles in simulation:  80
+  Number of particles lost this time step:  0
+
+  Now at t=6.08431e-07, dt=8.53649e-08.
+
+Timestep 5
+  Field degrees of freedom:                 4989
+  Total number of particles in simulation:  100
+  Number of particles lost this time step:  0
+
+  Now at t=6.81935e-07, dt=7.35039e-08.
+
+Timestep 6
+  Field degrees of freedom:                 4989
+  Total number of particles in simulation:  120
+  Number of particles lost this time step:  0
+
+  Now at t=7.47864e-07, dt=6.59294e-08.
+
+Timestep 7
+  Field degrees of freedom:                 4989
+  Total number of particles in simulation:  140
+  Number of particles lost this time step:  0
+
+  Now at t=8.2516e-07, dt=7.72957e-08.
+
+Timestep 8
+  Field degrees of freedom:                 4989
+  Total number of particles in simulation:  158
+  Number of particles lost this time step:  0
+
+  Now at t=8.95325e-07, dt=7.01652e-08.
+
+Timestep 9
+  Field degrees of freedom:                 4989
+  Total number of particles in simulation:  172
+  Number of particles lost this time step:  0
+
+  Now at t=9.67852e-07, dt=7.25269e-08.
+
+Timestep 10
+  Field degrees of freedom:                 4989
+  Total number of particles in simulation:  186
+  Number of particles lost this time step:  0
+
+  Now at t=1.03349e-06, dt=6.56398e-08.
+
+--- Writing checkpoint... ---
+
+Timestep 11
+  Field degrees of freedom:                 4989
+  Total number of particles in simulation:  198
+  Number of particles lost this time step:  0
+
+  Now at t=1.11482e-06, dt=8.13268e-08.
+
+Timestep 12
+  Field degrees of freedom:                 4989
+  Total number of particles in simulation:  206
+  Number of particles lost this time step:  0
+
+  Now at t=1.18882e-06, dt=7.39967e-08.
+
+Timestep 13
+  Field degrees of freedom:                 4989
+  Total number of particles in simulation:  212
+  Number of particles lost this time step:  0
+
+  Now at t=1.26049e-06, dt=7.16705e-08.
+
+[...]
+@endcode
+The only thing that is different is the additional line after the tenth
+output (which also appears after the 20th, 30th, etc., time step) indicating
+that a checkpoint file has been written.
+
+Because we chose to use a text-based format for the checkpoint file (which
+you should not do in production codes because it uses quite a lot of disk space),
+we can actually inspect this file. It will look like this, with many many more
+lines:
+@code
+22 serialization::archive 18 0 0 0 0 0 7 0 0 3 1 0
+4989 -1.00000000000000000e+00 -1.00000000000000000e+00 -1.00000000000000000e+00 -9.96108134982226390e-01 -1.00000000000000000e+00 -9.98361082867431748e-01
+[...]
+@endcode
+What each of these numbers represents is hard to tell in practice, and also
+entirely unimportant for our current purposes -- it's
+a representation of the many objects that make up this program's state, and
+from which one can restore its state. The point simply being that this is what
+serialization produces: A long list (a sequence) of bits that we can put
+into a file, and that we can later read again to recreate the state of the
+program.
+
+Now here's the fun part. Let's say you hit Control-C on the command
+line at the point above (say, during time step 13 or 14). There's
+a set of checkpoint files on disk that saved the state after ten time steps.
+Based on the logic in `main()`, we should be able to restart from
+this point if we run the program with
+```
+  ./step-83 restart
+```
+Indeed, this is what then happens:
+@code
+--- Restarting at t=1.03349e-06, dt=6.56398e-08
+
+Timestep 11
+  Field degrees of freedom:                 4989
+  Total number of particles in simulation:  198
+  Number of particles lost this time step:  0
+
+  Now at t=1.11482e-06, dt=8.13268e-08.
+
+Timestep 12
+  Field degrees of freedom:                 4989
+  Total number of particles in simulation:  206
+  Number of particles lost this time step:  0
+
+  Now at t=1.18882e-06, dt=7.39967e-08.
+
+[...]
+@endcode
+After the status message that shows that we are restarting, this is
+indeed *the exact same output* for the following time steps we had
+gotten previously -- in other words, saving the complete state
+seems to have worked, and the program has continued as if it had
+never been interrupted!
+
+
+
+<a name="extensions"></a>
+<h3>Possibilities for extensions</h3>
+
+<h4> Making efficiency a priority </h4>
+
+While the techniques we have shown here are fully sufficient for what
+we want to do, namely checkpoint and restart computations, and are in
+fact also fully sufficient for much larger code bases such as
+[ASPECT](https://aspect.geodynamics.org), one could go beyond what is
+still a relatively simple scheme.
+
+Specifically, among the things we need to recognize is that writing
+large amounts of data to disk is expensive and can take a good long
+time to finish -- for example, for large parallel computations with,
+say, a billion unknowns, checkpoints can run into the hundred gigabyte
+range or beyond. One may ask whether that could be avoided, or at
+least whether we can mitigate the cost.
+
+One way to do that is to first serialize the state of the program into
+a buffer in memory (like the `Archive` objects the `serialize()`
+functions write to and read from), and once that is done, start a *separate*
+thread do the writing while the rest of the program continues with computations.
+This is useful because writing the data to disk often takes a
+long time but not a lot of CPU power: It just takes time to move the
+data through the network to the file server, and from there onto the
+actual disks. This is something that might as well happen while we are
+doing something useful again (namely, solving more time steps). Should
+the machine crash during this phase, nothing is lost: As discussed in
+the introduction, we are writing the checkpoint into a temporary file
+(which will be lost in the case of a machine failure), but we have
+kept the previous checkpoint around until we know that the temporary
+file is complete and can be moved over the old one.
+
+The only thing we have to pay attention in this background-writing
+scheme is that we cannot start with creating a new checkpoint while
+the previous one is still being written in the background.
+
+Doing this all is not technically very difficult; the code just
+requires more explanation than lines of code, and so we omit doing
+this in the program here. But you can take a look at the
+`MainLoop::output()` function of step-69 to see how such a code looks
+like.
+
+A variation of this general approach is that each process writes its
+data immediately, but into files that are held on fast file systems --
+say, a node-local SSD rather than a file server shared by the entire
+cluster. One would then just tell the operating system to move this
+file to the centeral file server in a second step, and this step can
+happen in the background at whatever speed the operating system can
+provide. Or perhaps one leaves *most* of these files on the fast local
+file system in hopes that the restart happens before these files are
+purged (say, by a script that runs nightly) and only moves these files
+to the permanent file system every tenth time we create a checkpoint.
+
+In all of these cases, the logic quickly becomes quite complicated. As
+usual, the solution is not to re-invent the wheel: Libraries such as
+[VeloC](https://www.anl.gov/mcs/veloc-very-low-overhead-transparent-multilevel-checkpointrestart),
+developed by the Exascale Computing Project (ECP) already do all of
+this and more, for codes that are orders of magnitude more complex
+than the little example here.
+
+Separately, one might want to try to reduce the amount of time it
+takes to serialize objects into a buffer in memory. As mentioned
+above, we use the
+[BOOST serialization
+library](https://www.boost.org/doc/libs/1_74_0/libs/serialization/doc/index.html)
+for this task, but it is not the only player in town. One could, for
+example, use the [bitsery](https://github.com/fraillt/bitsery), [cereal](https://github.com/USCiLab/cereal), or
+[zpp](https://github.com/eyalz800/serializer) projects instead, which can be substantially faster than BOOST.

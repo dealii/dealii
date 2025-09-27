@@ -1,26 +1,26 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2023 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2023 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 #ifndef dealii_tria_orientation_h
 #define dealii_tria_orientation_h
 
 #include <deal.II/base/config.h>
 
+#include <deal.II/base/types.h>
 #include <deal.II/base/utilities.h>
 
-#include <vector>
+#include <tuple>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -29,12 +29,12 @@ namespace internal
   /**
    * Combine orientation flags.
    */
-  inline unsigned char
+  inline types::geometric_orientation
   combined_face_orientation(const bool face_orientation,
                             const bool face_rotation,
                             const bool face_flip)
   {
-    return (face_orientation ? 1 : 0) + (face_rotation ? 2 : 0) +
+    return (face_orientation ? 0 : 1) + (face_rotation ? 2 : 0) +
            (face_flip ? 4 : 0);
   }
 
@@ -43,11 +43,17 @@ namespace internal
    * rotation flag, flip flag.
    */
   inline std::tuple<bool, bool, bool>
-  split_face_orientation(const unsigned char combined_face_orientation)
+  split_face_orientation(
+    const types::geometric_orientation combined_orientation)
   {
-    return {Utilities::get_bit(combined_face_orientation, 0),
-            Utilities::get_bit(combined_face_orientation, 1),
-            Utilities::get_bit(combined_face_orientation, 2)};
+    Assert(combined_orientation != numbers::invalid_geometric_orientation,
+           ExcMessage(
+             "The provided orientation value is not valid. This typically "
+             "means this value was initialized to an invalid value and not "
+             "correctly set later."));
+    return {!Utilities::get_bit(combined_orientation, 0),
+            Utilities::get_bit(combined_orientation, 1),
+            Utilities::get_bit(combined_orientation, 2)};
   }
 
 

@@ -1,5 +1,3 @@
-<br>
-
 <i>
 This program was contributed by Natasha Sharma, Guido Kanschat, Timo
 Heister, Wolfgang Bangerth, and Zhuoran Wang.
@@ -10,7 +8,7 @@ Timo Heister and Wolfgang Bangerth acknowledge support through NSF
 awards DMS-1821210, EAR-1550901, and OAC-1835673.
 </i>
 
-<a name="Intro"></a>
+<a name="step_47-Intro"></a>
 <h1>Introduction</h1>
 
 This program deals with the <a
@@ -224,7 +222,7 @@ alternative method.
 <h3> Derivation of the C0IP method </h3>
 
 We base this program on the $C^0$ IP method presented by Susanne
-Brenner and Li-Yeng Sung in the paper "C$^0$ Interior Penalty Method
+Brenner and Li-Yeng Sung in the paper "$C^0$ Interior Penalty Method
 for Linear Fourth Order Boundary Value Problems on polygonal
 domains"
 @cite Brenner2005

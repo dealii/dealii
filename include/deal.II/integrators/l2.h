@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2010 - 2023 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2010 - 2024 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 #ifndef dealii_integrators_l2_h
 #define dealii_integrators_l2_h
@@ -54,7 +53,7 @@ namespace LocalIntegrators
      * @param factor A constant that multiplies the mass matrix.
      */
     template <int dim>
-    void
+    DEAL_II_DEPRECATED void
     mass_matrix(FullMatrix<double>      &M,
                 const FEValuesBase<dim> &fe,
                 const double             factor = 1.)
@@ -105,7 +104,7 @@ namespace LocalIntegrators
      * quadrature points in the element).
      */
     template <int dim>
-    void
+    DEAL_II_DEPRECATED void
     weighted_mass_matrix(FullMatrix<double>        &M,
                          const FEValuesBase<dim>   &fe,
                          const std::vector<double> &weights)
@@ -156,7 +155,7 @@ namespace LocalIntegrators
      * @param factor A constant that multiplies the result.
      */
     template <int dim, typename number>
-    void
+    DEAL_II_DEPRECATED void
     L2(Vector<number>            &result,
        const FEValuesBase<dim>   &fe,
        const std::vector<double> &input,
@@ -186,7 +185,7 @@ namespace LocalIntegrators
      * @param factor A constant that multiplies the result.
      */
     template <int dim, typename number>
-    void
+    DEAL_II_DEPRECATED void
     L2(Vector<number>                             &result,
        const FEValuesBase<dim>                    &fe,
        const ArrayView<const std::vector<double>> &input,
@@ -234,7 +233,7 @@ namespace LocalIntegrators
      * second cell.
      */
     template <int dim>
-    void
+    DEAL_II_DEPRECATED void
     jump_matrix(FullMatrix<double>      &M11,
                 FullMatrix<double>      &M12,
                 FullMatrix<double>      &M21,

@@ -1,17 +1,16 @@
-# ---------------------------------------------------------------------
-#
-# Copyright (C) 2016 - 2019 by the deal.II authors
-#
-# This file is part of the deal.II library.
-#
-# The deal.II library is free software; you can use it, redistribute
-# it, and/or modify it under the terms of the GNU Lesser General
-# Public License as published by the Free Software Foundation; either
-# version 2.1 of the License, or (at your option) any later version.
-# The full text of the license can be found in the file LICENSE.md at
-# the top level directory of deal.II.
-#
-# ---------------------------------------------------------------------
+## ------------------------------------------------------------------------
+##
+## SPDX-License-Identifier: LGPL-2.1-or-later
+## Copyright (C) 2016 - 2025 by the deal.II authors
+##
+## This file is part of the deal.II library.
+##
+## Part of the source code is dual licensed under Apache-2.0 WITH
+## LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+## governing the source code and code contributions can be found in
+## LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
+##
+## ------------------------------------------------------------------------
 
 import unittest
 
@@ -20,10 +19,10 @@ try:
 except ImportError:
     from PyDealII.Release import *
 
-class TestCellAccessorWrapper(unittest.TestCase):
 
+class TestCellAccessorWrapper(unittest.TestCase):
     def setUp(self):
-        self.triangulation = Triangulation('2D')
+        self.triangulation = Triangulation("2D")
         self.triangulation.generate_hyper_cube()
         self.triangulation.refine_global(1)
 
@@ -34,7 +33,7 @@ class TestCellAccessorWrapper(unittest.TestCase):
 
     def test_at_boundary(self):
         for cell in self.triangulation.active_cells():
-            self.assertEqual(cell.at_boundary(), cell.has_boundary_lines()) 
+            self.assertEqual(cell.at_boundary(), cell.has_boundary_lines())
 
     def test_faces(self):
         n_neighbors = 0
@@ -68,7 +67,7 @@ class TestCellAccessorWrapper(unittest.TestCase):
 
     def test_refine_flag(self):
         index = 0
-        refine_flags = ['no_refinement', 'cut_x', 'cut_y', 'cut_xy']
+        refine_flags = ["no_refinement", "cut_x", "cut_y", "cut_xy"]
         for cell in self.triangulation.active_cells():
             cell.refine_flag = refine_flags[index]
             index += 1
@@ -111,5 +110,5 @@ class TestCellAccessorWrapper(unittest.TestCase):
             index += 1
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

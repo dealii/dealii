@@ -1,23 +1,23 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2005 - 2022 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2015 - 2024 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 
 /* clang-format off */
 // find the least dominating FE from a set of FEs on faces (codim=1).
-// for this task we concatenate the two functions
-// FECollection::find_common_subspace() and FECollection::find_dominated_fe().
+// for this task we call FECollection::find_dominating_fe_extended(), which
+// concatenates the two functions FECollection::find_common_fes() and
+// FECollection::find_dominated_fe().
 // we test the results for the following collections:
 //   {Q1, Q2, Q3, Q4}             with {2,3} => Q3          2
 //   {Q1xQ1, Q2xQ2, Q3xQ4, Q4xQ3} with {2,3} => Q2xQ2       1
@@ -63,8 +63,8 @@ test()
   // {Q1xQ1, Q2xQ2, Q3xQ4, Q4xQ3}
   {
     hp::FECollection<dim> fe_collection;
-    fe_collection.push_back(FESystem<dim>(FE_Q<dim>(1), 1, FE_Q<dim>(1), 1));
-    fe_collection.push_back(FESystem<dim>(FE_Q<dim>(2), 1, FE_Q<dim>(2), 1));
+    fe_collection.push_back(FESystem<dim>(FE_Q<dim>(1), 2));
+    fe_collection.push_back(FESystem<dim>(FE_Q<dim>(2), 2));
     fe_collection.push_back(FESystem<dim>(FE_Q<dim>(3), 1, FE_Q<dim>(4), 1));
     fe_collection.push_back(FESystem<dim>(FE_Q<dim>(4), 1, FE_Q<dim>(3), 1));
     deallog << fe_collection.find_dominating_fe_extended(fes, /*codim=*/1)
@@ -74,7 +74,7 @@ test()
   // {Q1xQ1, Q3xQ4, Q4xQ3}
   {
     hp::FECollection<dim> fe_collection;
-    fe_collection.push_back(FESystem<dim>(FE_Q<dim>(1), 1, FE_Q<dim>(1), 1));
+    fe_collection.push_back(FESystem<dim>(FE_Q<dim>(1), 2));
     fe_collection.push_back(FESystem<dim>(FE_Q<dim>(3), 1, FE_Q<dim>(4), 1));
     fe_collection.push_back(FESystem<dim>(FE_Q<dim>(4), 1, FE_Q<dim>(3), 1));
     std::set<unsigned int> fes;
@@ -87,10 +87,8 @@ test()
   // {0x0, 0x0, Q1x0, 0xQ1}
   {
     hp::FECollection<dim> fe_collection;
-    fe_collection.push_back(
-      FESystem<dim>(FE_Nothing<dim>(), 1, FE_Nothing<dim>(), 1));
-    fe_collection.push_back(
-      FESystem<dim>(FE_Nothing<dim>(), 1, FE_Nothing<dim>(), 1));
+    fe_collection.push_back(FESystem<dim>(FE_Nothing<dim>(), 2));
+    fe_collection.push_back(FESystem<dim>(FE_Nothing<dim>(), 2));
     fe_collection.push_back(
       FESystem<dim>(FE_Q<dim>(1), 1, FE_Nothing<dim>(), 1));
     fe_collection.push_back(
@@ -107,10 +105,8 @@ test()
   // {0x0, 0x0, Q1x0, 0xQ1}
   {
     hp::FECollection<dim> fe_collection;
-    fe_collection.push_back(
-      FESystem<dim>(FE_Nothing<dim>(1, true), 1, FE_Nothing<dim>(1, true), 1));
-    fe_collection.push_back(
-      FESystem<dim>(FE_Nothing<dim>(1, true), 1, FE_Nothing<dim>(1, true), 1));
+    fe_collection.push_back(FESystem<dim>(FE_Nothing<dim>(1, true), 2));
+    fe_collection.push_back(FESystem<dim>(FE_Nothing<dim>(1, true), 2));
     fe_collection.push_back(
       FESystem<dim>(FE_Q<dim>(1), 1, FE_Nothing<dim>(1, true), 1));
     fe_collection.push_back(
@@ -123,8 +119,8 @@ test()
   // {Q1xQ1, Q1xQ1, Q2xQ1, Q1xQ2}
   {
     hp::FECollection<dim> fe_collection;
-    fe_collection.push_back(FESystem<dim>(FE_Q<dim>(1), 1, FE_Q<dim>(1), 1));
-    fe_collection.push_back(FESystem<dim>(FE_Q<dim>(1), 1, FE_Q<dim>(1), 1));
+    fe_collection.push_back(FESystem<dim>(FE_Q<dim>(1), 2));
+    fe_collection.push_back(FESystem<dim>(FE_Q<dim>(1), 2));
     fe_collection.push_back(FESystem<dim>(FE_Q<dim>(2), 1, FE_Q<dim>(1), 1));
     fe_collection.push_back(FESystem<dim>(FE_Q<dim>(1), 1, FE_Q<dim>(2), 1));
     deallog << fe_collection.find_dominating_fe_extended(fes, /*codim=*/1)
@@ -134,8 +130,8 @@ test()
   // {Q4xQ4, Q5xQ5, Q3xQ4, Q4xQ3}
   {
     hp::FECollection<dim> fe_collection;
-    fe_collection.push_back(FESystem<dim>(FE_Q<dim>(4), 1, FE_Q<dim>(4), 1));
-    fe_collection.push_back(FESystem<dim>(FE_Q<dim>(5), 1, FE_Q<dim>(5), 1));
+    fe_collection.push_back(FESystem<dim>(FE_Q<dim>(4), 2));
+    fe_collection.push_back(FESystem<dim>(FE_Q<dim>(5), 2));
     fe_collection.push_back(FESystem<dim>(FE_Q<dim>(3), 1, FE_Q<dim>(4), 1));
     fe_collection.push_back(FESystem<dim>(FE_Q<dim>(4), 1, FE_Q<dim>(3), 1));
     const unsigned int ind =

@@ -1,27 +1,28 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2020 - 2023 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2020 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 #ifndef dealii_mpi_noncontiguous_partitioner_h
 #define dealii_mpi_noncontiguous_partitioner_h
 
 #include <deal.II/base/config.h>
 
+#include <deal.II/base/array_view.h>
 #include <deal.II/base/communication_pattern_base.h>
-#include <deal.II/base/mpi_compute_index_owner_internal.h>
 #include <deal.II/base/mpi_stub.h>
+#include <deal.II/base/types.h>
 
+#include <deal.II/lac/vector_operation.h>
 
 
 DEAL_II_NAMESPACE_OPEN
@@ -80,6 +81,14 @@ namespace Utilities
        * Fill the vector @p ghost_array according to the precomputed communication
        * pattern with values from @p locally_owned_array.
        *
+       * In the default case, only one object is communicated per entry
+       * (`n_components_templated == 1'). If you want to communicate more
+       * entries, you can increase the value of @p n_components_templated in the
+       * case that you know the size at compile time. If you want to set the
+       * size during runtime, you can set @p n_components. However,
+       * @p n_components_templated has to be set to `0` in this case. Either
+       * @p n_components_templated or @p n_components can be set.
+       *
        * @pre The vectors only have to provide a method begin(), which allows
        *   to access their raw data.
        *
@@ -92,11 +101,12 @@ namespace Utilities
        *   functions separately and hereby overlap communication and
        *   computation.
        */
-      template <typename Number>
+      template <typename Number, unsigned int n_components_templated = 1>
       void
       export_to_ghosted_array(
         const ArrayView<const Number> &locally_owned_array,
-        const ArrayView<Number>       &ghost_array) const;
+        const ArrayView<Number>       &ghost_array,
+        const unsigned int             n_components = 0) const;
 
       /**
        * Same as above but with an interface similar to
@@ -112,14 +122,15 @@ namespace Utilities
        * @note Any value less than 10 is a valid value of
        *   @p communication_channel.
        */
-      template <typename Number>
+      template <typename Number, unsigned int n_components_templated = 1>
       void
       export_to_ghosted_array(
         const unsigned int             communication_channel,
         const ArrayView<const Number> &locally_owned_array,
         const ArrayView<Number>       &temporary_storage,
         const ArrayView<Number>       &ghost_array,
-        std::vector<MPI_Request>      &requests) const;
+        std::vector<MPI_Request>      &requests,
+        const unsigned int             n_components = 0) const;
 
       /**
        * Start update: Data is packed, non-blocking send and receives
@@ -137,13 +148,14 @@ namespace Utilities
        * @note Any value less than 10 is a valid value of
        *   @p communication_channel.
        */
-      template <typename Number>
+      template <typename Number, unsigned int n_components_templated = 1>
       void
       export_to_ghosted_array_start(
         const unsigned int             communication_channel,
         const ArrayView<const Number> &locally_owned_array,
         const ArrayView<Number>       &temporary_storage,
-        std::vector<MPI_Request>      &requests) const;
+        std::vector<MPI_Request>      &requests,
+        const unsigned int             n_components = 0) const;
 
       /**
        * Finish update. The method waits until all data has been sent and
@@ -159,12 +171,13 @@ namespace Utilities
        * @pre The required size of the vectors are the same as in the functions
        *   above.
        */
-      template <typename Number>
+      template <typename Number, unsigned int n_components_templated = 1>
       void
       export_to_ghosted_array_finish(
         const ArrayView<const Number> &temporary_storage,
         const ArrayView<Number>       &ghost_array,
-        std::vector<MPI_Request>      &requests) const;
+        std::vector<MPI_Request>      &requests,
+        const unsigned int             n_components = 0) const;
 
       /**
        * Similar to the above functions but for importing vector entries
@@ -307,9 +320,28 @@ namespace Utilities
        * Local index of each entry in recv_buffer within the destination
        * vector.
        *
+       * In the case that an entry is more than once requested by the
+       * same rank, local index of each entry in recv_buffer within
+       * recv_indices_duplicates_ptr.
+       *
        * @note Together with `recv_ptr` this forms a CRS data structure.
        */
       std::vector<types::global_dof_index> recv_indices;
+
+      /**
+       * In the case that an entry is more than once requested by the
+       * same rank, offset of each index in recv_indices_duplicates.
+       */
+      std::vector<unsigned int> recv_indices_duplicates_ptr;
+
+      /**
+       * Local index of each entry within the destination vector in the
+       * case that an entry is more than once requested by the same rank.
+       *
+       * @note Together with `recv_indices_duplicates_ptr`
+       * this forms a CRS data structure.
+       */
+      std::vector<unsigned int> recv_indices_duplicates;
 
       /**
        * Buffer containing the values sorted by rank for sending and receiving.

@@ -1,17 +1,16 @@
-/* ---------------------------------------------------------------------
+/* ------------------------------------------------------------------------
  *
- * Copyright (C) 2018 - 2023 by the deal.II authors
+ * SPDX-License-Identifier: LGPL-2.1-or-later
+ * Copyright (C) 2018 - 2024 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
- * The deal.II library is free software; you can use it, redistribute
- * it, and/or modify it under the terms of the GNU Lesser General
- * Public License as published by the Free Software Foundation; either
- * version 2.1 of the License, or (at your option) any later version.
- * The full text of the license can be found in the file LICENSE.md at
- * the top level directory of deal.II.
+ * Part of the source code is dual licensed under Apache-2.0 WITH
+ * LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+ * governing the source code and code contributions can be found in
+ * LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
  *
- * ---------------------------------------------------------------------
+ * ------------------------------------------------------------------------
  *
  * Authors: Thomas C. Clevenger, Clemson University
  *          Timo Heister, Clemson University and University of Utah
@@ -50,7 +49,6 @@
 #include <deal.II/fe/fe_values.h>
 
 #include <deal.II/numerics/vector_tools.h>
-#include <deal.II/numerics/matrix_tools.h>
 #include <deal.II/numerics/data_out.h>
 
 // Include all relevant multilevel files:
@@ -196,7 +194,7 @@ namespace Step63
     /* ...and then try to read their values from the input file: */
     if (prm_filename.empty())
       {
-        prm.print_parameters(std::cout, ParameterHandler::Text);
+        prm.print_parameters(std::cout, ParameterHandler::PRM);
         AssertThrow(
           false, ExcMessage("Please pass a .prm file as the first argument!"));
       }
@@ -468,7 +466,7 @@ namespace Step63
   }
 
 
-  // @sect3{<code>AdvectionProlem</code> class}
+  // @sect3{<code>AdvectionProblem</code> class}
 
   // This is the main class of the program, and should look very similar to
   // step-16. The major difference is that, since we are defining our multigrid
@@ -633,7 +631,7 @@ namespace Step63
               DoFRenumbering::random(dof_handler, level);
           }
         else
-          Assert(false, ExcNotImplemented());
+          DEAL_II_NOT_IMPLEMENTED();
       }
 
     // The rest of the function just sets up data structures. The last
@@ -814,13 +812,16 @@ namespace Step63
     for (unsigned int level = 0; level < triangulation.n_global_levels();
          ++level)
       {
-        const IndexSet locally_owned_level_dof_indices =
-          DoFTools::extract_locally_relevant_level_dofs(dof_handler, level);
-        boundary_constraints[level].reinit(locally_owned_level_dof_indices);
-        boundary_constraints[level].add_lines(
-          mg_constrained_dofs.get_refinement_edge_indices(level));
-        boundary_constraints[level].add_lines(
-          mg_constrained_dofs.get_boundary_indices(level));
+        boundary_constraints[level].reinit(
+          dof_handler.locally_owned_mg_dofs(level),
+          DoFTools::extract_locally_relevant_level_dofs(dof_handler, level));
+
+        for (const types::global_dof_index dof_index :
+             mg_constrained_dofs.get_refinement_edge_indices(level))
+          boundary_constraints[level].constrain_dof_to_zero(dof_index);
+        for (const types::global_dof_index dof_index :
+             mg_constrained_dofs.get_boundary_indices(level))
+          boundary_constraints[level].constrain_dof_to_zero(dof_index);
         boundary_constraints[level].close();
       }
 
@@ -1179,7 +1180,7 @@ namespace Step63
   template <int dim>
   void AdvectionProblem<dim>::run()
   {
-    for (unsigned int cycle = 0; cycle < (settings.fe_degree == 1 ? 7 : 5);
+    for (unsigned int cycle = 0; cycle < (settings.fe_degree == 1 ? 7u : 5u);
          ++cycle)
       {
         std::cout << "  Cycle " << cycle << ':' << std::endl;

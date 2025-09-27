@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 1999 - 2022 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 1999 - 2024 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 #ifndef dealii_precondition_block_h
 #define dealii_precondition_block_h
@@ -19,9 +18,9 @@
 
 #include <deal.II/base/config.h>
 
+#include <deal.II/base/enable_observer_pointer.h>
 #include <deal.II/base/exceptions.h>
-#include <deal.II/base/smartpointer.h>
-#include <deal.II/base/subscriptor.h>
+#include <deal.II/base/observer_pointer.h>
 
 #include <deal.II/lac/precondition_block_base.h>
 
@@ -41,9 +40,8 @@ DEAL_II_NAMESPACE_OPEN
  * diagonal and provides the inversion of the diagonal blocks of the matrix.
  * It is not necessary for this class that the matrix be block diagonal;
  * rather, it applies to matrices of arbitrary structure with the minimal
- * property of having invertible blocks on the diagonal. Still the matrix must
- * have access to single matrix entries. Therefore, BlockMatrixArray and
- * similar classes are not a possible matrix class template arguments.
+ * property of having invertible blocks on the diagonal. The matrix must
+ * have access to individual matrix entries.
  *
  * The block matrix structure used by this class is given, e.g., for the DG
  * method for the transport equation. For a downstream numbering the matrices
@@ -80,7 +78,7 @@ DEAL_II_NAMESPACE_OPEN
  */
 template <typename MatrixType,
           typename inverse_type = typename MatrixType::value_type>
-class PreconditionBlock : public virtual Subscriptor,
+class PreconditionBlock : public virtual EnableObserverPointer,
                           protected PreconditionBlockBase<inverse_type>
 {
 private:
@@ -344,7 +342,8 @@ protected:
    * inverse matrices should not be stored) until the last call of the
    * preconditoining @p vmult function of the derived classes.
    */
-  SmartPointer<const MatrixType, PreconditionBlock<MatrixType, inverse_type>> A;
+  ObserverPointer<const MatrixType, PreconditionBlock<MatrixType, inverse_type>>
+    A;
   /**
    * Relaxation parameter to be used by derived classes.
    */
@@ -377,7 +376,7 @@ protected:
 template <typename MatrixType,
           typename inverse_type = typename MatrixType::value_type>
 class PreconditionBlockJacobi
-  : public virtual Subscriptor,
+  : public virtual EnableObserverPointer,
     private PreconditionBlock<MatrixType, inverse_type>
 {
 private:
@@ -654,7 +653,7 @@ private:
 template <typename MatrixType,
           typename inverse_type = typename MatrixType::value_type>
 class PreconditionBlockSOR
-  : public virtual Subscriptor,
+  : public virtual EnableObserverPointer,
     protected PreconditionBlock<MatrixType, inverse_type>
 {
 public:
@@ -704,10 +703,7 @@ public:
   /**
    * Execute block SOR preconditioning.
    *
-   * Warning: this function performs normal @p vmult without adding. The
-   * reason for its existence is that BlockMatrixArray requires the adding
-   * version by default. On the other hand, adding requires an additional
-   * auxiliary vector, which is not desirable.
+   * Warning: this function performs normal @p vmult without adding.
    *
    * @see vmult
    */
@@ -730,10 +726,7 @@ public:
   /**
    * Execute backward block SOR preconditioning.
    *
-   * Warning: this function performs normal @p vmult without adding. The
-   * reason for its existence is that BlockMatrixArray requires the adding
-   * version by default. On the other hand, adding requires an additional
-   * auxiliary vector, which is not desirable.
+   * Warning: this function performs normal @p vmult without adding.
    *
    * @see vmult
    */
@@ -817,7 +810,7 @@ protected:
 template <typename MatrixType,
           typename inverse_type = typename MatrixType::value_type>
 class PreconditionBlockSSOR
-  : public virtual Subscriptor,
+  : public virtual EnableObserverPointer,
     private PreconditionBlockSOR<MatrixType, inverse_type>
 {
 public:

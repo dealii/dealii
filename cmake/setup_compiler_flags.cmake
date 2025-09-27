@@ -1,17 +1,16 @@
-## ---------------------------------------------------------------------
+## ------------------------------------------------------------------------
 ##
-## Copyright (C) 2012 - 2022 by the deal.II authors
+## SPDX-License-Identifier: LGPL-2.1-or-later
+## Copyright (C) 2012 - 2024 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
-## The deal.II library is free software; you can use it, redistribute
-## it, and/or modify it under the terms of the GNU Lesser General
-## Public License as published by the Free Software Foundation; either
-## version 2.1 of the License, or (at your option) any later version.
-## The full text of the license can be found in the file LICENSE.md at
-## the top level directory of deal.II.
+## Part of the source code is dual licensed under Apache-2.0 WITH
+## LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+## governing the source code and code contributions can be found in
+## LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 ##
-## ---------------------------------------------------------------------
+## ------------------------------------------------------------------------
 
 #
 # Setup default compiler flags: This file sets up sensible default compiler
@@ -69,12 +68,14 @@
 #
 
 foreach(build ${DEAL_II_BUILD_TYPES})
+  set(CMAKE_TRY_COMPILE_CONFIGURATION ${build})
   check_compiler_setup(
     "${DEAL_II_CXX_FLAGS_SAVED} ${DEAL_II_CXX_FLAGS_${build}_SAVED}"
     "${DEAL_II_LINKER_FLAGS_SAVED} ${DEAL_II_LINKER_FLAGS_${build}_SAVED}"
     DEAL_II_HAVE_USABLE_USER_FLAGS_${build}
     ${DEAL_II_LIBRARIES} ${DEAL_II_LIBRARIES_${build}}
     )
+  unset(CMAKE_TRY_COMPILE_CONFIGURATION)
 
   if(NOT DEAL_II_HAVE_USABLE_USER_FLAGS_${build})
     message(FATAL_ERROR "
@@ -98,7 +99,8 @@ endforeach()
 ########################################################################
 
 if( CMAKE_CXX_COMPILER_ID MATCHES "GNU" OR
-    CMAKE_CXX_COMPILER_ID MATCHES "Clang" )
+    CMAKE_CXX_COMPILER_ID MATCHES "Clang" OR
+    CMAKE_CXX_COMPILER_ID MATCHES "IntelLLVM")
   #
   # General setup for GCC and compilers sufficiently close to GCC:
   #

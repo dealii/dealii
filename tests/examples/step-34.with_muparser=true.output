@@ -1,0 +1,24 @@
+DEAL::
+DEAL::Parsing parameter file ../../../source/step-34/parameters.prm
+DEAL::for a 2 dimensional simulation. 
+DEAL::Cycle 0:
+DEAL::   Number of active cells:       20
+DEAL::   Number of degrees of freedom: 20
+DEAL::Cycle 1:
+DEAL::   Number of active cells:       40
+DEAL::   Number of degrees of freedom: 40
+DEAL::Cycle 2:
+DEAL::   Number of active cells:       80
+DEAL::   Number of degrees of freedom: 80
+DEAL::
+DEAL::Parsing parameter file ../../../source/step-34/parameters.prm
+DEAL::for a 3 dimensional simulation. 
+DEAL::Cycle 0:
+DEAL::   Number of active cells:       24
+DEAL::   Number of degrees of freedom: 26
+DEAL::Cycle 1:
+DEAL::   Number of active cells:       96
+DEAL::   Number of degrees of freedom: 98
+DEAL::Cycle 2:
+DEAL::   Number of active cells:       384
+DEAL::   Number of degrees of freedom: 386

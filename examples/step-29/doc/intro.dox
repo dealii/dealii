@@ -1,5 +1,3 @@
-<br>
-
 <i>
 This program was contributed by Moritz Allmaras at Texas A&amp;M
 University. Some of the work on this tutorial program has been funded
@@ -11,7 +9,7 @@ the UMFPACK sparse direct solver. Refer to the <a
 href="../../readme.html#umfpack">ReadMe</a> for instructions how to do this.
 
 
-<a name="Intro"></a>
+<a name="step_29-Intro"></a>
 <h1>Introduction</h1>
 
 
@@ -28,7 +26,7 @@ keeping everything complex-valued, is demonstrated in a different
 tutorial program: see step-58 for this.)
 When split into real and imaginary parts, the equations covered here
 fall into the class of vector-valued problems. A toplevel overview of
-this topic can be found in the @ref vector_valued module.
+this topic can be found in the @ref vector_valued topic.
 
 In addition to this discussion, we also discuss the ParameterHandler
 class, which provides a convenient way for reading parameters from a

@@ -1,17 +1,16 @@
-/* ---------------------------------------------------------------------
+/* ------------------------------------------------------------------------
  *
- * Copyright (C) 2009 - 2022 by the deal.II authors
+ * SPDX-License-Identifier: LGPL-2.1-or-later
+ * Copyright (C) 2018 - 2024 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
- * The deal.II library is free software; you can use it, redistribute
- * it, and/or modify it under the terms of the GNU Lesser General
- * Public License as published by the Free Software Foundation; either
- * version 2.1 of the License, or (at your option) any later version.
- * The full text of the license can be found in the file LICENSE.md at
- * the top level directory of deal.II.
+ * Part of the source code is dual licensed under Apache-2.0 WITH
+ * LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+ * governing the source code and code contributions can be found in
+ * LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
  *
- * ---------------------------------------------------------------------
+ * ------------------------------------------------------------------------
  *
  * Authors: Katharina Kormann, Martin Kronbichler, Uppsala University,
  * 2009-2012, updated to MPI version with parallel vectors in 2016
@@ -81,7 +80,7 @@ namespace Step37
   public:
     virtual double
     value(const Point<dim> &p,
-          const unsigned int /*compononent*/ = 0) const override
+          const unsigned int /*component*/ = 0) const override
     {
       return value<double>(p);
     }
@@ -403,7 +402,7 @@ namespace Step37
       DoFTools::extract_locally_relevant_dofs(dof_handler);
 
     constraints.clear();
-    constraints.reinit(locally_relevant_dofs);
+    constraints.reinit(dof_handler.locally_owned_dofs(), locally_relevant_dofs);
     DoFTools::make_hanging_node_constraints(dof_handler, constraints);
     VectorTools::interpolate_boundary_values(dof_handler,
                                              0,
@@ -445,7 +444,8 @@ namespace Step37
         const IndexSet relevant_dofs =
           DoFTools::extract_locally_relevant_level_dofs(dof_handler, level);
         AffineConstraints<double> level_constraints;
-        level_constraints.reinit(relevant_dofs);
+        level_constraints.reinit(dof_handler.locally_owned_mg_dofs(level),
+                                 relevant_dofs);
         level_constraints.add_lines(
           mg_constrained_dofs.get_boundary_indices(level));
         level_constraints.close();
@@ -595,7 +595,7 @@ namespace Step37
                                       ManufacturedSolution<dim>(),
                                       errors,
                                       QIterated<dim>(QTrapezoid<1>(), 4),
-                                      VectorTools::NormType::Linfty_norm);
+                                      VectorTools::Linfty_norm);
     double max_cell_error = 1.0;
     if (errors.begin() != errors.end())
       max_cell_error = *std::max_element(errors.begin(), errors.end());

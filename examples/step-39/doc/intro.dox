@@ -1,4 +1,4 @@
-<a name="Intro"></a>
+<a name="step_39-Intro"></a>
 
 In this program, we use the interior penalty method and Nitsche's weak
 boundary conditions to solve Poisson's equation. We use multigrid
@@ -79,9 +79,9 @@ Thus, the functions for assembling matrices, right hand side and error
 estimates below exhibit that these loops are all generic and can be
 programmed in the same way.
 
-This program is related to step-12b, in that it uses MeshWorker and
-discontinuous Galerkin methods. While there, we solved an advection
-problem, here it is a diffusion problem. Here, we also use multigrid
+This program is related to step-12, in that it uses MeshWorker and
+discontinuous Galerkin methods. There we solved an advection
+problem, while here it is a diffusion problem. Here, we also use multigrid
 preconditioning and a theoretically justified error estimator, see
 Karakashian and Pascal (2003). The multilevel scheme was discussed in
 detail in Kanschat (2004). The adaptive iteration and its convergence

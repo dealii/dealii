@@ -1,29 +1,199 @@
-1058c1058
-<     triangulation.refine_global(6 - dim);
----
->     triangulation.refine_global(2);
-1098c1098
-<         std::cout << "   VM Peak: " << mem.VmPeak << std::endl;
----
->         // std::cout << "   VM Peak: " << mem.VmPeak << std::endl;
-1100c1100
-<         computing_timer.print_summary();
----
->         // computing_timer.print_summary();
-1114c1114
-<       const int dim    = 3;
----
->       const int dim    = 2;
-1116,1118c1116,1123
-<       StokesProblem<dim> flow_problem(degree, SolverType::FGMRES_GMG);
-< 
-<       flow_problem.run();
----
->       {
->         StokesProblem<dim> flow_problem(degree, SolverType::FGMRES_GMG);
->         flow_problem.run();
->       }
->       {
->         StokesProblem<dim> flow_problem(degree, SolverType::FGMRES_ILU);
->         flow_problem.run();
->       }
+*** step-56.cc	2025-06-03 15:25:51.972483511 -0600
+--- step-56.patched	2025-06-03 15:25:42.779468142 -0600
+***************
+*** 64,70 ****
+  #include <deal.II/multigrid/mg_coarse.h>
+  #include <deal.II/multigrid/mg_smoother.h>
+  #include <deal.II/multigrid/mg_matrix.h>
+! 
+  #include <iostream>
+  #include <fstream>
+  
+--- 64,70 ----
+  #include <deal.II/multigrid/mg_coarse.h>
+  #include <deal.II/multigrid/mg_smoother.h>
+  #include <deal.II/multigrid/mg_matrix.h>
+! #include "../example_test.h"
+  #include <iostream>
+  #include <fstream>
+  
+***************
+*** 830,836 ****
+                                   1e-10 * system_rhs.l2_norm());
+      unsigned int  n_iterations_A;
+      unsigned int  n_iterations_S;
+! 
+      // This is used to pass whether or not we want to solve for A inside
+      // the preconditioner.  One could change this to false to see if
+      // there is still convergence and if so does the program then run
+--- 830,837 ----
+                                   1e-10 * system_rhs.l2_norm());
+      unsigned int  n_iterations_A;
+      unsigned int  n_iterations_S;
+!     (void)n_iterations_A;
+!     (void)n_iterations_S;
+      // This is used to pass whether or not we want to solve for A inside
+      // the preconditioner.  One could change this to false to see if
+      // there is still convergence and if so does the program then run
+***************
+*** 866,872 ****
+          {
+            TimerOutput::Scope solve_fmgres(computing_timer, "Solve - FGMRES");
+  
+!           solver.solve(system_matrix, solution, system_rhs, preconditioner);
+            n_iterations_A = preconditioner.n_iterations_A;
+            n_iterations_S = preconditioner.n_iterations_S;
+          }
+--- 867,877 ----
+          {
+            TimerOutput::Scope solve_fmgres(computing_timer, "Solve - FGMRES");
+  
+! //          solver.solve(system_matrix, solution, system_rhs, preconditioner);
+!           check_solver_within_range(std::cout,
+!                                     solver.solve(system_matrix, solution, system_rhs, preconditioner),
+!                                     solver_control.last_step(),
+!                                     13, 17);
+            n_iterations_A = preconditioner.n_iterations_A;
+            n_iterations_S = preconditioner.n_iterations_S;
+          }
+***************
+*** 928,934 ****
+  
+          {
+            TimerOutput::Scope solve_fmgres(computing_timer, "Solve - FGMRES");
+!           solver.solve(system_matrix, solution, system_rhs, preconditioner);
+            n_iterations_A = preconditioner.n_iterations_A;
+            n_iterations_S = preconditioner.n_iterations_S;
+          }
+--- 933,943 ----
+  
+          {
+            TimerOutput::Scope solve_fmgres(computing_timer, "Solve - FGMRES");
+!           //solver.solve(system_matrix, solution, system_rhs, preconditioner);
+!           check_solver_within_range(std::cout,
+!                                     solver.solve(system_matrix, solution, system_rhs, preconditioner),
+!                                     solver_control.last_step(),
+!                                     13, 17);
+            n_iterations_A = preconditioner.n_iterations_A;
+            n_iterations_S = preconditioner.n_iterations_S;
+          }
+***************
+*** 936,950 ****
+  
+      constraints.distribute(solution);
+  
+!     std::cout
+!       << std::endl
+!       << "\tNumber of FGMRES iterations: " << solver_control.last_step()
+!       << std::endl
+!       << "\tTotal number of iterations used for approximation of A inverse: "
+!       << n_iterations_A << std::endl
+!       << "\tTotal number of iterations used for approximation of S inverse: "
+!       << n_iterations_S << std::endl
+!       << std::endl;
+    }
+  
+  
+--- 945,959 ----
+  
+      constraints.distribute(solution);
+  
+! //    std::cout
+! //      << std::endl
+! //      << "\tNumber of FGMRES iterations: " << solver_control.last_step()
+! //      << std::endl
+! //      << "\tTotal number of iterations used for approximation of A inverse: "
+! //      << n_iterations_A << std::endl
+! //      << "\tTotal number of iterations used for approximation of S inverse: "
+! //      << n_iterations_S << std::endl
+! //      << std::endl;
+    }
+  
+  
+***************
+*** 963,970 ****
+      const double mean_pressure = VectorTools::compute_mean_value(
+        dof_handler, QGauss<dim>(pressure_degree + 2), solution, dim);
+      solution.block(1).add(-mean_pressure);
+!     std::cout << "   Note: The mean value was adjusted by " << -mean_pressure
+!               << std::endl;
+  
+      const ComponentSelectFunction<dim> pressure_mask(dim, dim + 1);
+      const ComponentSelectFunction<dim> velocity_mask(std::make_pair(0, dim),
+--- 972,979 ----
+      const double mean_pressure = VectorTools::compute_mean_value(
+        dof_handler, QGauss<dim>(pressure_degree + 2), solution, dim);
+      solution.block(1).add(-mean_pressure);
+! //    std::cout << "   Note: The mean value was adjusted by " << -mean_pressure
+! //              << std::endl;
+  
+      const ComponentSelectFunction<dim> pressure_mask(dim, dim + 1);
+      const ComponentSelectFunction<dim> velocity_mask(std::make_pair(0, dim),
+***************
+*** 1057,1063 ****
+    void StokesProblem<dim>::run()
+    {
+      GridGenerator::hyper_cube(triangulation);
+!     triangulation.refine_global(6 - dim);
+  
+      if (solver_type == SolverType::FGMRES_ILU)
+        std::cout << "Now running with ILU" << std::endl;
+--- 1066,1072 ----
+    void StokesProblem<dim>::run()
+    {
+      GridGenerator::hyper_cube(triangulation);
+!     triangulation.refine_global(2);
+  
+      if (solver_type == SolverType::FGMRES_ILU)
+        std::cout << "Now running with ILU" << std::endl;
+***************
+*** 1097,1105 ****
+  
+          Utilities::System::MemoryStats mem;
+          Utilities::System::get_memory_stats(mem);
+!         std::cout << "   VM Peak: " << mem.VmPeak << std::endl;
+  
+!         computing_timer.print_summary();
+          computing_timer.reset();
+        }
+    }
+--- 1106,1114 ----
+  
+          Utilities::System::MemoryStats mem;
+          Utilities::System::get_memory_stats(mem);
+!         // std::cout << "   VM Peak: " << mem.VmPeak << std::endl;
+  
+!         // computing_timer.print_summary();
+          computing_timer.reset();
+        }
+    }
+***************
+*** 1113,1123 ****
+        using namespace Step56;
+  
+        const int degree = 1;
+!       const int dim    = 3;
+        // options for SolverType: UMFPACK FGMRES_ILU FGMRES_GMG
+!       StokesProblem<dim> flow_problem(degree, SolverType::FGMRES_GMG);
+! 
+!       flow_problem.run();
+      }
+    catch (std::exception &exc)
+      {
+--- 1122,1137 ----
+        using namespace Step56;
+  
+        const int degree = 1;
+!       const int dim    = 2;
+        // options for SolverType: UMFPACK FGMRES_ILU FGMRES_GMG
+!       {
+!         StokesProblem<dim> flow_problem(degree, SolverType::FGMRES_GMG);
+!         flow_problem.run();
+!       }
+!       {
+!         StokesProblem<dim> flow_problem(degree, SolverType::FGMRES_ILU);
+!         flow_problem.run();
+!       }
+      }
+    catch (std::exception &exc)
+      {

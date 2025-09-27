@@ -1,19 +1,19 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2022 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2022 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
-#pragma once
+#ifndef dealii_tests_tensor_produce_matrix_h
+#define dealii_tests_tensor_produce_matrix_h
 
 #include <deal.II/fe/fe_nothing.h>
 #include <deal.II/fe/fe_values.h>
@@ -65,7 +65,7 @@ namespace dealii
     }
 
     // Compute harmonic extent of each locally owned cell including of each
-    // of its neighbors. If there is no neigbor, its extent is zero.
+    // of its neighbors. If there is no neighbor, its extent is zero.
     template <int dim>
     std::vector<dealii::ndarray<double, dim, 3>>
     compute_harmonic_patch_extent(const Mapping<dim>        &mapping,
@@ -79,7 +79,7 @@ namespace dealii
                                                 quadrature);
 
       // 2) accumulate for each face the normal extent for the
-      // neigboring cell(s); here we also consider periodicies
+      // neighboring cell(s); here we also consider periodicies
       std::vector<double> face_extent(triangulation.n_faces(), 0.0);
 
       for (const auto &cell : triangulation.active_cell_iterators())
@@ -131,3 +131,5 @@ namespace dealii
 
   } // namespace GridTools
 } // namespace dealii
+
+#endif

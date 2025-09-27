@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2004 - 2023 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2004 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 #ifndef dealii_block_matrix_base_h
 #define dealii_block_matrix_base_h
@@ -21,7 +20,7 @@
 
 #include <deal.II/base/memory_consumption.h>
 #include <deal.II/base/mutex.h>
-#include <deal.II/base/smartpointer.h>
+#include <deal.II/base/observer_pointer.h>
 #include <deal.II/base/table.h>
 #include <deal.II/base/utilities.h>
 
@@ -100,10 +99,6 @@ namespace BlockMatrixIterators
      * Block column into which we presently point.
      */
     unsigned int col_block;
-
-    // Let the iterator class be a friend.
-    template <typename>
-    friend class MatrixIterator;
   };
 
 
@@ -195,9 +190,12 @@ namespace BlockMatrixIterators
     operator==(const Accessor &a) const;
 
     template <typename>
-    friend class MatrixIterator;
+    friend class dealii::MatrixIterator;
+
     friend class Accessor<BlockMatrixType, true>;
   };
+
+
 
   /**
    * Block matrix accessor for constant matrices, implementing the stepping
@@ -348,7 +346,7 @@ namespace BlockMatrixIterators
  * @ref GlossBlockLA "Block (linear algebra)"
  */
 template <typename MatrixType>
-class BlockMatrixBase : public Subscriptor
+class BlockMatrixBase : public EnableObserverPointer
 {
 public:
   /**
@@ -851,7 +849,7 @@ protected:
   /**
    * Array of sub-matrices.
    */
-  Table<2, SmartPointer<BlockType, BlockMatrixBase<MatrixType>>> sub_objects;
+  Table<2, ObserverPointer<BlockType, BlockMatrixBase<MatrixType>>> sub_objects;
 
   /**
    * This function collects the sizes of the sub-objects and stores them in
@@ -859,8 +857,8 @@ protected:
    * matrix to indices into the subobjects. You *must* call this function each
    * time after you have changed the size of the sub-objects.
    *
-   * Derived classes should call this function whenever the size of the sub-
-   * objects has changed and the @p X_block_indices arrays need to be updated.
+   * Derived classes should call this function whenever the size of the
+   * sub-objects has changed and the @p X_block_indices arrays need to be updated.
    *
    * Note that this function is not public since not all derived classes need
    * to export its interface. For example, for the usual deal.II SparseMatrix
@@ -1118,7 +1116,6 @@ namespace BlockMatrixIterators
     : matrix(matrix)
     , base_iterator(matrix->block(0, 0).begin())
   {
-    (void)col;
     Assert(col == 0, ExcNotImplemented());
 
     // check if this is a regular row or
@@ -1318,7 +1315,6 @@ namespace BlockMatrixIterators
     : matrix(matrix)
     , base_iterator(matrix->block(0, 0).begin())
   {
-    (void)col;
     Assert(col == 0, ExcNotImplemented());
     // check if this is a regular row or
     // the end of the matrix
@@ -1788,14 +1784,15 @@ BlockMatrixBase<MatrixType>::set(const size_type  row,
       temporary_data.column_values[col_index.first][local_index] = value;
     }
 
-#  ifdef DEBUG
-  // If in debug mode, do a check whether
-  // the right length has been obtained.
-  size_type length = 0;
-  for (unsigned int i = 0; i < this->n_block_cols(); ++i)
-    length += temporary_data.counter_within_block[i];
-  Assert(length <= n_cols, ExcInternalError());
-#  endif
+  if constexpr (running_in_debug_mode())
+    {
+      // If in debug mode, do a check whether
+      // the right length has been obtained.
+      size_type length = 0;
+      for (unsigned int i = 0; i < this->n_block_cols(); ++i)
+        length += temporary_data.counter_within_block[i];
+      Assert(length <= n_cols, ExcInternalError());
+    }
 
   // Now we found out about where the
   // individual columns should start and
@@ -1931,17 +1928,21 @@ BlockMatrixBase<MatrixType>::add(const size_type  row,
   // efficiently.
   if (col_indices_are_sorted == true)
     {
-#  ifdef DEBUG
-      // check whether indices really are
-      // sorted.
-      size_type before = col_indices[0];
-      for (size_type i = 1; i < n_cols; ++i)
-        if (col_indices[i] <= before)
-          Assert(false,
-                 ExcMessage("Flag col_indices_are_sorted is set, but "
-                            "indices appear to not be sorted.")) else before =
-            col_indices[i];
-#  endif
+      if constexpr (running_in_debug_mode())
+        {
+          // check whether indices really are
+          // sorted.
+          size_type before = col_indices[0];
+          for (size_type i = 1; i < n_cols; ++i)
+            if (col_indices[i] <= before)
+              {
+                Assert(false,
+                       ExcMessage("Flag col_indices_are_sorted is set, but "
+                                  "indices appear to not be sorted."));
+              }
+            else
+              before = col_indices[i];
+        }
       const std::pair<unsigned int, size_type> row_index =
         this->row_block_indices.global_to_local(row);
 
@@ -2044,14 +2045,15 @@ BlockMatrixBase<MatrixType>::add(const size_type  row,
       temporary_data.column_values[col_index.first][local_index] = value;
     }
 
-#  ifdef DEBUG
-  // If in debug mode, do a check whether
-  // the right length has been obtained.
-  size_type length = 0;
-  for (unsigned int i = 0; i < this->n_block_cols(); ++i)
-    length += temporary_data.counter_within_block[i];
-  Assert(length <= n_cols, ExcInternalError());
-#  endif
+  if constexpr (running_in_debug_mode())
+    {
+      // If in debug mode, do a check whether
+      // the right length has been obtained.
+      size_type length = 0;
+      for (unsigned int i = 0; i < this->n_block_cols(); ++i)
+        length += temporary_data.counter_within_block[i];
+      Assert(length <= n_cols, ExcInternalError());
+    }
 
   // Now we found out about where the
   // individual columns should start and

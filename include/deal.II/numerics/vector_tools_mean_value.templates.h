@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2023 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2020 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 #ifndef dealii_vector_tools_mean_value_templates_h
 #define dealii_vector_tools_mean_value_templates_h
@@ -91,7 +90,6 @@ namespace VectorTools
     std::enable_if_t<dealii::is_serial_vector<VectorType>::value == false>
     subtract_mean_value(VectorType &v, const std::vector<bool> &p_select)
     {
-      (void)p_select;
       Assert(p_select.empty(), ExcNotImplemented());
       // In case of an empty boolean mask operate on the whole vector:
       v.add(-v.mean_value());
@@ -274,9 +272,9 @@ namespace VectorTools
 
 
 #  ifdef DEAL_II_TRILINOS_WITH_TPETRA
-  template <int dim, int spacedim, typename ValueType>
+  template <int dim, int spacedim, typename ValueType, typename MemorySpace>
   void
-  add_constant(LinearAlgebra::TpetraWrappers::Vector<ValueType> &,
+  add_constant(LinearAlgebra::TpetraWrappers::Vector<ValueType, MemorySpace> &,
                const DoFHandler<dim, spacedim> &,
                const unsigned int,
                const ValueType)
@@ -354,7 +352,7 @@ namespace VectorTools
                                        3,
                                        MPI_DOUBLE,
                                        MPI_SUM,
-                                       p_triangulation->get_communicator());
+                                       p_triangulation->get_mpi_communicator());
         AssertThrowMPI(ierr);
 
         internal::set_possibly_complex_number(global_values[0],

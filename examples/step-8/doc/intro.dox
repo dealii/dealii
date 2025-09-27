@@ -1,11 +1,11 @@
-<a name="Intro"></a>
+<a name="step_8-Intro"></a>
 <h1>Introduction</h1>
 
 
 In real life, most partial differential equations are really systems
 of equations. Accordingly, the solutions are usually
 vector-valued. The deal.II library supports such problems (see the
-extensive documentation in the @ref vector_valued module), and we will show
+extensive documentation in the @ref vector_valued topic), and we will show
 that that is mostly rather simple. The only more complicated problems
 are in assembling matrix and right hand side, but these are easily
 understood as well.
@@ -156,13 +156,13 @@ href="http://en.wikipedia.org/wiki/Plane_stress#Plane_stress">plan stress</a>.
 But let's get back to the original problem.
 How do we assemble the matrix for such an equation? A very long answer
 with a number of different alternatives is given in the documentation of the
-@ref vector_valued module. Historically, the solution shown below was the only
+@ref vector_valued topic. Historically, the solution shown below was the only
 one available in the early years of the library. It turns out to also be the
 fastest. On the other hand, if a few per cent of compute time do not matter,
 there are simpler and probably more intuitive ways to assemble the linear
 system than the one discussed below but that weren't available until several
 years after this tutorial program was first written; if you are interested in
-them, take a look at the @ref vector_valued module.
+them, take a look at the @ref vector_valued topic.
 
 Let us go back to the question of how to assemble the linear system. The first
 thing we need is some knowledge about how the shape functions work in the case
@@ -396,8 +396,8 @@ As a final note: in the step-17 example program, we will
 revisit the elastic problem laid out here, and will show how to solve it in
 %parallel on a cluster of computers. The resulting program will thus be able to
 solve this problem to significantly higher accuracy, and more efficiently if
-this is required. In addition, in step-20, @ref step_21
-"step-21", as well as a few other of the later tutorial programs, we will
+this is required. In addition, in step-20, step-21,
+as well as a few other of the later tutorial programs, we will
 revisit some vector-valued problems and show a few techniques that may make it
 simpler to actually go through all the stuff shown above, with
 FiniteElement::system_to_component_index etc.

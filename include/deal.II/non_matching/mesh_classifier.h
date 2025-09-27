@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2021 - 2021 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2021 - 2024 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 #ifndef dealii_non_matching_mesh_classifier
 #define dealii_non_matching_mesh_classifier
@@ -106,7 +105,7 @@ namespace NonMatching
    * same way as for the discrete level set function.
    */
   template <int dim>
-  class MeshClassifier : public Subscriptor
+  class MeshClassifier : public EnableObserverPointer
   {
   public:
     /**
@@ -173,7 +172,7 @@ namespace NonMatching
     /**
      * Pointer to the triangulation that should be classified.
      */
-    const SmartPointer<const Triangulation<dim>> triangulation;
+    const ObserverPointer<const Triangulation<dim>> triangulation;
 
     /**
      * Pointer to an object that describes what we need to know about the

@@ -1,25 +1,24 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2010 - 2022 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2010 - 2024 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 #ifndef dealii_relaxation_block_h
 #define dealii_relaxation_block_h
 
 #include <deal.II/base/config.h>
 
-#include <deal.II/base/smartpointer.h>
-#include <deal.II/base/subscriptor.h>
+#include <deal.II/base/enable_observer_pointer.h>
+#include <deal.II/base/observer_pointer.h>
 
 #include <deal.II/lac/precondition_block_base.h>
 #include <deal.II/lac/sparsity_pattern.h>
@@ -42,8 +41,8 @@ DEAL_II_NAMESPACE_OPEN
  * PreconditionBlock, since the index sets may be arbitrary and overlapping,
  * while there only contiguous, disjoint sets of equal size are allowed. As a
  * drawback, this class cannot be used as a preconditioner, since its
- * implementation relies on a straight forward implementation of the Gauss-
- * Seidel process.
+ * implementation relies on a straight forward implementation of the
+ * Gauss-Seidel process.
  *
  * Parallel computations require you to specify an initialized
  * ghost vector in AdditionalData::temp_ghost_vector.
@@ -78,7 +77,7 @@ public:
    * structure in #block_list and an optional ordering of the blocks in
    * #order.
    */
-  class AdditionalData : public Subscriptor
+  class AdditionalData : public EnableObserverPointer
   {
   public:
     /**
@@ -247,15 +246,15 @@ protected:
    * inverse matrices should not be stored) until the last call of the
    * preconditioning @p vmult function of the derived classes.
    */
-  SmartPointer<const MatrixType,
-               RelaxationBlock<MatrixType, InverseNumberType, VectorType>>
+  ObserverPointer<const MatrixType,
+                  RelaxationBlock<MatrixType, InverseNumberType, VectorType>>
     A;
 
   /**
    * Control information.
    */
-  SmartPointer<const AdditionalData,
-               RelaxationBlock<MatrixType, InverseNumberType, VectorType>>
+  ObserverPointer<const AdditionalData,
+                  RelaxationBlock<MatrixType, InverseNumberType, VectorType>>
     additional_data;
 
 private:
@@ -284,7 +283,7 @@ template <typename MatrixType,
           typename InverseNumberType = typename MatrixType::value_type,
           typename VectorType        = Vector<double>>
 class RelaxationBlockJacobi
-  : public virtual Subscriptor,
+  : public virtual EnableObserverPointer,
     protected RelaxationBlock<MatrixType, InverseNumberType, VectorType>
 {
 public:
@@ -380,7 +379,7 @@ template <typename MatrixType,
           typename InverseNumberType = typename MatrixType::value_type,
           typename VectorType        = Vector<double>>
 class RelaxationBlockSOR
-  : public virtual Subscriptor,
+  : public virtual EnableObserverPointer,
     protected RelaxationBlock<MatrixType, InverseNumberType, VectorType>
 {
 public:
@@ -476,7 +475,7 @@ template <typename MatrixType,
           typename InverseNumberType = typename MatrixType::value_type,
           typename VectorType        = Vector<double>>
 class RelaxationBlockSSOR
-  : public virtual Subscriptor,
+  : public virtual EnableObserverPointer,
     protected RelaxationBlock<MatrixType, InverseNumberType, VectorType>
 {
 public:

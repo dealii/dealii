@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2014 - 2021 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2015 - 2024 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 
 
@@ -76,14 +75,14 @@ template <int dim,
           int n_q_points_1d = fe_degree + 1,
           typename BlockVectorType =
             LinearAlgebra::distributed::BlockVector<double>>
-class BlockLaplace : public Subscriptor
+class BlockLaplace : public EnableObserverPointer
 {
 public:
   using value_type = typename BlockVectorType::value_type;
   using size_type  = typename BlockVectorType::size_type;
 
   BlockLaplace()
-    : Subscriptor()
+    : EnableObserverPointer()
   {}
 
   void
@@ -231,7 +230,7 @@ do_test(const DoFHandler<dim> &dof, const unsigned int nb)
 
   // fine-level constraints
   AffineConstraints<double> constraints;
-  constraints.reinit(locally_relevant_dofs);
+  constraints.reinit(dof.locally_owned_dofs(), locally_relevant_dofs);
   DoFTools::make_hanging_node_constraints(dof, constraints);
   VectorTools::interpolate_boundary_values(dof,
                                            dirichlet_boundary,
@@ -280,7 +279,8 @@ do_test(const DoFHandler<dim> &dof, const unsigned int nb)
   {
     // this is to make it consistent with parallel_multigrid_adaptive.cc
     AffineConstraints<double> hanging_node_constraints;
-    hanging_node_constraints.reinit(locally_relevant_dofs);
+    hanging_node_constraints.reinit(dof.locally_owned_dofs(),
+                                    locally_relevant_dofs);
     DoFTools::make_hanging_node_constraints(dof, hanging_node_constraints);
     hanging_node_constraints.close();
 
@@ -317,7 +317,7 @@ do_test(const DoFHandler<dim> &dof, const unsigned int nb)
       AffineConstraints<double> level_constraints;
       const IndexSet            relevant_dofs =
         DoFTools::extract_locally_relevant_level_dofs(dof, level);
-      level_constraints.reinit(relevant_dofs);
+      level_constraints.reinit(dof.locally_owned_mg_dofs(level), relevant_dofs);
       level_constraints.add_lines(
         mg_constrained_dofs.get_boundary_indices(level));
       level_constraints.close();

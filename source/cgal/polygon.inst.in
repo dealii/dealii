@@ -1,0 +1,37 @@
+// ------------------------------------------------------------------------
+//
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2025 by the deal.II authors
+//
+// This file is part of the deal.II library.
+//
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
+//
+// ------------------------------------------------------------------------
+
+
+
+for (cgal_kernel : CGAL_KERNELS)
+  {
+    template CGAL::Polygon_2<cgal_kernel> dealii_cell_to_cgal_polygon<
+      cgal_kernel>(const typename Triangulation<2, 2>::cell_iterator &cell,
+                   const Mapping<2, 2>                               &mapping);
+
+    template CGAL::Polygon_with_holes_2<cgal_kernel>
+    dealii_tria_to_cgal_polygon<cgal_kernel>(const Triangulation<2, 2> &tria,
+                                             const Mapping<2, 2> &mapping);
+
+    template CGAL::Polygon_with_holes_2<cgal_kernel>
+    polygon_to_polygon_with_holes(
+      const CGAL::Polygon_2<cgal_kernel>              &boundary_outside,
+      const std::vector<CGAL::Polygon_2<cgal_kernel>> &boundary_holes);
+
+    template std::vector<CGAL::Polygon_with_holes_2<cgal_kernel>>
+    compute_boolean_operation<cgal_kernel>(
+      const CGAL::Polygon_with_holes_2<cgal_kernel> &polygon_1,
+      const CGAL::Polygon_with_holes_2<cgal_kernel> &polygon_2,
+      const BooleanOperation                        &boolean_operation);
+  }

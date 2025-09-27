@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2008 - 2022 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2010 - 2022 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 
 
@@ -19,7 +18,6 @@
 
 #include <deal.II/base/tensor.h>
 
-#include <deal.II/distributed/solution_transfer.h>
 #include <deal.II/distributed/tria.h>
 
 #include <deal.II/fe/fe_q.h>
@@ -31,6 +29,8 @@
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_iterator.h>
+
+#include <deal.II/numerics/solution_transfer.h>
 
 #include "../tests.h"
 
@@ -50,8 +50,8 @@ test(std::ostream & /*out*/)
   static const FE_Q<dim> fe(2);
   dofh.distribute_dofs(fe);
 
-  parallel::distributed::SolutionTransfer<dim, Vector<double>> soltrans(dofh);
-  parallel::distributed::SolutionTransfer<dim, Vector<double>> soltrans2(dofh);
+  SolutionTransfer<dim, Vector<double>> soltrans(dofh);
+  SolutionTransfer<dim, Vector<double>> soltrans2(dofh);
 
   for (typename Triangulation<dim>::active_cell_iterator cell =
          tr.begin_active();

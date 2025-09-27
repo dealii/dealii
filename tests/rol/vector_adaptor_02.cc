@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2017 - 2022 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2017 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 #include <deal.II/lac/generic_linear_algebra.h>
 
@@ -21,11 +20,12 @@
 #include <iostream>
 #include <sstream>
 
+#include "../tests.h"
+
 #include "ROL_Algorithm.hpp"
 #include "ROL_LineSearchStep.hpp"
 #include "ROL_Objective.hpp"
 #include "ROL_StatusTest.hpp"
-#include "Teuchos_GlobalMPISession.hpp"
 
 // Use ROL to minimize the objective function, f(x,y) = x^2 + y^2.
 
@@ -37,21 +37,21 @@ template <class Real = double, typename Xprim = Rol::VectorAdaptor<VectorType>>
 class QuadraticObjective : public ROL::Objective<Real>
 {
 private:
-  Teuchos::RCP<const VectorType>
-  get_rcp_to_VectorType(const ROL::Vector<Real> &x)
+  ROL::Ptr<const VectorType>
+  get_rolptr_to_VectorType(const ROL::Vector<Real> &x)
   {
-    return (Teuchos::dyn_cast<const Xprim>(x)).getVector();
+    return (dynamic_cast<const Xprim &>(x)).getVector();
   }
 
-  Teuchos::RCP<dealii::Vector<Real>>
-  get_rcp_to_VectorType(ROL::Vector<Real> &x)
+  ROL::Ptr<dealii::Vector<Real>>
+  get_rolptr_to_VectorType(ROL::Vector<Real> &x)
   {
-    return (Teuchos::dyn_cast<Xprim>(x)).getVector();
+    return (dynamic_cast<Xprim &>(x)).getVector();
   }
 
 public:
   Real
-  value(const ROL::Vector<Real> &x, Real & /*tol*/)
+  value(const ROL::Vector<Real> &x, Real & /*tol*/) override
   {
     Assert(x.dimension() == 2, ExcInternalError());
 
@@ -59,10 +59,12 @@ public:
   }
 
   void
-  gradient(ROL::Vector<Real> &g, const ROL::Vector<Real> &x, Real & /*tol*/)
+  gradient(ROL::Vector<Real>       &g,
+           const ROL::Vector<Real> &x,
+           Real & /*tol*/) override
   {
-    Teuchos::RCP<const VectorType> xp = this->get_rcp_to_VectorType(x);
-    Teuchos::RCP<VectorType>       gp = this->get_rcp_to_VectorType(g);
+    ROL::Ptr<const VectorType> xp = this->get_rolptr_to_VectorType(x);
+    ROL::Ptr<VectorType>       gp = this->get_rolptr_to_VectorType(g);
 
     (*gp)[0] = 2. * (*xp)[0];
     (*gp)[1] = 2. * (*xp)[1];
@@ -76,8 +78,9 @@ test(const double x, const double y)
 
   QuadraticObjective<RealT> quad_objective;
 
-  Teuchos::RCP<std::ostream> outStream = Teuchos::rcp(&std::cout, false);
-  Teuchos::RCP<VectorType>   x_rcp     = Teuchos::rcp(new VectorType);
+  ROL::Ptr<std::ostream> outStream =
+    ROL::makePtrFromRef<std::ostream>(std::cout);
+  ROL::Ptr<VectorType> x_rcp = ROL::makePtr<VectorType>();
 
   x_rcp->reinit(2);
 
@@ -86,7 +89,7 @@ test(const double x, const double y)
 
   Rol::VectorAdaptor<VectorType> x_rol(x_rcp);
 
-  Teuchos::ParameterList parlist;
+  ROL::ParameterList parlist;
 
 #if DEAL_II_TRILINOS_VERSION_GTE(12, 18, 0)
   // Define algorithm in three intuitive and easy steps.
@@ -111,7 +114,7 @@ test(const double x, const double y)
   // Run Algorithm.
   algo.run(x_rol, quad_objective, true, *outStream);
 
-  Teuchos::RCP<const VectorType> xg = x_rol.getVector();
+  ROL::Ptr<const VectorType> xg = x_rol.getVector();
   std::cout << "The solution to minimization problem is: ";
   std::cout << (*xg)[0] << ' ' << (*xg)[1] << std::endl;
 }

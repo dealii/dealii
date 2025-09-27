@@ -1,0 +1,44 @@
+Number of active cells: 12288 (on 6 levels)
+Number of degrees of freedom: 186624 (99840+36864+49920)
+
+Timestep 0:  t=0 years
+
+   Rebuilding Stokes preconditioner...
+Solver stopped within 22 - 45 iterations
+   Maximal velocity: 62.8733 cm/year
+   Time step: 17994.4 years
+Solver stopped within 16 - 19 iterations
+   Temperature range: 973 4273.16
+
+Number of active cells: 17622 (on 7 levels)
+Number of degrees of freedom: 276660 (149196+52866+74598)
+
+Timestep 0:  t=0 years
+
+   Rebuilding Stokes preconditioner...
+Solver stopped within 22 - 45 iterations
+   Maximal velocity: 60.4718 cm/year
+   Time step: 10157 years
+Solver stopped within 16 - 19 iterations
+   Temperature range: 973 4273.16
+
+Number of active cells: 20742 (on 8 levels)
+Number of degrees of freedom: 337536 (183540+62226+91770)
+
+Timestep 0:  t=0 years
+
+   Rebuilding Stokes preconditioner...
+Solver stopped within 22 - 45 iterations
+   Maximal velocity: 60.5356 cm/year
+   Time step: 5078.11 years
+Solver stopped within 16 - 19 iterations
+   Temperature range: 973 4273.43
+
+Timestep 1:  t=5078.11 years
+
+Solver stopped within 22 - 45 iterations
+   Maximal velocity: 61.6599 cm/year
+   Time step: 4985.32 years
+Solver stopped within 16 - 19 iterations
+   Temperature range: 973 4273.43
+

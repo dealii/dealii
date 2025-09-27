@@ -1,0 +1,135 @@
+
+DEAL::testing empty IndexSet
+DEAL::size = 0
+DEAL::local size = 0
+DEAL::entries =
+DEAL::
+DEAL::testing an IndexSet with holes
+DEAL::size = 20
+DEAL::local size = 20
+DEAL::entries =
+DEAL::  10
+DEAL::  11
+DEAL::  12
+DEAL::  13
+DEAL::  14
+DEAL::  15
+DEAL::  16
+DEAL::  17
+DEAL::  18
+DEAL::  19
+DEAL::  90
+DEAL::  91
+DEAL::  92
+DEAL::  93
+DEAL::  94
+DEAL::  95
+DEAL::  96
+DEAL::  97
+DEAL::  98
+DEAL::  99
+DEAL::
+DEAL::testing a complete IndexSet
+DEAL::size = 100
+DEAL::local size = 100
+DEAL::entries =
+DEAL::  0
+DEAL::  1
+DEAL::  2
+DEAL::  3
+DEAL::  4
+DEAL::  5
+DEAL::  6
+DEAL::  7
+DEAL::  8
+DEAL::  9
+DEAL::  10
+DEAL::  11
+DEAL::  12
+DEAL::  13
+DEAL::  14
+DEAL::  15
+DEAL::  16
+DEAL::  17
+DEAL::  18
+DEAL::  19
+DEAL::  20
+DEAL::  21
+DEAL::  22
+DEAL::  23
+DEAL::  24
+DEAL::  25
+DEAL::  26
+DEAL::  27
+DEAL::  28
+DEAL::  29
+DEAL::  30
+DEAL::  31
+DEAL::  32
+DEAL::  33
+DEAL::  34
+DEAL::  35
+DEAL::  36
+DEAL::  37
+DEAL::  38
+DEAL::  39
+DEAL::  40
+DEAL::  41
+DEAL::  42
+DEAL::  43
+DEAL::  44
+DEAL::  45
+DEAL::  46
+DEAL::  47
+DEAL::  48
+DEAL::  49
+DEAL::  50
+DEAL::  51
+DEAL::  52
+DEAL::  53
+DEAL::  54
+DEAL::  55
+DEAL::  56
+DEAL::  57
+DEAL::  58
+DEAL::  59
+DEAL::  60
+DEAL::  61
+DEAL::  62
+DEAL::  63
+DEAL::  64
+DEAL::  65
+DEAL::  66
+DEAL::  67
+DEAL::  68
+DEAL::  69
+DEAL::  70
+DEAL::  71
+DEAL::  72
+DEAL::  73
+DEAL::  74
+DEAL::  75
+DEAL::  76
+DEAL::  77
+DEAL::  78
+DEAL::  79
+DEAL::  80
+DEAL::  81
+DEAL::  82
+DEAL::  83
+DEAL::  84
+DEAL::  85
+DEAL::  86
+DEAL::  87
+DEAL::  88
+DEAL::  89
+DEAL::  90
+DEAL::  91
+DEAL::  92
+DEAL::  93
+DEAL::  94
+DEAL::  95
+DEAL::  96
+DEAL::  97
+DEAL::  98
+DEAL::  99

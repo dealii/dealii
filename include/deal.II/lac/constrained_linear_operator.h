@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2015 - 2022 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2015 - 2024 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 #ifndef dealii_constrained_linear_operator_h
 #define dealii_constrained_linear_operator_h
@@ -51,7 +50,7 @@ DEAL_II_NAMESPACE_OPEN
  * of linear equations. How to solve a linear system of equations with this
  * approach is explained in detail in the
  * @ref constraints
- * module.
+ * topic.
  *
  *
  * @note Currently, this function may not work correctly for distributed data
@@ -232,7 +231,7 @@ project_to_constrained_linear_operator(
  *
  * A detailed explanation of this approach is given in the
  * @ref constraints
- * module.
+ * topic.
  *
  *
  * @note Currently, this function may not work correctly for distributed data
@@ -278,7 +277,7 @@ constrained_linear_operator(
  *
  * A detailed explanation of this approach is given in the
  * @ref constraints
- * module.
+ * topic.
  *
  *
  * @note Currently, this function may not work correctly for distributed data

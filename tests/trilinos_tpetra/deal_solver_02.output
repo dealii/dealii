@@ -1,0 +1,4 @@
+
+DEAL::Size 32 Unknowns 961
+DEAL::Solver type: N6dealii14SolverBicgstabINS_13LinearAlgebra14TpetraWrappers6VectorIdNS_11MemorySpace7DefaultEEEEE
+DEAL::Solver stopped within 49 - 51 iterations

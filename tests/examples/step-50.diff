@@ -1,0 +1,46 @@
+45c45
+< 
+---
+> #include "../example_test.h"
+1196,1199c1196,1207
+<               solver.solve(system_matrix,
+<                            solution,
+<                            right_hand_side,
+<                            preconditioner);
+---
+>               //            solver.solve(system_matrix,
+>               //                         solution,
+>               //                         right_hand_side,
+>               //                         preconditioner);
+>               check_solver_within_range(pcout,
+>                                         solver.solve(system_matrix,
+>                                                      solution,
+>                                                      right_hand_side,
+>                                                      preconditioner),
+>                                         solver_control.last_step(),
+>                                         1,
+>                                         33);
+1210,1211c1218,1220
+<     pcout << "   Number of CG iterations:      " << solver_control.last_step()
+<           << std::endl;
+---
+>     //  pcout << "   Number of CG iterations:      " <<
+>     //  solver_control.last_step()
+>     //        << std::endl;
+1482c1491
+<     for (unsigned int cycle = 0; cycle < settings.n_steps; ++cycle)
+---
+>     for (unsigned int cycle = 0; cycle < 8; ++cycle)
+1543,1544c1552,1553
+<         computing_timer.print_summary();
+<         computing_timer.reset();
+---
+>         // computing_timer.print_summary();
+>         // computing_timer.reset();
+1548a1558
+> 
+1562c1572,1573
+<   if (!settings.try_parse((argc > 1) ? (argv[1]) : ""))
+---
+>   if (!settings.try_parse((argc > 1) ? (argv[1]) :
+>                                        "../../../source/step-50/amg_2d.prm"))

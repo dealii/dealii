@@ -1,20 +1,20 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2020 - 2021 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2020 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 
 #include <deal.II/grid/grid_generator.h>
+#include <deal.II/grid/tria_description.h>
 
 namespace dealii
 {
@@ -123,7 +123,7 @@ namespace dealii
         }
       else
         {
-          AssertThrow(false, ExcNotImplemented())
+          AssertThrow(false, ExcNotImplemented());
         }
     }
 
@@ -269,7 +269,7 @@ namespace dealii
         }
       else
         {
-          AssertThrow(false, ExcNotImplemented())
+          AssertThrow(false, ExcNotImplemented());
         }
     }
 
@@ -373,7 +373,7 @@ namespace dealii
         }
       else
         {
-          AssertThrow(false, ExcNotImplemented())
+          AssertThrow(false, ExcNotImplemented());
         }
     }
 
@@ -412,15 +412,17 @@ namespace dealii
 
       // add simplex cell in coordinate direction
       const unsigned int coordinate = face_no / 2;
-#ifdef DEBUG
-      // all vertices should be in a plane
-      for (const auto &vertex : vertices)
-        Assert(midpoint(coordinate) == vertex(coordinate), ExcInternalError());
-#endif
+      if constexpr (running_in_debug_mode())
+        {
+          // all vertices should be in a plane
+          for (const auto &vertex : vertices)
+            Assert(midpoint[coordinate] == vertex[coordinate],
+                   ExcInternalError());
+        }
 
       // add another vertex as tip of triangle/pyramid
       Point<spacedim> tip = midpoint;
-      tip(coordinate) += (face_no % 2 == 1) ? 1. : -1.;
+      tip[coordinate] += (face_no % 2 == 1) ? 1. : -1.;
       vertices.push_back(tip);
 
       CellData<dim> simplex(vertices.size());

@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2009 - 2022 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2009 - 2024 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 
 /**
@@ -92,7 +91,7 @@ problems. In particular, they are aimed at the following goals:
   infrastructure code supporting AMR.
 
   Supporting this point is the fact that although there are
-  <a href="https://www.dealii.org/publications.html">more than 2,000
+  <a href="https://dealii.org/publications.html">more than 2,000
   publications</a> presenting results obtained with deal.II, we are aware of
   only a relatively small number of applications that have been built with deal.II from
   scratch; all others have started as modifications of one of the tutorial
@@ -126,7 +125,7 @@ problems. In particular, they are aimed at the following goals:
   applications both regarding computing times to solve as well as concerning
   the accuracy of numerical solutions.
 
-  The applications in this module will already have been benchmarked for
+  The applications in this group will already have been benchmarked for
   correctness. Existing tutorial programs typically employ simpler rather than
   more complicated solver schemes for exposition but frequently suggest more
   complicated schemes including hints on how they might be implemented in an

@@ -1,69 +1,132 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2002 - 2023 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2002 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 /**
  * @defgroup reordering Grid reordering and cell orientation
  *
- * @brief A module describing how deal.II consistently orients Triangulation
+ * @brief A group describing how deal.II consistently orients Triangulation
  * objects.
  *
  * @warning The implementation of orientation should be considered an internal
  * detail of the library. Normal users should not need to use the features
- * describd in this module: instead, classes like QProjector use orientation
+ * described in this group: instead, classes like QProjector use orientation
  * information to consistently compute values on faces and lines.
+ *
+ * The orientation of a line, triangle, or quadrilateral is a permutation of its
+ * vertices which does not result in a twisted cell: i.e., orientations are a
+ * subset of all possible vertex permutations. Orientations are encoded with
+ * types::geometric_orientation.
+ *
+ * A Triangulation contains both cells and also lower-dimensional objects, such
+ * as faces and vertices. While CellAccessor and TriaAccessor objects provide
+ * access to all the topological and geometric information of some entity (such
+ * as its neighbors, manifold ids, etc), these objects only store indices and a
+ * pointer to a Triangulation and look up the data they use from arrays managed
+ * by that Triangulation (typically in an
+ * internal::TriangulationImplementation::TriaLevel). This is an example of the
+ * <a href="https://en.wikipedia.org/wiki/Flyweight_pattern">flyweight
+ * pattern</a>. For brevity, we typically write "the line stores" or "the cell
+ * stores" but the underlying implementation contains at least one level of
+ * indirection, as this data is stored in some way by the Triangulation and is
+ * indexed by TriaAccessorBase::index() and TriaAccessorBase::level().
+ *
+ * In general, each geometric entity only stores the indices of the lower-level
+ * entities which bound it (e.g., a cell stores the indices of its faces, but in
+ * 3d must query the faces to get the indices of its lines). One exception to
+ * this rule is the vertex index cache: for performance reasons cells directly
+ * store their vertex indices.
+ *
+ * Each line and face has a unique index and exists exactly once in a
+ * Triangulation. Orientations are defined as the permutation which makes the
+ * vertices, defined in the context of the line or face, have the same order as
+ * the ones defined in the context of the cell.
  *
  * <h2>Orientation of Lines</h2>
  *
- * A Triangulation is built not just of cells but also of lower-dimensional
- * objects. In particular, a line in 2D is a face which may be shared by two
- * cells, whereas in 3D a line may be shared by an arbitrary number of cells.
+ * In 1D, lines are cells and, since each line appears in the Triangulation
+ * exactly once, they do not store any orientation information.
  *
- * Lines (i.e., faces in 2D) are implicitly defined by the vertex numbering of
- * the cell on which they are defined (i.e., there is no separate line or face
- * object). This information is encoded in various ReferenceCell functions. For
- * example, the first face of a triangle with nodes {0, 1, 2} is {0, 1}.
- * Similarly, the first face of a triangle with nodes {1, 0, 3} is {1, 0}. By
- * itself, this would be inconsistent, since the same line would be defined in
- * twice: once by each of the two adjacent cells, and they might not agree
- * whether the line should be {0, 1} or {1, 0}. To solve this problem deal.II
- * also stores an <tt>unsigned char</tt> on each cell for each of the cell's
- * faces; this value encodes the orientation of the line *as seen from this
- * cell*. In this particular case the orientation of the {1, 0} line from the
- * {0, 1, 2} cell is ReferenceCell::default_combined_face_orientation() whereas
- * the orientation of the {0, 1} line from the {1, 0, 3} cell is
- * ReferenceCell::reversed_combined_line_orientation().
+ * A line in 2D is a face which may be shared by two cells, whereas in 3D a line
+ * may be shared by an arbitrary number of cells.
+ *
+ * In 2D, each cell stores the indices of its bounding lines: i.e., each cell
+ * stores either 3 (for triangles) or 4 (for quadrilaterals) integers which
+ * enumerate those lines. Put another way: while there is no distinct `Line`
+ * class in deal.II, each line is uniquely identified by an index (accessed via
+ * CellAccessor::line_index()) and lines are, like other geometric entities,
+ * implemented with the flyweight pattern and represented by a TriaAccessor.
+ * Each line stores and is defined by the vertex indices which bound it and also
+ * stores other auxiliary information (such as boundary and manifold ids).
+ *
+ * In 3D, the line indices of a cell are stored by the faces which bound it:
+ * i.e., each cell stores its own face indices (which represent triangles or
+ * quadrilaterals) and each face stores its own line indices. Hence, when
+ * accessing a cell's lines, after identifying the face which owns that line
+ * (via ReferenceCell::standard_line_to_face_and_line_index()) all data lookups
+ * proceed in exactly the same way as the 2D case.
+ *
+ * Each line has both a unique index and a canonical vertex ordering. For
+ * example, consider two triangular cells with vertex numbers `{15, 20, 25}` and
+ * `{20, 15, 3}`. The order of the vertices on each cell is defined by the
+ * CellData objects passed to Triangulation::create_triangulation(): typically,
+ * the order of the vertices is arbitrary aside from the constraint that they
+ * form a cell whose mapping to the reference cell has a positive Jacobian (see
+ * Triangulation::Triangulation() for more information on whether or not this
+ * should be checked). In this example, the first line of the first cell is
+ * `{15, 20}` whereas the first line of the second cell is `{20, 15}`. In
+ * deal.II, the canonical order of a line's vertices is set by the first cell
+ * with that line: i.e., line `0` will have vertices `{15, 20}` since it first
+ * appears in the first cell and those are the first two vertices of that cell.
+ * Similarly, line `1` is `{20, 25}` and line `2` is `{25, 15}`. This order
+ * (i.e., first and second vertex, then second and third, then third and first)
+ * is defined by ReferenceCell::line_to_cell_vertices() for each reference cell
+ * type.
+ *
+ * Canonicalization creates an inconsistency because the vertices of the first
+ * line on the second cell are reversed. To resolve this inconsistency, each 2D
+ * structure (either cells in 2D or faces in 3D) also stores the relative
+ * orientations of its bounding lines. In this example, for the first line, the
+ * first cell will store numbers::default_geometric_orientation and the second
+ * cell will store numbers::reverse_line_orientation. In each case this
+ * orientation value encodes the transformation necessary to make the canonical
+ * ordering match the cell-local ordering: i.e., the first cell does nothing and
+ * the second cell must invert the order.
  *
  * <h2>Orientation of Faces</h2>
  *
- * In deal.II, we express the orientation of an object with three booleans:
- * orientation, rotate, and flip. The default values for these are true, false,
- * and false. These values are typically encoded or decoded from or to a single
- * <tt>unsigned char</tt> by the internal::combined_face_orientation() and
- * internal::split_face_orientation() functions.
+ * Unlike lines, which only have two possible orientations, a quadrilateral
+ * (i.e., a face of a pyramid, wedge, or hexahedron in 3D) has 8 possible
+ * orientations and a triangle (i.e., a face of a tetrahedron, pyramid, or wedge
+ * in 3D) has 6. In deal.II, we encode the orientation of a quadrilateral or
+ * triangle with three booleans: orientation, rotation, and flip. The default
+ * values for these are true, false, and false. These values are typically
+ * encoded or decoded from or to a single types::geometric_orientation value
+ * (whose exact binary representation is an internal library detail) by the
+ * internal::combined_face_orientation() and internal::split_face_orientation()
+ * functions.
  *
  * For a quadrilateral, these values correspond to
  * - *orientation* : `true` is the default orientation and `false` means
  *   vertices 1 and 2 are swapped.
- * - *rotation* : all vertices are rotated by 90 degrees clockwise.
- * - *flip* : all vertices are rotated by 180 degrees clockwise.
+ * - *rotation* : all vertices are rotated by 90 degrees counterclockwise.
+ * - *flip* : all vertices are rotated by 180 degrees counterclockwise.
  *
  * For a triangle, these values correspond to
  * - *orientation* : `true` is the default orientation and `false` means
  *   vertices 1 and 2 are swapped.
- * - *rotation* : all vertices are rotated by 120 degrees clockwise.
- * - *flip* : all vertices are rotated by 240 degrees clockwise.
+ * - *rotation* : all vertices are rotated by 120 degrees counterclockwise.
+ * - *flip* : all vertices are rotated by 240 degrees counterclockwise.
  *
  * Here, 'clockwise' is relative to the vector defined by the cross product of
  * two lines adjacent to the zeroth vertex in their standard orientation (which,
@@ -74,16 +137,95 @@
  * consider flip-rotate or flip-orient-rotate as those cases are equivalent,
  * respectively, to the identity operation or the orientation = `true` case as
  * flip-rotate is equal to the identity operation. As a consequence, there are
- * only six valid orientations for triangles as faces of tetrahedra.
+ * only six valid orientations for triangles as faces of tetrahedra, pyramids,
+ * or wedges.
+ *
+ * Like the line case, the stored orientation value defines the way that the
+ * vertices of the face must be permuted to match the cell-local ordering. A
+ * consequence of this choice is that QProjector uses the inverse orientation
+ * (via ReferenceCell::get_inverse_combined_orientation()) to compute the
+ * locations of quadrature points, since exactly one of the following
+ * possibilities must happen:
+ *
+ * 1. If we are on the face which defines the canonical ordering of the face
+ *    vertices then that face's orientation must be
+ *    numbers::default_geometric_orientation, whose inverse is itself (as it is
+ *    the identity permutation). Hence, in this case, applying the permutation
+ *    to the positions of the vertices will not change the positions of the
+ *    quadrature points.
+ *
+ * 2. If we are on the neighbor's face then, to make vertices match, we must
+ *    transform the cell-local vertices so that they match the first cell's
+ *    vertex ordering: i.e., the inverse orientation.
+ *
+ * <h2>Orientations as Permutations of Vertices</h2>
+ * As discussed above, TriaAccessor::combined_face_orientation() returns a value
+ * less than ReferenceCell::n_face_orientations() which describes how the
+ * bounding object (i.e., a face) should be rotated to match the cell-local
+ * definition of that object. The encoding of triangles is
+ *
+ * <div class="threecolumn" style="width: 600px">
+ *   <div class="parent">
+ *     <div class="img" align="center">
+ *       @image html triangle-0.svg
+ *       @image html triangle-1.svg
+ *     </div>
+ *   </div>
+ *   <div class="parent">
+ *     <div class="img" align="center">
+ *       @image html triangle-2.svg
+ *       @image html triangle-3.svg
+ *     </div>
+ *   </div>
+ *   <div class="parent">
+ *     <div class="img" align="center">
+ *       @image html triangle-4.svg
+ *       @image html triangle-5.svg
+ *     </div>
+ *   </div>
+ * </div>
+ *
+ * Similarly, quadrilaterals are encoded as
+ *
+ * <div class="fourcolumn" style="width: 800px">
+ *   <div class="parent">
+ *     <div class="img" align="center">
+ *       @image html quadrilateral-0.svg
+ *       @image html quadrilateral-1.svg
+ *     </div>
+ *   </div>
+ *   <div class="parent">
+ *     <div class="img" align="center">
+ *       @image html quadrilateral-2.svg
+ *       @image html quadrilateral-3.svg
+ *     </div>
+ *   </div>
+ *   <div class="parent">
+ *     <div class="img" align="center">
+ *       @image html quadrilateral-4.svg
+ *       @image html quadrilateral-5.svg
+ *     </div>
+ *   </div>
+ *   <div class="parent">
+ *     <div class="img" align="center">
+ *       @image html quadrilateral-6.svg
+ *       @image html quadrilateral-7.svg
+ *     </div>
+ *   </div>
+ * </div>
+ *
+ * The numbers on each edge are the line numbers with the two bounding vertices
+ * as subscripts: e.g., $0_0^1$ is the first line of a triangle and when it
+ * appears as $0_1^0$ then the line is in the reversed orientation (i.e.,
+ * numbers::reverse_line_orientation).
  *
  * <h2>Orientation of Quadrilateral Meshes</h2>
  *
  * Purely quadrilateral meshes are a special case, since deal.II will (with the
  * exception of faces which are neighbors across periodic boundaries)
  * consistently orient purely quadrilateral meshes. Hence, in this case, the
- * orientation of all lines will be
- * ReferenceCell::default_combined_face_orientation(). See @cite AABB17 for more
- * information on this algorithm.
+ * orientation of all lines will be numbers::default_geometric_orientation. See
+ * @cite AABB17 for more information on this algorithm.
  *
  * For example, in two dimensions, a quad consists of four lines which have a
  * direction, which is by definition as follows:

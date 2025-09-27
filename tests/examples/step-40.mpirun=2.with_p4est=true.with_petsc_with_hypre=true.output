@@ -1,0 +1,16 @@
+Running with PETSc on 2 MPI rank(s)...
+Cycle 0:
+   Number of active cells:       1024
+   Number of degrees of freedom: 4225
+Solver stopped after 7 iterations
+
+Cycle 1:
+   Number of active cells:       1966
+   Number of degrees of freedom: 8453
+Solver stopped after 7 iterations
+
+Cycle 2:
+   Number of active cells:       3676
+   Number of degrees of freedom: 16211
+Solver stopped after 7 iterations
+

@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2008 - 2021 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2010 - 2024 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 
 
@@ -58,26 +57,26 @@ create_disconnected_mesh(Triangulation<dim> &tria)
           vertices[0] = vertices[1] = p1;
           vertices[2] = vertices[3] = p2;
 
-          vertices[1](0) = p2(0);
-          vertices[2](0) = p1(0);
+          vertices[1][0] = p2[0];
+          vertices[2][0] = p1[0];
           break;
         case 3:
           vertices[0] = vertices[1] = vertices[2] = vertices[3] = p1;
           vertices[4] = vertices[5] = vertices[6] = vertices[7] = p2;
 
-          vertices[1](0) = p2(0);
-          vertices[2](1) = p2(1);
-          vertices[3](0) = p2(0);
-          vertices[3](1) = p2(1);
+          vertices[1][0] = p2[0];
+          vertices[2][1] = p2[1];
+          vertices[3][0] = p2[0];
+          vertices[3][1] = p2[1];
 
-          vertices[4](0) = p1(0);
-          vertices[4](1) = p1(1);
-          vertices[5](1) = p1(1);
-          vertices[6](0) = p1(0);
+          vertices[4][0] = p1[0];
+          vertices[4][1] = p1[1];
+          vertices[5][1] = p1[1];
+          vertices[6][0] = p1[0];
 
           break;
         default:
-          Assert(false, ExcNotImplemented());
+          DEAL_II_NOT_IMPLEMENTED();
       }
 
     // Prepare cell data
@@ -104,8 +103,8 @@ create_disconnected_mesh(Triangulation<dim> &tria)
           vertices[GeometryInfo<dim>::vertices_per_cell + 2] =
             vertices[GeometryInfo<dim>::vertices_per_cell + 3] = p2;
 
-          vertices[GeometryInfo<dim>::vertices_per_cell + 1](0) = p2(0);
-          vertices[GeometryInfo<dim>::vertices_per_cell + 2](0) = p1(0);
+          vertices[GeometryInfo<dim>::vertices_per_cell + 1][0] = p2[0];
+          vertices[GeometryInfo<dim>::vertices_per_cell + 2][0] = p1[0];
           break;
         case 3:
           vertices[GeometryInfo<dim>::vertices_per_cell + 0] =
@@ -117,19 +116,19 @@ create_disconnected_mesh(Triangulation<dim> &tria)
               vertices[GeometryInfo<dim>::vertices_per_cell + 6] =
                 vertices[GeometryInfo<dim>::vertices_per_cell + 7] = p2;
 
-          vertices[GeometryInfo<dim>::vertices_per_cell + 1](0) = p2(0);
-          vertices[GeometryInfo<dim>::vertices_per_cell + 2](1) = p2(1);
-          vertices[GeometryInfo<dim>::vertices_per_cell + 3](0) = p2(0);
-          vertices[GeometryInfo<dim>::vertices_per_cell + 3](1) = p2(1);
+          vertices[GeometryInfo<dim>::vertices_per_cell + 1][0] = p2[0];
+          vertices[GeometryInfo<dim>::vertices_per_cell + 2][1] = p2[1];
+          vertices[GeometryInfo<dim>::vertices_per_cell + 3][0] = p2[0];
+          vertices[GeometryInfo<dim>::vertices_per_cell + 3][1] = p2[1];
 
-          vertices[GeometryInfo<dim>::vertices_per_cell + 4](0) = p1(0);
-          vertices[GeometryInfo<dim>::vertices_per_cell + 4](1) = p1(1);
-          vertices[GeometryInfo<dim>::vertices_per_cell + 5](1) = p1(1);
-          vertices[GeometryInfo<dim>::vertices_per_cell + 6](0) = p1(0);
+          vertices[GeometryInfo<dim>::vertices_per_cell + 4][0] = p1[0];
+          vertices[GeometryInfo<dim>::vertices_per_cell + 4][1] = p1[1];
+          vertices[GeometryInfo<dim>::vertices_per_cell + 5][1] = p1[1];
+          vertices[GeometryInfo<dim>::vertices_per_cell + 6][0] = p1[0];
 
           break;
         default:
-          Assert(false, ExcNotImplemented());
+          DEAL_II_NOT_IMPLEMENTED();
       }
 
     // Prepare cell data

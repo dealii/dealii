@@ -1,0 +1,16 @@
+
+DEAL:0:2d/2d::Before refinement particle id 0 is in cell 0.0
+DEAL:0:2d/2d::Before refinement particle id 1 is in cell 0.0
+DEAL:0:2d/2d::After refinement particle id 1 is in cell 1.1
+DEAL:0:2d/2d::After coarsening particle id 1 is in cell 0.0
+DEAL:0:2d/2d::OK
+DEAL:0:2d/3d::Before refinement particle id 0 is in cell 0.0
+DEAL:0:2d/3d::Before refinement particle id 1 is in cell 0.0
+DEAL:0:2d/3d::After refinement particle id 1 is in cell 1.1
+DEAL:0:2d/3d::After coarsening particle id 1 is in cell 0.0
+DEAL:0:2d/3d::OK
+DEAL:0:3d/3d::Before refinement particle id 0 is in cell 0.0
+DEAL:0:3d/3d::Before refinement particle id 1 is in cell 0.0
+DEAL:0:3d/3d::After refinement particle id 1 is in cell 1.1
+DEAL:0:3d/3d::After coarsening particle id 1 is in cell 0.0
+DEAL:0:3d/3d::OK

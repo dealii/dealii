@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2015 - 2020 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2015 - 2024 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 // Set up a laplace problem with inhomogeneity 1 on the boundary, and run a
 // cycle with local refinement to have hanging nodes.
@@ -20,7 +19,7 @@
 // of applying the constraints directly to the solution obtained by solving
 // the system:
 //   (C^T * A * C + Id_c) * x = C^t * (b - A * k)
-// with the help of constrainted_linear_operator and
+// with the help of constrained_linear_operator and
 // constrained_right_hand_side
 
 #include <deal.II/base/quadrature_lib.h>

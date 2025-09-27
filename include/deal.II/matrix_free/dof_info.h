@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2011 - 2023 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2012 - 2024 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 
 #ifndef dealii_matrix_free_dof_info_h
@@ -159,8 +158,8 @@ namespace internal
       clear();
 
       /**
-       * Return the FE index for a given finite element degree. If not in hp-
-       * mode, this function always returns index 0. If an index is not found
+       * Return the FE index for a given finite element degree. If not in
+       * hp-mode, this function always returns index 0. If an index is not found
        * in hp-mode, it returns numbers::invalid_unsigned_int.
        */
       unsigned int
@@ -263,7 +262,8 @@ namespace internal
       template <int length>
       void
       compute_face_index_compression(
-        const std::vector<FaceToCellTopology<length>> &faces);
+        const std::vector<FaceToCellTopology<length>> &faces,
+        bool hold_all_faces_to_owned_cells);
 
       /**
        * This function computes the connectivity of the currently stored
@@ -710,8 +710,8 @@ namespace internal
       std::vector<unsigned int> cell_active_fe_index;
 
       /**
-       * Stores the maximum degree of different finite elements for the hp-
-       * case.
+       * Stores the maximum degree of different finite elements for the
+       * hp-case.
        */
       unsigned int max_fe_index;
 

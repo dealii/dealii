@@ -1,0 +1,36 @@
+grid refinements: 0
+viscosity: 0.00133333
+Number of active cells: 1024
+Number of degrees of freedom: 9539 (8450 + 1089)
+Solver stopped within 2 - 7 iterations
+The residual of initial guess is 0.00744886
+Solver stopped within 2 - 7 iterations
+  alpha:          1  residual: 0.00884171
+  alpha:        0.5  residual: 0.00493275
+  number of line searches: 0  residual: 0.00493275
+Solver stopped within 2 - 7 iterations
+  alpha:          1  residual: 0.0020156
+  number of line searches: 1  residual: 0.0020156
+Solver stopped within 2 - 7 iterations
+  alpha:          1  residual: 0.00134521
+  number of line searches: 2  residual: 0.00134521
+Solver stopped within 2 - 7 iterations
+  alpha:          1  residual: 0.000639533
+  number of line searches: 3  residual: 0.000639533
+Number of active cells: 2176
+Number of degrees of freedom: 20753 (18398 + 2355)
+grid refinements: 1
+viscosity: 0.00133333
+Solver stopped within 2 - 7 iterations
+  alpha:          1  residual: 0.00128952
+  number of line searches: 0  residual: 0.00128952
+Solver stopped within 2 - 7 iterations
+  alpha:          1  residual: 6.38976e-05
+  number of line searches: 1  residual: 6.38976e-05
+Number of active cells: 4840
+Number of degrees of freedom: 46315 (41086 + 5229)
+grid refinements: 2
+viscosity: 0.00133333
+Solver stopped within 2 - 7 iterations
+  alpha:          1  residual: 0.000567482
+  number of line searches: 0  residual: 0.000567482

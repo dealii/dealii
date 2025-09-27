@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2021 - 2023 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2021 - 2024 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 
 #ifndef dealii_sundials_sunlinsol_wrapper_h
@@ -60,7 +59,9 @@ namespace SUNDIALS
      * @param a_times_fn A function pointer to the function that computes A*v
      * @param linsol_ctx The context object used to set up the linear solver and all vectors
      */
-    SundialsOperator(void *A_data, ATimesFn a_times_fn, SUNContext linsol_ctx);
+    SundialsOperator(void       *A_data,
+                     SUNATimesFn a_times_fn,
+                     SUNContext  linsol_ctx);
 #  else
     /**
      * Constructor.
@@ -77,17 +78,23 @@ namespace SUNDIALS
      */
     void *A_data;
 
+#  if DEAL_II_SUNDIALS_VERSION_GTE(6, 0, 0)
+    /**
+     * %Function pointer declared by SUNDIALS to evaluate the matrix vector
+     * product.
+     */
+    SUNATimesFn a_times_fn;
+
+    /**
+     * Context object used for SUNDIALS logging.
+     */
+    SUNContext linsol_ctx;
+#  else
     /**
      * %Function pointer declared by SUNDIALS to evaluate the matrix vector
      * product.
      */
     ATimesFn a_times_fn;
-
-#  if DEAL_II_SUNDIALS_VERSION_GTE(6, 0, 0)
-    /**
-     * Context object used for SUNDIALS logging.
-     */
-    SUNContext linsol_ctx;
 #  endif
   };
 
@@ -125,10 +132,10 @@ namespace SUNDIALS
      * 6.0.0. If you are using an earlier version of SUNDIALS then you need to
      * use the other constructor.
      */
-    SundialsPreconditioner(void      *P_data,
-                           PSolveFn   p_solve_fn,
-                           SUNContext linsol_ctx,
-                           double     tol);
+    SundialsPreconditioner(void       *P_data,
+                           SUNPSolveFn p_solve_fn,
+                           SUNContext  linsol_ctx,
+                           double      tol);
 #  else
     /**
      * Constructor.
@@ -151,17 +158,23 @@ namespace SUNDIALS
      */
     void *P_data;
 
+#  if DEAL_II_SUNDIALS_VERSION_GTE(6, 0, 0)
+    /**
+     * %Function pointer to a function that computes the preconditioner
+     * application.
+     */
+    SUNPSolveFn p_solve_fn;
+
+    /**
+     * Context object used for SUNDIALS logging.
+     */
+    SUNContext linsol_ctx;
+#  else
     /**
      * %Function pointer to a function that computes the preconditioner
      * application.
      */
     PSolveFn p_solve_fn;
-
-#  if DEAL_II_SUNDIALS_VERSION_GTE(6, 0, 0)
-    /**
-     * Context object used for SUNDIALS logging.
-     */
-    SUNContext linsol_ctx;
 #  endif
 
     /**
@@ -240,6 +253,14 @@ namespace SUNDIALS
   } // namespace internal
 } // namespace SUNDIALS
 
+DEAL_II_NAMESPACE_CLOSE
+
+#else
+
+// Make sure the scripts that create the C++20 module input files have
+// something to latch on if the preprocessor #ifdef above would
+// otherwise lead to an empty content of the file.
+DEAL_II_NAMESPACE_OPEN
 DEAL_II_NAMESPACE_CLOSE
 
 #endif

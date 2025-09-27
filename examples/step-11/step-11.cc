@@ -1,17 +1,16 @@
-/* ---------------------------------------------------------------------
+/* ------------------------------------------------------------------------
  *
- * Copyright (C) 2001 - 2023 by the deal.II authors
+ * SPDX-License-Identifier: LGPL-2.1-or-later
+ * Copyright (C) 2001 - 2025 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
- * The deal.II library is free software; you can use it, redistribute
- * it, and/or modify it under the terms of the GNU Lesser General
- * Public License as published by the Free Software Foundation; either
- * version 2.1 of the License, or (at your option) any later version.
- * The full text of the license can be found in the file LICENSE.md at
- * the top level directory of deal.II.
+ * Part of the source code is dual licensed under Apache-2.0 WITH
+ * LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+ * governing the source code and code contributions can be found in
+ * LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
  *
- * ---------------------------------------------------------------------
+ * ------------------------------------------------------------------------
  *
  * Author: Wolfgang Bangerth, University of Heidelberg, 2001
  */
@@ -22,7 +21,6 @@
 #include <deal.II/base/quadrature_lib.h>
 #include <deal.II/base/function.h>
 #include <deal.II/base/numbers.h>
-#include <deal.II/base/logstream.h>
 #include <deal.II/base/table_handler.h>
 #include <deal.II/lac/vector.h>
 #include <deal.II/lac/sparse_matrix.h>
@@ -45,9 +43,12 @@
 // further down below.
 #include <deal.II/lac/dynamic_sparsity_pattern.h>
 
-// We will make use of the std::find algorithm of the C++ standard library, so
-// we have to include the following file for its declaration:
+// We will make use of the `std::find` algorithm of the C++ standard
+// library, so we have to include the following file for its
+// declaration, along with the other standard header files we will
+// use:
 #include <algorithm>
+#include <fstream>
 #include <iostream>
 #include <iomanip>
 #include <cmath>
@@ -83,10 +84,10 @@ namespace Step11
     void solve();
     void write_high_order_mesh(const unsigned cycle);
 
-    Triangulation<dim> triangulation;
-    FE_Q<dim>          fe;
-    DoFHandler<dim>    dof_handler;
-    MappingQ<dim>      mapping;
+    Triangulation<dim>  triangulation;
+    const FE_Q<dim>     fe;
+    DoFHandler<dim>     dof_handler;
+    const MappingQ<dim> mapping;
 
     SparsityPattern           sparsity_pattern;
     SparseMatrix<double>      system_matrix;
@@ -151,16 +152,17 @@ namespace Step11
 
     // Then generate a constraints object with just this one constraint. First
     // clear all previous content (which might reside there from the previous
-    // computation on a once coarser grid), then add this one line
+    // computation on a once coarser grid), then add this one constraint,
     // constraining the <code>first_boundary_dof</code> to the sum of other
     // boundary DoFs each with weight -1. Finally, close the constraints
     // object, i.e. do some internal bookkeeping on it for faster processing
     // of what is to come later:
     mean_value_constraints.clear();
-    mean_value_constraints.add_line(first_boundary_dof);
+    std::vector<std::pair<types::global_dof_index, double>> rhs;
     for (const types::global_dof_index i : boundary_dofs)
       if (i != first_boundary_dof)
-        mean_value_constraints.add_entry(first_boundary_dof, i, -1);
+        rhs.emplace_back(i, -1.);
+    mean_value_constraints.add_constraint(first_boundary_dof, rhs);
     mean_value_constraints.close();
 
     // Next task is to generate a sparsity pattern. This is indeed a tricky

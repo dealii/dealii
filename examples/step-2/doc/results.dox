@@ -1,3 +1,4 @@
+@anchor step_2-ResultsSection
 <h1>Results</h1>
 
 The program has, after having been run, produced two files of
@@ -18,8 +19,8 @@ spend too much time understanding what it does. Rather, the important part is
 to look at what we get as output:
 <table style="width:60%" align="center">
   <tr>
-    <td><img src="https://www.dealii.org/images/steps/developer/step-2.dof-locations-1.png" alt=""></td>
-    <td><img src="https://www.dealii.org/images/steps/developer/step-2.dof-locations-2.png" alt=""></td>
+    <td><img src="https://dealii.org/images/steps/developer/step-2.dof-locations-1.png" alt=""></td>
+    <td><img src="https://dealii.org/images/steps/developer/step-2.dof-locations-2.png" alt=""></td>
   </tr>
 </table>
 What these figures show is (i) a numeric label attached to each vertex -- the
@@ -40,8 +41,8 @@ and which can't couple when discretizing a local, i.e. differential,
 equation.)
 <table style="width:60%" align="center">
   <tr>
-    <td><img src="https://www.dealii.org/images/steps/developer/step-2.sparsity-1.svg" alt=""></td>
-    <td><img src="https://www.dealii.org/images/steps/developer/step-2.sparsity-2.svg" alt=""></td>
+    <td><img src="https://dealii.org/images/steps/developer/step-2.sparsity-1.svg" style="width:100%" alt=""></td>
+    <td><img src="https://dealii.org/images/steps/developer/step-2.sparsity-2.svg" style="width:100%" alt=""></td>
   </tr>
 </table>
 

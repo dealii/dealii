@@ -1,5 +1,3 @@
-<br>
-
 <i>This program was contributed by Timo Heister. Special thanks to Sander
 Rhebergen for the inspiration to finally write this tutorial.
 
@@ -20,7 +18,7 @@ and the p4est library installed. The installation of deal.II together with
 these additional libraries is described in the <a href="../../readme.html"
 target="body">README</a> file.
 
-<a name="Intro"></a>
+<a name="step_55-Intro"></a>
 <h1>Introduction</h1>
 
 Building on step-40, this tutorial shows how to solve linear PDEs with several
@@ -67,7 +65,7 @@ Our goal here is to construct a very simple (maybe the simplest?) optimal
 preconditioner for the linear system. A preconditioner is called "optimal" or
 "of optimal complexity", if the number of iterations of the preconditioned
 system is independent of the mesh size $h$. You can extend that definition to
-also require indepence of the number of processors used (we will discuss that
+also require independence of the number of processors used (we will discuss that
 in the results section), the computational domain and the mesh quality, the
 test case itself, the polynomial degree of the finite element space, and more.
 
@@ -156,7 +154,7 @@ see @cite kovasznay1948laminar. Here
 is an image of the solution colored by the x velocity including
 streamlines of the velocity:
 
- <img src="https://www.dealii.org/images/steps/developer/step-55.solution.png" alt="">
+ <img src="https://dealii.org/images/steps/developer/step-55.solution.png" alt="">
 
 We have to cheat here, though, because we are not solving the non-linear
 Navier-Stokes equations, but the linear Stokes system without convective

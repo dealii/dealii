@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 1999 - 2023 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2010 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 #ifndef dealii_relaxation_block_templates_h
 #define dealii_relaxation_block_templates_h
@@ -94,7 +93,7 @@ RelaxationBlock<MatrixType, InverseNumberType, VectorType>::invert_diagblocks()
 {
   if (this->same_diagonal())
     {
-      Assert(false, ExcNotImplemented());
+      DEAL_II_NOT_IMPLEMENTED();
     }
   else
     {
@@ -169,7 +168,7 @@ RelaxationBlock<MatrixType, InverseNumberType, VectorType>::block_kernel(
                 this->additional_data->threshold);
             break;
           default:
-            Assert(false, ExcNotImplemented());
+            DEAL_II_NOT_IMPLEMENTED();
         }
     }
 }
@@ -188,7 +187,6 @@ namespace internal
     // for a serial computation (don't!), or nobody implemented, instantiated,
     // and tested the parallel version for your vector type.
     Assert(other == nullptr, ExcNotImplemented());
-    (void)other;
     return prev;
   }
 
@@ -270,12 +268,13 @@ RelaxationBlock<MatrixType, InverseNumberType, VectorType>::do_step(
             }
           // Apply inverse diagonal
           this->inverse_vmult(block, x_cell, b_cell);
-#ifdef DEBUG
-          for (unsigned int i = 0; i < x_cell.size(); ++i)
+          if constexpr (running_in_debug_mode())
             {
-              AssertIsFinite(x_cell(i));
+              for (unsigned int i = 0; i < x_cell.size(); ++i)
+                {
+                  AssertIsFinite(x_cell(i));
+                }
             }
-#endif
           // Store in result vector
           row = additional_data->block_list.begin(block);
           for (size_type row_cell = 0; row_cell < bs; ++row_cell, ++row)

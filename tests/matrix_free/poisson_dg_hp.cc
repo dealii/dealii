@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2022 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2022 - 2024 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 
 // Solve Poisson problem problem on a with DG, MatrixFree and hp.
@@ -54,7 +53,6 @@
 
 #include "../tests.h"
 
-using namespace dealii;
 
 
 double
@@ -81,7 +79,7 @@ get_penalty_parameter(const unsigned int i,
         return 64.0;
     }
 
-  Assert(false, ExcNotImplemented());
+  DEAL_II_NOT_IMPLEMENTED();
 
   return 0.0;
 }
@@ -301,12 +299,10 @@ test(const unsigned int degree)
                                       Functions::ZeroFunction<dim>(),
                                       difference,
                                       quad,
-                                      VectorTools::NormType::L2_norm);
+                                      VectorTools::L2_norm);
 
     const double error =
-      VectorTools::compute_global_error(tria,
-                                        difference,
-                                        VectorTools::NormType::L2_norm);
+      VectorTools::compute_global_error(tria, difference, VectorTools::L2_norm);
 
     if (Utilities::MPI::this_mpi_process(MPI_COMM_WORLD) == 0)
       printf("Error %f.\n", error);

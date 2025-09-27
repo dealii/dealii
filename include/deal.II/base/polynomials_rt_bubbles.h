@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
+// SPDX-License-Identifier: LGPL-2.1-or-later
 // Copyright (C) 2018 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 #ifndef dealii_polynomials_rt_bubbles_h
 #define dealii_polynomials_rt_bubbles_h
@@ -22,7 +21,7 @@
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/point.h>
 #include <deal.II/base/polynomial.h>
-#include <deal.II/base/polynomials_raviart_thomas.h>
+#include <deal.II/base/polynomials_vector_anisotropic.h>
 #include <deal.II/base/tensor.h>
 #include <deal.II/base/tensor_polynomials_base.h>
 
@@ -93,7 +92,7 @@ class PolynomialsRT_Bubbles : public TensorPolynomialsBase<dim>
 public:
   /**
    * Constructor. Creates all basis functions for RT_bubbles polynomials of
-   * given degree.
+   * given degree using the lexicographic order from FE_RaviartThomas.
    */
   PolynomialsRT_Bubbles(const unsigned int k);
 
@@ -136,7 +135,7 @@ private:
   /**
    * An object representing the Raviart-Thomas part of the space
    */
-  const PolynomialsRaviartThomas<dim> raviart_thomas_space;
+  const PolynomialsVectorAnisotropic<dim> raviart_thomas_space;
 
   /**
    * Storage for monomials, we need all polynomials from degree zero

@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2023 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2020 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 
 #ifndef dealii_vector_tools_integrate_difference_templates_h
@@ -333,7 +332,7 @@ namespace VectorTools
             break;
 
           default:
-            Assert(false, ExcNotImplemented());
+            DEAL_II_NOT_IMPLEMENTED();
             break;
         }
 
@@ -432,7 +431,7 @@ namespace VectorTools
 
     template <int dim, int spacedim, typename Number, class OutVector>
     DEAL_II_CXX20_REQUIRES(concepts::is_writable_dealii_vector_type<OutVector>)
-    static void do_integrate_difference(
+    void do_integrate_difference(
       const dealii::hp::MappingCollection<dim, spacedim> &mapping,
       const DoFHandler<dim, spacedim>                    &dof,
       const ReadVector<Number>                           &fe_function,
@@ -654,23 +653,24 @@ namespace VectorTools
   {
     Assert(cellwise_error.size() == tria.n_active_cells(),
            ExcMessage("input vector cell_error has invalid size!"));
-#ifdef DEBUG
-    {
-      // check that off-processor entries are zero. Otherwise we will compute
-      // wrong results below!
-      typename InVector::size_type                                i = 0;
-      typename Triangulation<dim, spacedim>::active_cell_iterator it =
-        tria.begin_active();
-      for (; i < cellwise_error.size(); ++i, ++it)
-        if (!it->is_locally_owned())
-          Assert(
-            std::fabs(cellwise_error[i]) < 1e-20,
-            ExcMessage(
-              "cellwise_error of cells that are not locally owned need to be zero!"));
-    }
-#endif
+    if constexpr (running_in_debug_mode())
+      {
+        {
+          // check that off-processor entries are zero. Otherwise we will
+          // compute wrong results below!
+          typename InVector::size_type                                i = 0;
+          typename Triangulation<dim, spacedim>::active_cell_iterator it =
+            tria.begin_active();
+          for (; i < cellwise_error.size(); ++i, ++it)
+            if (!it->is_locally_owned())
+              Assert(
+                std::fabs(cellwise_error[i]) < 1e-20,
+                ExcMessage(
+                  "cellwise_error of cells that are not locally owned need to be zero!"));
+        }
+      }
 
-    const MPI_Comm comm = tria.get_communicator();
+    const MPI_Comm comm = tria.get_mpi_communicator();
 
     switch (norm)
       {

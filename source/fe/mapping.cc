@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2001 - 2023 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2001 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 
 #include <deal.II/boost_adaptors/bounding_box.h>
@@ -31,16 +30,26 @@
 #include <limits>
 
 DEAL_II_NAMESPACE_OPEN
-
+#ifndef DOXYGEN
 
 template <int dim, int spacedim>
 boost::container::small_vector<Point<spacedim>,
-                               GeometryInfo<dim>::vertices_per_cell>
+#  ifndef _MSC_VER
+                               ReferenceCells::max_n_vertices<dim>()
+#  else
+                               GeometryInfo<dim>::vertices_per_cell
+#  endif
+                               >
 Mapping<dim, spacedim>::get_vertices(
   const typename Triangulation<dim, spacedim>::cell_iterator &cell) const
 {
   boost::container::small_vector<Point<spacedim>,
-                                 GeometryInfo<dim>::vertices_per_cell>
+#  ifndef _MSC_VER
+                                 ReferenceCells::max_n_vertices<dim>()
+#  else
+                                 GeometryInfo<dim>::vertices_per_cell
+#  endif
+                                 >
     vertices;
   for (const unsigned int i : cell->vertex_indices())
     vertices.push_back(cell->vertex(i));
@@ -52,13 +61,23 @@ Mapping<dim, spacedim>::get_vertices(
 
 template <int dim, int spacedim>
 boost::container::small_vector<Point<spacedim>,
-                               GeometryInfo<dim>::vertices_per_face>
+#  ifndef _MSC_VER
+                               ReferenceCells::max_n_vertices<dim - 1>()
+#  else
+                               GeometryInfo<dim - 1>::vertices_per_cell
+#  endif
+                               >
 Mapping<dim, spacedim>::get_vertices(
   const typename Triangulation<dim, spacedim>::cell_iterator &cell,
   const unsigned int                                          face_no) const
 {
   boost::container::small_vector<Point<spacedim>,
-                                 GeometryInfo<dim>::vertices_per_face>
+#  ifndef _MSC_VER
+                                 ReferenceCells::max_n_vertices<dim - 1>()
+#  else
+                                 GeometryInfo<dim - 1>::vertices_per_cell
+#  endif
+                                 >
     face_vertices;
 
   const auto &cell_vertices    = get_vertices(cell);
@@ -143,8 +162,10 @@ Mapping<dim, spacedim>::transform_points_real_to_unit_cell(
         }
       catch (typename Mapping<dim>::ExcTransformationFailed &)
         {
+          // If the transformation for this one point failed, mark it
+          // as invalid as described in the documentation.
           unit_points[i]    = Point<dim>();
-          unit_points[i][0] = std::numeric_limits<double>::infinity();
+          unit_points[i][0] = std::numeric_limits<double>::lowest();
         }
     }
 }
@@ -171,28 +192,28 @@ Mapping<dim, spacedim>::project_real_point_to_unit_point_on_face(
   if (dim == 2)
     {
       if (unit_normal_direction == 0)
-        return Point<dim - 1>{unit_cell_pt(1)};
+        return Point<dim - 1>{unit_cell_pt[1]};
       else if (unit_normal_direction == 1)
-        return Point<dim - 1>{unit_cell_pt(0)};
+        return Point<dim - 1>{unit_cell_pt[0]};
     }
   else if (dim == 3)
     {
       if (unit_normal_direction == 0)
-        return Point<dim - 1>{unit_cell_pt(1), unit_cell_pt(2)};
+        return Point<dim - 1>{unit_cell_pt[1], unit_cell_pt[2]};
       else if (unit_normal_direction == 1)
-        return Point<dim - 1>{unit_cell_pt(0), unit_cell_pt(2)};
+        return Point<dim - 1>{unit_cell_pt[0], unit_cell_pt[2]};
       else if (unit_normal_direction == 2)
-        return Point<dim - 1>{unit_cell_pt(0), unit_cell_pt(1)};
+        return Point<dim - 1>{unit_cell_pt[0], unit_cell_pt[1]};
     }
 
   // We should never get here
-  Assert(false, ExcInternalError());
+  DEAL_II_ASSERT_UNREACHABLE();
   return {};
 }
 
 
 
-#ifndef DOXYGEN
+#  ifndef DOXYGEN
 template <int dim, int spacedim>
 void
 Mapping<dim, spacedim>::fill_fe_face_values(
@@ -258,7 +279,7 @@ Mapping<dim, spacedim>::get_face_data(
 
   return std::unique_ptr<typename Mapping<dim, spacedim>::InternalDataBase>();
 }
-#endif
+#  endif
 
 /* ---------------------------- InternalDataBase --------------------------- */
 
@@ -271,12 +292,22 @@ Mapping<dim, spacedim>::InternalDataBase::InternalDataBase()
 
 
 template <int dim, int spacedim>
+void
+Mapping<dim, spacedim>::InternalDataBase::reinit(const UpdateFlags,
+                                                 const Quadrature<dim> &)
+{
+  DEAL_II_ASSERT_UNREACHABLE();
+}
+
+
+
+template <int dim, int spacedim>
 std::size_t
 Mapping<dim, spacedim>::InternalDataBase::memory_consumption() const
 {
   return sizeof(*this);
 }
-
+#endif
 
 /* ------------------------------ Global functions ------------------------- */
 
@@ -301,7 +332,7 @@ get_default_linear_mapping(const Triangulation<dim, spacedim> &triangulation)
 
 
 // explicit instantiations
-#include "mapping.inst"
+#include "fe/mapping.inst"
 
 
 DEAL_II_NAMESPACE_CLOSE

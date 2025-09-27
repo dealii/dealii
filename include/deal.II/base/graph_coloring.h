@@ -1,18 +1,17 @@
 
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2013 - 2023 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2013 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 #ifndef dealii_graph_coloring_h
 #  define dealii_graph_coloring_h
@@ -20,7 +19,9 @@
 
 #  include <deal.II/base/config.h>
 
+#  include <deal.II/base/std_cxx20/type_traits.h>
 #  include <deal.II/base/thread_management.h>
+#  include <deal.II/base/types.h>
 
 #  include <algorithm>
 #  include <functional>
@@ -90,8 +91,8 @@ namespace GraphColoring
      * shells around the very first cell. Note that elements in each zone may
      * conflict with other elements in the same zone.
      *
-     * The question whether two iterators conflict is determined by a user-
-     * provided function. The meaning of this function is discussed in the
+     * The question whether two iterators conflict is determined by a
+     * user-provided function. The meaning of this function is discussed in the
      * documentation of the GraphColoring::make_graph_coloring() function.
      *
      * @param[in] begin The first element of a range of iterators for which a

@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2014 - 2022 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2014 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 #ifndef dealii_time_stepping_templates_h
 #define dealii_time_stepping_templates_h
@@ -168,6 +167,129 @@ namespace TimeStepping
 
             break;
           }
+        case (RK_FIFTH_ORDER):
+          {
+            /**
+             * Rabiei, F. and Ismail, F., 2012. Fifth-order improved
+             * Runge-Kutta method with reduced number of function evaluations.
+             * Australian Journal of Basic and Applied Sciences, 6(3),
+             * pp.97-105.
+             *
+             * Hossain, M.B., Hossain, M.J., Miah, M.M. and Alam, M.S., 2017.
+             * A comparative study on fourth order and butcher’s fifth order
+             * runge-kutta methods with third order initial value problem (IVP).
+             * Appl. Comput. Math, 6(6), p.243.
+             */
+            this->n_stages = 6;
+            this->b.reserve(this->n_stages);
+            this->c.reserve(this->n_stages);
+            std::vector<double> tmp;
+            this->a.push_back(tmp);
+            tmp.assign(5, 0.0);
+            tmp[0] = 1.0 / 4.0;
+            this->a.push_back(tmp);
+            tmp.assign(5, 0.0);
+            tmp[0] = 1.0 / 8.0;
+            tmp[1] = 1.0 / 8.0;
+            this->a.push_back(tmp);
+            tmp.assign(5, 0.0);
+            tmp[0] = 0.0;
+            tmp[1] = -1.0 / 2.0;
+            tmp[2] = 1.0;
+            this->a.push_back(tmp);
+            tmp.assign(5, 0.0);
+            tmp[0] = 3.0 / 16.0;
+            tmp[1] = 0.0;
+            tmp[2] = 0.0;
+            tmp[3] = 9.0 / 16.0;
+            this->a.push_back(tmp);
+            tmp.assign(5, 0.0);
+            tmp[0] = -3.0 / 7.0;
+            tmp[1] = 2.0 / 7.0;
+            tmp[2] = 12.0 / 7.0;
+            tmp[3] = -12.0 / 7.0;
+            tmp[4] = 8.0 / 7.0;
+            this->a.push_back(tmp);
+
+            this->b.push_back(7.0 / 90.0);
+            this->b.push_back(0.0);
+            this->b.push_back(32.0 / 90.0);
+            this->b.push_back(12.0 / 90.0);
+            this->b.push_back(32.0 / 90.0);
+            this->b.push_back(7.0 / 90.0);
+
+            this->c.push_back(0.0);
+            this->c.push_back(1.0 / 4.0);
+            this->c.push_back(1.0 / 4.0);
+            this->c.push_back(1.0 / 2.0);
+            this->c.push_back(3.0 / 4.0);
+            this->c.push_back(1.0);
+
+            break;
+          }
+        case (RK_SIXTH_ORDER):
+          {
+            /**
+             * Butcher, J.C., 1964. On Runge-Kutta processes of high order.
+             * Journal of the Australian Mathematical Society, 4(2), pp.179-194.
+             */
+            this->n_stages = 7;
+            this->b.reserve(this->n_stages);
+            this->c.reserve(this->n_stages);
+            std::vector<double> tmp;
+            this->a.push_back(tmp);
+            tmp.assign(6, 0.0);
+            tmp[0] = 1.0 / 3.0;
+            this->a.push_back(tmp);
+            tmp.assign(6, 0.0);
+            tmp[0] = 0.0;
+            tmp[1] = 2.0 / 3.0;
+            this->a.push_back(tmp);
+            tmp.assign(6, 0.0);
+            tmp[0] = 1.0 / 12.0;
+            tmp[1] = 1.0 / 3.0;
+            tmp[2] = -1.0 / 12.0;
+            this->a.push_back(tmp);
+            tmp.assign(6, 0.0);
+            tmp[0] = -1.0 / 16.0;
+            tmp[1] = 9.0 / 8.0;
+            tmp[2] = -3.0 / 16.0;
+            tmp[3] = -3.0 / 8.0;
+            this->a.push_back(tmp);
+            tmp.assign(6, 0.0);
+            tmp[0] = 0.0;
+            tmp[1] = 9.0 / 8.0;
+            tmp[2] = -3.0 / 8.0;
+            tmp[3] = -3.0 / 4.0;
+            tmp[4] = 1.0 / 2.0;
+            this->a.push_back(tmp);
+            tmp.assign(6, 0.0);
+            tmp[0] = 9.0 / 44.0;
+            tmp[1] = -9.0 / 11.0;
+            tmp[2] = 63.0 / 44.0;
+            tmp[3] = 18.0 / 11.0;
+            tmp[4] = 0.0;
+            tmp[5] = -16.0 / 11.0;
+            this->a.push_back(tmp);
+
+            this->b.push_back(11.0 / 120.0);
+            this->b.push_back(0.0);
+            this->b.push_back(27.0 / 40.0);
+            this->b.push_back(27.0 / 40.0);
+            this->b.push_back(-4.0 / 15.0);
+            this->b.push_back(-4.0 / 15.0);
+            this->b.push_back(11.0 / 120.0);
+
+            this->c.push_back(0.0);
+            this->c.push_back(1.0 / 3.0);
+            this->c.push_back(2.0 / 3.0);
+            this->c.push_back(1.0 / 3.0);
+            this->c.push_back(1.0 / 2.0);
+            this->c.push_back(1.0 / 2.0);
+            this->c.push_back(1.0);
+
+            break;
+          }
         default:
           {
             AssertThrow(
@@ -271,6 +393,25 @@ namespace TimeStepping
 
     switch (method)
       {
+        case (FORWARD_EULER):
+          {
+            this->n_stages = 1;
+            this->b.reserve(this->n_stages);
+            this->b.push_back(1.0);
+
+            this->a = {{}};
+            break;
+          }
+        case (HEUN_EULER):
+          {
+            this->n_stages = 2;
+            this->b.reserve(this->n_stages);
+            this->b.push_back(0.5);
+            this->b.push_back(0.5);
+
+            this->a = {{1.0}};
+            break;
+          }
         case (LOW_STORAGE_RK_STAGE3_ORDER3):
           {
             this->n_stages = 3;
@@ -279,9 +420,7 @@ namespace TimeStepping
             this->b.push_back(0.184896052186740);
             this->b.push_back(0.569933660509768);
 
-            std::vector<double> tmp;
-            tmp = {{0.755726351946097, 0.386954477304099}};
-            this->a.push_back(tmp);
+            this->a = {{0.755726351946097, 0.386954477304099}};
             break;
           }
         case (LOW_STORAGE_RK_STAGE5_ORDER4):
@@ -292,12 +431,11 @@ namespace TimeStepping
                                -1672844663538. / 4480602732383.,
                                2114624349019. / 3568978502595.,
                                5198255086312. / 14908931495163.}};
-            std::vector<double> ai;
-            ai = {{970286171893. / 4311952581923.,
-                   6584761158862. / 12103376702013.,
-                   2251764453980. / 15575788980749.,
-                   26877169314380. / 34165994151039.}};
-            this->a.push_back(ai);
+
+            this->a = {{970286171893. / 4311952581923.,
+                        6584761158862. / 12103376702013.,
+                        2251764453980. / 15575788980749.,
+                        26877169314380. / 34165994151039.}};
             break;
           }
         case (LOW_STORAGE_RK_STAGE7_ORDER4):
@@ -310,14 +448,13 @@ namespace TimeStepping
                                0.0605151571191401122,
                                0.345986987898399296,
                                0.186627171718797670}};
-            std::vector<double> ai;
-            ai = {{0.241566650129646868 + this->b[0],
-                   0.0423866513027719953 + this->b[1],
-                   0.215602732678803776 + this->b[2],
-                   0.232328007537583987 + this->b[3],
-                   0.256223412574146438 + this->b[4],
-                   0.0978694102142697230 + this->b[5]}};
-            this->a.push_back(ai);
+
+            this->a = {{0.241566650129646868 + this->b[0],
+                        0.0423866513027719953 + this->b[1],
+                        0.215602732678803776 + this->b[2],
+                        0.232328007537583987 + this->b[3],
+                        0.256223412574146438 + this->b[4],
+                        0.0978694102142697230 + this->b[5]}};
             break;
           }
         case (LOW_STORAGE_RK_STAGE9_ORDER5):
@@ -332,16 +469,15 @@ namespace TimeStepping
                                393957816125. / 7825732611452.,
                                720647959663. / 6565743875477.,
                                3559252274877. / 14424734981077.}};
-            std::vector<double> ai;
-            ai = {{1107026461565. / 5417078080134.,
-                   38141181049399. / 41724347789894.,
-                   493273079041. / 11940823631197.,
-                   1851571280403. / 6147804934346.,
-                   11782306865191. / 62590030070788.,
-                   9452544825720. / 13648368537481.,
-                   4435885630781. / 26285702406235.,
-                   2357909744247. / 11371140753790.}};
-            this->a.push_back(ai);
+
+            this->a = {{1107026461565. / 5417078080134.,
+                        38141181049399. / 41724347789894.,
+                        493273079041. / 11940823631197.,
+                        1851571280403. / 6147804934346.,
+                        11782306865191. / 62590030070788.,
+                        9452544825720. / 13648368537481.,
+                        4435885630781. / 26285702406235.,
+                        2357909744247. / 11371140753790.}};
             break;
           }
         default:
@@ -351,6 +487,9 @@ namespace TimeStepping
                           "Unimplemented low-storage Runge-Kutta method."));
           }
       }
+
+    AssertDimension(this->a[0].size() + 1, this->b.size());
+
     // compute ci
     this->c.reserve(this->n_stages);
     this->c.push_back(0.);
@@ -401,7 +540,7 @@ namespace TimeStepping
     compute_one_stage(f,
                       t,
                       this->b[0] * delta_t,
-                      this->a[0][0] * delta_t,
+                      (this->a[0].empty() ? 0 : this->a[0][0]) * delta_t,
                       solution,
                       vec_ki,
                       solution,

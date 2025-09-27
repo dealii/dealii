@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2001 - 2021 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2001 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 
 #include <deal.II/base/quadrature.h>
@@ -261,7 +260,7 @@ FE_DGQ<dim, spacedim>::rotate_indices(std::vector<unsigned int> &numbers,
                   }
             break;
           default:
-            Assert(false, ExcNotImplemented());
+            DEAL_II_NOT_IMPLEMENTED();
         }
     }
 }
@@ -274,78 +273,95 @@ FE_DGQ<dim, spacedim>::get_interpolation_matrix(
   const FiniteElement<dim, spacedim> &x_source_fe,
   FullMatrix<double>                 &interpolation_matrix) const
 {
-  // this is only implemented, if the
-  // source FE is also a
-  // DGQ element
-  using FE = FiniteElement<dim, spacedim>;
-  AssertThrow((dynamic_cast<const FE_DGQ<dim, spacedim> *>(&x_source_fe) !=
-               nullptr),
-              typename FE::ExcInterpolationNotImplemented());
-
-  // ok, source is a Q element, so
-  // we will be able to do the work
-  const FE_DGQ<dim, spacedim> &source_fe =
-    dynamic_cast<const FE_DGQ<dim, spacedim> &>(x_source_fe);
-
-  Assert(interpolation_matrix.m() == this->n_dofs_per_cell(),
-         ExcDimensionMismatch(interpolation_matrix.m(),
-                              this->n_dofs_per_cell()));
-  Assert(interpolation_matrix.n() == source_fe.n_dofs_per_cell(),
-         ExcDimensionMismatch(interpolation_matrix.n(),
-                              source_fe.n_dofs_per_cell()));
-
-
-  // compute the interpolation
-  // matrices in much the same way as
-  // we do for the embedding matrices
-  // from mother to child.
-  FullMatrix<double> cell_interpolation(this->n_dofs_per_cell(),
-                                        this->n_dofs_per_cell());
-  FullMatrix<double> source_interpolation(this->n_dofs_per_cell(),
-                                          source_fe.n_dofs_per_cell());
-  FullMatrix<double> tmp(this->n_dofs_per_cell(), source_fe.n_dofs_per_cell());
-  for (unsigned int j = 0; j < this->n_dofs_per_cell(); ++j)
+  // go through the list of elements we can interpolate from
+  if (const FE_DGQ<dim, spacedim> *source_fe =
+        dynamic_cast<const FE_DGQ<dim, spacedim> *>(&x_source_fe))
     {
-      // generate a point on this
-      // cell and evaluate the
-      // shape functions there
-      const Point<dim> p = this->unit_support_points[j];
+      Assert(interpolation_matrix.m() == this->n_dofs_per_cell(),
+             ExcDimensionMismatch(interpolation_matrix.m(),
+                                  this->n_dofs_per_cell()));
+      Assert(interpolation_matrix.n() == source_fe->n_dofs_per_cell(),
+             ExcDimensionMismatch(interpolation_matrix.n(),
+                                  source_fe->n_dofs_per_cell()));
+
+
+      // compute the interpolation
+      // matrices in much the same way as
+      // we do for the embedding matrices
+      // from mother to child.
+      FullMatrix<double> cell_interpolation(this->n_dofs_per_cell(),
+                                            this->n_dofs_per_cell());
+      FullMatrix<double> source_interpolation(this->n_dofs_per_cell(),
+                                              source_fe->n_dofs_per_cell());
+      FullMatrix<double> tmp(this->n_dofs_per_cell(),
+                             source_fe->n_dofs_per_cell());
+      for (unsigned int j = 0; j < this->n_dofs_per_cell(); ++j)
+        {
+          // generate a point on this
+          // cell and evaluate the
+          // shape functions there
+          const Point<dim> p = this->unit_support_points[j];
+          for (unsigned int i = 0; i < this->n_dofs_per_cell(); ++i)
+            cell_interpolation(j, i) = this->poly_space->compute_value(i, p);
+
+          for (unsigned int i = 0; i < source_fe->n_dofs_per_cell(); ++i)
+            source_interpolation(j, i) =
+              source_fe->poly_space->compute_value(i, p);
+        }
+
+      // then compute the
+      // interpolation matrix matrix
+      // for this coordinate
+      // direction
+      cell_interpolation.gauss_jordan();
+      cell_interpolation.mmult(interpolation_matrix, source_interpolation);
+
+      // cut off very small values
       for (unsigned int i = 0; i < this->n_dofs_per_cell(); ++i)
-        cell_interpolation(j, i) = this->poly_space->compute_value(i, p);
+        for (unsigned int j = 0; j < source_fe->n_dofs_per_cell(); ++j)
+          if (std::fabs(interpolation_matrix(i, j)) < 1e-15)
+            interpolation_matrix(i, j) = 0.;
 
-      for (unsigned int i = 0; i < source_fe.n_dofs_per_cell(); ++i)
-        source_interpolation(j, i) = source_fe.poly_space->compute_value(i, p);
+      if constexpr (running_in_debug_mode())
+        {
+          // make sure that the row sum of
+          // each of the matrices is 1 at
+          // this point. this must be so
+          // since the shape functions sum up
+          // to 1
+          for (unsigned int i = 0; i < this->n_dofs_per_cell(); ++i)
+            {
+              double sum = 0.;
+              for (unsigned int j = 0; j < source_fe->n_dofs_per_cell(); ++j)
+                sum += interpolation_matrix(i, j);
+
+              Assert(std::fabs(sum - 1) <
+                       5e-14 * std::max(this->degree, 1U) * dim,
+                     ExcInternalError());
+            }
+        }
     }
-
-  // then compute the
-  // interpolation matrix matrix
-  // for this coordinate
-  // direction
-  cell_interpolation.gauss_jordan();
-  cell_interpolation.mmult(interpolation_matrix, source_interpolation);
-
-  // cut off very small values
-  for (unsigned int i = 0; i < this->n_dofs_per_cell(); ++i)
-    for (unsigned int j = 0; j < source_fe.n_dofs_per_cell(); ++j)
-      if (std::fabs(interpolation_matrix(i, j)) < 1e-15)
-        interpolation_matrix(i, j) = 0.;
-
-#ifdef DEBUG
-  // make sure that the row sum of
-  // each of the matrices is 1 at
-  // this point. this must be so
-  // since the shape functions sum up
-  // to 1
-  for (unsigned int i = 0; i < this->n_dofs_per_cell(); ++i)
+  else if (dynamic_cast<const FE_Nothing<dim> *>(&x_source_fe))
     {
-      double sum = 0.;
-      for (unsigned int j = 0; j < source_fe.n_dofs_per_cell(); ++j)
-        sum += interpolation_matrix(i, j);
+      // the element we want to interpolate from is an FE_Nothing. this
+      // element represents a function that is constant zero and has no
+      // degrees of freedom, so the interpolation is simply a multiplication
+      // with a n_dofs x 0 matrix. there is nothing to do here
 
-      Assert(std::fabs(sum - 1) < 5e-14 * std::max(this->degree, 1U) * dim,
-             ExcInternalError());
+      // we would like to verify that the number of rows and columns of
+      // the matrix equals this->n_dofs_per_cell() and zero. unfortunately,
+      // whenever we do FullMatrix::reinit(m,0), it sets both rows and
+      // columns to zero, instead of m and zero. thus, only test the
+      // number of columns
+      Assert(interpolation_matrix.n() == x_source_fe.n_dofs_per_cell(),
+             ExcDimensionMismatch(interpolation_matrix.m(),
+                                  x_source_fe.n_dofs_per_cell()));
     }
-#endif
+  else
+    AssertThrow(
+      false,
+      (typename FiniteElement<dim,
+                              spacedim>::ExcInterpolationNotImplemented()));
 }
 
 
@@ -416,12 +432,13 @@ FE_DGQ<dim, spacedim>::get_prolongation_matrix(
   Assert(refinement_case != RefinementCase<dim>::no_refinement,
          ExcMessage(
            "Prolongation matrices are only available for refined cells!"));
-  AssertIndexRange(child, GeometryInfo<dim>::n_children(refinement_case));
+  AssertIndexRange(
+    child, this->reference_cell().template n_children<dim>(refinement_case));
 
   // initialization upon first request
   if (this->prolongation[refinement_case - 1][child].n() == 0)
     {
-      std::lock_guard<std::mutex> lock(this->mutex);
+      std::lock_guard<std::mutex> lock(prolongation_matrix_mutex);
 
       // if matrix got updated while waiting for the lock
       if (this->prolongation[refinement_case - 1][child].n() ==
@@ -437,7 +454,8 @@ FE_DGQ<dim, spacedim>::get_prolongation_matrix(
           std::vector<std::vector<FullMatrix<double>>> isotropic_matrices(
             RefinementCase<dim>::isotropic_refinement);
           isotropic_matrices.back().resize(
-            GeometryInfo<dim>::n_children(RefinementCase<dim>(refinement_case)),
+            this->reference_cell().template n_children<dim>(
+              RefinementCase<dim>(refinement_case)),
             FullMatrix<double>(this->n_dofs_per_cell(),
                                this->n_dofs_per_cell()));
           if (dim == spacedim)
@@ -448,8 +466,8 @@ FE_DGQ<dim, spacedim>::get_prolongation_matrix(
             FETools::compute_embedding_matrices(FE_DGQ<dim>(this->degree),
                                                 isotropic_matrices,
                                                 true);
-          this_nonconst.prolongation[refinement_case - 1].swap(
-            isotropic_matrices.back());
+          this_nonconst.prolongation[refinement_case - 1] =
+            std::move(isotropic_matrices.back());
         }
       else
         {
@@ -492,12 +510,13 @@ FE_DGQ<dim, spacedim>::get_restriction_matrix(
   Assert(refinement_case != RefinementCase<dim>::no_refinement,
          ExcMessage(
            "Restriction matrices are only available for refined cells!"));
-  AssertIndexRange(child, GeometryInfo<dim>::n_children(refinement_case));
+  AssertIndexRange(
+    child, this->reference_cell().template n_children<dim>(refinement_case));
 
   // initialization upon first request
   if (this->restriction[refinement_case - 1][child].n() == 0)
     {
-      std::lock_guard<std::mutex> lock(this->mutex);
+      std::lock_guard<std::mutex> lock(restriction_matrix_mutex);
 
       // if matrix got updated while waiting for the lock...
       if (this->restriction[refinement_case - 1][child].n() ==
@@ -513,7 +532,8 @@ FE_DGQ<dim, spacedim>::get_restriction_matrix(
           std::vector<std::vector<FullMatrix<double>>> isotropic_matrices(
             RefinementCase<dim>::isotropic_refinement);
           isotropic_matrices.back().resize(
-            GeometryInfo<dim>::n_children(RefinementCase<dim>(refinement_case)),
+            this->reference_cell().template n_children<dim>(
+              RefinementCase<dim>(refinement_case)),
             FullMatrix<double>(this->n_dofs_per_cell(),
                                this->n_dofs_per_cell()));
           if (dim == spacedim)
@@ -524,8 +544,8 @@ FE_DGQ<dim, spacedim>::get_restriction_matrix(
             FETools::compute_projection_matrices(FE_DGQ<dim>(this->degree),
                                                  isotropic_matrices,
                                                  true);
-          this_nonconst.restriction[refinement_case - 1].swap(
-            isotropic_matrices.back());
+          this_nonconst.restriction[refinement_case - 1] =
+            std::move(isotropic_matrices.back());
         }
       else
         {
@@ -722,7 +742,7 @@ FE_DGQ<dim, spacedim>::compare_for_domination(
         return FiniteElementDomination::no_requirements;
     }
 
-  Assert(false, ExcNotImplemented());
+  DEAL_II_NOT_IMPLEMENTED();
   return FiniteElementDomination::neither_element_dominates;
 }
 
@@ -812,7 +832,7 @@ FE_DGQ<dim, spacedim>::has_support_on_face(const unsigned int shape_index,
         }
 
       default:
-        Assert(false, ExcNotImplemented());
+        DEAL_II_NOT_IMPLEMENTED();
     }
   return true;
 }
@@ -856,7 +876,7 @@ FE_DGQArbitraryNodes<dim, spacedim>::get_name() const
   bool                equidistant = true;
   std::vector<double> points(this->degree + 1);
 
-  auto *const polynomial_space =
+  const auto *const polynomial_space =
     dynamic_cast<TensorProductPolynomials<dim> *>(this->poly_space.get());
   Assert(polynomial_space != nullptr, ExcInternalError());
   std::vector<unsigned int> lexicographic =
@@ -890,7 +910,7 @@ FE_DGQArbitraryNodes<dim, spacedim>::get_name() const
   const QGaussLobatto<1> points_gl(this->degree + 1);
   bool                   gauss_lobatto = true;
   for (unsigned int j = 0; j <= this->degree; ++j)
-    if (points[j] != points_gl.point(j)(0))
+    if (points[j] != points_gl.point(j)[0])
       {
         gauss_lobatto = false;
         break;
@@ -907,7 +927,7 @@ FE_DGQArbitraryNodes<dim, spacedim>::get_name() const
   const QGauss<1> points_g(this->degree + 1);
   bool            gauss = true;
   for (unsigned int j = 0; j <= this->degree; ++j)
-    if (points[j] != points_g.point(j)(0))
+    if (points[j] != points_g.point(j)[0])
       {
         gauss = false;
         break;
@@ -924,7 +944,7 @@ FE_DGQArbitraryNodes<dim, spacedim>::get_name() const
   const QGaussLog<1> points_glog(this->degree + 1);
   bool               gauss_log = true;
   for (unsigned int j = 0; j <= this->degree; ++j)
-    if (points[j] != points_glog.point(j)(0))
+    if (points[j] != points_glog.point(j)[0])
       {
         gauss_log = false;
         break;
@@ -973,14 +993,14 @@ FE_DGQArbitraryNodes<dim, spacedim>::clone() const
 {
   // Construct a dummy quadrature formula containing the FE's nodes:
   std::vector<Point<1>> qpoints(this->degree + 1);
-  auto *const           polynomial_space =
+  const auto *const     polynomial_space =
     dynamic_cast<TensorProductPolynomials<dim> *>(this->poly_space.get());
   Assert(polynomial_space != nullptr, ExcInternalError());
   std::vector<unsigned int> lexicographic =
     polynomial_space->get_numbering_inverse();
   for (unsigned int i = 0; i <= this->degree; ++i)
     qpoints[i] = Point<1>(this->unit_support_points[lexicographic[i]][0]);
-  Quadrature<1> pquadrature(qpoints);
+  const Quadrature<1> pquadrature(qpoints);
 
   return std::make_unique<FE_DGQArbitraryNodes<dim, spacedim>>(pquadrature);
 }
@@ -1060,7 +1080,7 @@ FE_DGQHermite<dim, spacedim>::clone() const
 
 
 // explicit instantiations
-#include "fe_dgq.inst"
+#include "fe/fe_dgq.inst"
 
 
 DEAL_II_NAMESPACE_CLOSE

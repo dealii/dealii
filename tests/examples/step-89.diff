@@ -1,0 +1,5 @@
+1191c1191,1192
+<       while (time < end_time)
+---
+>       (void)end_time;
+>       while (time < 0.001)

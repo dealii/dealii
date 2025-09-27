@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2008 - 2023 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2008 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 #ifndef dealii_trilinos_vector_h
 #define dealii_trilinos_vector_h
@@ -23,7 +22,6 @@
 #  include <deal.II/base/index_set.h>
 #  include <deal.II/base/mpi_stub.h>
 #  include <deal.II/base/partitioner.h>
-#  include <deal.II/base/subscriptor.h>
 
 #  include <deal.II/lac/exceptions.h>
 #  include <deal.II/lac/read_vector.h>
@@ -31,11 +29,13 @@
 #  include <deal.II/lac/vector_operation.h>
 #  include <deal.II/lac/vector_type_traits.h>
 
+DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
 #  include <Epetra_ConfigDefs.h>
 #  include <Epetra_FEVector.h>
 #  include <Epetra_LocalMap.h>
 #  include <Epetra_Map.h>
 #  include <Epetra_MpiComm.h>
+DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
 
 #  include <memory>
 #  include <utility>
@@ -68,6 +68,16 @@ namespace TrilinosWrappers
   class SparseMatrix;
 
   /**
+   * This class defines type aliases that are used in vector classes
+   * within the TrilinosWrappers namespace.
+   */
+  class VectorTraits
+  {
+  public:
+    using size_type = dealii::types::global_dof_index;
+  };
+
+  /**
    * @cond internal
    */
 
@@ -80,11 +90,6 @@ namespace TrilinosWrappers
   namespace internal
   {
     /**
-     * Declare type for container size.
-     */
-    using size_type = dealii::types::global_dof_index;
-
-    /**
      * This class implements a wrapper for accessing the Trilinos vector in
      * the same way as we access deal.II objects: it is initialized with a
      * vector and an element within it, and has a conversion operator to
@@ -96,6 +101,8 @@ namespace TrilinosWrappers
     class VectorReference
     {
     private:
+      using size_type = VectorTraits::size_type;
+
       /**
        * Constructor. It is made private so as to only allow the actual vector
        * class to create it.
@@ -395,7 +402,7 @@ namespace TrilinosWrappers
      * @ingroup TrilinosWrappers
      * @ingroup Vectors
      */
-    class Vector : public Subscriptor, public ReadVector<TrilinosScalar>
+    class Vector : public ReadVector<TrilinosScalar>
     {
     public:
       /**
@@ -405,7 +412,7 @@ namespace TrilinosWrappers
        */
       using value_type      = TrilinosScalar;
       using real_type       = TrilinosScalar;
-      using size_type       = dealii::types::global_dof_index;
+      using size_type       = VectorTraits::size_type;
       using iterator        = value_type *;
       using const_iterator  = const value_type *;
       using reference       = internal::VectorReference;
@@ -524,7 +531,7 @@ namespace TrilinosWrappers
        * Reinit functionality. This function sets the calling vector to the
        * dimension and the parallel distribution of the input vector, but does
        * not copy the elements in <tt>v</tt>. If <tt>omit_zeroing_entries</tt>
-       * is not <tt>true</tt>, the elements in the vector are initialized with
+       * is <tt>false</tt>, the elements in the vector are initialized with
        * zero. If it is set to <tt>true</tt>, the vector entries are in an
        * unspecified state and the user has to set all elements. In the
        * current implementation, this method does not touch the vector entries
@@ -552,11 +559,10 @@ namespace TrilinosWrappers
        * Reinit functionality. This function destroys the old vector content
        * and generates a new one based on the input partitioning.  The flag
        * <tt>omit_zeroing_entries</tt> determines whether the vector should be
-       * filled with zero (false). If the flag is set to <tt>true</tt>, the
-       * vector entries are in an unspecified state and the user has to set
-       * all elements. In the current implementation, this method still sets
-       * the entries to zero, but this might change between releases without
-       * notification.
+       * filled with zeros (if set to <tt>false</tt>) or left in an unspecified
+       * state (if the flag is set to <tt>true</tt>). In the current
+       * implementation, this method still sets the entries to zero, but this
+       * might change between releases without notification.
        *
        * Depending on whether the @p parallel_partitioning argument uniquely
        * subdivides elements among processors or not, the resulting vector may
@@ -673,8 +679,32 @@ namespace TrilinosWrappers
 
       /**
        * Copy the given vector. Resize the present vector if necessary. In
-       * this case, also the Epetra_Map that designs the parallel partitioning
+       * this case, also the `Epetra_Map` that designs the parallel partitioning
        * is taken from the input vector.
+       *
+       * The semantics of this operator are complex. If the two vectors have
+       * the same size, and
+       * if either the left or right hand side vector of the assignment (i.e.,
+       * either the input vector on the right hand side, or the calling vector
+       * to the left of the assignment operator) currently has ghost elements,
+       * then the left hand side vector will also have ghost values and will
+       * consequently be a read-only vector (see also the
+       * @ref GlossGhostedVector "glossary entry" on the issue). Otherwise, the
+       * left hand vector will be a writable vector after this operation.
+       * These semantics facilitate having a vector with ghost elements on the
+       * left hand side of the assignment, and a vector without ghost elements
+       * on the right hand side, with the resulting left hand side vector
+       * having the correct values in both its locally owned and its ghost
+       * elements.
+       *
+       * On the other hand, if the left hand side vector does not have the
+       * correct size yet, or is perhaps an entirely uninitialized vector,
+       * then the assignment is simply a copy operation in the usual sense:
+       * In that case, if the right hand side has no ghost elements (i.e.,
+       * is a completely distributed vector), then the left hand side will
+       * have no ghost elements either. And if the right hand side has
+       * ghost elements (and is consequently read-only), then the left
+       * hand side will have these same properties after the operation.
        */
       Vector &
       operator=(const Vector &v);
@@ -689,7 +719,7 @@ namespace TrilinosWrappers
       /**
        * Another copy function. This one takes a deal.II vector and copies it
        * into a TrilinosWrapper vector. Note that since we do not provide any
-       * Epetra_map that tells about the partitioning of the vector among the
+       * Epetra_Map that tells about the partitioning of the vector among the
        * MPI processes, the size of the TrilinosWrapper vector has to be the
        * same as the size of the input vector.
        */
@@ -710,9 +740,9 @@ namespace TrilinosWrappers
        * then queried from the input vector. Note that you should not write to
        * the resulting vector any more, since the some data can be stored
        * several times on different processors, leading to unpredictable
-       * results. In particular, such a vector cannot be used for matrix-
-       * vector products as for example done during the solution of linear
-       * systems.
+       * results. In particular, such a vector cannot be used for
+       * matrix-vector products as for example done during the solution of
+       * linear systems.
        */
       void
       import_nonlocal_data_for_fe(
@@ -728,18 +758,6 @@ namespace TrilinosWrappers
       void
       import_elements(const LinearAlgebra::ReadWriteVector<double> &rwv,
                       const VectorOperation::values                 operation);
-
-      /**
-       * @deprecated Use import_elements() instead.
-       */
-      DEAL_II_DEPRECATED
-      void
-      import(const LinearAlgebra::ReadWriteVector<double> &rwv,
-             const VectorOperation::values                 operation)
-      {
-        import_elements(rwv, operation);
-      }
-
 
       /**
        * Test for equality. This function assumes that the present vector and
@@ -921,7 +939,7 @@ namespace TrilinosWrappers
 
       /**
        * Return whether the vector contains only elements with value zero. This
-       * is a collective operation. This function is expensive, because
+       * is a @ref GlossCollectiveOperation "collective operation". This function is expensive, because
        * potentially all elements have to be checked.
        */
       bool
@@ -1001,8 +1019,9 @@ namespace TrilinosWrappers
        * Extract a range of elements all at once.
        */
       virtual void
-      extract_subvector_to(const ArrayView<const size_type> &indices,
-                           ArrayView<TrilinosScalar> &elements) const override;
+      extract_subvector_to(
+        const ArrayView<const size_type> &indices,
+        const ArrayView<TrilinosScalar>  &elements) const override;
 
       /**
        * Instead of getting individual elements of a vector via operator(),
@@ -1169,10 +1188,10 @@ namespace TrilinosWrappers
        * then it is possible to add data from a vector that uses a different
        * map, i.e., a vector whose elements are split across processors
        * differently. This may include vectors with ghost elements, for example.
-       * In general, however, adding vectors with a different element-to-
-       * processor map requires communicating data among processors and,
-       * consequently, is a slower operation than when using vectors using the
-       * same map.
+       * In general, however, adding vectors with a different
+       * element-to-processor map requires communicating data among processors
+       * and, consequently, is a slower operation than when using vectors using
+       * the same map.
        */
       void
       add(const Vector &V, const bool allow_different_maps = false);
@@ -1273,7 +1292,7 @@ namespace TrilinosWrappers
        * analogy to standard functions.
        */
       void
-      swap(Vector &v);
+      swap(Vector &v) noexcept;
 
       /**
        * Estimate for the memory consumption in bytes.
@@ -1389,7 +1408,7 @@ namespace TrilinosWrappers
      * @relatesalso TrilinosWrappers::MPI::Vector
      */
     inline void
-    swap(Vector &u, Vector &v)
+    swap(Vector &u, Vector &v) noexcept
     {
       u.swap(v);
     }
@@ -1551,8 +1570,9 @@ namespace TrilinosWrappers
 
 
     inline void
-    Vector::extract_subvector_to(const ArrayView<const size_type> &indices,
-                                 ArrayView<TrilinosScalar> &elements) const
+    Vector::extract_subvector_to(
+      const ArrayView<const size_type> &indices,
+      const ArrayView<TrilinosScalar>  &elements) const
     {
       AssertDimension(indices.size(), elements.size());
       for (unsigned int i = 0; i < indices.size(); ++i)
@@ -1573,8 +1593,8 @@ namespace TrilinosWrappers
       while (indices_begin != indices_end)
         {
           *values_begin = operator()(*indices_begin);
-          indices_begin++;
-          values_begin++;
+          ++indices_begin;
+          ++values_begin;
         }
     }
 
@@ -2295,6 +2315,14 @@ struct is_serial_vector<TrilinosWrappers::MPI::Vector> : std::false_type
 {};
 
 
+DEAL_II_NAMESPACE_CLOSE
+
+#else
+
+// Make sure the scripts that create the C++20 module input files have
+// something to latch on if the preprocessor #ifdef above would
+// otherwise lead to an empty content of the file.
+DEAL_II_NAMESPACE_OPEN
 DEAL_II_NAMESPACE_CLOSE
 
 #endif

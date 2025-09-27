@@ -1,20 +1,19 @@
-## ---------------------------------------------------------------------
+## ------------------------------------------------------------------------
 ##
-## Copyright (C) 2012 - 2023 by the deal.II authors
+## SPDX-License-Identifier: LGPL-2.1-or-later
+## Copyright (C) 2012 - 2025 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
-## The deal.II library is free software; you can use it, redistribute
-## it, and/or modify it under the terms of the GNU Lesser General
-## Public License as published by the Free Software Foundation; either
-## version 2.1 of the License, or (at your option) any later version.
-## The full text of the license can be found in the file LICENSE.md at
-## the top level directory of deal.II.
+## Part of the source code is dual licensed under Apache-2.0 WITH
+## LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+## governing the source code and code contributions can be found in
+## LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 ##
-## ---------------------------------------------------------------------
+## ------------------------------------------------------------------------
 
 #
-# This file sets up the project configuration consisting of
+# This file sets up the project installation and configuration consisting of
 #
 #   deal.IIConfig.cmake
 #   deal.IIVersionConfig.cmake
@@ -23,6 +22,57 @@
 # from the build directory or after installation. So we have to prepare
 # two distinct setups.
 #
+
+
+message(STATUS "Setting up library installation")
+
+set(_targets ${DEAL_II_TARGET_NAME})
+foreach(build ${DEAL_II_BUILD_TYPES})
+  string(TOLOWER ${build} build_lowercase)
+  list(APPEND _targets ${DEAL_II_TARGET_NAME}_${build_lowercase})
+  if(DEAL_II_WITH_CXX20_MODULE)
+    list(APPEND _targets ${DEAL_II_TARGET_NAME}_module_${build_lowercase})
+  endif()
+endforeach()
+
+if(CMAKE_VERSION VERSION_LESS 3.28)
+  install(TARGETS ${_targets} ${DEAL_II_TARGETS} ${DEAL_II_TARGETS_DEBUG} ${DEAL_II_TARGETS_RELEASE}
+    COMPONENT library
+    EXPORT ${DEAL_II_PROJECT_CONFIG_NAME}Targets
+    RUNTIME DESTINATION ${DEAL_II_EXECUTABLE_RELDIR}
+    LIBRARY DESTINATION ${DEAL_II_LIBRARY_RELDIR}
+    ARCHIVE DESTINATION ${DEAL_II_LIBRARY_RELDIR}
+    )
+else()
+  install(TARGETS ${_targets} ${DEAL_II_TARGETS} ${DEAL_II_TARGETS_DEBUG} ${DEAL_II_TARGETS_RELEASE}
+    COMPONENT library
+    EXPORT ${DEAL_II_PROJECT_CONFIG_NAME}Targets
+    RUNTIME DESTINATION ${DEAL_II_EXECUTABLE_RELDIR}
+    LIBRARY DESTINATION ${DEAL_II_LIBRARY_RELDIR}
+    ARCHIVE DESTINATION ${DEAL_II_LIBRARY_RELDIR}
+    FILE_SET external_module_interface_units
+      DESTINATION ${DEAL_II_INCLUDE_RELDIR}/deal.II/module
+    FILE_SET module_interface_units
+      DESTINATION ${DEAL_II_INCLUDE_RELDIR}/deal.II/module
+    FILE_SET headers
+      DESTINATION ${DEAL_II_INCLUDE_RELDIR}
+    )
+endif()
+
+install(EXPORT ${DEAL_II_PROJECT_CONFIG_NAME}Targets
+  NAMESPACE "${DEAL_II_TARGET_NAME}::"
+  DESTINATION ${DEAL_II_PROJECT_CONFIG_RELDIR}
+  COMPONENT library
+  )
+
+file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/${DEAL_II_PROJECT_CONFIG_RELDIR})
+export(TARGETS ${_targets} ${DEAL_II_TARGETS} ${DEAL_II_TARGETS_DEBUG} ${DEAL_II_TARGETS_RELEASE}
+  NAMESPACE "${DEAL_II_TARGET_NAME}::"
+  FILE ${CMAKE_BINARY_DIR}/${DEAL_II_PROJECT_CONFIG_RELDIR}/${DEAL_II_PROJECT_CONFIG_NAME}Targets.cmake
+)
+
+message(STATUS "Setting up library installation - Done")
+
 
 message(STATUS "Setting up project configuration")
 
@@ -143,6 +193,12 @@ endforeach()
 
 set(CONFIG_BUILD_DIR TRUE)
 
+#
+# Filter out -Wno-deprecated-decarations so that user projects actually see
+# deprecation warnings:
+#
+string(REPLACE "-Wno-deprecated-declarations" "" DEAL_II_WARNING_FLAGS "${DEAL_II_WARNING_FLAGS}")
+
 configure_file(
   ${CMAKE_CURRENT_SOURCE_DIR}/Config.cmake.in
   ${CMAKE_BINARY_DIR}/${DEAL_II_PROJECT_CONFIG_RELDIR}/${DEAL_II_PROJECT_CONFIG_NAME}Config.cmake
@@ -193,4 +249,3 @@ install(FILES
 #
 
 message(STATUS "Setting up project configuration - Done")
-

@@ -1,0 +1,23 @@
+27c27
+< 
+---
+> #include "../example_test.h"
+1086c1086,1089
+<     solver.solve(system_matrix, solution, system_rhs, preconditioner);
+---
+>     //solver.solve(system_matrix, solution, system_rhs, preconditioner);
+>     check_solver_within_range(std::cout,
+>                               solver.solve(system_matrix, solution, system_rhs, preconditioner)
+>                               , solver_control.last_step(), 2, 13);
+1089,1091c1092,1094
+<     std::cout << "          converged in " << solver_control.last_step()
+<               << " iterations"
+<               << " in " << time.last_wall_time() << " seconds " << std::endl;
+---
+> //    std::cout << "          converged in " << solver_control.last_step()
+> //              << " iterations"
+> //              << " in " << time.last_wall_time() << " seconds " << std::endl;
+1235c1238
+<       settings.get_parameters((argc > 1) ? (argv[1]) : "");
+---
+>       settings.get_parameters((argc > 1) ? (argv[1]) : "../../../source/step-63/sor.prm");

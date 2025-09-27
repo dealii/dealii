@@ -1,13 +1,12 @@
-<br>
-
 <i>
 This program was contributed by Bruno Turcksin and Daniel Arndt, Oak Ridge National Laboratory.
 </i>
 
 
+<a name="step_64-Intro"></a>
 <h1>Introduction</h1>
 
-This example shows how to implement a matrix-free method on the GPU using CUDA
+This example shows how to implement a matrix-free method on the GPU using Kokkos
 for the Helmholtz equation with variable coefficients on a hypercube. The linear
 system will be solved using the conjugate gradient method and is parallelized
  with MPI.
@@ -23,10 +22,12 @@ the most popular architecture for machine learning. On the other hand,
 GPUs are not easy to program. This program explores the deal.II
 capabilities to see how efficiently such a program can be implemented.
 
+We achieve a performance portable implementation by relying on the <a href="https://kokkos.org/">Kokkos</a>
+library, which supports different devices including CPUs (serial, using OpenMP), NVidia
+GPUs (when configured with CUDA), AMD GPUs (with ROCm), and more.
 While we have tried for the interface of the matrix-free classes for the CPU and
-the GPU to be as close as possible, there are a few differences. When using
-the matrix-free framework on a GPU, one must write some CUDA code. However, the
-amount is fairly small and the use of CUDA is limited to a few keywords.
+the GPU to be as close as possible, there are a few differences. However, the
+amount is fairly small and the use of Kokkos is limited to a few keywords.
 
 
 <h3>The test case</h3>
@@ -59,48 +60,24 @@ separate steps:
 The data movements can either be done explicitly by the user code or done
 automatically using UVM (Unified Virtual Memory). In deal.II, only the first
 method is supported. While it means an extra burden for the user, this
-allows for
-better control of data movement and more importantly it avoids to mistakenly run
-important kernels on the host instead of the device.
+allows for better control of data movement.
 
 The data movement in deal.II is done using LinearAlgebra::ReadWriteVector. These
 vectors can be seen as buffers on the host that are used to either store data
 received from the device or to send data to the device. There are two types of vectors
 that can be used on the device:
-- LinearAlgebra::CUDAWrappers::Vector, which is similar to the more common
-Vector<Number>, and
+- LinearAlgebra::TpetraWrappers::Vector<Number, MemorySpace>, that has a host
+and device copy of the data, and
 - LinearAlgebra::distributed::Vector<Number,
-MemorySpace::CUDA>, which is a regular
+MemorySpace::Default>, which is a regular
 LinearAlgebra::distributed::Vector where we have specified which memory
 space to use.
 
-If no memory space is specified, the default is MemorySpace::Host.
+If no memory space is specified, the default is MemorySpace::Host. MemorySpace::Default
+corresponds to data living on the device.
 
-Next, we show how to move data to/from the device using
-LinearAlgebra::CUDAWrappers::Vector:
-@code
-  unsigned int size = 10;
-  LinearAlgebra::ReadWriteVector<double> rw_vector(size);
-
-  ...do something with the rw_vector...
-
-  // Move the data to the device:
-  LinearAlgebra::CUDAWrappers::Vector<double> vector_dev(size);
-  vector_dev.import_elements(rw_vector, VectorOperations::insert);
-
-  ...do some computations on the device...
-
-  // Move the data back to the host:
-  rw_vector.import_elements(vector_dev, VectorOperations::insert);
-@endcode
-Both of the vector classes used here only work on a single machine,
-i.e., one memory space on a host and one on a device.
-
-But there are cases where one wants to run a parallel computation
-between multiple MPI processes on a number of machines, each of which
-is equipped with GPUs. In that case, one wants to use
-`LinearAlgebra::distributed::Vector<Number,MemorySpace::CUDA>`,
-which is similar but the `import()` stage may involve MPI communication:
+To copy a vector to/from the device, you can use `import_elements()`, which
+may also involve MPI communication:
 @code
   IndexSet locally_owned_dofs, locally_relevant_dofs;
   ...fill the two IndexSet objects...
@@ -111,7 +88,7 @@ which is similar but the `import()` stage may involve MPI communication:
   ...do something with the rw_vector...
 
   // Move the data to the device:
-  LinearAlgebra::distributed::Vector<double, MemorySpace::CUDA>
+  LinearAlgebra::distributed::Vector<double, MemorySpace::Default>
     distributed_vector_dev(locally_owned_dofs, MPI_COMM_WORLD);
   distributed_vector_dev.import_elements(owned_rw_vector, VectorOperations::insert);
 

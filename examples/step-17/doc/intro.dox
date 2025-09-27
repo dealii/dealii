@@ -1,4 +1,4 @@
-<a name="Intro"></a>
+<a name="step_17-Intro"></a>
 <h1>Introduction</h1>
 
 <h3>Overview</h3>
@@ -6,19 +6,20 @@
 This program does not introduce any new mathematical ideas; in fact, all it does
 is to do the same computations that step-8 already does, but it does so in a
 different manner.  Instead of using deal.II's linear algebra classes, we build
-everything on top of classes deal.II provides that wrap around the linear algebra implementation of the <a
-href="http://www.mcs.anl.gov/petsc/" target="_top">PETSc</a> library. And
-since PETSc allows the distribution of matrices and vectors across several
+everything on top of classes deal.II provides that wrap around the linear algebra
+(matrices, vectors, and linear solvers) objects of [PETSc](https://petsc.org).
+And since PETSc allows the distribution of matrices and vectors across several
 computers within an MPI network, the resulting code will even be capable of
 solving the problem in %parallel. If you don't know what PETSc is, then this
 would be a good time to take a quick glimpse at their homepage.
 
 As a prerequisite of this program, you need to have PETSc installed, and if
-you want to run in %parallel on a cluster, you also need <a
-href="http://www-users.cs.umn.edu/~karypis/metis/index.html"
-target="_top">METIS</a> to partition meshes. The installation of deal.II
-together with these two additional libraries is described in the <a
-href="../../readme.html" target="body">README</a> file.
+you want to run in %parallel on a cluster, we recommend using
+[METIS](https://karypis.github.io/) to partition
+meshes. If METIS is not available then this program will use a less efficient
+mesh partitioner which is built-in to deal.II. The installation of deal.II
+together with these two additional libraries is described in the
+[README](../../readme.html) file.
 
 Now, for the details: as mentioned, the program does not compute anything new,
 so the use of finite element classes, etc., is exactly the same as before. The
@@ -64,8 +65,8 @@ space, for example whenever multiple cores in a single machine work
 on a common task). Some of the fundamentals of distributed memory
 computing are discussed in the
 @ref distributed "Parallel computing with multiple processors using distributed memory"
-documentation module, which is itself a sub-module of the
-@ref Parallel "Parallel computing" module.
+documentation topic, which is itself a sub-topic of the
+@ref Parallel "Parallel computing" topic.
 
 In general, to be truly able to scale to large numbers of processors, one
 needs to split between the available processors <i>every</i> data structure

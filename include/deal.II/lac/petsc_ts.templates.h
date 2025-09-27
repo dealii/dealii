@@ -1,17 +1,16 @@
-//-----------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-//    Copyright (C) 2023 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2023 - 2025 by the deal.II authors
 //
-//    This file is part of the deal.II library.
+// This file is part of the deal.II library.
 //
-//    The deal.II library is free software; you can use it, redistribute
-//    it, and/or modify it under the terms of the GNU Lesser General
-//    Public License as published by the Free Software Foundation; either
-//    version 2.1 of the License, or (at your option) any later version.
-//    The full text of the license can be found in the file LICENSE.md at
-//    the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-//---------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 #ifndef dealii_petsc_ts_templates_h
 #define dealii_petsc_ts_templates_h
@@ -20,11 +19,13 @@
 
 #ifdef DEAL_II_WITH_PETSC
 #  include <deal.II/base/exceptions.h>
+#  include <deal.II/base/mpi_stub.h>
 
 #  include <deal.II/lac/petsc_precondition.h>
 #  include <deal.II/lac/petsc_ts.h>
 
 #  include <petscdm.h>
+#  include <petscerror.h>
 #  include <petscts.h>
 
 DEAL_II_NAMESPACE_OPEN
@@ -37,7 +38,7 @@ DEAL_II_NAMESPACE_OPEN
         PetscErrorCode ierr = (code);                \
         AssertThrow(ierr == 0, ExcPETScError(ierr)); \
       }                                              \
-    while (0)
+    while (false)
 
 // Macro to wrap PETSc inside callbacks.
 // This is used to raise "PETSc" exceptions, i.e.
@@ -49,7 +50,7 @@ DEAL_II_NAMESPACE_OPEN
           PetscErrorCode ierr = (code); \
           CHKERRQ(ierr);                \
         }                               \
-      while (0)
+      while (false)
 #    define undefPetscCall
 #  endif
 
@@ -341,6 +342,9 @@ namespace PETScWrappers
                                       TS_EXACTFINALTIME_MATCHSTEP :
                                       TS_EXACTFINALTIME_STEPOVER));
 
+    // Store the boolean to be passed to TSSetResize.
+    this->restart_if_remesh = data.restart_if_remesh;
+
     // Adaptive tolerances
     const PetscReal atol = data.absolute_tolerance > 0.0 ?
                              data.absolute_tolerance :
@@ -440,7 +444,14 @@ namespace PETScWrappers
 
       const int lineno = __LINE__;
       const int err    = call_and_possibly_capture_ts_exception(
-        user->decide_for_coarsening_and_refinement,
+        (user->decide_and_prepare_for_remeshing ?
+              [&](const real_type    t,
+               const unsigned int step,
+               const VectorType  &y,
+               bool              &resize) {
+             resize = user->decide_and_prepare_for_remeshing(t, step, y);
+           } :
+              user->decide_for_coarsening_and_refinement),
         user->pending_exception,
         {},
         t,
@@ -452,7 +463,7 @@ namespace PETScWrappers
         return PetscError(
           PetscObjectComm((PetscObject)ts),
           lineno + 1,
-          "decide_for_coarsening_and_refinement",
+          "decide_and_prepare_for_remeshing",
           __FILE__,
           PETSC_ERR_LIB,
           PETSC_ERROR_INITIAL,
@@ -477,7 +488,20 @@ namespace PETScWrappers
 
       const int lineno = __LINE__;
       const int err    = call_and_possibly_capture_ts_exception(
-        user->interpolate, user->pending_exception, {}, all_in, all_out);
+        (user->transfer_solution_vectors_to_new_mesh ?
+              // If we can, call the new callback
+           user->transfer_solution_vectors_to_new_mesh :
+              // otherwise, use the old one where we just ignore the time:
+           [user](const real_type /*t*/,
+                  const std::vector<VectorType> &all_in,
+                  std::vector<VectorType>       &all_out) {
+             user->interpolate(all_in, all_out);
+           }),
+        user->pending_exception,
+        {},
+        user->get_time(),
+        all_in,
+        all_out);
       if (err)
         return PetscError(
           PetscObjectComm((PetscObject)ts),
@@ -606,7 +630,11 @@ namespace PETScWrappers
 
       const int lineno = __LINE__;
       const int err    = call_and_possibly_capture_ts_exception(
-        user->distribute,
+        // Call the user-provided callback. Use the new name if used,
+        // or the legacy name otherwise.
+        (user->update_constrained_components ?
+              user->update_constrained_components :
+              user->distribute),
         user->pending_exception,
         [user, ts]() -> void {
           user->error_in_function = true;
@@ -621,7 +649,7 @@ namespace PETScWrappers
         return PetscError(
           PetscObjectComm((PetscObject)ts),
           lineno + 1,
-          "distribute",
+          "update_constrained_components",
           __FILE__,
           PETSC_ERR_LIB,
           PETSC_ERROR_INITIAL,
@@ -1023,22 +1051,68 @@ namespace PETScWrappers
         AssertPETSc(KSPSetPC(ksp, solve_with_jacobian_pc.get_pc()));
       }
 
-    if (distribute)
-      AssertPETSc(TSSetPostStage(ts, ts_poststage));
+    if (distribute || update_constrained_components)
+      {
+        if (update_constrained_components)
+          Assert(!distribute,
+                 ExcMessage(
+                   "The 'distribute' callback name of the TimeStepper "
+                   "class is deprecated. If you are setting the equivalent "
+                   "'update_constrained_components' callback, you cannot also "
+                   "set the 'distribute' callback."));
+        AssertPETSc(TSSetPostStage(ts, ts_poststage));
+      }
 
     // Attach user monitoring routine.
     if (monitor)
       AssertPETSc(TSMonitorSet(ts, ts_monitor, this, nullptr));
 
     // Handle AMR.
-    if (decide_for_coarsening_and_refinement)
+    if (decide_and_prepare_for_remeshing ||
+        decide_for_coarsening_and_refinement)
       {
-        AssertThrow(interpolate,
-                    StandardExceptions::ExcFunctionNotProvided("interpolate"));
-#  if DEAL_II_PETSC_VERSION_GTE(3, 20, 0)
+        if (decide_and_prepare_for_remeshing)
+          Assert(
+            !decide_for_coarsening_and_refinement,
+            ExcMessage(
+              "The 'decide_for_coarsening_and_refinement' callback name "
+              "of the TimeStepper class is deprecated. If you are setting "
+              "the equivalent 'decide_and_prepare_for_remeshing' callback, you "
+              "cannot also set the 'decide_for_coarsening_and_refinement' "
+              "callback."));
+
+        // If we have the decide_and_prepare_for_remeshing callback
+        // set, then we also need to have the callback for actually
+        // transferring the solution:
+        AssertThrow(interpolate || transfer_solution_vectors_to_new_mesh,
+                    StandardExceptions::ExcFunctionNotProvided(
+                      "transfer_solution_vectors_to_new_mesh"));
+
+        if (transfer_solution_vectors_to_new_mesh)
+          Assert(
+            !interpolate,
+            ExcMessage(
+              "The 'interpolate' callback name "
+              "of the TimeStepper class is deprecated. If you are setting "
+              "the equivalent 'transfer_solution_vectors_to_new_mesh' callback, you "
+              "cannot also set the 'interpolate' "
+              "callback."));
+
+#  if DEAL_II_PETSC_VERSION_GTE(3, 21, 0)
+        (void)ts_poststep_amr;
+        AssertPETSc(TSSetResize(ts,
+                                static_cast<PetscBool>(restart_if_remesh),
+                                ts_resize_setup,
+                                ts_resize_transfer,
+                                this));
+#  else
+        AssertThrow(!restart_if_remesh,
+                    ExcMessage(
+                      "Restart with remesh supported from PETSc 3.21."));
+#    if DEAL_II_PETSC_VERSION_GTE(3, 20, 0)
         (void)ts_poststep_amr;
         AssertPETSc(TSSetResize(ts, ts_resize_setup, ts_resize_transfer, this));
-#  else
+#    else
         AssertPETSc(PetscObjectComposeFunction(
           (PetscObject)ts,
           "__dealii_ts_resize_setup__",
@@ -1051,6 +1125,7 @@ namespace PETScWrappers
           static_cast<PetscErrorCode (*)(TS, PetscInt, Vec[], Vec[], void *)>(
             ts_resize_transfer)));
         AssertPETSc(TSSetPostStep(ts, ts_poststep_amr));
+#    endif
 #  endif
       }
 
@@ -1251,6 +1326,14 @@ namespace PETScWrappers
 #    undef undefPetscCall
 #  endif
 
+DEAL_II_NAMESPACE_CLOSE
+
+#else
+
+// Make sure the scripts that create the C++20 module input files have
+// something to latch on if the preprocessor #ifdef above would
+// otherwise lead to an empty content of the file.
+DEAL_II_NAMESPACE_OPEN
 DEAL_II_NAMESPACE_CLOSE
 
 #endif // DEAL_II_WITH_PETSC

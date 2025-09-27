@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2017 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2017 - 2024 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 /**
 @page changes_between_8_4_2_and_8_5_0 Changes between Version 8.4.2 and 8.5.0
@@ -26,7 +25,7 @@ author.
 
 <!-- ----------- INCOMPATIBILITIES ----------------- -->
 
-<a name="incompatible"></a>
+<a name="842-850-incompatible"></a>
 <h3 style="color:red">Incompatibilities</h3>
 
 <p style="color:red">
@@ -313,7 +312,7 @@ inconvenience this causes.
 
 <!-- ----------- GENERAL IMPROVEMENTS ----------------- -->
 
-<a name="general"></a>
+<a name="842-850-general"></a>
 <h3>General</h3>
 
 <ol>
@@ -637,7 +636,7 @@ inconvenience this causes.
 
 <!-- ----------- SPECIFIC IMPROVEMENTS ----------------- -->
 
-<a name="specific"></a>
+<a name="842-850-specific"></a>
 <h3>Specific improvements</h3>
 
 <ol>
@@ -1018,7 +1017,7 @@ inconvenience this causes.
  </li>
 
  <li>
-  Improved: ContraintMatrix::distribute_local_to_global now does a bulk write of
+  Improved: ConstraintMatrix::distribute_local_to_global now does a bulk write of
   all vector values at once. This improves performance with
   PETScWrappers::MPI::Vector by about 10%.
   <br>
@@ -1613,7 +1612,7 @@ inconvenience this causes.
 
  <li>
   Fixed: Allow to use FETools::get_fe_by_name for all
-  availabale FiniteElements.
+  available FiniteElements.
   <br>
   (Daniel Arndt, 2016/07/10)
  </li>

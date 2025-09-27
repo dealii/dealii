@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2009 - 2018 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2013 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 
 
@@ -29,8 +28,6 @@
 
 #include <deal.II/lac/affine_constraints.h>
 #include <deal.II/lac/petsc_vector.h>
-
-#include <sstream>
 
 #include "../tests.h"
 
@@ -69,7 +66,8 @@ test()
     std::max<int>(100 * myid - 50, 0),
     std::min(static_cast<types::global_dof_index>(100 * myid + 150),
              vec.size()));
-  AffineConstraints<PetscScalar> cm(locally_relevant_range);
+  AffineConstraints<PetscScalar> cm(vec.locally_owned_elements(),
+                                    locally_relevant_range);
 
   // add constraints that constrain an element in the middle of the
   // local range of each processor against an element outside, both in

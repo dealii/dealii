@@ -1,22 +1,23 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2022 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 1998 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/logstream.h>
 #include <deal.II/base/mpi.h>
 #include <deal.II/base/utilities.h>
+
+#include <Kokkos_Core.hpp>
 
 #include <cstdlib>
 #include <cstring>
@@ -25,7 +26,9 @@
 #include <string>
 
 #ifdef DEAL_II_WITH_MPI
+DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
 #  include <mpi.h>
+DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
 #endif
 
 #ifdef DEAL_II_TRILINOS_WITH_SEACAS
@@ -183,14 +186,27 @@ ExceptionBase::print_exc_data(std::ostream &out) const
   // print a header for the exception
   out << "An error occurred in line <" << line << "> of file <" << file
       << "> in function" << std::endl
-      << "    " << function << std::endl
-      << "The violated condition was: " << std::endl
-      << "    " << cond << std::endl;
+      << "    " << function << std::endl;
 
-  // print the way the additional information message was generated.
-  // this is useful if the names of local variables appear in the
-  // generation of the error message, because it allows the identification
-  // of parts of the error text with what variables may have cause this
+  // If the exception stores a string representation of the violated
+  // condition, then output it. Not all exceptions do (e.g., when
+  // creating an exception inside DEAL_II_NOT_IMPLEMENTED();), so
+  // we have to check whether there is anything to print.
+  //
+  // There are also places where the condition is not very interesting.
+  // Specifically, this is the case for places such as
+  //   Assert (false, ExcInternalError());
+  // Here, the condition is simply 'false'. This is not worth printing,
+  // so suppress this case.
+  if ((cond != nullptr) && (std::strcmp(cond, "false") != 0))
+    out << "The violated condition was: " << std::endl
+        << "    " << cond << std::endl;
+
+  // If a string representation of the exception itself is available,
+  // consider printing it as well. This is useful if the names of
+  // local variables appear in the generation of the error message,
+  // because it allows the identification of parts of the error text
+  // with what variables may have cause this.
   //
   // On the other hand, this is almost never the case for ExcMessage
   // exceptions which would simply print the same text twice: once for
@@ -198,8 +214,15 @@ ExceptionBase::print_exc_data(std::ostream &out) const
   // information. Furthermore, the former of these two is often spread
   // between numerous "..."-enclosed strings that the preprocessor
   // collates into a single string, making it awkward to read. Consequently,
-  // elide this text if the message was generated via an ExcMessage object
-  if (std::strstr(cond, "dealii::ExcMessage") != nullptr)
+  // elide this text if the message was generated via an ExcMessage object.
+  //
+  // There are cases where the exception generation mechanism suppresses
+  // the string representation of the exception because it does not add
+  // anything -- e.g., DEAL_II_NOT_IMPLEMENTED does this. In those cases,
+  // also suppress the output.
+  if ((exc != nullptr) &&
+      ((cond == nullptr) ||
+       (std::strstr(cond, "dealii::ExcMessage") != nullptr)))
     out << "The name and call sequence of the exception was:" << std::endl
         << "    " << exc << std::endl;
 
@@ -266,8 +289,9 @@ ExceptionBase::print_stack_trace(std::ostream &out) const
       std::string functionname =
         stacktrace_entry.substr(pos_start + 1, pos_end - pos_start - 1);
 
-      stacktrace_entry = stacktrace_entry.substr(0, pos_start);
-      stacktrace_entry += ": ";
+      std::string demangled_stacktrace_entry =
+        stacktrace_entry.substr(0, pos_start);
+      demangled_stacktrace_entry += ": ";
 
       // demangle, and if successful replace old mangled string by
       // unmangled one (skipping address and offset). treat "main"
@@ -292,27 +316,27 @@ ExceptionBase::print_stack_trace(std::ostream &out) const
             realname.erase(realname.find(", boost::tuples::null_type>"),
                            std::string(", boost::tuples::null_type").size());
 
-          stacktrace_entry += realname;
+          demangled_stacktrace_entry += realname;
         }
       else
-        stacktrace_entry += functionname;
+        demangled_stacktrace_entry += functionname;
 
-      free(p);
+      std::free(p);
 
 #else
 
-      stacktrace_entry += functionname;
+      demangled_stacktrace_entry += functionname;
 #endif
 
       // then output what we have
-      out << stacktrace_entry << std::endl;
+      out << demangled_stacktrace_entry << std::endl;
 
       // stop if we're in main()
       if (functionname == "main")
         break;
     }
 
-  free(stacktrace); // free(nullptr) is allowed
+  std::free(stacktrace); // free(nullptr) is allowed
   stacktrace = nullptr;
 }
 
@@ -497,7 +521,12 @@ namespace deal_II_exceptions
             }
         }
 #endif
-      std::abort();
+
+      // Let's abort the program here. On the host, we need to call
+      // std::abort, on devices we need to do something different.
+      // Kokkos::abort() does the right thing in all circumstances.
+      Kokkos::abort(
+        "Abort() was called during dealing with an assertion or exception.");
     }
 
 
@@ -515,97 +544,6 @@ namespace deal_II_exceptions
           deallog << exc.what() << std::endl;
         }
     }
-
-
-
-#ifdef DEAL_II_WITH_CUDA
-    std::string
-    get_cusparse_error_string(const cusparseStatus_t error_code)
-    {
-      switch (error_code)
-        {
-          case CUSPARSE_STATUS_NOT_INITIALIZED:
-            {
-              return "The cuSPARSE library was not initialized";
-            }
-          case CUSPARSE_STATUS_ALLOC_FAILED:
-            {
-              return "Resource allocation failed inside the cuSPARSE library";
-            }
-          case CUSPARSE_STATUS_INVALID_VALUE:
-            {
-              return "An unsupported value of parameter was passed to the function";
-            }
-          case CUSPARSE_STATUS_ARCH_MISMATCH:
-            {
-              return "The function requires a feature absent from the device architecture";
-            }
-          case CUSPARSE_STATUS_MAPPING_ERROR:
-            {
-              return "An access to GPU memory space failed";
-            }
-          case CUSPARSE_STATUS_EXECUTION_FAILED:
-            {
-              return "The GPU program failed to execute";
-            }
-          case CUSPARSE_STATUS_INTERNAL_ERROR:
-            {
-              return "An internal cuSPARSE operation failed";
-            }
-          case CUSPARSE_STATUS_MATRIX_TYPE_NOT_SUPPORTED:
-            {
-              return "The matrix type is not supported by this function";
-            }
-          default:
-            {
-              return "Unknown error";
-            }
-        }
-    }
-
-
-
-    std::string
-    get_cusolver_error_string(cusolverStatus_t error_code)
-    {
-      std::string message;
-      switch (error_code)
-        {
-          case CUSOLVER_STATUS_NOT_INITIALIZED:
-            {
-              return "The cuSolver library was not initialized";
-            }
-          case CUSOLVER_STATUS_ALLOC_FAILED:
-            {
-              return "Resource allocation failed inside the cuSolver library";
-            }
-          case CUSOLVER_STATUS_INVALID_VALUE:
-            {
-              return "An unsupported value of a parameter was passed to the function";
-            }
-          case CUSOLVER_STATUS_ARCH_MISMATCH:
-            {
-              return "The function requires a feature absent from the device architecture";
-            }
-          case CUSOLVER_STATUS_EXECUTION_FAILED:
-            {
-              return "The GPU program failed to execute";
-            }
-          case CUSOLVER_STATUS_INTERNAL_ERROR:
-            {
-              return "An internal cuSolver operation failed";
-            }
-          case CUSOLVER_STATUS_MATRIX_TYPE_NOT_SUPPORTED:
-            {
-              return "The matrix type is not supported by this function";
-            }
-          default:
-            {
-              return "Unknown error";
-            }
-        }
-    }
-#endif
 
   } /*namespace internals*/
 } /*namespace deal_II_exceptions*/

@@ -1,0 +1,4 @@
+1317c1317
+<         if (solver.n_dofs() < 20000)
+---
+>         if (solver.n_dofs() < 5000)

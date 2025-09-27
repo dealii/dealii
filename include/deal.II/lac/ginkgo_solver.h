@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2018 - 2022 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2019 - 2024 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 #ifndef dealii_ginkgo_solver_h
 #define dealii_ginkgo_solver_h
@@ -43,8 +42,6 @@ namespace GinkgoWrappers
    * available at <a Ginkgo
    * href="https://ginkgo-project.github.io/ginkgo/doc/develop/"> documentation
    * and manual pages</a>.
-   *
-   * @ingroup GinkgoWrappers
    */
   template <typename ValueType, typename IndexType>
   class SolverBase
@@ -208,8 +205,6 @@ namespace GinkgoWrappers
 
   /**
    * An implementation of the solver interface using the Ginkgo CG solver.
-   *
-   * @ingroup GinkgoWrappers
    */
   template <typename ValueType = double, typename IndexType = int32_t>
   class SolverCG : public SolverBase<ValueType, IndexType>
@@ -264,8 +259,6 @@ namespace GinkgoWrappers
 
   /**
    * An implementation of the solver interface using the Ginkgo Bicgstab solver.
-   *
-   * @ingroup GinkgoWrappers
    */
   template <typename ValueType = double, typename IndexType = int32_t>
   class SolverBicgstab : public SolverBase<ValueType, IndexType>
@@ -322,8 +315,6 @@ namespace GinkgoWrappers
    *
    * CGS or the conjugate gradient square method is an iterative type Krylov
    * subspace method which is suitable for general systems.
-   *
-   * @ingroup GinkgoWrappers
    */
   template <typename ValueType = double, typename IndexType = int32_t>
   class SolverCGS : public SolverBase<ValueType, IndexType>
@@ -389,8 +380,6 @@ namespace GinkgoWrappers
    * vectors spanning the Krylov subspace. This increases the computational cost
    * of every Krylov solver iteration but allows for non-constant
    * preconditioners.
-   *
-   * @ingroup GinkgoWrappers
    */
   template <typename ValueType = double, typename IndexType = int32_t>
   class SolverFCG : public SolverBase<ValueType, IndexType>
@@ -444,8 +433,6 @@ namespace GinkgoWrappers
 
   /**
    * An implementation of the solver interface using the Ginkgo GMRES solver.
-   *
-   * @ingroup GinkgoWrappers
    */
   template <typename ValueType = double, typename IndexType = int32_t>
   class SolverGMRES : public SolverBase<ValueType, IndexType>
@@ -514,8 +501,6 @@ namespace GinkgoWrappers
    * Iterative refinement (IR) is an iterative method that uses another coarse
    * method to approximate the error of the current solution via the current
    * residual.
-   *
-   * @ingroup GinkgoWrappers
    */
   template <typename ValueType = double, typename IndexType = int32_t>
   class SolverIR : public SolverBase<ValueType, IndexType>
@@ -570,6 +555,14 @@ namespace GinkgoWrappers
 
 } // namespace GinkgoWrappers
 
+DEAL_II_NAMESPACE_CLOSE
+
+#else
+
+// Make sure the scripts that create the C++20 module input files have
+// something to latch on if the preprocessor #ifdef above would
+// otherwise lead to an empty content of the file.
+DEAL_II_NAMESPACE_OPEN
 DEAL_II_NAMESPACE_CLOSE
 
 #endif // DEAL_II_WITH_GINKGO

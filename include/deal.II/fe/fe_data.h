@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2000 - 2023 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2001 - 2024 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 #ifndef dealii_fe_data_h
 #define dealii_fe_data_h
@@ -63,11 +62,11 @@ namespace FiniteElementDomination
    *
    * Note that there are situations where neither side dominates. The
    * @ref hp_paper "hp-paper"
-   * lists two case, with the simpler one being that a $Q_2\times Q_1$ vector-
-   * valued element (i.e. a <code>FESystem(FE_Q(2),1,FE_Q(1),1)</code>) meets
-   * a $Q_1\times Q_2$ element: here, for each of the two vector-components,
-   * we can define a domination relationship, but it is different for the two
-   * components.
+   * lists two case, with the simpler one being that a $Q_2\times Q_1$
+   * vector-valued element (i.e. a <code>FESystem(FE_Q(2),1,FE_Q(1),1)</code>)
+   * meets a $Q_1\times Q_2$ element: here, for each of the two
+   * vector-components, we can define a domination relationship, but it is
+   * different for the two components.
    *
    * It is clear that the concept of domination doesn't matter for
    * discontinuous elements. However, discontinuous elements may be part of
@@ -765,7 +764,7 @@ namespace FiniteElementDomination
 
         default:
           // shouldn't get here
-          Assert(false, ExcInternalError());
+          DEAL_II_ASSERT_UNREACHABLE();
       }
 
     return neither_element_dominates;
@@ -891,7 +890,7 @@ FiniteElementData<dim>::n_dofs_per_object(const unsigned int i) const
       case 3:
         return n_dofs_per_hex();
       default:
-        Assert(false, ExcInternalError());
+        DEAL_II_ASSERT_UNREACHABLE();
     }
   return numbers::invalid_unsigned_int;
 }

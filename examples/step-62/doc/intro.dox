@@ -1,5 +1,3 @@
-<br>
-
 <i>This program was contributed by Daniel Garcia-Sanchez.</i>
 <br>
 
@@ -9,6 +7,7 @@ and the p4est libraries installed. The installation of deal.II
 together with these additional libraries is described in the <a
 href="../../readme.html" target="body">README</a> file.
 
+<a name="step_62-Intro"></a>
 <h1>Introduction</h1>
 A phononic crystal is a periodic nanostructure that modifies the motion of
 mechanical vibrations or [phonons](https://en.wikipedia.org/wiki/Phonon).
@@ -37,7 +36,7 @@ The bilayers correspond to GaAs/AlAs mirror pairs.
 As shown below, the thickness of the mirror layers (brown and green) is
 $\lambda/4$ and the thickness of the cavity (blue) is $\lambda/2$.
 
-<img alt="Phononic superlattice cavity" src="https://www.dealii.org/images/steps/developer/step-62.01.svg" height="200" />
+<img alt="Phononic superlattice cavity" src="https://dealii.org/images/steps/developer/step-62.01.svg" height="200" />
 
 In this tutorial we calculate the
 [band gap](https://en.wikipedia.org/wiki/Band_gap) and the
@@ -60,7 +59,7 @@ There are two regimes that depend on the waveguide width:
   This case can be solved using FEM
   or with a [scattering matrix formalism](https://doi.org/10.1103/PhysRevA.94.033813).
   Although we do not study this case in this tutorial, it is very easy to reach the multimode
-  regime by increasing the parameter waveguide width (`dimension_y` in the jupyter notebook).
+  regime by increasing the parameter waveguide width (`dimension_y` in the Jupyter Notebook).
 
 The simulations of this tutorial are performed in the frequency domain.
 To calculate the transmission spectrum, we use a
@@ -71,12 +70,12 @@ structure and the transmitted energy is measured on the right side of the struct
 The simulation is run twice. First, we run the simulation with the phononic
 structure and measure the transmitted energy:
 
-<img alt="Phononic superlattice cavity" src="https://www.dealii.org/images/steps/developer/step-62.02.svg" height="200" />
+<img alt="Phononic superlattice cavity" src="https://dealii.org/images/steps/developer/step-62.02.svg" height="200" />
 
 Then, we run the simulation without the phononic structure and measure the transmitted
 energy. We use the simulation without the structure for the calibration:
 
-<img alt="Phononic superlattice cavity" src="https://www.dealii.org/images/steps/developer/step-62.03.svg" height="200" />
+<img alt="Phononic superlattice cavity" src="https://dealii.org/images/steps/developer/step-62.03.svg" height="200" />
 
 The transmission coefficient corresponds to the energy of the first simulation
 divided by the calibration energy.
@@ -167,8 +166,8 @@ F_i &=& \int_\Omega\varphi_m^i f_m
 @f}
 
 <h3>Simulation parameters</h3>
-In this tutorial we use a python
-[jupyter notebook](https://github.com/dealii/dealii/blob/master/examples/step-62/step-62.ipynb)
+In this tutorial we use a Python
+[Jupyter Notebook](https://github.com/dealii/dealii/blob/master/examples/step-62/step-62.ipynb)
 to set up the parameters and run the simulation.
 First we create a HDF5 file where we store the parameters and the results of
 the simulation.

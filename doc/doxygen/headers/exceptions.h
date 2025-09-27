@@ -1,23 +1,22 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2003 - 2022 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2003 - 2024 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 
 /**
  * @defgroup Exceptions Exceptions and assertions
  *
- * This module contains classes that are used in the exception mechanism of
+ * This group contains classes that are used in the exception mechanism of
  * deal.II.
  *
  * <h2>Brief overview</h2>
@@ -73,7 +72,7 @@
  *   introduced in step-9, step-13, and
  *   following tutorial programs. The macro checks a condition, and if
  *   violated throws an exception of one of the types declared in this
- *   module, using the C++ <code>throw</code> mechanism. Since these
+ *   group, using the C++ <code>throw</code> mechanism. Since these
  *   are run-time exceptions, this gives the program the chance to
  *   catch the exception and, for example, write the output to a
  *   writable file instead.
@@ -394,7 +393,7 @@
  *  undesirable and one needs to exit in a somewhat more graceful
  *  way -- even if there is really not very much one can do in these
  *  cases to still produce a meaningful result. An example is if a
- *  deal.II program is run a one module in a bigger framework of
+ *  deal.II program is run as one module in a bigger framework of
  *  software. Think, for example, of a case where a deal.II program
  *  computed the flow field that corresponds to a set of input
  *  variables provided by some optimization routine: if the optimizer

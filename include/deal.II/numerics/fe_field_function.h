@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2007 - 2022 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2007 - 2024 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 #ifndef dealii_fe_function_h
 #define dealii_fe_function_h
@@ -124,12 +123,12 @@ namespace Functions
    * letting this class know.
    *
    *
-   * <h3>Using FEFieldFunction with parallel::distributed::Triangulation</h3>
+   * <h3>Using FEFieldFunction with parallel triangulations</h3>
    *
    * When using this class with a parallel distributed triangulation object
    * and evaluating the solution at a particular point, not every processor
-   * will own the cell at which the solution is evaluated. Rather, it may be
-   * that the cell in which this point is found is in fact a ghost or
+   * will own the cell at which the solution should be evaluated. Rather, it may
+   * be that the cell in which this point is found is in fact a ghost or
    * artificial cell (see
    * @ref GlossArtificialCell
    * and
@@ -161,6 +160,23 @@ namespace Functions
    *   if (point_found == true)
    *     ...do something...;
    * @endcode
+   * The last part (the `...do something...`) part needs to be application
+   * specific. If you really do need the information on this process, you need
+   * to communicate with the process that actually owns the cell in which the
+   * point at which you want the solution is located. Since you don't know
+   * which process that may be, this will necessarily require a global
+   * communication step. The FERemoteEvaluation class may be useful in this
+   * context.
+   *
+   * Finally, there is the case of the value_list(), gradient_list(),
+   * and similar functions of this class that take a list of points. For these
+   * functions, it may be that some of the points are on locally owned cells,
+   * and others are not -- in which case, again, you will receive an exception.
+   * Because these functions do not return information about which of the points
+   * can and which cannot be evaluated, the correct approach is to call the
+   * `*_list()` function within a `try` block, and if it fails fall back to
+   * calling value(), gradient(), or similar in a loop over the points you
+   * wanted evaluated to find out for which point the call fails.
    *
    * @ingroup functions
    */
@@ -453,8 +469,8 @@ namespace Functions
     /**
      * Pointer to the dof handler.
      */
-    SmartPointer<const DoFHandler<dim, spacedim>,
-                 FEFieldFunction<dim, VectorType, spacedim>>
+    ObserverPointer<const DoFHandler<dim, spacedim>,
+                    FEFieldFunction<dim, VectorType, spacedim>>
       dh;
 
     /**

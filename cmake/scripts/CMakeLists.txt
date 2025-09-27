@@ -1,17 +1,16 @@
-## ---------------------------------------------------------------------
+## ------------------------------------------------------------------------
 ##
-## Copyright (C) 2012 - 2022 by the deal.II authors
+## SPDX-License-Identifier: LGPL-2.1-or-later
+## Copyright (C) 2012 - 2025 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
-## The deal.II library is free software; you can use it, redistribute
-## it, and/or modify it under the terms of the GNU Lesser General
-## Public License as published by the Free Software Foundation; either
-## version 2.1 of the License, or (at your option) any later version.
-## The full text of the license can be found in the file LICENSE.md at
-## the top level directory of deal.II.
+## Part of the source code is dual licensed under Apache-2.0 WITH
+## LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+## governing the source code and code contributions can be found in
+## LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 ##
-## ---------------------------------------------------------------------
+## ------------------------------------------------------------------------
 
 add_executable(expand_instantiations_exe expand_instantiations.cc)
 
@@ -51,6 +50,7 @@ set(_scripts
   ${CMAKE_CURRENT_SOURCE_DIR}/run_test.sh
   ${CMAKE_CURRENT_SOURCE_DIR}/get_closest_tag.sh
   ${CMAKE_CURRENT_SOURCE_DIR}/get_latest_tag.sh
+  ${CMAKE_CURRENT_SOURCE_DIR}/get_fancy_tag.sh
   )
 file(COPY ${_scripts}
   DESTINATION ${CMAKE_BINARY_DIR}/${DEAL_II_SHARE_RELDIR}/scripts

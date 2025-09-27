@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2001 - 2023 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2008 - 2024 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 for (X : TRIANGULATIONS; deal_II_dimension : DIMENSIONS;
      deal_II_space_dimension : SPACE_DIMENSIONS)
@@ -78,14 +77,8 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
 
       template std::map<unsigned int, types::global_vertex_index>
       compute_local_to_global_vertex_index_map(
-        const parallel::distributed::Triangulation<deal_II_dimension,
-                                                   deal_II_space_dimension>
+        const Triangulation<deal_II_dimension, deal_II_space_dimension>
           &triangulation);
-
-      template std::map<unsigned int, Point<deal_II_space_dimension>>
-      extract_used_vertices(
-        const Triangulation<deal_II_dimension, deal_II_space_dimension> &mesh,
-        const Mapping<deal_II_dimension, deal_II_space_dimension> &mapping);
 
       template std::pair<
         typename Triangulation<deal_II_dimension,
@@ -198,6 +191,7 @@ for (deal_II_struct_dimension : DIMENSIONS; deal_II_dimension : DIMENSIONS;
           const unsigned int,
           const Triangulation<deal_II_dimension, deal_II_space_dimension> &,
           const Mapping<deal_II_dimension, deal_II_space_dimension> &,
+          std::vector<Quadrature<deal_II_space_dimension>> *,
           const bool) const;
 
       template internal::DistributedComputeIntersectionLocationsInternal<
@@ -255,16 +249,6 @@ for (deal_II_space_dimension : SPACE_DIMENSIONS)
     GridTools::build_global_description_tree(
       const std::vector<BoundingBox<deal_II_space_dimension>> &,
       const MPI_Comm);
-
-    template Vector<double> GridTools::compute_aspect_ratio_of_cells(
-      const Mapping<deal_II_space_dimension> &,
-      const Triangulation<deal_II_space_dimension> &,
-      const Quadrature<deal_II_space_dimension> &);
-
-    template double GridTools::compute_maximum_aspect_ratio(
-      const Mapping<deal_II_space_dimension> &,
-      const Triangulation<deal_II_space_dimension> &,
-      const Quadrature<deal_II_space_dimension> &);
   }
 
 
@@ -273,60 +257,6 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
 #if deal_II_dimension <= deal_II_space_dimension
     namespace GridTools
     \{
-      template double
-      diameter(
-        const Triangulation<deal_II_dimension, deal_II_space_dimension> &);
-
-      template double
-      volume(const Triangulation<deal_II_dimension, deal_II_space_dimension> &);
-
-      template double
-      volume(const Triangulation<deal_II_dimension, deal_II_space_dimension> &,
-             const Mapping<deal_II_dimension, deal_II_space_dimension> &);
-
-      template std::pair<
-        DerivativeForm<1, deal_II_dimension, deal_II_space_dimension>,
-        Tensor<1, deal_II_space_dimension>>
-      affine_cell_approximation<deal_II_dimension, deal_II_space_dimension>(
-        const ArrayView<const Point<deal_II_space_dimension>> &);
-
-      template BoundingBox<deal_II_space_dimension>
-      compute_bounding_box(
-        const Triangulation<deal_II_dimension, deal_II_space_dimension> &);
-
-      template std::tuple<std::vector<Point<deal_II_space_dimension>>,
-                          std::vector<CellData<deal_II_dimension>>,
-                          SubCellData>
-      get_coarse_mesh_description(
-        const Triangulation<deal_II_dimension, deal_II_space_dimension> &tria);
-
-      template void
-      delete_unused_vertices(std::vector<Point<deal_II_space_dimension>> &,
-                             std::vector<CellData<deal_II_dimension>> &,
-                             SubCellData &);
-
-      template void
-      delete_duplicated_vertices(std::vector<Point<deal_II_space_dimension>> &,
-                                 std::vector<CellData<deal_II_dimension>> &,
-                                 SubCellData &,
-                                 std::vector<unsigned int> &,
-                                 double);
-
-      template void
-      invert_all_negative_measure_cells(
-        const std::vector<Point<deal_II_space_dimension>> &,
-        std::vector<CellData<deal_II_dimension>> &);
-
-      template std::size_t
-      invert_cells_with_negative_measure(
-        const std::vector<Point<deal_II_space_dimension>> &,
-        std::vector<CellData<deal_II_dimension>> &);
-
-#  if deal_II_dimension == deal_II_space_dimension
-      template void
-      consistently_order_cells(std::vector<CellData<deal_II_dimension>> &);
-#  endif
-
       template void
       shift<deal_II_dimension>(
         const Tensor<1, deal_II_space_dimension> &,
@@ -350,12 +280,6 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
         const Tensor<1, deal_II_space_dimension, double> &,
         const double,
         Triangulation<deal_II_dimension, deal_II_space_dimension> &);
-
-      template void
-      rotate<deal_II_dimension>(
-        const double,
-        const unsigned int,
-        Triangulation<deal_II_dimension, deal_II_space_dimension> &);
 #  endif
 
       template void
@@ -364,25 +288,6 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
         Triangulation<deal_II_dimension, deal_II_space_dimension> &,
         const bool,
         const unsigned int);
-
-      template void
-      get_face_connectivity_of_cells(
-        const Triangulation<deal_II_dimension, deal_II_space_dimension>
-                               &triangulation,
-        DynamicSparsityPattern &cell_connectivity);
-
-      template void
-      get_vertex_connectivity_of_cells(
-        const Triangulation<deal_II_dimension, deal_II_space_dimension>
-                               &triangulation,
-        DynamicSparsityPattern &cell_connectivity);
-
-      template void
-      get_vertex_connectivity_of_cells_on_level(
-        const Triangulation<deal_II_dimension, deal_II_space_dimension>
-                               &triangulation,
-        const unsigned int      level,
-        DynamicSparsityPattern &cell_connectivity);
 
       template void
       partition_triangulation(
@@ -441,29 +346,6 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
       get_locally_owned_vertices(
         const Triangulation<deal_II_dimension, deal_II_space_dimension> &);
 
-      template double
-      minimal_cell_diameter(
-        const Triangulation<deal_II_dimension, deal_II_space_dimension>
-          &triangulation,
-        const Mapping<deal_II_dimension, deal_II_space_dimension> &);
-
-      template double
-      maximal_cell_diameter(
-        const Triangulation<deal_II_dimension, deal_II_space_dimension>
-          &triangulation,
-        const Mapping<deal_II_dimension, deal_II_space_dimension> &);
-
-      template std::map<unsigned int, Point<deal_II_space_dimension>>
-      get_all_vertices_at_boundary(
-        const Triangulation<deal_II_dimension, deal_II_space_dimension> &tria);
-
-      template std::vector<
-        std::set<Triangulation<deal_II_dimension,
-                               deal_II_space_dimension>::active_cell_iterator>>
-      vertex_to_cell_map(
-        const Triangulation<deal_II_dimension, deal_II_space_dimension>
-          &triangulation);
-
       template std::vector<std::vector<Tensor<1, deal_II_space_dimension>>>
       vertex_to_cell_centers_directions(
         const Triangulation<deal_II_dimension, deal_II_space_dimension> &mesh,
@@ -479,15 +361,6 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
         Triangulation<deal_II_dimension>                       &triangulation,
         const Function<deal_II_dimension>                      *coefficient,
         const bool);
-
-      template Triangulation<deal_II_dimension,
-                             deal_II_space_dimension>::DistortedCellList
-      fix_up_distorted_child_cells(
-        const Triangulation<deal_II_dimension,
-                            deal_II_space_dimension>::DistortedCellList
-          &distorted_cells,
-        Triangulation<deal_II_dimension, deal_II_space_dimension>
-          &triangulation);
 #    endif
 #  endif
     \}
@@ -538,42 +411,6 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
       compute_vertices_with_ghost_neighbors(
         const Triangulation<deal_II_dimension, deal_II_space_dimension> &);
     \}
-#endif
-  }
-
-
-for (deal_II_dimension : DIMENSIONS)
-  {
-    template std::pair<unsigned int, double>
-      GridTools::get_longest_direction<deal_II_dimension, deal_II_dimension>(
-        Triangulation<deal_II_dimension>::active_cell_iterator);
-
-    template void
-    GridTools::remove_hanging_nodes<deal_II_dimension, deal_II_dimension>(
-      Triangulation<deal_II_dimension> & tria, bool, unsigned int);
-
-    template void
-    GridTools::remove_anisotropy<deal_II_dimension, deal_II_dimension>(
-      Triangulation<deal_II_dimension> &, double, unsigned int);
-
-#if deal_II_dimension < 3
-    template std::pair<unsigned int, double>
-      GridTools::get_longest_direction<deal_II_dimension,
-                                       deal_II_dimension + 1>(
-        Triangulation<deal_II_dimension,
-                      deal_II_dimension + 1>::active_cell_iterator);
-
-    template void
-    GridTools::remove_hanging_nodes<deal_II_dimension, deal_II_dimension + 1>(
-      Triangulation<deal_II_dimension, deal_II_dimension + 1> & tria,
-      bool,
-      unsigned int);
-
-    template void
-    GridTools::remove_anisotropy<deal_II_dimension, deal_II_dimension + 1>(
-      Triangulation<deal_II_dimension, deal_II_dimension + 1> &,
-      double,
-      unsigned int);
 #endif
   }
 

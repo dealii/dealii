@@ -1,0 +1,35 @@
+
+DEAL:0::Number of vertices = 96
+DEAL:0::Number of id pairs = 53
+DEAL:0::Found 53 matching vertices between ranks 0 and 0
+DEAL:0::Found 22 matching vertices between ranks 0 and 1
+DEAL:0::Found 8 matching vertices between ranks 0 and 2
+DEAL:0::Found 17 matching vertices between ranks 0 and 3
+DEAL:0::OK
+
+DEAL:1::Number of vertices = 105
+DEAL:1::Number of id pairs = 61
+DEAL:1::Found 22 matching vertices between ranks 1 and 0
+DEAL:1::Found 61 matching vertices between ranks 1 and 1
+DEAL:1::Found 37 matching vertices between ranks 1 and 2
+DEAL:1::Found 17 matching vertices between ranks 1 and 3
+DEAL:1::OK
+
+
+DEAL:2::Number of vertices = 92
+DEAL:2::Number of id pairs = 57
+DEAL:2::Found 8 matching vertices between ranks 2 and 0
+DEAL:2::Found 37 matching vertices between ranks 2 and 1
+DEAL:2::Found 57 matching vertices between ranks 2 and 2
+DEAL:2::Found 24 matching vertices between ranks 2 and 3
+DEAL:2::OK
+
+
+DEAL:3::Number of vertices = 96
+DEAL:3::Number of id pairs = 55
+DEAL:3::Found 17 matching vertices between ranks 3 and 0
+DEAL:3::Found 17 matching vertices between ranks 3 and 1
+DEAL:3::Found 24 matching vertices between ranks 3 and 2
+DEAL:3::Found 55 matching vertices between ranks 3 and 3
+DEAL:3::OK
+

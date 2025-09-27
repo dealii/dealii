@@ -1,6 +1,0 @@
-Removed: Deprecated constructors for ConsensusAlgorithms::Interface,
-ConsensusAlgorithms::Process, ConsensusAlgorithms::NBX, ConsensusAlgorithms::PEX,
-ConsensusAlgorithms::Serial, ConsensusAlgorithms::Selector have been removed
-as well as ConsensusAlgorithms::AnonymousProcess.
-<br>
-(Daniel Arndt, 2023/06/29)

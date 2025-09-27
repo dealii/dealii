@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 1999 - 2023 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2013 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 #include <deal.II/base/table.h>
 #include <deal.II/base/template_constraints.h>
@@ -509,8 +508,21 @@ namespace DoFTools
           Assert(primary_dofs[col] != numbers::invalid_dof_index,
                  ExcInternalError());
 
-        std::vector<
-          std::pair<typename AffineConstraints<number2>::size_type, number2>>
+        // Build constraints in a vector of pairs that can be
+        // arbitrarily large, but that holds up to 25 elements without
+        // external memory allocation. This is good enough for hanging
+        // node constraints of Q4 elements in 3d, so covers most
+        // common cases. Sort the primary dofs to add a sorted list to the
+        // affine constraints, which increases performance there.
+        using size_type = typename AffineConstraints<number2>::size_type;
+        boost::container::small_vector<std::pair<size_type, size_type>, 25>
+          sorted_primary_dofs;
+        sorted_primary_dofs.reserve(n_primary_dofs);
+        for (unsigned int i = 0; i < n_primary_dofs; ++i)
+          sorted_primary_dofs.emplace_back(primary_dofs[i], i);
+        std::sort(sorted_primary_dofs.begin(), sorted_primary_dofs.end());
+
+        boost::container::small_vector<std::pair<size_type, number2>, 25>
           entries;
         entries.reserve(n_primary_dofs);
         for (unsigned int row = 0; row != n_dependent_dofs; ++row)
@@ -552,14 +564,11 @@ namespace DoFTools
                 if (is_trivial_constraint == true)
                   continue;
               }
-              // add up the absolute values of all constraints in this line
-              // to get a measure of their absolute size
-              number1 abs_sum = 0;
-              for (unsigned int i = 0; i < n_primary_dofs; ++i)
-                abs_sum += std::abs(face_constraints(row, i));
 
               // then enter those constraints that are larger than
-              // 1e-14*abs_sum. everything else probably originated from
+              // 1e-14; since numbers are normalized for the subface
+              // interpolation matrices, we do not need to normalize here.
+              // everything else probably originated from
               // inexact inversion of matrices and similar effects. having
               // those constraints in here will only lead to problems because
               // it makes sparsity patterns fuller than necessary without
@@ -567,55 +576,19 @@ namespace DoFTools
               // filling a vector and then adding to the constraints in order
               // to reduce the number of memory allocations.
               entries.clear();
-              for (unsigned int i = 0; i < n_primary_dofs; ++i)
-                if (std::fabs(face_constraints(row, i)) >= 1e-14 * abs_sum)
-                  entries.emplace_back(primary_dofs[i],
-                                       face_constraints(row, i));
-              constraints.add_line(dependent_dofs[row]);
-              constraints.add_entries(dependent_dofs[row], entries);
-              constraints.set_inhomogeneity(dependent_dofs[row], 0.);
+              for (const auto &[dof_index, unsorted_index] :
+                   sorted_primary_dofs)
+                if (std::fabs(face_constraints(row, unsorted_index)) >= 1e-14)
+                  entries.emplace_back(dof_index,
+                                       face_constraints(row, unsorted_index));
+              constraints.add_constraint(dependent_dofs[row],
+                                         entries,
+                                         /* inhomogeneity= */ 0.);
             }
       }
 
     } // namespace
 
-
-    template <typename number>
-    void
-    make_hp_hanging_node_constraints(const DoFHandler<1> &,
-                                     AffineConstraints<number> &)
-    {
-      // nothing to do for regular dof handlers in 1d
-    }
-
-
-    template <typename number>
-    void
-    make_oldstyle_hanging_node_constraints(const DoFHandler<1> &,
-                                           AffineConstraints<number> &,
-                                           std::integral_constant<int, 1>)
-    {
-      // nothing to do for regular dof handlers in 1d
-    }
-
-
-    template <typename number>
-    void
-    make_hp_hanging_node_constraints(const DoFHandler<1, 2> &,
-                                     AffineConstraints<number> &)
-    {
-      // nothing to do for regular dof handlers in 1d
-    }
-
-
-    template <typename number>
-    void
-    make_oldstyle_hanging_node_constraints(const DoFHandler<1, 2> &,
-                                           AffineConstraints<number> &,
-                                           std::integral_constant<int, 1>)
-    {
-      // nothing to do for regular dof handlers in 1d
-    }
 
 
     template <typename number, int spacedim>
@@ -628,6 +601,19 @@ namespace DoFTools
     }
 
 
+
+    template <typename number, int spacedim>
+    void
+    make_hanging_node_constraints_nedelec(
+      const dealii::DoFHandler<1, spacedim> & /*dof_handler*/,
+      AffineConstraints<number> & /*constraints*/,
+      std::integral_constant<int, 1>)
+    {
+      // nothing to do for dof handlers in 1d
+    }
+
+
+
     template <typename number, int spacedim>
     void
     make_oldstyle_hanging_node_constraints(
@@ -637,6 +623,8 @@ namespace DoFTools
     {
       // nothing to do for dof handlers in 1d
     }
+
+
 
     template <int dim_, int spacedim, typename number>
     void
@@ -650,6 +638,16 @@ namespace DoFTools
       std::vector<types::global_dof_index> dofs_on_mother;
       std::vector<types::global_dof_index> dofs_on_children;
 
+      // Build constraints in a vector of pairs that can be
+      // arbitrarily large, but that holds up to 25 elements without
+      // external memory allocation. This is good enough for hanging
+      // node constraints of Q4 elements in 3d, so covers most
+      // common cases.
+      boost::container::small_vector<
+        std::pair<typename AffineConstraints<number>::size_type, number>,
+        25>
+        constraint_entries;
+
       // loop over all lines; only on lines there can be constraints. We do so
       // by looping over all active cells and checking whether any of the faces
       // are refined which can only be from the neighboring cell because this
@@ -658,10 +656,7 @@ namespace DoFTools
       // note that even though we may visit a face twice if the neighboring
       // cells are equally refined, we can only visit each face with hanging
       // nodes once
-      typename DoFHandler<dim_, spacedim>::active_cell_iterator
-        cell = dof_handler.begin_active(),
-        endc = dof_handler.end();
-      for (; cell != endc; ++cell)
+      for (const auto &cell : dof_handler.active_cell_iterators())
         {
           // artificial cells can at best neighbor ghost cells, but we're not
           // interested in these interfaces
@@ -760,13 +755,15 @@ namespace DoFTools
                 for (unsigned int row = 0; row != dofs_on_children.size();
                      ++row)
                   {
-                    constraints.add_line(dofs_on_children[row]);
+                    constraint_entries.clear();
+                    constraint_entries.reserve(dofs_on_mother.size());
                     for (unsigned int i = 0; i != dofs_on_mother.size(); ++i)
-                      constraints.add_entry(dofs_on_children[row],
-                                            dofs_on_mother[i],
-                                            fe.constraints()(row, i));
+                      constraint_entries.emplace_back(dofs_on_mother[i],
+                                                      fe.constraints()(row, i));
 
-                    constraints.set_inhomogeneity(dofs_on_children[row], 0.);
+                    constraints.add_constraint(dofs_on_children[row],
+                                               constraint_entries,
+                                               0.);
                   }
               }
             else
@@ -802,6 +799,16 @@ namespace DoFTools
       std::vector<types::global_dof_index> dofs_on_mother;
       std::vector<types::global_dof_index> dofs_on_children;
 
+      // Build constraints in a vector of pairs that can be
+      // arbitrarily large, but that holds up to 25 elements without
+      // external memory allocation. This is good enough for hanging
+      // node constraints of Q4 elements in 3d, so covers most
+      // common cases.
+      boost::container::small_vector<
+        std::pair<typename AffineConstraints<number>::size_type, number>,
+        25>
+        constraint_entries;
+
       // loop over all quads; only on quads there can be constraints. We do so
       // by looping over all active cells and checking whether any of the faces
       // are refined which can only be from the neighboring cell because this
@@ -810,10 +817,7 @@ namespace DoFTools
       // note that even though we may visit a face twice if the neighboring
       // cells are equally refined, we can only visit each face with hanging
       // nodes once
-      typename DoFHandler<dim_, spacedim>::active_cell_iterator
-        cell = dof_handler.begin_active(),
-        endc = dof_handler.end();
-      for (; cell != endc; ++cell)
+      for (const auto &cell : dof_handler.active_cell_iterators())
         {
           // artificial cells can at best neighbor ghost cells, but we're not
           // interested in these interfaces
@@ -1000,18 +1004,27 @@ namespace DoFTools
                 Assert(dofs_on_children.size() <= n_dofs_on_children,
                        ExcInternalError());
 
-                // for each row in the AffineConstraints object for this line:
+                // For each row in the AffineConstraints object for
+                // this line, add the constraint. Ignore rows that
+                // have already been added (e.g., in 3d degrees of
+                // freedom on edges with hanging nodes will be visited
+                // more than once).
                 for (unsigned int row = 0; row != dofs_on_children.size();
                      ++row)
-                  {
-                    constraints.add_line(dofs_on_children[row]);
-                    for (unsigned int i = 0; i != dofs_on_mother.size(); ++i)
-                      constraints.add_entry(dofs_on_children[row],
-                                            dofs_on_mother[i],
-                                            fe.constraints()(row, i));
+                  if (constraints.is_constrained(dofs_on_children[row]) ==
+                      false)
+                    {
+                      constraint_entries.clear();
+                      constraint_entries.reserve(dofs_on_mother.size());
+                      for (unsigned int i = 0; i != dofs_on_mother.size(); ++i)
+                        constraint_entries.emplace_back(dofs_on_mother[i],
+                                                        fe.constraints()(row,
+                                                                         i));
 
-                    constraints.set_inhomogeneity(dofs_on_children[row], 0.);
-                  }
+                      constraints.add_constraint(dofs_on_children[row],
+                                                 constraint_entries,
+                                                 0.);
+                    }
               }
             else
               {
@@ -1032,6 +1045,1279 @@ namespace DoFTools
         }
     }
 
+
+
+    template <int dim_, int spacedim, typename number>
+    void
+    make_hanging_node_constraints_nedelec(
+      const DoFHandler<dim_, spacedim> &dof_handler,
+      AffineConstraints<number>        &constraints,
+      std::integral_constant<int, 2>)
+    {
+      // Parts of this function are very similar to
+      // make_oldstyle_hanging_node_constraints.
+      // Therefore, only the parts that differ from the
+      // make_oldstyle_hanging_node_constraints are commented on.
+
+      const unsigned int dim = 2;
+
+      std::vector<types::global_dof_index> face_dof_indices;
+      std::map<types::global_dof_index, std::set<types::global_dof_index>>
+        depends_on;
+
+      // loop over all lines
+      for (const auto &cell : dof_handler.active_cell_iterators())
+        {
+          // skip artificial cells
+          if (cell->is_artificial())
+            continue;
+
+          // loop over all faces:
+          for (const unsigned int f : cell->face_indices())
+            {
+              // check if the neighbor is refined; if so, we need to
+              // treat the constraints on this interface
+              if (!cell->face(f)->has_children())
+                continue;
+
+              Assert(cell->face(f)->n_active_fe_indices() == 1,
+                     ExcInternalError());
+              Assert(cell->face(f)->fe_index_is_active(
+                       cell->active_fe_index()) == true,
+                     ExcInternalError());
+
+              if constexpr (running_in_debug_mode())
+                {
+                  for (unsigned int c = 0; c < cell->face(f)->n_children(); ++c)
+                    {
+                      if (cell->neighbor_child_on_subface(f, c)
+                            ->is_artificial())
+                        continue;
+
+                      Assert(cell->face(f)->child(c)->n_active_fe_indices() ==
+                               1,
+                             ExcInternalError());
+
+                      Assert(cell->face(f)->child(c)->fe_index_is_active(
+                               cell->active_fe_index()) == true,
+                             ExcNotImplemented());
+                    }
+                } // DEBUG
+
+              // Ok, start up the work:
+              const FiniteElement<dim, spacedim> &fe = cell->get_fe();
+
+              const unsigned int n_dofs = fe.n_dofs_per_line();
+              face_dof_indices.resize(n_dofs);
+
+              cell->face(f)->get_dof_indices(face_dof_indices);
+              const std::vector<types::global_dof_index> dof_on_mother_face =
+                face_dof_indices;
+
+              cell->face(f)->child(0)->get_dof_indices(face_dof_indices);
+              const std::vector<types::global_dof_index> dof_on_child_face_0 =
+                face_dof_indices;
+
+              cell->face(f)->child(1)->get_dof_indices(face_dof_indices);
+              const std::vector<types::global_dof_index> dof_on_child_face_1 =
+                face_dof_indices;
+
+              // As the Nedelec elements are oriented, we need to take care of
+              // the orientation of the lines.
+              // Remark: "false" indicates the line is not flipped.
+              //         "true" indicates the line is flipped.
+
+              // get the orientation of the faces
+              const bool direction_mother = (cell->face(f)->vertex_index(0) >
+                                             cell->face(f)->vertex_index(1)) ?
+                                              false :
+                                              true;
+              const bool direction_child_0 =
+                (cell->face(f)->child(0)->vertex_index(0) >
+                 cell->face(f)->child(0)->vertex_index(1)) ?
+                  false :
+                  true;
+              const bool direction_child_1 =
+                (cell->face(f)->child(1)->vertex_index(0) >
+                 cell->face(f)->child(1)->vertex_index(1)) ?
+                  false :
+                  true;
+
+              for (unsigned int row = 0; row < n_dofs; ++row)
+                {
+                  constraints.add_line(dof_on_child_face_0[row]);
+                  constraints.add_line(dof_on_child_face_1[row]);
+                }
+
+              for (unsigned int row = 0; row < n_dofs; ++row)
+                {
+                  for (unsigned int dof_i_on_mother = 0;
+                       dof_i_on_mother < n_dofs;
+                       ++dof_i_on_mother)
+                    {
+                      // We need to keep in mind that, if we use a FE_System
+                      // with multiple FE_NedelecSZ blocks inside, we need
+                      // to consider, that n_dofs depends on the number
+                      // of FE_NedelecSZ blocks used.
+                      unsigned int shift_0 =
+                        (direction_mother == direction_child_0) ? 0 : n_dofs;
+                      constraints.add_entry(dof_on_child_face_0[row],
+                                            dof_on_mother_face[dof_i_on_mother],
+                                            fe.constraints()(row + shift_0,
+                                                             dof_i_on_mother));
+
+                      unsigned int shift_1 =
+                        (direction_mother == direction_child_1) ? 0 : n_dofs;
+                      constraints.add_entry(dof_on_child_face_1[row],
+                                            dof_on_mother_face[dof_i_on_mother],
+                                            fe.constraints()(row + shift_1,
+                                                             dof_i_on_mother));
+                    }
+                }
+            }
+        }
+    }
+
+
+    template <int dim_, int spacedim, typename number>
+    void
+    make_hanging_node_constraints_nedelec(
+      const DoFHandler<dim_, spacedim> &dof_handler,
+      AffineConstraints<number>        &constraints,
+      std::integral_constant<int, 3>)
+    {
+      // Parts of this function are very similar to
+      // make_oldstyle_hanging_node_constraints.
+      // Therefore, only the parts that differ from the
+      // make_oldstyle_hanging_node_constraints are commented on.
+
+      const unsigned int dim = 3;
+
+      std::vector<types::global_dof_index> dofs_on_mother;
+      std::vector<types::global_dof_index> dofs_on_children;
+
+      // loop over all quads
+      for (const auto &cell : dof_handler.active_cell_iterators())
+        {
+          // skip artificial cells
+          if (cell->is_artificial())
+            continue;
+
+          // loop over all faces
+          for (const unsigned int face : cell->face_indices())
+            {
+              // skip cells without children
+              if (cell->face(face)->has_children() == false)
+                continue;
+
+              if (cell->get_fe().n_dofs_per_face(face) == 0)
+                continue;
+
+              Assert(cell->face(face)->refinement_case() ==
+                       RefinementCase<dim - 1>::isotropic_refinement,
+                     ExcNotImplemented());
+
+              AssertDimension(cell->face(face)->n_active_fe_indices(), 1);
+
+              Assert(cell->face(face)->fe_index_is_active(
+                       cell->active_fe_index()) == true,
+                     ExcInternalError());
+
+              if constexpr (running_in_debug_mode())
+                {
+                  for (unsigned int c = 0; c < cell->face(face)->n_children();
+                       ++c)
+                    {
+                      if (cell->neighbor_child_on_subface(face, c)
+                            ->is_artificial())
+                        continue;
+
+                      AssertDimension(
+                        cell->face(face)->child(c)->n_active_fe_indices(), 1);
+
+                      Assert(cell->face(face)->child(c)->fe_index_is_active(
+                               cell->active_fe_index()) == true,
+                             ExcNotImplemented());
+
+                      for (unsigned int e = 0;
+                           e < GeometryInfo<dim>::vertices_per_face;
+                           ++e)
+                        {
+                          Assert(cell->face(face)
+                                     ->child(c)
+                                     ->line(e)
+                                     ->n_active_fe_indices() == 1,
+                                 ExcNotImplemented());
+
+                          Assert(cell->face(face)
+                                     ->child(c)
+                                     ->line(e)
+                                     ->fe_index_is_active(
+                                       cell->active_fe_index()) == true,
+                                 ExcNotImplemented());
+                        }
+                    }
+
+                  for (unsigned int e = 0;
+                       e < GeometryInfo<dim>::vertices_per_face;
+                       ++e)
+                    {
+                      Assert(cell->face(face)->line(e)->n_active_fe_indices() ==
+                               1,
+                             ExcNotImplemented());
+
+                      Assert(cell->face(face)->line(e)->fe_index_is_active(
+                               cell->active_fe_index()) == true,
+                             ExcNotImplemented());
+                    }
+                } // DEBUG
+
+              // Ok, start up the work
+              const FiniteElement<dim, spacedim> &fe = cell->get_fe();
+              const unsigned int fe_index            = cell->active_fe_index();
+
+              // get the polynomial degree
+              unsigned int degree(fe.degree);
+
+              // get the number of DoFs on mother and children;
+              // number of DoFs on the mother
+              const unsigned int n_dofs_on_mother = fe.n_dofs_per_face(face);
+              dofs_on_mother.resize(n_dofs_on_mother);
+
+              const unsigned int n_lines_on_mother =
+                GeometryInfo<dim>::lines_per_face;
+
+              // number of internal lines of the children;
+              // for more details see description of the
+              // GeometryInfo<dim> class
+              // .................
+              // .       |       .
+              // .  c2   1   c3  .
+              // .       |       .
+              // .---2---+---3---.
+              // .       |       .
+              // .  c0   0   c1  .
+              // .       |       .
+              // .................
+              const unsigned int n_internal_lines_on_children = 4;
+
+              // number of external lines of the children
+              // +---6--------7--+
+              // |       .       |
+              // 1  c2   .   c3  3
+              // |       .       |
+              // |...............|
+              // |       .       |
+              // 0  c0   .   c1  2
+              // |       .       |
+              // +---4---+---5---+
+              const unsigned int n_external_lines_on_children = 8;
+
+              const unsigned int n_lines_on_children =
+                n_internal_lines_on_children + n_external_lines_on_children;
+
+              // we only consider the isotropic case here
+              const unsigned int n_children_per_face =
+                GeometryInfo<dim>::max_children_per_face;
+              const unsigned int n_children_per_line =
+                GeometryInfo<dim - 1>::max_children_per_face;
+
+              // number of DoFs on the children
+              // Remark: Nedelec elements have no DoFs on the vertices,
+              // therefore we skip the vertices
+              const unsigned int n_dofs_on_children =
+                (n_lines_on_children * fe.n_dofs_per_line() +
+                 n_children_per_face * fe.n_dofs_per_quad(face));
+
+              dofs_on_children.clear();
+              dofs_on_children.reserve(n_dofs_on_children);
+
+              AssertDimension(n_dofs_on_mother, fe.constraints().n());
+              AssertDimension(n_dofs_on_children, fe.constraints().m());
+
+              // get the current face
+              const typename DoFHandler<dim, dim>::face_iterator this_face =
+                cell->face(face);
+
+              // fill the DoFs on the mother:
+              unsigned int next_index = 0;
+
+              // DoFs on vertices:
+              // Nedelec elements have no DoFs on the vertices
+
+              // DoFs on lines:
+              for (unsigned int line = 0;
+                   line < GeometryInfo<dim>::lines_per_face;
+                   ++line)
+                for (unsigned int dof = 0; dof != fe.n_dofs_per_line(); ++dof)
+                  dofs_on_mother[next_index++] =
+                    this_face->line(line)->dof_index(dof, fe_index);
+
+              // DoFs on the face:
+              for (unsigned int dof = 0; dof != fe.n_dofs_per_quad(face); ++dof)
+                dofs_on_mother[next_index++] =
+                  this_face->dof_index(dof, fe_index);
+
+              // check that we have added all DoFs
+              AssertDimension(next_index, dofs_on_mother.size());
+
+              // the implementation does not support anisotropic refinement
+              Assert(!dof_handler.get_triangulation()
+                        .get_anisotropic_refinement_flag(),
+                     ExcInternalError());
+
+              // fill the DoF on the children:
+              // DoFs on vertices:
+              // Nedelec elements have no DoFs on the vertices
+
+              // DoFs on lines:
+              // the DoFs on the interior lines to the children; the order
+              // of these lines is shown above (see
+              // n_internal_lines_on_children)
+              for (unsigned int dof = 0; dof < fe.n_dofs_per_line(); ++dof)
+                dofs_on_children.push_back(
+                  this_face->child(0)->line(1)->dof_index(dof, fe_index));
+
+              for (unsigned int dof = 0; dof < fe.n_dofs_per_line(); ++dof)
+                dofs_on_children.push_back(
+                  this_face->child(2)->line(1)->dof_index(dof, fe_index));
+
+              for (unsigned int dof = 0; dof < fe.n_dofs_per_line(); ++dof)
+                dofs_on_children.push_back(
+                  this_face->child(0)->line(3)->dof_index(dof, fe_index));
+
+              for (unsigned int dof = 0; dof < fe.n_dofs_per_line(); ++dof)
+                dofs_on_children.push_back(
+                  this_face->child(1)->line(3)->dof_index(dof, fe_index));
+
+              // DoFs on the bordering lines:
+              // DoFs on the exterior lines to the children; the order of
+              // these lines is shown above (see n_external_lines_on_children)
+              for (unsigned int line = 0;
+                   line < GeometryInfo<dim>::lines_per_face;
+                   ++line)
+                for (unsigned int child = 0; child < n_children_per_line;
+                     ++child)
+                  for (unsigned int dof = 0; dof < fe.n_dofs_per_line(); ++dof)
+                    dofs_on_children.push_back(
+                      this_face->line(line)->child(child)->dof_index(dof,
+                                                                     fe_index));
+
+              // DoFs on the faces of the four children:
+              for (unsigned int child = 0; child < n_children_per_face; ++child)
+                {
+                  // skip artificial cells
+                  if (cell->neighbor_child_on_subface(face, child)
+                        ->is_artificial())
+                    continue;
+
+                  for (unsigned int dof = 0; dof < fe.n_dofs_per_quad(face);
+                       ++dof)
+                    dofs_on_children.push_back(
+                      this_face->child(child)->dof_index(dof, fe_index));
+                } // rof: child
+
+              // consistency check:
+              // note: we can get fewer DoFs when we have artificial cells
+              Assert(dofs_on_children.size() <= n_dofs_on_children,
+                     ExcInternalError());
+
+              // As the Nedelec elements are oriented, we need to take care of
+              // the orientation of the lines.
+              // Remark: "false" indicates the line is not flipped.
+              //         "true" indicates the line is flipped.
+
+              // Orientation - Lines:
+              // get the orientation from the edges from the mother cell
+              std::vector<bool> direction_mother(
+                GeometryInfo<dim>::lines_per_face, false);
+              for (unsigned int line = 0;
+                   line < GeometryInfo<dim>::lines_per_face;
+                   ++line)
+                if (this_face->line(line)->vertex_index(0) >
+                    this_face->line(line)->vertex_index(1))
+                  direction_mother[line] = true;
+
+              // get the orientation from the intern edges of the children
+              std::vector<bool> direction_child_intern(
+                n_internal_lines_on_children, false);
+
+              // get the global vertex index of vertex in the center;
+              // we need this vertex index, to compute the direction
+              // of the internal edges
+              unsigned int center = this_face->child(0)->vertex_index(3);
+
+              // compute the direction of the internal edges
+              for (unsigned int line = 0; line < n_internal_lines_on_children;
+                   ++line)
+                if (line % 2 == 0)
+                  {
+                    direction_child_intern[line] =
+                      this_face->line(line)->child(0)->vertex_index(1) <
+                          center ?
+                        false :
+                        true;
+                  }
+                else
+                  {
+                    direction_child_intern[line] =
+                      this_face->line(line)->child(0)->vertex_index(1) >
+                          center ?
+                        false :
+                        true;
+                  }
+
+              // compute the direction of the outer edges
+              std::vector<bool> direction_child(n_external_lines_on_children,
+                                                false);
+              for (unsigned int line = 0;
+                   line < GeometryInfo<dim>::lines_per_face;
+                   ++line)
+                {
+                  if (this_face->line(line)->child(0)->vertex_index(0) >
+                      this_face->line(line)->child(0)->vertex_index(1))
+                    direction_child[2 * line] = true;
+                  if (this_face->line(line)->child(1)->vertex_index(0) >
+                      this_face->line(line)->child(1)->vertex_index(1))
+                    direction_child[2 * line + 1] = true;
+                }
+
+
+              // Orientation - Faces:
+              bool              mother_flip_x  = false;
+              bool              mother_flip_y  = false;
+              bool              mother_flip_xy = false;
+              std::vector<bool> child_flip_x(n_children_per_face, false);
+              std::vector<bool> child_flip_y(n_children_per_face, false);
+              std::vector<bool> child_flip_xy(n_children_per_face, false);
+              const unsigned int
+                vertices_adjacent_on_face[GeometryInfo<dim>::vertices_per_face]
+                                         [2] = {{1, 2}, {0, 3}, {3, 0}, {2, 1}};
+
+              {
+                // Mother
+                // get the position of the vertex with the highest number
+                unsigned int current_glob = cell->face(face)->vertex_index(0);
+                unsigned int current_max  = 0;
+                for (unsigned int v = 1;
+                     v < GeometryInfo<dim>::vertices_per_face;
+                     ++v)
+                  if (current_glob < this_face->vertex_index(v))
+                    {
+                      current_max  = v;
+                      current_glob = this_face->vertex_index(v);
+                    }
+
+                // if the vertex with the highest DoF index is in the lower row
+                // of the face, the face is flipped in y direction
+                if (current_max < 2)
+                  mother_flip_y = true;
+
+                // if the vertex with the highest DoF index is on the left side
+                // of the face is flipped in x direction
+                if (current_max % 2 == 0)
+                  mother_flip_x = true;
+
+                // get the minor direction of the face of the mother
+                if (this_face->vertex_index(
+                      vertices_adjacent_on_face[current_max][0]) <
+                    this_face->vertex_index(
+                      vertices_adjacent_on_face[current_max][1]))
+                  mother_flip_xy = true;
+              }
+
+              // Children:
+              // get the orientation of the faces of the children
+              for (unsigned int child = 0; child < n_children_per_face; ++child)
+                {
+                  unsigned int current_max = 0;
+                  unsigned int current_glob =
+                    this_face->child(child)->vertex_index(0);
+
+                  for (unsigned int v = 1;
+                       v < GeometryInfo<dim>::vertices_per_face;
+                       ++v)
+                    if (current_glob < this_face->child(child)->vertex_index(v))
+                      {
+                        current_max  = v;
+                        current_glob = this_face->child(child)->vertex_index(v);
+                      }
+
+                  if (current_max < 2)
+                    child_flip_y[child] = true;
+
+                  if (current_max % 2 == 0)
+                    child_flip_x[child] = true;
+
+                  if (this_face->child(child)->vertex_index(
+                        vertices_adjacent_on_face[current_max][0]) <
+                      this_face->child(child)->vertex_index(
+                        vertices_adjacent_on_face[current_max][1]))
+                    child_flip_xy[child] = true;
+
+                  child_flip_xy[child] = mother_flip_xy;
+                }
+
+              // copy the constraint matrix, since we need to modify that matrix
+              std::vector<std::vector<double>> constraints_matrix(
+                n_lines_on_children * fe.n_dofs_per_line() +
+                  n_children_per_face * fe.n_dofs_per_quad(),
+                std::vector<double>(dofs_on_mother.size(), 0));
+
+              {
+                // copy the constraint matrix
+                // internal lines
+                for (unsigned int line = 0; line < n_internal_lines_on_children;
+                     ++line)
+                  {
+                    unsigned int row_start   = line * fe.n_dofs_per_line();
+                    unsigned int line_mother = line / 2;
+                    unsigned int row_mother =
+                      (line_mother * 2) * fe.n_dofs_per_line();
+                    for (unsigned int row = 0; row < fe.n_dofs_per_line();
+                         ++row)
+                      for (unsigned int i = 0;
+                           i < n_lines_on_mother * fe.n_dofs_per_line();
+                           ++i)
+                        constraints_matrix[row + row_start][i] =
+                          fe.constraints()(row + row_mother, i);
+                  }
+
+                for (unsigned int line = 0; line < n_internal_lines_on_children;
+                     ++line)
+                  {
+                    unsigned int row_start   = line * fe.n_dofs_per_line();
+                    unsigned int line_mother = line / 2;
+                    unsigned int row_mother =
+                      (line_mother * 2) * fe.n_dofs_per_line();
+                    for (unsigned int row = 0; row < fe.n_dofs_per_line();
+                         ++row)
+                      for (unsigned int i =
+                             n_lines_on_mother * fe.n_dofs_per_line();
+                           i < dofs_on_mother.size();
+                           ++i)
+                        constraints_matrix[row + row_start][i] =
+                          fe.constraints()(row + row_mother, i);
+                  }
+
+                // external lines
+                unsigned int row_offset =
+                  n_internal_lines_on_children * fe.n_dofs_per_line();
+                for (unsigned int line = 0; line < n_external_lines_on_children;
+                     line++)
+                  {
+                    unsigned int row_start   = line * fe.n_dofs_per_line();
+                    unsigned int line_mother = line / 2;
+                    unsigned int row_mother =
+                      (line_mother * 2) * fe.n_dofs_per_line();
+                    for (unsigned int row = row_offset;
+                         row < row_offset + fe.n_dofs_per_line();
+                         ++row)
+                      for (unsigned int i = 0; i < dofs_on_mother.size(); ++i)
+                        constraints_matrix[row + row_start][i] =
+                          fe.constraints()(row + row_mother, i);
+                  }
+
+                // copy the weights for the faces
+                row_offset = n_lines_on_children * fe.n_dofs_per_line();
+                for (unsigned int face = 0; face < n_children_per_face; ++face)
+                  {
+                    unsigned int row_start = face * fe.n_dofs_per_quad();
+                    for (unsigned int row = row_offset;
+                         row < row_offset + fe.n_dofs_per_quad();
+                         row++)
+                      for (unsigned int i = 0; i < dofs_on_mother.size(); ++i)
+                        constraints_matrix[row + row_start][i] =
+                          fe.constraints()(row, i);
+                  }
+              }
+
+              // Modify the matrix
+              // Edge - Edge:
+              // Interior edges: the interior edges have support on the
+              // corresponding edges and faces loop over all 4 intern edges
+              for (unsigned int i = 0;
+                   i < n_internal_lines_on_children * fe.n_dofs_per_line();
+                   ++i)
+                {
+                  unsigned int line_i = i / fe.n_dofs_per_line();
+                  unsigned int tmp_i  = i % degree;
+
+                  // loop over the edges of the mother cell
+                  for (unsigned int j = 0;
+                       j < n_lines_on_mother * fe.n_dofs_per_line();
+                       ++j)
+                    {
+                      unsigned int line_j = j / fe.n_dofs_per_line();
+                      unsigned int tmp_j  = j % degree;
+
+                      if ((line_i < 2 && line_j < 2) ||
+                          (line_i >= 2 && line_j >= 2))
+                        {
+                          if (direction_child_intern[line_i] !=
+                              direction_mother[line_j])
+                            {
+                              if ((tmp_i + tmp_j) % 2 == 1)
+                                { // anti-symmetric
+                                  constraints_matrix[i][j] *= -1.0;
+                                }
+                            }
+                        }
+                      else
+                        {
+                          if (direction_mother[line_i])
+                            {
+                              if ((tmp_i + tmp_j) % 2 == 1)
+                                { // anti-symmetric
+                                  constraints_matrix[i][j] *= -1.0;
+                                }
+                            }
+                        }
+                    }
+                }
+
+              // Exterior edges:
+              for (unsigned int i =
+                     n_internal_lines_on_children * fe.n_dofs_per_line();
+                   i < n_lines_on_children * fe.n_dofs_per_line();
+                   ++i)
+                {
+                  unsigned int line_i = (i / fe.n_dofs_per_line()) - 4;
+                  unsigned int tmp_i  = i % degree;
+
+                  // loop over the edges of the mother cell
+                  for (unsigned int j = 0;
+                       j < n_lines_on_mother * fe.n_dofs_per_line();
+                       ++j)
+                    {
+                      unsigned int line_j = j / fe.n_dofs_per_line();
+                      unsigned int tmp_j  = j % degree;
+
+                      if (direction_child[line_i] != direction_mother[line_j])
+                        {
+                          if ((tmp_i + tmp_j) % 2 == 1)
+                            { // anti-symmetric
+                              constraints_matrix[i][j] *= -1.0;
+                            }
+                        }
+                    }
+                }
+
+              // Note:
+              // We need to keep in mind that, if we use a FE_System
+              // with multiple FE_NedelecSZ blocks inside, we need
+              // to consider, that fe.n_dofs_per_line() depends on the number
+              // of FE_NedelecSZ blocks used.
+              const unsigned int n_blocks = fe.n_dofs_per_line() / degree;
+
+              // Edge - Face
+              // Interior edges: for x-direction
+              for (unsigned int i = 0; i < 2 * fe.n_dofs_per_line(); ++i)
+                {
+                  unsigned int line_i = i / fe.n_dofs_per_line();
+                  unsigned int tmp_i  = i % degree;
+
+                  unsigned int start_j =
+                    n_lines_on_mother * fe.n_dofs_per_line();
+
+                  for (unsigned int block = 0; block < n_blocks; ++block)
+                    {
+                      // Type 1:
+                      for (unsigned int jy = 0; jy < degree - 1; ++jy)
+                        for (unsigned int jx = 0; jx < degree - 1; ++jx)
+                          {
+                            unsigned int j = start_j + jx + (jy * (degree - 1));
+                            if (direction_child_intern[line_i] != mother_flip_y)
+                              {
+                                if ((jy + tmp_i) % 2 == 0)
+                                  { // anti-symmetric case
+                                    constraints_matrix[i][j] *= -1.0;
+                                  }
+                              }
+                          }
+
+                      start_j += (degree - 1) * (degree - 1);
+
+                      // Type 2:
+                      for (unsigned int jy = 0; jy < degree - 1; ++jy)
+                        for (unsigned int jx = 0; jx < degree - 1; ++jx)
+                          {
+                            unsigned int j = start_j + jx + (jy * (degree - 1));
+
+                            if (direction_child_intern[line_i] != mother_flip_y)
+                              {
+                                if ((jy + tmp_i) % 2 == 0)
+                                  { // anti-symmetric case
+                                    constraints_matrix[i][j] *= -1.0;
+                                  }
+                              }
+                          }
+                      start_j += (degree - 1) * (degree - 1);
+
+                      // Type 3.1:
+                      // nothing to do
+                      start_j += degree - 1;
+
+                      // Type 3.2:
+                      // nothing to do
+                      start_j += degree - 1;
+                    }
+                }
+
+              // Interior edges: for y-direction
+              for (unsigned int i = 2 * fe.n_dofs_per_line();
+                   i < 4 * fe.n_dofs_per_line();
+                   i++)
+                {
+                  unsigned int line_i = i / fe.n_dofs_per_line();
+                  unsigned int tmp_i  = i % degree;
+
+                  unsigned int start_j =
+                    n_lines_on_mother * fe.n_dofs_per_line();
+
+                  for (unsigned int block = 0; block < n_blocks; block++)
+                    {
+                      // Type 1:
+                      for (unsigned int jy = 0; jy < degree - 1; ++jy)
+                        for (unsigned int jx = 0; jx < degree - 1; ++jx)
+                          {
+                            unsigned int j = start_j + jx + (jy * (degree - 1));
+                            if (direction_child_intern[line_i] != mother_flip_x)
+                              {
+                                if ((jx + tmp_i) % 2 == 0)
+                                  { // anti-symmetric case
+                                    constraints_matrix[i][j] *= -1.0;
+                                  }
+                              }
+                          }
+
+                      start_j += (degree - 1) * (degree - 1);
+
+                      // Type 2:
+                      for (unsigned int jy = 0; jy < degree - 1; ++jy)
+                        for (unsigned int jx = 0; jx < degree - 1; ++jx)
+                          {
+                            unsigned int j = start_j + jx + (jy * (degree - 1));
+                            if (direction_child_intern[line_i] != mother_flip_x)
+                              {
+                                if ((jx + tmp_i) % 2 == 0)
+                                  { // anti-symmetric case
+                                    constraints_matrix[i][j] *= -1.0;
+                                  }
+                              }
+                          }
+                      start_j += (degree - 1) * (degree - 1);
+
+                      // Type 3.1:
+                      // nothing to do
+                      start_j += degree - 1;
+
+                      // Type 3.2:
+                      // nothing to do
+                      start_j += degree - 1;
+                    }
+                }
+
+              // Face - Face
+              unsigned int degree_square = (degree - 1) * (degree - 1);
+              {
+                // Face
+                unsigned int i = n_lines_on_children * fe.n_dofs_per_line();
+                for (unsigned int child_face = 0;
+                     child_face < n_children_per_face;
+                     ++child_face)
+                  for (unsigned int block = 0; block < n_blocks; ++block)
+                    {
+                      unsigned int block_size = fe.n_dofs_per_quad() / n_blocks;
+
+                      // check if the counting of the DoFs is correct:
+                      Assert((block == 0 &&
+                              i != n_lines_on_children * fe.n_dofs_per_line() +
+                                     child_face * fe.n_dofs_per_quad()) ==
+                               false,
+                             ExcInternalError());
+
+                      // Type 1:
+                      for (unsigned int iy = 0; iy < degree - 1; ++iy)
+                        for (unsigned int ix = 0; ix < degree - 1; ++ix)
+                          {
+                            // Type 1 on mother:
+                            unsigned int j =
+                              n_lines_on_mother * fe.n_dofs_per_line() +
+                              block * block_size;
+                            for (unsigned int jy = 0; jy < degree - 1; ++jy)
+                              for (unsigned int jx = 0; jx < degree - 1; ++jx)
+                                {
+                                  if (child_flip_x[child_face] !=
+                                      mother_flip_x) //  x - direction (x-flip)
+                                    {
+                                      if ((ix + jx) % 2 == 1)
+                                        { // anti-symmetric in x
+                                          constraints_matrix[i][j] *= -1.0;
+                                        }
+                                    }
+
+                                  if (child_flip_y[child_face] !=
+                                      mother_flip_y) // y - direction (y-flip)
+                                    {
+                                      if ((iy + jy) % 2 == 1)
+                                        { // anti-symmetric in y
+                                          constraints_matrix[i][j] *= -1.0;
+                                        }
+                                    }
+
+                                  j++;
+                                }
+                            i++;
+                          }
+
+                      // Type 2:
+                      for (unsigned int iy = 0; iy < degree - 1; ++iy)
+                        for (unsigned int ix = 0; ix < degree - 1; ++ix)
+                          {
+                            // Type 2 on mother:
+                            unsigned int j =
+                              n_lines_on_mother * fe.n_dofs_per_line() +
+                              degree_square + block * block_size;
+                            for (unsigned int jy = 0; jy < degree - 1; ++jy)
+                              for (unsigned int jx = 0; jx < degree - 1; ++jx)
+                                {
+                                  if (child_flip_x[child_face] !=
+                                      mother_flip_x) //  x - direction (x-flip)
+                                    {
+                                      if ((ix + jx) % 2 == 1)
+                                        { // anti-symmetric in x
+                                          constraints_matrix[i][j] *= -1.0;
+                                        }
+                                    }
+
+                                  if (child_flip_y[child_face] !=
+                                      mother_flip_y) // y - direction (y-flip)
+                                    {
+                                      if ((iy + jy) % 2 == 1)
+                                        { // anti-symmetric in y
+                                          constraints_matrix[i][j] *= -1.0;
+                                        }
+                                    }
+
+                                  j++;
+                                }
+
+                            i++;
+                          }
+
+
+                      // Type 3 (y):
+                      for (unsigned int iy = 0; iy < degree - 1; ++iy)
+                        {
+                          // Type 2 on mother:
+                          unsigned int j =
+                            n_lines_on_mother * fe.n_dofs_per_line() +
+                            degree_square + block * block_size;
+                          for (unsigned int jy = 0; jy < degree - 1; ++jy)
+                            for (unsigned int jx = 0; jx < degree - 1; ++jx)
+                              {
+                                if (child_flip_x[child_face] !=
+                                    mother_flip_x) //  x - direction (x-flip)
+                                  {
+                                    if ((jx) % 2 == 0)
+                                      { // anti-symmetric in x
+                                        constraints_matrix[i][j] *= -1.0;
+                                      }
+                                  }
+
+                                if (child_flip_y[child_face] !=
+                                    mother_flip_y) // y - direction (y-flip)
+                                  {
+                                    if ((iy + jy) % 2 == 1)
+                                      { // anti-symmetric in y
+                                        constraints_matrix[i][j] *= -1.0;
+                                      }
+                                  }
+
+                                j++;
+                              }
+
+                          // Type 3 on mother:
+                          j = n_lines_on_mother * fe.n_dofs_per_line() +
+                              2 * degree_square + block * block_size;
+                          for (unsigned int jy = 0; jy < degree - 1; ++jy)
+                            {
+                              if (child_flip_y[child_face] !=
+                                  mother_flip_y) // y - direction (y-flip)
+                                {
+                                  if ((iy + jy) % 2 == 1)
+                                    { // anti-symmetric in y
+                                      constraints_matrix[i][j] *= -1.0;
+                                    }
+                                }
+
+                              j++;
+                            }
+                          i++;
+                        }
+
+                      // Type 3 (x):
+                      for (unsigned int ix = 0; ix < degree - 1; ++ix)
+                        {
+                          // Type 2 on mother:
+                          unsigned int j =
+                            n_lines_on_mother * fe.n_dofs_per_line() +
+                            degree_square + block * block_size;
+                          for (unsigned int jy = 0; jy < degree - 1; ++jy)
+                            for (unsigned int jx = 0; jx < degree - 1; ++jx)
+                              {
+                                if (child_flip_x[child_face] !=
+                                    mother_flip_x) //  x - direction (x-flip)
+                                  {
+                                    if ((ix + jx) % 2 == 1)
+                                      { // anti-symmetric in x
+                                        constraints_matrix[i][j] *= -1.0;
+                                      }
+                                  }
+
+                                if (child_flip_y[child_face] !=
+                                    mother_flip_y) // y - direction (y-flip)
+                                  {
+                                    if ((jy) % 2 == 0)
+                                      { // anti-symmetric in y
+                                        constraints_matrix[i][j] *= -1.0;
+                                      }
+                                  }
+
+                                j++;
+                              } // rof: Dof j
+
+                          // Type 3 on mother:
+                          j = n_lines_on_mother * fe.n_dofs_per_line() +
+                              2 * degree_square + (degree - 1) +
+                              block * block_size;
+                          for (unsigned int jx = 0; jx < degree - 1; ++jx)
+                            {
+                              if (child_flip_x[child_face] !=
+                                  mother_flip_x) //  x - direction (x-flip)
+                                {
+                                  if ((ix + jx) % 2 == 1)
+                                    { // anti-symmetric in x
+                                      constraints_matrix[i][j] *= -1.0;
+                                    }
+                                }
+
+                              j++;
+                            }
+                          i++;
+                        }
+                    }
+              }
+
+              // Next, after we have adapted the signs in the constraint matrix,
+              // based on the directions of the edges, we need to modify the
+              // constraint matrix based on the orientation of the faces (i.e.
+              // if x and y direction are exchanged on the face)
+
+              // interior edges:
+              for (unsigned int i = 0;
+                   i < n_internal_lines_on_children * fe.n_dofs_per_line();
+                   ++i)
+                {
+                  // check if x and y are permuted on the parent's face
+                  if (mother_flip_xy)
+                    {
+                      // copy the constraints:
+                      std::vector<double> constraints_matrix_old(
+                        dofs_on_mother.size(), 0);
+                      for (unsigned int j = 0; j < dofs_on_mother.size(); ++j)
+                        {
+                          constraints_matrix_old[j] = constraints_matrix[i][j];
+                        }
+
+                      unsigned int j_start =
+                        n_lines_on_mother * fe.n_dofs_per_line();
+                      for (unsigned block = 0; block < n_blocks; block++)
+                        {
+                          // Type 1
+                          for (unsigned int jy = 0; jy < degree - 1; ++jy)
+                            for (unsigned int jx = 0; jx < degree - 1; ++jx)
+                              {
+                                unsigned int j_old =
+                                  j_start + jx + (jy * (degree - 1));
+                                unsigned int j_new =
+                                  j_start + jy + (jx * (degree - 1));
+                                constraints_matrix[i][j_new] =
+                                  constraints_matrix_old[j_old];
+                              }
+                          j_start += degree_square;
+
+                          // Type 2
+                          for (unsigned int jy = 0; jy < degree - 1; ++jy)
+                            for (unsigned int jx = 0; jx < degree - 1; ++jx)
+                              {
+                                unsigned int j_old =
+                                  j_start + jx + (jy * (degree - 1));
+                                unsigned int j_new =
+                                  j_start + jy + (jx * (degree - 1));
+                                constraints_matrix[i][j_new] =
+                                  -constraints_matrix_old[j_old];
+                              }
+                          j_start += degree_square;
+
+                          // Type 3
+                          for (unsigned int j = j_start;
+                               j < j_start + (degree - 1);
+                               j++)
+                            {
+                              constraints_matrix[i][j] =
+                                constraints_matrix_old[j + (degree - 1)];
+                              constraints_matrix[i][j + (degree - 1)] =
+                                constraints_matrix_old[j];
+                            }
+                          j_start += 2 * (degree - 1);
+                        }
+                    }
+                }
+
+              {
+                // faces:
+                const unsigned int deg = degree - 1;
+
+                // copy the constraints
+                std::vector<std::vector<double>> constraints_matrix_old(
+                  4 * fe.n_dofs_per_quad(),
+                  std::vector<double>(fe.n_dofs_per_quad(), 0));
+                for (unsigned int i = 0;
+                     i < n_children_per_face * fe.n_dofs_per_quad();
+                     ++i)
+                  for (unsigned int j = 0; j < fe.n_dofs_per_quad(); ++j)
+                    constraints_matrix_old[i][j] = constraints_matrix
+                      [i + (n_lines_on_children * fe.n_dofs_per_line())]
+                      [j + (n_lines_on_mother * fe.n_dofs_per_line())];
+
+                // permute rows (on child)
+                for (unsigned int child = 0; child < n_children_per_face;
+                     ++child)
+                  {
+                    if (!child_flip_xy[child])
+                      continue;
+
+                    unsigned int i_start_new =
+                      n_lines_on_children * fe.n_dofs_per_line() +
+                      (child * fe.n_dofs_per_quad());
+                    unsigned int i_start_old = child * fe.n_dofs_per_quad();
+
+                    unsigned int j_start =
+                      n_lines_on_mother * fe.n_dofs_per_line();
+
+                    for (unsigned int block = 0; block < n_blocks; block++)
+                      {
+                        // Type 1:
+                        for (unsigned int ix = 0; ix < deg; ++ix)
+                          {
+                            for (unsigned int iy = 0; iy < deg; ++iy)
+                              {
+                                for (unsigned int j = 0;
+                                     j < fe.n_dofs_per_quad();
+                                     ++j)
+                                  constraints_matrix[i_start_new + iy +
+                                                     (ix * deg)][j + j_start] =
+                                    constraints_matrix_old[i_start_old + ix +
+                                                           (iy * deg)][j];
+                              }
+                          }
+                        i_start_new += deg * deg;
+                        i_start_old += deg * deg;
+
+                        // Type 2:
+                        for (unsigned int ix = 0; ix < deg; ++ix)
+                          {
+                            for (unsigned int iy = 0; iy < deg; ++iy)
+                              {
+                                for (unsigned int j = 0;
+                                     j < fe.n_dofs_per_quad();
+                                     j++)
+                                  constraints_matrix[i_start_new + iy +
+                                                     (ix * deg)][j + j_start] =
+                                    -constraints_matrix_old[i_start_old + ix +
+                                                            (iy * deg)][j];
+                              }
+                          }
+                        i_start_new += deg * deg;
+                        i_start_old += deg * deg;
+
+                        // Type 3:
+                        for (unsigned int ix = 0; ix < deg; ++ix)
+                          {
+                            for (unsigned int j = 0; j < fe.n_dofs_per_quad();
+                                 ++j)
+                              constraints_matrix[i_start_new + ix][j +
+                                                                   j_start] =
+                                constraints_matrix_old[i_start_old + ix + deg]
+                                                      [j];
+                            for (unsigned int j = 0; j < fe.n_dofs_per_quad();
+                                 ++j)
+                              constraints_matrix[i_start_new + ix +
+                                                 deg][j + j_start] =
+                                constraints_matrix_old[i_start_old + ix][j];
+                          } // rof: ix
+
+                        i_start_new += 2 * deg;
+                        i_start_old += 2 * deg;
+                      }
+                  }
+
+                // update the constraints_old
+                for (unsigned int i = 0;
+                     i < n_children_per_face * fe.n_dofs_per_quad();
+                     i++)
+                  for (unsigned int j = 0; j < fe.n_dofs_per_quad(); j++)
+                    constraints_matrix_old[i][j] = constraints_matrix
+                      [i + (n_lines_on_children * fe.n_dofs_per_line())]
+                      [j + (n_lines_on_mother * fe.n_dofs_per_line())];
+
+                // Mother
+                if (mother_flip_xy)
+                  {
+                    unsigned int i_start =
+                      n_lines_on_children * fe.n_dofs_per_line();
+
+                    unsigned int j_start_new =
+                      n_lines_on_mother * fe.n_dofs_per_line();
+                    unsigned int j_start_old = 0;
+
+                    for (unsigned int block = 0; block < n_blocks; ++block)
+                      {
+                        // Type 1:
+                        for (unsigned int jx = 0; jx < deg; ++jx)
+                          {
+                            for (unsigned int jy = 0; jy < deg; ++jy)
+                              {
+                                for (unsigned int i = 0;
+                                     i <
+                                     n_children_per_face * fe.n_dofs_per_quad();
+                                     ++i)
+                                  constraints_matrix[i + i_start][j_start_new +
+                                                                  jy +
+                                                                  (jx * deg)] =
+                                    constraints_matrix_old[i][j_start_old + jx +
+                                                              (jy * deg)];
+                              }
+                          }
+                        j_start_new += deg * deg;
+                        j_start_old += deg * deg;
+
+                        // Type 2:
+                        for (unsigned int jx = 0; jx < deg; ++jx)
+                          {
+                            for (unsigned int jy = 0; jy < deg; ++jy)
+                              {
+                                for (unsigned int i = 0;
+                                     i <
+                                     n_children_per_face * fe.n_dofs_per_quad();
+                                     ++i)
+                                  constraints_matrix[i + i_start][j_start_new +
+                                                                  jy +
+                                                                  (jx * deg)] =
+                                    -constraints_matrix_old[i][j_start_old +
+                                                               jx + (jy * deg)];
+                              }
+                          }
+                        j_start_new += deg * deg;
+                        j_start_old += deg * deg;
+
+                        // Type 3:
+                        for (unsigned int jx = 0; jx < deg; ++jx)
+                          {
+                            for (unsigned int i = 0;
+                                 i < n_children_per_face * fe.n_dofs_per_quad();
+                                 ++i)
+                              {
+                                constraints_matrix[i + i_start][j_start_new +
+                                                                jx] =
+                                  constraints_matrix_old[i][j_start_old + jx +
+                                                            deg];
+                                constraints_matrix[i + i_start][j_start_new +
+                                                                jx + deg] =
+                                  constraints_matrix_old[i][j_start_old + jx];
+                              }
+                          }
+                        j_start_new += 2 * deg;
+                        j_start_old += 2 * deg;
+                      }
+                  }
+              }
+
+              // For each row in the AffineConstraints object for
+              // this line, add the constraint. We split this into the different
+              // cases.
+
+              // internal edges:
+              for (unsigned int line = 0; line < n_internal_lines_on_children;
+                   ++line)
+                {
+                  unsigned int row_start = line * fe.n_dofs_per_line();
+
+                  for (unsigned int row = 0; row < fe.n_dofs_per_line(); ++row)
+                    {
+                      constraints.add_line(dofs_on_children[row_start + row]);
+                      for (unsigned int i = 0; i < dofs_on_mother.size(); ++i)
+                        {
+                          constraints.add_entry(
+                            dofs_on_children[row_start + row],
+                            dofs_on_mother[i],
+                            constraints_matrix[row_start + row][i]);
+                        }
+                      constraints.set_inhomogeneity(
+                        dofs_on_children[row_start + row], 0.);
+                    }
+                }
+
+              // Exterior edges
+              for (unsigned int line = 0; line < n_external_lines_on_children;
+                   ++line)
+                {
+                  unsigned int row_start =
+                    (4 * fe.n_dofs_per_line()) + (line * fe.n_dofs_per_line());
+
+                  for (unsigned int row = 0; row < fe.n_dofs_per_line(); ++row)
+                    {
+                      constraints.add_line(dofs_on_children[row_start + row]);
+                      for (unsigned int i = 0; i < dofs_on_mother.size(); ++i)
+                        {
+                          constraints.add_entry(
+                            dofs_on_children[row_start + row],
+                            dofs_on_mother[i],
+                            constraints_matrix[row_start + row][i]);
+                        }
+                      constraints.set_inhomogeneity(
+                        dofs_on_children[row_start + row], 0.);
+                    }
+                }
+
+              // Faces:
+              for (unsigned int f = 0; f < n_children_per_face; ++f)
+                {
+                  unsigned int row_start =
+                    (n_lines_on_children * fe.n_dofs_per_line()) +
+                    (f * fe.n_dofs_per_quad());
+
+                  for (unsigned int row = 0; row < fe.n_dofs_per_quad(); ++row)
+                    {
+                      constraints.add_line(dofs_on_children[row_start + row]);
+
+                      for (unsigned int i = 0; i < dofs_on_mother.size(); ++i)
+                        {
+                          constraints.add_entry(
+                            dofs_on_children[row_start + row],
+                            dofs_on_mother[i],
+                            constraints_matrix[row_start + row][i]);
+                        }
+
+                      constraints.set_inhomogeneity(
+                        dofs_on_children[row_start + row], 0.);
+                    }
+                }
+            }
+        }
+    }
 
 
     template <int dim, int spacedim, typename number>
@@ -1488,7 +2774,7 @@ namespace DoFTools
 
                     default:
                       // we shouldn't get here
-                      Assert(false, ExcInternalError());
+                      DEAL_II_ASSERT_UNREACHABLE();
                   }
               }
             else
@@ -1781,7 +3067,7 @@ namespace DoFTools
 
                         default:
                           // we shouldn't get here
-                          Assert(false, ExcInternalError());
+                          DEAL_II_ASSERT_UNREACHABLE();
                       }
                   }
               }
@@ -1801,11 +3087,16 @@ namespace DoFTools
              "The given DoFHandler does not have any DoFs. Did you forget to "
              "call dof_handler.distribute_dofs()?"));
 
-    // Decide whether to use the new or old make_hanging_node_constraints
+    // Decide whether to use make_hanging_node_constraints_nedelec,
+    // the new or old make_hanging_node_constraints
     // function. If all the FiniteElement or all elements in a FECollection
     // support the new face constraint matrix, the new code will be used.
     // Otherwise, the old implementation is used for the moment.
-    if (dof_handler.get_fe_collection().hp_constraints_are_implemented())
+    if (dof_handler.get_fe().get_name().find("FE_NedelecSZ") !=
+        std::string::npos)
+      internal::make_hanging_node_constraints_nedelec(
+        dof_handler, constraints, std::integral_constant<int, dim>());
+    else if (dof_handler.get_fe_collection().hp_constraints_are_implemented())
       internal::make_hp_hanging_node_constraints(dof_handler, constraints);
     else
       internal::make_oldstyle_hanging_node_constraints(
@@ -1814,33 +3105,8 @@ namespace DoFTools
 
 
 
-  namespace
+  namespace internal
   {
-    /**
-     * @internal
-     *
-     * Internally used in make_periodicity_constraints.
-     *
-     * enter constraints for periodicity into the given AffineConstraints
-     * object. this function is called when at least one of the two face
-     * iterators corresponds to an active object without further children
-     *
-     * @param transformation A matrix that maps degrees of freedom from one face
-     * to another. If the DoFs on the two faces are supposed to match exactly,
-     * then the matrix so provided will be the identity matrix. if face 2 is
-     * once refined from face 1, then the matrix needs to be the interpolation
-     * matrix from a face to this particular child
-     *
-     * @precondition: face_1 is supposed to be active
-     *
-     * @note We have to be careful not to accidentally create constraint
-     * cycles when adding periodic constraints: For example, as the
-     * corresponding testcase bits/periodicity_05 demonstrates, we can
-     * occasionally get into trouble if we already have the constraint
-     * x1 == x2 and want to insert x2 == x1. We avoid this by skipping
-     * such "identity constraints" if the opposite constraint already
-     * exists.
-     */
     template <typename FaceIterator, typename number>
     void
     set_periodicity_constraints(
@@ -1849,39 +3115,66 @@ namespace DoFTools
       const FullMatrix<double>                       &transformation,
       AffineConstraints<number>                      &affine_constraints,
       const ComponentMask                            &component_mask,
-      const bool                                      face_orientation,
-      const bool                                      face_flip,
-      const bool                                      face_rotation,
-      const number                                    periodicity_factor)
+      const types::geometric_orientation              combined_orientation,
+      const number                                    periodicity_factor,
+      const unsigned int                              level)
     {
       static const int dim      = FaceIterator::AccessorType::dimension;
       static const int spacedim = FaceIterator::AccessorType::space_dimension;
 
-      // we should be in the case where face_1 is active, i.e. has no children:
-      Assert(!face_1->has_children(), ExcInternalError());
+      // We need to inquire about some face things, but in this context we do
+      // not have face numbers. Because of the assumptions above we can just
+      // assume the face number is zero.
+      const unsigned int face_no = 0;
 
+      const bool use_mg = (level != numbers::invalid_unsigned_int);
+
+      // If we don't use multigrid, we should be in the case where face_1 is
+      // active, i.e. has no children. In the case of multigrid, constraints
+      // between cells on the same level are set up.
+      Assert(use_mg || (!face_1->has_children()), ExcInternalError());
       Assert(face_1->n_active_fe_indices() == 1, ExcInternalError());
 
-      // TODO: the implementation makes the assumption that all faces have the
-      // same number of dofs
       AssertDimension(
         face_1->get_fe(face_1->nth_active_fe_index(0)).n_unique_faces(), 1);
       AssertDimension(
         face_2->get_fe(face_2->nth_active_fe_index(0)).n_unique_faces(), 1);
-      const unsigned int face_no = 0;
 
-      // If face_2 does have children, then we need to iterate over these
-      // children and set periodic constraints in the inverse direction:
+      const types::fe_index face_1_index     = face_1->nth_active_fe_index(0);
+      const types::fe_index face_2_index     = face_2->nth_active_fe_index(0);
+      const FiniteElement<dim, spacedim> &fe = face_1->get_fe(face_1_index);
+      Assert(face_1->get_fe(face_1_index) == face_2->get_fe(face_2_index),
+             ExcMessage(
+               "Matching periodic cells need to use the same finite element"));
+      Assert(component_mask.represents_n_components(fe.n_components()),
+             ExcMessage(
+               "The number of components in the mask has to be either "
+               "zero or equal to the number of components in the finite "
+               "element."));
+      const unsigned int dofs_per_face = fe.n_dofs_per_face(face_no);
 
-      if (face_2->has_children())
+      // If we don't use multigrid and face_2 does have children,
+      // then we need to iterate over these children and set periodic
+      // constraints in the inverse direction. In the case of multigrid,
+      // we don't need to do this, since constraints between cells on
+      // the same level are set up.
+
+      if ((!use_mg) && face_2->has_children())
         {
           Assert(face_2->n_children() ==
-                   GeometryInfo<dim>::max_children_per_face,
+                   face_2->reference_cell().template n_children<dim - 1>(),
                  ExcNotImplemented());
 
-          const unsigned int dofs_per_face =
-            face_1->get_fe(face_1->nth_active_fe_index(0))
-              .n_dofs_per_face(face_no);
+          // Skip further recursion if face_1 carries invalid dof indices,
+          // i.e., it is on an artificial cell.
+          std::vector<types::global_dof_index> dofs_1(dofs_per_face);
+          face_1->get_dof_indices(dofs_1, face_1->nth_active_fe_index(0));
+          for (unsigned int i = 0; i < dofs_per_face; ++i)
+            if (dofs_1[i] == numbers::invalid_dof_index)
+              {
+                return;
+              }
+
           FullMatrix<double> child_transformation(dofs_per_face, dofs_per_face);
           FullMatrix<double> subface_interpolation(dofs_per_face,
                                                    dofs_per_face);
@@ -1903,9 +3196,7 @@ namespace DoFTools
                                           child_transformation,
                                           affine_constraints,
                                           component_mask,
-                                          face_orientation,
-                                          face_flip,
-                                          face_rotation,
+                                          combined_orientation,
                                           periodicity_factor);
             }
           return;
@@ -1916,27 +3207,21 @@ namespace DoFTools
       // that is left is to match the corresponding DoFs of both faces.
       //
 
-      const types::fe_index face_1_index = face_1->nth_active_fe_index(0);
-      const types::fe_index face_2_index = face_2->nth_active_fe_index(0);
-      Assert(face_1->get_fe(face_1_index) == face_2->get_fe(face_2_index),
-             ExcMessage(
-               "Matching periodic cells need to use the same finite element"));
-
-      const FiniteElement<dim, spacedim> &fe = face_1->get_fe(face_1_index);
-
-      Assert(component_mask.represents_n_components(fe.n_components()),
-             ExcMessage(
-               "The number of components in the mask has to be either "
-               "zero or equal to the number of components in the finite "
-               "element."));
-
-      const unsigned int dofs_per_face = fe.n_dofs_per_face(face_no);
-
       std::vector<types::global_dof_index> dofs_1(dofs_per_face);
       std::vector<types::global_dof_index> dofs_2(dofs_per_face);
 
-      face_1->get_dof_indices(dofs_1, face_1_index);
-      face_2->get_dof_indices(dofs_2, face_2_index);
+      // Note that, in 3d, these functions take into account the line
+      // orientations on each face: i.e., this function does not need to
+      // consider line orientations.
+      if (use_mg)
+        face_1->get_mg_dof_indices(level, dofs_1, face_1_index);
+      else
+        face_1->get_dof_indices(dofs_1, face_1_index);
+
+      if (use_mg)
+        face_2->get_mg_dof_indices(level, dofs_2, face_2_index);
+      else
+        face_2->get_dof_indices(dofs_2, face_2_index);
 
       // If either of the two faces has an invalid dof index, stop. This is
       // so that there is no attempt to match artificial cells of parallel
@@ -1961,43 +3246,50 @@ namespace DoFTools
             return;
           }
 
-      // Well, this is a hack:
-      //
-      // There is no
-      //   face_to_face_index(face_index,
-      //                      face_orientation,
-      //                      face_flip,
-      //                      face_rotation)
-      // function in FiniteElementData, so we have to use
-      //   face_to_cell_index(face_index, face
-      //                      face_orientation,
-      //                      face_flip,
-      //                      face_rotation)
-      // But this will give us an index on a cell - something we cannot work
-      // with directly. But luckily we can match them back :-]
+      // In the case of shared Triangulation with artificial cells all
+      // cells have valid DoF indices, i.e., the check above does not work.
+      if (const auto tria = dynamic_cast<
+            const parallel::shared::Triangulation<dim, spacedim> *>(
+            &face_1->get_triangulation()))
+        if (tria->with_artificial_cells() &&
+            (affine_constraints.get_local_lines().size() != 0))
+          for (unsigned int i = 0; i < dofs_per_face; ++i)
+            if ((affine_constraints.get_local_lines().is_element(dofs_1[i]) ==
+                 false) ||
+                (affine_constraints.get_local_lines().is_element(dofs_2[i]) ==
+                 false))
+              {
+                return;
+              }
 
-      std::map<unsigned int, unsigned int> cell_to_rotated_face_index;
+      // To match DoFs we need to use combined_orientation to permute the face
+      // DoFs. FiniteElement does not offer a function to do exactly that: i.e.,
+      // adjust_line_dof_index_for_line_orientation() only considers the
+      // orientation of a line and adjust_quad_dof_index_for_face_orientation()
+      // is only for DoFs defined on quads. Hence we compute our own lookup
+      // table with the necessary information:
+      std::vector<unsigned int> cell_to_face_index(
+        fe.dofs_per_cell, numbers::invalid_unsigned_int);
 
-      // Build up a cell to face index for face_2:
-      for (unsigned int i = 0; i < dofs_per_face; ++i)
-        {
-          const unsigned int cell_index =
-            fe.face_to_cell_index(i,
-                                  0, /* It doesn't really matter, just
-                                      * assume we're on the first face...
-                                      */
-                                  true,
-                                  false,
-                                  false // default orientation
-            );
-          cell_to_rotated_face_index[cell_index] = i;
-        }
+      for (unsigned int face_dof = 0; face_dof < dofs_per_face; ++face_dof)
+        cell_to_face_index[fe.face_to_cell_index(
+          face_dof, face_no, numbers::default_geometric_orientation)] =
+          face_dof;
+
+      // Build constraints in a vector of pairs that can be
+      // arbitrarily large, but that holds up to 25 elements without
+      // external memory allocation. This is good enough for hanging
+      // node constraints of Q4 elements in 3d, so covers most
+      // common cases.
+      boost::container::small_vector<
+        std::pair<typename AffineConstraints<number>::size_type, number>,
+        25>
+        constraint_entries;
 
       //
       // Loop over all dofs on face 2 and constrain them against all
       // matching dofs on face 1:
       //
-
       for (unsigned int i = 0; i < dofs_per_face; ++i)
         {
           // Obey the component mask
@@ -2055,22 +3347,29 @@ namespace DoFTools
               if (affine_constraints.is_constrained(dofs_2[i]))
                 continue;
 
-              // Enter the constraint piece by piece:
-              affine_constraints.add_line(dofs_2[i]);
+              constraint_entries.clear();
+              constraint_entries.reserve(dofs_per_face);
 
               for (unsigned int jj = 0; jj < dofs_per_face; ++jj)
                 {
                   // Get the correct dof index on face_1 respecting the
                   // given orientation:
                   const unsigned int j =
-                    cell_to_rotated_face_index[fe.face_to_cell_index(
-                      jj, 0, face_orientation, face_flip, face_rotation)];
+                    cell_to_face_index[fe.face_to_cell_index(
+                      jj, face_no, combined_orientation)];
+                  Assert(j != numbers::invalid_unsigned_int,
+                         ExcInternalError());
 
                   if (std::abs(transformation(i, jj)) > eps)
-                    affine_constraints.add_entry(dofs_2[i],
-                                                 dofs_1[j],
-                                                 transformation(i, jj));
+                    constraint_entries.emplace_back(dofs_1[j],
+                                                    transformation(i, jj));
                 }
+
+              // Enter the constraint::
+              affine_constraints.add_constraint(dofs_2[i],
+                                                constraint_entries,
+                                                0.);
+
 
               // Continue with next dof.
               continue;
@@ -2080,9 +3379,9 @@ namespace DoFTools
 
           // Get the correct dof index on face_1 respecting the given
           // orientation:
-          const unsigned int j =
-            cell_to_rotated_face_index[fe.face_to_cell_index(
-              target, 0, face_orientation, face_flip, face_rotation)];
+          const unsigned int j = cell_to_face_index[fe.face_to_cell_index(
+            target, face_no, combined_orientation)];
+          Assert(j != numbers::invalid_unsigned_int, ExcInternalError());
 
           auto dof_left  = dofs_1[j];
           auto dof_right = dofs_2[i];
@@ -2149,14 +3448,12 @@ namespace DoFTools
           if (constraints_are_cyclic)
             {
               if (std::abs(cycle_constraint_factor - number(1.)) > eps)
-                affine_constraints.add_line(dof_left);
+                affine_constraints.constrain_dof_to_zero(dof_left);
             }
           else
             {
-              affine_constraints.add_line(dof_left);
-              affine_constraints.add_entry(dof_left,
-                                           dof_right,
-                                           constraint_factor);
+              affine_constraints.add_constraint(
+                dof_left, {{dof_right, constraint_factor}}, 0.);
               // The number 1e10 in the assert below is arbitrary. If the
               // absolute value of constraint_factor is too large, then probably
               // the absolute value of periodicity_factor is too large or too
@@ -2184,9 +3481,11 @@ namespace DoFTools
             }
         } /* for dofs_per_face */
     }
+  } // namespace internal
 
 
-
+  namespace
+  {
     // Internally used in make_periodicity_constraints.
     //
     // Build up a (possibly rotated) interpolation matrix that is used in
@@ -2225,10 +3524,10 @@ namespace DoFTools
       // matrix, we assume that for a 0* rotation we would have to build the
       // identity matrix
 
-      Assert(matrix.m() == spacedim, ExcInternalError())
+      Assert(matrix.m() == spacedim, ExcInternalError());
 
-        Quadrature<dim - 1>
-          quadrature(fe.get_unit_face_support_points(face_no));
+      const Quadrature<dim - 1> quadrature(
+        fe.get_unit_face_support_points(face_no));
 
       // have an array that stores the location of each vector-dof tuple we want
       // to rotate.
@@ -2268,7 +3567,7 @@ namespace DoFTools
                     vector_dofs[fe.face_system_to_component_index(k, face_no)
                                   .first -
                                 first_vector_component] = k;
-                    n_found++;
+                    ++n_found;
                     if (n_found == dim)
                       break;
                   }
@@ -2299,9 +3598,7 @@ namespace DoFTools
     const std_cxx20::type_identity_t<FaceIterator> &face_2,
     AffineConstraints<number>                      &affine_constraints,
     const ComponentMask                            &component_mask,
-    const bool                                      face_orientation,
-    const bool                                      face_flip,
-    const bool                                      face_rotation,
+    const types::geometric_orientation              combined_orientation,
     const FullMatrix<double>                       &matrix,
     const std::vector<unsigned int>                &first_vector_components,
     const number                                    periodicity_factor)
@@ -2309,120 +3606,96 @@ namespace DoFTools
     static const int dim      = FaceIterator::AccessorType::dimension;
     static const int spacedim = FaceIterator::AccessorType::space_dimension;
 
-    Assert((dim != 1) || (face_orientation == true && face_flip == false &&
-                          face_rotation == false),
-           ExcMessage("The supplied orientation "
-                      "(face_orientation, face_flip, face_rotation) "
-                      "is invalid for 1d"));
-
-    Assert((dim != 2) || (face_orientation == true && face_rotation == false),
-           ExcMessage("The supplied orientation "
-                      "(face_orientation, face_flip, face_rotation) "
-                      "is invalid for 2d"));
-
-    Assert(face_1 != face_2,
-           ExcMessage("face_1 and face_2 are equal! Cannot constrain DoFs "
-                      "on the very same face"));
-
-    Assert(face_1->at_boundary() && face_2->at_boundary(),
-           ExcMessage("Faces for periodicity constraints must be on the "
-                      "boundary"));
-
-    Assert(matrix.m() == matrix.n(),
-           ExcMessage("The supplied (rotation or interpolation) matrix must "
-                      "be a square matrix"));
-
-    Assert(first_vector_components.empty() || matrix.m() == spacedim,
-           ExcMessage("first_vector_components is nonempty, so matrix must "
-                      "be a rotation matrix exactly of size spacedim"));
-
-#ifdef DEBUG
-    if (!face_1->has_children())
+    if constexpr (running_in_debug_mode())
       {
-        // TODO: the implementation makes the assumption that all faces have the
-        // same number of dofs
-        AssertDimension(
-          face_1->get_fe(face_1->nth_active_fe_index(0)).n_unique_faces(), 1);
-        const unsigned int face_no = 0;
+        const auto [orientation, rotation, flip] =
+          ::dealii::internal::split_face_orientation(combined_orientation);
 
-        Assert(face_1->n_active_fe_indices() == 1, ExcInternalError());
-        const unsigned int n_dofs_per_face =
-          face_1->get_fe(face_1->nth_active_fe_index(0))
-            .n_dofs_per_face(face_no);
-
-        Assert(matrix.m() == 0 ||
-                 (first_vector_components.empty() &&
-                  matrix.m() == n_dofs_per_face) ||
-                 (!first_vector_components.empty() && matrix.m() == spacedim),
+        Assert((dim != 1) ||
+                 (orientation == true && flip == false && rotation == false),
                ExcMessage(
-                 "The matrix must have either size 0 or spacedim "
-                 "(if first_vector_components is nonempty) "
-                 "or the size must be equal to the # of DoFs on the face "
-                 "(if first_vector_components is empty)."));
-      }
+                 "The supplied orientation (orientation, rotation, flip) "
+                 "is invalid for 1d"));
 
-    if (!face_2->has_children())
-      {
-        // TODO: the implementation makes the assumption that all faces have the
-        // same number of dofs
-        AssertDimension(
-          face_2->get_fe(face_2->nth_active_fe_index(0)).n_unique_faces(), 1);
-        const unsigned int face_no = 0;
-
-        Assert(face_2->n_active_fe_indices() == 1, ExcInternalError());
-        const unsigned int n_dofs_per_face =
-          face_2->get_fe(face_2->nth_active_fe_index(0))
-            .n_dofs_per_face(face_no);
-
-        Assert(matrix.m() == 0 ||
-                 (first_vector_components.empty() &&
-                  matrix.m() == n_dofs_per_face) ||
-                 (!first_vector_components.empty() && matrix.m() == spacedim),
+        Assert((dim != 2) || (flip == false && rotation == false),
                ExcMessage(
-                 "The matrix must have either size 0 or spacedim "
-                 "(if first_vector_components is nonempty) "
-                 "or the size must be equal to the # of DoFs on the face "
-                 "(if first_vector_components is empty)."));
+                 "The supplied orientation (orientation, rotation, flip) "
+                 "is invalid for 2d"));
+
+        Assert(face_1 != face_2,
+               ExcMessage("face_1 and face_2 are equal! Cannot constrain DoFs "
+                          "on the very same face"));
+
+        Assert(face_1->at_boundary() && face_2->at_boundary(),
+               ExcMessage("Faces for periodicity constraints must be on the "
+                          "boundary"));
+
+        Assert(matrix.m() == matrix.n(),
+               ExcMessage(
+                 "The supplied (rotation or interpolation) matrix must "
+                 "be a square matrix"));
+
+        Assert(first_vector_components.empty() || matrix.m() == spacedim,
+               ExcMessage("first_vector_components is nonempty, so matrix must "
+                          "be a rotation matrix exactly of size spacedim"));
+
+        if (!face_1->has_children())
+          {
+            // TODO: the implementation makes the assumption that all faces have
+            // the same number of dofs
+            AssertDimension(
+              face_1->get_fe(face_1->nth_active_fe_index(0)).n_unique_faces(),
+              1);
+            const unsigned int face_no = 0;
+
+            Assert(face_1->n_active_fe_indices() == 1, ExcInternalError());
+            const unsigned int n_dofs_per_face =
+              face_1->get_fe(face_1->nth_active_fe_index(0))
+                .n_dofs_per_face(face_no);
+
+            Assert(matrix.m() == 0 ||
+                     (first_vector_components.empty() &&
+                      matrix.m() == n_dofs_per_face) ||
+                     (!first_vector_components.empty() &&
+                      matrix.m() == spacedim),
+                   ExcMessage(
+                     "The matrix must have either size 0 or spacedim "
+                     "(if first_vector_components is nonempty) "
+                     "or the size must be equal to the # of DoFs on the face "
+                     "(if first_vector_components is empty)."));
+          }
+
+        if (!face_2->has_children())
+          {
+            // TODO: the implementation makes the assumption that all faces have
+            // the same number of dofs
+            AssertDimension(
+              face_2->get_fe(face_2->nth_active_fe_index(0)).n_unique_faces(),
+              1);
+            const unsigned int face_no = 0;
+
+            Assert(face_2->n_active_fe_indices() == 1, ExcInternalError());
+            const unsigned int n_dofs_per_face =
+              face_2->get_fe(face_2->nth_active_fe_index(0))
+                .n_dofs_per_face(face_no);
+
+            Assert(matrix.m() == 0 ||
+                     (first_vector_components.empty() &&
+                      matrix.m() == n_dofs_per_face) ||
+                     (!first_vector_components.empty() &&
+                      matrix.m() == spacedim),
+                   ExcMessage(
+                     "The matrix must have either size 0 or spacedim "
+                     "(if first_vector_components is nonempty) "
+                     "or the size must be equal to the # of DoFs on the face "
+                     "(if first_vector_components is empty)."));
+          }
       }
-#endif
-
-    // A lookup table on how to go through the child faces depending on the
-    // orientation:
-
-    static const int lookup_table_2d[2][2] = {
-      //          flip:
-      {0, 1}, //  false
-      {1, 0}, //  true
-    };
-
-    static const int lookup_table_3d[2][2][2][4] = {
-      //                    orientation flip  rotation
-      {
-        {
-          {0, 2, 1, 3}, //  false       false false
-          {2, 3, 0, 1}, //  false       false true
-        },
-        {
-          {3, 1, 2, 0}, //  false       true  false
-          {1, 0, 3, 2}, //  false       true  true
-        },
-      },
-      {
-        {
-          {0, 1, 2, 3}, //  true        false false
-          {1, 3, 0, 2}, //  true        false true
-        },
-        {
-          {3, 2, 1, 0}, //  true        true  false
-          {2, 0, 3, 1}, //  true        true  true
-        },
-      },
-    };
 
     if (face_1->has_children() && face_2->has_children())
       {
         // In the case that both faces have children, we loop over all children
-        // and apply make_periodicty_constrains recursively:
+        // and apply make_periodicity_constraints() recursively:
 
         Assert(face_1->n_children() ==
                    GeometryInfo<dim>::max_children_per_face &&
@@ -2433,28 +3706,24 @@ namespace DoFTools
         for (unsigned int i = 0; i < GeometryInfo<dim>::max_children_per_face;
              ++i)
           {
-            // Lookup the index for the second face
-            unsigned int j;
-            switch (dim)
-              {
-                case 2:
-                  j = lookup_table_2d[face_flip][i];
-                  break;
-                case 3:
-                  j = lookup_table_3d[face_orientation][face_flip]
-                                     [face_rotation][i];
-                  break;
-                default:
-                  AssertThrow(false, ExcNotImplemented());
-              }
+            // We need to access the subface indices without knowing the face
+            // number. Hence, we pick the lowest-value face: i.e., face 2 in 2D
+            // has subfaces {0, 1} and face 4 in 3D has subfaces {0, 1, 2, 3}.
+            const unsigned int face_no = dim == 2 ? 2 : 4;
+
+            // Lookup the index for the second face. Like the assertions above,
+            // this is only presently valid for hypercube meshes.
+            const auto reference_cell = ReferenceCells::get_hypercube<dim>();
+            const unsigned int j =
+              reference_cell.child_cell_on_face(face_no,
+                                                i,
+                                                combined_orientation);
 
             make_periodicity_constraints(face_1->child(i),
                                          face_2->child(j),
                                          affine_constraints,
                                          component_mask,
-                                         face_orientation,
-                                         face_flip,
-                                         face_rotation,
+                                         combined_orientation,
                                          matrix,
                                          first_vector_components,
                                          periodicity_factor);
@@ -2492,53 +3761,45 @@ namespace DoFTools
             // matrix is the identity matrix.
             if (first_vector_components.empty() && matrix.m() == 0)
               {
-                set_periodicity_constraints(face_2,
-                                            face_1,
-                                            transformation,
-                                            affine_constraints,
-                                            component_mask,
-                                            face_orientation,
-                                            face_flip,
-                                            face_rotation,
-                                            periodicity_factor);
+                internal::set_periodicity_constraints(face_2,
+                                                      face_1,
+                                                      transformation,
+                                                      affine_constraints,
+                                                      component_mask,
+                                                      combined_orientation,
+                                                      periodicity_factor);
               }
             else
               {
                 FullMatrix<double> inverse(transformation.m());
                 inverse.invert(transformation);
 
-                set_periodicity_constraints(face_2,
-                                            face_1,
-                                            inverse,
-                                            affine_constraints,
-                                            component_mask,
-                                            face_orientation,
-                                            face_flip,
-                                            face_rotation,
-                                            periodicity_factor);
+                internal::set_periodicity_constraints(face_2,
+                                                      face_1,
+                                                      inverse,
+                                                      affine_constraints,
+                                                      component_mask,
+                                                      combined_orientation,
+                                                      periodicity_factor);
               }
           }
         else
           {
             Assert(!face_1->has_children(), ExcInternalError());
 
-            // Important note:
-            // In 3d we have to take care of the fact that face_rotation gives
-            // the relative rotation of face_1 to face_2, i.e. we have to invert
-            // the rotation when constraining face_2 to face_1. Therefore
-            // face_flip has to be toggled if face_rotation is true: In case of
-            // inverted orientation, nothing has to be done.
-            set_periodicity_constraints(face_1,
-                                        face_2,
-                                        transformation,
-                                        affine_constraints,
-                                        component_mask,
-                                        face_orientation,
-                                        face_orientation ?
-                                          face_rotation ^ face_flip :
-                                          face_flip,
-                                        face_rotation,
-                                        periodicity_factor);
+            // since the combined_orientation describes how we should rotate
+            // face_1 to match face_2, we invert it to match the convention
+            // expected by set_periodicity_constraints()
+            const auto face_reference_cell = face_1->reference_cell();
+            internal::set_periodicity_constraints(
+              face_1,
+              face_2,
+              transformation,
+              affine_constraints,
+              component_mask,
+              face_reference_cell.get_inverse_combined_orientation(
+                combined_orientation),
+              periodicity_factor);
           }
       }
   }
@@ -2573,9 +3834,7 @@ namespace DoFTools
                                      face_2,
                                      constraints,
                                      component_mask,
-                                     pair.orientation[0],
-                                     pair.orientation[1],
-                                     pair.orientation[2],
+                                     pair.orientation,
                                      pair.matrix,
                                      first_vector_components,
                                      periodicity_factor);
@@ -2655,6 +3914,7 @@ namespace DoFTools
   {
     namespace Assembler
     {
+      // We don't actually need a scratch object, so use an empty class for it.
       struct Scratch
       {};
 
@@ -2684,7 +3944,6 @@ namespace DoFTools
       void
       compute_intergrid_weights_3(
         const typename DoFHandler<dim, spacedim>::active_cell_iterator &cell,
-        const Assembler::Scratch &,
         Assembler::CopyData<dim, spacedim>            &copy_data,
         const unsigned int                             coarse_component,
         const FiniteElement<dim, spacedim>            &coarse_fe,
@@ -2725,7 +3984,7 @@ namespace DoFTools
         // when on cell 1, we compute the weights of dof 'x' to be 1/2 from
         // parameter dofs 0 and 1, respectively. however, when later we are on
         // cell 2, we again compute the prolongation of shape function 1
-        // restricted to cell 2 to the globla grid and find that the weight of
+        // restricted to cell 2 to the global grid and find that the weight of
         // global dof 'x' now is zero. however, we should not overwrite the old
         // value.
         //
@@ -2857,7 +4116,6 @@ namespace DoFTools
         const std::vector<types::global_dof_index>    &weight_mapping,
         std::vector<std::map<types::global_dof_index, float>> &weights)
       {
-        Assembler::Scratch                 scratch;
         Assembler::CopyData<dim, spacedim> copy_data;
 
         unsigned int n_interesting_dofs = 0;
@@ -2885,7 +4143,7 @@ namespace DoFTools
                                          TriangulationBase<dim, spacedim> &>(
                     coarse_to_fine_grid_map.get_destination_grid()
                       .get_triangulation());
-                communicator          = tria.get_communicator();
+                communicator          = tria.get_mpi_communicator();
                 is_called_in_parallel = true;
               }
             catch (std::bad_cast &)
@@ -2915,11 +4173,10 @@ namespace DoFTools
            &coarse_to_fine_grid_map,
            &parameter_dofs](
             const typename DoFHandler<dim, spacedim>::active_cell_iterator
-                                               &cell,
-            const Assembler::Scratch           &scratch_data,
+              &cell,
+            const Assembler::Scratch &,
             Assembler::CopyData<dim, spacedim> &copy_data) {
             compute_intergrid_weights_3<dim, spacedim>(cell,
-                                                       scratch_data,
                                                        copy_data,
                                                        coarse_component,
                                                        coarse_grid.get_fe(),
@@ -2945,7 +4202,7 @@ namespace DoFTools
                         coarse_grid.end(),
                         worker,
                         copier,
-                        scratch,
+                        Assembler::Scratch(),
                         copy_data);
 
 #ifdef DEAL_II_WITH_MPI
@@ -3018,13 +4275,14 @@ namespace DoFTools
                    fine_fe.component_to_base_index(fine_component).first),
                ExcFiniteElementsDontMatch());
 
-#ifdef DEBUG
-        // if in debug mode, check whether the coarse grid is indeed coarser
-        // everywhere than the fine grid
-        for (const auto &cell : coarse_grid.active_cell_iterators())
-          Assert(cell->level() <= coarse_to_fine_grid_map[cell]->level(),
-                 ExcGridNotCoarser());
-#endif
+        if constexpr (running_in_debug_mode())
+          {
+            // if in debug mode, check whether the coarse grid is indeed coarser
+            // everywhere than the fine grid
+            for (const auto &cell : coarse_grid.active_cell_iterators())
+              Assert(cell->level() <= coarse_to_fine_grid_map[cell]->level(),
+                     ExcGridNotCoarser());
+          }
 
         /*
          * From here on: the term `parameter' refers to the selected component
@@ -3153,18 +4411,20 @@ namespace DoFTools
         // respective dofs of the other components have sum of weights zero, of
         // course. we do not explicitly ask which component a dof belongs to,
         // but this at least tests some errors
-#ifdef DEBUG
-        for (unsigned int col = 0; col < n_parameters_on_fine_grid; ++col)
+        if constexpr (running_in_debug_mode())
           {
-            double sum = 0;
-            for (types::global_dof_index row = 0; row < n_coarse_dofs; ++row)
-              if (weights[row].find(col) != weights[row].end())
-                sum += weights[row][col];
-            Assert((std::fabs(sum - 1) < 1.e-12) ||
-                     ((coarse_fe.n_components() > 1) && (sum == 0)),
-                   ExcInternalError());
+            for (unsigned int col = 0; col < n_parameters_on_fine_grid; ++col)
+              {
+                double sum = 0;
+                for (types::global_dof_index row = 0; row < n_coarse_dofs;
+                     ++row)
+                  if (weights[row].find(col) != weights[row].end())
+                    sum += weights[row][col];
+                Assert((std::fabs(sum - 1) < 1.e-12) ||
+                         ((coarse_fe.n_components() > 1) && (sum == 0)),
+                       ExcInternalError());
+              }
           }
-#endif
 
 
         return n_parameters_on_fine_grid;
@@ -3340,8 +4600,6 @@ namespace DoFTools
 
 
           // otherwise enter all constraints
-          constraints.add_line(global_dof);
-
           constraint_line.clear();
           for (types::global_dof_index row = first_used_row;
                row < n_coarse_dofs;
@@ -3353,7 +4611,7 @@ namespace DoFTools
                 constraint_line.emplace_back(representants[row], j->second);
             }
 
-          constraints.add_entries(global_dof, constraint_line);
+          constraints.add_constraint(global_dof, constraint_line, 0.);
         }
   }
 
@@ -3484,10 +4742,14 @@ namespace DoFTools
     std::vector<types::global_dof_index> cell_dofs;
     cell_dofs.reserve(dof.get_fe_collection().max_dofs_per_cell());
 
-    typename DoFHandler<dim, spacedim>::active_cell_iterator
-      cell = dof.begin_active(),
-      endc = dof.end();
-    for (; cell != endc; ++cell)
+    // In looping over faces, we will encounter some DoFs multiple
+    // times (namely, the ones on vertices and (in 3d) edges shared
+    // between multiple boundary faces. Keep track of which DoFs we
+    // have already encountered, so that we do not have to consider
+    // them a second time.
+    std::set<types::global_dof_index> dofs_already_treated;
+
+    for (const auto &cell : dof.active_cell_iterators())
       if (!cell->is_artificial() && cell->at_boundary())
         {
           const FiniteElement<dim, spacedim> &fe = cell->get_fe();
@@ -3514,30 +4776,50 @@ namespace DoFTools
                   // enter those dofs into the list that match the component
                   // signature.
                   for (const types::global_dof_index face_dof : face_dofs)
-                    {
-                      // Find out if a dof has a contribution in this component,
-                      // and if so, add it to the list
-                      const std::vector<types::global_dof_index>::iterator
-                        it_index_on_cell = std::find(cell_dofs.begin(),
-                                                     cell_dofs.end(),
-                                                     face_dof);
-                      Assert(it_index_on_cell != cell_dofs.end(),
-                             ExcInvalidIterator());
-                      const unsigned int index_on_cell =
-                        std::distance(cell_dofs.begin(), it_index_on_cell);
-                      const ComponentMask &nonzero_component_array =
-                        cell->get_fe().get_nonzero_components(index_on_cell);
-                      bool nonzero = false;
-                      for (unsigned int c = 0; c < n_components; ++c)
-                        if (nonzero_component_array[c] && component_mask[c])
+                    if (dofs_already_treated.find(face_dof) ==
+                        dofs_already_treated.end())
+                      {
+                        // Find out if a dof has a contribution in this
+                        // component, and if so, add it to the list
+                        const std::vector<types::global_dof_index>::iterator
+                          it_index_on_cell = std::find(cell_dofs.begin(),
+                                                       cell_dofs.end(),
+                                                       face_dof);
+                        Assert(it_index_on_cell != cell_dofs.end(),
+                               ExcInvalidIterator());
+                        const unsigned int index_on_cell =
+                          std::distance(cell_dofs.begin(), it_index_on_cell);
+                        const ComponentMask &nonzero_component_array =
+                          cell->get_fe().get_nonzero_components(index_on_cell);
+
+                        bool nonzero = false;
+                        for (unsigned int c = 0; c < n_components; ++c)
+                          if (nonzero_component_array[c] && component_mask[c])
+                            {
+                              nonzero = true;
+                              break;
+                            }
+
+                        if (nonzero)
                           {
-                            nonzero = true;
-                            break;
+                            // Check that either (i) the DoF is not
+                            // yet constrained, or (ii) if it is, its
+                            // inhomogeneity is zero:
+                            if (zero_boundary_constraints.is_constrained(
+                                  face_dof) == false)
+                              zero_boundary_constraints.constrain_dof_to_zero(
+                                face_dof);
+                            else
+                              Assert(zero_boundary_constraints
+                                         .is_inhomogeneously_constrained(
+                                           face_dof) == false,
+                                     ExcInternalError());
                           }
 
-                      if (nonzero)
-                        zero_boundary_constraints.add_line(face_dof);
-                    }
+                        // We already dealt with this DoF. Make sure we
+                        // don't touch it again.
+                        dofs_already_treated.insert(face_dof);
+                      }
                 }
             }
         }
@@ -3565,7 +4847,7 @@ namespace DoFTools
 
 // explicit instantiations
 
-#include "dof_tools_constraints.inst"
+#include "dofs/dof_tools_constraints.inst"
 
 
 

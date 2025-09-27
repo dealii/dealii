@@ -3,41 +3,29 @@ DEAL::Cycle 0:
 DEAL::   Number of active cells:       64
 DEAL::   Number of degrees of freedom: 81 (by level: 25, 81)
 DEAL::   Size of coarse grid matrix: 25
-DEAL:cg::Starting value 0.1094
-DEAL:cg::Convergence step 10 value 0
 DEAL::   10 CG iterations needed to obtain convergence.
 DEAL::Cycle 1:
 DEAL::   Number of active cells:       121
 DEAL::   Number of degrees of freedom: 152 (by level: 25, 81, 105)
 DEAL::   Size of coarse grid matrix: 25
-DEAL:cg::Starting value 0.09300
-DEAL:cg::Convergence step 13 value 0
 DEAL::   13 CG iterations needed to obtain convergence.
 DEAL::Cycle 2:
 DEAL::   Number of active cells:       238
 DEAL::   Number of degrees of freedom: 281 (by level: 25, 81, 233, 53)
 DEAL::   Size of coarse grid matrix: 25
-DEAL:cg::Starting value 0.06601
-DEAL:cg::Convergence step 13 value 0
 DEAL::   13 CG iterations needed to obtain convergence.
 DEAL::Cycle 3:
 DEAL::   Number of active cells:       460
 DEAL::   Number of degrees of freedom: 559 (by level: 25, 81, 265, 342, 89)
 DEAL::   Size of coarse grid matrix: 25
-DEAL:cg::Starting value 0.05777
-DEAL:cg::Convergence step 15 value 0
 DEAL::   15 CG iterations needed to obtain convergence.
 DEAL::Cycle 4:
 DEAL::   Number of active cells:       892
 DEAL::   Number of degrees of freedom: 995 (by level: 25, 81, 273, 743, 209, 54)
 DEAL::   Size of coarse grid matrix: 25
-DEAL:cg::Starting value 0.04269
-DEAL:cg::Convergence step 17 value 0
 DEAL::   17 CG iterations needed to obtain convergence.
 DEAL::Cycle 5:
 DEAL::   Number of active cells:       1759
 DEAL::   Number of degrees of freedom: 2014 (by level: 25, 81, 277, 961, 966, 437, 106)
 DEAL::   Size of coarse grid matrix: 25
-DEAL:cg::Starting value 0.03542
-DEAL:cg::Convergence step 15 value 0
 DEAL::   15 CG iterations needed to obtain convergence.

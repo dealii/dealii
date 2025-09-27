@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2020 - 2022 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2020 - 2024 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 #ifndef dealii_tests_multigrid_util_h
 #define dealii_tests_multigrid_util_h
@@ -58,8 +57,8 @@
 
 #include "../tests.h"
 
-template <int dim_, typename Number>
-class Operator : public Subscriptor
+template <int dim_, int n_components = dim_, typename Number = double>
+class Operator : public EnableObserverPointer
 {
 public:
   using value_type = Number;
@@ -68,14 +67,15 @@ public:
 
   static const int dim = dim_;
 
-  using FECellIntegrator = FEEvaluation<dim, -1, 0, 1, number>;
+  using FECellIntegrator = FEEvaluation<dim, -1, 0, n_components, Number>;
 
   void
   reinit(const Mapping<dim>              &mapping,
          const DoFHandler<dim>           &dof_handler,
          const Quadrature<dim>           &quad,
          const AffineConstraints<number> &constraints,
-         const unsigned int mg_level = numbers::invalid_unsigned_int)
+         const unsigned int mg_level         = numbers::invalid_unsigned_int,
+         const bool         ones_on_diagonal = false)
   {
     // Clear internal data structures (if operator is reused).
     this->system_matrix.clear();
@@ -92,6 +92,12 @@ public:
     data.mg_level             = mg_level;
 
     matrix_free.reinit(mapping, dof_handler, constraints, quad, data);
+
+    constrained_indices.clear();
+
+    if (ones_on_diagonal)
+      for (auto i : this->matrix_free.get_constrained_dofs())
+        constrained_indices.push_back(i);
   }
 
   virtual types::global_dof_index
@@ -107,7 +113,7 @@ public:
   Number
   el(unsigned int, unsigned int) const
   {
-    Assert(false, ExcNotImplemented());
+    DEAL_II_NOT_IMPLEMENTED();
     return 0;
   }
 
@@ -122,6 +128,10 @@ public:
   {
     this->matrix_free.cell_loop(
       &Operator::do_cell_integral_range, this, dst, src, true);
+
+    for (unsigned int i = 0; i < constrained_indices.size(); ++i)
+      dst.local_element(constrained_indices[i]) =
+        src.local_element(constrained_indices[i]);
   }
 
   void
@@ -195,7 +205,16 @@ public:
           {
             phi.reinit(cell);
             for (unsigned int q = 0; q < phi.n_q_points; ++q)
-              phi.submit_value(1.0, q);
+              {
+                Tensor<1, n_components, VectorizedArray<Number>> temp;
+                for (unsigned int v = 0; v < VectorizedArray<Number>::size();
+                     ++v)
+                  {
+                    for (unsigned int i = 0; i < n_components; i++)
+                      temp[i][v] = 1.;
+                  }
+                phi.submit_value(temp, q);
+              }
 
             phi.integrate_scatter(EvaluationFlags::values, dst);
           }
@@ -252,6 +271,8 @@ private:
   AffineConstraints<number> constraints;
 
   mutable TrilinosWrappers::SparseMatrix system_matrix;
+
+  std::vector<unsigned int> constrained_indices;
 };
 
 struct GMGParameters

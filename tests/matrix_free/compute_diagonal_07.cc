@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2019 - 2022 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2022 - 2024 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 
 
@@ -30,7 +29,7 @@ template <int dim,
           typename Number              = double,
           typename VectorizedArrayType = VectorizedArray<Number>>
 void
-test()
+test(const unsigned int first_vector_component)
 {
   Triangulation<dim> tria;
   GridGenerator::hyper_ball(tria);
@@ -105,9 +104,10 @@ test()
 
   diagonal_global.print(deallog.get_file_stream());
 
-  LinearAlgebra::distributed::BlockVector<Number> diagonal_global_block(dim);
+  LinearAlgebra::distributed::BlockVector<Number> diagonal_global_block(
+    dim + first_vector_component);
 
-  for (unsigned int comp = 0; comp < dim; ++comp)
+  for (unsigned int comp = 0; comp < dim + first_vector_component; ++comp)
     matrix_free.initialize_dof_vector(diagonal_global_block.block(comp), 1);
 
   MatrixFreeTools::compute_diagonal<dim,
@@ -115,10 +115,14 @@ test()
                                     n_points,
                                     n_components,
                                     Number,
-                                    VectorizedArrayType>(matrix_free,
-                                                         diagonal_global_block,
-                                                         kernel,
-                                                         1);
+                                    VectorizedArrayType>(
+    matrix_free,
+    diagonal_global_block,
+    kernel,
+    1,
+    0,
+    0,
+    first_vector_component);
 
   diagonal_global_block.print(deallog.get_file_stream());
 }
@@ -129,5 +133,6 @@ main(int argc, char **argv)
   Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
   MPILogInitAll                    all;
 
-  test<2, 1>();
+  test<2, 1>(0);
+  test<2, 1>(1 /*test first vector component*/);
 }

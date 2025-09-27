@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2019 - 2021 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2019 - 2024 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 
 // Verify that we can run SolutionTransfer when coarsening a cell that has
@@ -68,6 +67,10 @@ main()
   for (const auto &cell : dof_handler.active_cell_iterators())
     cell->set_coarsen_flag();
 
+  // Assign FE_Q(1) to all cells
+  for (const auto &cell : dof_handler.active_cell_iterators())
+    cell->set_future_fe_index(0);
+
   triangulation.prepare_coarsening_and_refinement();
 
   // Interpolate solution
@@ -77,16 +80,11 @@ main()
 
   triangulation.execute_coarsening_and_refinement();
 
-  // Assign FE_Q(1) to all cells
-  for (const auto &cell : dof_handler.active_cell_iterators())
-    cell->set_active_fe_index(0);
-
   dof_handler.distribute_dofs(fe_collection);
   deallog << "Final number of dofs: " << dof_handler.n_dofs() << std::endl;
 
   Vector<double> new_solution(dof_handler.n_dofs());
-  new_solution = 1.;
-  solution_trans.interpolate(solution, new_solution);
+  solution_trans.interpolate(new_solution);
 
   deallog << "Vector after solution transfer:" << std::endl;
   new_solution.print(deallog.get_file_stream());

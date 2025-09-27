@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 1999 - 2023 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 1999 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 #ifndef dealii_grid_in_h
 #define dealii_grid_in_h
@@ -19,11 +18,22 @@
 
 #include <deal.II/base/config.h>
 
+#ifdef DEAL_II_GMSH_WITH_API
+#  include <deal.II/base/mpi.h>
+
+#  include <deal.II/distributed/fully_distributed_tria.h>
+
+#  include <gmsh.h>
+#endif
+
 #include <deal.II/base/exceptions.h>
+#include <deal.II/base/observer_pointer.h>
 #include <deal.II/base/point.h>
-#include <deal.II/base/smartpointer.h>
+
+#include <deal.II/lac/vector.h>
 
 #include <iostream>
+#include <map>
 #include <string>
 #include <vector>
 
@@ -39,8 +49,8 @@ struct CellData;
 #endif
 
 /**
- * This class implements an input mechanism for grid data. It allows to read a
- * grid structure into a triangulation object. At present, UCD (unstructured
+ * This class implements an input mechanism for mesh data. It allows to read a
+ * mesh structure into a Triangulation object. At present, UCD (unstructured
  * cell data), DB Mesh, XDA, %Gmsh, Tecplot, UNV, VTK, ASSIMP, and Cubit
  * are supported as input format for grid data. Any numerical data other than
  * geometric (vertex locations) and topological (how vertices form cells,
@@ -52,12 +62,14 @@ struct CellData;
  * @ref GlossBoundaryIndicator "this"
  * glossary entry for more information).
  *
- * @note Since deal.II only supports line, quadrilateral and hexahedral
- * meshes, the functions in this class can only read meshes that consist
- * exclusively of such cells. If you absolutely need to work with a mesh that
- * uses triangles or tetrahedra, then your only option is to convert the mesh
- * to quadrilaterals and hexahedra. A tool that can do this is tethex,
- * available <a href="https://github.com/martemyev/tethex">here</a>.
+ * In practice, the list of formats this class supports is of course limited.
+ * However, other people have written tools to convert mesh files from one
+ * format to another, and if you have a mesh you cannot read with the functions
+ * of this class, you may want to convert it into a format that is in fact
+ * supported. One of these tools you may want to look up is
+ * [meshio](https://github.com/nschloe/meshio).
+ * A separate tool that can convert tetrahedral to hexahedral mesges is tethex,
+ * available [here](https://github.com/martemyev/tethex).
  *
  * The mesh you read will form the coarsest level of a @p Triangulation
  * object. As such, it must not contain hanging nodes or other forms of
@@ -305,7 +317,6 @@ struct CellData;
  *
  * @ingroup grid
  * @ingroup input
- * Pelteret 2015, Timo Heister 2015,  Krzysztof Bzowski, 2015
  */
 
 template <int dim, int spacedim = dim>
@@ -368,9 +379,8 @@ public:
   read(std::istream &in, Format format = Default);
 
   /**
-   * Open the file given by the string and call the previous function read().
-   * This function uses the PathSearch mechanism to find files. The file class
-   * used is <code>MESH</code>.
+   * Open the file given by the string and call the previous function
+   * read() taking a std::istream argument.
    */
   void
   read(const std::string &in, Format format = Default);
@@ -447,12 +457,13 @@ public:
   read_unv(std::istream &in);
 
   /**
-   * Read grid data from an ucd file. Numerical data is ignored.
-   * It is not possible to use a ucd file to set both boundary_id and
-   * manifold_id for the same cell. Yet it is possible to use
-   * the flag apply_all_indicators_to_manifolds to decide if
-   * the indicators in the file refer to manifolds (flag set to true)
-   * or boundaries (flag set to false). If the flag is set, the
+   * Read grid data from an UCD file. Numerical data is ignored, and
+   * only the mesh part of the file is considered.
+   * It is not possible to use a UCD file to set both `boundary_id` and
+   * `manifold_id` for the same cell. Yet it is possible to use
+   * the flag `apply_all_indicators_to_manifolds` to decide if
+   * the indicators in the file refer to manifold (flag set to `true`)
+   * or boundary ids (flag set to `false`). If the flag is set, the
    * indicators are used for cells as manifold id, too.
    */
   void
@@ -585,6 +596,66 @@ public:
   void
   read_msh(const std::string &filename);
 #endif
+
+
+  /**
+   * Read a partitioned GMSH file and create a fully distributed
+   * triangulation in deal.II.
+   *
+   * This function reads partitioned mesh files generated by GMSH's internal
+   * partitioner (usually metis) and constructs a fully distributed
+   * triangulation that can be used in parallel computations with MPI. The
+   * function automatically handles ghost cell identification, vertex
+   * coordinates, and cell connectivity across processor boundaries.
+   *
+   * In order to generate a set of partitioned mesh files that can be used with
+   * this function, you can use the `gmsh` command-line tool with the following
+   * options:
+   * @code
+   * gmsh -part 4 -part_ghosts -part_split {mesh_file_name}
+   * @endcode
+   *
+   * This will partition the mesh `{mesh_file_name}` into 4 parts, include ghost
+   * cells, and write each partition to a separate file.
+   *
+   * For example: If we have a VTK mesh file named `input_file.vtk`, the command
+   * becomes:
+   * @code
+   * gmsh -format msh -part 4 -part_ghosts -part_split input_file.vtk
+   * @endcode
+   *
+   * This will generate a set of mesh files named like:
+   *   {input_file}_1.msh
+   *   {input_file}_2.msh
+   *   {input_file}_3.msh
+   *   {input_file}_4.msh
+   *
+   * In the command above:
+   *   - {input_file} can be any valid Gmsh mesh input file.
+   *   - The number after `-part` specifies the number of partitions.
+   *   - `-part_ghosts` ensures ghost cells are included for parallel use.
+   *   - `-part_split` writes each partition to a separate file.
+   *   - `-format msh` specifies the mesh format for the output files.
+   *
+   * The mesh files follow this naming convention:
+   *   - Single processor: {file_prefix}.{file_suffix}
+   *   - Multiple processors: {file_prefix}_{rank+1}.{file_suffix}
+   *     where rank goes from 0 to number_of_processors-1.
+   *
+   * @param[in]  file_prefix  User-defined prefix of mesh files (not fixed).
+   * @param[in]  file_suffix  Suffix of mesh files.
+   *
+   * @pre  Mesh files must match the number of MPI ranks. An exception is thrown
+   * if there are more (or less) files than ranks.
+   * @note This function internally calls `gmsh::initialize()` (and
+   * `gmsh::finalize()` when finished), so users do *not* need to
+   * initialize or finalize Gmsh themselves before or after calling it.
+   */
+
+  void
+  read_partitioned_msh(const std::string &file_prefix,
+                       const std::string &file_suffix = "msh");
+
 
   /**
    * Read grid data from a `.mphtxt` file. `.mphtxt` is one of the file formats
@@ -771,6 +842,25 @@ public:
   get_format_names();
 
   /**
+   * Return a map containing cell data associated with the elements of an
+   * external vtk format mesh imported using read_vtk().
+   * The format of the returned map is as
+   * follows:
+   * - std::string stores the name of the field data (identifier) as specified
+   * in the external mesh
+   * - Vector<double> stores value for the given identifier in each cell.
+   * To access the value, use cell_data[name_field][cell->active_cell_index()].
+   *
+   * For example, if the vtk mesh contains field data "Density" defined on
+   * cells, then `cell_data["Density"][0]` provides the density defined at cell
+   * ID '0', which corresponds to index 0 of the vector. The length of the
+   * vector in `cell_data["Density"]` equals the number of elements in the
+   * coarse mesh.
+   */
+  const std::map<std::string, Vector<double>> &
+  get_cell_data() const;
+
+  /**
    * Exception
    */
   DeclException1(ExcUnknownSectionType,
@@ -862,9 +952,11 @@ public:
                  << "Supported elements are: \n"
                  << "ELM-TYPE\n"
                  << "1 Line (2 nodes, 1 edge).\n"
+                 << "2 Triangle (3 nodes, 3 edges).\n"
                  << "3 Quadrilateral (4 nodes, 4 edges).\n"
+                 << "4 Tetrahedron (4 nodes, 6 edges, 4 faces) when in 3d.\n"
                  << "5 Hexahedron (8 nodes, 12 edges, 6 faces) when in 3d.\n"
-                 << "15 Point (1 node, ignored when read)");
+                 << "15 Point (1 node, ignored when read).");
 
 
   DeclException2(
@@ -883,7 +975,7 @@ protected:
   /**
    * Store address of the triangulation to be fed with the data read in.
    */
-  SmartPointer<Triangulation<dim, spacedim>, GridIn<dim, spacedim>> tria;
+  ObserverPointer<Triangulation<dim, spacedim>, GridIn<dim, spacedim>> tria;
 
   /**
    * This function can write the raw cell data objects created by the
@@ -949,6 +1041,17 @@ private:
    * Input format used by read() if no format is given.
    */
   Format default_format;
+
+  /**
+   * Data member that stores field data defined at the cells of the mesh.
+   * The format is as follows:
+   * - std::string stores the name of the field data (identifier) as specified
+   * in the external mesh
+   * - Vector<double> stores value for the given identifier in each cell id.
+   *
+   * To access the value use cell_data[name_field][cell->active_cell_index()].
+   */
+  std::map<std::string, Vector<double>> cell_data;
 };
 
 /* -------------- declaration of explicit specializations ------------- */

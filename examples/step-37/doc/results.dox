@@ -7,7 +7,7 @@ a different coefficient), there is little to say about the
 solution. We show a picture anyway, illustrating the size of the
 solution through both isocontours and volume rendering:
 
-<img src="https://www.dealii.org/images/steps/developer/step-37.solution.png" alt="">
+<img src="https://dealii.org/images/steps/developer/step-37.solution.png" alt="">
 
 Of more interest is to evaluate some aspects of the multigrid solver.
 When we run this program in 2D for quadratic ($Q_2$) elements, we get the
@@ -346,7 +346,7 @@ counts, the curves flatten out a bit earlier, which is because of the
 communication network in SuperMUC where communication between processors
 farther away is slightly slower.
 
-<img src="https://www.dealii.org/images/steps/developer/step-37.scaling_strong.png" alt="">
+<img src="https://dealii.org/images/steps/developer/step-37.scaling_strong.png" alt="">
 
 In addition, the plot also contains results for <b>weak scaling</b> that lists
 how the algorithm behaves as both the number of processor cores and elements
@@ -378,7 +378,7 @@ computation shown in this picture involves 292 billion ($2.92 \cdot 10^{11}$)
 degrees of freedom. On a DG computation of 147k cores, the above algorithms
 were also run involving up to 549 billion (2^39) DoFs.
 
-<img src="https://www.dealii.org/images/steps/developer/step-37.scaling_size.png" alt="">
+<img src="https://dealii.org/images/steps/developer/step-37.scaling_size.png" alt="">
 
 Finally, we note that while performing the tests on the large-scale system
 shown above, improvements of the multigrid algorithms in deal.II have been
@@ -390,7 +390,7 @@ more. However, the following picture shows that the improvement already pay
 off on a smaller scale, here shown on computations on up to 14,336 cores for
 $\mathcal Q_5$ elements:
 
-<img src="https://www.dealii.org/images/steps/developer/step-37.scaling_oldnew.png" alt="">
+<img src="https://dealii.org/images/steps/developer/step-37.scaling_oldnew.png" alt="">
 
 
 <h3> Adaptivity</h3>
@@ -431,7 +431,7 @@ const IndexSet locally_relevant_dofs = DoFTools::extract_locally_relevant_dofs(d
 LinearAlgebra::distributed::Vector<double> copy_vec(solution);
 solution.reinit(dof_handler.locally_owned_dofs(),
                 locally_relevant_dofs,
-                triangulation.get_communicator());
+                triangulation.get_mpi_communicator());
 solution.copy_locally_owned_data_from(copy_vec);
 constraints.distribute(solution);
 solution.update_ghost_values();
@@ -488,8 +488,8 @@ step-6 and step-7 tutorial programs, we can account for the contribution of
 inhomogeneous constraints <i>j</i> by multiplying the columns <i>j</i> and
 rows <i>i</i> of the local matrix according to the integrals $(\varphi_i,
 \varphi_j)_\Omega$ by the inhomogeneities and subtracting the resulting from
-the position <i>i</i> in the global right-hand-side vector, see also the @ref
-constraints module. In essence, we use some of the integrals that get
+the position <i>i</i> in the global right-hand-side vector, see also the
+@ref constraints topic. In essence, we use some of the integrals that get
 eliminated from the left hand side of the equation to finalize the right hand
 side contribution. Similar mathematics are also involved when first writing
 all entries into a left hand side matrix and then eliminating matrix rows and
@@ -684,7 +684,7 @@ one hand, increasing the polynomial degree to three or four will further
 improve the time per unknown. (Even higher degrees typically get slower again,
 because the multigrid iteration counts increase slightly with the chosen
 simple smoother. One could then use hybrid multigrid algorithms to use
-polynomial coarsening through MGTransferGlobalCoarsening, to reduce the impact
+polynomial coarsening through MGTransferMatrixFree, to reduce the impact
 of the coarser level on the communication latency.) A more significant
 improvement can be obtained by data-locality optimizations. The class
 PreconditionChebyshev, when combined with a `DiagonalMatrix` inner

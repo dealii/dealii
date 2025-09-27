@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2017 - 2023 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2018 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 #ifndef dealii_numerics_rtree_h
 #define dealii_numerics_rtree_h
@@ -25,9 +24,11 @@
 #include <deal.II/boost_adaptors/point.h>
 #include <deal.II/boost_adaptors/segment.h>
 
+DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
 #include <boost/geometry/algorithms/distance.hpp>
 #include <boost/geometry/index/rtree.hpp>
 #include <boost/geometry/strategies/strategies.hpp>
+DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
 
 #include <memory>
 
@@ -380,12 +381,12 @@ struct ExtractLevelVisitor
   /**
    * Store the level we are currently visiting.
    */
-  size_t level;
+  std::size_t level;
 
   /**
    * The level we want to extract from the RTree object.
    */
-  const size_t target_level;
+  const std::size_t target_level;
 
   /**
    * A reference to the input vector of BoundingBox objects.
@@ -411,7 +412,7 @@ struct ExtractLevelVisitor
  * processes. The finest level of information is given by the leaves, which in
  * this context would be the collection of all the bounding boxes associated
  * to the locally owned cells of the triangulation. Exchanging this information
- * with all participating processes would defeat the purpuse of parallel
+ * with all participating processes would defeat the purpose of parallel
  * computations. If however one constructs an RTree containing these bounding
  * boxes (for example, by calling
  * GridTools::Cache::get_cell_bounding_boxes_rtree()), and then extracts one of
@@ -499,9 +500,17 @@ RTree<typename ContainerType::size_type,
       IndexableGetterFromIndices<ContainerType>>
 pack_rtree_of_indices(const ContainerType &container)
 {
-  std_cxx20::ranges::iota_view<typename ContainerType::size_type,
-                               typename ContainerType::size_type>
-    indices(0, container.size());
+  // We need an array that holds the indices we want to pack. The rtree
+  // implementation in BOOST, for reasons not entirely clear, insists
+  // on using a reference to the elements of the range. This is fine if
+  // the indices are stored in a container, so that's what we do.
+  // (It would be nice if we could just pass a std::ranges::iota_view
+  // instead, but that has no nested 'reference' type, and this then
+  // trips up BOOST rtree.)
+  std::vector<typename ContainerType::size_type> indices(container.size());
+  for (typename ContainerType::size_type i = 0; i < container.size(); ++i)
+    indices[i] = i;
+
   return RTree<typename ContainerType::size_type,
                IndexType,
                IndexableGetterFromIndices<ContainerType>>(
@@ -562,7 +571,7 @@ ExtractLevelVisitor<Value, Options, Translator, Box, Allocators>::operator()(
       return;
     }
 
-  const size_t level_backup = level;
+  const std::size_t level_backup = level;
   ++level;
 
   for (typename ElementsType::const_iterator it = elements.begin();
@@ -699,19 +708,19 @@ struct NodeVisitor : public boost::geometry::index::detail::rtree::visitor<
   /**
    * Store the level we are currently visiting.
    */
-  size_t level;
+  std::size_t level;
 
   /**
    * Index used to keep track of the number of different visited nodes during
    * recursion/
    */
-  size_t node_counter;
+  std::size_t node_counter;
 
   /**
    * The level where children are living.
    * Before: "we want to extract from the RTree object."
    */
-  const size_t target_level;
+  const std::size_t target_level;
 
   /**
    * A reference to the input vector of vector of BoundingBox objects. This
@@ -782,7 +791,7 @@ NodeVisitor<Value, Options, Translator, Box, Allocators>::operator()(
       return;
     }
 
-  size_t level_backup = level;
+  std::size_t level_backup = level;
   ++level;
 
   for (typename elements_type::const_iterator it = elements.begin();

@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2022 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2022 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 
 // Check ArborX wrapper: intersection of spheres with points
@@ -37,11 +36,15 @@ test_1d()
   std::vector<std::pair<Point<1>, double>> query_spheres;
   query_spheres.emplace_back(Point<1>(0.5), 0.8);
   query_spheres.emplace_back(Point<1>(1.5), 0.8);
-  query_spheres.emplace_back(Point<1>(2.2), 1.2);
+  query_spheres.emplace_back(Point<1>(2.2), 1.2001);
   query_spheres.emplace_back(Point<1>(2.6), 0.9);
 
 
-  ArborXWrappers::BVH                      bvh(points);
+#if ARBORX_VERSION_MAJOR < 2
+  ArborXWrappers::BVH bvh(points);
+#else
+  ArborXWrappers::BVH<Point<1>> bvh(points);
+#endif
   ArborXWrappers::SphereIntersectPredicate sph_intersect(query_spheres);
   auto             indices_offsets = bvh.query(sph_intersect);
   std::vector<int> indices         = indices_offsets.first;
@@ -50,6 +53,9 @@ test_1d()
   std::vector<int> indices_ref = {0, 1, 1, 2, 1, 2, 3, 2, 3};
   std::vector<int> offsets_ref = {0, 2, 4, 7, 9};
 
+  std::cout << indices.size() << " " << indices_ref.size() << std::endl;
+  for (auto &val : indices)
+    std::cout << val << std::endl;
   AssertThrow(indices.size() == indices_ref.size(), ExcInternalError());
   AssertThrow(offsets.size() == offsets_ref.size(), ExcInternalError());
   for (unsigned int i = 0; i < offsets.size() - 1; ++i)
@@ -96,7 +102,11 @@ test_2d()
   query_spheres.push_back(std::make_pair(Point<2>(2.6, 2.6), 0.9));
 
 
-  ArborXWrappers::BVH                      bvh(points);
+#if ARBORX_VERSION_MAJOR < 2
+  ArborXWrappers::BVH bvh(points);
+#else
+  ArborXWrappers::BVH<Point<2>> bvh(points);
+#endif
   ArborXWrappers::SphereIntersectPredicate sph_intersect(query_spheres);
   auto             indices_offsets = bvh.query(sph_intersect);
   std::vector<int> indices         = indices_offsets.first;
@@ -155,7 +165,11 @@ test_3d()
   query_spheres.push_back(std::make_pair(Point<3>(2.6, 2.6, 2.6), 1.1));
 
 
-  ArborXWrappers::BVH                      bvh(points);
+#if ARBORX_VERSION_MAJOR < 2
+  ArborXWrappers::BVH bvh(points);
+#else
+  ArborXWrappers::BVH<Point<3>> bvh(points);
+#endif
   ArborXWrappers::SphereIntersectPredicate sph_intersect(query_spheres);
   auto             indices_offsets = bvh.query(sph_intersect);
   std::vector<int> indices         = indices_offsets.first;
@@ -199,7 +213,14 @@ main(int argc, char **argv)
   // Initialize ArborX
   Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv);
 
-  // tests
+  // The 1D test hits a bug in clang:
+  // https://github.com/llvm/llvm-project/issues/18060
+#if defined(DEAL_II_HAVE_FP_EXCEPTIONS)
+  {
+    const int current_fe_except = fegetexcept();
+    fedisableexcept(current_fe_except);
+  }
+#endif
   test_1d();
   test_2d();
   test_3d();

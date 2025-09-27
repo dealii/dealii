@@ -1,5 +1,0 @@
-Removed: The deprecated MatrixFree::FEEvaluation
-and MatrixFreeFaceEvaluation member function taking
-bools instead of EvaluationFlags have been removed.
-<br>
-(Daniel Arndt, 2023/07/02)

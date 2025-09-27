@@ -1,0 +1,13 @@
+filter r is: 0.251
+Starting outer step in iteration 0 with barrier parameter 25
+  Starting inner step in iteration 0 with merit function penalty multiplier 1
+    current watchdog state merit is: 252.431; target merit is 3766.57
+     found workable step within 1 to 5 iterations 
+    Checking convergence. Current rhs norm is 266.879, target is 0.25
+  Starting inner step in iteration 1 with merit function penalty multiplier 7117.96
+    current watchdog state merit is: 22725.6; target merit is 252.43
+    current watchdog state merit is: 4928.21; target merit is 252.43
+    current watchdog state merit is: 311.272; target merit is 252.43
+    current watchdog state merit is: 241.415; target merit is 252.43
+     found workable step within 1 to 5 iterations 
+

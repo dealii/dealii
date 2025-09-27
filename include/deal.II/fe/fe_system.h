@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 1999 - 2023 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 1999 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 #ifndef dealii_fe_system_h
 #define dealii_fe_system_h
@@ -80,7 +79,7 @@ class FE_Enriched;
  * tutorial programs, for example step-8, step-20, step-21, step-22, and in
  * particular in the
  * @ref vector_valued
- * module.
+ * topic.
  *
  * @dealiiVideoLecture{19,20}
  *
@@ -234,7 +233,7 @@ public:
    *
    * This constructor (or its variants below) is used in essentially all
    * tutorial programs that deal with vector valued problems. See step-8,
-   * step-20, step-22 and others for use cases. Also see the module on
+   * step-20, step-22 and others for use cases. Also see the topic on
    * @ref vector_valued "Handling vector valued problems".
    *
    * @dealiiVideoLecture{19,20}
@@ -573,11 +572,10 @@ public:
    */
   FESystem(FESystem<dim, spacedim> &&other_fe_system) noexcept
     : FiniteElement<dim, spacedim>(std::move(other_fe_system))
-  {
-    base_elements = std::move(other_fe_system.base_elements);
-    generalized_support_points_index_table =
-      std::move(other_fe_system.generalized_support_points_index_table);
-  }
+    , base_elements(std::move(other_fe_system.base_elements))
+    , generalized_support_points_index_table(
+        std::move(other_fe_system.generalized_support_points_index_table))
+  {}
 
   /**
    * Destructor.
@@ -605,7 +603,7 @@ public:
   using FiniteElement<dim, spacedim>::get_sub_fe;
 
   /**
-   * @copydoc FiniteElement<dim,spacedim>::get_sub_fe()
+   * @copydoc FiniteElement::get_sub_fe()
    */
   virtual const FiniteElement<dim, spacedim> &
   get_sub_fe(const unsigned int first_component,
@@ -670,14 +668,15 @@ public:
                        const unsigned int component) const override;
 
   /**
-   * Return the tensor of second derivatives of the @p ith shape function at
-   * point @p p on the unit cell. The derivatives are derivatives on the unit
-   * cell with respect to unit cell coordinates. Since this finite element is
-   * always vector-valued, we return the value of the only non-zero component
-   * of the vector value of this shape function. If the shape function has
-   * more than one non-zero component (which we refer to with the term non-
-   * primitive), then throw an exception of type @p
-   * ExcShapeFunctionNotPrimitive.
+   * Return the tensor of second derivatives of the @p ith shape
+   * function at point @p p on the unit cell. The derivatives are
+   * derivatives on the unit cell with respect to unit cell
+   * coordinates. Since this finite element is always vector-valued,
+   * we return the value of the only non-zero component of the vector
+   * value of this shape function. If the shape function has more than
+   * one non-zero component (which we refer to with the term
+   * non-primitive), then throw an exception of type
+   * @p ExcShapeFunctionNotPrimitive.
    *
    * An @p ExcUnitShapeValuesDoNotExist is thrown if the shape values of the
    * @p FiniteElement (corresponding to the @p ith shape function) depend on
@@ -705,8 +704,8 @@ public:
    * cell with respect to unit cell coordinates. Since this finite element is
    * always vector-valued, we return the value of the only non-zero component
    * of the vector value of this shape function. If the shape function has
-   * more than one non-zero component (which we refer to with the term non-
-   * primitive), then throw an exception of type @p
+   * more than one non-zero component (which we refer to with the term
+   * non-primitive), then throw an exception of type @p
    * ExcShapeFunctionNotPrimitive.
    *
    * An @p ExcUnitShapeValuesDoNotExist is thrown if the shape values of the
@@ -736,9 +735,9 @@ public:
    * cell with respect to unit cell coordinates. Since this finite element is
    * always vector-valued, we return the value of the only non-zero component
    * of the vector value of this shape function. If the shape function has
-   * more than one non-zero component (which we refer to with the term non-
-   * primitive), then throw an exception of type @p
-   * ExcShapeFunctionNotPrimitive.
+   * more than one non-zero component (which we refer to with the term
+   * non-primitive), then throw an exception of type
+   * @p ExcShapeFunctionNotPrimitive.
    *
    * An @p ExcUnitShapeValuesDoNotExist is thrown if the shape values of the
    * @p FiniteElement (corresponding to the @p ith shape function) depend on
@@ -880,25 +879,18 @@ public:
    * index must be between zero and dofs_per_face.
    * @param face The number of the face this degree of freedom lives on. This
    * number must be between zero and GeometryInfo::faces_per_cell.
-   * @param face_orientation One part of the description of the orientation of
-   * the face. See
-   * @ref GlossFaceOrientation.
-   * @param face_flip One part of the description of the orientation of the
-   * face. See
-   * @ref GlossFaceOrientation.
-   * @param face_rotation One part of the description of the orientation of
-   * the face. See
-   * @ref GlossFaceOrientation.
+   * @param combined_orientation The combined orientation flag containing the
+   * orientation, rotation, and flip of the face. See
+   * @ref GlossCombinedOrientation.
    * @return The index of this degree of freedom within the set of degrees of
    * freedom on the entire cell. The returned value will be between zero and
    * dofs_per_cell.
    */
   virtual unsigned int
-  face_to_cell_index(const unsigned int face_dof_index,
-                     const unsigned int face,
-                     const bool         face_orientation = true,
-                     const bool         face_flip        = false,
-                     const bool         face_rotation = false) const override;
+  face_to_cell_index(const unsigned int                 face_dof_index,
+                     const unsigned int                 face,
+                     const types::geometric_orientation combined_orientation =
+                       numbers::default_geometric_orientation) const override;
 
   /**
    * Implementation of the respective function in the base class.
@@ -1280,8 +1272,8 @@ private:
     ~InternalData() override;
 
     /**
-     * Give write-access to the pointer to a @p InternalData of the @p
-     * base_noth base element.
+     * Give write-access to the pointer to a @p InternalData of the
+     * `base_no`th base element.
      */
     void
     set_fe_data(
@@ -1289,8 +1281,8 @@ private:
       std::unique_ptr<typename FiniteElement<dim, spacedim>::InternalDataBase>);
 
     /**
-     * Give read-access to the pointer to a @p InternalData of the @p
-     * base_noth base element.
+     * Give read-access to the pointer to a @p InternalData of the
+     * `base_no`th base element.
      */
     typename FiniteElement<dim, spacedim>::InternalDataBase &
     get_fe_data(const unsigned int base_no) const;
@@ -1332,9 +1324,11 @@ private:
   };
 
   /**
-   * Mutex for protecting initialization of restriction and embedding matrix.
+   * Mutex variables used for protecting the initialization of restriction
+   * and embedding matrices.
    */
-  mutable std::mutex mutex;
+  mutable std::mutex restriction_matrix_mutex;
+  mutable std::mutex prolongation_matrix_mutex;
 
   friend class FE_Enriched<dim, spacedim>;
 };

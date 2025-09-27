@@ -1,17 +1,16 @@
-/* ---------------------------------------------------------------------
+/* ------------------------------------------------------------------------
  *
- * Copyright (C) 2008 - 2023 by the deal.II authors
+ * SPDX-License-Identifier: LGPL-2.1-or-later
+ * Copyright (C) 2017 - 2024 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
- * The deal.II library is free software; you can use it, redistribute
- * it, and/or modify it under the terms of the GNU Lesser General
- * Public License as published by the Free Software Foundation; either
- * version 2.1 of the License, or (at your option) any later version.
- * The full text of the license can be found in the file LICENSE.md at
- * the top level directory of deal.II.
+ * Part of the source code is dual licensed under Apache-2.0 WITH
+ * LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+ * governing the source code and code contributions can be found in
+ * LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
  *
- * ---------------------------------------------------------------------
+ * ------------------------------------------------------------------------
  *
  * Author: Liang Zhao and Timo Heister, Clemson University, 2016
  */
@@ -47,7 +46,6 @@
 #include <deal.II/fe/fe_values.h>
 
 #include <deal.II/numerics/vector_tools.h>
-#include <deal.II/numerics/matrix_tools.h>
 #include <deal.II/numerics/data_out.h>
 #include <deal.II/numerics/error_estimator.h>
 
@@ -117,9 +115,9 @@ namespace Step57
     const unsigned int                   degree;
     std::vector<types::global_dof_index> dofs_per_block;
 
-    Triangulation<dim> triangulation;
-    FESystem<dim>      fe;
-    DoFHandler<dim>    dof_handler;
+    Triangulation<dim>  triangulation;
+    const FESystem<dim> fe;
+    DoFHandler<dim>     dof_handler;
 
     AffineConstraints<double> zero_constraints;
     AffineConstraints<double> nonzero_constraints;
@@ -184,7 +182,7 @@ namespace Step57
   // positive definite, we can use CG to solve the corresponding linear
   // system.
   template <class PreconditionerMp>
-  class BlockSchurPreconditioner : public Subscriptor
+  class BlockSchurPreconditioner : public EnableObserverPointer
   {
   public:
     BlockSchurPreconditioner(double                           gamma,
@@ -368,7 +366,7 @@ namespace Step57
 
     system_rhs = 0;
 
-    QGauss<dim> quadrature_formula(degree + 2);
+    const QGauss<dim> quadrature_formula(degree + 2);
 
     FEValues<dim> fe_values(fe,
                             quadrature_formula,
@@ -607,7 +605,7 @@ namespace Step57
     // Transfer solution from coarse to fine mesh and apply boundary value
     // constraints to the new transferred solution. Note that present_solution
     // is still a vector corresponding to the old mesh.
-    solution_transfer.interpolate(present_solution, tmp);
+    solution_transfer.interpolate(tmp);
     nonzero_constraints.distribute(tmp);
 
     // Finally set up matrix and vectors and set the present_solution to the
@@ -788,18 +786,18 @@ namespace Step57
     f << "# y u_x u_y" << std::endl;
 
     Point<dim> p;
-    p(0) = 0.5;
-    p(1) = 0.5;
+    p[0] = 0.5;
+    p[1] = 0.5;
 
     f << std::scientific;
 
     for (unsigned int i = 0; i <= 100; ++i)
       {
-        p(dim - 1) = i / 100.0;
+        p[dim - 1] = i / 100.0;
 
         Vector<double> tmp_vector(dim + 1);
         VectorTools::point_value(dof_handler, present_solution, p, tmp_vector);
-        f << p(dim - 1);
+        f << p[dim - 1];
 
         for (int j = 0; j < dim; ++j)
           f << ' ' << tmp_vector(j);

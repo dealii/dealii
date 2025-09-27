@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2017 - 2023 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2017 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 #ifndef dealii_particles_particle_handler_h
 #define dealii_particles_particle_handler_h
@@ -20,9 +19,9 @@
 
 #include <deal.II/base/array_view.h>
 #include <deal.II/base/bounding_box.h>
+#include <deal.II/base/enable_observer_pointer.h>
 #include <deal.II/base/function.h>
-#include <deal.II/base/smartpointer.h>
-#include <deal.II/base/subscriptor.h>
+#include <deal.II/base/observer_pointer.h>
 
 #include <deal.II/distributed/tria.h>
 
@@ -37,6 +36,8 @@
 
 #include <boost/range/iterator_range.hpp>
 #include <boost/serialization/map.hpp>
+#include <boost/signals2.hpp>
+
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -57,12 +58,10 @@ namespace Particles
    *
    * For examples on how to use this class to track particles, store properties
    * on particles, and let the properties on the particles influence the
-   * finite-element solution see step-19, step-68, and step-70.
-   *
-   * @ingroup Particle
+   * finite-element solution see step-19, step-68, step-70, and step-83.
    */
   template <int dim, int spacedim = dim>
-  class ParticleHandler : public Subscriptor
+  class ParticleHandler : public EnableObserverPointer
   {
   public:
     /**
@@ -794,36 +793,10 @@ namespace Particles
     deserialize();
 
     /**
-     * Callback function that should be called before every refinement
-     * and when writing checkpoints. This function is used to
-     * register pack_callback() with the triangulation. This function
-     * is used in step-70.
-     *
-     * @deprecated Please use prepare_for_coarsening_and_refinement() or
-     * prepare_for_serialization() instead. See there for further information
-     * about the purpose of this function.
-     */
-    DEAL_II_DEPRECATED
-    void
-    register_store_callback_function();
-
-    /**
-     * Callback function that should be called after every refinement
-     * and after resuming from a checkpoint.  This function is used to
-     * register unpack_callback() with the triangulation. This function
-     * is used in step-70.
-     *
-     * @deprecated Please use unpack_after_coarsening_and_refinement() or
-     * deserialize() instead. See there for further information about the
-     * purpose of this function.
-     */
-    DEAL_II_DEPRECATED
-    void
-    register_load_callback_function(const bool serialization);
-
-    /**
      * Serialize the contents of this class using the [BOOST serialization
      * library](https://www.boost.org/doc/libs/1_74_0/libs/serialization/doc/index.html).
+     *
+     * This function is used in step-83.
      */
     template <class Archive>
     void
@@ -887,7 +860,8 @@ namespace Particles
      */
     particle_iterator
     insert_particle(
-      const typename PropertyPool<dim, spacedim>::Handle          handle,
+      const typename PropertyPool<dim, spacedim>::Handle
+        tria_attached_data_index,
       const typename Triangulation<dim, spacedim>::cell_iterator &cell);
 
     /**
@@ -905,14 +879,15 @@ namespace Particles
     /**
      * Address of the triangulation to work on.
      */
-    SmartPointer<const Triangulation<dim, spacedim>,
-                 ParticleHandler<dim, spacedim>>
+    ObserverPointer<const Triangulation<dim, spacedim>,
+                    ParticleHandler<dim, spacedim>>
       triangulation;
 
     /**
      * Address of the mapping to work on.
      */
-    SmartPointer<const Mapping<dim, spacedim>, ParticleHandler<dim, spacedim>>
+    ObserverPointer<const Mapping<dim, spacedim>,
+                    ParticleHandler<dim, spacedim>>
       mapping;
 
     /**
@@ -1016,7 +991,12 @@ namespace Particles
      * to check where the particle data was registered in the corresponding
      * triangulation object.
      */
-    unsigned int handle;
+    unsigned int tria_attached_data_index;
+
+    /**
+     * Tolerance to be used for GeometryInfo<dim>::is_inside_cell().
+     */
+    const double tolerance_inside_cell = 1e-12;
 
     /**
      * The GridTools::Cache is used to store the information about the
@@ -1318,13 +1298,15 @@ namespace Particles
   inline void
   ParticleHandler<dim, spacedim>::serialize(Archive &ar, const unsigned int)
   {
-    // Note that we do not serialize the particle data itself. Instead we
+    // Note that we do not serialize the particle data itself (i.e., the
+    // 'particles' member variable). Instead we
     // use the serialization functionality of the triangulation class, because
     // this guarantees that data is immediately shipped to new processes if
     // the domain is distributed differently after resuming from a checkpoint.
-    ar //&particles
-      &global_number_of_particles &global_max_particles_per_cell
-        &next_free_particle_index;
+    //
+    // See step-83 for how to serialize ParticleHandler objects.
+    ar &global_number_of_particles &global_max_particles_per_cell
+      &next_free_particle_index;
   }
 
 
@@ -1341,12 +1323,15 @@ namespace Particles
                     get_next_free_particle_index() * spacedim);
     for (auto &p : *this)
       {
-        Point<spacedim> new_point(displace_particles ? p.get_location() :
-                                                       Point<spacedim>());
-        const auto      id = p.get_id();
-        for (unsigned int i = 0; i < spacedim; ++i)
-          new_point[i] += input_vector[id * spacedim + i];
-        p.set_location(new_point);
+        Point<spacedim> &position = p.get_location();
+        const auto       id       = p.get_id();
+
+        if (displace_particles)
+          for (unsigned int i = 0; i < spacedim; ++i)
+            position[i] += input_vector[id * spacedim + i];
+        else
+          for (unsigned int i = 0; i < spacedim; ++i)
+            position[i] = input_vector[id * spacedim + i];
       }
     sort_particles_into_subdomains_and_cells();
   }

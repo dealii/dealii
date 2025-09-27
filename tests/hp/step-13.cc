@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2005 - 2022 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2006 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 
 
@@ -223,7 +222,7 @@ namespace LaplaceSolver
     n_dofs() const = 0;
 
   protected:
-    const SmartPointer<Triangulation<dim>> triangulation;
+    const ObserverPointer<Triangulation<dim>> triangulation;
   };
 
 
@@ -259,11 +258,11 @@ namespace LaplaceSolver
     n_dofs() const;
 
   protected:
-    const SmartPointer<const hp::FECollection<dim>> fe;
-    const SmartPointer<const hp::QCollection<dim>>  quadrature;
-    DoFHandler<dim>                                 dof_handler;
-    Vector<double>                                  solution;
-    const SmartPointer<const Function<dim>>         boundary_values;
+    const ObserverPointer<const hp::FECollection<dim>> fe;
+    const ObserverPointer<const hp::QCollection<dim>>  quadrature;
+    DoFHandler<dim>                                    dof_handler;
+    Vector<double>                                     solution;
+    const ObserverPointer<const Function<dim>>         boundary_values;
 
     virtual void
     assemble_rhs(Vector<double> &rhs) const = 0;
@@ -494,7 +493,7 @@ namespace LaplaceSolver
                  const Function<dim>         &boundary_values);
 
   protected:
-    const SmartPointer<const Function<dim>> rhs_function;
+    const ObserverPointer<const Function<dim>> rhs_function;
     virtual void
     assemble_rhs(Vector<double> &rhs) const;
   };
@@ -671,9 +670,9 @@ double
 Solution<dim>::value(const Point<dim> &p,
                      const unsigned int /*component*/) const
 {
-  double q = p(0);
+  double q = p[0];
   for (unsigned int i = 1; i < dim; ++i)
-    q += std::sin(10 * p(i) + 5 * p(0) * p(0));
+    q += std::sin(10 * p[i] + 5 * p[0] * p[0]);
   const double exponential = std::exp(q);
   return exponential;
 }
@@ -698,19 +697,19 @@ double
 RightHandSide<dim>::value(const Point<dim> &p,
                           const unsigned int /*component*/) const
 {
-  double q = p(0);
+  double q = p[0];
   for (unsigned int i = 1; i < dim; ++i)
-    q += std::sin(10 * p(i) + 5 * p(0) * p(0));
+    q += std::sin(10 * p[i] + 5 * p[0] * p[0]);
   const double u  = std::exp(q);
   double       t1 = 1, t2 = 0, t3 = 0;
   for (unsigned int i = 1; i < dim; ++i)
     {
-      t1 += std::cos(10 * p(i) + 5 * p(0) * p(0)) * 10 * p(0);
-      t2 += 10 * std::cos(10 * p(i) + 5 * p(0) * p(0)) -
-            100 * std::sin(10 * p(i) + 5 * p(0) * p(0)) * p(0) * p(0);
-      t3 += 100 * std::cos(10 * p(i) + 5 * p(0) * p(0)) *
-              std::cos(10 * p(i) + 5 * p(0) * p(0)) -
-            100 * std::sin(10 * p(i) + 5 * p(0) * p(0));
+      t1 += std::cos(10 * p[i] + 5 * p[0] * p[0]) * 10 * p[0];
+      t2 += 10 * std::cos(10 * p[i] + 5 * p[0] * p[0]) -
+            100 * std::sin(10 * p[i] + 5 * p[0] * p[0]) * p[0] * p[0];
+      t3 += 100 * std::cos(10 * p[i] + 5 * p[0] * p[0]) *
+              std::cos(10 * p[i] + 5 * p[0] * p[0]) -
+            100 * std::sin(10 * p[i] + 5 * p[0] * p[0]);
     };
   t1 = t1 * t1;
 
@@ -725,11 +724,11 @@ run_simulation(
   LaplaceSolver::Base<dim>                           &solver,
   const std::list<Evaluation::EvaluationBase<dim> *> &postprocessor_list)
 {
-  deallog << "Refinement cycle: ";
+  deallog << "Refinement cycle: " << std::endl;
 
   for (unsigned int step = 0; true; ++step)
     {
-      deallog << step << ' ' << std::flush;
+      deallog << step << ' ' << std::endl;
 
       solver.solve_problem();
 

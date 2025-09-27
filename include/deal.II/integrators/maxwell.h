@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2010 - 2023 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2010 - 2024 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 #ifndef dealii_integrators_maxwell_h
 #define dealii_integrators_maxwell_h
@@ -73,7 +72,9 @@ namespace LocalIntegrators
      * \partial_1\partial_2 u_2 - \partial_2^2 u_1 \\
      * \partial_1\partial_2 u_1 - \partial_1^2 u_2
      * \end{pmatrix}
-     *
+     * @f]
+     * and
+     * @f[
      * \nabla\times\nabla\times \mathbf u = \begin{pmatrix}
      * \partial_1\partial_2 u_2 + \partial_1\partial_3 u_3
      * - (\partial_2^2+\partial_3^2) u_1 \\
@@ -81,17 +82,17 @@ namespace LocalIntegrators
      * - (\partial_3^2+\partial_1^2) u_2 \\
      * \partial_3\partial_1 u_1 + \partial_3\partial_2 u_2
      * - (\partial_1^2+\partial_2^2) u_3
-     * \end{pmatrix}
+     * \end{pmatrix}.
      * @f]
      *
      * @note The third tensor argument is not used in two dimensions and can
      * for instance duplicate one of the previous.
      */
     template <int dim>
-    Tensor<1, dim>
-    curl_curl(const Tensor<2, dim> &h0,
-              const Tensor<2, dim> &h1,
-              const Tensor<2, dim> &h2)
+    DEAL_II_DEPRECATED Tensor<1, dim>
+                       curl_curl(const Tensor<2, dim> &h0,
+                                 const Tensor<2, dim> &h1,
+                                 const Tensor<2, dim> &h2)
     {
       Tensor<1, dim> result;
       switch (dim)
@@ -106,7 +107,7 @@ namespace LocalIntegrators
             result[2] = h0[2][0] + h1[2][1] - h2[0][0] - h2[1][1];
             break;
           default:
-            Assert(false, ExcNotImplemented());
+            DEAL_II_NOT_IMPLEMENTED();
         }
       return result;
     }
@@ -122,11 +123,11 @@ namespace LocalIntegrators
      * for instance duplicate one of the previous.
      */
     template <int dim>
-    Tensor<1, dim>
-    tangential_curl(const Tensor<1, dim> &g0,
-                    const Tensor<1, dim> &g1,
-                    const Tensor<1, dim> &g2,
-                    const Tensor<1, dim> &normal)
+    DEAL_II_DEPRECATED Tensor<1, dim>
+                       tangential_curl(const Tensor<1, dim> &g0,
+                                       const Tensor<1, dim> &g1,
+                                       const Tensor<1, dim> &g2,
+                                       const Tensor<1, dim> &normal)
     {
       Tensor<1, dim> result;
 
@@ -145,7 +146,7 @@ namespace LocalIntegrators
               normal[1] * (g1[0] - g2[1]) + normal[0] * (g0[2] - g2[0]);
             break;
           default:
-            Assert(false, ExcNotImplemented());
+            DEAL_II_NOT_IMPLEMENTED();
         }
       return result;
     }
@@ -159,7 +160,7 @@ namespace LocalIntegrators
      * in weak form.
      */
     template <int dim>
-    void
+    DEAL_II_DEPRECATED void
     curl_curl_matrix(FullMatrix<double>      &M,
                      const FEValuesBase<dim> &fe,
                      const double             factor = 1.)
@@ -212,7 +213,7 @@ namespace LocalIntegrators
      * functions.
      */
     template <int dim>
-    void
+    DEAL_II_DEPRECATED void
     curl_matrix(FullMatrix<double>      &M,
                 const FEValuesBase<dim> &fe,
                 const FEValuesBase<dim> &fetest,
@@ -324,7 +325,7 @@ namespace LocalIntegrators
      * @f]
      */
     template <int dim>
-    void
+    DEAL_II_DEPRECATED void
     tangential_trace_matrix(FullMatrix<double>      &M,
                             const FEValuesBase<dim> &fe,
                             double                   factor = 1.)
@@ -381,7 +382,7 @@ namespace LocalIntegrators
      * @f]
      */
     template <int dim>
-    inline void
+    DEAL_II_DEPRECATED inline void
     ip_curl_matrix(FullMatrix<double>      &M11,
                    FullMatrix<double>      &M12,
                    FullMatrix<double>      &M21,

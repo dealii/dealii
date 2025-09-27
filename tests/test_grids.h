@@ -1,23 +1,23 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2006 - 2021 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2006 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 #include <deal.II/base/point.h>
 
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/tria_accessor.h>
+#include <deal.II/grid/tria_description.h>
 #include <deal.II/grid/tria_iterator.h>
 
 #include <vector>
@@ -81,7 +81,7 @@ namespace TestGrids
                 const Point<dim> &p        = cell->center();
                 bool              negative = true;
                 for (unsigned int d = 0; d < dim; ++d)
-                  if (p(d) >= 0.)
+                  if (p[d] >= 0.)
                     negative = false;
                 if (negative)
                   cell->set_refine_flag();
@@ -139,7 +139,7 @@ namespace TestGrids
    * x-coordinate direction.
    *
    * The domain this grid represents covers $[0,n_cells] \times [0,1]^{d-1}$.
-   * Thus, integer division of the x-cordinate $x // 1$ on any point in this
+   * Thus, integer division of the x-coordinate $x // 1$ on any point in this
    * triangulation gives you the index of the cell the point is located in.
    */
   template <int dim, int spacedim>

@@ -1,5 +1,3 @@
-<br>
-
 <i>
 This program was written for fun by David Neckels (NCAR) while working
 at Sandia (on the Wyoming Express bus to and from Corrales each day).
@@ -31,7 +29,7 @@ can be solved more efficiently.
 
 
 
-<a name="Intro"></a> <h1>Introduction</h1>
+<a name="step_33-Intro"></a> <h1>Introduction</h1>
 
 <h3>Euler flow</h3>
 
@@ -98,7 +96,7 @@ specific heats is $\gamma=1.4$.
 
 This problem obviously falls into the class of vector-valued
 problems. A general overview of how to deal with these problems in
-deal.II can be found in the @ref vector_valued module.
+deal.II can be found in the @ref vector_valued topic.
 
 <h3>Discretization</h3>
 
@@ -191,7 +189,7 @@ $\mathbf z$, we arrive at a linear system for $\delta \mathbf W$:
 This linear system is, in general, neither symmetric nor has any
 particular definiteness properties. We will either use a direct solver
 or Trilinos' GMRES implementation to solve it. As will become apparent from
-the <a href="#Results">results shown below</a>, this fully implicit iteration
+the @ref step_33-ResultsSection "results shown below", this fully implicit iteration
 converges very rapidly (typically in 3 steps) and with the quadratic
 convergence order expected from a Newton method.
 
@@ -346,7 +344,7 @@ if the author's advisor heard about it, the author would likely be exiled foreve
 
 We use an input file deck to drive the simulation.  In this way, we can alter the boundary conditions
 and other important properties of the simulation without having to recompile.  For more information on
-the format, look at the <a href="#Results">results section</a>, where we
+the format, look at the @ref step_33-ResultsSection "results section", where we
 describe an example input file in more detail.
 
 In previous example programs, we have usually hard-coded the initial
@@ -391,6 +389,6 @@ correctly done, and consequently nothing in the <code>ConservationLaw</code>
 would have to be modified.
 
 Similarly, if we wanted to improve on the linear or nonlinear solvers, or on
-the time stepping scheme (as hinted at the end of the <a
-href="#Results">results section</a>), then this would not require changes in
+the time stepping scheme (as hinted at the end of the
+@ref step_33-ResultsSection "results section"), then this would not require changes in
 the <code>EulerEquations</code> at all.

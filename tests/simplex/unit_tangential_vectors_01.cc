@@ -1,20 +1,19 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2020 - 2021 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2020 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 
-// Test ReferenceCell::unit_tangential_vectors() and ::unit_normal_vectors()
+// Test ReferenceCell::face_tangent_vector() and ::face_normal_vector()
 // for all reference-cell types.
 
 
@@ -24,7 +23,6 @@
 
 #include "../tests.h"
 
-using namespace dealii;
 
 template <int dim>
 void
@@ -32,12 +30,11 @@ test(const ReferenceCell &reference_cell)
 {
   for (const auto face_no : reference_cell.face_indices())
     {
-      deallog << reference_cell.template unit_normal_vectors<dim>(face_no)
+      deallog << reference_cell.template face_normal_vector<dim>(face_no)
               << std::endl;
 
       for (unsigned int i = 0; i < dim - 1; ++i)
-        deallog << reference_cell.template unit_tangential_vectors<dim>(face_no,
-                                                                        i)
+        deallog << reference_cell.template face_tangent_vector<dim>(face_no, i)
                 << std::endl;
     }
   deallog << std::endl;

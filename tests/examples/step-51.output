@@ -1,0 +1,75 @@
+Solving with Q1 elements, adaptive refinement
+=============================================
+
+Cycle 0:
+   Number of degrees of freedom: 80
+Solver stopped within 34 - 173 iterations
+Cycle 1:
+   Number of degrees of freedom: 148
+Solver stopped within 34 - 173 iterations
+Cycle 2:
+   Number of degrees of freedom: 248
+Solver stopped within 34 - 173 iterations
+Cycle 3:
+   Number of degrees of freedom: 516
+Solver stopped within 34 - 173 iterations
+Cycle 4:
+   Number of degrees of freedom: 992
+Solver stopped within 34 - 173 iterations
+cells dofs  val L2    grad L2  val L2-post 
+   16   80 1.804e+01 2.207e+01   1.798e+01 
+   28  148 1.151e+01 1.484e+01   1.144e+01 
+   52  248 9.875e-01 4.266e+00   7.229e-01 
+   97  516 3.814e-01 1.608e+00   3.181e-01 
+  193  992 1.325e-01 1.085e+00   7.341e-02 
+
+Solving with Q1 elements, global refinement
+===========================================
+
+Cycle 0:
+   Number of degrees of freedom: 80
+Solver stopped within 34 - 173 iterations
+Cycle 1:
+   Number of degrees of freedom: 168
+Solver stopped within 34 - 173 iterations
+Cycle 2:
+   Number of degrees of freedom: 288
+Solver stopped within 34 - 173 iterations
+Cycle 3:
+   Number of degrees of freedom: 624
+Solver stopped within 34 - 173 iterations
+Cycle 4:
+   Number of degrees of freedom: 1088
+Solver stopped within 34 - 173 iterations
+cells dofs     val L2        grad L2      val L2-post   
+   16   80 1.804e+01    - 2.207e+01    - 1.798e+01    - 
+   36  168 6.125e+00 2.66 9.472e+00 2.09 6.084e+00 2.67 
+   64  288 9.785e-01 6.38 4.260e+00 2.78 7.102e-01 7.47 
+  144  624 2.730e-01 3.15 1.866e+00 2.04 6.115e-02 6.05 
+  256 1088 1.493e-01 2.10 1.046e+00 2.01 2.880e-02 2.62 
+
+Solving with Q3 elements, global refinement
+===========================================
+
+Cycle 0:
+   Number of degrees of freedom: 160
+Solver stopped within 34 - 173 iterations
+Cycle 1:
+   Number of degrees of freedom: 336
+Solver stopped within 34 - 173 iterations
+Cycle 2:
+   Number of degrees of freedom: 576
+Solver stopped within 34 - 173 iterations
+Cycle 3:
+   Number of degrees of freedom: 1248
+Solver stopped within 34 - 173 iterations
+Cycle 4:
+   Number of degrees of freedom: 2176
+Solver stopped within 34 - 173 iterations
+cells dofs     val L2        grad L2      val L2-post   
+   16  160 3.613e-01    - 1.891e+00    - 3.020e-01    - 
+   36  336 6.411e-02 4.26 5.081e-01 3.24 3.238e-02 5.51 
+   64  576 3.480e-02 2.12 2.533e-01 2.42 5.277e-03 6.31 
+  144 1248 8.297e-03 3.54 5.924e-02 3.58 6.330e-04 5.23 
+  256 2176 2.254e-03 4.53 1.636e-02 4.47 1.403e-04 5.24 
+

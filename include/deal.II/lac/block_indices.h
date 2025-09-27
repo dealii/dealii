@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2000 - 2022 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2000 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 #ifndef dealii_block_indices_h
 #define dealii_block_indices_h
@@ -19,9 +18,10 @@
 
 #include <deal.II/base/config.h>
 
+#include <deal.II/base/enable_observer_pointer.h>
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/logstream.h>
-#include <deal.II/base/subscriptor.h>
+#include <deal.II/base/types.h>
 
 #include <algorithm>
 #include <cstddef>
@@ -57,7 +57,7 @@ DEAL_II_NAMESPACE_OPEN
  * @see
  * @ref GlossBlockLA "Block (linear algebra)"
  */
-class BlockIndices : public Subscriptor
+class BlockIndices : public EnableObserverPointer
 {
 public:
   /**
@@ -205,7 +205,7 @@ public:
    * Swap the contents of these two objects.
    */
   void
-  swap(BlockIndices &b);
+  swap(BlockIndices &b) noexcept;
 
   /**
    * Determine an estimate for the memory consumption (in bytes) of this
@@ -442,7 +442,7 @@ BlockIndices::operator==(const BlockIndices &b) const
 
 
 inline void
-BlockIndices::swap(BlockIndices &b)
+BlockIndices::swap(BlockIndices &b) noexcept
 {
   std::swap(n_blocks, b.n_blocks);
   std::swap(start_indices, b.start_indices);
@@ -469,7 +469,7 @@ BlockIndices::memory_consumption() const
  * @relatesalso BlockIndices
  */
 inline void
-swap(BlockIndices &u, BlockIndices &v)
+swap(BlockIndices &u, BlockIndices &v) noexcept
 {
   u.swap(v);
 }

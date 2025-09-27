@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2020 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2020 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE at
-// the top level of the deal.II distribution.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 
 // Check that one can perform substitution of symbolic derivatives that
@@ -20,7 +19,7 @@
 // See tests/symengine/basic_06.cc and tests/symengine/basic_07.cc for
 // a more simple example of differentiation of symbols with
 // explicit/implicit relationships.
-// We invoke the batch optimzer before symbolic evaluation takes place.
+// We invoke the batch optimizer before symbolic evaluation takes place.
 //
 // Here we use only dictionary substitution, and invoke no symbolic
 // optimizations.

@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2004 - 2023 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2004 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 
 #include <deal.II/base/logstream.h>
@@ -33,7 +32,7 @@
         PetscErrorCode ierr = (code);                \
         AssertThrow(ierr == 0, ExcPETScError(ierr)); \
       }                                              \
-    while (0)
+    while (false)
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -195,7 +194,7 @@ namespace PETScWrappers
           break;
 
         default:
-          Assert(false, ExcNotImplemented());
+          DEAL_II_NOT_IMPLEMENTED();
       }
 
     PetscFunctionReturn(PETSC_SUCCESS);
@@ -262,13 +261,6 @@ namespace PETScWrappers
 
 
 
-  SolverRichardson::SolverRichardson(SolverControl &cn,
-                                     const MPI_Comm,
-                                     const AdditionalData &data)
-    : SolverRichardson(cn, data)
-  {}
-
-
   void
   SolverRichardson::set_solver_type(KSP &ksp) const
   {
@@ -312,13 +304,6 @@ namespace PETScWrappers
   {}
 
 
-  SolverChebychev::SolverChebychev(SolverControl &cn,
-                                   const MPI_Comm,
-                                   const AdditionalData &data)
-    : SolverChebychev(cn, data)
-  {}
-
-
   void
   SolverChebychev::set_solver_type(KSP &ksp) const
   {
@@ -336,13 +321,6 @@ namespace PETScWrappers
   SolverCG::SolverCG(SolverControl &cn, const AdditionalData &data)
     : SolverBase(cn)
     , additional_data(data)
-  {}
-
-
-  SolverCG::SolverCG(SolverControl &cn,
-                     const MPI_Comm,
-                     const AdditionalData &data)
-    : SolverCG(cn, data)
   {}
 
 
@@ -365,12 +343,6 @@ namespace PETScWrappers
     , additional_data(data)
   {}
 
-
-  SolverBiCG::SolverBiCG(SolverControl &cn,
-                         const MPI_Comm,
-                         const AdditionalData &data)
-    : SolverBiCG(cn, data)
-  {}
 
 
   void
@@ -402,12 +374,6 @@ namespace PETScWrappers
   {}
 
 
-  SolverGMRES::SolverGMRES(SolverControl &cn,
-                           const MPI_Comm,
-                           const AdditionalData &data)
-    : SolverGMRES(cn, data)
-  {}
-
 
   void
   SolverGMRES::set_solver_type(KSP &ksp) const
@@ -437,13 +403,6 @@ namespace PETScWrappers
   {}
 
 
-  SolverBicgstab::SolverBicgstab(SolverControl &cn,
-                                 const MPI_Comm,
-                                 const AdditionalData &data)
-    : SolverBicgstab(cn, data)
-  {}
-
-
   void
   SolverBicgstab::set_solver_type(KSP &ksp) const
   {
@@ -461,13 +420,6 @@ namespace PETScWrappers
   SolverCGS::SolverCGS(SolverControl &cn, const AdditionalData &data)
     : SolverBase(cn)
     , additional_data(data)
-  {}
-
-
-  SolverCGS::SolverCGS(SolverControl &cn,
-                       const MPI_Comm,
-                       const AdditionalData &data)
-    : SolverCGS(cn, data)
   {}
 
 
@@ -491,13 +443,6 @@ namespace PETScWrappers
   {}
 
 
-  SolverTFQMR::SolverTFQMR(SolverControl &cn,
-                           const MPI_Comm,
-                           const AdditionalData &data)
-    : SolverTFQMR(cn, data)
-  {}
-
-
   void
   SolverTFQMR::set_solver_type(KSP &ksp) const
   {
@@ -515,13 +460,6 @@ namespace PETScWrappers
   SolverTCQMR::SolverTCQMR(SolverControl &cn, const AdditionalData &data)
     : SolverBase(cn)
     , additional_data(data)
-  {}
-
-
-  SolverTCQMR::SolverTCQMR(SolverControl &cn,
-                           const MPI_Comm,
-                           const AdditionalData &data)
-    : SolverTCQMR(cn, data)
   {}
 
 
@@ -545,13 +483,6 @@ namespace PETScWrappers
   {}
 
 
-  SolverCR::SolverCR(SolverControl &cn,
-                     const MPI_Comm,
-                     const AdditionalData &data)
-    : SolverCR(cn, data)
-  {}
-
-
   void
   SolverCR::set_solver_type(KSP &ksp) const
   {
@@ -569,14 +500,6 @@ namespace PETScWrappers
   SolverLSQR::SolverLSQR(SolverControl &cn, const AdditionalData &data)
     : SolverBase(cn)
     , additional_data(data)
-  {}
-
-
-
-  SolverLSQR::SolverLSQR(SolverControl &cn,
-                         const MPI_Comm,
-                         const AdditionalData &data)
-    : SolverLSQR(cn, data)
   {}
 
 
@@ -608,12 +531,6 @@ namespace PETScWrappers
   {}
 
 
-  SolverPreOnly::SolverPreOnly(SolverControl &cn,
-                               const MPI_Comm,
-                               const AdditionalData &data)
-    : SolverPreOnly(cn, data)
-  {}
-
 
   void
   SolverPreOnly::set_solver_type(KSP &ksp) const
@@ -644,14 +561,6 @@ namespace PETScWrappers
     : SolverBase(cn)
     , additional_data(data)
     , symmetric_mode(false)
-  {}
-
-
-
-  SparseDirectMUMPS::SparseDirectMUMPS(SolverControl &cn,
-                                       const MPI_Comm,
-                                       const AdditionalData &data)
-    : SparseDirectMUMPS(cn, data)
   {}
 
 
@@ -801,8 +710,6 @@ namespace PETScWrappers
         "the MUMPS package necessary for this solver. You will need to configure "
         "PETSc so that it includes MUMPS, recompile it, and then re-configure "
         "and recompile deal.II as well."));
-
-    // Cast to void to silence compiler warnings
     (void)A;
     (void)x;
     (void)b;
@@ -812,9 +719,9 @@ namespace PETScWrappers
 
 
   void
-  SparseDirectMUMPS::set_symmetric_mode(const bool flag)
+  SparseDirectMUMPS::set_symmetric_mode(const bool matrix_is_symmetric)
   {
-    symmetric_mode = flag;
+    symmetric_mode = matrix_is_symmetric;
   }
 
 } // namespace PETScWrappers

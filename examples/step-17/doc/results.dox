@@ -122,8 +122,8 @@ Here is some output generated in the 12th cycle of the program, i.e. with roughl
 
 <table align="center" style="width:80%">
   <tr>
-    <td><img src="https://www.dealii.org/images/steps/developer/step-17.12-ux.png" alt="" width="100%"></td>
-    <td><img src="https://www.dealii.org/images/steps/developer/step-17.12-uy.png" alt="" width="100%"></td>
+    <td><img src="https://dealii.org/images/steps/developer/step-17.12-ux.png" alt="" width="100%"></td>
+    <td><img src="https://dealii.org/images/steps/developer/step-17.12-uy.png" alt="" width="100%"></td>
   </tr>
 </table>
 
@@ -136,8 +136,8 @@ though, is to look at the mesh and partition at this step:
 
 <table align="center" width="80%">
   <tr>
-    <td><img src="https://www.dealii.org/images/steps/developer/step-17.12-grid.png" alt="" width="100%"></td>
-    <td><img src="https://www.dealii.org/images/steps/developer/step-17.12-partition.png" alt="" width="100%"></td>
+    <td><img src="https://dealii.org/images/steps/developer/step-17.12-grid.png" alt="" width="100%"></td>
+    <td><img src="https://dealii.org/images/steps/developer/step-17.12-partition.png" alt="" width="100%"></td>
   </tr>
 </table>
 
@@ -219,8 +219,8 @@ we contend ourselves with showing output from cycle 4:
 
 <table width="80%" align="center">
   <tr>
-    <td><img src="https://www.dealii.org/images/steps/developer/step-17.4-3d-partition.png" width="100%" alt=""></td>
-    <td><img src="https://www.dealii.org/images/steps/developer/step-17.4-3d-ux.png" alt="" width="100%"></td>
+    <td><img src="https://dealii.org/images/steps/developer/step-17.4-3d-partition.png" width="100%" alt=""></td>
+    <td><img src="https://dealii.org/images/steps/developer/step-17.4-3d-ux.png" alt="" width="100%"></td>
   </tr>
 </table>
 
@@ -231,7 +231,7 @@ the right one shows the x-displacement along two cutplanes through the cube.
 
 
 
-<a name="extensions"></a>
+<a name="step-17-extensions"></a>
 <h3>Possibilities for extensions</h3>
 
 The program keeps a complete copy of the Triangulation and DoFHandler objects
@@ -242,7 +242,7 @@ the bottleneck as far as parallelization is concerned.
 Internally, within deal.II, parallelizing the data
 structures used in hierarchic and unstructured triangulations is a hard
 problem, and it took us a few more years to make this happen. The step-40
-tutorial program and the @ref distributed documentation module talk about how
+tutorial program and the @ref distributed documentation topic talk about how
 to do these steps and what it takes from an application perspective. An
 obvious extension of the current program would be to use this functionality to
 completely distribute computations to many more processors than used here.

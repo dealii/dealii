@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2021 - 2023 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2022 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/grid_tools.h>
@@ -242,15 +241,15 @@ namespace
     Manifold<dim, spacedim>::push_forward(const Point<3> &chart_point) const
     {
       // Rotate the orthogonal direction by the given angle.
-      const double sine_r   = chart_point(0) * std::sin(chart_point(1));
-      const double cosine_r = chart_point(0) * std::cos(chart_point(1));
+      const double sine_r   = chart_point[0] * std::sin(chart_point[1]);
+      const double cosine_r = chart_point[0] * std::cos(chart_point[1]);
 
       const Tensor<1, spacedim> intermediate =
         normal_direction * cosine_r + dxn * sine_r;
 
       // Map the axial coordinate back to the pipe segment.
       const double lambda =
-        chart_point(2) * compute_z_expansion(cosine_r, sine_r, data);
+        chart_point[2] * compute_z_expansion(cosine_r, sine_r, data);
 
       // Finally, put everything together.
       return point_on_axis + direction * lambda + intermediate;
@@ -269,7 +268,7 @@ namespace GridGenerator
                 const std::pair<Point<spacedim>, double> &,
                 const double)
   {
-    Assert(false, ExcNotImplemented());
+    DEAL_II_NOT_IMPLEMENTED();
   }
 
 
@@ -291,15 +290,17 @@ namespace GridGenerator
     constexpr unsigned int n_pipes   = 3;
     constexpr double       tolerance = 1.e-12;
 
-#  ifdef DEBUG
-    // Verify user input.
-    Assert(bifurcation.second > 0,
-           ExcMessage("Invalid input: negative radius."));
-    Assert(openings.size() == n_pipes,
-           ExcMessage("Invalid input: only 3 openings allowed."));
-    for (const auto &opening : openings)
-      Assert(opening.second > 0, ExcMessage("Invalid input: negative radius."));
-#  endif
+    if constexpr (running_in_debug_mode())
+      {
+        // Verify user input.
+        Assert(bifurcation.second > 0,
+               ExcMessage("Invalid input: negative radius."));
+        Assert(openings.size() == n_pipes,
+               ExcMessage("Invalid input: only 3 openings allowed."));
+        for (const auto &opening : openings)
+          Assert(opening.second > 0,
+                 ExcMessage("Invalid input: negative radius."));
+      }
 
     // Each pipe segment will be identified by the index of its opening in the
     // parameter array. To determine the next and previous entry in the array
@@ -614,6 +615,7 @@ namespace GridGenerator
 
     for (unsigned int p = 0; p < n_pipes; ++p)
       tria.set_manifold(p, manifolds[p]);
+    tria.set_manifold(n_pipes, FlatManifold<3>());
 
     // Since GridGenerator::merge_triangulations() does not copy boundary IDs
     // either, we need to set them after the final geometry is created. Luckily,
@@ -639,6 +641,6 @@ namespace GridGenerator
 
 
 // explicit instantiations
-#include "grid_generator_pipe_junction.inst"
+#include "grid/grid_generator_pipe_junction.inst"
 
 DEAL_II_NAMESPACE_CLOSE

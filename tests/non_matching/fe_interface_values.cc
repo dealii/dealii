@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2022 - 2023 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2022 - 2024 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE at
-// the top level of the deal.II distribution.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/function_signed_distance.h>
@@ -30,7 +29,6 @@
 
 #include "../tests.h"
 
-using namespace dealii;
 
 // Set up a triangulation with 2 elements in a row: |-0-|-1-|, over
 // [0,2]x[0,1]^{dim-1}, and a level set  function with a cut in the plane
@@ -57,9 +55,11 @@ private:
   void
   setup_discrete_level_set();
 
+  template <typename IteratorType>
   void
   print_which_optionals_have_values_on_cell_0(
-    NonMatching::FEInterfaceValues<dim> &fe_values);
+    NonMatching::FEInterfaceValues<dim> &fe_values,
+    IteratorType                         cell);
 
   Triangulation<dim>    triangulation;
   hp::FECollection<dim> fe_collection;
@@ -108,7 +108,10 @@ Test<dim>::run()
                                                   mesh_classifier,
                                                   dof_handler,
                                                   level_set);
-    print_which_optionals_have_values_on_cell_0(fe_values);
+    print_which_optionals_have_values_on_cell_0(fe_values,
+                                                triangulation.begin_active());
+    print_which_optionals_have_values_on_cell_0(fe_values,
+                                                dof_handler.begin_active());
   }
   {
     deallog << "Advanced constructor:" << std::endl;
@@ -120,7 +123,10 @@ Test<dim>::run()
                                                   mesh_classifier,
                                                   dof_handler,
                                                   level_set);
-    print_which_optionals_have_values_on_cell_0(fe_values);
+    print_which_optionals_have_values_on_cell_0(fe_values,
+                                                triangulation.begin_active());
+    print_which_optionals_have_values_on_cell_0(fe_values,
+                                                dof_handler.begin_active());
   }
 }
 
@@ -168,12 +174,12 @@ Test<dim>::setup_discrete_level_set()
 
 
 template <int dim>
+template <typename IteratorType>
 void
 Test<dim>::print_which_optionals_have_values_on_cell_0(
-  NonMatching::FEInterfaceValues<dim> &fe_values)
+  NonMatching::FEInterfaceValues<dim> &fe_values,
+  IteratorType                         cell)
 {
-  const auto cell = dof_handler.begin_active();
-
   for (const unsigned int face_index : cell->face_indices())
     {
       deallog << "face " << face_index << std::endl;

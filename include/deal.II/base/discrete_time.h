@@ -1,22 +1,24 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2019 - 2022 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2020 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 #ifndef dealii_discrete_time_h
 #define dealii_discrete_time_h
 
 #include <deal.II/base/config.h>
+
+#include <cstddef>
+
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -26,7 +28,8 @@ DEAL_II_NAMESPACE_OPEN
  * $T_{\text{start}}$ to an end time $T_{\text{end}}$. It also allows adjusting
  * the time step size during the simulation. This class provides the necessary
  * interface to be incorporated in any time-dependent simulation.
- * The usage of this class is demonstrated in step-19 and step-21.
+ * The usage of this class is demonstrated in step-19 (and step-83) as well as
+ * step-21.
  *
  * This class provides a number of invariants that are guaranteed to be
  * true at all times.
@@ -394,6 +397,24 @@ public:
   void
   restart();
 
+  /**
+   * Determine an estimate for the memory consumption (in bytes) of this
+   * object.
+   */
+  std::size_t
+  memory_consumption() const;
+
+  /**
+   * Write or read the data of this object to or from a stream for the purpose
+   * of serialization using the [BOOST serialization
+   * library](https://www.boost.org/doc/libs/1_74_0/libs/serialization/doc/index.html).
+   *
+   * This function is used in step-83.
+   */
+  template <class Archive>
+  void
+  serialize(Archive &ar, const unsigned int version);
+
 private:
   /**
    * The beginning of the time interval.
@@ -523,6 +544,20 @@ DiscreteTime::get_step_number() const
   return step_number;
 }
 
+
+
+template <class Archive>
+inline void
+DiscreteTime::serialize(Archive &ar, const unsigned int)
+{
+  ar &start_time;
+  ar &end_time;
+  ar &current_time;
+  ar &next_time;
+  ar &previous_time;
+  ar &start_step_size;
+  ar &step_number;
+}
 
 DEAL_II_NAMESPACE_CLOSE
 

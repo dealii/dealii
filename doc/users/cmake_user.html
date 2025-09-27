@@ -65,7 +65,7 @@
 <pre class="cmake">
 cmake_minimum_required(VERSION 3.13.4)
 
-find_package(deal.II 9.5.0 REQUIRED
+find_package(deal.II 9.8.0 REQUIRED
   HINTS ${DEAL_II_DIR} ../ ../../ $ENV{DEAL_II_DIR}
   )
 deal_ii_initialize_cached_variables()
@@ -86,7 +86,7 @@ deal_ii_setup_target(mycode)
 <p>
   Next, we find our deal.II installation with the help of the
   <code>FIND_PACKAGE</code> command. In this case requiring at least
-  version 9.0.0. The <code>HINTS</code> are a list of directories where the
+  version 9.8.0. The <code>HINTS</code> are a list of directories where the
   install directory of deal.II is likely to be found. First, the location
   possibly defined in the CMake variable <code>DEAL_II_DIR</code> is
   considered. After that, we check whether we are in a subdirectory (first
@@ -272,7 +272,7 @@ In this case the top level <code>CMakeLists.txt</code> file may be:
 <pre class="cmake">
 # top level CMakeLists.txt
 cmake_minimum_required(VERSION 3.13.4)
-find_package(deal.II 9.5.0 REQUIRED)
+find_package(deal.II 9.8.0 REQUIRED)
 
 deal_ii_initialize_cached_variables()
 project(myproject)
@@ -500,7 +500,7 @@ The <code>DEAL_II_INITIALIZE_CACHED_VARIABLES</code> macro is responsible
 for setting up cached variables and has to invoked before the
 <code>PROJECT</code> call:
 <pre class="cmake">
-find_package(deal.II 9.5.0 REQUIRED)
+find_package(deal.II 9.8.0 REQUIRED)
 
 deal_ii_initialize_cached_variables()
 
@@ -644,7 +644,7 @@ INSTALL(DIRECTORY run DESTINATION share/mycode/run)
 </p>
 
 <pre class="cmake">
-find_package(deal.II 9.5.0 REQUIRED
+find_package(deal.II 9.8.0 REQUIRED
   HINTS
     ${DEAL_II_DIR} ../ ../../ $ENV{DEAL_II_DIR}
     # You can specify additional hints for search paths here, e.g.
@@ -815,8 +815,6 @@ DEAL_II_MPIEXEC_POSTFLAGS
 # Information about include directories and libraries
 #
 
-DEAL_II_INCLUDE_DIRS
-
 DEAL_II_LIBRARIES_DEBUG   - a list of the full link interface for the debug configuration
 DEAL_II_LIBRARIES_RELEASE - a list of the full link interface for the release configuration
 DEAL_II_LIBRARIES         - full list of libraries with "debug" and "optimized" keywords
@@ -844,7 +842,6 @@ DEAL_II_WITH_ADOLC
 DEAL_II_WITH_ARPACK
 DEAL_II_WITH_ASSIMP
 DEAL_II_WITH_COMPLEX_VALUES
-DEAL_II_WITH_CUDA
 DEAL_II_WITH_GINKGO
 DEAL_II_WITH_GMSH
 DEAL_II_WITH_GSL
@@ -854,6 +851,7 @@ LAPACK_WITH_64BIT_BLAS_INDICES
 DEAL_II_LAPACK_WITH_MKL
 DEAL_II_WITH_METIS
 DEAL_II_WITH_MPI
+DEAL_II_WITH_MUMPS
 DEAL_II_WITH_MUPARSER
 DEAL_II_WITH_OPENCASCADE
 DEAL_II_WITH_P4EST

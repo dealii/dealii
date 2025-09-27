@@ -1,5 +1,3 @@
-<br>
-
 <i>
 This program grew out of a student project by Sven Wetterauer at the
 University of Heidelberg, Germany. Most of the work for this program
@@ -8,7 +6,7 @@ is by him.
 <br>
 
 
-<a name="Intro"></a>
+<a name="step_15-Intro"></a>
 <h1>Introduction</h1>
 
 <h3>Foreword</h3>
@@ -99,9 +97,9 @@ u^{0}=g$ in the first step and with $\delta u^{n}=0$ in all the following steps.
   implements $F(u)$, it is duplicative to also have to implement
   $F'(u,\delta)$. As always, duplication tempts bugs and we would like
   to avoid it. While we do not explore this issue in this program, we
-  will come back to it at the end of the <a
-  href="#extensions">Possibilities for extensions</a> section below,
-  and specifically in step-72.
+  will come back to it at the end of the
+  @ref step_15-Extensions "Possibilities for extensions"
+  section below, and specifically in step-72.
 
 
 <h3>Weak formulation of the problem</h3>
@@ -250,7 +248,7 @@ full step lengths we forego the rapid, quadratic convergence that
 makes Newton's method so appealing. Obviously, this is a point one
 eventually has to address if the program was made into one that is
 meant to solve more realistic problems. We will comment on this issue
-some more in the <a href="#Results">results section</a>, and use an
+some more in the @ref step_15-ResultsSection "results section", and use an
 even better approach in step-77.
 
 
@@ -264,8 +262,8 @@ follows:
 <li>
   Start with the function $u^{0}\equiv 0$ and modify it in such a way
   that the values of $u^0$ along the boundary equal the correct
-  boundary values $g$ (this happens in
-  <code>MinimalSurfaceProblem::set_boundary_values</code>). Set
+  boundary values $g$ (this happens in the call to
+  <code>AffineConstraints::distribute()</code>). Set
   $n=0$.
 </li>
 
@@ -296,8 +294,7 @@ follows:
   If $n$ is a multiple of 5 then refine the mesh, transfer the
   solution $u^{n+1}$ to the new mesh and set the values of $u^{n+1}$
   in such a way that along the boundary we have
-  $u^{n+1}|_{\partial\Gamma}=g$ (again in
-  <code>MinimalSurfaceProblem::set_boundary_values</code>). Note that
+  $u^{n+1}|_{\partial\Gamma}=g$. Note that
   this isn't automatically
   guaranteed even though by construction we had that before mesh
   refinement $u^{n+1}|_{\partial\Gamma}=g$ because mesh refinement

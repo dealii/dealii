@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2019 - 2023 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2019 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 #include <deal.II/base/memory_consumption.h>
 #include <deal.II/base/utilities.h>
@@ -112,14 +111,15 @@ MappingQCache<dim, spacedim>::initialize(
           auto &fe_values = fe_values_all.get();
           if (fe_values.get() == nullptr)
             {
-              QGaussLobatto<dim> quadrature_gl(this->polynomial_degree + 1);
+              const QGaussLobatto<dim> quadrature_gl(this->polynomial_degree +
+                                                     1);
 
               std::vector<Point<dim>> quadrature_points;
               for (const auto i :
                    FETools::hierarchic_to_lexicographic_numbering<dim>(
                      this->polynomial_degree))
                 quadrature_points.push_back(quadrature_gl.point(i));
-              Quadrature<dim> quadrature(quadrature_points);
+              const Quadrature<dim> quadrature(quadrature_points);
 
               fe_values = std::make_unique<FEValues<dim, spacedim>>(
                 mapping, fe, quadrature, update_quadrature_points);
@@ -159,9 +159,13 @@ MappingQCache<dim, spacedim>::initialize(
         void *) {
       (*support_point_cache)[cell->level()][cell->index()] =
         compute_points_on_cell(cell);
+      // Do not use `this` in Assert because nvcc when using C++20 assumes that
+      // `this` is an integer and we get the following error: invalid type
+      // argument of unary '*' (have 'int')
+      const unsigned int d = this->get_degree() + 1;
       AssertDimension(
         (*support_point_cache)[cell->level()][cell->index()].size(),
-        Utilities::pow(this->get_degree() + 1, dim));
+        Utilities::pow(d, dim));
     },
     /* copier */ std::function<void(void *)>(),
     /* scratch_data */ nullptr,
@@ -209,14 +213,15 @@ MappingQCache<dim, spacedim>::initialize(
           auto &fe_values = fe_values_all.get();
           if (fe_values.get() == nullptr)
             {
-              QGaussLobatto<dim> quadrature_gl(this->polynomial_degree + 1);
+              const QGaussLobatto<dim> quadrature_gl(this->polynomial_degree +
+                                                     1);
 
               std::vector<Point<dim>> quadrature_points;
               for (const auto i :
                    FETools::hierarchic_to_lexicographic_numbering<dim>(
                      this->polynomial_degree))
                 quadrature_points.push_back(quadrature_gl.point(i));
-              Quadrature<dim> quadrature(quadrature_points);
+              const Quadrature<dim> quadrature(quadrature_points);
 
               fe_values = std::make_unique<FEValues<dim, spacedim>>(
                 mapping, fe, quadrature, update_quadrature_points);
@@ -316,7 +321,7 @@ MappingQCache<dim, spacedim>::initialize(
     DoFTools::extract_locally_relevant_dofs(dof_handler);
   vector_ghosted.reinit(dof_handler.locally_owned_dofs(),
                         locally_relevant_dofs,
-                        dof_handler.get_communicator());
+                        dof_handler.get_mpi_communicator());
   copy_locally_owned_data_from(vector, vector_ghosted);
   vector_ghosted.update_ghost_values();
 
@@ -365,14 +370,15 @@ MappingQCache<dim, spacedim>::initialize(
           auto &fe_values = fe_values_all.get();
           if (fe_values.get() == nullptr)
             {
-              QGaussLobatto<dim> quadrature_gl(this->polynomial_degree + 1);
+              const QGaussLobatto<dim> quadrature_gl(this->polynomial_degree +
+                                                     1);
 
               std::vector<Point<dim>> quadrature_points;
               for (const auto i :
                    FETools::hierarchic_to_lexicographic_numbering<dim>(
                      this->polynomial_degree))
                 quadrature_points.push_back(quadrature_gl.point(i));
-              Quadrature<dim> quadrature(quadrature_points);
+              const Quadrature<dim> quadrature(quadrature_points);
 
               fe_values = std::make_unique<FEValues<dim, spacedim>>(
                 mapping,
@@ -519,7 +525,7 @@ MappingQCache<dim, spacedim>::initialize(
         DoFTools::extract_locally_relevant_level_dofs(dof_handler, l);
       vectors_ghosted[l].reinit(dof_handler.locally_owned_mg_dofs(l),
                                 locally_relevant_dofs,
-                                dof_handler.get_communicator());
+                                dof_handler.get_mpi_communicator());
       copy_locally_owned_data_from(vectors[l], vectors_ghosted[l]);
       vectors_ghosted[l].update_ghost_values();
     }
@@ -568,14 +574,15 @@ MappingQCache<dim, spacedim>::initialize(
           auto &fe_values = fe_values_all.get();
           if (fe_values.get() == nullptr)
             {
-              QGaussLobatto<dim> quadrature_gl(this->polynomial_degree + 1);
+              const QGaussLobatto<dim> quadrature_gl(this->polynomial_degree +
+                                                     1);
 
               std::vector<Point<dim>> quadrature_points;
               for (const auto i :
                    FETools::hierarchic_to_lexicographic_numbering<dim>(
                      this->polynomial_degree))
                 quadrature_points.push_back(quadrature_gl.point(i));
-              Quadrature<dim> quadrature(quadrature_points);
+              const Quadrature<dim> quadrature(quadrature_points);
 
               fe_values = std::make_unique<FEValues<dim, spacedim>>(
                 mapping,
@@ -725,7 +732,12 @@ MappingQCache<dim, spacedim>::compute_mapping_support_points(
 
 template <int dim, int spacedim>
 boost::container::small_vector<Point<spacedim>,
-                               GeometryInfo<dim>::vertices_per_cell>
+#ifndef _MSC_VER
+                               ReferenceCells::max_n_vertices<dim>()
+#else
+                               GeometryInfo<dim>::vertices_per_cell
+#endif
+                               >
 MappingQCache<dim, spacedim>::get_vertices(
   const typename Triangulation<dim, spacedim>::cell_iterator &cell) const
 {
@@ -739,14 +751,18 @@ MappingQCache<dim, spacedim>::get_vertices(
   AssertIndexRange(cell->index(), (*support_point_cache)[cell->level()].size());
   const auto ptr = (*support_point_cache)[cell->level()][cell->index()].begin();
   return boost::container::small_vector<Point<spacedim>,
-                                        GeometryInfo<dim>::vertices_per_cell>(
-    ptr, ptr + cell->n_vertices());
+#ifndef _MSC_VER
+                                        ReferenceCells::max_n_vertices<dim>()
+#else
+                                        GeometryInfo<dim>::vertices_per_cell
+#endif
+                                        >(ptr, ptr + cell->n_vertices());
 }
 
 
 
 //--------------------------- Explicit instantiations -----------------------
-#include "mapping_q_cache.inst"
+#include "fe/mapping_q_cache.inst"
 
 
 DEAL_II_NAMESPACE_CLOSE

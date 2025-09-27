@@ -1,0 +1,4 @@
+323c323
+<   std::ifstream input_file("circle-grid.inp");
+---
+>   std::ifstream input_file("../../../source/step-5/circle-grid.inp");

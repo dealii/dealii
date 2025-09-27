@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2014 - 2021 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2014 - 2024 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 
 // Test by Kevin Drzycimski: compute the measure of the faces of a 3d cell
@@ -31,9 +30,9 @@
 Point<3>
 distort_planar(Point<3> p)
 {
-  if (p(1) > 0.5 && p(2) > 0.5)
+  if (p[1] > 0.5 && p[2] > 0.5)
     {
-      p(1) += 1;
+      p[1] += 1;
     }
   return p;
 }
@@ -44,9 +43,9 @@ distort_planar(Point<3> p)
 Point<3>
 distort_twisted(Point<3> p)
 {
-  if (p(2) > 0.5 && ((p(0) > 0.5) ^ (p(1) > 0.5)))
+  if (p[2] > 0.5 && ((p[0] > 0.5) ^ (p[1] > 0.5)))
     {
-      p(2) += 1;
+      p[2] += 1;
     }
   return p;
 }

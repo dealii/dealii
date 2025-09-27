@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2022 - 2022 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2022 - 2024 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 #include <deal.II/base/function_lib.h>
 
@@ -46,7 +45,6 @@
 // (x0, y0, z0, x1, y1, z1, ...) and solution1 should contain (u0, v0, w0, u1,
 // v1, w1, ...). Verify that they match when we interpolate.
 
-using namespace dealii;
 
 class Test : public Function<2>
 {
@@ -65,7 +63,7 @@ public:
         case 1:
           return std::cos(p[0]) * std::cos(3.0 * p[1]) + 2.0;
         default:
-          Assert(false, ExcNotImplemented());
+          DEAL_II_NOT_IMPLEMENTED();
       }
     return 0.0;
   }
@@ -75,7 +73,7 @@ void
 test(DoFHandler<2> &dof_handler, const hp::MappingCollection<2> &mappings)
 {
   DoFRenumbering::support_point_wise(dof_handler);
-  const MPI_Comm comm = dof_handler.get_communicator();
+  const MPI_Comm comm = dof_handler.get_mpi_communicator();
 
   const IndexSet &local_dofs = dof_handler.locally_owned_dofs();
   deallog << "new case with locally owned dofs = ";

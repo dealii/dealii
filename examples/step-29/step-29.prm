@@ -3,21 +3,19 @@
 
 subsection Mesh & geometry parameters
   # Distance of the focal point of the lens to the x-axis
-  set Focal distance        = 0.3
+  set Focal distance = 0.3
 
   # Number of global mesh refinement steps applied to initial coarse grid
   set Number of refinements = 5
 end
 
-
 subsection Physical constants
   # Wave speed
-  set c     = 1.5e5
+  set c = 1.5e5
 
   # Frequency
   set omega = 3.0e7
 end
-
 
 subsection Output parameters
   # Name of the output file (without extension)

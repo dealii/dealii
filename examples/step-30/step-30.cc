@@ -1,17 +1,16 @@
-/* ---------------------------------------------------------------------
+/* ------------------------------------------------------------------------
  *
- * Copyright (C) 2007 - 2023 by the deal.II authors
+ * SPDX-License-Identifier: LGPL-2.1-or-later
+ * Copyright (C) 2008 - 2024 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
- * The deal.II library is free software; you can use it, redistribute
- * it, and/or modify it under the terms of the GNU Lesser General
- * Public License as published by the Free Software Foundation; either
- * version 2.1 of the License, or (at your option) any later version.
- * The full text of the license can be found in the file LICENSE.md at
- * the top level directory of deal.II.
+ * Part of the source code is dual licensed under Apache-2.0 WITH
+ * LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+ * governing the source code and code contributions can be found in
+ * LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
  *
- * ---------------------------------------------------------------------
+ * ------------------------------------------------------------------------
  *
  * Author: Tobias Leicht, 2007
  */
@@ -81,7 +80,7 @@ namespace Step30
 
       for (unsigned int i = 0; i < values.size(); ++i)
         {
-          if (points[i](0) < 0.5)
+          if (points[i][0] < 0.5)
             values[i] = 1.;
           else
             values[i] = 0.;
@@ -111,15 +110,15 @@ namespace Step30
 
       for (unsigned int i = 0; i < points.size(); ++i)
         {
-          if (points[i](0) > 0)
+          if (points[i][0] > 0)
             {
-              values[i](0) = -points[i](1);
-              values[i](1) = points[i](0);
+              values[i][0] = -points[i][1];
+              values[i][1] = points[i][0];
             }
           else
             {
               values[i]    = Point<dim>();
-              values[i](0) = -points[i](1);
+              values[i][0] = -points[i][1];
             }
         }
     }
@@ -312,7 +311,7 @@ namespace Step30
     // specified in the constructor). If you want to use a DG method of a
     // different degree replace 1 in the constructor by the new degree.
     const unsigned int degree;
-    FE_DGQ<dim>        fe;
+    const FE_DGQ<dim>  fe;
     DoFHandler<dim>    dof_handler;
 
     SparsityPattern      sparsity_pattern;
@@ -340,20 +339,18 @@ namespace Step30
   template <int dim>
   DGMethod<dim>::DGMethod(const bool anisotropic)
     : mapping()
-    ,
     // Change here for DG methods of different degrees.
-    degree(1)
+    , degree(1)
     , fe(degree)
     , dof_handler(triangulation)
     , anisotropic_threshold_ratio(3.)
     , anisotropic(anisotropic)
-    ,
     // As beta is a linear function, we can choose the degree of the
     // quadrature for which the resulting integration is correct. Thus, we
     // choose to use <code>degree+1</code> Gauss points, which enables us to
     // integrate exactly polynomials of degree <code>2*degree+1</code>, enough
     // for all the integrals we will perform in this program.
-    quadrature(degree + 1)
+    , quadrature(degree + 1)
     , face_quadrature(degree + 1)
     , dg()
   {}
@@ -714,8 +711,8 @@ namespace Step30
       // We only need to consider cells which are flagged for refinement.
       if (cell->refine_flag_set())
         {
-          Point<dim> jump;
-          Point<dim> area;
+          std::array<double, dim> jump_in_coordinate_direction      = {};
+          std::array<double, dim> face_area_in_coordinate_direction = {};
 
           for (const auto face_no : cell->face_indices())
             {
@@ -781,11 +778,12 @@ namespace Step30
                               // second coordinate direction and so on, so we
                               // accumulate these values into vectors with
                               // <code>dim</code> components.
-                              jump[face_no / 2] +=
+                              jump_in_coordinate_direction[face_no / 2] +=
                                 std::abs(u[x] - u_neighbor[x]) * JxW[x];
                               // We also sum up the scaled weights to obtain
                               // the measure of the face.
-                              area[face_no / 2] += JxW[x];
+                              face_area_in_coordinate_direction[face_no / 2] +=
+                                JxW[x];
                             }
                         }
                     }
@@ -815,9 +813,10 @@ namespace Step30
                                x < fe_v_face.n_quadrature_points;
                                ++x)
                             {
-                              jump[face_no / 2] +=
+                              jump_in_coordinate_direction[face_no / 2] +=
                                 std::abs(u[x] - u_neighbor[x]) * JxW[x];
-                              area[face_no / 2] += JxW[x];
+                              face_area_in_coordinate_direction[face_no / 2] +=
+                                JxW[x];
                             }
                         }
                       else // i.e. neighbor is coarser than cell
@@ -859,9 +858,10 @@ namespace Step30
                                x < fe_v_face.n_quadrature_points;
                                ++x)
                             {
-                              jump[face_no / 2] +=
+                              jump_in_coordinate_direction[face_no / 2] +=
                                 std::abs(u[x] - u_neighbor[x]) * JxW[x];
-                              area[face_no / 2] += JxW[x];
+                              face_area_in_coordinate_direction[face_no / 2] +=
+                                JxW[x];
                             }
                         }
                     }
@@ -873,7 +873,8 @@ namespace Step30
           double                  sum_of_average_jumps = 0.;
           for (unsigned int i = 0; i < dim; ++i)
             {
-              average_jumps[i] = jump(i) / area(i);
+              average_jumps[i] = jump_in_coordinate_direction[i] /
+                                 face_area_in_coordinate_direction[i];
               sum_of_average_jumps += average_jumps[i];
             }
 
@@ -946,10 +947,9 @@ namespace Step30
           {
             // Create the rectangular domain.
             Point<dim> p1, p2;
-            p1(0) = 0;
-            p1(0) = -1;
+            p1[0] = -1.;
             for (unsigned int i = 0; i < dim; ++i)
-              p2(i) = 1.;
+              p2[i] = 1.;
             // Adjust the number of cells in different directions to obtain
             // completely isotropic cells for the original mesh.
             std::vector<unsigned int> repetitions(dim, 1);

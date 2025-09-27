@@ -1,18 +1,17 @@
 #!/usr/bin/perl
-## ---------------------------------------------------------------------
+## ------------------------------------------------------------------------
 ##
-## Copyright (C) 2007 - 2021 by the deal.II authors
+## SPDX-License-Identifier: LGPL-2.1-or-later
+## Copyright (C) 2007 - 2023 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
-## The deal.II library is free software; you can use it, redistribute
-## it, and/or modify it under the terms of the GNU Lesser General
-## Public License as published by the Free Software Foundation; either
-## version 2.1 of the License, or (at your option) any later version.
-## The full text of the license can be found in the file LICENSE.md at
-## the top level directory of deal.II.
+## Part of the source code is dual licensed under Apache-2.0 WITH
+## LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+## governing the source code and code contributions can be found in
+## LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 ##
-## ---------------------------------------------------------------------
+## ------------------------------------------------------------------------
 
 
 # read all lines of input. within the loop, first do some
@@ -76,9 +75,9 @@ while (<>)
     # this rule, we actually had to write this sequence out in our
     # documentation. Unfortunately, as a consequence, there are vestiges
     # of this style, so we can't substitute things that look like
-    # "step-xx". We therefore not substitute if step-xx is preceded or
-    # followed by quotation marks, or if the text is explicitly
-    # preceded by a backslash for escaping.
+    # "step-xx" (with the quotes). We therefore do not substitute
+    # if step-xx is preceded or followed by quotation marks, or if
+    # the text is explicitly preceded by a backslash for escaping.
     #
     # There are other exceptions:
     # - the scripts in doc/doxygen/tutorial produce files that have
@@ -90,8 +89,11 @@ while (<>)
     s/(?<![\"\\\/])step-(\d\w*)(?!\")/\@ref step_\1 \"step-\1\"/gi
         if !m/(\@page|\<img|\@image|<h\d>)/i;
 
-    # If step-xx was explicitly escaped with a backslash, remove the
-    # latter
+    # Now that we have substituted things that involve step-xx text
+    # that was supposed to be expanded, we no longer need to guard
+    # text that shouldn't be expanded by backslashes. So, if we have
+    # \step-xx that was explicitly escaped with a backslash, remove the
+    # latter.
     s/\\(step-\d\w*)/\1/g;
 
     # doxygen version 1.7.1 and later have the habit of thinking that

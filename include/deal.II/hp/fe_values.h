@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2003 - 2023 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2004 - 2024 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 #ifndef dealii_hp_fe_values_h
 #define dealii_hp_fe_values_h
@@ -65,7 +64,7 @@ namespace hp
    * @ingroup hp
    */
   template <int dim, int q_dim, typename FEValuesType>
-  class FEValuesBase : public Subscriptor
+  class FEValuesBase : public EnableObserverPointer
   {
   public:
     /**
@@ -203,14 +202,15 @@ namespace hp
     /**
      * A pointer to the collection of finite elements to be used.
      */
-    const SmartPointer<const FECollection<dim, FEValuesType::space_dimension>,
-                       FEValuesBase<dim, q_dim, FEValuesType>>
+    const ObserverPointer<
+      const FECollection<dim, FEValuesType::space_dimension>,
+      FEValuesBase<dim, q_dim, FEValuesType>>
       fe_collection;
 
     /**
      * A pointer to the collection of mappings to be used.
      */
-    const SmartPointer<
+    const ObserverPointer<
       const MappingCollection<dim, FEValuesType::space_dimension>,
       FEValuesBase<dim, q_dim, FEValuesType>>
       mapping_collection;
@@ -694,6 +694,14 @@ namespace hp
   inline const FEValuesType &
   FEValuesBase<dim, q_dim, FEValuesType>::get_present_fe_values() const
   {
+    Assert(
+      present_fe_values_index != TableIndices<3>(numbers::invalid_unsigned_int,
+                                                 numbers::invalid_unsigned_int,
+                                                 numbers::invalid_unsigned_int),
+      ExcMessage(
+        "The indices of the present FEValues object are all invalid. The reason"
+        " is likely that you have forgotten to call the reinit() function."));
+
     return *fe_values_table(present_fe_values_index);
   }
 

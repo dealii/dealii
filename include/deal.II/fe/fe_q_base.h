@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2000 - 2023 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2013 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 #ifndef dealii_fe_q_base_h
 #define dealii_fe_q_base_h
@@ -184,25 +183,18 @@ public:
    * index must be between zero and dofs_per_face.
    * @param face The number of the face this degree of freedom lives on. This
    * number must be between zero and GeometryInfo::faces_per_cell.
-   * @param face_orientation One part of the description of the orientation of
-   * the face. See
-   * @ref GlossFaceOrientation.
-   * @param face_flip One part of the description of the orientation of the
-   * face. See
-   * @ref GlossFaceOrientation.
-   * @param face_rotation One part of the description of the orientation of
-   * the face. See
-   * @ref GlossFaceOrientation.
+   * @param combined_orientation The combined orientation flag containing the
+   * orientation, rotation, and flip of the face. See
+   * @ref GlossCombinedOrientation.
    * @return The index of this degree of freedom within the set of degrees of
    * freedom on the entire cell. The returned value will be between zero and
    * dofs_per_cell.
    */
   virtual unsigned int
-  face_to_cell_index(const unsigned int face_dof_index,
-                     const unsigned int face,
-                     const bool         face_orientation = true,
-                     const bool         face_flip        = false,
-                     const bool         face_rotation = false) const override;
+  face_to_cell_index(const unsigned int                 face_dof_index,
+                     const unsigned int                 face,
+                     const types::geometric_orientation combined_orientation =
+                       numbers::default_geometric_orientation) const override;
 
   /**
    * Return a list of constant modes of the element. For this element, the
@@ -315,11 +307,12 @@ protected:
   initialize_unit_face_support_points(const std::vector<Point<1>> &points);
 
   /**
-   * Initialize the @p adjust_quad_dof_index_for_face_orientation_table field
-   * of the FiniteElement class. Called from initialize().
+   * Initialize the @p adjust_quad_dof_index_for_face_orientation_table and
+   * adjust_line_dof_index_for_line_orientation_table tables of the
+   * FiniteElement class. Called from initialize().
    */
   void
-  initialize_quad_dof_index_permutation();
+  initialize_dof_index_permutations();
 
   /**
    * Forward declaration of a class into which we put significant parts of the
@@ -334,9 +327,11 @@ protected:
 
 private:
   /**
-   * Mutex for protecting initialization of restriction and embedding matrix.
+   * Mutex variables used for protecting the initialization of restriction
+   * and embedding matrices.
    */
-  mutable Threads::Mutex mutex;
+  mutable Threads::Mutex restriction_matrix_mutex;
+  mutable Threads::Mutex prolongation_matrix_mutex;
 
   /**
    * The highest polynomial degree of the underlying tensor product space

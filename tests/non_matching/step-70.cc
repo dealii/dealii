@@ -1,17 +1,16 @@
-/* ---------------------------------------------------------------------
+/* ------------------------------------------------------------------------
  *
- * Copyright (C) 2020 - 2022 by the deal.II authors
+ * SPDX-License-Identifier: LGPL-2.1-or-later
+ * Copyright (C) 2020 - 2024 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
- * The deal.II library is free software; you can use it, redistribute
- * it, and/or modify it under the terms of the GNU Lesser General
- * Public License as published by the Free Software Foundation; either
- * version 2.1 of the License, or (at your option) any later version.
- * The full text of the license can be found in the file LICENSE.md at
- * the top level directory of deal.II.
+ * Part of the source code is dual licensed under Apache-2.0 WITH
+ * LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+ * governing the source code and code contributions can be found in
+ * LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
  *
- * ---------------------------------------------------------------------
+ * ------------------------------------------------------------------------
 
  *
  * Authors: Luca Heltai, Bruno Blais, Rene Gassmoeller, 2020
@@ -56,7 +55,6 @@ namespace LA
 #include <deal.II/base/utilities.h>
 
 #include <deal.II/distributed/grid_refinement.h>
-#include <deal.II/distributed/solution_transfer.h>
 #include <deal.II/distributed/tria.h>
 
 #include <deal.II/dofs/dof_handler.h>
@@ -90,6 +88,7 @@ namespace LA
 
 #include <deal.II/numerics/data_out.h>
 #include <deal.II/numerics/error_estimator.h>
+#include <deal.II/numerics/solution_transfer.h>
 #include <deal.II/numerics/vector_tools.h>
 
 // These are the only new include files with regard to step-60. In this
@@ -152,7 +151,6 @@ namespace LA
 
 namespace Step70
 {
-  using namespace dealii;
 
   // @sect3{Run-time parameter handling}
 
@@ -1249,7 +1247,7 @@ namespace Step70
     fluid_relevant_dofs[1] = locally_relevant_dofs.get_view(n_u, n_u + n_p);
 
     {
-      constraints.reinit(locally_relevant_dofs);
+      constraints.reinit(fluid_dh.locally_owned_dofs(), locally_relevant_dofs);
 
       const FEValuesExtractors::Vector velocities(0);
       DoFTools::make_hanging_node_constraints(fluid_dh, constraints);
@@ -1661,8 +1659,7 @@ namespace Step70
           cell->clear_coarsen_flag();
       }
 
-    parallel::distributed::SolutionTransfer<spacedim, LA::MPI::BlockVector>
-      transfer(fluid_dh);
+    SolutionTransfer<spacedim, LA::MPI::BlockVector> transfer(fluid_dh);
 
     fluid_tria.prepare_coarsening_and_refinement();
     transfer.prepare_for_coarsening_and_refinement(locally_relevant_solution);
@@ -1913,7 +1910,6 @@ int
 main(int argc, char *argv[])
 {
   using namespace Step70;
-  using namespace dealii;
 
   auto          init = Utilities::MPI::MPI_InitFinalize(argc, argv, 1);
   MPILogInitAll log(true);

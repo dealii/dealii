@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2010 - 2023 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2010 - 2024 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 
 #ifndef dealii_theta_timestepping_h
@@ -22,7 +21,7 @@
 #include <deal.II/algorithms/operator.h>
 #include <deal.II/algorithms/timestep_control.h>
 
-#include <deal.II/base/smartpointer.h>
+#include <deal.II/base/observer_pointer.h>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -130,7 +129,7 @@ namespace Algorithms
    * them <code>Implicit</code> and <code>Explicit</code>. They both share the
    * public interface of Operator, and additionally provide storage for the
    * matrices to be used and a pointer to TimestepData. Note that we do not
-   * use a SmartPointer here, since the TimestepData will be destroyed before
+   * use a ObserverPointer here, since the TimestepData will be destroyed before
    * the operator.
    *
    * @code
@@ -141,7 +140,7 @@ namespace Algorithms
    *   void operator()(AnyData &out, const AnyData &in);
    *
    * private:
-   *   SmartPointer<const FullMatrix<double>, Explicit> matrix;
+   *   ObserverPointer<const FullMatrix<double>, Explicit> matrix;
    *   FullMatrix<double>                               m;
    * };
    *
@@ -152,7 +151,7 @@ namespace Algorithms
    *   void operator()(AnyData &out, const AnyData &in);
    *
    * private:
-   *   SmartPointer<const FullMatrix<double>, Implicit> matrix;
+   *   ObserverPointer<const FullMatrix<double>, Implicit> matrix;
    *   FullMatrix<double>                               m;
    * };
    * @endcode
@@ -413,7 +412,7 @@ namespace Algorithms
      * vector, $M$ the @ref GlossMassMatrix "mass matrix", $F$ the operator in space and $c$ is the
      * adjusted time step size $(1-\theta) \Delta t$.
      */
-    SmartPointer<OperatorBase, ThetaTimestepping<VectorType>> op_explicit;
+    ObserverPointer<OperatorBase, ThetaTimestepping<VectorType>> op_explicit;
 
     /**
      * The operator solving the implicit part of the scheme. It will receive
@@ -425,12 +424,12 @@ namespace Algorithms
      * the input data, <i>M</i> the @ref GlossMassMatrix "mass matrix", <i>F</i> the operator in
      * space and <i>c</i> is the adjusted time step size $ \theta \Delta t$
      */
-    SmartPointer<OperatorBase, ThetaTimestepping<VectorType>> op_implicit;
+    ObserverPointer<OperatorBase, ThetaTimestepping<VectorType>> op_implicit;
 
     /**
      * The operator writing the output in each time step
      */
-    SmartPointer<OutputOperator<VectorType>, ThetaTimestepping<VectorType>>
+    ObserverPointer<OutputOperator<VectorType>, ThetaTimestepping<VectorType>>
       output;
   };
 

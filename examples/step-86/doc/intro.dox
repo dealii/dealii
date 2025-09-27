@@ -1,0 +1,451 @@
+<i>
+This program was contributed by Wolfgang Bangerth (Colorado State University),
+Stefano Zampini (King Abdullah University of Science and Technology), and
+Luca Heltai (University of Pisa).
+
+This material is based upon work partially supported by National Science
+Foundation grants OAC-1835673, DMS-1821210, and EAR-1925595.
+</i>
+<br>
+
+<a name="step_86-Intro"></a>
+<h1>Introduction</h1>
+
+step-26 solved the simple heat equation, one of the prototypical examples
+of time dependent problems:
+@f{align*}{
+  \frac{\partial u(\mathbf x, t)}{\partial t}
+  -
+  \Delta u(\mathbf x, t)
+  &=
+  f(\mathbf x, t),
+  \qquad\qquad &&
+  \forall \mathbf x \in \Omega, t\in (0,T),
+  \\
+  u(\mathbf x, 0) &= u_0(\mathbf x) &&
+  \forall \mathbf x \in \Omega,
+  \\
+  u(\mathbf x, t) &= g(\mathbf x,t) &&
+  \forall \mathbf x \in \partial\Omega, t \in (0,T).
+@f}
+While that program showed a number of advanced techniques such as
+using adaptive mesh refinement for time-dependent problems, it did not address one big issue:
+It hand-rolls its own time stepping scheme, which in that program
+is the simple
+<a href="https://en.wikipedia.org/wiki/Crank%E2%80%93Nicolson_method">Crank-Nicolson</a>
+method with a fixed time step. This is neither accurate nor efficient: We
+should be using a higher-order time stepping algorithm, and we should
+use one of the many ways to efficiently and automatically choose the
+length of the time step in response to the accuracy obtained.
+
+This would of course require quite a lot of development effort -- unless,
+of course, you do what we always advise: You build on what others have
+already done and have likely done in a way far superior to what one can
+do by oneself. In the current case, deal.II has interfaces to two
+such libraries: SUNDIALS, the *SUite of Nonlinear and DIfferential/ALgebraic
+equation Solvers* (and here specifically the Runge-Kutta-type solvers
+wrapped in the SUNDIALS::ARKode class), and PETSc's TS sub-package
+(wrapped in the PETScWrappers::TimeStepper class). In this program, we will
+use the PETSc TS interfaces.
+
+While we're at it with updating step-26, we will also make the program run
+in parallel -- a minor change if you've read step-40, for example.
+
+
+<h3> %Mapping the heat equation onto an ordinary differential equation formulation </h3>
+
+Both the PETSc TS and the SUNDIALS interfaces require that we first write the partial differential equation
+in the form of a system of ordinary differential equations. To this end, let us turn
+around the approach we used in step-26. There, we first discretized in time,
+obtaining a PDE to be solved at each time step that we could then discretize
+using the finite element method. This approach is called the "Rothe method".
+Instead, here, we use what's called the "Method of Lines" where we first
+discretize in space, obtaining a system of ordinary differential equations
+to which we can apply traditional time steppers. (There are some trade-offs
+between these two strategies, principally around using dynamically changing
+meshes; we will get back to this issue later on.)
+
+To get this started, we take the equation above and multiply it by a test
+function $\varphi(\mathbf x)$ and integrate by parts to get a weak form:
+We seek a function $u(\mathbf x, t)$ that for all test functions
+$\varphi \in H^1_0(\Omega)$
+satisfies
+@f{align*}{
+\left(\varphi(\mathbf x),
+  \frac{\partial u(\mathbf x, t)}{\partial t} \right)_\Omega
+  +
+\left(\nabla \varphi(\mathbf x),
+  \nabla u(\mathbf x, t) \right)_\Omega
+  &=
+\left(\varphi(\mathbf x),
+  f(\mathbf x, t) \right)_\Omega,
+  \\
+\left(\varphi(\mathbf x),  u(\mathbf x, 0)\right)_\Omega &=
+\left(\varphi(\mathbf x), u_0(\mathbf x)\right)_\Omega, &&
+  \\
+  u(\mathbf x, t) &= g(\mathbf x,t) &&
+  \forall \mathbf x \in \partial\Omega, t \in (0,T).
+@f}
+(Integration by parts would ordinarily result in boundary terms unless
+one has Dirichlet boundary conditions -- possibly nonzero -- all
+around the boundary. We will assume that this is indeed so herein.)
+
+We then discretize by restricting ourself to finite element functions
+of the form
+@f{align*}{
+u_h(\mathbf x,t) = \sum_j U_j(t) \varphi_j(\mathbf x),
+@f}
+which leads to the problem of finding a function $u_h(\mathbf x, t)$ that for all
+discrete test functions $\varphi \in V_h(\Omega)$ satisfies
+@f{align*}{
+\left(\varphi_i(\mathbf x),
+  \frac{\partial u_h(\mathbf x, t)}{\partial t} \right)_\Omega
+  +
+\left(\nabla \varphi_j(\mathbf x),
+  \nabla u_h(\mathbf x, t) \right)_\Omega
+  &=
+\left(\varphi_i(\mathbf x),
+  f(\mathbf x, t) \right)_\Omega,
+  \\
+\left(\varphi_i(\mathbf x),  u_h(\mathbf x, 0)\right)_\Omega &=
+\left(\varphi_i(\mathbf x), u_0(\mathbf x)\right)_\Omega, &&
+  \\
+  u_h(\mathbf x, t) &= g_h(\mathbf x,t) &&
+  \forall \mathbf x \in \partial\Omega, t \in (0,T),
+@f}
+where $g_h$ is an interpolant of the function $g$ on the boundary.
+
+This equation can be rewritten in matrix form in the usual way, by
+expanding $u_h$ into its coefficients times shape function form,
+pulling the sum over $j$ out of the integrals, and then considering
+that choosing test function $\varphi_i$ leads to the $i$th row
+of the linear system. This then gives us
+@f{align*}{
+  M
+  \frac{\partial U(t)}{\partial t}
+  +
+  AU(t)
+  &=
+  F(t),
+  \\
+  U(0) = U_0,
+@f}
+plus appropriate boundary conditions.
+
+There are now two perspectives on how one should proceed. If we
+were to use the SUNDIALS::ARKode wrappers to solve this linear system,
+we would bring the $AU$ term to the right hand side and consider
+the ODE
+@f{align*}{
+  M
+  \frac{\partial U(t)}{\partial t}
+  &=
+  -
+  AU(t)
+  +
+  F(t),
+@f}
+which matches the form stated in the documentation of SUNDIALS::ARKode.
+In particular, ARKode is able to deal with the fact that the time
+derivative is multiplied by the mass matrix $M$, which is always
+there when using finite elements.
+
+On the other hand, when using the PETScWrappers::TimeStepper class,
+we can solve ODEs that are stated in a general "implicit" form, and in that
+case we simply bring everything to the left hand side and obtain
+@f{align*}{
+  \underbrace{
+    M
+    \frac{\partial U(t)}{\partial t}
+    +
+    AU(t)
+    -
+    F(t)
+  }_{=:R(t,U,\dot U)}
+  =
+  0.
+@f}
+This matches the form $R(t,U,\dot U) = 0$ you can find in the
+documentation of PETScWrappers::TimeStepper if you identify the time
+dependent function $y=y(t)$ used there with our solution vector
+$U(t)$, and our notation $R(t,U,\dot U)$ instead of the $F(t,y,\dot y)$
+used there and which we rename because we want to use $F$ as the right
+hand side vector of the ODE indicating forcing terms.
+
+This program uses the PETScWrappers::TimeStepper class, and so we will
+take the latter viewpoint. (It is worth noting that SUNDIALS also has
+a package that can solve ODEs in implicit form, wrapped by the
+SUNDIALS::IDA class.) In what follows, we will continue to use $U(t)$
+as the function we seek, even though the documentation of the class
+uses $y(t)$.
+
+
+<h3> %Mapping the differential equation formulation to the time stepper</h3>
+
+Having identified how we want to see the problem (namely, as an "implicit"
+ODE), the question is how we describe the problem to the time stepper.
+Conceptually, all of the wrappers for time stepping packages we support
+in deal.II only requires us to provide them with a very limited set of
+operations. Specifically, for the implicit formulation used by
+PETScWrappers::TimeStepper, all we need to implement are functions
+that provide the following:
+- A way, for a given $t,U,\dot U$, to evaluate the residual vector
+  $R(t,U,\dot U)$.
+- A way, for a given $t,U,\dot U, \alpha$, to set up a matrix
+  $J := \dfrac{\partial R}{\partial y} +
+  \alpha \dfrac{\partial R}{\partial \dot y}$. This is often
+  called the "Jacobian" of the implicit function $R$, perhaps with
+  a small abuse of terminology. In the current case, this matrix
+  is $J=A + \alpha M$. If you have read through step-26, it is probably
+  not lost on you that this matrix appears prominently there as well --
+  with $\alpha$ being a multiple of the inverse of the time step (which
+  there we had denoted by $k_n$).
+  Importantly, for the linear problem we consider here, $J$ is a linear
+  combination of matrices that do not depend on $U$.
+- A way to solve a linear system with this matrix $J$.
+
+That's really it. If we can provide these three functions, PETSc will do
+the rest (as would, for example, SUNDIALS::ARKode or, if you prefer
+the implicit form, SUNDIALS::IDA). It will not be
+very difficult to set these things up. In practice, the way this will
+work is that inside the `run()` function, we will set up lambda functions
+that can access the information of the surrounding scopes and that
+return the requested information.
+
+In practice, we often want to provide a fourth function:
+- A callback that is called at the end of each time step
+  and that is provided with the current solution
+  and other information that can be used to "monitor" the progress
+  of computations. One of the ways in which this can be used is to
+  output visualization data every few time steps.
+
+
+<h3> Complication 1: Dirichlet boundary values </h3>
+
+While we like to say that all nodes in a finite element mesh are
+"degrees of freedom", this is not actually true if we have Dirichlet
+boundary conditions: Degrees of "freedom" located along Dirichlet
+boundaries have specific values that are prescribed by the boundary
+conditions and are, consequently, not "free". Moreover, while the form
+@f{align*}{
+  M
+  \frac{\partial U(t)}{\partial t}
+  &=
+  -
+  AU(t)
+  +
+  F(t)
+@f}
+suggests that *all* elements of the vector $U(t)$ satisfy a
+differential equation, this is not actually true for those components
+of $U$ that correspond to boundary nodes; rather, their values are
+prescribed and will in general not satisfy the equation. On second
+thought, you will also find that the same sort of issue happens as
+well with handing nodes: These, too, are not really "free" but
+constrained to values that are derived from the values of neighboring
+nodes.
+
+For the same reason as we will also discuss in the next section, all
+of this is easier using the Rothe method we have used in all previous
+tutorials. There, we end up with a PDE at every time step for which we
+can independently prescribe boundary conditions and hanging node
+constraints, and we then deal with those by modifying the matrix and
+right hand side appropriately. Here, with the method of lines, things
+are slightly more complicated.
+
+Not too complicated, however: Like with the mesh refinement issues of
+the next section, Dirichlet boundary conditions (and constrained
+degrees of freedom in general) are something every PDE solver has to
+deal with, and because the people who write ODE solvers also have PDEs
+in mind, they needed to address these cases too and so the interfaces
+we use are prepared for it. Specifically, what we need to do is mark
+which entries of the solution vector (i.e., which degrees of freedom)
+are "algebraic" -- that is, satisfy an algebraic, rather than a
+differential, equation. The way we will do this is that the ODE
+integrator interface requires us to provide a "callback" function that
+it can call and that needs to return an IndexSet object in which all
+the algebraic degrees of freedom are listed. At the end of each
+solution stage, a second callback then needs to
+provide the ability to take a solution vector and set its constrained
+(algebraic) entries to their correct values; for us, that will mean
+setting boundary values and hanging node constraints correctly.
+
+(We note that when dealing with Differential-Algebraic Equations (DAEs),
+the algebraic components identified by the first callback mentioned
+above contain hanging nodes, Dirichlet boundary nodes, *and degrees
+of freedom for which the equation does not provide time derivatives*.
+This is not of concern to us here, and so we will not dwell on
+the issue -- or the fact that the second callback in the case of DAEs
+should set only a subset of the algebraic components -- and instead
+refer to the examples shown in the SUNDIALS::IDA class documentation.)
+
+
+<h3> Complication 2: Mesh refinement </h3>
+
+When stating an ODE in the form
+@f{align*}{
+  M
+  \frac{\partial U(t)}{\partial t}
+  &=
+  -
+  AU(t)
+  +
+  F(t),
+@f}
+or one of the reformulations discussed above, there is an implicit
+assumption that the number of entries in the vector $U$ stays constant
+and that each entry continues to correspond to the same quantity. But
+if you use mesh refinement, this is not the case: The number of unknowns
+will go up or down whenever you refine or coarsen the mesh, and the
+42nd (or any other) degree of freedom may be located at an entirely different
+physical location after mesh refinement than where it was located
+below. In other words, the size of vectors and what individual vector
+entries mean changes when we do mesh refinement. The ODE form we derived above
+after spatial discretization simply ceases to be meaningful at these times.
+
+This was precisely why, in all previous time-dependent tutorial
+programs, we have adopted the Rothe approach. There, one first
+discretizes in time, and obtains a PDE at each time step. This PDE can
+then be discretized anew -- if one really wanted to, with an entirely
+different mesh in each time step, though we typically don't go that
+far. On the other hand, being able to use external ODE integrators
+*is* undoubtedly very useful, and so let us see if we can shoehorn the
+mesh refinement complication into what external ODE integrators
+do. This is, in practice, not as difficult as it may at first sound
+because, perhaps not surprisingly, ODE integrators are written by
+people who want to solve problems like ours, and so they have had to
+deal with the same kinds of complications we are discussing here.
+
+The way we approach the situation from a *conceptual* perspective is
+that we break things into "time slabs". Let's say we want to solve on
+the time interval $[0,T]$, then we break things into slabs
+$[0=\tau_0,\tau_1], [\tau_1,\tau_2], \ldots [\tau_{n-1},\tau_n=T]$
+where the break points satisfy $\tau_{k-1}<\tau_k$.  On each time
+slab, we keep the mesh the same, and so we can call into our time
+integrator. At the end of a time slab, we then save the solution,
+refine the mesh, set up other data structures, and restore the
+solution on the new mesh; then we start the time integrator again at
+the start of the new time slab.  This approach guarantees that for the
+purposes of ODE solvers, we really only ever give them something that
+can rightfully be considered an ODE system. A disadvantage is that we
+typically want to refine or coarsen the mesh relatively frequently (in
+large-scale codes one often chooses to refine and coarsen the mesh
+every 10-20 time steps), and that limits the efficiency of time
+integrators: They gain much of their advantage from being able to
+choose the time step length automatically, but there is often a cost
+associated with starting up; if the slabs are too short, then neither
+the start-up cost nor the benefit of potentially long time steps are
+realized.
+
+In *practice*, good integrators such as those in PETSc TS can deal
+with this transparently. We just have to give them a way to call back
+into our code at the end of each time step
+to ask whether we want to refine the mesh and do some
+prep work; and a second function that the integrator can then call to
+do the actual refinement and interpolate solution vectors from old to
+new mesh. You will see in the `run()` function that none of this is
+difficult to explain to the ODE integrator.
+
+
+<h3> Structure of the code </h3>
+
+Compared to the code structure of step-26, the program the current tutorial
+is principally based on, there are essentially two sets of changes:
+
+- The program runs in parallel via MPI. This may, at first, seem like
+  a major change, but the reality is that it does not show up in a very
+  large number of places. If you compare step-6 (a sequential Laplace
+  solver) with step-40 (its parallel version), you will see that it takes
+  maybe 20 or 30 extra lines of code to make a simple code run in parallel.
+  These are principally related to keeping track which cells and degrees
+  of freedom are locally owned, or are on ghost cells. We will also have
+  to use matrix and vector data types that are MPI-aware, and we will
+  get those from the PETScWrappers namespace given that we are already
+  using PETSc for the time stepping.
+
+- In step-26 (and most other tutorials), the logic that drives the program's
+  execution lives in the `run()` function: You can see the loop over all
+  time steps, and which functions are called where within the loop. Here,
+  however, this is no longer the case. In essence, in `run()`, we create
+  an object of type PETScWrappers::TimeStepper, and after some set-up,
+  we turn over control to that object's PETScWrappers::TimeStepper::solve()
+  function that contains the loop over time steps and the logic that
+  decides how large the time step needs to be, what needs to happen when,
+  etc. In other words, the *details* of the program's logic are no longer
+  visible. Instead, what you have to provide to the PETScWrappers::TimeStepper
+  object is a series of "callbacks": Functions that the time stepper
+  can call whenever appropriate. These callbacks are typically small
+  [lambda functions](https://en.cppreference.com/w/cpp/language/lambda) that,
+  if the functionality required only takes a few lines of code do exactly
+  that or, otherwise, call larger member functions of the main class.
+
+
+<h3> The test case </h3>
+
+The program solves the heat equation, which with all right hand sides,
+initial, and boundary values reads as
+@f{align*}{
+  \frac{\partial u(\mathbf x, t)}{\partial t}
+  -
+  \Delta u(\mathbf x, t)
+  &=
+  f(\mathbf x, t),
+  \qquad\qquad &&
+  \forall \mathbf x \in \Omega, t\in (0,T),
+  \\
+  u(\mathbf x, 0) &= u_0(\mathbf x) &&
+  \forall \mathbf x \in \Omega,
+  \\
+  u(\mathbf x, t) &= g(\mathbf x,t) &&
+  \forall \mathbf x \in \partial\Omega, t \in (0,T).
+@f}
+The right hand side $f$, initial conditions $u_0$, and Dirichlet boundary
+values $g$ are all specified in an input file `heat_equation.prm` in which
+these functions are provided as expressions that are parsed and evaluated
+at run time using the Functions::ParsedFunction<dim> class. The version of
+this file that is distributed with the library uses
+@f{align*}{
+  f(\mathbf x,t) &= 0, \\
+  u_0(\mathbf x) &= 0, \\
+  g(\mathbf x,t) &=
+  \begin{cases}
+    \cos(4\pi t) & \text{if $x=-1$}, \\
+    -\cos(4\pi t) & \text{if $x=1$}, \\
+    0 & \text{otherwise}
+  \end{cases}
+@f}
+but this is easily changed.
+
+The program's input file also contains two sections that control the
+time stepper:
+@code
+  subsection Time stepper
+    subsection Running parameters
+      set final time              = 5
+      set initial step size       = 0.025
+      set initial time            = 0
+      set match final time        = false
+      set maximum number of steps = -1
+      set options prefix          =
+      set solver type             = beuler
+    end
+
+    subsection Error control
+      set absolute error tolerance = -1
+      set relative error tolerance = -1
+      set adaptor type             = none
+      set ignore algebraic lte     = true
+      set maximum step size        = -1
+      set minimum step size        = -1
+    end
+  end
+@endcode
+The first of these two sections describes things such as the end time up to
+which we want to run the program, the initial time step size, and the type
+of the time stepper (where `beuler` indicates "backward Euler"; other
+choices are
+[listed here](https://petsc.org/release/overview/integrator_table/#integrator-table).
+We will play with some of these parameters in the results section.
+As usual when using PETSc solvers, these runtime configuration
+options can always be complemented (or overridden) via command
+line options.

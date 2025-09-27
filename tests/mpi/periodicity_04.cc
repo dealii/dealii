@@ -1,17 +1,16 @@
-/* ---------------------------------------------------------------------
+/* ------------------------------------------------------------------------
  *
- * Copyright (C) 2008 - 2022 by the deal.II authors
+ * SPDX-License-Identifier: LGPL-2.1-or-later
+ * Copyright (C) 2015 - 2025 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
- * The deal.II library is free software; you can use it, redistribute
- * it, and/or modify it under the terms of the GNU Lesser General
- * Public License as published by the Free Software Foundation; either
- * version 2.1 of the License, or (at your option) any later version.
- * The full text of the license can be found in the file LICENSE.md at
- * the top level directory of deal.II.
+ * Part of the source code is dual licensed under Apache-2.0 WITH
+ * LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+ * governing the source code and code contributions can be found in
+ * LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
  *
- * ---------------------------------------------------------------------
+ * ------------------------------------------------------------------------
  */
 
 //
@@ -50,9 +49,9 @@ set_periodicity(parallel::distributed::Triangulation<dim> &triangulation,
   // Look for the two outermost faces:
   for (const unsigned int j : GeometryInfo<dim>::face_indices())
     {
-      if (cell_1->face(j)->center()(dim - 1) > 2.9)
+      if (cell_1->face(j)->center()[dim - 1] > 2.9)
         face_1 = cell_1->face(j);
-      if (cell_2->face(j)->center()(dim - 1) < -2.9)
+      if (cell_2->face(j)->center()[dim - 1] < -2.9)
         face_2 = cell_2->face(j);
     }
   face_1->set_boundary_id(42);
@@ -189,7 +188,7 @@ check(const unsigned int orientation, bool reverse)
   const IndexSet  locally_relevant_dofs =
     DoFTools::extract_locally_relevant_dofs(dof_handler);
 
-  constraints.reinit(locally_relevant_dofs);
+  constraints.reinit(locally_owned_dofs, locally_relevant_dofs);
   {
     std::vector<
       GridTools::PeriodicFacePair<typename DoFHandler<dim>::cell_iterator>>
@@ -255,17 +254,19 @@ check(const unsigned int orientation, bool reverse)
   // now refine and check if the neighboring faces are correctly found
   typename Triangulation<dim>::active_cell_iterator cell;
   for (cell = triangulation.begin_active(); cell != triangulation.end(); ++cell)
-    if (cell->is_locally_owned() && cell->center()(dim - 1) > 0)
+    if (cell->is_locally_owned() && cell->center()[dim - 1] > 0)
       cell->set_refine_flag();
 
   triangulation.execute_coarsening_and_refinement();
 
   using CellFace =
     std::pair<typename Triangulation<dim>::cell_iterator, unsigned int>;
-  const typename std::map<CellFace, std::pair<CellFace, std::bitset<3>>>
+  const typename std::map<CellFace,
+                          std::pair<CellFace, types::geometric_orientation>>
     &face_map = triangulation.get_periodic_face_map();
-  typename std::map<CellFace,
-                    std::pair<CellFace, std::bitset<3>>>::const_iterator it;
+  typename std::map<
+    CellFace,
+    std::pair<CellFace, types::geometric_orientation>>::const_iterator it;
   int sum_of_pairs_local = face_map.size();
   int sum_of_pairs_global;
   MPI_Allreduce(&sum_of_pairs_local,
@@ -273,7 +274,7 @@ check(const unsigned int orientation, bool reverse)
                 1,
                 MPI_INT,
                 MPI_SUM,
-                triangulation.get_communicator());
+                triangulation.get_mpi_communicator());
   Assert(sum_of_pairs_global > 0, ExcInternalError());
   for (it = face_map.begin(); it != face_map.end(); ++it)
     {
@@ -284,20 +285,22 @@ check(const unsigned int orientation, bool reverse)
       const unsigned int face_no_2     = it->second.first.second;
       const Point<dim>   face_center_1 = cell_1->face(face_no_1)->center();
       const Point<dim>   face_center_2 = cell_2->face(face_no_2)->center();
-      Assert(std::min(std::abs(face_center_1(dim - 1) - 3.),
-                      std::abs(face_center_1(dim - 1) + 3.)) < 1.e-8,
+      Assert(std::min(std::abs(face_center_1[dim - 1] - 3.),
+                      std::abs(face_center_1[dim - 1] + 3.)) < 1.e-8,
              ExcInternalError());
-      Assert(std::min(std::abs(face_center_2(dim - 1) - 3.),
-                      std::abs(face_center_2(dim - 1) + 3.)) < 1.e-8,
+      Assert(std::min(std::abs(face_center_2[dim - 1] - 3.),
+                      std::abs(face_center_2[dim - 1] + 3.)) < 1.e-8,
              ExcInternalError());
       if (cell_1->level() == cell_2->level())
         for (unsigned int c = 0; c < dim - 1; ++c)
-          if (std::abs(face_center_1(c) - face_center_2(c)) > 1.e-8)
+          if (std::abs(face_center_1[c] - face_center_2[c]) > 1.e-8)
             {
               std::cout << "face_center_1: " << face_center_1 << std::endl;
               std::cout << "face_center_2: " << face_center_2 << std::endl;
-              typename std::map<CellFace, std::pair<CellFace, std::bitset<3>>>::
-                const_iterator it;
+              typename std::map<
+                CellFace,
+                std::pair<CellFace,
+                          types::geometric_orientation>>::const_iterator it;
               for (it = triangulation.get_periodic_face_map().begin();
                    it != triangulation.get_periodic_face_map().end();
                    ++it)

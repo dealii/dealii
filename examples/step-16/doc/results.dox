@@ -3,7 +3,7 @@
 On the finest mesh, the solution looks like this:
 
 <p align="center">
-  <img src="https://www.dealii.org/images/steps/developer/step-16.solution.png" alt="">
+  <img src="https://dealii.org/images/steps/developer/step-16.solution.png" alt="">
 </p>
 
 More importantly, we would like to see if the multigrid method really improved
@@ -13,48 +13,50 @@ the solver performance. Therefore, here is the textual output:
 Cycle 0
    Number of active cells:       80
    Number of degrees of freedom: 89 (by level: 8, 25, 89)
-   Number of CG iterations: 8
+   Number of CG iterations: 5
 
 Cycle 1
-   Number of active cells:       158
-   Number of degrees of freedom: 183 (by level: 8, 25, 89, 138)
-   Number of CG iterations: 9
+   Number of active cells:       152
+   Number of degrees of freedom: 174 (by level: 8, 25, 89, 123)
+   Number of CG iterations: 5
 
 Cycle 2
-   Number of active cells:       302
-   Number of degrees of freedom: 352 (by level: 8, 25, 89, 223, 160)
-   Number of CG iterations: 10
+   Number of active cells:       287
+   Number of degrees of freedom: 331 (by level: 8, 25, 89, 223, 127)
+   Number of CG iterations: 6
 
 Cycle 3
-   Number of active cells:       578
-   Number of degrees of freedom: 649 (by level: 8, 25, 89, 231, 494, 66)
-   Number of CG iterations: 10
+   Number of active cells:       545
+   Number of degrees of freedom: 608 (by level: 8, 25, 89, 231, 476, 24)
+   Number of CG iterations: 6
 
 Cycle 4
-   Number of active cells:       1100
-   Number of degrees of freedom: 1218 (by level: 8, 25, 89, 274, 764, 417, 126)
-   Number of CG iterations: 10
+   Number of active cells:       1034
+   Number of degrees of freedom: 1137 (by level: 8, 25, 89, 274, 756, 417, 15)
+   Number of CG iterations: 6
 
 Cycle 5
-   Number of active cells:       2096
-   Number of degrees of freedom: 2317 (by level: 8, 25, 89, 304, 779, 1214, 817)
-   Number of CG iterations: 11
+   Number of active cells:       1964
+   Number of degrees of freedom: 2181 (by level: 8, 25, 89, 304, 779, 1030, 817)
+   Number of CG iterations: 6
 
 Cycle 6
-   Number of active cells:       3986
-   Number of degrees of freedom: 4366 (by level: 8, 25, 89, 337, 836, 2270, 897, 1617)
-   Number of CG iterations: 10
+   Number of active cells:       3734
+   Number of degrees of freedom: 4101 (by level: 8, 25, 89, 337, 779, 2046, 885, 1545)
+   Number of CG iterations: 6
 
 Cycle 7
-   Number of active cells:       7574
-   Number of degrees of freedom: 8350 (by level: 8, 25, 89, 337, 1086, 2835, 2268, 1789, 3217)
-   Number of CG iterations: 11
+   Number of active cells:       7094
+   Number of degrees of freedom: 7833 (by level: 8, 25, 89, 337, 1056, 2835, 1740, 1765, 3085)
+   Number of CG iterations: 6
+
 </pre>
 
-That's almost perfect multigrid performance: the linear residual gets reduced by 12 orders of
-magnitude in 10 iteration steps, and the results are almost independent of the mesh size. That's
-obviously in part due to the simple nature of the problem solved, but
-it shows the power of multigrid methods.
+That's almost perfect multigrid performance: the linear residual gets
+reduced by 6 orders of magnitude in 5 or 6 iterations, and the results
+are almost independent of the mesh size. That's obviously in part due
+to the simple nature of the problem solved, but it also shows the
+power of multigrid methods.
 
 
 <h3> Possibilities for extensions </h3>

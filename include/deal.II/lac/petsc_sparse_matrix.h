@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2004 - 2023 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2004 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 #ifndef dealii_petsc_sparse_matrix_h
 #define dealii_petsc_sparse_matrix_h
@@ -28,6 +27,7 @@
 #  include <petscis.h>
 #  include <petscistypes.h>
 
+#  include <cstddef>
 #  include <vector>
 
 DEAL_II_NAMESPACE_OPEN
@@ -222,13 +222,13 @@ namespace PETScWrappers
     /**
      * Return the number of rows of this matrix.
      */
-    size_t
+    std::size_t
     m() const;
 
     /**
      * Return the number of columns of this matrix.
      */
-    size_t
+    std::size_t
     n() const;
 
     /**
@@ -384,7 +384,7 @@ namespace PETScWrappers
         /**
          * It is not safe to elide additions of zeros to individual elements
          * of this matrix. The reason is that additions to the matrix may
-         * trigger collective operations synchronizing buffers on multiple
+         * trigger @ref GlossCollectiveOperation "collective operations" synchronizing buffers on multiple
          * processes. If an addition is elided on one process, this may lead
          * to other processes hanging in an infinite waiting loop.
          */
@@ -663,6 +663,14 @@ namespace PETScWrappers
   } // namespace MPI
 } // namespace PETScWrappers
 
+DEAL_II_NAMESPACE_CLOSE
+
+#else
+
+// Make sure the scripts that create the C++20 module input files have
+// something to latch on if the preprocessor #ifdef above would
+// otherwise lead to an empty content of the file.
+DEAL_II_NAMESPACE_OPEN
 DEAL_II_NAMESPACE_CLOSE
 
 #endif // DEAL_II_WITH_PETSC

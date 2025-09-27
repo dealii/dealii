@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2000 - 2023 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2000 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 #include <deal.II/base/quadrature_lib.h>
 #include <deal.II/base/work_stream.h>
@@ -115,7 +114,7 @@ DataOutRotation<dim, spacedim>::build_one_patch(
     {
       // would this function make any sense after all? who would want to
       // output/compute in four space dimensions?
-      Assert(false, ExcNotImplemented());
+      DEAL_II_NOT_IMPLEMENTED();
       return;
     }
 
@@ -148,8 +147,8 @@ DataOutRotation<dim, spacedim>::build_one_patch(
         {
           case 1:
             {
-              const double r1 = (*cell)->vertex(0)(0),
-                           r2 = (*cell)->vertex(1)(0);
+              const double r1 = (*cell)->vertex(0)[0],
+                           r2 = (*cell)->vertex(1)[0];
               Assert(r1 >= 0, ExcRadialVariableHasNegativeValues(r1));
               Assert(r2 >= 0, ExcRadialVariableHasNegativeValues(r2));
 
@@ -169,26 +168,26 @@ DataOutRotation<dim, spacedim>::build_one_patch(
                   const Point<dim> v = (*cell)->vertex(vertex);
 
                   // make sure that the radial variable is nonnegative
-                  Assert(v(0) >= 0, ExcRadialVariableHasNegativeValues(v(0)));
+                  Assert(v[0] >= 0, ExcRadialVariableHasNegativeValues(v[0]));
 
                   // now set the vertices of the patch
                   my_patches[angle].vertices[vertex] =
-                    v(0) * angle_directions[angle];
-                  my_patches[angle].vertices[vertex][0] = v(1);
+                    v[0] * angle_directions[angle];
+                  my_patches[angle].vertices[vertex][0] = v[1];
 
                   my_patches[angle]
                     .vertices[vertex + GeometryInfo<dim>::vertices_per_cell] =
-                    v(0) * angle_directions[angle + 1];
+                    v[0] * angle_directions[angle + 1];
                   my_patches[angle]
                     .vertices[vertex + GeometryInfo<dim>::vertices_per_cell]
-                             [0] = v(1);
+                             [0] = v[1];
                 }
 
               break;
             }
 
           default:
-            Assert(false, ExcNotImplemented());
+            DEAL_II_NOT_IMPLEMENTED();
         }
 
       // then fill in data
@@ -326,7 +325,7 @@ DataOutRotation<dim, spacedim>::build_one_patch(
                             break;
 
                           default:
-                            Assert(false, ExcNotImplemented());
+                            DEAL_II_NOT_IMPLEMENTED();
                         }
                     }
                 }
@@ -359,7 +358,7 @@ DataOutRotation<dim, spacedim>::build_one_patch(
                         break;
 
                       default:
-                        Assert(false, ExcNotImplemented());
+                        DEAL_II_NOT_IMPLEMENTED();
                     }
                 }
               else
@@ -400,7 +399,7 @@ DataOutRotation<dim, spacedim>::build_one_patch(
                             break;
 
                           default:
-                            Assert(false, ExcNotImplemented());
+                            DEAL_II_NOT_IMPLEMENTED();
                         }
                     }
                 }
@@ -444,7 +443,7 @@ DataOutRotation<dim, spacedim>::build_one_patch(
                     break;
 
                   default:
-                    Assert(false, ExcNotImplemented());
+                    DEAL_II_NOT_IMPLEMENTED();
                 }
             }
         }
@@ -580,7 +579,7 @@ DataOutRotation<dim, spacedim>::next_cell(const cell_iterator &cell)
 
 
 // explicit instantiations
-#include "data_out_rotation.inst"
+#include "numerics/data_out_rotation.inst"
 
 
 DEAL_II_NAMESPACE_CLOSE

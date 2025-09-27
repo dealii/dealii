@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2006 - 2023 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2006 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 #ifndef dealii_numbers_h
 #define dealii_numbers_h
@@ -21,30 +20,12 @@
 
 #include <deal.II/base/types.h>
 
-#ifdef DEAL_II_WITH_CUDA
-#  include <cuComplex.h>
-#endif
-
-#include <Kokkos_Macros.hpp>
+#include <Kokkos_MathematicalFunctions.hpp>
 
 #include <cmath>
 #include <complex>
 #include <cstddef>
 #include <type_traits>
-
-#define DEAL_II_HOST_DEVICE KOKKOS_FUNCTION
-#define DEAL_II_CUDA_HOST_DEV DEAL_II_HOST_DEVICE
-#define DEAL_II_HOST_DEVICE_ALWAYS_INLINE KOKKOS_FORCEINLINE_FUNCTION
-
-// clang++ assumes that all constexpr functions are __host__ __device__ when
-// Kokkos was configured with CUDA or HIP support. This is problematic
-// when calling non-constexpr functions in constexpr functions. Hence, we
-// need a way to annotate functions explicitly as host-only.
-#if (defined(__clang__) && defined(__CUDA__)) || defined(KOKKOS_ENABLE_HIP)
-#  define DEAL_II_HOST __host__
-#else
-#  define DEAL_II_HOST
-#endif
 
 // Forward-declare the automatic differentiation types so we can add prototypes
 // for our own wrappers.
@@ -172,112 +153,112 @@ abs(const adtl::adouble &x);
 #  endif
 #endif
 
-DEAL_II_NAMESPACE_CLOSE
+DEAL_II_NAMESPACE_CLOSE // Do not convert for module purposes
 
-namespace std
+  namespace std
 {
   template <typename Number, std::size_t width>
-  DEAL_II_ALWAYS_INLINE ::dealii::VectorizedArray<Number, width>
-  sqrt(const ::dealii::VectorizedArray<Number, width> &);
+  DEAL_II_ALWAYS_INLINE ::dealii::VectorizedArray<Number, width> sqrt(
+    const ::dealii::VectorizedArray<Number, width> &);
   template <typename Number, std::size_t width>
-  DEAL_II_ALWAYS_INLINE ::dealii::VectorizedArray<Number, width>
-  abs(const ::dealii::VectorizedArray<Number, width> &);
+  DEAL_II_ALWAYS_INLINE ::dealii::VectorizedArray<Number, width> abs(
+    const ::dealii::VectorizedArray<Number, width> &);
   template <typename Number, std::size_t width>
-  DEAL_II_ALWAYS_INLINE ::dealii::VectorizedArray<Number, width>
-  max(const ::dealii::VectorizedArray<Number, width> &,
-      const ::dealii::VectorizedArray<Number, width> &);
+  DEAL_II_ALWAYS_INLINE ::dealii::VectorizedArray<Number, width> max(
+    const ::dealii::VectorizedArray<Number, width> &,
+    const ::dealii::VectorizedArray<Number, width> &);
   template <typename Number, std::size_t width>
-  DEAL_II_ALWAYS_INLINE ::dealii::VectorizedArray<Number, width>
-  min(const ::dealii::VectorizedArray<Number, width> &,
-      const ::dealii::VectorizedArray<Number, width> &);
+  DEAL_II_ALWAYS_INLINE ::dealii::VectorizedArray<Number, width> min(
+    const ::dealii::VectorizedArray<Number, width> &,
+    const ::dealii::VectorizedArray<Number, width> &);
   template <typename Number, size_t width>
-  ::dealii::VectorizedArray<Number, width>
-  pow(const ::dealii::VectorizedArray<Number, width> &, const Number p);
+  ::dealii::VectorizedArray<Number, width> pow(
+    const ::dealii::VectorizedArray<Number, width> &, const Number p);
   template <typename Number, size_t width>
-  ::dealii::VectorizedArray<Number, width>
-  sin(const ::dealii::VectorizedArray<Number, width> &);
+  ::dealii::VectorizedArray<Number, width> sin(
+    const ::dealii::VectorizedArray<Number, width> &);
   template <typename Number, size_t width>
-  ::dealii::VectorizedArray<Number, width>
-  cos(const ::dealii::VectorizedArray<Number, width> &);
+  ::dealii::VectorizedArray<Number, width> cos(
+    const ::dealii::VectorizedArray<Number, width> &);
   template <typename Number, size_t width>
-  ::dealii::VectorizedArray<Number, width>
-  tan(const ::dealii::VectorizedArray<Number, width> &);
+  ::dealii::VectorizedArray<Number, width> tan(
+    const ::dealii::VectorizedArray<Number, width> &);
   template <typename Number, size_t width>
-  ::dealii::VectorizedArray<Number, width>
-  exp(const ::dealii::VectorizedArray<Number, width> &);
+  ::dealii::VectorizedArray<Number, width> exp(
+    const ::dealii::VectorizedArray<Number, width> &);
   template <typename Number, size_t width>
-  ::dealii::VectorizedArray<Number, width>
-  log(const ::dealii::VectorizedArray<Number, width> &);
+  ::dealii::VectorizedArray<Number, width> log(
+    const ::dealii::VectorizedArray<Number, width> &);
 } // namespace std
 
-DEAL_II_NAMESPACE_OPEN
+DEAL_II_NAMESPACE_OPEN // Do not convert for module purposes
 
-/**
- * Namespace for the declaration of universal constants. Since the
- * availability in <tt>math.h</tt> is not always guaranteed, we put them here.
- * Since this file is included by <tt>base/config.h</tt>, they are available
- * to the whole library.
- *
- * The constants defined here are a subset of the <tt>M_XXX</tt> constants
- * sometimes declared in the system include file <tt>math.h</tt>, but without
- * the prefix <tt>M_</tt>.
- *
- * In addition to that, we declare  <tt>invalid_unsigned_int</tt> to be the
- * largest unsigned integer representable; this value is widely used in the
- * library as a marker for an invalid index, an invalid size of an array, and
- * similar purposes.
- */
-namespace numbers
+  /**
+   * Namespace for the declaration of universal constants. Since the
+   * availability in <tt>math.h</tt> is not always guaranteed, we put them here.
+   * Since this file is included by <tt>base/config.h</tt>, they are available
+   * to the whole library.
+   *
+   * The constants defined here are a subset of the <tt>M_XXX</tt> constants
+   * sometimes declared in the system include file <tt>math.h</tt>, but without
+   * the prefix <tt>M_</tt>.
+   *
+   * In addition to that, we declare  <tt>invalid_unsigned_int</tt> to be the
+   * largest unsigned integer representable; this value is widely used in the
+   * library as a marker for an invalid index, an invalid size of an array, and
+   * similar purposes.
+   */
+  namespace numbers
 {
   /**
    * e
    */
-  static constexpr double E = 2.7182818284590452354;
+  constexpr double E = 2.7182818284590452354;
 
   /**
    * log_2 e
    */
-  static constexpr double LOG2E = 1.4426950408889634074;
+  constexpr double LOG2E = 1.4426950408889634074;
 
   /**
    * log_10 e
    */
-  static constexpr double LOG10E = 0.43429448190325182765;
+  constexpr double LOG10E = 0.43429448190325182765;
 
   /**
    * log_e 2
    */
-  static constexpr double LN2 = 0.69314718055994530942;
+  constexpr double LN2 = 0.69314718055994530942;
 
   /**
    * log_e 10
    */
-  static constexpr double LN10 = 2.30258509299404568402;
+  constexpr double LN10 = 2.30258509299404568402;
 
   /**
    * pi
    */
-  static constexpr double PI = 3.14159265358979323846;
+  constexpr double PI = 3.14159265358979323846;
 
   /**
    * pi/2
    */
-  static constexpr double PI_2 = 1.57079632679489661923;
+  constexpr double PI_2 = 1.57079632679489661923;
 
   /**
    * pi/4
    */
-  static constexpr double PI_4 = 0.78539816339744830962;
+  constexpr double PI_4 = 0.78539816339744830962;
 
   /**
    * sqrt(2)
    */
-  static constexpr double SQRT2 = 1.41421356237309504880;
+  constexpr double SQRT2 = 1.41421356237309504880;
 
   /**
    * 1/sqrt(2)
    */
-  static constexpr double SQRT1_2 = 0.70710678118654752440;
+  constexpr double SQRT1_2 = 0.70710678118654752440;
 
   /**
    * Return @p true if the given value is a finite floating point number, i.e.
@@ -288,22 +269,19 @@ namespace numbers
    * double</code>, this function may return <code>false</code> even if the
    * number is finite with respect to type <code>long double</code>.
    */
-  bool
-  is_finite(const double x);
+  bool is_finite(const double x);
 
   /**
    * Return @p true if real and imaginary parts of the given complex number
    * are finite.
    */
-  bool
-  is_finite(const std::complex<double> &x);
+  bool is_finite(const std::complex<double> &x);
 
   /**
    * Return @p true if real and imaginary parts of the given complex number
    * are finite.
    */
-  bool
-  is_finite(const std::complex<float> &x);
+  bool is_finite(const std::complex<float> &x);
 
   /**
    * Return @p true if real and imaginary parts of the given complex number
@@ -313,8 +291,7 @@ namespace numbers
    * numbers that are infinite in terms of <code>double</code>, but finite
    * with respect to <code>long double</code>.
    */
-  bool
-  is_finite(const std::complex<long double> &x);
+  bool is_finite(const std::complex<long double> &x);
 
   /**
    * Return whether two numbers are equal to one another.
@@ -327,8 +304,8 @@ namespace numbers
    * of @p value_1.
    */
   template <typename Number1, typename Number2>
-  constexpr DEAL_II_HOST_DEVICE bool
-  values_are_equal(const Number1 &value_1, const Number2 &value_2);
+  constexpr DEAL_II_HOST_DEVICE bool values_are_equal(const Number1 &value_1,
+                                                      const Number2 &value_2);
 
   /**
    * Return whether two numbers are not equal to one another.
@@ -341,8 +318,8 @@ namespace numbers
    * of @p value_1.
    */
   template <typename Number1, typename Number2>
-  bool
-  values_are_not_equal(const Number1 &value_1, const Number2 &value_2);
+  constexpr bool values_are_not_equal(const Number1 &value_1,
+                                      const Number2 &value_2);
 
   /**
    * Return whether or not a value is equal to zero.
@@ -352,8 +329,7 @@ namespace numbers
    * by the input arguments.
    */
   template <typename Number>
-  constexpr DEAL_II_HOST_DEVICE bool
-  value_is_zero(const Number &value);
+  constexpr DEAL_II_HOST_DEVICE bool value_is_zero(const Number &value);
 
   /**
    * Return whether @p value_1 is less than that of @p value_2.
@@ -366,8 +342,7 @@ namespace numbers
    * of @p value_1.
    */
   template <typename Number1, typename Number2>
-  bool
-  value_is_less_than(const Number1 &value_1, const Number2 &value_2);
+  bool value_is_less_than(const Number1 &value_1, const Number2 &value_2);
 
   /**
    * Return whether @p value_1 is less than or equal to that of @p value_2.
@@ -380,9 +355,8 @@ namespace numbers
    * of @p value_1.
    */
   template <typename Number1, typename Number2>
-  bool
-  value_is_less_than_or_equal_to(const Number1 &value_1,
-                                 const Number2 &value_2);
+  bool value_is_less_than_or_equal_to(const Number1 &value_1,
+                                      const Number2 &value_2);
 
 
 
@@ -397,8 +371,7 @@ namespace numbers
    * of @p value_1.
    */
   template <typename Number1, typename Number2>
-  bool
-  value_is_greater_than(const Number1 &value_1, const Number2 &value_2);
+  bool value_is_greater_than(const Number1 &value_1, const Number2 &value_2);
 
   /**
    * Return whether @p value_1 is greater than or equal to that of @p value_2.
@@ -411,9 +384,8 @@ namespace numbers
    * of @p value_1.
    */
   template <typename Number1, typename Number2>
-  bool
-  value_is_greater_than_or_equal_to(const Number1 &value_1,
-                                    const Number2 &value_2);
+  bool value_is_greater_than_or_equal_to(const Number1 &value_1,
+                                         const Number2 &value_2);
 
   /**
    * A structure that, together with its partial specializations
@@ -436,8 +408,8 @@ namespace numbers
     /**
      * For this data type, alias the corresponding real type. Since the
      * general template is selected for all data types that are not
-     * specializations of std::complex<T>, the underlying type must be real-
-     * values, so the real_type is equal to the underlying type.
+     * specializations of std::complex<T>, the underlying type must be
+     * real-values, so the real_type is equal to the underlying type.
      */
     using real_type = number;
 
@@ -470,7 +442,7 @@ namespace numbers
     /**
      * Return the absolute value of a number.
      */
-    static real_type
+    static DEAL_II_HOST_DEVICE real_type
     abs(const number &x);
   };
 
@@ -527,24 +499,21 @@ namespace numbers
 
   // --------------- inline and template functions ---------------- //
 
-  inline bool
-  is_nan(const double x)
+  inline bool is_nan(const double x)
   {
     return std::isnan(x);
   }
 
 
 
-  inline bool
-  is_finite(const double x)
+  inline bool is_finite(const double x)
   {
     return std::isfinite(x);
   }
 
 
 
-  inline bool
-  is_finite(const std::complex<double> &x)
+  inline bool is_finite(const std::complex<double> &x)
   {
     // Check complex numbers for infinity
     // by testing real and imaginary part
@@ -553,8 +522,7 @@ namespace numbers
 
 
 
-  inline bool
-  is_finite(const std::complex<float> &x)
+  inline bool is_finite(const std::complex<float> &x)
   {
     // Check complex numbers for infinity
     // by testing real and imaginary part
@@ -563,8 +531,7 @@ namespace numbers
 
 
 
-  inline bool
-  is_finite(const std::complex<long double> &x)
+  inline bool is_finite(const std::complex<long double> &x)
   {
     // Same for std::complex<long double>
     return (is_finite(x.real()) && is_finite(x.imag()));
@@ -572,8 +539,8 @@ namespace numbers
 
 
   template <typename number>
-  constexpr DEAL_II_HOST_DEVICE const number &
-  NumberTraits<number>::conjugate(const number &x)
+  constexpr DEAL_II_HOST_DEVICE const number &NumberTraits<number>::conjugate(
+    const number &x)
   {
     return x;
   }
@@ -590,16 +557,28 @@ namespace numbers
 
 
   template <typename number>
-  typename NumberTraits<number>::real_type
+  DEAL_II_HOST_DEVICE typename NumberTraits<number>::real_type
   NumberTraits<number>::abs(const number &x)
   {
-    // Make things work with AD types
+    // Make things work with AD types and device code
+
+#if DEAL_II_KOKKOS_VERSION_GTE(3, 7, 0)
+    if constexpr (std::is_same_v<number, double> ||
+                  std::is_same_v<number, float>)
+      {
+        // Supported since Kokkos 3.7 and required for device support
+        // with SYCL.
+        return Kokkos::abs(x);
+      }
+#endif
+
     using std::abs;
+
 #ifdef DEAL_II_WITH_ADOLC
-    // This one is a little tricky - we have our own abs function in dealii::,
-    // prototyped with forward-declared types in this file, but it only exists
-    // if we have ADOL-C: hence we only add this using statement in that
-    // situation
+    // This one is a little tricky - we have our own abs function in
+    // dealii::, prototyped with forward-declared types in this file, but it
+    // only exists if we have ADOL-C: hence we only add this using statement
+    // in that situation
     using dealii::abs;
 #endif
     return abs(x);
@@ -608,8 +587,8 @@ namespace numbers
 
 
   template <typename number>
-  constexpr std::complex<number>
-  NumberTraits<std::complex<number>>::conjugate(const std::complex<number> &x)
+  constexpr std::complex<number> NumberTraits<std::complex<number>>::conjugate(
+    const std::complex<number> &x)
   {
     return std::conj(x);
   }
@@ -776,27 +755,6 @@ namespace internal
     }
   };
 
-#ifdef DEAL_II_WITH_CUDA
-  template <>
-  struct NumberType<cuComplex>
-  {
-    static cuComplex
-    value(const float t)
-    {
-      return make_cuComplex(t, 0.f);
-    }
-  };
-
-  template <>
-  struct NumberType<cuDoubleComplex>
-  {
-    static cuDoubleComplex
-    value(const double t)
-    {
-      return make_cuDoubleComplex(t, 0.);
-    }
-  };
-#endif
 } // namespace internal
 
 namespace numbers
@@ -925,7 +883,7 @@ namespace numbers
 
 
   template <typename Number1, typename Number2>
-  inline bool
+  inline constexpr bool
   values_are_not_equal(const Number1 &value_1, const Number2 &value_2)
   {
     return !(values_are_equal(value_1, value_2));

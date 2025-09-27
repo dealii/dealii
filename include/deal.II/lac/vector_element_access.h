@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2017 - 2023 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2017 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 #ifndef dealii_vector_element_access_h
 #define dealii_vector_element_access_h
@@ -20,6 +19,7 @@
 #include <deal.II/base/config.h>
 
 #include <deal.II/lac/trilinos_epetra_vector.h>
+#include <deal.II/lac/trilinos_tpetra_block_vector.h>
 #include <deal.II/lac/trilinos_tpetra_vector.h>
 
 DEAL_II_NAMESPACE_OPEN
@@ -128,11 +128,13 @@ namespace internal
 
 
 #  ifdef DEAL_II_TRILINOS_WITH_TPETRA
-  template <typename NumberType>
-  struct ElementAccess<LinearAlgebra::TpetraWrappers::Vector<NumberType>>
+  template <typename NumberType, typename MemorySpace>
+  struct ElementAccess<
+    LinearAlgebra::TpetraWrappers::Vector<NumberType, MemorySpace>>
   {
   public:
-    using VectorType = LinearAlgebra::TpetraWrappers::Vector<NumberType>;
+    using VectorType =
+      LinearAlgebra::TpetraWrappers::Vector<NumberType, MemorySpace>;
     static void
     add(const typename VectorType::value_type value,
         const types::global_dof_index         i,
@@ -149,16 +151,16 @@ namespace internal
 
 
 
-  template <typename NumberType>
+  template <typename NumberType, typename MemorySpace>
   inline void
-  ElementAccess<LinearAlgebra::TpetraWrappers::Vector<NumberType>>::add(
-    const typename VectorType::value_type              value,
-    const types::global_dof_index                      i,
-    LinearAlgebra::TpetraWrappers::Vector<NumberType> &V)
+  ElementAccess<
+    LinearAlgebra::TpetraWrappers::Vector<NumberType, MemorySpace>>::
+    add(const typename VectorType::value_type                           value,
+        const types::global_dof_index                                   i,
+        LinearAlgebra::TpetraWrappers::Vector<NumberType, MemorySpace> &V)
   {
     // Extract local indices in the vector.
-    Tpetra::Vector<NumberType, int, types::signed_global_dof_index> vector =
-      V.trilinos_vector();
+    auto                              vector = V.trilinos_vector();
     TrilinosWrappers::types::int_type trilinos_i =
       vector.getMap()->getLocalElement(
         static_cast<TrilinosWrappers::types::int_type>(i));
@@ -185,16 +187,16 @@ namespace internal
 
 
 
-  template <typename NumberType>
+  template <typename NumberType, typename MemorySpace>
   inline void
-  ElementAccess<LinearAlgebra::TpetraWrappers::Vector<NumberType>>::set(
-    const typename VectorType::value_type              value,
-    const types::global_dof_index                      i,
-    LinearAlgebra::TpetraWrappers::Vector<NumberType> &V)
+  ElementAccess<
+    LinearAlgebra::TpetraWrappers::Vector<NumberType, MemorySpace>>::
+    set(const typename VectorType::value_type                           value,
+        const types::global_dof_index                                   i,
+        LinearAlgebra::TpetraWrappers::Vector<NumberType, MemorySpace> &V)
   {
     // Extract local indices in the vector.
-    Tpetra::Vector<NumberType, int, types::signed_global_dof_index> vector =
-      V.trilinos_vector();
+    auto                              vector = V.trilinos_vector();
     TrilinosWrappers::types::int_type trilinos_i =
       vector.getMap()->getLocalElement(
         static_cast<TrilinosWrappers::types::int_type>(i));
@@ -221,21 +223,21 @@ namespace internal
 
 
 
-  template <typename NumberType>
-  inline typename LinearAlgebra::TpetraWrappers::Vector<NumberType>::value_type
-  ElementAccess<LinearAlgebra::TpetraWrappers::Vector<NumberType>>::get(
-    const LinearAlgebra::TpetraWrappers::Vector<NumberType> &V,
-    const types::global_dof_index                            i)
+  template <typename NumberType, typename MemorySpace>
+  inline typename LinearAlgebra::TpetraWrappers::Vector<NumberType,
+                                                        MemorySpace>::value_type
+  ElementAccess<
+    LinearAlgebra::TpetraWrappers::Vector<NumberType, MemorySpace>>::
+    get(const LinearAlgebra::TpetraWrappers::Vector<NumberType, MemorySpace> &V,
+        const types::global_dof_index                                         i)
   {
     // Extract local indices in the vector.
 #    if DEAL_II_TRILINOS_VERSION_GTE(13, 2, 0)
-    const Tpetra::Vector<NumberType, int, types::signed_global_dof_index>
-        &vector = V.trilinos_vector();
-    auto vector_2d =
+    const auto &vector = V.trilinos_vector();
+    auto        vector_2d =
       vector.template getLocalView<Kokkos::HostSpace>(Tpetra::Access::ReadOnly);
 #    else
-    Tpetra::Vector<NumberType, int, types::signed_global_dof_index> vector =
-      V.trilinos_vector();
+    auto vector    = V.trilinos_vector();
     vector.template sync<Kokkos::HostSpace>();
     auto vector_2d = vector.template getLocalView<Kokkos::HostSpace>();
 #    endif

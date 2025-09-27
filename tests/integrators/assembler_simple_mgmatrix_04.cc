@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2012 - 2021 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2013 - 2024 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 
 /**
@@ -177,15 +176,15 @@ test(FiniteElement<dim> &fe)
   deallog << fe.get_name() << std::endl;
 
   Triangulation<dim> tr(Triangulation<dim>::limit_level_difference_at_vertices);
-  std::vector<unsigned int> repititions(dim, 1);
-  repititions[0] = 2;
+  std::vector<unsigned int> repetitions(dim, 1);
+  repetitions[0] = 2;
   const Point<dim> p1 =
     (dim == 1 ? Point<dim>(-1.) :
                 (dim == 2 ? Point<dim>(-1., -1.) : Point<dim>(-1., -1., -1.)));
   const Point<dim> p2 =
     (dim == 1 ? Point<dim>(1.) :
                 (dim == 2 ? Point<dim>(1., 1.) : Point<dim>(1., 1., 1.)));
-  GridGenerator::subdivided_hyper_rectangle(tr, repititions, p1, p2);
+  GridGenerator::subdivided_hyper_rectangle(tr, repetitions, p1, p2);
   tr.begin_active()->set_refine_flag();
   tr.execute_coarsening_and_refinement();
 

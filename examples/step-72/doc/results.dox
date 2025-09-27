@@ -122,7 +122,7 @@ be evaluated further:
   mode ("FAD-FAD") types employed here. The reason that the RAD-FAD type was not
   selected by default is that, at the time of writing, there remain some
   bugs in its implementation within the Sacado library that lead to memory leaks.
-  This is documented in the @ref auto_symb_diff module.
+  This is documented in the @ref auto_symb_diff topic.
 - It might be the case that using reduced precision types (i.e., `float`) as the
   scalar types for the AD numbers could render a reduction in computational
   expense during assembly. Using `float` as the data type for the

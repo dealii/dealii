@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2022 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2017 - 2024 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 #ifndef dealii_solver_fire_h
 #define dealii_solver_fire_h
@@ -20,6 +19,7 @@
 #include <deal.II/base/config.h>
 
 #include <deal.II/base/logstream.h>
+#include <deal.II/base/template_constraints.h>
 
 #include <deal.II/lac/diagonal_matrix.h>
 #include <deal.II/lac/solver.h>
@@ -88,6 +88,7 @@ DEAL_II_NAMESPACE_OPEN
  * Eidel et al. 2011.
  */
 template <typename VectorType = Vector<double>>
+DEAL_II_CXX20_REQUIRES(concepts::is_vector_space_vector<VectorType>)
 class SolverFIRE : public SolverBase<VectorType>
 {
 public:
@@ -156,11 +157,13 @@ public:
    * = \frac{1}{2} \mathbf x^{T} \mathbf A \mathbf x - \mathbf x^{T} \mathbf b$.
    */
   template <typename MatrixType, typename PreconditionerType>
-  void
-  solve(const MatrixType         &A,
-        VectorType               &x,
-        const VectorType         &b,
-        const PreconditionerType &preconditioner);
+  DEAL_II_CXX20_REQUIRES(
+    (concepts::is_linear_operator_on<MatrixType, VectorType> &&
+     concepts::is_linear_operator_on<PreconditionerType, VectorType>))
+  void solve(const MatrixType         &A,
+             VectorType               &x,
+             const VectorType         &b,
+             const PreconditionerType &preconditioner);
 
 protected:
   /**
@@ -188,6 +191,7 @@ protected:
 #ifndef DOXYGEN
 
 template <typename VectorType>
+DEAL_II_CXX20_REQUIRES(concepts::is_vector_space_vector<VectorType>)
 SolverFIRE<VectorType>::AdditionalData::AdditionalData(
   const double initial_timestep,
   const double maximum_timestep,
@@ -206,6 +210,7 @@ SolverFIRE<VectorType>::AdditionalData::AdditionalData(
 
 
 template <typename VectorType>
+DEAL_II_CXX20_REQUIRES(concepts::is_vector_space_vector<VectorType>)
 SolverFIRE<VectorType>::SolverFIRE(SolverControl            &solver_control,
                                    VectorMemory<VectorType> &vector_memory,
                                    const AdditionalData     &data)
@@ -216,6 +221,7 @@ SolverFIRE<VectorType>::SolverFIRE(SolverControl            &solver_control,
 
 
 template <typename VectorType>
+DEAL_II_CXX20_REQUIRES(concepts::is_vector_space_vector<VectorType>)
 SolverFIRE<VectorType>::SolverFIRE(SolverControl        &solver_control,
                                    const AdditionalData &data)
   : SolverBase<VectorType>(solver_control)
@@ -225,9 +231,9 @@ SolverFIRE<VectorType>::SolverFIRE(SolverControl        &solver_control,
 
 
 template <typename VectorType>
+DEAL_II_CXX20_REQUIRES(concepts::is_vector_space_vector<VectorType>)
 template <typename PreconditionerType>
-void
-SolverFIRE<VectorType>::solve(
+void SolverFIRE<VectorType>::solve(
   const std::function<double(VectorType &, const VectorType &)> &compute,
   VectorType                                                    &x,
   const PreconditionerType &inverse_mass_matrix)
@@ -347,12 +353,15 @@ SolverFIRE<VectorType>::solve(
 
 
 template <typename VectorType>
+DEAL_II_CXX20_REQUIRES(concepts::is_vector_space_vector<VectorType>)
 template <typename MatrixType, typename PreconditionerType>
-void
-SolverFIRE<VectorType>::solve(const MatrixType         &A,
-                              VectorType               &x,
-                              const VectorType         &b,
-                              const PreconditionerType &preconditioner)
+DEAL_II_CXX20_REQUIRES(
+  (concepts::is_linear_operator_on<MatrixType, VectorType> &&
+   concepts::is_linear_operator_on<PreconditionerType, VectorType>))
+void SolverFIRE<VectorType>::solve(const MatrixType         &A,
+                                   VectorType               &x,
+                                   const VectorType         &b,
+                                   const PreconditionerType &preconditioner)
 {
   std::function<double(VectorType &, const VectorType &)> compute_func =
     [&](VectorType &g, const VectorType &x) -> double {
@@ -373,11 +382,11 @@ SolverFIRE<VectorType>::solve(const MatrixType         &A,
 
 
 template <typename VectorType>
-void
-SolverFIRE<VectorType>::print_vectors(const unsigned int,
-                                      const VectorType &,
-                                      const VectorType &,
-                                      const VectorType &) const
+DEAL_II_CXX20_REQUIRES(concepts::is_vector_space_vector<VectorType>)
+void SolverFIRE<VectorType>::print_vectors(const unsigned int,
+                                           const VectorType &,
+                                           const VectorType &,
+                                           const VectorType &) const
 {}
 
 

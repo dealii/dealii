@@ -1,17 +1,16 @@
-## ---------------------------------------------------------------------
+## ------------------------------------------------------------------------
 ##
-## Copyright (C) 2014 - 2023 by the deal.II authors
+## SPDX-License-Identifier: LGPL-2.1-or-later
+## Copyright (C) 2014 - 2025 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
-## The deal.II library is free software; you can use it, redistribute
-## it, and/or modify it under the terms of the GNU Lesser General
-## Public License as published by the Free Software Foundation; either
-## version 2.1 of the License, or (at your option) any later version.
-## The full text of the license can be found in the file LICENSE.md at
-## the top level directory of deal.II.
+## Part of the source code is dual licensed under Apache-2.0 WITH
+## LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+## governing the source code and code contributions can be found in
+## LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 ##
-## ---------------------------------------------------------------------
+## ------------------------------------------------------------------------
 
 
 ########################################################################
@@ -82,8 +81,14 @@ elseif(DEAL_II_HAVE_CXX20)
   _both("#        C++ language standard:  C++20\n")
 elseif(DEAL_II_HAVE_CXX17)
   _both("#        C++ language standard:  C++17\n")
-elseif(DEAL_II_HAVE_CXX14)
-  _both("#        C++ language standard:  C++14\n")
+endif()
+
+if(DEAL_II_HAVE_CXX23 OR DEAL_II_HAVE_CXX20)
+  if(DEAL_II_WITH_CXX20_MODULE)
+    _both("#        Building C++20 module:  ON\n")
+  else()
+    _both("#        Building C++20 module:  OFF\n")
+  endif()
 endif()
 
 _both("#        Vectorization level:    ${DEAL_II_VECTORIZATION_WIDTH_IN_BITS} bit")
@@ -106,6 +111,8 @@ endif()
 if(NOT "${_instructions}" STREQUAL "")
   to_string(_string ${_instructions})
   _both(" (${_string})\n")
+else()
+  _both("\n")
 endif()
 
 if(CMAKE_CROSSCOMPILING)
@@ -173,19 +180,24 @@ foreach(_feature ${_deal_ii_features_sorted})
         _both("#        ${_var} set up with bundled packages\n")
       endif()
     else()
-     _both("#        ${_var} = ${${_var}}\n")
+      _both("#        ${_var} = ${${_var}}\n")
     endif()
 
     #
-    # Print some non interface target related configuration values:
+    # Print some non interface target related configuration values.
+    # Specifically, go through all combinations of
+    #   ${FEATURE}_EXECUTABLE
+    #   ${FEATURE}_VERSION
+    #   ...
+    # and if a variable of that name is found, prints its value.
     #
 
-    foreach(_var
+    foreach(_conf_var
       EXECUTABLE VERSION DIR C_COMPILER CXX_COMPILER Fortran_COMPILER
       WITH_64BIT_BLAS_INDICES
       )
-      if(NOT "${${_feature}_${_var}}" STREQUAL "")
-        _detailed("#            ${_feature}_${_var} = ${${_feature}_${_var}}\n")
+      if(NOT "${${_feature}_${_conf_var}}" STREQUAL "")
+        _detailed("#            ${_feature}_${_conf_var} = ${${_feature}_${_conf_var}}\n")
       endif()
     endforeach()
 

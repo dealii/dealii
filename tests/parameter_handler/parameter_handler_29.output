@@ -1,0 +1,21 @@
+
+DEAL::ExcEncounteredDeprecatedEntries(deprecation_messages)
+DEAL::    The following deprecated entries were encountered:
+
+
+--------------------------------------------------------
+An error occurred in file <parameter_handler.cc> 
+Additional information: 
+    Line <2> of file <prm/parameter_handler_3.prm>: Entry <string list> is
+    deprecated.
+--------------------------------------------------------
+
+--------------------------------------------------------
+An error occurred in file <parameter_handler.cc> 
+Additional information: 
+    Line <3> of file <prm/parameter_handler_3.prm>: Entry <int> is
+    deprecated.
+--------------------------------------------------------
+
+a, b, c
+DEAL::3

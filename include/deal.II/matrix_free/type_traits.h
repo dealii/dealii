@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2019 - 2022 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2019 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 
 #ifndef dealii_matrix_free_type_traits_h
@@ -29,13 +28,14 @@
 DEAL_II_NAMESPACE_OPEN
 
 #ifndef DOXYGEN
+
 namespace internal
 {
   //
   // type traits for FEEvaluation
   //
 
-  // a helper type-trait that leverage SFINAE to figure out if type T has
+  // a helper type-trait leveraging SFINAE to figure out if type T has
   // ... T::local_element() const
   template <typename T>
   using local_element_t = decltype(std::declval<const T>().local_element(0));
@@ -45,7 +45,7 @@ namespace internal
 
 
 
-  // a helper type-trait that leverage SFINAE to figure out if type T has
+  // a helper type-trait leveraging SFINAE to figure out if type T has
   // void T::add_local_element(const uint, const typename T::value_type)
   template <typename T>
   using add_local_element_t =
@@ -57,7 +57,7 @@ namespace internal
 
 
 
-  // a helper type-trait that leverage SFINAE to figure out if type T has
+  // a helper type-trait leveraging SFINAE to figure out if type T has
   // void T::set_local_element(const uint, const typename T::value_type)
   template <typename T>
   using set_local_element_t =
@@ -66,7 +66,6 @@ namespace internal
   template <typename T>
   constexpr bool has_set_local_element =
     is_supported_operation<set_local_element_t, T>;
-
 
 
   // same as above to check
@@ -102,27 +101,6 @@ namespace internal
   template <typename T>
   constexpr bool has_shared_vector_data =
     is_supported_operation<shared_vector_data_t, T>;
-
-
-
-  // type trait for vector T and Number to see if
-  // we can do vectorized load/save.
-  // for VectorReader and VectorDistributorLocalToGlobal we assume that
-  // if both begin() and local_element()
-  // exist, then begin() + offset == local_element(offset)
-  template <typename T, typename Number>
-  struct is_vectorizable
-  {
-    static const bool value =
-      has_begin<T> &&
-      (has_local_element<T> ||
-       is_serial_vector<std::remove_const_t<T>>::value) &&
-      std::is_same_v<typename T::value_type, Number>;
-  };
-
-  // We need to have a separate declaration for static const members
-  template <typename T, typename Number>
-  const bool is_vectorizable<T, Number>::value;
 
 
   //
@@ -169,6 +147,18 @@ namespace internal
 
 
   // a helper type-trait that leverage SFINAE to figure out if type T has
+  // T & T::operator=(const T::value_type) const
+  template <typename T>
+  using assignment_operator_t =
+    decltype(std::declval<T>().operator=(typename T::value_type()));
+
+  template <typename T>
+  constexpr bool has_assignment_operator =
+    is_supported_operation<assignment_operator_t, T>;
+
+
+
+  // a helper type-trait that leverage SFINAE to figure out if type T has
   // T::communication_block_size
   template <typename T>
   using communication_block_size_t = decltype(T::communication_block_size);
@@ -176,18 +166,6 @@ namespace internal
   template <typename T>
   constexpr bool has_communication_block_size =
     is_supported_operation<communication_block_size_t, T>;
-
-
-
-  // type trait for vector T to see if
-  // we need to do any data exchange for this vector type at all.
-  // is_serial_vector<> would have been enough, but in some circumstances
-  // (like calculation of diagonals for matrix-free operators)
-  // a dummy InVector == unsigned int is provided.
-  // Thus we have to treat this case as well.
-  template <class T, class IsSerialVectorNotSpecialized = void>
-  using not_parallel_vector_t =
-    std::integral_constant<bool, is_serial_vector<T>::value>;
 
   /**
    * A predicate stating whether something is a vector type. We test this
@@ -214,6 +192,54 @@ namespace internal
   constexpr bool is_not_parallel_vector =
     (is_supported_operation<is_vector_type, VectorType> == false) ||
     (is_supported_operation<is_serial_vector_type, VectorType> == true);
+
+
+
+  /**
+   * A type trait for vector T indicating serial vectors with access through
+   * operator[], which are the deal.II serial vectors and ArrayView<Number>
+   */
+  template <typename VectorType>
+  struct is_serial_vector_or_array
+  {
+    static const bool value =
+      is_supported_operation<is_serial_vector_type, VectorType>;
+  };
+
+  /**
+   * A type trait for vector T indicating serial vectors with access through
+   * operator[], which are the deal.II serial vectors and ArrayView<Number>
+   */
+  template <typename Number>
+  struct is_serial_vector_or_array<dealii::ArrayView<Number>>
+  {
+    static const bool value = true;
+  };
+
+  // We need to have a separate declaration for static const members
+  template <typename VectorType>
+  const bool is_serial_vector_or_array<VectorType>::value;
+
+
+
+  // type trait for vector T and Number to see if
+  // we can do vectorized load/save.
+  // for VectorReader and VectorDistributorLocalToGlobal we assume that
+  // if both begin() and local_element()
+  // exist, then begin() + offset == local_element(offset)
+  template <typename T, typename Number>
+  struct is_vectorizable
+  {
+    static const bool value =
+      has_begin<T> &&
+      (has_local_element<T> || is_serial_vector_or_array<T>::value) &&
+      std::is_same_v<typename T::value_type, Number>;
+  };
+
+  // We need to have a separate declaration for static const members
+  template <typename T, typename Number>
+  const bool is_vectorizable<T, Number>::value;
+
 } // namespace internal
 #endif
 

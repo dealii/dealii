@@ -1,22 +1,24 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2023 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2020 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 #ifndef dealii_vector_tools_interpolate_templates_h
 #define dealii_vector_tools_interpolate_templates_h
 
 
+#include <deal.II/dofs/dof_tools.h>
+
+#include <deal.II/fe/fe_nothing.h>
 #include <deal.II/fe/fe_q.h>
 #include <deal.II/fe/fe_system.h>
 
@@ -34,9 +36,20 @@
 #include <deal.II/lac/trilinos_parallel_block_vector.h>
 #include <deal.II/lac/trilinos_vector.h>
 
+#include <deal.II/multigrid/mg_transfer_global_coarsening.h>
+
 #include <deal.II/numerics/vector_tools_interpolate.h>
 
 DEAL_II_NAMESPACE_OPEN
+
+namespace LinearAlgebra
+{
+  namespace EpetraWrappers
+  {
+    class Vector;
+  }
+} // namespace LinearAlgebra
+
 
 namespace VectorTools
 {
@@ -175,16 +188,15 @@ namespace VectorTools
                     const FEValuesType                 &fe_values_jacobians,
                     T3                                 &function_values)
     {
-      if (const auto *system =
-            dynamic_cast<const FESystem<dim, spacedim> *>(&fe))
+      if (fe.n_base_elements() > 1 || fe.element_multiplicity(0) > 1)
         {
           // In case of an FESystem transform every (vector) component
           // separately:
           unsigned current_offset = offset;
-          for (unsigned int i = 0; i < system->n_base_elements(); ++i)
+          for (unsigned int i = 0; i < fe.n_base_elements(); ++i)
             {
-              const auto &base_fe      = system->base_element(i);
-              const auto  multiplicity = system->element_multiplicity(i);
+              const auto &base_fe      = fe.base_element(i);
+              const auto  multiplicity = fe.element_multiplicity(i);
               for (unsigned int m = 0; m < multiplicity; ++m)
                 {
                   // recursively call apply_transform to make sure to
@@ -220,7 +232,8 @@ namespace VectorTools
       const DoFHandler<dim, spacedim>            &dof_handler,
       T                                          &function,
       VectorType                                 &vec,
-      const ComponentMask                        &component_mask)
+      const ComponentMask                        &component_mask,
+      const unsigned int level = numbers::invalid_unsigned_int)
     {
       Assert(component_mask.represents_n_components(
                dof_handler.get_fe_collection().n_components()),
@@ -229,7 +242,10 @@ namespace VectorTools
                "zero or equal to the number of components in the finite "
                "element."));
 
-      AssertDimension(vec.size(), dof_handler.n_dofs());
+      if (level == numbers::invalid_unsigned_int)
+        AssertDimension(vec.size(), dof_handler.n_dofs());
+      else
+        AssertDimension(vec.size(), dof_handler.n_dofs(level));
 
       Assert(component_mask.n_selected_components(
                dof_handler.get_fe_collection().n_components()) > 0,
@@ -301,11 +317,42 @@ namespace VectorTools
       // initialize a quadrature with all generalized support points and
       // create an FEValues object with it.
 
+      std::vector<bool>    needs_expensive_algorithm(fe.size(), true);
       hp::QCollection<dim> support_quadrature;
       for (unsigned int fe_index = 0; fe_index < fe.size(); ++fe_index)
         {
-          const auto &points = fe[fe_index].get_generalized_support_points();
+          const auto &fe_i = fe[fe_index];
+          // If the finite element has no dofs, we can skip it
+          if (fe_i.dofs_per_cell == 0)
+            {
+              support_quadrature.push_back(Quadrature<dim>());
+              continue;
+            }
+          Assert(fe_i.has_generalized_support_points(),
+                 ExcMessage(
+                   "The finite element does not have generalized support "
+                   "points. This is required for interpolation."));
+          const auto &points = fe_i.get_generalized_support_points();
           support_quadrature.push_back(Quadrature<dim>(points));
+          if (fe_i.n_base_elements() == 1 &&
+              fe_i.element_multiplicity(0) == fe.n_components() &&
+              fe_i.has_support_points())
+            {
+              const auto &fe_base          = fe_i.base_element(0);
+              bool        all_points_equal = true;
+              // Check points for exact equality - they are either copied
+              // inside an FESystem or genuinely different, so no need for a
+              // tolerance
+              for (unsigned int i = 0; i < fe_base.n_dofs_per_cell(); ++i)
+                if (fe_base.get_unit_support_points()[i].distance(points[i]) >
+                    0.)
+                  {
+                    all_points_equal = false;
+                    break;
+                  }
+              if (all_points_equal)
+                needs_expensive_algorithm[fe_index] = false;
+            }
         }
 
       // An FEValues object to evaluate (generalized) support point
@@ -322,128 +369,152 @@ namespace VectorTools
       //
       // Now loop over all locally owned, active cells.
       //
+      const auto runner = [&](const auto &cell) {
+        const unsigned int fe_index = cell->active_fe_index();
 
-      for (const auto &cell : dof_handler.active_cell_iterators())
-        {
-          // If this cell is not locally owned, do nothing.
-          if (!cell->is_locally_owned())
-            continue;
+        // Do nothing if there are no local degrees of freedom.
+        if (fe[fe_index].n_dofs_per_cell() == 0)
+          return;
 
-          const unsigned int fe_index = cell->active_fe_index();
+        // Skip processing of the current cell if the function object is
+        // invalid. This is used by interpolate_by_material_id to skip
+        // interpolating over cells with unknown material id.
+        if (!function(cell))
+          return;
 
-          // Do nothing if there are no local degrees of freedom.
-          if (fe[fe_index].n_dofs_per_cell() == 0)
-            continue;
+        // Get transformed, generalized support points
+        fe_values.reinit(cell);
+        const std::vector<Point<spacedim>> &generalized_support_points =
+          fe_values.get_present_fe_values().get_quadrature_points();
 
-          // Skip processing of the current cell if the function object is
-          // invalid. This is used by interpolate_by_material_id to skip
-          // interpolating over cells with unknown material id.
-          if (!function(cell))
-            continue;
+        // Get indices of the dofs on this cell
+        const auto n_dofs = fe[fe_index].n_dofs_per_cell();
+        dofs_on_cell.resize(n_dofs);
+        cell->get_active_or_mg_dof_indices(dofs_on_cell);
 
-          // Get transformed, generalized support points
-          fe_values.reinit(cell);
-          const std::vector<Point<spacedim>> &generalized_support_points =
-            fe_values.get_present_fe_values().get_quadrature_points();
+        // Prepare temporary storage
+        auto &function_values = fe_function_values[fe_index];
+        auto &dof_values      = fe_dof_values[fe_index];
 
-          // Get indices of the dofs on this cell
-          const auto n_dofs = fe[fe_index].n_dofs_per_cell();
-          dofs_on_cell.resize(n_dofs);
-          cell->get_dof_indices(dofs_on_cell);
-
-          // Prepare temporary storage
-          auto &function_values = fe_function_values[fe_index];
-          auto &dof_values      = fe_dof_values[fe_index];
-
-          const auto n_components = fe[fe_index].n_components();
+        const auto n_components = fe[fe_index].n_components();
+        // Only resize (and create sample entry) if sizes do not match
+        if (function_values.size() != generalized_support_points.size())
           function_values.resize(generalized_support_points.size(),
                                  Vector<number>(n_components));
-          dof_values.resize(n_dofs);
 
-          // Get all function values:
-          AssertDimension(n_components, function(cell)->n_components);
-          function(cell)->vector_value_list(generalized_support_points,
-                                            function_values);
+        // Get all function values:
+        AssertDimension(n_components, function(cell)->n_components);
+        function(cell)->vector_value_list(generalized_support_points,
+                                          function_values);
 
+        // For the simple case with elements with support points, we will
+        // simply use the interpolated DoF values in the access loop further
+        // down. Otherwise, we have to transform all function values from
+        // the real cell back to the unit cell. We query the finite element
+        // for the correct transformation. Matters get a bit more
+        // complicated because we have to apply said transformation for
+        // every base element.
+        if (needs_expensive_algorithm[fe_index])
           {
-            // Before we can average, we have to transform all function values
-            // from the real cell back to the unit cell. We query the finite
-            // element for the correct transformation. Matters get a bit more
-            // complicated because we have to apply said transformation for
-            // every base element.
-
+            dof_values.resize(n_dofs);
             const unsigned int offset =
               apply_transform(fe[fe_index],
                               /* starting_offset = */ 0,
                               fe_values,
                               function_values);
-            (void)offset;
             Assert(offset == n_components, ExcInternalError());
+
+            FETools::convert_generalized_support_point_values_to_dof_values(
+              fe[fe_index], function_values, dof_values);
           }
 
-          FETools::convert_generalized_support_point_values_to_dof_values(
-            fe[fe_index], function_values, dof_values);
+        for (unsigned int i = 0; i < n_dofs; ++i)
+          {
+            const auto &nonzero_components =
+              fe[fe_index].get_nonzero_components(i);
 
-          for (unsigned int i = 0; i < n_dofs; ++i)
-            {
-              const auto &nonzero_components =
-                fe[fe_index].get_nonzero_components(i);
+            // Figure out whether the component mask applies. We assume
+            // that we are allowed to set degrees of freedom if at least
+            // one of the components (of the dof) is selected.
+            bool selected = false;
+            for (unsigned int c = 0; c < nonzero_components.size(); ++c)
+              selected =
+                selected || (nonzero_components[c] && component_mask[c]);
 
-              // Figure out whether the component mask applies. We assume
-              // that we are allowed to set degrees of freedom if at least
-              // one of the components (of the dof) is selected.
-              bool selected = false;
-              for (unsigned int c = 0; c < nonzero_components.size(); ++c)
-                selected =
-                  selected || (nonzero_components[c] && component_mask[c]);
+            if (selected)
+              {
+                if constexpr (running_in_debug_mode())
+                  {
+                    // make sure that all selected base elements are indeed
+                    // interpolatory
 
-              if (selected)
-                {
-#ifdef DEBUG
-                  // make sure that all selected base elements are indeed
-                  // interpolatory
+                    if (const auto fe_system =
+                          dynamic_cast<const FESystem<dim> *>(&fe[fe_index]))
+                      {
+                        const auto index =
+                          fe_system->system_to_base_index(i).first.first;
+                        Assert(fe_system->base_element(index)
+                                 .has_generalized_support_points(),
+                               ExcMessage("The component mask supplied to "
+                                          "VectorTools::interpolate selects a "
+                                          "non-interpolatory element."));
+                      }
+                  }
 
-                  if (const auto fe_system =
-                        dynamic_cast<const FESystem<dim> *>(&fe[fe_index]))
-                    {
-                      const auto index =
-                        fe_system->system_to_base_index(i).first.first;
-                      Assert(fe_system->base_element(index)
-                               .has_generalized_support_points(),
-                             ExcMessage("The component mask supplied to "
-                                        "VectorTools::interpolate selects a "
-                                        "non-interpolatory element."));
-                    }
-#endif
-
-                  // Add local values to the global vectors
+                // Add local values to the global vectors
+                if (needs_expensive_algorithm[fe_index])
                   ::dealii::internal::ElementAccess<VectorType>::add(
                     dof_values[i], dofs_on_cell[i], interpolation);
-                  ::dealii::internal::ElementAccess<VectorType>::add(
-                    typename VectorType::value_type(1.0),
-                    dofs_on_cell[i],
-                    weights);
-                }
-              else
-                {
-                  // If a component is ignored, copy the dof values
-                  // from the vector "vec", but only if they are locally
-                  // available
-                  if (locally_owned_dofs.is_element(dofs_on_cell[i]))
-                    {
-                      const auto value =
-                        ::dealii::internal::ElementAccess<VectorType>::get(
-                          vec, dofs_on_cell[i]);
-                      ::dealii::internal::ElementAccess<VectorType>::add(
-                        value, dofs_on_cell[i], interpolation);
-                      ::dealii::internal::ElementAccess<VectorType>::add(
-                        typename VectorType::value_type(1.0),
-                        dofs_on_cell[i],
-                        weights);
-                    }
-                }
+                else
+                  {
+                    const auto base_index =
+                      fe[fe_index].system_to_base_index(i);
+                    ::dealii::internal::ElementAccess<VectorType>::add(
+                      function_values[base_index.second]
+                                     [base_index.first.second],
+                      dofs_on_cell[i],
+                      interpolation);
+                  }
+                ::dealii::internal::ElementAccess<VectorType>::add(
+                  typename VectorType::value_type(1.0),
+                  dofs_on_cell[i],
+                  weights);
+              }
+            else
+              {
+                // If a component is ignored, copy the dof values
+                // from the vector "vec", but only if they are locally
+                // available
+                if (locally_owned_dofs.is_element(dofs_on_cell[i]))
+                  {
+                    const auto value =
+                      ::dealii::internal::ElementAccess<VectorType>::get(
+                        vec, dofs_on_cell[i]);
+                    ::dealii::internal::ElementAccess<VectorType>::add(
+                      value, dofs_on_cell[i], interpolation);
+                    ::dealii::internal::ElementAccess<VectorType>::add(
+                      typename VectorType::value_type(1.0),
+                      dofs_on_cell[i],
+                      weights);
+                  }
+              }
+          }
+      };
+
+      if (level == numbers::invalid_unsigned_int)
+        {
+          for (const auto &cell : dof_handler.active_cell_iterators())
+            {
+              if (cell->is_locally_owned())
+                runner(cell);
             }
-        } /* loop over dof_handler.active_cell_iterators() */
+        }
+      else
+        {
+          for (const auto &cell : dof_handler.mg_cell_iterators_on_level(level))
+            if (cell->is_locally_owned_on_level())
+              runner(cell);
+        }
 
       interpolation.compress(VectorOperation::add);
       weights.compress(VectorOperation::add);
@@ -480,22 +551,21 @@ namespace VectorTools
     const DoFHandler<dim, spacedim>                           &dof_handler,
     const Function<spacedim, typename VectorType::value_type> &function,
     VectorType                                                &vec,
-    const ComponentMask                                       &component_mask)
+    const ComponentMask                                       &component_mask,
+    const unsigned int                                         level)
   {
     AssertDimension(dof_handler.get_fe_collection().n_components(),
                     function.n_components);
 
     // Create a small lambda capture wrapping function and call the
     // internal implementation
-    const auto function_map =
-      [&function](
-        const typename DoFHandler<dim, spacedim>::active_cell_iterator &)
+    const auto function_map = [&function](const auto &)
       -> const Function<spacedim, typename VectorType::value_type> * {
       return &function;
     };
 
     internal::interpolate(
-      mapping, dof_handler, function_map, vec, component_mask);
+      mapping, dof_handler, function_map, vec, component_mask, level);
   }
 
 
@@ -507,13 +577,15 @@ namespace VectorTools
     const DoFHandler<dim, spacedim>                           &dof_handler,
     const Function<spacedim, typename VectorType::value_type> &function,
     VectorType                                                &vec,
-    const ComponentMask                                       &component_mask)
+    const ComponentMask                                       &component_mask,
+    const unsigned int                                         level)
   {
     interpolate(hp::MappingCollection<dim, spacedim>(mapping),
                 dof_handler,
                 function,
                 vec,
-                component_mask);
+                component_mask,
+                level);
   }
 
 
@@ -524,7 +596,8 @@ namespace VectorTools
     const DoFHandler<dim, spacedim>                           &dof,
     const Function<spacedim, typename VectorType::value_type> &function,
     VectorType                                                &vec,
-    const ComponentMask                                       &component_mask)
+    const ComponentMask                                       &component_mask,
+    const unsigned int                                         level)
   {
     AssertDimension(dof.get_fe_collection().n_components(),
                     function.n_components);
@@ -532,7 +605,8 @@ namespace VectorTools
                 dof,
                 function,
                 vec,
-                component_mask);
+                component_mask,
+                level);
   }
 
 
@@ -863,17 +937,18 @@ namespace VectorTools
 
   template <int dim, int spacedim, typename VectorType>
   DEAL_II_CXX20_REQUIRES(concepts::is_writable_dealii_vector_type<VectorType>)
-  void interpolate_to_different_mesh(const DoFHandler<dim, spacedim> &dof1,
-                                     const VectorType                &u1,
-                                     const DoFHandler<dim, spacedim> &dof2,
-                                     VectorType                      &u2)
+  void interpolate_to_different_mesh(
+    const DoFHandler<dim, spacedim> &dof_handler_1,
+    const VectorType                &u1,
+    const DoFHandler<dim, spacedim> &dof_handler_2,
+    VectorType                      &u2)
   {
-    Assert(GridTools::have_same_coarse_mesh(dof1, dof2),
+    Assert(GridTools::have_same_coarse_mesh(dof_handler_1, dof_handler_2),
            ExcMessage("The two DoF handlers must represent triangulations that "
                       "have the same coarse meshes"));
 
     InterGridMap<DoFHandler<dim, spacedim>> intergridmap;
-    intergridmap.make_mapping(dof1, dof2);
+    intergridmap.make_mapping(dof_handler_1, dof_handler_2);
 
     AffineConstraints<typename VectorType::value_type> dummy;
     dummy.close();
@@ -886,18 +961,18 @@ namespace VectorTools
   template <int dim, int spacedim, typename VectorType>
   DEAL_II_CXX20_REQUIRES(concepts::is_writable_dealii_vector_type<VectorType>)
   void interpolate_to_different_mesh(
-    const DoFHandler<dim, spacedim>                          &dof1,
+    const DoFHandler<dim, spacedim>                          &dof_handler_1,
     const VectorType                                         &u1,
-    const DoFHandler<dim, spacedim>                          &dof2,
+    const DoFHandler<dim, spacedim>                          &dof_handler_2,
     const AffineConstraints<typename VectorType::value_type> &constraints,
     VectorType                                               &u2)
   {
-    Assert(GridTools::have_same_coarse_mesh(dof1, dof2),
+    Assert(GridTools::have_same_coarse_mesh(dof_handler_1, dof_handler_2),
            ExcMessage("The two DoF handlers must represent triangulations that "
                       "have the same coarse meshes"));
 
     InterGridMap<DoFHandler<dim, spacedim>> intergridmap;
-    intergridmap.make_mapping(dof1, dof2);
+    intergridmap.make_mapping(dof_handler_1, dof_handler_2);
 
     interpolate_to_different_mesh(intergridmap, u1, constraints, u2);
   }
@@ -912,15 +987,16 @@ namespace VectorTools
     const AffineConstraints<typename VectorType::value_type> &constraints,
     VectorType                                               &u2)
   {
-    const DoFHandler<dim, spacedim> &dof1 = intergridmap.get_source_grid();
-    const DoFHandler<dim, spacedim> &dof2 = intergridmap.get_destination_grid();
-    (void)dof2;
+    const DoFHandler<dim, spacedim> &dof_handler_1 =
+      intergridmap.get_source_grid();
+    const DoFHandler<dim, spacedim> &dof_handler_2 =
+      intergridmap.get_destination_grid();
 
-    Assert(dof1.get_fe_collection() == dof2.get_fe_collection(),
-           ExcMessage(
-             "The FECollections of both DoFHandler objects must match"));
-    AssertDimension(u1.size(), dof1.n_dofs());
-    AssertDimension(u2.size(), dof2.n_dofs());
+    Assert(
+      dof_handler_1.get_fe_collection() == dof_handler_2.get_fe_collection(),
+      ExcMessage("The FECollections of both DoFHandler objects must match"));
+    AssertDimension(u1.size(), dof_handler_1.n_dofs());
+    AssertDimension(u2.size(), dof_handler_2.n_dofs());
 
     Vector<typename VectorType::value_type> cache;
 
@@ -933,10 +1009,7 @@ namespace VectorTools
     // Therefore, loop over all cells
     // (active and inactive) of the source
     // grid ..
-    typename DoFHandler<dim, spacedim>::cell_iterator cell1 = dof1.begin();
-    const typename DoFHandler<dim, spacedim>::cell_iterator endc1 = dof1.end();
-
-    for (; cell1 != endc1; ++cell1)
+    for (const auto &cell1 : dof_handler_1.cell_iterators())
       {
         const typename DoFHandler<dim, spacedim>::cell_iterator cell2 =
           intergridmap[cell1];
@@ -990,6 +1063,248 @@ namespace VectorTools
     // Apply hanging node constraints.
     constraints.distribute(u2);
   }
+
+
+  // Some helper functions. Much of the functions here is taken from a similar
+  // implementation in data_out_dof_data.templates.h.
+  namespace InterpolateBetweenMeshes
+  {
+    template <int dim, int spacedim, typename Number>
+    void
+    create_vector(const DoFHandler<dim, spacedim>            &dof_handler,
+                  LinearAlgebra::distributed::Vector<Number> &u)
+    {
+      const IndexSet &locally_owned_dofs = dof_handler.locally_owned_dofs();
+
+      const IndexSet locally_relevant_dofs =
+        DoFTools::extract_locally_relevant_dofs(dof_handler);
+
+      Assert(locally_owned_dofs.is_contiguous(),
+             ExcMessage("You are trying to use vectors with non-contiguous "
+                        "locally-owned index sets. This is not possible."));
+
+      u.reinit(locally_owned_dofs,
+               locally_relevant_dofs,
+               dof_handler.get_mpi_communicator());
+    }
+
+
+    /**
+     * Copy the data from an arbitrary non-block vector to a
+     * LinearAlgebra::distributed::Vector.
+     */
+    template <typename VectorType, typename Number>
+    void
+    copy_locally_owned_data_from(
+      const VectorType                           &src,
+      LinearAlgebra::distributed::Vector<Number> &dst)
+    {
+      if constexpr (!IsBlockVector<VectorType>::value)
+        {
+          // If source and destination vector have the same underlying scalar,
+          // we can directly import elements by using only one temporary vector:
+          if constexpr (std::is_same_v<typename VectorType::value_type, Number>)
+            {
+              LinearAlgebra::ReadWriteVector<typename VectorType::value_type>
+                temp;
+              temp.reinit(src.locally_owned_elements());
+              temp.import_elements(src, VectorOperation::insert);
+
+              dst.import_elements(temp, VectorOperation::insert);
+            }
+          else
+            // The source and destination vector have different scalar types. We
+            // need to split the parallel import and local copy operations into
+            // two phases
+            {
+              LinearAlgebra::ReadWriteVector<typename VectorType::value_type>
+                temp;
+              temp.reinit(src.locally_owned_elements());
+              temp.import_elements(src, VectorOperation::insert);
+
+              LinearAlgebra::ReadWriteVector<Number> temp2;
+              temp2.reinit(temp, true);
+              temp2 = temp;
+
+              dst.import_elements(temp2, VectorOperation::insert);
+            }
+        }
+      else
+        DEAL_II_NOT_IMPLEMENTED();
+    }
+
+#ifdef DEAL_II_WITH_TRILINOS
+    template <typename Number>
+    void
+    copy_locally_owned_data_from(
+      const TrilinosWrappers::MPI::Vector        &src,
+      LinearAlgebra::distributed::Vector<Number> &dst)
+    {
+      // ReadWriteVector does not work for ghosted
+      // TrilinosWrappers::MPI::Vector objects. Fall back to copy the
+      // entries manually.
+      for (const auto i : dst.locally_owned_elements())
+        dst[i] = src[i];
+    }
+#endif
+
+#ifdef DEAL_II_TRILINOS_WITH_TPETRA
+    template <typename Number, typename MemorySpace>
+    void
+    copy_locally_owned_data_from(
+      const LinearAlgebra::TpetraWrappers::Vector<Number, MemorySpace> &src,
+      LinearAlgebra::distributed::Vector<Number>                       &dst)
+    {
+      // ReadWriteVector does not work for ghosted
+      // TrilinosWrappers::MPI::Vector objects. Fall back to copy the
+      // entries manually.
+      for (const auto i : dst.locally_owned_elements())
+        dst[i] = src[i];
+    }
+#endif
+  } // namespace InterpolateBetweenMeshes
+
+
+  template <int dim, int spacedim, typename VectorType>
+  DEAL_II_CXX20_REQUIRES(concepts::is_writable_dealii_vector_type<VectorType>)
+  void interpolate_to_coarser_mesh(
+    const DoFHandler<dim, spacedim> &dof_handler_fine,
+    const VectorType                &u_fine,
+    const DoFHandler<dim, spacedim> &dof_handler_coarse,
+    const AffineConstraints<typename VectorType::value_type>
+               &constraints_coarse,
+    VectorType &u_coarse)
+  {
+    Assert(GridTools::have_same_coarse_mesh(dof_handler_coarse,
+                                            dof_handler_fine),
+           ExcMessage("The two DoF handlers must represent triangulations that "
+                      "have the same coarse meshes"));
+    AssertDimension(dof_handler_fine.n_dofs(), u_fine.size());
+    AssertDimension(dof_handler_coarse.n_dofs(), u_coarse.size());
+
+    using LAVector =
+      LinearAlgebra::distributed::Vector<typename VectorType::value_type>;
+
+    // Create and initialize a version of the coarse vector using the
+    // p::d::Vector type:
+    LAVector my_u_coarse;
+    InterpolateBetweenMeshes::create_vector(dof_handler_coarse, my_u_coarse);
+
+    // Then do the same for the fine vector, and initialize it with a copy
+    // of the source vector
+    LAVector my_u_fine;
+    InterpolateBetweenMeshes::create_vector(dof_handler_fine, my_u_fine);
+    InterpolateBetweenMeshes::copy_locally_owned_data_from(u_fine, my_u_fine);
+    my_u_fine.update_ghost_values();
+
+
+    // Set up transfer operator. The transfer object also wants a constraints
+    // object for the fine level, because it implements both the up- and
+    // down-transfers. But we here only ever need the down-transfer, which
+    // never touches the fine constraints. So we can use a dummy object for
+    // that.
+    AffineConstraints<typename VectorType::value_type> constraints_fine(
+      dof_handler_fine.locally_owned_dofs(),
+      DoFTools::extract_locally_relevant_dofs(dof_handler_fine));
+    constraints_fine.close();
+
+    MGTwoLevelTransfer<dim, LAVector> transfer;
+    transfer.reinit(dof_handler_fine,
+                    dof_handler_coarse,
+                    constraints_fine,
+                    constraints_coarse);
+
+    // Then perform the interpolation from fine to coarse mesh:
+    transfer.interpolate(my_u_coarse, my_u_fine);
+
+    // Finally, apply the constraints to make sure that the resulting
+    // object is conforming. Then copy it back into the user vector.
+    // (At the time of writing, LinearAlgebra::EpetraWrappers::Vector
+    // does not allow individual element access via operator() or
+    // operator[]. So disallow this vector type for the moment here.)
+    constraints_coarse.distribute(my_u_coarse);
+    if constexpr (!std::is_same_v<VectorType,
+                                  LinearAlgebra::EpetraWrappers::Vector>)
+      {
+        for (const auto i : u_coarse.locally_owned_elements())
+          u_coarse(i) = my_u_coarse(i);
+      }
+    else
+      DEAL_II_NOT_IMPLEMENTED();
+  }
+
+
+
+  template <int dim, int spacedim, typename VectorType>
+  DEAL_II_CXX20_REQUIRES(concepts::is_writable_dealii_vector_type<VectorType>)
+  void interpolate_to_finer_mesh(
+    const DoFHandler<dim, spacedim> &dof_handler_coarse,
+    const VectorType                &u_coarse,
+    const DoFHandler<dim, spacedim> &dof_handler_fine,
+    const AffineConstraints<typename VectorType::value_type> &constraints_fine,
+    VectorType                                               &u_fine)
+  {
+    Assert(GridTools::have_same_coarse_mesh(dof_handler_fine,
+                                            dof_handler_coarse),
+           ExcMessage("The two DoF handlers must represent triangulations that "
+                      "have the same coarse meshes"));
+    AssertDimension(dof_handler_fine.n_dofs(), u_fine.size());
+    AssertDimension(dof_handler_coarse.n_dofs(), u_coarse.size());
+
+    using LAVector =
+      LinearAlgebra::distributed::Vector<typename VectorType::value_type>;
+
+    // Create and initialize a version of the coarse vector using the
+    // p::d::Vector type. Copy the source vector
+    LAVector my_u_coarse;
+    InterpolateBetweenMeshes::create_vector(dof_handler_coarse, my_u_coarse);
+    InterpolateBetweenMeshes::copy_locally_owned_data_from(u_coarse,
+                                                           my_u_coarse);
+    my_u_coarse.update_ghost_values();
+
+    // Then do the same for the fine vector, and initialize it with a copy
+    // of the source vector
+    LAVector my_u_fine;
+    InterpolateBetweenMeshes::create_vector(dof_handler_fine, my_u_fine);
+
+    // Set up transfer operator. The transfer object also wants a constraints
+    // object for the coarse level, because it implements both the up- and
+    // down-transfers. But we here only ever need the up-transfer, which
+    // never touches the coarse constraints. So we can use a dummy object for
+    // that.
+    AffineConstraints<typename VectorType::value_type> constraints_coarse(
+      dof_handler_coarse.locally_owned_dofs(),
+      DoFTools::extract_locally_relevant_dofs(dof_handler_coarse));
+    constraints_coarse.close();
+
+    MGTwoLevelTransfer<dim, LAVector> transfer;
+    transfer.reinit(dof_handler_fine,
+                    dof_handler_coarse,
+                    constraints_fine,
+                    constraints_coarse);
+
+    // Then perform the interpolation from coarse to fine mesh. (Note that
+    // we add to my_u_fine, but that vector is initially a zero vector,
+    // so we are really just writing into it.)
+    transfer.prolongate_and_add(my_u_fine, my_u_coarse);
+
+    // Finally, apply the constraints to make sure that the resulting
+    // object is conforming. Then copy it back into the user vector.
+    // (At the time of writing, LinearAlgebra::EpetraWrappers::Vector
+    // does not allow individual element access via operator() or
+    // operator[]. So disallow this vector type for the moment here.)
+    constraints_fine.distribute(my_u_fine);
+    if constexpr (!std::is_same_v<VectorType,
+                                  LinearAlgebra::EpetraWrappers::Vector>)
+      {
+        for (const auto i : u_fine.locally_owned_elements())
+          u_fine(i) = my_u_fine(i);
+      }
+    else
+      DEAL_II_NOT_IMPLEMENTED();
+  }
+
+
 } // namespace VectorTools
 
 DEAL_II_NAMESPACE_CLOSE

@@ -1,17 +1,16 @@
-/* ---------------------------------------------------------------------
+/* ------------------------------------------------------------------------
  *
- * Copyright (C) 2022 - 2022 by the deal.II authors
+ * SPDX-License-Identifier: LGPL-2.1-or-later
+ * Copyright (C) 2023 - 2024 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
- * The deal.II library is free software; you can use it, redistribute
- * it, and/or modify it under the terms of the GNU Lesser General
- * Public License as published by the Free Software Foundation; either
- * version 2.1 of the License, or (at your option) any later version.
- * The full text of the license can be found in the file LICENSE.md at
- * the top level directory of deal.II.
+ * Part of the source code is dual licensed under Apache-2.0 WITH
+ * LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+ * governing the source code and code contributions can be found in
+ * LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
  *
- * ---------------------------------------------------------------------
+ * ------------------------------------------------------------------------
  */
 
 // Verify convergence rates for continuous simplex elements.
@@ -57,7 +56,7 @@ public:
   {
     double u = 1.0;
     for (int d = 0; d < dim; ++d)
-      u *= std::sin(numbers::PI * p(d));
+      u *= std::sin(numbers::PI * p[d]);
 
     return u;
   }
@@ -72,7 +71,7 @@ public:
   {
     double u = 1.0;
     for (int d = 0; d < dim; ++d)
-      u *= std::sin(numbers::PI * p(d));
+      u *= std::sin(numbers::PI * p[d]);
 
     return (1 + 0.0 * dim * numbers::PI * numbers::PI) * u;
   }
@@ -80,20 +79,23 @@ public:
 
 template <int dim>
 void
-test(const unsigned int degree)
+test(const unsigned int degree, const bool use_amr = false)
 {
 #ifdef SIMPLEX
   FE_SimplexP<dim>   fe(degree);
-  QGaussSimplex<dim> quadrature(degree + 2);
+  QGaussSimplex<dim> quadrature(degree + 1);
 #else
   FE_Q<dim>   fe(degree);
-  QGauss<dim> quadrature(degree + 2);
+  QGauss<dim> quadrature(degree + 1);
 #endif
   deallog << "FE = " << fe.get_name() << std::endl;
+  deallog << std::setprecision(4);
+  if (use_amr)
+    deallog << "using AMR" << std::endl;
 
   double previous_error = 1.0;
 
-  for (unsigned int r = 0; r < 4; ++r)
+  for (unsigned int r = 0; r < (use_amr ? 3 : 4); ++r)
     {
       Triangulation<dim> tria_hex, tria;
       GridGenerator::hyper_cube(tria_hex);
@@ -103,6 +105,13 @@ test(const unsigned int degree)
 #else
       tria.copy_triangulation(tria_hex);
 #endif
+      if (use_amr)
+        {
+          for (auto &cell : tria.active_cell_iterators())
+            if (cell->index() % 3 == 0)
+              cell->set_refine_flag();
+          tria.execute_coarsening_and_refinement();
+        }
 
       ReferenceCell   reference_cell = tria.begin_active()->reference_cell();
       DoFHandler<dim> dof_handler(tria);
@@ -111,70 +120,55 @@ test(const unsigned int degree)
       Vector<double>            cell_errors(tria.n_active_cells());
       Vector<double>            solution(dof_handler.n_dofs());
       Solution<dim>             function;
-      AffineConstraints<double> dummy;
+      AffineConstraints<double> constraints;
       const auto               &mapping =
         reference_cell.template get_default_linear_mapping<dim>();
-      dummy.close();
+      DoFTools::make_hanging_node_constraints(dof_handler, constraints);
+      constraints.close();
 
-      const bool l2_projection = false;
+      SparsityPattern sparsity_pattern;
+      {
+        DynamicSparsityPattern dsp(dof_handler.n_dofs(), dof_handler.n_dofs());
+        DoFTools::make_sparsity_pattern(dof_handler, dsp, constraints, true);
+        sparsity_pattern.copy_from(dsp);
+      }
 
-      if (l2_projection)
-        {
-          VectorTools::project(
-            mapping, dof_handler, dummy, quadrature, function, solution);
-        }
-      else
-        {
-          SparsityPattern sparsity_pattern;
-          {
-            DynamicSparsityPattern dsp(dof_handler.n_dofs(),
-                                       dof_handler.n_dofs());
-            DoFTools::make_sparsity_pattern(dof_handler, dsp);
-            sparsity_pattern.copy_from(dsp);
-          }
+      SparseMatrix<double> h1_matrix(sparsity_pattern);
+      SparseMatrix<double> laplace_matrix(sparsity_pattern);
 
-          SparseMatrix<double> h1_matrix(sparsity_pattern);
-          SparseMatrix<double> laplace_matrix(sparsity_pattern);
+      MatrixCreator::create_mass_matrix(
+        mapping, dof_handler, quadrature, h1_matrix, {}, constraints);
+      MatrixCreator::create_laplace_matrix(
+        mapping, dof_handler, quadrature, laplace_matrix, {}, constraints);
 
-          MatrixCreator::create_mass_matrix(mapping,
-                                            dof_handler,
-                                            quadrature,
-                                            h1_matrix);
-          MatrixCreator::create_laplace_matrix(mapping,
-                                               dof_handler,
-                                               quadrature,
-                                               laplace_matrix);
+      h1_matrix.add(0.0, laplace_matrix);
 
-          h1_matrix.add(0.0, laplace_matrix);
+      Vector<double> rhs(solution.size());
+      VectorTools::create_right_hand_side(
+        mapping, dof_handler, quadrature, ForcingH1<dim>(), rhs, constraints);
 
-          Vector<double> rhs(solution.size());
-          VectorTools::create_right_hand_side(
-            mapping, dof_handler, quadrature, ForcingH1<dim>(), rhs);
+      SolverControl solver_control(1000, 1e-12 * rhs.l2_norm(), false, false);
+      SolverCG<Vector<double>> cg(solver_control);
 
-          SolverControl            solver_control(1000,
-                                       1e-12 * rhs.l2_norm(),
-                                       false,
-                                       false);
-          SolverCG<Vector<double>> cg(solver_control);
-
-          cg.solve(h1_matrix, solution, rhs, PreconditionIdentity());
-        }
+      cg.solve(h1_matrix, solution, rhs, PreconditionIdentity());
+      constraints.distribute(solution);
 
       VectorTools::integrate_difference(mapping,
                                         dof_handler,
                                         solution,
                                         function,
                                         cell_errors,
-                                        Quadrature<dim>(
-                                          fe.get_unit_support_points()),
-                                        VectorTools::Linfty_norm);
+                                        quadrature,
+                                        VectorTools::L2_norm);
+      const double L2_error =
+        VectorTools::compute_global_error(tria,
+                                          cell_errors,
+                                          VectorTools::L2_norm);
 
-      const double max_error =
-        *std::max_element(cell_errors.begin(), cell_errors.end());
-      deallog << "max error = " << max_error << std::endl;
-      if (max_error != 0.0)
-        deallog << "ratio = " << previous_error / max_error << std::endl;
-      previous_error = max_error;
+      deallog << "L2 error = " << L2_error << std::endl;
+      if (L2_error != 0.0)
+        deallog << "ratio = " << previous_error / L2_error << std::endl;
+      previous_error = L2_error;
 
 #if 0
       if (dim == 2)
@@ -199,7 +193,13 @@ main()
 
   test<2>(1);
   test<2>(2);
+  test<2>(3);
 
   test<3>(1);
   test<3>(2);
+  test<3>(3);
+
+  test<2>(1, true);
+  test<2>(2, true);
+  test<2>(3, true);
 }

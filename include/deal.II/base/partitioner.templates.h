@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2017 - 2023 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2017 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 #ifndef dealii_partitioner_templates_h
 #define dealii_partitioner_templates_h
@@ -312,10 +311,9 @@ namespace Utilities
       // inserted data, therefore the communication is still initialized.
       // Having different code in debug and optimized mode is somewhat
       // dangerous, but it really saves communication so do it anyway
-#    ifndef DEBUG
-      if (vector_operation == VectorOperation::insert)
-        return;
-#    endif
+      if constexpr (running_in_debug_mode() == false)
+        if (vector_operation == VectorOperation::insert)
+          return;
 
       // nothing to do when we neither have import
       // nor ghost indices.
@@ -546,24 +544,23 @@ namespace Utilities
 
       // in optimized mode, no communication was started, so leave the
       // function directly (and only clear ghosts)
-#    ifndef DEBUG
-      if (vector_operation == VectorOperation::insert)
-        {
-          Assert(requests.empty(),
-                 ExcInternalError(
-                   "Did not expect a non-empty communication "
-                   "request when inserting. Check that the same "
-                   "vector_operation argument was passed to "
-                   "import_from_ghosted_array_start as is passed "
-                   "to import_from_ghosted_array_finish."));
+      if constexpr (running_in_debug_mode() == false)
+        if (vector_operation == VectorOperation::insert)
+          {
+            Assert(requests.empty(),
+                   ExcInternalError(
+                     "Did not expect a non-empty communication "
+                     "request when inserting. Check that the same "
+                     "vector_operation argument was passed to "
+                     "import_from_ghosted_array_start as is passed "
+                     "to import_from_ghosted_array_finish."));
 
-          Kokkos::deep_copy(
-            Kokkos::View<Number *, typename MemorySpaceType::kokkos_space>(
-              ghost_array.data(), ghost_array.size()),
-            0);
-          return;
-        }
-#    endif
+            Kokkos::deep_copy(
+              Kokkos::View<Number *, typename MemorySpaceType::kokkos_space>(
+                ghost_array.data(), ghost_array.size()),
+              0);
+            return;
+          }
 
       // nothing to do when we neither have import nor ghost indices.
       if (n_ghost_indices() == 0 && n_import_indices() == 0)
@@ -709,7 +706,7 @@ namespace Utilities
                       locally_owned_array[j] =
                         internal::get_min(*read_position,
                                           locally_owned_array[j]);
-                      read_position++;
+                      ++read_position;
                     }
               else if (vector_operation == VectorOperation::max)
                 for (const auto &import_range : import_indices_data)
@@ -720,7 +717,7 @@ namespace Utilities
                       locally_owned_array[j] =
                         internal::get_max(*read_position,
                                           locally_owned_array[j]);
-                      read_position++;
+                      ++read_position;
                     }
               else
                 for (const auto &import_range : import_indices_data)
@@ -778,21 +775,14 @@ namespace Utilities
               Kokkos::deep_copy(
                 Kokkos::View<Number *, MemorySpace::Default::kokkos_space>(
                   ghost_array.data(), n_ghost_indices()),
-                0);
+                Number(0));
             }
           else
 #    endif
             {
-              if constexpr (std::is_trivial_v<Number>)
-                {
-                  std::memset(ghost_array.data(),
-                              0,
-                              sizeof(Number) * n_ghost_indices());
-                }
-              else
-                std::fill(ghost_array.data(),
-                          ghost_array.data() + n_ghost_indices(),
-                          0);
+              std::fill(ghost_array.data(),
+                        ghost_array.data() + n_ghost_indices(),
+                        Number(0));
             }
         }
 

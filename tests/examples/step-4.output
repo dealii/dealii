@@ -1,0 +1,10 @@
+Solving problem in 2 space dimensions.
+   Number of active cells: 256
+   Total number of cells: 341
+   Number of degrees of freedom: 289
+   19 CG iterations needed to obtain convergence.
+Solving problem in 3 space dimensions.
+   Number of active cells: 4096
+   Total number of cells: 4681
+   Number of degrees of freedom: 4913
+   20 CG iterations needed to obtain convergence.

@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2015 - 2018 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2015 - 2024 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 // Check constructor and operator=
 
@@ -24,14 +23,11 @@
 
 
 void
-test()
+test(const IndexSet &is)
 {
   unsigned int double_size = 2;
   unsigned int float_size  = 10;
-  IndexSet     is(50);
-  is.add_range(0, 2);
-  is.add_index(46);
-  is.add_range(10, 15);
+
   LinearAlgebra::ReadWriteVector<double> double_vector(is);
   LinearAlgebra::ReadWriteVector<float>  float_vector(float_size);
   deallog << "double_size " << double_vector.locally_owned_size() << std::endl;
@@ -51,6 +47,9 @@ test()
 
   LinearAlgebra::ReadWriteVector<double> double_vector2(double_vector);
   double_vector2.print(deallog.get_file_stream());
+  deallog << "copy local size = " << double_vector2.locally_owned_size()
+          << std::endl;
+  deallog << "copy size       = " << double_vector2.size() << std::endl;
 
   for (unsigned int i = 0; i < double_vector.locally_owned_size(); ++i)
     double_vector2.local_element(i) += i;
@@ -62,7 +61,19 @@ int
 main()
 {
   initlog();
-  test();
 
-  return 0;
+  // Test with a normal index set:
+  {
+    IndexSet is(50);
+    is.add_range(0, 2);
+    is.add_index(46);
+    is.add_range(10, 15);
+    test(is);
+  }
+
+  // Test with an empty index set:
+  {
+    IndexSet is(50);
+    test(is);
+  }
 }

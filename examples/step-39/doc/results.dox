@@ -4,87 +4,69 @@
 First, the program produces the usual logfile here stored in <tt>deallog</tt>. It reads (with omission of intermediate steps)
 
 @code
-DEAL::Element: FE_DGQ<2>(3)
-DEAL::Step 0
-DEAL::Triangulation 16 cells, 2 levels
-DEAL::DoFHandler 256 dofs, level dofs 64 256
-DEAL::Assemble matrix
-DEAL::Assemble multilevel matrix
-DEAL::Assemble right hand side
-DEAL::Solve
-DEAL:cg::Starting value 37.4071
-DEAL:cg::Convergence step 13 value 1.64974e-13
-DEAL::energy-error: 0.297419
-DEAL::L2-error:     0.00452447
-DEAL::Estimate 0.990460
-DEAL::Writing solution to <sol-00.gnuplot>...
-DEAL::
-DEAL::Step 1
-DEAL::Triangulation 25 cells, 3 levels
-DEAL::DoFHandler 400 dofs, level dofs 64 256 192
-DEAL::Assemble matrix
-DEAL::Assemble multilevel matrix
-DEAL::Assemble right hand side
-DEAL::Solve
-DEAL:cg::Starting value 37.4071
-DEAL:cg::Convergence step 14 value 3.72262e-13
-DEAL::energy-error: 0.258559
-DEAL::L2-error:     0.00288510
-DEAL::Estimate 0.738624
-DEAL::Writing solution to <sol-01.gnuplot>...
-DEAL::
-DEAL::Step 2
-DEAL::Triangulation 34 cells, 4 levels
-DEAL::DoFHandler 544 dofs, level dofs 64 256 256 128
-DEAL::Assemble matrix
-DEAL::Assemble multilevel matrix
-DEAL::Assemble right hand side
-DEAL::Solve
-DEAL:cg::Starting value 37.4071
-DEAL:cg::Convergence step 15 value 1.91610e-13
-DEAL::energy-error: 0.189234
-DEAL::L2-error:     0.00147954
-DEAL::Estimate 0.657507
-DEAL::Writing solution to <sol-02.gnuplot>...
+Element: FE_DGQ<2>(3)
+Step 0
+Triangulation 16 cells, 2 levels
+DoFHandler 256 dofs, level dofs 64 256
+Assemble matrix
+Assemble multilevel matrix
+Assemble right hand side
+Solve
+Converged in 13 iterations
+energy-error: 0.297419
+L2-error:     0.00452447
+Estimate 0.990460
+Writing solution to <sol-00.gnuplot>...
+
+Step 1
+Triangulation 25 cells, 3 levels
+DoFHandler 400 dofs, level dofs 64 256 192
+Assemble matrix
+Assemble multilevel matrix
+Assemble right hand side
+Solve
+Converged in 14 iterations
+energy-error: 0.258559
+L2-error:     0.00288510
+Estimate 0.738624
+Writing solution to <sol-01.gnuplot>...
 
 ...
 
-DEAL::Step 10
-DEAL::Triangulation 232 cells, 11 levels
-DEAL::DoFHandler 3712 dofs, level dofs 64 256 896 768 768 640 512 256 256 256 256
-DEAL::Assemble matrix
-DEAL::Assemble multilevel matrix
-DEAL::Assemble right hand side
-DEAL::Solve
-DEAL:cg::Starting value 51.1571
-DEAL:cg::Convergence step 15 value 7.19599e-13
-DEAL::energy-error: 0.0132475
-DEAL::L2-error:     1.00423e-05
-DEAL::Estimate 0.0470724
-DEAL::Writing solution to <sol-10.gnuplot>...
-DEAL::
-DEAL::Step 11
-DEAL::Triangulation 322 cells, 12 levels
-DEAL::DoFHandler 5152 dofs, level dofs 64 256 1024 1024 896 768 768 640 448 320 320 320
-DEAL::Assemble matrix
-DEAL::Assemble multilevel matrix
-DEAL::Assemble right hand side
-DEAL::Solve
-DEAL:cg::Starting value 52.2226
-DEAL:cg::Convergence step 15 value 8.15195e-13
-DEAL::energy-error: 0.00934891
-DEAL::L2-error:     5.41095e-06
-DEAL::Estimate 0.0329102
-DEAL::Writing solution to <sol-11.gnuplot>...
-DEAL::
+Step 10
+Triangulation 232 cells, 11 levels
+DoFHandler 3712 dofs, level dofs 64 256 896 768 768 640 512 256 256 256 256
+Assemble matrix
+Assemble multilevel matrix
+Assemble right hand side
+Solve
+Converged in 15 iterations
+energy-error: 0.0132475
+L2-error:     1.00423e-05
+Estimate 0.0470724
+Writing solution to <sol-10.gnuplot>...
+
+Step 11
+Triangulation 322 cells, 12 levels
+DoFHandler 5152 dofs, level dofs 64 256 1024 1024 896 768 768 640 448 320 320 320
+Assemble matrix
+Assemble multilevel matrix
+Assemble right hand side
+Solve
+Converged in 15 iterations
+energy-error: 0.00934891
+L2-error:     5.41095e-06
+Estimate 0.0329102
+Writing solution to <sol-11.gnuplot>...
 @endcode
 
 This log for instance shows that the number of conjugate gradient
 iteration steps is constant at approximately 15.
 
+
 <h3>Postprocessing of the logfile</h3>
 
-<img src="https://www.dealii.org/images/steps/developer/step-39-convergence.svg" alt="">
+<img src="https://dealii.org/images/steps/developer/step-39-convergence.svg" alt="">
 Using the perl script <tt>postprocess.pl</tt>, we extract relevant
 data into <tt>output.dat</tt>, which can be used to plot graphs with
 <tt>gnuplot</tt>. The graph above for instance was produced using the gnuplot

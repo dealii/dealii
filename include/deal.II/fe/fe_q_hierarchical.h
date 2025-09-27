@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2002 - 2023 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2002 - 2024 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 #ifndef dealii_fe_q_hierarchical_h
 #define dealii_fe_q_hierarchical_h
@@ -109,22 +108,22 @@ DEAL_II_NAMESPACE_OPEN
  *
  * In 2d, these shape functions look as follows: <table> <tr> <td
  * align="center">
- * @image html http://www.dealii.org/images/shape-functions/hierarchical/Q1/Q1H_shape0000.png
+ * @image html http://dealii.org/images/shape-functions/hierarchical/Q1/Q1H_shape0000.png
  * </td>
  *
  * <td align="center">
- * @image html http://www.dealii.org/images/shape-functions/hierarchical/Q1/Q1H_shape0001.png
+ * @image html http://dealii.org/images/shape-functions/hierarchical/Q1/Q1H_shape0001.png
  * </td> </tr> <tr> <td align="center"> $Q_1^H$ element, shape function 0
  * </td>
  *
  * <td align="center"> $Q_1^H$ element, shape function 1 </td> </tr>
  *
  * <tr> <td align="center">
- * @image html http://www.dealii.org/images/shape-functions/hierarchical/Q1/Q1H_shape0002.png
+ * @image html http://dealii.org/images/shape-functions/hierarchical/Q1/Q1H_shape0002.png
  * </td>
  *
  * <td align="center">
- * @image html http://www.dealii.org/images/shape-functions/hierarchical/Q1/Q1H_shape0003.png
+ * @image html http://dealii.org/images/shape-functions/hierarchical/Q1/Q1H_shape0003.png
  * </td> </tr> <tr> <td align="center"> $Q_1^H$ element, shape function 2
  * </td>
  *
@@ -171,7 +170,7 @@ DEAL_II_NAMESPACE_OPEN
  *     |/       /       |       |/
  *     *-------*        *-------*
  *   @endverbatim
- * The center vertex has number 26.
+ * The center node has number 26.
  *
  * The respective coordinate values of the support points of the degrees of
  * freedom are as follows:
@@ -210,51 +209,51 @@ DEAL_II_NAMESPACE_OPEN
  * In 2d, these shape functions look as follows (the black plane corresponds
  * to zero; negative shape function values may not be visible): <table> <tr>
  * <td align="center">
- * @image html http://www.dealii.org/images/shape-functions/hierarchical/Q2/Q2H_shape0000.png
+ * @image html http://dealii.org/images/shape-functions/hierarchical/Q2/Q2H_shape0000.png
  * </td>
  *
  * <td align="center">
- * @image html http://www.dealii.org/images/shape-functions/hierarchical/Q2/Q2H_shape0001.png
+ * @image html http://dealii.org/images/shape-functions/hierarchical/Q2/Q2H_shape0001.png
  * </td> </tr> <tr> <td align="center"> $Q_2^H$ element, shape function 0
  * </td>
  *
  * <td align="center"> $Q_2^H$ element, shape function 1 </td> </tr>
  *
  * <tr> <td align="center">
- * @image html http://www.dealii.org/images/shape-functions/hierarchical/Q2/Q2H_shape0002.png
+ * @image html http://dealii.org/images/shape-functions/hierarchical/Q2/Q2H_shape0002.png
  * </td>
  *
  * <td align="center">
- * @image html http://www.dealii.org/images/shape-functions/hierarchical/Q2/Q2H_shape0003.png
+ * @image html http://dealii.org/images/shape-functions/hierarchical/Q2/Q2H_shape0003.png
  * </td> </tr> <tr> <td align="center"> $Q_2^H$ element, shape function 2
  * </td>
  *
  * <td align="center"> $Q_2^H$ element, shape function 3 </td> </tr>
  *
  * <tr> <td align="center">
- * @image html http://www.dealii.org/images/shape-functions/hierarchical/Q2/Q2H_shape0004.png
+ * @image html http://dealii.org/images/shape-functions/hierarchical/Q2/Q2H_shape0004.png
  * </td>
  *
  * <td align="center">
- * @image html http://www.dealii.org/images/shape-functions/hierarchical/Q2/Q2H_shape0005.png
+ * @image html http://dealii.org/images/shape-functions/hierarchical/Q2/Q2H_shape0005.png
  * </td> </tr> <tr> <td align="center"> $Q_2^H$ element, shape function 4
  * </td>
  *
  * <td align="center"> $Q_2^H$ element, shape function 5 </td> </tr>
  *
  * <tr> <td align="center">
- * @image html http://www.dealii.org/images/shape-functions/hierarchical/Q2/Q2H_shape0006.png
+ * @image html http://dealii.org/images/shape-functions/hierarchical/Q2/Q2H_shape0006.png
  * </td>
  *
  * <td align="center">
- * @image html http://www.dealii.org/images/shape-functions/hierarchical/Q2/Q2H_shape0007.png
+ * @image html http://dealii.org/images/shape-functions/hierarchical/Q2/Q2H_shape0007.png
  * </td> </tr> <tr> <td align="center"> $Q_2^H$ element, shape function 6
  * </td>
  *
  * <td align="center"> $Q_2^H$ element, shape function 7 </td> </tr>
  *
  * <tr> <td align="center">
- * @image html http://www.dealii.org/images/shape-functions/hierarchical/Q2/Q2H_shape0008.png
+ * @image html http://dealii.org/images/shape-functions/hierarchical/Q2/Q2H_shape0008.png
  * </td>
  *
  * <td align="center"> </td> </tr> <tr> <td align="center"> $Q_2^H$ element,
@@ -285,88 +284,88 @@ DEAL_II_NAMESPACE_OPEN
  * In 2d, these shape functions look as follows (the black plane corresponds
  * to zero; negative shape function values may not be visible): <table> <tr>
  * <td align="center">
- * @image html http://www.dealii.org/images/shape-functions/hierarchical/Q3/Q3H_shape0000.png
+ * @image html http://dealii.org/images/shape-functions/hierarchical/Q3/Q3H_shape0000.png
  * </td>
  *
  * <td align="center">
- * @image html http://www.dealii.org/images/shape-functions/hierarchical/Q3/Q3H_shape0001.png
+ * @image html http://dealii.org/images/shape-functions/hierarchical/Q3/Q3H_shape0001.png
  * </td> </tr> <tr> <td align="center"> $Q_3^H$ element, shape function 0
  * </td>
  *
  * <td align="center"> $Q_3^H$ element, shape function 1 </td> </tr>
  *
  * <tr> <td align="center">
- * @image html http://www.dealii.org/images/shape-functions/hierarchical/Q3/Q3H_shape0002.png
+ * @image html http://dealii.org/images/shape-functions/hierarchical/Q3/Q3H_shape0002.png
  * </td>
  *
  * <td align="center">
- * @image html http://www.dealii.org/images/shape-functions/hierarchical/Q3/Q3H_shape0003.png
+ * @image html http://dealii.org/images/shape-functions/hierarchical/Q3/Q3H_shape0003.png
  * </td> </tr> <tr> <td align="center"> $Q_3^H$ element, shape function 2
  * </td>
  *
  * <td align="center"> $Q_3^H$ element, shape function 3 </td> </tr>
  *
  * <tr> <td align="center">
- * @image html http://www.dealii.org/images/shape-functions/hierarchical/Q3/Q3H_shape0004.png
+ * @image html http://dealii.org/images/shape-functions/hierarchical/Q3/Q3H_shape0004.png
  * </td>
  *
  * <td align="center">
- * @image html http://www.dealii.org/images/shape-functions/hierarchical/Q3/Q3H_shape0005.png
+ * @image html http://dealii.org/images/shape-functions/hierarchical/Q3/Q3H_shape0005.png
  * </td> </tr> <tr> <td align="center"> $Q_3^H$ element, shape function 4
  * </td>
  *
  * <td align="center"> $Q_3^H$ element, shape function 5 </td> </tr>
  *
  * <tr> <td align="center">
- * @image html http://www.dealii.org/images/shape-functions/hierarchical/Q3/Q3H_shape0006.png
+ * @image html http://dealii.org/images/shape-functions/hierarchical/Q3/Q3H_shape0006.png
  * </td>
  *
  * <td align="center">
- * @image html http://www.dealii.org/images/shape-functions/hierarchical/Q3/Q3H_shape0007.png
+ * @image html http://dealii.org/images/shape-functions/hierarchical/Q3/Q3H_shape0007.png
  * </td> </tr> <tr> <td align="center"> $Q_3^H$ element, shape function 6
  * </td>
  *
  * <td align="center"> $Q_3^H$ element, shape function 7 </td> </tr>
  *
  * <tr> <td align="center">
- * @image html http://www.dealii.org/images/shape-functions/hierarchical/Q3/Q3H_shape0008.png
+ * @image html http://dealii.org/images/shape-functions/hierarchical/Q3/Q3H_shape0008.png
  * </td>
  *
  * <td align="center">
- * @image html http://www.dealii.org/images/shape-functions/hierarchical/Q3/Q3H_shape0009.png
+ * @image html http://dealii.org/images/shape-functions/hierarchical/Q3/Q3H_shape0009.png
  * </td> </tr> <tr> <td align="center"> $Q_3^H$ element, shape function 8
  * </td>
  *
  * <td align="center"> $Q_3^H$ element, shape function 9 </td> </tr>
  *
  * <tr> <td align="center">
- * @image html http://www.dealii.org/images/shape-functions/hierarchical/Q3/Q3H_shape0010.png
+ * @image html http://dealii.org/images/shape-functions/hierarchical/Q3/Q3H_shape0010.png
  * </td>
  *
  * <td align="center">
- * @image html http://www.dealii.org/images/shape-functions/hierarchical/Q3/Q3H_shape0011.png
+ * @image html http://dealii.org/images/shape-functions/hierarchical/Q3/Q3H_shape0011.png
  * </td> </tr> <tr> <td align="center"> $Q_3^H$ element, shape function 10
  * </td>
  *
  * <td align="center"> $Q_3^H$ element, shape function 11 </td> </tr>
  *
  * <tr> <td align="center">
- * @image html http://www.dealii.org/images/shape-functions/hierarchical/Q3/Q3H_shape0012.png
+ * @image html http://dealii.org/images/shape-functions/hierarchical/Q3/Q3H_shape0012.png
  * </td>
  *
  * <td align="center">
- * @image html http://www.dealii.org/images/shape-functions/hierarchical/Q3/Q3H_shape0013.png
+ * @image html http://dealii.org/images/shape-functions/hierarchical/Q3/Q3H_shape0013.png
  * </td> </tr> <tr> <td align="center"> $Q_3^H$ element, shape function 12
  * </td>
  *
  * <td align="center"> $Q_3^H$ element, shape function 13 </td> </tr>
  *
  * <tr> <td align="center">
- * @image html http://www.dealii.org/images/shape-functions/hierarchical/Q3/Q3H_shape0014.png
+ * @image html http://dealii.org/images/shape-functions/hierarchical/Q3/Q3H_shape0014.png
  * </td>
  *
  * <td align="center">
- * @image html http://www.dealii.org/images/shape-functions/hierarchical/Q3/Q3H_shape0015.png
+ * @image html http://dealii.org/images/shape-functions/hierarchical/Q3/Q3H_shape0015.png
  * </td> </tr> <tr> <td align="center"> $Q_3^H$ element, shape function 14
  * </td>
  *
@@ -397,139 +396,139 @@ DEAL_II_NAMESPACE_OPEN
  * In 2d, these shape functions look as follows (the black plane corresponds
  * to zero; negative shape function values may not be visible): <table> <tr>
  * <td align="center">
- * @image html http://www.dealii.org/images/shape-functions/hierarchical/Q4/Q4H_shape0000.png
+ * @image html http://dealii.org/images/shape-functions/hierarchical/Q4/Q4H_shape0000.png
  * </td>
  *
  * <td align="center">
- * @image html http://www.dealii.org/images/shape-functions/hierarchical/Q4/Q4H_shape0001.png
+ * @image html http://dealii.org/images/shape-functions/hierarchical/Q4/Q4H_shape0001.png
  * </td> </tr> <tr> <td align="center"> $Q_4^H$ element, shape function 0
  * </td>
  *
  * <td align="center"> $Q_4^H$ element, shape function 1 </td> </tr>
  *
  * <tr> <td align="center">
- * @image html http://www.dealii.org/images/shape-functions/hierarchical/Q4/Q4H_shape0002.png
+ * @image html http://dealii.org/images/shape-functions/hierarchical/Q4/Q4H_shape0002.png
  * </td>
  *
  * <td align="center">
- * @image html http://www.dealii.org/images/shape-functions/hierarchical/Q4/Q4H_shape0003.png
+ * @image html http://dealii.org/images/shape-functions/hierarchical/Q4/Q4H_shape0003.png
  * </td> </tr> <tr> <td align="center"> $Q_4^H$ element, shape function 2
  * </td>
  *
  * <td align="center"> $Q_4^H$ element, shape function 3 </td> </tr>
  *
  * <tr> <td align="center">
- * @image html http://www.dealii.org/images/shape-functions/hierarchical/Q4/Q4H_shape0004.png
+ * @image html http://dealii.org/images/shape-functions/hierarchical/Q4/Q4H_shape0004.png
  * </td>
  *
  * <td align="center">
- * @image html http://www.dealii.org/images/shape-functions/hierarchical/Q4/Q4H_shape0005.png
+ * @image html http://dealii.org/images/shape-functions/hierarchical/Q4/Q4H_shape0005.png
  * </td> </tr> <tr> <td align="center"> $Q_4^H$ element, shape function 4
  * </td>
  *
  * <td align="center"> $Q_4^H$ element, shape function 5 </td> </tr>
  *
  * <tr> <td align="center">
- * @image html http://www.dealii.org/images/shape-functions/hierarchical/Q4/Q4H_shape0006.png
+ * @image html http://dealii.org/images/shape-functions/hierarchical/Q4/Q4H_shape0006.png
  * </td>
  *
  * <td align="center">
- * @image html http://www.dealii.org/images/shape-functions/hierarchical/Q4/Q4H_shape0007.png
+ * @image html http://dealii.org/images/shape-functions/hierarchical/Q4/Q4H_shape0007.png
  * </td> </tr> <tr> <td align="center"> $Q_4^H$ element, shape function 6
  * </td>
  *
  * <td align="center"> $Q_4^H$ element, shape function 7 </td> </tr>
  *
  * <tr> <td align="center">
- * @image html http://www.dealii.org/images/shape-functions/hierarchical/Q4/Q4H_shape0008.png
+ * @image html http://dealii.org/images/shape-functions/hierarchical/Q4/Q4H_shape0008.png
  * </td>
  *
  * <td align="center">
- * @image html http://www.dealii.org/images/shape-functions/hierarchical/Q4/Q4H_shape0009.png
+ * @image html http://dealii.org/images/shape-functions/hierarchical/Q4/Q4H_shape0009.png
  * </td> </tr> <tr> <td align="center"> $Q_4^H$ element, shape function 8
  * </td>
  *
  * <td align="center"> $Q_4^H$ element, shape function 9 </td> </tr>
  *
  * <tr> <td align="center">
- * @image html http://www.dealii.org/images/shape-functions/hierarchical/Q4/Q4H_shape0010.png
+ * @image html http://dealii.org/images/shape-functions/hierarchical/Q4/Q4H_shape0010.png
  * </td>
  *
  * <td align="center">
- * @image html http://www.dealii.org/images/shape-functions/hierarchical/Q4/Q4H_shape0011.png
+ * @image html http://dealii.org/images/shape-functions/hierarchical/Q4/Q4H_shape0011.png
  * </td> </tr> <tr> <td align="center"> $Q_4^H$ element, shape function 10
  * </td>
  *
  * <td align="center"> $Q_4^H$ element, shape function 11 </td> </tr>
  *
  * <tr> <td align="center">
- * @image html http://www.dealii.org/images/shape-functions/hierarchical/Q4/Q4H_shape0012.png
+ * @image html http://dealii.org/images/shape-functions/hierarchical/Q4/Q4H_shape0012.png
  * </td>
  *
  * <td align="center">
- * @image html http://www.dealii.org/images/shape-functions/hierarchical/Q4/Q4H_shape0013.png
+ * @image html http://dealii.org/images/shape-functions/hierarchical/Q4/Q4H_shape0013.png
  * </td> </tr> <tr> <td align="center"> $Q_4^H$ element, shape function 12
  * </td>
  *
  * <td align="center"> $Q_4^H$ element, shape function 13 </td> </tr>
  *
  * <tr> <td align="center">
- * @image html http://www.dealii.org/images/shape-functions/hierarchical/Q4/Q4H_shape0014.png
+ * @image html http://dealii.org/images/shape-functions/hierarchical/Q4/Q4H_shape0014.png
  * </td>
  *
  * <td align="center">
- * @image html http://www.dealii.org/images/shape-functions/hierarchical/Q4/Q4H_shape0015.png
+ * @image html http://dealii.org/images/shape-functions/hierarchical/Q4/Q4H_shape0015.png
  * </td> </tr> <tr> <td align="center"> $Q_4^H$ element, shape function 14
  * </td>
  *
  * <td align="center"> $Q_4^H$ element, shape function 15 </td> </tr>
  *
  * <tr> <td align="center">
- * @image html http://www.dealii.org/images/shape-functions/hierarchical/Q4/Q4H_shape0016.png
+ * @image html http://dealii.org/images/shape-functions/hierarchical/Q4/Q4H_shape0016.png
  * </td>
  *
  * <td align="center">
- * @image html http://www.dealii.org/images/shape-functions/hierarchical/Q4/Q4H_shape0017.png
+ * @image html http://dealii.org/images/shape-functions/hierarchical/Q4/Q4H_shape0017.png
  * </td> </tr> <tr> <td align="center"> $Q_4^H$ element, shape function 16
  * </td>
  *
  * <td align="center"> $Q_4^H$ element, shape function 17 </td> </tr>
  *
  * <tr> <td align="center">
- * @image html http://www.dealii.org/images/shape-functions/hierarchical/Q4/Q4H_shape0018.png
+ * @image html http://dealii.org/images/shape-functions/hierarchical/Q4/Q4H_shape0018.png
  * </td>
  *
  * <td align="center">
- * @image html http://www.dealii.org/images/shape-functions/hierarchical/Q4/Q4H_shape0019.png
+ * @image html http://dealii.org/images/shape-functions/hierarchical/Q4/Q4H_shape0019.png
  * </td> </tr> <tr> <td align="center"> $Q_4^H$ element, shape function 18
  * </td>
  *
  * <td align="center"> $Q_4^H$ element, shape function 19 </td> </tr>
  *
  * <tr> <td align="center">
- * @image html http://www.dealii.org/images/shape-functions/hierarchical/Q4/Q4H_shape0020.png
+ * @image html http://dealii.org/images/shape-functions/hierarchical/Q4/Q4H_shape0020.png
  * </td>
  *
  * <td align="center">
- * @image html http://www.dealii.org/images/shape-functions/hierarchical/Q4/Q4H_shape0021.png
+ * @image html http://dealii.org/images/shape-functions/hierarchical/Q4/Q4H_shape0021.png
  * </td> </tr> <tr> <td align="center"> $Q_4^H$ element, shape function 20
  * </td>
  *
  * <td align="center"> $Q_4^H$ element, shape function 21 </td> </tr>
  *
  * <tr> <td align="center">
- * @image html http://www.dealii.org/images/shape-functions/hierarchical/Q4/Q4H_shape0022.png
+ * @image html http://dealii.org/images/shape-functions/hierarchical/Q4/Q4H_shape0022.png
  * </td>
  *
  * <td align="center">
- * @image html http://www.dealii.org/images/shape-functions/hierarchical/Q4/Q4H_shape0023.png
+ * @image html http://dealii.org/images/shape-functions/hierarchical/Q4/Q4H_shape0023.png
  * </td> </tr> <tr> <td align="center"> $Q_4^H$ element, shape function 22
  * </td>
  *
  * <td align="center"> $Q_4^H$ element, shape function 23 </td> </tr>
  *
  * <tr> <td align="center">
- * @image html http://www.dealii.org/images/shape-functions/hierarchical/Q4/Q4H_shape0024.png
+ * @image html http://dealii.org/images/shape-functions/hierarchical/Q4/Q4H_shape0024.png
  * </td>
  *
  * <td align="center"> </td> </tr> <tr> <td align="center"> $Q_4^H$ element,

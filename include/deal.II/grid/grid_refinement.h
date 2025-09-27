@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
+// SPDX-License-Identifier: LGPL-2.1-or-later
 // Copyright (C) 2000 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 #ifndef dealii_grid_refinement_h
 #define dealii_grid_refinement_h
@@ -226,8 +225,8 @@ namespace GridRefinement
    * @param[in] norm_type To determine thresholds, combined errors on
    * subsets of cells are calculated as norms of the criteria on these
    * cells. Different types of norms can be used for this purpose, from
-   * which VectorTools::NormType::L1_norm and
-   * VectorTools::NormType::L2_norm are currently supported.
+   * which VectorTools::L1_norm and
+   * VectorTools::L2_norm are currently supported.
    */
   template <int dim, typename Number, int spacedim>
   void
@@ -237,7 +236,7 @@ namespace GridRefinement
     const double                  top_fraction,
     const double                  bottom_fraction,
     const unsigned int max_n_cells = std::numeric_limits<unsigned int>::max(),
-    const VectorTools::NormType norm_type = VectorTools::NormType::L1_norm);
+    const VectorTools::NormType norm_type = VectorTools::L1_norm);
 
 
 

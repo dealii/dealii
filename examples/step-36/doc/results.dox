@@ -17,10 +17,10 @@ $m,n\in{\mathbb N^+}$. Eigenfunctions are sines and cosines with $m$ and $n$
 periods in $x$ and $y$ directions. This matches the output our program
 generates:
 @code
-examples/\step-36> make run
-============================ Running \step-36
+step-36$ ./step-36
    Number of active cells:       1024
    Number of degrees of freedom: 1089
+   Spurious eigenvalues are all in the interval [1536,1536]
    Solver converged in 67 iterations.
 
       Eigenvalue 0 : 4.93877
@@ -29,20 +29,22 @@ examples/\step-36> make run
       Eigenvalue 3 : 19.8027
       Eigenvalue 4 : 24.837
 
-   Job done.  @endcode These eigenvalues are exactly the ones that
+   Job done.
+@endcode
+These eigenvalues are exactly the ones that
 correspond to pairs $(m,n)=(1,1)$, $(1,2)$ and $(2,1)$, $(2,2)$, and
 $(3,1)$. A visualization of the corresponding eigenfunctions would
 look like this:
 
 <table width="80%">
 <tr>
-<td><img src="https://www.dealii.org/images/steps/developer/step-36.default.eigenfunction.0.png" alt=""></td>
-<td><img src="https://www.dealii.org/images/steps/developer/step-36.default.eigenfunction.1.png" alt=""></td>
-<td><img src="https://www.dealii.org/images/steps/developer/step-36.default.eigenfunction.2.png" alt=""></td>
+<td><img src="https://dealii.org/images/steps/developer/step-36.default.eigenfunction.0.png" alt=""></td>
+<td><img src="https://dealii.org/images/steps/developer/step-36.default.eigenfunction.1.png" alt=""></td>
+<td><img src="https://dealii.org/images/steps/developer/step-36.default.eigenfunction.2.png" alt=""></td>
 </tr>
 <tr>
-<td><img src="https://www.dealii.org/images/steps/developer/step-36.default.eigenfunction.3.png" alt=""></td>
-<td><img src="https://www.dealii.org/images/steps/developer/step-36.default.eigenfunction.4.png" alt=""></td>
+<td><img src="https://dealii.org/images/steps/developer/step-36.default.eigenfunction.3.png" alt=""></td>
+<td><img src="https://dealii.org/images/steps/developer/step-36.default.eigenfunction.4.png" alt=""></td>
 <td></td>
 </tr>
 </table>
@@ -83,8 +85,7 @@ set Potential = if (x^2 + y^2 < 0.75^2, if (x*y > 0, -100, -5), 0)
 If in addition we also increase the mesh refinement by one level, we get the
 following results:
 @code
-examples/\step-36> make run
-============================ Running \step-36
+step-36$ ./step-36
    Number of active cells:       4096
    Number of degrees of freedom: 4225
 
@@ -101,19 +102,19 @@ probability densities $|\Psi(\mathbf x)|^2$ that are significant only where the
 potential is the lowest, i.e. in the top right and bottom left sector of inner
 circle of the potential):
 
-<img src="https://www.dealii.org/images/steps/developer/step-36.mod.potential.png" alt="">
+<img src="https://dealii.org/images/steps/developer/step-36.mod.potential.png" alt="">
 
 The first five eigenfunctions are now like this:
 
 <table width="80%">
 <tr>
-<td><img src="https://www.dealii.org/images/steps/developer/step-36.mod.eigenfunction.0.png" alt=""></td>
-<td><img src="https://www.dealii.org/images/steps/developer/step-36.mod.eigenfunction.1.png" alt=""></td>
-<td><img src="https://www.dealii.org/images/steps/developer/step-36.mod.eigenfunction.2.png" alt=""></td>
+<td><img src="https://dealii.org/images/steps/developer/step-36.mod.eigenfunction.0.png" alt=""></td>
+<td><img src="https://dealii.org/images/steps/developer/step-36.mod.eigenfunction.1.png" alt=""></td>
+<td><img src="https://dealii.org/images/steps/developer/step-36.mod.eigenfunction.2.png" alt=""></td>
 </tr>
 <tr>
-<td><img src="https://www.dealii.org/images/steps/developer/step-36.mod.eigenfunction.3.png" alt=""></td>
-<td><img src="https://www.dealii.org/images/steps/developer/step-36.mod.eigenfunction.4.png" alt=""></td>
+<td><img src="https://dealii.org/images/steps/developer/step-36.mod.eigenfunction.3.png" alt=""></td>
+<td><img src="https://dealii.org/images/steps/developer/step-36.mod.eigenfunction.4.png" alt=""></td>
 <td></td>
 </tr>
 </table>
@@ -164,8 +165,8 @@ can be particularly useful here since the generalized eigenspectrum
 problem is somewhat more expensive to solve than the standard problems
 considered in most of the earlier tutorials. Fortunately, modifying the above
 program to be MPI compliant is a relatively straightforward
-procedure. A sketch of how this can be done can be found in @ref
-step_17 "step-17".
+procedure. A sketch of how this can be done can be found in
+step-17.
 
 <li> Finally, there are alternatives to using the SLEPc eigenvalue
 solvers. deal.II has interfaces to one of them, ARPACK (see <a
@@ -198,51 +199,51 @@ ARPACK allows complex eigenvalues, so we will also need
 Secondly, we switch back to the deal.II matrix and vector definitions in the
 main class:
 @code
-    SparsityPattern                     sparsity_pattern;
-    SparseMatrix<double>                stiffness_matrix, mass_matrix;
-    std::vector<Vector<double> >        eigenfunctions;
-    std::vector<std::complex<double>>   eigenvalues;
+    SparsityPattern                   sparsity_pattern;
+    SparseMatrix<double>              stiffness_matrix, mass_matrix;
+    std::vector<Vector<double>>       eigenfunctions;
+    std::vector<std::complex<double>> eigenvalues;
 @endcode
 and initialize them as usual in <code>make_grid_and_dofs()</code>:
 @code
-    sparsity_pattern.reinit (dof_handler.n_dofs(),
-                             dof_handler.n_dofs(),
-                             dof_handler.max_couplings_between_dofs());
+    sparsity_pattern.reinit(dof_handler.n_dofs(),
+                            dof_handler.n_dofs(),
+                            dof_handler.max_couplings_between_dofs());
 
-    DoFTools::make_sparsity_pattern (dof_handler, sparsity_pattern);
-    constraints.condense (sparsity_pattern);
+    DoFTools::make_sparsity_pattern(dof_handler, sparsity_pattern);
+    constraints.condense(sparsity_pattern);
     sparsity_pattern.compress();
 
-    stiffness_matrix.reinit (sparsity_pattern);
-    mass_matrix.reinit (sparsity_pattern);
+    stiffness_matrix.reinit(sparsity_pattern);
+    mass_matrix.reinit(sparsity_pattern);
 @endcode
 
 For solving the eigenvalue problem with ARPACK, we finally need to modify
 <code>solve()</code>:
 @code
   template <int dim>
-  unsigned int EigenvalueProblem<dim>::solve ()
+  unsigned int EigenvalueProblem<dim>::solve()
   {
-    SolverControl solver_control (dof_handler.n_dofs(), 1e-9);
+    SolverControl solver_control(dof_handler.n_dofs(), 1e-9);
 
     SparseDirectUMFPACK inverse;
-    inverse.initialize (stiffness_matrix);
+    inverse.initialize(stiffness_matrix);
 
-    const unsigned int num_arnoldi_vectors = 2*eigenvalues.size() + 2;
+    const unsigned int num_arnoldi_vectors = 2 * eigenvalues.size() + 2;
     ArpackSolver::AdditionalData additional_data(num_arnoldi_vectors);
 
-    ArpackSolver eigensolver (solver_control, additional_data);
-    eigensolver.solve (stiffness_matrix,
-                       mass_matrix,
-                       inverse,
-                       eigenvalues,
-                       eigenfunctions,
-                       eigenvalues.size());
+    ArpackSolver eigensolver(solver_control, additional_data);
+    eigensolver.solve(stiffness_matrix,
+                      mass_matrix,
+                      inverse,
+                      eigenvalues,
+                      eigenfunctions,
+                      eigenvalues.size());
 
-    for (unsigned int i=0; i<eigenfunctions.size(); ++i)
-      eigenfunctions[i] /= eigenfunctions[i].linfty_norm ();
+    for (unsigned int i = 0; i < eigenfunctions.size(); ++i)
+      eigenfunctions[i] /= eigenfunctions[i].linfty_norm();
 
-    return solver_control.last_step ();
+    return solver_control.last_step();
   }
 @endcode
 Note how we have used an exact decomposition (using SparseDirectUMFPACK) as a

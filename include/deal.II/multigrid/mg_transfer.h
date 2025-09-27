@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2001 - 2022 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2001 - 2024 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 #ifndef dealii_mg_transfer_h
 #define dealii_mg_transfer_h
@@ -84,7 +83,7 @@ namespace internal
            const SparsityPatternType       &sp,
            const DoFHandler<dim, spacedim> &dh)
     {
-      const MPI_Comm communicator = dh.get_communicator();
+      const MPI_Comm communicator = dh.get_mpi_communicator();
 
       matrix.reinit(dh.locally_owned_mg_dofs(level + 1),
                     dh.locally_owned_mg_dofs(level),
@@ -110,7 +109,7 @@ namespace internal
            const SparsityPatternType       &sp,
            const DoFHandler<dim, spacedim> &dh)
     {
-      const MPI_Comm communicator = dh.get_communicator();
+      const MPI_Comm communicator = dh.get_mpi_communicator();
 
       matrix.reinit(dh.locally_owned_mg_dofs(level + 1),
                     dh.locally_owned_mg_dofs(level),
@@ -122,8 +121,9 @@ namespace internal
 
 #  ifdef DEAL_II_WITH_MPI
 #    ifdef DEAL_II_TRILINOS_WITH_TPETRA
-  template <typename Number>
-  struct MatrixSelector<dealii::LinearAlgebra::TpetraWrappers::Vector<Number>>
+  template <typename Number, typename MemorySpace>
+  struct MatrixSelector<
+    dealii::LinearAlgebra::TpetraWrappers::Vector<Number, MemorySpace>>
   {
     using Sparsity = ::dealii::TrilinosWrappers::SparsityPattern;
     using Matrix   = ::dealii::TrilinosWrappers::SparseMatrix;
@@ -138,7 +138,7 @@ namespace internal
            const SparsityPatternType       &sp,
            const DoFHandler<dim, spacedim> &dh)
     {
-      const MPI_Comm communicator = dh.get_communicator();
+      const MPI_Comm communicator = dh.get_mpi_communicator();
 
       matrix.reinit(dh.locally_owned_mg_dofs(level + 1),
                     dh.locally_owned_mg_dofs(level),
@@ -165,7 +165,7 @@ namespace internal
            const SparsityPatternType       &sp,
            const DoFHandler<dim, spacedim> &dh)
     {
-      const MPI_Comm communicator = dh.get_communicator();
+      const MPI_Comm communicator = dh.get_mpi_communicator();
 
       matrix.reinit(dh.locally_owned_mg_dofs(level + 1),
                     dh.locally_owned_mg_dofs(level),
@@ -221,7 +221,7 @@ namespace internal
            const SparsityPatternType       &sp,
            const DoFHandler<dim, spacedim> &dh)
     {
-      const MPI_Comm communicator = dh.get_communicator();
+      const MPI_Comm communicator = dh.get_mpi_communicator();
 
       // Reinit PETSc matrix
       matrix.reinit(dh.locally_owned_mg_dofs(level + 1),
@@ -386,7 +386,7 @@ protected:
   /**
    * The mg_constrained_dofs of the level systems.
    */
-  SmartPointer<const MGConstrainedDoFs> mg_constrained_dofs;
+  ObserverPointer<const MGConstrainedDoFs> mg_constrained_dofs;
 
 private:
   /**
@@ -407,9 +407,11 @@ private:
  * routines as compared to the %parallel vectors in the PETScWrappers and
  * TrilinosWrappers namespaces.
  */
-template <typename Number>
-class MGLevelGlobalTransfer<LinearAlgebra::distributed::Vector<Number>>
-  : public MGTransferBase<LinearAlgebra::distributed::Vector<Number>>
+template <typename Number, typename MemorySpace>
+class MGLevelGlobalTransfer<
+  LinearAlgebra::distributed::Vector<Number, MemorySpace>>
+  : public MGTransferBase<
+      LinearAlgebra::distributed::Vector<Number, MemorySpace>>
 {
 public:
   /**
@@ -426,9 +428,10 @@ public:
    */
   template <int dim, typename Number2, int spacedim>
   void
-  copy_to_mg(const DoFHandler<dim, spacedim> &dof_handler,
-             MGLevelObject<LinearAlgebra::distributed::Vector<Number>> &dst,
-             const LinearAlgebra::distributed::Vector<Number2> &src) const;
+  copy_to_mg(
+    const DoFHandler<dim, spacedim> &dof_handler,
+    MGLevelObject<LinearAlgebra::distributed::Vector<Number, MemorySpace>> &dst,
+    const LinearAlgebra::distributed::Vector<Number2, MemorySpace> &src) const;
 
   /**
    * Transfer from multi-level vector to normal vector.
@@ -440,9 +443,10 @@ public:
   template <int dim, typename Number2, int spacedim>
   void
   copy_from_mg(
-    const DoFHandler<dim, spacedim>             &dof_handler,
-    LinearAlgebra::distributed::Vector<Number2> &dst,
-    const MGLevelObject<LinearAlgebra::distributed::Vector<Number>> &src) const;
+    const DoFHandler<dim, spacedim>                          &dof_handler,
+    LinearAlgebra::distributed::Vector<Number2, MemorySpace> &dst,
+    const MGLevelObject<LinearAlgebra::distributed::Vector<Number, MemorySpace>>
+      &src) const;
 
   /**
    * Add a multi-level vector to a normal vector.
@@ -452,9 +456,10 @@ public:
   template <int dim, typename Number2, int spacedim>
   void
   copy_from_mg_add(
-    const DoFHandler<dim, spacedim>             &dof_handler,
-    LinearAlgebra::distributed::Vector<Number2> &dst,
-    const MGLevelObject<LinearAlgebra::distributed::Vector<Number>> &src) const;
+    const DoFHandler<dim, spacedim>                          &dof_handler,
+    LinearAlgebra::distributed::Vector<Number2, MemorySpace> &dst,
+    const MGLevelObject<LinearAlgebra::distributed::Vector<Number, MemorySpace>>
+      &src) const;
 
   /**
    * If this object operates on BlockVector objects, we need to describe how
@@ -493,10 +498,11 @@ protected:
    */
   template <int dim, typename Number2, int spacedim>
   void
-  copy_to_mg(const DoFHandler<dim, spacedim> &dof_handler,
-             MGLevelObject<LinearAlgebra::distributed::Vector<Number>> &dst,
-             const LinearAlgebra::distributed::Vector<Number2>         &src,
-             const bool solution_transfer) const;
+  copy_to_mg(
+    const DoFHandler<dim, spacedim> &dof_handler,
+    MGLevelObject<LinearAlgebra::distributed::Vector<Number, MemorySpace>> &dst,
+    const LinearAlgebra::distributed::Vector<Number2, MemorySpace>         &src,
+    const bool solution_transfer) const;
 
   /**
    * Internal function to @p fill copy_indices*. Called by derived classes.
@@ -574,33 +580,34 @@ protected:
   /**
    * The mg_constrained_dofs of the level systems.
    */
-  SmartPointer<const MGConstrainedDoFs> mg_constrained_dofs;
+  ObserverPointer<const MGConstrainedDoFs> mg_constrained_dofs;
 
   /**
    * In the function copy_to_mg, we need to access ghosted entries of the
    * global vector for inserting into the level vectors. This vector is
    * populated with those entries.
    */
-  mutable LinearAlgebra::distributed::Vector<Number> ghosted_global_vector;
+  mutable LinearAlgebra::distributed::Vector<Number, MemorySpace>
+    ghosted_global_vector;
 
   /**
    * Same as above but used when working with solution vectors.
    */
-  mutable LinearAlgebra::distributed::Vector<Number>
+  mutable LinearAlgebra::distributed::Vector<Number, MemorySpace>
     solution_ghosted_global_vector;
 
   /**
    * In the function copy_from_mg, we access all level vectors with certain
    * ghost entries for inserting the result into a global vector.
    */
-  mutable MGLevelObject<LinearAlgebra::distributed::Vector<Number>>
+  mutable MGLevelObject<LinearAlgebra::distributed::Vector<Number, MemorySpace>>
     ghosted_level_vector;
 
   /**
    * Function to initialize internal level vectors.
    */
   std::function<void(const unsigned int,
-                     LinearAlgebra::distributed::Vector<Number> &)>
+                     LinearAlgebra::distributed::Vector<Number, MemorySpace> &)>
     initialize_dof_vector;
 
 private:
@@ -670,11 +677,11 @@ public:
    * <tt>to_level</tt> using the embedding matrices of the underlying finite
    * element. The previous content of <tt>dst</tt> is overwritten.
    *
-   * @arg src is a vector with as many elements as there are degrees of
+   * @param[in] to_level The destination level of the operation.
+   * @param[in] src A vector with as many elements as there are degrees of
    * freedom on the coarser level involved.
-   *
-   * @arg dst has as many elements as there are degrees of freedom on the
-   * finer level.
+   * @param[out] dst The output vector. It must have as many elements as
+   *   there are degrees of freedom on the finer level.
    */
   virtual void
   prolongate(const unsigned int to_level,
@@ -690,11 +697,11 @@ public:
    * altered. For the other degrees of freedom, the result of the restriction
    * is added.
    *
-   * @arg src is a vector with as many elements as there are degrees of
-   * freedom on the finer level involved.
-   *
-   * @arg dst has as many elements as there are degrees of freedom on the
-   * coarser level.
+   * @param[in] from_level The level of the source vector of the operation.
+   * @param[in] src A vector with as many elements as there are degrees of
+   * freedom on the finer level.
+   * @param[out] dst A vector with as many elements as there are degrees of
+   * freedom on the coarser level.
    */
   virtual void
   restrict_and_add(const unsigned int from_level,
@@ -733,7 +740,7 @@ private:
 
   /**
    * The actual prolongation matrix.  column indices belong to the dof indices
-   * of the mother cell, i.e. the coarse level.  while row indices belong to
+   * of the parent cell, i.e. the coarse level.  while row indices belong to
    * the child cell, i.e. the fine level.
    */
   std::vector<

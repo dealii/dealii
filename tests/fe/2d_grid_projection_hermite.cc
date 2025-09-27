@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2023 - 2023 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2023 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 #include <deal.II/base/config.h>
 
@@ -52,6 +51,8 @@
 #include <sstream>
 #include <vector>
 
+#include "../tests.h"
+
 #define PRECISION 8
 
 /**
@@ -71,7 +72,7 @@ public:
   value(const Point<2> &p, unsigned int c = 0) const override
   {
     (void)c;
-    return p(0) * p(1);
+    return p[0] * p[1];
   }
 
 
@@ -98,7 +99,7 @@ test_fe_on_domain(const unsigned int regularity)
   double   left = -1.0, right = 1.0;
   Point<2> left_point, right_point;
   for (unsigned int i = 0; i < 2; ++i)
-    left_point(i) = left, right_point(i) = right;
+    left_point[i] = left, right_point[i] = right;
   GridGenerator::subdivided_hyper_cube(tr, 4, left, right);
 
   FE_Hermite<2> herm(2 * regularity + 1);

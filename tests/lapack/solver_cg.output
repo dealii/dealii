@@ -1,24 +1,15 @@
 
 DEAL::Size 4 Unknowns 9
-DEAL:no-fail:cg::Starting value 3.000
 DEAL:no-fail:cg::Condition number estimate: 3.535
-DEAL:no-fail:cg::Convergence step 3 value 5.917e-17
 DEAL:no-fail:cg::Final Eigenvalues:  1.176 4.157
-DEAL:no:cg::Starting value 3.000
 DEAL:no:cg::Condition number estimate: 3.535
-DEAL:no:cg::Convergence step 3 value 5.917e-17
 DEAL:no:cg::Final Eigenvalues:  1.176 4.157
-DEAL:rich:cg::Starting value 3.000
 DEAL:rich:cg::Condition number estimate: 3.535
-DEAL:rich:cg::Convergence step 3 value 2.009e-16
 DEAL:rich:cg::Final Eigenvalues:  0.7056 2.494
-DEAL:ssor:cg::Starting value 3.000
 DEAL:ssor:cg::Condition number estimate: 1.384
 DEAL:ssor:cg::Condition number estimate: 1.421
-DEAL:ssor:cg::Convergence step 4 value 6.018e-05
 DEAL:ssor:cg::Final Eigenvalues:  0.7030 0.8172 0.9988
 DEAL::Size 12 Unknowns 121
-DEAL:no-fail:cg::Starting value 11.00
 DEAL:no-fail:cg::Condition number estimate: 11.01
 DEAL:no-fail:cg::Condition number estimate: 21.10
 DEAL:no-fail:cg::Condition number estimate: 33.11
@@ -27,10 +18,9 @@ DEAL:no-fail:cg::Condition number estimate: 48.52
 DEAL:no-fail:cg::Condition number estimate: 51.74
 DEAL:no-fail:cg::Condition number estimate: 53.54
 DEAL:no-fail:cg::Condition number estimate: 54.75
-DEAL:no-fail:cg::Failure step 10 value 0.1496
 DEAL:no-fail:cg::Final Eigenvalues:  0.1363 0.6565 1.499 2.357 3.131 3.994 5.392 6.576 7.464
+DEAL:no-fail::Failure step 10 value 0.1496
 DEAL:no-fail::Exception: SolverControl::NoConvergence(it, worker.residual_norm)
-DEAL:no:cg::Starting value 11.00
 DEAL:no:cg::Condition number estimate: 11.01
 DEAL:no:cg::Condition number estimate: 21.10
 DEAL:no:cg::Condition number estimate: 33.11
@@ -44,9 +34,7 @@ DEAL:no:cg::Condition number estimate: 56.76
 DEAL:no:cg::Condition number estimate: 57.32
 DEAL:no:cg::Condition number estimate: 57.64
 DEAL:no:cg::Condition number estimate: 57.68
-DEAL:no:cg::Convergence step 15 value 0.0005794
 DEAL:no:cg::Final Eigenvalues:  0.1363 0.6539 1.173 1.552 2.119 2.616 3.388 3.933 4.821 5.350 6.003 6.785 7.337 7.862
-DEAL:rich:cg::Starting value 11.00
 DEAL:rich:cg::Condition number estimate: 11.01
 DEAL:rich:cg::Condition number estimate: 21.10
 DEAL:rich:cg::Condition number estimate: 33.11
@@ -60,14 +48,11 @@ DEAL:rich:cg::Condition number estimate: 56.76
 DEAL:rich:cg::Condition number estimate: 57.32
 DEAL:rich:cg::Condition number estimate: 57.64
 DEAL:rich:cg::Condition number estimate: 57.68
-DEAL:rich:cg::Convergence step 15 value 0.0005794
 DEAL:rich:cg::Final Eigenvalues:  0.08178 0.3924 0.7039 0.9313 1.271 1.569 2.033 2.360 2.893 3.210 3.602 4.071 4.402 4.717
-DEAL:ssor:cg::Starting value 11.00
 DEAL:ssor:cg::Condition number estimate: 4.354
 DEAL:ssor:cg::Condition number estimate: 5.511
 DEAL:ssor:cg::Condition number estimate: 5.673
 DEAL:ssor:cg::Condition number estimate: 5.706
 DEAL:ssor:cg::Condition number estimate: 5.715
 DEAL:ssor:cg::Condition number estimate: 5.718
-DEAL:ssor:cg::Convergence step 8 value 0.0005816
 DEAL:ssor:cg::Final Eigenvalues:  0.1748 0.4549 0.5519 0.6780 0.7983 0.9058 0.9996

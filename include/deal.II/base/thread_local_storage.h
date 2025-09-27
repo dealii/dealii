@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2011 - 2022 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2011 - 2024 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 #ifndef dealii_thread_local_storage_h
 #  define dealii_thread_local_storage_h
@@ -25,6 +24,7 @@
 #  include <map>
 #  include <memory>
 #  include <mutex>
+#  include <optional>
 #  include <shared_mutex>
 #  include <thread>
 #  include <vector>
@@ -104,8 +104,8 @@ namespace Threads
   class ThreadLocalStorage
   {
     static_assert(
-      std::is_copy_constructible<
-        typename internal::unpack_container<T>::type>::value ||
+      std::is_copy_constructible_v<
+        typename internal::unpack_container<T>::type> ||
         std::is_default_constructible_v<T>,
       "The stored type must be either copyable, or default constructible");
 
@@ -177,6 +177,23 @@ namespace Threads
     get(bool &exists);
 
     /**
+     * If the thread with given `id` has an object currently stored, then return
+     * it by value via the `std::optional` object. If the indicated thread does
+     * not have an object stored, return an empty `std::optional`.
+     *
+     * Note that in the successful case, this function returns a *copy* of
+     * the object, unlike get() which returns a reference to it. This is
+     * because when you call get(), you are calling it from the current
+     * thread (i.e., the thread that "owns" the object), and so all accesses
+     * are by definition not concurrent. On the other hand, if you are asking
+     * about the object owned by a different thread, that other thread might
+     * concurrently be accessing it and that might cause race conditions.
+     * To avoid these, the function here returns a copy.
+     */
+    std::optional<T>
+    get_for_thread(const std::thread::id &id) const;
+
+    /**
      * Conversion operator that simply converts the thread-local object to the
      * data type that it stores. This function is equivalent to calling the
      * get() member function; it's purpose is to make the TLS object look more
@@ -231,8 +248,8 @@ namespace Threads
      * same time, the purpose of this function is to release memory other
      * threads may have allocated for their own thread local objects after
      * which every use of this object will require some kind of
-     * initialization. This is necessary both in the multithreaded or non-
-     * multithreaded case.
+     * initialization. This is necessary both in the multithreaded or
+     * non-multithreaded case.
      */
     void
     clear();
@@ -257,8 +274,6 @@ namespace Threads
      * An exemplar for creating a new (thread specific) copy.
      */
     std::shared_ptr<const T> exemplar;
-
-    friend class dealii::LogStream;
   };
 } // namespace Threads
 /**
@@ -438,6 +453,23 @@ namespace Threads
 
       return internal::construct_element(data, my_id, exemplar);
     }
+  }
+
+
+  template <typename T>
+  std::optional<T>
+  ThreadLocalStorage<T>::get_for_thread(const std::thread::id &id) const
+  {
+    // Take a shared ("reader") lock for lookup:
+    std::shared_lock<decltype(insertion_mutex)> lock(insertion_mutex);
+
+    // Then see whether we can find the indicated object; if so, copy it,
+    // otherwise return an empty std::optional.
+    const auto it = data.find(id);
+    if (it != data.end())
+      return it->second;
+    else
+      return {};
   }
 
 

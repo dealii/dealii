@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2008 - 2023 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2008 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 #include <deal.II/base/memory_consumption.h>
 #include <deal.II/base/utilities.h>
@@ -45,14 +44,15 @@ DynamicSparsityPattern::Line::add_entries(ForwardIterator begin,
     {
       // in debug mode, check whether the
       // indices really are sorted.
-#ifdef DEBUG
-      {
-        ForwardIterator test = begin, test1 = begin;
-        ++test1;
-        for (; test1 != end; ++test, ++test1)
-          Assert(*test1 > *test, ExcInternalError());
-      }
-#endif
+      if constexpr (running_in_debug_mode())
+        {
+          {
+            ForwardIterator test = begin, test1 = begin;
+            ++test1;
+            for (; test1 != end; ++test, ++test1)
+              Assert(*test1 > *test, ExcInternalError());
+          }
+        }
 
       if (entries.empty() || entries.back() < *begin)
         {
@@ -232,7 +232,6 @@ DynamicSparsityPattern::DynamicSparsityPattern(const DynamicSparsityPattern &s)
   , have_entries(false)
   , rowset(0)
 {
-  (void)s;
   Assert(s.rows == 0 && s.cols == 0,
          ExcMessage(
            "This constructor can only be called if the provided argument "
@@ -271,7 +270,6 @@ DynamicSparsityPattern::DynamicSparsityPattern(const size_type n)
 DynamicSparsityPattern &
 DynamicSparsityPattern::operator=(const DynamicSparsityPattern &s)
 {
-  (void)s;
   Assert(s.n_rows() == 0 && s.n_cols() == 0,
          ExcMessage(
            "This operator can only be called if the provided argument "

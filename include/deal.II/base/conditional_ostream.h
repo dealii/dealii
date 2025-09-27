@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2004 - 2020 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2004 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 #ifndef dealii_conditional_ostream_h
 #define dealii_conditional_ostream_h
@@ -36,8 +35,8 @@ DEAL_II_NAMESPACE_OPEN
  * parallel programs, this means that each of the MPI processes write to the
  * screen, which yields many repetitions of the same text. To avoid it, one
  * would have to have a designated process, say the one with MPI process
- * number zero, do the output, and guard each write statement with an if-
- * condition. This becomes cumbersome and clutters up the code. Rather than
+ * number zero, do the output, and guard each write statement with an
+ * if-condition. This becomes cumbersome and clutters up the code. Rather than
  * doing so, the present class can be used: objects of its type act just like
  * a standard output stream, but they only print something based on a
  * condition that can be set to, for example, <tt>mpi_process==0</tt>, so that
@@ -67,8 +66,8 @@ DEAL_II_NAMESPACE_OPEN
  * @code
  * system_matrix.print_formatted(pout);
  * @endcode
- * is <em>not</em> possible. Instead use the is_active() function for a work-
- * around:
+ * is <em>not</em> possible. Instead use the is_active() function for a
+ * work-around:
  *
  * @code
  * if (pout.is_active())

@@ -1,17 +1,16 @@
-## ---------------------------------------------------------------------
+## ------------------------------------------------------------------------
 ##
-## Copyright (C) 2012 - 2023 by the deal.II authors
+## SPDX-License-Identifier: LGPL-2.1-or-later
+## Copyright (C) 2012 - 2025 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
-## The deal.II library is free software; you can use it, redistribute
-## it, and/or modify it under the terms of the GNU Lesser General
-## Public License as published by the Free Software Foundation; either
-## version 2.1 of the License, or (at your option) any later version.
-## The full text of the license can be found in the file LICENSE.md at
-## the top level directory of deal.II.
+## Part of the source code is dual licensed under Apache-2.0 WITH
+## LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+## governing the source code and code contributions can be found in
+## LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 ##
-## ---------------------------------------------------------------------
+## ------------------------------------------------------------------------
 
 #
 # Configuration for the boost library:
@@ -43,7 +42,7 @@ macro(feature_boost_find_external var)
       # Test that Boost.Iostreams is usable.
       #
       reset_cmake_required()
-      list(APPEND CMAKE_REQUIRED_LIBRARIES ${BOOST_LIBRARIES})
+      list(APPEND CMAKE_REQUIRED_LIBRARIES ${BOOST_TARGETS})
       list(APPEND CMAKE_REQUIRED_INCLUDES ${BOOST_INCLUDE_DIRS})
 
       CHECK_CXX_SOURCE_COMPILES(
@@ -80,70 +79,6 @@ macro(feature_boost_find_external var)
       endif()
       reset_cmake_required()
     endif() # DEAL_II_WITH_ZLIB
-
-    if(${BOOST_VERSION} VERSION_LESS 1.74.0 AND DEAL_II_ALLOW_PLATFORM_INTROSPECTION)
-      #
-      # Test that Boost.Serialization is usable.
-      #
-      if(NOT DEFINED BOOST_SERIALIZATION_USABLE OR NOT ${BOOST_SERIALIZATION_USABLE})
-        # Only run this check if it hasn't successfully run previously.
-        message(STATUS "Performing Test BOOST_SERIALIZATION_USABLE")
-
-        set(_binary_test_dir ${CMAKE_CURRENT_BINARY_DIR}/cmake/configure/TestBoostBugWorkdir)
-
-        set(_flags "${DEAL_II_CXX_FLAGS}")
-        strip_flag(_flags "-Werror")
-
-        file(REMOVE_RECURSE ${_binary_test_dir})
-        file(MAKE_DIRECTORY ${_binary_test_dir})
-        execute_process(
-          COMMAND ${CMAKE_COMMAND}
-            -DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}
-            -DCMAKE_C_COMPILER=${CMAKE_C_COMPILER}
-            "-DCMAKE_CXX_FLAGS=${_flags}"
-            "-DCMAKE_EXE_LINKER_FLAGS=${DEAL_II_LINKER_FLAGS}"
-            "-DCMAKE_SHARED_LINKER_FLAGS=${DEAL_II_LINKER_FLAGS}"
-            "-DBOOST_INCLUDE_DIRS=${BOOST_INCLUDE_DIRS}"
-            "-DBOOST_LIBRARIES=${BOOST_LIBRARIES}"
-            ${CMAKE_CURRENT_SOURCE_DIR}/cmake/configure/TestBoostBug
-          WORKING_DIRECTORY ${_binary_test_dir}
-          RESULT_VARIABLE _result
-          OUTPUT_QUIET
-          ERROR_QUIET
-          )
-        if(${_result} EQUAL 0)
-          execute_process(
-            COMMAND ${CMAKE_COMMAND} --build . --target run
-            WORKING_DIRECTORY ${_binary_test_dir}
-            RESULT_VARIABLE _result
-            OUTPUT_QUIET
-            ERROR_QUIET
-            )
-        endif()
-        if(${_result} EQUAL 0)
-          message(STATUS "Performing Test BOOST_SERIALIZATION_USABLE - Success")
-          set(BOOST_SERIALIZATION_USABLE TRUE CACHE INTERNAL "")
-        else()
-          message(STATUS "Performing Test BOOST_SERIALIZATION_USABLE - Failed")
-          set(BOOST_SERIALIZATION_USABLE FALSE)
-        endif()
-      endif()
-
-      if(NOT ${BOOST_SERIALIZATION_USABLE})
-        message(STATUS
-          "The externally provided Boost.Serialization library "
-          "failed to pass a crucial test. \n"
-          "Therefore, the bundled boost package is used. \n"
-          "The configured testing project can be found at \n"
-          "${_binary_test_dir}"
-          )
-        set(BOOST_ADDITIONAL_ERROR_STRING
-          "The externally provided Boost.Serialization library "
-          "failed to pass a crucial test."
-          )
-        set(${var} FALSE)
-      endif()
-    endif() # DEAL_II_ALLOW_PLATFORM_INTROSPECTION
   endif()
 endmacro()
 

@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2016 - 2023 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2018 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE at
-// the top level of the deal.II distribution.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 #ifndef dealii_differentiation_ad_ad_helpers_h
 #define dealii_differentiation_ad_ad_helpers_h
@@ -58,7 +57,7 @@ namespace Differentiation
      * indicating the @p ADNumberTypeCode . The @p ADNumberTypeCode dictates
      * which auto-differentiation library is to be used, and what the nature of
      * the underlying auto-differentiable number is. Refer to the
-     * @ref auto_symb_diff module for more details in this regard.
+     * @ref auto_symb_diff topic for more details in this regard.
      *
      * For all of the classes derived from this base class, there are two
      * possible ways that the code in which they are used can be structured.
@@ -3819,24 +3818,25 @@ namespace Differentiation
       // function, in the sense that we simply populate our array of independent
       // values with a meaningful number. However, in this case we need to
       // double check that we're not registering these variables twice
-#    ifdef DEBUG
-      const std::vector<unsigned int> index_set(
-        internal::extract_field_component_indices<dim>(extractor));
-      for (const unsigned int index : index_set)
+      if constexpr (running_in_debug_mode())
         {
-          Assert(
-            this->registered_independent_variable_values[index] == false,
-            ExcMessage(
-              "Overlapping indices for independent variables. "
-              "One or more indices associated with the field that "
-              "is being registered as an independent variable have "
-              "already been associated with another field. This suggests "
-              "that the component offsets used to construct their counterpart "
-              "extractors are incompatible with one another. Make sure that "
-              "the first component for each extractor properly takes into "
-              "account the dimensionality of the preceding fields."));
+          const std::vector<unsigned int> index_set(
+            internal::extract_field_component_indices<dim>(extractor));
+          for (const unsigned int index : index_set)
+            {
+              Assert(
+                this->registered_independent_variable_values[index] == false,
+                ExcMessage(
+                  "Overlapping indices for independent variables. "
+                  "One or more indices associated with the field that "
+                  "is being registered as an independent variable have "
+                  "already been associated with another field. This suggests "
+                  "that the component offsets used to construct their counterpart "
+                  "extractors are incompatible with one another. Make sure that "
+                  "the first component for each extractor properly takes into "
+                  "account the dimensionality of the preceding fields."));
+            }
         }
-#    endif
       set_independent_variable(value, extractor);
     }
 
@@ -4136,6 +4136,14 @@ namespace Differentiation
 #  endif // DOXYGEN
 
 
+DEAL_II_NAMESPACE_CLOSE
+
+#else
+
+// Make sure the scripts that create the C++20 module input files have
+// something to latch on if the preprocessor #ifdef above would
+// otherwise lead to an empty content of the file.
+DEAL_II_NAMESPACE_OPEN
 DEAL_II_NAMESPACE_CLOSE
 
 #endif // defined(DEAL_II_WITH_ADOLC) || defined(DEAL_II_TRILINOS_WITH_SACADO)

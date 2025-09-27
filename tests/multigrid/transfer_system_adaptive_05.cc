@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2000 - 2023 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2010 - 2024 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 
 // test like _03 but with a TransferSelect that selects only the first vector
@@ -42,19 +41,6 @@
 
 #include "../tests.h"
 
-
-
-template <int dim, typename number, int spacedim>
-void
-reinit_vector(const dealii::DoFHandler<dim, spacedim> &mg_dof,
-              MGLevelObject<dealii::Vector<number>>   &v)
-{
-  for (unsigned int level = v.min_level(); level <= v.max_leve(); ++level)
-    {
-      unsigned int n = mg_dof.n_dofs(level);
-      v[level].reinit(n);
-    }
-}
 
 
 template <typename Transfer>
@@ -100,7 +86,7 @@ refine_mesh(Triangulation<dim> &triangulation)
        ++cell)
     {
       const Point<dim> p        = cell->center();
-      bool             positive = p(0) > 0;
+      bool             positive = p[0] > 0;
       if (positive)
         {
           cell->set_refine_flag();

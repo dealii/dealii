@@ -1,28 +1,29 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2005 - 2022 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2022 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 #include <deal.II/base/mpi.h>
 #include <deal.II/base/trilinos_utilities.h>
 
 #ifdef DEAL_II_WITH_TRILINOS
+DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
 #  ifdef DEAL_II_WITH_MPI
 #    include <Epetra_MpiComm.h>
 #    include <Teuchos_DefaultComm.hpp>
 #  endif
 #  include <Epetra_SerialComm.h>
 #  include <Teuchos_RCP.hpp>
+DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
 #endif
 
 DEAL_II_NAMESPACE_OPEN
@@ -169,6 +170,32 @@ namespace Utilities
     }
   } // namespace Trilinos
 #endif
+
+
+#ifdef DEAL_II_TRILINOS_WITH_TPETRA
+  namespace Trilinos
+  {
+    MPI_Comm
+    teuchos_comm_to_mpi_comm(
+      const Teuchos::RCP<const Teuchos::Comm<int>> &teuchos_comm)
+    {
+      MPI_Comm out;
+#  ifdef DEAL_II_WITH_MPI
+      // Cast from Teuchos::Comm<int> to Teuchos::MpiComm<int>.
+      const Teuchos::MpiComm<int> *mpi_comm =
+        dynamic_cast<const Teuchos::MpiComm<int> *>(teuchos_comm.get());
+      Assert(mpi_comm != nullptr, ExcInternalError());
+      // From the Teuchos::MpiComm<int> object we can extract
+      // the MPI_Comm object via the getRawMpiComm() function.
+      out = *(mpi_comm->getRawMpiComm())();
+#  else
+      out = MPI_COMM_SELF;
+#  endif
+      return out;
+    }
+  }    // namespace Trilinos
+#endif // DEAL_II_TRILINOS_WITH_TPETRA
+
 } // namespace Utilities
 
 DEAL_II_NAMESPACE_CLOSE

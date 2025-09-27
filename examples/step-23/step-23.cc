@@ -1,17 +1,16 @@
-/* ---------------------------------------------------------------------
+/* ------------------------------------------------------------------------
  *
- * Copyright (C) 2006 - 2023 by the deal.II authors
+ * SPDX-License-Identifier: LGPL-2.1-or-later
+ * Copyright (C) 2006 - 2024 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
- * The deal.II library is free software; you can use it, redistribute
- * it, and/or modify it under the terms of the GNU Lesser General
- * Public License as published by the Free Software Foundation; either
- * version 2.1 of the License, or (at your option) any later version.
- * The full text of the license can be found in the file LICENSE.md at
- * the top level directory of deal.II.
+ * Part of the source code is dual licensed under Apache-2.0 WITH
+ * LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+ * governing the source code and code contributions can be found in
+ * LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
  *
- * ---------------------------------------------------------------------
+ * ------------------------------------------------------------------------
  *
  * Author: Wolfgang Bangerth, Texas A&M University, 2006
  */
@@ -61,8 +60,9 @@
 // mass and Laplace matrices, although it would have only taken copying the
 // relevant code from any number of previous tutorial programs. Rather, we
 // want to focus on the things that are truly new to this program and
-// therefore use the MatrixCreator::create_mass_matrix and
-// MatrixCreator::create_laplace_matrix functions. They are declared here:
+// therefore use the MatrixCreator::create_mass_matrix() and
+// MatrixCreator::create_laplace_matrix() functions. They are declared here:
+#include <deal.II/numerics/matrix_creator.h>
 #include <deal.II/numerics/matrix_tools.h>
 
 // Finally, here is an include file that contains all sorts of tool functions
@@ -118,7 +118,7 @@ namespace Step23
     void output_results() const;
 
     Triangulation<dim> triangulation;
-    FE_Q<dim>          fe;
+    const FE_Q<dim>    fe;
     DoFHandler<dim>    dof_handler;
 
     AffineConstraints<double> constraints;
@@ -312,7 +312,7 @@ namespace Step23
     // processors are available in a machine: for more information see the
     // documentation of WorkStream or the
     // @ref threads "Parallel computing with multiple processors"
-    // module. The matrices for solving linear systems will be filled in the
+    // topic. The matrices for solving linear systems will be filled in the
     // run() method because we need to re-apply boundary conditions every time
     // step.
     mass_matrix.reinit(sparsity_pattern);

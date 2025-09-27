@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2023 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 1998 - 2024 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 #ifndef dealii_error_estimator_h
 #define dealii_error_estimator_h
@@ -44,7 +43,10 @@ namespace hp
 {
   template <int>
   class QCollection;
-}
+
+  template <int, int>
+  class MappingCollection;
+} // namespace hp
 #endif
 
 
@@ -191,8 +193,8 @@ namespace hp
  * contribution of the face $F\in\partial K$ looks like \f[ n_F\int_F
  * \left|g-a\frac{\partial u_h}{\partial n}\right|^2 ds \f] where $g$ is the
  * Neumann boundary function, $n_F=\frac {h_K}{24}$ and $n_F=\frac {h_F}{p}$ for
- * the Kelly and hp-estimator, respectively. If the finite element is vector-
- * valued, then obviously the function denoting the Neumann boundary
+ * the Kelly and hp-estimator, respectively. If the finite element is
+ * vector-valued, then obviously the function denoting the Neumann boundary
  * conditions needs to be vector-valued as well.
  *
  * <li> No other boundary conditions are considered.
@@ -229,9 +231,9 @@ namespace hp
  * reason is that finding neighborship information is a bit easier then, but
  * that's all practical reasoning, nothing fundamental.
  *
- * Since we integrate from the coarse side of the face, we have the mother
+ * Since we integrate from the coarse side of the face, we have the parent
  * face readily at hand and store the result of the integration over that
- * mother face (being the sum of the integrals along the subfaces) in the
+ * parent face (being the sum of the integrals along the subfaces) in the
  * abovementioned map of integrals as well. This consumes some memory more
  * than needed, but makes the summing up of the face contributions to the
  * cells easier, since then we have the information from all faces of all
@@ -428,11 +430,37 @@ public:
 
   /**
    * Equivalent to the set of functions above, except that this one takes a
-   * quadrature collection for hp-finite element dof handlers.
+   * mapping and quadrature collection for hp-finite element dof handlers.
    */
   template <typename Number>
   static void
   estimate(
+    const hp::MappingCollection<dim, spacedim> &mapping,
+    const DoFHandler<dim, spacedim>            &dof,
+    const hp::QCollection<dim - 1>             &quadrature,
+    const std::map<types::boundary_id, const Function<spacedim, Number> *>
+                             &neumann_bc,
+    const ReadVector<Number> &solution,
+    Vector<float>            &error,
+    const ComponentMask      &component_mask = {},
+    const Function<spacedim> *coefficients   = nullptr,
+    const unsigned int        n_threads      = numbers::invalid_unsigned_int,
+    const types::subdomain_id subdomain_id   = numbers::invalid_subdomain_id,
+    const types::material_id  material_id    = numbers::invalid_material_id,
+    const Strategy            strategy       = cell_diameter_over_24);
+
+
+  /**
+   * Equivalent to the set of functions above, except that this one takes a
+   * quadrature collection for hp-finite element dof handlers.
+   *
+   * @deprecated Use the version of this function which takes a
+   * hp::MappingCollection instead.
+   */
+  template <typename Number>
+  DEAL_II_DEPRECATED_WITH_COMMENT(
+    "Use the version of this function which takes a hp::MappingCollection instead.")
+  static void estimate(
     const Mapping<dim, spacedim>    &mapping,
     const DoFHandler<dim, spacedim> &dof,
     const hp::QCollection<dim - 1>  &quadrature,
@@ -471,11 +499,37 @@ public:
 
   /**
    * Equivalent to the set of functions above, except that this one takes a
-   * quadrature collection for hp-finite element dof handlers.
+   * mapping and quadrature collection for hp-finite element dof handlers.
    */
   template <typename Number>
   static void
   estimate(
+    const hp::MappingCollection<dim, spacedim> &mapping,
+    const DoFHandler<dim, spacedim>            &dof,
+    const hp::QCollection<dim - 1>             &quadrature,
+    const std::map<types::boundary_id, const Function<spacedim, Number> *>
+                                                &neumann_bc,
+    const ArrayView<const ReadVector<Number> *> &solutions,
+    ArrayView<Vector<float> *>                  &errors,
+    const ComponentMask                         &component_mask = {},
+    const Function<spacedim>                    *coefficients   = nullptr,
+    const unsigned int        n_threads    = numbers::invalid_unsigned_int,
+    const types::subdomain_id subdomain_id = numbers::invalid_subdomain_id,
+    const types::material_id  material_id  = numbers::invalid_material_id,
+    const Strategy            strategy     = cell_diameter_over_24);
+
+
+  /**
+   * Equivalent to the set of functions above, except that this one takes a
+   * quadrature collection for hp-finite element dof handlers.
+   *
+   * @deprecated Use the version of this function which takes a
+   * hp::MappingCollection instead.
+   */
+  template <typename Number>
+  DEAL_II_DEPRECATED_WITH_COMMENT(
+    "Use the version of this function which takes a hp::MappingCollection instead.")
+  static void estimate(
     const Mapping<dim, spacedim>    &mapping,
     const DoFHandler<dim, spacedim> &dof,
     const hp::QCollection<dim - 1>  &quadrature,
@@ -715,11 +769,38 @@ public:
 
   /**
    * Equivalent to the set of functions above, except that this one takes a
-   * quadrature collection for hp-finite element dof handlers.
+   * mapping and quadrature collection for hp-finite element dof handlers.
    */
   template <typename Number>
   static void
   estimate(
+    const hp::MappingCollection<1, spacedim> &mapping,
+    const DoFHandler<1, spacedim>            &dof,
+    const hp::QCollection<0>                 &quadrature,
+    const std::map<types::boundary_id, const Function<spacedim, Number> *>
+                             &neumann_bc,
+    const ReadVector<Number> &solution,
+    Vector<float>            &error,
+    const ComponentMask      &component_mask = {},
+    const Function<spacedim> *coefficients   = nullptr,
+    const unsigned int        n_threads      = numbers::invalid_unsigned_int,
+    const types::subdomain_id subdomain_id   = numbers::invalid_subdomain_id,
+    const types::material_id  material_id    = numbers::invalid_material_id,
+    const Strategy            strategy       = cell_diameter_over_24);
+
+
+
+  /**
+   * Equivalent to the set of functions above, except that this one takes a
+   * quadrature collection for hp-finite element dof handlers.
+   *
+   * @deprecated Use the version of this function which takes a
+   * hp::MappingCollection instead.
+   */
+  template <typename Number>
+  DEAL_II_DEPRECATED_WITH_COMMENT(
+    "Use the version of this function which takes a hp::MappingCollection instead.")
+  static void estimate(
     const Mapping<1, spacedim>    &mapping,
     const DoFHandler<1, spacedim> &dof,
     const hp::QCollection<0>      &quadrature,
@@ -760,11 +841,38 @@ public:
 
   /**
    * Equivalent to the set of functions above, except that this one takes a
-   * quadrature collection for hp-finite element dof handlers.
+   * mapping and quadrature collection for hp-finite element dof handlers.
    */
   template <typename Number>
   static void
   estimate(
+    const hp::MappingCollection<1, spacedim> &mapping,
+    const DoFHandler<1, spacedim>            &dof,
+    const hp::QCollection<0>                 &quadrature,
+    const std::map<types::boundary_id, const Function<spacedim, Number> *>
+                                                &neumann_bc,
+    const ArrayView<const ReadVector<Number> *> &solutions,
+    ArrayView<Vector<float> *>                  &errors,
+    const ComponentMask                         &component_mask = {},
+    const Function<spacedim>                    *coefficients   = nullptr,
+    const unsigned int        n_threads    = numbers::invalid_unsigned_int,
+    const types::subdomain_id subdomain_id = numbers::invalid_subdomain_id,
+    const types::material_id  material_id  = numbers::invalid_material_id,
+    const Strategy            strategy     = cell_diameter_over_24);
+
+
+
+  /**
+   * Equivalent to the set of functions above, except that this one takes a
+   * quadrature collection for hp-finite element dof handlers.
+   *
+   * @deprecated Use the version of this function which takes a
+   * hp::MappingCollection instead.
+   */
+  template <typename Number>
+  DEAL_II_DEPRECATED_WITH_COMMENT(
+    "Use the version of this function which takes a hp::MappingCollection instead.")
+  static void estimate(
     const Mapping<1, spacedim>    &mapping,
     const DoFHandler<1, spacedim> &dof,
     const hp::QCollection<0>      &quadrature,

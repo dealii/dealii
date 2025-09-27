@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2021 - 2022 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2021 - 2024 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 
 
@@ -44,7 +43,7 @@ namespace dealii
     template <int dim, typename Number, bool is_face>
     struct FEEvaluationImplHangingNodesReference
     {
-      template <int fe_degree, int n_q_points_1d>
+      template <int fe_degree>
       static bool
       run(
         const FEEvaluationData<dim, Number, is_face> &fe_eval,
@@ -203,10 +202,10 @@ namespace dealii
                               const auto w =
                                 transpose ?
                                   constraint_weights[i * (fe_degree + 1) +
-                                                     interp_idx][v] :
+                                                     interp_idx] :
                                   constraint_weights[interp_idx *
                                                        (fe_degree + 1) +
-                                                     i][v];
+                                                     i];
                               t += w * values_temp[real_idx][v];
                             }
                         }
@@ -223,11 +222,10 @@ namespace dealii
                                 transpose ?
                                   constraint_weights[(fe_degree - i) *
                                                        (fe_degree + 1) +
-                                                     fe_degree - interp_idx]
-                                                    [v] :
+                                                     fe_degree - interp_idx] :
                                   constraint_weights[(fe_degree - interp_idx) *
                                                        (fe_degree + 1) +
-                                                     fe_degree - i][v];
+                                                     fe_degree - i];
                               t += w * values_temp[real_idx][v];
                             }
                         }
@@ -376,10 +374,10 @@ namespace dealii
                                 const auto w =
                                   transpose ?
                                     constraint_weights[i * (fe_degree + 1) +
-                                                       interp_idx][v] :
+                                                       interp_idx] :
                                     constraint_weights[interp_idx *
                                                          (fe_degree + 1) +
-                                                       i][v];
+                                                       i];
                                 t += w * values_temp[real_idx][v];
                               }
                           }
@@ -398,12 +396,11 @@ namespace dealii
                                   transpose ?
                                     constraint_weights[(fe_degree - i) *
                                                          (fe_degree + 1) +
-                                                       fe_degree - interp_idx]
-                                                      [v] :
+                                                       fe_degree - interp_idx] :
                                     constraint_weights[(fe_degree -
                                                         interp_idx) *
                                                          (fe_degree + 1) +
-                                                       fe_degree - i][v];
+                                                       fe_degree - i];
                                 t += w * values_temp[real_idx][v];
                               }
                           }
@@ -486,9 +483,9 @@ test(const unsigned int                                           degree,
       internal::FEEvaluationImplHangingNodesReference<
         dim,
         VectorizedArray<double>,
-        false>::template run<-1, -1>(eval, b == 1, cmask_, values1.data());
+        false>::template run<-1>(eval, b == 1, cmask_, values1.data());
       internal::FEEvaluationImplHangingNodes<dim, VectorizedArray<double>>::
-        template run<-1, -1>(
+        template run<-1>(
           1, eval.get_shape_info(), b == 1, cmask, values2.data());
 
       for (const auto i : values1)

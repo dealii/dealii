@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2021 - 2022 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2022 - 2024 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 
 // Test PreconditionRelaxation for different Jacobi preconditioners.
@@ -98,12 +97,19 @@ private:
 };
 
 template <typename SparseMatrixType>
-class MySparseMatrix : public Subscriptor
+class MySparseMatrix : public EnableObserverPointer
 {
 public:
   MySparseMatrix(const SparseMatrixType &sparse_matrix)
     : sparse_matrix(sparse_matrix)
   {}
+
+  template <typename VectorType>
+  void
+  vmult(VectorType &dst, const VectorType &src) const
+  {
+    sparse_matrix.vmult(dst, src);
+  }
 
   template <typename VectorType>
   void
@@ -169,6 +175,7 @@ int
 main()
 {
   initlog();
+  deallog << std::setprecision(10);
 
   using Number     = double;
   using VectorType = Vector<Number>;
@@ -211,7 +218,7 @@ main()
 
   src = 1.0;
 
-  std::vector<double>       relaxations{1.0, 0.9, 1.1};
+  std::vector<double>       relaxations{0.0, 1.0, 0.9, 1.1};
   std::vector<unsigned int> n_iterationss{1, 2, 3};
 
   for (const auto relaxation : relaxations)
@@ -219,18 +226,19 @@ main()
       {
         std::vector<std::tuple<double, double, double, double>> results;
 
-        {
-          // 0) Test PreconditionJacobi
-          PreconditionJacobi<MatrixType> preconditioner;
+        if (relaxation != 0.0)
+          {
+            // 0) Test PreconditionJacobi
+            PreconditionJacobi<MatrixType> preconditioner;
 
-          PreconditionJacobi<MatrixType>::AdditionalData ad;
-          ad.relaxation   = relaxation;
-          ad.n_iterations = n_iterations;
+            PreconditionJacobi<MatrixType>::AdditionalData ad;
+            ad.relaxation   = relaxation;
+            ad.n_iterations = n_iterations;
 
-          preconditioner.initialize(system_matrix, ad);
+            preconditioner.initialize(system_matrix, ad);
 
-          results.emplace_back(test(preconditioner, src));
-        }
+            results.emplace_back(test(preconditioner, src));
+          }
 
         {
           // 1) Test PreconditionRelaxation + DiagonalMatrix and matrix with
@@ -352,7 +360,9 @@ main()
 
               return true;
             }))
-          deallog << "OK!" << std::endl;
+          deallog << "OK! " << std::get<0>(results[0]) << " "
+                  << std::get<1>(results[0]) << " " << std::get<2>(results[0])
+                  << " " << std::get<3>(results[0]) << " " << std::endl;
         else
           deallog << "ERROR!" << std::endl;
       }

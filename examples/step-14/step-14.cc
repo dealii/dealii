@@ -1,17 +1,16 @@
-/* ---------------------------------------------------------------------
+/* ------------------------------------------------------------------------
  *
- * Copyright (C) 2002 - 2021 by the deal.II authors
+ * SPDX-License-Identifier: LGPL-2.1-or-later
+ * Copyright (C) 2002 - 2024 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
- * The deal.II library is free software; you can use it, redistribute
- * it, and/or modify it under the terms of the GNU Lesser General
- * Public License as published by the Free Software Foundation; either
- * version 2.1 of the License, or (at your option) any later version.
- * The full text of the license can be found in the file LICENSE.md at
- * the top level directory of deal.II.
+ * Part of the source code is dual licensed under Apache-2.0 WITH
+ * LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+ * governing the source code and code contributions can be found in
+ * LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
  *
- * ---------------------------------------------------------------------
+ * ------------------------------------------------------------------------
  *
  * Author: Wolfgang Bangerth, ETH Zurich, 2002
  */
@@ -20,7 +19,6 @@
 // Start out with well known things...
 #include <deal.II/base/quadrature_lib.h>
 #include <deal.II/base/function.h>
-#include <deal.II/base/logstream.h>
 #include <deal.II/base/thread_management.h>
 #include <deal.II/base/work_stream.h>
 #include <deal.II/lac/vector.h>
@@ -145,7 +143,7 @@ namespace Step14
       AssertThrow(evaluation_point_found,
                   ExcEvaluationPointNotFound(evaluation_point));
 
-      std::cout << "   Point value=" << point_value << std::endl;
+      std::cout << "   Point value: " << point_value << std::endl;
     }
 
 
@@ -203,7 +201,7 @@ namespace Step14
 
       // ...then have some objects of which the meaning will become clear
       // below...
-      QTrapezoid<dim>             vertex_quadrature;
+      const QTrapezoid<dim>       vertex_quadrature;
       FEValues<dim>               fe_values(dof_handler.get_fe(),
                               vertex_quadrature,
                               update_gradients | update_quadrature_points);
@@ -357,7 +355,7 @@ namespace Step14
       virtual void output_solution() const = 0;
 
     protected:
-      const SmartPointer<Triangulation<dim>> triangulation;
+      const ObserverPointer<Triangulation<dim>> triangulation;
 
       unsigned int refinement_cycle;
     };
@@ -401,12 +399,12 @@ namespace Step14
       virtual unsigned int n_dofs() const override;
 
     protected:
-      const SmartPointer<const FiniteElement<dim>>  fe;
-      const SmartPointer<const Quadrature<dim>>     quadrature;
-      const SmartPointer<const Quadrature<dim - 1>> face_quadrature;
-      DoFHandler<dim>                               dof_handler;
-      Vector<double>                                solution;
-      const SmartPointer<const Function<dim>>       boundary_values;
+      const ObserverPointer<const FiniteElement<dim>>  fe;
+      const ObserverPointer<const Quadrature<dim>>     quadrature;
+      const ObserverPointer<const Quadrature<dim - 1>> face_quadrature;
+      DoFHandler<dim>                                  dof_handler;
+      Vector<double>                                   solution;
+      const ObserverPointer<const Function<dim>>       boundary_values;
 
       virtual void assemble_rhs(Vector<double> &rhs) const = 0;
 
@@ -711,7 +709,7 @@ namespace Step14
       virtual void output_solution() const override;
 
     protected:
-      const SmartPointer<const Function<dim>> rhs_function;
+      const ObserverPointer<const Function<dim>> rhs_function;
       virtual void assemble_rhs(Vector<double> &rhs) const override;
     };
 
@@ -915,7 +913,7 @@ namespace Step14
       virtual void refine_grid() override;
 
     private:
-      const SmartPointer<const Function<dim>> weighting_function;
+      const ObserverPointer<const Function<dim>> weighting_function;
     };
 
 
@@ -1053,10 +1051,11 @@ namespace Step14
     // @sect4{The SetUpBase and SetUp classes}
 
     // Based on the above description, the <code>SetUpBase</code> class then
-    // looks as follows. To allow using the <code>SmartPointer</code> class
-    // with this class, we derived from the <code>Subscriptor</code> class.
+    // looks as follows. To allow using the <code>ObserverPointer</code> class
+    // with this class, we derived from the
+    // <code>EnableObserverPointer</code> class.
     template <int dim>
-    struct SetUpBase : public Subscriptor
+    struct SetUpBase : public EnableObserverPointer
     {
       virtual const Function<dim> &get_boundary_values() const = 0;
 
@@ -1385,7 +1384,7 @@ namespace Step14
     // the right hand side, we only need to provide for a function that
     // assembles the right hand side for a given discretization:
     template <int dim>
-    class DualFunctionalBase : public Subscriptor
+    class DualFunctionalBase : public EnableObserverPointer
     {
     public:
       virtual void assemble_rhs(const DoFHandler<dim> &dof_handler,
@@ -1529,7 +1528,7 @@ namespace Step14
       // Initialize a <code>FEValues</code> object with a quadrature formula,
       // have abbreviations for the number of quadrature points and shape
       // functions...
-      QGauss<dim>        quadrature(dof_handler.get_fe().degree + 1);
+      const QGauss<dim>  quadrature(dof_handler.get_fe().degree + 1);
       FEValues<dim>      fe_values(dof_handler.get_fe(),
                               quadrature,
                               update_gradients | update_quadrature_points |
@@ -1626,7 +1625,7 @@ namespace Step14
         const DualFunctional::DualFunctionalBase<dim> &dual_functional);
 
     protected:
-      const SmartPointer<const DualFunctional::DualFunctionalBase<dim>>
+      const ObserverPointer<const DualFunctional::DualFunctionalBase<dim>>
                    dual_functional;
       virtual void assemble_rhs(Vector<double> &rhs) const override;
 
@@ -1759,8 +1758,8 @@ namespace Step14
       // that will serve as the "scratch data" class of the WorkStream concept:
       struct CellData
       {
-        FEValues<dim>                           fe_values;
-        const SmartPointer<const Function<dim>> right_hand_side;
+        FEValues<dim>                              fe_values;
+        const ObserverPointer<const Function<dim>> right_hand_side;
 
         std::vector<double> cell_residual;
         std::vector<double> rhs_values;
@@ -2238,7 +2237,7 @@ namespace Step14
             }
           ++present_cell;
         }
-      std::cout << "   Estimated error="
+      std::cout << "   Estimated error: "
                 << std::accumulate(error_indicators.begin(),
                                    error_indicators.end(),
                                    0.)
@@ -2778,7 +2777,7 @@ namespace Step14
         solver->solve_problem();
         solver->output_solution();
 
-        std::cout << "   Number of degrees of freedom=" << solver->n_dofs()
+        std::cout << "   Number of degrees of freedom: " << solver->n_dofs()
                   << std::endl;
 
         for (const auto &evaluator : descriptor.evaluator_list)

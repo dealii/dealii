@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2015 - 2020 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2015 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 
 #include <deal.II/base/geometry_info.h>
@@ -39,26 +38,26 @@ PolynomialsRannacherTurek<dim>::compute_value(const unsigned int i,
   Assert(dim == 2, ExcNotImplemented());
   if (i == 0)
     {
-      return (0.75 - 2.5 * p(0) + 1.5 * p(1) +
-              1.5 * (p(0) * p(0) - p(1) * p(1)));
+      return (0.75 - 2.5 * p[0] + 1.5 * p[1] +
+              1.5 * (p[0] * p[0] - p[1] * p[1]));
     }
   else if (i == 1)
     {
-      return (-0.25 - 0.5 * p(0) + 1.5 * p(1) +
-              1.5 * (p(0) * p(0) - p(1) * p(1)));
+      return (-0.25 - 0.5 * p[0] + 1.5 * p[1] +
+              1.5 * (p[0] * p[0] - p[1] * p[1]));
     }
   else if (i == 2)
     {
-      return (0.75 + 1.5 * p(0) - 2.5 * p(1) -
-              1.5 * (p(0) * p(0) - p(1) * p(1)));
+      return (0.75 + 1.5 * p[0] - 2.5 * p[1] -
+              1.5 * (p[0] * p[0] - p[1] * p[1]));
     }
   else if (i == 3)
     {
-      return (-0.25 + 1.5 * p(0) - 0.5 * p(1) -
-              1.5 * (p(0) * p(0) - p(1) * p(1)));
+      return (-0.25 + 1.5 * p[0] - 0.5 * p[1] -
+              1.5 * (p[0] * p[0] - p[1] * p[1]));
     }
 
-  Assert(false, ExcNotImplemented());
+  DEAL_II_NOT_IMPLEMENTED();
   return 0;
 }
 
@@ -69,34 +68,42 @@ Tensor<1, dim>
 PolynomialsRannacherTurek<dim>::compute_grad(const unsigned int i,
                                              const Point<dim>  &p) const
 {
-  Assert(dim == 2, ExcNotImplemented());
-  Tensor<1, dim> grad;
-  if (i == 0)
+  if constexpr (dim == 2)
     {
-      grad[0] = -2.5 + 3 * p(0);
-      grad[1] = 1.5 - 3 * p(1);
-    }
-  else if (i == 1)
-    {
-      grad[0] = -0.5 + 3.0 * p(0);
-      grad[1] = 1.5 - 3.0 * p(1);
-    }
-  else if (i == 2)
-    {
-      grad[0] = 1.5 - 3.0 * p(0);
-      grad[1] = -2.5 + 3.0 * p(1);
-    }
-  else if (i == 3)
-    {
-      grad[0] = 1.5 - 3.0 * p(0);
-      grad[1] = -0.5 + 3.0 * p(1);
-    }
-  else
-    {
-      Assert(false, ExcNotImplemented());
+      Tensor<1, dim> grad;
+      if (i == 0)
+        {
+          grad[0] = -2.5 + 3 * p[0];
+          grad[1] = 1.5 - 3 * p[1];
+        }
+      else if (i == 1)
+        {
+          grad[0] = -0.5 + 3.0 * p[0];
+          grad[1] = 1.5 - 3.0 * p[1];
+        }
+      else if (i == 2)
+        {
+          grad[0] = 1.5 - 3.0 * p[0];
+          grad[1] = -2.5 + 3.0 * p[1];
+        }
+      else if (i == 3)
+        {
+          grad[0] = 1.5 - 3.0 * p[0];
+          grad[1] = -0.5 + 3.0 * p[1];
+        }
+      else
+        {
+          DEAL_II_NOT_IMPLEMENTED();
+        }
+
+      return grad;
     }
 
-  return grad;
+  else
+    {
+      DEAL_II_NOT_IMPLEMENTED();
+      return {};
+    }
 }
 
 
@@ -107,37 +114,45 @@ PolynomialsRannacherTurek<dim>::compute_grad_grad(
   const unsigned int i,
   const Point<dim> & /*p*/) const
 {
-  Assert(dim == 2, ExcNotImplemented());
-  Tensor<2, dim> grad_grad;
-  if (i == 0)
+  if constexpr (dim == 2)
     {
-      grad_grad[0][0] = 3;
-      grad_grad[0][1] = 0;
-      grad_grad[1][0] = 0;
-      grad_grad[1][1] = -3;
+      Tensor<2, dim> grad_grad;
+      if (i == 0)
+        {
+          grad_grad[0][0] = 3;
+          grad_grad[0][1] = 0;
+          grad_grad[1][0] = 0;
+          grad_grad[1][1] = -3;
+        }
+      else if (i == 1)
+        {
+          grad_grad[0][0] = 3;
+          grad_grad[0][1] = 0;
+          grad_grad[1][0] = 0;
+          grad_grad[1][1] = -3;
+        }
+      else if (i == 2)
+        {
+          grad_grad[0][0] = -3;
+          grad_grad[0][1] = 0;
+          grad_grad[1][0] = 0;
+          grad_grad[1][1] = 3;
+        }
+      else if (i == 3)
+        {
+          grad_grad[0][0] = -3;
+          grad_grad[0][1] = 0;
+          grad_grad[1][0] = 0;
+          grad_grad[1][1] = 3;
+        }
+      return grad_grad;
     }
-  else if (i == 1)
+
+  else
     {
-      grad_grad[0][0] = 3;
-      grad_grad[0][1] = 0;
-      grad_grad[1][0] = 0;
-      grad_grad[1][1] = -3;
+      DEAL_II_NOT_IMPLEMENTED();
+      return {};
     }
-  else if (i == 2)
-    {
-      grad_grad[0][0] = -3;
-      grad_grad[0][1] = 0;
-      grad_grad[1][0] = 0;
-      grad_grad[1][1] = 3;
-    }
-  else if (i == 3)
-    {
-      grad_grad[0][0] = -3;
-      grad_grad[0][1] = 0;
-      grad_grad[1][0] = 0;
-      grad_grad[1][1] = 3;
-    }
-  return grad_grad;
 }
 
 
@@ -200,6 +215,6 @@ PolynomialsRannacherTurek<dim>::clone() const
 
 
 // explicit instantiations
-#include "polynomials_rannacher_turek.inst"
+#include "base/polynomials_rannacher_turek.inst"
 
 DEAL_II_NAMESPACE_CLOSE

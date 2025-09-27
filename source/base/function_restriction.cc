@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2010 - 2021 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2021 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 #include <deal.II/base/bounding_box.h>
 #include <deal.II/base/function_restriction.h>
@@ -28,13 +27,13 @@ namespace internal
     AssertIndexRange(component_in_dim_plus_1, dim + 1);
 
     Point<dim + 1> output;
-    output(component_in_dim_plus_1) = coordinate_value;
+    output[component_in_dim_plus_1] = coordinate_value;
     for (int d = 0; d < dim; ++d)
       {
         const unsigned int component_to_write_to =
           dealii::internal::coordinate_to_one_dim_higher<dim>(
             component_in_dim_plus_1, d);
-        output(component_to_write_to) = point(d);
+        output[component_to_write_to] = point[d];
       }
 
     return output;
@@ -155,7 +154,7 @@ namespace Functions
                                const unsigned int component) const
   {
     const Point<dim + 1> full_point =
-      internal::create_higher_dim_point(point, open_direction, point_1D(0));
+      internal::create_higher_dim_point(point, open_direction, point_1D[0]);
     return function->value(full_point, component);
   }
 
@@ -167,7 +166,7 @@ namespace Functions
                                   const unsigned int component) const
   {
     const Point<dim + 1> full_point =
-      internal::create_higher_dim_point(point, open_direction, point_1D(0));
+      internal::create_higher_dim_point(point, open_direction, point_1D[0]);
     const Tensor<1, dim + 1> full_gradient =
       function->gradient(full_point, component);
 
@@ -186,7 +185,7 @@ namespace Functions
                                  const unsigned int component) const
   {
     const Point<dim + 1> full_point =
-      internal::create_higher_dim_point(point, open_direction, point_1D(0));
+      internal::create_higher_dim_point(point, open_direction, point_1D[0]);
     const Tensor<2, dim + 1> full_hessian =
       function->hessian(full_point, component);
 
@@ -200,5 +199,5 @@ namespace Functions
 
 
 } // namespace Functions
-#include "function_restriction.inst"
+#include "base/function_restriction.inst"
 DEAL_II_NAMESPACE_CLOSE

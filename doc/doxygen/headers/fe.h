@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2003 - 2020 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2006 - 2024 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 
 /**
@@ -19,15 +18,15 @@
  *
  * All classes related to shape functions and to access to shape
  * functions.  This concerns the actual values of finite elements. For
- * the numbering of degrees of freedom refer to the module on
+ * the numbering of degrees of freedom refer to the topic on
  * @ref dofs.
  *
- * The classes and functions of this module fall into several sub-groups that
- * are discussed in their respective sub-modules listed above. In addition,
+ * The classes and functions of this topic fall into several sub-groups that
+ * are discussed in their respective sub-topics listed above. In addition,
  * the FETools class provides functions that provide information on finite
  * elements, transformations between elements, etc.
  *
- * In the grand scheme of things, the pieces of this module interact
+ * In the grand scheme of things, the pieces of this topic interact
  * with a variety of other parts of the library:
  * @dot
  digraph G
@@ -77,7 +76,7 @@
 /**
  * @defgroup febase Base classes
  *
- * The members of this sub-module describe the implementation mechanics of
+ * The members of this sub-topic describe the implementation mechanics of
  * finite element classes, without actually implementing a concrete
  * element. For example, the FiniteElement base class declares the virtual
  * functions a derived class has to implement if it wants to describe a finite
@@ -114,7 +113,7 @@
 /**
  * @defgroup feaccess Finite element access/FEValues classes
  *
- * The classes in this module are used when one wants to assemble matrices or
+ * The classes in this topic are used when one wants to assemble matrices or
  * vectors. They link finite elements, quadrature objects, and mappings: the
  * finite element classes describe a finite element space on a unit cell
  * (i.e. the unit line segment, square, or cube <tt>[0,1]^d</tt>), the
@@ -133,7 +132,7 @@
  * the FEValues and related classes allow access to all vector components; if
  * one wants to pick individual components, there are extractor classes that
  * make this task simpler, as described in the
- * @ref vector_valued module.
+ * @ref vector_valued topic.
  *
  * The last member of this group, the UpdateFlags enumeration, is used as an
  * optimization: instead of letting the FEValues class compute every possible
@@ -151,7 +150,7 @@
  * @ref UpdateFlags
  * attempts to give an overview of how this works.
  *
- * In the grand scheme of things, the pieces of this module interact
+ * In the grand scheme of things, the pieces of this topic interact
  * with a variety of other parts of the library:
  * @dot
  digraph G
@@ -276,7 +275,7 @@
 /**
  * @defgroup mapping Mappings between reference and real cell
  *
- * The classes in this module are used to map from unit coordinates to the
+ * The classes in this group are used to map from unit coordinates to the
  * coordinates of a cell in real cell. Most commonly, one uses the MappingQ1
  * class that provides a Q1 (bi-/trilinear) mapping (i.e. a mapping that is
  * isoparametric for the usual Q1 elements). However, there are other classes
@@ -295,7 +294,7 @@
  * Finally, the MappingCartesian class is an optimization for elements that
  * are brick-shaped and with edges parallel to the coordinate axes.
  *
- * In the grand scheme of things, the pieces of this module interact
+ * In the grand scheme of things, the pieces of this group interact
  * with a variety of other parts of the library:
  * @dot
  digraph G

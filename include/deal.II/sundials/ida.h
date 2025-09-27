@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2017 - 2023 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2017 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 
 #ifndef dealii_sundials_ida_h
@@ -22,7 +21,6 @@
 #ifdef DEAL_II_WITH_SUNDIALS
 #  include <deal.II/base/conditional_ostream.h>
 #  include <deal.II/base/exceptions.h>
-#  include <deal.II/base/logstream.h>
 #  include <deal.II/base/mpi_stub.h>
 #  include <deal.II/base/parameter_handler.h>
 
@@ -39,6 +37,7 @@
 #    include <ida/ida.h>
 #  endif
 
+#  include <deal.II/sundials/sundials_types.h>
 #  include <deal.II/sundials/sunlinsol_wrapper.h>
 
 #  include <boost/signals2.hpp>
@@ -46,15 +45,12 @@
 #  include <nvector/nvector_serial.h>
 #  include <sundials/sundials_config.h>
 #  include <sundials/sundials_math.h>
-#  include <sundials/sundials_types.h>
 
 #  include <memory>
 
 
 DEAL_II_NAMESPACE_OPEN
 
-// Shorthand notation for IDA error codes.
-#  define AssertIDA(code) Assert(code >= 0, ExcIDAError(code))
 
 namespace SUNDIALS
 {
@@ -63,7 +59,8 @@ namespace SUNDIALS
    *
    * The class IDA is a wrapper to SUNDIALS Implicit Differential-Algebraic
    * solver which is a general purpose solver for systems of
-   * Differential-Algebraic Equations (DAEs).
+   * Differential-Algebraic Equations (DAEs). Another class that can solve
+   * this set of equations is PETScWrappers::TimeStepper.
    *
    * The user has to provide the implementation of the following std::functions:
    *  - reinit_vector;
@@ -129,16 +126,21 @@ namespace SUNDIALS
    *approximation of the system Jacobian
    *
    * \f[
-   *   J=\dfrac{\partial G}{\partial y} = \dfrac{\partial F}{\partial y} +
-   *  \alpha \dfrac{\partial F}{\partial \dot y}\, ,
+   *   J=\dfrac{\partial G}{\partial y}
+   *   = \dfrac{\partial F}{\partial y} +
+   *     \alpha \dfrac{\partial F}{\partial \dot y}\, ,
    * \f]
    *
    * and $\alpha = \alpha_{n,0}/h_n$. It is worth mentioning that the
    * scalar $\alpha$ changes whenever the step size or method order
    * changes.
    *
+   *
+   * <h3> A simple example: an ordinary differential equation </h3>
+   *
    * To provide a simple example, consider the following harmonic oscillator
-   *problem: \f[ \begin{split}
+   * problem:
+   * \f[ \begin{split}
    *   u'' & = -k^2 u \\
    *   u (0) & = 0 \\
    *   u'(0) & = k
@@ -153,10 +155,10 @@ namespace SUNDIALS
    * \end{matrix}
    * \f]
    *
-   * That is $F(y', y, t) = y' + A y = 0 $
+   * That is, $F(y', y, t) = y' + A y = 0 $
    * where
-   * A =
    * \f[
+   * A =
    * \begin{pmatrix}
    * 0 & -1 \\
    * k^2 &0
@@ -202,20 +204,21 @@ namespace SUNDIALS
    * };
    *
    * time_stepper.setup_jacobian = [&](const double ,
-   *                                   const VectorType &,
-   *                                   const VectorType &,
+   *                                   const VectorType &, // y
+   *                                   const VectorType &, // y_dot
    *                                   const double alpha)
    * {
    *   J = A;
    *
-   *   J(0,0) = alpha;
-   *   J(1,1) = alpha;
+   *   J(0,0) += alpha;
+   *   J(1,1) += alpha;
    *
    *   Jinv.invert(J);
    * };
    *
    * time_stepper.solve_with_jacobian_system = [&](const VectorType &src,
-   *                                               VectorType &dst, double)
+   *                                               VectorType       &dst,
+   *                                               const double)  // tolerance
    * {
    *   Jinv.vmult(dst,src);
    * };
@@ -224,6 +227,255 @@ namespace SUNDIALS
    * y_dot[0] = kappa;
    * time_stepper.solve_dae(y,y_dot);
    * @endcode
+   *
+   *
+   * <h3> A differential algebraic equation (DAE) example </h3>
+   *
+   * A more interesting example is a situation where the form $F(y', y, t) = 0$
+   * provides something genuinely more flexible than a typical ordinary
+   * differential equation. Specifically, consider the equation
+   * @f{align*}{
+   *   u'(t) &= av(t),
+   *   \\
+   *   0 &= v(t) - u(t).
+   * @f}
+   * One can combine the two variables into $y(t) = [u(t), v(t)]^T$.
+   * Here, one of the two variables does not have a time derivative. In
+   * applications, this is often the case when one variable evolves in
+   * time (here, $u(t)$) on its own time scale, and the other one finds
+   * its value as a function of the former on a much faster time scale.
+   * In the current context, we could of course easily eliminate $v(t)$
+   * using the second equation, and would then just be left with the
+   * equation
+   * @f[
+   *   u'(t) = au(t)
+   * @f]
+   * which has solution $u(t) = u(0)e^{at}$. But this is, in general, not
+   * easily possible if the two variables are related by differential
+   * operators. In fact, this happens quite frequently in application. Take,
+   * for example, the time-dependent Stokes equations:
+   * @f{align*}{
+   *   \frac{\partial \mathbf u(\mathbf x,t)}{\partial t}
+   *   - \nu \Delta \mathbf u(\mathbf x,t) + \nabla p(\mathbf x,t)
+   *   &= \mathbf f(\mathbf x,t),
+   *   \\
+   *   \nabla \cdot \mathbf u(\mathbf x,t) &= 0.
+   * @f}
+   * Here, the fluid velocity $\mathbf u(\mathbf x,t)$ evolves over time,
+   * and the pressure is always in equilibrium with the flow because the Stokes
+   * equations are derived under the assumption that the speed of sound (at
+   * which pressure perturbations propagate) is much larger than the fluid
+   * velocity. As a consequence, there is no time derivative on the pressure
+   * available in the equation, but unlike the simple model problem above, the
+   * pressure can not easily be eliminated from the system. Similar situations
+   * happen in step-21, step-31, step-32, step-43, and others, where a subset of
+   * variables is always in instantaneous equilibrium with another set of
+   * variables that evolves on a slower time scale.
+   *
+   * Another case where we *could* eliminate a variable but do not want to
+   * is where that additional variable is introduced in the first place to work
+   * around some other problem. As an example, consider the time dependent
+   * version of the biharmonic problem we consider in step-47 (as well as some
+   * later ones). The equations we would then be interested in would read
+   * @f{align*}{
+   *   \frac{\partial u(\mathbf x,t)}{\partial t} + \Delta^2 u(\mathbf x,t) &=
+   *   f(\mathbf x,t).
+   * @f}
+   * As discussed in step-47, the difficulty is the presence of the fourth
+   * derivatives. One way in which one can address this is by introducing
+   * an auxiliary variable $v=\Delta u$ which would render the problem into
+   * the following one that only ever has second derivatives which we know
+   * how to deal with:
+   * @f{align*}{
+   *   \frac{\partial u(\mathbf x,t)}{\partial t} + \Delta v(\mathbf x,t) &=
+   *   f(\mathbf x,t),
+   *   \\
+   *   v(\mathbf x,t)-\Delta u(\mathbf x,t) &= 0.
+   * @f}
+   * Here, the introduction of the additional variable was voluntary, and
+   * could be undone, but we don't want that of course. Rather, we end
+   * up with a differential-algebraic equation because the equations do
+   * not have a time derivative for $v$.
+   *
+   * Rather than show how to solve the trivial (linear) case above, let us
+   * instead consider the situation where we introduce another variable $v$ that
+   * is related to $u$ by the nonlinear relationship $v=u^p$, $p\ge 1$:
+   * @f{align*}{
+   *   u'(t) &= a v(t)^{1/p},
+   *   \\
+   *   0 &= v(t) - u(t)^p.
+   * @f}
+   * We will impose initial conditions as
+   * @f{align*}{
+   *   u(0) &= 1 \\
+   *   v(0) &= 1.
+   * @f}
+   * The problem continues to have the solution $u(t)=e^{at}$ with the
+   * auxiliary variable satisfying $v(t)=[e^{at}]^p$. One would implement
+   * all of this using the following little program where you have to recall
+   * that
+   * @f[
+   *   F = \begin{pmatrix}u' -a v^{1/p} \\ -u^p + v \end{pmatrix}
+   * @f]
+   * and that the Jacobian we need to provide is
+   * @f[
+   *   J(\alpha) =
+   *   = \dfrac{\partial F}{\partial y} +
+   *     \alpha \dfrac{\partial F}{\partial \dot y}
+   *   = \begin{pmatrix} \alpha && -av^{1/p-1}/p \\ -pu^{p-1} & 1 \end{pmatrix}
+   * @f]
+   *
+   * All of this can be implemented using the following code:
+   * @code
+   *   const double a = 1.0;
+   *   const double p = 1.5;
+   *
+   *   using VectorType = Vector<double>;
+   *
+   *   VectorType         y(2);
+   *   VectorType         y_dot(2);
+   *   FullMatrix<double> J(2, 2);
+   *   FullMatrix<double> A(2, 2);
+   *   FullMatrix<double> Jinv(2, 2);
+   *
+   *   SUNDIALS::IDA<VectorVector> time_stepper;
+   *
+   *   time_stepper.reinit_vector = [&](VectorType &v) {
+   *     v.reinit(2);
+   *   };
+   *
+   *   time_stepper.residual = [&](const double      t,
+   *                               const VectorType &y,
+   *                               const VectorType &y_dot,
+   *                               VectorType       &res) {
+   *     //  F(Y', Y, t) = [x' -a y^{1/p} ; -x^p + y]
+   *     res    = 0;
+   *     res[0] = y_dot[0] - a * std::pow(y[1], 1./p);
+   *     res[1] = -std::pow(y[0], p) + y[1];
+   *   };
+   *
+   *   time_stepper.setup_jacobian = [&](const double,
+   *                                     const VectorType &y,
+   *                                     const VectorType &,
+   *                                     const double alpha) {
+   *     // J = [alpha -ay^{1/p-1}/p ; -px^{p-1} 1]
+   *     J(0, 0) = alpha;
+   *     J(0, 1) = -a*std::pow(y[1], 1./p-1)/p;
+   *     J(1, 0) = -p*std::pow(y[0], p-1);
+   *     J(1, 1) = 1;
+   *
+   *     Jinv.invert(J);
+   *   };
+   *
+   *   time_stepper.solve_with_jacobian =
+   *     [&](const VectorType &src, VectorType &dst, const double) {
+   *       Jinv.vmult(dst, src);
+   *     };
+   *
+   *   // Provide initial values:
+   *   y[0] = y[1] = 1;
+   *   // Also provide initial derivatives. Note that
+   *   //    v'(0) = d/dt[u^p](0) = p[u'(0)]^{p-1} = p a^{p-1}
+   *   y_dot[0] = a;
+   *   y_dot[1] = p*std::pow(a, p-1);
+   *   time_stepper.solve_dae(y, y_dot);
+   * @endcode
+   * Note that in this code, we not only provide initial conditions for
+   * $u$ and $v$, but also for $u'$ and $v'$. We can do this here because
+   * we know what the exact solution is.
+   *
+   *
+   * <h3> DAEs with missing initial conditions </h3>
+   *
+   * Whereas in the previous section, we were able to provide not only
+   * initial values in the form of a vector for $y(0)$, but also for
+   * $y'(0)$, this is not a common situation. For example, for the Stokes
+   * equations mentioned above,
+   * @f{align*}{
+   *   \frac{\partial \mathbf u(\mathbf x,t)}{\partial t}
+   *   - \nu \Delta \mathbf u(\mathbf x,t) + \nabla p(\mathbf x,t)
+   *   &= \mathbf f(\mathbf x,t),
+   *   \\
+   *   \nabla \cdot \mathbf u(\mathbf x,t) &= 0,
+   * @f}
+   * one generally might have an initial velocity field for
+   * $\mathbf u(\mathbf x,0)$, but typically one does not have an initial
+   * pressure field $p(\mathbf x,0)$ nor either of these variables' time
+   * derivatives at $t=0$.
+   *
+   * Fortunately, they can typically be computed via the relationship
+   * $F(t,y,\dot y) = 0$. To illustrate how this can is done, let us
+   * re-use the nonlinear example from the previous section:
+   * @f{align*}{
+   *   u'(t) &= a v(t)^{1/p},
+   *   \\
+   *   0 &= v(t) - u(t)^p.
+   * @f}
+   * If we now impose initial conditions for both variables, for
+   * example
+   * @f{align*}{
+   *   u(0) &= 1 \\
+   *   v(0) &= 1,
+   * @f}
+   * then the only change necessary is to create the time stepper via
+   * @code
+   *   SUNDIALS::IDA<VectorType>::AdditionalData data;
+   *   data.ic_type = SUNDIALS::IDA<VectorType>::AdditionalData::use_y_diff;
+   *   SUNDIALS::IDA<Vector<double>> time_stepper(data);
+   * @endcode
+   * and then we can run the program with the following at the end:
+   * @code
+   *   // Provide correct initial conditions y(0), but incorrect initial
+   *   // derivatives y'(0):
+   *   y[0] = y[1] = 1;  // correct
+   *   y_dot[0]    = 0;  // wrong
+   *   y_dot[1]    = 0;  // wrong
+   *   time_stepper.solve_dae(y, y_dot);
+   * @endcode
+   * Here, IDA first compute $\dot y(0)$ before starting the time stepping
+   * process.
+   *
+   * In many applications, however, one does not even have a complete set of
+   * initial conditions -- e.g., in the Stokes equations above, one generally
+   * only has initial values for the velocity, but not the pressure. IDA can
+   * also compute these, but for that it needs to know which components of the
+   * solution vector have differential equations attached to them -- i.e., for
+   * which components a time derivative appears in $F(t,y,\dot y)$. This is
+   * not difficult to do -- we only have to add the following block where a
+   * lambda function returns an IndexSet that describes which variables
+   * are "differential" (included in the index set) and which are not (not
+   * included in the index set):
+   * @code
+   *     time_stepper.differential_components = []() {
+   *     IndexSet x(2);
+   *     x.add_index(0);
+   *     return x;
+   *   };
+   *
+   *   y[0]     = 1;   // correct
+   *   y[1]     = 42;  // wrong
+   *   y_dot[0] = 0;   // wrong
+   *   y_dot[1] = 0;   // wrong
+   *   time_stepper.solve_dae(y, y_dot);
+   * @endcode
+   * With these modifications, IDA correctly computes the solutions $u(t)$
+   * and $v(t)$.
+   *
+   * A word of caution, however: All of this solving for components of
+   * $y(0)$ and $y'(t)$ costs time and accuracy. If you *can* provide initial
+   * conditions, you should; if you can't, they have to be numerically
+   * approximated and will be close but not exact. In the examples above,
+   * if all initial conditions $y(0),\dot y(0)$ are provided, IDA computes
+   * the solution $y(10)=e^{10}\approx 22,000$ to an absolute accuracy of
+   * around $3\cdot 10^{-5}$ (i.e., to a relative tolerance of better than
+   * $10^{-8}$). If you only provide $y(0)$ correctly, the absolute error
+   * is about twice as large, around $6\cdot 10^{-5}$. If one also omits
+   * providing the initial value for the second component of $y(0)$ (the
+   * non-differential component $v(0)$), the error goes up to $5\cdot 10^{-4}$.
+   * That's not bad, but the trend is clear. In practice, one can control
+   * the accuracy of the required solves for initial conditions by
+   * setting the appropriate flags in the AdditionalData object passed to
+   * the constructor.
    */
   template <typename VectorType = Vector<double>>
   class IDA
@@ -238,11 +490,11 @@ namespace SUNDIALS
       /**
        * IDA is a Differential Algebraic solver. As such, it requires initial
        * conditions also for the first order derivatives. If you do not provide
-       * consistent initial conditions, (i.e., conditions for which F(y_dot(0),
-       * y(0), 0) = 0), you can ask SUNDIALS to compute initial conditions for
-       * you by specifying InitialConditionCorrection for the initial
-       * conditions both at the `initial_time` (`ic_type`) and after a reset
-       * has occurred (`reset_type`).
+       * consistent initial conditions, (i.e., conditions for which $F(\dot
+       * y(0), y(0), 0) = 0)$, you can ask SUNDIALS to compute initial
+       * conditions for you by specifying InitialConditionCorrection for the
+       * initial conditions both at the `initial_time` (`ic_type`) and after a
+       * reset has occurred (`reset_type`).
        */
       enum InitialConditionCorrection
       {
@@ -252,15 +504,16 @@ namespace SUNDIALS
         none = 0,
 
         /**
-         * Compute the algebraic components of y and differential
-         * components of y_dot, given the differential components of y.
-         *    This option requires that the user specifies differential and
-         *    algebraic components in the function get_differential_components.
+         * Compute the algebraic components of $y$ and differential
+         * components of $\dot y$, given the differential components of $y$.
+         * This option requires that the user specifies differential and
+         * algebraic components in the function
+         * IDA::differential_components().
          */
         use_y_diff = 1,
 
         /**
-         * Compute all components of y, given y_dot.
+         * Compute all components of $y$, given $\dot y$.
          */
         use_y_dot = 2
       };
@@ -411,7 +664,7 @@ namespace SUNDIALS
           " use_y_diff: compute the algebraic components of y and differential\n"
           "    components of y_dot, given the differential components of y. \n"
           "    This option requires that the user specifies differential and \n"
-          "    algebraic components in the function get_differential_components.\n"
+          "    algebraic components in the function differential_components().\n"
           " use_y_dot: compute all components of y, given y_dot.",
           Patterns::Selection("none|use_y_diff|use_y_dot"));
         prm.add_action("Correction type at initial time",
@@ -436,7 +689,7 @@ namespace SUNDIALS
           " use_y_diff: compute the algebraic components of y and differential\n"
           "    components of y_dot, given the differential components of y. \n"
           "    This option requires that the user specifies differential and \n"
-          "    algebraic components in the function get_differential_components.\n"
+          "    algebraic components in the function differential_components().\n"
           " use_y_dot: compute all components of y, given y_dot.",
           Patterns::Selection("none|use_y_diff|use_y_dot"));
         prm.add_action("Correction type after restart",
@@ -564,7 +817,7 @@ namespace SUNDIALS
      * -  use_y_diff: compute the algebraic components of y and differential
      *    components of y_dot, given the differential components of y.
      *    This option requires that the user specifies differential and
-     *    algebraic components in the function get_differential_components.
+     *    algebraic components in the function differential_components().
      * -  use_y_dot: compute all components of y, given y_dot.
      *
      * By default, this class assumes that all components are differential, and
@@ -814,8 +1067,8 @@ namespace SUNDIALS
      */
     DeclException1(ExcIDAError,
                    int,
-                   << "One of the SUNDIALS IDA internal functions "
-                   << " returned a negative error code: " << arg1
+                   << "One of SUNDIALS IDA's internal functions "
+                   << "returned an error code: " << arg1
                    << ". Please consult SUNDIALS manual.");
 
 
@@ -886,6 +1139,14 @@ namespace SUNDIALS
   };
 } // namespace SUNDIALS
 
+DEAL_II_NAMESPACE_CLOSE
+
+#else
+
+// Make sure the scripts that create the C++20 module input files have
+// something to latch on if the preprocessor #ifdef above would
+// otherwise lead to an empty content of the file.
+DEAL_II_NAMESPACE_OPEN
 DEAL_II_NAMESPACE_CLOSE
 
 #endif // DEAL_II_WITH_SUNDIALS

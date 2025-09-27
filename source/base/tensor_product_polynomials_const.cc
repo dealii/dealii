@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2012 - 2020 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2013 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 
 #include <deal.II/base/exceptions.h>
@@ -57,6 +56,7 @@ TensorProductPolynomialsConst<dim>::set_numbering(
     index_map_inverse[index_map[i]] = i;
 
   std::vector<unsigned int> renumber_base;
+  renumber_base.reserve(tensor_polys.n());
   for (unsigned int i = 0; i < tensor_polys.n(); ++i)
     renumber_base.push_back(renumber[i]);
 
@@ -82,30 +82,30 @@ TensorProductPolynomialsConst<dim>::compute_value(const unsigned int i,
 
 
 
-template <>
-double
-TensorProductPolynomialsConst<0>::compute_value(const unsigned int,
-                                                const Point<0> &) const
-{
-  Assert(false, ExcNotImplemented());
-  return 0.;
-}
-
-
 template <int dim>
 Tensor<1, dim>
 TensorProductPolynomialsConst<dim>::compute_grad(const unsigned int i,
                                                  const Point<dim>  &p) const
 {
-  const unsigned int max_indices = tensor_polys.n();
-  Assert(i <= max_indices, ExcInternalError());
-
-  // treat the regular basis functions
-  if (i < max_indices)
-    return tensor_polys.compute_grad(i, p);
+  if constexpr (dim == 0)
+    {
+      (void)i;
+      (void)p;
+      DEAL_II_NOT_IMPLEMENTED();
+      return {};
+    }
   else
-    // this is for the constant function
-    return Tensor<1, dim>();
+    {
+      const unsigned int max_indices = tensor_polys.n();
+      Assert(i <= max_indices, ExcInternalError());
+
+      // treat the regular basis functions
+      if (i < max_indices)
+        return tensor_polys.compute_grad(i, p);
+      else
+        // this is for the constant function
+        return Tensor<1, dim>();
+    }
 }
 
 template <int dim>

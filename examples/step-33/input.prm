@@ -1,16 +1,19 @@
 # Listing of Parameters
 # ---------------------
 
-# The input grid 
+# The input grid
+
 set mesh = slide.inp
 
 # Stabilization parameter
+
 set diffusion power = 2.0
 
 # --------------------------------------------------
 # Boundary conditions
 # We may specify boundary conditions for up to MAX_BD boundaries.
 # Your .inp file should have these boundaries designated.
+
 subsection boundary_1
   set no penetration = true # reflective boundary condition
 end
@@ -46,23 +49,25 @@ end
 
 # --------------------------------------------------
 # Time stepping control
+
 subsection time stepping
-  set final time = 10.0 # simulation end time
-  set time step  = 0.02 # simulation time step
+  set final time         = 10.0 # simulation end time
+  set time step          = 0.02 # simulation time step
   set theta scheme value = 0.5
 end
 
 subsection linear solver
-  set output         = quiet
-  set method         = gmres
-  set ilut fill      = 1.5
-  set ilut drop tolerance = 1e-6
+  set output                  = quiet
+  set method                  = gmres
+  set ilut fill               = 1.5
+  set ilut drop tolerance     = 1e-6
   set ilut absolute tolerance = 1e-6
   set ilut relative tolerance = 1.0
 end
 
 # --------------------------------------------------
 # Output frequency and kind
+
 subsection output
   set step           = 0.01
   set schlieren plot = true
@@ -70,15 +75,17 @@ end
 
 # --------------------------------------------------
 # Refinement control
+
 subsection refinement
-  set refinement = true # none only other option
-  set shock value = 1.5
+  set refinement   = true # none only other option
+  set shock value  = 1.5
   set shock levels = 1 # how many levels of refinement to allow
 end
 
 # --------------------------------------------------
 # Flux parameters
+
 subsection flux
- set stab = constant
- #set stab value = 1.0
+  set stab = constant
+  #set stab value = 1.0
 end

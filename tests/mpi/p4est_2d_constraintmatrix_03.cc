@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2009 - 2018 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2010 - 2024 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 
 
@@ -45,14 +44,12 @@
 #include <deal.II/numerics/data_out.h>
 #include <deal.II/numerics/vector_tools.h>
 
-#include <sstream>
-
 #include "../tests.h"
 
 
 template <int dim>
 void
-test()
+test(const bool use_manifold_for_normal, const Mapping<dim> &mapping)
 {
   unsigned int myid = Utilities::MPI::this_mpi_process(MPI_COMM_WORLD);
 
@@ -100,7 +97,7 @@ test()
   TrilinosWrappers::MPI::Vector x_rel;
   x_rel.reinit(relevant_set, MPI_COMM_WORLD);
 
-  AffineConstraints<double> cm(relevant_set);
+  AffineConstraints<double> cm(owned_set, relevant_set);
   DoFTools::make_hanging_node_constraints(dofh, cm);
   ComponentMask velocity_mask(dim + 1, true);
 
@@ -113,10 +110,8 @@ test()
   no_normal_flux_boundaries.insert(1);
 
 
-  VectorTools::compute_no_normal_flux_constraints(dofh,
-                                                  0,
-                                                  no_normal_flux_boundaries,
-                                                  cm);
+  VectorTools::compute_no_normal_flux_constraints(
+    dofh, 0, no_normal_flux_boundaries, cm, mapping, use_manifold_for_normal);
 
   cm.close();
 
@@ -141,5 +136,10 @@ main(int argc, char *argv[])
   Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
 
   mpi_initlog();
-  test<2>();
+  deallog << "Normal with manifold:" << std::endl;
+  test<2>(true, MappingQ1<2>());
+  deallog << std::endl;
+
+  deallog << "Normal with mapping:" << std::endl;
+  test<2>(false, MappingQ<2>(3));
 }

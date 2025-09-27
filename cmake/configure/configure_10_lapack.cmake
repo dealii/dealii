@@ -1,17 +1,16 @@
-## ---------------------------------------------------------------------
+## ------------------------------------------------------------------------
 ##
-## Copyright (C) 2012 - 2022 by the deal.II authors
+## SPDX-License-Identifier: LGPL-2.1-or-later
+## Copyright (C) 2012 - 2025 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
-## The deal.II library is free software; you can use it, redistribute
-## it, and/or modify it under the terms of the GNU Lesser General
-## Public License as published by the Free Software Foundation; either
-## version 2.1 of the License, or (at your option) any later version.
-## The full text of the license can be found in the file LICENSE.md at
-## the top level directory of deal.II.
+## Part of the source code is dual licensed under Apache-2.0 WITH
+## LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+## governing the source code and code contributions can be found in
+## LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 ##
-## ---------------------------------------------------------------------
+## ------------------------------------------------------------------------
 
 #
 # Configuration for the lapack library:
@@ -28,26 +27,32 @@ macro(feature_lapack_find_external var)
     set(${var} TRUE)
 
     #
-    # Clear the test flags because the following test will use a C compiler
+    # Clear the test flags
     #
     clear_cmake_required()
     set(CMAKE_REQUIRED_LIBRARIES
       ${DEAL_II_LINKER_FLAGS_SAVED} ${LAPACK_LINKER_FLAGS} ${LAPACK_LIBRARIES}
       )
 
-    CHECK_C_SOURCE_COMPILES("
+    CHECK_CXX_SOURCE_COMPILES("
       #define MANGLE(name, NAME) ${DEAL_II_FORTRAN_MANGLE}
 
-      char MANGLE(daxpy, DAXPY)(); char MANGLE(dgeev, DGEEV)(); char MANGLE(dgeevx, DGEEVX)(); char MANGLE(dgelsd, DGELSD)();
-      char MANGLE(dgemm, DGEMM)(); char MANGLE(dgemv, DGEMV)(); char MANGLE(dgeqrf, DGEQRF)(); char MANGLE(dgesdd, DGESDD)();
-      char MANGLE(dgesvd, DGESVD)(); char MANGLE(dgetrf, DGETRF)(); char MANGLE(dgetri, DGETRI)(); char MANGLE(dgetrs, DGETRS)();
-      char MANGLE(dorgqr, DORGQR)(); char MANGLE(dormqr, DORMQR)(); char MANGLE(dstev, DSTEV)(); char MANGLE(dsyevx, DSYEVX)();
-      char MANGLE(dsygv, DSYGV)(); char MANGLE(dsygvx, DSYGVX)(); char MANGLE(dtrtrs, DTRTRS)(); char MANGLE(saxpy, SAXPY)();
-      char MANGLE(sgeev, SGEEV)(); char MANGLE(sgeevx, SGEEVX)(); char MANGLE(sgelsd, SGELSD)(); char MANGLE(sgemm, SGEMM)();
-      char MANGLE(sgemv, SGEMV)(); char MANGLE(sgeqrf, SGEQRF)(); char MANGLE(sgesdd, SGESDD)(); char MANGLE(sgesvd, SGESVD)();
-      char MANGLE(sgetrf, SGETRF)(); char MANGLE(sgetri, SGETRI)(); char MANGLE(sgetrs, SGETRS)(); char MANGLE(sorgqr, SORGQR)();
-      char MANGLE(sormqr, SORMQR)(); char MANGLE(sstev, SSTEV)(); char MANGLE(ssyevx, SSYEVX)(); char MANGLE(ssygv, SSYGV)();
-      char MANGLE(ssygvx, SSYGVX)(); char MANGLE(strtrs, STRTRS)();
+      // Declare BLAS and LAPACK functions
+      extern \"C\" {
+        char MANGLE(daxpy, DAXPY)(); char MANGLE(dgeev, DGEEV)(); char MANGLE(dgeevx, DGEEVX)(); char MANGLE(dgelsd, DGELSD)();
+        char MANGLE(dgemm, DGEMM)(); char MANGLE(dgemv, DGEMV)(); char MANGLE(dgeqrf, DGEQRF)(); char MANGLE(dgesdd, DGESDD)();
+        char MANGLE(dgesvd, DGESVD)(); char MANGLE(dgetrf, DGETRF)(); char MANGLE(dgetri, DGETRI)(); char MANGLE(dgetrs, DGETRS)();
+        char MANGLE(dorgqr, DORGQR)(); char MANGLE(dormqr, DORMQR)(); char MANGLE(dstev, DSTEV)(); char MANGLE(dsyevx, DSYEVX)();
+        char MANGLE(dsygv, DSYGV)(); char MANGLE(dsygvx, DSYGVX)(); char MANGLE(dtrtrs, DTRTRS)(); char MANGLE(saxpy, SAXPY)();
+        char MANGLE(sgeev, SGEEV)(); char MANGLE(sgeevx, SGEEVX)(); char MANGLE(sgelsd, SGELSD)(); char MANGLE(sgemm, SGEMM)();
+        char MANGLE(sgemv, SGEMV)(); char MANGLE(sgeqrf, SGEQRF)(); char MANGLE(sgesdd, SGESDD)(); char MANGLE(sgesvd, SGESVD)();
+        char MANGLE(sgetrf, SGETRF)(); char MANGLE(sgetri, SGETRI)(); char MANGLE(sgetrs, SGETRS)(); char MANGLE(sorgqr, SORGQR)();
+        char MANGLE(sormqr, SORMQR)(); char MANGLE(sstev, SSTEV)(); char MANGLE(ssyevx, SSYEVX)(); char MANGLE(ssygv, SSYGV)();
+        char MANGLE(ssygvx, SSYGVX)(); char MANGLE(strtrs, STRTRS)();
+      }
+
+      // Then call them. When we link this program, the linker needs to be able
+      // to resolve these function references.
       int main(){
         MANGLE(daxpy, DAXPY)(); MANGLE(dgeev, DGEEV)(); MANGLE(dgeevx, DGEEVX)(); MANGLE(dgelsd, DGELSD)(); MANGLE(dgemm, DGEMM)();
         MANGLE(dgemv, DGEMV)(); MANGLE(dgeqrf, DGEQRF)(); MANGLE(dgesdd, DGESDD)(); MANGLE(dgesvd, DGESVD)(); MANGLE(dgetrf, DGETRF)();

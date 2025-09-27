@@ -1,19 +1,18 @@
 #!/usr/bin/env python
 
-## ---------------------------------------------------------------------
+## ------------------------------------------------------------------------
 ##
-## Copyright (C) 2019 - 2022 by the deal.II authors
+## SPDX-License-Identifier: LGPL-2.1-or-later
+## Copyright (C) 2019 - 2025 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
-## The deal.II library is free software; you can use it, redistribute
-## it, and/or modify it under the terms of the GNU Lesser General
-## Public License as published by the Free Software Foundation; either
-## version 2.1 of the License, or (at your option) any later version.
-## The full text of the license can be found in the file LICENSE.md at
-## the top level directory of deal.II.
+## Part of the source code is dual licensed under Apache-2.0 WITH
+## LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+## governing the source code and code contributions can be found in
+## LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 ##
-## ---------------------------------------------------------------------
+## ------------------------------------------------------------------------
 """This script can be used to format code in external projects
 (that use deal.II) by adding .clang_format files.
 
@@ -58,8 +57,7 @@ from __future__ import print_function
 
 import argparse
 import time
-import distutils.spawn
-import distutils.file_util
+import shutil
 
 import filecmp
 import fnmatch
@@ -88,37 +86,58 @@ def parse_arguments():
     """
     Argument parser.
     """
-    parser = argparse.ArgumentParser("Run clang-format on all files "
-                                     "in a list of directories "
-                                     "that satisfy a given regex."
-                                     "This program requires "
-                                     "clang-format version 16.0.")
+    parser = argparse.ArgumentParser(
+        "Run clang-format on all files "
+        "in a list of directories "
+        "that satisfy a given regex."
+        "This program requires "
+        "clang-format version 16.0."
+    )
 
-    parser.add_argument("-b", "--clang-format-binary", metavar="PATH",
-                        default=distutils.spawn.find_executable("clang-format"))
+    parser.add_argument(
+        "-b",
+        "--clang-format-binary",
+        metavar="PATH",
+        default=shutil.which("clang-format"),
+    )
 
-    parser.add_argument("--regex", default="*.cc,*.h",
-                        help="Regular expression (regex) to filter files on "
-                        "which clang-format is applied.")
+    parser.add_argument(
+        "--regex",
+        default="*.cc,*.h",
+        help="Regular expression (regex) to filter files on "
+        "which clang-format is applied.",
+    )
 
-    parser.add_argument("--dry-run", default=False, action='store_true',
-                        help="If --dry-run is passed as an argument, "
-                        "file names of files that are not formatted correctly "
-                        "are written out, without actually formatting them.")
+    parser.add_argument(
+        "--dry-run",
+        default=False,
+        action="store_true",
+        help="If --dry-run is passed as an argument, "
+        "file names of files that are not formatted correctly "
+        "are written out, without actually formatting them.",
+    )
 
-    parser.add_argument("-dirs", "--directories",
-                        default="include,source,tests,examples",
-                        help="Comma-delimited list of directories to work on."
-                        "By default only \"examples\", \"include\", "
-                        "\"source\" and \"tests\" "
-                        "directories are chosen to work on."
-                        "Path to directories can be both absolute or relative.")
+    parser.add_argument(
+        "-dirs",
+        "--directories",
+        default="include,source,tests,examples",
+        help="Comma-delimited list of directories to work on."
+        'By default only "examples", "include", '
+        '"source" and "tests" '
+        "directories are chosen to work on."
+        "Path to directories can be both absolute or relative.",
+    )
 
-    parser.add_argument("-j", metavar="THREAD_COUNT", type=int, default=0,
-                        help="Number of clang-format instances to be run "
-                        "in parallel."
-                        "By default this is equal to the maximum number of "
-                        "available threads less one.")
+    parser.add_argument(
+        "-j",
+        metavar="THREAD_COUNT",
+        type=int,
+        default=0,
+        help="Number of clang-format instances to be run "
+        "in parallel."
+        "By default this is equal to the maximum number of "
+        "available threads less one.",
+    )
 
     return parser.parse_args()
 
@@ -133,11 +152,12 @@ def check_clang_format_version(clang_format_binary, compatible_version_list):
     """
     if clang_format_binary:
         try:
-            clang_format_version = subprocess.check_output([clang_format_binary,
-                                                            '--version']).decode()
-            version_number = re.search(r'Version\s*([\d.]+)',
-                                       clang_format_version,
-                                       re.IGNORECASE).group(1)
+            clang_format_version = subprocess.check_output(
+                [clang_format_binary, "--version"]
+            ).decode()
+            version_number = re.search(
+                r"Version\s*([\d.]+)", clang_format_version, re.IGNORECASE
+            ).group(1)
             if version_number not in compatible_version_list:
                 sys.exit(
                     """
@@ -145,7 +165,8 @@ def check_clang_format_version(clang_format_binary, compatible_version_list):
                     ***   No compatible clang-format program found.
                     ***
                     ***   Install any of the following versions
-                    ***""" + ", ".join(compatible_version_list)
+                    ***"""
+                    + ", ".join(compatible_version_list)
                 )
         except subprocess.CalledProcessError as subprocess_error:
             raise SystemExit(subprocess_error)
@@ -191,17 +212,20 @@ def format_file(parsed_arguments, task_queue, temp_dir):
         #
         # Generate a temporary file and copy the contents of the given file.
         #
-        _, temp_file_name = mkstemp(dir=temp_dir,
-                                    prefix=file_name+'.',
-                                    suffix='.tmp')
+        _, temp_file_name = mkstemp(dir=temp_dir, prefix=file_name + ".", suffix=".tmp")
 
         shutil.copyfile(full_file_name, temp_file_name)
         #
         # Prepare command line statement to be executed by a subprocess call
         # to apply formatting to file_name.
         #
-        apply_clang_format_str = parsed_arguments.clang_format_binary + ' ' + \
-            full_file_name + " > " + temp_file_name
+        apply_clang_format_str = (
+            parsed_arguments.clang_format_binary
+            + " "
+            + full_file_name
+            + " > "
+            + temp_file_name
+        )
         try:
             subprocess.call(apply_clang_format_str, shell=True)
         except OSError as os_error:
@@ -243,7 +267,7 @@ def process(arguments):
     # available threads less one.
     #
     if n_threads == 0:
-        n_threads = (n_available_threads-1) if n_available_threads > 1 else 1
+        n_threads = (n_available_threads - 1) if n_available_threads > 1 else 1
 
     logging.info("Number of threads picked up: %d", n_threads)
 
@@ -257,8 +281,9 @@ def process(arguments):
     # a target with given arguments.
     #
     for _ in range(n_threads):
-        thread_worker = threading.Thread(target=format_file,
-                                         args=(arguments, task_queue, tmpdir))
+        thread_worker = threading.Thread(
+            target=format_file, args=(arguments, task_queue, tmpdir)
+        )
         thread_worker.daemon = True
         thread_worker.start()
 
@@ -267,9 +292,9 @@ def process(arguments):
     # Look through all directories, recursively, and find all files
     # that match the given regex.
     #
-    for directory in arguments.directories.split(','):
+    for directory in arguments.directories.split(","):
         for dirpath, _, filenames in os.walk(directory):
-            for pattern in arguments.regex.split(','):
+            for pattern in arguments.regex.split(","):
                 for file_name in fnmatch.filter(filenames, pattern):
                     task_queue.put(os.path.join(dirpath, file_name))
     #
@@ -292,10 +317,10 @@ if __name__ == "__main__":
     # contrib/utlitlies/programs/clang-16/bin
     #
     if not PARSED_ARGUMENTS.clang_format_binary:
-        os.environ["PATH"] += ':' + \
-            os.getcwd() + "/contrib/utilities/programs/clang-16/bin"
-        PARSED_ARGUMENTS.clang_format_binary = distutils.spawn.find_executable(
-            "clang-format")
+        os.environ["PATH"] += (
+            ":" + os.getcwd() + "/contrib/utilities/programs/clang-16/bin"
+        )
+        PARSED_ARGUMENTS.clang_format_binary = shutil.which("clang-format")
 
     #
     # Do not log verbose information on dry-run.
@@ -305,9 +330,8 @@ if __name__ == "__main__":
     else:
         logging.basicConfig(level=logging.INFO)
 
-    check_clang_format_version(PARSED_ARGUMENTS.clang_format_binary,
-                               ['6.0.0', '6.0.1'])
+    check_clang_format_version(PARSED_ARGUMENTS.clang_format_binary, ["6.0.0", "6.0.1"])
     process(PARSED_ARGUMENTS)
     FINISH = time.time()
 
-    logging.info("Finished code formatting in: %f seconds.", (FINISH-START))
+    logging.info("Finished code formatting in: %f seconds.", (FINISH - START))

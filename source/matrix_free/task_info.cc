@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2018 - 2023 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2018 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 
 #include <deal.II/base/conditional_ostream.h>
@@ -473,12 +472,12 @@ namespace internal
                                                slice_index,
                                                *this,
                                                false);
-                      slice_index++;
+                      ++slice_index;
                       for (; slice_index < partition_row_index[part + 1];
                            slice_index++)
                         {
                           worker[worker_index]->set_ref_count(1);
-                          worker_index++;
+                          ++worker_index;
                           worker[worker_index] =
                             new (worker[worker_index - 1]->allocate_child())
                               color::PartitionWork(funct,
@@ -492,7 +491,7 @@ namespace internal
                           blocked_worker[(part - 1) / 2]->dummy =
                             new (worker[worker_index]->allocate_child())
                               tbb::empty_task;
-                          worker_index++;
+                          ++worker_index;
                           if (spawn_index_child == -1)
                             tbb::task::spawn(*blocked_worker[(part - 1) / 2]);
                           else
@@ -509,7 +508,7 @@ namespace internal
                             new (worker[worker_index]->allocate_child())
                               MPICommunication(funct, false);
                           tbb::task::spawn(*worker_dist);
-                          worker_index++;
+                          ++worker_index;
                         }
                       part += 1;
                       if (part < partition_row_index.size() - 1)
@@ -522,7 +521,7 @@ namespace internal
                                                        slice_index,
                                                        *this,
                                                        true);
-                              slice_index++;
+                              ++slice_index;
                               if (slice_index < partition_row_index[part + 1])
                                 {
                                   blocked_worker[part / 2]->set_ref_count(1);
@@ -532,7 +531,7 @@ namespace internal
                                                          slice_index,
                                                          *this,
                                                          false);
-                                  slice_index++;
+                                  ++slice_index;
                                 }
                               else
                                 {
@@ -546,7 +545,7 @@ namespace internal
                               if (slice_index > partition_row_index[part])
                                 {
                                   worker[worker_index]->set_ref_count(1);
-                                  worker_index++;
+                                  ++worker_index;
                                 }
                               worker[worker_index] =
                                 new (worker[worker_index - 1]->allocate_child())
@@ -556,7 +555,7 @@ namespace internal
                                                        false);
                             }
                           spawn_index_child = worker_index;
-                          worker_index++;
+                          ++worker_index;
                         }
                       else
                         {
@@ -1137,12 +1136,13 @@ namespace internal
       cell_partition_data.push_back(n_cell_batches + n_ghost_batches);
       partition_row_index.back() = cell_partition_data.size() - 1;
 
-#ifdef DEBUG
-      std::vector<unsigned int> renumber_cpy(renumbering);
-      std::sort(renumber_cpy.begin(), renumber_cpy.end());
-      for (unsigned int i = 0; i < renumber_cpy.size(); ++i)
-        AssertDimension(i, renumber_cpy[i]);
-#endif
+      if constexpr (running_in_debug_mode())
+        {
+          std::vector<unsigned int> renumber_cpy(renumbering);
+          std::sort(renumber_cpy.begin(), renumber_cpy.end());
+          for (unsigned int i = 0; i < renumber_cpy.size(); ++i)
+            AssertDimension(i, renumber_cpy[i]);
+        }
     }
 
 
@@ -1303,15 +1303,16 @@ namespace internal
 
       partition_list = renumbering;
 
-#ifdef DEBUG
-      // in debug mode, check that the partition color list is one-to-one
-      {
-        std::vector<unsigned int> sorted_pc_list(partition_color_list);
-        std::sort(sorted_pc_list.begin(), sorted_pc_list.end());
-        for (unsigned int i = 0; i < sorted_pc_list.size(); ++i)
-          Assert(sorted_pc_list[i] == i, ExcInternalError());
-      }
-#endif
+      if constexpr (running_in_debug_mode())
+        {
+          // in debug mode, check that the partition color list is one-to-one
+          {
+            std::vector<unsigned int> sorted_pc_list(partition_color_list);
+            std::sort(sorted_pc_list.begin(), sorted_pc_list.end());
+            for (unsigned int i = 0; i < sorted_pc_list.size(); ++i)
+              Assert(sorted_pc_list[i] == i, ExcInternalError());
+          }
+        }
 
       // set the start list for each block and compute the renumbering of
       // cells
@@ -1370,14 +1371,15 @@ namespace internal
       AssertDimension(counter_macro, n_cell_batches);
 
       // check that the renumbering is one-to-one
-#ifdef DEBUG
-      {
-        std::vector<unsigned int> sorted_renumbering(renumbering);
-        std::sort(sorted_renumbering.begin(), sorted_renumbering.end());
-        for (unsigned int i = 0; i < sorted_renumbering.size(); ++i)
-          Assert(sorted_renumbering[i] == i, ExcInternalError());
-      }
-#endif
+      if constexpr (running_in_debug_mode())
+        {
+          {
+            std::vector<unsigned int> sorted_renumbering(renumbering);
+            std::sort(sorted_renumbering.begin(), sorted_renumbering.end());
+            for (unsigned int i = 0; i < sorted_renumbering.size(); ++i)
+              Assert(sorted_renumbering[i] == i, ExcInternalError());
+          }
+        }
 
 
       update_task_info(
@@ -1484,15 +1486,16 @@ namespace internal
                                                       partition_2layers_list);
         }
 
-        // in debug mode, check that the partition_2layers_list is one-to-one
-#ifdef DEBUG
-      {
-        std::vector<unsigned int> sorted_pc_list(partition_2layers_list);
-        std::sort(sorted_pc_list.begin(), sorted_pc_list.end());
-        for (unsigned int i = 0; i < sorted_pc_list.size(); ++i)
-          Assert(sorted_pc_list[i] == i, ExcInternalError());
-      }
-#endif
+      // in debug mode, check that the partition_2layers_list is one-to-one
+      if constexpr (running_in_debug_mode())
+        {
+          {
+            std::vector<unsigned int> sorted_pc_list(partition_2layers_list);
+            std::sort(sorted_pc_list.begin(), sorted_pc_list.end());
+            for (unsigned int i = 0; i < sorted_pc_list.size(); ++i)
+              Assert(sorted_pc_list[i] == i, ExcInternalError());
+          }
+        }
 
       // Set the new renumbering
       std::vector<unsigned int> renumbering_in(n_active_cells, 0);
@@ -1567,14 +1570,15 @@ namespace internal
           AssertDimension(counter, n_active_cells);
           AssertDimension(counter_macro, n_cell_batches);
           // check that the renumbering is one-to-one
-#ifdef DEBUG
-          {
-            std::vector<unsigned int> sorted_renumbering(renumbering);
-            std::sort(sorted_renumbering.begin(), sorted_renumbering.end());
-            for (unsigned int i = 0; i < sorted_renumbering.size(); ++i)
-              Assert(sorted_renumbering[i] == i, ExcInternalError());
-          }
-#endif
+          if constexpr (running_in_debug_mode())
+            {
+              {
+                std::vector<unsigned int> sorted_renumbering(renumbering);
+                std::sort(sorted_renumbering.begin(), sorted_renumbering.end());
+                for (unsigned int i = 0; i < sorted_renumbering.size(); ++i)
+                  Assert(sorted_renumbering[i] == i, ExcInternalError());
+              }
+            }
         }
 
       // Update the task_info with the more information for the thread graph.
@@ -1778,7 +1782,7 @@ namespace internal
                             partition_list[start_up]);
                           partition_partition_list[counter++] =
                             partition_list[start_up];
-                          start_up++;
+                          ++start_up;
                           break;
                         }
                   }
@@ -1805,7 +1809,7 @@ namespace internal
                                   neighbor_it->column());
                                 partition_partition_list[counter++] =
                                   neighbor_it->column();
-                                partition_counter++;
+                                ++partition_counter;
                               }
                           }
                       }
@@ -1862,7 +1866,7 @@ namespace internal
                           if (remaining_per_cell_batch[0] != 0)
                             {
                               filled = false;
-                              missing_macros++;
+                              ++missing_macros;
                             }
                         }
                       missing_macros =
@@ -1928,8 +1932,8 @@ namespace internal
                                           .push_back(neighbor->column());
                                       partition_partition_list[counter] =
                                         neighbor->column();
-                                      counter++;
-                                      partition_counter++;
+                                      ++counter;
+                                      ++partition_counter;
                                       if (remaining_per_cell_batch
                                               [this_index] == 0 &&
                                           missing_macros > 0)
@@ -1992,7 +1996,7 @@ namespace internal
                             {
                               irregular_cells[n_cell_batches_before] =
                                 partition_counter % vectorization_length;
-                              n_cell_batches_before++;
+                              ++n_cell_batches_before;
                             }
                         }
                     }
@@ -2072,7 +2076,7 @@ namespace internal
           for (unsigned int color = 0; color <= max_color; ++color)
             {
               cell_partition_data.push_back(color_counter);
-              index_counter++;
+              ++index_counter;
               for (unsigned int k = partition_size[part];
                    k < partition_size[part + 1];
                    k++)
@@ -2179,7 +2183,7 @@ namespace internal
               neighbor_list.push_back(start_up);
               partition_list[counter++] = start_up;
               partition_size.back()++;
-              start_up++;
+              ++start_up;
               remainder--;
               if (remainder == cluster_size)
                 remainder = 0;
@@ -2223,7 +2227,7 @@ namespace internal
 
           while (neighbor_list.size() > 0)
             {
-              partition++;
+              ++partition;
 
               // counter for number of cells so far in current partition
               unsigned int partition_counter = 0;
@@ -2251,7 +2255,7 @@ namespace internal
                           // use as neighbors in next partition
                           neighbor_neighbor_list.push_back(neighbor->column());
                           partition_list[counter++] = neighbor->column();
-                          partition_counter++;
+                          ++partition_counter;
                         }
                     }
                 }
@@ -2315,7 +2319,7 @@ namespace internal
               }
         }
       if (remainder != 0)
-        partition++;
+        ++partition;
 
       AssertDimension(partition_size[partition], n_blocks);
     }

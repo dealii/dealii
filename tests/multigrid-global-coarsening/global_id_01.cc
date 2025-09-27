@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2020 - 2023 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2020 - 2024 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 
 // Test CellIDTranslator.
@@ -29,7 +28,7 @@
 
 #include <deal.II/lac/la_parallel_vector.h>
 
-#include <deal.II/multigrid/mg_transfer_global_coarsening.templates.h>
+#include <deal.II/multigrid/mg_transfer_matrix_free.templates.h>
 
 #include <set>
 
@@ -43,7 +42,7 @@ test(const MPI_Comm comm)
   GridGenerator::subdivided_hyper_cube(basetria, 4);
   basetria.refine_global(4);
 
-  const auto deterimine_n_coarse_cells = [&comm](auto &tria) {
+  const auto determine_n_coarse_cells = [&comm](auto &tria) {
     types::coarse_cell_id n_coarse_cells = 0;
 
     for (auto cell : tria.active_cell_iterators())
@@ -56,7 +55,7 @@ test(const MPI_Comm comm)
 
   // create translator: CellID <-> unique ID
   internal::CellIDTranslator<dim> cell_id_translator(
-    deterimine_n_coarse_cells(basetria), basetria.n_global_levels());
+    determine_n_coarse_cells(basetria), basetria.n_global_levels());
 
 
   for (auto cell : basetria.cell_iterators())

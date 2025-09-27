@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 1999 - 2023 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2014 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 #ifndef dealii_manifold_lib_h
 #define dealii_manifold_lib_h
@@ -23,6 +22,9 @@
 #include <deal.II/base/function_parser.h>
 
 #include <deal.II/grid/manifold.h>
+
+#include <boost/signals2/connection.hpp>
+
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -49,20 +51,34 @@ namespace internal
  * polar change of coordinates).
  *
  * The two template arguments match the meaning of the two template arguments
- * in Triangulation<dim, spacedim>, however this Manifold can be used to
+ * in Triangulation<dim, spacedim>; however, this Manifold can be used to
  * describe both thin and thick objects, and the behavior is identical when
  * dim <= spacedim, i.e., the functionality of PolarManifold<2,3> is
  * identical to PolarManifold<3,3>.
  *
- * This class works by transforming points to polar coordinates (in
- * both two and three dimensions), taking the average in that
- * coordinate system, and then transforming the point back to
- * Cartesian coordinates. In order for this manifold to work
- * correctly, it cannot be attached to cells containing the center of
- * the coordinate system or the north and south poles in three
- * dimensions. These points are singular points of the coordinate
- * transformation, and taking averages around these points does not
- * make any sense.
+ * This class works by transforming points from Cartesian coordinates into Polar
+ * coordinates, doing computations (e.g., averages) in that coordinate system,
+ * and then transforming the results back to Cartesian coordinates. For more
+ * information on this approach see the documentation of the base class
+ * (ChartManifold).
+ *
+ * In order for this manifold to work correctly, it cannot be attached to cells
+ * containing the center of the coordinate system or, in 3d, the north and south
+ * poles. Those points are singular points of the coordinate mapping;
+ * consequently, pull_back() is not defined at those points and taking averages
+ * across them does not make sense. We recommend setting the manifold_id of the
+ * cell containing the center to numbers::flat_manifold_id and blending in one
+ * of two ways:
+ *
+ * 1. Only set PolarManifold manifold ids on the curved boundary (i.e., set the
+ *    manifold id of faces and not cells). deal.II will use a cell-by-cell
+ *    version of transfinite interpolation to compute cell center locations for,
+ *    e.g., mesh refinement.
+ * 2. Set the PolarManifold manifold ids on cells and use
+ *    TransfiniteInterpolationManifold.
+ *
+ * In 3d, we recommend using SphericalManifold to correctly handle the north and
+ * south poles.
  *
  * @ingroup manifold
  */
@@ -71,12 +87,10 @@ class PolarManifold : public ChartManifold<dim, spacedim, spacedim>
 {
 public:
   /**
-   * The Constructor takes the center of the spherical coordinates system.
-   * This class uses the pull_back and push_forward mechanism to transform
-   * from Cartesian to spherical coordinate systems, taking into account the
-   * periodicity of base Manifold in two dimensions, while in three dimensions
-   * it takes the middle point, and project it along the radius using the
-   * average radius of the surrounding points.
+   * Constructor.
+   *
+   * @param[in] center The center of the coordinate system. Defaults to the
+   * origin.
    */
   PolarManifold(const Point<spacedim> center = Point<spacedim>());
 
@@ -88,8 +102,7 @@ public:
 
   /**
    * Pull back the given point from the Euclidean space. Will return the polar
-   * coordinates associated with the point @p space_point. Only used when
-   * spacedim = 2.
+   * coordinates associated with the point @p space_point.
    */
   virtual Point<spacedim>
   pull_back(const Point<spacedim> &space_point) const override;
@@ -97,7 +110,6 @@ public:
   /**
    * Given a point in the spherical coordinate system, this method returns the
    * Euclidean coordinates associated to the polar coordinates @p chart_point.
-   * Only used when spacedim = 3.
    */
   virtual Point<spacedim>
   push_forward(const Point<spacedim> &chart_point) const override;
@@ -126,11 +138,28 @@ public:
     const Point<spacedim> &p) const override;
 
   /**
-   * The center of the spherical coordinate system.
+   * Return the center of the spherical coordinate system.
    */
+  const Point<spacedim> &
+  get_center() const;
+
+  /**
+   * The center of the spherical coordinate system.
+   *
+   * @deprecated Use get_center() instead.
+   */
+  DEAL_II_DEPRECATED_WITH_COMMENT(
+    "Access the center with get_center() instead.")
   const Point<spacedim> center;
 
 private:
+  /**
+   * The center of the spherical coordinate system.
+   *
+   * @note This exists to avoid warnings when using center internally.
+   */
+  const Point<spacedim> p_center;
+
   /**
    * Helper function which returns the periodicity associated with this
    * coordinate system, according to dim, chartdim, and spacedim.
@@ -223,8 +252,8 @@ private:
  * points across the center, they would travel on spherical
  * coordinates, avoiding the center.
  *
- * The ideal geometry for this Manifold is an HyperShell. If you plan to use
- * this Manifold on a HyperBall, you have to make sure you do not attach this
+ * The ideal geometry for this Manifold is a hyper shell. If you plan to use
+ * this Manifold on a hyper ball, you have to make sure you do not attach this
  * Manifold to the cell containing the center. It is advisable to combine this
  * class with TransfiniteInterpolationManifold to ensure a smooth transition
  * from a curved shape to the straight coordinate system in the center of the
@@ -237,7 +266,10 @@ class SphericalManifold : public Manifold<dim, spacedim>
 {
 public:
   /**
-   * The Constructor takes the center of the spherical coordinates.
+   * Constructor.
+   *
+   * @param[in] center The center of the coordinate system. Defaults to the
+   * origin.
    */
   SphericalManifold(const Point<spacedim> center = Point<spacedim>());
 
@@ -312,11 +344,28 @@ public:
                 const ArrayView<const double>          &weights) const override;
 
   /**
-   * The center of the spherical coordinate system.
+   * Return the center of the spherical coordinate system.
    */
+  const Point<spacedim> &
+  get_center() const;
+
+  /**
+   * The center of the spherical coordinate system.
+   *
+   * @deprecated Use get_center() instead.
+   */
+  DEAL_II_DEPRECATED_WITH_COMMENT(
+    "Access the center with get_center() instead.")
   const Point<spacedim> center;
 
 private:
+  /**
+   * The center of the spherical coordinate system.
+   *
+   * @note This exists to avoid warnings when using center internally.
+   */
+  const Point<spacedim> p_center;
+
   /**
    * Return a point on the spherical manifold which is intermediate
    * with respect to the surrounding points. This function uses a linear
@@ -329,28 +378,11 @@ private:
                   const ArrayView<const double>              &weights) const;
 
   /**
-   * Return a point on the spherical manifold which is intermediate
-   * with respect to the surrounding points. This function uses a candidate
-   * point as guess, and performs a Newton-style iteration to compute the
-   * correct point.
+   * This function provides an internal implementation of the get_new_points()
+   * interface.
    *
-   * The main part of the implementation uses the ideas in the publication
-   *
-   * Buss, Samuel R., and Jay P. Fillmore.
-   * "Spherical averages and applications to spherical splines and
-   * interpolation." ACM Transactions on Graphics (TOG) 20.2 (2001): 95-126.
-   *
-   * and in particular the implementation provided at
-   * http://math.ucsd.edu/~sbuss/ResearchWeb/spheremean/
-   */
-  Point<spacedim>
-  get_new_point(const ArrayView<const Tensor<1, spacedim>> &directions,
-                const ArrayView<const double>              &distances,
-                const ArrayView<const double>              &weights,
-                const Point<spacedim> &candidate_point) const;
-
-  /**
-   * Compute a new set of points that interpolate between the given points @p
+   * It computes a new set of points that interpolate between the given points
+   * @p
    * surrounding_points. @p weights is an array view with as many entries as @p
    * surrounding_points.size() times @p new_points.size().
    *
@@ -362,10 +394,10 @@ private:
    * @p new_points to point to the same array, so make sure to pass different
    * objects into the function.
    */
-  virtual void
-  get_new_points(const ArrayView<const Point<spacedim>> &surrounding_points,
-                 const ArrayView<const double>          &weights,
-                 ArrayView<Point<spacedim>>              new_points) const;
+  void
+  do_get_new_points(const ArrayView<const Point<spacedim>> &surrounding_points,
+                    const ArrayView<const double>          &weights,
+                    ArrayView<Point<spacedim>>              new_points) const;
 
   /**
    * A manifold description to be used for get_new_point in 2d.
@@ -450,6 +482,27 @@ public:
   virtual Point<spacedim>
   get_new_point(const ArrayView<const Point<spacedim>> &surrounding_points,
                 const ArrayView<const double>          &weights) const override;
+
+  /**
+   * Get the Tensor parallel to the cylinder's axis.
+   */
+  const Tensor<1, spacedim> &
+  get_direction() const;
+
+  /**
+   * Get a point on the Cylinder's axis.
+   *
+   * @note This argument, like get_direction() and get_tolerance(), just returns
+   * the arguments set in the three-argument constructor.
+   */
+  const Point<spacedim> &
+  get_point_on_axis() const;
+
+  /**
+   * Get the tolerance which determines if a point is on the Cylinder's axis.
+   */
+  double
+  get_tolerance() const;
 
 private:
   /**
@@ -549,16 +602,40 @@ public:
   virtual DerivativeForm<1, spacedim, spacedim>
   push_forward_gradient(const Point<spacedim> &chart_point) const override;
 
+  /**
+   * Get the Tensor parallel to the cylinder's major axis.
+   */
+  const Tensor<1, spacedim> &
+  get_major_axis_direction() const;
+
+  /**
+   * Return the center of the elliptical coordinate system.
+   */
+  const Point<spacedim> &
+  get_center() const;
+
+  /**
+   * Return the ellipse's eccentricity.
+   */
+  double
+  get_eccentricity() const;
 
 private:
   /**
    * The direction vector of the major axis.
    */
-  Tensor<1, spacedim> direction;
+  const Tensor<1, spacedim> direction;
+
   /**
    * The center of the manifold.
    */
   const Point<spacedim> center;
+
+  /**
+   * The eccentricity.
+   */
+  const double eccentricity;
+
   /**
    * Parameters deriving from the eccentricity of the manifold.
    */
@@ -716,15 +793,15 @@ private:
   /**
    * Pointer to the push_forward function.
    */
-  SmartPointer<const Function<chartdim>,
-               FunctionManifold<dim, spacedim, chartdim>>
+  ObserverPointer<const Function<chartdim>,
+                  FunctionManifold<dim, spacedim, chartdim>>
     push_forward_function;
 
   /**
    * Pointer to the pull_back function.
    */
-  SmartPointer<const Function<spacedim>,
-               FunctionManifold<dim, spacedim, chartdim>>
+  ObserverPointer<const Function<spacedim>,
+                  FunctionManifold<dim, spacedim, chartdim>>
     pull_back_function;
 
   /**
@@ -791,11 +868,11 @@ public:
   static const int spacedim = 3;
 
   /**
-   * Constructor. Specify the radius of the centerline @p R and the radius
-   * of the torus itself (@p r). The variables have the same meaning as
-   * the parameters in GridGenerator::torus().
+   * Constructor. Specify the radius of the centerline @p centerline_radius and
+   * the radius of the torus' inner circle (@p inner_radius). The variables have
+   * the same meaning as the parameters in GridGenerator::torus().
    */
-  TorusManifold(const double R, const double r);
+  TorusManifold(const double centerline_radius, const double inner_radius);
 
   /**
    * Make a clone of this Manifold object.
@@ -821,8 +898,22 @@ public:
   virtual DerivativeForm<1, 3, 3>
   push_forward_gradient(const Point<3> &chart_point) const override;
 
+  /**
+   * Get the radius of the centerline.
+   */
+  double
+  get_centerline_radius() const;
+
+  /**
+   * Get the inner radius of the torus.
+   */
+  double
+  get_inner_radius() const;
+
 private:
-  double r, R;
+  double centerline_radius;
+
+  double inner_radius;
 };
 
 
@@ -1161,6 +1252,96 @@ private:
    */
   boost::signals2::connection clear_signal;
 };
+
+/*----------------------------- inline functions -----------------------------*/
+
+template <int dim, int spacedim>
+inline const Point<spacedim> &
+PolarManifold<dim, spacedim>::get_center() const
+{
+  return p_center;
+}
+
+
+
+template <int dim, int spacedim>
+inline const Point<spacedim> &
+SphericalManifold<dim, spacedim>::get_center() const
+{
+  return p_center;
+}
+
+
+
+template <int dim, int spacedim>
+inline const Tensor<1, spacedim> &
+CylindricalManifold<dim, spacedim>::get_direction() const
+{
+  return direction;
+}
+
+
+
+template <int dim, int spacedim>
+inline const Point<spacedim> &
+CylindricalManifold<dim, spacedim>::get_point_on_axis() const
+{
+  return point_on_axis;
+}
+
+
+
+template <int dim, int spacedim>
+inline double
+CylindricalManifold<dim, spacedim>::get_tolerance() const
+{
+  return tolerance;
+}
+
+
+
+template <int dim, int spacedim>
+inline const Tensor<1, spacedim> &
+EllipticalManifold<dim, spacedim>::get_major_axis_direction() const
+{
+  return direction;
+}
+
+
+
+template <int dim, int spacedim>
+inline const Point<spacedim> &
+EllipticalManifold<dim, spacedim>::get_center() const
+{
+  return center;
+}
+
+
+
+template <int dim, int spacedim>
+inline double
+EllipticalManifold<dim, spacedim>::get_eccentricity() const
+{
+  return eccentricity;
+}
+
+
+
+template <int dim>
+inline double
+TorusManifold<dim>::get_centerline_radius() const
+{
+  return centerline_radius;
+}
+
+
+
+template <int dim>
+inline double
+TorusManifold<dim>::get_inner_radius() const
+{
+  return inner_radius;
+}
 
 DEAL_II_NAMESPACE_CLOSE
 

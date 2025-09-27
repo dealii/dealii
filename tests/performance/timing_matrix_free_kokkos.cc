@@ -1,27 +1,26 @@
-/* ---------------------------------------------------------------------
+/* ------------------------------------------------------------------------
  *
- * Copyright (C) 2023 by the deal.II authors
+ * SPDX-License-Identifier: LGPL-2.1-or-later
+ * Copyright (C) 2023 - 2025 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
- * The deal.II library is free software; you can use it, redistribute
- * it, and/or modify it under the terms of the GNU Lesser General
- * Public License as published by the Free Software Foundation; either
- * version 2.1 of the License, or (at your option) any later version.
- * The full text of the license can be found in the file LICENSE.md at
- * the top level directory of deal.II.
+ * Part of the source code is dual licensed under Apache-2.0 WITH
+ * LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+ * governing the source code and code contributions can be found in
+ * LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
  *
- * ---------------------------------------------------------------------
+ * ------------------------------------------------------------------------
  *
  * Description:
  *
- * This test compares the MatrixFree and CUDAWrapper::MatrixFree
+ * This test compares the MatrixFree and Portable::MatrixFree
  * infrastructure on the CPU. Considered are the initialization
  * costs and the costs for an operator evaluation.
- * CUDAWrapper::MatrixFree was written with CUDA and now uses
- * Kokkos as backend and, as consequnce, favors GPU hardware. This
+ * Portable::MatrixFree was written with CUDA and now uses
+ * Kokkos as backend and, as consequence, favors GPU hardware. This
  * performance test is meant to track the improvement of
- * the performance of CUDAWrapper::MatrixFree on the CPU.
+ * the performance of Portable::MatrixFree on the CPU.
  *
  * Status: experimental
  */
@@ -36,10 +35,10 @@
 
 #include <deal.II/grid/grid_generator.h>
 
-#include <deal.II/matrix_free/cuda_fe_evaluation.h>
-#include <deal.II/matrix_free/cuda_matrix_free.h>
 #include <deal.II/matrix_free/fe_evaluation.h>
 #include <deal.II/matrix_free/matrix_free.h>
+#include <deal.II/matrix_free/portable_fe_evaluation.h>
+#include <deal.II/matrix_free/portable_matrix_free.h>
 
 #include <deal.II/numerics/vector_tools.h>
 
@@ -120,8 +119,7 @@ class LaplaceOperatorQuad
 public:
   DEAL_II_HOST_DEVICE void
   operator()(
-    CUDAWrappers::FEEvaluation<dim, fe_degree, fe_degree + 1, 1, Number>
-             *fe_eval,
+    Portable::FEEvaluation<dim, fe_degree, fe_degree + 1, 1, Number> *fe_eval,
     const int q_point) const
   {
     fe_eval->submit_gradient(fe_eval->get_gradient(q_point), q_point);
@@ -133,22 +131,17 @@ class LaplaceOperatorLocal
 {
 public:
   DEAL_II_HOST_DEVICE void
-  operator()(
-    const unsigned int                                          cell,
-    const typename CUDAWrappers::MatrixFree<dim, Number>::Data *gpu_data,
-    CUDAWrappers::SharedData<dim, Number>                      *shared_data,
-    const Number                                               *src,
-    Number                                                     *dst) const
+  operator()(const typename Portable::MatrixFree<dim, Number>::Data *gpu_data,
+             const Portable::DeviceVector<double>                   &src,
+             Portable::DeviceVector<double>                         &dst) const
   {
-    (void)cell; // TODO?
-
-    CUDAWrappers::FEEvaluation<dim, fe_degree, fe_degree + 1, 1, Number>
-      fe_eval(/*cell,*/ gpu_data, shared_data);
+    Portable::FEEvaluation<dim, fe_degree, fe_degree + 1, 1, Number> fe_eval(
+      gpu_data);
     fe_eval.read_dof_values(src);
-    fe_eval.evaluate(false, true);
+    fe_eval.evaluate(EvaluationFlags::gradients);
     fe_eval.apply_for_each_quad_point(
       LaplaceOperatorQuad<dim, fe_degree, Number>());
-    fe_eval.integrate(false, true);
+    fe_eval.integrate(EvaluationFlags::gradients);
     fe_eval.distribute_local_to_global(dst);
   }
   static const unsigned int n_dofs_1d    = fe_degree + 1;
@@ -171,8 +164,7 @@ public:
          const AffineConstraints<Number> &constraints,
          const Quadrature<1>             &quadrature)
   {
-    typename CUDAWrappers::MatrixFree<dim, Number>::AdditionalData
-      additional_data;
+    typename Portable::MatrixFree<dim, Number>::AdditionalData additional_data;
     additional_data.mapping_update_flags = update_JxW_values | update_gradients;
 
     matrix_free.reinit(
@@ -193,7 +185,7 @@ public:
   }
 
 private:
-  CUDAWrappers::MatrixFree<dim, Number> matrix_free;
+  Portable::MatrixFree<dim, Number> matrix_free;
 };
 
 

@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2003 - 2023 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2004 - 2024 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 #ifndef dealii_tria_iterator_selector_h
 #define dealii_tria_iterator_selector_h
@@ -50,7 +49,7 @@ namespace internal
      * This class implements some types which differ between the dimensions.
      * These are the declarations for the 1d case only. See the
      * @ref Iterators
-     * module for more information.
+     * topic for more information.
      *
      * A @p line_iterator is aliased to an iterator operating on the @p
      * lines member variable of a <tt>Triangulation<1></tt> object. An @p
@@ -104,7 +103,7 @@ namespace internal
      * This class implements some types which differ between the dimensions.
      * These are the declarations for the 2d case only. See the
      * @ref Iterators
-     * module for more information.
+     * topic for more information.
      *
      * A @p line_iterator is aliased to an iterator operating on the @p
      * lines member variable of a <tt>Triangulation<2></tt> object. An @p
@@ -162,7 +161,7 @@ namespace internal
      * This class implements some types which differ between the dimensions.
      * These are the declarations for the 3d case only. See the
      * @ref Iterators
-     * module for more information.
+     * topic for more information.
      *
      * For the declarations of the data types, more or less the same holds as
      * for lower dimensions (see <tt>Iterators<[12]></tt>). The dimension

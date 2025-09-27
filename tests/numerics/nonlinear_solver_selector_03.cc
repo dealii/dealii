@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2007 - 2023 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2023 - 2024 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 
 
@@ -77,7 +76,6 @@ namespace LA
 
 namespace MPI_nonlinear_solver_selector_test
 {
-  using namespace dealii;
 
   using NLSolve = NonlinearSolverSelector<LA::MPI::Vector>;
 
@@ -172,7 +170,7 @@ namespace MPI_nonlinear_solver_selector_test
 
         {
           nonzero_constraints.clear();
-          nonzero_constraints.reinit(locally_relevant_dofs);
+          nonzero_constraints.reinit(locally_owned_dofs, locally_relevant_dofs);
           DoFTools::make_hanging_node_constraints(dof_handler,
                                                   nonzero_constraints);
 
@@ -194,7 +192,7 @@ namespace MPI_nonlinear_solver_selector_test
 
         {
           zero_constraints.clear();
-          zero_constraints.reinit(locally_relevant_dofs);
+          zero_constraints.reinit(locally_owned_dofs, locally_relevant_dofs);
           DoFTools::make_hanging_node_constraints(dof_handler,
                                                   zero_constraints);
           VectorTools::interpolate_boundary_values(
@@ -389,11 +387,7 @@ namespace MPI_nonlinear_solver_selector_test
 
     SolverControl solver_control(dof_handler.n_dofs(), 1e-12);
 
-#ifdef USE_PETSC_LA
-    LA::SolverCG solver(solver_control, mpi_communicator);
-#else
     LA::SolverCG solver(solver_control);
-#endif
 
     LA::MPI::PreconditionAMG preconditioner;
 

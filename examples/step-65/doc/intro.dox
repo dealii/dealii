@@ -1,11 +1,8 @@
-
-<br>
-
 <i>
 This program was contributed by Martin Kronbichler.
 </i>
 
-<a name="Intro"></a>
+<a name="step_65-Intro"></a>
 <h1>Introduction</h1>
 
 This tutorial program presents an advanced manifold class,
@@ -38,10 +35,10 @@ programmatically from within the source code.
 
 Within deal.II, the placement of new points during mesh refinement or for the
 definition of higher order mappings is controlled by manifold objects, see the
-@ref manifold "manifold module"
+@ref manifold "manifold topic"
 for details.
 To give an example, consider the following situation of a two-dimensional
-annulus (with pictures taken from the manifold module). If we start with an
+annulus (with pictures taken from the manifold topic). If we start with an
 initial mesh of 10 cells and refine the mesh three times globally without
 attaching any manifolds, we would obtain the following mesh:
 
@@ -75,7 +72,7 @@ system. By contrast, the case above where only the boundary was subject to the
 polar manifold, only mid points along the boundary would be placed along the
 curved description, whereas mid points in the interior would be computed by
 suitable averages of the surrounding points in the Cartesian coordinate system
-(see the @ref manifold "manifold module" for more details).
+(see the @ref manifold "manifold topic" for more details).
 
 At this point, one might assume that curved volume descriptions are the way to
 go. This is generally not wrong, though it is sometimes not so easy to
@@ -435,7 +432,7 @@ inclusion has different material properties that require that the
 interface between the two materials needs to be tracked by element interfaces. A
 visualization of the grid is given here:
 
-<img src="https://www.dealii.org/images/steps/developer/step-65-mesh.png" alt="">
+<img src="https://dealii.org/images/steps/developer/step-65-mesh.png" alt="">
 
 For this case, we want to attach a spherical description to the surface inside
 the domain and use the transfinite interpolation to smoothly switch to the

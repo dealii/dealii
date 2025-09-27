@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2023 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 1998 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 #include <deal.II/base/array_view.h>
 #include <deal.II/base/numbers.h>
@@ -24,6 +23,12 @@
 #include <deal.II/fe/fe_values_views_internal.h>
 
 #include <deal.II/lac/vector.h>
+
+#ifdef DEAL_II_WITH_ADOLC
+#  include <adolc/adouble.h>
+#  include <adolc/adtl.h>
+#endif
+
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -368,6 +373,7 @@ namespace FEValuesViews
              "update_values")));
     Assert(fe_values->present_cell.is_initialized(),
            (typename FEValuesBase<dim, spacedim>::ExcNotReinited()));
+    AssertDimension(values.size(), fe_values->n_quadrature_points);
 
     // get function values of dofs on this cell and call internal worker
     // function
@@ -397,6 +403,7 @@ namespace FEValuesViews
     Assert(fe_values->present_cell.is_initialized(),
            (typename FEValuesBase<dim, spacedim>::ExcNotReinited()));
     AssertDimension(dof_values.size(), fe_values->dofs_per_cell);
+    AssertDimension(values.size(), fe_values->n_quadrature_points);
 
     internal::do_function_values<dim, spacedim>(
       make_const_array_view(dof_values),
@@ -421,6 +428,7 @@ namespace FEValuesViews
            (typename FEValuesBase<dim, spacedim>::ExcNotReinited()));
     AssertDimension(fe_function.size(),
                     fe_values->present_cell.n_dofs_for_dof_handler());
+    AssertDimension(gradients.size(), fe_values->n_quadrature_points);
 
     // get function values of dofs on this cell
     dealii::Vector<Number> dof_values(fe_values->dofs_per_cell);
@@ -449,6 +457,7 @@ namespace FEValuesViews
     Assert(fe_values->present_cell.is_initialized(),
            (typename FEValuesBase<dim, spacedim>::ExcNotReinited()));
     AssertDimension(dof_values.size(), fe_values->dofs_per_cell);
+    AssertDimension(gradients.size(), fe_values->n_quadrature_points);
 
     internal::do_function_derivatives<1, dim, spacedim>(
       make_const_array_view(dof_values),
@@ -473,6 +482,7 @@ namespace FEValuesViews
            (typename FEValuesBase<dim, spacedim>::ExcNotReinited()));
     AssertDimension(fe_function.size(),
                     fe_values->present_cell.n_dofs_for_dof_handler());
+    AssertDimension(hessians.size(), fe_values->n_quadrature_points);
 
     // get function values of dofs on this cell
     dealii::Vector<Number> dof_values(fe_values->dofs_per_cell);
@@ -501,6 +511,7 @@ namespace FEValuesViews
     Assert(fe_values->present_cell.is_initialized(),
            (typename FEValuesBase<dim, spacedim>::ExcNotReinited()));
     AssertDimension(dof_values.size(), fe_values->dofs_per_cell);
+    AssertDimension(hessians.size(), fe_values->n_quadrature_points);
 
     internal::do_function_derivatives<2, dim, spacedim>(
       make_const_array_view(dof_values),
@@ -525,6 +536,7 @@ namespace FEValuesViews
            (typename FEValuesBase<dim, spacedim>::ExcNotReinited()));
     AssertDimension(fe_function.size(),
                     fe_values->present_cell.n_dofs_for_dof_handler());
+    AssertDimension(laplacians.size(), fe_values->n_quadrature_points);
 
     // get function values of dofs on this cell
     dealii::Vector<Number> dof_values(fe_values->dofs_per_cell);
@@ -553,6 +565,7 @@ namespace FEValuesViews
     Assert(fe_values->present_cell.is_initialized(),
            (typename FEValuesBase<dim, spacedim>::ExcNotReinited()));
     AssertDimension(dof_values.size(), fe_values->dofs_per_cell);
+    AssertDimension(laplacians.size(), fe_values->n_quadrature_points);
 
     internal::do_function_laplacians<dim, spacedim>(
       make_const_array_view(dof_values),
@@ -578,6 +591,7 @@ namespace FEValuesViews
            (typename FEValuesBase<dim, spacedim>::ExcNotReinited()));
     AssertDimension(fe_function.size(),
                     fe_values->present_cell.n_dofs_for_dof_handler());
+    AssertDimension(third_derivatives.size(), fe_values->n_quadrature_points);
 
     // get function values of dofs on this cell
     dealii::Vector<Number> dof_values(fe_values->dofs_per_cell);
@@ -607,6 +621,7 @@ namespace FEValuesViews
     Assert(fe_values->present_cell.is_initialized(),
            (typename FEValuesBase<dim, spacedim>::ExcNotReinited()));
     AssertDimension(dof_values.size(), fe_values->dofs_per_cell);
+    AssertDimension(third_derivatives.size(), fe_values->n_quadrature_points);
 
     internal::do_function_derivatives<3, dim, spacedim>(
       make_const_array_view(dof_values),
@@ -629,6 +644,7 @@ namespace FEValuesViews
              "update_values")));
     Assert(fe_values->present_cell.is_initialized(),
            (typename FEValuesBase<dim, spacedim>::ExcNotReinited()));
+    AssertDimension(values.size(), fe_values->n_quadrature_points);
 
     // get function values of dofs on this cell
     dealii::Vector<Number> dof_values(fe_values->dofs_per_cell);
@@ -657,6 +673,7 @@ namespace FEValuesViews
     Assert(fe_values->present_cell.is_initialized(),
            (typename FEValuesBase<dim, spacedim>::ExcNotReinited()));
     AssertDimension(dof_values.size(), fe_values->dofs_per_cell);
+    AssertDimension(values.size(), fe_values->n_quadrature_points);
 
     internal::do_function_values<dim, spacedim>(
       make_const_array_view(dof_values),
@@ -681,6 +698,7 @@ namespace FEValuesViews
            (typename FEValuesBase<dim, spacedim>::ExcNotReinited()));
     AssertDimension(fe_function.size(),
                     fe_values->present_cell.n_dofs_for_dof_handler());
+    AssertDimension(gradients.size(), fe_values->n_quadrature_points);
 
     // get function values of dofs on this cell
     dealii::Vector<Number> dof_values(fe_values->dofs_per_cell);
@@ -709,6 +727,7 @@ namespace FEValuesViews
     Assert(fe_values->present_cell.is_initialized(),
            (typename FEValuesBase<dim, spacedim>::ExcNotReinited()));
     AssertDimension(dof_values.size(), fe_values->dofs_per_cell);
+    AssertDimension(gradients.size(), fe_values->n_quadrature_points);
 
     internal::do_function_derivatives<1, dim, spacedim>(
       make_const_array_view(dof_values),
@@ -734,6 +753,7 @@ namespace FEValuesViews
            (typename FEValuesBase<dim, spacedim>::ExcNotReinited()));
     AssertDimension(fe_function.size(),
                     fe_values->present_cell.n_dofs_for_dof_handler());
+    AssertDimension(symmetric_gradients.size(), fe_values->n_quadrature_points);
 
     // get function values of dofs on this cell
     dealii::Vector<Number> dof_values(fe_values->dofs_per_cell);
@@ -763,6 +783,7 @@ namespace FEValuesViews
     Assert(fe_values->present_cell.is_initialized(),
            (typename FEValuesBase<dim, spacedim>::ExcNotReinited()));
     AssertDimension(dof_values.size(), fe_values->dofs_per_cell);
+    AssertDimension(symmetric_gradients.size(), fe_values->n_quadrature_points);
 
     internal::do_function_symmetric_gradients<dim, spacedim>(
       make_const_array_view(dof_values),
@@ -787,6 +808,7 @@ namespace FEValuesViews
            (typename FEValuesBase<dim, spacedim>::ExcNotReinited()));
     AssertDimension(fe_function.size(),
                     fe_values->present_cell.n_dofs_for_dof_handler());
+    AssertDimension(divergences.size(), fe_values->n_quadrature_points);
 
     // get function values of dofs
     // on this cell
@@ -816,6 +838,7 @@ namespace FEValuesViews
     Assert(fe_values->present_cell.is_initialized(),
            (typename FEValuesBase<dim, spacedim>::ExcNotReinited()));
     AssertDimension(dof_values.size(), fe_values->dofs_per_cell);
+    AssertDimension(divergences.size(), fe_values->n_quadrature_points);
 
     internal::do_function_divergences<dim, spacedim>(
       make_const_array_view(dof_values),
@@ -840,6 +863,7 @@ namespace FEValuesViews
            ExcMessage("FEValues object is not reinited to any cell"));
     AssertDimension(fe_function.size(),
                     fe_values->present_cell.n_dofs_for_dof_handler());
+    AssertDimension(curls.size(), fe_values->n_quadrature_points);
 
     // get function values of dofs on this cell
     dealii::Vector<Number> dof_values(fe_values->dofs_per_cell);
@@ -868,6 +892,7 @@ namespace FEValuesViews
     Assert(fe_values->present_cell.is_initialized(),
            ExcMessage("FEValues object is not reinited to any cell"));
     AssertDimension(dof_values.size(), fe_values->dofs_per_cell);
+    AssertDimension(curls.size(), fe_values->n_quadrature_points);
 
     internal::do_function_curls<dim, spacedim>(
       make_const_array_view(dof_values),
@@ -892,6 +917,7 @@ namespace FEValuesViews
            (typename FEValuesBase<dim, spacedim>::ExcNotReinited()));
     AssertDimension(fe_function.size(),
                     fe_values->present_cell.n_dofs_for_dof_handler());
+    AssertDimension(hessians.size(), fe_values->n_quadrature_points);
 
     // get function values of dofs on this cell
     dealii::Vector<Number> dof_values(fe_values->dofs_per_cell);
@@ -920,6 +946,7 @@ namespace FEValuesViews
     Assert(fe_values->present_cell.is_initialized(),
            (typename FEValuesBase<dim, spacedim>::ExcNotReinited()));
     AssertDimension(dof_values.size(), fe_values->dofs_per_cell);
+    AssertDimension(hessians.size(), fe_values->n_quadrature_points);
 
     internal::do_function_derivatives<2, dim, spacedim>(
       make_const_array_view(dof_values),
@@ -949,6 +976,7 @@ namespace FEValuesViews
       fe_function.size() == fe_values->present_cell.n_dofs_for_dof_handler(),
       ExcDimensionMismatch(fe_function.size(),
                            fe_values->present_cell.n_dofs_for_dof_handler()));
+    AssertDimension(laplacians.size(), fe_values->n_quadrature_points);
 
     // get function values of dofs on this cell
     dealii::Vector<Number> dof_values(fe_values->dofs_per_cell);
@@ -980,6 +1008,7 @@ namespace FEValuesViews
     Assert(fe_values->present_cell.is_initialized(),
            (typename FEValuesBase<dim, spacedim>::ExcNotReinited()));
     AssertDimension(dof_values.size(), fe_values->dofs_per_cell);
+    AssertDimension(laplacians.size(), fe_values->n_quadrature_points);
 
     internal::do_function_laplacians<dim, spacedim>(
       make_const_array_view(dof_values),
@@ -1005,6 +1034,7 @@ namespace FEValuesViews
            (typename FEValuesBase<dim, spacedim>::ExcNotReinited()));
     AssertDimension(fe_function.size(),
                     fe_values->present_cell.n_dofs_for_dof_handler());
+    AssertDimension(third_derivatives.size(), fe_values->n_quadrature_points);
 
     // get function values of dofs on this cell
     dealii::Vector<Number> dof_values(fe_values->dofs_per_cell);
@@ -1034,6 +1064,7 @@ namespace FEValuesViews
     Assert(fe_values->present_cell.is_initialized(),
            (typename FEValuesBase<dim, spacedim>::ExcNotReinited()));
     AssertDimension(dof_values.size(), fe_values->dofs_per_cell);
+    AssertDimension(third_derivatives.size(), fe_values->n_quadrature_points);
 
     internal::do_function_derivatives<3, dim, spacedim>(
       make_const_array_view(dof_values),
@@ -1056,6 +1087,7 @@ namespace FEValuesViews
              "update_values")));
     Assert(fe_values->present_cell.is_initialized(),
            (typename FEValuesBase<dim, spacedim>::ExcNotReinited()));
+    AssertDimension(values.size(), fe_values->n_quadrature_points);
 
     // get function values of dofs on this cell
     dealii::Vector<Number> dof_values(fe_values->dofs_per_cell);
@@ -1084,6 +1116,7 @@ namespace FEValuesViews
     Assert(fe_values->present_cell.is_initialized(),
            (typename FEValuesBase<dim, spacedim>::ExcNotReinited()));
     AssertDimension(dof_values.size(), fe_values->dofs_per_cell);
+    AssertDimension(values.size(), fe_values->n_quadrature_points);
 
     internal::do_function_values<dim, spacedim>(
       make_const_array_view(dof_values),
@@ -1108,6 +1141,7 @@ namespace FEValuesViews
            (typename FEValuesBase<dim, spacedim>::ExcNotReinited()));
     AssertDimension(fe_function.size(),
                     fe_values->present_cell.n_dofs_for_dof_handler());
+    AssertDimension(divergences.size(), fe_values->n_quadrature_points);
 
     // get function values of dofs
     // on this cell
@@ -1138,6 +1172,7 @@ namespace FEValuesViews
     Assert(fe_values->present_cell.is_initialized(),
            (typename FEValuesBase<dim, spacedim>::ExcNotReinited()));
     AssertDimension(dof_values.size(), fe_values->dofs_per_cell);
+    AssertDimension(divergences.size(), fe_values->n_quadrature_points);
 
     internal::do_function_divergences<dim, spacedim>(
       make_const_array_view(dof_values),
@@ -1160,6 +1195,7 @@ namespace FEValuesViews
              "update_values")));
     Assert(fe_values->present_cell.is_initialized(),
            (typename FEValuesBase<dim, spacedim>::ExcNotReinited()));
+    AssertDimension(values.size(), fe_values->n_quadrature_points);
 
     // get function values of dofs on this cell
     dealii::Vector<Number> dof_values(fe_values->dofs_per_cell);
@@ -1188,6 +1224,7 @@ namespace FEValuesViews
     Assert(fe_values->present_cell.is_initialized(),
            (typename FEValuesBase<dim, spacedim>::ExcNotReinited()));
     AssertDimension(dof_values.size(), fe_values->dofs_per_cell);
+    AssertDimension(values.size(), fe_values->n_quadrature_points);
 
     internal::do_function_values<dim, spacedim>(
       make_const_array_view(dof_values),
@@ -1212,6 +1249,7 @@ namespace FEValuesViews
            (typename FEValuesBase<dim, spacedim>::ExcNotReinited()));
     AssertDimension(fe_function.size(),
                     fe_values->present_cell.n_dofs_for_dof_handler());
+    AssertDimension(divergences.size(), fe_values->n_quadrature_points);
 
     // get function values of dofs
     // on this cell
@@ -1241,6 +1279,7 @@ namespace FEValuesViews
     Assert(fe_values->present_cell.is_initialized(),
            (typename FEValuesBase<dim, spacedim>::ExcNotReinited()));
     AssertDimension(dof_values.size(), fe_values->dofs_per_cell);
+    AssertDimension(divergences.size(), fe_values->n_quadrature_points);
 
     internal::do_function_divergences<dim, spacedim>(
       make_const_array_view(dof_values),
@@ -1265,6 +1304,7 @@ namespace FEValuesViews
            (typename FEValuesBase<dim, spacedim>::ExcNotReinited()));
     AssertDimension(fe_function.size(),
                     fe_values->present_cell.n_dofs_for_dof_handler());
+    AssertDimension(gradients.size(), fe_values->n_quadrature_points);
 
     // get function values of dofs
     // on this cell
@@ -1294,6 +1334,7 @@ namespace FEValuesViews
     Assert(fe_values->present_cell.is_initialized(),
            (typename FEValuesBase<dim, spacedim>::ExcNotReinited()));
     AssertDimension(dof_values.size(), fe_values->dofs_per_cell);
+    AssertDimension(gradients.size(), fe_values->n_quadrature_points);
 
     internal::do_function_gradients<dim, spacedim>(
       make_const_array_view(dof_values),
@@ -1314,9 +1355,7 @@ namespace internal
       const FiniteElement<dim, spacedim> &fe = fe_values.get_fe();
 
       const unsigned int n_scalars = fe.n_components();
-      scalars.reserve(n_scalars);
-      for (unsigned int component = 0; component < n_scalars; ++component)
-        scalars.emplace_back(fe_values, component);
+      scalars.resize(n_scalars);
 
       // compute number of vectors that we can fit into this finite element.
       // note that this is based on the dimensionality 'dim' of the manifold,
@@ -1326,9 +1365,7 @@ namespace internal
            fe.n_components() - Tensor<1, spacedim>::n_independent_components +
              1 :
            0);
-      vectors.reserve(n_vectors);
-      for (unsigned int component = 0; component < n_vectors; ++component)
-        vectors.emplace_back(fe_values, component);
+      vectors.resize(n_vectors);
 
       // compute number of symmetric tensors in the same way as above
       const unsigned int n_symmetric_second_order_tensors =
@@ -1337,12 +1374,7 @@ namespace internal
            fe.n_components() -
              SymmetricTensor<2, spacedim>::n_independent_components + 1 :
            0);
-      symmetric_second_order_tensors.reserve(n_symmetric_second_order_tensors);
-      for (unsigned int component = 0;
-           component < n_symmetric_second_order_tensors;
-           ++component)
-        symmetric_second_order_tensors.emplace_back(fe_values, component);
-
+      symmetric_second_order_tensors.resize(n_symmetric_second_order_tensors);
 
       // compute number of symmetric tensors in the same way as above
       const unsigned int n_second_order_tensors =
@@ -1350,16 +1382,13 @@ namespace internal
            fe.n_components() - Tensor<2, spacedim>::n_independent_components +
              1 :
            0);
-      second_order_tensors.reserve(n_second_order_tensors);
-      for (unsigned int component = 0; component < n_second_order_tensors;
-           ++component)
-        second_order_tensors.emplace_back(fe_values, component);
+      second_order_tensors.resize(n_second_order_tensors);
     }
   } // namespace FEValuesViews
 } // namespace internal
 
 /*------------------------------- Explicit Instantiations -------------*/
 
-#include "fe_values_views.inst"
+#include "fe/fe_values_views.inst"
 
 DEAL_II_NAMESPACE_CLOSE

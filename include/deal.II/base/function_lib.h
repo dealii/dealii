@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 1999 - 2023 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 1999 - 2024 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 #ifndef dealii_function_lib_h
 #define dealii_function_lib_h
@@ -20,8 +19,8 @@
 #include <deal.II/base/config.h>
 
 #include <deal.II/base/function.h>
+#include <deal.II/base/observer_pointer.h>
 #include <deal.II/base/point.h>
-#include <deal.II/base/smartpointer.h>
 #include <deal.II/base/table.h>
 
 #include <array>
@@ -1371,8 +1370,8 @@ namespace Functions
   /**
    * A scalar function that computes its values by (bi-, tri-)linear
    * interpolation from a set of point data that are arranged on a possibly
-   * non-uniform tensor product mesh. In other words, considering the three-
-   * dimensional case, let there be points $x_0,\ldots, x_{K-1}$,
+   * non-uniform tensor product mesh. In other words, considering the
+   * three-dimensional case, let there be points $x_0,\ldots, x_{K-1}$,
    * $y_0,\ldots,y_{L-1}$, $z_1,\ldots,z_{M-1}$, and data $d_{klm}$ defined at
    * point $(x_k,y_l,z_m)^T$, then evaluating the function at a point $\mathbf
    * x=(x,y,z)$ will find the box so that $x_k\le x\le x_{k+1}, y_l\le y\le
@@ -1460,8 +1459,8 @@ namespace Functions
      * @param coordinate_values An array of dim arrays. Each of the inner
      * arrays contains the coordinate values $x_0,\ldots, x_{K-1}$ and
      * similarly for the other coordinate directions. These arrays need not
-     * have the same size. Obviously, we need dim such arrays for a dim-
-     * dimensional function object. The coordinate values within this array
+     * have the same size. Obviously, we need dim such arrays for a
+     * dim-dimensional function object. The coordinate values within this array
      * are assumed to be strictly ascending to allow for efficient lookup.
      *
      * @param data_values A dim-dimensional table of data at each of the mesh
@@ -1482,6 +1481,13 @@ namespace Functions
      * separately. In other words, there is no need to keep the original object
      * from which this object could copy its information, but it might as well
      * take over ("move") the data.
+     *
+     * Moving data also enables using tables that are located in shared memory
+     * between multiple MPI processes, rather than copying the data from
+     * shared memory into local memory whenever one creates an
+     * InterpolatedTensorProductGridData object. See the
+     * TableBase::replicate_across_communicator() function on how to share a
+     * data set between multiple processes.
      */
     InterpolatedTensorProductGridData(
       std::array<std::vector<double>, dim> &&coordinate_values,
@@ -1549,10 +1555,10 @@ namespace Functions
   /**
    * A scalar function that computes its values by (bi-, tri-)linear
    * interpolation from a set of point data that are arranged on a uniformly
-   * spaced tensor product mesh. In other words, considering the three-
-   * dimensional case, let there be points $x_0,\ldots, x_{K-1}$ that result
-   * from a uniform subdivision of the interval $[x_0,x_{K-1}]$ into $K-1$
-   * sub-intervals of size $\Delta x = (x_{K-1}-x_0)/(K-1)$, and similarly
+   * spaced tensor product mesh. In other words, considering the
+   * three-dimensional case, let there be points $x_0,\ldots, x_{K-1}$ that
+   * result from a uniform subdivision of the interval $[x_0,x_{K-1}]$ into
+   * $K-1$ sub-intervals of size $\Delta x = (x_{K-1}-x_0)/(K-1)$, and similarly
    * $y_0,\ldots,y_{L-1}$, $z_1,\ldots,z_{M-1}$. Also consider data $d_{klm}$
    * defined at point $(x_k,y_l,z_m)^T$, then evaluating the function at a
    * point $\mathbf x=(x,y,z)$ will find the box so that $x_k\le x\le x_{k+1},
@@ -1620,6 +1626,13 @@ namespace Functions
      * separately. In other words, there is no need to keep the original object
      * from which this object could copy its information, but it might as well
      * take over ("move") the data.
+     *
+     * Moving data also enables using tables that are located in shared memory
+     * between multiple MPI processes, rather than copying the data from
+     * shared memory into local memory whenever one creates an
+     * InterpolatedUniformGridData object. See the
+     * TableBase::replicate_across_communicator() function on how to share a
+     * data set between multiple processes.
      */
     InterpolatedUniformGridData(
       std::array<std::pair<double, double>, dim> &&interval_endpoints,
@@ -1761,30 +1774,30 @@ namespace Functions
    * to strong rotation and elongation of the fluid @cite Blais2013.
    *
    * The stream function $\Psi$ of this Rayleigh-Kothe vortex is defined as:
-@f[
-\Psi = \frac{1}{\pi} \sin^2 (\pi x) \sin^2 (\pi y) \cos \left( \pi \frac{t}{T}
-\right)
-@f]
+   * @f[
+   * \Psi = \frac{1}{\pi} \sin^2 (\pi x) \sin^2 (\pi y) \cos \left( \pi
+   * \frac{t}{T} \right)
+   * @f]
    * where $T$ is half the period of the flow. The velocity profile in 2D
-($\textbf{u}=[u,v]^T$) is :
-@f{eqnarray*}{
-   u &=&  - \frac{\partial\Psi}{\partial y} = -2 \sin^2 (\pi x) \sin (\pi y)
-\cos (\pi y)  \cos \left( \pi \frac{t}{T} \right)\\ v &=&
-\frac{\partial\Psi}{\partial x} = 2 \cos(\pi x) \sin(\pi x) \sin^2 (\pi y) \cos
-\left( \pi \frac{t}{T} \right)
-@f}
+   * ($\textbf{u}=[u,v]^T$) is:
+   * @f{eqnarray*}{
+   * u &=&  - \frac{\partial\Psi}{\partial y} = -2 \sin^2 (\pi x) \sin (\pi y)
+   * \cos (\pi y)  \cos \left( \pi \frac{t}{T} \right)\\ v &=&
+   * \frac{\partial\Psi}{\partial x} = 2 \cos(\pi x) \sin(\pi x) \sin^2 (\pi y)
+   * \cos \left( \pi \frac{t}{T} \right)
+   * @f}
    * where $T$ is half the period of the flow.
    *
    * The velocity profile is illustrated in the following animation:
    *
-@htmlonly
-<p align="center">
-  <iframe width="560" height="500"
-src="https://www.youtube.com/embed/m6hQm7etji8" frameborder="0"
-   allow="accelerometer; autoplay; encrypted-media; gyroscope;
-picture-in-picture" allowfullscreen></iframe>
- </p>
-@endhtmlonly
+   * @htmlonly
+   * <p align="center">
+   *   <iframe width="560" height="500"
+   * src="https://www.youtube.com/embed/m6hQm7etji8" frameborder="0"
+   *    allow="accelerometer; autoplay; encrypted-media; gyroscope;
+   * picture-in-picture" allowfullscreen></iframe>
+   *  </p>
+   * @endhtmlonly
    *
    * It can be seen that this velocity reverses periodically due to the term
    * $\cos \left( \pi \frac{t}{T} \right)$ and that material will end up at its

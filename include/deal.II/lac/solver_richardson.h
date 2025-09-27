@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 1999 - 2022 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 1999 - 2024 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 #ifndef dealii_solver_richardson_h
 #define dealii_solver_richardson_h
@@ -21,6 +20,7 @@
 
 #include <deal.II/base/logstream.h>
 #include <deal.II/base/signaling_nan.h>
+#include <deal.II/base/template_constraints.h>
 
 #include <deal.II/lac/solver.h>
 #include <deal.II/lac/solver_control.h>
@@ -61,6 +61,7 @@ DEAL_II_NAMESPACE_OPEN
  * to observe the progress of the iteration.
  */
 template <typename VectorType = Vector<double>>
+DEAL_II_CXX20_REQUIRES(concepts::is_vector_space_vector<VectorType>)
 class SolverRichardson : public SolverBase<VectorType>
 {
 public:
@@ -109,21 +110,25 @@ public:
    * Solve the linear system $Ax=b$ for x.
    */
   template <typename MatrixType, typename PreconditionerType>
-  void
-  solve(const MatrixType         &A,
-        VectorType               &x,
-        const VectorType         &b,
-        const PreconditionerType &preconditioner);
+  DEAL_II_CXX20_REQUIRES(
+    (concepts::is_linear_operator_on<MatrixType, VectorType> &&
+     concepts::is_linear_operator_on<PreconditionerType, VectorType>))
+  void solve(const MatrixType         &A,
+             VectorType               &x,
+             const VectorType         &b,
+             const PreconditionerType &preconditioner);
 
   /**
    * Solve $A^Tx=b$ for $x$.
    */
   template <typename MatrixType, typename PreconditionerType>
-  void
-  Tsolve(const MatrixType         &A,
-         VectorType               &x,
-         const VectorType         &b,
-         const PreconditionerType &preconditioner);
+  DEAL_II_CXX20_REQUIRES(
+    (concepts::is_transpose_linear_operator_on<MatrixType, VectorType> &&
+     concepts::is_transpose_linear_operator_on<PreconditionerType, VectorType>))
+  void Tsolve(const MatrixType         &A,
+              VectorType               &x,
+              const VectorType         &b,
+              const PreconditionerType &preconditioner);
 
   /**
    * Set the damping-coefficient. Default is 1., i.e. no damping.
@@ -164,6 +169,7 @@ protected:
 #ifndef DOXYGEN
 
 template <typename VectorType>
+DEAL_II_CXX20_REQUIRES(concepts::is_vector_space_vector<VectorType>)
 inline SolverRichardson<VectorType>::AdditionalData::AdditionalData(
   const double omega,
   const bool   use_preconditioned_residual)
@@ -173,6 +179,7 @@ inline SolverRichardson<VectorType>::AdditionalData::AdditionalData(
 
 
 template <typename VectorType>
+DEAL_II_CXX20_REQUIRES(concepts::is_vector_space_vector<VectorType>)
 SolverRichardson<VectorType>::SolverRichardson(SolverControl            &cn,
                                                VectorMemory<VectorType> &mem,
                                                const AdditionalData     &data)
@@ -183,6 +190,7 @@ SolverRichardson<VectorType>::SolverRichardson(SolverControl            &cn,
 
 
 template <typename VectorType>
+DEAL_II_CXX20_REQUIRES(concepts::is_vector_space_vector<VectorType>)
 SolverRichardson<VectorType>::SolverRichardson(SolverControl        &cn,
                                                const AdditionalData &data)
   : SolverBase<VectorType>(cn)
@@ -192,12 +200,16 @@ SolverRichardson<VectorType>::SolverRichardson(SolverControl        &cn,
 
 
 template <typename VectorType>
+DEAL_II_CXX20_REQUIRES(concepts::is_vector_space_vector<VectorType>)
 template <typename MatrixType, typename PreconditionerType>
-void
-SolverRichardson<VectorType>::solve(const MatrixType         &A,
-                                    VectorType               &x,
-                                    const VectorType         &b,
-                                    const PreconditionerType &preconditioner)
+DEAL_II_CXX20_REQUIRES(
+  (concepts::is_linear_operator_on<MatrixType, VectorType> &&
+   concepts::is_linear_operator_on<PreconditionerType, VectorType>))
+void SolverRichardson<VectorType>::solve(
+  const MatrixType         &A,
+  VectorType               &x,
+  const VectorType         &b,
+  const PreconditionerType &preconditioner)
 {
   SolverControl::State conv = SolverControl::iterate;
 
@@ -249,12 +261,16 @@ SolverRichardson<VectorType>::solve(const MatrixType         &A,
 
 
 template <typename VectorType>
+DEAL_II_CXX20_REQUIRES(concepts::is_vector_space_vector<VectorType>)
 template <typename MatrixType, typename PreconditionerType>
-void
-SolverRichardson<VectorType>::Tsolve(const MatrixType         &A,
-                                     VectorType               &x,
-                                     const VectorType         &b,
-                                     const PreconditionerType &preconditioner)
+DEAL_II_CXX20_REQUIRES(
+  (concepts::is_transpose_linear_operator_on<MatrixType, VectorType> &&
+   concepts::is_transpose_linear_operator_on<PreconditionerType, VectorType>))
+void SolverRichardson<VectorType>::Tsolve(
+  const MatrixType         &A,
+  VectorType               &x,
+  const VectorType         &b,
+  const PreconditionerType &preconditioner)
 {
   SolverControl::State conv           = SolverControl::iterate;
   double               last_criterion = std::numeric_limits<double>::lowest();
@@ -302,20 +318,22 @@ SolverRichardson<VectorType>::Tsolve(const MatrixType         &A,
 }
 
 
+
 template <typename VectorType>
-void
-SolverRichardson<VectorType>::print_vectors(const unsigned int,
-                                            const VectorType &,
-                                            const VectorType &,
-                                            const VectorType &) const
+DEAL_II_CXX20_REQUIRES(concepts::is_vector_space_vector<VectorType>)
+void SolverRichardson<VectorType>::print_vectors(const unsigned int,
+                                                 const VectorType &,
+                                                 const VectorType &,
+                                                 const VectorType &) const
 {}
 
 
 
 template <typename VectorType>
+DEAL_II_CXX20_REQUIRES(concepts::is_vector_space_vector<VectorType>)
 inline typename VectorType::value_type
-SolverRichardson<VectorType>::criterion(const VectorType &r,
-                                        const VectorType &d) const
+  SolverRichardson<VectorType>::criterion(const VectorType &r,
+                                          const VectorType &d) const
 {
   if (!additional_data.use_preconditioned_residual)
     return r.l2_norm();
@@ -325,8 +343,8 @@ SolverRichardson<VectorType>::criterion(const VectorType &r,
 
 
 template <typename VectorType>
-inline void
-SolverRichardson<VectorType>::set_omega(const double om)
+DEAL_II_CXX20_REQUIRES(concepts::is_vector_space_vector<VectorType>)
+inline void SolverRichardson<VectorType>::set_omega(const double om)
 {
   additional_data.omega = om;
 }

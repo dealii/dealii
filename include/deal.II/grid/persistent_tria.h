@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 1999 - 2022 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 1999 - 2024 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 #ifndef dealii_persistent_tria_h
 #define dealii_persistent_tria_h
@@ -19,7 +18,7 @@
 
 #include <deal.II/base/config.h>
 
-#include <deal.II/base/smartpointer.h>
+#include <deal.II/base/observer_pointer.h>
 
 #include <deal.II/grid/tria.h>
 
@@ -29,8 +28,8 @@ DEAL_II_NAMESPACE_OPEN
 
 /**
  * This class handles the history of a triangulation and can rebuild it after
- * it was deleted some time before. Its main purpose is support for time-
- * dependent problems where one frequently deletes a triangulation due to
+ * it was deleted some time before. Its main purpose is support for
+ * time-dependent problems where one frequently deletes a triangulation due to
  * memory pressure and later wants to rebuild it; this class has all the
  * information to rebuild it exactly as it was before including the mapping of
  * cell numbers to the geometrical cells.
@@ -97,7 +96,7 @@ DEAL_II_NAMESPACE_OPEN
  * a triangulation; it only becomes one after @p restore is first called. Note
  * also that the @p execute_coarsening_and_refinement stores all necessary
  * flags for later reconstruction using the @p restore function.
- * Triangulation::clear() resets the underlying triangulation to a virgin
+ * Triangulation::clear() resets the underlying triangulation to an empty
  * state, but does not affect the stored refinement flags needed for later
  * reconstruction and does also not touch the coarse grid which is used within
  * restore().
@@ -163,7 +162,7 @@ public:
   restore();
 
   /**
-   * Differential restore. Performs the @p step_noth local refinement and
+   * Differential restore. Performs the `step_no`th local refinement and
    * coarsening step. Step 0 stands for the copying of the coarse grid.
    *
    * This function will only succeed if the triangulation is in just the state
@@ -251,8 +250,8 @@ private:
   /**
    * This grid shall be used as coarse grid.
    */
-  SmartPointer<const Triangulation<dim, spacedim>,
-               PersistentTriangulation<dim, spacedim>>
+  ObserverPointer<const Triangulation<dim, spacedim>,
+                  PersistentTriangulation<dim, spacedim>>
     coarse_grid;
 
   /**

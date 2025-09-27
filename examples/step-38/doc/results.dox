@@ -36,7 +36,7 @@ this, neatly following the theoretically predicted pattern:
 Finally, the program produces graphical output that we can visualize. Here is
 a plot of the results:
 
-<img src="https://www.dealii.org/images/steps/developer/step-38.solution-3d.png" alt="">
+<img src="https://dealii.org/images/steps/developer/step-38.solution-3d.png" alt="">
 
 The program also works for 1d curves in 2d, not just 2d surfaces in 3d. You
 can test this by changing the template argument in <code>main()</code> like
@@ -50,10 +50,10 @@ then looks like so (the white curve is the domain, the colored curve is the
 solution extruded into the third dimension, clearly showing the change in sign
 as the curve moves from one quadrant of the domain into the adjacent one):
 
-<img src="https://www.dealii.org/images/steps/developer/step-38.solution-2d.png" alt="">
+<img src="https://dealii.org/images/steps/developer/step-38.solution-2d.png" alt="">
 
 
-<a name="extensions"></a>
+<a name="step-38-extensions"></a>
 <h3>Possibilities for extensions</h3>
 
 Computing on surfaces only becomes interesting if the surface is more
@@ -67,9 +67,9 @@ before, we stretch it by a factor of 10 in the z-direction, and then we jumble
 the x- and y-coordinates a bit. Let's show the computational domain and the
 solution first before we go into details of the implementation below:
 
-<img src="https://www.dealii.org/images/steps/developer/step-38.warp-1.png" alt="">
+<img src="https://dealii.org/images/steps/developer/step-38.warp-1.png" alt="">
 
-<img src="https://www.dealii.org/images/steps/developer/step-38.warp-2.png" alt="">
+<img src="https://dealii.org/images/steps/developer/step-38.warp-2.png" alt="">
 
 The way to produce such a mesh is by using the GridTools::transform()
 function. It needs a way to transform each individual mesh point to a
@@ -137,12 +137,14 @@ void LaplaceBeltrami<spacedim>::make_grid_and_dofs()
 Note that the only essential addition is the line marked with
 asterisks. It is worth pointing out one other thing here, though: because we
 detach the manifold description from the surface mesh, whenever we use a
-mapping object in the rest of the program, it has no curves boundary
+mapping object in the rest of the program, it has no curved boundary
 description to go on any more. Rather, it will have to use the implicit,
 FlatManifold class that is used on all parts of the domain not
 explicitly assigned a different manifold object. Consequently, whether we use
 MappingQ(2), MappingQ(15) or MappingQ1, each cell of our mesh will be mapped
-using a bilinear approximation.
+using a bilinear approximation. (That is of course undesirable, and can be
+fixed by creating a manifold description of the domain you have, and attaching
+this manifold to the triangulation.)
 
 All these drawbacks aside, the resulting pictures are still pretty. The only
 other differences to what's in step-38 is that we changed the right hand side

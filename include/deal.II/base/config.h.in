@@ -1,21 +1,24 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2012 - 2023 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2012 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 #ifndef dealii_config_h
 #define dealii_config_h
 
+/***********************************************************************
+ * Some deal.II macros depends on Kokkos macros:
+ */
+#include <Kokkos_Macros.hpp>
 
 /***********************************************************************
  * Information about deal.II:
@@ -28,6 +31,57 @@
 #define DEAL_II_VERSION_MAJOR @DEAL_II_VERSION_MAJOR@
 #define DEAL_II_VERSION_MINOR @DEAL_II_VERSION_MINOR@
 #define DEAL_II_VERSION_SUBMINOR @DEAL_II_VERSION_SUBMINOR@
+
+/***********************************************************************
+ * Two macro names that we put at the top and bottom of all deal.II files
+ * and that will be expanded to "namespace dealii {" and "}".
+ */
+
+#define DEAL_II_NAMESPACE_OPEN namespace dealii {
+#define DEAL_II_NAMESPACE_CLOSE }
+
+/***********************************************************************
+ * A variable that can be used to query whether we are compiling in
+ * debug or release mode.
+ */
+
+DEAL_II_NAMESPACE_OPEN
+
+/**
+ * An enum type that is used to describe what kind of build has
+ * been used to compile the deal.II library: Namely, whether it is
+ * a debug or a release build.
+ */
+enum class LibraryBuildMode
+{
+  debug,
+  release
+};
+
+/**
+ * A variable that can be queried to determine whether the deal.II
+ * library you are trying to compile against is a debug or a release
+ * mode build.
+ */
+constexpr LibraryBuildMode library_build_mode
+#ifdef DEBUG
+ = LibraryBuildMode::debug;
+#else
+ = LibraryBuildMode::release;
+#endif
+
+
+/**
+ * A function that returns whether we are currently compiling for a debug
+ * build (rather than a release build).
+ */
+constexpr bool running_in_debug_mode()
+{
+  return (library_build_mode == LibraryBuildMode::debug);
+}
+
+
+DEAL_II_NAMESPACE_CLOSE
 
 
 /***********************************************************************
@@ -42,7 +96,6 @@
 #cmakedefine DEAL_II_FEATURE_BOOST_BUNDLED_CONFIGURED
 #cmakedefine DEAL_II_WITH_CGAL
 #cmakedefine DEAL_II_WITH_COMPLEX_VALUES
-#cmakedefine DEAL_II_WITH_CUDA
 #cmakedefine DEAL_II_WITH_GINKGO
 #cmakedefine DEAL_II_WITH_GMSH
 #cmakedefine DEAL_II_WITH_GSL
@@ -52,13 +105,16 @@
 #cmakedefine DEAL_II_WITH_LAPACK
 #cmakedefine LAPACK_WITH_64BIT_BLAS_INDICES
 #cmakedefine DEAL_II_LAPACK_WITH_MKL
+#cmakedefine DEAL_II_WITH_MAGIC_ENUM
 #cmakedefine DEAL_II_WITH_METIS
 #cmakedefine DEAL_II_WITH_MPI
 #cmakedefine DEAL_II_WITH_MUPARSER
+#cmakedefine DEAL_II_WITH_MUMPS
 #cmakedefine DEAL_II_FEATURE_MUPARSER_BUNDLED_CONFIGURED
 #cmakedefine DEAL_II_WITH_OPENCASCADE
 #cmakedefine DEAL_II_WITH_P4EST
 #cmakedefine DEAL_II_WITH_PETSC
+#cmakedefine DEAL_II_WITH_PSBLAS
 #cmakedefine DEAL_II_WITH_SCALAPACK
 #cmakedefine DEAL_II_WITH_SLEPC
 #cmakedefine DEAL_II_WITH_SUNDIALS
@@ -111,6 +167,22 @@
 #cmakedefine DEAL_II_RESTRICT @DEAL_II_RESTRICT@
 #cmakedefine DEAL_II_COMPILER_HAS_DIAGNOSTIC_PRAGMA
 
+
+#define DEAL_II_HOST_DEVICE KOKKOS_FUNCTION
+#define DEAL_II_HOST_DEVICE_ALWAYS_INLINE KOKKOS_FORCEINLINE_FUNCTION
+
+// clang++ assumes that all constexpr functions are __host__ __device__ when
+// Kokkos was configured with CUDA or HIP support. This is problematic
+// when calling non-constexpr functions in constexpr functions. Hence, we
+// need a way to annotate functions explicitly as host-only.
+#cmakedefine DEAL_II_KOKKOS_ENABLE_HIP
+#if (defined(__clang__) && defined(__CUDA__)) || defined(DEAL_II_KOKKOS_ENABLE_HIP)
+#  define DEAL_II_HOST __host__
+#else
+#  define DEAL_II_HOST
+#endif
+
+
 /***********************************************************************
  * CPU features:
  *
@@ -139,8 +211,6 @@
 #define DEAL_II_COMPILER_VECTORIZATION_LEVEL 0
 #endif
 
-#define DEAL_II_HAVE_ARM_NEON @DEAL_II_HAVE_ARM_NEON@
-
 #define DEAL_II_OPENMP_SIMD_PRAGMA @DEAL_II_OPENMP_SIMD_PRAGMA@
 
 
@@ -153,6 +223,18 @@
 #cmakedefine DEAL_II_HAVE_CXX14
 #cmakedefine DEAL_II_HAVE_CXX17
 #cmakedefine DEAL_II_HAVE_CXX20
+#cmakedefine DEAL_II_HAVE_CXX23
+
+#cmakedefine DEAL_II_HAVE_FP_EXCEPTIONS
+#cmakedefine DEAL_II_HAVE_COMPLEX_OPERATOR_OVERLOADS
+#cmakedefine DEAL_II_HAVE_CXX17_BESSEL_FUNCTIONS
+#cmakedefine DEAL_II_CXX14_CONSTEXPR_BUG
+
+// The following three are defined for backwards compatibility with older
+// deal.II versions:
+#define DEAL_II_WITH_CXX11
+#define DEAL_II_WITH_CXX14
+#define DEAL_II_WITH_CXX17
 
 /**
  * If we have C++20 available, we can have concepts and requires
@@ -166,10 +248,36 @@
 #  define DEAL_II_CXX20_REQUIRES(condition)
 #endif
 
-#cmakedefine DEAL_II_HAVE_FP_EXCEPTIONS
-#cmakedefine DEAL_II_HAVE_COMPLEX_OPERATOR_OVERLOADS
-#cmakedefine DEAL_II_HAVE_CXX17_BESSEL_FUNCTIONS
-#cmakedefine DEAL_II_CXX14_CONSTEXPR_BUG
+/**
+ * Provide support for the C++23 [[assume]] attribute. To mimic the
+ * attribute for older standards we rely on compiler intrinsics when
+ * available.
+ */
+#ifdef DEAL_II_HAVE_CXX23
+#  define DEAL_II_CXX23_ASSUME(expr) [[assume(expr)]]
+#else
+#  if defined(__clang__)
+#    define DEAL_II_CXX23_ASSUME(expr) __builtin_assume(static_cast<bool>(expr))
+#  elif defined(_MSC_VER) || defined(__ICC)
+#    define DEAL_II_CXX23_ASSUME(expr) __assume(expr);
+#  else
+/* no way with GCC to express this without evaluating 'expr' */
+#    define DEAL_II_CXX23_ASSUME(expr) \
+    do                               \
+      {                              \
+      }                              \
+    while (false)
+#  endif
+#endif
+
+#cmakedefine DEAL_II_FALLTHROUGH @DEAL_II_FALLTHROUGH@
+#cmakedefine DEAL_II_CONSTEXPR @DEAL_II_CONSTEXPR@
+
+
+
+/***********************************************************************
+ * Dealing with deprecations.
+ */
 
 /**
  * Macro indicating that the current feature will be removed in a future
@@ -202,14 +310,6 @@
 #define DEAL_II_DEPRECATED_EARLY_WITH_COMMENT(comment)
 #endif
 #endif
-
-#cmakedefine DEAL_II_FALLTHROUGH @DEAL_II_FALLTHROUGH@
-#cmakedefine DEAL_II_CONSTEXPR @DEAL_II_CONSTEXPR@
-
-// The following three are defined for backwards compatibility with older deal.II versions:
-#define DEAL_II_WITH_CXX11
-#define DEAL_II_WITH_CXX14
-#define DEAL_II_WITH_CXX17
 
 
 /***********************************************************************
@@ -268,8 +368,10 @@
 
 /* cmake/configure/configure_2_trilinos.cmake */
 #cmakedefine DEAL_II_TRILINOS_CXX_SUPPORTS_SACADO_COMPLEX_RAD
+#cmakedefine DEAL_II_TRILINOS_WITH_AMESOS2
 #cmakedefine DEAL_II_TRILINOS_WITH_BELOS
 #cmakedefine DEAL_II_TRILINOS_WITH_EPETRAEXT
+#cmakedefine DEAL_II_TRILINOS_WITH_IFPACK2
 #cmakedefine DEAL_II_TRILINOS_WITH_MUELU
 #cmakedefine DEAL_II_TRILINOS_WITH_NOX
 #cmakedefine DEAL_II_TRILINOS_WITH_ROL
@@ -329,6 +431,25 @@
 #ifdef DEAL_II_WITH_GMSH
 #  define DEAL_II_GMSH_EXECUTABLE_PATH "@GMSH_EXECUTABLE@"
 #endif
+
+
+/**
+ * Kokkos:
+ */
+
+#ifdef DEAL_II_WITH_KOKKOS
+#  define DEAL_II_KOKKOS_VERSION_MAJOR @KOKKOS_VERSION_MAJOR@
+#  define DEAL_II_KOKKOS_VERSION_MINOR @KOKKOS_VERSION_MINOR@
+#  define DEAL_II_KOKKOS_VERSION_SUBMINOR @KOKKOS_VERSION_SUBMINOR@
+
+#  define DEAL_II_KOKKOS_VERSION_GTE(major,minor,subminor) \
+ ((DEAL_II_KOKKOS_VERSION_MAJOR * 10000 + \
+    DEAL_II_KOKKOS_VERSION_MINOR * 100 + \
+      DEAL_II_KOKKOS_VERSION_SUBMINOR) \
+    >=  \
+    (major)*10000 + (minor)*100 + (subminor))
+#endif
+
 
 /**
  * OpenCASCADE:
@@ -394,10 +515,11 @@
  * PETSc:
  *
  * Note: The following macros are defined in petscversion.h
- *       so we don't repeat them here.
+ *       so we simply refer to the ones there.
  */
 
 #ifdef DEAL_II_WITH_PETSC
+#  include <petscversion.h>
 #  define DEAL_II_PETSC_VERSION_LT(major,minor,subminor) \
     PETSC_VERSION_LT(major,minor,subminor)
 #  define DEAL_II_PETSC_VERSION_GTE(major,minor,subminor) \
@@ -409,6 +531,7 @@
  */
 
 #ifdef DEAL_II_WITH_SLEPC
+#  include <slepcversion.h>
 #  define DEAL_II_SLEPC_VERSION_LT(major,minor,subminor) \
     SLEPC_VERSION_LT(major,minor,subminor)
 #  define DEAL_II_SLEPC_VERSION_GTE(major,minor,subminor) \
@@ -465,17 +588,6 @@
 #endif
 
 #cmakedefine DEAL_II_MPI_WITH_DEVICE_SUPPORT
-#ifdef DEAL_II_MPI_WITH_DEVICE_SUPPORT
-#cmakedefine DEAL_II_MPI_WITH_CUDA_SUPPORT
-#endif
-
-/***********************************************************************
- * Two macro names that we put at the top and bottom of all deal.II files
- * and that will be expanded to "namespace dealii {" and "}".
- */
-
-#define DEAL_II_NAMESPACE_OPEN namespace dealii {
-#define DEAL_II_NAMESPACE_CLOSE }
 
 /***********************************************************************
  * Two macros to guard external header includes.
@@ -497,6 +609,7 @@ _Pragma("GCC diagnostic ignored \"-Wunknown-warning\"")           /*!*/ \
 _Pragma("GCC diagnostic ignored \"-Wextra\"")                     /*!*/ \
 _Pragma("GCC diagnostic ignored \"-Waddress-of-packed-member\"")        \
 _Pragma("GCC diagnostic ignored \"-Wcast-function-type\"")              \
+_Pragma("GCC diagnostic ignored \"-Wcpp\"")                             \
 _Pragma("GCC diagnostic ignored \"-Wdeprecated-copy\"")                 \
 _Pragma("GCC diagnostic ignored \"-Wdeprecated-declarations\"")         \
 _Pragma("GCC diagnostic ignored \"-Wdeprecated-volatile\"")             \
@@ -570,19 +683,6 @@ _Pragma("GCC diagnostic pop")
 /***********************************************************************
  * Final inclusions:
  */
-
-/*
- * Some systems require including mpi.h before stdio.h which happens in
- * types.h
- */
-#if defined(DEAL_II_WITH_MPI)
-DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
-#  include <mpi.h>
-DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
-#endif
-
-#include <deal.II/base/numbers.h>
-#include <deal.II/base/types.h>
 
 /*
  * Include the boost version header to do a quick version check in case, by

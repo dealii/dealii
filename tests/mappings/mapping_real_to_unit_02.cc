@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2006 - 2021 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2012 - 2024 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 
 /*
@@ -66,8 +65,8 @@ test2()
       for (unsigned int j = 0; j < 19; ++j)
         {
           /// all points are inside
-          points[19 * i + j](0) = -0.7 + (i + 1) * .07;
-          points[19 * i + j](1) = -0.7 + (j + 1) * .07;
+          points[19 * i + j][0] = -0.7 + (i + 1) * .07;
+          points[19 * i + j][1] = -0.7 + (j + 1) * .07;
         }
   points[95] = p;
   fe_function.value_list(points, m); // <<<< this fails at point[95] but only if

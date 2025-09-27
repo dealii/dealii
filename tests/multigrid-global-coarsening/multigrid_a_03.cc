@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2020 - 2022 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2020 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 
 /**
@@ -37,7 +36,7 @@ test(const unsigned int n_refinements, const unsigned int fe_degree_fine)
   const unsigned int max_level = n_refinements;
 
   MGLevelObject<AffineConstraints<Number>> constraints(min_level, max_level);
-  MGLevelObject<Operator<dim, Number>>     operators(min_level, max_level);
+  MGLevelObject<Operator<dim, 1, Number>>  operators(min_level, max_level);
 
   std::unique_ptr<FiniteElement<dim>> fe;
   std::unique_ptr<Quadrature<dim>>    quad;
@@ -67,7 +66,7 @@ test(const unsigned int n_refinements, const unsigned int fe_degree_fine)
       // set up constraints
       const IndexSet relevant_dofs =
         DoFTools::extract_locally_relevant_level_dofs(dof_handler, l);
-      constraint.reinit(relevant_dofs);
+      constraint.reinit(dof_handler.locally_owned_mg_dofs(l), relevant_dofs);
       constraint.add_lines(mg_constrained_dofs.get_boundary_indices(l));
       constraint.close();
 
@@ -78,7 +77,7 @@ test(const unsigned int n_refinements, const unsigned int fe_degree_fine)
     }
 
   // set up transfer operator
-  MGTransferGlobalCoarsening<dim, VectorType> transfer(mg_constrained_dofs);
+  MGTransferMatrixFree<dim, Number> transfer(mg_constrained_dofs);
 
   transfer.build(dof_handler, [&](const auto l, auto &vec) {
     operators[l].initialize_dof_vector(vec);

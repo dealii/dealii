@@ -1,0 +1,48 @@
+// ------------------------------------------------------------------------
+//
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2023 by the deal.II authors
+//
+// This file is part of the deal.II library.
+//
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
+//
+// ------------------------------------------------------------------------
+
+
+
+for (deal_II_dimension : DIMENSIONS)
+  {
+    template void MGConstrainedDoFs::initialize(
+      const DoFHandler<deal_II_dimension, deal_II_dimension> &dof,
+      const MGLevelObject<IndexSet> &level_relevant_dofs);
+
+    template void MGConstrainedDoFs::make_zero_boundary_constraints(
+      const DoFHandler<deal_II_dimension, deal_II_dimension> &dof,
+      const std::set<types::boundary_id>                     &boundary_ids,
+      const ComponentMask                                    &component_mask);
+
+    template void MGConstrainedDoFs::add_boundary_indices(
+      const DoFHandler<deal_II_dimension, deal_II_dimension> &dof,
+      const unsigned int                                      level,
+      const IndexSet                                         &boundary_indices);
+
+    template void MGConstrainedDoFs::make_no_normal_flux_constraints(
+      const DoFHandler<deal_II_dimension, deal_II_dimension> &dof,
+      const types::boundary_id                                bid,
+      const unsigned int first_vector_component);
+  }
+
+for (S1 : REAL_SCALARS)
+  {
+    template void MGConstrainedDoFs::merge_constraints(
+      AffineConstraints<S1> & constraints,
+      const unsigned int level,
+      const bool         add_boundary_indices,
+      const bool         add_refinement_edge_indices,
+      const bool         add_level_constraints,
+      const bool         add_user_constraints) const;
+  }

@@ -1,17 +1,16 @@
-/* ---------------------------------------------------------------------
+/* ------------------------------------------------------------------------
  *
- * Copyright (C) 2000 - 2023 by the deal.II authors
+ * SPDX-License-Identifier: LGPL-2.1-or-later
+ * Copyright (C) 2000 - 2024 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
- * The deal.II library is free software; you can use it, redistribute
- * it, and/or modify it under the terms of the GNU Lesser General
- * Public License as published by the Free Software Foundation; either
- * version 2.1 of the License, or (at your option) any later version.
- * The full text of the license can be found in the file LICENSE.md at
- * the top level directory of deal.II.
+ * Part of the source code is dual licensed under Apache-2.0 WITH
+ * LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+ * governing the source code and code contributions can be found in
+ * LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
  *
- * ---------------------------------------------------------------------
+ * ------------------------------------------------------------------------
  *
  * Author: Wolfgang Bangerth, University of Heidelberg, 2000
  */
@@ -21,7 +20,6 @@
 // meaning has already been discussed:
 #include <deal.II/base/quadrature_lib.h>
 #include <deal.II/base/function.h>
-#include <deal.II/base/logstream.h>
 #include <deal.II/lac/vector.h>
 #include <deal.II/lac/full_matrix.h>
 #include <deal.II/lac/sparse_matrix.h>
@@ -35,8 +33,6 @@
 #include <deal.II/dofs/dof_handler.h>
 #include <deal.II/dofs/dof_tools.h>
 #include <deal.II/fe/fe_values.h>
-#include <deal.II/numerics/vector_tools.h>
-#include <deal.II/numerics/matrix_tools.h>
 #include <deal.II/numerics/data_out.h>
 #include <deal.II/fe/fe_q.h>
 #include <deal.II/grid/grid_out.h>
@@ -77,7 +73,7 @@ namespace Step9
   // coefficients in previous examples, but there is another possibility in
   // the library, namely a base class that describes tensor valued
   // functions. This is more convenient than overriding Function::value() with
-  // a method that knows about multiple function components: at the end of the
+  // a method that knows about multiple function components: At the end of the
   // day we need a Tensor, so we may as well just use a class that returns a
   // Tensor.
   template <int dim>
@@ -85,52 +81,9 @@ namespace Step9
   {
   public:
     virtual Tensor<1, dim> value(const Point<dim> &p) const override;
-
-    // In previous examples, we have used assertions that throw exceptions in
-    // several places. However, we have never seen how such exceptions are
-    // declared. This can be done as follows:
-    DeclException2(ExcDimensionMismatch,
-                   unsigned int,
-                   unsigned int,
-                   << "The vector has size " << arg1 << " but should have "
-                   << arg2 << " elements.");
-    // The syntax may look a little strange, but is reasonable. The format is
-    // basically as follows: use the name of one of the macros
-    // <code>DeclExceptionN</code>, where <code>N</code> denotes the number of
-    // additional parameters which the exception object shall take. In this
-    // case, as we want to throw the exception when the sizes of two vectors
-    // differ, we need two arguments, so we use
-    // <code>DeclException2</code>. The first parameter then describes the
-    // name of the exception, while the following declare the data types of
-    // the parameters. The last argument is a sequence of output directives
-    // that will be piped into the <code>std::cerr</code> object, thus the
-    // strange format with the leading <code>@<@<</code> operator and the
-    // like. Note that we can access the parameters which are passed to the
-    // exception upon construction (i.e. within the <code>Assert</code> call)
-    // by using the names <code>arg1</code> through <code>argN</code>, where
-    // <code>N</code> is the number of arguments as defined by the use of the
-    // respective macro <code>DeclExceptionN</code>.
-    //
-    // To learn how the preprocessor expands this macro into actual code,
-    // please refer to the documentation of the exception classes. In brief,
-    // this macro call declares and defines a class
-    // <code>ExcDimensionMismatch</code> inheriting from ExceptionBase which
-    // implements all necessary error output functions.
-    //
-    // @note This exception is similarly used inside the
-    // <code>AssertDimension</code> macro, which is a handy wrapper to the
-    // check the dimensions of two given objects.
   };
 
-  // The following two functions implement the interface described above. The
-  // first simply implements the function as described in the introduction,
-  // while the second uses the same trick to avoid calling a virtual function
-  // as has already been introduced in the previous example program. Note the
-  // check for the right sizes of the arguments in the second function, which
-  // should always be present in such functions; it is our experience that
-  // many if not most programming errors result from incorrectly initialized
-  // arrays, incompatible parameters to functions and the like; using
-  // assertion as in this case can eliminate many of these problems.
+
   template <int dim>
   Tensor<1, dim> AdvectionField<dim>::value(const Point<dim> &p) const
   {
@@ -248,11 +201,11 @@ namespace Step9
     // matrix.
     //
     // The strategy for parallelization we choose here is one of the
-    // possibilities mentioned in detail in the @ref threads module in
+    // possibilities mentioned in detail in the @ref threads topic in
     // the documentation. Specifically, we will use the WorkStream
     // approach discussed there. Since there is so much documentation
-    // in this module, we will not repeat the rationale for the design
-    // choices here (for example, if you read through the module
+    // in this group, we will not repeat the rationale for the design
+    // choices here (for example, if you read through the topic
     // mentioned above, you will understand what the purpose of the
     // <code>AssemblyScratchData</code> and
     // <code>AssemblyCopyData</code> structures is). Rather, we will
@@ -322,7 +275,7 @@ namespace Step9
     Triangulation<dim> triangulation;
     DoFHandler<dim>    dof_handler;
 
-    FE_Q<dim> fe;
+    const FE_Q<dim> fe;
 
     AffineConstraints<double> hanging_node_constraints;
 
@@ -406,6 +359,41 @@ namespace Step9
   // the result into its final location, we do not need a copy-local-to-global
   // function and will instead give the WorkStream::run() function an empty
   // function object -- the equivalent to a NULL function pointer.
+  //
+  // There is one more part to this class.
+  // In previous examples, we have used assertions that throw exceptions in
+  // several places (see, for example, step-5 and step-8). However, you have
+  // never seen how such exceptions are declared. The code below shows how
+  // to do that, using the `DeclException2` macro.
+  //
+  // The syntax may look a little strange, but is reasonable. The format is
+  // basically as follows: Use the name of one of the macros
+  // <code>DeclExceptionN</code>, where <code>N</code> denotes the number of
+  // additional parameters which the exception object should take. In this
+  // case, as we want to throw the exception when the sizes of two vectors
+  // differ, we need two arguments, so we use
+  // <code>DeclException2</code>. The first parameter then describes the
+  // name of the exception, while the following declare the data types of
+  // the parameters. The last argument is a sequence of output directives
+  // that will be piped into the <code>std::cerr</code> object, thus the
+  // strange format with the leading `<<` operator and the
+  // like. Note that we can access the parameters which are passed to the
+  // exception upon construction (i.e. within the <code>Assert</code> call)
+  // by using the names <code>arg1</code> through <code>argN</code>, where
+  // <code>N</code> is the number of arguments as defined by the use of the
+  // respective macro <code>DeclExceptionN</code>.
+  //
+  // To learn how the preprocessor expands this macro into actual code,
+  // please refer to the documentation of the exception classes. In brief,
+  // this macro call declares and defines a class
+  // <code>ExcDimensionMismatch</code> inheriting from ExceptionBase which
+  // implements all necessary error output functions.
+  //
+  // @note This exception we declare here is similar to the used inside the
+  // <code>AssertDimension</code> macro, which is a handy wrapper for
+  // checking that the dimensions of two given objects are equal, and that
+  // you have already seen in step-8.
+
   class GradientEstimation
   {
   public:
@@ -496,7 +484,7 @@ namespace Step9
   // does not do this itself, but rather delegates to the function following
   // next, utilizing the WorkStream concept discussed in @ref threads .
   //
-  // If you have looked through the @ref threads module, you will have
+  // If you have looked through the @ref threads topic, you will have
   // seen that assembling in parallel does not take an incredible
   // amount of extra code as long as you diligently describe what the
   // scratch and copy data objects are, and if you define suitable
@@ -755,9 +743,9 @@ namespace Step9
       system_rhs);
   }
 
-  // Here comes the linear solver routine. As the system is no longer
+  // The next function is the linear solver routine. As the system is no longer
   // symmetric positive definite as in all the previous examples, we cannot
-  // use the Conjugate Gradient method anymore. Rather, we use a solver that
+  // use the Conjugate Gradient method any more. Rather, we use a solver that
   // is more general and does not rely on any special properties of the
   // matrix: the GMRES method. GMRES, like the conjugate gradient method,
   // requires a decent preconditioner: we use a Jacobi preconditioner here,
@@ -773,16 +761,12 @@ namespace Step9
     preconditioner.initialize(system_matrix, 1.0);
     solver.solve(system_matrix, solution, system_rhs, preconditioner);
 
-    Vector<double> residual(dof_handler.n_dofs());
+    hanging_node_constraints.distribute(solution);
 
-    system_matrix.vmult(residual, solution);
-    residual -= system_rhs;
     std::cout << "   Iterations required for convergence: "
               << solver_control.last_step() << '\n'
-              << "   Max norm of residual:                "
-              << residual.linfty_norm() << '\n';
-
-    hanging_node_constraints.distribute(solution);
+              << "   Norm of residual at convergence:     "
+              << solver_control.last_value() << '\n';
   }
 
   // The following function refines the grid according to the quantity
@@ -805,21 +789,23 @@ namespace Step9
     triangulation.execute_coarsening_and_refinement();
   }
 
-  // This function is similar to the one in step 6, but since we use a higher
+  // This function is similar to the one in step-6, but since we use a higher
   // degree finite element we save the solution in a different
   // way. Visualization programs like VisIt and Paraview typically only
   // understand data that is associated with nodes: they cannot plot
   // fifth-degree basis functions, which results in a very inaccurate picture
   // of the solution we computed. To get around this we save multiple
-  // <em>patches</em> per cell: in 2d we save 64 bilinear `cells' to the VTU
-  // file for each cell, and in 3d we save 512. The end result is that the
+  // <em>patches</em> per cell: in 2d we save $8\times 8=64$ bilinear
+  // `sub-cells' to the VTU file for each cell, and in 3d we save
+  // $8\times 8\times 8 = 512$. The end result is that the
   // visualization program will use a piecewise linear interpolation of the
-  // cubic basis functions: this captures the solution detail and, with most
+  // cubic basis functions on a 3 times refined mesh:
+  // This captures the solution detail and, with most
   // screen resolutions, looks smooth. We save the grid in a separate step
   // with no extra patches so that we have a visual representation of the cell
   // faces.
   //
-  // Version 9.1 of deal.II gained the ability to write higher degree
+  // @note Version 9.1 of deal.II gained the ability to write higher degree
   // polynomials (i.e., write piecewise bicubic visualization data for our
   // piecewise bicubic solution) VTK and VTU output: however, not all recent
   // versions of ParaView and VisIt (as of 2018) can read this format, so we
@@ -828,9 +814,11 @@ namespace Step9
   void AdvectionProblem<dim>::output_results(const unsigned int cycle) const
   {
     {
-      GridOut       grid_out;
-      std::ofstream output("grid-" + std::to_string(cycle) + ".vtu");
+      GridOut           grid_out;
+      const std::string filename = "grid-" + std::to_string(cycle) + ".vtu";
+      std::ofstream     output(filename);
       grid_out.write_vtu(triangulation, output);
+      std::cout << "   Grid written to " << filename << std::endl;
     }
 
     {
@@ -846,8 +834,10 @@ namespace Step9
       vtk_flags.compression_level = DataOutBase::CompressionLevel::best_speed;
       data_out.set_flags(vtk_flags);
 
-      std::ofstream output("solution-" + std::to_string(cycle) + ".vtu");
+      const std::string filename = "solution-" + std::to_string(cycle) + ".vtu";
+      std::ofstream     output(filename);
       data_out.write_vtu(output);
+      std::cout << "   Solution written to " << filename << std::endl;
     }
   }
 
@@ -934,7 +924,8 @@ namespace Step9
   // other function, but there is a bit of setup at the top.
   //
   // Before starting with the work, we check that the vector into
-  // which the results are written has the right size. Programming
+  // which the results are written has the right size, using the `Assert`
+  // macro and the exception class we declared above. Programming
   // mistakes in which one forgets to size arguments correctly at the
   // calling site are quite common. Because the resulting damage from
   // not catching such errors is often subtle (e.g., corruption of
@@ -1201,7 +1192,7 @@ namespace Step9
 
 // The <code>main</code> function is similar to the previous examples. The
 // primary difference is that we use MultithreadInfo to set the maximum
-// number of threads (see the documentation module @ref threads
+// number of threads (see the documentation topic @ref threads
 // "Parallel computing with multiple processors accessing shared memory"
 // for more information). The number of threads used is the minimum of the
 // environment variable DEAL_II_NUM_THREADS and the parameter of

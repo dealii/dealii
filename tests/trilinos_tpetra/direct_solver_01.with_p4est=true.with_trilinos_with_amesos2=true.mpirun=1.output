@@ -1,0 +1,10 @@
+
+DEAL:DirectKLU2::Norm of error in direct solve 1: 0
+DEAL:DirectKLU2::Norm of error in direct solve 2: 0
+DEAL:DirectMEASLES::Error: 
+    You tried to select the solver type <MEASLES>
+but this solver is not supported by Trilinos/Amesos2
+due to one of the following reasons:
+* This solver does not exist
+* This solver is not (yet) supported by Trilinos/Amesos2
+* Trilinos/Amesos2 was not configured for its use.

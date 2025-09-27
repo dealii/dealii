@@ -1,17 +1,16 @@
-//-----------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-//    Copyright (C) 2023 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2023 - 2024 by the deal.II authors
 //
-//    This file is part of the deal.II library.
+// This file is part of the deal.II library.
 //
-//    The deal.II library is free software; you can use it, redistribute
-//    it, and/or modify it under the terms of the GNU Lesser General
-//    Public License as published by the Free Software Foundation; either
-//    version 2.1 of the License, or (at your option) any later version.
-//    The full text of the license can be found in the file LICENSE.md at
-//    the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-//-----------------------------------------------------------
+// ------------------------------------------------------------------------
 
 #include <deal.II/base/parameter_handler.h>
 
@@ -171,26 +170,27 @@ public:
               << ')' << std::endl;
     };
 
-    // This callback is invoked after a successfull stage.
+    // This callback is invoked after a successful stage.
     // Here we only print that the callback is invoked.
-    time_stepper.distribute = [&](const real_type t, VectorType &) -> void {
+    time_stepper.update_constrained_components = [&](const real_type t,
+                                                     VectorType &) -> void {
       deallog << "Distribute at time " << t << std::endl;
     };
 
     // This callback is used to decide to remesh.
-    time_stepper.decide_for_coarsening_and_refinement =
+    time_stepper.decide_and_prepare_for_remeshing =
       [&](const real_type    t,
           const unsigned int step,
-          const VectorType &,
-          bool &resize) -> void {
+          const VectorType &) -> bool {
       deallog << "Prepare at time " << t << " and step " << step << std::endl;
-      resize = (step && step % 5 == 0);
+      return (step && step % 5 == 0);
     };
 
-    // This callback is called if decide_for_coarsening_and_refinement sets
-    // resize to true.
-    time_stepper.interpolate = [&](const std::vector<VectorType> &all_in,
-                                   std::vector<VectorType> &all_out) -> void {
+    // This callback is called if decide_and_prepare_for_remeshing returns true.
+    time_stepper.transfer_solution_vectors_to_new_mesh =
+      [&](const double /* t */,
+          const std::vector<VectorType> &all_in,
+          std::vector<VectorType>       &all_out) -> void {
       deallog << "Interpolate" << std::endl;
       for (auto &v : all_in)
         all_out.push_back(v);
@@ -233,13 +233,13 @@ main(int argc, char **argv)
 
   data.add_parameters(prm);
   deallog << "# Default Parameters" << std::endl;
-  prm.print_parameters(deallog.get_file_stream(), ParameterHandler::ShortText);
+  prm.print_parameters(deallog.get_file_stream(), ParameterHandler::ShortPRM);
 
   std::ifstream ifile(SOURCE_DIR "/petsc_ts_03_in.prm");
   prm.parse_input(ifile);
 
   deallog << "# Testing Parameters" << std::endl;
-  prm.print_parameters(deallog.get_file_stream(), ParameterHandler::ShortText);
+  prm.print_parameters(deallog.get_file_stream(), ParameterHandler::ShortPRM);
 
   for (int setjaci = 0; setjaci < 2; setjaci++)
     {

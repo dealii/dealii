@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2021 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2021 - 2024 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 
 // Test AffineConstraints::make_consistent_in_parallel().
@@ -31,7 +30,6 @@
 
 #include "../tests.h"
 
-using namespace dealii;
 
 /**
  * mpirun -np 4 ./constraints_01
@@ -63,7 +61,8 @@ void
 test(const DoFHandler<dim, spacedim> &dof_handler,
      const IndexSet                  &locally_relevant_dofs)
 {
-  AffineConstraints<double> constraints;
+  AffineConstraints<double> constraints(dof_handler.locally_owned_dofs(),
+                                        locally_relevant_dofs);
 
   std::vector<types::global_dof_index> dof_indices(
     dof_handler.get_fe().n_dofs_per_face());
@@ -75,7 +74,8 @@ test(const DoFHandler<dim, spacedim> &dof_handler,
         {
           cell->face(face)->get_dof_indices(dof_indices);
           for (const auto i : dof_indices)
-            constraints.add_line(i);
+            if (constraints.is_constrained(i) == false)
+              constraints.constrain_dof_to_zero(i);
         }
 
   const auto a = collect_lines(constraints, dof_handler.n_dofs());
@@ -83,7 +83,7 @@ test(const DoFHandler<dim, spacedim> &dof_handler,
 
   constraints.make_consistent_in_parallel(dof_handler.locally_owned_dofs(),
                                           locally_relevant_dofs,
-                                          dof_handler.get_communicator());
+                                          dof_handler.get_mpi_communicator());
 
   const auto b = collect_lines(constraints, dof_handler.n_dofs());
   b.print(deallog.get_file_stream());

@@ -1,0 +1,26 @@
+29c29
+< 
+---
+> #include "../example_test.h"
+523c523,527
+<     solver.solve(system_matrix, solution, system_rhs, precondition);
+---
+>     check_solver_within_range(std::cout,
+>                               solver.solve(system_matrix, solution, system_rhs, precondition),
+>                               reduction_control.last_step(),
+>                               3, 7);
+>  //   solver.solve(system_matrix, solution, system_rhs, precondition);
+526,529c530,533
+<     std::cout << "      Error: " << reduction_control.initial_value() << " -> "
+<               << reduction_control.last_value() << " in "
+<               << reduction_control.last_step() << " CG iterations."
+<               << std::endl;
+---
+> //    std::cout << "      Error: " << reduction_control.initial_value() << " -> "
+> //              << reduction_control.last_value() << " in "
+> //              << reduction_control.last_step() << " CG iterations."
+> //              << std::endl;
+588c592
+<     for (unsigned int iteration = 0; iteration <= solution.size(); ++iteration)
+---
+>     for (unsigned int iteration = 0; iteration <= 5; ++iteration)

@@ -1,17 +1,16 @@
-## ---------------------------------------------------------------------
+## ------------------------------------------------------------------------
 ##
-## Copyright (C) 2012 - 2023 by the deal.II authors
+## SPDX-License-Identifier: LGPL-2.1-or-later
+## Copyright (C) 2012 - 2025 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
-## The deal.II library is free software; you can use it, redistribute
-## it, and/or modify it under the terms of the GNU Lesser General
-## Public License as published by the Free Software Foundation; either
-## version 2.1 of the License, or (at your option) any later version.
-## The full text of the license can be found in the file LICENSE.md at
-## the top level directory of deal.II.
+## Part of the source code is dual licensed under Apache-2.0 WITH
+## LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+## governing the source code and code contributions can be found in
+## LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 ##
-## ---------------------------------------------------------------------
+## ------------------------------------------------------------------------
 
 #
 # Generate the source documentation via doxygen:
@@ -84,26 +83,20 @@ else()
 endif()
 
 
-# Collect where the build system will write the .inst files after
+# Note where the build system will write the .inst files after
 # expansion from the .inst.in files. We need this because we let
 # doxygen read the .cc files and they #include the .inst files.
 #
-# To get at this, find all of the .inst.in files, strip all but the
-# directory name under $CMAKE_SOURCE_DIR/source, and then prepend
-# the build directory to it
+# The .cc files #include the .inst files with the directory name
+# relative to the /source directory under the build directory, so the
+# correct include path is <build dir>/source
 #
-# See options.dox.in where ${_inst_in_dirs} is later added to INCLUDE_PATH.
-file(GLOB _inst_in_files
-     "${CMAKE_SOURCE_DIR}/source/*/*.inst.in")
-string(REPLACE "${CMAKE_SOURCE_DIR}/source/" "" _inst_in_dirs_x "${_inst_in_files}")
-string(REGEX REPLACE "/[a-zA-Z0-9_\\.]*.inst.in" "/" _inst_in_dirs_y "${_inst_in_dirs_x}")
-list(REMOVE_DUPLICATES _inst_in_dirs_y)
-set(_inst_in_dirs "")
-foreach (_dir ${_inst_in_dirs_y})
-  set(_inst_in_dirs "${_inst_in_dirs} ${CMAKE_BINARY_DIR}/source/${_dir}")
-endforeach()
+# This variable is used in options.dox.in where ${_inst_in_dir} is
+# added to INCLUDE_PATH.
+set(_inst_in_dir "${CMAKE_BINARY_DIR}/source/")
 
-message(STATUS "Additional doxygen include paths: ${_inst_in_dirs}")
+
+message(STATUS "Additional doxygen include path: ${_inst_in_dir}")
 
 # make sure doxygen sees the extra.sty stylefile:
 set(_extra_packages "${CMAKE_CURRENT_SOURCE_DIR}/extra")
@@ -113,6 +106,23 @@ set(_extra_packages "${CMAKE_CURRENT_SOURCE_DIR}/extra")
 configure_file(
   ${CMAKE_CURRENT_SOURCE_DIR}/options.dox.in
   ${CMAKE_CURRENT_BINARY_DIR}/options.dox
+  )
+
+#
+# Set up DoxygenLayout.xml. Note that the "Modules" tab has been renamed to
+# "Topics" in Doxygen 1.9.8 to avoid confusion with C++ modules.
+# Unfortunately, this requires us to play a little bit of a configuration
+# dance:
+#
+if(${DOXYGEN_VERSION} VERSION_LESS 1.9.8)
+  set(_topics_layout_flag "<tab type=\"modules\" visible=\"yes\" title=\"\" intro=\"\"/>")
+else()
+  set(_topics_layout_flag "<tab type=\"topics\" visible=\"yes\" title=\"\" intro=\"\"/>")
+endif()
+
+configure_file(
+  ${CMAKE_CURRENT_SOURCE_DIR}/DoxygenLayout.xml.in
+  ${CMAKE_CURRENT_BINARY_DIR}/DoxygenLayout.xml
   )
 
 # Figure out the last copyright date of any of the deal.II source
@@ -159,7 +169,8 @@ add_custom_command(
          ${CMAKE_CURRENT_BINARY_DIR}/footer.html
   COMMAND ${CMAKE_COMMAND} -E touch header.html
   COMMAND ${CMAKE_COMMAND} -E touch footer.html
-  COMMAND ${DOXYGEN_EXECUTABLE} -w html header.html footer.html style.css options.dox
+  COMMAND ${DOXYGEN_EXECUTABLE} -w html header.html footer.html
+                                   style.css options.dox
   COMMAND ${PERL_EXECUTABLE} -pi ${CMAKE_CURRENT_BINARY_DIR}/scripts/mod_header.pl header.html
   WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
   DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/options.dox
@@ -282,7 +293,7 @@ endif()
 # doxygen version 1.9.1 can not correctly parse C++20-style 'requires'
 # clauses and just drops certain classes and shows documentation for
 # DEAL_II_CXX20_REQUIRES instead. 1.9.7 gets this right, but has other
-# bugs. It's unclear for versions inbetween. Err on the safe side, and
+# bugs. It's unclear for versions in between. Err on the safe side, and
 # only make them visible to doxygen if we have at least 1.9.8.
 if(${DOXYGEN_VERSION} VERSION_LESS 1.9.8)
   message(STATUS "Suppressing 'requires' clause parsing because doxygen is too old")
@@ -320,7 +331,7 @@ add_custom_command(
     ${CMAKE_CURRENT_BINARY_DIR}/options.dox
     ${CMAKE_CURRENT_BINARY_DIR}/header.html
     ${CMAKE_CURRENT_BINARY_DIR}/footer.html
-    ${CMAKE_CURRENT_SOURCE_DIR}/DoxygenLayout.xml
+    ${CMAKE_CURRENT_BINARY_DIR}/DoxygenLayout.xml
     ${CMAKE_CURRENT_SOURCE_DIR}/scripts/filter.pl
     ${_doxygen_depend}
     expand_all_instantiations

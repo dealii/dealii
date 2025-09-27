@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2014 - 2022 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2014 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 
 #include <deal.II/base/config.h>
@@ -64,7 +63,7 @@ namespace OpenCASCADE
         return Handle(BRepAdaptor_Curve)(
           new BRepAdaptor_Curve(TopoDS::Edge(shape)));
 
-      Assert(false, ExcInternalError());
+      DEAL_II_ASSERT_UNREACHABLE();
       return Handle(BRepAdaptor_Curve)(new BRepAdaptor_Curve());
     }
 #  else
@@ -81,7 +80,7 @@ namespace OpenCASCADE
         return Handle(BRepAdaptor_HCurve)(
           new BRepAdaptor_HCurve(TopoDS::Edge(shape)));
 
-      Assert(false, ExcInternalError());
+      DEAL_II_ASSERT_UNREACHABLE();
       return Handle(BRepAdaptor_HCurve)(new BRepAdaptor_HCurve());
     }
 #  endif
@@ -132,13 +131,15 @@ namespace OpenCASCADE
     const Point<spacedim>                  &candidate) const
   {
     (void)surrounding_points;
-#  ifdef DEBUG
-    for (unsigned int i = 0; i < surrounding_points.size(); ++i)
-      Assert(closest_point(sh, surrounding_points[i], tolerance)
-                 .distance(surrounding_points[i]) <
-               std::max(tolerance * surrounding_points[i].norm(), tolerance),
-             ExcPointNotOnManifold<spacedim>(surrounding_points[i]));
-#  endif
+    if constexpr (running_in_debug_mode())
+      {
+        for (unsigned int i = 0; i < surrounding_points.size(); ++i)
+          Assert(closest_point(sh, surrounding_points[i], tolerance)
+                     .distance(surrounding_points[i]) <
+                   std::max(tolerance * surrounding_points[i].norm(),
+                            tolerance),
+                 ExcPointNotOnManifold<spacedim>(surrounding_points[i]));
+      }
     return closest_point(sh, candidate, tolerance);
   }
 
@@ -175,13 +176,15 @@ namespace OpenCASCADE
     const Point<spacedim>                  &candidate) const
   {
     (void)surrounding_points;
-#  ifdef DEBUG
-    for (unsigned int i = 0; i < surrounding_points.size(); ++i)
-      Assert(closest_point(sh, surrounding_points[i], tolerance)
-                 .distance(surrounding_points[i]) <
-               std::max(tolerance * surrounding_points[i].norm(), tolerance),
-             ExcPointNotOnManifold<spacedim>(surrounding_points[i]));
-#  endif
+    if constexpr (running_in_debug_mode())
+      {
+        for (unsigned int i = 0; i < surrounding_points.size(); ++i)
+          Assert(closest_point(sh, surrounding_points[i], tolerance)
+                     .distance(surrounding_points[i]) <
+                   std::max(tolerance * surrounding_points[i].norm(),
+                            tolerance),
+                 ExcPointNotOnManifold<spacedim>(surrounding_points[i]));
+      }
     return line_intersection(sh, candidate, direction, tolerance);
   }
 
@@ -220,7 +223,7 @@ namespace OpenCASCADE
                                  const ArrayView<const Point<spacedim>> &,
                                  const Point<spacedim> &)
     {
-      Assert(false, ExcNotImplemented());
+      DEAL_II_NOT_IMPLEMENTED();
       return {};
     }
 
@@ -235,14 +238,15 @@ namespace OpenCASCADE
       constexpr int       spacedim = 3;
       TopoDS_Shape        out_shape;
       Tensor<1, spacedim> average_normal;
-#  ifdef DEBUG
-      for (const auto &point : surrounding_points)
+      if constexpr (running_in_debug_mode())
         {
-          Assert(closest_point(sh, point, tolerance).distance(point) <
-                   std::max(tolerance * point.norm(), tolerance),
-                 ExcPointNotOnManifold<spacedim>(point));
+          for (const auto &point : surrounding_points)
+            {
+              Assert(closest_point(sh, point, tolerance).distance(point) <
+                       std::max(tolerance * point.norm(), tolerance),
+                     ExcPointNotOnManifold<spacedim>(point));
+            }
         }
-#  endif
 
       switch (surrounding_points.size())
         {
@@ -565,8 +569,13 @@ namespace OpenCASCADE
     return std::make_tuple(umin, umax, vmin, vmax);
   }
 
-// Explicit instantiations
-#  include "manifold_lib.inst"
+// We don't build the .inst file if deal.II isn't configured
+// with GMSH, but doxygen doesn't know that and tries to find that
+// file anyway for parsing -- which then of course it fails on. So
+// exclude the following from doxygen consideration.
+#  ifndef DOXYGEN
+#    include "opencascade/manifold_lib.inst"
+#  endif
 } // end namespace OpenCASCADE
 
 DEAL_II_NAMESPACE_CLOSE

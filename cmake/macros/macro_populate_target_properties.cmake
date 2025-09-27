@@ -1,22 +1,21 @@
-## ---------------------------------------------------------------------
+## ------------------------------------------------------------------------
 ##
-## Copyright (C) 2022 - 2023 by the deal.II authors
+## SPDX-License-Identifier: LGPL-2.1-or-later
+## Copyright (C) 2023 - 2025 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
-## The deal.II library is free software; you can use it, redistribute
-## it, and/or modify it under the terms of the GNU Lesser General
-## Public License as published by the Free Software Foundation; either
-## version 2.1 of the License, or (at your option) any later version.
-## The full text of the license can be found in the file LICENSE.md at
-## the top level directory of deal.II.
+## Part of the source code is dual licensed under Apache-2.0 WITH
+## LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+## governing the source code and code contributions can be found in
+## LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 ##
-## ---------------------------------------------------------------------
+## ------------------------------------------------------------------------
 
 #
 # populate_target_properties(<target> <build>)
 #
-# This function populate target properties according to (globally) defined
+# This function populates target properties according to (globally) defined
 # DEAL_II_* variables. Specifically:
 #
 #   DEAL_II_LIBRARIES DEAL_II_LIBRARIES_<build>
@@ -59,13 +58,14 @@ function(populate_target_properties _target _build)
   # Build-directory specific includes:
 
   target_include_directories(${_target} PRIVATE
-    ${CMAKE_BINARY_DIR}/include
-    ${CMAKE_SOURCE_DIR}/include
+    ${CMAKE_BINARY_DIR}/include   # e.g., deal.II/base/config.h that has been placed into the binary dir
+    ${CMAKE_BINARY_DIR}/source    # all of the .inst files that have been placed into the binary dir
+    ${CMAKE_SOURCE_DIR}/include   # all unprocessed header files
     )
 
   #
   # Do not add bundled include directories to bundled_ targets. First of
-  # all this is unnecessary, secondly, this severly trips up ICC-19 that
+  # all this is unnecessary, secondly, this severely trips up ICC-19 that
   # cannot handle the additional -isystem include properly...
   #
   if(NOT "${_target}" MATCHES "^bundled_")
@@ -127,4 +127,13 @@ function(populate_target_properties _target _build)
     ${DEAL_II_LIBRARIES} ${DEAL_II_LIBRARIES_${_build}}
     ${DEAL_II_TARGETS} ${DEAL_II_TARGETS_${_build}}
     )
+
+
+   # For release builds (and their corresponding object files),
+   # use interprocedural optimizations if possible
+   if (DEAL_II_USE_LTO AND ("${_build}" STREQUAL "RELEASE"))
+     set_property(TARGET ${_target}
+                  PROPERTY INTERPROCEDURAL_OPTIMIZATION TRUE)
+   endif()
+
 endfunction()

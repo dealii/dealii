@@ -1,21 +1,21 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2001 - 2023 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2018 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 #include <deal.II/base/geometry_info.h>
 #include <deal.II/base/point.h>
 #include <deal.II/base/tensor.h>
+#include <deal.II/base/types.h>
 
 #include <deal.II/distributed/fully_distributed_tria.h>
 #include <deal.II/distributed/shared_tria.h>
@@ -43,6 +43,7 @@
 #include <list>
 #include <map>
 #include <numeric>
+#include <optional>
 #include <set>
 #include <vector>
 
@@ -270,23 +271,26 @@ namespace GridTools
               // (possibly) coarser neighbor. if this is the case,
               // then we need to also add this neighbor
               if (dim >= 2)
-                for (const auto face :
-                     cell->reference_cell().faces_for_given_vertex(v))
-                  if (!cell->at_boundary(face) &&
-                      cell->neighbor(face)->is_active())
-                    {
-                      // there is a (possibly) coarser cell behind a
-                      // face to which the vertex belongs. the
-                      // vertex we are looking at is then either a
-                      // vertex of that coarser neighbor, or it is a
-                      // hanging node on one of the faces of that
-                      // cell. in either case, it is adjacent to the
-                      // vertex, so add it to the list as well (if
-                      // the cell was already in the list then the
-                      // std::set makes sure that we get it only
-                      // once)
-                      adjacent_cells.insert(cell->neighbor(face));
-                    }
+                {
+                  const auto reference_cell = cell->reference_cell();
+                  for (const auto face :
+                       reference_cell.faces_for_given_vertex(v))
+                    if (!cell->at_boundary(face) &&
+                        cell->neighbor(face)->is_active())
+                      {
+                        // there is a (possibly) coarser cell behind a
+                        // face to which the vertex belongs. the
+                        // vertex we are looking at is then either a
+                        // vertex of that coarser neighbor, or it is a
+                        // hanging node on one of the faces of that
+                        // cell. in either case, it is adjacent to the
+                        // vertex, so add it to the list as well (if
+                        // the cell was already in the list then the
+                        // std::set makes sure that we get it only
+                        // once)
+                        adjacent_cells.insert(cell->neighbor(face));
+                      }
+                }
 
               // in any case, we have found a cell, so go to the next cell
               goto next_cell;
@@ -710,7 +714,7 @@ namespace GridTools
                     vertex_indices[count_vertex_indices].first = d;
                     vertex_indices[count_vertex_indices].second =
                       unit_point[d] > 0.5 ? 1 : 0;
-                    count_vertex_indices++;
+                    ++count_vertex_indices;
                   }
                 else
                   free_direction = d;
@@ -823,13 +827,24 @@ namespace GridTools
     std::vector<bool> locally_active_vertices_on_subdomain(
       mesh.get_triangulation().n_vertices(), false);
 
+    std::map<unsigned int, std::vector<unsigned int>> coinciding_vertex_groups;
+    std::map<unsigned int, unsigned int> vertex_to_coinciding_vertex_group;
+    GridTools::collect_coinciding_vertices(mesh.get_triangulation(),
+                                           coinciding_vertex_groups,
+                                           vertex_to_coinciding_vertex_group);
+
     // Find the cells for which the predicate is true
     // These are the cells around which we wish to construct
     // the halo layer
     for (const auto &cell : mesh.active_cell_iterators())
       if (predicate(cell)) // True predicate --> Part of subdomain
         for (const auto v : cell->vertex_indices())
-          locally_active_vertices_on_subdomain[cell->vertex_index(v)] = true;
+          {
+            locally_active_vertices_on_subdomain[cell->vertex_index(v)] = true;
+            for (const auto vv : coinciding_vertex_groups
+                   [vertex_to_coinciding_vertex_group[cell->vertex_index(v)]])
+              locally_active_vertices_on_subdomain[vv] = true;
+          }
 
     // Find the cells that do not conform to the predicate
     // but share a vertex with the selected subdomain
@@ -984,7 +999,7 @@ namespace GridTools
         {
           for (const unsigned int v : cell->vertex_indices())
             vertices_outside_subdomain[cell->vertex_index(v)] = true;
-          n_non_predicate_cells++;
+          ++n_non_predicate_cells;
         }
 
     // If all the active cells conform to the predicate
@@ -2112,37 +2127,37 @@ namespace GridTools
     std::vector<PeriodicFacePair<CellIterator>> &matched_pairs,
     const dealii::Tensor<1, CellIterator::AccessorType::space_dimension>
                              &offset,
-    const FullMatrix<double> &matrix)
+    const FullMatrix<double> &matrix,
+    const double              abs_tol = 1e-10)
   {
     static const int space_dim = CellIterator::AccessorType::space_dimension;
-    (void)space_dim;
     AssertIndexRange(direction, space_dim);
 
-#ifdef DEBUG
-    {
-      constexpr int dim      = CellIterator::AccessorType::dimension;
-      constexpr int spacedim = CellIterator::AccessorType::space_dimension;
-      // For parallel::fullydistributed::Triangulation there might be unmatched
-      // faces on periodic boundaries on the coarse grid, which results that
-      // this assert is not fulfilled (not a bug!). See also the discussion in
-      // the method collect_periodic_faces.
-      if (!(((pairs1.size() > 0) &&
-             (dynamic_cast<const parallel::fullydistributed::
-                             Triangulation<dim, spacedim> *>(
-                &pairs1.begin()->first->get_triangulation()) != nullptr)) ||
-            ((pairs2.size() > 0) &&
-             (dynamic_cast<
-                const parallel::fullydistributed::Triangulation<dim, spacedim>
-                  *>(&pairs2.begin()->first->get_triangulation()) != nullptr))))
-        Assert(pairs1.size() == pairs2.size(),
-               ExcMessage("Unmatched faces on periodic boundaries"));
-    }
-#endif
+    if constexpr (running_in_debug_mode())
+      {
+        {
+          constexpr int dim      = CellIterator::AccessorType::dimension;
+          constexpr int spacedim = CellIterator::AccessorType::space_dimension;
+          // For parallel::fullydistributed::Triangulation there might be
+          // unmatched faces on periodic boundaries on the coarse grid. As a
+          // result this assert is not fulfilled (which is not a bug!). See also
+          // the discussion in the method collect_periodic_faces.
+          if (!(((pairs1.size() > 0) &&
+                 (dynamic_cast<const parallel::fullydistributed::
+                                 Triangulation<dim, spacedim> *>(
+                    &pairs1.begin()->first->get_triangulation()) != nullptr)) ||
+                ((pairs2.size() > 0) &&
+                 (dynamic_cast<const parallel::fullydistributed::
+                                 Triangulation<dim, spacedim> *>(
+                    &pairs2.begin()->first->get_triangulation()) != nullptr))))
+            Assert(pairs1.size() == pairs2.size(),
+                   ExcMessage("Unmatched faces on periodic boundaries"));
+        }
+      }
 
     unsigned int n_matches = 0;
 
     // Match with a complexity of O(n^2). This could be improved...
-    std::bitset<3> orientation;
     using PairIterator =
       typename std::set<std::pair<CellIterator, unsigned int>>::const_iterator;
     for (PairIterator it1 = pairs1.begin(); it1 != pairs1.end(); ++it1)
@@ -2153,18 +2168,22 @@ namespace GridTools
             const CellIterator cell2     = it2->first;
             const unsigned int face_idx1 = it1->second;
             const unsigned int face_idx2 = it2->second;
-            if (GridTools::orthogonal_equality(orientation,
-                                               cell1->face(face_idx1),
-                                               cell2->face(face_idx2),
-                                               direction,
-                                               offset,
-                                               matrix))
+            if (const std::optional<types::geometric_orientation> orientation =
+                  GridTools::orthogonal_equality(cell1->face(face_idx1),
+                                                 cell2->face(face_idx2),
+                                                 direction,
+                                                 offset,
+                                                 matrix,
+                                                 abs_tol))
               {
                 // We have a match, so insert the matching pairs and
                 // remove the matched cell in pairs2 to speed up the
                 // matching:
                 const PeriodicFacePair<CellIterator> matched_face = {
-                  {cell1, cell2}, {face_idx1, face_idx2}, orientation, matrix};
+                  {cell1, cell2},
+                  {face_idx1, face_idx2},
+                  orientation.value(),
+                  matrix};
                 matched_pairs.push_back(matched_face);
                 pairs2.erase(it2);
                 ++n_matches;
@@ -2173,11 +2192,11 @@ namespace GridTools
           }
       }
 
-    // Assure that all faces are matched if not
-    // parallel::fullydistributed::Triangulation is used. This is related to the
-    // fact that the faces might not be successfully matched on the coarse grid
-    // (not a bug!). See also the comment above and in the
-    // method collect_periodic_faces.
+    // Assure that all faces are matched if
+    // parallel::fullydistributed::Triangulation is not used. This is related to
+    // the fact that the faces might not be successfully matched on the coarse
+    // grid (not a bug!). See also the comment above and in the method
+    // collect_periodic_faces.
     {
       constexpr int dim      = CellIterator::AccessorType::dimension;
       constexpr int spacedim = CellIterator::AccessorType::space_dimension;
@@ -2205,14 +2224,12 @@ namespace GridTools
     std::vector<PeriodicFacePair<typename MeshType::cell_iterator>>
                                                &matched_pairs,
     const Tensor<1, MeshType::space_dimension> &offset,
-    const FullMatrix<double>                   &matrix)
+    const FullMatrix<double>                   &matrix,
+    const double                                abs_tol)
   {
     static const int dim       = MeshType::dimension;
     static const int space_dim = MeshType::space_dimension;
-    (void)dim;
-    (void)space_dim;
     AssertIndexRange(direction, space_dim);
-
     Assert(dim == space_dim, ExcNotImplemented());
 
     // Loop over all cells on the highest level and collect all boundary
@@ -2253,26 +2270,26 @@ namespace GridTools
                       "Are you sure that you've selected the correct boundary "
                       "id's and that the coarsest level mesh is colorized?"));
 
-#ifdef DEBUG
-    const unsigned int size_old = matched_pairs.size();
-#endif
+    [[maybe_unused]] const unsigned int size_old = matched_pairs.size();
 
     // and call match_periodic_face_pairs that does the actual matching:
     match_periodic_face_pairs(
-      pairs1, pairs2, direction, matched_pairs, offset, matrix);
+      pairs1, pairs2, direction, matched_pairs, offset, matrix, abs_tol);
 
-#ifdef DEBUG
-    // check for standard orientation
-    const unsigned int size_new = matched_pairs.size();
-    for (unsigned int i = size_old; i < size_new; ++i)
+    if constexpr (running_in_debug_mode())
       {
-        Assert(matched_pairs[i].orientation == 1,
-               ExcMessage(
-                 "Found a face match with non standard orientation. "
-                 "This function is only suitable for meshes with cells "
-                 "in default orientation"));
+        // check for standard orientation
+        const unsigned int size_new = matched_pairs.size();
+        for (unsigned int i = size_old; i < size_new; ++i)
+          {
+            Assert(matched_pairs[i].orientation ==
+                     numbers::default_geometric_orientation,
+                   ExcMessage(
+                     "Found a face match with non standard orientation. "
+                     "This function is only suitable for meshes with cells "
+                     "in default orientation"));
+          }
       }
-#endif
   }
 
 
@@ -2287,12 +2304,11 @@ namespace GridTools
     std::vector<PeriodicFacePair<typename MeshType::cell_iterator>>
                                                &matched_pairs,
     const Tensor<1, MeshType::space_dimension> &offset,
-    const FullMatrix<double>                   &matrix)
+    const FullMatrix<double>                   &matrix,
+    const double                                abs_tol)
   {
     static const int dim       = MeshType::dimension;
     static const int space_dim = MeshType::space_dimension;
-    (void)dim;
-    (void)space_dim;
     AssertIndexRange(direction, space_dim);
 
     // Loop over all cells on the highest level and collect all boundary
@@ -2324,10 +2340,10 @@ namespace GridTools
           }
       }
 
-    // Assure that all faces are matched on the coare grid. This requirement
+    // Assure that all faces are matched on the coarse grid. This requirement
     // can only fulfilled if a process owns the complete coarse grid. This is
-    // not the case for a parallel::fullydistributed::Triangulation, i.e. this
-    // requirement has not to be met neither (consider faces on the outside of a
+    // not the case for a parallel::fullydistributed::Triangulation, i.e., this
+    // requirement has not to be met (consider faces on the outside of a
     // ghost cell that are periodic but for which the ghost neighbor doesn't
     // exist).
     if (!(((pairs1.size() > 0) &&
@@ -2352,7 +2368,7 @@ namespace GridTools
 
     // and call match_periodic_face_pairs that does the actual matching:
     match_periodic_face_pairs(
-      pairs1, pairs2, direction, matched_pairs, offset, matrix);
+      pairs1, pairs2, direction, matched_pairs, offset, matrix, abs_tol);
   }
 
 
@@ -2372,7 +2388,8 @@ namespace GridTools
                       const Point<spacedim>     &point2,
                       const unsigned int         direction,
                       const Tensor<1, spacedim> &offset,
-                      const FullMatrix<double>  &matrix)
+                      const FullMatrix<double>  &matrix,
+                      const double               abs_tol = 1e-10)
   {
     AssertIndexRange(direction, spacedim);
 
@@ -2383,7 +2400,7 @@ namespace GridTools
     if (matrix.m() == spacedim)
       for (unsigned int i = 0; i < spacedim; ++i)
         for (unsigned int j = 0; j < spacedim; ++j)
-          distance(i) += matrix(i, j) * point1(j);
+          distance[i] += matrix(i, j) * point1[j];
     else
       distance = point1;
 
@@ -2395,7 +2412,7 @@ namespace GridTools
         if (i == direction)
           continue;
 
-        if (std::abs(distance(i)) > 1.e-10)
+        if (std::abs(distance[i]) > abs_tol)
           return false;
       }
 
@@ -2403,179 +2420,85 @@ namespace GridTools
   }
 
 
-  /*
-   * Internally used in orthogonal_equality
-   *
-   * A lookup table to transform vertex matchings to orientation flags of
-   * the form (face_orientation, face_flip, face_rotation)
-   *
-   * See the comment on the next function as well as the detailed
-   * documentation of make_periodicity_constraints and
-   * collect_periodic_faces for details
-   */
-  template <int dim>
-  struct OrientationLookupTable
-  {};
-
-  template <>
-  struct OrientationLookupTable<1>
-  {
-    using MATCH_T =
-      std::array<unsigned int, GeometryInfo<1>::vertices_per_face>;
-    static inline std::bitset<3>
-    lookup(const MATCH_T &)
-    {
-      // The 1d case is trivial
-      return 1; // [true ,false,false]
-    }
-  };
-
-  template <>
-  struct OrientationLookupTable<2>
-  {
-    using MATCH_T =
-      std::array<unsigned int, GeometryInfo<2>::vertices_per_face>;
-    static inline std::bitset<3>
-    lookup(const MATCH_T &matching)
-    {
-      // In 2d matching faces (=lines) results in two cases: Either
-      // they are aligned or flipped. We store this "line_flip"
-      // property somewhat sloppy as "face_flip"
-      // (always: face_orientation = true, face_rotation = false)
-
-      static const MATCH_T m_tff = {{0, 1}};
-      if (matching == m_tff)
-        return 1; // [true ,false,false]
-      static const MATCH_T m_ttf = {{1, 0}};
-      if (matching == m_ttf)
-        return 3; // [true ,true ,false]
-      Assert(false, ExcInternalError());
-      // what follows is dead code, but it avoids warnings about the lack
-      // of a return value
-      return 0;
-    }
-  };
-
-  template <>
-  struct OrientationLookupTable<3>
-  {
-    using MATCH_T =
-      std::array<unsigned int, GeometryInfo<3>::vertices_per_face>;
-
-    static inline std::bitset<3>
-    lookup(const MATCH_T &matching)
-    {
-      // The full fledged 3d case. *Yay*
-      // See the documentation in include/deal.II/base/geometry_info.h
-      // as well as the actual implementation in source/grid/tria.cc
-      // for more details...
-
-      static const MATCH_T m_tff = {{0, 1, 2, 3}};
-      if (matching == m_tff)
-        return 1; // [true ,false,false]
-      static const MATCH_T m_tft = {{1, 3, 0, 2}};
-      if (matching == m_tft)
-        return 5; // [true ,false,true ]
-      static const MATCH_T m_ttf = {{3, 2, 1, 0}};
-      if (matching == m_ttf)
-        return 3; // [true ,true ,false]
-      static const MATCH_T m_ttt = {{2, 0, 3, 1}};
-      if (matching == m_ttt)
-        return 7; // [true ,true ,true ]
-      static const MATCH_T m_fff = {{0, 2, 1, 3}};
-      if (matching == m_fff)
-        return 0; // [false,false,false]
-      static const MATCH_T m_fft = {{2, 3, 0, 1}};
-      if (matching == m_fft)
-        return 4; // [false,false,true ]
-      static const MATCH_T m_ftf = {{3, 1, 2, 0}};
-      if (matching == m_ftf)
-        return 2; // [false,true ,false]
-      static const MATCH_T m_ftt = {{1, 0, 3, 2}};
-      if (matching == m_ftt)
-        return 6; // [false,true ,true ]
-      Assert(false, ExcInternalError());
-      // what follows is dead code, but it avoids warnings about the lack
-      // of a return value
-      return 0;
-    }
-  };
-
-
 
   template <typename FaceIterator>
-  inline bool
+  std::optional<types::geometric_orientation>
   orthogonal_equality(
-    std::bitset<3>                                               &orientation,
     const FaceIterator                                           &face1,
     const FaceIterator                                           &face2,
     const unsigned int                                            direction,
     const Tensor<1, FaceIterator::AccessorType::space_dimension> &offset,
-    const FullMatrix<double>                                     &matrix)
+    const FullMatrix<double>                                     &matrix,
+    const double                                                  abs_tol)
   {
     Assert(matrix.m() == matrix.n(),
            ExcMessage("The supplied matrix must be a square matrix"));
-
-    static const int dim = FaceIterator::AccessorType::dimension;
+    Assert(face1->reference_cell() == face2->reference_cell(),
+           ExcMessage(
+             "The faces to be matched must have the same reference cell."));
 
     // Do a full matching of the face vertices:
-
-    std::array<unsigned int, GeometryInfo<dim>::vertices_per_face> matching;
-
     AssertDimension(face1->n_vertices(), face2->n_vertices());
 
-    std::set<unsigned int> face2_vertices;
+    std::vector<unsigned int> face1_vertices(face1->n_vertices(),
+                                             numbers::invalid_unsigned_int),
+      face2_vertices(face2->n_vertices(), numbers::invalid_unsigned_int);
+
+    std::set<unsigned int> face2_vertices_set;
     for (unsigned int i = 0; i < face1->n_vertices(); ++i)
-      face2_vertices.insert(i);
+      face2_vertices_set.insert(i);
 
     for (unsigned int i = 0; i < face1->n_vertices(); ++i)
       {
-        for (std::set<unsigned int>::iterator it = face2_vertices.begin();
-             it != face2_vertices.end();
+        for (auto it = face2_vertices_set.begin();
+             it != face2_vertices_set.end();
              ++it)
           {
             if (orthogonal_equality(face1->vertex(i),
                                     face2->vertex(*it),
                                     direction,
                                     offset,
-                                    matrix))
+                                    matrix,
+                                    abs_tol))
               {
-                matching[i] = *it;
-                face2_vertices.erase(it);
+                face1_vertices[i] = *it;
+                face2_vertices[i] = i;
+                face2_vertices_set.erase(it);
                 break; // jump out of the innermost loop
               }
           }
       }
 
-    // And finally, a lookup to determine the ordering bitmask:
-    if (face2_vertices.empty())
-      orientation = OrientationLookupTable<dim>::lookup(matching);
+    if (face2_vertices_set.empty())
+      {
+        // Just to be sure, did we fill both arrays with sensible data?
+        Assert(face1_vertices.end() ==
+                 std::find(face1_vertices.begin(),
+                           face1_vertices.begin() + face1->n_vertices(),
+                           numbers::invalid_unsigned_int),
+               ExcInternalError());
+        Assert(face2_vertices.end() ==
+                 std::find(face2_vertices.begin(),
+                           face2_vertices.begin() + face1->n_vertices(),
+                           numbers::invalid_unsigned_int),
+               ExcInternalError());
 
-    return face2_vertices.empty();
+        const auto reference_cell = face1->reference_cell();
+        // We want the relative orientation of face1 with respect to face2 so
+        // the order is flipped here:
+        return std::make_optional(reference_cell.get_combined_orientation(
+          make_array_view(face2_vertices.cbegin(),
+                          face2_vertices.cbegin() + face2->n_vertices()),
+          make_array_view(face1_vertices.cbegin(),
+                          face1_vertices.cbegin() + face1->n_vertices())));
+      }
+    else
+      return std::nullopt;
   }
-
-
-
-  template <typename FaceIterator>
-  inline bool
-  orthogonal_equality(
-    const FaceIterator                                           &face1,
-    const FaceIterator                                           &face2,
-    const unsigned int                                            direction,
-    const Tensor<1, FaceIterator::AccessorType::space_dimension> &offset,
-    const FullMatrix<double>                                     &matrix)
-  {
-    // Call the function above with a dummy orientation array
-    std::bitset<3> dummy;
-    return orthogonal_equality(dummy, face1, face2, direction, offset, matrix);
-  }
-
-
-
 } // namespace GridTools
 
 
-#include "grid_tools_dof_handlers.inst"
+#include "grid/grid_tools_dof_handlers.inst"
 
 
 DEAL_II_NAMESPACE_CLOSE

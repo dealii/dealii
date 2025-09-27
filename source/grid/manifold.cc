@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2023 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2014 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 #include <deal.II/base/table.h>
 #include <deal.II/base/tensor.h>
@@ -27,13 +26,18 @@
 
 #include <boost/container/small_vector.hpp>
 
+#include <algorithm>
 #include <cmath>
 #include <limits>
 #include <memory>
+#include <numeric>
+
 
 DEAL_II_NAMESPACE_OPEN
 
 /* -------------------------- Manifold --------------------- */
+#ifndef DOXYGEN
+
 template <int dim, int spacedim>
 Point<spacedim>
 Manifold<dim, spacedim>::project_to_manifold(
@@ -53,8 +57,7 @@ Manifold<dim, spacedim>::get_intermediate_point(const Point<spacedim> &p1,
                                                 const double           w) const
 {
   const std::array<Point<spacedim>, 2> vertices{{p1, p2}};
-  return project_to_manifold(make_array_view(vertices.begin(), vertices.end()),
-                             w * p2 + (1 - w) * p1);
+  return project_to_manifold(make_array_view(vertices), w * p2 + (1 - w) * p1);
 }
 
 
@@ -90,9 +93,10 @@ Manifold<dim, spacedim>::get_new_point(
             });
 
   // Now loop over points in the order of their associated weight
+  DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
   Point<spacedim> p = surrounding_points[permutation[0]];
-  double          w = weights[permutation[0]];
-
+  DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
+  double w = weights[permutation[0]];
   for (unsigned int i = 1; i < n_points; ++i)
     {
       double weight = 0.0;
@@ -131,9 +135,7 @@ Manifold<dim, spacedim>::get_new_points(
   for (unsigned int row = 0; row < weights.size(0); ++row)
     {
       new_points[row] =
-        get_new_point(make_array_view(surrounding_points.begin(),
-                                      surrounding_points.end()),
-                      make_array_view(weights, row));
+        get_new_point(surrounding_points, make_array_view(weights, row));
     }
 }
 
@@ -173,8 +175,8 @@ Manifold<3, 3>::normal_vector(const Triangulation<3, 3>::face_iterator &face,
                                          vertices[1].distance(p),
                                          vertices[2].distance(p),
                                          vertices[3].distance(p)}};
-  const double max_distance = std::max(std::max(distances[0], distances[1]),
-                                       std::max(distances[2], distances[3]));
+  const double                max_distance =
+    std::max({distances[0], distances[1], distances[2], distances[3]});
 
   // We need to find two tangential vectors to the given point p, but we do
   // not know how the point is oriented against the face. We guess the two
@@ -354,10 +356,8 @@ Manifold<dim, spacedim>::get_new_point_on_line(
   const typename Triangulation<dim, spacedim>::line_iterator &line) const
 {
   const auto points_weights = Manifolds::get_default_points_and_weights(line);
-  return get_new_point(make_array_view(points_weights.first.begin(),
-                                       points_weights.first.end()),
-                       make_array_view(points_weights.second.begin(),
-                                       points_weights.second.end()));
+  return get_new_point(make_array_view(points_weights.first),
+                       make_array_view(points_weights.second));
 }
 
 
@@ -368,10 +368,8 @@ Manifold<dim, spacedim>::get_new_point_on_quad(
   const typename Triangulation<dim, spacedim>::quad_iterator &quad) const
 {
   const auto points_weights = Manifolds::get_default_points_and_weights(quad);
-  return get_new_point(make_array_view(points_weights.first.begin(),
-                                       points_weights.first.end()),
-                       make_array_view(points_weights.second.begin(),
-                                       points_weights.second.end()));
+  return get_new_point(make_array_view(points_weights.first),
+                       make_array_view(points_weights.second));
 }
 
 
@@ -500,10 +498,8 @@ Manifold<3, 3>::get_new_point_on_hex(
 {
   const auto points_weights =
     Manifolds::get_default_points_and_weights(hex, true);
-  return get_new_point(make_array_view(points_weights.first.begin(),
-                                       points_weights.first.end()),
-                       make_array_view(points_weights.second.begin(),
-                                       points_weights.second.end()));
+  return get_new_point(make_array_view(points_weights.first),
+                       make_array_view(points_weights.second));
 }
 
 
@@ -518,11 +514,10 @@ Manifold<dim, spacedim>::get_tangent_vector(const Point<spacedim> &x1,
   const std::array<Point<spacedim>, 2> points{{x1, x2}};
   const std::array<double, 2>          weights{{epsilon, 1.0 - epsilon}};
   const Point<spacedim>                neighbor_point =
-    get_new_point(make_array_view(points.begin(), points.end()),
-                  make_array_view(weights.begin(), weights.end()));
+    get_new_point(make_array_view(points), make_array_view(weights));
   return (neighbor_point - x1) / epsilon;
 }
-
+#endif
 /* -------------------------- FlatManifold --------------------- */
 
 namespace internal
@@ -535,7 +530,7 @@ namespace internal
       // we get here from FlatManifold<2,3>::normal_vector, but
       // the implementation below is bogus for this case anyway
       // (see the assert at the beginning of that function).
-      Assert(false, ExcNotImplemented());
+      DEAL_II_NOT_IMPLEMENTED();
       return {};
     }
 
@@ -550,6 +545,8 @@ namespace internal
 
   } // namespace
 } // namespace internal
+
+#ifndef DOXYGEN
 
 template <int dim, int spacedim>
 FlatManifold<dim, spacedim>::FlatManifold(
@@ -771,7 +768,7 @@ FlatManifold<1, 2>::get_normals_at_vertices(
   const Triangulation<1, 2>::face_iterator &,
   Manifold<1, 2>::FaceVertexNormals &) const
 {
-  Assert(false, ExcNotImplemented());
+  DEAL_II_NOT_IMPLEMENTED();
 }
 
 
@@ -782,7 +779,7 @@ FlatManifold<1, 3>::get_normals_at_vertices(
   const Triangulation<1, 3>::face_iterator &,
   Manifold<1, 3>::FaceVertexNormals &) const
 {
-  Assert(false, ExcNotImplemented());
+  DEAL_II_NOT_IMPLEMENTED();
 }
 
 
@@ -808,7 +805,7 @@ FlatManifold<2, 3>::get_normals_at_vertices(
   const Triangulation<2, 3>::face_iterator & /*face*/,
   Manifold<2, 3>::FaceVertexNormals & /*face_vertex_normals*/) const
 {
-  Assert(false, ExcNotImplemented());
+  DEAL_II_NOT_IMPLEMENTED();
 }
 
 
@@ -819,24 +816,30 @@ FlatManifold<3>::get_normals_at_vertices(
   const Triangulation<3>::face_iterator &face,
   Manifold<3, 3>::FaceVertexNormals     &face_vertex_normals) const
 {
-  const unsigned int vertices_per_face = GeometryInfo<3>::vertices_per_face;
-
-  static const unsigned int neighboring_vertices[4][2] = {{1, 2},
-                                                          {3, 0},
-                                                          {0, 3},
-                                                          {2, 1}};
-  for (unsigned int vertex = 0; vertex < vertices_per_face; ++vertex)
+  if (face->reference_cell() == ReferenceCells::Quadrilateral)
     {
-      // first define the two tangent vectors at the vertex by using the
-      // two lines radiating away from this vertex
-      const Tensor<1, 3> tangents[2] = {
-        face->vertex(neighboring_vertices[vertex][0]) - face->vertex(vertex),
-        face->vertex(neighboring_vertices[vertex][1]) - face->vertex(vertex)};
+      static const unsigned int neighboring_vertices[4][2] = {{1, 2},
+                                                              {3, 0},
+                                                              {0, 3},
+                                                              {2, 1}};
+      for (unsigned int vertex = 0; vertex < face->n_vertices(); ++vertex)
+        {
+          // first define the two tangent vectors at the vertex by using the
+          // two lines radiating away from this vertex
+          const Tensor<1, 3> tangents[2] = {
+            face->vertex(neighboring_vertices[vertex][0]) -
+              face->vertex(vertex),
+            face->vertex(neighboring_vertices[vertex][1]) -
+              face->vertex(vertex)};
 
-      // then compute the normal by taking the cross product. since the
-      // normal is not required to be normalized, no problem here
-      face_vertex_normals[vertex] = cross_product_3d(tangents[0], tangents[1]);
+          // then compute the normal by taking the cross product. since the
+          // normal is not required to be normalized, no problem here
+          face_vertex_normals[vertex] =
+            cross_product_3d(tangents[0], tangents[1]);
+        }
     }
+  else
+    DEAL_II_NOT_IMPLEMENTED();
 }
 
 
@@ -846,7 +849,7 @@ Tensor<1, 1>
 FlatManifold<1, 1>::normal_vector(const Triangulation<1, 1>::face_iterator &,
                                   const Point<1> &) const
 {
-  Assert(false, ExcNotImplemented());
+  DEAL_II_NOT_IMPLEMENTED();
   return {};
 }
 
@@ -857,7 +860,7 @@ Tensor<1, 2>
 FlatManifold<1, 2>::normal_vector(const Triangulation<1, 2>::face_iterator &,
                                   const Point<2> &) const
 {
-  Assert(false, ExcNotImplemented());
+  DEAL_II_NOT_IMPLEMENTED();
   return {};
 }
 
@@ -868,7 +871,7 @@ Tensor<1, 3>
 FlatManifold<1, 3>::normal_vector(const Triangulation<1, 3>::face_iterator &,
                                   const Point<3> &) const
 {
-  Assert(false, ExcNotImplemented());
+  DEAL_II_NOT_IMPLEMENTED();
   return {};
 }
 
@@ -1004,7 +1007,7 @@ FlatManifold<dim, spacedim>::normal_vector(
   // vectors given by grad_F
   return internal::normalized_alternating_product(grad_F);
 }
-
+#endif
 
 /* -------------------------- ChartManifold --------------------- */
 template <int dim, int spacedim, int chartdim>
@@ -1024,8 +1027,7 @@ ChartManifold<dim, spacedim, chartdim>::get_intermediate_point(
 {
   const std::array<Point<spacedim>, 2> points{{p1, p2}};
   const std::array<double, 2>          weights{{1. - w, w}};
-  return get_new_point(make_array_view(points.begin(), points.end()),
-                       make_array_view(weights.begin(), weights.end()));
+  return get_new_point(make_array_view(points), make_array_view(weights));
 }
 
 
@@ -1043,8 +1045,8 @@ ChartManifold<dim, spacedim, chartdim>::get_new_point(
   for (unsigned int i = 0; i < n_points; ++i)
     chart_points[i] = pull_back(surrounding_points[i]);
 
-  const Point<chartdim> p_chart = sub_manifold.get_new_point(
-    make_array_view(chart_points.begin(), chart_points.end()), weights);
+  const Point<chartdim> p_chart =
+    sub_manifold.get_new_point(chart_points, weights);
 
   return push_forward(p_chart);
 }
@@ -1069,10 +1071,7 @@ ChartManifold<dim, spacedim, chartdim>::get_new_points(
 
   boost::container::small_vector<Point<chartdim>, 200> new_points_on_chart(
     weights.size(0));
-  sub_manifold.get_new_points(
-    make_array_view(chart_points.begin(), chart_points.end()),
-    weights,
-    make_array_view(new_points_on_chart.begin(), new_points_on_chart.end()));
+  sub_manifold.get_new_points(chart_points, weights, new_points_on_chart);
 
   for (std::size_t row = 0; row < weights.size(0); ++row)
     new_points[row] = push_forward(new_points_on_chart[row]);
@@ -1133,6 +1132,6 @@ ChartManifold<dim, spacedim, chartdim>::get_periodicity() const
 }
 
 // explicit instantiations
-#include "manifold.inst"
+#include "grid/manifold.inst"
 
 DEAL_II_NAMESPACE_CLOSE

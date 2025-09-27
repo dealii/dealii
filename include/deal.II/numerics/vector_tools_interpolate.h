@@ -1,22 +1,24 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2023 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2020 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 #ifndef dealii_vector_tools_interpolate_h
 #define dealii_vector_tools_interpolate_h
 
 #include <deal.II/base/config.h>
+
+#include <deal.II/base/template_constraints.h>
+#include <deal.II/base/types.h>
 
 #include <deal.II/fe/component_mask.h>
 
@@ -76,7 +78,8 @@ namespace VectorTools
     const DoFHandler<dim, spacedim>                           &dof,
     const Function<spacedim, typename VectorType::value_type> &function,
     VectorType                                                &vec,
-    const ComponentMask &component_mask = {});
+    const ComponentMask &component_mask = {},
+    const unsigned int   level          = numbers::invalid_unsigned_int);
 
   /**
    * Same as above but in an hp-context.
@@ -90,7 +93,8 @@ namespace VectorTools
     const DoFHandler<dim, spacedim>                           &dof,
     const Function<spacedim, typename VectorType::value_type> &function,
     VectorType                                                &vec,
-    const ComponentMask &component_mask = {});
+    const ComponentMask &component_mask = {},
+    const unsigned int   level          = numbers::invalid_unsigned_int);
 
 
   /**
@@ -105,7 +109,8 @@ namespace VectorTools
     const DoFHandler<dim, spacedim>                           &dof,
     const Function<spacedim, typename VectorType::value_type> &function,
     VectorType                                                &vec,
-    const ComponentMask &component_mask = {});
+    const ComponentMask &component_mask = {},
+    const unsigned int   level          = numbers::invalid_unsigned_int);
 
   /**
    * Interpolate different finite element spaces. The interpolation of vector
@@ -197,9 +202,13 @@ namespace VectorTools
     const ComponentMask &component_mask = {});
 
   /**
-   * Compute the interpolation of a @p dof1-function @p u1 to a @p dof2-function
-   * @p u2, where @p dof1 and @p dof2 represent different triangulations with
-   * a common coarse grid.
+   * Compute the interpolation of a @p dof_handler_1 function @p u1 (i.e.,
+   * a function defined on the mesh that underlies @p dof_handler_1, using
+   * the finite element associated with that DoFHandler) to
+   * a @p dof_handler_2 function @p u2 (i.e., a function defined on the mesh
+   * and finite element associated with @p dof_handler_2). This function
+   * assumes that @p dof_handler_1 and @p dof_handler_2 are defined on
+   * (possibly different) triangulations that have a common coarse grid.
    *
    * dof1 and dof2 need to have the same finite element discretization.
    *
@@ -212,32 +221,38 @@ namespace VectorTools
    * For this case (continuous elements on grids with hanging nodes), please
    * use the interpolate_to_different_mesh function with an additional
    * AffineConstraints argument, see below, or make the field conforming
-   * yourself by calling the @p AffineConstraints::distribute function of your
+   * yourself by calling the AffineConstraints::distribute() function of your
    * hanging node constraints object.
    *
    * @note This function works with parallel::distributed::Triangulation, but
    * only if the parallel partitioning is the same for both meshes (see the
    * parallel::distributed::Triangulation<dim>::no_automatic_repartitioning
-   * flag).
+   * flag). In practice, this is rarely the case because two triangulations,
+   * partitioned in their own ways, will not typically have corresponding
+   * cells owned by the same process, and implementing the interpolation
+   * procedure would require transferring data between processes in ways
+   * that are difficult to implement efficiently. However, some special
+   * cases can more easily be implemented, namely the case where one
+   * of the meshes is strictly coarser or finer than the other. For these
+   * cases, see the interpolate_to_coarser_mesh() and
+   * interpolate_to_finer_mesh().
    *
    * @dealiiConceptRequires{concepts::is_writable_dealii_vector_type<VectorType>}
    */
   template <int dim, int spacedim, typename VectorType>
   DEAL_II_CXX20_REQUIRES(concepts::is_writable_dealii_vector_type<VectorType>)
-  void interpolate_to_different_mesh(const DoFHandler<dim, spacedim> &dof1,
-                                     const VectorType                &u1,
-                                     const DoFHandler<dim, spacedim> &dof2,
-                                     VectorType                      &u2);
+  void interpolate_to_different_mesh(
+    const DoFHandler<dim, spacedim> &dof_handler_1,
+    const VectorType                &u1,
+    const DoFHandler<dim, spacedim> &dof_handler_2,
+    VectorType                      &u2);
 
   /**
-   * Compute the interpolation of a @p dof1-function @p u1 to a @p dof2-function
-   * @p u2, where @p dof1 and @p dof2 represent different triangulations with
-   * a common coarse grid.
+   * This is a variation of the previous function that takes an additional
+   * constraint object as argument.
    *
-   * dof1 and dof2 need to have the same finite element discretization.
-   *
-   * @p constraints is a hanging node constraints object corresponding to @p
-   * dof2. This object is particularly important when interpolating onto
+   * @p constraints is a hanging node constraints object corresponding to
+   * @p dof2. This object is particularly important when interpolating onto
    * continuous elements on grids with hanging nodes (locally refined grids):
    * Without it - due to cellwise interpolation - the resulting output vector
    * does not necessarily respect continuity requirements at hanging nodes.
@@ -247,15 +262,16 @@ namespace VectorTools
   template <int dim, int spacedim, typename VectorType>
   DEAL_II_CXX20_REQUIRES(concepts::is_writable_dealii_vector_type<VectorType>)
   void interpolate_to_different_mesh(
-    const DoFHandler<dim, spacedim>                          &dof1,
+    const DoFHandler<dim, spacedim>                          &dof_handler_1,
     const VectorType                                         &u1,
-    const DoFHandler<dim, spacedim>                          &dof2,
+    const DoFHandler<dim, spacedim>                          &dof_handler_2,
     const AffineConstraints<typename VectorType::value_type> &constraints,
     VectorType                                               &u2);
 
   /**
    * The same function as above, but takes an InterGridMap object directly as
-   * a parameter. Useful for interpolating several vectors at the same time.
+   * a parameter. This function is useful for interpolating several vectors at
+   * the same time.
    *
    * @p intergridmap has to be initialized via InterGridMap::make_mapping
    * pointing from a source DoFHandler to a destination DoFHandler.
@@ -269,6 +285,71 @@ namespace VectorTools
     const VectorType                                         &u1,
     const AffineConstraints<typename VectorType::value_type> &constraints,
     VectorType                                               &u2);
+
+  /**
+   * This function addresses one of the limitations of the
+   * interpolate_to_different_mesh() function, namely that the latter only
+   * works on parallel triangulations in very specific cases where both
+   * triangulations involved happen to be partitioned in such a way that
+   * if a process owns a cell of one mesh, it also needs to own the
+   * corresponding parent of child cells of the other mesh. In practice, this is
+   * rarely the case.
+   *
+   * This function does not have this restriction, and consequently also works
+   * in parallel, as long as the mesh we interpolate onto can be obtained from
+   * the mesh we interpolate off by *coarsening*. In other words, the target
+   * mesh is coarser than the source mesh.
+   *
+   * The function takes an additional constraints argument that is used after
+   * interpolation to ensure that the output vector is conforming (that is,
+   * that all entries of the output vector conform to their constraints).
+   * @p constraints_coarse therefore needs to correspond to
+   * @p dof_handler_coarse .
+   *
+   * The opposite operation, interpolation from a coarser to a finer mesh,
+   * is implemented in the interpolate_to_finer_mesh() function.
+   */
+  template <int dim, int spacedim, typename VectorType>
+  DEAL_II_CXX20_REQUIRES(concepts::is_writable_dealii_vector_type<VectorType>)
+  void interpolate_to_coarser_mesh(
+    const DoFHandler<dim, spacedim> &dof_handler_fine,
+    const VectorType                &u_fine,
+    const DoFHandler<dim, spacedim> &dof_handler_coarse,
+    const AffineConstraints<typename VectorType::value_type>
+               &constraints_coarse,
+    VectorType &u_coarse);
+
+  /**
+   * This function addresses one of the limitations of the
+   * interpolate_to_different_mesh() function, namely that the latter only
+   * works on parallel triangulations in very specific cases where both
+   * triangulations involved happen to be partitioned in such a way that
+   * if a process owns a cell of one mesh, it also needs to own the
+   * corresponding parent of child cells of the other mesh. In practice, this is
+   * rarely the case.
+   *
+   * This function does not have this restriction, and consequently also works
+   * in parallel, as long as the mesh we interpolate onto can be obtained from
+   * the mesh we interpolate off by *refinement*. In other words, the target
+   * mesh is finer than the source mesh.
+   *
+   * The function takes an additional constraints argument that is used after
+   * interpolation to ensure that the output vector is conforming (that is,
+   * that all entries of the output vector conform to their constraints).
+   * @p constraints_finee therefore needs to correspond to
+   * @p dof_handler_fine .
+   *
+   * The opposite operation, interpolation from a finer to a coarser mesh,
+   * is implemented in the interpolate_to_coarser_mesh() function.
+   */
+  template <int dim, int spacedim, typename VectorType>
+  DEAL_II_CXX20_REQUIRES(concepts::is_writable_dealii_vector_type<VectorType>)
+  void interpolate_to_finer_mesh(
+    const DoFHandler<dim, spacedim> &dof_handler_coarse,
+    const VectorType                &u_coarse,
+    const DoFHandler<dim, spacedim> &dof_handler_fine,
+    const AffineConstraints<typename VectorType::value_type> &constraints_fine,
+    VectorType                                               &u_fine);
 
   /** @} */
 

@@ -1,25 +1,22 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2020 - 2023 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2020 - 2024 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 #include <deal.II/base/conditional_ostream.h>
 #include <deal.II/base/mpi.h>
 #include <deal.II/base/mpi.templates.h>
-#include <deal.II/base/mpi_compute_index_owner_internal.h>
 #include <deal.II/base/mpi_consensus_algorithms.h>
 #include <deal.II/base/partitioner.h>
-#include <deal.II/base/timer.h>
 
 #include <deal.II/matrix_free/vector_data_exchange.h>
 
@@ -389,7 +386,7 @@ namespace internal
         const auto &ghost_indices_within_larger_ghost_set =
           partitioner->ghost_indices_within_larger_ghost_set();
 
-        // temporal data strucutures
+        // temporal data structures
         std::vector<unsigned int> n_ghost_indices_in_larger_set_by_remote_rank;
 
         std::vector<std::array<unsigned int, 3>> ghost_targets_data;
@@ -429,22 +426,10 @@ namespace internal
           Utilities::MPI::mpi_processes_within_communicator(comm, comm_sm);
 
         // determine owners of ghost indices and determine requesters
-        std::vector<unsigned int> owning_ranks_of_ghosts(
-          is_locally_ghost.n_elements());
-
-        Utilities::MPI::internal::ComputeIndexOwner::ConsensusAlgorithmsPayload
-          process(is_locally_owned,
-                  is_locally_ghost,
-                  comm,
-                  owning_ranks_of_ghosts,
-                  /*track_index_requests = */ true);
-
-        Utilities::MPI::ConsensusAlgorithms::Selector<
-          std::vector<
-            std::pair<types::global_dof_index, types::global_dof_index>>,
-          std::vector<unsigned int>>
-          consensus_algorithm;
-        consensus_algorithm.run(process, comm);
+        const auto [owning_ranks_of_ghosts, rank_to_global_indices] =
+          Utilities::MPI::compute_index_owner_and_requesters(is_locally_owned,
+                                                             is_locally_ghost,
+                                                             comm);
 
         // decompress ghost_indices_within_larger_ghost_set for simpler
         // data access during setup
@@ -526,8 +511,6 @@ namespace internal
 
         // process requesters
         {
-          const auto rank_to_global_indices = process.get_requesters();
-
           for (const auto &rank_and_global_indices : rank_to_global_indices)
             {
               const auto sm_ranks_ptr =
@@ -1049,7 +1032,7 @@ namespace internal
                       }
                     else
                       {
-                        Assert(false, ExcNotImplemented());
+                        DEAL_II_NOT_IMPLEMENTED();
                       }
 
                     ++ki;
@@ -1159,7 +1142,7 @@ namespace internal
                   }
                 else
                   {
-                    Assert(false, ExcNotImplemented());
+                    DEAL_II_NOT_IMPLEMENTED();
                   }
 
                 if (++ki == ghost_indices_subset_data.second[ko].second)

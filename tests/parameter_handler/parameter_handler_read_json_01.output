@@ -1,0 +1,85 @@
+
+{
+    "int1":
+    {
+        "value": "2",
+        "default_value": "1",
+        "documentation": "doc 1",
+        "pattern": "0",
+        "pattern_description": "[Integer range -2147483648...2147483647 (inclusive)]",
+        "actions": "0"
+    },
+    "int2":
+    {
+        "value": "3",
+        "default_value": "2",
+        "documentation": "doc 2",
+        "pattern": "1",
+        "pattern_description": "[Integer range -2147483648...2147483647 (inclusive)]",
+        "actions": "1"
+    },
+    "Testing%testing":
+    {
+        "double+double":
+        {
+            "value": "7.1415926",
+            "default_value": "6.14159",
+            "documentation": "docs 3",
+            "pattern": "6",
+            "pattern_description": "[Double -MAX_DOUBLE...MAX_DOUBLE (inclusive)]",
+            "actions": "6"
+        },
+        "double_double":
+        {
+            "value": "1.234",
+            "default_value": "0",
+            "documentation": "docs 4",
+            "pattern": "7",
+            "pattern_description": "[Double -MAX_DOUBLE...MAX_DOUBLE (inclusive)]",
+            "actions": "7"
+        },
+        "int*int":
+        {
+            "value": "2",
+            "default_value": "2",
+            "documentation": "",
+            "pattern": "5",
+            "pattern_description": "[Integer range -2147483648...2147483647 (inclusive)]",
+            "actions": "5"
+        },
+        "string&list":
+        {
+            "value": "< & > ; \/",
+            "default_value": "< & > ; \/",
+            "documentation": "docs 1",
+            "pattern": "4",
+            "pattern_description": "[Anything]",
+            "actions": "4"
+        }
+    },
+    "ss1":
+    {
+        "double 1":
+        {
+            "value": "2.234",
+            "default_value": "1.234",
+            "documentation": "doc 3",
+            "pattern": "2",
+            "pattern_description": "[Double -MAX_DOUBLE...MAX_DOUBLE (inclusive)]",
+            "actions": "2"
+        },
+        "ss2":
+        {
+            "double 2":
+            {
+                "value": "5.321",
+                "default_value": "4.321",
+                "documentation": "doc 4",
+                "pattern": "3",
+                "pattern_description": "[Double -MAX_DOUBLE...MAX_DOUBLE (inclusive)]",
+                "actions": "3"
+            }
+        }
+    }
+}
+

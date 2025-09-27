@@ -1,17 +1,16 @@
-/* ---------------------------------------------------------------------
+/* ------------------------------------------------------------------------
  *
- * Copyright (C) 2009 - 2022 by the deal.II authors
+ * SPDX-License-Identifier: LGPL-2.1-or-later
+ * Copyright (C) 2009 - 2024 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
- * The deal.II library is free software; you can use it, redistribute
- * it, and/or modify it under the terms of the GNU Lesser General
- * Public License as published by the Free Software Foundation; either
- * version 2.1 of the License, or (at your option) any later version.
- * The full text of the license can be found in the file LICENSE.md at
- * the top level directory of deal.II.
+ * Part of the source code is dual licensed under Apache-2.0 WITH
+ * LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+ * governing the source code and code contributions can be found in
+ * LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
  *
- * ---------------------------------------------------------------------
+ * ------------------------------------------------------------------------
  *
  * Authors: Luca Heltai, Cataldo Manigrasso, 2009
  */
@@ -22,7 +21,7 @@
 // The program starts with including a bunch of include files that we will use
 // in the various parts of the program. Most of them have been discussed in
 // previous tutorials already:
-#include <deal.II/base/smartpointer.h>
+#include <deal.II/base/observer_pointer.h>
 #include <deal.II/base/convergence_table.h>
 #include <deal.II/base/quadrature_lib.h>
 #include <deal.II/base/quadrature_selector.h>
@@ -87,8 +86,7 @@ namespace Step34
             return (1. / (R.norm() * 4 * numbers::PI));
 
           default:
-            Assert(false, ExcInternalError());
-            return 0.;
+            DEAL_II_NOT_IMPLEMENTED();
         }
     }
 
@@ -105,8 +103,7 @@ namespace Step34
             return R / (-4 * numbers::PI * R.norm_square() * R.norm());
 
           default:
-            Assert(false, ExcInternalError());
-            return Tensor<1, dim>();
+            DEAL_II_NOT_IMPLEMENTED();
         }
     }
   } // namespace LaplaceKernel
@@ -233,10 +230,10 @@ namespace Step34
     // finite element space. The order of the finite element space and of the
     // mapping can be selected in the constructor of the class.
 
-    Triangulation<dim - 1, dim> tria;
-    FE_Q<dim - 1, dim>          fe;
-    DoFHandler<dim - 1, dim>    dof_handler;
-    MappingQ<dim - 1, dim>      mapping;
+    Triangulation<dim - 1, dim>  tria;
+    const FE_Q<dim - 1, dim>     fe;
+    DoFHandler<dim - 1, dim>     dof_handler;
+    const MappingQ<dim - 1, dim> mapping;
 
     // In BEM methods, the matrix that is generated is dense. Depending on the
     // size of the problem, the final system might be solved by direct LU
@@ -505,7 +502,7 @@ namespace Step34
           break;
 
         default:
-          Assert(false, ExcNotImplemented());
+          DEAL_II_NOT_IMPLEMENTED();
       }
 
     GridIn<dim - 1, dim> gi;
@@ -915,7 +912,7 @@ namespace Step34
     Triangulation<dim> external_tria;
     GridGenerator::hyper_cube(external_tria, -2, 2);
 
-    FE_Q<dim>       external_fe(1);
+    const FE_Q<dim> external_fe(1);
     DoFHandler<dim> external_dh(external_tria);
     Vector<double>  external_phi;
 

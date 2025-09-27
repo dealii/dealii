@@ -1,0 +1,370 @@
+<i>This program was contributed by Sam Scheuerman and Wolfgang
+Bangerth.</i>
+<br>
+
+<a name="step_93-Intro"></a>
+<h1>Introduction</h1>
+
+In all previous tutorial programs, we have only ever dealt with
+discretizations of partial differential equations posed on a
+Triangulation where every degree of freedom was associated with
+a local geometric element (vertices, lines, quadrangles, etc.) which
+is clearly part of one cell or another (or, in the worst case, some
+small number of adjacent cells). This was true
+whether we were solving a single differential equation (say, in step-4
+or step-6), or a system of coupled equations (step-8, step-22, and
+many others). In other words, the *unknowns* we were considering were
+always functions of space (and sometimes time) that we discretized on
+a Triangulation.
+
+There are also situations where we have unknowns in the equations
+we consider that are *not* functions but are *scalars* instead. The
+example we will consider here to illustrate this kind of situation is
+an optimization problem: Let's assume we have a body to which we have
+attached four heaters. How should we set the power levels $C_1,\ldots,
+C_4$ of these four heaters so that the (steady state) temperature $u(\mathbf x)$ of
+the body is as close as possible to a desired state? The issue here is
+that we have one unknown that is a function (namely, the temperature
+$u(\mathbf x)$) for which we can apply the usual finite element
+approximation, but we also have four scalars $C_i$ that are *not*
+functions and that, after discretization of the whole problem, are not
+tied to one of the cells of the mesh. As a consequence, we call these
+unknowns *non-local degrees of freedom* to represent that they are not
+tied to a specific locality: They represent something that does not
+depend on the spatial variable $\mathbf x$ at all, and is not the
+result of a discretization process.
+
+Before going into how we solve this issue, let us first state the concrete set of equations.
+
+We want to find a solution $u$ to the Poisson equation
+
+@f{align*}{
+  -\Delta u =& f \text{ in }\Omega\\
+  u =&0 \text{ on } \partial\Omega,
+@f}
+
+which is as close as
+possible to a desired solution $\overline{u}$. We can formulate this as an optimization problem
+
+@f{align*}{
+  \min_{u, f} & \frac 12 ||u-\overline{u}||^2\\
+  \text{s.t.} & -\Delta u = f.
+@f}
+
+Instead of allowing *any* source function $f$, we will assume that the heat source is described by four
+heating pads $f_k(\mathbf x)$ that are characteristic functions of a subset of the domain, times
+a heater setting $C^k$ (perhaps the power level you set each heating pad to).
+In other words, we have that $f(\mathbf x) = \sum_{k=0}^m C^k f_k(\mathbf x)$.
+The optimization problem then reads as follows:
+@f{align*}{
+  \min_{u, C^k} & \frac 12 ||u-\overline{u}||^2\\
+  \text{s.t.} & -\Delta u = \sum_k C^k f_k.
+@f}
+
+To write this optimization problem in a more compact form, we introduce a Lagrangian
+
+@f{align*}{
+  L = \frac{1}{2}||u - \overline{u}||^2 - \left(\lambda, \left(-\Delta u - \sum_k C^k f_k\right)\right),
+@f}
+
+where $\lambda = \lambda(\mathbf{x})$ is a Lagrange multiplier and $(\cdot, \cdot)$ denotes the usual $L^2$ scalar
+product (note that $\lambda$ is a function that lives in the space of test functions, not just a scalar). We do this because finding a critical point of $L$
+is equivalent to solving the original optimization problem, and we can find a critical point
+of $L$ by finding roots of its derivatives. At this point, we have a choice: we can either
+derive the optimality conditions first, then discretize the problem (in the literature this
+is called the optimize then discretize approach), or we can first discretize $L$ and then
+determine the optimality conditions for the discrete system (discretize then optimize). We
+will use the second approach here, because the formulation is a more straightforward.
+The discretized Lagrangian is
+
+@f{align*}{
+  L =& \frac{1}{2}||u_h - \overline{u}||^2 - (\lambda_h, (-\Delta u_h - f))\\
+   =& \frac{1}{2}\left[\sum_{i=0}^n\sum_{j=0}^n U^iU^j\int_{\Omega}\varphi_i\varphi_j
+   - 2\sum_{i=0}^n U^i\int_\Omega \varphi_i \overline{u} + \int_\Omega\overline{u}^2\right]
+   - \sum_{i=0}^n\sum_{j=0}^n\left[\Lambda^iU^j\int_{\Omega}\nabla\varphi_i\cdot\nabla\varphi_j\right]
+   + \sum_{i=0}^n \sum_{k=0}^m \left[\Lambda^i C^k \int_{\Omega}\varphi_i f_k\right].
+@f}
+
+where
+
+@f{align*}{
+  u_h(x) =& \sum_i^n U^i\varphi_i(x),\\
+  \lambda_h =& \sum_j^n \Lambda^j\varphi_j,\text{ and}\\
+  f =& \sum_{k=0}^m C^k f_k.
+@f}
+
+Note the application of integration by parts above, which makes use of the Dirichlet boundary conditions to eliminate the boundary integral. In practice, we assume that each $f_k$ is something simple. In this example step, each $f_k$ is a characteristic function as mentioned, and $m=4$. These functions, plotted together, look like this:
+
+<center><img src="https://dealii.org/images/steps/developer/step-93.shape_of_characteristic_functions.png"
+         alt="Visualization of four characteristic functions together on the same plot"
+         width="50%"></center>
+
+
+_Note:_ At this point, we can clearly see where the nonlocal degrees of freedom are coming from. The term $\int_\Omega \varphi_i f_k$ is an integral which cannot a priori be confined to a single cell or small collection of cells, but rather must be evaluated on all cells that lie in the domain of $f$.
+
+To find a critical point, we take a partial derivative with respect to each $U^i$,
+ $\Lambda^j$, and $C^k$. The derivatives have the following form:
+
+@f{align*}{
+  \frac{\partial L}{\partial U^i} =& \sum_{j=0}^nU^j\int_{\Omega}\varphi_i\varphi_j
+   - \int_\Omega \varphi_i\overline{u}
+   - \sum_{j=0}^n\left[\Lambda^j\int_{\Omega}\nabla\varphi_i\cdot\nabla\varphi_j\right]\\
+  \frac{\partial L}{\partial \Lambda^j} =& -\sum_{i=0}^n\left[U^i\int_{\Omega}\nabla\varphi_i\cdot\nabla\varphi_j\right]
+  + \sum_{k=0}^m C^k\int_{\Omega}\varphi_j f_k\\
+  \frac{\partial L}{\partial C^k} =& \sum_{j=0}^n \Lambda^j\int_{\Omega}\varphi_j f_k.
+@f}
+
+Note the paired indices on the left- and right-hand sides. As with many other minimization problems, we can observe that for a critical point to occur,
+these derivatives must all be 0. This gives us $n + n + m$ linear equations to solve
+for the coefficient vectors $U$, $\Lambda$, and $C$:
+
+@f{align*}{
+  \frac{\partial L}{\partial U^i} =& \sum_{j=0}^nU^j\int_{\Omega}\varphi_i\varphi_j
+   - \int_\Omega\varphi_i\overline{u}
+   - \sum_{j=0}^n\left[\Lambda^j\int_{\Omega}\nabla\varphi_i\cdot\nabla\varphi_j\right] = 0\\
+  \frac{\partial L}{\partial \Lambda^j} =& -\sum_{i=0}^n\left[U^i\int_{\Omega}\nabla\varphi_i\cdot\nabla\varphi_j\right]
+  + \sum_{k=0}^m C^k\int_{\Omega}\varphi_j f_k = 0\\
+  \frac{\partial L}{\partial C^k} =& \sum_{j=0}^n \Lambda^j\int_{\Omega}\varphi_j f_k = 0.\\
+@f}
+
+The summations are suggestive of matrix-vector multiplication, and in fact we can write the equations
+in such a form. Take $(\mathcal{M}_{i, j}) = \int_\Omega\varphi_i\varphi_j$, $(\mathcal{N}_{i, j})
+ = \int_\Omega \nabla\varphi_i\cdot\nabla\varphi_j$, $(\overline{\mathcal{U}}_i) = \int_\Omega\varphi_i\overline{u}$,
+  and $(\mathcal{F}_{j, k}) = \int_\Omega\varphi_j
+ f_k$, and note that $\mathcal{F}$ is an $n\times m$ matrix. Then we get the matrix system
+
+ @f{align*}{
+  \mathcal{M}U - \mathcal{U} - \mathcal{N}^T\Lambda  =& 0\\
+  -\mathcal{N}U + \mathcal{F}^TC =& 0\\
+  \mathcal{F}\Lambda =& 0.
+ @f}
+
+Moving known quantities to the right-hand-side and combinging the matrix equations gives us an
+idealized system to solve:
+
+@f{align*}{
+  \left(\begin{array}{c c c}
+  \mathcal{M} & -\mathcal{N}^T & 0\\
+  -\mathcal{N} & 0 & \mathcal{F}^T\\
+  0 & \mathcal{F} & 0
+  \end{array}\right)
+  \left(\begin{array}{c}
+  U\\ \Lambda \\ C
+  \end{array}\right) =
+  \left(\begin{array}{c}
+  \overline{\mathcal{U}}\\0\\0
+  \end{array}\right).
+@f}
+
+Unfortunately, setting up this type of block matrix, where some of the dofs couple in a
+nonlocal way, does not work well with deal.II's internal structure. So, we will need to
+modify how this problem is constructed to work well with deal.II, which is discussed below.
+
+<h3>What is the problem?</h3>
+
+The straightforward way to deal with the equations above is to define
+an FESystem object with two components, one for the temperature
+$u(\mathbf x)$ and one for the Lagrange multiplier $\lambda(\mathbf
+x)$. This would work in much the same way as you define system
+elements in all other @ref vector_valued "vector valued problems".
+You will then end up with $N_U$ variables for the finite element
+approximation of the temperature, and $N_\Lambda$ variables for the
+finite element approximation of the Lagrange multiplier, and all of
+these $N_U+N_\Lambda$ unknowns live on the triangulation in the form
+of a DoFHandler object. While in principle $N_U$ and $N_\Lambda$ can
+be different (if you chose different element types, or different polynomial
+degrees to discretize $u$ and $\lambda$), in practice it is best to keep them the same, so we have
+that $N_U = N_\Lambda = n$.
+
+Now the problem is that what you really want is a linear system of
+$N=n + n + m$ unknowns that includes the $m = 4$ degrees of
+freedom for the source strengths we are trying to optimize for: We
+need a matrix of size $N\times N$, and solution and right hand side
+vectors of size $N$. Moreover, if you try to build a block linear
+system because that's how your linear solver is structured, you
+probably want a $3\times 3$ block structure for the matrix, and three
+blocks for the vectors, even though the finite element and the
+DoFHandler only know of two solution components.
+
+Conceptually, of course, there is nothing wrong with creating matrices
+and vectors that have sizes that don't match the number of unknowns in
+a DoFHandler. You just need a way to translate between the index of a
+degree of freedom in a DoFHandler and the corresponding row and column
+in a linear system. Here, perhaps one would make the choice that the
+mesh-based degrees of freedom (which the DoFHandler numbers from zero
+to $n+n-1$) come first, and the four $C_k$ additional scalar
+unknowns come last. However, the fact that we need to spell out such
+a convention should give you a hint that something with this kind of
+design is wrong. Most codes which would use a convention like this
+will, almost certainly, leave this convention implicit (something
+for the programmer to know about) rather than enforcing it
+explicitly (say, in the form of a function `mesh_dof_to_linear_system_index()`).
+It is then very easy for a number of bugs to emerge.
+For example, we can not renumber all degrees of freedom with the
+functions in DoFRenumbering in arbitrary ways if we want the $m$
+additional variables always at the end.
+
+Precisely because it is so easy to make mistakes and because it is so
+restricting to have implicit conventions like "Yes, your matrix can be
+larger than the number of DoFs in the DoFHandler; but it can't be
+smaller", deal.II a long time ago made the decision that a lot of
+functions test that the sizes of vectors and matrices are equal to the
+number of unknowns in a DoFHandler. For example,
+DoFTools::make_sparsity_pattern() takes a DoFHandler and expects that
+the sparsity pattern has as many rows and columns as there are DoFs in
+the DoFHandler. So does
+DoFTools::make_hanging_node_constraints(). VectorTools::interpolate_boundary_values()
+uses the same convention. Many many other functions do too, and they
+all in fact check that this is true and will terminate the program if
+it is not. This is because one can find many many bugs in codes this
+way, and it also allows for an assumption that is so obvious that we
+have never stated it so far: The degree of freedom with index $i$
+corresponds to row $i$ of the linear system and column $i$ of the
+matrix. If we allowed sizes to differ, we would need to have a way to
+make this connection. Further, that way would need to be be explicit (by way of a
+function that translates from DoF index to row and column, as already mentioned above) or there
+would be no end to the possibility of introducing bugs.
+
+In other words, the fact that we want to have $2n$ degrees
+of freedom in the DoFHandler, but matrices and vectors with
+$2n + m$ rows and columns does not work with deal.II's
+underlying design decisions. Creating matrices and vectors that happen
+to be larger is going to trigger lots of assertions, and for good
+reasons.
+
+
+
+<h3>How do we address this?</h3>
+
+So then how are we going to address this? At its core, what needs to
+happen is that the DoFHandler knows about the additional degrees of
+freedom. The question is how we are going to teach it about these
+"nonlocal" degrees of freedom -- they are, after all, not ones that
+are associated with vertices, edges, faces, or cells of the mesh as
+the usual finite element degrees of freedom are. The approach we are
+going to use is not what one would generally call "obvious" or
+"natural", but it does fit into the infrastructure deal.II provides
+(even though this infrastructure was originally built for other
+purposes). In fact, at the time this program is written in 2024, there
+is substantial debate on whether we can implement *better* ways to achieve
+the same result that do not require this kind of "abuse" of features intended
+for other purposes; if consensus is ever reached on these alternative
+approaches, this program may also be converted.
+
+Whatever the future, let us turn to how our goal can be achieved today.
+The key to the following is that deal.II (i) allows using different
+finite elements on different cells, originally intended to support
+$hp$ finite elements; and (ii) has elements that have no degrees of
+freedom. We have used these features in other tutorial programs:
+step-27 and step-75 make use of feature (i) to implement the $hp$
+finite element method, and step-46 makes use of feature (ii) for
+multiphysics problems where some
+variables live only on some cells.
+
+We will (ab)use the general approach used in step-46 for our purposes
+here. Specifically, on the first four cells of the mesh, we will
+define a finite element that has three components: a temperature component and a
+Lagrange multiplier component (both of which are the usual FE_Q
+element), plus a third vector component that is piecewise constant
+(FE_DGQ(0)). On all other
+cells, the finite element used has the same temperature and Lagrange
+multiplier components, but the third component is of type FE_Nothing
+and so has no degrees of freedom at all. Note that with this setup,
+the first four cells will have one additional degree of freedom.
+The end result of this
+approach is that nearly every function you have ever used will work as
+one would expect. In particular:
+
+- We have exactly four additional degrees of freedom, located on the
+  first four cells.
+- We can use DoFRenumbering::component_wise() to sort degrees of freedom
+  explicitly into the order described above (rather than using an
+  implicit convention). In particular, if we really wanted to, we could
+  also ask for the nonlocal degrees of freedom to be numbered *first*
+  rather than last -- because they are on equal footing to all of the other
+  field-based variables.
+- We can use functions such as
+  DoFTools::count_dofs_per_fe_block() or DoFTools::count_dofs_per_fe_component()
+  to create a $3\times 3$ block structure
+  of the linear system, because the finite elements used on all cells have
+  three vector components.
+- The size of matrices and vectors corresponds to the number of degrees
+  of freedom in the DoFHandler.
+- The additional degrees of freedom end up in the output files created by
+  DataOut because they are finite element fields -- just fields of a very
+  specific kind.
+
+What we have with this setup is a good way to not break things in deal.II.
+However, it is not so natural that we can use the full extent of features
+in deal.II without issue. In particular, to the DoFHandler the
+nonlocal degrees of freedom only live on one cell each. On the other
+hand, from the perspective of the PDE, we need these nonlocal DoFs on
+all cells that intersect the areas in which the heating is applied. So,
+we cannot use `cell->get_dof_indices()` to find DoF
+indices for the third vector component on most cells, because the DoF handler
+does not see that these dofs reach beyond the cell they are defined on. As a consequence,
+we will have to do some extra work when building sparsity patterns, and later when building the
+system matrix/system right hand side.
+
+
+<h3>What concrete steps do we need to take?</h3>
+
+There are four places in the standard finite element code where we will
+need to take special care: assigning FE_DGQ elements, constructing the sparsity pattern, constructing
+the system matrix/system right hand side, and outputting results.
+
+1. First, we need to determine on which cells the FE_Nothing element becomes
+an FE_DGQ element. We do this in `setup_system()`, before dofs are distributed.
+Since we are using FE_DGQ elements, we don't need to worry about boundary
+conditions affecting the nonlocal dofs. We simply enumerate the cells
+until we have collected enough dofs, which in this program depends on the
+dimension of the problem. Each time we encounter a new cell, we
+change the hp finite element from an FESystem with a 3rd FE_Nothing
+component to an FESystem with a third FE_DGQ component. Calling
+DoFHandler::distribute_dofs() after this is all we need to do to have the system set
+up correctly. Next, we need to grab the indices of the FE_DGQ dofs. We
+do this by calling DoFTools::extract_dofs(), using a component mask to
+pick just the third component of the FESystem. We store these indices
+in a standard vector, and use them for the three parts below.
+
+2. When we construct the sparsity pattern, deal.II implicitly assumes that
+only dofs that share a cell could have a non-zero entry in the matrix.
+Consequently, when working with non-local dofs, the sparsity pattern that
+DoFTools::make_sparsity_pattern() creates will omit entries, on all
+but the first four cells, that in fact
+we want to fill. To fix this, after creating the sparsity pattern we
+need to loop over all cells in the mesh and check whether the dofs on
+that cell overlap with regions where each $f_k$ is nonzero. If they do,
+then we need to add an entry to the sparsity pattern at location
+(`dof_index`, `nonlocal_dof_index`) and (`nonlocal_dof_index`, `dof_index`).
+Note that we need to add two entries because it doesn't matter whether
+the nonlocal dof is the row or column index, the entry could be
+nonzero. In this example, we further refine this by only adding entries
+where the $\Lambda$ component of the FESystem is nonzero, because we only
+deal with the nonlocal functions in the equations stemming from the
+$\Lambda^j$ and $C^k$ derivatives.
+
+3. We take a similar approach when constructing the system matrix. We do
+the standard loop over cells, quadrature points, and dof indices. Normally,
+we would simply integrate the finite elements on the cell and add these
+values to a local matrix. However, because we are dealing with nonlocal dofs
+this approach won't work. Instead, we use the standard approach for
+constructing the $\mathcal{M}$ and $\mathcal{N}$ portions of the block system
+matrix, but for the $\mathcal{F}$ portions we need to numerically integrate
+each finite element against the nonlocal $f_k$ functions, and enter the
+resulting value in the correct location in the system matrix. To do the integration,
+we simply instantiate a Point object for the quadrature point and pass this
+to the $f_k$ functions, keeping all other aspects of integration the same. We
+then use the extracted dof indices to add the integrated value to the system
+matrix, using the loop's current dof index as the other index. The system right hand
+side is constructed as usual, integrating the right hand side function on each cell.
+
+4. Finally, to properly visualize the solution and constituent parts of the program,
+we need to correctly interpret the nonlocal dofs. We do this by interpolating the
+$f_k$ functions onto a smaller DoFHandler (one which has only one FE_Q element),
+then multiplying by the corresponding coefficient $c_k$. For this program, we also
+add together all the individual $C^kf_k$ to visualize $f$, and interpolate the
+target function as well. These steps (for the $f_k$) all occur in a loop, which makes
+scaling the number of nonlocal dofs relatively straightforward.
+
+To see how we actually do these things, let's look at the code.

@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2004 - 2023 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2023 - 2024 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 #ifndef dealii_example_test_h
 #define dealii_example_test_h
@@ -23,8 +22,10 @@
  */
 
 #include <deal.II/base/exceptions.h>
+#include <deal.II/base/logstream.h>
 
 #include <fstream>
+#include <iostream>
 
 /*
  * Given the name of a file, copy it to std::cout
@@ -57,7 +58,7 @@ cat_file(const char *filename)
       {                                                                   \
         SolverType_COMMAND;                                               \
       }                                                                   \
-    catch (SolverControl::NoConvergence & exc)                            \
+    catch (SolverControl::NoConvergence &)                                \
       {}                                                                  \
     const unsigned int steps = CONTROL_COMMAND;                           \
     if (steps >= MIN_ALLOWED && steps <= MAX_ALLOWED)                     \
@@ -72,5 +73,18 @@ cat_file(const char *filename)
       }                                                                   \
   }
 
+std::string   deallogname;
+std::ofstream deallogfile;
+
+void
+initlog(const bool                    console = false,
+        const std::ios_base::fmtflags flags   = std::ios::showpoint |
+                                              std::ios::left)
+{
+  deallogname = "output";
+  deallogfile.open(deallogname);
+  dealii::deallog.attach(deallogfile, true, flags);
+  dealii::deallog.depth_console(console ? 10 : 0);
+}
 
 #endif // dealii_example_test_h

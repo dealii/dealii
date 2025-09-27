@@ -1,24 +1,24 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2019 - 2021 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2019 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 
 // A lightly adapted version of the step-4 tutorial program. Compared
 // to step-4, this test uses hp::DoFHandler and
 // parallel::distributed::Triangulation. In the upper half of the domain
-// FENothing is used to save effort, as these elements would only be used later.
-// The test checks whether the hanging-node constraints are setup correctly.
+// FE_Nothing is used to save effort, as these elements would only be used
+// later. The test checks whether the hanging-node constraints are setup
+// correctly.
 
 #include <deal.II/base/conditional_ostream.h>
 #include <deal.II/base/function.h>
@@ -191,29 +191,31 @@ namespace Step4
 
     constraints.clear();
 
-    constraints.reinit(locally_relevant_dofs);
+    constraints.reinit(locally_owned_dofs, locally_relevant_dofs);
 
     DoFTools::make_hanging_node_constraints(dof_handler, constraints);
 
     DoFTools::make_zero_boundary_constraints(dof_handler, constraints);
 
-#ifdef DEBUG
-    // We did not think about hp-constraints on ghost cells yet.
-    // Thus, we are content with verifying their consistency for now.
-    const std::vector<IndexSet> locally_owned_dofs_per_processor =
-      Utilities::MPI::all_gather(communicator,
-                                 dof_handler.locally_owned_dofs());
+    if constexpr (running_in_debug_mode())
+      {
+        // We did not think about hp-constraints on ghost cells yet.
+        // Thus, we are content with verifying their consistency for now.
+        const std::vector<IndexSet> locally_owned_dofs_per_processor =
+          Utilities::MPI::all_gather(communicator,
+                                     dof_handler.locally_owned_dofs());
 
-    const IndexSet locally_active_dofs =
-      DoFTools::extract_locally_active_dofs(dof_handler);
+        const IndexSet locally_active_dofs =
+          DoFTools::extract_locally_active_dofs(dof_handler);
 
-    AssertThrow(
-      constraints.is_consistent_in_parallel(locally_owned_dofs_per_processor,
-                                            locally_active_dofs,
-                                            communicator,
-                                            /*verbose=*/true),
-      ExcMessage("AffineConstraints object contains inconsistencies!"));
-#endif
+        AssertThrow(constraints.is_consistent_in_parallel(
+                      locally_owned_dofs_per_processor,
+                      locally_active_dofs,
+                      communicator,
+                      /*verbose=*/true),
+                    ExcMessage(
+                      "AffineConstraints object contains inconsistencies!"));
+      }
 
     constraints.close();
 

@@ -1,17 +1,16 @@
-## ---------------------------------------------------------------------
+## ------------------------------------------------------------------------
 ##
-## Copyright (C) 2013 - 2022 by the deal.II authors
+## SPDX-License-Identifier: LGPL-2.1-or-later
+## Copyright (C) 2013 - 2024 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
-## The deal.II library is free software; you can use it, redistribute
-## it, and/or modify it under the terms of the GNU Lesser General
-## Public License as published by the Free Software Foundation; either
-## version 2.1 of the License, or (at your option) any later version.
-## The full text of the license can be found in the file LICENSE.md at
-## the top level directory of deal.II.
+## Part of the source code is dual licensed under Apache-2.0 WITH
+## LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+## governing the source code and code contributions can be found in
+## LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 ##
-## ---------------------------------------------------------------------
+## ------------------------------------------------------------------------
 
 #
 # A macro to set up testing and pick up all tests in the current
@@ -20,9 +19,9 @@
 # If TEST_PICKUP_REGEX is set, only tests matching the regex will be
 # processed.
 #
-# Furthermore, the macro sets up (if necessary) deal.II, perl, numdiff,
-# and the following variables, that can be overwritten by environment or
-# command line:
+# Furthermore, the macro sets up (if necessary) deal.II, bash, perl,
+# numdiff, and the following variables, that can be overwritten by
+# environment or command line:
 #
 #     TEST_LIBRARIES
 #     TEST_LIBRARIES_DEBUG
@@ -163,7 +162,7 @@ macro(deal_ii_pickup_tests)
          "running mpi tests within the testsuite. As a consequence all "
          "tests that require an mpi launcher have been disabled.\n"
          "If you want to run tests with mpi then please configure deal.II "
-         "by either setting the MPIEXEC environemt variable or the CMake "
+         "by either setting the MPIEXEC environment variable or the CMake "
          "variable MPIEXEC_EXECUTABLE to a full path to the MPI launcher "
          "program.\n\n"
          )

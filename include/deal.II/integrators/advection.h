@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2010 - 2020 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2012 - 2024 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 #ifndef dealii_integrators_advection_h
 #define dealii_integrators_advection_h
@@ -71,7 +70,7 @@ namespace LocalIntegrators
      * @param factor is an optional multiplication factor for the result.
      */
     template <int dim>
-    void
+    DEAL_II_DEPRECATED void
     cell_matrix(FullMatrix<double>                         &M,
                 const FEValuesBase<dim>                    &fe,
                 const FEValuesBase<dim>                    &fetest,
@@ -127,7 +126,7 @@ namespace LocalIntegrators
      * with its transpose.
      */
     template <int dim>
-    inline void
+    DEAL_II_DEPRECATED inline void
     cell_residual(Vector<double>                             &result,
                   const FEValuesBase<dim>                    &fe,
                   const std::vector<Tensor<1, dim>>          &input,
@@ -170,7 +169,7 @@ namespace LocalIntegrators
      * with its transpose.
      */
     template <int dim>
-    inline void
+    DEAL_II_DEPRECATED inline void
     cell_residual(Vector<double>                                     &result,
                   const FEValuesBase<dim>                            &fe,
                   const ArrayView<const std::vector<Tensor<1, dim>>> &input,
@@ -212,7 +211,7 @@ namespace LocalIntegrators
      * \f[ r_i = \int_Z  (\mathbf w \cdot \nabla)v\, u_i \, dx. \f]
      */
     template <int dim>
-    inline void
+    DEAL_II_DEPRECATED inline void
     cell_residual(Vector<double>                             &result,
                   const FEValuesBase<dim>                    &fe,
                   const std::vector<double>                  &input,
@@ -252,7 +251,7 @@ namespace LocalIntegrators
      * \cdot\mathbf u_i \, dx. \f]
      */
     template <int dim>
-    inline void
+    DEAL_II_DEPRECATED inline void
     cell_residual(Vector<double>                             &result,
                   const FEValuesBase<dim>                    &fe,
                   const ArrayView<const std::vector<double>> &input,
@@ -306,7 +305,7 @@ namespace LocalIntegrators
      * component is advected by the same velocity.
      */
     template <int dim>
-    void
+    DEAL_II_DEPRECATED void
     upwind_value_matrix(FullMatrix<double>                         &M,
                         const FEValuesBase<dim>                    &fe,
                         const FEValuesBase<dim>                    &fetest,
@@ -379,7 +378,7 @@ namespace LocalIntegrators
      * component is advected by the same velocity.
      */
     template <int dim>
-    inline void
+    DEAL_II_DEPRECATED inline void
     upwind_value_residual(Vector<double>                             &result,
                           const FEValuesBase<dim>                    &fe,
                           const std::vector<double>                  &input,
@@ -446,7 +445,7 @@ namespace LocalIntegrators
      * component is advected by the same velocity.
      */
     template <int dim>
-    inline void
+    DEAL_II_DEPRECATED inline void
     upwind_value_residual(Vector<double>                             &result,
                           const FEValuesBase<dim>                    &fe,
                           const ArrayView<const std::vector<double>> &input,
@@ -513,7 +512,7 @@ namespace LocalIntegrators
      * component is advected the same way.
      */
     template <int dim>
-    void
+    DEAL_II_DEPRECATED void
     upwind_value_matrix(FullMatrix<double>                         &M11,
                         FullMatrix<double>                         &M12,
                         FullMatrix<double>                         &M21,
@@ -598,7 +597,7 @@ namespace LocalIntegrators
      * component is advected the same way.
      */
     template <int dim>
-    void
+    DEAL_II_DEPRECATED void
     upwind_face_residual(Vector<double>                             &result1,
                          Vector<double>                             &result2,
                          const FEValuesBase<dim>                    &fe1,
@@ -675,7 +674,7 @@ namespace LocalIntegrators
      * component is advected the same way.
      */
     template <int dim>
-    void
+    DEAL_II_DEPRECATED void
     upwind_face_residual(Vector<double>                             &result1,
                          Vector<double>                             &result2,
                          const FEValuesBase<dim>                    &fe1,

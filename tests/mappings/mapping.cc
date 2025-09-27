@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2001 - 2022 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2001 - 2024 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 
 // Shows the shape functions implemented and computes the area of cells.
@@ -220,7 +219,7 @@ create_triangulations(std::vector<Triangulation<dim> *> &,
                       std::vector<Manifold<dim> *> &,
                       std::vector<double> &)
 {
-  Assert(false, ExcNotImplemented());
+  DEAL_II_NOT_IMPLEMENTED();
 }
 
 
@@ -288,10 +287,10 @@ create_triangulations(std::vector<Triangulation<2> *> &tria_ptr,
       tria_ptr.push_back(tria);
       GridGenerator::hyper_cube(*tria, 1., 3.);
       Point<2> &v0 = tria->begin_active()->vertex(0);
-      v0(0)        = 0.;
+      v0[0]        = 0.;
       Point<2> &v3 = tria->begin_active()->vertex(3);
-      v3(0)        = 5.;
-      v3(1)        = 4.;
+      v3[0]        = 5.;
+      v3[1]        = 4.;
       exact_areas.push_back(7.);
       show[1][0] = 1;
     }
@@ -308,10 +307,10 @@ create_triangulations(std::vector<Triangulation<2> *> &tria_ptr,
       GridGenerator::hyper_cube(*tria, 1., 5.);
       Point<2> &v2 = tria->begin_active()->vertex(2);
       Point<2> &v3 = tria->begin_active()->vertex(3);
-      v2(0)        = 1.;
-      v2(1)        = 3.;
-      v3(0)        = 3.;
-      v3(1)        = 3.;
+      v2[0]        = 1.;
+      v2[1]        = 3.;
+      v3[0]        = 3.;
+      v3[1]        = 3.;
       tria->set_manifold(1, *boundary1);
       tria->set_manifold(2, *boundary2);
       tria->begin_active()->face(1)->set_manifold_id(1);
@@ -329,10 +328,10 @@ create_triangulations(std::vector<Triangulation<2> *> &tria_ptr,
       tria_ptr.push_back(tria);
       Point<2> p0;
       Point<2> p1;
-      p0(0) = 1.;
-      p0(1) = 2.5;
-      p1(0) = 2.;
-      p1(1) = 4.;
+      p0[0] = 1.;
+      p0[1] = 2.5;
+      p1[0] = 2.;
+      p1[1] = 4.;
       GridGenerator::hyper_rectangle(*tria, p0, p1);
       exact_areas.push_back(1.5);
       show[3][4] = 1;
@@ -347,10 +346,10 @@ create_triangulations(std::vector<Triangulation<2> *> &tria_ptr,
       GridGenerator::hyper_cube(*tria, 0., 1.);
       Point<2> &v2 = tria->begin_active()->vertex(2);
       Point<2> &v3 = tria->begin_active()->vertex(3);
-      v2(0)        = 2.;
-      v2(1)        = 1.;
-      v3(0)        = 0.5;
-      v3(1)        = 1.5;
+      v2[0]        = 2.;
+      v2[1]        = 1.;
+      v3[0]        = 0.5;
+      v3[1]        = 1.5;
       tria->set_manifold(1, *boundary1);
       tria->begin_active()->face(1)->set_manifold_id(1);
       exact_areas.push_back(0.);
@@ -387,9 +386,9 @@ create_triangulations(std::vector<Triangulation<3> *> &tria_ptr,
       tria_ptr.push_back(tria);
       GridGenerator::hyper_cube(*tria, 1., 3.);
       Point<3> &v = tria->begin()->vertex(7);
-      v(0)        = 5.;
-      v(1)        = 4.;
-      v(2)        = 4.5;
+      v[0]        = 5.;
+      v[1]        = 4.;
+      v[2]        = 4.5;
       exact_areas.push_back(12.5);
     }
 
@@ -417,12 +416,12 @@ create_triangulations(std::vector<Triangulation<3> *> &tria_ptr,
       tria_ptr.push_back(tria);
       Point<3> p0;
       Point<3> p1;
-      p0(0) = 1.;
-      p0(1) = 2.5;
-      p0(2) = 3.;
-      p1(0) = 2.;
-      p1(1) = 4.;
-      p1(2) = 6.;
+      p0[0] = 1.;
+      p0[1] = 2.5;
+      p0[2] = 3.;
+      p1[0] = 2.;
+      p1[1] = 4.;
+      p1[2] = 6.;
       GridGenerator::hyper_rectangle(*tria, p0, p1);
       exact_areas.push_back(4.5);
       show[3][4] = 1;

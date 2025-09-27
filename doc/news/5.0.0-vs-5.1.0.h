@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2013, 2014 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2013 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 /**
  * @page changes_between_5_0_and_5_1 Changes between Version 5.0 and 5.1
@@ -24,7 +23,7 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
 </p>
 
 
-<a name="incompatible"></a>
+<a name="500-510-incompatible"></a>
 <h3 style="color:red">Incompatibilities</h3>
 
 <p style="color:red">
@@ -65,7 +64,7 @@ inconvenience this causes.
 
 
 
-<a name="general"></a>
+<a name="500-510-general"></a>
 <h3>General</h3>
 
 <ol>
@@ -143,7 +142,7 @@ inconvenience this causes.
 </ol>
 
 
-<a name="base"></a>
+<a name="500-510-base"></a>
 <h3>base</h3>
 
 <ol>
@@ -237,7 +236,7 @@ inconvenience this causes.
 
 
 
-<a name="lac"></a>
+<a name="500-510-lac"></a>
 <h3>lac</h3>
 
 <ol>
@@ -420,7 +419,7 @@ inconvenience this causes.
 
 
 
-<a name="deal.II"></a>
+<a name="500-510-deal.II"></a>
 <h3>deal.II</h3>
 
 <ol>

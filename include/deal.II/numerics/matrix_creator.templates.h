@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2016 - 2022 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2016 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 #ifndef dealii_matrix_creator_templates_h
 #define dealii_matrix_creator_templates_h
@@ -119,7 +118,7 @@ namespace MatrixCreator
         Scratch &
         operator=(const Scratch &)
         {
-          Assert(false, ExcNotImplemented());
+          DEAL_II_NOT_IMPLEMENTED();
           return *this;
         }
 
@@ -582,8 +581,6 @@ namespace MatrixCreator
         return;
 
       const unsigned int dofs_per_cell = data.dof_indices.size();
-      (void)dofs_per_cell;
-
       Assert(data.cell_matrix.m() == dofs_per_cell, ExcInternalError());
       Assert(data.cell_matrix.n() == dofs_per_cell, ExcInternalError());
       Assert((right_hand_side == nullptr) ||
@@ -638,16 +635,16 @@ namespace MatrixCreator
 
 namespace MatrixCreator
 {
-  template <int dim, int spacedim, typename SparseMatrixType>
+  template <int dim, int spacedim, typename MatrixType>
   void
   create_mass_matrix(
     const Mapping<dim, spacedim>    &mapping,
     const DoFHandler<dim, spacedim> &dof,
     const Quadrature<dim>           &q,
-    SparseMatrixType                &matrix,
-    const Function<spacedim, typename SparseMatrixType::value_type>
-      *const                                                        coefficient,
-    const AffineConstraints<typename SparseMatrixType::value_type> &constraints)
+    MatrixType                      &matrix,
+    const Function<spacedim, typename MatrixType::value_type>
+      *const                                                  coefficient,
+    const AffineConstraints<typename MatrixType::value_type> &constraints)
   {
     Assert(matrix.m() == dof.n_dofs(),
            ExcDimensionMismatch(matrix.m(), dof.n_dofs()));
@@ -658,7 +655,7 @@ namespace MatrixCreator
     hp::QCollection<dim> q_collection(q);
     hp::MappingCollection<dim, spacedim> mapping_collection(mapping);
     MatrixCreator::internal::AssemblerData::
-      Scratch<dim, spacedim, typename SparseMatrixType::value_type>
+      Scratch<dim, spacedim, typename MatrixType::value_type>
         assembler_data(fe_collection,
                        update_values | update_JxW_values |
                          (coefficient != nullptr ? update_quadrature_points :
@@ -669,7 +666,7 @@ namespace MatrixCreator
                        mapping_collection);
 
     MatrixCreator::internal::AssemblerData::CopyData<
-      typename SparseMatrixType::value_type>
+      typename MatrixType::value_type>
       copy_data;
     copy_data.cell_matrix.reinit(
       assembler_data.fe_collection.max_dofs_per_cell(),
@@ -687,14 +684,14 @@ namespace MatrixCreator
         dim,
         spacedim,
         typename DoFHandler<dim, spacedim>::active_cell_iterator,
-        typename SparseMatrixType::value_type>,
-      [&matrix](const internal::AssemblerData::CopyData<
-                typename SparseMatrixType::value_type> &data) {
+        typename MatrixType::value_type>,
+      [&matrix](
+        const internal::AssemblerData::CopyData<typename MatrixType::value_type>
+          &data) {
         MatrixCreator::internal::copy_local_to_global(
           data,
           &matrix,
-          static_cast<Vector<typename SparseMatrixType::value_type> *>(
-            nullptr));
+          static_cast<Vector<typename MatrixType::value_type> *>(nullptr));
       },
       assembler_data,
       copy_data);
@@ -704,15 +701,15 @@ namespace MatrixCreator
 
 
 
-  template <int dim, int spacedim, typename SparseMatrixType>
+  template <int dim, int spacedim, typename MatrixType>
   void
   create_mass_matrix(
     const DoFHandler<dim, spacedim> &dof,
     const Quadrature<dim>           &q,
-    SparseMatrixType                &matrix,
-    const Function<spacedim, typename SparseMatrixType::value_type>
-      *const                                                        coefficient,
-    const AffineConstraints<typename SparseMatrixType::value_type> &constraints)
+    MatrixType                      &matrix,
+    const Function<spacedim, typename MatrixType::value_type>
+      *const                                                  coefficient,
+    const AffineConstraints<typename MatrixType::value_type> &constraints)
   {
     create_mass_matrix(get_default_linear_mapping(dof.get_triangulation()),
                        dof,
@@ -724,18 +721,18 @@ namespace MatrixCreator
 
 
 
-  template <int dim, int spacedim, typename SparseMatrixType>
+  template <int dim, int spacedim, typename MatrixType>
   void
   create_mass_matrix(
-    const Mapping<dim, spacedim>                                    &mapping,
-    const DoFHandler<dim, spacedim>                                 &dof,
-    const Quadrature<dim>                                           &q,
-    SparseMatrixType                                                &matrix,
-    const Function<spacedim, typename SparseMatrixType::value_type> &rhs,
-    Vector<typename SparseMatrixType::value_type>                   &rhs_vector,
-    const Function<spacedim, typename SparseMatrixType::value_type>
-      *const                                                        coefficient,
-    const AffineConstraints<typename SparseMatrixType::value_type> &constraints)
+    const Mapping<dim, spacedim>                              &mapping,
+    const DoFHandler<dim, spacedim>                           &dof,
+    const Quadrature<dim>                                     &q,
+    MatrixType                                                &matrix,
+    const Function<spacedim, typename MatrixType::value_type> &rhs,
+    Vector<typename MatrixType::value_type>                   &rhs_vector,
+    const Function<spacedim, typename MatrixType::value_type>
+      *const                                                  coefficient,
+    const AffineConstraints<typename MatrixType::value_type> &constraints)
   {
     Assert(matrix.m() == dof.n_dofs(),
            ExcDimensionMismatch(matrix.m(), dof.n_dofs()));
@@ -746,7 +743,7 @@ namespace MatrixCreator
     hp::QCollection<dim> q_collection(q);
     hp::MappingCollection<dim, spacedim> mapping_collection(mapping);
     MatrixCreator::internal::AssemblerData::
-      Scratch<dim, spacedim, typename SparseMatrixType::value_type>
+      Scratch<dim, spacedim, typename MatrixType::value_type>
         assembler_data(fe_collection,
                        update_values | update_JxW_values |
                          update_quadrature_points,
@@ -755,7 +752,7 @@ namespace MatrixCreator
                        q_collection,
                        mapping_collection);
     MatrixCreator::internal::AssemblerData::CopyData<
-      typename SparseMatrixType::value_type>
+      typename MatrixType::value_type>
       copy_data;
     copy_data.cell_matrix.reinit(
       assembler_data.fe_collection.max_dofs_per_cell(),
@@ -773,9 +770,10 @@ namespace MatrixCreator
         dim,
         spacedim,
         typename DoFHandler<dim, spacedim>::active_cell_iterator,
-        typename SparseMatrixType::value_type>,
-      [&matrix, &rhs_vector](const internal::AssemblerData::CopyData<
-                             typename SparseMatrixType::value_type> &data) {
+        typename MatrixType::value_type>,
+      [&matrix, &rhs_vector](
+        const internal::AssemblerData::CopyData<typename MatrixType::value_type>
+          &data) {
         MatrixCreator::internal::copy_local_to_global(data,
                                                       &matrix,
                                                       &rhs_vector);
@@ -788,17 +786,17 @@ namespace MatrixCreator
 
 
 
-  template <int dim, int spacedim, typename SparseMatrixType>
+  template <int dim, int spacedim, typename MatrixType>
   void
   create_mass_matrix(
-    const DoFHandler<dim, spacedim>                                 &dof,
-    const Quadrature<dim>                                           &q,
-    SparseMatrixType                                                &matrix,
-    const Function<spacedim, typename SparseMatrixType::value_type> &rhs,
-    Vector<typename SparseMatrixType::value_type>                   &rhs_vector,
-    const Function<spacedim, typename SparseMatrixType::value_type>
-      *const                                                        coefficient,
-    const AffineConstraints<typename SparseMatrixType::value_type> &constraints)
+    const DoFHandler<dim, spacedim>                           &dof,
+    const Quadrature<dim>                                     &q,
+    MatrixType                                                &matrix,
+    const Function<spacedim, typename MatrixType::value_type> &rhs,
+    Vector<typename MatrixType::value_type>                   &rhs_vector,
+    const Function<spacedim, typename MatrixType::value_type>
+      *const                                                  coefficient,
+    const AffineConstraints<typename MatrixType::value_type> &constraints)
   {
     create_mass_matrix(get_default_linear_mapping(dof.get_triangulation()),
                        dof,
@@ -812,16 +810,16 @@ namespace MatrixCreator
 
 
 
-  template <int dim, int spacedim, typename SparseMatrixType>
+  template <int dim, int spacedim, typename MatrixType>
   void
   create_mass_matrix(
     const hp::MappingCollection<dim, spacedim> &mapping,
     const DoFHandler<dim, spacedim>            &dof,
     const hp::QCollection<dim>                 &q,
-    SparseMatrixType                           &matrix,
-    const Function<spacedim, typename SparseMatrixType::value_type>
-      *const                                                        coefficient,
-    const AffineConstraints<typename SparseMatrixType::value_type> &constraints)
+    MatrixType                                 &matrix,
+    const Function<spacedim, typename MatrixType::value_type>
+      *const                                                  coefficient,
+    const AffineConstraints<typename MatrixType::value_type> &constraints)
   {
     Assert(matrix.m() == dof.n_dofs(),
            ExcDimensionMismatch(matrix.m(), dof.n_dofs()));
@@ -829,7 +827,7 @@ namespace MatrixCreator
            ExcDimensionMismatch(matrix.n(), dof.n_dofs()));
 
     MatrixCreator::internal::AssemblerData::
-      Scratch<dim, spacedim, typename SparseMatrixType::value_type>
+      Scratch<dim, spacedim, typename MatrixType::value_type>
         assembler_data(dof.get_fe_collection(),
                        update_values | update_JxW_values |
                          (coefficient != nullptr ? update_quadrature_points :
@@ -839,7 +837,7 @@ namespace MatrixCreator
                        q,
                        mapping);
     MatrixCreator::internal::AssemblerData::CopyData<
-      typename SparseMatrixType::value_type>
+      typename MatrixType::value_type>
       copy_data;
     copy_data.cell_matrix.reinit(
       assembler_data.fe_collection.max_dofs_per_cell(),
@@ -857,14 +855,14 @@ namespace MatrixCreator
         dim,
         spacedim,
         typename DoFHandler<dim, spacedim>::active_cell_iterator,
-        typename SparseMatrixType::value_type>,
-      [&matrix](const internal::AssemblerData::CopyData<
-                typename SparseMatrixType::value_type> &data) {
+        typename MatrixType::value_type>,
+      [&matrix](
+        const internal::AssemblerData::CopyData<typename MatrixType::value_type>
+          &data) {
         MatrixCreator::internal::copy_local_to_global(
           data,
           &matrix,
-          static_cast<Vector<typename SparseMatrixType::value_type> *>(
-            nullptr));
+          static_cast<Vector<typename MatrixType::value_type> *>(nullptr));
       },
       assembler_data,
       copy_data);
@@ -874,15 +872,15 @@ namespace MatrixCreator
 
 
 
-  template <int dim, int spacedim, typename SparseMatrixType>
+  template <int dim, int spacedim, typename MatrixType>
   void
   create_mass_matrix(
     const DoFHandler<dim, spacedim> &dof,
     const hp::QCollection<dim>      &q,
-    SparseMatrixType                &matrix,
-    const Function<spacedim, typename SparseMatrixType::value_type>
-      *const                                                        coefficient,
-    const AffineConstraints<typename SparseMatrixType::value_type> &constraints)
+    MatrixType                      &matrix,
+    const Function<spacedim, typename MatrixType::value_type>
+      *const                                                  coefficient,
+    const AffineConstraints<typename MatrixType::value_type> &constraints)
   {
     create_mass_matrix(hp::StaticMappingQ1<dim, spacedim>::mapping_collection,
                        dof,
@@ -894,18 +892,18 @@ namespace MatrixCreator
 
 
 
-  template <int dim, int spacedim, typename SparseMatrixType>
+  template <int dim, int spacedim, typename MatrixType>
   void
   create_mass_matrix(
-    const hp::MappingCollection<dim, spacedim>                      &mapping,
-    const DoFHandler<dim, spacedim>                                 &dof,
-    const hp::QCollection<dim>                                      &q,
-    SparseMatrixType                                                &matrix,
-    const Function<spacedim, typename SparseMatrixType::value_type> &rhs,
-    Vector<typename SparseMatrixType::value_type>                   &rhs_vector,
-    const Function<spacedim, typename SparseMatrixType::value_type>
-      *const                                                        coefficient,
-    const AffineConstraints<typename SparseMatrixType::value_type> &constraints)
+    const hp::MappingCollection<dim, spacedim>                &mapping,
+    const DoFHandler<dim, spacedim>                           &dof,
+    const hp::QCollection<dim>                                &q,
+    MatrixType                                                &matrix,
+    const Function<spacedim, typename MatrixType::value_type> &rhs,
+    Vector<typename MatrixType::value_type>                   &rhs_vector,
+    const Function<spacedim, typename MatrixType::value_type>
+      *const                                                  coefficient,
+    const AffineConstraints<typename MatrixType::value_type> &constraints)
   {
     Assert(matrix.m() == dof.n_dofs(),
            ExcDimensionMismatch(matrix.m(), dof.n_dofs()));
@@ -913,7 +911,7 @@ namespace MatrixCreator
            ExcDimensionMismatch(matrix.n(), dof.n_dofs()));
 
     MatrixCreator::internal::AssemblerData::
-      Scratch<dim, spacedim, typename SparseMatrixType::value_type>
+      Scratch<dim, spacedim, typename MatrixType::value_type>
         assembler_data(dof.get_fe_collection(),
                        update_values | update_JxW_values |
                          update_quadrature_points,
@@ -922,7 +920,7 @@ namespace MatrixCreator
                        q,
                        mapping);
     MatrixCreator::internal::AssemblerData::CopyData<
-      typename SparseMatrixType::value_type>
+      typename MatrixType::value_type>
       copy_data;
     copy_data.cell_matrix.reinit(
       assembler_data.fe_collection.max_dofs_per_cell(),
@@ -940,9 +938,10 @@ namespace MatrixCreator
         dim,
         spacedim,
         typename DoFHandler<dim, spacedim>::active_cell_iterator,
-        typename SparseMatrixType::value_type>,
-      [&matrix, &rhs_vector](const internal::AssemblerData::CopyData<
-                             typename SparseMatrixType::value_type> &data) {
+        typename MatrixType::value_type>,
+      [&matrix, &rhs_vector](
+        const internal::AssemblerData::CopyData<typename MatrixType::value_type>
+          &data) {
         MatrixCreator::internal::copy_local_to_global(data,
                                                       &matrix,
                                                       &rhs_vector);
@@ -955,17 +954,17 @@ namespace MatrixCreator
 
 
 
-  template <int dim, int spacedim, typename SparseMatrixType>
+  template <int dim, int spacedim, typename MatrixType>
   void
   create_mass_matrix(
-    const DoFHandler<dim, spacedim>                                 &dof,
-    const hp::QCollection<dim>                                      &q,
-    SparseMatrixType                                                &matrix,
-    const Function<spacedim, typename SparseMatrixType::value_type> &rhs,
-    Vector<typename SparseMatrixType::value_type>                   &rhs_vector,
-    const Function<spacedim, typename SparseMatrixType::value_type>
-      *const                                                        coefficient,
-    const AffineConstraints<typename SparseMatrixType::value_type> &constraints)
+    const DoFHandler<dim, spacedim>                           &dof,
+    const hp::QCollection<dim>                                &q,
+    MatrixType                                                &matrix,
+    const Function<spacedim, typename MatrixType::value_type> &rhs,
+    Vector<typename MatrixType::value_type>                   &rhs_vector,
+    const Function<spacedim, typename MatrixType::value_type>
+      *const                                                  coefficient,
+    const AffineConstraints<typename MatrixType::value_type> &constraints)
   {
     create_mass_matrix(hp::StaticMappingQ1<dim, spacedim>::mapping_collection,
                        dof,
@@ -982,7 +981,7 @@ namespace MatrixCreator
   namespace internal
   {
     template <int dim, int spacedim, typename number>
-    void static inline create_boundary_mass_matrix_1(
+    void inline create_boundary_mass_matrix_1(
       const typename DoFHandler<dim, spacedim>::active_cell_iterator &cell,
       const MatrixCreator::internal::AssemblerBoundary::Scratch &,
       MatrixCreator::internal::AssemblerBoundary::
@@ -1101,11 +1100,11 @@ namespace MatrixCreator
                     if (!base.conforms(FiniteElementData<dim>::H1) &&
                         base.conforms(FiniteElementData<dim>::Hdiv) &&
                         fe_is_primitive)
-                      Assert(false, ExcNotImplemented());
+                      DEAL_II_NOT_IMPLEMENTED();
 
                     if (!base.conforms(FiniteElementData<dim>::H1) &&
                         base.conforms(FiniteElementData<dim>::Hcurl))
-                      Assert(false, ExcNotImplemented());
+                      DEAL_II_NOT_IMPLEMENTED();
 
                     if (!base.conforms(FiniteElementData<dim>::H1) &&
                         base.conforms(FiniteElementData<dim>::Hdiv))
@@ -1307,8 +1306,9 @@ namespace MatrixCreator
       const Function<3, float> *const /*coefficient*/,
       const std::vector<unsigned int> & /*component_mapping*/)
     {
-      Assert(false, ExcNotImplemented());
+      DEAL_II_NOT_IMPLEMENTED();
     }
+
 
     template <>
     void inline create_boundary_mass_matrix_1<1, 3, double>(
@@ -1324,7 +1324,7 @@ namespace MatrixCreator
       const Function<3, double> *const /*coefficient*/,
       const std::vector<unsigned int> & /*component_mapping*/)
     {
-      Assert(false, ExcNotImplemented());
+      DEAL_II_NOT_IMPLEMENTED();
     }
 
   } // namespace internal
@@ -1350,7 +1350,7 @@ namespace MatrixCreator
     // dofs?
     if (dim == 1)
       {
-        Assert(false, ExcNotImplemented());
+        DEAL_II_NOT_IMPLEMENTED();
         return;
       }
 
@@ -1362,7 +1362,6 @@ namespace MatrixCreator
     Assert(fe_is_hermite ||
              matrix.n() == dof.n_boundary_dofs(boundary_functions),
            ExcInternalError());
-    (void)fe_is_hermite;
 
     Assert(matrix.n() == matrix.m(), ExcInternalError());
     Assert(matrix.n() == rhs_vector.size(), ExcInternalError());
@@ -1552,11 +1551,11 @@ namespace MatrixCreator
                     if (!base.conforms(FiniteElementData<dim>::H1) &&
                         base.conforms(FiniteElementData<dim>::Hdiv) &&
                         fe_is_primitive)
-                      Assert(false, ExcNotImplemented());
+                      DEAL_II_NOT_IMPLEMENTED();
 
                     if (!base.conforms(FiniteElementData<dim>::H1) &&
                         base.conforms(FiniteElementData<dim>::Hcurl))
-                      Assert(false, ExcNotImplemented());
+                      DEAL_II_NOT_IMPLEMENTED();
 
                     if (!base.conforms(FiniteElementData<dim>::H1) &&
                         base.conforms(FiniteElementData<dim>::Hdiv))
@@ -1724,31 +1723,35 @@ namespace MatrixCreator
                 copy_data.cell->face(face)->boundary_id()) !=
               boundary_functions.end())
             {
-#ifdef DEBUG
-              // in debug mode: compute an element in the matrix which is
-              // guaranteed to belong to a boundary dof. We do this to check
-              // that the entries in the cell matrix are guaranteed to be zero
-              // if the respective dof is not on the boundary. Since because of
-              // round-off, the actual value of the matrix entry may be
-              // only close to zero, we assert that it is small relative to an
-              // element which is guaranteed to be nonzero. (absolute smallness
-              // does not suffice since the size of the domain scales in here)
-              //
-              // for this purpose we seek the diagonal of the matrix, where
-              // there must be an element belonging to the boundary. we take the
-              // maximum diagonal entry.
-              types::global_dof_index max_element = 0;
-              for (const auto index : dof_to_boundary_mapping)
-                if ((index != numbers::invalid_dof_index) &&
-                    (index > max_element))
-                  max_element = index;
-              Assert(max_element == matrix.n() - 1, ExcInternalError());
+              if constexpr (running_in_debug_mode())
+                {
+                  // in debug mode: compute an element in the matrix which is
+                  // guaranteed to belong to a boundary dof. We do this to check
+                  // that the entries in the cell matrix are guaranteed to be
+                  // zero if the respective dof is not on the boundary. Since
+                  // because of round-off, the actual value of the matrix entry
+                  // may be only close to zero, we assert that it is small
+                  // relative to an element which is guaranteed to be nonzero.
+                  // (absolute smallness does not suffice since the size of the
+                  // domain scales in here)
+                  //
+                  // for this purpose we seek the diagonal of the matrix, where
+                  // there must be an element belonging to the boundary. we take
+                  // the maximum diagonal entry.
+                  types::global_dof_index max_element = 0;
+                  for (const auto index : dof_to_boundary_mapping)
+                    if ((index != numbers::invalid_dof_index) &&
+                        (index > max_element))
+                      max_element = index;
+                  Assert(max_element == matrix.n() - 1, ExcInternalError());
 
-              double max_diag_entry = 0;
-              for (unsigned int i = 0; i < copy_data.dofs_per_cell; ++i)
-                if (std::abs(copy_data.cell_matrix[pos](i, i)) > max_diag_entry)
-                  max_diag_entry = std::abs(copy_data.cell_matrix[pos](i, i));
-#endif
+                  double max_diag_entry = 0;
+                  for (unsigned int i = 0; i < copy_data.dofs_per_cell; ++i)
+                    if (std::abs(copy_data.cell_matrix[pos](i, i)) >
+                        max_diag_entry)
+                      max_diag_entry =
+                        std::abs(copy_data.cell_matrix[pos](i, i));
+                }
 
               for (unsigned int i = 0; i < copy_data.dofs_per_cell; ++i)
                 {
@@ -1825,7 +1828,7 @@ namespace MatrixCreator
     // dofs?
     if (dim == 1)
       {
-        Assert(false, ExcNotImplemented());
+        DEAL_II_NOT_IMPLEMENTED();
         return;
       }
 
@@ -1921,16 +1924,16 @@ namespace MatrixCreator
 
 
 
-  template <int dim, int spacedim, typename SparseMatrixType>
+  template <int dim, int spacedim, typename MatrixType>
   void
   create_laplace_matrix(
     const Mapping<dim, spacedim>    &mapping,
     const DoFHandler<dim, spacedim> &dof,
     const Quadrature<dim>           &q,
-    SparseMatrixType                &matrix,
-    const Function<spacedim, typename SparseMatrixType::value_type>
-      *const                                                        coefficient,
-    const AffineConstraints<typename SparseMatrixType::value_type> &constraints)
+    MatrixType                      &matrix,
+    const Function<spacedim, typename MatrixType::value_type>
+      *const                                                  coefficient,
+    const AffineConstraints<typename MatrixType::value_type> &constraints)
   {
     Assert(matrix.m() == dof.n_dofs(),
            ExcDimensionMismatch(matrix.m(), dof.n_dofs()));
@@ -1941,7 +1944,7 @@ namespace MatrixCreator
     hp::QCollection<dim> q_collection(q);
     hp::MappingCollection<dim, spacedim> mapping_collection(mapping);
     MatrixCreator::internal::AssemblerData::
-      Scratch<dim, spacedim, typename SparseMatrixType::value_type>
+      Scratch<dim, spacedim, typename MatrixType::value_type>
         assembler_data(fe_collection,
                        update_gradients | update_JxW_values |
                          (coefficient != nullptr ? update_quadrature_points :
@@ -1951,7 +1954,7 @@ namespace MatrixCreator
                        q_collection,
                        mapping_collection);
     MatrixCreator::internal::AssemblerData::CopyData<
-      typename SparseMatrixType::value_type>
+      typename MatrixType::value_type>
       copy_data;
     copy_data.cell_matrix.reinit(
       assembler_data.fe_collection.max_dofs_per_cell(),
@@ -1969,14 +1972,14 @@ namespace MatrixCreator
         dim,
         spacedim,
         typename DoFHandler<dim, spacedim>::active_cell_iterator,
-        typename SparseMatrixType::value_type>,
-      [&matrix](const internal::AssemblerData::CopyData<
-                typename SparseMatrixType::value_type> &data) {
+        typename MatrixType::value_type>,
+      [&matrix](
+        const internal::AssemblerData::CopyData<typename MatrixType::value_type>
+          &data) {
         MatrixCreator::internal::copy_local_to_global(
           data,
           &matrix,
-          static_cast<Vector<typename SparseMatrixType::value_type> *>(
-            nullptr));
+          static_cast<Vector<typename MatrixType::value_type> *>(nullptr));
       },
       assembler_data,
       copy_data);
@@ -1986,15 +1989,15 @@ namespace MatrixCreator
 
 
 
-  template <int dim, int spacedim, typename SparseMatrixType>
+  template <int dim, int spacedim, typename MatrixType>
   void
   create_laplace_matrix(
     const DoFHandler<dim, spacedim> &dof,
     const Quadrature<dim>           &q,
-    SparseMatrixType                &matrix,
-    const Function<spacedim, typename SparseMatrixType::value_type>
-      *const                                                        coefficient,
-    const AffineConstraints<typename SparseMatrixType::value_type> &constraints)
+    MatrixType                      &matrix,
+    const Function<spacedim, typename MatrixType::value_type>
+      *const                                                  coefficient,
+    const AffineConstraints<typename MatrixType::value_type> &constraints)
   {
     create_laplace_matrix(get_default_linear_mapping(dof.get_triangulation()),
                           dof,
@@ -2006,18 +2009,18 @@ namespace MatrixCreator
 
 
 
-  template <int dim, int spacedim, typename SparseMatrixType>
+  template <int dim, int spacedim, typename MatrixType>
   void
   create_laplace_matrix(
-    const Mapping<dim, spacedim>                                    &mapping,
-    const DoFHandler<dim, spacedim>                                 &dof,
-    const Quadrature<dim>                                           &q,
-    SparseMatrixType                                                &matrix,
-    const Function<spacedim, typename SparseMatrixType::value_type> &rhs,
-    Vector<typename SparseMatrixType::value_type>                   &rhs_vector,
-    const Function<spacedim, typename SparseMatrixType::value_type>
-      *const                                                        coefficient,
-    const AffineConstraints<typename SparseMatrixType::value_type> &constraints)
+    const Mapping<dim, spacedim>                              &mapping,
+    const DoFHandler<dim, spacedim>                           &dof,
+    const Quadrature<dim>                                     &q,
+    MatrixType                                                &matrix,
+    const Function<spacedim, typename MatrixType::value_type> &rhs,
+    Vector<typename MatrixType::value_type>                   &rhs_vector,
+    const Function<spacedim, typename MatrixType::value_type>
+      *const                                                  coefficient,
+    const AffineConstraints<typename MatrixType::value_type> &constraints)
   {
     Assert(matrix.m() == dof.n_dofs(),
            ExcDimensionMismatch(matrix.m(), dof.n_dofs()));
@@ -2028,7 +2031,7 @@ namespace MatrixCreator
     hp::QCollection<dim> q_collection(q);
     hp::MappingCollection<dim, spacedim> mapping_collection(mapping);
     MatrixCreator::internal::AssemblerData::
-      Scratch<dim, spacedim, typename SparseMatrixType::value_type>
+      Scratch<dim, spacedim, typename MatrixType::value_type>
         assembler_data(fe_collection,
                        update_gradients | update_values | update_JxW_values |
                          update_quadrature_points,
@@ -2037,7 +2040,7 @@ namespace MatrixCreator
                        q_collection,
                        mapping_collection);
     MatrixCreator::internal::AssemblerData::CopyData<
-      typename SparseMatrixType::value_type>
+      typename MatrixType::value_type>
       copy_data;
     copy_data.cell_matrix.reinit(
       assembler_data.fe_collection.max_dofs_per_cell(),
@@ -2055,9 +2058,10 @@ namespace MatrixCreator
         dim,
         spacedim,
         typename DoFHandler<dim, spacedim>::active_cell_iterator,
-        typename SparseMatrixType::value_type>,
-      [&matrix, &rhs_vector](const internal::AssemblerData::CopyData<
-                             typename SparseMatrixType::value_type> &data) {
+        typename MatrixType::value_type>,
+      [&matrix, &rhs_vector](
+        const internal::AssemblerData::CopyData<typename MatrixType::value_type>
+          &data) {
         MatrixCreator::internal::copy_local_to_global(data,
                                                       &matrix,
                                                       &rhs_vector);
@@ -2070,17 +2074,17 @@ namespace MatrixCreator
 
 
 
-  template <int dim, int spacedim, typename SparseMatrixType>
+  template <int dim, int spacedim, typename MatrixType>
   void
   create_laplace_matrix(
-    const DoFHandler<dim, spacedim>                                 &dof,
-    const Quadrature<dim>                                           &q,
-    SparseMatrixType                                                &matrix,
-    const Function<spacedim, typename SparseMatrixType::value_type> &rhs,
-    Vector<typename SparseMatrixType::value_type>                   &rhs_vector,
-    const Function<spacedim, typename SparseMatrixType::value_type>
-      *const                                                        coefficient,
-    const AffineConstraints<typename SparseMatrixType::value_type> &constraints)
+    const DoFHandler<dim, spacedim>                           &dof,
+    const Quadrature<dim>                                     &q,
+    MatrixType                                                &matrix,
+    const Function<spacedim, typename MatrixType::value_type> &rhs,
+    Vector<typename MatrixType::value_type>                   &rhs_vector,
+    const Function<spacedim, typename MatrixType::value_type>
+      *const                                                  coefficient,
+    const AffineConstraints<typename MatrixType::value_type> &constraints)
   {
     create_laplace_matrix(get_default_linear_mapping(dof.get_triangulation()),
                           dof,
@@ -2094,16 +2098,16 @@ namespace MatrixCreator
 
 
 
-  template <int dim, int spacedim, typename SparseMatrixType>
+  template <int dim, int spacedim, typename MatrixType>
   void
   create_laplace_matrix(
     const hp::MappingCollection<dim, spacedim> &mapping,
     const DoFHandler<dim, spacedim>            &dof,
     const hp::QCollection<dim>                 &q,
-    SparseMatrixType                           &matrix,
-    const Function<spacedim, typename SparseMatrixType::value_type>
-      *const                                                        coefficient,
-    const AffineConstraints<typename SparseMatrixType::value_type> &constraints)
+    MatrixType                                 &matrix,
+    const Function<spacedim, typename MatrixType::value_type>
+      *const                                                  coefficient,
+    const AffineConstraints<typename MatrixType::value_type> &constraints)
   {
     Assert(matrix.m() == dof.n_dofs(),
            ExcDimensionMismatch(matrix.m(), dof.n_dofs()));
@@ -2111,7 +2115,7 @@ namespace MatrixCreator
            ExcDimensionMismatch(matrix.n(), dof.n_dofs()));
 
     MatrixCreator::internal::AssemblerData::
-      Scratch<dim, spacedim, typename SparseMatrixType::value_type>
+      Scratch<dim, spacedim, typename MatrixType::value_type>
         assembler_data(dof.get_fe_collection(),
                        update_gradients | update_JxW_values |
                          (coefficient != nullptr ? update_quadrature_points :
@@ -2121,7 +2125,7 @@ namespace MatrixCreator
                        q,
                        mapping);
     MatrixCreator::internal::AssemblerData::CopyData<
-      typename SparseMatrixType::value_type>
+      typename MatrixType::value_type>
       copy_data;
     copy_data.cell_matrix.reinit(
       assembler_data.fe_collection.max_dofs_per_cell(),
@@ -2139,14 +2143,14 @@ namespace MatrixCreator
         dim,
         spacedim,
         typename DoFHandler<dim, spacedim>::active_cell_iterator,
-        typename SparseMatrixType::value_type>,
-      [&matrix](const internal::AssemblerData::CopyData<
-                typename SparseMatrixType::value_type> &data) {
+        typename MatrixType::value_type>,
+      [&matrix](
+        const internal::AssemblerData::CopyData<typename MatrixType::value_type>
+          &data) {
         MatrixCreator::internal::copy_local_to_global(
           data,
           &matrix,
-          static_cast<Vector<typename SparseMatrixType::value_type> *>(
-            nullptr));
+          static_cast<Vector<typename MatrixType::value_type> *>(nullptr));
       },
       assembler_data,
       copy_data);
@@ -2156,15 +2160,15 @@ namespace MatrixCreator
 
 
 
-  template <int dim, int spacedim, typename SparseMatrixType>
+  template <int dim, int spacedim, typename MatrixType>
   void
   create_laplace_matrix(
     const DoFHandler<dim, spacedim> &dof,
     const hp::QCollection<dim>      &q,
-    SparseMatrixType                &matrix,
-    const Function<spacedim, typename SparseMatrixType::value_type>
-      *const                                                        coefficient,
-    const AffineConstraints<typename SparseMatrixType::value_type> &constraints)
+    MatrixType                      &matrix,
+    const Function<spacedim, typename MatrixType::value_type>
+      *const                                                  coefficient,
+    const AffineConstraints<typename MatrixType::value_type> &constraints)
   {
     create_laplace_matrix(
       hp::StaticMappingQ1<dim, spacedim>::mapping_collection,
@@ -2177,18 +2181,18 @@ namespace MatrixCreator
 
 
 
-  template <int dim, int spacedim, typename SparseMatrixType>
+  template <int dim, int spacedim, typename MatrixType>
   void
   create_laplace_matrix(
-    const hp::MappingCollection<dim, spacedim>                      &mapping,
-    const DoFHandler<dim, spacedim>                                 &dof,
-    const hp::QCollection<dim>                                      &q,
-    SparseMatrixType                                                &matrix,
-    const Function<spacedim, typename SparseMatrixType::value_type> &rhs,
-    Vector<typename SparseMatrixType::value_type>                   &rhs_vector,
-    const Function<spacedim, typename SparseMatrixType::value_type>
-      *const                                                        coefficient,
-    const AffineConstraints<typename SparseMatrixType::value_type> &constraints)
+    const hp::MappingCollection<dim, spacedim>                &mapping,
+    const DoFHandler<dim, spacedim>                           &dof,
+    const hp::QCollection<dim>                                &q,
+    MatrixType                                                &matrix,
+    const Function<spacedim, typename MatrixType::value_type> &rhs,
+    Vector<typename MatrixType::value_type>                   &rhs_vector,
+    const Function<spacedim, typename MatrixType::value_type>
+      *const                                                  coefficient,
+    const AffineConstraints<typename MatrixType::value_type> &constraints)
   {
     Assert(matrix.m() == dof.n_dofs(),
            ExcDimensionMismatch(matrix.m(), dof.n_dofs()));
@@ -2196,7 +2200,7 @@ namespace MatrixCreator
            ExcDimensionMismatch(matrix.n(), dof.n_dofs()));
 
     MatrixCreator::internal::AssemblerData::
-      Scratch<dim, spacedim, typename SparseMatrixType::value_type>
+      Scratch<dim, spacedim, typename MatrixType::value_type>
         assembler_data(dof.get_fe_collection(),
                        update_gradients | update_values | update_JxW_values |
                          update_quadrature_points,
@@ -2205,7 +2209,7 @@ namespace MatrixCreator
                        q,
                        mapping);
     MatrixCreator::internal::AssemblerData::CopyData<
-      typename SparseMatrixType::value_type>
+      typename MatrixType::value_type>
       copy_data;
     copy_data.cell_matrix.reinit(
       assembler_data.fe_collection.max_dofs_per_cell(),
@@ -2223,9 +2227,10 @@ namespace MatrixCreator
         dim,
         spacedim,
         typename DoFHandler<dim, spacedim>::active_cell_iterator,
-        typename SparseMatrixType::value_type>,
-      [&matrix, &rhs_vector](const internal::AssemblerData::CopyData<
-                             typename SparseMatrixType::value_type> &data) {
+        typename MatrixType::value_type>,
+      [&matrix, &rhs_vector](
+        const internal::AssemblerData::CopyData<typename MatrixType::value_type>
+          &data) {
         MatrixCreator::internal::copy_local_to_global(data,
                                                       &matrix,
                                                       &rhs_vector);
@@ -2238,17 +2243,17 @@ namespace MatrixCreator
 
 
 
-  template <int dim, int spacedim, typename SparseMatrixType>
+  template <int dim, int spacedim, typename MatrixType>
   void
   create_laplace_matrix(
-    const DoFHandler<dim, spacedim>                                 &dof,
-    const hp::QCollection<dim>                                      &q,
-    SparseMatrixType                                                &matrix,
-    const Function<spacedim, typename SparseMatrixType::value_type> &rhs,
-    Vector<typename SparseMatrixType::value_type>                   &rhs_vector,
-    const Function<spacedim, typename SparseMatrixType::value_type>
-      *const                                                        coefficient,
-    const AffineConstraints<typename SparseMatrixType::value_type> &constraints)
+    const DoFHandler<dim, spacedim>                           &dof,
+    const hp::QCollection<dim>                                &q,
+    MatrixType                                                &matrix,
+    const Function<spacedim, typename MatrixType::value_type> &rhs,
+    Vector<typename MatrixType::value_type>                   &rhs_vector,
+    const Function<spacedim, typename MatrixType::value_type>
+      *const                                                  coefficient,
+    const AffineConstraints<typename MatrixType::value_type> &constraints)
   {
     create_laplace_matrix(
       hp::StaticMappingQ1<dim, spacedim>::mapping_collection,

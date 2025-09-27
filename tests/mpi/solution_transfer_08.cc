@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2021 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2021 - 2024 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE at
-// the top level of the deal.II distribution.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 
 
@@ -57,13 +56,13 @@ test(const bool allow_artificial_cells)
   sol_old = 1.;
 
   SolutionTransfer<dim> soltrans(dh);
-  soltrans.prepare_for_pure_refinement();
+  soltrans.prepare_for_coarsening_and_refinement(sol_old);
 
   tria.execute_coarsening_and_refinement();
   dh.distribute_dofs(fe);
 
   Vector<double> sol_new(dh.n_dofs());
-  soltrans.refine_interpolate(sol_old, sol_new);
+  soltrans.interpolate(sol_new);
   for (unsigned int i = 0; i < sol_new.size(); ++i)
     AssertThrow(sol_new[i] == 1., ExcInternalError());
 

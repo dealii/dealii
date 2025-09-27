@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2010 - 2020 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2010 - 2024 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 #ifndef dealii_integrators_elasticity_h
 #define dealii_integrators_elasticity_h
@@ -47,7 +46,7 @@ namespace LocalIntegrators
      * \f[ \int_Z \varepsilon(u): \varepsilon(v)\,dx \f]
      */
     template <int dim>
-    inline void
+    DEAL_II_DEPRECATED inline void
     cell_matrix(FullMatrix<double>      &M,
                 const FEValuesBase<dim> &fe,
                 const double             factor = 1.)
@@ -80,7 +79,7 @@ namespace LocalIntegrators
      * \f[ - \int_Z \varepsilon(u): \varepsilon(v) \,dx \f]
      */
     template <int dim, typename number>
-    inline void
+    DEAL_II_DEPRECATED inline void
     cell_residual(Vector<number>                                     &result,
                   const FEValuesBase<dim>                            &fe,
                   const ArrayView<const std::vector<Tensor<1, dim>>> &input,
@@ -119,7 +118,7 @@ namespace LocalIntegrators
      * @f]
      */
     template <int dim>
-    inline void
+    DEAL_II_DEPRECATED inline void
     nitsche_matrix(FullMatrix<double>      &M,
                    const FEValuesBase<dim> &fe,
                    double                   penalty,
@@ -174,7 +173,7 @@ namespace LocalIntegrators
      * @f]
      */
     template <int dim>
-    inline void
+    DEAL_II_DEPRECATED inline void
     nitsche_tangential_matrix(FullMatrix<double>      &M,
                               const FEValuesBase<dim> &fe,
                               double                   penalty,
@@ -253,7 +252,7 @@ namespace LocalIntegrators
      * the usual penalty parameter.
      */
     template <int dim, typename number>
-    void
+    DEAL_II_DEPRECATED void
     nitsche_residual(Vector<number>                                     &result,
                      const FEValuesBase<dim>                            &fe,
                      const ArrayView<const std::vector<double>>         &input,
@@ -305,7 +304,7 @@ namespace LocalIntegrators
      * @f]
      */
     template <int dim, typename number>
-    inline void
+    DEAL_II_DEPRECATED inline void
     nitsche_tangential_residual(
       Vector<number>                                     &result,
       const FEValuesBase<dim>                            &fe,
@@ -383,7 +382,7 @@ namespace LocalIntegrators
      * penalty parameter.
      */
     template <int dim, typename number>
-    void
+    DEAL_II_DEPRECATED void
     nitsche_residual_homogeneous(
       Vector<number>                                     &result,
       const FEValuesBase<dim>                            &fe,
@@ -428,7 +427,7 @@ namespace LocalIntegrators
      * The interior penalty flux for symmetric gradients.
      */
     template <int dim>
-    inline void
+    DEAL_II_DEPRECATED inline void
     ip_matrix(FullMatrix<double>      &M11,
               FullMatrix<double>      &M12,
               FullMatrix<double>      &M21,
@@ -536,7 +535,7 @@ namespace LocalIntegrators
      * Elasticity residual term for the symmetric interior penalty method.
      */
     template <int dim, typename number>
-    void
+    DEAL_II_DEPRECATED void
     ip_residual(Vector<number>                                     &result1,
                 Vector<number>                                     &result2,
                 const FEValuesBase<dim>                            &fe1,

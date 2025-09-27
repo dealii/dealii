@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2019 - 2023 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2019 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 #ifndef dealii_fully_distributed_tria_h
 #define dealii_fully_distributed_tria_h
@@ -23,6 +22,8 @@
 
 #include <deal.II/distributed/repartitioning_policy_tools.h>
 #include <deal.II/distributed/tria_base.h>
+
+#include <deal.II/grid/tria_description.h>
 
 #include <vector>
 
@@ -42,8 +43,6 @@ namespace parallel
 {
   /**
    * A namespace for the fully distributed triangulation.
-   *
-   * @ingroup parallel
    */
   namespace fullydistributed
   {
@@ -134,7 +133,16 @@ namespace parallel
       virtual ~Triangulation() = default;
 
       /**
-       * @copydoc dealii::Triangulation::create_triangulation()
+       * Create a triangulation from the provided
+       * TriangulationDescription::Description.
+       *
+       * @note Don't forget to attach the manifolds with set_manifold() before
+       *   calling this function if manifolds are needed.
+       *
+       * @note The namespace TriangulationDescription::Utilities contains functions
+       *   to create TriangulationDescription::Description.
+       *
+       * @param construction_data The data needed for this process.
        *
        * @note This is the function to be used instead of
        * Triangulation::create_triangulation() for some of the other
@@ -251,22 +259,13 @@ namespace parallel
        * must be empty before calling this function.
        *
        * You need to load with the same number of MPI processes that
-       * you saved with, hence autopartition is disabled.
+       * you saved with.
        *
        * Cell-based data that was saved with register_data_attach() can be read
        * in with notify_ready_to_unpack() after calling load().
        */
       virtual void
       load(const std::string &filename) override;
-
-      /**
-       * @copydoc load()
-       *
-       * @deprecated The autopartition parameter has been removed.
-       */
-      DEAL_II_DEPRECATED
-      virtual void
-      load(const std::string &filename, const bool autopartition) override;
 
     private:
       virtual unsigned int
@@ -288,8 +287,8 @@ namespace parallel
        * The stored vector will have a size equal to the number of locally owned
        * active cells and will be ordered by the occurrence of those cells.
        */
-      virtual void
-      update_cell_relations() override;
+      void
+      update_cell_relations();
 
       virtual void
       update_number_cache() override;
@@ -309,7 +308,7 @@ namespace parallel
       /**
        * Partitioner used during repartition().
        */
-      SmartPointer<const RepartitioningPolicyTools::Base<dim, spacedim>>
+      ObserverPointer<const RepartitioningPolicyTools::Base<dim, spacedim>>
         partitioner_distributed;
 
       /**

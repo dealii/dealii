@@ -1,22 +1,21 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2018 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2013 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 
 // it turns out that FE_Q::face_to_cell_index() had a bug for elements beyond
-// Q2 when using the face flip flag. this test is for the 2d case for the Q2
-// case
+// Q2 when using the face orientation flag. this test is for the 2d case for the
+// Q2 case
 
 #include <deal.II/fe/fe_q.h>
 
@@ -35,14 +34,14 @@ test()
     {
       deallog << "Face=" << face << std::endl;
 
-      for (int flip = 0; flip < 2; ++flip)
+      for (types::geometric_orientation orientation = 0; orientation < 2;
+           ++orientation)
         {
-          deallog << "  flip=" << (flip == 0 ? "false" : "true") << std::endl
+          deallog << "  orientation=" << (orientation == 0 ? "false" : "true")
+                  << std::endl
                   << "    ";
           for (unsigned int i = 0; i < dofs_per_face; ++i)
-            deallog << fe.face_to_cell_index(
-                         i, face, true, (flip == 0 ? false : true), false)
-                    << " - ";
+            deallog << fe.face_to_cell_index(i, face, orientation) << " - ";
           deallog << std::endl;
         }
     }

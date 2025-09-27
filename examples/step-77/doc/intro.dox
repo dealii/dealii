@@ -1,5 +1,3 @@
-<br>
-
 <i>
 This program was contributed by Wolfgang Bangerth, Colorado State University.
 
@@ -11,11 +9,11 @@ Award No. EAR-1550901 and The University of California-Davis.
 
 Stefano Zampini (King Abdullah University of Science and Technology)
 contributed the results obtained with the PETSc variant of this program
-discussed in the <a href="#Results">results section</a> below.
+discussed in the @ref step_77-ResultsSection "results section" below.
 </i>
 <br>
 
-<a name="Intro"></a>
+<a name="step_77-Intro"></a>
 <h1>Introduction</h1>
 
 The step-15 program solved the following, nonlinear equation
@@ -171,7 +169,7 @@ functionality, and we better use it.
   of the former two packages instead: Basically everything that we
   say and do below will also be true and work for these other packages!
   (We will also come back to this point in the
-  <a href="#Results">results section</a>
+  @ref step_77-ResultsSection "results section"
   below.)
 
 

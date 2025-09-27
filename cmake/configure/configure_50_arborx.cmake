@@ -1,17 +1,16 @@
-## ---------------------------------------------------------------------
+## ------------------------------------------------------------------------
 ##
-## Copyright (C) 2021 - 2022 by the deal.II authors
+## SPDX-License-Identifier: LGPL-2.1-or-later
+## Copyright (C) 2021 - 2025 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
-## The deal.II library is free software; you can use it, redistribute
-## it, and/or modify it under the terms of the GNU Lesser General
-## Public License as published by the Free Software Foundation; either
-## version 2.1 of the License, or (at your option) any later version.
-## The full text of the license can be found in the file LICENSE.md at
-## the top level directory of deal.II.
+## Part of the source code is dual licensed under Apache-2.0 WITH
+## LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+## governing the source code and code contributions can be found in
+## LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 ##
-## ---------------------------------------------------------------------
+## ------------------------------------------------------------------------
 
 #
 # Configuration for ArborX support in deal.II:
@@ -51,27 +50,45 @@ macro(feature_arborx_find_external var)
       ArborX::ArborX
     )
 
-    check_cxx_compiler_bug(
-      "
-      #include <ArborX.hpp>
-      int main() {
-        Kokkos::View<ArborX::Point*, Kokkos::HostSpace> points(\"points\", 0);
-        [[maybe_unused]] ArborX::BVH<Kokkos::HostSpace> bvh(Kokkos::DefaultExecutionSpace{}, points);
-      }
-      "
-      DEAL_II_ARBORX_CXX20_BUG)
-    reset_cmake_required()
+    if(ArborX_VERSION VERSION_LESS 2.0.0)
+      check_cxx_compiler_bug(
+        "
+        #include <ArborX.hpp>
+        int main() {
+          Kokkos::View<ArborX::Point*, Kokkos::HostSpace> points(\"points\", 0);
+          [[maybe_unused]] ArborX::BVH<Kokkos::HostSpace> bvh(Kokkos::DefaultHostExecutionSpace{}, points);
+        }
+        "
+        DEAL_II_ARBORX_CXX20_BUG)
+      reset_cmake_required()
 
-    if(DEAL_II_ARBORX_CXX20_BUG)
-      message(STATUS "Could not find a sufficient ArborX installation: "
-        "The ArborX version doesn't work with C++20 or higher."
-        )
-      set(ARBORX_ADDITIONAL_ERROR_STRING
-        ${ARBORX_ADDITIONAL_ERROR_STRING}
-        "Could not find a sufficient ArborX installation:\n"
-        "The ArborX version doesn't work with C++20 or higher. Try using a later ArborX release or try specifying a lower C++ standard.\n"
-        )
-      set(${var} FALSE)
+      if(DEAL_II_ARBORX_CXX20_BUG)
+        message(STATUS "Could not find a sufficient ArborX installation: "
+          "The ArborX version doesn't work with C++20 or higher."
+          )
+        set(ARBORX_ADDITIONAL_ERROR_STRING
+          ${ARBORX_ADDITIONAL_ERROR_STRING}
+          "Could not find a sufficient ArborX installation:\n"
+          "The ArborX version doesn't work with C++20 or higher. "
+          "Try using a later ArborX release or try specifying a lower C++ standard.\n"
+          )
+        set(${var} FALSE)
+      endif()
+    endif()
+
+    if(ArborX_VERSION VERSION_GREATER_EQUAL 2.0.0)
+      if(NOT DEAL_II_HAVE_CXX20)
+        message(STATUS "Could not find a sufficient ArborX installation: "
+          "The ArborX version ${ArborX_VERSION} requires C++20 or higher."
+          )
+        set(ARBORX_ADDITIONAL_ERROR_STRING
+          ${ARBORX_ADDITIONAL_ERROR_STRING}
+          "Could not find a sufficient ArborX installation:\n"
+          "The ArborX version ${ArborX_VERSION} requires C++20 or higher. "
+          "Try using an earlier ArborX release or try specifying a higher C++ standard.\n"
+          )
+        set(${var} FALSE)
+      endif()
     endif()
   endif()
 
@@ -79,4 +96,3 @@ macro(feature_arborx_find_external var)
 endmacro()
 
 configure_feature(ARBORX)
-

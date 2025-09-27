@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2022 - 2023 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2022 - 2024 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 //
 // Description:
@@ -203,7 +202,7 @@ RightHandSide<dim>::value_list(const std::vector<Point<dim>> &vp,
 
 
 template <class MatrixType, class PreconditionerType>
-class InverseMatrix : public Subscriptor
+class InverseMatrix : public EnableObserverPointer
 {
 public:
   InverseMatrix(const MatrixType &m, const PreconditionerType &preconditioner);
@@ -212,8 +211,8 @@ public:
   vmult(Vector<double> &dst, const Vector<double> &src) const;
 
 private:
-  const SmartPointer<const MatrixType>         matrix;
-  const SmartPointer<const PreconditionerType> preconditioner;
+  const ObserverPointer<const MatrixType>         matrix;
+  const ObserverPointer<const PreconditionerType> preconditioner;
 };
 
 
@@ -242,7 +241,7 @@ InverseMatrix<MatrixType, PreconditionerType>::vmult(
 
 
 template <class PreconditionerType>
-class SchurComplement : public Subscriptor
+class SchurComplement : public EnableObserverPointer
 {
 public:
   SchurComplement(
@@ -253,8 +252,8 @@ public:
   vmult(Vector<double> &dst, const Vector<double> &src) const;
 
 private:
-  const SmartPointer<const BlockSparseMatrix<double>> system_matrix;
-  const SmartPointer<
+  const ObserverPointer<const BlockSparseMatrix<double>> system_matrix;
+  const ObserverPointer<
     const InverseMatrix<SparseMatrix<double>, PreconditionerType>>
     A_inverse;
 

@@ -418,12 +418,11 @@ library        - builds and installs the 'library' component
     </p>
 
     <p>
-      The library will be compiled with the default C++ standard enabled by
-      the compiler. This is (as of May 2020) C++14 for all compilers. If
-      you want to override this behavior, please set the C++ standard
-      directly for example by configuring with
-      <code>-DDEAL_II_CXX_FLAGS="-std=c++17"</code>, or by setting the
-      environment variable <code>CXXFLAGS="-std=c++17"</code>.
+      deal.II (as of version 9.6) requires a compiler which supports the C++17
+      language standard. If you want to override this behavior, please set the
+      C++ standard directly for example by configuring with
+      <code>-DDEAL_II_CXX_FLAGS="-std=c++23"</code>, or by setting the
+      environment variable <code>CXXFLAGS="-std=c++23"</code>.
 
       Similarly, for enabling SIMD vectorization support, you have to set
       an appropriate target architecture via <code>-march=...</code>, for
@@ -458,7 +457,6 @@ DEAL_II_WITH_ASSIMP
 DEAL_II_WITH_BOOST
 DEAL_II_WITH_CGAL
 DEAL_II_WITH_COMPLEX_VALUES
-DEAL_II_WITH_CUDA
 DEAL_II_WITH_GINKGO
 DEAL_II_WITH_GMSH
 DEAL_II_WITH_GSL
@@ -466,6 +464,7 @@ DEAL_II_WITH_HDF5
 DEAL_II_WITH_LAPACK
 DEAL_II_WITH_METIS
 DEAL_II_WITH_MPI
+DEAL_II_WITH_MUMPS
 DEAL_II_WITH_MUPARSER
 DEAL_II_WITH_OPENCASCADE
 DEAL_II_WITH_P4EST
@@ -610,6 +609,7 @@ BOOST_DIR,
 HDF5_DIR,
 LAPACK_DIR (and BLAS_DIR),
 METIS_DIR,
+MUMPS_DIR (and SCALAPACK_DIR, BLACS_DIR),
 MUPARSER_DIR,
 P4EST_DIR (and SC_DIR),
 PETSC_DIR and PETSC_ARCH (forming ${PETSC_DIR}/${PETSC_ARCH}),
@@ -782,6 +782,14 @@ cmake -DLAPACK_FOUND=true \
           <code>DEAL_II_ALLOW_PLATFORM_INTROSPECTION</code>: If set
           (default), <acronym>deal.II</acronym> will perform platform
           introspection for the given CPU.
+
+        <li>
+          <code>DEAL_II_USE_LTO</code>: If set to "ON" (the default is
+          "OFF"), allow the compiler to use interprocedural and
+          link-time optimization for release builds. These
+          optimizations often substantially improve performance, but
+          take both a substantial amount of memory and CPU time when
+          compiling the library.
 
         <li>
           <code>BUILD_SHARED_LIBS</code>: If set (default),

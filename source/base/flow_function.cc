@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2007 - 2023 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2007 - 2024 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 #include <deal.II/base/flow_function.h>
 #include <deal.II/base/point.h>
@@ -180,7 +179,7 @@ namespace Functions
   std::size_t
   FlowFunction<dim>::memory_consumption() const
   {
-    Assert(false, ExcNotImplemented());
+    DEAL_II_NOT_IMPLEMENTED();
     return 0;
   }
 
@@ -217,7 +216,7 @@ namespace Functions
         // the radius.
         double r2 = 0;
         for (unsigned int d = 1; d < dim; ++d)
-          r2 += p(d) * p(d);
+          r2 += p[d] * p[d];
         r2 *= inv_sqr_radius;
 
         // x-velocity
@@ -226,7 +225,7 @@ namespace Functions
         for (unsigned int d = 1; d < dim; ++d)
           values[d][k] = 0.;
         // pressure
-        values[dim][k] = -2 * (dim - 1) * inv_sqr_radius * p(0) / Reynolds +
+        values[dim][k] = -2 * (dim - 1) * inv_sqr_radius * p[0] / Reynolds +
                          this->mean_pressure;
       }
   }
@@ -252,7 +251,7 @@ namespace Functions
         // x-velocity
         values[0][k][0] = 0.;
         for (unsigned int d = 1; d < dim; ++d)
-          values[0][k][d] = -2. * p(d) * inv_sqr_radius;
+          values[0][k][d] = -2. * p[d] * inv_sqr_radius;
         // other velocities
         for (unsigned int d = 1; d < dim; ++d)
           values[d][k] = 0.;
@@ -317,8 +316,8 @@ namespace Functions
     for (unsigned int k = 0; k < n; ++k)
       {
         const Point<dim> &p  = points[k];
-        const double      x  = numbers::PI / 2. * p(0);
-        const double      y  = numbers::PI / 2. * p(1);
+        const double      x  = numbers::PI / 2. * p[0];
+        const double      y  = numbers::PI / 2. * p[1];
         const double      cx = std::cos(x);
         const double      cy = std::cos(y);
         const double      sx = std::sin(x);
@@ -332,7 +331,7 @@ namespace Functions
           }
         else if (dim == 3)
           {
-            const double z  = numbers::PI / 2. * p(2);
+            const double z  = numbers::PI / 2. * p[2];
             const double cz = std::cos(z);
             const double sz = std::sin(z);
 
@@ -343,7 +342,7 @@ namespace Functions
           }
         else
           {
-            Assert(false, ExcNotImplemented());
+            DEAL_II_NOT_IMPLEMENTED();
           }
       }
   }
@@ -366,8 +365,8 @@ namespace Functions
     for (unsigned int k = 0; k < n; ++k)
       {
         const Point<dim> &p   = points[k];
-        const double      x   = numbers::PI / 2. * p(0);
-        const double      y   = numbers::PI / 2. * p(1);
+        const double      x   = numbers::PI / 2. * p[0];
+        const double      y   = numbers::PI / 2. * p[1];
         const double      c2x = std::cos(2 * x);
         const double      c2y = std::cos(2 * y);
         const double      s2x = std::sin(2 * x);
@@ -386,7 +385,7 @@ namespace Functions
           }
         else if (dim == 3)
           {
-            const double z   = numbers::PI / 2. * p(2);
+            const double z   = numbers::PI / 2. * p[2];
             const double c2z = std::cos(2 * z);
             const double s2z = std::sin(2 * z);
             const double cz2 = .5 + .5 * c2z; // cos^2 z
@@ -409,7 +408,7 @@ namespace Functions
           }
         else
           {
-            Assert(false, ExcNotImplemented());
+            DEAL_II_NOT_IMPLEMENTED();
           }
       }
   }
@@ -446,8 +445,8 @@ namespace Functions
     for (unsigned int k = 0; k < n; ++k)
       {
         const Point<dim> &p   = points[k];
-        const double      x   = numbers::PI / 2. * p(0);
-        const double      y   = numbers::PI / 2. * p(1);
+        const double      x   = numbers::PI / 2. * p[0];
+        const double      y   = numbers::PI / 2. * p[1];
         const double      c2x = std::cos(2 * x);
         const double      c2y = std::cos(2 * y);
         const double      s2x = std::sin(2 * x);
@@ -464,7 +463,7 @@ namespace Functions
           }
         else if (dim == 3)
           {
-            const double z   = numbers::PI * p(2);
+            const double z   = numbers::PI * p[2];
             const double c2z = std::cos(2 * z);
             const double s2z = std::sin(2 * z);
 
@@ -480,7 +479,7 @@ namespace Functions
           }
         else
           {
-            Assert(false, ExcNotImplemented());
+            DEAL_II_NOT_IMPLEMENTED();
           }
       }
   }
@@ -556,8 +555,8 @@ namespace Functions
     for (unsigned int k = 0; k < n; ++k)
       {
         const Point<2> &p = points[k];
-        const double    x = p(0);
-        const double    y = p(1);
+        const double    x = p[0];
+        const double    y = p[1];
 
         if ((x < 0) || (y < 0))
           {
@@ -596,8 +595,8 @@ namespace Functions
     for (unsigned int k = 0; k < n; ++k)
       {
         const Point<2> &p = points[k];
-        const double    x = p(0);
-        const double    y = p(1);
+        const double    x = p[0];
+        const double    y = p[1];
 
         if ((x < 0) || (y < 0))
           {
@@ -689,8 +688,8 @@ namespace Functions
     for (unsigned int k = 0; k < n; ++k)
       {
         const Point<2> &p   = points[k];
-        const double    x   = p(0);
-        const double    y   = 2. * numbers::PI * p(1);
+        const double    x   = p[0];
+        const double    y   = 2. * numbers::PI * p[1];
         const double    elx = std::exp(lbda * x);
 
         values[0][k] = 1. - elx * std::cos(y);
@@ -713,8 +712,8 @@ namespace Functions
 
     for (unsigned int i = 0; i < n; ++i)
       {
-        const double x = points[i](0);
-        const double y = points[i](1);
+        const double x = points[i][0];
+        const double y = points[i][1];
 
         const double elx = std::exp(lbda * x);
         const double cy  = std::cos(2 * numbers::PI * y);
@@ -748,8 +747,8 @@ namespace Functions
         for (unsigned int k = 0; k < n; ++k)
           {
             const Point<2> &p   = points[k];
-            const double    x   = p(0);
-            const double    y   = zp * p(1);
+            const double    x   = p[0];
+            const double    y   = zp * p[1];
             const double    elx = std::exp(lbda * x);
             const double    u   = 1. - elx * std::cos(y);
             const double    ux  = -lbda * elx * std::cos(y);

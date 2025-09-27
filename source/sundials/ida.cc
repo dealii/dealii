@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2015 - 2023 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2017 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 #include <deal.II/base/config.h>
 
@@ -38,6 +37,11 @@
 #  include <deal.II/sundials/n_vector.h>
 #  include <deal.II/sundials/utilities.h>
 
+#  include <idas/idas.h>
+#  if DEAL_II_SUNDIALS_VERSION_GTE(6, 0, 0)
+#    include <sundials/sundials_context.h>
+#  endif
+
 #  include <iomanip>
 #  include <iostream>
 
@@ -62,12 +66,21 @@ namespace SUNDIALS
     , mpi_communicator(mpi_comm)
     , pending_exception(nullptr)
   {
+    set_functions_to_trigger_an_assert();
+
     // SUNDIALS will always duplicate communicators if we provide them. This
     // can cause problems if SUNDIALS is configured with MPI and we pass along
     // MPI_COMM_SELF in a serial application as MPI won't be
     // initialized. Hence, work around that by just not providing a
     // communicator in that case.
-#  if DEAL_II_SUNDIALS_VERSION_GTE(6, 0, 0)
+#  if DEAL_II_SUNDIALS_VERSION_GTE(7, 0, 0)
+    const int status =
+      SUNContext_Create(mpi_communicator == MPI_COMM_SELF ? SUN_COMM_NULL :
+                                                            mpi_communicator,
+                        &ida_ctx);
+    (void)status;
+    AssertIDA(status);
+#  elif DEAL_II_SUNDIALS_VERSION_GTE(6, 0, 0)
     const int status =
       SUNContext_Create(mpi_communicator == MPI_COMM_SELF ? nullptr :
                                                             &mpi_communicator,
@@ -75,7 +88,6 @@ namespace SUNDIALS
     (void)status;
     AssertIDA(status);
 #  endif
-    set_functions_to_trigger_an_assert();
   }
 
 
@@ -166,12 +178,14 @@ namespace SUNDIALS
         while (solver_should_restart(t, solution, solution_dot))
           reset(t, h, solution, solution_dot);
 
-        step_number++;
+        ++step_number;
 
         output_step(t, solution, solution_dot, step_number);
       }
-
-    return step_number;
+    long int n_steps;
+    status = IDAGetNumSteps(ida_mem, &n_steps);
+    AssertIDA(status);
+    return n_steps;
   }
 
 
@@ -188,7 +202,17 @@ namespace SUNDIALS
     int status;
     (void)status;
 
-#  if DEAL_II_SUNDIALS_VERSION_GTE(6, 0, 0)
+#  if DEAL_II_SUNDIALS_VERSION_GTE(7, 0, 0)
+    status = SUNContext_Free(&ida_ctx);
+    AssertIDA(status);
+
+    // Same comment applies as in class constructor:
+    status =
+      SUNContext_Create(mpi_communicator == MPI_COMM_SELF ? SUN_COMM_NULL :
+                                                            mpi_communicator,
+                        &ida_ctx);
+    AssertIDA(status);
+#  elif DEAL_II_SUNDIALS_VERSION_GTE(6, 0, 0)
     status = SUNContext_Free(&ida_ctx);
     AssertIDA(status);
 
@@ -227,8 +251,11 @@ namespace SUNDIALS
 
     status = IDAInit(
       ida_mem,
-      [](realtype tt, N_Vector yy, N_Vector yp, N_Vector rr, void *user_data)
-        -> int {
+      [](SUNDIALS::realtype tt,
+         N_Vector           yy,
+         N_Vector           yp,
+         N_Vector           rr,
+         void              *user_data) -> int {
         IDA<VectorType> &solver = *static_cast<IDA<VectorType> *>(user_data);
 
         auto *src_yy   = internal::unwrap_nvector_const<VectorType>(yy);
@@ -329,10 +356,10 @@ namespace SUNDIALS
         }
       if (LS->ops)
         {
-          free(LS->ops);
+          std::free(LS->ops);
           LS->ops = nullptr;
         }
-      free(LS);
+      std::free(LS);
       LS = nullptr;
       return 0;
     };
@@ -341,9 +368,9 @@ namespace SUNDIALS
                 ExcFunctionNotProvided("solve_with_jacobian"));
     LS->ops->solve = [](SUNLinearSolver LS,
                         SUNMatrix /*ignored*/,
-                        N_Vector x,
-                        N_Vector b,
-                        realtype tol) -> int {
+                        N_Vector           x,
+                        N_Vector           b,
+                        SUNDIALS::realtype tol) -> int {
       IDA<VectorType> &solver = *static_cast<IDA<VectorType> *>(LS->content);
 
       auto *src_b = internal::unwrap_nvector_const<VectorType>(b);
@@ -393,10 +420,10 @@ namespace SUNDIALS
         }
       if (A->ops)
         {
-          free(A->ops);
+          std::free(A->ops);
           A->ops = nullptr;
         }
-      free(A);
+      std::free(A);
       A = nullptr;
     };
 
@@ -411,10 +438,10 @@ namespace SUNDIALS
     // calling IDASetLinearSolver
     status = IDASetJacFn(
       ida_mem,
-      [](realtype tt,
-         realtype cj,
-         N_Vector yy,
-         N_Vector yp,
+      [](SUNDIALS::realtype tt,
+         SUNDIALS::realtype cj,
+         N_Vector           yy,
+         N_Vector           yp,
          N_Vector /* residual */,
          SUNMatrix /* ignored */,
          void *user_data,

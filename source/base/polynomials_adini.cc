@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2000 - 2020 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2009 - 2024 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/polynomials_adini.h>
@@ -193,8 +192,8 @@ double
 PolynomialsAdini<dim>::compute_value(const unsigned int i,
                                      const Point<dim>  &p) const
 {
-  const double x = p(0);
-  const double y = p(1);
+  const double x = p[0];
+  const double y = p[1];
   return coef(0, i) + coef(1, i) * x + coef(2, i) * y + coef(3, i) * x * x +
          coef(4, i) * y * y + coef(5, i) * x * y + coef(6, i) * x * x * x +
          coef(7, i) * y * y * y + coef(8, i) * x * y * y +
@@ -209,8 +208,8 @@ Tensor<1, dim>
 PolynomialsAdini<dim>::compute_grad(const unsigned int i,
                                     const Point<dim>  &p) const
 {
-  const double   x = p(0);
-  const double   y = p(1);
+  const double   x = p[0];
+  const double   y = p[1];
   Tensor<1, dim> tensor;
   tensor[0] = dx(0, i) + dx(1, i) * x + dx(2, i) * y + dx(3, i) * x * x +
               dx(4, i) * y * y + dx(5, i) * x * y + dx(6, i) * x * x * x +
@@ -233,8 +232,8 @@ Tensor<2, dim>
 PolynomialsAdini<dim>::compute_grad_grad(const unsigned int i,
                                          const Point<dim>  &p) const
 {
-  const double   x = p(0);
-  const double   y = p(1);
+  const double   x = p[0];
+  const double   y = p[1];
   Tensor<2, dim> tensor;
   tensor[0][0] = dxx(0, i) + dxx(1, i) * x + dxx(2, i) * y + dxx(3, i) * x * x +
                  dxx(4, i) * y * y + dxx(5, i) * x * y + dxx(6, i) * x * x * x +

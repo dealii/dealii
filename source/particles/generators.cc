@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2019 - 2023 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2019 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 #include <deal.II/base/bounding_box.h>
 #include <deal.II/base/geometry_info.h>
@@ -28,6 +27,8 @@
 #include <deal.II/particles/generators.h>
 
 #include <limits>
+#include <random>
+
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -200,12 +201,13 @@ namespace Particles
 
           // The local particle start index is the number of all particles
           // generated on lower MPI ranks.
-          const int ierr = MPI_Exscan(&n_particles_to_generate,
-                                      &particle_index,
-                                      1,
-                                      DEAL_II_PARTICLE_INDEX_MPI_TYPE,
-                                      MPI_SUM,
-                                      tria->get_communicator());
+          const int ierr = MPI_Exscan(
+            &n_particles_to_generate,
+            &particle_index,
+            1,
+            Utilities::MPI::mpi_type_id_for_type<types::particle_index>,
+            MPI_SUM,
+            tria->get_mpi_communicator());
           AssertThrowMPI(ierr);
         }
 #endif
@@ -288,7 +290,7 @@ namespace Particles
               &triangulation))
         {
           const unsigned int my_rank =
-            Utilities::MPI::this_mpi_process(tria->get_communicator());
+            Utilities::MPI::this_mpi_process(tria->get_mpi_communicator());
           combined_seed += my_rank;
         }
       std::mt19937 random_number_generator(combined_seed);
@@ -312,18 +314,21 @@ namespace Particles
                                          cumulative_cell_weights.back() :
                                          0.0;
 
-        double global_weight_integral;
+
+        double local_start_weight     = numbers::signaling_nan<double>();
+        double global_weight_integral = numbers::signaling_nan<double>();
 
         if (const auto tria =
               dynamic_cast<const parallel::TriangulationBase<dim, spacedim> *>(
                 &triangulation))
           {
-            global_weight_integral =
-              Utilities::MPI::sum(local_weight_integral,
-                                  tria->get_communicator());
+            std::tie(local_start_weight, global_weight_integral) =
+              Utilities::MPI::partial_and_total_sum(
+                local_weight_integral, tria->get_mpi_communicator());
           }
         else
           {
+            local_start_weight     = 0;
             global_weight_integral = local_weight_integral;
           }
 
@@ -336,25 +341,6 @@ namespace Particles
                       "provided function is positive in at least a "
                       "part of the domain; also check the syntax of "
                       "the function."));
-
-        // Determine the starting weight of this process, which is the sum of
-        // the weights of all processes with a lower rank
-        double local_start_weight = 0.0;
-
-#ifdef DEAL_II_WITH_MPI
-        if (const auto tria =
-              dynamic_cast<const parallel::TriangulationBase<dim, spacedim> *>(
-                &triangulation))
-          {
-            const int ierr = MPI_Exscan(&local_weight_integral,
-                                        &local_start_weight,
-                                        1,
-                                        MPI_DOUBLE,
-                                        MPI_SUM,
-                                        tria->get_communicator());
-            AssertThrowMPI(ierr);
-          }
-#endif
 
         // Calculate start id
         start_particle_id =
@@ -398,26 +384,29 @@ namespace Particles
           }
         else
           {
-            // Compute number of particles per cell according to the ratio
-            // between their weight and the local weight integral
-            types::particle_index particles_created = 0;
-
-            for (const auto &cell : triangulation.active_cell_iterators() |
-                                      IteratorFilters::LocallyOwnedCell())
+            if (local_weight_integral > 0)
               {
-                const types::particle_index cumulative_particles_to_create =
-                  std::llround(
-                    static_cast<double>(n_local_particles) *
-                    cumulative_cell_weights[cell->active_cell_index()] /
-                    local_weight_integral);
+                types::particle_index particles_created = 0;
 
-                // Compute particles for this cell as difference between
-                // number of particles that should be created including this
-                // cell minus the number of particles already created.
-                particles_per_cell[cell->active_cell_index()] =
-                  cumulative_particles_to_create - particles_created;
-                particles_created +=
-                  particles_per_cell[cell->active_cell_index()];
+                // Compute number of particles per cell according to the ratio
+                // between their weight and the local weight integral
+                for (const auto &cell : triangulation.active_cell_iterators() |
+                                          IteratorFilters::LocallyOwnedCell())
+                  {
+                    const types::particle_index cumulative_particles_to_create =
+                      std::llround(
+                        static_cast<double>(n_local_particles) *
+                        cumulative_cell_weights[cell->active_cell_index()] /
+                        local_weight_integral);
+
+                    // Compute particles for this cell as difference between
+                    // number of particles that should be created including this
+                    // cell minus the number of particles already created.
+                    particles_per_cell[cell->active_cell_index()] =
+                      cumulative_particles_to_create - particles_created;
+                    particles_created +=
+                      particles_per_cell[cell->active_cell_index()];
+                  }
               }
           }
       }
@@ -521,6 +510,6 @@ namespace Particles
   } // namespace Generators
 } // namespace Particles
 
-#include "generators.inst"
+#include "particles/generators.inst"
 
 DEAL_II_NAMESPACE_CLOSE

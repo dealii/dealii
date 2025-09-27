@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2021 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2001 - 2024 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 
 
@@ -43,137 +42,138 @@
 
 template <int dim>
 void
-test_2d_3d(std::vector<FiniteElement<dim> *> &fe_datas)
+test_2d_3d(std::vector<FiniteElement<dim> *> &finite_elements)
 {
   // Vector DG elements
-  fe_datas.push_back(new FE_DGRaviartThomas<dim>(0));
-  deallog << (*fe_datas.rbegin())->get_name() << std::endl;
-  fe_datas.push_back(new FE_DGRaviartThomas<dim>(1));
-  deallog << (*fe_datas.rbegin())->get_name() << std::endl;
-  fe_datas.push_back(new FE_DGBDM<dim>(1));
-  deallog << (*fe_datas.rbegin())->get_name() << std::endl;
-  fe_datas.push_back(new FE_DGBDM<dim>(2));
-  deallog << (*fe_datas.rbegin())->get_name() << std::endl;
-  fe_datas.push_back(new FE_DGNedelec<dim>(0));
-  deallog << (*fe_datas.rbegin())->get_name() << std::endl;
-  fe_datas.push_back(new FE_DGNedelec<dim>(1));
-  deallog << (*fe_datas.rbegin())->get_name() << std::endl;
+  finite_elements.push_back(new FE_DGRaviartThomas<dim>(0));
+  deallog << (*finite_elements.rbegin())->get_name() << std::endl;
+  finite_elements.push_back(new FE_DGRaviartThomas<dim>(1));
+  deallog << (*finite_elements.rbegin())->get_name() << std::endl;
+  finite_elements.push_back(new FE_DGBDM<dim>(1));
+  deallog << (*finite_elements.rbegin())->get_name() << std::endl;
+  finite_elements.push_back(new FE_DGBDM<dim>(2));
+  deallog << (*finite_elements.rbegin())->get_name() << std::endl;
+  finite_elements.push_back(new FE_DGNedelec<dim>(0));
+  deallog << (*finite_elements.rbegin())->get_name() << std::endl;
+  finite_elements.push_back(new FE_DGNedelec<dim>(1));
+  deallog << (*finite_elements.rbegin())->get_name() << std::endl;
 
   // Hdiv elements
   FE_RaviartThomas<dim> *rt0 = new FE_RaviartThomas<dim>(0);
-  fe_datas.push_back(rt0);
-  deallog << (*fe_datas.rbegin())->get_name() << std::endl;
+  finite_elements.push_back(rt0);
+  deallog << (*finite_elements.rbegin())->get_name() << std::endl;
 
   FE_RaviartThomas<dim> *rt1 = new FE_RaviartThomas<dim>(1);
-  fe_datas.push_back(rt1);
-  deallog << (*fe_datas.rbegin())->get_name() << std::endl;
+  finite_elements.push_back(rt1);
+  deallog << (*finite_elements.rbegin())->get_name() << std::endl;
 
-  fe_datas.push_back(new FE_RaviartThomas<dim>(2));
-  deallog << (*fe_datas.rbegin())->get_name() << std::endl;
-  fe_datas.push_back(new FESystem<dim>(*rt1, 1, FE_DGQ<dim>(1), 1));
-  deallog << (*fe_datas.rbegin())->get_name() << std::endl;
+  finite_elements.push_back(new FE_RaviartThomas<dim>(2));
+  deallog << (*finite_elements.rbegin())->get_name() << std::endl;
+  finite_elements.push_back(new FESystem<dim>(*rt1, 1, FE_DGQ<dim>(1), 1));
+  deallog << (*finite_elements.rbegin())->get_name() << std::endl;
 
-  fe_datas.push_back(new FE_BDM<dim>(1));
-  deallog << (*fe_datas.rbegin())->get_name() << std::endl;
-  fe_datas.push_back(new FE_BDM<dim>(2));
-  deallog << (*fe_datas.rbegin())->get_name() << std::endl;
+  finite_elements.push_back(new FE_BDM<dim>(1));
+  deallog << (*finite_elements.rbegin())->get_name() << std::endl;
+  finite_elements.push_back(new FE_BDM<dim>(2));
+  deallog << (*finite_elements.rbegin())->get_name() << std::endl;
 
   // Hcurl elements
   FE_Nedelec<dim> *ned0 = new FE_Nedelec<dim>(0);
-  fe_datas.push_back(ned0);
-  deallog << (*fe_datas.rbegin())->get_name() << std::endl;
+  finite_elements.push_back(ned0);
+  deallog << (*finite_elements.rbegin())->get_name() << std::endl;
   FE_Nedelec<dim> *ned1 = new FE_Nedelec<dim>(1);
-  fe_datas.push_back(ned1);
-  deallog << (*fe_datas.rbegin())->get_name() << std::endl;
+  finite_elements.push_back(ned1);
+  deallog << (*finite_elements.rbegin())->get_name() << std::endl;
 }
 
 
 
 void
-test_2d_3d(std::vector<FiniteElement<1> *> &fe_datas)
+test_2d_3d(std::vector<FiniteElement<1> *> &finite_elements)
 {}
 
 
 
 template <int dim>
 void
-test_fe_datas()
+test_finite_elements()
 {
-  std::vector<FiniteElement<dim> *> fe_datas;
-  fe_datas.push_back(new FE_Q<dim>(1));
-  deallog << (*fe_datas.rbegin())->get_name() << std::endl;
-  fe_datas.push_back(new FE_Q<dim>(2));
-  deallog << (*fe_datas.rbegin())->get_name() << std::endl;
-  fe_datas.push_back(new FE_Q<dim>(4));
-  deallog << (*fe_datas.rbegin())->get_name() << std::endl;
-  fe_datas.push_back(new FE_Q_Hierarchical<dim>(1));
-  deallog << (*fe_datas.rbegin())->get_name() << std::endl;
-  fe_datas.push_back(new FE_Q_Hierarchical<dim>(2));
-  deallog << (*fe_datas.rbegin())->get_name() << std::endl;
-  fe_datas.push_back(new FE_Q_Hierarchical<dim>(4));
-  deallog << (*fe_datas.rbegin())->get_name() << std::endl;
-  fe_datas.push_back(new FE_DGQ<dim>(1));
-  deallog << (*fe_datas.rbegin())->get_name() << std::endl;
-  fe_datas.push_back(new FE_DGQ<dim>(2));
-  deallog << (*fe_datas.rbegin())->get_name() << std::endl;
-  fe_datas.push_back(
+  std::vector<FiniteElement<dim> *> finite_elements;
+  finite_elements.push_back(new FE_Q<dim>(1));
+  deallog << (*finite_elements.rbegin())->get_name() << std::endl;
+  finite_elements.push_back(new FE_Q<dim>(2));
+  deallog << (*finite_elements.rbegin())->get_name() << std::endl;
+  finite_elements.push_back(new FE_Q<dim>(4));
+  deallog << (*finite_elements.rbegin())->get_name() << std::endl;
+  finite_elements.push_back(new FE_Q_Hierarchical<dim>(1));
+  deallog << (*finite_elements.rbegin())->get_name() << std::endl;
+  finite_elements.push_back(new FE_Q_Hierarchical<dim>(2));
+  deallog << (*finite_elements.rbegin())->get_name() << std::endl;
+  finite_elements.push_back(new FE_Q_Hierarchical<dim>(4));
+  deallog << (*finite_elements.rbegin())->get_name() << std::endl;
+  finite_elements.push_back(new FE_DGQ<dim>(1));
+  deallog << (*finite_elements.rbegin())->get_name() << std::endl;
+  finite_elements.push_back(new FE_DGQ<dim>(2));
+  deallog << (*finite_elements.rbegin())->get_name() << std::endl;
+  finite_elements.push_back(
     new FE_DGQArbitraryNodes<dim>(QIterated<1>(QTrapezoid<1>(), 4)));
-  deallog << (*fe_datas.rbegin())->get_name() << std::endl;
-  fe_datas.push_back(new FE_DGQ<dim>(4));
-  deallog << (*fe_datas.rbegin())->get_name() << std::endl;
-  fe_datas.push_back(new FE_DGQArbitraryNodes<dim>(QGauss<1>(3)));
-  deallog << (*fe_datas.rbegin())->get_name() << std::endl;
-  fe_datas.push_back(new FE_DGQLegendre<dim>(1));
-  deallog << (*fe_datas.rbegin())->get_name() << std::endl;
-  fe_datas.push_back(new FE_DGQLegendre<dim>(2));
-  deallog << (*fe_datas.rbegin())->get_name() << std::endl;
-  fe_datas.push_back(new FE_DGQHermite<dim>(3));
-  deallog << (*fe_datas.rbegin())->get_name() << std::endl;
-  fe_datas.push_back(new FE_DGP<dim>(1));
-  deallog << (*fe_datas.rbegin())->get_name() << std::endl;
-  fe_datas.push_back(new FE_DGP<dim>(2));
-  deallog << (*fe_datas.rbegin())->get_name() << std::endl;
-  fe_datas.push_back(new FESystem<dim>(FE_Q<dim>(2), 2));
-  deallog << (*fe_datas.rbegin())->get_name() << std::endl;
-  fe_datas.push_back(new FESystem<dim>(FE_Q<dim>(1), 2, FE_Q<dim>(2), 1));
-  deallog << (*fe_datas.rbegin())->get_name() << std::endl;
+  deallog << (*finite_elements.rbegin())->get_name() << std::endl;
+  finite_elements.push_back(new FE_DGQ<dim>(4));
+  deallog << (*finite_elements.rbegin())->get_name() << std::endl;
+  finite_elements.push_back(new FE_DGQArbitraryNodes<dim>(QGauss<1>(3)));
+  deallog << (*finite_elements.rbegin())->get_name() << std::endl;
+  finite_elements.push_back(new FE_DGQLegendre<dim>(1));
+  deallog << (*finite_elements.rbegin())->get_name() << std::endl;
+  finite_elements.push_back(new FE_DGQLegendre<dim>(2));
+  deallog << (*finite_elements.rbegin())->get_name() << std::endl;
+  finite_elements.push_back(new FE_DGQHermite<dim>(3));
+  deallog << (*finite_elements.rbegin())->get_name() << std::endl;
+  finite_elements.push_back(new FE_DGP<dim>(1));
+  deallog << (*finite_elements.rbegin())->get_name() << std::endl;
+  finite_elements.push_back(new FE_DGP<dim>(2));
+  deallog << (*finite_elements.rbegin())->get_name() << std::endl;
+  finite_elements.push_back(new FESystem<dim>(FE_Q<dim>(2), 2));
+  deallog << (*finite_elements.rbegin())->get_name() << std::endl;
+  finite_elements.push_back(
+    new FESystem<dim>(FE_Q<dim>(1), 2, FE_Q<dim>(2), 1));
+  deallog << (*finite_elements.rbegin())->get_name() << std::endl;
 
   // Face Q elements
-  fe_datas.push_back(new FE_FaceQ<dim>(0));
-  deallog << (*fe_datas.rbegin())->get_name() << std::endl;
-  fe_datas.push_back(new FE_FaceQ<dim>(1));
-  deallog << (*fe_datas.rbegin())->get_name() << std::endl;
-  fe_datas.push_back(new FE_FaceQ<dim>(3));
-  deallog << (*fe_datas.rbegin())->get_name() << std::endl;
+  finite_elements.push_back(new FE_FaceQ<dim>(0));
+  deallog << (*finite_elements.rbegin())->get_name() << std::endl;
+  finite_elements.push_back(new FE_FaceQ<dim>(1));
+  deallog << (*finite_elements.rbegin())->get_name() << std::endl;
+  finite_elements.push_back(new FE_FaceQ<dim>(3));
+  deallog << (*finite_elements.rbegin())->get_name() << std::endl;
   // Face P elements
-  fe_datas.push_back(new FE_FaceP<dim>(0));
-  deallog << (*fe_datas.rbegin())->get_name() << std::endl;
-  fe_datas.push_back(new FE_FaceP<dim>(1));
-  deallog << (*fe_datas.rbegin())->get_name() << std::endl;
-  fe_datas.push_back(new FE_FaceP<dim>(3));
-  deallog << (*fe_datas.rbegin())->get_name() << std::endl;
+  finite_elements.push_back(new FE_FaceP<dim>(0));
+  deallog << (*finite_elements.rbegin())->get_name() << std::endl;
+  finite_elements.push_back(new FE_FaceP<dim>(1));
+  deallog << (*finite_elements.rbegin())->get_name() << std::endl;
+  finite_elements.push_back(new FE_FaceP<dim>(3));
+  deallog << (*finite_elements.rbegin())->get_name() << std::endl;
 
 
   // Check vector elements in 2d and higher only
-  test_2d_3d(fe_datas);
+  test_2d_3d(finite_elements);
 
   if (dim == 2)
     {
-      fe_datas.push_back(new FE_DGBDM<dim>(1));
-      deallog << (*fe_datas.rbegin())->get_name() << std::endl;
-      fe_datas.push_back(new FE_DGBDM<dim>(2));
-      deallog << (*fe_datas.rbegin())->get_name() << std::endl;
+      finite_elements.push_back(new FE_DGBDM<dim>(1));
+      deallog << (*finite_elements.rbegin())->get_name() << std::endl;
+      finite_elements.push_back(new FE_DGBDM<dim>(2));
+      deallog << (*finite_elements.rbegin())->get_name() << std::endl;
     }
   if (dim > 1)
     {
       FE_RaviartThomasNodal<dim> *rt0 = new FE_RaviartThomasNodal<dim>(0);
       FE_RaviartThomasNodal<dim> *rt1 = new FE_RaviartThomasNodal<dim>(1);
-      fe_datas.push_back(rt0);
-      deallog << (*fe_datas.rbegin())->get_name() << std::endl;
-      fe_datas.push_back(rt1);
-      deallog << (*fe_datas.rbegin())->get_name() << std::endl;
-      fe_datas.push_back(new FESystem<dim>(*rt1, 1, FE_DGQ<dim>(1), 1));
-      deallog << (*fe_datas.rbegin())->get_name() << std::endl;
+      finite_elements.push_back(rt0);
+      deallog << (*finite_elements.rbegin())->get_name() << std::endl;
+      finite_elements.push_back(rt1);
+      deallog << (*finite_elements.rbegin())->get_name() << std::endl;
+      finite_elements.push_back(new FESystem<dim>(*rt1, 1, FE_DGQ<dim>(1), 1));
+      deallog << (*finite_elements.rbegin())->get_name() << std::endl;
     }
 
 
@@ -181,12 +181,13 @@ test_fe_datas()
   // only hardcoded for Q1-Q2
   if (dim != 3)
     {
-      fe_datas.push_back(new FESystem<dim>(FE_Q<dim>(3), 2));
-      deallog << (*fe_datas.rbegin())->get_name() << std::endl;
-      fe_datas.push_back(new FESystem<dim>(FE_Q<dim>(1), 2, FE_Q<dim>(3), 1));
-      deallog << (*fe_datas.rbegin())->get_name() << std::endl;
-      fe_datas.push_back(new FESystem<dim>(FE_Q<dim>(4), 2));
-      deallog << (*fe_datas.rbegin())->get_name() << std::endl;
+      finite_elements.push_back(new FESystem<dim>(FE_Q<dim>(3), 2));
+      deallog << (*finite_elements.rbegin())->get_name() << std::endl;
+      finite_elements.push_back(
+        new FESystem<dim>(FE_Q<dim>(1), 2, FE_Q<dim>(3), 1));
+      deallog << (*finite_elements.rbegin())->get_name() << std::endl;
+      finite_elements.push_back(new FESystem<dim>(FE_Q<dim>(4), 2));
+      deallog << (*finite_elements.rbegin())->get_name() << std::endl;
     }
 
   // have systems of systems, and
@@ -194,31 +195,33 @@ test_fe_datas()
   // subsequently weirder elements by
   // taking each of them in turn as
   // basis of others
-  fe_datas.push_back(new FESystem<dim>(FESystem<dim>(FE_Q<dim>(1), 2), 2));
-  deallog << (*fe_datas.rbegin())->get_name() << std::endl;
-  fe_datas.push_back(new FESystem<dim>(
+  finite_elements.push_back(
+    new FESystem<dim>(FESystem<dim>(FE_Q<dim>(1), 2), 2));
+  deallog << (*finite_elements.rbegin())->get_name() << std::endl;
+  finite_elements.push_back(new FESystem<dim>(
     FESystem<dim>(FE_Q<dim>(1), 2), 1, FESystem<dim>(FE_DGQ<dim>(1), 2), 1));
-  deallog << (*fe_datas.rbegin())->get_name() << std::endl;
-  fe_datas.push_back(
+  deallog << (*finite_elements.rbegin())->get_name() << std::endl;
+  finite_elements.push_back(
     new FESystem<dim>(FESystem<dim>(FE_Q<dim>(1), 1, FE_Q<dim>(2), 1),
                       1,
                       FESystem<dim>(FE_Q<dim>(2), 2),
                       1,
                       FESystem<dim>(FE_DGQ<dim>(2), 2),
                       1));
-  deallog << (*fe_datas.rbegin())->get_name() << std::endl;
-  fe_datas.push_back(new FESystem<dim>(*fe_datas[fe_datas.size() - 3],
-                                       2,
-                                       *fe_datas[fe_datas.size() - 2],
-                                       1,
-                                       *fe_datas[fe_datas.size() - 1],
-                                       2));
-  deallog << (*fe_datas.rbegin())->get_name() << std::endl;
+  deallog << (*finite_elements.rbegin())->get_name() << std::endl;
+  finite_elements.push_back(
+    new FESystem<dim>(*finite_elements[finite_elements.size() - 3],
+                      2,
+                      *finite_elements[finite_elements.size() - 2],
+                      1,
+                      *finite_elements[finite_elements.size() - 1],
+                      2));
+  deallog << (*finite_elements.rbegin())->get_name() << std::endl;
 
   deallog << std::endl << "dim=" << dim << std::endl;
-  for (unsigned int n = 0; n < fe_datas.size(); ++n)
+  for (unsigned int n = 0; n < finite_elements.size(); ++n)
     {
-      FiniteElement<dim> *fe_data = fe_datas[n];
+      FiniteElement<dim> *fe_data = finite_elements[n];
       deallog << "fe_data[" << n << "]:" << fe_data->get_name() << std::endl;
       deallog << "dofs_per_vertex=" << fe_data->dofs_per_vertex << std::endl;
       deallog << "dofs_per_line=" << fe_data->dofs_per_line << std::endl;
@@ -273,16 +276,16 @@ test_fe_datas()
         {
           deallog << "support on face " << f << ':';
           for (unsigned int s = 0; s < fe_data->dofs_per_cell; ++s)
-            if (fe_datas[n]->has_support_on_face(s, f))
+            if (finite_elements[n]->has_support_on_face(s, f))
               deallog << '\t' << s;
           deallog << std::endl;
         }
       deallog << std::endl;
     }
 
-  // delete all FiniteElementDatas
-  for (unsigned int i = 0; i < fe_datas.size(); ++i)
-    delete fe_datas[i];
+  // delete all finite elements
+  for (unsigned int i = 0; i < finite_elements.size(); ++i)
+    delete finite_elements[i];
 }
 
 int
@@ -290,7 +293,7 @@ main()
 {
   initlog();
 
-  test_fe_datas<1>();
-  test_fe_datas<2>();
-  test_fe_datas<3>();
+  test_finite_elements<1>();
+  test_finite_elements<2>();
+  test_finite_elements<3>();
 }

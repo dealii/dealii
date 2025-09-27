@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2010 - 2020 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2016 - 2024 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 #ifndef dealii_integrators_grad_div_h
 #define dealii_integrators_grad_div_h
@@ -48,7 +47,7 @@ namespace LocalIntegrators
      * @f]
      */
     template <int dim>
-    void
+    DEAL_II_DEPRECATED void
     cell_matrix(FullMatrix<double>      &M,
                 const FEValuesBase<dim> &fe,
                 double                   factor = 1.)
@@ -82,7 +81,7 @@ namespace LocalIntegrators
      * @f]
      */
     template <int dim, typename number>
-    void
+    DEAL_II_DEPRECATED void
     cell_residual(Vector<number>                                     &result,
                   const FEValuesBase<dim>                            &fetest,
                   const ArrayView<const std::vector<Tensor<1, dim>>> &input,
@@ -118,7 +117,7 @@ namespace LocalIntegrators
      * @f]
      */
     template <int dim>
-    inline void
+    DEAL_II_DEPRECATED inline void
     nitsche_matrix(FullMatrix<double>      &M,
                    const FEValuesBase<dim> &fe,
                    double                   penalty,
@@ -170,7 +169,7 @@ namespace LocalIntegrators
      * argument <tt>data</tt>. $\gamma$ is the usual penalty parameter.
      */
     template <int dim>
-    void
+    DEAL_II_DEPRECATED void
     nitsche_residual(Vector<double>                                     &result,
                      const FEValuesBase<dim>                            &fe,
                      const ArrayView<const std::vector<double>>         &input,
@@ -180,8 +179,8 @@ namespace LocalIntegrators
                      double factor = 1.)
     {
       const unsigned int n_dofs = fe.dofs_per_cell;
-      AssertDimension(fe.get_fe().n_components(), dim)
-        AssertVectorVectorDimension(input, dim, fe.n_quadrature_points);
+      AssertDimension(fe.get_fe().n_components(), dim);
+      AssertVectorVectorDimension(input, dim, fe.n_quadrature_points);
       AssertVectorVectorDimension(Dinput, dim, fe.n_quadrature_points);
       AssertVectorVectorDimension(data, dim, fe.n_quadrature_points);
 
@@ -216,9 +215,8 @@ namespace LocalIntegrators
      * The interior penalty flux for the grad-div operator. See
      * ip_residual() for details.
      */
-
     template <int dim>
-    void
+    DEAL_II_DEPRECATED void
     ip_matrix(FullMatrix<double>      &M11,
               FullMatrix<double>      &M12,
               FullMatrix<double>      &M21,
@@ -298,7 +296,7 @@ namespace LocalIntegrators
      * See for instance Hansbo and Larson, 2002
      */
     template <int dim>
-    void
+    DEAL_II_DEPRECATED void
     ip_residual(Vector<double>                                     &result1,
                 Vector<double>                                     &result2,
                 const FEValuesBase<dim>                            &fe1,

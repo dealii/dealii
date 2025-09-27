@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2010 - 2022 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2014 - 2024 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 
 
@@ -164,9 +163,9 @@ ExactSolution<dim>::value(const Point<dim>  &p,
   switch (component)
     {
       case 0:
-        val = cos(numbers::PI * p(0)) * sin(numbers::PI * p(1)) + bc_constant;
+        val = cos(numbers::PI * p[0]) * sin(numbers::PI * p[1]) + bc_constant;
       case 1:
-        val = -sin(numbers::PI * p(0)) * cos(numbers::PI * p(1)) + bc_constant;
+        val = -sin(numbers::PI * p[0]) * cos(numbers::PI * p[1]) + bc_constant;
     }
   return val;
 }
@@ -176,8 +175,8 @@ ExactSolution<dim>::vector_value(const Point<dim> &p,
                                  Vector<double>   &result) const
 {
   Assert(dim >= 2, ExcNotImplemented());
-  result(0) = cos(numbers::PI * p(0)) * sin(numbers::PI * p(1)) + bc_constant;
-  result(1) = -sin(numbers::PI * p(0)) * cos(numbers::PI * p(1)) + bc_constant;
+  result(0) = cos(numbers::PI * p[0]) * sin(numbers::PI * p[1]) + bc_constant;
+  result(1) = -sin(numbers::PI * p[0]) * cos(numbers::PI * p[1]) + bc_constant;
 }
 template <int dim>
 void
@@ -195,10 +194,10 @@ ExactSolution<dim>::value_list(const std::vector<Point<dim>> &points,
         {
           case 0:
             values[i] =
-              cos(numbers::PI * p(0)) * sin(numbers::PI * p(1)) + bc_constant;
+              cos(numbers::PI * p[0]) * sin(numbers::PI * p[1]) + bc_constant;
           case 1:
             values[i] =
-              -sin(numbers::PI * p(0)) * cos(numbers::PI * p(1)) + bc_constant;
+              -sin(numbers::PI * p[0]) * cos(numbers::PI * p[1]) + bc_constant;
         }
     }
 }
@@ -215,9 +214,9 @@ ExactSolution<dim>::vector_value_list(const std::vector<Point<dim>> &points,
     {
       const Point<dim> &p = points[i];
       values[i](0) =
-        cos(numbers::PI * p(0)) * sin(numbers::PI * p(1)) + bc_constant;
+        cos(numbers::PI * p[0]) * sin(numbers::PI * p[1]) + bc_constant;
       values[i](1) =
-        -sin(numbers::PI * p(0)) * cos(numbers::PI * p(1)) + bc_constant;
+        -sin(numbers::PI * p[0]) * cos(numbers::PI * p[1]) + bc_constant;
     }
 }
 // END EXACT SOLUTION MEMBERS
@@ -236,11 +235,11 @@ RightHandSide<dim>::vector_value(const Point<dim> &p,
   Assert(dim >= 2, ExcNotImplemented());
 
   // 2D solution
-  values(0) = (2 * numbers::PI * numbers::PI + 1) * cos(numbers::PI * p(0)) *
-                sin(numbers::PI * p(1)) +
+  values(0) = (2 * numbers::PI * numbers::PI + 1) * cos(numbers::PI * p[0]) *
+                sin(numbers::PI * p[1]) +
               bc_constant;
-  values(1) = -(2 * numbers::PI * numbers::PI + 1) * sin(numbers::PI * p(0)) *
-                cos(numbers::PI * p(1)) +
+  values(1) = -(2 * numbers::PI * numbers::PI + 1) * sin(numbers::PI * p[0]) *
+                cos(numbers::PI * p[1]) +
               bc_constant;
 }
 template <int dim>

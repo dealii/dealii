@@ -1,17 +1,16 @@
-## ---------------------------------------------------------------------
+## ------------------------------------------------------------------------
 ##
-## Copyright (C) 2013 - 2016 by the deal.II authors
+## SPDX-License-Identifier: LGPL-2.1-or-later
+## Copyright (C) 2013 - 2024 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
-## The deal.II library is free software; you can use it, redistribute
-## it, and/or modify it under the terms of the GNU Lesser General
-## Public License as published by the Free Software Foundation; either
-## version 2.1 of the License, or (at your option) any later version.
-## The full text of the license can be found in the file LICENSE.md at
-## the top level directory of deal.II.
+## Part of the source code is dual licensed under Apache-2.0 WITH
+## LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+## governing the source code and code contributions can be found in
+## LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 ##
-## ---------------------------------------------------------------------
+## ------------------------------------------------------------------------
 
 #
 # This file is run when "make test" is executed by the user and is
@@ -53,7 +52,7 @@ endif()
 string(TOLOWER "${CMAKE_BUILD_TYPE}" _build_type)
 execute_process(COMMAND ${CMAKE_CTEST_COMMAND}
   -j${_n_processors} -C ${CMAKE_BUILD_TYPE} --force-new-ctest-process
-  -R "(quick_tests|examples)/"
+  -R "(a-framework|quick_tests|examples)/"
   --output-on-failure
   ${_redirect_output}
   RESULT_VARIABLE _return_value
@@ -83,7 +82,7 @@ If you need help with this problem, open a bug report on the issue tracker
 
                https://github.com/dealii/dealii/issues/new
 
-or write to the mailing list linked at https://www.dealii.org/mail.html
+or write to the mailing list linked at https://dealii.org/mail.html
 Please also add the files quick_tests.log , Testing/Temporary/LastTest.log
 to your bug report."
     )

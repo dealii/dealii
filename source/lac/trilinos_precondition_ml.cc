@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2008 - 2022 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2015 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 #include <deal.II/lac/trilinos_index_access.h>
 #include <deal.II/lac/trilinos_precondition.h>
@@ -22,6 +21,8 @@
 #  include <deal.II/lac/trilinos_sparse_matrix.h>
 #  include <deal.II/lac/vector.h>
 
+DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
+
 #  include <Epetra_MultiVector.h>
 #  include <Ifpack.h>
 #  include <Ifpack_Chebyshev.h>
@@ -29,6 +30,8 @@
 #  include <Teuchos_RCP.hpp>
 #  include <ml_MultiLevelPreconditioner.h>
 #  include <ml_include.h>
+
+DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -74,7 +77,7 @@ namespace TrilinosWrappers
         ML_Epetra::SetDefaults("SA", parameter_list);
 
         // uncoupled mode can give a lot of warnings or even fail when there
-        // are too many entries per row and aggreggation gets complicated, but
+        // are too many entries per row and aggregation gets complicated, but
         // MIS does not work if too few elements are located on one
         // processor. work around these warnings by choosing the different
         // strategies in different situations: for low order, always use the
@@ -95,10 +98,7 @@ namespace TrilinosWrappers
     parameter_list.set("coarse: type", coarse_type);
 
     // Force re-initialization of the random seed to make ML deterministic
-    // (only supported in trilinos >12.2):
-#  if DEAL_II_TRILINOS_VERSION_GTE(12, 4, 0)
     parameter_list.set("initialize random seed", true);
-#  endif
 
     parameter_list.set("smoother: sweeps", static_cast<int>(smoother_sweeps));
     parameter_list.set("cycle applications", static_cast<int>(n_cycles));
@@ -129,57 +129,67 @@ namespace TrilinosWrappers
     std::unique_ptr<Epetra_MultiVector> &ptr_distributed_constant_modes,
     const Epetra_RowMatrix              &matrix) const
   {
-    const Epetra_Map &domain_map = matrix.OperatorDomainMap();
+    const auto run = [&](const auto &constant_modes) {
+      const Epetra_Map &domain_map = matrix.OperatorDomainMap();
 
-    const size_type constant_modes_dimension = constant_modes.size();
-    ptr_distributed_constant_modes = std::make_unique<Epetra_MultiVector>(
-      domain_map, constant_modes_dimension > 0 ? constant_modes_dimension : 1);
-    Assert(ptr_distributed_constant_modes, ExcNotInitialized());
-    Epetra_MultiVector &distributed_constant_modes =
-      *ptr_distributed_constant_modes;
+      const size_type constant_modes_dimension = constant_modes.size();
+      ptr_distributed_constant_modes =
+        std::make_unique<Epetra_MultiVector>(domain_map,
+                                             constant_modes_dimension > 0 ?
+                                               constant_modes_dimension :
+                                               1);
+      Assert(ptr_distributed_constant_modes, ExcNotInitialized());
+      Epetra_MultiVector &distributed_constant_modes =
+        *ptr_distributed_constant_modes;
 
-    if (constant_modes_dimension > 0)
+      if (constant_modes_dimension > 0)
+        {
+          const size_type global_size = TrilinosWrappers::n_global_rows(matrix);
+          Assert(global_size ==
+                   static_cast<size_type>(TrilinosWrappers::global_length(
+                     distributed_constant_modes)),
+                 ExcDimensionMismatch(global_size,
+                                      TrilinosWrappers::global_length(
+                                        distributed_constant_modes)));
+          const bool constant_modes_are_global =
+            constant_modes[0].size() == global_size;
+          const size_type my_size = domain_map.NumMyElements();
+
+          // Reshape null space as a contiguous vector of doubles so that
+          // Trilinos can read from it.
+          const size_type expected_mode_size =
+            constant_modes_are_global ? global_size : my_size;
+          for (size_type d = 0; d < constant_modes_dimension; ++d)
+            {
+              Assert(constant_modes[d].size() == expected_mode_size,
+                     ExcDimensionMismatch(constant_modes[d].size(),
+                                          expected_mode_size));
+              for (size_type row = 0; row < my_size; ++row)
+                {
+                  const TrilinosWrappers::types::int_type mode_index =
+                    constant_modes_are_global ?
+                      TrilinosWrappers::global_index(domain_map, row) :
+                      row;
+                  distributed_constant_modes[d][row] =
+                    static_cast<double>(constant_modes[d][mode_index]);
+                }
+            }
+
+          parameter_list.set("null space: type", "pre-computed");
+          parameter_list.set("null space: dimension",
+                             distributed_constant_modes.NumVectors());
+          parameter_list.set("null space: vectors",
+                             distributed_constant_modes.Values());
+        }
+    };
+
+    if (!constant_modes_values.empty())
       {
-        const size_type global_size = TrilinosWrappers::n_global_rows(matrix);
-        (void)global_length; // work around compiler warning about unused
-                             // function in release mode
-        Assert(global_size ==
-                 static_cast<size_type>(
-                   TrilinosWrappers::global_length(distributed_constant_modes)),
-               ExcDimensionMismatch(global_size,
-                                    TrilinosWrappers::global_length(
-                                      distributed_constant_modes)));
-        const bool constant_modes_are_global =
-          constant_modes[0].size() == global_size;
-        const size_type my_size = domain_map.NumMyElements();
-
-        // Reshape null space as a contiguous vector of doubles so that
-        // Trilinos can read from it.
-        const size_type expected_mode_size =
-          constant_modes_are_global ? global_size : my_size;
-        for (size_type d = 0; d < constant_modes_dimension; ++d)
-          {
-            Assert(constant_modes[d].size() == expected_mode_size,
-                   ExcDimensionMismatch(constant_modes[d].size(),
-                                        expected_mode_size));
-            for (size_type row = 0; row < my_size; ++row)
-              {
-                const TrilinosWrappers::types::int_type mode_index =
-                  constant_modes_are_global ?
-                    TrilinosWrappers::global_index(domain_map, row) :
-                    row;
-                distributed_constant_modes[d][row] =
-                  static_cast<double>(constant_modes[d][mode_index]);
-              }
-          }
-        (void)expected_mode_size;
-
-        parameter_list.set("null space: type", "pre-computed");
-        parameter_list.set("null space: dimension",
-                           distributed_constant_modes.NumVectors());
-        parameter_list.set("null space: vectors",
-                           distributed_constant_modes.Values());
+        AssertDimension(constant_modes.size(), 0);
+        run(constant_modes_values);
       }
+    else
+      run(constant_modes);
   }
 
 

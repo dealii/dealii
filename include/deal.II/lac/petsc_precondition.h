@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2004 - 2023 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2004 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 #ifndef dealii_petsc_precondition_h
 #define dealii_petsc_precondition_h
@@ -19,8 +18,9 @@
 
 #include <deal.II/base/config.h>
 
+#include <deal.II/base/enable_observer_pointer.h>
+#include <deal.II/base/mpi_stub.h>
 #include <deal.II/base/point.h>
-#include <deal.II/base/subscriptor.h>
 
 #ifdef DEAL_II_WITH_PETSC
 
@@ -57,7 +57,7 @@ namespace PETScWrappers
    *
    * @ingroup PETScWrappers
    */
-  class PreconditionBase : public Subscriptor
+  class PreconditionBase : public EnableObserverPointer
   {
   public:
     /**
@@ -98,7 +98,10 @@ namespace PETScWrappers
     /**
      * Explicitly call setup. This is usually not needed since PETSc will
      * automatically call the setup function when needed.
+     *
+     * @deprecated setup() is now explicitly called during initialize().
      */
+    DEAL_II_DEPRECATED_EARLY
     void
     setup();
 
@@ -613,8 +616,14 @@ namespace PETScWrappers
    * multigrid preconditioner from the HYPRE suite. Note that PETSc has to be
    * configured with HYPRE (e.g. with \--download-hypre=1).
    *
-   * The preconditioner does support parallel distributed computations. See
+   * This preconditioner does support parallel distributed computations. See
    * step-40 for an example.
+   *
+   * This class can be used as a preconditioner for linear solvers. It
+   * also provides a `vmult()` function (implemented in the
+   * PreconditionBase base class) that, when called, performs one
+   * multigrid cycle. By default, this is a V-cycle, but the
+   * AdditionalData class allows to also select a W-cycle.
    *
    * @ingroup PETScWrappers
    */
@@ -1164,6 +1173,14 @@ namespace PETScWrappers
 
 DEAL_II_NAMESPACE_CLOSE
 
+
+#else
+
+// Make sure the scripts that create the C++20 module input files have
+// something to latch on if the preprocessor #ifdef above would
+// otherwise lead to an empty content of the file.
+DEAL_II_NAMESPACE_OPEN
+DEAL_II_NAMESPACE_CLOSE
 
 #endif // DEAL_II_WITH_PETSC
 

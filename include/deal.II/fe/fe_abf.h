@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2003 - 2023 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2003 - 2024 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 #ifndef dealii_fe_abf_h
 #define dealii_fe_abf_h
@@ -50,7 +49,7 @@ DEAL_II_NAMESPACE_OPEN
  * also BDM and other proposed finite dimensional subspaces of H(div) do not
  * work properly on arbitrary FE grids. I.e. the convergence rates deteriorate
  * on these meshes. As a solution the authors propose the ABF elements, which
- * are implemented in this module.
+ * are implemented in this class.
  *
  * This class is not implemented for the codimension one case (<tt>spacedim !=
  * dim</tt>).
@@ -168,7 +167,7 @@ private:
 
   /**
    * Initialize the interpolation from functions on refined mesh cells onto
-   * the father cell. According to the philosophy of the Raviart-Thomas
+   * the parent cell. According to the philosophy of the Raviart-Thomas
    * element, this restriction operator preserves the divergence of a function
    * weakly.
    */

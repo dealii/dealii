@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2023 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2023 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 // Test a mesh with two tetrahedra for all possible orientations. Similar to
 // orientation_02 but also checks that quadrature points on faces (computed via
@@ -40,10 +39,10 @@ test_face(const std::vector<Point<3>>    &vertices_,
   Point<3> extra_vertex;
   for (unsigned int i = 0; i < 3; ++i)
     extra_vertex += ref_cell.template vertex<3>(ref_cell.face_to_cell_vertices(
-      face_n, i, ReferenceCell::default_combined_face_orientation()));
+      face_n, i, numbers::default_geometric_orientation));
 
   extra_vertex /= 3.0;
-  extra_vertex += ref_cell.template unit_normal_vectors<3>(face_n);
+  extra_vertex += ref_cell.template face_normal_vector<3>(face_n);
 
   vertices.push_back(extra_vertex);
 
@@ -51,7 +50,7 @@ test_face(const std::vector<Point<3>>    &vertices_,
   cell_data.back().vertices.resize(0);
   for (unsigned int i = 0; i < 3; ++i)
     cell_data.back().vertices.push_back(ref_cell.face_to_cell_vertices(
-      face_n, i, ref_cell.default_combined_face_orientation()));
+      face_n, i, numbers::default_geometric_orientation));
   cell_data.back().vertices.push_back(ref_cell.n_vertices());
   std::sort(cell_data.back().vertices.begin(), cell_data.back().vertices.end());
 

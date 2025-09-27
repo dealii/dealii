@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2018 - 2023 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2018 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE at
-// the top level of the deal.II distribution.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 #ifndef dealii_hanging_nodes_internal_h
 #define dealii_hanging_nodes_internal_h
@@ -28,6 +27,9 @@
 #include <deal.II/fe/fe_tools.h>
 
 #include <deal.II/hp/fe_collection.h>
+
+#include <boost/container/small_vector.hpp>
+
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -258,7 +260,7 @@ namespace internal
 
     /**
      * This class creates the mask used in the treatment of hanging nodes in
-     * CUDAWrappers::MatrixFree.
+     * Portable::MatrixFree.
      * The implementation of this class is explained in detail in
      * @cite munch2022hn.
      */
@@ -328,18 +330,14 @@ namespace internal
       rotate_subface_index(int times, unsigned int &subface_index) const;
 
       void
-      rotate_face(int                                   times,
-                  unsigned int                          n_dofs_1d,
+      orient_face(const types::geometric_orientation    combined_orientation,
+                  const unsigned int                    n_dofs_1d,
                   std::vector<types::global_dof_index> &dofs) const;
 
       unsigned int
       line_dof_idx(int          local_line,
                    unsigned int dof,
                    unsigned int n_dofs_1d) const;
-
-      void
-      transpose_face(const unsigned int                    fe_degree,
-                     std::vector<types::global_dof_index> &dofs) const;
 
       void
       transpose_subface_index(unsigned int &subface) const;
@@ -384,10 +382,8 @@ namespace internal
     template <int dim>
     inline void
     HangingNodes<dim>::setup_line_to_cell(
-      const Triangulation<dim> &triangulation)
-    {
-      (void)triangulation;
-    }
+      const Triangulation<dim> & /*triangulation*/)
+    {}
 
 
 
@@ -631,7 +627,6 @@ namespace internal
         return;
 
       const auto &fe = cell->get_fe();
-
       AssertDimension(fe.n_unique_faces(), 1);
 
       std::vector<std::vector<unsigned int>>
@@ -645,14 +640,14 @@ namespace internal
       std::vector<unsigned int> idx_offset = {0};
 
       for (unsigned int base_element_index = 0;
-           base_element_index < cell->get_fe().n_base_elements();
+           base_element_index < fe.n_base_elements();
            ++base_element_index)
         for (unsigned int c = 0;
-             c < cell->get_fe().element_multiplicity(base_element_index);
+             c < fe.element_multiplicity(base_element_index);
              ++c)
           idx_offset.push_back(
             idx_offset.back() +
-            cell->get_fe().base_element(base_element_index).n_dofs_per_cell());
+            fe.base_element(base_element_index).n_dofs_per_cell());
 
       std::vector<types::global_dof_index> neighbor_dofs_all(idx_offset.back());
       std::vector<types::global_dof_index> neighbor_dofs_all_temp(
@@ -682,10 +677,10 @@ namespace internal
               case 2:
                 return n_dofs_1d * n_dofs_1d * offset + n_dofs_1d * i + j;
               default:
-                Assert(false, ExcNotImplemented());
+                DEAL_II_NOT_IMPLEMENTED();
             }
 
-        Assert(false, ExcNotImplemented());
+        DEAL_II_NOT_IMPLEMENTED();
 
         return 0;
       };
@@ -717,10 +712,10 @@ namespace internal
                 index = partitioner->global_to_local(index);
 
             for (unsigned int base_element_index = 0, comp = 0;
-                 base_element_index < cell->get_fe().n_base_elements();
+                 base_element_index < fe.n_base_elements();
                  ++base_element_index)
               for (unsigned int c = 0;
-                   c < cell->get_fe().element_multiplicity(base_element_index);
+                   c < fe.element_multiplicity(base_element_index);
                    ++c, ++comp)
                 {
                   if (supported_components[cell->active_fe_index()][comp] ==
@@ -745,30 +740,24 @@ namespace internal
                     neighbor_dofs[i] = neighbor_dofs_face
                       [component_to_system_index_face_array[comp][i]];
 
-                  // fix DoFs depending on orientation, flip, and rotation
+                  // fix DoFs depending on orientation, rotation, and flip
                   if (dim == 2)
                     {
-                      // TODO: for mixed meshes we need to take care of
-                      // orientation here
-                      Assert(cell->face_orientation(face_no),
+                      // TODO: this needs to be implemented for simplices but
+                      // all-quad meshes are OK
+                      Assert(cell->combined_face_orientation(face_no) ==
+                               numbers::default_geometric_orientation,
                              ExcNotImplemented());
                     }
                   else if (dim == 3)
                     {
-                      int rotate = 0;                   // TODO
-                      if (cell->face_rotation(face_no)) //
-                        rotate -= 1;                    //
-                      if (cell->face_flip(face_no))     //
-                        rotate -= 2;                    //
-
-                      rotate_face(rotate, n_dofs_1d, neighbor_dofs);
-
-                      if (cell->face_orientation(face_no) == false)
-                        transpose_face(n_dofs_1d - 1, neighbor_dofs);
+                      orient_face(cell->combined_face_orientation(face_no),
+                                  n_dofs_1d,
+                                  neighbor_dofs);
                     }
                   else
                     {
-                      Assert(false, ExcNotImplemented());
+                      DEAL_II_NOT_IMPLEMENTED();
                     }
 
                   // update DoF map
@@ -830,11 +819,10 @@ namespace internal
                 neighbor_cell.line_orientation(local_line_neighbor);
 
               for (unsigned int base_element_index = 0, comp = 0;
-                   base_element_index < cell->get_fe().n_base_elements();
+                   base_element_index < fe.n_base_elements();
                    ++base_element_index)
                 for (unsigned int c = 0;
-                     c <
-                     cell->get_fe().element_multiplicity(base_element_index);
+                     c < fe.element_multiplicity(base_element_index);
                      ++c, ++comp)
                   {
                     if (supported_components[cell->active_fe_index()][comp] ==
@@ -923,18 +911,25 @@ namespace internal
 
     template <int dim>
     inline void
-    HangingNodes<dim>::rotate_face(
-      int                                   times,
-      unsigned int                          n_dofs_1d,
+    HangingNodes<dim>::orient_face(
+      const types::geometric_orientation    combined_orientation,
+      const unsigned int                    n_dofs_1d,
       std::vector<types::global_dof_index> &dofs) const
     {
+      const auto [orientation, rotation, flip] =
+        ::dealii::internal::split_face_orientation(combined_orientation);
+      const int n_rotations =
+        rotation || flip ? 4 - int(rotation) - 2 * int(flip) : 0;
+
       const unsigned int rot_mapping[4] = {2, 0, 3, 1};
+      Assert(n_dofs_1d > 1, ExcInternalError());
+      // 'per line' has the same meaning here as in FiniteElementData, i.e., the
+      // number of dofs assigned to a line (not including vertices).
+      const unsigned int dofs_per_line = n_dofs_1d - 2;
 
-      times = times % 4;
-      times = times < 0 ? times + 4 : times;
-
+      // rotate:
       std::vector<types::global_dof_index> copy(dofs.size());
-      for (int t = 0; t < times; ++t)
+      for (int t = 0; t < n_rotations; ++t)
         {
           std::swap(copy, dofs);
 
@@ -943,28 +938,63 @@ namespace internal
             dofs[rot_mapping[i]] = copy[i];
 
           // Edges
-          const unsigned int n_int  = n_dofs_1d - 2;
-          unsigned int       offset = 4;
-          for (unsigned int i = 0; i < n_int; ++i)
+          unsigned int offset = 4;
+          for (unsigned int i = 0; i < dofs_per_line; ++i)
             {
               // Left edge
-              dofs[offset + i] = copy[offset + 2 * n_int + (n_int - 1 - i)];
+              dofs[offset + i] =
+                copy[offset + 2 * dofs_per_line + (dofs_per_line - 1 - i)];
               // Right edge
-              dofs[offset + n_int + i] =
-                copy[offset + 3 * n_int + (n_int - 1 - i)];
+              dofs[offset + dofs_per_line + i] =
+                copy[offset + 3 * dofs_per_line + (dofs_per_line - 1 - i)];
               // Bottom edge
-              dofs[offset + 2 * n_int + i] = copy[offset + n_int + i];
+              dofs[offset + 2 * dofs_per_line + i] =
+                copy[offset + dofs_per_line + i];
               // Top edge
-              dofs[offset + 3 * n_int + i] = copy[offset + i];
+              dofs[offset + 3 * dofs_per_line + i] = copy[offset + i];
             }
 
           // Interior points
-          offset += 4 * n_int;
+          offset += 4 * dofs_per_line;
 
-          for (unsigned int i = 0; i < n_int; ++i)
-            for (unsigned int j = 0; j < n_int; ++j)
-              dofs[offset + i * n_int + j] =
-                copy[offset + j * n_int + (n_int - 1 - i)];
+          for (unsigned int i = 0; i < dofs_per_line; ++i)
+            for (unsigned int j = 0; j < dofs_per_line; ++j)
+              dofs[offset + i * dofs_per_line + j] =
+                copy[offset + j * dofs_per_line + (dofs_per_line - 1 - i)];
+        }
+
+      // transpose (note that we are using the standard geometric orientation
+      // here so orientation = true is the default):
+      if (!orientation)
+        {
+          copy = dofs;
+
+          // Vertices
+          dofs[1] = copy[2];
+          dofs[2] = copy[1];
+
+          // Edges
+          unsigned int offset = 4;
+          for (unsigned int i = 0; i < dofs_per_line; ++i)
+            {
+              // Right edge
+              dofs[offset + i] = copy[offset + 2 * dofs_per_line + i];
+              // Left edge
+              dofs[offset + dofs_per_line + i] =
+                copy[offset + 3 * dofs_per_line + i];
+              // Bottom edge
+              dofs[offset + 2 * dofs_per_line + i] = copy[offset + i];
+              // Top edge
+              dofs[offset + 3 * dofs_per_line + i] =
+                copy[offset + dofs_per_line + i];
+            }
+
+          // Interior
+          offset += 4 * dofs_per_line;
+          for (unsigned int i = 0; i < dofs_per_line; ++i)
+            for (unsigned int j = 0; j < dofs_per_line; ++j)
+              dofs[offset + i * dofs_per_line + j] =
+                copy[offset + j * dofs_per_line + i];
         }
     }
 
@@ -998,42 +1028,6 @@ namespace internal
         }
 
       return n_dofs_1d * n_dofs_1d * z + n_dofs_1d * y + x;
-    }
-
-
-
-    template <int dim>
-    inline void
-    HangingNodes<dim>::transpose_face(
-      const unsigned int                    fe_degree,
-      std::vector<types::global_dof_index> &dofs) const
-    {
-      const std::vector<types::global_dof_index> copy(dofs);
-
-      // Vertices
-      dofs[1] = copy[2];
-      dofs[2] = copy[1];
-
-      // Edges
-      const unsigned int n_int  = fe_degree - 1;
-      unsigned int       offset = 4;
-      for (unsigned int i = 0; i < n_int; ++i)
-        {
-          // Right edge
-          dofs[offset + i] = copy[offset + 2 * n_int + i];
-          // Left edge
-          dofs[offset + n_int + i] = copy[offset + 3 * n_int + i];
-          // Bottom edge
-          dofs[offset + 2 * n_int + i] = copy[offset + i];
-          // Top edge
-          dofs[offset + 3 * n_int + i] = copy[offset + n_int + i];
-        }
-
-      // Interior
-      offset += 4 * n_int;
-      for (unsigned int i = 0; i < n_int; ++i)
-        for (unsigned int j = 0; j < n_int; ++j)
-          dofs[offset + i * n_int + j] = copy[offset + j * n_int + i];
     }
 
 

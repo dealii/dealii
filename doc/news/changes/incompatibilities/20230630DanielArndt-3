@@ -1,5 +1,0 @@
-Removed: The deprecated classes Threads::Thread,
-and Threads::ThreadGroup and the function
-Threads::new_thread() has been removed.
-<br>
-(Daniel Arndt, 2023/07/01)

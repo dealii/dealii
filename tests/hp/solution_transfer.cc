@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2021 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2012 - 2024 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 
 
@@ -152,12 +151,6 @@ transfer(std::ostream &out)
         cell->set_coarsen_flag();
     }
 
-  Vector<double> q_old_solution = q_solution, dgq_old_solution = dgq_solution;
-  tria.prepare_coarsening_and_refinement();
-  q_soltrans.prepare_for_coarsening_and_refinement(q_old_solution);
-  dgq_soltrans.prepare_for_coarsening_and_refinement(dgq_old_solution);
-  tria.execute_coarsening_and_refinement();
-
   counter = 0;
   {
     typename DoFHandler<dim>::active_cell_iterator
@@ -166,22 +159,28 @@ transfer(std::ostream &out)
     for (; cell != endc; ++cell, ++celldg, ++counter)
       {
         if (counter > 20 && counter < 90)
-          cell->set_active_fe_index(0);
+          cell->set_future_fe_index(0);
         else
-          cell->set_active_fe_index(Testing::rand() % max_degree);
+          cell->set_future_fe_index(Testing::rand() % max_degree);
         if (counter > 20 && counter < 90)
-          celldg->set_active_fe_index(0);
+          celldg->set_future_fe_index(0);
         else
-          celldg->set_active_fe_index(Testing::rand() % max_degree);
+          celldg->set_future_fe_index(Testing::rand() % max_degree);
       }
   }
+
+  Vector<double> q_old_solution = q_solution, dgq_old_solution = dgq_solution;
+  tria.prepare_coarsening_and_refinement();
+  q_soltrans.prepare_for_coarsening_and_refinement(q_old_solution);
+  dgq_soltrans.prepare_for_coarsening_and_refinement(dgq_old_solution);
+  tria.execute_coarsening_and_refinement();
 
   q_dof_handler.distribute_dofs(fe_q);
   dgq_dof_handler.distribute_dofs(fe_dgq);
   q_solution.reinit(q_dof_handler.n_dofs());
   dgq_solution.reinit(dgq_dof_handler.n_dofs());
-  q_soltrans.interpolate(q_old_solution, q_solution);
-  dgq_soltrans.interpolate(dgq_old_solution, dgq_solution);
+  q_soltrans.interpolate(q_solution);
+  dgq_soltrans.interpolate(dgq_solution);
 
   // check correctness by comparing the values
   // on points of QGauss of order 2.

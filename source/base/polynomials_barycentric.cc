@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2020 - 2023 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2021 - 2024 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 #include <deal.II/base/polynomials_barycentric.h>
 
@@ -92,8 +91,59 @@ BarycentricPolynomials<dim>::get_fe_p_basis(const unsigned int degree)
             }
           break;
         }
+      case 3:
+        {
+          // vertices, then lines, then quads:
+          for (const unsigned int v : reference_cell.vertex_indices())
+            polys.push_back(
+              0.5 * BarycentricPolynomial<dim, double>::monomial(v) *
+              (3 * BarycentricPolynomial<dim, double>::monomial(v) - 1) *
+              (3 * BarycentricPolynomial<dim, double>::monomial(v) - 2));
+          for (unsigned int l : reference_cell.line_indices())
+            {
+              const auto v0 = reference_cell.line_to_cell_vertices(l, 0);
+              const auto v1 = reference_cell.line_to_cell_vertices(l, 1);
+              polys.push_back(
+                4.5 * BarycentricPolynomial<dim, double>::monomial(v0) *
+                (3 * BarycentricPolynomial<dim, double>::monomial(v0) - 1) *
+                BarycentricPolynomial<dim, double>::monomial(v1));
+              polys.push_back(
+                4.5 * BarycentricPolynomial<dim, double>::monomial(v0) *
+                (3 * BarycentricPolynomial<dim, double>::monomial(v1) - 1) *
+                BarycentricPolynomial<dim, double>::monomial(v1));
+            }
+
+          if (dim == 2)
+            {
+              polys.push_back(27 *
+                              BarycentricPolynomial<dim, double>::monomial(0) *
+                              BarycentricPolynomial<dim, double>::monomial(1) *
+                              BarycentricPolynomial<dim, double>::monomial(2));
+            }
+          else if (dim == 3)
+            {
+              polys.push_back(27 *
+                              BarycentricPolynomial<dim, double>::monomial(0) *
+                              BarycentricPolynomial<dim, double>::monomial(1) *
+                              BarycentricPolynomial<dim, double>::monomial(2));
+              polys.push_back(27 *
+                              BarycentricPolynomial<dim, double>::monomial(0) *
+                              BarycentricPolynomial<dim, double>::monomial(1) *
+                              BarycentricPolynomial<dim, double>::monomial(3));
+              polys.push_back(27 *
+                              BarycentricPolynomial<dim, double>::monomial(0) *
+                              BarycentricPolynomial<dim, double>::monomial(2) *
+                              BarycentricPolynomial<dim, double>::monomial(3));
+              polys.push_back(27 *
+                              BarycentricPolynomial<dim, double>::monomial(1) *
+                              BarycentricPolynomial<dim, double>::monomial(2) *
+                              BarycentricPolynomial<dim, double>::monomial(3));
+            }
+
+          break;
+        }
       default:
-        Assert(false, ExcNotImplemented());
+        DEAL_II_NOT_IMPLEMENTED();
     }
 
   return BarycentricPolynomials<dim>(polys);
@@ -106,9 +156,8 @@ BarycentricPolynomials<dim>::BarycentricPolynomials(
   const std::vector<PolyType> &polynomials)
   : ScalarPolynomialsBase<dim>(internal::get_degree<dim>(polynomials),
                                polynomials.size())
+  , polys(polynomials)
 {
-  polys = polynomials;
-
   poly_grads.resize(polynomials.size());
   poly_hessians.resize(polynomials.size());
   poly_third_derivatives.resize(polynomials.size());

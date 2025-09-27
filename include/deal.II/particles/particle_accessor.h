@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2017 - 2022 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2017 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 #ifndef dealii_particles_particle_accessor_h
 #define dealii_particles_particle_accessor_h
@@ -25,6 +24,12 @@
 
 #include <deal.II/particles/particle.h>
 #include <deal.II/particles/property_pool.h>
+
+#include <boost/geometry/index/indexable.hpp>
+#include <boost/serialization/array_wrapper.hpp>
+
+#include <list>
+
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -149,12 +154,36 @@ namespace Particles
     set_location(const Point<spacedim> &new_location);
 
     /**
-     * Get the location of this particle.
+     * Get read-access to the location of this particle.
      *
      * @return The location of this particle.
      */
     const Point<spacedim> &
     get_location() const;
+
+    /**
+     * Get read- and write-access to the location of this particle.
+     * Note that changing the location does not check
+     * whether this is a valid location in the simulation domain.
+     *
+     * @note In parallel programs, the ParticleHandler class stores particles
+     *   on both the locally owned cells, as well as on ghost cells. The
+     *   particles on the latter are *copies* of particles owned on other
+     *   processors, and should therefore be treated in the same way as
+     *   ghost entries in
+     *   @ref GlossGhostedVector "vectors with ghost elements"
+     *   or
+     *   @ref GlossGhostCell "ghost cells":
+     *   In both cases, one should
+     *   treat the ghost elements or cells as `const` objects that shouldn't
+     *   be modified even if the objects allow for calls that modify
+     *   properties. Rather, properties should only be modified on processors
+     *   that actually *own* the particle.
+     *
+     * @return The location of this particle.
+     */
+    Point<spacedim> &
+    get_location();
 
     /**
      * Set the reference location of this particle.
@@ -303,7 +332,21 @@ namespace Particles
      * @return An ArrayView of the properties of this particle.
      */
     ArrayView<double>
-    get_properties();
+    get_properties()
+    {
+      // The implementation is up here inside the class declaration because
+      // NVCC (at least in 12.5 and 12.6) otherwise produce a compile error:
+      //
+      // error: no declaration matches ‘dealii::ArrayView<__remove_cv(const
+      // double)> dealii::Particles::ParticleAccessor<dim,
+      // spacedim>::get_properties()’
+      //
+      // See https://github.com/dealii/dealii/issues/17148
+      Assert(state() == IteratorState::valid, ExcInternalError());
+
+      return property_pool->get_properties(get_handle());
+    }
+
 
     /**
      * Get read-access to properties of this particle.
@@ -312,21 +355,6 @@ namespace Particles
      */
     ArrayView<const double>
     get_properties() const;
-
-    /**
-     * Tell the particle where to store its properties (even if it does not
-     * own properties). Usually this is only done once per particle, but
-     * since the particle generator does not know about the properties
-     * we want to do it not at construction time. Another use for this
-     * function is after particle transfer to a new process.
-     *
-     * @deprecated This function is only kept for backward compatibility
-     * and has no meaning any more. ParticleAccessors always use the
-     * property pool of the owning particle handler.
-     */
-    DEAL_II_DEPRECATED
-    void
-    set_property_pool(PropertyPool<dim, spacedim> &property_pool);
 
     /**
      * Return the size in bytes this particle occupies if all of its data is
@@ -338,21 +366,9 @@ namespace Particles
 
     /**
      * Get a cell iterator to the cell surrounding the current particle.
-     * As particles are organized in the structure of a triangulation,
-     * but the triangulation itself is not stored in the particle this
-     * operation requires a reference to the triangulation.
      */
     const typename Triangulation<dim, spacedim>::cell_iterator &
     get_surrounding_cell() const;
-
-    /**
-     * @deprecated Deprecated version of the function with the same
-     * name above.
-     */
-    DEAL_II_DEPRECATED
-    const typename Triangulation<dim, spacedim>::cell_iterator &
-    get_surrounding_cell(
-      const Triangulation<dim, spacedim> &triangulation) const;
 
     /**
      * Write the data of this object to a stream for the purpose of
@@ -367,10 +383,6 @@ namespace Particles
      * Read the data of this object from a stream for the purpose of
      * serialization using the [BOOST serialization
      * library](https://www.boost.org/doc/libs/1_74_0/libs/serialization/doc/index.html).
-     * Note that in order to store the properties correctly, the property pool
-     * of this particle has to be known at the time of reading, i.e.
-     * set_property_pool() has to have been called, before this function is
-     * called.
      */
     template <class Archive>
     void
@@ -571,12 +583,12 @@ namespace Particles
 
     Point<spacedim> location;
     for (unsigned int i = 0; i < spacedim; ++i)
-      location(i) = *pdata++;
+      location[i] = *pdata++;
     set_location(location);
 
     Point<dim> reference_location;
     for (unsigned int i = 0; i < dim; ++i)
-      reference_location(i) = *pdata++;
+      reference_location[i] = *pdata++;
     set_reference_location(reference_location);
 
     // See if there are properties to load
@@ -642,6 +654,17 @@ namespace Particles
   template <int dim, int spacedim>
   inline const Point<spacedim> &
   ParticleAccessor<dim, spacedim>::get_location() const
+  {
+    Assert(state() == IteratorState::valid, ExcInternalError());
+
+    return property_pool->get_location(get_handle());
+  }
+
+
+
+  template <int dim, int spacedim>
+  inline Point<spacedim> &
+  ParticleAccessor<dim, spacedim>::get_location()
   {
     Assert(state() == IteratorState::valid, ExcInternalError());
 
@@ -795,17 +818,6 @@ namespace Particles
 
 
   template <int dim, int spacedim>
-  inline void
-  ParticleAccessor<dim, spacedim>::set_property_pool(
-    PropertyPool<dim, spacedim> &new_property_pool)
-  {
-    Assert(&new_property_pool == property_pool, ExcInternalError());
-    (void)new_property_pool;
-  }
-
-
-
-  template <int dim, int spacedim>
   inline const typename Triangulation<dim, spacedim>::cell_iterator &
   ParticleAccessor<dim, spacedim>::get_surrounding_cell() const
   {
@@ -818,28 +830,9 @@ namespace Particles
 
 
 
-  template <int dim, int spacedim>
-  inline const typename Triangulation<dim, spacedim>::cell_iterator &
-  ParticleAccessor<dim, spacedim>::get_surrounding_cell(
-    const Triangulation<dim, spacedim> & /*triangulation*/) const
-  {
-    Assert(state() == IteratorState::valid, ExcInternalError());
-    Assert(particles_in_cell->cell.state() == IteratorState::valid,
-           ExcInternalError());
-
-    return particles_in_cell->cell;
-  }
-
-
-
-  template <int dim, int spacedim>
-  inline ArrayView<double>
-  ParticleAccessor<dim, spacedim>::get_properties()
-  {
-    Assert(state() == IteratorState::valid, ExcInternalError());
-
-    return property_pool->get_properties(get_handle());
-  }
+  // template <int dim, int spacedim>
+  // inline ArrayView<double>
+  //   ParticleAccessor<dim, spacedim>::get_properties()
 
 
 
@@ -849,8 +842,9 @@ namespace Particles
   {
     Assert(state() == IteratorState::valid, ExcInternalError());
 
-    std::size_t size = sizeof(get_id()) + sizeof(get_location()) +
-                       sizeof(get_reference_location());
+    std::size_t size = sizeof(get_id()) +
+                       sizeof(double) * spacedim + // get_location()
+                       sizeof(double) * dim;       // get_reference_location()
 
     if (has_properties())
       {
@@ -965,10 +959,6 @@ namespace boost
   {
     namespace index
     {
-      // Forward declaration of bgi::indexable
-      template <class T>
-      struct indexable;
-
       /**
        * Make sure we can construct an RTree from Particles::ParticleAccessor
        * objects.

@@ -1,0 +1,57 @@
+diff --git a/examples/step-93/step-93.cc b/examples/step-93/step-93.cc
+index e0d3978560..ff524aa602 100644
+--- a/examples/step-93/step-93.cc
++++ b/examples/step-93/step-93.cc
+@@ -20,7 +20,6 @@
+ 
+ #include <deal.II/base/function.h>
+ #include <deal.II/base/quadrature_lib.h>
+-#include <deal.II/base/timer.h>
+ 
+ #include <deal.II/dofs/dof_handler.h>
+ #include <deal.II/dofs/dof_tools.h>
+@@ -49,6 +48,8 @@
+ #include <fstream>
+ #include <iostream>
+ 
++#include "../example_test.h"
++
+ 
+ namespace Step93
+ {
+@@ -312,7 +313,7 @@ namespace Step93
+   void Step93<dim>::make_grid()
+   {
+     GridGenerator::hyper_cube(triangulation, -1, 1);
+-    triangulation.refine_global(7);
++    triangulation.refine_global(3);
+ 
+     std::cout << "Number of active cells: " << triangulation.n_active_cells()
+               << std::endl;
+@@ -639,21 +640,14 @@ namespace Step93
+   template <int dim>
+   void Step93<dim>::solve()
+   {
+-    Timer timer;
+-    timer.start();
+-
+-    std::cout << "Beginning solve..." << std::endl;
+-
+     SolverControl solver_control(1'000'000, 1e-6 * system_rhs.l2_norm());
+     SolverMinRes<Vector<double>> solver(solver_control);
+ 
+-    solver.solve(system_matrix, solution, system_rhs, PreconditionIdentity());
+-
+-    timer.stop();
+-
+-    std::cout << "Wall time: " << timer.wall_time() << "s" << std::endl;
+-    std::cout << "Solved in " << solver_control.last_step()
+-              << " MINRES iterations." << std::endl;
++    check_solver_within_range(std::cout,
++                              solver.solve(system_matrix, solution, system_rhs, PreconditionIdentity()),
++                              solver_control.last_step(),
++                              245,
++                              260);
+   }
+ 
+ 

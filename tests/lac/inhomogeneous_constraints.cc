@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2009 - 2023 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2009 - 2024 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 
 
@@ -226,7 +225,7 @@ LaplaceProblem<dim>::setup_system()
       {
         if (!test_all_constraints.is_constrained(boundary_value->first))
           {
-            test_all_constraints.add_line(boundary_value->first);
+            test_all_constraints.constrain_dof_to_zero(boundary_value->first);
             test_all_constraints.set_inhomogeneity(boundary_value->first,
                                                    boundary_value->second);
           }
@@ -633,7 +632,7 @@ LaplaceProblem<dim>::run()
               << hanging_nodes_only.n_constraints() << std::endl
               << "   Total number of constraints:        "
               << test_all_constraints.n_constraints() << std::endl
-              << "   Number of inhomogenous constraints: "
+              << "   Number of inhomogeneous constraints: "
               << test_all_constraints.n_inhomogeneities() << std::endl
               << "   Number of identity constraints:     "
               << test_all_constraints.n_identities() << std::endl;
@@ -694,7 +693,7 @@ LaplaceProblem<dim>::estimate_smoothness(
         }
 
       default:
-        Assert(false, ExcNotImplemented());
+        DEAL_II_NOT_IMPLEMENTED();
     }
 
   const unsigned      n_fourier_modes = k_vectors.size();

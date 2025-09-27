@@ -2,25 +2,15 @@
 DEAL::Cycle 0:
 DEAL::   Number of active cells:       256
 DEAL::   Number of degrees of freedom: 289 (by level: 4, 9, 25, 81, 289)
-DEAL:cg::Starting value 0.5859375000
-DEAL:cg::Convergence step 7 value 4.581996212e-09
 DEAL::Cycle 1:
 DEAL::   Number of active cells:       418
 DEAL::   Number of degrees of freedom: 495 (by level: 4, 9, 25, 81, 289, 305)
-DEAL:cg::Starting value 0.5339372772
-DEAL:cg::Convergence step 10 value 7.405430549e-10
 DEAL::Cycle 2:
 DEAL::   Number of active cells:       865
 DEAL::   Number of degrees of freedom: 952 (by level: 4, 9, 25, 81, 289, 769, 153)
-DEAL:cg::Starting value 0.3787800687
-DEAL:cg::Convergence step 11 value 1.398936158e-09
 DEAL::Cycle 3:
 DEAL::   Number of active cells:       1219
 DEAL::   Number of degrees of freedom: 1354 (by level: 4, 9, 25, 81, 289, 953, 277, 261)
-DEAL:cg::Starting value 0.3437292109
-DEAL:cg::Convergence step 13 value 6.165515097e-10
 DEAL::Cycle 4:
 DEAL::   Number of active cells:       1297
 DEAL::   Number of degrees of freedom: 1446 (by level: 4, 9, 25, 81, 289, 961, 313, 349)
-DEAL:cg::Starting value 0.3394403283
-DEAL:cg::Convergence step 13 value 7.008502779e-10

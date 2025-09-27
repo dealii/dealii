@@ -1,17 +1,16 @@
-/* ---------------------------------------------------------------------
+/* ------------------------------------------------------------------------
  *
- * Copyright (C) 2020 - 2022 by the deal.II authors
+ * SPDX-License-Identifier: LGPL-2.1-or-later
+ * Copyright (C) 2021 - 2025 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
- * The deal.II library is free software; you can use it, redistribute
- * it, and/or modify it under the terms of the GNU Lesser General
- * Public License as published by the Free Software Foundation; either
- * version 2.1 of the License, or (at your option) any later version.
- * The full text of the license can be found in the file LICENSE at
- * the top level of the deal.II distribution.
+ * Part of the source code is dual licensed under Apache-2.0 WITH
+ * LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+ * governing the source code and code contributions can be found in
+ * LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
  *
- * ---------------------------------------------------------------------
+ * ------------------------------------------------------------------------
 
  * Author:
  *         Timo Heister, Clemson University
@@ -70,7 +69,6 @@
 
 namespace StokesTests
 {
-  using namespace dealii;
 
   struct CopyDataFace
   {
@@ -157,8 +155,8 @@ namespace StokesTests
   Solution<2>::value(const Point<2> &p, const unsigned int component) const
   {
     using numbers::PI;
-    const double x = p(0);
-    const double y = p(1);
+    const double x = p[0];
+    const double y = p[1];
     // zero on BD's
     if (component == 0)
       return PI * sin(PI * x) * sin(PI * x) * sin(2.0 * PI * y);
@@ -177,9 +175,9 @@ namespace StokesTests
     Assert(component <= 3 + 1, ExcIndexRange(component, 0, 3 + 1));
 
     using numbers::PI;
-    const double x = p(0);
-    const double y = p(1);
-    const double z = p(2);
+    const double x = p[0];
+    const double y = p[1];
+    const double z = p[2];
 
     if (component == 0)
       return 2. * PI * sin(PI * x) * sin(PI * x) * sin(2.0 * PI * y) *
@@ -204,8 +202,8 @@ namespace StokesTests
     Assert(component <= 2, ExcIndexRange(component, 0, 2 + 1));
 
     using numbers::PI;
-    const double x = p(0);
-    const double y = p(1);
+    const double x = p[0];
+    const double y = p[1];
 
     Tensor<1, 2> return_value;
     if (component == 0)
@@ -236,9 +234,9 @@ namespace StokesTests
     Assert(component <= 3, ExcIndexRange(component, 0, 3 + 1));
 
     using numbers::PI;
-    const double x = p(0);
-    const double y = p(1);
-    const double z = p(2);
+    const double x = p[0];
+    const double y = p[1];
+    const double z = p[2];
 
     Tensor<1, 3> return_value;
     if (component == 0)
@@ -300,8 +298,8 @@ namespace StokesTests
     Assert(component <= 2, ExcIndexRange(component, 0, 2 + 1));
 
     using numbers::PI;
-    double x  = p(0);
-    double y  = p(1);
+    double x  = p[0];
+    double y  = p[1];
     double nu = 1.0;
 
     // RHS for 0 BD's
@@ -327,9 +325,9 @@ namespace StokesTests
     Assert(component <= 3, ExcIndexRange(component, 0, 3 + 1));
 
     using numbers::PI;
-    double x = p(0);
-    double y = p(1);
-    double z = p(2);
+    double x = p[0];
+    double y = p[1];
+    double z = p[2];
 
     if (component == 0)
       return 4. * PI * PI * PI *
@@ -433,7 +431,7 @@ namespace StokesTests
     // Velocities start at component 0:
     const FEValuesExtractors::Vector velocities(0);
 
-    // ILU behaves better if we apply a reordering to reduce fillin. There
+    // ILU behaves better if we apply a reordering to reduce filling. There
     // is no advantage in doing this for the other solvers.
     DoFRenumbering::Cuthill_McKee(dof_handler);
 
@@ -869,7 +867,6 @@ main()
 {
   try
     {
-      using namespace dealii;
       using namespace StokesTests;
       const int dim = 2;
 

@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2008 - 2018 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2013 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 
 
@@ -22,7 +21,7 @@
 905: An error occurred in line <1898> of file
 </scratch/deal-trunk/deal.II/include/deal.II/lac/affine_constraints.h> in
 function 905:     void
-dealii::AffineConstraints<double>::add_line(dealii::AffineConstraints<double>::size_type)
+dealii::AffineConstraints<double>::constrain_dof_to_zero(dealii::AffineConstraints<double>::size_type)
 905: The violated condition was: 905:     line != numbers::invalid_size_type
 905: The name and call sequence of the exception was: 905: ExcInternalError()
 905: Additional Information: 905: (none) 905:

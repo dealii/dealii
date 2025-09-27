@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2020 - 2023 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2020 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 
 #ifndef dealii_memory_space_data_h
@@ -19,7 +18,7 @@
 
 #include <deal.II/base/config.h>
 
-#include <deal.II/base/cuda.h>
+#include <deal.II/base/array_view.h>
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/kokkos.h>
 
@@ -36,9 +35,8 @@ namespace MemorySpace
 {
   /**
    * Structure which stores data on the host or the @ref GlossDevice "device" depending on the
-   * template parameter @p MemorySpace. Valid choices are MemorySpace::Host,
-   * MemorySpace::Default, and MemorySpace::CUDA (if CUDA was enabled in
-   * deal.II). The data is copied into the structure which then owns the data
+   * template parameter @p MemorySpace. Valid choices are MemorySpace::Host and MemorySpace::Default.
+   * The data is copied into the structure which then owns the data
    * and will release the memory when the destructor is called.
    */
   template <typename T, typename MemorySpace>
@@ -64,10 +62,10 @@ namespace MemorySpace
      * Kokkos View owning a host buffer used for MPI communication.
      */
     // FIXME Should we move this somewhere else?
-#if KOKKOS_VERSION < 40000
-    Kokkos::View<T *, Kokkos::HostSpace> values_host_buffer;
-#else
+#if DEAL_II_KOKKOS_VERSION_GTE(4, 0, 0)
     Kokkos::View<T *, Kokkos::SharedHostPinnedSpace> values_host_buffer;
+#else
+    Kokkos::View<T *, Kokkos::HostSpace> values_host_buffer;
 #endif
 
     /**
@@ -100,7 +98,8 @@ namespace MemorySpace
    */
   template <typename T, typename MemorySpace>
   inline void
-  swap(MemorySpaceData<T, MemorySpace> &u, MemorySpaceData<T, MemorySpace> &v);
+  swap(MemorySpaceData<T, MemorySpace> &u,
+       MemorySpaceData<T, MemorySpace> &v) noexcept;
 
 
 #ifndef DOXYGEN
@@ -109,11 +108,11 @@ namespace MemorySpace
   MemorySpaceData<T, MemorySpace>::MemorySpaceData()
     : values_host_buffer(
         (dealii::internal::ensure_kokkos_initialized(),
-#  if KOKKOS_VERSION < 40000
-         Kokkos::View<T *, Kokkos::HostSpace>("host buffer", 0)))
-#  else
+#  if DEAL_II_KOKKOS_VERSION_GTE(4, 0, 0)
          Kokkos::View<T *, Kokkos::SharedHostPinnedSpace>("host pinned buffer",
                                                           0)))
+#  else
+         Kokkos::View<T *, Kokkos::HostSpace>("host buffer", 0)))
 #  endif
     , values(Kokkos::View<T *, typename MemorySpace::kokkos_space>(
         "memoryspace data",
@@ -170,11 +169,13 @@ namespace MemorySpace
    */
   template <typename T, typename MemorySpace>
   inline void
-  swap(MemorySpaceData<T, MemorySpace> &u, MemorySpaceData<T, MemorySpace> &v)
+  swap(MemorySpaceData<T, MemorySpace> &u,
+       MemorySpaceData<T, MemorySpace> &v) noexcept
   {
     std::swap(u.values_host_buffer, v.values_host_buffer);
     std::swap(u.values, v.values);
     std::swap(u.values_sm_ptr, v.values_sm_ptr);
+    std::swap(u.values_sm, v.values_sm);
   }
 
 #endif

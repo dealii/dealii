@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2001 - 2022 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2001 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 #include <deal.II/base/array_view.h>
 #include <deal.II/base/memory_consumption.h>
@@ -92,9 +91,24 @@ template <int dim, int spacedim>
 MappingCartesian<dim, spacedim>::InternalData::InternalData(
   const Quadrature<dim> &q)
   : cell_extents(numbers::signaling_nan<Tensor<1, dim>>())
+  , inverse_cell_extents(numbers::signaling_nan<Tensor<1, dim>>())
   , volume_element(numbers::signaling_nan<double>())
   , quadrature_points(q.get_points())
 {}
+
+
+
+template <int dim, int spacedim>
+void
+MappingCartesian<dim, spacedim>::InternalData::reinit(
+  const UpdateFlags update_flags,
+  const Quadrature<dim> &)
+{
+  // store the flags in the internal data object so we can access them
+  // in fill_fe_*_values(). use the transitive hull of the required
+  // flags
+  this->update_each = update_flags;
+}
 
 
 
@@ -104,8 +118,8 @@ MappingCartesian<dim, spacedim>::InternalData::memory_consumption() const
 {
   return (Mapping<dim, spacedim>::InternalDataBase::memory_consumption() +
           MemoryConsumption::memory_consumption(cell_extents) +
-          MemoryConsumption::memory_consumption(volume_element) +
-          MemoryConsumption::memory_consumption(quadrature_points));
+          MemoryConsumption::memory_consumption(inverse_cell_extents) +
+          MemoryConsumption::memory_consumption(volume_element));
 }
 
 
@@ -161,13 +175,8 @@ MappingCartesian<dim, spacedim>::get_data(const UpdateFlags      update_flags,
                                           const Quadrature<dim> &q) const
 {
   std::unique_ptr<typename Mapping<dim, spacedim>::InternalDataBase> data_ptr =
-    std::make_unique<InternalData>(q);
-  auto &data = dynamic_cast<InternalData &>(*data_ptr);
-
-  // store the flags in the internal data object so we can access them
-  // in fill_fe_*_values(). use the transitive hull of the required
-  // flags
-  data.update_each = requires_update_flags(update_flags);
+    std::make_unique<InternalData>();
+  data_ptr->reinit(requires_update_flags(update_flags), q);
 
   return data_ptr;
 }
@@ -233,32 +242,44 @@ MappingCartesian<dim, spacedim>::update_cell_extents(
   const CellSimilarity::Similarity                            cell_similarity,
   const InternalData                                         &data) const
 {
-  // Compute start point and sizes
-  // along axes.  Strange vertex
-  // numbering makes this complicated
-  // again.
+  // Compute start point and sizes along axes. The vertices to be looked at
+  // are 1, 2, 4 compared to the base vertex 0.
   if (cell_similarity != CellSimilarity::translation)
     {
-      const Point<dim> &start = cell->vertex(0);
-      switch (dim)
+      const Point<dim> start = cell->vertex(0);
+      for (unsigned int d = 0; d < dim; ++d)
         {
-          case 1:
-            data.cell_extents[0] = cell->vertex(1)(0) - start(0);
-            break;
-          case 2:
-            data.cell_extents[0] = cell->vertex(1)(0) - start(0);
-            data.cell_extents[1] = cell->vertex(2)(1) - start(1);
-            break;
-          case 3:
-            data.cell_extents[0] = cell->vertex(1)(0) - start(0);
-            data.cell_extents[1] = cell->vertex(2)(1) - start(1);
-            data.cell_extents[2] = cell->vertex(4)(2) - start(2);
-            break;
-          default:
-            Assert(false, ExcNotImplemented());
+          const double cell_extent_d = cell->vertex(1 << d)[d] - start[d];
+          data.cell_extents[d]       = cell_extent_d;
+          Assert(cell_extent_d != 0.,
+                 ExcMessage("Cell does not appear to be Cartesian!"));
+          data.inverse_cell_extents[d] = 1. / cell_extent_d;
         }
     }
 }
+
+
+
+namespace
+{
+  template <int dim>
+  void
+  transform_quadrature_points(
+    const Tensor<1, dim>                               first_vertex,
+    const Tensor<1, dim>                               cell_extents,
+    const ArrayView<const Point<dim>>                 &unit_quadrature_points,
+    const typename QProjector<dim>::DataSetDescriptor &offset,
+    std::vector<Point<dim>>                           &quadrature_points)
+  {
+    for (unsigned int i = 0; i < quadrature_points.size(); ++i)
+      {
+        quadrature_points[i] = first_vertex;
+        for (unsigned int d = 0; d < dim; ++d)
+          quadrature_points[i][d] +=
+            cell_extents[d] * unit_quadrature_points[i + offset][d];
+      }
+  }
+} // namespace
 
 
 
@@ -267,13 +288,18 @@ void
 MappingCartesian<dim, spacedim>::maybe_update_cell_quadrature_points(
   const typename Triangulation<dim, spacedim>::cell_iterator &cell,
   const InternalData                                         &data,
-  std::vector<Point<dim>> &quadrature_points) const
+  const ArrayView<const Point<dim>> &unit_quadrature_points,
+  std::vector<Point<dim>>           &quadrature_points) const
 {
   if (data.update_each & update_quadrature_points)
     {
       const auto offset = QProjector<dim>::DataSetDescriptor::cell();
 
-      transform_quadrature_points(cell, data, offset, quadrature_points);
+      transform_quadrature_points(cell->vertex(0),
+                                  data.cell_extents,
+                                  unit_quadrature_points,
+                                  offset,
+                                  quadrature_points);
     }
 }
 
@@ -294,13 +320,15 @@ MappingCartesian<dim, spacedim>::maybe_update_face_quadrature_points(
       const auto offset = QProjector<dim>::DataSetDescriptor::face(
         ReferenceCells::get_hypercube<dim>(),
         face_no,
-        cell->face_orientation(face_no),
-        cell->face_flip(face_no),
-        cell->face_rotation(face_no),
+        cell->combined_face_orientation(face_no),
         quadrature_points.size());
 
 
-      transform_quadrature_points(cell, data, offset, quadrature_points);
+      transform_quadrature_points(cell->vertex(0),
+                                  data.cell_extents,
+                                  make_array_view(data.quadrature_points),
+                                  offset,
+                                  quadrature_points);
     }
 }
 
@@ -328,36 +356,15 @@ MappingCartesian<dim, spacedim>::maybe_update_subface_quadrature_points(
         ReferenceCells::get_hypercube<dim>(),
         face_no,
         sub_no,
-        cell->face_orientation(face_no),
-        cell->face_flip(face_no),
-        cell->face_rotation(face_no),
+        cell->combined_face_orientation(face_no),
         quadrature_points.size(),
         cell->subface_case(face_no));
 
-      transform_quadrature_points(cell, data, offset, quadrature_points);
-    }
-}
-
-
-
-template <int dim, int spacedim>
-void
-MappingCartesian<dim, spacedim>::transform_quadrature_points(
-  const typename Triangulation<dim, spacedim>::cell_iterator &cell,
-  const InternalData                                         &data,
-  const typename QProjector<dim>::DataSetDescriptor          &offset,
-  std::vector<Point<dim>> &quadrature_points) const
-{
-  // let @p{start} be the origin of a local coordinate system. it is chosen
-  // as the (lower) left vertex
-  const Point<dim> &start = cell->vertex(0);
-
-  for (unsigned int i = 0; i < quadrature_points.size(); ++i)
-    {
-      quadrature_points[i] = start;
-      for (unsigned int d = 0; d < dim; ++d)
-        quadrature_points[i](d) +=
-          data.cell_extents[d] * data.quadrature_points[i + offset](d);
+      transform_quadrature_points(cell->vertex(0),
+                                  data.cell_extents,
+                                  make_array_view(data.quadrature_points),
+                                  offset,
+                                  quadrature_points);
     }
 }
 
@@ -376,7 +383,8 @@ MappingCartesian<dim, spacedim>::maybe_update_normal_vectors(
       Assert(face_no < GeometryInfo<dim>::faces_per_cell, ExcInternalError());
       std::fill(normal_vectors.begin(),
                 normal_vectors.end(),
-                GeometryInfo<dim>::unit_normal_vector[face_no]);
+                ReferenceCells::get_hypercube<dim>()
+                  .template face_normal_vector<dim>(face_no));
     }
 }
 
@@ -488,7 +496,8 @@ MappingCartesian<dim, spacedim>::maybe_update_inverse_jacobians(
         {
           output_data.inverse_jacobians[i] = Tensor<2, dim>();
           for (unsigned int j = 0; j < dim; ++j)
-            output_data.inverse_jacobians[i][j][j] = 1. / data.cell_extents[j];
+            output_data.inverse_jacobians[i][j][j] =
+              data.inverse_cell_extents[j];
         }
 }
 
@@ -517,6 +526,7 @@ MappingCartesian<dim, spacedim>::fill_fe_values(
 
   maybe_update_cell_quadrature_points(cell,
                                       data,
+                                      quadrature.get_points(),
                                       output_data.quadrature_points);
 
   // compute Jacobian determinant. all values are equal and are the
@@ -566,13 +576,12 @@ MappingCartesian<dim, spacedim>::fill_mapping_data_for_generic_points(
 
   InternalData data;
   data.update_each = update_flags;
-  data.quadrature_points =
-    std::vector<Point<dim>>(unit_points.begin(), unit_points.end());
 
   update_cell_extents(cell, CellSimilarity::none, data);
 
   maybe_update_cell_quadrature_points(cell,
                                       data,
+                                      unit_points,
                                       output_data.quadrature_points);
 
   maybe_update_jacobians(data, CellSimilarity::none, output_data);
@@ -716,6 +725,7 @@ MappingCartesian<dim, spacedim>::fill_fe_immersed_surface_values(
 
   maybe_update_cell_quadrature_points(cell,
                                       data,
+                                      quadrature.get_points(),
                                       output_data.quadrature_points);
 
   if (data.update_each & update_normal_vectors)
@@ -726,7 +736,7 @@ MappingCartesian<dim, spacedim>::fill_fe_immersed_surface_values(
         const Tensor<1, dim> &ref_space_normal = quadrature.normal_vector(i);
         for (unsigned int d = 0; d < dim; ++d)
           {
-            normal[d] = ref_space_normal[d] / data.cell_extents[d];
+            normal[d] = ref_space_normal[d] * data.inverse_cell_extents[d];
           }
         normal /= normal.norm();
         output_data.normal_vectors[i] = normal;
@@ -743,7 +753,8 @@ MappingCartesian<dim, spacedim>::fill_fe_immersed_surface_values(
         for (unsigned int d = 0; d < dim; ++d)
           {
             det_jacobian *= data.cell_extents[d];
-            invJTxNormal[d] = ref_space_normal[d] / data.cell_extents[d];
+            invJTxNormal[d] =
+              ref_space_normal[d] * data.inverse_cell_extents[d];
           }
         output_data.JxW_values[i] =
           det_jacobian * invJTxNormal.norm() * quadrature.weight(i);
@@ -780,7 +791,7 @@ MappingCartesian<dim, spacedim>::transform(
 
           for (unsigned int i = 0; i < output.size(); ++i)
             for (unsigned int d = 0; d < dim; ++d)
-              output[i][d] = input[i][d] / data.cell_extents[d];
+              output[i][d] = input[i][d] * data.inverse_cell_extents[d];
           return;
         }
 
@@ -811,7 +822,7 @@ MappingCartesian<dim, spacedim>::transform(
           return;
         }
       default:
-        Assert(false, ExcNotImplemented());
+        DEAL_II_NOT_IMPLEMENTED();
     }
 }
 
@@ -841,7 +852,8 @@ MappingCartesian<dim, spacedim>::transform(
           for (unsigned int i = 0; i < output.size(); ++i)
             for (unsigned int d1 = 0; d1 < dim; ++d1)
               for (unsigned int d2 = 0; d2 < dim; ++d2)
-                output[i][d1][d2] = input[i][d1][d2] / data.cell_extents[d2];
+                output[i][d1][d2] =
+                  input[i][d1][d2] * data.inverse_cell_extents[d2];
           return;
         }
 
@@ -867,8 +879,9 @@ MappingCartesian<dim, spacedim>::transform(
           for (unsigned int i = 0; i < output.size(); ++i)
             for (unsigned int d1 = 0; d1 < dim; ++d1)
               for (unsigned int d2 = 0; d2 < dim; ++d2)
-                output[i][d1][d2] = input[i][d1][d2] / data.cell_extents[d2] /
-                                    data.cell_extents[d1];
+                output[i][d1][d2] = input[i][d1][d2] *
+                                    data.inverse_cell_extents[d2] *
+                                    data.inverse_cell_extents[d1];
           return;
         }
 
@@ -881,8 +894,8 @@ MappingCartesian<dim, spacedim>::transform(
           for (unsigned int i = 0; i < output.size(); ++i)
             for (unsigned int d1 = 0; d1 < dim; ++d1)
               for (unsigned int d2 = 0; d2 < dim; ++d2)
-                output[i][d1][d2] = input[i][d1][d2] * data.cell_extents[d2] /
-                                    data.cell_extents[d1];
+                output[i][d1][d2] = input[i][d1][d2] * data.cell_extents[d2] *
+                                    data.inverse_cell_extents[d1];
           return;
         }
 
@@ -915,13 +928,14 @@ MappingCartesian<dim, spacedim>::transform(
           for (unsigned int i = 0; i < output.size(); ++i)
             for (unsigned int d1 = 0; d1 < dim; ++d1)
               for (unsigned int d2 = 0; d2 < dim; ++d2)
-                output[i][d1][d2] = input[i][d1][d2] * data.cell_extents[d2] /
-                                    data.cell_extents[d1] / data.volume_element;
+                output[i][d1][d2] = input[i][d1][d2] * data.cell_extents[d2] *
+                                    data.inverse_cell_extents[d1] /
+                                    data.volume_element;
           return;
         }
 
       default:
-        Assert(false, ExcNotImplemented());
+        DEAL_II_NOT_IMPLEMENTED();
     }
 }
 
@@ -951,7 +965,8 @@ MappingCartesian<dim, spacedim>::transform(
           for (unsigned int i = 0; i < output.size(); ++i)
             for (unsigned int d1 = 0; d1 < dim; ++d1)
               for (unsigned int d2 = 0; d2 < dim; ++d2)
-                output[i][d1][d2] = input[i][d1][d2] / data.cell_extents[d2];
+                output[i][d1][d2] =
+                  input[i][d1][d2] * data.inverse_cell_extents[d2];
           return;
         }
 
@@ -977,8 +992,9 @@ MappingCartesian<dim, spacedim>::transform(
           for (unsigned int i = 0; i < output.size(); ++i)
             for (unsigned int d1 = 0; d1 < dim; ++d1)
               for (unsigned int d2 = 0; d2 < dim; ++d2)
-                output[i][d1][d2] = input[i][d1][d2] / data.cell_extents[d2] /
-                                    data.cell_extents[d1];
+                output[i][d1][d2] = input[i][d1][d2] *
+                                    data.inverse_cell_extents[d2] *
+                                    data.inverse_cell_extents[d1];
           return;
         }
 
@@ -991,8 +1007,8 @@ MappingCartesian<dim, spacedim>::transform(
           for (unsigned int i = 0; i < output.size(); ++i)
             for (unsigned int d1 = 0; d1 < dim; ++d1)
               for (unsigned int d2 = 0; d2 < dim; ++d2)
-                output[i][d1][d2] = input[i][d1][d2] * data.cell_extents[d2] /
-                                    data.cell_extents[d1];
+                output[i][d1][d2] = input[i][d1][d2] * data.cell_extents[d2] *
+                                    data.inverse_cell_extents[d1];
           return;
         }
 
@@ -1025,13 +1041,14 @@ MappingCartesian<dim, spacedim>::transform(
           for (unsigned int i = 0; i < output.size(); ++i)
             for (unsigned int d1 = 0; d1 < dim; ++d1)
               for (unsigned int d2 = 0; d2 < dim; ++d2)
-                output[i][d1][d2] = input[i][d1][d2] * data.cell_extents[d2] /
-                                    data.cell_extents[d1] / data.volume_element;
+                output[i][d1][d2] = input[i][d1][d2] * data.cell_extents[d2] *
+                                    data.inverse_cell_extents[d1] /
+                                    data.volume_element;
           return;
         }
 
       default:
-        Assert(false, ExcNotImplemented());
+        DEAL_II_NOT_IMPLEMENTED();
     }
 }
 
@@ -1063,14 +1080,14 @@ MappingCartesian<dim, spacedim>::transform(
               for (unsigned int j = 0; j < spacedim; ++j)
                 for (unsigned int k = 0; k < spacedim; ++k)
                   {
-                    output[q][i][j][k] = input[q][i][j][k] /
-                                         data.cell_extents[j] /
-                                         data.cell_extents[k];
+                    output[q][i][j][k] = input[q][i][j][k] *
+                                         data.inverse_cell_extents[j] *
+                                         data.inverse_cell_extents[k];
                   }
           return;
         }
       default:
-        Assert(false, ExcNotImplemented());
+        DEAL_II_NOT_IMPLEMENTED();
     }
 }
 
@@ -1105,9 +1122,10 @@ MappingCartesian<dim, spacedim>::transform(
               for (unsigned int j = 0; j < spacedim; ++j)
                 for (unsigned int k = 0; k < spacedim; ++k)
                   {
-                    output[q][i][j][k] =
-                      input[q][i][j][k] * data.cell_extents[i] /
-                      data.cell_extents[j] / data.cell_extents[k];
+                    output[q][i][j][k] = input[q][i][j][k] *
+                                         data.cell_extents[i] *
+                                         data.inverse_cell_extents[j] *
+                                         data.inverse_cell_extents[k];
                   }
           return;
         }
@@ -1123,9 +1141,10 @@ MappingCartesian<dim, spacedim>::transform(
               for (unsigned int j = 0; j < spacedim; ++j)
                 for (unsigned int k = 0; k < spacedim; ++k)
                   {
-                    output[q][i][j][k] =
-                      input[q][i][j][k] / data.cell_extents[i] /
-                      data.cell_extents[j] / data.cell_extents[k];
+                    output[q][i][j][k] = input[q][i][j][k] *
+                                         (data.inverse_cell_extents[i] *
+                                          data.inverse_cell_extents[j]) *
+                                         data.inverse_cell_extents[k];
                   }
 
           return;
@@ -1149,16 +1168,17 @@ MappingCartesian<dim, spacedim>::transform(
                 for (unsigned int k = 0; k < spacedim; ++k)
                   {
                     output[q][i][j][k] =
-                      input[q][i][j][k] * data.cell_extents[i] /
-                      data.volume_element / data.cell_extents[j] /
-                      data.cell_extents[k];
+                      input[q][i][j][k] *
+                      (data.cell_extents[i] / data.volume_element *
+                       data.inverse_cell_extents[j]) *
+                      data.inverse_cell_extents[k];
                   }
 
           return;
         }
 
       default:
-        Assert(false, ExcNotImplemented());
+        DEAL_II_NOT_IMPLEMENTED();
     }
 }
 
@@ -1171,32 +1191,15 @@ MappingCartesian<dim, spacedim>::transform_unit_to_real_cell(
   const Point<dim>                                           &p) const
 {
   Assert(is_cartesian(cell), ExcCellNotCartesian());
+  Assert(dim == spacedim, ExcNotImplemented());
 
-  Tensor<1, dim>   length;
-  const Point<dim> start = cell->vertex(0);
-  switch (dim)
-    {
-      case 1:
-        length[0] = cell->vertex(1)(0) - start(0);
-        break;
-      case 2:
-        length[0] = cell->vertex(1)(0) - start(0);
-        length[1] = cell->vertex(2)(1) - start(1);
-        break;
-      case 3:
-        length[0] = cell->vertex(1)(0) - start(0);
-        length[1] = cell->vertex(2)(1) - start(1);
-        length[2] = cell->vertex(4)(2) - start(2);
-        break;
-      default:
-        Assert(false, ExcNotImplemented());
-    }
+  Point<dim> unit = cell->vertex(0);
 
-  Point<dim> p_real = cell->vertex(0);
+  // Go through vertices with numbers 1, 2, 4
   for (unsigned int d = 0; d < dim; ++d)
-    p_real(d) += length[d] * p(d);
+    unit[d] += (cell->vertex(1 << d)[d] - unit[d]) * p[d];
 
-  return p_real;
+  return unit;
 }
 
 
@@ -1208,31 +1211,43 @@ MappingCartesian<dim, spacedim>::transform_real_to_unit_cell(
   const Point<spacedim>                                      &p) const
 {
   Assert(is_cartesian(cell), ExcCellNotCartesian());
+  Assert(dim == spacedim, ExcNotImplemented());
+
+  const Point<dim> start = cell->vertex(0);
+  Point<dim>       real  = p;
+
+  // Go through vertices with numbers 1, 2, 4
+  for (unsigned int d = 0; d < dim; ++d)
+    real[d] = (real[d] - start[d]) / (cell->vertex(1 << d)[d] - start[d]);
+
+  return real;
+}
+
+
+
+template <int dim, int spacedim>
+void
+MappingCartesian<dim, spacedim>::transform_points_real_to_unit_cell(
+  const typename Triangulation<dim, spacedim>::cell_iterator &cell,
+  const ArrayView<const Point<spacedim>>                     &real_points,
+  const ArrayView<Point<dim>>                                &unit_points) const
+{
+  Assert(is_cartesian(cell), ExcCellNotCartesian());
+  AssertDimension(real_points.size(), unit_points.size());
 
   if (dim != spacedim)
-    Assert(false, ExcNotImplemented());
-  const Point<dim> &start = cell->vertex(0);
-  Point<dim>        real  = p;
-  real -= start;
+    DEAL_II_NOT_IMPLEMENTED();
 
-  switch (dim)
-    {
-      case 1:
-        real(0) /= cell->vertex(1)(0) - start(0);
-        break;
-      case 2:
-        real(0) /= cell->vertex(1)(0) - start(0);
-        real(1) /= cell->vertex(2)(1) - start(1);
-        break;
-      case 3:
-        real(0) /= cell->vertex(1)(0) - start(0);
-        real(1) /= cell->vertex(2)(1) - start(1);
-        real(2) /= cell->vertex(4)(2) - start(2);
-        break;
-      default:
-        Assert(false, ExcNotImplemented());
-    }
-  return real;
+  const Point<dim> start = cell->vertex(0);
+
+  // Go through vertices with numbers 1, 2, 4
+  std::array<double, dim> inverse_lengths;
+  for (unsigned int d = 0; d < dim; ++d)
+    inverse_lengths[d] = 1. / (cell->vertex(1 << d)[d] - start[d]);
+
+  for (unsigned int i = 0; i < real_points.size(); ++i)
+    for (unsigned int d = 0; d < dim; ++d)
+      unit_points[i][d] = (real_points[i][d] - start[d]) * inverse_lengths[d];
 }
 
 
@@ -1247,7 +1262,7 @@ MappingCartesian<dim, spacedim>::clone() const
 
 //---------------------------------------------------------------------------
 // explicit instantiations
-#include "mapping_cartesian.inst"
+#include "fe/mapping_cartesian.inst"
 
 
 DEAL_II_NAMESPACE_CLOSE

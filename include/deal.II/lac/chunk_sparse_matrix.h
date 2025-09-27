@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2008 - 2023 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2008 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 #ifndef dealii_chunk_sparse_matrix_h
 #define dealii_chunk_sparse_matrix_h
@@ -19,8 +18,8 @@
 
 #include <deal.II/base/config.h>
 
-#include <deal.II/base/smartpointer.h>
-#include <deal.II/base/subscriptor.h>
+#include <deal.II/base/enable_observer_pointer.h>
+#include <deal.II/base/observer_pointer.h>
 
 #include <deal.II/lac/chunk_sparsity_pattern.h>
 #include <deal.II/lac/exceptions.h>
@@ -409,9 +408,9 @@ namespace ChunkSparseMatrixIterators
 
 } // namespace ChunkSparseMatrixIterators
 
-DEAL_II_NAMESPACE_CLOSE
+DEAL_II_NAMESPACE_CLOSE // Do not convert for module purposes
 
-namespace std
+  namespace std
 {
   template <typename number, bool Constness>
   struct iterator_traits<
@@ -425,28 +424,28 @@ namespace std
   };
 } // namespace std
 
-DEAL_II_NAMESPACE_OPEN
+DEAL_II_NAMESPACE_OPEN // Do not convert for module purposes
 
 
 
-/**
- * Sparse matrix. This class implements the function to store values in the
- * locations of a sparse matrix denoted by a SparsityPattern. The separation
- * of sparsity pattern and values is done since one can store data elements of
- * different type in these locations without the SparsityPattern having to
- * know this, and more importantly one can associate more than one matrix with
- * the same sparsity pattern.
- *
- * The use of this class is demonstrated in step-51.
- *
- * @note Instantiations for this template are provided for <tt>@<float@> and
- * @<double@></tt>; others can be generated in application programs (see the
- * section on
- * @ref Instantiations
- * in the manual).
- */
-template <typename number>
-class ChunkSparseMatrix : public virtual Subscriptor
+  /**
+   * Sparse matrix. This class implements the function to store values in the
+   * locations of a sparse matrix denoted by a SparsityPattern. The separation
+   * of sparsity pattern and values is done since one can store data elements of
+   * different type in these locations without the SparsityPattern having to
+   * know this, and more importantly one can associate more than one matrix with
+   * the same sparsity pattern.
+   *
+   * The use of this class is demonstrated in step-51.
+   *
+   * @note Instantiations for this template are provided for <tt>@<float@> and
+   * @<double@></tt>; others can be generated in application programs (see the
+   * section on
+   * @ref Instantiations
+   * in the manual).
+   */
+  template <typename number>
+  class ChunkSparseMatrix : public virtual EnableObserverPointer
 {
 public:
   /**
@@ -1285,23 +1284,25 @@ public:
   print(std::ostream &out) const;
 
   /**
-   * Print the matrix in the usual format, i.e. as a matrix and not as a list
+   * Print the matrix in the usual format, i.e., as a matrix and not as a list
    * of nonzero elements. For better readability, elements not in the matrix
    * are displayed as empty space, while matrix elements which are explicitly
    * set to zero are displayed as such.
    *
    * The parameters allow for a flexible setting of the output format:
-   * <tt>precision</tt> and <tt>scientific</tt> are used to determine the
-   * number format, where <tt>scientific = false</tt> means fixed point
-   * notation.  A zero entry for <tt>width</tt> makes the function compute a
-   * width, but it may be changed to a positive value, if output is crude.
+   * @p precision and @p scientific are used to determine the number format,
+   * where <code>scientific = false</code> means fixed point notation. A zero
+   * entry for @p width makes the function compute a width, but it may be
+   * changed to a positive value, if output is crude.
    *
-   * Additionally, a character for an empty value may be specified.
+   * Additionally, a character for an empty value may be specified in
+   * @p zero_string, and a character to separate row entries can be set in
+   * @p separator.
    *
-   * Finally, the whole matrix can be multiplied with a common denominator to
-   * produce more readable output, even integers.
+   * Finally, the whole matrix can be multiplied with a common @p denominator
+   * to produce more readable output, even integers.
    *
-   * @attention This function may produce <b>large</b> amounts of output if
+   * @attention This function may produce @em large amounts of output if
    * applied to a large matrix!
    */
   void
@@ -1310,7 +1311,8 @@ public:
                   const bool         scientific  = true,
                   const unsigned int width       = 0,
                   const char        *zero_string = " ",
-                  const double       denominator = 1.) const;
+                  const double       denominator = 1.,
+                  const char        *separator   = " ") const;
 
   /**
    * Print the actual pattern of the matrix. For each entry with an absolute
@@ -1403,9 +1405,9 @@ private:
   /**
    * Pointer to the sparsity pattern used for this matrix. In order to
    * guarantee that it is not deleted while still in use, we subscribe to it
-   * using the SmartPointer class.
+   * using the ObserverPointer class.
    */
-  SmartPointer<const ChunkSparsityPattern, ChunkSparseMatrix<number>> cols;
+  ObserverPointer<const ChunkSparsityPattern, ChunkSparseMatrix<number>> cols;
 
   /**
    * Array of values for all the nonzero entries. The position of an

@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2005 - 2018 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2012 - 2024 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 
 // test Utilities::replace_in_string
@@ -38,11 +37,11 @@ check(const std::string in,
 void
 test()
 {
-  check("wie geht es dir?", "dir", "euch", "wie geht es euch?");
+  check("how are you?", "you", "you all", "how are you all?");
   check("empty from", "", "abc", "empty from");
-  check("eins zwei drei", "ei", "", "ns zw dr");
-  check("eins zwei drei", "zwei", "zweiundvierzig", "eins zweiundvierzig drei");
-  check("wer das liest ist doof", "das liest ", "", "wer ist doof");
+  check("one two three", "e", "", "on two thr");
+  check("one two three", "two", "fortytwo", "one fortytwo three");
+  check("how are you?", "how are ", "", "you?");
   check("string string", "string", "", " ");
   check(" same is same", " same", " same", " same is same");
   check("  ", " ", "", "");

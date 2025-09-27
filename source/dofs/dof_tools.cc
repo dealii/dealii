@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 1999 - 2023 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 1999 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 #include <deal.II/base/mpi.h>
 #include <deal.II/base/quadrature.h>
@@ -43,6 +42,8 @@
 #include <deal.II/lac/sparsity_pattern.h>
 #include <deal.II/lac/sparsity_pattern_base.h>
 #include <deal.II/lac/vector.h>
+
+#include <deal.II/numerics/vector_tools_interpolate.h>
 
 #include <algorithm>
 #include <numeric>
@@ -179,7 +180,7 @@ namespace DoFTools
     // the output array dofs_by_component lists for each dof the
     // corresponding vector component. if the DoFHandler is based on a
     // parallel distributed triangulation then the output array is index by
-    // dof.locally_owned_dofs().index_within_set(indices[i])
+    // dof_handler.locally_owned_dofs().index_within_set(indices[i])
     //
     // if an element is non-primitive then we assign to each degree of
     // freedom the following component:
@@ -191,16 +192,23 @@ namespace DoFTools
     //   in the component_mask that corresponds to this shape function
     template <int dim, int spacedim>
     void
-    get_component_association(const DoFHandler<dim, spacedim> &dof,
-                              const ComponentMask             &component_mask,
-                              std::vector<unsigned char> &dofs_by_component)
+    get_component_association(
+      const DoFHandler<dim, spacedim> &dof_handler,
+      const ComponentMask             &component_mask,
+      std::vector<unsigned char>      &dofs_by_component,
+      const unsigned int               mg_level = numbers::invalid_unsigned_int)
     {
       const dealii::hp::FECollection<dim, spacedim> &fe_collection =
-        dof.get_fe_collection();
+        dof_handler.get_fe_collection();
       Assert(fe_collection.n_components() < 256, ExcNotImplemented());
-      Assert(dofs_by_component.size() == dof.n_locally_owned_dofs(),
-             ExcDimensionMismatch(dofs_by_component.size(),
-                                  dof.n_locally_owned_dofs()));
+
+      const auto &locally_owned_dofs =
+        (mg_level == numbers::invalid_unsigned_int) ?
+          dof_handler.locally_owned_dofs() :
+          dof_handler.locally_owned_mg_dofs(mg_level);
+
+      AssertDimension(dofs_by_component.size(),
+                      locally_owned_dofs.n_elements());
 
       // next set up a table for the degrees of freedom on each of the
       // cells (regardless of the fact whether it is listed in the
@@ -220,18 +228,40 @@ namespace DoFTools
 
       // then loop over all cells and do the work
       std::vector<types::global_dof_index> indices;
-      for (const auto &c :
-           dof.active_cell_iterators() | IteratorFilters::LocallyOwnedCell())
-        {
-          const types::fe_index fe_index      = c->active_fe_index();
-          const unsigned int    dofs_per_cell = c->get_fe().n_dofs_per_cell();
-          indices.resize(dofs_per_cell);
-          c->get_dof_indices(indices);
-          for (unsigned int i = 0; i < dofs_per_cell; ++i)
-            if (dof.locally_owned_dofs().is_element(indices[i]))
-              dofs_by_component[dof.locally_owned_dofs().index_within_set(
-                indices[i])] = local_component_association[fe_index][i];
-        }
+
+      const auto runner = [&](const auto &task) {
+        if (mg_level == numbers::invalid_unsigned_int)
+          {
+            for (const auto &cell : dof_handler.active_cell_iterators() |
+                                      IteratorFilters::LocallyOwnedCell())
+              {
+                indices.resize(cell->get_fe().n_dofs_per_cell());
+                cell->get_dof_indices(indices);
+
+                task(cell);
+              }
+          }
+        else
+          {
+            for (const auto &cell :
+                 dof_handler.cell_iterators_on_level(mg_level))
+              if (cell->is_locally_owned_on_level())
+                {
+                  indices.resize(cell->get_fe().n_dofs_per_cell());
+                  cell->get_mg_dof_indices(indices);
+
+                  task(cell);
+                }
+          }
+      };
+
+      runner([&](const auto &cell) {
+        const types::fe_index fe_index = cell->active_fe_index();
+        for (unsigned int i = 0; i < cell->get_fe().n_dofs_per_cell(); ++i)
+          if (locally_owned_dofs.is_element(indices[i]))
+            dofs_by_component[locally_owned_dofs.index_within_set(indices[i])] =
+              local_component_association[fe_index][i];
+      });
     }
 
 
@@ -461,7 +491,7 @@ namespace DoFTools
           index_per_comp[comp_i].add_index(
             locally_owned_dofs.nth_index_in_set(i));
       }
-    for (auto &c : index_per_comp)
+    for (const auto &c : index_per_comp)
       c.compress();
     return index_per_comp;
   }
@@ -1236,104 +1266,133 @@ namespace DoFTools
   }
 
 
-
-  template <int dim, int spacedim>
-  void
-  extract_constant_modes(const DoFHandler<dim, spacedim> &dof_handler,
-                         const ComponentMask             &component_mask,
-                         std::vector<std::vector<bool>>  &constant_modes)
+  namespace internal
   {
-    // If there are no locally owned DoFs, return with an empty
-    // constant_modes object:
-    if (dof_handler.n_locally_owned_dofs() == 0)
+    template <int dim, int spacedim>
+    std::vector<std::vector<bool>>
+    extract_constant_modes(const DoFHandler<dim, spacedim> &dof_handler,
+                           const ComponentMask             &component_mask,
+                           const unsigned int               mg_level)
+    {
+      std::vector<std::vector<bool>> constant_modes;
+
+      const auto &locally_owned_dofs =
+        (mg_level == numbers::invalid_unsigned_int) ?
+          dof_handler.locally_owned_dofs() :
+          dof_handler.locally_owned_mg_dofs(mg_level);
+
+      // If there are no locally owned DoFs, return with an empty
+      // constant_modes object:
+      if (locally_owned_dofs.n_elements() == 0)
+        {
+          return std::vector<std::vector<bool>>(0);
+        }
+
+      const unsigned int n_components = dof_handler.get_fe(0).n_components();
+      Assert(component_mask.represents_n_components(n_components),
+             ExcDimensionMismatch(n_components, component_mask.size()));
+
+      std::vector<unsigned char> dofs_by_component(
+        locally_owned_dofs.n_elements());
+      internal::get_component_association(dof_handler,
+                                          component_mask,
+                                          dofs_by_component,
+                                          mg_level);
+      unsigned int n_selected_dofs = 0;
+      for (unsigned int i = 0; i < n_components; ++i)
+        if (component_mask[i] == true)
+          n_selected_dofs +=
+            std::count(dofs_by_component.begin(), dofs_by_component.end(), i);
+
+      // Find local numbering within the selected components
+      std::vector<unsigned int> component_numbering(
+        locally_owned_dofs.n_elements(), numbers::invalid_unsigned_int);
+      for (unsigned int i = 0, count = 0; i < locally_owned_dofs.n_elements();
+           ++i)
+        if (component_mask[dofs_by_component[i]])
+          component_numbering[i] = count++;
+
+      // get the element constant modes and find a translation table between
+      // index in the constant modes and the components.
+      //
+      // TODO: We might be able to extend this also for elements which do not
+      // have the same constant modes, but that is messy...
+      const dealii::hp::FECollection<dim, spacedim> &fe_collection =
+        dof_handler.get_fe_collection();
+      std::vector<Table<2, bool>> element_constant_modes;
+      std::vector<std::vector<std::pair<unsigned int, unsigned int>>>
+        constant_mode_to_component_translation(n_components);
       {
-        constant_modes = std::vector<std::vector<bool>>(0);
-        return;
+        unsigned int n_constant_modes              = 0;
+        int          first_non_empty_constant_mode = -1;
+        for (unsigned int f = 0; f < fe_collection.size(); ++f)
+          {
+            std::pair<Table<2, bool>, std::vector<unsigned int>> data =
+              fe_collection[f].get_constant_modes();
+
+            // Store the index of the current element if it is the first that
+            // has non-empty constant modes.
+            if (first_non_empty_constant_mode < 0 && data.first.n_rows() > 0)
+              {
+                first_non_empty_constant_mode = f;
+                // This is the first non-empty constant mode, so we figure out
+                // the translation between index in the constant modes and the
+                // components
+                for (unsigned int i = 0; i < data.second.size(); ++i)
+                  if (component_mask[data.second[i]])
+                    constant_mode_to_component_translation[data.second[i]]
+                      .emplace_back(n_constant_modes++, i);
+              }
+
+            // Add the constant modes of this element to the list and assert
+            // that there are as many constant modes as for the other elements
+            // (or zero constant modes).
+            element_constant_modes.push_back(data.first);
+            Assert(element_constant_modes.back().n_rows() == 0 ||
+                     element_constant_modes.back().n_rows() ==
+                       element_constant_modes[first_non_empty_constant_mode]
+                         .n_rows(),
+                   ExcInternalError());
+          }
+        AssertIndexRange(first_non_empty_constant_mode, fe_collection.size());
+
+        // Now we know the number of constant modes and resize the return vector
+        // accordingly
+        constant_modes.clear();
+        constant_modes.resize(n_constant_modes,
+                              std::vector<bool>(n_selected_dofs, false));
       }
 
-    const unsigned int n_components = dof_handler.get_fe(0).n_components();
-    Assert(component_mask.represents_n_components(n_components),
-           ExcDimensionMismatch(n_components, component_mask.size()));
+      // Loop over all owned cells and ask the element for the constant modes
+      std::vector<types::global_dof_index> dof_indices;
 
-    std::vector<unsigned char> dofs_by_component(
-      dof_handler.n_locally_owned_dofs());
-    internal::get_component_association(dof_handler,
-                                        component_mask,
-                                        dofs_by_component);
-    unsigned int n_selected_dofs = 0;
-    for (unsigned int i = 0; i < n_components; ++i)
-      if (component_mask[i] == true)
-        n_selected_dofs +=
-          std::count(dofs_by_component.begin(), dofs_by_component.end(), i);
+      const auto runner = [&](const auto &task) {
+        if (mg_level == numbers::invalid_unsigned_int)
+          {
+            for (const auto &cell : dof_handler.active_cell_iterators() |
+                                      IteratorFilters::LocallyOwnedCell())
+              {
+                dof_indices.resize(cell->get_fe().n_dofs_per_cell());
+                cell->get_dof_indices(dof_indices);
 
-    // Find local numbering within the selected components
-    const IndexSet &locally_owned_dofs = dof_handler.locally_owned_dofs();
-    std::vector<unsigned int> component_numbering(
-      locally_owned_dofs.n_elements(), numbers::invalid_unsigned_int);
-    for (unsigned int i = 0, count = 0; i < locally_owned_dofs.n_elements();
-         ++i)
-      if (component_mask[dofs_by_component[i]])
-        component_numbering[i] = count++;
+                task(cell);
+              }
+          }
+        else
+          {
+            for (const auto &cell :
+                 dof_handler.cell_iterators_on_level(mg_level))
+              if (cell->is_locally_owned_on_level())
+                {
+                  dof_indices.resize(cell->get_fe().n_dofs_per_cell());
+                  cell->get_mg_dof_indices(dof_indices);
 
-    // get the element constant modes and find a translation table between
-    // index in the constant modes and the components.
-    //
-    // TODO: We might be able to extend this also for elements which do not
-    // have the same constant modes, but that is messy...
-    const dealii::hp::FECollection<dim, spacedim> &fe_collection =
-      dof_handler.get_fe_collection();
-    std::vector<Table<2, bool>> element_constant_modes;
-    std::vector<std::vector<std::pair<unsigned int, unsigned int>>>
-      constant_mode_to_component_translation(n_components);
-    {
-      unsigned int n_constant_modes              = 0;
-      int          first_non_empty_constant_mode = -1;
-      for (unsigned int f = 0; f < fe_collection.size(); ++f)
-        {
-          std::pair<Table<2, bool>, std::vector<unsigned int>> data =
-            fe_collection[f].get_constant_modes();
+                  task(cell);
+                }
+          }
+      };
 
-          // Store the index of the current element if it is the first that has
-          // non-empty constant modes.
-          if (first_non_empty_constant_mode < 0 && data.first.n_rows() > 0)
-            {
-              first_non_empty_constant_mode = f;
-              // This is the first non-empty constant mode, so we figure out the
-              // translation between index in the constant modes and the
-              // components
-              for (unsigned int i = 0; i < data.second.size(); ++i)
-                if (component_mask[data.second[i]])
-                  constant_mode_to_component_translation[data.second[i]]
-                    .emplace_back(n_constant_modes++, i);
-            }
-
-          // Add the constant modes of this element to the list and assert that
-          // there are as many constant modes as for the other elements (or zero
-          // constant modes).
-          element_constant_modes.push_back(data.first);
-          Assert(
-            element_constant_modes.back().n_rows() == 0 ||
-              element_constant_modes.back().n_rows() ==
-                element_constant_modes[first_non_empty_constant_mode].n_rows(),
-            ExcInternalError());
-        }
-      AssertIndexRange(first_non_empty_constant_mode, fe_collection.size());
-
-      // Now we know the number of constant modes and resize the return vector
-      // accordingly
-      constant_modes.clear();
-      constant_modes.resize(n_constant_modes,
-                            std::vector<bool>(n_selected_dofs, false));
-    }
-
-    // Loop over all owned cells and ask the element for the constant modes
-    std::vector<types::global_dof_index> dof_indices;
-    for (const auto &cell : dof_handler.active_cell_iterators() |
-                              IteratorFilters::LocallyOwnedCell())
-      {
-        dof_indices.resize(cell->get_fe().n_dofs_per_cell());
-        cell->get_dof_indices(dof_indices);
-
+      runner([&](const auto &cell) {
         for (unsigned int i = 0; i < dof_indices.size(); ++i)
           if (locally_owned_dofs.is_element(dof_indices[i]))
             {
@@ -1348,7 +1407,215 @@ namespace DoFTools
                     element_constant_modes[cell->active_fe_index()](
                       indices.second, i);
             }
-      }
+      });
+
+      return constant_modes;
+    }
+
+
+
+    /**
+     * Definition of the rigid body motions for linear elasticity.
+     */
+    template <int dim>
+    class RigidBodyMotion : public Function<dim>
+    {
+    public:
+      static constexpr unsigned int n_modes = dim * (dim + 1) / 2;
+
+      RigidBodyMotion(const unsigned int type);
+
+      virtual double
+      value(const Point<dim> &p, const unsigned int component) const override;
+
+    private:
+      const unsigned int type;
+    };
+
+
+
+    template <int dim>
+    RigidBodyMotion<dim>::RigidBodyMotion(const unsigned int type)
+      : Function<dim>(dim)
+      , type(type)
+    {
+      Assert(type < n_modes, ExcNotImplemented());
+    }
+
+
+
+    Tensor<1, 2>
+    cross_product(const Tensor<1, 2> &tensor1, const Tensor<1, 1> &tensor2)
+    {
+      // |a|   |0|   |+bc|
+      // |b| x |0| = |-ac|
+      // |0|   |c|   | 0 |
+
+      Tensor<1, 2> cproduct;
+      cproduct[0] = +tensor1[1] * tensor2[0];
+      cproduct[1] = -tensor1[0] * tensor2[0];
+      return cproduct;
+    }
+
+
+
+    Tensor<1, 3>
+    cross_product(const Tensor<1, 3> &tensor1, const Tensor<1, 3> &tensor2)
+    {
+      Tensor<1, 3> cproduct;
+      cproduct[0] = +tensor1[1] * tensor2[2] - tensor1[2] * tensor2[1];
+      cproduct[1] = +tensor1[2] * tensor2[0] - tensor1[0] * tensor2[2];
+      cproduct[2] = +tensor1[0] * tensor2[1] - tensor1[1] * tensor2[0];
+      return cproduct;
+    }
+
+
+
+    template <int dim>
+    double
+    RigidBodyMotion<dim>::value(const Point<dim>  &p,
+                                const unsigned int component) const
+    {
+      if (type < dim) // translation modes
+        return static_cast<double>(component == type);
+
+      if constexpr (dim >= 2) // rotation modes
+        {
+          Tensor<1, n_modes - dim> dir;
+          dir[type - dim] = 1.0;
+
+          return cross_product(p, dir)[component];
+        }
+      else
+        {
+          Assert(false, ExcNotImplemented());
+
+          return 0.0;
+        }
+    }
+
+
+
+    template <int dim, int spacedim>
+    std::vector<std::vector<double>>
+    extract_rigid_body_modes(const Mapping<dim, spacedim>    &mapping,
+                             const DoFHandler<dim, spacedim> &dof_handler,
+                             const ComponentMask             &component_mask,
+                             const unsigned int               mg_level)
+    {
+      AssertDimension(dim, spacedim);
+
+      constexpr unsigned int n_modes = RigidBodyMotion<dim>::n_modes;
+
+      std::vector<std::vector<double>> rigid_body_modes(n_modes);
+
+      LinearAlgebra::distributed::Vector<double> rigid_body_modes_dealii(
+        mg_level == numbers::invalid_unsigned_int ?
+          dof_handler.locally_owned_dofs() :
+          dof_handler.locally_owned_mg_dofs(mg_level),
+        mg_level == numbers::invalid_unsigned_int ?
+          DoFTools::extract_locally_active_dofs(dof_handler) :
+          DoFTools::extract_locally_active_level_dofs(dof_handler, mg_level),
+        dof_handler.get_communicator());
+
+      for (unsigned int i = 0; i < n_modes; ++i)
+        {
+          VectorTools::interpolate(mapping,
+                                   dof_handler,
+                                   RigidBodyMotion<dim>(i),
+                                   rigid_body_modes_dealii,
+                                   component_mask,
+                                   mg_level);
+
+          // copy to right format
+          rigid_body_modes[i].assign(rigid_body_modes_dealii.begin(),
+                                     rigid_body_modes_dealii.end());
+        }
+
+      return rigid_body_modes;
+    }
+
+  } // namespace internal
+
+
+
+  template <int dim, int spacedim>
+  std::vector<std::vector<bool>>
+  extract_constant_modes(const DoFHandler<dim, spacedim> &dof_handler,
+                         const ComponentMask             &component_mask)
+  {
+    return internal::extract_constant_modes(dof_handler,
+                                            component_mask,
+                                            numbers::invalid_unsigned_int);
+  }
+
+
+
+  template <int dim, int spacedim>
+  void
+  extract_constant_modes(const DoFHandler<dim, spacedim> &dof_handler,
+                         const ComponentMask             &component_mask,
+                         std::vector<std::vector<bool>>  &constant_modes)
+  {
+    const auto temp =
+      internal::extract_constant_modes(dof_handler,
+                                       component_mask,
+                                       numbers::invalid_unsigned_int);
+    constant_modes = temp;
+  }
+
+
+
+  template <int dim, int spacedim>
+  std::vector<std::vector<bool>>
+  extract_level_constant_modes(const unsigned int               level,
+                               const DoFHandler<dim, spacedim> &dof_handler,
+                               const ComponentMask             &component_mask)
+  {
+    return internal::extract_constant_modes(dof_handler, component_mask, level);
+  }
+
+
+
+  template <int dim, int spacedim>
+  void
+  extract_level_constant_modes(const unsigned int               level,
+                               const DoFHandler<dim, spacedim> &dof_handler,
+                               const ComponentMask             &component_mask,
+                               std::vector<std::vector<bool>>  &constant_modes)
+  {
+    const auto temp =
+      internal::extract_constant_modes(dof_handler, component_mask, level);
+    constant_modes = temp;
+  }
+
+
+
+  template <int dim, int spacedim>
+  std::vector<std::vector<double>>
+  extract_rigid_body_modes(const Mapping<dim, spacedim>    &mapping,
+                           const DoFHandler<dim, spacedim> &dof_handler,
+                           const ComponentMask             &component_mask)
+  {
+    return internal::extract_rigid_body_modes(mapping,
+                                              dof_handler,
+                                              component_mask,
+                                              numbers::invalid_unsigned_int);
+  }
+
+
+
+  template <int dim, int spacedim>
+  std::vector<std::vector<double>>
+  extract_level_rigid_body_modes(const unsigned int               level,
+                                 const Mapping<dim, spacedim>    &mapping,
+                                 const DoFHandler<dim, spacedim> &dof_handler,
+                                 const ComponentMask &component_mask)
+  {
+    return internal::extract_rigid_body_modes(mapping,
+                                              dof_handler,
+                                              component_mask,
+                                              level);
   }
 
 
@@ -1470,7 +1737,7 @@ namespace DoFTools
          Utilities::MPI::n_mpi_processes(
            dynamic_cast<const parallel::TriangulationBase<dim, spacedim> *>(
              &dof_handler.get_triangulation())
-             ->get_communicator()));
+             ->get_mpi_communicator()));
     Assert(n_subdomains > *std::max_element(subdomain_association.begin(),
                                             subdomain_association.end()),
            ExcInternalError());
@@ -1997,12 +2264,13 @@ namespace DoFTools
         std::vector<types::global_dof_index> local_dof_count =
           dofs_per_component;
 
-        const int ierr = MPI_Allreduce(local_dof_count.data(),
-                                       dofs_per_component.data(),
-                                       n_target_components,
-                                       DEAL_II_DOF_INDEX_MPI_TYPE,
-                                       MPI_SUM,
-                                       tria->get_communicator());
+        const int ierr = MPI_Allreduce(
+          local_dof_count.data(),
+          dofs_per_component.data(),
+          n_target_components,
+          Utilities::MPI::mpi_type_id_for_type<types::global_dof_index>,
+          MPI_SUM,
+          tria->get_mpi_communicator());
         AssertThrowMPI(ierr);
       }
 #endif
@@ -2085,12 +2353,13 @@ namespace DoFTools
           {
             std::vector<types::global_dof_index> local_dof_count =
               dofs_per_block;
-            const int ierr = MPI_Allreduce(local_dof_count.data(),
-                                           dofs_per_block.data(),
-                                           n_target_blocks,
-                                           DEAL_II_DOF_INDEX_MPI_TYPE,
-                                           MPI_SUM,
-                                           tria->get_communicator());
+            const int ierr = MPI_Allreduce(
+              local_dof_count.data(),
+              dofs_per_block.data(),
+              n_target_blocks,
+              Utilities::MPI::mpi_type_id_for_type<types::global_dof_index>,
+              MPI_SUM,
+              tria->get_mpi_communicator());
             AssertThrowMPI(ierr);
           }
 #endif
@@ -2230,8 +2499,13 @@ namespace DoFTools
 
         std::vector<types::global_dof_index> local_dof_indices;
         for (const auto &cell : dof_handler.active_cell_iterators())
-          // only work on locally relevant cells
-          if (cell->is_artificial() == false)
+          // Only work on locally relevant cells. Exclude cells
+          // without DoFs (e.g., if a cell has FE_Nothing associated
+          // with it) because that trips up internal assertions about
+          // using FEValues with quadrature formulas without
+          // quadrature points.
+          if ((cell->is_artificial() == false) &&
+              (cell->get_fe().n_dofs_per_cell() > 0))
             {
               hp_fe_values.reinit(cell);
               const FEValues<dim, spacedim> &fe_values =
@@ -2250,7 +2524,39 @@ namespace DoFTools
 
                   // insert the values into the map if it is a valid component
                   if (mask[dof_comp])
-                    support_points[local_dof_indices[i]] = points[i];
+                    {
+                      // For continuous elements, we encounter some DoFs more
+                      // than once, namely from each cell that is adjacent to a
+                      // DoF. If everything is alright then a DoF should have
+                      // the same support point on all elements over which it
+                      // has support.
+                      //
+                      // This assertion verifies exactly that: if a DoF is
+                      // encountered more than once in this function, then its
+                      // support point should be the same (up to a numerical
+                      // tolerance).
+                      if constexpr (running_in_debug_mode())
+                        {
+                          const auto it =
+                            support_points.find(local_dof_indices[i]);
+                          // if we have degree p Lagrange elements and width dx
+                          // cells, then points are approximately dx / (p ** 2)
+                          // apart. Make that tolerance stricter (we should
+                          // catch other errors), but not much stricter so that
+                          // we don't unnecessarily constrain huge elements
+                          // which may exhibit major roundoff problems when we
+                          // subtract
+                          if (it != support_points.end())
+                            {
+                              const auto p = cell->get_fe().tensor_degree();
+                              Assert((it->second - points[i]).norm() <
+                                       cell->diameter() / (4.0 * p * p),
+                                     ExcInternalError());
+                            }
+                        }
+
+                      support_points[local_dof_indices[i]] = points[i];
+                    }
                 }
             }
 
@@ -2887,7 +3193,7 @@ namespace DoFTools
 
 // explicit instantiations
 
-#include "dof_tools.inst"
+#include "dofs/dof_tools.inst"
 
 
 

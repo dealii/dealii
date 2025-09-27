@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2018 - 2022 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2018 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/point.h>
@@ -222,7 +221,7 @@ namespace NonMatching
            ExcNotImplemented());
 
     const bool tria_is_parallel =
-      (dynamic_cast<const parallel::TriangulationBase<dim1, spacedim> *>(
+      (dynamic_cast<const parallel::TriangulationBase<dim0, spacedim> *>(
          &space_dh.get_triangulation()) != nullptr);
     const auto &space_fe    = space_dh.get_fe();
     const auto &immersed_fe = immersed_dh.get_fe();
@@ -412,7 +411,7 @@ namespace NonMatching
            ExcNotImplemented());
 
     const bool tria_is_parallel =
-      (dynamic_cast<const parallel::TriangulationBase<dim1, spacedim> *>(
+      (dynamic_cast<const parallel::TriangulationBase<dim0, spacedim> *>(
          &space_dh.get_triangulation()) != nullptr);
 
     const auto &space_fe    = space_dh.get_fe();
@@ -956,7 +955,7 @@ namespace NonMatching
       }
   }
 #ifndef DOXYGEN
-#  include "coupling.inst"
+#  include "non_matching/coupling.inst"
 #endif
 } // namespace NonMatching
 

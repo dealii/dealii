@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2023 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 1998 - 2024 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 
 
@@ -52,11 +51,11 @@ public:
     Point<dim> middle = FlatManifold<dim>::get_new_point_on_line(line);
 
     for (int i = 0; i < dim; ++i)
-      middle(i) -= .5;
+      middle[i] -= .5;
     middle *=
       std::sqrt(static_cast<double>(dim)) / (std::sqrt(middle.square()) * 2);
     for (int i = 0; i < dim; ++i)
-      middle(i) += .5;
+      middle[i] += .5;
 
     return middle;
   }
@@ -69,11 +68,11 @@ public:
     Point<dim> middle = FlatManifold<dim>::get_new_point_on_quad(quad);
 
     for (int i = 0; i < dim; ++i)
-      middle(i) -= .5;
+      middle[i] -= .5;
     middle *=
       std::sqrt(static_cast<double>(dim)) / (std::sqrt(middle.square()) * 2);
     for (int i = 0; i < dim; ++i)
-      middle(i) += .5;
+      middle[i] += .5;
 
     return middle;
   }
@@ -108,7 +107,7 @@ CurvedLine<dim>::get_new_point_on_line(
   // 0 or 1, then the z-values of all
   // vertices of the line is like that
   if (dim >= 3)
-    if (((middle(2) == 0) || (middle(2) == 1))
+    if (((middle[2] == 0) || (middle[2] == 1))
         // find out, if the line is in the
         // interior of the top or bottom face
         // of the domain, or at the edge.
@@ -125,18 +124,18 @@ CurvedLine<dim>::get_new_point_on_line(
       return middle;
 
 
-  double x = middle(0), y = middle(1);
+  double x = middle[0], y = middle[1];
 
   if (y < x)
     if (y < 1 - x)
-      middle(1) = 0.04 * std::sin(6 * numbers::PI * middle(0));
+      middle[1] = 0.04 * std::sin(6 * numbers::PI * middle[0]);
     else
-      middle(0) = 1 + 0.04 * std::sin(6 * numbers::PI * middle(1));
+      middle[0] = 1 + 0.04 * std::sin(6 * numbers::PI * middle[1]);
 
   else if (y < 1 - x)
-    middle(0) = 0.04 * std::sin(6 * numbers::PI * middle(1));
+    middle[0] = 0.04 * std::sin(6 * numbers::PI * middle[1]);
   else
-    middle(1) = 1 + 0.04 * std::sin(6 * numbers::PI * middle(0));
+    middle[1] = 1 + 0.04 * std::sin(6 * numbers::PI * middle[0]);
 
   return middle;
 }
@@ -156,21 +155,21 @@ CurvedLine<dim>::get_new_point_on_quad(
   // z-value of the midpoint is either
   // 0 or 1, then the z-values of all
   // vertices of the quad is like that
-  if (dim == 3 && ((middle(dim - 1) == 0) || (middle(dim - 1) == 1)))
+  if (dim == 3 && ((middle[dim - 1] == 0) || (middle[dim - 1] == 1)))
     return middle;
 
-  double x = middle(0), y = middle(1);
+  double x = middle[0], y = middle[1];
 
   if (y < x)
     if (y < 1 - x)
-      middle(1) = 0.04 * std::sin(6 * numbers::PI * middle(0));
+      middle[1] = 0.04 * std::sin(6 * numbers::PI * middle[0]);
     else
-      middle(0) = 1 + 0.04 * std::sin(6 * numbers::PI * middle(1));
+      middle[0] = 1 + 0.04 * std::sin(6 * numbers::PI * middle[1]);
 
   else if (y < 1 - x)
-    middle(0) = 0.04 * std::sin(6 * numbers::PI * middle(1));
+    middle[0] = 0.04 * std::sin(6 * numbers::PI * middle[1]);
   else
-    middle(1) = 1 + 0.04 * std::sin(6 * numbers::PI * middle(0));
+    middle[1] = 1 + 0.04 * std::sin(6 * numbers::PI * middle[0]);
 
   return middle;
 }

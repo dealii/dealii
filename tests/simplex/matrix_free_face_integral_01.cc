@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2020 - 2021 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2021 - 2024 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 
 // Compute the right-hand side vector due to a Neumann boundary condition on
@@ -45,7 +44,6 @@
 
 #include "./simplex_grids.h"
 
-using namespace dealii;
 
 
 template <int dim>
@@ -94,7 +92,7 @@ test(const unsigned int v, const unsigned int degree)
                                             QGaussSimplex<dim - 1>(degree + 1)};
     }
   else
-    Assert(false, ExcNotImplemented());
+    DEAL_II_NOT_IMPLEMENTED();
 
   MappingFE<dim> mapping(*fe_mapping);
 
@@ -220,7 +218,7 @@ main(int argc, char **argv)
       else if (i == 2)
         deallog.push("PYRAMID");
       else
-        Assert(false, ExcNotImplemented());
+        DEAL_II_NOT_IMPLEMENTED();
 
       if (i == 0) // 2D makes only sense for simplex
         {

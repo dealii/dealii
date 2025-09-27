@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2018 - 2023 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2018 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 #ifndef dealii_distributed_cell_weights_h
 #define dealii_distributed_cell_weights_h
@@ -22,6 +21,8 @@
 
 #include <deal.II/dofs/dof_handler.h>
 
+#include <boost/signals2/connection.hpp>
+
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -30,10 +31,14 @@ namespace parallel
   /**
    * Anytime a parallel::TriangulationBase is repartitioned, either upon request
    * or by refinement/coarsening, cells will be distributed amongst all
-   * subdomains to achieve an equally balanced workload. If the workload per
-   * cell varies, which is in general the case for DoFHandler objects with
-   * hp-capabilities, we can take that into account by introducing individual
-   * weights for different cells.
+   * subdomains to achieve an equally balanced workload. By default, if you
+   * don't do anything specific, the workload is assumed to be the same for
+   * every cell of the triangulation, and in that case a well-balanced mesh
+   * will have about the same number of cells on each process. But, if the
+   * workload per cell varies, which is in general the case for DoFHandler
+   * objects that hp-capabilities (i.e., where you use different finite elements
+   * on different cells), we can take that into account by introducing
+   * individual weights for different cells.
    *
    * This class allows computing these weights for load balancing by
    * consulting the FiniteElement that is associated with each cell of

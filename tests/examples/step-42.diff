@@ -1,0 +1,68 @@
+30c30
+< 
+---
+> #include "../example_test.h"
+1654,1662c1654,1668
+<       solver.solve(newton_matrix,
+<                    distributed_solution,
+<                    newton_rhs,
+<                    preconditioner);
+< 
+<       pcout << "         Error: " << solver_control.initial_value() << " -> "
+<             << solver_control.last_value() << " in "
+<             << solver_control.last_step() << " Bicgstab iterations."
+<             << std::endl;
+---
+> //      solver.solve(newton_matrix,
+> //                   distributed_solution,
+> //                   newton_rhs,
+> //                   preconditioner);
+>       check_solver_within_range(pcout,
+>                                 solver.solve(newton_matrix,
+>                                              distributed_solution,
+>                                              newton_rhs,
+>                                              preconditioner),
+>                                 solver_control.last_step(),
+>                                 6, 8);
+> //      pcout << "         Error: " << solver_control.initial_value() << " -> "
+> //            << solver_control.last_value() << " in "
+> //            << solver_control.last_step() << " Bicgstab iterations."
+> //            << std::endl;
+2126c2132
+<     for (; current_refinement_cycle < n_refinement_cycles;
+---
+>     for (; current_refinement_cycle < 1;
+2151,2152c2157,2158
+<         computing_timer.print_summary();
+<         computing_timer.reset();
+---
+> //        computing_timer.print_summary();
+> //        computing_timer.reset();
+2154,2157c2160,2163
+<         Utilities::System::MemoryStats stats;
+<         Utilities::System::get_memory_stats(stats);
+<         pcout << "Peak virtual memory used, resident in kB: " << stats.VmSize
+<               << ' ' << stats.VmRSS << std::endl;
+---
+> //        Utilities::System::MemoryStats stats;
+> //        Utilities::System::get_memory_stats(stats);
+> //        pcout << "Peak virtual memory used, resident in kB: " << stats.VmSize
+> //              << ' ' << stats.VmRSS << std::endl;
+2178,2183c2184,2189
+<       if (argc != 2)
+<         {
+<           std::cerr << "*** Call this program as <./step-42 input.prm>"
+<                     << std::endl;
+<           return 1;
+<         }
+---
+> //      if (argc != 2)
+> //        {
+> //          std::cerr << "*** Call this program as <./step-42 input.prm>"
+> //                    << std::endl;
+> //          return 1;
+> //        }
+2185c2191
+<       prm.parse_input(argv[1]);
+---
+>       prm.parse_input("../../../source/step-42/p1_adaptive.prm");

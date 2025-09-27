@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 1999 - 2023 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 1999 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 
 #ifndef dealii_sparse_matrix_templates_h
@@ -56,7 +55,7 @@ SparseMatrix<number>::SparseMatrix()
 
 template <typename number>
 SparseMatrix<number>::SparseMatrix(const SparseMatrix &m)
-  : Subscriptor(m)
+  : EnableObserverPointer(m)
   , cols(nullptr, "SparseMatrix")
   , val(nullptr)
   , max_len(0)
@@ -73,8 +72,8 @@ SparseMatrix<number>::SparseMatrix(const SparseMatrix &m)
 
 template <typename number>
 SparseMatrix<number>::SparseMatrix(SparseMatrix<number> &&m) noexcept
-  : Subscriptor(std::move(m))
-  , cols(m.cols)
+  : EnableObserverPointer(std::move(m))
+  , cols(std::move(m.cols))
   , val(std::move(m.val))
   , max_len(m.max_len)
 {
@@ -89,7 +88,6 @@ template <typename number>
 SparseMatrix<number> &
 SparseMatrix<number>::operator=(const SparseMatrix<number> &m)
 {
-  (void)m;
   Assert(m.cols == nullptr && m.val == nullptr && m.max_len == 0,
          ExcMessage("This operator can only be called if the provided right "
                     "hand side is an empty matrix. This operator can not be "
@@ -139,7 +137,6 @@ SparseMatrix<number>::SparseMatrix(const SparsityPattern &c,
   , val(nullptr)
   , max_len(0)
 {
-  (void)id;
   Assert(c.n_rows() == id.m(), ExcDimensionMismatch(c.n_rows(), id.m()));
   Assert(c.n_cols() == id.n(), ExcDimensionMismatch(c.n_cols(), id.n()));
 
@@ -161,35 +158,10 @@ SparseMatrix<number>::~SparseMatrix()
 
 
 
-namespace internal
-{
-  namespace SparseMatrixImplementation
-  {
-    using size_type = types::global_dof_index;
-
-    template <typename T>
-    std::enable_if_t<std::is_trivial_v<T>>
-    zero_subrange(const size_type begin, const size_type end, T *dst)
-    {
-      std::memset(dst + begin, 0, (end - begin) * sizeof(T));
-    }
-
-    template <typename T>
-    std::enable_if_t<!std::is_trivial_v<T>>
-    zero_subrange(const size_type begin, const size_type end, T *dst)
-    {
-      std::fill(dst + begin, dst + end, 0);
-    }
-  } // namespace SparseMatrixImplementation
-} // namespace internal
-
-
-
 template <typename number>
 SparseMatrix<number> &
 SparseMatrix<number>::operator=(const double d)
 {
-  (void)d;
   Assert(d == 0, ExcScalarAssignmentOnlyForZeroValue());
 
   Assert(cols != nullptr, ExcNeedsSparsityPattern());
@@ -211,18 +183,13 @@ SparseMatrix<number>::operator=(const double d)
     parallel::apply_to_subranges(
       0U,
       matrix_size,
-      [this](const size_type begin, const size_type end) {
-        internal::SparseMatrixImplementation::zero_subrange(begin,
-                                                            end,
-                                                            val.get());
+      [values = this->val.get()](const size_type begin, const size_type end) {
+        std::fill(values + begin, values + end, number(0.));
       },
       grain_size);
   else if (matrix_size > 0)
     {
-      if constexpr (std::is_trivial_v<number>)
-        std::memset(val.get(), 0, matrix_size * sizeof(number));
-      else
-        std::fill(val.get(), val.get() + matrix_size, 0);
+      std::fill(val.get(), val.get() + matrix_size, 0);
     }
 
   return *this;
@@ -234,7 +201,6 @@ template <typename number>
 SparseMatrix<number> &
 SparseMatrix<number>::operator=(const IdentityMatrix &id)
 {
-  (void)id;
   Assert(cols->n_rows() == id.m(),
          ExcDimensionMismatch(cols->n_rows(), id.m()));
   Assert(cols->n_cols() == id.n(),
@@ -437,7 +403,6 @@ SparseMatrix<number>::copy_from(const TrilinosWrappers::SparseMatrix &matrix)
         value_cache.data(),
         reinterpret_cast<TrilinosWrappers::types::int_type *>(
           colnum_cache.data()));
-      (void)ierr;
       Assert(ierr == 0, ExcTrilinosError(ierr));
 
       // resize arrays to the size actually used
@@ -478,6 +443,8 @@ namespace internal
 {
   namespace SparseMatrixImplementation
   {
+    using size_type = types::global_dof_index;
+
     /**
      * Perform a vmult using the SparseMatrix data structures, but only using
      * a subinterval for the row indices.
@@ -549,12 +516,13 @@ SparseMatrix<number>::add(const size_type  row,
     {
       // check whether the given indices are
       // really sorted
-#ifdef DEBUG
-      for (size_type i = 1; i < n_cols; ++i)
-        Assert(col_indices[i] > col_indices[i - 1],
-               ExcMessage(
-                 "List of indices is unsorted or contains duplicates."));
-#endif
+      if constexpr (running_in_debug_mode())
+        {
+          for (size_type i = 1; i < n_cols; ++i)
+            Assert(col_indices[i] > col_indices[i - 1],
+                   ExcMessage(
+                     "List of indices is unsorted or contains duplicates."));
+        }
 
       const size_type *this_cols    = &cols->colnums[cols->rowstart[row]];
       const size_type  row_length_1 = cols->row_length(row) - 1;
@@ -616,7 +584,7 @@ SparseMatrix<number>::add(const size_type  row,
         {
           // Use the same algorithm as above, but because the matrix is
           // not square, we can now do without the split for diagonal/
-          // entries before the diagional/entries are the diagonal.
+          // entries before the diagonal/entries are the diagonal.
           size_type counter = 0;
           for (size_type i = 0; i < n_cols; ++i)
             {
@@ -649,13 +617,16 @@ SparseMatrix<number>::add(const size_type  row,
       const number value = number(values[j]);
       AssertIsFinite(value);
 
-#ifdef DEBUG
-      if (elide_zero_values == true && value == number())
-        continue;
-#else
-      if (value == number())
-        continue;
-#endif
+      if constexpr (running_in_debug_mode())
+        {
+          if (elide_zero_values == true && value == number())
+            continue;
+        }
+      else
+        {
+          if (value == number())
+            continue;
+        }
 
       // check whether the next index to add is
       // the next present index in the sparsity
@@ -1372,26 +1343,30 @@ namespace internal
     void
     AssertNoZerosOnDiagonal(const SparseMatrix<number> &matrix)
     {
-#ifdef DEBUG
-      for (typename SparseMatrix<number>::size_type row = 0; row < matrix.m();
-           ++row)
-        Assert(matrix.diag_element(row) != number(),
-               ExcMessage(
-                 "There is a zero on the diagonal of this matrix "
-                 "in row " +
-                 std::to_string(row) +
-                 ". The preconditioner you selected cannot work if that "
-                 "is the case because one of its steps requires "
-                 "division by the diagonal elements of the matrix."
-                 "\n\n"
-                 "You should check whether you have correctly "
-                 "assembled the matrix that you use for this "
-                 "preconditioner. If it is correct that there are "
-                 "zeros on the diagonal, then you will have to chose "
-                 "a different preconditioner."));
-#else
-      (void)matrix;
-#endif
+      if constexpr (running_in_debug_mode())
+        {
+          for (typename SparseMatrix<number>::size_type row = 0;
+               row < matrix.m();
+               ++row)
+            Assert(matrix.diag_element(row) != number(),
+                   ExcMessage(
+                     "There is a zero on the diagonal of this matrix "
+                     "in row " +
+                     std::to_string(row) +
+                     ". The preconditioner you selected cannot work if that "
+                     "is the case because one of its steps requires "
+                     "division by the diagonal elements of the matrix."
+                     "\n\n"
+                     "You should check whether you have correctly "
+                     "assembled the matrix that you use for this "
+                     "preconditioner. If it is correct that there are "
+                     "zeros on the diagonal, then you will have to chose "
+                     "a different preconditioner."));
+        }
+      else
+        {
+          (void)matrix;
+        }
     }
   } // namespace SparseMatrixImplementation
 } // namespace internal
@@ -1847,7 +1822,7 @@ SparseMatrix<number>::SSOR(Vector<somenumber> &dst, const number omega) const
 {
   // TODO: Is this called anywhere? If so, multiplication with omega(2-omega)D
   // is missing
-  Assert(false, ExcNotImplemented());
+  DEAL_II_NOT_IMPLEMENTED();
 
   Assert(cols != nullptr, ExcNeedsSparsityPattern());
   Assert(val != nullptr, ExcNotInitialized());
@@ -1896,23 +1871,14 @@ SparseMatrix<number>::SSOR(Vector<somenumber> &dst, const number omega) const
 
 
 template <typename number>
-const SparsityPattern &
-SparseMatrix<number>::get_sparsity_pattern() const
-{
-  Assert(cols != nullptr, ExcNeedsSparsityPattern());
-  return *cols;
-}
-
-
-
-template <typename number>
 void
 SparseMatrix<number>::print_formatted(std::ostream      &out,
                                       const unsigned int precision,
                                       const bool         scientific,
                                       const unsigned int width_,
                                       const char        *zero_string,
-                                      const double       denominator) const
+                                      const double       denominator,
+                                      const char        *separator) const
 {
   Assert(cols != nullptr, ExcNeedsSparsityPattern());
   Assert(val != nullptr, ExcNotInitialized());
@@ -1940,9 +1906,9 @@ SparseMatrix<number>::print_formatted(std::ostream      &out,
       for (size_type j = 0; j < n(); ++j)
         if ((*cols)(i, j) != SparsityPattern::invalid_entry)
           out << std::setw(width)
-              << val[cols->operator()(i, j)] * number(denominator) << ' ';
+              << val[cols->operator()(i, j)] * number(denominator) << separator;
         else
-          out << std::setw(width) << zero_string << ' ';
+          out << std::setw(width) << zero_string << separator;
       out << std::endl;
     };
   AssertThrow(out.fail() == false, ExcIO());

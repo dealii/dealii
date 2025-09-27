@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 1999 - 2023 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 1999 - 2024 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 #ifndef dealii_time_dependent_h
 #define dealii_time_dependent_h
@@ -19,9 +18,10 @@
 
 #include <deal.II/base/config.h>
 
+#include <deal.II/base/enable_observer_pointer.h>
 #include <deal.II/base/exceptions.h>
-#include <deal.II/base/smartpointer.h>
-#include <deal.II/base/subscriptor.h>
+#include <deal.II/base/observer_pointer.h>
+#include <deal.II/base/template_constraints.h>
 
 #include <utility>
 #include <vector>
@@ -616,7 +616,7 @@ protected:
    * this object operates on. Note that this object takes possession of the
    * objects pointed to by the pointers in this collection.
    */
-  std::vector<SmartPointer<TimeStepBase, TimeDependent>> timesteps;
+  std::vector<ObserverPointer<TimeStepBase, TimeDependent>> timesteps;
 
   /**
    * Number of the present sweep. This is reset by the @p start_sweep function
@@ -660,7 +660,7 @@ private:
  * following grids, and some functions to be called before a new loop over all
  * time steps is started.
  */
-class TimeStepBase : public Subscriptor
+class TimeStepBase : public EnableObserverPointer
 {
 public:
   /**
@@ -1466,14 +1466,14 @@ protected:
    * the functions @p sleep and @p wake_up to save memory, if such a behavior
    * is specified in the @p flags structure.
    */
-  SmartPointer<Triangulation<dim, dim>, TimeStepBase_Tria<dim>> tria;
+  ObserverPointer<Triangulation<dim, dim>, TimeStepBase_Tria<dim>> tria;
 
   /**
    * Pointer to a grid which is to be used as the coarse grid for this time
    * level.  This pointer is set through the constructor; ownership remains
    * with the owner of this management object.
    */
-  SmartPointer<const Triangulation<dim, dim>, TimeStepBase_Tria<dim>>
+  ObserverPointer<const Triangulation<dim, dim>, TimeStepBase_Tria<dim>>
     coarse_grid;
 
   /**

@@ -1,17 +1,16 @@
-## ---------------------------------------------------------------------
+## ------------------------------------------------------------------------
 ##
-## Copyright (C) 2015 - 2022 by the deal.II authors
+## SPDX-License-Identifier: LGPL-2.1-or-later
+## Copyright (C) 2015 - 2025 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
-## The deal.II library is free software; you can use it, redistribute
-## it, and/or modify it under the terms of the GNU Lesser General
-## Public License as published by the Free Software Foundation; either
-## version 2.1 of the License, or (at your option) any later version.
-## The full text of the license can be found in the file LICENSE.md at
-## the top level directory of deal.II.
+## Part of the source code is dual licensed under Apache-2.0 WITH
+## LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+## governing the source code and code contributions can be found in
+## LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 ##
-## ---------------------------------------------------------------------
+## ------------------------------------------------------------------------
 
 #
 # This file implements the DEAL_II_QUERY_GIT_INFORMATION macro, which is
@@ -148,6 +147,30 @@ macro(deal_ii_query_git_information)
        endif()
     else()
        message(STATUS "Could not locate get_latest_tag.sh. " ${_prefix}GIT_TAG " will not be set.")
+    endif()
+
+    #
+    # Query for fancy tag:
+    #
+    set(_script "")
+    if(EXISTS     ${CMAKE_BINARY_DIR}/${DEAL_II_SHARE_RELDIR}/scripts/get_fancy_tag.sh)
+      set(_script ${CMAKE_BINARY_DIR}/${DEAL_II_SHARE_RELDIR}/scripts/get_fancy_tag.sh)
+    elseif(EXISTS ${DEAL_II_PATH}/${DEAL_II_SHARE_RELDIR}/scripts/get_fancy_tag.sh)
+      set(_script ${DEAL_II_PATH}/${DEAL_II_SHARE_RELDIR}/scripts/get_fancy_tag.sh)
+    endif()
+    if(NOT "${_script}" STREQUAL "")
+       execute_process(
+          COMMAND ${_script}
+          WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+          OUTPUT_VARIABLE _fancy_tag
+          RESULT_VARIABLE _result
+          OUTPUT_STRIP_TRAILING_WHITESPACE
+          )
+       if(${_result} EQUAL 0)
+         set(${_prefix}GIT_FANCY_TAG ${_fancy_tag})
+       endif()
+    else()
+       message(STATUS "Could not locate get_fancy_tag.sh. " ${_prefix}GIT_FANCY_TAG " will not be set.")
     endif()
 
   endif()

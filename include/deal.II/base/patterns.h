@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2023 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2017 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 #ifndef dealii_patterns_h
 #define dealii_patterns_h
@@ -19,10 +18,11 @@
 
 #include <deal.II/base/config.h>
 
+#include <deal.II/base/enable_observer_pointer.h>
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/point.h>
-#include <deal.II/base/subscriptor.h>
 #include <deal.II/base/template_constraints.h>
+#include <deal.II/base/tensor.h>
 #include <deal.II/base/utilities.h>
 
 #include <deal.II/fe/component_mask.h>
@@ -48,6 +48,10 @@
 #include <unordered_set>
 #include <utility>
 #include <vector>
+
+#ifdef DEAL_II_WITH_MAGIC_ENUM
+#  include <magic_enum.hpp>
+#endif
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -802,7 +806,7 @@ namespace Patterns
 
     /**
      * Constructor. This is needed to allow users to specify
-     * directly the separator without using std::string(";").
+     * directly the separator without using ";".
      *
      * Since we support a pure variadic templates version, without this
      * specialization, the compiler will fail with cryptic errors.
@@ -1438,7 +1442,7 @@ namespace Patterns
   template <class... PatternTypes>
   Tuple::Tuple(const PatternTypes &...ps)
     : // forward to the version with the separator argument
-    Tuple(std::string(":"), ps...)
+    Tuple(":", ps...)
   {}
 
 
@@ -1628,14 +1632,14 @@ namespace Patterns
     template <typename T>
     struct is_list_compatible
     {
-      static constexpr const bool value =
+      static constexpr bool value =
         internal::is_list_compatible<std::decay_t<T>>::value;
     };
 
     template <typename T>
     struct is_map_compatible
     {
-      static constexpr const bool value =
+      static constexpr bool value =
         internal::is_map_compatible<std::decay_t<T>>::value;
     };
 
@@ -2384,6 +2388,63 @@ namespace Patterns
           s, pattern, std::make_index_sequence<std::tuple_size<T>::value>{});
       }
     };
+
+#ifdef DEAL_II_WITH_MAGIC_ENUM
+    // Enums
+    template <class T>
+    struct Convert<T, typename std::enable_if_t<std::is_enum_v<T>>>
+    {
+      static std::unique_ptr<Patterns::PatternBase>
+      to_pattern()
+      {
+        const auto               n     = magic_enum::enum_names<T>();
+        std::vector<std::string> names = {n.begin(), n.end()};
+        const auto               selection =
+          Patterns::Tools::Convert<decltype(names)>::to_string(
+            names,
+            Patterns::List(
+              Patterns::Anything(), names.size(), names.size(), "|"));
+        // Allow parsing a list of enums, and make bitwise or between them
+        return Patterns::List(Patterns::Selection(selection),
+                              0,
+                              names.size(),
+                              "|")
+          .clone();
+      }
+
+      static std::string
+      to_string(const T                     &value,
+                const Patterns::PatternBase &p = *Convert<T>::to_pattern())
+      {
+        const auto               values = magic_enum::enum_values<T>();
+        std::vector<std::string> names;
+        for (const auto &v : values)
+          if (magic_enum::bitwise_operators::operator&(value, v) == v)
+            names.push_back(std::string(magic_enum::enum_name(v)));
+        return Patterns::Tools::Convert<decltype(names)>::to_string(names, p);
+      }
+
+      static T
+      to_value(const std::string                   &s,
+               const dealii::Patterns::PatternBase &p = *to_pattern())
+      {
+        // Make sure we have a valid enum value, or empty value
+        AssertThrow(p.match(s), ExcNoMatch(s, p.description()));
+        T                        value = T();
+        std::vector<std::string> value_names;
+        value_names =
+          Patterns::Tools::Convert<decltype(value_names)>::to_value(s, p);
+        for (const auto &name : value_names)
+          {
+            auto v = magic_enum::enum_cast<T>(name);
+            if (v.has_value())
+              value =
+                magic_enum::bitwise_operators::operator|(value, v.value());
+          }
+        return value;
+      }
+    };
+#endif
 
     // Utility function with default Pattern
     template <typename T>

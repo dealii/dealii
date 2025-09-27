@@ -1,17 +1,16 @@
-/* ---------------------------------------------------------------------
+/* ------------------------------------------------------------------------
  *
- * Copyright (C) 2020 - 2022 by the deal.II authors
+ * SPDX-License-Identifier: LGPL-2.1-or-later
+ * Copyright (C) 2020 - 2024 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
- * The deal.II library is free software; you can use it, redistribute
- * it, and/or modify it under the terms of the GNU Lesser General
- * Public License as published by the Free Software Foundation; either
- * version 2.1 of the License, or (at your option) any later version.
- * The full text of the license can be found in the file LICENSE.md at
- * the top level directory of deal.II.
+ * Part of the source code is dual licensed under Apache-2.0 WITH
+ * LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+ * governing the source code and code contributions can be found in
+ * LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
  *
- * ---------------------------------------------------------------------
+ * ------------------------------------------------------------------------
 
  *
  * Authors: Wolfgang Bangerth, Rene Gassmoeller, Peter Munch, 2020.
@@ -64,8 +63,6 @@
 
 #include "../tests.h"
 
-
-using namespace dealii;
 
 
 // @sect3{Global definitions}
@@ -237,7 +234,7 @@ namespace Step19
   // we want to solve. Recall how the domain looks like:
   //   <p align="center">
   //     <img
-  //     src="https://www.dealii.org/images/steps/developer/step-19.geometry.png"
+  //     src="https://dealii.org/images/steps/developer/step-19.geometry.png"
   //          alt="The geometry used in this program"
   //          width="600">
   //   </p>
@@ -757,7 +754,9 @@ namespace Step19
                 deallog << "Setting new velocity of particle "
                         << particle->get_id() << ": " << new_velocity
                         << std::endl;
-                particle->set_properties(make_array_view(new_velocity));
+                particle->set_properties(
+                  make_array_view(new_velocity.begin_raw(),
+                                  new_velocity.end_raw()));
 
                 // With the new velocity, we can then also update the location
                 // of the particle and tell the particle about it.

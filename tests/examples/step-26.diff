@@ -1,0 +1,30 @@
+45c45
+< 
+---
+> #include "../example_test.h"
+275c275,279
+<     cg.solve(system_matrix, solution, system_rhs, preconditioner);
+---
+>     //cg.solve(system_matrix, solution, system_rhs, preconditioner);
+>     check_solver_within_range(std::cout,
+>                               cg.solve(system_matrix, solution, system_rhs, preconditioner),
+>                               solver_control.last_step(),
+>                               6, 9);
+279,280c283,284
+<     std::cout << "     " << solver_control.last_step() << " CG iterations."
+<               << std::endl;
+---
+> //    std::cout << "     " << solver_control.last_step() << " CG iterations."
+> //              << std::endl;
+465c469
+<     output_results();
+---
+>   //output_results();
+473c477
+<     const double end_time = 0.5;
+---
+>     const double end_time = 0.009;
+550c554
+<         output_results();
+---
+>       //output_results();

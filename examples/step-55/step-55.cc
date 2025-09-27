@@ -1,17 +1,16 @@
-/* ---------------------------------------------------------------------
+/* ------------------------------------------------------------------------
  *
- * Copyright (C) 2016 - 2023 by the deal.II authors
+ * SPDX-License-Identifier: LGPL-2.1-or-later
+ * Copyright (C) 2016 - 2024 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
- * The deal.II library is free software; you can use it, redistribute
- * it, and/or modify it under the terms of the GNU Lesser General
- * Public License as published by the Free Software Foundation; either
- * version 2.1 of the License, or (at your option) any later version.
- * The full text of the license can be found in the file LICENSE.md at
- * the top level directory of deal.II.
+ * Part of the source code is dual licensed under Apache-2.0 WITH
+ * LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+ * governing the source code and code contributions can be found in
+ * LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
  *
- * ---------------------------------------------------------------------
+ * ------------------------------------------------------------------------
  *
  * Author: Timo Heister, Clemson University, 2016
  */
@@ -88,14 +87,17 @@ namespace Step55
 
   namespace LinearSolvers
   {
-    // This class exposes the action of applying the inverse of a giving
-    // matrix via the function InverseMatrix::vmult(). Internally, the
-    // inverse is not formed explicitly. Instead, a linear solver with CG
-    // is performed. This class extends the InverseMatrix class in step-22
-    // with an option to specify a preconditioner, and to allow for different
-    // vector types in the vmult function.
+    // This class exposes the action of applying the inverse of a
+    // giving matrix via the function
+    // InverseMatrix::vmult(). Internally, the inverse is not formed
+    // explicitly. Instead, a linear solver with CG is performed. This
+    // class extends the InverseMatrix class in step-22 with an option
+    // to specify a preconditioner, and to allow for different vector
+    // types in the vmult function. We use the same mechanism as in
+    // step-31 to convert a run-time exception into a failed assertion
+    // should the inner solver not converge.
     template <class Matrix, class Preconditioner>
-    class InverseMatrix : public Subscriptor
+    class InverseMatrix : public EnableObserverPointer
     {
     public:
       InverseMatrix(const Matrix &m, const Preconditioner &preconditioner);
@@ -104,8 +106,8 @@ namespace Step55
       void vmult(VectorType &dst, const VectorType &src) const;
 
     private:
-      const SmartPointer<const Matrix> matrix;
-      const Preconditioner            &preconditioner;
+      const ObserverPointer<const Matrix> matrix;
+      const Preconditioner               &preconditioner;
     };
 
 
@@ -143,7 +145,7 @@ namespace Step55
     // The class A template class for a simple block diagonal preconditioner
     // for 2x2 matrices.
     template <class PreconditionerA, class PreconditionerS>
-    class BlockDiagonalPreconditioner : public Subscriptor
+    class BlockDiagonalPreconditioner : public EnableObserverPointer
     {
     public:
       BlockDiagonalPreconditioner(const PreconditionerA &preconditioner_A,
@@ -210,13 +212,15 @@ namespace Step55
                   std::exp(R_x * (-2 * std::sqrt(25.0 + 4 * pi2) + 10.0)) -
                 0.4 * pi2 * std::exp(R_x * (-std::sqrt(25.0 + 4 * pi2) + 5.0)) *
                   std::cos(2 * R_y * pi) +
-                0.1 * std::pow(-std::sqrt(25.0 + 4 * pi2) + 5.0, 2) *
+                0.1 *
+                  Utilities::fixed_power<2>(-std::sqrt(25.0 + 4 * pi2) + 5.0) *
                   std::exp(R_x * (-std::sqrt(25.0 + 4 * pi2) + 5.0)) *
                   std::cos(2 * R_y * pi);
     values[1] = 0.2 * pi * (-std::sqrt(25.0 + 4 * pi2) + 5.0) *
                   std::exp(R_x * (-std::sqrt(25.0 + 4 * pi2) + 5.0)) *
                   std::sin(2 * R_y * pi) -
-                0.05 * std::pow(-std::sqrt(25.0 + 4 * pi2) + 5.0, 3) *
+                0.05 *
+                  Utilities::fixed_power<3>(-std::sqrt(25.0 + 4 * pi2) + 5.0) *
                   std::exp(R_x * (-std::sqrt(25.0 + 4 * pi2) + 5.0)) *
                   std::sin(2 * R_y * pi) / pi;
 
@@ -296,13 +300,13 @@ namespace Step55
     void assemble_system();
     void solve();
     void refine_grid();
-    void output_results(const unsigned int cycle) const;
+    void output_results(const unsigned int cycle);
 
-    unsigned int velocity_degree;
-    double       viscosity;
-    MPI_Comm     mpi_communicator;
+    const unsigned int velocity_degree;
+    const double       viscosity;
+    MPI_Comm           mpi_communicator;
 
-    FESystem<dim>                             fe;
+    const FESystem<dim>                       fe;
     parallel::distributed::Triangulation<dim> triangulation;
     DoFHandler<dim>                           dof_handler;
 
@@ -382,16 +386,14 @@ namespace Step55
     // We split up the IndexSet for locally owned and locally relevant DoFs
     // into two IndexSets based on how we want to create the block matrices
     // and vectors.
-    owned_partitioning.resize(2);
-    owned_partitioning[0] = dof_handler.locally_owned_dofs().get_view(0, n_u);
-    owned_partitioning[1] =
-      dof_handler.locally_owned_dofs().get_view(n_u, n_u + n_p);
+    const IndexSet &locally_owned_dofs = dof_handler.locally_owned_dofs();
+    owned_partitioning                 = {locally_owned_dofs.get_view(0, n_u),
+                                          locally_owned_dofs.get_view(n_u, n_u + n_p)};
 
     const IndexSet locally_relevant_dofs =
       DoFTools::extract_locally_relevant_dofs(dof_handler);
-    relevant_partitioning.resize(2);
-    relevant_partitioning[0] = locally_relevant_dofs.get_view(0, n_u);
-    relevant_partitioning[1] = locally_relevant_dofs.get_view(n_u, n_u + n_p);
+    relevant_partitioning = {locally_relevant_dofs.get_view(0, n_u),
+                             locally_relevant_dofs.get_view(n_u, n_u + n_p)};
 
     // Setting up the constraints for boundary conditions and hanging nodes
     // is identical to step-40. Even though we don't have any hanging nodes
@@ -399,7 +401,7 @@ namespace Step55
     // to put this function call in, in case adaptive refinement gets
     // introduced later.
     {
-      constraints.reinit(locally_relevant_dofs);
+      constraints.reinit(locally_owned_dofs, locally_relevant_dofs);
 
       const FEValuesExtractors::Vector velocities(0);
       DoFTools::make_hanging_node_constraints(dof_handler, constraints);
@@ -505,8 +507,8 @@ namespace Step55
     const unsigned int dofs_per_cell = fe.n_dofs_per_cell();
     const unsigned int n_q_points    = quadrature_formula.size();
 
-    FullMatrix<double> cell_matrix(dofs_per_cell, dofs_per_cell);
-    FullMatrix<double> cell_matrix2(dofs_per_cell, dofs_per_cell);
+    FullMatrix<double> system_cell_matrix(dofs_per_cell, dofs_per_cell);
+    FullMatrix<double> preconditioner_cell_matrix(dofs_per_cell, dofs_per_cell);
     Vector<double>     cell_rhs(dofs_per_cell);
 
     const RightHandSide<dim>    right_hand_side;
@@ -523,9 +525,9 @@ namespace Step55
     for (const auto &cell : dof_handler.active_cell_iterators())
       if (cell->is_locally_owned())
         {
-          cell_matrix  = 0;
-          cell_matrix2 = 0;
-          cell_rhs     = 0;
+          system_cell_matrix         = 0;
+          preconditioner_cell_matrix = 0;
+          cell_rhs                   = 0;
 
           fe_values.reinit(cell);
           right_hand_side.vector_value_list(fe_values.get_quadrature_points(),
@@ -543,14 +545,15 @@ namespace Step55
                 {
                   for (unsigned int j = 0; j < dofs_per_cell; ++j)
                     {
-                      cell_matrix(i, j) +=
+                      system_cell_matrix(i, j) +=
                         (viscosity *
                            scalar_product(grad_phi_u[i], grad_phi_u[j]) -
                          div_phi_u[i] * phi_p[j] - phi_p[i] * div_phi_u[j]) *
                         fe_values.JxW(q);
 
-                      cell_matrix2(i, j) += 1.0 / viscosity * phi_p[i] *
-                                            phi_p[j] * fe_values.JxW(q);
+                      preconditioner_cell_matrix(i, j) += 1.0 / viscosity *
+                                                          phi_p[i] * phi_p[j] *
+                                                          fe_values.JxW(q);
                     }
 
                   const unsigned int component_i =
@@ -562,13 +565,13 @@ namespace Step55
 
 
           cell->get_dof_indices(local_dof_indices);
-          constraints.distribute_local_to_global(cell_matrix,
+          constraints.distribute_local_to_global(system_cell_matrix,
                                                  cell_rhs,
                                                  local_dof_indices,
                                                  system_matrix,
                                                  system_rhs);
 
-          constraints.distribute_local_to_global(cell_matrix2,
+          constraints.distribute_local_to_global(preconditioner_cell_matrix,
                                                  local_dof_indices,
                                                  preconditioner_matrix);
         }
@@ -673,15 +676,17 @@ namespace Step55
 
 
   template <int dim>
-  void StokesProblem<dim>::output_results(const unsigned int cycle) const
+  void StokesProblem<dim>::output_results(const unsigned int cycle)
   {
+    TimerOutput::Scope t(computing_timer, "output");
+
     {
       const ComponentSelectFunction<dim> pressure_mask(dim, dim + 1);
       const ComponentSelectFunction<dim> velocity_mask(std::make_pair(0, dim),
                                                        dim + 1);
 
-      Vector<double> cellwise_errors(triangulation.n_active_cells());
-      QGauss<dim>    quadrature(velocity_degree + 2);
+      Vector<double>    cellwise_errors(triangulation.n_active_cells());
+      const QGauss<dim> quadrature(velocity_degree + 2);
 
       VectorTools::integrate_difference(dof_handler,
                                         locally_relevant_solution,
@@ -784,10 +789,7 @@ namespace Step55
         solve();
 
         if (Utilities::MPI::n_mpi_processes(mpi_communicator) <= 32)
-          {
-            TimerOutput::Scope t(computing_timer, "output");
-            output_results(cycle);
-          }
+          output_results(cycle);
 
         computing_timer.print_summary();
         computing_timer.reset();

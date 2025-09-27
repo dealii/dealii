@@ -1,4 +1,4 @@
-find_package(deal.II 9.5.0 REQUIRED
+find_package(deal.II 9.8.0 REQUIRED
   HINTS
     ${DEAL_II_DIR} ../ ../../ $ENV{DEAL_II_DIR}
     # You can specify additional hints for search paths here, e.g.
@@ -14,7 +14,7 @@ set(TARGET "step-1")
 # you may want to either replace the following statement by something like
 #    FILE(GLOB_RECURSE TARGET_SRC  "source/*.cc")
 #    FILE(GLOB_RECURSE TARGET_INC  "include/*.h")
-#    SET(TARGET_SRC ${TARGET_SRC}  ${TARGET_INC}) 
+#    SET(TARGET_SRC ${TARGET_SRC}  ${TARGET_INC})
 # or switch altogether to the large project CMakeLists.txt file discussed
 # in the "CMake in user projects" page accessible from the "User info"
 # page of the documentation.

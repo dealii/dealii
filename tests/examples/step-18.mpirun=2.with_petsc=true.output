@@ -1,0 +1,15 @@
+Timestep 1 at time 1
+  Cycle 0:
+    Number of active cells:       3712 (by partition: 1856+1856)
+    Number of degrees of freedom: 17226 (by partition: 8874+8352)
+    Assembling system... norm of rhs is 1.88062e+10
+Solver stopped within 100 - 175 iterations
+    Updating quadrature point data...
+  Cycle 1:
+    Number of active cells:       12805 (by partition: 6399+6406)
+    Number of degrees of freedom: 51720 (by partition: 25902+25818)
+    Assembling system... norm of rhs is 1.72532e+10
+Solver stopped within 100 - 175 iterations
+    Updating quadrature point data...
+    Moving mesh...
+

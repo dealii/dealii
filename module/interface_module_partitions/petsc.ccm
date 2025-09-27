@@ -1,0 +1,589 @@
+// ------------------------------------------------------------------------
+//
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2025 by the deal.II authors
+//
+// This file is part of the deal.II library.
+//
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
+//
+// ------------------------------------------------------------------------
+
+
+// It is very inefficient in the module system to have repeated
+// #includes in many module partition files because when you 'import'
+// those partitions, you also have to load everything they
+// #included. In other words, you get the same content *many times*,
+// once from each imported partition, rather than only once via the
+// old-style #include system. We deal with this by wrapping all of our
+// external packages into partitions that we can 'import' wherever we
+// need.
+
+// This is the file that wraps everything we need from PETSc into one
+// module partition.
+
+
+module;
+
+#include <deal.II/base/config.h>
+
+#ifdef DEAL_II_WITH_PETSC
+#  include <petsc/private/pcimpl.h>
+#  include <petsc/private/petscimpl.h>
+#  include <petsc/private/snesimpl.h>
+#  include <petsc/private/tsimpl.h>
+#  include <petscconf.h>
+#  include <petscdm.h>
+#  include <petscis.h>
+#  include <petscistypes.h>
+#  include <petscksp.h>
+#  include <petscmat.h>
+#  include <petscpc.h>
+#  include <petscsf.h>
+#  include <petscsnes.h>
+#  include <petscsys.h>
+#  include <petscts.h>
+#  include <petscvec.h>
+#endif
+
+
+export module dealii.external.petsc;
+
+#ifdef DEAL_II_WITH_PETSC
+
+export
+{
+  using ::DM;
+  using ::DMDestroy;
+  using ::DMSetMatType;
+  using ::InsertMode;
+  using ::IS;
+  using ::ISCreateGeneral;
+  using ::ISDestroy;
+  using ::ISGetIndices;
+  using ::ISGetLocalSize;
+  using ::ISLocalToGlobalMapping;
+  using ::ISLocalToGlobalMappingCreateIS;
+  using ::ISLocalToGlobalMappingDestroy;
+  using ::ISLocalToGlobalMappingViewFromOptions;
+  using ::ISRestoreIndices;
+  using ::KSP;
+  using ::KSPConvergedReason;
+  using ::KSPCreate;
+  using ::KSPDestroy;
+  using ::KSPGetOperators;
+  using ::KSPGetPC;
+  using ::KSPGMRESSetRestart;
+  using ::KSPRichardsonSetScale;
+  using ::KSPSetConvergenceTest;
+  using ::KSPSetFromOptions;
+  using ::KSPSetInitialGuessNonzero;
+  using ::KSPSetOperators;
+  using ::KSPSetOptionsPrefix;
+  using ::KSPSetPC;
+  using ::KSPSetPCSide;
+  using ::KSPSetReusePreconditioner;
+  using ::KSPSetTolerances;
+  using ::KSPSetType;
+  using ::KSPSetUp;
+  using ::KSPSolve;
+  using ::Mat;
+  using ::MatAssemblyBegin;
+  using ::MatAssemblyEnd;
+  using ::MatAXPY;
+  using ::MatConvert;
+  using ::MatCopy;
+  using ::MatCreate;
+  using ::MatCreateIS;
+  using ::MatCreateNest;
+  using ::MatCreateSeqAIJ;
+  using ::MatCreateSeqDense;
+  using ::MatCreateShell;
+  using ::MatDestroy;
+  using ::MatDiagonalScale;
+  using ::MatDuplicate;
+  using ::MatGetInfo;
+  using ::MatGetLocalSize;
+  using ::MatGetOwnershipRange;
+  using ::MatGetOwnershipRangeColumn;
+  using ::MatGetRow;
+  using ::MatGetSize;
+  using ::MatGetTrace;
+  using ::MatGetType;
+  using ::MatGetValues;
+  using ::MatHasOperation;
+  using ::MatInfo;
+  using ::MatISGetLocalMat;
+  using ::MatIsHermitian;
+  using ::MatISRestoreLocalMat;
+  using ::MatIsSymmetric;
+  using ::MatMatMult;
+  using ::MatMPIAIJSetPreallocation;
+  using ::MatMPIAIJSetPreallocationCSR;
+  using ::MatMult;
+  using ::MatMultAdd;
+  using ::MatMultTranspose;
+  using ::MatMultTransposeAdd;
+  using ::MatMumpsSetIcntl;
+  using ::MatNestGetSize;
+  using ::MatNestGetSubMat;
+  using ::MatNestSetVecType;
+  using ::MatNorm;
+  using ::MatOption;
+  using ::MatRestoreRow;
+  using ::MatScale;
+  using ::MatSeqAIJSetPreallocation;
+  using ::MatSeqAIJSetPreallocationCSR;
+  using ::MatSetFromOptions;
+  using ::MatSetOption;
+  using ::MatSetSizes;
+  using ::MatSetType;
+  using ::MatSetUp;
+  using ::MatSetValues;
+  using ::MatShellGetContext;
+  using ::MatShellSetOperation;
+  using ::MatShift;
+  using ::MatTranspose;
+  using ::MatTransposeMatMult;
+  using ::MatType;
+  using ::MatView;
+  using ::MatZeroEntries;
+  using ::MatZeroRowsColumnsIS;
+  using ::MatZeroRowsIS;
+  using ::PC;
+  using ::PC_RIGHT;
+  using ::PCApply;
+  using ::PCApplyTranspose;
+  using ::PCCreate;
+  using ::PCDestroy;
+  using ::PCFactorGetMatrix;
+  using ::PCFactorSetColumnPivot;
+  using ::PCFactorSetLevels;
+#  if DEAL_II_PETSC_VERSION_LT(3, 9, 0)
+  using ::PCFactorSetMatSolverPackage;
+#  else
+  using ::PCFactorSetMatSolverType;
+#  endif
+  using ::PCFactorSetShiftAmount;
+#  if DEAL_II_PETSC_VERSION_LT(3, 9, 0)
+  using ::PCFactorSetUpMatSolverPackage;
+#  else
+  using ::PCFactorSetUpMatSolverType;
+#  endif
+  using ::PCFactorSetZeroPivot;
+  using ::PCFailedReason;
+  using ::PCGetOperators;
+  using ::PCGetUseAmat;
+  using ::PCHYPRESetType;
+  using ::PCSetCoordinates;
+  using ::PCSetFailedReason;
+  using ::PCSetFromOptions;
+  using ::PCSetOperators;
+  using ::PCSetType;
+  using ::PCSetUp;
+  using ::PCShellGetContext;
+  using ::PCShellSetApply;
+  using ::PCShellSetApplyTranspose;
+  using ::PCShellSetContext;
+  using ::PCShellSetName;
+  using ::PCShellSetSetUp;
+  using ::PCSORSetOmega;
+  using ::PCSORSetSymmetric;
+  using ::PETSC_COMM_WORLD;
+  using ::PETSC_VIEWER_STDOUT_;
+  using ::PetscBool;
+  using ::PetscError;
+  using ::PetscErrorCode;
+  using ::PetscErrorMessage;
+  using ::PetscFinalize;
+  using ::PetscFinalizeCalled;
+  using ::PetscInitialize;
+  using ::PetscInitializeCalled;
+  using ::PetscInt;
+  using ::PetscLayout;
+  using ::PetscLayoutCreate;
+  using ::PetscLayoutDestroy;
+  using ::PetscLayoutGetLocalSize;
+  using ::PetscLayoutGetRange;
+  using ::PetscLayoutGetRanges;
+  using ::PetscLayoutSetLocalSize;
+  using ::PetscLayoutSetSize;
+  using ::PetscLayoutSetUp;
+  using ::PetscMallocA;
+  using ::PetscMPIInt;
+  using ::PetscObject;
+  using ::PetscObjectComm;
+  using ::PetscObjectComposeFunction_Private;
+  using ::PetscObjectGetComm;
+  using ::PetscObjectQueryFunction_Private;
+  using ::PetscObjectReference;
+  using ::PetscObjectTypeCompare;
+  using ::PetscOptionsSetValue;
+  using ::PetscPopSignalHandler;
+  using ::PetscReal;
+  using ::PetscScalar;
+  using ::PetscSF;
+  using ::PetscSFBcastBegin;
+  using ::PetscSFBcastEnd;
+  using ::PetscSFCompose;
+  using ::PetscSFCreate;
+  using ::PetscSFCreateInverseSF;
+  using ::PetscSFDestroy;
+  using ::PetscSFNode;
+  using ::PetscSFReduceBegin;
+  using ::PetscSFReduceEnd;
+  using ::PetscSFSetGraph;
+  using ::PetscSFSetGraphLayout;
+  using ::PetscSFSetUp;
+  using ::PetscTrMalloc;
+  using ::PetscViewerPushFormat;
+
+#  if defined(PETSC_HAVE_SAWS)
+  using ::PetscStackSAWsGrantAccess;
+  using ::PetscStackSAWsTakeAccess;
+#  endif
+
+  using ::PetscViewerFormat;
+  using ::PetscViewerPopFormat;
+  using ::PetscVoidFunction;
+  using ::SNES;
+  using ::SNESConvergedReason;
+  using ::SNESConvergedReasons;
+  using ::SNESCreate;
+  using ::SNESDestroy;
+  using ::SNESGetConvergedReason;
+  using ::SNESGetDM;
+  using ::SNESGetIterationNumber;
+  using ::SNESGetKSP;
+  using ::SNESGetLineSearch;
+  using ::SNESGetSolution;
+  using ::SNESLineSearch;
+  using ::SNESLineSearchSetType;
+  using ::SNESMonitorSet;
+  using ::SNESReset;
+  using ::SNESSetApplicationContext;
+  using ::SNESSetCheckJacobianDomainError;
+  using ::SNESSetFromOptions;
+  using ::SNESSetFunction;
+  using ::SNESSetFunctionDomainError;
+  using ::SNESSetJacobian;
+  using ::SNESSetObjective;
+  using ::SNESSetOptionsPrefix;
+  using ::SNESSetSolution;
+  using ::SNESSetTolerances;
+  using ::SNESSetType;
+  using ::SNESSetUseMatrixFree;
+  using ::SNESSolve;
+  using ::TS;
+  using ::TSAdapt;
+  using ::TSAdaptSetOptionsPrefix;
+  using ::TSAdaptSetStepLimits;
+  using ::TSAdaptSetType;
+  using ::TSConvergedReason;
+  using ::TSConvergedReasons;
+  using ::TSCreate;
+  using ::TSDestroy;
+  using ::TSGetAdapt;
+  using ::TSGetApplicationContext;
+  using ::TSGetConvergedReason;
+  using ::TSGetSNES;
+  using ::TSGetSolution;
+  using ::TSGetStepNumber;
+  using ::TSGetTime;
+  using ::TSGetTimeStep;
+  using ::TSGetTolerances;
+  using ::TSMonitorSet;
+  using ::TSPostStep;
+  using ::TSReset;
+  using ::TSSetApplicationContext;
+  using ::TSSetErrorIfStepFails;
+  using ::TSSetExactFinalTime;
+  using ::TSSetFromOptions;
+  using ::TSSetFunctionDomainError;
+  using ::TSSetIFunction;
+  using ::TSSetIJacobian;
+  using ::TSSetMaxSNESFailures;
+  using ::TSSetMaxSteps;
+  using ::TSSetMaxTime;
+  using ::TSSetOptionsPrefix;
+  using ::TSSetPostStage;
+  using ::TSSetPostStep;
+  using ::TSSetPreStage;
+#  if DEAL_II_PETSC_VERSION_GTE(3, 20, 0)
+  using ::TSSetResize;
+#  endif
+  using ::TSSetRHSFunction;
+  using ::TSSetRHSJacobian;
+  using ::TSSetSolution;
+  using ::TSSetTime;
+  using ::TSSetTimeStep;
+  using ::TSSetTolerances;
+  using ::TSSetType;
+  using ::TSSetUp;
+  using ::TSSolve;
+  using ::Vec;
+  using ::VecAssemblyBegin;
+  using ::VecAssemblyEnd;
+  using ::VecAXPBY;
+  using ::VecAXPY;
+  using ::VecAYPX;
+  using ::VecCopy;
+  using ::VecCreateGhost;
+  using ::VecCreateMPI;
+  using ::VecCreateNest;
+  using ::VecDestroy;
+  using ::VecDot;
+  using ::VecDuplicate;
+  using ::VecEqual;
+  using ::VecGetArray;
+  using ::VecGetArrayRead;
+  using ::VecGetLocalSize;
+  using ::VecGetOwnershipRange;
+  using ::VecGetSize;
+  using ::VecGhostGetLocalForm;
+  using ::VecGhostRestoreLocalForm;
+  using ::VecGhostUpdateBegin;
+  using ::VecGhostUpdateEnd;
+  using ::VecMAXPY;
+  using ::VecNestGetSize;
+  using ::VecNestGetSubVec;
+  using ::VecNorm;
+  using ::VecPointwiseMult;
+  using ::VecRestoreArray;
+  using ::VecRestoreArrayRead;
+  using ::VecScale;
+  using ::VecScatter;
+  using ::VecScatterBegin;
+  using ::VecScatterCreateToAll;
+  using ::VecScatterDestroy;
+  using ::VecScatterEnd;
+  using ::VecSet;
+  using ::VecSetValues;
+  using ::VecShift;
+  using ::VecSum;
+  using ::VecView;
+
+#  if DEAL_II_PETSC_VERSION_GTE(3, 22, 0)
+  using ::PetscLayoutFindOwner;
+#  else
+  // The following function is declared as a 'static inline' function
+  // and so can't be exported. (This was fixed in PETSc 3.22, see also
+  // https://gitlab.com/petsc/petsc/-/issues/1753.) Wrap it via a
+  // function implemented in namespace dealii:
+  namespace dealii
+  {
+    inline PetscErrorCode
+    PetscLayoutFindOwner(PetscLayout map, PetscInt idx, PetscMPIInt *owner)
+    {
+      return ::PetscLayoutFindOwner(map, idx, owner);
+    }
+  } // namespace dealii
+#  endif
+
+  // In general, we treat PETSc data types like PC, SNES, TS as
+  // opaque, which means that all we need to know and export is that
+  // they exist. In practice, these types are typedefs to pointers to
+  // internal structures, and we do not need to export these internal
+  // structures. But in petsc_compatibility, we have a couple of
+  // places where we do access the objects pointed to ourselves, and
+  // so the compiler needs to also know the structure pointed to --
+  // which means we have to export that as well. The following places
+  // are all guarded by the same version checks as used in
+  // petsc_compatibility.cc, where appropriate
+#  if !DEAL_II_PETSC_VERSION_GTE(3, 14, 0)
+  using ::_p_PC;
+#  endif
+  using ::_p_SNES;
+  using ::_p_TS;
+}
+
+
+// PETSc also defines quite a lot of symbols that are either
+// implemented as macros, or perhaps as constants in header
+// files. In the former case, they cannot be referenced in 'using'
+// expressions, and so we need to work around things by creating
+// *variables* of the same names. In the latter case, they are often
+// implemented as constants with internal linkage that we can't
+// re-export (e.g., if they are members of anonymous enums).
+//
+// Dealing with this situation requires creating some other set of
+// variable, undefining the macro names, and then creating variables
+// with the same names as the macro names. Because we would end up
+// with name clashes if these new variables were in the global
+// namespace for those MPI implementations that implement things as
+// variables in the global namespace, we put everything into the
+// dealii namespace.
+//
+// We put the exportable symbols into namespace 'dealii'. This is
+// necessary for cases where the symbol we create is derived not from
+// a preprocessor macro, but for example as a member of an anonymous
+// enum. Such symbols can't be exported, so we declare a variable that
+// we *can* export, but it will not have the type of the enum, but of
+// the underlying int. The compiler will therefore complain that the
+// variable we're creating here redeclares another one but with a
+// different type. We can avoid this by putting things into our own
+// namespace.
+#  define CREATE_EXPORTABLE_PREPROCESSOR_SYMBOL(sym)        \
+    namespace dealii                                        \
+    {                                                       \
+      namespace PETSc_Macros                                \
+      {                                                     \
+        [[maybe_unused]] const auto exportable_##sym = sym; \
+      }                                                     \
+    } // namespace dealii
+
+#  define EXPORT_PREPROCESSOR_SYMBOL(sym)                              \
+    namespace dealii                                                   \
+    {                                                                  \
+      export const auto &sym = dealii::PETSc_Macros::exportable_##sym; \
+    }
+
+
+CREATE_EXPORTABLE_PREPROCESSOR_SYMBOL(KSPBCGS)
+#  undef KSPBCGS
+EXPORT_PREPROCESSOR_SYMBOL(KSPBCGS)
+
+CREATE_EXPORTABLE_PREPROCESSOR_SYMBOL(KSPBICG)
+#  undef KSPBICG
+EXPORT_PREPROCESSOR_SYMBOL(KSPBICG)
+
+CREATE_EXPORTABLE_PREPROCESSOR_SYMBOL(KSPCG)
+#  undef KSPCG
+EXPORT_PREPROCESSOR_SYMBOL(KSPCG)
+
+CREATE_EXPORTABLE_PREPROCESSOR_SYMBOL(KSPCGS)
+#  undef KSPCGS
+EXPORT_PREPROCESSOR_SYMBOL(KSPCGS)
+
+CREATE_EXPORTABLE_PREPROCESSOR_SYMBOL(KSPCHEBYSHEV)
+#  undef KSPCHEBYSHEV
+EXPORT_PREPROCESSOR_SYMBOL(KSPCHEBYSHEV)
+
+CREATE_EXPORTABLE_PREPROCESSOR_SYMBOL(KSPCR)
+#  undef KSPCR
+EXPORT_PREPROCESSOR_SYMBOL(KSPCR)
+
+CREATE_EXPORTABLE_PREPROCESSOR_SYMBOL(KSPGMRES)
+#  undef KSPGMRES
+EXPORT_PREPROCESSOR_SYMBOL(KSPGMRES)
+
+CREATE_EXPORTABLE_PREPROCESSOR_SYMBOL(KSPLSQR)
+#  undef KSPLSQR
+EXPORT_PREPROCESSOR_SYMBOL(KSPLSQR)
+
+CREATE_EXPORTABLE_PREPROCESSOR_SYMBOL(KSPPREONLY)
+#  undef KSPPREONLY
+EXPORT_PREPROCESSOR_SYMBOL(KSPPREONLY)
+
+CREATE_EXPORTABLE_PREPROCESSOR_SYMBOL(KSPRICHARDSON)
+#  undef KSPRICHARDSON
+EXPORT_PREPROCESSOR_SYMBOL(KSPRICHARDSON)
+
+CREATE_EXPORTABLE_PREPROCESSOR_SYMBOL(KSPTCQMR)
+#  undef KSPTCQMR
+EXPORT_PREPROCESSOR_SYMBOL(KSPTCQMR)
+
+CREATE_EXPORTABLE_PREPROCESSOR_SYMBOL(KSPTFQMR)
+#  undef KSPTFQMR
+EXPORT_PREPROCESSOR_SYMBOL(KSPTFQMR)
+
+CREATE_EXPORTABLE_PREPROCESSOR_SYMBOL(MATAIJ)
+#  undef MATAIJ
+EXPORT_PREPROCESSOR_SYMBOL(MATAIJ)
+
+CREATE_EXPORTABLE_PREPROCESSOR_SYMBOL(MATMFFD)
+#  undef MATMFFD
+EXPORT_PREPROCESSOR_SYMBOL(MATMFFD)
+
+CREATE_EXPORTABLE_PREPROCESSOR_SYMBOL(MATIS)
+#  undef MATIS
+EXPORT_PREPROCESSOR_SYMBOL(MATIS)
+
+CREATE_EXPORTABLE_PREPROCESSOR_SYMBOL(MATNEST)
+#  undef MATNEST
+EXPORT_PREPROCESSOR_SYMBOL(MATNEST)
+
+CREATE_EXPORTABLE_PREPROCESSOR_SYMBOL(MATSEQAIJ)
+#  undef MATSEQAIJ
+EXPORT_PREPROCESSOR_SYMBOL(MATSEQAIJ)
+
+CREATE_EXPORTABLE_PREPROCESSOR_SYMBOL(MATSHELL)
+#  undef MATSHELL
+EXPORT_PREPROCESSOR_SYMBOL(MATSHELL)
+
+CREATE_EXPORTABLE_PREPROCESSOR_SYMBOL(MATSOLVERMUMPS)
+#  undef MATSOLVERMUMPS
+EXPORT_PREPROCESSOR_SYMBOL(MATSOLVERMUMPS)
+
+CREATE_EXPORTABLE_PREPROCESSOR_SYMBOL(PCBDDC)
+#  undef PCBDDC
+EXPORT_PREPROCESSOR_SYMBOL(PCBDDC)
+
+CREATE_EXPORTABLE_PREPROCESSOR_SYMBOL(PCBJACOBI)
+#  undef PCBJACOBI
+EXPORT_PREPROCESSOR_SYMBOL(PCBJACOBI)
+
+CREATE_EXPORTABLE_PREPROCESSOR_SYMBOL(PCCHOLESKY)
+#  undef PCCHOLESKY
+EXPORT_PREPROCESSOR_SYMBOL(PCCHOLESKY)
+
+CREATE_EXPORTABLE_PREPROCESSOR_SYMBOL(PETSC_COMM_SELF)
+#  undef PETSC_COMM_SELF
+EXPORT_PREPROCESSOR_SYMBOL(PETSC_COMM_SELF)
+
+CREATE_EXPORTABLE_PREPROCESSOR_SYMBOL(PETSC_DEFAULT)
+#  undef PETSC_DEFAULT
+EXPORT_PREPROCESSOR_SYMBOL(PETSC_DEFAULT)
+
+CREATE_EXPORTABLE_PREPROCESSOR_SYMBOL(PETSC_DECIDE)
+#  undef PETSC_DECIDE
+EXPORT_PREPROCESSOR_SYMBOL(PETSC_DECIDE)
+
+CREATE_EXPORTABLE_PREPROCESSOR_SYMBOL(PETSC_DETERMINE)
+#  undef PETSC_DETERMINE
+EXPORT_PREPROCESSOR_SYMBOL(PETSC_DETERMINE)
+
+CREATE_EXPORTABLE_PREPROCESSOR_SYMBOL(PETSC_MACHINE_EPSILON)
+#  undef PETSC_MACHINE_EPSILON
+EXPORT_PREPROCESSOR_SYMBOL(PETSC_MACHINE_EPSILON)
+
+CREATE_EXPORTABLE_PREPROCESSOR_SYMBOL(PCHYPRE)
+#  undef PCHYPRE
+EXPORT_PREPROCESSOR_SYMBOL(PCHYPRE)
+
+CREATE_EXPORTABLE_PREPROCESSOR_SYMBOL(PCICC)
+#  undef PCICC
+EXPORT_PREPROCESSOR_SYMBOL(PCICC)
+
+CREATE_EXPORTABLE_PREPROCESSOR_SYMBOL(PCILU)
+#  undef PCILU
+EXPORT_PREPROCESSOR_SYMBOL(PCILU)
+
+CREATE_EXPORTABLE_PREPROCESSOR_SYMBOL(PCJACOBI)
+#  undef PCJACOBI
+EXPORT_PREPROCESSOR_SYMBOL(PCJACOBI)
+
+CREATE_EXPORTABLE_PREPROCESSOR_SYMBOL(PCLU)
+#  undef PCLU
+EXPORT_PREPROCESSOR_SYMBOL(PCLU)
+
+CREATE_EXPORTABLE_PREPROCESSOR_SYMBOL(PCNONE)
+#  undef PCNONE
+EXPORT_PREPROCESSOR_SYMBOL(PCNONE)
+
+CREATE_EXPORTABLE_PREPROCESSOR_SYMBOL(PCSHELL)
+#  undef PCSHELL
+EXPORT_PREPROCESSOR_SYMBOL(PCSHELL)
+
+CREATE_EXPORTABLE_PREPROCESSOR_SYMBOL(PCSOR)
+#  undef PCSOR
+EXPORT_PREPROCESSOR_SYMBOL(PCSOR)
+
+CREATE_EXPORTABLE_PREPROCESSOR_SYMBOL(VECNEST)
+#  undef VECNEST
+EXPORT_PREPROCESSOR_SYMBOL(VECNEST)
+
+#endif

@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2003 - 2023 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2016 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 
 #include <deal.II/base/function.h>
@@ -86,8 +85,9 @@ MGLevelGlobalTransfer<VectorType>::fill_and_communicate_copy_indices(
   if (const parallel::TriangulationBase<dim, spacedim> *ptria =
         dynamic_cast<const parallel::TriangulationBase<dim, spacedim> *>(
           &mg_dof.get_triangulation()))
-    perform_plain_copy = (Utilities::MPI::min(my_perform_plain_copy ? 1 : 0,
-                                              ptria->get_communicator()) == 1);
+    perform_plain_copy =
+      (Utilities::MPI::min(my_perform_plain_copy ? 1 : 0,
+                           ptria->get_mpi_communicator()) == 1);
   else
     perform_plain_copy = my_perform_plain_copy;
 }
@@ -160,14 +160,14 @@ namespace
   template <int dim, int spacedim, typename Number>
   void
   fill_internal(
-    const DoFHandler<dim, spacedim>            &mg_dof,
-    SmartPointer<const MGConstrainedDoFs>       mg_constrained_dofs,
-    const MPI_Comm                              mpi_communicator,
-    const bool                                  transfer_solution_vectors,
-    std::vector<Table<2, unsigned int>>        &copy_indices,
-    std::vector<Table<2, unsigned int>>        &copy_indices_global_mine,
-    std::vector<Table<2, unsigned int>>        &copy_indices_level_mine,
-    LinearAlgebra::distributed::Vector<Number> &ghosted_global_vector,
+    const DoFHandler<dim, spacedim>                &mg_dof,
+    const ObserverPointer<const MGConstrainedDoFs> &mg_constrained_dofs,
+    const MPI_Comm                                  mpi_communicator,
+    const bool                                      transfer_solution_vectors,
+    std::vector<Table<2, unsigned int>>            &copy_indices,
+    std::vector<Table<2, unsigned int>>            &copy_indices_global_mine,
+    std::vector<Table<2, unsigned int>>            &copy_indices_level_mine,
+    LinearAlgebra::distributed::Vector<Number>     &ghosted_global_vector,
     MGLevelObject<LinearAlgebra::distributed::Vector<Number>>
       &ghosted_level_vector)
   {
@@ -275,13 +275,13 @@ namespace
   }
 } // namespace
 
-template <typename Number>
+template <typename Number, typename MemorySpace>
 template <int dim, int spacedim>
 void
-MGLevelGlobalTransfer<LinearAlgebra::distributed::Vector<Number>>::
+MGLevelGlobalTransfer<LinearAlgebra::distributed::Vector<Number, MemorySpace>>::
   fill_and_communicate_copy_indices(const DoFHandler<dim, spacedim> &mg_dof)
 {
-  const MPI_Comm mpi_communicator = mg_dof.get_communicator();
+  const MPI_Comm mpi_communicator = mg_dof.get_mpi_communicator();
 
   fill_internal(mg_dof,
                 mg_constrained_dofs,
@@ -382,9 +382,10 @@ MGLevelGlobalTransfer<LinearAlgebra::distributed::Vector<Number>>::
 
 
 
-template <typename Number>
+template <typename Number, typename MemorySpace>
 void
-MGLevelGlobalTransfer<LinearAlgebra::distributed::Vector<Number>>::clear()
+MGLevelGlobalTransfer<
+  LinearAlgebra::distributed::Vector<Number, MemorySpace>>::clear()
 {
   sizes.resize(0);
   copy_indices.clear();
@@ -404,9 +405,9 @@ MGLevelGlobalTransfer<LinearAlgebra::distributed::Vector<Number>>::clear()
 
 
 
-template <typename Number>
+template <typename Number, typename MemorySpace>
 void
-MGLevelGlobalTransfer<LinearAlgebra::distributed::Vector<Number>>::
+MGLevelGlobalTransfer<LinearAlgebra::distributed::Vector<Number, MemorySpace>>::
   print_indices(std::ostream &os) const
 {
   for (unsigned int level = 0; level < copy_indices.size(); ++level)
@@ -435,10 +436,10 @@ MGLevelGlobalTransfer<LinearAlgebra::distributed::Vector<Number>>::
 
 
 
-template <typename Number>
+template <typename Number, typename MemorySpace>
 std::size_t
-MGLevelGlobalTransfer<
-  LinearAlgebra::distributed::Vector<Number>>::memory_consumption() const
+MGLevelGlobalTransfer<LinearAlgebra::distributed::Vector<Number, MemorySpace>>::
+  memory_consumption() const
 {
   std::size_t result = sizeof(*this);
   result += MemoryConsumption::memory_consumption(sizes);
@@ -457,11 +458,6 @@ MGLevelGlobalTransfer<
 
 
 // explicit instantiation
-#include "mg_level_global_transfer.inst"
-
-// create an additional instantiation currently not supported by the automatic
-// template instantiation scheme
-template class MGLevelGlobalTransfer<LinearAlgebra::distributed::Vector<float>>;
-
+#include "multigrid/mg_level_global_transfer.inst"
 
 DEAL_II_NAMESPACE_CLOSE

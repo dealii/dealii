@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2018 - 2023 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2019 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 #ifndef dealii_fe_interface_values_h
 #define dealii_fe_interface_values_h
@@ -1442,6 +1441,8 @@ public:
    *   finite element across the interface (only used if the FEInterface object
    *   is initialized with an hp::FECollection, an hp::QCollection, and possibly
    *   an hp::MappingCollection).
+   * @param[in] fe_index_neighbor Active fe index of neighboring cell. Useful
+   *   if hp capabilities are used and for non-DoFHandler iterators.
    */
   template <typename CellIteratorType, typename CellNeighborIteratorType>
   void
@@ -1451,9 +1452,10 @@ public:
          const CellNeighborIteratorType &cell_neighbor,
          const unsigned int              face_no_neighbor,
          const unsigned int              sub_face_no_neighbor,
-         const unsigned int q_index       = numbers::invalid_unsigned_int,
-         const unsigned int mapping_index = numbers::invalid_unsigned_int,
-         const unsigned int fe_index      = numbers::invalid_unsigned_int);
+         const unsigned int q_index           = numbers::invalid_unsigned_int,
+         const unsigned int mapping_index     = numbers::invalid_unsigned_int,
+         const unsigned int fe_index          = numbers::invalid_unsigned_int,
+         const unsigned int fe_index_neighbor = numbers::invalid_unsigned_int);
 
   /**
    * Re-initialize this object to be used on an interface given by a single face
@@ -1604,6 +1606,31 @@ public:
   get_JxW_values() const;
 
   /**
+   * Return the normal in a given quadrature point.
+   *
+   * The normal points in outwards direction as seen from the first cell of
+   * this interface.
+   *
+   * @deprecated Use the function normal_vector().
+   *
+   * @dealiiRequiresUpdateFlags{update_normal_vectors}
+   */
+  DEAL_II_DEPRECATED_WITH_COMMENT("Use the function normal_vector().")
+  Tensor<1, spacedim>
+  normal(const unsigned int q_point_index) const;
+
+  /**
+   * Return the normal in a given quadrature point.
+   *
+   * The normal points in outwards direction as seen from the first cell of
+   * this interface.
+   *
+   * @dealiiRequiresUpdateFlags{update_normal_vectors}
+   */
+  Tensor<1, spacedim>
+  normal_vector(const unsigned int q_point_index) const;
+
+  /**
    * Return the normal vector of the interface in each quadrature point.
    *
    * The return value is identical to get_fe_face_values(0).get_normal_vectors()
@@ -1624,6 +1651,15 @@ public:
    */
   std_cxx20::ranges::iota_view<unsigned int, unsigned int>
   quadrature_point_indices() const;
+
+  /**
+   * Return the location of the <tt>q_point</tt>th quadrature point in
+   * real space.
+   *
+   * @dealiiRequiresUpdateFlags{update_quadrature_points}
+   */
+  const Point<spacedim> &
+  quadrature_point(const unsigned int q_point) const;
 
   /**
    * Return a reference to the quadrature points in real space.
@@ -1705,22 +1741,11 @@ public:
   interface_dof_to_dof_indices(const unsigned int interface_dof_index) const;
 
   /**
-   * Return the normal in a given quadrature point.
-   *
-   * The normal points in outwards direction as seen from the first cell of
-   * this interface.
-   *
-   * @dealiiRequiresUpdateFlags{update_normal_vectors}
-   */
-  Tensor<1, spacedim>
-  normal(const unsigned int q_point_index) const;
-
-  /**
    * @}
    */
 
   /**
-   * @name Access to shape functions
+   * @name Access to shape functions and their derivatives
    * @{
    */
 
@@ -1750,6 +1775,21 @@ public:
               const unsigned int interface_dof_index,
               const unsigned int q_point,
               const unsigned int component = 0) const;
+
+  /**
+   * Return component @p component of the gradient of the shape function
+   * with interface dof index @p interface_dof_index in
+   * quadrature point @p q_point.
+   *
+   * Similar to @p shape_value() , the argument @p here_or_there selects between
+   * the gradient on cell 0 (here, @p true) and cell 1 (there, @p false)
+   * at this quadrature point.
+   */
+  Tensor<1, spacedim>
+  shape_grad(const bool         here_or_there,
+             const unsigned int interface_dof_index,
+             const unsigned int q_point,
+             const unsigned int component = 0) const;
 
   /**
    * @}
@@ -2319,10 +2359,26 @@ FEInterfaceValues<dim, spacedim>::reinit(
   const unsigned int              sub_face_no_neighbor,
   const unsigned int              q_index,
   const unsigned int              mapping_index,
-  const unsigned int              fe_index)
+  const unsigned int              fe_index_in,
+  const unsigned int              fe_index_neighbor_in)
 {
   Assert(internal_fe_face_values || internal_hp_fe_face_values,
          ExcNotInitialized());
+
+  constexpr bool is_dof_cell_accessor =
+    std::is_same_v<DoFCellAccessor<dim, spacedim, true>,
+                   typename CellIteratorType::AccessorType> ||
+    std::is_same_v<DoFCellAccessor<dim, spacedim, false>,
+                   typename CellIteratorType::AccessorType>;
+
+  constexpr bool is_dof_cell_accessor_neighbor =
+    std::is_same_v<DoFCellAccessor<dim, spacedim, true>,
+                   typename CellNeighborIteratorType::AccessorType> ||
+    std::is_same_v<DoFCellAccessor<dim, spacedim, false>,
+                   typename CellNeighborIteratorType::AccessorType>;
+
+  unsigned int active_fe_index          = 0;
+  unsigned int active_fe_index_neighbor = 0;
 
   if (internal_fe_face_values)
     {
@@ -2358,6 +2414,28 @@ FEInterfaceValues<dim, spacedim>::reinit(
     }
   else if (internal_hp_fe_face_values)
     {
+      active_fe_index = fe_index_in;
+      active_fe_index_neighbor =
+        (fe_index_neighbor_in != numbers::invalid_unsigned_int) ?
+          fe_index_neighbor_in :
+          fe_index_in;
+
+      if (active_fe_index == numbers::invalid_unsigned_int)
+        {
+          if constexpr (is_dof_cell_accessor)
+            active_fe_index = cell->active_fe_index();
+          else
+            active_fe_index = 0;
+        }
+
+      if (active_fe_index_neighbor == numbers::invalid_unsigned_int)
+        {
+          if constexpr (is_dof_cell_accessor_neighbor)
+            active_fe_index_neighbor = cell_neighbor->active_fe_index();
+          else
+            active_fe_index_neighbor = 0;
+        }
+
       unsigned int used_q_index       = q_index;
       unsigned int used_mapping_index = mapping_index;
 
@@ -2377,58 +2455,67 @@ FEInterfaceValues<dim, spacedim>::reinit(
       // same :-(
       if (used_q_index == numbers::invalid_unsigned_int)
         if (internal_hp_fe_face_values
-              ->get_quadrature_collection()[cell->active_fe_index()] ==
+              ->get_quadrature_collection()[active_fe_index] ==
             internal_hp_fe_face_values
-              ->get_quadrature_collection()[cell_neighbor->active_fe_index()])
-          used_q_index = cell->active_fe_index();
+              ->get_quadrature_collection()[active_fe_index_neighbor])
+          used_q_index = active_fe_index;
 
       // Third check, if the above did not already suffice. We see if we
       // can get somewhere via the dominated's finite element index.
-      const unsigned int dominated_fe_index =
-        ((used_q_index == numbers::invalid_unsigned_int) ||
-             (used_mapping_index == numbers::invalid_unsigned_int) ?
-           internal_hp_fe_face_values->get_fe_collection().find_dominated_fe(
-             {cell->active_fe_index(), cell_neighbor->active_fe_index()}) :
-           numbers::invalid_unsigned_int);
-
-      if (used_q_index == numbers::invalid_unsigned_int)
+      if ((used_q_index == numbers::invalid_unsigned_int) ||
+          (used_mapping_index == numbers::invalid_unsigned_int))
         {
-          Assert(dominated_fe_index != numbers::invalid_fe_index,
-                 ExcMessage(
-                   "You called this function with 'q_index' left at its "
-                   "default value, but this can only work if one of "
-                   "the two finite elements adjacent to this face "
-                   "dominates the other. See the documentation "
-                   "of this function for more information of how "
-                   "to deal with this situation."));
-          used_q_index = dominated_fe_index;
-        }
+          const unsigned int dominated_fe_index =
+            ((used_q_index == numbers::invalid_unsigned_int) ||
+                 (used_mapping_index == numbers::invalid_unsigned_int) ?
+               internal_hp_fe_face_values->get_fe_collection()
+                 .find_dominated_fe(
+                   {active_fe_index, active_fe_index_neighbor}) :
+               numbers::invalid_unsigned_int);
 
-      if (used_mapping_index == numbers::invalid_unsigned_int)
-        {
-          Assert(dominated_fe_index != numbers::invalid_fe_index,
-                 ExcMessage(
-                   "You called this function with 'mapping_index' left "
-                   "at its default value, but this can only work if one "
-                   "of the two finite elements adjacent to this face "
-                   "dominates the other. See the documentation "
-                   "of this function for more information of how "
-                   "to deal with this situation."));
-          used_mapping_index = dominated_fe_index;
+          if (used_q_index == numbers::invalid_unsigned_int)
+            {
+              Assert(dominated_fe_index != numbers::invalid_fe_index,
+                     ExcMessage(
+                       "You called this function with 'q_index' left at its "
+                       "default value, but this can only work if one of "
+                       "the two finite elements adjacent to this face "
+                       "dominates the other. See the documentation "
+                       "of this function for more information of how "
+                       "to deal with this situation."));
+              used_q_index = dominated_fe_index;
+            }
+
+          if (used_mapping_index == numbers::invalid_unsigned_int)
+            {
+              Assert(dominated_fe_index != numbers::invalid_fe_index,
+                     ExcMessage(
+                       "You called this function with 'mapping_index' left "
+                       "at its default value, but this can only work if one "
+                       "of the two finite elements adjacent to this face "
+                       "dominates the other. See the documentation "
+                       "of this function for more information of how "
+                       "to deal with this situation."));
+              used_mapping_index = dominated_fe_index;
+            }
         }
 
       // Same as if above, but when hp is enabled.
       if (sub_face_no == numbers::invalid_unsigned_int)
         {
           internal_hp_fe_face_values->reinit(
-            cell, face_no, used_q_index, used_mapping_index, fe_index);
+            cell, face_no, used_q_index, used_mapping_index, active_fe_index);
           fe_face_values = &const_cast<FEFaceValues<dim, spacedim> &>(
             internal_hp_fe_face_values->get_present_fe_values());
         }
       else
         {
-          internal_hp_fe_subface_values->reinit(
-            cell, face_no, sub_face_no, used_q_index, used_mapping_index);
+          internal_hp_fe_subface_values->reinit(cell,
+                                                face_no,
+                                                sub_face_no,
+                                                used_q_index,
+                                                used_mapping_index,
+                                                active_fe_index);
 
           fe_face_values = &const_cast<FESubfaceValues<dim, spacedim> &>(
             internal_hp_fe_subface_values->get_present_fe_values());
@@ -2438,18 +2525,21 @@ FEInterfaceValues<dim, spacedim>::reinit(
           internal_hp_fe_face_values_neighbor->reinit(cell_neighbor,
                                                       face_no_neighbor,
                                                       used_q_index,
-                                                      used_mapping_index);
+                                                      used_mapping_index,
+                                                      active_fe_index_neighbor);
 
           fe_face_values_neighbor = &const_cast<FEFaceValues<dim, spacedim> &>(
             internal_hp_fe_face_values_neighbor->get_present_fe_values());
         }
       else
         {
-          internal_hp_fe_subface_values_neighbor->reinit(cell_neighbor,
-                                                         face_no_neighbor,
-                                                         sub_face_no_neighbor,
-                                                         used_q_index,
-                                                         used_mapping_index);
+          internal_hp_fe_subface_values_neighbor->reinit(
+            cell_neighbor,
+            face_no_neighbor,
+            sub_face_no_neighbor,
+            used_q_index,
+            used_mapping_index,
+            active_fe_index_neighbor);
 
           fe_face_values_neighbor =
             &const_cast<FESubfaceValues<dim, spacedim> &>(
@@ -2464,47 +2554,70 @@ FEInterfaceValues<dim, spacedim>::reinit(
     }
 
   // Set up dof mapping and remove duplicates (for continuous elements).
-  {
-    // Get dof indices first:
-    std::vector<types::global_dof_index> v(
-      fe_face_values->get_fe().n_dofs_per_cell());
-    cell->get_active_or_mg_dof_indices(v);
-    std::vector<types::global_dof_index> v2(
-      fe_face_values_neighbor->get_fe().n_dofs_per_cell());
-    cell_neighbor->get_active_or_mg_dof_indices(v2);
+  if constexpr (is_dof_cell_accessor_neighbor && is_dof_cell_accessor)
+    {
+      // Get dof indices first:
+      std::vector<types::global_dof_index> v(
+        fe_face_values->get_fe().n_dofs_per_cell());
+      cell->get_active_or_mg_dof_indices(v);
+      std::vector<types::global_dof_index> v2(
+        fe_face_values_neighbor->get_fe().n_dofs_per_cell());
+      cell_neighbor->get_active_or_mg_dof_indices(v2);
 
-    // Fill a map from the global dof index to the left and right
-    // local index.
-    std::map<types::global_dof_index, std::pair<unsigned int, unsigned int>>
-                                          tempmap;
-    std::pair<unsigned int, unsigned int> invalid_entry(
-      numbers::invalid_unsigned_int, numbers::invalid_unsigned_int);
+      // Fill a map from the global dof index to the left and right
+      // local index.
+      std::map<types::global_dof_index, std::pair<unsigned int, unsigned int>>
+                                            tempmap;
+      std::pair<unsigned int, unsigned int> invalid_entry(
+        numbers::invalid_unsigned_int, numbers::invalid_unsigned_int);
 
-    for (unsigned int i = 0; i < v.size(); ++i)
-      {
-        // If not already existing, add an invalid entry:
-        auto result = tempmap.insert(std::make_pair(v[i], invalid_entry));
-        result.first->second.first = i;
-      }
+      for (unsigned int i = 0; i < v.size(); ++i)
+        {
+          // If not already existing, add an invalid entry:
+          auto result = tempmap.insert(std::make_pair(v[i], invalid_entry));
+          result.first->second.first = i;
+        }
 
-    for (unsigned int i = 0; i < v2.size(); ++i)
-      {
-        // If not already existing, add an invalid entry:
-        auto result = tempmap.insert(std::make_pair(v2[i], invalid_entry));
-        result.first->second.second = i;
-      }
+      for (unsigned int i = 0; i < v2.size(); ++i)
+        {
+          // If not already existing, add an invalid entry:
+          auto result = tempmap.insert(std::make_pair(v2[i], invalid_entry));
+          result.first->second.second = i;
+        }
 
-    // Transfer from the map to the sorted std::vectors.
-    dofmap.resize(tempmap.size());
-    interface_dof_indices.resize(tempmap.size());
-    unsigned int idx = 0;
-    for (auto &x : tempmap)
-      {
-        interface_dof_indices[idx] = x.first;
-        dofmap[idx]                = {{x.second.first, x.second.second}};
-        ++idx;
-      }
-  }
+      // Transfer from the map to the sorted std::vectors.
+      dofmap.resize(tempmap.size());
+      interface_dof_indices.resize(tempmap.size());
+      unsigned int idx = 0;
+      for (auto &x : tempmap)
+        {
+          interface_dof_indices[idx] = x.first;
+          dofmap[idx]                = {{x.second.first, x.second.second}};
+          ++idx;
+        }
+    }
+  else
+    {
+      const unsigned int n_dofs_per_cell_1 = fe_face_values->dofs_per_cell;
+      const unsigned int n_dofs_per_cell_2 =
+        fe_face_values_neighbor->dofs_per_cell;
+
+      interface_dof_indices.resize(n_dofs_per_cell_1 + n_dofs_per_cell_2);
+      dofmap.resize(n_dofs_per_cell_1 + n_dofs_per_cell_2);
+
+      for (unsigned int i = 0; i < n_dofs_per_cell_1; ++i)
+        {
+          interface_dof_indices[i] = numbers::invalid_dof_index;
+          dofmap[i]                = {{i, numbers::invalid_unsigned_int}};
+        }
+
+      for (unsigned int i = 0; i < n_dofs_per_cell_2; ++i)
+        {
+          interface_dof_indices[i + n_dofs_per_cell_1] =
+            numbers::invalid_dof_index;
+          dofmap[i + n_dofs_per_cell_1] = {{numbers::invalid_unsigned_int, i}};
+        }
+    }
 }
 
 
@@ -2523,30 +2636,45 @@ FEInterfaceValues<dim, spacedim>::reinit(const CellIteratorType &cell,
 
   if (internal_fe_face_values)
     {
+      Assert((q_index == 0 || q_index == numbers::invalid_unsigned_int),
+             ExcNotImplemented());
+      Assert((mapping_index == 0 ||
+              mapping_index == numbers::invalid_unsigned_int),
+             ExcNotImplemented());
+      Assert((fe_index == 0 || fe_index == numbers::invalid_unsigned_int),
+             ExcNotImplemented());
+
       internal_fe_face_values->reinit(cell, face_no);
       fe_face_values          = internal_fe_face_values.get();
       fe_face_values_neighbor = nullptr;
-
-      interface_dof_indices.resize(fe_face_values->get_fe().n_dofs_per_cell());
-      cell->get_active_or_mg_dof_indices(interface_dof_indices);
     }
   else if (internal_hp_fe_face_values)
     {
       internal_hp_fe_face_values->reinit(
         cell, face_no, q_index, mapping_index, fe_index);
-      fe_face_values = &const_cast<FEFaceValues<dim> &>(
+      fe_face_values = &const_cast<FEFaceValues<dim, spacedim> &>(
         internal_hp_fe_face_values->get_present_fe_values());
       fe_face_values_neighbor = nullptr;
+    }
 
-      interface_dof_indices.resize(fe_face_values->get_fe().n_dofs_per_cell());
+  interface_dof_indices.resize(fe_face_values->get_fe().n_dofs_per_cell());
+
+  if constexpr (std::is_same_v<typename CellIteratorType::AccessorType,
+                               DoFCellAccessor<dim, spacedim, true>> ||
+                std::is_same_v<typename CellIteratorType::AccessorType,
+                               DoFCellAccessor<dim, spacedim, false>>)
+    {
       cell->get_active_or_mg_dof_indices(interface_dof_indices);
+    }
+  else
+    {
+      for (auto &i : interface_dof_indices)
+        i = numbers::invalid_dof_index;
     }
 
   dofmap.resize(interface_dof_indices.size());
   for (unsigned int i = 0; i < interface_dof_indices.size(); ++i)
-    {
-      dofmap[i] = {{i, numbers::invalid_unsigned_int}};
-    }
+    dofmap[i] = {{i, numbers::invalid_unsigned_int}};
 }
 
 
@@ -2678,7 +2806,20 @@ template <int dim, int spacedim>
 inline std_cxx20::ranges::iota_view<unsigned int, unsigned int>
 FEInterfaceValues<dim, spacedim>::quadrature_point_indices() const
 {
-  return {0U, n_quadrature_points};
+  return std_cxx20::ranges::iota_view<unsigned int, unsigned int>(
+    0U, n_quadrature_points);
+}
+
+
+
+template <int dim, int spacedim>
+const Point<spacedim> &
+FEInterfaceValues<dim, spacedim>::quadrature_point(
+  const unsigned int q_point) const
+{
+  Assert(fe_face_values != nullptr,
+         ExcMessage("This call requires a call to reinit() first."));
+  return fe_face_values->quadrature_point(q_point);
 }
 
 
@@ -2796,6 +2937,16 @@ template <int dim, int spacedim>
 Tensor<1, spacedim>
 FEInterfaceValues<dim, spacedim>::normal(const unsigned int q_point_index) const
 {
+  return normal_vector(q_point_index);
+}
+
+
+
+template <int dim, int spacedim>
+Tensor<1, spacedim>
+FEInterfaceValues<dim, spacedim>::normal_vector(
+  const unsigned int q_point_index) const
+{
   return fe_face_values->normal_vector(q_point_index);
 }
 
@@ -2824,6 +2975,29 @@ FEInterfaceValues<dim, spacedim>::shape_value(
 }
 
 
+template <int dim, int spacedim>
+Tensor<1, spacedim>
+FEInterfaceValues<dim, spacedim>::shape_grad(
+  const bool         here_or_there,
+  const unsigned int interface_dof_index,
+  const unsigned int q_point,
+  const unsigned int component) const
+{
+  const auto dof_pair = dofmap[interface_dof_index];
+
+  Tensor<1, dim> value;
+
+  if (here_or_there && dof_pair[0] != numbers::invalid_unsigned_int)
+    value = get_fe_face_values(0).shape_grad_component(dof_pair[0],
+                                                       q_point,
+                                                       component);
+  if (!here_or_there && dof_pair[1] != numbers::invalid_unsigned_int)
+    value = get_fe_face_values(1).shape_grad_component(dof_pair[1],
+                                                       q_point,
+                                                       component);
+
+  return value;
+}
 
 template <int dim, int spacedim>
 double

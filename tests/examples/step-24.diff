@@ -1,0 +1,40 @@
+25c25
+< 
+---
+> #include "../example_test.h"
+392c392,396
+<     cg.solve(system_matrix, solution_p, system_rhs_p, PreconditionIdentity());
+---
+>     check_solver_within_range(std::cout,
+>                               cg.solve(system_matrix, solution_p, system_rhs_p, PreconditionIdentity()),
+>                               solver_control.last_step(),
+>                               8, 10);
+> //    cg.solve(system_matrix, solution_p, system_rhs_p, PreconditionIdentity());
+394,395c398,399
+<     std::cout << "   p-equation: " << solver_control.last_step()
+<               << " CG iterations." << std::endl;
+---
+> //    std::cout << "   p-equation: " << solver_control.last_step()
+> //              << " CG iterations." << std::endl;
+406,409c410,417
+<     cg.solve(mass_matrix, solution_v, system_rhs_v, PreconditionIdentity());
+< 
+<     std::cout << "   v-equation: " << solver_control.last_step()
+<               << " CG iterations." << std::endl;
+---
+>     check_solver_within_range(std::cout,
+>                               cg.solve(mass_matrix, solution_v, system_rhs_v, PreconditionIdentity()),
+>                               solver_control.last_step(),
+>                               29, 39);
+> //    cg.solve(mass_matrix, solution_v, system_rhs_v, PreconditionIdentity());
+> //
+> //    std::cout << "   v-equation: " << solver_control.last_step()
+> //              << " CG iterations." << std::endl;
+471c479
+<     const double end_time = 0.7;
+---
+>     const double end_time = 0.01;
+504c512
+<         output_results();
+---
+>       //output_results();

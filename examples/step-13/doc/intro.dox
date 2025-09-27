@@ -1,4 +1,4 @@
-<a name="Intro"></a>
+<a name="step_13-Intro"></a>
 <h1>Introduction</h1>
 
 <h3>Background and purpose</h3>
@@ -110,7 +110,7 @@ number of differences compared to previous example programs:
 <li>Parallelize the assembly of linear systems using the WorkStream
     facilities. This follows the extensive description that can be
     found in the @ref threads "Parallel computing with multiple processors accessing shared memory"
-    documentation module. The implementation essentially follows what
+    documentation topic. The implementation essentially follows what
     has already been described in step-9.
 </ol>
 

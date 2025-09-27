@@ -4,7 +4,7 @@
   <head>
     <title>The deal.II Readme on interfacing to PETSc</title>
     <link href="../screen.css" rel="StyleSheet">
-    <meta name="copyright" content="Copyright (C) 2008 - 2022 by the deal.II authors">
+    <meta name="copyright" content="Copyright (C) 2008 - 2023 by the deal.II authors">
     <meta name="keywords" content="deal.II">
   </head>
 
@@ -17,10 +17,10 @@
       target="_top">PETSc</a> is a
       software package that provides lots of functionality for linear
       algebra, among other things. For example, it includes implementations of a variety of
-      linear solvers, as well as various different sparse and dense matrix and
-      vector formats. Of particular interest to deal.II is their ability to
-      provide this functionality both on sequential and parallel (using MPI)
-      computers.
+      linear, nonlinear and ordinary differential equation solvers, as well as various
+      different sparse and dense matrix and vector formats. Of particular interest to
+      deal.II is their ability to provide this functionality both on sequential and
+      parallel (using MPI) computers.
     </p>
 
     <p>
@@ -30,17 +30,15 @@
       algebra classes. We use these interfaces for parallel computations based
       on MPI since the native deal.II linear algebra classes lack this
       ability. They are used, among other programs, in step-17, step-18 and
-      step-40.
+      step-40. See step-77 for an example that uses PETSc's nonlinear solver
+      capabilities.
     </p>
 
     <h4>Installing <acronym>deal.II</acronym> with PETSc</h4>
 
-    <p style="color: red"><b>Note:</b> The most recent version of PETSc
-      that has been reported to be compatible with
-      <acronym>deal.II</acronym> is version 3.17.1. If you use a later
-      version than this and encounter problems, let us
-      know. <acronym>deal.II</acronym> does not support versions of PETSc prior
-      to 3.7.0.
+    <p style="color: red"><b>Note:</b> <acronym>deal.II</acronym> is compatible
+      with any PETSc version newer than 3.7.0. If you encounter problems with a
+      specific version, let us know.
     </p>
 
     <p>
@@ -71,23 +69,6 @@
       <acronym>deal.II</acronym> to be configured for PETSc use, you
       should specify <code>-DDEAL_II_WITH_PETSC=OFF</code> as a flag
       during configuration.
-    </p>
-
-    <p><b>Note:</b> <acronym>deal.II</acronym> can be installed with both
-      PETSc and Trilinos and they do not usually get in their
-      respective ways. There are, however, occasions where this is not true
-      and this fundamentally comes from the fact that both of these packages
-      are built from subpackages that are developed by independent
-      groups. Unfortunately, some of these sub-packages can be configured to
-      be part of both PETSc and Trilinos, and if you try to
-      use <acronym>deal.II</acronym> with versions of PETSc and Trilinos
-      that <i>both</i> contain a particular sub-package, little good will come
-      of it in general. In particular, we have experienced this with the ML
-      package that can serve as an algebraic multigrid method to both PETSc
-      and Trilinos. If both of these packages are configured to use ML, then
-      difficult to understand error messages at compile or link time are
-      almost inevitable, and there is little the <acronym>deal.II</acronym>
-      build system can do to prevent this. Thus, <i>don't try to do that!</i>
     </p>
 
 
@@ -121,6 +102,19 @@
       another way, installing PETSc with the flag <code>--download-mpich</code>
       often causes problems (such as linking errors or poor performance)
       that may be avoided by using whatever your system provides instead.
+
+      If you want to solve problems which have more than two billion unknowns
+      with PETSc then you should also pass the
+      <code>--with-64-bit-indices=on</code> flag to <code>configure.py</code>.
+      You will also want to configure deal.II with 64-bit indices by
+      providing <code>-DDEAL_II_WITH_64BIT_INDICES=ON</code> to deal.II's cmake
+      configuration run. deal.II will throw an exception if it cannot
+      successfully convert indices between the two libraries, but, as long
+      as the supported index ranges overlap (e.g., when solving problems with
+      less than 2 billion degrees of freedom where either PETSc or deal.II uses
+      32-bit indices and the other uses 64-bit indices) all solvers will work
+      correctly.
+
       <br>
       Now let PETSc check his own sanity:
       <pre>

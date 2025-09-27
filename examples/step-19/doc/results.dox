@@ -36,47 +36,47 @@ Timestep 4
 
 Timestep 1000
   Field degrees of freedom:                 4989
-  Total number of particles in simulation:  394
-  Number of particles lost this time step:  2
-  Fraction of particles lost through anode: 0.823188
+  Total number of particles in simulation:  447
+  Number of particles lost this time step:  0
+  Fraction of particles lost through anode: 0.75514
 
-  Now at t=3.83822e-05, dt=4.18519e-08.
+  Now at t=3.19506e-05, dt=2.19758e-08.
 
 Timestep 1001
   Field degrees of freedom:                 4989
-  Total number of particles in simulation:  392
-  Number of particles lost this time step:  0
-  Fraction of particles lost through anode: 0.823188
+  Total number of particles in simulation:  448
+  Number of particles lost this time step:  1
+  Fraction of particles lost through anode: 0.755597
 
-  Now at t=3.84244e-05, dt=4.22178e-08.
+  Now at t=3.19726e-05, dt=2.19516e-08.
 
 
 ...
 
 
-Timestep 2478
+Timestep 3788
   Field degrees of freedom:                 4989
-  Total number of particles in simulation:  364
+  Total number of particles in simulation:  389
+  Number of particles lost this time step:  1
+  Fraction of particles lost through anode: 0.757485
+
+  Now at t=9.99589e-05, dt=2.27541e-08.
+
+Timestep 3789
+  Field degrees of freedom:                 4989
+  Total number of particles in simulation:  388
   Number of particles lost this time step:  0
-  Fraction of particles lost through anode: 0.867745
+  Fraction of particles lost through anode: 0.757485
 
-  Now at t=9.99509e-05, dt=4.20455e-08.
+  Now at t=9.99816e-05, dt=2.26898e-08.
 
-Timestep 2479
+Timestep 3790
   Field degrees of freedom:                 4989
-  Total number of particles in simulation:  364
-  Number of particles lost this time step:  2
-  Fraction of particles lost through anode: 0.867871
+  Total number of particles in simulation:  388
+  Number of particles lost this time step:  0
+  Fraction of particles lost through anode: 0.757485
 
-  Now at t=9.99929e-05, dt=4.20105e-08.
-
-Timestep 2480
-  Field degrees of freedom:                 4989
-  Total number of particles in simulation:  362
-  Number of particles lost this time step:  2
-  Fraction of particles lost through anode: 0.867047
-
-  Now at t=0.0001, dt=7.11401e-09.
+  Now at t=0.0001, dt=1.84417e-08.
 ```
 
 Picking a random few time steps, we can visualize the solution in the
@@ -86,7 +86,7 @@ are no longer exact representations of the solution as currently
 computed -- but they are conceptually still correct):
 <div class="twocolumn" style="width: 80%">
   <div>
-    <img src="https://www.dealii.org/images/steps/developer/step-19.solution.0000.png"
+    <img src="https://dealii.org/images/steps/developer/step-19.solution.0000.png"
          alt="The solution at time step 0 (t=0 seconds)."
          width="500">
     <br>
@@ -94,7 +94,7 @@ computed -- but they are conceptually still correct):
     <br>
   </div>
   <div>
-    <img src="https://www.dealii.org/images/steps/developer/step-19.solution.1400.png"
+    <img src="https://dealii.org/images/steps/developer/step-19.solution.1400.png"
          alt="The solution at time step 1400 (t=0.000068 seconds)."
          width="500">
     <br>
@@ -102,7 +102,7 @@ computed -- but they are conceptually still correct):
     <br>
   </div>
   <div>
-    <img src="https://www.dealii.org/images/steps/developer/step-19.solution.0700.png"
+    <img src="https://dealii.org/images/steps/developer/step-19.solution.0700.png"
          alt="The solution at time step 700 (t=0.000035 seconds)."
          width="500">
     <br>
@@ -110,7 +110,7 @@ computed -- but they are conceptually still correct):
     <br>
   </div>
   <div>
-    <img src="https://www.dealii.org/images/steps/developer/step-19.solution.2092.png"
+    <img src="https://dealii.org/images/steps/developer/step-19.solution.2092.png"
          alt="The solution at time step 2092 (t=0.0001 seconds)."
          width="500">
     <br>
@@ -160,7 +160,7 @@ the magnitude exceeds the threshold necessary to draw an electron out of the
 electrode.
 
 
-<a name="extensions"></a>
+@anchor step_19-Extensions
 <h3>Possibilities for extensions</h3>
 
 

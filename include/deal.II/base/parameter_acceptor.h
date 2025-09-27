@@ -1,17 +1,16 @@
-//-----------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-//    Copyright (C) 2017 - 2023 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2017 - 2025 by the deal.II authors
 //
-//    This file is part of the deal.II library.
+// This file is part of the deal.II library.
 //
-//    The deal.II library is free software; you can use it, redistribute
-//    it, and/or modify it under the terms of the GNU Lesser General
-//    Public License as published by the Free Software Foundation; either
-//    version 2.1 of the License, or (at your option) any later version.
-//    The full text of the license can be found in the file LICENSE.md at
-//    the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-//-----------------------------------------------------------
+// ------------------------------------------------------------------------
 
 #ifndef dealii_base_parameter_acceptor_h
 #define dealii_base_parameter_acceptor_h
@@ -19,13 +18,13 @@
 #include <deal.II/base/config.h>
 
 #include <deal.II/base/exceptions.h>
-#include <deal.II/base/logstream.h>
+#include <deal.II/base/observer_pointer.h>
 #include <deal.II/base/parameter_handler.h>
-#include <deal.II/base/smartpointer.h>
 
 #include <boost/signals2/signal.hpp>
 
 #include <mutex>
+#include <set>
 #include <typeinfo>
 
 DEAL_II_NAMESPACE_OPEN
@@ -357,7 +356,7 @@ namespace internal
  *
  * See the tutorial program step-60 for an example on how to use this class.
  */
-class ParameterAcceptor : public Subscriptor
+class ParameterAcceptor : public EnableObserverPointer
 {
 public:
   /**

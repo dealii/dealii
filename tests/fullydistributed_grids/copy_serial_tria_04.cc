@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2019 - 2020 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2019 - 2024 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 
 // Create a serial triangulation with periodic face in x-direction and copy it.
@@ -32,7 +31,6 @@
 
 #include "../grid/tests.h"
 
-using namespace dealii;
 
 template <int dim>
 void
@@ -41,7 +39,7 @@ test(const int n_refinements, const int n_subdivisions, MPI_Comm comm)
   const double left  = 0;
   const double right = 1;
 
-  auto add_periodicy = [&](dealii::Triangulation<dim> &tria) {
+  auto add_periodicity = [&](dealii::Triangulation<dim> &tria) {
     std::vector<
       GridTools::PeriodicFacePair<typename Triangulation<dim>::cell_iterator>>
          periodic_faces;
@@ -49,21 +47,21 @@ test(const int n_refinements, const int n_subdivisions, MPI_Comm comm)
     auto endc = tria.end();
     for (; cell != endc; ++cell)
       for (const unsigned int face_number : GeometryInfo<dim>::face_indices())
-        if (std::fabs(cell->face(face_number)->center()(0) - left) < 1e-12)
+        if (std::fabs(cell->face(face_number)->center()[0] - left) < 1e-12)
           cell->face(face_number)->set_all_boundary_ids(1);
-        else if (std::fabs(cell->face(face_number)->center()(0) - right) <
+        else if (std::fabs(cell->face(face_number)->center()[0] - right) <
                  1e-12)
           cell->face(face_number)->set_all_boundary_ids(2);
         else if (dim >= 2 &&
-                 std::fabs(cell->face(face_number)->center()(1) - left) < 1e-12)
+                 std::fabs(cell->face(face_number)->center()[1] - left) < 1e-12)
           cell->face(face_number)->set_all_boundary_ids(3);
-        else if (dim >= 2 && std::fabs(cell->face(face_number)->center()(1) -
+        else if (dim >= 2 && std::fabs(cell->face(face_number)->center()[1] -
                                        right) < 1e-12)
           cell->face(face_number)->set_all_boundary_ids(4);
         else if (dim >= 3 &&
-                 std::fabs(cell->face(face_number)->center()(2) - left) < 1e-12)
+                 std::fabs(cell->face(face_number)->center()[2] - left) < 1e-12)
           cell->face(face_number)->set_all_boundary_ids(5);
-        else if (dim >= 3 && std::fabs(cell->face(face_number)->center()(2) -
+        else if (dim >= 3 && std::fabs(cell->face(face_number)->center()[2] -
                                        right) < 1e-12)
           cell->face(face_number)->set_all_boundary_ids(6);
 
@@ -80,8 +78,8 @@ test(const int n_refinements, const int n_subdivisions, MPI_Comm comm)
   // create serial triangulation
   Triangulation<dim> basetria;
   GridGenerator::subdivided_hyper_cube(basetria, n_subdivisions);
-  // new: add periodicy on serial mesh
-  add_periodicy(basetria);
+  // new: add periodicity on serial mesh
+  add_periodicity(basetria);
   basetria.refine_global(n_refinements);
 
   GridTools::partition_triangulation_zorder(
@@ -98,8 +96,8 @@ test(const int n_refinements, const int n_subdivisions, MPI_Comm comm)
   // actually create triangulation
   tria_pft.create_triangulation(construction_data);
 
-  // new: add periodicy on fullydistributed mesh (!!!)
-  add_periodicy(tria_pft);
+  // new: add periodicity on fullydistributed mesh (!!!)
+  add_periodicity(tria_pft);
 
   // test triangulation
   FE_Q<dim>       fe(2);

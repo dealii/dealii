@@ -1,0 +1,33 @@
+55c55
+< 
+---
+> #include "../example_test.h"
+356,361c356,365
+<     eigensolver.solve(stiffness_matrix,
+<                       mass_matrix,
+<                       eigenvalues,
+<                       eigenfunctions,
+<                       eigenfunctions.size());
+< 
+---
+> //    eigensolver.solve(stiffness_matrix,
+> //                      mass_matrix,
+> //                      eigenvalues,
+> //                      eigenfunctions,
+> //                      eigenfunctions.size());
+>       check_solver_within_range(std::cout,
+>                             	   eigensolver.solve(stiffness_matrix, mass_matrix, eigenvalues, eigenfunctions, eigenfunctions.size());,
+>                              	   solver_control.last_step(),
+>                              	   56,
+>                              	   68);
+452,453c456,458
+<     std::cout << "   Solver converged in " << n_iterations << " iterations."
+<               << std::endl;
+---
+>     (void)n_iterations;
+> //    std::cout << "   Solver converged in " << n_iterations << " iterations."
+> //              << std::endl;
+480c485
+<       EigenvalueProblem<2> problem("step-36.prm");
+---
+>       EigenvalueProblem<2> problem("../../../source/step-36/step-36.prm");

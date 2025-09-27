@@ -1,0 +1,35 @@
+# vtk DataFile Version 3.0
+Triangulation generated with deal.II
+ASCII
+DATASET UNSTRUCTURED_GRID
+POINTS 8 double
+0 0 0
+0 0 1
+0 0 0
+0 -1 0
+0 0 0
+0 0 -1
+0 0 0
+0 1 0
+
+CELLS 4 12
+2 0 1
+2 2 3
+2 4 5
+2 6 7
+
+CELL_TYPES 4
+3 3 3 3 
+
+
+
+CELL_DATA 4
+SCALARS MaterialID int 1
+LOOKUP_TABLE default
+0 1 2 3 
+
+
+
+SCALARS ManifoldID int 1
+LOOKUP_TABLE default
+-1 -1 -1 -1 

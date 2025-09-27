@@ -1,25 +1,25 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 1999 - 2022 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 1999 - 2024 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 #ifndef dealii_solver_qmrs_h
 #define dealii_solver_qmrs_h
 
 #include <deal.II/base/config.h>
 
+#include <deal.II/base/enable_observer_pointer.h>
 #include <deal.II/base/logstream.h>
-#include <deal.II/base/subscriptor.h>
+#include <deal.II/base/template_constraints.h>
 
 #include <deal.II/lac/solver.h>
 #include <deal.II/lac/solver_control.h>
@@ -91,6 +91,7 @@ DEAL_II_NAMESPACE_OPEN
  * to observe the progress of the iteration.
  */
 template <typename VectorType = Vector<double>>
+DEAL_II_CXX20_REQUIRES(concepts::is_vector_space_vector<VectorType>)
 class SolverQMRS : public SolverBase<VectorType>
 {
 public:
@@ -175,11 +176,13 @@ public:
    * Solve the linear system $Ax=b$ for x.
    */
   template <typename MatrixType, typename PreconditionerType>
-  void
-  solve(const MatrixType         &A,
-        VectorType               &x,
-        const VectorType         &b,
-        const PreconditionerType &preconditioner);
+  DEAL_II_CXX20_REQUIRES(
+    (concepts::is_linear_operator_on<MatrixType, VectorType> &&
+     concepts::is_linear_operator_on<PreconditionerType, VectorType>))
+  void solve(const MatrixType         &A,
+             VectorType               &x,
+             const VectorType         &b,
+             const PreconditionerType &preconditioner);
 
   /**
    * Interface for derived class. This function gets the current iteration
@@ -241,6 +244,7 @@ private:
 
 
 template <typename VectorType>
+DEAL_II_CXX20_REQUIRES(concepts::is_vector_space_vector<VectorType>)
 SolverQMRS<VectorType>::IterationResult::IterationResult(
   const SolverControl::State state,
   const double               last_residual)
@@ -251,6 +255,7 @@ SolverQMRS<VectorType>::IterationResult::IterationResult(
 
 
 template <typename VectorType>
+DEAL_II_CXX20_REQUIRES(concepts::is_vector_space_vector<VectorType>)
 SolverQMRS<VectorType>::SolverQMRS(SolverControl            &cn,
                                    VectorMemory<VectorType> &mem,
                                    const AdditionalData     &data)
@@ -259,7 +264,10 @@ SolverQMRS<VectorType>::SolverQMRS(SolverControl            &cn,
   , step(0)
 {}
 
+
+
 template <typename VectorType>
+DEAL_II_CXX20_REQUIRES(concepts::is_vector_space_vector<VectorType>)
 SolverQMRS<VectorType>::SolverQMRS(SolverControl        &cn,
                                    const AdditionalData &data)
   : SolverBase<VectorType>(cn)
@@ -267,21 +275,28 @@ SolverQMRS<VectorType>::SolverQMRS(SolverControl        &cn,
   , step(0)
 {}
 
-template <typename VectorType>
-void
-SolverQMRS<VectorType>::print_vectors(const unsigned int,
-                                      const VectorType &,
-                                      const VectorType &,
-                                      const VectorType &) const
-{}
+
 
 template <typename VectorType>
+DEAL_II_CXX20_REQUIRES(concepts::is_vector_space_vector<VectorType>)
+void SolverQMRS<VectorType>::print_vectors(const unsigned int,
+                                           const VectorType &,
+                                           const VectorType &,
+                                           const VectorType &) const
+{}
+
+
+
+template <typename VectorType>
+DEAL_II_CXX20_REQUIRES(concepts::is_vector_space_vector<VectorType>)
 template <typename MatrixType, typename PreconditionerType>
-void
-SolverQMRS<VectorType>::solve(const MatrixType         &A,
-                              VectorType               &x,
-                              const VectorType         &b,
-                              const PreconditionerType &preconditioner)
+DEAL_II_CXX20_REQUIRES(
+  (concepts::is_linear_operator_on<MatrixType, VectorType> &&
+   concepts::is_linear_operator_on<PreconditionerType, VectorType>))
+void SolverQMRS<VectorType>::solve(const MatrixType         &A,
+                                   VectorType               &x,
+                                   const VectorType         &b,
+                                   const PreconditionerType &preconditioner)
 {
   LogStream::Prefix prefix("SQMR");
 
@@ -323,18 +338,21 @@ SolverQMRS<VectorType>::solve(const MatrixType         &A,
   // otherwise exit as normal
 }
 
+
+
 template <typename VectorType>
+DEAL_II_CXX20_REQUIRES(concepts::is_vector_space_vector<VectorType>)
 template <typename MatrixType, typename PreconditionerType>
 typename SolverQMRS<VectorType>::IterationResult
-SolverQMRS<VectorType>::iterate(const MatrixType         &A,
-                                VectorType               &x,
-                                const VectorType         &b,
-                                const PreconditionerType &preconditioner,
-                                VectorType               &r,
-                                VectorType               &u,
-                                VectorType               &q,
-                                VectorType               &t,
-                                VectorType               &d)
+  SolverQMRS<VectorType>::iterate(const MatrixType         &A,
+                                  VectorType               &x,
+                                  const VectorType         &b,
+                                  const PreconditionerType &preconditioner,
+                                  VectorType               &r,
+                                  VectorType               &u,
+                                  VectorType               &q,
+                                  VectorType               &t,
+                                  VectorType               &d)
 {
   SolverControl::State state = SolverControl::iterate;
 
@@ -371,8 +389,8 @@ SolverQMRS<VectorType>::iterate(const MatrixType         &A,
 
   while (state == SolverControl::iterate)
     {
-      step++;
-      it++;
+      ++step;
+      ++it;
       //--------------------------------------------------------------
       // Step 1: apply the system matrix and compute one inner product
       //--------------------------------------------------------------

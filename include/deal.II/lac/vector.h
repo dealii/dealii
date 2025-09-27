@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 1999 - 2023 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 1999 - 2024 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 #ifndef dealii_vector_h
 #define dealii_vector_h
@@ -23,7 +22,6 @@
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/index_set.h>
 #include <deal.II/base/numbers.h>
-#include <deal.II/base/subscriptor.h>
 
 #include <deal.II/lac/read_vector.h>
 #include <deal.II/lac/vector_operation.h>
@@ -56,6 +54,17 @@ namespace TrilinosWrappers
     class Vector;
   }
 } // namespace TrilinosWrappers
+#  endif
+
+#  ifdef DEAL_II_TRILINOS_WITH_TPETRA
+namespace LinearAlgebra
+{
+  namespace TpetraWrappers
+  {
+    template <typename Number, typename MemorySpace>
+    class Vector;
+  }
+} // namespace LinearAlgebra
 #  endif
 
 template <typename number>
@@ -106,7 +115,7 @@ namespace parallel
  * in the manual).
  */
 template <typename Number>
-class Vector : public Subscriptor, public ReadVector<Number>
+class Vector : public ReadVector<Number>
 {
 public:
   /**
@@ -117,8 +126,7 @@ public:
    * std::complex.
    */
   static_assert(
-    std::is_arithmetic<
-      typename numbers::NumberTraits<Number>::real_type>::value,
+    std::is_arithmetic_v<typename numbers::NumberTraits<Number>::real_type>,
     "The Vector class only supports basic numeric types. In particular, it "
     "does not support automatically differentiated numbers.");
 
@@ -228,10 +236,30 @@ public:
    * the same time. This means that unless you use a split MPI communicator
    * then it is not normally possible for only one or a subset of processes
    * to obtain a copy of a parallel vector while the other jobs do something
-   * else. In other words, calling this function is a 'collective operation'
+   * else. In other words, calling this function is a @ref GlossCollectiveOperation "collective operation"
    * that needs to be executed by all MPI processes that jointly share @p v.
    */
   explicit Vector(const TrilinosWrappers::MPI::Vector &v);
+#endif
+
+#ifdef DEAL_II_TRILINOS_WITH_TPETRA
+  /**
+   * Another copy constructor: copy the values from a Trilinos wrapper vector.
+   * This copy constructor is only available if Trilinos was detected during
+   * configuration time.
+   *
+   * @note Due to the communication model used in MPI, this operation can
+   * only succeed if all processes that have knowledge of @p v
+   * (i.e. those given by <code>v.get_mpi_communicator()</code>) do it at
+   * the same time. This means that unless you use a split MPI communicator
+   * then it is not normally possible for only one or a subset of processes
+   * to obtain a copy of a parallel vector while the other jobs do something
+   * else. In other words, calling this function is a @ref GlossCollectiveOperation "collective operation"
+   * that needs to be executed by all MPI processes that jointly share @p v.
+   */
+  template <typename OtherNumber, typename MemorySpace>
+  explicit Vector(
+    const LinearAlgebra::TpetraWrappers::Vector<OtherNumber, MemorySpace> &v);
 #endif
 
   /**
@@ -257,6 +285,13 @@ public:
    * to behave properly.
    */
   virtual ~Vector() override = default;
+
+
+  /**
+   * This function is equivalent to writing <code>size() == 0</code>.
+   */
+  bool
+  empty() const;
 
   /**
    * This function does nothing but exists for compatibility with the parallel
@@ -357,7 +392,7 @@ public:
    * memory separately.
    */
   virtual void
-  swap(Vector<Number> &v);
+  swap(Vector<Number> &v) noexcept;
 
   /**
    * Set all components of the vector to the given number @p s.
@@ -433,11 +468,33 @@ public:
    * the same time. This means that unless you use a split MPI communicator
    * then it is not normally possible for only one or a subset of processes
    * to obtain a copy of a parallel vector while the other jobs do something
-   * else. In other words, calling this function is a 'collective operation'
+   * else. In other words, calling this function is a @ref GlossCollectiveOperation "collective operation"
    * that needs to be executed by all MPI processes that jointly share @p v.
    */
   Vector<Number> &
   operator=(const TrilinosWrappers::MPI::Vector &v);
+#endif
+
+#ifdef DEAL_II_TRILINOS_WITH_TPETRA
+  /**
+   * Another copy operator: copy the values from a (sequential or parallel,
+   * depending on the underlying compiler) Trilinos wrapper vector class. This
+   * operator is only available if Trilinos was detected during configuration
+   * time.
+   *
+   * @note Due to the communication model used in MPI, this operation can
+   * only succeed if all processes that have knowledge of @p v
+   * (i.e. those given by <code>v.get_mpi_communicator()</code>) do it at
+   * the same time. This means that unless you use a split MPI communicator
+   * then it is not normally possible for only one or a subset of processes
+   * to obtain a copy of a parallel vector while the other jobs do something
+   * else. In other words, calling this function is a @ref GlossCollectiveOperation "collective operation"
+   * that needs to be executed by all MPI processes that jointly share @p v.
+   */
+  template <typename OtherNumber, typename MemorySpace>
+  Vector<Number> &
+  operator=(
+    const LinearAlgebra::TpetraWrappers::Vector<OtherNumber, MemorySpace> &v);
 #endif
 
   /**
@@ -668,7 +725,7 @@ public:
    */
   virtual void
   extract_subvector_to(const ArrayView<const types::global_dof_index> &indices,
-                       ArrayView<Number> &elements) const override;
+                       const ArrayView<Number> &elements) const override;
 
   /**
    * Instead of getting individual elements of a vector via operator(),
@@ -1021,6 +1078,16 @@ public:
    */
   void
   zero_out_ghost_values() const;
+
+  /**
+   * This function returns the empty object MPI_COMM_SELF that does not signal
+   * any parallel communication model, as this vector is in fact serial with
+   * respect to the message passing interface (MPI). The function exists for
+   * compatibility with the @p parallel vector classes (e.g.,
+   * LinearAlgebra::distributed::Vector class).
+   */
+  MPI_Comm
+  get_mpi_communicator() const;
   /** @} */
 
 private:
@@ -1255,8 +1322,8 @@ Vector<Number>::extract_subvector_to(ForwardIterator       indices_begin,
   while (indices_begin != indices_end)
     {
       *values_begin = operator()(*indices_begin);
-      indices_begin++;
-      values_begin++;
+      ++indices_begin;
+      ++values_begin;
     }
 }
 
@@ -1331,6 +1398,12 @@ Vector<Number>::operator!=(const Vector<Number2> &v) const
 }
 
 
+template <typename Number>
+inline bool
+Vector<Number>::empty() const
+{
+  return this->size() == 0;
+}
 
 template <typename Number>
 inline void
@@ -1363,6 +1436,14 @@ Vector<Number>::update_ghost_values() const
 
 
 template <typename Number>
+inline MPI_Comm
+Vector<Number>::get_mpi_communicator() const
+{
+  return MPI_COMM_SELF;
+}
+
+
+template <typename Number>
 template <typename Number2>
 inline void
 Vector<Number>::reinit(const Vector<Number2> &v,
@@ -1384,7 +1465,7 @@ Vector<Number>::reinit(const Vector<Number2> &v,
 // swap virtual.
 template <typename Number>
 inline void
-Vector<Number>::swap(Vector<Number> &v)
+Vector<Number>::swap(Vector<Number> &v) noexcept
 {
   values.swap(v.values);
   std::swap(thread_loop_partitioner, v.thread_loop_partitioner);
@@ -1398,7 +1479,7 @@ inline void
 Vector<Number>::save(Archive &ar, const unsigned int) const
 {
   // forward to serialization function in the base class.
-  ar &static_cast<const Subscriptor &>(*this);
+  ar &static_cast<const EnableObserverPointer &>(*this);
   ar &values;
 }
 
@@ -1410,7 +1491,7 @@ inline void
 Vector<Number>::load(Archive &ar, const unsigned int)
 {
   // the load stuff again from the archive
-  ar &static_cast<Subscriptor &>(*this);
+  ar &static_cast<EnableObserverPointer &>(*this);
   ar &values;
   maybe_reset_thread_partitioner();
 }
@@ -1433,7 +1514,7 @@ Vector<Number>::load(Archive &ar, const unsigned int)
  */
 template <typename Number>
 inline void
-swap(Vector<Number> &u, Vector<Number> &v)
+swap(Vector<Number> &u, Vector<Number> &v) noexcept
 {
   u.swap(v);
 }
@@ -1466,7 +1547,7 @@ operator<<(std::ostream &out, const Vector<number> &v)
 
 
 /**
- * Declare dealii::Vector< Number > as serial vector.
+ * Declare Vector<Number> as serial vector.
  *
  * @relatesalso Vector
  */

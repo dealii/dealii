@@ -1,0 +1,18 @@
+
+DEAL:0::OK
+
+DEAL:1::0_2:00: future_fe=0 coarsen=0
+DEAL:1::0_2:01: future_fe=0 coarsen=0
+DEAL:1::0_2:02: future_fe=0 coarsen=0
+DEAL:1::0_2:03: future_fe=0 coarsen=0
+DEAL:1::OK
+
+
+DEAL:2::0_1:1: future_fe=1 coarsen=0
+DEAL:2::OK
+
+
+DEAL:3::0_1:2: future_fe=1 coarsen=0
+DEAL:3::0_1:3: future_fe=1 coarsen=0
+DEAL:3::OK
+

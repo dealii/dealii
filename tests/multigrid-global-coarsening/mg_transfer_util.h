@@ -1,29 +1,29 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2019 - 2023 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2020 - 2024 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 #ifndef dealii_multigrid_transfer_tests_h
 #define dealii_multigrid_transfer_tests_h
 
 #include <deal.II/base/function_lib.h>
 
+#include <deal.II/multigrid/mg_constrained_dofs.h>
+#include <deal.II/multigrid/mg_transfer_global_coarsening.h>
+
 #include <deal.II/numerics/data_out.h>
 #include <deal.II/numerics/vector_tools.h>
 
 #include "../tests.h"
-
-using namespace dealii;
 
 
 
@@ -47,7 +47,7 @@ initialize_dof_vector(LinearAlgebra::distributed::Vector<Number> &vec,
       &(dof_handler.get_triangulation()));
 
   MPI_Comm comm =
-    dist_tria != nullptr ? dist_tria->get_communicator() : MPI_COMM_SELF;
+    dist_tria != nullptr ? dist_tria->get_mpi_communicator() : MPI_COMM_SELF;
 
   vec.reinit(level == numbers::invalid_unsigned_int ?
                dof_handler.locally_owned_dofs() :
@@ -65,6 +65,19 @@ print(const LinearAlgebra::distributed::Vector<Number> &vec)
   deallog << std::endl;
 }
 
+template <typename Number>
+void
+print_if_non_zero(const LinearAlgebra::distributed::Vector<Number> &vec,
+                  const Number                                      tolerance)
+{
+  for (const auto &v : vec)
+    if (std::abs(v) > tolerance)
+      deallog << v << " ";
+    else
+      deallog << 0.0 << " ";
+  deallog << std::endl;
+}
+
 
 template <int dim, typename Number, typename MeshType>
 void
@@ -76,7 +89,9 @@ test_transfer_operator(
   const unsigned int mg_level_fine   = numbers::invalid_unsigned_int,
   const unsigned int mg_level_coarse = numbers::invalid_unsigned_int)
 {
-  AffineConstraints<Number> constraint_fine;
+  AffineConstraints<Number> constraint_fine(
+    dof_handler_fine.locally_owned_dofs(),
+    DoFTools::extract_locally_relevant_dofs(dof_handler_fine));
   DoFTools::make_hanging_node_constraints(dof_handler_fine, constraint_fine);
   constraint_fine.close();
 
@@ -186,7 +201,9 @@ test_non_nested_transfer(
   const unsigned int mg_level_fine   = numbers::invalid_unsigned_int,
   const unsigned int mg_level_coarse = numbers::invalid_unsigned_int)
 {
-  AffineConstraints<Number> constraint_fine;
+  AffineConstraints<Number> constraint_fine(
+    dof_handler_fine.locally_owned_dofs(),
+    DoFTools::extract_locally_relevant_dofs(dof_handler_fine));
   DoFTools::make_hanging_node_constraints(dof_handler_fine, constraint_fine);
   constraint_fine.close();
 

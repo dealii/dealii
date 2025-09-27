@@ -1,17 +1,16 @@
-/* ---------------------------------------------------------------------
+/* ------------------------------------------------------------------------
  *
- * Copyright (C) 2001 - 2023 by the deal.II authors
+ * SPDX-License-Identifier: LGPL-2.1-or-later
+ * Copyright (C) 2002 - 2024 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
- * The deal.II library is free software; you can use it, redistribute
- * it, and/or modify it under the terms of the GNU Lesser General
- * Public License as published by the Free Software Foundation; either
- * version 2.1 of the License, or (at your option) any later version.
- * The full text of the license can be found in the file LICENSE.md at
- * the top level directory of deal.II.
+ * Part of the source code is dual licensed under Apache-2.0 WITH
+ * LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+ * governing the source code and code contributions can be found in
+ * LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
  *
- * ---------------------------------------------------------------------
+ * ------------------------------------------------------------------------
  *
  * Author: Wolfgang Bangerth, University of Heidelberg, 2001, 2002
  */
@@ -24,7 +23,6 @@
 // roughly builds upon previous ones), then C++ standard headers:
 #include <deal.II/base/quadrature_lib.h>
 #include <deal.II/base/function.h>
-#include <deal.II/base/logstream.h>
 #include <deal.II/base/table_handler.h>
 #include <deal.II/base/thread_management.h>
 #include <deal.II/base/work_stream.h>
@@ -92,7 +90,7 @@ namespace Step13
   // old one).  On a related note, you can reuse the evaluation classes for
   // other projects, solving different equations.
   //
-  // In order to improve separation of code into different modules, we put the
+  // In order to improve separation of code into different groups, we put the
   // evaluation classes into a namespace of their own. This makes it easier to
   // actually solve different equations in the same program, by assembling it
   // from existing building blocks. The reason for this is that classes for
@@ -471,7 +469,7 @@ namespace Step13
     // a triangulation in the constructor and storing it henceforth. Since
     // this triangulation will be used throughout all computations, we have to
     // make sure that the triangulation is valid until it is last used. We
-    // do this by keeping a <code>SmartPointer</code> to this triangulation,
+    // do this by keeping a <code>ObserverPointer</code> to this triangulation,
     // as explained in step-7.
     //
     // Note that while the pointer itself is declared constant
@@ -498,7 +496,7 @@ namespace Step13
       virtual unsigned int n_dofs() const                           = 0;
 
     protected:
-      const SmartPointer<Triangulation<dim>> triangulation;
+      const ObserverPointer<Triangulation<dim>> triangulation;
     };
 
 
@@ -570,11 +568,11 @@ namespace Step13
       // member variables, of which the use should be clear from the previous
       // examples:
     protected:
-      const SmartPointer<const FiniteElement<dim>> fe;
-      const SmartPointer<const Quadrature<dim>>    quadrature;
-      DoFHandler<dim>                              dof_handler;
-      Vector<double>                               solution;
-      const SmartPointer<const Function<dim>>      boundary_values;
+      const ObserverPointer<const FiniteElement<dim>> fe;
+      const ObserverPointer<const Quadrature<dim>>    quadrature;
+      DoFHandler<dim>                                 dof_handler;
+      Vector<double>                                  solution;
+      const ObserverPointer<const Function<dim>>      boundary_values;
 
       // Then we declare an abstract function that will be used to assemble
       // the right hand side. As explained above, there are various cases for
@@ -710,7 +708,7 @@ namespace Step13
     // assemble both the matrix and the right hand side. These are
     // independent operations, and we should do this in parallel. To
     // this end, we use the concept of "tasks" that is discussed in
-    // the @ref threads documentation module. In essence, what we want
+    // the @ref threads documentation topic. In essence, what we want
     // to say "here is something that needs to be worked on, go do it
     // whenever a CPU core is available", then do something else, and
     // when we need the result of the first operation wait for its
@@ -998,7 +996,7 @@ namespace Step13
     // constructor takes the same data as does that of the underlying class
     // (to which it passes all information) except for one function object
     // that denotes the right hand side of the problem. A pointer to this
-    // object is stored (again as a <code>SmartPointer</code>, in order to
+    // object is stored (again as a <code>ObserverPointer</code>, in order to
     // make sure that the function object is not deleted as long as it is
     // still used by this class).
     //
@@ -1015,7 +1013,7 @@ namespace Step13
                    const Function<dim>      &boundary_values);
 
     protected:
-      const SmartPointer<const Function<dim>> rhs_function;
+      const ObserverPointer<const Function<dim>> rhs_function;
       virtual void assemble_rhs(Vector<double> &rhs) const override;
     };
 
@@ -1224,9 +1222,9 @@ namespace Step13
   {
     (void)component;
     AssertIndexRange(component, 1);
-    double q = p(0);
+    double q = p[0];
     for (unsigned int i = 1; i < dim; ++i)
-      q += std::sin(10 * p(i) + 5 * p(0) * p(0));
+      q += std::sin(10 * p[i] + 5 * p[0] * p[0]);
     const double exponential = std::exp(q);
     return exponential;
   }
@@ -1248,19 +1246,19 @@ namespace Step13
   {
     (void)component;
     AssertIndexRange(component, 1);
-    double q = p(0);
+    double q = p[0];
     for (unsigned int i = 1; i < dim; ++i)
-      q += std::sin(10 * p(i) + 5 * p(0) * p(0));
+      q += std::sin(10 * p[i] + 5 * p[0] * p[0]);
     const double u  = std::exp(q);
     double       t1 = 1, t2 = 0, t3 = 0;
     for (unsigned int i = 1; i < dim; ++i)
       {
-        t1 += std::cos(10 * p(i) + 5 * p(0) * p(0)) * 10 * p(0);
-        t2 += 10 * std::cos(10 * p(i) + 5 * p(0) * p(0)) -
-              100 * std::sin(10 * p(i) + 5 * p(0) * p(0)) * p(0) * p(0);
-        t3 += 100 * std::cos(10 * p(i) + 5 * p(0) * p(0)) *
-                std::cos(10 * p(i) + 5 * p(0) * p(0)) -
-              100 * std::sin(10 * p(i) + 5 * p(0) * p(0));
+        t1 += std::cos(10 * p[i] + 5 * p[0] * p[0]) * 10 * p[0];
+        t2 += 10 * std::cos(10 * p[i] + 5 * p[0] * p[0]) -
+              100 * std::sin(10 * p[i] + 5 * p[0] * p[0]) * p[0] * p[0];
+        t3 += 100 * std::cos(10 * p[i] + 5 * p[0] * p[0]) *
+                std::cos(10 * p[i] + 5 * p[0] * p[0]) -
+              100 * std::sin(10 * p[i] + 5 * p[0] * p[0]);
       };
     t1 = t1 * t1;
 
@@ -1378,8 +1376,7 @@ namespace Step13
                                                          results_table);
 
     // Also generate an evaluator which writes out the solution:
-    Evaluation::SolutionOutput<dim> postprocessor2(std::string("solution-") +
-                                                     solver_name,
+    Evaluation::SolutionOutput<dim> postprocessor2("solution-" + solver_name,
                                                    DataOutBase::gnuplot);
 
     // Take these two evaluation objects and put them in a list...

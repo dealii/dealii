@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2023 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2023 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 #ifndef dealii_fe_values_base_h
 #define dealii_fe_values_base_h
@@ -20,11 +19,11 @@
 #include <deal.II/base/config.h>
 
 #include <deal.II/base/derivative_form.h>
+#include <deal.II/base/enable_observer_pointer.h>
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/point.h>
 #include <deal.II/base/quadrature.h>
 #include <deal.II/base/std_cxx20/iota_view.h>
-#include <deal.II/base/subscriptor.h>
 #include <deal.II/base/symmetric_tensor.h>
 
 #include <deal.II/dofs/dof_accessor.h>
@@ -44,9 +43,13 @@
 
 #include <deal.II/lac/read_vector.h>
 
+#include <boost/signals2/connection.hpp>
+
 #include <algorithm>
 #include <memory>
+#include <optional>
 #include <type_traits>
+#include <variant>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -126,8 +129,8 @@ DEAL_II_NAMESPACE_OPEN
  * set of functions as above, except that for vector valued finite elements
  * they return only one vector component. This is useful for elements of which
  * shape functions have more than one non-zero component, since then the above
- * functions cannot be used, and you have to walk over all (or only the non-
- * zero) components of the shape function using this set of functions.
+ * functions cannot be used, and you have to walk over all (or only the
+ * non-zero) components of the shape function using this set of functions.
  *
  * <li> get_function_values(), get_function_gradients(), etc.: Compute a
  * finite element function or its derivative in quadrature points.
@@ -150,7 +153,7 @@ DEAL_II_NAMESPACE_OPEN
  * @ingroup feaccess
  */
 template <int dim, int spacedim>
-class FEValuesBase : public Subscriptor
+class FEValuesBase : public EnableObserverPointer
 {
 public:
   /**
@@ -255,8 +258,8 @@ public:
    * subface selected the last time the <tt>reinit</tt> function of the
    * derived class was called.
    *
-   * If the shape function is vector-valued, then this returns the only non-
-   * zero component. If the shape function has more than one non-zero
+   * If the shape function is vector-valued, then this returns the only
+   * non-zero component. If the shape function has more than one non-zero
    * component (i.e. it is not primitive), then throw an exception of type
    * ExcShapeFunctionNotPrimitive. In that case, use the
    * shape_value_component() function.
@@ -307,8 +310,8 @@ public:
    * reference to the gradient's value is returned, there should be no major
    * performance drawback.
    *
-   * If the shape function is vector-valued, then this returns the only non-
-   * zero component. If the shape function has more than one non-zero
+   * If the shape function is vector-valued, then this returns the only
+   * non-zero component. If the shape function has more than one non-zero
    * component (i.e. it is not primitive), then it will throw an exception of
    * type ExcShapeFunctionNotPrimitive. In that case, use the
    * shape_grad_component() function.
@@ -355,8 +358,8 @@ public:
    * one component. Since only a reference to the hessian values is returned,
    * there should be no major performance drawback.
    *
-   * If the shape function is vector-valued, then this returns the only non-
-   * zero component. If the shape function has more than one non-zero
+   * If the shape function is vector-valued, then this returns the only
+   * non-zero component. If the shape function has more than one non-zero
    * component (i.e. it is not primitive), then throw an exception of type
    * ExcShapeFunctionNotPrimitive. In that case, use the
    * shape_hessian_component() function.
@@ -398,8 +401,8 @@ public:
    * to extract one component. Since only a reference to the 3rd derivative
    * values is returned, there should be no major performance drawback.
    *
-   * If the shape function is vector-valued, then this returns the only non-
-   * zero component. If the shape function has more than one non-zero
+   * If the shape function is vector-valued, then this returns the only
+   * non-zero component. If the shape function has more than one non-zero
    * component (i.e. it is not primitive), then throw an exception of type
    * ExcShapeFunctionNotPrimitive. In that case, use the
    * shape_3rdderivative_component() function.
@@ -983,8 +986,9 @@ public:
 
   /**
    * This function does the same as the other
-   * get_function_third_derivatives(), but applied to multi-component (vector-
-   * valued) elements. The meaning of the arguments is as explained there.
+   * get_function_third_derivatives(), but applied to multi-component
+   * (vector-valued) elements. The meaning of the arguments is as explained
+   * there.
    *
    * @post <code>third_derivatives[q]</code> is a vector of third derivatives
    * of the field described by fe_function at the $q$th quadrature point. The
@@ -1404,7 +1408,7 @@ public:
    * concept of views is explained in the documentation of the namespace
    * FEValuesViews and in particular in the
    * @ref vector_valued
-   * module.
+   * topic.
    */
   const FEValuesViews::Scalar<dim, spacedim> &
   operator[](const FEValuesExtractors::Scalar &scalar) const;
@@ -1415,7 +1419,7 @@ public:
    * finite element. The concept of views is explained in the documentation of
    * the namespace FEValuesViews and in particular in the
    * @ref vector_valued
-   * module.
+   * topic.
    */
   const FEValuesViews::Vector<dim, spacedim> &
   operator[](const FEValuesExtractors::Vector &vector) const;
@@ -1427,7 +1431,7 @@ public:
    * is explained in the documentation of the namespace FEValuesViews and in
    * particular in the
    * @ref vector_valued
-   * module.
+   * topic.
    */
   const FEValuesViews::SymmetricTensor<2, dim, spacedim> &
   operator[](const FEValuesExtractors::SymmetricTensor<2> &tensor) const;
@@ -1439,7 +1443,7 @@ public:
    * vector-valued finite element. The concept of views is explained in the
    * documentation of the namespace FEValuesViews and in particular in the
    * @ref vector_valued
-   * module.
+   * topic.
    */
   const FEValuesViews::Tensor<2, dim, spacedim> &
   operator[](const FEValuesExtractors::Tensor<2> &tensor) const;
@@ -1556,8 +1560,18 @@ protected:
    * to the present cell in order to be able to extract the values of the
    * degrees of freedom on this cell in the get_function_values() and assorted
    * functions.
+   *
+   * The problem is that the iterators given to the various reinit() functions
+   * can either be Triangulation iterators, or DoFHandler cell or level
+   * iterators. All three are valid, and provide different functionality that is
+   * used in different contexts; as a consequence we need to be able to store
+   * all three. This class provides the ability to store an object of any of
+   * these types, via a member variable that is a std::variant that encapsulates
+   * an object of any of the three types. Because a std::variant always stores
+   * an object of *one* of these types, we wrap the std::variant object into a
+   * std::optional that allows us to encode a "not yet initialized" state.
    */
-  class CellIteratorContainer
+  class CellIteratorWrapper
   {
   public:
     DeclExceptionMsg(
@@ -1571,22 +1585,28 @@ protected:
       "degrees of freedom, such as DoFHandler<dim,spacedim>::cell_iterator.");
 
     /**
-     * Constructor.
+     * Constructor. Creates an unusable object that is not associated with
+     * any cell at all.
      */
-    CellIteratorContainer();
+    CellIteratorWrapper() = default;
 
     /**
      * Constructor.
      */
-    template <bool lda>
-    CellIteratorContainer(
-      const TriaIterator<DoFCellAccessor<dim, spacedim, lda>> &cell);
-
-    /**
-     * Constructor.
-     */
-    CellIteratorContainer(
+    CellIteratorWrapper(
       const typename Triangulation<dim, spacedim>::cell_iterator &cell);
+
+    /**
+     * Constructor.
+     */
+    CellIteratorWrapper(
+      const typename DoFHandler<dim, spacedim>::cell_iterator &cell);
+
+    /**
+     * Constructor.
+     */
+    CellIteratorWrapper(
+      const typename DoFHandler<dim, spacedim>::level_cell_iterator &cell);
 
     /**
      * Indicate whether FEValues::reinit() was called.
@@ -1618,19 +1638,17 @@ protected:
     get_interpolated_dof_values(const ReadVector<Number> &in,
                                 Vector<Number>           &out) const;
 
-    /**
-     * Call @p get_interpolated_dof_values of the iterator with the
-     * given arguments.
-     */
-    void
-    get_interpolated_dof_values(const IndexSet               &in,
-                                Vector<IndexSet::value_type> &out) const;
-
   private:
-    bool                                                 initialized;
-    typename Triangulation<dim, spacedim>::cell_iterator cell;
-    const DoFHandler<dim, spacedim>                     *dof_handler;
-    bool                                                 level_dof_access;
+    /**
+     * The cell in question, if one has been assigned to this object. The
+     * concrete data type can either be a Triangulation cell iterator, a
+     * DoFHandler cell iterator, or a DoFHandler level cell iterator.
+     */
+    std::optional<
+      std::variant<typename Triangulation<dim, spacedim>::cell_iterator,
+                   typename DoFHandler<dim, spacedim>::cell_iterator,
+                   typename DoFHandler<dim, spacedim>::level_cell_iterator>>
+      cell;
   };
 
   /**
@@ -1638,7 +1656,7 @@ protected:
    * is necessary for the <tt>get_function_*</tt> functions as well as the
    * functions of same name in the extractor classes.
    */
-  CellIteratorContainer present_cell;
+  CellIteratorWrapper present_cell;
 
   /**
    * A signal connection we use to ensure we get informed whenever the
@@ -1682,7 +1700,8 @@ protected:
   /**
    * A pointer to the mapping object associated with this FEValues object.
    */
-  const SmartPointer<const Mapping<dim, spacedim>, FEValuesBase<dim, spacedim>>
+  const ObserverPointer<const Mapping<dim, spacedim>,
+                        FEValuesBase<dim, spacedim>>
     mapping;
 
   /**
@@ -1704,8 +1723,8 @@ protected:
    * A pointer to the finite element object associated with this FEValues
    * object.
    */
-  const SmartPointer<const FiniteElement<dim, spacedim>,
-                     FEValuesBase<dim, spacedim>>
+  const ObserverPointer<const FiniteElement<dim, spacedim>,
+                        FEValuesBase<dim, spacedim>>
     fe;
 
   /**
@@ -1785,26 +1804,16 @@ private:
 /*---------------------- Inline functions: FEValuesBase ---------------------*/
 
 template <int dim, int spacedim>
-template <bool lda>
-inline FEValuesBase<dim, spacedim>::CellIteratorContainer::
-  CellIteratorContainer(
-    const TriaIterator<DoFCellAccessor<dim, spacedim, lda>> &cell)
-  : initialized(true)
-  , cell(cell)
-  , dof_handler(&cell->get_dof_handler())
-  , level_dof_access(lda)
-{}
-
-
-
-template <int dim, int spacedim>
 inline const FEValuesViews::Scalar<dim, spacedim> &
 FEValuesBase<dim, spacedim>::operator[](
   const FEValuesExtractors::Scalar &scalar) const
 {
   AssertIndexRange(scalar.component, fe_values_views_cache.scalars.size());
 
-  return fe_values_views_cache.scalars[scalar.component];
+  return fe_values_views_cache.scalars[scalar.component].value_or_initialize(
+    [scalar, this]() {
+      return FEValuesViews::Scalar<dim, spacedim>(*this, scalar.component);
+    });
 }
 
 
@@ -1817,7 +1826,11 @@ FEValuesBase<dim, spacedim>::operator[](
   AssertIndexRange(vector.first_vector_component,
                    fe_values_views_cache.vectors.size());
 
-  return fe_values_views_cache.vectors[vector.first_vector_component];
+  return fe_values_views_cache.vectors[vector.first_vector_component]
+    .value_or_initialize([vector, this]() {
+      return FEValuesViews::Vector<dim, spacedim>(
+        *this, vector.first_vector_component);
+    });
 }
 
 
@@ -1835,7 +1848,11 @@ FEValuesBase<dim, spacedim>::operator[](
                   fe_values_views_cache.symmetric_second_order_tensors.size()));
 
   return fe_values_views_cache
-    .symmetric_second_order_tensors[tensor.first_tensor_component];
+    .symmetric_second_order_tensors[tensor.first_tensor_component]
+    .value_or_initialize([tensor, this]() {
+      return FEValuesViews::SymmetricTensor<2, dim, spacedim>(
+        *this, tensor.first_tensor_component);
+    });
 }
 
 
@@ -1849,7 +1866,11 @@ FEValuesBase<dim, spacedim>::operator[](
                    fe_values_views_cache.second_order_tensors.size());
 
   return fe_values_views_cache
-    .second_order_tensors[tensor.first_tensor_component];
+    .second_order_tensors[tensor.first_tensor_component]
+    .value_or_initialize([tensor, this]() {
+      return FEValuesViews::Tensor<2, dim, spacedim>(
+        *this, tensor.first_tensor_component);
+    });
 }
 
 
@@ -2328,7 +2349,8 @@ template <int dim, int spacedim>
 inline std_cxx20::ranges::iota_view<unsigned int, unsigned int>
 FEValuesBase<dim, spacedim>::dof_indices() const
 {
-  return {0U, dofs_per_cell};
+  return std_cxx20::ranges::iota_view<unsigned int, unsigned int>(
+    0U, dofs_per_cell);
 }
 
 
@@ -2340,7 +2362,8 @@ FEValuesBase<dim, spacedim>::dof_indices_starting_at(
 {
   Assert(start_dof_index <= dofs_per_cell,
          ExcIndexRange(start_dof_index, 0, dofs_per_cell + 1));
-  return {start_dof_index, dofs_per_cell};
+  return std_cxx20::ranges::iota_view<unsigned int, unsigned int>(
+    start_dof_index, dofs_per_cell);
 }
 
 
@@ -2352,7 +2375,8 @@ FEValuesBase<dim, spacedim>::dof_indices_ending_at(
 {
   Assert(end_dof_index < dofs_per_cell,
          ExcIndexRange(end_dof_index, 0, dofs_per_cell));
-  return {0U, end_dof_index + 1};
+  return std_cxx20::ranges::iota_view<unsigned int, unsigned int>(
+    0U, end_dof_index + 1);
 }
 
 
@@ -2361,7 +2385,8 @@ template <int dim, int spacedim>
 inline std_cxx20::ranges::iota_view<unsigned int, unsigned int>
 FEValuesBase<dim, spacedim>::quadrature_point_indices() const
 {
-  return {0U, n_quadrature_points};
+  return std_cxx20::ranges::iota_view<unsigned int, unsigned int>(
+    0U, n_quadrature_points);
 }
 
 

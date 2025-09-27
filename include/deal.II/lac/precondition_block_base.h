@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 1999 - 2020 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2010 - 2024 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 #ifndef dealii_precondition_block_base_h
 #define dealii_precondition_block_base_h
@@ -19,10 +18,11 @@
 
 #include <deal.II/base/config.h>
 
+#include <deal.II/base/enable_observer_pointer.h>
 #include <deal.II/base/exceptions.h>
+#include <deal.II/base/logstream.h>
 #include <deal.II/base/memory_consumption.h>
-#include <deal.II/base/smartpointer.h>
-#include <deal.II/base/subscriptor.h>
+#include <deal.II/base/observer_pointer.h>
 
 #include <deal.II/lac/householder.h>
 #include <deal.II/lac/lapack_full_matrix.h>
@@ -356,7 +356,7 @@ PreconditionBlockBase<number>::reinit(unsigned int n,
             var_inverse_svd[0].reinit(b, b);
             break;
           default:
-            Assert(false, ExcNotImplemented());
+            DEAL_II_NOT_IMPLEMENTED();
         }
 
       if (store_diagonals())
@@ -400,7 +400,7 @@ PreconditionBlockBase<number>::reinit(unsigned int n,
               break;
             }
           default:
-            Assert(false, ExcNotImplemented());
+            DEAL_II_NOT_IMPLEMENTED();
         }
     }
 }
@@ -437,7 +437,7 @@ PreconditionBlockBase<number>::inverse_vmult(size_type              i,
         var_inverse_svd[ii].vmult(dst, src);
         break;
       default:
-        Assert(false, ExcNotImplemented());
+        DEAL_II_NOT_IMPLEMENTED();
     }
 }
 
@@ -466,7 +466,7 @@ PreconditionBlockBase<number>::inverse_Tvmult(size_type              i,
         var_inverse_svd[ii].Tvmult(dst, src);
         break;
       default:
-        Assert(false, ExcNotImplemented());
+        DEAL_II_NOT_IMPLEMENTED();
     }
 }
 
@@ -657,7 +657,7 @@ PreconditionBlockBase<number>::log_statistics() const
     }
   else
     {
-      Assert(false, ExcNotImplemented());
+      DEAL_II_NOT_IMPLEMENTED();
     }
 }
 

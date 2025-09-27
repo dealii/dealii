@@ -1,26 +1,31 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2021 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2016 - 2024 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 
 
-for (V1 : VECTORS_WITH_MATRIX)
+for (V1 : VECTORS_WITHOUT_LAVEC)
   {
     template class MGLevelGlobalTransfer<V1>;
   }
 
-for (deal_II_dimension : DIMENSIONS; V1 : VECTORS_WITH_MATRIX)
+for (S1 : REAL_SCALARS)
+  {
+    template class MGLevelGlobalTransfer<
+      LinearAlgebra::distributed::Vector<S1, MemorySpace::Host>>;
+  }
+
+for (deal_II_dimension : DIMENSIONS; V1 : VECTORS_WITHOUT_LAVEC)
   {
     template void MGLevelGlobalTransfer<V1>::
       fill_and_communicate_copy_indices<deal_II_dimension, deal_II_dimension>(
@@ -44,42 +49,60 @@ for (deal_II_dimension : DIMENSIONS; V1, V2 : DEAL_II_VEC_TEMPLATES;
       const MGLevelObject<V1<S1>> &) const;
   }
 
-for (deal_II_dimension : DIMENSIONS)
+for (deal_II_dimension : DIMENSIONS; S1 : REAL_SCALARS)
   {
-    template void
-    MGLevelGlobalTransfer<LinearAlgebra::distributed::Vector<float>>::
+    template void MGLevelGlobalTransfer<
+      LinearAlgebra::distributed::Vector<S1, MemorySpace::Host>>::
       fill_and_communicate_copy_indices<deal_II_dimension, deal_II_dimension>(
         const DoFHandler<deal_II_dimension, deal_II_dimension> &mg_dof);
   }
 
 for (deal_II_dimension : DIMENSIONS; S1, S2 : REAL_SCALARS)
   {
-    template void
-    MGLevelGlobalTransfer<LinearAlgebra::distributed::Vector<S1>>::copy_to_mg(
-      const DoFHandler<deal_II_dimension> &,
-      MGLevelObject<LinearAlgebra::distributed::Vector<S1>> &,
-      const LinearAlgebra::distributed::Vector<S2> &,
-      const bool) const;
+    template void MGLevelGlobalTransfer<
+      LinearAlgebra::distributed::Vector<S1, MemorySpace::Host>>::
+      copy_to_mg(
+        const DoFHandler<deal_II_dimension> &,
+        MGLevelObject<LinearAlgebra::distributed::Vector<S1, MemorySpace::Host>>
+          &,
+        const LinearAlgebra::distributed::Vector<S2, MemorySpace::Host> &,
+        const bool) const;
+
+    // template void
+    //     MGLevelGlobalTransfer<LinearAlgebra::distributed::Vector<S1,
+    //     MemorySpace::Default>>::copy_to_mg( const
+    //     DoFHandler<deal_II_dimension> &,
+    //   MGLevelObject<LinearAlgebra::distributed::Vector<S1,
+    //   MemorySpace::Host>>
+    //   &,
+    //  const LinearAlgebra::distributed::Vector<S2, MemorySpace::Host> &,
+    //  const bool) const;
   }
 
 for (deal_II_dimension : DIMENSIONS; S1, S2 : REAL_SCALARS)
   {
-    template void
-    MGLevelGlobalTransfer<LinearAlgebra::distributed::Vector<S1>>::copy_to_mg(
-      const DoFHandler<deal_II_dimension> &,
-      MGLevelObject<LinearAlgebra::distributed::Vector<S1>> &,
-      const LinearAlgebra::distributed::Vector<S2> &) const;
-    template void
-    MGLevelGlobalTransfer<LinearAlgebra::distributed::Vector<S1>>::copy_from_mg(
-      const DoFHandler<deal_II_dimension> &,
-      LinearAlgebra::distributed::Vector<S2> &,
-      const MGLevelObject<LinearAlgebra::distributed::Vector<S1>> &) const;
-    template void
-    MGLevelGlobalTransfer<LinearAlgebra::distributed::Vector<S1>>::
+    template void MGLevelGlobalTransfer<
+      LinearAlgebra::distributed::Vector<S1, MemorySpace::Host>>::
+      copy_to_mg(
+        const DoFHandler<deal_II_dimension> &,
+        MGLevelObject<LinearAlgebra::distributed::Vector<S1, MemorySpace::Host>>
+          &,
+        const LinearAlgebra::distributed::Vector<S2, MemorySpace::Host> &)
+        const;
+    template void MGLevelGlobalTransfer<
+      LinearAlgebra::distributed::Vector<S1, MemorySpace::Host>>::
+      copy_from_mg(
+        const DoFHandler<deal_II_dimension> &,
+        LinearAlgebra::distributed::Vector<S2, MemorySpace::Host> &,
+        const MGLevelObject<
+          LinearAlgebra::distributed::Vector<S1, MemorySpace::Host>> &) const;
+    template void MGLevelGlobalTransfer<
+      LinearAlgebra::distributed::Vector<S1, MemorySpace::Host>>::
       copy_from_mg_add(
         const DoFHandler<deal_II_dimension> &,
-        LinearAlgebra::distributed::Vector<S2> &,
-        const MGLevelObject<LinearAlgebra::distributed::Vector<S1>> &) const;
+        LinearAlgebra::distributed::Vector<S2, MemorySpace::Host> &,
+        const MGLevelObject<
+          LinearAlgebra::distributed::Vector<S1, MemorySpace::Host>> &) const;
   }
 
 for (deal_II_dimension : DIMENSIONS)

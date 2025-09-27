@@ -1,0 +1,16 @@
+20a21
+> #include "../example_test.h"
+495c496,500
+<     solver.solve(system_matrix, solution, right_hand_side, preconditioner);
+---
+>     check_solver_within_range(std::cout,
+> 			      solver.solve(system_matrix, solution, right_hand_side, preconditioner),
+> 			      solver_control.last_step(),
+> 			      3,
+> 			      100);
+497,498c502,503
+<     std::cout << "  Solver converged in " << solver_control.last_step()
+<               << " iterations." << std::endl;
+---
+>     //std::cout << "  Solver converged in " << solver_control.last_step()
+>     //          << " iterations." << std::endl;

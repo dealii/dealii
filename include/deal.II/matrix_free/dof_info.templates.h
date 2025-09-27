@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2011 - 2022 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2012 - 2024 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 #ifndef dealii_matrix_free_dof_info_templates_h
 #define dealii_matrix_free_dof_info_templates_h
@@ -244,7 +243,8 @@ namespace internal
     template <int length>
     void
     DoFInfo::compute_face_index_compression(
-      const std::vector<FaceToCellTopology<length>> &faces)
+      const std::vector<FaceToCellTopology<length>> &faces,
+      const bool hold_all_faces_to_owned_cells)
     {
       AssertDimension(length, vectorization_length);
 
@@ -257,20 +257,33 @@ namespace internal
       n_vectorization_lanes_filled[dof_access_face_interior].resize(
         faces.size());
 
-      // all interior faces come before the boundary faces
-      unsigned int n_exterior_faces = 0;
-      for (; n_exterior_faces < faces.size(); ++n_exterior_faces)
-        if (faces[n_exterior_faces].cells_exterior[0] ==
+      // all inner faces come before the boundary faces
+      unsigned int n_inner_faces = 0;
+      for (; n_inner_faces < faces.size(); ++n_inner_faces)
+        if (faces[n_inner_faces].cells_exterior[0] ==
             numbers::invalid_unsigned_int)
           break;
+
+      // all boundary faces come after the inner faces and before the ghosted
+      // inner faces
+      unsigned int n_boundary_faces = 0;
+      for (; n_inner_faces + n_boundary_faces < faces.size();
+           ++n_boundary_faces)
+        if (faces[n_inner_faces + n_boundary_faces].cells_exterior[0] !=
+            numbers::invalid_unsigned_int)
+          break;
+
+      const unsigned int size_exterior_faces =
+        hold_all_faces_to_owned_cells ? faces.size() : n_inner_faces;
+
       index_storage_variants[dof_access_face_exterior].resize(
-        n_exterior_faces, IndexStorageVariants::full);
+        size_exterior_faces, IndexStorageVariants::full);
       dof_indices_contiguous[dof_access_face_exterior].resize(
-        n_exterior_faces * length, numbers::invalid_unsigned_int);
+        size_exterior_faces * length, numbers::invalid_unsigned_int);
       dof_indices_interleave_strides[dof_access_face_exterior].resize(
         faces.size() * length, numbers::invalid_unsigned_int);
       n_vectorization_lanes_filled[dof_access_face_exterior].resize(
-        n_exterior_faces);
+        size_exterior_faces);
 
       for (unsigned int face = 0; face < faces.size(); ++face)
         {
@@ -363,7 +376,9 @@ namespace internal
 
           face_computation(dof_access_face_interior,
                            faces[face].cells_interior);
-          if (face < n_exterior_faces)
+          if (face < n_inner_faces ||
+              (hold_all_faces_to_owned_cells &&
+               face >= (n_inner_faces + n_boundary_faces)))
             face_computation(dof_access_face_exterior,
                              faces[face].cells_exterior);
         }

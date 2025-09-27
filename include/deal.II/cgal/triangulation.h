@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2022 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2022 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 #ifndef dealii_cgal_triangulation_h
 #define dealii_cgal_triangulation_h
@@ -21,14 +20,20 @@
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/function.h>
 
-#include <deal.II/grid/tria.h>
-
 #include <deal.II/cgal/utilities.h>
 
+#include <deal.II/grid/tria.h>
+#include <deal.II/grid/tria_description.h>
+
 #ifdef DEAL_II_WITH_CGAL
+#  include <deal.II/cgal/surface_mesh.h>
 
 #  include <boost/hana.hpp>
 
+#  include <CGAL/version.h>
+#  if CGAL_VERSION_MAJOR >= 6
+#    include <CGAL/Installation/internal/disable_deprecation_warnings_and_errors.h>
+#  endif
 #  include <CGAL/Complex_2_in_triangulation_3.h>
 #  include <CGAL/IO/facets_in_complex_2_to_triangle_mesh.h>
 #  include <CGAL/Implicit_surface_3.h>
@@ -43,7 +48,6 @@
 #  include <CGAL/Triangulation_3.h>
 #  include <CGAL/make_mesh_3.h>
 #  include <CGAL/make_surface_mesh.h>
-#  include <deal.II/cgal/surface_mesh.h>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -388,7 +392,7 @@ namespace CGALWrappers
             }
         else
           {
-            Assert(false, ExcInternalError());
+            DEAL_II_ASSERT_UNREACHABLE();
           }
       }
     else if constexpr (decltype(has_cells(cgal_triangulation)){})
@@ -439,7 +443,7 @@ namespace CGALWrappers
             }
         else
           {
-            Assert(false, ExcInternalError());
+            DEAL_II_ASSERT_UNREACHABLE();
           }
       }
     dealii_triangulation.create_triangulation(vertices, cells, subcell_data);
@@ -563,6 +567,14 @@ namespace CGALWrappers
 } // namespace CGALWrappers
 #  endif // doxygen
 
+DEAL_II_NAMESPACE_CLOSE
+
+#else
+
+// Make sure the scripts that create the C++20 module input files have
+// something to latch on if the preprocessor #ifdef above would
+// otherwise lead to an empty content of the file.
+DEAL_II_NAMESPACE_OPEN
 DEAL_II_NAMESPACE_CLOSE
 
 #endif

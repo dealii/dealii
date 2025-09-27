@@ -1,0 +1,18 @@
+
+DEAL::Working with FE_DGQ<2>(1) and 64 dofs
+DEAL::FEPointEvaluation verification: 0.0
+DEAL::
+DEAL::Working with FE_DGQ<2>(2) and 144 dofs
+DEAL::FEPointEvaluation verification: 0.0
+DEAL::
+DEAL::Working with FE_DGQ<3>(1) and 512 dofs
+DEAL::FEPointEvaluation verification: 0.0
+DEAL::
+DEAL::Working with FE_DGQ<3>(2) and 1728 dofs
+DEAL::FEPointEvaluation verification: 0.0
+DEAL::
+DEAL::Working with FE_DGQ<2>(1) and 96 dofs
+DEAL::FEPointEvaluation verification: 0.0
+DEAL::
+DEAL::Working with FE_DGQ<2>(2) and 216 dofs
+DEAL::FEPointEvaluation verification: 0.0

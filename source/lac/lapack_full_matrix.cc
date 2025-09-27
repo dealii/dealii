@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2005 - 2023 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2005 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 #include <deal.II/base/numbers.h>
 
@@ -417,7 +416,6 @@ template <typename number>
 LAPACKFullMatrix<number> &
 LAPACKFullMatrix<number>::operator=(const number d)
 {
-  (void)d;
   Assert(d == number(0), ExcScalarAssignmentOnlyForZeroValue());
 
   if (this->n_elements() != 0)
@@ -1505,7 +1503,6 @@ LAPACKFullMatrix<number>::compute_cholesky_factorization()
 
   const types::blas_int mm = this->m();
   const types::blas_int nn = this->n();
-  (void)mm;
   Assert(mm == nn, ExcDimensionMismatch(mm, nn));
 
   number *const         values = this->values.data();
@@ -2523,7 +2520,8 @@ LAPACKFullMatrix<number>::print_formatted(std::ostream      &out,
                                           const unsigned int width_,
                                           const char        *zero_string,
                                           const double       denominator,
-                                          const double       threshold) const
+                                          const double       threshold,
+                                          const char        *separator) const
 {
   unsigned int width = width_;
 
@@ -2559,11 +2557,11 @@ LAPACKFullMatrix<number>::print_formatted(std::ostream      &out,
         // we might have complex numbers, so use abs also to check for nan
         // since there is no isnan on complex numbers
         if (numbers::is_nan(std::abs((*this)(i, j))))
-          out << std::setw(width) << (*this)(i, j) << ' ';
+          out << std::setw(width) << (*this)(i, j) << separator;
         else if (std::abs(this->el(i, j)) > threshold)
-          out << std::setw(width) << this->el(i, j) * denominator << ' ';
+          out << std::setw(width) << this->el(i, j) * denominator << separator;
         else
-          out << std::setw(width) << zero_string << ' ';
+          out << std::setw(width) << zero_string << separator;
       out << std::endl;
     }
 
@@ -2571,6 +2569,15 @@ LAPACKFullMatrix<number>::print_formatted(std::ostream      &out,
   // reset output format
   out.flags(old_flags);
   out.precision(old_precision);
+}
+
+
+
+template <typename number>
+LAPACKSupport::State
+LAPACKFullMatrix<number>::get_state() const
+{
+  return this->state;
 }
 
 
@@ -2642,7 +2649,7 @@ PreconditionLU<number>::Tvmult(BlockVector<number>       &dst,
 
 
 
-#include "lapack_full_matrix.inst"
+#include "lac/lapack_full_matrix.inst"
 
 
 DEAL_II_NAMESPACE_CLOSE

@@ -1,26 +1,25 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 1999 - 2023 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2002 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 #ifndef dealii_sparse_matrix_h
 #define dealii_sparse_matrix_h
 
 #include <deal.II/base/config.h>
 
+#include <deal.II/base/enable_observer_pointer.h>
 #include <deal.II/base/mpi_stub.h>
-#include <deal.II/base/smartpointer.h>
-#include <deal.II/base/subscriptor.h>
+#include <deal.II/base/observer_pointer.h>
 
 #include <deal.II/lac/exceptions.h>
 #include <deal.II/lac/identity_matrix.h>
@@ -464,9 +463,9 @@ namespace SparseMatrixIterators
 
 } // namespace SparseMatrixIterators
 
-DEAL_II_NAMESPACE_CLOSE
+DEAL_II_NAMESPACE_CLOSE // Do not convert for module purposes
 
-namespace std
+  namespace std
 {
   template <typename number, bool Constness>
   struct iterator_traits<
@@ -481,43 +480,43 @@ namespace std
   };
 } // namespace std
 
-DEAL_II_NAMESPACE_OPEN
+DEAL_II_NAMESPACE_OPEN // Do not convert for module purposes
 
-/**
- * @}
- */
+  /**
+   * @}
+   */
 
 
-// TODO: Add multithreading to the other vmult functions.
+  // TODO: Add multithreading to the other vmult functions.
 
-/**
- * Sparse matrix. This class implements the functionality to store matrix
- * entry values in the locations denoted by a SparsityPattern. See
- * @ref Sparsity
- * for a discussion about the separation between sparsity patterns and
- * matrices.
- *
- * The elements of a SparseMatrix are stored in the same order in which the
- * SparsityPattern class stores its entries. Within each row, elements are
- * generally stored left-to-right in increasing column index order; the
- * exception to this rule is that if the matrix is square (m() == n()), then
- * the diagonal entry is stored as the first element in each row to make
- * operations like applying a Jacobi or SSOR preconditioner faster. As a
- * consequence, if you traverse the elements of a row of a SparseMatrix with
- * the help of iterators into this object (using SparseMatrix::begin and
- * SparseMatrix::end) you will find that the elements are not sorted by column
- * index within each row whenever the matrix is square.
- *
- * @note Instantiations for this template are provided for <tt>@<float@> and
- * @<double@></tt>; others can be generated in application programs (see the
- * section on
- * @ref Instantiations
- * in the manual).
- *
- * @ingroup Matrix1
- */
-template <typename number>
-class SparseMatrix : public virtual Subscriptor
+  /**
+   * Sparse matrix. This class implements the functionality to store matrix
+   * entry values in the locations denoted by a SparsityPattern. See
+   * @ref Sparsity
+   * for a discussion about the separation between sparsity patterns and
+   * matrices.
+   *
+   * The elements of a SparseMatrix are stored in the same order in which the
+   * SparsityPattern class stores its entries. Within each row, elements are
+   * generally stored left-to-right in increasing column index order; the
+   * exception to this rule is that if the matrix is square (m() == n()), then
+   * the diagonal entry is stored as the first element in each row to make
+   * operations like applying a Jacobi or SSOR preconditioner faster. As a
+   * consequence, if you traverse the elements of a row of a SparseMatrix with
+   * the help of iterators into this object (using SparseMatrix::begin and
+   * SparseMatrix::end) you will find that the elements are not sorted by column
+   * index within each row whenever the matrix is square.
+   *
+   * @note Instantiations for this template are provided for <tt>@<float@> and
+   * @<double@></tt>; others can be generated in application programs (see the
+   * section on
+   * @ref Instantiations
+   * in the manual).
+   *
+   * @ingroup Matrix1
+   */
+  template <typename number>
+  class SparseMatrix : public virtual EnableObserverPointer
 {
 public:
   /**
@@ -1322,8 +1321,8 @@ public:
    * Return the $l_1$-norm of the matrix, that is $|M|_1=\max_{\mathrm{all\
    * columns\ }j}\sum_{\mathrm{all\ rows\ } i} |M_{ij}|$, (max. sum of
    * columns).  This is the natural matrix norm that is compatible to the
-   * $l_1$-norm for vectors, i.e.  $|Mv|_1\leq |M|_1 |v|_1$. (cf. Haemmerlin-
-   * Hoffmann: Numerische Mathematik)
+   * $l_1$-norm for vectors, i.e.  $|Mv|_1\leq |M|_1 |v|_1$. (cf.
+   * Haemmerlin-Hoffmann: Numerische Mathematik)
    */
   real_type
   l1_norm() const;
@@ -1584,23 +1583,25 @@ public:
         const bool  diagonal_first = true) const;
 
   /**
-   * Print the matrix in the usual format, i.e. as a matrix and not as a list
+   * Print the matrix in the usual format, i.e., as a matrix and not as a list
    * of nonzero elements. For better readability, elements not in the matrix
    * are displayed as empty space, while matrix elements which are explicitly
    * set to zero are displayed as such.
    *
    * The parameters allow for a flexible setting of the output format:
-   * <tt>precision</tt> and <tt>scientific</tt> are used to determine the
-   * number format, where <tt>scientific = false</tt> means fixed point
-   * notation.  A zero entry for <tt>width</tt> makes the function compute a
-   * width, but it may be changed to a positive value, if output is crude.
+   * @p precision and @p scientific are used to determine the number format,
+   * where <code>scientific = false</code> means fixed point notation. A zero
+   * entry for @p width makes the function compute a width, but it may be
+   * changed to a positive value, if output is crude.
    *
-   * Additionally, a character for an empty value may be specified.
+   * Additionally, a character for an empty value may be specified in
+   * @p zero_string, and a character to separate row entries can be set in
+   * @p separator.
    *
-   * Finally, the whole matrix can be multiplied with a common denominator to
-   * produce more readable output, even integers.
+   * Finally, the whole matrix can be multiplied with a common @p denominator
+   * to produce more readable output, even integers.
    *
-   * @attention This function may produce <b>large</b> amounts of output if
+   * @attention This function may produce @em large amounts of output if
    * applied to a large matrix!
    */
   void
@@ -1609,7 +1610,8 @@ public:
                   const bool         scientific  = true,
                   const unsigned int width       = 0,
                   const char        *zero_string = " ",
-                  const double       denominator = 1.) const;
+                  const double       denominator = 1.,
+                  const char        *separator   = " ") const;
 
   /**
    * Print the actual pattern of the matrix. For each entry with an absolute
@@ -1740,9 +1742,9 @@ private:
   /**
    * Pointer to the sparsity pattern used for this matrix. In order to
    * guarantee that it is not deleted while still in use, we subscribe to it
-   * using the SmartPointer class.
+   * using the ObserverPointer class.
    */
-  SmartPointer<const SparsityPattern, SparseMatrix<number>> cols;
+  ObserverPointer<const SparsityPattern, SparseMatrix<number>> cols;
 
   /**
    * Array of values for all the nonzero entries. The position of an
@@ -1813,6 +1815,7 @@ SparseMatrix<number>::m() const
 }
 
 
+
 template <typename number>
 inline typename SparseMatrix<number>::size_type
 SparseMatrix<number>::n() const
@@ -1820,6 +1823,17 @@ SparseMatrix<number>::n() const
   Assert(cols != nullptr, ExcNeedsSparsityPattern());
   return cols->cols;
 }
+
+
+
+template <typename number>
+inline const SparsityPattern &
+SparseMatrix<number>::get_sparsity_pattern() const
+{
+  Assert(cols != nullptr, ExcNeedsSparsityPattern());
+  return *cols;
+}
+
 
 
 // Inline the set() and add() functions, since they will be called frequently.

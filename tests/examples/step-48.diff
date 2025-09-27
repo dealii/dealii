@@ -1,0 +1,49 @@
+351c351
+<     , n_global_refinements(10 - 2 * dim)
+---
+>     , n_global_refinements(9 - 2 * dim)
+354c354
+<     , final_time(10.)
+---
+>     , final_time(-5.)
+497c497
+< 
+---
+>     (void)timestep_number;
+521,533d520
+<     {
+<       pcout << "Number of MPI ranks:            "
+<             << Utilities::MPI::n_mpi_processes(MPI_COMM_WORLD) << std::endl;
+<       pcout << "Number of threads on each rank: "
+<             << MultithreadInfo::n_threads() << std::endl;
+<       const unsigned int n_vect_doubles = VectorizedArray<double>::size();
+<       const unsigned int n_vect_bits    = 8 * sizeof(double) * n_vect_doubles;
+<       pcout << "Vectorization over " << n_vect_doubles
+<             << " doubles = " << n_vect_bits << " bits ("
+<             << Utilities::System::get_current_vectorization_level() << ')'
+<             << std::endl
+<             << std::endl;
+<     }
+595,596d581
+<     double wtime       = 0;
+<     double output_time = 0;
+604,606c589
+<         wtime += timer.wall_time();
+< 
+<         timer.restart();
+---
+> //
+609,610d591
+< 
+<         output_time += timer.wall_time();
+612d592
+<     timer.restart();
+614d593
+<     output_time += timer.wall_time();
+618,623d596
+< 
+<     pcout << "   Average wallclock time per time step: "
+<           << wtime / timestep_number << 's' << std::endl;
+< 
+<     pcout << "   Spent " << output_time << "s on output and " << wtime
+<           << "s on computations." << std::endl;

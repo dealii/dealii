@@ -1,0 +1,8 @@
+497c497
+<     for (unsigned int refinement_cycle = 0; refinement_cycle < 6;
+---
+>     for (unsigned int refinement_cycle = 0; refinement_cycle < 4;
+585c585
+<         computing_timer.print_summary();
+---
+>         //computing_timer.print_summary();

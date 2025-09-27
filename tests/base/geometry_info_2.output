@@ -39,21 +39,21 @@ DEAL:2d::face normal1 +x0
 DEAL:2d::face normal2 -x1
 DEAL:2d::face normal3 +x1
 DEAL:2d::face_children0[true ] 0 2
-DEAL:2d::face_children0[false] 0 2
+DEAL:2d::face_children0[false] 2 0
 DEAL:2d::face_children1[true ] 1 3
-DEAL:2d::face_children1[false] 1 3
+DEAL:2d::face_children1[false] 3 1
 DEAL:2d::face_children2[true ] 0 1
-DEAL:2d::face_children2[false] 0 1
+DEAL:2d::face_children2[false] 1 0
 DEAL:2d::face_children3[true ] 2 3
-DEAL:2d::face_children3[false] 2 3
+DEAL:2d::face_children3[false] 3 2
 DEAL:2d::face_vertices0[true ] 0 2
-DEAL:2d::face_vertices0[false] 0 2
+DEAL:2d::face_vertices0[false] 2 0
 DEAL:2d::face_vertices1[true ] 1 3
-DEAL:2d::face_vertices1[false] 1 3
+DEAL:2d::face_vertices1[false] 3 1
 DEAL:2d::face_vertices2[true ] 0 1
-DEAL:2d::face_vertices2[false] 0 1
+DEAL:2d::face_vertices2[false] 1 0
 DEAL:2d::face_vertices3[true ] 2 3
-DEAL:2d::face_vertices3[false] 2 3
+DEAL:2d::face_vertices3[false] 3 2
 DEAL:2d::face_lines0[true ] 0
 DEAL:2d::face_lines0[false] 0
 DEAL:2d::face_lines1[true ] 1

@@ -1,18 +1,18 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2023 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 1998 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
+#include <deal.II/base/exceptions.h>
 #include <deal.II/base/job_identifier.h>
 #include <deal.II/base/logstream.h>
 #include <deal.II/base/thread_management.h>
@@ -21,6 +21,7 @@
 #include <iomanip>
 #include <iostream>
 #include <sstream>
+#include <stack>
 #include <thread>
 
 
@@ -307,7 +308,7 @@ LogStream::push(const std::string &text)
     pre = get_prefixes().top();
 
   pre += text;
-  pre += std::string(":");
+  pre += ":";
   get_prefixes().push(pre);
 }
 
@@ -387,11 +388,11 @@ LogStream::get_prefixes() const
 
   // If this is a new locally stored stack, copy the "blessed" prefixes
   // from the initial thread that created logstream.
-  if (!exists)
+  if (exists == false)
     {
-      auto it = prefixes.data.find(parent_thread);
-      if (it != prefixes.data.end())
-        local_prefixes = it->second;
+      const auto parent_prefixes = prefixes.get_for_thread(parent_thread);
+      if (parent_prefixes)
+        local_prefixes = parent_prefixes.value();
     }
 
   return local_prefixes;

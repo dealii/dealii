@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2007 - 2021 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2008 - 2024 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 
 
@@ -66,10 +65,10 @@ VectorFunction<2>::value(const Point<2> &p, const unsigned int component) const
   switch (component)
     {
       case 0:
-        val = pow(p(0), 3);
+        val = pow(p[0], 3);
         break;
       case 1:
-        val = pow(p(1), 2) * p(0);
+        val = pow(p[1], 2) * p[0];
         break;
     }
   return val;
@@ -86,13 +85,13 @@ VectorFunction<3>::value(const Point<3> &p, const unsigned int component) const
   switch (component)
     {
       case 0:
-        val = pow(p(0), 3);
+        val = pow(p[0], 3);
         break;
       case 1:
-        val = pow(p(1), 2) * p(0);
+        val = pow(p[1], 2) * p[0];
         break;
       case 2:
-        val = p(2) * p(1) * p(0);
+        val = p[2] * p[1] * p[0];
         break;
     }
   return val;
@@ -150,7 +149,7 @@ test(const Triangulation<dim> &tr, const FiniteElement<dim> &fe)
     // 'c'
     if (c + dim <= fe.n_components())
       {
-        FEValuesExtractors::Vector vector_components(c);
+        const FEValuesExtractors::Vector vector_components(c);
         fe_values[vector_components].get_function_third_derivatives(
           function_vals, selected_vector_values);
         deallog << "component=" << c << std::endl;

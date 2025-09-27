@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2017 - 2019 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2019 - 2024 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 /**
 @page changes_between_9_0_1_and_9_1_0 Changes between Version 9.0.1 and 9.1.0
@@ -26,7 +25,7 @@ author.
 
 <!-- ----------- INCOMPATIBILITIES ----------------- -->
 
-<a name="incompatible"></a>
+<a name="901-910-incompatible"></a>
 <h3 style="color:red">Incompatibilities</h3>
 
 <p style="color:red">
@@ -201,7 +200,7 @@ inconvenience this causes.
 
 <!-- ----------- GENERAL IMPROVEMENTS ----------------- -->
 
-<a name="general"></a>
+<a name="901-910-general"></a>
 <h3>General</h3>
 
 <ol>
@@ -429,7 +428,7 @@ inconvenience this causes.
   for quadrilateral and hexahedral meshes. The BR1-P0 pair is LBB stable for Stokes problems. Due
   to the edge-based bubble functions, features such as hanging nodes are not supported.
   <br>
-  (Graham Harper, 07/09/2018)
+  (Graham Harper, 2018/07/09)
  </li>
 
  <li>
@@ -493,7 +492,7 @@ inconvenience this causes.
 
 <!-- ----------- SPECIFIC IMPROVEMENTS ----------------- -->
 
-<a name="specific"></a>
+<a name="901-910-specific"></a>
 <h3>Specific improvements</h3>
 
 <ol>
@@ -966,7 +965,7 @@ inconvenience this causes.
   requested, i.e., perform `degree+1` matrix-vector products rather than
   `degree` which is the convention in literature. This is now fixed. Note that
   the quality of PreconditionChebyshev is obviously slightly reduced by this
-  change, and some solvers might need more outer iterations due to a ligher
+  change, and some solvers might need more outer iterations due to a lighter
   Chebyshev iteration.
   <br>
   (Martin Kronbichler, 2019/02/08)

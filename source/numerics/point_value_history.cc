@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2009 - 2022 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2009 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 #include <deal.II/grid/grid_tools.h>
 
@@ -291,6 +290,7 @@ PointValueHistory<dim>::add_point(const Point<dim> &location)
   // the GridTools function does not cater for
   // a vector of points, and does not seem to
   // be intrinsicly faster than this method.
+  new_solution_indices.reserve(dof_handler->get_fe(0).n_components());
   for (unsigned int component = 0;
        component < dof_handler->get_fe(0).n_components();
        component++)
@@ -424,6 +424,7 @@ PointValueHistory<dim>::add_points(const std::vector<Point<dim>> &locations)
       current_cell[point]->get_dof_indices(local_dof_indices);
       std::vector<types::global_dof_index> new_solution_indices;
 
+      new_solution_indices.reserve(dof_handler->get_fe(0).n_components());
       for (unsigned int component = 0;
            component < dof_handler->get_fe(0).n_components();
            component++)
@@ -523,7 +524,6 @@ PointValueHistory<dim>::add_component_names(
     component_mask.find(vector_name);
   Assert(mask != component_mask.end(), ExcMessage("vector_name not in class"));
   unsigned int n_stored = mask->second.n_selected_components();
-  (void)n_stored;
   Assert(component_names.size() == n_stored,
          ExcDimensionMismatch(component_names.size(), n_stored));
 
@@ -633,7 +633,7 @@ PointValueHistory<dim>::evaluate_field(const std::string &vector_name,
                 .push_back(
                   internal::ElementAccess<VectorType>::get(solution,
                                                            solution_index));
-              store_index++;
+              ++store_index;
             }
         }
     }
@@ -864,7 +864,7 @@ PointValueHistory<dim>::evaluate_field(
                   data_store_field
                     ->second[data_store_index * n_stored + store_index]
                     .push_back(computed_quantities[0](comp));
-                  store_index++;
+                  ++store_index;
                 }
             }
         }
@@ -952,7 +952,7 @@ PointValueHistory<dim>::evaluate_field_at_requested_location(
               data_store_field
                 ->second[data_store_index * n_stored + store_index]
                 .push_back(value(comp));
-              store_index++;
+              ++store_index;
             }
         }
     }
@@ -1503,7 +1503,7 @@ PointValueHistory<dim>::tria_change_listener()
 
 
 // explicit instantiations
-#include "point_value_history.inst"
+#include "numerics/point_value_history.inst"
 
 
 DEAL_II_NAMESPACE_CLOSE

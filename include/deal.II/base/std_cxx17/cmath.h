@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2018 - 2020 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2018 - 2024 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 #ifndef dealii_cxx17_cmath_h
 #define dealii_cxx17_cmath_h
 
@@ -55,18 +54,9 @@ namespace std_cxx17
     return boost::math::cyl_bessel_j(nu, x);
   }
 
-
-
-  inline long double
-  cyl_bessel_jl(long double nu, long double x)
-  {
-    return boost::math::cyl_bessel_j(nu, x);
-  }
-
 #else
   using std::cyl_bessel_j;
   using std::cyl_bessel_jf;
-  using std::cyl_bessel_jl;
 #endif
 
 #ifndef DEAL_II_HAVE_CXX17_LEGENDRE_FUNCTIONS
@@ -91,28 +81,8 @@ namespace std_cxx17
 
 
 
-  inline long double
-  legendre(unsigned int l, long double x)
-  {
-    Assert(static_cast<int>(l) >= 0,
-           ExcIndexRange(l, 0, std::numeric_limits<int>::max()));
-    return boost::math::legendre_p(static_cast<int>(l), x);
-  }
-
-
-
   inline float
   legendref(unsigned int l, float x)
-  {
-    Assert(static_cast<int>(l) >= 0,
-           ExcIndexRange(l, 0, std::numeric_limits<int>::max()));
-    return boost::math::legendre_p(static_cast<int>(l), x);
-  }
-
-
-
-  inline long double
-  legendrel(unsigned int l, long double x)
   {
     Assert(static_cast<int>(l) >= 0,
            ExcIndexRange(l, 0, std::numeric_limits<int>::max()));
@@ -122,7 +92,6 @@ namespace std_cxx17
 #else
   using std::legendre;
   using std::legendref;
-  using std::legendrel;
 #endif
 } // namespace std_cxx17
 

@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2023 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2023 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 #include <deal.II/base/array_view.h>
 #include <deal.II/base/memory_consumption.h>
@@ -105,58 +104,76 @@ namespace internal
   } // namespace
 } // namespace internal
 
-/* ------------ FEValuesBase<dim,spacedim>::CellIteratorContainer ----------- */
+/* ------------ FEValuesBase<dim,spacedim>::CellIteratorWrapper ----------- */
+
 
 template <int dim, int spacedim>
-FEValuesBase<dim, spacedim>::CellIteratorContainer::CellIteratorContainer()
-  : initialized(false)
-  , cell(typename Triangulation<dim, spacedim>::cell_iterator(nullptr, -1, -1))
-  , dof_handler(nullptr)
-  , level_dof_access(false)
+FEValuesBase<dim, spacedim>::CellIteratorWrapper::CellIteratorWrapper(
+  const typename Triangulation<dim, spacedim>::cell_iterator &cell)
+  : cell(cell)
 {}
 
 
 
 template <int dim, int spacedim>
-FEValuesBase<dim, spacedim>::CellIteratorContainer::CellIteratorContainer(
-  const typename Triangulation<dim, spacedim>::cell_iterator &cell)
-  : initialized(true)
-  , cell(cell)
-  , dof_handler(nullptr)
-  , level_dof_access(false)
+FEValuesBase<dim, spacedim>::CellIteratorWrapper::CellIteratorWrapper(
+  const typename DoFHandler<dim, spacedim>::cell_iterator &cell)
+  : cell(cell)
+{}
+
+
+
+template <int dim, int spacedim>
+FEValuesBase<dim, spacedim>::CellIteratorWrapper::CellIteratorWrapper(
+  const typename DoFHandler<dim, spacedim>::level_cell_iterator &cell)
+  : cell(cell)
 {}
 
 
 
 template <int dim, int spacedim>
 bool
-FEValuesBase<dim, spacedim>::CellIteratorContainer::is_initialized() const
+FEValuesBase<dim, spacedim>::CellIteratorWrapper::is_initialized() const
 {
-  return initialized;
+  return cell.has_value();
 }
 
 
 
 template <int dim, int spacedim>
-FEValuesBase<dim, spacedim>::CellIteratorContainer::
+FEValuesBase<dim, spacedim>::CellIteratorWrapper::
 operator typename Triangulation<dim, spacedim>::cell_iterator() const
 {
   Assert(is_initialized(), ExcNotReinited());
 
-  return cell;
+  // We can always convert to a tria iterator, regardless of which of
+  // the three types of cell we store.
+  return std::visit(
+    [](auto &cell_iterator) ->
+    typename Triangulation<dim, spacedim>::cell_iterator {
+      return cell_iterator;
+    },
+    cell.value());
 }
 
 
 
 template <int dim, int spacedim>
 types::global_dof_index
-FEValuesBase<dim, spacedim>::CellIteratorContainer::n_dofs_for_dof_handler()
-  const
+FEValuesBase<dim, spacedim>::CellIteratorWrapper::n_dofs_for_dof_handler() const
 {
   Assert(is_initialized(), ExcNotReinited());
-  Assert(dof_handler != nullptr, ExcNeedsDoFHandler());
 
-  return dof_handler->n_dofs();
+  switch (cell.value().index())
+    {
+      case 1:
+        return std::get<1>(cell.value())->get_dof_handler().n_dofs();
+      case 2:
+        return std::get<2>(cell.value())->get_dof_handler().n_dofs();
+      default:
+        Assert(false, ExcNeedsDoFHandler());
+        return numbers::invalid_dof_index;
+    }
 }
 
 
@@ -164,48 +181,26 @@ FEValuesBase<dim, spacedim>::CellIteratorContainer::n_dofs_for_dof_handler()
 template <int dim, int spacedim>
 template <typename Number>
 void
-FEValuesBase<dim, spacedim>::CellIteratorContainer::get_interpolated_dof_values(
+FEValuesBase<dim, spacedim>::CellIteratorWrapper::get_interpolated_dof_values(
   const ReadVector<Number> &in,
   Vector<Number>           &out) const
 {
   Assert(is_initialized(), ExcNotReinited());
-  Assert(dof_handler != nullptr, ExcNeedsDoFHandler());
 
-  if (level_dof_access)
-    DoFCellAccessor<dim, spacedim, true>(&cell->get_triangulation(),
-                                         cell->level(),
-                                         cell->index(),
-                                         dof_handler)
-      .get_interpolated_dof_values(in, out);
-  else
-    DoFCellAccessor<dim, spacedim, false>(&cell->get_triangulation(),
-                                          cell->level(),
-                                          cell->index(),
-                                          dof_handler)
-      .get_interpolated_dof_values(in, out);
-}
+  switch (cell.value().index())
+    {
+      case 1:
+        std::get<1>(cell.value())->get_interpolated_dof_values(in, out);
+        break;
 
+      case 2:
+        std::get<2>(cell.value())->get_interpolated_dof_values(in, out);
+        break;
 
-
-template <int dim, int spacedim>
-void
-FEValuesBase<dim, spacedim>::CellIteratorContainer::get_interpolated_dof_values(
-  const IndexSet               &in,
-  Vector<IndexSet::value_type> &out) const
-{
-  Assert(is_initialized(), ExcNotReinited());
-  Assert(dof_handler != nullptr, ExcNeedsDoFHandler());
-  Assert(level_dof_access == false, ExcNotImplemented());
-
-  const DoFCellAccessor<dim, spacedim, false> cell_dofs(
-    &cell->get_triangulation(), cell->level(), cell->index(), dof_handler);
-
-  std::vector<types::global_dof_index> dof_indices(
-    cell_dofs.get_fe().n_dofs_per_cell());
-  cell_dofs.get_dof_indices(dof_indices);
-
-  for (unsigned int i = 0; i < cell_dofs.get_fe().n_dofs_per_cell(); ++i)
-    out[i] = (in.is_element(dof_indices[i]) ? 1 : 0);
+      default:
+        Assert(false, ExcNeedsDoFHandler());
+        break;
+    }
 }
 
 
@@ -313,7 +308,7 @@ namespace internal
     const dealii::Table<2, double>                   &shape_values,
     const FiniteElement<dim, spacedim>               &fe,
     const std::vector<unsigned int> &shape_function_to_row_table,
-    ArrayView<VectorType>            values,
+    const ArrayView<VectorType>     &values,
     const bool                       quadrature_points_fastest = false,
     const unsigned int               component_multiple        = 1)
   {
@@ -464,7 +459,7 @@ namespace internal
     const dealii::Table<2, Tensor<order, spacedim>> &shape_derivatives,
     const FiniteElement<dim, spacedim>              &fe,
     const std::vector<unsigned int> &shape_function_to_row_table,
-    ArrayView<std::vector<Tensor<order, spacedim, Number>>> derivatives,
+    const ArrayView<std::vector<Tensor<order, spacedim, Number>>> &derivatives,
     const bool         quadrature_points_fastest = false,
     const unsigned int component_multiple        = 1)
   {
@@ -1440,7 +1435,7 @@ FEValuesBase<dim, spacedim>::check_cell_similarity(
            CellSimilarity::translation :
            CellSimilarity::none);
 
-  if ((dim < spacedim) && (cell_similarity == CellSimilarity::translation))
+  if ((dim == spacedim - 1) && (cell_similarity == CellSimilarity::translation))
     {
       if (static_cast<const typename Triangulation<dim, spacedim>::cell_iterator
                         &>(this->present_cell)
@@ -1473,6 +1468,6 @@ const unsigned int FEValuesBase<dim, spacedim>::space_dimension;
 /*-------------------------- Explicit Instantiations -------------------------*/
 
 
-#include "fe_values_base.inst"
+#include "fe/fe_values_base.inst"
 
 DEAL_II_NAMESPACE_CLOSE

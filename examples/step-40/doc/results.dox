@@ -3,47 +3,48 @@
 When you run the program, on a single processor or with your local MPI
 installation on a few, you should get output like this:
 @code
+Running with PETSc on 1 MPI rank(s)...
 Cycle 0:
    Number of active cells:       1024
    Number of degrees of freedom: 4225
-   Solved in 10 iterations.
+   Solved in 7 iterations.
 
 
 +---------------------------------------------+------------+------------+
-| Total wallclock time elapsed since start    |     0.176s |            |
+| Total wallclock time elapsed since start    |     0.548s |            |
 |                                             |            |            |
 | Section                         | no. calls |  wall time | % of total |
 +---------------------------------+-----------+------------+------------+
-| assembly                        |         1 |    0.0209s |        12% |
-| output                          |         1 |    0.0189s |        11% |
-| setup                           |         1 |    0.0299s |        17% |
-| solve                           |         1 |    0.0419s |        24% |
+| assembly                        |         1 |     0.242s |        44% |
+| output                          |         1 |    0.0495s |         9% |
+| setup                           |         1 |     0.102s |        19% |
+| solve                           |         1 |    0.0283s |       5.2% |
 +---------------------------------+-----------+------------+------------+
 
 
 Cycle 1:
-   Number of active cells:       1954
-   Number of degrees of freedom: 8399
-   Solved in 10 iterations.
+   Number of active cells:       1963
+   Number of degrees of freedom: 8437
+   Solved in 7 iterations.
 
 
 +---------------------------------------------+------------+------------+
-| Total wallclock time elapsed since start    |     0.327s |            |
+| Total wallclock time elapsed since start    |      1.19s |            |
 |                                             |            |            |
 | Section                         | no. calls |  wall time | % of total |
 +---------------------------------+-----------+------------+------------+
-| assembly                        |         1 |    0.0368s |        11% |
-| output                          |         1 |    0.0208s |       6.4% |
-| refine                          |         1 |     0.157s |        48% |
-| setup                           |         1 |    0.0452s |        14% |
-| solve                           |         1 |    0.0668s |        20% |
+| assembly                        |         1 |     0.469s |        40% |
+| output                          |         1 |    0.0899s |       7.6% |
+| refine                          |         1 |     0.429s |        36% |
+| setup                           |         1 |     0.177s |        15% |
+| solve                           |         1 |    0.0204s |       1.7% |
 +---------------------------------+-----------+------------+------------+
 
 
 Cycle 2:
-   Number of active cells:       3664
-   Number of degrees of freedom: 16183
-   Solved in 11 iterations.
+   Number of active cells:       3670
+   Number of degrees of freedom: 16175
+   Solved in 7 iterations.
 
 ...
 @endcode
@@ -66,10 +67,10 @@ partitioning onto the 16 processors, and the corresponding solution:
 <table width="100%">
 <tr>
 <td>
-  <img src="https://www.dealii.org/images/steps/developer/step-40.mesh.png" alt="">
+  <img src="https://dealii.org/images/steps/developer/step-40.mesh.png" alt="">
 </td>
 <td>
-  <img src="https://www.dealii.org/images/steps/developer/step-40.solution.png" alt="">
+  <img src="https://dealii.org/images/steps/developer/step-40.solution.png" alt="">
 </td>
 </tr>
 </table>
@@ -89,10 +90,10 @@ more interpretation can be found in the final version of the paper):
 <table width="100%">
 <tr>
 <td>
-  <img src="https://www.dealii.org/images/steps/developer/step-40.strong2.png" alt="">
+  <img src="https://dealii.org/images/steps/developer/step-40.strong2.png" alt="">
 </td>
 <td>
-  <img src="https://www.dealii.org/images/steps/developer/step-40.strong.png" alt="">
+  <img src="https://dealii.org/images/steps/developer/step-40.strong.png" alt="">
 </td>
 </tr>
 </table>
@@ -117,10 +118,10 @@ this in the following two graphs for 256 and 4096 processors:
 <table width="100%">
 <tr>
 <td>
-  <img src="https://www.dealii.org/images/steps/developer/step-40.256.png" alt="">
+  <img src="https://dealii.org/images/steps/developer/step-40.256.png" alt="">
 </td>
 <td>
-  <img src="https://www.dealii.org/images/steps/developer/step-40.4096.png" alt="">
+  <img src="https://dealii.org/images/steps/developer/step-40.4096.png" alt="">
 </td>
 </tr>
 </table>
@@ -151,7 +152,7 @@ here.
 
 
 
-<a name="extensions"></a>
+<a name="step-40-extensions"></a>
 <h3>Possibilities for extensions</h3>
 
 In a sense, this program is the ultimate solver for the Laplace

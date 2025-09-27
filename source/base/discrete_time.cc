@@ -1,21 +1,21 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2019 - 2020 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2020 - 2024 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 
 #include <deal.II/base/discrete_time.h>
 #include <deal.II/base/exceptions.h>
+#include <deal.II/base/memory_consumption.h>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -103,6 +103,20 @@ DiscreteTime::restart()
   current_time  = start_time;
   next_time     = calculate_next_time(current_time, start_step_size, end_time);
   step_number   = 0;
+}
+
+
+
+std::size_t
+DiscreteTime::memory_consumption() const
+{
+  return (MemoryConsumption::memory_consumption(start_time) +
+          MemoryConsumption::memory_consumption(end_time) +
+          MemoryConsumption::memory_consumption(current_time) +
+          MemoryConsumption::memory_consumption(next_time) +
+          MemoryConsumption::memory_consumption(previous_time) +
+          MemoryConsumption::memory_consumption(start_step_size) +
+          MemoryConsumption::memory_consumption(step_number));
 }
 
 DEAL_II_NAMESPACE_CLOSE

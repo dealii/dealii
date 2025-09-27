@@ -1,6 +1,3 @@
-
-<br>
-
 <i>
 This program was contributed by Martin Kronbichler. Many ideas presented here
 are the result of common code development with Niklas Fehn, Katharina Kormann,
@@ -11,7 +8,7 @@ the project "High-order discontinuous Galerkin for the exa-scale" (ExaDG)
 within the priority program "Software for Exascale Computing" (SPPEXA).
 </i>
 
-<a name="Intro"></a>
+<a name="step_67-Intro"></a>
 <h1>Introduction</h1>
 
 This tutorial program solves the Euler equations of fluid dynamics using an
@@ -715,7 +712,7 @@ a cost similar to the forward application of a mass matrix, which is cheaper
 than the evaluation of the spatial operator $\mathcal L_h$
 with over-integration and face integrals. (We
 will demonstrate this with detailed timing information in the
-<a href="#Results">results section</a>.) In fact, it
+@ref step_67-ResultsSection "results section".) In fact, it
 is so cheap that it is limited by the bandwidth of reading the source vector,
 reading the diagonal, and writing into the destination vector on most modern
 architectures. The hardware used for the result section allows to do the
@@ -741,4 +738,4 @@ discontinuity in density and pressure. In downstream direction, the transport
 is faster as sound propagation and fluid flow go in the same direction, which smears
 out the discontinuity somewhat. Once the sound wave hits the upper and lower
 walls, the sound is reflected back, creating some nice shapes as illustrated
-in the <a href="#Results">results section</a> below.
+in the @ref step_67-ResultsSection "results section" below.

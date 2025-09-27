@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2002 - 2022 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2002 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 #ifndef dealii_sparse_matrix_ez_h
 #define dealii_sparse_matrix_ez_h
@@ -19,8 +18,11 @@
 
 #include <deal.II/base/config.h>
 
-#include <deal.II/base/smartpointer.h>
-#include <deal.II/base/subscriptor.h>
+#include <deal.II/base/enable_observer_pointer.h>
+#include <deal.II/base/exceptions.h>
+#include <deal.II/base/numbers.h>
+#include <deal.II/base/observer_pointer.h>
+#include <deal.II/base/types.h>
 
 #include <deal.II/lac/exceptions.h>
 
@@ -101,7 +103,7 @@ class FullMatrix;
  *   where "EZ" is pronounced the same way as the word "easy".
  */
 template <typename number>
-class SparseMatrixEZ : public Subscriptor
+class SparseMatrixEZ : public EnableObserverPointer
 {
 public:
   /**
@@ -161,7 +163,7 @@ public:
      */
     unsigned short length;
     /**
-     * Position of the diagonal element relative tor the start index.
+     * Position of the diagonal element relative to the start index.
      */
     unsigned short diagonal;
     /**
@@ -352,11 +354,11 @@ public:
    * efficient assembling of the matrix.
    */
   void
-  reinit(const size_type n_rows,
-         const size_type n_columns,
-         size_type       default_row_length = 0,
-         unsigned int    default_increment  = 1,
-         size_type       reserve            = 0);
+  reinit(const size_type    n_rows,
+         const size_type    n_columns,
+         const size_type    default_row_length = 0,
+         const unsigned int default_increment  = 1,
+         const size_type    reserve            = 0);
 
   /**
    * Release all memory and return to a state just like after having called
@@ -749,24 +751,26 @@ public:
   print(std::ostream &out) const;
 
   /**
-   * Print the matrix in the usual format, i.e. as a matrix and not as a list
+   * Print the matrix in the usual format, i.e., as a matrix and not as a list
    * of nonzero elements. For better readability, elements not in the matrix
    * are displayed as empty space, while matrix elements which are explicitly
    * set to zero are displayed as such.
    *
-   * The parameters allow for a flexible setting of the output format: @p
-   * precision and @p scientific are used to determine the number format,
-   * where @p scientific = @p false means fixed point notation.  A zero entry
-   * for @p width makes the function compute a width, but it may be changed to
-   * a positive value, if output is crude.
+   * The parameters allow for a flexible setting of the output format:
+   * @p precision and @p scientific are used to determine the number format,
+   * where <code>scientific = false</code> means fixed point notation. A zero
+   * entry for @p width makes the function compute a width, but it may be
+   * changed to a positive value, if output is crude.
    *
-   * Additionally, a character for an empty value may be specified.
+   * Additionally, a character for an empty value may be specified in
+   * @p zero_string, and a character to separate row entries can be set in
+   * @p separator.
    *
-   * Finally, the whole matrix can be multiplied with a common denominator to
-   * produce more readable output, even integers.
+   * Finally, the whole matrix can be multiplied with a common @p denominator
+   * to produce more readable output, even integers.
    *
-   * This function may produce @em large amounts of output if applied to a
-   * large matrix!
+   * @attention This function may produce @em large amounts of output if
+   * applied to a large matrix!
    */
   void
   print_formatted(std::ostream      &out,
@@ -774,7 +778,8 @@ public:
                   const bool         scientific  = true,
                   const unsigned int width       = 0,
                   const char        *zero_string = " ",
-                  const double       denominator = 1.) const;
+                  const double       denominator = 1.,
+                  const char        *separator   = " ") const;
 
   /**
    * Write the data of this object in binary mode to a file.

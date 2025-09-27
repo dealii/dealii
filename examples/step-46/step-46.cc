@@ -1,17 +1,16 @@
-/* ---------------------------------------------------------------------
+/* ------------------------------------------------------------------------
  *
- * Copyright (C) 2011 - 2021 by the deal.II authors
+ * SPDX-License-Identifier: LGPL-2.1-or-later
+ * Copyright (C) 2011 - 2024 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
- * The deal.II library is free software; you can use it, redistribute
- * it, and/or modify it under the terms of the GNU Lesser General
- * Public License as published by the Free Software Foundation; either
- * version 2.1 of the License, or (at your option) any later version.
- * The full text of the license can be found in the file LICENSE.md at
- * the top level directory of deal.II.
+ * Part of the source code is dual licensed under Apache-2.0 WITH
+ * LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+ * governing the source code and code contributions can be found in
+ * LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
  *
- * ---------------------------------------------------------------------
+ * ------------------------------------------------------------------------
  *
  * Author: Wolfgang Bangerth, Texas A&M University, 2011
  */
@@ -25,7 +24,6 @@
 // discussed in step-27.
 
 #include <deal.II/base/quadrature_lib.h>
-#include <deal.II/base/logstream.h>
 #include <deal.II/base/function.h>
 #include <deal.II/base/utilities.h>
 
@@ -124,8 +122,8 @@ namespace Step46
     const unsigned int elasticity_degree;
 
     Triangulation<dim>    triangulation;
-    FESystem<dim>         stokes_fe;
-    FESystem<dim>         elasticity_fe;
+    const FESystem<dim>   stokes_fe;
+    const FESystem<dim>   elasticity_fe;
     hp::FECollection<dim> fe_collection;
     DoFHandler<dim>       dof_handler;
 
@@ -182,7 +180,7 @@ namespace Step46
           case 3:
             return std::sin(numbers::PI * p[0]) * std::sin(numbers::PI * p[1]);
           default:
-            Assert(false, ExcNotImplemented());
+            DEAL_II_NOT_IMPLEMENTED();
         }
 
     return 0;
@@ -306,7 +304,7 @@ namespace Step46
         else if (cell_is_in_solid_domain(cell))
           cell->set_active_fe_index(1);
         else
-          Assert(false, ExcNotImplemented());
+          DEAL_II_NOT_IMPLEMENTED();
       }
   }
 
@@ -385,7 +383,8 @@ namespace Step46
                          ++i)
                       if (stokes_fe.face_system_to_component_index(i).first <
                           dim)
-                        constraints.add_line(local_face_dof_indices[i]);
+                        constraints.constrain_dof_to_zero(
+                          local_face_dof_indices[i]);
                   }
               }
     }
@@ -547,7 +546,7 @@ namespace Step46
         //
         // The actual computation of the local matrix is the same as in
         // step-22 as well as that given in the @ref vector_valued
-        // documentation module for the elasticity equations:
+        // documentation topic for the elasticity equations:
         if (cell_is_in_fluid_domain(cell))
           {
             const unsigned int dofs_per_cell = cell->get_fe().n_dofs_per_cell();

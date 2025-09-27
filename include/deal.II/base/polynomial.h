@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2000 - 2023 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2000 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 #ifndef dealii_polynomial_h
 #define dealii_polynomial_h
@@ -20,13 +19,16 @@
 
 #include <deal.II/base/config.h>
 
+#include <deal.II/base/enable_observer_pointer.h>
 #include <deal.II/base/exceptions.h>
+#include <deal.II/base/numbers.h>
 #include <deal.II/base/point.h>
-#include <deal.II/base/subscriptor.h>
+#include <deal.II/base/types.h>
 
 #include <array>
 #include <limits>
 #include <memory>
+#include <shared_mutex>
 #include <vector>
 
 DEAL_II_NAMESPACE_OPEN
@@ -62,7 +64,7 @@ namespace Polynomials
    * TensorProductPolynomials class.
    */
   template <typename number>
-  class Polynomial : public Subscriptor
+  class Polynomial : public EnableObserverPointer
   {
   public:
     /**
@@ -157,10 +159,13 @@ namespace Polynomials
      * `number` by `operator=`.
      */
     template <std::size_t n_entries, typename Number2>
-    void
-    values_of_array(const std::array<Number2, n_entries> &points,
-                    const unsigned int                    n_derivatives,
-                    std::array<Number2, n_entries>       *values) const;
+#ifndef DEBUG
+    DEAL_II_ALWAYS_INLINE
+#endif
+      void
+      values_of_array(const std::array<Number2, n_entries> &points,
+                      const unsigned int                    n_derivatives,
+                      std::array<Number2, n_entries>       *values) const;
 
     /**
      * Degree of the polynomial. This is the degree reflected by the number of
@@ -556,8 +561,8 @@ namespace Polynomials
     compute_coefficients(const unsigned int p);
 
     /**
-     * Get coefficients for constructor.  This way, it can use the non-
-     * standard constructor of Polynomial.
+     * Get coefficients for constructor.  This way, it can use the
+     * non-standard constructor of Polynomial.
      */
     static const std::vector<double> &
     get_coefficients(const unsigned int p);
@@ -572,6 +577,12 @@ namespace Polynomials
      */
     static std::vector<std::unique_ptr<const std::vector<double>>>
       recursive_coefficients;
+
+    /**
+     * The mutex that guards read and write access to the
+     * `recursive_coefficients` array.
+     */
+    static std::shared_mutex coefficients_lock;
   };
 
 
@@ -857,11 +868,15 @@ namespace Polynomials
 
   template <typename number>
   template <std::size_t n_entries, typename Number2>
-  inline void
-  Polynomial<number>::values_of_array(
-    const std::array<Number2, n_entries> &x,
-    const unsigned int                    n_derivatives,
-    std::array<Number2, n_entries>       *values) const
+  inline
+#ifndef DEBUG
+    DEAL_II_ALWAYS_INLINE
+#endif
+    void
+    Polynomial<number>::values_of_array(
+      const std::array<Number2, n_entries> &x,
+      const unsigned int                    n_derivatives,
+      std::array<Number2, n_entries>       *values) const
   {
     // evaluate Lagrange polynomial and derivatives
     if (in_lagrange_product_form == true)
@@ -1018,7 +1033,7 @@ namespace Polynomials
   Polynomial<number>::serialize(Archive &ar, const unsigned int)
   {
     // forward to serialization function in the base class.
-    ar &static_cast<Subscriptor &>(*this);
+    ar &static_cast<EnableObserverPointer &>(*this);
     ar &coefficients;
     ar &in_lagrange_product_form;
     ar &lagrange_support_points;

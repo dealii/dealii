@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2019 - 2023 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2019 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 
 #include <deal.II/base/config.h>
@@ -20,9 +19,10 @@
 
 #include <deal.II/distributed/grid_refinement.h>
 #include <deal.II/distributed/shared_tria.h>
+#include <deal.II/distributed/tria.h>
 #include <deal.II/distributed/tria_base.h>
 
-#include <deal.II/dofs/dof_accessor.templates.h>
+#include <deal.II/dofs/dof_accessor.h>
 #include <deal.II/dofs/dof_handler.h>
 
 #include <deal.II/grid/filtered_iterator.h>
@@ -48,7 +48,7 @@ namespace hp
     void
     full_p_adaptivity(const DoFHandler<dim, spacedim> &dof_handler)
     {
-      if (dof_handler.get_fe_collection().size() == 0)
+      if (dof_handler.get_fe_collection().empty())
         // nothing to do
         return;
 
@@ -68,7 +68,7 @@ namespace hp
     p_adaptivity_from_flags(const DoFHandler<dim, spacedim> &dof_handler,
                             const std::vector<bool>         &p_flags)
     {
-      if (dof_handler.get_fe_collection().size() == 0)
+      if (dof_handler.get_fe_collection().empty())
         // nothing to do
         return;
 
@@ -117,7 +117,7 @@ namespace hp
       const ComparisonFunction<std_cxx20::type_identity_t<Number>>
         &compare_coarsen)
     {
-      if (dof_handler.get_fe_collection().size() == 0)
+      if (dof_handler.get_fe_collection().empty())
         // nothing to do
         return;
 
@@ -156,7 +156,7 @@ namespace hp
       const ComparisonFunction<std_cxx20::type_identity_t<Number>>
         &compare_coarsen)
     {
-      if (dof_handler.get_fe_collection().size() == 0)
+      if (dof_handler.get_fe_collection().empty())
         // nothing to do
         return;
 
@@ -208,16 +208,16 @@ namespace hp
         {
           max_criterion_refine =
             Utilities::MPI::max(max_criterion_refine,
-                                parallel_tria->get_communicator());
+                                parallel_tria->get_mpi_communicator());
           min_criterion_refine =
             Utilities::MPI::min(min_criterion_refine,
-                                parallel_tria->get_communicator());
+                                parallel_tria->get_mpi_communicator());
           max_criterion_coarsen =
             Utilities::MPI::max(max_criterion_coarsen,
-                                parallel_tria->get_communicator());
+                                parallel_tria->get_mpi_communicator());
           min_criterion_coarsen =
             Utilities::MPI::min(min_criterion_coarsen,
-                                parallel_tria->get_communicator());
+                                parallel_tria->get_mpi_communicator());
         }
 
       // Absent any better strategies, we will set the threshold by linear
@@ -253,7 +253,7 @@ namespace hp
       const ComparisonFunction<std_cxx20::type_identity_t<Number>>
         &compare_coarsen)
     {
-      if (dof_handler.get_fe_collection().size() == 0)
+      if (dof_handler.get_fe_collection().empty())
         // nothing to do
         return;
 
@@ -308,7 +308,7 @@ namespace hp
       //     that apply to all or none of the cells at once. However here, we
       //     do not know which threshold would suffice for this task because the
       //     user could provide any comparison function. Thus if necessary, we
-      //     overwrite the user's choice with suitable functions simplying
+      //     overwrite the user's choice with suitable functions simply
       //     returning 'true' and 'false' for any cell with reference wrappers.
       //     Thus, no function object copies are stored.
       //
@@ -326,13 +326,13 @@ namespace hp
             &dof_handler.get_triangulation()) == nullptr)
         {
 #ifndef DEAL_II_WITH_P4EST
-          Assert(false, ExcInternalError());
+          DEAL_II_ASSERT_UNREACHABLE();
 #else
           //
           // parallel implementation with distributed memory
           //
 
-          MPI_Comm mpi_communicator = parallel_tria->get_communicator();
+          MPI_Comm mpi_communicator = parallel_tria->get_mpi_communicator();
 
           // 2.) Communicate the number of cells scheduled for p-adaptation
           //     globally.
@@ -447,7 +447,7 @@ namespace hp
     p_adaptivity_from_regularity(const DoFHandler<dim, spacedim> &dof_handler,
                                  const Vector<Number> &sobolev_indices)
     {
-      if (dof_handler.get_fe_collection().size() == 0)
+      if (dof_handler.get_fe_collection().empty())
         // nothing to do
         return;
 
@@ -509,7 +509,7 @@ namespace hp
       const ComparisonFunction<std_cxx20::type_identity_t<Number>>
         &compare_coarsen)
     {
-      if (dof_handler.get_fe_collection().size() == 0)
+      if (dof_handler.get_fe_collection().empty())
         // nothing to do
         return;
 
@@ -550,7 +550,7 @@ namespace hp
                   const double                     gamma_h,
                   const double                     gamma_n)
     {
-      if (dof_handler.get_fe_collection().size() == 0)
+      if (dof_handler.get_fe_collection().empty())
         // nothing to do
         return;
 
@@ -600,12 +600,13 @@ namespace hp
               if (future_fe_indices_on_coarsened_cells.find(parent) ==
                   future_fe_indices_on_coarsened_cells.end())
                 {
-#ifdef DEBUG
-                  for (const auto &child : parent->child_iterators())
-                    Assert(child->is_active() && child->coarsen_flag_set(),
-                           typename Triangulation<
-                             dim>::ExcInconsistentCoarseningFlags());
-#endif
+                  if constexpr (running_in_debug_mode())
+                    {
+                      for (const auto &child : parent->child_iterators())
+                        Assert(child->is_active() && child->coarsen_flag_set(),
+                               typename Triangulation<
+                                 dim>::ExcInconsistentCoarseningFlags());
+                    }
 
                   parent_future_fe_index =
                     internal::hp::DoFHandlerImplementation::
@@ -633,16 +634,26 @@ namespace hp
           // step 1: exponential decay with p-adaptation
           if (cell->future_fe_index_set())
             {
-              predicted_errors[cell->active_cell_index()] *=
-                std::pow(gamma_p,
-                         int(future_fe_degree) - int(cell->get_fe().degree));
+              if (future_fe_degree > cell->get_fe().degree)
+                predicted_errors[cell->active_cell_index()] *=
+                  Utilities::pow(gamma_p,
+                                 future_fe_degree - cell->get_fe().degree);
+              else if (future_fe_degree < cell->get_fe().degree)
+                predicted_errors[cell->active_cell_index()] /=
+                  Utilities::pow(gamma_p,
+                                 cell->get_fe().degree - future_fe_degree);
+              else
+                {
+                  // The two degrees are the same; we do not need to
+                  // adapt the predicted error
+                }
             }
 
           // step 2: algebraic decay with h-adaptation
           if (cell->refine_flag_set())
             {
               predicted_errors[cell->active_cell_index()] *=
-                (gamma_h * std::pow(.5, future_fe_degree));
+                (gamma_h * Utilities::pow(.5, future_fe_degree));
 
               // predicted error will be split on children cells
               // after adaptation via CellDataTransfer
@@ -650,7 +661,7 @@ namespace hp
           else if (cell->coarsen_flag_set())
             {
               predicted_errors[cell->active_cell_index()] /=
-                (gamma_h * std::pow(.5, future_fe_degree));
+                (gamma_h * Utilities::pow(.5, future_fe_degree));
 
               // predicted error will be summed up on parent cell
               // after adaptation via CellDataTransfer
@@ -667,7 +678,7 @@ namespace hp
     void
     force_p_over_h(const DoFHandler<dim, spacedim> &dof_handler)
     {
-      if (dof_handler.get_fe_collection().size() == 0)
+      if (dof_handler.get_fe_collection().empty())
         // nothing to do
         return;
 
@@ -688,24 +699,36 @@ namespace hp
     void
     choose_p_over_h(const DoFHandler<dim, spacedim> &dof_handler)
     {
-      if (dof_handler.get_fe_collection().size() == 0)
+      if (dof_handler.get_fe_collection().empty())
         // nothing to do
         return;
 
       Assert(dof_handler.has_hp_capabilities(),
              (typename DoFHandler<dim, spacedim>::ExcOnlyAvailableWithHP()));
 
-      // Ghost siblings might occur on parallel::shared::Triangulation objects.
-      // We need information about future FE indices on all locally relevant
-      // cells here, and thus communicate them.
-      if (dynamic_cast<const parallel::shared::Triangulation<dim, spacedim> *>(
-            &dof_handler.get_triangulation()) != nullptr)
-        internal::hp::DoFHandlerImplementation::communicate_future_fe_indices(
-          const_cast<DoFHandler<dim, spacedim> &>(dof_handler));
+      // Ghost siblings might occur on parallel Triangulation objects.
+      // We need information about refinement flags and future FE indices
+      // on all locally relevant cells here, and thus communicate them.
+      if (dealii::parallel::distributed::Triangulation<dim, spacedim> *tria =
+            dynamic_cast<
+              dealii::parallel::distributed::Triangulation<dim, spacedim> *>(
+              const_cast<dealii::Triangulation<dim, spacedim> *>(
+                &dof_handler.get_triangulation())))
+        {
+          dealii::internal::parallel::distributed::TriangulationImplementation::
+            exchange_refinement_flags(*tria);
+        }
 
+      internal::hp::DoFHandlerImplementation::communicate_future_fe_indices(
+        const_cast<DoFHandler<dim, spacedim> &>(dof_handler));
+
+      // Now: choose p-adaptation over h-adaptation.
       for (const auto &cell : dof_handler.active_cell_iterators())
         if (cell->is_locally_owned() && cell->future_fe_index_set())
           {
+            // This cell is flagged for p-adaptation.
+
+            // Remove any h-refinement flags.
             cell->clear_refine_flag();
 
             // A cell will only be coarsened into its parent if all of its
@@ -731,43 +754,22 @@ namespace hp
                   {
                     if (child->is_active())
                       {
-                        if (child->is_locally_owned())
-                          {
-                            if (child->coarsen_flag_set())
-                              ++h_flagged_children;
-                            if (child->future_fe_index_set())
-                              ++p_flagged_children;
-                          }
-                        else if (child->is_ghost())
-                          {
-                            // The case of siblings being owned by different
-                            // processors can only occur for
-                            // parallel::shared::Triangulation objects.
-                            Assert(
-                              (dynamic_cast<const parallel::shared::
-                                              Triangulation<dim, spacedim> *>(
-                                 &dof_handler.get_triangulation()) != nullptr),
-                              ExcInternalError());
+                        Assert(child->is_artificial() == false,
+                               ExcInternalError());
 
-                            if (child->coarsen_flag_set())
-                              ++h_flagged_children;
-                            // The public interface does not allow to access
-                            // future FE indices on ghost cells. However, we
-                            // need this information here and thus call the
-                            // internal function that does not check for cell
-                            // ownership.
-                            if (internal::DoFCellAccessorImplementation::
-                                  Implementation::
-                                    future_fe_index_set<dim, spacedim, false>(
-                                      *child))
-                              ++p_flagged_children;
-                          }
-                        else
-                          {
-                            // Siblings of locally owned cells are all
-                            // either also locally owned or ghost cells.
-                            Assert(false, ExcInternalError());
-                          }
+                        if (child->coarsen_flag_set())
+                          ++h_flagged_children;
+
+                        // The public interface does not allow to access
+                        // future FE indices on ghost cells. However, we
+                        // need this information here and thus call the
+                        // internal function that does not check for cell
+                        // ownership.
+                        if (internal::DoFCellAccessorImplementation::
+                              Implementation::
+                                future_fe_index_set<dim, spacedim, false>(
+                                  *child))
+                          ++p_flagged_children;
                       }
                   }
 
@@ -787,7 +789,7 @@ namespace hp
                   }
                 else
                   {
-                    // Perform p-adaptation on all children and
+                    // Perform p-adaptation (if scheduled) and
                     // drop all h-coarsening flags.
                     for (const auto &child : parent->child_iterators())
                       {
@@ -810,7 +812,7 @@ namespace hp
                              const unsigned int               max_difference,
                              const unsigned int               contains_fe_index)
     {
-      if (dof_handler.get_fe_collection().size() == 0)
+      if (dof_handler.get_fe_collection().empty())
         // nothing to do
         return false;
 
@@ -1037,7 +1039,7 @@ namespace hp
 
           levels_changed_in_cycle =
             Utilities::MPI::logical_or(levels_changed_in_cycle,
-                                       dof_handler.get_communicator());
+                                       dof_handler.get_mpi_communicator());
           levels_changed |= levels_changed_in_cycle;
         }
       while (levels_changed_in_cycle);
@@ -1054,9 +1056,10 @@ namespace hp
               const unsigned int fe_index =
                 fe_index_for_hierarchy_level[cell_level];
 
-              // only update if necessary
               if (fe_index != cell->active_fe_index())
                 cell->set_future_fe_index(fe_index);
+              else
+                cell->clear_future_fe_index();
             }
         }
 
@@ -1067,6 +1070,6 @@ namespace hp
 
 
 // explicit instantiations
-#include "refinement.inst"
+#include "hp/refinement.inst"
 
 DEAL_II_NAMESPACE_CLOSE

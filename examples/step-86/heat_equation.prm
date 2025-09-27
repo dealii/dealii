@@ -1,0 +1,44 @@
+subsection Heat Equation
+  set Initial global refinement      = 4
+  set Maximum delta refinement level = 2
+  set Mesh adaptation frequency      = 10
+
+  subsection Right hand side
+    set Function constants  =
+    set Function expression = 0
+    set Variable names      = x,y,t
+  end
+
+  subsection Initial value
+    set Function constants  =
+    set Function expression = 0
+    set Variable names      = x,y,t
+  end
+
+  subsection Boundary values
+    set Function constants  =
+    set Function expression = (if(x<-0.999, 1, 0) + if(x>0.999, -1, 0)) * cos(4*pi*t)
+    set Variable names      = x,y,t
+  end
+
+  subsection Time stepper
+    subsection Running parameters
+      set final time              = 5
+      set initial step size       = 0.025
+      set initial time            = 0
+      set match final time        = false
+      set maximum number of steps = -1
+      set options prefix          =
+      set solver type             = beuler
+    end
+
+    subsection Error control
+      set absolute error tolerance = -1
+      set relative error tolerance = -1
+      set adaptor type             = none
+      set ignore algebraic lte     = true
+      set maximum step size        = -1
+      set minimum step size        = -1
+    end
+  end
+end

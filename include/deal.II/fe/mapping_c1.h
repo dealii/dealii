@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2001 - 2022 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2001 - 2024 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 #ifndef dealii_mapping_c1_h
 #define dealii_mapping_c1_h
@@ -64,8 +63,8 @@ public:
    */
   virtual void
   add_line_support_points(
-    const typename Triangulation<dim>::cell_iterator &cell,
-    std::vector<Point<dim>>                          &a) const override;
+    const typename Triangulation<dim, spacedim>::cell_iterator &cell,
+    std::vector<Point<spacedim>> &a) const override;
 
   /**
    * For <tt>dim=3</tt>. Append the support points of all shape functions
@@ -78,8 +77,8 @@ public:
    */
   virtual void
   add_quad_support_points(
-    const typename Triangulation<dim>::cell_iterator &cell,
-    std::vector<Point<dim>>                          &a) const override;
+    const typename Triangulation<dim, spacedim>::cell_iterator &cell,
+    std::vector<Point<spacedim>> &a) const override;
 };
 
 /** @} */

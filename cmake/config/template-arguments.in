@@ -64,6 +64,7 @@ ALL_SCALAR_TYPES := {
 // Since many of our MPI calls use std::vector we cannot include bool here
 MPI_SCALARS     := { int;
                      long int;
+                     long long int;
                      unsigned int;
                      unsigned long int;
                      unsigned long long int;
@@ -76,6 +77,7 @@ MPI_SCALARS     := { int;
 // complex types and long double are typically not directly supported on GPUs
 MPI_DEVICE_SCALARS := { int;
                         long int;
+                        long long int;
                         unsigned int;
                         unsigned long int;
                         unsigned long long int;
@@ -115,6 +117,11 @@ VECTOR_TYPES := {   Vector<double>;
 
                     @DEAL_II_EXPAND_TRILINOS_MPI_BLOCKVECTOR@;
                     @DEAL_II_EXPAND_PETSC_MPI_BLOCKVECTOR@;
+
+                    @DEAL_II_EXPAND_TPETRA_BLOCKVECTOR_DOUBLE@;
+                    @DEAL_II_EXPAND_TPETRA_BLOCKVECTOR_FLOAT@;
+                    @DEAL_II_EXPAND_TPETRA_BLOCKVECTOR_COMPLEX_DOUBLE@;
+                    @DEAL_II_EXPAND_TPETRA_BLOCKVECTOR_COMPLEX_FLOAT@;
                   }
 
 // same as VECTOR_TYPES but only real-valued vectors (and only with PETSc
@@ -139,6 +146,8 @@ REAL_VECTOR_TYPES  := {  Vector<double>;
 
                          @DEAL_II_EXPAND_TRILINOS_MPI_BLOCKVECTOR@;
                          @DEAL_II_EXPAND_PETSC_MPI_BLOCKVECTOR_REAL@;
+                         @DEAL_II_EXPAND_TPETRA_BLOCKVECTOR_DOUBLE@;
+                         @DEAL_II_EXPAND_TPETRA_BLOCKVECTOR_FLOAT@;
                        }
 
 // real vector types excluding block vectors
@@ -164,20 +173,19 @@ EXTERNAL_PARALLEL_VECTORS := { @DEAL_II_EXPAND_TRILINOS_MPI_VECTOR@;
                                @DEAL_II_EXPAND_TPETRA_VECTOR_COMPLEX_DOUBLE@;
                                @DEAL_II_EXPAND_TPETRA_VECTOR_COMPLEX_FLOAT@;
                                @DEAL_II_EXPAND_PETSC_MPI_VECTOR@;
-                               @DEAL_II_EXPAND_PETSC_MPI_BLOCKVECTOR@
+                               @DEAL_II_EXPAND_PETSC_MPI_BLOCKVECTOR@;
+                               @DEAL_II_EXPAND_TPETRA_BLOCKVECTOR_DOUBLE@;
+                               @DEAL_II_EXPAND_TPETRA_BLOCKVECTOR_FLOAT@;
+                               @DEAL_II_EXPAND_TPETRA_BLOCKVECTOR_COMPLEX_DOUBLE@;
+                               @DEAL_II_EXPAND_TPETRA_BLOCKVECTOR_COMPLEX_FLOAT@;
                              }
 
-// TODO: I don't understand this one. LA::distributed::Vector does not have a
-// native matrix type, especially if we don't compile with Trilinos. Currently
-// only used: mg_transfer_prebuilt.inst.in and
-// mg_level_global_transfer.inst.in
-VECTORS_WITH_MATRIX := { Vector<double>;
+// Vectors we can do GMG with excluding the LinearAlgebra::distributed::Vector<> (which is handled separately):
+VECTORS_WITHOUT_LAVEC := { Vector<double>;
                          Vector<float> ;
 
                          BlockVector<double>;
                          BlockVector<float>;
-
-                         LinearAlgebra::distributed::Vector<double>;
 
                          @DEAL_II_EXPAND_TRILINOS_MPI_VECTOR@;
                          @DEAL_II_EXPAND_EPETRA_VECTOR@;
@@ -241,6 +249,8 @@ TRIANGULATIONS := { Triangulation<deal_II_dimension, deal_II_space_dimension>;
                     parallel::shared::Triangulation<deal_II_dimension, deal_II_space_dimension>;
                     parallel::distributed::Triangulation<deal_II_dimension, deal_II_space_dimension>;
                     parallel::fullydistributed::Triangulation<deal_II_dimension, deal_II_space_dimension>; }
+
+TRILINOS_SCALARS := { @DEAL_II_EXPAND_TPETRA_TYPES@; }
 
 // all supported logical dimensions
 DIMENSIONS := { 1; 2; 3 }

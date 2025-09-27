@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2023 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 1998 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 #ifndef dealii_dof_handler_h
 #define dealii_dof_handler_h
@@ -24,7 +23,7 @@
 #include <deal.II/base/function.h>
 #include <deal.II/base/index_set.h>
 #include <deal.II/base/iterator_range.h>
-#include <deal.II/base/smartpointer.h>
+#include <deal.II/base/observer_pointer.h>
 #include <deal.II/base/types.h>
 
 #include <deal.II/dofs/block_info.h>
@@ -37,6 +36,7 @@
 #include <deal.II/hp/fe_collection.h>
 
 #include <boost/serialization/split_member.hpp>
+#include <boost/signals2/connection.hpp>
 
 #include <map>
 #include <memory>
@@ -94,6 +94,13 @@ namespace parallel
     class CellDataTransfer;
   }
 } // namespace parallel
+
+template <int structdim, int dim, int spacedim, bool level_dof_access>
+class DoFAccessor;
+
+template <int dimension_, int space_dimension_, bool level_dof_access>
+class DoFCellAccessor;
+
 #endif
 
 /**
@@ -167,7 +174,7 @@ namespace parallel
  * parallel::distributed::Triangulation (see, for example, step-32, step-40
  * and in particular the
  * @ref distributed
- * module) in which case the DoFHandler object will proceed to only manage
+ * topic) in which case the DoFHandler object will proceed to only manage
  * degrees of freedom on locally owned and ghost cells. This process is
  * entirely transparent to the used.
  *
@@ -314,7 +321,7 @@ namespace parallel
  */
 template <int dim, int spacedim = dim>
 DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
-class DoFHandler : public Subscriptor
+class DoFHandler : public EnableObserverPointer
 {
   using ActiveSelector =
     dealii::internal::DoFHandlerImplementation::Iterators<dim, spacedim, false>;
@@ -325,7 +332,7 @@ public:
   /**
    * An alias that is used to identify cell iterators in DoFHandler objects.
    * The concept of iterators is discussed at length in the
-   * @ref Iterators "iterators documentation module".
+   * @ref Iterators "iterators documentation topic".
    *
    * The current alias works, in essence, like the corresponding
    * Triangulation::cell_accessor alias. However, it also makes available
@@ -339,7 +346,7 @@ public:
   /**
    * An alias that is used to identify iterators that point to faces.
    * The concept of iterators is discussed at length in the
-   * @ref Iterators "iterators documentation module".
+   * @ref Iterators "iterators documentation topic".
    *
    * The current alias works, in essence, like the corresponding
    * Triangulation::face_accessor alias. However, it also makes available
@@ -422,7 +429,7 @@ public:
    * An alias that is used to identify
    * @ref GlossActive "active cell iterators".
    * The concept of iterators is discussed at length in the
-   * @ref Iterators "iterators documentation module".
+   * @ref Iterators "iterators documentation topic".
    *
    * The current alias identifies active cells in a DoFHandler object. While
    * the actual data type of the alias is hidden behind a few layers of
@@ -443,7 +450,7 @@ public:
   /**
    * An alias that is used to identify cell iterators. The concept of
    * iterators is discussed at length in the
-   * @ref Iterators "iterators documentation module".
+   * @ref Iterators "iterators documentation topic".
    *
    * The current alias identifies cells in a DoFHandler object. Some of
    * these cells may in fact be active (see
@@ -471,7 +478,7 @@ public:
   /**
    * An alias that is used to identify iterators that point to faces.
    * The concept of iterators is discussed at length in the
-   * @ref Iterators "iterators documentation module".
+   * @ref Iterators "iterators documentation topic".
    *
    * While the actual data type of the alias is hidden behind a few layers
    * of (unfortunately necessary) indirections, it is in essence
@@ -522,33 +529,9 @@ public:
   static const types::fe_index default_fe_index = 0;
 
   /**
-   * Invalid index of the finite element to be used on a given cell.
-   *
-   * @deprecated Use numbers::invalid_fe_index instead.
-   */
-  static const unsigned int invalid_fe_index DEAL_II_DEPRECATED =
-    numbers::invalid_fe_index;
-
-  /**
-   * The type in which we store the active FE index.
-   *
-   * @deprecated Use types::fe_index instead.
-   */
-  using active_fe_index_type DEAL_II_DEPRECATED = types::fe_index;
-
-  /**
    * The type in which we store the offsets in the CRS data structures.
    */
   using offset_type = unsigned int;
-
-  /**
-   * Invalid active FE index which will be used as a default value to determine
-   * whether a future FE index has been set or not.
-   *
-   * @deprecated Use numbers::invalid_fe_index instead.
-   */
-  static const types::fe_index invalid_active_fe_index DEAL_II_DEPRECATED =
-    numbers::invalid_fe_index;
 
   /**
    * Standard constructor, not initializing any data. After constructing an
@@ -624,26 +607,6 @@ public:
    */
   std::vector<types::fe_index>
   get_active_fe_indices() const;
-
-  /**
-   * For each locally relevant cell, extract the active finite element index and
-   * fill the vector @p active_fe_indices in the order in which we iterate over
-   * active cells. This vector is resized, if necessary.
-   *
-   * As we do not know the active FE index on artificial cells, they are set to
-   * the invalid value numbers::invalid_fe_index.
-   *
-   * For DoFHandler objects without hp-capabilities, the vector will consist of
-   * zeros, indicating that all cells use the same finite element. In hp-mode,
-   * the values may be different, though.
-   *
-   * The returned vector has as many entries as there are active cells.
-   *
-   * @deprecated Use get_active_fe_indices() that returns the result vector.
-   */
-  DEAL_II_DEPRECATED
-  void
-  get_active_fe_indices(std::vector<unsigned int> &active_fe_indices) const;
 
   /**
    * For each locally owned cell, set the future finite element index to the
@@ -784,7 +747,7 @@ public:
    * computing a new ordering of the degree of freedom indices. However, it
    * can of course also be called from user code.
    *
-   * @arg new_number This array must have a size equal to the number of
+   * @param[in] new_numbers This array must have a size equal to the number of
    * degrees of freedom owned by the current processor, i.e. the size must be
    * equal to what n_locally_owned_dofs() returns. If only one processor
    * participates in storing the current mesh, then this equals the total
@@ -864,7 +827,7 @@ public:
    * use an intermediate compressed sparsity pattern that only allocates
    * memory on demand. Refer to the step-2 and step-11 example programs on how
    * to do this. The problem is also discussed in the documentation of the
-   * module on
+   * topic on
    * @ref Sparsity.
    */
   unsigned int
@@ -877,7 +840,7 @@ public:
    * The number is the same as for max_couplings_between_dofs() in one
    * dimension less.
    *
-   * @note The same applies to this function as to max_couplings_per_dofs() as
+   * @note The same applies to this function as to max_couplings_between_dofs() as
    * regards the performance of this function. Think about one of the dynamic
    * sparsity pattern classes instead (see
    * @ref Sparsity).
@@ -1243,6 +1206,16 @@ public:
    * Return MPI communicator used by the underlying triangulation.
    */
   MPI_Comm
+  get_mpi_communicator() const;
+
+  /**
+   * Return MPI communicator used by the underlying triangulation.
+   *
+   * @deprecated Use get_mpi_communicator() instead.
+   */
+  DEAL_II_DEPRECATED_WITH_COMMENT(
+    "Access the MPI communicator with get_mpi_communicator() instead.")
+  MPI_Comm
   get_communicator() const;
 
   /**
@@ -1498,15 +1471,15 @@ private:
   BlockInfo block_info_object;
 
   /**
-   * Boolean indicating whether or not the current DoFHandler has hp-
-   * capabilities.
+   * Boolean indicating whether or not the current DoFHandler has
+   * hp-capabilities.
    */
   bool hp_capability_enabled;
 
   /**
    * Address of the triangulation to work on.
    */
-  SmartPointer<const Triangulation<dim, spacedim>, DoFHandler<dim, spacedim>>
+  ObserverPointer<const Triangulation<dim, spacedim>, DoFHandler<dim, spacedim>>
     tria;
 
   /**
@@ -1783,7 +1756,7 @@ namespace internal
        * @note This function can only be called on direct parent cells, i.e.,
        * non-active cells whose children are all active.
        *
-       * @note On parallel::shared::Triangulation objects where sibling cells
+       * @note On parallel Triangulation objects where sibling cells
        * can be ghost cells, make sure that future FE indices have been properly
        * communicated with communicate_future_fe_indices() first. Otherwise,
        * results might differ on different processors. There is no check for
@@ -1934,12 +1907,21 @@ inline const Triangulation<dim, spacedim>
 
 template <int dim, int spacedim>
 DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
-inline MPI_Comm DoFHandler<dim, spacedim>::get_communicator() const
+inline MPI_Comm DoFHandler<dim, spacedim>::get_mpi_communicator() const
 {
   Assert(tria != nullptr,
          ExcMessage("This DoFHandler object has not been associated "
                     "with a triangulation."));
-  return tria->get_communicator();
+  return tria->get_mpi_communicator();
+}
+
+
+
+template <int dim, int spacedim>
+DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
+inline MPI_Comm DoFHandler<dim, spacedim>::get_communicator() const
+{
+  return get_mpi_communicator();
 }
 
 
@@ -2145,13 +2127,24 @@ inline types::global_dof_index
 
 
 
+// Declare the existence of explicit instantiations of the class
+// above. This is not strictly necessary, but tells the compiler to
+// avoid instantiating templates that we know are instantiated in
+// .cc files and so can be referenced without implicit
+// instantiations.
+//
+// Unfortunately, this does not seem to work when building modules
+// because the compiler (well, Clang at least) then just doesn't
+// instantiate these classes at all, even though their members are
+// defined and explicitly instantiated in a .cc file.
+#  ifndef DEAL_II_BUILDING_CXX20_MODULE
 extern template class DoFHandler<1, 1>;
 extern template class DoFHandler<1, 2>;
 extern template class DoFHandler<1, 3>;
 extern template class DoFHandler<2, 2>;
 extern template class DoFHandler<2, 3>;
 extern template class DoFHandler<3, 3>;
-
+#  endif
 
 #endif // DOXYGEN
 

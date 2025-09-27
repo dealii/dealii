@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2004 - 2021 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2018 - 2024 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 #ifndef dealii_fe_bernardi_raugel_h
 #define dealii_fe_bernardi_raugel_h
@@ -45,21 +44,7 @@ DEAL_II_NAMESPACE_OPEN
  * pressure space to provide additional accuracy commensurate with the
  * cost of the large number of velocity unknowns.
  *
- * The element was introduced in the following paper:
- * @code{.bib}
- * @article{BR85,
- *   author    = {Christine Bernardi and Genevi{\`e}ve Raugel},
- *   title     = {Analysis of some finite elements for the {S}tokes problem},
- *   journal   = {Mathematics of Computation},
- *   publisher = {American Mathematical Society ({AMS})},
- *   volume    = {44},
- *   number    = {169},
- *   pages     = {71--79},
- *   year      = {1985},
- *   doi       = {10.1090/s0025-5718-1985-0771031-7},
- *   url       = {https://doi.org/10.1090/s0025-5718-1985-0771031-7}
- * }
- * @endcode
+ * The element was introduced in the paper @cite BR85.
  *
  *
  * <h3>Degrees of freedom</h3>
@@ -90,7 +75,7 @@ public:
    * Constructor for the Bernardi-Raugel element of degree @p p. The only
    * supported degree is 1.
    *
-   * @arg p: The degree of the element $p=1$ for $BR_1$.
+   * @param p The degree of the element $p=1$ for $BR_1$.
    */
   FE_BernardiRaugel(const unsigned int p = 1);
 

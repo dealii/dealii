@@ -1,4 +1,4 @@
-<a name="Intro"></a>
+<a name="step_1-Intro"></a>
 <h1>Introduction</h1>
 
 <h3> About the tutorial </h3>
@@ -17,7 +17,7 @@ different levels:
   every single (member) function in deal.II. You get there if, for
   example, you click on the "Main page" or "Classes" tab at the top of
   this page. This is the place where you would look up what the second
-  argument of Triangulation::create_triangulation means,
+  argument of Triangulation::create_triangulation() means,
   to give just one example. You need this level of
   documentation for when you know what you want to do, but forgot how
   exactly the function was named, what its arguments are, or what it
@@ -28,20 +28,20 @@ different levels:
   class. On the other hand, the manual is not a good place to learn
   deal.II since it gives you a microscopic view of things without
   telling you how a function might fit into the bigger picture.
-- Modules: These are groups of classes and functions that work
+- Topics: These are groups of classes and functions that work
   together or have related functionality. If you click on the
-  "Modules" tab at the top of this page, you end up on a page that
-  lists a number of such groups. Each module discusses the underlying
-  principles of these classes; for example, the @ref Sparsity module
+  "Topics" tab at the top of this page, you end up on a page that
+  lists a number of such groups. Each topic discusses the underlying
+  principles of these classes; for example, the @ref Sparsity topic
   talks about all sorts of different issues related to storing
   sparsity patterns of matrices. This is documentation at an
   intermediate level: they give you an overview of what's there in a
   particular area. For example when you wonder what finite element
-  classes exist, you would take a look at the @ref fe module. The
-  modules are, of course, also cross-linked to the manual (and, at
+  classes exist, you would take a look at the @ref fe topic. The
+  topics are, of course, also cross-linked to the manual (and, at
   times, to the tutorial); if you click on a class name, say on
-  Triangulation, would will also at the very top right under the class
-  name get a link to the modules this class is a member of if you want
+  Triangulation, you will also at the very top right under the class
+  name get a link to the topics this class is a member of if you want
   to learn more about its context.
 
 Let's come back to the tutorial, since you are looking at the first program
@@ -63,7 +63,7 @@ sections:
        interpretation. This section also frequently has a subsection
        that gives suggestions on how to extend the program in various
        direction; in the earlier programs, this is intended to give
-       you directions for little experiments designed to make your
+       you directions for little experiments designed to make you
        familiar with deal.II, while in later programs it is more about
        how to use more advanced numerical techniques.
   <li> <b>The plain program:</b> The source code stripped of
@@ -85,7 +85,7 @@ tutorial is that you're interested in) and type
 @endcode
 The first command sets up the files that describe which include files this
 tutorial program depends on, how to compile it and how to run it. This command
-should find the installed deal.II libraries as well that were generated when
+should find the installed deal.II libraries as well as those that were generated when
 you compiled and installed everything as described in the
 <a href="../../readme.html" target="body">README</a> file.
 If this command should fail to find the deal.II library, then you need to
@@ -137,25 +137,61 @@ later on. Additionally, as of deal.II version 9.0, GridGenerator::hyper_shell()
 now automatically attaches a SphericalManifold to the Triangulation. Otherwise
 the rest of the lecture material is relevant.
 
+
 <h3> What this program does </h3>
 
-Let's come back to step-1, the current program.
-In this first example, we don't actually do very much, but show two
-techniques: what is the syntax to generate triangulation objects, and
-some elements of simple loops over all cells. We create two grids, one
-which is a regularly refined square (not very exciting, but a common
-starting grid for some problems), and one more geometric attempt: a
-ring-shaped domain, which is refined towards the inner edge. Through
-this, you will get to know three things every finite element program
-will have to have somewhere: An object of type Triangulation for the
-mesh; a call to the GridGenerator functions to generate a mesh; and
-loops over all cells that involve iterators (iterators are a
-generalization of pointers and are frequently used in the C++ standard
-library; in the context of deal.II, the @ref Iterators module talks
-about them).
+Let's come back to step-1, the current program. The goal of this
+program is to introduce you to the Triangulation class that is at the
+core of every finite element program. The name "triangulation" in this
+context is mostly historical: To finite element practitioners, the
+terms "triangulation", "mesh", and "grid" are all synonymous and
+describe a subdivision of a domain on which a differential equation is
+posed into cells of some kind. If the domain is two-dimensional, these
+cells may indeed be triangles, but they could also be quadrilaterals
+(four-sided objects such as squares and rectangles, and their
+deformations). In one space dimension, the cells are line segments. In
+three space dimensions, they can be tetrahedra, hexahedra (deformed
+cubes), pyramids (a four-sided base with three triangles connecting to
+a point at the top), and "wedges" (two triangles at the bottom and
+top, connected by three quadrilaterals; wedges are often also called
+"(triangular) prisms", for example in
+[this wikipedia article about types of meshes](https://en.wikipedia.org/wiki/Types_of_mesh)).
+Collections of any such cells are
+"triangulations" in common usage of the word even though they may not
+actually have triangles in them. All of them are also "grids" in
+common usage of the word even though the usual meaning of the word "grid"
+would be something where the vertices are in neat rows
+parallel to the coordinate axes (which would then be a "structured grid"
+in the finite element context). In other words, whenever you read any
+of the three terms in the tutorials or the library's documentation,
+consider them equivalent.
 
-The program is otherwise small enough that it doesn't need a whole lot
-of introduction.
+What this program shows, then, is how to create a Triangulation
+object, and to operate on it. The underlying concept of a
+Triangulation is that it is a *container*, i.e., a class that stores
+a *collection of cells*. As is common in modern programming languages,
+the key operation on containers is that one can *iterate* over its
+elements, and that's exactly what we will do below.
+
+Specifically, in the program we create two grids, one which is a
+regularly refined square (not very exciting, but a common starting
+grid for many problems), and one that is a more geometric attempt: a
+ring-shaped domain that is refined towards the inner edge. The process
+of refining the mesh in this way will illustrate how we iterate (i.e.,
+loop) over the elements of the triangulation (i.e., the cells of the
+mesh). You will see many more such loops throughout the remainder
+of the tutorial. (Since there are so many loops over cells in finite
+element programs, the @ref Iterators topic talks about them in more
+detail.)
+
+In the program shown below, we will use meshes of quadrilaterals
+because, historically, this is what deal.II supported in 2d. However,
+deal.II's Triangulation class is quite happy to also store triangles
+these days (and tetrahedra, wedges, pyramids, and hexehedra in 3d),
+and you can find a section further down below on this page explaining
+how you can switch from quadrilaterals to triangles. The program is
+otherwise small enough that it doesn't need a whole lot of
+introduction.
 
 @dealiiVideoLecture{5,6}
 
@@ -199,6 +235,17 @@ are worthwhile browsing through before you start any large-scale programming:
   to continuously transform existing code to make it fit for future
   extension @cite Refactoring .
 
+- deal.II is written in C++, a language that is perhaps not the very
+  easiest one to learn. There are may good books that provide an
+  introduction to the language, as well as web resources such as
+  [this C++ quickstart tutorial](https://cplusplus.com/doc/tutorial/) and
+  [this more in-depth reference](https://www.learncpp.com/).
+  If all you want is to look up a
+  fact (say, the name of a member function of `std::vector`, or the
+  order of function arguments of `std::accumulate()`, then
+  [cppreference.org](https://en.cppreference.com/) is the place many
+  of us go to.
+
 - The <a href="http://software-carpentry.org/">Software Carpentry project</a>
   that provides introductions to many topics that are important to dealing
   with software, such as version control, make files, testing, etc. It is
@@ -231,8 +278,12 @@ are worthwhile browsing through before you start any large-scale programming:
 As a general recommendation: If you expect to spend more than a few days
 writing software in the future, do yourself the favor of learning tools that
 can make your life more productive, in particular debuggers and integrated
-development environments. (@dealiiVideoLectureSeeAlso{7,8,8.01,25})
-You will find that you will get the time spent
-learning these tools back severalfold soon by being more productive!
-Several of the video lectures referenced above show how to use tools
+development environments.
+Several of the video lectures mentioned above show how to use tools
 such as integrated development environments or debuggers.
+(@dealiiVideoLectureSeeAlso{7,8,8.01,25})
+A good overview of all sorts of approaches one can use towards
+finding bugs can be found in the article
+[Modern debugging: the art of finding a needle in a haystack](https://dl.acm.org/doi/10.1145/3186278).
+You will find that the time spent learning these tools amortizes very quickly:
+Knowing ways to debug efficiently will make you vastly more productive!

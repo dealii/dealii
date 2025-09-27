@@ -1,17 +1,16 @@
-/* ---------------------------------------------------------------------
+/* ------------------------------------------------------------------------
  *
- * Copyright (C) 2000 - 2021 by the deal.II authors
+ * SPDX-License-Identifier: LGPL-2.1-or-later
+ * Copyright (C) 2021 - 2024 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
- * The deal.II library is free software; you can use it, redistribute
- * it, and/or modify it under the terms of the GNU Lesser General
- * Public License as published by the Free Software Foundation; either
- * version 2.1 of the License, or (at your option) any later version.
- * The full text of the license can be found in the file LICENSE.md at
- * the top level directory of deal.II.
+ * Part of the source code is dual licensed under Apache-2.0 WITH
+ * LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+ * governing the source code and code contributions can be found in
+ * LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
  *
- * ---------------------------------------------------------------------
+ * ------------------------------------------------------------------------
  */
 
 
@@ -27,8 +26,8 @@
 #include <deal.II/base/convergence_table.h>
 #include <deal.II/base/function.h>
 #include <deal.II/base/logstream.h>
+#include <deal.II/base/observer_pointer.h>
 #include <deal.II/base/quadrature_lib.h>
-#include <deal.II/base/smartpointer.h>
 
 #include <deal.II/dofs/dof_accessor.h>
 #include <deal.II/dofs/dof_handler.h>
@@ -72,7 +71,6 @@
 
 namespace Step7
 {
-  using namespace dealii;
 
 
   template <int dim>
@@ -211,7 +209,7 @@ namespace Step7
     Triangulation<dim> triangulation;
     DoFHandler<dim>    dof_handler;
 
-    SmartPointer<const FiniteElement<dim>> fe;
+    ObserverPointer<const FiniteElement<dim>> fe;
 
     AffineConstraints<double> hanging_node_constraints;
 
@@ -426,7 +424,7 @@ namespace Step7
 
         default:
           {
-            Assert(false, ExcNotImplemented());
+            DEAL_II_NOT_IMPLEMENTED();
           }
       }
   }
@@ -524,8 +522,8 @@ namespace Step7
               for (const auto &face : cell->face_iterators())
                 {
                   const auto center = face->center();
-                  if ((std::fabs(center(0) - (-1.0)) < 1e-12) ||
-                      (std::fabs(center(1) - (-1.0)) < 1e-12))
+                  if ((std::fabs(center[0] - (-1.0)) < 1e-12) ||
+                      (std::fabs(center[1] - (-1.0)) < 1e-12))
                     face->set_boundary_id(1);
                 }
           }
@@ -550,7 +548,7 @@ namespace Step7
           vtk_filename = "solution-adaptive";
           break;
         default:
-          Assert(false, ExcNotImplemented());
+          DEAL_II_NOT_IMPLEMENTED();
       }
 
     switch (fe->degree)
@@ -563,7 +561,7 @@ namespace Step7
           break;
 
         default:
-          Assert(false, ExcNotImplemented());
+          DEAL_II_NOT_IMPLEMENTED();
       }
 
     vtk_filename += ".vtk";
@@ -612,7 +610,7 @@ namespace Step7
           error_filename += "-adaptive";
           break;
         default:
-          Assert(false, ExcNotImplemented());
+          DEAL_II_NOT_IMPLEMENTED();
       }
 
     switch (fe->degree)
@@ -624,7 +622,7 @@ namespace Step7
           error_filename += "-q2";
           break;
         default:
-          Assert(false, ExcNotImplemented());
+          DEAL_II_NOT_IMPLEMENTED();
       }
 
     error_filename += ".tex";
@@ -665,7 +663,7 @@ namespace Step7
               conv_filename += "-adaptive";
               break;
             default:
-              Assert(false, ExcNotImplemented());
+              DEAL_II_NOT_IMPLEMENTED();
           }
         switch (fe->degree)
           {
@@ -676,7 +674,7 @@ namespace Step7
               conv_filename += "-q2";
               break;
             default:
-              Assert(false, ExcNotImplemented());
+              DEAL_II_NOT_IMPLEMENTED();
           }
         conv_filename += ".tex";
 
@@ -696,7 +694,6 @@ main()
 
   try
     {
-      using namespace dealii;
       using namespace Step7;
 
       {

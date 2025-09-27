@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2016 - 2021 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2014 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 // Check SphericalManifold for get_intermediate_point and get_tangent_vector
 // issues.
@@ -41,7 +40,6 @@ main()
     Point<2> Q = manifold.get_intermediate_point(P1, P2, .5);
 
     deallog << "=================================" << std::endl;
-    ;
     deallog << manifold.get_intermediate_point(P1, P2, .125) << std::endl;
     deallog << manifold.get_intermediate_point(P1, P2, .25) << std::endl;
     deallog << manifold.get_intermediate_point(P1, P2, .375) << std::endl;
@@ -70,7 +68,6 @@ main()
     Point<2> Q = manifold.get_intermediate_point(P1, P2, .5);
 
     deallog << "=================================" << std::endl;
-    ;
     deallog << manifold.get_intermediate_point(P1, P2, .125) << std::endl;
     deallog << manifold.get_intermediate_point(P1, P2, .25) << std::endl;
     deallog << manifold.get_intermediate_point(P1, P2, .375) << std::endl;
@@ -99,7 +96,6 @@ main()
     Point<3> Q = manifold.get_intermediate_point(P1, P2, .5);
 
     deallog << "=================================" << std::endl;
-    ;
     deallog << manifold.get_intermediate_point(P1, P2, .125) << std::endl;
     deallog << manifold.get_intermediate_point(P1, P2, .25) << std::endl;
     deallog << manifold.get_intermediate_point(P1, P2, .375) << std::endl;
@@ -129,7 +125,6 @@ main()
 
     const unsigned int num_points = 20;
     deallog << "=================================" << std::endl;
-    ;
     for (unsigned int i = 0; i < num_points; ++i)
       deallog << manifold.get_intermediate_point(P1,
                                                  P2,
@@ -179,7 +174,6 @@ main()
     Point<3> R = manifold.get_intermediate_point(P5, P4, 2.0 / 3.0);
 
     deallog << "=================================" << std::endl;
-    ;
     deallog << Q << std::endl;
     deallog << S << std::endl;
     deallog << T << std::endl;

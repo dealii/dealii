@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2014 - 2023 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2014 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 #ifndef dealii_time_stepping_h
 #define dealii_time_stepping_h
@@ -39,11 +38,16 @@ namespace TimeStepping
    *   - RK_THIRD_ORDER (third order Runge-Kutta)
    *   - SSP_THIRD_ORDER (third order SSP Runge-Kutta)
    *   - RK_CLASSIC_FOURTH_ORDER (classical fourth order Runge-Kutta)
-   * - Low-storage (explicit) Runge-Kutta methods
-   *   - LOW_STORAGE_RK_STAGE3_ORDER3 (Three stages and third order)
-   *   - LOW_STORAGE_RK_STAGE5_ORDER4 (Five stages and fourth order)
-   *   - LOW_STORAGE_RK_STAGE7_ORDER4 (Seven stages and fourth order)
-   *   - LOW_STORAGE_RK_STAGE9_ORDER5 (Nine stages and fifth order)
+   *   - RK_FIFTH_ORDER (six stages and fifth order)
+   *   - RK_SIXTH_ORDER (seven stages and sixth order)
+   * - Low-storage (explicit) Runge-Kutta methods (see
+   * LowStorageRungeKutta::initialize):
+   *   - FORWARD_EULER (first order)
+   *   - HEUN_EULER (second order)
+   *   - LOW_STORAGE_RK_STAGE3_ORDER3 (three stages and third order)
+   *   - LOW_STORAGE_RK_STAGE5_ORDER4 (five stages and fourth order)
+   *   - LOW_STORAGE_RK_STAGE7_ORDER4 (seven stages and fourth order)
+   *   - LOW_STORAGE_RK_STAGE9_ORDER5 (nine stages and fifth order)
    * - Implicit methods (see ImplicitRungeKutta::initialize):
    *   - BACKWARD_EULER (first order)
    *   - IMPLICIT_MIDPOINT (second order)
@@ -77,6 +81,14 @@ namespace TimeStepping
      * Classical fourth order Runge-Kutta method.
      */
     RK_CLASSIC_FOURTH_ORDER,
+    /**
+     * Fifth order Runge-Kutta method.
+     */
+    RK_FIFTH_ORDER,
+    /**
+     * Sixth order Runge-Kutta method.
+     */
+    RK_SIXTH_ORDER,
     /**
      * Three-stage scheme of order three by Kennedy et al.
      * @cite KennedyCarpenterLewis2000. Its stability region is
@@ -509,7 +521,7 @@ namespace TimeStepping
       const double                                                       t,
       const double      factor_solution,
       const double      factor_ai,
-      const VectorType &corrent_ri,
+      const VectorType &current_ri,
       VectorType       &vec_ki,
       VectorType       &solution,
       VectorType       &next_ri) const;

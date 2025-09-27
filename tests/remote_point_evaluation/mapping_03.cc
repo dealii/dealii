@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2021 - 2022 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2021 - 2024 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 // Test Utilities::MPI::RemotePointEvaluation with and without unique mapping
 // for a within a tolerance.
@@ -24,17 +23,17 @@
 #include <deal.II/fe/mapping_q1.h>
 
 #include <deal.II/grid/grid_generator.h>
+#include <deal.II/grid/grid_tools_cache.h>
 
 #include <deal.II/numerics/vector_tools_evaluate.h>
 
 #include "../tests.h"
 
-using namespace dealii;
 
 
 template <int dim>
 void
-test(const bool enforce_unique_map)
+test(const bool enforce_unique_map, const bool use_cache)
 {
   parallel::distributed::Triangulation<dim> tria(MPI_COMM_WORLD);
   GridGenerator::subdivided_hyper_cube(tria, 2);
@@ -55,7 +54,17 @@ test(const bool enforce_unique_map)
     // should be assigned to rank 0 for unique mapping
     evaluation_points.emplace_back(0.5, 0.5 + std::pow<double>(10.0, -i));
 
-  Utilities::MPI::RemotePointEvaluation<dim> eval(1e-6, enforce_unique_map);
+  typename Utilities::MPI::RemotePointEvaluation<dim>::AdditionalData
+    additional_data;
+  additional_data.enforce_unique_mapping = enforce_unique_map;
+  additional_data.tolerance              = 1e-6;
+
+  Utilities::MPI::RemotePointEvaluation<dim> eval(additional_data);
+  if (use_cache)
+    {
+      GridTools::Cache<dim> cache(tria, mapping);
+      eval.reinit(cache, evaluation_points);
+    }
 
   const auto result_avg =
     VectorTools::point_values<1>(mapping,
@@ -86,6 +95,7 @@ main(int argc, char **argv)
   Utilities::MPI::MPI_InitFinalize mpi(argc, argv, 1);
   MPILogInitAll                    all;
 
-  test<2>(false);
-  test<2>(true);
+  test<2>(false, false);
+  test<2>(true, false);
+  test<2>(true, true);
 }

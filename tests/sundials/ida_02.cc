@@ -1,17 +1,16 @@
-//-----------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-//    Copyright (C) 2017 - 2023 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2017 - 2024 by the deal.II authors
 //
-//    This file is part of the deal.II library.
+// This file is part of the deal.II library.
 //
-//    The deal.II library is free software; you can use it, redistribute
-//    it, and/or modify it under the terms of the GNU Lesser General
-//    Public License as published by the Free Software Foundation; either
-//    version 2.1 of the License, or (at your option) any later version.
-//    The full text of the license can be found in the file LICENSE.md at
-//    the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-//-----------------------------------------------------------
+// ------------------------------------------------------------------------
 
 #include <deal.II/base/parameter_handler.h>
 
@@ -34,7 +33,7 @@
  * u (0) = 0
  * u'(0) = k
  *
- * write in terms of a first order ode:
+ * written in terms of a first order ode:
  *
  * y[0]' -     y[1]  = 0
  * y[1]' + k^2 y[0]  = 0
@@ -93,8 +92,8 @@ public:
 
       J = A;
 
-      J(0, 0) = alpha;
-      J(1, 1) = alpha;
+      J(0, 0) += alpha;
+      J(1, 1) += alpha;
     };
 
     time_stepper.solve_with_jacobian =
@@ -143,7 +142,7 @@ main()
   data.add_parameters(prm);
 
   // std::ofstream ofile(SOURCE_DIR "/ida_01.prm");
-  // prm.print_parameters(ofile, ParameterHandler::ShortText);
+  // prm.print_parameters(ofile, ParameterHandler::ShortPRM);
   // ofile.close();
 
   std::ifstream ifile(SOURCE_DIR "/ida_01_in.prm");

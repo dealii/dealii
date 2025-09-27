@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2015 - 2023 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2015 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 
 #include <deal.II/base/logstream.h>
@@ -120,6 +119,7 @@ namespace parallel
   DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
   TriangulationBase<dim, spacedim>::NumberCache::NumberCache()
     : n_locally_owned_active_cells(0)
+    , n_global_active_cells(0)
     , number_of_global_coarse_cells(0)
     , n_global_levels(0)
   {}
@@ -157,7 +157,7 @@ namespace parallel
 
   template <int dim, int spacedim>
   DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
-  MPI_Comm TriangulationBase<dim, spacedim>::get_communicator() const
+  MPI_Comm TriangulationBase<dim, spacedim>::get_mpi_communicator() const
   {
     return mpi_communicator;
   }
@@ -233,60 +233,61 @@ namespace parallel
             this->number_cache.level_ghost_owners.insert(
               cell->level_subdomain_id());
 
-#  ifdef DEBUG
-        // Check that level_ghost_owners is symmetric by sending a message
-        // to everyone
-        {
-          int ierr = MPI_Barrier(this->mpi_communicator);
-          AssertThrowMPI(ierr);
-
-          const int mpi_tag = Utilities::MPI::internal::Tags::
-            triangulation_base_fill_level_ghost_owners;
-
-          // important: preallocate to avoid (re)allocation:
-          std::vector<MPI_Request> requests(
-            this->number_cache.level_ghost_owners.size());
-          unsigned int dummy       = 0;
-          unsigned int req_counter = 0;
-
-          for (const auto &it : this->number_cache.level_ghost_owners)
+        if constexpr (running_in_debug_mode())
+          {
+            // Check that level_ghost_owners is symmetric by sending a message
+            // to everyone
             {
-              ierr = MPI_Isend(&dummy,
-                               1,
-                               MPI_UNSIGNED,
-                               it,
-                               mpi_tag,
-                               this->mpi_communicator,
-                               &requests[req_counter]);
+              int ierr = MPI_Barrier(this->mpi_communicator);
               AssertThrowMPI(ierr);
-              ++req_counter;
-            }
 
-          for (const auto &it : this->number_cache.level_ghost_owners)
-            {
-              unsigned int dummy;
-              ierr = MPI_Recv(&dummy,
-                              1,
-                              MPI_UNSIGNED,
-                              it,
-                              mpi_tag,
-                              this->mpi_communicator,
-                              MPI_STATUS_IGNORE);
+              const int mpi_tag = Utilities::MPI::internal::Tags::
+                triangulation_base_fill_level_ghost_owners;
+
+              // important: preallocate to avoid (re)allocation:
+              std::vector<MPI_Request> requests(
+                this->number_cache.level_ghost_owners.size());
+              unsigned int dummy       = 0;
+              unsigned int req_counter = 0;
+
+              for (const auto &it : this->number_cache.level_ghost_owners)
+                {
+                  ierr = MPI_Isend(&dummy,
+                                   1,
+                                   MPI_UNSIGNED,
+                                   it,
+                                   mpi_tag,
+                                   this->mpi_communicator,
+                                   &requests[req_counter]);
+                  AssertThrowMPI(ierr);
+                  ++req_counter;
+                }
+
+              for (const auto &it : this->number_cache.level_ghost_owners)
+                {
+                  unsigned int dummy;
+                  ierr = MPI_Recv(&dummy,
+                                  1,
+                                  MPI_UNSIGNED,
+                                  it,
+                                  mpi_tag,
+                                  this->mpi_communicator,
+                                  MPI_STATUS_IGNORE);
+                  AssertThrowMPI(ierr);
+                }
+
+              if (requests.size() > 0)
+                {
+                  ierr = MPI_Waitall(requests.size(),
+                                     requests.data(),
+                                     MPI_STATUSES_IGNORE);
+                  AssertThrowMPI(ierr);
+                }
+
+              ierr = MPI_Barrier(this->mpi_communicator);
               AssertThrowMPI(ierr);
             }
-
-          if (requests.size() > 0)
-            {
-              ierr = MPI_Waitall(requests.size(),
-                                 requests.data(),
-                                 MPI_STATUSES_IGNORE);
-              AssertThrowMPI(ierr);
-            }
-
-          ierr = MPI_Barrier(this->mpi_communicator);
-          AssertThrowMPI(ierr);
-        }
-#  endif
+          }
 
         Assert(this->number_cache.level_ghost_owners.size() <
                  Utilities::MPI::n_mpi_processes(this->mpi_communicator),
@@ -583,17 +584,18 @@ namespace parallel
     const std::vector<bool> &vertex_locally_moved)
   {
     AssertDimension(vertex_locally_moved.size(), this->n_vertices());
-#ifdef DEBUG
-    {
-      const std::vector<bool> locally_owned_vertices =
-        dealii::GridTools::get_locally_owned_vertices(*this);
-      for (unsigned int i = 0; i < locally_owned_vertices.size(); ++i)
-        Assert((vertex_locally_moved[i] == false) ||
-                 (locally_owned_vertices[i] == true),
-               ExcMessage("The vertex_locally_moved argument must not "
-                          "contain vertices that are not locally owned"));
-    }
-#endif
+    if constexpr (running_in_debug_mode())
+      {
+        {
+          const std::vector<bool> locally_owned_vertices =
+            dealii::GridTools::get_locally_owned_vertices(*this);
+          for (unsigned int i = 0; i < locally_owned_vertices.size(); ++i)
+            Assert((vertex_locally_moved[i] == false) ||
+                     (locally_owned_vertices[i] == true),
+                   ExcMessage("The vertex_locally_moved argument must not "
+                              "contain vertices that are not locally owned"));
+        }
+      }
 
     Point<spacedim> invalid_point;
     for (unsigned int d = 0; d < spacedim; ++d)
@@ -684,9 +686,11 @@ namespace parallel
 
   template <int dim, int spacedim>
   DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
-  void DistributedTriangulationBase<dim, spacedim>::clear()
+  void TriangulationBase<dim, spacedim>::clear()
   {
     dealii::Triangulation<dim, spacedim>::clear();
+
+    number_cache = {};
   }
 
 
@@ -722,6 +726,6 @@ namespace parallel
 
 
 /*-------------- Explicit Instantiations -------------------------------*/
-#include "tria_base.inst"
+#include "distributed/tria_base.inst"
 
 DEAL_II_NAMESPACE_CLOSE

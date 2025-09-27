@@ -1,0 +1,9 @@
+
+DEAL:0:all::1 2 
+DEAL:0:all::101 102 
+DEAL:0:all::101 102 
+
+DEAL:1:all::101 102 
+DEAL:1:all::1 2 101 102 
+DEAL:1:all::1 2 101 102 
+

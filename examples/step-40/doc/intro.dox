@@ -1,6 +1,4 @@
-<br>
-
-<i>This program was contributed by Timo Heister, Martin Kronbichler and Wolfgang
+<i>This program was contributed by Timo Heister, Martin Kronbichler, and Wolfgang
 Bangerth.
 <br>
 This material is based upon work partly supported by the National
@@ -23,12 +21,12 @@ PETSc configuration; see the page linked to from the installation
 instructions for PETSc.
 
 
-<a name="Intro"></a>
+<a name="step_40-Intro"></a>
 <h1>Introduction</h1>
 
 @dealiiVideoLecture{41.5,41.75}
 
-Given today's computers, most finite element computations can be done on
+Given today's computers, many finite element computations can be done on
 a single machine. The majority of previous tutorial programs therefore
 shows only this, possibly splitting up work among a number of
 processors that, however, can all access the same, shared memory
@@ -42,7 +40,7 @@ assembling the linear system, storing it, solving it, and computing
 error estimators. All of these operations scale relatively trivially
 (for a definition of what it means for an operation to "scale", see
 @ref GlossParallelScaling "this glossary entry"),
-but there was one significant drawback: for this to be moderately
+but there was one significant drawback: For this to be moderately
 simple to implement, each MPI processor had to keep its own copy of
 the entire Triangulation and DoFHandler objects. Consequently, while
 we can suspect (with good reasons) that the operations listed above
@@ -62,11 +60,12 @@ very large problems, each processor can only store its own little piece
 of the Triangulation and DoFHandler objects. deal.II implements such a
 scheme in the parallel::distributed namespace and the classes
 therein. It builds on an external library, <a
-href="http://www.p4est.org/">p4est</a> (a play on the expression
+href="http://www.p4est.org/">p4est</a> (a word play on the expression
 <i>parallel forest</i> that describes the parallel storage of a
 hierarchically constructed mesh as a forest of quad- or
 oct-trees). You need to <a
-href="../../external-libs/p4est.html">install and configure p4est,</a>
+href="../../external-libs/p4est.html">install p4est and configure deal.II
+to use it</a>,
 but apart from that, all of its workings are hidden under the surface
 of deal.II.
 
@@ -85,12 +84,82 @@ parallelized because no processor has all the information necessary
 for sequential operations.
 
 A general overview of how this parallelization happens is described in
-the @ref distributed documentation module. You should read it for a
+the @ref distributed documentation topic. You should read it for a
 top-level overview before reading through the source code of this
 program. A concise discussion of many terms we will use in the program
 is also provided in the @ref distributed_paper "Distributed Computing paper".
 It is probably worthwhile reading it for background information on how
 things work internally in this program.
+
+
+<h3>Linear algebra</h3>
+
+step-17 and step-18 already used parallel linear algebra classes, but since
+the current program is the first one that *really* covers parallel computing,
+it is probably worth giving a broad overview of parallel linear algebra here
+as well.
+
+First, the general mantra mentioned above was that *everything* has to be
+distributed. It does not scale if one process (or in fact *all* processes)
+have to keep a complete triangulation or even a substantial share of it; it
+all only works if every one of the $N$ processes in the parallel universe
+keep at most a small multiple of one $N$th of the triangulation.
+Similarly, each process can only hold a small multiple of one $N$th of
+each solution or right hand side vector, and of the system matrix.
+
+To this end, deal.II has acquired interfaces to a number of packages
+that provide these kind of distributed linear algebra data structures.
+More specifically, deal.II comes with a number of "sub-packages" that
+all provide vector, matrix, and linear solver classes that are typically
+named the same or very similarly, but live in different namespaces:
+- deal.II's own linear algebra classes. These are what we have been
+  using in step-1 to step-6, for example, along with most of the
+  other programs in the deal.II tutorial. These classes are all not
+  parallel in the sense that they do not use MPI, can not subdivide
+  the data among processes, or work on them on processes that cannot
+  access each other's memory directory. (On the other hand, many of
+  these classes actually use multiple threads internally, to use
+  the multiple processor cores available on today's laptops and
+  work stations.) These classes reside in the top-level
+  `namespace dealii`.
+- Interfaces to the PETSc library's implementations of linear
+  algebra functionality. These are found in namespace `PETScWrappers`.
+  PETSc is a library that has built a large collection of linear algebra,
+  linear solvers, nonlinear solvers, time steppers, and other functionality
+  that runs on some of the largest machines in the world in parallel,
+  using MPI.
+- The classes in the TrilinosWrapper namespace wrap functionality
+  provided by the Trilinos project. Trilinos is, in many regards, similar
+  in functionality to what PETSc provides, but it does so in a very different
+  way (namely, as a bunch of independent and loosely coupled sub-projects,
+  rather than as a single library). This nothwithstanding, the classes
+  deal.II provides in namespace TrilinosWrappers are very similar to the
+  ones in namespace PETScWrappers. Trilinos, like PETSc, is run on some of
+  the biggest machines in the world.
+- The classes in namespace TrilinosWrappers are generally written for the
+  functionality Trilinos provides via its "Epetra" collection of vector
+  and matrix classes, and everything that builds on it. Epetra has been
+  slated for removal since the early 2020s (and may already have been removed
+  by the time you read this), with replacements provided in the "Tpetra"
+  collection. Tpetra replaces the old classes by ones that are templatized
+  on the type of objects it stores (thus the "T" at the beginning of the
+  name; "petra" being the word for "rock" or "foundation" since the rest of
+  Trilinos builds on these packages). deal.II is wrapping the Tpetra classes
+  in namespace LinearAlgebra::TpetraWrappers, but this process is still
+  ongoing and may be available in a version of deal.II after release 9.5.
+- deal.II also implements a subset of parallel linear algebra functionality
+  internally through the LinearAlgebra::distributed::Vector class (compatible
+  with most Trilinos classes) and matrix-free linear solvers, which are run
+  on some of the biggest machines in the world as well. For further details, see
+  the step-37 tutorial program.
+
+For the current program, we need to use parallel linear algebra classes
+to represent the matrix and vectors. Both the PETScWrapper and TrilinosWrapper
+classes will fit the bill and, depending on whether deal.II was configured
+with one or the other (or both), the top of the program selects one or the
+other set of wrappers by putting the respective class names into a
+namespace `LA`.
+
 
 
 <h3>The testcase</h3>
@@ -126,14 +195,14 @@ picture shown below in the results section.
 
 Rather than continuing here and giving a long introduction, let us go
 straight to the program code. If you have read through step-6 and the
-@ref distributed documentation module, most of things that are going
+@ref distributed documentation topic, most of things that are going
 to happen should be familiar to you already. In fact, comparing the two
 programs you will notice that the additional effort necessary to make things
 work in %parallel is almost insignificant: the two programs have about the
 same number of lines of code (though step-6 spends more space on dealing with
 coefficients and output). In either case, the comments below will only be on
 the things that set step-40 apart from step-6 and that aren't already covered
-in the @ref distributed documentation module.
+in the @ref distributed documentation topic.
 
 
 @note This program will be able to compute on as many processors as you want

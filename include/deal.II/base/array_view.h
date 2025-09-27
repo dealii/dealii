@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2004 - 2023 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2015 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 #ifndef dealii_array_view_h
 #define dealii_array_view_h
@@ -21,7 +20,10 @@
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/memory_space.h>
 #include <deal.II/base/symmetric_tensor.h>
+#include <deal.II/base/template_constraints.h>
 #include <deal.II/base/tensor.h>
+
+#include <boost/container/small_vector.hpp>
 
 #include <array>
 #include <type_traits>
@@ -110,7 +112,10 @@ public:
    * Constructor.
    *
    * @param[in] starting_element A pointer to the first element of the array
-   * this object should represent.
+   * this object should represent. The value of this argument is only evaluated
+   * if `n_elements` is larger than zero. Otherwise, the value of this
+   * argument is ignored as if the ArrayView object used a `nullptr`
+   * to point to the first element of the array.
    * @param[in] n_elements The length (in elements) of the chunk of memory
    * this object should represent.
    *
@@ -145,37 +150,112 @@ public:
    */
   explicit ArrayView(value_type &element);
 
+#ifdef DEAL_II_HAVE_CXX20
   /**
-   * A constructor that automatically creates a view from a std::vector object.
-   * The view encompasses all elements of the given vector.
+   * A constructor that automatically creates a view from a container
+   * object that requires a contiguous array of elements (such as
+   * `std::vector`, `std::array`, `boost::container::small_vector`,
+   * and the like). The view encompasses all elements of the given
+   * container.
    *
    * This implicit conversion constructor is particularly useful when calling
    * a function that takes an ArrayView object as argument, and passing in
-   * a std::vector.
+   * a container.
    *
-   * @note This constructor takes a reference to a @p const vector as argument.
+   * @note This constructor takes a reference to a @p const container as argument.
    *   It can only be used to initialize ArrayView objects that point to
    *   @p const memory locations, such as <code>ArrayView@<const double@></code>.
    *   You cannot initialize ArrayView objects to non-@p const memory with
    *   such arguments, such as <code>ArrayView@<double@></code>.
    */
-  ArrayView(const std::vector<std::remove_cv_t<value_type>> &vector);
+  template <typename ContiguousContainer>
+  ArrayView(const ContiguousContainer &container)
+    requires(std::is_same_v<
+               std::remove_cv_t<ElementType>,
+               std::remove_cv_t<typename ContiguousContainer::value_type>> &&
+             std::is_const_v<ElementType> &&
+             concepts::is_contiguous_container<ContiguousContainer>);
 
   /**
-   * A constructor that automatically creates a view from a std::vector object.
-   * The view encompasses all elements of the given vector.
+   * A constructor that automatically creates a view from a container
+   * object that requires a contiguous array of elements (such as
+   * `std::vector`, `std::array`, `boost::container::small_vector`,
+   * and the like). The view encompasses all elements of the given
+   * container.
    *
    * This implicit conversion constructor is particularly useful when calling
    * a function that takes an ArrayView object as argument, and passing in
-   * a std::vector.
+   * a container.
    *
-   * @note This constructor takes a reference to a non-@p const vector as
+   * @note This constructor takes a reference to a non-@p const container as
    *   argument. It can be used to initialize ArrayView objects that point to
    *   either @p const memory locations, such as
    *   <code>ArrayView@<const double@></code>, or to non-@p const memory,
    *   such as <code>ArrayView@<double@></code>.
    */
-  ArrayView(std::vector<std::remove_cv_t<value_type>> &vector);
+  template <typename ContiguousContainer>
+  ArrayView(ContiguousContainer &container)
+    requires(std::is_same_v<
+               std::remove_cv_t<ElementType>,
+               std::remove_cv_t<typename ContiguousContainer::value_type>> &&
+             concepts::is_contiguous_container<ContiguousContainer>);
+
+#else
+
+
+  /**
+   * A constructor that automatically creates a view from a container
+   * object that requires a contiguous array of elements (such as
+   * `std::vector`, `std::array`, `boost::container::small_vector`,
+   * and the like). The view encompasses all elements of the given
+   * container.
+   *
+   * This implicit conversion constructor is particularly useful when calling
+   * a function that takes an ArrayView object as argument, and passing in
+   * a container.
+   *
+   * @note This constructor takes a reference to a @p const container as argument.
+   *   It can only be used to initialize ArrayView objects that point to
+   *   @p const memory locations, such as <code>ArrayView@<const double@></code>.
+   *   You cannot initialize ArrayView objects to non-@p const memory with
+   *   such arguments, such as <code>ArrayView@<double@></code>.
+   */
+  template <typename ContiguousContainer,
+            typename = decltype(std::data(std::declval<ContiguousContainer>())),
+            typename = decltype(std::size(std::declval<ContiguousContainer>())),
+            typename = std::enable_if_t<
+              std::is_same_v<
+                std::remove_cv_t<ElementType>,
+                std::remove_cv_t<typename ContiguousContainer::value_type>> &&
+              std::is_const_v<ElementType>>>
+  ArrayView(const ContiguousContainer &container);
+
+  /**
+   * A constructor that automatically creates a view from a container
+   * object that requires a contiguous array of elements (such as
+   * `std::vector`, `std::array`, `boost::container::small_vector`,
+   * and the like). The view encompasses all elements of the given
+   * container.
+   *
+   * This implicit conversion constructor is particularly useful when calling
+   * a function that takes an ArrayView object as argument, and passing in
+   * a container.
+   *
+   * @note This constructor takes a reference to a non-@p const container as
+   *   argument. It can be used to initialize ArrayView objects that point to
+   *   either @p const memory locations, such as
+   *   <code>ArrayView@<const double@></code>, or to non-@p const memory,
+   *   such as <code>ArrayView@<double@></code>.
+   */
+  template <typename ContiguousContainer,
+            typename = decltype(std::data(std::declval<ContiguousContainer>())),
+            typename = decltype(std::size(std::declval<ContiguousContainer>())),
+            typename = std::enable_if_t<std::is_same_v<
+              std::remove_cv_t<ElementType>,
+              std::remove_cv_t<typename ContiguousContainer::value_type>>>>
+  ArrayView(ContiguousContainer &container);
+
+#endif
 
   /**
    * A constructor that automatically creates a view for a given C-style array.
@@ -195,26 +275,51 @@ public:
   ArrayView(value_type (&array)[N]);
 
   /**
-   * A constructor that automatically creates a view from a std::array object.
-   * The view encompasses all elements of the given vector.
+   * A constructor that creates a view of the array that underlies a
+   * [std::initializer_list](https://en.cppreference.com/w/cpp/utility/initializer_list).
+   * This constructor allows for cases such as where one has a function
+   * that takes an ArrayView object:
+   * @code
+   *   void f(const ArrayView<const int> &a);
+   * @endcode
+   * and then to call this function with a list of integers:
+   * @code
+   *   f({1,2,3});
+   * @endcode
+   * This also works with an empty list:
+   * @code
+   *   f({});
+   * @encode
    *
-   * This implicit conversion constructor is particularly useful when calling
-   * a function that takes an ArrayView object as argument, and passing in
-   * a std::array.
-   */
-  template <std::size_t N>
-  ArrayView(const std::array<std::remove_cv_t<value_type>, N> &vector);
-
-  /**
-   * A constructor that automatically creates a view from a std::array object.
-   * The view encompasses all elements of the given vector.
+   * @note This constructor only works if the template type is `const`
+   * qualified. That is, you can initialize an `ArrayView<const int>`
+   * object from a `std::initializer_list<int>`, but not an
+   * `ArrayView<int>` object. This is because the elements of initializer
+   * lists are `const`.
    *
-   * This implicit conversion constructor is particularly useful when calling
-   * a function that takes an ArrayView object as argument, and passing in
-   * a std::array.
+   * @note `std::initializer_list` objects are temporary. They are constructed
+   * where the compiler finds a brace-enclosed list, and so they only live
+   * for at most the time it takes to execute the current statement. As a
+   * consequence, creating an ArrayView object of such a `std::initializer_list`
+   * also results in a view object that points to valid memory only for as long
+   * as the current statement is executed. You shouldn't expect that the
+   * resulting ArrayView can be used to point to useful memory content past
+   * that point. In other words, while this code...
+   * @code
+   *   std::vector<int> v(10);
+   *   ArrayView<int> a(v);
+   *   f(a);
+   * @endcode
+   * ...works because the array `v` pointed to exists until after the call to
+   * `f()`, the following code will not likely work as expected:
+   * @code
+   *   ArrayView<int> a({1,2,3});
+   *   f(a);
+   * @endcode
    */
-  template <std::size_t N>
-  ArrayView(std::array<std::remove_cv_t<value_type>, N> &vector);
+  ArrayView(
+    const std::initializer_list<std::remove_cv_t<value_type>> &initializer_list)
+    DEAL_II_CXX20_REQUIRES(std::is_const_v<ElementType>);
 
   /**
    * Reinitialize a view.
@@ -400,7 +505,14 @@ template <typename ElementType, typename MemorySpaceType>
 inline ArrayView<ElementType, MemorySpaceType>::ArrayView(
   value_type       *starting_element,
   const std::size_t n_elements)
-  : starting_element(starting_element)
+  : // In debug mode, make sure that n_elements>0 and if it is not, set
+    // the pointer to a nullptr to trigger segfaults if anyone ever wanted
+    // to access elements of the array. In release mode, just take the
+    // pointer as given.
+  starting_element((library_build_mode == LibraryBuildMode::release) ||
+                       (n_elements > 0) ?
+                     starting_element :
+                     nullptr)
   , n_elements(n_elements)
 {}
 
@@ -411,8 +523,18 @@ inline void
 ArrayView<ElementType, MemorySpaceType>::reinit(value_type *starting_element,
                                                 const std::size_t n_elements)
 {
-  this->starting_element = starting_element;
-  this->n_elements       = n_elements;
+  if constexpr (running_in_debug_mode())
+    {
+      if (n_elements > 0)
+        this->starting_element = starting_element;
+      else
+        this->starting_element = nullptr;
+    }
+  else
+    {
+      this->starting_element = starting_element;
+    }
+  this->n_elements = n_elements;
 }
 
 
@@ -433,62 +555,57 @@ inline ArrayView<ElementType, MemorySpaceType>::ArrayView(
 {}
 
 
+#ifdef DEAL_II_HAVE_CXX20
 
 template <typename ElementType, typename MemorySpaceType>
+template <typename ContiguousContainer>
 inline ArrayView<ElementType, MemorySpaceType>::ArrayView(
-  const std::vector<std::remove_cv_t<value_type>> &vector)
+  const ContiguousContainer &container)
+  requires(std::is_same_v<
+             std::remove_cv_t<ElementType>,
+             std::remove_cv_t<typename ContiguousContainer::value_type>> &&
+           std::is_const_v<ElementType> &&
+           concepts::is_contiguous_container<ContiguousContainer>)
   : // use delegating constructor
-  ArrayView(vector.data(), vector.size())
-{
-  // the following static_assert is not strictly necessary because,
-  // if we got a const std::vector reference argument but ElementType
-  // is not itself const, then the call to the forwarding constructor
-  // above will already have failed: vector.data() will have returned
-  // a const pointer, but we need a non-const pointer.
-  //
-  // nevertheless, leave the static_assert in since it provides a
-  // more descriptive error message that will simply come after the first
-  // error produced above
-  static_assert(std::is_const_v<value_type> == true,
-                "This constructor may only be called if the ArrayView "
-                "object has a const value_type. In other words, you can "
-                "only create an ArrayView to const values from a const "
-                "std::vector.");
-}
-
-
-
-template <typename ElementType, typename MemorySpaceType>
-inline ArrayView<ElementType, MemorySpaceType>::ArrayView(
-  std::vector<std::remove_cv_t<value_type>> &vector)
-  : // use delegating constructor
-  ArrayView(vector.data(), vector.size())
+  ArrayView(container.data(), container.size())
 {}
 
 
 
 template <typename ElementType, typename MemorySpaceType>
-template <std::size_t N>
+template <typename ContiguousContainer>
 inline ArrayView<ElementType, MemorySpaceType>::ArrayView(
-  const std::array<std::remove_cv_t<value_type>, N> &vector)
+  ContiguousContainer &container)
+  requires(std::is_same_v<
+             std::remove_cv_t<ElementType>,
+             std::remove_cv_t<typename ContiguousContainer::value_type>> &&
+           concepts::is_contiguous_container<ContiguousContainer>)
   : // use delegating constructor
-  ArrayView(vector.data(), vector.size())
-{
-  // the following static_assert is not strictly necessary because,
-  // if we got a const std::array reference argument but ElementType
-  // is not itself const, then the call to the forwarding constructor
-  // above will already have failed: vector.data() will have returned
-  // a const pointer, but we need a non-const pointer.
-  //
-  // nevertheless, leave the static_assert in since it provides a
-  // more descriptive error message that will simply come after the first
-  // error produced above
-  static_assert(std::is_const_v<value_type> == true,
-                "This constructor may only be called if the ArrayView "
-                "object has a const value_type. In other words, you can "
-                "only create an ArrayView to const values from a const "
-                "std::array.");
-}
+  ArrayView(std::data(container), std::size(container))
+{}
+
+
+#else
+
+template <typename ElementType, typename MemorySpaceType>
+template <typename ContiguousContainer, typename, typename, typename>
+inline ArrayView<ElementType, MemorySpaceType>::ArrayView(
+  const ContiguousContainer &container)
+  : // use delegating constructor
+  ArrayView(container.data(), container.size())
+{}
+
+
+
+template <typename ElementType, typename MemorySpaceType>
+template <typename ContiguousContainer, typename, typename, typename>
+inline ArrayView<ElementType, MemorySpaceType>::ArrayView(
+  ContiguousContainer &container)
+  : // use delegating constructor
+  ArrayView(std::data(container), std::size(container))
+{}
+
+#endif
 
 
 
@@ -500,13 +617,12 @@ inline ArrayView<ElementType, MemorySpaceType>::ArrayView(
 {}
 
 
-
 template <typename ElementType, typename MemorySpaceType>
-template <std::size_t N>
 inline ArrayView<ElementType, MemorySpaceType>::ArrayView(
-  std::array<std::remove_cv_t<value_type>, N> &vector)
+  const std::initializer_list<std::remove_cv_t<value_type>> &initializer)
+  DEAL_II_CXX20_REQUIRES(std::is_const_v<ElementType>)
   : // use delegating constructor
-  ArrayView(vector.data(), vector.size())
+  ArrayView(initializer.begin(), initializer.size())
 {}
 
 
@@ -832,9 +948,9 @@ namespace internal
  * @relatesalso ArrayView
  */
 template <typename Iterator, typename MemorySpaceType = MemorySpace::Host>
-ArrayView<typename std::remove_reference<
-            typename std::iterator_traits<Iterator>::reference>::type,
-          MemorySpaceType>
+ArrayView<
+  std::remove_reference_t<typename std::iterator_traits<Iterator>::reference>,
+  MemorySpaceType>
 make_array_view(const Iterator begin, const Iterator end)
 {
   static_assert(
@@ -853,9 +969,9 @@ make_array_view(const Iterator begin, const Iterator end)
   Assert(internal::ArrayViewHelper::is_contiguous(begin, end),
          ExcMessage("The provided range isn't contiguous in memory!"));
   // the reference type, not the value type, knows the constness of the iterator
-  return ArrayView<typename std::remove_reference<
-                     typename std::iterator_traits<Iterator>::reference>::type,
-                   MemorySpaceType>(std::addressof(*begin), end - begin);
+  return ArrayView<
+    std::remove_reference_t<typename std::iterator_traits<Iterator>::reference>,
+    MemorySpaceType>(std::addressof(*begin), end - begin);
 }
 
 
@@ -915,127 +1031,6 @@ inline ArrayView<Number, MemorySpaceType>
 make_array_view(ArrayView<Number, MemorySpaceType> &array_view)
 {
   return make_array_view(array_view.begin(), array_view.end());
-}
-
-
-
-/**
- * Create a view to an entire Tensor object. This is equivalent to initializing
- * an ArrayView object with a pointer to the first element and the size of the
- * given argument.
- *
- * This function is used for @p const references to objects of Tensor type
- * because they contain immutable elements. Consequently, the return type of
- * this function is a view to a set of @p const objects.
- *
- * @param[in] tensor The Tensor for which we want to have an array view
- * object. The array view corresponds to the <em>entire</em> object but the
- * order in which the entries are presented in the array is an implementation
- * detail and should not be relied upon.
- *
- * @deprecated This function suggests that the elements of a Tensor
- *   object are stored as a contiguous array, but this is not in fact true
- *   and one should not pretend that this so. As a consequence, this function
- *   is deprecated.
- *
- * @relatesalso ArrayView
- */
-template <int rank, int dim, typename Number>
-DEAL_II_DEPRECATED inline ArrayView<const Number>
-make_array_view(const Tensor<rank, dim, Number> &tensor)
-{
-  return make_array_view(tensor.begin_raw(), tensor.end_raw());
-}
-
-
-
-/**
- * Create a view to an entire Tensor object. This is equivalent to initializing
- * an ArrayView object with a pointer to the first element and the size of the
- * given argument.
- *
- * This function is used for non-@p const references to objects of Tensor type.
- * Such objects contain elements that can be written to. Consequently,
- * the return type of this function is a view to a set of writable objects.
- *
- * @param[in] tensor The Tensor for which we want to have an array view
- * object. The array view corresponds to the <em>entire</em> object but the
- * order in which the entries are presented in the array is an implementation
- * detail and should not be relied upon.
- *
- * @deprecated This function suggests that the elements of a Tensor
- *   object are stored as a contiguous array, but this is not in fact true
- *   and one should not pretend that this so. As a consequence, this function
- *   is deprecated.
- *
- * @relatesalso ArrayView
- */
-template <int rank, int dim, typename Number>
-DEAL_II_DEPRECATED inline ArrayView<Number>
-make_array_view(Tensor<rank, dim, Number> &tensor)
-{
-  return make_array_view(tensor.begin_raw(), tensor.end_raw());
-}
-
-
-
-/**
- * Create a view to an entire SymmetricTensor object. This is equivalent to
- * initializing an ArrayView object with a pointer to the first element and the
- * size of the given argument.
- *
- * This function is used for @p const references to objects of SymmetricTensor
- * type because they contain immutable elements. Consequently, the return type
- * of this function is a view to a set of @p const objects.
- *
- * @param[in] tensor The SymmetricTensor for which we want to have an array
- * view object. The array view corresponds to the <em>entire</em> object but
- * the order in which the entries are presented in the array is an
- * implementation detail and should not be relied upon.
- *
- * @deprecated This function suggests that the elements of a SymmetricTensor
- *   object are stored as a contiguous array, but this is not in fact true
- *   and one should not pretend that this so. As a consequence, this function
- *   is deprecated.
- *
- * @relatesalso ArrayView
- */
-template <int rank, int dim, typename Number>
-DEAL_II_DEPRECATED inline ArrayView<const Number>
-make_array_view(const SymmetricTensor<rank, dim, Number> &tensor)
-{
-  return make_array_view(tensor.begin_raw(), tensor.end_raw());
-}
-
-
-
-/**
- * Create a view to an entire SymmetricTensor object. This is equivalent to
- * initializing an ArrayView object with a pointer to the first element and the
- * size of the given argument.
- *
- * This function is used for non-@p const references to objects of
- * SymmetricTensor type. Such objects contain elements that can be written to.
- * Consequently, the return type of this function is a view to a set of writable
- * objects.
- *
- * @param[in] tensor The SymmetricTensor for which we want to have an array
- * view object. The array view corresponds to the <em>entire</em> object but
- * the order in which the entries are presented in the array is an
- * implementation detail and should not be relied upon.
- *
- * @deprecated This function suggests that the elements of a SymmetricTensor
- *   object are stored as a contiguous array, but this is not in fact true
- *   and one should not pretend that this so. As a consequence, this function
- *   is deprecated.
- *
- * @relatesalso ArrayView
- */
-template <int rank, int dim, typename Number>
-DEAL_II_DEPRECATED inline ArrayView<Number>
-make_array_view(SymmetricTensor<rank, dim, Number> &tensor)
-{
-  return make_array_view(tensor.begin_raw(), tensor.end_raw());
 }
 
 
@@ -1156,8 +1151,8 @@ make_array_view(const std::vector<ElementType> &vector)
 
 /**
  * Create a view to a part of a std::vector object. This is equivalent to
- * initializing the ArrayView object with a pointer to the @p starting_index-
- * th element and the @p size_of_view as the length of the view.
+ * initializing the ArrayView object with a pointer to the
+ * @p starting_index-th element and the @p size_of_view as the length of the view.
  *
  * This function is used for non-@p const references to objects of vector
  * type. Such objects contain elements that can be written to. Consequently,
@@ -1190,8 +1185,8 @@ make_array_view(std::vector<ElementType> &vector,
 
 /**
  * Create a view to a part of a std::vector object. This is equivalent to
- * initializing the ArrayView object with a pointer to the @p starting_index-
- * th element and the @p size_of_view as the length of the view.
+ * initializing the ArrayView object with a pointer to the @p starting_index-th
+ * element and the @p size_of_view as the length of the view.
  *
  * This function is used for @p const references to objects of vector type
  * because they contain immutable elements. Consequently, the return type of

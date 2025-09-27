@@ -1,17 +1,16 @@
-/* ---------------------------------------------------------------------
+/* ------------------------------------------------------------------------
  *
- * Copyright (C) 2003 - 2022 by the deal.II authors
+ * SPDX-License-Identifier: LGPL-2.1-or-later
+ * Copyright (C) 2003 - 2024 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
- * The deal.II library is free software; you can use it, redistribute
- * it, and/or modify it under the terms of the GNU Lesser General
- * Public License as published by the Free Software Foundation; either
- * version 2.1 of the License, or (at your option) any later version.
- * The full text of the license can be found in the file LICENSE.md at
- * the top level directory of deal.II.
+ * Part of the source code is dual licensed under Apache-2.0 WITH
+ * LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+ * governing the source code and code contributions can be found in
+ * LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
  *
- * ---------------------------------------------------------------------
+ * ------------------------------------------------------------------------
  *
  * Authors: Guido Kanschat, University of Heidelberg, 2003
  *          Baerbel Janssen, University of Heidelberg, 2010
@@ -26,7 +25,6 @@
 // on them:
 #include <deal.II/base/quadrature_lib.h>
 #include <deal.II/base/function.h>
-#include <deal.II/base/logstream.h>
 #include <deal.II/base/utilities.h>
 
 #include <deal.II/lac/affine_constraints.h>
@@ -76,10 +74,10 @@
 #include <iostream>
 #include <fstream>
 
-using namespace dealii;
-
 namespace Step16
 {
+  using namespace dealii;
+
   // @sect3{The Scratch and Copy objects}
   //
   // We use MeshWorker::mesh_loop() to assemble our matrices. For this, we
@@ -155,7 +153,7 @@ namespace Step16
     void output_results(const unsigned int cycle) const;
 
     Triangulation<dim> triangulation;
-    FE_Q<dim>          fe;
+    const FE_Q<dim>    fe;
     DoFHandler<dim>    dof_handler;
 
     SparsityPattern      sparsity_pattern;
@@ -283,7 +281,7 @@ namespace Step16
 
     // Now, we have to provide a matrix on each level. To this end, we first use
     // the MGTools::make_sparsity_pattern function to generate a preliminary
-    // compressed sparsity pattern on each level (see the @ref Sparsity module
+    // compressed sparsity pattern on each level (see the @ref Sparsity topic
     // for more information on this topic) and then copy it over to the one we
     // really want. The next step is to initialize the interface matrices with
     // the fitting sparsity pattern.
@@ -375,7 +373,7 @@ namespace Step16
   template <int dim>
   void LaplaceProblem<dim>::assemble_system()
   {
-    MappingQ1<dim> mapping;
+    const MappingQ1<dim> mapping;
 
     auto cell_worker =
       [&](const typename DoFHandler<dim>::active_cell_iterator &cell,
@@ -427,19 +425,22 @@ namespace Step16
   template <int dim>
   void LaplaceProblem<dim>::assemble_multigrid()
   {
-    MappingQ1<dim>     mapping;
-    const unsigned int n_levels = triangulation.n_levels();
+    const MappingQ1<dim> mapping;
+    const unsigned int   n_levels = triangulation.n_levels();
 
     std::vector<AffineConstraints<double>> boundary_constraints(n_levels);
     for (unsigned int level = 0; level < n_levels; ++level)
       {
-        const IndexSet dofset =
-          DoFTools::extract_locally_relevant_level_dofs(dof_handler, level);
-        boundary_constraints[level].reinit(dofset);
-        boundary_constraints[level].add_lines(
-          mg_constrained_dofs.get_refinement_edge_indices(level));
-        boundary_constraints[level].add_lines(
-          mg_constrained_dofs.get_boundary_indices(level));
+        boundary_constraints[level].reinit(
+          dof_handler.locally_owned_mg_dofs(level),
+          DoFTools::extract_locally_relevant_level_dofs(dof_handler, level));
+
+        for (const types::global_dof_index dof_index :
+             mg_constrained_dofs.get_refinement_edge_indices(level))
+          boundary_constraints[level].constrain_dof_to_zero(dof_index);
+        for (const types::global_dof_index dof_index :
+             mg_constrained_dofs.get_boundary_indices(level))
+          boundary_constraints[level].constrain_dof_to_zero(dof_index);
         boundary_constraints[level].close();
       }
 
@@ -578,7 +579,7 @@ namespace Step16
 
     // With all this together, we can finally get about solving the linear
     // system in the usual way:
-    SolverControl            solver_control(1000, 1e-12);
+    SolverControl            solver_control(1000, 1e-6 * system_rhs.l2_norm());
     SolverCG<Vector<double>> solver(solver_control);
 
     solution = 0;

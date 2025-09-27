@@ -1,0 +1,59 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+
+<html>
+
+<head>
+  <title>The deal.II Readme on interfacing to MUMPS</title>
+  <link href="../screen.css" rel="StyleSheet">
+  <meta name="copyright" content="Copyright (C) 2010, 2011, 2012, 2013, 2015 by the deal.II authors">
+  <meta name="keywords" content="deal.II">
+</head>
+
+<body>
+
+  <h1>Interfacing <acronym>deal.II</acronym>
+    to <acronym>MUMPS</acronym></h1>
+
+  <p>
+    <a href="https://mumps-solver.org" target="_top">MUMPS</a>
+    should be readily packaged by most Linux distributions.
+    Don't forget to install a development version of the library.
+    In order for <acronym>deal.II</acronym> to use <acronym>MUMPS</acronym>,
+    you also need to have <acronym>BLAS</acronym>, <acronym>LAPACK</acronym>,
+    and <acronym>SCALAPACK</acronym> installed. Make sure that the libraries
+    used by <acronym>MUMPS</acronym> are the same as the ones used by
+    <acronym>deal.II</acronym>.
+  </p>
+
+
+  <h2>Linking with deal.II</h2>
+
+  <p>
+    Support for <acronym>MUMPS</acronym> will be enabled automatically
+    if a system wide installation of <acronym>MUMPS</acronym>
+    can be found. To use a self compiled version, specify
+  <pre>
+
+    -DMUMPS_DIR=/path/to/mumps
+      </pre> on the command line when invoking <code>cmake</code>.
+  </p>
+
+  <p>
+    You can override the autodetection by manually specifying
+  <pre>
+
+    -DDEAL_II_WITH_MUMPS=OFF|ON
+  </pre>.
+  </p>
+
+  <hr />
+  <div class="right">
+    <a href="http://validator.w3.org/check?uri=referer" target="_top">
+      <img style="border:0" src="http://www.w3.org/Icons/valid-html401" alt="Valid HTML 4.01!"></a>
+    <a href="http://jigsaw.w3.org/css-validator/check/referer" target="_top">
+      <img style="border:0;width:88px;height:31px" src="http://jigsaw.w3.org/css-validator/images/vcss"
+        alt="Valid CSS!"></a>
+  </div>
+</body>
+
+</html>

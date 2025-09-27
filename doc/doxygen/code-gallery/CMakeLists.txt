@@ -1,17 +1,15 @@
-## ---------------------------------------------------------------------
+## ------------------------------------------------------------------------
 ##
-## Copyright (C) 2015 - 2022 by the deal.II Authors
+## Copyright (C) 2015 - 2024 by the deal.II Authors
 ##
 ## This file is part of the deal.II library.
 ##
-## The deal.II library is free software; you can use it, redistribute
-## it, and/or modify it under the terms of the GNU Lesser General
-## Public License as published by the Free Software Foundation; either
-## version 2.1 of the License, or (at your option) any later version.
-## The full text of the license can be found in the file LICENSE.md at
-## the top level directory of deal.II.
+## Part of the source code is dual licensed under Apache-2.0 WITH
+## LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+## governing the source code and code contributions can be found in
+## LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 ##
-## ---------------------------------------------------------------------
+## ------------------------------------------------------------------------
 
 
 
@@ -92,9 +90,10 @@ if (EXISTS ${DEAL_II_CODE_GALLERY_DIRECTORY}/README.md)
     string(REPLACE "${DEAL_II_CODE_GALLERY_DIRECTORY}/${_step}/" "" _relative_src_files
            "${_src_files}")
     list(REMOVE_ITEM _relative_src_files doc/author)
-    list(REMOVE_ITEM _relative_src_files doc/tooltip)
-    list(REMOVE_ITEM _relative_src_files doc/dependencies)
     list(REMOVE_ITEM _relative_src_files doc/builds-on)
+    list(REMOVE_ITEM _relative_src_files doc/dependencies)
+    list(REMOVE_ITEM _relative_src_files doc/entry-name)
+    list(REMOVE_ITEM _relative_src_files doc/tooltip)
 
 
     # Also remove files that were created by running 'cmake' in the
@@ -129,7 +128,7 @@ if (EXISTS ${DEAL_II_CODE_GALLERY_DIRECTORY}/README.md)
         ${CMAKE_CURRENT_BINARY_DIR}
       DEPENDS
         ${CMAKE_SOURCE_DIR}/doc/doxygen/scripts/make_gallery.pl
-        ${CMAKE_SOURCE_DIR}/doc/doxygen/scripts/program2doxygen
+        ${CMAKE_SOURCE_DIR}/doc/doxygen/scripts/program2doxygen.pl
         ${_src_files}
       )
 

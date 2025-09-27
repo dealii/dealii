@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2023 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2023 - 2024 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 
 
@@ -384,10 +383,10 @@ public:
     double sinval = deformation;
     for (unsigned int d = 0; d < dim; ++d)
       sinval *= std::sin(frequency * dealii::numbers::PI *
-                         (chart_point(d) - left) / (right - left));
+                         (chart_point[d] - left) / (right - left));
     dealii::Point<dim> space_point;
     for (unsigned int d = 0; d < dim; ++d)
-      space_point(d) = chart_point(d) + sinval;
+      space_point[d] = chart_point[d] + sinval;
     return space_point;
   }
 
@@ -397,12 +396,12 @@ public:
     dealii::Point<dim> x = space_point;
     dealii::Point<dim> one;
     for (unsigned int d = 0; d < dim; ++d)
-      one(d) = 1.;
+      one[d] = 1.;
 
     // Newton iteration to solve the nonlinear equation given by the point
     dealii::Tensor<1, dim> sinvals;
     for (unsigned int d = 0; d < dim; ++d)
-      sinvals[d] = std::sin(frequency * dealii::numbers::PI * (x(d) - left) /
+      sinvals[d] = std::sin(frequency * dealii::numbers::PI * (x[d] - left) /
                             (right - left));
 
     double sinval = deformation;
@@ -420,7 +419,7 @@ public:
             double sinval_der = deformation * frequency / (right - left) *
                                 dealii::numbers::PI *
                                 std::cos(frequency * dealii::numbers::PI *
-                                         (x(d) - left) / (right - left));
+                                         (x[d] - left) / (right - left));
             for (unsigned int e = 0; e < dim; ++e)
               if (e != d)
                 sinval_der *= sinvals[e];
@@ -432,7 +431,7 @@ public:
 
         for (unsigned int d = 0; d < dim; ++d)
           sinvals[d] = std::sin(frequency * dealii::numbers::PI *
-                                (x(d) - left) / (right - left));
+                                (x[d] - left) / (right - left));
 
         sinval = deformation;
         for (unsigned int d = 0; d < dim; ++d)

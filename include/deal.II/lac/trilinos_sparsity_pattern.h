@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2008 - 2023 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2008 - 2024 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 #ifndef dealii_trilinos_sparsity_pattern_h
 #define dealii_trilinos_sparsity_pattern_h
@@ -20,16 +19,19 @@
 
 #ifdef DEAL_II_WITH_TRILINOS
 
+#  include <deal.II/base/enable_observer_pointer.h>
 #  include <deal.II/base/index_set.h>
 #  include <deal.II/base/mpi_stub.h>
-#  include <deal.II/base/subscriptor.h>
+#  include <deal.II/base/utilities.h>
 
 #  include <deal.II/lac/exceptions.h>
 #  include <deal.II/lac/sparsity_pattern_base.h>
 
+DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
 #  include <Epetra_FECrsGraph.h>
 #  include <Epetra_Map.h>
 #  include <Epetra_MpiComm.h>
+DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
 
 #  include <cmath>
 #  include <memory>
@@ -124,7 +126,7 @@ namespace TrilinosWrappers
       /**
        * The matrix accessed.
        */
-      mutable SparsityPattern *sparsity_pattern;
+      SparsityPattern *sparsity_pattern;
 
       /**
        * Current row number.
@@ -398,7 +400,7 @@ namespace TrilinosWrappers
      * Release all memory and return to a state just like after having called
      * the default constructor.
      *
-     * This is a collective operation that needs to be called on all
+     * This is a @ref GlossCollectiveOperation "collective operation" that needs to be called on all
      * processors in order to avoid a dead lock.
      */
     void
@@ -410,7 +412,7 @@ namespace TrilinosWrappers
      * actually generating a (Trilinos-based) matrix. This function also
      * exchanges non-local data that might have accumulated during the
      * addition of new elements. This function must therefore be called once
-     * the structure is fixed. This is a collective operation, i.e., it needs
+     * the structure is fixed. This is a @ref GlossCollectiveOperation "collective operation", i.e., it needs
      * to be run on all processors when used in parallel.
      */
     void
@@ -487,8 +489,8 @@ namespace TrilinosWrappers
                     const std::vector<size_type> &n_entries_per_row);
 
     /**
-     * This constructor constructs general sparsity patterns, possible non-
-     * square ones. Constructing a sparsity pattern this way allows the user
+     * This constructor constructs general sparsity patterns, possible
+     * non-square ones. Constructing a sparsity pattern this way allows the user
      * to explicitly specify the rows into which we are going to add elements.
      * This set is required to be a superset of the first index set @p
      * row_parallel_partitioning that includes also rows that are owned by
@@ -576,8 +578,8 @@ namespace TrilinosWrappers
            const size_type n_entries_per_row = 0);
 
     /**
-     * This reinit function is used to specify general matrices, possibly non-
-     * square ones. In addition to the arguments of the other reinit method
+     * This reinit function is used to specify general matrices, possibly
+     * non-square ones. In addition to the arguments of the other reinit method
      * above, it allows the user to explicitly specify the rows into which we
      * are going to add elements. This set is a superset of the first index
      * set @p row_parallel_partitioning that includes also rows that are owned
@@ -805,8 +807,8 @@ namespace TrilinosWrappers
     /**
      * Return a const reference to the underlying Trilinos Epetra_Map that
      * sets the partitioning of the range space of this sparsity pattern,
-     * i.e., the partitioning of the vectors that are result from matrix-
-     * vector products.
+     * i.e., the partitioning of the vectors that are result from
+     * matrix-vector products.
      */
     const Epetra_Map &
     range_partitioner() const;
@@ -1278,9 +1280,10 @@ namespace TrilinosWrappers
         // thread-safety)
         Assert(nonlocal_graph->RowMap().LID(
                  static_cast<TrilinosWrappers::types::int_type>(row)) != -1,
-               ExcMessage("Attempted to write into off-processor matrix row "
-                          "that has not be specified as being writable upon "
-                          "initialization"));
+               ExcMessage("Attempted to write into off-processor matrix row " +
+                          Utilities::to_string(row) +
+                          " that has not been specified as being writable upon "
+                          "initialization."));
         ierr = nonlocal_graph->InsertGlobalIndices(trilinos_row_index,
                                                    n_cols,
                                                    col_index_ptr);
@@ -1324,6 +1327,14 @@ namespace TrilinosWrappers
 
 DEAL_II_NAMESPACE_CLOSE
 
+
+#else
+
+// Make sure the scripts that create the C++20 module input files have
+// something to latch on if the preprocessor #ifdef above would
+// otherwise lead to an empty content of the file.
+DEAL_II_NAMESPACE_OPEN
+DEAL_II_NAMESPACE_CLOSE
 
 #endif // DEAL_II_WITH_TRILINOS
 

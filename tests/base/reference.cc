@@ -1,27 +1,26 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2018 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 1998 - 2024 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 
 
-// check that SmartPointers preserve constness etc of the objects they
-// point to, through assignment of SmartPointers to each other and
+// check that ObserverPointers preserve constness etc of the objects they
+// point to, through assignment of ObserverPointers to each other and
 // other tests.
 
 
-#include <deal.II/base/smartpointer.h>
-#include <deal.II/base/subscriptor.h>
+#include <deal.II/base/enable_observer_pointer.h>
+#include <deal.II/base/observer_pointer.h>
 
 #include <iostream>
 #include <vector>
@@ -33,7 +32,7 @@
 std::vector<char> memory(10000);
 int               next = 0;
 
-class Test : public Subscriptor
+class Test : public EnableObserverPointer
 {
   const char *name;
 
@@ -71,11 +70,11 @@ main()
   Test        a("A");
   const Test &b("B");
 
-  SmartPointer<Test, Test>       r(&a, "Test R");
-  SmartPointer<const Test, Test> s(&a, "const Test S");
-  //  SmartPointer<Test,Test>       t=&b;    // this one should not work
-  SmartPointer<Test, Test>       t(const_cast<Test *>(&b), "Test T");
-  SmartPointer<const Test, Test> u(&b, "const Test");
+  ObserverPointer<Test, Test>       r(&a, "Test R");
+  ObserverPointer<const Test, Test> s(&a, "const Test S");
+  //  ObserverPointer<Test,Test>       t=&b;    // this one should not work
+  ObserverPointer<Test, Test>       t(const_cast<Test *>(&b), "Test T");
+  ObserverPointer<const Test, Test> u(&b, "const Test");
 
 
   deallog << "a ";

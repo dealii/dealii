@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2009 - 2022 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2011 - 2024 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 
 
@@ -21,7 +20,6 @@
 #include <deal.II/base/tensor.h>
 #include <deal.II/base/utilities.h>
 
-#include <deal.II/distributed/solution_transfer.h>
 #include <deal.II/distributed/tria.h>
 
 #include <deal.II/dofs/dof_handler.h>
@@ -36,6 +34,8 @@
 #include <deal.II/grid/tria_accessor.h>
 
 #include <deal.II/lac/petsc_vector.h>
+
+#include <deal.II/numerics/solution_transfer.h>
 
 #include "../tests.h"
 
@@ -87,10 +87,8 @@ test()
                                          locally_relevant_dofs,
                                          MPI_COMM_WORLD);
 
-    parallel::distributed::SolutionTransfer<dim, PETScWrappers::MPI::Vector>
-      soltrans(dh);
-    parallel::distributed::SolutionTransfer<dim, PETScWrappers::MPI::Vector>
-      soltrans2(dh);
+    SolutionTransfer<dim, PETScWrappers::MPI::Vector> soltrans(dh);
+    SolutionTransfer<dim, PETScWrappers::MPI::Vector> soltrans2(dh);
 
     for (unsigned int i = 0; i < locally_owned_dofs.n_elements(); ++i)
       {
@@ -125,7 +123,7 @@ test()
     parallel::distributed::Triangulation<dim> tr(MPI_COMM_WORLD);
 
     GridGenerator::hyper_cube(tr);
-    tr.load(filename.c_str(), false);
+    tr.load(filename.c_str());
     FE_Q<dim>       fe(1);
     DoFHandler<dim> dh(tr);
 
@@ -137,10 +135,8 @@ test()
 
     PETScWrappers::MPI::Vector solution(locally_owned_dofs, MPI_COMM_WORLD);
     PETScWrappers::MPI::Vector solution2(locally_owned_dofs, MPI_COMM_WORLD);
-    parallel::distributed::SolutionTransfer<dim, PETScWrappers::MPI::Vector>
-      soltrans(dh);
-    parallel::distributed::SolutionTransfer<dim, PETScWrappers::MPI::Vector>
-      soltrans2(dh);
+    SolutionTransfer<dim, PETScWrappers::MPI::Vector> soltrans(dh);
+    SolutionTransfer<dim, PETScWrappers::MPI::Vector> soltrans2(dh);
     solution = 2;
     soltrans.deserialize(solution);
     soltrans2.deserialize(solution2);

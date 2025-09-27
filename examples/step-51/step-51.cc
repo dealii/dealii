@@ -1,17 +1,16 @@
-/* ---------------------------------------------------------------------
+/* ------------------------------------------------------------------------
  *
- * Copyright (C) 2013 - 2023 by the deal.II authors
+ * SPDX-License-Identifier: LGPL-2.1-or-later
+ * Copyright (C) 2013 - 2025 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
- * The deal.II library is free software; you can use it, redistribute
- * it, and/or modify it under the terms of the GNU Lesser General
- * Public License as published by the Free Software Foundation; either
- * version 2.1 of the License, or (at your option) any later version.
- * The full text of the license can be found in the file LICENSE.md at
- * the top level directory of deal.II.
+ * Part of the source code is dual licensed under Apache-2.0 WITH
+ * LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+ * governing the source code and code contributions can be found in
+ * LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
  *
- * ---------------------------------------------------------------------
+ * ------------------------------------------------------------------------
  *
  * Author: Martin Kronbichler, Technical University of Munich,
  *         Scott T. Miller, The Pennsylvania State University, 2013
@@ -25,7 +24,6 @@
 #include <deal.II/base/function.h>
 #include <deal.II/base/tensor_function.h>
 #include <deal.II/base/exceptions.h>
-#include <deal.II/base/logstream.h>
 #include <deal.II/base/work_stream.h>
 #include <deal.II/base/convergence_table.h>
 #include <deal.II/lac/vector.h>
@@ -45,7 +43,6 @@
 #include <deal.II/fe/fe_values.h>
 #include <deal.II/numerics/vector_tools.h>
 #include <deal.II/numerics/error_estimator.h>
-#include <deal.II/numerics/matrix_tools.h>
 #include <deal.II/numerics/data_out.h>
 
 // However, we do have a few new includes for the example.
@@ -75,6 +72,7 @@
 // the simulation.
 #include <deal.II/numerics/data_out_faces.h>
 
+#include <fstream>
 #include <iostream>
 
 
@@ -218,7 +216,7 @@ namespace Step51
             convection[2] = 1;
             break;
           default:
-            Assert(false, ExcNotImplemented());
+            DEAL_II_NOT_IMPLEMENTED();
         }
       return convection;
     }
@@ -322,17 +320,17 @@ namespace Step51
     // The 'local' solutions are interior to each element.  These
     // represent the primal solution field $u$ as well as the auxiliary
     // field $\mathbf{q}$.
-    FESystem<dim>   fe_local;
-    DoFHandler<dim> dof_handler_local;
-    Vector<double>  solution_local;
+    const FESystem<dim> fe_local;
+    DoFHandler<dim>     dof_handler_local;
+    Vector<double>      solution_local;
 
     // The new finite element type and corresponding <code>DoFHandler</code> are
     // used for the global skeleton solution that couples the element-level
     // local solutions.
-    FE_FaceQ<dim>   fe;
-    DoFHandler<dim> dof_handler;
-    Vector<double>  solution;
-    Vector<double>  system_rhs;
+    const FE_FaceQ<dim> fe;
+    DoFHandler<dim>     dof_handler;
+    Vector<double>      solution;
+    Vector<double>      system_rhs;
 
     // As stated in the introduction, HDG solutions can be post-processed to
     // attain superconvergence rates of $\mathcal{O}(h^{p+2})$.  The
@@ -340,9 +338,9 @@ namespace Step51
     // representing the primal variable on the interior of each cell.  We define
     // a FE type of degree $p+1$ to represent this post-processed solution,
     // which we only use for output after constructing it.
-    FE_DGQ<dim>     fe_u_post;
-    DoFHandler<dim> dof_handler_u_post;
-    Vector<double>  solution_u_post;
+    const FE_DGQ<dim> fe_u_post;
+    DoFHandler<dim>   dof_handler_u_post;
+    Vector<double>    solution_u_post;
 
     // The degrees of freedom corresponding to the skeleton strongly enforce
     // Dirichlet boundary conditions, just as in a continuous Galerkin finite
@@ -1208,7 +1206,7 @@ namespace Step51
           filename = "solution-adaptive";
           break;
         default:
-          Assert(false, ExcNotImplemented());
+          DEAL_II_NOT_IMPLEMENTED();
       }
 
     std::string face_out(filename);
@@ -1332,7 +1330,7 @@ namespace Step51
 
           default:
             {
-              Assert(false, ExcNotImplemented());
+              DEAL_II_NOT_IMPLEMENTED();
             }
         }
 
@@ -1344,8 +1342,8 @@ namespace Step51
     for (const auto &cell : triangulation.cell_iterators())
       for (const auto &face : cell->face_iterators())
         if (face->at_boundary())
-          if ((std::fabs(face->center()(0) - (-1)) < 1e-12) ||
-              (std::fabs(face->center()(1) - (-1)) < 1e-12))
+          if ((std::fabs(face->center()[0] - (-1)) < 1e-12) ||
+              (std::fabs(face->center()[1] - (-1)) < 1e-12))
             face->set_boundary_id(1);
   }
 

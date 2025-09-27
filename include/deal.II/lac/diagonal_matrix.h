@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2016 - 2022 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2016 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 #ifndef dealii_diagonal_matrix_h
 #define dealii_diagonal_matrix_h
@@ -44,7 +43,7 @@ namespace LinearAlgebra
  * VectorType::scale, so the template vector class needs to provide a
  * @p scale() method.
  *
- * When using this class with ConstraintsMatrix::distribute_local_to_global(),
+ * When using this class with AffineConstraints::distribute_local_to_global(),
  * the underlying vector needs to provide write access to all entries referenced
  * by cells in an assembly process. This means that this class also needs access
  * to ghost entries that are owned by other processors than the calling one.
@@ -59,7 +58,7 @@ namespace LinearAlgebra
  * @endcode
  */
 template <typename VectorType = Vector<double>>
-class DiagonalMatrix : public Subscriptor
+class DiagonalMatrix : public EnableObserverPointer
 {
 public:
   using value_type = typename VectorType::value_type;
@@ -354,7 +353,6 @@ DiagonalMatrix<VectorType>::operator()(const size_type i,
                                        const size_type j) const
 {
   Assert(i == j, ExcIndexRange(j, i, i + 1));
-  (void)j;
   return diagonal(i);
 }
 
@@ -365,7 +363,6 @@ typename VectorType::value_type &
 DiagonalMatrix<VectorType>::operator()(const size_type i, const size_type j)
 {
   Assert(i == j, ExcIndexRange(j, i, i + 1));
-  (void)j;
   return diagonal(i);
 }
 

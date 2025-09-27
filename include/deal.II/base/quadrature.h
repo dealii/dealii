@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2023 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 1998 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 #ifndef dealii_quadrature_h
 #define dealii_quadrature_h
@@ -19,8 +18,10 @@
 
 #include <deal.II/base/config.h>
 
+#include <deal.II/base/array_view.h>
+#include <deal.II/base/enable_observer_pointer.h>
+#include <deal.II/base/exceptions.h>
 #include <deal.II/base/point.h>
-#include <deal.II/base/subscriptor.h>
 
 #include <array>
 #include <memory>
@@ -119,7 +120,7 @@ DEAL_II_NAMESPACE_OPEN
  * as "list of evaluation points".
  */
 template <int dim>
-class Quadrature : public Subscriptor
+class Quadrature : public EnableObserverPointer
 {
 public:
   /**
@@ -130,14 +131,9 @@ public:
   using SubQuadrature = Quadrature<dim == 0 ? 0 : dim - 1>;
 
   /**
-   * Constructor.
-   *
-   * This constructor is marked as explicit to avoid involuntary accidents
-   * like in <code>hp::QCollection@<dim@> q_collection(3)</code> where
-   * <code>hp::QCollection@<dim@> q_collection(QGauss@<dim@>(3))</code> was
-   * meant.
+   * Default constructor.
    */
-  explicit Quadrature(const unsigned int n_quadrature_points = 0);
+  Quadrature();
 
   /**
    * Build this quadrature formula as the tensor product of a formula in a
@@ -238,11 +234,15 @@ public:
 
   /**
    * Set the quadrature points and weights to the values provided in the
-   * arguments.
+   * arguments. The weights array is allowed to be empty, in which case the
+   * weights are set to infinity. The resulting object is therefore not meant
+   * to actually perform integrations, but rather to be used with FEValues
+   * objects in order to find the position of some points (the quadrature
+   * points in this object) on the transformed cell in real space.
    */
   void
-  initialize(const std::vector<Point<dim>> &points,
-             const std::vector<double>     &weights);
+  initialize(const ArrayView<const Point<dim>> &points,
+             const ArrayView<const double>     &weights = {});
 
   /**
    * Number of quadrature points.
@@ -315,23 +315,38 @@ public:
    *
    * @note The actual return type of this function is
    * @code
-   * std::conditional<dim == 1,
-   *                  std::array<Quadrature<1>, dim>,
-   *                  const std::array<Quadrature<1>, dim> &>::type
+   * std::conditional_t<dim == 1,
+   *                    std::array<Quadrature<1>, dim>,
+   *                    const std::array<Quadrature<1>, dim> &>
    * @endcode
    * The type is abbreviated in the online documentation to improve
    * readability of this page.
    */
 #ifndef DOXYGEN
-  typename std::conditional<dim == 1,
-                            std::array<Quadrature<1>, dim>,
-                            const std::array<Quadrature<1>, dim> &>::type
+  std::conditional_t<dim == 1,
+                     std::array<Quadrature<1>, dim>,
+                     const std::array<Quadrature<1>, dim> &>
 #else
   const std::array<Quadrature<1>, dim> &
 #endif
   get_tensor_basis() const;
 
 protected:
+  /**
+   * Constructor.
+   *
+   * This constructor is marked as explicit to avoid involuntary accidents
+   * like in <code>hp::QCollection@<dim@> q_collection(3)</code> where
+   * <code>hp::QCollection@<dim@> q_collection(QGauss@<dim@>(3))</code> was
+   * meant. Nonetheless, it is easy to accidentally write
+   * @code
+   *   Quadrature<dim> quadrature(3);
+   * @endcode
+   * where QGauss was meant. As a consequence, this constructor is `protected`
+   * and so only available to derived classes initializing their base class.
+   */
+  explicit Quadrature(const unsigned int n_quadrature_points);
+
   /**
    * List of quadrature points. To be filled by the constructors of derived
    * classes.
@@ -531,7 +546,7 @@ Quadrature<dim>::serialize(Archive &ar, const unsigned int)
 {
   // forward to serialization
   // function in the base class.
-  ar &static_cast<Subscriptor &>(*this);
+  ar &static_cast<EnableObserverPointer &>(*this);
 
   ar &quadrature_points &weights;
 }

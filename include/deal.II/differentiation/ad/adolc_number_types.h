@@ -1,24 +1,39 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2016 - 2022 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2017 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 #ifndef dealii_differentiation_ad_adolc_number_types_h
 #define dealii_differentiation_ad_adolc_number_types_h
 
 #include <deal.II/base/config.h>
 
+#include <deal.II/base/exceptions.h>
+#include <deal.II/base/numbers.h>
+
+#include <deal.II/differentiation/ad/ad_number_traits.h>
+#include <deal.II/differentiation/ad/ad_number_types.h>
+
+#ifdef DEAL_II_WITH_ADOLC
+#  include <adolc/adouble.h> // Taped double
+#  include <adolc/adtl.h>    // Tapeless double
+#  include <adolc/internal/adolc_settings.h>
+#  include <adolc/internal/adubfunc.h> // Taped double math functions
+#endif
+
+#include <complex>
+#include <limits>
 #include <type_traits>
+
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -59,26 +74,8 @@ namespace Differentiation
 } // namespace Differentiation
 
 
-DEAL_II_NAMESPACE_CLOSE
-
 
 #ifdef DEAL_II_WITH_ADOLC
-
-#  include <deal.II/base/exceptions.h>
-#  include <deal.II/base/numbers.h>
-
-#  include <deal.II/differentiation/ad/ad_number_traits.h>
-#  include <deal.II/differentiation/ad/ad_number_types.h>
-
-#  include <adolc/adouble.h> // Taped double
-#  include <adolc/adtl.h>    // Tapeless double
-#  include <adolc/internal/adolc_settings.h>
-#  include <adolc/internal/adubfunc.h> // Taped double math functions
-
-#  include <complex>
-#  include <limits>
-
-DEAL_II_NAMESPACE_OPEN
 
 /**
  * An exception which states that a function has been disabled due to the
@@ -496,9 +493,9 @@ namespace Differentiation
 #  endif // DOXYGEN
 
 
+#endif // DEAL_II_WITH_ADOLC
+
 DEAL_II_NAMESPACE_CLOSE
 
-
-#endif // DEAL_II_WITH_ADOLC
 
 #endif

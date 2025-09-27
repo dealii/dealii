@@ -1,22 +1,23 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2016 - 2022 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2019 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 
 // Check MGTransferMatrixFree with custom user constraints
 
 #include <deal.II/distributed/tria.h>
+
+#include <deal.II/dofs/dof_tools.h>
 
 #include <deal.II/fe/fe_q.h>
 
@@ -41,7 +42,7 @@ check()
 
   tr.refine_global(1);
 
-  FE_Q<dim> fe = FE_Q<dim>(1);
+  FE_Q<dim> fe(1);
 
   DoFHandler<dim> mgdof(tr);
   mgdof.distribute_dofs(fe);
@@ -53,7 +54,7 @@ check()
   const IndexSet relevant_dofs =
     DoFTools::extract_locally_relevant_level_dofs(mgdof, 0);
   AffineConstraints<double> user_constraints;
-  user_constraints.reinit(relevant_dofs);
+  user_constraints.reinit(mgdof.locally_owned_mg_dofs(0), relevant_dofs);
 
   typename DoFHandler<dim>::level_face_iterator face0 = mgdof.begin(0)->face(0);
   std::vector<types::global_dof_index>          face_dofs(fe.dofs_per_face);
@@ -62,8 +63,7 @@ check()
     {
       if (user_constraints.can_store_line(face_dofs[i]))
         {
-          user_constraints.add_line(face_dofs[i]);
-          user_constraints.set_inhomogeneity(face_dofs[i], 5.0);
+          user_constraints.constrain_dof_to_zero(face_dofs[i]);
         }
     }
   user_constraints.close();
@@ -74,6 +74,7 @@ check()
 
   deallog << "SRC Vector" << std::endl;
   LinearAlgebra::distributed::Vector<double> src_level_0(mgdof.n_dofs(0));
+  src_level_0 = 1.0;
   for (unsigned int i = 0; i < mgdof.n_dofs(0); ++i)
     deallog << src_level_0(i) << ' ';
   deallog << std::endl << std::endl;

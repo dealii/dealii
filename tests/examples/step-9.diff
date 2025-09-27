@@ -1,0 +1,28 @@
+49a49
+> #include "../example_test.h"
+762c762,766
+<     solver.solve(system_matrix, solution, system_rhs, preconditioner);
+---
+>     check_solver_within_range(std::cout,
+> 			   solver.solve(system_matrix, solution, system_rhs, preconditioner),
+> 			   solver_control.last_step(),
+> 			   335,
+> 			   1050);
+766,769c770,773
+<     std::cout << "   Iterations required for convergence: "
+<               << solver_control.last_step() << '\n'
+<               << "   Norm of residual at convergence:     "
+<               << solver_control.last_value() << '\n';
+---
+>     //std::cout << "   Iterations required for convergence: "
+>     //          << solver_control.last_step() << '\n'
+>     //          << "   Norm of residual at convergence:     "
+>     //          << solver_control.last_value() << '\n';
+850c854
+<     for (unsigned int cycle = 0; cycle < 10; ++cycle)
+---
+>     for (unsigned int cycle = 0; cycle < 5; ++cycle)
+875c879
+<         output_results(cycle);
+---
+>       //output_results(cycle);

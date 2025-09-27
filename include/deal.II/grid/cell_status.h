@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2023 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2023 - 2024 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 #ifndef dealii_cell_status_h
 #define dealii_cell_status_h
@@ -51,22 +50,22 @@ enum class CellStatus : unsigned int
   /**
    * @deprecated Use CellStatus::cell_will_persist instead
    */
-  CELL_PERSIST DEAL_II_DEPRECATED_EARLY = cell_will_persist,
+  CELL_PERSIST DEAL_II_DEPRECATED = cell_will_persist,
 
   /**
    * @deprecated Use CellStatus::cell_will_be_refined instead
    */
-  CELL_REFINE DEAL_II_DEPRECATED_EARLY = cell_will_be_refined,
+  CELL_REFINE DEAL_II_DEPRECATED = cell_will_be_refined,
 
   /**
    * @deprecated Use CellStatus::cell_will_be_coarsened instead
    */
-  CELL_COARSEN DEAL_II_DEPRECATED_EARLY = children_will_be_coarsened,
+  CELL_COARSEN DEAL_II_DEPRECATED = children_will_be_coarsened,
 
   /**
    * @deprecated Use CellStatus::cell_invalid instead
    */
-  CELL_INVALID DEAL_II_DEPRECATED_EARLY = cell_invalid,
+  CELL_INVALID DEAL_II_DEPRECATED = cell_invalid,
 };
 
 DEAL_II_NAMESPACE_CLOSE

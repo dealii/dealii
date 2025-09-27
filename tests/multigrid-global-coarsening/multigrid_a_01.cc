@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
+// SPDX-License-Identifier: LGPL-2.1-or-later
 // Copyright (C) 2020 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 
 /**
@@ -25,7 +24,8 @@ template <int dim, typename Number = double>
 void
 test(const unsigned int n_refinements,
      const unsigned int fe_degree_fine,
-     const bool         do_simplex_mesh)
+     const bool         do_simplex_mesh,
+     const bool         ones_on_diagonal)
 {
   using VectorType = LinearAlgebra::distributed::Vector<Number>;
 
@@ -37,7 +37,7 @@ test(const unsigned int n_refinements,
   MGLevelObject<AffineConstraints<Number>> constraints(min_level, max_level);
   MGLevelObject<MGTwoLevelTransfer<dim, VectorType>> transfers(min_level,
                                                                max_level);
-  MGLevelObject<Operator<dim, Number>> operators(min_level, max_level);
+  MGLevelObject<Operator<dim, 1, Number>> operators(min_level, max_level);
 
   std::unique_ptr<Mapping<dim>> mapping_;
 
@@ -83,13 +83,19 @@ test(const unsigned int n_refinements,
       // set up constraints
       const IndexSet locally_relevant_dofs =
         DoFTools::extract_locally_relevant_dofs(dof_handler);
-      constraint.reinit(locally_relevant_dofs);
+      constraint.reinit(dof_handler.locally_owned_dofs(),
+                        locally_relevant_dofs);
       VectorTools::interpolate_boundary_values(
         *mapping, dof_handler, 0, Functions::ZeroFunction<dim>(), constraint);
       constraint.close();
 
       // set up operator
-      op.reinit(*mapping, dof_handler, *quad, constraint);
+      op.reinit(*mapping,
+                dof_handler,
+                *quad,
+                constraint,
+                numbers::invalid_unsigned_int,
+                ones_on_diagonal);
     }
 
   // set up transfer operator
@@ -99,7 +105,7 @@ test(const unsigned int n_refinements,
                             constraints[l + 1],
                             constraints[l]);
 
-  MGTransferGlobalCoarsening<dim, VectorType> transfer(
+  MGTransferMatrixFree<dim, Number> transfer(
     transfers,
     [&](const auto l, auto &vec) { operators[l].initialize_dof_vector(vec); });
 
@@ -161,11 +167,17 @@ main(int argc, char **argv)
 
   deallog.precision(8);
 
-  for (unsigned int n_refinements = 2; n_refinements <= 4; ++n_refinements)
-    for (unsigned int degree = 1; degree <= 4; ++degree)
-      test<2>(n_refinements, degree, false /*quadrilateral*/);
+  for (const auto ones_on_diagonal : {false, true})
+    {
+      for (unsigned int n_refinements = 2; n_refinements <= 4; ++n_refinements)
+        for (unsigned int degree = 1; degree <= 4; ++degree)
+          test<2>(n_refinements,
+                  degree,
+                  false /*quadrilateral*/,
+                  ones_on_diagonal);
 
-  for (unsigned int n_refinements = 2; n_refinements <= 4; ++n_refinements)
-    for (unsigned int degree = 1; degree <= 2; ++degree)
-      test<2>(n_refinements, degree, true /*triangle*/);
+      for (unsigned int n_refinements = 2; n_refinements <= 4; ++n_refinements)
+        for (unsigned int degree = 1; degree <= 2; ++degree)
+          test<2>(n_refinements, degree, true /*triangle*/, ones_on_diagonal);
+    }
 }

@@ -1,0 +1,84 @@
+Number of active cells: 256 (on 5 levels)
+Number of degrees of freedom: 3556 (2178+289+1089)
+
+Timestep 0:  t=0
+   Assembling...
+   Rebuilding Stokes preconditioner...
+   Solving...
+Solver stopped after 0 iterations
+   Time step: 0.919118
+Solver stopped within 7 - 10 iterations
+   Temperature range: -0.16687 1.30011
+
+Number of active cells: 280 (on 6 levels)
+Number of degrees of freedom: 4062 (2490+327+1245)
+
+Timestep 0:  t=0
+   Assembling...
+   Rebuilding Stokes preconditioner...
+   Solving...
+Solver stopped after 0 iterations
+   Time step: 0.459559
+Solver stopped within 7 - 10 iterations
+   Temperature range: -0.0982971 0.598503
+
+Number of active cells: 520 (on 7 levels)
+Number of degrees of freedom: 7432 (4562+589+2281)
+
+Timestep 0:  t=0
+   Assembling...
+   Rebuilding Stokes preconditioner...
+   Solving...
+Solver stopped after 0 iterations
+   Time step: 0.229779
+Solver stopped within 7 - 10 iterations
+   Temperature range: -0.0551098 0.294493
+
+Number of active cells: 1072 (on 8 levels)
+Number of degrees of freedom: 15294 (9398+1197+4699)
+
+Timestep 0:  t=0
+   Assembling...
+   Rebuilding Stokes preconditioner...
+   Solving...
+Solver stopped after 0 iterations
+   Time step: 0.11489
+Solver stopped within 7 - 10 iterations
+   Temperature range: -0.0273524 0.156861
+
+Number of active cells: 2128 (on 9 levels)
+Number of degrees of freedom: 30270 (18614+2349+9307)
+
+Timestep 0:  t=0
+   Assembling...
+   Rebuilding Stokes preconditioner...
+   Solving...
+Solver stopped after 0 iterations
+   Time step: 0.0574449
+Solver stopped within 7 - 10 iterations
+   Temperature range: -0.014961 0.0738328
+
+Timestep 1:  t=0.0574449
+   Assembling...
+   Solving...
+Solver stopped within 1 - 60 iterations
+   Time step: 0.0574449
+Solver stopped within 7 - 10 iterations
+   Temperature range: -0.0273934 0.14488
+
+Timestep 2:  t=0.11489
+   Assembling...
+   Solving...
+Solver stopped within 1 - 60 iterations
+   Time step: 0.0574449
+Solver stopped within 7 - 10 iterations
+   Temperature range: -0.0371147 0.212425
+
+Timestep 3:  t=0.172335
+   Assembling...
+   Solving...
+Solver stopped within 1 - 60 iterations
+   Time step: 0.0574449
+Solver stopped within 7 - 10 iterations
+   Temperature range: -0.044128 0.276515
+

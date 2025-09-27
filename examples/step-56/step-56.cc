@@ -1,17 +1,16 @@
-/* ---------------------------------------------------------------------
+/* ------------------------------------------------------------------------
  *
- * Copyright (C) 2016 - 2023 by the deal.II authors
+ * SPDX-License-Identifier: LGPL-2.1-or-later
+ * Copyright (C) 2016 - 2025 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
- * The deal.II library is free software; you can use it, redistribute
- * it, and/or modify it under the terms of the GNU Lesser General
- * Public License as published by the Free Software Foundation; either
- * version 2.1 of the License, or (at your option) any later version.
- * The full text of the license can be found in the file LICENSE.md at
- * the top level directory of deal.II.
+ * Part of the source code is dual licensed under Apache-2.0 WITH
+ * LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+ * governing the source code and code contributions can be found in
+ * LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
  *
- * ---------------------------------------------------------------------
+ * ------------------------------------------------------------------------
 
  * Authors: Ryan Grove, Clemson University
  *          Timo Heister, Clemson University
@@ -20,7 +19,6 @@
 // @sect3{Include files}
 
 #include <deal.II/base/quadrature_lib.h>
-#include <deal.II/base/logstream.h>
 #include <deal.II/base/function.h>
 #include <deal.II/base/utilities.h>
 
@@ -48,7 +46,6 @@
 #include <deal.II/fe/fe_values.h>
 
 #include <deal.II/numerics/vector_tools.h>
-#include <deal.II/numerics/matrix_tools.h>
 #include <deal.II/numerics/data_out.h>
 #include <deal.II/numerics/error_estimator.h>
 
@@ -116,15 +113,15 @@ namespace Step56
     Assert(component <= 2 + 1, ExcIndexRange(component, 0, 2 + 1));
 
     using numbers::PI;
-    const double x = p(0);
-    const double y = p(1);
+    const double x = p[0];
+    const double y = p[1];
 
     if (component == 0)
-      return sin(PI * x);
+      return std::sin(PI * x);
     if (component == 1)
-      return -PI * y * cos(PI * x);
+      return -PI * y * std::cos(PI * x);
     if (component == 2)
-      return sin(PI * x) * cos(PI * y);
+      return std::sin(PI * x) * std::cos(PI * y);
 
     return 0;
   }
@@ -136,18 +133,18 @@ namespace Step56
     Assert(component <= 3 + 1, ExcIndexRange(component, 0, 3 + 1));
 
     using numbers::PI;
-    const double x = p(0);
-    const double y = p(1);
-    const double z = p(2);
+    const double x = p[0];
+    const double y = p[1];
+    const double z = p[2];
 
     if (component == 0)
-      return 2.0 * sin(PI * x);
+      return 2.0 * std::sin(PI * x);
     if (component == 1)
-      return -PI * y * cos(PI * x);
+      return -PI * y * std::cos(PI * x);
     if (component == 2)
-      return -PI * z * cos(PI * x);
+      return -PI * z * std::cos(PI * x);
     if (component == 3)
-      return sin(PI * x) * cos(PI * y) * sin(PI * z);
+      return std::sin(PI * x) * std::cos(PI * y) * std::sin(PI * z);
 
     return 0;
   }
@@ -160,24 +157,24 @@ namespace Step56
     Assert(component <= 2, ExcIndexRange(component, 0, 2 + 1));
 
     using numbers::PI;
-    const double x = p(0);
-    const double y = p(1);
+    const double x = p[0];
+    const double y = p[1];
 
     Tensor<1, 2> return_value;
     if (component == 0)
       {
-        return_value[0] = PI * cos(PI * x);
+        return_value[0] = PI * std::cos(PI * x);
         return_value[1] = 0.0;
       }
     else if (component == 1)
       {
-        return_value[0] = y * PI * PI * sin(PI * x);
-        return_value[1] = -PI * cos(PI * x);
+        return_value[0] = y * PI * PI * std::sin(PI * x);
+        return_value[1] = -PI * std::cos(PI * x);
       }
     else if (component == 2)
       {
-        return_value[0] = PI * cos(PI * x) * cos(PI * y);
-        return_value[1] = -PI * sin(PI * x) * sin(PI * y);
+        return_value[0] = PI * std::cos(PI * x) * std::cos(PI * y);
+        return_value[1] = -PI * std::sin(PI * x) * std::sin(PI * y);
       }
 
     return return_value;
@@ -190,34 +187,37 @@ namespace Step56
     Assert(component <= 3, ExcIndexRange(component, 0, 3 + 1));
 
     using numbers::PI;
-    const double x = p(0);
-    const double y = p(1);
-    const double z = p(2);
+    const double x = p[0];
+    const double y = p[1];
+    const double z = p[2];
 
     Tensor<1, 3> return_value;
     if (component == 0)
       {
-        return_value[0] = 2 * PI * cos(PI * x);
+        return_value[0] = 2 * PI * std::cos(PI * x);
         return_value[1] = 0.0;
         return_value[2] = 0.0;
       }
     else if (component == 1)
       {
-        return_value[0] = y * PI * PI * sin(PI * x);
-        return_value[1] = -PI * cos(PI * x);
+        return_value[0] = y * PI * PI * std::sin(PI * x);
+        return_value[1] = -PI * std::cos(PI * x);
         return_value[2] = 0.0;
       }
     else if (component == 2)
       {
-        return_value[0] = z * PI * PI * sin(PI * x);
+        return_value[0] = z * PI * PI * std::sin(PI * x);
         return_value[1] = 0.0;
-        return_value[2] = -PI * cos(PI * x);
+        return_value[2] = -PI * std::cos(PI * x);
       }
     else if (component == 3)
       {
-        return_value[0] = PI * cos(PI * x) * cos(PI * y) * sin(PI * z);
-        return_value[1] = -PI * sin(PI * x) * sin(PI * y) * sin(PI * z);
-        return_value[2] = PI * sin(PI * x) * cos(PI * y) * cos(PI * z);
+        return_value[0] =
+          PI * std::cos(PI * x) * std::cos(PI * y) * std::sin(PI * z);
+        return_value[1] =
+          -PI * std::sin(PI * x) * std::sin(PI * y) * std::sin(PI * z);
+        return_value[2] =
+          PI * std::sin(PI * x) * std::cos(PI * y) * std::cos(PI * z);
       }
 
     return return_value;
@@ -243,12 +243,14 @@ namespace Step56
     Assert(component <= 2, ExcIndexRange(component, 0, 2 + 1));
 
     using numbers::PI;
-    double x = p(0);
-    double y = p(1);
+    const double x = p[0];
+    const double y = p[1];
     if (component == 0)
-      return PI * PI * sin(PI * x) + PI * cos(PI * x) * cos(PI * y);
+      return PI * PI * std::sin(PI * x) +
+             PI * std::cos(PI * x) * std::cos(PI * y);
     if (component == 1)
-      return -PI * PI * PI * y * cos(PI * x) - PI * sin(PI * y) * sin(PI * x);
+      return -PI * PI * PI * y * std::cos(PI * x) -
+             PI * std::sin(PI * y) * std::sin(PI * x);
     if (component == 2)
       return 0;
 
@@ -262,18 +264,18 @@ namespace Step56
     Assert(component <= 3, ExcIndexRange(component, 0, 3 + 1));
 
     using numbers::PI;
-    double x = p(0);
-    double y = p(1);
-    double z = p(2);
+    const double x = p[0];
+    const double y = p[1];
+    const double z = p[2];
     if (component == 0)
-      return 2 * PI * PI * sin(PI * x) +
-             PI * cos(PI * x) * cos(PI * y) * sin(PI * z);
+      return 2 * PI * PI * std::sin(PI * x) +
+             PI * std::cos(PI * x) * std::cos(PI * y) * std::sin(PI * z);
     if (component == 1)
-      return -PI * PI * PI * y * cos(PI * x) +
-             PI * (-1) * sin(PI * y) * sin(PI * x) * sin(PI * z);
+      return -PI * PI * PI * y * std::cos(PI * x) +
+             PI * (-1) * std::sin(PI * y) * std::sin(PI * x) * std::sin(PI * z);
     if (component == 2)
-      return -PI * PI * PI * z * cos(PI * x) +
-             PI * cos(PI * z) * sin(PI * x) * cos(PI * y);
+      return -PI * PI * PI * z * std::cos(PI * x) +
+             PI * std::cos(PI * z) * std::sin(PI * x) * std::cos(PI * y);
     if (component == 3)
       return 0;
 
@@ -304,7 +306,7 @@ namespace Step56
   // Notice how we keep track of the sum of the inner iterations
   // (preconditioner applications).
   template <class PreconditionerAType, class PreconditionerSType>
-  class BlockSchurPreconditioner : public Subscriptor
+  class BlockSchurPreconditioner : public EnableObserverPointer
   {
   public:
     BlockSchurPreconditioner(
@@ -421,11 +423,11 @@ namespace Step56
     const unsigned int pressure_degree;
     const SolverType   solver_type;
 
-    Triangulation<dim> triangulation;
-    FESystem<dim>      velocity_fe;
-    FESystem<dim>      fe;
-    DoFHandler<dim>    dof_handler;
-    DoFHandler<dim>    velocity_dof_handler;
+    Triangulation<dim>  triangulation;
+    const FESystem<dim> velocity_fe;
+    const FESystem<dim> fe;
+    DoFHandler<dim>     dof_handler;
+    DoFHandler<dim>     velocity_dof_handler;
 
     AffineConstraints<double> constraints;
 
@@ -454,8 +456,7 @@ namespace Step56
     , solver_type(solver_type)
     , triangulation(Triangulation<dim>::maximum_smoothing)
     ,
-    // Finite element for the velocity only -- we choose the
-    // $Q_{\text{pressure_degree}}^d$ element:
+    // Finite element for the velocity only:
     velocity_fe(FE_Q<dim>(pressure_degree + 1) ^ dim)
     ,
     // Finite element for the whole system:
@@ -494,7 +495,7 @@ namespace Step56
     // Velocities start at component 0:
     const FEValuesExtractors::Vector velocities(0);
 
-    // ILU behaves better if we apply a reordering to reduce fillin. There
+    // ILU behaves better if we apply a reordering to reduce filling. There
     // is no advantage in doing this for the other solvers.
     if (solver_type == SolverType::FGMRES_ILU)
       {
@@ -572,7 +573,7 @@ namespace Step56
       // this here by marking the first pressure dof, which has index n_u as a
       // constrained dof.
       if (solver_type == SolverType::UMFPACK)
-        constraints.add_line(n_u);
+        constraints.constrain_dof_to_zero(n_u);
 
       constraints.close();
     }
@@ -610,7 +611,7 @@ namespace Step56
     const bool assemble_pressure_mass_matrix =
       (solver_type == SolverType::UMFPACK) ? false : true;
 
-    QGauss<dim> quadrature_formula(pressure_degree + 2);
+    const QGauss<dim> quadrature_formula(pressure_degree + 2);
 
     FEValues<dim> fe_values(fe,
                             quadrature_formula,
@@ -708,7 +709,7 @@ namespace Step56
 
     mg_matrices = 0.;
 
-    QGauss<dim> quadrature_formula(pressure_degree + 2);
+    const QGauss<dim> quadrature_formula(pressure_degree + 2);
 
     FEValues<dim> fe_values(velocity_fe,
                             quadrature_formula,
@@ -732,16 +733,22 @@ namespace Step56
       triangulation.n_levels());
     for (unsigned int level = 0; level < triangulation.n_levels(); ++level)
       {
-        boundary_constraints[level].add_lines(
-          mg_constrained_dofs.get_refinement_edge_indices(level));
-        boundary_constraints[level].add_lines(
-          mg_constrained_dofs.get_boundary_indices(level));
+        for (const types::global_dof_index dof_index :
+             mg_constrained_dofs.get_refinement_edge_indices(level))
+          boundary_constraints[level].constrain_dof_to_zero(dof_index);
+        for (const types::global_dof_index dof_index :
+             mg_constrained_dofs.get_boundary_indices(level))
+          boundary_constraints[level].constrain_dof_to_zero(dof_index);
         boundary_constraints[level].close();
 
-        IndexSet idx = mg_constrained_dofs.get_refinement_edge_indices(level) &
-                       mg_constrained_dofs.get_boundary_indices(level);
+        const IndexSet idx =
+          mg_constrained_dofs.get_refinement_edge_indices(level) &
+          mg_constrained_dofs.get_boundary_indices(level);
 
-        boundary_interface_constraints[level].add_lines(idx);
+        for (const types::global_dof_index dof_index : idx)
+          boundary_interface_constraints[level].add_constraint(dof_index,
+                                                               {},
+                                                               0.);
         boundary_interface_constraints[level].close();
       }
 

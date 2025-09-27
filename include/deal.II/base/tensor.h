@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2023 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 1998 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 #ifndef dealii_tensor_h
 #define dealii_tensor_h
@@ -25,12 +24,16 @@
 #include <deal.II/base/template_constraints.h>
 #include <deal.II/base/tensor_accessors.h>
 
+#include <Kokkos_Array.hpp>
+
 #ifdef DEAL_II_WITH_ADOLC
 #  include <adolc/adouble.h> // Taped double
 #endif
 
 #include <cmath>
+#include <complex>
 #include <ostream>
+#include <type_traits>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -181,55 +184,6 @@ public:
 #endif
 
   /**
-   * Return a pointer to the first element of the underlying storage.
-   *
-   * @deprecated This function suggests that the elements of a Tensor
-   *   object are stored as a contiguous array, but this is not in fact true
-   *   and one should not pretend that this so. As a consequence, this function
-   *   is deprecated.
-   */
-  DEAL_II_DEPRECATED
-  Number *
-  begin_raw();
-
-  /**
-   * Return a const pointer to the first element of the underlying storage.
-   *
-   * @deprecated This function suggests that the elements of a Tensor
-   *   object are stored as a contiguous array, but this is not in fact true
-   *   and one should not pretend that this so. As a consequence, this function
-   *   is deprecated.
-   */
-  DEAL_II_DEPRECATED
-  const Number *
-  begin_raw() const;
-
-  /**
-   * Return a pointer to the element past the end of the underlying storage.
-   *
-   * @deprecated This function suggests that the elements of a Tensor
-   *   object are stored as a contiguous array, but this is not in fact true
-   *   and one should not pretend that this so. As a consequence, this function
-   *   is deprecated.
-   */
-  DEAL_II_DEPRECATED
-  Number *
-  end_raw();
-
-  /**
-   * Return a const pointer to the element past the end of the underlying
-   * storage.
-   *
-   * @deprecated This function suggests that the elements of a Tensor
-   *   object are stored as a contiguous array, but this is not in fact true
-   *   and one should not pretend that this so. As a consequence, this function
-   *   is deprecated.
-   */
-  DEAL_II_DEPRECATED
-  const Number *
-  end_raw() const;
-
-  /**
    * Return a reference to the encapsulated Number object. Since rank-0
    * tensors are scalars, this is a natural operation.
    *
@@ -367,7 +321,7 @@ public:
    * clear() member functions of the standard library containers and of
    * several other classes within deal.II, which not only reset the values of
    * stored elements to zero, but release all memory and return the object
-   * into a virginial state. However, since the size of objects of the present
+   * into an empty state. However, since the size of objects of the present
    * type is determined by its template parameters, resizing is not an option,
    * and indeed the state where all elements have a zero value is the state
    * right after construction of such an object.
@@ -423,13 +377,6 @@ private:
    * The value of this scalar object.
    */
   Number value;
-
-  /**
-   * Internal helper function for unroll.
-   */
-  template <typename Iterator>
-  Iterator
-  unroll_recursion(const Iterator current, const Iterator end) const;
 
   // Allow an arbitrary Tensor to access the underlying values.
   template <int, int, typename>
@@ -536,7 +483,17 @@ public:
 
   /**
    * Number of independent components of a tensor of current rank. This is dim
-   * times the number of independent components of each sub-tensor.
+   * times the number of independent components of each sub-tensor, which
+   * equates to `dim^rank`.
+   *
+   * This number can be used to loop over all of the entries of a tensor,
+   * using the unrolled_to_component_indices() function:
+   * @code
+   *   // Fill a tensor of arbitrary rank with ones:
+   *   Tensor<rank,dim> t;
+   *   for (unsigned int i=0; i<Tensor<rank,dim>::n_independent_components; ++i)
+   *     t[Tensor<rank,dim>::unrolled_to_component_indices(i)] = 1.0;
+   * @endcode
    */
   static constexpr unsigned int n_independent_components =
     Tensor<rank_ - 1, dim>::n_independent_components * dim;
@@ -544,16 +501,26 @@ public:
   /**
    * Type of objects encapsulated by this container and returned by
    * operator[](). This is a tensor of lower rank for a general tensor, and a
-   * scalar number type for Tensor<1,dim,Number>.
+   * scalar number type for rank-1 tensors.
    */
-  using value_type = typename Tensor<rank_ - 1, dim, Number>::tensor_type;
+  using value_type =
+    std::conditional_t<rank_ == 1, Number, Tensor<rank_ - 1, dim, Number>>;
 
   /**
    * Declare an array type which can be used to initialize an object of this
-   * type statically. For `dim == 0`, its size is 1. Otherwise, it is `dim`.
+   * type statically. For rank-1 tensors, this array is simply an array of
+   * length `dim` of scalars of type `Number`. For higher-rank tensors, it is an
+   * array of length `dim` of the `array_type` of the next lower-rank tensor.
+   *
+   * This class is occasionally instantiated for `dim == 0`. C++ does not allow
+   * the creation of zero-length arrays. As a consequence, if `dim==0`, then all
+   * arrays that *should* have length `dim` are instead declared as having
+   * length 1 to avoid compiler errors.
    */
-  using array_type =
-    typename Tensor<rank_ - 1, dim, Number>::array_type[(dim != 0) ? dim : 1];
+  using array_type = std::conditional_t<
+    rank_ == 1,
+    Number[(dim != 0) ? dim : 1],
+    typename Tensor<rank_ - 1, dim, Number>::array_type[(dim != 0) ? dim : 1]>;
 
   /**
    * Constructor. Initialize all entries to zero.
@@ -654,24 +621,28 @@ public:
   /**
    * Return a pointer to the first element of the underlying storage.
    */
+  DEAL_II_DEPRECATED
   Number *
   begin_raw();
 
   /**
    * Return a const pointer to the first element of the underlying storage.
    */
+  DEAL_II_DEPRECATED
   const Number *
   begin_raw() const;
 
   /**
    * Return a pointer to the element past the end of the underlying storage.
    */
+  DEAL_II_DEPRECATED
   Number *
   end_raw();
 
   /**
    * Return a pointer to the element past the end of the underlying storage.
    */
+  DEAL_II_DEPRECATED
   const Number *
   end_raw() const;
 
@@ -783,7 +754,7 @@ public:
    * clear() member functions of the standard library containers and of
    * several other classes within deal.II, which not only reset the values of
    * stored elements to zero, but release all memory and return the object
-   * into a virginial state. However, since the size of objects of the present
+   * into an empty state. However, since the size of objects of the present
    * type is determined by its template parameters, resizing is not an option,
    * and indeed the state where all elements have a zero value is the state
    * right after construction of such an object.
@@ -811,20 +782,6 @@ public:
   constexpr DEAL_II_HOST_DEVICE
     typename numbers::NumberTraits<Number>::real_type
     norm_square() const;
-
-  /**
-   * Fill a vector with all tensor elements.
-   *
-   * This function unrolls all tensor entries into a single, linearly numbered
-   * vector. As usual in C++, the rightmost index of the tensor marches
-   * fastest.
-   *
-   * @deprecated Use the more general function that takes a pair of iterators
-   * instead.
-   */
-  template <typename OtherNumber>
-  DEAL_II_DEPRECATED void
-  unroll(Vector<OtherNumber> &result) const;
 
   /**
    * Fill a range with all tensor elements.
@@ -879,18 +836,20 @@ public:
 
 private:
   /**
-   * Array of tensors holding the subelements.
+   * Array of tensors holding the elements of the tensor. If this is
+   * a rank-1 tensor, then we simply need an array of scalars.
+   * Otherwise, it is an array of tensors one rank lower.
    */
-  Tensor<rank_ - 1, dim, Number> values[(dim != 0) ? dim : 1];
-  // ... avoid a compiler warning in case of dim == 0 and ensure that the
-  // array always has positive size.
-
-  /**
-   * Internal helper function for unroll.
-   */
-  template <typename Iterator>
-  Iterator
-  unroll_recursion(const Iterator current, const Iterator end) const;
+#if DEAL_II_KOKKOS_VERSION_GTE(3, 7, 0)
+  std::conditional_t<rank_ == 1,
+                     Kokkos::Array<Number, dim>,
+                     Kokkos::Array<Tensor<rank_ - 1, dim, Number>, dim>>
+#else
+  std::conditional_t<rank_ == 1,
+                     std::array<Number, dim>,
+                     std::array<Tensor<rank_ - 1, dim, Number>, dim>>
+#endif
+    values;
 
   /**
    * This constructor is for internal use. It provides a way
@@ -1020,41 +979,6 @@ Tensor<0, dim, Number>::Tensor(Tensor<0, dim, Number> &&other) noexcept
 #  endif
 
 
-template <int dim, typename Number>
-inline Number *
-Tensor<0, dim, Number>::begin_raw()
-{
-  return std::addressof(value);
-}
-
-
-
-template <int dim, typename Number>
-inline const Number *
-Tensor<0, dim, Number>::begin_raw() const
-{
-  return std::addressof(value);
-}
-
-
-
-template <int dim, typename Number>
-inline Number *
-Tensor<0, dim, Number>::end_raw()
-{
-  return begin_raw() + n_independent_components;
-}
-
-
-
-template <int dim, typename Number>
-const Number *
-Tensor<0, dim, Number>::end_raw() const
-{
-  return begin_raw() + n_independent_components;
-}
-
-
 
 template <int dim, typename Number>
 constexpr DEAL_II_HOST_DEVICE_ALWAYS_INLINE
@@ -1181,7 +1105,7 @@ namespace internal
     constexpr DEAL_II_HOST_DEVICE_ALWAYS_INLINE void
     multiply_assign_scalar(std::complex<Number> &val, const OtherNumber &s)
     {
-#  if KOKKOS_VERSION >= 30600
+#  if DEAL_II_KOKKOS_VERSION_GTE(3, 6, 0)
       KOKKOS_IF_ON_HOST((val *= s;))
       KOKKOS_IF_ON_DEVICE(({
         (void)val;
@@ -1190,14 +1114,8 @@ namespace internal
           "This function is not implemented for std::complex<Number>!\n");
       }))
 #  else
-#    ifdef KOKKOS_ACTIVE_EXECUTION_MEMORY_SPACE_HOST
+      // We do not support device code for Kokkos < 3.7:
       val *= s;
-#    else
-      (void)val;
-      (void)s;
-      Kokkos::abort(
-        "This function is not implemented for std::complex<Number>!\n");
-#    endif
 #  endif
     }
   } // namespace ComplexWorkaround
@@ -1256,24 +1174,6 @@ constexpr DEAL_II_HOST_DEVICE inline DEAL_II_ALWAYS_INLINE
 
 
 template <int dim, typename Number>
-template <typename Iterator>
-Iterator
-Tensor<0, dim, Number>::unroll_recursion(const Iterator current,
-                                         const Iterator end) const
-{
-  (void)end;
-  Assert(dim != 0,
-         ExcMessage("Cannot unroll an object of type Tensor<0,0,Number>"));
-  Assert(std::distance(current, end) >= 1,
-         ExcMessage("The provided iterator range must contain at least one "
-                    "element."));
-  *current = value;
-  return std::next(current);
-}
-
-
-
-template <int dim, typename Number>
 constexpr inline void
 Tensor<0, dim, Number>::clear()
 {
@@ -1290,7 +1190,12 @@ inline void
 Tensor<0, dim, Number>::unroll(const Iterator begin, const Iterator end) const
 {
   AssertDimension(std::distance(begin, end), n_independent_components);
-  unroll_recursion(begin, end);
+  Assert(dim != 0,
+         ExcMessage("Cannot unroll an object of type Tensor<0,0,Number>"));
+  Assert(std::distance(begin, end) >= 1,
+         ExcMessage("The provided iterator range must contain at least one "
+                    "element."));
+  *begin = value;
 }
 
 
@@ -1315,22 +1220,154 @@ template <typename ArrayLike, std::size_t... indices>
 constexpr DEAL_II_HOST_DEVICE_ALWAYS_INLINE
 Tensor<rank_, dim, Number>::Tensor(const ArrayLike &initializer,
                                    std::index_sequence<indices...>)
-  : values{Tensor<rank_ - 1, dim, Number>(initializer[indices])...}
+  // Extract from the 'initializer' a sequence of elements via template
+  // pack evaluation. This could be as easy as
+  //     values{{ (initializer[indices])... }}
+  // but of course in practice it is not. The challenge is that if rank>1,
+  // we want to pass the elements initializer[indices] down to the next
+  // lower rank tensor for evaluation unchanged. But at the rank==1 level,
+  // we need to convert to the scalar type 'Number'. This would all be
+  // relatively straightforward if we could rely on automatic type
+  // conversion, but for some autodifferentiation types, the conversion
+  // from the AD to double (i.e., the extraction of a scalar value) is
+  // not implicit, and we need to call internal::NumberType<Number>::value() --
+  // but as mentioned, we can only do that for rank==1.
+  //
+  // We can achieve all of this by dispatching to a lambda function within
+  // which we can use a 'if constexpr'.
+  : values{{([&initializer]() -> value_type {
+    if constexpr (rank_ == 1)
+      return internal::NumberType<Number>::value(initializer[indices]);
+    else
+      return value_type(initializer[indices]);
+  }())...}}
 {
   static_assert(sizeof...(indices) == dim,
                 "dim should match the number of indices");
 }
 
 
+#  if defined(DEAL_II_HAVE_CXX20) && !defined(__NVCC__)
 
 template <int rank_, int dim, typename Number>
 constexpr DEAL_II_HOST_DEVICE_ALWAYS_INLINE
 Tensor<rank_, dim, Number>::Tensor()
-  // We would like to use =default, but this causes compile errors with some
-  // MSVC versions and internal compiler errors with -O1 in gcc 5.4.
-  : values{}
+  : values(
+      // In order to initialize the Kokkos::Array<Number,dim>, we would need a
+      // brace-enclosed list of length 'dim'. There is no way in C++ to create
+      // such a list in-place, but we can come up with a lambda function that
+      // expands such a list via template-pack expansion, and then uses this
+      // list to initialize a Kokkos::Array which it then returns.
+      //
+      // The trick to come up with such a lambda function is to have a function
+      // that takes an argument that depends on a template-pack of integers.
+      // We will call the function with an integer list of length 'dim', and
+      // in the function itself expand that pack in a way that it serves as
+      // a brace-enclosed list of initializers for a Kokkos::Array.
+      //
+      // Of course, we do not want to initialize the array with the integers,
+      // but with  zeros. (Or, more correctly, a zero of the element type.)
+      // The canonical way to do this would be using the comma operator:
+      //     (sequence_element, 0.0)
+      // returns zero, and
+      //     (sequence, 0.0)...
+      // returns a list of zeros of the right length. Unfortunately, some
+      // compilers then warn that the left side of the comma expression has
+      // no effect -- well, bummer, that was of course exactly the idea.
+      // We could work around this by using
+      //     (sequence_element * 0.0)
+      // instead, assuming that the compiler will optimize (known) integer
+      // times zero to zero, and similarly for (known) integer times times
+      // default-initialized tensor.
+      //
+      // But, instead of relying on compiler optimizations, a better way is
+      // to simply have another (nested) lambda function that takes the
+      // integer sequence element as an argument and ignores it, just
+      // returning a zero instead.
+      []<std::size_t... I>(
+        const std::index_sequence<I...> &) constexpr -> decltype(values) {
+        if constexpr (dim == 0)
+          {
+            return {};
+          }
+        else if constexpr (rank_ == 1)
+          {
+            auto get_zero_and_ignore_argument = [](int) {
+              return internal::NumberType<Number>::value(0.0);
+            };
+            return {{(get_zero_and_ignore_argument(I))...}};
+          }
+        else
+          {
+            auto get_zero_and_ignore_argument = [](int) {
+              return Tensor<rank_ - 1, dim, Number>();
+            };
+            return {{(get_zero_and_ignore_argument(I))...}};
+          }
+      }(std::make_index_sequence<dim>()))
 {}
 
+#  else
+
+// The C++17 case works in essence the same, except that we can't use a
+// lambda function with explicit template parameters, i.e., we can't do
+//   []<std::size_t... I>(const std::index_sequence<I...> &)
+// as above because that's a C++20 feature. Lambda functions in C++17 can
+// have template packs as arguments, but we need the ability to *name*
+// that template pack (the 'I' above) and that's not possible in C++17.
+//
+// We work around this by moving the lambda function to a global function
+// and using the traditional template syntax on it.
+namespace internal
+{
+  namespace TensorInitialization
+  {
+    template <int rank, int dim, typename Number, std::size_t... I>
+#    if DEAL_II_KOKKOS_VERSION_GTE(3, 7, 0)
+    constexpr Kokkos::Array<typename Tensor<rank, dim, Number>::value_type, dim>
+#    else
+    constexpr std::array<typename Tensor<rank, dim, Number>::value_type, dim>
+#    endif
+    make_zero_array(const std::index_sequence<I...> &)
+    {
+      static_assert(sizeof...(I) == dim, "This is bad.");
+
+      // First peel off the case dim==0. If we don't, some compilers
+      // will warn below that we define these lambda functions but
+      // never use them (because the expanded list has zero elements,
+      // and the get_zero_and_ignore_argument() function is not used...)
+      if constexpr (dim == 0)
+        {
+          return {};
+        }
+      else if constexpr (rank == 1)
+        {
+          auto get_zero_and_ignore_argument = [](int) {
+            return internal::NumberType<Number>::value(0.0);
+          };
+          return {{(get_zero_and_ignore_argument(I))...}};
+        }
+      else
+        {
+          auto get_zero_and_ignore_argument = [](int) {
+            return Tensor<rank - 1, dim, Number>();
+          };
+          return {{(get_zero_and_ignore_argument(I))...}};
+        }
+    }
+  } // namespace TensorInitialization
+} // namespace internal
+
+
+template <int rank_, int dim, typename Number>
+constexpr DEAL_II_HOST_DEVICE_ALWAYS_INLINE
+Tensor<rank_, dim, Number>::Tensor()
+  : values(internal::TensorInitialization::make_zero_array<rank_, dim, Number>(
+      std::make_index_sequence<dim>()))
+{}
+
+
+#  endif
 
 
 template <int rank_, int dim, typename Number>
@@ -1382,7 +1419,9 @@ template <typename OtherNumber>
 constexpr DEAL_II_ALWAYS_INLINE Tensor<rank_, dim, Number>::
 operator Tensor<1, dim, Tensor<rank_ - 1, dim, OtherNumber>>() const
 {
-  return Tensor<1, dim, Tensor<rank_ - 1, dim, OtherNumber>>(values);
+  Tensor<1, dim, Tensor<rank_ - 1, dim, OtherNumber>> x;
+  std::copy(values.data(), values.data() + values.size(), x.values.data());
+  return x;
 }
 
 
@@ -1390,50 +1429,18 @@ operator Tensor<1, dim, Tensor<rank_ - 1, dim, OtherNumber>>() const
 template <int rank_, int dim, typename Number>
 constexpr DEAL_II_ALWAYS_INLINE
 Tensor<rank_, dim, Number>::Tensor(const Tensor<rank_, dim, Number> &other)
-{
-  for (unsigned int i = 0; i < dim; ++i)
-    values[i] = other.values[i];
-}
+  : values(other.values)
+{}
 
 
 
 template <int rank_, int dim, typename Number>
 constexpr DEAL_II_ALWAYS_INLINE
 Tensor<rank_, dim, Number>::Tensor(Tensor<rank_, dim, Number> &&other) noexcept
-{
-  for (unsigned int i = 0; i < dim; ++i)
-    values[i] = other.values[i];
-}
+  : values(std::move(other.values))
+{}
 #  endif
 
-namespace internal
-{
-  namespace TensorSubscriptor
-  {
-    template <typename ArrayElementType, int dim>
-    constexpr DEAL_II_HOST_DEVICE_ALWAYS_INLINE ArrayElementType &
-    subscript(ArrayElementType  *values,
-              const unsigned int i,
-              std::integral_constant<int, dim>)
-    {
-      AssertIndexRange(i, dim);
-      return values[i];
-    }
-
-    template <typename ArrayElementType>
-    constexpr DEAL_II_HOST_DEVICE_ALWAYS_INLINE ArrayElementType &
-    subscript(ArrayElementType *dummy,
-              const unsigned int,
-              std::integral_constant<int, 0>)
-    {
-      Assert(
-        false,
-        ExcMessage(
-          "Cannot access elements of an object of type Tensor<rank,0,Number>."));
-      return *dummy;
-    }
-  } // namespace TensorSubscriptor
-} // namespace internal
 
 
 template <int rank_, int dim, typename Number>
@@ -1441,8 +1448,12 @@ constexpr DEAL_II_HOST_DEVICE_ALWAYS_INLINE
   typename Tensor<rank_, dim, Number>::value_type &
   Tensor<rank_, dim, Number>::operator[](const unsigned int i)
 {
-  return dealii::internal::TensorSubscriptor::subscript(
-    values, i, std::integral_constant<int, dim>());
+  Assert(dim != 0,
+         ExcMessage("Cannot access an object of type Tensor<rank_,0,Number>"));
+  AssertIndexRange(i, dim);
+  DEAL_II_CXX23_ASSUME(i < dim);
+
+  return values[i];
 }
 
 
@@ -1451,13 +1462,10 @@ constexpr DEAL_II_ALWAYS_INLINE
   DEAL_II_HOST_DEVICE const typename Tensor<rank_, dim, Number>::value_type &
   Tensor<rank_, dim, Number>::operator[](const unsigned int i) const
 {
-#  if KOKKOS_VERSION < 30700
-#    ifdef KOKKOS_ACTIVE_MEMORY_SPACE_HOST
+  Assert(dim != 0,
+         ExcMessage("Cannot access an object of type Tensor<rank_,0,Number>"));
   AssertIndexRange(i, dim);
-#    endif
-#  else
-  KOKKOS_IF_ON_HOST((AssertIndexRange(i, dim);))
-#  endif
+  DEAL_II_CXX23_ASSUME(i < dim);
 
   return values[i];
 }
@@ -1467,17 +1475,8 @@ template <int rank_, int dim, typename Number>
 constexpr inline DEAL_II_ALWAYS_INLINE const Number &
 Tensor<rank_, dim, Number>::operator[](const TableIndices<rank_> &indices) const
 {
-#  if KOKKOS_VERSION < 30700
-#    ifdef KOKKOS_ACTIVE_MEMORY_SPACE_HOST
   Assert(dim != 0,
          ExcMessage("Cannot access an object of type Tensor<rank_,0,Number>"));
-#    endif
-#  else
-  KOKKOS_IF_ON_HOST(
-    (Assert(dim != 0,
-            ExcMessage(
-              "Cannot access an object of type Tensor<rank_,0,Number>"));))
-#  endif
 
   return TensorAccessors::extract<rank_>(*this, indices);
 }
@@ -1488,17 +1487,8 @@ template <int rank_, int dim, typename Number>
 constexpr inline DEAL_II_ALWAYS_INLINE Number &
 Tensor<rank_, dim, Number>::operator[](const TableIndices<rank_> &indices)
 {
-#  if KOKKOS_VERSION < 30700
-#    ifdef KOKKOS_ACTIVE_MEMORY_SPACE_HOST
   Assert(dim != 0,
          ExcMessage("Cannot access an object of type Tensor<rank_,0,Number>"));
-#    endif
-#  else
-  KOKKOS_IF_ON_HOST(
-    (Assert(dim != 0,
-            ExcMessage(
-              "Cannot access an object of type Tensor<rank_,0,Number>"));))
-#  endif
 
   return TensorAccessors::extract<rank_>(*this, indices);
 }
@@ -1509,6 +1499,11 @@ template <int rank_, int dim, typename Number>
 inline Number *
 Tensor<rank_, dim, Number>::begin_raw()
 {
+  static_assert(rank_ == 1,
+                "This function is only available for rank-1 tensors "
+                "because higher-rank tensors may not store their elements "
+                "in a contiguous array.");
+
   return std::addressof(
     this->operator[](this->unrolled_to_component_indices(0)));
 }
@@ -1519,6 +1514,11 @@ template <int rank_, int dim, typename Number>
 inline const Number *
 Tensor<rank_, dim, Number>::begin_raw() const
 {
+  static_assert(rank_ == 1,
+                "This function is only available for rank-1 tensors "
+                "because higher-rank tensors may not store their elements "
+                "in a contiguous array.");
+
   return std::addressof(
     this->operator[](this->unrolled_to_component_indices(0)));
 }
@@ -1529,6 +1529,11 @@ template <int rank_, int dim, typename Number>
 inline Number *
 Tensor<rank_, dim, Number>::end_raw()
 {
+  static_assert(rank_ == 1,
+                "This function is only available for rank-1 tensors "
+                "because higher-rank tensors may not store their elements "
+                "in a contiguous array.");
+
   return begin_raw() + n_independent_components;
 }
 
@@ -1538,6 +1543,11 @@ template <int rank_, int dim, typename Number>
 inline const Number *
 Tensor<rank_, dim, Number>::end_raw() const
 {
+  static_assert(rank_ == 1,
+                "This function is only available for rank-1 tensors "
+                "because higher-rank tensors may not store their elements "
+                "in a contiguous array.");
+
   return begin_raw() + n_independent_components;
 }
 
@@ -1563,7 +1573,6 @@ constexpr DEAL_II_HOST_DEVICE inline DEAL_II_ALWAYS_INLINE
   Tensor<rank_, dim, Number>::operator=(const Number &d) &
 {
   Assert(numbers::value_is_zero(d), ExcScalarAssignmentOnlyForZeroValue());
-  (void)d;
 
   for (unsigned int i = 0; i < dim; ++i)
     values[i] = internal::NumberType<Number>::value(0.0);
@@ -1601,8 +1610,16 @@ constexpr inline bool
 Tensor<rank_, dim, Number>::operator==(
   const Tensor<rank_, dim, OtherNumber> &p) const
 {
+#  ifdef DEAL_II_ADOLC_WITH_ADVANCED_BRANCHING
+  Assert(!(std::is_same_v<Number, adouble> ||
+           std::is_same_v<OtherNumber, adouble>),
+         ExcMessage(
+           "The Tensor equality operator for ADOL-C taped numbers has not yet "
+           "been extended to support advanced branching."));
+#  endif
+
   for (unsigned int i = 0; i < dim; ++i)
-    if (values[i] != p.values[i])
+    if (numbers::values_are_not_equal(values[i], p.values[i]))
       return false;
   return true;
 }
@@ -1670,50 +1687,6 @@ constexpr inline DEAL_II_ALWAYS_INLINE
 }
 
 
-namespace internal
-{
-  namespace TensorImplementation
-  {
-    template <int rank,
-              int dim,
-              typename Number,
-              typename OtherNumber,
-              std::enable_if_t<
-                !std::is_integral<
-                  typename ProductType<Number, OtherNumber>::type>::value &&
-                  !std::is_same_v<Number, Differentiation::SD::Expression>,
-                int> = 0>
-    constexpr DEAL_II_HOST_DEVICE inline DEAL_II_ALWAYS_INLINE void
-    division_operator(Tensor<rank, dim, Number> (&t)[dim],
-                      const OtherNumber &factor)
-    {
-      const Number inverse_factor = Number(1.) / factor;
-      // recurse over the base objects
-      for (unsigned int d = 0; d < dim; ++d)
-        t[d] *= inverse_factor;
-    }
-
-
-    template <int rank,
-              int dim,
-              typename Number,
-              typename OtherNumber,
-              std::enable_if_t<
-                std::is_integral<
-                  typename ProductType<Number, OtherNumber>::type>::value ||
-                  std::is_same_v<Number, Differentiation::SD::Expression>,
-                int> = 0>
-    constexpr DEAL_II_HOST_DEVICE inline DEAL_II_ALWAYS_INLINE void
-    division_operator(Tensor<rank, dim, Number> (&t)[dim],
-                      const OtherNumber &factor)
-    {
-      // recurse over the base objects
-      for (unsigned int d = 0; d < dim; ++d)
-        t[d] /= factor;
-    }
-  } // namespace TensorImplementation
-} // namespace internal
-
 
 template <int rank_, int dim, typename Number>
 template <typename OtherNumber>
@@ -1721,7 +1694,23 @@ constexpr inline DEAL_II_ALWAYS_INLINE
   DEAL_II_HOST_DEVICE Tensor<rank_, dim, Number> &
   Tensor<rank_, dim, Number>::operator/=(const OtherNumber &s)
 {
-  internal::TensorImplementation::division_operator(values, s);
+  if constexpr (std::is_integral_v<
+                  typename ProductType<Number, OtherNumber>::type> ||
+                std::is_same_v<Number, Differentiation::SD::Expression>)
+    {
+      // recurse over the base objects
+      for (unsigned int d = 0; d < dim; ++d)
+        values[d] /= s;
+    }
+  else
+    {
+      // If we can, avoid division by multiplying by the inverse of the given
+      // factor:
+      const Number inverse_factor = Number(1.) / s;
+      for (unsigned int d = 0; d < dim; ++d)
+        values[d] *= inverse_factor;
+    }
+
   return *this;
 }
 
@@ -1744,9 +1733,27 @@ template <int rank_, int dim, typename Number>
 inline DEAL_II_HOST_DEVICE typename numbers::NumberTraits<Number>::real_type
 Tensor<rank_, dim, Number>::norm() const
 {
-  // Make things work with AD types
-  using std::sqrt;
-  return sqrt(norm_square());
+  // Handle cases of a tensor consisting of just one number more
+  // efficiently:
+  if constexpr ((rank_ == 1) && (dim == 1) && std::is_arithmetic_v<Number>)
+    {
+      return std::abs(values[0]);
+    }
+  else if constexpr ((rank_ == 2) && (dim == 1) && std::is_arithmetic_v<Number>)
+    {
+      return std::abs(values[0][0]);
+    }
+  else
+    {
+      // Otherwise fall back to the naive algorithm of taking the square root of
+      // the sum of squares.
+
+      // Make things work with AD types by letting the compiler look up
+      // the symbol sqrt in namespace std and in the type-associated
+      // namespaces
+      using std::sqrt;
+      return sqrt(norm_square());
+    }
 }
 
 
@@ -1755,22 +1762,31 @@ constexpr DEAL_II_HOST_DEVICE_ALWAYS_INLINE
   typename numbers::NumberTraits<Number>::real_type
   Tensor<rank_, dim, Number>::norm_square() const
 {
-  typename numbers::NumberTraits<Number>::real_type s = internal::NumberType<
-    typename numbers::NumberTraits<Number>::real_type>::value(0.0);
-  for (unsigned int i = 0; i < dim; ++i)
-    s += values[i].norm_square();
+  if constexpr (dim == 0)
+    return internal::NumberType<
+      typename numbers::NumberTraits<Number>::real_type>::value(0.0);
+  else if constexpr (rank_ == 1)
+    {
+      // For rank-1 tensors, the square of the norm is simply the sum of
+      // squares of the elements:
+      typename numbers::NumberTraits<Number>::real_type s =
+        numbers::NumberTraits<Number>::abs_square(values[0]);
+      for (unsigned int i = 1; i < dim; ++i)
+        s += numbers::NumberTraits<Number>::abs_square(values[i]);
 
-  return s;
-}
+      return s;
+    }
+  else
+    {
+      // For higher-rank tensors, the square of the norm is the sum
+      // of squares of sub-tensors
+      typename numbers::NumberTraits<Number>::real_type s =
+        values[0].norm_square();
+      for (unsigned int i = 1; i < dim; ++i)
+        s += values[i].norm_square();
 
-
-
-template <int rank_, int dim, typename Number>
-template <typename OtherNumber>
-inline void
-Tensor<rank_, dim, Number>::unroll(Vector<OtherNumber> &result) const
-{
-  unroll(result.begin(), result.end());
+      return s;
+    }
 }
 
 
@@ -1781,23 +1797,29 @@ inline void
 Tensor<rank_, dim, Number>::unroll(const Iterator begin,
                                    const Iterator end) const
 {
-  AssertDimension(std::distance(begin, end), n_independent_components);
-  unroll_recursion(begin, end);
+  if constexpr (rank_ > 1)
+    {
+      // For higher-rank tensors, we recurse to the sub-tensors:
+      Iterator next = begin;
+      for (unsigned int i = 0; i < dim; ++i)
+        {
+          values[i].unroll(next, end);
+          std::advance(
+            next, Tensor<rank_ - 1, dim, Number>::n_independent_components);
+        }
+    }
+  else
+    {
+      // For rank-1 tensors, we can simply copy the current elements from
+      // our linear array into the output range:
+      Assert(std::distance(begin, end) >= dim,
+             ExcMessage(
+               "The provided iterator range must contain at least 'dim' "
+               "elements."));
+      std::copy(values.data(), values.data() + values.size(), begin);
+    }
 }
 
-
-
-template <int rank_, int dim, typename Number>
-template <typename Iterator>
-Iterator
-Tensor<rank_, dim, Number>::unroll_recursion(const Iterator current,
-                                             const Iterator end) const
-{
-  Iterator next = current;
-  for (unsigned int i = 0; i < dim; ++i)
-    next = values[i].unroll_recursion(next, end);
-  return next;
-}
 
 
 template <int rank_, int dim, typename Number>
@@ -1814,45 +1836,6 @@ Tensor<rank_, dim, Number>::component_to_unrolled_index(
 
 
 
-namespace internal
-{
-  // unrolled_to_component_indices is instantiated from DataOut for dim==0
-  // and rank=2. Make sure we don't have compiler warnings.
-
-  template <int dim>
-  DEAL_II_HOST_DEVICE inline constexpr unsigned int
-  mod(const unsigned int x)
-  {
-    return x % dim;
-  }
-
-  template <>
-  DEAL_II_HOST_DEVICE inline unsigned int
-  mod<0>(const unsigned int x)
-  {
-    Assert(false, ExcInternalError());
-    return x;
-  }
-
-  template <int dim>
-  DEAL_II_HOST_DEVICE inline constexpr unsigned int
-  div(const unsigned int x)
-  {
-    return x / dim;
-  }
-
-  template <>
-  DEAL_II_HOST_DEVICE inline unsigned int
-  div<0>(const unsigned int x)
-  {
-    Assert(false, ExcInternalError());
-    return x;
-  }
-
-} // namespace internal
-
-
-
 template <int rank_, int dim, typename Number>
 constexpr inline TableIndices<rank_>
 Tensor<rank_, dim, Number>::unrolled_to_component_indices(const unsigned int i)
@@ -1860,19 +1843,29 @@ Tensor<rank_, dim, Number>::unrolled_to_component_indices(const unsigned int i)
   // Work-around nvcc warning
   unsigned int dummy = n_independent_components;
   AssertIndexRange(i, dummy);
-  (void)dummy;
 
-  TableIndices<rank_> indices;
-
-  unsigned int remainder = i;
-  for (int r = rank_ - 1; r >= 0; --r)
+  if constexpr (dim == 0)
     {
-      indices[r] = internal::mod<dim>(remainder);
-      remainder  = internal::div<dim>(remainder);
+      Assert(false,
+             ExcMessage(
+               "A tensor with dimension 0 does not store any elements. "
+               "There is no indexing that can address its elements."));
+      return {};
     }
-  Assert(remainder == 0, ExcInternalError());
+  else
+    {
+      TableIndices<rank_> indices;
 
-  return indices;
+      unsigned int remainder = i;
+      for (int r = rank_ - 1; r >= 0; --r)
+        {
+          indices[r] = remainder % dim;
+          remainder  = remainder / dim;
+        }
+      Assert(remainder == 0, ExcInternalError());
+
+      return indices;
+    }
 }
 
 
@@ -1898,7 +1891,10 @@ template <class Archive>
 inline void
 Tensor<rank_, dim, Number>::serialize(Archive &ar, const unsigned int)
 {
-  ar &values;
+  for (int i = 0; i < dim; ++i)
+    {
+      ar &values[i];
+    }
 }
 
 
@@ -1929,7 +1925,8 @@ operator<<(std::ostream &out, const Tensor<rank_, dim, Number> &p)
     {
       out << p[i];
       if (i != dim - 1)
-        out << ' ';
+        for (unsigned int j = 0; j < rank_; ++j)
+          out << ' ';
     }
 
   return out;
@@ -1955,7 +1952,7 @@ operator<<(std::ostream &out, const Tensor<0, dim, Number> &p)
  * @}
  */
 /**
- * @name Vector space operations on Tensor objects:
+ * @name Vector space operations on Tensor objects
  * @{
  */
 
@@ -2093,10 +2090,8 @@ constexpr DEAL_II_HOST_DEVICE inline DEAL_II_ALWAYS_INLINE
                               typename EnableIfScalar<OtherNumber>::type>::type>
   operator*(const Tensor<rank, dim, Number> &t, const OtherNumber &factor)
 {
-  // recurse over the base objects
-  Tensor<rank, dim, typename ProductType<Number, OtherNumber>::type> tt;
-  for (unsigned int d = 0; d < dim; ++d)
-    tt[d] = t[d] * factor;
+  Tensor<rank, dim, typename ProductType<Number, OtherNumber>::type> tt(t);
+  tt *= factor;
   return tt;
 }
 
@@ -2126,54 +2121,6 @@ DEAL_II_HOST_DEVICE constexpr inline DEAL_II_ALWAYS_INLINE
 }
 
 
-namespace internal
-{
-  namespace TensorImplementation
-  {
-    template <int rank,
-              int dim,
-              typename Number,
-              typename OtherNumber,
-              std::enable_if_t<
-                !std::is_integral<
-                  typename ProductType<Number, OtherNumber>::type>::value,
-                int> = 0>
-    constexpr DEAL_II_HOST_DEVICE inline DEAL_II_ALWAYS_INLINE
-      Tensor<rank, dim, typename ProductType<Number, OtherNumber>::type>
-      division_operator(const Tensor<rank, dim, Number> &t,
-                        const OtherNumber               &factor)
-    {
-      Tensor<rank, dim, typename ProductType<Number, OtherNumber>::type> tt;
-      const Number inverse_factor = Number(1.) / factor;
-      // recurse over the base objects
-      for (unsigned int d = 0; d < dim; ++d)
-        tt[d] = t[d] * inverse_factor;
-      return tt;
-    }
-
-
-    template <int rank,
-              int dim,
-              typename Number,
-              typename OtherNumber,
-              std::enable_if_t<
-                std::is_integral<
-                  typename ProductType<Number, OtherNumber>::type>::value,
-                int> = 0>
-    constexpr DEAL_II_HOST_DEVICE inline DEAL_II_ALWAYS_INLINE
-      Tensor<rank, dim, typename ProductType<Number, OtherNumber>::type>
-      division_operator(const Tensor<rank, dim, Number> &t,
-                        const OtherNumber               &factor)
-    {
-      Tensor<rank, dim, typename ProductType<Number, OtherNumber>::type> tt;
-      // recurse over the base objects
-      for (unsigned int d = 0; d < dim; ++d)
-        tt[d] = t[d] / factor;
-      return tt;
-    }
-  } // namespace TensorImplementation
-} // namespace internal
-
 
 /**
  * Division of a tensor of general rank with a scalar number. See the
@@ -2192,7 +2139,9 @@ constexpr DEAL_II_HOST_DEVICE inline DEAL_II_ALWAYS_INLINE
                               typename EnableIfScalar<OtherNumber>::type>::type>
   operator/(const Tensor<rank, dim, Number> &t, const OtherNumber &factor)
 {
-  return internal::TensorImplementation::division_operator(t, factor);
+  Tensor<rank, dim, typename ProductType<Number, OtherNumber>::type> tt(t);
+  tt /= factor;
+  return tt;
 }
 
 
@@ -2212,10 +2161,7 @@ constexpr DEAL_II_HOST_DEVICE inline DEAL_II_ALWAYS_INLINE
             const Tensor<rank, dim, OtherNumber> &q)
 {
   Tensor<rank, dim, typename ProductType<Number, OtherNumber>::type> tmp(p);
-
-  for (unsigned int i = 0; i < dim; ++i)
-    tmp[i] += q[i];
-
+  tmp += q;
   return tmp;
 }
 
@@ -2236,10 +2182,7 @@ constexpr DEAL_II_HOST_DEVICE inline DEAL_II_ALWAYS_INLINE
             const Tensor<rank, dim, OtherNumber> &q)
 {
   Tensor<rank, dim, typename ProductType<Number, OtherNumber>::type> tmp(p);
-
-  for (unsigned int i = 0; i < dim; ++i)
-    tmp[i] -= q[i];
-
+  tmp -= q;
   return tmp;
 }
 
@@ -2350,17 +2293,55 @@ constexpr inline DEAL_II_ALWAYS_INLINE
   operator*(const Tensor<rank_1, dim, Number>      &src1,
             const Tensor<rank_2, dim, OtherNumber> &src2)
 {
-  typename Tensor<rank_1 + rank_2 - 2,
-                  dim,
-                  typename ProductType<Number, OtherNumber>::type>::tensor_type
-    result{};
+  // Treat some common cases separately. Specifically, these are the dot
+  // product between two rank-1 tensors, and the product between a
+  // rank-2 tensor and a rank-1 tensor. Both of these lead to a linear
+  // loop over adjacent memory and can be dealt with efficiently; in the
+  // latter case (rank-2 times rank-1), we implement things by deferring
+  // to rank-1 times rank-1 dot products.
+  if constexpr ((rank_1 == 1) && (rank_2 == 1))
+    {
+      // This is a dot product between two rank-1 tensors. Write it out as
+      // a linear loop:
+      static_assert(dim > 0, "Tensors cannot have dimension zero.");
+      typename ProductType<Number, OtherNumber>::type sum = src1[0] * src2[0];
+      for (unsigned int i = 1; i < dim; ++i)
+        sum += src1[i] * src2[i];
 
-  TensorAccessors::internal::
-    ReorderedIndexView<0, rank_2, const Tensor<rank_2, dim, OtherNumber>>
-      reordered = TensorAccessors::reordered_index_view<0, rank_2>(src2);
-  TensorAccessors::contract<1, rank_1, rank_2, dim>(result, src1, reordered);
+      return sum;
+    }
+  else if constexpr ((rank_1 == 2) && (rank_2 == 1))
+    {
+      // This is a product between a rank-2 and a rank-1 tensor. This
+      // corresponds to taking dot products between the rows of the former
+      // and the latter.
+      typename Tensor<
+        rank_1 + rank_2 - 2,
+        dim,
+        typename ProductType<Number, OtherNumber>::type>::tensor_type result;
+      for (unsigned int i = 0; i < dim; ++i)
+        result[i] += src1[i] * src2;
 
-  return result;
+      return result;
+    }
+  else
+    {
+      // Treat all of the other cases using the more general contraction
+      // machinery.
+      typename Tensor<
+        rank_1 + rank_2 - 2,
+        dim,
+        typename ProductType<Number, OtherNumber>::type>::tensor_type result{};
+
+      TensorAccessors::internal::
+        ReorderedIndexView<0, rank_2, const Tensor<rank_2, dim, OtherNumber>>
+          reordered = TensorAccessors::reordered_index_view<0, rank_2>(src2);
+      TensorAccessors::contract<1, rank_1, rank_2, dim>(result,
+                                                        src1,
+                                                        reordered);
+
+      return result;
+    }
 }
 
 
@@ -2689,14 +2670,12 @@ constexpr inline DEAL_II_ALWAYS_INLINE
 
   Tensor<1, dim, typename ProductType<Number1, Number2>::type> result;
 
-  // avoid compiler warnings
-  constexpr int s0 = 0 % dim;
-  constexpr int s1 = 1 % dim;
-  constexpr int s2 = 2 % dim;
-
-  result[s0] = src1[s1] * src2[s2] - src1[s2] * src2[s1];
-  result[s1] = src1[s2] * src2[s0] - src1[s0] * src2[s2];
-  result[s2] = src1[s0] * src2[s1] - src1[s1] * src2[s0];
+  if constexpr (dim == 3)
+    {
+      result[0] = src1[1] * src2[2] - src1[2] * src2[1];
+      result[1] = src1[2] * src2[0] - src1[0] * src2[2];
+      result[2] = src1[0] * src2[1] - src1[1] * src2[0];
+    }
 
   return result;
 }
@@ -2854,34 +2833,29 @@ constexpr inline DEAL_II_ALWAYS_INLINE Tensor<2, 2, Number>
   return return_tensor;
 }
 
-
 template <typename Number>
 constexpr inline DEAL_II_ALWAYS_INLINE Tensor<2, 3, Number>
                                        invert(const Tensor<2, 3, Number> &t)
 {
   Tensor<2, 3, Number> return_tensor;
 
-  return_tensor[0][0] = internal::NumberType<Number>::value(t[1][1] * t[2][2]) -
-                        internal::NumberType<Number>::value(t[1][2] * t[2][1]);
-  return_tensor[0][1] = internal::NumberType<Number>::value(t[0][2] * t[2][1]) -
-                        internal::NumberType<Number>::value(t[0][1] * t[2][2]);
-  return_tensor[0][2] = internal::NumberType<Number>::value(t[0][1] * t[1][2]) -
-                        internal::NumberType<Number>::value(t[0][2] * t[1][1]);
-  return_tensor[1][0] = internal::NumberType<Number>::value(t[1][2] * t[2][0]) -
-                        internal::NumberType<Number>::value(t[1][0] * t[2][2]);
-  return_tensor[1][1] = internal::NumberType<Number>::value(t[0][0] * t[2][2]) -
-                        internal::NumberType<Number>::value(t[0][2] * t[2][0]);
-  return_tensor[1][2] = internal::NumberType<Number>::value(t[0][2] * t[1][0]) -
-                        internal::NumberType<Number>::value(t[0][0] * t[1][2]);
-  return_tensor[2][0] = internal::NumberType<Number>::value(t[1][0] * t[2][1]) -
-                        internal::NumberType<Number>::value(t[1][1] * t[2][0]);
-  return_tensor[2][1] = internal::NumberType<Number>::value(t[0][1] * t[2][0]) -
-                        internal::NumberType<Number>::value(t[0][0] * t[2][1]);
-  return_tensor[2][2] = internal::NumberType<Number>::value(t[0][0] * t[1][1]) -
-                        internal::NumberType<Number>::value(t[0][1] * t[1][0]);
-  const Number inv_det_t = internal::NumberType<Number>::value(
-    1.0 / (t[0][0] * return_tensor[0][0] + t[0][1] * return_tensor[1][0] +
-           t[0][2] * return_tensor[2][0]));
+  const auto value = [](const auto &t) {
+    return internal::NumberType<Number>::value(t);
+  };
+
+  return_tensor[0][0] = value(t[1][1] * t[2][2]) - value(t[1][2] * t[2][1]);
+  return_tensor[0][1] = value(t[0][2] * t[2][1]) - value(t[0][1] * t[2][2]);
+  return_tensor[0][2] = value(t[0][1] * t[1][2]) - value(t[0][2] * t[1][1]);
+  return_tensor[1][0] = value(t[1][2] * t[2][0]) - value(t[1][0] * t[2][2]);
+  return_tensor[1][1] = value(t[0][0] * t[2][2]) - value(t[0][2] * t[2][0]);
+  return_tensor[1][2] = value(t[0][2] * t[1][0]) - value(t[0][0] * t[1][2]);
+  return_tensor[2][0] = value(t[1][0] * t[2][1]) - value(t[1][1] * t[2][0]);
+  return_tensor[2][1] = value(t[0][1] * t[2][0]) - value(t[0][0] * t[2][1]);
+  return_tensor[2][2] = value(t[0][0] * t[1][1]) - value(t[0][1] * t[1][0]);
+
+  const Number inv_det_t =
+    value(1.0 / (t[0][0] * return_tensor[0][0] + t[0][1] * return_tensor[1][0] +
+                 t[0][2] * return_tensor[2][0]));
   return_tensor *= inv_det_t;
 
   return return_tensor;

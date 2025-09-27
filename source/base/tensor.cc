@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2005 - 2023 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2020 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 #include <deal.II/base/array_view.h>
 #include <deal.II/base/tensor.h>
@@ -37,7 +36,7 @@ namespace
     // major ordering, we take the SVD of A^T by running the gesvd command.
     // The results (V^T)^T and U^T are provided in column major that we use
     // as row major results V^T and U.
-    // It essentially computs A^T = (V^T)^T S U^T and gives us V^T and U.
+    // It essentially computes A^T = (V^T)^T S U^T and gives us V^T and U.
     // This trick gives what we originally wanted (A = U S V^T) but the order
     // of U and V^T is reversed.
     std::array<Number, dim> S;

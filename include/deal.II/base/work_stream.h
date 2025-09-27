@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2008 - 2023 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2009 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 #ifndef dealii_work_stream_h
 #  define dealii_work_stream_h
@@ -23,6 +22,7 @@
 #  include <deal.II/base/iterator_range.h>
 #  include <deal.II/base/multithread_info.h>
 #  include <deal.II/base/parallel.h>
+#  include <deal.II/base/std_cxx20/type_traits.h>
 #  include <deal.II/base/template_constraints.h>
 #  include <deal.II/base/thread_local_storage.h>
 #  include <deal.II/base/thread_management.h>
@@ -33,10 +33,16 @@
 #    else
 #      include <tbb/pipeline.h>
 #    endif
+#    include <tbb/blocked_range.h>
+#  endif
+
+#  ifdef DEAL_II_WITH_TASKFLOW
+#    include <taskflow/taskflow.hpp>
 #  endif
 
 #  include <functional>
 #  include <iterator>
+#  include <list>
 #  include <memory>
 #  include <utility>
 #  include <vector>
@@ -52,7 +58,7 @@ DEAL_II_NAMESPACE_OPEN
  * individual subranges onto the available threads. For a lengthy discussion
  * of the rationale of this class, see the
  * @ref threads "Parallel computing with multiple processors"
- * module. It is used in the tutorial first in step-9, and again in step-13,
+ * topic. It is used in the tutorial first in step-9, and again in step-13,
  * step-14, step-32 and others.
  *
  * The class is built on the following premise: One frequently has some work
@@ -165,6 +171,79 @@ namespace WorkStream
    */
   namespace internal
   {
+    /**
+     * A structure that contains a pointer to a scratch data object and a copy
+     * data object along with a flag that indicates whether this object is
+     * currently in use.
+     */
+    template <typename Iterator, typename ScratchData, typename CopyData>
+    struct ScratchAndCopyDataObjects
+    {
+      std::unique_ptr<ScratchData> scratch_data;
+      std::unique_ptr<CopyData>    copy_data;
+      bool                         currently_in_use;
+
+      /**
+       * Default constructor.
+       */
+      ScratchAndCopyDataObjects()
+        : currently_in_use(false)
+      {}
+
+      ScratchAndCopyDataObjects(std::unique_ptr<ScratchData> &&p,
+                                std::unique_ptr<CopyData>    &&q,
+                                const bool                     in_use)
+        : scratch_data(std::move(p))
+        , copy_data(std::move(q))
+        , currently_in_use(in_use)
+      {}
+
+      // Provide a copy constructor that actually doesn't copy the
+      // internal state. This makes handling ScratchAndCopyDataObjects
+      // easier to handle with STL containers.
+      ScratchAndCopyDataObjects(const ScratchAndCopyDataObjects &)
+        : currently_in_use(false)
+      {}
+    };
+
+    /**
+     * A structure that contains a pointer to a scratch data object
+     * along with a flag that indicates whether this object is currently
+     * in use.
+     */
+    template <typename ScratchData>
+    struct ScratchDataObject
+    {
+      std::unique_ptr<ScratchData> scratch_data;
+      bool                         currently_in_use;
+
+      /**
+       * Default constructor.
+       */
+      ScratchDataObject()
+        : currently_in_use(false)
+      {}
+
+      ScratchDataObject(std::unique_ptr<ScratchData> &&p, const bool in_use)
+        : scratch_data(std::move(p))
+        , currently_in_use(in_use)
+      {}
+
+      ScratchDataObject(ScratchData *p, const bool in_use)
+        : scratch_data(p)
+        , currently_in_use(in_use)
+      {}
+
+      // Provide a copy constructor that actually doesn't copy the
+      // internal state. This makes handling ScratchAndCopyDataObjects
+      // easier to handle with STL containers.
+      ScratchDataObject(const ScratchDataObject &)
+        : currently_in_use(false)
+      {}
+
+      ScratchDataObject(ScratchDataObject &&o) noexcept = default;
+    };
+
 #  ifdef DEAL_II_WITH_TBB
     /**
      * A namespace for the implementation of details of the WorkStream pattern
@@ -198,43 +277,10 @@ namespace WorkStream
         struct ItemType
         {
           /**
-           * A structure that contains a pointer to a scratch data object
-           * along with a flag that indicates whether this object is currently
-           * in use.
-           */
-          struct ScratchDataObject
-          {
-            std::unique_ptr<ScratchData> scratch_data;
-            bool                         currently_in_use;
-
-            /**
-             * Default constructor.
-             */
-            ScratchDataObject()
-              : currently_in_use(false)
-            {}
-
-            ScratchDataObject(ScratchData *p, const bool in_use)
-              : scratch_data(p)
-              , currently_in_use(in_use)
-            {}
-
-            // Provide a copy constructor that actually doesn't copy the
-            // internal state. This makes handling ScratchAndCopyDataObjects
-            // easier to handle with STL containers.
-            ScratchDataObject(const ScratchDataObject &)
-              : currently_in_use(false)
-            {}
-
-            ScratchDataObject(ScratchDataObject &&o) noexcept = default;
-          };
-
-
-          /**
            * Typedef to a list of scratch data objects. The rationale for this
            * list is provided in the variables that use these lists.
            */
-          using ScratchDataList = std::list<ScratchDataObject>;
+          using ScratchDataList = std::list<ScratchDataObject<ScratchData>>;
 
           /**
            * A list of iterators that need to be worked on. Only the first
@@ -482,13 +528,13 @@ namespace WorkStream
                                                             ScratchData,
                                                             CopyData>::ItemType;
 
-        // Create the three stages of the pipeline:
+        // Define the three stages of the pipeline:
 
         //
         // ----- Stage 1 -----
         //
         // The first stage is the one that provides us with chunks of data
-        // to work on (the stream of "items"). This stage runs sequentially.
+        // to work on (the stream of "items"). This stage will run sequentially.
         IteratorRangeToItemStream<Iterator, ScratchData, CopyData>
              iterator_range_to_item_stream(begin,
                                         end,
@@ -496,33 +542,22 @@ namespace WorkStream
                                         chunk_size,
                                         sample_scratch_data,
                                         sample_copy_data);
-        auto tbb_item_stream_filter = tbb::make_filter<void, ItemType *>(
-#    ifdef DEAL_II_TBB_WITH_ONEAPI
-          tbb::filter_mode::serial_in_order,
-#    else
-          tbb::filter::serial,
-#    endif
-          [&](tbb::flow_control &fc) -> ItemType * {
-            if (const auto item = iterator_range_to_item_stream.get_item())
-              return item;
-            else
-              {
-                fc.stop();
-                return nullptr;
-              }
-          });
+        auto item_generator = [&](tbb::flow_control &fc) -> ItemType * {
+          if (const auto item = iterator_range_to_item_stream.get_item())
+            return item;
+          else
+            {
+              fc.stop();
+              return nullptr;
+            }
+        };
 
         //
         // ----- Stage 2 -----
         //
         // The second stage is the one that does the actual work. This is the
         // stage that runs in parallel
-        auto tbb_worker_filter = tbb::make_filter<ItemType *, ItemType *>(
-#    ifdef DEAL_II_TBB_WITH_ONEAPI
-          tbb::filter_mode::parallel,
-#    else
-          tbb::filter::parallel,
-#    endif
+        auto item_worker =
           [worker =
              std::function<void(const Iterator &, ScratchData &, CopyData &)>(
                worker),
@@ -561,7 +596,7 @@ namespace WorkStream
                   current_item->scratch_data->get().emplace_back(scratch_data,
                                                                  true);
                 }
-            }
+            };
 
             // then call the worker function on each element of the chunk we
             // were given. since these worker functions are called on separate
@@ -606,52 +641,66 @@ namespace WorkStream
             // Then return the original pointer
             // to the now modified object. The copier will work on it next.
             return current_item;
-          });
-
+          };
 
         //
         // ----- Stage 3 -----
         //
         // The last stage is the one that copies data from the CopyData objects
         // to the final destination. This stage runs sequentially again.
+        auto item_copier = [copier = std::function<void(const CopyData &)>(
+                              copier)](ItemType *current_item) {
+          if (copier)
+            {
+              // Initiate copying data. For the same reasons as in the worker
+              // class above, catch exceptions rather than letting them
+              // propagate into unknown territories:
+              for (unsigned int i = 0; i < current_item->n_iterators; ++i)
+                {
+                  try
+                    {
+                      copier(current_item->copy_datas[i]);
+                    }
+                  catch (const std::exception &exc)
+                    {
+                      Threads::internal::handle_std_exception(exc);
+                    }
+                  catch (...)
+                    {
+                      Threads::internal::handle_unknown_exception();
+                    }
+                }
+            }
+          // mark current item as usable again
+          current_item->currently_in_use = false;
+        };
+
+
+        // Now we just have to set up the pipeline and run it:
+        auto tbb_item_stream_filter = tbb::make_filter<void, ItemType *>(
+#    ifdef DEAL_II_TBB_WITH_ONEAPI
+          tbb::filter_mode::serial_in_order,
+#    else
+          tbb::filter::serial,
+#    endif
+          item_generator);
+
+        auto tbb_worker_filter = tbb::make_filter<ItemType *, ItemType *>(
+#    ifdef DEAL_II_TBB_WITH_ONEAPI
+          tbb::filter_mode::parallel,
+#    else
+          tbb::filter::parallel,
+#    endif
+          item_worker);
+
         auto tbb_copier_filter = tbb::make_filter<ItemType *, void>(
 #    ifdef DEAL_II_TBB_WITH_ONEAPI
           tbb::filter_mode::serial_in_order,
 #    else
           tbb::filter::serial,
 #    endif
-          [copier = std::function<void(const CopyData &)>(copier)](
-            ItemType *current_item) {
-            if (copier)
-              {
-                // Initiate copying data. For the same reasons as in the worker
-                // class above, catch exceptions rather than letting them
-                // propagate into unknown territories:
-                for (unsigned int i = 0; i < current_item->n_iterators; ++i)
-                  {
-                    try
-                      {
-                        copier(current_item->copy_datas[i]);
-                      }
-                    catch (const std::exception &exc)
-                      {
-                        Threads::internal::handle_std_exception(exc);
-                      }
-                    catch (...)
-                      {
-                        Threads::internal::handle_unknown_exception();
-                      }
-                  }
-              }
-            // mark current item as usable again
-            current_item->currently_in_use = false;
-          });
+          item_copier);
 
-
-        //
-        // ----- The pipeline -----
-        //
-        // Now create a pipeline from these stages and execute it:
         tbb::parallel_pipeline(queue_length,
                                tbb_item_stream_filter & tbb_worker_filter &
                                  tbb_copier_filter);
@@ -660,6 +709,199 @@ namespace WorkStream
     }    // namespace tbb_no_coloring
 #  endif // DEAL_II_WITH_TBB
 
+
+
+#  ifdef DEAL_II_WITH_TASKFLOW
+    /**
+     * Mostly a copy of the 2nd implementation of the Workstream paper taking
+     * advantage of thread local lists for re-use. Uses taskflow for task
+     * scheduling rather than TBB. Currently does not support chunking.
+     */
+
+
+    namespace taskflow_no_coloring
+    {
+      /**
+       * The main run function for the taskflow colorless implementation. The
+       * last two arguments in this function are for chunking support which
+       * currently does not exist but ideally will later. For now they are
+       * ignored but still here to permit existing programs to function
+       */
+      template <typename Worker,
+                typename Copier,
+                typename Iterator,
+                typename ScratchData,
+                typename CopyData>
+      void
+      run(const Iterator                             &begin,
+          const std_cxx20::type_identity_t<Iterator> &end,
+          Worker                                      worker,
+          Copier                                      copier,
+          const ScratchData                          &sample_scratch_data,
+          const CopyData                             &sample_copy_data,
+          const unsigned int /*queue_length*/ = 2 *
+                                                MultithreadInfo::n_threads(),
+          const unsigned int chunk_size = 8)
+
+      {
+        tf::Executor &executor = MultithreadInfo::get_taskflow_executor();
+        tf::Taskflow  taskflow;
+
+        using ScratchDataList = std::list<ScratchDataObject<ScratchData>>;
+
+        Threads::ThreadLocalStorage<ScratchDataList>
+          thread_safe_scratch_data_list;
+
+        tf::Task last_copier;
+
+
+        // A collection of chunk_size copy objects which each represent the
+        // contribution of a single worker. Chunk_size workers are thus chunked
+        // together by having their outputs stored in this object in a single
+        // task.
+        struct CopyChunk
+        {
+          std::vector<CopyData> copy_datas;
+
+          CopyChunk(const unsigned int chunk_size,
+                    const CopyData    &sample_copy_data)
+            : copy_datas(chunk_size, sample_copy_data)
+          {}
+        };
+
+        // idx is used to connect each worker to its copier as communication
+        // between tasks is not supported. It does this by providing a unique
+        // index in the vector of pointers copy_datas at which the copy data
+        // object where the work done by work task #idx is stored
+        unsigned int idx = 0;
+
+        // A collection of handles to a CopyChunk object for each chunk. The
+        // actual data will be allocated only when a worker arrives at this
+        // chunk and will be freed as soon as the result has been copied.
+        std::vector<std::unique_ptr<CopyChunk>> copy_chunks;
+
+        std::vector<Iterator> chunk;
+        chunk.reserve(chunk_size);
+
+        unsigned int total_chunks  = 0;
+        unsigned int chunk_counter = 0;
+
+        // Generate a static task graph. Here we generate a task for each cell
+        // that will be worked on. The tasks are not executed until all of them
+        // are created, this code runs sequentially.
+        for (Iterator it = begin; it != end;)
+          {
+            for (; (chunk_counter < chunk_size) && (it != end);
+                 ++it, ++chunk_counter)
+              chunk.emplace_back(it);
+            ++total_chunks;
+            // Create a worker task.
+            auto worker_task =
+              taskflow
+                .emplace([chunk,
+                          idx,
+                          chunk_counter,
+                          &thread_safe_scratch_data_list,
+                          &sample_scratch_data,
+                          &sample_copy_data,
+                          &copy_chunks,
+                          &worker]() {
+                  ScratchData *scratch_data = nullptr;
+
+                  ScratchDataList &scratch_data_list =
+                    thread_safe_scratch_data_list.get();
+                  // We need to find an unused scratch data object in the list
+                  // that corresponds to the current thread and then mark it as
+                  // used. if we can't find one, create one. There is no need to
+                  // synchronize access to this variable using a mutex since
+                  // each object is local to its own thread.
+                  for (auto &p : scratch_data_list)
+                    {
+                      if (p.currently_in_use == false)
+                        {
+                          scratch_data       = p.scratch_data.get();
+                          p.currently_in_use = true;
+                          break;
+                        }
+                    }
+                  // If no element in the list was found, create
+                  // one and mark it as used.
+                  if (scratch_data == nullptr)
+                    {
+                      scratch_data_list.emplace_back(
+                        std::make_unique<ScratchData>(sample_scratch_data),
+                        true);
+                      scratch_data =
+                        scratch_data_list.back().scratch_data.get();
+                    }
+
+                  // Create a unique copy chunk object where this
+                  // worker's work will be stored.
+                  copy_chunks[idx] =
+                    std::make_unique<CopyChunk>(chunk_counter,
+                                                sample_copy_data);
+                  auto         copy_chunk = copy_chunks[idx].get();
+                  unsigned int i          = 0;
+                  for (auto &it : chunk)
+                    {
+                      worker(it, *scratch_data, copy_chunk->copy_datas[i]);
+                      ++i;
+                    }
+
+                  // Find our currently used scratch data and
+                  // mark it as unused.
+                  for (auto &p : scratch_data_list)
+                    {
+                      if (p.scratch_data.get() == scratch_data)
+                        {
+                          Assert(p.currently_in_use == true,
+                                 ExcInternalError());
+                          p.currently_in_use = false;
+                        }
+                    }
+                })
+                .name("worker");
+
+            // Create a copier task. This task is a separate object from the
+            // worker task.
+            tf::Task copier_task =
+              taskflow
+                .emplace([idx, &copy_chunks, &copier]() {
+                  auto copy_chunk = copy_chunks[idx].get();
+                  for (auto &copy_data : copy_chunk->copy_datas)
+                    {
+                      copier(copy_data);
+                    }
+                  // Finally free the memory.
+                  copy_chunks[idx].reset();
+                })
+                .name("copy");
+
+            // Ensure the copy task runs after the worker task.
+            worker_task.precede(copier_task);
+
+            // Ensure that only one copy task can run at a time. The code
+            // below makes each copy task wait until the previous one has
+            // finished before it can start
+            if (!last_copier.empty())
+              last_copier.precede(copier_task);
+
+            // Keep a handle to the last copier. Tasks in taskflow are
+            // basically handles to internally stored data, so this does not
+            // perform a copy:
+            last_copier = copier_task;
+            ++idx;
+            chunk_counter = 0;
+            chunk.clear();
+          }
+        copy_chunks.resize(total_chunks);
+        // Now we run all the tasks in the task graph. They will be run in
+        // parallel and are eligible to run when their dependencies established
+        // above are met.
+        executor.run(taskflow).wait();
+      }
+    } // namespace taskflow_no_coloring
+#  endif
 
     /**
      * A reference implementation without using multithreading to be used if we
@@ -766,43 +1008,6 @@ namespace WorkStream
      */
     namespace tbb_colored
     {
-      /**
-       * A structure that contains a pointer to scratch and copy data objects
-       * along with a flag that indicates whether this object is currently in
-       * use.
-       */
-      template <typename Iterator, typename ScratchData, typename CopyData>
-      struct ScratchAndCopyDataObjects
-      {
-        std::unique_ptr<ScratchData> scratch_data;
-        std::unique_ptr<CopyData>    copy_data;
-        bool                         currently_in_use;
-
-        /**
-         * Default constructor.
-         */
-        ScratchAndCopyDataObjects()
-          : currently_in_use(false)
-        {}
-
-        ScratchAndCopyDataObjects(std::unique_ptr<ScratchData> &&p,
-                                  std::unique_ptr<CopyData>    &&q,
-                                  const bool                     in_use)
-          : scratch_data(std::move(p))
-          , copy_data(std::move(q))
-          , currently_in_use(in_use)
-        {}
-
-        // Provide a copy constructor that actually doesn't copy the
-        // internal state. This makes handling ScratchAndCopyDataObjects
-        // easier to handle with STL containers.
-        ScratchAndCopyDataObjects(const ScratchAndCopyDataObjects &)
-          : currently_in_use(false)
-        {}
-      };
-
-
-
       /**
        * A class that manages calling the worker and copier functions. Unlike
        * the other implementations, parallel_for is used instead of a
@@ -923,7 +1128,7 @@ namespace WorkStream
         }
 
       private:
-        using ScratchAndCopyDataObjects = typename tbb_colored::
+        using ScratchAndCopyDataObjects = typename internal::
           ScratchAndCopyDataObjects<Iterator, ScratchData, CopyData>;
 
         /**
@@ -996,6 +1201,166 @@ namespace WorkStream
 
     }    // namespace tbb_colored
 #  endif // DEAL_II_WITH_TBB
+
+
+
+#  ifdef DEAL_II_WITH_TASKFLOW
+    /**
+     * Mostly a copy of the 3rd implementation of the Workstream paper taking
+     * advantage of thread local lists for re-use. Uses taskflow for task
+     * scheduling rather than TBB. Currently does not support chunking.
+     */
+    namespace taskflow_colored
+    {
+      /**
+       * The main run function for the taskflow colored implementation. The
+       * last two arguments in this function are for chunking support which
+       * currently does not exist but ideally will later. For now they are
+       * ignored but still here to permit existing programs to function.
+       */
+      template <typename Worker,
+                typename Copier,
+                typename Iterator,
+                typename ScratchData,
+                typename CopyData>
+      void
+      run(const std::vector<std::vector<Iterator>> &colored_iterators,
+          Worker                                    worker,
+          Copier                                    copier,
+          const ScratchData                        &sample_scratch_data,
+          const CopyData                           &sample_copy_data,
+          const unsigned int /*queue_length*/ = 2 *
+                                                MultithreadInfo::n_threads(),
+          const unsigned int chunk_size = 8)
+
+      {
+        tf::Executor &executor = MultithreadInfo::get_taskflow_executor();
+        using ScratchAndCopyDataObjects = typename internal::
+          ScratchAndCopyDataObjects<Iterator, ScratchData, CopyData>;
+
+        using ScratchAndCopyDataList = std::list<ScratchAndCopyDataObjects>;
+
+        Threads::ThreadLocalStorage<ScratchAndCopyDataList>
+          thread_safe_scratch_and_copy_data_list;
+
+        tf::Taskflow taskflow;
+
+        // Create a "future" object which eventually contains the execution
+        // result of a taskflow graph and can be used to yield execution
+        tf::Future<void> execution_future;
+
+        const bool have_worker =
+          (static_cast<const std::function<
+             void(const Iterator &, ScratchData &, CopyData &)> &>(worker)) !=
+          nullptr;
+        const bool have_copier =
+          (static_cast<const std::function<void(const CopyData &)> &>(
+            copier)) != nullptr;
+
+        std::vector<Iterator> chunk;
+        chunk.reserve(chunk_size);
+
+        unsigned int chunk_counter = 0;
+        // Generate a static task graph. Here we generate a task for each cell
+        // that will be worked on. The tasks are not executed until all of them
+        // are created, this code runs sequentially. Cells have been grouped
+        // into "colors" data from cells in the same color are safe to copy in
+        // parallel so copying need not be sequential.
+        for (unsigned int color = 0; color < colored_iterators.size(); ++color)
+          // Ignore color blocks which are empty.
+          if (colored_iterators[color].size() > 0)
+            {
+              // For each cell queue up a combined worker and copier task. These
+              // are not yet run.
+              for (auto it = colored_iterators[color].begin();
+                   it != colored_iterators[color].end();)
+                {
+                  for (; (chunk_counter < chunk_size) &&
+                         (it != colored_iterators[color].end());
+                       ++it, ++chunk_counter)
+                    chunk.emplace_back(*it);
+                  taskflow
+                    .emplace([chunk,
+                              have_worker,
+                              have_copier,
+                              &thread_safe_scratch_and_copy_data_list,
+                              &sample_scratch_data,
+                              &sample_copy_data,
+                              &worker,
+                              &copier]() {
+                      ScratchData *scratch_data = nullptr;
+                      CopyData    *copy_data    = nullptr;
+
+                      ScratchAndCopyDataList &scratch_and_copy_data_list =
+                        thread_safe_scratch_and_copy_data_list.get();
+                      // See if there is an unused object. if so, grab it
+                      // and mark it as used.
+                      for (typename ScratchAndCopyDataList::iterator p =
+                             scratch_and_copy_data_list.begin();
+                           p != scratch_and_copy_data_list.end();
+                           ++p)
+                        {
+                          if (p->currently_in_use == false)
+                            {
+                              scratch_data        = p->scratch_data.get();
+                              copy_data           = p->copy_data.get();
+                              p->currently_in_use = true;
+                              break;
+                            }
+                        }
+                      // If no element in the list was found, create one and
+                      // mark it as used.
+                      if (scratch_data == nullptr)
+                        {
+                          Assert(copy_data == nullptr, ExcInternalError());
+                          scratch_and_copy_data_list.emplace_back(
+                            std::make_unique<ScratchData>(sample_scratch_data),
+                            std::make_unique<CopyData>(sample_copy_data),
+                            true);
+                          scratch_data = scratch_and_copy_data_list.back()
+                                           .scratch_data.get();
+                          copy_data =
+                            scratch_and_copy_data_list.back().copy_data.get();
+                        }
+
+                      for (const Iterator &it : chunk)
+                        {
+                          if (have_worker)
+                            worker(it, *scratch_data, *copy_data);
+                          if (have_copier)
+                            copier(*copy_data);
+                        }
+
+                      // Mark objects as free to be used again.
+                      for (typename ScratchAndCopyDataList::iterator p =
+                             scratch_and_copy_data_list.begin();
+                           p != scratch_and_copy_data_list.end();
+                           ++p)
+                        {
+                          if (p->scratch_data.get() == scratch_data)
+                            {
+                              Assert(p->currently_in_use == true,
+                                     ExcInternalError());
+                              p->currently_in_use = false;
+                            }
+                        }
+                    })
+                    .name("worker_and_copier");
+                  chunk.clear();
+                  chunk_counter = 0;
+                }
+
+              if (color > 0)
+                // Wait for the previous color to finish executing
+                execution_future.wait();
+              execution_future = executor.run(std::move(taskflow));
+            }
+        // Wait for our final execution to finish
+        if (colored_iterators.size() > 0)
+          execution_future.wait();
+      }
+    }    // namespace taskflow_colored
+#  endif // DEAL_II_WITH_TASKFLOW
 
 
   } // namespace internal
@@ -1142,10 +1507,20 @@ namespace WorkStream
 
     if (MultithreadInfo::n_threads() > 1)
       {
-#  ifdef DEAL_II_WITH_TBB
+#  if defined(DEAL_II_WITH_TBB) || defined(DEAL_II_WITH_TASKFLOW)
         if (static_cast<const std::function<void(const CopyData &)> &>(copier))
           {
             // If we have a copier, run the algorithm:
+#    if defined(DEAL_II_WITH_TASKFLOW)
+            internal::taskflow_no_coloring::run(begin,
+                                                end,
+                                                worker,
+                                                copier,
+                                                sample_scratch_data,
+                                                sample_copy_data,
+                                                queue_length,
+                                                chunk_size);
+#    elif defined(DEAL_II_WITH_TBB)
             internal::tbb_no_coloring::run(begin,
                                            end,
                                            worker,
@@ -1154,6 +1529,7 @@ namespace WorkStream
                                            sample_copy_data,
                                            queue_length,
                                            chunk_size);
+#    endif
           }
         else
           {
@@ -1189,7 +1565,7 @@ namespace WorkStream
 #  endif
       }
 
-    // no TBB installed or we are requested to run sequentially:
+    // no TBB or Taskflow installed or we are requested to run sequentially:
     internal::sequential::run(
       begin, end, worker, copier, sample_scratch_data, sample_copy_data);
   }
@@ -1203,12 +1579,16 @@ namespace WorkStream
    * both of which return iterators to elements that form the bounds of the
    * range.
    */
-  template <typename Worker,
-            typename Copier,
-            typename IteratorRangeType,
-            typename ScratchData,
-            typename CopyData,
-            typename = std::enable_if_t<has_begin_and_end<IteratorRangeType>>>
+  template <
+    typename Worker,
+    typename Copier,
+    typename IteratorRangeType,
+    typename ScratchData,
+    typename CopyData,
+    typename = std::enable_if_t<
+      has_begin_and_end<IteratorRangeType> &&
+      !std::is_same_v<IteratorRangeType,
+                      IteratorRange<typename IteratorRangeType::iterator>>>>
   void
   run(IteratorRangeType  iterator_range,
       Worker             worker,
@@ -1285,7 +1665,17 @@ namespace WorkStream
 
     if (MultithreadInfo::n_threads() > 1)
       {
-#  ifdef DEAL_II_WITH_TBB
+#  ifdef DEAL_II_WITH_TASKFLOW
+        internal::taskflow_colored::run(colored_iterators,
+                                        worker,
+                                        copier,
+                                        sample_scratch_data,
+                                        sample_copy_data,
+                                        chunk_size);
+
+        // exit this function to not run the sequential version below:
+        return;
+#  elif defined(DEAL_II_WITH_TBB)
         internal::tbb_colored::run(colored_iterators,
                                    worker,
                                    copier,
@@ -1427,11 +1817,15 @@ namespace WorkStream
    * both of which return iterators to elements that form the bounds of the
    * range.
    */
-  template <typename MainClass,
-            typename IteratorRangeType,
-            typename ScratchData,
-            typename CopyData,
-            typename = std::enable_if_t<has_begin_and_end<IteratorRangeType>>>
+  template <
+    typename MainClass,
+    typename IteratorRangeType,
+    typename ScratchData,
+    typename CopyData,
+    typename = std::enable_if_t<
+      has_begin_and_end<IteratorRangeType> &&
+      !std::is_same_v<IteratorRangeType,
+                      IteratorRange<typename IteratorRangeType::iterator>>>>
   void
   run(
     IteratorRangeType iterator_range,

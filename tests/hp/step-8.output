@@ -2,8 +2,6 @@
 DEAL::Cycle 0:
 DEAL::   Number of active cells:       16
 DEAL::   Number of degrees of freedom: 50
-DEAL:cg::Starting value 0.28
-DEAL:cg::Convergence step 11 value 0
 gmvinput ascii
 
 nodes 64
@@ -55,8 +53,6 @@ endgmv
 DEAL::Cycle 1:
 DEAL::   Number of active cells:       28
 DEAL::   Number of degrees of freedom: 82
-DEAL:cg::Starting value 0.15
-DEAL:cg::Convergence step 15 value 0
 gmvinput ascii
 
 nodes 112
@@ -132,8 +128,6 @@ endgmv
 DEAL::Cycle 2:
 DEAL::   Number of active cells:       52
 DEAL::   Number of degrees of freedom: 146
-DEAL:cg::Starting value 0.071
-DEAL:cg::Convergence step 19 value 0
 gmvinput ascii
 
 nodes 208
@@ -257,8 +251,6 @@ endgmv
 DEAL::Cycle 3:
 DEAL::   Number of active cells:       100
 DEAL::   Number of degrees of freedom: 262
-DEAL:cg::Starting value 0.062
-DEAL:cg::Convergence step 25 value 0
 gmvinput ascii
 
 nodes 400
@@ -478,8 +470,6 @@ endgmv
 DEAL::Cycle 4:
 DEAL::   Number of active cells:       196
 DEAL::   Number of degrees of freedom: 482
-DEAL:cg::Starting value 0.048
-DEAL:cg::Convergence step 38 value 0
 gmvinput ascii
 
 nodes 784
@@ -891,8 +881,6 @@ endgmv
 DEAL::Cycle 5:
 DEAL::   Number of active cells:       370
 DEAL::   Number of degrees of freedom: 854
-DEAL:cg::Starting value 0.035
-DEAL:cg::Convergence step 50 value 0
 gmvinput ascii
 
 nodes 1480
@@ -1652,8 +1640,6 @@ endgmv
 DEAL::Cycle 6:
 DEAL::   Number of active cells:       706
 DEAL::   Number of degrees of freedom: 1606
-DEAL:cg::Starting value 0.023
-DEAL:cg::Convergence step 65 value 0
 gmvinput ascii
 
 nodes 2824
@@ -3085,8 +3071,6 @@ endgmv
 DEAL::Cycle 7:
 DEAL::   Number of active cells:       1342
 DEAL::   Number of degrees of freedom: 2906
-DEAL:cg::Starting value 0.019
-DEAL:cg::Convergence step 87 value 0
 gmvinput ascii
 
 nodes 5368

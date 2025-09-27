@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2017 - 2023 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2021 - 2024 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 
 #ifndef dealii_matrix_free_evaluation_kernels_hanging_nodes_h
@@ -89,15 +88,18 @@ namespace internal
     Number>
   {
   private:
-    template <int structdim, unsigned int direction, bool transpose>
+    template <int          structdim,
+              unsigned int direction,
+              bool         transpose,
+              typename Number2>
     static void
-    interpolate(const unsigned int             offset,
-                const unsigned int             outer_stride,
-                const unsigned int             given_degree,
-                const Number                   mask_weight,
-                const Number                   mask_write,
-                const Number *DEAL_II_RESTRICT weights,
-                Number *DEAL_II_RESTRICT       values)
+    interpolate(const unsigned int              offset,
+                const unsigned int              outer_stride,
+                const unsigned int              given_degree,
+                const Number                    mask_weight,
+                const Number                    mask_write,
+                const Number2 *DEAL_II_RESTRICT weights,
+                Number *DEAL_II_RESTRICT        values)
     {
       static constexpr unsigned int max_n_points_1D = 40;
 
@@ -179,19 +181,19 @@ namespace internal
     }
 
   public:
-    template <bool transpose>
+    template <bool transpose, typename Number2>
     static void
     run_internal(
-      const unsigned int                            n_components,
-      const MatrixFreeFunctions::ShapeInfo<Number> &shape_info,
+      const unsigned int                             n_components,
+      const MatrixFreeFunctions::ShapeInfo<Number2> &shape_info,
       const std::array<MatrixFreeFunctions::compressed_constraint_kind,
-                       Number::size()>             &constraint_mask,
-      Number                                       *values)
+                       Number::size()>              &constraint_mask,
+      Number                                        *values)
     {
       const unsigned int given_degree =
         fe_degree != -1 ? fe_degree : shape_info.data.front().fe_degree;
 
-      const Number *DEAL_II_RESTRICT weights =
+      const Number2 *DEAL_II_RESTRICT weights =
         shape_info.data.front().subface_interpolation_matrices[0].data();
 
       const unsigned int points = given_degree + 1;
@@ -449,7 +451,7 @@ namespace internal
         }
       else
         {
-          Assert(false, ExcNotImplemented());
+          DEAL_II_NOT_IMPLEMENTED();
         }
     }
   };
@@ -704,7 +706,7 @@ namespace internal
     {
       (void)kind;
 
-      Assert(false, ExcInternalError());
+      DEAL_II_ASSERT_UNREACHABLE();
 
       return v > 0; // should not be called
     }
@@ -1525,14 +1527,14 @@ namespace internal
     }
 
   public:
-    template <bool transpose>
+    template <bool transpose, typename Number2>
     static void
     run_internal(
-      const unsigned int                            n_desired_components,
-      const MatrixFreeFunctions::ShapeInfo<Number> &shape_info,
+      const unsigned int                             n_desired_components,
+      const MatrixFreeFunctions::ShapeInfo<Number2> &shape_info,
       const std::array<MatrixFreeFunctions::compressed_constraint_kind,
-                       Number::size()>             &constraint_mask,
-      Number                                       *values)
+                       Number::size()>              &constraint_mask,
+      Number                                        *values)
     {
       const unsigned int given_degree =
         fe_degree != -1 ? fe_degree : shape_info.data.front().fe_degree;
@@ -1689,7 +1691,7 @@ namespace internal
                 }
               else
                 {
-                  Assert(false, ExcNotImplemented());
+                  DEAL_II_NOT_IMPLEMENTED();
                 }
             }
 
@@ -1704,14 +1706,14 @@ namespace internal
   struct FEEvaluationImplHangingNodes
   {
   public:
-    template <int fe_degree, int n_q_points_1d>
+    template <int fe_degree, typename Number2>
     static bool
-    run(const unsigned int                            n_desired_components,
-        const MatrixFreeFunctions::ShapeInfo<Number> &shape_info,
-        const bool                                    transpose,
+    run(const unsigned int                             n_desired_components,
+        const MatrixFreeFunctions::ShapeInfo<Number2> &shape_info,
+        const bool                                     transpose,
         const std::array<MatrixFreeFunctions::compressed_constraint_kind,
-                         Number::size()>             &c_mask,
-        Number                                       *values)
+                         Number::size()>              &c_mask,
+        Number                                        *values)
     {
       using RunnerType =
         FEEvaluationImplHangingNodesRunner<used_runner_type<fe_degree>(),

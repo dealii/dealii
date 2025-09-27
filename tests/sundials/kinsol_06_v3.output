@@ -1,0 +1,23 @@
+
+DEAL::Computing residual for the 1th time, at u=10.0000
+DEAL::Setting up Jacobian system at u=10.0000
+DEAL::Computing residual for the 2th time, at u=10.0000
+DEAL::Computing residual for the 3th time, at u=-88.0839
+DEAL::Reporting recoverable failure.
+DEAL::Computing residual for the 3th time, at u=-39.0419
+DEAL::Reporting recoverable failure.
+DEAL::Computing residual for the 3th time, at u=-14.5210
+DEAL::Reporting recoverable failure.
+DEAL::Computing residual for the 3th time, at u=-2.26049
+DEAL::Setting up Jacobian system at u=-2.26049
+DEAL::Computing residual for the 4th time, at u=-2.26049
+DEAL::Computing residual for the 5th time, at u=7.84693
+DEAL::Computing residual for the 6th time, at u=7.84693
+DEAL::Computing residual for the 7th time, at u=2.07902
+DEAL::Setting up Jacobian system at u=2.07902
+DEAL::Computing residual for the 8th time, at u=2.07902
+DEAL::Computing residual for the 9th time, at u=-1.23396
+DEAL::Computing residual for the 10th time, at u=-1.23396
+DEAL::Computing residual for the 11th time, at u=6.16274
+DEAL::KINSOL threw an exception with the following message:
+    One of the SUNDIALS KINSOL internal functions returned a negative error code: -6. Please consult SUNDIALS manual.

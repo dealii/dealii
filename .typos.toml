@@ -1,0 +1,66 @@
+[default]
+# Don't check text that matches the following regexes'
+extend-ignore-re = [
+    '\\cite\{.*\}', # citations contain arbitrary keys,
+    '@cite \w'
+]
+
+[default.extend-identifiers]
+# Don't correct these whole identifiers (word-groups)
+bungartz2016precice = "bungartz2016precice"
+chourdakis2021precice = "chourdakis2021precice"
+y_FoR = "y_FoR"
+use_degress = "use_degress"
+MPI_MODE_WRONLY = "MPI_MODE_WRONLY"
+Equil = "Equil"
+multline = "multline"
+Tro = "Tro"
+arange = "arange"
+iy = "iy"
+Strang = "Strang"
+SuperMUC = "SuperMUC"
+pn = "pn"
+thr = "thr"
+yhat = "yhat"
+noy2tics = "noy2tics"
+bck = "bck"
+DMUMPS_STRUC_C = "DMUMPS_STRUC_C"
+
+[default.extend-words]
+# Don't correct these word (parts)
+OCE = "OCE"
+MIS = "MIS"
+parm = "parm"
+nd = "nd"
+inout = "inout"
+datas = "datas"
+Elemente = "Elemente"
+Methode = "Methode"
+workd = "workd"
+Stoer = "Stoer"
+Lik = "Lik"
+htmp = "htmp"
+Numer = "Numer"
+Comput = "Comput"
+ue = "ue"
+reord = "reord"
+Uite = "Uite"
+strat = "strat"
+Ned = "Ned"
+BA = "BA"
+Fike = "Fike"
+clen = "clen"
+
+# Don't check the following files
+[files]
+extend-exclude = [
+    "*.output",
+    "*.svg",
+    "*.pvsm",
+    "*.vtu",
+    "*.bib", # bib entries contain many arbitrary abbreviations
+    # the following files contain typos on purpose
+    "tests/parameter_handler/parameter_handler_25.cc",
+    "tests/parameter_handler/prm/parameter_handler_26_fail.json",
+    "tests/parameter_handler/prm/parameter_handler_26_fail.prm",
+    ] 

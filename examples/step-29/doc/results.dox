@@ -1,4 +1,3 @@
-<a name="Results"></a>
 <h1>Results</h1>
 
 The current program reads its run-time parameters from an input file
@@ -44,15 +43,17 @@ Here's the console output of the program in debug mode:
 
 @code
 > make run
+[ 33%] Building CXX object CMakeFiles/step-29.dir/step-29.cc.o
+[ 66%] Linking CXX executable step-29
 [ 66%] Built target step-29
 [100%] Run step-29 with Debug configuration
-Generating grid... done (0.820449s)
+Generating grid... done (0.675234s)
   Number of active cells:  25600
-Setting up system... done (1.18392s)
+Setting up system... done (0.375661s)
   Number of degrees of freedom: 51842
-Assembling system matrix... done (2.33291s)
-Solving linear system... done (1.34837s)
-Generating output... done (2.05782s)
+Assembling system matrix... done (1.96864s)
+Solving linear system... done (0.861862s)
+Generating output... done (1.66913s)
 [100%] Built target run
 @endcode
 
@@ -65,16 +66,17 @@ hardly sped up at all:
 
 @code
 > make run
+[ 33%] Building CXX object CMakeFiles/step-29.dir/step-29.cc.o
+[ 66%] Linking CXX executable step-29
 [ 66%] Built target step-29
-Scanning dependencies of target run
 [100%] Run step-29 with Release configuration
-DEAL::Generating grid... done (0.0144960s)
-DEAL::  Number of active cells:  25600
-DEAL::Setting up system... done (0.0356880s)
-DEAL::  Number of degrees of freedom: 51842
-DEAL::Assembling system matrix... done (0.0436570s)
-DEAL::Solving linear system... done (1.54733s)
-DEAL::Generating output... done (0.720528s)
+Generating grid... done (0.005207s)
+  Number of active cells:  25600
+Setting up system... done (0.018111s)
+  Number of degrees of freedom: 51842
+Assembling system matrix... done (0.021501s)
+Solving linear system... done (0.590303s)
+Generating output... done (0.090787s)
 [100%] Built target run
 @endcode
 
@@ -84,15 +86,15 @@ The graphical output of the program looks as follows:
 <table align="center" class="doxtable">
   <tr>
     <td>
-      <img src="https://www.dealii.org/images/steps/developer/step-29.v.png" alt="v = Re(u)">
+      <img src="https://dealii.org/images/steps/developer/step-29.v.png" alt="v = Re(u)">
     </td>
     <td>
-      <img src="https://www.dealii.org/images/steps/developer/step-29.w.png" alt="w = Im(u)">
+      <img src="https://dealii.org/images/steps/developer/step-29.w.png" alt="w = Im(u)">
     </td>
   </tr>
   <tr>
     <td colspan="2">
-      <img src="https://www.dealii.org/images/steps/developer/step-29.intensity.png" alt="|u|">
+      <img src="https://dealii.org/images/steps/developer/step-29.intensity.png" alt="|u|">
     </td>
   </tr>
 </table>
@@ -112,10 +114,10 @@ the intensity is actually focused in $x$-direction:
 <table align="center" class="doxtable">
   <tr>
     <td>
-      <img src="https://www.dealii.org/images/steps/developer/step-29.surface.png" alt="|u|">
+      <img src="https://dealii.org/images/steps/developer/step-29.surface.png" alt="|u|">
     </td>
     <td>
-      <img src="https://www.dealii.org/images/steps/developer/step-29.contours.png" alt="|u|">
+      <img src="https://dealii.org/images/steps/developer/step-29.contours.png" alt="|u|">
     </td>
   </tr>
 </table>
@@ -130,41 +132,41 @@ global refinements:
 > make run
 [ 66%] Built target step-29
 [100%] Run step-29 with Release configuration
-DEAL::Generating grid... done (0.0135260s)
-DEAL::  Number of active cells:  25600
-DEAL::Setting up system... done (0.0213910s)
-DEAL::  Number of degrees of freedom: 51842
-DEAL::Assembling system matrix... done (0.0414300s)
-DEAL::Solving linear system... done (1.56621s)
-DEAL::Generating output... done (0.729605s)
+Generating grid... done (0.008767s)
+  Number of active cells:  25600
+Setting up system... done (0.007043s)
+  Number of degrees of freedom: 51842
+Assembling system matrix... done (0.020942s)
+Solving linear system... done (0.585853s)
+Generating output... done (0.092681s)
 [100%] Built target run
 
 > make run
 [ 66%] Built target step-29
 [100%] Run step-29 with Release configuration
-DEAL::Generating grid... done (0.0668490s)
-DEAL::  Number of active cells:  102400
-DEAL::Setting up system... done (0.109694s)
-DEAL::  Number of degrees of freedom: 206082
-DEAL::Assembling system matrix... done (0.160784s)
-DEAL::Solving linear system... done (7.86577s)
-DEAL::Generating output... done (2.89320s)
+Generating grid... done (0.027986s)
+  Number of active cells:  102400
+Setting up system... done (0.070022s)
+  Number of degrees of freedom: 206082
+Assembling system matrix... done (0.075252s)
+Solving linear system... done (4.13989s)
+Generating output... done (0.369556s)
 [100%] Built target run
 
 > make run
 [ 66%] Built target step-29
 [100%] Run step-29 with Release configuration
-DEAL::Generating grid... done (0.293154s)
-DEAL::  Number of active cells:  409600
-DEAL::Setting up system... done (0.491301s)
-DEAL::  Number of degrees of freedom: 821762
-DEAL::Assembling system matrix... done (0.605386s)
-DEAL::Solving linear system... done (45.1989s)
-DEAL::Generating output... done (11.2292s)
+Generating grid... done (0.186439s)
+  Number of active cells:  409600
+Setting up system... done (0.272828s)
+  Number of degrees of freedom: 821762
+Assembling system matrix... done (0.316252s)
+Solving linear system... done (33.1424s)
+Generating output... done (1.36328s)
 [100%] Built target run
 @endcode
 
-Each time we refine the mesh once, so the number of cells and degrees
+Each time we refine the mesh once more, so the number of cells and degrees
 of freedom roughly quadruples from each step to the next. As can be seen,
 generating the grid, setting up degrees of freedom, assembling the
 linear system, and generating output scale pretty closely to linear,
@@ -183,7 +185,7 @@ other parts of the program scale very nicely.
 
 
 
-<a name="extensions"></a>
+@anchor step_29-Extensions
 <h3>Possibilities for extensions</h3>
 
 An obvious possible extension for this program is to run it in 3d

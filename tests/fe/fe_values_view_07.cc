@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2007 - 2020 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2008 - 2024 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 
 
@@ -65,7 +64,7 @@ test(const Triangulation<dim> &tr, const FiniteElement<dim> &fe)
 
   for (unsigned int c = 0; c < fe.n_components(); ++c)
     {
-      FEValuesExtractors::Scalar single_component(c);
+      const FEValuesExtractors::Scalar single_component(c);
       fe_values[single_component].get_function_hessians(fe_function,
                                                         scalar_values);
       deallog << "component=" << c << std::endl;
@@ -73,9 +72,10 @@ test(const Triangulation<dim> &tr, const FiniteElement<dim> &fe)
       for (const auto q : fe_values.quadrature_point_indices())
         {
           deallog << scalar_values[q] << std::endl;
-          Assert((scalar_values[q] - vector_values[q][c]).norm() <=
-                   1e-12 * scalar_values[q].norm(),
-                 ExcInternalError());
+          const auto norm = (scalar_values[q] - vector_values[q][c]).norm();
+          const auto tolerance =
+            std::max(1.e-11, 1.e-12 * scalar_values[q].norm());
+          Assert(norm <= tolerance, ExcInternalError());
         }
     }
 }

@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2018 - 2023 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2018 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 
 #include <deal.II/base/qprojector.h>
@@ -68,16 +67,16 @@ FE_RT_Bubbles<dim>::FE_RT_Bubbles(const unsigned int deg)
 
   // Reinit the vectors of prolongation matrices to the
   // right sizes. There are no restriction matrices implemented
-  for (unsigned int ref_case = RefinementCase<dim>::cut_x;
-       ref_case < RefinementCase<dim>::isotropic_refinement + 1;
-       ++ref_case)
-    {
-      const unsigned int nc =
-        GeometryInfo<dim>::n_children(RefinementCase<dim>(ref_case));
+  for (const unsigned int ref_case :
+       RefinementCase<dim>::all_refinement_cases())
+    if (ref_case != RefinementCase<dim>::no_refinement)
+      {
+        const unsigned int nc = this->reference_cell().template n_children<dim>(
+          RefinementCase<dim>(ref_case));
 
-      for (unsigned int i = 0; i < nc; ++i)
-        this->prolongation[ref_case - 1][i].reinit(n_dofs, n_dofs);
-    }
+        for (unsigned int i = 0; i < nc; ++i)
+          this->prolongation[ref_case - 1][i].reinit(n_dofs, n_dofs);
+      }
 
   // TODO: the implementation makes the assumption that all faces have the
   // same number of dofs
@@ -176,7 +175,7 @@ FE_RT_Bubbles<dim>::initialize_support_points(const unsigned int deg)
   // This is the deg of the RT_Bubble element plus one.
   if (dim > 1)
     {
-      QGaussLobatto<dim - 1> face_points(deg + 1);
+      const QGaussLobatto<dim - 1> face_points(deg + 1);
       Assert(face_points.size() == this->n_dofs_per_face(face_no),
              ExcInternalError());
       for (unsigned int k = 0; k < this->n_dofs_per_face(face_no); ++k)
@@ -185,20 +184,24 @@ FE_RT_Bubbles<dim>::initialize_support_points(const unsigned int deg)
       Quadrature<dim> faces =
         QProjector<dim>::project_to_all_faces(this->reference_cell(),
                                               face_points);
-      for (unsigned int k = 0; k < this->n_dofs_per_face(face_no) *
-                                     GeometryInfo<dim>::faces_per_cell;
-           ++k)
-        this->generalized_support_points[k] = faces.point(
-          k + QProjector<dim>::DataSetDescriptor::face(this->reference_cell(),
-                                                       0,
-                                                       true,
-                                                       false,
-                                                       false,
-                                                       this->n_dofs_per_face(
-                                                         face_no)));
-
-      current =
-        this->n_dofs_per_face(face_no) * GeometryInfo<dim>::faces_per_cell;
+      for (unsigned int face_no = 0;
+           face_no < GeometryInfo<dim>::faces_per_cell;
+           ++face_no)
+        {
+          const auto offset = QProjector<dim>::DataSetDescriptor::face(
+            this->reference_cell(),
+            face_no,
+            numbers::default_geometric_orientation,
+            face_points.size());
+          for (unsigned int face_point = 0; face_point < face_points.size();
+               ++face_point)
+            {
+              // Enter the support point into the vector
+              this->generalized_support_points[current] =
+                faces.point(offset + face_point);
+              ++current;
+            }
+        }
     }
 
   if (deg == 1)
@@ -206,8 +209,8 @@ FE_RT_Bubbles<dim>::initialize_support_points(const unsigned int deg)
 
   // In the interior, we need anisotropic Gauss-Lobatto quadratures,
   // one for each direction
-  QGaussLobatto<1>      high(deg + 1);
-  std::vector<Point<1>> pts = high.get_points();
+  const QGaussLobatto<1> high(deg + 1);
+  std::vector<Point<1>>  pts = high.get_points();
   if (pts.size() > 2)
     {
       pts.erase(pts.begin());
@@ -215,7 +218,7 @@ FE_RT_Bubbles<dim>::initialize_support_points(const unsigned int deg)
     }
 
   std::vector<double> wts(pts.size(), 1);
-  Quadrature<1>       low(pts, wts);
+  const Quadrature<1> low(pts, wts);
 
   for (unsigned int d = 0; d < dim; ++d)
     {
@@ -237,7 +240,7 @@ FE_RT_Bubbles<dim>::initialize_support_points(const unsigned int deg)
                                                   ((d == 2) ? low : high));
             break;
           default:
-            Assert(false, ExcNotImplemented());
+            DEAL_II_NOT_IMPLEMENTED();
         }
 
       for (unsigned int k = 0; k < quadrature->size(); ++k)
@@ -352,7 +355,7 @@ FE_RT_Bubbles<dim>::convert_generalized_support_point_values_to_dof_values(
 
 
 // explicit instantiations
-#include "fe_rt_bubbles.inst"
+#include "fe/fe_rt_bubbles.inst"
 
 
 DEAL_II_NAMESPACE_CLOSE

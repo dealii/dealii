@@ -1,9 +1,8 @@
-<br>
-
 <i>This program was contributed by Jean-Paul Pelteret.
 </i>
 
 
+<a name="step_71-Intro"></a>
 <h1>Introduction</h1>
 
 The aim of this tutorial is, quite simply, to introduce the fundamentals of both
@@ -40,7 +39,7 @@ that question is easy to answer but without context is not very insightful. So
 we're not going to cover that in this introduction, but will rather defer this
 until the first introductory example where we lay out the key points as this
 example unfolds. To complement this, we should mention that the core theory for
-both frameworks is extensively discussed in the @ref auto_symb_diff module, so
+both frameworks is extensively discussed in the @ref auto_symb_diff topic, so
 it bears little repeating here.
 
 Since we have to pick *some* sufficiently interesting topic to investigate
@@ -605,7 +604,7 @@ the problem set up.
   <tr>
     <td align="center">
         <img
-        src="https://www.dealii.org/images/steps/developer/step-71.parallel_plate-geometry.png"
+        src="https://dealii.org/images/steps/developer/step-71.parallel_plate-geometry.png"
         alt="" height="300">
   <p align="center">
         The basic functional geometry of the parallel-plate rotational
@@ -620,7 +619,7 @@ the problem set up.
     </td>
     <td align="center">
         <img
-        src="https://www.dealii.org/images/steps/developer/step-71.parallel_plate-kinematics.png"
+        src="https://dealii.org/images/steps/developer/step-71.parallel_plate-kinematics.png"
         alt="" height="300">
   <p align="center">
         Schematic of the kinematics of the problem, assuming no
@@ -670,7 +669,7 @@ the assisted differentiation frameworks.
 
 <h3>Suggested literature</h3>
 
-In addition to the already mentioned @ref auto_symb_diff module, the following are a few
+In addition to the already mentioned @ref auto_symb_diff topic, the following are a few
 references that discuss in more detail
 - magneto-mechanics, and some aspects of automated differentiation frameworks: @cite Pao1978a, @cite Pelteret2019a, and
 - the automation of finite element frameworks using AD and/or SD: @cite Logg2012a, @cite Korelc2016a.

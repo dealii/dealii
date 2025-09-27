@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2016 - 2019 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2016 - 2024 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 
 for (deal_II_dimension : DIMENSIONS; number : REAL_SCALARS)
@@ -24,9 +23,10 @@ for (deal_II_dimension : DIMENSIONS; number : REAL_SCALARS)
       const SymmetricTensor<2, deal_II_dimension, number> &);
 
     template std::array<std::pair<number, Tensor<1, deal_II_dimension, number>>,
-                        std::integral_constant<int, deal_II_dimension>::value>
-    eigenvectors(const SymmetricTensor<2, deal_II_dimension, number> &,
-                 const SymmetricTensorEigenvectorMethod);
+                        deal_II_dimension>
+    eigenvectors<deal_II_dimension, number>(
+      const SymmetricTensor<2, deal_II_dimension, number> &,
+      const SymmetricTensorEigenvectorMethod);
   }
 
 for (deal_II_dimension : DIMENSIONS; number : DIFFERENTIABLE_ADOLC_REAL_SCALARS)
@@ -47,9 +47,10 @@ for (deal_II_dimension : DIMENSIONS;
       const SymmetricTensor<2, deal_II_dimension, number> &);
 
     template std::array<std::pair<number, Tensor<1, deal_II_dimension, number>>,
-                        std::integral_constant<int, deal_II_dimension>::value>
-    eigenvectors(const SymmetricTensor<2, deal_II_dimension, number> &,
-                 const SymmetricTensorEigenvectorMethod);
+                        deal_II_dimension>
+    eigenvectors<deal_II_dimension, number>(
+      const SymmetricTensor<2, deal_II_dimension, number> &,
+      const SymmetricTensorEigenvectorMethod);
   }
 
 for (deal_II_dimension : DIMENSIONS; number : COMPLEX_SCALARS)
@@ -62,18 +63,18 @@ for (deal_II_dimension : DIMENSIONS; number : COMPLEX_SCALARS)
 
 for (number : REAL_SCALARS)
   {
-    template SymmetricTensor<4, 3, number> invert(
+    template DEAL_II_HOST_DEVICE SymmetricTensor<4, 3, number> invert(
       const SymmetricTensor<4, 3, number> &t);
   }
 
 for (number : DIFFERENTIABLE_ADOLC_REAL_SCALARS)
   {
-    template SymmetricTensor<4, 3, number> invert(
+    template DEAL_II_HOST_DEVICE SymmetricTensor<4, 3, number> invert(
       const SymmetricTensor<4, 3, number> &t);
   }
 
 for (number : DIFFERENTIABLE_TRILINOS_SACADO_REAL_SCALARS)
   {
-    template SymmetricTensor<4, 3, number> invert(
+    template DEAL_II_HOST_DEVICE SymmetricTensor<4, 3, number> invert(
       const SymmetricTensor<4, 3, number> &t);
   }

@@ -1,17 +1,16 @@
-## ---------------------------------------------------------------------
+## ------------------------------------------------------------------------
 ##
-## Copyright (C) 2012 - 2023 by the deal.II authors
+## SPDX-License-Identifier: LGPL-2.1-or-later
+## Copyright (C) 2012 - 2025 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
-## The deal.II library is free software; you can use it, redistribute
-## it, and/or modify it under the terms of the GNU Lesser General
-## Public License as published by the Free Software Foundation; either
-## version 2.1 of the License, or (at your option) any later version.
-## The full text of the license can be found in the file LICENSE.md at
-## the top level directory of deal.II.
+## Part of the source code is dual licensed under Apache-2.0 WITH
+## LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+## governing the source code and code contributions can be found in
+## LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 ##
-## ---------------------------------------------------------------------
+## ------------------------------------------------------------------------
 
 #
 # General setup for GCC and compilers sufficiently close to GCC
@@ -96,15 +95,7 @@ enable_if_supported(DEAL_II_WARNING_FLAGS "-Wno-literal-suffix")
 #
 enable_if_supported(DEAL_II_WARNING_FLAGS "-Wno-psabi")
 
-#
-# Disable warnings regarding improper direct memory access
-# if compiling without C++17 support
-#
-if(NOT DEAL_II_HAVE_CXX17)
-  enable_if_supported(DEAL_II_WARNING_FLAGS "-Wno-class-memaccess")
-endif()
-
-if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+if(CMAKE_CXX_COMPILER_ID MATCHES "Clang" OR CMAKE_CXX_COMPILER_ID MATCHES "IntelLLVM")
   # Enable warnings for conversion from real types to integer types.
   # The warning is too noisy in gcc and therefore only enabled for clang.
   enable_if_supported(DEAL_II_WARNING_FLAGS "-Wfloat-conversion")
@@ -143,7 +134,7 @@ if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
   endif()
 
   #
-  # Clang-14.0.5 complaines loudly about not being able to vectorize some
+  # Clang-14.0.5 complains loudly about not being able to vectorize some
   # of our loops that we have annotated with DEAL_II_OPENMP_SIMD:
   #
   #     warning: loop not vectorized: the optimizer was unable to perform
@@ -171,7 +162,6 @@ if (CMAKE_BUILD_TYPE MATCHES "Release")
 
   enable_if_supported(DEAL_II_CXX_FLAGS_RELEASE "-funroll-loops")
   enable_if_supported(DEAL_II_CXX_FLAGS_RELEASE "-funroll-all-loops")
-  enable_if_supported(DEAL_II_CXX_FLAGS_RELEASE "-fstrict-aliasing")
 
   #
   # Disable assert() in deal.II and user projects in release mode
@@ -179,11 +169,13 @@ if (CMAKE_BUILD_TYPE MATCHES "Release")
   list(APPEND DEAL_II_DEFINITIONS_RELEASE "NDEBUG")
 
   #
-  # There are many places in the library where we create a new typedef and then
-  # immediately use it in an Assert. Hence, only ignore unused typedefs in Release
-  # mode.
+  # There are many places in the library where we
+  #  - create a new typedef and then only use it in an Assert.
+  #  - use a function parameter only in an Assert.
+  # Thus disable these two warnings in release mode.
   #
   enable_if_supported(DEAL_II_CXX_FLAGS_RELEASE "-Wno-unused-local-typedefs")
+  enable_if_supported(DEAL_II_CXX_FLAGS_RELEASE "-Wno-unused-parameter")
 endif()
 
 
@@ -197,9 +189,26 @@ if (CMAKE_BUILD_TYPE MATCHES "Debug")
 
   list(APPEND DEAL_II_DEFINITIONS_DEBUG "DEBUG")
 
+  # Enable invalid element access and other checks in the c++ standard library:
+  list(APPEND DEAL_II_DEFINITIONS_DEBUG "_GLIBCXX_ASSERTIONS")
+  if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+    # _LIBCPP_ENABLE_ASSERTIONS was deprecated in clang++-19
+    # _LIBCPP_HARDENING_MODE=_LIBCPP_HARDENING_MODE_EXTENSIVE should be used instead
+    if (CMAKE_CXX_COMPILER_ID STREQUAL AppleClang)
+      if(CMAKE_CXX_COMPILER_VERSION VERSION_LESS 17)
+        list(APPEND DEAL_II_DEFINITIONS_DEBUG "_LIBCPP_ENABLE_ASSERTIONS")
+      endif()
+    else()
+      if(CMAKE_CXX_COMPILER_VERSION VERSION_LESS 19)
+        list(APPEND DEAL_II_DEFINITIONS_DEBUG "_LIBCPP_ENABLE_ASSERTIONS")
+      endif()
+    endif()
+    list(APPEND DEAL_II_DEFINITIONS_DEBUG "_LIBCPP_HARDENING_MODE=_LIBCPP_HARDENING_MODE_EXTENSIVE")
+  endif()
+
   #
   # We have to ensure that we emit floating-point instructions in debug
-  # mode that preserve the occurence of floating-point exceptions and don't
+  # mode that preserve the occurrence of floating-point exceptions and don't
   # introduce new ones. gcc plays nicely in this regard by enabling
   # `-ftrapping-math` per default, at least for the level of optimization
   # we have in debug mode. clang however is more aggressive and assumes

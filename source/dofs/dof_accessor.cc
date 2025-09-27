@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2023 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 1998 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 #include <deal.II/dofs/dof_accessor.h>
 #include <deal.II/dofs/dof_handler.h>
@@ -20,7 +19,8 @@
 #include <deal.II/fe/fe.h>
 
 #include <deal.II/grid/tria_iterator.h>
-#include <deal.II/grid/tria_iterator.templates.h>
+
+#include <boost/container/small_vector.hpp>
 
 #include <vector>
 
@@ -79,7 +79,7 @@ DoFInvalidAccessor<structdim, dim, spacedim>::dof_index(
   const unsigned int,
   const types::fe_index) const
 {
-  Assert(false, ExcInternalError());
+  DEAL_II_ASSERT_UNREACHABLE();
   return 0;
 }
 
@@ -92,7 +92,7 @@ DoFInvalidAccessor<structdim, dim, spacedim>::set_dof_index(
   const types::global_dof_index,
   const types::fe_index) const
 {
-  Assert(false, ExcInternalError());
+  DEAL_II_ASSERT_UNREACHABLE();
 }
 
 
@@ -322,6 +322,6 @@ DoFCellAccessor<dimension_, space_dimension_, level_dof_access>::
 
 // --------------------------------------------------------------------------
 // explicit instantiations
-#include "dof_accessor.inst"
+#include "dofs/dof_accessor.inst"
 
 DEAL_II_NAMESPACE_CLOSE

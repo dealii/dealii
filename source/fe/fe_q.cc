@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2000 - 2023 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2001 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 
 #include <deal.II/base/quadrature_lib.h>
@@ -134,7 +133,7 @@ FE_Q<dim, spacedim>::get_name() const
       const QGaussLobatto<1> points_gl(this->degree + 1);
       bool                   gauss_lobatto = true;
       for (unsigned int j = 0; j <= this->degree; ++j)
-        if (points[j] != points_gl.point(j)(0))
+        if (points[j] != points_gl.point(j)[0])
           {
             gauss_lobatto = false;
             break;
@@ -268,12 +267,12 @@ FE_Q<dim, spacedim>::compare_for_domination(
         return FiniteElementDomination::neither_element_dominates;
     }
 
-  Assert(false, ExcNotImplemented());
+  DEAL_II_NOT_IMPLEMENTED();
   return FiniteElementDomination::neither_element_dominates;
 }
 
 
 // explicit instantiations
-#include "fe_q.inst"
+#include "fe/fe_q.inst"
 
 DEAL_II_NAMESPACE_CLOSE

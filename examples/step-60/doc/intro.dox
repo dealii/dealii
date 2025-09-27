@@ -1,11 +1,10 @@
-<br>
-
 <i>This program was contributed by Luca Heltai and Giovanni Alzetta, SISSA, Trieste.
 </i>
 
 @dealiiTutorialDOI{10.5281/zenodo.1243280,https://zenodo.org/badge/DOI/10.5281/zenodo.1243280.svg}
 
 
+<a name="step_60-Intro"></a>
 <h1>Introduction</h1>
 
 <h3>Non-matching grid constraints through distributed Lagrange multipliers</h3>
@@ -255,7 +254,7 @@ transforms the reference element $\hat T$ into the element $T$: $v_j(y_i) = \hat
 v_j \circ G^{-1}_{T} (y_i)$.
 
 <p align="center"> <img
-  src="https://www.dealii.org/images/steps/developer/step-60.C_interpolation.png"
+  src="https://dealii.org/images/steps/developer/step-60.C_interpolation.png"
   alt=""> </p>
 
 The three steps above can be computed by calling, in turn,

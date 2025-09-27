@@ -1,0 +1,20 @@
+
+fe_degree n_refinements n_components n_dofs version    norm    
+3         3             1            625    host    1.1706e-04 
+3         3             1            625    host    1.2457e-01 
+3         3             1            625    host    1.2465e-01 
+3         3             1            625    default 1.1706e-04 
+3         3             1            625    default 1.2457e-01 
+3         3             1            625    default 1.2465e-01 
+3         3             2            1250   host    2.6174e-04 
+3         3             2            1250   host    2.7854e-01 
+3         3             2            1250   host    2.7872e-01 
+3         3             2            1250   default 2.6174e-04 
+3         3             2            1250   default 2.7854e-01 
+3         3             2            1250   default 2.7872e-01 
+3         3             3            1875   host    4.3798e-04 
+3         3             3            1875   host    4.6609e-01 
+3         3             3            1875   host    4.6639e-01 
+3         3             3            1875   default 4.3798e-04 
+3         3             3            1875   default 4.6609e-01 
+3         3             3            1875   default 4.6639e-01 

@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2022 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2013 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 #include <deal.II/dofs/dof_accessor.h>
 #include <deal.II/dofs/dof_handler.h>
@@ -20,7 +19,6 @@
 #include <deal.II/fe/fe.h>
 
 #include <deal.II/grid/tria_iterator.h>
-#include <deal.II/grid/tria_iterator.templates.h>
 
 #include <deal.II/lac/block_vector.h>
 #include <deal.II/lac/la_parallel_block_vector.h>
@@ -30,10 +28,12 @@
 #include <deal.II/lac/sparse_matrix.h>
 #include <deal.II/lac/trilinos_epetra_vector.h>
 #include <deal.II/lac/trilinos_parallel_block_vector.h>
+#include <deal.II/lac/trilinos_tpetra_block_vector.h>
 #include <deal.II/lac/trilinos_tpetra_vector.h>
 #include <deal.II/lac/trilinos_vector.h>
 #include <deal.II/lac/vector.h>
 
+#include <iomanip>
 #include <limits>
 #include <vector>
 
@@ -71,21 +71,6 @@ namespace internal
     return a;
   }
 
-  /**
-   * Check if a vector is a deal.II vector.
-   */
-  template <typename VectorType>
-  constexpr bool is_dealii_vector =
-    std::is_same_v<VectorType,
-                   dealii::Vector<typename VectorType::value_type>> ||
-    std::is_same_v<VectorType,
-                   dealii::BlockVector<typename VectorType::value_type>> ||
-    std::is_same_v<VectorType,
-                   dealii::LinearAlgebra::distributed::Vector<
-                     typename VectorType::value_type>> ||
-    std::is_same_v<VectorType,
-                   dealii::LinearAlgebra::distributed::BlockVector<
-                     typename VectorType::value_type>>;
 
   /**
    * Helper functions that call set_ghost_state() if the vector supports this
@@ -118,6 +103,7 @@ namespace internal
   }
 #endif
 
+
   /**
    * Helper function that sets the values on a cell, but also checks if the
    * new values are similar to the old values.
@@ -135,32 +121,41 @@ namespace internal
   {
     (void)perform_check;
 
-#ifdef DEBUG
-    if (perform_check && is_dealii_vector<OutputVector>)
+    if constexpr (running_in_debug_mode())
       {
-        const bool old_ghost_state = values.has_ghost_elements();
-        set_ghost_state(values, true);
-
-        Vector<number> local_values_old(cell.get_fe().n_dofs_per_cell());
-        cell.get_dof_values(values, local_values_old);
-
-        for (unsigned int i = 0; i < cell.get_fe().n_dofs_per_cell(); ++i)
+        using VectorNumber = typename OutputVector::value_type;
+        constexpr bool is_dealii_vector =
+          std::is_same_v<OutputVector, Vector<VectorNumber>> ||
+          std::is_same_v<OutputVector, BlockVector<VectorNumber>> ||
+          std::is_same_v<OutputVector,
+                         LinearAlgebra::distributed::Vector<VectorNumber>> ||
+          std::is_same_v<OutputVector,
+                         LinearAlgebra::distributed::BlockVector<VectorNumber>>;
+        if (perform_check && is_dealii_vector)
           {
-            // a check consistent with the one in
-            // Utilities::MPI::Partitioner::import_from_ghosted_array_finish()
-            Assert(local_values_old[i] == number() ||
-                     get_abs(local_values_old[i] - local_values[i]) <=
-                       get_abs(local_values_old[i] + local_values[i]) *
-                         100000. *
-                         std::numeric_limits<typename numbers::NumberTraits<
-                           number>::real_type>::epsilon(),
-                   ExcNonMatchingElementsSetDofValuesByInterpolation<number>(
-                     local_values[i], local_values_old[i]));
-          }
+            const bool old_ghost_state = values.has_ghost_elements();
+            set_ghost_state(values, true);
 
-        set_ghost_state(values, old_ghost_state);
+            Vector<number> local_values_old(cell.get_fe().n_dofs_per_cell());
+            cell.get_dof_values(values, local_values_old);
+
+            for (unsigned int i = 0; i < cell.get_fe().n_dofs_per_cell(); ++i)
+              {
+                // a check consistent with the one in
+                // Utilities::MPI::Partitioner::import_from_ghosted_array_finish()
+                Assert(
+                  local_values_old[i] == number() ||
+                    get_abs(local_values_old[i] - local_values[i]) <=
+                      get_abs(local_values_old[i] + local_values[i]) * 100000. *
+                        std::numeric_limits<typename numbers::NumberTraits<
+                          number>::real_type>::epsilon(),
+                  ExcNonMatchingElementsSetDofValuesByInterpolation<number>(
+                    local_values[i], local_values_old[i]));
+              }
+
+            set_ghost_state(values, old_ghost_state);
+          }
       }
-#endif
 
     cell.set_dof_values(local_values, values);
   }
@@ -313,6 +308,6 @@ DoFCellAccessor<dim, spacedim, lda>::
 
 // --------------------------------------------------------------------------
 // explicit instantiations
-#include "dof_accessor_set.inst"
+#include "dofs/dof_accessor_set.inst"
 
 DEAL_II_NAMESPACE_CLOSE

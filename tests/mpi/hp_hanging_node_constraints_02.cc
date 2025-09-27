@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2020 - 2021 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2020 - 2024 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 
 
@@ -64,7 +63,7 @@ test()
   for (unsigned int n_ref = 0; n_ref < 2; ++n_ref)
     {
       for (const auto &cell : triangulation.active_cell_iterators())
-        if (cell->is_locally_owned() && cell->center()(1) < 0.5)
+        if (cell->is_locally_owned() && cell->center()[1] < 0.5)
           cell->set_refine_flag();
 
       triangulation.prepare_coarsening_and_refinement();
@@ -85,7 +84,7 @@ test()
   for (const auto &cell : dof_handler.active_cell_iterators() |
                             IteratorFilters::LocallyOwnedCell())
     {
-      if (cell->center()(0) < 0.5)
+      if (cell->center()[0] < 0.5)
         cell->set_active_fe_index(0);
       else
         cell->set_active_fe_index(1);
@@ -98,7 +97,8 @@ test()
     DoFTools::extract_locally_relevant_dofs(dof_handler);
 
   AffineConstraints<double> hanging_node_constraints;
-  hanging_node_constraints.reinit(locally_relevant_dofs);
+  hanging_node_constraints.reinit(dof_handler.locally_owned_dofs(),
+                                  locally_relevant_dofs);
   DoFTools::make_hanging_node_constraints(dof_handler,
                                           hanging_node_constraints);
 

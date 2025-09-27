@@ -1,8 +1,0 @@
-Removed: The methods copy_to_mg, copy_from_mg,
-and interpolate_to_mg used of
-MGTransferGlobalCoarsening and MGTransferMatrixFree
-used to have spacedim as template argument. Since it
-is not used and the underlying functionality did not work,
-it has been removed.
-<br>
-(Peter Munch, 2023/07/21)

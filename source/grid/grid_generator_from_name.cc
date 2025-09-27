@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2019 - 2023 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2019 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 #include <deal.II/base/mutable_bind.h>
 
@@ -120,7 +119,17 @@ namespace GridGenerator
       else if (name == "channel_with_cylinder")
         parse_and_create<dim, dim, double, unsigned int, double, bool>(
           channel_with_cylinder, arguments, tria);
-
+      else if (name == "uniform_channel_with_cylinder")
+        parse_and_create<dim,
+                         dim,
+                         const std::vector<unsigned int> &,
+                         double,
+                         unsigned int,
+                         double,
+                         unsigned int,
+                         double,
+                         bool,
+                         bool>(uniform_channel_with_cylinder, arguments, tria);
       else if (name == "enclosed_hyper_cube")
         parse_and_create<dim, dim, double, double, double, bool>(
           enclosed_hyper_cube, arguments, tria);
@@ -214,7 +223,8 @@ namespace GridGenerator
                          double,
                          double,
                          unsigned int,
-                         unsigned int>(cylinder_shell, arguments, tria);
+                         unsigned int,
+                         bool>(cylinder_shell, arguments, tria);
 
       else if (name == "hyper_cube_with_cylindrical_hole")
         parse_and_create<dim, dim, double, double, double, unsigned int, bool>(
@@ -244,6 +254,16 @@ namespace GridGenerator
                          bool>(subdivided_hyper_rectangle_with_simplices,
                                arguments,
                                tria);
+
+      else if (name == "subdivided_hyper_L")
+        parse_and_create<dim,
+                         dim,
+                         const std::vector<unsigned int> &,
+                         const Point<dim> &,
+                         const Point<dim> &,
+                         const std::vector<int> &>(subdivided_hyper_L,
+                                                   arguments,
+                                                   tria);
 
       else
         return false;
@@ -403,6 +423,6 @@ namespace GridGenerator
   }
 } // namespace GridGenerator
 
-#include "grid_generator_from_name.inst"
+#include "grid/grid_generator_from_name.inst"
 
 DEAL_II_NAMESPACE_CLOSE

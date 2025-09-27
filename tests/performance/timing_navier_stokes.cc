@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2022 - 2023 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2022 - 2024 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 //
 // Description:
@@ -544,7 +543,7 @@ namespace NavierStokes_DG
       }
     else
       {
-        Assert(false, ExcNotImplemented());
+        DEAL_II_NOT_IMPLEMENTED();
       }
 #else
     (void)subcommunicator;
@@ -675,17 +674,19 @@ namespace NavierStokes_DG
       dim,
       n_points_1d,
       n_points_1d,
-      VectorizedArrayType>
-      eval(AlignedVector<VectorizedArrayType>(),
+      VectorizedArrayType,
+      Number>
+      eval({},
            data.get_shape_info().data[0].shape_gradients_collocation_eo,
-           AlignedVector<VectorizedArrayType>());
+           {});
 
     internal::EvaluatorTensorProduct<
       internal::EvaluatorVariant::evaluate_evenodd,
       dim - 1,
       n_q_points_1d,
       n_q_points_1d,
-      VectorizedArrayType>
+      VectorizedArrayType,
+      Number>
       eval_face({},
                 data.get_shape_info().data[0].shape_gradients_collocation_eo,
                 {});
@@ -790,7 +791,7 @@ namespace NavierStokes_DG
 
             phi_m.reinit(cell, face);
 
-            const AlignedVector<VectorizedArrayType> &shape_data =
+            const AlignedVector<Number> &shape_data =
               data.get_shape_info().data.front().quadrature_data_on_face[face %
                                                                          2];
             const std::array<int, 2> n_blocks{

@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2005 - 2022 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2005 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 #ifndef dealii_householder_h
 #define dealii_householder_h
@@ -20,7 +19,6 @@
 #include <deal.II/base/config.h>
 
 #include <deal.II/lac/full_matrix.h>
-#include <deal.II/lac/vector_memory.h>
 
 #include <cmath>
 #include <vector>
@@ -109,14 +107,14 @@ public:
    * Solve the least-squares problem for the right hand side <tt>src</tt>. The
    * returned scalar value is the Euclidean norm of the approximation error.
    *
-   * @arg @c dst contains the solution of the least squares problem on return.
+   * @param dst Contains the solution of the least squares problem on return.
    *
-   * @arg @c src contains the right hand side <i>b</i> of the least squares
+   * @param src Contains the right hand side <i>b</i> of the least squares
    * problem. It will be changed during the algorithm and is unusable on
    * return.
    */
   template <typename number2>
-  double
+  number2
   least_squares(Vector<number2> &dst, const Vector<number2> &src) const;
 
   /**
@@ -154,7 +152,7 @@ private:
   /**
    * Storage that is internally used for the Householder transformation.
    */
-  FullMatrix<double> storage;
+  FullMatrix<number> storage;
 };
 
 /** @} */
@@ -188,10 +186,14 @@ Householder<number>::initialize(const FullMatrix<number2> &M)
         sigma += storage(i, j) * storage(i, j);
       // We are ready if the column is
       // empty. Are we?
-      if (std::fabs(sigma) < 1.e-15)
+      if (std::abs(sigma) < 1.e-15)
         return;
 
-      number2 s = (storage(j, j) < 0) ? std::sqrt(sigma) : -std::sqrt(sigma);
+      number2 s;
+      if constexpr (numbers::NumberTraits<number2>::is_complex)
+        s = storage(j, j).real() < 0 ? std::sqrt(sigma) : -std::sqrt(sigma);
+      else
+        s = storage(j, j) < 0 ? std::sqrt(sigma) : -std::sqrt(sigma);
       //
       number2 beta = std::sqrt(1. / (sigma - s * storage(j, j)));
 
@@ -233,7 +235,7 @@ Householder<number>::Householder(const FullMatrix<number2> &M)
 
 template <typename number>
 template <typename number2>
-double
+number2
 Householder<number>::least_squares(Vector<number2>       &dst,
                                    const Vector<number2> &src) const
 {
@@ -243,10 +245,7 @@ Householder<number>::least_squares(Vector<number2>       &dst,
 
   const size_type m = storage.m(), n = storage.n();
 
-  GrowingVectorMemory<Vector<number2>>            mem;
-  typename VectorMemory<Vector<number2>>::Pointer aux(mem);
-  aux->reinit(src, true);
-  *aux = src;
+  Vector<number2> aux(src);
   // m > n, m = src.n, n = dst.n
 
   // Multiply Q_n ... Q_2 Q_1 src
@@ -254,22 +253,22 @@ Householder<number>::least_squares(Vector<number2>       &dst,
   for (size_type j = 0; j < n; ++j)
     {
       // sum = v_i^T dst
-      number2 sum = diagonal[j] * (*aux)(j);
+      number2 sum = diagonal[j] * aux(j);
       for (size_type i = j + 1; i < m; ++i)
-        sum += static_cast<number2>(storage(i, j)) * (*aux)(i);
+        sum += static_cast<number2>(storage(i, j)) * aux(i);
       // dst -= v * sum
-      (*aux)(j) -= sum * diagonal[j];
+      aux(j) -= sum * diagonal[j];
       for (size_type i = j + 1; i < m; ++i)
-        (*aux)(i) -= sum * static_cast<number2>(storage(i, j));
+        aux(i) -= sum * static_cast<number2>(storage(i, j));
     }
   // Compute norm of residual
   number2 sum = 0.;
   for (size_type i = n; i < m; ++i)
-    sum += (*aux)(i) * (*aux)(i);
+    sum += aux(i) * aux(i);
   AssertIsFinite(sum);
 
   // Compute solution
-  storage.backward(dst, *aux);
+  storage.backward(dst, aux);
 
   return std::sqrt(sum);
 }
@@ -288,10 +287,9 @@ Householder<number>::least_squares(BlockVector<number2>       &dst,
 
   const size_type m = storage.m(), n = storage.n();
 
-  GrowingVectorMemory<BlockVector<number2>>            mem;
-  typename VectorMemory<BlockVector<number2>>::Pointer aux(mem);
-  aux->reinit(src, true);
-  *aux = src;
+  BlockVector<number2> aux;
+  aux.reinit(src, true);
+  aux = src;
   // m > n, m = src.n, n = dst.n
 
   // Multiply Q_n ... Q_2 Q_1 src
@@ -299,30 +297,27 @@ Householder<number>::least_squares(BlockVector<number2>       &dst,
   for (size_type j = 0; j < n; ++j)
     {
       // sum = v_i^T dst
-      number2 sum = diagonal[j] * (*aux)(j);
+      number2 sum = diagonal[j] * aux(j);
       for (size_type i = j + 1; i < m; ++i)
-        sum += storage(i, j) * (*aux)(i);
+        sum += storage(i, j) * aux(i);
       // dst -= v * sum
-      (*aux)(j) -= sum * diagonal[j];
+      aux(j) -= sum * diagonal[j];
       for (size_type i = j + 1; i < m; ++i)
-        (*aux)(i) -= sum * storage(i, j);
+        aux(i) -= sum * storage(i, j);
     }
   // Compute norm of residual
   number2 sum = 0.;
   for (size_type i = n; i < m; ++i)
-    sum += (*aux)(i) * (*aux)(i);
+    sum += *aux(i) * aux(i);
   AssertIsFinite(sum);
 
-  // backward works for
-  // Vectors only, so copy
-  // them before
+  // backward works for Vectors only, so copy them before
   Vector<number2> v_dst, v_aux;
   v_dst = dst;
-  v_aux = *aux;
+  v_aux = aux;
   // Compute solution
   storage.backward(v_dst, v_aux);
-  // copy the result back
-  // to the BlockVector
+  // copy the result back to the BlockVector
   dst = v_dst;
 
   return std::sqrt(sum);
@@ -343,7 +338,7 @@ template <typename VectorType>
 void
 Householder<number>::Tvmult(VectorType &, const VectorType &) const
 {
-  Assert(false, ExcNotImplemented());
+  DEAL_II_NOT_IMPLEMENTED();
 }
 
 

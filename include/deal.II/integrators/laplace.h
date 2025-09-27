@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2010 - 2021 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2010 - 2024 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 #ifndef dealii_integrators_laplace_h
 #define dealii_integrators_laplace_h
@@ -48,7 +47,7 @@ namespace LocalIntegrators
      * latter case, the Laplacian is applied to each component separately.
      */
     template <int dim>
-    void
+    DEAL_II_DEPRECATED void
     cell_matrix(FullMatrix<double>      &M,
                 const FEValuesBase<dim> &fe,
                 const double             factor = 1.)
@@ -88,7 +87,7 @@ namespace LocalIntegrators
      * \f[ \int_Z \nu \nabla u \cdot \nabla v \, dx. \f]
      */
     template <int dim>
-    inline void
+    DEAL_II_DEPRECATED inline void
     cell_residual(Vector<double>                    &result,
                   const FEValuesBase<dim>           &fe,
                   const std::vector<Tensor<1, dim>> &input,
@@ -115,7 +114,7 @@ namespace LocalIntegrators
      * \f[ \int_Z \nu \nabla u : \nabla v \, dx. \f]
      */
     template <int dim>
-    inline void
+    DEAL_II_DEPRECATED inline void
     cell_residual(Vector<double>                                     &result,
                   const FEValuesBase<dim>                            &fe,
                   const ArrayView<const std::vector<Tensor<1, dim>>> &input,
@@ -153,7 +152,7 @@ namespace LocalIntegrators
      * compute_penalty().
      */
     template <int dim>
-    void
+    DEAL_II_DEPRECATED void
     nitsche_matrix(FullMatrix<double>      &M,
                    const FEValuesBase<dim> &fe,
                    double                   penalty,
@@ -194,7 +193,7 @@ namespace LocalIntegrators
      * compute_penalty().
      */
     template <int dim>
-    void
+    DEAL_II_DEPRECATED void
     nitsche_tangential_matrix(FullMatrix<double>      &M,
                               const FEValuesBase<dim> &fe,
                               double                   penalty,
@@ -257,7 +256,7 @@ namespace LocalIntegrators
      * argument <tt>data</tt>. $\gamma$ is the usual penalty parameter.
      */
     template <int dim>
-    void
+    DEAL_II_DEPRECATED void
     nitsche_residual(Vector<double>                    &result,
                      const FEValuesBase<dim>           &fe,
                      const std::vector<double>         &input,
@@ -304,7 +303,7 @@ namespace LocalIntegrators
      * argument <tt>data</tt>. $\gamma$ is the usual penalty parameter.
      */
     template <int dim>
-    void
+    DEAL_II_DEPRECATED void
     nitsche_residual(Vector<double>                                     &result,
                      const FEValuesBase<dim>                            &fe,
                      const ArrayView<const std::vector<double>>         &input,
@@ -355,7 +354,7 @@ namespace LocalIntegrators
      * has to be computed accordingly.
      */
     template <int dim>
-    void
+    DEAL_II_DEPRECATED void
     ip_matrix(FullMatrix<double>      &M11,
               FullMatrix<double>      &M12,
               FullMatrix<double>      &M21,
@@ -428,7 +427,7 @@ namespace LocalIntegrators
      * @warning This function is still under development!
      */
     template <int dim>
-    void
+    DEAL_II_DEPRECATED void
     ip_tangential_matrix(FullMatrix<double>      &M11,
                          FullMatrix<double>      &M12,
                          FullMatrix<double>      &M21,
@@ -540,7 +539,7 @@ namespace LocalIntegrators
      * @f]
      */
     template <int dim>
-    void
+    DEAL_II_DEPRECATED void
     ip_residual(Vector<double>                    &result1,
                 Vector<double>                    &result2,
                 const FEValuesBase<dim>           &fe1,
@@ -607,7 +606,7 @@ namespace LocalIntegrators
      * @f]
      */
     template <int dim>
-    void
+    DEAL_II_DEPRECATED void
     ip_residual(Vector<double>                                     &result1,
                 Vector<double>                                     &result2,
                 const FEValuesBase<dim>                            &fe1,
@@ -681,7 +680,7 @@ namespace LocalIntegrators
      * <i>Z<sub>i</sub></i> orthogonal to the current face.
      */
     template <int dim, int spacedim, typename number>
-    double
+    DEAL_II_DEPRECATED double
     compute_penalty(const MeshWorker::DoFInfo<dim, spacedim, number> &dinfo1,
                     const MeshWorker::DoFInfo<dim, spacedim, number> &dinfo2,
                     unsigned int                                      deg1,

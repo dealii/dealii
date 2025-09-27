@@ -1,0 +1,188 @@
+Mesh refinement step 0
+  Target_tolerance: 0.001
+
+  Computing residual vector... norm=0.867975
+  Computing Jacobian matrix
+  Factorizing Jacobian matrix
+  Solving linear system
+  Computing residual vector... norm=0.867975
+  Computing residual vector... norm=0.212073
+  Solving linear system
+  Computing residual vector... norm=0.212073
+  Computing residual vector... norm=0.202631
+  Solving linear system
+  Computing residual vector... norm=0.202631
+  Computing residual vector... norm=0.165773
+  Solving linear system
+  Computing residual vector... norm=0.165774
+  Computing residual vector... norm=0.162594
+  Solving linear system
+  Computing residual vector... norm=0.162594
+  Computing residual vector... norm=0.148175
+  Solving linear system
+  Computing residual vector... norm=0.148175
+  Computing residual vector... norm=0.145391
+  Solving linear system
+  Computing residual vector... norm=0.145391
+  Computing residual vector... norm=0.137551
+  Solving linear system
+  Computing residual vector... norm=0.137551
+  Computing residual vector... norm=0.135366
+  Solving linear system
+  Computing residual vector... norm=0.135365
+  Computing residual vector... norm=0.130367
+  Solving linear system
+  Computing residual vector... norm=0.130367
+  Computing residual vector... norm=0.128704
+  Computing Jacobian matrix
+  Factorizing Jacobian matrix
+  Solving linear system
+  Computing residual vector... norm=0.128704
+  Computing residual vector... norm=0.0302623
+  Solving linear system
+  Computing residual vector... norm=0.0302624
+  Computing residual vector... norm=0.0126764
+  Solving linear system
+  Computing residual vector... norm=0.0126763
+  Computing residual vector... norm=0.00488315
+  Solving linear system
+  Computing residual vector... norm=0.00488322
+  Computing residual vector... norm=0.00195788
+  Solving linear system
+  Computing residual vector... norm=0.00195781
+  Computing residual vector... norm=0.000773169
+
+Mesh refinement step 1
+  Target_tolerance: 0.0001
+
+  Computing residual vector... norm=0.2467
+  Computing Jacobian matrix
+  Factorizing Jacobian matrix
+  Solving linear system
+  Computing residual vector... norm=0.246699
+  Computing residual vector... norm=0.0357783
+  Solving linear system
+  Computing residual vector... norm=0.0357784
+  Computing residual vector... norm=0.0222161
+  Solving linear system
+  Computing residual vector... norm=0.022216
+  Computing residual vector... norm=0.0122148
+  Solving linear system
+  Computing residual vector... norm=0.0122149
+  Computing residual vector... norm=0.00750795
+  Solving linear system
+  Computing residual vector... norm=0.00750787
+  Computing residual vector... norm=0.00439629
+  Solving linear system
+  Computing residual vector... norm=0.00439638
+  Computing residual vector... norm=0.00265093
+  Solving linear system
+  Computing residual vector... norm=0.00265085
+  Computing residual vector... norm=0.00157171
+  Solving linear system
+  Computing residual vector... norm=0.0015718
+  Computing residual vector... norm=0.000941256
+  Solving linear system
+  Computing residual vector... norm=0.000941166
+  Computing residual vector... norm=0.000560255
+  Solving linear system
+  Computing residual vector... norm=0.000560345
+  Computing residual vector... norm=0.000334684
+
+Mesh refinement step 2
+  Target_tolerance: 1e-05
+
+  Computing residual vector... norm=0.504414
+  Computing Jacobian matrix
+  Factorizing Jacobian matrix
+  Solving linear system
+  Computing residual vector... norm=0.504414
+  Computing residual vector... norm=0.17167
+  Solving linear system
+  Computing residual vector... norm=0.17167
+  Computing residual vector... norm=0.126993
+  Solving linear system
+  Computing residual vector... norm=0.126993
+  Computing residual vector... norm=0.11675
+  Solving linear system
+  Computing residual vector... norm=0.11675
+  Computing residual vector... norm=0.121561
+  Computing residual vector... norm=0.015797
+  Solving linear system
+  Computing residual vector... norm=0.015797
+  Computing residual vector... norm=0.0223562
+  Computing residual vector... norm=0.00678293
+  Solving linear system
+  Computing residual vector... norm=0.00678294
+  Computing residual vector... norm=0.00678141
+  Solving linear system
+  Computing residual vector... norm=0.00678138
+  Computing residual vector... norm=0.00853687
+  Computing residual vector... norm=0.00206473
+  Solving linear system
+  Computing residual vector... norm=0.00206477
+  Computing residual vector... norm=0.00239021
+  Computing residual vector... norm=0.000750581
+  Solving linear system
+  Computing residual vector... norm=0.000750521
+  Computing residual vector... norm=0.000292574
+  Solving linear system
+  Computing residual vector... norm=0.0002926
+  Computing residual vector... norm=0.000513237
+  Computing residual vector... norm=0.000108961
+  Computing Jacobian matrix
+  Factorizing Jacobian matrix
+  Solving linear system
+  Computing residual vector... norm=0.00010898
+  Computing residual vector... norm=6.76543e-08
+
+Mesh refinement step 3
+  Target_tolerance: 1e-06
+
+  Computing residual vector... norm=0.193085
+  Computing Jacobian matrix
+  Factorizing Jacobian matrix
+  Solving linear system
+  Computing residual vector... norm=0.193085
+  Computing residual vector... norm=0.241338
+  Computing residual vector... norm=0.11247
+  Solving linear system
+  Computing residual vector... norm=0.11247
+  Computing residual vector... norm=0.239251
+  Computing residual vector... norm=0.0860549
+  Computing residual vector... norm=0.0382624
+  Solving linear system
+  Computing residual vector... norm=0.0382624
+  Computing residual vector... norm=0.0386293
+  Computing residual vector... norm=0.0185099
+  Solving linear system
+  Computing residual vector... norm=0.01851
+  Computing residual vector... norm=0.0185837
+  Computing residual vector... norm=0.00812866
+  Solving linear system
+  Computing residual vector... norm=0.00812867
+  Computing residual vector... norm=0.0114016
+  Computing residual vector... norm=0.00555605
+  Solving linear system
+  Computing residual vector... norm=0.00555606
+  Computing residual vector... norm=0.00437649
+  Solving linear system
+  Computing residual vector... norm=0.00437645
+  Computing residual vector... norm=0.0110066
+  Computing residual vector... norm=0.00166439
+  Solving linear system
+  Computing residual vector... norm=0.00166442
+  Computing residual vector... norm=0.000924996
+  Solving linear system
+  Computing residual vector... norm=0.000925028
+  Computing residual vector... norm=0.00233454
+  Computing residual vector... norm=0.000483462
+  Solving linear system
+  Computing residual vector... norm=0.00048347
+  Computing residual vector... norm=0.000263493
+  Computing Jacobian matrix
+  Factorizing Jacobian matrix
+  Solving linear system
+  Computing residual vector... norm=0.000263514
+  Computing residual vector... norm=7.94967e-07
+

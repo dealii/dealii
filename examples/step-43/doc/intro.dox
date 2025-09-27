@@ -1,5 +1,3 @@
-<br>
-
 <i>
 This program was contributed by Chih-Che Chueh (University of Victoria) and
 Wolfgang Bangerth. Results from this program are used and discussed in the
@@ -32,7 +30,7 @@ California Institute of Technology, or of The University of California
 </i>
 
 
-<a name="Intro"></a> <h1>Introduction</h1>
+<a name="step_43-Intro"></a> <h1>Introduction</h1>
 
 The simulation of multiphase flow in porous media is a ubiquitous problem, and
 we have previously addressed it already in some form in step-20 and
@@ -314,7 +312,7 @@ where $\nabla S_h(\mathbf x_K)$ is the gradient of the discrete saturation
 variable evaluated at the center $\mathbf x_K$ of cell $K$. This approach is
 analogous to ones frequently used in compressible flow problems, where density
 gradients are used to indicate refinement. That said, as we will
-discuss at the end of the <a href="#Results">results section</a>, this turns
+discuss at the end of the @ref step_43-ResultsSection "results section", this turns
 out to not be a very useful criterion since it leads to refinement basically
 everywhere. We only show it here for illustrative purposes.
 

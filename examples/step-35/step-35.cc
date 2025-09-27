@@ -1,17 +1,16 @@
-/* ---------------------------------------------------------------------
+/* ------------------------------------------------------------------------
  *
- * Copyright (C) 2009 - 2023 by the deal.II authors
+ * SPDX-License-Identifier: LGPL-2.1-or-later
+ * Copyright (C) 2009 - 2024 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
- * The deal.II library is free software; you can use it, redistribute
- * it, and/or modify it under the terms of the GNU Lesser General
- * Public License as published by the Free Software Foundation; either
- * version 2.1 of the License, or (at your option) any later version.
- * The full text of the license can be found in the file LICENSE.md at
- * the top level directory of deal.II.
+ * Part of the source code is dual licensed under Apache-2.0 WITH
+ * LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+ * governing the source code and code contributions can be found in
+ * LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
  *
- * ---------------------------------------------------------------------
+ * ------------------------------------------------------------------------
  *
  * Author: Abner Salgado, Texas A&M University 2009
  */
@@ -57,6 +56,7 @@
 #include <deal.II/fe/fe_tools.h>
 #include <deal.II/fe/fe_system.h>
 
+#include <deal.II/numerics/matrix_creator.h>
 #include <deal.II/numerics/matrix_tools.h>
 #include <deal.II/numerics/vector_tools.h>
 #include <deal.II/numerics/data_out.h>
@@ -238,7 +238,7 @@ namespace Step35
 
       prm.parse_input(file);
 
-      if (prm.get("Method_Form") == std::string("rotational"))
+      if (prm.get("Method_Form") == "rotational")
         form = Method::rotational;
       else
         form = Method::standard;
@@ -364,7 +364,7 @@ namespace Step35
         {
           const double Um = 1.5;
           const double H  = 4.1;
-          return 4. * Um * p(1) * (H - p(1)) / (H * H);
+          return 4. * Um * p[1] * (H - p[1]) / (H * H);
         }
       else
         return 0.;
@@ -398,7 +398,7 @@ namespace Step35
     {
       (void)component;
       AssertIndexRange(component, 1);
-      return 25. - p(0);
+      return 25. - p[0];
     }
 
     template <int dim>
@@ -446,14 +446,14 @@ namespace Step35
 
     Triangulation<dim> triangulation;
 
-    FE_Q<dim> fe_velocity;
-    FE_Q<dim> fe_pressure;
+    const FE_Q<dim> fe_velocity;
+    const FE_Q<dim> fe_pressure;
 
     DoFHandler<dim> dof_handler_velocity;
     DoFHandler<dim> dof_handler_pressure;
 
-    QGauss<dim> quadrature_pressure;
-    QGauss<dim> quadrature_velocity;
+    const QGauss<dim> quadrature_pressure;
+    const QGauss<dim> quadrature_velocity;
 
     SparsityPattern sparsity_pattern_velocity;
     SparsityPattern sparsity_pattern_pressure;
@@ -1079,7 +1079,7 @@ namespace Step35
                     boundary_values);
                   break;
                 default:
-                  Assert(false, ExcNotImplemented());
+                  DEAL_II_NOT_IMPLEMENTED();
               }
           }
         MatrixTools::apply_boundary_values(boundary_values,
@@ -1122,7 +1122,7 @@ namespace Step35
   // is the part of the system matrix for the diffusion step that changes at
   // every time step. As mentioned above, we will run the assembly loop over all
   // cells in %parallel, using the WorkStream class and other
-  // facilities as described in the documentation module on @ref threads.
+  // facilities as described in the documentation topic on @ref threads.
   template <int dim>
   void NavierStokesProjection<dim>::assemble_advection_term()
   {
@@ -1156,7 +1156,7 @@ namespace Step35
       {
         scratch.fe_val.get_function_values(u_star[d], scratch.u_star_tmp);
         for (unsigned int q = 0; q < scratch.nqp; ++q)
-          scratch.u_star_local[q](d) = scratch.u_star_tmp[q];
+          scratch.u_star_local[q][d] = scratch.u_star_tmp[q];
       }
 
     for (unsigned int d = 0; d < dim; ++d)
@@ -1260,7 +1260,7 @@ namespace Step35
           pres_n += phi_n;
           break;
         default:
-          Assert(false, ExcNotImplemented());
+          DEAL_II_NOT_IMPLEMENTED();
       };
   }
 
@@ -1337,7 +1337,7 @@ namespace Step35
                   loc_vel_dof_indices[joint_fe.system_to_base_index(i).second]);
                 break;
               default:
-                Assert(false, ExcInternalError());
+                DEAL_II_ASSERT_UNREACHABLE();
             }
       }
     std::vector<std::string> joint_solution_names(dim, "v");

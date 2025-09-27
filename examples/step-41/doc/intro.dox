@@ -1,5 +1,3 @@
-<br>
-
 <i>This program was contributed by Jörg Frohne (University of Siegen,
 Germany) while on a long-term visit to Texas A&amp;M University.
 <br>
@@ -7,7 +5,7 @@ This material is based upon work partly supported by ThyssenKrupp Steel Europe.
 </i>
 
 
-<a name="Intro"></a>
+<a name="step_41-Intro"></a>
 <h3>Introduction</h3>
 
 This example is based on the Laplace equation in 2d and deals with the
@@ -31,10 +29,10 @@ we should expect:
 <table align="center" class="tutorial" cellspacing="3" cellpadding="3">
   <tr>
     <td align="center">
-        <img src="https://www.dealii.org/images/steps/developer/step-41.displacement.png" alt="">
+        <img src="https://dealii.org/images/steps/developer/step-41.displacement.png" alt="">
     </td>
     <td align="center">
-        <img src="https://www.dealii.org/images/steps/developer/step-41.active-set.png" alt="">
+        <img src="https://dealii.org/images/steps/developer/step-41.active-set.png" alt="">
     </td>
   </tr>
 </table>
@@ -54,9 +52,9 @@ The classical formulation of the problem possesses the following form:
  \sigma &= \nabla u & &\quad\text{in } \Omega,\\
  u(\mathbf x) &= 0 & &\quad\text{on }\partial\Omega,\\
 (-\Delta u - f)(u - g) &= 0 & &\quad\text{in } \Omega,\\
- u(\mathbf x) &\geq g(\mathbf x) & &\quad\text{in } \Omega
+ u(\mathbf x) &\geq g(\mathbf x) & &\quad\text{in } \Omega,
 @f}
-with $u\in H^2(\Omega)$.  $u$ is a scalar valued function that denotes the
+where $u$ is a scalar valued function that denotes the
 vertical displacement of the membrane. The first equation is called equilibrium
 condition with a force of areal density $f$. Here, we will consider this force
 to be gravity. The second one is known as Hooke's Law that says that the stresses
@@ -314,7 +312,7 @@ This suggest a semismooth Newton step of the form
 \end{pmatrix}
 =
 -\begin{pmatrix}
- (AU^k + \Lambda^k - F)_{\mathcal{F}_k}\\ (AU^k + \Lambda^k - F)_{\mathcal{A}_k}\\ -\Lambda^k_{\mathcal{F}_k}\\ c(B_{\mathcal{A}_k} U^k - G)_{\mathcal{A}_k}
+ (AU^k + B\Lambda^k - F)_{\mathcal{F}_k}\\ (AU^k + B\Lambda^k - F)_{\mathcal{A}_k}\\ -\Lambda^k_{\mathcal{F}_k}\\ c(B_{\mathcal{A}_k} U^k - G)_{\mathcal{A}_k}
 \end{pmatrix},
 @f}
 where we have split matrices $A,B$ as well as vectors in the natural way into

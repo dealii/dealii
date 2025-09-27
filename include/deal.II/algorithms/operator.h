@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2010 - 2020 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2010 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 
 #ifndef dealii_operator_h
@@ -21,6 +20,7 @@
 
 #include <deal.II/algorithms/any_data.h>
 
+#include <deal.II/base/enable_observer_pointer.h>
 #include <deal.II/base/event.h>
 
 #include <fstream>
@@ -63,7 +63,7 @@ namespace Algorithms
    * providing additional information and forwarded to the inner Operator
    * objects of the nested iteration.
    */
-  class OperatorBase : public Subscriptor
+  class OperatorBase : public EnableObserverPointer
   {
   public:
     /**
@@ -102,7 +102,7 @@ namespace Algorithms
    * in each step of an iteration.
    */
   template <typename VectorType>
-  class OutputOperator : public Subscriptor
+  class OutputOperator : public EnableObserverPointer
   {
   public:
     /**

@@ -1,4 +1,4 @@
-<a name="Intro"></a>
+<a name="step_79-Intro"></a>
 <h1>Introduction</h1>
 
 Topology Optimization of Elastic Media is a technique used to optimize a
@@ -100,7 +100,6 @@ following:
   0<\rho_{\min}\leq \rho(x) \leq 1,
 @f]
 @f[
-
   \nabla \cdot \boldsymbol{\sigma}(\rho) + \mathbf{F} = 0 \quad \text{on } \Omega
 @f]
 The final constraint, the balance of linear momentum (which we will refer to as the elasticity equation),
@@ -178,7 +177,7 @@ define an effective minimal beam width for the optimal structures we seek to
 find.
 
 <div style="text-align:center;">
-  <img src="https://www.dealii.org/images/steps/developer/step-79.checkerboard.png"
+  <img src="https://dealii.org/images/steps/developer/step-79.checkerboard.png"
        alt="Checkerboarding occurring in an MBB Beam">
 </div>
 
@@ -300,7 +299,6 @@ where forces are applied, and Neumann boundary conditions are used.
 @f[
   \int_\Omega -d_\varrho z_1 + d_\varrho z_2 + H(d_\varrho)y_2 d\Omega= 0\;\;\forall
   d_\varrho
-
 @f]
 </li>
 <li> Primal Feasibility:

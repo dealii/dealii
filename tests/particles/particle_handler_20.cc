@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2017 - 2020 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2017 - 2024 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 
 
@@ -51,15 +50,15 @@ test()
 
     for (unsigned int p = 0; p < n_particles; ++p)
       {
-        if (Utilities::MPI::this_mpi_process(tr.get_communicator()) == 0)
+        if (Utilities::MPI::this_mpi_process(tr.get_mpi_communicator()) == 0)
           {
             for (unsigned int i = 0; i < dim; ++i)
-              position(i) = 0.410 + 0.01 * p;
+              position[i] = 0.410 + 0.01 * p;
 
             Particles::Particle<dim, spacedim> particle(
               position,
               reference_position,
-              Utilities::MPI::this_mpi_process(tr.get_communicator()) *
+              Utilities::MPI::this_mpi_process(tr.get_mpi_communicator()) *
                   n_particles +
                 p);
             typename Triangulation<dim, spacedim>::active_cell_iterator cell =
@@ -78,10 +77,12 @@ test()
          ++particle)
       {
         particle->get_properties()[0] =
-          1000 + 100 * Utilities::MPI::this_mpi_process(tr.get_communicator()) +
+          1000 +
+          100 * Utilities::MPI::this_mpi_process(tr.get_mpi_communicator()) +
           10 * particle->get_id();
         particle->get_properties()[1] =
-          2000 + 100 * Utilities::MPI::this_mpi_process(tr.get_communicator()) +
+          2000 +
+          100 * Utilities::MPI::this_mpi_process(tr.get_mpi_communicator()) +
           10 * particle->get_id();
         counter++;
       }
@@ -96,7 +97,7 @@ test()
               << " location : " << particle->get_location()
               << " property : " << particle->get_properties()[0] << " and "
               << particle->get_properties()[1] << " is local on process : "
-              << Utilities::MPI::this_mpi_process(tr.get_communicator())
+              << Utilities::MPI::this_mpi_process(tr.get_mpi_communicator())
               << std::endl;
 
     for (auto particle = particle_handler.begin_ghost();
@@ -106,7 +107,7 @@ test()
               << " location : " << particle->get_location()
               << " property : " << particle->get_properties()[0] << " and "
               << particle->get_properties()[1] << " is ghost on process : "
-              << Utilities::MPI::this_mpi_process(tr.get_communicator())
+              << Utilities::MPI::this_mpi_process(tr.get_mpi_communicator())
               << std::endl;
 
     deallog << "Modifying particles positions and properties" << std::endl;
@@ -135,7 +136,7 @@ test()
               << " location : " << particle->get_location()
               << " property : " << particle->get_properties()[0] << " and "
               << particle->get_properties()[1] << " is local on process : "
-              << Utilities::MPI::this_mpi_process(tr.get_communicator())
+              << Utilities::MPI::this_mpi_process(tr.get_mpi_communicator())
               << std::endl;
 
     for (auto particle = particle_handler.begin_ghost();
@@ -145,7 +146,7 @@ test()
               << " location : " << particle->get_location()
               << " property : " << particle->get_properties()[0] << " and "
               << particle->get_properties()[1] << " is ghost on process : "
-              << Utilities::MPI::this_mpi_process(tr.get_communicator())
+              << Utilities::MPI::this_mpi_process(tr.get_mpi_communicator())
               << std::endl;
   }
 

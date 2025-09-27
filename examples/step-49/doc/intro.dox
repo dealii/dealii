@@ -1,13 +1,13 @@
 <i>This program was contributed by Timo Heister. Parts of the results section
 were contributed by Yuhan Zhou, Wolfgang Bangerth, David Wells, and Sean Ingimarson.</i>
 
-<a name="Intro"></a>
+<a name="step_49-Intro"></a>
 <h1> Introduction </h1>
 This tutorial is an extension to step-1 and demonstrates several ways to
 obtain more involved meshes than the ones shown there.
 
 @note This tutorial is also available as a Jupyter Python notebook that
-  uses the deal.II python interface. The notebook is available in the
+  uses the deal.II Python interface. The notebook is available in the
   same directory as the original C++ program.
 
 Generating complex geometries is a challenging task, especially in three space
@@ -121,7 +121,7 @@ with two circles cut out in the interior and several slits on the sides. For the
 directory, %Gmsh will show the following view (displaying the boundary
 indicators as well as the mesh are discussed further down below):
 
-<img src="https://www.dealii.org/images/steps/developer/step-49.gmsh_picture2.png" alt="">
+<img src="https://dealii.org/images/steps/developer/step-49.gmsh_picture2.png" alt="">
 
 We will go through the basics of %Gmsh and show how we can obtain a mesh like this.
 
@@ -367,7 +367,7 @@ file.  If everything was set up correctly, we can press <code>Mesh -> 2D</code>.
 If all this goes well, then we
 should see something similar to the following output:
 
-<img src="https://www.dealii.org/images/steps/developer/step-49.gmsh_picture_2Dmesh.png" alt="">
+<img src="https://dealii.org/images/steps/developer/step-49.gmsh_picture_2Dmesh.png" alt="">
 
 It behooves us at this point to also make sure our boundaries were declared
 correctly.  So in the Options menu go to <code>Mesh -> Visibility</code>.
@@ -376,7 +376,7 @@ We wish to check physical IDs, so we would like to have "Physical tag" picked.
 Now we check "1D element labels" and we should see the numbers assigned to the
 specified boundaries.
 
-<img src="https://www.dealii.org/images/steps/developer/step-49.gmsh_picture_2Dmesh_ids.png" alt="">
+<img src="https://dealii.org/images/steps/developer/step-49.gmsh_picture_2Dmesh_ids.png" alt="">
 
 Finally, we can choose  <code>Mesh -> Save</code> to save the <code>.msh</code> file, which
 deal.II's GridIn class can read. You can also generate the <code>.msh</code> from the
@@ -423,10 +423,10 @@ coordinate of a mesh with a sine curve:
 <table width="60%" align="center">
   <tr>
     <td align="center">
-        <img src="https://www.dealii.org/images/steps/developer/step-49.grid-5a.png" alt=""> regular input mesh
+        <img src="https://dealii.org/images/steps/developer/step-49.grid-5a.png" alt=""> regular input mesh
     </td>
     <td align="center">
-        <img src="https://www.dealii.org/images/steps/developer/step-49.grid-5.png" alt=""> output mesh
+        <img src="https://dealii.org/images/steps/developer/step-49.grid-5.png" alt=""> output mesh
     </td>
   </tr>
 </table>
@@ -438,10 +438,10 @@ of this tutorial:
 <table width="60%" align="center">
   <tr>
     <td align="center">
-        <img src="https://www.dealii.org/images/steps/developer/step-49.grid-6a.png" alt=""> regular input mesh
+        <img src="https://dealii.org/images/steps/developer/step-49.grid-6a.png" alt=""> regular input mesh
     </td>
     <td align="center">
-        <img src="https://www.dealii.org/images/steps/developer/step-49.grid-6.png" alt=""> wall-adapted output mesh
+        <img src="https://dealii.org/images/steps/developer/step-49.grid-6.png" alt=""> wall-adapted output mesh
     </td>
   </tr>
 </table>
@@ -453,10 +453,10 @@ demonstrated in <code>grid_7()</code> and the result is as follows:
 <table width="60%" align="center">
   <tr>
     <td align="center">
-        <img src="https://www.dealii.org/images/steps/developer/step-49.grid-7a.png" alt=""> regular input mesh
+        <img src="https://dealii.org/images/steps/developer/step-49.grid-7a.png" alt=""> regular input mesh
     </td>
     <td align="center">
-        <img src="https://www.dealii.org/images/steps/developer/step-49.grid-7.png" alt=""> perturbed output mesh
+        <img src="https://dealii.org/images/steps/developer/step-49.grid-7.png" alt=""> perturbed output mesh
     </td>
   </tr>
 </table>
@@ -497,9 +497,9 @@ These are the input meshes and the output mesh:
 
 <table width="80%" align="center">
   <tr>
-    <td align="center"><img src="https://www.dealii.org/images/steps/developer/step-49.grid-2a.png" alt="" height="200px">input mesh 1</td>
-    <td align="center"><img src="https://www.dealii.org/images/steps/developer/step-49.grid-2b.png" alt="" height="200px">input mesh 2</td>
-    <td align="center"><img src="https://www.dealii.org/images/steps/developer/step-49.grid-2.png" alt="" height="200px">merged mesh</td>
+    <td align="center"><img src="https://dealii.org/images/steps/developer/step-49.grid-2a.png" alt="" height="200px">input mesh 1</td>
+    <td align="center"><img src="https://dealii.org/images/steps/developer/step-49.grid-2b.png" alt="" height="200px">input mesh 2</td>
+    <td align="center"><img src="https://dealii.org/images/steps/developer/step-49.grid-2.png" alt="" height="200px">merged mesh</td>
   </tr>
 </table>
 
@@ -515,10 +515,10 @@ centered by moving the top vertices upwards:
 <table width="60%" align="center">
   <tr>
     <td align="center">
-        <img src="https://www.dealii.org/images/steps/developer/step-49.grid-3a.png" alt="" height="200px"> input mesh
+        <img src="https://dealii.org/images/steps/developer/step-49.grid-3a.png" alt="" height="200px"> input mesh
     </td>
     <td align="center">
-        <img src="https://www.dealii.org/images/steps/developer/step-49.grid-3.png" alt="" height="200px"> top vertices moved upwards
+        <img src="https://dealii.org/images/steps/developer/step-49.grid-3.png" alt="" height="200px"> top vertices moved upwards
     </td>
   </tr>
 </table>
@@ -540,10 +540,10 @@ mesh, generated for example with %Gmsh, that is read in from a
 <table width="60%" align="center">
   <tr>
     <td align="center">
-      <img src="https://www.dealii.org/images/steps/developer/step-49.grid-4base.png" alt=""> input mesh
+      <img src="https://dealii.org/images/steps/developer/step-49.grid-4base.png" alt=""> input mesh
     </td>
     <td align="center">
-      <img src="https://www.dealii.org/images/steps/developer/step-49.grid-4.png" alt=""> extruded output mesh
+      <img src="https://dealii.org/images/steps/developer/step-49.grid-4.png" alt=""> extruded output mesh
     </td>
   </tr>
 </table>
@@ -557,4 +557,4 @@ refinement. This is not difficult &mdash; in fact, there is nothing else to do
 &mdash; if your geometry consists of only straight faces. However, this is
 often not the case if you have a more complex geometry and more steps than
 just creating the mesh are necessary. We will go over some of these steps in
-the <a href="#Results">results section</a> below.
+the @ref step_49-ResultsSection "results section" below.

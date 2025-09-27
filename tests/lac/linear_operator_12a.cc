@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2017 - 2021 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2017 - 2024 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 // tests Trilinos direct solvers on a 2D Poisson equation for linear elements
 // Note: This test is a modified version of tests/trilinos/direct_solver_2.cc
@@ -130,7 +129,7 @@ RightHandSide<dim>::value(const Point<dim> &p,
 {
   double return_value = 0;
   for (unsigned int i = 0; i < dim; ++i)
-    return_value += 2 * std::pow(p(i), 2);
+    return_value += 2 * std::pow(p[i], 2);
 
   return return_value;
 }
@@ -186,19 +185,19 @@ Step4<dim>::setup_system()
 {
   dof_handler.distribute_dofs(fe);
 
+  const IndexSet &locally_owned_dofs = dof_handler.locally_owned_dofs();
+  const IndexSet  locally_relevant_dofs =
+    DoFTools::extract_locally_relevant_dofs(dof_handler);
+
   constraints.clear();
-  std::map<unsigned int, double> boundary_values;
+  constraints.reinit(locally_owned_dofs, locally_relevant_dofs);
   VectorTools::interpolate_boundary_values(dof_handler,
                                            0,
                                            BoundaryValues<dim>(),
                                            constraints);
   constraints.close();
 
-  const IndexSet &locally_owned_dofs = dof_handler.locally_owned_dofs();
-  const IndexSet  locally_relevant_dofs =
-    DoFTools::extract_locally_relevant_dofs(dof_handler);
-
-  DynamicSparsityPattern dsp(dof_handler.n_dofs());
+  DynamicSparsityPattern dsp(locally_relevant_dofs);
   DoFTools::make_sparsity_pattern(dof_handler, dsp, constraints, false);
   SparsityTools::distribute_sparsity_pattern(dsp,
                                              locally_owned_dofs,

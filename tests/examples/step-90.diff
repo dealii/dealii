@@ -1,0 +1,4 @@
+652c652
+<     triangulation.refine_global(3);
+---
+>     triangulation.refine_global(2);

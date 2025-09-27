@@ -1,44 +1,45 @@
-## ---------------------------------------------------------------------
+## ------------------------------------------------------------------------
 ##
-## Copyright (C) 2012 - 2022 by the deal.II authors
+## SPDX-License-Identifier: LGPL-2.1-or-later
+## Copyright (C) 2012 - 2025 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
-## The deal.II library is free software; you can use it, redistribute
-## it, and/or modify it under the terms of the GNU Lesser General
-## Public License as published by the Free Software Foundation; either
-## version 2.1 of the License, or (at your option) any later version.
-## The full text of the license can be found in the file LICENSE.md at
-## the top level directory of deal.II.
+## Part of the source code is dual licensed under Apache-2.0 WITH
+## LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+## governing the source code and code contributions can be found in
+## LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 ##
-## ---------------------------------------------------------------------
+## ------------------------------------------------------------------------
+
 
 #
-# Configure config.h and revision.h
+# Recurse into the sub-directories:
 #
-configure_file(
-  ${CMAKE_CURRENT_SOURCE_DIR}/deal.II/base/config.h.in
-  ${CMAKE_CURRENT_BINARY_DIR}/deal.II/base/config.h
-  )
-configure_file(
-  ${CMAKE_CURRENT_SOURCE_DIR}/deal.II/base/revision.h.in
-  ${CMAKE_CURRENT_BINARY_DIR}/deal.II/base/revision.h
-  )
+add_subdirectory(deal.II)
 
 #
-# Add a rule for how to install the header files:
+# For CMake versions >= 3.28 onwards, we attach the header files as a
+# FILE_SET to the target directly, which is then installed in
+# cmake/config/CMakeLists.txt alongside the target. For older CMake
+# versions we need to install headers by hand:
 #
-install(DIRECTORY deal.II
-  DESTINATION ${DEAL_II_INCLUDE_RELDIR}
-  COMPONENT library
-  FILES_MATCHING PATTERN "*.h"
-  )
+if(CMAKE_VERSION VERSION_LESS 3.28)
+  #
+  # Add a rule for how to install the header files that are part of the source tree:
+  #
+  install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/deal.II
+    DESTINATION ${DEAL_II_INCLUDE_RELDIR}
+    COMPONENT library
+    FILES_MATCHING PATTERN "*.h"
+    )
 
-#
-# and don't forget to install all generated header files, too:
-#
-install(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/deal.II
-  DESTINATION ${DEAL_II_INCLUDE_RELDIR}
-  COMPONENT library
-  FILES_MATCHING PATTERN "*.h"
-  )
+  #
+  # and don't forget to install all generated header files, too:
+  #
+  install(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/deal.II
+    DESTINATION ${DEAL_II_INCLUDE_RELDIR}
+    COMPONENT library
+    FILES_MATCHING PATTERN "*.h"
+    )
+endif()

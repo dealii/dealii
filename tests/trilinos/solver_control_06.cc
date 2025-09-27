@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2017 - 2020 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2017 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 
 
@@ -78,17 +77,17 @@ private:
   assemble_system();
 
   void
-  solve_base();
+  solve_base(const unsigned int cycle);
   void
-  solve_cg();
+  solve_cg(const unsigned int cycle);
   void
-  solve_cgs();
+  solve_cgs(const unsigned int cycle);
   void
-  solve_gmres();
+  solve_gmres(const unsigned int cycle);
   void
-  solve_bicgstab();
+  solve_bicgstab(const unsigned int cycle);
   void
-  solve_tfqmr();
+  solve_tfqmr(const unsigned int cycle);
 
   void
   refine_grid();
@@ -114,8 +113,9 @@ private:
   LA::MPI::Vector       locally_relevant_solution;
   LA::MPI::Vector       system_rhs;
 
-  ConditionalOStream pcout;
-  TimerOutput        timer;
+  ConditionalOStream pcout_timer;
+
+  TimerOutput timer;
 };
 
 Test_Solver_Output::Test_Solver_Output()
@@ -128,11 +128,8 @@ Test_Solver_Output::Test_Solver_Output()
                     Triangulation<2>::smoothing_on_coarsening))
   , dof_handler(triangulation)
   , fe(1)
-  , pcout(std::cout, (Utilities::MPI::this_mpi_process(mpi_comm) == 0))
-  ,
-  // pcout(deallog.get_file_stream(),
-  //       (Utilities::MPI::this_mpi_process(mpi_comm) == 0)),
-  timer(mpi_comm, pcout, TimerOutput::never, TimerOutput::wall_times)
+  , pcout_timer(std::cout, (Utilities::MPI::this_mpi_process(mpi_comm) == 0))
+  , timer(mpi_comm, pcout_timer, TimerOutput::never, TimerOutput::wall_times)
 {}
 
 Test_Solver_Output::~Test_Solver_Output()
@@ -146,7 +143,7 @@ Test_Solver_Output::run()
   const unsigned int n_cycles = 2;
   for (unsigned int cycle = 0; cycle < n_cycles; ++cycle)
     {
-      pcout << "   Cycle: " << cycle << std::endl;
+      deallog << "   Cycle: " << cycle << std::endl;
       if (cycle == 0)
         {
           make_grid();
@@ -158,18 +155,18 @@ Test_Solver_Output::run()
 
       setup_system();
 
-      pcout << "   Number of active cells:       "
-            << triangulation.n_global_active_cells() << std::endl
-            << "   Number of degrees of freedom: " << dof_handler.n_dofs()
-            << std::endl;
+      deallog << "   Number of active cells:       "
+              << triangulation.n_global_active_cells() << std::endl
+              << "   Number of degrees of freedom: " << dof_handler.n_dofs()
+              << std::endl;
 
       assemble_system();
-      solve_base();
-      solve_cg();
-      solve_cgs();
-      solve_gmres();
-      solve_bicgstab();
-      solve_tfqmr();
+      solve_base(cycle);
+      solve_cg(cycle);
+      solve_cgs(cycle);
+      solve_gmres(cycle);
+      solve_bicgstab(cycle);
+      solve_tfqmr(cycle);
 
       // {
       //   TimerOutput::Scope t(timer, "output");
@@ -179,7 +176,7 @@ Test_Solver_Output::run()
       // timer.print_summary();
       // timer.reset();
 
-      pcout << std::endl << std::endl << std::endl;
+      deallog << std::endl << std::endl << std::endl;
     }
 }
 
@@ -205,7 +202,7 @@ Test_Solver_Output::setup_system()
   system_rhs.reinit(locally_owned_dofs, mpi_comm);
 
   constraints.clear();
-  constraints.reinit(locally_relevant_dofs);
+  constraints.reinit(locally_owned_dofs, locally_relevant_dofs);
   DoFTools::make_hanging_node_constraints(dof_handler, constraints);
   VectorTools::interpolate_boundary_values(dof_handler,
                                            0,
@@ -287,10 +284,10 @@ Test_Solver_Output::assemble_system()
 }
 
 void
-Test_Solver_Output::solve_base()
+Test_Solver_Output::solve_base(const unsigned int cycle)
 {
   TimerOutput::Scope t(timer, "solve_base");
-  pcout << "Solving using SolverBase" << std::endl;
+  deallog << "Solving using SolverBase" << std::endl;
 
   LA::MPI::Vector completely_distributed_solution(locally_owned_dofs, mpi_comm);
 
@@ -303,23 +300,23 @@ Test_Solver_Output::solve_base()
   TrilinosWrappers::SolverBase solver(TrilinosWrappers::SolverBase::cg,
                                       solver_control,
                                       solver_data);
-  solver.solve(system_matrix,
-               completely_distributed_solution,
-               system_rhs,
-               prec);
-
-  pcout << "   Solved in " << solver_control.last_step() << " iterations."
-        << std::endl;
+  check_solver_within_range(solver.solve(system_matrix,
+                                         completely_distributed_solution,
+                                         system_rhs,
+                                         prec),
+                            solver_control.last_step(),
+                            (cycle == 0 ? 1 : 11),
+                            (cycle == 0 ? 2 : 15));
 
   constraints.distribute(completely_distributed_solution);
   locally_relevant_solution = completely_distributed_solution;
 }
 
 void
-Test_Solver_Output::solve_cg()
+Test_Solver_Output::solve_cg(const unsigned int cycle)
 {
   TimerOutput::Scope t(timer, "solve_cg");
-  pcout << "Solving using SolverCG" << std::endl;
+  deallog << "Solving using SolverCG" << std::endl;
 
   LA::MPI::Vector completely_distributed_solution(locally_owned_dofs, mpi_comm);
 
@@ -330,23 +327,23 @@ Test_Solver_Output::solve_cg()
   SolverControl                solver_control(100, 1e-12);
   LA::SolverCG::AdditionalData solver_data(true);
   LA::SolverCG                 solver(solver_control, solver_data);
-  solver.solve(system_matrix,
-               completely_distributed_solution,
-               system_rhs,
-               prec);
-
-  pcout << "   Solved in " << solver_control.last_step() << " iterations."
-        << std::endl;
+  check_solver_within_range(solver.solve(system_matrix,
+                                         completely_distributed_solution,
+                                         system_rhs,
+                                         prec),
+                            solver_control.last_step(),
+                            (cycle == 0 ? 1 : 11),
+                            (cycle == 0 ? 2 : 15));
 
   constraints.distribute(completely_distributed_solution);
   locally_relevant_solution = completely_distributed_solution;
 }
 
 void
-Test_Solver_Output::solve_cgs()
+Test_Solver_Output::solve_cgs(const unsigned int cycle)
 {
   TimerOutput::Scope t(timer, "solve_cgs");
-  pcout << "Solving using SolverCGS" << std::endl;
+  deallog << "Solving using SolverCGS" << std::endl;
 
   LA::MPI::Vector completely_distributed_solution(locally_owned_dofs, mpi_comm);
 
@@ -357,23 +354,23 @@ Test_Solver_Output::solve_cgs()
   SolverControl                               solver_control(100, 1e-12);
   TrilinosWrappers::SolverCGS::AdditionalData solver_data(true);
   TrilinosWrappers::SolverCGS solver(solver_control, solver_data);
-  solver.solve(system_matrix,
-               completely_distributed_solution,
-               system_rhs,
-               prec);
-
-  pcout << "   Solved in " << solver_control.last_step() << " iterations."
-        << std::endl;
+  check_solver_within_range(solver.solve(system_matrix,
+                                         completely_distributed_solution,
+                                         system_rhs,
+                                         prec),
+                            solver_control.last_step(),
+                            (cycle == 0 ? 1 : 5),
+                            (cycle == 0 ? 2 : 9));
 
   constraints.distribute(completely_distributed_solution);
   locally_relevant_solution = completely_distributed_solution;
 }
 
 void
-Test_Solver_Output::solve_gmres()
+Test_Solver_Output::solve_gmres(const unsigned int cycle)
 {
   TimerOutput::Scope t(timer, "solve_gmres");
-  pcout << "Solving using SolverGMRES" << std::endl;
+  deallog << "Solving using SolverGMRES" << std::endl;
 
   LA::MPI::Vector completely_distributed_solution(locally_owned_dofs, mpi_comm);
 
@@ -384,23 +381,23 @@ Test_Solver_Output::solve_gmres()
   SolverControl                   solver_control(100, 1e-12);
   LA::SolverGMRES::AdditionalData solver_data(true, 25);
   LA::SolverGMRES                 solver(solver_control, solver_data);
-  solver.solve(system_matrix,
-               completely_distributed_solution,
-               system_rhs,
-               prec);
-
-  pcout << "   Solved in " << solver_control.last_step() << " iterations."
-        << std::endl;
+  check_solver_within_range(solver.solve(system_matrix,
+                                         completely_distributed_solution,
+                                         system_rhs,
+                                         prec),
+                            solver_control.last_step(),
+                            (cycle == 0 ? 1 : 11),
+                            (cycle == 0 ? 2 : 15));
 
   constraints.distribute(completely_distributed_solution);
   locally_relevant_solution = completely_distributed_solution;
 }
 
 void
-Test_Solver_Output::solve_bicgstab()
+Test_Solver_Output::solve_bicgstab(const unsigned int cycle)
 {
   TimerOutput::Scope t(timer, "solve_bicgstab");
-  pcout << "Solving using SolverBicgstab" << std::endl;
+  deallog << "Solving using SolverBicgstab" << std::endl;
 
   LA::MPI::Vector completely_distributed_solution(locally_owned_dofs, mpi_comm);
 
@@ -411,23 +408,23 @@ Test_Solver_Output::solve_bicgstab()
   SolverControl                                    solver_control(100, 1e-12);
   TrilinosWrappers::SolverBicgstab::AdditionalData solver_data(true);
   TrilinosWrappers::SolverBicgstab solver(solver_control, solver_data);
-  solver.solve(system_matrix,
-               completely_distributed_solution,
-               system_rhs,
-               prec);
-
-  pcout << "   Solved in " << solver_control.last_step() << " iterations."
-        << std::endl;
+  check_solver_within_range(solver.solve(system_matrix,
+                                         completely_distributed_solution,
+                                         system_rhs,
+                                         prec),
+                            solver_control.last_step(),
+                            (cycle == 0 ? 1 : 5),
+                            (cycle == 0 ? 2 : 9));
 
   constraints.distribute(completely_distributed_solution);
   locally_relevant_solution = completely_distributed_solution;
 }
 
 void
-Test_Solver_Output::solve_tfqmr()
+Test_Solver_Output::solve_tfqmr(const unsigned int cycle)
 {
   TimerOutput::Scope t(timer, "solve_tfqmr");
-  pcout << "Solving using SolverTFQMR" << std::endl;
+  deallog << "Solving using SolverTFQMR" << std::endl;
 
   LA::MPI::Vector completely_distributed_solution(locally_owned_dofs, mpi_comm);
 
@@ -438,13 +435,13 @@ Test_Solver_Output::solve_tfqmr()
   SolverControl                                 solver_control(100, 1e-12);
   TrilinosWrappers::SolverTFQMR::AdditionalData solver_data(true);
   TrilinosWrappers::SolverTFQMR solver(solver_control, solver_data);
-  solver.solve(system_matrix,
-               completely_distributed_solution,
-               system_rhs,
-               prec);
-
-  pcout << "   Solved in " << solver_control.last_step() << " iterations."
-        << std::endl;
+  check_solver_within_range(solver.solve(system_matrix,
+                                         completely_distributed_solution,
+                                         system_rhs,
+                                         prec),
+                            solver_control.last_step(),
+                            (cycle == 0 ? 1 : 5),
+                            (cycle == 0 ? 2 : 9));
 
   constraints.distribute(completely_distributed_solution);
   locally_relevant_solution = completely_distributed_solution;
@@ -511,24 +508,4 @@ main(int argc, char *argv[])
 
   Test_Solver_Output problem;
   problem.run();
-
-  // Trilinos dumps the output into std::cout
-  // We catch this output and it is written to the stdout logfile
-  // Since we're interested in this output we read it back in and
-  // write parts of it to the logstream
-  std::ifstream inputfile;
-  inputfile.open("stdout");
-  Assert(inputfile.good() && inputfile.is_open(), ExcIO());
-  std::string       line;
-  const std::string key = "*****";
-  while (std::getline(inputfile, line))
-    {
-      if (line.find(key) != std::string::npos)
-        deallog << line << std::endl;
-    }
-  inputfile.close();
-
-  deallog << "OK" << std::endl;
-
-  return 0;
 }

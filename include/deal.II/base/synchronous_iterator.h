@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2008 - 2021 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2009 - 2024 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 #ifndef dealii_synchronous_iterator_h
 #define dealii_synchronous_iterator_h
@@ -67,6 +66,16 @@ struct SynchronousIterators
    */
   Iterators &
   operator*();
+
+  /**
+   * The following traits are necessary for std::distance() to
+   * work with SynchronousIterators.
+   */
+  using difference_type   = std::size_t;
+  using iterator_category = std::bidirectional_iterator_tag;
+  using value_type        = Iterators;
+  using pointer           = Iterators *;
+  using reference         = Iterators &;
 
 private:
   /**
@@ -180,7 +189,47 @@ advance(std::tuple<I1, I2, I3, I4> &t, const unsigned int n)
   std::advance(std::get<3>(t), n);
 }
 
+/**
+ * Reverse a tuple of iterators by 1.
+ *
+ * @relatesalso SynchronousIterators
+ */
+template <typename I1, typename I2>
+inline void
+prev(std::tuple<I1, I2> &t)
+{
+  --std::get<0>(t);
+  --std::get<1>(t);
+}
 
+/**
+ * Reverse a tuple of iterators by 1.
+ *
+ * @relatesalso SynchronousIterators
+ */
+template <typename I1, typename I2, typename I3>
+inline void
+prev(std::tuple<I1, I2, I3> &t)
+{
+  --std::get<0>(t);
+  --std::get<1>(t);
+  --std::get<2>(t);
+}
+
+/**
+ * Reverse a tuple of iterators by 1.
+ *
+ * @relatesalso SynchronousIterators
+ */
+template <typename I1, typename I2, typename I3, typename I4>
+inline void
+prev(std::tuple<I1, I2, I3, I4> &t)
+{
+  --std::get<0>(t);
+  --std::get<1>(t);
+  --std::get<2>(t);
+  --std::get<3>(t);
+}
 
 /**
  * Advance a tuple of iterators by 1.
@@ -224,8 +273,6 @@ advance_by_one(std::tuple<I1, I2, I3, I4> &t)
   ++std::get<3>(t);
 }
 
-
-
 /**
  * Advance the elements of this iterator by $n$.
  *
@@ -241,18 +288,44 @@ operator+(const SynchronousIterators<Iterators> &a, const std::size_t n)
 }
 
 /**
- * Advance the elements of this iterator by 1.
+ * Advance the elements of this iterator by 1 (pre-increment).
  *
  * @relatesalso SynchronousIterators
  */
 template <typename Iterators>
-inline SynchronousIterators<Iterators>
+inline SynchronousIterators<Iterators> &
 operator++(SynchronousIterators<Iterators> &a)
 {
   dealii::advance_by_one(*a);
   return a;
 }
 
+/**
+ * Reverse the elements of this iterator by 1 (pre-decrement).
+ *
+ * @relatesalso SynchronousIterators
+ */
+template <typename Iterators>
+inline SynchronousIterators<Iterators> &
+operator--(SynchronousIterators<Iterators> &a)
+{
+  dealii::prev(*a);
+  return a;
+}
+
+/**
+ * Advance the elements of this iterator by 1 (post-increment).
+ *
+ * @relatesalso SynchronousIterators
+ */
+template <typename Iterators>
+inline SynchronousIterators<Iterators>
+operator++(SynchronousIterators<Iterators> &a, int)
+{
+  SynchronousIterators<Iterators> b = a;
+  dealii::advance_by_one(*a);
+  return b;
+}
 
 /**
  * Compare synch iterators for inequality. Since they march in synch,

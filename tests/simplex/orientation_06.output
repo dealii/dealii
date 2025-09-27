@@ -1,0 +1,11 @@
+
+DEAL::rhs l2 = 2.27397
+DEAL::global error = 0.00166288
+DEAL::rhs l2 = 2.08466
+DEAL::global error = 0.000105423
+DEAL::rhs l2 = 2.69354
+DEAL::global error = 6.61142e-06
+DEAL::rhs l2 = 3.77050
+DEAL::global error = 4.13368e-07
+DEAL::rhs l2 = 5.33304
+DEAL::global error = 2.58314e-08

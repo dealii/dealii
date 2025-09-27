@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2015 - 2022 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2015 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 
 #ifndef dealii_polynomials_rannacher_turek_h
@@ -19,6 +18,7 @@
 
 #include <deal.II/base/config.h>
 
+#include <deal.II/base/exceptions.h>
 #include <deal.II/base/point.h>
 #include <deal.II/base/scalar_polynomials_base.h>
 #include <deal.II/base/tensor.h>
@@ -154,78 +154,76 @@ namespace internal
     {
       const unsigned int dim = 2;
 
-      Tensor<order, dim> derivative;
-      switch (order)
+      if constexpr (order == 1)
         {
-          case 1:
+          Tensor<1, dim> derivative;
+          if (i == 0)
             {
-              Tensor<1, dim> &grad =
-                *reinterpret_cast<Tensor<1, dim> *>(&derivative);
-              if (i == 0)
-                {
-                  grad[0] = -2.5 + 3 * p(0);
-                  grad[1] = 1.5 - 3 * p(1);
-                }
-              else if (i == 1)
-                {
-                  grad[0] = -0.5 + 3.0 * p(0);
-                  grad[1] = 1.5 - 3.0 * p(1);
-                }
-              else if (i == 2)
-                {
-                  grad[0] = 1.5 - 3.0 * p(0);
-                  grad[1] = -2.5 + 3.0 * p(1);
-                }
-              else if (i == 3)
-                {
-                  grad[0] = 1.5 - 3.0 * p(0);
-                  grad[1] = -0.5 + 3.0 * p(1);
-                }
-              else
-                {
-                  Assert(false, ExcNotImplemented());
-                }
-              return derivative;
+              derivative[0] = -2.5 + 3 * p[0];
+              derivative[1] = 1.5 - 3 * p[1];
             }
-          case 2:
+          else if (i == 1)
             {
-              Tensor<2, dim> &grad_grad =
-                *reinterpret_cast<Tensor<2, dim> *>(&derivative);
-              if (i == 0)
-                {
-                  grad_grad[0][0] = 3;
-                  grad_grad[0][1] = 0;
-                  grad_grad[1][0] = 0;
-                  grad_grad[1][1] = -3;
-                }
-              else if (i == 1)
-                {
-                  grad_grad[0][0] = 3;
-                  grad_grad[0][1] = 0;
-                  grad_grad[1][0] = 0;
-                  grad_grad[1][1] = -3;
-                }
-              else if (i == 2)
-                {
-                  grad_grad[0][0] = -3;
-                  grad_grad[0][1] = 0;
-                  grad_grad[1][0] = 0;
-                  grad_grad[1][1] = 3;
-                }
-              else if (i == 3)
-                {
-                  grad_grad[0][0] = -3;
-                  grad_grad[0][1] = 0;
-                  grad_grad[1][0] = 0;
-                  grad_grad[1][1] = 3;
-                }
-              return derivative;
+              derivative[0] = -0.5 + 3.0 * p[0];
+              derivative[1] = 1.5 - 3.0 * p[1];
             }
-          default:
+          else if (i == 2)
             {
-              // higher derivatives are all zero
-              return Tensor<order, dim>();
+              derivative[0] = 1.5 - 3.0 * p[0];
+              derivative[1] = -2.5 + 3.0 * p[1];
             }
+          else if (i == 3)
+            {
+              derivative[0] = 1.5 - 3.0 * p[0];
+              derivative[1] = -0.5 + 3.0 * p[1];
+            }
+          else
+            {
+              DEAL_II_NOT_IMPLEMENTED();
+            }
+          return derivative;
+        }
+      else if constexpr (order == 2)
+        {
+          Tensor<2, dim> derivative;
+          if (i == 0)
+            {
+              derivative[0][0] = 3;
+              derivative[0][1] = 0;
+              derivative[1][0] = 0;
+              derivative[1][1] = -3;
+            }
+          else if (i == 1)
+            {
+              derivative[0][0] = 3;
+              derivative[0][1] = 0;
+              derivative[1][0] = 0;
+              derivative[1][1] = -3;
+            }
+          else if (i == 2)
+            {
+              derivative[0][0] = -3;
+              derivative[0][1] = 0;
+              derivative[1][0] = 0;
+              derivative[1][1] = 3;
+            }
+          else if (i == 3)
+            {
+              derivative[0][0] = -3;
+              derivative[0][1] = 0;
+              derivative[1][0] = 0;
+              derivative[1][1] = 3;
+            }
+          else
+            {
+              DEAL_II_NOT_IMPLEMENTED();
+            }
+          return derivative;
+        }
+      else
+        {
+          // higher derivatives are all zero
+          return {};
         }
     }
   } // namespace PolynomialsRannacherTurekImplementation

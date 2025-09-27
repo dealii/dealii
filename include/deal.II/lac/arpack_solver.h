@@ -1,24 +1,26 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2010 - 2023 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2010 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 #ifndef dealii_arpack_solver_h
 #define dealii_arpack_solver_h
 
 #include <deal.II/base/config.h>
 
-#include <deal.II/base/smartpointer.h>
+#include <deal.II/base/enable_observer_pointer.h>
+#include <deal.II/base/exceptions.h>
+#include <deal.II/base/observer_pointer.h>
+#include <deal.II/base/types.h>
 
 #include <deal.II/lac/solver_control.h>
 
@@ -161,10 +163,10 @@ dseupd_(int          *rvec,
  * get a single additional eigenvalue. But beware that some functions in
  * deal.II set these diagonals to rather arbitrary (from the point of view
  * of eigenvalue problems) values. See also
- * @ref step_36 "step-36"
+ * step-36
  * for an example.
  */
-class ArpackSolver : public Subscriptor
+class ArpackSolver : public EnableObserverPointer
 {
 public:
   /**
@@ -899,6 +901,14 @@ ArpackSolver::control() const
 
 DEAL_II_NAMESPACE_CLOSE
 
+
+#else
+
+// Make sure the scripts that create the C++20 module input files have
+// something to latch on if the preprocessor #ifdef above would
+// otherwise lead to an empty content of the file.
+DEAL_II_NAMESPACE_OPEN
+DEAL_II_NAMESPACE_CLOSE
 
 #endif
 #endif

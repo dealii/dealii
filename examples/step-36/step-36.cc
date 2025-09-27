@@ -1,17 +1,16 @@
-/* ---------------------------------------------------------------------
+/* ------------------------------------------------------------------------
  *
- * Copyright (C) 2009 - 2023 by the deal.II authors
+ * SPDX-License-Identifier: LGPL-2.1-or-later
+ * Copyright (C) 2009 - 2024 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
- * The deal.II library is free software; you can use it, redistribute
- * it, and/or modify it under the terms of the GNU Lesser General
- * Public License as published by the Free Software Foundation; either
- * version 2.1 of the License, or (at your option) any later version.
- * The full text of the license can be found in the file LICENSE.md at
- * the top level directory of deal.II.
+ * Part of the source code is dual licensed under Apache-2.0 WITH
+ * LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+ * governing the source code and code contributions can be found in
+ * LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
  *
- * ---------------------------------------------------------------------
+ * ------------------------------------------------------------------------
  *
  * Authors: Toby D. Young, Polish Academy of Sciences,
  *          Wolfgang Bangerth, Texas A&M University
@@ -23,7 +22,6 @@
 // slightly revised version of step-4. As a consequence, most of the following
 // include files are as used there, or at least as used already in previous
 // tutorial programs:
-#include <deal.II/base/logstream.h>
 #include <deal.II/base/quadrature_lib.h>
 #include <deal.II/base/function.h>
 #include <deal.II/base/function_parser.h>
@@ -36,7 +34,6 @@
 #include <deal.II/fe/fe_q.h>
 #include <deal.II/fe/fe_values.h>
 #include <deal.II/numerics/vector_tools.h>
-#include <deal.II/numerics/matrix_tools.h>
 #include <deal.II/numerics/data_out.h>
 #include <deal.II/lac/affine_constraints.h>
 #include <deal.II/lac/full_matrix.h>
@@ -81,7 +78,7 @@ namespace Step36
     void         output_results() const;
 
     Triangulation<dim> triangulation;
-    FE_Q<dim>          fe;
+    const FE_Q<dim>    fe;
     DoFHandler<dim>    dof_handler;
 
     // With these exceptions: For our eigenvalue problem, we need both a
@@ -233,7 +230,7 @@ namespace Step36
   template <int dim>
   void EigenvalueProblem<dim>::assemble_system()
   {
-    QGauss<dim> quadrature_formula(fe.degree + 1);
+    const QGauss<dim> quadrature_formula(fe.degree + 1);
 
     FEValues<dim> fe_values(fe,
                             quadrature_formula,
@@ -313,7 +310,7 @@ namespace Step36
     // ensure that we can ignore them should they show up in our
     // computations.
     double min_spurious_eigenvalue = std::numeric_limits<double>::max(),
-           max_spurious_eigenvalue = -std::numeric_limits<double>::max();
+           max_spurious_eigenvalue = std::numeric_limits<double>::lowest();
 
     for (unsigned int i = 0; i < dof_handler.n_dofs(); ++i)
       if (constraints.is_constrained(i))
@@ -407,8 +404,7 @@ namespace Step36
 
     for (unsigned int i = 0; i < eigenfunctions.size(); ++i)
       data_out.add_data_vector(eigenfunctions[i],
-                               std::string("eigenfunction_") +
-                                 Utilities::int_to_string(i));
+                               "eigenfunction_" + Utilities::int_to_string(i));
 
     // The only thing worth discussing may be that because the potential is
     // specified as a function expression in the input file, it would be nice

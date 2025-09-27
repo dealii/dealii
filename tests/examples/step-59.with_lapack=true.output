@@ -1,0 +1,17 @@
+Running with 1 MPI process, element FE_DGQHermite<3>(5)
+
+Cycle 0
+Number of degrees of freedom: 1728
+Solver stopped within 12 - 15 iterations
+Verification via L2 error:    0.667141
+
+Cycle 1
+Number of degrees of freedom: 13824
+Solver stopped within 12 - 15 iterations
+Verification via L2 error:    0.0232412
+
+Cycle 2
+Number of degrees of freedom: 110592
+Solver stopped within 12 - 15 iterations
+Verification via L2 error:    0.00034861
+

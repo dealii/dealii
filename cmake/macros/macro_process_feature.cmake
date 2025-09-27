@@ -1,17 +1,16 @@
-## ---------------------------------------------------------------------
+## ------------------------------------------------------------------------
 ##
-## Copyright (C) 2014 - 2023 by the deal.II authors
+## SPDX-License-Identifier: LGPL-2.1-or-later
+## Copyright (C) 2014 - 2025 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
-## The deal.II library is free software; you can use it, redistribute
-## it, and/or modify it under the terms of the GNU Lesser General
-## Public License as published by the Free Software Foundation; either
-## version 2.1 of the License, or (at your option) any later version.
-## The full text of the license can be found in the file LICENSE.md at
-## the top level directory of deal.II.
+## Part of the source code is dual licensed under Apache-2.0 WITH
+## LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+## governing the source code and code contributions can be found in
+## LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 ##
-## ---------------------------------------------------------------------
+## ------------------------------------------------------------------------
 
 #
 # process_feature(<feature>
@@ -47,6 +46,7 @@
 # search.
 #
 # Valid suffixes are
+#   TARGETS      TARGETS_RELEASE      TARGETS_DEBUG
 #   LIBRARIES    LIBRARIES_RELEASE    LIBRARIES_DEBUG
 #   INCLUDE_DIRS
 #   DEFINITIONS  DEFINITIONS_RELEASE  DEFINITIONS_DEBUG
@@ -131,7 +131,7 @@ macro(process_feature _feature)
       elseif(_arg MATCHES "^(optimized|debug|general)$")
         message(FATAL_ERROR
           "Internal configuration error: process_feature() does not support "
-          "»debug«, »optimized«, or »general« library identifiers, use the "
+          "\"debug«, »optimized«, or »general\" library identifiers, use the "
           "appropriate keyword instead."
           )
       endif()
@@ -166,6 +166,31 @@ macro(process_feature _feature)
   set(${_feature}_CLEAR_VARIABLES ${_clear} CACHE INTERNAL "")
 
   if(${_feature}_FOUND)
+    #
+    # Take care of "optimized", "debug", and "general" keywords in
+    # LIBRARIES and TARGETS variables by distributing affected entries into
+    # the respective LIBRARIES_(DEBUG|RELEASE) and TARGETS_(DEBUG|RELEASE)
+    # variables.
+    #
+    foreach(_suffix LIBRARIES TARGETS)
+      set(_temp ${_temp_${_suffix}})
+      set(_temp_${_suffix} "")
+      set(_switch "")
+      foreach(_entry ${_temp})
+        if("${_entry}" STREQUAL "optimized")
+          set(_split_configuration TRUE)
+          set(_switch "_RELEASE")
+        elseif("${_entry}" STREQUAL "debug")
+          set(_split_configuration TRUE)
+          set(_switch "_DEBUG")
+        elseif("${_entry}" STREQUAL "general")
+          set(_switch "")
+        else()
+          list(APPEND _temp_${_suffix}${_switch} ${_entry})
+        endif()
+      endforeach()
+    endforeach()
+
     #
     # Deduplicate and stringify entries:
     #

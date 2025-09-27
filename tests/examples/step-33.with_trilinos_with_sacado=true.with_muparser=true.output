@@ -1,0 +1,22 @@
+T=0
+   Number of active cells:       1702
+   Number of degrees of freedom: 7288
+
+   NonLin Res     Lin Iter       Lin Res
+   _____________________________________
+   5.1e-02          within        5.7e-13
+   4.4e-04          within        1.2e-14
+   2.2e-07          within        7.0e-18
+   2.5e-13          (converged)
+
+T=0.02
+   Number of active cells:       1792
+   Number of degrees of freedom: 7660
+
+   NonLin Res     Lin Iter       Lin Res
+   _____________________________________
+   2.0e-02          within        1.5e-12
+   1.1e-04          within        3.6e-15
+   2.2e-08          within        8.0e-19
+   2.1e-15          (converged)
+

@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2012 - 2020 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2013 - 2024 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 
 
@@ -66,30 +65,30 @@ run()
               {
                 if (cell->face(face)->at_boundary())
                   {
-                    if ((std::fabs(cell->face(face)->center()(0)) < 0.1) &&
-                        (std::fabs(cell->face(face)->center()(dim - 1)) <
+                    if ((std::fabs(cell->face(face)->center()[0]) < 0.1) &&
+                        (std::fabs(cell->face(face)->center()[dim - 1]) <
                          1e-12))
                       {
                         cell->face(face)->set_boundary_id(1);
                       }
 
-                    if ((std::fabs(cell->face(face)->center()(0)) < 1e-12) &&
-                        (std::fabs(cell->face(face)->center()(dim - 1)) < 0.1))
+                    if ((std::fabs(cell->face(face)->center()[0]) < 1e-12) &&
+                        (std::fabs(cell->face(face)->center()[dim - 1]) < 0.1))
                       {
                         cell->face(face)->set_boundary_id(1);
                       }
 
-                    if ((std::fabs(1.0 - cell->face(face)->center()(0)) <
+                    if ((std::fabs(1.0 - cell->face(face)->center()[0]) <
                          0.1) &&
-                        (std::fabs(1.0 - cell->face(face)->center()(dim - 1)) <
+                        (std::fabs(1.0 - cell->face(face)->center()[dim - 1]) <
                          1e-12))
                       {
                         cell->face(face)->set_boundary_id(2);
                       }
 
-                    if ((std::fabs(1.0 - cell->face(face)->center()(0)) <
+                    if ((std::fabs(1.0 - cell->face(face)->center()[0]) <
                          1e-12) &&
-                        (std::fabs(1.0 - cell->face(face)->center()(dim - 1)) <
+                        (std::fabs(1.0 - cell->face(face)->center()[dim - 1]) <
                          0.1))
                       {
                         cell->face(face)->set_boundary_id(2);
@@ -97,35 +96,35 @@ run()
 
                     // no normal flux boundary
 
-                    if ((std::fabs(cell->face(face)->center()(0)) >= 0.1 &&
-                         std::fabs(cell->face(face)->center()(0)) <= 1.0) &&
-                        (std::fabs(cell->face(face)->center()(dim - 1)) <
+                    if ((std::fabs(cell->face(face)->center()[0]) >= 0.1 &&
+                         std::fabs(cell->face(face)->center()[0]) <= 1.0) &&
+                        (std::fabs(cell->face(face)->center()[dim - 1]) <
                          1e-12))
                       {
                         cell->face(face)->set_boundary_id(3);
                       }
 
-                    if ((std::fabs(cell->face(face)->center()(0)) >= 0.0 &&
-                         std::fabs(cell->face(face)->center()(0)) <= 0.9) &&
-                        (std::fabs(1.0 - cell->face(face)->center()(dim - 1)) <
+                    if ((std::fabs(cell->face(face)->center()[0]) >= 0.0 &&
+                         std::fabs(cell->face(face)->center()[0]) <= 0.9) &&
+                        (std::fabs(1.0 - cell->face(face)->center()[dim - 1]) <
                          1e-12))
                       {
                         cell->face(face)->set_boundary_id(5);
                       }
 
-                    if ((std::fabs(1.0 - cell->face(face)->center()(0)) <
+                    if ((std::fabs(1.0 - cell->face(face)->center()[0]) <
                          1e-12) &&
-                        (std::fabs(cell->face(face)->center()(dim - 1)) >=
+                        (std::fabs(cell->face(face)->center()[dim - 1]) >=
                            0.0 &&
-                         std::fabs(cell->face(face)->center()(dim - 1)) <= 0.9))
+                         std::fabs(cell->face(face)->center()[dim - 1]) <= 0.9))
                       {
                         cell->face(face)->set_boundary_id(4);
                       }
 
-                    if ((std::fabs(cell->face(face)->center()(0)) < 1e-12) &&
-                        (std::fabs(cell->face(face)->center()(dim - 1)) >=
+                    if ((std::fabs(cell->face(face)->center()[0]) < 1e-12) &&
+                        (std::fabs(cell->face(face)->center()[dim - 1]) >=
                            0.1 &&
-                         std::fabs(cell->face(face)->center()(dim - 1)) <= 1.0))
+                         std::fabs(cell->face(face)->center()[dim - 1]) <= 1.0))
                       {
                         cell->face(face)->set_boundary_id(6);
                       }

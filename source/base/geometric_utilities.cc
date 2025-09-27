@@ -1,21 +1,22 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2016 - 2023 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2016 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/geometric_utilities.h>
+#include <deal.II/base/numbers.h>
+#include <deal.II/base/point.h>
 
 #include <array>
 #include <cmath>
@@ -54,7 +55,7 @@ namespace GeometricUtilities
         {
           scoord[0] = position.norm();
           // azimuth angle \theta:
-          scoord[1] = std::atan2(position(1), position(0));
+          scoord[1] = std::atan2(position[1], position[0]);
           // correct to [0,2*pi)
           if (scoord[1] < 0.0)
             scoord[1] += 2.0 * numbers::PI;
@@ -65,7 +66,7 @@ namespace GeometricUtilities
         {
           // acos returns the angle in the range [0,\pi]
           if (scoord[0] > std::numeric_limits<double>::min())
-            scoord[2] = std::acos(position(2) / scoord[0]);
+            scoord[2] = std::acos(position[2] / scoord[0]);
           else
             scoord[2] = 0.0;
         }
@@ -102,7 +103,7 @@ namespace GeometricUtilities
               break;
             }
           default:
-            Assert(false, ExcNotImplemented());
+            DEAL_II_NOT_IMPLEMENTED();
             break;
         }
 
@@ -110,7 +111,7 @@ namespace GeometricUtilities
     }
 
     // explicit instantiations
-#include "geometric_utilities.inst"
+#include "base/geometric_utilities.inst"
 
   } // namespace Coordinates
 } // namespace GeometricUtilities

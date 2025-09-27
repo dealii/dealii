@@ -1,17 +1,16 @@
-/* ---------------------------------------------------------------------
+/* ------------------------------------------------------------------------
  *
- * Copyright (C) 2009 - 2021 by the deal.II authors
+ * SPDX-License-Identifier: LGPL-2.1-or-later
+ * Copyright (C) 2014 - 2024 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
- * The deal.II library is free software; you can use it, redistribute
- * it, and/or modify it under the terms of the GNU Lesser General
- * Public License as published by the Free Software Foundation; either
- * version 2.1 of the License, or (at your option) any later version.
- * The full text of the license can be found in the file LICENSE.md at
- * the top level directory of deal.II.
+ * Part of the source code is dual licensed under Apache-2.0 WITH
+ * LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+ * governing the source code and code contributions can be found in
+ * LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
  *
- * ---------------------------------------------------------------------
+ * ------------------------------------------------------------------------
  *
  *  Authors: Andrea Mola, Luca Heltai, 2014
  */
@@ -27,7 +26,6 @@
 #include <deal.II/grid/grid_in.h>
 #include <deal.II/grid/grid_out.h>
 #include <deal.II/numerics/data_out.h>
-#include <deal.II/numerics/vector_tools.h>
 
 // These are the headers of the opencascade support classes and
 // functions. Notice that these will contain sensible data only if you
@@ -172,6 +170,7 @@ namespace Step54
   void TriangulationOnCAD::read_domain()
   {
     TopoDS_Shape bow_surface = OpenCASCADE::read_IGES(cad_file_name, 1e-3);
+    std::cout << " Read " << cad_file_name << std::endl;
 
     // Each CAD geometrical object is defined along with a tolerance,
     // which indicates possible inaccuracy of its placement. For
@@ -352,9 +351,10 @@ namespace Step54
   {
     const std::string filename =
       (output_filename + "_" + Utilities::int_to_string(cycle) + ".vtk");
-    std::ofstream logfile(filename);
+    std::ofstream vtk_file(filename);
     GridOut       grid_out;
-    grid_out.write_vtk(tria, logfile);
+    grid_out.write_vtk(tria, vtk_file);
+    std::cout << " Wrote " << filename << std::endl;
   }
 
 

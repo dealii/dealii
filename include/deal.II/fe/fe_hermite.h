@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2023 - 2023 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2023 - 2024 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 #ifndef dealii_fe_hermite_h
 #define dealii_fe_hermite_h
@@ -75,21 +74,21 @@ DEAL_II_NAMESPACE_OPEN
  * <code>FE_Hermite<3>(3)</code>:
  *
  * @verbatim
- *       (40,41,44,45)__(42,43,46,47)          (40,41,44,45)__(42,43,46,47)
- *       (56,57,60,61)  (58,59,62,63)          (56,57,60,61)  (58,59,62,63)
- *          /  |              |                    /           /  |
- *         /   |              |                   /           /   |
- *        /    |              |                  /           /    |
- *(32,33,36,37)|              |         (32,33,36,37)__(34,35,38,39)
- *(48,49,52,53)|              |         (48,49,52,53)  (50,51,54,55)
- *       |     |              |                |            |     |
- *       |( 8,9,12,13 )__(10,11,14,15)         |            |(10,11,14,15)
- *       |(24,25,28,29)  (26,27,30,31)         |            |(26,27,30,31)
- *       |    /              /                 |            |    /
- *       |   /              /                  |            |   /
- *       |  /              /                   |            |  /
- *  (  0,1,4,5  )___(  2,3,6,7  )      (  0,1,4,5  )___(  2,3,6,7  )
- *  (16,17,20,21)   (18,19,22,23)      (16,17,20,21)   (18,19,22,23)
+ *        (40,41,44,45)__(42,43,46,47)          (40,41,44,45)__(42,43,46,47)
+ *        (56,57,60,61)  (58,59,62,63)          (56,57,60,61)  (58,59,62,63)
+ *           /  |              |                    /           /  |
+ *          /   |              |                   /           /   |
+ *         /    |              |                  /           /    |
+ * (32,33,36,37)|              |         (32,33,36,37)__(34,35,38,39)
+ * (48,49,52,53)|              |         (48,49,52,53)  (50,51,54,55)
+ *        |     |              |                |            |     |
+ *        |( 8,9,12,13 )__(10,11,14,15)         |            |(10,11,14,15)
+ *        |(24,25,28,29)  (26,27,30,31)         |            |(26,27,30,31)
+ *        |    /              /                 |            |    /
+ *        |   /              /                  |            |   /
+ *        |  /              /                   |            |  /
+ *   (  0,1,4,5  )___(  2,3,6,7  )      (  0,1,4,5  )___(  2,3,6,7  )
+ *   (16,17,20,21)   (18,19,22,23)      (16,17,20,21)   (18,19,22,23)
  * @endverbatim
  *
  * Due to the increased regularity constraints many of these functions are

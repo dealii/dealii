@@ -1,19 +1,16 @@
-/* ---------------------------------------------------------------------
+/* ------------------------------------------------------------------------
  *
- * Copyright (C) 2000 - 2023 by the deal.II authors
+ * SPDX-License-Identifier: LGPL-2.1-or-later
+ * Copyright (C) 2000 - 2024 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
- * The deal.II library is free software; you can use it, redistribute
- * it, and/or modify it under the terms of the GNU Lesser General
- * Public License as published by the Free Software Foundation; either
- * version 2.1 of the License, or (at your option) any later version.
- * The full text of the license can be found in the file LICENSE.md at
- * the top level directory of deal.II.
+ * Part of the source code is dual licensed under Apache-2.0 WITH
+ * LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+ * governing the source code and code contributions can be found in
+ * LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
  *
- * ---------------------------------------------------------------------
- *
- * Authors: Wolfgang Bangerth and Ralf Hartmann, University of Heidelberg, 2000
+ * ------------------------------------------------------------------------
  */
 
 
@@ -23,7 +20,6 @@
 // won't explain what is in them again.
 #include <deal.II/base/quadrature_lib.h>
 #include <deal.II/base/function.h>
-#include <deal.II/base/logstream.h>
 #include <deal.II/lac/vector.h>
 #include <deal.II/lac/full_matrix.h>
 #include <deal.II/lac/sparse_matrix.h>
@@ -48,8 +44,8 @@
 #include <deal.II/dofs/dof_renumbering.h>
 // Then we will show a little trick how we can make sure that objects are not
 // deleted while they are still in use. For this purpose, deal.II has the
-// SmartPointer helper class, which is declared in this file:
-#include <deal.II/base/smartpointer.h>
+// ObserverPointer helper class, which is declared in this file:
+#include <deal.II/base/observer_pointer.h>
 // Next, we will want to use the function VectorTools::integrate_difference()
 // mentioned in the introduction, and we are going to use a ConvergenceTable
 // that collects all important data during a run and prints it at the end as a
@@ -363,29 +359,31 @@ namespace Step7
     // still active references to an object and the object is still alive
     // from the point of view of a using object. Basically, the method is along
     // the following line: all objects that are subject to such potentially
-    // dangerous pointers are derived from a class called Subscriptor. For
-    // example, the Triangulation, DoFHandler, and a base class of the
-    // FiniteElement class are derived from Subscriptor. This latter class
-    // does not offer much functionality, but it has a built-in counter which
-    // we can subscribe to, thus the name of the class. Whenever we initialize
-    // a pointer to that object, we can increase its use counter, and when we
-    // move away our pointer or do not need it any more, we decrease the
-    // counter again. This way, we can always check how many objects still use
-    // that object. Additionally, the class requires to know about a pointer
-    // that it can use to tell the subscribing object about its invalidation.
+    // dangerous pointers are derived from a class called
+    // EnableObserverPointer. For example, the Triangulation,
+    // DoFHandler, and a base class of the FiniteElement class are derived from
+    // EnableObserverPointer. This latter class does not offer much
+    // functionality, but it has a built-in counter which we can subscribe to,
+    // thus the name of the class. Whenever we initialize a pointer to that
+    // object, we can increase its use counter, and when we move away our
+    // pointer or do not need it any more, we decrease the counter again. This
+    // way, we can always check how many objects still use that object.
+    // Additionally, the class requires to know about a pointer that it can use
+    // to tell the subscribing object about its invalidation.
     //
-    // If an object of a class that is derived from the Subscriptor class is
-    // destroyed, it also has to call the destructor of the Subscriptor class.
-    // In this destructor, we tell all the subscribing objects about the
+    // If an object of a class that is derived from the
+    // EnableObserverPointer class is destroyed, it also has to
+    // call the destructor of the EnableObserverPointer class. In
+    // this destructor, we tell all the subscribing objects about the
     // invalidation of the object using the stored pointers. The same happens
     // when the object appears on the right hand side of a move expression,
     // i.e., it will no longer contain valid content after the operation. The
     // subscribing class is expected to check the value stored in its
     // corresponding pointer before trying to access the object subscribed to.
     //
-    // This is exactly what the SmartPointer class is doing. It basically acts
-    // just like a pointer, i.e. it can be dereferenced, can be assigned to and
-    // from other pointers, and so on. On top of that it uses the mechanism
+    // This is exactly what the ObserverPointer class is doing. It basically
+    // acts just like a pointer, i.e. it can be dereferenced, can be assigned to
+    // and from other pointers, and so on. On top of that it uses the mechanism
     // described above to find out if the pointer this class is representing is
     // dangling when we try to dereference it. In that case an exception is
     // thrown.
@@ -393,9 +391,9 @@ namespace Step7
     // In the present example program, we want to protect the finite element
     // object from the situation that for some reason the finite element
     // pointed to is destroyed while still in use. We therefore use a
-    // SmartPointer to the finite element object; since the finite element
+    // ObserverPointer to the finite element object; since the finite element
     // object is actually never changed in our computations, we pass a const
-    // FiniteElement&lt;dim&gt; as template argument to the SmartPointer
+    // FiniteElement&lt;dim&gt; as template argument to the ObserverPointer
     // class. Note that the pointer so declared is assigned at construction
     // time of the solve object, and destroyed upon destruction, so the lock
     // on the destruction of the finite element object extends throughout the
@@ -403,7 +401,7 @@ namespace Step7
     Triangulation<dim> triangulation;
     DoFHandler<dim>    dof_handler;
 
-    SmartPointer<const FiniteElement<dim>> fe;
+    ObserverPointer<const FiniteElement<dim>> fe;
 
     AffineConstraints<double> hanging_node_constraints;
 
@@ -514,8 +512,8 @@ namespace Step7
   template <int dim>
   void HelmholtzProblem<dim>::assemble_system()
   {
-    QGauss<dim>     quadrature_formula(fe->degree + 1);
-    QGauss<dim - 1> face_quadrature_formula(fe->degree + 1);
+    const QGauss<dim>     quadrature_formula(fe->degree + 1);
+    const QGauss<dim - 1> face_quadrature_formula(fe->degree + 1);
 
     const unsigned int n_q_points      = quadrature_formula.size();
     const unsigned int n_face_q_points = face_quadrature_formula.size();
@@ -584,10 +582,10 @@ namespace Step7
     // previous examples, so we only comment on the things that have changed.
     for (const auto &cell : dof_handler.active_cell_iterators())
       {
+        fe_values.reinit(cell);
+
         cell_matrix = 0.;
         cell_rhs    = 0.;
-
-        fe_values.reinit(cell);
 
         right_hand_side.value_list(fe_values.get_quadrature_points(),
                                    rhs_values);
@@ -596,17 +594,21 @@ namespace Step7
           for (unsigned int i = 0; i < dofs_per_cell; ++i)
             {
               for (unsigned int j = 0; j < dofs_per_cell; ++j)
-                // The first thing that has changed is the bilinear form. It
-                // now contains the additional term from the Helmholtz
-                // equation:
-                cell_matrix(i, j) +=
-                  ((fe_values.shape_grad(i, q_point) *     // grad phi_i(x_q)
-                      fe_values.shape_grad(j, q_point)     // grad phi_j(x_q)
-                    +                                      //
-                    fe_values.shape_value(i, q_point) *    // phi_i(x_q)
-                      fe_values.shape_value(j, q_point)) * // phi_j(x_q)
-                   fe_values.JxW(q_point));                // dx
-
+                {
+                  // The first thing that has changed is the bilinear form. It
+                  // now contains the additional term from the Helmholtz
+                  // equation, including the coefficient $\alpha=1$:
+                  const double alpha = 1;
+                  cell_matrix(i, j) +=
+                    (fe_values.shape_grad(i, q_point)      // [grad phi_i(x_q)
+                       * fe_values.shape_grad(j, q_point)  //  * grad phi_j(x_q)
+                     +                                     //
+                     alpha                                 //  alpha
+                       * fe_values.shape_value(i, q_point) //  * phi_i(x_q)
+                       * fe_values.shape_value(j, q_point) //  * phi_j(x_q)]
+                     ) *
+                    fe_values.JxW(q_point); // * dx
+                }
 
               cell_rhs(i) += (fe_values.shape_value(i, q_point) * // phi_i(x_q)
                               rhs_values[q_point] *               // f(x_q)
@@ -689,7 +691,7 @@ namespace Step7
 
     std::map<types::global_dof_index, double> boundary_values;
     VectorTools::interpolate_boundary_values(dof_handler,
-                                             0,
+                                             types::boundary_id(0),
                                              Solution<dim>(),
                                              boundary_values);
     MatrixTools::apply_boundary_values(boundary_values,
@@ -705,7 +707,7 @@ namespace Step7
   template <int dim>
   void HelmholtzProblem<dim>::solve()
   {
-    SolverControl            solver_control(1000, 1e-12);
+    SolverControl            solver_control(1000, 1e-6 * system_rhs.l2_norm());
     SolverCG<Vector<double>> cg(solver_control);
 
     PreconditionSSOR<SparseMatrix<double>> preconditioner;
@@ -732,23 +734,26 @@ namespace Step7
   // matrix), we omit this detail even though doing this in a strictly correct
   // way would not be hard to add.
   //
-  // At the end of the switch, we have a default case that looks slightly
-  // strange: an <code>Assert</code> statement with a <code>false</code>
-  // condition. Since the <code>Assert</code> macro raises an error whenever
-  // the condition is false, this means that whenever we hit this statement
-  // the program will be aborted. This in intentional: Right now we have only
+  // At the end of the switch, we have a default case that simply says
+  // `DEAL_II_ASSERT_UNREACHABLE()`. This macro raises an error whenever
+  // the program reaches this point; the program is then aborted.
+  // This is intentional: Right now we have only
   // implemented two refinement strategies (global and adaptive), but someone
   // might want to add a third strategy (for example adaptivity with a
   // different refinement criterion) and add a third member to the enumeration
   // that determines the refinement mode. If it weren't for the default case
   // of the switch statement, this function would simply run to its end
   // without doing anything. This is most likely not what was intended. One of
-  // the defensive programming techniques that you will find all over the
-  // deal.II library is therefore to always have default cases that abort, to
-  // make sure that values not considered when listing the cases in the switch
-  // statement are eventually caught, and forcing programmers to add code to
-  // handle them. We will use this same technique in other places further down
-  // as well.
+  // the [defensive programming
+  // techniques](https://en.wikipedia.org/wiki/Defensive_programming) that you
+  // will find all over the deal.II library is therefore to always have default
+  // cases that abort, to make sure that values not considered when listing the
+  // cases in the switch statement are eventually caught, and forcing
+  // programmers to add code to handle them. The documentation of
+  // DEAL_II_ASSERT_UNREACHABLE() shows other examples of how this macro can be
+  // used.
+  //
+  // We will use this same technique in other places further down as well.
   template <int dim>
   void HelmholtzProblem<dim>::refine_grid()
   {
@@ -782,7 +787,7 @@ namespace Step7
 
         default:
           {
-            Assert(false, ExcNotImplemented());
+            DEAL_II_ASSERT_UNREACHABLE();
           }
       }
   }
@@ -926,19 +931,20 @@ namespace Step7
   // is as in previous examples, with the only difference that we want to have
   // part of the boundary marked as Neumann type, rather than Dirichlet.
   //
-  // For this, we will use the following convention: Faces belonging to Gamma1
-  // will have the boundary indicator <code>0</code> (which is the default, so
-  // we don't have to set it explicitly), and faces belonging to Gamma2 will
-  // use <code>1</code> as boundary indicator.  To set these values, we loop
-  // over all cells, then over all faces of a given cell, check whether it is
-  // part of the boundary that we want to denote by Gamma2, and if so set its
-  // boundary indicator to <code>1</code>. For the present program, we
-  // consider the left and bottom boundaries as Gamma2. We determine whether a
-  // face is part of that boundary by asking whether the x or y coordinates
-  // (i.e. vector components 0 and 1) of the midpoint of a face equals -1, up
-  // to some small wiggle room that we have to give since it is instable to
-  // compare floating point numbers that are subject to round off in
-  // intermediate computations.
+  // For this, we will use the following convention: Faces belonging to
+  // $\Gamma_1$ will have the boundary indicator <code>0</code> (which is the
+  // default, so we don't have to set it explicitly), and faces belonging to
+  // $\Gamma_2$ will use <code>1</code> as boundary indicator.  To set these
+  // values, we loop over all cells, then over all faces of a given cell, check
+  // whether it is at the boundary, and if so whether it is geometrically part
+  // of the boundary that we want to denote by $\Gamma_2$. If all of these
+  // conditions are true, we set its boundary indicator to <code>1</code>. For
+  // the present program, we consider the left and bottom boundaries as
+  // $\Gamma_2$. We determine whether a face is part of that boundary by asking
+  // whether the $x$ or $y$ coordinates (i.e. vector components 0 and 1) of the
+  // midpoint of a face equals $-1$, up to some small wiggle room that we have
+  // to give since it is unstable to compare floating point numbers for equality
+  // that are subject to round off in intermediate computations.
   //
   // It is worth noting that we have to loop over all cells here, not only the
   // active ones. The reason is that upon refinement, newly created faces
@@ -965,12 +971,13 @@ namespace Step7
 
             for (const auto &cell : triangulation.cell_iterators())
               for (const auto &face : cell->face_iterators())
-                {
-                  const auto center = face->center();
-                  if ((std::fabs(center(0) - (-1.0)) < 1e-12) ||
-                      (std::fabs(center(1) - (-1.0)) < 1e-12))
-                    face->set_boundary_id(1);
-                }
+                if (face->at_boundary())
+                  {
+                    const auto center = face->center();
+                    if ((std::fabs(center[0] - (-1.0)) < 1e-12) ||
+                        (std::fabs(center[1] - (-1.0)) < 1e-12))
+                      face->set_boundary_id(1);
+                  }
           }
         else
           refine_grid();
@@ -1013,32 +1020,15 @@ namespace Step7
           vtk_filename = "solution-adaptive";
           break;
         default:
-          Assert(false, ExcNotImplemented());
+          DEAL_II_ASSERT_UNREACHABLE();
       }
 
     // We augment the filename by a postfix denoting the finite element which
     // we have used in the computation. To this end, the finite element base
     // class stores the maximal polynomial degree of shape functions in each
-    // coordinate variable as a variable <code>degree</code>, and we use for
-    // the switch statement (note that the polynomial degree of bilinear shape
-    // functions is really 2, since they contain the term <code>x*y</code>;
-    // however, the polynomial degree in each coordinate variable is still
-    // only 1). We again use the same defensive programming technique to
-    // safeguard against the case that the polynomial degree has an unexpected
-    // value, using the <code>Assert (false, ExcNotImplemented())</code> idiom
-    // in the default branch of the switch statement:
-    switch (fe->degree)
-      {
-        case 1:
-          vtk_filename += "-q1";
-          break;
-        case 2:
-          vtk_filename += "-q2";
-          break;
-
-        default:
-          Assert(false, ExcNotImplemented());
-      }
+    // coordinate variable as a variable <code>degree</code>, which we append
+    // as "-q1", "-q2", etc., to the filename.
+    vtk_filename += "-q" + std::to_string(fe->degree);
 
     // Once we have the base name for the output file, we add an extension
     // appropriate for VTK output, open a file, and add the solution vector to
@@ -1131,10 +1121,10 @@ namespace Step7
     convergence_table.write_text(std::cout);
 
     // The table can also be written into a LaTeX file.  The (nicely)
-    // formatted table can be viewed at after calling `latex filename' and
-    // e.g. `xdvi filename', where filename is the name of the file to which
-    // we will write output now. We construct the file name in the same way as
-    // before, but with a different prefix "error":
+    // formatted table can be viewed after calling `latex filename.tex` and
+    // whatever output viewer you prefer, where filename is the name of the file
+    // to which we will write output. We construct the file name in the same way
+    // as before, but with a different prefix "error":
     std::string error_filename = "error";
     switch (refinement_mode)
       {
@@ -1145,21 +1135,10 @@ namespace Step7
           error_filename += "-adaptive";
           break;
         default:
-          Assert(false, ExcNotImplemented());
+          DEAL_II_ASSERT_UNREACHABLE();
       }
 
-    switch (fe->degree)
-      {
-        case 1:
-          error_filename += "-q1";
-          break;
-        case 2:
-          error_filename += "-q2";
-          break;
-        default:
-          Assert(false, ExcNotImplemented());
-      }
-
+    error_filename += "-q" + std::to_string(fe->degree);
     error_filename += ".tex";
     std::ofstream error_table_file(error_filename);
 
@@ -1231,19 +1210,9 @@ namespace Step7
               conv_filename += "-adaptive";
               break;
             default:
-              Assert(false, ExcNotImplemented());
+              DEAL_II_ASSERT_UNREACHABLE();
           }
-        switch (fe->degree)
-          {
-            case 1:
-              conv_filename += "-q1";
-              break;
-            case 2:
-              conv_filename += "-q2";
-              break;
-            default:
-              Assert(false, ExcNotImplemented());
-          }
+        conv_filename += "-q" + std::to_string(fe->degree);
         conv_filename += ".tex";
 
         std::ofstream table_file(conv_filename);
@@ -1290,7 +1259,7 @@ int main()
                   << std::endl
                   << std::endl;
 
-        FE_Q<dim>             fe(1);
+        const FE_Q<dim>       fe(1);
         HelmholtzProblem<dim> helmholtz_problem_2d(
           fe, HelmholtzProblem<dim>::adaptive_refinement);
 
@@ -1304,7 +1273,7 @@ int main()
                   << "===========================================" << std::endl
                   << std::endl;
 
-        FE_Q<dim>             fe(1);
+        const FE_Q<dim>       fe(1);
         HelmholtzProblem<dim> helmholtz_problem_2d(
           fe, HelmholtzProblem<dim>::global_refinement);
 
@@ -1318,7 +1287,7 @@ int main()
                   << "===========================================" << std::endl
                   << std::endl;
 
-        FE_Q<dim>             fe(2);
+        const FE_Q<dim>       fe(2);
         HelmholtzProblem<dim> helmholtz_problem_2d(
           fe, HelmholtzProblem<dim>::global_refinement);
 
@@ -1332,7 +1301,7 @@ int main()
                   << "===========================================" << std::endl
                   << std::endl;
 
-        FE_Q<dim>             fe(2);
+        const FE_Q<dim>       fe(2);
         HelmholtzProblem<dim> helmholtz_problem_2d(
           fe, HelmholtzProblem<dim>::adaptive_refinement);
 

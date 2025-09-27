@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2000 - 2022 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2000 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 #ifndef dealii_solver_minres_h
 #define dealii_solver_minres_h
@@ -19,9 +18,10 @@
 
 #include <deal.II/base/config.h>
 
+#include <deal.II/base/enable_observer_pointer.h>
 #include <deal.II/base/logstream.h>
 #include <deal.II/base/signaling_nan.h>
-#include <deal.II/base/subscriptor.h>
+#include <deal.II/base/template_constraints.h>
 
 #include <deal.II/lac/solver.h>
 #include <deal.II/lac/solver_control.h>
@@ -67,6 +67,7 @@ DEAL_II_NAMESPACE_OPEN
  * to observe the progress of the iteration.
  */
 template <typename VectorType = Vector<double>>
+DEAL_II_CXX20_REQUIRES(concepts::is_vector_space_vector<VectorType>)
 class SolverMinRes : public SolverBase<VectorType>
 {
 public:
@@ -100,11 +101,13 @@ public:
    * Solve the linear system $Ax=b$ for x.
    */
   template <typename MatrixType, typename PreconditionerType>
-  void
-  solve(const MatrixType         &A,
-        VectorType               &x,
-        const VectorType         &b,
-        const PreconditionerType &preconditioner);
+  DEAL_II_CXX20_REQUIRES(
+    (concepts::is_linear_operator_on<MatrixType, VectorType> &&
+     concepts::is_linear_operator_on<PreconditionerType, VectorType>))
+  void solve(const MatrixType         &A,
+             VectorType               &x,
+             const VectorType         &b,
+             const PreconditionerType &preconditioner);
 
   /**
    * @addtogroup Exceptions
@@ -114,7 +117,12 @@ public:
   /**
    * Exception
    */
-  DeclException0(ExcPreconditionerNotDefinite);
+  DeclExceptionMsg(ExcPreconditionerNotDefinite,
+                   "The preconditioner for MinRes must be a symmetric and "
+                   "definite operator, even though MinRes can solve linear "
+                   "systems with symmetric and *indefinite* operators. "
+                   "During iterations, MinRes has detected that the "
+                   "preconditioner is apparently not definite.");
   /** @} */
 
 protected:
@@ -150,6 +158,7 @@ protected:
 #ifndef DOXYGEN
 
 template <typename VectorType>
+DEAL_II_CXX20_REQUIRES(concepts::is_vector_space_vector<VectorType>)
 SolverMinRes<VectorType>::SolverMinRes(SolverControl            &cn,
                                        VectorMemory<VectorType> &mem,
                                        const AdditionalData &)
@@ -160,6 +169,7 @@ SolverMinRes<VectorType>::SolverMinRes(SolverControl            &cn,
 
 
 template <typename VectorType>
+DEAL_II_CXX20_REQUIRES(concepts::is_vector_space_vector<VectorType>)
 SolverMinRes<VectorType>::SolverMinRes(SolverControl &cn,
                                        const AdditionalData &)
   : SolverBase<VectorType>(cn)
@@ -169,30 +179,33 @@ SolverMinRes<VectorType>::SolverMinRes(SolverControl &cn,
 
 
 template <typename VectorType>
-double
-SolverMinRes<VectorType>::criterion()
+DEAL_II_CXX20_REQUIRES(concepts::is_vector_space_vector<VectorType>)
+double SolverMinRes<VectorType>::criterion()
 {
   return res2;
 }
 
 
 template <typename VectorType>
-void
-SolverMinRes<VectorType>::print_vectors(const unsigned int,
-                                        const VectorType &,
-                                        const VectorType &,
-                                        const VectorType &) const
+DEAL_II_CXX20_REQUIRES(concepts::is_vector_space_vector<VectorType>)
+void SolverMinRes<VectorType>::print_vectors(const unsigned int,
+                                             const VectorType &,
+                                             const VectorType &,
+                                             const VectorType &) const
 {}
 
 
 
 template <typename VectorType>
+DEAL_II_CXX20_REQUIRES(concepts::is_vector_space_vector<VectorType>)
 template <typename MatrixType, typename PreconditionerType>
-void
-SolverMinRes<VectorType>::solve(const MatrixType         &A,
-                                VectorType               &x,
-                                const VectorType         &b,
-                                const PreconditionerType &preconditioner)
+DEAL_II_CXX20_REQUIRES(
+  (concepts::is_linear_operator_on<MatrixType, VectorType> &&
+   concepts::is_linear_operator_on<PreconditionerType, VectorType>))
+void SolverMinRes<VectorType>::solve(const MatrixType         &A,
+                                     VectorType               &x,
+                                     const VectorType         &b,
+                                     const PreconditionerType &preconditioner)
 {
   LogStream::Prefix prefix("minres");
 

@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2000 - 2023 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2013 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 #ifndef dealii_fe_tools_extrapolate_templates_H
 #define dealii_fe_tools_extrapolate_templates_H
@@ -20,6 +19,7 @@
 #include <deal.II/base/config.h>
 
 #include <deal.II/base/mpi_consensus_algorithms.h>
+#include <deal.II/base/types.h>
 
 #include <deal.II/distributed/p4est_wrappers.h>
 #include <deal.II/distributed/tria.h>
@@ -34,11 +34,14 @@
 
 #include <deal.II/lac/affine_constraints.h>
 #include <deal.II/lac/block_vector.h>
+#include <deal.II/lac/block_vector_base.h>
 #include <deal.II/lac/la_parallel_block_vector.h>
 #include <deal.II/lac/la_parallel_vector.h>
 #include <deal.II/lac/petsc_block_vector.h>
 #include <deal.II/lac/petsc_vector.h>
 #include <deal.II/lac/trilinos_parallel_block_vector.h>
+#include <deal.II/lac/trilinos_tpetra_block_vector.h>
+#include <deal.II/lac/trilinos_tpetra_vector.h>
 #include <deal.II/lac/trilinos_vector.h>
 
 #include <queue>
@@ -57,7 +60,7 @@ namespace FETools
     public:
       ExtrapolateImplementation()
       {
-        Assert(false, ExcNotImplemented());
+        DEAL_II_NOT_IMPLEMENTED();
       };
 
       template <class InVector>
@@ -66,7 +69,7 @@ namespace FETools
                            const DoFHandler<dim, spacedim> & /*dof2*/,
                            OutVector & /*u2*/)
       {
-        Assert(false, ExcNotImplemented())
+        DEAL_II_NOT_IMPLEMENTED();
       }
     };
 
@@ -357,9 +360,14 @@ namespace FETools
       // computed or received data
       std::vector<CellData> available_cells;
 
-      // stores the indices of dofs on more refined ghosted cells along
+      // When OutVector is a distributed vector from LinearAlgebra::distributed,
+      // stores the dofs indices of refined locally owned (resp., ghost) cells
+      // that have a coarser neighboring ghost (resp., locally owned) cell,
+      // along with the max cell level associated with each of these dofs. Else,
+      // simply stores the indices of dofs on more refined ghosted cells along
       // with the maximum level
-      std::map<types::global_dof_index, int> dofs_on_refined_neighbors;
+      std::map<types::global_dof_index, int> dofs_at_refined_ghost_interface;
+
 
       // counts the send/receive round we are in
       unsigned int round;
@@ -373,7 +381,7 @@ namespace FETools
     public:
       ExtrapolateImplementation()
       {
-        AssertThrow(false, ExcNotImplemented())
+        AssertThrow(false, ExcNotImplemented());
       }
 
       template <class InVector>
@@ -390,7 +398,7 @@ namespace FETools
     public:
       ExtrapolateImplementation()
       {
-        AssertThrow(false, ExcNotImplemented())
+        AssertThrow(false, ExcNotImplemented());
       }
 
       template <class InVector>
@@ -407,7 +415,7 @@ namespace FETools
     public:
       ExtrapolateImplementation()
       {
-        AssertThrow(false, ExcNotImplemented())
+        AssertThrow(false, ExcNotImplemented());
       }
 
       template <class InVector>
@@ -677,7 +685,7 @@ namespace FETools
 
               if (found_child)
                 {
-                  // interpolate these to the mother cell
+                  // interpolate these to the parent cell
                   fe.get_restriction_matrix(c, dealii_cell->refinement_case())
                     .vmult(tmp2, tmp1);
 
@@ -698,7 +706,17 @@ namespace FETools
         }
     }
 
+    template <typename T>
+    inline constexpr bool is_la_vector = false;
 
+    template <typename Number, typename MemorySpace>
+    inline constexpr bool
+      is_la_vector<LinearAlgebra::distributed::Vector<Number, MemorySpace>> =
+        true;
+
+    template <typename Number, typename MemorySpace>
+    inline constexpr bool is_la_vector<
+      LinearAlgebra::distributed::BlockVector<Number, MemorySpace>> = true;
 
     template <int dim, int spacedim, class OutVector>
     void
@@ -722,13 +740,18 @@ namespace FETools
               dealii_cell->get_dof_indices(indices);
               for (unsigned int j = 0; j < dofs_per_cell; ++j)
                 {
-                  // don't set this dof if there is a more refined ghosted
-                  // neighbor setting this dof.
+                  // In serial runs, the DoFs values from refined patches always
+                  // overwrite the values that may be set by parent patches if
+                  // the triangulation is adaptively refined. For this to also
+                  // happen in a distributed simulation, only set the dof value
+                  // if there are no more refined ghosted neighbor setting this
+                  // dof. A final compression operation at the end will
+                  // synchronize the correct refined values on all processors.
                   const bool on_refined_neighbor =
-                    (dofs_on_refined_neighbors.find(indices[j]) !=
-                     dofs_on_refined_neighbors.end());
+                    (dofs_at_refined_ghost_interface.find(indices[j]) !=
+                     dofs_at_refined_ghost_interface.end());
                   if (!(on_refined_neighbor &&
-                        dofs_on_refined_neighbors[indices[j]] >
+                        dofs_at_refined_ghost_interface[indices[j]] >
                           dealii_cell->level()))
                     ::dealii::internal::ElementAccess<OutVector>::set(
                       local_values(j), indices[j], u);
@@ -1336,11 +1359,18 @@ namespace FETools
         ExcMessage(
           "Extrapolate in parallel only works for parallel distributed triangulations!"));
 
-      communicator = tr->get_communicator();
+      communicator = tr->get_mpi_communicator();
 
       compute_all_non_local_data(dof2, u2_relevant);
 
-      // exclude dofs on more refined ghosted cells
+      // List all DoFs that, on this mpi rank, live at the intersection between
+      // a non-artificial cell and a more refined ghost cell (the dofs being
+      // enumerated from the more refined side). For each of these DoFs, also
+      // store the most refined level among the neighboring cells. This set of
+      // DoFs naturally includes the set of DoFs shared between a refined ghost
+      // cell and a coarser locally owned cell and can be constructed without a
+      // recursion to find cells with common vertices (which are not necessarily
+      // direct neighbors in 2D and 3D).
       const FiniteElement<dim, spacedim> &fe = dof2.get_fe();
       if (fe.max_dofs_per_face() > 0)
         {
@@ -1349,14 +1379,15 @@ namespace FETools
 
           for (const auto &cell : dof2.active_cell_iterators())
             if (cell->is_ghost())
-              {
-                cell->get_dof_indices(indices);
-                for (const unsigned int face : cell->face_indices())
-                  if (!cell->at_boundary(face))
-                    {
-                      const typename DoFHandler<dim, spacedim>::cell_iterator
-                        neighbor = cell->neighbor(face);
-                      if (neighbor->level() != cell->level())
+              for (const unsigned int face : cell->face_indices())
+                if (!cell->at_boundary(face))
+                  {
+                    const typename DoFHandler<dim, spacedim>::cell_iterator
+                      neighbor = cell->neighbor(face);
+                    if (neighbor->is_active() && !neighbor->is_artificial() &&
+                        neighbor->level() < cell->level())
+                      {
+                        cell->get_dof_indices(indices);
                         for (unsigned int i = 0; i < fe.n_dofs_per_face(face);
                              ++i)
                           {
@@ -1364,24 +1395,50 @@ namespace FETools
                               indices[fe.face_to_cell_index(i, face)];
 
                             const bool index_stored =
-                              (dofs_on_refined_neighbors.find(index) !=
-                               dofs_on_refined_neighbors.end());
+                              (dofs_at_refined_ghost_interface.find(index) !=
+                               dofs_at_refined_ghost_interface.end());
                             const unsigned int level =
                               index_stored ?
-                                std::max(cell->level(),
-                                         dofs_on_refined_neighbors[index]) :
+                                std::max(
+                                  cell->level(),
+                                  dofs_at_refined_ghost_interface[index]) :
                                 cell->level();
-                            dofs_on_refined_neighbors[index] = level;
+                            dofs_at_refined_ghost_interface[index] = level;
                           }
-                    }
-              }
+                      }
+                  }
         }
 
       // after all dof values on
       // not owned patch cells
       // are computed, start
       // the interpolation
-      u2 = typename OutVector::value_type(0.);
+
+      // Set the output vector to the neutral element of the final compress
+      // operation
+      if constexpr (is_la_vector<OutVector>)
+        {
+          if constexpr (IsBlockVector<OutVector>::value)
+            for (unsigned int b = 0; b < u2.n_blocks(); ++b)
+              {
+                auto &block = u2.block(b);
+                for (unsigned int i = 0;
+                     i < block.locally_owned_size() +
+                           block.get_partitioner()->n_ghost_indices();
+                     i++)
+                  block.local_element(i) = std::numeric_limits<
+                    typename OutVector::value_type>::lowest();
+              }
+          else
+            for (unsigned int i = 0;
+                 i < u2.locally_owned_size() +
+                       u2.get_partitioner()->n_ghost_indices();
+                 i++)
+              u2.local_element(i) =
+                std::numeric_limits<typename OutVector::value_type>::lowest();
+        }
+      else
+        u2 = typename OutVector::value_type(0.);
 
       std::queue<WorkPackage> queue;
       {
@@ -1452,8 +1509,16 @@ namespace FETools
           queue.pop();
         }
 
-
-      u2.compress(VectorOperation::insert);
+      // Correctly synchronize values at ghost interface for all processors. For
+      // Petsc/Trilinos, a simple compress(insert) operation allows to insert
+      // values set by other processors into locally owned DoF, but the deal.II
+      // implementation of the LinearAlgebra::distributed vectors and associated
+      // compress(insert) operation does not do this. Instead, we use a
+      // compress(max) that mimic this behavior.
+      if constexpr (is_la_vector<OutVector>)
+        u2.compress(VectorOperation::max);
+      else
+        u2.compress(VectorOperation::insert);
     }
 #endif // DEAL_II_WITH_P4EST
 
@@ -1493,7 +1558,7 @@ namespace FETools
       Assert(parallel_tria != nullptr, ExcNotImplemented());
 
       const IndexSet &locally_owned_dofs = dh.locally_owned_dofs();
-      vector.reinit(locally_owned_dofs, parallel_tria->get_communicator());
+      vector.reinit(locally_owned_dofs, parallel_tria->get_mpi_communicator());
     }
 #endif // DEAL_II_WITH_PETSC
 
@@ -1510,17 +1575,18 @@ namespace FETools
       Assert(parallel_tria != nullptr, ExcNotImplemented());
 
       const IndexSet &locally_owned_dofs = dh.locally_owned_dofs();
-      vector.reinit(locally_owned_dofs, parallel_tria->get_communicator());
+      vector.reinit(locally_owned_dofs, parallel_tria->get_mpi_communicator());
     }
 
 
 
 #  ifdef DEAL_II_WITH_MPI
 #    ifdef DEAL_II_TRILINOS_WITH_TPETRA
-    template <int dim, int spacedim, typename Number>
+    template <int dim, int spacedim, typename Number, typename MemorySpace>
     void
-    reinit_distributed(const DoFHandler<dim, spacedim>               &dh,
-                       LinearAlgebra::TpetraWrappers::Vector<Number> &vector)
+    reinit_distributed(
+      const DoFHandler<dim, spacedim>                            &dh,
+      LinearAlgebra::TpetraWrappers::Vector<Number, MemorySpace> &vector)
     {
       const parallel::distributed::Triangulation<dim, spacedim> *parallel_tria =
         dynamic_cast<
@@ -1529,7 +1595,7 @@ namespace FETools
       Assert(parallel_tria != nullptr, ExcNotImplemented());
 
       const IndexSet &locally_owned_dofs = dh.locally_owned_dofs();
-      vector.reinit(locally_owned_dofs, parallel_tria->get_communicator());
+      vector.reinit(locally_owned_dofs, parallel_tria->get_mpi_communicator());
     }
 #    endif
 
@@ -1545,7 +1611,7 @@ namespace FETools
       Assert(parallel_tria != nullptr, ExcNotImplemented());
 
       const IndexSet &locally_owned_dofs = dh.locally_owned_dofs();
-      vector.reinit(locally_owned_dofs, parallel_tria->get_communicator());
+      vector.reinit(locally_owned_dofs, parallel_tria->get_mpi_communicator());
     }
 #  endif
 #endif // DEAL_II_WITH_TRILINOS
@@ -1562,7 +1628,7 @@ namespace FETools
       Assert(parallel_tria != nullptr, ExcNotImplemented());
 
       const IndexSet &locally_owned_dofs = dh.locally_owned_dofs();
-      vector.reinit(locally_owned_dofs, parallel_tria->get_communicator());
+      vector.reinit(locally_owned_dofs, parallel_tria->get_mpi_communicator());
     }
 
 
@@ -1571,7 +1637,7 @@ namespace FETools
     void
     reinit_ghosted(const DH & /*dh*/, VectorType & /*vector*/)
     {
-      Assert(false, ExcNotImplemented());
+      DEAL_II_NOT_IMPLEMENTED();
     }
 
 #ifdef DEAL_II_WITH_PETSC
@@ -1590,7 +1656,7 @@ namespace FETools
         DoFTools::extract_locally_relevant_dofs(dh);
       vector.reinit(locally_owned_dofs,
                     locally_relevant_dofs,
-                    parallel_tria->get_communicator());
+                    parallel_tria->get_mpi_communicator());
     }
 #endif // DEAL_II_WITH_PETSC
 
@@ -1610,7 +1676,7 @@ namespace FETools
         DoFTools::extract_locally_relevant_dofs(dh);
       vector.reinit(locally_owned_dofs,
                     locally_relevant_dofs,
-                    parallel_tria->get_communicator());
+                    parallel_tria->get_mpi_communicator());
     }
 #endif // DEAL_II_WITH_TRILINOS
 
@@ -1629,7 +1695,7 @@ namespace FETools
         DoFTools::extract_locally_relevant_dofs(dh);
       vector.reinit(locally_owned_dofs,
                     locally_relevant_dofs,
-                    parallel_tria->get_communicator());
+                    parallel_tria->get_mpi_communicator());
     }
 
 

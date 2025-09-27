@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2022 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 1998 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 #ifndef dealii_solver_control_h
 #define dealii_solver_control_h
@@ -19,7 +18,8 @@
 
 #include <deal.II/base/config.h>
 
-#include <deal.II/base/subscriptor.h>
+#include <deal.II/base/enable_observer_pointer.h>
+#include <deal.II/base/exceptions.h>
 
 #include <vector>
 
@@ -64,7 +64,7 @@ class ParameterHandler;
  * number of iterations.
  * </ul>
  */
-class SolverControl : public Subscriptor
+class SolverControl : public EnableObserverPointer
 {
 public:
   /**
@@ -146,12 +146,12 @@ public:
    * checked and the number of the iteration step) shall be printed to @p
    * deallog stream.  Default is: do not print. Similarly, @p log_result
    * specifies the whether the final result is logged to @p deallog. Default
-   * is yes.
+   * is: do not print.
    */
   explicit SolverControl(const unsigned int n           = 100,
                          const double       tol         = 1.e-10,
                          const bool         log_history = false,
-                         const bool         log_result  = true);
+                         const bool         log_result  = false);
 
   /**
    * Virtual destructor is needed as there are virtual functions in this
@@ -433,7 +433,7 @@ public:
                             const double       tolerance   = 1.e-10,
                             const double       reduce      = 1.e-2,
                             const bool         log_history = false,
-                            const bool         log_result  = true);
+                            const bool         log_result  = false);
 
   /**
    * Initialize with a SolverControl object. The result will emulate
@@ -519,7 +519,7 @@ public:
   explicit IterationNumberControl(const unsigned int maxiter     = 100,
                                   const double       tolerance   = 1e-12,
                                   const bool         log_history = false,
-                                  const bool         log_result  = true);
+                                  const bool         log_result  = false);
 
   /**
    * Initialize with a SolverControl object. The result will emulate

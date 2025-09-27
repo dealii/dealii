@@ -2,7 +2,7 @@ This folder contains the html documentation of deal.II
 ======================================================
 
 The documentation is generally covered by the same license as the deal.II
-library itself, namely LGPL-2.1+.
+library itself; see LICENSE.md for details.
 
 Exceptions:
 

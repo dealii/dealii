@@ -5,7 +5,7 @@
   <meta http-equiv="Content-type" content="text/html;charset=UTF-8">
   <title>The deal.II Testsuite</title>
   <link href="../screen.css" rel="StyleSheet">
-  <meta name="copyright" content="Copyright (C) 1998 - 2023 by the deal.II Authors">
+  <meta name="copyright" content="Copyright (C) 1998 - 2024 by the deal.II Authors">
   <meta name="keywords" content="deal dealii finite elements fem triangulation">
   <meta http-equiv="content-language" content="en">
 </head>
@@ -479,6 +479,11 @@ category/test.with_umfpack=on.output, or
 category/test.with_zlib=off.output
 </pre>
       These tests will only be set up if the specified feature was configured.
+<p><b>Note:</b> For CMake variables indicating whether sub-packages of third party libraries
+      were detected, like <code>DEAL_II_TRILINOS_WITH_BELOS</code> or <code>DEAL_II_PETSC_WITH_HYPRE</code>
+      the correct syntax is adding an additional <code>with_</code>,
+      i.e. <code>with_trilinos_with_belos=on|off</code>.
+</p>
       It is possible to provide different output files for disabled/enabled
       features, e.g.,
 <pre>
@@ -645,20 +650,19 @@ category/test.run_only
       and modify it to where it does what we'd like to test. Alternatively,
       you can also start from a template like this:
 <pre>
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2015 - 2023 by the deal.II Authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2024 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 // a short (a few lines) description of what the program does
 

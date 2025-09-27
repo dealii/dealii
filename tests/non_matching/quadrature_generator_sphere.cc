@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2021 - 2021 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2021 - 2024 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 #include <deal.II/base/function_signed_distance.h>
 #include <deal.II/base/quadrature.h>
@@ -26,7 +25,6 @@
 
 #include "../tests.h"
 
-using namespace dealii;
 
 /**
  * Compute the volume and surface area of a ball/sphere by setting up a
@@ -56,7 +54,7 @@ calculate_volume_and_surface_area()
 
   // Go over all cells and compute the volume and surface area.
   double surface_area = 0, volume = 0;
-  for (const auto cell : triangulation.active_cell_iterators())
+  for (const auto &cell : triangulation.active_cell_iterators())
     {
       // Create a box corresponding to the cell.
       std::pair<Point<dim>, Point<dim>> lower_upper_corner;

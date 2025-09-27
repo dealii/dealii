@@ -1,30 +1,23 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2005 - 2023 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2005 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 #include <deal.II/base/config.h>
-
-// It's necessary to include winsock2.h before thread_local_storage.h,
-// because Intel implementation of TBB includes winsock.h,
-// and we'll get a conflict between winsock.h and winsock2.h otherwise.
-#ifdef DEAL_II_MSVC
-#  include <winsock2.h>
-#endif
 
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/mpi.h>
 #include <deal.II/base/point.h>
+#include <deal.II/base/signaling_nan.h>
 #include <deal.II/base/thread_local_storage.h>
 #include <deal.II/base/utilities.h>
 
@@ -35,12 +28,17 @@
 #include <boost/iostreams/copy.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/random.hpp>
+
+#include <algorithm>
 #undef BOOST_BIND_GLOBAL_PLACEHOLDERS
+
+#ifdef DEAL_II_WITH_ZLIB
+#  include <boost/iostreams/filter/gzip.hpp>
+#endif
 
 #include <algorithm>
 #include <bitset>
 #include <cctype>
-#include <cerrno>
 #include <cmath>
 #include <cstddef>
 #include <cstdio>
@@ -57,22 +55,18 @@
 #endif
 
 #ifndef DEAL_II_MSVC
+// On Unix-type systems, we use posix_memalign:
 #  include <cstdlib>
 #endif
 
-
-#ifdef DEAL_II_WITH_TRILINOS
-#  ifdef DEAL_II_WITH_MPI
-#    include <deal.II/lac/trilinos_parallel_block_vector.h>
-#    include <deal.II/lac/trilinos_vector.h>
-#    include <deal.II/lac/vector_memory.h>
-
-#    include <Epetra_MpiComm.h>
-#    include <Teuchos_DefaultComm.hpp>
-#  endif
-#  include <Epetra_SerialComm.h>
-#  include <Teuchos_RCP.hpp>
+// It's necessary to include winsock2.h before thread_local_storage.h,
+// because Intel implementation of TBB includes winsock.h,
+// and we'll get a conflict between winsock.h and winsock2.h otherwise.
+#ifdef DEAL_II_MSVC
+#  include <winsock2.h>
 #endif
+
+
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -176,10 +170,9 @@ namespace Utilities
 
     // make sure our conversion from fractional coordinates to
     // Integers work as expected, namely our cast (LongDouble)max_int
-    const int min_bits =
-      std::min(bits_per_dim,
-               std::min(std::numeric_limits<Integer>::digits,
-                        std::numeric_limits<LongDouble>::digits));
+    const int min_bits = std::min({bits_per_dim,
+                                   std::numeric_limits<Integer>::digits,
+                                   std::numeric_limits<LongDouble>::digits});
 
     // based on that get the maximum integer:
     const Integer max_int = (min_bits == std::numeric_limits<Integer>::digits ?
@@ -433,9 +426,9 @@ namespace Utilities
   std::string
   encode_base64(const std::vector<unsigned char> &binary_input)
   {
-    using namespace boost::archive::iterators;
-    using It = base64_from_binary<
-      transform_width<std::vector<unsigned char>::const_iterator, 6, 8>>;
+    using It = boost::archive::iterators::base64_from_binary<
+      boost::archive::iterators::
+        transform_width<std::vector<unsigned char>::const_iterator, 6, 8>>;
     auto base64 = std::string(It(binary_input.begin()), It(binary_input.end()));
     // Add padding.
     return base64.append((3 - binary_input.size() % 3) % 3, '=');
@@ -446,9 +439,11 @@ namespace Utilities
   std::vector<unsigned char>
   decode_base64(const std::string &base64_input)
   {
-    using namespace boost::archive::iterators;
-    using It =
-      transform_width<binary_from_base64<std::string::const_iterator>, 8, 6>;
+    using It = boost::archive::iterators::transform_width<
+      boost::archive::iterators::binary_from_base64<
+        std::string::const_iterator>,
+      8,
+      6>;
     auto binary = std::vector<unsigned char>(It(base64_input.begin()),
                                              It(base64_input.end()));
     // Remove padding.
@@ -612,27 +607,28 @@ namespace Utilities
     while ((s.size() > 0) && (s.back() == ' '))
       s.erase(s.end() - 1);
 
-    // Now convert and see whether we succeed. Note that strtol only
-    // touches errno if an error occurred, so if we want to check
-    // whether an error happened, we need to make sure that errno==0
-    // before calling strtol since otherwise it may be that the
-    // conversion succeeds and that errno remains at the value it
-    // was before, whatever that was.
-    char *p;
-    errno       = 0;
-    const int i = std::strtol(s.c_str(), &p, 10);
+    // Now convert and see whether we succeed:
+    std::size_t pos;
+    int         i = std::numeric_limits<int>::max();
+    try
+      {
+        i = std::stoi(s, &pos);
 
-    // We have an error if one of the following conditions is true:
-    // - strtol sets errno != 0
-    // - The original string was empty (we could have checked that
-    //   earlier already)
-    // - The string has non-zero length and strtol converted the
-    //   first part to something useful, but stopped converting short
-    //   of the terminating '\0' character. This happens, for example,
-    //   if the given string is "1234 abc".
-    AssertThrow(!((errno != 0) || (s.empty()) ||
-                  ((s.size() > 0) && (*p != '\0'))),
-                ExcMessage("Can't convert <" + s + "> to an integer."));
+        // If we got here, std::stod() has succeeded (rather than throwing an
+        // exception) but it is entirely possible that it only succeeded
+        // in reading a number from the first part of the string. In that
+        // case, it will have set 'pos' to a number of characters
+        // processed that is less than the length of the string. If that is
+        // the case, throw an (arbitrary) exception that gets us into the
+        // 'catch' clause below so that we can issue a proper exception:
+        if (pos < s.size())
+          throw 1;
+      }
+    catch (...)
+      {
+        AssertThrow(false,
+                    ExcMessage("Can't convert <" + s + "> to a double."));
+      }
 
     return i;
   }
@@ -660,27 +656,28 @@ namespace Utilities
     while ((s.size() > 0) && (s.back() == ' '))
       s.erase(s.end() - 1);
 
-    // Now convert and see whether we succeed. Note that strtol only
-    // touches errno if an error occurred, so if we want to check
-    // whether an error happened, we need to make sure that errno==0
-    // before calling strtol since otherwise it may be that the
-    // conversion succeeds and that errno remains at the value it
-    // was before, whatever that was.
-    char *p;
-    errno          = 0;
-    const double d = std::strtod(s.c_str(), &p);
+    // Now convert and see whether we succeed:
+    std::size_t pos;
+    double      d = numbers::signaling_nan<double>();
+    try
+      {
+        d = std::stod(s, &pos);
 
-    // We have an error if one of the following conditions is true:
-    // - strtod sets errno != 0
-    // - The original string was empty (we could have checked that
-    //   earlier already)
-    // - The string has non-zero length and strtod converted the
-    //   first part to something useful, but stopped converting short
-    //   of the terminating '\0' character. This happens, for example,
-    //   if the given string is "1.234 abc".
-    AssertThrow(!((errno != 0) || (s.empty()) ||
-                  ((s.size() > 0) && (*p != '\0'))),
-                ExcMessage("Can't convert <" + s + "> to a double."));
+        // If we got here, std::stod() has succeeded (rather than throwing an
+        // exception) but it is entirely possible that it only succeeded
+        // in reading a number from the first part of the string. In that
+        // case, it will have set 'pos' to a number of characters
+        // processed that is less than the length of the string. If that is
+        // the case, throw an (arbitrary) exception that gets us into the
+        // 'catch' clause below so that we can issue a proper exception:
+        if (pos < s.size())
+          throw 1;
+      }
+    catch (...)
+      {
+        AssertThrow(false,
+                    ExcMessage("Can't convert <" + s + "> to a double."));
+      }
 
     return d;
   }
@@ -876,7 +873,7 @@ namespace Utilities
           return std::make_pair(i, 7U);
         else
           {
-            Assert(false, ExcNotImplemented());
+            DEAL_II_NOT_IMPLEMENTED();
             return std::make_pair(-1, numbers::invalid_unsigned_int);
           }
       }
@@ -1013,8 +1010,8 @@ namespace Utilities
     std::string
     get_time()
     {
-      std::time_t time1 = std::time(nullptr);
-      std::tm    *time  = std::localtime(&time1);
+      std::time_t    time1 = std::time(nullptr);
+      const std::tm *time  = std::localtime(&time1);
 
       std::ostringstream o;
       o << time->tm_hour << ":" << (time->tm_min < 10 ? "0" : "")
@@ -1029,8 +1026,8 @@ namespace Utilities
     std::string
     get_date()
     {
-      std::time_t time1 = std::time(nullptr);
-      std::tm    *time  = std::localtime(&time1);
+      std::time_t    time1 = std::time(nullptr);
+      const std::tm *time  = std::localtime(&time1);
 
       std::ostringstream o;
       o << time->tm_year + 1900 << "/" << time->tm_mon + 1 << "/"
@@ -1044,18 +1041,29 @@ namespace Utilities
     void
     posix_memalign(void **memptr, std::size_t alignment, std::size_t size)
     {
+      // Strictly speaking, one can call both posix_memalign() and malloc()
+      // with size==0. This is documented as returning a pointer that can
+      // be given to free(), but for which using it is otherwise undefined.
+      // That just seems like a bad idea -- let's just return a nullptr to
+      // *ensure* that it can not be used. free() is documented as accepting
+      // a nullptr, in which it simply does nothing.
+      if (size > 0)
+        {
 #ifndef DEAL_II_MSVC
-      const int ierr = ::posix_memalign(memptr, alignment, size);
+          const int ierr = ::posix_memalign(memptr, alignment, size);
 
-      AssertThrow(ierr == 0, ExcOutOfMemory(size));
-      AssertThrow(*memptr != nullptr, ExcOutOfMemory(size));
+          AssertThrow(ierr == 0, ExcOutOfMemory(size));
+          AssertThrow(*memptr != nullptr, ExcOutOfMemory(size));
 #else
-      // Windows does not appear to have posix_memalign. just use the
-      // regular malloc in that case
-      *memptr = malloc(size);
-      (void)alignment;
-      AssertThrow(*memptr != 0, ExcOutOfMemory(size));
+          // Windows does not appear to have posix_memalign. just use the
+          // regular malloc in that case
+          *memptr = std::malloc(size);
+          (void)alignment;
+          AssertThrow(*memptr != nullptr, ExcOutOfMemory(size));
 #endif
+        }
+      else
+        *memptr = nullptr;
     }
 
 

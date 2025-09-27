@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2004 - 2023 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2004 - 2024 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 #ifndef dealii_petsc_vector_h
 #define dealii_petsc_vector_h
@@ -21,9 +20,9 @@
 
 #ifdef DEAL_II_WITH_PETSC
 
+#  include <deal.II/base/enable_observer_pointer.h>
 #  include <deal.II/base/index_set.h>
 #  include <deal.II/base/partitioner.h>
-#  include <deal.II/base/subscriptor.h>
 
 #  include <deal.II/lac/exceptions.h>
 #  include <deal.II/lac/petsc_vector_base.h>
@@ -177,11 +176,14 @@ namespace PETScWrappers
        * Constructor. Set dimension to @p n and initialize all elements with
        * zero.
        *
-       * @arg locally_owned_size denotes the size of the chunk that shall be
-       * stored on the present process.
-       *
-       * @arg communicator denotes the MPI communicator over which the
+       * @param[in] communicator The MPI communicator over which the
        * different parts of the vector shall communicate
+       *
+       * @param[in] n The total size of the vector to be created, i.e.,
+       *   the sum of all locally owned sizes over all processes.
+       *
+       * @param[in] locally_owned_size The size of the chunk that shall be
+       * stored on the present process.
        *
        * The constructor is made explicit to avoid accidents like this:
        * <tt>v=0;</tt>. Presumably, the user wants to set every element of the
@@ -197,11 +199,13 @@ namespace PETScWrappers
        * Copy-constructor from deal.II vectors. Sets the dimension to that of
        * the given vector, and copies all elements.
        *
-       * @arg locally_owned_size denotes the size of the chunk that shall be
-       * stored on the present process.
-       *
-       * @arg communicator denotes the MPI communicator over which the
+       * @param[in] communicator The MPI communicator over which the
        * different parts of the vector shall communicate
+       *
+       * @param[in] v The vector to be copied.
+       *
+       * @param[in] locally_owned_size The size of the chunk that shall be
+       * stored on the present process.
        */
       template <typename Number>
       explicit Vector(const MPI_Comm                communicator,
@@ -263,6 +267,30 @@ namespace PETScWrappers
       /**
        * Copy the given vector. Resize the present vector if necessary. Also
        * take over the MPI communicator of @p v.
+       *
+       * The semantics of this operator are complex. If the two vectors have
+       * the same size, and
+       * if either the left or right hand side vector of the assignment (i.e.,
+       * either the input vector on the right hand side, or the calling vector
+       * to the left of the assignment operator) currently has ghost elements,
+       * then the left hand side vector will also have ghost values and will
+       * consequently be a read-only vector (see also the
+       * @ref GlossGhostedVector "glossary entry" on the issue). Otherwise, the
+       * left hand vector will be a writable vector after this operation.
+       * These semantics facilitate having a vector with ghost elements on the
+       * left hand side of the assignment, and a vector without ghost elements
+       * on the right hand side, with the resulting left hand side vector
+       * having the correct values in both its locally owned and its ghost
+       * elements.
+       *
+       * On the other hand, if the left hand side vector does not have the
+       * correct size yet, or is perhaps an entirely uninitialized vector,
+       * then the assignment is simply a copy operation in the usual sense:
+       * In that case, if the right hand side has no ghost elements (i.e.,
+       * is a completely distributed vector), then the left hand side will
+       * have no ghost elements either. And if the right hand side has
+       * ghost elements (and is consequently read-only), then the left
+       * hand side will have these same properties after the operation.
        */
       Vector &
       operator=(const Vector &v);
@@ -380,7 +408,7 @@ namespace PETScWrappers
        * @copydoc PETScWrappers::VectorBase::all_zero()
        *
        * @note This function overloads the one in the base class to make this
-       * a collective operation.
+       * a @ref GlossCollectiveOperation "collective operation".
        */
       bool
       all_zero() const;
@@ -423,7 +451,7 @@ namespace PETScWrappers
      * @relatesalso PETScWrappers::MPI::Vector
      */
     inline void
-    swap(Vector &u, Vector &v)
+    swap(Vector &u, Vector &v) noexcept
     {
       u.swap(v);
     }
@@ -549,6 +577,14 @@ struct is_serial_vector<PETScWrappers::MPI::Vector> : std::false_type
 {};
 
 
+DEAL_II_NAMESPACE_CLOSE
+
+#else
+
+// Make sure the scripts that create the C++20 module input files have
+// something to latch on if the preprocessor #ifdef above would
+// otherwise lead to an empty content of the file.
+DEAL_II_NAMESPACE_OPEN
 DEAL_II_NAMESPACE_CLOSE
 
 #endif // DEAL_II_WITH_PETSC

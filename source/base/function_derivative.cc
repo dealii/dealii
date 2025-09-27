@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2000 - 2018 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2000 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 #include <deal.II/base/function_derivative.h>
 #include <deal.II/base/point.h>
@@ -19,6 +18,8 @@
 #include <deal.II/lac/vector.h>
 
 #include <cmath>
+#include <vector>
+
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -111,7 +112,7 @@ FunctionDerivative<dim>::value(const Point<dim>  &p,
                 f.value(p - 2 * incr[0], component)) /
                (12 * h);
       default:
-        Assert(false, ExcNotImplemented());
+        DEAL_II_NOT_IMPLEMENTED();
     }
   return 0.;
 }
@@ -154,7 +155,7 @@ FunctionDerivative<dim>::vector_value(const Point<dim> &p,
         result /= (12. * h);
         return;
       default:
-        Assert(false, ExcNotImplemented());
+        DEAL_II_NOT_IMPLEMENTED();
     }
 }
 
@@ -220,7 +221,7 @@ FunctionDerivative<dim>::value_list(const std::vector<Point<dim>> &points,
           values[i] = (values[i] - 8. * aux[i]) / (12 * h);
         return;
       default:
-        Assert(false, ExcNotImplemented());
+        DEAL_II_NOT_IMPLEMENTED();
     }
 }
 

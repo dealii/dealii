@@ -1,25 +1,22 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2007 - 2022 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2007 - 2024 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 #ifndef dealii_fe_field_function_templates_h
 #define dealii_fe_field_function_templates_h
 
 
 #include <deal.II/base/config.h>
-
-#include <deal.II/base/logstream.h>
 
 #include <deal.II/fe/fe_values.h>
 
@@ -107,10 +104,10 @@ namespace Functions
     Quadrature<dim> quad = *qp;
     FEValues<dim>   fe_v(mapping, cell->get_fe(), quad, update_values);
     fe_v.reinit(cell);
-    std::vector<Vector<typename VectorType::value_type>> vvalues(
+    std::vector<Vector<typename VectorType::value_type>> vector_values(
       1, Vector<typename VectorType::value_type>(values.size()));
-    fe_v.get_function_values(data_vector, vvalues);
-    values = vvalues[0];
+    fe_v.get_function_values(data_vector, vector_values);
+    values = vector_values[0];
   }
 
 
@@ -245,10 +242,10 @@ namespace Functions
     Quadrature<dim> quad = *qp;
     FEValues<dim>   fe_v(mapping, cell->get_fe(), quad, update_hessians);
     fe_v.reinit(cell);
-    std::vector<Vector<typename VectorType::value_type>> vvalues(
+    std::vector<Vector<typename VectorType::value_type>> vector_values(
       1, Vector<typename VectorType::value_type>(values.size()));
-    fe_v.get_function_laplacians(data_vector, vvalues);
-    values = vvalues[0];
+    fe_v.get_function_laplacians(data_vector, vector_values);
+    values = vector_values[0];
   }
 
 
@@ -310,12 +307,13 @@ namespace Functions
         fe_v.reinit(cells[i], i, 0);
         const unsigned int nq = qpoints[i].size();
 
-        std::vector<Vector<typename VectorType::value_type>> vvalues(
+        std::vector<Vector<typename VectorType::value_type>> vector_values(
           nq, Vector<typename VectorType::value_type>(this->n_components));
-        fe_v.get_present_fe_values().get_function_values(data_vector, vvalues);
+        fe_v.get_present_fe_values().get_function_values(data_vector,
+                                                         vector_values);
 
         for (unsigned int q = 0; q < nq; ++q)
-          values[maps[i][q]] = vvalues[q];
+          values[maps[i][q]] = vector_values[q];
       }
   }
 
@@ -335,14 +333,14 @@ namespace Functions
     // function. This requires a temporary object, but everything we
     // do here is so expensive that that really doesn't make any
     // difference any more.
-    std::vector<Vector<typename VectorType::value_type>> vvalues(
+    std::vector<Vector<typename VectorType::value_type>> vector_values(
       points.size(),
       Vector<typename VectorType::value_type>(this->n_components));
 
-    vector_value_list(points, vvalues);
+    vector_value_list(points, vector_values);
 
     for (unsigned int q = 0; q < points.size(); ++q)
-      values[q] = vvalues[q](component);
+      values[q] = vector_values[q](component);
   }
 
 
@@ -425,14 +423,15 @@ namespace Functions
     // do here is so expensive that that really doesn't make any
     // difference any more.
     std::vector<std::vector<Tensor<1, dim, typename VectorType::value_type>>>
-      vvalues(points.size(),
-              std::vector<Tensor<1, dim, typename VectorType::value_type>>(
-                this->n_components));
+      vector_values(
+        points.size(),
+        std::vector<Tensor<1, dim, typename VectorType::value_type>>(
+          this->n_components));
 
-    vector_gradient_list(points, vvalues);
+    vector_gradient_list(points, vector_values);
 
     for (unsigned int q = 0; q < points.size(); ++q)
-      values[q] = vvalues[q][component];
+      values[q] = vector_values[q][component];
   }
 
 
@@ -480,13 +479,13 @@ namespace Functions
         fe_v.reinit(cells[i], i, 0);
 
         const unsigned int nq = qpoints[i].size();
-        std::vector<Vector<typename VectorType::value_type>> vvalues(
+        std::vector<Vector<typename VectorType::value_type>> vector_values(
           nq, Vector<typename VectorType::value_type>(this->n_components));
         fe_v.get_present_fe_values().get_function_laplacians(data_vector,
-                                                             vvalues);
+                                                             vector_values);
 
         for (unsigned int q = 0; q < nq; ++q)
-          values[maps[i][q]] = vvalues[q];
+          values[maps[i][q]] = vector_values[q];
       }
   }
 
@@ -506,14 +505,14 @@ namespace Functions
     // function. This requires a temporary object, but everything we
     // do here is so expensive that that really doesn't make any
     // difference any more.
-    std::vector<Vector<typename VectorType::value_type>> vvalues(
+    std::vector<Vector<typename VectorType::value_type>> vector_values(
       points.size(),
       Vector<typename VectorType::value_type>(this->n_components));
 
-    vector_laplacian_list(points, vvalues);
+    vector_laplacian_list(points, vector_values);
 
     for (unsigned int q = 0; q < points.size(); ++q)
-      values[q] = vvalues[q](component);
+      values[q] = vector_values[q](component);
   }
 
 

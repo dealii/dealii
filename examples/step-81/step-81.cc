@@ -1,17 +1,16 @@
-/* ---------------------------------------------------------------------
+/* ------------------------------------------------------------------------
  *
- * Copyright (C) 2021 - 2023 by the deal.II authors
+ * SPDX-License-Identifier: LGPL-2.1-or-later
+ * Copyright (C) 2022 - 2025 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
- * The deal.II library is free software; you can use it, redistribute
- * it, and/or modify it under the terms of the GNU Lesser General
- * Public License as published by the Free Software Foundation; either
- * version 2.1 of the License, or (at your option) any later version.
- * The full text of the license can be found in the file LICENSE.md at
- * the top level directory of deal.II.
+ * Part of the source code is dual licensed under Apache-2.0 WITH
+ * LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+ * governing the source code and code contributions can be found in
+ * LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
  *
- * ---------------------------------------------------------------------
+ * ------------------------------------------------------------------------
  *
  * Authors: Manaswinee Bezbaruah, Matthias Maier, Texas A&M University, 2021.
  */
@@ -57,7 +56,6 @@
 
 #include <deal.II/numerics/data_out.h>
 #include <deal.II/numerics/error_estimator.h>
-#include <deal.II/numerics/matrix_tools.h>
 #include <deal.II/numerics/vector_tools.h>
 
 
@@ -226,9 +224,10 @@ namespace Step81
     const auto distance = (dipole_position - point).norm() / dipole_radius;
     if (distance > 1.)
       return J_a;
-    double scale = std::cos(distance * M_PI / 2.) *
-                   std::cos(distance * M_PI / 2.) / (M_PI / 2. - 2. / M_PI) /
-                   dipole_radius / dipole_radius;
+    double scale = std::cos(distance * numbers::PI / 2.) *
+                   std::cos(distance * numbers::PI / 2.) /
+                   (numbers::PI / 2. - 2. / numbers::PI) / dipole_radius /
+                   dipole_radius;
     J_a = dipole_strength * dipole_orientation * scale;
     return J_a;
   }
@@ -506,7 +505,7 @@ namespace Step81
     GridGenerator::hyper_cube(triangulation, -scaling, scaling);
     triangulation.refine_global(refinements);
 
-    if (!absorbing_boundary)
+    if (absorbing_boundary)
       {
         for (auto &face : triangulation.active_face_iterators())
           if (face->at_boundary())
@@ -598,8 +597,8 @@ namespace Step81
   template <int dim>
   void Maxwell<dim>::assemble_system()
   {
-    QGauss<dim>     quadrature_formula(quadrature_order);
-    QGauss<dim - 1> face_quadrature_formula(quadrature_order);
+    const QGauss<dim>     quadrature_formula(quadrature_order);
+    const QGauss<dim - 1> face_quadrature_formula(quadrature_order);
 
     FEValues<dim, dim>     fe_values(*fe,
                                  quadrature_formula,
@@ -622,27 +621,29 @@ namespace Step81
     Vector<double>     cell_rhs(dofs_per_cell);
     std::vector<types::global_dof_index> local_dof_indices(dofs_per_cell);
 
-    // This is assembling the interior of the domain on the left hand side.
-    // So we are assembling
+    // Next, let us assemble on the interior of the domain on the left hand
+    // side. So we are computing
     // \f{align*}{
-    // \int_\Omega (\mu_r^{-1}\nabla \times \varphi_i) \cdot
-    // (\nabla\times\bar{\varphi}_j)\text{d}x
-    // - \int_\Omega \varepsilon_r\varphi_i \cdot \bar{\varphi}_j\text{d}x
+    //   \int_\Omega (\mu_r^{-1}\nabla \times \varphi_i) \cdot
+    //   (\nabla\times\bar{\varphi}_j)\text{d}x
+    //   -
+    //   \int_\Omega \varepsilon_r\varphi_i \cdot \bar{\varphi}_j\text{d}x
     // \f}
     // and
     // \f{align}{
-    // i\int_\Omega J_a \cdot \bar{\varphi_i}\text{d}x
-    // - \int_\Omega \mu_r^{-1} \cdot (\nabla \times \bar{\varphi_i}) \text{d}x.
+    //   i\int_\Omega J_a \cdot \bar{\varphi_i}\text{d}x
+    //   - \int_\Omega \mu_r^{-1} \cdot (\nabla \times \bar{\varphi_i})
+    //   \text{d}x.
     // \f}
     // In doing so, we need test functions $\varphi_i$ and $\varphi_j$, and the
     // curl of these test variables. We must be careful with the signs of the
     // imaginary parts of these complex test variables. Moreover, we have a
     // conditional that changes the parameters if the cell is in the PML region.
+    const FEValuesExtractors::Vector real_part(0);
+    const FEValuesExtractors::Vector imag_part(dim);
     for (const auto &cell : dof_handler.active_cell_iterators())
       {
         fe_values.reinit(cell);
-        FEValuesViews::Vector<dim> real_part(fe_values, 0);
-        FEValuesViews::Vector<dim> imag_part(fe_values, dim);
 
         cell_matrix = 0.;
         cell_rhs    = 0.;
@@ -671,10 +672,12 @@ namespace Step81
               {
                 constexpr std::complex<double> imag{0., 1.};
 
-                const auto phi_i = real_part.value(i, q_point) -
-                                   imag * imag_part.value(i, q_point);
-                const auto curl_phi_i = real_part.curl(i, q_point) -
-                                        imag * imag_part.curl(i, q_point);
+                const auto phi_i =
+                  fe_values[real_part].value(i, q_point) -
+                  imag * fe_values[imag_part].value(i, q_point);
+                const auto curl_phi_i =
+                  fe_values[real_part].curl(i, q_point) -
+                  imag * fe_values[imag_part].curl(i, q_point);
 
                 const auto rhs_value =
                   (imag * scalar_product(J_a, phi_i)) * fe_values.JxW(q_point);
@@ -682,10 +685,12 @@ namespace Step81
 
                 for (const auto j : fe_values.dof_indices())
                   {
-                    const auto phi_j = real_part.value(j, q_point) +
-                                       imag * imag_part.value(j, q_point);
-                    const auto curl_phi_j = real_part.curl(j, q_point) +
-                                            imag * imag_part.curl(j, q_point);
+                    const auto phi_j =
+                      fe_values[real_part].value(j, q_point) +
+                      imag * fe_values[imag_part].value(j, q_point);
+                    const auto curl_phi_j =
+                      fe_values[real_part].curl(j, q_point) +
+                      imag * fe_values[imag_part].curl(j, q_point);
 
                     const auto temp =
                       (scalar_product(mu_inv * curl_phi_j, curl_phi_i) -
@@ -706,16 +711,21 @@ namespace Step81
         // \f}
         // respectively. The test variables and the PML are implemented
         // similarly as the domain.
+        //
+        // If we are at the domain boundary $\partial\Omega$ and absorbing
+        // boundary conditions are set (<code>id == 1</code>) we assemble
+        // the corresponding boundary term:
+        //
+        const FEValuesExtractors::Vector real_part(0);
+        const FEValuesExtractors::Vector imag_part(dim);
         for (const auto &face : cell->face_iterators())
           {
             if (face->at_boundary())
               {
                 const auto id = face->boundary_id();
-                if (id != 0)
+                if (id == 1)
                   {
                     fe_face_values.reinit(cell, face);
-                    FEValuesViews::Vector<dim> real_part(fe_face_values, 0);
-                    FEValuesViews::Vector<dim> imag_part(fe_face_values, dim);
 
                     for (unsigned int q_point = 0; q_point < n_face_q_points;
                          ++q_point)
@@ -742,15 +752,17 @@ namespace Step81
                             constexpr std::complex<double> imag{0., 1.};
 
                             const auto phi_i =
-                              real_part.value(i, q_point) -
-                              imag * imag_part.value(i, q_point);
+                              fe_face_values[real_part].value(i, q_point) -
+                              imag *
+                                fe_face_values[imag_part].value(i, q_point);
                             const auto phi_i_T = tangential_part(phi_i, normal);
 
                             for (const auto j : fe_face_values.dof_indices())
                               {
                                 const auto phi_j =
-                                  real_part.value(j, q_point) +
-                                  imag * imag_part.value(j, q_point);
+                                  fe_face_values[real_part].value(j, q_point) +
+                                  imag *
+                                    fe_face_values[imag_part].value(j, q_point);
                                 const auto phi_j_T =
                                   tangential_part(phi_j, normal) *
                                   fe_face_values.JxW(q_point);
@@ -779,8 +791,6 @@ namespace Step81
                   continue; /* skip this face */
 
                 fe_face_values.reinit(cell, face);
-                FEValuesViews::Vector<dim> real_part(fe_face_values, 0);
-                FEValuesViews::Vector<dim> imag_part(fe_face_values, dim);
 
                 for (unsigned int q_point = 0; q_point < n_face_q_points;
                      ++q_point)
@@ -799,15 +809,17 @@ namespace Step81
                       {
                         constexpr std::complex<double> imag{0., 1.};
 
-                        const auto phi_i = real_part.value(i, q_point) -
-                                           imag * imag_part.value(i, q_point);
+                        const auto phi_i =
+                          fe_face_values[real_part].value(i, q_point) -
+                          imag * fe_face_values[imag_part].value(i, q_point);
                         const auto phi_i_T = tangential_part(phi_i, normal);
 
                         for (const auto j : fe_face_values.dof_indices())
                           {
                             const auto phi_j =
-                              real_part.value(j, q_point) +
-                              imag * imag_part.value(j, q_point);
+                              fe_face_values[real_part].value(j, q_point) +
+                              imag *
+                                fe_face_values[imag_part].value(j, q_point);
                             const auto phi_j_T = tangential_part(phi_j, normal);
 
                             const auto temp =
@@ -844,8 +856,10 @@ namespace Step81
     data_out.add_data_vector(solution,
                              {"real_Ex", "real_Ey", "imag_Ex", "imag_Ey"});
     data_out.build_patches();
-    std::ofstream output("solution.vtk");
+    const std::string filename = "solution.vtk";
+    std::ofstream     output(filename);
     data_out.write_vtk(output);
+    std::cout << "Output written to " << filename << std::endl;
   }
 
 

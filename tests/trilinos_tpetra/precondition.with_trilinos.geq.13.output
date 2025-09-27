@@ -1,0 +1,43 @@
+
+DEAL:01089:Identity::Solver stopped within 49 - 51 iterations
+DEAL:01089:CustomSGS::Solver stopped after 41 iterations
+DEAL:01089:Jacobi::Solver stopped within 49 - 51 iterations
+DEAL:01089:l1Jacobi::Solver stopped within 49 - 51 iterations
+DEAL:01089:l1GaussSeidel::Solver stopped after 48 iterations
+DEAL:01089:SOR::Solver stopped within 31 - 33 iterations
+DEAL:01089:SSOR::Solver stopped within 40 - 42 iterations
+DEAL:01089:BlockJacobi::Solver stopped after 58 iterations
+DEAL:01089:BlockSOR::Solver stopped after 16 iterations
+DEAL:01089:BlockSSOR::Solver stopped after 28 iterations
+DEAL:01089:ILU::Solver stopped within 30 - 32 iterations
+DEAL:01089:ILUT::Solver stopped after 5 iterations
+DEAL:01089:Chebyshev::Solver stopped after 38 iterations
+DEAL:01089:CustomIGLOO::Error: 
+    You tried to select the preconditioner type <IGLOO>
+but this preconditioner is not supported by Trilinos/Ifpack22
+due to one of the following reasons:
+* This preconditioner does not exist
+* This preconditioner has a specialized constructor not supported by the Ifpack2 Factory.
+* This preconditioner is not (yet) supported by Trilinos/Ifpack2
+* Trilinos/Ifpack2 was not configured for its use.
+DEAL:04225:Identity::Solver stopped within 100 - 102 iterations
+DEAL:04225:CustomSGS::Solver stopped after 78 iterations
+DEAL:04225:Jacobi::Solver stopped within 100 - 102 iterations
+DEAL:04225:l1Jacobi::Solver stopped within 100 - 102 iterations
+DEAL:04225:l1GaussSeidel::Solver stopped after 98 iterations
+DEAL:04225:SOR::Solver stopped within 62 - 64 iterations
+DEAL:04225:SSOR::Solver stopped within 77 - 79 iterations
+DEAL:04225:BlockJacobi::Solver stopped after 82 iterations
+DEAL:04225:BlockSOR::Solver stopped after 20 iterations
+DEAL:04225:BlockSSOR::Solver stopped after 40 iterations
+DEAL:04225:ILU::Solver stopped within 56 - 58 iterations
+DEAL:04225:ILUT::Solver stopped after 10 iterations
+DEAL:04225:Chebyshev::Solver stopped after 75 iterations
+DEAL:04225:CustomIGLOO::Error: 
+    You tried to select the preconditioner type <IGLOO>
+but this preconditioner is not supported by Trilinos/Ifpack22
+due to one of the following reasons:
+* This preconditioner does not exist
+* This preconditioner has a specialized constructor not supported by the Ifpack2 Factory.
+* This preconditioner is not (yet) supported by Trilinos/Ifpack2
+* Trilinos/Ifpack2 was not configured for its use.

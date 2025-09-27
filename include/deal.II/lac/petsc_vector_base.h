@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2004 - 2023 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2004 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 #ifndef dealii_petsc_vector_base_h
 #define dealii_petsc_vector_base_h
@@ -22,11 +21,13 @@
 #ifdef DEAL_II_WITH_PETSC
 
 #  include <deal.II/base/index_set.h>
-#  include <deal.II/base/subscriptor.h>
 
 #  include <deal.II/lac/exceptions.h>
 #  include <deal.II/lac/vector.h>
 #  include <deal.II/lac/vector_operation.h>
+
+#  include <boost/serialization/split_member.hpp>
+#  include <boost/serialization/utility.hpp>
 
 #  include <petscvec.h>
 
@@ -247,7 +248,7 @@ namespace PETScWrappers
    *
    * @ingroup PETScWrappers
    */
-  class VectorBase : public ReadVector<PetscScalar>, public Subscriptor
+  class VectorBase : public ReadVector<PetscScalar>
   {
   public:
     /**
@@ -486,7 +487,7 @@ namespace PETScWrappers
     virtual void
     extract_subvector_to(
       const ArrayView<const types::global_dof_index> &indices,
-      ArrayView<PetscScalar>                         &elements) const override;
+      const ArrayView<PetscScalar>                   &elements) const override;
 
     /**
      * Instead of getting individual elements of a vector via operator(),
@@ -623,7 +624,7 @@ namespace PETScWrappers
 
     /**
      * Return whether the vector contains only elements with value zero. This
-     * is a collective operation. This function is expensive, because
+     * is a @ref GlossCollectiveOperation "collective operation". This function is expensive, because
      * potentially all elements have to be checked.
      */
     bool
@@ -725,6 +726,41 @@ namespace PETScWrappers
           const bool         across     = true) const;
 
     /**
+     * Write the data of this object to a stream for the purpose of
+     * serialization using the [BOOST serialization
+     * library](https://www.boost.org/doc/libs/1_74_0/libs/serialization/doc/index.html).
+     *
+     * @note Each processor only serializes its own locally owned values.
+     */
+    template <class Archive>
+    void
+    save(Archive &ar, const unsigned int version) const;
+
+    /**
+     * Read the data of this object from a stream for the purpose of
+     * serialization using the [BOOST serialization
+     * library](https://www.boost.org/doc/libs/1_74_0/libs/serialization/doc/index.html).
+     */
+    template <class Archive>
+    void
+    load(Archive &ar, const unsigned int version);
+
+#  ifdef DOXYGEN
+    /**
+     * Write and read the data of this object from a stream for the purpose
+     * of serialization using the [BOOST serialization
+     * library](https://www.boost.org/doc/libs/1_74_0/libs/serialization/doc/index.html).
+     */
+    template <class Archive>
+    void
+    serialize(Archive &archive, const unsigned int version);
+#  else
+    // This macro defines the serialize() method that is compatible with
+    // the templated save() and load() method that have been implemented.
+    BOOST_SERIALIZATION_SPLIT_MEMBER()
+#  endif
+
+    /**
      * Swap the contents of this vector and the other vector @p v. One could
      * do this operation with a temporary variable and copying over the data
      * elements, but this function is significantly more efficient since it
@@ -737,7 +773,7 @@ namespace PETScWrappers
      * analogy to standard functions.
      */
     void
-    swap(VectorBase &v);
+    swap(VectorBase &v) noexcept;
 
     /**
      * Conversion operator to gain access to the underlying PETSc type. If you
@@ -829,7 +865,7 @@ namespace PETScWrappers
    * @relatesalso PETScWrappers::VectorBase
    */
   inline void
-  swap(VectorBase &u, VectorBase &v)
+  swap(VectorBase &u, VectorBase &v) noexcept
   {
     u.swap(v);
   }
@@ -1155,7 +1191,7 @@ namespace PETScWrappers
   inline void
   VectorBase::extract_subvector_to(
     const ArrayView<const types::global_dof_index> &indices,
-    ArrayView<PetscScalar>                         &elements) const
+    const ArrayView<PetscScalar>                   &elements) const
   {
     AssertDimension(indices.size(), elements.size());
     extract_subvector_to(indices.begin(), indices.end(), elements.begin());
@@ -1168,8 +1204,7 @@ namespace PETScWrappers
                                    const ForwardIterator indices_end,
                                    OutputIterator        values_begin) const
   {
-    const PetscInt n_idx = static_cast<PetscInt>(indices_end - indices_begin);
-    if (n_idx == 0)
+    if (indices_begin == indices_end)
       return;
 
     // if we are dealing
@@ -1209,24 +1244,28 @@ namespace PETScWrappers
         ierr = VecGetArrayRead(locally_stored_elements, &ptr);
         AssertThrow(ierr == 0, ExcPETScError(ierr));
 
-        for (PetscInt i = 0; i < n_idx; ++i)
+        auto input  = indices_begin;
+        auto output = values_begin;
+        while (input != indices_end)
           {
-            const unsigned int index = *(indices_begin + i);
-            if (index >= static_cast<unsigned int>(begin) &&
-                index < static_cast<unsigned int>(end))
+            const auto index = static_cast<PetscInt>(*input);
+            AssertIntegerConversion(index, *input);
+            if (index >= begin && index < end)
               {
                 // local entry
-                *(values_begin + i) = *(ptr + index - begin);
+                *output = *(ptr + index - begin);
               }
             else
               {
                 // ghost entry
-                const unsigned int ghostidx =
-                  ghost_indices.index_within_set(index);
+                const auto ghost_index = ghost_indices.index_within_set(*input);
 
-                AssertIndexRange(ghostidx + end - begin, lsize);
-                *(values_begin + i) = *(ptr + ghostidx + end - begin);
+                AssertIndexRange(ghost_index + end - begin, lsize);
+                *output = *(ptr + ghost_index + end - begin);
               }
+
+            ++input;
+            ++output;
           }
 
         ierr = VecRestoreArrayRead(locally_stored_elements, &ptr);
@@ -1248,12 +1287,14 @@ namespace PETScWrappers
         ierr = VecGetArrayRead(vector, &ptr);
         AssertThrow(ierr == 0, ExcPETScError(ierr));
 
-        for (PetscInt i = 0; i < n_idx; ++i)
+        auto input  = indices_begin;
+        auto output = values_begin;
+        while (input != indices_end)
           {
-            const unsigned int index = *(indices_begin + i);
+            const auto index = static_cast<PetscInt>(*input);
+            AssertIntegerConversion(index, *input);
 
-            Assert(index >= static_cast<unsigned int>(begin) &&
-                     index < static_cast<unsigned int>(end),
+            Assert(index >= begin && index < end,
                    ExcMessage("You are accessing elements of a vector without "
                               "ghost elements that are not actually owned by "
                               "this vector. A typical case where this may "
@@ -1263,7 +1304,10 @@ namespace PETScWrappers
                               "elements for all locally relevant or locally "
                               "active vector entries."));
 
-            *(values_begin + i) = *(ptr + index - begin);
+            *output = *(ptr + index - begin);
+
+            ++input;
+            ++output;
           }
 
         ierr = VecRestoreArrayRead(vector, &ptr);
@@ -1271,9 +1315,74 @@ namespace PETScWrappers
       }
   }
 
+  template <class Archive>
+  inline void
+  VectorBase::save(Archive &ar, const unsigned int) const
+  {
+    // forward to serialization function in the base class.
+    ar &static_cast<const EnableObserverPointer &>(*this);
+    ar &size();
+    ar &local_range();
+
+    const PetscScalar *array = nullptr;
+    int                ierr  = VecGetArrayRead(*this, &array);
+    AssertThrow(ierr == 0, ExcPETScError(ierr));
+
+    boost::serialization::array_wrapper<const PetscScalar> wrapper(
+      array, locally_owned_size());
+    ar &wrapper;
+
+    ierr = VecRestoreArrayRead(*this, &array);
+    AssertThrow(ierr == 0, ExcPETScError(ierr));
+  }
+
+
+
+  template <class Archive>
+  inline void
+  VectorBase::load(Archive &ar, const unsigned int)
+  {
+    ar &static_cast<EnableObserverPointer &>(*this);
+
+    size_type                       size = 0;
+    std::pair<size_type, size_type> local_range;
+
+    ar &size;
+    Assert(size == this->size(),
+           ExcMessage("The serialized value of size (" + std::to_string(size) +
+                      ") does not match the current size (" +
+                      std::to_string(this->size()) + ")"));
+    ar &local_range;
+    Assert(local_range == this->local_range(),
+           ExcMessage("The serialized value of local_range (" +
+                      std::to_string(local_range.first) + ", " +
+                      std::to_string(local_range.second) +
+                      ") does not match the current local_range (" +
+                      std::to_string(this->local_range().first) + ", " +
+                      std::to_string(this->local_range().second) + ")"));
+
+    PetscScalar *array = nullptr;
+    int          ierr  = VecGetArray(petsc_vector(), &array);
+    AssertThrow(ierr == 0, ExcPETScError(ierr));
+
+    boost::serialization::array_wrapper<PetscScalar> wrapper(
+      array, locally_owned_size());
+    ar &wrapper;
+
+    ierr = VecRestoreArray(petsc_vector(), &array);
+    AssertThrow(ierr == 0, ExcPETScError(ierr));
+  }
 #  endif // DOXYGEN
 } // namespace PETScWrappers
 
+DEAL_II_NAMESPACE_CLOSE
+
+#else
+
+// Make sure the scripts that create the C++20 module input files have
+// something to latch on if the preprocessor #ifdef above would
+// otherwise lead to an empty content of the file.
+DEAL_II_NAMESPACE_OPEN
 DEAL_II_NAMESPACE_CLOSE
 
 #endif // DEAL_II_WITH_PETSC

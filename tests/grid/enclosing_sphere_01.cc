@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2005 - 2020 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2017 - 2024 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 
 // Computes a reasonably small enclosing ball on a variety of cells.
@@ -38,7 +37,7 @@ template <int dim>
 void
 create_triangulation(const unsigned int, Triangulation<dim> &)
 {
-  Assert(false, ExcNotImplemented());
+  DEAL_II_NOT_IMPLEMENTED();
 }
 
 
@@ -55,16 +54,16 @@ create_triangulation(const unsigned int case_no, Triangulation<2> &tria)
         {
           GridGenerator::hyper_cube(tria, 1., 3.);
           Point<2> &v0 = tria.begin_active()->vertex(0);
-          v0(0)        = 0.;
+          v0[0]        = 0.;
           break;
         }
       case 2:
         {
           GridGenerator::hyper_cube(tria, 1., 3.);
           Point<2> &v0 = tria.begin_active()->vertex(0);
-          v0(0)        = 0.;
+          v0[0]        = 0.;
           Point<2> &v3 = tria.begin_active()->vertex(3);
-          v3(0)        = 4.;
+          v3[0]        = 4.;
           break;
         }
       case 3:
@@ -101,7 +100,7 @@ create_triangulation(const unsigned int case_no, Triangulation<2> &tria)
           //   *------------>x
         }
       default:
-        Assert(false, ExcNotImplemented());
+        DEAL_II_NOT_IMPLEMENTED();
     };
 }
 
@@ -120,7 +119,7 @@ create_triangulation(const unsigned int case_no, Triangulation<3> &tria)
         {
           GridGenerator::hyper_cube(tria, 1., 3.);
           Point<3> &v0 = tria.begin_active()->vertex(0);
-          v0(0)        = 0.;
+          v0[0]        = 0.;
           break;
         }
       case 3:
@@ -170,7 +169,7 @@ create_triangulation(const unsigned int case_no, Triangulation<3> &tria)
           break;
         }
       default:
-        Assert(false, ExcNotImplemented());
+        DEAL_II_NOT_IMPLEMENTED();
     };
 }
 

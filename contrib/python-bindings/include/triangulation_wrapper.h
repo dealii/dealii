@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2016 - 2022 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2016 - 2024 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 #ifndef dealii_triangulation_wrapper_h
 #define dealii_triangulation_wrapper_h
@@ -193,6 +192,30 @@ namespace python
     void
     generate_cheese(boost::python::list &holes);
 
+    /*! @copydoc GridGenerator::plate_with_a_hole
+     */
+    void
+    generate_plate_with_a_hole(const double        inner_radius = 0.4,
+                               const double        outer_radius = 1.,
+                               const double        pad_bottom   = 2.,
+                               const double        pad_top      = 2.,
+                               const double        pad_left     = 1.,
+                               const double        pad_right    = 1.,
+                               const PointWrapper &center = PointWrapper(),
+                               const int           polar_manifold_id = 0,
+                               const int           tfi_manifold_id   = 1,
+                               const double        L                 = 1.,
+                               const unsigned int  n_slices          = 2,
+                               const bool          colorize          = false);
+
+    /*! @copydoc GridGenerator::generate_channel_with_cylinder
+     */
+    void
+    generate_channel_with_cylinder(const double       shell_region_width = 0.03,
+                                   const unsigned int n_shells           = 2,
+                                   const double       skewness           = 2.,
+                                   const bool         colorize = false);
+
     /*! @copydoc GridGenerator::general_cell
      */
     void
@@ -242,6 +265,12 @@ namespace python
     void
     generate_hyper_ball(PointWrapper &center, const double radius = 1.);
 
+    /*! @copydoc GridGenerator::hyper_ball_balanced
+     */
+    void
+    generate_hyper_ball_balanced(const PointWrapper &center = PointWrapper(),
+                                 const double        radius = 1.);
+
     /*! @copydoc GridGenerator::hyper_sphere
      */
     void
@@ -256,6 +285,25 @@ namespace python
      */
     void
     generate_half_hyper_ball(PointWrapper &center, const double radius = 1.);
+
+    /*! @copydoc GridGenerator::cylinder
+     */
+    void
+    generate_cylinder(const double radius = 1., const double half_length = 1.);
+
+    /*! @copydoc GridGenerator::subdivided_cylinder
+     */
+    void
+    generate_subdivided_cylinder(const unsigned int x_subdivisions,
+                                 const double       radius      = 1.,
+                                 const double       half_length = 1.);
+
+    /*! @copydoc GridGenerator::truncated_cone
+     */
+    void
+    generate_truncated_cone(const double radius_0    = 1.,
+                            const double radius_1    = 0.5,
+                            const double half_length = 1.0);
 
     /*! @copydoc GridGenerator::hyper_shell
      */

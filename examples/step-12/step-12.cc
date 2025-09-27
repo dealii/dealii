@@ -1,17 +1,16 @@
-/* ---------------------------------------------------------------------
+/* ------------------------------------------------------------------------
  *
- * Copyright (C) 2009 - 2022 by the deal.II authors
+ * SPDX-License-Identifier: LGPL-2.1-or-later
+ * Copyright (C) 2009 - 2024 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
- * The deal.II library is free software; you can use it, redistribute
- * it, and/or modify it under the terms of the GNU Lesser General
- * Public License as published by the Free Software Foundation; either
- * version 2.1 of the License, or (at your option) any later version.
- * The full text of the license can be found in the file LICENSE.md at
- * the top level directory of deal.II.
+ * Part of the source code is dual licensed under Apache-2.0 WITH
+ * LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+ * governing the source code and code contributions can be found in
+ * LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
  *
- * ---------------------------------------------------------------------
+ * ------------------------------------------------------------------------
  *
  * Authors: Guido Kanschat, Texas A&M University, 2009
  *          Timo Heister, Clemson University, 2019
@@ -45,12 +44,12 @@
 // This header is needed for FEInterfaceValues to compute integrals on
 // interfaces:
 #include <deal.II/fe/fe_interface_values.h>
-// We are going to use the simplest possible solver, called Richardson
-// iteration, that represents a simple defect correction. This, in combination
-// with a block SSOR preconditioner (defined in precondition_block.h), that
-// uses the special block matrix structure of system matrices arising from DG
-// discretizations.
-#include <deal.II/lac/solver_richardson.h>
+// We are going to use a standard solver, called Generalized minimal residual
+// method (GMRES). It is an iterative solver which is applicable to arbitrary
+// invertible matrices. This, in combination with a block SSOR preconditioner
+// (defined in precondition_block.h), that uses the special block matrix
+// structure of system matrices arising from DG discretizations.
+#include <deal.II/lac/solver_gmres.h>
 #include <deal.II/lac/precondition_block.h>
 // We are going to use gradients as refinement indicator.
 #include <deal.II/numerics/derivative_approximation.h>
@@ -101,7 +100,7 @@ namespace Step12
 
     for (unsigned int i = 0; i < values.size(); ++i)
       {
-        if (points[i](0) < 0.5)
+        if (points[i][0] < 0.5)
           values[i] = 1.;
         else
           values[i] = 0.;
@@ -458,8 +457,9 @@ namespace Step12
 
   // @sect3{All the rest}
   //
-  // For this simple problem we use the simplest possible solver, called
-  // Richardson iteration, that represents a simple defect correction. This, in
+  // For this simple problem we use a standard iterative solver, called GMRES,
+  // that creates approximate solutions minimizing the residual in each
+  // iterations by adding a new basis vector to the Krylov subspace. This, in
   // combination with a block SSOR preconditioner, that uses the special block
   // matrix structure of system matrices arising from DG discretizations. The
   // size of these blocks are the number of DoFs per cell. Here, we use a SSOR
@@ -467,11 +467,22 @@ namespace Step12
   // field. If the DoFs are renumbered in the downstream direction of the flow,
   // then a block Gauss-Seidel preconditioner (see the PreconditionBlockSOR
   // class with relaxation=1) does a much better job.
+
+  // We create an additional data object for the GMRES solver to increase the
+  // maximum number of basis vectors of the Krylov subspace. When this number
+  // is reached the GMRES algorithm is restarted using the solution of the
+  // previous iteration as the starting approximation. The choice of the
+  // number of basis vectors is a trade-off between memory consumption and
+  // convergence speed, since a longer basis means minimization over a larger
+  // space.
   template <int dim>
   void AdvectionProblem<dim>::solve()
   {
-    SolverControl                    solver_control(1000, 1e-12);
-    SolverRichardson<Vector<double>> solver(solver_control);
+    SolverControl solver_control(1000, 1e-6 * right_hand_side.l2_norm());
+
+    SolverGMRES<Vector<double>>::AdditionalData additional_data;
+    additional_data.max_basis_size = 100;
+    SolverGMRES<Vector<double>> solver(solver_control, additional_data);
 
     // Here we create the preconditioner,
     PreconditionBlockSSOR<SparseMatrix<double>> preconditioner;

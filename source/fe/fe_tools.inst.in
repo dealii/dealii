@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2021 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2010 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 
 for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
@@ -171,6 +170,17 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
         const Quadrature<deal_II_dimension> &,
         const Quadrature<deal_II_dimension> &,
         FullMatrix<double> &);
+
+      template Quadrature<deal_II_dimension>
+      compute_nodal_quadrature(
+        const FiniteElement<deal_II_dimension, deal_II_space_dimension> &);
+
+      template unsigned int
+      face_to_cell_index(
+        const FiniteElement<deal_II_dimension, deal_II_space_dimension> &,
+        const unsigned int,
+        const unsigned int,
+        const types::geometric_orientation);
 #endif
 
 #if deal_II_dimension == deal_II_space_dimension
@@ -225,10 +235,9 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
       template void
       compute_face_embedding_matrices<deal_II_dimension, double>(
         const FiniteElement<deal_II_dimension> &,
-        FullMatrix<double> (
-            &)[GeometryInfo<deal_II_dimension>::max_children_per_face],
-        unsigned int,
-        unsigned int,
+        const ArrayView<FullMatrix<double>> &,
+        const unsigned int,
+        const unsigned int,
         const double);
 
       template void
@@ -259,6 +268,18 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
 
       template std::vector<unsigned int>
       lexicographic_to_hierarchic_numbering<deal_II_dimension>(unsigned int);
+
+      template std::pair<std::vector<unsigned int>, std::vector<unsigned int>>
+      cell_to_face_patch<deal_II_dimension>(const unsigned int &,
+                                            const unsigned int &,
+                                            const bool &,
+                                            const bool &);
+
+      template std::pair<std::vector<unsigned int>, std::vector<unsigned int>>
+      cell_to_face_patch_numbering<deal_II_dimension>(const unsigned int &,
+                                                      const unsigned int &,
+                                                      const bool &,
+                                                      const bool &);
 
 #endif
     \}

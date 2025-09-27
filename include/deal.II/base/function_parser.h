@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2005 - 2022 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2005 - 2024 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 #ifndef dealii_function_parser_h
 #define dealii_function_parser_h
@@ -155,6 +154,14 @@ class Vector;
  * is explained in detail at the homepage of the underlying muparser library
  * at https://beltoforion.de/en/muparser/.
  *
+ * If you would like to check that muparser is parsing your functions correctly,
+ * and to evaluate the functions at given parameter values, you may consider
+ * running your expressions through pymuparser
+ * (https://github.com/bobmyhill/pymuparser),
+ * which can be installed using pip (python -m pip install pymuparser).
+ * This module also allows users to define functions not included in MuParser,
+ * such as the extended library provided by deal.II.
+ *
  * For a wrapper of the FunctionParser class that supports ParameterHandler,
  * see Functions::ParsedFunction.
  *
@@ -277,14 +284,14 @@ public:
   /**
    * Initialize the object by setting the actual parsed functions.
    *
-   * @param[in] vars a string with the variables that will be used by the
-   * expressions to be evaluated. Note that the variables can have any name
-   * (of course different from the function names defined above!), but the
-   * order IS important. The first variable will correspond to the first
+   * @param[in] vars a string with the variables, separated by commas, that will
+   * be used by the expressions to be evaluated. Note that the variables can
+   * have any name (of course different from the function names defined above!),
+   * but the order IS important. The first variable will correspond to the first
    * component of the point in which the function is evaluated, the second
    * variable to the second component and so forth. If this function is also
    * time dependent, then it is necessary to specify it by setting the
-   * <code>time_dependent</code> parameter to true.  An exception is thrown if
+   * <code>time_dependent</code> parameter to true. An exception is thrown if
    * the number of variables specified here is different from dim (if this
    * function is not time-dependent) or from dim+1 (if it is time-dependent).
    *
@@ -385,7 +392,7 @@ FunctionParser<dim>::default_variable_names()
       case 3:
         return "x,y,z";
       default:
-        Assert(false, ExcNotImplemented());
+        DEAL_II_NOT_IMPLEMENTED();
     }
   return "";
 }

@@ -44,8 +44,12 @@ DEAL::p = 4.00000 * t0^1 * t2^1
 DEAL::p_x = -4.00000 * t2^1
 DEAL::p_y = -4.00000 * t2^1 + 4.00000 * t0^1
 DEAL::
-DEAL::
+DEAL::Test with TRI6 - Success
+DEAL::Test with TRI10
+DEAL::Test with TRI10 - Success
 DEAL::Test with TET4
 DEAL::Test with TET4 - Success
 DEAL::Test with TET10
 DEAL::Test with TET10 - Success
+DEAL::Test with TET20
+DEAL::Test with TET20 - Success

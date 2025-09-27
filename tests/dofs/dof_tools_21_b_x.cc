@@ -1,26 +1,25 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2003 - 2023 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2013 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 //
 // Test
 //   DoFTools::
-//   make_periodicity_constraints (const FaceIterator       &,
-//                                 const FaceIterator       &,
-//                                 dealii::AffineConstraints<double> &,
-//                                 const std::vector<bool>  &,
-//                                 bool, bool, bool)
+//   make_periodicity_constraints(const FaceIterator        &,
+//                                const FaceIterator        &,
+//                                AffineConstraints<double> &,
+//                                const ComponentMask       &,
+//                                types::geometric_orientation)
 // for correct behavior on non standard oriented meshes.
 //
 // a redux of why the 21_b test failed starting in r29525. in essence,
@@ -95,9 +94,9 @@ generate_grid(Triangulation<2> &triangulation)
   // Look for the two outermost faces:
   for (const unsigned int j : GeometryInfo<2>::face_indices())
     {
-      if (cell_1->face(j)->center()(1) > 2.9)
+      if (cell_1->face(j)->center()[1] > 2.9)
         face_1 = cell_1->face(j);
-      if (cell_2->face(j)->center()(1) < -2.9)
+      if (cell_2->face(j)->center()[1] < -2.9)
         face_2 = cell_2->face(j);
     }
   face_1->set_boundary_id(42);
@@ -146,9 +145,9 @@ generate_grid(Triangulation<2, 3> &triangulation)
   // Look for the two outermost faces:
   for (const unsigned int j : GeometryInfo<2>::face_indices())
     {
-      if (cell_1->face(j)->center()(1) > 2.9)
+      if (cell_1->face(j)->center()[1] > 2.9)
         face_1 = cell_1->face(j);
-      if (cell_2->face(j)->center()(1) < -2.9)
+      if (cell_2->face(j)->center()[1] < -2.9)
         face_2 = cell_2->face(j);
     }
   face_1->set_boundary_id(42);
@@ -158,7 +157,7 @@ generate_grid(Triangulation<2, 3> &triangulation)
 
 /*
  * Print out all face DoFs and support points as well as the actual
- * matching via make_periodicity_constraints
+ * matching via make_periodicity_constraints()
  */
 template <int dim, int spacedim>
 void
@@ -196,19 +195,11 @@ print_matching(DoFHandler<dim, spacedim> &dof_handler)
     deallog << dofs_2[i] << " is located at " << support_points[dofs_2[i]]
             << std::endl;
 
-
-  std::bitset<3> orientation;
-  orientation[0] = 1;
-  orientation[1] = 1;
-  orientation[2] = 0;
-
   DoFTools::make_periodicity_constraints(face_1,
                                          face_2,
                                          constraint_matrix,
                                          ComponentMask(),
-                                         orientation[0],
-                                         orientation[1],
-                                         orientation[2]);
+                                         numbers::reverse_line_orientation);
   constraint_matrix.print(deallog.get_file_stream());
   constraint_matrix.close();
   deallog << "Matching:" << std::endl;

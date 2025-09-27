@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2023 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2023 - 2024 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 //
 // Description:
@@ -80,7 +79,7 @@ dealii::ConditionalOStream debug_output(std::cout, false);
 
 
 template <int dim, typename number = double>
-class LaplaceOperator : public Subscriptor
+class LaplaceOperator : public EnableObserverPointer
 {
 public:
   using value_type = number;
@@ -304,8 +303,8 @@ public:
   }
 
 private:
-  SmartPointer<const MGSmootherBase<VectorType>> coarse_smooth;
-  const std::vector<unsigned int>               *constrained_dofs;
+  ObserverPointer<const MGSmootherBase<VectorType>> coarse_smooth;
+  const std::vector<unsigned int>                  *constrained_dofs;
 
   mutable VectorType src_copy;
 };
@@ -403,7 +402,8 @@ private:
     PreconditionChebyshev<LaplaceOperator<dim, float>, VectorTypeMG>;
   mg::SmootherRelaxation<SmootherType, VectorTypeMG> mg_smoother;
 
-  MGLevelObject<MGTwoLevelTransfer<dim, VectorTypeMG>>           mg_transfers;
+  MGLevelObject<std::unique_ptr<MGTwoLevelTransferBase<VectorTypeMG>>>
+                                                                 mg_transfers;
   std::unique_ptr<MGTransferGlobalCoarsening<dim, VectorTypeMG>> mg_transfer;
 };
 
@@ -504,7 +504,7 @@ LaplaceProblem<dim>::setup_dofs()
 
       IndexSet relevant_dofs = DoFTools::extract_locally_relevant_dofs(dof_h);
       AffineConstraints<float> &constraints = level_constraints[level];
-      constraints.reinit(relevant_dofs);
+      constraints.reinit(dof_h.locally_owned_dofs(), relevant_dofs);
       DoFTools::make_hanging_node_constraints(dof_h, constraints);
       constraints.close();
       typename MatrixFree<dim, float>::AdditionalData additional_data;
@@ -518,7 +518,7 @@ LaplaceProblem<dim>::setup_dofs()
       // now create the final constraints object
       relevant_dofs = DoFTools::extract_locally_relevant_dofs(dof_h);
       constraints.clear();
-      constraints.reinit(relevant_dofs);
+      constraints.reinit(dof_h.locally_owned_dofs(), relevant_dofs);
       DoFTools::make_hanging_node_constraints(dof_h, constraints);
       constraints.close();
     }
@@ -571,9 +571,8 @@ LaplaceProblem<dim>::setup_smoother()
       IterationNumberControl control(12, 1e-6, false, false);
 
       using VectorType = LinearAlgebra::distributed::Vector<float>;
-      SolverCG<VectorType> solver(control);
-      internal::PreconditionChebyshevImplementation::EigenvalueTracker
-        eigenvalue_tracker;
+      SolverCG<VectorType>        solver(control);
+      internal::EigenvalueTracker eigenvalue_tracker;
       solver.connect_eigenvalues_slot(
         [&eigenvalue_tracker](const std::vector<double> &eigenvalues) {
           eigenvalue_tracker.slot(eigenvalues);
@@ -623,10 +622,19 @@ LaplaceProblem<dim>::setup_transfer()
   mg_transfers.resize(0, dof_handlers.max_level());
   for (unsigned int level = 1; level <= dof_handlers.max_level(); ++level)
     {
-      mg_transfers[level].reinit(dof_handlers[level],
-                                 dof_handlers[level - 1],
-                                 level_constraints[level],
-                                 level_constraints[level - 1]);
+      auto transfer = std::make_unique<MGTwoLevelTransfer<dim, VectorTypeMG>>();
+      if (level < triangulation.n_global_levels())
+        transfer->reinit(dof_handlers[level],
+                         dof_handlers[level - 1],
+                         level_constraints[level],
+                         level_constraints[level - 1]);
+      else
+        transfer->reinit(level_matrices[level].get_matrix_free(),
+                         0,
+                         level_matrices[level - 1].get_matrix_free(),
+                         0);
+
+      mg_transfers[level] = std::move(transfer);
     }
 
   mg_transfer = std::make_unique<MGTransferGlobalCoarsening<dim, VectorTypeMG>>(

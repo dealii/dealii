@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2009 - 2022 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2014 - 2024 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 
 
@@ -117,7 +116,7 @@ test()
       for (unsigned int i = 1; i < nprocs; ++i)
         {
           if (myid == i)
-            MPI_Send(&renumbering[0],
+            MPI_Send((renumbering.size() > 0) ? (&renumbering[0]) : nullptr,
                      renumbering.size(),
                      Utilities::MPI::mpi_type_id_for_type<
                        decltype(complete_renumbering[0])>,
@@ -125,7 +124,9 @@ test()
                      i,
                      MPI_COMM_WORLD);
           else if (myid == 0)
-            MPI_Recv(&complete_renumbering[offset],
+            MPI_Recv((dofs_per_proc[i].n_elements() > 0) ?
+                       (&complete_renumbering[offset]) :
+                       nullptr,
                      dofs_per_proc[i].n_elements(),
                      Utilities::MPI::mpi_type_id_for_type<
                        decltype(complete_renumbering[0])>,

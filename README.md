@@ -5,12 +5,11 @@
 [![jenkins/dealii-mpi](https://ci.tjhei.info/job/dealii-mpi/job/master/badge/icon?style=plastic&subject=jenkins-MPI)](https://ci.tjhei.info/job/dealii-mpi/job/master/)
 [![jenkins/dealii-osx](https://ci.tjhei.info/job/dealii-osx/job/master/badge/icon?style=plastic&subject=jenkins-OSX)](https://ci.tjhei.info/job/dealii-osx/job/master/)
 [![jenkins/dealii-ampere](https://ci.tjhei.info/job/dealii-ampere/job/master/badge/icon?style=plastic&subject=jenkins-ampere)](https://ci.tjhei.info/job/dealii-ampere/job/master/)
-[![workflows/github-docker](https://github.com/dealii/dealii/workflows/github-docker/badge.svg)](https://github.com/dealii/dealii/actions?query=workflow%3Agithub-docker)
-[![workflows/indent](https://github.com/dealii/dealii/workflows/indent/badge.svg)](https://github.com/dealii/dealii/actions?query=workflow%3Aindent)
-[![workflows/tidy](https://github.com/dealii/dealii/workflows/tidy/badge.svg)](https://github.com/dealii/dealii/actions?query=workflow%3Atidy)
-[![workflows/github-linux](https://github.com/dealii/dealii/workflows/github-linux/badge.svg)](https://github.com/dealii/dealii/actions?query=workflow%3Agithub-linux)
-[![workflows/github-OSX](https://github.com/dealii/dealii/workflows/github-OSX/badge.svg)](https://github.com/dealii/dealii/actions?query=workflow%3Agithub-OSX)
-[![workflows/github-windows](https://github.com/dealii/dealii/workflows/github-windows/badge.svg)](https://github.com/dealii/dealii/actions?query=workflow%3Agithub-windows)
+[![workflows/indent](https://github.com/dealii/dealii/actions/workflows/indent.yml/badge.svg?branch=master)](https://github.com/dealii/dealii/actions/workflows/indent.yml?query=branch%3Amaster)
+[![workflows/tidy](https://github.com/dealii/dealii/actions/workflows/tidy.yml/badge.svg?branch=master)](https://github.com/dealii/dealii/actions/workflows/tidy.yml?query=branch%3Amaster)
+[![workflows/github-linux](https://github.com/dealii/dealii/actions/workflows/linux.yml/badge.svg?branch=master)](https://github.com/dealii/dealii/actions/workflows/linux.yml?query=branch%3Amaster)
+[![workflows/github-OSX](https://github.com/dealii/dealii/actions/workflows/osx.yml/badge.svg?branch=master)](https://github.com/dealii/dealii/actions/workflows/osx.yml?query=branch%3Amaster)
+[![workflows/github-windows](https://github.com/dealii/dealii/actions/workflows/windows.yml/badge.svg?branch=master)](https://github.com/dealii/dealii/actions/workflows/windows.yml?query=branch%3Amaster)
 
 What is deal.II?
 ================
@@ -23,7 +22,7 @@ to the complex data structures and algorithms required.
 For the impatient:
 ------------------
 
-Let's say you've unpacked the .tar.gz file into a directory /path/to/dealii/sources. 
+Let's say you've unpacked the .tar.gz file into a directory /path/to/dealii/sources.
 Then configure, compile, and install the deal.II library with:
 
     $ mkdir build
@@ -41,7 +40,7 @@ Then continue as before.
 
 A detailed *ReadME* can be found at [./doc/readme.html](https://dealii.org/developer/readme.html),
 [./doc/users/cmake_user.html](https://dealii.org/developer/users/cmake_user.html),
-or at https://www.dealii.org/.
+or at https://dealii.org/.
 
 Getting started:
 ----------------
@@ -49,7 +48,7 @@ Getting started:
 The tutorial steps are located under examples/ of the installation.
 Information about the tutorial steps can be found at
 [./doc/doxygen/tutorial/index.html](https://dealii.org/developer/doxygen/deal.II/Tutorial.html)
-or at https://www.dealii.org/.
+or at https://dealii.org/.
 
 deal.II includes support for pretty-printing deal.II objects inside GDB.
 See [`contrib/utilities/dotgdbinit.py`](contrib/utilities/dotgdbinit.py) or
@@ -66,20 +65,19 @@ Further information:
 
 For further information have a look at
 [./doc/index.html](https://dealii.org/developer/index.html) or at
-https://www.dealii.org.
+https://dealii.org.
 
 Docker Images:
 -------------
 
 Docker images based on the Ubuntu operating system are available on
-[Docker Hub](https://hub.docker.com/repository/docker/dealii/dealii). You can 
-use any of the available version 
-([list of available tags](https://hub.docker.com/repository/docker/dealii/dealii/tags)) 
+[Docker Hub](https://hub.docker.com/r/dealii/dealii). You can
+use any of the available version
+([list of available tags](https://hub.docker.com/r/dealii/dealii/tags))
 by running, for example:
 
     $ docker run --rm -t -i dealii/dealii:master-focal
 
-The above command would drop you into an isolated environment, in which you 
+The above command would drop you into an isolated environment, in which you
 will find the latest version of deal.II (master development branch) installed
 under `/usr/local`.
-

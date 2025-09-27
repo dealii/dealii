@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2019 - 2020 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2020 - 2024 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 /**
 @page changes_between_9_1_1_and_9_2_0 Changes between Version 9.1.1 and 9.2.0
@@ -26,7 +25,7 @@ author.
 
 <!-- ----------- INCOMPATIBILITIES ----------------- -->
 
-<a name="incompatible"></a>
+<a name="911-920-incompatible"></a>
 <h3 style="color:red">Incompatibilities</h3>
 
 <p style="color:red">
@@ -322,7 +321,7 @@ inconvenience this causes.
   Changed: Adjusted ranges for GridRefinement::refine_and_coarsen_fixed_fraction():
   Now criteria of every cell will be considered.
   <br>
-  (Marc Fehling, 12/05/2019)
+  (Marc Fehling, 2019/12/05)
  </li>
 
  <li>
@@ -331,7 +330,7 @@ inconvenience this causes.
   This affects both GridRefinement::fixed_number_refinement() and
   parallel::distributed::GridRefinement::fixed_number_refinement().
   <br>
-  (Marc Fehling, 12/05/2019)
+  (Marc Fehling, 2019/12/05)
  </li>
 
  <li>
@@ -582,7 +581,7 @@ inconvenience this causes.
 
 <!-- ----------- GENERAL IMPROVEMENTS ----------------- -->
 
-<a name="general"></a>
+<a name="911-920-general"></a>
 <h3>General</h3>
 
 <ol>
@@ -735,7 +734,8 @@ inconvenience this causes.
 
  <li>
   New: The step-12 tutorial program has been changed to use
-  FEInterfaceValues. The old version of step-12 is still available as step-12b.
+  FEInterfaceValues. The old version of step-12 was still available
+  until deal.II 9.5 as step 12b.
   <br>
   (Timo Heister, 2019/08/27)
  </li>
@@ -743,7 +743,7 @@ inconvenience this causes.
  <li>
   New: The FEInterfaceValues class provides a new abstraction to assemble
   interface terms between two neighboring cells. This is commonly used in
-  Discontinous Galerkin methods.
+  Discontinuous Galerkin methods.
   <br>
   (Timo Heister, 2019/08/24)
  </li>
@@ -785,7 +785,7 @@ inconvenience this causes.
 
 <!-- ----------- SPECIFIC IMPROVEMENTS ----------------- -->
 
-<a name="specific"></a>
+<a name="911-920-specific"></a>
 <h3>Specific improvements</h3>
 
 <ol>
@@ -989,7 +989,7 @@ inconvenience this causes.
  </li>
 
  <li>
-  Fixed: step-26 and step-52 now also output the simulation time
+  Fixed: step-26 and step 52 now also output the simulation time
   in the VTK/VTU output files.
   <br>
   (Wolfgang Bangerth, 2020/03/27)
@@ -1394,7 +1394,7 @@ inconvenience this causes.
   Improved: mu_parser functions now use random number generation facilities
   provided by the standard library.
   <br>
-  (Reza Rastak, 2019/20/30)
+  (Reza Rastak, 2019/12/30)
  </li>
 
  <li>
@@ -1454,7 +1454,9 @@ inconvenience this causes.
  <li>
   New: IndexSet::tensor_product() creates a new IndexSet with global size equal to
   this->size()*other.size(), containing for every element n of this IndexSet, the indices
-  of the other IndexSet, contained in the interval [n*other.size(), (n+1)*other.size()).;<br>;(Luca Heltai, 2019/12/12)
+  of the other IndexSet, contained in the interval [n*other.size(), (n+1)*other.size()).
+  <br>
+  (Luca Heltai, 2019/12/12)
  </li>
 
  <li>

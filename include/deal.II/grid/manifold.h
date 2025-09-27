@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2023 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2014 - 2024 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 #ifndef dealii_tria_manifold_h
 #define dealii_tria_manifold_h
@@ -23,9 +22,9 @@
 
 #include <deal.II/base/array_view.h>
 #include <deal.II/base/derivative_form.h>
+#include <deal.II/base/enable_observer_pointer.h>
 #include <deal.II/base/point.h>
 #include <deal.II/base/quadrature_lib.h>
-#include <deal.II/base/subscriptor.h>
 
 #include <deal.II/grid/tria.h>
 
@@ -283,7 +282,7 @@ namespace Manifolds
  * @ingroup manifold
  */
 template <int dim, int spacedim = dim>
-class Manifold : public Subscriptor
+class Manifold : public EnableObserverPointer
 {
 public:
   // explicitly check for sensible template arguments
@@ -780,6 +779,12 @@ public:
   const Tensor<1, spacedim> &
   get_periodicity() const;
 
+  /**
+   * Return the relative tolerance set in the constructor.
+   */
+  double
+  get_tolerance() const;
+
 private:
   /**
    * The periodicity of this Manifold. Periodicity affects the way a middle
@@ -1134,6 +1139,15 @@ Manifold<3, 3>::get_new_point_on_hex(
 
 /*---Templated functions---*/
 
+template <int dim, int spacedim>
+inline double
+FlatManifold<dim, spacedim>::get_tolerance() const
+{
+  return tolerance;
+}
+
+
+
 namespace Manifolds
 {
   template <typename MeshIteratorType>
@@ -1254,7 +1268,7 @@ namespace Manifolds
           }
           break;
         default:
-          Assert(false, ExcInternalError());
+          DEAL_II_ASSERT_UNREACHABLE();
           break;
       }
     return points_weights;

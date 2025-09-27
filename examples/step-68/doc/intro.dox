@@ -1,5 +1,3 @@
-<br>
-
 <i>
 This program was contributed by
 Bruno Blais (Polytechnique Montréal),
@@ -10,6 +8,7 @@ Bruno Blais was supported by NSERC Discovery grant
 RGPIN-2020-04510, by Compute Canada and Calcul Québec.
 </i>
 
+<a name="step_68-Intro"></a>
 <h1>Introduction</h1>
 
 <h3>Simulation of the motion of massless tracer particles in a vortical flow</h3>

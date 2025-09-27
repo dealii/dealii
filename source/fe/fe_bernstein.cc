@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2000 - 2023 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2015 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 
 #include <deal.II/base/polynomials_bernstein.h>
@@ -154,13 +153,18 @@ FE_Bernstein<dim, spacedim>::get_subface_interpolation_matrix(
       // be done for the face orientation flag in 3d.
       const Quadrature<dim> subface_quadrature =
         subface == numbers::invalid_unsigned_int ?
-          QProjector<dim>::project_to_face(this->reference_cell(),
-                                           quad_face_support,
-                                           0) :
-          QProjector<dim>::project_to_subface(this->reference_cell(),
-                                              quad_face_support,
-                                              0,
-                                              subface);
+          QProjector<dim>::project_to_face(
+            this->reference_cell(),
+            quad_face_support,
+            0,
+            numbers::default_geometric_orientation) :
+          QProjector<dim>::project_to_subface(
+            this->reference_cell(),
+            quad_face_support,
+            0,
+            subface,
+            numbers::default_geometric_orientation,
+            RefinementCase<dim - 1>::isotropic_refinement);
 
       for (unsigned int i = 0; i < source_fe->n_dofs_per_face(face_no); ++i)
         {
@@ -182,19 +186,20 @@ FE_Bernstein<dim, spacedim>::get_subface_interpolation_matrix(
             }
         }
 
-#ifdef DEBUG
-      // make sure that the row sum of each of the matrices is 1 at this
-      // point. this must be so since the shape functions sum up to 1
-      for (unsigned int j = 0; j < source_fe->n_dofs_per_face(face_no); ++j)
+      if constexpr (running_in_debug_mode())
         {
-          double sum = 0.;
+          // make sure that the row sum of each of the matrices is 1 at this
+          // point. this must be so since the shape functions sum up to 1
+          for (unsigned int j = 0; j < source_fe->n_dofs_per_face(face_no); ++j)
+            {
+              double sum = 0.;
 
-          for (unsigned int i = 0; i < this->n_dofs_per_face(face_no); ++i)
-            sum += interpolation_matrix(j, i);
+              for (unsigned int i = 0; i < this->n_dofs_per_face(face_no); ++i)
+                sum += interpolation_matrix(j, i);
 
-          Assert(std::fabs(sum - 1) < eps, ExcInternalError());
+              Assert(std::fabs(sum - 1) < eps, ExcInternalError());
+            }
         }
-#endif
     }
   else
     {
@@ -248,7 +253,7 @@ FE_Bernstein<dim, spacedim>::hp_vertex_dof_identities(
     }
   else
     {
-      Assert(false, ExcNotImplemented());
+      DEAL_II_NOT_IMPLEMENTED();
       return std::vector<std::pair<unsigned int, unsigned int>>();
     }
 }
@@ -327,7 +332,7 @@ FE_Bernstein<dim, spacedim>::compare_for_domination(
         return FiniteElementDomination::no_requirements;
     }
 
-  Assert(false, ExcNotImplemented());
+  DEAL_II_NOT_IMPLEMENTED();
   return FiniteElementDomination::neither_element_dominates;
 }
 
@@ -341,7 +346,8 @@ FE_Bernstein<dim, spacedim>::get_name() const
   // kept in synch
 
   std::ostringstream namebuf;
-  namebuf << "FE_Bernstein<" << dim << ">(" << this->degree << ")";
+  namebuf << "FE_Bernstein<" << Utilities::dim_string(dim, spacedim) << ">("
+          << this->degree << ")";
   return namebuf.str();
 }
 
@@ -381,6 +387,6 @@ FE_Bernstein<dim, spacedim>::renumber_bases(const unsigned int deg)
 
 
 // explicit instantiations
-#include "fe_bernstein.inst"
+#include "fe/fe_bernstein.inst"
 
 DEAL_II_NAMESPACE_CLOSE

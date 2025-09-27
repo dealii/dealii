@@ -1,0 +1,26 @@
+74c74
+<   constexpr unsigned int n_global_refinements = 3;
+---
+>   constexpr unsigned int n_global_refinements = 2;
+81c81
+<   constexpr double final_time  = testcase == 0 ? 10 : 2.0;
+---
+>   constexpr double final_time  = testcase == 0 ? 5 : 2.0;
+2169,2171c2169
+<       const std::string filename =
+<         "solution_" + Utilities::int_to_string(result_number, 3) + ".vtu";
+<       data_out.write_vtu_in_parallel(filename, MPI_COMM_WORLD);
+---
+>       (void)result_number;
+2194,2196d2191
+<       const unsigned int n_vect_number = VectorizedArray<Number>::size();
+<       const unsigned int n_vect_bits   = 8 * sizeof(Number) * n_vect_number;
+< 
+2200,2204d2194
+<       pcout << "Vectorization over " << n_vect_number << ' '
+<             << (std::is_same_v<Number, double> ? "doubles" : "floats") << " = "
+<             << n_vect_bits << " bits ("
+<             << Utilities::System::get_current_vectorization_level() << ')'
+<             << std::endl;
+2282d2271
+<     timer.print_wall_time_statistics(MPI_COMM_WORLD);

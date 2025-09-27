@@ -1,0 +1,11 @@
+Running with 1 MPI processes
+Number of degrees of freedom: 36864 ( = 4 [vars] x 256 [cells] x 36 [dofs/cell/var] )
+Time step size: 0.0137935, minimal h: 0.625, initial transport scaling: 0.205622
+
+Time:       0, dt:    0.014, error rho:  1.867e-05, rho * u:   7.97e-05, energy: 0.0001589
+Time:    1.01, dt:    0.014, error rho:  5.715e-05, rho * u:  0.0001503, energy: 0.0002395
+Time:       2, dt:    0.014, error rho:  7.119e-05, rho * u:  0.0001799, energy: 0.0002681
+Time:    3.01, dt:    0.014, error rho:  7.981e-05, rho * u:  0.0001989, energy: 0.0002824
+Time:       4, dt:    0.014, error rho:  9.041e-05, rho * u:  0.0002087, energy: 0.0002955
+Time:    5.01, dt:    0.014, error rho:  7.695e-05, rho * u:   0.000158, energy: 0.0002245
+

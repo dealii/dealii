@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2023 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 1998 - 2024 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/mpi.h>
@@ -176,6 +175,9 @@ Timer::Timer(const MPI_Comm mpi_communicator, const bool sync_lap_times_)
 void
 Timer::start()
 {
+  if (running == false)
+    ++n_timed_laps;
+
   running = true;
 #ifdef DEAL_II_WITH_MPI
   if (sync_lap_times)
@@ -288,9 +290,18 @@ Timer::reset()
 {
   wall_times.reset();
   cpu_times.reset();
-  running = false;
+  running      = false;
+  n_timed_laps = 0;
   internal::TimerImplementation::clear_timing_data(last_lap_wall_time_data);
   internal::TimerImplementation::clear_timing_data(accumulated_wall_time_data);
+}
+
+
+
+unsigned int
+Timer::n_laps() const
+{
+  return n_timed_laps;
 }
 
 
@@ -302,6 +313,8 @@ TimerOutput::TimerOutput(std::ostream         &stream,
                          const OutputType      output_type)
   : output_frequency(output_frequency)
   , output_type(output_type)
+  , timer_all()
+  , sections()
   , out_stream(stream, true)
   , output_is_enabled(true)
   , mpi_communicator(MPI_COMM_SELF)
@@ -314,6 +327,8 @@ TimerOutput::TimerOutput(ConditionalOStream   &stream,
                          const OutputType      output_type)
   : output_frequency(output_frequency)
   , output_type(output_type)
+  , timer_all()
+  , sections()
   , out_stream(stream)
   , output_is_enabled(true)
   , mpi_communicator(MPI_COMM_SELF)
@@ -327,6 +342,8 @@ TimerOutput::TimerOutput(const MPI_Comm        mpi_communicator,
                          const OutputType      output_type)
   : output_frequency(output_frequency)
   , output_type(output_type)
+  , timer_all(mpi_communicator, /* sync_lap_times */ false)
+  , sections()
   , out_stream(stream, true)
   , output_is_enabled(true)
   , mpi_communicator(mpi_communicator)
@@ -340,6 +357,8 @@ TimerOutput::TimerOutput(const MPI_Comm        mpi_communicator,
                          const OutputType      output_type)
   : output_frequency(output_frequency)
   , output_type(output_type)
+  , timer_all(mpi_communicator, /* sync_lap_times */ false)
+  , sections()
   , out_stream(stream)
   , output_is_enabled(true)
   , mpi_communicator(mpi_communicator)
@@ -367,12 +386,7 @@ TimerOutput::~TimerOutput()
   // avoid communicating with other processes if there is an uncaught
   // exception
 #ifdef DEAL_II_WITH_MPI
-#  if __cpp_lib_uncaught_exceptions >= 201411
-  // std::uncaught_exception() is deprecated in c++17
   if (std::uncaught_exceptions() > 0 && mpi_communicator != MPI_COMM_SELF)
-#  else
-  if (std::uncaught_exception() == true && mpi_communicator != MPI_COMM_SELF)
-#  endif
     {
       const unsigned int myid =
         Utilities::MPI::this_mpi_process(mpi_communicator);
@@ -408,8 +422,8 @@ TimerOutput::enter_subsection(const std::string &section_name)
   Assert(std::find(active_sections.begin(),
                    active_sections.end(),
                    section_name) == active_sections.end(),
-         ExcMessage(std::string("Cannot enter the already active section <") +
-                    section_name + ">."));
+         ExcMessage("Cannot enter the already active section <" + section_name +
+                    ">."));
 
   if (sections.find(section_name) == sections.end())
     {
@@ -522,7 +536,7 @@ TimerOutput::get_summary_data(const OutputData kind) const
             output[section.first] = section.second.n_calls;
             break;
           default:
-            Assert(false, ExcNotImplemented());
+            DEAL_II_NOT_IMPLEMENTED();
         }
     }
   return output;
@@ -552,19 +566,19 @@ TimerOutput::print_summary() const
       // in case we want to write CPU times
       if (output_type != wall_times)
         {
-          double total_cpu_time =
-            Utilities::MPI::sum(timer_all.cpu_time(), mpi_communicator);
+          double total_cpu_time = timer_all.cpu_time();
 
-          // check that the sum of all times is less or equal than the total
-          // time. otherwise, we might have generated a lot of overhead in this
-          // function.
-          double check_time = 0.;
+          // check that the sum of all section times is less or equal than the
+          // total time. otherwise, we might have generated a lot of overhead in
+          // this function.
+          double total_cpu_time_in_sections = 0.;
           for (const auto &i : sections)
-            check_time += i.second.total_cpu_time;
+            total_cpu_time_in_sections += i.second.total_cpu_time;
 
-          const double time_gap = check_time - total_cpu_time;
-          if (time_gap > 0.0)
-            total_cpu_time = check_time;
+          const double section_overhead =
+            total_cpu_time_in_sections - total_cpu_time;
+          if (section_overhead > 0.0)
+            total_cpu_time = total_cpu_time_in_sections;
 
           // generate a nice table
           out_stream << "\n\n"
@@ -630,10 +644,10 @@ TimerOutput::print_summary() const
                      << "------------+------------+\n"
                      << std::endl;
 
-          if (time_gap > 0.0)
+          if (section_overhead > 0.0)
             out_stream
               << std::endl
-              << "Note: The sum of counted times is " << time_gap
+              << "Note: The sum of section times is " << section_overhead
               << " seconds larger than the total time.\n"
               << "(Timer function may have introduced too much overhead, or different\n"
               << "section timers may have run at the same time.)" << std::endl;
@@ -642,7 +656,7 @@ TimerOutput::print_summary() const
       // in case we want to write out wallclock times
       if (output_type != cpu_times)
         {
-          double total_wall_time = timer_all.wall_time();
+          const double total_wall_time = timer_all.wall_time();
 
           // now generate a nice table
           out_stream << "\n\n"
@@ -713,19 +727,18 @@ TimerOutput::print_summary() const
     // output_type == cpu_and_wall_times_grouped
     {
       const double total_wall_time = timer_all.wall_time();
-      double       total_cpu_time =
-        Utilities::MPI::sum(timer_all.cpu_time(), mpi_communicator);
+      double       total_cpu_time  = timer_all.cpu_time();
 
       // check that the sum of all times is less or equal than the total time.
       // otherwise, we might have generated a lot of overhead in this function.
-      double check_time = 0.;
-
+      double total_cpu_time_in_sections = 0.;
       for (const auto &i : sections)
-        check_time += i.second.total_cpu_time;
+        total_cpu_time_in_sections += i.second.total_cpu_time;
 
-      const double time_gap = check_time - total_cpu_time;
-      if (time_gap > 0.0)
-        total_cpu_time = check_time;
+      const double section_overhead =
+        total_cpu_time_in_sections - total_cpu_time;
+      if (section_overhead > 0.0)
+        total_cpu_time = total_cpu_time_in_sections;
 
       // generate a nice table
       out_stream << "\n\n+---------------------------------------------"
@@ -734,7 +747,8 @@ TimerOutput::print_summary() const
                  << "------------+------------+" << '\n'
                  << "| Total CPU/wall time elapsed since start     "
                  << extra_space << "|" << std::setw(10) << std::setprecision(3)
-                 << std::right << total_cpu_time << "s |            |"
+                 << std::right << total_cpu_time << "s |            "
+                 << extra_space << "|" << std::setw(10) << std::setprecision(3)
                  << total_wall_time << "s |            |"
                  << "\n|                                             "
                  << extra_space << "|"
@@ -825,10 +839,10 @@ TimerOutput::print_summary() const
                  << "------------+------------+" << std::endl
                  << std::endl;
 
-      if (output_type != wall_times && time_gap > 0.0)
+      if (output_type != wall_times && section_overhead > 0.0)
         out_stream
           << std::endl
-          << "Note: The sum of counted times is " << time_gap
+          << "Note: The sum of section times is " << section_overhead
           << " seconds larger than the total time.\n"
           << "(Timer function may have introduced too much overhead, or different\n"
           << "section timers may have run at the same time.)" << std::endl;
@@ -1019,6 +1033,7 @@ void
 TimerOutput::disable_output()
 {
   output_is_enabled = false;
+  out_stream.set_condition(false);
 }
 
 
@@ -1027,6 +1042,7 @@ void
 TimerOutput::enable_output()
 {
   output_is_enabled = true;
+  out_stream.set_condition(true);
 }
 
 void

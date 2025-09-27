@@ -1,0 +1,115 @@
+
+DEAL::lines
+DEAL::o = 0
+DEAL::  0
+DEAL::  1
+DEAL::o = 1
+DEAL::  0
+DEAL::  1
+DEAL::triangles
+DEAL::o = 0
+DEAL::  0
+DEAL::  1
+DEAL::  2
+DEAL::o = 1
+DEAL::  0
+DEAL::  1
+DEAL::  2
+DEAL::o = 2
+DEAL::  0
+DEAL::  1
+DEAL::  2
+DEAL::o = 3
+DEAL::  0
+DEAL::  1
+DEAL::  2
+DEAL::o = 4
+DEAL::  0
+DEAL::  1
+DEAL::  2
+DEAL::o = 5
+DEAL::  0
+DEAL::  1
+DEAL::  2
+DEAL::quadrilaterals
+DEAL::o = 0
+DEAL::  0
+DEAL::  1
+DEAL::  2
+DEAL::  3
+DEAL::o = 1
+DEAL::  0
+DEAL::  1
+DEAL::  2
+DEAL::  3
+DEAL::o = 2
+DEAL::  0
+DEAL::  1
+DEAL::  2
+DEAL::  3
+DEAL::o = 3
+DEAL::  0
+DEAL::  1
+DEAL::  2
+DEAL::  3
+DEAL::o = 4
+DEAL::  0
+DEAL::  1
+DEAL::  2
+DEAL::  3
+DEAL::o = 5
+DEAL::  0
+DEAL::  1
+DEAL::  2
+DEAL::  3
+DEAL::o = 6
+DEAL::  0
+DEAL::  1
+DEAL::  2
+DEAL::  3
+DEAL::o = 7
+DEAL::  0
+DEAL::  1
+DEAL::  2
+DEAL::  3
+DEAL::quadrilaterals (manual)
+DEAL::o = 0
+DEAL::  0
+DEAL::  1
+DEAL::  2
+DEAL::  3
+DEAL::o = 1
+DEAL::  0
+DEAL::  1
+DEAL::  2
+DEAL::  3
+DEAL::o = 2
+DEAL::  0
+DEAL::  1
+DEAL::  2
+DEAL::  3
+DEAL::o = 3
+DEAL::  0
+DEAL::  1
+DEAL::  2
+DEAL::  3
+DEAL::o = 4
+DEAL::  0
+DEAL::  1
+DEAL::  2
+DEAL::  3
+DEAL::o = 5
+DEAL::  0
+DEAL::  1
+DEAL::  2
+DEAL::  3
+DEAL::o = 6
+DEAL::  0
+DEAL::  1
+DEAL::  2
+DEAL::  3
+DEAL::o = 7
+DEAL::  0
+DEAL::  1
+DEAL::  2
+DEAL::  3

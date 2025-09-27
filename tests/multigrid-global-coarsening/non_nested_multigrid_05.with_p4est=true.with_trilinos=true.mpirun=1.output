@@ -1,0 +1,9 @@
+
+DEAL:0::2 1 2 1 simplex 4
+DEAL:0::2 2 2 1 simplex 5
+DEAL:0::2 1 3 1 simplex 5
+DEAL:0::2 2 3 1 simplex 6
+DEAL:0::2 1 2 2 simplex 4
+DEAL:0::2 2 2 2 simplex 5
+DEAL:0::2 1 3 2 simplex 5
+DEAL:0::2 2 3 2 simplex 6

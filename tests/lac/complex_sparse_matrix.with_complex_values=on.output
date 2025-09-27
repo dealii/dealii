@@ -1,0 +1,8 @@
+
+DEAL::real_matrix.set(0, 0, 1.0) True
+DEAL::cmpl_matrix.copy_from(real_matrix) True
+DEAL::cmpl_matrix.add(0, 0, 1i) True
+DEAL::cmpl_vec.vmult(compl_vec, real_vec) True
+DEAL::cmpl_vec.vmult_add(cmpl_vec, real_vec) True
+DEAL::cmpl_vec.Tvmult(cmpl_vec, real_vec) True
+DEAL::cmpl_vec.Tvmult_add(cmpl_vec, real_vec) True

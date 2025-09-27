@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2017 - 2023 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2017 - 2024 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 #ifndef dealii_lac_utilities_h
 #define dealii_lac_utilities_h
@@ -109,19 +108,7 @@ namespace Utilities
      * OperatorType has to provide <code>vmult</code> operation with
      * VectorType.
      *
-     * This function implements the algorithm from
-     * @code{.bib}
-     * @article{Zhou2006,
-     *   Title   = {Self-consistent-field Calculations Using Chebyshev-filtered
-     *              Subspace Iteration},
-     *   Author  = {Zhou, Yunkai and Saad, Yousef and Tiago, Murilo L. and
-     *              Chelikowsky, James R.},
-     *   Journal = {Journal of Computational Physics},
-     *   Year    = {2006},
-     *   Volume  = {219},
-     *   Pages   = {172--184},
-     * }
-     * @endcode
+     * This function implements the algorithm from @cite Zhou2006.
      *
      * @note This function uses Lapack routines to compute the largest
      * eigenvalue of $T_k$.
@@ -168,18 +155,7 @@ namespace Utilities
      * @p vector_memory is used to allocate memory for temporary objects.
      *
      * This function implements the algorithm (with a minor fix of sign of
-     * $\sigma_1$) from
-     * @code{.bib}
-     * @article{Zhou2014,
-     *   Title   = {Chebyshev-filtered subspace iteration method free of sparse
-     *              diagonalization for solving the Kohn--Sham equation},
-     *   Author  = {Zhou, Yunkai and Chelikowsky, James R and Saad, Yousef},
-     *   Journal = {Journal of Computational Physics},
-     *   Year    = {2014},
-     *   Volume  = {274},
-     *   Pages   = {770--782},
-     * }
-     * @endcode
+     * $\sigma_1$) from @cite Zhou2014.
      *
      * @note If @p tau is equal to
      * <code>std::numeric_limits<double>::infinity()</code>, no normalization

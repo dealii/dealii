@@ -13,8 +13,17 @@ DEAL:double::Absolute value: OK
 DEAL:double::Maximum value: OK
 DEAL:double::Minimum value: OK
 DEAL:double::Sine: OK
+DEAL:double::Arc sine: OK
 DEAL:double::Cosine: OK
+DEAL:double::Arc cosine: OK
 DEAL:double::Tangent: OK
+DEAL:double::Arc tangent: OK
+DEAL:double::Hyperbolic cosine: OK
+DEAL:double::Area hyperbolic cosine: OK
+DEAL:double::Hyperbolic sine: OK
+DEAL:double::Area hyperbolic sine: OK
+DEAL:double::Hyperbolic tangent: OK
+DEAL:double::Area hyperbolic tangent: OK
 DEAL:double::Exponential: OK
 DEAL:double::Logarithm: OK
 DEAL:float::Addition: OK
@@ -31,8 +40,17 @@ DEAL:float::Absolute value: OK
 DEAL:float::Maximum value: OK
 DEAL:float::Minimum value: OK
 DEAL:float::Sine: OK
+DEAL:float::Arc sine: OK
 DEAL:float::Cosine: OK
+DEAL:float::Arc cosine: OK
 DEAL:float::Tangent: OK
+DEAL:float::Arc tangent: OK
+DEAL:float::Hyperbolic cosine: OK
+DEAL:float::Area hyperbolic cosine: OK
+DEAL:float::Hyperbolic sine: OK
+DEAL:float::Area hyperbolic sine: OK
+DEAL:float::Hyperbolic tangent: OK
+DEAL:float::Area hyperbolic tangent: OK
 DEAL:float::Exponential: OK
 DEAL:float::Logarithm: OK
 DEAL:long double::Addition: OK
@@ -49,7 +67,16 @@ DEAL:long double::Absolute value: OK
 DEAL:long double::Maximum value: OK
 DEAL:long double::Minimum value: OK
 DEAL:long double::Sine: OK
+DEAL:long double::Arc sine: OK
 DEAL:long double::Cosine: OK
+DEAL:long double::Arc cosine: OK
 DEAL:long double::Tangent: OK
+DEAL:long double::Arc tangent: OK
+DEAL:long double::Hyperbolic cosine: OK
+DEAL:long double::Area hyperbolic cosine: OK
+DEAL:long double::Hyperbolic sine: OK
+DEAL:long double::Area hyperbolic sine: OK
+DEAL:long double::Hyperbolic tangent: OK
+DEAL:long double::Area hyperbolic tangent: OK
 DEAL:long double::Exponential: OK
 DEAL:long double::Logarithm: OK

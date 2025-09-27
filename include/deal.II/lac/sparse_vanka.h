@@ -1,27 +1,25 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 1999 - 2022 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 1999 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 #ifndef dealii_sparse_vanka_h
 #define dealii_sparse_vanka_h
 
-
-
 #include <deal.II/base/config.h>
 
 #include <deal.II/base/multithread_info.h>
-#include <deal.II/base/smartpointer.h>
+#include <deal.II/base/observer_pointer.h>
+#include <deal.II/base/types.h>
 
 #include <vector>
 
@@ -218,6 +216,12 @@ public:
   Tvmult(Vector<number2> &dst, const Vector<number2> &src) const;
 
   /**
+   * Clear all memory.
+   */
+  void
+  clear();
+
+  /**
    * Return the dimension of the codomain (or range) space. Note that the
    * matrix is of dimension $m \times n$.
    *
@@ -241,9 +245,11 @@ protected:
   /**
    * Apply the inverses corresponding to those degrees of freedom that have a
    * @p true value in @p dof_mask, to the @p src vector and move the result
-   * into @p dst. Actually, only values for allowed indices are written to @p
-   * dst, so the application of this function only does what is announced in
-   * the general documentation if the given mask sets all values to zero
+   * into @p dst. The transpose of the inverse is applied instead if
+   * @p transpose equals true. Actually, only values for allowed indices are
+   * written to @p dst, so the application of this function only does what is
+   * announced in the general documentation if the given mask sets all values
+   * to zero.
    *
    * The reason for providing the mask anyway is that in derived classes we
    * may want to apply the preconditioner to parts of the matrix only, in
@@ -259,10 +265,12 @@ protected:
    * The @p vmult of this class of course calls this function with a null
    * pointer
    */
+
   template <typename number2>
   void
   apply_preconditioner(Vector<number2>               &dst,
                        const Vector<number2>         &src,
+                       const bool                     transpose = false,
                        const std::vector<bool> *const dof_mask = nullptr) const;
 
   /**
@@ -276,7 +284,7 @@ private:
   /**
    * Pointer to the matrix.
    */
-  SmartPointer<const SparseMatrix<number>, SparseVanka<number>> matrix;
+  ObserverPointer<const SparseMatrix<number>, SparseVanka<number>> matrix;
 
   /**
    * Indices of those degrees of freedom that we shall work on.
@@ -287,7 +295,7 @@ private:
    * Array of inverse matrices, one for each degree of freedom. Only those
    * elements will be used that are tagged in @p selected.
    */
-  mutable std::vector<SmartPointer<FullMatrix<float>, SparseVanka<number>>>
+  mutable std::vector<ObserverPointer<FullMatrix<float>, SparseVanka<number>>>
     inverses;
 
   /**
@@ -377,9 +385,9 @@ private:
  * Splitting the matrix into blocks is always done in a way such that the
  * blocks are not necessarily of equal size, but such that the number of
  * selected degrees of freedom for which a local system is to be solved is
- * equal between blocks. The reason for this strategy to subdivision is load-
- * balancing for multithreading. There are several possibilities to actually
- * split the matrix into blocks, which are selected by the flag @p
+ * equal between blocks. The reason for this strategy to subdivision is
+ * load-balancing for multithreading. There are several possibilities to
+ * actually split the matrix into blocks, which are selected by the flag @p
  * blocking_strategy that is passed to the constructor. By a block, we will in
  * the sequel denote a list of indices of degrees of freedom; the algorithm
  * will work on each block separately, i.e. the solutions of the local systems
@@ -512,6 +520,14 @@ public:
   void
   vmult(Vector<number2> &dst, const Vector<number2> &src) const;
 
+
+  /**
+   * Apply the transpose preconditioner.
+   */
+  template <typename number2>
+  void
+  Tvmult(Vector<number2> &dst, const Vector<number2> &src) const;
+
   /**
    * Determine an estimate for the memory consumption (in bytes) of this
    * object.
@@ -563,15 +579,6 @@ SparseVanka<number>::n() const
 {
   Assert(_n != 0, ExcNotInitialized());
   return _n;
-}
-
-template <typename number>
-template <typename number2>
-inline void
-SparseVanka<number>::Tvmult(Vector<number2> & /*dst*/,
-                            const Vector<number2> & /*src*/) const
-{
-  AssertThrow(false, ExcNotImplemented());
 }
 
 #endif // DOXYGEN

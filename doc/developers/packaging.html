@@ -4,7 +4,7 @@
   <head>
     <title>Packaging deal.II</title>
     <link href="../screen.css" rel="StyleSheet" media="screen">
-    <meta name="copyright" content="Copyright (C) 2000 - 2022 by the deal.II Authors">
+    <meta name="copyright" content="Copyright (C) 2000 - 2023 by the deal.II Authors">
     <meta name="keywords" content="deal.II packaging">
   </head>
 
@@ -58,12 +58,6 @@
         correct directory for software licenses.
       </li>
       <li>
-        By default, all tutorial programs are compiled in both debug and release
-        mode and installed in the <tt>bin</tt> subdirectory of the installation
-        prefix. We recommend disabling the examples by configuring with
-        the <tt>-DDEAL_II_COMPILE_EXAMPLES=OFF</tt> option.
-      </li>
-      <li>
         The CMake configuration of <acronym>deal.II</acronym> will determine
         what compiler is being used and pick reasonable optimization and
         debugging flags automatically. Further flags for debug and release mode
@@ -78,8 +72,7 @@
       </li>
       <li>
         The flag <tt>DEAL_II_WITH_64BIT_INDICES</tt> changes an integral type
-        used for indices in the library. This value should be made consistent
-        with the way PETSc is configured.
+        used for indices in the library.
       </li>
       <li>
         <acronym>deal.II</acronym> includes copies of boost, Kokkos, muParser, TBB, and

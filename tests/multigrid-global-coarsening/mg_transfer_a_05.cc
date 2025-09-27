@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2020 - 2022 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2020 - 2024 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 
 /**
@@ -29,6 +28,7 @@
 #include <deal.II/distributed/tria.h>
 
 #include <deal.II/dofs/dof_handler.h>
+#include <deal.II/dofs/dof_tools.h>
 
 #include <deal.II/fe/fe_dgq.h>
 #include <deal.II/fe/fe_q.h>
@@ -125,10 +125,12 @@ test(int                          fe_degree,
 {
   const auto str_fine   = std::to_string(fe_degree);
   const auto str_coarse = std::to_string(fe_degree);
+  const auto str_dim    = std::to_string(dim);
 
   if ((fe_degree > 0) && (do_simplex_mesh == false))
     {
-      deallog.push("CG<2>(" + str_fine + ")<->CG<2>(" + str_coarse + ")");
+      deallog.push("HCG<" + str_dim + ">(" + str_fine + ")<->HCG<" + str_dim +
+                   ">(" + str_coarse + ")");
       do_test<dim, double>(FE_Q<dim>(fe_degree),
                            FE_Q<dim>(fe_degree),
                            function);
@@ -137,7 +139,8 @@ test(int                          fe_degree,
 
   if ((fe_degree > 0) && do_simplex_mesh)
     {
-      deallog.push("CG<2>(" + str_fine + ")<->CG<2>(" + str_coarse + ")");
+      deallog.push("SCG<" + str_dim + ">(" + str_fine + ")<->SCG<" + str_dim +
+                   ">(" + str_coarse + ")");
       do_test<dim, double>(FE_SimplexP<dim>(fe_degree),
                            FE_SimplexP<dim>(fe_degree),
                            function);
@@ -155,10 +158,14 @@ main(int argc, char **argv)
 
   // Functions::ConstantFunction<2, double> fu(1.);
   RightHandSideFunction<2> fu;
+  RightHandSideFunction<3> fu3;
 
   for (unsigned int i = 0; i <= 4; ++i)
     test<2, double>(i, fu, false);
 
-  for (unsigned int i = 0; i <= 2; ++i)
+  for (unsigned int i = 0; i <= 3; ++i)
     test<2, double>(i, fu, true);
+
+  for (unsigned int i = 1; i <= 3; ++i)
+    test<3, double>(i, fu3, true);
 }

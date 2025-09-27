@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2004 - 2020 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2004 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 
 
@@ -91,7 +90,7 @@ namespace internal
         Assert(p.size() == k + 1, ExcDimensionMismatch(p.size(), k + 1));
         const double h = 1. / k;
         for (unsigned int i = 0; i < p.size(); ++i)
-          p[i](0) = i * h;
+          p[i][0] = i * h;
       }
 
       template <>
@@ -103,8 +102,8 @@ namespace internal
                ExcInternalError());
         for (unsigned int i = 0; i < p.size(); ++i)
           {
-            p[i](0) = points2d[start_index2d[k] + i][0];
-            p[i](1) = points2d[start_index2d[k] + i][1];
+            p[i][0] = points2d[start_index2d[k] + i][0];
+            p[i][1] = points2d[start_index2d[k] + i][1];
           }
       }
 
@@ -117,9 +116,9 @@ namespace internal
                ExcInternalError());
         for (unsigned int i = 0; i < p.size(); ++i)
           {
-            p[i](0) = points3d[start_index3d[k] + i][0];
-            p[i](1) = points3d[start_index3d[k] + i][1];
-            p[i](2) = points3d[start_index3d[k] + i][2];
+            p[i][0] = points3d[start_index3d[k] + i][0];
+            p[i][1] = points3d[start_index3d[k] + i][1];
+            p[i][2] = points3d[start_index3d[k] + i][2];
           }
       }
     } // namespace
@@ -252,7 +251,7 @@ template <int dim>
 void
 FE_DGPMonomial<dim>::initialize_restriction()
 {
-  Assert(false, ExcNotImplemented());
+  DEAL_II_NOT_IMPLEMENTED();
 }
 
 
@@ -351,7 +350,7 @@ FE_DGPMonomial<dim>::hp_vertex_dof_identities(
     return std::vector<std::pair<unsigned int, unsigned int>>();
   else
     {
-      Assert(false, ExcNotImplemented());
+      DEAL_II_NOT_IMPLEMENTED();
       return std::vector<std::pair<unsigned int, unsigned int>>();
     }
 }
@@ -369,7 +368,7 @@ FE_DGPMonomial<dim>::hp_line_dof_identities(
     return std::vector<std::pair<unsigned int, unsigned int>>();
   else
     {
-      Assert(false, ExcNotImplemented());
+      DEAL_II_NOT_IMPLEMENTED();
       return std::vector<std::pair<unsigned int, unsigned int>>();
     }
 }
@@ -387,7 +386,7 @@ FE_DGPMonomial<dim>::hp_quad_dof_identities(const FiniteElement<dim> &fe_other,
     return std::vector<std::pair<unsigned int, unsigned int>>();
   else
     {
-      Assert(false, ExcNotImplemented());
+      DEAL_II_NOT_IMPLEMENTED();
       return std::vector<std::pair<unsigned int, unsigned int>>();
     }
 }
@@ -433,7 +432,7 @@ FE_DGPMonomial<dim>::compare_for_domination(const FiniteElement<dim> &fe_other,
         return FiniteElementDomination::no_requirements;
     }
 
-  Assert(false, ExcNotImplemented());
+  DEAL_II_NOT_IMPLEMENTED();
   return FiniteElementDomination::neither_element_dominates;
 }
 
@@ -504,14 +503,14 @@ template <int dim>
 std::size_t
 FE_DGPMonomial<dim>::memory_consumption() const
 {
-  Assert(false, ExcNotImplemented());
+  DEAL_II_NOT_IMPLEMENTED();
   return 0;
 }
 
 
 
 // explicit instantiations
-#include "fe_dgp_monomial.inst"
+#include "fe/fe_dgp_monomial.inst"
 
 
 DEAL_II_NAMESPACE_CLOSE

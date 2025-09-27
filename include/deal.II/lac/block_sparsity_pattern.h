@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2000 - 2023 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2000 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 #ifndef dealii_block_sparsity_pattern_h
 #define dealii_block_sparsity_pattern_h
@@ -19,9 +18,9 @@
 
 #include <deal.II/base/config.h>
 
+#include <deal.II/base/enable_observer_pointer.h>
 #include <deal.II/base/exceptions.h>
-#include <deal.II/base/smartpointer.h>
-#include <deal.II/base/subscriptor.h>
+#include <deal.II/base/observer_pointer.h>
 #include <deal.II/base/table.h>
 
 #include <deal.II/lac/block_indices.h>
@@ -200,8 +199,8 @@ public:
   /**
    * Return whether the object is empty. It is empty if no memory is
    * allocated, which is the same as that both dimensions are zero. This
-   * function is just the concatenation of the respective call to all sub-
-   * matrices.
+   * function is just the concatenation of the respective call to all
+   * sub-matrices.
    */
   bool
   empty() const;
@@ -263,8 +262,8 @@ public:
 
   /**
    * Return number of columns of this matrix, which equals the dimension of
-   * the range space. It is the sum of columns of the (block-)columns of sub-
-   * matrices.
+   * the range space. It is the sum of columns of the (block-)columns of
+   * sub-matrices.
    */
   using SparsityPatternBase::n_cols;
 
@@ -476,8 +475,8 @@ public:
 
 
   /**
-   * Return whether the structure is compressed or not, i.e. whether all sub-
-   * matrices are compressed.
+   * Return whether the structure is compressed or not, i.e. whether all
+   * sub-matrices are compressed.
    */
   bool
   is_compressed() const;
@@ -898,15 +897,16 @@ BlockSparsityPatternBase<SparsityPatternType>::add_entries(
           block_column_indices[0].push_back(local_index);
 
           // Check that calculation:
-#ifdef DEBUG
-          {
-            auto check_block_and_col = column_indices.global_to_local(*it);
-            Assert(current_block == check_block_and_col.first,
-                   ExcInternalError());
-            Assert(local_index == check_block_and_col.second,
-                   ExcInternalError());
-          }
-#endif
+          if constexpr (running_in_debug_mode())
+            {
+              {
+                auto check_block_and_col = column_indices.global_to_local(*it);
+                Assert(current_block == check_block_and_col.first,
+                       ExcInternalError());
+                Assert(local_index == check_block_and_col.second,
+                       ExcInternalError());
+              }
+            }
         }
       // add whatever is left over:
       sub_objects[row_index.first][current_block]->add_entries(
@@ -1071,7 +1071,7 @@ BlockDynamicSparsityPattern::column_number(const size_type    row,
       block_columns += sub_objects[row_index.first][b]->n_cols();
     }
 
-  Assert(false, ExcInternalError());
+  DEAL_II_ASSERT_UNREACHABLE();
   return 0;
 }
 

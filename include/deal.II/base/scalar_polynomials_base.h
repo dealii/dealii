@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2005 - 2022 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2019 - 2024 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 #ifndef dealii_scalar_polynomials_base_h
 #define dealii_scalar_polynomials_base_h
@@ -259,29 +258,27 @@ inline Tensor<order, dim>
 ScalarPolynomialsBase<dim>::compute_derivative(const unsigned int i,
                                                const Point<dim>  &p) const
 {
-  if (order == 1)
+  if constexpr (order == 1)
     {
-      auto derivative = compute_1st_derivative(i, p);
-      return *reinterpret_cast<Tensor<order, dim> *>(&derivative);
+      return compute_1st_derivative(i, p);
     }
-  if (order == 2)
+  else if constexpr (order == 2)
     {
-      auto derivative = compute_2nd_derivative(i, p);
-      return *reinterpret_cast<Tensor<order, dim> *>(&derivative);
+      return compute_2nd_derivative(i, p);
     }
-  if (order == 3)
+  else if constexpr (order == 3)
     {
-      auto derivative = compute_3rd_derivative(i, p);
-      return *reinterpret_cast<Tensor<order, dim> *>(&derivative);
+      return compute_3rd_derivative(i, p);
     }
-  if (order == 4)
+  else if constexpr (order == 4)
     {
-      auto derivative = compute_4th_derivative(i, p);
-      return *reinterpret_cast<Tensor<order, dim> *>(&derivative);
+      return compute_4th_derivative(i, p);
     }
-  Assert(false, ExcNotImplemented());
-  Tensor<order, dim> empty;
-  return empty;
+  else
+    {
+      DEAL_II_NOT_IMPLEMENTED();
+      return {};
+    }
 }
 
 DEAL_II_NAMESPACE_CLOSE

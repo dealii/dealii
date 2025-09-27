@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2005 - 2023 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2013 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 
 /**
@@ -202,12 +201,6 @@
  *       </td></tr>
  *
  *   <tr valign="top">
- *       <td>step-12b</td>
- *       <td> A variant of step-12 (for linear advection problems), but
- *       using the MeshWorker framework for the assembly of linear systems.
- *       </td></tr>
- *
- *   <tr valign="top">
  *       <td>step-13</td>
  *       <td> Software design questions and
  *       how to write a modular, extensible finite element program.
@@ -235,12 +228,6 @@
  *       <br/> Keywords: Multigrid, PreconditionMG, mg::Matrix,
  *       MGTransferPrebuilt, MeshWorker::mesh_loop(), MGLevelObject,
  *       MGConstrainedDoFs
- *       </td></tr>
- *
- *   <tr valign="top">
- *       <td>step-16b</td>
- *       <td> A variant of step-16 but with MeshWorker for assembly: Multigrid
- *       preconditioning of the Laplace equation on adaptive meshes.
  *       </td></tr>
  *
  *   <tr valign="top">
@@ -475,12 +462,13 @@
  *   <tr valign="top">
  *       <td>step-49</td>
  *       <td> Advanced mesh creation and manipulation techniques.
+ *         <br/> (Also available as a Python <a href="https://github.com/dealii/dealii/blob/master/examples/step-49/step-49.ipynb">Jupyter notebook</a>)
  *       </td></tr>
  *
  *   <tr valign="top">
  *       <td>step-50</td>
  *       <td> Geometric multigrid on adaptive meshes distributed in parallel.
- *       <br/> Keywords: Multigrid, MGLevelObject, MGConstrainedDoFs, IndexSet, MGTools, PreconditionMG, MatrixFree, FEInterfaceValues, MeshWorker::mesh_loop()
+ *         <br/> Keywords: Multigrid, MGLevelObject, MGConstrainedDoFs, IndexSet, MGTools, PreconditionMG, MatrixFree, FEInterfaceValues, MeshWorker::mesh_loop()
  *       </td></tr>
  *
  *   <tr valign="top">
@@ -490,21 +478,17 @@
  *       </td></tr>
  *
  *   <tr valign="top">
- *       <td>step-52</td>
- *       <td> Solving the time dependent neutron diffusion equation using
- *       Runge-Kutta methods. Explicit and implicit time stepping.
- *       </td></tr>
- *
- *   <tr valign="top">
  *       <td>step-53</td>
  *       <td> Describing the geometry of complex domains and curved boundaries.
+ *         <br/> Keywords: Functions::InterpolatedUniformGridData, ChartManifold
+ *         <br/> (Also available as a Python <a href="https://github.com/dealii/dealii/blob/master/examples/step-53/step-53.ipynb">Jupyter notebook</a>)
  *       </td></tr>
  *
  *   <tr valign="top">
  *       <td>step-54</td>
  *       <td> Using CAD files to describe the boundary of your domain.
  *       <br/> Keywords: Manifold, OpenCASCADE::read_IGES(),
- *       OpenCASCADE::NormalProjectionBoundary
+ *       OpenCASCADE::NormalProjectionManifold
  *       </td></tr>
  *
  *   <tr valign="top">
@@ -553,6 +537,7 @@
  *       <td> Resonance frequency and bandgap of a phononic crystal. Elastic
  *       wave equation in the frequency domain with Perfectly Matched Layer
  *       boundary conditions. Parallelization via MUMPS and MPI.
+ *       <br/> (Also available as a Python <a href="https://github.com/dealii/dealii/blob/master/examples/step-62/step-62.ipynb">Jupyter notebook</a>)
  *       </td></tr>
  *
  *   <tr valign="top">
@@ -568,7 +553,7 @@
  *       <td>step-64</td>
  *       <td> Solving a Helmholtz problem using matrix-free methods on the GPU
  *       with MPI parallelization.
- *       <br/> Keywords: LinearAlgebra::CUDAWrappers, CUDAWrappers::MatrixFree
+ *       <br/> Keywords: Portable::MatrixFree, Portable::FEEvaluation, Kokkos
  *       </td></tr>
  *
  *   <tr valign="top">
@@ -679,11 +664,62 @@
  *       </td></tr>
  *
  *   <tr valign="top">
+ *       <td>step-83</td>
+ *       <td> Serialization, checkpoint/restart.
+ *       </td></tr>
+ *
+ *   <tr valign="top">
  *       <td>step-85</td>
  *       <td> Solving the Poisson equation using the cut finite element method.
  *       <br/> Keywords: FEInterfaceValues, NonMatching::FEImmersedSurfaceValues
  *       </td></tr>
  *
+ *   <tr valign="top">
+ *       <td>step-86</td>
+ *       <td> The heat equation, solved with an external time stepping
+ *       library
+ *       <br/> Keywords: PETScWrappers::TimeStepper
+ *       </td></tr>
+ *
+ *   <tr valign="top">
+ *       <td>step-87</td>
+ *       <td> Evaluation of finite element solutions at arbitrary points within a distributed
+ *       mesh with application to two-phase flow.
+ *       <br/> Keywords: Utilities::MPI::RemotePointEvaluation, VectorTools::point_values()
+ *       </td></tr>
+ *
+ *   <tr valign="top">
+ *       <td>step-89</td>
+ *       <td> Matrix-free operator evaluation for non-matching and Chimera methods with application
+ *       to acoustic conservation equations.
+ *       <br/> Keywords: FERemoteEvaluation
+ *       </td></tr>
+ *
+ *   <tr valign="top">
+ *       <td>step-90</td>
+ *       <td> Solving the Laplace-Beltrami equation on a surface using the trace finite element method.
+ *       <br/> Keywords: MeshWorker::mesh_loop(), NonMatching::FEImmersedSurfaceValues
+ *       </td></tr>
+ * 
+ *   <tr valign="top">
+ *       <td>step-93</td>
+ *       <td> Using nonlocal dofs to solve a simple optimization problem with the Poisson equation
+ *       <br/> Keywords: nonlocal dofs, optimization, Poisson
+ *       </td></tr>
+ *
+ *   <tr valign="top">
+ *       <td>step-95</td>
+ *       <td> Solve the Poisson equation with CutFEM/CutDG and a matrix-free operator.
+ *       <br/> Keywords: FEPointEvaluation, FEFacePointEvaluation, NonMatching::MappingInfo
+ *       </td></tr>
+ *
+ *   <tr valign="top">
+ *       <td>step-97</td>
+ *       <td> Application of the Nedelec and Raviart-Thomas finite elements to a magnetic
+ *       problem formulated in terms of the magnetic vector potential and current vector potential.
+ *       Solving the curl-curl equation.
+ *       <br/> Keywords: FE_Nedelec, FE_RaviartThomas, WorkStream::run()
+ *       </td></tr>
  * </table>
  *
  *
@@ -804,7 +840,8 @@
  *       step-18,
  *       step-40,
  *       step-50,
- *       step-55
+ *       step-55,
+ *       step-86
  *     </td>
  *   </tr>
  *
@@ -830,7 +867,7 @@
  *   </tr>
  *
  *   <tr valign="top">
- *     <td> Parallelization via CUDA and MPI
+ *     <td> Parallelization via Kokkos and MPI
  *     </td>
  *     <td>
  *       step-64
@@ -852,7 +889,8 @@
  *       step-67,
  *       step-69,
  *       step-70,
- *       step-75
+ *       step-75,
+ *       step-86
  *     </td>
  *   </tr>
  *
@@ -874,7 +912,8 @@
  *       step-69,
  *       step-70,
  *       step-71,
- *       step-72
+ *       step-72,
+ *       step-86
  *     </td>
  *   </tr>
  *
@@ -901,7 +940,8 @@
  *       step-14,
  *       step-39,
  *       step-50,
- *       step-74
+ *       step-74,
+ *       step-86
  *     </td>
  *   </tr>
  *
@@ -926,7 +966,6 @@
  *     </td>
  *     <td>
  *       step-12,
- *       step-12b,
  *       step-21,
  *       step-39,
  *       step-46,
@@ -1006,7 +1045,9 @@
  *       step-66,
  *       step-67,
  *       step-75,
- *       step-76
+ *       step-76,
+ *       step-89,
+ *       step-95
  *     </td>
  *   </tr>
  *
@@ -1027,7 +1068,10 @@
  *     <td>
  *       step-60,
  *       step-70,
- *       step-85
+ *       step-85,
+ *       step-87,
+ *       step-89,
+ *       step-95
  *     </td>
  *   </tr>
  *
@@ -1050,6 +1094,8 @@
  *   </tr>
  *
  * </table>
+ *
+ *
  * <h4><b>Linear solvers</b></h4>
  * <table align="center" width="90%">
  *
@@ -1091,7 +1137,6 @@
  *     </td>
  *     <td>
  *       step-16,
- *       step-16b
  *       step-31,
  *       step-32,
  *       step-37,
@@ -1122,7 +1167,8 @@
  *       step-55,
  *       step-59,
  *       step-66,
- *       step-75
+ *       step-75,
+ *       step-86
  *     </td>
  *   </tr>
  *
@@ -1154,6 +1200,7 @@
  *     <td> Linear Newton systems from nonlinear equations
  *     </td>
  *     <td>
+ *       step-15,
  *       step-33,
  *       step-41,
  *       step-42,
@@ -1249,7 +1296,8 @@
  *     <td>
  *       step-33,
  *       step-67,
- *       step-69
+ *       step-69,
+ *       step-76
  *     </td>
  *   </tr>
  *
@@ -1345,6 +1393,15 @@
  *     <td>step-46</td>
  *   </tr>
  *
+ *   <tr valign="top">
+ *     <td> The curl-curl equation
+ *     </td>
+ *     <td>
+ *       step-81,
+ *       step-97
+ *     </td>
+ *   </tr>
+ *
  * </table>
  *
  *
@@ -1401,13 +1458,20 @@
  *     <td>
  *       step-33,
  *       step-67,
- *       step-69
+ *       step-69,
+ *       step-76
  *     </td>
  *   </tr>
  *
  *   <tr valign="top">
  *     <td> Coupling different equations in different parts of the domain
  *     <td>step-46</td>
+ *   </tr>
+ *
+ *   <tr valign="top">
+ *     <td> The magnetic vector potential and current vector potential
+ *     </td>
+ *     <td>step-97</td>
  *   </tr>
  *
  * </table>
@@ -1420,7 +1484,9 @@
  *   <tr valign="top">
  *     <td> The heat equation
  *     </td>
- *     <td>step-26
+ *     <td>
+ *       step-26,
+ *       step-86
  *     </td>
  *   </tr>
  *
@@ -1466,7 +1532,8 @@
  *     <td>
  *       step-33,
  *       step-67,
- *       step-69
+ *       step-69,
+ *       step-76
  *     </td>
  *   </tr>
  *
@@ -1474,12 +1541,6 @@
  *     <td> The nonlinear Schr&ouml;dinger equation
  *     </td>
  *     <td>step-58</td>
- *   </tr>
- *
- *   <tr valign="top">
- *     <td> Time dependent neutron diffusion equation
- *     </td>
- *     <td>step-52</td>
  *   </tr>
  *
  *   <tr valign="top">

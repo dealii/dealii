@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2022 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 1998 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 #ifndef dealii_function_h
 #define dealii_function_h
@@ -19,10 +18,11 @@
 
 #include <deal.II/base/config.h>
 
+#include <deal.II/base/enable_observer_pointer.h>
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/function_time.h>
+#include <deal.II/base/numbers.h>
 #include <deal.II/base/point.h>
-#include <deal.II/base/subscriptor.h>
 #include <deal.II/base/symmetric_tensor.h>
 #include <deal.II/base/tensor.h>
 
@@ -94,8 +94,8 @@ class TensorFunction;
  * or several points (i.e. vector_value(), vector_value_list()), will
  * <em>not</em> call the function returning one component at one point
  * repeatedly, once for each point and component. The reason is efficiency:
- * this would amount to too many virtual function calls. If you have vector-
- * valued functions, you should therefore also provide overloads of the
+ * this would amount to too many virtual function calls. If you have
+ * vector-valued functions, you should therefore also provide overloads of the
  * virtual functions for all components at a time.
  *
  * Also note, that unless only called a very small number of times, you should
@@ -149,7 +149,7 @@ class TensorFunction;
 template <int dim, typename RangeNumberType = double>
 class Function : public FunctionTime<
                    typename numbers::NumberTraits<RangeNumberType>::real_type>,
-                 public Subscriptor
+                 public EnableObserverPointer
 {
 public:
   /**
@@ -186,8 +186,8 @@ public:
    * Virtual destructor; absolutely necessary in this case.
    *
    * This destructor is declared pure virtual, such that objects of this class
-   * cannot be created. Since all the other virtual functions have a pseudo-
-   * implementation to avoid overhead in derived classes, they can not be
+   * cannot be created. Since all the other virtual functions have a
+   * pseudo-implementation to avoid overhead in derived classes, they can not be
    * abstract. As a consequence, we could generate an object of this class
    * because none of this class's functions are abstract.
    *
@@ -812,6 +812,15 @@ public:
     const std::function<RangeNumberType(const Point<dim> &)> &function_object);
 
   /**
+   * Given a function object that takes  a time and a Point and returns a
+   * RangeNumberType value, convert this into an object that matches the
+   * Function<dim, RangeNumberType> interface.
+   */
+  explicit ScalarFunctionFromFunctionObject(
+    const std::function<RangeNumberType(const double, const Point<dim> &)>
+      &function_object_t);
+
+  /**
    * Return the value of the function at the given point. Returns the value
    * the function given to the constructor produces for this point.
    */
@@ -823,7 +832,8 @@ private:
    * The function object which we call when this class's value() or
    * value_list() functions are called.
    */
-  const std::function<RangeNumberType(const Point<dim> &)> function_object;
+  const std::function<RangeNumberType(const double, const Point<dim> &)>
+    function_object;
 };
 
 
@@ -983,6 +993,20 @@ public:
     const double initial_time = 0.0);
 
   /**
+   * Constructor for functions of which you only know the values.
+   *
+   * The resulting function will have a number of components equal @p n_components.
+   * A call to the FunctionFromFunctionObject::gradient()
+   * method will trigger an exception, unless you first call the
+   * set_function_gradients() method.
+   */
+  explicit FunctionFromFunctionObjects(
+    const std::function<RangeNumberType(const Point<dim> &, const unsigned int)>
+                      &values,
+    const unsigned int n_components,
+    const double       initial_time = 0.0);
+
+  /**
    * Constructor for functions of which you know both the values and the
    * gradients.
    *
@@ -1043,14 +1067,14 @@ private:
   /**
    * The actual function values.
    */
-  std::vector<std::function<RangeNumberType(const Point<dim> &)>>
+  std::function<RangeNumberType(const Point<dim> &, const unsigned int)>
     function_values;
 
   /**
    * The actual function gradients.
    */
-  std::vector<
-    std::function<Tensor<1, dim, RangeNumberType>(const Point<dim> &)>>
+  std::function<Tensor<1, dim, RangeNumberType>(const Point<dim> &,
+                                                const unsigned int)>
     function_gradients;
 };
 
@@ -1102,12 +1126,12 @@ public:
    * By default, create a Vector object of the same size as
    * <tt>tensor_function</tt> returns, i.e., with <tt>dim</tt> components.
    *
-   * @param tensor_function The TensorFunction that will form one component of
+   * @param tensor_function The TensorFunction that will form `dim` components of
    * the resulting Vector Function object.
    * @param n_components The total number of vector components of the
-   * resulting TensorFunction object.
+   * resulting TensorFunction object. This clearly has to be at least `dim`.
    * @param selected_component The first component that should be filled by
-   * the first argument.  This should be such that the entire tensor_function
+   * the first argument.  This should be such that the entire `tensor_function`
    * fits inside the <tt>n_component</tt> length return vector.
    */
   explicit VectorFunctionFromTensorFunction(
@@ -1208,6 +1232,118 @@ private:
    * or vector_value_list() functions are called.
    */
   const TensorFunction<1, dim, RangeNumberType> &tensor_function;
+
+  /**
+   * The first vector component whose value is to be filled by the given
+   * TensorFunction.  The values will be placed in components
+   * selected_component to selected_component+dim-1 for a
+   * <tt>TensorFunction<1,dim, RangeNumberType></tt> object.
+   */
+  const unsigned int selected_component;
+};
+
+
+/**
+ * This class is built as a means of translating the <code>Tensor<1,dim,
+ * RangeNumberType> </code> values produced by function objects that
+ * for a given point return a tensor,
+ * and returning them as a multiple component version of the same thing as a
+ * Vector for use in, for example, the VectorTools::interpolate or the many
+ * other functions taking Function objects. It allows the user to place the
+ * desired components into an <tt>n_components</tt> long vector starting at
+ * the <tt>selected_component</tt> location in that vector and have all other
+ * components be 0.
+ *
+ * For example: Say you created a function object that returns the gravity
+ * (here, a radially inward pointing vector of magnitude 9.81):
+ * @code
+ *   const auto gravity
+ *     = [](const Point<dim> &p) -> Tensor<1,dim> { return -9.81 * (p /
+ * p.norm()); }
+ * @endcode
+ * and you want to interpolate this onto your mesh using the
+ * VectorTools::interpolate function, with a finite element for the
+ * DoFHandler object has 3 copies of a finite element with <tt>dim</tt>
+ * components, for a total of 3*dim components. To interpolate onto that
+ * DoFHandler, you need an object of type Function that has 3*dim vector
+ * components. Creating such an object from the existing <code>gravity</code>
+ * object is done using this piece of code:
+ * @code
+ * VectorFunctionFromTensorFunctionObject<dim, RangeNumberType>
+ *   gravity_vector_function(gravity, 0, 3*dim);
+ * @endcode
+ * where the <code>dim</code> components of the `gravity` function are placed
+ * into the first <code>dim</code> components of the function object.
+ *
+ * @ingroup functions
+ */
+template <int dim, typename RangeNumberType = double>
+class VectorFunctionFromTensorFunctionObject
+  : public Function<dim, RangeNumberType>
+{
+public:
+  /**
+   * Given a function object that takes a <tt>Point</tt> and returns a
+   * <tt>Tensor<1,dim, RangeNumberType></tt> value, convert this into an object
+   * that matches the Function@<dim@> interface.
+   *
+   * By default, create a Vector object of the same size as
+   * <tt>tensor_function</tt> returns, i.e., with <tt>dim</tt> components.
+   *
+   * @param tensor_function_object The TensorFunction that will form `dim` components of
+   * the resulting Vector Function object.
+   * @param n_components The total number of vector components of the
+   * resulting TensorFunction object. This clearly has to be at least `dim`.
+   * @param selected_component The first component that should be filled by
+   * the first argument.  This should be such that the entire tensor_function
+   * fits inside the <tt>n_component</tt> length return vector.
+   */
+  explicit VectorFunctionFromTensorFunctionObject(
+    const std::function<Tensor<1, dim, RangeNumberType>(const Point<dim> &)>
+                      &tensor_function_object,
+    const unsigned int selected_component = 0,
+    const unsigned int n_components       = dim);
+
+  /**
+   * This destructor is defined as virtual so as to coincide with all other
+   * aspects of class.
+   */
+  virtual ~VectorFunctionFromTensorFunctionObject() override = default;
+
+  /**
+   * Return a single component of a vector-valued function at a given point.
+   */
+  virtual RangeNumberType
+  value(const Point<dim> &p, const unsigned int component = 0) const override;
+
+  /**
+   * Return all components of a vector-valued function at a given point.
+   *
+   * <tt>values</tt> shall have the right size beforehand, i.e. #n_components.
+   */
+  virtual void
+  vector_value(const Point<dim>        &p,
+               Vector<RangeNumberType> &values) const override;
+
+  /**
+   * Return all components of a vector-valued function at a list of points.
+   *
+   * <tt>value_list</tt> shall be the same size as <tt>points</tt> and each
+   * element of the vector will be passed to vector_value() to evaluate the
+   * function
+   */
+  virtual void
+  vector_value_list(
+    const std::vector<Point<dim>>        &points,
+    std::vector<Vector<RangeNumberType>> &value_list) const override;
+
+private:
+  /**
+   * The TensorFunction object which we call when this class's vector_value()
+   * or vector_value_list() functions are called.
+   */
+  const std::function<Tensor<1, dim, RangeNumberType>(const Point<dim> &)>
+    tensor_function_object;
 
   /**
    * The first vector component whose value is to be filled by the given

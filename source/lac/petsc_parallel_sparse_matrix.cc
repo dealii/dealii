@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2004 - 2023 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2004 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 #include <deal.II/lac/petsc_sparse_matrix.h>
 
@@ -49,7 +48,6 @@ namespace PETScWrappers
     SparseMatrix::~SparseMatrix()
     {
       PetscErrorCode ierr = MatDestroy(&matrix);
-      (void)ierr;
       AssertNothrow(ierr == 0, ExcPETScError(ierr));
     }
 
@@ -186,6 +184,15 @@ namespace PETScWrappers
                             const IndexSet            &local_columns,
                             const SparsityPatternType &sparsity_pattern)
     {
+      // If the sparsity pattern's dimensions can be converted to PetscInts then
+      // the rest of the conversions will succeed
+      AssertThrowIntegerConversion(static_cast<PetscInt>(
+                                     sparsity_pattern.n_rows()),
+                                   sparsity_pattern.n_rows());
+      AssertThrowIntegerConversion(static_cast<PetscInt>(
+                                     sparsity_pattern.n_cols()),
+                                   sparsity_pattern.n_cols());
+
       Assert(sparsity_pattern.n_rows() == local_rows.size(),
              ExcMessage(
                "SparsityPattern and IndexSet have different number of rows"));
@@ -198,30 +205,30 @@ namespace PETScWrappers
       Assert(local_rows.is_ascending_and_one_to_one(communicator),
              ExcNotImplemented());
 
-#  ifdef DEBUG
-      {
-        // check indexsets
-        types::global_dof_index row_owners =
-          Utilities::MPI::sum(local_rows.n_elements(), communicator);
-        types::global_dof_index col_owners =
-          Utilities::MPI::sum(local_columns.n_elements(), communicator);
-        Assert(row_owners == sparsity_pattern.n_rows(),
-               ExcMessage(
-                 std::string(
-                   "Each row has to be owned by exactly one owner (n_rows()=") +
-                 std::to_string(sparsity_pattern.n_rows()) +
-                 " but sum(local_rows.n_elements())=" +
-                 std::to_string(row_owners) + ")"));
-        Assert(
-          col_owners == sparsity_pattern.n_cols(),
-          ExcMessage(
-            std::string(
-              "Each column has to be owned by exactly one owner (n_cols()=") +
-            std::to_string(sparsity_pattern.n_cols()) +
-            " but sum(local_columns.n_elements())=" +
-            std::to_string(col_owners) + ")"));
-      }
-#  endif
+      if constexpr (running_in_debug_mode())
+        {
+          // check indexsets
+          types::global_dof_index row_owners =
+            Utilities::MPI::sum(local_rows.n_elements(), communicator);
+          types::global_dof_index col_owners =
+            Utilities::MPI::sum(local_columns.n_elements(), communicator);
+          Assert(
+            row_owners == sparsity_pattern.n_rows(),
+            ExcMessage(
+              std::string(
+                "Each row has to be owned by exactly one owner (n_rows()=") +
+              std::to_string(sparsity_pattern.n_rows()) +
+              " but sum(local_rows.n_elements())=" +
+              std::to_string(row_owners) + ")"));
+          Assert(
+            col_owners == sparsity_pattern.n_cols(),
+            ExcMessage(
+              std::string(
+                "Each column has to be owned by exactly one owner (n_cols()=") +
+              std::to_string(sparsity_pattern.n_cols()) +
+              " but sum(local_columns.n_elements())=" +
+              std::to_string(col_owners) + ")"));
+        }
 
 
       // create the matrix. We do not set row length but set the
@@ -273,9 +280,9 @@ namespace PETScWrappers
           // dummy entry at the end to make
           // sure petsc doesn't read past the
           // end
-          std::vector<PetscInt>
-
-            rowstart_in_window(local_row_end - local_row_start + 1, 0),
+          std::vector<PetscInt> rowstart_in_window(local_row_end -
+                                                     local_row_start + 1,
+                                                   0),
             colnums_in_window;
           {
             unsigned int n_cols = 0;
@@ -352,6 +359,14 @@ namespace PETScWrappers
                                   local_columns_per_process.size()));
       Assert(this_process < local_rows_per_process.size(), ExcInternalError());
       assert_is_compressed();
+      // If the sparsity pattern's dimensions can be converted to PetscInts then
+      // the rest of the conversions will succeed
+      AssertThrowIntegerConversion(static_cast<PetscInt>(
+                                     sparsity_pattern.n_rows()),
+                                   sparsity_pattern.n_rows());
+      AssertThrowIntegerConversion(static_cast<PetscInt>(
+                                     sparsity_pattern.n_cols()),
+                                   sparsity_pattern.n_cols());
 
       // for each row that we own locally, we
       // have to count how many of the
@@ -411,17 +426,20 @@ namespace PETScWrappers
           // dummy entry at the end to make
           // sure petsc doesn't read past the
           // end
-          std::vector<PetscInt>
-
-            rowstart_in_window(local_row_end - local_row_start + 1, 0),
+          std::vector<PetscInt> rowstart_in_window(local_row_end -
+                                                     local_row_start + 1,
+                                                   0),
             colnums_in_window;
           {
             size_type n_cols = 0;
             for (size_type i = local_row_start; i < local_row_end; ++i)
               {
                 const size_type row_length = sparsity_pattern.row_length(i);
-                rowstart_in_window[i + 1 - local_row_start] =
+                const auto      row_start =
                   rowstart_in_window[i - local_row_start] + row_length;
+                const auto petsc_row_start = static_cast<PetscInt>(row_start);
+                AssertIntegerConversion(petsc_row_start, row_start);
+                rowstart_in_window[i + 1 - local_row_start] = petsc_row_start;
                 n_cols += row_length;
               }
             colnums_in_window.resize(n_cols + 1, -1);
@@ -436,7 +454,11 @@ namespace PETScWrappers
                      sparsity_pattern.begin(i);
                    p != sparsity_pattern.end(i);
                    ++p, ++ptr)
-                *ptr = p->column();
+                {
+                  const auto petsc_column = static_cast<PetscInt>(p->column());
+                  AssertIntegerConversion(petsc_column, p->column());
+                  *ptr = petsc_column;
+                }
           }
 
 
@@ -472,6 +494,15 @@ namespace PETScWrappers
                             const IndexSet            &local_active_columns,
                             const SparsityPatternType &sparsity_pattern)
     {
+      // If the sparsity pattern's dimensions can be converted to PetscInts then
+      // the rest of the conversions will succeed
+      AssertThrowIntegerConversion(static_cast<PetscInt>(
+                                     sparsity_pattern.n_rows()),
+                                   sparsity_pattern.n_rows());
+      AssertThrowIntegerConversion(static_cast<PetscInt>(
+                                     sparsity_pattern.n_cols()),
+                                   sparsity_pattern.n_cols());
+
 #  if DEAL_II_PETSC_VERSION_GTE(3, 10, 0)
       Assert(sparsity_pattern.n_rows() == local_rows.size(),
              ExcMessage(
@@ -485,30 +516,30 @@ namespace PETScWrappers
       Assert(local_rows.is_ascending_and_one_to_one(communicator),
              ExcNotImplemented());
 
-#    ifdef DEBUG
-      {
-        // check indexsets
-        const types::global_dof_index row_owners =
-          Utilities::MPI::sum(local_rows.n_elements(), communicator);
-        const types::global_dof_index col_owners =
-          Utilities::MPI::sum(local_columns.n_elements(), communicator);
-        Assert(row_owners == sparsity_pattern.n_rows(),
-               ExcMessage(
-                 std::string(
-                   "Each row has to be owned by exactly one owner (n_rows()=") +
-                 std::to_string(sparsity_pattern.n_rows()) +
-                 " but sum(local_rows.n_elements())=" +
-                 std::to_string(row_owners) + ")"));
-        Assert(
-          col_owners == sparsity_pattern.n_cols(),
-          ExcMessage(
-            std::string(
-              "Each column has to be owned by exactly one owner (n_cols()=") +
-            std::to_string(sparsity_pattern.n_cols()) +
-            " but sum(local_columns.n_elements())=" +
-            std::to_string(col_owners) + ")"));
-      }
-#    endif
+      if constexpr (running_in_debug_mode())
+        {
+          // check indexsets
+          const types::global_dof_index row_owners =
+            Utilities::MPI::sum(local_rows.n_elements(), communicator);
+          const types::global_dof_index col_owners =
+            Utilities::MPI::sum(local_columns.n_elements(), communicator);
+          Assert(
+            row_owners == sparsity_pattern.n_rows(),
+            ExcMessage(
+              std::string(
+                "Each row has to be owned by exactly one owner (n_rows()=") +
+              std::to_string(sparsity_pattern.n_rows()) +
+              " but sum(local_rows.n_elements())=" +
+              std::to_string(row_owners) + ")"));
+          Assert(
+            col_owners == sparsity_pattern.n_cols(),
+            ExcMessage(
+              std::string(
+                "Each column has to be owned by exactly one owner (n_cols()=") +
+              std::to_string(sparsity_pattern.n_cols()) +
+              " but sum(local_columns.n_elements())=" +
+              std::to_string(col_owners) + ")"));
+        }
       PetscErrorCode ierr;
 
       // create the local to global mappings as arrays.

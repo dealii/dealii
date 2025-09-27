@@ -1,35 +1,40 @@
 # Listing of Parameters
 # ---------------------
 # The end time of the simulation in years.
-set End time                            = 1e8
+
+set End time = 1e8
 
 # Whether graphical output is to be generated or not. You may not want to get
 # graphical output if the number of processors is large.
-set Generate graphical output           = true
+
+set Generate graphical output = true
 
 # The number of adaptive refinement steps performed after initial global
 # refinement.
-set Initial adaptive refinement         = 2
+
+set Initial adaptive refinement = 2
 
 # The number of global refinement steps performed on the initial coarse mesh,
 # before the problem is first solved there.
-set Initial global refinement           = 5
+
+set Initial global refinement = 5
 
 # The number of time steps between each generation of graphical output files.
+
 set Time steps between graphical output = 50
 
 # The number of time steps after which the mesh is to be adapted based on
 # computed error indicators.
-set Time steps between mesh refinement  = 10
 
+set Time steps between mesh refinement = 10
 
 subsection Discretization
   # The polynomial degree to use for the velocity variables in the Stokes
   # system.
-  set Stokes velocity polynomial degree       = 2
+  set Stokes velocity polynomial degree = 2
 
   # The polynomial degree to use for the temperature variable.
-  set Temperature polynomial degree           = 2
+  set Temperature polynomial degree = 2
 
   # Whether to use a Stokes discretization that is locally conservative at the
   # expense of a larger number of degrees of freedom, or to go with a cheaper
@@ -38,15 +43,14 @@ subsection Discretization
   set Use locally conservative discretization = true
 end
 
-
 subsection Stabilization parameters
   # The exponent in the entropy viscosity stabilization.
   set alpha = 2
 
   # The beta factor in the artificial viscosity stabilization. An appropriate
   # value for 2d is 0.052 and 0.078 for 3d.
-  set beta  = 0.078
+  set beta = 0.078
 
   # The c_R factor in the entropy viscosity stabilization.
-  set c_R   = 0.5
+  set c_R = 0.5
 end

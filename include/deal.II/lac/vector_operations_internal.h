@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2016 - 2023 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2016 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 
 #ifndef dealii_vector_operations_internal_h
@@ -28,8 +27,16 @@
 
 #include <deal.II/lac/vector_operation.h>
 
+#include <Kokkos_Core.hpp>
+
 #include <cstdio>
 #include <cstring>
+
+#ifdef DEAL_II_WITH_TBB
+#  include <tbb/blocked_range.h>
+#  include <tbb/partitioner.h>
+#endif
+
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -211,14 +218,9 @@ namespace internal
         Assert(end >= begin, ExcInternalError());
 
         if (value == Number())
-          {
-            if constexpr (std::is_trivial_v<Number>)
-              {
-                std::memset(dst + begin, 0, sizeof(Number) * (end - begin));
-                return;
-              }
-          }
-        std::fill(dst + begin, dst + end, value);
+          std::fill(dst + begin, dst + end, Number());
+        else
+          std::fill(dst + begin, dst + end, value);
       }
 
       const Number  value;
@@ -1021,12 +1023,12 @@ namespace internal
           // on the number types we are given. To choose the vectorized
           // version often enough, we need to have all tasks but the last one
           // to be divisible by the vectorization length
-          size_type n_chunks = do_accumulate(
-            op,
-            vec_size,
-            first,
-            outer_results,
-            std::integral_constant<bool, Operation::vectorizes>());
+          size_type n_chunks =
+            do_accumulate(op,
+                          vec_size,
+                          first,
+                          outer_results,
+                          std::bool_constant<Operation::vectorizes>());
 
           AssertIndexRange(n_chunks,
                            vector_accumulation_recursion_threshold + 1);
@@ -1114,7 +1116,7 @@ namespace internal
                   const size_type vec_size,
                   const size_type start_index,
                   ResultType     *outer_results,
-                  std::integral_constant<bool, false>)
+                  std::bool_constant<false>)
     {
       // Create local copy to indicate no aliasing to the compiler
       size_type index = start_index;
@@ -1196,7 +1198,7 @@ namespace internal
                   const size_type vec_size,
                   const size_type start_index,
                   Number         *outer_results,
-                  std::integral_constant<bool, true>)
+                  std::bool_constant<true>)
     {
       // Create local copy to indicate no aliasing to the compiler
       size_type index = start_index;
@@ -2011,10 +2013,15 @@ namespace internal
              real_type      &sum,
              ::dealii::MemorySpace::MemorySpaceData<Number,
                                                     ::dealii::MemorySpace::Host>
-               &data)
+                            &data,
+             const size_type optional_offset = 0)
       {
         Norm1<Number, real_type> norm1(data.values.data());
-        parallel_reduce(norm1, 0, size, sum, thread_loop_partitioner);
+        parallel_reduce(norm1,
+                        optional_offset,
+                        optional_offset + size,
+                        sum,
+                        thread_loop_partitioner);
       }
 
       template <typename real_type>
@@ -2508,7 +2515,8 @@ namespace internal
         real_type      &sum,
         ::dealii::MemorySpace::MemorySpaceData<Number,
                                                ::dealii::MemorySpace::Default>
-          &data)
+                       &data,
+        const size_type optional_offset = 0)
       {
         auto exec = typename ::dealii::MemorySpace::Default::kokkos_space::
           execution_space{};
@@ -2516,14 +2524,12 @@ namespace internal
           "dealii::norm_1",
           Kokkos::RangePolicy<
             ::dealii::MemorySpace::Default::kokkos_space::execution_space>(
-            exec, 0, size),
+            exec, optional_offset, optional_offset + size),
           KOKKOS_LAMBDA(size_type i, Number & update) {
-#if KOKKOS_VERSION < 30400
-            update += std::abs(data.values(i));
-#elif KOKKOS_VERSION < 30700
-            update += Kokkos::Experimental::fabs(data.values(i));
-#else
+#if DEAL_II_KOKKOS_VERSION_GTE(3, 7, 0)
             update += Kokkos::abs(data.values(i));
+#else
+            update += Kokkos::Experimental::fabs(data.values(i));
 #endif
           },
           sum);
@@ -2548,13 +2554,11 @@ namespace internal
             ::dealii::MemorySpace::Default::kokkos_space::execution_space>(
             exec, 0, size),
           KOKKOS_LAMBDA(size_type i, Number & update) {
-#if KOKKOS_VERSION < 30400
-            update += std::pow(fabs(data.values(i)), exp);
-#elif KOKKOS_VERSION < 30700
+#if DEAL_II_KOKKOS_VERSION_GTE(3, 7, 0)
+            update += Kokkos::pow(Kokkos::abs(data.values(i)), exp);
+#else
             update += Kokkos::Experimental::pow(
               Kokkos::Experimental::fabs(data.values(i)), exp);
-#else
-            update += Kokkos::pow(Kokkos::abs(data.values(i)), exp);
 #endif
           },
           sum);

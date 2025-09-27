@@ -1,17 +1,16 @@
-## ---------------------------------------------------------------------
+## ------------------------------------------------------------------------
 ##
-## Copyright (C) 2013 - 2022 by the deal.II authors
+## SPDX-License-Identifier: LGPL-2.1-or-later
+## Copyright (C) 2013 - 2025 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
-## The deal.II library is free software; you can use it, redistribute
-## it, and/or modify it under the terms of the GNU Lesser General
-## Public License as published by the Free Software Foundation; either
-## version 2.1 of the License, or (at your option) any later version.
-## The full text of the license can be found in the file LICENSE.md at
-## the top level directory of deal.II.
+## Part of the source code is dual licensed under Apache-2.0 WITH
+## LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+## governing the source code and code contributions can be found in
+## LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 ##
-## ---------------------------------------------------------------------
+## ------------------------------------------------------------------------
 
 if ($#ARGV < 1) {
   print "\nUsage: make_gallery.pl cmake_source_dir gallery_name gallery_dir gallery_src_files...\n";
@@ -22,7 +21,7 @@ my $cmake_source_dir = shift(@ARGV);
 
 my $gallery = shift(@ARGV);
 my $gallery_underscore = $gallery;
-$gallery_underscore    =~ s/-/_/;
+$gallery_underscore    =~ s/-/_/g;
 
 my $gallery_dir = shift(@ARGV);
 
@@ -150,7 +149,7 @@ foreach my $file (@src_files)
             }
 
             # update markdown links of the form "[text](./filename)"
-            $line =~ s/(\[.*\])\(.\//\1\(..\/code-gallery\/$gallery\//g;
+            $line =~ s/(\[.*?\])\(.\//\1\(..\/code-gallery\/$gallery\//g;
             print "$line";
         }
 
@@ -163,7 +162,7 @@ foreach my $file (@src_files)
         print "<a name=\"ann-$file\"></a>\n";
         print "<h1>Annotated version of $file</h1>\n";
 
-        system $^X, "$cmake_source_dir/doc/doxygen/scripts/program2doxygen", "$gallery_dir/$file";
+        system $^X, "$cmake_source_dir/doc/doxygen/scripts/program2doxygen.pl", "$gallery_dir/$file" , "--prefix=$file";
 
         print "\n\n";
     }

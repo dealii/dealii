@@ -1,17 +1,16 @@
-/* ---------------------------------------------------------------------
+/* ------------------------------------------------------------------------
  *
- * Copyright (C) 2009 - 2023 by the deal.II authors
+ * SPDX-License-Identifier: LGPL-2.1-or-later
+ * Copyright (C) 2010 - 2024 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
- * The deal.II library is free software; you can use it, redistribute
- * it, and/or modify it under the terms of the GNU Lesser General
- * Public License as published by the Free Software Foundation; either
- * version 2.1 of the License, or (at your option) any later version.
- * The full text of the license can be found in the file LICENSE.md at
- * the top level directory of deal.II.
+ * Part of the source code is dual licensed under Apache-2.0 WITH
+ * LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+ * governing the source code and code contributions can be found in
+ * LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
  *
- * ---------------------------------------------------------------------
+ * ------------------------------------------------------------------------
  *
  * Authors: Wolfgang Bangerth, Texas A&M University, 2009, 2010
  *          Timo Heister, University of Goettingen, 2009, 2010
@@ -93,7 +92,7 @@ namespace LA
 // generate output itself.
 #include <deal.II/base/conditional_ostream.h>
 // After these preliminaries, here is where it becomes more interesting. As
-// mentioned in the @ref distributed module, one of the fundamental truths of
+// mentioned in the @ref distributed topic, one of the fundamental truths of
 // solving problems on large numbers of processors is that there is no way for
 // any processor to store everything (e.g. information about all cells in the
 // mesh, all degrees of freedom, or the values of all elements of the solution
@@ -167,13 +166,13 @@ namespace Step40
     void assemble_system();
     void solve();
     void refine_grid();
-    void output_results(const unsigned int cycle) const;
+    void output_results(const unsigned int cycle);
 
     MPI_Comm mpi_communicator;
 
     parallel::distributed::Triangulation<dim> triangulation;
 
-    FE_Q<dim>       fe;
+    const FE_Q<dim> fe;
     DoFHandler<dim> dof_handler;
 
     IndexSet locally_owned_dofs;
@@ -244,6 +243,12 @@ namespace Step40
 
     dof_handler.distribute_dofs(fe);
 
+    pcout << "   Number of active cells:       "
+          << triangulation.n_global_active_cells() << std::endl
+          << "   Number of degrees of freedom: " << dof_handler.n_dofs()
+          << std::endl;
+
+
     // The next two lines extract some information we will need later on,
     // namely two index sets that provide information about which degrees of
     // freedom are owned by the current processor (this information will be
@@ -280,17 +285,25 @@ namespace Step40
     // consequence, we need to tell the AffineConstraints object for which
     // degrees of freedom it can store constraints and for which it may not
     // expect any information to store. In our case, as explained in the
-    // @ref distributed module, the degrees of freedom we need to care about on
+    // @ref distributed topic, the degrees of freedom we need to care about on
     // each processor are the locally relevant ones, so we pass this to the
-    // AffineConstraints::reinit function. As a side note, if you forget to
-    // pass this argument, the AffineConstraints class will allocate an array
+    // AffineConstraints::reinit() function as a second argument. A further
+    // optimization, AffineConstraint can avoid certain operations if you also
+    // provide it with the set of locally owned degrees of freedom -- the
+    // first argument to AffineConstraints::reinit().
+    //
+    // (What would happen if we didn't pass this information to
+    // AffineConstraints, for example if we called the argument-less version of
+    // AffineConstraints::reinit() typically used in non-parallel codes? In that
+    // case, the AffineConstraints class will allocate an array
     // with length equal to the largest DoF index it has seen so far. For
-    // processors with high MPI process number, this may be very large --
+    // processors with large numbers of MPI processes, this may be very large --
     // maybe on the order of billions. The program would then allocate more
     // memory than for likely all other operations combined for this single
-    // array.
+    // array. Fortunately, recent versions of deal.II would trigger an assertion
+    // that tells you that this is considered a bug.)
     constraints.clear();
-    constraints.reinit(locally_relevant_dofs);
+    constraints.reinit(locally_owned_dofs, locally_relevant_dofs);
     DoFTools::make_hanging_node_constraints(dof_handler, constraints);
     VectorTools::interpolate_boundary_values(dof_handler,
                                              0,
@@ -386,10 +399,10 @@ namespace Step40
     for (const auto &cell : dof_handler.active_cell_iterators())
       if (cell->is_locally_owned())
         {
+          fe_values.reinit(cell);
+
           cell_matrix = 0.;
           cell_rhs    = 0.;
-
-          fe_values.reinit(cell);
 
           for (unsigned int q_point = 0; q_point < n_q_points; ++q_point)
             {
@@ -476,10 +489,12 @@ namespace Step40
   void LaplaceProblem<dim>::solve()
   {
     TimerOutput::Scope t(computing_timer, "solve");
-    LA::MPI::Vector    completely_distributed_solution(locally_owned_dofs,
+
+    LA::MPI::Vector completely_distributed_solution(locally_owned_dofs,
                                                     mpi_communicator);
 
-    SolverControl solver_control(dof_handler.n_dofs(), 1e-12);
+    SolverControl solver_control(dof_handler.n_dofs(),
+                                 1e-6 * system_rhs.l2_norm());
     LA::SolverCG  solver(solver_control);
 
 
@@ -577,8 +592,10 @@ namespace Step40
   // to locally owned cells, while providing the wrong value for all other
   // elements -- but these are then ignored anyway.
   template <int dim>
-  void LaplaceProblem<dim>::output_results(const unsigned int cycle) const
+  void LaplaceProblem<dim>::output_results(const unsigned int cycle)
   {
+    TimerOutput::Scope t(computing_timer, "output");
+
     DataOut<dim> data_out;
     data_out.attach_dof_handler(dof_handler);
     data_out.add_data_vector(locally_relevant_solution, "u");
@@ -637,19 +654,9 @@ namespace Step40
           refine_grid();
 
         setup_system();
-
-        pcout << "   Number of active cells:       "
-              << triangulation.n_global_active_cells() << std::endl
-              << "   Number of degrees of freedom: " << dof_handler.n_dofs()
-              << std::endl;
-
         assemble_system();
         solve();
-
-        {
-          TimerOutput::Scope t(computing_timer, "output");
-          output_results(cycle);
-        }
+        output_results(cycle);
 
         computing_timer.print_summary();
         computing_timer.reset();

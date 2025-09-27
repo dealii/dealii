@@ -1,17 +1,16 @@
-## ---------------------------------------------------------------------
+## ------------------------------------------------------------------------
 ##
-## Copyright (C) 2012 - 2022 by the deal.II authors
+## SPDX-License-Identifier: LGPL-2.1-or-later
+## Copyright (C) 2013 - 2024 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
-## The deal.II library is free software; you can use it, redistribute
-## it, and/or modify it under the terms of the GNU Lesser General
-## Public License as published by the Free Software Foundation; either
-## version 2.1 of the License, or (at your option) any later version.
-## The full text of the license can be found in the file LICENSE.md at
-## the top level directory of deal.II.
+## Part of the source code is dual licensed under Apache-2.0 WITH
+## LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+## governing the source code and code contributions can be found in
+## LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 ##
-## ---------------------------------------------------------------------
+## ------------------------------------------------------------------------
 
 #
 # This file sets up:
@@ -91,7 +90,6 @@ if( CMAKE_SYSTEM_NAME MATCHES "CYGWIN" OR
 endif()
 
 if(CMAKE_SYSTEM_NAME MATCHES "Windows")
-
   #
   # Export DEAL_II_MSVC if we are on a Windows platform:
   #
@@ -100,21 +98,25 @@ if(CMAKE_SYSTEM_NAME MATCHES "Windows")
   #
   # Shared library handling:
   #
+  # We disabled dynamic linking on Windows. The *.dll format only allows
+  # up to 65535 objects or members, i.e., it is limited by a 16bit
+  # descriptor. We need more than that for deal.II. For more information,
+  # look up the linker tools error LNK1189.
+  #
+  # Unfortunately, this means that we are stuck with static linking.
+  # As a consequence each binary will be very large.
+  #
+  message(WARNING "\n"
+    "BUILD_SHARED_LIBS forced to OFF\n\n"
+    )
+  set(BUILD_SHARED_LIBS OFF CACHE BOOL "" FORCE)
 
-  if(CMAKE_CXX_COMPILER_ID MATCHES "GNU")
-    # With MinGW we're lucky:
-    enable_if_links(DEAL_II_LINKER_FLAGS "-Wl,--export-all-symbols")
-    enable_if_links(DEAL_II_LINKER_FLAGS "-Wl,--enable-auto-import")
-    enable_if_links(DEAL_II_LINKER_FLAGS "-Wl,--allow-multiple-definition")
-  else()
-    # Otherwise disable shared libraries:
-    message(WARNING "\n"
-      "BUILD_SHARED_LIBS forced to OFF\n\n"
-      )
-    set(BUILD_SHARED_LIBS OFF CACHE BOOL "" FORCE)
-
-    # And disable compilation of examples:
-    set(DEAL_II_COMPILE_EXAMPLES OFF CACHE BOOL "" FORCE)
+  #
+  # In case we find a solution to enable dynamic linking in the future,
+  # we will most probably want to use the CMake infrastructure to
+  # automatically export symbols on Windows targets.
+  #
+  if(BUILD_SHARED_LIBS)
+    set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
   endif()
-
 endif()

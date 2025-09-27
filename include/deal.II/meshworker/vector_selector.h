@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2009 - 2020 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2009 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 #ifndef dealii_mesh_worker_vector_selector_h
 #define dealii_mesh_worker_vector_selector_h
@@ -21,9 +20,11 @@
 #include <deal.II/algorithms/any_data.h>
 #include <deal.II/algorithms/named_selection.h>
 
+#include <deal.II/base/enable_observer_pointer.h>
 #include <deal.II/base/mg_level_object.h>
-#include <deal.II/base/smartpointer.h>
+#include <deal.II/base/observer_pointer.h>
 #include <deal.II/base/tensor.h>
+#include <deal.II/base/types.h>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -43,12 +44,9 @@ namespace MeshWorker
    * those, which are actually used in computing residuals etc. This class
    * organizes the selection.
    *
-   * It is used for instance in IntegrationWorker to determine which values,
-   * derivatives or second derivatives are actually computed.
-   *
    * @ingroup MeshWorker
    */
-  class VectorSelector : public Subscriptor
+  class VectorSelector : public EnableObserverPointer
   {
   public:
     /**

@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2003 - 2021 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2003 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 
 #include <deal.II/base/function.h>
@@ -111,7 +110,6 @@ MGTransferPrebuilt<VectorType>::restrict_and_add(const unsigned int from_level,
 {
   Assert((from_level >= 1) && (from_level <= prolongation_matrices.size()),
          ExcIndexRange(from_level, 1, prolongation_matrices.size() + 1));
-  (void)from_level;
 
   prolongation_matrices[from_level - 1]->Tvmult_add(dst, src);
 }
@@ -269,7 +267,7 @@ MGTransferPrebuilt<VectorType>::build(
           ::dealii::SparsityTools::distribute_sparsity_pattern(
             dsp,
             dof_handler.locally_owned_mg_dofs(level + 1),
-            dof_handler.get_communicator(),
+            dof_handler.get_mpi_communicator(),
             dsp.row_index_set());
         }
 #endif
@@ -368,7 +366,7 @@ MGTransferPrebuilt<VectorType>::memory_consumption() const
 
 
 // explicit instantiation
-#include "mg_transfer_prebuilt.inst"
+#include "multigrid/mg_transfer_prebuilt.inst"
 
 
 DEAL_II_NAMESPACE_CLOSE

@@ -1,17 +1,16 @@
-/* ---------------------------------------------------------------------
+/* ------------------------------------------------------------------------
  *
- * Copyright (C) 2018 - 2023 by the deal.II authors
+ * SPDX-License-Identifier: LGPL-2.1-or-later
+ * Copyright (C) 2018 - 2024 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
- * The deal.II library is free software; you can use it, redistribute
- * it, and/or modify it under the terms of the GNU Lesser General
- * Public License as published by the Free Software Foundation; either
- * version 2.1 of the License, or (at your option) any later version.
- * The full text of the license can be found in the file LICENSE.md at
- * the top level directory of deal.II.
+ * Part of the source code is dual licensed under Apache-2.0 WITH
+ * LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+ * governing the source code and code contributions can be found in
+ * LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
  *
- * ---------------------------------------------------------------------
+ * ------------------------------------------------------------------------
  *
  * Authors: Katharina Kormann, Martin Kronbichler, 2018
  */
@@ -23,7 +22,6 @@
 // contained in `fe_evaluation.h`.
 #include <deal.II/base/quadrature_lib.h>
 #include <deal.II/base/function.h>
-#include <deal.II/base/logstream.h>
 #include <deal.II/base/timer.h>
 
 #include <deal.II/lac/affine_constraints.h>
@@ -149,9 +147,9 @@ namespace Step59
   // MatrixFreeOperators::Base because we want to present some additional
   // features of MatrixFree::loop() that are not available in the
   // general-purpose class MatrixFreeOperators::Base. We derive the class from
-  // the Subscriptor class to be able to use the operator within the Chebyshev
-  // preconditioner because that preconditioner stores the underlying matrix
-  // via a SmartPointer.
+  // the EnableObserverPointer class to be able to use the operator
+  // within the Chebyshev preconditioner because that preconditioner stores the
+  // underlying matrix via a ObserverPointer.
   //
   // Given that we implement a complete matrix interface by hand, we need to
   // add an `initialize()` function, an `m()` function, a `vmult()` function,
@@ -162,7 +160,7 @@ namespace Step59
   // step-39.
 
   template <int dim, int fe_degree, typename number>
-  class LaplaceOperator : public Subscriptor
+  class LaplaceOperator : public EnableObserverPointer
   {
   public:
     using value_type = number;
@@ -179,6 +177,9 @@ namespace Step59
       LinearAlgebra::distributed::Vector<number> &vec) const;
 
     std::shared_ptr<const MatrixFree<dim, number>> get_matrix_free() const;
+
+    std::shared_ptr<const Utilities::MPI::Partitioner>
+    get_vector_partitioner() const;
 
     void vmult(LinearAlgebra::distributed::Vector<number>       &dst,
                const LinearAlgebra::distributed::Vector<number> &src) const;
@@ -253,43 +254,6 @@ namespace Step59
 
 
 
-  // This free-standing function is used in both the `LaplaceOperator` and
-  // `%PreconditionBlockJacobi` classes to adjust the ghost range. This function
-  // is necessary because some of the vectors that the `vmult()` functions are
-  // supplied with are not initialized properly with
-  // `LaplaceOperator::initialize_dof_vector` that includes the correct layout
-  // of ghost entries, but instead comes from the MGTransferMatrixFree class
-  // that has no notion on the ghost selection of the matrix-free classes. To
-  // avoid index confusion, we must adjust the ghost range before actually
-  // doing something with these vectors. Since the vectors are kept around in
-  // the multigrid smoother and transfer classes, a vector whose ghost range
-  // has once been adjusted will remain in this state throughout the lifetime
-  // of the object, so we can use a shortcut at the start of the function to
-  // see whether the partitioner object of the distributed vector, which is
-  // stored as a shared pointer, is the same as the layout expected by
-  // MatrixFree, which is stored in a data structure accessed by
-  // MatrixFree::get_dof_info(0), where the 0 indicates the DoFHandler number
-  // from which this was extracted; we only use a single DoFHandler in
-  // MatrixFree, so the only valid number is 0 here.
-
-  template <int dim, typename number>
-  void adjust_ghost_range_if_necessary(
-    const MatrixFree<dim, number>                    &data,
-    const LinearAlgebra::distributed::Vector<number> &vec)
-  {
-    if (vec.get_partitioner().get() ==
-        data.get_dof_info(0).vector_partitioner.get())
-      return;
-
-    LinearAlgebra::distributed::Vector<number> copy_vec(vec);
-    const_cast<LinearAlgebra::distributed::Vector<number> &>(vec).reinit(
-      data.get_dof_info(0).vector_partitioner);
-    const_cast<LinearAlgebra::distributed::Vector<number> &>(vec)
-      .copy_locally_owned_data_from(copy_vec);
-  }
-
-
-
   // The next five functions to clear and initialize the `LaplaceOperator`
   // class, to return the shared pointer holding the MatrixFree data
   // container, as well as the correct initialization of the vector and
@@ -322,6 +286,15 @@ namespace Step59
 
 
   template <int dim, int fe_degree, typename number>
+  std::shared_ptr<const Utilities::MPI::Partitioner>
+  LaplaceOperator<dim, fe_degree, number>::get_vector_partitioner() const
+  {
+    return data->get_dof_info().vector_partitioner;
+  }
+
+
+
+  template <int dim, int fe_degree, typename number>
   void LaplaceOperator<dim, fe_degree, number>::initialize_dof_vector(
     LinearAlgebra::distributed::Vector<number> &vec) const
   {
@@ -341,13 +314,9 @@ namespace Step59
 
   // This function implements the action of the LaplaceOperator on a vector
   // `src` and stores the result in the vector `dst`. When compared to
-  // step-37, there are four new features present in this call.
+  // step-37, there are three new features present in this call.
   //
-  // The first new feature is the `adjust_ghost_range_if_necessary` function
-  // mentioned above that is needed to fit the vectors to the layout expected
-  // by FEEvaluation and FEFaceEvaluation in the cell and face functions.
-  //
-  // The second new feature is the fact that we do not implement a
+  // The first new feature is the fact that we do not implement a
   // `vmult_add()` function as we did in step-37 (through the virtual function
   // MatrixFreeOperators::Base::vmult_add()), but directly implement a
   // `vmult()` functionality. Since both cell and face integrals will sum into
@@ -375,7 +344,7 @@ namespace Step59
   // available for MatrixFree::cell_loop and for continuous bases, even though
   // it was not used in the step-37 or step-48 tutorial programs.
   //
-  // The third new feature is the way we provide the functions to compute on
+  // The second new feature is the way we provide the functions to compute on
   // cells, inner faces, and boundary faces: The class MatrixFree has a
   // function called `loop` that takes three function pointers to the three
   // cases, allowing to separate the implementations of different things. As
@@ -431,8 +400,6 @@ namespace Step59
     LinearAlgebra::distributed::Vector<number>       &dst,
     const LinearAlgebra::distributed::Vector<number> &src) const
   {
-    adjust_ghost_range_if_necessary(*data, dst);
-    adjust_ghost_range_if_necessary(*data, src);
     data->loop(&LaplaceOperator::apply_cell,
                &LaplaceOperator::apply_face,
                &LaplaceOperator::apply_boundary,
@@ -751,7 +718,7 @@ namespace Step59
         laplace_matrices[d].reinit(N, N);
       }
 
-    QGauss<1> quadrature(N);
+    const QGauss<1> quadrature(N);
     for (unsigned int i = 0; i < N; ++i)
       for (unsigned int j = 0; j < N; ++j)
         {
@@ -879,9 +846,6 @@ namespace Step59
     LinearAlgebra::distributed::Vector<number>       &dst,
     const LinearAlgebra::distributed::Vector<number> &src) const
   {
-    adjust_ghost_range_if_necessary(*data, dst);
-    adjust_ghost_range_if_necessary(*data, src);
-
     FEEvaluation<dim, fe_degree, fe_degree + 1, 1, number> phi(*data);
     for (unsigned int cell = 0; cell < data->n_cell_batches(); ++cell)
       {
@@ -925,10 +889,10 @@ namespace Step59
     Triangulation<dim> triangulation;
 #endif
 
-    FE_DGQHermite<dim> fe;
-    DoFHandler<dim>    dof_handler;
+    const FE_DGQHermite<dim> fe;
+    DoFHandler<dim>          dof_handler;
 
-    MappingQ1<dim> mapping;
+    const MappingQ1<dim> mapping;
 
     using SystemMatrixType = LaplaceOperator<dim, fe_degree, double>;
     SystemMatrixType system_matrix;
@@ -1199,8 +1163,10 @@ namespace Step59
 
   // The `solve()` function is copied almost verbatim from step-37. We set up
   // the same multigrid ingredients, namely the level transfer, a smoother,
-  // and a coarse grid solver. The only difference is the fact that we do not
-  // use the diagonal of the Laplacian for the preconditioner of the Chebyshev
+  // and a coarse grid solver. The only two differences are that we supply the
+  // transfer object with the underlying partitioners (since we do not use the
+  // MatrixFreeOperators::Base infrastructure) and that we do not use the
+  // diagonal of the Laplacian for the preconditioner of the Chebyshev
   // iteration used for smoothing, but instead our newly resolved class
   // `%PreconditionBlockJacobi`. The mechanisms are the same, though.
   template <int dim, int fe_degree>
@@ -1208,7 +1174,12 @@ namespace Step59
   {
     Timer                            time;
     MGTransferMatrixFree<dim, float> mg_transfer;
-    mg_transfer.build(dof_handler);
+    std::vector<std::shared_ptr<const Utilities::MPI::Partitioner>>
+      partitioners(dof_handler.get_triangulation().n_global_levels());
+    for (unsigned int level = 0; level < partitioners.size(); ++level)
+      partitioners[level] = mg_matrices[level].get_vector_partitioner();
+
+    mg_transfer.build(dof_handler, partitioners);
     setup_time += time.wall_time();
     time_details << "MG build transfer time        " << time.wall_time()
                  << " s\n";

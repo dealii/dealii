@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2021 - 2022 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2021 - 2024 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 // This test a triangulation which has a periodic boundary along the x axis.
 // Particles are generated close to the x- and x+ limit of the domain
@@ -69,7 +68,7 @@ test()
     Point<spacedim> position;
     Point<dim>      reference_position;
 
-    if (Utilities::MPI::this_mpi_process(tr.get_communicator()) == 0)
+    if (Utilities::MPI::this_mpi_process(tr.get_mpi_communicator()) == 0)
       position[0] = 0.001;
     else
       position[0] = 0.999;
@@ -77,7 +76,7 @@ test()
     Particles::Particle<dim, spacedim> particle(
       position,
       reference_position,
-      Utilities::MPI::this_mpi_process(tr.get_communicator()));
+      Utilities::MPI::this_mpi_process(tr.get_mpi_communicator()));
 
     // We give a local random cell hint to check that sorting and
     // transferring ghost particles works.

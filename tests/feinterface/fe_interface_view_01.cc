@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2007 - 2021 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2021 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 // test FEInterfaceViews and extractor classes. these tests use a primitive
 // finite element and scalar extractors. To simplify the output, we skip writing
@@ -69,29 +68,35 @@ test(const Triangulation<dim> &tr, const FiniteElement<dim> &fe)
 
         for (unsigned int c = 0; c < fe.n_components(); ++c)
           {
-            FEValuesExtractors::Scalar single_component(c);
+            const FEValuesExtractors::Scalar single_component(c);
+            constexpr double                 tolerance = 1e-10;
             for (unsigned int i = 0; i < n_dofs_face; ++i)
               for (unsigned int q = 0; q < n_q_points; ++q)
                 {
-                  if (fe_iv[single_component].value(true, i, q) != 0)
+                  if (std::abs(fe_iv[single_component].value(true, i, q)) >
+                      tolerance)
                     deallog << fe_iv[single_component].value(true, i, q)
                             << "  ";
-                  if (fe_iv[single_component].value(false, i, q) != 0)
+                  if (std::abs(fe_iv[single_component].value(false, i, q)) >
+                      tolerance)
                     deallog << fe_iv[single_component].value(false, i, q)
                             << "  ";
-                  if (fe_iv[single_component].jump_in_values(i, q) != 0)
+                  if (std::abs(fe_iv[single_component].jump_in_values(i, q)) >
+                      tolerance)
                     deallog << fe_iv[single_component].jump_in_values(i, q)
                             << "  ";
-                  if (fe_iv[single_component].average_of_values(i, q) != 0)
+                  if (std::abs(
+                        fe_iv[single_component].average_of_values(i, q)) >
+                      tolerance)
                     deallog << fe_iv[single_component].average_of_values(i, q)
                             << "  ";
-                  if (fe_iv[single_component].jump_in_gradients(i, q).norm() !=
-                      0)
+                  if (fe_iv[single_component].jump_in_gradients(i, q).norm() >
+                      tolerance)
                     deallog << fe_iv[single_component].jump_in_gradients(i, q)
                             << "  ";
                   if (fe_iv[single_component]
                         .average_of_gradients(i, q)
-                        .norm() != 0)
+                        .norm() > tolerance)
                     deallog
                       << fe_iv[single_component].average_of_gradients(i, q)
                       << std::endl;

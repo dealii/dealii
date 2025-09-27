@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2018 - 2023 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2019 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE at
-// the top level of the deal.II distribution.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 #include <deal.II/base/config.h>
 
@@ -2172,12 +2171,18 @@ namespace Differentiation
 
 
 /* --- Explicit instantiations --- */
-#  include "ad_drivers.inst"
-#  ifdef DEAL_II_WITH_ADOLC
-#    include "ad_drivers.inst1"
-#  endif
-#  ifdef DEAL_II_TRILINOS_WITH_SACADO
-#    include "ad_drivers.inst2"
+// We don't build the .inst files if deal.II isn't configured with the
+// external dependencies, but doxygen doesn't know that and tries to
+// find that file anyway for parsing -- which then of course it fails
+// on. So exclude the following from doxygen consideration.
+#  ifndef DOXYGEN
+#    include "differentiation/ad/ad_drivers.inst"
+#    ifdef DEAL_II_WITH_ADOLC
+#      include "differentiation/ad/ad_drivers.inst1"
+#    endif
+#    ifdef DEAL_II_TRILINOS_WITH_SACADO
+#      include "differentiation/ad/ad_drivers.inst2"
+#    endif
 #  endif
 
 

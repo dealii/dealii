@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2022 - 2023 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2022 - 2024 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 //
 // Description:
@@ -373,7 +372,7 @@ LaplaceProblem<dim>::setup_dofs()
     DoFTools::extract_locally_relevant_dofs(dof_handler);
 
   constraints.clear();
-  constraints.reinit(locally_relevant_dofs);
+  constraints.reinit(dof_handler.locally_owned_dofs(), locally_relevant_dofs);
   DoFTools::make_hanging_node_constraints(dof_handler, constraints);
   VectorTools::interpolate_boundary_values(
     mapping, dof_handler, 0, Functions::ZeroFunction<dim>(), constraints);
@@ -394,7 +393,7 @@ LaplaceProblem<dim>::setup_dofs()
       const IndexSet relevant_dofs =
         DoFTools::extract_locally_relevant_level_dofs(dof_handler, level);
       AffineConstraints<double> level_constraints;
-      level_constraints.reinit(relevant_dofs);
+      level_constraints.reinit(dof_handler.locally_owned_dofs(), relevant_dofs);
       level_constraints.add_lines(
         mg_constrained_dofs.get_boundary_indices(level));
       level_constraints.close();
@@ -443,7 +442,7 @@ LaplaceProblem<dim>::setup_matrix_free()
       const IndexSet relevant_dofs =
         DoFTools::extract_locally_relevant_level_dofs(dof_handler, level);
       AffineConstraints<double> level_constraints;
-      level_constraints.reinit(relevant_dofs);
+      level_constraints.reinit(dof_handler.locally_owned_dofs(), relevant_dofs);
       level_constraints.add_lines(
         mg_constrained_dofs.get_boundary_indices(level));
       level_constraints.close();
@@ -502,11 +501,9 @@ LaplaceProblem<dim>::setup_transfer()
   std::vector<std::shared_ptr<const Utilities::MPI::Partitioner>> partitioners(
     dof_handler.get_triangulation().n_global_levels());
   for (unsigned int level = 0; level < partitioners.size(); ++level)
-    {
-      LinearAlgebra::distributed::Vector<float> vec;
-      mg_matrices[level].initialize_dof_vector(vec);
-      partitioners[level] = vec.get_partitioner();
-    }
+    partitioners[level] =
+      mg_matrices[level].get_matrix_free()->get_dof_info().vector_partitioner;
+
   mg_transfer.build(dof_handler, partitioners);
 }
 

@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2022 - 2023 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2022 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 #ifndef dealii_trilinos_nox_templates
 #define dealii_trilinos_nox_templates
@@ -43,44 +42,41 @@ namespace TrilinosWrappers
   {
     namespace NOXWrappers
     {
-      namespace
+      /**
+       * A function that calls the function object given by its first argument
+       * with the set of arguments following at the end. If the call returns
+       * regularly, the current function returns zero to indicate success. If
+       * the call fails with an exception, then the current function returns
+       * with an error code of -1. In that case, the exception thrown by `f`
+       * is captured and `eptr` is set to the exception. In case of success,
+       * `eptr` is set to `nullptr`.
+       */
+      template <typename F, typename... Args>
+      int
+      call_and_possibly_capture_exception(const F            &f,
+                                          std::exception_ptr &eptr,
+                                          Args &&...args)
       {
-        /**
-         * A function that calls the function object given by its first argument
-         * with the set of arguments following at the end. If the call returns
-         * regularly, the current function returns zero to indicate success. If
-         * the call fails with an exception, then the current function returns
-         * with an error code of -1. In that case, the exception thrown by `f`
-         * is captured and `eptr` is set to the exception. In case of success,
-         * `eptr` is set to `nullptr`.
-         */
-        template <typename F, typename... Args>
-        int
-        call_and_possibly_capture_exception(const F            &f,
-                                            std::exception_ptr &eptr,
-                                            Args &&...args)
-        {
-          // See whether there is already something in the exception pointer
-          // variable. There is no reason why this should be so, and
-          // we should probably bail out:
-          AssertThrow(eptr == nullptr, ExcInternalError());
+        // See whether there is already something in the exception pointer
+        // variable. There is no reason why this should be so, and
+        // we should probably bail out:
+        AssertThrow(eptr == nullptr, ExcInternalError());
 
-          // Call the function and if that succeeds, return zero:
-          try
-            {
-              f(std::forward<Args>(args)...);
-              eptr = nullptr;
-              return 0;
-            }
-          // In case of an exception, capture the exception and
-          // return -1:
-          catch (...)
-            {
-              eptr = std::current_exception();
-              return -1;
-            }
-        }
-      } // namespace
+        // Call the function and if that succeeds, return zero:
+        try
+          {
+            f(std::forward<Args>(args)...);
+            eptr = nullptr;
+            return 0;
+          }
+        // In case of an exception, capture the exception and
+        // return -1:
+        catch (...)
+          {
+            eptr = std::current_exception();
+            return -1;
+          }
+      }
 
 
       template <typename VectorType>
@@ -284,7 +280,7 @@ namespace TrilinosWrappers
           if (type == NOX::Abstract::Vector::NormType::MaxNorm)
             return vector->linfty_norm();
 
-          Assert(false, ExcInternalError());
+          DEAL_II_ASSERT_UNREACHABLE();
 
           return 0.0;
         }
@@ -355,7 +351,7 @@ namespace TrilinosWrappers
       public:
         /**
          * Constructor. The class is initialized by the solution vector and
-         * functions to compute the residual, to set up the jacobian, and
+         * functions to compute the residual, to set up the Jacobian, and
          * to solve the Jacobian.
          */
         Group(
@@ -985,7 +981,7 @@ namespace TrilinosWrappers
           ExcMessage(
             "No residual function has been attached to the NOXSolver object."));
 
-        n_residual_evaluations++;
+        ++n_residual_evaluations;
 
         // evaluate residual
         return internal::NOXWrappers::call_and_possibly_capture_exception(
@@ -1046,6 +1042,8 @@ namespace TrilinosWrappers
       [&](const VectorType &f, VectorType &x, const double tolerance) -> int {
         ++n_nonlinear_iterations;
 
+        int ret_code = 0;
+
         // invert Jacobian
         if (solve_with_jacobian)
           {
@@ -1056,8 +1054,9 @@ namespace TrilinosWrappers
                 "solve_with_jacobian_and_track_n_linear_iterations!"));
 
             // without tracking of linear iterations
-            return internal::NOXWrappers::call_and_possibly_capture_exception(
-              solve_with_jacobian, pending_exception, f, x, tolerance);
+            ret_code =
+              internal::NOXWrappers::call_and_possibly_capture_exception(
+                solve_with_jacobian, pending_exception, f, x, tolerance);
           }
         else if (solve_with_jacobian_and_track_n_linear_iterations)
           {
@@ -1070,14 +1069,14 @@ namespace TrilinosWrappers
             // trigger an exception that will propagate through the lambda
             // function and be treated correctly by the logic in
             // internal::NOXWrappers::call_and_possibly_capture_exception.
-            return internal::NOXWrappers::call_and_possibly_capture_exception(
-              [&]() {
-                this->n_last_linear_iterations =
-                  solve_with_jacobian_and_track_n_linear_iterations(f,
-                                                                    x,
-                                                                    tolerance);
-              },
-              pending_exception);
+            ret_code =
+              internal::NOXWrappers::call_and_possibly_capture_exception(
+                [&]() {
+                  this->n_last_linear_iterations =
+                    solve_with_jacobian_and_track_n_linear_iterations(
+                      f, x, tolerance);
+                },
+                pending_exception);
           }
         else
           {
@@ -1088,9 +1087,50 @@ namespace TrilinosWrappers
                 "solve_with_jacobian_and_track_n_linear_iterations function "
                 "has been attached to the NOXSolver object."));
 
-            Assert(false, ExcNotImplemented());
-            return 1;
+            DEAL_II_NOT_IMPLEMENTED();
+            ret_code = 1;
           }
+
+        // NOX has a recovery feature that is enabled by default. In this case,
+        // if a solve_with_jacobian or a
+        // solve_with_jacobian_and_track_n_linear_iterations function triggers
+        // an exception and therefore call_and_possibly_capture_exception
+        // returns code different from 0, then NOX does not interrupt the
+        // solution process but rather performs a recovery step. To ensure this
+        // feature is available to the user, we need to suppress the exception
+        // in this case, since it is exactly that, what NOX expects from our
+        // callbacks.
+        const bool do_rescue =
+          parameters->sublist("Newton").get("Rescue Bad Newton Solve", true);
+        if (do_rescue && (pending_exception != nullptr))
+          {
+            try
+              {
+                std::rethrow_exception(pending_exception);
+              }
+            catch (const RecoverableUserCallbackError &exc)
+              {
+                pending_exception = nullptr;
+
+                // If the callback threw a recoverable exception, and if
+                // recovery is enabled, then eat the exception and return the
+                // error code.
+                return ret_code;
+              }
+            catch (...)
+              {
+                // If not a recoverable exception, then just re-throw the
+                // exception and hope that NOX knows what to do with propagating
+                // exceptions (i.e., does not create a resource leak, for
+                // example).
+                pending_exception = nullptr;
+                throw;
+              }
+          }
+        else
+          // Rescue not allowed, or there was no exception -> simply return
+          // the value produced by the callback.
+          return ret_code;
       }));
 
     // setup solver control
@@ -1220,6 +1260,14 @@ namespace TrilinosWrappers
 
 #  endif
 
+DEAL_II_NAMESPACE_CLOSE
+
+#else
+
+// Make sure the scripts that create the C++20 module input files have
+// something to latch on if the preprocessor #ifdef above would
+// otherwise lead to an empty content of the file.
+DEAL_II_NAMESPACE_OPEN
 DEAL_II_NAMESPACE_CLOSE
 
 #endif

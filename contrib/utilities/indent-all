@@ -1,18 +1,17 @@
 #!/bin/bash
-## ---------------------------------------------------------------------
+## ------------------------------------------------------------------------
 ##
-## Copyright (C) 2012 - 2018 by the deal.II authors
+## SPDX-License-Identifier: LGPL-2.1-or-later
+## Copyright (C) 2012 - 2025 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
-## The deal.II library is free software; you can use it, redistribute
-## it, and/or modify it under the terms of the GNU Lesser General
-## Public License as published by the Free Software Foundation; either
-## version 2.1 of the License, or (at your option) any later version.
-## The full text of the license can be found in the file LICENSE.md at
-## the top level directory of deal.II.
+## Part of the source code is dual licensed under Apache-2.0 WITH
+## LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+## governing the source code and code contributions can be found in
+## LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 ##
-## ---------------------------------------------------------------------
+## ------------------------------------------------------------------------
 
 #
 # This script indents all source files of deal.II according to our usual
@@ -65,8 +64,9 @@ checks
 # Process all source and header files:
 #
 
-process "tests include source examples contrib/python-bindings" ".*\.(cc|h)" format_file
+process "tests include source module examples contrib/python-bindings" ".*\.(cc|ccm|h)" format_file
 process "source" ".*\.inst.in" format_inst
+process "tests include source examples contrib" ".*\.py" format_python_file
 
 #
 # Fix permissions and convert to unix line ending if necessary:
@@ -75,8 +75,14 @@ process "source" ".*\.inst.in" format_inst
 process "tests include source examples cmake/scripts contrib/python-bindings" \
   ".*\.(cc|h|inst.in|output.*|cmake)" fix_permissions
 
+process "doc/news/*/*" "doc/news/.*/.*/[0-9].*" fix_permissions
+
 process "tests include source examples cmake/scripts contrib/python-bindings" \
   ".*\.(cc|h|inst.in|cmake)" dos_to_unix
+
+process "doc/news/*/*" "doc/news/.*/.*/[0-9].*" dos_to_unix
+
+process "tests include source examples contrib" ".*\.py" dos_to_unix
 
 #
 # Removing trailing whitespace
@@ -85,9 +91,17 @@ process "tests include source examples cmake/scripts contrib/python-bindings" \
 process "tests include source examples cmake/scripts contrib/python-bindings doc" \
   ".*\.(cc|h|html|dox|txt)" remove_trailing_whitespace
 
+process "doc/news/*/*" "doc/news/.*/.*/[0-9].*" remove_trailing_whitespace
+
+process "tests include source examples contrib" ".*\.py" remove_trailing_whitespace
+
 #
 # Ensure only a single newline at end of files
 #
 
 process "tests include source examples cmake/scripts contrib/python-bindings doc" \
   ".*\.(cc|h|html|dox|txt)" ensure_single_trailing_newline
+
+process "doc/news/*/*" "doc/news/.*/.*/[0-9].*" ensure_single_trailing_newline
+
+process "tests include source examples contrib" ".*\.py" ensure_single_trailing_newline

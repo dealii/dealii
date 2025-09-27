@@ -1,0 +1,48 @@
+
+DEAL:0::------------- make_hanging_node_constraints():
+DEAL:0::What process 0 believes about DoF 63:
+DEAL:0::    constrained against 3 with weight 0.323607
+DEAL:0::    constrained against 7 with weight -0.123607
+DEAL:0::    constrained against 19 with weight 0.800000
+DEAL:0::What process 0 believes about DoF 64:
+DEAL:0::    constrained against 3 with weight -0.123607
+DEAL:0::    constrained against 7 with weight 0.323607
+DEAL:0::    constrained against 19 with weight 0.800000
+DEAL:0::------------- make_consistent_in_parallel() on locally active dofs:
+DEAL:0::What process 0 believes about DoF 63:
+DEAL:0::    constrained against 3 with weight 0.323607
+DEAL:0::    constrained against 7 with weight -0.123607
+DEAL:0::    constrained against 19 with weight 0.800000
+DEAL:0::What process 0 believes about DoF 64:
+DEAL:0::    constrained against 3 with weight -0.123607
+DEAL:0::    constrained against 7 with weight 0.323607
+DEAL:0::    constrained against 19 with weight 0.800000
+DEAL:0::------------- make_consistent_in_parallel() on locally relevant dofs:
+DEAL:0::What process 0 believes about DoF 63:
+DEAL:0::    constrained against 3 with weight 0.323607
+DEAL:0::    constrained against 7 with weight -0.123607
+DEAL:0::    constrained against 19 with weight 0.800000
+DEAL:0::What process 0 believes about DoF 64:
+DEAL:0::    constrained against 3 with weight -0.123607
+DEAL:0::    constrained against 7 with weight 0.323607
+DEAL:0::    constrained against 19 with weight 0.800000
+
+DEAL:1::------------- make_hanging_node_constraints():
+DEAL:1::What process 1 believes about DoF 63:
+DEAL:1::What process 1 believes about DoF 64:
+DEAL:1::    constrained against 3 with weight -0.447214
+DEAL:1::    constrained against 7 with weight 0.447214
+DEAL:1::    constrained against 63 with weight 1.00000
+DEAL:1::------------- make_consistent_in_parallel() on locally active dofs:
+DEAL:1::What process 1 believes about DoF 63:
+DEAL:1::What process 1 believes about DoF 64:
+DEAL:1::------------- make_consistent_in_parallel() on locally relevant dofs:
+DEAL:1::What process 1 believes about DoF 63:
+DEAL:1::    constrained against 3 with weight 0.323607
+DEAL:1::    constrained against 7 with weight -0.123607
+DEAL:1::    constrained against 19 with weight 0.800000
+DEAL:1::What process 1 believes about DoF 64:
+DEAL:1::    constrained against 3 with weight -0.123607
+DEAL:1::    constrained against 7 with weight 0.323607
+DEAL:1::    constrained against 19 with weight 0.800000
+

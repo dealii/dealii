@@ -1,0 +1,48 @@
+Cycle 0:
+   Number of active cells:       12
+   Number of degrees of freedom: 65
+Solver stopped within 1 - 33 iterations
+   Global error estimate:        0.350774
+   Wrote solution_00.pvtu
+Cycle 1:
+   Number of active cells:       24
+   Number of degrees of freedom: 139
+Solver stopped within 1 - 33 iterations
+   Global error estimate:        0.21433
+   Wrote solution_01.pvtu
+Cycle 2:
+   Number of active cells:       51
+   Number of degrees of freedom: 245
+Solver stopped within 1 - 33 iterations
+   Global error estimate:        0.110282
+   Wrote solution_02.pvtu
+Cycle 3:
+   Number of active cells:       105
+   Number of degrees of freedom: 531
+Solver stopped within 1 - 33 iterations
+   Global error estimate:        0.056739
+   Wrote solution_03.pvtu
+Cycle 4:
+   Number of active cells:       207
+   Number of degrees of freedom: 1009
+Solver stopped within 1 - 33 iterations
+   Global error estimate:        0.0328678
+   Wrote solution_04.pvtu
+Cycle 5:
+   Number of active cells:       414
+   Number of degrees of freedom: 1953
+Solver stopped within 1 - 33 iterations
+   Global error estimate:        0.0195039
+   Wrote solution_05.pvtu
+Cycle 6:
+   Number of active cells:       837
+   Number of degrees of freedom: 3769
+Solver stopped within 1 - 33 iterations
+   Global error estimate:        0.0112093
+   Wrote solution_06.pvtu
+Cycle 7:
+   Number of active cells:       1683
+   Number of degrees of freedom: 7415
+Solver stopped within 1 - 33 iterations
+   Global error estimate:        0.00670352
+   Wrote solution_07.pvtu

@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2023 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2023 - 2024 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 /*
  * Test NonMatching::MappingInfo if reinit with quadratures which contain JxW as
@@ -78,7 +77,7 @@ test()
     // 2) reinit mapping info
     mapping_info.reinit_faces(tria.active_cell_iterators(), quad_vec);
 
-    FEPointEvaluation<n_components, dim, spacedim, Number> fe_point_eval(
+    FEFacePointEvaluation<n_components, dim, spacedim, Number> fe_point_eval(
       mapping_info, fe);
 
     // 3) print JxW
@@ -87,7 +86,8 @@ test()
         for (auto f : cell->face_indices())
           {
             fe_point_eval.reinit(cell->active_cell_index(), f);
-            for (unsigned int q : fe_point_eval.quadrature_point_indices())
+            for (const unsigned int q :
+                 fe_point_eval.quadrature_point_indices())
               deallog << fe_point_eval.JxW(q) << std::endl;
           }
       }
@@ -123,7 +123,7 @@ test()
     for (const auto &cell : tria.active_cell_iterators())
       {
         fe_point_eval.reinit(cell->active_cell_index());
-        for (unsigned int q : fe_point_eval.quadrature_point_indices())
+        for (const unsigned int q : fe_point_eval.quadrature_point_indices())
           deallog << fe_point_eval.JxW(q) << std::endl;
       }
   }

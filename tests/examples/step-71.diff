@@ -1,0 +1,4 @@
+3946c3946
+<         parameter_file = "parameters.prm";
+---
+>         parameter_file = "../../../source/step-71/parameters.prm";

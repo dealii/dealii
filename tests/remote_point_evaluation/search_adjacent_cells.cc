@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
+// SPDX-License-Identifier: LGPL-2.1-or-later
 // Copyright (C) 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 #include <deal.II/base/quadrature_lib.h>
 
@@ -158,7 +157,10 @@ test(const unsigned int mapping_degree,
     }
 
   // initialize RPE without any marked points
-  dealii::Utilities::MPI::RemotePointEvaluation<dim> rpe(tolerance);
+  typename Utilities::MPI::RemotePointEvaluation<dim>::AdditionalData
+    additional_data;
+  additional_data.tolerance = tolerance;
+  dealii::Utilities::MPI::RemotePointEvaluation<dim> rpe(additional_data);
   rpe.reinit(points, tria, mapping);
 
   unsigned int                    n_points_not_found_rpe = 0;
@@ -182,8 +184,13 @@ test(const unsigned int mapping_degree,
 
   // initialize RPE with all points marked
   std::vector<bool> marked_vertices(tria.n_vertices(), true);
-  dealii::Utilities::MPI::RemotePointEvaluation<dim> rpe2(
-    tolerance, false, 0, [marked_vertices]() { return marked_vertices; });
+
+  typename Utilities::MPI::RemotePointEvaluation<dim>::AdditionalData
+    additional_data2(tolerance, false, 0, [marked_vertices]() {
+      return marked_vertices;
+    });
+
+  dealii::Utilities::MPI::RemotePointEvaluation<dim> rpe2(additional_data2);
 
   rpe2.reinit(points, tria, mapping);
 

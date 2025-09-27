@@ -1,5 +1,3 @@
-<br>
-
 <i>This program was contributed by Yaqi Wang and Wolfgang
 Bangerth. Results from this program are used and discussed in the publication
 "Three-dimensional h-adaptivity for the multigroup neutron diffusion
@@ -23,7 +21,7 @@ href="https://www.semanticscholar.org/paper/Three-dimensional-h-adaptivity-for-t
 <br>
 
 
-<a name="Intro"></a> <h1>Introduction</h1>
+<a name="step_28-Intro"></a> <h1>Introduction</h1>
 In this example, we intend to solve the multigroup diffusion approximation of
 the neutron transport equation. Essentially, the way to view this is as follows: In a
 nuclear reactor, neutrons are speeding around at different energies, get

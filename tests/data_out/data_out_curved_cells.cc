@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2003 - 2021 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2008 - 2024 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 
 // test output of curved cells at the boundary and in the inner of the domain,
@@ -158,7 +157,9 @@ curved_grid(std::ostream &out)
       for (const unsigned int vertex_no : GeometryInfo<2>::vertex_indices())
         {
           for (unsigned int i = 0; i < 2; ++i)
-            m[i].add_line(cell->vertex_dof_index(vertex_no, 0));
+            if (m[i].is_constrained(cell->vertex_dof_index(vertex_no, 0)) ==
+                false)
+              m[i].constrain_dof_to_zero(cell->vertex_dof_index(vertex_no, 0));
         }
 
       if (cell->at_boundary())
@@ -174,15 +175,15 @@ curved_grid(std::ostream &out)
                 if (std::fabs(face->vertex(1).norm() - r_i) < eps)
                   for (unsigned int i = 0; i < 2; ++i)
                     {
-                      m[i].add_line(face->dof_index(0));
+                      m[i].constrain_dof_to_zero(face->dof_index(0));
                       m[i].set_inhomogeneity(face->dof_index(0),
                                              (face->center() *
                                               (r_i / face->center().norm() -
-                                               1))(i));
+                                               1))[i]);
                     }
                 else if (std::fabs(face->vertex(1).norm() - r_a) < eps)
                   for (unsigned int i = 0; i < 2; ++i)
-                    m[i].add_line(face->dof_index(0));
+                    m[i].constrain_dof_to_zero(face->dof_index(0));
                 else
                   Assert(false, ExcInternalError());
               }

@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2022 - 2023 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2022 - 2024 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 #ifndef dealii_trilinos_nox
 #define dealii_trilinos_nox
@@ -198,7 +197,7 @@ namespace TrilinosWrappers
      * @ref GlossUserProvidedCallBack "user provided callback".
      * See there for a description of how to deal with errors and other
      * requirements and conventions. NOX can not deal
-     * with "recoverable" errors, so if a callback
+     * with "recoverable" errors for this callback, so if it
      * throws an exception of type RecoverableUserCallbackError, then this
      * exception is treated like any other exception.
      */
@@ -212,7 +211,7 @@ namespace TrilinosWrappers
      * @ref GlossUserProvidedCallBack "user provided callback".
      * See there for a description of how to deal with errors and other
      * requirements and conventions. NOX can not deal
-     * with "recoverable" errors, so if a callback
+     * with "recoverable" errors for this callback, so if it
      * throws an exception of type RecoverableUserCallbackError, then this
      * exception is treated like any other exception.
      */
@@ -231,7 +230,7 @@ namespace TrilinosWrappers
      * @ref GlossUserProvidedCallBack "user provided callback".
      * See there for a description of how to deal with errors and other
      * requirements and conventions. NOX can not deal
-     * with "recoverable" errors, so if a callback
+     * with "recoverable" errors for this callback, so if it
      * throws an exception of type RecoverableUserCallbackError, then this
      * exception is treated like any other exception.
      */
@@ -253,7 +252,7 @@ namespace TrilinosWrappers
      * @ref GlossUserProvidedCallBack "user provided callback".
      * See there for a description of how to deal with errors and other
      * requirements and conventions. NOX can not deal
-     * with "recoverable" errors, so if a callback
+     * with "recoverable" errors for this callback, so if it
      * throws an exception of type RecoverableUserCallbackError, then this
      * exception is treated like any other exception.
      */
@@ -274,10 +273,13 @@ namespace TrilinosWrappers
      * @note This variable represents a
      * @ref GlossUserProvidedCallBack "user provided callback".
      * See there for a description of how to deal with errors and other
-     * requirements and conventions. NOX can not deal
-     * with "recoverable" errors, so if a callback
-     * throws an exception of type RecoverableUserCallbackError, then this
-     * exception is treated like any other exception.
+     * requirements and conventions. NOX can deal with "recoverable"
+     * errors for this callback, if the NOX parameter
+     * "Newton/Rescue Bad Newton Solve" is set to @p true (which is, in
+     * fact, its default value). If this parameters is set to @p true,
+     * then exceptions of type RecoverableUserCallbackError are eaten for
+     * this callback and NOX can safely proceed with a recovery step.
+     * Exceptions of other types are still treated as "irrecoverable".
      */
     std::function<
       void(const VectorType &y, VectorType &x, const double tolerance)>
@@ -307,10 +309,13 @@ namespace TrilinosWrappers
      * @note This variable represents a
      * @ref GlossUserProvidedCallBack "user provided callback".
      * See there for a description of how to deal with errors and other
-     * requirements and conventions. NOX can not deal
-     * with "recoverable" errors, so if a callback
-     * throws an exception of type RecoverableUserCallbackError, then this
-     * exception is treated like any other exception.
+     * requirements and conventions. NOX can deal with "recoverable"
+     * errors for this callback, if the NOX parameter
+     * "Newton/Rescue Bad Newton Solve" is set to @p true (which is, in
+     * fact, its default value). If this parameters is set to @p true,
+     * then exceptions of type RecoverableUserCallbackError are eaten for
+     * this callback and NOX can safely proceed with a recovery step.
+     * Exceptions of other types are still treated as "irrecoverable".
      */
     std::function<
       int(const VectorType &y, VectorType &x, const double tolerance)>
@@ -331,7 +336,7 @@ namespace TrilinosWrappers
      * @ref GlossUserProvidedCallBack "user provided callback".
      * See there for a description of how to deal with errors and other
      * requirements and conventions. NOX can not deal
-     * with "recoverable" errors, so if a callback
+     * with "recoverable" errors for this callback, so if it
      * throws an exception of type RecoverableUserCallbackError, then this
      * exception is treated like any other exception.
      */
@@ -355,7 +360,7 @@ namespace TrilinosWrappers
      * @ref GlossUserProvidedCallBack "user provided callback".
      * See there for a description of how to deal with errors and other
      * requirements and conventions. NOX can not deal
-     * with "recoverable" errors, so if a callback
+     * with "recoverable" errors for this callback, so if it
      * throws an exception of type RecoverableUserCallbackError, then this
      * exception is treated like any other exception.
      */
@@ -403,6 +408,14 @@ namespace TrilinosWrappers
   };
 } // namespace TrilinosWrappers
 
+DEAL_II_NAMESPACE_CLOSE
+
+#else
+
+// Make sure the scripts that create the C++20 module input files have
+// something to latch on if the preprocessor #ifdef above would
+// otherwise lead to an empty content of the file.
+DEAL_II_NAMESPACE_OPEN
 DEAL_II_NAMESPACE_CLOSE
 
 #endif

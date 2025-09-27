@@ -1,60 +1,191 @@
-## ---------------------------------------------------------------------
+## ------------------------------------------------------------------------
 ##
-## Copyright (C) 2021 - 2023 by the deal.II authors
+## SPDX-License-Identifier: LGPL-2.1-or-later
+## Copyright (C) 2021 - 2025 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
-## The deal.II library is free software; you can use it, redistribute
-## it, and/or modify it under the terms of the GNU Lesser General
-## Public License as published by the Free Software Foundation; either
-## version 2.1 of the License, or (at your option) any later version.
-## The full text of the license can be found in the file LICENSE.md at
-## the top level directory of deal.II.
+## Part of the source code is dual licensed under Apache-2.0 WITH
+## LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+## governing the source code and code contributions can be found in
+## LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 ##
-## ---------------------------------------------------------------------
+## ------------------------------------------------------------------------
 
 #
 # Try to find the Kokkos library
 #
 # This module exports
 #
+#   DEAL_II_KOKKOS_ENABLE_HIP
 #   KOKKOS_INCLUDE_DIRS
 #   KOKKOS_INTERFACE_LINK_FLAGS
+#   KOKKOS_VERSION
+#   KOKKOS_VERSION_MAJOR
+#   KOKKOS_VERSION_MINOR
+#   KOKKOS_VERSION_SUBMINOR
 #
 
 set(KOKKOS_DIR "" CACHE PATH "An optional hint to a Kokkos installation")
 set_if_empty(KOKKOS_DIR "$ENV{KOKKOS_DIR}")
 
+# silence a warning when including FindKOKKOS.cmake
+set(CMAKE_CXX_EXTENSIONS OFF)
 
-if(DEAL_II_TRILINOS_WITH_KOKKOS OR DEAL_II_PETSC_WITH_KOKKOS)
-  # Let ArborX know that we have found Kokkos
-  set(Kokkos_FOUND ON)
-  # Let deal.II know that we have found Kokkos
-  set(KOKKOS_FOUND ON)
-else()
-  # silence a warning when including FindKOKKOS.cmake
-  set(CMAKE_CXX_EXTENSIONS OFF)
-  find_package(Kokkos 3.7.0 QUIET
-    HINTS ${KOKKOS_DIR} ${Kokkos_DIR} $ENV{Kokkos_DIR}
+# The minimal Kokkos version we support
+set(KOKKOS_MINIMUM_REQUIRED_VERSION 3.7.0)
+
+#
+# Make sure that we prioritize Kokkos bundled with Trilinos or PETSc.
+#
+# We do this by searching for the Kokkos installation first at the
+# restrictive path locations we deduced from both configurations.
+#
+
+if(Kokkos_FOUND)
+  message(WARNING "\n"
+    "find_package(Kokkos [...]) already called. The deal.II CMake "
+    "configuration might be inconsistent.\n\n"
+    )
+endif()
+
+if(DEAL_II_WITH_TRILINOS AND TRILINOS_WITH_KOKKOS)
+  message(STATUS "Found Trilinos with bundled Kokkos library. Overriding search path.")
+  set(KOKKOS_MINIMUM_REQUIRED_VERSION 3.4.0)
+  find_package(Kokkos ${KOKKOS_MINIMUM_REQUIRED_VERSION} QUIET
+    PATHS ${TRILINOS_KOKKOS_DIR} NO_DEFAULT_PATH
     )
 
-  set(KOKKOS_FOUND ${Kokkos_FOUND})
-
-  if(Kokkos_FOUND)
-    # We need to disable SIMD vectorization for CUDA device code.
-    # Otherwise, nvcc compilers from version 9 on will emit an error message like:
-    # "[...] contains a vector, which is not supported in device code". We
-    # would like to set the variable in check_01_cpu_feature but at that point
-    # we don't know if CUDA support is enabled in Kokkos
-    if(Kokkos_ENABLE_CUDA)
-      set(DEAL_II_VECTORIZATION_WIDTH_IN_BITS 0)
-      # Require lambda support to use Kokkos as a backend
-      KOKKOS_CHECK(OPTIONS CUDA_LAMBDA)
-    endif()
+  if(NOT Kokkos_FOUND)
+    message(WARNING "\n"
+      "The find_package(Kokkos [...]) call failed with the path deduced from "
+      "the Trilinos configuration. The deal.II CMake configuration might be "
+      "inconsistent.\n\n"
+      )
   endif()
 
-  set(_target Kokkos::kokkos)
+elseif(DEAL_II_WITH_PETSC AND PETSC_WITH_KOKKOS)
+  message(STATUS "Found PETSc with bundled Kokkos library. Overriding search path.")
+  set(KOKKOS_MINIMUM_REQUIRED_VERSION 3.4.0)
+  find_package(Kokkos ${KOKKOS_MINIMUM_REQUIRED_VERSION} QUIET
+    PATHS ${PETSC_KOKKOS_DIR} NO_DEFAULT_PATH
+    )
+
+  if(NOT Kokkos_FOUND)
+    message(WARNING "\n"
+      "The find_package(Kokkos [...]) call failed with the path deduced from "
+      "the PETSc configuration. The deal.II CMake configuration might be "
+      "inconsistent.\n\n"
+      )
+  endif()
+endif()
+
+#
+# Find the Kokkos CMake configuration:
+#
+
+find_package(Kokkos ${KOKKOS_MINIMUM_REQUIRED_VERSION} HINTS ${KOKKOS_DIR})
+
+if (DEAL_II_WITH_TRILINOS AND TRILINOS_VERSION VERSION_LESS 14
+    AND DEAL_II_TRILINOS_WITH_KOKKOS)
+  #
+  # Workaround: Trilinos prior to version 14 needs extensive cleanup of the
+  # exported CMake configuration, which we do in
+  # FindDEAL_II_TRILINOS.cmake. This also applies to the bundled Kokkos
+  # library, which prevents us from simply importing the Kokkos::kokkos
+  # target. We work around this issue by simply not calling
+  # process_feature().
+  #
+  set(KOKKOS_FOUND TRUE)
+
+else()
+
+  set(_target)
+  if(Kokkos_FOUND)
+    set(_target Kokkos::kokkos)
+  endif()
+
   process_feature(KOKKOS
     TARGETS REQUIRED _target
+    CLEAR Kokkos_DIR
     )
+endif()
+
+if(KOKKOS_FOUND)
+  #
+  # Set version number:
+  #
+  if(NOT Kokkos_VERSION)
+    message(WARNING "\n"
+      "find_package(Kokkos [...]) did not set Kokkos_VERSION!"
+      )
+    set(Kokkos_VERSION ${KOKKOS_MINIMUM_REQUIRED_VERSION})
+  endif()
+  set(KOKKOS_VERSION ${Kokkos_VERSION})
+
+  if(Kokkos_ENABLE_CUDA)
+    if (NOT CMAKE_CXX_COMPILER_ID MATCHES Clang)
+      # We need to disable SIMD vectorization for CUDA device code with nvcc.
+      # Otherwise, nvcc compilers from version 9 on will emit an error message like:
+      # "[...] contains a vector, which is not supported in device code". We
+      # would like to set the variable in check_01_cpu_feature but at that point
+      # we don't know if CUDA support is enabled in Kokkos
+      set(DEAL_II_VECTORIZATION_WIDTH_IN_BITS 0)
+    endif()
+
+    # Require lambda support and expt-relaxed-constexpr for Cuda
+    # so that we can use std::array and other interfaces with
+    # __host__ constexpr functions in device code
+    KOKKOS_CHECK(OPTIONS CUDA_LAMBDA CUDA_CONSTEXPR)
+
+    # Disable a bunch of annoying warnings generated by boost, template code,
+    # and in other random places:
+    #
+    # integer conversion resulted in a change of sign:
+    enable_if_supported(DEAL_II_CXX_FLAGS "-Xcudafe --diag_suppress=68")
+    # loop is not reachable:
+    enable_if_supported(DEAL_II_CXX_FLAGS "-Xcudafe --diag_suppress=128")
+    # warning #177-D: variable "n_max_face_orientations" was declared but never referenced
+    enable_if_supported(DEAL_II_CXX_FLAGS "-Xcudafe --diag_suppress=177")
+    # warning #186-D: pointless comparison of unsigned integer with zero
+    enable_if_supported(DEAL_II_CXX_FLAGS "-Xcudafe --diag_suppress=186")
+    # warning #191-D: type qualifier is meaningless on cast type
+    enable_if_supported(DEAL_II_CXX_FLAGS "-Xcudafe --diag_suppress=191")
+    # warning #284-D: NULL reference is not allowed
+    enable_if_supported(DEAL_II_CXX_FLAGS "-Xcudafe --diag_suppress=284")
+    # variable "i" was set but never used:
+    enable_if_supported(DEAL_II_CXX_FLAGS "-Xcudafe --diag_suppress=550")
+    # warning #940-D: missing return statement at end of non-void function
+    enable_if_supported(DEAL_II_CXX_FLAGS "-Xcudafe --diag_suppress=940")
+    # warning #20012-D: __host__ annotation is ignored on a function that is explicitly defaulted on its first declaration
+    enable_if_supported(DEAL_II_CXX_FLAGS "-Xcudafe --diag_suppress=20012")
+  endif()
+
+  if(Kokkos_ENABLE_HIP)
+    # Define our own variable to avoid including Kokkos_Macros.hpp in config.h
+    set(DEAL_II_KOKKOS_ENABLE_HIP ON)
+  endif()
+
+  #
+  # Extract version numbers:
+  #
+
+  string(REGEX REPLACE
+    "^([0-9]+).*$" "\\1"
+    KOKKOS_VERSION_MAJOR "${KOKKOS_VERSION}")
+
+  string(REGEX REPLACE
+    "^[0-9]+\\.([0-9]+).*$" "\\1"
+    KOKKOS_VERSION_MINOR "${KOKKOS_VERSION}")
+
+  # If there is no subminor number, KOKKOS_VERSION_SUBMINOR is set to an
+  # empty string. If that is the case, set the subminor number to zero
+  string(REGEX REPLACE
+    "^[0-9]+\\.[0-9]+\\.?(([0-9]+)?).*$" "\\1"
+    KOKKOS_VERSION_SUBMINOR "${KOKKOS_VERSION}")
+  if("${KOKKOS_VERSION_SUBMINOR}" STREQUAL "")
+    set(KOKKOS_VERSION_SUBMINOR "0")
+  endif()
+
+
 endif()

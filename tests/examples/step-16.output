@@ -1,0 +1,48 @@
+Cycle 0
+   Number of active cells:       80
+   Number of degrees of freedom: 89 (by level: 8, 25, 89)
+Solver stopped after 5 iterations
+   Number of CG iterations: 5
+
+Cycle 1
+   Number of active cells:       152
+   Number of degrees of freedom: 174 (by level: 8, 25, 89, 123)
+Solver stopped after 5 iterations
+   Number of CG iterations: 5
+
+Cycle 2
+   Number of active cells:       287
+   Number of degrees of freedom: 331 (by level: 8, 25, 89, 223, 127)
+Solver stopped after 6 iterations
+   Number of CG iterations: 6
+
+Cycle 3
+   Number of active cells:       545
+   Number of degrees of freedom: 608 (by level: 8, 25, 89, 231, 476, 24)
+Solver stopped after 6 iterations
+   Number of CG iterations: 6
+
+Cycle 4
+   Number of active cells:       1034
+   Number of degrees of freedom: 1137 (by level: 8, 25, 89, 274, 756, 417, 15)
+Solver stopped after 6 iterations
+   Number of CG iterations: 6
+
+Cycle 5
+   Number of active cells:       1964
+   Number of degrees of freedom: 2181 (by level: 8, 25, 89, 304, 779, 1030, 817)
+Solver stopped after 6 iterations
+   Number of CG iterations: 6
+
+Cycle 6
+   Number of active cells:       3734
+   Number of degrees of freedom: 4101 (by level: 8, 25, 89, 337, 779, 2046, 885, 1545)
+Solver stopped after 6 iterations
+   Number of CG iterations: 6
+
+Cycle 7
+   Number of active cells:       7094
+   Number of degrees of freedom: 7833 (by level: 8, 25, 89, 337, 1056, 2835, 1740, 1765, 3085)
+Solver stopped after 6 iterations
+   Number of CG iterations: 6
+

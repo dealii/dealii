@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2008 - 2022 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2008 - 2024 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 #ifndef dealii_chunk_sparsity_pattern_h
 #define dealii_chunk_sparsity_pattern_h
@@ -19,8 +18,8 @@
 
 #include <deal.II/base/config.h>
 
+#include <deal.II/base/enable_observer_pointer.h>
 #include <deal.II/base/exceptions.h>
-#include <deal.II/base/subscriptor.h>
 
 #include <deal.II/lac/sparsity_pattern.h>
 
@@ -242,7 +241,7 @@ namespace ChunkSparsityPatternIterators
  *
  * The use of this class is demonstrated in step-51.
  */
-class ChunkSparsityPattern : public Subscriptor
+class ChunkSparsityPattern : public EnableObserverPointer
 {
 public:
   /**
@@ -307,8 +306,12 @@ public:
   /**
    * Initialize a rectangular matrix.
    *
-   * @arg m number of rows @arg n number of columns @arg max_per_row maximum
-   * number of nonzero entries per row
+   * @param[in] m The number of rows.
+   * @param[in] n The number of columns.
+   * @param[in] max_chunks_per_row The maximum number of nonzero chunks per row
+   *   that is to be allocated.
+   * @param[in] chunk_size The number of rows/columns that should be chunked
+   *   together.
    */
   ChunkSparsityPattern(const size_type m,
                        const size_type n,
@@ -318,9 +321,12 @@ public:
   /**
    * Initialize a rectangular matrix.
    *
-   * @arg m number of rows @arg n number of columns @arg row_lengths possible
-   * number of nonzero entries for each row.  This vector must have one entry
-   * for each row.
+   * @param[in] m The number of rows.
+   * @param[in] n The number of columns.
+   * @param[in] row_lengths The possible number of nonzero entries for each row.
+   *   This vector must have one entry for each row.
+   * @param[in] chunk_size The number of rows/columns that should be chunked
+   *   together.
    */
   ChunkSparsityPattern(const size_type               m,
                        const size_type               n,
@@ -342,9 +348,11 @@ public:
   /**
    * Initialize a quadratic matrix.
    *
-   * @arg m number of rows and columns @arg row_lengths possible number of
-   * nonzero entries for each row.  This vector must have one entry for each
-   * row.
+   * @param[in] m The number of rows and columns.
+   * @param[in] row_lengths The possible number of nonzero entries for each row.
+   *   This vector must have one entry for each row.
+   * @param[in] chunk_size The number of rows/columns that should be chunked
+   *   together.
    */
   ChunkSparsityPattern(const size_type               m,
                        const std::vector<size_type> &row_lengths,

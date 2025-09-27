@@ -1,0 +1,79 @@
+
+DEAL:0::2 2 2 quad 3
+DEAL:0::Norm interpolated solution on level 0: 0.33877875
+DEAL:0::Norm interpolated solution on level 1: 0.66014529
+DEAL:0::2 3 2 quad 3
+DEAL:0::Norm interpolated solution on level 0: 0.33872299
+DEAL:0::Norm interpolated solution on level 1: 0.99016130
+DEAL:0::2 4 2 quad 3
+DEAL:0::Norm interpolated solution on level 0: 0.33877890
+DEAL:0::Norm interpolated solution on level 1: 0.66010393
+DEAL:0::Norm interpolated solution on level 2: 1.3201957
+DEAL:0::2 2 3 quad 3
+DEAL:0::Norm interpolated solution on level 0: 0.66459543
+DEAL:0::Norm interpolated solution on level 1: 1.3203627
+DEAL:0::2 3 3 quad 3
+DEAL:0::Norm interpolated solution on level 0: 0.66458798
+DEAL:0::Norm interpolated solution on level 1: 1.9805368
+DEAL:0::2 4 3 quad 3
+DEAL:0::Norm interpolated solution on level 0: 0.66459725
+DEAL:0::Norm interpolated solution on level 1: 1.3203574
+DEAL:0::Norm interpolated solution on level 2: 2.6407133
+DEAL:0::2 2 4 quad 3
+DEAL:0::Norm interpolated solution on level 0: 1.3225826
+DEAL:0::Norm interpolated solution on level 1: 2.6407347
+DEAL:0::2 3 4 quad 3
+DEAL:0::Norm interpolated solution on level 0: 1.3225816
+DEAL:0::Norm interpolated solution on level 1: 3.9611011
+DEAL:0::2 4 4 quad 3
+DEAL:0::Norm interpolated solution on level 0: 1.3225830
+DEAL:0::Norm interpolated solution on level 1: 2.6407340
+DEAL:0::Norm interpolated solution on level 2: 5.2814679
+DEAL:0::2 2 2 tri  3
+DEAL:0::Norm interpolated solution on level 0: 0.33806168
+DEAL:0::Norm interpolated solution on level 1: 0.66011744
+DEAL:0::2 2 3 tri  3
+DEAL:0::Norm interpolated solution on level 0: 0.66445481
+DEAL:0::Norm interpolated solution on level 1: 1.3203595
+DEAL:0::2 2 4 tri  3
+DEAL:0::Norm interpolated solution on level 0: 1.3225585
+DEAL:0::Norm interpolated solution on level 1: 2.6407344
+DEAL:0::2 2 2 quad 2
+DEAL:0::Norm interpolated solution on level 0: 0.13157424
+DEAL:0::Norm interpolated solution on level 1: 0.24449632
+DEAL:0::2 3 2 quad 3
+DEAL:0::Norm interpolated solution on level 0: 0.13144458
+DEAL:0::Norm interpolated solution on level 1: 0.35587970
+DEAL:0::2 4 2 quad 3
+DEAL:0::Norm interpolated solution on level 0: 0.13139421
+DEAL:0::Norm interpolated solution on level 1: 0.24404614
+DEAL:0::Norm interpolated solution on level 2: 0.46558561
+DEAL:0::2 2 3 quad 3
+DEAL:0::Norm interpolated solution on level 0: 0.23622379
+DEAL:0::Norm interpolated solution on level 1: 0.45479680
+DEAL:0::2 3 3 quad 3
+DEAL:0::Norm interpolated solution on level 0: 0.23657515
+DEAL:0::Norm interpolated solution on level 1: 0.66773399
+DEAL:0::2 4 3 quad 3
+DEAL:0::Norm interpolated solution on level 0: 0.23652211
+DEAL:0::Norm interpolated solution on level 1: 0.45456995
+DEAL:0::Norm interpolated solution on level 2: 0.87733284
+DEAL:0::2 2 4 quad 3
+DEAL:0::Norm interpolated solution on level 0: 0.43119420
+DEAL:0::Norm interpolated solution on level 1: 0.85199621
+DEAL:0::2 3 4 quad 3
+DEAL:0::Norm interpolated solution on level 0: 0.43119824
+DEAL:0::Norm interpolated solution on level 1: 1.2615628
+DEAL:0::2 4 4 quad 3
+DEAL:0::Norm interpolated solution on level 0: 0.43118187
+DEAL:0::Norm interpolated solution on level 1: 0.85199072
+DEAL:0::Norm interpolated solution on level 2: 1.6669458
+DEAL:0::2 2 2 tri  3
+DEAL:0::Norm interpolated solution on level 0: 0.13575160
+DEAL:0::Norm interpolated solution on level 1: 0.24280231
+DEAL:0::2 2 3 tri  3
+DEAL:0::Norm interpolated solution on level 0: 0.21915908
+DEAL:0::Norm interpolated solution on level 1: 0.41924192
+DEAL:0::2 2 4 tri  4
+DEAL:0::Norm interpolated solution on level 0: 0.40718520
+DEAL:0::Norm interpolated solution on level 1: 0.80533381

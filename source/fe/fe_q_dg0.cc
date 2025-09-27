@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2012 - 2022 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2012 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 
 #include <deal.II/base/quadrature.h>
@@ -70,8 +69,6 @@ FE_Q_DG0<dim, spacedim>::FE_Q_DG0(const Quadrature<1> &points)
       get_riaf_vector(points.size() - 1))
 {
   const int degree = points.size() - 1;
-  (void)degree;
-
   Assert(degree > 0,
          ExcMessage("This element can only be used for polynomial degrees "
                     "at least zero"));
@@ -108,18 +105,18 @@ FE_Q_DG0<dim, spacedim>::get_name() const
   // Decode the support points in one coordinate direction.
   for (unsigned int j = 0; j < dofs_per_cell; ++j)
     {
-      if ((dim > 1) ? (unit_support_points[j](1) == 0 &&
-                       ((dim > 2) ? unit_support_points[j](2) == 0 : true)) :
+      if ((dim > 1) ? (unit_support_points[j][1] == 0 &&
+                       ((dim > 2) ? unit_support_points[j][2] == 0 : true)) :
                       true)
         {
           if (index == 0)
-            points[index] = unit_support_points[j](0);
+            points[index] = unit_support_points[j][0];
           else if (index == 1)
-            points[n_points - 1] = unit_support_points[j](0);
+            points[n_points - 1] = unit_support_points[j][0];
           else
-            points[index - 1] = unit_support_points[j](0);
+            points[index - 1] = unit_support_points[j][0];
 
-          index++;
+          ++index;
         }
     }
   // Do not consider the discontinuous node for dimension 1
@@ -150,7 +147,7 @@ FE_Q_DG0<dim, spacedim>::get_name() const
       const QGaussLobatto<1> points_gl(n_points);
       type = true;
       for (unsigned int j = 0; j < n_points; ++j)
-        if (points[j] != points_gl.point(j)(0))
+        if (points[j] != points_gl.point(j)[0])
           {
             type = false;
             break;
@@ -333,12 +330,12 @@ FE_Q_DG0<dim, spacedim>::compare_for_domination(
         return FiniteElementDomination::no_requirements;
     }
 
-  Assert(false, ExcNotImplemented());
+  DEAL_II_NOT_IMPLEMENTED();
   return FiniteElementDomination::neither_element_dominates;
 }
 
 
 // explicit instantiations
-#include "fe_q_dg0.inst"
+#include "fe/fe_q_dg0.inst"
 
 DEAL_II_NAMESPACE_CLOSE

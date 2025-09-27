@@ -1,0 +1,280 @@
+<h1>Results</h1>
+
+When you run this program with the input file as is, you get output as follows:
+@code
+
+Number of active cells: 768
+Number of degrees of freedom: 833
+
+Time step 0 at t=0
+     5 linear iterations.
+     8 linear iterations.
+Time step 1 at t=0.025
+     6 linear iterations.
+Time step 2 at t=0.05
+     5 linear iterations.
+     8 linear iterations.
+Time step 3 at t=0.075
+     6 linear iterations.
+Time step 4 at t=0.1
+     6 linear iterations.
+Time step 5 at t=0.125
+     6 linear iterations.
+Time step 6 at t=0.15
+     6 linear iterations.
+Time step 7 at t=0.175
+     6 linear iterations.
+Time step 8 at t=0.2
+     6 linear iterations.
+Time step 9 at t=0.225
+     6 linear iterations.
+
+Adapting the mesh...
+
+Number of active cells: 1050
+Number of degrees of freedom: 1155
+
+Time step 10 at t=0.25
+     5 linear iterations.
+     8 linear iterations.
+Time step 11 at t=0.275
+     5 linear iterations.
+     7 linear iterations.
+
+[...]
+
+Time step 195 at t=4.875
+     6 linear iterations.
+Time step 196 at t=4.9
+     6 linear iterations.
+Time step 197 at t=4.925
+     6 linear iterations.
+Time step 198 at t=4.95
+     6 linear iterations.
+Time step 199 at t=4.975
+     5 linear iterations.
+
+Adapting the mesh...
+
+Number of active cells: 1380
+Number of degrees of freedom: 1547
+
+Time step 200 at t=5
+
+
++---------------------------------------------+------------+------------+
+| Total wallclock time elapsed since start    |      43.2s |            |
+|                                             |            |            |
+| Section                         | no. calls |  wall time | % of total |
++---------------------------------+-----------+------------+------------+
+| assemble implicit Jacobian      |       226 |      9.93s |        23% |
+| implicit function               |       426 |      16.2s |        37% |
+| output results                  |       201 |      9.74s |        23% |
+| set algebraic components        |       200 |    0.0496s |      0.11% |
+| setup system                    |        21 |     0.799s |       1.8% |
+| solve with Jacobian             |       226 |      0.56s |       1.3% |
+| update current constraints      |       201 |      1.53s |       3.5% |
++---------------------------------+-----------+------------+------------+
+
+@endcode
+
+We can generate output for this in the form of a video:
+@htmlonly
+<p align="center">
+  <iframe width="560" height="315" src="https://www.youtube.com/embed/fhJVkcdRksM"
+   frameborder="0"
+   allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
+   allowfullscreen></iframe>
+ </p>
+@endhtmlonly
+The solution here is driven by boundary values (the initial conditions are zero,
+and so is the right hand side of the equation). It takes a little bit of time
+for the boundary values to diffuse into the domain, and so the temperature
+(the solution of the heat equation) in the interior of the domain has a slight
+lag compared to the temperature at the boundary.
+
+
+The more interesting component of this program is how easy it is to play with
+the details of the time stepping algorithm. Recall that the solution above
+is controlled by the following parameters:
+@code
+  subsection Time stepper
+    subsection Running parameters
+      set final time              = 5
+      set initial step size       = 0.025
+      set initial time            = 0
+      set match final time        = false
+      set maximum number of steps = -1
+      set options prefix          =
+      set solver type             = beuler
+    end
+
+    subsection Error control
+      set absolute error tolerance = -1
+      set adaptor type             = none
+      set ignore algebraic lte     = true
+      set maximum step size        = -1
+      set minimum step size        = -1
+      set relative error tolerance = -1
+    end
+  end
+@endcode
+Of particular interest for us here is to set the time stepping algorithm
+and the adaptive time step control method. The latter is set to "none"
+above, but there are
+[several alternative choices](https://petsc.org/release/manualpages/TS/TSAdaptType/)
+for this parameter. For example, we can set parameters as follows,
+@code
+  subsection Time stepper
+    subsection Running parameters
+      set final time              = 5
+      set initial step size       = 0.025
+      set initial time            = 0
+      set match final time        = false
+      set maximum number of steps = -1
+      set options prefix          =
+      set solver type             = bdf
+    end
+
+    subsection Error control
+      set absolute error tolerance = 1e-2
+      set relative error tolerance = 1e-2
+      set adaptor type             = basic
+      set ignore algebraic lte     = true
+      set maximum step size        = 1
+      set minimum step size        = 0.01
+    end
+  end
+@endcode
+What we do here is set the initial time step size to 0.025, and choose relatively
+large absolute and relative error tolerances of 0.01 for the time step size
+adaptation algorithm (for which we choose "basic"). We ask PETSc TS to use a
+[Backward Differentiation Formula (BDF)](https://en.wikipedia.org/wiki/Backward_differentiation_formula)
+method, and we get the following as output:
+@code
+
+===========================================
+Number of active cells: 768
+Number of degrees of freedom: 833
+
+Time step 0 at t=0
+     5 linear iterations.
+     5 linear iterations.
+     5 linear iterations.
+     4 linear iterations.
+     6 linear iterations.
+Time step 1 at t=0.01
+     5 linear iterations.
+     5 linear iterations.
+Time step 2 at t=0.02
+     5 linear iterations.
+     5 linear iterations.
+Time step 3 at t=0.03
+     5 linear iterations.
+     5 linear iterations.
+Time step 4 at t=0.042574
+     5 linear iterations.
+     5 linear iterations.
+Time step 5 at t=0.0588392
+     5 linear iterations.
+     5 linear iterations.
+Time step 6 at t=0.0783573
+     5 linear iterations.
+     7 linear iterations.
+     5 linear iterations.
+     7 linear iterations.
+Time step 7 at t=0.100456
+     5 linear iterations.
+     7 linear iterations.
+     5 linear iterations.
+     7 linear iterations.
+Time step 8 at t=0.124982
+     5 linear iterations.
+     8 linear iterations.
+     5 linear iterations.
+     7 linear iterations.
+Time step 9 at t=0.153156
+     6 linear iterations.
+     5 linear iterations.
+
+[...]
+
+Time step 206 at t=4.96911
+     5 linear iterations.
+     5 linear iterations.
+Time step 207 at t=4.99398
+     5 linear iterations.
+     5 linear iterations.
+Time step 208 at t=5.01723
+
+
++---------------------------------------------+------------+------------+
+| Total wallclock time elapsed since start    |       117s |            |
+|                                             |            |            |
+| Section                         | no. calls |  wall time | % of total |
++---------------------------------+-----------+------------+------------+
+| assemble implicit Jacobian      |       593 |      35.6s |        31% |
+| implicit function               |      1101 |      56.3s |        48% |
+| output results                  |       209 |      12.5s |        11% |
+| set algebraic components        |       508 |     0.156s |      0.13% |
+| setup system                    |        21 |      1.11s |      0.95% |
+| solve with Jacobian             |       593 |      1.97s |       1.7% |
+| update current constraints      |       509 |      4.53s |       3.9% |
++---------------------------------+-----------+------------+------------+
+@endcode
+What is happening here is that apparently PETSc TS is not happy with our
+choice of initial time step size, and after several linear solves has
+reduced it to the minimum we allow it to, 0.01. The following time steps
+then run at a time step size of 0.01 until it decides to make it slightly
+larger again and (apparently) switches to a higher order method that
+requires more linear solves per time step but allows for a larger time
+step closer to our initial choice 0.025 again. It does not quite hit the
+final time of $T=5$ with its time step choices, but we've got only
+ourselves to blame for that by setting
+@code
+      set match final time        = false
+@endcode
+in the input file. If hitting the end time exactly is important to us,
+setting the flag to `true` resolves this issue.
+
+We can even reason why PETSc eventually chooses a time step of around
+0.025: The boundary values undergo a complete cosine cycle within 0.5
+time units; we should expect that it takes around ten or twenty time
+steps to resolve each period of a cycle to reasonable accuracy, and
+this leads to the time step choice PETSc finds.
+
+Not all combinations of methods, time step adaptation algorithms, and
+other parameters are valid, but the main messages from the experiment
+above that you should take away are:
+- It would undoubtedly be quite time consuming to implement many of the
+  methods that PETSc TS offers for time stepping -- but with a program
+  such as the one here, we don't need to: We can just select from the
+  many methods PETSc TS already has.
+- Adaptive time step control is difficult; adaptive choice of which
+  method or order to choose is perhaps even more difficult. None of the
+  time dependent programs that came before the current one (say, step-23,
+  step-26, step-31, step-58, and a good number of others) have either.
+  Moreover, while deal.II is good at spatial adaptation of meshes, it
+  is not a library written by experts in time step adaptation, and so will
+  likely not gain this ability either. But, again, it doesn't
+  have to: We can rely on a library written by experts in that area.
+
+
+
+<a name="step-86-extensions"></a>
+<h3>Possibilities for extensions</h3>
+
+The program actually runs in parallel, even though we have not used
+that above. Specifically, if you have configured deal.II to use MPI,
+then you can do `mpirun -np 8 ./step-86 heat_equation.prm` to run the
+program with 8 processes.
+
+For the program as currently written (and in debug mode), this makes
+little difference: It will run about twice as fast, but take about 8
+times as much CPU time. That is because the problem is just so small:
+Generally between 1000 and 2000 degrees of freedom. A good rule of
+thumb is that programs really only benefit from parallel computing if
+you have somewhere in the range of 50,000 to 100,000 unknowns *per MPI
+process*. But it is not difficult to adapt the program at hand here to
+run with a much finer mesh, or perhaps in 3d, so that one is beyond
+that limit and sees the benefits of parallel computing.

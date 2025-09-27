@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2001 - 2021 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2012 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 
 
@@ -74,9 +73,9 @@ generate_grid(Triangulation<2> &triangulation)
   // Look for the two outermost faces:
   for (const unsigned int j : GeometryInfo<2>::face_indices())
     {
-      if (cell_1->face(j)->center()(1) > 2.9)
+      if (cell_1->face(j)->center()[1] > 2.9)
         face_1 = cell_1->face(j);
-      if (cell_2->face(j)->center()(1) < -2.9)
+      if (cell_2->face(j)->center()[1] < -2.9)
         face_2 = cell_2->face(j);
     }
   face_1->set_boundary_id(42);
@@ -137,9 +136,9 @@ generate_grid(Triangulation<3> &triangulation)
   // Look for the two outermost faces:
   for (const unsigned int j : GeometryInfo<3>::face_indices())
     {
-      if (cell_1->face(j)->center()(2) > 2.9)
+      if (cell_1->face(j)->center()[2] > 2.9)
         face_1 = cell_1->face(j);
-      if (cell_2->face(j)->center()(2) < -2.9)
+      if (cell_2->face(j)->center()[2] < -2.9)
         face_2 = cell_2->face(j);
     }
   face_1->set_boundary_id(42);
@@ -155,9 +154,9 @@ generate_grid(Triangulation<3> &triangulation)
  */
 template <typename FaceIterator>
 void
-print_match(const FaceIterator   &face_1,
-            const FaceIterator   &face_2,
-            const std::bitset<3> &orientation)
+print_match(const FaceIterator                &face_1,
+            const FaceIterator                &face_2,
+            const types::geometric_orientation combined_orientation)
 {
   static const int dim = FaceIterator::AccessorType::dimension;
 
@@ -171,8 +170,10 @@ print_match(const FaceIterator   &face_1,
     deallog << " :: " << face_2->vertex(j);
   deallog << std::endl;
 
-  deallog << "orientation: " << orientation[0] << "  flip: " << orientation[1]
-          << "  rotation: " << orientation[2] << std::endl
+  const auto [orientation, rotation, flip] =
+    internal::split_face_orientation(combined_orientation);
+  deallog << "orientation: " << orientation << "  flip: " << flip
+          << "  rotation: " << rotation << std::endl
           << std::endl;
 }
 

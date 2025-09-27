@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2000 - 2022 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2000 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 #ifndef dealii_sparsity_pattern_h
 #define dealii_sparsity_pattern_h
@@ -20,9 +19,9 @@
 #include <deal.II/base/config.h>
 
 #include <deal.II/base/array_view.h>
+#include <deal.II/base/enable_observer_pointer.h>
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/linear_index_iterator.h>
-#include <deal.II/base/subscriptor.h>
 
 #include <deal.II/lac/sparsity_pattern_base.h>
 
@@ -330,7 +329,7 @@ namespace SparsityPatternIterators
  * systems, it is rarely set up directly due to the way it stores its
  * information. Rather, one typically goes through an intermediate format
  * first, see for example the step-2 tutorial program as well as the
- * documentation module
+ * documentation topic
  * @ref Sparsity.
  *
  * You can iterate over entries in the pattern using begin(), end(),
@@ -514,8 +513,8 @@ public:
    *
    * This constructs objects intended for the application of the ILU(n)-method
    * or other incomplete decompositions.  Therefore, additional to the
-   * original entry structure, space for <tt>extra_off_diagonals</tt> side-
-   * diagonals is provided on both sides of the main diagonal.
+   * original entry structure, space for <tt>extra_off_diagonals</tt>
+   * side-diagonals is provided on both sides of the main diagonal.
    *
    * <tt>max_per_row</tt> is the maximum number of nonzero elements per row
    * which this structure is to hold. It is assumed that this number is
@@ -524,8 +523,8 @@ public:
    * will usually want to give the same number as you gave for
    * <tt>original</tt> plus the number of side diagonals times two. You may
    * however give a larger value if you wish to add further nonzero entries
-   * for the decomposition based on other criteria than their being on side-
-   * diagonals.
+   * for the decomposition based on other criteria than their being on
+   * side-diagonals.
    *
    * This function requires that <tt>original</tt> refers to a quadratic
    * matrix structure.  It must be compressed. The matrix structure is not
@@ -778,26 +777,6 @@ public:
   empty() const;
 
   /**
-   * Check if a value at a certain position may be non-zero.
-   */
-  bool
-  exists(const size_type i, const size_type j) const;
-
-  /**
-   * This is the inverse operation to operator()(): given a global index, find
-   * out row and column of the matrix entry to which it belongs. The returned
-   * value is the pair composed of row and column index.
-   *
-   * This function may only be called if the sparsity pattern is closed. The
-   * global index must then be between zero and n_nonzero_elements().
-   *
-   * If <tt>N</tt> is the number of rows of this matrix, then the complexity
-   * of this function is <i>log(N)</i>.
-   */
-  std::pair<size_type, size_type>
-  matrix_position(const std::size_t global_index) const;
-
-  /**
    * Compute the bandwidth of the matrix represented by this structure. The
    * bandwidth is the maximum of $|i-j|$ for which the index pair $(i,j)$
    * represents a nonzero entry of the matrix. Consequently, the maximum
@@ -893,6 +872,12 @@ public:
   operator()(const size_type i, const size_type j) const;
 
   /**
+   * Check if a value at a certain position may be non-zero.
+   */
+  bool
+  exists(const size_type i, const size_type j) const;
+
+  /**
    * Access to column number field.  Return the column number of the
    * <tt>index</tt>th entry in <tt>row</tt>. Note that if diagonal elements
    * are optimized, the first element in each row is the diagonal element,
@@ -904,6 +889,20 @@ public:
    */
   size_type
   column_number(const size_type row, const unsigned int index) const;
+
+  /**
+   * This is the inverse operation to operator()(): given a global index, find
+   * out row and column of the matrix entry to which it belongs. The returned
+   * value is the pair composed of row and column index.
+   *
+   * This function may only be called if the sparsity pattern is closed. The
+   * global index must then be between zero and n_nonzero_elements().
+   *
+   * If <tt>N</tt> is the number of rows of this matrix, then the complexity
+   * of this function is <i>log(N)</i>.
+   */
+  std::pair<size_type, size_type>
+  matrix_position(const std::size_t global_index) const;
 
   /**
    * The index of a global matrix entry in its row.
@@ -1395,34 +1394,6 @@ SparsityPattern::end(const size_type r) const
 
 
 
-inline bool
-SparsityPattern::operator==(const SparsityPattern &sp2) const
-{
-  if (store_diagonal_first_in_row != sp2.store_diagonal_first_in_row)
-    return false;
-
-  // it isn't quite necessary to compare *all* member variables. by only
-  // comparing the essential ones, we can say that two sparsity patterns are
-  // equal even if one is compressed and the other is not (in which case some
-  // of the member variables are not yet set correctly)
-  if (rows != sp2.rows || cols != sp2.cols || compressed != sp2.compressed)
-    return false;
-
-  if (rows > 0)
-    for (size_type i = 0; i < rows + 1; ++i)
-      if (rowstart[i] != sp2.rowstart[i])
-        return false;
-
-  if (rows > 0)
-    for (size_type i = 0; i < rowstart[rows]; ++i)
-      if (colnums[i] != sp2.colnums[i])
-        return false;
-
-  return true;
-}
-
-
-
 namespace internal
 {
   namespace SparsityPatternTools
@@ -1516,7 +1487,7 @@ inline void
 SparsityPattern::save(Archive &ar, const unsigned int) const
 {
   // forward to serialization function in the base class.
-  ar &boost::serialization::base_object<const Subscriptor>(*this);
+  ar &boost::serialization::base_object<const EnableObserverPointer>(*this);
 
   ar &max_dim &rows &cols &max_vec_len &max_row_length &compressed;
 
@@ -1539,7 +1510,7 @@ inline void
 SparsityPattern::load(Archive &ar, const unsigned int)
 {
   // forward to serialization function in the base class.
-  ar &boost::serialization::base_object<Subscriptor>(*this);
+  ar &boost::serialization::base_object<EnableObserverPointer>(*this);
 
   ar &max_dim &rows &cols &max_vec_len &max_row_length &compressed;
 

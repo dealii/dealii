@@ -1,17 +1,16 @@
-## ---------------------------------------------------------------------
+## ------------------------------------------------------------------------
 ##
-## Copyright (C) 2012 - 2023 by the deal.II authors
+## SPDX-License-Identifier: LGPL-2.1-or-later
+## Copyright (C) 2012 - 2024 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
-## The deal.II library is free software; you can use it, redistribute
-## it, and/or modify it under the terms of the GNU Lesser General
-## Public License as published by the Free Software Foundation; either
-## version 2.1 of the License, or (at your option) any later version.
-## The full text of the license can be found in the file LICENSE.md at
-## the top level directory of deal.II.
+## Part of the source code is dual licensed under Apache-2.0 WITH
+## LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+## governing the source code and code contributions can be found in
+## LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 ##
-## ---------------------------------------------------------------------
+## ------------------------------------------------------------------------
 
 #
 # This file implements the DEAL_II_INVOKE_AUTOPILOT macro, which is
@@ -36,13 +35,27 @@
 #
 
 macro(deal_ii_invoke_autopilot)
+  message(STATUS "Autopilot invoked")
 
-  # Generator specific values:
-  if(CMAKE_GENERATOR MATCHES "Ninja")
-    set(_make_command "$ ninja")
-  else()
-    set(_make_command " $ make")
+  get_property(_generator_is_multi_config
+    GLOBAL PROPERTY GENERATOR_IS_MULTI_CONFIG
+    )
+
+  if(${_generator_is_multi_config})
+    message(STATUS "Setting up multiple generator configurations")
+    set(CMAKE_BUILD_TYPE "multiple generator")
+    set(CMAKE_CONFIGURATION_TYPES "")
+    if(${DEAL_II_BUILD_TYPE} MATCHES "Debug")
+      list(APPEND CMAKE_CONFIGURATION_TYPES "Debug")
+    endif()
+    if(${DEAL_II_BUILD_TYPE} MATCHES "Release")
+      list(APPEND CMAKE_CONFIGURATION_TYPES "Release")
+    endif()
   endif()
+
+  #
+  # Generate compile_commands.json
+  #
 
   set(CMAKE_EXPORT_COMPILE_COMMANDS TRUE)
 
@@ -73,9 +86,34 @@ macro(deal_ii_invoke_autopilot)
 
   # Define and set up a compilation target:
   add_executable(${TARGET} ${TARGET_SRC})
-  deal_ii_setup_target(${TARGET})
 
-  message(STATUS "Autopilot invoked")
+  #
+  # To ensure maximal compatibility with existing user codes we use the
+  # deal_ii_setup_target() macro when setting up the target for a standard
+  # single-configuration generator und switch to the dealii::dealii target
+  # only for a multiple generator configuration.
+  #
+  # This hopefully ensures that subtle differences in how cmake expands
+  # compiler and linker flags coming from either the target directly or
+  # from the interface target dealii::dealii do not propagate to user
+  # project configurations.
+  #
+  if(${_generator_is_multi_config})
+    if(NOT DEAL_II_TARGET_CONFIG_INCLUDED)
+      include(${DEAL_II_TARGET_CONFIG})
+      set(DEAL_II_TARGET_CONFIG_INCLUDED TRUE)
+    endif()
+    target_link_libraries(${TARGET} dealii::dealii)
+  else()
+    deal_ii_setup_target(${TARGET})
+  endif()
+
+  # Generator specific values:
+  if(CMAKE_GENERATOR MATCHES "Ninja")
+    set(_make_command "$ ninja")
+  else()
+    set(_make_command " $ make")
+  endif()
 
   # Define a custom target to easily run the program:
   if(NOT DEFINED TARGET_RUN)
@@ -103,9 +141,7 @@ macro(deal_ii_invoke_autopilot)
     set(_command
       ${CMAKE_COMMAND} -P ${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/run_target.cmake
       )
-
   else()
-
     set(_command ${TARGET_RUN})
   endif()
 
@@ -113,13 +149,12 @@ macro(deal_ii_invoke_autopilot)
     add_custom_target(run
       COMMAND ${_command}
       DEPENDS ${TARGET}
-      COMMENT "Run ${TARGET} with ${CMAKE_BUILD_TYPE} configuration"
+      COMMENT "Run ${TARGET} with $<$<CONFIG:Release>:Release>$<$<CONFIG:Debug>:Debug> configuration"
       )
     set(_run_targets
       "#      ${_make_command} run            - to (compile, link and) run the program\n"
       )
   endif()
-
 
   #
   # Provide a target to sign the generated executable with a Mac OSX
@@ -158,45 +193,38 @@ macro(deal_ii_invoke_autopilot)
       )
   endif()
 
-  #
-  # Define custom targets to easily switch the build type:
-  #
+  if(NOT ${_generator_is_multi_config})
+    #
+    # Define custom targets to easily switch the build type:
+    #
 
-  if(${DEAL_II_BUILD_TYPE} MATCHES "Debug")
-    add_custom_target(debug
-      COMMAND ${CMAKE_COMMAND} -DCMAKE_BUILD_TYPE=Debug ${CMAKE_SOURCE_DIR}
-      COMMAND ${CMAKE_COMMAND} -E echo "***"
-      COMMAND ${CMAKE_COMMAND} -E echo "*** Switched to Debug mode. Now recompile with: ${_make_command}"
-      COMMAND ${CMAKE_COMMAND} -E echo "***"
-      COMMENT "Switching CMAKE_BUILD_TYPE to Debug"
-      VERBATIM
-      )
+    if(${DEAL_II_BUILD_TYPE} MATCHES "Debug")
+      add_custom_target(debug
+        COMMAND ${CMAKE_COMMAND} -DCMAKE_BUILD_TYPE=Debug ${CMAKE_SOURCE_DIR}
+        COMMAND ${CMAKE_COMMAND} -E echo "***"
+        COMMAND ${CMAKE_COMMAND} -E echo "*** Switched to Debug mode. Now recompile with: ${_make_command}"
+        COMMAND ${CMAKE_COMMAND} -E echo "***"
+        COMMENT "Switching CMAKE_BUILD_TYPE to Debug"
+        VERBATIM
+        )
+    endif()
+
+    if(${DEAL_II_BUILD_TYPE} MATCHES "Release")
+      add_custom_target(release
+        COMMAND ${CMAKE_COMMAND} -DCMAKE_BUILD_TYPE=Release ${CMAKE_SOURCE_DIR}
+        COMMAND ${CMAKE_COMMAND} -E echo "***"
+        COMMAND ${CMAKE_COMMAND} -E echo "*** Switched to Release mode. Now recompile with: ${_make_command}"
+        COMMAND ${CMAKE_COMMAND} -E echo "***"
+        COMMENT "Switching CMAKE_BUILD_TYPE to Release"
+        VERBATIM
+        )
+    endif()
   endif()
 
-  if(${DEAL_II_BUILD_TYPE} MATCHES "Release")
-    add_custom_target(release
-      COMMAND ${CMAKE_COMMAND} -DCMAKE_BUILD_TYPE=Release ${CMAKE_SOURCE_DIR}
-      COMMAND ${CMAKE_COMMAND} -E echo "***"
-      COMMAND ${CMAKE_COMMAND} -E echo "*** Switched to Release mode. Now recompile with: ${_make_command}"
-      COMMAND ${CMAKE_COMMAND} -E echo "***"
-      COMMENT "Switching CMAKE_BUILD_TYPE to Release"
-      VERBATIM
-      )
-  endif()
-
   #
-  # Only mention release and debug targets if it is actually possible to
-  # switch between them:
-  #
-
-  if(${DEAL_II_BUILD_TYPE} MATCHES "DebugRelease")
-    set(_switch_targets
-"#      ${_make_command} debug          - to switch the build type to 'Debug'
-#      ${_make_command} release        - to switch the build type to 'Release'\n"
-      )
-  endif()
-
   # And another custom target to clean up all files generated by the program:
+  #
+
   if("${CLEAN_UP_FILES}" STREQUAL "")
     set(CLEAN_UP_FILES *.log *.gmv *.gnuplot *.gpl *.eps *.pov *.vtk *.ucd *.d2)
   endif()
@@ -205,28 +233,45 @@ macro(deal_ii_invoke_autopilot)
     COMMENT "runclean invoked"
     )
 
+  #
   # Define a distclean target to remove every generated file:
+  #
+
   add_custom_target(distclean
     COMMAND ${CMAKE_COMMAND} --build ${CMAKE_BINARY_DIR} --target clean
     COMMAND ${CMAKE_COMMAND} --build ${CMAKE_BINARY_DIR} --target runclean
     COMMAND ${CMAKE_COMMAND} -E remove_directory CMakeFiles
     COMMAND ${CMAKE_COMMAND} -E remove
-      CMakeCache.txt cmake_install.cmake Makefile
+      CMakeCache.txt cmake_install.cmake compile_commands.json Makefile
       build.ninja rules.ninja .ninja_deps .ninja_log
     COMMENT "distclean invoked"
     )
 
-  # Define a strip-comments target:
+  #
+  # Define a strip_comments target:
+  #
+
   find_package(Perl QUIET)
   if(PERL_FOUND)
     add_custom_target(strip_comments
-      COMMAND ${PERL_EXECUTABLE} -pi -e 's\#^[ \\t]*//.*\\n\#\#g;' ${TARGET_SRC}
+      COMMAND ${PERL_EXECUTABLE} -pi -e 's\#^[ \\t]*//.*\\n\#\#g;' ${CMAKE_SOURCE_DIR}/${TARGET_SRC}
       COMMENT "strip comments"
       )
   endif()
 
+  #
+  # Construct help message:
+  #
 
-  # Print out some usage information to file:
+  # Only mention release and debug targets if it is actually possible to
+  # switch between them:
+  if(NOT ${_generator_is_multi_config} AND ${DEAL_II_BUILD_TYPE} MATCHES "DebugRelease")
+    set(_switch_targets
+"#      ${_make_command} debug          - to switch the build type to 'Debug'
+#      ${_make_command} release        - to switch the build type to 'Release'\n"
+      )
+  endif()
+
   file(WRITE ${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/print_usage.cmake
 "message(
 \"###
@@ -281,4 +326,3 @@ ${_switch_targets}#
   endif()
 
 endmacro()
-

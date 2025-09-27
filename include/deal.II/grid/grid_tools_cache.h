@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2017 - 2022 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2017 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 #ifndef dealii_grid_grid_tools_cache_h
 #define dealii_grid_grid_tools_cache_h
@@ -19,9 +18,9 @@
 
 #include <deal.II/base/config.h>
 
+#include <deal.II/base/enable_observer_pointer.h>
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/point.h>
-#include <deal.II/base/subscriptor.h>
 
 #include <deal.II/fe/mapping.h>
 
@@ -34,7 +33,10 @@
 
 #include <boost/signals2.hpp>
 
+#include <atomic>
 #include <cmath>
+#include <set>
+
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -62,7 +64,7 @@ namespace GridTools
    * method mark_for_update() manually.
    */
   template <int dim, int spacedim = dim>
-  class Cache : public Subscriptor
+  class Cache : public EnableObserverPointer
   {
   public:
     /**
@@ -71,18 +73,19 @@ namespace GridTools
      * If you provide the optional `mapping` argument, then this is used
      * whenever a mapping is required.
      *
-     * @param tria The triangulation for which to store information
-     * @param mapping The mapping to use when computing cached objects
+     * @param tria The triangulation for which to store information.
+     * @param mapping The Mapping to use when computing cached objects.
      */
     Cache(const Triangulation<dim, spacedim> &tria,
-          const Mapping<dim, spacedim>       &mapping =
-            (ReferenceCells::get_hypercube<dim>()
-#ifndef _MSC_VER
-               .template get_default_linear_mapping<dim, spacedim>()
-#else
-               .ReferenceCell::get_default_linear_mapping<dim, spacedim>()
-#endif
-               ));
+          const Mapping<dim, spacedim>       &mapping);
+
+    /**
+     * Constructor. Uses the default linear or multilinear mapping for the
+     * underlying ReferenceCell of @p tria.
+     *
+     * @param tria The triangulation for which to store information.
+     */
+    Cache(const Triangulation<dim, spacedim> &tria);
 
     /**
      * Destructor.
@@ -205,7 +208,7 @@ namespace GridTools
      * Constructing or updating the rtree requires a call to
      * GridTools::build_global_description_tree(), which exchanges
      * bounding boxes between all processes using
-     * Utilities::MPI::all_gather(), a collective operation.
+     * Utilities::MPI::all_gather(), a @ref GlossCollectiveOperation "collective operation".
      * Therefore this function must be called by all processes
      * at the same time.
      *
@@ -221,19 +224,31 @@ namespace GridTools
 
   private:
     /**
-     * Keep track of what needs to be updated next.
+     * Keep track of what needs to be updated every time the triangulation
+     * is changed. Each of the get_*() functions above checks whether a
+     * data structure still needs to be updated before returning a reference
+     * to it; if it needs to be updated, it does so and resets the
+     * corresponding flag. The constructor as well as the signal slot
+     * that is called whenever the triangulation changes the re-sets this
+     * flag to `update_all` again.
+     *
+     * The various get_() member functions may be reading and updating this
+     * variable from different threads, but are only ever reading or writing
+     * individual bits. We can make that thread-safe by using std::atomic
+     * with the correct integer type for the `enum` type of `CacheUpdateFlags`.
      */
-    mutable CacheUpdateFlags update_flags;
+    mutable std::atomic<std::underlying_type_t<CacheUpdateFlags>> update_flags;
 
     /**
      * A pointer to the Triangulation.
      */
-    SmartPointer<const Triangulation<dim, spacedim>, Cache<dim, spacedim>> tria;
+    ObserverPointer<const Triangulation<dim, spacedim>, Cache<dim, spacedim>>
+      tria;
 
     /**
      * Mapping to use when computing on the Triangulation.
      */
-    SmartPointer<const Mapping<dim, spacedim>, Cache<dim, spacedim>> mapping;
+    ObserverPointer<const Mapping<dim, spacedim>, Cache<dim, spacedim>> mapping;
 
 
     /**
@@ -242,14 +257,16 @@ namespace GridTools
      */
     mutable std::vector<
       std::set<typename Triangulation<dim, spacedim>::active_cell_iterator>>
-      vertex_to_cells;
+                       vertex_to_cells;
+    mutable std::mutex vertex_to_cells_mutex;
 
     /**
      * Store vertex to cell center directions, as generated by
      * GridTools::vertex_to_cell_centers_directions().
      */
     mutable std::vector<std::vector<Tensor<1, spacedim>>>
-      vertex_to_cell_centers;
+                       vertex_to_cell_centers;
+    mutable std::mutex vertex_to_cell_centers_mutex;
 
     /**
      * A collection of rtree objects covering the whole mesh.
@@ -261,18 +278,21 @@ namespace GridTools
      */
     mutable std::map<unsigned int,
                      RTree<std::pair<BoundingBox<spacedim>, unsigned int>>>
-      covering_rtree;
+                       covering_rtree;
+    mutable std::mutex covering_rtree_mutex;
 
     /**
      * Store the used vertices of the Triangulation, as generated by
      * GridTools::extract_used_vertices().
      */
     mutable std::map<unsigned int, Point<spacedim>> used_vertices;
+    mutable std::mutex                              used_vertices_mutex;
 
     /**
      * Store an RTree object, containing the used vertices of the triangulation.
      */
     mutable RTree<std::pair<Point<spacedim>, unsigned int>> used_vertices_rtree;
+    mutable std::mutex used_vertices_rtree_mutex;
 
     /**
      * Store an RTree object, containing the bounding boxes of the cells of the
@@ -281,7 +301,8 @@ namespace GridTools
     mutable RTree<
       std::pair<BoundingBox<spacedim>,
                 typename Triangulation<dim, spacedim>::active_cell_iterator>>
-      cell_bounding_boxes_rtree;
+                       cell_bounding_boxes_rtree;
+    mutable std::mutex cell_bounding_boxes_rtree_mutex;
 
     /**
      * Store an RTree object, containing the bounding boxes of the locally owned
@@ -290,26 +311,33 @@ namespace GridTools
     mutable RTree<
       std::pair<BoundingBox<spacedim>,
                 typename Triangulation<dim, spacedim>::active_cell_iterator>>
-      locally_owned_cell_bounding_boxes_rtree;
-
+                       locally_owned_cell_bounding_boxes_rtree;
+    mutable std::mutex locally_owned_cell_bounding_boxes_rtree_mutex;
 
     /**
      * Store an std::vector of std::set of integer containing the id of all
      * subdomain to which a vertex is connected to.
      */
     mutable std::vector<std::set<unsigned int>> vertex_to_neighbor_subdomain;
+    mutable std::mutex vertex_to_neighbor_subdomain_mutex;
 
     /**
      * Store an std::map of unsigned integer containing
      * the set of subdomains connected to each vertex.
      */
     mutable std::map<unsigned int, std::set<dealii::types::subdomain_id>>
-      vertices_with_ghost_neighbors;
+                       vertices_with_ghost_neighbors;
+    mutable std::mutex vertices_with_ghost_neighbors_mutex;
 
     /**
-     * Storage for the status of the triangulation signal.
+     * Storage for the status of the triangulation change signal.
      */
-    boost::signals2::connection tria_signal;
+    boost::signals2::connection tria_change_signal;
+
+    /**
+     * Storage for the status of the triangulation creation signal.
+     */
+    boost::signals2::connection tria_create_signal;
   };
 
 
@@ -328,6 +356,7 @@ namespace GridTools
   inline const Mapping<dim, spacedim> &
   Cache<dim, spacedim>::get_mapping() const
   {
+    Assert(mapping, ExcNotInitialized());
     return *mapping;
   }
 } // namespace GridTools

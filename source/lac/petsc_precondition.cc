@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2004 - 2023 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2004 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 #include <deal.II/lac/petsc_precondition.h>
 
@@ -83,12 +82,7 @@ namespace PETScWrappers
 
   void
   PreconditionBase::setup()
-  {
-    AssertThrow(pc != nullptr, StandardExceptions::ExcInvalidState());
-
-    PetscErrorCode ierr = PCSetUp(pc);
-    AssertThrow(ierr == 0, ExcPETScError(ierr));
-  }
+  {}
 
   MPI_Comm
   PreconditionBase::get_mpi_communicator() const
@@ -184,6 +178,9 @@ namespace PETScWrappers
 
     create_pc_with_mat(matrix_);
     initialize();
+
+    PetscErrorCode ierr = PCSetUp(pc);
+    AssertThrow(ierr == 0, ExcPETScError(ierr));
   }
 
 
@@ -240,6 +237,9 @@ namespace PETScWrappers
 
     create_pc_with_mat(matrix_);
     initialize();
+
+    PetscErrorCode ierr = PCSetUp(pc);
+    AssertThrow(ierr == 0, ExcPETScError(ierr));
   }
 
 
@@ -283,6 +283,9 @@ namespace PETScWrappers
     AssertThrow(ierr == 0, ExcPETScError(ierr));
 
     ierr = PCSetFromOptions(pc);
+    AssertThrow(ierr == 0, ExcPETScError(ierr));
+
+    ierr = PCSetUp(pc);
     AssertThrow(ierr == 0, ExcPETScError(ierr));
   }
 
@@ -332,6 +335,9 @@ namespace PETScWrappers
 
     ierr = PCSetFromOptions(pc);
     AssertThrow(ierr == 0, ExcPETScError(ierr));
+
+    ierr = PCSetUp(pc);
+    AssertThrow(ierr == 0, ExcPETScError(ierr));
   }
 
 
@@ -376,6 +382,9 @@ namespace PETScWrappers
 
     ierr = PCSetFromOptions(pc);
     AssertThrow(ierr == 0, ExcPETScError(ierr));
+
+    ierr = PCSetUp(pc);
+    AssertThrow(ierr == 0, ExcPETScError(ierr));
   }
 
 
@@ -419,6 +428,9 @@ namespace PETScWrappers
     AssertThrow(ierr == 0, ExcPETScError(ierr));
 
     ierr = PCSetFromOptions(pc);
+    AssertThrow(ierr == 0, ExcPETScError(ierr));
+
+    ierr = PCSetUp(pc);
     AssertThrow(ierr == 0, ExcPETScError(ierr));
   }
 
@@ -524,7 +536,7 @@ namespace PETScWrappers
             string_type = "None";
             break;
           default:
-            Assert(false, ExcNotImplemented());
+            DEAL_II_NOT_IMPLEMENTED();
         }
       return string_type;
     }
@@ -552,7 +564,6 @@ namespace PETScWrappers
 #  ifdef DEAL_II_PETSC_WITH_HYPRE
     initialize();
 #  else // DEAL_II_PETSC_WITH_HYPRE
-    (void)pc;
     Assert(false,
            ExcMessage("Your PETSc installation does not include a copy of "
                       "the hypre package necessary for this preconditioner."));
@@ -672,6 +683,7 @@ namespace PETScWrappers
 
     ierr = PCSetFromOptions(pc);
     AssertThrow(ierr == 0, ExcPETScError(ierr));
+
 #  else
     Assert(false,
            ExcMessage("Your PETSc installation does not include a copy of "
@@ -692,6 +704,9 @@ namespace PETScWrappers
 
     create_pc_with_mat(matrix_);
     initialize();
+
+    PetscErrorCode ierr = PCSetUp(pc);
+    AssertThrow(ierr == 0, ExcPETScError(ierr));
 
 #  else // DEAL_II_PETSC_WITH_HYPRE
     (void)matrix_;
@@ -807,6 +822,9 @@ namespace PETScWrappers
     ierr = PCSetFromOptions(pc);
     AssertThrow(ierr == 0, ExcPETScError(ierr));
 
+    ierr = PCSetUp(pc);
+    AssertThrow(ierr == 0, ExcPETScError(ierr));
+
 #  else // DEAL_II_PETSC_WITH_HYPRE
     (void)matrix_;
     Assert(false,
@@ -846,6 +864,9 @@ namespace PETScWrappers
     AssertThrow(ierr == 0, ExcPETScError(ierr));
 
     ierr = PCSetFromOptions(pc);
+    AssertThrow(ierr == 0, ExcPETScError(ierr));
+
+    ierr = PCSetUp(pc);
     AssertThrow(ierr == 0, ExcPETScError(ierr));
   }
 
@@ -900,6 +921,9 @@ namespace PETScWrappers
     AssertThrow(ierr == 0, ExcPETScError(ierr));
 
     ierr = PCSetFromOptions(pc);
+    AssertThrow(ierr == 0, ExcPETScError(ierr));
+
+    ierr = PCSetUp(pc);
     AssertThrow(ierr == 0, ExcPETScError(ierr));
   }
 
@@ -1048,6 +1072,9 @@ namespace PETScWrappers
 
     create_pc_with_mat(matrix_);
     initialize();
+
+    PetscErrorCode ierr = PCSetUp(pc);
+    AssertThrow(ierr == 0, ExcPETScError(ierr));
   }
 
   /* ----------------- PreconditionShell -------------------- */
@@ -1094,6 +1121,9 @@ namespace PETScWrappers
     PetscErrorCode ierr;
     ierr = PCSetOperators(pc, matrix, matrix);
     AssertThrow(ierr == 0, ExcPETScError(ierr));
+
+    ierr = PCSetUp(pc);
+    AssertThrow(ierr == 0, ExcPETScError(ierr));
   }
 
 #  ifndef PetscCall
@@ -1103,7 +1133,7 @@ namespace PETScWrappers
           PetscErrorCode ierr = (code); \
           CHKERRQ(ierr);                \
         }                               \
-      while (0)
+      while (false)
 #  endif
 
   PetscErrorCode

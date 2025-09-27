@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2000 - 2023 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2013 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 #ifndef dealii_fe_tools_interpolate_templates_H
 #define dealii_fe_tools_interpolate_templates_H
@@ -43,6 +42,7 @@
 #include <deal.II/lac/petsc_vector.h>
 #include <deal.II/lac/trilinos_epetra_vector.h>
 #include <deal.II/lac/trilinos_parallel_block_vector.h>
+#include <deal.II/lac/trilinos_tpetra_block_vector.h>
 #include <deal.II/lac/trilinos_tpetra_vector.h>
 #include <deal.II/lac/trilinos_vector.h>
 #include <deal.II/lac/vector.h>
@@ -88,17 +88,20 @@ namespace FETools
 
 
     const IndexSet u2_elements = u2.locally_owned_elements();
-#ifdef DEBUG
-    const IndexSet &dof1_local_dofs = dof1.locally_owned_dofs();
-    const IndexSet &dof2_local_dofs = dof2.locally_owned_dofs();
-    const IndexSet  u1_elements     = u1.locally_owned_elements();
-    Assert(u1_elements == dof1_local_dofs,
-           ExcMessage("The provided vector and DoF handler should have the same"
-                      " index sets."));
-    Assert(u2_elements == dof2_local_dofs,
-           ExcMessage("The provided vector and DoF handler should have the same"
-                      " index sets."));
-#endif
+    if constexpr (running_in_debug_mode())
+      {
+        const IndexSet &dof1_local_dofs = dof1.locally_owned_dofs();
+        const IndexSet &dof2_local_dofs = dof2.locally_owned_dofs();
+        const IndexSet  u1_elements     = u1.locally_owned_elements();
+        Assert(u1_elements == dof1_local_dofs,
+               ExcMessage(
+                 "The provided vector and DoF handler should have the same"
+                 " index sets."));
+        Assert(u2_elements == dof2_local_dofs,
+               ExcMessage(
+                 "The provided vector and DoF handler should have the same"
+                 " index sets."));
+      }
 
     // allocate vectors at maximal
     // size. will be reinited in inner
@@ -149,20 +152,21 @@ namespace FETools
                  ExcDimensionMismatch(cell1->get_fe().n_components(),
                                       cell2->get_fe().n_components()));
 
-#ifdef DEBUG
-          // For continuous elements on grids with hanging nodes we need
-          // hanging node constraints. Consequently, when the elements are
-          // continuous no hanging node constraints are allowed.
-          const bool hanging_nodes_not_allowed =
-            ((cell2->get_fe().n_dofs_per_vertex() != 0) &&
-             (constraints.n_constraints() == 0));
+          if constexpr (running_in_debug_mode())
+            {
+              // For continuous elements on grids with hanging nodes we need
+              // hanging node constraints. Consequently, when the elements are
+              // continuous no hanging node constraints are allowed.
+              const bool hanging_nodes_not_allowed =
+                ((cell2->get_fe().n_dofs_per_vertex() != 0) &&
+                 (constraints.n_constraints() == 0));
 
-          if (hanging_nodes_not_allowed)
-            for (const unsigned int face : cell1->face_indices())
-              Assert(cell1->at_boundary(face) ||
-                       cell1->neighbor(face)->level() == cell1->level(),
-                     ExcHangingNodesNotAllowed());
-#endif
+              if (hanging_nodes_not_allowed)
+                for (const unsigned int face : cell1->face_indices())
+                  Assert(cell1->at_boundary(face) ||
+                           cell1->neighbor(face)->level() == cell1->level(),
+                         ExcHangingNodesNotAllowed());
+            }
 
           const unsigned int dofs_per_cell1 = cell1->get_fe().n_dofs_per_cell();
           const unsigned int dofs_per_cell2 = cell2->get_fe().n_dofs_per_cell();
@@ -268,18 +272,21 @@ namespace FETools
     Assert(u1_interpolated.size() == dof1.n_dofs(),
            ExcDimensionMismatch(u1_interpolated.size(), dof1.n_dofs()));
 
-#ifdef DEBUG
-    const IndexSet &dof1_local_dofs = dof1.locally_owned_dofs();
-    const IndexSet  u1_elements     = u1.locally_owned_elements();
-    const IndexSet  u1_interpolated_elements =
-      u1_interpolated.locally_owned_elements();
-    Assert(u1_elements == dof1_local_dofs,
-           ExcMessage("The provided vector and DoF handler should have the same"
-                      " index sets."));
-    Assert(u1_interpolated_elements == dof1_local_dofs,
-           ExcMessage("The provided vector and DoF handler should have the same"
-                      " index sets."));
-#endif
+    if constexpr (running_in_debug_mode())
+      {
+        const IndexSet &dof1_local_dofs = dof1.locally_owned_dofs();
+        const IndexSet  u1_elements     = u1.locally_owned_elements();
+        const IndexSet  u1_interpolated_elements =
+          u1_interpolated.locally_owned_elements();
+        Assert(u1_elements == dof1_local_dofs,
+               ExcMessage(
+                 "The provided vector and DoF handler should have the same"
+                 " index sets."));
+        Assert(u1_interpolated_elements == dof1_local_dofs,
+               ExcMessage(
+                 "The provided vector and DoF handler should have the same"
+                 " index sets."));
+      }
 
     Vector<typename OutVector::value_type> u1_local(
       dof1.get_fe_collection().max_dofs_per_cell());
@@ -303,20 +310,21 @@ namespace FETools
       if ((cell->subdomain_id() == subdomain_id) ||
           (subdomain_id == numbers::invalid_subdomain_id))
         {
-#ifdef DEBUG
-          // For continuous elements on grids with hanging nodes we need
-          // hanging node constraints. Consequently, when the elements are
-          // continuous no hanging node constraints are allowed.
-          const bool hanging_nodes_not_allowed =
-            (cell->get_fe().n_dofs_per_vertex() != 0) ||
-            (fe2.n_dofs_per_vertex() != 0);
+          if constexpr (running_in_debug_mode())
+            {
+              // For continuous elements on grids with hanging nodes we need
+              // hanging node constraints. Consequently, when the elements are
+              // continuous no hanging node constraints are allowed.
+              const bool hanging_nodes_not_allowed =
+                (cell->get_fe().n_dofs_per_vertex() != 0) ||
+                (fe2.n_dofs_per_vertex() != 0);
 
-          if (hanging_nodes_not_allowed)
-            for (const unsigned int face : cell->face_indices())
-              Assert(cell->at_boundary(face) ||
-                       cell->neighbor(face)->level() == cell->level(),
-                     ExcHangingNodesNotAllowed());
-#endif
+              if (hanging_nodes_not_allowed)
+                for (const unsigned int face : cell->face_indices())
+                  Assert(cell->at_boundary(face) ||
+                           cell->neighbor(face)->level() == cell->level(),
+                         ExcHangingNodesNotAllowed());
+            }
 
           const unsigned int dofs_per_cell1 = cell->get_fe().n_dofs_per_cell();
 
@@ -407,7 +415,7 @@ namespace FETools
       const AffineConstraints<PETScWrappers::MPI::BlockVector::value_type> &,
       PETScWrappers::MPI::BlockVector &)
     {
-      Assert(false, ExcNotImplemented());
+      DEAL_II_NOT_IMPLEMENTED();
     }
 #endif
 
@@ -493,17 +501,51 @@ namespace FETools
     }
 
 #  ifdef DEAL_II_TRILINOS_WITH_TPETRA
-    template <int dim, int spacedim, typename Number>
+    template <int dim, int spacedim, typename Number, typename MemorySpace>
+    void
+    back_interpolate(
+      const DoFHandler<dim, spacedim> &dof1,
+      const AffineConstraints<typename LinearAlgebra::TpetraWrappers::
+                                Vector<Number, MemorySpace>::value_type>
+        &constraints1,
+      const LinearAlgebra::TpetraWrappers::Vector<Number, MemorySpace> &u1,
+      const DoFHandler<dim, spacedim>                                  &dof2,
+      const AffineConstraints<typename LinearAlgebra::TpetraWrappers::
+                                Vector<Number, MemorySpace>::value_type>
+        &constraints2,
+      LinearAlgebra::TpetraWrappers::Vector<Number, MemorySpace>
+        &u1_interpolated)
+    {
+      // if u1 is a parallel distributed Trilinos vector, we create a
+      // vector u2 with based on the sets of locally owned and relevant
+      // dofs of dof2
+      const IndexSet &dof2_locally_owned_dofs = dof2.locally_owned_dofs();
+      const IndexSet  dof2_locally_relevant_dofs =
+        DoFTools::extract_locally_relevant_dofs(dof2);
+
+      LinearAlgebra::TpetraWrappers::Vector<Number, MemorySpace> u2_out(
+        dof2_locally_owned_dofs, u1.get_mpi_communicator());
+      interpolate(dof1, u1, dof2, constraints2, u2_out);
+
+      LinearAlgebra::TpetraWrappers::Vector<Number, MemorySpace> u2(
+        dof2_locally_owned_dofs,
+        dof2_locally_relevant_dofs,
+        u1.get_mpi_communicator());
+      u2 = u2_out;
+      interpolate(dof2, u2, dof1, constraints1, u1_interpolated);
+    }
+
+    template <int dim, int spacedim, typename Number, typename MemorySpace>
     void
     back_interpolate(
       const DoFHandler<dim, spacedim> &,
-      const AffineConstraints<
-        typename LinearAlgebra::TpetraWrappers::Vector<Number>::value_type> &,
-      const LinearAlgebra::TpetraWrappers::Vector<Number> &,
+      const AffineConstraints<typename LinearAlgebra::TpetraWrappers::
+                                BlockVector<Number, MemorySpace>::value_type> &,
+      const LinearAlgebra::TpetraWrappers::BlockVector<Number, MemorySpace> &,
       const DoFHandler<dim, spacedim> &,
-      const AffineConstraints<
-        typename LinearAlgebra::TpetraWrappers::Vector<Number>::value_type> &,
-      LinearAlgebra::TpetraWrappers::Vector<Number> &)
+      const AffineConstraints<typename LinearAlgebra::TpetraWrappers::
+                                BlockVector<Number, MemorySpace>::value_type> &,
+      LinearAlgebra::TpetraWrappers::BlockVector<Number, MemorySpace> &)
     {
       AssertThrow(false, ExcNotImplemented());
     }
@@ -605,18 +647,21 @@ namespace FETools
     Assert(u1_difference.size() == dof1.n_dofs(),
            ExcDimensionMismatch(u1_difference.size(), dof1.n_dofs()));
 
-#ifdef DEBUG
-    const IndexSet &dof1_local_dofs = dof1.locally_owned_dofs();
-    const IndexSet  u1_elements     = u1.locally_owned_elements();
-    const IndexSet  u1_difference_elements =
-      u1_difference.locally_owned_elements();
-    Assert(u1_elements == dof1_local_dofs,
-           ExcMessage("The provided vector and DoF handler should have the same"
-                      " index sets."));
-    Assert(u1_difference_elements == dof1_local_dofs,
-           ExcMessage("The provided vector and DoF handler should have the same"
-                      " index sets."));
-#endif
+    if constexpr (running_in_debug_mode())
+      {
+        const IndexSet &dof1_local_dofs = dof1.locally_owned_dofs();
+        const IndexSet  u1_elements     = u1.locally_owned_elements();
+        const IndexSet  u1_difference_elements =
+          u1_difference.locally_owned_elements();
+        Assert(u1_elements == dof1_local_dofs,
+               ExcMessage(
+                 "The provided vector and DoF handler should have the same"
+                 " index sets."));
+        Assert(u1_difference_elements == dof1_local_dofs,
+               ExcMessage(
+                 "The provided vector and DoF handler should have the same"
+                 " index sets."));
+      }
 
     const unsigned int dofs_per_cell = dof1.get_fe().n_dofs_per_cell();
 
@@ -637,20 +682,21 @@ namespace FETools
       if ((cell->subdomain_id() == subdomain_id) ||
           (subdomain_id == numbers::invalid_subdomain_id))
         {
-#ifdef DEBUG
-          // For continuous elements on grids with hanging nodes we need
-          // hanging node constraints. Consequently, when the elements are
-          // continuous no hanging node constraints are allowed.
-          const bool hanging_nodes_not_allowed =
-            (dof1.get_fe().n_dofs_per_vertex() != 0) ||
-            (fe2.n_dofs_per_vertex() != 0);
+          if constexpr (running_in_debug_mode())
+            {
+              // For continuous elements on grids with hanging nodes we need
+              // hanging node constraints. Consequently, when the elements are
+              // continuous no hanging node constraints are allowed.
+              const bool hanging_nodes_not_allowed =
+                (dof1.get_fe().n_dofs_per_vertex() != 0) ||
+                (fe2.n_dofs_per_vertex() != 0);
 
-          if (hanging_nodes_not_allowed)
-            for (const unsigned int face : cell->face_indices())
-              Assert(cell->at_boundary(face) ||
-                       cell->neighbor(face)->level() == cell->level(),
-                     ExcHangingNodesNotAllowed());
-#endif
+              if (hanging_nodes_not_allowed)
+                for (const unsigned int face : cell->face_indices())
+                  Assert(cell->at_boundary(face) ||
+                           cell->neighbor(face)->level() == cell->level(),
+                         ExcHangingNodesNotAllowed());
+            }
 
           cell->get_dof_values(u1, u1_local);
           difference_matrix.vmult(u1_diff_local, u1_local);

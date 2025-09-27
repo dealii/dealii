@@ -1,15 +1,14 @@
 //------------------  matrix_vector_faces_common.h  ------------------------
 //
-// Copyright (C) 2018 - 2023 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2018 - 2024 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
 //------------------  matrix_vector_faces_common.h  ------------------------
 
@@ -86,6 +85,32 @@ public:
               this,
               dst,
               src);
+  }
+
+  void
+  manual_loop_vmult(VectorType &dst, const VectorType &src) const
+  {
+    src.update_ghost_values();
+    dst = 0;
+    local_apply(data, dst, src, std::make_pair(0, data.n_cell_batches()));
+    local_apply_face(data,
+                     dst,
+                     src,
+                     std::make_pair(0, data.n_inner_face_batches()));
+    local_apply_boundary_face(data,
+                              dst,
+                              src,
+                              std::make_pair(data.n_inner_face_batches(),
+                                             data.n_inner_face_batches() +
+                                               data.n_boundary_face_batches()));
+    local_apply_face(data,
+                     dst,
+                     src,
+                     std::make_pair(data.n_inner_face_batches() +
+                                      data.n_boundary_face_batches(),
+                                    data.n_inner_face_batches() +
+                                      data.n_boundary_face_batches() +
+                                      data.n_ghost_inner_face_batches()));
   }
 
 private:

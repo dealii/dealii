@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2000 - 2022 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2000 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 #ifndef dealii_memory_consumption_h
 #define dealii_memory_consumption_h
@@ -19,11 +18,14 @@
 
 #include <deal.II/base/config.h>
 
+#include <deal.II/base/vectorization.h>
+
 #include <array>
 #include <complex>
 #include <cstddef>
 #include <cstring>
 #include <memory>
+#include <optional>
 #include <string>
 #include <type_traits>
 #include <vector>
@@ -221,6 +223,14 @@ namespace MemoryConsumption
   memory_consumption(const std::pair<A, B> &p);
 
   /**
+   * Determine an estimate of the amount of memory in bytes consumed by a
+   * value wrapped in a std::optional.
+   */
+  template <typename A>
+  inline std::size_t
+  memory_consumption(const std::optional<A> &o);
+
+  /**
    * Calculate the memory consumption of a pointer.
    *
    * @note This function is overloaded for C-style strings; see the
@@ -276,7 +286,7 @@ namespace MemoryConsumption
       }
     else
       {
-        return sizeof(char) * (strlen(string) /*Remember the NUL*/ + 1);
+        return sizeof(char) * (std::strlen(string) /*Remember the NUL*/ + 1);
       }
   }
 
@@ -376,6 +386,31 @@ namespace MemoryConsumption
   memory_consumption(const std::pair<A, B> &p)
   {
     return (memory_consumption(p.first) + memory_consumption(p.second));
+  }
+
+
+
+  template <typename A>
+  inline std::size_t
+  memory_consumption(const std::optional<A> &o)
+  {
+    if (o.has_value())
+      {
+        //
+        // If the optional carries a value then we query the contained
+        // value for memory consumption and estimate the size of the
+        // control overhead.
+        //
+        return memory_consumption(o.value()) + sizeof(o) - sizeof(A);
+      }
+    else
+      {
+        //
+        // The optional contains no value, so simply return its plain size
+        // (consisting of space for the value and control overhead):
+        //
+        return sizeof(o);
+      }
   }
 
 

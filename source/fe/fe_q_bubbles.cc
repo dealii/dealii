@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2012 - 2023 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2015 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 
 #include <deal.II/base/quadrature.h>
@@ -85,21 +84,22 @@ namespace internal
               q_fine = std::make_unique<QGauss<dim>>(degree + 1);
               break;
             default:
-              Assert(false, ExcInternalError());
+              DEAL_II_ASSERT_UNREACHABLE();
           }
 
         Assert(q_fine.get() != nullptr, ExcInternalError());
         const unsigned int nq = q_fine->size();
 
         // loop over all possible refinement cases
-        unsigned int ref_case = (isotropic_only) ?
-                                  RefinementCase<dim>::isotropic_refinement :
-                                  RefinementCase<dim>::cut_x;
-        for (; ref_case <= RefinementCase<dim>::isotropic_refinement;
+        for (unsigned int ref_case =
+               (isotropic_only ? RefinementCase<dim>::isotropic_refinement :
+                                 RefinementCase<dim>::cut_x);
+             ref_case <= RefinementCase<dim>::isotropic_refinement;
              ++ref_case)
           {
             const unsigned int nc =
-              GeometryInfo<dim>::n_children(RefinementCase<dim>(ref_case));
+              fe.reference_cell().template n_children<dim>(
+                RefinementCase<dim>(ref_case));
 
             for (unsigned int i = 0; i < nc; ++i)
               {
@@ -155,7 +155,7 @@ namespace internal
                                                fine.JxW(q);
                         Point<dim> quad_tmp;
                         for (unsigned int k = 0; k < dim; ++k)
-                          quad_tmp(k) = fine.quadrature_point(q)(k);
+                          quad_tmp[k] = fine.quadrature_point(q)[k];
                         coarse_rhs_matrix(gdi, j) +=
                           fine.shape_value(i, q) * fe.shape_value(j, quad_tmp) *
                           fine.JxW(q);
@@ -282,18 +282,18 @@ FE_Q_Bubbles<dim, spacedim>::get_name() const
   // Decode the support points in one coordinate direction.
   for (unsigned int j = 0; j < dofs_per_cell; ++j)
     {
-      if ((dim > 1) ? (unit_support_points[j](1) == 0 &&
-                       ((dim > 2) ? unit_support_points[j](2) == 0 : true)) :
+      if ((dim > 1) ? (unit_support_points[j][1] == 0 &&
+                       ((dim > 2) ? unit_support_points[j][2] == 0 : true)) :
                       true)
         {
           if (index == 0)
-            points[index] = unit_support_points[j](0);
+            points[index] = unit_support_points[j][0];
           else if (index == 1)
-            points[n_points - 1] = unit_support_points[j](0);
+            points[n_points - 1] = unit_support_points[j][0];
           else
-            points[index - 1] = unit_support_points[j](0);
+            points[index - 1] = unit_support_points[j][0];
 
-          index++;
+          ++index;
         }
     }
   // Do not consider the discontinuous node for dimension 1
@@ -325,16 +325,17 @@ FE_Q_Bubbles<dim, spacedim>::get_name() const
       const QGaussLobatto<1> points_gl(n_points);
       type = true;
       for (unsigned int j = 0; j < n_points; ++j)
-        if (points[j] != points_gl.point(j)(0))
+        if (points[j] != points_gl.point(j)[0])
           {
             type = false;
             break;
           }
       if (type == true)
-        namebuf << "FE_Q_Bubbles<" << dim << ">(" << this->degree - 1 << ")";
+        namebuf << "FE_Q_Bubbles<" << Utilities::dim_string(dim, spacedim)
+                << ">(" << this->degree - 1 << ")";
       else
-        namebuf << "FE_Q_Bubbles<" << dim << ">(QUnknownNodes(" << this->degree
-                << "))";
+        namebuf << "FE_Q_Bubbles<" << Utilities::dim_string(dim, spacedim)
+                << ">(QUnknownNodes(" << this->degree << "))";
     }
   return namebuf.str();
 }
@@ -471,7 +472,8 @@ FE_Q_Bubbles<dim, spacedim>::get_prolongation_matrix(
   Assert(refinement_case != RefinementCase<dim>::no_refinement,
          ExcMessage(
            "Prolongation matrices are only available for refined cells!"));
-  AssertIndexRange(child, GeometryInfo<dim>::n_children(refinement_case));
+  AssertIndexRange(
+    child, this->reference_cell().template n_children<dim>(refinement_case));
 
   Assert(this->prolongation[refinement_case - 1][child].n() != 0,
          ExcMessage("This prolongation matrix has not been computed yet!"));
@@ -492,7 +494,8 @@ FE_Q_Bubbles<dim, spacedim>::get_restriction_matrix(
   Assert(refinement_case != RefinementCase<dim>::no_refinement,
          ExcMessage(
            "Restriction matrices are only available for refined cells!"));
-  AssertIndexRange(child, GeometryInfo<dim>::n_children(refinement_case));
+  AssertIndexRange(
+    child, this->reference_cell().template n_children<dim>(refinement_case));
 
   Assert(this->restriction[refinement_case - 1][child].n() != 0,
          ExcMessage("This restriction matrix has not been computed yet!"));
@@ -545,12 +548,12 @@ FE_Q_Bubbles<dim, spacedim>::compare_for_domination(
         return FiniteElementDomination::no_requirements;
     }
 
-  Assert(false, ExcNotImplemented());
+  DEAL_II_NOT_IMPLEMENTED();
   return FiniteElementDomination::neither_element_dominates;
 }
 
 
 // explicit instantiations
-#include "fe_q_bubbles.inst"
+#include "fe/fe_q_bubbles.inst"
 
 DEAL_II_NAMESPACE_CLOSE

@@ -1,0 +1,34 @@
+23a24
+> #include <deal.II/base/multithread_info.h>
+25c26
+< 
+---
+> #include "../example_test.h"
+268c269
+<     triangulation.refine_global(9 - 2 * dim);
+---
+>     triangulation.refine_global(2);
+436c437,441
+<     solver.solve(system_matrix, solution, system_rhs, preconditioner);
+---
+>     //solver.solve(system_matrix, solution, system_rhs, preconditioner);
+>     check_solver_within_range(std::cout,
+>                               solver.solve(system_matrix, solution, system_rhs, preconditioner),
+>                               solver_control.last_step(),
+>                               137, 228);
+439,440c444,445
+<     std::cout << "   Number of solver iterations:  "
+<               << solver_control.last_step() << std::endl;
+---
+> //    std::cout << "   Number of solver iterations:  "
+> //              << solver_control.last_step() << std::endl;
+619d623
+<       timer.print_summary();
+644,645d647
+<       std::cout << "   Memory consumption cache:     "
+<                 << 1e-6 * mapping.memory_consumption() << " MB" << std::endl;
+651,652d652
+< 
+<       timer.print_summary();
+660a661
+>   dealii::MultithreadInfo::set_thread_limit(2);

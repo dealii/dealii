@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2020 - 2023 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2022 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 #include <deal.II/base/quadrature_lib.h>
 
@@ -75,19 +74,18 @@ namespace dealii
 
         };
 
-    const internal::MatrixFreeFunctions::ShapeInfo<VectorizedArrayType>
-      *shape_info_base;
+    const internal::MatrixFreeFunctions::ShapeInfo<Number> *shape_info_base;
 
     void
     reinit(unsigned int cell_batch_index,
-           const internal::MatrixFreeFunctions::ShapeInfo<VectorizedArrayType>
-             *shape_info = nullptr);
+           const internal::MatrixFreeFunctions::ShapeInfo<Number> *shape_info =
+             nullptr);
 
     void
     reinit(unsigned int cell_batch_index,
            unsigned int face_number,
-           const internal::MatrixFreeFunctions::ShapeInfo<VectorizedArrayType>
-             *shape_info = nullptr);
+           const internal::MatrixFreeFunctions::ShapeInfo<Number> *shape_info =
+             nullptr);
   };
 
   template <int dim,
@@ -104,8 +102,7 @@ namespace dealii
                     Number,
                     VectorizedArrayType>::
     reinit(const unsigned int cell_batch_index,
-           const internal::MatrixFreeFunctions::ShapeInfo<VectorizedArrayType>
-             *shape_info)
+           const internal::MatrixFreeFunctions::ShapeInfo<Number> *shape_info)
   {
     Assert(this->mapped_geometry == nullptr,
            ExcMessage(
@@ -140,13 +137,14 @@ namespace dealii
     else
       this->data = this->shape_info_base;
 
-#ifdef DEBUG
-    this->is_reinitialized           = true;
-    this->dof_values_initialized     = false;
-    this->values_quad_initialized    = false;
-    this->gradients_quad_initialized = false;
-    this->hessians_quad_initialized  = false;
-#endif
+    if constexpr (running_in_debug_mode())
+      {
+        this->is_reinitialized           = true;
+        this->dof_values_initialized     = false;
+        this->values_quad_initialized    = false;
+        this->gradients_quad_initialized = false;
+        this->hessians_quad_initialized  = false;
+      }
   }
 
   template <int dim,
@@ -164,8 +162,7 @@ namespace dealii
                     VectorizedArrayType>::
     reinit(const unsigned int cell_batch_index,
            const unsigned int face_number,
-           const internal::MatrixFreeFunctions::ShapeInfo<VectorizedArrayType>
-             *shape_info)
+           const internal::MatrixFreeFunctions::ShapeInfo<Number> *shape_info)
   {
     Assert(
       this->quad_no <
@@ -245,13 +242,14 @@ namespace dealii
     else
       this->data = this->shape_info_base;
 
-#ifdef DEBUG
-    this->is_reinitialized           = true;
-    this->dof_values_initialized     = false;
-    this->values_quad_initialized    = false;
-    this->gradients_quad_initialized = false;
-    this->hessians_quad_initialized  = false;
-#endif
+    if constexpr (running_in_debug_mode())
+      {
+        this->is_reinitialized           = true;
+        this->dof_values_initialized     = false;
+        this->values_quad_initialized    = false;
+        this->gradients_quad_initialized = false;
+        this->hessians_quad_initialized  = false;
+      }
   }
 } // namespace dealii
 
@@ -270,7 +268,6 @@ shift_1d_quadrature(const Quadrature<1> &quadrature_1D, const Number shift)
   return {points_shift, weights};
 }
 
-using namespace dealii;
 
 template <int dim,
           int fe_degree,
@@ -346,8 +343,7 @@ test(const dealii::FE_Poly<dim> &fe)
 
   matrix_free.initialize_dof_vector(dst);
 
-  std::array<internal::MatrixFreeFunctions::ShapeInfo<VectorizedArrayType>,
-             2 * dim>
+  std::array<internal::MatrixFreeFunctions::ShapeInfo<Number>, 2 * dim>
     shape_info_shift;
 
   const QGauss<1> quadrature_1D(n_points);
@@ -357,11 +353,11 @@ test(const dealii::FE_Poly<dim> &fe)
   const Quadrature<1> quadrature_1D_shift_plus =
     shift_1d_quadrature(quadrature_1D, +1.);
 
-  dealii::internal::MatrixFreeFunctions::ShapeInfo<VectorizedArrayType>
-    shape_info_base(quadrature_1D, fe);
-  dealii::internal::MatrixFreeFunctions::ShapeInfo<VectorizedArrayType>
+  dealii::internal::MatrixFreeFunctions::ShapeInfo<Number> shape_info_base(
+    quadrature_1D, fe);
+  dealii::internal::MatrixFreeFunctions::ShapeInfo<Number>
     shape_info_shift_plus(quadrature_1D_shift_plus, fe);
-  dealii::internal::MatrixFreeFunctions::ShapeInfo<VectorizedArrayType>
+  dealii::internal::MatrixFreeFunctions::ShapeInfo<Number>
     shape_info_shift_minus(quadrature_1D_shift_minus, fe);
 
   for (unsigned int f = 0; f < 2 * dim; ++f)

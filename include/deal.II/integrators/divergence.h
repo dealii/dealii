@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2010 - 2020 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2010 - 2024 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 #ifndef dealii_integrators_divergence_h
 #define dealii_integrators_divergence_h
@@ -50,7 +49,7 @@ namespace LocalIntegrators
      * <b>H</b><sup>div</sup>. The test functions may be discontinuous.
      */
     template <int dim>
-    void
+    DEAL_II_DEPRECATED void
     cell_matrix(FullMatrix<double>      &M,
                 const FEValuesBase<dim> &fe,
                 const FEValuesBase<dim> &fetest,
@@ -89,7 +88,7 @@ namespace LocalIntegrators
      * with respect to the test functions.
      */
     template <int dim, typename number>
-    void
+    DEAL_II_DEPRECATED void
     cell_residual(Vector<number>                                     &result,
                   const FEValuesBase<dim>                            &fetest,
                   const ArrayView<const std::vector<Tensor<1, dim>>> &input,
@@ -122,7 +121,7 @@ namespace LocalIntegrators
      * this function with respect to the test functions.
      */
     template <int dim, typename number>
-    void
+    DEAL_II_DEPRECATED void
     cell_residual(Vector<number>                             &result,
                   const FEValuesBase<dim>                    &fetest,
                   const ArrayView<const std::vector<double>> &input,
@@ -153,7 +152,7 @@ namespace LocalIntegrators
      * <i>H</i><sup>1</sup>. The test functions can be discontinuous.
      */
     template <int dim>
-    void
+    DEAL_II_DEPRECATED void
     gradient_matrix(FullMatrix<double>      &M,
                     const FEValuesBase<dim> &fe,
                     const FEValuesBase<dim> &fetest,
@@ -193,7 +192,7 @@ namespace LocalIntegrators
      * function with respect to the test functions.
      */
     template <int dim, typename number>
-    void
+    DEAL_II_DEPRECATED void
     gradient_residual(Vector<number>                    &result,
                       const FEValuesBase<dim>           &fetest,
                       const std::vector<Tensor<1, dim>> &input,
@@ -226,7 +225,7 @@ namespace LocalIntegrators
      * of this function with respect to the test functions.
      */
     template <int dim, typename number>
-    void
+    DEAL_II_DEPRECATED void
     gradient_residual(Vector<number>            &result,
                       const FEValuesBase<dim>   &fetest,
                       const std::vector<double> &input,
@@ -255,7 +254,7 @@ namespace LocalIntegrators
      * @f[ \int_F (\mathbf u\cdot \mathbf n) v \,ds @f]
      */
     template <int dim>
-    void
+    DEAL_II_DEPRECATED void
     u_dot_n_matrix(FullMatrix<double>      &M,
                    const FEValuesBase<dim> &fe,
                    const FEValuesBase<dim> &fetest,
@@ -288,7 +287,7 @@ namespace LocalIntegrators
      * @f]
      */
     template <int dim, typename number>
-    void
+    DEAL_II_DEPRECATED void
     u_dot_n_residual(Vector<number>                             &result,
                      const FEValuesBase<dim>                    &fe,
                      const FEValuesBase<dim>                    &fetest,
@@ -320,7 +319,7 @@ namespace LocalIntegrators
      * @f]
      */
     template <int dim, typename number>
-    void
+    DEAL_II_DEPRECATED void
     u_times_n_residual(Vector<number>            &result,
                        const FEValuesBase<dim>   &fetest,
                        const std::vector<double> &data,
@@ -354,7 +353,7 @@ namespace LocalIntegrators
      * @f]
      */
     template <int dim>
-    void
+    DEAL_II_DEPRECATED void
     u_dot_n_matrix(FullMatrix<double>      &M11,
                    FullMatrix<double>      &M12,
                    FullMatrix<double>      &M21,
@@ -413,7 +412,7 @@ namespace LocalIntegrators
      * @f]
      */
     template <int dim>
-    void
+    DEAL_II_DEPRECATED void
     u_dot_n_jump_matrix(FullMatrix<double>      &M11,
                         FullMatrix<double>      &M12,
                         FullMatrix<double>      &M21,
@@ -468,7 +467,7 @@ namespace LocalIntegrators
      * element has to be equal to the space dimension.
      */
     template <int dim>
-    double
+    DEAL_II_DEPRECATED double
     norm(const FEValuesBase<dim>                            &fe,
          const ArrayView<const std::vector<Tensor<1, dim>>> &Du)
     {

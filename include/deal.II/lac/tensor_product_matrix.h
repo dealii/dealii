@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2017 - 2023 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2017 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 #ifndef dealii_tensor_product_matrix_h
 #define dealii_tensor_product_matrix_h
@@ -27,6 +26,9 @@
 #include <deal.II/lac/lapack_full_matrix.h>
 
 #include <deal.II/matrix_free/tensor_product_kernels.h>
+
+#include <bitset>
+
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -582,7 +584,6 @@ namespace internal
           std::array<AlignedVector<Number>, dim>  &eigenvalues)
     {
       const unsigned int n_rows_1d = mass_matrix[0].n_cols();
-      (void)n_rows_1d;
 
       for (unsigned int dir = 0; dir < dim; ++dir)
         {
@@ -650,16 +651,18 @@ namespace internal
           for (unsigned int vv = 0; vv < macro_size; ++vv)
             offsets_nm[vv] = nm * vv;
 
-          vectorized_transpose_and_store(false,
-                                         nm,
-                                         &(mass_matrix[dir](0, 0)),
-                                         offsets_nm.cbegin(),
-                                         mass_matrix_flat.data());
-          vectorized_transpose_and_store(false,
-                                         nm,
-                                         &(derivative_matrix[dir](0, 0)),
-                                         offsets_nm.cbegin(),
-                                         deriv_matrix_flat.data());
+          vectorized_transpose_and_store<Number, n_lanes>(
+            false,
+            nm,
+            &(mass_matrix[dir](0, 0)),
+            offsets_nm.data(),
+            mass_matrix_flat.data());
+          vectorized_transpose_and_store<Number, n_lanes>(
+            false,
+            nm,
+            &(derivative_matrix[dir](0, 0)),
+            offsets_nm.data(),
+            deriv_matrix_flat.data());
 
           const Number *mass_cbegin    = mass_matrix_flat.data();
           const Number *deriv_cbegin   = deriv_matrix_flat.data();
@@ -678,14 +681,16 @@ namespace internal
           eigenvectors[dir].reinit(n_rows, n_cols);
           for (unsigned int vv = 0; vv < macro_size; ++vv)
             offsets_n[vv] = n_rows * vv;
-          vectorized_load_and_transpose(n_rows,
-                                        eigenvalues_flat.data(),
-                                        offsets_n.cbegin(),
-                                        eigenvalues[dir].begin());
-          vectorized_load_and_transpose(nm,
-                                        eigenvectors_flat.data(),
-                                        offsets_nm.cbegin(),
-                                        &(eigenvectors[dir](0, 0)));
+          vectorized_load_and_transpose<Number, n_lanes>(
+            n_rows,
+            eigenvalues_flat.data(),
+            offsets_n.data(),
+            eigenvalues[dir].begin());
+          vectorized_load_and_transpose<Number, n_lanes>(
+            nm,
+            eigenvectors_flat.data(),
+            offsets_nm.data(),
+            &(eigenvectors[dir](0, 0)));
         }
     }
 
@@ -877,7 +882,7 @@ namespace internal
         }
 
       else
-        Assert(false, ExcNotImplemented());
+        DEAL_II_NOT_IMPLEMENTED();
     }
 
 

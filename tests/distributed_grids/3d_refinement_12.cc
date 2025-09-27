@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2015 - 2021 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2015 - 2024 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 
 #include <deal.II/distributed/grid_refinement.h>
@@ -124,8 +123,8 @@ main(int argc, char *argv[])
   std::vector<unsigned int> n_cell_smooth;
   std::vector<unsigned int> n_cell_no_smooth;
 
-  std::set<Location<dim>> final_cell_center_loactions_smooth;
-  std::set<Location<dim>> final_cell_center_loactions_no_smooth;
+  std::set<Location<dim>> final_cell_center_locations_smooth;
+  std::set<Location<dim>> final_cell_center_locations_no_smooth;
   if (I_am_host)
     {
       deallog << "Flag limit_level_difference_at_vertices set:" << std::endl;
@@ -133,7 +132,7 @@ main(int argc, char *argv[])
   {
     TriaTest<dim> tria_test(
       dealii::Triangulation<dim>::limit_level_difference_at_vertices);
-    tria_test.run(n_cell_smooth, final_cell_center_loactions_smooth);
+    tria_test.run(n_cell_smooth, final_cell_center_locations_smooth);
   }
   if (I_am_host)
     {
@@ -141,7 +140,7 @@ main(int argc, char *argv[])
     }
   {
     TriaTest<dim> tria_test(dealii::Triangulation<dim>::none);
-    tria_test.run(n_cell_no_smooth, final_cell_center_loactions_no_smooth);
+    tria_test.run(n_cell_no_smooth, final_cell_center_locations_no_smooth);
   }
   if (I_am_host)
     {
@@ -162,26 +161,26 @@ main(int argc, char *argv[])
       }
   }
   {
-    bool cell_center_loactions_are_same =
-      (final_cell_center_loactions_smooth.size() ==
-       final_cell_center_loactions_no_smooth.size());
+    bool cell_center_locations_are_same =
+      (final_cell_center_locations_smooth.size() ==
+       final_cell_center_locations_no_smooth.size());
 
     std::set<Location<dim>>::const_iterator it1 =
-      final_cell_center_loactions_smooth.begin();
+      final_cell_center_locations_smooth.begin();
     std::set<Location<dim>>::const_iterator it2 =
-      final_cell_center_loactions_no_smooth.begin();
+      final_cell_center_locations_no_smooth.begin();
 
-    for (; cell_center_loactions_are_same &&
-           (it1 != final_cell_center_loactions_smooth.end());
+    for (; cell_center_locations_are_same &&
+           (it1 != final_cell_center_locations_smooth.end());
          ++it1, ++it2)
       {
-        cell_center_loactions_are_same =
-          cell_center_loactions_are_same && (*it1 == *it2);
+        cell_center_locations_are_same =
+          cell_center_locations_are_same && (*it1 == *it2);
       }
     if (I_am_host)
       {
-        deallog << "cell_center_loactions_are_same = "
-                << cell_center_loactions_are_same << std::endl;
+        deallog << "cell_center_locations_are_same = "
+                << cell_center_locations_are_same << std::endl;
       }
   }
 

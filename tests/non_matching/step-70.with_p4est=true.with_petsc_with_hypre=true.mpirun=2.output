@@ -1,0 +1,43 @@
+
+DEAL:0::Running StokesImmersedProblem<2> using Trilinos.
+DEAL:0::Cycle 0:
+DEAL:0::Time : 0.00000, time step: 0.00250000
+DEAL:0::   Number of degrees of freedom: 9539 (8450+1089 -- 0+0)
+DEAL:0::Tracer particles: 1504
+DEAL:0::Solid particles: 9216
+DEAL:0::   Solved in 148 iterations.
+DEAL:0::   Number of degrees of freedom: 9845 (8722+1123 -- 9216+1504)
+DEAL:0::Cycle 1:
+DEAL:0::Time : 0.00250000, time step: 0.00250000
+DEAL:0::   Solved in 146 iterations.
+DEAL:0::Cycle 2:
+DEAL:0::Time : 0.00500000, time step: 0.00250000
+DEAL:0::   Solved in 117 iterations.
+DEAL:0::Cycle 3:
+DEAL:0::Time : 0.00750000, time step: 0.00250000
+DEAL:0::   Solved in 125 iterations.
+DEAL:0::Cycle 4:
+DEAL:0::Time : 0.0100000, time step: 0.00250000
+DEAL:0::   Solved in 130 iterations.
+
+DEAL:1::Running StokesImmersedProblem<2> using Trilinos.
+DEAL:1::Cycle 0:
+DEAL:1::Time : 0.00000, time step: 0.00250000
+DEAL:1::   Number of degrees of freedom: 9539 (8450+1089 -- 0+0)
+DEAL:1::Tracer particles: 1504
+DEAL:1::Solid particles: 9216
+DEAL:1::   Solved in 148 iterations.
+DEAL:1::   Number of degrees of freedom: 9845 (8722+1123 -- 9216+1504)
+DEAL:1::Cycle 1:
+DEAL:1::Time : 0.00250000, time step: 0.00250000
+DEAL:1::   Solved in 146 iterations.
+DEAL:1::Cycle 2:
+DEAL:1::Time : 0.00500000, time step: 0.00250000
+DEAL:1::   Solved in 117 iterations.
+DEAL:1::Cycle 3:
+DEAL:1::Time : 0.00750000, time step: 0.00250000
+DEAL:1::   Solved in 125 iterations.
+DEAL:1::Cycle 4:
+DEAL:1::Time : 0.0100000, time step: 0.00250000
+DEAL:1::   Solved in 130 iterations.
+

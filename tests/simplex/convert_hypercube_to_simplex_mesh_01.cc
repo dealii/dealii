@@ -1,17 +1,16 @@
-/* ---------------------------------------------------------------------
+/* ------------------------------------------------------------------------
  *
- * Copyright (C) 2020 - 2022 by the deal.II authors
+ * SPDX-License-Identifier: LGPL-2.1-or-later
+ * Copyright (C) 2020 - 2025 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
- * The deal.II library is free software; you can use it, redistribute
- * it, and/or modify it under the terms of the GNU Lesser General
- * Public License as published by the Free Software Foundation; either
- * version 2.1 of the License, or (at your option) any later version.
- * The full text of the license can be found in the file LICENSE.md at
- * the top level directory of deal.II.
+ * Part of the source code is dual licensed under Apache-2.0 WITH
+ * LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+ * governing the source code and code contributions can be found in
+ * LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
  *
- * ---------------------------------------------------------------------
+ * ------------------------------------------------------------------------
  *
  * Test function GridGenerator::convert_hypercube_to_simplex_mesh() in 2D
  * and 3D (dim = spacedim = 2, 3) on a quarter_hyper_ball() triangulation and
@@ -32,7 +31,6 @@
 
 #include "../tests.h"
 
-using namespace dealii;
 
 template <int dim, int spacedim>
 void
@@ -50,7 +48,7 @@ create_triangulation(Triangulation<dim, dim> &triangulation)
 
 template <int dim, int spacedim>
 void
-check_file(unsigned int n_refinements = 0) // for dim = spaceim
+check_file(unsigned int n_divisions, unsigned int n_refinements = 0)
 {
   Triangulation<dim, spacedim> in_tria, out_tria;
   create_triangulation(in_tria);
@@ -76,7 +74,9 @@ check_file(unsigned int n_refinements = 0) // for dim = spaceim
         }
     }
 
-  GridGenerator::convert_hypercube_to_simplex_mesh(in_tria, out_tria);
+  GridGenerator::convert_hypercube_to_simplex_mesh(in_tria,
+                                                   out_tria,
+                                                   n_divisions);
 
   // copy manifolds to test global refining
   for (const auto i : in_tria.get_manifold_ids())
@@ -123,27 +123,42 @@ main()
   // dim = spacedim = 2
   deallog.push(
     "2D: conversion triangulation with quad elements to tri elements: ");
-  check_file<2, 2>();
+  check_file<2, 2>(8);
   deallog.pop();
 
-  // TETRAHEDRAL ELEMENTS
+  // TRIANGULAR ELEMENTS
   // dim = 2, spacedim = 2
   deallog.push(
     "2D: conversion triangulation with quad elements to tri elements: ");
-  check_file<2, 3>();
+  check_file<2, 3>(8);
+  deallog.pop();
+
+  // TRIANGULAR ELEMENTS
+  // dim = 2, spacedim = 2
+  deallog.push(
+    "2D: conversion triangulation with quad elements to tri elements "
+    "(split 2): ");
+  check_file<2, 2>(2, 1);
   deallog.pop();
 
   // TETRAHEDRAL ELEMENTS
   // dim = spacedim = 3
   deallog.push(
     "3D: conversion triangulation with tet elements to hex elements: ");
-  check_file<3, 3>();
+  check_file<3, 3>(24);
+  deallog.pop();
+
+  // TETRAHEDRAL ELEMENTS
+  // dim = spacedim = 3
+  deallog.push(
+    "3D: conversion triangulation with tet elements to hex elements (split 6): ");
+  check_file<3, 3>(6, 1);
   deallog.pop();
 
   // TETRAHEDRAL ELEMENTS
   // dim = spacedim = 3
   deallog.push(
     "3D: conversion triangulation with tet elements to hex elements + refinement: ");
-  check_file<3, 3>(1);
+  check_file<3, 3>(24, 1);
   deallog.pop();
 }

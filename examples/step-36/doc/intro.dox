@@ -1,9 +1,6 @@
-<br>
-
 <i>This program was contributed by Toby D. Young and Wolfgang
 Bangerth.  </i>
 
-<a name="Preamble"></a>
 <h1>Preamble</h1>
 
 The problem we want to solve in this example is an eigenspectrum
@@ -48,7 +45,7 @@ library; SLEPc itself builds on the <a
 href="http://www.mcs.anl.gov/petsc/" target="_top">PETSc</a> library
 for linear algebra contents.
 
-<a name="Intro"></a>
+<a name="step_36-Intro"></a>
 <h1>Introduction</h1>
 
 The basic equation of stationary quantum mechanics is the
@@ -111,7 +108,7 @@ later time when we apply boundary values. There are two basic ways
 of doing this (either using MatrixTools::apply_boundary_values()
 <i>after</i> assembling the linear system, or using
 AffineConstraints::distribute_local_to_global() <i>during</i> assembly;
-see the @ref constraints "constraints module" for more information),
+see the @ref constraints "constraints topic" for more information),
 but both result in the same: a linear system that has a total
 number of rows equal to the number of <i>all</i> degrees of freedom,
 including those that lie on the boundary. However, degrees of
@@ -254,8 +251,8 @@ x})$, the number of global refinement steps of the mesh,
 or the number of eigenvalues we want to solve for. We could go much
 further with this but stop at making only a few of the things that one
 could select at run time actual input file parameters. In order to see
-what could be done in this regard, take a look at @ref step_29
-"step-29" and step-33.</li>
+what could be done in this regard, take a look at
+step-29 and step-33.</li>
 
 <li>We use the FunctionParser class to make the potential $V(\mathbf
 x)$ a run-time parameter that can be specified in the input file as a

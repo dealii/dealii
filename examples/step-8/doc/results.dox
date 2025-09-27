@@ -9,10 +9,10 @@ the $x$- and $y$-displacements as scalar components:
 <table width="100%">
 <tr>
 <td>
-<img src="https://www.dealii.org/images/steps/developer/step-8.x.png" alt="">
+<img src="https://dealii.org/images/steps/developer/step-8.x.png" alt="">
 </td>
 <td>
-<img src="https://www.dealii.org/images/steps/developer/step-8.y.png" alt="">
+<img src="https://dealii.org/images/steps/developer/step-8.y.png" alt="">
 </td>
 </tr>
 </table>
@@ -21,30 +21,65 @@ the $x$- and $y$-displacements as scalar components:
 You can clearly see the sources of $x$-displacement around $x=0.5$ and
 $x=-0.5$, and of $y$-displacement at the origin.
 
+
+<a name="step-8-extensions"></a>
+<h3>Possibilities for extensions</h3>
+
 What one frequently would like to do is to show the displacement as a vector
 field, i.e., vectors that for each point illustrate the direction and magnitude
 of displacement. Unfortunately, that's a bit more involved. To understand why
-this is so, remember that we have just defined our finite element as a
-collection of two  components (in <code>dim=2</code> dimensions). Nowhere have
-we said that this is not just a pressure and a concentration (two scalar
-quantities) but that the two components actually are the parts of a
-vector-valued quantity, namely the displacement. Absent this knowledge, the
-DataOut class assumes that all individual variables we print are separate
+this is so, remember that we have defined our finite element as just a
+collection of `dim` individual components when we said `fe(FE_Q<dim>(1) ^ dim)`
+in the constructor. From the perspective of deal.II, these components could
+just be a pressure and a concentration (i.e., two scalar and unrelated
+quantities). What we *want* to express somehow is that the components of the finite
+element actually are the parts of a *vector-valued* quantity, namely the
+displacement. Absent having specific knowledge about this, the
+DataOut class assumes that all individual variables we output are separate
 scalars, and VisIt and Paraview then faithfully assume that this is indeed what it is. In
 other words, once we have written the data as scalars, there is nothing in
 these programs that allows us to paste these two scalar fields back together as a
-vector field. Where we would have to attack this problem is at the root,
-namely in <code>ElasticProblem::output_results()</code>. We won't do so here but
-instead refer the reader to the step-22 program where we show how to do this
-for a more general situation. That said, we couldn't help generating the data
-anyway that would show how this would look if implemented as discussed in
-step-22. The vector field then looks like this (VisIt and Paraview
-randomly select a few
+vector field. (This is not entirely true: It is possible to *define* a
+vector-valued field in both of these programs whose components are scalar fields
+that already exist in an output field; but it is not easy to find how
+exactly one would do that.)
+
+Where we would have to attack this problem is at its root,
+namely in <code>ElasticProblem::output_results()</code>. The step-22 program
+discussed in some detail how to do that for a more general situation. That said,
+the following small variation of the `output_results()`, in which we essentially
+only add the `data_component_interpretation` variable and use the same
+string `"displacement"` `dim` times, will do the trick:
+@code
+  template <int dim>
+  void ElasticProblem<dim>::output_results(const unsigned int cycle) const
+  {
+    DataOut<dim> data_out;
+    data_out.attach_dof_handler(dof_handler);
+
+    const std::vector<std::string> solution_names(dim, "displacement");
+
+    const std::vector<DataComponentInterpretation::DataComponentInterpretation>
+      data_component_interpretation(
+        dim, DataComponentInterpretation::component_is_part_of_vector);
+
+    data_out.add_data_vector(solution,
+                             solution_names,
+                             DataOut<dim>::type_dof_data,
+                             data_component_interpretation);
+    data_out.build_patches();
+
+    std::ofstream output("solution-" + std::to_string(cycle) + ".vtk");
+    data_out.write_vtk(output);
+  }
+@endcode
+As mentioned, step-22 discusses what exactly this does. In any case,
+the displacement vector field that is then output then looks like this
+(VisIt and Paraview randomly select a few
 hundred vertices from which to draw the vectors; drawing them from each
 individual vertex would make the picture unreadable):
 
-<img src="https://www.dealii.org/images/steps/developer/step-8.vectors.png" alt="">
-
+<img src="https://dealii.org/images/steps/developer/step-8.vectors.png" alt="">
 
 We note that one may have intuitively expected the
 solution to be symmetric about the $x$- and $y$-axes since the $x$- and

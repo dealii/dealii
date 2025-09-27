@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2003 - 2021 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2003 - 2024 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 
 
@@ -49,7 +48,7 @@ check()
 
   // Now get the cell
   const typename Triangulation<dim>::cell_iterator cell = triangulation.begin();
-  cell->vertex(0)(0)                                    = -1.;
+  cell->vertex(0)[0]                                    = -1.;
 
   // and test it.
   double testcoord[14][3] = {{0.5, 0.5, 0.5},
@@ -73,10 +72,10 @@ check()
   for (int i = 0; i < 14; ++i)
     {
       Point<dim> testpoint;
-      testpoint(0) = testcoord[i][0];
-      testpoint(1) = testcoord[i][1];
+      testpoint[0] = testcoord[i][0];
+      testpoint[1] = testcoord[i][1];
       if (dim == 3)
-        testpoint(2) = testcoord[i][2];
+        testpoint[2] = testcoord[i][2];
 
       bool res = cell->point_inside(testpoint);
       deallog << testpoint << "  \t inside " << res << " expected "

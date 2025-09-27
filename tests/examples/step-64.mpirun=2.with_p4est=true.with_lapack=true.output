@@ -1,0 +1,24 @@
+Cycle 0
+   Number of active cells:       8
+   Number of degrees of freedom: 343
+Solver stopped within 8 - 60 iterations
+  solution norm: 0.0205439
+
+Cycle 1
+   Number of active cells:       64
+   Number of degrees of freedom: 2197
+Solver stopped within 8 - 60 iterations
+  solution norm: 0.0205269
+
+Cycle 2
+   Number of active cells:       512
+   Number of degrees of freedom: 15625
+Solver stopped within 8 - 60 iterations
+  solution norm: 0.0205261
+
+Cycle 3
+   Number of active cells:       4096
+   Number of degrees of freedom: 117649
+Solver stopped within 8 - 60 iterations
+  solution norm: 0.0205261
+

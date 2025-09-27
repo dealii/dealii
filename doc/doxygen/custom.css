@@ -1,0 +1,139 @@
+/*
+ * Set primary color equal to the main webpage.
+ */
+html {
+    --primary-color: #546d78;
+}
+
+a:link, a:visited, a:hover, a:focus, a:active {
+    color: #1779c4 !important;
+}
+
+/*
+ * Mobile mode: fix '+' and '-' symbols for opening/closing sub-menus in the top navigation bar.
+ */
+@media screen and (max-width: 767px) {
+    .sm-dox a span.sub-arrow:before {
+        display: block;
+        content: '+';
+    }
+
+    .sm-dox a.highlighted span.sub-arrow:before {
+        display: block;
+        content: '-';
+    }
+}
+
+/*
+ * Remove padding around titlebar.
+ */
+#titlearea {
+    width: auto;
+    padding: 0px;
+    background: none;
+    color: var(--header-foreground);
+    border-bottom: none;
+}
+
+@media (prefers-color-scheme: light) {
+  table.tutorial {
+    color: black;
+    border: 1px solid #aaa;
+    background-color: #f9f9f9;
+    padding: 5px;
+    font-size: 95%;
+  }
+}
+div.tutorial {
+    color: black;
+    border: 1px solid #aaa;
+    background-color: #f9f9f9;
+    padding: 50px;
+    font-size: 95%;
+}
+div.doxygen-generated-exception-message {
+    color: black;
+    border: 1px solid #aaa;
+    background-color: #f9f9f9;
+    padding: 5px;
+    font-size: 95%;
+}
+
+/*
+ * Fix the default table settings to be readable: this overrides the first row
+ * and column background to light blue (instead of dark blue, upon which links
+ * are impossible to read) and the text color to black (instead of white, which
+ * would no longer be visible).
+ */
+table.doxtable th {
+    background-color: #D6E2FA;
+    color: #000000;
+}
+
+div.image img[src="fe_enriched_1d.png"] {
+    width:500px;
+}
+
+div.image img[src="fe_enriched_h-refinement.png"] {
+    width:500px;
+}
+
+/*
+ * environment for aligning pictures in four columns.
+ */
+.fourcolumn {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr 1fr;
+  grid-column-gap: 25px;
+  grid-row-gap: 25px;
+  margin-left: auto;
+  margin-right: auto;
+  margin-bottom: 25px;
+}
+
+/*
+ * environment for aligning pictures in three columns.
+ */
+.threecolumn {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  grid-column-gap: 25px;
+  grid-row-gap: 25px;
+  margin-left: auto;
+  margin-right: auto;
+  margin-bottom: 25px;
+}
+
+/*
+ * environment for aligning pictures in two columns.
+ */
+.twocolumn {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-column-gap: 25px;
+  grid-row-gap: 25px;
+  margin-left: auto;
+  margin-right: auto;
+  margin-bottom: 25px;
+}
+
+/*
+ * environment for aligning pictures in one column.
+ */
+.onecolumn {
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-column-gap: 25px;
+  grid-row-gap: 25px;
+  margin-left: auto;
+  margin-right: auto;
+  margin-bottom: 25px;
+}
+
+
+/*
+ * environment for code fragments in tutorial comments
+ */
+.CodeFragmentInTutorialComment {
+    /* background-color: #FF33F0; */
+}

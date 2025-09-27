@@ -1,17 +1,16 @@
-/* ---------------------------------------------------------------------
+/* ------------------------------------------------------------------------
  *
- * Copyright (C) 2008 - 2023 by the deal.II authors
+ * SPDX-License-Identifier: LGPL-2.1-or-later
+ * Copyright (C) 2008 - 2025 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
- * The deal.II library is free software; you can use it, redistribute
- * it, and/or modify it under the terms of the GNU Lesser General
- * Public License as published by the Free Software Foundation; either
- * version 2.1 of the License, or (at your option) any later version.
- * The full text of the license can be found in the file LICENSE.md at
- * the top level directory of deal.II.
+ * Part of the source code is dual licensed under Apache-2.0 WITH
+ * LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+ * governing the source code and code contributions can be found in
+ * LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
  *
- * ---------------------------------------------------------------------
+ * ------------------------------------------------------------------------
  *
  * Author: Wolfgang Bangerth, Texas A&M University, 2008
  */
@@ -21,7 +20,6 @@
 
 // As usual, we start by including some well-known files:
 #include <deal.II/base/quadrature_lib.h>
-#include <deal.II/base/logstream.h>
 #include <deal.II/base/function.h>
 #include <deal.II/base/utilities.h>
 #include <deal.II/base/tensor_function.h>
@@ -48,7 +46,6 @@
 #include <deal.II/fe/fe_values.h>
 
 #include <deal.II/numerics/vector_tools.h>
-#include <deal.II/numerics/matrix_tools.h>
 #include <deal.II/numerics/data_out.h>
 #include <deal.II/numerics/error_estimator.h>
 
@@ -128,9 +125,9 @@ namespace Step22
 
     const unsigned int degree;
 
-    Triangulation<dim> triangulation;
-    FESystem<dim>      fe;
-    DoFHandler<dim>    dof_handler;
+    Triangulation<dim>  triangulation;
+    const FESystem<dim> fe;
+    DoFHandler<dim>     dof_handler;
 
     AffineConstraints<double> constraints;
 
@@ -282,7 +279,7 @@ namespace Step22
   // <code>InverseMatrix</code> object is created. The member function
   // <code>vmult</code> is obtained by solving a linear system:
   template <class MatrixType, class PreconditionerType>
-  class InverseMatrix : public Subscriptor
+  class InverseMatrix : public EnableObserverPointer
   {
   public:
     InverseMatrix(const MatrixType         &m,
@@ -291,8 +288,8 @@ namespace Step22
     void vmult(Vector<double> &dst, const Vector<double> &src) const;
 
   private:
-    const SmartPointer<const MatrixType>         matrix;
-    const SmartPointer<const PreconditionerType> preconditioner;
+    const ObserverPointer<const MatrixType>         matrix;
+    const ObserverPointer<const PreconditionerType> preconditioner;
   };
 
 
@@ -338,9 +335,9 @@ namespace Step22
   // consequence of the definition above, the declaration
   // <code>InverseMatrix</code> now contains the second template parameter for
   // a preconditioner class as above, which affects the
-  // <code>SmartPointer</code> object <code>m_inverse</code> as well.
+  // <code>ObserverPointer</code> object <code>m_inverse</code> as well.
   template <class PreconditionerType>
-  class SchurComplement : public Subscriptor
+  class SchurComplement : public EnableObserverPointer
   {
   public:
     SchurComplement(
@@ -350,8 +347,8 @@ namespace Step22
     void vmult(Vector<double> &dst, const Vector<double> &src) const;
 
   private:
-    const SmartPointer<const BlockSparseMatrix<double>> system_matrix;
-    const SmartPointer<
+    const ObserverPointer<const BlockSparseMatrix<double>> system_matrix;
+    const ObserverPointer<
       const InverseMatrix<SparseMatrix<double>, PreconditionerType>>
       A_inverse;
 
@@ -393,7 +390,7 @@ namespace Step22
   // the vector-valued velocity components and of order <code>degree</code>
   // for the pressure.  This gives the LBB-stable element pair
   // $Q_{degree+1}^d\times Q_{degree}$, often referred to as the Taylor-Hood
-  // element.
+  // element for degree$\geq 1$.
   //
   // Note that we initialize the triangulation with a MeshSmoothing argument,
   // which ensures that the refinement of cells is done in a way that the
@@ -437,8 +434,9 @@ namespace Step22
   // comparison of the results we obtain with several of these algorithms
   // based on the testcase discussed here in this tutorial program. Here, we
   // will use the traditional Cuthill-McKee algorithm already used in some of
-  // the previous tutorial programs.  In the <a href="#improved-ilu">section
-  // on improved ILU</a> we're going to discuss this issue in more detail.
+  // the previous tutorial programs.  In the
+  // @ref step_22-ImprovedILU "section on improved ILU" we're going to discuss
+  // this issue in more detail.
 
   // There is one more change compared to previous tutorial programs: There is
   // no reason in sorting the <code>dim</code> velocity components
@@ -603,7 +601,7 @@ namespace Step22
     system_rhs            = 0;
     preconditioner_matrix = 0;
 
-    QGauss<dim> quadrature_formula(degree + 2);
+    const QGauss<dim> quadrature_formula(degree + 2);
 
     FEValues<dim> fe_values(fe,
                             quadrature_formula,
@@ -660,6 +658,7 @@ namespace Step22
     for (const auto &cell : dof_handler.active_cell_iterators())
       {
         fe_values.reinit(cell);
+
         local_matrix                = 0;
         local_preconditioner_matrix = 0;
         local_rhs                   = 0;

@@ -1,26 +1,25 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2020 - 2023 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2020 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 
 /**
- * @defgroup simplex Simplex support (experimental)
+ * @defgroup simplex Simplex support
  *
- * This module describes the experimental simplex support in deal.II.
+ * This group describes the simplex support in deal.II.
  *
- * Simplex and mixed meshes in deal.II are still experimental, i.e., work
- * in progress. Large parts of the library have been ported to be able to
+ * Simplex and mixed meshes in deal.II are work in progress.
+ * Large parts of the library have been ported to be able to
  * operate on such kind of meshes. However, there are still many functions
  * that need to be generalized.
  *
@@ -66,10 +65,8 @@
  *
  * @section simplex_reference_cells Reference cells
  *
- * In 2D, we provide triangles and quadrilaterals with the following possible
- * orientations in 3D:
+ * In 2D, we provide triangles and quadrilaterals:
  *
- * <div class="twocolumn" style="width: 100%">
  *   <div class="parent">
  *     <div class="img" align="center">
  *       @image html reference_cells_0.png
@@ -78,15 +75,6 @@
  *       2D: triangle and quadrilateral
  *     </div>
  *   </div>
- *   <div class="parent">
- *     <div class="img" align="center">
- *       @image html reference_cells_1.png
- *     </div>
- *     <div class="text" align="center">
- *       Possible orientations of triangles and quadrilaterals in 3D
- *     </div>
- *   </div>
- * </div>
  *
  * In 3D, tetrahedra, pyramids, wedges, and hexahedra are available:
  *

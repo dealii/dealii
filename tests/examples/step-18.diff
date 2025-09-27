@@ -1,0 +1,43 @@
+26a27
+> #include "../example_test.h"
+693c694,698
+<     : triangulation(MPI_COMM_WORLD)
+---
+>     : triangulation(
+>         MPI_COMM_WORLD,
+>         {},
+>         false,
+>         parallel::shared::Triangulation<dim>::Settings::partition_zorder)
+699c704
+<     , end_time(10.0)
+---
+>     , end_time(1.0)
+1088,1089c1093,1095
+<     pcout << "    Solver converged in " << n_iterations << " iterations."
+<           << std::endl;
+---
+>     // pcout << "    Solver converged in " << n_iterations << " iterations."
+>     //       << std::endl;
+>     (void)n_iterations;
+1126,1129c1132,1139
+<     cg.solve(system_matrix,
+<              distributed_incremental_displacement,
+<              system_rhs,
+<              preconditioner);
+---
+>     check_solver_within_range(pcout,
+>                               cg.solve(system_matrix,
+>                                        distributed_incremental_displacement,
+>                                        system_rhs,
+>                                        preconditioner),
+>                               solver_control.last_step(),
+>                               100,
+>                               175);
+1330c1340
+<     output_results();
+---
+>     // output_results();
+1358c1368
+<     output_results();
+---
+>     // output_results();

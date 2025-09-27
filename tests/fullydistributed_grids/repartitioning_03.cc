@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2021 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2021 - 2024 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 
 // Test MGTransferGlobalCoarseningTools::create_geometric_coarsening_sequence
@@ -39,7 +38,6 @@
 
 #include "../grid/tests.h"
 
-using namespace dealii;
 
 template <int dim, int spacedim>
 void
@@ -73,7 +71,7 @@ output_grid(
   const std::string                                                      &label)
 {
   deallog.push(label);
-  const auto comm    = trias.front()->get_communicator();
+  const auto comm    = trias.front()->get_mpi_communicator();
   const auto my_rank = Utilities::MPI::this_mpi_process(comm);
 
   for (unsigned int i = 0; i < trias.size(); ++i)

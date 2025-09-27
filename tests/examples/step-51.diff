@@ -1,0 +1,20 @@
+47c47
+< 
+---
+> #include "../example_test.h"
+975,978c975,980
+<     solver.solve(system_matrix, solution, system_rhs, PreconditionIdentity());
+< 
+<     std::cout << "   Number of BiCGStab iterations: "
+<               << solver_control.last_step() << std::endl;
+---
+>     //solver.solve(system_matrix, solution, system_rhs, PreconditionIdentity());
+>     check_solver_within_range(std::cout,
+>                               solver.solve(system_matrix, solution, system_rhs, PreconditionIdentity())
+>                                 , solver_control.last_step(), 34, 173);
+> //    std::cout << "   Number of BiCGStab iterations: "
+> //              << solver_control.last_step() << std::endl;
+1356c1358
+<     for (unsigned int cycle = 0; cycle < 10; ++cycle)
+---
+>     for (unsigned int cycle = 0; cycle < 5; ++cycle)

@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2021 - 2022 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2021 - 2024 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 // Step-74 on a simplex mesh. Following incompatible modifications had to be
 // made:
@@ -66,7 +65,6 @@
 
 namespace Step74
 {
-  using namespace dealii;
 
   enum class Test_Case
   {
@@ -916,7 +914,7 @@ namespace Step74
               }
             default:
               {
-                Assert(false, ExcNotImplemented());
+                DEAL_II_NOT_IMPLEMENTED();
               }
           }
         deallog << "  Number of active cells       : "
@@ -986,7 +984,6 @@ main()
 
   try
     {
-      using namespace dealii;
       using namespace Step74;
       Test_Case      test_case = Test_Case::l_singularity;
       SIPGLaplace<2> problem(test_case);

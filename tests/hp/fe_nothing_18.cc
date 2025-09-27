@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2021 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2013 - 2024 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 
 // test by Denis Davydov, see bug report 76: can't create hanging node
@@ -88,11 +87,11 @@ private:
   void
   setup_system();
 
-  const unsigned int n_blocks;         // total number of blocks
-  const unsigned int n_components;     // total number of components
-  const unsigned int first_u_comp;     // where displacements starts
-  const unsigned int first_lamda_comp; // where lagrage multipliers start
-  const unsigned int degree;           // of shape functions
+  const unsigned int n_blocks;          // total number of blocks
+  const unsigned int n_components;      // total number of components
+  const unsigned int first_u_comp;      // where displacements starts
+  const unsigned int first_lambda_comp; // where lagrage multipliers start
+  const unsigned int degree;            // of shape functions
 
   std::vector<types::global_dof_index> dofs_per_block;
 
@@ -119,7 +118,7 @@ private:
                                            // used for integral evaluation
 
   const FEValuesExtractors::Vector u_fe;
-  const FEValuesExtractors::Vector lamda_fe;
+  const FEValuesExtractors::Vector lambda_fe;
 
   unsigned int id_of_lagrange_mult;
   double       beta1;
@@ -157,7 +156,7 @@ public:
   virtual void
   vector_value(const Point<dim> &p, Vector<double> &values) const;
   virtual double
-  value(const Point<dim> &p, unsigned int compoment) const;
+  value(const Point<dim> &p, unsigned int component) const;
 };
 
 template <int dim>
@@ -170,7 +169,7 @@ BoundaryValues<dim>::vector_value(const Point<dim> &p,
 
 template <int dim>
 inline double
-BoundaryValues<dim>::value(const Point<dim> &p, unsigned int compoment) const
+BoundaryValues<dim>::value(const Point<dim> &p, unsigned int component) const
 {
   return -0.001;
 }
@@ -238,11 +237,11 @@ ElasticProblem<dim>::ElasticProblem()
   : n_blocks(2)
   , n_components(dim * n_blocks)
   , first_u_comp(0)
-  , first_lamda_comp(dim)
+  , first_lambda_comp(dim)
   , degree(1)
   , dofs_per_block(n_blocks)
   , dof_handler(triangulation)
-  , /*assotiate dof_handler to the triangulation */
+  , /*associate dof_handler to the triangulation */
   elasticity_fe(
     FE_Q<dim>(degree),
     dim, // use dim FE_Q of a given degree to represent displacements
@@ -255,7 +254,7 @@ ElasticProblem<dim>::ElasticProblem()
                              dim // same for lagrange multipliers
                              )
   , u_fe(first_u_comp)
-  , lamda_fe(first_lamda_comp)
+  , lambda_fe(first_lambda_comp)
   , id_of_lagrange_mult(1)
   , beta1(1.0)
 {
@@ -344,7 +343,7 @@ ElasticProblem<dim>::setup_system()
           << n_elasticity_cells << std::endl;
   Assert(n_lagrange_cells > 0,
          ExcInternalError()); // there should be at least 1 cell! Otherwise
-                              // DoFHanlder crashes with 0 dofs for block 2!
+                              // DoFHandler crashes with 0 dofs for block 2!
   //
   //(2) distribute DoFs
   dof_handler.distribute_dofs(

@@ -1,0 +1,43 @@
+
+DEAL:0:2d::n_levels:                  1
+DEAL:0:2d::n_cells:                   15
+DEAL:0:2d::n_active_cells:            15
+DEAL:0:2d::has_hanging_nodes:         false
+DEAL:0:2d::
+DEAL:0:2d::n_dofs:                             143
+DEAL:0:2d::n_locally_owned_dofs:               55
+DEAL:0:2d::has_hanging_nodes:                  false
+DEAL:0:2d::
+
+DEAL:1:2d::n_levels:                  1
+DEAL:1:2d::n_cells:                   20
+DEAL:1:2d::n_active_cells:            20
+DEAL:1:2d::has_hanging_nodes:         false
+DEAL:1:2d::
+DEAL:1:2d::n_dofs:                             143
+DEAL:1:2d::n_locally_owned_dofs:               44
+DEAL:1:2d::has_hanging_nodes:                  false
+DEAL:1:2d::
+
+
+DEAL:2:2d::n_levels:                  1
+DEAL:2:2d::n_cells:                   15
+DEAL:2:2d::n_active_cells:            15
+DEAL:2:2d::has_hanging_nodes:         false
+DEAL:2:2d::
+DEAL:2:2d::n_dofs:                             143
+DEAL:2:2d::n_locally_owned_dofs:               22
+DEAL:2:2d::has_hanging_nodes:                  false
+DEAL:2:2d::
+
+
+DEAL:3:2d::n_levels:                  1
+DEAL:3:2d::n_cells:                   10
+DEAL:3:2d::n_active_cells:            10
+DEAL:3:2d::has_hanging_nodes:         false
+DEAL:3:2d::
+DEAL:3:2d::n_dofs:                             143
+DEAL:3:2d::n_locally_owned_dofs:               22
+DEAL:3:2d::has_hanging_nodes:                  false
+DEAL:3:2d::
+

@@ -1,7 +1,5 @@
-<a name="results"></a>
 <h1>Results</h1>
 
-<a name="Re100"></a>
 <h3> Re = 100 </h3>
 
 We run the code with the following <code>parameter-file.prm</code>, which can be found in the
@@ -45,7 +43,7 @@ same directory as the source:
   end
 
   #The output frequency
-  set output = 50
+  set output_interval = 50
 
   #Finally we set the verbosity level
   set verbose = false
@@ -63,24 +61,24 @@ vorticity and in the right the velocity field:
 
 <table>
   <tr>
-    <td> <img src="https://www.dealii.org/images/steps/developer/step-35.Re_100.vorticity.0.9.3.png" alt="" width="400"> </td>
-    <td> <img src="https://www.dealii.org/images/steps/developer/step-35.Re_100.velocity.0.9.3.png" alt="" width="400"> </td>
+    <td> <img src="https://dealii.org/images/steps/developer/step-35.Re_100.vorticity.0.9.3.png" alt="" width="400"> </td>
+    <td> <img src="https://dealii.org/images/steps/developer/step-35.Re_100.velocity.0.9.3.png" alt="" width="400"> </td>
   </tr>
   <tr>
-    <td> <img src="https://www.dealii.org/images/steps/developer/step-35.Re_100.vorticity.1.9.3.png" alt="" width="400"> </td>
-    <td> <img src="https://www.dealii.org/images/steps/developer/step-35.Re_100.velocity.1.9.3.png" alt="" width="400"> </td>
+    <td> <img src="https://dealii.org/images/steps/developer/step-35.Re_100.vorticity.1.9.3.png" alt="" width="400"> </td>
+    <td> <img src="https://dealii.org/images/steps/developer/step-35.Re_100.velocity.1.9.3.png" alt="" width="400"> </td>
   </tr>
   <tr>
-    <td> <img src="https://www.dealii.org/images/steps/developer/step-35.Re_100.vorticity.2.9.3.png" alt="" width="400"> </td>
-    <td> <img src="https://www.dealii.org/images/steps/developer/step-35.Re_100.velocity.2.9.3.png" alt="" width="400"> </td>
+    <td> <img src="https://dealii.org/images/steps/developer/step-35.Re_100.vorticity.2.9.3.png" alt="" width="400"> </td>
+    <td> <img src="https://dealii.org/images/steps/developer/step-35.Re_100.velocity.2.9.3.png" alt="" width="400"> </td>
   </tr>
   <tr>
-    <td> <img src="https://www.dealii.org/images/steps/developer/step-35.Re_100.vorticity.3.9.3.png" alt="" width="400"> </td>
-    <td> <img src="https://www.dealii.org/images/steps/developer/step-35.Re_100.velocity.3.9.3.png" alt="" width="400"> </td>
+    <td> <img src="https://dealii.org/images/steps/developer/step-35.Re_100.vorticity.3.9.3.png" alt="" width="400"> </td>
+    <td> <img src="https://dealii.org/images/steps/developer/step-35.Re_100.velocity.3.9.3.png" alt="" width="400"> </td>
   </tr>
   <tr>
-    <td> <img src="https://www.dealii.org/images/steps/developer/step-35.Re_100.vorticity.4.9.3.png" alt="" width="400"> </td>
-    <td> <img src="https://www.dealii.org/images/steps/developer/step-35.Re_100.velocity.4.9.3.png" alt="" width="400"> </td>
+    <td> <img src="https://dealii.org/images/steps/developer/step-35.Re_100.vorticity.4.9.3.png" alt="" width="400"> </td>
+    <td> <img src="https://dealii.org/images/steps/developer/step-35.Re_100.velocity.4.9.3.png" alt="" width="400"> </td>
   </tr>
 </table>
 
@@ -89,7 +87,6 @@ behind the obstacles, with the sign of the vorticity indicating
 whether this is a left or right turning vortex.
 
 
-<a name="Re500"></a>
 <h3> Re = 500 </h3>
 
 We can change the Reynolds number, $Re$, in the parameter file to a
@@ -98,12 +95,12 @@ yields the following images at times $t=20,40$:
 
 <table>
   <tr>
-    <td> <img src="https://www.dealii.org/images/steps/developer/step-35.Re_500.vorticity.0.9.3.png" alt="" width="400"> </td>
-    <td> <img src="https://www.dealii.org/images/steps/developer/step-35.Re_500.velocity.0.9.3.png" alt="" width="400"> </td>
+    <td> <img src="https://dealii.org/images/steps/developer/step-35.Re_500.vorticity.0.9.3.png" alt="" width="400"> </td>
+    <td> <img src="https://dealii.org/images/steps/developer/step-35.Re_500.velocity.0.9.3.png" alt="" width="400"> </td>
   </tr>
   <tr>
-    <td> <img src="https://www.dealii.org/images/steps/developer/step-35.Re_500.vorticity.1.9.3.png" alt="" width="400"> </td>
-    <td> <img src="https://www.dealii.org/images/steps/developer/step-35.Re_500.velocity.1.9.3.png" alt="" width="400"> </td>
+    <td> <img src="https://dealii.org/images/steps/developer/step-35.Re_500.vorticity.1.9.3.png" alt="" width="400"> </td>
+    <td> <img src="https://dealii.org/images/steps/developer/step-35.Re_500.velocity.1.9.3.png" alt="" width="400"> </td>
   </tr>
 </table>
 
@@ -117,12 +114,12 @@ the geometry is large. We look at a zoom at the region behind the obstacle, and
 the mesh size we have there:
 
 
-<img src="https://www.dealii.org/images/steps/developer/step-35.Re_500.zoom.9.3.png" alt="" width="400">
+<img src="https://dealii.org/images/steps/developer/step-35.Re_500.zoom.9.3.png" alt="" width="400">
 
 We can easily test our hypothesis by re-running the simulation with one more
 mesh refinement set in the parameter file:
 
-<img src="https://www.dealii.org/images/steps/developer/step-35.Re_500.zoom_2.9.3.png" alt="" width="400">
+<img src="https://dealii.org/images/steps/developer/step-35.Re_500.zoom_2.9.3.png" alt="" width="400">
 
 Indeed, the vorticity field now looks much smoother. While we can expect that
 further refining the mesh will suppress the remaining oscillations as well,
@@ -130,7 +127,7 @@ one should take measures to obtain a robust scheme in the limit of coarse
 resolutions, as described below.
 
 
-<a name="extensions"></a>
+<a name="step-35-extensions"></a>
 <h3> Possibilities for extensions </h3>
 
 This program can be extended in the following directions:

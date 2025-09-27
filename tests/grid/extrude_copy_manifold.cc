@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2018 - 2020 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2018 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 // Check that we can correctly copy manifold ids during extrusion. The output
 // was manually checked by plotting points in paraview.
@@ -19,6 +18,7 @@
 
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/grid_out.h>
+#include <deal.II/grid/manifold.h>
 #include <deal.II/grid/manifold_lib.h>
 #include <deal.II/grid/tria.h>
 
@@ -47,6 +47,8 @@ test()
   Triangulation<3> triangulation_3;
   GridGenerator::extrude_triangulation(
     triangulation_2, 3, 1.0, triangulation_3, true);
+  triangulation_3.set_manifold(0, FlatManifold<3>());
+  triangulation_3.set_manifold(1, FlatManifold<3>());
   TransfiniteInterpolationManifold<3> tfi_manifold;
   tfi_manifold.initialize(triangulation_3);
   CylindricalManifold<3> cylinder_manifold(2);

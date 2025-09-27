@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2003 - 2022 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2016 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 
 #include <deal.II/base/logstream.h>
@@ -25,6 +24,7 @@
 #include <deal.II/fe/fe_system.h>
 #include <deal.II/fe/fe_tools.h>
 
+#include <deal.II/grid/filtered_iterator.h>
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/tria_iterator.h>
@@ -59,7 +59,7 @@ public:
   {
     double return_value = 0.;
     for (unsigned int d = 0; d < dim; ++d)
-      return_value += std::pow(std::abs(.5 - p(d)), degree);
+      return_value += std::pow(std::abs(.5 - p[d]), degree);
 
     return return_value;
   }
@@ -79,16 +79,17 @@ make_tria()
   typename parallel::distributed::Triangulation<dim>::active_cell_iterator cell;
   GridGenerator::hyper_cube(*tria, 0., 1.);
   tria->refine_global(2);
-  for (int i = 0; i < 2; ++i)
+  for (auto &cell :
+       tria->active_cell_iterators() | IteratorFilters::LocallyOwnedCell())
     {
-      cell = tria->begin_active();
-      cell->set_refine_flag();
-      ++cell;
-      if (cell != tria->end())
+      auto p           = cell->barycenter();
+      bool refine_cell = p[0] > 0.5 && p[1] > 0.5;
+      if (dim == 3)
+        refine_cell = refine_cell && p[2] > 0.75;
+      if (refine_cell)
         cell->set_refine_flag();
-
-      tria->execute_coarsening_and_refinement();
     }
+  tria->execute_coarsening_and_refinement();
   return tria;
 }
 
@@ -193,12 +194,6 @@ check_this(const FiniteElement<dim> &fe1, const FiniteElement<dim> &fe2)
 
   std::unique_ptr<DoFHandler<dim>> dof1(make_dof_handler(*tria, fe1));
   std::unique_ptr<DoFHandler<dim>> dof2(make_dof_handler(*tria, fe2));
-  AffineConstraints<double>        cm1;
-  DoFTools::make_hanging_node_constraints(*dof1, cm1);
-  cm1.close();
-  AffineConstraints<double> cm2;
-  DoFTools::make_hanging_node_constraints(*dof2, cm2);
-  cm2.close();
 
   const IndexSet &locally_owned_dofs1 = dof1->locally_owned_dofs();
   const IndexSet  locally_relevant_dofs1 =
@@ -206,6 +201,16 @@ check_this(const FiniteElement<dim> &fe1, const FiniteElement<dim> &fe2)
   const IndexSet &locally_owned_dofs2 = dof2->locally_owned_dofs();
   const IndexSet  locally_relevant_dofs2 =
     DoFTools::extract_locally_relevant_dofs(*dof2);
+
+  AffineConstraints<typename VectorType::value_type> cm1(
+    locally_owned_dofs1, locally_relevant_dofs1);
+  DoFTools::make_hanging_node_constraints(*dof1, cm1);
+  cm1.close();
+  AffineConstraints<typename VectorType::value_type> cm2(
+    locally_owned_dofs2, locally_relevant_dofs2);
+  DoFTools::make_hanging_node_constraints(*dof2, cm2);
+  cm2.close();
+
 
   VectorType in_ghosted =
     build_ghosted<VectorType>(locally_owned_dofs1, locally_relevant_dofs1);
@@ -324,12 +329,6 @@ check_this_dealii(const FiniteElement<dim> &fe1, const FiniteElement<dim> &fe2)
 
   std::unique_ptr<DoFHandler<dim>> dof1(make_dof_handler(*tria, fe1));
   std::unique_ptr<DoFHandler<dim>> dof2(make_dof_handler(*tria, fe2));
-  AffineConstraints<double>        cm1;
-  DoFTools::make_hanging_node_constraints(*dof1, cm1);
-  cm1.close();
-  AffineConstraints<double> cm2;
-  DoFTools::make_hanging_node_constraints(*dof2, cm2);
-  cm2.close();
 
   const IndexSet &locally_owned_dofs1 = dof1->locally_owned_dofs();
   const IndexSet  locally_relevant_dofs1 =
@@ -337,6 +336,13 @@ check_this_dealii(const FiniteElement<dim> &fe1, const FiniteElement<dim> &fe2)
   const IndexSet &locally_owned_dofs2 = dof2->locally_owned_dofs();
   const IndexSet  locally_relevant_dofs2 =
     DoFTools::extract_locally_relevant_dofs(*dof2);
+
+  AffineConstraints<double> cm1(locally_owned_dofs1, locally_relevant_dofs1);
+  DoFTools::make_hanging_node_constraints(*dof1, cm1);
+  cm1.close();
+  AffineConstraints<double> cm2(locally_owned_dofs2, locally_relevant_dofs2);
+  DoFTools::make_hanging_node_constraints(*dof2, cm2);
+  cm2.close();
 
   VectorType in_ghosted =
     build_ghosted<VectorType>(locally_owned_dofs1, locally_relevant_dofs1);

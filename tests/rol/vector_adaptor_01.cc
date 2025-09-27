@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2017 - 2020 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2017 - 2024 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 // Test to check Rol::VectorAdaptor::set() and Rol::VectorAdaptor::plus().
 
@@ -26,7 +25,8 @@ template <typename VectorType>
 void
 test(const VectorType &given_vector)
 {
-  Teuchos::RCP<VectorType> given_vector_rcp(new VectorType(given_vector));
+  ROL::Ptr<VectorType> given_vector_rcp =
+    ROL::makePtr<VectorType>(given_vector);
 
   // --- Testing the constructor
   Rol::VectorAdaptor<VectorType> given_vector_rol(given_vector_rcp);
@@ -34,7 +34,7 @@ test(const VectorType &given_vector)
               ExcInternalError());
 
 
-  Teuchos::RCP<VectorType>       w_rcp = Teuchos::rcp(new VectorType);
+  ROL::Ptr<VectorType>           w_rcp = ROL::makePtr<VectorType>();
   Rol::VectorAdaptor<VectorType> w_rol(w_rcp);
 
   // --- Testing VectorAdaptor::set()

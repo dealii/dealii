@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 1999 - 2023 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 1999 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 #ifndef dealii_dof_tools_h
 #define dealii_dof_tools_h
@@ -22,6 +21,7 @@
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/index_set.h>
 #include <deal.II/base/point.h>
+#include <deal.II/base/types.h>
 
 #include <deal.II/dofs/dof_handler.h>
 
@@ -133,8 +133,9 @@ namespace DoFTools
  * With this vector, one can get, for any given degree of freedom, a unique
  * number among those DoFs that sit on the boundary; or, if your DoF was
  * interior to the domain, the result would be numbers::invalid_dof_index. We
- * need this mapping, for example, to build the @ref GlossMassMatrix "mass
- * matrix" on the boundary (for this, see make_boundary_sparsity_pattern()
+ * need this mapping, for example, to build the
+ * @ref GlossMassMatrix "mass matrix"
+ * on the boundary (for this, see make_boundary_sparsity_pattern()
  * function, the corresponding section below, as well as the MatrixCreator
  * namespace documentation).
  *
@@ -734,7 +735,7 @@ namespace DoFTools
    * global system matrix and right hand side, and to extend the solution
    * vectors from the true degrees of freedom also to the constraint nodes.
    * This function is explained in detail in the
-   * @ref step_6 "step-6"
+   * step-6
    * tutorial program and is used in almost all following programs as well.
    *
    * This function does not clear the AffineConstraints object before use, in
@@ -918,97 +919,9 @@ namespace DoFTools
    * of components of the finite element. This can be used to enforce
    * periodicity in only one variable in a system of equations.
    *
-   * @p face_orientation, @p face_flip and @p face_rotation describe an
-   * orientation that should be applied to @p face_1 prior to matching and
-   * constraining DoFs. This has nothing to do with the actual orientation of
-   * the given faces in their respective cells (which for boundary faces is
-   * always the default) but instead how you want to see periodicity to be
-   * enforced. For example, by using these flags, you can enforce a condition
-   * of the kind $u(0,y)=u(1,1-y)$ (i.e., a Moebius band) or in 3d a twisted
-   * torus. More precisely, these flags match local face DoF indices in the
-   * following manner:
-   *
-   * In 2d: <tt>face_orientation</tt> must always be <tt>true</tt>,
-   * <tt>face_rotation</tt> is always <tt>false</tt>, and face_flip has the
-   * meaning of <tt>line_flip</tt>; this implies e.g. for <tt>Q1</tt>:
-   *
-   * @code
-   *
-   * face_orientation = true, face_flip = false, face_rotation = false:
-   *
-   *     face1:           face2:
-   *
-   *     1                1
-   *     |        <-->    |
-   *     0                0
-   *
-   *     Resulting constraints: 0 <-> 0, 1 <-> 1
-   *
-   *     (Numbers denote local face DoF indices.)
-   *
-   *
-   * face_orientation = true, face_flip = true, face_rotation = false:
-   *
-   *     face1:           face2:
-   *
-   *     0                1
-   *     |        <-->    |
-   *     1                0
-   *
-   *     Resulting constraints: 1 <-> 0, 0 <-> 1
-   * @endcode
-   *
-   * And similarly for the case of Q1 in 3d:
-   *
-   * @code
-   *
-   * face_orientation = true, face_flip = false, face_rotation = false:
-   *
-   *     face1:           face2:
-   *
-   *     2 - 3            2 - 3
-   *     |   |    <-->    |   |
-   *     0 - 1            0 - 1
-   *
-   *     Resulting constraints: 0 <-> 0, 1 <-> 1, 2 <-> 2, 3 <-> 3
-   *
-   *     (Numbers denote local face DoF indices.)
-   *
-   *
-   * face_orientation = false, face_flip = false, face_rotation = false:
-   *
-   *     face1:           face2:
-   *
-   *     1 - 3            2 - 3
-   *     |   |    <-->    |   |
-   *     0 - 2            0 - 1
-   *
-   *     Resulting constraints: 0 <-> 0, 2 <-> 1, 1 <-> 2, 3 <-> 3
-   *
-   *
-   * face_orientation = true, face_flip = true, face_rotation = false:
-   *
-   *     face1:           face2:
-   *
-   *     1 - 0            2 - 3
-   *     |   |    <-->    |   |
-   *     3 - 2            0 - 1
-   *
-   *     Resulting constraints: 3 <-> 0, 2 <-> 1, 1 <-> 2, 0 <-> 3
-   *
-   *
-   * face_orientation = true, face_flip = false, face_rotation = true
-   *
-   *     face1:           face2:
-   *
-   *     0 - 2            2 - 3
-   *     |   |    <-->    |   |
-   *     1 - 3            0 - 1
-   *
-   *     Resulting constraints: 1 <-> 0, 3 <-> 1, 0 <-> 2, 2 <-> 3
-   *
-   * and any combination of that...
-   * @endcode
+   * Here, @p combined_orientation is the relative orientation of @p face_1 with
+   * respect to @p face_2. This is typically computed by
+   * GridTools::orthogonal_equality().
    *
    * Optionally a matrix @p matrix along with a std::vector @p
    * first_vector_components can be specified that describes how DoFs on @p
@@ -1046,10 +959,9 @@ namespace DoFTools
     const FaceIterator                             &face_1,
     const std_cxx20::type_identity_t<FaceIterator> &face_2,
     AffineConstraints<number>                      &constraints,
-    const ComponentMask                            &component_mask   = {},
-    const bool                                      face_orientation = true,
-    const bool                                      face_flip        = false,
-    const bool                                      face_rotation    = false,
+    const ComponentMask                            &component_mask = {},
+    const types::geometric_orientation              combined_orientation =
+      numbers::default_geometric_orientation,
     const FullMatrix<double>        &matrix = FullMatrix<double>(),
     const std::vector<unsigned int> &first_vector_components =
       std::vector<unsigned int>(),
@@ -1130,10 +1042,6 @@ namespace DoFTools
 
 
   /**
-   * This compatibility version of make_periodicity_constraints only works on
-   * grids with cells in
-   * @ref GlossFaceOrientation "standard orientation".
-   *
    * Instead of defining a 'first' and 'second' boundary with the help of two
    * boundary_ids this function defines a 'left' boundary as all faces with
    * local face index <code>2*dimension</code> and boundary indicator @p b_id
@@ -1141,9 +1049,9 @@ namespace DoFTools
    * index <code>2*dimension+1</code> and boundary indicator @p b_id. Faces with
    * coordinates only differing in the @p direction component are identified.
    *
-   * @note This version of make_periodicity_constraints  will not work on
+   * @warning This version of make_periodicity_constraints will not work on
    * meshes with cells not in
-   * @ref GlossFaceOrientation "standard orientation".
+   * @ref GlossCombinedOrientation "the default orientation".
    *
    * @note This function is a convenience wrapper. It internally calls
    * GridTools::collect_periodic_faces() with the supplied parameters and
@@ -1162,6 +1070,47 @@ namespace DoFTools
                                AffineConstraints<number>       &constraints,
                                const ComponentMask &component_mask     = {},
                                const number         periodicity_factor = 1.);
+
+  namespace internal
+  {
+    /**
+     * This function is internally used in make_periodicity_constraints().
+     * Enter constraints for periodicity into the given AffineConstraints
+     * object.
+     *
+     * This function works both on 1) an active mesh
+     * (`level == numbers::invalid_unsigned_int`) and on 2) multigrid levels.
+     *
+     * In the case of an active mesh, this function is called when at least
+     * one of the two face iterators corresponds to an active object
+     * without further children. Furthermore, @p face_1 is supposed to be active.
+     *
+     * The matrix @p transformation maps degrees of freedom from one face
+     * to another. If the DoFs on the two faces are supposed to match exactly,
+     * then the matrix so provided will be the identity matrix. if face 2 is
+     * once refined from face 1, then the matrix needs to be the interpolation
+     * matrix from a face to this particular child
+     *
+     * @note We have to be careful not to accidentally create constraint
+     * cycles when adding periodic constraints: For example, as the
+     * corresponding testcase bits/periodicity_05 demonstrates, we can
+     * occasionally get into trouble if we already have the constraint
+     * x1 == x2 and want to insert x2 == x1. We avoid this by skipping
+     * such "identity constraints" if the opposite constraint already
+     * exists.
+     */
+    template <typename FaceIterator, typename number>
+    void
+    set_periodicity_constraints(
+      const FaceIterator                             &face_1,
+      const std_cxx20::type_identity_t<FaceIterator> &face_2,
+      const FullMatrix<double>                       &transformation,
+      AffineConstraints<number>                      &affine_constraints,
+      const ComponentMask                            &component_mask,
+      const types::geometric_orientation              combined_orientation,
+      const number                                    periodicity_factor,
+      const unsigned int level = numbers::invalid_unsigned_int);
+  } // namespace internal
 
   /**
    * @}
@@ -1207,7 +1156,10 @@ namespace DoFTools
    *   are to be filtered by this function.
    * @param[in] component_mask A mask that states which components you want
    *   to select. The size of this mask must be compatible with the number of
-   *   components in the FiniteElement used by the @p dof_handler. See
+   *   components in the FiniteElement used by the @p dof_handler. A common
+   *   way to create this kind of mask is using extractors for whatever
+   *   vector component you want to extract, and using it with
+   *   FiniteElement::component_mask(). See
    *   @ref GlossComponentMask "the glossary entry on component masks"
    *   for more information.
    * @return An IndexSet object that will contain exactly those entries that
@@ -1416,10 +1368,65 @@ namespace DoFTools
    * This function is used in step-31, step-32, and step-42, for example.
    */
   template <int dim, int spacedim>
-  void
+  std::vector<std::vector<bool>>
   extract_constant_modes(const DoFHandler<dim, spacedim> &dof_handler,
-                         const ComponentMask             &component_mask,
-                         std::vector<std::vector<bool>>  &constant_modes);
+                         const ComponentMask             &component_mask = {});
+
+  /**
+   * Same as above.
+   *
+   * @deprecated
+   */
+  template <int dim, int spacedim>
+  DEAL_II_DEPRECATED_WITH_COMMENT(
+    "Use the other function that returns the constant modes by value, rather than via an argument.")
+  void extract_constant_modes(const DoFHandler<dim, spacedim> &dof_handler,
+                              const ComponentMask             &component_mask,
+                              std::vector<std::vector<bool>>  &constant_modes);
+
+  /**
+   * Same as above but for multigrid levels.
+   */
+  template <int dim, int spacedim>
+  std::vector<std::vector<bool>>
+  extract_level_constant_modes(const unsigned int               level,
+                               const DoFHandler<dim, spacedim> &dof_handler,
+                               const ComponentMask &component_mask = {});
+
+  /**
+   * Same as above.
+   *
+   * @deprecated
+   */
+  template <int dim, int spacedim>
+  DEAL_II_DEPRECATED_WITH_COMMENT(
+    "Use the other function that returns the constant modes by value, rather than via an argument.")
+  void extract_level_constant_modes(
+    const unsigned int               level,
+    const DoFHandler<dim, spacedim> &dof_handler,
+    const ComponentMask             &component_mask,
+    std::vector<std::vector<bool>>  &constant_modes);
+
+  /**
+   * Same as the above but additional to the translational modes also
+   * the rotational modes are added, needed, e.g., to set up AMG for solving
+   * elasticity problems.
+   */
+  template <int dim, int spacedim>
+  std::vector<std::vector<double>>
+  extract_rigid_body_modes(const Mapping<dim, spacedim>    &mapping,
+                           const DoFHandler<dim, spacedim> &dof_handler,
+                           const ComponentMask &component_mask = {});
+
+  /**
+   * Same as above but for multigrid levels.
+   */
+  template <int dim, int spacedim>
+  std::vector<std::vector<double>>
+  extract_level_rigid_body_modes(const unsigned int               level,
+                                 const Mapping<dim, spacedim>    &mapping,
+                                 const DoFHandler<dim, spacedim> &dof_handler,
+                                 const ComponentMask &component_mask = {});
   /** @} */
 
   /**
@@ -1575,7 +1582,7 @@ namespace DoFTools
    * @deprecated Use the previous function instead.
    */
   template <int dim, int spacedim>
-  DEAL_II_DEPRECATED_EARLY void
+  DEAL_II_DEPRECATED void
   extract_locally_active_dofs(const DoFHandler<dim, spacedim> &dof_handler,
                               IndexSet                        &dof_set);
 
@@ -1600,7 +1607,7 @@ namespace DoFTools
    * @deprecated Use the previous function instead.
    */
   template <int dim, int spacedim>
-  DEAL_II_DEPRECATED_EARLY void
+  DEAL_II_DEPRECATED void
   extract_locally_active_level_dofs(
     const DoFHandler<dim, spacedim> &dof_handler,
     IndexSet                        &dof_set,
@@ -1630,7 +1637,7 @@ namespace DoFTools
    * @deprecated Use the previous function instead.
    */
   template <int dim, int spacedim>
-  DEAL_II_DEPRECATED_EARLY void
+  DEAL_II_DEPRECATED void
   extract_locally_relevant_dofs(const DoFHandler<dim, spacedim> &dof_handler,
                                 IndexSet                        &dof_set);
 
@@ -1702,7 +1709,7 @@ namespace DoFTools
    * @deprecated Use the previous function instead.
    */
   template <int dim, int spacedim>
-  DEAL_II_DEPRECATED_EARLY void
+  DEAL_II_DEPRECATED void
   extract_locally_relevant_level_dofs(
     const DoFHandler<dim, spacedim> &dof_handler,
     const unsigned int               level,
@@ -1931,8 +1938,8 @@ namespace DoFTools
    * details of the generated patches. The default settings are those for
    * Arnold-Falk-Winther type smoothers for divergence and curl conforming
    * finite elements with essential boundary conditions. Other applications
-   * are possible, in particular changing <tt>boundary_patches</tt> for non-
-   * essential boundary conditions.
+   * are possible, in particular changing <tt>boundary_patches</tt> for
+   * non-essential boundary conditions.
    *
    * This function returns the <tt>vertex_mapping</tt>,
    * that contains the mapping from the vertex indices to the block indices
@@ -1943,28 +1950,30 @@ namespace DoFTools
    * contains the mapping from the block indices to the corresponding vertex
    * indices.
    *
-   * @arg <tt>block_list</tt>: the SparsityPattern into which the patches will
+   * @param block_list The SparsityPattern into which the patches will
    * be stored.
    *
-   * @arg <tt>dof_handler</tt>: the multilevel dof handler providing the
+   * @param dof_handler The multilevel dof handler providing the
    * topology operated on.
    *
-   * @arg <tt>interior_dofs_only</tt>: for each patch of cells around a
+   * @param level The multigrid level of the DoFHandler on which to operate.
+   *
+   * @param interior_dofs_only for each patch of cells around a
    * vertex, collect only the interior degrees of freedom of the patch and
    * disregard those on the boundary of the patch. This is for instance the
    * setting for smoothers of Arnold-Falk-Winther type.
    *
-   * @arg <tt>boundary_patches</tt>: include patches around vertices at the
+   * @param boundary_patches include patches around vertices at the
    * boundary of the domain. If not, only patches around interior vertices
    * will be generated.
    *
-   * @arg <tt>level_boundary_patches</tt>: same for refinement edges towards
+   * @param level_boundary_patches same for refinement edges towards
    * coarser cells.
    *
-   * @arg <tt>single_cell_patches</tt>: if not true, patches containing a
+   * @param single_cell_patches if not true, patches containing a
    * single cell are eliminated.
    *
-   * @arg <tt>invert_vertex_mapping</tt>: if true, then the return value
+   * @param invert_vertex_mapping if true, then the return value
    * contains one vertex index for each block; if false, then the return value
    * contains one block index or <tt>invalid_unsigned_int</tt> for each vertex.
    */
@@ -2022,21 +2031,23 @@ namespace DoFTools
    * details of the generated patches. The default settings are those for
    * Arnold-Falk-Winther type smoothers for divergence and curl conforming
    * finite elements with essential boundary conditions. Other applications
-   * are possible, in particular changing <tt>boundary_dofs</tt> for non-
-   * essential boundary conditions.
+   * are possible, in particular changing <tt>boundary_dofs</tt> for
+   * non-essential boundary conditions.
    *
-   * @arg <tt>block_list</tt>: the SparsityPattern into which the patches will
+   * @param block_list The SparsityPattern into which the patches will
    * be stored.
    *
-   * @arg <tt>dof_handler</tt>: The multilevel dof handler providing the
+   * @param dof_handler The multilevel dof handler providing the
    * topology operated on.
    *
-   * @arg <tt>interior_dofs_only</tt>: for each patch of cells around a
+   * @param level The multigrid level of the DoFHandler on which to operate.
+   *
+   * @param interior_dofs_only for each patch of cells around a
    * vertex, collect only the interior degrees of freedom of the patch and
    * disregard those on the boundary of the patch. This is for instance the
    * setting for smoothers of Arnold-Falk-Winther type.
    *
-   * @arg <tt>boundary_dofs</tt>: include degrees of freedom, which would have
+   * @param boundary_dofs include degrees of freedom, which would have
    * excluded by <tt>interior_dofs_only</tt>, but are lying on the boundary of
    * the domain, and thus need smoothing. This parameter has no effect if
    * <tt>interior_dofs_only</tt> is false.
@@ -2057,15 +2068,15 @@ namespace DoFTools
    * make_child_patches() and make_vertex_patches(), which may produce an
    * empty patch list.
    *
-   * @arg <tt>block_list</tt>: the SparsityPattern into which the patches will
+   * @param block_list The SparsityPattern into which the patches will
    * be stored.
    *
-   * @arg <tt>dof_handler</tt>: The multilevel dof handler providing the
+   * @param dof_handler The multilevel dof handler providing the
    * topology operated on.
    *
-   * @arg <tt>level</tt> The grid level used for building the list.
+   * @param level The grid level used for building the list.
    *
-   * @arg <tt>interior_dofs_only</tt>: if true, exclude degrees of freedom on
+   * @param interior_dofs_only if true, exclude degrees of freedom on
    * the boundary of the domain.
    */
   template <int dim, int spacedim>
@@ -2103,8 +2114,8 @@ namespace DoFTools
    * components of a nonprimitive vector valued element is collected only in
    * the first component. All other components will have a count of zero.
    *
-   * The additional optional argument @p target_component allows for a re-
-   * sorting and grouping of components. To this end, it contains for each
+   * The additional optional argument @p target_component allows for a
+   * re-sorting and grouping of components. To this end, it contains for each
    * component the component number it shall be counted as. Having the same
    * number entered several times sums up several components as the same. One
    * of the applications of this argument is when you want to form block
@@ -2247,11 +2258,14 @@ namespace DoFTools
    * @ref GlossSupport "glossary entry")
    * for all the degrees of freedom handled by this DoF handler object. This
    * function, of course, only works if the finite element object used by the
-   * DoF handler object actually provides support points, i.e. no edge
-   * elements or the like. Otherwise, an exception is thrown.
+   * DoF handler object actually provides support points; this rules out
+   * "modal" elements in which the shape functions are not defined via point
+   * evaluation at individual node points, but by integrals. In practice, this
+   * function checks the requirement by requiring that the element in question
+   * returns `true` from the FiniteElement::has_support_points().
    *
-   * @pre The given array must have a length of as many elements as there are
-   * degrees of freedom.
+   * @pre The given array `support_points` must have a length of as many
+   * elements as there are degrees of freedom.
    *
    * @note The precondition to this function that the output argument needs to
    * have size equal to the total number of degrees of freedom makes this
@@ -2539,11 +2553,11 @@ namespace DoFTools
    * constraints for degrees of freedom located on the boundary, then this
    * would constitute a conflict. See the
    * @ref constraints
-   * module for handling the case where there are conflicting constraints on
+   * topic for handling the case where there are conflicting constraints on
    * individual degrees of freedom.
    * @param component_mask An optional component mask that restricts the
-   * functionality of this function to a subset of an FESystem. For non-
-   * @ref GlossPrimitive "primitive"
+   * functionality of this function to a subset of an FESystem. For
+   * non-@ref GlossPrimitive "primitive"
    * shape functions, any degree of freedom is affected that belongs to a
    * shape function where at least one of its nonzero components is affected
    * by the component mask (see

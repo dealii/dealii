@@ -1,17 +1,16 @@
-/* ---------------------------------------------------------------------
+/* ------------------------------------------------------------------------
  *
- * Copyright (C) 2007 - 2023 by the deal.II authors
+ * SPDX-License-Identifier: LGPL-2.1-or-later
+ * Copyright (C) 2007 - 2024 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
- * The deal.II library is free software; you can use it, redistribute
- * it, and/or modify it under the terms of the GNU Lesser General
- * Public License as published by the Free Software Foundation; either
- * version 2.1 of the License, or (at your option) any later version.
- * The full text of the license can be found in the file LICENSE.md at
- * the top level directory of deal.II.
+ * Part of the source code is dual licensed under Apache-2.0 WITH
+ * LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+ * governing the source code and code contributions can be found in
+ * LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
  *
- * ---------------------------------------------------------------------
+ * ------------------------------------------------------------------------
  *
  * Authors: Martin Kronbichler, Uppsala University,
  *          Wolfgang Bangerth, Texas A&M University 2007, 2008
@@ -23,7 +22,6 @@
 // The first step, as always, is to include the functionality of these
 // well-known deal.II library files and some C++ header files.
 #include <deal.II/base/quadrature_lib.h>
-#include <deal.II/base/logstream.h>
 #include <deal.II/base/utilities.h>
 
 #include <deal.II/lac/full_matrix.h>
@@ -232,13 +230,19 @@ namespace Step31
     // where the exception was generated.
     //
     // So rather than letting the exception propagate freely up to
-    // <code>main()</code> we realize that there is little that an outer
-    // function can do if the inner solver fails and rather convert the
-    // run-time exception into an assertion that fails and triggers a call to
-    // <code>abort()</code>, allowing us to trace back in a debugger how we
-    // got to the current place.
+    // <code>main()</code>, we acknowledge that in the current context
+    // there is little that an outer function can do if the inner
+    // solver fails. As a consequence, we deal with the situation by
+    // catching the exception and letting the program fail by
+    // triggering an assertion with a `false` condition (which of
+    // course always fails) and that uses the error message associated
+    // with the caught exception (returned by calling `e.what()`) as
+    // error text. In other words, instead of letting the error
+    // message be produced by `main()`, we rather report it here where
+    // we can abort the program preserving information about where the
+    // problem happened.
     template <class MatrixType, class PreconditionerType>
-    class InverseMatrix : public Subscriptor
+    class InverseMatrix : public EnableObserverPointer
     {
     public:
       InverseMatrix(const MatrixType         &m,
@@ -249,8 +253,8 @@ namespace Step31
       void vmult(VectorType &dst, const VectorType &src) const;
 
     private:
-      const SmartPointer<const MatrixType> matrix;
-      const PreconditionerType            &preconditioner;
+      const ObserverPointer<const MatrixType> matrix;
+      const PreconditionerType               &preconditioner;
     };
 
 
@@ -338,7 +342,7 @@ namespace Step31
     // preconditioners in the constructor and that the matrices we use here
     // are built upon Trilinos:
     template <class PreconditionerTypeA, class PreconditionerTypeMp>
-    class BlockSchurPreconditioner : public Subscriptor
+    class BlockSchurPreconditioner : public EnableObserverPointer
     {
     public:
       BlockSchurPreconditioner(
@@ -351,10 +355,10 @@ namespace Step31
                  const TrilinosWrappers::MPI::BlockVector &src) const;
 
     private:
-      const SmartPointer<const TrilinosWrappers::BlockSparseMatrix>
+      const ObserverPointer<const TrilinosWrappers::BlockSparseMatrix>
         stokes_matrix;
-      const SmartPointer<const InverseMatrix<TrilinosWrappers::SparseMatrix,
-                                             PreconditionerTypeMp>>
+      const ObserverPointer<const InverseMatrix<TrilinosWrappers::SparseMatrix,
+                                                PreconditionerTypeMp>>
                                  m_inverse;
       const PreconditionerTypeA &a_preconditioner;
 
@@ -478,7 +482,7 @@ namespace Step31
     double             global_Omega_diameter;
 
     const unsigned int        stokes_degree;
-    FESystem<dim>             stokes_fe;
+    const FESystem<dim>       stokes_fe;
     DoFHandler<dim>           stokes_dof_handler;
     AffineConstraints<double> stokes_constraints;
 
@@ -492,7 +496,7 @@ namespace Step31
 
 
     const unsigned int        temperature_degree;
-    FE_Q<dim>                 temperature_fe;
+    const FE_Q<dim>           temperature_fe;
     DoFHandler<dim>           temperature_dof_handler;
     AffineConstraints<double> temperature_constraints;
 
@@ -669,7 +673,7 @@ namespace Step31
     if (timestep_number != 0)
       {
         double min_temperature = std::numeric_limits<double>::max(),
-               max_temperature = -std::numeric_limits<double>::max();
+               max_temperature = std::numeric_limits<double>::lowest();
 
         for (const auto &cell : temperature_dof_handler.active_cell_iterators())
           {
@@ -695,7 +699,7 @@ namespace Step31
     else
       {
         double min_temperature = std::numeric_limits<double>::max(),
-               max_temperature = -std::numeric_limits<double>::max();
+               max_temperature = std::numeric_limits<double>::lowest();
 
         for (const auto &cell : temperature_dof_handler.active_cell_iterators())
           {
@@ -1120,12 +1124,10 @@ namespace Step31
 
     Amg_preconditioner = std::make_shared<TrilinosWrappers::PreconditionAMG>();
 
-    std::vector<std::vector<bool>>   constant_modes;
-    const FEValuesExtractors::Vector velocity_components(0);
-    DoFTools::extract_constant_modes(stokes_dof_handler,
-                                     stokes_fe.component_mask(
-                                       velocity_components),
-                                     constant_modes);
+    const FEValuesExtractors::Vector     velocity_components(0);
+    const std::vector<std::vector<bool>> constant_modes =
+      DoFTools::extract_constant_modes(
+        stokes_dof_handler, stokes_fe.component_mask(velocity_components));
     TrilinosWrappers::PreconditionAMG::AdditionalData amg_data;
     amg_data.constant_modes = constant_modes;
 
@@ -1393,8 +1395,8 @@ namespace Step31
     temperature_mass_matrix      = 0;
     temperature_stiffness_matrix = 0;
 
-    QGauss<dim>   quadrature_formula(temperature_degree + 2);
-    FEValues<dim> temperature_fe_values(temperature_fe,
+    const QGauss<dim> quadrature_formula(temperature_degree + 2);
+    FEValues<dim>     temperature_fe_values(temperature_fe,
                                         quadrature_formula,
                                         update_values | update_gradients |
                                           update_JxW_values);
@@ -1973,10 +1975,10 @@ namespace Step31
     std::vector<TrilinosWrappers::MPI::Vector> tmp = {
       TrilinosWrappers::MPI::Vector(temperature_solution),
       TrilinosWrappers::MPI::Vector(temperature_solution)};
-    temperature_trans.interpolate(x_temperature, tmp);
+    temperature_trans.interpolate(tmp);
 
-    temperature_solution     = std::move(tmp[0]);
-    old_temperature_solution = std::move(tmp[1]);
+    temperature_solution     = tmp[0];
+    old_temperature_solution = tmp[1];
 
     // After the solution has been transferred we then enforce the constraints
     // on the transferred solution.
@@ -1987,7 +1989,7 @@ namespace Step31
     // we do not need another temporary vector since we just interpolate a
     // single vector. In the end, we have to tell the program that the matrices
     // and preconditioners need to be regenerated, since the mesh has changed.
-    stokes_trans.interpolate(x_stokes, stokes_solution);
+    stokes_trans.interpolate(stokes_solution);
 
     stokes_constraints.distribute(stokes_solution);
 

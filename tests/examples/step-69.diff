@@ -1,0 +1,18 @@
+2400c2400
+<     t_final = 4.;
+---
+>     t_final = 4.0;
+2469c2469
+<     ParameterAcceptor::initialize("step-69.prm");
+---
+>     ParameterAcceptor::initialize("../../../source/step-69/step-69.prm");
+2572c2572
+<     while (t < t_final)
+---
+>     while (t < 0.01)
+2616,2617c2616,2617
+<     computing_timer.print_summary();
+<     pcout << timer_output.str() << std::endl;
+---
+> //    computing_timer.print_summary();
+> //    pcout << timer_output.str() << std::endl;

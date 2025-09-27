@@ -1,17 +1,16 @@
-/* ---------------------------------------------------------------------
+/* ------------------------------------------------------------------------
  *
- * Copyright (C) 2020 - 2023 by the deal.II authors
+ * SPDX-License-Identifier: LGPL-2.1-or-later
+ * Copyright (C) 2020 - 2024 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
- * The deal.II library is free software; you can use it, redistribute
- * it, and/or modify it under the terms of the GNU Lesser General
- * Public License as published by the Free Software Foundation; either
- * version 2.1 of the License, or (at your option) any later version.
- * The full text of the license can be found in the file LICENSE.md at
- * the top level directory of deal.II.
+ * Part of the source code is dual licensed under Apache-2.0 WITH
+ * LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+ * governing the source code and code contributions can be found in
+ * LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
  *
- * ---------------------------------------------------------------------
+ * ------------------------------------------------------------------------
  *
  * Authors: Luca Heltai, Bruno Blais, Rene Gassmoeller, 2020
  */
@@ -53,7 +52,6 @@ namespace LA
 #include <deal.II/base/utilities.h>
 
 #include <deal.II/distributed/grid_refinement.h>
-#include <deal.II/distributed/solution_transfer.h>
 #include <deal.II/distributed/tria.h>
 
 #include <deal.II/dofs/dof_handler.h>
@@ -88,6 +86,7 @@ namespace LA
 #include <deal.II/numerics/data_out.h>
 #include <deal.II/numerics/error_estimator.h>
 #include <deal.II/numerics/vector_tools.h>
+#include <deal.II/numerics/solution_transfer.h>
 
 // These are the only new include files with regard to step-60. In this
 // tutorial, the non-matching coupling between the solid and the fluid is
@@ -996,7 +995,7 @@ namespace Step70
       par.arguments_for_particle_grid);
     particle_insert_tria.refine_global(par.particle_insertion_refinement);
 
-    FE_Q<spacedim>       particles_fe(1);
+    const FE_Q<spacedim> particles_fe(1);
     DoFHandler<spacedim> particles_dof_handler(particle_insert_tria);
     particles_dof_handler.distribute_dofs(particles_fe);
 
@@ -1116,7 +1115,7 @@ namespace Step70
   template <int dim, int spacedim>
   void StokesImmersedProblem<dim, spacedim>::setup_solid_particles()
   {
-    QGauss<dim> quadrature(fluid_fe->degree + 1);
+    const QGauss<dim> quadrature(fluid_fe->degree + 1);
 
     const unsigned int n_properties = 1;
     solid_particle_handler.initialize(fluid_tria,
@@ -1250,7 +1249,7 @@ namespace Step70
     fluid_relevant_dofs[1] = locally_relevant_dofs.get_view(n_u, n_u + n_p);
 
     {
-      constraints.reinit(locally_relevant_dofs);
+      constraints.reinit(fluid_dh.locally_owned_dofs(), locally_relevant_dofs);
 
       const FEValuesExtractors::Vector velocities(0);
       DoFTools::make_hanging_node_constraints(fluid_dh, constraints);
@@ -1263,7 +1262,7 @@ namespace Step70
       constraints.close();
     }
 
-    auto locally_owned_dofs_per_processor =
+    const auto locally_owned_dofs_per_processor =
       Utilities::MPI::all_gather(mpi_communicator,
                                  fluid_dh.locally_owned_dofs());
     {
@@ -1339,8 +1338,8 @@ namespace Step70
 
     TimerOutput::Scope t(computing_timer, "Assemble Stokes terms");
 
-    QGauss<spacedim>   quadrature_formula(fluid_fe->degree + 1);
-    FEValues<spacedim> fe_values(*fluid_fe,
+    const QGauss<spacedim> quadrature_formula(fluid_fe->degree + 1);
+    FEValues<spacedim>     fe_values(*fluid_fe,
                                  quadrature_formula,
                                  update_values | update_gradients |
                                    update_quadrature_points |
@@ -1665,8 +1664,7 @@ namespace Step70
           cell->clear_coarsen_flag();
       }
 
-    parallel::distributed::SolutionTransfer<spacedim, LA::MPI::BlockVector>
-      transfer(fluid_dh);
+    SolutionTransfer<spacedim, LA::MPI::BlockVector> transfer(fluid_dh);
 
     fluid_tria.prepare_coarsening_and_refinement();
     transfer.prepare_for_coarsening_and_refinement(locally_relevant_solution);

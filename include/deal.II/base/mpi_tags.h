@@ -1,22 +1,23 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2019 - 2021 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2019 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 #ifndef dealii_mpi_tags_h
 #define dealii_mpi_tags_h
 
 #include <deal.II/base/config.h>
+
+#include <cstdint>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -41,7 +42,6 @@ namespace Utilities
        * - MPI_Isend, MPI_Irecv
        * - MPI_Probe, MPI_Iprobe
        * - MPI_Comm_create_group, MPI_Intercomm_create,
-       * Utilities::MPI::create_group
        */
       namespace Tags
       {
@@ -148,11 +148,6 @@ namespace Utilities
 
           // GridTools::internal::distributed_compute_point_locations
           distributed_compute_point_locations,
-
-          // AffineConstraints::make_consistent_in_parallel()
-          affine_constraints_make_consistent_in_parallel_0,
-          affine_constraints_make_consistent_in_parallel_1,
-
         };
       } // namespace Tags
     }   // namespace internal

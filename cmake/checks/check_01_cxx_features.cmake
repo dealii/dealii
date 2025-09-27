@@ -1,17 +1,16 @@
-## ---------------------------------------------------------------------
+## ------------------------------------------------------------------------
 ##
-## Copyright (C) 2012 - 2023 by the deal.II authors
+## SPDX-License-Identifier: LGPL-2.1-or-later
+## Copyright (C) 2012 - 2025 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
-## The deal.II library is free software; you can use it, redistribute
-## it, and/or modify it under the terms of the GNU Lesser General
-## Public License as published by the Free Software Foundation; either
-## version 2.1 of the License, or (at your option) any later version.
-## The full text of the license can be found in the file LICENSE.md at
-## the top level directory of deal.II.
+## Part of the source code is dual licensed under Apache-2.0 WITH
+## LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+## governing the source code and code contributions can be found in
+## LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 ##
-## ---------------------------------------------------------------------
+## ------------------------------------------------------------------------
 
 #
 # Check for various C++ language features
@@ -20,6 +19,7 @@
 #
 #   DEAL_II_HAVE_CXX17
 #   DEAL_II_HAVE_CXX20
+#   DEAL_II_HAVE_CXX23
 #
 #   DEAL_II_HAVE_FP_EXCEPTIONS
 #   DEAL_II_HAVE_COMPLEX_OPERATOR_OVERLOADS
@@ -35,7 +35,6 @@
 #                         C++ Version Support:                         #
 #                                                                      #
 ########################################################################
-
 
 #
 # We need compiler flags specified in ${DEAL_II_CXX_FLAGS} for all the
@@ -62,6 +61,7 @@ macro(_test_cxx23_support)
   # Strictly speaking "202100L" indicates support for a preliminary version
   # of the C++23 standard (which will have "202302L" when finalized). gcc-13
   # exports this version number when configured with C++23 support.
+  add_flags(CMAKE_REQUIRED_FLAGS "-Werror")
   CHECK_CXX_SOURCE_COMPILES(
     "
     #include <version>
@@ -74,9 +74,12 @@ macro(_test_cxx23_support)
       static void operator()() {}
     };
 
-    int main() {}
+    int main() {
+      [[assume(2 > 1)]];
+    }
     "
     DEAL_II_HAVE_CXX23_FEATURES)
+  reset_cmake_required()
 
   if(DEAL_II_HAVE_CXX23_FEATURES)
     message(STATUS "C++23 support is enabled.")
@@ -382,9 +385,9 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 if(NOT "${CMAKE_CXX_STANDARD}" STREQUAL "${_cxx_standard}")
   message(FATAL_ERROR
     "\nThe current version of deal.II was configured with CMAKE_CXX_STANDARD "
-    "set to »${CMAKE_CXX_STANDARD}«, but we detected only support for standard "
-    "version »${_cxx_standard}«. Either unset the CMake variable "
-    "CMAKE_CXX_STANDARD, or ensure that it is at most set to »${_cxx_standard}«.\n\n"
+    "set to \"${CMAKE_CXX_STANDARD}\", but we detected only support for standard "
+    "version \"${_cxx_standard}\". Either unset the CMake variable "
+    "CMAKE_CXX_STANDARD, or ensure that it is at most set to \"${_cxx_standard}\".\n\n"
     )
 endif()
 
@@ -409,6 +412,12 @@ else()
   enable_if_supported(_werror_flag "-Werror")
   enable_if_supported(_werror_flag "-Wno-unused-command-line-argument")
 endif()
+
+#
+# We need to reset CMAKE_REQUIRED_* variables again after the above call to
+# enable_if_supported()
+#
+_set_up_cmake_required()
 add_flags(CMAKE_REQUIRED_FLAGS "${_werror_flag}")
 
 unset_if_changed(CHECK_CXX_FEATURES_FLAGS_SAVED
@@ -427,7 +436,7 @@ unset_if_changed(CHECK_CXX_FEATURES_FLAGS_SAVED
 # Check that we can use feenableexcept through the C++11 header file cfenv:
 #
 # The test is a bit more complicated because we also check that no garbage
-# exception is thrown if we convert -std::numeric_limits<double>::max to a
+# exception is thrown if we convert std::numeric_limits<double>::lowest to a
 # string. This sadly happens with some compiler support libraries :-(
 #
 # - Timo Heister, 2015
@@ -442,7 +451,7 @@ set(_snippet
   {
     feenableexcept(FE_DIVBYZERO|FE_INVALID);
     std::ostringstream description;
-    const double lower_bound = -std::numeric_limits<double>::max();
+    const double lower_bound = std::numeric_limits<double>::lowest();
 
     description << lower_bound;
 
@@ -462,8 +471,17 @@ endif()
 
 
 #
-# Check whether the standard library provides operator* overloads for mixed
-# floating point multiplication of complex and real valued numbers.
+# Check whether the standard library provides operator* overloads for
+# mixed floating point multiplication of complex and real valued
+# numbers. The C++ standard does not say that such overloads should
+# exist, and so they shouldn't. In other words, a standards compliant
+# compiler will fail this check.
+#
+# In practice, the absence of these overloads makes it quite difficult
+# to write mixed-precision linear algebra functions. To make this less
+# of a pain, we declare such overloads ourselves (in namespace dealii)
+# unless the compiler already has them (which, as mentioned above, it
+# shouldn't).
 #
 # - Matthias Maier, 2015
 #
@@ -556,7 +574,6 @@ CHECK_CXX_SOURCE_COMPILES(
   #include <cmath>
   using std::cyl_bessel_j;
   using std::cyl_bessel_jf;
-  using std::cyl_bessel_jl;
   int main()
   {
   }
@@ -574,7 +591,6 @@ CHECK_CXX_SOURCE_COMPILES(
   #include <cmath>
   using std::legendre;
   using std::legendref;
-  using std::legendrel;
   int main()
   {
   }

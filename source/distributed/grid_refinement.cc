@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2000 - 2023 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2010 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 
 #include <deal.II/base/utilities.h>
@@ -221,7 +220,7 @@ namespace
     Vector<Number> locally_owned_indicators(n_locally_owned_active_cells(tria));
     get_locally_owned_indicators(tria, criteria, locally_owned_indicators);
 
-    MPI_Comm mpi_communicator = tria.get_communicator();
+    MPI_Comm mpi_communicator = tria.get_mpi_communicator();
 
     // figure out the global max and min of the indicators. we don't need it
     // here, but it's a collective communication call
@@ -376,7 +375,7 @@ namespace internal
               }
             while (true);
 
-            Assert(false, ExcInternalError());
+            DEAL_II_ASSERT_UNREACHABLE();
             return -1;
           }
         } // namespace RefineAndCoarsenFixedNumber
@@ -482,7 +481,7 @@ namespace internal
               }
             while (true);
 
-            Assert(false, ExcInternalError());
+            DEAL_II_ASSERT_UNREACHABLE();
             return -1;
           }
         } // namespace RefineAndCoarsenFixedFraction
@@ -533,7 +532,7 @@ namespace parallel
           n_locally_owned_active_cells(tria));
         get_locally_owned_indicators(tria, criteria, locally_owned_indicators);
 
-        MPI_Comm mpi_communicator = tria.get_communicator();
+        MPI_Comm mpi_communicator = tria.get_mpi_communicator();
 
         // figure out the global max and min of the indicators. we don't need it
         // here, but it's a collective communication call
@@ -595,7 +594,7 @@ namespace parallel
 
         switch (norm_type)
           {
-            case VectorTools::NormType::L1_norm:
+            case VectorTools::L1_norm:
               // evaluate norms on subsets and compare them as
               //   c_0 + c_1 + ... < fraction * l1-norm(c)
               refine_and_coarsen_fixed_fraction_via_l1_norm(
@@ -605,7 +604,7 @@ namespace parallel
                 bottom_fraction_of_error);
               break;
 
-            case VectorTools::NormType::L2_norm:
+            case VectorTools::L2_norm:
               {
                 // we do not want to evaluate norms on subsets as:
                 //   sqrt(c_0^2 + c_1^2 + ...) < fraction * l2-norm(c)
@@ -628,7 +627,7 @@ namespace parallel
               break;
 
             default:
-              Assert(false, ExcNotImplemented());
+              DEAL_II_NOT_IMPLEMENTED();
               break;
           }
       }
@@ -638,7 +637,7 @@ namespace parallel
 
 
 // explicit instantiations
-#  include "grid_refinement.inst"
+#  include "distributed/grid_refinement.inst"
 
 DEAL_II_NAMESPACE_CLOSE
 

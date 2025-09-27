@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2023 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2023 - 2024 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 #ifndef dealii_lac_orthogonalization_h
 #define dealii_lac_orthogonalization_h
@@ -40,7 +39,21 @@ namespace LinearAlgebra
      * is less stable in terms of roundoff error propagation, requiring
      * additional re-orthogonalization steps more frequently.
      */
-    classical_gram_schmidt
+    classical_gram_schmidt,
+    /**
+     * Use classical Gram-Schmidt algorithm with two orthogonalization
+     * iterations and delayed orthogonalization using the algorithm described
+     * in @cite Bielich2022. This approach works on multi-vectors with a
+     * single global reduction (of multiple elements) and is more efficient
+     * than the modified Gram-Schmidt algorithm. At the same time, it
+     * unconditionally performs the second orthogonalization step, making it
+     * more stable than the classical Gram-Schmidt variant. For deal.II's own
+     * vectors, there is no additional cost compared to the classical
+     * Gram-Schmidt algorithm, because the second orthogonalization step is
+     * done on cached data. For these beneficial reasons, this is the default
+     * algorithm in the SolverGMRES class.
+     */
+    delayed_classical_gram_schmidt
   };
 } // namespace LinearAlgebra
 

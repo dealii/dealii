@@ -44,16 +44,16 @@ Cycle 5
 We show the solutions on the initial mesh, the mesh after two
 and after five adaptive refinement steps.
 
-<img src="https://www.dealii.org/images/steps/developer/step-12.sol-0.png" alt="">
-<img src="https://www.dealii.org/images/steps/developer/step-12.sol-2.png" alt="">
-<img src="https://www.dealii.org/images/steps/developer/step-12.sol-5.png" alt="">
+<img src="https://dealii.org/images/steps/developer/step-12.sol-0.png" alt="">
+<img src="https://dealii.org/images/steps/developer/step-12.sol-2.png" alt="">
+<img src="https://dealii.org/images/steps/developer/step-12.sol-5.png" alt="">
 
 And finally we show a plot of a 3d computation.
 
-<img src="https://www.dealii.org/images/steps/developer/step-12.sol-5-3d.png" alt="">
+<img src="https://dealii.org/images/steps/developer/step-12.sol-5-3d.png" alt="">
 
 
-<a name="dg-vs-cg"></a>
+<a name="step-12-dg-vs-cg"></a>
 <h3>Why use discontinuous elements</h3>
 
 In this program we have used discontinuous elements. It is a legitimate
@@ -79,13 +79,13 @@ refinement, results look much different when using a continuous element:
       0 &nbsp;
     </td>
     <td valign="top">
-      <img src="https://www.dealii.org/images/steps/developer/step-12.cg.sol-0.png" alt="">
+      <img src="https://dealii.org/images/steps/developer/step-12.cg.sol-0.png" alt="">
     </td>
     <td valign="top">
       1 &nbsp;
     </td>
     <td valign="top">
-      <img src="https://www.dealii.org/images/steps/developer/step-12.cg.sol-1.png" alt="">
+      <img src="https://dealii.org/images/steps/developer/step-12.cg.sol-1.png" alt="">
     </td>
   </tr>
   <tr>
@@ -93,13 +93,13 @@ refinement, results look much different when using a continuous element:
       2 &nbsp;
     </td>
     <td valign="top">
-      <img src="https://www.dealii.org/images/steps/developer/step-12.cg.sol-2.png" alt="">
+      <img src="https://dealii.org/images/steps/developer/step-12.cg.sol-2.png" alt="">
     </td>
     <td valign="top">
       3 &nbsp;
     </td>
     <td valign="top">
-      <img src="https://www.dealii.org/images/steps/developer/step-12.cg.sol-3.png" alt="">
+      <img src="https://dealii.org/images/steps/developer/step-12.cg.sol-3.png" alt="">
     </td>
   </tr>
   <tr>
@@ -107,13 +107,13 @@ refinement, results look much different when using a continuous element:
       4 &nbsp;
     </td>
     <td valign="top">
-      <img src="https://www.dealii.org/images/steps/developer/step-12.cg.sol-4.png" alt="">
+      <img src="https://dealii.org/images/steps/developer/step-12.cg.sol-4.png" alt="">
     </td>
     <td valign="top">
       5 &nbsp;
     </td>
     <td valign="top">
-      <img src="https://www.dealii.org/images/steps/developer/step-12.cg.sol-5.png" alt="">
+      <img src="https://dealii.org/images/steps/developer/step-12.cg.sol-5.png" alt="">
     </td>
   </tr>
 </table>
@@ -131,7 +131,7 @@ take a look at step-31.
 
 
 
-<a name="extensions"></a>
+<a name="step-12-extensions"></a>
 <h3>Possibilities for extensions</h3>
 
 Given that the exact solution is known in this case, one interesting

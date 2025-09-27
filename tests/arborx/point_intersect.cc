@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2021 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2021 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 
 // Check ArborX wrapper: intersection of points with bounding boxes
@@ -45,7 +44,11 @@ test_1d()
   query_points.emplace_back(2.6);
 
 
-  ArborXWrappers::BVH                     bvh(bounding_boxes);
+#if ARBORX_VERSION_MAJOR < 2
+  ArborXWrappers::BVH bvh(bounding_boxes);
+#else
+  ArborXWrappers::BVH<BoundingBox<1>> bvh(bounding_boxes);
+#endif
   ArborXWrappers::PointIntersectPredicate pt_intersect(query_points);
   auto             indices_offset = bvh.query(pt_intersect);
   std::vector<int> indices        = indices_offset.first;
@@ -113,7 +116,11 @@ test_2d()
   query_points.emplace_back(2.6, 2.6);
 
 
-  ArborXWrappers::BVH                     bvh(bounding_boxes);
+#if ARBORX_VERSION_MAJOR < 2
+  ArborXWrappers::BVH bvh(bounding_boxes);
+#else
+  ArborXWrappers::BVH<BoundingBox<2>> bvh(bounding_boxes);
+#endif
   ArborXWrappers::PointIntersectPredicate pt_intersect(query_points);
   auto             indices_offset = bvh.query(pt_intersect);
   std::vector<int> indices        = indices_offset.first;
@@ -188,7 +195,11 @@ test_3d()
   query_points.emplace_back(2.6, 2.6, 2.6);
 
 
-  ArborXWrappers::BVH                     bvh(bounding_boxes);
+#if ARBORX_VERSION_MAJOR < 2
+  ArborXWrappers::BVH bvh(bounding_boxes);
+#else
+  ArborXWrappers::BVH<BoundingBox<3>> bvh(bounding_boxes);
+#endif
   ArborXWrappers::PointIntersectPredicate pt_intersect(query_points);
   auto             indices_offset = bvh.query(pt_intersect);
   std::vector<int> indices        = indices_offset.first;

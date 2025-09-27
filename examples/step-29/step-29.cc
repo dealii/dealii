@@ -1,17 +1,16 @@
-/* ---------------------------------------------------------------------
+/* ------------------------------------------------------------------------
  *
- * Copyright (C) 2007 - 2023 by the deal.II authors
+ * SPDX-License-Identifier: LGPL-2.1-or-later
+ * Copyright (C) 2007 - 2024 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
- * The deal.II library is free software; you can use it, redistribute
- * it, and/or modify it under the terms of the GNU Lesser General
- * Public License as published by the Free Software Foundation; either
- * version 2.1 of the License, or (at your option) any later version.
- * The full text of the license can be found in the file LICENSE.md at
- * the top level directory of deal.II.
+ * Part of the source code is dual licensed under Apache-2.0 WITH
+ * LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+ * governing the source code and code contributions can be found in
+ * LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
  *
- * ---------------------------------------------------------------------
+ * ------------------------------------------------------------------------
  *
  * Author: Moritz Allmaras, Texas A&M University, 2007
  */
@@ -23,7 +22,6 @@
 
 #include <deal.II/base/quadrature_lib.h>
 #include <deal.II/base/function.h>
-#include <deal.II/base/logstream.h>
 
 #include <deal.II/lac/vector.h>
 #include <deal.II/lac/full_matrix.h>
@@ -125,7 +123,7 @@ namespace Step29
   // <code>declare_parameters</code> that declares all the necessary
   // parameters and a <code>read_parameters</code> function that is called
   // from outside to initiate the parameter reading process.
-  class ParameterReader : public Subscriptor
+  class ParameterReader : public EnableObserverPointer
   {
   public:
     ParameterReader(ParameterHandler &);
@@ -373,9 +371,9 @@ namespace Step29
 
     ParameterHandler &prm;
 
-    Triangulation<dim> triangulation;
-    DoFHandler<dim>    dof_handler;
-    FESystem<dim>      fe;
+    Triangulation<dim>  triangulation;
+    DoFHandler<dim>     dof_handler;
+    const FESystem<dim> fe;
 
     SparsityPattern      sparsity_pattern;
     SparseMatrix<double> system_matrix;
@@ -530,8 +528,8 @@ namespace Step29
     // used. Since our bilinear form involves boundary integrals on
     // $\Gamma_2$, we also need a quadrature rule for surface integration on
     // the faces, which are $dim-1$ dimensional:
-    QGauss<dim>     quadrature_formula(fe.degree + 1);
-    QGauss<dim - 1> face_quadrature_formula(fe.degree + 1);
+    const QGauss<dim>     quadrature_formula(fe.degree + 1);
+    const QGauss<dim - 1> face_quadrature_formula(fe.degree + 1);
 
     const unsigned int n_q_points      = quadrature_formula.size(),
                        n_face_q_points = face_quadrature_formula.size(),
@@ -600,7 +598,7 @@ namespace Step29
                 // but this information is not relevant here. If you want to
                 // know more about this function and the underlying scheme
                 // behind primitive vector valued elements, take a look at
-                // step-8 or the @ref vector_valued module, where these topics
+                // step-8 or the @ref vector_valued topic, where these topics
                 // are explained in depth.
                 if (fe.system_to_component_index(i).first ==
                     fe.system_to_component_index(j).first)
@@ -739,7 +737,7 @@ namespace Step29
   // symmetric nor definite, and so it is not quite obvious how to come up
   // with an iterative solver and a preconditioner that do a good job on this
   // matrix. (For more on this topic, see also the
-  // <a href="#extensions">Possibilities for extensions</a> section below.)
+  // @ref step_29-Extensions "Possibilities for extensions" section below.)
   // We chose instead to go a different way and solve the linear
   // system with the sparse LU decomposition provided by UMFPACK. This is
   // often a good first choice for 2d problems and works reasonably well even

@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2019 - 2023 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2019 - 2024 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE at
-// the top level of the deal.II distribution.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 
 // Check that symbol substitution works for tensors
@@ -103,11 +102,20 @@ test_tensor()
   using Tensor_SD_number_t = Tensor<rank, dim, SD_number_t>;
   using Tensor_t           = Tensor<rank, dim, double>;
 
+  // Fill two tensors with ones and twos, respectively.
   Tensor_t t_a, t_b;
-  for (auto it = t_a.begin_raw(); it != t_a.end_raw(); ++it)
-    *it = 1.0;
-  for (auto it = t_b.begin_raw(); it != t_b.end_raw(); ++it)
-    *it = 2.0;
+  if constexpr (rank > 0)
+    {
+      for (unsigned int i = 0; i < Tensor_t::n_independent_components; ++i)
+        t_a[Tensor_t::unrolled_to_component_indices(i)] = 1.0;
+      for (unsigned int i = 0; i < Tensor_t::n_independent_components; ++i)
+        t_b[Tensor_t::unrolled_to_component_indices(i)] = 2.0;
+    }
+  else
+    {
+      t_a = 1.0;
+      t_b = 2.0;
+    }
 
   const Tensor_SD_number_t symb_t_a =
     SD::make_tensor_of_symbols<rank, dim>("a");
@@ -128,10 +136,29 @@ test_symmetric_tensor()
   using Tensor_t           = SymmetricTensor<rank, dim, double>;
 
   Tensor_t t_a, t_b;
-  for (auto it = t_a.begin_raw(); it != t_a.end_raw(); ++it)
-    *it = 1.0;
-  for (auto it = t_b.begin_raw(); it != t_b.end_raw(); ++it)
-    *it = 2.0;
+
+  static_assert(rank == 2 || rank == 4);
+
+  if constexpr (rank == 2)
+    {
+      for (unsigned int i = 0; i < dim; ++i)
+        for (unsigned int j = 0; j < dim; ++j)
+          {
+            t_a({i, j}) = 1.0;
+            t_b({i, j}) = 2.0;
+          }
+    }
+  else
+    {
+      for (unsigned int i = 0; i < dim; ++i)
+        for (unsigned int j = 0; j < dim; ++j)
+          for (unsigned int k = 0; k < dim; ++k)
+            for (unsigned int l = 0; l < dim; ++l)
+              {
+                t_a({i, j, k, l}) = 1.0;
+                t_b({i, j, k, l}) = 2.0;
+              }
+    }
 
   const Tensor_SD_number_t symb_t_a =
     SD::make_symmetric_tensor_of_symbols<rank, dim>("a");

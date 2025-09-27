@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 1999 - 2023 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 1999 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 #ifndef dealii_data_out_dof_data_templates_h
 #define dealii_data_out_dof_data_templates_h
@@ -44,6 +43,7 @@
 #include <deal.II/hp/q_collection.h>
 
 #include <deal.II/lac/block_vector_base.h>
+#include <deal.II/lac/la_parallel_block_vector.h>
 #include <deal.II/lac/la_parallel_vector.h>
 #include <deal.II/lac/read_write_vector.h>
 #include <deal.II/lac/vector.h>
@@ -93,11 +93,9 @@ namespace internal
      */
     template <int dim>
     inline std::vector<Point<dim>>
-    generate_simplex_evaluation_points(const unsigned int n_subdivisions)
+    generate_simplex_evaluation_points(const unsigned int /*n_subdivisions*/)
     {
-      (void)n_subdivisions;
-
-      Assert(false, ExcNotImplemented());
+      DEAL_II_NOT_IMPLEMENTED();
 
       return {};
     }
@@ -353,7 +351,7 @@ namespace internal
                       else if (reference_cell == ReferenceCells::Pyramid)
                         quadrature.push_back(*quadrature_pyramid);
                       else
-                        Assert(false, ExcNotImplemented());
+                        DEAL_II_NOT_IMPLEMENTED();
                     }
 
                   x_fe_values[i] =
@@ -693,7 +691,7 @@ namespace internal
             return value.imag();
 
           default:
-            Assert(false, ExcInternalError());
+            DEAL_II_ASSERT_UNREACHABLE();
         }
 
       return numbers::signaling_nan<double>();
@@ -791,7 +789,7 @@ namespace internal
 
 
 
-    namespace
+    namespace CreateVectors
     {
       /**
        * Copy the data from an arbitrary non-block vector to a
@@ -803,15 +801,33 @@ namespace internal
         const VectorType                           &src,
         LinearAlgebra::distributed::Vector<Number> &dst)
       {
-        LinearAlgebra::ReadWriteVector<typename VectorType::value_type> temp;
-        temp.reinit(src.locally_owned_elements());
-        temp.import_elements(src, VectorOperation::insert);
+        // If source and destination vector have the same underlying scalar,
+        // we can directly import elements by using only one temporary vector:
+        if constexpr (std::is_same_v<typename VectorType::value_type, Number>)
+          {
+            LinearAlgebra::ReadWriteVector<typename VectorType::value_type>
+              temp;
+            temp.reinit(src.locally_owned_elements());
+            temp.import_elements(src, VectorOperation::insert);
 
-        LinearAlgebra::ReadWriteVector<Number> temp2;
-        temp2.reinit(temp, true);
-        temp2 = temp;
+            dst.import_elements(temp, VectorOperation::insert);
+          }
+        else
+          // The source and destination vector have different scalar types. We
+          // need to split the parallel import and local copy operations into
+          // two phases
+          {
+            LinearAlgebra::ReadWriteVector<typename VectorType::value_type>
+              temp;
+            temp.reinit(src.locally_owned_elements());
+            temp.import_elements(src, VectorOperation::insert);
 
-        dst.import_elements(temp2, VectorOperation::insert);
+            LinearAlgebra::ReadWriteVector<Number> temp2;
+            temp2.reinit(temp, true);
+            temp2 = temp;
+
+            dst.import_elements(temp2, VectorOperation::insert);
+          }
       }
 
 #ifdef DEAL_II_WITH_TRILINOS
@@ -820,6 +836,21 @@ namespace internal
       copy_locally_owned_data_from(
         const TrilinosWrappers::MPI::Vector        &src,
         LinearAlgebra::distributed::Vector<Number> &dst)
+      {
+        // ReadWriteVector does not work for ghosted
+        // TrilinosWrappers::MPI::Vector objects. Fall back to copy the
+        // entries manually.
+        for (const auto i : dst.locally_owned_elements())
+          dst[i] = src[i];
+      }
+#endif
+
+#ifdef DEAL_II_TRILINOS_WITH_TPETRA
+      template <typename Number, typename MemorySpace>
+      void
+      copy_locally_owned_data_from(
+        const LinearAlgebra::TpetraWrappers::Vector<Number, MemorySpace> &src,
+        LinearAlgebra::distributed::Vector<Number>                       &dst)
       {
         // ReadWriteVector does not work for ghosted
         // TrilinosWrappers::MPI::Vector objects. Fall back to copy the
@@ -888,7 +919,7 @@ namespace internal
 
             dst.block(b).reinit(locally_owned_dofs_b[b],
                                 locally_relevant_dofs_b[b],
-                                dof_handler.get_communicator());
+                                dof_handler.get_mpi_communicator());
             copy_locally_owned_data_from(src.block(b), dst.block(b));
           }
 
@@ -934,7 +965,7 @@ namespace internal
 
         dst.block(0).reinit(locally_owned_dofs,
                             locally_relevant_dofs,
-                            dof_handler.get_communicator());
+                            dof_handler.get_mpi_communicator());
         copy_locally_owned_data_from(src, dst.block(0));
 
         dst.collect_sizes();
@@ -985,7 +1016,7 @@ namespace internal
 
         dst.update_ghost_values();
       }
-    } // namespace
+    } // namespace CreateVectors
 
 
 
@@ -1136,11 +1167,11 @@ namespace internal
       : DataEntryBase<dim, spacedim>(dofs, names, data_component_interpretation)
     {
       if (actual_type == DataVectorType::type_dof_data)
-        create_dof_vector(*dofs, *data, vector);
+        CreateVectors::create_dof_vector(*dofs, *data, vector);
       else if (actual_type == DataVectorType::type_cell_data)
-        create_cell_vector(*data, vector);
+        CreateVectors::create_cell_vector(*data, vector);
       else
-        Assert(false, ExcInternalError());
+        DEAL_II_ASSERT_UNREACHABLE();
     }
 
 
@@ -1153,7 +1184,7 @@ namespace internal
       const DataPostprocessor<spacedim> *data_postprocessor)
       : DataEntryBase<dim, spacedim>(dofs, data_postprocessor)
     {
-      create_dof_vector(*dofs, *data, vector);
+      CreateVectors::create_dof_vector(*dofs, *data, vector);
     }
 
 
@@ -1465,7 +1496,10 @@ namespace internal
 
         for (unsigned int l = vectors->min_level(); l <= vectors->max_level();
              ++l)
-          create_dof_vector(*dofs, (*vectors)[l], this->vectors[l], l);
+          CreateVectors::create_dof_vector(*dofs,
+                                           (*vectors)[l],
+                                           this->vectors[l],
+                                           l);
       }
 
       virtual double
@@ -1499,7 +1533,7 @@ namespace internal
         const ComponentExtractor /*extract_component*/,
         std::vector<Tensor<1, spacedim>> & /*patch_gradients*/) const override
       {
-        Assert(false, ExcNotImplemented());
+        DEAL_II_NOT_IMPLEMENTED();
       }
 
       /**
@@ -1514,7 +1548,7 @@ namespace internal
         std::vector<std::vector<Tensor<1, spacedim>>>
           & /*patch_gradients_system*/) const override
       {
-        Assert(false, ExcNotImplemented());
+        DEAL_II_NOT_IMPLEMENTED();
       }
 
 
@@ -1528,7 +1562,7 @@ namespace internal
         const ComponentExtractor /*extract_component*/,
         std::vector<Tensor<2, spacedim>> & /*patch_hessians*/) const override
       {
-        Assert(false, ExcNotImplemented());
+        DEAL_II_NOT_IMPLEMENTED();
       }
 
       /**
@@ -1543,7 +1577,7 @@ namespace internal
         std::vector<std::vector<Tensor<2, spacedim>>>
           & /*patch_hessians_system*/) const override
       {
-        Assert(false, ExcNotImplemented());
+        DEAL_II_NOT_IMPLEMENTED();
       }
 
       /**
@@ -1600,13 +1634,11 @@ namespace internal
     template <int dim, int spacedim, typename ScalarType>
     double
     MGDataEntry<dim, spacedim, ScalarType>::get_cell_data_value(
-      const unsigned int       cell_number,
-      const ComponentExtractor extract_component) const
+      const unsigned int /*cell_number*/,
+      const ComponentExtractor /*extract_component*/) const
     {
-      Assert(false, ExcNotImplemented());
+      DEAL_II_NOT_IMPLEMENTED();
 
-      (void)cell_number;
-      (void)extract_component;
       return 0.0;
     }
 
@@ -1724,10 +1756,10 @@ DataOut_DoFData<dim, patch_dim, spacedim, patch_spacedim>::attach_dof_handler(
          Exceptions::DataOutImplementation::ExcOldDataStillPresent());
 
   triangulation =
-    SmartPointer<const Triangulation<dim, spacedim>>(&d.get_triangulation(),
-                                                     typeid(*this).name());
+    ObserverPointer<const Triangulation<dim, spacedim>>(&d.get_triangulation(),
+                                                        typeid(*this).name());
   dofs =
-    SmartPointer<const DoFHandler<dim, spacedim>>(&d, typeid(*this).name());
+    ObserverPointer<const DoFHandler<dim, spacedim>>(&d, typeid(*this).name());
 }
 
 
@@ -1743,8 +1775,8 @@ DataOut_DoFData<dim, patch_dim, spacedim, patch_spacedim>::attach_triangulation(
          Exceptions::DataOutImplementation::ExcOldDataStillPresent());
 
   triangulation =
-    SmartPointer<const Triangulation<dim, spacedim>>(&tria,
-                                                     typeid(*this).name());
+    ObserverPointer<const Triangulation<dim, spacedim>>(&tria,
+                                                        typeid(*this).name());
 }
 
 
@@ -1769,7 +1801,7 @@ DataOut_DoFData<dim, patch_dim, spacedim, patch_spacedim>::add_data_vector(
     }
   else
     {
-      triangulation = SmartPointer<const Triangulation<dim, spacedim>>(
+      triangulation = ObserverPointer<const Triangulation<dim, spacedim>>(
         &dof_handler.get_triangulation(), typeid(*this).name());
     }
 
@@ -1809,7 +1841,7 @@ DataOut_DoFData<dim, patch_dim, spacedim, patch_spacedim>::
   if (triangulation == nullptr)
     {
       Assert(dof_handler != nullptr, ExcInternalError());
-      triangulation = SmartPointer<const Triangulation<dim, spacedim>>(
+      triangulation = ObserverPointer<const Triangulation<dim, spacedim>>(
         &dof_handler->get_triangulation(), typeid(*this).name());
     }
 
@@ -1893,7 +1925,7 @@ DataOut_DoFData<dim, patch_dim, spacedim, patch_spacedim>::
                  deduced_names.size(), dof_handler->get_fe(0).n_components()));
         break;
       default:
-        Assert(false, ExcInternalError());
+        DEAL_II_ASSERT_UNREACHABLE();
     }
 
   const auto &data_component_interpretation =
@@ -1949,7 +1981,7 @@ DataOut_DoFData<dim, patch_dim, spacedim, patch_spacedim>::add_mg_data_vector(
     &data_component_interpretation_)
 {
   if (triangulation == nullptr)
-    triangulation = SmartPointer<const Triangulation<dim, spacedim>>(
+    triangulation = ObserverPointer<const Triangulation<dim, spacedim>>(
       &dof_handler.get_triangulation(), typeid(*this).name());
 
   Assert(&dof_handler.get_triangulation() == triangulation,
@@ -2132,7 +2164,7 @@ DataOut_DoFData<dim, patch_dim, spacedim, patch_spacedim>::get_dataset_names()
                   }
 
                 default:
-                  Assert(false, ExcInternalError());
+                  DEAL_II_ASSERT_UNREACHABLE();
               }
           }
       }
@@ -2342,7 +2374,7 @@ DataOut_DoFData<dim, patch_dim, spacedim, patch_spacedim>::
             }
 
           default:
-            Assert(false, ExcNotImplemented());
+            DEAL_II_NOT_IMPLEMENTED();
         }
 
   // note that we do not have to traverse the list of cell data here because
@@ -2421,7 +2453,7 @@ DataOut_DoFData<dim, patch_dim, spacedim, patch_spacedim>::get_fes() const
               std::make_shared<dealii::hp::FECollection<dim, spacedim>>(
                 FE_PyramidDGP<dim, spacedim>(1)));
           else
-            Assert(false, ExcNotImplemented());
+            DEAL_II_NOT_IMPLEMENTED();
         }
     }
   return finite_elements;

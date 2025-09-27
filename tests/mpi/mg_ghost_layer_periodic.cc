@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2020 - 2023 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2020 - 2024 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 // test level subdomain ids for periodic boundary conditions
 
@@ -39,9 +38,9 @@ test()
   for (const auto &cell : tria.cell_iterators())
     for (const unsigned int face_index : GeometryInfo<dim>::face_indices())
       {
-        if (std::abs(cell->face(face_index)->center()(face_index / 2)) < 1e-12)
+        if (std::abs(cell->face(face_index)->center()[face_index / 2]) < 1e-12)
           cell->face(face_index)->set_all_boundary_ids(face_index);
-        if (std::abs(cell->face(face_index)->center()(face_index / 2) - 1.) <
+        if (std::abs(cell->face(face_index)->center()[face_index / 2] - 1.) <
             1e-12)
           cell->face(face_index)->set_all_boundary_ids(face_index);
       }
@@ -50,11 +49,8 @@ test()
     GridTools::PeriodicFacePair<typename Triangulation<dim>::cell_iterator>>
     periodic_faces;
   for (unsigned int d = 0; d < dim; ++d)
-    GridTools::collect_periodic_faces(static_cast<Triangulation<dim> &>(tria),
-                                      2 * d,
-                                      2 * d + 1,
-                                      d,
-                                      periodic_faces);
+    GridTools::collect_periodic_faces(
+      tria, 2 * d, 2 * d + 1, d, periodic_faces);
 
   tria.add_periodicity(periodic_faces);
 

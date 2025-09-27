@@ -1,25 +1,24 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2006 - 2015 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2006 - 2024 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 
 /**
  * @defgroup memory Memory handling
  *
  * This group has some basic classes and namespaces for memory
- * handling. The Subscriptor and SmartPointer classes are used for
- * counted memory handling, i.e. whenever a SmartPointer is set to
+ * handling. The EnableObserverPointer and ObserverPointer classes are used for
+ * counted memory handling, i.e. whenever a ObserverPointer is set to
  * point to an object, it increases a counter in that object; when the
  * pointer is set to point elsewhere, it decreases it again. This way,
  * one always knows how many users of an object there still are. While

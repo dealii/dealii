@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2023 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2018 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 #include <deal.II/lac/affine_constraints.h>
 #include <deal.II/lac/affine_constraints.templates.h>
@@ -19,7 +18,7 @@
 
 DEAL_II_NAMESPACE_OPEN
 
-#include "affine_constraints.inst"
+#include "lac/affine_constraints.inst"
 
 /*
  * Note: You probably do not want to add your custom instantiation down
@@ -61,7 +60,7 @@ DEAL_II_NAMESPACE_OPEN
       MatrixType &,                                           \
       VectorType &,                                           \
       bool,                                                   \
-      std::integral_constant<bool, false>) const
+      std::bool_constant<false>) const
 
 #define INSTANTIATE_DLTG_BLOCK_VECTORMATRIX(MatrixType, VectorType) \
   template void AffineConstraints<MatrixType::value_type>::         \
@@ -72,7 +71,7 @@ DEAL_II_NAMESPACE_OPEN
       MatrixType &,                                                 \
       VectorType &,                                                 \
       bool,                                                         \
-      std::integral_constant<bool, true>) const
+      std::bool_constant<true>) const
 
 #define INSTANTIATE_DLTG_MATRIX(MatrixType)                              \
   template void                                                          \
@@ -144,8 +143,14 @@ INSTANTIATE_DLTG_MATRIX(TrilinosWrappers::BlockSparseMatrix);
 // FIXME: This mixed variant is needed for multigrid and matrix free.
 template void
 dealii::AffineConstraints<double>::distribute<
-  dealii::LinearAlgebra::TpetraWrappers::Vector<float>>(
-  dealii::LinearAlgebra::TpetraWrappers::Vector<float> &) const;
+  dealii::LinearAlgebra::TpetraWrappers::Vector<float, MemorySpace::Host>>(
+  dealii::LinearAlgebra::TpetraWrappers::Vector<float, MemorySpace::Host> &)
+  const;
+template void
+dealii::AffineConstraints<double>::distribute<
+  dealii::LinearAlgebra::TpetraWrappers::Vector<float, MemorySpace::Default>>(
+  dealii::LinearAlgebra::TpetraWrappers::Vector<float, MemorySpace::Default> &)
+  const;
 #    endif
 #  endif
 #endif

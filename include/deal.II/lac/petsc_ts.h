@@ -1,17 +1,16 @@
-//-----------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-//    Copyright (C) 2023 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2023 - 2024 by the deal.II authors
 //
-//    This file is part of the deal.II library.
+// This file is part of the deal.II library.
 //
-//    The deal.II library is free software; you can use it, redistribute
-//    it, and/or modify it under the terms of the GNU Lesser General
-//    Public License as published by the Free Software Foundation; either
-//    version 2.1 of the License, or (at your option) any later version.
-//    The full text of the license can be found in the file LICENSE.md at
-//    the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-//---------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 #ifndef dealii_petsc_ts_h
 #define dealii_petsc_ts_h
@@ -20,8 +19,8 @@
 
 #ifdef DEAL_II_WITH_PETSC
 #  include <deal.II/base/mpi.h>
+#  include <deal.II/base/observer_pointer.h>
 #  include <deal.II/base/parameter_handler.h>
-#  include <deal.II/base/smartpointer.h>
 
 #  include <deal.II/lac/petsc_matrix_base.h>
 #  include <deal.II/lac/petsc_precondition.h>
@@ -64,6 +63,7 @@ namespace PETScWrappers
      * @param initial_step_size Initial step size.
      * @param max_steps Maximum number of steps allowed.
      * @param match_step Whether or not to exactly stop at final time or step over it.
+     * @param restart_if_remesh Whether or not to restart the step when remeshing is flagged.
      *
      * Error parameters:
      *
@@ -94,6 +94,7 @@ namespace PETScWrappers
       const real_type    initial_step_size = 0.0,
       const int          max_steps         = -1,
       const bool         match_step        = false,
+      const bool         restart_if_remesh = false,
       // Error parameters
       const std::string &ts_adapt_type        = "none",
       const real_type    minimum_step_size    = -1.0,
@@ -108,6 +109,7 @@ namespace PETScWrappers
       , initial_step_size(initial_step_size)
       , max_steps(max_steps)
       , match_step(match_step)
+      , restart_if_remesh(restart_if_remesh)
       , ts_adapt_type(ts_adapt_type)
       , minimum_step_size(minimum_step_size)
       , maximum_step_size(maximum_step_size)
@@ -162,6 +164,11 @@ namespace PETScWrappers
     bool match_step;
 
     /**
+     * Flag to indicate to restart the step if remeshing is flagged.
+     */
+    bool restart_if_remesh;
+
+    /**
      * PETSc time step adaptor type.
      */
     std::string ts_adapt_type;
@@ -203,7 +210,8 @@ namespace PETScWrappers
   /**
    * Interface to the PETSc TS solver for Ordinary Differential Equations
    * and Differential-Algebraic Equations. The TS solver is described in the
-   * [PETSc manual](https://petsc.org/release/manual/ts/).
+   * [PETSc manual](https://petsc.org/release/manual/ts/). This class is used
+   * and extensively discussed in step-86.
    *
    * This class supports two kinds of formulations.
    * The explicit formulation:
@@ -221,14 +229,17 @@ namespace PETScWrappers
    *   \end{cases}
    * \f]
    *
-   * The interface to PETSc is realized by means of std::function callbacks
-   * like in the SUNDIALS::IDA and SUNDIALS::ARKode classes.
+   * The interface to PETSc is realized by means of std::function
+   * callbacks like in the SUNDIALS::IDA (which also solves implicit
+   * ODES) and SUNDIALS::ARKode classes (which solves a slightly
+   * generalized form of the explicit formulation above that also
+   * allows for a mass matrix on the left hand side).
    *
    * TimeStepper supports any vector and matrix type having constructors and
    * methods:
    *
    * @code
-   * class VectorType : public Subscriptor
+   * class VectorType : public EnableObserverPointer
    *    ...
    *    explicit VectorType(Vec);
    *    ...
@@ -237,7 +248,7 @@ namespace PETScWrappers
    * @endcode
    *
    * @code
-   * class MatrixType : public Subscriptor
+   * class MatrixType : public EnableObserverPointer
    *    ...
    *    explicit MatrixType(Mat);
    *    ...
@@ -572,16 +583,50 @@ namespace PETScWrappers
 
     /**
      * Callback to return an index set containing the algebraic components.
+     * Algebraic components are degrees of freedom for which the differential
+     * equation does not provide a time derivative. This can either be because
+     * the degree of freedom is constrained (say, because it is a hanging
+     * node, or because it is part of Dirichlet boundary values), or because
+     * the differential equation simply does not contain time derivatives
+     * for a specific solution variable. An example for the latter case is
+     * the pressure in the time dependent Stokes equations,
+     * @f{align*}{
+     *   \frac{\partial \mathbf u(\mathbf x,t)}{\partial t}
+     *   - \nu \Delta \mathbf u(\mathbf x,t) + \nabla p(\mathbf x,t)
+     *   &= \mathbf f(\mathbf x,t),
+     *   \\
+     *   \nabla \cdot \mathbf u(\mathbf x,t) &= 0.
+     * @f}
+     * The documentation of the SUNDIALS::IDA class has an extensive
+     * documentation of algebraic variables as part of differential-algebraic
+     * equations.
      *
      * Implementation of this function is optional. If your equation is also
      * algebraic (i.e., it contains algebraic constraints, or Lagrange
      * multipliers), you should implement this function in order to return only
      * these components of your system.
+     *
+     * @note This variable represents a
+     * @ref GlossUserProvidedCallBack "user provided callback".
+     * See there for a description of how to deal with errors and other
+     * requirements and conventions.
      */
     std::function<IndexSet()> algebraic_components;
 
     /**
-     * Callback to distribute solution to hanging nodes.
+     * @deprecated This callback is equivalent to `update_constrained_components`, but is
+     * deprecated. Use `update_constrained_components` instead.
+     */
+    DEAL_II_DEPRECATED
+    std::function<void(const real_type t, VectorType &y)> distribute;
+
+    /**
+     * Callback to set the values of constrained components to their correct
+     * values. Constrained components are a subset of the algebraic
+     * components discussed in the documentation of the
+     * TimeStepper::algebraic_components callback. In practice, the constrained
+     * components are typically hanging nodes and degrees of freedom
+     * constrained by Dirichlet boundary conditions.
      *
      * Implementation of this function is optional.
      * It is called at the end of each successful stage.
@@ -593,24 +638,17 @@ namespace PETScWrappers
      * See there for a description of how to deal with errors and other
      * requirements and conventions.
      */
-    std::function<void(const real_type t, VectorType &y)> distribute;
+    std::function<void(const real_type t, VectorType &y)>
+      update_constrained_components;
 
     /**
-     * Callback to set up mesh adaption.
-     *
-     * Implementation of this function is optional.
-     * @p resize must be set to true if mesh adaption is to be performed, false
-     * otherwise.
-     * The @p y vector contains the current solution, @p t the current time,
-     * @ step the step number.
-     * Solution transfer and actual mesh adaption must be performed in a
-     * separate callback, TimeStepper::interpolate
-     *
-     * @note This variable represents a
-     * @ref GlossUserProvidedCallBack "user provided callback".
-     * See there for a description of how to deal with errors and other
-     * requirements and conventions.
+     * @deprecated This callback is equivalent to `decide_and_prepare_for_remeshing`
+     * except that it returns the decision whether or not to stop
+     * operations via the last reference argument of the function
+     * object instead of a plain return value. This callback is
+     * deprecated. Use `decide_and_prepare_for_remeshing` instead.
      */
+    DEAL_II_DEPRECATED
     std::function<void(const real_type    t,
                        const unsigned int step,
                        const VectorType  &y,
@@ -618,22 +656,56 @@ namespace PETScWrappers
       decide_for_coarsening_and_refinement;
 
     /**
-     * Callback to interpolate vectors and perform mesh adaption.
+     * A callback that returns whether or not to stop time stepping at the
+     * current moment for mesh adaptation. If the callback returns `true`,
+     * then the time stepper stops time integration for now, saves some state,
+     * calls the `interpolate` callback, and then resumes time integration.
+     * Either in the current callback or the `interpolate` callback, the
+     * user code needs to perform the mesh refinement.
      *
-     * Implementation of this function is mandatory if
-     * TimeStepper::decide_for_coarsening_and_refinement is used.
-     * This function must perform mesh adaption and interpolate the discrete
-     * functions that are stored in @p all_in onto the refined and/or coarsenend grid.
-     * Output vectors must be created inside the callback.
+     * Implementation of this function is optional. The callback
+     * must return `true` if mesh adaption is to be performed, `false`
+     * otherwise.
+     * The @p y vector contains the current solution, @p t the current time,
+     * @ step the step number.
      *
      * @note This variable represents a
      * @ref GlossUserProvidedCallBack "user provided callback".
      * See there for a description of how to deal with errors and other
      * requirements and conventions.
      */
+    std::function<
+      bool(const real_type t, const unsigned int step, const VectorType &y)>
+      decide_and_prepare_for_remeshing;
+
+    /**
+     * @deprecated This callback is equivalent to `transfer_solution_vectors_to_new_mesh`, but is
+     * deprecated. Use `transfer_solution_vectors_to_new_mesh` instead.
+     */
+    DEAL_II_DEPRECATED
     std::function<void(const std::vector<VectorType> &all_in,
                        std::vector<VectorType>       &all_out)>
       interpolate;
+
+    /**
+     * Callback to perform mesh adaptation and transfer solution vectors
+     * from the old to the new mesh.
+     *
+     * Implementation of this function is mandatory if
+     * TimeStepper::decide_and_prepare_for_remeshing is used.
+     * This function must perform mesh adaption and interpolate the discrete
+     * functions that are stored in @p all_in onto the refined and/or coarsened grid.
+     * The output vectors must be sized correctly within this callback.
+     *
+     * @note This variable represents a
+     * @ref GlossUserProvidedCallBack "user provided callback".
+     * See there for a description of how to deal with errors and other
+     * requirements and conventions.
+     */
+    std::function<void(const real_type                t,
+                       const std::vector<VectorType> &all_in,
+                       std::vector<VectorType>       &all_out)>
+      transfer_solution_vectors_to_new_mesh;
 
   private:
     /**
@@ -644,13 +716,19 @@ namespace PETScWrappers
     /**
      * Pointers to the internal PETSc matrix objects.
      */
-    SmartPointer<AMatrixType, TimeStepper> A;
-    SmartPointer<PMatrixType, TimeStepper> P;
+    ObserverPointer<AMatrixType, TimeStepper> A;
+    ObserverPointer<PMatrixType, TimeStepper> P;
 
     /**
      * Object to apply solve_with_jacobian.
      */
     PreconditionShell solve_with_jacobian_pc;
+
+    /**
+     * This flag is used to decide whether or not to restart the step if
+     * remeshing has been performed
+     */
+    bool restart_if_remesh;
 
     /**
      * This flag is set when changing the customization and used within solve.
@@ -697,6 +775,14 @@ namespace PETScWrappers
 
 } // namespace PETScWrappers
 
+DEAL_II_NAMESPACE_CLOSE
+
+#else
+
+// Make sure the scripts that create the C++20 module input files have
+// something to latch on if the preprocessor #ifdef above would
+// otherwise lead to an empty content of the file.
+DEAL_II_NAMESPACE_OPEN
 DEAL_II_NAMESPACE_CLOSE
 
 #endif // DEAL_II_WITH_PETSC

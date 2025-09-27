@@ -1,17 +1,16 @@
-/* ---------------------------------------------------------------------
+/* ------------------------------------------------------------------------
  *
- * Copyright (C) 2012 - 2023 by the deal.II authors
+ * SPDX-License-Identifier: LGPL-2.1-or-later
+ * Copyright (C) 2012 - 2024 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
- * The deal.II library is free software; you can use it, redistribute
- * it, and/or modify it under the terms of the GNU Lesser General
- * Public License as published by the Free Software Foundation; either
- * version 2.1 of the License, or (at your option) any later version.
- * The full text of the license can be found in the file LICENSE.md at
- * the top level directory of deal.II.
+ * Part of the source code is dual licensed under Apache-2.0 WITH
+ * LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+ * governing the source code and code contributions can be found in
+ * LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
  *
- * ---------------------------------------------------------------------
+ * ------------------------------------------------------------------------
  *
  * Author: Sven Wetterauer, University of Heidelberg, 2012
  */
@@ -44,7 +43,6 @@
 #include <deal.II/fe/fe_q.h>
 
 #include <deal.II/numerics/vector_tools.h>
-#include <deal.II/numerics/matrix_tools.h>
 #include <deal.II/numerics/data_out.h>
 #include <deal.II/numerics/error_estimator.h>
 
@@ -72,16 +70,21 @@ namespace Step15
   // are made:
   // - There are two solution vectors, one for the Newton update
   //   $\delta u^n$, and one for the current iterate $u^n$.
+  // - The single AffineConstraints<> object in step-6 that is used to store
+  //   boundary conditions and hanging node constraints, is replaced by two
+  //   different objects of the same type: `zero_constraints` and
+  //   `nonzero_constraints`. The former contains homogeneous boundary
+  //   conditions to be used for the residual and solution updates, while the
+  //   latter contains the correct boundary conditions for the solution. Both
+  //   objects also contain the hanging nodes constraints.
   // - The <code>setup_system</code> function takes an argument that denotes
   //   whether this is the first time it is called or not. The difference is
   //   that the first time around we need to distribute the degrees of freedom
   //   and set the solution vector for $u^n$ to the correct size. The following
   //   times, the function is called after we have already done these steps as
   //   part of refining the mesh in <code>refine_mesh</code>.
-  // - We then also need new functions: <code>set_boundary_values()</code>
-  //   takes care of setting the boundary values on the solution vector
-  //   correctly, as discussed at the end of the
-  //   introduction. <code>compute_residual()</code> is a function that computes
+  // - We then also need a few new functions:
+  //   <code>compute_residual()</code> is a function that computes
   //   the norm of the nonlinear (discrete) residual. We use this function to
   //   monitor convergence of the Newton iteration. The function takes a step
   //   length $\alpha^n$ as argument to compute the residual of $u^n + \alpha^n
@@ -102,11 +105,10 @@ namespace Step15
     void run();
 
   private:
-    void   setup_system(const bool initial_step);
+    void   setup_system();
     void   assemble_system();
     void   solve();
     void   refine_mesh();
-    void   set_boundary_values();
     double compute_residual(const double alpha) const;
     double determine_step_length() const;
     void   output_results(const unsigned int refinement_cycle) const;
@@ -114,9 +116,10 @@ namespace Step15
     Triangulation<dim> triangulation;
 
     DoFHandler<dim> dof_handler;
-    FE_Q<dim>       fe;
+    const FE_Q<dim> fe;
 
-    AffineConstraints<double> hanging_node_constraints;
+    AffineConstraints<double> zero_constraints;
+    AffineConstraints<double> nonzero_constraints;
 
     SparsityPattern      sparsity_pattern;
     SparseMatrix<double> system_matrix;
@@ -164,39 +167,36 @@ namespace Step15
   // @sect4{MinimalSurfaceProblem::setup_system}
 
   // As always in the setup-system function, we set up the variables of the
-  // finite element method. There are same differences to step-6, because
-  // there we start solving the PDE from scratch in every refinement cycle
-  // whereas here we need to take the solution from the previous mesh onto the
-  // current mesh. Consequently, we can't just reset solution vectors. The
-  // argument passed to this function thus indicates whether we can
-  // distributed degrees of freedom (plus compute constraints) and set the
-  // solution vector to zero or whether this has happened elsewhere already
-  // (specifically, in <code>refine_mesh()</code>).
-
+  // finite element method. There are some differences to step-6, because
+  // we need to construct two AffineConstraint<> objects.
   template <int dim>
-  void MinimalSurfaceProblem<dim>::setup_system(const bool initial_step)
+  void MinimalSurfaceProblem<dim>::setup_system()
   {
-    if (initial_step)
-      {
-        dof_handler.distribute_dofs(fe);
-        current_solution.reinit(dof_handler.n_dofs());
+    dof_handler.distribute_dofs(fe);
+    current_solution.reinit(dof_handler.n_dofs());
 
-        hanging_node_constraints.clear();
-        DoFTools::make_hanging_node_constraints(dof_handler,
-                                                hanging_node_constraints);
-        hanging_node_constraints.close();
-      }
+    zero_constraints.clear();
+    VectorTools::interpolate_boundary_values(dof_handler,
+                                             0,
+                                             Functions::ZeroFunction<dim>(),
+                                             zero_constraints);
+    DoFTools::make_hanging_node_constraints(dof_handler, zero_constraints);
+    zero_constraints.close();
 
+    nonzero_constraints.clear();
+    VectorTools::interpolate_boundary_values(dof_handler,
+                                             0,
+                                             BoundaryValues<dim>(),
+                                             nonzero_constraints);
 
-    // The remaining parts of the function are the same as in step-6.
+    DoFTools::make_hanging_node_constraints(dof_handler, nonzero_constraints);
+    nonzero_constraints.close();
 
     newton_update.reinit(dof_handler.n_dofs());
     system_rhs.reinit(dof_handler.n_dofs());
 
     DynamicSparsityPattern dsp(dof_handler.n_dofs());
-    DoFTools::make_sparsity_pattern(dof_handler, dsp);
-
-    hanging_node_constraints.condense(dsp);
+    DoFTools::make_sparsity_pattern(dof_handler, dsp, zero_constraints);
 
     sparsity_pattern.copy_from(dsp);
     system_matrix.reinit(sparsity_pattern);
@@ -207,8 +207,9 @@ namespace Step15
   // This function does the same as in the previous tutorials except that now,
   // of course, the matrix and right hand side functions depend on the
   // previous iteration's solution. As discussed in the introduction, we need
-  // to use zero boundary values for the Newton updates; we compute them at
-  // the end of this function.
+  // to use zero boundary values for the Newton updates; this is done by using
+  // the `zero_constraints` object when assembling into the global matrix and
+  // vector.
   //
   // The top of the function contains the usual boilerplate code, setting up
   // the objects that allow us to evaluate shape functions at quadrature
@@ -293,32 +294,9 @@ namespace Step15
           }
 
         cell->get_dof_indices(local_dof_indices);
-        for (unsigned int i = 0; i < dofs_per_cell; ++i)
-          {
-            for (unsigned int j = 0; j < dofs_per_cell; ++j)
-              system_matrix.add(local_dof_indices[i],
-                                local_dof_indices[j],
-                                cell_matrix(i, j));
-
-            system_rhs(local_dof_indices[i]) += cell_rhs(i);
-          }
+        zero_constraints.distribute_local_to_global(
+          cell_matrix, cell_rhs, local_dof_indices, system_matrix, system_rhs);
       }
-
-    // Finally, we remove hanging nodes from the system and apply zero
-    // boundary values to the linear system that defines the Newton updates
-    // $\delta u^n$:
-    hanging_node_constraints.condense(system_matrix);
-    hanging_node_constraints.condense(system_rhs);
-
-    std::map<types::global_dof_index, double> boundary_values;
-    VectorTools::interpolate_boundary_values(dof_handler,
-                                             0,
-                                             Functions::ZeroFunction<dim>(),
-                                             boundary_values);
-    MatrixTools::apply_boundary_values(boundary_values,
-                                       system_matrix,
-                                       newton_update,
-                                       system_rhs);
   }
 
 
@@ -340,7 +318,7 @@ namespace Step15
 
     solver.solve(system_matrix, newton_update, system_rhs, preconditioner);
 
-    hanging_node_constraints.distribute(newton_update);
+    zero_constraints.distribute(newton_update);
 
     const double alpha = determine_step_length();
     current_solution.add(alpha, newton_update);
@@ -390,86 +368,32 @@ namespace Step15
     triangulation.prepare_coarsening_and_refinement();
 
     // With this out of the way, we initialize a SolutionTransfer object with
-    // the present DoFHandler and attach the solution vector to it, followed
-    // by doing the actual refinement and distribution of degrees of freedom
-    // on the new mesh
+    // the present DoFHandler. We make a copy of the solution vector and attach
+    // it to the SolutionTransfer. Now we can actually execute the refinement
+    // and create the new matrices and vectors including the vector
+    // `current_solution`, that will hold the current solution on the new mesh
+    // after calling SolutionTransfer::interpolate():
     SolutionTransfer<dim> solution_transfer(dof_handler);
-    solution_transfer.prepare_for_coarsening_and_refinement(current_solution);
+    const Vector<double>  coarse_solution = current_solution;
+    solution_transfer.prepare_for_coarsening_and_refinement(coarse_solution);
 
     triangulation.execute_coarsening_and_refinement();
 
-    dof_handler.distribute_dofs(fe);
+    setup_system();
 
-    // Finally, we retrieve the old solution interpolated to the new
-    // mesh. Since the SolutionTransfer function does not actually store the
-    // values of the old solution, but rather indices, we need to preserve the
-    // old solution vector until we have gotten the new interpolated
-    // values. Thus, we have the new values written into a temporary vector,
-    // and only afterwards write them into the solution vector object:
-    Vector<double> tmp(dof_handler.n_dofs());
-    solution_transfer.interpolate(current_solution, tmp);
-    current_solution = tmp;
+    solution_transfer.interpolate(current_solution);
 
-    // On the new mesh, there are different hanging nodes, for which we have to
-    // compute constraints again, after throwing away previous content of the
-    // object. To be on the safe side, we should then also make sure that the
-    // current solution's vector entries satisfy the hanging node constraints
-    // (see the discussion in the documentation of the SolutionTransfer class
-    // for why this is necessary). We could do this by calling
-    // `hanging_node_constraints.distribute(current_solution)` explicitly; we
-    // omit this step because this will happen at the end of the call to
-    // `set_boundary_values()` below, and it is not necessary to do it twice.
-    hanging_node_constraints.clear();
-
-    DoFTools::make_hanging_node_constraints(dof_handler,
-                                            hanging_node_constraints);
-    hanging_node_constraints.close();
-
-    // Once we have the interpolated solution and all information about
-    // hanging nodes, we have to make sure that the $u^n$ we now have
-    // actually has the correct boundary values. As explained at the end of
-    // the introduction, this is not automatically the case even if the
-    // solution before refinement had the correct boundary values, and so we
-    // have to explicitly make sure that it now has:
-    set_boundary_values();
-
-    // We end the function by updating all the remaining data structures,
-    // indicating to <code>setup_dofs()</code> that this is not the first
-    // go-around and that it needs to preserve the content of the solution
-    // vector:
-    setup_system(false);
+    // On the new mesh, there are different hanging nodes, computed in
+    // `setup_system()` above. To be on the safe side, we should  make sure that
+    // the current solution's vector entries satisfy the hanging node
+    // constraints (see the discussion in the documentation of the
+    // SolutionTransfer class for why this is necessary) and boundary values. As
+    // explained at the end of the introduction, the interpolated solution does
+    // not automatically satisfy the boundary values even if the solution before
+    // refinement had the correct boundary values.
+    nonzero_constraints.distribute(current_solution);
   }
 
-
-
-  // @sect4{MinimalSurfaceProblem::set_boundary_values}
-
-  // The next function ensures that the solution vector's entries respect the
-  // boundary values for our problem.  Having refined the mesh (or just
-  // started computations), there might be new nodal points on the
-  // boundary. These have values that are simply interpolated from the
-  // previous mesh in `refine_mesh()`, instead of the correct boundary
-  // values. This is fixed up by setting all boundary nodes of the current
-  // solution vector explicit to the right value.
-  //
-  // There is one issue we have to pay attention to, though: If we have
-  // a hanging node right next to a new boundary node, then its value
-  // must also be adjusted to make sure that the finite element field
-  // remains continuous. This is what the call in the last line of this
-  // function does.
-  template <int dim>
-  void MinimalSurfaceProblem<dim>::set_boundary_values()
-  {
-    std::map<types::global_dof_index, double> boundary_values;
-    VectorTools::interpolate_boundary_values(dof_handler,
-                                             0,
-                                             BoundaryValues<dim>(),
-                                             boundary_values);
-    for (auto &boundary_value : boundary_values)
-      current_solution(boundary_value.first) = boundary_value.second;
-
-    hanging_node_constraints.distribute(current_solution);
-  }
 
 
   // @sect4{MinimalSurfaceProblem::compute_residual}
@@ -538,33 +462,11 @@ namespace Step15
           }
 
         cell->get_dof_indices(local_dof_indices);
-        for (unsigned int i = 0; i < dofs_per_cell; ++i)
-          residual(local_dof_indices[i]) += cell_residual(i);
+        zero_constraints.distribute_local_to_global(cell_residual,
+                                                    local_dof_indices,
+                                                    residual);
       }
 
-    // At the end of this function we also have to deal with the hanging node
-    // constraints and with the issue of boundary values. With regard to the
-    // latter, we have to set to zero the elements of the residual vector for
-    // all entries that correspond to degrees of freedom that sit at the
-    // boundary. The reason is that because the value of the solution there is
-    // fixed, they are of course no "real" degrees of freedom and so, strictly
-    // speaking, we shouldn't have assembled entries in the residual vector
-    // for them. However, as we always do, we want to do exactly the same
-    // thing on every cell and so we didn't want to deal with the question
-    // of whether a particular degree of freedom sits at the boundary in the
-    // integration above. Rather, we will simply set to zero these entries
-    // after the fact. To this end, we need to determine which degrees
-    // of freedom do in fact belong to the boundary and then loop over all of
-    // those and set the residual entry to zero. This happens in the following
-    // lines which we have already seen used in step-11, using the appropriate
-    // function from namespace DoFTools:
-    hanging_node_constraints.condense(residual);
-
-    for (const types::global_dof_index i :
-         DoFTools::extract_boundary_dofs(dof_handler))
-      residual(i) = 0;
-
-    // At the end of the function, we return the norm of the residual:
     return residual.l2_norm();
   }
 
@@ -623,8 +525,7 @@ namespace Step15
   // the origin, created in the same way as shown in step-6. The mesh is
   // globally refined twice followed later on by several adaptive cycles.
   //
-  // Before starting the Newton loop, we also need to do a bit of
-  // setup work: We need to create the basic data structures and
+  // Before starting the Newton loop, we also need to do
   // ensure that the first Newton iterate already has the correct
   // boundary values, as discussed in the introduction.
   template <int dim>
@@ -633,8 +534,8 @@ namespace Step15
     GridGenerator::hyper_ball(triangulation);
     triangulation.refine_global(2);
 
-    setup_system(/*first time=*/true);
-    set_boundary_values();
+    setup_system();
+    nonzero_constraints.distribute(current_solution);
 
     // The Newton iteration starts next. We iterate until the (norm of the)
     // residual computed at the end of the previous iteration is less than
@@ -696,8 +597,8 @@ int main()
     {
       using namespace Step15;
 
-      MinimalSurfaceProblem<2> laplace_problem_2d;
-      laplace_problem_2d.run();
+      MinimalSurfaceProblem<2> problem;
+      problem.run();
     }
   catch (std::exception &exc)
     {

@@ -1,17 +1,16 @@
-/* ---------------------------------------------------------------------
+/* ------------------------------------------------------------------------
  *
- * Copyright (C) 2006 - 2023 by the deal.II authors
+ * SPDX-License-Identifier: LGPL-2.1-or-later
+ * Copyright (C) 2006 - 2025 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
- * The deal.II library is free software; you can use it, redistribute
- * it, and/or modify it under the terms of the GNU Lesser General
- * Public License as published by the Free Software Foundation; either
- * version 2.1 of the License, or (at your option) any later version.
- * The full text of the license can be found in the file LICENSE.md at
- * the top level directory of deal.II.
+ * Part of the source code is dual licensed under Apache-2.0 WITH
+ * LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+ * governing the source code and code contributions can be found in
+ * LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
  *
- * ---------------------------------------------------------------------
+ * ------------------------------------------------------------------------
  *
  * Authors: Yan Li, Wolfgang Bangerth, Texas A&M University, 2006
  */
@@ -26,7 +25,6 @@
 
 // All of these include files have been used before:
 #include <deal.II/base/quadrature_lib.h>
-#include <deal.II/base/logstream.h>
 #include <deal.II/base/function.h>
 
 #include <deal.II/lac/block_vector.h>
@@ -50,7 +48,6 @@
 #include <deal.II/fe/fe_values.h>
 
 #include <deal.II/numerics/vector_tools.h>
-#include <deal.II/numerics/matrix_tools.h>
 #include <deal.II/numerics/data_out.h>
 
 #include <iostream>
@@ -112,9 +109,9 @@ namespace Step21
 
     const unsigned int degree;
 
-    Triangulation<dim> triangulation;
-    FESystem<dim>      fe;
-    DoFHandler<dim>    dof_handler;
+    Triangulation<dim>  triangulation;
+    const FESystem<dim> fe;
+    DoFHandler<dim>     dof_handler;
 
     BlockSparsityPattern      sparsity_pattern;
     BlockSparseMatrix<double> system_matrix;
@@ -346,7 +343,7 @@ namespace Step21
                                        (0.05 * 0.05));
 
             const double normalized_permeability =
-              std::min(std::max(permeability, 0.01), 4.);
+              std::clamp(permeability, 0.01, 4.);
 
             for (unsigned int d = 0; d < dim; ++d)
               values[p][d][d] = 1. / normalized_permeability;
@@ -412,7 +409,7 @@ namespace Step21
   // maximum number of iterations equal to the maximum of the size of the linear
   // system and 200.
   template <class MatrixType>
-  class InverseMatrix : public Subscriptor
+  class InverseMatrix : public EnableObserverPointer
   {
   public:
     InverseMatrix(const MatrixType &m)
@@ -431,12 +428,12 @@ namespace Step21
     }
 
   private:
-    const SmartPointer<const MatrixType> matrix;
+    const ObserverPointer<const MatrixType> matrix;
   };
 
 
 
-  class SchurComplement : public Subscriptor
+  class SchurComplement : public EnableObserverPointer
   {
   public:
     SchurComplement(const BlockSparseMatrix<double>           &A,
@@ -455,15 +452,15 @@ namespace Step21
     }
 
   private:
-    const SmartPointer<const BlockSparseMatrix<double>>           system_matrix;
-    const SmartPointer<const InverseMatrix<SparseMatrix<double>>> m_inverse;
+    const ObserverPointer<const BlockSparseMatrix<double>> system_matrix;
+    const ObserverPointer<const InverseMatrix<SparseMatrix<double>>> m_inverse;
 
     mutable Vector<double> tmp1, tmp2;
   };
 
 
 
-  class ApproximateSchurComplement : public Subscriptor
+  class ApproximateSchurComplement : public EnableObserverPointer
   {
   public:
     ApproximateSchurComplement(const BlockSparseMatrix<double> &A)
@@ -480,7 +477,7 @@ namespace Step21
     }
 
   private:
-    const SmartPointer<const BlockSparseMatrix<double>> system_matrix;
+    const ObserverPointer<const BlockSparseMatrix<double>> system_matrix;
 
     mutable Vector<double> tmp1, tmp2;
   };
@@ -580,8 +577,8 @@ namespace Step21
     system_matrix = 0;
     system_rhs    = 0;
 
-    QGauss<dim>     quadrature_formula(degree + 2);
-    QGauss<dim - 1> face_quadrature_formula(degree + 2);
+    const QGauss<dim>     quadrature_formula(degree + 2);
+    const QGauss<dim - 1> face_quadrature_formula(degree + 2);
 
     FEValues<dim>     fe_values(fe,
                             quadrature_formula,
@@ -730,18 +727,18 @@ namespace Step21
   template <int dim>
   void TwoPhaseFlowProblem<dim>::assemble_rhs_S()
   {
-    QGauss<dim>       quadrature_formula(degree + 2);
-    QGauss<dim - 1>   face_quadrature_formula(degree + 2);
-    FEValues<dim>     fe_values(fe,
+    const QGauss<dim>     quadrature_formula(degree + 2);
+    const QGauss<dim - 1> face_quadrature_formula(degree + 2);
+    FEValues<dim>         fe_values(fe,
                             quadrature_formula,
                             update_values | update_gradients |
                               update_quadrature_points | update_JxW_values);
-    FEFaceValues<dim> fe_face_values(fe,
+    FEFaceValues<dim>     fe_face_values(fe,
                                      face_quadrature_formula,
                                      update_values | update_normal_vectors |
                                        update_quadrature_points |
                                        update_JxW_values);
-    FEFaceValues<dim> fe_face_values_neighbor(fe,
+    FEFaceValues<dim>     fe_face_values_neighbor(fe,
                                               face_quadrature_formula,
                                               update_values);
 
@@ -995,7 +992,7 @@ namespace Step21
           break;
 
         default:
-          Assert(false, ExcNotImplemented());
+          DEAL_II_NOT_IMPLEMENTED();
       }
 
     DataOut<dim> data_out;
@@ -1049,7 +1046,7 @@ namespace Step21
   template <int dim>
   double TwoPhaseFlowProblem<dim>::get_maximal_velocity() const
   {
-    QGauss<dim>        quadrature_formula(degree + 2);
+    const QGauss<dim>  quadrature_formula(degree + 2);
     const unsigned int n_q_points = quadrature_formula.size();
 
     FEValues<dim> fe_values(fe, quadrature_formula, update_values);

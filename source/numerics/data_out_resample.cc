@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2021 - 2022 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2021 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 #include <deal.II/dofs/dof_tools.h>
 
@@ -55,7 +54,7 @@ DataOutResample<dim, patch_dim, spacedim>::update_mapping(
 
   std::vector<std::pair<types::global_dof_index, Point<spacedim>>> points_all;
 
-  Quadrature<patch_dim> quadrature(fe.get_unit_support_points());
+  const Quadrature<patch_dim> quadrature(fe.get_unit_support_points());
 
   FEValues<patch_dim, spacedim> fe_values(*patch_mapping,
                                           fe,
@@ -64,10 +63,10 @@ DataOutResample<dim, patch_dim, spacedim>::update_mapping(
 
   std::vector<types::global_dof_index> dof_indices(fe.n_dofs_per_cell());
 
-  const IndexSet active_dofs =
-    DoFTools::extract_locally_active_dofs(patch_dof_handler);
   partitioner = std::make_shared<Utilities::MPI::Partitioner>(
-    patch_dof_handler.locally_owned_dofs(), active_dofs, MPI_COMM_WORLD);
+    patch_dof_handler.locally_owned_dofs(),
+    DoFTools::extract_locally_active_dofs(patch_dof_handler),
+    patch_dof_handler.get_mpi_communicator());
 
   for (const auto &cell : patch_dof_handler.active_cell_iterators() |
                             IteratorFilters::LocallyOwnedCell())
@@ -151,14 +150,15 @@ DataOutResample<dim, patch_dim, spacedim>::build_patches(
 
       const auto &dh = *data_ptr->dof_handler;
 
-#ifdef DEBUG
-      for (const auto &fe : dh.get_fe_collection())
-        Assert(
-          fe.n_base_elements() == 1,
-          ExcMessage(
-            "This class currently only supports scalar elements and elements "
-            "with a single base element."));
-#endif
+      if constexpr (running_in_debug_mode())
+        {
+          for (const auto &fe : dh.get_fe_collection())
+            Assert(
+              fe.n_base_elements() == 1,
+              ExcMessage(
+                "This class currently only supports scalar elements and elements "
+                "with a single base element."));
+        }
 
       for (unsigned int comp = 0; comp < dh.get_fe_collection().n_components();
            ++comp)
@@ -185,7 +185,7 @@ DataOutResample<dim, patch_dim, spacedim>::build_patches(
             DataOut_DoFData<patch_dim, patch_dim, spacedim, spacedim>::
               DataVectorType::type_dof_data);
 
-          counter++;
+          ++counter;
         }
     }
 
@@ -205,6 +205,6 @@ DataOutResample<dim, patch_dim, spacedim>::get_patches() const
 
 
 // explicit instantiations
-#include "data_out_resample.inst"
+#include "numerics/data_out_resample.inst"
 
 DEAL_II_NAMESPACE_CLOSE

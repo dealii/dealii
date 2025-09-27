@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2002 - 2023 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2002 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 #ifndef dealii_table_h
 #define dealii_table_h
@@ -19,10 +18,10 @@
 #include <deal.II/base/config.h>
 
 #include <deal.II/base/aligned_vector.h>
+#include <deal.II/base/enable_observer_pointer.h>
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/linear_index_iterator.h>
 #include <deal.II/base/memory_consumption.h>
-#include <deal.II/base/subscriptor.h>
 #include <deal.II/base/table_indices.h>
 
 #include <algorithm>
@@ -104,8 +103,8 @@ namespace internal
 
     /**
      * @internal Have a class which declares some nested alias, depending
-     * on its template parameters. Specialization for accessors to non-
-     * constant objects.
+     * on its template parameters. Specialization for accessors to
+     * non-constant objects.
      */
     template <int N, typename T>
     struct Types<N, T, false>
@@ -166,8 +165,8 @@ namespace internal
       using iterator       = typename Types<N, T, C>::iterator;
       using const_iterator = typename Types<N, T, C>::const_iterator;
 
-      using size_type       = size_t;
-      using difference_type = ptrdiff_t;
+      using size_type       = std::size_t;
+      using difference_type = std::ptrdiff_t;
 
     private:
       /**
@@ -252,8 +251,8 @@ namespace internal
       using reference       = typename Types<N, T, C>::reference;
       using const_reference = typename Types<N, T, C>::const_reference;
 
-      using size_type       = size_t;
-      using difference_type = ptrdiff_t;
+      using size_type       = std::size_t;
+      using difference_type = std::ptrdiff_t;
 
       /**
        * Import an alias from the switch class above.
@@ -270,7 +269,7 @@ namespace internal
        * objects around. The only way to create such objects is via the
        * <tt>Table</tt> class, which only generates them as temporary objects.
        * This guarantees that the accessor objects go out of scope earlier
-       * than the mother object, avoid problems with data consistency.
+       * than the parent object, avoid problems with data consistency.
        */
       Accessor(const TableType &table, const iterator data);
 
@@ -438,7 +437,7 @@ namespace internal
  * @ingroup data
  */
 template <int N, typename T>
-class TableBase : public Subscriptor
+class TableBase : public EnableObserverPointer
 {
 public:
   using value_type = T;
@@ -671,7 +670,7 @@ public:
    * process and possibly ghost elements that are mirrored from its owning
    * process to other processes. Rather, the elements of the current object are
    * simply copied to the other processes, and it is useful to think of this
-   * operation as creating a set of `const` AlignedVector objects on all
+   * operation as creating a set of `const` TableBase objects on all
    * processes that should not be changed any more after the replication
    * operation, as this is the only way to ensure that the vectors remain the
    * same on all processes. This is particularly true because of the use of
@@ -741,7 +740,7 @@ public:
    * functions.
    */
   void
-  swap(TableBase<N, T> &v);
+  swap(TableBase<N, T> &v) noexcept;
 
   /**
    * Determine an estimate for the memory consumption (in bytes) of this
@@ -987,8 +986,8 @@ namespace MatrixTableIterators
     /**
      * Type of the stored pointer to the table.
      */
-    using container_pointer_type = typename std::
-      conditional<Constness, const TableType *, TableType *>::type;
+    using container_pointer_type =
+      std::conditional_t<Constness, const TableType *, TableType *>;
 
     /**
      * Value type of the underlying container.
@@ -1199,8 +1198,8 @@ namespace MatrixTableIterators
     /**
      * Type of the stored pointer to the table.
      */
-    using container_pointer_type = typename std::
-      conditional<Constness, const TableType *, TableType *>::type;
+    using container_pointer_type =
+      std::conditional_t<Constness, const TableType *, TableType *>;
 
     /**
      * Constructor from an accessor.
@@ -1563,8 +1562,8 @@ public:
   using TableBase<3, T>::reinit;
 
   /**
-   * Access operator. Generate an object that accesses the requested two-
-   * dimensional subobject of this three-dimensional table. Range checks are
+   * Access operator. Generate an object that accesses the requested
+   * two-dimensional subobject of this three-dimensional table. Range checks are
    * performed.
    *
    * This version of the function only allows read access.
@@ -1573,9 +1572,9 @@ public:
   operator[](const size_type i) const;
 
   /**
-   * Access operator. Generate an object that accesses the requested two-
-   * dimensional subobject of this three-dimensional table. Range checks are
-   * performed.
+   * Access operator. Generate an object that accesses the requested
+   * two-dimensional subobject of this three-dimensional table. Range
+   * checks are performed.
    *
    * This version of the function allows read-write access.
    */
@@ -1641,9 +1640,9 @@ public:
         const size_type size4);
 
   /**
-   * Access operator. Generate an object that accesses the requested three-
-   * dimensional subobject of this four-dimensional table. Range checks are
-   * performed.
+   * Access operator. Generate an object that accesses the requested
+   * three-dimensional subobject of this four-dimensional table. Range checks
+   * are performed.
    *
    * This version of the function only allows read access.
    */
@@ -1651,9 +1650,9 @@ public:
   operator[](const size_type i) const;
 
   /**
-   * Access operator. Generate an object that accesses the requested three-
-   * dimensional subobject of this four-dimensional table. Range checks are
-   * performed.
+   * Access operator. Generate an object that accesses the requested
+   * three-dimensional subobject of this four-dimensional table. Range checks
+   * are performed.
    *
    * This version of the function allows read-write access.
    */
@@ -1727,8 +1726,8 @@ public:
         const size_type size5);
 
   /**
-   * Access operator. Generate an object that accesses the requested four-
-   * dimensional subobject of this five-dimensional table. Range checks are
+   * Access operator. Generate an object that accesses the requested
+   * four-dimensional subobject of this five-dimensional table. Range checks are
    * performed.
    *
    * This version of the function only allows read access.
@@ -1737,8 +1736,8 @@ public:
   operator[](const size_type i) const;
 
   /**
-   * Access operator. Generate an object that accesses the requested four-
-   * dimensional subobject of this five-dimensional table. Range checks are
+   * Access operator. Generate an object that accesses the requested
+   * four-dimensional subobject of this five-dimensional table. Range checks are
    * performed.
    *
    * This version of the function allows read-write access.
@@ -1814,8 +1813,8 @@ public:
         const size_type size6);
 
   /**
-   * Access operator. Generate an object that accesses the requested five-
-   * dimensional subobject of this six-dimensional table. Range checks are
+   * Access operator. Generate an object that accesses the requested
+   * five-dimensional subobject of this six-dimensional table. Range checks are
    * performed.
    *
    * This version of the function only allows read access.
@@ -1824,8 +1823,8 @@ public:
   operator[](const size_type i) const;
 
   /**
-   * Access operator. Generate an object that accesses the requested five-
-   * dimensional subobject of this six-dimensional table. Range checks are
+   * Access operator. Generate an object that accesses the requested
+   * five-dimensional subobject of this six-dimensional table. Range checks are
    * performed.
    *
    * This version of the function allows read-write access.
@@ -1903,8 +1902,8 @@ public:
         const size_type size7);
 
   /**
-   * Access operator. Generate an object that accesses the requested six-
-   * dimensional subobject of this seven-dimensional table. Range checks are
+   * Access operator. Generate an object that accesses the requested
+   * six-dimensional subobject of this seven-dimensional table. Range checks are
    * performed.
    *
    * This version of the function only allows read access.
@@ -1913,8 +1912,8 @@ public:
   operator[](const size_type i) const;
 
   /**
-   * Access operator. Generate an object that accesses the requested six-
-   * dimensional subobject of this seven-dimensional table. Range checks are
+   * Access operator. Generate an object that accesses the requested
+   * six-dimensional subobject of this seven-dimensional table. Range checks are
    * performed.
    *
    * This version of the function allows read-write access.
@@ -2166,7 +2165,7 @@ TableBase<N, T>::TableBase(const TableIndices<N> &sizes,
 
 template <int N, typename T>
 TableBase<N, T>::TableBase(const TableBase<N, T> &src)
-  : Subscriptor()
+  : EnableObserverPointer()
   , values(src.values)
   , table_size(src.table_size)
 {}
@@ -2186,7 +2185,7 @@ TableBase<N, T>::TableBase(const TableBase<N, T2> &src)
 
 template <int N, typename T>
 TableBase<N, T>::TableBase(TableBase<N, T> &&src) noexcept
-  : Subscriptor(std::move(src))
+  : EnableObserverPointer(std::move(src))
   , values(std::move(src.values))
   , table_size(src.table_size)
 {
@@ -2200,7 +2199,7 @@ template <class Archive>
 inline void
 TableBase<N, T>::serialize(Archive &ar, const unsigned int)
 {
-  ar &static_cast<Subscriptor &>(*this);
+  ar &static_cast<EnableObserverPointer &>(*this);
 
   ar &values &table_size;
 }
@@ -2343,10 +2342,11 @@ template <int N, typename T>
 inline TableBase<N, T> &
 TableBase<N, T>::operator=(TableBase<N, T> &&m) noexcept
 {
-  static_cast<Subscriptor &>(*this) = std::move(static_cast<Subscriptor &>(m));
-  values                            = std::move(m.values);
-  table_size                        = m.table_size;
-  m.table_size                      = TableIndices<N>();
+  static_cast<EnableObserverPointer &>(*this) =
+    std::move(static_cast<EnableObserverPointer &>(m));
+  values       = std::move(m.values);
+  table_size   = m.table_size;
+  m.table_size = TableIndices<N>();
 
   return *this;
 }
@@ -2533,7 +2533,7 @@ namespace internal
     void
     fill_Fortran_style(InputIterator, TableBase<N, T> &)
     {
-      Assert(false, ExcNotImplemented());
+      DEAL_II_NOT_IMPLEMENTED();
     }
   } // namespace TableImplementation
 } // namespace internal
@@ -2559,7 +2559,7 @@ TableBase<N, T>::fill(InputIterator entries, const bool C_style_indexing)
 
 template <int N, typename T>
 inline void
-TableBase<N, T>::swap(TableBase<N, T> &v)
+TableBase<N, T>::swap(TableBase<N, T> &v) noexcept
 {
   values.swap(v.values);
   std::swap(table_size, v.table_size);
@@ -2873,7 +2873,7 @@ namespace MatrixTableIterators
           case Storage::column_major:
             return linear_index % container->n_rows();
           default:
-            Assert(false, ExcInternalError());
+            DEAL_II_ASSERT_UNREACHABLE();
         }
       return {};
     }
@@ -2892,7 +2892,7 @@ namespace MatrixTableIterators
           case Storage::column_major:
             return linear_index / container->n_rows();
           default:
-            Assert(false, ExcInternalError());
+            DEAL_II_ASSERT_UNREACHABLE();
         }
       return {};
     }
@@ -3713,7 +3713,7 @@ Table<7, T>::operator()(const size_type i,
  */
 template <int N, typename T>
 inline void
-swap(TableBase<N, T> &u, TableBase<N, T> &v)
+swap(TableBase<N, T> &u, TableBase<N, T> &v) noexcept
 {
   u.swap(v);
 }

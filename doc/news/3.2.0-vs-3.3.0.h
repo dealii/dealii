@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2013, 2014 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2013 - 2024 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 /**
  * @page changes_between_3_2_and_3_3 Changes between Version 3.2 and 3.3
@@ -22,7 +21,7 @@ All entries are signed with the names of the author.
 </p>
 
 
-<a name="general"></a>
+<a name="320-330-general"></a>
 <h3>General</h3>
 
 <ol>
@@ -121,7 +120,7 @@ All entries are signed with the names of the author.
 
 
 
-<a name="base"></a>
+<a name="320-330-base"></a>
 <h3>base</h3>
 
 <ol>
@@ -227,7 +226,7 @@ All entries are signed with the names of the author.
 
 
 
-<a name="lac"></a>
+<a name="320-330-lac"></a>
 <h3>lac</h3>
 
 <ol>
@@ -336,7 +335,7 @@ All entries are signed with the names of the author.
 
 
 
-<a name="deal.II"></a>
+<a name="320-330-deal.II"></a>
 <h3>deal.II</h3>
 
 <ol>
@@ -384,7 +383,7 @@ All entries are signed with the names of the author.
   <li> <p>
        New: <code>GridGenerator</code> has a function
        <code>cylinder</code> for cylinders in three
-       space dimensions. Accoridngly, a class <code
+       space dimensions. Accordingly, a class <code
        class="class">CylinderBoundary</code> has been created.
        <br>
        (GK 2001/12/07)

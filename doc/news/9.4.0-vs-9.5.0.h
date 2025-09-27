@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2017 - 2023 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2023 - 2024 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 /**
 @page changes_between_9_4_0_and_9_5_0 Changes between Version 9.4.0 and 9.5.0
@@ -23,7 +22,7 @@ author.
 </p>
 <!-- ----------- INCOMPATIBILITIES ----------------- -->
 
-<a name="incompatible"></a>
+<a name="940-950-incompatible"></a>
 <h3 style="color:red">Incompatibilities</h3>
 
 <p style="color:red">
@@ -328,7 +327,7 @@ inconvenience this causes.
 
 <!-- ----------- GENERAL IMPROVEMENTS ----------------- -->
 
-<a name="general"></a>
+<a name="940-950-general"></a>
 <h3>General</h3>
 <ol>
 
@@ -401,7 +400,7 @@ inconvenience this causes.
 
 <!-- ----------- SPECIFIC IMPROVEMENTS ----------------- -->
 
-<a name="specific"></a>
+<a name="940-950-specific"></a>
 <h3>Specific improvements</h3>
 <ol>
 
@@ -1006,7 +1005,7 @@ inconvenience this causes.
  </li>
 
  <li>
-  Improved: The functions VectorTools::point_values()/::point_gradients() and
+  Improved: The functions VectorTools::point_values()/VectorTools::point_gradients() and
   the class Utilities::MPI::RemotePointEvaluation now allow to specify the first
   component to be selected. The feature is used in the class DataOutResample
   to output multi-component solutions.
@@ -1053,7 +1052,7 @@ inconvenience this causes.
   New: The new class MatrixFreeTools::ElementActivationAndDeactivationMatrixFree
   is a wrapper around MatrixFree designed to deal with
   DoFHandler objects involving cells without degrees of freedom, i.e.,
-  cells using FENothing as element type. The class helps to implement the
+  cells using FE_Nothing as element type. The class helps to implement the
   "element birth and death technique".
   <br>
   (Peter Munch, Sebastian Proell, 2022/07/09)

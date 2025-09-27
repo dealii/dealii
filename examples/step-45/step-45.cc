@@ -1,17 +1,16 @@
-/* ---------------------------------------------------------------------
+/* ------------------------------------------------------------------------
  *
- * Copyright (C) 2008 - 2023 by the deal.II authors
+ * SPDX-License-Identifier: LGPL-2.1-or-later
+ * Copyright (C) 2010 - 2024 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
- * The deal.II library is free software; you can use it, redistribute
- * it, and/or modify it under the terms of the GNU Lesser General
- * Public License as published by the Free Software Foundation; either
- * version 2.1 of the License, or (at your option) any later version.
- * The full text of the license can be found in the file LICENSE.md at
- * the top level directory of deal.II.
+ * Part of the source code is dual licensed under Apache-2.0 WITH
+ * LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+ * governing the source code and code contributions can be found in
+ * LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
  *
- * ---------------------------------------------------------------------
+ * ------------------------------------------------------------------------
  *
  * Authors: Daniel Arndt, Matthias Maier, 2015
  *
@@ -88,7 +87,7 @@ namespace Step45
     MPI_Comm mpi_communicator;
 
     parallel::distributed::Triangulation<dim> triangulation;
-    FESystem<dim>                             fe;
+    const FESystem<dim>                       fe;
     DoFHandler<dim>                           dof_handler;
 
     AffineConstraints<double> constraints;
@@ -104,7 +103,7 @@ namespace Step45
 
     ConditionalOStream pcout;
 
-    MappingQ<dim> mapping;
+    const MappingQ<dim> mapping;
   };
 
 
@@ -186,7 +185,7 @@ namespace Step45
 
 
   template <class MatrixType, class PreconditionerType>
-  class InverseMatrix : public Subscriptor
+  class InverseMatrix : public EnableObserverPointer
   {
   public:
     InverseMatrix(const MatrixType         &m,
@@ -198,8 +197,8 @@ namespace Step45
                const TrilinosWrappers::MPI::Vector &src) const;
 
   private:
-    const SmartPointer<const MatrixType>         matrix;
-    const SmartPointer<const PreconditionerType> preconditioner;
+    const ObserverPointer<const MatrixType>         matrix;
+    const ObserverPointer<const PreconditionerType> preconditioner;
 
     mutable TrilinosWrappers::MPI::Vector tmp;
   };
@@ -249,8 +248,9 @@ namespace Step45
                const TrilinosWrappers::MPI::Vector &src) const;
 
   private:
-    const SmartPointer<const TrilinosWrappers::BlockSparseMatrix> system_matrix;
-    const SmartPointer<
+    const ObserverPointer<const TrilinosWrappers::BlockSparseMatrix>
+      system_matrix;
+    const ObserverPointer<
       const InverseMatrix<TrilinosWrappers::SparseMatrix, PreconditionerType>>
                                           A_inverse;
     mutable TrilinosWrappers::MPI::Vector tmp1, tmp2;
@@ -366,7 +366,7 @@ namespace Step45
 
     {
       owned_partitioning.clear();
-      IndexSet locally_owned_dofs = dof_handler.locally_owned_dofs();
+      const IndexSet &locally_owned_dofs = dof_handler.locally_owned_dofs();
       owned_partitioning.push_back(locally_owned_dofs.get_view(0, n_u));
       owned_partitioning.push_back(locally_owned_dofs.get_view(n_u, n_u + n_p));
 
@@ -378,7 +378,7 @@ namespace Step45
         locally_relevant_dofs.get_view(n_u, n_u + n_p));
 
       constraints.clear();
-      constraints.reinit(locally_relevant_dofs);
+      constraints.reinit(locally_owned_dofs, locally_relevant_dofs);
 
       const FEValuesExtractors::Vector velocities(0);
 
@@ -535,7 +535,7 @@ namespace Step45
     system_rhs            = 0.;
     preconditioner_matrix = 0.;
 
-    QGauss<dim> quadrature_formula(degree + 2);
+    const QGauss<dim> quadrature_formula(degree + 2);
 
     FEValues<dim> fe_values(mapping,
                             fe,

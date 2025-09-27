@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2017 - 2023 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2017 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 
 
@@ -42,7 +41,12 @@
 // Make sure we #include the SUNDIALS config file...
 #  include <sundials/sundials_config.h>
 // ...before the rest of the SUNDIALS files:
-#  include <kinsol/kinsol_direct.h>
+#  if DEAL_II_SUNDIALS_VERSION_GTE(6, 0, 0)
+#    include <kinsol/kinsol_ls.h>
+#  else
+#    include <kinsol/kinsol_direct.h>
+#  endif
+#  include <kinsol/kinsol.h>
 #  include <sunlinsol/sunlinsol_dense.h>
 #  include <sunmatrix/sunmatrix_dense.h>
 
@@ -55,16 +59,17 @@ namespace SUNDIALS
 {
   template <typename VectorType>
   KINSOL<VectorType>::AdditionalData::AdditionalData(
-    const SolutionStrategy &strategy,
-    const unsigned int      maximum_non_linear_iterations,
-    const double            function_tolerance,
-    const double            step_tolerance,
-    const bool              no_init_setup,
-    const unsigned int      maximum_setup_calls,
-    const double            maximum_newton_step,
-    const double            dq_relative_error,
-    const unsigned int      maximum_beta_failures,
-    const unsigned int      anderson_subspace_size)
+    const SolutionStrategy         &strategy,
+    const unsigned int              maximum_non_linear_iterations,
+    const double                    function_tolerance,
+    const double                    step_tolerance,
+    const bool                      no_init_setup,
+    const unsigned int              maximum_setup_calls,
+    const double                    maximum_newton_step,
+    const double                    dq_relative_error,
+    const unsigned int              maximum_beta_failures,
+    const unsigned int              anderson_subspace_size,
+    const OrthogonalizationStrategy anderson_qr_orthogonalization)
     : strategy(strategy)
     , maximum_non_linear_iterations(maximum_non_linear_iterations)
     , function_tolerance(function_tolerance)
@@ -75,6 +80,7 @@ namespace SUNDIALS
     , dq_relative_error(dq_relative_error)
     , maximum_beta_failures(maximum_beta_failures)
     , anderson_subspace_size(anderson_subspace_size)
+    , anderson_qr_orthogonalization(anderson_qr_orthogonalization)
   {}
 
 
@@ -99,7 +105,7 @@ namespace SUNDIALS
       else if (value == "picard")
         strategy = picard;
       else
-        Assert(false, ExcInternalError());
+        DEAL_II_ASSERT_UNREACHABLE();
     });
     prm.add_parameter("Maximum number of nonlinear iterations",
                       maximum_non_linear_iterations);
@@ -125,6 +131,30 @@ namespace SUNDIALS
     prm.enter_subsection("Fixed point and Picard parameters");
     prm.add_parameter("Anderson acceleration subspace size",
                       anderson_subspace_size);
+
+    static std::string orthogonalization_str("modified_gram_schmidt");
+    prm.add_parameter(
+      "Anderson QR orthogonalization",
+      orthogonalization_str,
+      "Choose among modified_gram_schmidt|inverse_compact|"
+      "classical_gram_schmidt|delayed_classical_gram_schmidt",
+      Patterns::Selection(
+        "modified_gram_schmidt|inverse_compact|classical_gram_schmidt|"
+        "delayed_classical_gram_schmidt"));
+    prm.add_action("Anderson QR orthogonalization",
+                   [&](const std::string &value) {
+                     if (value == "modified_gram_schmidt")
+                       anderson_qr_orthogonalization = modified_gram_schmidt;
+                     else if (value == "inverse_compact")
+                       anderson_qr_orthogonalization = inverse_compact;
+                     else if (value == "classical_gram_schmidt")
+                       anderson_qr_orthogonalization = classical_gram_schmidt;
+                     else if (value == "delayed_classical_gram_schmidt")
+                       anderson_qr_orthogonalization =
+                         delayed_classical_gram_schmidt;
+                     else
+                       DEAL_II_ASSERT_UNREACHABLE();
+                   });
     prm.leave_subsection();
   }
 
@@ -150,12 +180,19 @@ namespace SUNDIALS
   {
     set_functions_to_trigger_an_assert();
 
-#  if DEAL_II_SUNDIALS_VERSION_GTE(6, 0, 0)
     // SUNDIALS will always duplicate communicators if we provide them. This
     // can cause problems if SUNDIALS is configured with MPI and we pass along
     // MPI_COMM_SELF in a serial application as MPI won't be
     // initialized. Hence, work around that by just not providing a
     // communicator in that case.
+#  if DEAL_II_SUNDIALS_VERSION_GTE(7, 0, 0)
+    const int status =
+      SUNContext_Create(mpi_communicator == MPI_COMM_SELF ? SUN_COMM_NULL :
+                                                            mpi_communicator,
+                        &kinsol_ctx);
+    (void)status;
+    AssertKINSOL(status);
+#  elif DEAL_II_SUNDIALS_VERSION_GTE(6, 0, 0)
     const int status =
       SUNContext_Create(mpi_communicator == MPI_COMM_SELF ? nullptr :
                                                             &mpi_communicator,
@@ -209,9 +246,17 @@ namespace SUNDIALS
     AssertKINSOL(status);
 #  endif
 
-#  if DEAL_II_SUNDIALS_VERSION_LT(6, 0, 0)
-    kinsol_mem = KINCreate();
-#  else
+
+#  if DEAL_II_SUNDIALS_VERSION_GTE(7, 0, 0)
+    // Same comment applies as in class constructor:
+    status =
+      SUNContext_Create(mpi_communicator == MPI_COMM_SELF ? SUN_COMM_NULL :
+                                                            mpi_communicator,
+                        &kinsol_ctx);
+    AssertKINSOL(status);
+
+    kinsol_mem = KINCreate(kinsol_ctx);
+#  elif DEAL_II_SUNDIALS_VERSION_GTE(6, 0, 0)
     // Same comment applies as in class constructor:
     status =
       SUNContext_Create(mpi_communicator == MPI_COMM_SELF ? nullptr :
@@ -220,6 +265,8 @@ namespace SUNDIALS
     AssertKINSOL(status);
 
     kinsol_mem = KINCreate(kinsol_ctx);
+#  else
+    kinsol_mem = KINCreate();
 #  endif
 
     status = KINSetUserData(kinsol_mem, static_cast<void *>(this));
@@ -257,6 +304,21 @@ namespace SUNDIALS
     // From the manual: this must be called BEFORE KINInit
     status = KINSetMAA(kinsol_mem, data.anderson_subspace_size);
     AssertKINSOL(status);
+
+#  if DEAL_II_SUNDIALS_VERSION_GTE(6, 0, 0)
+    // From the manual: this must be called BEFORE KINInit
+    status = KINSetOrthAA(kinsol_mem, data.anderson_qr_orthogonalization);
+    AssertKINSOL(status);
+#  else
+    AssertThrow(
+      data.anderson_qr_orthogonalization ==
+        AdditionalData::modified_gram_schmidt,
+      ExcMessage(
+        "You specified an orthogonalization strategy for QR factorization "
+        "different from the default (modified Gram-Schmidt) but the installed "
+        "SUNDIALS version does not support this feature. Either choose the "
+        "default or install a SUNDIALS version >= 6.0.0."));
+#  endif
 
     if (data.strategy == AdditionalData::fixed_point)
       status = KINInit(
@@ -352,19 +414,19 @@ namespace SUNDIALS
             }
           if (LS->ops)
             {
-              free(LS->ops);
+              std::free(LS->ops);
               LS->ops = nullptr;
             }
-          free(LS);
+          std::free(LS);
           LS = nullptr;
           return 0;
         };
 
         LS->ops->solve = [](SUNLinearSolver LS,
                             SUNMatrix /*ignored*/,
-                            N_Vector x,
-                            N_Vector b,
-                            realtype tol) -> int {
+                            N_Vector           x,
+                            N_Vector           b,
+                            SUNDIALS::realtype tol) -> int {
           // Receive the object that describes the linear solver and
           // unpack the pointer to the KINSOL object from which we can then
           // get the 'reinit' and 'solve' functions.
@@ -409,10 +471,10 @@ namespace SUNDIALS
             }
           if (A->ops)
             {
-              free(A->ops);
+              std::free(A->ops);
               A->ops = nullptr;
             }
-          free(A);
+          std::free(A);
           A = nullptr;
         };
 
@@ -458,7 +520,7 @@ namespace SUNDIALS
 
 
     // Having set up all of the ancillary things, finally call the main KINSol
-    // function. One we return, check that what happened:
+    // function. Once we return, check what happened:
     // - If we have a pending recoverable exception, ignore it if SUNDIAL's
     //   return code was zero -- in that case, SUNDIALS managed to indeed
     //   recover and we no longer need the exception
@@ -502,7 +564,17 @@ namespace SUNDIALS
             throw;
           }
       }
-    AssertKINSOL(status);
+    // It is of course also possible that KINSOL experienced
+    // convergence issues even if the user-side callbacks
+    // succeeded. In that case, we also want to throw an exception
+    // that can be caught by the user -- whether that's actually
+    // useful to determine a different course of action (i.e., whether
+    // the user side can do something to recover the ability to
+    // converge) is a separate matter that we need not decide
+    // here. (One could imagine this happening in a time or load
+    // stepping procedure where re-starting with a smaller time step
+    // or load step could help.)
+    AssertThrow(status >= 0, ExcKINSOLError(status));
 
     long nniters;
     status = KINGetNumNonlinSolvIters(kinsol_mem, &nniters);

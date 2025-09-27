@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2001 - 2022 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2008 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 #include <deal.II/base/quadrature_lib.h>
 #include <deal.II/base/utilities.h>
@@ -34,13 +33,13 @@
 #include <deal.II/lac/trilinos_vector.h>
 #include <deal.II/lac/vector.h>
 
+#include <boost/container/small_vector.hpp>
+
 #include <memory>
+
 
 DEAL_II_NAMESPACE_OPEN
 
-
-
-// .... MAPPING Q EULERIAN CONSTRUCTOR
 
 
 template <int dim, typename VectorType, int spacedim>
@@ -54,7 +53,9 @@ MappingQEulerian<dim, VectorType, spacedim>::MappingQEulerian(
   , euler_dof_handler(&euler_dof_handler)
   , level(level)
   , support_quadrature(degree)
-  , fe_values(euler_dof_handler.get_fe(),
+  , mapping_q(degree)
+  , fe_values(mapping_q,
+              euler_dof_handler.get_fe(),
               support_quadrature,
               update_values | update_quadrature_points)
 {}
@@ -70,8 +71,6 @@ MappingQEulerian<dim, VectorType, spacedim>::clone() const
 }
 
 
-
-// .... SUPPORT QUADRATURE CONSTRUCTOR
 
 template <int dim, typename VectorType, int spacedim>
 MappingQEulerian<dim, VectorType, spacedim>::SupportQuadrature::
@@ -96,11 +95,14 @@ MappingQEulerian<dim, VectorType, spacedim>::SupportQuadrature::
 
 
 
-// .... COMPUTE MAPPING SUPPORT POINTS
-
 template <int dim, typename VectorType, int spacedim>
 boost::container::small_vector<Point<spacedim>,
-                               GeometryInfo<dim>::vertices_per_cell>
+#ifndef _MSC_VER
+                               ReferenceCells::max_n_vertices<dim>()
+#else
+                               GeometryInfo<dim>::vertices_per_cell
+#endif
+                               >
 MappingQEulerian<dim, VectorType, spacedim>::get_vertices(
   const typename Triangulation<dim, spacedim>::cell_iterator &cell) const
 {
@@ -108,9 +110,13 @@ MappingQEulerian<dim, VectorType, spacedim>::get_vertices(
   const std::vector<Point<spacedim>> a = compute_mapping_support_points(cell);
 
   boost::container::small_vector<Point<spacedim>,
-                                 GeometryInfo<dim>::vertices_per_cell>
-    vertex_locations(a.begin(),
-                     a.begin() + GeometryInfo<dim>::vertices_per_cell);
+#ifndef _MSC_VER
+                                 ReferenceCells::max_n_vertices<dim>()
+#else
+                                 GeometryInfo<dim>::vertices_per_cell
+#endif
+                                 >
+    vertex_locations(a.begin(), a.begin() + cell->n_vertices());
 
   return vertex_locations;
 }
@@ -127,10 +133,6 @@ MappingQEulerian<dim, VectorType, spacedim>::compute_mapping_support_points(
   const types::global_dof_index n_dofs =
     mg_vector ? euler_dof_handler->n_dofs(level) : euler_dof_handler->n_dofs();
   const types::global_dof_index vector_size = euler_vector->size();
-
-  (void)n_dofs;
-  (void)vector_size;
-
   AssertDimension(vector_size, n_dofs);
 
   // we then transform our tria iterator into a dof iterator so we can access
@@ -182,7 +184,7 @@ MappingQEulerian<dim, VectorType, spacedim>::compute_mapping_support_points(
     {
       a[q] = fe_values.quadrature_point(q);
       for (unsigned int d = 0; d < spacedim; ++d)
-        a[q](d) += shift_vector[q](d);
+        a[q][d] += shift_vector[q][d];
     }
 
   return a;
@@ -216,7 +218,7 @@ MappingQEulerian<dim, VectorType, spacedim>::fill_fe_values(
 
 
 // explicit instantiations
-#include "mapping_q_eulerian.inst"
+#include "fe/mapping_q_eulerian.inst"
 
 
 DEAL_II_NAMESPACE_CLOSE

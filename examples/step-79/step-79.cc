@@ -1,17 +1,16 @@
-/* ---------------------------------------------------------------------
+/* ------------------------------------------------------------------------
  *
- * Copyright (C) 2021 - 2023 by the deal.II authors
+ * SPDX-License-Identifier: LGPL-2.1-or-later
+ * Copyright (C) 2021 - 2025 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
- * The deal.II library is free software; you can use it, redistribute
- * it, and/or modify it under the terms of the GNU Lesser General
- * Public License as published by the Free Software Foundation; either
- * version 2.1 of the License, or (at your option) any later version.
- * The full text of the license can be found in the file LICENSE.md at
- * the top level directory of deal.II.
+ * Part of the source code is dual licensed under Apache-2.0 WITH
+ * LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+ * governing the source code and code contributions can be found in
+ * LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
  *
- * ---------------------------------------------------------------------
+ * ------------------------------------------------------------------------
  *
  * Author: Justin O'Connor, Colorado State University, 2021.
  */
@@ -46,7 +45,6 @@
 #include <deal.II/fe/fe_system.h>
 #include <deal.II/fe/fe_q.h>
 
-#include <deal.II/numerics/vector_tools.h>
 #include <deal.II/numerics/matrix_tools.h>
 #include <deal.II/numerics/data_out.h>
 
@@ -235,7 +233,7 @@ namespace SAND
     // factors below) as well as the filter matrix to ensure that
     // the design remains smooth.
     Triangulation<dim>        triangulation;
-    FESystem<dim>             fe;
+    const FESystem<dim>       fe;
     DoFHandler<dim>           dof_handler;
     AffineConstraints<double> constraints;
 
@@ -332,9 +330,9 @@ namespace SAND
             if (face->at_boundary())
               {
                 const auto center = face->center();
-                if (std::fabs(center(1) - 1) < 1e-12)
+                if (std::fabs(center[1] - 1) < 1e-12)
                   {
-                    if ((std::fabs(center(0) - 3) < .3))
+                    if ((std::fabs(center[0] - 3) < .3))
                       face->set_boundary_id(BoundaryIds::down_force);
                     else
                       face->set_boundary_id(BoundaryIds::no_force);
@@ -374,14 +372,14 @@ namespace SAND
                 // boundary, and if it is whether one of its
                 // vertices might be the bottom left or bottom
                 // right vertex:
-                if (std::fabs(center(1) - 0) < 1e-12)
+                if (std::fabs(center[1] - 0) < 1e-12)
                   {
                     for (const auto vertex_number : cell->vertex_indices())
                       {
                         const auto vert = cell->vertex(vertex_number);
 
-                        if (std::fabs(vert(0) - 0) < 1e-12 &&
-                            std::fabs(vert(1) - 0) < 1e-12)
+                        if (std::fabs(vert[0] - 0) < 1e-12 &&
+                            std::fabs(vert[1] - 0) < 1e-12)
                           {
                             types::global_dof_index x_displacement =
                               cell->vertex_dof_index(vertex_number, 0);
@@ -398,8 +396,8 @@ namespace SAND
                             boundary_values[y_displacement_multiplier] = 0;
                           }
 
-                        else if (std::fabs(vert(0) - 6) < 1e-12 &&
-                                 std::fabs(vert(1) - 0) < 1e-12)
+                        else if (std::fabs(vert[0] - 6) < 1e-12 &&
+                                 std::fabs(vert[1] - 0) < 1e-12)
                           {
                             types::global_dof_index y_displacement =
                               cell->vertex_dof_index(vertex_number, 1);
@@ -536,13 +534,16 @@ namespace SAND
     types::global_dof_index last_density_dof =
       density_dofs.nth_index_in_set(density_dofs.n_elements() - 1);
     constraints.clear();
-    constraints.add_line(last_density_dof);
-    for (unsigned int i = 0; i < density_dofs.n_elements() - 1; ++i)
-      constraints.add_entry(last_density_dof,
-                            density_dofs.nth_index_in_set(i),
-                            -1);
-    constraints.set_inhomogeneity(last_density_dof, 0);
+    {
+      std::vector<std::pair<types::global_dof_index, double>>
+        constraint_entries;
+      constraint_entries.reserve(density_dofs.n_elements() - 1);
+      for (const types::global_dof_index dof_index : density_dofs)
+        if (dof_index != last_density_dof)
+          constraint_entries.emplace_back(dof_index, -1.);
 
+      constraints.add_constraint(last_density_dof, constraint_entries, 0.);
+    }
     constraints.close();
 
     // We can now finally create the sparsity pattern for the
@@ -751,15 +752,15 @@ namespace SAND
     system_rhs    = 0;
 
 
-    MappingQ<dim>     mapping(1);
-    QGauss<dim>       quadrature_formula(fe.degree + 1);
-    QGauss<dim - 1>   face_quadrature_formula(fe.degree + 1);
-    FEValues<dim>     fe_values(mapping,
+    const MappingQ<dim>   mapping(1);
+    const QGauss<dim>     quadrature_formula(fe.degree + 1);
+    const QGauss<dim - 1> face_quadrature_formula(fe.degree + 1);
+    FEValues<dim>         fe_values(mapping,
                             fe,
                             quadrature_formula,
                             update_values | update_gradients |
                               update_quadrature_points | update_JxW_values);
-    FEFaceValues<dim> fe_face_values(mapping,
+    FEFaceValues<dim>     fe_face_values(mapping,
                                      fe,
                                      face_quadrature_formula,
                                      update_values | update_quadrature_points |
@@ -1299,7 +1300,7 @@ namespace SAND
     BlockVector<double> test_rhs;
     test_rhs.reinit(system_rhs);
 
-    MappingQ<dim>         mapping(1);
+    const MappingQ<dim>   mapping(1);
     const QGauss<dim>     quadrature_formula(fe.degree + 1);
     const QGauss<dim - 1> face_quadrature_formula(fe.degree + 1);
     FEValues<dim>         fe_values(mapping,
@@ -1625,7 +1626,7 @@ namespace SAND
     // Start with computing the objective function:
     double objective_function_merit = 0;
     {
-      MappingQ<dim>         mapping(1);
+      const MappingQ<dim>   mapping(1);
       const QGauss<dim>     quadrature_formula(fe.degree + 1);
       const QGauss<dim - 1> face_quadrature_formula(fe.degree + 1);
       FEValues<dim>         fe_values(mapping,
@@ -1687,7 +1688,7 @@ namespace SAND
       }
 
     // Then compute the residual and take the $l_1$ norms of the
-    // components that correspond to Lagrange mulipliers. We add
+    // components that correspond to Lagrange multipliers. We add
     // those to the objective function computed above, and return
     // the sum at the bottom:
     const BlockVector<double> test_rhs = calculate_test_rhs(test_solution);
@@ -2410,18 +2411,24 @@ namespace SAND
 
         // At the end of the outer loop, we have to update the
         // barrier parameter, for which we use the following
-        // formula. The rest of the function is then simply about
-        // checking the outer loop convergence condition, and if
+        // algorithm: First we reduce the barrier parameter
+        // to the smaller of two potential values (causing first a
+        // linear and later an exponential decrease), then
+        // we ensure we do not reduce the barrier parameter
+        // below a lower limit.
+        // Once we reach the lower limit for the barrier parameter
+        // the rest of the function is simply about
+        // checking the outer loop convergence condition, and when
         // we decide to terminate computations, about writing the
         // final "design" as an STL file for use in 3d printing,
         // and to output some timing information.
         const double barrier_size_multiplier = .8;
         const double barrier_size_exponent   = 1.2;
 
-        barrier_size =
-          std::max(std::min(barrier_size * barrier_size_multiplier,
-                            std::pow(barrier_size, barrier_size_exponent)),
-                   min_barrier_size);
+        barrier_size = std::min(barrier_size * barrier_size_multiplier,
+                                std::pow(barrier_size, barrier_size_exponent));
+
+        barrier_size = std::max(barrier_size, min_barrier_size);
 
         std::cout << std::endl;
       }

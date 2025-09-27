@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2002 - 2022 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2002 - 2024 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 #ifndef dealii_block_sparse_matrix_ez_h
 #define dealii_block_sparse_matrix_ez_h
@@ -24,9 +23,9 @@
 
 #include <deal.II/base/config.h>
 
+#include <deal.II/base/enable_observer_pointer.h>
 #include <deal.II/base/exceptions.h>
-#include <deal.II/base/smartpointer.h>
-#include <deal.II/base/subscriptor.h>
+#include <deal.II/base/observer_pointer.h>
 #include <deal.II/base/table.h>
 
 #include <deal.II/lac/block_indices.h>
@@ -58,7 +57,7 @@ class BlockVector;
  * @ref GlossBlockLA "Block (linear algebra)"
  */
 template <typename Number>
-class BlockSparseMatrixEZ : public Subscriptor
+class BlockSparseMatrixEZ : public EnableObserverPointer
 {
 public:
   /**
@@ -157,8 +156,8 @@ public:
   /**
    * Return whether the object is empty. It is empty if no memory is
    * allocated, which is the same as that both dimensions are zero. This
-   * function is just the concatenation of the respective call to all sub-
-   * matrices.
+   * function is just the concatenation of the respective call to all
+   * sub-matrices.
    */
   bool
   empty() const;
@@ -174,9 +173,9 @@ public:
 
   /**
    * Return number of columns of this matrix, which equals the dimension of
-   * the domain space. It is the sum of the number of columns over the sub-
-   * matrix blocks of this matrix. Recall that the matrix is of size m() times
-   * n().
+   * the domain space. It is the sum of the number of columns over the
+   * sub-matrix blocks of this matrix. Recall that the matrix is of size m()
+   * times n().
    */
   size_type
   n() const;

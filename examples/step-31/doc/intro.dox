@@ -1,5 +1,3 @@
-<br>
-
 <i>This program was contributed by Martin Kronbichler and Wolfgang
 Bangerth.
 <br>
@@ -12,7 +10,7 @@ California Institute of Technology.
 </i>
 
 
-<a name="Intro"></a>
+<a name="step_31-Intro"></a>
 <h1>Introduction</h1>
 
 <h3>The Boussinesq equations</h3>
@@ -40,7 +38,7 @@ Boussinesq equations that read as follows:
   \nabla \cdot \kappa \nabla T &=& \gamma.
 @f}
 These equations fall into the class of vector-valued problems (a
-toplevel overview of this topic can be found in the @ref vector_valued module).
+toplevel overview of this topic can be found in the @ref vector_valued topic).
 Here, $\mathbf u$ is the velocity field, $p$ the pressure, and $T$
 the temperature of the fluid. $\varepsilon ({\mathbf u}) = \frac 12
 [(\nabla{\mathbf u}) + (\nabla {\mathbf u})^T]$ is the symmetric
@@ -236,14 +234,14 @@ explicit time stepping scheme, but by character not too far away either.
 
 The introduction of the temperature extrapolation limits the time step by a
 <a href="http://en.wikipedia.org/wiki/Courant–Friedrichs–Lewy_condition">
-Courant-Friedrichs-Lewy (CFL) condition</a> just like it was in @ref step_21
-"step-21". (We wouldn't have had that stability condition if we treated the
+Courant-Friedrichs-Lewy (CFL) condition</a> just like it was in
+step-21. (We wouldn't have had that stability condition if we treated the
 advection term implicitly since the BDF-2 scheme is A-stable, at the price
 that we needed to build a new temperature matrix at each time step.) We will
-discuss the exact choice of time step in the <a href="#Results">results
-section</a>, but for the moment of importance is that this CFL condition
-means that the time step size $k$ may change from time step to time
-step, and that we have to modify the above formula slightly. If
+discuss the exact choice of time step in the
+@ref step_31-ResultsSection "results section", but for the moment of importance is
+that this CFL condition means that the time step size $k$ may change from time
+step to time step, and that we have to modify the above formula slightly. If
 $k_n,k_{n-1}$ are the time steps sizes of the current and previous time
 step, then we use the approximations
 @f{align*}{
@@ -448,7 +446,7 @@ follows:
 
 Here, $\beta$ is a stabilization constant (a dimensional analysis
 reveals that it is unitless and therefore independent of scaling; we will
-discuss its choice in the <a href="#Results">results section</a>) and
+discuss its choice in the @ref step_31-ResultsSection "results section" and
 $c(\mathbf{u},T)$ is a normalization constant that must have units
 $\frac{m^{\alpha-1}K^\alpha}{s}$. We will choose it as
 $c(\mathbf{u},T) =

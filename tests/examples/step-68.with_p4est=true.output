@@ -1,0 +1,13 @@
+Number of particles inserted: 384
+Repartitioning triangulation after particle generation
+Writing particle output file: analytical-particles-0
+Writing particle output file: analytical-particles-10
+Writing particle output file: analytical-particles-20
+Number of particles inserted: 384
+Repartitioning triangulation after particle generation
+Writing particle output file: interpolated-particles-0
+Writing background field file: background-0
+Writing particle output file: interpolated-particles-10
+Writing background field file: background-10
+Writing particle output file: interpolated-particles-20
+Writing background field file: background-20

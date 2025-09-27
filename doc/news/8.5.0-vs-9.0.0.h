@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2017 - 2018 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2018 - 2024 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 /**
 @page changes_between_8_5_0_and_9_0_0 Changes between Version 8.5.0 and 9.0.0
@@ -26,7 +25,7 @@ author.
 
 <!-- ----------- INCOMPATIBILITIES ----------------- -->
 
-<a name="incompatible"></a>
+<a name="850-900-incompatible"></a>
 <h3 style="color:red">Incompatibilities</h3>
 
 <p style="color:red">
@@ -693,7 +692,7 @@ inconvenience this causes.
 
 <!-- ----------- GENERAL IMPROVEMENTS ----------------- -->
 
-<a name="general"></a>
+<a name="850-900-general"></a>
 <h3>General</h3>
 
 <ol>
@@ -960,7 +959,7 @@ inconvenience this causes.
 
 <!-- ----------- SPECIFIC IMPROVEMENTS ----------------- -->
 
-<a name="specific"></a>
+<a name="850-900-specific"></a>
 <h3>Specific improvements</h3>
 
 <ol>
@@ -1038,7 +1037,7 @@ inconvenience this causes.
 
  <li>
   New: FECollection gained an equality comparison operator. Both FiniteElement
-  and FECollcetion have a non-equality comparison operator now.
+  and FECollection have a non-equality comparison operator now.
   <br>
   (Daniel Arndt, 2018/04/25)
  </li>
@@ -1672,7 +1671,7 @@ inconvenience this causes.
  </li>
 
  <li>
-  New: DynamicSparsityPattern::compute_mmult_pattern(left, right) with two arguents of either
+  New: DynamicSparsityPattern::compute_mmult_pattern(left, right) with two arguments of either
   a DynamicSparsityPattern or a SparsityPattern; or any combination of those.
   The result is the pattern which is obtained by multiplying the two sparse matrices on
   the given sparsity patterns.
@@ -2504,7 +2503,7 @@ inconvenience this causes.
  </li>
 
  <li>
-  Deprecated: internal::bool2type and int2type has been depreated
+  Deprecated: internal::bool2type and int2type has been deprecated
   in favor of std::intergral_constant.
   <br>
   (Daniel Arndt, 2017/08/10)

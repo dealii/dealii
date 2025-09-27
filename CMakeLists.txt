@@ -1,17 +1,16 @@
-## ---------------------------------------------------------------------
+## ------------------------------------------------------------------------
 ##
+## SPDX-License-Identifier: LGPL-2.1-or-later
 ## Copyright (C) 2012 - 2023 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
-## The deal.II library is free software; you can use it, redistribute
-## it, and/or modify it under the terms of the GNU Lesser General
-## Public License as published by the Free Software Foundation; either
-## version 2.1 of the License, or (at your option) any later version.
-## The full text of the license can be found in the file LICENSE.md at
-## the top level directory of deal.II.
+## Part of the source code is dual licensed under Apache-2.0 WITH
+## LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+## governing the source code and code contributions can be found in
+## LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 ##
-## ---------------------------------------------------------------------
+## ------------------------------------------------------------------------
 
 
 ##                                                                    ##
@@ -39,11 +38,30 @@ cmake_minimum_required(VERSION 3.13.4)
 #
 cmake_policy(VERSION 3.13.4)
 
+if(POLICY CMP0074)
+  # Introduced in CMake 3.12: find_package(<PackageName>) also searches
+  # <PackageName>_ROOT CMake and environment variables when set to NEW.
+  cmake_policy(SET CMP0074 NEW)
+endif()
+
 if(POLICY CMP0075)
   # Introduced in CMake 3.12: Use CMAKE_REQUIRED_LIBRARIES also in include
   # file checks. We set the policy to NEW explicitly in order to avoid
   # spurious configure warnings.
   cmake_policy(SET CMP0075 NEW)
+endif()
+
+if(POLICY CMP0167)
+  # Introduced in CMake 3.30: When set to true then CMake uses the Boost
+  # CMake Config installed with Boost instead of using the FindBoost.cmake
+  # module installed with CMake.
+  cmake_policy(SET CMP0167 NEW)
+endif()
+
+if(POLICY CMP0177)
+  # Introduced in CMAKE 3:31: Normalize DESTINATION paths so that they do
+  # not contain "." or "..".
+  cmake_policy(SET CMP0177 NEW)
 endif()
 
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/modules/)
@@ -148,9 +166,20 @@ endif()
 if(DEAL_II_HAVE_BUNDLED_DIRECTORY)
   add_subdirectory(bundled)
 endif()
-add_subdirectory(source) # has to be included after bundled
 
-add_subdirectory(cmake/config) # has to be included after source
+# Now that we have collected information about the configuration
+# and the bundled directory, set up the compilation of the
+# library from the files in the source/ directory, as well as the
+# C++20 module:
+add_subdirectory(source)
+add_subdirectory(module)
+
+# Then also set up installation and other targets.
+add_subdirectory(cmake/config)
+
+# Now also configure installation of the examples. This relies on
+# the correctly set up library, so needs to come after configuration
+# in source/ and cmake/config/
 add_subdirectory(examples)
 
 add_subdirectory(contrib/utilities)

@@ -1,0 +1,35 @@
+
+DEAL:0:3D-Test:: Point search on subdivided hyper cube...
+DEAL:0:3D-Test::   Number of MPI processes = 3
+DEAL:0:3D-Test::   Number of this MPI processes = 0
+DEAL:0:3D-Test::   Number of cells = 4096
+DEAL:0:3D-Test::   Number of levels = 4
+DEAL:0:3D-Test::   Number of global levels = 4
+DEAL:0:3D-Test::   Triangulation checksum = 544659457
+DEAL:0:3D-Test::   points = 0.230000 0.770000 0.770000    
+DEAL:0:3D-Test::
+DEAL:0:3D-Test::   All point owner ranks found on all processes equal each other. TEST PASSED.
+DEAL:0:3D-Test::
+DEAL:0:3D-Test::   >>> Reached end of test <<<
+
+DEAL:1:3D-Test:: Point search on subdivided hyper cube...
+DEAL:1:3D-Test::   Number of MPI processes = 3
+DEAL:1:3D-Test::   Number of this MPI processes = 1
+DEAL:1:3D-Test::   Number of cells = 4096
+DEAL:1:3D-Test::   Number of levels = 4
+DEAL:1:3D-Test::   Number of global levels = 4
+DEAL:1:3D-Test::   Triangulation checksum = 544659457
+DEAL:1:3D-Test::   points = 0.230000 0.770000 0.770000    
+DEAL:1:3D-Test::   >>> Reached end of test <<<
+
+
+DEAL:2:3D-Test:: Point search on subdivided hyper cube...
+DEAL:2:3D-Test::   Number of MPI processes = 3
+DEAL:2:3D-Test::   Number of this MPI processes = 2
+DEAL:2:3D-Test::   Number of cells = 4096
+DEAL:2:3D-Test::   Number of levels = 4
+DEAL:2:3D-Test::   Number of global levels = 4
+DEAL:2:3D-Test::   Triangulation checksum = 544659457
+DEAL:2:3D-Test::   points = 0.230000 0.770000 0.770000    
+DEAL:2:3D-Test::   >>> Reached end of test <<<
+

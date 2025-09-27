@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2001 - 2022 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2001 - 2024 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 #ifndef dealii_mapping_cartesian_h
 #define dealii_mapping_cartesian_h
@@ -109,6 +108,13 @@ public:
   transform_real_to_unit_cell(
     const typename Triangulation<dim, spacedim>::cell_iterator &cell,
     const Point<spacedim> &p) const override;
+
+  // for documentation, see the Mapping base class
+  virtual void
+  transform_points_real_to_unit_cell(
+    const typename Triangulation<dim, spacedim>::cell_iterator &cell,
+    const ArrayView<const Point<spacedim>>                     &real_points,
+    const ArrayView<Point<dim>> &unit_points) const override;
 
   /**
    * @}
@@ -212,6 +218,11 @@ public:
      */
     InternalData(const Quadrature<dim> &quadrature);
 
+    // Documentation see Mapping::InternalDataBase.
+    virtual void
+    reinit(const UpdateFlags      update_flags,
+           const Quadrature<dim> &quadrature) override;
+
     /**
      * Return an estimate (in bytes) for the memory consumption of this object.
      */
@@ -225,12 +236,21 @@ public:
     mutable Tensor<1, dim> cell_extents;
 
     /**
+     * Reciprocal of the extents of the last cell we have seen in the
+     * coordinate directions, i.e., <i>h<sub>x</sub></i>,
+     * <i>h<sub>y</sub></i>, <i>h<sub>z</sub></i>.
+     */
+    mutable Tensor<1, dim> inverse_cell_extents;
+
+    /**
      * The volume element
      */
     mutable double volume_element;
 
     /**
-     * Vector of all quadrature points. Especially, all points on all faces.
+     * Location of quadrature points of faces or subfaces in 3d with all
+     * possible orientations. Can be accessed with the correct offset provided
+     * via QProjector::DataSetDescriptor. Not needed/used for cells.
      */
     std::vector<Point<dim>> quadrature_points;
   };
@@ -322,7 +342,8 @@ private:
   maybe_update_cell_quadrature_points(
     const typename Triangulation<dim, spacedim>::cell_iterator &cell,
     const InternalData                                         &data,
-    std::vector<Point<dim>> &quadrature_points) const;
+    const ArrayView<const Point<dim>> &unit_quadrature_points,
+    std::vector<Point<dim>>           &quadrature_points) const;
 
   /**
    * Compute the quadrature points if the UpdateFlags of the incoming
@@ -349,19 +370,6 @@ private:
     const unsigned int                                          face_no,
     const unsigned int                                          sub_no,
     const InternalData                                         &data,
-    std::vector<Point<dim>> &quadrature_points) const;
-
-  /**
-   * Transform quadrature points in InternalData to real space by scaling unit
-   * coordinates with cell_extends in each direction.
-   *
-   * Called from the various maybe_update_*_quadrature_points functions.
-   */
-  void
-  transform_quadrature_points(
-    const typename Triangulation<dim, spacedim>::cell_iterator &cell,
-    const InternalData                                         &data,
-    const typename QProjector<dim>::DataSetDescriptor          &offset,
     std::vector<Point<dim>> &quadrature_points) const;
 
   /**

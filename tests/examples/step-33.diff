@@ -1,0 +1,46 @@
+1205c1205
+<         final_time = prm.get_double("final time");
+---
+>         final_time = 0.04;//prm.get_double("final time");
+2373c2373,2374
+<       std::ifstream input_file(parameters.mesh_filename);
+---
+>       //std::ifstream input_file(parameters.mesh_filename);
+>       std::ifstream input_file("../../../source/step-33/slide.inp");
+2471c2472
+<                 std::printf("   %-16.3e (converged)\n\n", res_norm);
+---
+>                 std::printf("   %-16.1e (converged)\n\n", res_norm);
+2483c2484,2488
+<                 std::printf("   %-16.3e %04d        %-5.2e\n",
+---
+>                 std::string output;
+>                 if( (convergence.first < 10)&&(convergence.first > 6))
+>                   output="within";
+>                 else output="outside";
+>                 std::printf("   %-16.1e %s        %-5.1e\n",
+2485c2490
+<                             convergence.first,
+---
+>                             output.c_str(),
+2486a2492,2495
+>   //                std::printf("   %-16.3e %04d        %-5.2e\n",
+> //                            res_norm,
+> //                            convergence.first,
+> //                            convergence.second);
+2550,2554c2559,2563
+<       if (argc != 2)
+<         {
+<           std::cout << "Usage:" << argv[0] << " input_file" << std::endl;
+<           std::exit(1);
+<         }
+---
+>       //{
+>       //  std::cout << "Usage:" << argv[0] << " input_file" << std::endl;
+>         //std::exit(1);
+>       //}
+>       const char *input_file="../../../source/step-33/input.prm";
+2559c2568
+<       ConservationLaw<2> cons(argv[1]);
+---
+>       ConservationLaw<2> cons(input_file);

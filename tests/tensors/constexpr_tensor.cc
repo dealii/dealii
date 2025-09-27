@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2019 - 2022 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2019 - 2024 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 // Create and copy tensors in constexpr setting
 
@@ -183,7 +182,7 @@ main()
     constexpr Tensor<1, 3> dummy_1;
     constexpr Tensor<0, 3> dummy_0;
     DEAL_II_CONSTEXPR auto product_result = dummy_1 * dummy_1;
-    DEAL_II_CONSTEXPR auto constraction_result =
+    DEAL_II_CONSTEXPR auto contraction_result =
       contract<0, 0>(dummy_1, dummy_1);
     DEAL_II_CONSTEXPR auto outer_product_result =
       outer_product(dummy_0, dummy_0);

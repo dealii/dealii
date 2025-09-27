@@ -1,0 +1,711 @@
+
+DEAL::periodic face_pair:
+DEAL::    first  = (3, 0)
+DEAL::    second = (6, 3)
+DEAL::    relative orientation = 1
+DEAL::periodic face_pair:
+DEAL::    first  = (5, 1)
+DEAL::    second = (7, 3)
+DEAL::    relative orientation = 1
+DEAL::periodic face_pair:
+DEAL::    first  = (15, 0)
+DEAL::    second = (18, 3)
+DEAL::    relative orientation = 1
+DEAL::periodic face_pair:
+DEAL::    first  = (17, 1)
+DEAL::    second = (19, 3)
+DEAL::    relative orientation = 1
+DEAL::periodic face_pair:
+DEAL::    first  = (27, 0)
+DEAL::    second = (30, 3)
+DEAL::    relative orientation = 1
+DEAL::periodic face_pair:
+DEAL::    first  = (29, 1)
+DEAL::    second = (31, 3)
+DEAL::    relative orientation = 1
+DEAL::periodic face_pair:
+DEAL::    first  = (39, 0)
+DEAL::    second = (42, 3)
+DEAL::    relative orientation = 1
+DEAL::periodic face_pair:
+DEAL::    first  = (41, 1)
+DEAL::    second = (43, 3)
+DEAL::    relative orientation = 1
+DEAL::periodic face_pair:
+DEAL::    first  = (1, 1)
+DEAL::    second = (14, 3)
+DEAL::    relative orientation = 1
+DEAL::periodic face_pair:
+DEAL::    first  = (4, 2)
+DEAL::    second = (15, 1)
+DEAL::    relative orientation = 1
+DEAL::periodic face_pair:
+DEAL::    first  = (7, 1)
+DEAL::    second = (20, 3)
+DEAL::    relative orientation = 1
+DEAL::periodic face_pair:
+DEAL::    first  = (10, 2)
+DEAL::    second = (21, 1)
+DEAL::    relative orientation = 1
+DEAL::periodic face_pair:
+DEAL::    first  = (25, 1)
+DEAL::    second = (38, 3)
+DEAL::    relative orientation = 1
+DEAL::periodic face_pair:
+DEAL::    first  = (28, 2)
+DEAL::    second = (39, 1)
+DEAL::    relative orientation = 1
+DEAL::periodic face_pair:
+DEAL::    first  = (31, 1)
+DEAL::    second = (44, 3)
+DEAL::    relative orientation = 1
+DEAL::periodic face_pair:
+DEAL::    first  = (34, 2)
+DEAL::    second = (45, 1)
+DEAL::    relative orientation = 1
+DEAL::periodic face_pair:
+DEAL::    first  = (0, 0)
+DEAL::    second = (28, 0)
+DEAL::    relative orientation = 1
+DEAL::periodic face_pair:
+DEAL::    first  = (2, 2)
+DEAL::    second = (29, 0)
+DEAL::    relative orientation = 1
+DEAL::periodic face_pair:
+DEAL::    first  = (6, 0)
+DEAL::    second = (34, 0)
+DEAL::    relative orientation = 1
+DEAL::periodic face_pair:
+DEAL::    first  = (8, 2)
+DEAL::    second = (35, 0)
+DEAL::    relative orientation = 1
+DEAL::periodic face_pair:
+DEAL::    first  = (12, 0)
+DEAL::    second = (40, 0)
+DEAL::    relative orientation = 1
+DEAL::periodic face_pair:
+DEAL::    first  = (14, 2)
+DEAL::    second = (41, 0)
+DEAL::    relative orientation = 1
+DEAL::periodic face_pair:
+DEAL::    first  = (18, 0)
+DEAL::    second = (46, 0)
+DEAL::    relative orientation = 1
+DEAL::periodic face_pair:
+DEAL::    first  = (20, 2)
+DEAL::    second = (47, 0)
+DEAL::    relative orientation = 1
+DEAL::Number of constraints = 9
+DEAL::Number of constraints = 9
+DEAL::Number of constraints = 9
+DEAL::Number of constraints = 25
+DEAL::Number of constraints = 25
+DEAL::Number of constraints = 25
+DEAL::Number of constraints = 49
+    64 0:  1.00000
+    65 30:  1.00000
+    66 40:  1.00000
+    69 31:  1.00000
+    70 32:  1.00000
+    75 44:  1.00000
+    76 43:  1.00000
+    77 41:  1.00000
+    78 42:  1.00000
+    82 47:  1.00000
+    83 50:  1.00000
+    86 56:  1.00000
+    87 55:  1.00000
+    88 61:  1.00000
+    89 60:  1.00000
+    92 63:  1.00000
+    160 132:  1.00000
+    161 142:  1.00000
+    162 133:  1.00000
+    163 134:  1.00000
+    168 146:  1.00000
+    169 145:  1.00000
+    170 143:  1.00000
+    171 144:  1.00000
+    175 149:  1.00000
+    176 157:  1.00000
+    177 156:  1.00000
+    179 159:  1.00000
+    244 220:  1.00000
+    247 224:  1.00000
+    248 223:  1.00000
+    249 221:  1.00000
+    250 222:  1.00000
+    253 227:  1.00000
+    254 230:  1.00000
+    257 236:  1.00000
+    258 235:  1.00000
+    259 241:  1.00000
+    260 240:  1.00000
+    263 243:  1.00000
+    316 298:  1.00000
+    319 302:  1.00000
+    320 301:  1.00000
+    321 299:  1.00000
+    322 300:  1.00000
+    325 305:  1.00000
+    326 313:  1.00000
+    327 312:  1.00000
+    329 315:  1.00000
+DEAL::Number of constraints = 49
+    112 1:  1.00000
+    113 20:  1.00000
+    122 23:  1.00000
+    123 24:  1.00000
+    132 0:  1.00000
+    135 22:  1.00000
+    136 21:  1.00000
+    137 5:  1.00000
+    138 4:  1.00000
+    141 27:  1.00000
+    142 50:  1.00000
+    143 56:  1.00000
+    144 55:  1.00000
+    147 54:  1.00000
+    148 53:  1.00000
+    150 59:  1.00000
+    160 64:  1.00000
+    161 83:  1.00000
+    170 86:  1.00000
+    171 87:  1.00000
+    180 85:  1.00000
+    181 84:  1.00000
+    182 68:  1.00000
+    183 67:  1.00000
+    186 90:  1.00000
+    187 107:  1.00000
+    188 106:  1.00000
+    189 110:  1.00000
+    280 206:  1.00000
+    285 209:  1.00000
+    286 210:  1.00000
+    294 208:  1.00000
+    295 207:  1.00000
+    297 213:  1.00000
+    298 230:  1.00000
+    299 236:  1.00000
+    300 235:  1.00000
+    303 234:  1.00000
+    304 233:  1.00000
+    306 239:  1.00000
+    316 254:  1.00000
+    321 257:  1.00000
+    322 258:  1.00000
+    330 256:  1.00000
+    331 255:  1.00000
+    333 261:  1.00000
+    334 275:  1.00000
+    335 274:  1.00000
+    336 278:  1.00000
+DEAL::Number of constraints = 49
+    196 2:  1.00000
+    206 1:  1.00000
+    211 7:  1.00000
+    212 6:  1.00000
+    220 30:  1.00000
+    225 36:  1.00000
+    226 35:  1.00000
+    230 0:  1.00000
+    231 9:  1.00000
+    232 8:  1.00000
+    233 5:  1.00000
+    234 4:  1.00000
+    237 16:  1.00000
+    240 31:  1.00000
+    241 32:  1.00000
+    242 38:  1.00000
+    244 65:  1.00000
+    254 64:  1.00000
+    259 70:  1.00000
+    260 69:  1.00000
+    268 96:  1.00000
+    269 95:  1.00000
+    272 72:  1.00000
+    273 71:  1.00000
+    274 68:  1.00000
+    275 67:  1.00000
+    276 79:  1.00000
+    279 98:  1.00000
+    280 112:  1.00000
+    290 115:  1.00000
+    291 114:  1.00000
+    298 132:  1.00000
+    303 138:  1.00000
+    304 137:  1.00000
+    308 117:  1.00000
+    309 116:  1.00000
+    310 124:  1.00000
+    312 133:  1.00000
+    313 134:  1.00000
+    314 140:  1.00000
+    316 160:  1.00000
+    326 163:  1.00000
+    327 162:  1.00000
+    334 183:  1.00000
+    335 182:  1.00000
+    338 165:  1.00000
+    339 164:  1.00000
+    340 172:  1.00000
+    342 185:  1.00000
+DEAL::OK!
+DEAL::periodic face_pair:
+DEAL::    first  = (4, 0)
+DEAL::    second = (31, 0)
+DEAL::    relative orientation = 1
+DEAL::periodic face_pair:
+DEAL::    first  = (5, 1)
+DEAL::    second = (30, 2)
+DEAL::    relative orientation = 5
+DEAL::periodic face_pair:
+DEAL::    first  = (8, 0)
+DEAL::    second = (33, 0)
+DEAL::    relative orientation = 1
+DEAL::periodic face_pair:
+DEAL::    first  = (11, 0)
+DEAL::    second = (34, 1)
+DEAL::    relative orientation = 5
+DEAL::periodic face_pair:
+DEAL::    first  = (52, 0)
+DEAL::    second = (79, 0)
+DEAL::    relative orientation = 1
+DEAL::periodic face_pair:
+DEAL::    first  = (53, 1)
+DEAL::    second = (78, 2)
+DEAL::    relative orientation = 5
+DEAL::periodic face_pair:
+DEAL::    first  = (56, 0)
+DEAL::    second = (81, 0)
+DEAL::    relative orientation = 1
+DEAL::periodic face_pair:
+DEAL::    first  = (59, 0)
+DEAL::    second = (82, 1)
+DEAL::    relative orientation = 5
+DEAL::periodic face_pair:
+DEAL::    first  = (100, 0)
+DEAL::    second = (127, 0)
+DEAL::    relative orientation = 1
+DEAL::periodic face_pair:
+DEAL::    first  = (101, 1)
+DEAL::    second = (126, 2)
+DEAL::    relative orientation = 5
+DEAL::periodic face_pair:
+DEAL::    first  = (104, 0)
+DEAL::    second = (129, 0)
+DEAL::    relative orientation = 1
+DEAL::periodic face_pair:
+DEAL::    first  = (107, 0)
+DEAL::    second = (130, 1)
+DEAL::    relative orientation = 5
+DEAL::periodic face_pair:
+DEAL::    first  = (148, 0)
+DEAL::    second = (175, 0)
+DEAL::    relative orientation = 1
+DEAL::periodic face_pair:
+DEAL::    first  = (149, 1)
+DEAL::    second = (174, 2)
+DEAL::    relative orientation = 5
+DEAL::periodic face_pair:
+DEAL::    first  = (152, 0)
+DEAL::    second = (177, 0)
+DEAL::    relative orientation = 1
+DEAL::periodic face_pair:
+DEAL::    first  = (155, 0)
+DEAL::    second = (178, 1)
+DEAL::    relative orientation = 5
+DEAL::periodic face_pair:
+DEAL::    first  = (0, 1)
+DEAL::    second = (49, 0)
+DEAL::    relative orientation = 5
+DEAL::periodic face_pair:
+DEAL::    first  = (3, 1)
+DEAL::    second = (50, 0)
+DEAL::    relative orientation = 5
+DEAL::periodic face_pair:
+DEAL::    first  = (8, 2)
+DEAL::    second = (59, 1)
+DEAL::    relative orientation = 5
+DEAL::periodic face_pair:
+DEAL::    first  = (9, 1)
+DEAL::    second = (58, 0)
+DEAL::    relative orientation = 5
+DEAL::periodic face_pair:
+DEAL::    first  = (24, 1)
+DEAL::    second = (73, 0)
+DEAL::    relative orientation = 5
+DEAL::periodic face_pair:
+DEAL::    first  = (27, 1)
+DEAL::    second = (74, 0)
+DEAL::    relative orientation = 5
+DEAL::periodic face_pair:
+DEAL::    first  = (32, 2)
+DEAL::    second = (83, 1)
+DEAL::    relative orientation = 5
+DEAL::periodic face_pair:
+DEAL::    first  = (33, 1)
+DEAL::    second = (82, 0)
+DEAL::    relative orientation = 5
+DEAL::periodic face_pair:
+DEAL::    first  = (96, 1)
+DEAL::    second = (145, 0)
+DEAL::    relative orientation = 5
+DEAL::periodic face_pair:
+DEAL::    first  = (99, 1)
+DEAL::    second = (146, 0)
+DEAL::    relative orientation = 5
+DEAL::periodic face_pair:
+DEAL::    first  = (104, 2)
+DEAL::    second = (155, 1)
+DEAL::    relative orientation = 5
+DEAL::periodic face_pair:
+DEAL::    first  = (105, 1)
+DEAL::    second = (154, 0)
+DEAL::    relative orientation = 5
+DEAL::periodic face_pair:
+DEAL::    first  = (120, 1)
+DEAL::    second = (169, 0)
+DEAL::    relative orientation = 5
+DEAL::periodic face_pair:
+DEAL::    first  = (123, 1)
+DEAL::    second = (170, 0)
+DEAL::    relative orientation = 5
+DEAL::periodic face_pair:
+DEAL::    first  = (128, 2)
+DEAL::    second = (179, 1)
+DEAL::    relative orientation = 5
+DEAL::periodic face_pair:
+DEAL::    first  = (129, 1)
+DEAL::    second = (178, 0)
+DEAL::    relative orientation = 5
+DEAL::periodic face_pair:
+DEAL::    first  = (0, 0)
+DEAL::    second = (99, 0)
+DEAL::    relative orientation = 5
+DEAL::periodic face_pair:
+DEAL::    first  = (1, 1)
+DEAL::    second = (98, 1)
+DEAL::    relative orientation = 5
+DEAL::periodic face_pair:
+DEAL::    first  = (4, 1)
+DEAL::    second = (101, 0)
+DEAL::    relative orientation = 5
+DEAL::periodic face_pair:
+DEAL::    first  = (7, 2)
+DEAL::    second = (102, 0)
+DEAL::    relative orientation = 1
+DEAL::periodic face_pair:
+DEAL::    first  = (24, 0)
+DEAL::    second = (123, 0)
+DEAL::    relative orientation = 5
+DEAL::periodic face_pair:
+DEAL::    first  = (25, 1)
+DEAL::    second = (122, 1)
+DEAL::    relative orientation = 5
+DEAL::periodic face_pair:
+DEAL::    first  = (28, 1)
+DEAL::    second = (125, 0)
+DEAL::    relative orientation = 5
+DEAL::periodic face_pair:
+DEAL::    first  = (31, 2)
+DEAL::    second = (126, 0)
+DEAL::    relative orientation = 1
+DEAL::periodic face_pair:
+DEAL::    first  = (48, 0)
+DEAL::    second = (147, 0)
+DEAL::    relative orientation = 5
+DEAL::periodic face_pair:
+DEAL::    first  = (49, 1)
+DEAL::    second = (146, 1)
+DEAL::    relative orientation = 5
+DEAL::periodic face_pair:
+DEAL::    first  = (52, 1)
+DEAL::    second = (149, 0)
+DEAL::    relative orientation = 5
+DEAL::periodic face_pair:
+DEAL::    first  = (55, 2)
+DEAL::    second = (150, 0)
+DEAL::    relative orientation = 1
+DEAL::periodic face_pair:
+DEAL::    first  = (72, 0)
+DEAL::    second = (171, 0)
+DEAL::    relative orientation = 5
+DEAL::periodic face_pair:
+DEAL::    first  = (73, 1)
+DEAL::    second = (170, 1)
+DEAL::    relative orientation = 5
+DEAL::periodic face_pair:
+DEAL::    first  = (76, 1)
+DEAL::    second = (173, 0)
+DEAL::    relative orientation = 5
+DEAL::periodic face_pair:
+DEAL::    first  = (79, 2)
+DEAL::    second = (174, 0)
+DEAL::    relative orientation = 1
+DEAL::Number of constraints = 13
+DEAL::Number of constraints = 13
+DEAL::Number of constraints = 13
+DEAL::Number of constraints = 41
+DEAL::Number of constraints = 41
+DEAL::Number of constraints = 41
+DEAL::Number of constraints = 85
+    172 0:  1.00000
+    191 20:  1.00000
+    209 40:  1.00000
+    227 59:  1.00000
+    254 76:  1.00000
+    255 90:  1.00000
+    256 89:  1.00000
+    257 91:  1.00000
+    258 92:  1.00000
+    261 93:  1.00000
+    262 94:  1.00000
+    265 98:  1.00000
+    267 82:  1.00000
+    268 81:  1.00000
+    269 80:  1.00000
+    270 79:  1.00000
+    271 78:  1.00000
+    272 77:  1.00000
+    275 85:  1.00000
+    284 127:  1.00000
+    285 126:  1.00000
+    288 130:  1.00000
+    292 150:  1.00000
+    293 151:  1.00000
+    297 154:  1.00000
+    476 329:  1.00000
+    494 349:  1.00000
+    531 376:  1.00000
+    532 390:  1.00000
+    533 389:  1.00000
+    534 391:  1.00000
+    535 392:  1.00000
+    538 393:  1.00000
+    539 394:  1.00000
+    542 398:  1.00000
+    544 382:  1.00000
+    545 381:  1.00000
+    546 380:  1.00000
+    547 379:  1.00000
+    548 378:  1.00000
+    549 377:  1.00000
+    552 385:  1.00000
+    562 428:  1.00000
+    565 444:  1.00000
+    566 445:  1.00000
+    570 448:  1.00000
+    759 613:  1.00000
+    777 632:  1.00000
+    803 649:  1.00000
+    804 660:  1.00000
+    805 659:  1.00000
+    806 661:  1.00000
+    807 662:  1.00000
+    810 663:  1.00000
+    811 664:  1.00000
+    814 668:  1.00000
+    816 653:  1.00000
+    817 652:  1.00000
+    818 651:  1.00000
+    819 650:  1.00000
+    822 656:  1.00000
+    830 694:  1.00000
+    831 693:  1.00000
+    834 697:  1.00000
+    838 717:  1.00000
+    839 718:  1.00000
+    843 721:  1.00000
+    1005 880:  1.00000
+    1041 907:  1.00000
+    1042 918:  1.00000
+    1043 917:  1.00000
+    1044 919:  1.00000
+    1045 920:  1.00000
+    1048 921:  1.00000
+    1049 922:  1.00000
+    1052 926:  1.00000
+    1054 911:  1.00000
+    1055 910:  1.00000
+    1056 909:  1.00000
+    1057 908:  1.00000
+    1060 914:  1.00000
+    1069 953:  1.00000
+    1072 969:  1.00000
+    1073 970:  1.00000
+    1077 973:  1.00000
+DEAL::Number of constraints = 85
+    329 0:  1.00000
+    330 1:  1.00000
+    331 3:  1.00000
+    332 4:  1.00000
+    333 5:  1.00000
+    334 12:  1.00000
+    335 13:  1.00000
+    336 11:  1.00000
+    337 10:  1.00000
+    344 17:  1.00000
+    348 58:  1.00000
+    349 59:  1.00000
+    351 60:  1.00000
+    352 61:  1.00000
+    353 68:  1.00000
+    354 69:  1.00000
+    355 67:  1.00000
+    356 66:  1.00000
+    363 73:  1.00000
+    436 134:  1.00000
+    437 135:  1.00000
+    440 139:  1.00000
+    444 127:  1.00000
+    445 126:  1.00000
+    449 132:  1.00000
+    476 172:  1.00000
+    477 174:  1.00000
+    478 175:  1.00000
+    479 176:  1.00000
+    480 183:  1.00000
+    481 184:  1.00000
+    482 182:  1.00000
+    483 181:  1.00000
+    490 188:  1.00000
+    494 227:  1.00000
+    496 228:  1.00000
+    497 229:  1.00000
+    498 236:  1.00000
+    499 237:  1.00000
+    500 235:  1.00000
+    501 234:  1.00000
+    508 241:  1.00000
+    565 284:  1.00000
+    566 285:  1.00000
+    569 289:  1.00000
+    575 282:  1.00000
+    869 592:  1.00000
+    870 595:  1.00000
+    871 596:  1.00000
+    872 594:  1.00000
+    873 593:  1.00000
+    876 599:  1.00000
+    879 631:  1.00000
+    880 632:  1.00000
+    882 633:  1.00000
+    883 634:  1.00000
+    884 641:  1.00000
+    885 642:  1.00000
+    886 640:  1.00000
+    887 639:  1.00000
+    894 646:  1.00000
+    961 701:  1.00000
+    962 702:  1.00000
+    965 706:  1.00000
+    969 694:  1.00000
+    970 693:  1.00000
+    974 699:  1.00000
+    995 739:  1.00000
+    996 742:  1.00000
+    997 743:  1.00000
+    998 741:  1.00000
+    999 740:  1.00000
+    1002 746:  1.00000
+    1005 777:  1.00000
+    1007 778:  1.00000
+    1008 779:  1.00000
+    1009 786:  1.00000
+    1010 787:  1.00000
+    1011 785:  1.00000
+    1012 784:  1.00000
+    1019 791:  1.00000
+    1072 830:  1.00000
+    1073 831:  1.00000
+    1076 835:  1.00000
+    1082 828:  1.00000
+DEAL::Number of constraints = 85
+    612 21:  1.00000
+    613 20:  1.00000
+    614 2:  1.00000
+    615 24:  1.00000
+    616 23:  1.00000
+    621 31:  1.00000
+    622 32:  1.00000
+    623 29:  1.00000
+    624 30:  1.00000
+    628 36:  1.00000
+    631 1:  1.00000
+    632 0:  1.00000
+    633 5:  1.00000
+    634 4:  1.00000
+    635 9:  1.00000
+    636 8:  1.00000
+    637 7:  1.00000
+    638 6:  1.00000
+    645 16:  1.00000
+    659 77:  1.00000
+    660 78:  1.00000
+    667 86:  1.00000
+    672 118:  1.00000
+    673 119:  1.00000
+    680 124:  1.00000
+    759 191:  1.00000
+    760 173:  1.00000
+    761 194:  1.00000
+    762 193:  1.00000
+    767 201:  1.00000
+    768 202:  1.00000
+    769 199:  1.00000
+    770 200:  1.00000
+    774 206:  1.00000
+    777 172:  1.00000
+    778 176:  1.00000
+    779 175:  1.00000
+    780 180:  1.00000
+    781 179:  1.00000
+    782 178:  1.00000
+    783 177:  1.00000
+    790 187:  1.00000
+    800 246:  1.00000
+    804 271:  1.00000
+    805 272:  1.00000
+    812 277:  1.00000
+    879 330:  1.00000
+    880 329:  1.00000
+    881 319:  1.00000
+    882 333:  1.00000
+    883 332:  1.00000
+    888 340:  1.00000
+    889 341:  1.00000
+    890 338:  1.00000
+    891 339:  1.00000
+    895 345:  1.00000
+    898 323:  1.00000
+    899 322:  1.00000
+    900 321:  1.00000
+    901 320:  1.00000
+    904 326:  1.00000
+    917 377:  1.00000
+    918 378:  1.00000
+    925 386:  1.00000
+    930 418:  1.00000
+    931 419:  1.00000
+    938 424:  1.00000
+    1005 476:  1.00000
+    1006 466:  1.00000
+    1007 479:  1.00000
+    1008 478:  1.00000
+    1013 486:  1.00000
+    1014 487:  1.00000
+    1015 484:  1.00000
+    1016 485:  1.00000
+    1020 491:  1.00000
+    1023 470:  1.00000
+    1024 469:  1.00000
+    1025 468:  1.00000
+    1026 467:  1.00000
+    1029 473:  1.00000
+    1038 523:  1.00000
+    1042 548:  1.00000
+    1043 549:  1.00000
+    1050 554:  1.00000
+DEAL::OK!

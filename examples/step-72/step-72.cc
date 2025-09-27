@@ -1,17 +1,16 @@
-/* ---------------------------------------------------------------------
+/* ------------------------------------------------------------------------
  *
- * Copyright (C) 2021 - 2023 by the deal.II authors
+ * SPDX-License-Identifier: LGPL-2.1-or-later
+ * Copyright (C) 2021 - 2024 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
- * The deal.II library is free software; you can use it, redistribute
- * it, and/or modify it under the terms of the GNU Lesser General
- * Public License as published by the Free Software Foundation; either
- * version 2.1 of the License, or (at your option) any later version.
- * The full text of the license can be found in the file LICENSE.md at
- * the top level directory of deal.II.
+ * Part of the source code is dual licensed under Apache-2.0 WITH
+ * LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+ * governing the source code and code contributions can be found in
+ * LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
  *
- * ---------------------------------------------------------------------
+ * ------------------------------------------------------------------------
  *
  * Authors: Jean-Paul Pelteret,
  *          Wolfgang Bangerth, Colorado State University, 2021.
@@ -67,7 +66,6 @@
 #include <deal.II/meshworker/scratch_data.h>
 
 #include <deal.II/numerics/vector_tools.h>
-#include <deal.II/numerics/matrix_tools.h>
 #include <deal.II/numerics/data_out.h>
 #include <deal.II/numerics/error_estimator.h>
 
@@ -147,24 +145,24 @@ namespace Step72
     void run(const int formulation, const double tolerance);
 
   private:
-    void   setup_system(const bool initial_step);
+    void   setup_system();
     void   assemble_system_unassisted();
     void   assemble_system_with_residual_linearization();
     void   assemble_system_using_energy_functional();
     void   solve();
     void   refine_mesh();
-    void   set_boundary_values();
     double compute_residual(const double alpha) const;
     double determine_step_length() const;
     void   output_results(const unsigned int refinement_cycle) const;
 
     Triangulation<dim> triangulation;
 
-    DoFHandler<dim> dof_handler;
-    FE_Q<dim>       fe;
-    QGauss<dim>     quadrature_formula;
+    DoFHandler<dim>   dof_handler;
+    const FE_Q<dim>   fe;
+    const QGauss<dim> quadrature_formula;
 
-    AffineConstraints<double> hanging_node_constraints;
+    AffineConstraints<double> nonzero_constraints;
+    AffineConstraints<double> zero_constraints;
 
     SparsityPattern      sparsity_pattern;
     SparseMatrix<double> system_matrix;
@@ -213,26 +211,30 @@ namespace Step72
   // data structures, namely the DoFHandler, the hanging node constraints
   // applied to the problem, and the linear system.
   template <int dim>
-  void MinimalSurfaceProblem<dim>::setup_system(const bool initial_step)
+  void MinimalSurfaceProblem<dim>::setup_system()
   {
-    if (initial_step)
-      {
-        dof_handler.distribute_dofs(fe);
-        current_solution.reinit(dof_handler.n_dofs());
-
-        hanging_node_constraints.clear();
-        DoFTools::make_hanging_node_constraints(dof_handler,
-                                                hanging_node_constraints);
-        hanging_node_constraints.close();
-      }
-
+    dof_handler.distribute_dofs(fe);
+    current_solution.reinit(dof_handler.n_dofs());
     newton_update.reinit(dof_handler.n_dofs());
     system_rhs.reinit(dof_handler.n_dofs());
 
-    DynamicSparsityPattern dsp(dof_handler.n_dofs());
-    DoFTools::make_sparsity_pattern(dof_handler, dsp);
+    zero_constraints.clear();
+    VectorTools::interpolate_boundary_values(dof_handler,
+                                             0,
+                                             Functions::ZeroFunction<dim>(),
+                                             zero_constraints);
+    DoFTools::make_hanging_node_constraints(dof_handler, zero_constraints);
+    zero_constraints.close();
 
-    hanging_node_constraints.condense(dsp);
+    nonzero_constraints.clear();
+    VectorTools::interpolate_boundary_values(dof_handler,
+                                             0,
+                                             BoundaryValues<dim>(),
+                                             nonzero_constraints);
+    nonzero_constraints.close();
+
+    DynamicSparsityPattern dsp(dof_handler.n_dofs());
+    DoFTools::make_sparsity_pattern(dof_handler, dsp, zero_constraints);
 
     sparsity_pattern.copy_from(dsp);
     system_matrix.reinit(sparsity_pattern);
@@ -380,21 +382,14 @@ namespace Step72
     // in the `copy_data` instance that is passed into this function. This
     // `copy_data` has been filled with data during @a some call to the
     // `cell_worker`.
-    const auto copier = [dofs_per_cell, this](const CopyData &copy_data) {
+    const auto copier = [this](const CopyData &copy_data) {
       const FullMatrix<double> &cell_matrix = copy_data.matrices[0];
       const Vector<double>     &cell_rhs    = copy_data.vectors[0];
       const std::vector<types::global_dof_index> &local_dof_indices =
         copy_data.local_dof_indices[0];
 
-      for (unsigned int i = 0; i < dofs_per_cell; ++i)
-        {
-          for (unsigned int j = 0; j < dofs_per_cell; ++j)
-            system_matrix.add(local_dof_indices[i],
-                              local_dof_indices[j],
-                              cell_matrix(i, j));
-
-          system_rhs(local_dof_indices[i]) += cell_rhs(i);
-        }
+      zero_constraints.distribute_local_to_global(
+        cell_matrix, cell_rhs, local_dof_indices, system_matrix, system_rhs);
     };
 
     // We have all of the required functions definitions in place, so
@@ -411,22 +406,6 @@ namespace Step72
                           sample_scratch_data,
                           sample_copy_data,
                           MeshWorker::assemble_own_cells);
-
-    // And finally, as is done in step-15, we remove hanging nodes from the
-    // system and apply zero boundary values to the linear system that defines
-    // the Newton updates $\delta u^n$.
-    hanging_node_constraints.condense(system_matrix);
-    hanging_node_constraints.condense(system_rhs);
-
-    std::map<types::global_dof_index, double> boundary_values;
-    VectorTools::interpolate_boundary_values(dof_handler,
-                                             0,
-                                             Functions::ZeroFunction<dim>(),
-                                             boundary_values);
-    MatrixTools::apply_boundary_values(boundary_values,
-                                       system_matrix,
-                                       newton_update,
-                                       system_rhs);
   }
 
   // @sect5{Assembly via differentiation of the residual vector}
@@ -612,21 +591,14 @@ namespace Step72
     };
 
     // The remainder of the function equals what we had previously:
-    const auto copier = [dofs_per_cell, this](const CopyData &copy_data) {
+    const auto copier = [this](const CopyData &copy_data) {
       const FullMatrix<double> &cell_matrix = copy_data.matrices[0];
       const Vector<double>     &cell_rhs    = copy_data.vectors[0];
       const std::vector<types::global_dof_index> &local_dof_indices =
         copy_data.local_dof_indices[0];
 
-      for (unsigned int i = 0; i < dofs_per_cell; ++i)
-        {
-          for (unsigned int j = 0; j < dofs_per_cell; ++j)
-            system_matrix.add(local_dof_indices[i],
-                              local_dof_indices[j],
-                              cell_matrix(i, j));
-
-          system_rhs(local_dof_indices[i]) += cell_rhs(i);
-        }
+      zero_constraints.distribute_local_to_global(
+        cell_matrix, cell_rhs, local_dof_indices, system_matrix, system_rhs);
     };
 
     MeshWorker::mesh_loop(dof_handler.active_cell_iterators(),
@@ -635,19 +607,6 @@ namespace Step72
                           sample_scratch_data,
                           sample_copy_data,
                           MeshWorker::assemble_own_cells);
-
-    hanging_node_constraints.condense(system_matrix);
-    hanging_node_constraints.condense(system_rhs);
-
-    std::map<types::global_dof_index, double> boundary_values;
-    VectorTools::interpolate_boundary_values(dof_handler,
-                                             0,
-                                             Functions::ZeroFunction<dim>(),
-                                             boundary_values);
-    MatrixTools::apply_boundary_values(boundary_values,
-                                       system_matrix,
-                                       newton_update,
-                                       system_rhs);
   }
 
   // @sect5{Assembly via differentiation of the energy functional}
@@ -780,21 +739,14 @@ namespace Step72
 
     // As in the previous two functions, the remainder of the function is as
     // before:
-    const auto copier = [dofs_per_cell, this](const CopyData &copy_data) {
+    const auto copier = [this](const CopyData &copy_data) {
       const FullMatrix<double> &cell_matrix = copy_data.matrices[0];
       const Vector<double>     &cell_rhs    = copy_data.vectors[0];
       const std::vector<types::global_dof_index> &local_dof_indices =
         copy_data.local_dof_indices[0];
 
-      for (unsigned int i = 0; i < dofs_per_cell; ++i)
-        {
-          for (unsigned int j = 0; j < dofs_per_cell; ++j)
-            system_matrix.add(local_dof_indices[i],
-                              local_dof_indices[j],
-                              cell_matrix(i, j));
-
-          system_rhs(local_dof_indices[i]) += cell_rhs(i);
-        }
+      zero_constraints.distribute_local_to_global(
+        cell_matrix, cell_rhs, local_dof_indices, system_matrix, system_rhs);
     };
 
     MeshWorker::mesh_loop(dof_handler.active_cell_iterators(),
@@ -803,19 +755,6 @@ namespace Step72
                           sample_scratch_data,
                           sample_copy_data,
                           MeshWorker::assemble_own_cells);
-
-    hanging_node_constraints.condense(system_matrix);
-    hanging_node_constraints.condense(system_rhs);
-
-    std::map<types::global_dof_index, double> boundary_values;
-    VectorTools::interpolate_boundary_values(dof_handler,
-                                             0,
-                                             Functions::ZeroFunction<dim>(),
-                                             boundary_values);
-    MatrixTools::apply_boundary_values(boundary_values,
-                                       system_matrix,
-                                       newton_update,
-                                       system_rhs);
   }
 
 
@@ -834,7 +773,7 @@ namespace Step72
 
     solver.solve(system_matrix, newton_update, system_rhs, preconditioner);
 
-    hanging_node_constraints.distribute(newton_update);
+    zero_constraints.distribute(newton_update);
 
     const double alpha = determine_step_length();
     current_solution.add(alpha, newton_update);
@@ -863,44 +802,19 @@ namespace Step72
                                                     0.03);
 
     triangulation.prepare_coarsening_and_refinement();
+
     SolutionTransfer<dim> solution_transfer(dof_handler);
-    solution_transfer.prepare_for_coarsening_and_refinement(current_solution);
+    const Vector<double>  coarse_solution = current_solution;
+    solution_transfer.prepare_for_coarsening_and_refinement(coarse_solution);
+
     triangulation.execute_coarsening_and_refinement();
 
-    dof_handler.distribute_dofs(fe);
+    setup_system();
 
-    Vector<double> tmp(dof_handler.n_dofs());
-    solution_transfer.interpolate(current_solution, tmp);
-    current_solution = tmp;
-
-    hanging_node_constraints.clear();
-    DoFTools::make_hanging_node_constraints(dof_handler,
-                                            hanging_node_constraints);
-    hanging_node_constraints.close();
-
-    set_boundary_values();
-
-    setup_system(false);
+    solution_transfer.interpolate(current_solution);
+    nonzero_constraints.distribute(current_solution);
   }
 
-
-
-  // @sect4{MinimalSurfaceProblem::set_boundary_values}
-
-  // The choice of boundary conditions remains identical to step-15...
-  template <int dim>
-  void MinimalSurfaceProblem<dim>::set_boundary_values()
-  {
-    std::map<types::global_dof_index, double> boundary_values;
-    VectorTools::interpolate_boundary_values(dof_handler,
-                                             0,
-                                             BoundaryValues<dim>(),
-                                             boundary_values);
-    for (auto &boundary_value : boundary_values)
-      current_solution(boundary_value.first) = boundary_value.second;
-
-    hanging_node_constraints.distribute(current_solution);
-  }
 
 
   // @sect4{MinimalSurfaceProblem::compute_residual}
@@ -952,15 +866,10 @@ namespace Step72
           }
 
         cell->get_dof_indices(local_dof_indices);
-        for (unsigned int i = 0; i < dofs_per_cell; ++i)
-          residual(local_dof_indices[i]) += cell_residual(i);
+        zero_constraints.distribute_local_to_global(cell_residual,
+                                                    local_dof_indices,
+                                                    residual);
       }
-
-    hanging_node_constraints.condense(residual);
-
-    for (const types::global_dof_index i :
-         DoFTools::extract_boundary_dofs(dof_handler))
-      residual(i) = 0;
 
     return residual.l2_norm();
   }
@@ -1034,8 +943,8 @@ namespace Step72
     GridGenerator::hyper_ball(triangulation);
     triangulation.refine_global(2);
 
-    setup_system(/*first time=*/true);
-    set_boundary_values();
+    setup_system();
+    nonzero_constraints.distribute(current_solution);
 
     double       last_residual_norm = std::numeric_limits<double>::max();
     unsigned int refinement_cycle   = 0;

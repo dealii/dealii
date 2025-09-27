@@ -1,19 +1,20 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 1999 - 2022 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 1999 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 #include <deal.II/base/convergence_table.h>
+#include <deal.II/base/exceptions.h>
+#include <deal.II/base/table_handler.h>
 
 #include <cmath>
 
@@ -37,8 +38,9 @@ ConvergenceTable::evaluate_convergence_rates(
   // the top that don't yet exist
   set_auto_fill_mode(false);
 
-  std::vector<internal::TableEntry> &entries = columns[data_column_key].entries;
-  std::vector<internal::TableEntry> &ref_entries =
+  const std::vector<internal::TableEntry> &entries =
+    columns[data_column_key].entries;
+  const std::vector<internal::TableEntry> &ref_entries =
     columns[reference_column_key].entries;
   std::string rate_key = data_column_key + "...";
 
@@ -69,7 +71,7 @@ ConvergenceTable::evaluate_convergence_rates(
             if (i == 0)
               {
                 // no value available for the first row
-                add_value(rate_key, std::string("-"));
+                add_value(rate_key, "-");
               }
             else
               {
@@ -88,7 +90,7 @@ ConvergenceTable::evaluate_convergence_rates(
             if (i == 0)
               {
                 // no value available for the first row
-                add_value(rate_key, std::string("-"));
+                add_value(rate_key, "-");
               }
             else
               {
@@ -133,8 +135,9 @@ ConvergenceTable::evaluate_convergence_rates(const std::string &data_column_key,
   // the top that don't yet exist
   set_auto_fill_mode(false);
 
-  std::vector<internal::TableEntry> &entries = columns[data_column_key].entries;
-  std::string                        rate_key = data_column_key + "...";
+  const std::vector<internal::TableEntry> &entries =
+    columns[data_column_key].entries;
+  std::string rate_key = data_column_key + "...";
 
   const unsigned int n = entries.size();
 
@@ -158,7 +161,7 @@ ConvergenceTable::evaluate_convergence_rates(const std::string &data_column_key,
             if (i == 0)
               {
                 // no value available for the first row
-                add_value(rate_key, std::string("-"));
+                add_value(rate_key, "-");
               }
             else
               {
@@ -176,7 +179,7 @@ ConvergenceTable::evaluate_convergence_rates(const std::string &data_column_key,
             if (i == 0)
               {
                 // no value available for the first row
-                add_value(rate_key, std::string("-"));
+                add_value(rate_key, "-");
               }
             else
               {

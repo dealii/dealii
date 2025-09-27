@@ -1,22 +1,23 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2018 - 2023 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2018 - 2024 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 
 #include <deal.II/base/polynomials_rt_bubbles.h>
 #include <deal.II/base/quadrature_lib.h>
 #include <deal.II/base/thread_management.h>
+
+#include <deal.II/fe/fe_raviart_thomas.h>
 
 #include <iomanip>
 #include <iostream>
@@ -28,7 +29,10 @@ DEAL_II_NAMESPACE_OPEN
 template <int dim>
 PolynomialsRT_Bubbles<dim>::PolynomialsRT_Bubbles(const unsigned int k)
   : TensorPolynomialsBase<dim>(k, n_polynomials(k))
-  , raviart_thomas_space(k - 1)
+  , raviart_thomas_space(k,
+                         k - 1,
+                         FE_RaviartThomas<dim>::get_lexicographic_numbering(k -
+                                                                            1))
   , monomials(k + 2)
 {
   Assert(dim >= 2, ExcImpossibleInDim(dim));
@@ -69,22 +73,12 @@ PolynomialsRT_Bubbles<dim>::evaluate(
   const unsigned int n_sub     = raviart_thomas_space.n();
   const unsigned int my_degree = this->degree();
 
-  // Guard access to the scratch arrays in the following block
-  // using a mutex to make sure they are not used by multiple threads
-  // at once
   {
-    static std::mutex           mutex;
-    std::lock_guard<std::mutex> lock(mutex);
-
-    static std::vector<Tensor<1, dim>> p_values;
-    static std::vector<Tensor<2, dim>> p_grads;
-    static std::vector<Tensor<3, dim>> p_grad_grads;
-    static std::vector<Tensor<4, dim>> p_third_derivatives;
-    static std::vector<Tensor<5, dim>> p_fourth_derivatives;
-
-    p_values.resize((values.empty()) ? 0 : n_sub);
-    p_grads.resize((grads.empty()) ? 0 : n_sub);
-    p_grad_grads.resize((grad_grads.empty()) ? 0 : n_sub);
+    std::vector<Tensor<1, dim>> p_values(values.empty() ? 0 : n_sub);
+    std::vector<Tensor<2, dim>> p_grads(grads.empty() ? 0 : n_sub);
+    std::vector<Tensor<3, dim>> p_grad_grads(grad_grads.empty() ? 0 : n_sub);
+    std::vector<Tensor<4, dim>> p_third_derivatives;
+    std::vector<Tensor<5, dim>> p_fourth_derivatives;
 
     // This is the Raviart-Thomas part of the space
     raviart_thomas_space.evaluate(unit_point,
@@ -126,14 +120,14 @@ PolynomialsRT_Bubbles<dim>::evaluate(
       //  monoval_i = x^i,
       //  monoval_plus = x^(k+1)
       for (unsigned int d = 0; d < dim; ++d)
-        monomials[my_degree + 1].value(unit_point(d),
+        monomials[my_degree + 1].value(unit_point[d],
                                        n_derivatives,
                                        monoval_plus[d]);
 
       for (unsigned int i = 0; i <= my_degree; ++i, ++start)
         {
           for (unsigned int d = 0; d < dim; ++d)
-            monomials[i].value(unit_point(d), n_derivatives, monoval_i[d]);
+            monomials[i].value(unit_point[d], n_derivatives, monoval_i[d]);
 
           if (values.size() != 0)
             {
@@ -216,10 +210,10 @@ PolynomialsRT_Bubbles<dim>::evaluate(
       //  monoval_* = x^*, monoval_jplus = x^(j+1)
       for (unsigned int d = 0; d < dim; ++d)
         {
-          monomials[my_degree + 1].value(unit_point(d),
+          monomials[my_degree + 1].value(unit_point[d],
                                          n_derivatives,
                                          monoval_plus[d]);
-          monomials[my_degree].value(unit_point(d), n_derivatives, monoval[d]);
+          monomials[my_degree].value(unit_point[d], n_derivatives, monoval[d]);
         }
 
       const unsigned int n_curls = (my_degree + 1) * (2 * my_degree + 1);
@@ -227,16 +221,16 @@ PolynomialsRT_Bubbles<dim>::evaluate(
       for (unsigned int i = 0; i <= my_degree; ++i)
         {
           for (unsigned int d = 0; d < dim; ++d)
-            monomials[i].value(unit_point(d), n_derivatives, monoval_i[d]);
+            monomials[i].value(unit_point[d], n_derivatives, monoval_i[d]);
 
           for (unsigned int j = 0; j <= my_degree; ++j)
             {
               for (unsigned int d = 0; d < dim; ++d)
                 {
-                  monomials[j].value(unit_point(d),
+                  monomials[j].value(unit_point[d],
                                      n_derivatives,
                                      monoval_j[d]);
-                  monomials[j + 1].value(unit_point(d),
+                  monomials[j + 1].value(unit_point[d],
                                          n_derivatives,
                                          monoval_jplus[d]);
                 }
@@ -844,7 +838,7 @@ PolynomialsRT_Bubbles<dim>::n_polynomials(const unsigned int k)
   if (dim == 1 || dim == 2 || dim == 3)
     return dim * Utilities::fixed_power<dim>(k + 1);
 
-  Assert(false, ExcNotImplemented());
+  DEAL_II_NOT_IMPLEMENTED();
   return 0;
 }
 

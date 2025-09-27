@@ -1,0 +1,12 @@
+   Number of global active cells: 3892
+   Number of degrees of freedom: 63529
+   Time step size: 0.00586166, finest cell: 0.234375
+
+   Time:     -10, solution norm:  9.5599
+   Time:   -8.83, solution norm:  23.497
+   Time:   -7.66, solution norm:  29.495
+   Time:   -6.48, solution norm:  27.202
+   Time:   -5.31, solution norm:  18.398
+   Time:      -5, solution norm:  15.171
+
+   Performed 853 time steps.

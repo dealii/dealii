@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2009 - 2023 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2009 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 #ifndef dealii_index_set_h
 #define dealii_index_set_h
@@ -19,8 +18,13 @@
 #include <deal.II/base/config.h>
 
 #include <deal.II/base/exceptions.h>
+#include <deal.II/base/memory_space.h>
 #include <deal.II/base/mpi_stub.h>
 #include <deal.II/base/mutex.h>
+#include <deal.II/base/trilinos_utilities.h>
+#include <deal.II/base/types.h>
+
+#include <deal.II/lac/trilinos_tpetra_types.h>
 
 #include <boost/container/small_vector.hpp>
 
@@ -29,10 +33,14 @@
 
 
 #ifdef DEAL_II_WITH_TRILINOS
+
+DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
 #  include <Epetra_Map.h>
 #  ifdef DEAL_II_TRILINOS_WITH_TPETRA
 #    include <Tpetra_Map.hpp>
 #  endif
+DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
+
 #endif
 
 #ifdef DEAL_II_WITH_PETSC
@@ -131,11 +139,22 @@ public:
   operator=(IndexSet &&is) noexcept;
 
 #ifdef DEAL_II_WITH_TRILINOS
+
+#  ifdef DEAL_II_TRILINOS_WITH_TPETRA
+  /**
+   * Constructor from a Trilinos Teuchos::RCP<Tpetra::Map>.
+   */
+  template <typename NodeType>
+  explicit IndexSet(
+    const Teuchos::RCP<
+      const Tpetra::Map<int, types::signed_global_dof_index, NodeType>> &map);
+#  endif // DEAL_II_TRILINOS_WITH_TPETRA
+
   /**
    * Constructor from a Trilinos Epetra_BlockMap.
    */
   explicit IndexSet(const Epetra_BlockMap &map);
-#endif
+#endif // DEAL_II_WITH_TRILINOS
 
   /**
    * Remove all indices from this index set. The index set retains its size,
@@ -245,6 +264,11 @@ public:
   /**
    * Return whether the index set stored by this object contains no elements.
    * This is similar, but faster than checking <code>n_elements() == 0</code>.
+   *
+   * Note that a set being empty does not imply that the size of the
+   * index space must be zero. Rather, this function returns `true` if
+   * the subset of indices in the index space is the empty set,
+   * regardless of the size of the index space.
    */
   bool
   is_empty() const;
@@ -279,7 +303,7 @@ public:
    * Return the how-manyth element of this set (counted in ascending order) @p
    * global_index is. @p global_index needs to be less than the size(). This
    * function returns numbers::invalid_dof_index if the index @p global_index is not actually
-   * a member of this index set, i.e. if is_element(global_index) is false.
+   * a member of this index set, i.e. if `is_element(global_index)` is false.
    */
   size_type
   index_within_set(const size_type global_index) const;
@@ -371,9 +395,60 @@ public:
    * <tt>begin</tt>. This corresponds to the notion of a <i>view</i>: The
    * interval <tt>[begin, end)</tt> is a <i>window</i> through which we see
    * the set represented by the current object.
+   *
+   * A more general function of the same name, taking a mask instead
+   * of just an interval to define the view, is below.
    */
   IndexSet
   get_view(const size_type begin, const size_type end) const;
+
+  /**
+   * This command takes a "mask", i.e., a second index set of same size as the
+   * current one and returns the intersection of the current index set the mask,
+   * shifted to the index of an entry within the given mask. For example,
+   * if the current object is a an IndexSet object representing an index space
+   * `[0,100)` containing indices `[20,40)`, and if the mask represents
+   * an index space of the same size but containing all 50 *odd* indices in this
+   * range, then the result will be an index set for a space of size 50 that
+   * contains those indices that correspond to the question "the how many'th
+   * entry in the mask are the indices `[20,40)`. This will result in an index
+   * set of size 50 that contains the indices `{11,12,13,14,15,16,17,18,19,20}`
+   * (because, for example, the index 20 in the original set is not in the mask,
+   * but 21 is and corresponds to the 11th entry of the mask -- the mask
+   * contains the elements `{1,3,5,7,9,11,13,15,17,19,21,...}`).
+   *
+   * In other words, the result of this operation is the intersection of the
+   * set represented by the current object and the mask, as seen
+   * <i>within the mask</i>. This corresponds to the notion of a <i>view</i>:
+   * The mask is a <i>window</i> through which we see the set represented by the
+   * current object.
+   *
+   * A typical case where this function is useful is as follows. Say,
+   * you have a block linear system in which you have blocks
+   * corresponding to variables $(u,p,T,c)$ (which you can think of as
+   * velocity, pressure, temperature, and chemical composition -- or
+   * whatever other kind of problem you are currently considering in
+   * your own work). We solve this in parallel, so every MPI process
+   * has its own `locally_owned_dofs` index set that describes which
+   * among all $N_\text{dofs}$ degrees of freedom this process
+   * owns. Let's assume we have developed a linear solver or
+   * preconditioner that first solves the coupled $u$-$T$ system, and
+   * once that is done, solves the $p$-$c$ system. In this case, it is
+   * often useful to set up block vectors with only two components
+   * corresponding to the $u$ and $T$ components, and later for only
+   * the $p$-$c$ components of the solution. The question is which of
+   * the components of these 2-block vectors are locally owned? The
+   * answer is that we need to get a view of the `locally_owned_dofs`
+   * index set in which we apply a mask that corresponds to the
+   * variables we're currently interested in. For the $u$-$T$ system,
+   * we need a mask (corresponding to an index set of size
+   * $N_\text{dofs}$) that contains all indices of $u$ degrees of
+   * freedom as well as all indices of $T$ degrees of freedom. The
+   * resulting view is an index set of size $N_u+N_T$ that contains
+   * the indices of the locally owned $u$ and $T$ degrees of freedom.
+   */
+  IndexSet
+  get_view(const IndexSet &mask) const;
 
   /**
    * Split the set indices represented by this object into blocks given by the
@@ -414,14 +489,24 @@ public:
   /**
    * Remove and return the last element of the last range.
    * This function throws an exception if the IndexSet is empty.
+   *
+   * @deprecated This function is deprecated. Conceptually, an index set is a
+   *   set; it should not be seen as a sorted container in which it is clear
+   *   what element is stored "last".
    */
+  DEAL_II_DEPRECATED
   size_type
   pop_back();
 
   /**
    * Remove and return the first element of the first range.
    * This function throws an exception if the IndexSet is empty.
+   *
+   * @deprecated This function is deprecated. Conceptually, an index set is a
+   *   set; it should not be seen as a sorted container in which it is clear
+   *   what element is stored "first".
    */
+  DEAL_II_DEPRECATED
   size_type
   pop_front();
 
@@ -435,16 +520,6 @@ public:
    */
   std::vector<size_type>
   get_index_vector() const;
-
-  /**
-   * Fill the given vector with all indices contained in this IndexSet.
-   *
-   * This function is equivalent to calling get_index_vector() and
-   * assigning the result to the @p indices argument.
-   */
-  DEAL_II_DEPRECATED
-  void
-  fill_index_vector(std::vector<size_type> &indices) const;
 
   /**
    * Fill the given vector with either zero or one elements, providing a
@@ -542,9 +617,19 @@ public:
                     const bool     overlapping  = false) const;
 
 #  ifdef DEAL_II_TRILINOS_WITH_TPETRA
-  Tpetra::Map<int, types::signed_global_dof_index>
+  template <
+    typename NodeType =
+      LinearAlgebra::TpetraWrappers::TpetraTypes::NodeType<MemorySpace::Host>>
+  Tpetra::Map<int, types::signed_global_dof_index, NodeType>
   make_tpetra_map(const MPI_Comm communicator = MPI_COMM_WORLD,
                   const bool     overlapping  = false) const;
+
+  template <
+    typename NodeType =
+      LinearAlgebra::TpetraWrappers::TpetraTypes::NodeType<MemorySpace::Host>>
+  Teuchos::RCP<Tpetra::Map<int, types::signed_global_dof_index, NodeType>>
+  make_tpetra_map_rcp(const MPI_Comm communicator = MPI_COMM_WORLD,
+                      const bool     overlapping  = false) const;
 #  endif
 #endif
 
@@ -1863,12 +1948,13 @@ IndexSet::n_elements() const
       v              = r.nth_index_in_set + r.end - r.begin;
     }
 
-#ifdef DEBUG
-  size_type s = 0;
-  for (const auto &range : ranges)
-    s += (range.end - range.begin);
-  Assert(s == v, ExcInternalError());
-#endif
+  if constexpr (running_in_debug_mode())
+    {
+      size_type s = 0;
+      for (const auto &range : ranges)
+        s += (range.end - range.begin);
+      Assert(s == v, ExcInternalError());
+    }
 
   return v;
 }

@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2008 - 2021 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2008 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 #include <deal.II/lac/trilinos_precondition.h>
 
@@ -21,11 +20,13 @@
 #  include <deal.II/lac/trilinos_sparse_matrix.h>
 #  include <deal.II/lac/vector.h>
 
+DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
 #  include <Epetra_MultiVector.h>
 #  include <Ifpack.h>
 #  include <Ifpack_Chebyshev.h>
 #  include <Teuchos_ParameterList.hpp>
 #  include <Teuchos_RCP.hpp>
+DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -36,22 +37,11 @@ namespace TrilinosWrappers
   {}
 
 
-
-  PreconditionBase::PreconditionBase(const PreconditionBase &base)
-    : Subscriptor()
-    , preconditioner(base.preconditioner)
-    , communicator(base.communicator)
-    , vector_distributor(new Epetra_Map(*base.vector_distributor))
-  {}
-
-
-
   void
   PreconditionBase::clear()
   {
     preconditioner.reset();
     communicator = MPI_COMM_SELF;
-    vector_distributor.reset();
   }
 
 

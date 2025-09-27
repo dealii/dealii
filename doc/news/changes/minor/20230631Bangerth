@@ -1,6 +1,0 @@
-Changed: The constructor of the
-PETScWrappers::PreconditionSSOR::AdditionalData class is now
-`explicit`, thereby disallowing the implicit conversion of a number
-(the relaxation factor) to an object of this type.
-<br>
-(Wolfgang Bangerth, 2023/07/01)

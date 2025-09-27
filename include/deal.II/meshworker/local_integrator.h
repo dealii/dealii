@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2006 - 2020 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2012 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 
 #ifndef dealii_mesh_worker_local_integrator_h
@@ -19,7 +18,8 @@
 
 #include <deal.II/base/config.h>
 
-#include <deal.II/base/subscriptor.h>
+#include <deal.II/base/enable_observer_pointer.h>
+#include <deal.II/base/exceptions.h>
 
 #include <functional>
 #include <string>
@@ -50,10 +50,14 @@ namespace MeshWorker
    * If a function is not overloaded in a derived class, but its usage flag is
    * true, the function will cause an exception ExcPureFunction.
    *
+   * @deprecated This class is deprecated. It used to be the basis for
+   *   integration via the MeshWorker::integration_loop() function, but the
+   *   same functionality is available via MeshWorker::loop().
+   *
    * @ingroup MeshWorker
    */
   template <int dim, int spacedim = dim, typename number = double>
-  class LocalIntegrator : public Subscriptor
+  class DEAL_II_DEPRECATED LocalIntegrator : public EnableObserverPointer
   {
   public:
     /**
@@ -121,7 +125,11 @@ namespace MeshWorker
      *
      * @note This variable is currently not used by the library, but it is
      * provided to help develop application programs.
+     *
+     * @deprecated Because the library itself does not use this field, it is
+     *   better placed in derived classes.
      */
+    DEAL_II_DEPRECATED
     std::vector<std::string> input_vector_names;
 
     /**
@@ -131,7 +139,11 @@ namespace MeshWorker
      *
      * @note This variable is currently not used by the library, but it is
      * provided to help develop application programs.
+     *
+     * @deprecated Because the library itself does not use this field, it is
+     *   better placed in derived classes.
      */
+    DEAL_II_DEPRECATED
     std::vector<std::string> output_names;
 
     /**

@@ -1,0 +1,29 @@
+# Listing of Parameters
+# ---------------------
+subsection Coupled Constitutive Laws
+  subsection Constitutive Parameters
+    set Characteristic relaxation time                                    = 0.6
+    set Elastic shear modulus                                             = 30000
+    set Elastic shear modulus at magnetic saturation                      = 250000
+    set Poisson ratio                                                     = 0.49
+    set Relative magnetic permeability                                    = 6
+    set Saturation magnetic field strength for elastic shear modulus      = 212200
+    set Saturation magnetic field strength for viscoelastic shear modulus = 92840
+    set Viscoelastic shear modulus                                        = 20000
+    set Viscoelastic shear modulus at magnetic saturation                 = 35000
+  end
+
+  subsection Rheological Experiment
+    set Axial magnetic field strength                        = 60000
+    set Axial stretch                                        = 0.95
+    set Discretisation for each cycle                        = 2500
+    set Experimental sample radius                           = 0.001
+    set Frequency                                            = 0.159155
+    set Number of loading cycles                             = 5
+    set Output experimental results to file                  = true
+    set Output file name (rate dependent constitutive law)   = experimental_results-rate_dependent.csv
+    set Output file name (rate independent constitutive law) = experimental_results-rate_independent.csv
+    set Shear strain amplitude                               = 0.05
+  end
+
+end

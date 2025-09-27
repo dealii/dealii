@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2022 - 2023 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2022 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 #include <deal.II/base/config.h>
 
@@ -28,7 +27,12 @@
 
 #  include <deal.II/grid/tria.h>
 
+DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
 #  include <CGAL/Boolean_set_operations_2.h>
+DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
+
+#  include <deal.II/cgal/utilities.h>
+
 #  include <CGAL/Cartesian.h>
 #  include <CGAL/Circular_kernel_intersections.h>
 #  include <CGAL/Constrained_Delaunay_triangulation_2.h>
@@ -43,6 +47,7 @@
 #  include <CGAL/Projection_traits_xy_3.h>
 #  include <CGAL/Segment_3.h>
 #  include <CGAL/Simple_cartesian.h>
+#  include <CGAL/Surface_mesh/Surface_mesh.h>
 #  include <CGAL/Tetrahedron_3.h>
 #  include <CGAL/Triangle_2.h>
 #  include <CGAL/Triangle_3.h>
@@ -50,11 +55,8 @@
 #  include <CGAL/Triangulation_3.h>
 #  include <CGAL/Triangulation_face_base_with_id_2.h>
 #  include <CGAL/Triangulation_face_base_with_info_2.h>
-#  include <deal.II/cgal/utilities.h>
 
-#  include <fstream>
 #  include <optional>
-#  include <type_traits>
 #  include <variant>
 
 DEAL_II_NAMESPACE_OPEN
@@ -103,6 +105,20 @@ namespace CGALWrappers
   using Vertex_handle = CDT::Vertex_handle;
   using Face_handle   = CDT::Face_handle;
 
+  template <class T, class... Types>
+  const T *
+  get_if_(const std::variant<Types...> *v)
+  {
+    return std::get_if<T>(v);
+  }
+
+  template <class T, class... Types>
+  const T *
+  get_if_(const boost::variant<Types...> *v)
+  {
+    return boost::get<T>(v);
+  }
+
   namespace internal
   {
     namespace
@@ -148,6 +164,13 @@ namespace CGALWrappers
             // std::optional object.
             return {};
           }
+      }
+
+      template <typename... Types>
+      const std::optional<std::variant<Types...>> &
+      convert_boost_to_std(const std::optional<std::variant<Types...>> &opt)
+      {
+        return opt;
       }
     } // namespace
 
@@ -430,7 +453,6 @@ namespace CGALWrappers
                                     true);
 
               internal::mark_domains(cdt);
-              std::array<Point<2>, 3> vertices;
 
               for (Face_handle f : cdt.finite_face_handles())
                 {
@@ -493,8 +515,7 @@ namespace CGALWrappers
             {
               const auto intersection =
                 CGAL::intersection(segm, cdt.triangle(f));
-              if (const CGALSegment2 *s =
-                    boost::get<CGALSegment2>(&*intersection))
+              if (const CGALSegment2 *s = get_if_<CGALSegment2>(&*intersection))
                 {
                   vertices.push_back(
                     {{CGALWrappers::cgal_point_to_dealii_point<2>((*s)[0]),
@@ -542,7 +563,7 @@ namespace CGALWrappers
               const auto intersection =
                 CGAL::intersection(cgal_segment, cgal_tetrahedron);
               if (const CGALSegment3_exact *s =
-                    boost::get<CGALSegment3_exact>(&*intersection))
+                    get_if_<CGALSegment3_exact>(&*intersection))
                 {
                   if (s->squared_length() > tol * tol)
                     {
@@ -614,7 +635,7 @@ namespace CGALWrappers
                     CGAL::intersection(triangulation_quad.triangle(f), tet);
 
                   if (const CGALTriangle3_exact *t =
-                        boost::get<CGALTriangle3_exact>(&*intersection))
+                        get_if_<CGALTriangle3_exact>(&*intersection))
                     {
                       if (CGAL::to_double(t->squared_area()) > tol * tol)
                         {
@@ -626,8 +647,7 @@ namespace CGALWrappers
                     }
 
                   if (const std::vector<CGALPoint3_exact> *vps =
-                        boost::get<std::vector<CGALPoint3_exact>>(
-                          &*intersection))
+                        get_if_<std::vector<CGALPoint3_exact>>(&*intersection))
                     {
                       Triangulation3_exact tria_inter;
                       tria_inter.insert(vps->begin(), vps->end());
@@ -752,8 +772,8 @@ namespace CGALWrappers
   } // namespace internal
 
 
-  template <int dim0, int dim1, int spacedim>
-  std::vector<std::array<Point<spacedim>, dim1 + 1>>
+  template <int structdim0, int structdim1, int spacedim>
+  std::vector<std::array<Point<spacedim>, structdim1 + 1>>
   compute_intersection_of_cells(
     const ArrayView<const Point<spacedim>> &vertices0,
     const ArrayView<const Point<spacedim>> &vertices1,
@@ -767,7 +787,7 @@ namespace CGALWrappers
       ExcMessage(
         "The intersection cannot be computed as at least one of the two cells has no vertices."));
 
-    if constexpr (dim0 == 2 && dim1 == 2 && spacedim == 2)
+    if constexpr (structdim0 == 2 && structdim1 == 2 && spacedim == 2)
       {
         if (n_vertices0 == 4 && n_vertices1 == 4)
           {
@@ -776,7 +796,7 @@ namespace CGALWrappers
                                                             tol);
           }
       }
-    else if constexpr (dim0 == 2 && dim1 == 1 && spacedim == 2)
+    else if constexpr (structdim0 == 2 && structdim1 == 1 && spacedim == 2)
       {
         if (n_vertices0 == 4 && n_vertices1 == 2)
           {
@@ -785,7 +805,7 @@ namespace CGALWrappers
                                                             tol);
           }
       }
-    else if constexpr (dim0 == 3 && dim1 == 1 && spacedim == 3)
+    else if constexpr (structdim0 == 3 && structdim1 == 1 && spacedim == 3)
       {
         if (n_vertices0 == 8 && n_vertices1 == 2)
           {
@@ -794,7 +814,7 @@ namespace CGALWrappers
                                                             tol);
           }
       }
-    else if constexpr (dim0 == 3 && dim1 == 2 && spacedim == 3)
+    else if constexpr (structdim0 == 3 && structdim1 == 2 && spacedim == 3)
       {
         if (n_vertices0 == 8 && n_vertices1 == 4)
           {
@@ -803,7 +823,7 @@ namespace CGALWrappers
                                                             tol);
           }
       }
-    else if constexpr (dim0 == 3 && dim1 == 3 && spacedim == 3)
+    else if constexpr (structdim0 == 3 && structdim1 == 3 && spacedim == 3)
       {
         if (n_vertices0 == 8 && n_vertices1 == 8)
           {
@@ -814,7 +834,7 @@ namespace CGALWrappers
       }
     else
       {
-        Assert(false, ExcNotImplemented());
+        DEAL_II_NOT_IMPLEMENTED();
         return {};
       }
     (void)tol;
@@ -822,20 +842,20 @@ namespace CGALWrappers
   }
 
 
-  template <int dim0, int dim1, int spacedim>
-  std::vector<std::array<Point<spacedim>, dim1 + 1>>
+  template <int structdim0, int structdim1, int spacedim>
+  std::vector<std::array<Point<spacedim>, structdim1 + 1>>
   compute_intersection_of_cells(
-    const typename Triangulation<dim0, spacedim>::cell_iterator &cell0,
-    const typename Triangulation<dim1, spacedim>::cell_iterator &cell1,
-    const Mapping<dim0, spacedim>                               &mapping0,
-    const Mapping<dim1, spacedim>                               &mapping1,
-    const double                                                 tol)
+    const typename Triangulation<structdim0, spacedim>::cell_iterator &cell0,
+    const typename Triangulation<structdim1, spacedim>::cell_iterator &cell1,
+    const Mapping<structdim0, spacedim>                               &mapping0,
+    const Mapping<structdim1, spacedim>                               &mapping1,
+    const double                                                       tol)
   {
     Assert(mapping0.get_vertices(cell0).size() ==
-             ReferenceCells::get_hypercube<dim0>().n_vertices(),
+             ReferenceCells::get_hypercube<structdim0>().n_vertices(),
            ExcNotImplemented());
     Assert(mapping1.get_vertices(cell1).size() ==
-             ReferenceCells::get_hypercube<dim1>().n_vertices(),
+             ReferenceCells::get_hypercube<structdim1>().n_vertices(),
            ExcNotImplemented());
 
     const auto &vertices0 =
@@ -843,12 +863,19 @@ namespace CGALWrappers
     const auto &vertices1 =
       CGALWrappers::get_vertices_in_cgal_order(cell1, mapping1);
 
-    return compute_intersection_of_cells<dim0, dim1, spacedim>(vertices0,
-                                                               vertices1,
-                                                               tol);
+    return compute_intersection_of_cells<structdim0, structdim1, spacedim>(
+      vertices0, vertices1, tol);
   }
 
-#  include "intersections.inst"
+// Explicit instantiations.
+//
+// We don't build the instantiations.inst file if deal.II isn't
+// configured with CGAL, but doxygen doesn't know that and tries to
+// find that file anyway for parsing -- which then of course it fails
+// on. So exclude the following from doxygen consideration.
+#  ifndef DOXYGEN
+#    include "cgal/intersections.inst"
+#  endif
 
 } // namespace CGALWrappers
 
@@ -858,12 +885,12 @@ DEAL_II_NAMESPACE_CLOSE
 
 DEAL_II_NAMESPACE_OPEN
 
-template <int dim0,
-          int dim1,
+template <int structdim0,
+          int structdim1,
           int spacedim,
           int n_components0,
           int n_components1>
-std::vector<std::array<Point<spacedim>, dim1 + 1>>
+std::vector<std::array<Point<spacedim>, structdim1 + 1>>
 compute_intersection_of_cells(
   const std::array<Point<spacedim>, n_components0> &vertices0,
   const std::array<Point<spacedim>, n_components1> &vertices1,
@@ -875,14 +902,14 @@ compute_intersection_of_cells(
   AssertThrow(false, ExcNeedsCGAL());
 }
 
-template <int dim0, int dim1, int spacedim>
-std::vector<std::array<Point<spacedim>, dim1 + 1>>
+template <int structdim0, int structdim1, int spacedim>
+std::vector<std::array<Point<spacedim>, structdim1 + 1>>
 compute_intersection_of_cells(
-  const typename Triangulation<dim0, spacedim>::cell_iterator &cell0,
-  const typename Triangulation<dim1, spacedim>::cell_iterator &cell1,
-  const Mapping<dim0, spacedim>                               &mapping0,
-  const Mapping<dim1, spacedim>                               &mapping1,
-  const double                                                 tol)
+  const typename Triangulation<structdim0, spacedim>::cell_iterator &cell0,
+  const typename Triangulation<structdim1, spacedim>::cell_iterator &cell1,
+  const Mapping<structdim0, spacedim>                               &mapping0,
+  const Mapping<structdim1, spacedim>                               &mapping1,
+  const double                                                       tol)
 {
   (void)cell0;
   (void)cell1;

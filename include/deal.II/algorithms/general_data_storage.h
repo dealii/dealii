@@ -1,31 +1,31 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2019 - 2022 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2019 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 #ifndef dealii_algorithms_general_data_storage_h
 #define dealii_algorithms_general_data_storage_h
 
 #include <deal.II/base/config.h>
 
+#include <deal.II/base/enable_observer_pointer.h>
 #include <deal.II/base/exceptions.h>
-#include <deal.II/base/subscriptor.h>
 
-#include <boost/any.hpp>
 #include <boost/core/demangle.hpp>
 
 #include <algorithm>
+#include <any>
 #include <map>
+#include <ostream>
 #include <string>
 #include <typeinfo>
 
@@ -37,21 +37,9 @@ DEAL_II_NAMESPACE_OPEN
  * It offers a mechanism to store any amount of data, of any type,
  * which is then made accessible by an identifier string.
  *
- * When using this class, please cite
- *
- * @code{.bib}
- * @article{SartoriGiulianiBardelloni-2018-a,
- *  Author = {Sartori, Alberto and Giuliani, Nicola and
- *            Bardelloni, Mauro and Heltai, Luca},
- *  Journal = {SoftwareX},
- *  Pages = {318--327},
- *  Title = {{deal2lkit: A toolkit library for high performance
- *            programming in deal.II}},
- *  Volume = {7},
- *  Year = {2018}}
- * @endcode
+ * When using this class, please cite @cite SartoriGiulianiBardelloni-2018-a.
  */
-class GeneralDataStorage : public Subscriptor
+class GeneralDataStorage : public EnableObserverPointer
 {
 public:
   /**
@@ -330,14 +318,14 @@ public:
   /** @} */
 
   /**
-   * An entry with this name does not exist in the internal boost::any map.
+   * An entry with this name does not exist in the internal std::any map.
    */
   DeclException1(ExcNameNotFound,
                  std::string,
                  << "No entry with the name " << arg1 << " exists.");
 
   /**
-   * An entry with this name does not exist in the internal boost::any map.
+   * An entry with this name does not exist in the internal std::any map.
    */
   DeclException1(ExcNameHasBeenFound,
                  std::string,
@@ -357,7 +345,7 @@ private:
   /**
    * Arbitrary user data, identified by a string.
    */
-  std::map<std::string, boost::any> any_data;
+  std::map<std::string, std::any> any_data;
 };
 
 
@@ -426,11 +414,11 @@ GeneralDataStorage::get_object_with_name(const std::string &name)
 
   if (any_data[name].type() == typeid(Type *))
     {
-      p = boost::any_cast<Type *>(any_data[name]);
+      p = std::any_cast<Type *>(any_data[name]);
     }
   else if (any_data[name].type() == typeid(Type))
     {
-      p = boost::any_cast<Type>(&any_data[name]);
+      p = std::any_cast<Type>(&any_data[name]);
     }
   else
     {
@@ -454,12 +442,12 @@ GeneralDataStorage::get_object_with_name(const std::string &name) const
 
   if (it->second.type() == typeid(Type *))
     {
-      const Type *p = boost::any_cast<Type *>(it->second);
+      const Type *p = std::any_cast<Type *>(it->second);
       return *p;
     }
   else if (it->second.type() == typeid(Type))
     {
-      const Type *p = boost::any_cast<Type>(&it->second);
+      const Type *p = std::any_cast<Type>(&it->second);
       return *p;
     }
   else

@@ -1,17 +1,16 @@
-## ---------------------------------------------------------------------
+## ------------------------------------------------------------------------
 ##
-## Copyright (C) 2012 - 2023 by the deal.II authors
+## SPDX-License-Identifier: LGPL-2.1-or-later
+## Copyright (C) 2012 - 2024 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
-## The deal.II library is free software; you can use it, redistribute
-## it, and/or modify it under the terms of the GNU Lesser General
-## Public License as published by the Free Software Foundation; either
-## version 2.1 of the License, or (at your option) any later version.
-## The full text of the license can be found in the file LICENSE.md at
-## the top level directory of deal.II.
+## Part of the source code is dual licensed under Apache-2.0 WITH
+## LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+## governing the source code and code contributions can be found in
+## LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 ##
-## ---------------------------------------------------------------------
+## ------------------------------------------------------------------------
 
 #
 # General setup for the Intel C++ Compiler
@@ -83,6 +82,8 @@ enable_if_supported(DEAL_II_WARNING_FLAGS "-diag-disable=16219")
 #   -w383   value copied to temporary, reference to temporary used
 #   -w854   const variable requires an initializer (defect 253 in http://www.open-std.org/jtc1/sc22/wg21/docs/cwg_defects.html)
 #   -w981   operands are evaluated in unspecified order
+#   -w1011  missing return statement at end of non-void function
+#           (incorrectly triggered by constexpr if, see #18681)
 #   -w1418  external function definition with no prior declaration
 #           (happens in boost)
 #   -w1478  deprecation warning
@@ -109,6 +110,7 @@ enable_if_supported(DEAL_II_WARNING_FLAGS "-wd327")
 enable_if_supported(DEAL_II_WARNING_FLAGS "-wd383")
 enable_if_supported(DEAL_II_WARNING_FLAGS "-wd854")
 enable_if_supported(DEAL_II_WARNING_FLAGS "-wd981")
+enable_if_supported(DEAL_II_WARNING_FLAGS "-wd1011")
 enable_if_supported(DEAL_II_WARNING_FLAGS "-wd1418")
 enable_if_supported(DEAL_II_WARNING_FLAGS "-wd1478")
 enable_if_supported(DEAL_II_WARNING_FLAGS "-wd1572")
@@ -185,4 +187,3 @@ if (CMAKE_BUILD_TYPE MATCHES "Debug")
   enable_if_supported(DEAL_II_CXX_FLAGS_DEBUG "-gdwarf-2")
   enable_if_supported(DEAL_II_CXX_FLAGS_DEBUG "-grecord-gcc-switches")
 endif()
-

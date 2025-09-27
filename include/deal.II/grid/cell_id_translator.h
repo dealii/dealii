@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2021 - 2023 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2021 - 2024 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 #ifndef dealii_cell_id_translator_h
 #define dealii_cell_id_translator_h
@@ -76,6 +75,14 @@ namespace internal
     template <typename Accessor>
     types::global_cell_index
     translate(const TriaIterator<Accessor> &cell) const;
+
+    /**
+     * Convert a @p cell of type TriaAccessor, CellAccessor, DoFAccessor, or
+     * DoFCellAccessor to an index unique on a level.
+     */
+    template <typename Accessor>
+    static types::global_cell_index
+    translate_level(const TriaIterator<Accessor> &cell);
 
     /**
      * Convert the @p i-th child of @p to an index.
@@ -188,16 +195,24 @@ namespace internal
                     dim == Accessor::structure_dimension,
                   "The information can only be queried for cells.");
 
-    types::global_cell_index id = 0;
+    return translate_level(cell) + tree_sizes[cell->level()];
+  }
 
-    id += convert_cell_id_binary_type_to_level_coarse_cell_id(
+
+
+  template <int dim>
+  template <typename Accessor>
+  types::global_cell_index
+  CellIDTranslator<dim>::translate_level(const TriaIterator<Accessor> &cell)
+  {
+    static_assert(dim == Accessor::dimension &&
+                    dim == Accessor::structure_dimension,
+                  "The information can only be queried for cells.");
+
+    return convert_cell_id_binary_type_to_level_coarse_cell_id(
       CellAccessor<Accessor::dimension, Accessor::space_dimension>(*cell)
         .id()
         .template to_binary<dim>());
-
-    id += tree_sizes[cell->level()];
-
-    return id;
   }
 
 
@@ -245,7 +260,7 @@ namespace internal
 
     std::reverse(child_indices.begin(), child_indices.end());
 
-    return {id_temp, child_indices}; // TODO
+    return {id_temp, child_indices};
   }
 
 

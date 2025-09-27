@@ -1,0 +1,40 @@
+Element: FE_DGQ<2>(3)
+Step 0
+Triangulation 16 cells, 2 levels
+DoFHandler 256 dofs, level dofs 64 256
+Assemble matrix
+Assemble multilevel matrix
+Assemble right hand side
+Solve
+Converged in 13 iterations
+energy-error: 0.297419
+L2-error:     0.00452447
+Estimate 0.990460
+Writing solution to <sol-00.gnuplot>...
+
+Step 1
+Triangulation 25 cells, 3 levels
+DoFHandler 400 dofs, level dofs 64 256 192
+Assemble matrix
+Assemble multilevel matrix
+Assemble right hand side
+Solve
+Converged in 14 iterations
+energy-error: 0.258559
+L2-error:     0.00288510
+Estimate 0.738624
+Writing solution to <sol-01.gnuplot>...
+
+Step 2
+Triangulation 34 cells, 4 levels
+DoFHandler 544 dofs, level dofs 64 256 256 128
+Assemble matrix
+Assemble multilevel matrix
+Assemble right hand side
+Solve
+Converged in 15 iterations
+energy-error: 0.189234
+L2-error:     0.00147954
+Estimate 0.657507
+Writing solution to <sol-02.gnuplot>...
+

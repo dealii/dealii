@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2006 - 2020 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2020 - 2024 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE at
-// the top level of the deal.II distribution.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 // Test DataOut::add_mg_data_vector in parallel
 
@@ -37,7 +36,7 @@
 
 template <int dim>
 void
-do_test()
+do_test(const bool interpolate_with_vector_tools)
 {
   parallel::distributed::Triangulation<dim> triangulation(
     MPI_COMM_WORLD,
@@ -81,12 +80,31 @@ do_test()
   }
 
   {
-    MGLevelObject<VectorType>         dof_vector(0,
+    MGLevelObject<VectorType> dof_vector(0,
                                          triangulation.n_global_levels() - 1);
-    MGTransferMatrixFree<dim, double> transfer;
 
-    transfer.build(dof_handler);
-    transfer.interpolate_to_mg(dof_handler, dof_vector, global_dof_vector);
+    if (interpolate_with_vector_tools)
+      {
+        MGTransferMatrixFree<dim, double> transfer;
+
+        transfer.build(dof_handler);
+        transfer.interpolate_to_mg(dof_handler, dof_vector, global_dof_vector);
+      }
+    else
+      for (unsigned int level = 0; level < triangulation.n_global_levels();
+           ++level)
+        {
+          dof_vector[level].reinit(
+            dof_handler.locally_owned_mg_dofs(level),
+            DoFTools::extract_locally_active_level_dofs(dof_handler, level),
+            dof_handler.get_mpi_communicator());
+
+          VectorTools::interpolate(dof_handler,
+                                   Functions::SquareFunction<dim>(),
+                                   dof_vector[level],
+                                   {},
+                                   level);
+        }
 
     for (unsigned int level = 0; level < triangulation.n_global_levels();
          ++level)
@@ -116,7 +134,9 @@ main(int argc, char **argv)
   Utilities::MPI::MPI_InitFinalize mpi(argc, argv, 1);
   MPILogInitAll                    log;
 
-  do_test<2>();
+  do_test<2>(true);
+  do_test<2>(false);
+
   //  do_test<3>();
   return 0;
 }

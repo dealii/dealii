@@ -1,22 +1,29 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2004 - 2023 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2004 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
+
+#include <deal.II/base/mpi_stub.h>
 
 #include <deal.II/lac/petsc_block_sparse_matrix.h>
 #include <deal.II/lac/petsc_compatibility.h>
 
+
 #ifdef DEAL_II_WITH_PETSC
+
+#  include <petscmat.h>
+
+
+DEAL_II_NAMESPACE_OPEN
 
 namespace
 {
@@ -54,7 +61,6 @@ namespace
   }
 } // namespace
 
-DEAL_II_NAMESPACE_OPEN
 
 namespace PETScWrappers
 {
@@ -73,7 +79,6 @@ namespace PETScWrappers
     BlockSparseMatrix::~BlockSparseMatrix()
     {
       PetscErrorCode ierr = MatDestroy(&petsc_nest_matrix);
-      (void)ierr;
       AssertNothrow(ierr == 0, ExcPETScError(ierr));
     }
 
@@ -210,12 +215,12 @@ namespace PETScWrappers
                       std::to_string(c) +
                       " is completely empty "
                       "and so it is not possible to determine how many columns it should have."));
-                  Mat dummy = ::create_dummy_mat(
-                    comm,
-                    static_cast<PetscInt>(row_local_sizes[r]),
-                    static_cast<PetscInt>(row_sizes[r]),
-                    static_cast<PetscInt>(col_local_sizes[c]),
-                    static_cast<PetscInt>(col_sizes[c]));
+                  Mat dummy =
+                    create_dummy_mat(comm,
+                                     static_cast<PetscInt>(row_local_sizes[r]),
+                                     static_cast<PetscInt>(row_sizes[r]),
+                                     static_cast<PetscInt>(col_local_sizes[c]),
+                                     static_cast<PetscInt>(col_sizes[c]));
                   this->sub_objects[r][c] = new BlockType(dummy);
 
                   // the new object got a reference on dummy, we can safely

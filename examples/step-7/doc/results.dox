@@ -8,7 +8,7 @@ files <code>solution-adaptive-q1.vtk</code>,
 here:
 
 
-<img src="https://www.dealii.org/images/steps/developer/step-7.solution.png" alt="">
+<img src="https://dealii.org/images/steps/developer/step-7.solution.png" alt="">
 
 
 
@@ -28,40 +28,40 @@ Cycle 0:
    Number of active cells:       64
    Number of degrees of freedom: 81
 Cycle 1:
-   Number of active cells:       124
-   Number of degrees of freedom: 157
+   Number of active cells:       121
+   Number of degrees of freedom: 154
 Cycle 2:
    Number of active cells:       280
    Number of degrees of freedom: 341
 Cycle 3:
-   Number of active cells:       577
-   Number of degrees of freedom: 690
+   Number of active cells:       565
+   Number of degrees of freedom: 678
 Cycle 4:
-   Number of active cells:       1099
-   Number of degrees of freedom: 1264
+   Number of active cells:       1075
+   Number of degrees of freedom: 1240
 Cycle 5:
-   Number of active cells:       2191
-   Number of degrees of freedom: 2452
+   Number of active cells:       2041
+   Number of degrees of freedom: 2306
 Cycle 6:
-   Number of active cells:       4165
-   Number of degrees of freedom: 4510
+   Number of active cells:       3913
+   Number of degrees of freedom: 4216
 Cycle 7:
-   Number of active cells:       7915
-   Number of degrees of freedom: 8440
+   Number of active cells:       7432
+   Number of degrees of freedom: 7909
 Cycle 8:
-   Number of active cells:       15196
-   Number of degrees of freedom: 15912
+   Number of active cells:       14203
+   Number of degrees of freedom: 14870
 
 cycle cells dofs     L2        H1      Linfty
     0    64    81 1.840e+00 2.858e+00 1.835e+00
-    1   124   157 5.190e-02 1.200e+00 1.344e-01
+    1   121   154 5.336e-02 1.200e+00 1.354e-01
     2   280   341 1.439e-02 7.892e-01 7.554e-02
-    3   577   690 8.627e-03 5.061e-01 2.805e-02
-    4  1099  1264 3.217e-03 3.030e-01 1.073e-02
-    5  2191  2452 1.445e-03 2.097e-01 5.073e-03
-    6  4165  4510 8.387e-04 1.460e-01 2.013e-03
-    7  7915  8440 7.051e-04 1.053e-01 1.804e-03
-    8 15196 15912 2.774e-04 7.463e-02 6.911e-04
+    3   565   678 8.696e-03 5.086e-01 2.843e-02
+    4  1075  1240 3.245e-03 3.059e-01 1.072e-02
+    5  2041  2306 2.407e-03 2.147e-01 5.156e-03
+    6  3913  4216 8.501e-04 1.503e-01 2.033e-03
+    7  7432  7909 7.113e-04 1.086e-01 1.808e-03
+    8 14203 14870 3.140e-04 7.671e-02 7.181e-04
 
 Solving with Q1 elements, global refinement
 ===========================================
@@ -119,15 +119,15 @@ cycle cells dofs     L2        H1      Linfty
     0    64   289 1.606e-01 1.278e+00 3.029e-01
     1   256  1089 7.638e-03 5.248e-01 4.816e-02
     2  1024  4225 8.601e-04 1.086e-01 4.827e-03
-    3  4096 16641 1.107e-04 2.756e-02 7.802e-04
-    4 16384 66049 1.393e-05 6.915e-03 9.971e-05
+    3  4096 16641 1.107e-04 2.756e-02 7.804e-04
+    4 16384 66049 1.394e-05 6.915e-03 9.991e-05
 
 n cells         H1                   L2
 0    64 1.278e+00    -    - 1.606e-01     -    -
 1   256 5.248e-01 2.43 1.28 7.638e-03 21.03 4.39
 2  1024 1.086e-01 4.83 2.27 8.601e-04  8.88 3.15
 3  4096 2.756e-02 3.94 1.98 1.107e-04  7.77 2.96
-4 16384 6.915e-03 3.99 1.99 1.393e-05  7.94 2.99
+4 16384 6.915e-03 3.99 1.99 1.394e-05  7.94 2.99
 
 Solving with Q2 elements, adaptive refinement
 ===========================================
@@ -136,40 +136,40 @@ Cycle 0:
    Number of active cells:       64
    Number of degrees of freedom: 289
 Cycle 1:
-   Number of active cells:       124
-   Number of degrees of freedom: 577
+   Number of active cells:       121
+   Number of degrees of freedom: 569
 Cycle 2:
-   Number of active cells:       289
-   Number of degrees of freedom: 1353
+   Number of active cells:       280
+   Number of degrees of freedom: 1317
 Cycle 3:
-   Number of active cells:       547
-   Number of degrees of freedom: 2531
+   Number of active cells:       529
+   Number of degrees of freedom: 2459
 Cycle 4:
-   Number of active cells:       1057
-   Number of degrees of freedom: 4919
+   Number of active cells:       1015
+   Number of degrees of freedom: 4719
 Cycle 5:
-   Number of active cells:       2059
-   Number of degrees of freedom: 9223
+   Number of active cells:       1963
+   Number of degrees of freedom: 9039
 Cycle 6:
-   Number of active cells:       3913
-   Number of degrees of freedom: 17887
+   Number of active cells:       3727
+   Number of degrees of freedom: 17143
 Cycle 7:
-   Number of active cells:       7441
-   Number of degrees of freedom: 33807
+   Number of active cells:       7081
+   Number of degrees of freedom: 32343
 Cycle 8:
-   Number of active cells:       14212
-   Number of degrees of freedom: 64731
+   Number of active cells:       13525
+   Number of degrees of freedom: 60895
 
 cycle cells dofs     L2        H1      Linfty
     0    64   289 1.606e-01 1.278e+00 3.029e-01
-    1   124   577 7.891e-03 5.256e-01 4.852e-02
-    2   289  1353 1.070e-03 1.155e-01 4.868e-03
-    3   547  2531 5.962e-04 5.101e-02 1.876e-03
-    4  1057  4919 1.977e-04 3.094e-02 7.923e-04
-    5  2059  9223 7.738e-05 1.974e-02 7.270e-04
-    6  3913 17887 2.925e-05 8.772e-03 1.463e-04
-    7  7441 33807 1.024e-05 4.121e-03 8.567e-05
-    8 14212 64731 3.761e-06 2.108e-03 2.167e-05
+    1   121   569 7.916e-03 5.257e-01 4.857e-02
+    2   280  1317 1.092e-03 1.165e-01 4.832e-03
+    3   529  2459 5.999e-04 5.177e-02 1.873e-03
+    4  1015  4719 2.100e-04 3.245e-02 7.938e-04
+    5  1963  9039 7.821e-05 1.990e-02 7.261e-04
+    6  3727 17143 2.868e-05 8.498e-03 1.462e-04
+    7  7081 32343 1.146e-05 4.360e-03 8.576e-05
+    8 13525 60895 3.747e-06 2.123e-03 2.174e-05
 @endcode
 
 
@@ -195,7 +195,7 @@ because we were interested in testing that our solutions *converge*.
 But from an engineering perspective, the question is often more
 practical: How fine do I have to make my mesh so that the error is
 "small enough"? In other words, if in the table above the $H^1$
-semi-norm has been reduced to `4.121e-03`, is this good enough for me
+semi-norm has been reduced to `2.123e-03`, is this good enough for me
 to sign the blueprint and declare that our numerical simulation showed
 that the bridge is strong enough?
 
@@ -203,12 +203,12 @@ In practice, we are rarely in this situation because I can not
 typically compare the numerical solution $u_h$ against the exact
 solution $u$ in situations that matter -- if I knew $u$, I would not
 have to compute $u_h$. But even if I could, the question to ask in
-general is then: `4.121e-03` *what*? The solution will have physical
+general is then: `2.123e-03` *what*? The solution will have physical
 units, say kg-times-meter-squared, and I'm integrating a function with
 units square of the above over the domain, and then take the square
 root. So if the domain is two-dimensional, the units of
 $\|u-u_h\|_{L_2}$ are kg-times-meter-cubed. The question is then: Is
-$4.121\times 10^{-3}$ kg-times-meter-cubed small? That depends on what
+$2.123\times 10^{-3}$ kg-times-meter-cubed small? That depends on what
 you're trying to simulate: If you're an astronomer used to masses
 measured in solar masses and distances in light years, then yes, this
 is a fantastically small number. But if you're doing atomic physics,
@@ -217,8 +217,8 @@ sufficiently small; you need a finer mesh.
 
 In other words, when we look at these sorts of numbers, we generally
 need to compare against a "scale". One way to do that is to not look
-at the *absolute* error $\|u-u_h\|$ in whatever norm, but at the
-*relative* error $\|u-u_h\|/\|u\|$. If this ratio is $10^{-5}$, then
+at the *absolute* error $\|u-u_h\|$ in whatever norm, but at the *relative*
+error $\|u-u_h\|/\|u\|$. If this ratio is $10^{-5}$, then
 you know that *on average*, the difference between $u$ and $u_h$ is
 0.001 per cent -- probably small enough for engineering purposes.
 
@@ -262,14 +262,14 @@ norms into one global norm as we already do in the program, by calling
 
 <h3> Possibilities for extensions </h3>
 
-<h4> Higher Order Elements </h4>
+<h4> Higher order elements </h4>
 
 Go ahead and run the program with higher order elements ($Q_3$, $Q_4$, ...). You
 will notice that assertions in several parts of the code will trigger (for
 example in the generation of the filename for the data output). You might have to address these,
 but it should not be very hard to get the program to work!
 
-<h4> Convergence Comparison </h4>
+<h4> Convergence comparison </h4>
 
 Is $Q_1$ or $Q_2$ better? What about adaptive versus global refinement? A (somewhat
 unfair but typical) metric to compare them, is to look at the error as a
@@ -302,3 +302,49 @@ To see how a comparison of this kind could work, take a look at
 that illustrates the error as a function of compute time for
 a number of polynomial degrees (as well as a number of different ways
 to discretize the equation used there).
+
+
+@anchor step_7-ResultsSection-bad-sign
+<h4> Switching the sign of alpha in the equation </h4>
+
+The equation we are solving here is
+@f[
+  -\Delta u + \alpha u = f,
+@f]
+with $\alpha=1$. This is sometimes called "the Helmholtz equation with
+the good sign" because the fact that $\alpha>0$ makes the equation
+fairly easy to solve: The solution minimizes a quadratic energy
+@f[
+  E(u) = \int_\Omega \frac 12 |\nabla u|^2 + \frac 12 \alpha u^2 - fu,
+@f]
+with a unique minimizer,
+which translates into the fact that the bilinear form we use is
+[coercive](https://en.wikipedia.org/wiki/Coercive_function#Coercive_operators_and_forms);
+a different way of putting this is by saying that the operator
+$-\Delta + \alpha$ is positive definite and
+[elliptic](https://en.wikipedia.org/wiki/Elliptic_operator). Solutions of
+such equations are typically nice and smooth, and we have many good methods
+of solving them efficiently and to high accuracy.
+
+All of this is, in general, not true if $\alpha<0$. As long as $\alpha$ is not
+equal to the negative of one of the eigenvalues of the Laplace operator,
+the equation
+@f[
+  -\Delta u + \alpha u = f,
+@f]
+still has a solution even for $\alpha<0$, but the matrix you get is in
+general not nearly as easy to invert as for $\alpha\ge 0$. Moreover,
+unless you pick a specific $f$, you will see that the solution is not
+nice and smooth any more: Solutions of the "Helmholtz equation with the
+bad sign" (i.e., with $\alpha<0$) are in general oscillatory, and the more
+negative $\alpha$ is, the shorter the wave length of these oscillations.
+
+You can easily try all of this out with
+the program here by changing the bilinear form in the program. (Of course,
+if you want to still want to compute errors, you will also have to make
+sure that the desired solution and the right hand side match.) The only
+other place you have to change is the solver: The matrix you are now
+building is no longer positive definite, and so the SolverCG class
+(implementing the Conjugate Gradient method) is no longer appropriate.
+Instead, try SolverGMRES -- a method that can deal with matrices that are
+not definite.

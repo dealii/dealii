@@ -1,18 +1,6 @@
 
 DEAL::Using mapping with degree 1:
 DEAL::============================
-DEAL:cg::Starting value 1.1
-DEAL:cg::Convergence step 7 value 4.6e-18
-DEAL:cg::Starting value 1.0
-DEAL:cg::Convergence step 18 value 5.1e-14
-DEAL:cg::Starting value 0.64
-DEAL:cg::Convergence step 29 value 4.6e-13
-DEAL:cg::Starting value 0.35
-DEAL:cg::Convergence step 52 value 6.0e-13
-DEAL:cg::Starting value 0.18
-DEAL:cg::Convergence step 106 value 5.3e-13
-DEAL:cg::Starting value 0.094
-DEAL:cg::Convergence step 234 value 5.9e-13
 cells  |u|_1    error   
 5     0.680402 0.572912 
 20    1.088141 0.165173 
@@ -23,18 +11,6 @@ cells  |u|_1    error
 DEAL::
 DEAL::Using mapping with degree 2:
 DEAL::============================
-DEAL:cg::Starting value 1.5
-DEAL:cg::Convergence step 7 value 1.4e-18
-DEAL:cg::Starting value 1.1
-DEAL:cg::Convergence step 17 value 1.1e-13
-DEAL:cg::Starting value 0.65
-DEAL:cg::Convergence step 28 value 7.2e-13
-DEAL:cg::Starting value 0.35
-DEAL:cg::Convergence step 51 value 9.8e-13
-DEAL:cg::Starting value 0.18
-DEAL:cg::Convergence step 106 value 4.3e-13
-DEAL:cg::Starting value 0.094
-DEAL:cg::Convergence step 233 value 8.0e-13
 cells  |u|_1    error   
 5     1.177062 0.076252 
 20    1.228978 0.024336 
@@ -45,18 +21,6 @@ cells  |u|_1    error
 DEAL::
 DEAL::Using mapping with degree 3:
 DEAL::============================
-DEAL:cg::Starting value 1.5
-DEAL:cg::Convergence step 7 value 3.2e-18
-DEAL:cg::Starting value 1.1
-DEAL:cg::Convergence step 17 value 1.1e-13
-DEAL:cg::Starting value 0.65
-DEAL:cg::Convergence step 28 value 7.3e-13
-DEAL:cg::Starting value 0.35
-DEAL:cg::Convergence step 51 value 9.8e-13
-DEAL:cg::Starting value 0.18
-DEAL:cg::Convergence step 106 value 4.3e-13
-DEAL:cg::Starting value 0.094
-DEAL:cg::Convergence step 233 value 7.9e-13
 cells  |u|_1    error   
 5     1.193493 0.059821 
 20    1.229825 0.023489 

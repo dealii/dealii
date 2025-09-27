@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2008 - 2023 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2012 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 #ifndef dealii_trilinos_parallel_block_vector_h
 #define dealii_trilinos_parallel_block_vector_h
@@ -69,8 +68,8 @@ namespace TrilinosWrappers
      * elements of each of these blocks to be stored on the local process.
      *
      * @ingroup Vectors
-     * @ingroup TrilinosWrappers @see
-     * @ref GlossBlockLA "Block (linear algebra)"
+     * @ingroup TrilinosWrappers
+     * @see @ref GlossBlockLA "Block (linear algebra)"
      */
     class BlockVector : public dealii::BlockVectorBase<MPI::Vector>
     {
@@ -153,7 +152,14 @@ namespace TrilinosWrappers
       operator=(const value_type s);
 
       /**
-       * Copy operator for arguments of the same type.
+       * Copy operator for arguments of the same type. Resize the present vector
+       * if necessary to the correct number of blocks, then copy the individual
+       * blocks from `v` using the copy-assignment operator of the class that
+       * represents the individual blocks.
+       *
+       * Copying the vectors that make up individual blocks can have complex
+       * semantics in parallel vector classes. See the information provided
+       * by the class used to represent the individual blocks.
        */
       BlockVector &
       operator=(const BlockVector &v);
@@ -271,9 +277,9 @@ namespace TrilinosWrappers
        * then queried from the input vector. Note that you should not write to
        * the resulting vector any more, since the some data can be stored
        * several times on different processors, leading to unpredictable
-       * results. In particular, such a vector cannot be used for matrix-
-       * vector products as for example done during the solution of linear
-       * systems.
+       * results. In particular, such a vector cannot be used for
+       * matrix-vector products as for example done during the solution of
+       * linear systems.
        */
       void
       import_nonlocal_data_for_fe(const TrilinosWrappers::BlockSparseMatrix &m,
@@ -306,7 +312,7 @@ namespace TrilinosWrappers
        * functions.
        */
       void
-      swap(BlockVector &v);
+      swap(BlockVector &v) noexcept;
 
       /**
        * Print to a stream.
@@ -411,17 +417,19 @@ namespace TrilinosWrappers
     BlockVector::has_ghost_elements() const
     {
       bool ghosted = block(0).has_ghost_elements();
-#  ifdef DEBUG
-      for (unsigned int i = 0; i < this->n_blocks(); ++i)
-        Assert(block(i).has_ghost_elements() == ghosted, ExcInternalError());
-#  endif
+      if constexpr (running_in_debug_mode())
+        {
+          for (unsigned int i = 0; i < this->n_blocks(); ++i)
+            Assert(block(i).has_ghost_elements() == ghosted,
+                   ExcInternalError());
+        }
       return ghosted;
     }
 
 
 
     inline void
-    BlockVector::swap(BlockVector &v)
+    BlockVector::swap(BlockVector &v) noexcept
     {
       std::swap(this->components, v.components);
 
@@ -438,7 +446,7 @@ namespace TrilinosWrappers
      * @relatesalso TrilinosWrappers::MPI::BlockVector
      */
     inline void
-    swap(BlockVector &u, BlockVector &v)
+    swap(BlockVector &u, BlockVector &v) noexcept
     {
       u.swap(v);
     }
@@ -499,6 +507,14 @@ template <>
 struct is_serial_vector<TrilinosWrappers::MPI::BlockVector> : std::false_type
 {};
 
+DEAL_II_NAMESPACE_CLOSE
+
+#else
+
+// Make sure the scripts that create the C++20 module input files have
+// something to latch on if the preprocessor #ifdef above would
+// otherwise lead to an empty content of the file.
+DEAL_II_NAMESPACE_OPEN
 DEAL_II_NAMESPACE_CLOSE
 
 #endif // DEAL_II_WITH_TRILINOS

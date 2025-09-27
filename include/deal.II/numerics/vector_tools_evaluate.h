@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2021 - 2023 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2021 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 
 #ifndef dealii_vector_tools_evaluation_h
@@ -68,8 +67,9 @@ namespace VectorTools
   } // namespace EvaluationFlags
 
   /**
-   * Given a (distributed) solution vector @p vector, evaluate the values at
-   * the (arbitrary and even remote) points specified by @p evaluation_points.
+   * Given a (distributed) solution vector @p vector, reinitialize @p cache and
+   * evaluate the values at the (arbitrary and even remote) points specified by
+   * @p evaluation_points.
    *
    * The following code snippet shows the usage of this function. Given
    * a Mapping object, a DoFHandler object, and solution vector as well as a
@@ -80,13 +80,15 @@ namespace VectorTools
    * further function calls (see also the function below).
    *
    * @code
-   * // first usage: set up cache
    * Utilities::MPI::RemotePointEvaluation<dim, spacedim> cache;
    *
+   * // Set up the cache and perform evaluation. This overload always
+   * // reinitializes the RemotePointEvaluation cache object so, typically, it
+   * // should only be called once.
    * const auto result_1 = VectorTools::point_values(
    *   mapping, dof_handler_1, vector_1, evaluation_points, cache);
    *
-   * // further usages: reuse the cache
+   * // This overload does not initialize or reinitialize the cache.
    * const auto result_2 = VectorTools::point_values(
    *   cache, dof_handler_2, vector_2);
    * @endcode
@@ -119,7 +121,7 @@ namespace VectorTools
    *
    * The function can also be used to evaluate cell-data vectors. For this
    * purpose, one passes in a Triangulation instead of a DoFHandler and a
-   * vector of size Trinagulation::n_active_cells() or a vector, which
+   * vector of size Triangulation::n_active_cells() or a vector, which
    * has been initialized with the partitioner returned by
    * parallel::TriangulationBase::global_active_cell_index_partitioner().
    *
@@ -373,7 +375,7 @@ namespace VectorTools
           case EvaluationFlags::insert:
             return values[0];
           default:
-            Assert(false, ExcNotImplemented());
+            DEAL_II_NOT_IMPLEMENTED();
             return values[0];
         }
     }
@@ -400,7 +402,7 @@ namespace VectorTools
           case EvaluationFlags::insert:
             return values[0];
           default:
-            Assert(false, ExcNotImplemented());
+            DEAL_II_NOT_IMPLEMENTED();
             return values[0];
         }
     }
@@ -436,7 +438,7 @@ namespace VectorTools
           case EvaluationFlags::insert:
             return values[0];
           default:
-            Assert(false, ExcNotImplemented());
+            DEAL_II_NOT_IMPLEMENTED();
             return values[0];
         }
     }
@@ -525,7 +527,6 @@ namespace VectorTools
       const Vector<Number>                                              &vector,
       const typename Triangulation<dim, spacedim>::active_cell_iterator &cell)
     {
-      (void)tria;
       AssertDimension(tria.n_active_cells(), vector.size());
       return vector[cell->active_cell_index()];
     }
@@ -614,9 +615,6 @@ namespace VectorTools
                                           spacedim,
                                           typename VectorType::value_type>>> &)
     {
-      (void)evaluation_flags;
-      (void)first_selected_component;
-
       Assert(n_components == 1 && first_selected_component == 0,
              ExcMessage(
                "A cell-data vector can only have a single component."));

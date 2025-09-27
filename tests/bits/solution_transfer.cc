@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2021 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2008 - 2024 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 
 
@@ -116,22 +115,17 @@ transfer(std::ostream &out)
     cell->set_refine_flag();
 
   tria.prepare_coarsening_and_refinement();
-  q_soltrans.prepare_for_pure_refinement();
-  dgq_soltrans.prepare_for_pure_refinement();
+  q_soltrans.prepare_for_coarsening_and_refinement(q_solution);
+  dgq_soltrans.prepare_for_coarsening_and_refinement(dgq_solution);
   tria.execute_coarsening_and_refinement();
   q_dof_handler.distribute_dofs(fe_q);
   dgq_dof_handler.distribute_dofs(fe_dgq);
 
-  Vector<double> tmp_q(q_dof_handler.n_dofs());
-  q_soltrans.refine_interpolate(q_solution, tmp_q);
   q_solution.reinit(q_dof_handler.n_dofs());
-  q_solution = tmp_q;
+  q_soltrans.interpolate(q_solution);
 
-  Vector<double> tmp_dgq(dgq_dof_handler.n_dofs());
-  dgq_soltrans.refine_interpolate(dgq_solution, tmp_dgq);
   dgq_solution.reinit(dgq_dof_handler.n_dofs());
-  dgq_solution = tmp_dgq;
-
+  dgq_soltrans.interpolate(dgq_solution);
 
   q_data_out.clear_data_vectors();
   q_data_out.add_data_vector(q_solution, "solution");
@@ -168,8 +162,8 @@ transfer(std::ostream &out)
   dgq_dof_handler.distribute_dofs(fe_dgq);
   q_solution.reinit(q_dof_handler.n_dofs());
   dgq_solution.reinit(dgq_dof_handler.n_dofs());
-  q_soltrans.interpolate(q_old_solution, q_solution);
-  dgq_soltrans.interpolate(dgq_old_solution, dgq_solution);
+  q_soltrans.interpolate(q_solution);
+  dgq_soltrans.interpolate(dgq_solution);
 
   q_data_out.clear_data_vectors();
   q_data_out.add_data_vector(q_solution, "solution");

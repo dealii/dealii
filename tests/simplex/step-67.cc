@@ -1,17 +1,16 @@
-/* ---------------------------------------------------------------------
+/* ------------------------------------------------------------------------
  *
- * Copyright (C) 2020 - 2023 by the deal.II authors
+ * SPDX-License-Identifier: LGPL-2.1-or-later
+ * Copyright (C) 2020 - 2024 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
- * The deal.II library is free software; you can use it, redistribute
- * it, and/or modify it under the terms of the GNU Lesser General
- * Public License as published by the Free Software Foundation; either
- * version 2.1 of the License, or (at your option) any later version.
- * The full text of the license can be found in the file LICENSE.md at
- * the top level directory of deal.II.
+ * Part of the source code is dual licensed under Apache-2.0 WITH
+ * LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+ * governing the source code and code contributions can be found in
+ * LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
  *
- * ---------------------------------------------------------------------
+ * ------------------------------------------------------------------------
  *
  * step-67 on a simplex mesh (only testcase = 0 is tested). The major
  * modifications are:
@@ -61,6 +60,7 @@
 #endif
 
 #include <deal.II/dofs/dof_handler.h>
+#include <deal.II/dofs/dof_tools.h>
 
 #include <deal.II/fe/fe_dgq.h>
 #include <deal.II/fe/fe_system.h>
@@ -92,7 +92,6 @@
 
 namespace Euler_DG
 {
-  using namespace dealii;
 
   // Similarly to the other matrix-free tutorial programs, we collect all
   // parameters that control the execution of the program at the top of the
@@ -242,7 +241,7 @@ namespace Euler_DG
           }
 
         default:
-          Assert(false, ExcNotImplemented());
+          DEAL_II_NOT_IMPLEMENTED();
           return 0.;
       }
   }
@@ -653,7 +652,7 @@ namespace Euler_DG
 
         default:
           {
-            Assert(false, ExcNotImplemented());
+            DEAL_II_NOT_IMPLEMENTED();
             return {};
           }
       }
@@ -864,7 +863,9 @@ namespace Euler_DG
     const DoFHandler<dim> &dof_handler)
   {
     const std::vector<const DoFHandler<dim> *> dof_handlers = {&dof_handler};
-    const AffineConstraints<double>            dummy;
+    const AffineConstraints<double>            dummy(
+      dof_handler.locally_owned_dofs(),
+      DoFTools::extract_locally_relevant_dofs(dof_handler));
     const std::vector<const AffineConstraints<double> *> constraints = {&dummy};
 #ifdef HEX
     const std::vector<Quadrature<1>> quadratures = {QGauss<1>(n_q_points_1d),
@@ -2185,7 +2186,7 @@ namespace Euler_DG
           }
 
         default:
-          Assert(false, ExcNotImplemented());
+          DEAL_II_NOT_IMPLEMENTED();
       }
 #ifdef HEX
     triangulation.refine_global(n_global_refinements);
@@ -2320,7 +2321,9 @@ namespace Euler_DG
           euler_operator.project(ExactSolution<dim>(time), reference);
 #else
 
-          AffineConstraints<double> dummy;
+          AffineConstraints<double> dummy(
+            dof_handler.locally_owned_dofs(),
+            DoFTools::extract_locally_relevant_dofs(dof_handler));
           dummy.close();
           VectorTools::project(mapping,
                                dof_handler,
@@ -2414,7 +2417,9 @@ namespace Euler_DG
 #ifdef HEX
     euler_operator.project(ExactSolution<dim>(time), solution);
 #else
-    AffineConstraints<double> dummy;
+    AffineConstraints<double> dummy(dof_handler.locally_owned_dofs(),
+                                    DoFTools::extract_locally_relevant_dofs(
+                                      dof_handler));
     dummy.close();
     VectorTools::project(mapping,
                          dof_handler,
@@ -2508,7 +2513,6 @@ int
 main(int argc, char **argv)
 {
   using namespace Euler_DG;
-  using namespace dealii;
 
   // tests.h enables floating point exceptions in debug mode, here we disable
   // them to avoid division by zero when some cell lanes might not be occupied

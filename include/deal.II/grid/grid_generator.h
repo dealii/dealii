@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 1999 - 2023 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 1999 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 #ifndef dealii_grid_generator_h
 #define dealii_grid_generator_h
@@ -24,14 +23,16 @@
 #include <deal.II/base/point.h>
 #include <deal.II/base/table.h>
 
+#include <deal.II/cgal/additional_data.h>
+
 #include <deal.II/grid/reference_cell.h>
 #include <deal.II/grid/tria.h>
-
-#include <deal.II/cgal/additional_data.h>
 
 #include <array>
 #include <limits>
 #include <map>
+#include <set>
+
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -95,6 +96,10 @@ namespace GridGenerator
    *
    * @pre The triangulation passed as argument needs to be empty when calling
    * this function.
+   *
+   * @note This function is available through the python interface as
+   * `triangulation.generate_hyper_cube(left = 0., right = 1., colorize =
+   * false)`.
    */
   template <int dim, int spacedim>
   void
@@ -106,11 +111,15 @@ namespace GridGenerator
   /**
    * Create a $d$-<a href="https://en.wikipedia.org/wiki/Simplex">simplex</a>
    * (i.e., a triangle in 2d, or a tetrahedron in 3d) with
-   * $d+1$ corners. Since deal.II does not support triangular and
-   * tetrahedral cells, the simplex described by the input arguments
+   * $d+1$ corners. Since this function dates back to a time when deal.II
+   * did not support triangular and tetrahedral cells (which it does now),
+   * the simplex created by this function and described by the input arguments
    * is subdivided into quadrilaterals and hexahedra by adding edge,
    * face, and simplex midpoints, resulting in a mesh that consists of
-   * $d+1$ quadrilateral or hexahedral cells.
+   * $d+1$ quadrilateral or hexahedral cells. (However, you can create a
+   * simplex geometry with a single simplex cell -- i.e., a triangle or
+   * a tetrahedron -- with both the GridGenerator::reference_cell() and
+   * directly with the Triangulation::create_triangulation() functions.)
    *
    * The @p vertices argument contains a vector with all d+1 vertices defining
    * the corners of the simplex. They must be given in an order such that the
@@ -129,6 +138,9 @@ namespace GridGenerator
    *
    * @note Implemented for <tt>Triangulation@<2,2@></tt>,
    * <tt>Triangulation@<3,3@></tt>.
+   *
+   * @note This function is available through the python interface as
+   * `triangulation.generate_simplex(vertices)`.
    */
   template <int dim>
   void
@@ -171,6 +183,9 @@ namespace GridGenerator
    * @param right Upper bound for the interval used to create the hyper cube.
    *
    * @param colorize Assign different boundary ids if set to true.
+   *
+   * @note This function is available through the python interface as
+   * `triangulation.generate_subdivided_hyper_cube(left = 0., right = 1.)`.
    */
   template <int dim, int spacedim>
   void
@@ -214,6 +229,9 @@ namespace GridGenerator
    *
    * @pre The triangulation passed as argument needs to be empty when calling
    * this function.
+   *
+   * @note This function is available through the python interface as
+   * `triangulation.generate_hyper_rectangle(p1, p2, colorize = false)`.
    */
   template <int dim, int spacedim>
   void
@@ -270,6 +288,10 @@ namespace GridGenerator
    *
    * @param colorize Assign different boundary ids if set to true. The same
    * comments apply as for the hyper_rectangle() function.
+   *
+   * @note This function is available through the python interface as
+   * `triangulation.generate_subdivided_hyper_rectangle(repetitions, p1, p2,
+   * colorize = false)`.
    */
   template <int dim, int spacedim>
   void
@@ -293,6 +315,10 @@ namespace GridGenerator
    *
    * The step sizes have to add up to the dimensions of the hyper rectangle
    * specified by the points @p p1 and @p p2.
+   *
+   * @note This function is available through the python interface as
+   * `triangulation.generate_subdivided_steps_hyper_rectangle(step_sizes, p1,
+   * p2, colorize = false)`.
    */
   template <int dim>
   void
@@ -311,6 +337,10 @@ namespace GridGenerator
    * the domain will have a void there.
    *
    * @note If you need a lot of holes, you may consider cheese().
+   *
+   * @note This function is available through the python interface as
+   * `triangulation.generate_subdivided_material_hyper_rectangle(spacing, p,
+   * material_id, colorize = false)`.
    */
   template <int dim>
   void
@@ -343,6 +373,9 @@ namespace GridGenerator
    * calling this function.
    *
    * @param holes Positive number of holes in each of the dim directions.
+   *
+   * @note This function is available through the python interface as
+   * `triangulation.generate_cheese(holes)`.
    */
   template <int dim, int spacedim>
   void
@@ -391,6 +424,12 @@ namespace GridGenerator
    *
    * @p tria is the triangulation to be created. It needs to be empty upon
    * calling this function.
+   *
+   * @note This function is available through the python interface as
+   * `triangulation.generate_plate_with_a_holes(inner_radius = 0.4, outer_radius
+   * = 1, pad_bottom = 2, pad_top = 2., pad_left = 1., pad_right, center =
+   * Point(), polar_manifold = 0, tfi_manifold = 1, L = 1, n_slices = 2,
+   * colorize = false)`.
    */
   template <int dim>
   void
@@ -495,6 +534,10 @@ namespace GridGenerator
    * url       = {https://doi.org/10.1007/978-3-322-89849-4_39}
    * }
    * @endcode
+   *
+   * @note This function is available through the python interface as
+   * `triangulation.generate_channel_with_cylinder(shell_region_width = 0.03,
+   * n_shellsa = 2, skewness = 2., colorize = false)`.
    */
   template <int dim>
   void
@@ -503,6 +546,103 @@ namespace GridGenerator
                         const unsigned int  n_shells           = 2,
                         const double        skewness           = 2.0,
                         const bool          colorize           = false);
+
+  /**
+   * Generate a grid consisting of a channel with a cylinder where the length,
+   * the height and the depth (in 3D) of the channel can be defined by the user.
+   * This generator is a generalized version of
+   * GridGenerator::channel_with_cylinder. It can be used for benchmarking
+   * Navier-Stokes solvers for various flows around a cylinder cases in 2D or
+   * 3D. The main limitation of this generator is that the diameter of the
+   * cylinder is fixed at one and that the dimensions of the channel along the x
+   * and y dimensions must be an integer multiple of this diameter.
+   * Consequently, the length before the cylinder
+   * ($L_{pre}$), the length after the cylinder ($L_{post}$), the height below
+   * ($H_{below}$) and the height above ($H_{above}$) must be integer values.
+   * The depth of the channel ($W$) can be any real positive number. The
+   * geometry consists of a channel of size $[-L_{pre}, -H_{below}] \times
+   * [L_{post}, H_{above}] \times [0, W] $ (where the $z$ dimension is omitted
+   * in 2d) with a cylinder, parallel to the $z$ axis with diameter $1$,
+   * centered at $(0, 0, 0)$. The channel has three distinct regions: <ol>
+   *   <li>If @p n_shells is greater than zero, then there are that many shells
+   *   centered around the cylinder,</li>
+   *   <li>a blending region between the shells and the rest of the
+   *   triangulation, and</li>
+   *   <li>a bulk region consisting of Cartesian cells.</li>
+   * </ol>
+   * Here is an example of a grid (without additional global refinement)
+   * where the arguments were {8,16,8,8} and
+   * the default arguments are used for the number of shells and skewness:
+   *
+   * @image html custom_channel_with_cylinder.png
+   *
+   * The resulting Triangulation uses three manifolds: a PolarManifold (in 2d)
+   * or CylindricalManifold (in 3d) with manifold id $0$, a
+   * TransfiniteInterpolationManifold with manifold id $1$, and a FlatManifold
+   * everywhere else. For more information on this topic see
+   * @ref GlossManifoldIndicator "the glossary entry on manifold indicators".
+   * The
+   * cell faces on the cylinder and surrounding shells have manifold ids of
+   * $0$, while the cell volumes adjacent to the shells (or, if they do not
+   * exist, the cylinder) have a manifold id of $1$. Put another way: this
+   * grid uses TransfiniteInterpolationManifold to smoothly transition from
+   * the shells (generated with GridGenerator::concentric_hyper_shells) to the
+   * bulk region. All other cell volumes and faces have manifold id
+   * numbers::flat_manifold_id and use FlatManifold. All cells with id
+   * numbers::flat_manifold_id are rectangular prisms aligned with the
+   * coordinate axes.
+   *
+   *
+   * @param tria Triangulation to be created. Must be empty upon calling this
+   * function.
+   *
+   * @param lengths_and_heights  A vector containing the distance of the domain to the center of the cylinder.
+   * The vector must contain 4 unsigned integers which consist in the length (in
+   * number of cylinder diameter) before the cylinder, after the cylinder, below
+   * the cylinder and above the cylinder.
+   *
+   * @param depth The depth of the simulation domain (in 3D, the z axis)
+   *
+   * @param depth_division The number of division along the z axis
+   *
+   * @param shell_region_radius Radius of the layer of shells around the cylinder.
+   * This value should be between larger than 0.5 (the radius of the cylinder)
+   * and smaller than 1 (the half-length of the box around the cylinder).
+   *
+   * @param n_shells Number of shells to use in the shell layer.
+   *
+   * @param skewness Parameter controlling how close the shells are
+   * to the cylinder: see the mathematical definition given in
+   * GridGenerator::concentric_hyper_shells.
+   *
+   * @param use_transfinite_region If `true`, then a tranfinite manifold is used
+   * in the intermediary region between the cylindrical hypershell and the
+   * channel.
+   *
+   * @param colorize If `true`, then assign different boundary ids to
+   * different parts of the boundary. For more
+   * information on boundary indicators see
+   * @ref GlossBoundaryIndicator "this glossary entry".
+   * The left boundary (at $x = -L_{pre}$) is assigned an id of $0$, the right
+   * boundary (at $x = L_{post}$) is assigned an id of $1$; the boundary of
+   * the obstacle in the middle (i.e., the circle in 2d or the cylinder
+   * walls in 3d) is assigned an id of $2$, the bottom wall (at $y=-H$) is
+   * assigned and id of $/$, the top wall (at $y=H$) is assigned an id of $4$.
+   * In 3D, the front wall ($z=0$) is assigned an id of $5$ and the back wall
+   * ($z=W$) is assigned an id of $6$.
+   */
+  template <int dim>
+  void
+  uniform_channel_with_cylinder(
+    Triangulation<dim>              &tria,
+    const std::vector<unsigned int> &lengths_and_heights,
+    const double                     depth                  = 1,
+    const unsigned int               depth_division         = 1,
+    const double                     shell_region_radius    = 0.75,
+    const unsigned int               n_shells               = 2,
+    const double                     skewness               = 2.0,
+    const bool                       use_transfinite_region = false,
+    const bool                       colorize               = false);
 
   /**
    * A general @p dim -dimensional cell (a segment if dim is 1, a quadrilateral
@@ -523,6 +663,9 @@ namespace GridGenerator
    * @param tria The triangulation that will be created
    * @param vertices The 2^dim vertices of the cell
    * @param colorize If true, set different boundary ids.
+   *
+   * @note This function is available through the python interface as
+   * `triangulation.generate_general_cell(vertices, colorize = false)`.
    */
   template <int dim, int spacedim>
   void
@@ -545,6 +688,9 @@ namespace GridGenerator
    *
    * @param colorize Assign different boundary ids if true. (see
    * @ref GlossColorization "the glossary entry on colorization").
+   *
+   * @note This function is available through the python interface as
+   * `triangulation.generate_parallelogram(vertices, colorize = false)`.
    */
   template <int dim>
   void
@@ -566,6 +712,9 @@ namespace GridGenerator
    *
    * @pre The triangulation passed as argument needs to be empty when calling
    * this function.
+   *
+   * @note This function is available through the python interface as
+   * `triangulation.generate_parallelepiped(vertices, colorize = false)`.
    */
   template <int dim>
   void
@@ -583,6 +732,10 @@ namespace GridGenerator
    *
    * @pre The triangulation passed as argument needs to be empty when calling
    * this function.
+   *
+   * @note This function is available through the python interface as
+   * `triangulation.generate_fixed_subdivided_parallelepiped(n_subdivisions,
+   * corners, colorize = false)`.
    */
   template <int dim>
   void
@@ -598,6 +751,10 @@ namespace GridGenerator
    *
    * @pre The triangulation passed as argument needs to be empty when calling
    * this function.
+   *
+   * @note This function is available through the python interface as
+   * `triangulation.generate_varying_subdivided_parallelepiped(n_subdivisions,
+   * corners, colorize = false)`.
    */
   template <int dim>
   void
@@ -656,6 +813,10 @@ namespace GridGenerator
    *
    * @pre The triangulation passed as argument needs to be empty when calling
    * this function.
+   *
+   * @note This function is available through the python interface as
+   * `triangulation.generate_hyper_cube(left = 0, right = 1., thickness = 1.,
+   * colorize = false)`.
    */
   template <int dim>
   void
@@ -668,12 +829,12 @@ namespace GridGenerator
   /**
    * Initialize the given triangulation with several
    * @ref GlossCoarseMesh "coarse mesh cells"
-   * that cover a hyperball, i.e. a circle in 2d or a
-   * ball in 3d, around @p center with given @p radius. The function is
+   * that cover a hyperball, i.e. a circular disk if `dim==2` or a
+   * ball if `dim==3`, around @p center with given @p radius. The function is
    * used in step-6.
    *
-   * In order to avoid degenerate cells at the boundaries, the circle is
-   * triangulated by five cells, whereas in 3d the ball is subdivided by
+   * In order to avoid degenerate cells at the boundaries, the circular disk is
+   * triangulated by five cells, whereas in 3d the ball is subdivided into
    * seven cells. Specifically, these
    * cells are one cell in the center plus one "cap" cell on each of the faces
    * of this center cell. This ensures that under repeated refinement, none
@@ -685,7 +846,10 @@ namespace GridGenerator
    * after one refinement is optimized.
    *
    * This function is declared to exist for triangulations of all space
-   * dimensions, but throws an error if called in 1d.
+   * dimensions, but throws an error if called if `dim==1`. If `spacedim>dim`
+   * (which is only possible if `dim==2, spacedim==3`) then the function
+   * creates a circular disk for which all vertices have a $z$ value equal
+   * to the $z$ coordinate of the center point provided by the second argument.
    *
    * By default, the manifold_id is set to 0 on the boundary faces, 1 on the
    * boundary cells, and numbers::flat_manifold_id on the central cell and on
@@ -740,12 +904,15 @@ namespace GridGenerator
    *
    * @pre The triangulation passed as argument needs to be empty when calling
    * this function.
+   *
+   * @note This function is available through the python interface as
+   * `triangulation.generate_hyper_ball(point, radius = 1.)`.
    */
-  template <int dim>
+  template <int dim, int spacedim>
   void
-  hyper_ball(Triangulation<dim> &tria,
-             const Point<dim>   &center = Point<dim>(),
-             const double        radius = 1.,
+  hyper_ball(Triangulation<dim, spacedim> &tria,
+             const Point<spacedim>        &center                   = {},
+             const double                  radius                   = 1.,
              const bool attach_spherical_manifold_on_boundary_cells = false);
 
   /**
@@ -779,6 +946,9 @@ namespace GridGenerator
    *
    * @pre The triangulation passed as argument needs to be empty when calling
    * this function.
+   *
+   * @note This function is available through the python interface as
+   * `triangulation.generate_hyper_ball_balanced(point = Point(), radius = 1.)`.
    */
   template <int dim>
   void
@@ -853,7 +1023,7 @@ namespace GridGenerator
    * @endcode
    *
    * See the
-   * @ref manifold "documentation module on manifolds"
+   * @ref manifold "documentation topic on manifolds"
    * for more details.
    *
    * @image html sphere.png
@@ -861,6 +1031,9 @@ namespace GridGenerator
    *
    * @pre The triangulation passed as argument needs to be empty when calling
    * this function.
+   *
+   * @note This function is available through the python interface as
+   * `triangulation.generate_hyper_sphere(center, radius = 1.)`.
    */
   template <int spacedim>
   void
@@ -900,6 +1073,9 @@ namespace GridGenerator
    *
    * @pre The triangulation passed as argument needs to be empty when calling
    * this function.
+   *
+   * @note This function is available through the python interface as
+   * `triangulation.generate_quarter_hyper_ball(center, radius = 1.)`.
    */
   template <int dim>
   void
@@ -918,6 +1094,9 @@ namespace GridGenerator
    *
    * @pre The triangulation passed as argument needs to be empty when calling
    * this function.
+   *
+   * @note This function is available through the python interface as
+   * `triangulation.generate_half_hyper_ball(center, radius = 1.)`.
    */
   template <int dim>
   void
@@ -947,6 +1126,9 @@ namespace GridGenerator
    *
    * @pre The triangulation passed as argument needs to be empty when calling
    * this function.
+   *
+   * @note This function is available through the python interface as
+   * `triangulation.generate_cylinder(radius = 1., half_length = 1.)`.
    */
   template <int dim>
   void
@@ -987,6 +1169,10 @@ namespace GridGenerator
    * @param radius The radius of the circle in the yz-plane used to extrude the cylinder.
    *
    * @param half_length The half-length of the cylinder in the x direction.
+   *
+   * @note This function is available through the python interface as
+   * `triangulation.generate_subdivided_cylinder(x_subdivisions, radius = 1.,
+   * half_length = 1.)`.
    */
   template <int dim>
   void
@@ -1025,6 +1211,10 @@ namespace GridGenerator
    *
    * @pre The triangulation passed as argument needs to be empty when calling
    * this function.
+   *
+   * @note This function is available through the python interface as
+   * `triangulation.generate_truncated_cone(radius_0 = 1., radius_2 = 0.5,
+   * half_length = 1.)`.
    */
   template <int dim>
   void
@@ -1358,15 +1548,19 @@ namespace GridGenerator
    *
    * @pre The triangulation passed as argument needs to be empty when calling
    * this function.
+   *
+   * @note This function is available through the python interface as
+   * `triangulation.generate_hyper_shell(center, inner_radius, outer_radius,
+   * n_cells = 0, colorize = false)`.
    */
-  template <int dim>
+  template <int dim, int spacedim>
   void
-  hyper_shell(Triangulation<dim> &tria,
-              const Point<dim>   &center,
-              const double        inner_radius,
-              const double        outer_radius,
-              const unsigned int  n_cells  = 0,
-              bool                colorize = false);
+  hyper_shell(Triangulation<dim, spacedim> &tria,
+              const Point<spacedim>        &center,
+              const double                  inner_radius,
+              const double                  outer_radius,
+              const unsigned int            n_cells  = 0,
+              bool                          colorize = false);
 
   /**
    * Produce an eccentric hyper-shell, the region between two spheres centered
@@ -1493,6 +1687,11 @@ namespace GridGenerator
    * default), then it is computed adaptively such that the resulting elements
    * have the least aspect ratio. The same holds for @p n_axial_cells.
    *
+   * If @p colorize is set to true, a boundary id of 0 is set for the inner
+   * cylinder, a boundary id of 1 is set for the outer cylinder, a boundary
+   * id of 2 is set for the bottom (z-) boundary and a boundary id of 3
+   * is set for the top (z+) boundary.
+   *
    * @note Although this function is declared as a template, it does not make
    * sense in 1d and 2d. Also keep in mind that this object is rotated
    * and positioned differently than the one created by cylinder().
@@ -1516,7 +1715,8 @@ namespace GridGenerator
                  const double        inner_radius,
                  const double        outer_radius,
                  const unsigned int  n_radial_cells = 0,
-                 const unsigned int  n_axial_cells  = 0);
+                 const unsigned int  n_axial_cells  = 0,
+                 const bool          colorize       = false);
 
   /**
    * Produce the volume or surface mesh of a torus. The axis of the torus is
@@ -1550,10 +1750,12 @@ namespace GridGenerator
    *
    * @param tria The triangulation to be filled.
    *
-   * @param R The radius of the circle, which forms the middle line of the
-   * torus containing the loop of cells. Must be greater than @p r.
+   * @param centerline_radius The radius of the circle which forms the center
+   * line of the torus containing the loop of cells. Must be greater than @p
+   * inner_radius.
    *
-   * @param r The inner radius of the torus.
+   * @param inner_radius The distance between the inner edge of the torus and
+   * origin.
    *
    * @param n_cells_toroidal Optional argument to set the number of cell
    * layers in toroidal direction. The default is 6 cell layers.
@@ -1570,8 +1772,8 @@ namespace GridGenerator
   template <int dim, int spacedim>
   void
   torus(Triangulation<dim, spacedim> &tria,
-        const double                  R,
-        const double                  r,
+        const double                  centerline_radius,
+        const double                  inner_radius,
         const unsigned int            n_cells_toroidal = 6,
         const double                  phi              = 2.0 * numbers::PI);
 
@@ -1603,15 +1805,19 @@ namespace GridGenerator
    * flat faces (0 to 3 in 2d, 0 to 5 in 3d) plus the curved hole (4 in 2d,
    * and 6 in 3d). If @p colorize is set to false, then flat faces get the
    * number 0 and the hole gets number 1.
+   *
+   * @note This function is available through the python interface as
+   * `triangulation.generate_hyper_cube_with_cylindrical_hole(inner_radius =
+   * 0.25, outer_radius = 0.5, L = 0.5, repetitions = 1, colorize = false)`.
    */
-  template <int dim>
+  template <int dim, int spacedim>
   void
-  hyper_cube_with_cylindrical_hole(Triangulation<dim> &triangulation,
-                                   const double        inner_radius = .25,
-                                   const double        outer_radius = .5,
-                                   const double        L            = .5,
-                                   const unsigned int  repetitions  = 1,
-                                   const bool          colorize     = false);
+  hyper_cube_with_cylindrical_hole(Triangulation<dim, spacedim> &triangulation,
+                                   const double       inner_radius = .25,
+                                   const double       outer_radius = .5,
+                                   const double       L            = .5,
+                                   const unsigned int repetitions  = 1,
+                                   const bool         colorize     = false);
 
   /**
    * Produce a grid consisting of concentric shells. The primary difference
@@ -1721,7 +1927,7 @@ namespace GridGenerator
    * @p grid_generator_function_arguments.
    *
    * The string that supplies the arguments is passed to the function
-   * Patterns::Tools::Convert<TupleTyple>::to_value(), where `TupleType` here is
+   * Patterns::Tools::Convert<TupleType>::to_value(), where `TupleType` here is
    * a tuple containing **all** the arguments of the GridGenerator function,
    * including all optional arguments.
    *
@@ -1925,6 +2131,10 @@ namespace GridGenerator
    *                                       false,
    *                                       false);
    * @endcode
+   *
+   * @note This function is available through the python interface as
+   * `result.merge_triangulations(triangulations, duplicated_vertex_tolerance =
+   * 1e-12, copy_manifold_ids = false)`.
    */
   template <int dim, int spacedim>
   void
@@ -1981,6 +2191,9 @@ namespace GridGenerator
    * are not aligned with the coordinate axes then the copies might not share
    * common faces; i.e., this function is intended for simple geometries with
    * boundary faces aligned along the coordinate axes.
+   *
+   * @note This function is available through the python interface as
+   * `result.replicate_triangulation(input, extents)`.
    */
   template <int dim, int spacedim = dim>
   void
@@ -2142,6 +2355,9 @@ namespace GridGenerator
    * @note Since @p input and @p output have different spatial dimensions, no
    * manifold objects are copied by this function regardless of the value of
    * @p copy_manifold_ids.
+   *
+   * @note This function is available through the python interface as
+   * `input.extrude_triangulation(n_slices, height, result)`.
    */
   void
   extrude_triangulation(
@@ -2245,6 +2461,9 @@ namespace GridGenerator
    * @note Since @p input and @p output have different spatial dimensions, no
    * manifold objects are copied by this function: you must attach new
    * manifold objects to @p out_tria.
+   *
+   * @note This function is available through the python interface as
+   * `in_tria.flatten_triangulation(out_tria)`.
    */
   template <int dim, int spacedim1, int spacedim2>
   void
@@ -2256,22 +2475,35 @@ namespace GridGenerator
    * (quadrilaterals, hexahedra) to a triangulation only consisting of
    * simplices (triangles, tetrahedra).
    *
+   * The default splitting algorithm creates (in 2d) eight triangles for each
+   * quadrilateral and (in 3d) 24 tetrahedra for each hexahedron. These splits
+   * avoid creating mesh anisotropies by connecting the midpoint of each face to
+   * a vertex of that face. These values are encoded in the default value of @p
+   * n_divisions.
+   *
+   * Alternatively, one may split each quadrilateral into two triangles (by
+   * adding a line between vertex 1 and vertex 2) and each hexahedron into six
+   * tetrahedra (by adding a line between vertex 0 and vertex 7) by setting
+   * @p n_divisions to 2 or 6, respectively.
+   *
    * As an example, the following image shows how a set of four hexahedra
    * meshing one eighth of a sphere are subdivided into tetrahedra, and how
    * the curved surface is taken into account. Colors indicate how boundary
    * indicators are inherited:
    * @image html "convert_hypercube_to_simplex_mesh_visualization_octant.png"
    *
-   * In general, each quadrilateral in 2d is subdivided into eight triangles,
-   * and each hexahedron in 3d into 24 tetrahedra, as shown here (top left
-   * for the 2d case, the rest shows vertex numbers and subdivisions for
-   * a single 3d hexahedron):
    * @image html "convert_hypercube_to_simplex_mesh_visualization.png"
    *
    * Material ID and boundary IDs are inherited upon conversion.
    *
-   * @param in_tria The triangulation containing hex elements.
-   * @param out_tria The converted triangulation containing tet elements.
+   * @param[in] in_tria The triangulation containing quadrilateral or
+   *   hexahedral elements.
+   *
+   * @param[out] out_tria The converted triangulation containing triangular or
+   *   tetrahedral elements.
+   *
+   * @param[in] n_divisions The number of divisions for each hypercube cell.
+   *   Must be either 2 or 8 (the default) in 2d or 6 or 24 (the default) in 3d.
    *
    * @note No manifold objects are copied by this function: you must
    *   copy existing manifold objects from @p in_tria to @p out_tria, e.g.,
@@ -2284,29 +2516,51 @@ namespace GridGenerator
    *
    * Also see
    * @ref simplex "Simplex support".
+   *
+   * @note This function is available through the python interface as
+   * `in_tria.convert_hypercube_to_simplex_mesh(out_tria)`.
+   *
+   * @note in 1d this function copies @p in_tria into @p out_tria since 1d
+   * elements (lines) are both hypercubes and simplices.
    */
   template <int dim, int spacedim>
   void
   convert_hypercube_to_simplex_mesh(const Triangulation<dim, spacedim> &in_tria,
-                                    Triangulation<dim, spacedim> &out_tria);
+                                    Triangulation<dim, spacedim> &out_tria,
+                                    const unsigned int n_divisions = (dim == 2 ?
+                                                                        8u :
+                                                                        24u));
 
-  // Doxygen will not show the function above if we include the
-  // specialization.
-#ifndef DOXYGEN
   /**
-   * Specialization of the above function for 1d: simply copy triangulation.
+   * Perform an Alfeld split (also called barycentric refinement) of a simplex
+   * mesh.
+   *
+   * Each simplex cell in the input mesh (given in @p in_tria) is refined into
+   * three (for @p dim = 2) or four (for @p dim = 3) simplices connecting to the
+   * barycenter, which is the only new vertex added for each input cell. In the
+   * process, the simplex mesh is flattened (no hierarchy is kept).
+   *
+   * @note Currently only implemented for @p dim = 2 and hanging nodes are not
+   * supported.
+   *
+   * @image html alfeld-split.svg
+   *
+   * The meshes produced by this function can be used for Scott-Vogelius
+   * elements for the Stokes equation: The $P_k - DGP_{k-1}$ element is
+   * point-wise divergence free on barycentric refined meshes for $k\geq 2$
+   * for @p dim = 2 and $k\geq 3$ for @p dim = 3, see @cite Farrell2021.
+   *
+   * Also see
+   * @ref simplex "Simplex support".
    */
-  template <int spacedim>
+  template <int dim, int spacedim>
   void
-  convert_hypercube_to_simplex_mesh(const Triangulation<1, spacedim> &in_tria,
-                                    Triangulation<1, spacedim>       &out_tria);
-#endif
+  alfeld_split_of_simplex_mesh(const Triangulation<dim, spacedim> &in_tria,
+                               Triangulation<dim, spacedim>       &out_tria);
 
   /**
    * Namespace Airfoil contains classes and functions in order to create a
    * C-type mesh for the (flow) field around Joukowski or NACA airfoils.
-   *
-   * @ingroup GridGenerator
    */
   namespace Airfoil
   {
@@ -2457,9 +2711,9 @@ namespace GridGenerator
      *
      \htmlonly <style>div.image
      *
-     img[src="https://www.dealii.org/images/grids/airfoils_naca_joukowski.png"]{width:50%;}</style>
+     img[src="https://dealii.org/images/grids/airfoils_naca_joukowski.png"]{width:50%;}</style>
      \endhtmlonly
-     * @image html https://www.dealii.org/images/grids/airfoils_naca_joukowski.png
+     * @image html https://dealii.org/images/grids/airfoils_naca_joukowski.png
      */
     template <int dim>
     void
@@ -2493,12 +2747,14 @@ namespace GridGenerator
 
   /**
    * Create a coordinate-parallel brick from the two diagonally opposite
-   * corner points @p p1 and @p p2. The number of vertices in coordinate
+   * corner points @p p1 and @p p2 and subdivide each cell into simplices.
+   *
+   * The number of vertices in coordinate
    * direction @p i is given by <tt>repetitions[i]+1</tt>.
    *
-   * @note This function connects internally 4/8 vertices to
-   *   quadrilateral/hexahedral cells and subdivides these into 2/5
-   * triangular/tetrahedral cells.
+   * @note This function takes the mesh produced by subdivided_hyper_rectangle()
+   * and further subdivides each cell into 2 triangles (for @p dim 2) or
+   * 5 tetrahedra (for @p dim 3), respectively.
    *
    * @note Currently, this function only works for `dim==spacedim`.
    *
@@ -2516,15 +2772,17 @@ namespace GridGenerator
 
   /**
    * Initialize the given triangulation with a hypercube (square in 2d and
-   * cube in 3d) consisting of @p repetitions cells in each direction.
+   * cube in 3d) consisting of @p repetitions cells in each direction with
+   * each cell divided into simplices.
+   *
    * The hypercube volume is the tensor product interval
    * $[left,right]^{\text{dim}}$ in the present number of dimensions, where
    * the limits are given as arguments. They default to zero and unity, then
    * producing the unit hypercube.
    *
-   * @note This function connects internally 4/8 vertices to
-   * quadrilateral/hexahedral cells and subdivides these into 2/5
-   * triangular/tetrahedral cells.
+   * @note This function takes the mesh produced by subdivided_hyper_cube()
+   * and further subdivides each cell into 2 triangles (for @p dim 2) or
+   * 5 tetrahedra (for @p dim 3), respectively.
    *
    * Also see
    * @ref simplex "Simplex support".

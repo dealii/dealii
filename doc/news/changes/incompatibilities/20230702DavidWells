@@ -1,6 +1,0 @@
-Changed: The overloads of KellyErrorEstimator::estimate() which compute
-multiple vector error estimates at once now require that vectors be passed
-in ArrayView objects of pointers to ReadVector instead of std::vector objects
-of pointers to VectorType objects.
-<br>
-(David Wells, 2023/07/02)

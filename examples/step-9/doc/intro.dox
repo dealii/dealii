@@ -1,4 +1,4 @@
-<a name="Intro"></a>
+<a name="step_9-Intro"></a>
 <h1>Introduction</h1>
 
 
@@ -15,7 +15,7 @@ following. The use of multiple threads will then be detailed at the
 relevant places within the program. We will, however, follow the
 general discussion of the WorkStream approach detailed in the
 @ref threads "Parallel computing with multiple processors accessing shared memory"
-documentation module.
+documentation topic.
 
 
 <h3>Discretizing the advection equation</h3>

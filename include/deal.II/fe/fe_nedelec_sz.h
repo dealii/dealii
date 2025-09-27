@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2015 - 2023 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2018 - 2024 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 #ifndef dealii_fe_nedelec_sz_h
 #define dealii_fe_nedelec_sz_h
@@ -21,6 +20,7 @@
 #include <deal.II/base/derivative_form.h>
 #include <deal.II/base/polynomials_integrated_legendre_sz.h>
 #include <deal.II/base/qprojector.h>
+#include <deal.II/base/quadrature_lib.h>
 
 #include <deal.II/fe/fe.h>
 #include <deal.II/fe/fe_values.h>
@@ -36,10 +36,8 @@ DEAL_II_NAMESPACE_OPEN
 /**
  * This class represents an implementation of the
  * H<sup>curl</sup>-conforming N&eacute;d&eacute;lec element described in the
- * PhD thesis of S. Zaglmayr, <b>High Order Finite Element Methods for
- * Electromagnetic Field Computation</b>, Johannes Kepler Universit&auml;t Linz,
- * 2006. It its used in the same context as described at the top of the
- * description for the FE_Nedelec class.
+ * PhD thesis @cite Zaglmayr2006. It its used in the same context as
+ * described at the top of the description for the FE_Nedelec class.
  *
  * This element overcomes the sign conflict issues present in
  * traditional N&eacute;d&eacute;lec elements that arise from the edge
@@ -63,13 +61,16 @@ DEAL_II_NAMESPACE_OPEN
  * vertices are decided such that the second has a higher global vertex
  * numbering than the fourth.
  *
- * Note that this element does not support non-conforming meshes at this time.
+ * To overcome the sign conflict in the case of non-conforming meshes, hanging
+ * edges (and faces in 3D) must be addressed. This element chooses the
+ * orientation of hanging edges (and faces) based on the parent cell. Moreover,
+ * the associated constraint matrix that restricts the additional DoFs
+ * originating from the hanging edges and faces must be adapted to account for
+ * the orientation of the edges and faces.
  *
- * Further details on this element, including some benchmarking, can be
- * in the paper R. Kynch, P. Ledger: <b>Resolving the sign conflict
- * problem for hp-hexahedral N&eacute;d&eacute;lec elements with application to
- * eddy current problems</b>, Computers & Structures 181, 41-54, 2017 (see
- * https://doi.org/10.1016/j.compstruc.2016.05.021).
+ * Further details on this element, including some benchmarking, can be found
+ * in the paper @cite Kynch2017. For details on the implementation of the
+ * hanging node constraints, see the paper @cite Kinnewig2023.
  */
 template <int dim, int spacedim = dim>
 class FE_NedelecSZ : public FiniteElement<dim, dim>
@@ -104,14 +105,21 @@ public:
   clone() const override;
 
   /**
-   * This element is vector-valued so this function will
+   * Return the value of the <tt>i</tt>th shape function at the point
+   * <tt>p</tt>. See the FiniteElement base class for more information about
+   * the semantics of this function.
+   *
+   * Since this element is vector-valued, this function will
    * throw an exception.
    */
   virtual double
   shape_value(const unsigned int i, const Point<dim> &p) const override;
 
   /**
-   * Not implemented.
+   * Return the value of the <tt>component</tt>th vector component of the
+   * <tt>i</tt>th shape function at the point <tt>p</tt>. See the
+   * FiniteElement base class for more information about the semantics of this
+   * function.
    */
   virtual double
   shape_value_component(const unsigned int i,
@@ -119,14 +127,21 @@ public:
                         const unsigned int component) const override;
 
   /**
-   * This element is vector-valued so this function will
+   * Return the gradient of the <tt>i</tt>th shape function at the point
+   * <tt>p</tt>. See the FiniteElement base class for more information about
+   * the semantics of this function.
+   *
+   * Since this element is vector-valued, this function will
    * throw an exception.
    */
   virtual Tensor<1, dim>
   shape_grad(const unsigned int i, const Point<dim> &p) const override;
 
   /**
-   * Not implemented.
+   * Return the gradient of the <tt>component</tt>th vector component of the
+   * <tt>i</tt>th shape function at the point <tt>p</tt>. See the
+   * FiniteElement base class for more information about the semantics of this
+   * function.
    */
   virtual Tensor<1, dim>
   shape_grad_component(const unsigned int i,
@@ -134,19 +149,52 @@ public:
                        const unsigned int component) const override;
 
   /**
-   * This element is vector-valued so this function will
+   * Return the tensor of second derivatives of the <tt>i</tt>th shape
+   * function at point <tt>p</tt> on the unit cell. See the FiniteElement base
+   * class for more information about the semantics of this function.
+   *
+   * Since this element is vector-valued, this function will
    * throw an exception.
    */
   virtual Tensor<2, dim>
   shape_grad_grad(const unsigned int i, const Point<dim> &p) const override;
 
   /**
-   * Not implemented.
+   * Return the second derivative of the <tt>component</tt>th vector component
+   * of the <tt>i</tt>th shape function at the point <tt>p</tt>. See the
+   * FiniteElement base class for more information about the semantics of this
+   * function.
    */
   virtual Tensor<2, dim>
   shape_grad_grad_component(const unsigned int i,
                             const Point<dim>  &p,
                             const unsigned int component) const override;
+
+  /**
+   * Embedding matrix between grids.
+   *
+   * The identity operator from a coarse grid space into a fine grid space is
+   * associated with a matrix @p P. The restriction of this matrix @p P_i to a
+   * single child cell is returned here.
+   *
+   * The matrix @p P is the concatenation, not the sum of the cell matrices @p
+   * P_i. That is, if the same non-zero entry <tt>j,k</tt> exists in two
+   * different child matrices @p P_i, the value should be the same in both
+   * matrices and it is copied into the matrix @p P only once.
+   *
+   * Row and column indices are related to fine grid and coarse grid spaces,
+   * respectively, consistent with the definition of the associated operator.
+   *
+   * These matrices are used by routines assembling the prolongation matrix
+   * for multi-level methods.  Upon assembling the transfer matrix between
+   * cells using this matrix array, zero elements in the prolongation matrix
+   * are discarded and will not fill up the transfer matrix.
+   */
+  virtual const FullMatrix<double> &
+  get_prolongation_matrix(
+    const unsigned int         child,
+    const RefinementCase<dim> &refinement_case =
+      RefinementCase<dim>::isotropic_refinement) const override;
 
 protected:
   /**
@@ -154,6 +202,17 @@ protected:
    * cell to the mesh cell.
    */
   MappingKind mapping_kind;
+
+  /**
+   * Compute the value and the derivatives of the Nedelec functions at
+   * the points given in <tt>p_list</tt>.
+   */
+  void
+  evaluate(const std::vector<Point<dim>> &p_list,
+           const UpdateFlags              update_flags,
+           std::unique_ptr<
+             typename dealii::FiniteElement<dim, spacedim>::InternalDataBase>
+             &data_ptr) const;
 
   virtual std::unique_ptr<
     typename dealii::FiniteElement<dim, spacedim>::InternalDataBase>
@@ -456,6 +515,12 @@ private:
   fill_face_values(const typename Triangulation<dim, dim>::cell_iterator &cell,
                    const Quadrature<dim> &quadrature,
                    const InternalData    &fedata) const;
+
+  /**
+   * Mutex variables used for protecting the initialization of restriction
+   * and embedding matrices.
+   */
+  mutable Threads::Mutex prolongation_matrix_mutex;
 };
 
 

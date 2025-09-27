@@ -1,5 +1,3 @@
-<br>
-
 <i>
 This program was contributed by Katharina Kormann and Martin
 Kronbichler.
@@ -20,7 +18,7 @@ were supported by Gauss Centre for Supercomputing e.V. (www.gauss-centre.eu)
 by providing computing time on the GCS Supercomputer SuperMUC at Leibniz
 Supercomputing Centre (LRZ, www.lrz.de) through project id pr83te. </i>
 
-<a name="Intro"></a>
+<a name="step_37-Intro"></a>
 <h1>Introduction</h1>
 
 This example shows how to implement a matrix-free method, that is, a method

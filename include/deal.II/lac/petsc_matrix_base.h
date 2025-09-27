@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2004 - 2023 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2004 - 2024 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 #ifndef dealii_petsc_matrix_base_h
 #define dealii_petsc_matrix_base_h
@@ -21,7 +20,7 @@
 
 #ifdef DEAL_II_WITH_PETSC
 
-#  include <deal.II/base/subscriptor.h>
+#  include <deal.II/base/enable_observer_pointer.h>
 
 #  include <deal.II/lac/exceptions.h>
 #  include <deal.II/lac/full_matrix.h>
@@ -29,10 +28,13 @@
 #  include <deal.II/lac/petsc_vector_base.h>
 #  include <deal.II/lac/vector_operation.h>
 
+#  include <boost/container/small_vector.hpp>
+
 #  include <petscmat.h>
 
 #  include <cmath>
 #  include <memory>
+#  include <optional>
 #  include <vector>
 
 DEAL_II_NAMESPACE_OPEN
@@ -66,7 +68,14 @@ namespace PETScWrappers
      */
     class const_iterator
     {
+#  ifdef __CUDACC__
+      // NVCC, at least until 12.8, fails to compile the
+      // implementations of the nested Accessor class if it is
+      // declared as private. Work around this by making it public.
+    public:
+#  else
     private:
+#  endif
       /**
        * Accessor class for iterators
        */
@@ -281,7 +290,7 @@ namespace PETScWrappers
    * @ingroup PETScWrappers
    * @ingroup Matrix1
    */
-  class MatrixBase : public Subscriptor
+  class MatrixBase : public EnableObserverPointer
   {
   public:
     /**
@@ -577,8 +586,8 @@ namespace PETScWrappers
      * the diagonal entries, you have to set them by hand.
      */
     void
-    clear_rows(const std::vector<size_type> &rows,
-               const PetscScalar             new_diag_value = 0);
+    clear_rows(const ArrayView<const size_type> &rows,
+               const PetscScalar                 new_diag_value = 0);
 
     /**
      * Same as clear_rows(), except that the function also zeros the columns.
@@ -1090,36 +1099,21 @@ namespace PETScWrappers
     Tmmult(MatrixBase &C, const MatrixBase &B, const VectorBase &V) const;
 
   private:
-    /**
-     * An internal array of integer values that is used to store the column
-     * indices when adding/inserting local data into the (large) sparse
-     * matrix.
-     *
-     * This variable does not store any "state" of the matrix
-     * object. Rather, it is only used as a temporary buffer by some
-     * of the member functions of this class. As with all @p mutable
-     * member variables, the use of this variable is not thread-safe
-     * unless guarded by a mutex. However, since PETSc matrix
-     * operations are not thread-safe anyway, there is no need to
-     * attempt to make things thread-safe, and so there is no mutex
-     * associated with this variable.
-     */
-    mutable std::vector<PetscInt> column_indices;
-
-    /**
-     * An internal array of double values that is used to store the column
-     * indices when adding/inserting local data into the (large) sparse
-     * matrix.
-     *
-     * The same comment as for the @p column_indices variable above
-     * applies.
-     */
-    mutable std::vector<PetscScalar> column_values;
-
-
     // To allow calling protected prepare_add() and prepare_set().
     template <class>
     friend class dealii::BlockMatrixBase;
+
+
+    /**
+     * Internal function wrapping MatSetValues().
+     */
+    void
+    add_or_set(const VectorOperation::values &operation,
+               const size_type                row,
+               const size_type                n_cols,
+               const size_type               *col_indices,
+               const PetscScalar             *values,
+               const bool                     elide_zero_values);
   };
 
 
@@ -1339,57 +1333,12 @@ namespace PETScWrappers
                   const PetscScalar *values,
                   const bool         elide_zero_values)
   {
-    prepare_action(VectorOperation::insert);
-
-    const PetscInt  petsc_i = row;
-    const PetscInt *col_index_ptr;
-
-    const PetscScalar *col_value_ptr;
-    int                n_columns;
-
-    // If we don't elide zeros, the pointers are already available...
-    if (elide_zero_values == false)
-      {
-        col_index_ptr = reinterpret_cast<const PetscInt *>(col_indices);
-        col_value_ptr = values;
-        n_columns     = n_cols;
-      }
-    else
-      {
-        // Otherwise, extract nonzero values in each row and get the
-        // respective index.
-        if (column_indices.size() < n_cols)
-          {
-            column_indices.resize(n_cols);
-            column_values.resize(n_cols);
-          }
-
-        n_columns = 0;
-        for (size_type j = 0; j < n_cols; ++j)
-          {
-            const PetscScalar value = values[j];
-            AssertIsFinite(value);
-            if (value != PetscScalar())
-              {
-                column_indices[n_columns] = col_indices[j];
-                column_values[n_columns]  = value;
-                n_columns++;
-              }
-          }
-        AssertIndexRange(n_columns, n_cols + 1);
-
-        col_index_ptr = column_indices.data();
-        col_value_ptr = column_values.data();
-      }
-
-    const PetscErrorCode ierr = MatSetValues(matrix,
-                                             1,
-                                             &petsc_i,
-                                             n_columns,
-                                             col_index_ptr,
-                                             col_value_ptr,
-                                             INSERT_VALUES);
-    AssertThrow(ierr == 0, ExcPETScError(ierr));
+    add_or_set(VectorOperation::insert,
+               row,
+               n_cols,
+               col_indices,
+               values,
+               elide_zero_values);
   }
 
 
@@ -1481,53 +1430,88 @@ namespace PETScWrappers
                   const bool         elide_zero_values,
                   const bool /*col_indices_are_sorted*/)
   {
-    (void)elide_zero_values;
+    add_or_set(VectorOperation::add,
+               row,
+               n_cols,
+               col_indices,
+               values,
+               elide_zero_values);
+  }
 
-    prepare_action(VectorOperation::add);
 
-    const PetscInt  petsc_i = row;
-    const PetscInt *col_index_ptr;
 
-    const PetscScalar *col_value_ptr;
-    int                n_columns;
+  inline void
+  MatrixBase::add_or_set(const VectorOperation::values &operation,
+                         const size_type                row,
+                         const size_type                n_cols,
+                         const size_type               *col_indices,
+                         const PetscScalar             *values,
+                         const bool                     elide_zero_values)
+  {
+    prepare_action(operation);
 
-    // If we don't elide zeros, the pointers are already available...
+    const auto petsc_row = static_cast<PetscInt>(row);
+    AssertIntegerConversion(petsc_row, row);
+
+    // Use 100 entries so that we can store a row of a matrix constructed with
+    // FESystem<3>(FE_Q<3>(2), 3, FE_Q<3>(1), 1) (i.e., a common Stokes FE,
+    // which has 89 DoFs) with room to spare without allocating memory in the
+    // free store.
+    //
+    // Setting up small_vectors isn't free so only set up column_values if we
+    // actually use it.
+    boost::container::small_vector<PetscInt, 100> column_indices;
+    std::optional<boost::container::small_vector<PetscScalar, 100>>
+      column_values;
+
+    const PetscScalar *values_ptr = nullptr;
     if (elide_zero_values == false)
       {
-        col_index_ptr = reinterpret_cast<const PetscInt *>(col_indices);
-        col_value_ptr = values;
-        n_columns     = n_cols;
+        column_indices.resize(n_cols);
+
+        for (size_type j = 0; j < n_cols; ++j)
+          {
+            AssertIsFinite(values[j]);
+            column_indices[j] = static_cast<PetscInt>(col_indices[j]);
+            AssertIntegerConversion(column_indices[j], col_indices[j]);
+          }
+
+        values_ptr = values;
       }
     else
       {
         // Otherwise, extract nonzero values in each row and get the
         // respective index.
-        if (column_indices.size() < n_cols)
-          {
-            column_indices.resize(n_cols);
-            column_values.resize(n_cols);
-          }
-
-        n_columns = 0;
+        column_values.emplace();
         for (size_type j = 0; j < n_cols; ++j)
           {
             const PetscScalar value = values[j];
             AssertIsFinite(value);
             if (value != PetscScalar())
               {
-                column_indices[n_columns] = col_indices[j];
-                column_values[n_columns]  = value;
-                n_columns++;
+                column_indices.push_back(static_cast<PetscInt>(col_indices[j]));
+                AssertIntegerConversion(column_indices.back(), col_indices[j]);
+                column_values->push_back(value);
               }
           }
-        AssertIndexRange(n_columns, n_cols + 1);
-
-        col_index_ptr = column_indices.data();
-        col_value_ptr = column_values.data();
+        values_ptr = column_values->data();
       }
 
-    const PetscErrorCode ierr = MatSetValues(
-      matrix, 1, &petsc_i, n_columns, col_index_ptr, col_value_ptr, ADD_VALUES);
+    const auto petsc_n_columns = static_cast<PetscInt>(column_indices.size());
+    AssertIntegerConversion(petsc_n_columns, column_indices.size());
+
+    Assert(operation == VectorOperation::insert ||
+             operation == VectorOperation::add,
+           ExcInternalError());
+    const PetscErrorCode ierr =
+      MatSetValues(matrix,
+                   1,
+                   &petsc_row,
+                   petsc_n_columns,
+                   column_indices.data(),
+                   values_ptr,
+                   operation == VectorOperation::insert ? INSERT_VALUES :
+                                                          ADD_VALUES);
     AssertThrow(ierr == 0, ExcPETScError(ierr));
   }
 
@@ -1616,14 +1600,20 @@ namespace PETScWrappers
   inline bool
   MatrixBase::in_local_range(const size_type index) const
   {
-    PetscInt begin, end;
+    PetscInt petsc_begin, petsc_end;
 
     const PetscErrorCode ierr =
-      MatGetOwnershipRange(static_cast<const Mat &>(matrix), &begin, &end);
+      MatGetOwnershipRange(static_cast<const Mat &>(matrix),
+                           &petsc_begin,
+                           &petsc_end);
     AssertThrow(ierr == 0, ExcPETScError(ierr));
 
-    return ((index >= static_cast<size_type>(begin)) &&
-            (index < static_cast<size_type>(end)));
+    const auto begin = static_cast<size_type>(petsc_begin);
+    AssertIntegerConversion(begin, petsc_begin);
+    const auto end = static_cast<size_type>(petsc_end);
+    AssertIntegerConversion(end, petsc_end);
+
+    return ((index >= begin) && (index < end));
   }
 
 
@@ -1676,6 +1666,14 @@ namespace PETScWrappers
 
 DEAL_II_NAMESPACE_CLOSE
 
+
+#else
+
+// Make sure the scripts that create the C++20 module input files have
+// something to latch on if the preprocessor #ifdef above would
+// otherwise lead to an empty content of the file.
+DEAL_II_NAMESPACE_OPEN
+DEAL_II_NAMESPACE_CLOSE
 
 #endif // DEAL_II_WITH_PETSC
 

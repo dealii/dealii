@@ -1,19 +1,16 @@
-/* ---------------------------------------------------------------------
+/* ------------------------------------------------------------------------
  *
- * Copyright (C) 1999 - 2023 by the deal.II authors
+ * SPDX-License-Identifier: LGPL-2.1-or-later
+ * Copyright (C) 1999 - 2024 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
- * The deal.II library is free software; you can use it, redistribute
- * it, and/or modify it under the terms of the GNU Lesser General
- * Public License as published by the Free Software Foundation; either
- * version 2.1 of the License, or (at your option) any later version.
- * The full text of the license can be found in the file LICENSE.md at
- * the top level directory of deal.II.
+ * Part of the source code is dual licensed under Apache-2.0 WITH
+ * LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+ * governing the source code and code contributions can be found in
+ * LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
  *
- * ---------------------------------------------------------------------
- *
- * Author: Wolfgang Bangerth, University of Heidelberg, 1999
+ * ------------------------------------------------------------------------
  */
 
 
@@ -23,7 +20,6 @@
 // on them:
 #include <deal.II/base/quadrature_lib.h>
 #include <deal.II/base/function.h>
-#include <deal.II/base/logstream.h>
 #include <deal.II/lac/vector.h>
 #include <deal.II/lac/full_matrix.h>
 #include <deal.II/lac/sparse_matrix.h>
@@ -77,7 +73,7 @@ private:
   void output_results(const unsigned int cycle) const;
 
   Triangulation<dim> triangulation;
-  FE_Q<dim>          fe;
+  const FE_Q<dim>    fe;
   DoFHandler<dim>    dof_handler;
 
   SparsityPattern      sparsity_pattern;
@@ -115,7 +111,7 @@ double coefficient(const Point<dim> &p)
 // This function is as before.
 template <int dim>
 Step5<dim>::Step5()
-  : fe(1)
+  : fe(/* polynomial degree = */ 1)
   , dof_handler(triangulation)
 {}
 
@@ -158,7 +154,7 @@ void Step5<dim>::setup_system()
 template <int dim>
 void Step5<dim>::assemble_system()
 {
-  QGauss<dim> quadrature_formula(fe.degree + 1);
+  const QGauss<dim> quadrature_formula(fe.degree + 1);
 
   FEValues<dim> fe_values(fe,
                           quadrature_formula,
@@ -179,10 +175,10 @@ void Step5<dim>::assemble_system()
   // coefficient value at each quadrature point.
   for (const auto &cell : dof_handler.active_cell_iterators())
     {
+      fe_values.reinit(cell);
+
       cell_matrix = 0.;
       cell_rhs    = 0.;
-
-      fe_values.reinit(cell);
 
       for (const unsigned int q_index : fe_values.quadrature_point_indices())
         {
@@ -219,7 +215,7 @@ void Step5<dim>::assemble_system()
   // With the matrix so built, we use zero boundary values again:
   std::map<types::global_dof_index, double> boundary_values;
   VectorTools::interpolate_boundary_values(dof_handler,
-                                           0,
+                                           types::boundary_id(0),
                                            Functions::ZeroFunction<dim>(),
                                            boundary_values);
   MatrixTools::apply_boundary_values(boundary_values,
@@ -259,7 +255,7 @@ void Step5<dim>::assemble_system()
 template <int dim>
 void Step5<dim>::solve()
 {
-  SolverControl            solver_control(1000, 1e-12);
+  SolverControl            solver_control(1000, 1e-6 * system_rhs.l2_norm());
   SolverCG<Vector<double>> solver(solver_control);
 
   PreconditionSSOR<SparseMatrix<double>> preconditioner;
@@ -334,15 +330,15 @@ void Step5<dim>::run()
   // could skip this check, in this version of the program, without any ill
   // effects.
   //
-  // It turns out that more than 90 per cent of programming errors are invalid
-  // function parameters such as invalid array sizes, etc, so we use
+  // It turns out that perhaps 90 per cent of programming errors are invalid
+  // function parameters such as invalid array sizes, etc., so we use
   // assertions heavily throughout deal.II to catch such mistakes. For this,
   // the <code>Assert</code> macro is a good choice, since it makes sure that
   // the condition which is given as first argument is valid, and if not
   // throws an exception (its second argument) which will usually terminate
   // the program giving information where the error occurred and what the
   // reason was. (A longer discussion of what exactly the @p Assert macro
-  // does can be found in the @ref Exceptions "exception documentation module".)
+  // does can be found in the @ref Exceptions "exception documentation topic".)
   // This generally reduces the time to find programming errors
   // dramatically and we have found assertions an invaluable means to program
   // fast.
@@ -359,7 +355,7 @@ void Step5<dim>::run()
   // from calling functions with wrong arguments, walking off of arrays, etc.)
   // by compiling your program in optimized mode usually makes things run
   // about four times faster. Even though optimized programs are more
-  // performant, we still recommend developing in debug mode since it allows
+  // performant, you should always develop in debug mode since it allows
   // the library to find lots of common programming errors automatically. For
   // those who want to try: The way to switch from debug mode to optimized
   // mode is to recompile your program with the command <code>make
@@ -368,17 +364,21 @@ void Step5<dim>::run()
   // it will later also be linked to libraries that have been compiled for
   // optimized mode. In order to switch back to debug mode, simply recompile
   // with the command <code>make debug</code>.
-  Assert(dim == 2, ExcInternalError());
-  // ExcInternalError is a globally defined exception, which may be thrown
-  // whenever something is terribly wrong. Usually, one would like to use more
-  // specific exceptions, and particular in this case one would of course try
+  Assert(dim == 2, ExcNotImplemented());
+  // ExcNotImplemented is a globally defined exception, which may be thrown
+  // whenever a piece of code has simply not been implemented for a case
+  // other than the condition checked in the assertion. Here, it would not
+  // be difficult to simply implement reading a *different* mesh file that
+  // contains a description of a 1d or 3d geometry, but this has not (yet)
+  // been implemented and so the exception is appropriate.
+  //
+  // Usually, one would like to use more specific
+  // exception classes, and particular in this case one would of course try
   // to do something else if <code>dim</code> is not equal to two, e.g. create
   // a grid using library functions. Aborting a program is usually not a good
   // idea and assertions should really only be used for exceptional cases
   // which should not occur, but might due to stupidity of the programmer,
-  // user, or someone else. The situation above is not a very clever use of
-  // Assert, but again: this is a tutorial and it might be worth to show what
-  // not to do, after all.
+  // user, or someone else.
 
   // So if we got past the assertion, we know that dim==2, and we can now
   // actually read the grid. It is in UCD (unstructured cell data) format

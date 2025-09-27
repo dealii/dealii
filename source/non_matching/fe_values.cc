@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2021 - 2023 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2021 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/numbers.h>
@@ -23,6 +22,7 @@
 #include <deal.II/lac/petsc_vector.h>
 #include <deal.II/lac/trilinos_epetra_vector.h>
 #include <deal.II/lac/trilinos_parallel_block_vector.h>
+#include <deal.II/lac/trilinos_tpetra_block_vector.h>
 #include <deal.II/lac/trilinos_tpetra_vector.h>
 #include <deal.II/lac/trilinos_vector.h>
 #include <deal.II/lac/vector.h>
@@ -42,13 +42,13 @@ namespace NonMatching
 
 
   template <int dim>
-  template <typename VectorType>
+  template <typename Number>
   FEValues<dim>::FEValues(const hp::FECollection<dim> &fe_collection,
                           const Quadrature<1>         &quadrature,
                           const RegionUpdateFlags      region_update_flags,
                           const MeshClassifier<dim>   &mesh_classifier,
                           const DoFHandler<dim>       &dof_handler,
-                          const VectorType            &level_set,
+                          const ReadVector<Number>    &level_set,
                           const AdditionalData        &additional_data)
     : mapping_collection(&dealii::hp::StaticMappingQ1<dim>::mapping_collection)
     , fe_collection(&fe_collection)
@@ -72,7 +72,7 @@ namespace NonMatching
 
 
   template <int dim>
-  template <typename VectorType>
+  template <typename Number>
   FEValues<dim>::FEValues(const hp::MappingCollection<dim> &mapping_collection,
                           const hp::FECollection<dim>      &fe_collection,
                           const hp::QCollection<dim>       &q_collection,
@@ -80,7 +80,7 @@ namespace NonMatching
                           const RegionUpdateFlags           region_update_flags,
                           const MeshClassifier<dim>        &mesh_classifier,
                           const DoFHandler<dim>            &dof_handler,
-                          const VectorType                 &level_set,
+                          const ReadVector<Number>         &level_set,
                           const AdditionalData             &additional_data)
     : mapping_collection(&mapping_collection)
     , fe_collection(&fe_collection)
@@ -149,10 +149,72 @@ namespace NonMatching
   template <bool level_dof_access>
   void
   FEValues<dim>::reinit(
-    const TriaIterator<DoFCellAccessor<dim, dim, level_dof_access>> &cell)
+    const TriaIterator<DoFCellAccessor<dim, dim, level_dof_access>> &cell,
+    const unsigned int                                               q_index,
+    const unsigned int mapping_index)
+  {
+    this->reinit_internal(cell,
+                          q_index,
+                          mapping_index,
+                          cell->active_fe_index());
+  }
+
+
+
+  template <int dim>
+  void
+  FEValues<dim>::reinit(const TriaIterator<CellAccessor<dim, dim>> &cell,
+                        const unsigned int                          q_index,
+                        const unsigned int mapping_index,
+                        const unsigned int fe_index)
+  {
+    this->reinit_internal(cell, q_index, mapping_index, fe_index);
+  }
+
+
+
+  template <int dim>
+  template <typename CellIteratorType>
+  void
+  FEValues<dim>::reinit_internal(const CellIteratorType &cell,
+                                 const unsigned int      q_index_in,
+                                 const unsigned int      mapping_index_in,
+                                 const unsigned int      fe_index_in)
   {
     current_cell_location = mesh_classifier->location_to_level_set(cell);
-    active_fe_index       = cell->active_fe_index();
+
+    if (fe_index_in == numbers::invalid_unsigned_int)
+      this->active_fe_index = 0;
+    else
+      this->active_fe_index = fe_index_in;
+
+    unsigned int mapping_index = mapping_index_in;
+    unsigned int q_index       = q_index_in;
+    unsigned int q_index_1D    = q_index_in;
+
+    if (mapping_index == numbers::invalid_unsigned_int)
+      {
+        if (mapping_collection->size() > 1)
+          mapping_index = active_fe_index;
+        else
+          mapping_index = 0;
+      }
+
+    if (q_index == numbers::invalid_unsigned_int)
+      {
+        if (fe_values_inside_full_quadrature.size() > 1)
+          q_index = active_fe_index;
+        else
+          q_index = 0;
+      }
+
+    if (q_index_1D == numbers::invalid_unsigned_int)
+      {
+        if (q_collection_1D.size() > 1)
+          q_index_1D = active_fe_index;
+        else
+          q_index_1D = 0;
+      }
 
     // These objects were created with a quadrature based on the previous cell
     // and are thus no longer valid.
@@ -164,22 +226,29 @@ namespace NonMatching
       {
         case LocationToLevelSet::inside:
           {
-            fe_values_inside_full_quadrature.at(active_fe_index)->reinit(cell);
+            Assert((active_fe_index == mapping_index) ||
+                     ((mapping_collection->size() == 1) &&
+                      (mapping_index == 0)),
+                   ExcNotImplemented());
+            Assert(active_fe_index == q_index, ExcNotImplemented());
+
+            fe_values_inside_full_quadrature.at(q_index)->reinit(cell);
             break;
           }
         case LocationToLevelSet::outside:
           {
-            fe_values_outside_full_quadrature.at(active_fe_index)->reinit(cell);
+            Assert((active_fe_index == mapping_index) ||
+                     ((mapping_collection->size() == 1) &&
+                      (mapping_index == 0)),
+                   ExcNotImplemented());
+            Assert(active_fe_index == q_index, ExcNotImplemented());
+
+            fe_values_outside_full_quadrature.at(q_index)->reinit(cell);
             break;
           }
         case LocationToLevelSet::intersected:
           {
-            const unsigned int mapping_index =
-              mapping_collection->size() > 1 ? active_fe_index : 0;
-
-            const unsigned int q1D_index =
-              q_collection_1D.size() > 1 ? active_fe_index : 0;
-            quadrature_generator.set_1D_quadrature(q1D_index);
+            quadrature_generator.set_1D_quadrature(q_index_1D);
             quadrature_generator.generate(cell);
 
             const Quadrature<dim> &inside_quadrature =
@@ -225,7 +294,7 @@ namespace NonMatching
           }
         default:
           {
-            Assert(false, ExcInternalError());
+            DEAL_II_ASSERT_UNREACHABLE();
             break;
           }
       }
@@ -267,14 +336,14 @@ namespace NonMatching
 
 
   template <int dim>
-  template <typename VectorType>
+  template <typename Number>
   FEInterfaceValues<dim>::FEInterfaceValues(
     const hp::FECollection<dim> &fe_collection,
     const Quadrature<1>         &quadrature,
     const RegionUpdateFlags      region_update_flags,
     const MeshClassifier<dim>   &mesh_classifier,
     const DoFHandler<dim>       &dof_handler,
-    const VectorType            &level_set,
+    const ReadVector<Number>    &level_set,
     const AdditionalData        &additional_data)
     : mapping_collection(&dealii::hp::StaticMappingQ1<dim>::mapping_collection)
     , fe_collection(&fe_collection)
@@ -298,7 +367,7 @@ namespace NonMatching
 
 
   template <int dim>
-  template <typename VectorType>
+  template <typename Number>
   FEInterfaceValues<dim>::FEInterfaceValues(
     const hp::MappingCollection<dim> &mapping_collection,
     const hp::FECollection<dim>      &fe_collection,
@@ -307,7 +376,7 @@ namespace NonMatching
     const RegionUpdateFlags           region_update_flags,
     const MeshClassifier<dim>        &mesh_classifier,
     const DoFHandler<dim>            &dof_handler,
-    const VectorType                 &level_set,
+    const ReadVector<Number>         &level_set,
     const AdditionalData             &additional_data)
     : mapping_collection(&mapping_collection)
     , fe_collection(&fe_collection)
@@ -330,7 +399,6 @@ namespace NonMatching
     const hp::QCollection<dim - 1> &q_collection)
   {
     current_face_location = LocationToLevelSet::unassigned;
-    active_fe_index       = numbers::invalid_unsigned_int;
 
     Assert(fe_collection->size() > 0,
            ExcMessage("Incoming hp::FECollection can not be empty."));
@@ -349,43 +417,31 @@ namespace NonMatching
       ExcMessage(
         "Size of hp::QCollection<1> must be the same as hp::FECollection or 1."));
 
-    // For each element in fe_collection, create dealii::FEInterfaceValues
-    // objects to use on the non-intersected cells.
-    fe_values_inside_full_quadrature.resize(fe_collection->size());
-    fe_values_outside_full_quadrature.resize(fe_collection->size());
-    for (unsigned int fe_index = 0; fe_index < fe_collection->size();
-         ++fe_index)
-      {
-        const unsigned int mapping_index =
-          mapping_collection->size() > 1 ? fe_index : 0;
-        const unsigned int q_index = q_collection.size() > 1 ? fe_index : 0;
-
-        fe_values_inside_full_quadrature[fe_index].emplace(
-          (*mapping_collection)[mapping_index],
-          (*fe_collection)[fe_index],
-          q_collection[q_index],
-          region_update_flags.inside);
-        fe_values_outside_full_quadrature[fe_index].emplace(
-          (*mapping_collection)[mapping_index],
-          (*fe_collection)[fe_index],
-          q_collection[q_index],
-          region_update_flags.outside);
-      }
+    fe_values_inside_full_quadrature.emplace(*mapping_collection,
+                                             *fe_collection,
+                                             q_collection,
+                                             region_update_flags.inside);
+    fe_values_outside_full_quadrature.emplace(*mapping_collection,
+                                              *fe_collection,
+                                              q_collection,
+                                              region_update_flags.outside);
   }
 
 
 
   template <int dim>
-  template <bool level_dof_access>
+  template <typename CellAccessorType>
   void
   FEInterfaceValues<dim>::do_reinit(
-    const TriaIterator<DoFCellAccessor<dim, dim, level_dof_access>> &cell,
-    const unsigned int                                               face_no,
-    const std::function<void(dealii::FEInterfaceValues<dim> &)> &call_reinit)
+    const TriaIterator<CellAccessorType>          &cell,
+    const unsigned int                             face_no,
+    const unsigned int                             q_index_in,
+    const unsigned int                             active_fe_index_in,
+    const std::function<void(dealii::FEInterfaceValues<dim> &,
+                             const unsigned int)> &call_reinit)
   {
     current_face_location =
       mesh_classifier->location_to_level_set(cell, face_no);
-    active_fe_index = cell->active_fe_index();
 
     // These objects were created with a quadrature based on the previous cell
     // and are thus no longer valid.
@@ -396,22 +452,44 @@ namespace NonMatching
       {
         case LocationToLevelSet::inside:
           {
-            call_reinit(*fe_values_inside_full_quadrature.at(active_fe_index));
+            call_reinit(*fe_values_inside_full_quadrature, q_index_in);
             break;
           }
         case LocationToLevelSet::outside:
           {
-            call_reinit(*fe_values_outside_full_quadrature.at(active_fe_index));
+            call_reinit(*fe_values_outside_full_quadrature, q_index_in);
             break;
           }
         case LocationToLevelSet::intersected:
           {
-            const unsigned int mapping_index =
-              mapping_collection->size() > 1 ? active_fe_index : 0;
-            const unsigned int q1D_index =
-              q_collection_1D.size() > 1 ? active_fe_index : 0;
+            unsigned int q_index = q_index_in;
 
-            face_quadrature_generator.set_1D_quadrature(q1D_index);
+            if (q_index == numbers::invalid_unsigned_int)
+              {
+                unsigned int active_fe_index = active_fe_index_in;
+
+                if (active_fe_index == numbers::invalid_unsigned_int)
+                  {
+                    if constexpr (std::is_same_v<
+                                    DoFCellAccessor<dim, dim, true>,
+                                    CellAccessorType> ||
+                                  std::is_same_v<
+                                    DoFCellAccessor<dim, dim, false>,
+                                    CellAccessorType>)
+                      active_fe_index = cell->active_fe_index();
+                    else
+                      active_fe_index = 0;
+                  }
+
+                if (q_collection_1D.size() > 1)
+                  q_index = active_fe_index;
+                else
+                  q_index = 0;
+              }
+
+            AssertIndexRange(q_index, q_collection_1D.size());
+
+            face_quadrature_generator.set_1D_quadrature(q_index);
             face_quadrature_generator.generate(cell, face_no);
 
             const Quadrature<dim - 1> &inside_quadrature =
@@ -424,28 +502,30 @@ namespace NonMatching
             // object if that is the case.
             if (inside_quadrature.size() > 0)
               {
-                fe_values_inside.emplace((*mapping_collection)[mapping_index],
-                                         (*fe_collection)[active_fe_index],
-                                         inside_quadrature,
+                fe_values_inside.emplace(*mapping_collection,
+                                         *fe_collection,
+                                         hp::QCollection<dim - 1>(
+                                           inside_quadrature),
                                          region_update_flags.inside);
 
-                call_reinit(*fe_values_inside);
+                call_reinit(*fe_values_inside, /*q_index=*/0);
               }
 
             if (outside_quadrature.size() > 0)
               {
-                fe_values_outside.emplace((*mapping_collection)[mapping_index],
-                                          (*fe_collection)[active_fe_index],
-                                          outside_quadrature,
+                fe_values_outside.emplace(*mapping_collection,
+                                          *fe_collection,
+                                          hp::QCollection<dim - 1>(
+                                            outside_quadrature),
                                           region_update_flags.outside);
 
-                call_reinit(*fe_values_outside);
+                call_reinit(*fe_values_outside, /*q_index=*/0);
               }
             break;
           }
         default:
           {
-            Assert(false, ExcInternalError());
+            DEAL_II_ASSERT_UNREACHABLE();
             break;
           }
       }
@@ -458,7 +538,7 @@ namespace NonMatching
   FEInterfaceValues<dim>::get_inside_fe_values() const
   {
     if (current_face_location == LocationToLevelSet::inside)
-      return fe_values_inside_full_quadrature.at(active_fe_index);
+      return fe_values_inside_full_quadrature;
     else
       return fe_values_inside;
   }
@@ -470,13 +550,13 @@ namespace NonMatching
   FEInterfaceValues<dim>::get_outside_fe_values() const
   {
     if (current_face_location == LocationToLevelSet::outside)
-      return fe_values_outside_full_quadrature.at(active_fe_index);
+      return fe_values_outside_full_quadrature;
     else
       return fe_values_outside;
   }
 
 
-#include "fe_values.inst"
+#include "non_matching/fe_values.inst"
 
 } // namespace NonMatching
 DEAL_II_NAMESPACE_CLOSE

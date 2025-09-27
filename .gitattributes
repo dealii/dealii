@@ -14,11 +14,14 @@ Jenkinsfile export-ignore
 
 /.github/ export-ignore
 
+# exclude most of the testsuite from the tarball:
 /tests/* export-ignore
+# but keep everything to run the "make test" target (quick_tests, examples):
 /tests/CMakeLists.txt -export-ignore
+/tests/examples -export-ignore
 /tests/quick_tests -export-ignore
 /tests/run_*.cmake -export-ignore
-/tests/setup_testsubproject.cmake -export-ignore
+/tests/scripts -export-ignore
 /tests/tests.h -export-ignore
 
 #

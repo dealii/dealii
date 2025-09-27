@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2019 - 2021 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2021 - 2024 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 // Test MappingQCache initialization with point lambda/Function
 
@@ -38,10 +37,10 @@ public:
   {}
 
   double
-  value(const Point<dim> &point, const unsigned int compontent) const
+  value(const Point<dim> &point, const unsigned int component) const
   {
-    return std::sin(point[compontent] * 0.5 * numbers::PI) -
-           (is_displacement_function ? point[compontent] : 0.0);
+    return std::sin(point[component] * 0.5 * numbers::PI) -
+           (is_displacement_function ? point[component] : 0.0);
   }
 
 private:
@@ -94,9 +93,9 @@ main()
        const Point<2> &p) -> Point<2> {
       Point<2> result;
 
-      for (unsigned int compontent = 0; compontent < 2; ++compontent)
-        result[compontent] =
-          std::sin(p[compontent] * 0.5 * numbers::PI) - p[compontent];
+      for (unsigned int component = 0; component < 2; ++component)
+        result[component] =
+          std::sin(p[component] * 0.5 * numbers::PI) - p[component];
 
       return result;
     },
@@ -107,8 +106,8 @@ main()
        const Point<2> &p) -> Point<2> {
       Point<2> result;
 
-      for (unsigned int compontent = 0; compontent < 2; ++compontent)
-        result[compontent] = std::sin(p[compontent] * 0.5 * numbers::PI);
+      for (unsigned int component = 0; component < 2; ++component)
+        result[component] = std::sin(p[component] * 0.5 * numbers::PI);
 
       return result;
     },

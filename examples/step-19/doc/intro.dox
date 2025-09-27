@@ -1,6 +1,3 @@
-
-<br>
-
 <i>
 This program was contributed by Wolfgang Bangerth, Rene Gassmoeller, and Peter Munch.
 
@@ -13,7 +10,7 @@ awards DMS-1821210, EAR-1550901, and OAC-1835673.
   the publication @cite GLHPW2018 if you use particle functionality in your
   own work.
 
-<a name="Intro"></a>
+<a name="step_19-Intro"></a>
 <h1>Introduction</h1>
 
 The finite element method in general, and deal.II in particular, were invented
@@ -195,7 +192,7 @@ when updating the velocity, or more general Strang splitting methods for the cou
 system)
 but this isn't the point of the tutorial program, and so we will be content
 with what we have here. (We will comment on a piece of this puzzle in the
-<a href="#extensions">possibilities for extensions</a> section of this program,
+@ref step_19-Extensions "possibilities for extensions" section of this program,
 however.)
 
 There remains the question of how we should choose the time step size $\Delta t$.
@@ -412,7 +409,7 @@ that use particles.
 The following picture shows the geometry that we're going to use:
 
 <p align="center">
-  <img src="https://www.dealii.org/images/steps/developer/step-19.geometry.png"
+  <img src="https://dealii.org/images/steps/developer/step-19.geometry.png"
        alt="The geometry used in this program"
        width="600">
 </p>

@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2008 - 2018 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2017 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 
 // create a shared tria mesh and distribute with zorder scheme
@@ -37,10 +36,9 @@ compare_meshes(parallel::shared::Triangulation<dim>      &shared_tria,
 {
   AssertThrow(shared_tria.n_locally_owned_active_cells() ==
                 p4est_tria.n_locally_owned_active_cells(),
-              ExcMessage("Subdomains are of different sizes."))
+              ExcMessage("Subdomains are of different sizes."));
 
-    std::map<CellId, unsigned int>
-                                 shared_map;
+  std::map<CellId, unsigned int> shared_map;
   std::map<CellId, unsigned int> p4est_map;
 
   typename Triangulation<dim>::active_cell_iterator cell1 = shared_tria
@@ -66,7 +64,7 @@ compare_meshes(parallel::shared::Triangulation<dim>      &shared_tria,
        ++it)
     {
       AssertThrow(shared_map[it->first] == it->second,
-                  ExcMessage("Not all CellIds map to correct subdomain_ids."))
+                  ExcMessage("Not all CellIds map to correct subdomain_ids."));
     }
 }
 

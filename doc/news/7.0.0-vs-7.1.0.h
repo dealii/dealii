@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2011 - 2013 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2011 - 2024 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 /**
  * @page changes_between_7_0_and_7_1 Changes between Version 7.0 and 7.1
@@ -22,7 +21,7 @@ All entries are signed with the names of the author.
 </p>
 
 
-<a name="incompatible"></a>
+<a name="700-710-incompatible"></a>
 <h3 style="color:red">Incompatibilities</h3>
 
 <p style="color:red">
@@ -113,7 +112,7 @@ changed to use std_cxx1x::_1, std_cxx1x::_2, etc from now on.
 
 <!-- ----------- GENERAL IMPROVEMENTS ----------------- -->
 
-<a name="general"></a>
+<a name="700-710-general"></a>
 <h3>General</h3>
 
 <ol>
@@ -225,7 +224,7 @@ to an output stream and later retrieved to restore the state of the program.
 <li> New/deprecated: The Triangulation class offers ways to get informed
 whenever the triangulation changes. Previously, the mechanism doing this
 was through the Triangulation::RefinementListener class. This has been
-deprecated and has been superceded by a BOOST signals based mechanism
+deprecated and has been superseded by a BOOST signals based mechanism
 that is generally more powerful and does not rely on overloading
 particular virtual functions inherited from a base class.
 
@@ -342,7 +341,7 @@ and DoF handlers embedded in higher dimensional space have been added.
 
 <!-- ----------- SPECIFIC IMPROVEMENTS ----------------- -->
 
-<a name="specific"></a>
+<a name="700-710-specific"></a>
 <h3>Specific improvements</h3>
 
 <ol>
@@ -658,7 +657,7 @@ number of components. This is now fixed.
 <br>
 (Wolfgang Bangerth, 2011/03/07)
 
-<li> Fixed: PETScWrappers:MPI:SparseMatrix and apply_boundary_values() produced an error in debug mode about non-existant SparsityPattern entries. Reason: clear_rows() also eliminated the whole row in the PETSc-internal SparsityPattern, which resulted in an error in the next assembly process.
+<li> Fixed: PETScWrappers:MPI:SparseMatrix and apply_boundary_values() produced an error in debug mode about non-existent SparsityPattern entries. Reason: clear_rows() also eliminated the whole row in the PETSc-internal SparsityPattern, which resulted in an error in the next assembly process.
 <br>
 (Timo Heister, 2011/02/23)
 

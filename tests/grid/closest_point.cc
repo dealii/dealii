@@ -24,7 +24,8 @@ test(const ReferenceCell &reference_cell,
   for (const unsigned int vertex_no : reference_cell.vertex_indices())
     AssertThrow(distance_square <=
                   p.distance_square(
-                    reference_cell.template vertex<dim>(vertex_no)),
+                    reference_cell.template vertex<dim>(vertex_no)) *
+                    (1. + 2. * std::numeric_limits<double>::epsilon()),
                 ExcInternalError());
 
   // Also generate a lot of points in the unit cell - we should be closer than

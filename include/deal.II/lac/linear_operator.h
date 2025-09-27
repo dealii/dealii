@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2014 - 2022 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2015 - 2024 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 #ifndef dealii_linear_operator_h
 #define dealii_linear_operator_h
@@ -94,7 +93,7 @@ identity_operator(const LinearOperator<Range, Domain, Payload> &);
  *
  * But, in contrast to a usual matrix object, the domain and range of the
  * linear operator are also bound to the LinearOperator class on the type
- * level. Because of this, <code>LinearOperator <Range, Domain></code> has two
+ * level. Because of this, `LinearOperator<Range, Domain>` has two
  * additional function objects
  * @code
  *   std::function<void(Range &, bool)> reinit_range_vector;
@@ -169,9 +168,31 @@ identity_operator(const LinearOperator<Range, Domain, Payload> &);
  * for linear operators have been provided within the respective
  * TrilinosWrappers (and, in the future, PETScWrappers) namespaces.
  *
- * @note The step-20 tutorial program has a detailed usage example of the
+ * <h3> Examples of use </h3>
+ * The step-20 tutorial program has a detailed usage example of the
  * LinearOperator class.
  *
+ * <h3> Instrumenting operations </h3>
+ * It is sometimes useful to know when functions are called, or to inject
+ * additional operations. In such cases, what one wants is to replace, for
+ * example, the `vmult` object of this class with one that does the additional
+ * operations and then calls what was originally supposed to happen. This
+ * can be done with commands such as the following:
+ * @code
+ *    auto A_inv  = inverse_operator(A, solver_A, preconditioner_A);
+ *    A_inv.vmult = [base_vmult = A_inv.vmult](Vector<double>       &dst,
+ *                                             const Vector<double> &src) {
+ *      std::cout << "Calling A_inv.vmult()" << std::endl;
+ *      base_vmult(dst, src);
+ *    };
+ * @endcode
+ * Here, we replace `A_inv.vmult` with a lambda function that first captures
+ * the previous value of `A_inv.vmult` and stores it in the `base_vmult`
+ * object. The newly installed `A_inv.vmult` function then first outputs some
+ * status information, and then calls the original functionality.
+ *
+ * This approach works for all of the other function objects mentioned above
+ * as well.
  *
  * @ingroup LAOperators
  */
@@ -486,8 +507,8 @@ operator*(typename Range::value_type                    number,
           const LinearOperator<Range, Domain, Payload> &op)
 {
   static_assert(
-    std::is_convertible<typename Range::value_type,
-                        typename Domain::value_type>::value,
+    std::is_convertible_v<typename Range::value_type,
+                          typename Domain::value_type>,
     "Range and Domain must have implicitly convertible 'value_type's");
 
   if (op.is_null_operator)
@@ -553,8 +574,8 @@ operator*(const LinearOperator<Range, Domain, Payload> &op,
           typename Domain::value_type                   number)
 {
   static_assert(
-    std::is_convertible<typename Range::value_type,
-                        typename Domain::value_type>::value,
+    std::is_convertible_v<typename Range::value_type,
+                          typename Domain::value_type>,
     "Range and Domain must have implicitly convertible 'value_type's");
 
   return number * op;
@@ -1427,10 +1448,10 @@ linear_operator(const OperatorExemplar &operator_exemplar, const Matrix &matrix)
       Domain>::reinit_domain_vector(operator_exemplar, v, omit_zeroing_entries);
   };
 
-  typename std::conditional<
+  std::conditional_t<
     has_vmult_add_and_Tvmult_add<Range, Domain, Matrix>::type::value,
     MatrixInterfaceWithVmultAdd<Range, Domain, Payload>,
-    MatrixInterfaceWithoutVmultAdd<Range, Domain, Payload>>::type()
+    MatrixInterfaceWithoutVmultAdd<Range, Domain, Payload>>()
     .
     operator()(return_op, matrix);
 
@@ -1464,10 +1485,10 @@ linear_operator(const LinearOperator<Range, Domain, Payload> &operator_exemplar,
   // Initialize the payload based on the LinearOperator exemplar
   auto return_op = operator_exemplar;
 
-  typename std::conditional<
+  std::conditional_t<
     has_vmult_add_and_Tvmult_add<Range, Domain, Matrix>::type::value,
     MatrixInterfaceWithVmultAdd<Range, Domain, Payload>,
-    MatrixInterfaceWithoutVmultAdd<Range, Domain, Payload>>::type()
+    MatrixInterfaceWithoutVmultAdd<Range, Domain, Payload>>()
     .
     operator()(return_op, matrix);
 

@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2007 - 2022 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2007 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 #include <deal.II/base/parameter_handler.h>
 #include <deal.II/base/parsed_function.h>
@@ -33,7 +32,8 @@ namespace Functions
   template <int dim>
   void
   ParsedFunction<dim>::declare_parameters(ParameterHandler  &prm,
-                                          const unsigned int n_components)
+                                          const unsigned int n_components,
+                                          const std::string &input_expr)
   {
     Assert(n_components > 0, ExcZero());
 
@@ -70,9 +70,22 @@ namespace Functions
       "variable names in your function expression.");
 
     // The expression of the function
-    std::string expr = "0";
-    for (unsigned int i = 1; i < n_components; ++i)
-      expr += "; 0";
+    // If the string is an empty string, 0 is set for each components.
+    std::string expr = input_expr;
+    if (expr == "")
+      {
+        expr = "0";
+        for (unsigned int i = 1; i < n_components; ++i)
+          expr += "; 0";
+      }
+    else
+      {
+        // If the user specified an input expr, the number of component
+        // specified need to match n_components.
+        AssertDimension((std::count(expr.begin(), expr.end(), ';') + 1),
+                        n_components);
+      }
+
 
     prm.declare_entry(
       "Function expression",
@@ -124,11 +137,11 @@ namespace Functions
       {
         std::vector<std::string> this_c =
           Utilities::split_string_list(constant, '=');
-        AssertThrow(this_c.size() == 2, ExcMessage("Invalid format"));
-        double tmp;
-        AssertThrow(std::sscanf(this_c[1].c_str(), "%lf", &tmp),
-                    ExcMessage("Double number?"));
-        constants[this_c[0]] = tmp;
+        AssertThrow(this_c.size() == 2,
+                    ExcMessage("The list of constants, <" + constants_list +
+                               ">, is not a comma-separated list of "
+                               "entries of the form 'name=value'."));
+        constants[this_c[0]] = Utilities::string_to_double(this_c[1]);
       }
 
     // set pi and Pi as synonyms for the corresponding value. note that

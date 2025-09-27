@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2020 - 2023 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2021 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 #include <deal.II/base/config.h>
 
@@ -95,7 +94,7 @@ namespace FE_P_BubblesImplementation
                           reference_cell.face_to_cell_vertices(
                             face_no,
                             face_vertex_no,
-                            ReferenceCell::default_combined_face_orientation());
+                            numbers::default_geometric_orientation);
 
                         midpoint +=
                           reference_cell.template vertex<dim>(vertex_no);
@@ -111,7 +110,7 @@ namespace FE_P_BubblesImplementation
             return points;
           }
         default:
-          Assert(false, ExcNotImplemented());
+          DEAL_II_NOT_IMPLEMENTED();
       }
     return points;
   }
@@ -178,7 +177,7 @@ namespace FE_P_BubblesImplementation
                       vertices.push_back(reference_cell.face_to_cell_vertices(
                         face_no,
                         face_vertex_no,
-                        ReferenceCell::default_combined_face_orientation()));
+                        numbers::default_geometric_orientation));
 
                     Assert(vertices.size() == 3, ExcInternalError());
                     auto b =
@@ -218,18 +217,19 @@ namespace FE_P_BubblesImplementation
             for (auto &p : bubble_functions)
               lump_polys.push_back(std::move(p));
 
-              // Sanity check:
-#ifdef DEBUG
-            BarycentricPolynomial<dim> unity;
-            for (const auto &p : lump_polys)
-              unity = unity + p;
+            // Sanity check:
+            if constexpr (running_in_debug_mode())
+              {
+                BarycentricPolynomial<dim> unity;
+                for (const auto &p : lump_polys)
+                  unity = unity + p;
 
-            Point<dim> test;
-            for (unsigned int d = 0; d < dim; ++d)
-              test[d] = 2.0;
-            Assert(std::abs(unity.value(test) - 1.0) < 1e-10,
-                   ExcInternalError());
-#endif
+                Point<dim> test;
+                for (unsigned int d = 0; d < dim; ++d)
+                  test[d] = 2.0;
+                Assert(std::abs(unity.value(test) - 1.0) < 1e-10,
+                       ExcInternalError());
+              }
 
             return BarycentricPolynomials<dim>(lump_polys);
           }
@@ -268,6 +268,7 @@ FE_SimplexP_Bubbles<dim, spacedim>::FE_SimplexP_Bubbles(
   : FE_SimplexPoly<dim, spacedim>(
       FE_P_BubblesImplementation::get_basis<dim>(degree),
       FE_P_BubblesImplementation::get_fe_data<dim>(degree),
+      false,
       FE_P_BubblesImplementation::unit_support_points<dim>(degree),
       {FE_P_BubblesImplementation::unit_support_points<dim - 1>(degree)},
       // Interface constraints are not yet implemented
@@ -295,6 +296,6 @@ FE_SimplexP_Bubbles<dim, spacedim>::clone() const
 }
 
 // explicit instantiations
-#include "fe_simplex_p_bubbles.inst"
+#include "fe/fe_simplex_p_bubbles.inst"
 
 DEAL_II_NAMESPACE_CLOSE

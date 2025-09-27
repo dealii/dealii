@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2018 - 2023 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2018 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 #include <deal.II/base/quadrature_lib.h>
 #include <deal.II/base/signaling_nan.h>
@@ -237,7 +236,7 @@ namespace SmoothnessEstimator
 
               // choose the smallest decay of coefficients in each direction,
               // i.e. the maximum decay slope k_v as in exp(-k_v)
-              double k_v = std::numeric_limits<double>::infinity();
+              double k_v = std::numeric_limits<double>::max();
               for (unsigned int d = 0; d < dim; ++d)
                 {
                   x.resize(0);
@@ -295,6 +294,7 @@ namespace SmoothnessEstimator
       // finite element, the smoothness estimation algorithm tends to produce
       // stable results.
       std::vector<unsigned int> n_coefficients_per_direction;
+      n_coefficients_per_direction.reserve(fe_collection.size());
       for (unsigned int i = 0; i < fe_collection.size(); ++i)
         n_coefficients_per_direction.push_back(fe_collection[i].degree + 2);
 
@@ -522,7 +522,7 @@ namespace SmoothnessEstimator
 
               // choose the smallest decay of coefficients in each direction,
               // i.e. the maximum decay slope k_v as in exp(-k_v)
-              double k_v = std::numeric_limits<double>::infinity();
+              double k_v = std::numeric_limits<double>::max();
               for (unsigned int d = 0; d < dim; ++d)
                 {
                   x.resize(0);
@@ -584,6 +584,7 @@ namespace SmoothnessEstimator
       // element, the smoothness estimation algorithm tends to produce stable
       // results.
       std::vector<unsigned int> n_coefficients_per_direction;
+      n_coefficients_per_direction.reserve(fe_collection.size());
       for (unsigned int i = 0; i < fe_collection.size(); ++i)
         n_coefficients_per_direction.push_back(fe_collection[i].degree + 2);
 
@@ -621,6 +622,6 @@ namespace SmoothnessEstimator
 
 
 // explicit instantiations
-#include "smoothness_estimator.inst"
+#include "numerics/smoothness_estimator.inst"
 
 DEAL_II_NAMESPACE_CLOSE

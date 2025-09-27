@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2007 - 2018 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2007 - 2024 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 
 // Check automatic differentiation
@@ -116,7 +115,7 @@ check_sine(unsigned int nquad)
 
   Point<dim> wave_vector;
   for (unsigned int d = 0; d < dim; ++d)
-    wave_vector(d) = d + 2.;
+    wave_vector[d] = d + 2.;
 
   Functions::FourierSineFunction<dim> f(wave_vector);
 
@@ -131,7 +130,7 @@ check_sine(unsigned int nquad)
     {
       deallog << "Direction " << d << std::endl;
       Point<dim> dir;
-      dir(d) = 1.;
+      dir[d] = 1.;
       deallog.push("Euler");
       FunctionDerivative<dim> df(f, dir, 1.e-4);
       check_derivative_order(gradients, df, quadrature, d, 2);

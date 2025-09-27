@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2005 - 2023 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2019 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 #include <deal.II/base/mu_parser_internal.h>
 #include <deal.II/base/thread_management.h>
@@ -36,13 +35,17 @@ namespace internal
   namespace FunctionParser
   {
     int
-    mu_round(double val)
+    mu_round(const double val)
     {
       return static_cast<int>(val + ((val >= 0.0) ? 0.5 : -0.5));
     }
 
+
+
     double
-    mu_if(double condition, double thenvalue, double elsevalue)
+    mu_if(const double condition,
+          const double thenvalue,
+          const double elsevalue)
     {
       if (mu_round(condition) != 0)
         return thenvalue;
@@ -50,84 +53,110 @@ namespace internal
         return elsevalue;
     }
 
+
+
     double
-    mu_or(double left, double right)
+    mu_or(const double left, const double right)
     {
       return static_cast<double>((mu_round(left) != 0) ||
                                  (mu_round(right) != 0));
     }
 
+
+
     double
-    mu_and(double left, double right)
+    mu_and(const double left, const double right)
     {
       return static_cast<double>((mu_round(left) != 0) &&
                                  (mu_round(right) != 0));
     }
 
+
+
     double
-    mu_int(double value)
+    mu_int(const double value)
     {
       return static_cast<double>(mu_round(value));
     }
 
+
+
     double
-    mu_ceil(double value)
+    mu_ceil(const double value)
     {
       return std::ceil(value);
     }
 
+
+
     double
-    mu_floor(double value)
+    mu_floor(const double value)
     {
       return std::floor(value);
     }
 
+
+
     double
-    mu_cot(double value)
+    mu_cot(const double value)
     {
       return 1.0 / std::tan(value);
     }
 
+
+
     double
-    mu_csc(double value)
+    mu_csc(const double value)
     {
       return 1.0 / std::sin(value);
     }
 
+
+
     double
-    mu_sec(double value)
+    mu_sec(const double value)
     {
       return 1.0 / std::cos(value);
     }
 
+
+
     double
-    mu_log(double value)
+    mu_log(const double value)
     {
       return std::log(value);
     }
 
+
+
     double
-    mu_pow(double a, double b)
+    mu_pow(const double a, const double b)
     {
       return std::pow(a, b);
     }
 
+
+
     double
-    mu_erf(double value)
+    mu_erf(const double value)
     {
       return std::erf(value);
     }
 
+
+
     double
-    mu_erfc(double value)
+    mu_erfc(const double value)
     {
       return std::erfc(value);
     }
 
-    // returns a random value in the range [0,1] initializing the generator
-    // with the given seed
+
+
+    // Returns a random value in the range [0,1], after initializing the
+    // generator with the given seed
     double
-    mu_rand_seed(double seed)
+    mu_rand_seed(const double seed)
     {
       static std::mutex           rand_mutex;
       std::lock_guard<std::mutex> lock(rand_mutex);
@@ -138,13 +167,13 @@ namespace internal
       // which is initialized with the seed itself
       static std::map<double, std::mt19937> rng_map;
 
-      if (rng_map.find(seed) == rng_map.end())
-        rng_map[seed] = std::mt19937(static_cast<unsigned int>(seed));
-
-      return uniform_distribution(rng_map[seed]);
+      return uniform_distribution(
+        rng_map.try_emplace(seed, std::mt19937(static_cast<unsigned int>(seed)))
+          .first->second);
     }
 
-    // returns a random value in the range [0,1]
+
+    // Returns a random value in the range [0,1]
     double
     mu_rand()
     {
@@ -155,6 +184,8 @@ namespace internal
       static std::mt19937 rng(seed);
       return uniform_distribution(rng);
     }
+
+
 
     std::vector<std::string>
     get_function_names()
@@ -222,6 +253,8 @@ namespace internal
       mu::Parser parser;
     };
 #endif
+
+
 
     template <int dim, typename Number>
     ParserImplementation<dim, Number>::ParserImplementation()
@@ -389,7 +422,7 @@ namespace internal
         init_muparser();
 
       for (unsigned int i = 0; i < dim; ++i)
-        data.vars[i] = p(i);
+        data.vars[i] = p[i];
       if (dim != this->n_vars)
         data.vars[dim] = time;
 
@@ -437,7 +470,7 @@ namespace internal
         init_muparser();
 
       for (unsigned int i = 0; i < dim; ++i)
-        data.vars[i] = p(i);
+        data.vars[i] = p[i];
       if (dim != this->n_vars)
         data.vars[dim] = time;
 
@@ -474,7 +507,7 @@ namespace internal
     }
 
 // explicit instantiations
-#include "mu_parser_internal.inst"
+#include "base/mu_parser_internal.inst"
 
   } // namespace FunctionParser
 } // namespace internal

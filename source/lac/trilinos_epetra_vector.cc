@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2015 - 2023 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2016 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 #include <deal.II/lac/trilinos_epetra_vector.h>
 
@@ -38,6 +37,41 @@ namespace LinearAlgebra
 {
   namespace EpetraWrappers
   {
+#  ifndef DOXYGEN
+    namespace internal
+    {
+      VectorReference::operator value_type() const
+      {
+        AssertIndexRange(index, vector.size());
+
+        // Trilinos allows for vectors to be referenced by the [] or ()
+        // operators but only () checks index bounds. We check these bounds by
+        // ourselves, so we can use []. Note that we can only get local values.
+
+        const TrilinosWrappers::types::int_type local_index =
+          vector.vector->Map().LID(
+            static_cast<TrilinosWrappers::types::int_type>(index));
+
+#    ifndef DEAL_II_WITH_64BIT_INDICES
+        Assert(local_index >= 0,
+               ExcAccessToNonLocalElement(index,
+                                          vector.vector->Map().NumMyElements(),
+                                          vector.vector->Map().MinMyGID(),
+                                          vector.vector->Map().MaxMyGID()));
+#    else
+        Assert(local_index >= 0,
+               ExcAccessToNonLocalElement(index,
+                                          vector.vector->Map().NumMyElements(),
+                                          vector.vector->Map().MinMyGID64(),
+                                          vector.vector->Map().MaxMyGID64()));
+#    endif
+
+        return (*(vector.vector))[0][local_index];
+      }
+    } // namespace internal
+#  endif
+
+
     // Check that the class we declare here satisfies the
     // vector-space-vector concept. If we catch it here,
     // any mistake in the vector class declaration would
@@ -47,24 +81,21 @@ namespace LinearAlgebra
 #  endif
 
     Vector::Vector()
-      : Subscriptor()
-      , vector(new Epetra_FEVector(
+      : vector(new Epetra_FEVector(
           Epetra_Map(0, 0, 0, Utilities::Trilinos::comm_self())))
     {}
 
 
 
     Vector::Vector(const Vector &V)
-      : Subscriptor()
-      , vector(new Epetra_FEVector(V.trilinos_vector()))
+      : vector(new Epetra_FEVector(V.trilinos_vector()))
     {}
 
 
 
     Vector::Vector(const IndexSet &parallel_partitioner,
                    const MPI_Comm  communicator)
-      : Subscriptor()
-      , vector(new Epetra_FEVector(
+      : vector(new Epetra_FEVector(
           parallel_partitioner.make_trilinos_map(communicator, false)))
     {}
 
@@ -83,7 +114,6 @@ namespace LinearAlgebra
         {
           const int ierr = vector->PutScalar(0.);
           Assert(ierr == 0, ExcTrilinosError(ierr));
-          (void)ierr;
         }
     }
 
@@ -102,7 +132,7 @@ namespace LinearAlgebra
     void
     Vector::extract_subvector_to(
       const ArrayView<const types::global_dof_index> &indices,
-      ArrayView<double>                              &elements) const
+      const ArrayView<double>                        &elements) const
     {
       AssertDimension(indices.size(), elements.size());
       const auto &vector = trilinos_vector();
@@ -138,7 +168,6 @@ namespace LinearAlgebra
               const int ierr =
                 vector->Import(V.trilinos_vector(), data_exchange, Insert);
               Assert(ierr == 0, ExcTrilinosError(ierr));
-              (void)ierr;
             }
           else
             vector = std::make_unique<Epetra_FEVector>(V.trilinos_vector());
@@ -156,7 +185,6 @@ namespace LinearAlgebra
 
       const int ierr = vector->PutScalar(s);
       Assert(ierr == 0, ExcTrilinosError(ierr));
-      (void)ierr;
 
       return *this;
     }
@@ -193,9 +221,8 @@ namespace LinearAlgebra
               communication_pattern);
           AssertThrow(
             epetra_comm_pattern != nullptr,
-            ExcMessage(
-              std::string("The communication pattern is not of type ") +
-              "LinearAlgebra::EpetraWrappers::CommunicationPattern."));
+            ExcMessage("The communication pattern is not of type "
+                       "LinearAlgebra::EpetraWrappers::CommunicationPattern."));
         }
 
       Epetra_Import import_map(epetra_comm_pattern->get_epetra_import());
@@ -250,34 +277,17 @@ namespace LinearAlgebra
         {
           const int ierr = vector->Update(1., V.trilinos_vector(), 1.);
           Assert(ierr == 0, ExcTrilinosError(ierr));
-          (void)ierr;
         }
       else
         {
           Assert(this->size() == V.size(),
                  ExcDimensionMismatch(this->size(), V.size()));
 
-#  if DEAL_II_TRILINOS_VERSION_GTE(11, 11, 0)
           Epetra_Import data_exchange(vector->Map(), V.trilinos_vector().Map());
           const int     ierr = vector->Import(V.trilinos_vector(),
                                           data_exchange,
                                           Epetra_AddLocalAlso);
           Assert(ierr == 0, ExcTrilinosError(ierr));
-          (void)ierr;
-#  else
-          // In versions older than 11.11 the Import function is broken for
-          // adding Hence, we provide a workaround in this case
-
-          Epetra_MultiVector dummy(vector->Map(), 1, false);
-          Epetra_Import data_exchange(dummy.Map(), V.trilinos_vector().Map());
-
-          int ierr = dummy.Import(V.trilinos_vector(), data_exchange, Insert);
-          Assert(ierr == 0, ExcTrilinosError(ierr));
-
-          ierr = vector->Update(1.0, dummy, 1.0);
-          Assert(ierr == 0, ExcTrilinosError(ierr));
-          (void)ierr;
-#  endif
         }
 
       return *this;
@@ -306,7 +316,6 @@ namespace LinearAlgebra
       double    result(0.);
       const int ierr = vector->Dot(V.trilinos_vector(), &result);
       Assert(ierr == 0, ExcTrilinosError(ierr));
-      (void)ierr;
 
       return result;
     }
@@ -333,7 +342,6 @@ namespace LinearAlgebra
 
       const int ierr = vector->Update(a, V.trilinos_vector(), 1.);
       Assert(ierr == 0, ExcTrilinosError(ierr));
-      (void)ierr;
     }
 
 
@@ -354,7 +362,6 @@ namespace LinearAlgebra
       const int ierr =
         vector->Update(a, V.trilinos_vector(), b, W.trilinos_vector(), 1.);
       Assert(ierr == 0, ExcTrilinosError(ierr));
-      (void)ierr;
     }
 
 
@@ -379,7 +386,6 @@ namespace LinearAlgebra
       const int ierr =
         vector->Multiply(1.0, scaling_factors.trilinos_vector(), *vector, 0.0);
       Assert(ierr == 0, ExcTrilinosError(ierr));
-      (void)ierr;
     }
 
 
@@ -395,7 +401,6 @@ namespace LinearAlgebra
           // Otherwise, just update
           int ierr = vector->Update(a, V.trilinos_vector(), 0.);
           Assert(ierr == 0, ExcTrilinosError(ierr));
-          (void)ierr;
         }
     }
 
@@ -437,7 +442,6 @@ namespace LinearAlgebra
 
       int ierr = vector->MeanValue(&mean_value);
       Assert(ierr == 0, ExcTrilinosError(ierr));
-      (void)ierr;
 
       return mean_value;
     }
@@ -450,7 +454,6 @@ namespace LinearAlgebra
       double norm(0.);
       int    ierr = vector->Norm1(&norm);
       Assert(ierr == 0, ExcTrilinosError(ierr));
-      (void)ierr;
 
       return norm;
     }
@@ -463,7 +466,6 @@ namespace LinearAlgebra
       double norm(0.);
       int    ierr = vector->Norm2(&norm);
       Assert(ierr == 0, ExcTrilinosError(ierr));
-      (void)ierr;
 
       return norm;
     }
@@ -476,7 +478,6 @@ namespace LinearAlgebra
       double norm(0.);
       int    ierr = vector->NormInf(&norm);
       Assert(ierr == 0, ExcTrilinosError(ierr));
-      (void)ierr;
 
       return norm;
     }
@@ -595,7 +596,6 @@ namespace LinearAlgebra
       int     ierr = vector->ExtractView(&val, &leading_dimension);
 
       Assert(ierr == 0, ExcTrilinosError(ierr));
-      (void)ierr;
       out.precision(precision);
       if (scientific)
         out.setf(std::ios::scientific, std::ios::floatfield);

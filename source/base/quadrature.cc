@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2023 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 1998 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 #include <deal.II/base/memory_consumption.h>
 #include <deal.II/base/quadrature.h>
@@ -29,12 +28,24 @@ DEAL_II_NAMESPACE_OPEN
 
 #ifndef DOXYGEN
 template <>
+Quadrature<0>::Quadrature()
+  : is_tensor_product_flag(false)
+{}
+
+template <>
 Quadrature<0>::Quadrature(const unsigned int n_q)
   : quadrature_points(n_q)
   , weights(n_q, 0)
   , is_tensor_product_flag(false)
 {}
 #endif
+
+
+
+template <int dim>
+Quadrature<dim>::Quadrature()
+  : is_tensor_product_flag(dim == 1)
+{}
 
 
 
@@ -49,12 +60,24 @@ Quadrature<dim>::Quadrature(const unsigned int n_q)
 
 template <int dim>
 void
-Quadrature<dim>::initialize(const std::vector<Point<dim>> &p,
-                            const std::vector<double>     &w)
+Quadrature<dim>::initialize(const ArrayView<const Point<dim>> &points,
+                            const ArrayView<const double>     &weights)
 {
-  AssertDimension(w.size(), p.size());
-  quadrature_points      = p;
-  weights                = w;
+  this->weights.clear();
+  if (weights.size() > 0)
+    {
+      AssertDimension(weights.size(), points.size());
+      this->weights.insert(this->weights.end(), weights.begin(), weights.end());
+    }
+  else
+    this->weights.resize(points.size(),
+                         std::numeric_limits<double>::infinity());
+
+  quadrature_points.clear();
+  quadrature_points.insert(quadrature_points.end(),
+                           points.begin(),
+                           points.end());
+
   is_tensor_product_flag = dim == 1;
 }
 
@@ -155,25 +178,26 @@ Quadrature<dim>::Quadrature(const SubQuadrature &q1, const Quadrature<1> &q2)
         // compose coordinates of new quadrature point by tensor product in the
         // last component
         for (unsigned int d = 0; d < dim - 1; ++d)
-          quadrature_points[present_index](d) = q1.point(i1)(d);
-        quadrature_points[present_index](dim - 1) = q2.point(i2)(0);
+          quadrature_points[present_index][d] = q1.point(i1)[d];
+        quadrature_points[present_index][dim - 1] = q2.point(i2)[0];
 
         weights[present_index] = q1.weight(i1) * q2.weight(i2);
 
         ++present_index;
       }
 
-#ifdef DEBUG
-  if (size() > 0)
+  if constexpr (running_in_debug_mode())
     {
-      double sum = 0;
-      for (unsigned int i = 0; i < size(); ++i)
-        sum += weights[i];
-      // we cannot guarantee the sum of weights to be exactly one, but it should
-      // be near that.
-      Assert((sum > 0.999999) && (sum < 1.000001), ExcInternalError());
+      if (size() > 0)
+        {
+          double sum = 0;
+          for (unsigned int i = 0; i < size(); ++i)
+            sum += weights[i];
+          // we cannot guarantee the sum of weights to be exactly one, but it
+          // should be near that.
+          Assert((sum > 0.999999) && (sum < 1.000001), ExcInternalError());
+        }
     }
-#endif
 
   if (is_tensor_product_flag)
     {
@@ -197,31 +221,32 @@ Quadrature<1>::Quadrature(const SubQuadrature &, const Quadrature<1> &q2)
     {
       // compose coordinates of new quadrature point by tensor product in the
       // last component
-      quadrature_points[present_index](0) = q2.point(i2)(0);
+      quadrature_points[present_index][0] = q2.point(i2)[0];
 
       weights[present_index] = q2.weight(i2);
 
       ++present_index;
     }
 
-#  ifdef DEBUG
-  if (size() > 0)
+  if constexpr (running_in_debug_mode())
     {
-      double sum = 0;
-      for (unsigned int i = 0; i < size(); ++i)
-        sum += weights[i];
-      // we cannot guarantee the sum of weights to be exactly one, but it should
-      // be near that.
-      Assert((sum > 0.999999) && (sum < 1.000001), ExcInternalError());
+      if (size() > 0)
+        {
+          double sum = 0;
+          for (unsigned int i = 0; i < size(); ++i)
+            sum += weights[i];
+          // we cannot guarantee the sum of weights to be exactly one, but it
+          // should be near that.
+          Assert((sum > 0.999999) && (sum < 1.000001), ExcInternalError());
+        }
     }
-#  endif
 }
 
 
 
 template <>
 Quadrature<0>::Quadrature(const Quadrature<1> &)
-  : Subscriptor()
+  : EnableObserverPointer()
   , quadrature_points(1)
   , weights(1, 1.)
   , is_tensor_product_flag(false)
@@ -230,7 +255,7 @@ Quadrature<0>::Quadrature(const Quadrature<1> &)
 
 template <>
 Quadrature<1>::Quadrature(const Quadrature<0> &)
-  : Subscriptor()
+  : EnableObserverPointer()
 {
   // this function should never be called -- this should be the copy constructor
   // in 1d...
@@ -242,7 +267,7 @@ Quadrature<1>::Quadrature(const Quadrature<0> &)
 
 template <int dim>
 Quadrature<dim>::Quadrature(const Quadrature<dim != 1 ? 1 : 0> &q)
-  : Subscriptor()
+  : EnableObserverPointer()
   , quadrature_points(Utilities::fixed_power<dim>(q.size()))
   , weights(Utilities::fixed_power<dim>(q.size()))
   , is_tensor_product_flag(true)
@@ -258,11 +283,11 @@ Quadrature<dim>::Quadrature(const Quadrature<dim != 1 ? 1 : 0> &q)
     for (unsigned int i1 = 0; i1 < n1; ++i1)
       for (unsigned int i0 = 0; i0 < n0; ++i0)
         {
-          quadrature_points[k](0) = q.point(i0)(0);
+          quadrature_points[k][0] = q.point(i0)[0];
           if (dim > 1)
-            quadrature_points[k](1) = q.point(i1)(0);
+            quadrature_points[k][1] = q.point(i1)[0];
           if (dim > 2)
-            quadrature_points[k](2) = q.point(i2)(0);
+            quadrature_points[k][2] = q.point(i2)[0];
           weights[k] = q.weight(i0);
           if (dim > 1)
             weights[k] *= q.weight(i1);
@@ -280,7 +305,7 @@ Quadrature<dim>::Quadrature(const Quadrature<dim != 1 ? 1 : 0> &q)
 
 template <int dim>
 Quadrature<dim>::Quadrature(const Quadrature<dim> &q)
-  : Subscriptor()
+  : EnableObserverPointer()
   , quadrature_points(q.quadrature_points)
   , weights(q.weights)
   , is_tensor_product_flag(q.is_tensor_product_flag)
@@ -332,9 +357,9 @@ Quadrature<dim>::memory_consumption() const
 
 
 template <int dim>
-typename std::conditional<dim == 1,
-                          std::array<Quadrature<1>, dim>,
-                          const std::array<Quadrature<1>, dim> &>::type
+typename std::conditional_t<dim == 1,
+                            std::array<Quadrature<1>, dim>,
+                            const std::array<Quadrature<1>, dim> &>
 Quadrature<dim>::get_tensor_basis() const
 {
   Assert(this->is_tensor_product_flag == true,
@@ -370,7 +395,7 @@ QAnisotropic<dim>::QAnisotropic(const Quadrature<1> &qx)
   unsigned int k = 0;
   for (unsigned int k1 = 0; k1 < qx.size(); ++k1)
     {
-      this->quadrature_points[k](0) = qx.point(k1)(0);
+      this->quadrature_points[k][0] = qx.point(k1)[0];
       this->weights[k++]            = qx.weight(k1);
     }
   Assert(k == this->size(), ExcInternalError());
@@ -393,8 +418,8 @@ QAnisotropic<dim>::QAnisotropic(const Quadrature<1> &qx,
   for (unsigned int k2 = 0; k2 < qy.size(); ++k2)
     for (unsigned int k1 = 0; k1 < qx.size(); ++k1)
       {
-        this->quadrature_points[k](0)     = qx.point(k1)(0);
-        this->quadrature_points[k](dim_1) = qy.point(k2)(0);
+        this->quadrature_points[k][0]     = qx.point(k1)[0];
+        this->quadrature_points[k][dim_1] = qy.point(k2)[0];
         this->weights[k++]                = qx.weight(k1) * qy.weight(k2);
       }
   Assert(k == this->size(), ExcInternalError());
@@ -424,9 +449,9 @@ QAnisotropic<dim>::QAnisotropic(const Quadrature<1> &qx,
     for (unsigned int k2 = 0; k2 < qy.size(); ++k2)
       for (unsigned int k1 = 0; k1 < qx.size(); ++k1)
         {
-          this->quadrature_points[k](0)     = qx.point(k1)(0);
-          this->quadrature_points[k](dim_1) = qy.point(k2)(0);
-          this->quadrature_points[k](dim_2) = qz.point(k3)(0);
+          this->quadrature_points[k][0]     = qx.point(k1)[0];
+          this->quadrature_points[k][dim_1] = qy.point(k2)[0];
+          this->quadrature_points[k][dim_2] = qz.point(k3)[0];
           this->weights[k++] = qx.weight(k1) * qy.weight(k2) * qz.weight(k3);
         }
   Assert(k == this->size(), ExcInternalError());
@@ -485,7 +510,7 @@ template <>
 QIterated<0>::QIterated(const Quadrature<1> &, const std::vector<Point<1>> &)
   : Quadrature<0>()
 {
-  Assert(false, ExcNotImplemented());
+  DEAL_II_NOT_IMPLEMENTED();
 }
 
 
@@ -494,7 +519,7 @@ template <>
 QIterated<0>::QIterated(const Quadrature<1> &, const unsigned int)
   : Quadrature<0>()
 {
-  Assert(false, ExcNotImplemented());
+  DEAL_II_NOT_IMPLEMENTED();
 }
 
 
@@ -522,7 +547,7 @@ QIterated<1>::QIterated(const Quadrature<1>         &base_quadrature,
              ++q_point)
           {
             this->quadrature_points[next_point] =
-              Point<1>(base_quadrature.point(q_point)(0) *
+              Point<1>(base_quadrature.point(q_point)[0] *
                          (intervals[copy + 1][0] - intervals[copy][0]) +
                        intervals[copy][0]);
             this->weights[next_point] =
@@ -564,7 +589,7 @@ QIterated<1>::QIterated(const Quadrature<1>         &base_quadrature,
               {
                 Assert(this->quadrature_points[next_point - double_point_offset]
                            .distance(Point<1>(
-                             base_quadrature.point(q_point)(0) *
+                             base_quadrature.point(q_point)[0] *
                                (intervals[copy + 1][0] - intervals[copy][0]) +
                              intervals[copy][0])) < 1e-10 /*tolerance*/,
                        ExcInternalError());
@@ -577,7 +602,7 @@ QIterated<1>::QIterated(const Quadrature<1>         &base_quadrature,
               }
 
             this->quadrature_points[next_point] =
-              Point<1>(base_quadrature.point(q_point)(0) *
+              Point<1>(base_quadrature.point(q_point)[0] *
                          (intervals[copy + 1][0] - intervals[copy][0]) +
                        intervals[copy][0]);
 
@@ -600,12 +625,13 @@ QIterated<1>::QIterated(const Quadrature<1>         &base_quadrature,
     else if (std::abs(i[0] - 1.0) < 1e-12)
       i[0] = 1.0;
 
-#ifdef DEBUG
-  double sum_of_weights = 0;
-  for (unsigned int i = 0; i < this->size(); ++i)
-    sum_of_weights += this->weight(i);
-  Assert(std::fabs(sum_of_weights - 1) < 1e-13, ExcInternalError());
-#endif
+  if constexpr (running_in_debug_mode())
+    {
+      double sum_of_weights = 0;
+      for (unsigned int i = 0; i < this->size(); ++i)
+        sum_of_weights += this->weight(i);
+      Assert(std::fabs(sum_of_weights - 1) < 1e-13, ExcInternalError());
+    }
 }
 
 

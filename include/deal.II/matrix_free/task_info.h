@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2011 - 2023 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2018 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 
 #ifndef dealii_matrix_free_task_info_h
@@ -269,11 +268,11 @@ namespace internal
        *
        * The strategy is based on a two-level approach. The outer level is
        * subdivided into partitions similar to the type of neighbors in
-       * Cuthill-McKee, and the inner level is again subdivided into Cuthill-
-       * McKee-like partitions (partitions whose level differs by more than 2
-       * can be worked on independently). One task is represented by a chunk
-       * of cells. The cell chunks are formed after subdivision into the two
-       * levels of partitions.
+       * Cuthill-McKee, and the inner level is again subdivided into
+       * Cuthill-McKee-like partitions (partitions whose level differs by more
+       * than 2 can be worked on independently). One task is represented by a
+       * chunk of cells. The cell chunks are formed after subdivision into the
+       * two levels of partitions.
        *
        * @param cell_active_fe_index The active FE index corresponding to the
        * individual indices in the list of all cell indices, in order to be

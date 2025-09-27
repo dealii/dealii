@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2017 - 2022 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2017 - 2024 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 
 
@@ -31,47 +30,6 @@
 #include <deal.II/particles/particle_handler.h>
 
 #include "../tests.h"
-
-template <int dim, int spacedim>
-void
-create_regular_particle_distribution(
-  Particles::ParticleHandler<dim, spacedim>                 &particle_handler,
-  const parallel::distributed::Triangulation<dim, spacedim> &tr,
-  const unsigned int particles_per_direction = 3)
-{
-  for (unsigned int i = 0; i < particles_per_direction; ++i)
-    for (unsigned int j = 0; j < particles_per_direction; ++j)
-      {
-        Point<spacedim> position;
-        Point<dim>      reference_position;
-        unsigned int    id = i * particles_per_direction + j;
-
-        position[0] = static_cast<double>(i) /
-                      static_cast<double>(particles_per_direction - 1);
-        position[1] = static_cast<double>(j) /
-                      static_cast<double>(particles_per_direction - 1);
-
-        if (dim > 2)
-          for (unsigned int k = 0; k < particles_per_direction; ++k)
-            {
-              position[2] = static_cast<double>(j) /
-                            static_cast<double>(particles_per_direction - 1);
-            }
-        else
-          {
-            Particles::Particle<dim, spacedim> particle(position,
-                                                        reference_position,
-                                                        id);
-
-            typename parallel::distributed::Triangulation<dim, spacedim>::
-              active_cell_iterator cell =
-                GridTools::find_active_cell_around_point(
-                  tr, particle.get_location());
-
-            particle_handler.insert_particle(particle, cell);
-          }
-      }
-}
 
 template <int dim, int spacedim>
 void
@@ -107,8 +65,7 @@ test()
 
     for (const auto &particle : particle_handler)
       deallog << "Before refinement particle id " << particle.get_id()
-              << " is in cell " << particle.get_surrounding_cell(tr)
-              << std::endl;
+              << " is in cell " << particle.get_surrounding_cell() << std::endl;
 
     // Check that all particles are moved to children
     particle_handler.prepare_for_coarsening_and_refinement();
@@ -117,8 +74,7 @@ test()
 
     for (const auto &particle : particle_handler)
       deallog << "After refinement particle id " << particle.get_id()
-              << " is in cell " << particle.get_surrounding_cell(tr)
-              << std::endl;
+              << " is in cell " << particle.get_surrounding_cell() << std::endl;
 
     // Reverse the refinement and check again
     for (auto cell = tr.begin_active(); cell != tr.end(); ++cell)
@@ -130,8 +86,7 @@ test()
 
     for (const auto &particle : particle_handler)
       deallog << "After coarsening particle id " << particle.get_id()
-              << " is in cell " << particle.get_surrounding_cell(tr)
-              << std::endl;
+              << " is in cell " << particle.get_surrounding_cell() << std::endl;
   }
 
   deallog << "OK" << std::endl;

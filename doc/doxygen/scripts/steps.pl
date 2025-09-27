@@ -1,17 +1,16 @@
-## ---------------------------------------------------------------------
+## ------------------------------------------------------------------------
 ##
-## Copyright (C) 2006 - 2022 by the deal.II authors
+## SPDX-License-Identifier: LGPL-2.1-or-later
+## Copyright (C) 2009 - 2025 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
-## The deal.II library is free software; you can use it, redistribute
-## it, and/or modify it under the terms of the GNU Lesser General
-## Public License as published by the Free Software Foundation; either
-## version 2.1 of the License, or (at your option) any later version.
-## The full text of the license can be found in the file LICENSE.md at
-## the top level directory of deal.II.
+## Part of the source code is dual licensed under Apache-2.0 WITH
+## LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+## governing the source code and code contributions can be found in
+## LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 ##
-## ---------------------------------------------------------------------
+## ------------------------------------------------------------------------
 
 use strict;
 
@@ -33,8 +32,8 @@ my %colors = (
  "basic"          => 'green',
  "techniques"     => 'orange',
  "fluids"         => 'yellow2',
- "solids"         => 'lightblue',
- "time dependent" => 'dodgerblue1',
+ "solids"         => 'coral',
+ "time dependent" => 'darkolivegreen1',
  "unfinished"     => 'white',
  "code-gallery"   => 'white',
     );
@@ -53,19 +52,20 @@ my %style = (
 print << 'EOT'
 digraph StepsMap
 {
+  bgcolor=transparent;
   overlap=false;
   edge [fontname="FreeSans",
         fontsize="10",
         labelfontname="FreeSans",
         labelfontsize="10",
-        color="black",
+        color="cornflowerblue",
         style="solid"];
   node [fontname="FreeSans",
         fontsize="10",
         shape="rectangle",
         height=0.2,
         width=0.4,
-        color="black",
+        color="cornflowerblue",
         fillcolor="white",
         style="filled"];
 EOT
@@ -118,7 +118,7 @@ foreach $step (@ARGV)
       my $name = $step;
       $name =~ s/^.*code-gallery\///;
       my $tag = $name;
-      $tag =~ s/[^a-zA-Z]/_/g;
+      $tag =~ s/[^a-zA-Z_0-9]/_/g;
 
       $kind_map{"code_gallery_$tag"} = "code-gallery";
 
@@ -157,7 +157,7 @@ foreach $step (@ARGV)
       my $name = $step;
       $name =~ s/^.*code-gallery\///;
       my $tag = $name;
-      $tag =~ s/[^a-zA-Z]/_/g;
+      $tag =~ s/[^a-zA-Z_0-9]/_/g;
       $destination = "code_gallery_$tag";
     }
 
@@ -274,7 +274,7 @@ foreach $step (@ARGV)
                 }
             }
 
-            # If the destination is a code gallery program, used a dashed line
+            # If the destination is a code gallery program, use a dashed line
             if ($kind_map{$destination} eq "code-gallery")
             {
                 $edge_attributes .= "style=\"dashed\", arrowhead=\"empty\", color=\"gray\",";
@@ -298,21 +298,20 @@ while (my $line = <TUTORIAL>)
 print << 'EOT'
 graph StepsDescription
 {
+  bgcolor=transparent;
   overlap=false;
   edge [fontname="FreeSans",
-        fontsize="10",
+        fontsize="12",
         labelfontname="FreeSans",
         labelfontsize="10",
-        color="black",
+        color="cornflowerblue",
         style="solid"];
   node [fontname="FreeSans",
-        fontsize="10",
+        fontsize="11",
         shape="rectangle",
         height=0.2,
         width=0.4,
-        color="black",
-        fillcolor="white",
-        style="filled"];
+        color="cornflowerblue"];
 EOT
     ;
 
@@ -334,9 +333,9 @@ foreach $kind (keys %style)
 {
     my $escaped_kind = $kind;
     $escaped_kind =~ s/[^a-zA-Z]/_/g;
-    printf "  $escaped_kind [label=\"\" $style{$kind}, fillcolor=\"$colors{$kind}\"];\n";
-    printf "  fake_$escaped_kind [label=\"$kind_descriptions{$kind}\", shape=plaintext];\n";
-    printf "  $escaped_kind -- fake_$escaped_kind [style=dotted, arrowhead=odot, arrowsize=1];\n";
+    printf "  $escaped_kind [label=\"\" $style{$kind}, style=\"filled\" fillcolor=\"$colors{$kind}\"];\n";
+    printf "  fake_$escaped_kind [label=\"$kind_descriptions{$kind}\", fontcolor=\"cornflowerblue\" fontsize=12 shape=plaintext];\n";
+    printf "  $escaped_kind -- fake_$escaped_kind [style=\"bold,dotted\", arrowhead=odot, arrowsize=1];\n";
 }
 # now add connections to make sure they appear nicely next to each other
 # in the legend

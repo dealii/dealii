@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2010 - 2021 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2015 - 2024 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 
 // A simplified version of the _08 test that uses fewer cells
@@ -54,9 +53,9 @@ cylinder(Triangulation<3> &tria,
   // Turn cylinder such that y->x
   for (unsigned int i = 0; i < 16; ++i)
     {
-      const double h = vertices[i](1);
-      vertices[i](1) = -vertices[i](0);
-      vertices[i](0) = h;
+      const double h = vertices[i][1];
+      vertices[i][1] = -vertices[i][0];
+      vertices[i][0] = h;
     }
 
   int cell_vertices[5][8] = {{0, 1, 8, 9, 2, 3, 10, 11},

@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2018 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2008 - 2024 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 
 
@@ -76,12 +75,12 @@ transfer(std::ostream &out)
     cell->set_refine_flag();
 
   tria.prepare_coarsening_and_refinement();
-  soltrans.prepare_for_pure_refinement();
+  soltrans.prepare_for_coarsening_and_refinement(solution);
   tria.execute_coarsening_and_refinement();
   dof_handler.distribute_dofs(fe);
 
   Vector<double> tmp_q(dof_handler.n_dofs());
-  soltrans.refine_interpolate(solution, tmp_q);
+  soltrans.interpolate(tmp_q);
   solution.reinit(dof_handler.n_dofs());
   solution = tmp_q;
 
@@ -100,7 +99,7 @@ transfer(std::ostream &out)
   tria.execute_coarsening_and_refinement();
   dof_handler.distribute_dofs(fe);
   solution.reinit(dof_handler.n_dofs());
-  soltrans.interpolate(old_solution, solution);
+  soltrans.interpolate(solution);
 
   deallog << "OK" << std::endl;
 }

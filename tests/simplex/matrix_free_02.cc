@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2020 - 2022 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2020 - 2024 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 
 // Same as matrix_free_01 but testing mixed meshes (and also pure simplex and
@@ -52,7 +51,6 @@
 
 #include "./simplex_grids.h"
 
-using namespace dealii;
 
 template <int dim>
 class PoissonOperator
@@ -206,7 +204,7 @@ test(const unsigned version, const unsigned int degree, const bool do_helmholtz)
                                       Functions::ZeroFunction<dim>(),
                                       difference,
                                       quads,
-                                      VectorTools::NormType::L2_norm);
+                                      VectorTools::L2_norm);
 
     std::tuple<unsigned int, double, double, double> result(
       reduction_control.last_step(),
@@ -214,7 +212,7 @@ test(const unsigned version, const unsigned int degree, const bool do_helmholtz)
       x.linfty_norm(),
       VectorTools::compute_global_error(tria,
                                         difference,
-                                        VectorTools::NormType::L2_norm));
+                                        VectorTools::L2_norm));
 
     return result;
   };

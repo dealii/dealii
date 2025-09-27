@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2022 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2022 - 2024 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 // Test VectorTools::point_values() for cell-data vectors.
 
@@ -42,7 +41,6 @@
 
 #include "../tests.h"
 
-using namespace dealii;
 
 template <int dim, int spacedim>
 std::shared_ptr<const Utilities::MPI::Partitioner>
@@ -54,7 +52,7 @@ create_partitioner(const DoFHandler<dim, spacedim> &dof_handler)
   return std::make_shared<const Utilities::MPI::Partitioner>(
     dof_handler.locally_owned_dofs(),
     locally_relevant_dofs,
-    dof_handler.get_communicator());
+    dof_handler.get_mpi_communicator());
 }
 
 void
@@ -128,7 +126,7 @@ test()
                      evaluation_point_results_2[i]) > 1e-10 ||
             std::abs(evaluation_point_results_1[i] -
                      evaluation_point_results_3[i]) > 1e-10)
-          Assert(false, ExcNotImplemented());
+          DEAL_II_NOT_IMPLEMENTED();
       }
 
   deallog << "OK!" << std::endl;

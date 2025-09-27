@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
+// SPDX-License-Identifier: LGPL-2.1-or-later
 // Copyright (C) 2004 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 #ifndef dealii_fe_dgp_monomial_h
 #define dealii_fe_dgp_monomial_h
@@ -32,8 +31,8 @@ DEAL_II_NAMESPACE_OPEN
 /**
  * Discontinuous finite elements based on monomials.
  *
- * This finite element implements complete polynomial spaces, that is, dim-
- * dimensional polynomials of degree p. For example, in 2d the element
+ * This finite element implements complete polynomial spaces, that is,
+ * dim-dimensional polynomials of degree p. For example, in 2d the element
  * FE_DGP(1) would represent the span of the functions $\{1,\hat x,\hat y\}$,
  * which is in contrast to the element FE_DGQ(1) that is formed by the span of
  * $\{1,\hat x,\hat y,\hat x\hat y\}$. Since the DGP space has only three
@@ -87,7 +86,7 @@ DEAL_II_NAMESPACE_OPEN
  * <h4>$P_0$ element</h4>
  *
  * <table> <tr> <td align="center">
- * @image html http://www.dealii.org/images/shape-functions/DGPMonomial/P1/P1_DGPMonomial_shape0000.png
+ * @image html http://dealii.org/images/shape-functions/DGPMonomial/P1/P1_DGPMonomial_shape0000.png
  * </td>
  *
  * <td align="center"> </td> </tr> <tr> <td align="center"> $P_0$ element,
@@ -98,17 +97,17 @@ DEAL_II_NAMESPACE_OPEN
  * <h4>$P_1$ element</h4>
  *
  * <table> <tr> <td align="center">
- * @image html http://www.dealii.org/images/shape-functions/DGPMonomial/P1/P1_DGPMonomial_shape0000.png
+ * @image html http://dealii.org/images/shape-functions/DGPMonomial/P1/P1_DGPMonomial_shape0000.png
  * </td>
  *
  * <td align="center">
- * @image html http://www.dealii.org/images/shape-functions/DGPMonomial/P1/P1_DGPMonomial_shape0001.png
+ * @image html http://dealii.org/images/shape-functions/DGPMonomial/P1/P1_DGPMonomial_shape0001.png
  * </td> </tr> <tr> <td align="center"> $P_1$ element, shape function 0 </td>
  *
  * <td align="center"> $P_1$ element, shape function 1 </td> </tr>
  *
  * <tr> <td align="center">
- * @image html http://www.dealii.org/images/shape-functions/DGPMonomial/P1/P1_DGPMonomial_shape0002.png
+ * @image html http://dealii.org/images/shape-functions/DGPMonomial/P1/P1_DGPMonomial_shape0002.png
  * </td>
  *
  * <td align="center"> </td> </tr> <tr> <td align="center"> $P_1$ element,
@@ -120,31 +119,31 @@ DEAL_II_NAMESPACE_OPEN
  * <h4>$P_2$ element</h4>
  *
  * <table> <tr> <td align="center">
- * @image html http://www.dealii.org/images/shape-functions/DGPMonomial/P2/P2_DGPMonomial_shape0000.png
+ * @image html http://dealii.org/images/shape-functions/DGPMonomial/P2/P2_DGPMonomial_shape0000.png
  * </td>
  *
  * <td align="center">
- * @image html http://www.dealii.org/images/shape-functions/DGPMonomial/P2/P2_DGPMonomial_shape0001.png
+ * @image html http://dealii.org/images/shape-functions/DGPMonomial/P2/P2_DGPMonomial_shape0001.png
  * </td> </tr> <tr> <td align="center"> $P_2$ element, shape function 0 </td>
  *
  * <td align="center"> $P_2$ element, shape function 1 </td> </tr>
  *
  * <tr> <td align="center">
- * @image html http://www.dealii.org/images/shape-functions/DGPMonomial/P2/P2_DGPMonomial_shape0002.png
+ * @image html http://dealii.org/images/shape-functions/DGPMonomial/P2/P2_DGPMonomial_shape0002.png
  * </td>
  *
  * <td align="center">
- * @image html http://www.dealii.org/images/shape-functions/DGPMonomial/P2/P2_DGPMonomial_shape0003.png
+ * @image html http://dealii.org/images/shape-functions/DGPMonomial/P2/P2_DGPMonomial_shape0003.png
  * </td> </tr> <tr> <td align="center"> $P_2$ element, shape function 2 </td>
  *
  * <td align="center"> $P_2$ element, shape function 3 </td> </tr>
  *
  * <tr> <td align="center">
- * @image html http://www.dealii.org/images/shape-functions/DGPMonomial/P2/P2_DGPMonomial_shape0004.png
+ * @image html http://dealii.org/images/shape-functions/DGPMonomial/P2/P2_DGPMonomial_shape0004.png
  * </td>
  *
  * <td align="center">
- * @image html http://www.dealii.org/images/shape-functions/DGPMonomial/P2/P2_DGPMonomial_shape0005.png
+ * @image html http://dealii.org/images/shape-functions/DGPMonomial/P2/P2_DGPMonomial_shape0005.png
  * </td> </tr> <tr> <td align="center"> $P_2$ element, shape function 4 </td>
  *
  * <td align="center"> $P_2$ element, shape function 5 </td> </tr> </table>
@@ -153,128 +152,128 @@ DEAL_II_NAMESPACE_OPEN
  * <h4>$P_3$ element</h4>
  *
  * <table> <tr> <td align="center">
- * @image html http://www.dealii.org/images/shape-functions/DGPMonomial/P3/P3_DGPMonomial_shape0000.png
+ * @image html http://dealii.org/images/shape-functions/DGPMonomial/P3/P3_DGPMonomial_shape0000.png
  * </td>
  *
  * <td align="center">
- * @image html http://www.dealii.org/images/shape-functions/DGPMonomial/P3/P3_DGPMonomial_shape0001.png
+ * @image html http://dealii.org/images/shape-functions/DGPMonomial/P3/P3_DGPMonomial_shape0001.png
  * </td> </tr> <tr> <td align="center"> $P_3$ element, shape function 0 </td>
  *
  * <td align="center"> $P_3$ element, shape function 1 </td> </tr>
  *
  * <tr> <td align="center">
- * @image html http://www.dealii.org/images/shape-functions/DGPMonomial/P3/P3_DGPMonomial_shape0002.png
+ * @image html http://dealii.org/images/shape-functions/DGPMonomial/P3/P3_DGPMonomial_shape0002.png
  * </td>
  *
  * <td align="center">
- * @image html http://www.dealii.org/images/shape-functions/DGPMonomial/P3/P3_DGPMonomial_shape0003.png
+ * @image html http://dealii.org/images/shape-functions/DGPMonomial/P3/P3_DGPMonomial_shape0003.png
  * </td> </tr> <tr> <td align="center"> $P_3$ element, shape function 2 </td>
  *
  * <td align="center"> $P_3$ element, shape function 3 </td> </tr>
  *
  * <tr> <td align="center">
- * @image html http://www.dealii.org/images/shape-functions/DGPMonomial/P3/P3_DGPMonomial_shape0004.png
+ * @image html http://dealii.org/images/shape-functions/DGPMonomial/P3/P3_DGPMonomial_shape0004.png
  * </td>
  *
  * <td align="center">
- * @image html http://www.dealii.org/images/shape-functions/DGPMonomial/P3/P3_DGPMonomial_shape0005.png
+ * @image html http://dealii.org/images/shape-functions/DGPMonomial/P3/P3_DGPMonomial_shape0005.png
  * </td> </tr> <tr> <td align="center"> $P_3$ element, shape function 4 </td>
  *
  * <td align="center"> $P_3$ element, shape function 5 </td> </tr>
  *
  * <tr> <td align="center">
- * @image html http://www.dealii.org/images/shape-functions/DGPMonomial/P3/P3_DGPMonomial_shape0006.png
+ * @image html http://dealii.org/images/shape-functions/DGPMonomial/P3/P3_DGPMonomial_shape0006.png
  * </td>
  *
  * <td align="center">
- * @image html http://www.dealii.org/images/shape-functions/DGPMonomial/P3/P3_DGPMonomial_shape0007.png
+ * @image html http://dealii.org/images/shape-functions/DGPMonomial/P3/P3_DGPMonomial_shape0007.png
  * </td> </tr> <tr> <td align="center"> $P_3$ element, shape function 6 </td>
  *
  * <td align="center"> $P_3$ element, shape function 7 </td> </tr>
  *
  * <tr> <td align="center">
- * @image html http://www.dealii.org/images/shape-functions/DGPMonomial/P3/P3_DGPMonomial_shape0008.png
+ * @image html http://dealii.org/images/shape-functions/DGPMonomial/P3/P3_DGPMonomial_shape0008.png
  * </td>
  *
  * <td align="center">
- * @image html http://www.dealii.org/images/shape-functions/DGPMonomial/P3/P3_DGPMonomial_shape0009.png
+ * @image html http://dealii.org/images/shape-functions/DGPMonomial/P3/P3_DGPMonomial_shape0009.png
  * </td> </tr> <tr> <td align="center"> $P_3$ element, shape function 8 </td>
  *
  * <td align="center"> $P_3$ element, shape function 9 </td> </tr> </table>
  *
  *
  * <h4>$P_4$ element</h4> <table> <tr> <td align="center">
- * @image html http://www.dealii.org/images/shape-functions/DGPMonomial/P4/P4_DGPMonomial_shape0000.png
+ * @image html http://dealii.org/images/shape-functions/DGPMonomial/P4/P4_DGPMonomial_shape0000.png
  * </td>
  *
  * <td align="center">
- * @image html http://www.dealii.org/images/shape-functions/DGPMonomial/P4/P4_DGPMonomial_shape0001.png
+ * @image html http://dealii.org/images/shape-functions/DGPMonomial/P4/P4_DGPMonomial_shape0001.png
  * </td> </tr> <tr> <td align="center"> $P_4$ element, shape function 0 </td>
  *
  * <td align="center"> $P_4$ element, shape function 1 </td> </tr>
  *
  * <tr> <td align="center">
- * @image html http://www.dealii.org/images/shape-functions/DGPMonomial/P4/P4_DGPMonomial_shape0002.png
+ * @image html http://dealii.org/images/shape-functions/DGPMonomial/P4/P4_DGPMonomial_shape0002.png
  * </td>
  *
  * <td align="center">
- * @image html http://www.dealii.org/images/shape-functions/DGPMonomial/P4/P4_DGPMonomial_shape0003.png
+ * @image html http://dealii.org/images/shape-functions/DGPMonomial/P4/P4_DGPMonomial_shape0003.png
  * </td> </tr> <tr> <td align="center"> $P_4$ element, shape function 2 </td>
  *
  * <td align="center"> $P_4$ element, shape function 3 </td> </tr>
  *
  * <tr> <td align="center">
- * @image html http://www.dealii.org/images/shape-functions/DGPMonomial/P4/P4_DGPMonomial_shape0004.png
+ * @image html http://dealii.org/images/shape-functions/DGPMonomial/P4/P4_DGPMonomial_shape0004.png
  * </td>
  *
  * <td align="center">
- * @image html http://www.dealii.org/images/shape-functions/DGPMonomial/P4/P4_DGPMonomial_shape0005.png
+ * @image html http://dealii.org/images/shape-functions/DGPMonomial/P4/P4_DGPMonomial_shape0005.png
  * </td> </tr> <tr> <td align="center"> $P_4$ element, shape function 4 </td>
  *
  * <td align="center"> $P_4$ element, shape function 5 </td> </tr>
  *
  * <tr> <td align="center">
- * @image html http://www.dealii.org/images/shape-functions/DGPMonomial/P4/P4_DGPMonomial_shape0006.png
+ * @image html http://dealii.org/images/shape-functions/DGPMonomial/P4/P4_DGPMonomial_shape0006.png
  * </td>
  *
  * <td align="center">
- * @image html http://www.dealii.org/images/shape-functions/DGPMonomial/P4/P4_DGPMonomial_shape0007.png
+ * @image html http://dealii.org/images/shape-functions/DGPMonomial/P4/P4_DGPMonomial_shape0007.png
  * </td> </tr> <tr> <td align="center"> $P_4$ element, shape function 6 </td>
  *
  * <td align="center"> $P_4$ element, shape function 7 </td> </tr>
  *
  * <tr> <td align="center">
- * @image html http://www.dealii.org/images/shape-functions/DGPMonomial/P4/P4_DGPMonomial_shape0008.png
+ * @image html http://dealii.org/images/shape-functions/DGPMonomial/P4/P4_DGPMonomial_shape0008.png
  * </td>
  *
  * <td align="center">
- * @image html http://www.dealii.org/images/shape-functions/DGPMonomial/P4/P4_DGPMonomial_shape0009.png
+ * @image html http://dealii.org/images/shape-functions/DGPMonomial/P4/P4_DGPMonomial_shape0009.png
  * </td> </tr> <tr> <td align="center"> $P_4$ element, shape function 8 </td>
  *
  * <td align="center"> $P_4$ element, shape function 9 </td> </tr>
  *
  * <tr> <td align="center">
- * @image html http://www.dealii.org/images/shape-functions/DGPMonomial/P4/P4_DGPMonomial_shape0010.png
+ * @image html http://dealii.org/images/shape-functions/DGPMonomial/P4/P4_DGPMonomial_shape0010.png
  * </td>
  *
  * <td align="center">
- * @image html http://www.dealii.org/images/shape-functions/DGPMonomial/P4/P4_DGPMonomial_shape0011.png
+ * @image html http://dealii.org/images/shape-functions/DGPMonomial/P4/P4_DGPMonomial_shape0011.png
  * </td> </tr> <tr> <td align="center"> $P_4$ element, shape function 10 </td>
  *
  * <td align="center"> $P_4$ element, shape function 11 </td> </tr>
  *
  * <tr> <td align="center">
- * @image html http://www.dealii.org/images/shape-functions/DGPMonomial/P4/P4_DGPMonomial_shape0012.png
+ * @image html http://dealii.org/images/shape-functions/DGPMonomial/P4/P4_DGPMonomial_shape0012.png
  * </td>
  *
  * <td align="center">
- * @image html http://www.dealii.org/images/shape-functions/DGPMonomial/P4/P4_DGPMonomial_shape0013.png
+ * @image html http://dealii.org/images/shape-functions/DGPMonomial/P4/P4_DGPMonomial_shape0013.png
  * </td> </tr> <tr> <td align="center"> $P_4$ element, shape function 12 </td>
  *
  * <td align="center"> $P_4$ element, shape function 13 </td> </tr>
  *
  * <tr> <td align="center">
- * @image html http://www.dealii.org/images/shape-functions/DGPMonomial/P4/P4_DGPMonomial_shape0014.png
+ * @image html http://dealii.org/images/shape-functions/DGPMonomial/P4/P4_DGPMonomial_shape0014.png
  * </td>
  *
  * <td align="center"> </td> </tr> <tr> <td align="center"> $P_4$ element,

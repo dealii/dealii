@@ -1,24 +1,23 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2009 - 2021 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2010 - 2024 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 
 /**
  * @defgroup distributed Parallel computing with multiple processors using distributed memory
  * @ingroup Parallel
  *
- * @brief A module discussing the use of parallelism on distributed memory
+ * @brief A group discussing the use of parallelism on distributed memory
  * clusters.
  *
  * @dealiiVideoLecture{39,41,41.25,41.5}
@@ -27,7 +26,7 @@
  *
  * deal.II can use multiple machines connected via MPI to parallelize
  * computations, in addition to the parallelization within a shared
- * memory machine discussed in the @ref threads module. There are
+ * memory machine discussed in the @ref threads topic. There are
  * essentially two ways to utilize multiple machines:
  *
  * - Each machine keeps the entire mesh and DoF handler locally, but
@@ -52,7 +51,7 @@
  *
  * The use of truly distributed meshes is somewhat more complex because it
  * changes or makes impossible some of the things that can otherwise be done
- * with deal.II triangulations, DoF handlers, etc. This module documents these
+ * with deal.II triangulations, DoF handlers, etc. This topic documents these
  * issues with a vantage point at 50,000 ft above ground without going into
  * too many details. All the algorithms described below are implement in
  * classes and functions in namespace parallel::distributed.
@@ -67,7 +66,7 @@
  * A complete discussion of the algorithms used in this namespace, as well as
  * a thorough description of many of the terms used here, can be found in the
  * @ref distributed_paper "Distributed Computing paper". In particular, the
- * paper shows that the methods discussed in this module scale to thousands of
+ * paper shows that the methods discussed in this group scale to thousands of
  * processors and well over a billion degrees of freedom. The paper also gives a
  * concise definition of many of the terms that are used here and in other
  * places of the library related to distributed computing.  The step-40
@@ -100,12 +99,20 @@
  *
  * <table align="center">
  *   <tr>
- *     <td> @image html distributed_mesh_0.png </td>
- *     <td> @image html distributed_mesh_1.png </td>
- *   </tr>
+ *     <td>
+ *		@image html distributed_mesh_0.png
+ * 	</td>
+ *     <td>
+ * 		@image html distributed_mesh_1.png
+ *	</td>
+ *</tr>
  *   <tr>
- *     <td> @image html distributed_mesh_2.png </td>
- *     <td> @image html distributed_mesh_3.png </td>
+ *     <td>
+ * 		@image html distributed_mesh_2.png
+ * 	</td>
+ *     <td>
+ *		@image html distributed_mesh_3.png
+ *	</td>
  *   </tr>
  * </table>
  *
@@ -419,8 +426,7 @@ namespace parallel
    * A namespace for class and
    * functions that support %parallel
    * computing on %distributed memory
-   * machines. See the @ref
-   * distributed module for an
+   * machines. See the @ref distributed topic for an
    * overview of the facilities this
    * namespace offers.
    *

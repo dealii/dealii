@@ -1,17 +1,16 @@
-/* ---------------------------------------------------------------------
+/* ------------------------------------------------------------------------
  *
- * Copyright (C) 2020 - 2022 by the deal.II authors
+ * SPDX-License-Identifier: LGPL-2.1-or-later
+ * Copyright (C) 2020 - 2024 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
- * The deal.II library is free software; you can use it, redistribute
- * it, and/or modify it under the terms of the GNU Lesser General
- * Public License as published by the Free Software Foundation; either
- * version 2.1 of the License, or (at your option) any later version.
- * The full text of the license can be found in the file LICENSE.md at
- * the top level directory of deal.II.
+ * Part of the source code is dual licensed under Apache-2.0 WITH
+ * LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+ * governing the source code and code contributions can be found in
+ * LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
  *
- * ---------------------------------------------------------------------
+ * ------------------------------------------------------------------------
 
  *
  * Author: Martin Kronbichler, 2020
@@ -67,7 +66,6 @@
 
 namespace Euler_DG
 {
-  using namespace dealii;
 
   // Similarly to the other matrix-free tutorial programs, we collect all
   // parameters that control the execution of the program at the top of the
@@ -217,7 +215,7 @@ namespace Euler_DG
           }
 
         default:
-          Assert(false, ExcNotImplemented());
+          DEAL_II_NOT_IMPLEMENTED();
           return 0.;
       }
   }
@@ -627,7 +625,7 @@ namespace Euler_DG
 
         default:
           {
-            Assert(false, ExcNotImplemented());
+            DEAL_II_NOT_IMPLEMENTED();
             return {};
           }
       }
@@ -1156,7 +1154,7 @@ namespace Euler_DG
             const auto numerical_flux =
               euler_numerical_flux<dim>(phi_m.get_value(q),
                                         phi_p.get_value(q),
-                                        phi_m.get_normal_vector(q));
+                                        phi_m.normal_vector(q));
             phi_m.submit_value(-numerical_flux, q);
             phi_p.submit_value(numerical_flux, q);
           }
@@ -1237,7 +1235,7 @@ namespace Euler_DG
         for (unsigned int q = 0; q < phi.n_q_points; ++q)
           {
             const auto w_m    = phi.get_value(q);
-            const auto normal = phi.get_normal_vector(q);
+            const auto normal = phi.normal_vector(q);
 
             auto rho_u_dot_n = w_m[1] * normal[0];
             for (unsigned int d = 1; d < dim; ++d)
@@ -2061,7 +2059,7 @@ namespace Euler_DG
           }
 
         default:
-          Assert(false, ExcNotImplemented());
+          DEAL_II_NOT_IMPLEMENTED();
       }
 
     triangulation.refine_global(n_global_refinements);
@@ -2396,7 +2394,6 @@ int
 main(int argc, char **argv)
 {
   using namespace Euler_DG;
-  using namespace dealii;
 
   initlog();
   Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);

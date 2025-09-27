@@ -1,0 +1,14 @@
+
+DEAL::Computing residual for the 1th time, at u=10.0000
+DEAL::Setting up Jacobian system at u=10.0000
+DEAL::Computing residual for the 2th time, at u=10.0000
+DEAL::Computing residual for the 3th time, at u=-88.0839
+DEAL::Reporting recoverable failure.
+DEAL::Computing residual for the 3th time, at u=-39.0419
+DEAL::Reporting recoverable failure.
+DEAL::Computing residual for the 3th time, at u=-14.5210
+DEAL::Reporting recoverable failure.
+DEAL::Computing residual for the 3th time, at u=-2.26049
+DEAL::Computing residual for the 4th time, at u=8.77395
+DEAL::Nonlinear Solver threw an exception with the following message:
+    SNES solver did not converge after 1 iterations with reason DIVERGED_MAX_IT

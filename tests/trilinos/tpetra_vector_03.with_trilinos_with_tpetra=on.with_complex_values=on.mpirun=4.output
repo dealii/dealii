@@ -1,13 +1,17 @@
 
 DEAL:0::Tpetra first import add:
-4.000e+00 1.000e+02 
+size:8 locally_owned_size:2 :
+[0]: 4.000e+00
+[1]: 1.000e+02
 IndexSet: {[0,2]}
 
 [0]: 1.000e+00
 [1]: 1.000e+02
 [2]: 1.000e+01
 DEAL:0::Tpetra second import add:
-8.000e+00 2.000e+02 
+size:8 locally_owned_size:2 :
+[0]: 8.000e+00
+[1]: 2.000e+02
 IndexSet: {[0,2]}
 
 [0]: 2.000e+00
@@ -33,14 +37,18 @@ IndexSet: {[0,2]}
 [2]: 1.000e+02
 
 DEAL:1::Tpetra first import add:
-1.000e+01 1.010e+02 
+size:8 locally_owned_size:2 :
+[2]: 1.000e+01
+[3]: 1.010e+02
 IndexSet: {0, [3,4]}
 
 [0]: 1.000e+00
 [3]: 1.010e+02
 [4]: 1.100e+01
 DEAL:1::Tpetra second import add:
-3.000e+01 2.010e+02 
+size:8 locally_owned_size:2 :
+[2]: 3.000e+01
+[3]: 2.010e+02
 IndexSet: {0, [3,4]}
 
 [0]: 2.000e+00
@@ -67,14 +75,18 @@ IndexSet: {0, [3,4]}
 
 
 DEAL:2::Tpetra first import add:
-1.100e+01 1.020e+02 
+size:8 locally_owned_size:2 :
+[4]: 1.100e+01
+[5]: 1.020e+02
 IndexSet: {0, [5,6]}
 
 [0]: 1.000e+00
 [5]: 1.020e+02
 [6]: 1.200e+01
 DEAL:2::Tpetra second import add:
-3.200e+01 2.020e+02 
+size:8 locally_owned_size:2 :
+[4]: 3.200e+01
+[5]: 2.020e+02
 IndexSet: {0, [5,6]}
 
 [0]: 2.000e+00
@@ -101,13 +113,17 @@ IndexSet: {0, [5,6]}
 
 
 DEAL:3::Tpetra first import add:
-1.200e+01 1.030e+02 
+size:8 locally_owned_size:2 :
+[6]: 1.200e+01
+[7]: 1.030e+02
 IndexSet: {0, 7}
 
 [0]: 1.000e+00
 [7]: 1.030e+02
 DEAL:3::Tpetra second import add:
-3.400e+01 2.030e+02 
+size:8 locally_owned_size:2 :
+[6]: 3.400e+01
+[7]: 2.030e+02
 IndexSet: {0, 7}
 
 [0]: 2.000e+00

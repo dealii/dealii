@@ -1,18 +1,18 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 1999 - 2022 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 1999 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
+#include <deal.II/base/exceptions.h>
 #include <deal.II/base/table_handler.h>
 
 #include <boost/io/ios_state.hpp>
@@ -21,6 +21,7 @@
 #include <iomanip>
 #include <iostream>
 #include <sstream>
+#include <variant>
 
 
 DEAL_II_NAMESPACE_OPEN
@@ -73,7 +74,7 @@ namespace internal
       {
         Assert(false,
                ExcMessage("The number stored by this element of the "
-                          "table is not a number."))
+                          "table is not a number."));
       }
 
     return 0;
@@ -91,7 +92,10 @@ namespace internal
     else
       ss.setf(std::ios::fixed, std::ios::floatfield);
 
-    std::visit([&ss](auto &v) { ss << v; }, value);
+    if (scientific)
+      ss << get_numeric_value();
+    else
+      std::visit([&ss](const auto &v) { ss << v; }, value);
 
     cached_value = ss.str();
     if (cached_value.empty())
@@ -156,7 +160,7 @@ TableHandler::Column::pad_column_below(const unsigned int size)
   while (entries.size() < size)
     {
       entries.push_back(entries.back().get_default_constructed_copy());
-      internal::TableEntry &entry = entries.back();
+      const internal::TableEntry &entry = entries.back();
       entry.cache_string(scientific, precision);
       max_length =
         std::max(max_length,
@@ -219,7 +223,7 @@ TableHandler::start_new_row()
     while (column.second.entries.size() < max_col_length)
       {
         column.second.entries.emplace_back("");
-        internal::TableEntry &entry = column.second.entries.back();
+        const internal::TableEntry &entry = column.second.entries.back();
         entry.cache_string(column.second.scientific, column.second.precision);
         column.second.max_length =
           std::max(column.second.max_length,
@@ -275,7 +279,7 @@ TableHandler::add_column_to_supercolumn(const std::string &key,
       tex_supercaptions.insert(new_tex_supercaption);
     }
   else
-    Assert(false, ExcInternalError());
+    DEAL_II_ASSERT_UNREACHABLE();
 }
 
 
@@ -398,7 +402,7 @@ TableHandler::write_text(std::ostream &out, const TextOutputFormat format) const
   std::vector<unsigned int>   column_widths(n_cols, 0);
   for (unsigned int j = 0; j < n_cols; ++j)
     {
-      std::string                                         key = sel_columns[j];
+      const std::string                                  &key = sel_columns[j];
       const std::map<std::string, Column>::const_iterator col_iter =
         columns.find(key);
       Assert(col_iter != columns.end(), ExcInternalError());
@@ -476,7 +480,7 @@ TableHandler::write_text(std::ostream &out, const TextOutputFormat format) const
           // header for each column. enumerate columns starting with 1
           for (unsigned int j = 0; j < n_cols; ++j)
             {
-              std::string key = sel_columns[j];
+              const std::string &key = sel_columns[j];
               out << "# " << j + 1 << ": " << key << '\n';
             }
           break;
@@ -561,7 +565,7 @@ TableHandler::write_text(std::ostream &out, const TextOutputFormat format) const
         }
 
       default:
-        Assert(false, ExcInternalError());
+        DEAL_II_ASSERT_UNREACHABLE();
     }
 
 
@@ -687,7 +691,7 @@ TableHandler::write_tex(std::ostream &out, const bool with_header) const
 
       for (unsigned int j = 0; j < n_cols; ++j)
         {
-          std::string key = sel_columns[j];
+          const std::string &key = sel_columns[j];
           // avoid `column[key]'
           const std::map<std::string, Column>::const_iterator col_iter =
             columns.find(key);
@@ -702,7 +706,8 @@ TableHandler::write_tex(std::ostream &out, const bool with_header) const
           else
             out.setf(std::ios::fixed, std::ios::floatfield);
 
-          std::visit([&out](auto &v) { out << v; }, column.entries[i].value);
+          std::visit([&out](const auto &v) { out << v; },
+                     column.entries[i].value);
 
           if (j < n_cols - 1)
             out << " & ";
@@ -748,13 +753,16 @@ TableHandler::n_rows() const
   std::map<std::string, Column>::const_iterator col_iter = columns.begin();
   unsigned int n = col_iter->second.entries.size();
 
-#ifdef DEBUG
-  std::string first_name = col_iter->first;
-  for (++col_iter; col_iter != columns.end(); ++col_iter)
-    Assert(col_iter->second.entries.size() == n,
-           ExcWrongNumberOfDataEntries(
-             col_iter->first, col_iter->second.entries.size(), first_name, n));
-#endif
+  if constexpr (running_in_debug_mode())
+    {
+      std::string first_name = col_iter->first;
+      for (++col_iter; col_iter != columns.end(); ++col_iter)
+        Assert(col_iter->second.entries.size() == n,
+               ExcWrongNumberOfDataEntries(col_iter->first,
+                                           col_iter->second.entries.size(),
+                                           first_name,
+                                           n));
+    }
 
   return n;
 }

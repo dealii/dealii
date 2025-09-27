@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2002 - 2022 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2002 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 #ifndef dealii_fe_dgp_nonparametric_h
 #define dealii_fe_dgp_nonparametric_h
@@ -58,7 +57,7 @@ DEAL_II_NAMESPACE_OPEN
  * <h4>$P_0$ element</h4>
  *
  * <table> <tr> <td align="center">
- * @image html http://www.dealii.org/images/shape-functions/DGPNonparametric/P1/P1_DGPNonparametric_shape0000.png
+ * @image html http://dealii.org/images/shape-functions/DGPNonparametric/P1/P1_DGPNonparametric_shape0000.png
  * </td>
  *
  * <td align="center"> </td> </tr> <tr> <td align="center"> $P_0$ element,
@@ -69,17 +68,17 @@ DEAL_II_NAMESPACE_OPEN
  * <h4>$P_1$ element</h4>
  *
  * <table> <tr> <td align="center">
- * @image html http://www.dealii.org/images/shape-functions/DGPNonparametric/P1/P1_DGPNonparametric_shape0000.png
+ * @image html http://dealii.org/images/shape-functions/DGPNonparametric/P1/P1_DGPNonparametric_shape0000.png
  * </td>
  *
  * <td align="center">
- * @image html http://www.dealii.org/images/shape-functions/DGPNonparametric/P1/P1_DGPNonparametric_shape0001.png
+ * @image html http://dealii.org/images/shape-functions/DGPNonparametric/P1/P1_DGPNonparametric_shape0001.png
  * </td> </tr> <tr> <td align="center"> $P_1$ element, shape function 0 </td>
  *
  * <td align="center"> $P_1$ element, shape function 1 </td> </tr>
  *
  * <tr> <td align="center">
- * @image html http://www.dealii.org/images/shape-functions/DGPNonparametric/P1/P1_DGPNonparametric_shape0002.png
+ * @image html http://dealii.org/images/shape-functions/DGPNonparametric/P1/P1_DGPNonparametric_shape0002.png
  * </td>
  *
  * <td align="center"> </td> </tr> <tr> <td align="center"> $P_1$ element,
@@ -91,31 +90,31 @@ DEAL_II_NAMESPACE_OPEN
  * <h4>$P_2$ element</h4>
  *
  * <table> <tr> <td align="center">
- * @image html http://www.dealii.org/images/shape-functions/DGPNonparametric/P2/P2_DGPNonparametric_shape0000.png
+ * @image html http://dealii.org/images/shape-functions/DGPNonparametric/P2/P2_DGPNonparametric_shape0000.png
  * </td>
  *
  * <td align="center">
- * @image html http://www.dealii.org/images/shape-functions/DGPNonparametric/P2/P2_DGPNonparametric_shape0001.png
+ * @image html http://dealii.org/images/shape-functions/DGPNonparametric/P2/P2_DGPNonparametric_shape0001.png
  * </td> </tr> <tr> <td align="center"> $P_2$ element, shape function 0 </td>
  *
  * <td align="center"> $P_2$ element, shape function 1 </td> </tr>
  *
  * <tr> <td align="center">
- * @image html http://www.dealii.org/images/shape-functions/DGPNonparametric/P2/P2_DGPNonparametric_shape0002.png
+ * @image html http://dealii.org/images/shape-functions/DGPNonparametric/P2/P2_DGPNonparametric_shape0002.png
  * </td>
  *
  * <td align="center">
- * @image html http://www.dealii.org/images/shape-functions/DGPNonparametric/P2/P2_DGPNonparametric_shape0003.png
+ * @image html http://dealii.org/images/shape-functions/DGPNonparametric/P2/P2_DGPNonparametric_shape0003.png
  * </td> </tr> <tr> <td align="center"> $P_2$ element, shape function 2 </td>
  *
  * <td align="center"> $P_2$ element, shape function 3 </td> </tr>
  *
  * <tr> <td align="center">
- * @image html http://www.dealii.org/images/shape-functions/DGPNonparametric/P2/P2_DGPNonparametric_shape0004.png
+ * @image html http://dealii.org/images/shape-functions/DGPNonparametric/P2/P2_DGPNonparametric_shape0004.png
  * </td>
  *
  * <td align="center">
- * @image html http://www.dealii.org/images/shape-functions/DGPNonparametric/P2/P2_DGPNonparametric_shape0005.png
+ * @image html http://dealii.org/images/shape-functions/DGPNonparametric/P2/P2_DGPNonparametric_shape0005.png
  * </td> </tr> <tr> <td align="center"> $P_2$ element, shape function 4 </td>
  *
  * <td align="center"> $P_2$ element, shape function 5 </td> </tr> </table>
@@ -124,128 +123,128 @@ DEAL_II_NAMESPACE_OPEN
  * <h4>$P_3$ element</h4>
  *
  * <table> <tr> <td align="center">
- * @image html http://www.dealii.org/images/shape-functions/DGPNonparametric/P3/P3_DGPNonparametric_shape0000.png
+ * @image html http://dealii.org/images/shape-functions/DGPNonparametric/P3/P3_DGPNonparametric_shape0000.png
  * </td>
  *
  * <td align="center">
- * @image html http://www.dealii.org/images/shape-functions/DGPNonparametric/P3/P3_DGPNonparametric_shape0001.png
+ * @image html http://dealii.org/images/shape-functions/DGPNonparametric/P3/P3_DGPNonparametric_shape0001.png
  * </td> </tr> <tr> <td align="center"> $P_3$ element, shape function 0 </td>
  *
  * <td align="center"> $P_3$ element, shape function 1 </td> </tr>
  *
  * <tr> <td align="center">
- * @image html http://www.dealii.org/images/shape-functions/DGPNonparametric/P3/P3_DGPNonparametric_shape0002.png
+ * @image html http://dealii.org/images/shape-functions/DGPNonparametric/P3/P3_DGPNonparametric_shape0002.png
  * </td>
  *
  * <td align="center">
- * @image html http://www.dealii.org/images/shape-functions/DGPNonparametric/P3/P3_DGPNonparametric_shape0003.png
+ * @image html http://dealii.org/images/shape-functions/DGPNonparametric/P3/P3_DGPNonparametric_shape0003.png
  * </td> </tr> <tr> <td align="center"> $P_3$ element, shape function 2 </td>
  *
  * <td align="center"> $P_3$ element, shape function 3 </td> </tr>
  *
  * <tr> <td align="center">
- * @image html http://www.dealii.org/images/shape-functions/DGPNonparametric/P3/P3_DGPNonparametric_shape0004.png
+ * @image html http://dealii.org/images/shape-functions/DGPNonparametric/P3/P3_DGPNonparametric_shape0004.png
  * </td>
  *
  * <td align="center">
- * @image html http://www.dealii.org/images/shape-functions/DGPNonparametric/P3/P3_DGPNonparametric_shape0005.png
+ * @image html http://dealii.org/images/shape-functions/DGPNonparametric/P3/P3_DGPNonparametric_shape0005.png
  * </td> </tr> <tr> <td align="center"> $P_3$ element, shape function 4 </td>
  *
  * <td align="center"> $P_3$ element, shape function 5 </td> </tr>
  *
  * <tr> <td align="center">
- * @image html http://www.dealii.org/images/shape-functions/DGPNonparametric/P3/P3_DGPNonparametric_shape0006.png
+ * @image html http://dealii.org/images/shape-functions/DGPNonparametric/P3/P3_DGPNonparametric_shape0006.png
  * </td>
  *
  * <td align="center">
- * @image html http://www.dealii.org/images/shape-functions/DGPNonparametric/P3/P3_DGPNonparametric_shape0007.png
+ * @image html http://dealii.org/images/shape-functions/DGPNonparametric/P3/P3_DGPNonparametric_shape0007.png
  * </td> </tr> <tr> <td align="center"> $P_3$ element, shape function 6 </td>
  *
  * <td align="center"> $P_3$ element, shape function 7 </td> </tr>
  *
  * <tr> <td align="center">
- * @image html http://www.dealii.org/images/shape-functions/DGPNonparametric/P3/P3_DGPNonparametric_shape0008.png
+ * @image html http://dealii.org/images/shape-functions/DGPNonparametric/P3/P3_DGPNonparametric_shape0008.png
  * </td>
  *
  * <td align="center">
- * @image html http://www.dealii.org/images/shape-functions/DGPNonparametric/P3/P3_DGPNonparametric_shape0009.png
+ * @image html http://dealii.org/images/shape-functions/DGPNonparametric/P3/P3_DGPNonparametric_shape0009.png
  * </td> </tr> <tr> <td align="center"> $P_3$ element, shape function 8 </td>
  *
  * <td align="center"> $P_3$ element, shape function 9 </td> </tr> </table>
  *
  *
  * <h4>$P_4$ element</h4> <table> <tr> <td align="center">
- * @image html http://www.dealii.org/images/shape-functions/DGPNonparametric/P4/P4_DGPNonparametric_shape0000.png
+ * @image html http://dealii.org/images/shape-functions/DGPNonparametric/P4/P4_DGPNonparametric_shape0000.png
  * </td>
  *
  * <td align="center">
- * @image html http://www.dealii.org/images/shape-functions/DGPNonparametric/P4/P4_DGPNonparametric_shape0001.png
+ * @image html http://dealii.org/images/shape-functions/DGPNonparametric/P4/P4_DGPNonparametric_shape0001.png
  * </td> </tr> <tr> <td align="center"> $P_4$ element, shape function 0 </td>
  *
  * <td align="center"> $P_4$ element, shape function 1 </td> </tr>
  *
  * <tr> <td align="center">
- * @image html http://www.dealii.org/images/shape-functions/DGPNonparametric/P4/P4_DGPNonparametric_shape0002.png
+ * @image html http://dealii.org/images/shape-functions/DGPNonparametric/P4/P4_DGPNonparametric_shape0002.png
  * </td>
  *
  * <td align="center">
- * @image html http://www.dealii.org/images/shape-functions/DGPNonparametric/P4/P4_DGPNonparametric_shape0003.png
+ * @image html http://dealii.org/images/shape-functions/DGPNonparametric/P4/P4_DGPNonparametric_shape0003.png
  * </td> </tr> <tr> <td align="center"> $P_4$ element, shape function 2 </td>
  *
  * <td align="center"> $P_4$ element, shape function 3 </td> </tr>
  *
  * <tr> <td align="center">
- * @image html http://www.dealii.org/images/shape-functions/DGPNonparametric/P4/P4_DGPNonparametric_shape0004.png
+ * @image html http://dealii.org/images/shape-functions/DGPNonparametric/P4/P4_DGPNonparametric_shape0004.png
  * </td>
  *
  * <td align="center">
- * @image html http://www.dealii.org/images/shape-functions/DGPNonparametric/P4/P4_DGPNonparametric_shape0005.png
+ * @image html http://dealii.org/images/shape-functions/DGPNonparametric/P4/P4_DGPNonparametric_shape0005.png
  * </td> </tr> <tr> <td align="center"> $P_4$ element, shape function 4 </td>
  *
  * <td align="center"> $P_4$ element, shape function 5 </td> </tr>
  *
  * <tr> <td align="center">
- * @image html http://www.dealii.org/images/shape-functions/DGPNonparametric/P4/P4_DGPNonparametric_shape0006.png
+ * @image html http://dealii.org/images/shape-functions/DGPNonparametric/P4/P4_DGPNonparametric_shape0006.png
  * </td>
  *
  * <td align="center">
- * @image html http://www.dealii.org/images/shape-functions/DGPNonparametric/P4/P4_DGPNonparametric_shape0007.png
+ * @image html http://dealii.org/images/shape-functions/DGPNonparametric/P4/P4_DGPNonparametric_shape0007.png
  * </td> </tr> <tr> <td align="center"> $P_4$ element, shape function 6 </td>
  *
  * <td align="center"> $P_4$ element, shape function 7 </td> </tr>
  *
  * <tr> <td align="center">
- * @image html http://www.dealii.org/images/shape-functions/DGPNonparametric/P4/P4_DGPNonparametric_shape0008.png
+ * @image html http://dealii.org/images/shape-functions/DGPNonparametric/P4/P4_DGPNonparametric_shape0008.png
  * </td>
  *
  * <td align="center">
- * @image html http://www.dealii.org/images/shape-functions/DGPNonparametric/P4/P4_DGPNonparametric_shape0009.png
+ * @image html http://dealii.org/images/shape-functions/DGPNonparametric/P4/P4_DGPNonparametric_shape0009.png
  * </td> </tr> <tr> <td align="center"> $P_4$ element, shape function 8 </td>
  *
  * <td align="center"> $P_4$ element, shape function 9 </td> </tr>
  *
  * <tr> <td align="center">
- * @image html http://www.dealii.org/images/shape-functions/DGPNonparametric/P4/P4_DGPNonparametric_shape0010.png
+ * @image html http://dealii.org/images/shape-functions/DGPNonparametric/P4/P4_DGPNonparametric_shape0010.png
  * </td>
  *
  * <td align="center">
- * @image html http://www.dealii.org/images/shape-functions/DGPNonparametric/P4/P4_DGPNonparametric_shape0011.png
+ * @image html http://dealii.org/images/shape-functions/DGPNonparametric/P4/P4_DGPNonparametric_shape0011.png
  * </td> </tr> <tr> <td align="center"> $P_4$ element, shape function 10 </td>
  *
  * <td align="center"> $P_4$ element, shape function 11 </td> </tr>
  *
  * <tr> <td align="center">
- * @image html http://www.dealii.org/images/shape-functions/DGPNonparametric/P4/P4_DGPNonparametric_shape0012.png
+ * @image html http://dealii.org/images/shape-functions/DGPNonparametric/P4/P4_DGPNonparametric_shape0012.png
  * </td>
  *
  * <td align="center">
- * @image html http://www.dealii.org/images/shape-functions/DGPNonparametric/P4/P4_DGPNonparametric_shape0013.png
+ * @image html http://dealii.org/images/shape-functions/DGPNonparametric/P4/P4_DGPNonparametric_shape0013.png
  * </td> </tr> <tr> <td align="center"> $P_4$ element, shape function 12 </td>
  *
  * <td align="center"> $P_4$ element, shape function 13 </td> </tr>
  *
  * <tr> <td align="center">
- * @image html http://www.dealii.org/images/shape-functions/DGPNonparametric/P4/P4_DGPNonparametric_shape0014.png
+ * @image html http://dealii.org/images/shape-functions/DGPNonparametric/P4/P4_DGPNonparametric_shape0014.png
  * </td>
  *
  * <td align="center"> </td> </tr> <tr> <td align="center"> $P_4$ element,

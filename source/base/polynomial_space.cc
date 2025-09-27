@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2002 - 2020 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2002 - 2024 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/polynomial_space.h>
@@ -74,7 +73,7 @@ PolynomialSpace<2>::compute_index(const unsigned int i) const
     else
       k += n_1d - iy;
 
-  Assert(false, ExcInternalError());
+  DEAL_II_ASSERT_UNREACHABLE();
   return {{numbers::invalid_unsigned_int, numbers::invalid_unsigned_int}};
 }
 
@@ -104,7 +103,7 @@ PolynomialSpace<3>::compute_index(const unsigned int i) const
       else
         k += n_1d - iy - iz;
 
-  Assert(false, ExcInternalError());
+  DEAL_II_ASSERT_UNREACHABLE();
   return {{numbers::invalid_unsigned_int, numbers::invalid_unsigned_int}};
 }
 
@@ -134,7 +133,7 @@ PolynomialSpace<dim>::compute_value(const unsigned int i,
   // directions
   double result = 1.;
   for (unsigned int d = 0; d < dim; ++d)
-    result *= polynomials[ix[d]].value(p(d));
+    result *= polynomials[ix[d]].value(p[d]);
   return result;
 }
 
@@ -155,7 +154,7 @@ PolynomialSpace<dim>::compute_grad(const unsigned int i,
   std::vector<double> v(2);
   for (unsigned int d = 0; d < dim; ++d)
     {
-      polynomials[ix[d]].value(p(d), v);
+      polynomials[ix[d]].value(p[d], v);
       result[d] *= v[1];
       for (unsigned int d1 = 0; d1 < dim; ++d1)
         if (d1 != d)
@@ -182,7 +181,7 @@ PolynomialSpace<dim>::compute_grad_grad(const unsigned int i,
   std::vector<double> v(3);
   for (unsigned int d = 0; d < dim; ++d)
     {
-      polynomials[ix[d]].value(p(d), v);
+      polynomials[ix[d]].value(p[d], v);
       result[d][d] *= v[2];
       for (unsigned int d1 = 0; d1 < dim; ++d1)
         {
@@ -263,7 +262,7 @@ PolynomialSpace<dim>::evaluate(
     for (unsigned int i = 0; i < v.size()[1]; ++i)
       {
         v(d, i).resize(v_size, 0.);
-        polynomials[i].value(p(d), v(d, i));
+        polynomials[i].value(p[d], v(d, i));
       }
 
   if (update_values)

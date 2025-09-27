@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2001 - 2021 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2001 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 #ifndef dealii_matrix_out_h
 #  define dealii_matrix_out_h
@@ -51,12 +50,15 @@ DEAL_II_NAMESPACE_OPEN
  *
  *   // now write out M:
  *   MatrixOut matrix_out;
- *   std::ofstream out ("M.gnuplot");
+ *   std::ofstream out ("M.vtu");
  *   matrix_out.build_patches (M, "M");
- *   matrix_out.write_gnuplot (out);
+ *   matrix_out.write_vtu (out);
  * @endcode
- * Of course, you can as well choose a different graphical output format.
- * Also, this class supports any matrix, not only of type FullMatrix, as long
+ * Of course, you can as well choose a different graphical output format:
+ * all of the formats implemented by the DataOutInterface functions are also
+ * supported by this class.
+ *
+ * This class supports any matrix, not only of type FullMatrix, as long
  * as it satisfies a number of requirements, stated with the member functions
  * of this class.
  *
@@ -84,7 +86,11 @@ public:
   {
     /**
      * If @p true, only show the absolute values of the matrix entries, rather
-     * than their true values including the sign. Default value is @p false.
+     * than their true values including the sign. This is useful if you have
+     * matrix entries that span a large range and want to display their
+     * magnitude using a logarithmic scale.
+     *
+     * The default value is @p false.
      */
     bool show_absolute_values;
 
@@ -95,14 +101,49 @@ public:
      * shall be (in rows/columns). For example, if it is two, then always four
      * entries are collated into one.
      *
-     * Default value is one.
+     * The default value is one.
      */
     unsigned int block_size;
 
     /**
-     * If true, plot discontinuous patches, one for each entry.
+     * By default, this class shows each matrix entry as one value,
+     * and then produces a bilinear display of all of these
+     * values. This results in a continuous plot on a mesh with
+     * $N\times N$ vertices for a matrix of size $N$. If, on the other
+     * hand, the current variable is set to `true`, then this class
+     * instead creates a plot in which each matrix entry corresponds
+     * to a single patch on which the value of the matrix entry is
+     * shown as a constant function. This creates a discontinuous plot
+     * with $N\times N$ cells on a mesh of size $(N+1)\times(N+1)$.
+     *
+     * The default value is false.
      */
     bool discontinuous;
+
+    /**
+     * If this flag is set to `false`, the MatrixOut class creates
+     * a plot in which each matrix
+     * entry is actually shown, even if it is zero. For large
+     * matrices, this results in very large output files, or indeed
+     * exhausts the available memory. On the other hand, if the
+     * current flags is set to `true`, then the class only outputs
+     * patches whenever there are non-zero matrix entries to be
+     * shown. For sparse matrices, this leads to an output size that
+     * is proportional to the number of nonzero entries, rather than
+     * proportional to $N^2$.
+     *
+     * The default is `true`.
+     *
+     * @note Internally, the current implementation continues to loop
+     *   over all matrix entries, whether they are zero or not. As a
+     *   consequence, the *run time* of outputting sparse matrices
+     *   continues to be proportional to $N^2$, rather than proportional
+     *   to the number of nonzero entries. For large matrices, this means
+     *   that you still have to have patience -- but at least it is possible
+     *   to output information about matrices of size $10,000\times 10,000$
+     *   or $50,000\times 50,000$ with a few million nonzero entries.
+     */
+    bool create_sparse_plot;
 
     /**
      * Default constructor. Set all elements of this structure to their
@@ -110,7 +151,8 @@ public:
      */
     Options(const bool         show_absolute_values = false,
             const unsigned int block_size           = 1,
-            const bool         discontinuous        = false);
+            const bool         discontinuous        = false,
+            const bool         create_sparse_plot   = true);
   };
 
   /**
@@ -124,8 +166,9 @@ public:
    * been built, you can use the functions of the base class to write the data
    * into a files, using one of the supported output formats.
    *
-   * You may give a structure holding various options. See the description of
-   * the fields of this structure for more information.
+   * The last argument provides customization choices for how output
+   * is to be produced. See the description of the fields of the
+   * Options structure for more information.
    *
    * Note that this function requires that we can extract elements of the
    * matrix, which is done using the get_element() function declared in an
@@ -139,7 +182,7 @@ public:
   void
   build_patches(const Matrix      &matrix,
                 const std::string &name,
-                const Options      options = Options(false, 1, false));
+                const Options      options = Options());
 
 private:
   /**
@@ -326,29 +369,80 @@ MatrixOut::build_patches(const Matrix      &matrix,
                          const std::string &name,
                          const Options      options)
 {
-  size_type gridpoints_x = (matrix.n() / options.block_size +
-                            (matrix.n() % options.block_size != 0 ? 1 : 0)),
-            gridpoints_y = (matrix.m() / options.block_size +
-                            (matrix.m() % options.block_size != 0 ? 1 : 0));
+  size_type n_patches_x = (matrix.n() / options.block_size +
+                           (matrix.n() % options.block_size != 0 ? 1 : 0)),
+            n_patches_y = (matrix.m() / options.block_size +
+                           (matrix.m() % options.block_size != 0 ? 1 : 0));
 
   // If continuous, the number of
   // plotted patches is matrix size-1
   if (!options.discontinuous)
     {
-      --gridpoints_x;
-      --gridpoints_y;
+      --n_patches_x;
+      --n_patches_y;
     }
 
-  // first clear old data and set it
-  // to virgin state
+  const size_type n_patches =
+    (options.create_sparse_plot ?
+       [&]() {
+         size_type count = 0;
+         for (size_type i = 0; i < n_patches_y; ++i)
+           {
+             for (size_type j = 0; j < n_patches_x; ++j)
+               // Use the same logic as below to determine whether we
+               // need to output a patch, and count if we do:
+               if ((((options.discontinuous == true) &&
+                     (get_gridpoint_value(matrix, i, j, options) != 0)) ||
+                    ((options.discontinuous == false) &&
+                     ((get_gridpoint_value(matrix, i, j, options) != 0) ||
+                      (get_gridpoint_value(matrix, i + 1, j, options) != 0) ||
+                      (get_gridpoint_value(matrix, i, j + 1, options) != 0) ||
+                      (get_gridpoint_value(matrix, i + 1, j + 1, options) !=
+                       0)))))
+                 ++count;
+           }
+         return count;
+       }() :
+       n_patches_x * n_patches_y);
+
+  // first clear old data and re-set the object to a correctly sized state:
   patches.clear();
-  patches.resize((gridpoints_x) * (gridpoints_y));
+  try
+    {
+      patches.resize(n_patches);
+    }
+  catch (const std::bad_alloc &)
+    {
+      AssertThrow(false,
+                  ExcMessage("You are trying to create a graphical "
+                             "representation of a matrix that would "
+                             "requiring outputting " +
+                             (options.create_sparse_plot ?
+                                std::to_string(n_patches) :
+                                std::to_string(n_patches_x) + "x" +
+                                  std::to_string(n_patches_y)) +
+                             " patches. There is not enough memory to output " +
+                             "this many patches."));
+    }
 
   // now build the patches
   size_type index = 0;
-  for (size_type i = 0; i < gridpoints_y; ++i)
-    for (size_type j = 0; j < gridpoints_x; ++j, ++index)
+  for (size_type i = 0; i < n_patches_y; ++i)
+    for (size_type j = 0; j < n_patches_x; ++j)
       {
+        // If we are creating a sparse plot, check whether this patch
+        // would have any nonzero values. If not, we can skip the
+        // patch:
+        if (options.create_sparse_plot &&
+            (((options.discontinuous == true) &&
+              (get_gridpoint_value(matrix, i, j, options) == 0)) ||
+             ((options.discontinuous == false) &&
+              (get_gridpoint_value(matrix, i, j, options) == 0) &&
+              (get_gridpoint_value(matrix, i + 1, j, options) == 0) &&
+              (get_gridpoint_value(matrix, i, j + 1, options) == 0) &&
+              (get_gridpoint_value(matrix, i + 1, j + 1, options) == 0))))
+          continue;
+
         patches[index].n_subdivisions = 1;
         patches[index].reference_cell = ReferenceCells::Quadrilateral;
 
@@ -359,14 +453,14 @@ MatrixOut::build_patches(const Matrix      &matrix,
         // matrix, rather than perpendicular to it. this has the advantage that,
         // for example, the unit matrix is plotted as a straight ridge, rather
         // than as a series of bumps and valleys along the diagonal
-        patches[index].vertices[0](0) = j;
-        patches[index].vertices[0](1) = -static_cast<signed int>(i);
-        patches[index].vertices[1](0) = j;
-        patches[index].vertices[1](1) = -static_cast<signed int>(i + 1);
-        patches[index].vertices[2](0) = j + 1;
-        patches[index].vertices[2](1) = -static_cast<signed int>(i);
-        patches[index].vertices[3](0) = j + 1;
-        patches[index].vertices[3](1) = -static_cast<signed int>(i + 1);
+        patches[index].vertices[0][0] = j;
+        patches[index].vertices[0][1] = -static_cast<signed int>(i);
+        patches[index].vertices[1][0] = j;
+        patches[index].vertices[1][1] = -static_cast<signed int>(i + 1);
+        patches[index].vertices[2][0] = j + 1;
+        patches[index].vertices[2][1] = -static_cast<signed int>(i);
+        patches[index].vertices[3][0] = j + 1;
+        patches[index].vertices[3][1] = -static_cast<signed int>(i + 1);
         // next scale all the patch
         // coordinates by the block
         // size, to get original
@@ -399,7 +493,9 @@ MatrixOut::build_patches(const Matrix      &matrix,
             patches[index].data(0, 3) =
               get_gridpoint_value(matrix, i + 1, j + 1, options);
           }
-      };
+
+        ++index;
+      }
 
   // finally set the name
   this->name = name;

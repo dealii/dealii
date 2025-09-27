@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2001 - 2021 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2001 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 
 #include <deal.II/fe/mapping_c1.h>
@@ -32,6 +31,7 @@ MappingC1<dim, spacedim>::MappingC1()
   : MappingQ<dim, spacedim>(3)
 {
   Assert(dim > 1, ExcImpossibleInDim(dim));
+  Assert(dim == spacedim, ExcNotImplemented());
 }
 
 
@@ -157,10 +157,10 @@ MappingC1<2>::add_line_support_points(
 template <int dim, int spacedim>
 void
 MappingC1<dim, spacedim>::add_line_support_points(
-  const typename Triangulation<dim>::cell_iterator &,
-  std::vector<Point<dim>> &) const
+  const typename Triangulation<dim, spacedim>::cell_iterator &,
+  std::vector<Point<spacedim>> &) const
 {
-  Assert(false, ExcNotImplemented());
+  DEAL_II_NOT_IMPLEMENTED();
 }
 
 
@@ -192,10 +192,10 @@ MappingC1<2>::add_quad_support_points(const Triangulation<2>::cell_iterator &,
 template <int dim, int spacedim>
 void
 MappingC1<dim, spacedim>::add_quad_support_points(
-  const typename Triangulation<dim>::cell_iterator &,
-  std::vector<Point<dim>> &) const
+  const typename Triangulation<dim, spacedim>::cell_iterator &,
+  std::vector<Point<spacedim>> &) const
 {
-  Assert(false, ExcNotImplemented());
+  DEAL_II_NOT_IMPLEMENTED();
 }
 
 
@@ -210,7 +210,7 @@ MappingC1<dim, spacedim>::clone() const
 
 
 // explicit instantiations
-#include "mapping_c1.inst"
+#include "fe/mapping_c1.inst"
 
 
 DEAL_II_NAMESPACE_CLOSE

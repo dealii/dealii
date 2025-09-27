@@ -1,0 +1,22 @@
+Number of active cells: 1024
+Number of degrees of freedom: 4160 (2112+1024+1024)
+
+Timestep 1
+Solver stopped within 16 - 23 iterations
+Solver stopped within 1 - 2 iterations
+   Now at t=0.0326742, dt=0.0326742.
+
+Timestep 2
+Solver stopped within 16 - 23 iterations
+Solver stopped within 1 - 2 iterations
+   Now at t=0.0653816, dt=0.0327074.
+
+Timestep 3
+Solver stopped within 16 - 23 iterations
+Solver stopped within 1 - 2 iterations
+   Now at t=0.0980651, dt=0.0326836.
+
+Timestep 4
+Solver stopped within 16 - 23 iterations
+Solver stopped within 1 - 2 iterations
+   Now at t=0.1, dt=0.00193487.

@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2016 - 2023 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2016 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 
 #include <deal.II/distributed/tria.h>
@@ -208,7 +207,7 @@ namespace internal
 
 #ifdef DEAL_II_WITH_MPI
       if (tria && Utilities::MPI::sum(send_data_temp.size(),
-                                      tria->get_communicator()) > 0)
+                                      tria->get_mpi_communicator()) > 0)
         {
           const std::set<types::subdomain_id> &neighbors =
             tria->level_ghost_owners();
@@ -263,10 +262,8 @@ namespace internal
               AssertThrow(level_dof_indices.size() == is_ghost.n_elements(),
                           ExcMessage("Size does not match!"));
 
-              const auto index_owner =
-                Utilities::MPI::compute_index_owner(owned_level_dofs,
-                                                    is_ghost,
-                                                    tria->get_communicator());
+              const auto index_owner = Utilities::MPI::compute_index_owner(
+                owned_level_dofs, is_ghost, tria->get_mpi_communicator());
 
               AssertThrow(level_dof_indices.size() == index_owner.size(),
                           ExcMessage("Size does not match!"));
@@ -281,7 +278,7 @@ namespace internal
           // Protect the send/recv logic with a mutex:
           static Utilities::MPI::CollectiveMutex      mutex;
           Utilities::MPI::CollectiveMutex::ScopedLock lock(
-            mutex, tria->get_communicator());
+            mutex, tria->get_mpi_communicator());
 
           const int mpi_tag =
             Utilities::MPI::internal::Tags::mg_transfer_fill_copy_indices;
@@ -300,7 +297,7 @@ namespace internal
                             MPI_BYTE,
                             dest,
                             mpi_tag,
-                            tria->get_communicator(),
+                            tria->get_mpi_communicator(),
                             &*requests.rbegin());
                 AssertThrowMPI(ierr);
               }
@@ -316,7 +313,7 @@ namespace internal
                 MPI_Status status;
                 int        ierr = MPI_Probe(MPI_ANY_SOURCE,
                                      mpi_tag,
-                                     tria->get_communicator(),
+                                     tria->get_mpi_communicator(),
                                      &status);
                 AssertThrowMPI(ierr);
                 int len;
@@ -330,7 +327,7 @@ namespace internal
                                     MPI_BYTE,
                                     status.MPI_SOURCE,
                                     status.MPI_TAG,
-                                    tria->get_communicator(),
+                                    tria->get_mpi_communicator(),
                                     &status);
                     AssertThrowMPI(ierr);
                     continue;
@@ -347,7 +344,7 @@ namespace internal
                                 MPI_BYTE,
                                 status.MPI_SOURCE,
                                 status.MPI_TAG,
-                                tria->get_communicator(),
+                                tria->get_mpi_communicator(),
                                 &status);
                 AssertThrowMPI(ierr);
 
@@ -368,13 +365,14 @@ namespace internal
               AssertThrowMPI(ierr);
               requests.clear();
             }
-#  ifdef DEBUG
-          // Make sure in debug mode, that everybody sent/received all packages
-          // on this level. If a deadlock occurs here, the list of expected
-          // senders is not computed correctly.
-          const int ierr = MPI_Barrier(tria->get_communicator());
-          AssertThrowMPI(ierr);
-#  endif
+          if constexpr (running_in_debug_mode())
+            {
+              // Make sure in debug mode, that everybody sent/received all
+              // packages on this level. If a deadlock occurs here, the list of
+              // expected senders is not computed correctly.
+              const int ierr = MPI_Barrier(tria->get_mpi_communicator());
+              AssertThrowMPI(ierr);
+            }
         }
 #endif
 
@@ -637,6 +635,40 @@ namespace internal
       dirichlet_indices.clear();
       weights_on_refined.clear();
 
+      if constexpr (running_in_debug_mode())
+        {
+          if (mg_constrained_dofs)
+            {
+              const unsigned int n_levels =
+                dof_handler.get_triangulation().n_global_levels();
+
+              for (unsigned int l = 0; l < n_levels; ++l)
+                {
+                  const auto &constraints =
+                    mg_constrained_dofs->get_user_constraint_matrix(l);
+
+                  // no inhomogeneities are supported
+                  AssertDimension(constraints.n_inhomogeneities(), 0);
+
+                  for (const auto dof : constraints.get_local_lines())
+                    {
+                      const auto *entries_ptr =
+                        constraints.get_constraint_entries(dof);
+
+                      if (entries_ptr == nullptr)
+                        continue;
+
+                      // only homogeneous or identity constraints are supported
+                      Assert((entries_ptr->size() == 0) ||
+                               ((entries_ptr->size() == 1) &&
+                                (std::abs((*entries_ptr)[0].second - 1.) <
+                                 100 * std::numeric_limits<double>::epsilon())),
+                             ExcNotImplemented());
+                    }
+                }
+            }
+        }
+
       // we collect all child DoFs of a mother cell together. For faster
       // tensorized operations, we align the degrees of freedom
       // lexicographically. We distinguish FE_Q elements and FE_DGQ elements
@@ -891,7 +923,7 @@ namespace internal
                                    external_partitioners.empty() ?
                                      nullptr :
                                      external_partitioners[level],
-                                   tria.get_communicator(),
+                                   tria.get_mpi_communicator(),
                                    target_partitioners[level],
                                    copy_indices_global_mine[level]);
 
@@ -910,7 +942,7 @@ namespace internal
                                        external_partitioners.empty() ?
                                          nullptr :
                                          external_partitioners[0],
-                                       tria.get_communicator(),
+                                       tria.get_mpi_communicator(),
                                        target_partitioners[0],
                                        copy_indices_global_mine[0]);
 
@@ -1000,6 +1032,6 @@ namespace internal
 
 // Explicit instantiations
 
-#include "mg_transfer_internal.inst"
+#include "multigrid/mg_transfer_internal.inst"
 
 DEAL_II_NAMESPACE_CLOSE

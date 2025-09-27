@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2021 - 2022 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2021 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 
 
@@ -24,7 +23,7 @@
 #include "../tests.h"
 
 void
-test(const unsigned int orientation)
+test(const types::geometric_orientation orientation)
 {
   const unsigned int face_no = 0;
 
@@ -44,11 +43,11 @@ test(const unsigned int orientation)
   }
 
   {
-    const auto &face = dummy.begin()->face(face_no);
+    const auto &face                = dummy.begin()->face(face_no);
+    const auto  face_reference_cell = face->reference_cell();
     const auto  permuted =
-      ReferenceCell(ReferenceCells::Triangle)
-        .permute_according_orientation(std::array<unsigned int, 3>{{0, 1, 2}},
-                                       orientation);
+      ReferenceCells::Triangle.permute_according_orientation(
+        std::array<unsigned int, 3>{{0, 1, 2}}, orientation);
 
     auto direction =
       cross_product_3d(vertices[permuted[1]] - vertices[permuted[0]],
@@ -58,13 +57,10 @@ test(const unsigned int orientation)
     vertices.push_back(face->center() + direction);
 
     CellData<3> cell;
-    cell.vertices.resize(4);
-
-    cell.vertices[permuted[0]] = face->vertex_index(0);
-    cell.vertices[permuted[1]] = face->vertex_index(1);
-    cell.vertices[permuted[2]] = face->vertex_index(2);
-    cell.vertices[3]           = 4;
-
+    cell.vertices    = {face->vertex_index(permuted[0]),
+                        face->vertex_index(permuted[1]),
+                        face->vertex_index(permuted[2]),
+                        4};
     cell.material_id = 1;
     cells.push_back(cell);
   }
@@ -75,7 +71,7 @@ test(const unsigned int orientation)
   cell++;
 
   // check orientation
-  deallog << "face orientation: " << orientation << ' '
+  deallog << "face orientation: " << int(orientation) << ' '
           << int(cell->combined_face_orientation(0)) << ' ' << std::endl;
 
   // check vertices

@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2006 - 2023 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2009 - 2024 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 
 #ifndef dealii_mesh_worker_local_results_h
@@ -35,147 +34,6 @@ DEAL_II_NAMESPACE_OPEN
 class BlockIndices;
 #endif
 
-/**
- * A collection of functions and classes for the mesh loops that are an
- * ubiquitous part of each finite element program.
- *
- * The workhorse of this namespace is the loop() function, which implements a
- * completely generic loop over all mesh cells. Since the calls to loop() are
- * error-prone due to its generality, for many applications it is advisable to
- * derive a class from MeshWorker::LocalIntegrator and use the less general
- * integration_loop() instead.
- *
- * The loop() depends on certain objects handed to it as arguments. These
- * objects are of two types, @p info objects like DoFInfo and IntegrationInfo and
- * worker objects like LocalWorker and IntegrationWorker.
- *
- * Worker objects usually do two different jobs: first, they compute the local
- * contribution of a cell or face to the global operation. Second, they
- * assemble this local contribution into the global result, whether a
- * functional, a form or a bilinear form. While the first job is particular to
- * the problem being solved, the second is generic and only depends on the
- * data structures. Therefore, base classes for workers assembling into global
- * data are provided in the namespace Assembler.
- *
- * <h3>Template argument types</h3>
- *
- * The functions loop() and cell_action() take some arguments which are
- * template parameters. Let us list the minimum requirements for these classes
- * here and describe their properties.
- *
- * <h4>ITERATOR</h4>
- *
- * Any object that has an <tt>operator++()</tt> and points to a
- * TriaAccessor or derived class.
- *
- * <h4>DOFINFO</h4>
- *
- * For an example implementation, refer to the class template DoFInfo. In
- * order to work with cell_action() and loop(), DOFINFO needs to follow the
- * following interface.
- * @code
- * class DOFINFO
- * {
- *   private:
- *     DOFINFO();
- *     DOFINFO(const DOFINFO&);
- *     DOFINFO& operator=(const DOFINFO&);
- *
- *   public:
- *     template <class CellIt>
- *     void reinit(const CellIt& c);
- *
- *     template <class CellIt, class FaceIt>
- *     void reinit(const CellIt& c, const FaceIt& f, const unsigned int n);
- *
- *     template <class CellIt, class FaceIt>
- *     void reinit(const CellIt& c, const FaceIt& f, const unsigned int n,
- *                 const unsigned int s);
- *
- *   friend template class DoFInfoBox<int dim, DOFINFO>;
- * };
- * @endcode
- *
- * The three private functions are called by DoFInfoBox and should not be
- * needed elsewhere. Obviously, they can be made public and then the friend
- * declaration at the end may be missing.
- *
- * Additionally, you will need at least one public constructor. Furthermore
- * DOFINFO is pretty useless yet: functions to interface with INTEGRATIONINFO
- * and ASSEMBLER are needed.
- *
- * DOFINFO objects are gathered in a DoFInfoBox. In those objects, we store
- * the results of local operations on each cell and its faces. Once all this
- * information has been gathered, an ASSEMBLER is used to assemble it into
- * global data.
- *
- * <h4>INFOBOX</h4>
- *
- * This type is exemplified in IntegrationInfoBox. It collects the input data
- * for actions on cells and faces in INFO objects (see below). It provides the
- * following interface to loop() and cell_action():
- *
- * @code
- * class INFOBOX
- * {
- *   public:
- *     template <int dim, class DOFINFO>
- *     void post_cell(const DoFInfoBox<dim, DOFINFO>&);
- *
- *     template <int dim, class DOFINFO>
- *     void post_faces(const DoFInfoBox<dim, DOFINFO>&);
- *
- *     INFO cell;
- *     INFO boundary;
- *     INFO face;
- *     INFO subface;
- *     INFO neighbor;
- * };
- * @endcode
- *
- * The main purpose of this class is gathering the five INFO objects, which
- * contain the temporary data used on each cell or face. The requirements on
- * these objects are listed below. Here, we only note that there need to be
- * these 5 objects with the names listed above.
- *
- * The two function templates are call back functions called in cell_action().
- * The first is called before the faces are worked on, the second after the
- * faces.
- *
- * <h4>INFO</h4>
- *
- * See IntegrationInfo for an example of these objects. They contain the
- * temporary data needed on each cell or face to compute the result. The
- * MeshWorker only uses the interface
- *
- * @code
- * class INFO
- * {
- *   public:
- *     void reinit(const DOFINFO& i);
- * };
- * @endcode
- *
- * <h3>Simplified interfaces</h3>
- *
- * Since the loop() is fairly general, a specialization integration_loop() is
- * available, which is a wrapper around loop() with a simplified interface.
- *
- * The integration_loop() function loop takes most of the information that it
- * needs to pass to loop() from an IntegrationInfoBox object. Its use is
- * explained in step-12, but in short it requires functions that do the local
- * integration on a cell, interior or boundary face, and it needs an object
- * (called "assembler") that copies these local contributions into the global
- * matrix and right hand side objects.
- *
- * Before we can run the integration loop, we have to initialize several data
- * structures in our IntegrationWorker and assembler objects. For instance, we
- * have to decide on the quadrature rule or we may need more than the default
- * update flags.
- *
- * @ingroup MeshWorker
- * @ingroup Integrators
- */
 namespace MeshWorker
 {
   /**

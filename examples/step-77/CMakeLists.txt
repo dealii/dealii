@@ -23,7 +23,7 @@ set(TARGET_SRC
 
 cmake_minimum_required(VERSION 3.13.4)
 
-find_package(deal.II 9.6.0
+find_package(deal.II 9.8.0
   HINTS ${deal.II_DIR} ${DEAL_II_DIR} ../ ../../ $ENV{DEAL_II_DIR}
   )
 if(NOT ${deal.II_FOUND})
@@ -34,7 +34,7 @@ if(NOT ${deal.II_FOUND})
     )
 endif()
 
-if(NOT DEAL_II_WITH_SUNDIALS) # keep in one line
+if(NOT DEAL_II_WITH_SUNDIALS)
   message(FATAL_ERROR "
 Error! This tutorial requires a deal.II library that was configured with the following options:
     DEAL_II_WITH_SUNDIALS = ON

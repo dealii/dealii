@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2023 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2023 - 2024 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 /*
  * Test the NonMatching::MappingInfo class together with FEPointEvaluation and
@@ -38,7 +37,6 @@
 
 #include "../tests.h"
 
-using namespace dealii;
 
 template <int dim>
 void
@@ -183,10 +181,10 @@ test(const bool filtered_compression)
   FEPointEvaluation<1, dim, dim, double> fe_point_cell(mapping_info_cell, fe_q);
   FEPointEvaluation<1, dim, dim, double> fe_point_surface(mapping_info_surface,
                                                           fe_q);
-  FEPointEvaluation<1, dim, dim, double> fe_point_faces_m(mapping_info_faces,
-                                                          fe_q);
-  FEPointEvaluation<1, dim, dim, double> fe_point_faces_p(mapping_info_faces,
-                                                          fe_q);
+  FEFacePointEvaluation<1, dim, dim, double> fe_point_faces_m(
+    mapping_info_faces, fe_q);
+  FEFacePointEvaluation<1, dim, dim, double> fe_point_faces_p(
+    mapping_info_faces, fe_q);
 
   std::vector<double> solution_values_in(fe_q.dofs_per_cell);
   std::vector<double> solution_values_neighbor_in(fe_q.dofs_per_cell);

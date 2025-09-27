@@ -1,0 +1,56 @@
+// ------------------------------------------------------------------------
+//
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2013 - 2024 by the deal.II authors
+//
+// This file is part of the deal.II library.
+//
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
+//
+// ------------------------------------------------------------------------
+
+
+
+for (S : REAL_SCALARS)
+  {
+    template void internal::SolverGMRESImplementation::do_Tvmult_add<false, S>(
+      const unsigned int,
+      const std::size_t,
+      const S *,
+      const std::vector<const S *> &,
+      Vector<double> &);
+
+    template void internal::SolverGMRESImplementation::do_Tvmult_add<true, S>(
+      const unsigned int,
+      const std::size_t,
+      const S *,
+      const std::vector<const S *> &,
+      Vector<double> &);
+
+    template double
+    internal::SolverGMRESImplementation::do_subtract_and_norm<false, S>(
+      const unsigned int,
+      const std::size_t,
+      const std::vector<const S *> &,
+      const Vector<double> &,
+      S *);
+
+    template double
+    internal::SolverGMRESImplementation::do_subtract_and_norm<true, S>(
+      const unsigned int,
+      const std::size_t,
+      const std::vector<const S *> &,
+      const Vector<double> &,
+      S *);
+
+    template void internal::SolverGMRESImplementation::do_add<S>(
+      const unsigned int,
+      const std::size_t,
+      const std::vector<const S *> &,
+      const Vector<double> &,
+      const bool,
+      S *);
+  }

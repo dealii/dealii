@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2003 - 2021 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2015 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 
 #include <deal.II/base/function.h>
@@ -139,13 +138,13 @@ VectorFunction<3>::value(const Point<3> &p, const unsigned int component) const
   switch (component)
     {
       case 0:
-        val = -sin(PI * p(0)) * cos(PI * p(1)) * cos(PI * p(2));
+        val = -sin(PI * p[0]) * cos(PI * p[1]) * cos(PI * p[2]);
         break;
       case 1:
-        val = -cos(PI * p(0)) * sin(PI * p(1)) * cos(PI * p(2));
+        val = -cos(PI * p[0]) * sin(PI * p[1]) * cos(PI * p[2]);
         break;
       case 2:
-        val = 2 * cos(PI * p(0)) * cos(PI * p(1)) * sin(PI * p(2));
+        val = 2 * cos(PI * p[0]) * cos(PI * p[1]) * sin(PI * p[2]);
         break;
     }
   return val;
@@ -167,7 +166,7 @@ VectorFunction<3>::gradient(const Point<3>    &p,
 {
   const double PI = numbers::PI;
   Tensor<1, 3> val;
-  double       x = p(0), y = p(1), z = p(2);
+  double       x = p[0], y = p[1], z = p[2];
 
   switch (component)
     {
@@ -197,7 +196,7 @@ create_tria(Triangulation<3> &triangulation,
   const std::vector<Point<3>> vertices(&vertices_parallelograms[0],
                                        &vertices_parallelograms[n_vertices]);
 
-  // create grid with all possible combintations of face_flip, face_orientation
+  // create grid with all possible combinations of face_flip, face_orientation
   // and face_rotation flags
   static const int cell_vertices[][GeometryInfo<3>::vertices_per_cell] = {
     {0, 1, 9, 10, 3, 4, 12, 13},  // cell 1 standard

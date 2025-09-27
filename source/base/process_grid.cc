@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2017 - 2023 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2017 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 #include <deal.II/base/process_grid.h>
 
@@ -72,7 +71,6 @@ namespace
     //  ++Pc;
     // but this affects the grid shape dramatically, i.e. 10 cores 3x3 becomes
     // 2x5.
-
     // limit our estimate to be in [2, Np]
     int n_process_columns = std::min(Np, std::max(2, Pc));
     // finally, get the rows:
@@ -196,12 +194,13 @@ namespace Utilities
       AssertThrowMPI(ierr);
 
       // Double check that the process with rank 0 in subgroup is active:
-#  ifdef DEBUG
-      if (mpi_communicator_inactive_with_root != MPI_COMM_NULL &&
-          Utilities::MPI::this_mpi_process(
-            mpi_communicator_inactive_with_root) == 0)
-        Assert(mpi_process_is_active, ExcInternalError());
-#  endif
+      if constexpr (running_in_debug_mode())
+        {
+          if (mpi_communicator_inactive_with_root != MPI_COMM_NULL &&
+              Utilities::MPI::this_mpi_process(
+                mpi_communicator_inactive_with_root) == 0)
+            Assert(mpi_process_is_active, ExcInternalError());
+        }
     }
 
 

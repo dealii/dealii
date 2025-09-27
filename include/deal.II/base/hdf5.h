@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2018 - 2023 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2019 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 #ifndef dealii_hdf5_h
 #define dealii_hdf5_h
@@ -62,7 +61,7 @@ DEAL_II_NAMESPACE_OPEN
  * double double_attribute = 2.2;
  * data_file.set_attribute("double_attribute", double_attribute);
  * auto group = data_file.create_group("group");
- * group.set_attribute("simulation_type", std::string("elastic_equation"));
+ * group.set_attribute("simulation_type", "elastic_equation");
  * auto dataset = group.create_dataset<double>("dataset_name", dimensions);
  * dataset.set_attribute("complex_double_attribute",
  *                       std::complex<double>(2,2.3));
@@ -194,9 +193,8 @@ DEAL_II_NAMESPACE_OPEN
  * The following code can be used to query the I/O method.
  * @code
  * auto dataset = group.create_dataset<double>("name", dimensions);
- * #ifdef DEBUG
- * dataset.set_query_io_mode(true);
- * #endif
+ * if constexpr (running_in_debug_mode())
+ *   dataset.set_query_io_mode(true);
  *
  * if (Utilities::MPI::this_mpi_process(mpi_communicator) == 0)
  *   {
@@ -1312,7 +1310,6 @@ namespace HDF5
               // Release the HDF5 resource
               const herr_t ret = H5Tclose(*pointer);
               AssertNothrow(ret >= 0, ExcInternalError());
-              (void)ret;
               delete pointer;
             });
 
@@ -1335,7 +1332,6 @@ namespace HDF5
               // Release the HDF5 resource
               const herr_t ret = H5Tclose(*pointer);
               AssertNothrow(ret >= 0, ExcInternalError());
-              (void)ret;
               delete pointer;
             });
           *t_type = H5Tcreate(H5T_COMPOUND, sizeof(std::complex<double>));
@@ -1352,7 +1348,7 @@ namespace HDF5
         }
 
       // The function should not reach this point
-      Assert(false, ExcInternalError());
+      DEAL_II_ASSERT_UNREACHABLE();
       return {};
     }
 
@@ -1657,7 +1653,7 @@ namespace HDF5
     std::string string_value(string_out);
     // The memory of the variable length string has to be freed.
     // H5Dvlen_reclaim could be also used
-    free(string_out);
+    std::free(string_out);
     ret = H5Tclose(type);
     Assert(ret >= 0, ExcInternalError());
 
@@ -2253,6 +2249,14 @@ namespace HDF5
 
 DEAL_II_NAMESPACE_CLOSE
 
+
+#else
+
+// Make sure the scripts that create the C++20 module input files have
+// something to latch on if the preprocessor #ifdef above would
+// otherwise lead to an empty content of the file.
+DEAL_II_NAMESPACE_OPEN
+DEAL_II_NAMESPACE_CLOSE
 
 #endif // DEAL_II_WITH_HDF5
 

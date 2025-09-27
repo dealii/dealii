@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2021 - 2023 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2021 - 2024 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 // Integrate surface tension on surface mesh and test the result on background
 // mesh.
@@ -46,7 +45,6 @@
 
 #include "../tests.h"
 
-using namespace dealii;
 
 
 using VectorType = LinearAlgebra::distributed::Vector<double>;
@@ -60,7 +58,7 @@ get_mpi_comm(const MeshType &mesh)
                                       MeshType::space_dimension> *>(
     &(mesh.get_triangulation()));
 
-  return tria_parallel != nullptr ? tria_parallel->get_communicator() :
+  return tria_parallel != nullptr ? tria_parallel->get_mpi_communicator() :
                                     MPI_COMM_SELF;
 }
 
@@ -266,7 +264,7 @@ compute_force_vector_sharp_interface(
   const VectorType                &curvature_vector,
   VectorType                      &force_vector)
 {
-  using T = Tensor<1, spacedim, double>;
+  using T = double;
 
   const auto integration_points = [&]() {
     std::vector<Point<spacedim>> integration_points;
@@ -332,12 +330,10 @@ compute_force_vector_sharp_interface(
 
         for (const auto q : fe_eval_dim.quadrature_point_indices())
           {
-            T result;
             for (unsigned int i = 0; i < spacedim; ++i)
-              result[i] = -curvature_values[q] * normal_values[q][i] *
-                          fe_eval.JxW(q) * surface_tension;
-
-            integration_values.push_back(result);
+              integration_values.push_back(-curvature_values[q] *
+                                           normal_values[q][i] *
+                                           fe_eval.JxW(q) * surface_tension);
           }
       }
 
@@ -373,8 +369,9 @@ compute_force_vector_sharp_interface(
           cell_data.reference_point_ptrs[i + 1] -
             cell_data.reference_point_ptrs[i]);
 
-        const ArrayView<const T> force_JxW(
-          values.data() + cell_data.reference_point_ptrs[i],
+        const ArrayView<const Tensor<1, spacedim, T>> force_JxW(
+          reinterpret_cast<const Tensor<1, spacedim, T> *>(values.data()) +
+            cell_data.reference_point_ptrs[i],
           cell_data.reference_point_ptrs[i + 1] -
             cell_data.reference_point_ptrs[i]);
 
@@ -393,7 +390,9 @@ compute_force_vector_sharp_interface(
 
   std::vector<T> buffer;
 
-  eval.template process_and_evaluate<T>(integration_values, buffer, fu);
+  eval.template process_and_evaluate<T, spacedim>(integration_values,
+                                                  buffer,
+                                                  fu);
 }
 
 

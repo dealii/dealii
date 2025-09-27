@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2021 - 2022 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2021 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 
 #ifndef dealii_base_polynomials_wedge_h
@@ -33,7 +32,7 @@ namespace internal
    * to access the right shape function within the triangle and within
    * the line.
    */
-  static const constexpr dealii::ndarray<unsigned int, 6, 2> wedge_table_1{
+  constexpr dealii::ndarray<unsigned int, 6, 2> wedge_table_1{
     {{{0, 0}}, {{1, 0}}, {{2, 0}}, {{0, 1}}, {{1, 1}}, {{2, 1}}}};
 
   /**
@@ -41,25 +40,24 @@ namespace internal
    * to access the right shape function within the triangle and within
    * the line.
    */
-  static const constexpr dealii::ndarray<unsigned int, 18, 2> wedge_table_2{
-    {{{0, 0}},
-     {{1, 0}},
-     {{2, 0}},
-     {{0, 1}},
-     {{1, 1}},
-     {{2, 1}},
-     {{3, 0}},
-     {{4, 0}},
-     {{5, 0}},
-     {{3, 1}},
-     {{4, 1}},
-     {{5, 1}},
-     {{0, 2}},
-     {{1, 2}},
-     {{2, 2}},
-     {{3, 2}},
-     {{4, 2}},
-     {{5, 2}}}};
+  constexpr dealii::ndarray<unsigned int, 18, 2> wedge_table_2{{{{0, 0}},
+                                                                {{1, 0}},
+                                                                {{2, 0}},
+                                                                {{0, 1}},
+                                                                {{1, 1}},
+                                                                {{2, 1}},
+                                                                {{3, 0}},
+                                                                {{4, 0}},
+                                                                {{5, 0}},
+                                                                {{3, 1}},
+                                                                {{4, 1}},
+                                                                {{5, 1}},
+                                                                {{0, 2}},
+                                                                {{1, 2}},
+                                                                {{2, 2}},
+                                                                {{3, 2}},
+                                                                {{4, 2}},
+                                                                {{5, 2}}}};
 } // namespace internal
 
 

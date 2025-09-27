@@ -1,17 +1,16 @@
-/* ---------------------------------------------------------------------
+/* ------------------------------------------------------------------------
  *
- * Copyright (C) 2009 - 2023 by the deal.II authors
+ * SPDX-License-Identifier: LGPL-2.1-or-later
+ * Copyright (C) 2009 - 2024 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
- * The deal.II library is free software; you can use it, redistribute
- * it, and/or modify it under the terms of the GNU Lesser General
- * Public License as published by the Free Software Foundation; either
- * version 2.1 of the License, or (at your option) any later version.
- * The full text of the license can be found in the file LICENSE.md at
- * the top level directory of deal.II.
+ * Part of the source code is dual licensed under Apache-2.0 WITH
+ * LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+ * governing the source code and code contributions can be found in
+ * LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
  *
- * ---------------------------------------------------------------------
+ * ------------------------------------------------------------------------
  *
  * Authors: Katharina Kormann, Martin Kronbichler, Uppsala University,
  * 2009-2012, updated to MPI version with parallel vectors in 2016
@@ -171,7 +170,7 @@ namespace Step37
   // making sure that only cells are worked on that do not share any degree of
   // freedom (this makes the loop thread-safe when writing into destination
   // vectors). This is a more advanced strategy compared to the WorkStream
-  // class described in the @ref threads module. Of course, to not destroy
+  // class described in the @ref threads topic. Of course, to not destroy
   // thread-safety, we have to be careful when writing into class-global
   // structures.
   //
@@ -237,10 +236,7 @@ namespace Step37
                 const std::pair<unsigned int, unsigned int> &cell_range) const;
 
     void local_compute_diagonal(
-      const MatrixFree<dim, number>               &data,
-      LinearAlgebra::distributed::Vector<number>  &dst,
-      const unsigned int                          &dummy,
-      const std::pair<unsigned int, unsigned int> &cell_range) const;
+      FEEvaluation<dim, fe_degree, fe_degree + 1, 1, number> &integrator) const;
 
     Table<2, VectorizedArray<number>> coefficient;
   };
@@ -249,9 +245,9 @@ namespace Step37
 
   // This is the constructor of the @p LaplaceOperator class. All it does is
   // to call the default constructor of the base class
-  // MatrixFreeOperators::Base, which in turn is based on the Subscriptor
-  // class that asserts that this class is not accessed after going out of scope
-  // e.g. in a preconditioner.
+  // MatrixFreeOperators::Base, which in turn is based on the
+  // EnableObserverPointer class that asserts that this class is
+  // not accessed after going out of scope e.g. in a preconditioner.
   template <int dim, int fe_degree, typename number>
   LaplaceOperator<dim, fe_degree, number>::LaplaceOperator()
     : MatrixFreeOperators::Base<dim,
@@ -516,12 +512,10 @@ namespace Step37
   // inverse_diagonal_entries of type DiagonalMatrix in the base class
   // MatrixFreeOperators::Base. This member is a shared pointer that we first
   // need to initialize and then get the vector representing the diagonal
-  // entries in the matrix. As to the actual diagonal computation, we again
-  // use the cell_loop infrastructure of MatrixFree to invoke a local worker
-  // routine called local_compute_diagonal(). Since we will only write into a
-  // vector but not have any source vector, we put a dummy argument of type
-  // <tt>unsigned int</tt> in place of the source vector to confirm with the
-  // cell_loop interface. After the loop, we need to set the vector entries
+  // entries in the matrix. As to the actual diagonal computation, we could
+  // manually write a cell_loop and invoke a local worker that applies all unit
+  // vectors on each cell. Instead, we use MatrixFreeTools::compute_diagonal()
+  // to do this for us. Afterwards, we need to set the vector entries
   // subject to Dirichlet boundary conditions to one (either those on the
   // boundary described by the AffineConstraints object inside MatrixFree or
   // the indices at the interface between different grid levels in adaptive
@@ -532,8 +526,7 @@ namespace Step37
   // form required by the Chebyshev smoother based on the Jacobi iteration. In
   // the loop, we assert that all entries are non-zero, because they should
   // either have obtained a positive contribution from integrals or be
-  // constrained and treated by @p set_constrained_entries_to_one() following
-  // cell_loop.
+  // constrained and treated by @p set_constrained_entries_to_one().
   template <int dim, int fe_degree, typename number>
   void LaplaceOperator<dim, fe_degree, number>::compute_diagonal()
   {
@@ -542,11 +535,11 @@ namespace Step37
     LinearAlgebra::distributed::Vector<number> &inverse_diagonal =
       this->inverse_diagonal_entries->get_vector();
     this->data->initialize_dof_vector(inverse_diagonal);
-    unsigned int dummy = 0;
-    this->data->cell_loop(&LaplaceOperator::local_compute_diagonal,
-                          this,
-                          inverse_diagonal,
-                          dummy);
+
+    MatrixFreeTools::compute_diagonal(*this->data,
+                                      inverse_diagonal,
+                                      &LaplaceOperator::local_compute_diagonal,
+                                      this);
 
     this->set_constrained_entries_to_one(inverse_diagonal);
 
@@ -566,8 +559,8 @@ namespace Step37
   // columns in the local matrix and putting the entry 1 in the <i>i</i>th
   // slot and a zero entry in all other slots, i.e., we apply the cell-wise
   // differential operator on one unit vector at a time. The inner part
-  // invoking FEEvaluation::evaluate, the loop over quadrature points, and
-  // FEEvalution::integrate, is exactly the same as in the local_apply
+  // invoking FEEvaluation::evaluate(), the loop over quadrature points, and
+  // FEEvaluation::integrate(), is exactly the same as in the local_apply
   // function. Afterwards, we pick out the <i>i</i>th entry of the local
   // result and put it to a temporary storage (as we overwrite all entries in
   // the array behind FEEvaluation::get_dof_value() with the next loop
@@ -610,38 +603,17 @@ namespace Step37
   // level matrices where no hanging node constraints appear.
   template <int dim, int fe_degree, typename number>
   void LaplaceOperator<dim, fe_degree, number>::local_compute_diagonal(
-    const MatrixFree<dim, number>              &data,
-    LinearAlgebra::distributed::Vector<number> &dst,
-    const unsigned int &,
-    const std::pair<unsigned int, unsigned int> &cell_range) const
+    FEEvaluation<dim, fe_degree, fe_degree + 1, 1, number> &phi) const
   {
-    FEEvaluation<dim, fe_degree, fe_degree + 1, 1, number> phi(data);
+    const unsigned int cell = phi.get_current_cell_index();
 
-    AlignedVector<VectorizedArray<number>> diagonal(phi.dofs_per_cell);
+    phi.evaluate(EvaluationFlags::gradients);
 
-    for (unsigned int cell = cell_range.first; cell < cell_range.second; ++cell)
+    for (const unsigned int q : phi.quadrature_point_indices())
       {
-        AssertDimension(coefficient.size(0), data.n_cell_batches());
-        AssertDimension(coefficient.size(1), phi.n_q_points);
-
-        phi.reinit(cell);
-        for (unsigned int i = 0; i < phi.dofs_per_cell; ++i)
-          {
-            for (unsigned int j = 0; j < phi.dofs_per_cell; ++j)
-              phi.submit_dof_value(VectorizedArray<number>(), j);
-            phi.submit_dof_value(make_vectorized_array<number>(1.), i);
-
-            phi.evaluate(EvaluationFlags::gradients);
-            for (const unsigned int q : phi.quadrature_point_indices())
-              phi.submit_gradient(coefficient(cell, q) * phi.get_gradient(q),
-                                  q);
-            phi.integrate(EvaluationFlags::gradients);
-            diagonal[i] = phi.get_dof_value(i);
-          }
-        for (unsigned int i = 0; i < phi.dofs_per_cell; ++i)
-          phi.submit_dof_value(diagonal[i], i);
-        phi.distribute_local_to_global(dst);
+        phi.submit_gradient(coefficient(cell, q) * phi.get_gradient(q), q);
       }
+    phi.integrate(EvaluationFlags::gradients);
   }
 
 
@@ -686,10 +658,10 @@ namespace Step37
     Triangulation<dim> triangulation;
 #endif
 
-    FE_Q<dim>       fe;
+    const FE_Q<dim> fe;
     DoFHandler<dim> dof_handler;
 
-    MappingQ1<dim> mapping;
+    const MappingQ1<dim> mapping;
 
     AffineConstraints<double> constraints;
     using SystemMatrixType =
@@ -780,51 +752,50 @@ namespace Step37
   {
     Timer time;
     setup_time = 0;
+    {
+      system_matrix.clear();
+      mg_matrices.clear_elements();
 
-    system_matrix.clear();
-    mg_matrices.clear_elements();
+      dof_handler.distribute_dofs(fe);
+      dof_handler.distribute_mg_dofs();
 
-    dof_handler.distribute_dofs(fe);
-    dof_handler.distribute_mg_dofs();
+      pcout << "Number of degrees of freedom: " << dof_handler.n_dofs()
+            << std::endl;
 
-    pcout << "Number of degrees of freedom: " << dof_handler.n_dofs()
-          << std::endl;
-
-    const IndexSet locally_relevant_dofs =
-      DoFTools::extract_locally_relevant_dofs(dof_handler);
-
-    constraints.clear();
-    constraints.reinit(locally_relevant_dofs);
-    DoFTools::make_hanging_node_constraints(dof_handler, constraints);
-    VectorTools::interpolate_boundary_values(
-      mapping, dof_handler, 0, Functions::ZeroFunction<dim>(), constraints);
-    constraints.close();
+      constraints.clear();
+      constraints.reinit(dof_handler.locally_owned_dofs(),
+                         DoFTools::extract_locally_relevant_dofs(dof_handler));
+      DoFTools::make_hanging_node_constraints(dof_handler, constraints);
+      VectorTools::interpolate_boundary_values(
+        mapping, dof_handler, 0, Functions::ZeroFunction<dim>(), constraints);
+      constraints.close();
+    }
     setup_time += time.wall_time();
     time_details << "Distribute DoFs & B.C.     (CPU/wall) " << time.cpu_time()
                  << "s/" << time.wall_time() << 's' << std::endl;
     time.restart();
-
     {
-      typename MatrixFree<dim, double>::AdditionalData additional_data;
-      additional_data.tasks_parallel_scheme =
-        MatrixFree<dim, double>::AdditionalData::none;
-      additional_data.mapping_update_flags =
-        (update_gradients | update_JxW_values | update_quadrature_points);
-      std::shared_ptr<MatrixFree<dim, double>> system_mf_storage(
-        new MatrixFree<dim, double>());
-      system_mf_storage->reinit(mapping,
-                                dof_handler,
-                                constraints,
-                                QGauss<1>(fe.degree + 1),
-                                additional_data);
-      system_matrix.initialize(system_mf_storage);
+      {
+        typename MatrixFree<dim, double>::AdditionalData additional_data;
+        additional_data.tasks_parallel_scheme =
+          MatrixFree<dim, double>::AdditionalData::none;
+        additional_data.mapping_update_flags =
+          (update_gradients | update_JxW_values | update_quadrature_points);
+        std::shared_ptr<MatrixFree<dim, double>> system_mf_storage(
+          new MatrixFree<dim, double>());
+        system_mf_storage->reinit(mapping,
+                                  dof_handler,
+                                  constraints,
+                                  QGauss<1>(fe.degree + 1),
+                                  additional_data);
+        system_matrix.initialize(system_mf_storage);
+      }
+
+      system_matrix.evaluate_coefficient(Coefficient<dim>());
+
+      system_matrix.initialize_dof_vector(solution);
+      system_matrix.initialize_dof_vector(system_rhs);
     }
-
-    system_matrix.evaluate_coefficient(Coefficient<dim>());
-
-    system_matrix.initialize_dof_vector(solution);
-    system_matrix.initialize_dof_vector(system_rhs);
-
     setup_time += time.wall_time();
     time_details << "Setup matrix-free system   (CPU/wall) " << time.cpu_time()
                  << "s/" << time.wall_time() << 's' << std::endl;
@@ -839,43 +810,45 @@ namespace Step37
     // closely the construction of the system matrix on the original mesh,
     // except the slight difference in naming when accessing information on
     // the levels rather than the active cells.
-    const unsigned int nlevels = triangulation.n_global_levels();
-    mg_matrices.resize(0, nlevels - 1);
+    {
+      const unsigned int nlevels = triangulation.n_global_levels();
+      mg_matrices.resize(0, nlevels - 1);
 
-    const std::set<types::boundary_id> dirichlet_boundary_ids = {0};
-    mg_constrained_dofs.initialize(dof_handler);
-    mg_constrained_dofs.make_zero_boundary_constraints(dof_handler,
-                                                       dirichlet_boundary_ids);
+      const std::set<types::boundary_id> dirichlet_boundary_ids = {0};
+      mg_constrained_dofs.initialize(dof_handler);
+      mg_constrained_dofs.make_zero_boundary_constraints(
+        dof_handler, dirichlet_boundary_ids);
 
-    for (unsigned int level = 0; level < nlevels; ++level)
-      {
-        const IndexSet relevant_dofs =
-          DoFTools::extract_locally_relevant_level_dofs(dof_handler, level);
-        AffineConstraints<double> level_constraints;
-        level_constraints.reinit(relevant_dofs);
-        level_constraints.add_lines(
-          mg_constrained_dofs.get_boundary_indices(level));
-        level_constraints.close();
+      for (unsigned int level = 0; level < nlevels; ++level)
+        {
+          AffineConstraints<double> level_constraints(
+            dof_handler.locally_owned_mg_dofs(level),
+            DoFTools::extract_locally_relevant_level_dofs(dof_handler, level));
+          for (const types::global_dof_index dof_index :
+               mg_constrained_dofs.get_boundary_indices(level))
+            level_constraints.constrain_dof_to_zero(dof_index);
+          level_constraints.close();
 
-        typename MatrixFree<dim, float>::AdditionalData additional_data;
-        additional_data.tasks_parallel_scheme =
-          MatrixFree<dim, float>::AdditionalData::none;
-        additional_data.mapping_update_flags =
-          (update_gradients | update_JxW_values | update_quadrature_points);
-        additional_data.mg_level = level;
-        std::shared_ptr<MatrixFree<dim, float>> mg_mf_storage_level(
-          new MatrixFree<dim, float>());
-        mg_mf_storage_level->reinit(mapping,
-                                    dof_handler,
-                                    level_constraints,
-                                    QGauss<1>(fe.degree + 1),
-                                    additional_data);
+          typename MatrixFree<dim, float>::AdditionalData additional_data;
+          additional_data.tasks_parallel_scheme =
+            MatrixFree<dim, float>::AdditionalData::none;
+          additional_data.mapping_update_flags =
+            (update_gradients | update_JxW_values | update_quadrature_points);
+          additional_data.mg_level = level;
+          std::shared_ptr<MatrixFree<dim, float>> mg_mf_storage_level =
+            std::make_shared<MatrixFree<dim, float>>();
+          mg_mf_storage_level->reinit(mapping,
+                                      dof_handler,
+                                      level_constraints,
+                                      QGauss<1>(fe.degree + 1),
+                                      additional_data);
 
-        mg_matrices[level].initialize(mg_mf_storage_level,
-                                      mg_constrained_dofs,
-                                      level);
-        mg_matrices[level].evaluate_coefficient(Coefficient<dim>());
-      }
+          mg_matrices[level].initialize(mg_mf_storage_level,
+                                        mg_constrained_dofs,
+                                        level);
+          mg_matrices[level].evaluate_coefficient(Coefficient<dim>());
+        }
+    }
     setup_time += time.wall_time();
     time_details << "Setup matrix-free levels   (CPU/wall) " << time.cpu_time()
                  << "s/" << time.wall_time() << 's' << std::endl;

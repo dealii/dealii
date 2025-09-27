@@ -1,0 +1,10 @@
+
+DEAL:0:2d::n_levels:                  1
+DEAL:0:2d::n_cells:                   30
+DEAL:0:2d::n_active_cells:            30
+DEAL:0:2d::has_hanging_nodes:         false
+DEAL:0:2d::
+DEAL:0:2d::n_dofs:                             143
+DEAL:0:2d::n_locally_owned_dofs:               143
+DEAL:0:2d::has_hanging_nodes:                  false
+DEAL:0:2d::

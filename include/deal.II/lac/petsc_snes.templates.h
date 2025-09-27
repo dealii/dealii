@@ -1,17 +1,16 @@
-//-----------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-//    Copyright (C) 2023 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2023 - 2025 by the deal.II authors
 //
-//    This file is part of the deal.II library.
+// This file is part of the deal.II library.
 //
-//    The deal.II library is free software; you can use it, redistribute
-//    it, and/or modify it under the terms of the GNU Lesser General
-//    Public License as published by the Free Software Foundation; either
-//    version 2.1 of the License, or (at your option) any later version.
-//    The full text of the license can be found in the file LICENSE.md at
-//    the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-//---------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 #ifndef dealii_petsc_snes_templates_h
 #define dealii_petsc_snes_templates_h
@@ -20,11 +19,13 @@
 
 #ifdef DEAL_II_WITH_PETSC
 #  include <deal.II/base/exceptions.h>
+#  include <deal.II/base/mpi_stub.h>
 
 #  include <deal.II/lac/petsc_precondition.h>
 #  include <deal.II/lac/petsc_snes.h>
 
 #  include <petscdm.h>
+#  include <petscerror.h>
 #  include <petscsnes.h>
 
 DEAL_II_NAMESPACE_OPEN
@@ -37,7 +38,7 @@ DEAL_II_NAMESPACE_OPEN
         PetscErrorCode ierr = (code);                \
         AssertThrow(ierr == 0, ExcPETScError(ierr)); \
       }                                              \
-    while (0)
+    while (false)
 
 // Macro to wrap PETSc inside callbacks.
 // This is used to raise "PETSc" exceptions, i.e.
@@ -49,7 +50,7 @@ DEAL_II_NAMESPACE_OPEN
           PetscErrorCode ierr = (code); \
           CHKERRQ(ierr);                \
         }                               \
-      while (0)
+      while (false)
 #    define undefPetscCall
 #  endif
 
@@ -641,19 +642,20 @@ namespace PETScWrappers
     AssertPETSc(status);
 
     // Get the number of steps taken.
-    PetscInt nt;
-    AssertPETSc(SNESGetIterationNumber(snes, &nt));
+    PetscInt n_iterations;
+    AssertPETSc(SNESGetIterationNumber(snes, &n_iterations));
 
     // Raise an exception if the solver has not converged
     SNESConvergedReason reason;
     AssertPETSc(SNESGetConvergedReason(snes, &reason));
     AssertThrow(reason > 0,
                 ExcMessage("SNES solver did not converge after " +
-                           std::to_string(nt) + " iterations with reason " +
+                           std::to_string(n_iterations) +
+                           " iterations with reason " +
                            SNESConvergedReasons[reason]));
 
     // Finally return
-    return nt;
+    return n_iterations;
   }
 
 
@@ -705,6 +707,14 @@ namespace PETScWrappers
 #    undef undefPetscCall
 #  endif
 
+DEAL_II_NAMESPACE_CLOSE
+
+#else
+
+// Make sure the scripts that create the C++20 module input files have
+// something to latch on if the preprocessor #ifdef above would
+// otherwise lead to an empty content of the file.
+DEAL_II_NAMESPACE_OPEN
 DEAL_II_NAMESPACE_CLOSE
 
 #endif // DEAL_II_WITH_PETSC

@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2016 - 2021 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2016 - 2024 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 #include <point_wrapper.h>
 
@@ -558,9 +557,6 @@ namespace python
   {
     dim = other.dim;
 
-    AssertThrow(other.point != nullptr,
-                ExcMessage("Underlying point does not exist."));
-
     if (dim == 2)
       {
         Point<2> *other_point = static_cast<Point<2> *>(other.point);
@@ -573,8 +569,9 @@ namespace python
           new Point<3>((*other_point)[0], (*other_point)[1], (*other_point)[2]);
       }
     else
-      AssertThrow(false,
-                  ExcMessage("The dimension of the point should be 2 or 3."));
+      {
+        point = nullptr;
+      }
   }
 } // namespace python
 

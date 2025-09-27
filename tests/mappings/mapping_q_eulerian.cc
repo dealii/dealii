@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2008 - 2021 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2008 - 2024 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 
 // compute some convergence results from computing pi on a mesh that
@@ -67,10 +66,10 @@ void
 ImposedDisplacement<2>::vector_value(const Point<2> &p,
                                      Vector<double> &value) const
 {
-  double radius = 1 + (sqrt(5) - 1) * p(0);
-  double angle  = 0.5 * numbers::PI * (1 - p(1));
-  value(0)      = radius * sin(angle) - p(0);
-  value(1)      = radius * cos(angle) - p(1);
+  double radius = 1 + (sqrt(5) - 1) * p[0];
+  double angle  = 0.5 * numbers::PI * (1 - p[1]);
+  value(0)      = radius * sin(angle) - p[0];
+  value(1)      = radius * cos(angle) - p[1];
 }
 
 

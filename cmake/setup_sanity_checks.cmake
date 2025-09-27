@@ -1,17 +1,16 @@
-## ---------------------------------------------------------------------
+## ------------------------------------------------------------------------
 ##
-## Copyright (C) 2012 - 2023 by the deal.II authors
+## SPDX-License-Identifier: LGPL-2.1-or-later
+## Copyright (C) 2012 - 2025 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
-## The deal.II library is free software; you can use it, redistribute
-## it, and/or modify it under the terms of the GNU Lesser General
-## Public License as published by the Free Software Foundation; either
-## version 2.1 of the License, or (at your option) any later version.
-## The full text of the license can be found in the file LICENSE.md at
-## the top level directory of deal.II.
+## Part of the source code is dual licensed under Apache-2.0 WITH
+## LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+## governing the source code and code contributions can be found in
+## LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 ##
-## ---------------------------------------------------------------------
+## ------------------------------------------------------------------------
 
 
 ########################################################################
@@ -25,6 +24,8 @@
 #
 
 foreach(build ${DEAL_II_BUILD_TYPES})
+  set(CMAKE_TRY_COMPILE_CONFIGURATION ${build})
+
   macro(_check_linker_flags)
     check_compiler_setup(
       "${DEAL_II_CXX_FLAGS} ${DEAL_II_CXX_FLAGS_${build}}"
@@ -45,10 +46,7 @@ foreach(build ${DEAL_II_BUILD_TYPES})
       "Unable to compile a simple test program. "
       "Trying to drop \"${_linker_flag}\" from the linker flags."
       )
-    foreach(_flags
-        DEAL_II_LINKER_FLAGS DEAL_II_LINKER_FLAGS_${build}
-        BASE_LINKER_FLAGS BASE_LINKER_FLAGS_${build}
-        )
+    foreach(_flags DEAL_II_LINKER_FLAGS DEAL_II_LINKER_FLAGS_${build})
       string(REPLACE "${_linker_flag}" "${_replacement_flag}"
         ${_flags} "${${_flags}}"
         )
@@ -62,8 +60,6 @@ foreach(build ${DEAL_II_BUILD_TYPES})
     set(_replacement "")
     if(DEAL_II_COMPILER_HAS_FUSE_LD_LLD)
       set(_replacement "-fuse-ld=lld")
-    elseif(DEAL_II_COMPILER_HAS_FUSE_LD_GOLD)
-      set(_replacement "-fuse-ld=gold")
     endif()
     _drop_linker_flag(
       "-fuse-ld=mold" ${_replacement}
@@ -74,9 +70,6 @@ foreach(build ${DEAL_II_BUILD_TYPES})
 
   if(NOT DEAL_II_HAVE_USABLE_FLAGS_${build} AND DEAL_II_COMPILER_HAS_FUSE_LD_LLD)
     set(_replacement "")
-    if(DEAL_II_COMPILER_HAS_FUSE_LD_GOLD)
-      set(_replacement "-fuse-ld=gold")
-    endif()
     _drop_linker_flag(
       "-fuse-ld=lld" ${_replacement}
       DEAL_II_COMPILER_HAS_FUSE_LD_LLD
@@ -84,13 +77,7 @@ foreach(build ${DEAL_II_BUILD_TYPES})
     _check_linker_flags()
   endif()
 
-  if(NOT DEAL_II_HAVE_USABLE_FLAGS_${build} AND DEAL_II_COMPILER_HAS_FUSE_LD_GOLD)
-    _drop_linker_flag(
-      "-fuse-ld=gold" ""
-      DEAL_II_COMPILER_HAS_FUSE_LD_GOLD
-      )
-    _check_linker_flags()
-  endif()
+  unset(CMAKE_TRY_COMPILE_CONFIGURATION)
 
   if(NOT DEAL_II_HAVE_USABLE_FLAGS_${build})
     message(FATAL_ERROR "

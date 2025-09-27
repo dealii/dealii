@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2023 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2020 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 
 #ifndef dealii_vector_tools_boundary_templates_h
@@ -56,7 +55,7 @@ namespace VectorTools
               typename number,
               template <int, int>
               class M_or_MC>
-    static inline void
+    inline void
     do_interpolate_boundary_values(
       const M_or_MC<dim, spacedim>    &mapping,
       const DoFHandler<dim, spacedim> &dof,
@@ -519,11 +518,9 @@ namespace VectorTools
       {
         if (constraints.can_store_line(boundary_value.first) &&
             !constraints.is_constrained(boundary_value.first))
-          {
-            constraints.add_line(boundary_value.first);
-            constraints.set_inhomogeneity(boundary_value.first,
-                                          boundary_value.second);
-          }
+          constraints.add_constraint(boundary_value.first,
+                                     {},
+                                     boundary_value.second);
       }
   }
 
@@ -564,11 +561,9 @@ namespace VectorTools
       {
         if (constraints.can_store_line(boundary_value.first) &&
             !constraints.is_constrained(boundary_value.first))
-          {
-            constraints.add_line(boundary_value.first);
-            constraints.set_inhomogeneity(boundary_value.first,
-                                          boundary_value.second);
-          }
+          constraints.add_constraint(boundary_value.first,
+                                     {},
+                                     boundary_value.second);
       }
   }
 
@@ -780,30 +775,31 @@ namespace VectorTools
       // but it needs to be implemented
       if (dim >= 3)
         {
-#ifdef DEBUG
-          // Assert that there are no hanging nodes at the boundary
-          int level = -1;
-          for (const auto &cell : dof.active_cell_iterators())
-            for (auto f : cell->face_indices())
-              {
-                if (cell->at_boundary(f))
+          if constexpr (running_in_debug_mode())
+            {
+              // Assert that there are no hanging nodes at the boundary
+              int level = -1;
+              for (const auto &cell : dof.active_cell_iterators())
+                for (auto f : cell->face_indices())
                   {
-                    if (level == -1)
-                      level = cell->level();
-                    else
+                    if (cell->at_boundary(f))
                       {
-                        Assert(
-                          level == cell->level(),
-                          ExcMessage(
-                            "The mesh you use in projecting boundary values "
-                            "has hanging nodes at the boundary. This would require "
-                            "dealing with hanging node constraints when solving "
-                            "the linear system on the boundary, but this is not "
-                            "currently implemented."));
+                        if (level == -1)
+                          level = cell->level();
+                        else
+                          {
+                            Assert(
+                              level == cell->level(),
+                              ExcMessage(
+                                "The mesh you use in projecting boundary values "
+                                "has hanging nodes at the boundary. This would require "
+                                "dealing with hanging node constraints when solving "
+                                "the linear system on the boundary, but this is not "
+                                "currently implemented."));
+                          }
                       }
                   }
-              }
-#endif
+            }
         }
       sparsity.compress();
 
@@ -955,16 +951,13 @@ namespace VectorTools
     std::map<types::global_dof_index, number> boundary_values;
     project_boundary_values(
       mapping, dof, boundary_functions, q, boundary_values, component_mapping);
-    typename std::map<types::global_dof_index, number>::const_iterator
-      boundary_value = boundary_values.begin();
-    for (; boundary_value != boundary_values.end(); ++boundary_value)
+
+    for (const auto &boundary_value : boundary_values)
       {
-        if (!constraints.is_constrained(boundary_value->first))
-          {
-            constraints.add_line(boundary_value->first);
-            constraints.set_inhomogeneity(boundary_value->first,
-                                          boundary_value->second);
-          }
+        if (!constraints.is_constrained(boundary_value.first))
+          constraints.add_constraint(boundary_value.first,
+                                     {},
+                                     boundary_value.second);
       }
   }
 
@@ -1130,14 +1123,14 @@ namespace VectorTools
             GeometryInfo<dim>::vertices_per_face * fe.n_dofs_per_vertex() +
             line * fe.n_dofs_per_line() + line_dof_idx;
 
-          // Note, assuming that the edge orientations are "standard"
-          //       i.e. cell->line_orientation(line) = true.
-          Assert(cell->line_orientation(line),
+          // Note, assuming that the edge orientations are "standard", i.e.,
+          //       cell->line_orientation(line) =
+          //       numbers::default_geometric_orientation
+          Assert(cell->line_orientation(line) ==
+                   numbers::default_geometric_orientation,
                  ExcMessage("Edge orientation does not meet expectation."));
           // Next, translate from face to cell. Note, this might be assuming
-          // that the edge orientations are "standard" (not sure any more at
-          // this time), i.e.
-          //       cell->line_orientation(line) = true.
+          // that the edge orientations are "standard"
           const unsigned int cell_dof_idx =
             fe.face_to_cell_index(face_dof_idx, face);
 
@@ -1161,7 +1154,7 @@ namespace VectorTools
               dof_is_of_interest = true;
             }
           else
-            Assert(false, ExcNotImplemented());
+            DEAL_II_NOT_IMPLEMENTED();
 
           if (dof_is_of_interest)
             {
@@ -1215,9 +1208,9 @@ namespace VectorTools
           Point<dim> shifted_reference_point_2 =
             reference_quadrature_points[q_point];
 
-          shifted_reference_point_1(edge_coordinate_direction[face][line]) +=
+          shifted_reference_point_1[edge_coordinate_direction[face][line]] +=
             tol;
-          shifted_reference_point_2(edge_coordinate_direction[face][line]) -=
+          shifted_reference_point_2[edge_coordinate_direction[face][line]] -=
             tol;
           Tensor<1, dim> tangential =
             (0.5 *
@@ -1294,7 +1287,7 @@ namespace VectorTools
     {
       // dummy implementation of above function
       // for all other dimensions
-      Assert(false, ExcInternalError());
+      DEAL_II_ASSERT_UNREACHABLE();
     }
 
 
@@ -1566,9 +1559,7 @@ namespace VectorTools
                         line * fe.n_dofs_per_line() + line_dof_idx;
 
                       // Next, translate from face to cell. Note, this might be
-                      // assuming that the edge orientations are "standard" (not
-                      // sure any more at this time), i.e.
-                      //       cell->line_orientation(line) = true.
+                      // assuming that the edge orientations are "standard"
                       const unsigned int cell_dof_idx =
                         fe.face_to_cell_index(face_dof_idx, face);
 
@@ -1597,7 +1588,7 @@ namespace VectorTools
                           dof_is_of_interest = true;
                         }
                       else
-                        Assert(false, ExcNotImplemented());
+                        DEAL_II_NOT_IMPLEMENTED();
 
                       if (dof_is_of_interest)
                         {
@@ -1787,7 +1778,7 @@ namespace VectorTools
               break;
             }
           default:
-            Assert(false, ExcNotImplemented());
+            DEAL_II_NOT_IMPLEMENTED();
         }
     }
 
@@ -1934,16 +1925,12 @@ namespace VectorTools
                                         face_dof_indices[dof]) &&
                                       !(constraints.is_constrained(
                                         face_dof_indices[dof])))
-                                    {
-                                      constraints.add_line(
-                                        face_dof_indices[dof]);
-                                      if (std::abs(dof_values[dof]) > 1e-13)
-                                        {
-                                          constraints.set_inhomogeneity(
-                                            face_dof_indices[dof],
-                                            dof_values[dof]);
-                                        }
-                                    }
+                                    constraints.add_constraint(
+                                      face_dof_indices[dof],
+                                      {},
+                                      (std::abs(dof_values[dof]) > 1e-13 ?
+                                         dof_values[dof] :
+                                         0));
                                 }
                             }
                         }
@@ -1974,8 +1961,10 @@ namespace VectorTools
                               QProjector<dim - 1>::project_to_face(
                                 ReferenceCells::get_hypercube<dim - 1>(),
                                 reference_edge_quadrature,
-                                line),
-                              face));
+                                line,
+                                numbers::default_geometric_orientation),
+                              face,
+                              numbers::default_geometric_orientation));
                         }
                     }
                 }
@@ -2078,17 +2067,12 @@ namespace VectorTools
                                         face_dof_indices[dof]) &&
                                       !(constraints.is_constrained(
                                         face_dof_indices[dof])))
-                                    {
-                                      constraints.add_line(
-                                        face_dof_indices[dof]);
-
-                                      if (std::abs(dof_values[dof]) > 1e-13)
-                                        {
-                                          constraints.set_inhomogeneity(
-                                            face_dof_indices[dof],
-                                            dof_values[dof]);
-                                        }
-                                    }
+                                    constraints.add_constraint(
+                                      face_dof_indices[dof],
+                                      {},
+                                      (std::abs(dof_values[dof]) > 1e-13 ?
+                                         dof_values[dof] :
+                                         0));
                                 }
                             }
                         }
@@ -2097,7 +2081,7 @@ namespace VectorTools
               break;
             }
           default:
-            Assert(false, ExcNotImplemented());
+            DEAL_II_NOT_IMPLEMENTED();
         }
     }
 
@@ -2208,11 +2192,8 @@ namespace VectorTools
             dof_values(i) +=
               tmp * (normals[q_point] *
                      fe_values[vec].value(
-                       fe.face_to_cell_index(i,
-                                             face,
-                                             cell->face_orientation(face),
-                                             cell->face_flip(face),
-                                             cell->face_rotation(face)),
+                       fe.face_to_cell_index(
+                         i, face, cell->combined_face_orientation(face)),
                        q_point));
         }
 
@@ -2229,15 +2210,12 @@ namespace VectorTools
             fe.get_nonzero_components(fe.face_to_cell_index(
               i,
               face,
-              cell->face_orientation(face),
-              cell->face_flip(face),
-              cell->face_rotation(face)))[first_vector_component])
-          {
-            constraints.add_line(face_dof_indices[i]);
-
-            if (std::abs(dof_values(i)) > 1e-14)
-              constraints.set_inhomogeneity(face_dof_indices[i], dof_values(i));
-          }
+              cell->combined_face_orientation(face)))[first_vector_component])
+          constraints.add_constraint(face_dof_indices[i],
+                                     {},
+                                     (std::abs(dof_values[i]) > 1e-14 ?
+                                        dof_values[i] :
+                                        0));
     }
 
     // dummy implementation of above function for all other dimensions
@@ -2255,7 +2233,7 @@ namespace VectorTools
       const std::vector<DerivativeForm<1, dim, dim>> &,
       AffineConstraints<number> &)
     {
-      Assert(false, ExcNotImplemented());
+      DEAL_II_NOT_IMPLEMENTED();
     }
 
     // This function computes the projection of the boundary function on the
@@ -2272,7 +2250,7 @@ namespace VectorTools
       std::vector<number>                        &dof_values,
       std::vector<types::global_dof_index>       &projected_dofs)
     {
-      // Compute the intergral over the product of the normal components of
+      // Compute the integral over the product of the normal components of
       // the boundary function times the normal components of the shape
       // functions supported on the boundary.
       const FEValuesExtractors::Vector vec(first_vector_component);
@@ -2320,11 +2298,8 @@ namespace VectorTools
             dof_values_local(i) +=
               tmp * (normals[q_point] *
                      fe_values[vec].value(
-                       fe.face_to_cell_index(i,
-                                             face,
-                                             cell->face_orientation(face),
-                                             cell->face_flip(face),
-                                             cell->face_rotation(face)),
+                       fe.face_to_cell_index(
+                         i, face, cell->combined_face_orientation(face)),
                        q_point));
         }
 
@@ -2339,9 +2314,7 @@ namespace VectorTools
             fe.get_nonzero_components(fe.face_to_cell_index(
               i,
               face,
-              cell->face_orientation(face),
-              cell->face_flip(face),
-              cell->face_rotation(face)))[first_vector_component])
+              cell->combined_face_orientation(face)))[first_vector_component])
           {
             dof_values[face_dof_indices[i]]     = dof_values_local(i);
             projected_dofs[face_dof_indices[i]] = fe.degree;
@@ -2366,7 +2339,7 @@ namespace VectorTools
       std::vector<number> &,
       std::vector<types::global_dof_index> &)
     {
-      Assert(false, ExcNotImplemented());
+      DEAL_II_NOT_IMPLEMENTED();
     }
   } // namespace internals
 
@@ -2407,7 +2380,10 @@ namespace VectorTools
 
     for (const unsigned int face : GeometryInfo<dim>::face_indices())
       quadrature_collection.push_back(QProjector<dim>::project_to_face(
-        ReferenceCells::get_hypercube<dim>(), face_quadrature, face));
+        ReferenceCells::get_hypercube<dim>(),
+        face_quadrature,
+        face,
+        numbers::default_geometric_orientation));
 
     hp::FEValues<dim> fe_values(mapping_collection,
                                 fe_collection,
@@ -2529,18 +2505,17 @@ namespace VectorTools
             for (unsigned int dof = 0; dof < n_dofs; ++dof)
               if ((projected_dofs[dof] != 0) &&
                   !(constraints.is_constrained(dof)))
-                {
-                  constraints.add_line(dof);
-
-                  if (std::abs(dof_values[dof]) > 1e-14)
-                    constraints.set_inhomogeneity(dof, dof_values[dof]);
-                }
+                constraints.add_constraint(dof,
+                                           {},
+                                           (std::abs(dof_values[dof]) > 1e-14 ?
+                                              dof_values[dof] :
+                                              0));
 
             break;
           }
 
         default:
-          Assert(false, ExcNotImplemented());
+          DEAL_II_NOT_IMPLEMENTED();
       }
   }
 
@@ -2569,7 +2544,10 @@ namespace VectorTools
 
         for (const unsigned int face : GeometryInfo<dim>::face_indices())
           quadrature_collection.push_back(QProjector<dim>::project_to_face(
-            ReferenceCells::get_hypercube<dim>(), quadrature, face));
+            ReferenceCells::get_hypercube<dim>(),
+            quadrature,
+            face,
+            numbers::default_geometric_orientation));
       }
 
     hp::FEFaceValues<dim> fe_face_values(mapping_collection,
@@ -2688,18 +2666,17 @@ namespace VectorTools
             for (unsigned int dof = 0; dof < n_dofs; ++dof)
               if ((projected_dofs[dof] != 0) &&
                   !(constraints.is_constrained(dof)))
-                {
-                  constraints.add_line(dof);
-
-                  if (std::abs(dof_values[dof]) > 1e-14)
-                    constraints.set_inhomogeneity(dof, dof_values[dof]);
-                }
+                constraints.add_constraint(dof,
+                                           {},
+                                           (std::abs(dof_values[dof]) > 1e-14 ?
+                                              dof_values[dof] :
+                                              0));
 
             break;
           }
 
         default:
-          Assert(false, ExcNotImplemented());
+          DEAL_II_NOT_IMPLEMENTED();
       }
   }
 } // namespace VectorTools

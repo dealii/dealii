@@ -1,24 +1,23 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2005 - 2023 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2005 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 #ifndef dealii_mapping_collection_h
 #define dealii_mapping_collection_h
 
 #include <deal.II/base/config.h>
 
-#include <deal.II/base/subscriptor.h>
+#include <deal.II/base/enable_observer_pointer.h>
 
 #include <deal.II/fe/fe.h>
 #include <deal.II/fe/mapping.h>
@@ -39,7 +38,7 @@ namespace hp
    *
    * It implements the concepts stated in the
    * @ref hpcollection
-   * module described in the doxygen documentation.
+   * topic described in the doxygen documentation.
    *
    * Although it is recommended to supply an appropriate mapping for each
    * finite element kind used in a hp-computation, the MappingCollection class
@@ -96,11 +95,11 @@ namespace hp
      * clang-tidy).
      */
     MappingCollection(MappingCollection<dim, spacedim> &&) noexcept(
-      std::is_nothrow_move_constructible<
-        std::vector<std::shared_ptr<const Mapping<dim, spacedim>>>>::value
-        &&std::is_nothrow_move_constructible<std::function<
+      std::is_nothrow_move_constructible_v<
+        std::vector<std::shared_ptr<const Mapping<dim, spacedim>>>>
+        &&std::is_nothrow_move_constructible_v<std::function<
           unsigned int(const typename hp::MappingCollection<dim, spacedim> &,
-                       const unsigned int)>>::value) = default;
+                       const unsigned int)>>) = default;
 
     /**
      * Move assignment operator.
@@ -183,9 +182,18 @@ namespace hp
 
 
 #ifndef DOXYGEN
-  // Declare the existence of explicit instantiations of the class
-  // above to avoid certain warnings issues by clang and
-  // newer (LLVM-based) Intel compilers:
+// Declare the existence of explicit instantiations of the class
+// above. This is not strictly necessary, but tells the compiler to
+// avoid instantiating templates that we know are instantiated in
+// .cc files and so can be referenced without implicit
+// instantiations. In the current case, this also avoids certain
+// warnings issues by clang and newer (LLVM-based) Intel compilers.
+//
+// Unfortunately, this does not seem to work when building modules
+// because the compiler (well, Clang at least) then just doesn't
+// instantiate these classes at all, even though their members are
+// defined and explicitly instantiated in a .cc file.
+#  ifndef DEAL_II_BUILDING_CXX20_MODULE
   extern template struct StaticMappingQ1<1, 1>;
   extern template struct StaticMappingQ1<1, 2>;
   extern template struct StaticMappingQ1<1, 3>;
@@ -193,7 +201,7 @@ namespace hp
   extern template struct StaticMappingQ1<2, 3>;
   extern template struct StaticMappingQ1<3, 3>;
 
-#  ifndef _MSC_VER
+#    ifndef _MSC_VER
   extern template MappingCollection<1, 1>
     StaticMappingQ1<1, 1>::mapping_collection;
   extern template MappingCollection<1, 2>
@@ -206,6 +214,7 @@ namespace hp
     StaticMappingQ1<2, 3>::mapping_collection;
   extern template MappingCollection<3, 3>
     StaticMappingQ1<3, 3>::mapping_collection;
+#    endif
 #  endif
 #endif
 

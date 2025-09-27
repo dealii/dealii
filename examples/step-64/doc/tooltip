@@ -1,1 +1,1 @@
-Matrix-free methods using CUDA and MPI.
+Portable Matrix-free methods on devices using Kokkos and MPI.

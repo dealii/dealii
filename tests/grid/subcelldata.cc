@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2005 - 2020 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2005 - 2024 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 
 
@@ -41,14 +40,14 @@ test()
   Assert(dim == 2 || dim == 3, ExcNotImplemented());
 
   std::vector<Point<dim>> vertices(GeometryInfo<dim>::vertices_per_cell);
-  vertices[0](0) = 0;
-  vertices[0](1) = 0;
-  vertices[1](0) = 2;
-  vertices[1](1) = 1;
-  vertices[2](0) = 3;
-  vertices[2](1) = 3;
-  vertices[3](0) = 0;
-  vertices[3](1) = 1;
+  vertices[0][0] = 0;
+  vertices[0][1] = 0;
+  vertices[1][0] = 2;
+  vertices[1][1] = 1;
+  vertices[2][0] = 3;
+  vertices[2][1] = 3;
+  vertices[3][0] = 0;
+  vertices[3][1] = 1;
   if (dim == 3)
     {
       // for the new numbering
@@ -60,9 +59,9 @@ test()
       // for the old numbering
       for (unsigned int i = 0; i < 4; ++i)
         {
-          std::swap(vertices[i](1), vertices[i](2));
+          std::swap(vertices[i][1], vertices[i][2]);
           vertices[i + 4]    = vertices[i];
-          vertices[i + 4](1) = 1;
+          vertices[i + 4][1] = 1;
         }
     }
 

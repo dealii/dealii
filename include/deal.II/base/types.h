@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2009 - 2023 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2010 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 #ifndef dealii_types_h
 #define dealii_types_h
@@ -32,6 +31,15 @@ DEAL_II_NAMESPACE_OPEN
 namespace types
 {
   /**
+   * The type used to represent face and line orientations.
+   *
+   * See the
+   * @ref GlossCombinedOrientation "glossary"
+   * for more information.
+   */
+  using geometric_orientation = std::uint8_t;
+
+  /**
    * The type used to denote subdomain_ids of cells.
    *
    * See the
@@ -51,6 +59,10 @@ namespace types
   /**
    * An identifier that denotes the MPI type associated with
    * types::global_vertex_index.
+   *
+   * This preprocessor variable is deprecated. Use the variable
+   * `Utilities::MPI::mpi_type_id_for_type<types::global_vertex_index>`
+   * instead.
    */
 #define DEAL_II_VERTEX_INDEX_MPI_TYPE MPI_UINT64_T
 
@@ -79,7 +91,7 @@ namespace types
 #ifdef DEAL_II_WITH_64BIT_INDICES
   using global_dof_index = std::uint64_t;
 #else
-  using global_dof_index  = unsigned int;
+  using global_dof_index        = unsigned int;
 #endif
 
   /**
@@ -87,11 +99,19 @@ namespace types
    * This is useful for interacting with Trilinos' Tpetra that only works well
    * with a signed global ordinal type.
    */
-  using signed_global_dof_index = std::make_signed_t<global_dof_index>;
+#ifdef DEAL_II_WITH_64BIT_INDICES
+  using signed_global_dof_index = long long;
+#else
+  using signed_global_dof_index = int;
+#endif
 
   /**
    * An identifier that denotes the MPI type associated with
    * types::global_dof_index.
+   *
+   * This preprocessor variable is deprecated. Use the variable
+   * `Utilities::MPI::mpi_type_id_for_type<types::global_dof_index>`
+   * instead.
    */
 #ifdef DEAL_II_WITH_64BIT_INDICES
 #  define DEAL_II_DOF_INDEX_MPI_TYPE MPI_UINT64_T
@@ -115,7 +135,7 @@ namespace types
 #ifdef DEAL_II_WITH_64BIT_INDICES
   using global_cell_index = std::uint64_t;
 #else
-  using global_cell_index = unsigned int;
+  using global_cell_index       = unsigned int;
 #endif
 
   /**
@@ -165,8 +185,11 @@ namespace types
 
   /**
    * The type used to denote geometric entity types.
+   *
+   * @deprecated This type was previously only used in library internals and is
+   * deprecated without replacement.
    */
-  using geometric_entity_type = std::uint8_t;
+  using geometric_entity_type DEAL_II_DEPRECATED = std::uint8_t;
 } // namespace types
 
 /**
@@ -199,9 +222,7 @@ namespace TrilinosWrappers
 } // namespace TrilinosWrappers
 
 
-// this part of the namespace numbers got moved to the bottom types.h file,
-// because otherwise we get a circular inclusion of config.h, types.h, and
-// numbers.h
+
 namespace numbers
 {
   /**
@@ -209,28 +230,43 @@ namespace numbers
    * integer. This value is widely used throughout the library as a marker for
    * an invalid unsigned integer value, such as an invalid array index, an
    * invalid array size, and the like.
+   *
+   * This value is an example of an
+   * @ref GlossInvalidValue "invalid value".
+   * See there for more information.
    */
-  static const unsigned int invalid_unsigned_int =
-    static_cast<unsigned int>(-1);
+  constexpr unsigned int invalid_unsigned_int = static_cast<unsigned int>(-1);
 
   /**
    * Representation of the largest number that can be put into a size_type.
    * This value is used throughout the library as a marker for an invalid
    * size_type value, such as an invalid array index, an invalid array size,
    * and the like. Invalid_size_type is equivalent to invalid_dof_index.
+   *
+   * This value is an example of an
+   * @ref GlossInvalidValue "invalid value".
+   * See there for more information.
    */
-  const types::global_dof_index invalid_size_type =
+  constexpr types::global_dof_index invalid_size_type =
     static_cast<types::global_dof_index>(-1);
 
   /**
    * An invalid value for active and future fe indices.
+   *
+   * This value is an example of an
+   * @ref GlossInvalidValue "invalid value".
+   * See there for more information.
    */
-  const types::fe_index invalid_fe_index = static_cast<types::fe_index>(-1);
+  constexpr types::fe_index invalid_fe_index = static_cast<types::fe_index>(-1);
 
   /**
    * An invalid value for indices of degrees of freedom.
+   *
+   * This value is an example of an
+   * @ref GlossInvalidValue "invalid value".
+   * See there for more information.
    */
-  const types::global_dof_index invalid_dof_index =
+  constexpr types::global_dof_index invalid_dof_index =
     static_cast<types::global_dof_index>(-1);
 
   /**
@@ -238,64 +274,125 @@ namespace numbers
    * entry on
    * @ref GlossCoarseCellId "coarse cell IDs"
    * for more information.
+   *
+   * This value is an example of an
+   * @ref GlossInvalidValue "invalid value".
+   * See there for more information.
    */
-  const types::coarse_cell_id invalid_coarse_cell_id =
+  constexpr types::coarse_cell_id invalid_coarse_cell_id =
     static_cast<types::coarse_cell_id>(-1);
 
   /**
    * Invalid material_id which we need in several places as a default value.
-   * We assume that all material_ids lie in the range [0,
-   * invalid_material_id).
+   * We assume that all material_ids lie in the range `[0,
+   * invalid_material_id)`.
+   *
+   * This value is an example of an
+   * @ref GlossInvalidValue "invalid value".
+   * See there for more information.
    */
-  const types::material_id invalid_material_id =
+  constexpr types::material_id invalid_material_id =
     static_cast<types::material_id>(-1);
 
   /**
    * Invalid boundary_id which we need in several places as a default value.
-   * We assume that all valid boundary_ids lie in the range [0,
-   * invalid_boundary_id).
+   * We assume that all valid boundary_ids lie in the range `[0,
+   * invalid_boundary_id)`.
+   *
+   * This value is an example of an
+   * @ref GlossInvalidValue "invalid value".
+   * See there for more information.
    *
    * @see
    * @ref GlossBoundaryIndicator "Glossary entry on boundary indicators"
    */
-  const types::boundary_id invalid_boundary_id =
+  constexpr types::boundary_id invalid_boundary_id =
     static_cast<types::boundary_id>(-1);
 
   /**
    * A boundary indicator number that we reserve for internal faces.  We
-   * assume that all valid boundary_ids lie in the range [0,
-   * internal_face_boundary_id).
+   * assume that all valid boundary_ids lie in the range `[0,
+   * internal_face_boundary_id)`.
    *
    * This is an indicator that is used internally (by the library) to
    * differentiate between faces that lie at the boundary of the domain and
    * faces that lie in the interior of the domain. You should never try to
    * assign this boundary indicator to anything in user code.
    *
+   * This value is an example of an
+   * @ref GlossInvalidValue "invalid value".
+   * See there for more information.
+   *
    * @see
    * @ref GlossBoundaryIndicator "Glossary entry on boundary indicators"
    */
-  const types::boundary_id internal_face_boundary_id =
+  constexpr types::boundary_id internal_face_boundary_id =
     static_cast<types::boundary_id>(-1);
 
   /**
    * A manifold_id we reserve for the default flat Cartesian manifold.
    *
+   * This value is an example of an
+   * @ref GlossInvalidValue "invalid value".
+   * See there for more information.
+   *
    * @see
    * @ref GlossManifoldIndicator "Glossary entry on manifold indicators"
    */
-  const types::manifold_id flat_manifold_id =
+  constexpr types::manifold_id flat_manifold_id =
     static_cast<types::manifold_id>(-1);
+
+  /**
+   * Value indicating that a face or line is in its default orientation.
+   *
+   * See the
+   * @ref GlossCombinedOrientation "glossary"
+   * for more information.
+   */
+  constexpr types::geometric_orientation default_geometric_orientation =
+    static_cast<types::geometric_orientation>(0b000);
+
+  /**
+   * Value indicating that a line is in the reverse orientation. Since lines can
+   * only have two possible orientations, this value and
+   * default_geometric_orientation completely encode the possible values for
+   * line orientations.
+   *
+   * See the
+   * @ref GlossCombinedOrientation "glossary"
+   * for more information.
+   */
+  constexpr types::geometric_orientation reverse_line_orientation =
+    static_cast<types::geometric_orientation>(0b001);
+
+  /**
+   * Value indicating an invalid or unset orientation.
+   *
+   * This value is an example of an
+   * @ref GlossInvalidValue "invalid value".
+   * See there for more information.
+   *
+   * See the
+   * @ref GlossCombinedOrientation "glossary"
+   * for more information.
+   */
+  constexpr types::geometric_orientation invalid_geometric_orientation =
+    static_cast<types::geometric_orientation>(-1);
 
   /**
    * A special id for an invalid subdomain id. This value may not be used as a
    * valid id but is used, for example, for default arguments to indicate a
    * subdomain id that is not to be used.
    *
+   * This value is an example of an
+   * @ref GlossInvalidValue "invalid value".
+   * See there for more information.
+   *
    * See the
    * @ref GlossSubdomainId "glossary"
    * for more information.
    */
-  const types::subdomain_id invalid_subdomain_id =
+  constexpr types::subdomain_id invalid_subdomain_id =
     static_cast<types::subdomain_id>(-1);
 
   /**
@@ -310,9 +407,13 @@ namespace numbers
    * @ref GlossArtificialCell "artificial cells"
    * as well as the
    * @ref distributed
-   * module for more information.
+   * topic for more information.
+   *
+   * This value is an example of an
+   * @ref GlossInvalidValue "invalid value".
+   * See there for more information.
    */
-  const types::subdomain_id artificial_subdomain_id =
+  constexpr types::subdomain_id artificial_subdomain_id =
     static_cast<types::subdomain_id>(-2);
 } // namespace numbers
 

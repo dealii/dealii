@@ -3,7 +3,7 @@
 <h3>Resonance frequency and bandgap</h3>
 
 The results are analyzed in the
-[jupyter notebook](https://github.com/dealii/dealii/blob/master/examples/step-62/step-62.ipynb)
+[Jupyter Notebook](https://github.com/dealii/dealii/blob/master/examples/step-62/step-62.ipynb)
 with the following code
 @code{.py}
 h5_file = h5py.File('results.h5', 'r')
@@ -79,7 +79,7 @@ has a gaussian shape
 a^2 = a_\textrm{max}^2\frac{\omega^2\Gamma^2}{(\omega_r^2-\omega^2)^2+\Gamma^2\omega^2}
 @f]
 where $f_r = \frac{\omega_r}{2\pi}$ is the resonance frequency and $\Gamma=\frac{\omega_r}{Q}$ is the dissipation rate.
-We used the previous equation in the jupyter notebook to fit the mechanical resonance.
+We used the previous equation in the Jupyter Notebook to fit the mechanical resonance.
 
 Given the values we have chosen for the parameters, one could estimate the resonance frequency
 analytically. Indeed, this is then confirmed by what we get in this program:
@@ -87,8 +87,8 @@ the phononic superlattice cavity exhibits a mechanical resonance at 20GHz and a 
 The following images show the transmission amplitude and phase as a function of frequency in the
 vicinity of the resonance frequency:
 
-<img alt="Phononic superlattice cavity" src="https://www.dealii.org/images/steps/developer/step-62.05.png" height="400" />
-<img alt="Phononic superlattice cavity" src="https://www.dealii.org/images/steps/developer/step-62.06.png" height="400" />
+<img alt="Phononic superlattice cavity" src="https://dealii.org/images/steps/developer/step-62.05.png" height="400" />
+<img alt="Phononic superlattice cavity" src="https://dealii.org/images/steps/developer/step-62.06.png" height="400" />
 
 The images above suggest that the periodic structure has its intended effect: It really only lets waves of a very
 specific frequency pass through, whereas all other waves are reflected. This is of course precisely what one builds
@@ -98,7 +98,7 @@ the desired one at 20GHz only within a certain frequency range. Indeed, to find 
 which waves are blocked, we can extend the frequency range to 16 GHz through the appropriate parameters in the
 input file. We then obtain the following image:
 
-<img alt="Phononic superlattice cavity" src="https://www.dealii.org/images/steps/developer/step-62.07.png" height="400" />
+<img alt="Phononic superlattice cavity" src="https://dealii.org/images/steps/developer/step-62.07.png" height="400" />
 
 What this image suggests is that in the range of around 18 to around 22 GHz, really only the waves with a frequency
 of 20 GHz are allowed to pass through, but beyond this range, there are plenty of other frequencies that can pass
@@ -112,14 +112,14 @@ energy is transmitted and the amplitude of motion is amplified inside the cavity
 It can be observed that the PMLs are quite effective to truncate the solution.
 The following image shows the mode profile at resonance:
 
-<img alt="Phononic superlattice cavity" src="https://www.dealii.org/images/steps/developer/step-62.08.png" height="400" />
+<img alt="Phononic superlattice cavity" src="https://dealii.org/images/steps/developer/step-62.08.png" height="400" />
 
 On the other hand,  out of resonance all the mechanical energy is
 reflected. The following image shows the profile at 19.75 GHz.
 Note the interference between the force pulse and the reflected wave
 at the position $x=-8\mu\textrm{m}$.
 
-<img alt="Phononic superlattice cavity" src="https://www.dealii.org/images/steps/developer/step-62.09.png" height="400" />
+<img alt="Phononic superlattice cavity" src="https://dealii.org/images/steps/developer/step-62.09.png" height="400" />
 
 <h3>Experimental applications</h3>
 
@@ -137,7 +137,7 @@ macroscopic quantum harmonic oscillator.
 <h3>Possibilities for extensions</h3>
 
 Instead of setting the parameters in the C++ file we could set the parameters
-using a python script and save them in the HDF5 file that we will use for
+using a Python script and save them in the HDF5 file that we will use for
 the simulations. Then the deal.II program will read the parameters from the
 HDF5 file.
 

@@ -1,17 +1,16 @@
-//-----------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-//    Copyright (C) 2017 - 2022 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2017 - 2025 by the deal.II authors
 //
-//    This file is part of the deal.II library.
+// This file is part of the deal.II library.
 //
-//    The deal.II library is free software; you can use it, redistribute
-//    it, and/or modify it under the terms of the GNU Lesser General
-//    Public License as published by the Free Software Foundation; either
-//    version 2.1 of the License, or (at your option) any later version.
-//    The full text of the license can be found in the file LICENSE.md at
-//    the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-//---------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 #ifndef dealii_optimization_rol_vector_adaptor_h
 #define dealii_optimization_rol_vector_adaptor_h
@@ -131,28 +130,26 @@ namespace Rol
 
   private:
     /**
-     * Teuchos smart reference counting pointer to the underlying vector of type
-     * <tt>VectorType</tt>.
+     * ROL pointer to the underlying vector of type <tt>VectorType</tt>.
      */
-    Teuchos::RCP<VectorType> vector_ptr;
+    ROL::Ptr<VectorType> vector_ptr;
 
   public:
     /**
      * Constructor.
      */
-    VectorAdaptor(const Teuchos::RCP<VectorType> &vector_ptr);
+    VectorAdaptor(const ROL::Ptr<VectorType> &vector_ptr);
 
     /**
-     * Return the Teuchos smart reference counting pointer to
-     * the wrapper vector, #vector_ptr.
+     * Return the ROL pointer to the wrapper vector, #vector_ptr.
      */
-    Teuchos::RCP<VectorType>
+    ROL::Ptr<VectorType>
     getVector();
 
     /**
-     * Return the Teuchos smart reference counting pointer to const vector.
+     * Return the ROL pointer to const vector.
      */
-    Teuchos::RCP<const VectorType>
+    ROL::Ptr<const VectorType>
     getVector() const;
 
     /**
@@ -212,15 +209,14 @@ namespace Rol
     /**
      * Return a clone of the wrapped vector.
      */
-    Teuchos::RCP<ROL::Vector<value_type>>
+    ROL::Ptr<ROL::Vector<value_type>>
     clone() const;
 
     /**
-     * Create and return a Teuchos smart reference counting pointer to the basis
-     * vector corresponding to the @p i ${}^{th}$ element of
-     * the wrapper vector.
+     * Create and return a ROL pointer to the basis vector corresponding to the
+     * @p i ${}^{th}$ element of the wrapper vector.
      */
-    Teuchos::RCP<ROL::Vector<value_type>>
+    ROL::Ptr<ROL::Vector<value_type>>
     basis(const int i) const;
 
     /**
@@ -258,14 +254,14 @@ namespace Rol
 
   template <typename VectorType>
   VectorAdaptor<VectorType>::VectorAdaptor(
-    const Teuchos::RCP<VectorType> &vector_ptr)
+    const ROL::Ptr<VectorType> &vector_ptr)
     : vector_ptr(vector_ptr)
   {}
 
 
 
   template <typename VectorType>
-  Teuchos::RCP<VectorType>
+  ROL::Ptr<VectorType>
   VectorAdaptor<VectorType>::getVector()
   {
     return vector_ptr;
@@ -274,7 +270,7 @@ namespace Rol
 
 
   template <typename VectorType>
-  Teuchos::RCP<const VectorType>
+  ROL::Ptr<const VectorType>
   VectorAdaptor<VectorType>::getVector() const
   {
     return vector_ptr;
@@ -287,7 +283,7 @@ namespace Rol
   VectorAdaptor<VectorType>::set(const ROL::Vector<value_type> &rol_vector)
   {
     const VectorAdaptor &vector_adaptor =
-      Teuchos::dyn_cast<const VectorAdaptor>(rol_vector);
+      dynamic_cast<const VectorAdaptor &>(rol_vector);
 
     (*vector_ptr) = *(vector_adaptor.getVector());
   }
@@ -302,7 +298,7 @@ namespace Rol
            ExcDimensionMismatch(this->dimension(), rol_vector.dimension()));
 
     const VectorAdaptor &vector_adaptor =
-      Teuchos::dyn_cast<const VectorAdaptor>(rol_vector);
+      dynamic_cast<const VectorAdaptor &>(rol_vector);
 
     *vector_ptr += *(vector_adaptor.getVector());
   }
@@ -318,7 +314,7 @@ namespace Rol
            ExcDimensionMismatch(this->dimension(), rol_vector.dimension()));
 
     const VectorAdaptor &vector_adaptor =
-      Teuchos::dyn_cast<const VectorAdaptor>(rol_vector);
+      dynamic_cast<const VectorAdaptor &>(rol_vector);
 
     vector_ptr->add(alpha, *(vector_adaptor.getVector()));
   }
@@ -355,7 +351,7 @@ namespace Rol
            ExcDimensionMismatch(this->dimension(), rol_vector.dimension()));
 
     const VectorAdaptor &vector_adaptor =
-      Teuchos::dyn_cast<const VectorAdaptor>(rol_vector);
+      dynamic_cast<const VectorAdaptor &>(rol_vector);
 
     return (*vector_ptr) * (*vector_adaptor.getVector());
   }
@@ -372,22 +368,21 @@ namespace Rol
 
 
   template <typename VectorType>
-  Teuchos::RCP<ROL::Vector<typename VectorType::value_type>>
+  ROL::Ptr<ROL::Vector<typename VectorType::value_type>>
   VectorAdaptor<VectorType>::clone() const
   {
-    Teuchos::RCP<VectorType> vec_ptr = Teuchos::rcp(new VectorType);
-    (*vec_ptr)                       = (*vector_ptr);
+    ROL::Ptr<VectorType> vec_ptr = ROL::makePtr<VectorType>(*vector_ptr);
 
-    return Teuchos::rcp(new VectorAdaptor(vec_ptr));
+    return ROL::makePtr<VectorAdaptor>(vec_ptr);
   }
 
 
 
   template <typename VectorType>
-  Teuchos::RCP<ROL::Vector<typename VectorType::value_type>>
+  ROL::Ptr<ROL::Vector<typename VectorType::value_type>>
   VectorAdaptor<VectorType>::basis(const int i) const
   {
-    Teuchos::RCP<VectorType> vec_ptr = Teuchos::rcp(new VectorType);
+    ROL::Ptr<VectorType> vec_ptr = ROL::makePtr<VectorType>();
 
     // Zero all the entries in dealii vector.
     vec_ptr->reinit(*vector_ptr, false);
@@ -404,9 +399,7 @@ namespace Rol
         vec_ptr->compress(VectorOperation::insert);
       }
 
-    Teuchos::RCP<VectorAdaptor> e = Teuchos::rcp(new VectorAdaptor(vec_ptr));
-
-    return e;
+    return ROL::makePtr<VectorAdaptor>(vec_ptr);
   }
 
 
@@ -445,7 +438,7 @@ namespace Rol
            ExcDimensionMismatch(this->dimension(), rol_vector.dimension()));
 
     const VectorAdaptor &vector_adaptor =
-      Teuchos::dyn_cast<const VectorAdaptor>(rol_vector);
+      dynamic_cast<const VectorAdaptor &>(rol_vector);
 
     const VectorType &given_rol_vector = *(vector_adaptor.getVector());
 
@@ -506,6 +499,14 @@ namespace Rol
 
 DEAL_II_NAMESPACE_CLOSE
 
+
+#else
+
+// Make sure the scripts that create the C++20 module input files have
+// something to latch on if the preprocessor #ifdef above would
+// otherwise lead to an empty content of the file.
+DEAL_II_NAMESPACE_OPEN
+DEAL_II_NAMESPACE_CLOSE
 
 #endif // DEAL_II_TRILINOS_WITH_ROL
 

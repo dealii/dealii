@@ -1,17 +1,16 @@
-## ---------------------------------------------------------------------
+## ------------------------------------------------------------------------
 ##
-## Copyright (C) 2012 - 2023 by the deal.II authors
+## SPDX-License-Identifier: LGPL-2.1-or-later
+## Copyright (C) 2012 - 2025 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
-## The deal.II library is free software; you can use it, redistribute
-## it, and/or modify it under the terms of the GNU Lesser General
-## Public License as published by the Free Software Foundation; either
-## version 2.1 of the License, or (at your option) any later version.
-## The full text of the license can be found in the file LICENSE.md at
-## the top level directory of deal.II.
+## Part of the source code is dual licensed under Apache-2.0 WITH
+## LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+## governing the source code and code contributions can be found in
+## LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 ##
-## ---------------------------------------------------------------------
+## ------------------------------------------------------------------------
 
 #
 # Configuration for the trilinos library:
@@ -23,8 +22,8 @@ set(FEATURE_TRILINOS_DEPENDS MPI)
 # A list of optional Trilinos modules we use:
 #
 set(_deal_ii_trilinos_optional_modules
-  Belos EpetraExt Kokkos MueLu NOX ROL Sacado SEACAS Tpetra Zoltan
-  )
+  Amesos2 Belos EpetraExt Ifpack2 Kokkos MueLu NOX ROL Sacado SEACAS Tpetra Zoltan 
+)
 
 #
 # A list of optional Trilinos TPLs we use:
@@ -52,11 +51,11 @@ macro(feature_trilinos_find_external var)
     #
     message(STATUS
       "Checking whether the found trilinos package contains all required modules:"
-      )
+    )
 
     foreach(_module
-        Amesos Epetra Ifpack AztecOO Teuchos ML
-      )
+      Amesos Epetra Ifpack AztecOO Teuchos ML
+    )
       item_matches(_module_found ${_module} ${Trilinos_PACKAGE_LIST})
       if(_module_found)
         message(STATUS "  Found ${_module}")
@@ -70,29 +69,28 @@ macro(feature_trilinos_find_external var)
     if(NOT ${var})
       message(STATUS "Could not find a sufficient Trilinos installation: "
         "Missing ${_modules_missing}"
-        )
+      )
       set(TRILINOS_ADDITIONAL_ERROR_STRING
         "The Trilinos installation (found at \"${TRILINOS_DIR}\")\n"
         "is missing one or more modules necessary for the deal.II Trilinos interfaces:\n"
         "  ${_modules_missing}\n\n"
         "Please re-install Trilinos with the missing Trilinos subpackages enabled.\n\n"
-        )
+      )
     endif()
 
     #
-    # We require at least Trilinos 12.4
+    # We require at least Trilinos 13.2
     #
-    if(TRILINOS_VERSION VERSION_LESS 12.4)
-
+    if(TRILINOS_VERSION VERSION_LESS 13.2)
       message(STATUS "Could not find a sufficient Trilinos installation: "
-        "deal.II requires at least version 12.4, but version ${TRILINOS_VERSION} was found."
-        )
+        "deal.II requires at least version 13.2, but version ${TRILINOS_VERSION} was found."
+      )
       set(TRILINOS_ADDITIONAL_ERROR_STRING
         ${TRILINOS_ADDITIONAL_ERROR_STRING}
         "The Trilinos installation (found at \"${TRILINOS_DIR}\")\n"
         "with version ${TRILINOS_VERSION} is too old.\n"
-        "deal.II requires at least version 12.4.\n\n"
-        )
+        "deal.II requires at least version 13.2.\n\n"
+      )
       set(${var} FALSE)
     endif()
 
@@ -103,13 +101,13 @@ macro(feature_trilinos_find_external var)
     if(NOT TRILINOS_WITH_MPI)
       message(STATUS "Could not find a sufficient Trilinos installation: "
         "Trilinos has to have MPI support enabled."
-        )
+      )
       set(TRILINOS_ADDITIONAL_ERROR_STRING
         ${TRILINOS_ADDITIONAL_ERROR_STRING}
         "The Trilinos installation (found at \"${TRILINOS_DIR}\")\n"
         "has to be configured with MPI support, but found:\n"
         "  TRILINOS_WITH_MPI = ${TRILINOS_WITH_MPI}\n"
-        )
+      )
       set(${var} FALSE)
     endif()
 
@@ -121,7 +119,7 @@ macro(feature_trilinos_find_external var)
       message(STATUS "Could not find a sufficient Trilinos installation: "
         "deal.II was configured to use 32bit global indices but "
         "Trilinos was not."
-        )
+      )
       set(TRILINOS_ADDITIONAL_ERROR_STRING
         ${TRILINOS_ADDITIONAL_ERROR_STRING}
         "The Trilinos installation (found at \"${TRILINOS_DIR}\")\n"
@@ -129,7 +127,7 @@ macro(feature_trilinos_find_external var)
         "found:\n"
         "  DEAL_II_WITH_64BIT_INDICES = ${DEAL_II_WITH_64BIT_INDICES}\n"
         "  TRILINOS_WITH_NO_32BIT_INDICES = ${TRILINOS_WITH_NO_32_BIT_INDICES}\n"
-        )
+      )
       set(${var} FALSE)
     endif()
 
@@ -141,7 +139,7 @@ macro(feature_trilinos_find_external var)
       message(STATUS "Could not find a sufficient Trilinos installation: "
         "deal.II was configured to use 64bit global indices but "
         "Trilinos was not."
-        )
+      )
       set(TRILINOS_ADDITIONAL_ERROR_STRING
         ${TRILINOS_ADDITIONAL_ERROR_STRING}
         "The Trilinos installation (found at \"${TRILINOS_DIR}\")\n"
@@ -149,7 +147,7 @@ macro(feature_trilinos_find_external var)
         "found:\n"
         "  DEAL_II_WITH_64BIT_INDICES = ${DEAL_II_WITH_64BIT_INDICES}\n"
         "  TRILINOS_WITH_NO_64BIT_INDICES = ${TRILINOS_WITH_NO_64_BIT_INDICES}\n"
-        )
+      )
       set(${var} FALSE)
     endif()
 
@@ -158,7 +156,7 @@ macro(feature_trilinos_find_external var)
     #
     # Check which optional features of trilinos are installed.
     #
-    if (${var})
+    if(${var})
       #
       # Check for modules.
       #
@@ -198,31 +196,13 @@ macro(feature_trilinos_find_external var)
       endif()
 
       #
-      # We require at least Trilinos 12.14.1
+      # When configuring Kokkos we have to ensure that we actually pick up the
+      # correct Kokkos installation coming from Trilinos.
       #
-      if(TRILINOS_VERSION VERSION_LESS 12.14.1)
-        message(STATUS "Could not find a sufficient Trilinos installation: "
-          "deal.II requires at least version 12.14.1 if the Trilinos installation includes Kokkos, "
-          "but version ${TRILINOS_VERSION} was found."
-          )
-        set(TRILINOS_ADDITIONAL_ERROR_STRING
-          ${TRILINOS_ADDITIONAL_ERROR_STRING}
-          "The Trilinos installation (found at \"${TRILINOS_DIR}\")\n"
-          "with version ${TRILINOS_VERSION} is too old.\n"
-          "deal.II requires at least version 12.14.1 if the Trilinos installation includes Kokkos.\n\n"
-          )
-        set(${var} FALSE)
-      endif()
-    endif()
-
-    if(TRILINOS_WITH_KOKKOS AND Kokkos_ENABLE_CUDA)
-        # We need to disable SIMD vectorization for CUDA device code.
-        # Otherwise, nvcc compilers from version 9 on will emit an error message like:
-        # "[...] contains a vector, which is not supported in device code". We
-        # would like to set the variable in check_01_cpu_feature but at that point
-        # we don't know if CUDA support is enabled in Kokkos
-        set(DEAL_II_VECTORIZATION_WIDTH_IN_BITS 0)
-        KOKKOS_CHECK(OPTIONS CUDA_LAMBDA)
+      # FIXME: this logic should probably be refactored into
+      # FindDEAL_II_TRILINOS.cmake...
+      #
+      set(TRILINOS_KOKKOS_DIR "${TRILINOS_CONFIG_DIR}/..")
     endif()
 
     if(TRILINOS_WITH_TPETRA)
@@ -241,7 +221,7 @@ macro(feature_trilinos_find_external var)
       add_flags(CMAKE_REQUIRED_FLAGS "${DEAL_II_CXX_FLAGS} ${DEAL_II_LINKER_FLAGS}")
 
       if(DEAL_II_WITH_64BIT_INDICES)
-        set(_global_index_type "std::int64_t")
+        set(_global_index_type "long long")
       else()
         set(_global_index_type "int")
       endif()
@@ -262,21 +242,48 @@ macro(feature_trilinos_find_external var)
         }
         "
         TRILINOS_TPETRA_IS_FUNCTIONAL
-        )
+      )
 
       if(TRILINOS_TPETRA_IS_FUNCTIONAL)
-        check_cxx_symbol_exists(HAVE_TPETRA_INST_FLOAT          "TpetraCore_config.h" DEAL_II_HAVE_TPETRA_INST_FLOAT)
-        check_cxx_symbol_exists(HAVE_TPETRA_INST_DOUBLE         "TpetraCore_config.h" DEAL_II_HAVE_TPETRA_INST_DOUBLE)
-        check_cxx_symbol_exists(HAVE_TPETRA_INST_COMPLEX_FLOAT  "TpetraCore_config.h" DEAL_II_HAVE_TPETRA_INST_COMPLEX_FLOAT)
-        check_cxx_symbol_exists(HAVE_TPETRA_INST_COMPLEX_DOUBLE "TpetraCore_config.h" DEAL_II_HAVE_TPETRA_INST_COMPLEX_DOUBLE)
+        #
+        # We need to figure out what instantiations are used in Tpetra so
+        # that we can populate our DEAL_II_EXPAND_TPETRA correctly. We need
+        # to dof this here prior to the call to reset_cmake_required().
+        #
+        check_cxx_symbol_exists(HAVE_TPETRA_INST_DOUBLE "TpetraCore_config.h" _tpetra_inst_double)
+        check_cxx_symbol_exists(HAVE_TPETRA_INST_FLOAT "TpetraCore_config.h" _tpetra_inst_float)
+        check_cxx_symbol_exists(HAVE_TPETRA_INST_COMPLEX_DOUBLE "TpetraCore_config.h" _tpetra_inst_complex_double)
+        check_cxx_symbol_exists(HAVE_TPETRA_INST_COMPLEX_FLOAT "TpetraCore_config.h" _tpetra_inst_complex_float)
       else()
-        message(
-          STATUS
-          "Tpetra was found but is not usable! Disabling Tpetra support."
-          )
+        message(STATUS "Tpetra was found but is not usable due to a mismatch in ordinal number types.")
         set(TRILINOS_WITH_TPETRA OFF)
+
+        check_cxx_symbol_exists(HAVE_TPETRA_INT_INT "TpetraCore_config.h" _tpetra_int_int)
+        check_cxx_symbol_exists(HAVE_TPETRA_INT_LONG_LONG "TpetraCore_config.h" _tpetra_int_long_long)
+
+        if(NOT _tpetra_int_long_long AND DEAL_II_WITH_64BIT_INDICES)
+          message( STATUS
+            "  Tpetra was configured *without* support for 64-bit global indices"
+            " but deal.II is configured to use 64-bit global indices."
+            )
+          message(STATUS
+            "  Either reconfigure deal.II with -DDEAL_II_WITH_64BIT_INDICES=OFF"
+            " or rebuild Trilinos with -DTpetra_INST_INT_LONG_LONG=ON"
+            )
+
+        elseif(NOT _tpetra_int_int AND NOT DEAL_II_WITH_64BIT_INDICES)
+          message( STATUS
+            "  Tpetra was configured *without* support for 32-bit global indices"
+            " but deal.II is configured to use 32-bit global indices."
+            )
+          message(STATUS
+            "  Either reconfigure deal.II with -DDEAL_II_WITH_64BIT_INDICES=ON"
+            " or rebuild Trilinos with -DTpetra_INST_INT_INT=ON"
+            )
+        endif()
+
+        reset_cmake_required()
       endif()
-      reset_cmake_required()
     endif()
 
     if(TRILINOS_WITH_MUELU)
@@ -303,7 +310,7 @@ macro(feature_trilinos_find_external var)
         }
         "
         TRILINOS_MUELU_IS_FUNCTIONAL
-        )
+      )
 
       reset_cmake_required()
 
@@ -311,7 +318,7 @@ macro(feature_trilinos_find_external var)
         message(
           STATUS
           "MueLu was found but is not usable through Epetra! Disabling MueLu support."
-          )
+        )
         set(TRILINOS_WITH_MUELU OFF)
       endif()
     endif()
@@ -340,7 +347,7 @@ macro(feature_trilinos_find_external var)
         }
         "
         TRILINOS_SEACAS_IS_FUNCTIONAL
-        )
+      )
 
       reset_cmake_required()
 
@@ -348,7 +355,7 @@ macro(feature_trilinos_find_external var)
         message(
           STATUS
           "SEACAS was found but doesn't seem to include ExodusII. Disabling SEACAS support."
-          )
+        )
         set(TRILINOS_WITH_SEACAS OFF)
       endif()
     endif()
@@ -368,7 +375,7 @@ macro(feature_trilinos_find_external var)
         HINTS ${Trilinos_INCLUDE_DIRS}
         NO_DEFAULT_PATH NO_CMAKE_ENVIRONMENT_PATH NO_CMAKE_PATH
         NO_SYSTEM_ENVIRONMENT_PATH NO_CMAKE_SYSTEM_PATH NO_CMAKE_FIND_ROOT_PATH
-        )
+      )
 
       if(EXISTS ${SACADO_TRAD_HPP})
         list(APPEND CMAKE_REQUIRED_INCLUDES ${Trilinos_INCLUDE_DIRS})
@@ -385,7 +392,7 @@ macro(feature_trilinos_find_external var)
           }
           "
           TRILINOS_CXX_SUPPORTS_SACADO_COMPLEX_RAD
-          )
+        )
         reset_cmake_required()
       endif()
 
@@ -418,18 +425,42 @@ macro(feature_trilinos_configure_external)
   set(DEAL_II_EXPAND_EPETRA_VECTOR "LinearAlgebra::EpetraWrappers::Vector")
 
   if(${DEAL_II_TRILINOS_WITH_TPETRA})
-    if (DEAL_II_HAVE_TPETRA_INST_DOUBLE)
-      set(DEAL_II_EXPAND_TPETRA_VECTOR_DOUBLE "LinearAlgebra::TpetraWrappers::Vector<double>")
+    if(_tpetra_inst_double)
+      set(DEAL_II_EXPAND_TPETRA_TYPES "double")
+      set(DEAL_II_EXPAND_TPETRA_VECTOR_DOUBLE
+        "LinearAlgebra::TpetraWrappers::Vector<double, MemorySpace::Host>"
+        "LinearAlgebra::TpetraWrappers::Vector<double, MemorySpace::Default>")
+      set(DEAL_II_EXPAND_TPETRA_BLOCKVECTOR_DOUBLE
+        "LinearAlgebra::TpetraWrappers::BlockVector<double, MemorySpace::Host>"
+        "LinearAlgebra::TpetraWrappers::BlockVector<double, MemorySpace::Default>")
     endif()
-    if (DEAL_II_HAVE_TPETRA_INST_FLOAT)
-      set(DEAL_II_EXPAND_TPETRA_VECTOR_FLOAT "LinearAlgebra::TpetraWrappers::Vector<float>")
+
+    if(_tpetra_inst_float)
+      set(DEAL_II_EXPAND_TPETRA_VECTOR_FLOAT
+        "LinearAlgebra::TpetraWrappers::Vector<float, MemorySpace::Host>"
+        "LinearAlgebra::TpetraWrappers::Vector<float, MemorySpace::Default>")
+      set(DEAL_II_EXPAND_TPETRA_BLOCKVECTOR_FLOAT
+        "LinearAlgebra::TpetraWrappers::BlockVector<float, MemorySpace::Host>"
+        "LinearAlgebra::TpetraWrappers::BlockVector<float, MemorySpace::Default>")
     endif()
+
     if(${DEAL_II_WITH_COMPLEX_NUMBERS})
-    if(DEAL_II_HAVE_TPETRA_INST_COMPLEX_DOUBLE)
-        set(DEAL_II_EXPAND_TPETRA_VECTOR_COMPLEX_DOUBLE "LinearAlgebra::TpetraWrappers::Vector<std::complex<double>>")
+      if(_tpetra_inst_complex_double)
+        set(DEAL_II_EXPAND_TPETRA_VECTOR_COMPLEX_DOUBLE
+          "LinearAlgebra::TpetraWrappers::Vector<std::complex<double>, MemorySpace::Host>"
+          "LinearAlgebra::TpetraWrappers::Vector<std::complex<double>, MemorySpace::Default>")
+        set(DEAL_II_EXPAND_TPETRA_BLOCKVECTOR_COMPLEX_DOUBLE
+          "LinearAlgebra::TpetraWrappers::BlockVector<std::complex<double>, MemorySpace::Host>"
+          "LinearAlgebra::TpetraWrappers::BlockVector<std::complex<double>, MemorySpace::Default>")
       endif()
-      if(DEAL_II_HAVE_TPETRA_INST_COMPLEX_FLOAT)
-        set(DEAL_II_EXPAND_TPETRA_VECTOR_COMPLEX_FLOAT "LinearAlgebra::TpetraWrappers::Vector<std::complex<float>>")
+
+      if(_tpetra_inst_complex_float)
+        set(DEAL_II_EXPAND_TPETRA_VECTOR_COMPLEX_FLOAT
+          "LinearAlgebra::TpetraWrappers::Vector<std::complex<float>, MemorySpace::Host>"
+          "LinearAlgebra::TpetraWrappers::Vector<std::complex<float>, MemorySpace::Default>")
+        set(DEAL_II_EXPAND_TPETRA_BLOCKVECTOR_COMPLEX_FLOAT
+          "LinearAlgebra::TpetraWrappers::BlockVector<std::complex<float>, MemorySpace::Host>"
+          "LinearAlgebra::TpetraWrappers::BlockVector<std::complex<float>, MemorySpace::Default>")
       endif()
     endif()
   endif()
@@ -447,7 +478,7 @@ macro(feature_trilinos_configure_external)
       "Sacado::Rad::ADvar<Sacado::Fad::DFad<double>>"
       "Sacado::Rad::ADvar<Sacado::Fad::DFad<float>>"
       )
-    if (TRILINOS_CXX_SUPPORTS_SACADO_COMPLEX_RAD)
+    if(TRILINOS_CXX_SUPPORTS_SACADO_COMPLEX_RAD)
       set(DEAL_II_TRILINOS_CXX_SUPPORTS_SACADO_COMPLEX_RAD ${TRILINOS_CXX_SUPPORTS_SACADO_COMPLEX_RAD})
     endif()
   endif()

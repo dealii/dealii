@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2003 - 2015 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2006 - 2024 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 
 
@@ -49,7 +48,7 @@
  * @ref ConceptPreconditionerType "the PreconditionerType concept". In
  * practice, one can usually treat any matrix-like object which defines
  * <code>vmult()</code> and <code>Tvmult()</code> as a preconditioner. All
- * preconditioner classes in this module implement this interface.
+ * preconditioner classes in this group implement this interface.
  *
  * When used
  * in Krylov space methods, it is up to the method, whether it simply
@@ -71,7 +70,7 @@
  * operators mapping the previous iterate <i>x<sup>k</sup></i> to the
  * next iterate in this way relaxation operators. Their generic
  * interface is given by @ref ConceptRelaxationType "the RelaxationType concept".
- * The classes with names starting with <tt>Relaxation</tt> in this module
+ * The classes with names starting with <tt>Relaxation</tt> in this group
  * implement this interface, as well as the preconditioners
  * PreconditionJacobi, PreconditionSOR, PreconditionBlockJacobi,
  * PreconditionBlockSOR, and PreconditionBlockSSOR.

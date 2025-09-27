@@ -11,10 +11,10 @@ should look like this:
 <table width="60%" align="center">
   <tr>
     <td align="center">
-      <img src="https://www.dealii.org/images/steps/developer/step-1.grid-1-r9.2.png" alt="">
+      <img src="https://dealii.org/images/steps/developer/step-1.grid-1-r9.2.png" alt="">
     </td>
     <td align="center">
-      <img src="https://www.dealii.org/images/steps/developer/step-1.grid-2-r9.2.png" alt="">
+      <img src="https://dealii.org/images/steps/developer/step-1.grid-2-r9.2.png" alt="">
     </td>
   </tr>
 </table>
@@ -33,6 +33,82 @@ good for some things at least.)
 
 
 <h3> Possibilities for extensions </h3>
+
+<h4> Use triangles </h4>
+
+For the first 20 or so years of its existence, deal.II only supported
+hypercube elements (i.e., quadrilaterals in 2d, and hexahedra in
+3d). It now also supports triangles in 2d; and tetrahedra, pyramids,
+and wedges in 3d. A consequence of this history is that nearly all of
+the tutorial programs you will see exclusively use quadrilaterals and
+hexahedra, and you may be forgiven that that is all that's
+supported. But you can try out other types of cells yourself here
+already. For example, here are two ideas:
+
+- You could create a triangular triangulation meshing a triangular
+  domain. To do this, you would replace the call to
+  `GridGenerator::hyper_cube(triangulation);` in the `first_grid()`
+  function by `GridGenerator::reference_cell(triangulation,
+  ReferenceCells::Triangle);`. This will give you the following output
+  in `grid-1.svg`:
+  <br>
+  <img src="https://dealii.org/images/steps/developer/step-1.grid-1-triangle.png" alt="" style="width:25%">
+
+- You can start with a quadrilateral mesh and convert it to a
+  triangular mesh. For example, in the `first_grid()` function,
+  replace the code
+  @code
+  Triangulation<2> triangulation;
+  GridGenerator::hyper_cube(triangulation);
+  @endcode
+  by the following, which first creates a temporary mesh
+  `triangulation_quad` consisting of quadrilaterals, and then converts
+  it into the `triangulation` object that then only consists of
+  triangles:
+  @code
+  Triangulation<2> triangulation_quad;
+  GridGenerator::hyper_cube(triangulation_quad);
+  Triangulation<2> triangulation;
+  GridGenerator::convert_hypercube_to_simplex_mesh (triangulation_quad,
+                                                    triangulation);
+  @endcode
+  This produces the following mesh:
+  <br>
+  <img src="https://dealii.org/images/steps/developer/step-1.grid-1-triangle-2.png" alt="" style="width:25%">
+
+  You can do the same in the `second_grid()` function by replacing
+  @code
+  Triangulation<2> triangulation;
+
+  const Point<2> center(1, 0);
+  const double   inner_radius = 0.5, outer_radius = 1.0;
+  GridGenerator::hyper_shell(
+    triangulation, center, inner_radius, outer_radius, 10);
+  @endcode
+  by the following (that includes some magic at the bottom we're
+  perhaps not quite ready to explain in detail yet, but that is
+  mentioned in the documentation of
+  GridGenerator::convert_hypercube_to_simplex_mesh()):
+  @code
+  Triangulation<2> triangulation_quad;
+
+  const Point<2> center(1, 0);
+  const double   inner_radius = 0.5, outer_radius = 1.0;
+  GridGenerator::hyper_shell(
+    triangulation_quad, center, inner_radius, outer_radius, 10);
+
+  Triangulation<2> triangulation;
+  GridGenerator::convert_hypercube_to_simplex_mesh (triangulation_quad,
+                                                    triangulation);
+  for (const auto i : triangulation_quad.get_manifold_ids())
+    if (i != numbers::flat_manifold_id)
+      triangulation.set_manifold(i, triangulation_quad.get_manifold(i));
+  @endcode
+  This results in this picture:
+  <br>
+  <img src="https://dealii.org/images/steps/developer/step-1.grid-2-triangle.png" alt="" style="width:25%">
+
+
 
 <h4> Different adaptive refinement strategies </h4>
 
@@ -64,7 +140,7 @@ appear in a triangulation), and `CellAccessor` (which adds a few
 functions that are specific to *cells*).
 
 A more thorough description of the whole iterator concept can be found
-in the @ref Iterators documentation module.
+in the @ref Iterators documentation topic.
 
 
 <h4> Different geometries </h4>
@@ -82,7 +158,7 @@ GridGenerator::hyper_shell or GridGenerator::truncated_cone) attach a Manifold
 object to the part of the triangulation that should be curved (SphericalManifold
 and CylindricalManifold, respectively) and use another manifold on the parts that
 should be flat (FlatManifold). See the documentation
-of Manifold or the @ref manifold "manifold module" for descriptions of the design
+of Manifold or the @ref manifold "manifold topic" for descriptions of the design
 philosophy and interfaces of these classes. Take a look at what they provide and
 see how they could be used in a program like this.
 
@@ -109,7 +185,7 @@ advice we will provide in this program: learn how to use a debugger as soon as
 possible. It will be time well invested.
 (@dealiiVideoLectureSeeAlso{25}) The deal.II Frequently Asked
 Questions (FAQ) page linked to from the top-level <a
-href="http://www.dealii.org/">deal.II webpage</a> also provides a good number
+href="http://dealii.org/">deal.II webpage</a> also provides a good number
 of hints on debugging deal.II programs.
 
 

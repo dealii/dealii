@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2019 - 2023 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2019 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 
 #include <deal.II/base/memory_consumption.h>
@@ -150,8 +149,8 @@ namespace parallel
           for (auto &cell_info : cell_infos)
             std::sort(cell_info.begin(),
                       cell_info.end(),
-                      [&](TriangulationDescription::CellData<dim> a,
-                          TriangulationDescription::CellData<dim> b) {
+                      [&](const TriangulationDescription::CellData<dim> &a,
+                          const TriangulationDescription::CellData<dim> &b) {
                         const CellId a_id(a.id);
                         const CellId b_id(b.id);
 
@@ -226,17 +225,25 @@ namespace parallel
       Assert(
         currently_processing_create_triangulation_for_internal_usage,
         ExcMessage(
-          "You have called the method parallel::fullydistributed::Triangulation::create_triangulation() \n"
-          "that takes 3 arguments. If you have not called this function directly, \n"
-          "it might have been called via a function from the GridGenerator or GridIn \n"
-          "namespace. To be able to set up a fully-distributed Triangulation with these \n"
-          "utility functions nevertheless, please follow the following three steps:\n"
-          "  1) call the utility function for a (serial) Triangulation, \n"
-          "     a parallel::shared::Triangulation, or a parallel::distributed::Triangulation object,\n"
-          "  2) use the functions TriangulationDescription::Utilities::create_description_from_triangulation() \n"
-          "     or ::create_description_from_triangulation_in_groups() to create the \n"
-          "     description of the local partition, and\n"
-          "  3) pass the created description to parallel::fullydistributed::Triangulation::create_triangulation()."));
+          "You have called the overload of\n"
+          "\n"
+          "    parallel::fullydistributed::Triangulation::"
+          "create_triangulation()\n"
+          "\n"
+          "which takes 3 arguments. This function is not yet implemented for "
+          "this class. If you have not called this function directly, it "
+          "might have been called via a function from the GridGenerator or "
+          "GridIn namespace. To set up a fully-distributed Triangulation with "
+          "these utility functions, please start by using the same process to "
+          "set up a serial Triangulation, parallel::shared::Triangulation, or "
+          "a parallel::distributed::Triangulation. Once that is complete use "
+          "the copy_triangulation() member function to finish setting up the "
+          "original fully distributed Triangulation. Alternatively, you can "
+          "use TriangulationDescription::Utilities::"
+          "create_description_from_triangulation() or "
+          "create_description_from_triangulation_in_groups() to create the "
+          "description of the local partition, and pass that description to "
+          "parallel::fullydistributed::Triangulation::create_triangulation()."));
 
       dealii::Triangulation<dim, spacedim>::create_triangulation(vertices,
                                                                  cells,
@@ -351,7 +358,7 @@ namespace parallel
     DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
     void Triangulation<dim, spacedim>::execute_coarsening_and_refinement()
     {
-      Assert(false, ExcNotImplemented());
+      DEAL_II_NOT_IMPLEMENTED();
     }
 
 
@@ -492,11 +499,12 @@ namespace parallel
           std::ofstream f(fname);
           f << "version nproc n_attached_fixed_size_objs n_attached_variable_size_objs n_global_active_cells"
             << std::endl
-            << 4 << " "
-            << Utilities::MPI::n_mpi_processes(this->mpi_communicator) << " "
-            << this->cell_attached_data.pack_callbacks_fixed.size() << " "
-            << this->cell_attached_data.pack_callbacks_variable.size() << " "
-            << this->n_global_active_cells() << std::endl;
+            << ::dealii::internal::CellAttachedDataSerializer<dim, spacedim>::
+                 version_number
+            << " " << Utilities::MPI::n_mpi_processes(this->mpi_communicator)
+            << " " << this->cell_attached_data.pack_callbacks_fixed.size()
+            << " " << this->cell_attached_data.pack_callbacks_variable.size()
+            << " " << this->n_global_active_cells() << std::endl;
         }
 
       // Save cell attached data.
@@ -599,21 +607,6 @@ namespace parallel
       Assert(this->n_cells() == 0,
              ExcMessage("load() only works if the Triangulation is empty!"));
 
-      // Compute global offset for each rank.
-      unsigned int n_locally_owned_cells = this->n_locally_owned_active_cells();
-
-      unsigned int global_first_cell = 0;
-
-      int ierr = MPI_Exscan(&n_locally_owned_cells,
-                            &global_first_cell,
-                            1,
-                            MPI_UNSIGNED,
-                            MPI_SUM,
-                            this->mpi_communicator);
-      AssertThrowMPI(ierr);
-
-      global_first_cell *= sizeof(unsigned int);
-
 
       unsigned int version, numcpus, attached_count_fixed,
         attached_count_variable, n_global_active_cells;
@@ -622,15 +615,16 @@ namespace parallel
         std::ifstream f(fname);
         AssertThrow(f.fail() == false, ExcIO());
         std::string firstline;
-        getline(f, firstline); // skip first line
+        getline(f, firstline);
         f >> version >> numcpus >> attached_count_fixed >>
           attached_count_variable >> n_global_active_cells;
       }
 
-      AssertThrow(version == 4,
+      const auto expected_version = ::dealii::internal::
+        CellAttachedDataSerializer<dim, spacedim>::version_number;
+
+      AssertThrow(version == expected_version,
                   ExcMessage("Incompatible version found in .info file."));
-      Assert(this->n_global_active_cells() == n_global_active_cells,
-             ExcMessage("Number of global active cells differ!"));
 
       // Load description and construct the triangulation.
       {
@@ -710,6 +704,24 @@ namespace parallel
         this->create_triangulation(construction_data);
       }
 
+      // Compute global offset for each rank.
+      unsigned int n_locally_owned_cells = this->n_locally_owned_active_cells();
+
+      unsigned int global_first_cell = 0;
+
+      int ierr = MPI_Exscan(&n_locally_owned_cells,
+                            &global_first_cell,
+                            1,
+                            MPI_UNSIGNED,
+                            MPI_SUM,
+                            this->mpi_communicator);
+      AssertThrowMPI(ierr);
+
+      global_first_cell *= sizeof(unsigned int);
+
+      Assert(this->n_global_active_cells() == n_global_active_cells,
+             ExcMessage("Number of global active cells differ!"));
+
       // clear all of the callback data, as explained in the documentation of
       // register_data_attach()
       this->cell_attached_data.n_attached_data_sets = 0;
@@ -732,17 +744,6 @@ namespace parallel
 
       AssertThrow(false, ExcNeedsMPI());
 #endif
-    }
-
-
-
-    template <int dim, int spacedim>
-    DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
-    void Triangulation<dim, spacedim>::load(const std::string &filename,
-                                            const bool         autopartition)
-    {
-      (void)autopartition;
-      load(filename);
     }
 
 
@@ -778,7 +779,7 @@ namespace parallel
 
 
 /*-------------- Explicit Instantiations -------------------------------*/
-#include "fully_distributed_tria.inst"
+#include "distributed/fully_distributed_tria.inst"
 
 
 DEAL_II_NAMESPACE_CLOSE

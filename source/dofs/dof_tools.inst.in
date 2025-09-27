@@ -1,20 +1,19 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2009 - 2023 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2009 - 2024 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 
-for (deal_II_dimension, deal_II_space_dimension : DIMENSIONS)
+for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
   {
 #if deal_II_dimension <= deal_II_space_dimension
     namespace DoFTools
@@ -189,10 +188,39 @@ for (deal_II_dimension : DIMENSIONS)
       const types::subdomain_id            subdomain_id,
       std::vector<bool>                   &selected_dofs);
 
+    template std::vector<std::vector<bool>> DoFTools::extract_constant_modes<
+      deal_II_dimension>(const DoFHandler<deal_II_dimension> &dof_handler,
+                         const ComponentMask &selected_components);
+
     template void DoFTools::extract_constant_modes<deal_II_dimension>(
       const DoFHandler<deal_II_dimension> &dof_handler,
       const ComponentMask                 &selected_components,
       std::vector<std::vector<bool>>      &constant_modes);
+
+    template std::vector<std::vector<bool>>
+    DoFTools::extract_level_constant_modes<deal_II_dimension>(
+      const unsigned int                   level,
+      const DoFHandler<deal_II_dimension> &dof_handler,
+      const ComponentMask                 &selected_components);
+
+    template void DoFTools::extract_level_constant_modes<deal_II_dimension>(
+      const unsigned int                   level,
+      const DoFHandler<deal_II_dimension> &dof_handler,
+      const ComponentMask                 &selected_components,
+      std::vector<std::vector<bool>>      &constant_modes);
+
+    template std::vector<std::vector<double>>
+    DoFTools::extract_rigid_body_modes<deal_II_dimension>(
+      const Mapping<deal_II_dimension>    &mapping,
+      const DoFHandler<deal_II_dimension> &dof_handler,
+      const ComponentMask                 &selected_components);
+
+    template std::vector<std::vector<double>>
+    DoFTools::extract_level_rigid_body_modes<deal_II_dimension>(
+      const unsigned int                   level,
+      const Mapping<deal_II_dimension>    &mapping,
+      const DoFHandler<deal_II_dimension> &dof_handler,
+      const ComponentMask                 &selected_components);
 
     template void DoFTools::get_active_fe_indices<deal_II_dimension>(
       const DoFHandler<deal_II_dimension> &dof_handler,
@@ -384,7 +412,7 @@ for (deal_II_dimension : DIMENSIONS; S : REAL_AND_COMPLEX_SCALARS)
   }
 
 
-for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : DIMENSIONS)
+for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
   {
 #if deal_II_dimension <= deal_II_space_dimension
     namespace DoFTools
@@ -438,7 +466,7 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : DIMENSIONS)
   }
 
 
-for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : DIMENSIONS)
+for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
   {
 #if deal_II_dimension <= deal_II_space_dimension
     namespace DoFTools
@@ -485,7 +513,7 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : DIMENSIONS)
 #endif
   }
 
-for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : DIMENSIONS)
+for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
   {
 #if deal_II_dimension >= 2 && (deal_II_dimension <= deal_II_space_dimension)
     namespace DoFTools

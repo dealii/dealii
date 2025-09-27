@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2013 - 2020 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2013 - 2024 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 #include <deal.II/base/geometry_info.h>
 #include <deal.II/base/polynomial.h>
@@ -133,8 +132,8 @@ PolynomialsNedelec<dim>::evaluate(
           // shifted one step in positive direction
           Point<dim> p;
 
-          p(0) = unit_point(1);
-          p(1) = unit_point(0);
+          p[0] = unit_point[1];
+          p[1] = unit_point[0];
 
           std::vector<double>         p_values((values.empty()) ? 0 : n_basis);
           std::vector<Tensor<1, dim>> p_grads((grads.empty()) ? 0 : n_basis);
@@ -327,18 +326,18 @@ PolynomialsNedelec<dim>::evaluate(
           std::vector<Tensor<2, dim>> p2_grad_grads(
             (grad_grads.empty()) ? 0 : n_basis);
 
-          p1(0) = unit_point(1);
-          p1(1) = unit_point(2);
-          p1(2) = unit_point(0);
+          p1[0] = unit_point[1];
+          p1[1] = unit_point[2];
+          p1[2] = unit_point[0];
           polynomial_space.evaluate(p1,
                                     p1_values,
                                     p1_grads,
                                     p1_grad_grads,
                                     empty_vector_of_3rd_order_tensors,
                                     empty_vector_of_4th_order_tensors);
-          p2(0) = unit_point(2);
-          p2(1) = unit_point(0);
-          p2(2) = unit_point(1);
+          p2[0] = unit_point[2];
+          p2[1] = unit_point[0];
+          p2[2] = unit_point[1];
           polynomial_space.evaluate(p2,
                                     p2_values,
                                     p2_grads,
@@ -1474,7 +1473,7 @@ PolynomialsNedelec<dim>::evaluate(
         }
 
       default:
-        Assert(false, ExcNotImplemented());
+        DEAL_II_NOT_IMPLEMENTED();
     }
 }
 
@@ -1496,7 +1495,7 @@ PolynomialsNedelec<dim>::n_polynomials(const unsigned int k)
 
       default:
         {
-          Assert(false, ExcNotImplemented());
+          DEAL_II_NOT_IMPLEMENTED();
           return 0;
         }
     }

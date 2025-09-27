@@ -1,17 +1,16 @@
-## ---------------------------------------------------------------------
+## ------------------------------------------------------------------------
 ##
-## Copyright (C) 2012 - 2023 by the deal.II authors
+## SPDX-License-Identifier: LGPL-2.1-or-later
+## Copyright (C) 2012 - 2025 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
-## The deal.II library is free software; you can use it, redistribute
-## it, and/or modify it under the terms of the GNU Lesser General
-## Public License as published by the Free Software Foundation; either
-## version 2.1 of the License, or (at your option) any later version.
-## The full text of the license can be found in the file LICENSE.md at
-## the top level directory of deal.II.
+## Part of the source code is dual licensed under Apache-2.0 WITH
+## LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+## governing the source code and code contributions can be found in
+## LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 ##
-## ---------------------------------------------------------------------
+## ------------------------------------------------------------------------
 
 ########################################################################
 #                                                                      #
@@ -32,7 +31,6 @@
 #   DEAL_II_ALWAYS_INLINE
 #   DEAL_II_RESTRICT
 #   DEAL_II_COMPILER_HAS_DIAGNOSTIC_PRAGMA
-#   DEAL_II_COMPILER_HAS_FUSE_LD_GOLD
 #
 
 #
@@ -331,11 +329,11 @@ reset_cmake_required()
 
 
 #
-# Use 'mold', 'lld' or the 'gold' linker if possible, given that either of them
+# Use 'mold' or 'lld' linker if possible, given that either of them
 # is substantially faster.
 #
-# We have to try to link a full executable with -fuse-ld=mold, -fuse-ld=lld or
-# -fuse-ld=gold to check whether "ld.mold", "ld.lld" or "ld.gold" is actually
+# We have to try to link a full executable with -fuse-ld=mold or -fuse-ld=lld
+# to check whether "ld.mold" or "ld.lld" is actually
 # available.
 #
 # Clang always reports "argument unused during compilation", but fails at link
@@ -370,7 +368,7 @@ if(NOT CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
   add_flags(CMAKE_REQUIRED_FLAGS "-fPIC")
 
   #
-  # Check for ld.mold, ld.lld and ld.gold support:
+  # Check for ld.mold or ld.lld support:
   #
   add_flags(CMAKE_REQUIRED_FLAGS "-fuse-ld=mold")
   CHECK_CXX_SOURCE_COMPILES(
@@ -389,22 +387,27 @@ if(NOT CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
     "
     DEAL_II_COMPILER_HAS_FUSE_LD_LLD)
 
-  strip_flag(CMAKE_REQUIRED_FLAGS "-fuse-ld=lld")
-  add_flags(CMAKE_REQUIRED_FLAGS "-fuse-ld=gold")
-  CHECK_CXX_SOURCE_COMPILES(
-    "
-    #include <iostream>
-    void foo() { std::cout << \"Hello, world!\" << std::endl; }
-    "
-    DEAL_II_COMPILER_HAS_FUSE_LD_GOLD)
-
   if(DEAL_II_COMPILER_HAS_FUSE_LD_MOLD)
     add_flags(DEAL_II_LINKER_FLAGS "-fuse-ld=mold")
   elseif(DEAL_II_COMPILER_HAS_FUSE_LD_LLD)
     add_flags(DEAL_II_LINKER_FLAGS "-fuse-ld=lld")
-  elseif(DEAL_II_COMPILER_HAS_FUSE_LD_GOLD)
-    add_flags(DEAL_II_LINKER_FLAGS "-fuse-ld=gold")
   endif()
 
   reset_cmake_required()
+endif()
+
+
+#
+# Check whether the compiler supports interprocedural and link-time
+# optimization. If so, we can set the corresponding property on the
+# compile and link targets later on.
+#
+if(DEAL_II_USE_LTO)
+  include(CheckIPOSupported)
+  check_ipo_supported(RESULT _res OUTPUT _out LANGUAGES CXX)
+  if (_res)
+    message(STATUS "Compiler supports interprocedural/link-time optimizations")
+  else()
+    message(FATAL_ERROR "You asked for interprocedural/link-time optimizations, but the compiler does not support these optimizations: ${_out}")
+  endif()
 endif()

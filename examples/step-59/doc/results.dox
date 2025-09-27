@@ -345,7 +345,7 @@ same Laplacian matrix, which reduces the memory consumption for the inverse
 matrices. As compared to the algorithm implemented in this tutorial program,
 one would define the length scales as the distances between opposing
 faces. For continuous elements, the code project <a
-href=https://github.com/peterrum/dealii-dd-and-schwarz">Cache-optimized and
+href="https://github.com/peterrum/dealii-dd-and-schwarz">Cache-optimized and
 low-overhead implementations of multigrid smoothers for high-order FEM
 computations</a> presents the computation for continuous elements. There is
 currently no infrastructure in deal.II to automatically generate the 1D
@@ -357,8 +357,8 @@ Another way of extending the program would be to include support for adaptive
 meshes. While the classical approach of defining interface operations at edges
 of different refinement level, as discussed in step-39, is one possibility,
 for Poisson-type problems another option is typically more beneficial. Using
-the class MGTransferGlobalCoarsening, which is explained in the step-75
-tutorial program, one can deal with meshes of hanging nodes on all levels. An
+the class MGTransferMatrixFree, which is explained in the step-75
+tutorial program, one can also deal with meshes of hanging nodes on all levels. An
 algorithmic improvement can be obtained by combining the discontinuous
 function space with the auxiliary continuous finite element space of the same
 polynomial degree. This idea, introduced by Antonietti et al.
@@ -370,9 +370,9 @@ spaces. The latter work also proposes p-multigrid techniques and combination
 with algebraic multigrid coarse spaces as a means to efficiently solve Poisson
 problems with high-order discontinuous Galerkin discretizations on complicated
 geometries, representing the current state-of-the-art for simple Poisson-type
-problems. The class MGTransferGlobalCoarsening provides features for each of
+problems. The class MGTransferMatrixFree provides features for each of
 these three coarsening variants, the discontinuous-continuous auxiliary
 function concept, p-multigrid, and traditional h-multigrid. The main
 ingredient is to define an appropriate MGTwoLevelTransfer object and call
 MGTwoLevelTransfer::reinit_geometric_transfer() or
-MGTwoLevelTranfer::reinit_polynomial_transfer(), respectively.
+MGTwoLevelTransfer::reinit_polynomial_transfer(), respectively.

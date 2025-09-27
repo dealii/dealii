@@ -1,0 +1,5 @@
+Number of active cells: 1024
+Total number of cells: 1365
+Number of degrees of freedom: 3136 (2112+1024)
+24 CG Schur complement iterations to obtain convergence.
+Errors: ||e_p||_L2 = 0.0445032,   ||e_u||_L2 = 0.010826

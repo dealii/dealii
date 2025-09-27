@@ -1,7 +1,10 @@
-name: github-windows
+name: windows
 
 on:
   push:
+    branches:
+      - 'master'
+      - 'dealii-*'
   pull_request:
     types:
     - opened
@@ -10,17 +13,23 @@ on:
     - ready_for_review
 
 concurrency:
-  group: ${ {github.event_name }}-${{ github.workflow }}-${{ github.ref }}
+  group: ${{ github.event_name }}-${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: ${{github.event_name == 'pull_request'}}
 
 permissions:
   contents: read
 
+env:
+  CMAKE_BUILD_PARALLEL_LEVEL: 4
+  CTEST_OUTPUT_ON_FAILURE: 1
+  # test only in serial to avoid file locking error on ZERO_CHECK.lastbuildstate
+  CTEST_PARALLEL_LEVEL: 1
+
 jobs:
-  windows-serial:
+  serial:
     # Serial build on Windows
-    #
-    name: Windows Serial
+
+    name: ${{ matrix.os }} serial
     runs-on: ${{ matrix.os }}
 
     #
@@ -34,52 +43,41 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [windows-2019, windows-2022]
+        os: [windows-2022, windows-2025]
 
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v5
+    - name: set up path
+      # needed to use GNU patch instead of Strawberry Perl patch
+      run: |
+        echo "c:\program files\git\usr\bin" >> $env:GITHUB_PATH
     - name: info
       run: |
+        patch --version
         cmake --version
-        cmake -h
-        wmic logicaldisk get size, freespace, caption
     - name: configure
-      shell: bash
       run: |
-        mkdir build
-        mkdir c:/project
-        cd build
-        cmake -DCMAKE_BUILD_TYPE=Debug -DCMAKE_INSTALL_PREFIX=c:/project -DDEAL_II_WITH_ZLIB=off -DDEAL_II_CXX_FLAGS="-WX /D FE_EVAL_FACTORY_DEGREE_MAX=2" -T host=x64 -A x64 ..
+        cmake -B build -DCMAKE_BUILD_TYPE=Debug -DCMAKE_INSTALL_PREFIX=c:/project -DDEAL_II_CXX_FLAGS="/WX /std:c++20 /D FE_EVAL_FACTORY_DEGREE_MAX=2" -T host=x64 -A x64
     - name: print detailed.log
       run: type build/detailed.log
-    - name: build library
-      shell: bash
+    - name: build
       run: |
-        cmake --build build --parallel 2 --target install
-        cd c:/project
-        7z a dealii-windows.zip *
-    - name: test library
-      shell: bash
+        cmake --build build --target install
+    - name: test
       run: |
-        cmake --build build --parallel 2 --target test
-    - name: archive library
+        cmake --build build --target setup_tests_a-framework setup_tests_examples setup_tests_quick_tests
+        ctest --test-dir build --build-config Debug --extra-verbose
+    - name: upload library
       # run only if a PR is merged into master
-      if: github.ref == 'refs/heads/master'
-      uses: actions/upload-artifact@v3
+      if: ${{ github.ref == 'refs/heads/master' && matrix.os == 'windows-2025' }}
+      uses: actions/upload-artifact@v4
       with:
-        name: dealii-windows.zip
-        path: c:/project/dealii-windows.zip
-    - name: archive error 1
-      uses: actions/upload-artifact@v3
+        name: dealii-${{ matrix.os }}
+        path: c:/project
+    - name: upload CMakeConfigureLog
+      uses: actions/upload-artifact@v4
       if: always()
       continue-on-error: true
       with:
-        name: windows-serial-CMakeOutput.log
-        path: build/CMakeFiles/CMakeOutput.log
-    - name: archive error 2
-      uses: actions/upload-artifact@v3
-      if: always()
-      continue-on-error: true
-      with:
-        name: windows-serial-CMakeError.log
-        path: build/CMakeFiles/CMakeError.log
+        name: ${{ matrix.os }}-serial-CMakeConfigureLog.yaml
+        path: build/CMakeFiles/CMakeConfigureLog.yaml

@@ -1,12 +1,10 @@
-<br>
-
 <i>
 This program was contributed by Zhuoran Wang.
 Some more information about this program, as well as more numerical
 results, are presented in @cite Wang2019 .
 </i>
 
-<a name="Intro"></a>
+<a name="step_61-Intro"></a>
 <h1>Introduction</h1>
 
 This tutorial program presents an implementation of the "weak Galerkin"
@@ -238,7 +236,7 @@ Here, since $p_h$ has two components (the interior and the interface components)
 the same must hold true for the basis functions $\varphi_j(\mathbf x)$, which we
 can write as $\varphi_j = (\varphi_j^\circ,\varphi_j^\partial)$. If you've
 followed the descriptions in step-8, step-20, and the
-@ref vector_valued "documentation module on vector-valued problems",
+@ref vector_valued "documentation topic on vector-valued problems",
 it will be no surprise that for some values of $j$, $\varphi_j^\circ$ will be
 zero, whereas for other values of $j$, $\varphi_j^\partial$ will be zero -- i.e.,
 shape functions will be of either one or the other kind. That is not important,

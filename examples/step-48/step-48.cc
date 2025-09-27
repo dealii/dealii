@@ -1,24 +1,22 @@
-/* ---------------------------------------------------------------------
+/* ------------------------------------------------------------------------
  *
- * Copyright (C) 2011 - 2023 by the deal.II authors
+ * SPDX-License-Identifier: LGPL-2.1-or-later
+ * Copyright (C) 2012 - 2024 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
- * The deal.II library is free software; you can use it, redistribute
- * it, and/or modify it under the terms of the GNU Lesser General
- * Public License as published by the Free Software Foundation; either
- * version 2.1 of the License, or (at your option) any later version.
- * The full text of the license can be found in the file LICENSE.md at
- * the top level directory of deal.II.
+ * Part of the source code is dual licensed under Apache-2.0 WITH
+ * LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+ * governing the source code and code contributions can be found in
+ * LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
  *
- * ---------------------------------------------------------------------
+ * ------------------------------------------------------------------------
  *
  * Authors: Katharina Kormann, Martin Kronbichler, Uppsala University, 2011-2012
  */
 
 
 // The necessary files from the deal.II library.
-#include <deal.II/base/logstream.h>
 #include <deal.II/base/multithread_info.h>
 #include <deal.II/base/utilities.h>
 #include <deal.II/base/function.h>
@@ -308,10 +306,10 @@ namespace Step48
 #else
     Triangulation<dim> triangulation;
 #endif
-    FE_Q<dim>       fe;
+    const FE_Q<dim> fe;
     DoFHandler<dim> dof_handler;
 
-    MappingQ1<dim> mapping;
+    const MappingQ1<dim> mapping;
 
     AffineConstraints<double> constraints;
     IndexSet                  locally_relevant_dofs;
@@ -366,27 +364,21 @@ namespace Step48
   // cells whose center is within a radius of 11, and then refine once more
   // for a radius 6.  This simple ad hoc refinement could be done better by
   // adapting the mesh to the solution using error estimators during the time
-  // stepping as done in other example programs, and using
-  // parallel::distributed::SolutionTransfer to transfer the solution to the
-  // new mesh.
+  // stepping as done in other example programs, and using SolutionTransfer to
+  // transfer the solution to the new mesh.
   template <int dim>
   void SineGordonProblem<dim>::make_grid_and_dofs()
   {
     GridGenerator::hyper_cube(triangulation, -15, 15);
     triangulation.refine_global(n_global_refinements);
     {
-      typename Triangulation<dim>::active_cell_iterator
-        cell     = triangulation.begin_active(),
-        end_cell = triangulation.end();
-      for (; cell != end_cell; ++cell)
+      for (const auto &cell : triangulation.active_cell_iterators())
         if (cell->is_locally_owned())
           if (cell->center().norm() < 11)
             cell->set_refine_flag();
       triangulation.execute_coarsening_and_refinement();
 
-      cell     = triangulation.begin_active();
-      end_cell = triangulation.end();
-      for (; cell != end_cell; ++cell)
+      for (const auto &cell : triangulation.active_cell_iterators())
         if (cell->is_locally_owned())
           if (cell->center().norm() < 6)
             cell->set_refine_flag();
@@ -394,12 +386,7 @@ namespace Step48
     }
 
     pcout << "   Number of global active cells: "
-#ifdef DEAL_II_WITH_P4EST
-          << triangulation.n_global_active_cells()
-#else
-          << triangulation.n_active_cells()
-#endif
-          << std::endl;
+          << triangulation.n_global_active_cells() << std::endl;
 
     dof_handler.distribute_dofs(fe);
 
@@ -409,9 +396,9 @@ namespace Step48
 
     // We generate hanging node constraints for ensuring continuity of the
     // solution. As in step-40, we need to equip the constraint matrix with
-    // the IndexSet of locally relevant degrees of freedom to avoid it to
-    // consume too much memory for big problems. Next, the <code> MatrixFree
-    // </code> object for the problem is set up. Note that we specify a
+    // the IndexSet of locally active and locally relevant degrees of freedom
+    // to avoid it consuming too much memory for big problems. Next, the
+    // MatrixFree object for the problem is set up. Note that we specify a
     // particular scheme for shared-memory parallelization (hence one would
     // use multithreading for intra-node parallelism and not MPI; we here
     // choose the standard option &mdash; if we wanted to disable shared
@@ -428,7 +415,7 @@ namespace Step48
     locally_relevant_dofs =
       DoFTools::extract_locally_relevant_dofs(dof_handler);
     constraints.clear();
-    constraints.reinit(locally_relevant_dofs);
+    constraints.reinit(dof_handler.locally_owned_dofs(), locally_relevant_dofs);
     DoFTools::make_hanging_node_constraints(dof_handler, constraints);
     constraints.close();
 

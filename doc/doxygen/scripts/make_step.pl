@@ -1,17 +1,16 @@
-## ---------------------------------------------------------------------
+## ------------------------------------------------------------------------
 ##
-## Copyright (C) 2013 - 2022 by the deal.II authors
+## SPDX-License-Identifier: LGPL-2.1-or-later
+## Copyright (C) 2013 - 2024 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
-## The deal.II library is free software; you can use it, redistribute
-## it, and/or modify it under the terms of the GNU Lesser General
-## Public License as published by the Free Software Foundation; either
-## version 2.1 of the License, or (at your option) any later version.
-## The full text of the license can be found in the file LICENSE.md at
-## the top level directory of deal.II.
+## Part of the source code is dual licensed under Apache-2.0 WITH
+## LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+## governing the source code and code contributions can be found in
+## LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 ##
-## ---------------------------------------------------------------------
+## ------------------------------------------------------------------------
 
 if ($#ARGV != 1) {
   print "\nUsage: make_step.pl step cmake_source_dir\n";
@@ -47,33 +46,34 @@ if ($buildson ne "")
 # then show the table of contents
 print
 "\@htmlonly
-<table class=\"tutorial\" width=\"50%\">
+<table class=\"tutorial\" width=\"75%\">
 <tr><th colspan=\"2\"><b><small>Table of contents</small></b></th></tr>
 <tr><td width=\"50%\" valign=\"top\">
 <ol>
-  <li> <a href=\"#Intro\" class=bold>Introduction</a>
+  <li> <a href=\"#$step_underscore-Intro\" class=bold>Introduction</a>
 ";
 
-system $^X, "$cmake_source_dir/doc/doxygen/scripts/intro2toc", "$cmake_source_dir/examples/$step/doc/intro.dox";
+system $^X, "$cmake_source_dir/doc/doxygen/scripts/intro2toc.pl", "$cmake_source_dir/examples/$step/doc/intro.dox" , "--prefix=$step_underscore";
 
-print "  <li> <a href=\"#CommProg\" class=bold>The commented program</a>\n";
+print "  <li> <a href=\"#$step_underscore-CommProg\" class=bold>The commented program</a>\n";
 
-system $^X, "$cmake_source_dir/doc/doxygen/scripts/program2toc", "$cmake_source_dir/examples/$step/$step.cc";
+system $^X, "$cmake_source_dir/doc/doxygen/scripts/program2toc.pl", "$cmake_source_dir/examples/$step/$step.cc" , "--prefix=$step_underscore";
 
 print
 "</ol></td><td width=\"50%\" valign=\"top\"><ol>
-  <li value=\"3\"> <a href=\"#Results\" class=bold>Results</a>
+  <li value=\"3\"> <a href=\"#$step_underscore-Results\" class=bold>Results</a>
 ";
 
-system $^X, "$cmake_source_dir/doc/doxygen/scripts/intro2toc", "$cmake_source_dir/examples/$step/doc/results.dox";
+system $^X, "$cmake_source_dir/doc/doxygen/scripts/intro2toc.pl", "$cmake_source_dir/examples/$step/doc/results.dox" , "--prefix=$step_underscore";
 
 print
-"  <li> <a href=\"#PlainProg\" class=bold>The plain program</a>
+"  <li> <a href=\"#$step_underscore-PlainProg\" class=bold>The plain program</a>
 </ol> </td> </tr> </table>
 \@endhtmlonly
+
 ";
 
-system $^X, "$cmake_source_dir/doc/doxygen/scripts/create_anchors", "$cmake_source_dir/examples/$step/doc/intro.dox";
+system $^X, "$cmake_source_dir/doc/doxygen/scripts/create_anchors.pl", "$cmake_source_dir/examples/$step/doc/intro.dox" , "--prefix=$step_underscore";
 
 
 # Start the commented program by writing two empty lines. We have had
@@ -87,12 +87,12 @@ system $^X, "$cmake_source_dir/doc/doxygen/scripts/create_anchors", "$cmake_sour
 # solves the problem -- so a second newline character.
 print " *\n";
 print " *\n";
-print " * <a name=\"CommProg\"></a>\n";
+print " * <a name=\"$step_underscore-CommProg\"></a>\n";
 print " * <h1> The commented program</h1>\n";
 
-system $^X, "$cmake_source_dir/doc/doxygen/scripts/program2doxygen", "$cmake_source_dir/examples/$step/$step.cc";
+system $^X, "$cmake_source_dir/doc/doxygen/scripts/program2doxygen.pl", "$cmake_source_dir/examples/$step/$step.cc" , "--prefix=$step_underscore";
 
-system $^X, "$cmake_source_dir/doc/doxygen/scripts/create_anchors", "$cmake_source_dir/examples/$step/doc/results.dox";
+system $^X, "$cmake_source_dir/doc/doxygen/scripts/create_anchors.pl", "$cmake_source_dir/examples/$step/doc/results.dox" , "--prefix=$step_underscore";
 
 
 # Move to the stripped, plain program. The same principle as above
@@ -100,7 +100,7 @@ system $^X, "$cmake_source_dir/doc/doxygen/scripts/create_anchors", "$cmake_sour
 print " *\n";
 print " *\n";
 print
-"<a name=\"PlainProg\"></a>
+"<a name=\"$step_underscore-PlainProg\"></a>
 <h1> The plain program</h1>
 \@include \"$step.cc\"
 */

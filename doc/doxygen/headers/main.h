@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2006 - 2022 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2006 - 2024 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 
 /**
@@ -22,9 +21,8 @@
  * system, can be found elsewhere. In addition, there are
  * <a href="Tutorial.html">Tutorial programs on the use of the library</a>.
  *
- * Many of the classes in the deal.II library can be grouped into modules (see
- * the <a href="modules.html">Modules page</a> or the corresponding entry in
- * the menu at the top of this page). These modules form around the building
+ * Many of the classes in the deal.II library can be grouped into topics (see
+ * the "Topics" tab at the top of this page). These topics form around the building
  * blocks of any finite element program. An outline of how the primary groups
  * of classes in deal.II interact is given by the following clickable graph,
  * with a more detailed description below (gray boxes denote a subset of the
@@ -38,8 +36,8 @@
 
   node [fontname="FreeSans",fontsize=15,
         shape=record,height=0.2,width=0.4,
-        color="black", fillcolor="white", style="filled"];
-  edge [color="black", weight=10];
+        color="cornflowerblue", fillcolor="white", style="filled"];
+  edge [color="cornflowerblue", weight=10];
 
   tria       [label="Triangulation",    URL="\ref grid"];
   fe         [label="Finite elements",    URL="\ref feall"];
@@ -52,31 +50,30 @@
   output     [label="Graphical output", URL="\ref output"];
   manifold   [label="Manifold",         URL="\ref manifold"];
 
-  tria -> dh              [color="black",style="solid"];
-  fe -> dh                [color="black",style="solid"];
-  fe -> fevalues          [color="black",style="solid"];
-  mapping -> fevalues     [color="black",style="solid"];
-  quadrature -> fevalues  [color="black",style="solid"];
-  dh -> systems           [color="black",style="solid"];
-  fevalues -> systems     [color="black",style="solid"];
-  systems -> solvers      [color="black",style="solid"];
-  solvers -> output       [color="black",style="solid"];
-  manifold -> tria        [color="black",style="solid"];
-  manifold -> mapping     [color="black",style="solid"];
 
-
+  tria -> dh              [style="solid"];
+  fe -> dh                [style="solid"];
+  fe -> fevalues          [style="solid"];
+  mapping -> fevalues     [style="solid"];
+  quadrature -> fevalues  [style="solid"];
+  dh -> systems           [style="solid"];
+  fevalues -> systems     [style="solid"];
+  systems -> solvers      [style="solid"];
+  solvers -> output       [style="solid"];
+  manifold -> tria        [style="solid"];
+  manifold -> mapping     [style="solid"];
 
   node [fontname="FreeSans",fontsize=12,
         shape=record,height=0.2,width=0.4,
         color="gray55", fontcolor="gray55", fillcolor="white", style="filled"];
   edge [color="gray55", weight=1];
 
-  opencascade [label="OpenCASCADE"];
+  opencascade [label="OpenCASCADE", URL="\ref OpenCASCADE"];
+
   subgraph linalglibs {
     rank="same";
     petsc       [label="PETSc",    URL="\ref PETScWrappers"];
     trilinos    [label="Trilinos", URL="\ref TrilinosWrappers"];
-    cuda        [label="CUDA",     URL="\ref CUDAWrappers"];
   }
   umfpack     [label="UMFPACK"];
 
@@ -84,8 +81,6 @@
   petsc -> solvers        [dir="none"];
   trilinos -> systems     [dir="none"];
   trilinos -> solvers     [dir="none"];
-  cuda -> systems         [dir="none"];
-  cuda -> solvers         [dir="none"];
   umfpack -> solvers      [dir="none"];
   opencascade -> manifold [dir="none"];
 
@@ -95,10 +90,12 @@
         color="gray55", fontcolor="gray55", fillcolor="white", style="filled"];
   edge [color="gray55", weight=1];
 
+  kokkos      [label="Kokkos"];
   gmsh        [label="gmsh", URL="\ref Gmsh"];
   visit       [label="VisIt"]
   paraview    [label="ParaView"]
 
+  kokkos -> systems  [dir="none"];
   gmsh -> tria       [dir="none"];
   output -> visit    [dir="none"];
   output -> paraview [dir="none"];
@@ -114,7 +111,7 @@
  *   <li> <b>%Triangulation</b>: Triangulations are collections of
  *   cells and their lower-dimensional boundary objects. Cells are
  *   images of the reference hypercube [0,1]<sup>dim</sup> under a
- *   suitable mapping in the module on @ref mapping.
+ *   suitable mapping in the topic on @ref mapping.
  *
  *   The triangulation stores geometric and topological
  *   properties of a mesh: how are the cells connected and where are
@@ -135,8 +132,8 @@
  *   information about the cell it presently points to.
  *
  *   The classes that describe triangulations and cells are located
- *   and documented in the @ref grid module. Iterators are described
- *   in the @ref Iterators module.
+ *   and documented in the @ref grid topic. Iterators are described
+ *   in the @ref Iterators topic.
  *
  *   <li> <b>%Manifold</b>: Manifolds describe the shape of cells and,
  *   more generally, the geometry of the domain on which one wants
@@ -151,7 +148,7 @@
  *   provide values and gradients of individual shape functions at
  *   points on the unit cell.
  *
- *   The finite element classes are described in the @ref feall module.
+ *   The finite element classes are described in the @ref feall topic.
  *
  *   <li> <b>%Quadrature</b>: As with finite elements, quadrature
  *   objects are defined on the unit cell. They only describe the
@@ -159,7 +156,7 @@
  *   of quadrature points thereon.
  *
  *   The documentation of the classes describing particular quadrature
- *   formulas is found in the @ref Quadrature module.
+ *   formulas is found in the @ref Quadrature topic.
  *
  *   <li> <b>%DoFHandler</b>: %DoFHandler objects are the confluence
  *   of triangulations and finite elements: the finite element class
@@ -184,7 +181,7 @@
  *   these iterators is the geometric and topological information that
  *   can already be gotten from the triangulation iterators (they are
  *   in fact derived classes) as well as things like the global
- *   numbers of the degrees of freedom on the present cell. On can
+ *   numbers of the degrees of freedom on the present cell. One can
  *   also ask an iterator to extract the values corresponding to the
  *   degrees of freedom on the present cell from a data vector that
  *   stores values for all degrees of freedom associated with a
@@ -199,13 +196,13 @@
  *   specifics is relevant to the DoFHandler class with the exception of
  *   the fact that they exist.
  *
- *   The DoFHandler class and its associates are described in the @ref
- *   dofs module. In addition, there are specialized versions that can
+ *   The DoFHandler class and its associates are described in the
+ *   @ref dofs topic. In addition, there are specialized versions that can
  *   handle multilevel and hp-discretizations. These are described in
- *   the @ref mg and @ref hp modules. Finite element methods frequently
+ *   the @ref mg and @ref hp topics. Finite element methods frequently
  *   imply constraints on degrees of freedom, such as for hanging nodes
  *   or nodes at which boundary conditions apply; dealing with such
- *   constraints is described in the @ref constraints module.
+ *   constraints is described in the @ref constraints topic.
  *
  *   <li> <b>%Mapping</b>: The next step in a finite element program
  *   is that one would want to compute matrix and right hand side
@@ -219,7 +216,7 @@
  *   real space and back, as well as provide gradients of this
  *   derivative and Jacobian determinants.
  *
- *   These classes are all described in the @ref mapping module.
+ *   These classes are all described in the @ref mapping topic.
  *
  *   <li> <b>%FEValues</b>: The next step is to actually take a finite
  *   element and evaluate its shape functions and their gradients at
@@ -247,7 +244,7 @@
  *   evaluation on cells, FEFaceValues for evaluation on faces of
  *   cells, and FESubfaceValues for evaluation on parts of faces of
  *   cells. All these classes are described in the @ref feaccess
- *   module.
+ *   topic.
  *
  *   <li> <b>Linear Systems</b>: If one knows how to evaluate the
  *   values and gradients of shape functions on individual cells using
@@ -262,14 +259,14 @@
  *   entries of matrices and vectors. deal.II comes with a whole set
  *   of classes for this purpose, as well as with interfaces to other
  *   software packages that offer similar functionality. Documentation
- *   to this end can be found in the @ref LAC module.
+ *   to this end can be found in the @ref LAC topic.
  *
  *   <li> <b>Linear Solvers</b>: In order to determine the solution of
  *   a finite-dimensional, linear system of equations, one needs
  *   linear solvers. In finite element applications, they are
  *   frequently iterative, but sometimes one may also want to use
  *   direct or sparse direct solvers. deal.II has quite a number of
- *   these. They are documented in the @ref Solvers module.
+ *   these. They are documented in the @ref Solvers topic.
  *
  *   <li> <b>Output</b>: Finally, once one has obtained a solution of
  *   a finite element problem on a given triangulation, one will often
@@ -278,8 +275,8 @@
  *   files in a variety of graphics formats understood by widely
  *   available visualization tools.
  *
- *   A description of the classes that do so is given in the @ref
- *   output module.
+ *   A description of the classes that do so is given in the
+ *   @ref output topic.
  * </ol>
  *
  * In addition, deal.II has a number of groups of classes that go
@@ -289,8 +286,7 @@
  * finite element programs, but appear there as well. These classes
  * are all listed in the Classes and Namespaces views reachable from
  * the menu bar at the top of this page, and are also grouped into
- * modules of their own (see the <a href="modules.html">Modules link</a>
- * at the top of this page).
+ * topics of their own (see the "Topics" tab at the top of this page).
  *
  * We provide the Doxygen tag file for those of you who would like to directly link the
  * documentation of application programs to the deal.II online documentation. The tag file
@@ -299,7 +295,7 @@
  * to use the tag file, you have to download it into a place where Doxygen can find it.
  * After that, find the key <code>TAGFILES</code> in your Doxygen options file and write something like
  * <pre>
- * TAGFILES = deal.tag=https://www.dealii.org/X.Y.Z/doxygen/deal.II
+ * TAGFILES = deal.tag=https://dealii.org/X.Y.Z/doxygen/deal.II
  * </pre>
  * where <code>X.Y.Z</code> refers to the release you want to link to. Be sure you use
  * the matching tag file. In theory, you can also link against the developing revisions

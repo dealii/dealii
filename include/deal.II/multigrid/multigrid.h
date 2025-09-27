@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 1999 - 2023 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 1999 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 #ifndef dealii_multigrid_h
 #define dealii_multigrid_h
@@ -19,9 +18,9 @@
 
 #include <deal.II/base/config.h>
 
+#include <deal.II/base/enable_observer_pointer.h>
 #include <deal.II/base/mg_level_object.h>
-#include <deal.II/base/smartpointer.h>
-#include <deal.II/base/subscriptor.h>
+#include <deal.II/base/observer_pointer.h>
 
 #include <deal.II/distributed/tria.h>
 
@@ -32,7 +31,10 @@
 
 #include <deal.II/multigrid/mg_base.h>
 
+#include <boost/signals2.hpp>
+
 #include <vector>
+
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -160,7 +162,7 @@ namespace mg
  * MGTransferBase.
  */
 template <typename VectorType>
-class Multigrid : public Subscriptor
+class Multigrid : public EnableObserverPointer
 {
 public:
   /**
@@ -423,30 +425,30 @@ private:
   /**
    * The matrix for each level.
    */
-  SmartPointer<const MGMatrixBase<VectorType>, Multigrid<VectorType>> matrix;
+  ObserverPointer<const MGMatrixBase<VectorType>, Multigrid<VectorType>> matrix;
 
   /**
    * The matrix for each level.
    */
-  SmartPointer<const MGCoarseGridBase<VectorType>, Multigrid<VectorType>>
+  ObserverPointer<const MGCoarseGridBase<VectorType>, Multigrid<VectorType>>
     coarse;
 
   /**
    * Object for grid transfer.
    */
-  SmartPointer<const MGTransferBase<VectorType>, Multigrid<VectorType>>
+  ObserverPointer<const MGTransferBase<VectorType>, Multigrid<VectorType>>
     transfer;
 
   /**
    * The pre-smoothing object.
    */
-  SmartPointer<const MGSmootherBase<VectorType>, Multigrid<VectorType>>
+  ObserverPointer<const MGSmootherBase<VectorType>, Multigrid<VectorType>>
     pre_smooth;
 
   /**
    * The post-smoothing object.
    */
-  SmartPointer<const MGSmootherBase<VectorType>, Multigrid<VectorType>>
+  ObserverPointer<const MGSmootherBase<VectorType>, Multigrid<VectorType>>
     post_smooth;
 
   /**
@@ -454,7 +456,7 @@ private:
    *
    * @note Only <tt>vmult</tt> is used for these matrices.
    */
-  SmartPointer<const MGMatrixBase<VectorType>> edge_out;
+  ObserverPointer<const MGMatrixBase<VectorType>> edge_out;
 
   /**
    * Transpose edge matrix from the refinement edge to the interior of the
@@ -462,21 +464,23 @@ private:
    *
    * @note Only <tt>Tvmult</tt> is used for these matrices.
    */
-  SmartPointer<const MGMatrixBase<VectorType>> edge_in;
+  ObserverPointer<const MGMatrixBase<VectorType>> edge_in;
 
   /**
    * Edge matrix from fine to coarse.
    *
    * @note Only <tt>vmult</tt> is used for these matrices.
    */
-  SmartPointer<const MGMatrixBase<VectorType>, Multigrid<VectorType>> edge_down;
+  ObserverPointer<const MGMatrixBase<VectorType>, Multigrid<VectorType>>
+    edge_down;
 
   /**
    * Transpose edge matrix from coarse to fine.
    *
    * @note Only <tt>Tvmult</tt> is used for these matrices.
    */
-  SmartPointer<const MGMatrixBase<VectorType>, Multigrid<VectorType>> edge_up;
+  ObserverPointer<const MGMatrixBase<VectorType>, Multigrid<VectorType>>
+    edge_up;
 
   template <int dim, typename OtherVectorType, typename TransferType>
   friend class PreconditionMG;
@@ -498,12 +502,12 @@ private:
  * to be initialized with a separate DoFHandler for each block.
  */
 template <int dim, typename VectorType, typename TransferType>
-class PreconditionMG : public Subscriptor
+class PreconditionMG : public EnableObserverPointer
 {
 public:
   /**
-   * Constructor. Arguments are the multigrid object, pre-smoother, post-
-   * smoother and coarse grid solver.
+   * Constructor. Arguments are the associated DoFHandler (@p dof_handler),
+   * the multigrid object (@p mg) and the grid transfer object (@p transfer).
    */
   PreconditionMG(const DoFHandler<dim> &dof_handler,
                  Multigrid<VectorType> &mg,
@@ -611,28 +615,28 @@ private:
   /**
    * Associated @p DoFHandler.
    */
-  std::vector<SmartPointer<const DoFHandler<dim>,
-                           PreconditionMG<dim, VectorType, TransferType>>>
+  std::vector<ObserverPointer<const DoFHandler<dim>,
+                              PreconditionMG<dim, VectorType, TransferType>>>
     dof_handler_vector;
 
   /**
    * Storage for the pointers to the DoFHandler objects
-   * without SmartPointer wrapper.
+   * without ObserverPointer wrapper.
    */
   std::vector<const DoFHandler<dim> *> dof_handler_vector_raw;
 
   /**
    * The multigrid object.
    */
-  SmartPointer<Multigrid<VectorType>,
-               PreconditionMG<dim, VectorType, TransferType>>
+  ObserverPointer<Multigrid<VectorType>,
+                  PreconditionMG<dim, VectorType, TransferType>>
     multigrid;
 
   /**
    * Object for grid transfer.
    */
-  SmartPointer<const TransferType,
-               PreconditionMG<dim, VectorType, TransferType>>
+  ObserverPointer<const TransferType,
+                  PreconditionMG<dim, VectorType, TransferType>>
     transfer;
 
   /**
@@ -916,7 +920,7 @@ PreconditionMG<dim, VectorType, TransferType>::get_mpi_communicator() const
   const parallel::TriangulationBase<dim> *ptria =
     dynamic_cast<const parallel::TriangulationBase<dim> *>(&tria);
   Assert(ptria != nullptr, ExcInternalError());
-  return ptria->get_communicator();
+  return ptria->get_mpi_communicator();
 }
 
 
@@ -966,7 +970,7 @@ PreconditionMG<dim, VectorType, TransferType>::Tvmult(
   OtherVectorType &,
   const OtherVectorType &) const
 {
-  Assert(false, ExcNotImplemented());
+  DEAL_II_NOT_IMPLEMENTED();
 }
 
 
@@ -977,7 +981,7 @@ PreconditionMG<dim, VectorType, TransferType>::Tvmult_add(
   OtherVectorType &,
   const OtherVectorType &) const
 {
-  Assert(false, ExcNotImplemented());
+  DEAL_II_NOT_IMPLEMENTED();
 }
 
 

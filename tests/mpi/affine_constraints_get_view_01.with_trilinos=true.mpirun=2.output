@@ -1,0 +1,11 @@
+
+DEAL::dim=2
+DEAL::Cells on process #0: 51
+DEAL::Total number of DoFs: 853
+DEAL::Number of constrains: 170
+DEAL::OK
+DEAL::dim=3
+DEAL::Cells on process #0: 397
+DEAL::Total number of DoFs: 18081
+DEAL::Number of constrains: 5449
+DEAL::OK

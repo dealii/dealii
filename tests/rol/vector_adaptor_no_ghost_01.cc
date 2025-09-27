@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2017 - 2021 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2017 - 2024 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 // Check the Rol::VectorAdaptor with MPI fully distributed vectors
 // using ROL::Vector's checkVector method.
@@ -79,22 +78,22 @@ test()
   b.compress(VectorOperation::insert);
   c.compress(VectorOperation::insert);
 
-  Teuchos::RCP<VectorType> a_rcp(new VectorType(a));
-  Teuchos::RCP<VectorType> b_rcp(new VectorType(b));
-  Teuchos::RCP<VectorType> c_rcp(new VectorType(c));
+  ROL::Ptr<VectorType> a_ptr = ROL::makePtr<VectorType>(a);
+  ROL::Ptr<VectorType> b_ptr = ROL::makePtr<VectorType>(b);
+  ROL::Ptr<VectorType> c_ptr = ROL::makePtr<VectorType>(c);
 
   // --- Testing the constructor
-  Rol::VectorAdaptor<VectorType> a_rol(a_rcp);
-  Rol::VectorAdaptor<VectorType> b_rol(b_rcp);
-  Rol::VectorAdaptor<VectorType> c_rol(c_rcp);
+  Rol::VectorAdaptor<VectorType> a_rol(a_ptr);
+  Rol::VectorAdaptor<VectorType> b_rol(b_ptr);
+  Rol::VectorAdaptor<VectorType> c_rol(c_ptr);
 
-  Teuchos::RCP<std::ostream> out_stream;
-  Teuchos::oblackholestream  bhs; // outputs nothing
+  ROL::Ptr<std::ostream> out_stream;
+  ROL::nullstream        bhs; // outputs nothing
 
   if (dealii::Utilities::MPI::this_mpi_process(MPI_COMM_WORLD) == 0)
-    out_stream = Teuchos::rcp(&std::cout, false);
+    out_stream = ROL::makePtrFromRef<std::ostream>(std::cout);
   else
-    out_stream = Teuchos::rcp(&bhs, false);
+    out_stream = ROL::makePtrFromRef<std::ostream>(bhs);
 
   a_rol.checkVector(b_rol, c_rol, true, *out_stream);
 }

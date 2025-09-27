@@ -1,27 +1,26 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2019 - 2020 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2020 - 2024 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 #ifndef dealii_symbolic_function_h
 #define dealii_symbolic_function_h
 
 #include <deal.II/base/config.h>
 
+#include <deal.II/base/enable_observer_pointer.h>
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/function.h>
 #include <deal.II/base/point.h>
-#include <deal.II/base/subscriptor.h>
 #include <deal.II/base/symmetric_tensor.h>
 #include <deal.II/base/tensor.h>
 
@@ -121,7 +120,7 @@ namespace Functions
    * Partial substitution is possible (i.e., you can define the function using
    * additional symbols). However, as soon as you evaluate the function, you
    * have to make sure that all extraneous symbols (i.e., those not referring
-   * to the spacial @p coordinate_symbols or to the @p time_symbol variable)
+   * to the spatial @p coordinate_symbols or to the @p time_symbol variable)
    * have been substituted with numerical values, or expressions of the spatial
    * or temporal argument, by calling the update_user_substitution_map() or the
    * set_additional_function_arguments() methods.

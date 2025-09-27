@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2021 - 2022 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2021 - 2024 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 // Test DataOutResample to create a slice.
 
@@ -33,7 +32,6 @@
 
 #include "../tests.h"
 
-using namespace dealii;
 
 template <int dim>
 class AnalyticalFunction : public Function<dim>
@@ -63,7 +61,7 @@ create_partitioner(const DoFHandler<dim, spacedim> &dof_handler)
   return std::make_shared<const Utilities::MPI::Partitioner>(
     dof_handler.locally_owned_dofs(),
     locally_relevant_dofs,
-    dof_handler.get_communicator());
+    dof_handler.get_mpi_communicator());
 }
 
 
@@ -88,11 +86,11 @@ main(int argc, char **argv)
 
   MappingQ1<patch_dim, spacedim> mapping_slice;
 
-  parallel::distributed::Triangulation<dim, spacedim> tria_backround(comm);
-  GridGenerator::hyper_cube(tria_backround, -1.0, +1.0);
-  tria_backround.refine_global(n_refinements_1);
+  parallel::distributed::Triangulation<dim, spacedim> tria_background(comm);
+  GridGenerator::hyper_cube(tria_background, -1.0, +1.0);
+  tria_background.refine_global(n_refinements_1);
 
-  DoFHandler<dim, spacedim> dof_handler(tria_backround);
+  DoFHandler<dim, spacedim> dof_handler(tria_background);
   dof_handler.distribute_dofs(FE_Q<dim, spacedim>{1});
 
   MappingQ1<dim, spacedim> mapping;

@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2008 - 2023 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2008 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 #include <deal.II/lac/trilinos_index_access.h>
 #include <deal.II/lac/trilinos_sparsity_pattern.h>
@@ -24,7 +23,9 @@
 #  include <deal.II/lac/dynamic_sparsity_pattern.h>
 #  include <deal.II/lac/sparsity_pattern.h>
 
+DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
 #  include <Epetra_Export.h>
+DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
 
 #  include <limits>
 
@@ -39,7 +40,8 @@ namespace TrilinosWrappers
     {
       // if we are asked to visit the past-the-end line, then simply
       // release all our caches and go on with life
-      if (this->a_row == sparsity_pattern->n_rows())
+      if (this->a_row == sparsity_pattern->n_rows() ||
+          (sparsity_pattern->in_local_range(this->a_row) == false))
         {
           colnum_cache.reset();
           return;
@@ -135,7 +137,6 @@ namespace TrilinosWrappers
     , graph(
         new Epetra_FECrsGraph(View, *column_space_map, *column_space_map, 0))
   {
-    (void)input_sparsity;
     Assert(input_sparsity.n_rows() == 0,
            ExcMessage(
              "Copy constructor only works for empty sparsity patterns."));
@@ -412,58 +413,40 @@ namespace TrilinosWrappers
 
       std::vector<TrilinosWrappers::types::int_type> row_indices;
 
-      // Include possibility to exchange data since DynamicSparsityPattern is
-      // able to do so
-      if (exchange_data == false)
-        for (size_type row = first_row; row < last_row; ++row)
-          {
-            const TrilinosWrappers::types::int_type row_length =
-              sp.row_length(row);
-            if (row_length == 0)
-              continue;
+      for (size_type row = first_row; row < last_row; ++row)
+        {
+          const TrilinosWrappers::types::int_type row_length =
+            sp.row_length(row);
+          if (row_length == 0)
+            continue;
 
-            row_indices.resize(row_length, -1);
-            {
-              typename SparsityPatternType::iterator p = sp.begin(row);
-              // avoid incrementing p over the end of the current row because
-              // it is slow for DynamicSparsityPattern in parallel
-              for (int col = 0; col < row_length;)
-                {
-                  row_indices[col++] = p->column();
-                  if (col < row_length)
-                    ++p;
-                }
-            }
+          row_indices.resize(row_length, -1);
+          {
+            typename SparsityPatternType::iterator p = sp.begin(row);
+            // avoid incrementing p over the end of the current row because
+            // it is slow for DynamicSparsityPattern in parallel
+            for (int col = 0; col < row_length;)
+              {
+                row_indices[col++] = p->column();
+                if (col < row_length)
+                  ++p;
+              }
+          }
+          if (exchange_data == false)
             graph->Epetra_CrsGraph::InsertGlobalIndices(row,
                                                         row_length,
                                                         row_indices.data());
-          }
-      else
-        for (size_type row = 0; row < sp.n_rows(); ++row)
-          {
-            const TrilinosWrappers::types::int_type row_length =
-              sp.row_length(row);
-            if (row_length == 0)
-              continue;
-
-            row_indices.resize(row_length, -1);
+          else
             {
-              typename SparsityPatternType::iterator p = sp.begin(row);
-              // avoid incrementing p over the end of the current row because
-              // it is slow for DynamicSparsityPattern in parallel
-              for (int col = 0; col < row_length;)
-                {
-                  row_indices[col++] = p->column();
-                  if (col < row_length)
-                    ++p;
-                }
+              // Include possibility to exchange data since
+              // DynamicSparsityPattern is able to do so
+              const TrilinosWrappers::types::int_type trilinos_row = row;
+              graph->InsertGlobalIndices(1,
+                                         &trilinos_row,
+                                         row_length,
+                                         row_indices.data());
             }
-            const TrilinosWrappers::types::int_type trilinos_row = row;
-            graph->InsertGlobalIndices(1,
-                                       &trilinos_row,
-                                       row_length,
-                                       row_indices.data());
-          }
+        }
 
       // TODO A dynamic_cast fails here, this is suspicious.
       const auto &range_map =
@@ -575,15 +558,16 @@ namespace TrilinosWrappers
     IndexSet nonlocal_partitioner = writable_rows;
     AssertDimension(nonlocal_partitioner.size(),
                     row_parallel_partitioning.size());
-#  ifdef DEBUG
-    {
-      IndexSet tmp = writable_rows & row_parallel_partitioning;
-      Assert(tmp == row_parallel_partitioning,
-             ExcMessage(
-               "The set of writable rows passed to this method does not "
-               "contain the locally owned rows, which is not allowed."));
-    }
-#  endif
+    if constexpr (running_in_debug_mode())
+      {
+        {
+          IndexSet tmp = writable_rows & row_parallel_partitioning;
+          Assert(tmp == row_parallel_partitioning,
+                 ExcMessage(
+                   "The set of writable rows passed to this method does not "
+                   "contain the locally owned rows, which is not allowed."));
+        }
+      }
     nonlocal_partitioner.subtract_set(row_parallel_partitioning);
     if (Utilities::MPI::n_mpi_processes(communicator) > 1)
       {
@@ -654,7 +638,7 @@ namespace TrilinosWrappers
   SparsityPattern &
   SparsityPattern::operator=(const SparsityPattern &)
   {
-    Assert(false, ExcNotImplemented());
+    DEAL_II_NOT_IMPLEMENTED();
     return *this;
   }
 
@@ -845,7 +829,6 @@ namespace TrilinosWrappers
             int ierr = graph->ExtractGlobalRowView(trilinos_i,
                                                    nnz_extracted,
                                                    col_indices);
-            (void)ierr;
             Assert(ierr == 0, ExcTrilinosError(ierr));
             Assert(nnz_present == nnz_extracted,
                    ExcDimensionMismatch(nnz_present, nnz_extracted));
@@ -871,7 +854,6 @@ namespace TrilinosWrappers
             // an error.
             int ierr =
               graph->ExtractMyRowView(trilinos_i, nnz_extracted, col_indices);
-            (void)ierr;
             Assert(ierr == 0, ExcTrilinosError(ierr));
 
             Assert(nnz_present == nnz_extracted,
@@ -895,8 +877,7 @@ namespace TrilinosWrappers
   SparsityPattern::size_type
   SparsityPattern::bandwidth() const
   {
-    size_type                         local_b  = 0;
-    TrilinosWrappers::types::int_type global_b = 0;
+    size_type local_b = 0;
     for (int i = 0; i < static_cast<int>(local_size()); ++i)
       {
         int *indices;
@@ -909,6 +890,8 @@ namespace TrilinosWrappers
               local_b = std::abs(i - indices[j]);
           }
       }
+
+    TrilinosWrappers::types::int_type global_b = 0;
     graph->Comm().MaxAll(reinterpret_cast<TrilinosWrappers::types::int_type *>(
                            &local_b),
                          &global_b,
@@ -921,9 +904,7 @@ namespace TrilinosWrappers
   unsigned int
   SparsityPattern::local_size() const
   {
-    int n_rows = graph->NumMyRows();
-
-    return n_rows;
+    return graph->NumMyRows();
   }
 
 
@@ -931,11 +912,10 @@ namespace TrilinosWrappers
   std::pair<SparsityPattern::size_type, SparsityPattern::size_type>
   SparsityPattern::local_range() const
   {
-    size_type begin, end;
-    begin = TrilinosWrappers::min_my_gid(graph->RowMap());
-    end   = TrilinosWrappers::max_my_gid(graph->RowMap()) + 1;
+    const size_type begin = TrilinosWrappers::min_my_gid(graph->RowMap());
+    const size_type end   = TrilinosWrappers::max_my_gid(graph->RowMap()) + 1;
 
-    return std::make_pair(begin, end);
+    return {begin, end};
   }
 
 
@@ -943,9 +923,7 @@ namespace TrilinosWrappers
   std::uint64_t
   SparsityPattern::n_nonzero_elements() const
   {
-    TrilinosWrappers::types::int64_type nnz = n_global_entries(*graph);
-
-    return static_cast<std::uint64_t>(nnz);
+    return n_global_entries(*graph);
   }
 
 
@@ -953,9 +931,7 @@ namespace TrilinosWrappers
   unsigned int
   SparsityPattern::max_entries_per_row() const
   {
-    int nnz = graph->MaxNumIndices();
-
-    return static_cast<unsigned int>(nnz);
+    return graph->MaxNumIndices();
   }
 
 
@@ -1026,7 +1002,7 @@ namespace TrilinosWrappers
   void
   SparsityPattern::write_ascii()
   {
-    Assert(false, ExcNotImplemented());
+    DEAL_II_NOT_IMPLEMENTED();
   }
 
 
@@ -1095,7 +1071,7 @@ namespace TrilinosWrappers
   std::size_t
   SparsityPattern::memory_consumption() const
   {
-    Assert(false, ExcNotImplemented());
+    DEAL_II_NOT_IMPLEMENTED();
     return 0;
   }
 

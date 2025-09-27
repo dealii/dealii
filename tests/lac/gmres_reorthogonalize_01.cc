@@ -1,22 +1,21 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2013 - 2018 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2013 - 2024 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 
 // tests that GMRES builds an orthonormal basis properly for a few difficult
 // test matrices. In particular, this test monitors when re-orthogonalization
-// kicks in.
+// kicks in for the modified Gram-Schmidt algorithm.
 
 #include <deal.II/lac/full_matrix.h>
 #include <deal.II/lac/precondition.h>
@@ -70,7 +69,9 @@ test(unsigned int variant, unsigned int min_convergence_steps)
 
   SolverControl control(1000, 1e2 * std::numeric_limits<number>::epsilon());
   typename SolverGMRES<Vector<number>>::AdditionalData data;
-  data.max_n_tmp_vectors = 80;
+  data.max_basis_size = 80;
+  data.orthogonalization_strategy =
+    LinearAlgebra::OrthogonalizationStrategy::modified_gram_schmidt;
 
   SolverGMRES<Vector<number>> solver(control, data);
   auto print_re_orthogonalization = [](int accumulated_iterations) {

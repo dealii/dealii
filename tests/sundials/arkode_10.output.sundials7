@@ -1,0 +1,127 @@
+
+DEAL::0.00000 1.00000 0.00000
+DEAL:mass_preconditioner_setup::applied
+DEAL:mass_preconditioner_setup::applied
+DEAL:cg:mass_preconditioner_solve::applied
+DEAL:cg:mass_preconditioner_solve::applied
+DEAL:mass_preconditioner_setup::applied
+DEAL::Reporting recoverable failure when solving linearized system.
+DEAL:cg:mass_preconditioner_solve::applied
+DEAL:cg:mass_preconditioner_solve::applied
+DEAL:mass_preconditioner_setup::applied
+DEAL::Reporting recoverable failure when solving linearized system.
+DEAL:cg:mass_preconditioner_solve::applied
+DEAL:cg:mass_preconditioner_solve::applied
+DEAL:mass_preconditioner_setup::applied
+DEAL::Reporting recoverable failure when solving linearized system.
+DEAL:cg:mass_preconditioner_solve::applied
+DEAL:cg:mass_preconditioner_solve::applied
+DEAL:mass_preconditioner_setup::applied
+DEAL::Reporting recoverable failure when solving linearized system.
+DEAL:cg:mass_preconditioner_solve::applied
+DEAL:cg:mass_preconditioner_solve::applied
+DEAL:mass_preconditioner_setup::applied
+DEAL::Reporting recoverable failure when solving linearized system.
+DEAL:cg:mass_preconditioner_solve::applied
+DEAL:cg:mass_preconditioner_solve::applied
+DEAL:mass_preconditioner_setup::applied
+DEAL::Reporting recoverable failure when solving linearized system.
+DEAL:cg:mass_preconditioner_solve::applied
+DEAL:cg:mass_preconditioner_solve::applied
+DEAL:mass_preconditioner_setup::applied
+DEAL::Reporting recoverable failure when solving linearized system.
+DEAL:cg:mass_preconditioner_solve::applied
+DEAL:cg:mass_preconditioner_solve::applied
+DEAL:mass_preconditioner_setup::applied
+DEAL:cg:mass_preconditioner_solve::applied
+DEAL:cg:mass_preconditioner_solve::applied
+DEAL:mass_preconditioner_setup::applied
+DEAL::Reporting recoverable failure when solving linearized system.
+DEAL:cg:mass_preconditioner_solve::applied
+DEAL:cg:mass_preconditioner_solve::applied
+DEAL:mass_preconditioner_setup::applied
+DEAL::Reporting recoverable failure when solving linearized system.
+DEAL:cg:mass_preconditioner_solve::applied
+DEAL:cg:mass_preconditioner_solve::applied
+DEAL:mass_preconditioner_setup::applied
+DEAL::Reporting recoverable failure when solving linearized system.
+DEAL:cg:mass_preconditioner_solve::applied
+DEAL:cg:mass_preconditioner_solve::applied
+DEAL:mass_preconditioner_setup::applied
+DEAL::Reporting recoverable failure when solving linearized system.
+DEAL:cg:mass_preconditioner_solve::applied
+DEAL:cg:mass_preconditioner_solve::applied
+DEAL:mass_preconditioner_setup::applied
+DEAL::Reporting recoverable failure when solving linearized system.
+DEAL:cg:mass_preconditioner_solve::applied
+DEAL:cg:mass_preconditioner_solve::applied
+DEAL:mass_preconditioner_setup::applied
+DEAL::Reporting recoverable failure when solving linearized system.
+DEAL:cg:mass_preconditioner_solve::applied
+DEAL:cg:mass_preconditioner_solve::applied
+DEAL:mass_preconditioner_setup::applied
+DEAL::Reporting recoverable failure when solving linearized system.
+DEAL:cg:mass_preconditioner_solve::applied
+DEAL:cg:mass_preconditioner_solve::applied
+DEAL:mass_preconditioner_setup::applied
+DEAL:cg:mass_preconditioner_solve::applied
+DEAL:cg:mass_preconditioner_solve::applied
+DEAL:mass_preconditioner_setup::applied
+DEAL:cg:mass_preconditioner_solve::applied
+DEAL::0.100000 1.15000 0.150000
+DEAL:mass_preconditioner_setup::applied
+DEAL:cg:mass_preconditioner_solve::applied
+DEAL::0.200000 1.30000 0.300000
+DEAL:mass_preconditioner_setup::applied
+DEAL::Reporting recoverable failure when solving linearized system.
+DEAL:cg:mass_preconditioner_solve::applied
+DEAL:cg:mass_preconditioner_solve::applied
+DEAL:mass_preconditioner_setup::applied
+DEAL::Reporting recoverable failure when solving linearized system.
+DEAL:cg:mass_preconditioner_solve::applied
+DEAL:cg:mass_preconditioner_solve::applied
+DEAL:mass_preconditioner_setup::applied
+DEAL::Reporting recoverable failure when solving linearized system.
+DEAL:cg:mass_preconditioner_solve::applied
+DEAL:cg:mass_preconditioner_solve::applied
+DEAL:mass_preconditioner_setup::applied
+DEAL::Reporting recoverable failure when solving linearized system.
+DEAL:cg:mass_preconditioner_solve::applied
+DEAL:cg:mass_preconditioner_solve::applied
+DEAL:mass_preconditioner_setup::applied
+DEAL::Reporting recoverable failure when solving linearized system.
+DEAL:cg:mass_preconditioner_solve::applied
+DEAL:cg:mass_preconditioner_solve::applied
+DEAL:mass_preconditioner_setup::applied
+DEAL::Reporting recoverable failure when solving linearized system.
+DEAL:cg:mass_preconditioner_solve::applied
+DEAL:cg:mass_preconditioner_solve::applied
+DEAL:mass_preconditioner_setup::applied
+DEAL::Reporting recoverable failure when solving linearized system.
+DEAL:cg:mass_preconditioner_solve::applied
+DEAL:cg:mass_preconditioner_solve::applied
+DEAL:mass_preconditioner_setup::applied
+DEAL:cg:mass_preconditioner_solve::applied
+DEAL:cg:mass_preconditioner_solve::applied
+DEAL:mass_preconditioner_setup::applied
+DEAL:cg:mass_preconditioner_solve::applied
+DEAL::0.300000 1.45000 0.450000
+DEAL:mass_preconditioner_setup::applied
+DEAL:cg:mass_preconditioner_solve::applied
+DEAL::0.400000 1.60000 0.600000
+DEAL:mass_preconditioner_setup::applied
+DEAL:cg:mass_preconditioner_solve::applied
+DEAL::0.500000 1.75000 0.750000
+DEAL:mass_preconditioner_setup::applied
+DEAL:cg:mass_preconditioner_solve::applied
+DEAL::0.600000 1.90000 0.900000
+DEAL:mass_preconditioner_setup::applied
+DEAL:cg:mass_preconditioner_solve::applied
+DEAL::0.700000 2.05000 1.05000
+DEAL:mass_preconditioner_setup::applied
+DEAL:cg:mass_preconditioner_solve::applied
+DEAL::0.800000 2.20000 1.20000
+DEAL:mass_preconditioner_setup::applied
+DEAL:cg:mass_preconditioner_solve::applied
+DEAL::0.900000 2.35000 1.35000
+DEAL::1.00000 2.50000 1.50000

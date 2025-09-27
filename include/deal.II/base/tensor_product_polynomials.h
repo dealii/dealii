@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2000 - 2022 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2000 - 2024 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 #ifndef dealii_tensor_product_polynomials_h
 #define dealii_tensor_product_polynomials_h
@@ -270,8 +269,8 @@ protected:
 
   /**
    * Each tensor product polynomial <i>i</i> is a product of one-dimensional
-   * polynomials in each space direction. Compute the indices of these one-
-   * dimensional polynomials for each space direction, given the index
+   * polynomials in each space direction. Compute the indices of these
+   * one-dimensional polynomials for each space direction, given the index
    * <i>i</i>.
    */
   void
@@ -340,6 +339,25 @@ public:
   AnisotropicPolynomials(
     const std::vector<std::vector<Polynomials::Polynomial<double>>>
       &base_polynomials);
+
+  /**
+   * Set the ordering of the polynomials. Requires
+   * <tt>renumber.size()==n()</tt>.  Stores a copy of <tt>renumber</tt>.
+   */
+  void
+  set_numbering(const std::vector<unsigned int> &renumber);
+
+  /**
+   * Give read access to the renumber vector.
+   */
+  const std::vector<unsigned int> &
+  get_numbering() const;
+
+  /**
+   * Give read access to the inverse renumber vector.
+   */
+  const std::vector<unsigned int> &
+  get_numbering_inverse() const;
 
   /**
    * Compute the value and the first and second derivatives of each tensor
@@ -472,9 +490,19 @@ private:
   const std::vector<std::vector<Polynomials::Polynomial<double>>> polynomials;
 
   /**
+   * Index map for reordering the polynomials.
+   */
+  std::vector<unsigned int> index_map;
+
+  /**
+   * Index map for reordering the polynomials.
+   */
+  std::vector<unsigned int> index_map_inverse;
+
+  /**
    * Each tensor product polynomial $p_i$ is a product of one-dimensional
-   * polynomials in each space direction. Compute the indices of these one-
-   * dimensional polynomials for each space direction, given the index
+   * polynomials in each space direction. Compute the indices of these
+   * one-dimensional polynomials for each space direction, given the index
    * <tt>i</tt>.
    */
   void
@@ -555,7 +583,7 @@ TensorProductPolynomials<dim, PolynomialType>::compute_derivative(
     std::vector<double> tmp(5);
     for (unsigned int d = 0; d < dim; ++d)
       {
-        polynomials[indices[d]].value(p(d), tmp);
+        polynomials[indices[d]].value(p[d], tmp);
         v[d][0] = tmp[0];
         v[d][1] = tmp[1];
         v[d][2] = tmp[2];
@@ -564,36 +592,78 @@ TensorProductPolynomials<dim, PolynomialType>::compute_derivative(
       }
   }
 
-  Tensor<order, dim> derivative;
-  switch (order)
+  if constexpr (order == 1)
     {
-      case 1:
+      Tensor<1, dim> derivative;
+      for (unsigned int d = 0; d < dim; ++d)
         {
-          Tensor<1, dim> &derivative_1 =
-            *reinterpret_cast<Tensor<1, dim> *>(&derivative);
-          for (unsigned int d = 0; d < dim; ++d)
+          derivative[d] = 1.;
+          for (unsigned int x = 0; x < dim; ++x)
             {
-              derivative_1[d] = 1.;
+              unsigned int x_order = 0;
+              if (d == x)
+                ++x_order;
+
+              derivative[d] *= v[x][x_order];
+            }
+        }
+
+      return derivative;
+    }
+  else if constexpr (order == 2)
+    {
+      Tensor<2, dim> derivative;
+      for (unsigned int d1 = 0; d1 < dim; ++d1)
+        for (unsigned int d2 = 0; d2 < dim; ++d2)
+          {
+            derivative[d1][d2] = 1.;
+            for (unsigned int x = 0; x < dim; ++x)
+              {
+                unsigned int x_order = 0;
+                if (d1 == x)
+                  ++x_order;
+                if (d2 == x)
+                  ++x_order;
+
+                derivative[d1][d2] *= v[x][x_order];
+              }
+          }
+
+      return derivative;
+    }
+  else if constexpr (order == 3)
+    {
+      Tensor<3, dim> derivative;
+      for (unsigned int d1 = 0; d1 < dim; ++d1)
+        for (unsigned int d2 = 0; d2 < dim; ++d2)
+          for (unsigned int d3 = 0; d3 < dim; ++d3)
+            {
+              derivative[d1][d2][d3] = 1.;
               for (unsigned int x = 0; x < dim; ++x)
                 {
                   unsigned int x_order = 0;
-                  if (d == x)
+                  if (d1 == x)
+                    ++x_order;
+                  if (d2 == x)
+                    ++x_order;
+                  if (d3 == x)
                     ++x_order;
 
-                  derivative_1[d] *= v[x][x_order];
+                  derivative[d1][d2][d3] *= v[x][x_order];
                 }
             }
 
-          return derivative;
-        }
-      case 2:
-        {
-          Tensor<2, dim> &derivative_2 =
-            *reinterpret_cast<Tensor<2, dim> *>(&derivative);
-          for (unsigned int d1 = 0; d1 < dim; ++d1)
-            for (unsigned int d2 = 0; d2 < dim; ++d2)
+      return derivative;
+    }
+  else if constexpr (order == 4)
+    {
+      Tensor<4, dim> derivative;
+      for (unsigned int d1 = 0; d1 < dim; ++d1)
+        for (unsigned int d2 = 0; d2 < dim; ++d2)
+          for (unsigned int d3 = 0; d3 < dim; ++d3)
+            for (unsigned int d4 = 0; d4 < dim; ++d4)
               {
-                derivative_2[d1][d2] = 1.;
+                derivative[d1][d2][d3][d4] = 1.;
                 for (unsigned int x = 0; x < dim; ++x)
                   {
                     unsigned int x_order = 0;
@@ -601,71 +671,21 @@ TensorProductPolynomials<dim, PolynomialType>::compute_derivative(
                       ++x_order;
                     if (d2 == x)
                       ++x_order;
+                    if (d3 == x)
+                      ++x_order;
+                    if (d4 == x)
+                      ++x_order;
 
-                    derivative_2[d1][d2] *= v[x][x_order];
+                    derivative[d1][d2][d3][d4] *= v[x][x_order];
                   }
               }
 
-          return derivative;
-        }
-      case 3:
-        {
-          Tensor<3, dim> &derivative_3 =
-            *reinterpret_cast<Tensor<3, dim> *>(&derivative);
-          for (unsigned int d1 = 0; d1 < dim; ++d1)
-            for (unsigned int d2 = 0; d2 < dim; ++d2)
-              for (unsigned int d3 = 0; d3 < dim; ++d3)
-                {
-                  derivative_3[d1][d2][d3] = 1.;
-                  for (unsigned int x = 0; x < dim; ++x)
-                    {
-                      unsigned int x_order = 0;
-                      if (d1 == x)
-                        ++x_order;
-                      if (d2 == x)
-                        ++x_order;
-                      if (d3 == x)
-                        ++x_order;
-
-                      derivative_3[d1][d2][d3] *= v[x][x_order];
-                    }
-                }
-
-          return derivative;
-        }
-      case 4:
-        {
-          Tensor<4, dim> &derivative_4 =
-            *reinterpret_cast<Tensor<4, dim> *>(&derivative);
-          for (unsigned int d1 = 0; d1 < dim; ++d1)
-            for (unsigned int d2 = 0; d2 < dim; ++d2)
-              for (unsigned int d3 = 0; d3 < dim; ++d3)
-                for (unsigned int d4 = 0; d4 < dim; ++d4)
-                  {
-                    derivative_4[d1][d2][d3][d4] = 1.;
-                    for (unsigned int x = 0; x < dim; ++x)
-                      {
-                        unsigned int x_order = 0;
-                        if (d1 == x)
-                          ++x_order;
-                        if (d2 == x)
-                          ++x_order;
-                        if (d3 == x)
-                          ++x_order;
-                        if (d4 == x)
-                          ++x_order;
-
-                        derivative_4[d1][d2][d3][d4] *= v[x][x_order];
-                      }
-                  }
-
-          return derivative;
-        }
-      default:
-        {
-          Assert(false, ExcNotImplemented());
-          return derivative;
-        }
+      return derivative;
+    }
+  else
+    {
+      DEAL_II_NOT_IMPLEMENTED();
+      return {};
     }
 }
 
@@ -739,38 +759,80 @@ AnisotropicPolynomials<dim>::compute_derivative(const unsigned int i,
 
   std::vector<std::vector<double>> v(dim, std::vector<double>(order + 1));
   for (unsigned int d = 0; d < dim; ++d)
-    polynomials[d][indices[d]].value(p(d), v[d]);
+    polynomials[d][indices[d]].value(p[d], v[d]);
 
-  Tensor<order, dim> derivative;
-  switch (order)
+  if constexpr (order == 1)
     {
-      case 1:
+      Tensor<1, dim> derivative;
+      for (unsigned int d = 0; d < dim; ++d)
         {
-          Tensor<1, dim> &derivative_1 =
-            *reinterpret_cast<Tensor<1, dim> *>(&derivative);
-          for (unsigned int d = 0; d < dim; ++d)
+          derivative[d] = 1.;
+          for (unsigned int x = 0; x < dim; ++x)
             {
-              derivative_1[d] = 1.;
+              unsigned int x_order = 0;
+              if (d == x)
+                ++x_order;
+
+              derivative[d] *= v[x][x_order];
+            }
+        }
+
+      return derivative;
+    }
+  else if constexpr (order == 2)
+    {
+      Tensor<2, dim> derivative;
+      for (unsigned int d1 = 0; d1 < dim; ++d1)
+        for (unsigned int d2 = 0; d2 < dim; ++d2)
+          {
+            derivative[d1][d2] = 1.;
+            for (unsigned int x = 0; x < dim; ++x)
+              {
+                unsigned int x_order = 0;
+                if (d1 == x)
+                  ++x_order;
+                if (d2 == x)
+                  ++x_order;
+
+                derivative[d1][d2] *= v[x][x_order];
+              }
+          }
+
+      return derivative;
+    }
+  else if constexpr (order == 3)
+    {
+      Tensor<3, dim> derivative;
+      for (unsigned int d1 = 0; d1 < dim; ++d1)
+        for (unsigned int d2 = 0; d2 < dim; ++d2)
+          for (unsigned int d3 = 0; d3 < dim; ++d3)
+            {
+              derivative[d1][d2][d3] = 1.;
               for (unsigned int x = 0; x < dim; ++x)
                 {
                   unsigned int x_order = 0;
-                  if (d == x)
+                  if (d1 == x)
+                    ++x_order;
+                  if (d2 == x)
+                    ++x_order;
+                  if (d3 == x)
                     ++x_order;
 
-                  derivative_1[d] *= v[x][x_order];
+                  derivative[d1][d2][d3] *= v[x][x_order];
                 }
             }
 
-          return derivative;
-        }
-      case 2:
-        {
-          Tensor<2, dim> &derivative_2 =
-            *reinterpret_cast<Tensor<2, dim> *>(&derivative);
-          for (unsigned int d1 = 0; d1 < dim; ++d1)
-            for (unsigned int d2 = 0; d2 < dim; ++d2)
+      return derivative;
+    }
+  else if constexpr (order == 4)
+    {
+      Tensor<4, dim> derivative;
+      for (unsigned int d1 = 0; d1 < dim; ++d1)
+        for (unsigned int d2 = 0; d2 < dim; ++d2)
+          for (unsigned int d3 = 0; d3 < dim; ++d3)
+            for (unsigned int d4 = 0; d4 < dim; ++d4)
               {
-                derivative_2[d1][d2] = 1.;
+                derivative[d1][d2][d3][d4] = 1.;
                 for (unsigned int x = 0; x < dim; ++x)
                   {
                     unsigned int x_order = 0;
@@ -778,71 +840,21 @@ AnisotropicPolynomials<dim>::compute_derivative(const unsigned int i,
                       ++x_order;
                     if (d2 == x)
                       ++x_order;
+                    if (d3 == x)
+                      ++x_order;
+                    if (d4 == x)
+                      ++x_order;
 
-                    derivative_2[d1][d2] *= v[x][x_order];
+                    derivative[d1][d2][d3][d4] *= v[x][x_order];
                   }
               }
 
-          return derivative;
-        }
-      case 3:
-        {
-          Tensor<3, dim> &derivative_3 =
-            *reinterpret_cast<Tensor<3, dim> *>(&derivative);
-          for (unsigned int d1 = 0; d1 < dim; ++d1)
-            for (unsigned int d2 = 0; d2 < dim; ++d2)
-              for (unsigned int d3 = 0; d3 < dim; ++d3)
-                {
-                  derivative_3[d1][d2][d3] = 1.;
-                  for (unsigned int x = 0; x < dim; ++x)
-                    {
-                      unsigned int x_order = 0;
-                      if (d1 == x)
-                        ++x_order;
-                      if (d2 == x)
-                        ++x_order;
-                      if (d3 == x)
-                        ++x_order;
-
-                      derivative_3[d1][d2][d3] *= v[x][x_order];
-                    }
-                }
-
-          return derivative;
-        }
-      case 4:
-        {
-          Tensor<4, dim> &derivative_4 =
-            *reinterpret_cast<Tensor<4, dim> *>(&derivative);
-          for (unsigned int d1 = 0; d1 < dim; ++d1)
-            for (unsigned int d2 = 0; d2 < dim; ++d2)
-              for (unsigned int d3 = 0; d3 < dim; ++d3)
-                for (unsigned int d4 = 0; d4 < dim; ++d4)
-                  {
-                    derivative_4[d1][d2][d3][d4] = 1.;
-                    for (unsigned int x = 0; x < dim; ++x)
-                      {
-                        unsigned int x_order = 0;
-                        if (d1 == x)
-                          ++x_order;
-                        if (d2 == x)
-                          ++x_order;
-                        if (d3 == x)
-                          ++x_order;
-                        if (d4 == x)
-                          ++x_order;
-
-                        derivative_4[d1][d2][d3][d4] *= v[x][x_order];
-                      }
-                  }
-
-          return derivative;
-        }
-      default:
-        {
-          Assert(false, ExcNotImplemented());
-          return derivative;
-        }
+      return derivative;
+    }
+  else
+    {
+      DEAL_II_NOT_IMPLEMENTED();
+      return {};
     }
 }
 

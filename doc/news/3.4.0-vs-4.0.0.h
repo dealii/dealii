@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2013, 2014 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2013 - 2024 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 /**
  * @page changes_between_3_4_and_4_0 Changes between Version 3.4 and 4.0
@@ -24,7 +23,7 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
 </p>
 
 
-<a name="general"></a>
+<a name="340-400-general"></a>
 <h3>General</h3>
 
 <ol>
@@ -281,7 +280,7 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
        functions as a replacement.
        <br>
        For more information, read
-       <a href="https://www.dealii.org/mail/msg00638.html" target="body">this mail</a>.
+       <a href="https://dealii.org/mail/msg00638.html" target="body">this mail</a>.
        <br>
        (WB 2002/06/10)
        </p>
@@ -312,7 +311,7 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
 
 
 
-<a name="base"></a>
+<a name="340-400-base"></a>
 <h3>base</h3>
 
 <ol>
@@ -603,7 +602,7 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
 
 
 
-<a name="lac"></a>
+<a name="340-400-lac"></a>
 <h3>lac</h3>
 
 <ol>
@@ -774,7 +773,7 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
        <code>SparseDirectMA27</code> class now has a detached
        mode, in which it forks off a separate program that will do the
        computations using this solver. The actual operations are therefore
-       distributed to distint programs that have separate address spaces. This
+       distributed to distinct programs that have separate address spaces. This
        allows to have as many concurrent instances of this solver in parallel
        as you want. For more information, read the documentation of the
        <code>SparseDirectMA27</code> class.
@@ -843,7 +842,7 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
 
 
 
-<a name="deal.II"></a>
+<a name="340-400-deal.II"></a>
 <h3>deal.II</h3>
 
 <ol>
@@ -1221,7 +1220,7 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
        class="member">integrate_difference</code> can compute <i>L<sup>p</sup></i>
        and <i>W<sup>1,p</sup></i> norms for arbitrary <i>p</i>. The function
        receives an additional optional argument <i>p</i> for this. All previous
-       fuctionality remains unchanged, although the code has been cleaned up a bit.
+       functionality remains unchanged, although the code has been cleaned up a bit.
        <br>
        (GK 2002/08/01)
        </p>

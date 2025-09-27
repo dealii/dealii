@@ -95,7 +95,7 @@ DEAL::face 1 outside
 DEAL::face 2 intersected
 DEAL::face 3 intersected
 DEAL::
-DEAL::test_lagrange_coefficents_positive
+DEAL::test_lagrange_coefficients_positive
 DEAL::cell intersected
 DEAL::face 0 outside
 DEAL::face 1 outside
@@ -177,7 +177,7 @@ DEAL::face 3 intersected
 DEAL::face 4 intersected
 DEAL::face 5 intersected
 DEAL::
-DEAL::test_lagrange_coefficents_positive
+DEAL::test_lagrange_coefficients_positive
 DEAL::cell intersected
 DEAL::face 0 outside
 DEAL::face 1 intersected

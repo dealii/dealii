@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2020 - 2023 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2020 - 2024 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 
 #ifndef dealii_matrix_free_util_h
@@ -22,6 +21,8 @@
 
 #include <deal.II/base/quadrature.h>
 #include <deal.II/base/quadrature_lib.h>
+
+#include <deal.II/fe/fe_simplex_p.h>
 
 #include <deal.II/grid/reference_cell.h>
 
@@ -57,6 +58,15 @@ namespace internal
               return {ReferenceCells::get_simplex<dim>(),
                       dealii::hp::QCollection<dim - 1>(
                         QWitherdenVincentSimplex<dim - 1>(i))};
+
+          for (unsigned int i = 1; i <= 3; ++i)
+            {
+              const FE_SimplexP<dim> fe(i);
+              if (quad == Quadrature<dim>(fe.get_unit_support_points()))
+                return {ReferenceCells::get_simplex<dim>(),
+                        dealii::hp::QCollection<dim - 1>(Quadrature<dim - 1>(
+                          fe.get_unit_face_support_points()))};
+            }
         }
 
       if (dim == 3)
@@ -139,6 +149,22 @@ namespace internal
                   return {Quadrature<dim - 1>(),
                           QWitherdenVincentSimplex<dim - 1>(i)};
               }
+
+          for (unsigned int i = 1; i <= 3; ++i)
+            {
+              const FE_SimplexP<dim> fe(i);
+              if (quad == Quadrature<dim>(fe.get_unit_support_points()))
+                {
+                  if (dim == 2)
+                    return {Quadrature<dim - 1>(
+                              fe.get_unit_face_support_points()), // line!
+                            Quadrature<dim - 1>()};
+                  else
+                    return {Quadrature<dim - 1>(),
+                            Quadrature<dim - 1>(
+                              fe.get_unit_face_support_points())};
+                }
+            }
         }
 
       if (dim == 3)

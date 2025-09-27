@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2000 - 2023 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2001 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 #ifndef dealii_mapping_h
 #define dealii_mapping_h
@@ -30,6 +29,8 @@
 #include <deal.II/hp/q_collection.h>
 
 #include <deal.II/non_matching/immersed_surface_quadrature.h>
+
+#include <boost/container/small_vector.hpp>
 
 #include <array>
 #include <cmath>
@@ -60,6 +61,8 @@ namespace NonMatching
     template <int dim, int spacedim>
     class ComputeMappingDataHelper;
   }
+  template <int dim, int spacedim, typename Number>
+  class MappingInfo;
 } // namespace NonMatching
 
 
@@ -313,7 +316,7 @@ enum MappingKind
  * @ingroup mapping
  */
 template <int dim, int spacedim = dim>
-class Mapping : public Subscriptor
+class Mapping : public EnableObserverPointer
 {
 public:
   /**
@@ -348,7 +351,12 @@ public:
    * <code>cell-@>vertex(v)</code>.
    */
   virtual boost::container::small_vector<Point<spacedim>,
-                                         GeometryInfo<dim>::vertices_per_cell>
+#ifndef _MSC_VER
+                                         ReferenceCells::max_n_vertices<dim>()
+#else
+                                         GeometryInfo<dim>::vertices_per_cell
+#endif
+                                         >
   get_vertices(
     const typename Triangulation<dim, spacedim>::cell_iterator &cell) const;
 
@@ -361,7 +369,12 @@ public:
    * @param[in] face_no The number of the face within the cell.
    */
   boost::container::small_vector<Point<spacedim>,
-                                 GeometryInfo<dim>::vertices_per_face>
+#ifndef _MSC_VER
+                                 ReferenceCells::max_n_vertices<dim - 1>()
+#else
+                                 GeometryInfo<dim - 1>::vertices_per_cell
+#endif
+                                 >
   get_vertices(const typename Triangulation<dim, spacedim>::cell_iterator &cell,
                const unsigned int face_no) const;
 
@@ -416,7 +429,7 @@ public:
   /**
    * Return whether the mapping preserves vertex locations. In other words,
    * this function returns whether the mapped location of the reference cell
-   * vertices (given by GeometryInfo::unit_cell_vertex()) equals the result of
+   * vertices (given by ReferenceCell::vertex()) equals the result of
    * <code>cell-@>vertex()</code> (i.e., information stored by the
    * triangulation).
    *
@@ -472,7 +485,7 @@ public:
    * throws an exception of type Mapping::ExcTransformationFailed . Whether
    * the given point @p p lies outside the cell can therefore be determined by
    * checking whether the returned reference coordinates lie inside or outside
-   * the reference cell (e.g., using GeometryInfo::is_inside_unit_cell()) or
+   * the reference cell (e.g., using ReferenceCell::contains_point()) or
    * whether the exception mentioned above has been thrown.
    *
    * @param cell Iterator to the cell that will be used to define the mapping.
@@ -497,7 +510,8 @@ public:
    * MappingQ. The only difference in behavior is that this function
    * will never throw an ExcTransformationFailed() exception. If the
    * transformation fails for `real_points[i]`, the returned `unit_points[i]`
-   * contains std::numeric_limits<double>::infinity() as the first entry.
+   * contains std::numeric_limits<double>::lowest() as the first component
+   * of the point, marking this one point as invalid.
    */
   virtual void
   transform_points_real_to_unit_cell(
@@ -612,8 +626,8 @@ public:
    * - To provide scratch space for computations that are done in
    * Mapping::fill_fe_values() and similar functions. Some of the derived
    * classes would like to use scratch arrays and it would be a waste of time
-   * to allocate these arrays every time this function is called, just to de-
-   * allocate it again at the end of the function. Rather, one could allocate
+   * to allocate these arrays every time this function is called, just to
+   * de-allocate it again at the end of the function. Rather, one could allocate
    * this memory once as a member variable of the current class, and simply
    * use it in Mapping::fill_fe_values().
    * - After calling Mapping::fill_fe_values(), FEValues::reinit()
@@ -657,6 +671,18 @@ public:
     InternalDataBase(const InternalDataBase &) = delete;
 
     /**
+     * This function initializes the data fields related to evaluation of the
+     * mapping on cells, implemented by (derived) classes. This function is
+     * used both when setting up a field of this class for the first time or
+     * when a new Quadrature formula should be considered without creating an
+     * entirely new object. This is used when the number of evaluation points
+     * is different on each cell, e.g. when using FEPointEvaluation for
+     * handling particles or with certain non-matching problem settings.
+     */
+    virtual void
+    reinit(const UpdateFlags update_flags, const Quadrature<dim> &quadrature);
+
+    /**
      * Virtual destructor for derived classes
      */
     virtual ~InternalDataBase() = default;
@@ -684,7 +710,6 @@ public:
     memory_consumption() const;
   };
 
-
 protected:
   /**
    * Given a set of update flags, compute which other quantities <i>also</i>
@@ -705,7 +730,7 @@ protected:
    * An extensive discussion of the interaction between this function and
    * FEValues can be found in the
    * @ref FE_vs_Mapping_vs_FEValues
-   * documentation module.
+   * documentation topic.
    *
    * @see UpdateFlags
    */
@@ -721,8 +746,8 @@ protected:
    * interface of mappings with the FEValues class).
    *
    * Derived classes will return pointers to objects of a type derived from
-   * Mapping::InternalDataBase (see there for more information) and may pre-
-   * compute some information already (in accordance with what will be asked
+   * Mapping::InternalDataBase (see there for more information) and may
+   * pre-compute some information already (in accordance with what will be asked
    * of the mapping in the future, as specified by the update flags) and for
    * the given quadrature object. Subsequent calls to transform() or
    * fill_fe_values() and friends will then receive back the object created
@@ -736,7 +761,7 @@ protected:
    * An extensive discussion of the interaction between this function and
    * FEValues can be found in the
    * @ref FE_vs_Mapping_vs_FEValues
-   * documentation module.
+   * documentation topic.
    *
    * @param update_flags A set of flags that define what is expected of the
    * mapping class in future calls to transform() or the fill_fe_values()
@@ -752,13 +777,6 @@ protected:
    * @return A pointer to a newly created object of type InternalDataBase (or
    * a derived class). Ownership of this object passes to the calling
    * function.
-   *
-   * @note C++ allows that virtual functions in derived classes may return
-   * pointers to objects not of type InternalDataBase but in fact pointers to
-   * objects of classes <i>derived</i> from InternalDataBase. (This feature is
-   * called "covariant return types".) This is useful in some contexts where
-   * the calling is within the derived class and will immediately make use of
-   * the returned object, knowing its real (derived) type.
    */
   virtual std::unique_ptr<InternalDataBase>
   get_data(const UpdateFlags      update_flags,
@@ -783,13 +801,6 @@ protected:
    * @return A pointer to a newly created object of type InternalDataBase (or
    * a derived class). Ownership of this object passes to the calling
    * function.
-   *
-   * @note C++ allows that virtual functions in derived classes may return
-   * pointers to objects not of type InternalDataBase but in fact pointers to
-   * objects of classes <i>derived</i> from InternalDataBase. (This feature is
-   * called "covariant return types".) This is useful in some contexts where
-   * the calling is within the derived class and will immediately make use of
-   * the returned object, knowing its real (derived) type.
    */
   virtual std::unique_ptr<InternalDataBase>
   get_face_data(const UpdateFlags               update_flags,
@@ -822,13 +833,6 @@ protected:
    * @return A pointer to a newly created object of type InternalDataBase (or
    * a derived class). Ownership of this object passes to the calling
    * function.
-   *
-   * @note C++ allows that virtual functions in derived classes may return
-   * pointers to objects not of type InternalDataBase but in fact pointers to
-   * objects of classes <i>derived</i> from InternalDataBase. (This feature is
-   * called "covariant return types".) This is useful in some contexts where
-   * the calling is within the derived class and will immediately make use of
-   * the returned object, knowing its real (derived) type.
    */
   virtual std::unique_ptr<InternalDataBase>
   get_subface_data(const UpdateFlags          update_flags,
@@ -868,7 +872,7 @@ protected:
    * An extensive discussion of the interaction between this function and
    * FEValues can be found in the
    * @ref FE_vs_Mapping_vs_FEValues
-   * documentation module.
+   * documentation topic.
    *
    * @param[in] cell The cell of the triangulation for which this function is
    * to compute a mapping from the reference cell to.
@@ -1324,6 +1328,8 @@ public:
   friend class FESubfaceValues<dim, spacedim>;
   friend class NonMatching::FEImmersedSurfaceValues<dim>;
   friend class NonMatching::internal::ComputeMappingDataHelper<dim, spacedim>;
+  template <int, int, typename>
+  friend class NonMatching::MappingInfo;
 };
 
 

@@ -1,29 +1,28 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2015 - 2023 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2015 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 #ifndef dealii_read_write_vector_h
 #define dealii_read_write_vector_h
 
 #include <deal.II/base/config.h>
 
+#include <deal.II/base/aligned_vector.h>
 #include <deal.II/base/communication_pattern_base.h>
 #include <deal.II/base/index_set.h>
 #include <deal.II/base/memory_consumption.h>
 #include <deal.II/base/mpi_stub.h>
 #include <deal.II/base/parallel.h>
-#include <deal.II/base/subscriptor.h>
 #include <deal.II/base/template_constraints.h>
 #include <deal.II/base/types.h>
 
@@ -37,9 +36,12 @@
 #ifdef DEAL_II_WITH_TRILINOS
 #  include <deal.II/lac/trilinos_epetra_communication_pattern.h>
 #  include <deal.II/lac/trilinos_epetra_vector.h>
+#  include <deal.II/lac/trilinos_tpetra_block_vector.h>
 #  include <deal.II/lac/trilinos_tpetra_vector.h>
 
+DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
 #  include <Epetra_MultiVector.h>
+DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
 
 #endif
 
@@ -81,16 +83,6 @@ namespace TrilinosWrappers
 } // namespace TrilinosWrappers
 #  endif
 
-#  ifdef DEAL_II_WITH_CUDA
-namespace LinearAlgebra
-{
-  namespace CUDAWrappers
-  {
-    template <typename>
-    class Vector;
-  }
-} // namespace LinearAlgebra
-#  endif
 #endif
 
 namespace LinearAlgebra
@@ -133,7 +125,7 @@ namespace LinearAlgebra
    * get the first index of the largest range.
    */
   template <typename Number>
-  class ReadWriteVector : public Subscriptor, public ReadVector<Number>
+  class ReadWriteVector : public ReadVector<Number>
   {
   public:
     /**
@@ -266,7 +258,7 @@ namespace LinearAlgebra
      * analogy to standard functions.
      */
     void
-    swap(ReadWriteVector<Number> &v);
+    swap(ReadWriteVector<Number> &v) noexcept;
 
     /**
      * Copies the data and the IndexSet of the input vector @p in_vector.
@@ -305,19 +297,6 @@ namespace LinearAlgebra
         &communication_pattern = {});
 
     /**
-     * @deprecated Use import_elements() instead.
-     */
-    DEAL_II_DEPRECATED
-    void
-    import(const dealii::Vector<Number> &V,
-           VectorOperation::values       operation,
-           const std::shared_ptr<const Utilities::MPI::CommunicationPatternBase>
-             &communication_pattern = {})
-    {
-      import_elements(V, operation, communication_pattern);
-    }
-
-    /**
      * Imports all the elements present in the vector's IndexSet from the
      * input vector @p vec. VectorOperation::values @p operation
      * is used to decide if the elements in @p V should be added to the
@@ -332,20 +311,6 @@ namespace LinearAlgebra
       VectorOperation::values                         operation,
       const std::shared_ptr<const Utilities::MPI::CommunicationPatternBase>
         &communication_pattern = {});
-
-    /**
-     * @deprecated Use import_elements() instead.
-     */
-    template <typename MemorySpace>
-    DEAL_II_DEPRECATED void
-    import(const distributed::Vector<Number, MemorySpace> &V,
-           VectorOperation::values                         operation,
-           const std::shared_ptr<const Utilities::MPI::CommunicationPatternBase>
-             &communication_pattern = {})
-    {
-      import_elements(V, operation, communication_pattern);
-    }
-
 
 #ifdef DEAL_II_WITH_PETSC
     /**
@@ -362,19 +327,6 @@ namespace LinearAlgebra
       VectorOperation::values           operation,
       const std::shared_ptr<const Utilities::MPI::CommunicationPatternBase>
         &communication_pattern = {});
-
-    /**
-     * @deprecated Use import_elements() instead.
-     */
-    DEAL_II_DEPRECATED
-    void
-    import(const PETScWrappers::MPI::Vector &V,
-           VectorOperation::values           operation,
-           const std::shared_ptr<const Utilities::MPI::CommunicationPatternBase>
-             &communication_pattern = {})
-    {
-      import_elements(V, operation, communication_pattern);
-    }
 #endif
 
 #ifdef DEAL_II_WITH_TRILINOS
@@ -395,19 +347,6 @@ namespace LinearAlgebra
       const std::shared_ptr<const Utilities::MPI::CommunicationPatternBase>
         &communication_pattern = {});
 
-    /**
-     * @deprecated Use import_elements() instead.
-     */
-    DEAL_II_DEPRECATED
-    void
-    import(const TrilinosWrappers::MPI::Vector &V,
-           VectorOperation::values              operation,
-           const std::shared_ptr<const Utilities::MPI::CommunicationPatternBase>
-             &communication_pattern = {})
-    {
-      import_elements(V, operation, communication_pattern);
-    }
-
 #  ifdef DEAL_II_TRILINOS_WITH_TPETRA
     /**
      * Imports all the elements present in the vector's IndexSet from the input
@@ -417,28 +356,15 @@ namespace LinearAlgebra
      * communication pattern is used multiple times. This can be used to improve
      * performance.
      */
-    template <typename Dummy = Number>
+    template <typename MemorySpace, typename Dummy = Number>
     std::enable_if_t<std::is_same_v<Dummy, Number> &&
                      dealii::is_tpetra_type<Number>::value>
     import_elements(
-      const TpetraWrappers::Vector<Number> &tpetra_vec,
-      VectorOperation::values               operation,
+      const TpetraWrappers::Vector<Number, MemorySpace> &tpetra_vec,
+      VectorOperation::values                            operation,
       const std::shared_ptr<const Utilities::MPI::CommunicationPatternBase>
         &communication_pattern = {});
 
-    /**
-     * @deprecated Use import_elements() instead.
-     */
-    template <typename Dummy = Number>
-    DEAL_II_DEPRECATED std::enable_if_t<std::is_same_v<Dummy, Number> &&
-                                        dealii::is_tpetra_type<Number>::value>
-                       import(const TpetraWrappers::Vector<Number> &V,
-                              VectorOperation::values               operation,
-                              const std::shared_ptr<const Utilities::MPI::CommunicationPatternBase>
-                                &communication_pattern = {})
-    {
-      import_elements(V, operation, communication_pattern);
-    }
 #  endif
 
     /**
@@ -456,47 +382,6 @@ namespace LinearAlgebra
       const std::shared_ptr<const Utilities::MPI::CommunicationPatternBase>
         &communication_pattern = {});
 
-    /**
-     * @deprecated Use import_elements() instead.
-     */
-    DEAL_II_DEPRECATED
-    void
-    import(const EpetraWrappers::Vector &V,
-           VectorOperation::values       operation,
-           const std::shared_ptr<const Utilities::MPI::CommunicationPatternBase>
-             &communication_pattern = {})
-    {
-      import_elements(V, operation, communication_pattern);
-    }
-#endif
-
-#ifdef DEAL_II_WITH_CUDA
-    /**
-     * Import all the elements present in the vector's IndexSet from the input
-     * vector @p cuda_vec. VectorOperation::values @p operation is used to
-     * decide if the elements in @p V should be added to the current vector or
-     * replace the current elements. The last parameter is not used.
-     */
-    void
-    import_elements(
-      const CUDAWrappers::Vector<Number> &cuda_vec,
-      VectorOperation::values             operation,
-      const std::shared_ptr<const Utilities::MPI::CommunicationPatternBase>
-        &communication_pattern = {});
-
-
-    /**
-     * @deprecated Use import_elements() instead.
-     */
-    DEAL_II_DEPRECATED
-    void
-    import(const CUDAWrappers::Vector<Number> &V,
-           VectorOperation::values             operation,
-           const std::shared_ptr<const Utilities::MPI::CommunicationPatternBase>
-             &communication_pattern = {})
-    {
-      import_elements(V, operation, communication_pattern);
-    }
 #endif
 
     /**
@@ -621,7 +506,7 @@ namespace LinearAlgebra
     virtual void
     extract_subvector_to(
       const ArrayView<const types::global_dof_index> &indices,
-      ArrayView<Number>                              &entries) const override;
+      const ArrayView<Number>                        &entries) const override;
 
     /**
      * Instead of getting individual elements of a vector via operator(),
@@ -741,11 +626,12 @@ namespace LinearAlgebra
      * vector @p tpetra_vector. This is an helper function and it should not be
      * used directly.
      */
-    template <typename Dummy = Number>
+    template <typename MemorySpace, typename Dummy = Number>
     std::enable_if_t<std::is_same_v<Dummy, Number> &&
                      dealii::is_tpetra_type<Number>::value>
     import_elements(
-      const Tpetra::Vector<Number, int, types::signed_global_dof_index>
+      const Tpetra::
+        Vector<Number, int, types::signed_global_dof_index, MemorySpace>
                              &tpetra_vector,
       const IndexSet         &locally_owned_elements,
       VectorOperation::values operation,
@@ -775,19 +661,14 @@ namespace LinearAlgebra
     unsigned int
     global_to_local(const types::global_dof_index global_index) const;
 
-    /**
-     * A helper function that is used to resize the val array.
-     */
-    void
-    resize_val(const size_type new_allocated_size);
-
 #ifdef DEAL_II_WITH_TRILINOS
 #  ifdef DEAL_II_TRILINOS_WITH_TPETRA
     /**
      * Return a TpetraWrappers::CommunicationPattern and store it for future
      * use.
      */
-    TpetraWrappers::CommunicationPattern
+    template <typename MemorySpace = dealii::MemorySpace::Host>
+    TpetraWrappers::CommunicationPattern<MemorySpace>
     create_tpetra_comm_pattern(const IndexSet &source_index_set,
                                const MPI_Comm  mpi_comm);
 #  endif
@@ -818,10 +699,9 @@ namespace LinearAlgebra
     std::shared_ptr<Utilities::MPI::CommunicationPatternBase> comm_pattern;
 
     /**
-     * Pointer to the array of local elements of this vector.
+     * Locally stored elements.
      */
-    std::unique_ptr<Number[], /*decltype(std::free) * */ void (*)(void *)>
-      values;
+    AlignedVector<Number> values;
 
     /**
      * For parallel loops with TBB, this member variable stores the affinity
@@ -878,8 +758,6 @@ namespace LinearAlgebra
 
   template <typename Number>
   inline ReadWriteVector<Number>::ReadWriteVector()
-    : Subscriptor()
-    , values(nullptr, free)
   {
     // virtual functions called in constructors and destructors never use the
     // override in a derived class
@@ -892,8 +770,6 @@ namespace LinearAlgebra
   template <typename Number>
   inline ReadWriteVector<Number>::ReadWriteVector(
     const ReadWriteVector<Number> &v)
-    : Subscriptor()
-    , values(nullptr, free)
   {
     this->operator=(v);
   }
@@ -902,8 +778,6 @@ namespace LinearAlgebra
 
   template <typename Number>
   inline ReadWriteVector<Number>::ReadWriteVector(const size_type size)
-    : Subscriptor()
-    , values(nullptr, free)
   {
     // virtual functions called in constructors and destructors never use the
     // override in a derived class
@@ -916,8 +790,6 @@ namespace LinearAlgebra
   template <typename Number>
   inline ReadWriteVector<Number>::ReadWriteVector(
     const IndexSet &locally_stored_indices)
-    : Subscriptor()
-    , values(nullptr, free)
   {
     // virtual functions called in constructors and destructors never use the
     // override in a derived class
@@ -958,7 +830,7 @@ namespace LinearAlgebra
   inline typename ReadWriteVector<Number>::iterator
   ReadWriteVector<Number>::begin()
   {
-    return values.get();
+    return values.begin();
   }
 
 
@@ -967,7 +839,7 @@ namespace LinearAlgebra
   inline typename ReadWriteVector<Number>::const_iterator
   ReadWriteVector<Number>::begin() const
   {
-    return values.get();
+    return values.begin();
   }
 
 
@@ -976,7 +848,7 @@ namespace LinearAlgebra
   inline typename ReadWriteVector<Number>::iterator
   ReadWriteVector<Number>::end()
   {
-    return values.get() + this->locally_owned_size();
+    return values.end();
   }
 
 
@@ -985,7 +857,7 @@ namespace LinearAlgebra
   inline typename ReadWriteVector<Number>::const_iterator
   ReadWriteVector<Number>::end() const
   {
-    return values.get() + this->locally_owned_size();
+    return values.end();
   }
 
 
@@ -1043,7 +915,7 @@ namespace LinearAlgebra
   void
   ReadWriteVector<Number>::extract_subvector_to(
     const ArrayView<const types::global_dof_index> &indices,
-    ArrayView<Number>                              &entries) const
+    const ArrayView<Number>                        &entries) const
   {
     AssertDimension(indices.size(), entries.size());
     for (unsigned int i = 0; i < indices.size(); ++i)
@@ -1063,8 +935,8 @@ namespace LinearAlgebra
     while (indices_begin != indices_end)
       {
         *values_begin = operator()(*indices_begin);
-        indices_begin++;
-        values_begin++;
+        ++indices_begin;
+        ++values_begin;
       }
   }
 
@@ -1193,7 +1065,7 @@ namespace LinearAlgebra
 template <typename Number>
 inline void
 swap(LinearAlgebra::ReadWriteVector<Number> &u,
-     LinearAlgebra::ReadWriteVector<Number> &v)
+     LinearAlgebra::ReadWriteVector<Number> &v) noexcept
 {
   u.swap(v);
 }

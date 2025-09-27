@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2017 - 2023 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2017 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 
 #ifndef dealii_sundials_kinsol_h
@@ -24,19 +23,19 @@
 
 #  include <deal.II/base/conditional_ostream.h>
 #  include <deal.II/base/exceptions.h>
-#  include <deal.II/base/logstream.h>
 #  include <deal.II/base/mpi_stub.h>
 #  include <deal.II/base/parameter_handler.h>
 
 #  include <deal.II/lac/vector.h>
 #  include <deal.II/lac/vector_memory.h>
 
+#  include <deal.II/sundials/sundials_types.h>
+
 #  include <boost/signals2.hpp>
 
 #  include <kinsol/kinsol.h>
 #  include <nvector/nvector_serial.h>
 #  include <sundials/sundials_math.h>
-#  include <sundials/sundials_types.h>
 
 #  include <exception>
 #  include <memory>
@@ -44,8 +43,6 @@
 
 DEAL_II_NAMESPACE_OPEN
 
-// Shorthand notation for KINSOL error codes.
-#  define AssertKINSOL(code) Assert(code >= 0, ExcKINSOLError(code))
 
 namespace SUNDIALS
 {
@@ -214,6 +211,52 @@ namespace SUNDIALS
         picard = KIN_PICARD,
       };
 
+
+      /**
+       * Orthogonalization strategy used for fixed-point iteration with
+       * Anderson acceleration. While `modified_gram_schmidt` is a good default
+       * choice, it suffers from excessive communication for a growing number of
+       * acceleration vectors. Instead, the user may use one of the other
+       * strategies.  For a detailed documentation consult the SUNDIALS manual.
+       *
+       * @note Similar strategies are defined in
+       * LinearAlgebra::OrthogonalizationStrategy.
+       *
+       * @note The values assigned to the enum constants matter since they are
+       * directly passed to KINSOL.
+       */
+      enum OrthogonalizationStrategy
+      {
+        /**
+         * The default, stable strategy. Requires an increasing number of
+         * communication steps with increasing Anderson subspace size.
+         */
+        modified_gram_schmidt = 0,
+
+        /**
+         * Use a compact WY representation in the orthogonalization process of
+         * the inverse iteration with the Householder transformation. This
+         * strategy requires two communication steps and a very small linear
+         * system solve.
+         */
+        inverse_compact = 1,
+
+        /**
+         * Classical Gram Schmidt, that can work on multi-vectors in parallel
+         * and thus always requires three communication steps. However, it
+         * is less stable in terms of roundoff error propagation, requiring
+         * additional re-orthogonalization steps more frequently.
+         */
+        classical_gram_schmidt = 2,
+
+        /**
+         * Classical Gram Schmidt with delayed re-orthogonalization, which
+         * reduces the number of communication steps from three to two compared
+         * to `classical_gram_schmidt`.
+         */
+        delayed_classical_gram_schmidt = 3,
+      };
+
       /**
        * Initialization parameters for KINSOL.
        *
@@ -241,6 +284,8 @@ namespace SUNDIALS
        * Fixed point and Picard parameters:
        *
        * @param anderson_subspace_size Anderson acceleration subspace size
+       * @param anderson_qr_orthogonalization Orthogonalization strategy for QR
+       * factorization when using Anderson acceleration
        */
       AdditionalData(const SolutionStrategy &strategy = linesearch,
                      const unsigned int maximum_non_linear_iterations = 200,
@@ -251,7 +296,9 @@ namespace SUNDIALS
                      const double       maximum_newton_step           = 0.0,
                      const double       dq_relative_error             = 0.0,
                      const unsigned int maximum_beta_failures         = 0,
-                     const unsigned int anderson_subspace_size        = 0);
+                     const unsigned int anderson_subspace_size        = 0,
+                     const OrthogonalizationStrategy
+                       anderson_qr_orthogonalization = modified_gram_schmidt);
 
       /**
        * Add all AdditionalData() parameters to the given ParameterHandler
@@ -374,6 +421,12 @@ namespace SUNDIALS
        * If you set this to 0, no acceleration is used.
        */
       unsigned int anderson_subspace_size;
+
+      /**
+       * In case Anderson acceleration is used, this parameter selects the
+       * orthogonalization strategy used in the QR factorization.
+       */
+      OrthogonalizationStrategy anderson_qr_orthogonalization;
     };
 
     /**
@@ -474,7 +527,7 @@ namespace SUNDIALS
      * function is never called.
      *
      * The setup_jacobian() function may call a user-supplied function, or a
-     * function within the linear solver module, to compute Jacobian-related
+     * function within the linear solver group, to compute Jacobian-related
      * data that is required by the linear solver. It may also preprocess that
      * data as needed for solve_with_jacobian(), which may involve calling a
      * generic function (such as for LU factorization) or, more generally,
@@ -715,6 +768,14 @@ namespace SUNDIALS
 } // namespace SUNDIALS
 
 
+DEAL_II_NAMESPACE_CLOSE
+
+#else
+
+// Make sure the scripts that create the C++20 module input files have
+// something to latch on if the preprocessor #ifdef above would
+// otherwise lead to an empty content of the file.
+DEAL_II_NAMESPACE_OPEN
 DEAL_II_NAMESPACE_CLOSE
 
 #endif

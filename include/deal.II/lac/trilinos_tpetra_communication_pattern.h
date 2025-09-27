@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2018 - 2023 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2018 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 #ifndef dealii_trilinos_tpetra_communication_pattern_h
 #define dealii_trilinos_tpetra_communication_pattern_h
@@ -19,9 +18,14 @@
 
 #include <deal.II/base/config.h>
 
+#include <deal.II/base/memory_space.h>
+
+#include <deal.II/lac/trilinos_tpetra_types.h>
+
 #ifdef DEAL_II_TRILINOS_WITH_TPETRA
 
 #  include <deal.II/base/communication_pattern_base.h>
+#  include <deal.II/base/memory_space.h>
 
 #  include <Tpetra_Export.hpp>
 #  include <Tpetra_Import.hpp>
@@ -37,8 +41,12 @@ namespace LinearAlgebra
     /**
      * This class implements a wrapper to Tpetra::Import and Tpetra::Export.
      */
+    template <typename MemorySpace = dealii::MemorySpace::Host>
     class CommunicationPattern : public Utilities::MPI::CommunicationPatternBase
     {
+      static_assert(std::is_same_v<MemorySpace, dealii::MemorySpace::Default> ||
+                    std::is_same_v<MemorySpace, dealii::MemorySpace::Host>);
+
     public:
       /**
        * Initialize the communication pattern.
@@ -84,36 +92,54 @@ namespace LinearAlgebra
       /**
        * Return the underlying Tpetra::Import object.
        */
-      const Tpetra::Import<int, types::signed_global_dof_index> &
+      const TpetraTypes::ImportType<MemorySpace> &
       get_tpetra_import() const;
+
+      /**
+       * Return a Teuchos::RCP to the underlying Tpetra::Import object.
+       */
+      Teuchos::RCP<TpetraTypes::ImportType<MemorySpace>>
+      get_tpetra_import_rcp() const;
 
       /**
        * Return the underlying Tpetra::Export object.
        */
-      const Tpetra::Export<int, types::signed_global_dof_index> &
+      const TpetraTypes::ExportType<MemorySpace> &
       get_tpetra_export() const;
+
+      /**
+       * Return a Teuchos::RCP to the underlying Tpetra::Export object.
+       */
+      Teuchos::RCP<TpetraTypes::ExportType<MemorySpace>>
+      get_tpetra_export_rcp() const;
 
     private:
       /**
-       * Shared pointer to the MPI communicator used.
+       * Teuchos::RCP to the MPI communicator used.
        */
-      std::shared_ptr<const MPI_Comm> comm;
+      Teuchos::RCP<const MPI_Comm> comm;
 
       /**
-       * Shared pointer to the Tpetra::Import object used.
+       * Teuchos::RCP to the Tpetra::Import object used.
        */
-      std::unique_ptr<Tpetra::Import<int, types::signed_global_dof_index>>
-        tpetra_import;
+      Teuchos::RCP<TpetraTypes::ImportType<MemorySpace>> tpetra_import;
 
       /**
-       * Shared pointer to the Tpetra::Export object used.
+       * Teuchos::RCP to the Tpetra::Export object used.
        */
-      std::unique_ptr<Tpetra::Export<int, types::signed_global_dof_index>>
-        tpetra_export;
+      Teuchos::RCP<TpetraTypes::ExportType<MemorySpace>> tpetra_export;
     };
   } // end of namespace TpetraWrappers
 } // end of namespace LinearAlgebra
 
+DEAL_II_NAMESPACE_CLOSE
+
+#else
+
+// Make sure the scripts that create the C++20 module input files have
+// something to latch on if the preprocessor #ifdef above would
+// otherwise lead to an empty content of the file.
+DEAL_II_NAMESPACE_OPEN
 DEAL_II_NAMESPACE_CLOSE
 
 #endif

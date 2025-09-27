@@ -1,5 +1,3 @@
-<br>
-
 <i>This program was contributed by Martin Kronbichler, Wolfgang
 Bangerth, and Timo Heister.
 
@@ -27,7 +25,7 @@ more flexible in solving many kinds of related problems.
 </i>
 
 
-<a name="Intro"></a>
+<a name="step_32-Intro"></a>
 <h1>Introduction</h1>
 
 This program does pretty much exactly what step-31 already does: it
@@ -217,9 +215,9 @@ certain tolerance, i.e., until
 @f[
   \left\|
   \left(\begin{array}{c}
-    F_U - A U^{(k)} - B P^{(k)}
+    F_U - A U^{(k)} - B^TP^{(k)}
     \\
-    B^T U^{(k)}
+    -B U^{(k)}
   \end{array}\right)
   \right\|
   < \text{Tol}.
@@ -517,7 +515,7 @@ program, and with a different viscosity that affects transport
 velocities and therefore time step sizes) in 2d will produce the
 following graph:
 
-<img src="https://www.dealii.org/images/steps/developer/step-32.beta.2d.png" alt="">
+<img src="https://dealii.org/images/steps/developer/step-32.beta.2d.png" alt="">
 
 As can be seen, values $\beta \le 0.05$ are too small whereas
 $\beta=0.052$ appears to work, at least to the time horizon shown
@@ -547,7 +545,7 @@ viscosity $\nu$ and play with the constant $c_R$, making it as large
 as possible in order to make $\nu$ as small as possible. This gives us
 a picture like this:
 
-<img src="https://www.dealii.org/images/steps/developer/step-32.beta_cr.2d.png" alt="">
+<img src="https://dealii.org/images/steps/developer/step-32.beta_cr.2d.png" alt="">
 
 Consequently, $c_R=0.1$ would appear to be the right value here. While this
 graph has been obtained for an exponent $\alpha=1$, in the program we use
@@ -721,15 +719,15 @@ are part of Trilinos' Epetra library of basic linear algebra and tool classes:
   possible. Furthermore, the elements of these partitionings do not
   necessarily be mutually exclusive. This is important because when
   postprocessing solutions, we need access to all locally relevant or at least
-  the locally active degrees of freedom (see the module on @ref distributed
+  the locally active degrees of freedom (see the topic on @ref distributed
   for a definition, as well as the discussion in step-40). Which elements the
   Trilinos vector considers as locally owned is not important to us then. All
   we care about is that it stores those elements locally that we need.
 </ul>
 
 There are a number of other concepts relevant to distributing the mesh
-to a number of processors; you may want to take a look at the @ref
-distributed module and step-40 or step-55 before trying to understand this
+to a number of processors; you may want to take a look at the
+@ref distributed topic and step-40 or step-55 before trying to understand this
 program.  The rest of the program is almost completely agnostic about
 the fact that we don't store all objects completely locally. There
 will be a few points where we have to limit loops over all cells to
@@ -779,10 +777,10 @@ href="http://en.wikipedia.org/wiki/Race_condition">race condition</a>.
 
 deal.II has a class that is made for exactly this workflow: WorkStream, first
 discussed in step-9 and step-13. Its
-use is also extensively documented in the module on @ref threads (in the section
+use is also extensively documented in the topic on @ref threads (in the section
 on @ref MTWorkStream "the WorkStream class") and we won't repeat here the
 rationale and detailed instructions laid out there, though you will want to
-read through this module to understand the distinction between scratch space
+read through this topic to understand the distinction between scratch space
 and per-cell data. Suffice it to mention that we need the following:
 
 - An iterator range for those cells on which we are supposed to work. This is
@@ -897,9 +895,9 @@ the following quantities:
   don't really have anything useful to offer here, but we can hope that if we
   start with something and let things run for a while that the exact initial
   conditions don't matter that much any more &mdash; as is in fact suggested
-  by looking at the pictures shown in the <a href="#Results">results section
-  below</a>. The initial temperature field we use here is given in terms of
-  the radius by
+  by looking at the pictures shown in the
+  @ref step_32-ResultsSection "results section below". The initial temperature field
+  we use here is given in terms of the radius by
   @f{align*}{
     s &= \frac{\|\mathbf x\|-R_0}{R_1-R_0}, \\
     \varphi &= \arctan \frac{y}{x}, \\
@@ -922,7 +920,7 @@ the following quantities:
   href="http://www.wolframalpha.com/input/?i=plot+%28sqrt%28x^2%2By^2%29%2B0.2*%28sqrt%28x^2%2By^2%29*%281-sqrt%28x^2%2By^2%29%29*sin%286*atan2%28x%2Cy%29%29%29%2C+x%3D-1+to+1%2C+y%3D-1+to+1">this
   page</a>):
 
-  <img src="https://www.dealii.org/images/steps/developer/step-32.2d-initial.png" alt="">
+  <img src="https://dealii.org/images/steps/developer/step-32.2d-initial.png" alt="">
 
   The point of this profile is that if we had used $s$ instead of $\tau$ in
   the definition of $T(\mathbf x)$ then it would simply be a linear

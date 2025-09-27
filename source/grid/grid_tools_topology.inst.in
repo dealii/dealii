@@ -1,0 +1,129 @@
+// ------------------------------------------------------------------------
+//
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2023 by the deal.II authors
+//
+// This file is part of the deal.II library.
+//
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
+//
+// ------------------------------------------------------------------------
+
+for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
+  {
+#if deal_II_dimension <= deal_II_space_dimension
+    namespace GridTools
+    \{
+      template std::tuple<std::vector<Point<deal_II_space_dimension>>,
+                          std::vector<CellData<deal_II_dimension>>,
+                          SubCellData>
+      get_coarse_mesh_description(
+        const Triangulation<deal_II_dimension, deal_II_space_dimension> &tria);
+
+      template void
+      delete_unused_vertices(std::vector<Point<deal_II_space_dimension>> &,
+                             std::vector<CellData<deal_II_dimension>> &,
+                             SubCellData &);
+
+      template void
+      delete_duplicated_vertices(std::vector<Point<deal_II_space_dimension>> &,
+                                 std::vector<CellData<deal_II_dimension>> &,
+                                 SubCellData &,
+                                 std::vector<unsigned int> &,
+                                 double);
+
+#  if deal_II_dimension == deal_II_space_dimension
+      template void
+      delete_duplicated_vertices(std::vector<Point<deal_II_space_dimension>> &,
+                                 const double);
+#  endif
+
+      template void
+      invert_all_negative_measure_cells(
+        const std::vector<Point<deal_II_space_dimension>> &,
+        std::vector<CellData<deal_II_dimension>> &);
+
+      template std::size_t
+      invert_cells_with_negative_measure(
+        const std::vector<Point<deal_II_space_dimension>> &,
+        std::vector<CellData<deal_II_dimension>> &);
+
+#  if deal_II_dimension == deal_II_space_dimension
+      template void
+      consistently_order_cells(std::vector<CellData<deal_II_dimension>> &);
+#  endif
+
+      template std::map<unsigned int, Point<deal_II_space_dimension>>
+      get_all_vertices_at_boundary(
+        const Triangulation<deal_II_dimension, deal_II_space_dimension> &tria);
+
+#  if deal_II_dimension == 2
+      template std::vector<
+        std::vector<std::pair<unsigned int, Point<deal_II_space_dimension>>>>
+      extract_ordered_boundary_vertices(
+        const Triangulation<deal_II_dimension, deal_II_space_dimension> &tria,
+        const Mapping<deal_II_dimension, deal_II_space_dimension> &mapping);
+#  endif
+
+      template std::vector<
+        std::set<Triangulation<deal_II_dimension,
+                               deal_II_space_dimension>::active_cell_iterator>>
+      vertex_to_cell_map(
+        const Triangulation<deal_II_dimension, deal_II_space_dimension>
+          &triangulation);
+
+      template std::map<unsigned int, Point<deal_II_space_dimension>>
+      extract_used_vertices(
+        const Triangulation<deal_II_dimension, deal_II_space_dimension> &mesh,
+        const Mapping<deal_II_dimension, deal_II_space_dimension> &mapping);
+
+      template void
+      get_face_connectivity_of_cells(
+        const Triangulation<deal_II_dimension, deal_II_space_dimension>
+                               &triangulation,
+        DynamicSparsityPattern &cell_connectivity);
+
+      template void
+      get_vertex_connectivity_of_cells(
+        const Triangulation<deal_II_dimension, deal_II_space_dimension>
+                               &triangulation,
+        DynamicSparsityPattern &cell_connectivity);
+
+      template void
+      get_vertex_connectivity_of_cells_on_level(
+        const Triangulation<deal_II_dimension, deal_II_space_dimension>
+                               &triangulation,
+        const unsigned int      level,
+        DynamicSparsityPattern &cell_connectivity);
+
+    \}
+#endif
+  }
+
+for (deal_II_dimension : DIMENSIONS)
+  {
+    template void
+    GridTools::remove_hanging_nodes<deal_II_dimension, deal_II_dimension>(
+      Triangulation<deal_II_dimension> & tria, bool, unsigned int);
+
+    template void
+    GridTools::remove_anisotropy<deal_II_dimension, deal_II_dimension>(
+      Triangulation<deal_II_dimension> &, double, unsigned int);
+
+#if deal_II_dimension < 3
+    template void
+    GridTools::remove_hanging_nodes<deal_II_dimension, deal_II_dimension + 1>(
+      Triangulation<deal_II_dimension, deal_II_dimension + 1> & tria,
+      bool,
+      unsigned int);
+
+    template void
+    GridTools::remove_anisotropy<deal_II_dimension, deal_II_dimension + 1>(
+      Triangulation<deal_II_dimension, deal_II_dimension + 1> &,
+      double,
+      unsigned int);
+#endif
+  }

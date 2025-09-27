@@ -1,19 +1,16 @@
-/* ---------------------------------------------------------------------
+/* ------------------------------------------------------------------------
  *
- * Copyright (C) 2000 - 2023 by the deal.II authors
+ * SPDX-License-Identifier: LGPL-2.1-or-later
+ * Copyright (C) 2000 - 2024 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
- * The deal.II library is free software; you can use it, redistribute
- * it, and/or modify it under the terms of the GNU Lesser General
- * Public License as published by the Free Software Foundation; either
- * version 2.1 of the License, or (at your option) any later version.
- * The full text of the license can be found in the file LICENSE.md at
- * the top level directory of deal.II.
+ * Part of the source code is dual licensed under Apache-2.0 WITH
+ * LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+ * governing the source code and code contributions can be found in
+ * LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
  *
- * ---------------------------------------------------------------------
- *
- * Author: Wolfgang Bangerth, University of Heidelberg, 2000
+ * ------------------------------------------------------------------------
  */
 
 
@@ -104,7 +101,7 @@ private:
 
   Triangulation<dim> triangulation;
 
-  FE_Q<dim>       fe;
+  const FE_Q<dim> fe;
   DoFHandler<dim> dof_handler;
 
 
@@ -146,7 +143,7 @@ double coefficient(const Point<dim> &p)
 // the desired polynomial degree (here <code>2</code>):
 template <int dim>
 Step6<dim>::Step6()
-  : fe(2)
+  : fe(/* polynomial degree = */ 2)
   , dof_handler(triangulation)
 {}
 
@@ -195,7 +192,7 @@ void Step6<dim>::setup_system()
   // order: if two constraints conflict then the constraint matrix either abort
   // or throw an exception via the Assert macro.
   VectorTools::interpolate_boundary_values(dof_handler,
-                                           0,
+                                           types::boundary_id(0),
                                            Functions::ZeroFunction<dim>(),
                                            constraints);
 
@@ -272,10 +269,10 @@ void Step6<dim>::assemble_system()
 
   for (const auto &cell : dof_handler.active_cell_iterators())
     {
+      fe_values.reinit(cell);
+
       cell_matrix = 0;
       cell_rhs    = 0;
-
-      fe_values.reinit(cell);
 
       for (const unsigned int q_index : fe_values.quadrature_point_indices())
         {
@@ -290,8 +287,8 @@ void Step6<dim>::assemble_system()
                    fe_values.shape_grad(j, q_index) * // grad phi_j(x_q)
                    fe_values.JxW(q_index));           // dx
 
-              cell_rhs(i) += (1.0 *                               // f(x)
-                              fe_values.shape_value(i, q_index) * // phi_i(x_q)
+              cell_rhs(i) += (fe_values.shape_value(i, q_index) * // phi_i(x_q)
+                              1.0 *                               // f(x)
                               fe_values.JxW(q_index));            // dx
             }
         }
@@ -333,7 +330,7 @@ void Step6<dim>::assemble_system()
 template <int dim>
 void Step6<dim>::solve()
 {
-  SolverControl            solver_control(1000, 1e-12);
+  SolverControl            solver_control(1000, 1e-6 * system_rhs.l2_norm());
   SolverCG<Vector<double>> solver(solver_control);
 
   PreconditionSSOR<SparseMatrix<double>> preconditioner;
@@ -477,7 +474,7 @@ void Step6<dim>::output_results(const unsigned int cycle) const
     std::ofstream         output("grid-" + std::to_string(cycle) + ".gnuplot");
     GridOutFlags::Gnuplot gnuplot_flags(false, 5);
     grid_out.set_flags(gnuplot_flags);
-    MappingQ<dim> mapping(3);
+    const MappingQ<dim> mapping(3);
     grid_out.write_gnuplot(triangulation, output, &mapping);
   }
 

@@ -3,8 +3,6 @@ DEAL::Solving problem in 2 space dimensions.
 DEAL::   Number of active cells: 256
 DEAL::   Total number of cells: 341
 DEAL::   Number of degrees of freedom: 289
-DEAL:cg::Starting value 11.
-DEAL:cg::Convergence step 26 value 0
 DEAL::   26 CG iterations needed to obtain convergence.
 gmvinput ascii
 
@@ -535,8 +533,6 @@ DEAL::Solving problem in 3 space dimensions.
 DEAL::   Number of active cells: 512
 DEAL::   Total number of cells: 585
 DEAL::   Number of degrees of freedom: 729
-DEAL:cg::Starting value 8.0
-DEAL:cg::Convergence step 16 value 0
 DEAL::   16 CG iterations needed to obtain convergence.
 gmvinput ascii
 

@@ -1,23 +1,25 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2023 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2020 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 #ifndef dealii_vector_tools_project_h
 #define dealii_vector_tools_project_h
 
 
 #include <deal.II/base/config.h>
+
+#include <deal.II/base/template_constraints.h>
+#include <deal.II/base/vectorization.h>
 
 #include <functional>
 #include <memory>
@@ -153,7 +155,7 @@ namespace VectorTools
     VectorType                                                &vec,
     const bool                 enforce_zero_boundary = false,
     const Quadrature<dim - 1> &q_boundary = (dim > 1 ? QGauss<dim - 1>(2) :
-                                                       Quadrature<dim - 1>(0)),
+                                                       Quadrature<dim - 1>()),
     const bool                 project_to_boundary_first = false);
 
   /**
@@ -172,7 +174,7 @@ namespace VectorTools
     VectorType                                                &vec,
     const bool                 enforce_zero_boundary = false,
     const Quadrature<dim - 1> &q_boundary = (dim > 1 ? QGauss<dim - 1>(2) :
-                                                       Quadrature<dim - 1>(0)),
+                                                       Quadrature<dim - 1>()),
     const bool                 project_to_boundary_first = false);
 
   /**
@@ -191,7 +193,7 @@ namespace VectorTools
     VectorType                                                &vec,
     const bool                      enforce_zero_boundary = false,
     const hp::QCollection<dim - 1> &q_boundary = hp::QCollection<dim - 1>(
-      dim > 1 ? QGauss<dim - 1>(2) : Quadrature<dim - 1>(0)),
+      dim > 1 ? QGauss<dim - 1>(2) : Quadrature<dim - 1>()),
     const bool project_to_boundary_first = false);
 
   /**
@@ -210,7 +212,7 @@ namespace VectorTools
     VectorType                                                &vec,
     const bool                      enforce_zero_boundary = false,
     const hp::QCollection<dim - 1> &q_boundary = hp::QCollection<dim - 1>(
-      dim > 1 ? QGauss<dim - 1>(2) : Quadrature<dim - 1>(0)),
+      dim > 1 ? QGauss<dim - 1>(2) : Quadrature<dim - 1>()),
     const bool project_to_boundary_first = false);
 
   /**

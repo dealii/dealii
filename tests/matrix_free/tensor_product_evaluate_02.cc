@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2020 - 2022 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2020 - 2024 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 
 
@@ -29,7 +28,7 @@
 
 #include <deal.II/lac/vector.h>
 
-#include <deal.II/matrix_free/tensor_product_kernels.h>
+#include <deal.II/matrix_free/tensor_product_point_kernels.h>
 
 #include "../tests.h"
 
@@ -67,7 +66,11 @@ test(const unsigned int degree)
   for (const auto &p : evaluation_points)
     {
       const auto val = internal::evaluate_tensor_product_value_and_gradient(
-        polynomials, coefficients, p, false, renumbering);
+        polynomials,
+        make_const_array_view(coefficients),
+        p,
+        false,
+        renumbering);
       deallog << "Value " << val.first << " vs " << matrix * p + offset
               << std::endl;
       deallog << "Gradient " << val.second << " vs " << transpose(matrix)
@@ -80,7 +83,11 @@ test(const unsigned int degree)
       for (const auto &p : evaluation_points)
         {
           const auto val = internal::evaluate_tensor_product_value_and_gradient(
-            polynomials, coefficients, p, true, renumbering);
+            polynomials,
+            make_const_array_view(coefficients),
+            p,
+            true,
+            renumbering);
           deallog << "Value " << val.first << " vs " << matrix * p + offset
                   << std::endl;
           deallog << "Gradient " << val.second << " vs " << transpose(matrix)

@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2010 - 2013 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2010 - 2024 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 /**
  * @page changes_between_6_2_and_6_3 Changes between Version 6.2 and 6.3
@@ -31,7 +30,7 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
 </p>
 
 
-<a name="incompatible"></a>
+<a name="620-630-incompatible"></a>
 <h3 style="color:red">Incompatibilities</h3>
 
 <p style="color:red">
@@ -115,7 +114,7 @@ inconvenience this causes.
 </ol>
 
 
-<a name="general"></a>
+<a name="620-630-general"></a>
 <h3>General</h3>
 
 <ol>
@@ -195,7 +194,7 @@ inconvenience this causes.
    <li>
    <p>
    New: A report has been added on the
-   <a href="https://www.dealii.org/reports/codimension-one/desimone-heltai-manigrasso.pdf"
+   <a href="https://dealii.org/reports/codimension-one/desimone-heltai-manigrasso.pdf"
    target="body">codimension one</a> capabilities
    of the library (by Antonio DeSimone, Luca Heltai
    and Cataldo Manigrasso, SISSA, Trieste, Italy). It
@@ -280,7 +279,7 @@ inconvenience this causes.
    rather than how these jobs have to be mapped onto threads. We then
    use the <a href="https://www.threadingbuildingblocks.org">Threading
    Building Blocks (TBB) library</a> to schedule tasks onto available
-   hardware resources. This new scheme of describing parallism and
+   hardware resources. This new scheme of describing parallelism and
    various abstractions to make programming in this framework easier
    are described in great detail in the
    @ref threads "Parallel computing with multiple processors" module.
@@ -321,7 +320,7 @@ inconvenience this causes.
 
 
 
-<a name="base"></a>
+<a name="620-630-base"></a>
 <h3>base</h3>
 
 <ol>
@@ -493,7 +492,7 @@ inconvenience this causes.
 
 
 
-<a name="lac"></a>
+<a name="620-630-lac"></a>
 <h3>lac</h3>
 
 <ol>
@@ -715,7 +714,7 @@ inconvenience this causes.
 </ol>
 
 
-<a name="deal.II"></a>
+<a name="620-630-deal.II"></a>
 <h3>deal.II</h3>
 
 <ol>

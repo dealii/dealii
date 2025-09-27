@@ -1,24 +1,23 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 1999 - 2023 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 1999 - 2024 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 #ifndef dealii_intergrid_map_h
 #define dealii_intergrid_map_h
 
 #include <deal.II/base/config.h>
 
-#include <deal.II/base/smartpointer.h>
+#include <deal.II/base/observer_pointer.h>
 
 #include <deal.II/dofs/dof_accessor.h>
 
@@ -62,11 +61,11 @@ DEAL_II_NAMESPACE_OPEN
  *          1  ------------------>  1
  *          2  ------------------>  1
  *          3  ------------------>  2
- *          4  ------------------>  mother cell of cells 3 and 4
+ *          4  ------------------>  parent cell of cells 3 and 4
  *                                  (a non-active cell, not shown here)
  * @endverbatim
  * Besides the mappings shown here, the non-active cells on grid 1 are also
- * valid keys. For example, the mapping for the mother cell of cells 1 and 2
+ * valid keys. For example, the mapping for the parent cell of cells 1 and 2
  * on the first grid will point to cell 1 on the second grid.
  *
  * @tparam MeshType This class may be used with any class that satisfies the
@@ -114,7 +113,7 @@ DEAL_II_NAMESPACE_OPEN
  */
 template <typename MeshType>
 DEAL_II_CXX20_REQUIRES(concepts::is_triangulation_or_dof_handler<MeshType>)
-class InterGridMap : public Subscriptor
+class InterGridMap : public EnableObserverPointer
 {
 public:
   /**
@@ -123,7 +122,8 @@ public:
   using cell_iterator = typename MeshType::cell_iterator;
 
   /**
-   * Constructor setting the class name arguments in the SmartPointer members.
+   * Constructor setting the class name arguments in the ObserverPointer
+   * members.
    */
   InterGridMap();
 
@@ -188,12 +188,12 @@ private:
   /**
    * Store a pointer to the source grid.
    */
-  SmartPointer<const MeshType, InterGridMap<MeshType>> source_grid;
+  ObserverPointer<const MeshType, InterGridMap<MeshType>> source_grid;
 
   /**
    * Likewise for the destination grid.
    */
-  SmartPointer<const MeshType, InterGridMap<MeshType>> destination_grid;
+  ObserverPointer<const MeshType, InterGridMap<MeshType>> destination_grid;
 
   /**
    * Set the mapping for the pair of cells given. These shall match in level

@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2018 - 2022 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2018 - 2024 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 // Make sure that periodic boundary conditions also work correctly if we have
 // multiple periodic boundary pairs that meet at an edge.
@@ -128,8 +127,8 @@ public:
   value(const Point<dim> &p, const unsigned int component = 0) const override
   {
     if (dim == 3)
-      return std::sin(p(0) + 1.) * std::sin(p(1) + 2.) * std::sin(p(2) + 3.);
-    return std::sin(p(0) + 1.) * std::sin(p(1) + 2.);
+      return std::sin(p[0] + 1.) * std::sin(p[1] + 2.) * std::sin(p[2] + 3.);
+    return std::sin(p[0] + 1.) * std::sin(p[1] + 2.);
   }
 };
 
@@ -164,11 +163,11 @@ check_periodicity(const DoFHandler<2> &dof_handler,
       Vector<double> value2(1);
 
       Point<2> point1;
-      point1(0) = -numbers::PI + 2. * i / n_points + eps;
-      point1(1) = -numbers::PI;
+      point1[0] = -numbers::PI + 2. * i / n_points + eps;
+      point1[1] = -numbers::PI;
       Point<2> point2;
-      point2(0) = -numbers::PI + 2. * i / n_points + eps;
-      point2(1) = numbers::PI;
+      point2[0] = -numbers::PI + 2. * i / n_points + eps;
+      point2[1] = numbers::PI;
 
       VectorTools::point_value(dof_handler, solution, point1, value1);
       VectorTools::point_value(dof_handler, solution, point2, value2);
@@ -193,11 +192,11 @@ check_periodicity(const DoFHandler<2> &dof_handler,
       Vector<double> value2(1);
 
       Point<2> point1;
-      point1(1) = -numbers::PI + 2. * i / n_points + eps;
-      point1(0) = -numbers::PI;
+      point1[1] = -numbers::PI + 2. * i / n_points + eps;
+      point1[0] = -numbers::PI;
       Point<2> point2;
-      point2(1) = -numbers::PI + 2. * i / n_points + eps;
-      point2(0) = numbers::PI;
+      point2[1] = -numbers::PI + 2. * i / n_points + eps;
+      point2[0] = numbers::PI;
 
       VectorTools::point_value(dof_handler, solution, point1, value1);
       VectorTools::point_value(dof_handler, solution, point2, value2);

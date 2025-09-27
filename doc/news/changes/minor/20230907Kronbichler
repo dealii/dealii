@@ -1,5 +1,0 @@
-Fixed: FEValues requesting only mapping information but initialized with
-elements derived from FE_PolyTensor would previously run into an assertion on
-unstructured 2d meshes. This is now fixed.
-<br>
-(Martin Kronbichler, 2023/09/07)

@@ -1,17 +1,16 @@
-/* ---------------------------------------------------------------------
+/* ------------------------------------------------------------------------
  *
- * Copyright (C) 2019 - 2023 by the deal.II authors
+ * SPDX-License-Identifier: LGPL-2.1-or-later
+ * Copyright (C) 2019 - 2025 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
- * The deal.II library is free software; you can use it, redistribute
- * it, and/or modify it under the terms of the GNU Lesser General
- * Public License as published by the Free Software Foundation; either
- * version 2.1 of the License, or (at your option) any later version.
- * The full text of the license can be found in the file LICENSE.md at
- * the top level directory of deal.II.
+ * Part of the source code is dual licensed under Apache-2.0 WITH
+ * LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+ * governing the source code and code contributions can be found in
+ * LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
  *
- * ---------------------------------------------------------------------
+ * ------------------------------------------------------------------------
  *
  * Authors: Bruno Turcksin, Daniel Arndt, Oak Ridge National Laboratory, 2019
  */
@@ -38,10 +37,8 @@
 
 // The following ones include the data structures for the
 // implementation of matrix-free methods on GPU:
-#include <deal.II/base/cuda.h>
-
-#include <deal.II/matrix_free/cuda_fe_evaluation.h>
-#include <deal.II/matrix_free/cuda_matrix_free.h>
+#include <deal.II/matrix_free/portable_fe_evaluation.h>
+#include <deal.II/matrix_free/portable_matrix_free.h>
 #include <deal.II/matrix_free/operators.h>
 
 #include <fstream>
@@ -57,7 +54,7 @@ namespace Step64
 
   // Next, we define a class that implements the varying coefficients
   // we want to use in the Helmholtz operator. Later, we want to pass
-  // an object of this type to a CUDAWrappers::MatrixFree
+  // an object of this type to a Portable::MatrixFree
   // object that expects the class to have an `operator()` that fills the
   // values provided in the constructor for a given cell. This operator
   // needs to run on the device, so it needs to be marked as
@@ -70,18 +67,17 @@ namespace Step64
       : coef(coefficient)
     {}
 
-    DEAL_II_HOST_DEVICE void operator()(
-      const typename CUDAWrappers::MatrixFree<dim, double>::Data *gpu_data,
-      const unsigned int                                          cell,
-      const unsigned int                                          q) const;
+    DEAL_II_HOST_DEVICE void
+    operator()(const typename Portable::MatrixFree<dim, double>::Data *gpu_data,
+               const unsigned int                                      cell,
+               const unsigned int                                      q) const;
 
-    // Since CUDAWrappers::MatrixFree::Data doesn't know about the size of its
+    // Since Portable::MatrixFree::Data doesn't know about the size of its
     // arrays, we need to store the number of quadrature points and the
     // number of degrees of freedom in this class to do necessary index
     // conversions.
-    static const unsigned int n_dofs_1d    = fe_degree + 1;
-    static const unsigned int n_local_dofs = Utilities::pow(n_dofs_1d, dim);
-    static const unsigned int n_q_points   = Utilities::pow(n_dofs_1d, dim);
+    static const unsigned int n_local_dofs = Utilities::pow(fe_degree + 1, dim);
+    static const unsigned int n_q_points   = Utilities::pow(fe_degree + 1, dim);
 
   private:
     double *coef;
@@ -95,9 +91,9 @@ namespace Step64
   template <int dim, int fe_degree>
   DEAL_II_HOST_DEVICE void
   VaryingCoefficientFunctor<dim, fe_degree>::operator()(
-    const typename CUDAWrappers::MatrixFree<dim, double>::Data *gpu_data,
-    const unsigned int                                          cell,
-    const unsigned int                                          q) const
+    const typename Portable::MatrixFree<dim, double>::Data *gpu_data,
+    const unsigned int                                      cell,
+    const unsigned int                                      q) const
   {
     const unsigned int pos = gpu_data->local_q_point_id(cell, n_q_points, q);
     const Point<dim>   q_point = gpu_data->get_quadrature_point(cell, q);
@@ -126,27 +122,23 @@ namespace Step64
   class HelmholtzOperatorQuad
   {
   public:
-    DEAL_II_HOST_DEVICE HelmholtzOperatorQuad(
-      const typename CUDAWrappers::MatrixFree<dim, double>::Data *gpu_data,
-      double                                                     *coef,
-      int                                                         cell)
-      : gpu_data(gpu_data)
-      , coef(coef)
-      , cell(cell)
+    DEAL_II_HOST_DEVICE HelmholtzOperatorQuad(double *coef)
+      : coef(coef)
     {}
 
     DEAL_II_HOST_DEVICE void operator()(
-      CUDAWrappers::FEEvaluation<dim, fe_degree, fe_degree + 1, 1, double>
-               *fe_eval,
+      Portable::FEEvaluation<dim, fe_degree, fe_degree + 1, 1, double> *fe_eval,
       const int q_point) const;
+
+
 
     static const unsigned int n_q_points =
       dealii::Utilities::pow(fe_degree + 1, dim);
 
+    static const unsigned int n_local_dofs = n_q_points;
+
   private:
-    const typename CUDAWrappers::MatrixFree<dim, double>::Data *gpu_data;
-    double                                                     *coef;
-    int                                                         cell;
+    double *coef;
   };
 
 
@@ -159,14 +151,20 @@ namespace Step64
   // here:
   template <int dim, int fe_degree>
   DEAL_II_HOST_DEVICE void HelmholtzOperatorQuad<dim, fe_degree>::operator()(
-    CUDAWrappers::FEEvaluation<dim, fe_degree, fe_degree + 1, 1, double>
-             *fe_eval,
+    Portable::FEEvaluation<dim, fe_degree, fe_degree + 1, 1, double> *fe_eval,
     const int q_point) const
   {
-    const unsigned int pos =
-      gpu_data->local_q_point_id(cell, n_q_points, q_point);
+    const int cell_index = fe_eval->get_current_cell_index();
+    const typename Portable::MatrixFree<dim, double>::Data *data =
+      fe_eval->get_matrix_free_data();
 
-    fe_eval->submit_value(coef[pos] * fe_eval->get_value(q_point), q_point);
+    const unsigned int position =
+      data->local_q_point_id(cell_index, n_q_points, q_point);
+    auto coeff = coef[position];
+
+    auto value = fe_eval->get_value(q_point);
+
+    fe_eval->submit_value(coeff * value, q_point);
     fe_eval->submit_gradient(fe_eval->get_gradient(q_point), q_point);
   }
 
@@ -180,10 +178,9 @@ namespace Step64
   class LocalHelmholtzOperator
   {
   public:
-    // Again, the CUDAWrappers::MatrixFree object doesn't know about the number
+    // Again, the Portable::MatrixFree object doesn't know about the number
     // of degrees of freedom and the number of quadrature points so we need
     // to store these for index calculations in the call operator.
-    static constexpr unsigned int n_dofs_1d = fe_degree + 1;
     static constexpr unsigned int n_local_dofs =
       Utilities::pow(fe_degree + 1, dim);
     static constexpr unsigned int n_q_points =
@@ -193,12 +190,10 @@ namespace Step64
       : coef(coefficient)
     {}
 
-    DEAL_II_HOST_DEVICE void operator()(
-      const unsigned int                                          cell,
-      const typename CUDAWrappers::MatrixFree<dim, double>::Data *gpu_data,
-      CUDAWrappers::SharedData<dim, double>                      *shared_data,
-      const double                                               *src,
-      double                                                     *dst) const;
+    DEAL_II_HOST_DEVICE void
+    operator()(const typename Portable::MatrixFree<dim, double>::Data *data,
+               const Portable::DeviceVector<double>                   &src,
+               Portable::DeviceVector<double> &dst) const;
 
   private:
     double *coef;
@@ -212,19 +207,17 @@ namespace Step64
   // vector.
   template <int dim, int fe_degree>
   DEAL_II_HOST_DEVICE void LocalHelmholtzOperator<dim, fe_degree>::operator()(
-    const unsigned int                                          cell,
-    const typename CUDAWrappers::MatrixFree<dim, double>::Data *gpu_data,
-    CUDAWrappers::SharedData<dim, double>                      *shared_data,
-    const double                                               *src,
-    double                                                     *dst) const
+    const typename Portable::MatrixFree<dim, double>::Data *data,
+    const Portable::DeviceVector<double>                   &src,
+    Portable::DeviceVector<double>                         &dst) const
   {
-    CUDAWrappers::FEEvaluation<dim, fe_degree, fe_degree + 1, 1, double>
-      fe_eval(gpu_data, shared_data);
+    Portable::FEEvaluation<dim, fe_degree, fe_degree + 1, 1, double> fe_eval(
+      data);
     fe_eval.read_dof_values(src);
-    fe_eval.evaluate(true, true);
+    fe_eval.evaluate(EvaluationFlags::values | EvaluationFlags::gradients);
     fe_eval.apply_for_each_quad_point(
-      HelmholtzOperatorQuad<dim, fe_degree>(gpu_data, coef, cell));
-    fe_eval.integrate(true, true);
+      HelmholtzOperatorQuad<dim, fe_degree>(coef));
+    fe_eval.integrate(EvaluationFlags::values | EvaluationFlags::gradients);
     fe_eval.distribute_local_to_global(dst);
   }
 
@@ -238,7 +231,7 @@ namespace Step64
   // needs to have a `vmult()` function that performs the action of
   // the linear operator on a source vector.
   template <int dim, int fe_degree>
-  class HelmholtzOperator
+  class HelmholtzOperator : public EnableObserverPointer
   {
   public:
     HelmholtzOperator(const DoFHandler<dim>           &dof_handler,
@@ -253,9 +246,25 @@ namespace Step64
       LinearAlgebra::distributed::Vector<double, MemorySpace::Default> &vec)
       const;
 
+    void compute_diagonal();
+
+    std::shared_ptr<DiagonalMatrix<
+      LinearAlgebra::distributed::Vector<double, MemorySpace::Default>>>
+    get_matrix_diagonal_inverse() const;
+
+    types::global_dof_index m() const;
+
+    types::global_dof_index n() const;
+
+    double el(const types::global_dof_index row,
+              const types::global_dof_index col) const;
+
   private:
-    CUDAWrappers::MatrixFree<dim, double>                            mf_data;
+    Portable::MatrixFree<dim, double>                                mf_data;
     LinearAlgebra::distributed::Vector<double, MemorySpace::Default> coef;
+    std::shared_ptr<DiagonalMatrix<
+      LinearAlgebra::distributed::Vector<double, MemorySpace::Default>>>
+      inverse_diagonal_entries;
   };
 
 
@@ -272,15 +281,14 @@ namespace Step64
   // DoFHandler::get_triangulation() returns a Triangulation object, not a
   // parallel::TriangulationBase object, we have to downcast the return value.
   // This is safe to do here because we know that the triangulation is a
-  // parallel:distributed::Triangulation object in fact.
+  // parallel::distributed::Triangulation object in fact.
   template <int dim, int fe_degree>
   HelmholtzOperator<dim, fe_degree>::HelmholtzOperator(
     const DoFHandler<dim>           &dof_handler,
     const AffineConstraints<double> &constraints)
   {
-    MappingQ<dim> mapping(fe_degree);
-    typename CUDAWrappers::MatrixFree<dim, double>::AdditionalData
-      additional_data;
+    const MappingQ<dim> mapping(fe_degree);
+    typename Portable::MatrixFree<dim, double>::AdditionalData additional_data;
     additional_data.mapping_update_flags = update_values | update_gradients |
                                            update_JxW_values |
                                            update_quadrature_points;
@@ -330,6 +338,81 @@ namespace Step64
   }
 
 
+
+  template <int dim, int fe_degree>
+  void HelmholtzOperator<dim, fe_degree>::compute_diagonal()
+  {
+    this->inverse_diagonal_entries.reset(
+      new DiagonalMatrix<
+        LinearAlgebra::distributed::Vector<double, MemorySpace::Default>>());
+    LinearAlgebra::distributed::Vector<double, MemorySpace::Default>
+      &inverse_diagonal = inverse_diagonal_entries->get_vector();
+    initialize_dof_vector(inverse_diagonal);
+
+    HelmholtzOperatorQuad<dim, fe_degree> helmholtz_operator_quad(
+      coef.get_values());
+
+    MatrixFreeTools::compute_diagonal<dim, fe_degree, fe_degree + 1, 1, double>(
+      mf_data,
+      inverse_diagonal,
+      helmholtz_operator_quad,
+      EvaluationFlags::values | EvaluationFlags::gradients,
+      EvaluationFlags::values | EvaluationFlags::gradients);
+
+    double *raw_diagonal = inverse_diagonal.get_values();
+
+    Kokkos::parallel_for(
+      inverse_diagonal.locally_owned_size(), KOKKOS_LAMBDA(int i) {
+        Assert(raw_diagonal[i] > 0.,
+               ExcMessage("No diagonal entry in a positive definite operator "
+                          "should be zero"));
+        raw_diagonal[i] = 1. / raw_diagonal[i];
+      });
+  }
+
+
+
+  template <int dim, int fe_degree>
+  std::shared_ptr<DiagonalMatrix<
+    LinearAlgebra::distributed::Vector<double, MemorySpace::Default>>>
+  HelmholtzOperator<dim, fe_degree>::get_matrix_diagonal_inverse() const
+  {
+    return inverse_diagonal_entries;
+  }
+
+
+
+  template <int dim, int fe_degree>
+  types::global_dof_index HelmholtzOperator<dim, fe_degree>::m() const
+  {
+    return mf_data.get_vector_partitioner()->size();
+  }
+
+
+
+  template <int dim, int fe_degree>
+  types::global_dof_index HelmholtzOperator<dim, fe_degree>::n() const
+  {
+    return mf_data.get_vector_partitioner()->size();
+  }
+
+
+
+  template <int dim, int fe_degree>
+  double
+  HelmholtzOperator<dim, fe_degree>::el(const types::global_dof_index row,
+                                        const types::global_dof_index col) const
+  {
+    (void)col;
+    Assert(row == col, ExcNotImplemented());
+    Assert(inverse_diagonal_entries.get() != nullptr &&
+             inverse_diagonal_entries->m() > 0,
+           ExcNotInitialized());
+    return 1.0 / (*inverse_diagonal_entries)(row, row);
+  }
+
+
+
   // @sect3{Class <code>HelmholtzProblem</code>}
 
   // This is the main class of this program. It defines the usual
@@ -357,7 +440,7 @@ namespace Step64
 
     parallel::distributed::Triangulation<dim> triangulation;
 
-    FE_Q<dim>       fe;
+    const FE_Q<dim> fe;
     DoFHandler<dim> dof_handler;
 
     IndexSet locally_owned_dofs;
@@ -369,8 +452,7 @@ namespace Step64
     // Since all the operations in the `solve()` function are executed on the
     // graphics card, it is necessary for the vectors used to store their values
     // on the GPU as well. LinearAlgebra::distributed::Vector can be told which
-    // memory space to use. There is also LinearAlgebra::CUDAWrappers::Vector
-    // that always uses GPU memory storage but doesn't work with MPI. It might
+    // memory space to use. It might
     // be worth noticing that the communication between different MPI processes
     // can be improved if the MPI implementation is GPU-aware and the configure
     // flag `DEAL_II_MPI_WITH_DEVICE_SUPPORT` is enabled. (The value of this
@@ -415,7 +497,7 @@ namespace Step64
     system_rhs_dev.reinit(locally_owned_dofs, mpi_communicator);
 
     constraints.clear();
-    constraints.reinit(locally_relevant_dofs);
+    constraints.reinit(locally_owned_dofs, locally_relevant_dofs);
     DoFTools::make_hanging_node_constraints(dof_handler, constraints);
     VectorTools::interpolate_boundary_values(dof_handler,
                                              0,
@@ -504,7 +586,7 @@ namespace Step64
   // This solve() function finally contains the calls to the new classes
   // previously discussed. Here we don't use any preconditioner, i.e.,
   // precondition by the identity matrix, to focus just on the peculiarities of
-  // the CUDAWrappers::MatrixFree framework. Of course, in a real application
+  // the Portable::MatrixFree framework. Of course, in a real application
   // the choice of a suitable preconditioner is crucial but we have at least the
   // same restrictions as in step-37 since matrix entries are computed on the
   // fly and not stored.
@@ -516,7 +598,20 @@ namespace Step64
   template <int dim, int fe_degree>
   void HelmholtzProblem<dim, fe_degree>::solve()
   {
-    PreconditionIdentity preconditioner;
+    system_matrix_dev->compute_diagonal();
+
+    using PreconditionerType = PreconditionChebyshev<
+      HelmholtzOperator<dim, fe_degree>,
+      LinearAlgebra::distributed::Vector<double, MemorySpace::Default>>;
+    typename PreconditionerType::AdditionalData additional_data;
+    additional_data.smoothing_range     = 15.;
+    additional_data.degree              = 5;
+    additional_data.eig_cg_n_iterations = 10;
+    additional_data.preconditioner =
+      system_matrix_dev->get_matrix_diagonal_inverse();
+
+    PreconditionerType preconditioner;
+    preconditioner.initialize(*system_matrix_dev, additional_data);
 
     SolverControl solver_control(system_rhs_dev.size(),
                                  1e-12 * system_rhs_dev.l2_norm());
@@ -611,23 +706,16 @@ namespace Step64
 
 
 // @sect3{The <code>main()</code> function}
-
-// Finally for the `main()` function.  By default, all the MPI ranks
-// will try to access the device with number 0, which we assume to be
-// the GPU device associated with the CPU on which a particular MPI
-// rank runs. This works, but if we are running with MPI support it
-// may be that multiple MPI processes are running on the same machine
-// (for example, one per CPU core) and then they would all want to
-// access the same GPU on that machine. If there is only one GPU in
-// the machine, there is nothing we can do about it: All MPI ranks on
-// that machine need to share it. But if there are more than one GPU,
-// then it is better to address different graphic cards for different
-// processes. The choice below is based on the MPI process id by
-// assigning GPUs round robin to GPU ranks. (To work correctly, this
-// scheme assumes that the MPI ranks on one machine are
-// consecutive. If that were not the case, then the rank-GPU
-// association may just not be optimal.) To make this work, MPI needs
-// to be initialized before using this function.
+//
+// Finally for the `main()` function.
+// Kokkos needs to be initialized before being used, just as MPI does.
+// Utilities::MPI::MPI_InitFinalize takes care of first initializing MPI and
+// then Kokkos. This implies that Kokkos can take advantage of environment
+// variables set by MPI such as OMPI_COMM_WORLD_LOCAL_RANK or
+// OMPI_COMM_WORLD_LOCAL_SIZE to assign GPUs to MPI processes in a round-robin
+// fashion. If such environment variables are not present, Kokkos uses the first
+// visible GPU on every process. This might be suboptimal if that implies that
+// multiple processes use the same GPU.
 int main(int argc, char *argv[])
 {
   try

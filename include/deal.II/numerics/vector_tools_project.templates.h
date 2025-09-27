@@ -1,20 +1,21 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2023 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2020 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 #ifndef dealii_vector_tools_project_templates_h
 #define dealii_vector_tools_project_templates_h
+
+#include <deal.II/dofs/dof_tools.h>
 
 #include <deal.II/fe/fe_dgq.h>
 #include <deal.II/fe/fe_q.h>
@@ -169,14 +170,11 @@ namespace VectorTools
                                                  &function,
       LinearAlgebra::distributed::Vector<Number> &work_result,
       const bool                                  enforce_zero_boundary,
-      const Quadrature<dim - 1>                  &q_boundary,
-      const bool                                  project_to_boundary_first)
+      const Quadrature<dim - 1> & /*q_boundary*/,
+      const bool project_to_boundary_first)
     {
       Assert(project_to_boundary_first == false, ExcNotImplemented());
       Assert(enforce_zero_boundary == false, ExcNotImplemented());
-      (void)enforce_zero_boundary;
-      (void)project_to_boundary_first;
-      (void)q_boundary;
 
       AssertDimension(dof.get_fe_collection().size(), 1);
       AssertDimension(dof.get_fe(0).n_components(), function.n_components);
@@ -310,12 +308,13 @@ namespace VectorTools
       const DiagonalMatrix<decltype(rhs)> &preconditioner =
         use_lumped ? *mass_matrix.get_matrix_lumped_diagonal_inverse() :
                      *mass_matrix.get_matrix_diagonal_inverse();
-#ifdef DEBUG
-      // Make sure we picked a valid preconditioner
-      const auto &diagonal = preconditioner.get_vector();
-      for (const Number &v : diagonal)
-        Assert(v > 0.0, ExcInternalError());
-#endif
+      if constexpr (running_in_debug_mode())
+        {
+          // Make sure we picked a valid preconditioner
+          const auto &diagonal = preconditioner.get_vector();
+          for (const Number &v : diagonal)
+            Assert(v > 0.0, ExcInternalError());
+        }
       cg.solve(mass_matrix, work_result, rhs, preconditioner);
       work_result += inhomogeneities;
 
@@ -395,7 +394,7 @@ namespace VectorTools
             break;
 
           default:
-            Assert(false, ExcInternalError());
+            DEAL_II_ASSERT_UNREACHABLE();
         }
     }
 

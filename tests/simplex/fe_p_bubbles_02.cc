@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2021 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2021 - 2024 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 // Verify that FE_SimplexP_Bubbles can be used with a lumped mass matrix by
 // computing a convergence rate.
@@ -21,11 +20,10 @@
 
 #include <deal.II/dofs/dof_handler.h>
 
-#include <deal.II/fe/fe_pyramid_p.h>
 #include <deal.II/fe/fe_simplex_p.h>
 #include <deal.II/fe/fe_simplex_p_bubbles.h>
+#include <deal.II/fe/fe_tools.h>
 #include <deal.II/fe/fe_values.h>
-#include <deal.II/fe/fe_wedge_p.h>
 
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/grid_tools.h>
@@ -36,45 +34,6 @@
 #include <deal.II/numerics/vector_tools_interpolate.h>
 
 #include "../tests.h"
-
-using namespace dealii;
-
-template <int dim, int spacedim = dim>
-Quadrature<dim>
-compute_nodal_quadrature(const FiniteElement<dim, spacedim> &fe)
-{
-  Assert(fe.n_blocks() == 1, ExcNotImplemented());
-  Assert(fe.n_components() == 1, ExcNotImplemented());
-
-  const ReferenceCell type = fe.reference_cell();
-
-  const Quadrature<dim> q_gauss =
-    type.get_gauss_type_quadrature<dim>(fe.tensor_degree() + 1);
-  Triangulation<dim, spacedim> tria;
-  GridGenerator::reference_cell(tria, type);
-  const Mapping<dim, spacedim> &mapping =
-    type.template get_default_linear_mapping<dim, spacedim>();
-
-  auto                    cell = tria.begin_active();
-  FEValues<dim, spacedim> fe_values(mapping,
-                                    fe,
-                                    q_gauss,
-                                    update_values | update_JxW_values);
-  fe_values.reinit(cell);
-
-  std::vector<Point<dim>> nodal_quad_points = fe.get_unit_support_points();
-  std::vector<double>     nodal_quad_weights(nodal_quad_points.size());
-  Assert(nodal_quad_points.size() > 0, ExcNotImplemented());
-  for (unsigned int i = 0; i < fe.n_dofs_per_cell(); ++i)
-    {
-      double integral = 0.0;
-      for (unsigned int q = 0; q < q_gauss.size(); ++q)
-        integral += fe_values.shape_value(i, q) * fe_values.JxW(q);
-      nodal_quad_weights[i] = integral;
-    }
-  return {nodal_quad_points, nodal_quad_weights};
-}
-
 
 
 template <int dim, int spacedim = dim>
@@ -181,8 +140,9 @@ test_lumped_project()
           DoFHandler<dim, spacedim> dh(tria);
           dh.distribute_dofs(fe);
           deallog << "number of dofs = " << dh.n_dofs() << std::endl;
-          const Quadrature<dim> nodal_quad = compute_nodal_quadrature(fe);
-          const Quadrature<dim> cell_quad  = QGaussSimplex<dim>(
+          const Quadrature<dim> nodal_quad =
+            FETools::compute_nodal_quadrature(fe);
+          const Quadrature<dim> cell_quad = QGaussSimplex<dim>(
             std::max<unsigned int>(fe.tensor_degree() + 1, 2));
 
           Vector<double> lumped_mass(dh.n_dofs());

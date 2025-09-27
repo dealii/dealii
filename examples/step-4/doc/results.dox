@@ -10,12 +10,12 @@ Solving problem in 2 space dimensions.
    Number of active cells: 256
    Total number of cells: 341
    Number of degrees of freedom: 289
-   26 CG iterations needed to obtain convergence.
+   19 CG iterations needed to obtain convergence.
 Solving problem in 3 space dimensions.
    Number of active cells: 4096
    Total number of cells: 4681
    Number of degrees of freedom: 4913
-   30 CG iterations needed to obtain convergence.
+   20 CG iterations needed to obtain convergence.
 @endcode
 It is obvious that in three spatial dimensions the number of cells and
 therefore also the number of degrees of freedom is
@@ -38,7 +38,7 @@ you should play around with your favorite visualization tool to get familiar
 with its functionality. Here's what I have come up with for the 2d solution:
 
 <p align="center">
-  <img src="https://www.dealii.org/images/steps/developer/step-4.solution-2d.png" alt="">
+  <img src="https://dealii.org/images/steps/developer/step-4.solution-2d.png" alt="">
 </p>
 
 (@dealiiVideoLectureSeeAlso{11,32})
@@ -73,10 +73,10 @@ so that it is possible to see through them and see what's behind.
 <table width="60%" align="center">
   <tr>
     <td align="center">
-      <img src="https://www.dealii.org/images/steps/developer/step-4.solution-3d.png" alt="">
+      <img src="https://dealii.org/images/steps/developer/step-4.solution-3d.png" alt="">
     </td>
     <td align="center">
-      <img src="https://www.dealii.org/images/steps/developer/step-4.contours-3d.png" alt="">
+      <img src="https://dealii.org/images/steps/developer/step-4.contours-3d.png" alt="">
     </td>
   </tr>
 </table>
@@ -100,7 +100,7 @@ wants to see, but no more.
 
 
 
-<a name="postprocessing"></a>
+<a name="step-4-postprocessing"></a>
 <h3> Postprocessing: What to do with the solution? </h3>
 
 This tutorial -- like most of the other programs -- principally only shows how
@@ -308,14 +308,14 @@ should expect (and obtain!) a negative value.
 
 
 
-<a name="extensions"></a>
+<a name="step-4-extensions"></a>
 <h3>Possibilities for extensions</h3>
 
 There are many ways with which one can play with this program. The simpler
 ones include essentially all the possibilities already discussed in the
-<a href="step_3.html#extensions" target="body">Possibilities for extensions in the documentation of step 3</a>,
-except that you will have to think about whether something now also applies
-to the 3d case discussed in the current program.
+@ref step_3-Extensions "Possibilities for extensions" in the documentation of
+step-3, except that you will have to think about whether something now also
+applies to the 3d case discussed in the current program.
 
 It is also worthwhile considering the postprocessing options discussed
 above. The documentation states two numbers (the mean value and the

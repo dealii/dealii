@@ -1,5 +1,0 @@
-Changed: Most of the member functions of FEValues now have different template
-parameters. As a result, some function calls which relied on implicit
-conversions to ArrayView now require explicit conversions instead.
-<br>
-(David Wells, 2023/07/01)

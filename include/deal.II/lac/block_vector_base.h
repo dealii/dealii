@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2004 - 2023 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2004 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 #ifndef dealii_block_vector_base_h
 #define dealii_block_vector_base_h
@@ -22,7 +21,6 @@
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/memory_consumption.h>
 #include <deal.II/base/numbers.h>
-#include <deal.II/base/subscriptor.h>
 
 #include <deal.II/lac/block_indices.h>
 #include <deal.II/lac/exceptions.h>
@@ -133,9 +131,9 @@ namespace internal
        * number.
        */
       using value_type =
-        typename std::conditional<Constness,
-                                  const typename BlockVectorType::value_type,
-                                  typename BlockVectorType::value_type>::type;
+        std::conditional_t<Constness,
+                           const typename BlockVectorType::value_type,
+                           typename BlockVectorType::value_type>;
 
       /**
        * Declare some aliases that are standard for iterators and are used
@@ -155,17 +153,17 @@ namespace internal
       using reference         = typename BlockVectorType::reference;
       using pointer           = value_type *;
 
-      using dereference_type = typename std::conditional<
-        Constness,
-        value_type,
-        typename BlockVectorType::BlockType::reference>::type;
+      using dereference_type =
+        std::conditional_t<Constness,
+                           value_type,
+                           typename BlockVectorType::BlockType::reference>;
 
       /**
        * Typedef the type of the block vector (which differs in constness,
        * depending on the second template parameter).
        */
-      using BlockVector = typename std::
-        conditional<Constness, const BlockVectorType, BlockVectorType>::type;
+      using BlockVector =
+        std::conditional_t<Constness, const BlockVectorType, BlockVectorType>;
 
       /**
        * Construct an iterator from a vector to which we point and the global
@@ -439,8 +437,7 @@ namespace internal
  * @ref GlossBlockLA "Block (linear algebra)"
  */
 template <typename VectorType>
-class BlockVectorBase : public Subscriptor,
-                        public ReadVector<typename VectorType::value_type>
+class BlockVectorBase : public ReadVector<typename VectorType::value_type>
 {
 public:
   /**
@@ -655,7 +652,7 @@ public:
 
   virtual void
   extract_subvector_to(const ArrayView<const types::global_dof_index> &indices,
-                       ArrayView<value_type> &entries) const override;
+                       const ArrayView<value_type> &entries) const override;
 
   /**
    * Instead of getting individual elements of a vector via operator(),
@@ -951,6 +948,14 @@ public:
   update_ghost_values() const;
 
   /**
+   * This function returns the MPI communicator of the vector in the
+   * underlying blocks or, if the vector has not been initialized, the empty
+   * MPI_COMM_SELF.
+   */
+  MPI_Comm
+  get_mpi_communicator() const;
+
+  /**
    * Determine an estimate for the memory consumption (in bytes) of this
    * object.
    */
@@ -1041,17 +1046,8 @@ namespace internal
 
     template <typename BlockVectorType, bool Constness>
     inline Iterator<BlockVectorType, Constness> &
-    Iterator<BlockVectorType, Constness>::operator=(const Iterator &c)
-    {
-      parent              = c.parent;
-      global_index        = c.global_index;
-      index_within_block  = c.index_within_block;
-      current_block       = c.current_block;
-      next_break_forward  = c.next_break_forward;
-      next_break_backward = c.next_break_backward;
-
-      return *this;
-    }
+    Iterator<BlockVectorType, Constness>::operator=(const Iterator &c) =
+      default;
 
 
 
@@ -1996,6 +1992,18 @@ BlockVectorBase<VectorType>::update_ghost_values() const
 
 
 template <typename VectorType>
+MPI_Comm
+BlockVectorBase<VectorType>::get_mpi_communicator() const
+{
+  if (n_blocks() > 0)
+    return block(0).get_mpi_communicator();
+  else
+    return MPI_COMM_SELF;
+}
+
+
+
+template <typename VectorType>
 BlockVectorBase<VectorType> &
 BlockVectorBase<VectorType>::operator=(const value_type s)
 {
@@ -2156,7 +2164,7 @@ template <typename VectorType>
 inline void
 BlockVectorBase<VectorType>::extract_subvector_to(
   const ArrayView<const types::global_dof_index> &indices,
-  ArrayView<value_type>                          &entries) const
+  const ArrayView<value_type>                    &entries) const
 {
   AssertDimension(indices.size(), entries.size());
   for (unsigned int i = 0; i < indices.size(); ++i)
@@ -2179,8 +2187,8 @@ BlockVectorBase<VectorType>::extract_subvector_to(
   while (indices_begin != indices_end)
     {
       *values_begin = operator()(*indices_begin);
-      indices_begin++;
-      values_begin++;
+      ++indices_begin;
+      ++values_begin;
     }
 }
 

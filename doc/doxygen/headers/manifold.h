@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2003 - 2022 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2014 - 2024 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 
 /**
@@ -19,7 +18,7 @@
  *
  * <h3>Overview</h3>
  *
- * The classes in this module are concerned with the description of the
+ * The classes in this group are concerned with the description of the
  * manifold in which the domain that a Triangulation describes lives. This
  * manifold description is necessary in several contexts:
  *
@@ -57,7 +56,7 @@
  *   matrix and right hand side of the linear system) using curved
  *   approximations of the boundary, rather than the straight line
  *   approximation. The actual implementation of such curved elements happens
- *   in the Mapping class (see the @ref mapping module), which however obtains
+ *   in the Mapping class (see the @ref mapping topic), which however obtains
  *   its information about the boundary of the domain from the classes
  *   described here. The same is, of course, true when integrating boundary
  *   terms (e.g., inhomogeneous Neumann boundary conditions).
@@ -95,7 +94,7 @@
  * reasonable implementations. More complicated examples can be described
  * using the techniques shown in step-53 and step-54.
  *
- * In the grand scheme of things, the classes of this module interact
+ * In the grand scheme of things, the classes of this group interact
  * with a variety of other parts of the library:
  * @dot
  digraph G

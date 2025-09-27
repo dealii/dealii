@@ -1,29 +1,29 @@
-## ---------------------------------------------------------------------
+## ------------------------------------------------------------------------
 ##
-## Copyright (C) 2012 - 2022 by the deal.II authors
+## SPDX-License-Identifier: LGPL-2.1-or-later
+## Copyright (C) 2012 - 2025 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
-## The deal.II library is free software; you can use it, redistribute
-## it, and/or modify it under the terms of the GNU Lesser General
-## Public License as published by the Free Software Foundation; either
-## version 2.1 of the License, or (at your option) any later version.
-## The full text of the license can be found in the file LICENSE.md at
-## the top level directory of deal.II.
+## Part of the source code is dual licensed under Apache-2.0 WITH
+## LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+## governing the source code and code contributions can be found in
+## LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 ##
-## ---------------------------------------------------------------------
+## ------------------------------------------------------------------------
 
 #
 # Tests whether it is possible to compile and link a dummy program with a
-# given flag.
-# If so, add it to variable.
+# given flag. If so, add it to variable.
+#
+# Note: This macro will reset the CMAKE_REQUIRED_* variables.
 #
 # Usage:
 #     enable_if_links(variable flag)
 #
 
 macro(enable_if_links _variable _flag)
-  # keep on top to avoid cluttering the _flag and _flag_stripped variables
+  reset_cmake_required()
   enable_if_supported(CMAKE_REQUIRED_FLAGS "-Werror")
 
   string(STRIP "${_flag}" _flag_stripped)
@@ -33,11 +33,12 @@ macro(enable_if_links _variable _flag)
 
     list(APPEND CMAKE_REQUIRED_LIBRARIES "${_flag_stripped}")
     CHECK_CXX_SOURCE_COMPILES("int main(){}" DEAL_II_HAVE_LINKER_FLAG_${_flag_name})
-    reset_cmake_required()
 
     if(DEAL_II_HAVE_LINKER_FLAG_${_flag_name})
       set(${_variable} "${${_variable}} ${_flag_stripped}")
       string(STRIP "${${_variable}}" ${_variable})
     endif()
   endif()
+
+  reset_cmake_required()
 endmacro()

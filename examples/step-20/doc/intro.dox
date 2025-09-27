@@ -1,4 +1,4 @@
-<a name="Intro"></a>
+<a name="step_20-Intro"></a>
 <h1>Introduction</h1>
 
 @dealiiVideoLecture{19,20,21}
@@ -27,7 +27,7 @@ solve not only the mixed Laplace equation, but add another equation that
 describes the transport of a mixture of two fluids.
 
 The equations covered here fall into the class of vector-valued problems. A
-toplevel overview of this topic can be found in the @ref vector_valued module.
+toplevel overview of this topic can be found in the @ref vector_valued topic.
 
 
 <h3>The equations</h3>
@@ -274,26 +274,26 @@ components. For example, in 2d, the first term could be rewritten like this
 If we implemented this, we would get code like this:
 
 @code
-  for (unsigned int q=0; q<n_q_points; ++q)
-    for (unsigned int i=0; i<dofs_per_cell; ++i)
-      for (unsigned int j=0; j<dofs_per_cell; ++j)
-        local_matrix(i,j) += (k_inverse_values[q][0][0] *
-                              fe_values.shape_value_component(i,q,0) *
-                              fe_values.shape_value_component(j,q,0)
+  for (unsigned int q = 0; q < n_q_points; ++q)
+    for (unsigned int i = 0; i < dofs_per_cell; ++i)
+      for (unsigned int j = 0; j < dofs_per_cell; ++j)
+        local_matrix(i, j) += (k_inverse_values[q][0][0] *
+                              fe_values.shape_value_component(i, q, 0) *
+                              fe_values.shape_value_component(j, q, 0)
                               +
                               k_inverse_values[q][0][1] *
-                              fe_values.shape_value_component(i,q,0) *
-                              fe_values.shape_value_component(j,q,1)
+                              fe_values.shape_value_component(i, q, 0) *
+                              fe_values.shape_value_component(j, q, 1)
                               +
                               k_inverse_values[q][1][0] *
-                              fe_values.shape_value_component(i,q,1) *
-                              fe_values.shape_value_component(j,q,0)
+                              fe_values.shape_value_component(i, q, 1) *
+                              fe_values.shape_value_component(j, q, 0)
                               +
                               k_inverse_values[q][1][1] *
-                              fe_values.shape_value_component(i,q,1) *
-                              fe_values.shape_value_component(j,q,1)
-                             ) *
-                             fe_values.JxW(q);
+                              fe_values.shape_value_component(i, q, 1) *
+                              fe_values.shape_value_component(j, q, 1)
+                              ) *
+                              fe_values.JxW(q);
 @endcode
 
 This is, at best, tedious, error prone, and not dimension independent. There
@@ -303,23 +303,23 @@ extract the ${\mathbf u}$ and $p$ components of a shape function $x_h^i$. In the
 program we do that in the following way:
 
 @code
-  const FEValuesExtractors::Vector velocities (0);
-  const FEValuesExtractors::Scalar pressure (dim);
+  const FEValuesExtractors::Vector velocities(0);
+  const FEValuesExtractors::Scalar pressure(dim);
 
   ...
 
-  for (unsigned int q=0; q<n_q_points; ++q)
-    for (unsigned int i=0; i<dofs_per_cell; ++i)
-      for (unsigned int j=0; j<dofs_per_cell; ++j)
-        local_matrix(i,j) += (fe_values[velocities].value (i, q) *
+  for (unsigned int q = 0; q < n_q_points; ++q)
+    for (unsigned int i = 0; i < dofs_per_cell; ++i)
+      for (unsigned int j = 0; j < dofs_per_cell; ++j)
+        local_matrix(i,j) += (fe_values[velocities].value(i, q) *
                               k_inverse_values[q] *
-                              fe_values[velocities].value (j, q)
+                              fe_values[velocities].value(j, q)
                               -
-                              fe_values[velocities].divergence (i, q) *
-                              fe_values[pressure].value (j, q)
+                              fe_values[velocities].divergence(i, q) *
+                              fe_values[pressure].value(j, q)
                               -
-                              fe_values[pressure].value (i, q) *
-                              fe_values[velocities].divergence (j, q)) *
+                              fe_values[pressure].value(i, q) *
+                              fe_values[velocities].divergence(j, q)) *
                               fe_values.JxW(q);
 @endcode
 
@@ -335,7 +335,7 @@ tuple. Note that the velocity is of course a <code>dim</code>-dimensional tensor
 that the function returns a corresponding object. Similarly, where we
 subscript with the pressure extractor, we extract the scalar pressure
 component. The whole mechanism is described in more detail in the
-@ref vector_valued module.
+@ref vector_valued topic.
 
 In practice, it turns out that we can do a bit better if we evaluate the shape
 functions, their gradients and divergences only once per outermost loop, and
@@ -348,32 +348,32 @@ The final result then looks like this, working in every space dimension:
 @code
   for (const auto &cell : dof_handler.active_cell_iterators())
     {
-      fe_values.reinit (cell);
+      fe_values.reinit(cell);
       local_matrix = 0;
       local_rhs = 0;
 
-      right_hand_side.value_list (fe_values.get_quadrature_points(),
-                                  rhs_values);
-      k_inverse.value_list (fe_values.get_quadrature_points(),
-                            k_inverse_values);
+      right_hand_side.value_list(fe_values.get_quadrature_points(),
+                                 rhs_values);
+      k_inverse.value_list(fe_values.get_quadrature_points(),
+                           k_inverse_values);
 
-      for (unsigned int q=0; q<n_q_points; ++q)
-        for (unsigned int i=0; i<dofs_per_cell; ++i)
+      for (unsigned int q = 0; q < n_q_points; ++q)
+        for (unsigned int i = 0; i < dofs_per_cell; ++i)
           {
-            const Tensor<1,dim> phi_i_u     = fe_values[velocities].value (i, q);
-            const double        div_phi_i_u = fe_values[velocities].divergence (i, q);
-            const double        phi_i_p     = fe_values[pressure].value (i, q);
+            const Tensor<1,dim> phi_i_u     = fe_values[velocities].value(i, q);
+            const double        div_phi_i_u = fe_values[velocities].divergence(i, q);
+            const double        phi_i_p     = fe_values[pressure].value(i, q);
 
-            for (unsigned int j=0; j<dofs_per_cell; ++j)
+            for (unsigned int j = 0; j < dofs_per_cell; ++j)
               {
-                const Tensor<1,dim> phi_j_u     = fe_values[velocities].value (j, q);
-                const double        div_phi_j_u = fe_values[velocities].divergence (j, q);
-                const double        phi_j_p     = fe_values[pressure].value (j, q);
+                const Tensor<1,dim> phi_j_u     = fe_values[velocities].value(j, q);
+                const double        div_phi_j_u = fe_values[velocities].divergence(j, q);
+                const double        phi_j_p     = fe_values[pressure].value(j, q);
 
-                local_matrix(i,j) += (phi_i_u * k_inverse_values[q] * phi_j_u
-                                      - div_phi_i_u * phi_j_p
-                                      - phi_i_p * div_phi_j_u) *
-                                     fe_values.JxW(q);
+                local_matrix(i, j) += (phi_i_u * k_inverse_values[q] * phi_j_u
+                                       - div_phi_i_u * phi_j_p
+                                       - phi_i_p * div_phi_j_u) *
+                                      fe_values.JxW(q);
               }
 
             local_rhs(i) += -phi_i_p *
@@ -616,12 +616,12 @@ class SchurComplement
 
   // ...
 
-  void SchurComplement::vmult (Vector<double>       &dst,
-                               const Vector<double> &src) const
+  void SchurComplement::vmult(Vector<double>       &dst,
+                              const Vector<double> &src) const
   {
-    B.vmult (tmp1, src);
+    B.vmult(tmp1, src);
     solver_M(M, tmp2, tmp1, preconditioner_M);
-    B.Tvmult (dst, tmp2);
+    B.Tvmult(dst, tmp2);
   }
 };
 @endcode
@@ -644,10 +644,10 @@ complement matrix and the mass matrix, respectively. For example the right
 hand side of the first equation reads $B^TM^{-1}F-G$. This could be
 implemented as follows:
 @code
-    Vector<double> schur_rhs (P.size());
-    Vector<double> tmp (U.size());
-    op_M_inv.vmult (tmp, F);
-    transpose_operator(op_B).vmult (schur_rhs, tmp);
+    Vector<double> schur_rhs(P.size());
+    Vector<double> tmp(U.size());
+    op_M_inv.vmult(tmp, F);
+    transpose_operator(op_B).vmult(schur_rhs, tmp);
     schur_rhs -= G;
 @endcode
 Again, this is a perfectly valid approach, but the fact that deal.II
@@ -800,5 +800,5 @@ hand side equals $f=0$, and as boundary values we have to choose
 $g=p|_{\partial\Omega}$.
 
 For the computations in this program, we choose $\alpha=0.3,\beta=1$. You can
-find the resulting solution in the <a name="#Results">results section
-below</a>, after the commented program.
+find the resulting solution in the @ref step_20-ResultsSection "results section below",
+after the commented program.

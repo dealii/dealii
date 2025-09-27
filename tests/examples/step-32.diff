@@ -1,0 +1,56 @@
+32c32
+< 
+---
+> #include "../example_test.h"
+1113c1113
+<     end_time                  = prm.get_double("End time");
+---
+>     end_time                  = 1;//prm.get_double("End time");
+2775c2775
+<       pcout << "   Solving Stokes system... " << std::flush;
+---
+>     //pcout << "   Solving Stokes system... " << std::flush;
+2815,2819c2815,2819
+<           solver.solve(stokes_matrix,
+<                        distributed_stokes_solution,
+<                        stokes_rhs,
+<                        preconditioner);
+< 
+---
+>     check_solver_within_range(pcout,
+> 	   solver.solve(stokes_matrix, distributed_stokes_solution, stokes_rhs, preconditioner),
+> 	   solver_control.last_step(),
+> 	   22,
+> 	   45);
+2856c2856
+<       pcout << n_iterations << " iterations." << std::endl;
+---
+>       (void)n_iterations;//pcout << n_iterations << " iterations." << std::endl;
+2915,2919c2915,2919
+<       cg.solve(temperature_matrix,
+<                distributed_temperature_solution,
+<                temperature_rhs,
+<                *T_preconditioner);
+< 
+---
+>     check_solver_within_range(pcout,
+> 	   cg.solve(temperature_matrix, distributed_temperature_solution, temperature_rhs, *T_preconditioner),
+> 	   solver_control.last_step(),
+> 	   16,
+> 	   19);   
+2923,2924c2923,2924
+<       pcout << "   " << solver_control.last_step()
+<             << " CG iterations for temperature" << std::endl;
+---
+>       //pcout << "   " << solver_control.last_step()
+>       //      << " CG iterations for temperature" << std::endl;                    
+3494,3495c3494,3495
+<         if ((timestep_number > 0) && (timestep_number % 100 == 0))
+<           computing_timer.print_summary();
+---
+>       //if ((timestep_number > 0) && (timestep_number % 100 == 0))
+>       computing_timer.disable_output();// computing_timer.print_summary();
+3538c3538
+<         parameter_filename = "step-32.prm";
+---
+>         parameter_filename = "../../../source/step-32/step-32.prm";

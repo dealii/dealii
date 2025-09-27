@@ -1,19 +1,16 @@
-/* ---------------------------------------------------------------------
+/* ------------------------------------------------------------------------
  *
- * Copyright (C) 1999 - 2023 by the deal.II authors
+ * SPDX-License-Identifier: LGPL-2.1-or-later
+ * Copyright (C) 1999 - 2024 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
- * The deal.II library is free software; you can use it, redistribute
- * it, and/or modify it under the terms of the GNU Lesser General
- * Public License as published by the Free Software Foundation; either
- * version 2.1 of the License, or (at your option) any later version.
- * The full text of the license can be found in the file LICENSE.md at
- * the top level directory of deal.II.
+ * Part of the source code is dual licensed under Apache-2.0 WITH
+ * LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+ * governing the source code and code contributions can be found in
+ * LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
  *
- * ---------------------------------------------------------------------
- *
- * Author: Wolfgang Bangerth, University of Heidelberg, 1999
+ * ------------------------------------------------------------------------
  */
 
 
@@ -132,7 +129,7 @@ void make_grid(Triangulation<2> &triangulation)
 void write_dof_locations(const DoFHandler<2> &dof_handler,
                          const std::string   &filename)
 {
-  std::map<types::global_dof_index, Point<2>> dof_location_map =
+  const std::map<types::global_dof_index, Point<2>> dof_location_map =
     DoFTools::map_dofs_to_support_points(MappingQ1<2>(), dof_handler);
 
   std::ofstream dof_location_file(filename);
@@ -217,7 +214,7 @@ void distribute_dofs(DoFHandler<2> &dof_handler)
   // intermediate object of type DynamicSparsityPattern that uses a
   // different %internal data structure and that we can later copy into the
   // SparsityPattern object without much overhead. (Some more information on
-  // these data structures can be found in the @ref Sparsity module.) In order
+  // these data structures can be found in the @ref Sparsity topic.) In order
   // to initialize this intermediate data structure, we have to give it the
   // size of the matrix, which in our case will be square with as many rows
   // and columns as there are degrees of freedom on the grid:

@@ -1,0 +1,4 @@
+1098c1098
+<     for (unsigned int cycle = 0; cycle < 9 - dim; ++cycle)
+---
+>     for (unsigned int cycle = 0; cycle < 5 - dim; ++cycle)

@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
+// SPDX-License-Identifier: LGPL-2.1-or-later
 // Copyright (C) 2004 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 #ifndef dealii_polynomials_abf_h
 #define dealii_polynomials_abf_h
@@ -35,9 +34,9 @@ DEAL_II_NAMESPACE_OPEN
 
 /**
  * This class implements the <i>H<sup>div</sup></i>-conforming, vector-valued
- * Arnold-Boffi-Falk polynomials as described in the article by Arnold-Boffi-
- * Falk: Quadrilateral H(div) finite elements, SIAM J. Numer. Anal. Vol.42,
- * No.6, pp.2429-2451
+ * Arnold-Boffi-Falk polynomials as described in the article by Arnold, Boffi,
+ * and Falk: Quadrilateral H(div) finite elements, SIAM J. Numer. Anal., Vol.
+ * 42, No. 6, pp.2429-2451
  *
  *
  * The ABF polynomials are constructed such that the divergence is in the
@@ -57,15 +56,15 @@ public:
    * Constructor. Creates all basis functions for Raviart-Thomas polynomials
    * of given degree.
    *
-   * @arg k: the degree of the Raviart-Thomas-space, which is the degree of
+   * @param k The degree of the Raviart-Thomas-space, which is the degree of
    * the largest tensor product polynomial space <i>Q<sub>k</sub></i>
    * contained.
    */
   PolynomialsABF(const unsigned int k);
 
   /**
-   * Compute the value and the first and second derivatives of each Raviart-
-   * Thomas polynomial at @p unit_point.
+   * Compute the value and the first and second derivatives of each
+   * Raviart-Thomas polynomial at @p unit_point.
    *
    * The size of the vectors must either be zero or equal <tt>n()</tt>.  In
    * the first case, the function will not compute these values.

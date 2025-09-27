@@ -1,18 +1,17 @@
 #!/usr/bin/env python3
-# ---------------------------------------------------------------------
-#
-# Copyright (C) 2018 by the deal.II authors
-#
-# This file is part of the deal.II library.
-#
-# The deal.II library is free software; you can use it, redistribute
-# it, and/or modify it under the terms of the GNU Lesser General
-# Public License as published by the Free Software Foundation; either
-# version 2.1 of the License, or (at your option) any later version.
-# The full text of the license can be found in the file LICENSE.md at
-# the top level directory of deal.II.
-#
-# ---------------------------------------------------------------------
+## ------------------------------------------------------------------------
+##
+## SPDX-License-Identifier: LGPL-2.1-or-later
+## Copyright (C) 2018 - 2025 by the deal.II authors
+##
+## This file is part of the deal.II library.
+##
+## Part of the source code is dual licensed under Apache-2.0 WITH
+## LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+## governing the source code and code contributions can be found in
+## LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
+##
+## ------------------------------------------------------------------------
 """A script that locates double word typos, e.g., from tria.h:
 
     This way it it possible to obtain neighbors across a periodic
@@ -38,10 +37,22 @@ import sys
 
 # Skip the following tokens since they show up frequently but are not related to
 # double word typos
-SKIP = ["//", "*", "}", "|", "};", ">", "\"", "|", "/",
-        "numbers::invalid_unsigned_int,", "std::string,", "int,"]
+SKIP = [
+    "//",
+    "*",
+    "}",
+    "|",
+    "};",
+    ">",
+    '"',
+    "|",
+    "/",
+    "numbers::invalid_unsigned_int,",
+    "std::string,",
+    "int,",
+]
 
-with open(sys.argv[1], 'r', encoding='utf-8') as handle:
+with open(sys.argv[1], "r", encoding="utf-8") as handle:
     previous_line = ""
     for line_n, line in enumerate(handle):
         line = line.strip()

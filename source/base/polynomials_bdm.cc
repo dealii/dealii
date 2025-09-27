@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2004 - 2022 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2004 - 2024 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 
 #include <deal.II/base/geometry_info.h>
@@ -45,7 +44,7 @@ PolynomialsBDM<dim>::PolynomialsBDM(const unsigned int k)
           monomials[i] = Polynomials::Monomial<double>(i);
         break;
       default:
-        Assert(false, ExcNotImplemented());
+        DEAL_II_NOT_IMPLEMENTED();
     }
 }
 
@@ -132,22 +131,22 @@ PolynomialsBDM<dim>::evaluate(
   else if (dim == 2)
     {
       for (unsigned int d = 0; d < dim; ++d)
-        monomials[0].value(unit_point(d), monovali[d]);
+        monomials[0].value(unit_point[d], monovali[d]);
       if (values.size() != 0)
         {
           values[start][0]     = monovali[0][0];
-          values[start][1]     = -unit_point(1) * monovali[0][1];
-          values[start + 1][0] = unit_point(0) * monovali[1][1];
+          values[start][1]     = -unit_point[1] * monovali[0][1];
+          values[start + 1][0] = unit_point[0] * monovali[1][1];
           values[start + 1][1] = -monovali[1][0];
         }
       if (grads.size() != 0)
         {
           grads[start][0][0]     = monovali[0][1];
           grads[start][0][1]     = 0.;
-          grads[start][1][0]     = -unit_point(1) * monovali[0][2];
+          grads[start][1][0]     = -unit_point[1] * monovali[0][2];
           grads[start][1][1]     = -monovali[0][1];
           grads[start + 1][0][0] = monovali[1][1];
-          grads[start + 1][0][1] = unit_point(0) * monovali[1][2];
+          grads[start + 1][0][1] = unit_point[0] * monovali[1][2];
           grads[start + 1][1][0] = 0.;
           grads[start + 1][1][1] = -monovali[1][1];
         }
@@ -157,14 +156,14 @@ PolynomialsBDM<dim>::evaluate(
           grad_grads[start][0][0][1]     = 0.;
           grad_grads[start][0][1][0]     = 0.;
           grad_grads[start][0][1][1]     = 0.;
-          grad_grads[start][1][0][0]     = -unit_point(1) * monovali[0][3];
+          grad_grads[start][1][0][0]     = -unit_point[1] * monovali[0][3];
           grad_grads[start][1][0][1]     = -monovali[0][2];
           grad_grads[start][1][1][0]     = -monovali[0][2];
           grad_grads[start][1][1][1]     = 0.;
           grad_grads[start + 1][0][0][0] = 0;
           grad_grads[start + 1][0][0][1] = monovali[1][2];
           grad_grads[start + 1][0][1][0] = monovali[1][2];
-          grad_grads[start + 1][0][1][1] = unit_point(0) * monovali[1][3];
+          grad_grads[start + 1][0][1][1] = unit_point[0] * monovali[1][3];
           grad_grads[start + 1][1][0][0] = 0.;
           grad_grads[start + 1][1][0][1] = 0.;
           grad_grads[start + 1][1][1][0] = 0.;
@@ -184,9 +183,9 @@ PolynomialsBDM<dim>::evaluate(
           for (unsigned int d = 0; d < dim; ++d)
             {
               // p(t) = t^(i+1)
-              monomials[i + 1].value(unit_point(d), monovali[d]);
+              monomials[i + 1].value(unit_point[d], monovali[d]);
               // q(t) = t^(k-i)
-              monomials[this->degree() - 1 - i].value(unit_point(d),
+              monomials[this->degree() - 1 - i].value(unit_point[d],
                                                       monovalk[d]);
             }
 
@@ -194,21 +193,21 @@ PolynomialsBDM<dim>::evaluate(
             {
               // x p'(y) q(z)
               values[start][0] =
-                unit_point(0) * monovali[1][1] * monovalk[2][0];
+                unit_point[0] * monovali[1][1] * monovalk[2][0];
               // - p(y) q(z)
               values[start][1] = -monovali[1][0] * monovalk[2][0];
               values[start][2] = 0.;
 
               // y p'(z) q(x)
               values[start + 1][1] =
-                unit_point(1) * monovali[2][1] * monovalk[0][0];
+                unit_point[1] * monovali[2][1] * monovalk[0][0];
               // - p(z) q(x)
               values[start + 1][2] = -monovali[2][0] * monovalk[0][0];
               values[start + 1][0] = 0.;
 
               // z p'(x) q(y)
               values[start + 2][2] =
-                unit_point(2) * monovali[0][1] * monovalk[1][0];
+                unit_point[2] * monovali[0][1] * monovalk[1][0];
               // -p(x) q(y)
               values[start + 2][0] = -monovali[0][0] * monovalk[1][0];
               values[start + 2][1] = 0.;
@@ -218,9 +217,9 @@ PolynomialsBDM<dim>::evaluate(
             {
               grads[start][0][0] = monovali[1][1] * monovalk[2][0];
               grads[start][0][1] =
-                unit_point(0) * monovali[1][2] * monovalk[2][0];
+                unit_point[0] * monovali[1][2] * monovalk[2][0];
               grads[start][0][2] =
-                unit_point(0) * monovali[1][1] * monovalk[2][1];
+                unit_point[0] * monovali[1][1] * monovalk[2][1];
               grads[start][1][0] = 0.;
               grads[start][1][1] = -monovali[1][1] * monovalk[2][0];
               grads[start][1][2] = -monovali[1][0] * monovalk[2][1];
@@ -230,9 +229,9 @@ PolynomialsBDM<dim>::evaluate(
 
               grads[start + 1][1][1] = monovali[2][1] * monovalk[0][0];
               grads[start + 1][1][2] =
-                unit_point(1) * monovali[2][2] * monovalk[0][0];
+                unit_point[1] * monovali[2][2] * monovalk[0][0];
               grads[start + 1][1][0] =
-                unit_point(1) * monovali[2][1] * monovalk[0][1];
+                unit_point[1] * monovali[2][1] * monovalk[0][1];
               grads[start + 1][2][1] = 0.;
               grads[start + 1][2][2] = -monovali[2][1] * monovalk[0][0];
               grads[start + 1][2][0] = -monovali[2][0] * monovalk[0][1];
@@ -242,9 +241,9 @@ PolynomialsBDM<dim>::evaluate(
 
               grads[start + 2][2][2] = monovali[0][1] * monovalk[1][0];
               grads[start + 2][2][0] =
-                unit_point(2) * monovali[0][2] * monovalk[1][0];
+                unit_point[2] * monovali[0][2] * monovalk[1][0];
               grads[start + 2][2][1] =
-                unit_point(2) * monovali[0][1] * monovalk[1][1];
+                unit_point[2] * monovali[0][1] * monovalk[1][1];
               grads[start + 2][0][2] = 0.;
               grads[start + 2][0][0] = -monovali[0][1] * monovalk[1][0];
               grads[start + 2][0][1] = -monovali[0][0] * monovalk[1][1];
@@ -260,14 +259,14 @@ PolynomialsBDM<dim>::evaluate(
               grad_grads[start][0][0][2] = monovali[1][1] * monovalk[2][1];
               grad_grads[start][0][1][0] = monovali[1][2] * monovalk[2][0];
               grad_grads[start][0][1][1] =
-                unit_point(0) * monovali[1][3] * monovalk[2][0];
+                unit_point[0] * monovali[1][3] * monovalk[2][0];
               grad_grads[start][0][1][2] =
-                unit_point(0) * monovali[1][2] * monovalk[2][1];
+                unit_point[0] * monovali[1][2] * monovalk[2][1];
               grad_grads[start][0][2][0] = monovali[1][1] * monovalk[2][1];
               grad_grads[start][0][2][1] =
-                unit_point(0) * monovali[1][2] * monovalk[2][1];
+                unit_point[0] * monovali[1][2] * monovalk[2][1];
               grad_grads[start][0][2][2] =
-                unit_point(0) * monovali[1][1] * monovalk[2][2];
+                unit_point[0] * monovali[1][1] * monovalk[2][2];
               grad_grads[start][1][0][0] = 0.;
               grad_grads[start][1][0][1] = 0.;
               grad_grads[start][1][0][2] = 0.;
@@ -297,18 +296,18 @@ PolynomialsBDM<dim>::evaluate(
               grad_grads[start + 1][0][2][1] = 0.;
               grad_grads[start + 1][0][2][2] = 0.;
               grad_grads[start + 1][1][0][0] =
-                unit_point(1) * monovali[2][1] * monovalk[0][2];
+                unit_point[1] * monovali[2][1] * monovalk[0][2];
               grad_grads[start + 1][1][0][1] = monovali[2][1] * monovalk[0][1];
               grad_grads[start + 1][1][0][2] =
-                unit_point(1) * monovali[2][2] * monovalk[0][1];
+                unit_point[1] * monovali[2][2] * monovalk[0][1];
               grad_grads[start + 1][1][1][0] = monovalk[0][1] * monovali[2][1];
               grad_grads[start + 1][1][1][1] = 0.;
               grad_grads[start + 1][1][1][2] = monovalk[0][0] * monovali[2][2];
               grad_grads[start + 1][1][2][0] =
-                unit_point(1) * monovalk[0][1] * monovali[2][2];
+                unit_point[1] * monovalk[0][1] * monovali[2][2];
               grad_grads[start + 1][1][2][1] = monovalk[0][0] * monovali[2][2];
               grad_grads[start + 1][1][2][2] =
-                unit_point(1) * monovalk[0][0] * monovali[2][3];
+                unit_point[1] * monovalk[0][0] * monovali[2][3];
               grad_grads[start + 1][2][0][0] = -monovalk[0][2] * monovali[2][0];
               grad_grads[start + 1][2][0][1] = 0.;
               grad_grads[start + 1][2][0][2] = -monovalk[0][1] * monovali[2][1];
@@ -338,14 +337,14 @@ PolynomialsBDM<dim>::evaluate(
               grad_grads[start + 2][1][2][1] = 0.;
               grad_grads[start + 2][1][2][2] = 0.;
               grad_grads[start + 2][2][0][0] =
-                unit_point(2) * monovali[0][3] * monovalk[1][0];
+                unit_point[2] * monovali[0][3] * monovalk[1][0];
               grad_grads[start + 2][2][0][1] =
-                unit_point(2) * monovali[0][2] * monovalk[1][1];
+                unit_point[2] * monovali[0][2] * monovalk[1][1];
               grad_grads[start + 2][2][0][2] = monovali[0][2] * monovalk[1][0];
               grad_grads[start + 2][2][1][0] =
-                unit_point(2) * monovali[0][2] * monovalk[1][1];
+                unit_point[2] * monovali[0][2] * monovalk[1][1];
               grad_grads[start + 2][2][1][1] =
-                unit_point(2) * monovali[0][1] * monovalk[1][2];
+                unit_point[2] * monovali[0][1] * monovalk[1][2];
               grad_grads[start + 2][2][1][2] = monovali[0][1] * monovalk[1][1];
               grad_grads[start + 2][2][2][0] = monovali[0][2] * monovalk[1][0];
               grad_grads[start + 2][2][2][1] = monovali[0][1] * monovalk[1][1];
@@ -367,7 +366,7 @@ PolynomialsBDM<dim>::n_polynomials(const unsigned int k)
     return (k + 1) * (k + 2) + 2;
   if (dim == 3)
     return ((k + 1) * (k + 2) * (k + 3)) / 2 + 3 * (k + 1);
-  Assert(false, ExcNotImplemented());
+  DEAL_II_NOT_IMPLEMENTED();
   return 0;
 }
 

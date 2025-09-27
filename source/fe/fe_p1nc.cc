@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2015 - 2022 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2016 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 
 #include <deal.II/fe/fe_p1nc.h>
@@ -99,33 +98,33 @@ FE_P1NC::get_linear_shape_coefficients(
   const Point<2> cpt =
     (cell->vertex(0) + cell->vertex(1) + cell->vertex(2) + cell->vertex(3)) / 4;
 
-  const double det = (mpt[0](0) - mpt[1](0)) * (mpt[2](1) - mpt[3](1)) -
-                     (mpt[2](0) - mpt[3](0)) * (mpt[0](1) - mpt[1](1));
+  const double det = (mpt[0][0] - mpt[1][0]) * (mpt[2][1] - mpt[3][1]) -
+                     (mpt[2][0] - mpt[3][0]) * (mpt[0][1] - mpt[1][1]);
 
   ndarray<double, 4, 3> coeffs;
   coeffs[0][0] =
-    ((mpt[2](1) - mpt[3](1)) * (0.5) - (mpt[0](1) - mpt[1](1)) * (0.5)) / det;
+    ((mpt[2][1] - mpt[3][1]) * (0.5) - (mpt[0][1] - mpt[1][1]) * (0.5)) / det;
   coeffs[1][0] =
-    ((mpt[2](1) - mpt[3](1)) * (-0.5) - (mpt[0](1) - mpt[1](1)) * (0.5)) / det;
+    ((mpt[2][1] - mpt[3][1]) * (-0.5) - (mpt[0][1] - mpt[1][1]) * (0.5)) / det;
   coeffs[2][0] =
-    ((mpt[2](1) - mpt[3](1)) * (0.5) - (mpt[0](1) - mpt[1](1)) * (-0.5)) / det;
+    ((mpt[2][1] - mpt[3][1]) * (0.5) - (mpt[0][1] - mpt[1][1]) * (-0.5)) / det;
   coeffs[3][0] =
-    ((mpt[2](1) - mpt[3](1)) * (-0.5) - (mpt[0](1) - mpt[1](1)) * (-0.5)) / det;
+    ((mpt[2][1] - mpt[3][1]) * (-0.5) - (mpt[0][1] - mpt[1][1]) * (-0.5)) / det;
 
   coeffs[0][1] =
-    (-(mpt[2](0) - mpt[3](0)) * (0.5) + (mpt[0](0) - mpt[1](0)) * (0.5)) / det;
+    (-(mpt[2][0] - mpt[3][0]) * (0.5) + (mpt[0][0] - mpt[1][0]) * (0.5)) / det;
   coeffs[1][1] =
-    (-(mpt[2](0) - mpt[3](0)) * (-0.5) + (mpt[0](0) - mpt[1](0)) * (0.5)) / det;
+    (-(mpt[2][0] - mpt[3][0]) * (-0.5) + (mpt[0][0] - mpt[1][0]) * (0.5)) / det;
   coeffs[2][1] =
-    (-(mpt[2](0) - mpt[3](0)) * (0.5) + (mpt[0](0) - mpt[1](0)) * (-0.5)) / det;
+    (-(mpt[2][0] - mpt[3][0]) * (0.5) + (mpt[0][0] - mpt[1][0]) * (-0.5)) / det;
   coeffs[3][1] =
-    (-(mpt[2](0) - mpt[3](0)) * (-0.5) + (mpt[0](0) - mpt[1](0)) * (-0.5)) /
+    (-(mpt[2][0] - mpt[3][0]) * (-0.5) + (mpt[0][0] - mpt[1][0]) * (-0.5)) /
     det;
 
-  coeffs[0][2] = 0.25 - cpt(0) * coeffs[0][0] - cpt(1) * coeffs[0][1];
-  coeffs[1][2] = 0.25 - cpt(0) * coeffs[1][0] - cpt(1) * coeffs[1][1];
-  coeffs[2][2] = 0.25 - cpt(0) * coeffs[2][0] - cpt(1) * coeffs[2][1];
-  coeffs[3][2] = 0.25 - cpt(0) * coeffs[3][0] - cpt(1) * coeffs[3][1];
+  coeffs[0][2] = 0.25 - cpt[0] * coeffs[0][0] - cpt[1] * coeffs[0][1];
+  coeffs[1][2] = 0.25 - cpt[0] * coeffs[1][0] - cpt[1] * coeffs[1][1];
+  coeffs[2][2] = 0.25 - cpt[0] * coeffs[2][0] - cpt[1] * coeffs[2][1];
+  coeffs[3][2] = 0.25 - cpt[0] * coeffs[3][0] - cpt[1] * coeffs[3][1];
 
   return coeffs;
 }
@@ -231,8 +230,8 @@ FE_P1NC::fill_fe_values(
     for (unsigned int i = 0; i < n_q_points; ++i)
       for (unsigned int k = 0; k < this->n_dofs_per_cell(); ++k)
         output_data.shape_values[k][i] =
-          (coeffs[k][0] * mapping_data.quadrature_points[i](0) +
-           coeffs[k][1] * mapping_data.quadrature_points[i](1) + coeffs[k][2]);
+          (coeffs[k][0] * mapping_data.quadrature_points[i][0] +
+           coeffs[k][1] * mapping_data.quadrature_points[i][1] + coeffs[k][2]);
 
   if (flags & update_gradients)
     for (unsigned int i = 0; i < n_q_points; ++i)
@@ -266,7 +265,8 @@ FE_P1NC::fill_fe_face_values(
   const Quadrature<2> quadrature_on_face =
     QProjector<2>::project_to_face(this->reference_cell(),
                                    quadrature[0],
-                                   face_no);
+                                   face_no,
+                                   numbers::default_geometric_orientation);
 
   if (flags & update_values)
     for (unsigned int i = 0; i < quadrature_on_face.size(); ++i)
@@ -277,8 +277,8 @@ FE_P1NC::fill_fe_face_values(
                                                 quadrature_on_face.point(i));
 
           output_data.shape_values[k][i] =
-            (coeffs[k][0] * quadrature_point(0) +
-             coeffs[k][1] * quadrature_point(1) + coeffs[k][2]);
+            (coeffs[k][0] * quadrature_point[0] +
+             coeffs[k][1] * quadrature_point[1] + coeffs[k][2]);
         }
 
   if (flags & update_gradients)
@@ -309,8 +309,13 @@ FE_P1NC::fill_fe_subface_values(
   const ndarray<double, 4, 3> coeffs = get_linear_shape_coefficients(cell);
 
   // compute on the subface
-  const Quadrature<2> quadrature_on_subface = QProjector<2>::project_to_subface(
-    this->reference_cell(), quadrature, face_no, sub_no);
+  const Quadrature<2> quadrature_on_subface =
+    QProjector<2>::project_to_subface(this->reference_cell(),
+                                      quadrature,
+                                      face_no,
+                                      sub_no,
+                                      numbers::default_geometric_orientation,
+                                      RefinementCase<1>::isotropic_refinement);
 
   if (flags & update_values)
     for (unsigned int i = 0; i < quadrature_on_subface.size(); ++i)
@@ -322,8 +327,8 @@ FE_P1NC::fill_fe_subface_values(
                 cell, quadrature_on_subface.point(i));
 
             output_data.shape_values[k][i] =
-              (coeffs[k][0] * quadrature_point(0) +
-               coeffs[k][1] * quadrature_point(1) + coeffs[k][2]);
+              (coeffs[k][0] * quadrature_point[0] +
+               coeffs[k][1] * quadrature_point[1] + coeffs[k][2]);
           }
       }
 

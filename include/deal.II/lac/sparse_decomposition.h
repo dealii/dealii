@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2002 - 2023 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2002 - 2024 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 #ifndef dealii_sparse_decomposition_h
 #define dealii_sparse_decomposition_h
@@ -52,9 +51,9 @@ DEAL_II_NAMESPACE_OPEN
  * sparsity pattern of the decomposition is a superset of the sparsity pattern
  * in the original matrix.
  *
- * Such fill-in can be accomplished by various ways, one of which is the copy-
- * constructor of the SparsityPattern class that allows the addition of side-
- * diagonals to a given sparsity structure.
+ * Such fill-in can be accomplished by various ways, one of which is the
+ * copy-constructor of the SparsityPattern class that allows the addition of
+ * side-diagonals to a given sparsity structure.
  *
  *
  * <h3>Unified use of preconditioners</h3>
@@ -105,7 +104,7 @@ DEAL_II_NAMESPACE_OPEN
  */
 template <typename number>
 class SparseLUDecomposition : protected SparseMatrix<number>,
-                              public virtual Subscriptor
+                              public virtual EnableObserverPointer
 {
 protected:
   /**

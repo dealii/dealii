@@ -1,17 +1,16 @@
-/* ---------------------------------------------------------------------
+/* ------------------------------------------------------------------------
  *
- * Copyright (C) 2020 - 2023 by the deal.II authors
+ * SPDX-License-Identifier: LGPL-2.1-or-later
+ * Copyright (C) 2020 - 2024 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
- * The deal.II library is free software; you can use it, redistribute
- * it, and/or modify it under the terms of the GNU Lesser General
- * Public License as published by the Free Software Foundation; either
- * version 2.1 of the License, or (at your option) any later version.
- * The full text of the license can be found in the file LICENSE.md at
- * the top level directory of deal.II.
+ * Part of the source code is dual licensed under Apache-2.0 WITH
+ * LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+ * governing the source code and code contributions can be found in
+ * LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
  *
- * ---------------------------------------------------------------------
+ * ------------------------------------------------------------------------
  *
  * Author: Martin Kronbichler, 2020
  */
@@ -20,7 +19,6 @@
 // step-37, step-48, and step-59
 #include <deal.II/base/conditional_ostream.h>
 #include <deal.II/base/function.h>
-#include <deal.II/base/logstream.h>
 #include <deal.II/base/timer.h>
 #include <deal.II/base/time_stepping.h>
 #include <deal.II/base/utilities.h>
@@ -206,7 +204,7 @@ namespace Euler_DG
           }
 
         default:
-          Assert(false, ExcNotImplemented());
+          DEAL_II_NOT_IMPLEMENTED();
           return 0.;
       }
   }
@@ -339,8 +337,6 @@ namespace Euler_DG
                            VectorType     &vec_ri,
                            VectorType     &vec_ki) const
     {
-      AssertDimension(ai.size() + 1, bi.size());
-
       pde_operator.perform_stage(current_time,
                                  bi[0] * time_step,
                                  ai[0] * time_step,
@@ -615,7 +611,7 @@ namespace Euler_DG
 
         default:
           {
-            Assert(false, ExcNotImplemented());
+            DEAL_II_NOT_IMPLEMENTED();
             return {};
           }
       }
@@ -1718,8 +1714,7 @@ namespace Euler_DG
         // speed only on the valid cells of a cell batch.
         for (unsigned int v = 0; v < data.n_active_entries_per_cell_batch(cell);
              ++v)
-          for (unsigned int d = 0; d < 3; ++d)
-            max_transport = std::max(max_transport, local_max[v]);
+          max_transport = std::max(max_transport, local_max[v]);
       }
 
     max_transport = Utilities::MPI::max(max_transport, MPI_COMM_WORLD);
@@ -1775,9 +1770,9 @@ namespace Euler_DG
     Triangulation<dim> triangulation;
 #endif
 
-    FESystem<dim>   fe;
-    MappingQ<dim>   mapping;
-    DoFHandler<dim> dof_handler;
+    const FESystem<dim> fe;
+    const MappingQ<dim> mapping;
+    DoFHandler<dim>     dof_handler;
 
     TimerOutput timer;
 
@@ -2011,7 +2006,7 @@ namespace Euler_DG
           }
 
         default:
-          Assert(false, ExcNotImplemented());
+          DEAL_II_NOT_IMPLEMENTED();
       }
 
     triangulation.refine_global(n_global_refinements);
@@ -2304,8 +2299,6 @@ int main(int argc, char **argv)
 
   try
     {
-      deallog.depth_console(0);
-
       EulerProblem<dimension> euler_problem;
       euler_problem.run();
     }

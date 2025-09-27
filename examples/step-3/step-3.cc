@@ -1,20 +1,16 @@
-/* ---------------------------------------------------------------------
+/* ------------------------------------------------------------------------
  *
- * Copyright (C) 1999 - 2023 by the deal.II authors
+ * SPDX-License-Identifier: LGPL-2.1-or-later
+ * Copyright (C) 1999 - 2024 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
- * The deal.II library is free software; you can use it, redistribute
- * it, and/or modify it under the terms of the GNU Lesser General
- * Public License as published by the Free Software Foundation; either
- * version 2.1 of the License, or (at your option) any later version.
- * The full text of the license can be found in the file LICENSE.md at
- * the top level directory of deal.II.
+ * Part of the source code is dual licensed under Apache-2.0 WITH
+ * LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+ * governing the source code and code contributions can be found in
+ * LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
  *
- * ---------------------------------------------------------------------
- *
- * Authors: Wolfgang Bangerth, 1999,
- *          Guido Kanschat, 2011
+ * ------------------------------------------------------------------------
  */
 
 
@@ -106,7 +102,7 @@ private:
   // will specify the exact polynomial degree of the finite element in the
   // constructor of this class)...
   Triangulation<2> triangulation;
-  FE_Q<2>          fe;
+  const FE_Q<2>    fe;
   DoFHandler<2>    dof_handler;
 
   // ...variables for the sparsity pattern and values of the system matrix
@@ -133,7 +129,7 @@ private:
 // distribute_dofs() function.) All the other member variables of the Step3
 // class have a default constructor which does all we want.
 Step3::Step3()
-  : fe(1)
+  : fe(/* polynomial degree = */ 1)
   , dof_handler(triangulation)
 {}
 
@@ -263,7 +259,7 @@ void Step3::assemble_system()
   // 2d. This quadrature formula integrates polynomials of degrees up to three
   // exactly (in 1d). It is easy to check that this is sufficient for the
   // present problem:
-  QGauss<2> quadrature_formula(fe.degree + 1);
+  const QGauss<2> quadrature_formula(fe.degree + 1);
   // And we initialize the object which we have briefly talked about above. It
   // needs to be told which finite element we want to use, and the quadrature
   // points and their weights (jointly described by a Quadrature object). As
@@ -491,8 +487,9 @@ void Step3::assemble_system()
   // boundary by indicators, and tell the interpolate_boundary_values
   // function to only compute the boundary values on a certain part of the
   // boundary (e.g. the clamped part, or the inflow boundary). By default,
-  // all boundaries have a 0 boundary indicator, unless otherwise specified. If
-  // sections of the boundary have different boundary conditions, you have to
+  // all boundaries have a 0 boundary indicator, unless otherwise specified.
+  // (For example, many functions in namespace GridGenerator specify otherwise.)
+  // If sections of the boundary have different boundary conditions, you have to
   // number those parts with different boundary indicators. The function call
   // below will then only determine boundary values for those parts of the
   // boundary for which the boundary indicator is in fact the zero specified as
@@ -511,7 +508,7 @@ void Step3::assemble_system()
   // class.
   std::map<types::global_dof_index, double> boundary_values;
   VectorTools::interpolate_boundary_values(dof_handler,
-                                           0,
+                                           types::boundary_id(0),
                                            Functions::ZeroFunction<2>(),
                                            boundary_values);
   // Now that we got the list of boundary DoFs and their respective boundary
@@ -550,12 +547,17 @@ void Step3::assemble_system()
 //   constructing better preconditioners.
 //
 // At the end of this process, the `solution` variable contains the
-// nodal values of the solution function.
+// nodal values of the solution function. At the end of the function, we
+// output how many Conjugate Gradients iterations it took to solve the
+// linear system.
 void Step3::solve()
 {
   SolverControl            solver_control(1000, 1e-6 * system_rhs.l2_norm());
   SolverCG<Vector<double>> solver(solver_control);
   solver.solve(system_matrix, solution, system_rhs, PreconditionIdentity());
+
+  std::cout << solver_control.last_step()
+            << " CG iterations needed to obtain convergence." << std::endl;
 }
 
 
@@ -594,8 +596,10 @@ void Step3::output_results() const
   // functions in the DataOut class we are using here that can write the
   // data in postscript, AVS, GMV, Gnuplot, or some other file
   // formats):
-  std::ofstream output("solution.vtk");
+  const std::string filename = "solution.vtk";
+  std::ofstream     output(filename);
   data_out.write_vtk(output);
+  std::cout << "Output written to " << filename << std::endl;
 }
 
 
@@ -623,55 +627,8 @@ void Step3::run()
 // before C++ programming, it often does not do much more than
 // creating an object of the top-level class and calling its principle
 // function.
-//
-// Finally, the first line of the function is used to enable output of
-// some diagnostics that deal.II can generate.  The @p deallog
-// variable (which stands for deal-log, not de-allog) represents a
-// stream to which some parts of the library write output. For
-// example, iterative solvers will generate diagnostics (starting
-// residual, number of solver steps, final residual) as can be seen
-// when running this tutorial program.
-//
-// The output of @p deallog can be written to the console, to a file,
-// or both. Both are disabled by default since over the years we have
-// learned that a program should only generate output when a user
-// explicitly asks for it. But this can be changed, and to explain how
-// this can be done, we need to explain how @p deallog works: When
-// individual parts of the library want to log output, they open a
-// "context" or "section" into which this output will be placed. At
-// the end of the part that wants to write output, one exits this
-// section again. Since a function may call another one from within
-// the scope where this output section is open, output may in fact be
-// nested hierarchically into these sections. The LogStream class of
-// which @p deallog is a variable calls each of these sections a
-// "prefix" because all output is printed with this prefix at the left
-// end of the line, with prefixes separated by colons. There is always
-// a default prefix called "DEAL" (a hint at deal.II's history as the
-// successor of a previous library called "DEAL" and from which the
-// LogStream class is one of the few pieces of code that were taken
-// into deal.II).
-//
-// By default, @p logstream only outputs lines with zero prefixes --
-// i.e., all output is disabled because the default "DEAL" prefix is
-// always there. But one can set a different maximal number of
-// prefixes for lines that should be output to something larger, and
-// indeed here we set it to two by calling
-// LogStream::depth_console(). This means that for all screen output,
-// a context that has pushed one additional prefix beyond the default
-// "DEAL" is allowed to print its output to the screen ("console"),
-// whereas all further nested sections that would have three or more
-// prefixes active would write to @p deallog, but @p deallog does not
-// forward this output to the screen. Thus, running this example (or
-// looking at the "Results" section), you will see the solver
-// statistics prefixed with "DEAL:CG", which is two prefixes. This is
-// sufficient for the context of the current program, but you will see
-// examples later on (e.g., in step-22) where solvers are nested more
-// deeply and where you may get useful information by setting the
-// depth even higher.
 int main()
 {
-  deallog.depth_console(2);
-
   Step3 laplace_problem;
   laplace_problem.run();
 

@@ -1,19 +1,16 @@
-/* ---------------------------------------------------------------------
+/* ------------------------------------------------------------------------
  *
- * Copyright (C) 1999 - 2023 by the deal.II authors
+ * SPDX-License-Identifier: LGPL-2.1-or-later
+ * Copyright (C) 1999 - 2024 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
- * The deal.II library is free software; you can use it, redistribute
- * it, and/or modify it under the terms of the GNU Lesser General
- * Public License as published by the Free Software Foundation; either
- * version 2.1 of the License, or (at your option) any later version.
- * The full text of the license can be found in the file LICENSE.md at
- * the top level directory of deal.II.
+ * Part of the source code is dual licensed under Apache-2.0 WITH
+ * LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+ * governing the source code and code contributions can be found in
+ * LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
  *
- * ---------------------------------------------------------------------
- *
- * Author: Wolfgang Bangerth, University of Heidelberg, 1999
+ * ------------------------------------------------------------------------
  */
 
 
@@ -41,12 +38,6 @@
 #include <deal.II/numerics/data_out.h>
 #include <fstream>
 #include <iostream>
-
-// This is new, however: in the previous example we got some unwanted output
-// from the linear solvers. If we want to suppress it, we have to include this
-// file and add a single line somewhere to the program (see the main()
-// function below for that):
-#include <deal.II/base/logstream.h>
 
 // The final step, as in previous programs, is to import all the deal.II class
 // and function names into the global namespace:
@@ -77,7 +68,7 @@ private:
   void output_results() const;
 
   Triangulation<dim> triangulation;
-  FE_Q<dim>          fe;
+  const FE_Q<dim>    fe;
   DoFHandler<dim>    dof_handler;
 
   SparsityPattern      sparsity_pattern;
@@ -190,7 +181,7 @@ double RightHandSide<dim>::value(const Point<dim> &p,
 {
   double return_value = 0.0;
   for (unsigned int i = 0; i < dim; ++i)
-    return_value += 4.0 * std::pow(p(i), 4.0);
+    return_value += 4.0 * std::pow(p[i], 4.0);
 
   return return_value;
 }
@@ -241,7 +232,7 @@ double BoundaryValues<dim>::value(const Point<dim> &p,
 // example program, step-3:
 template <int dim>
 Step4<dim>::Step4()
-  : fe(1)
+  : fe(/* polynomial degree = */ 1)
   , dof_handler(triangulation)
 {}
 
@@ -314,7 +305,7 @@ void Step4<dim>::setup_system()
 template <int dim>
 void Step4<dim>::assemble_system()
 {
-  QGauss<dim> quadrature_formula(fe.degree + 1);
+  const QGauss<dim> quadrature_formula(fe.degree + 1);
 
   // We wanted to have a non-constant right hand side, so we use an object of
   // the class declared above to generate the necessary data. Since this right
@@ -355,6 +346,7 @@ void Step4<dim>::assemble_system()
   for (const auto &cell : dof_handler.active_cell_iterators())
     {
       fe_values.reinit(cell);
+
       cell_matrix = 0;
       cell_rhs    = 0;
 
@@ -426,12 +418,12 @@ void Step4<dim>::assemble_system()
   // on faces that have been marked with boundary indicator 0 (because that's
   // what we say the function should work on with the second argument below).
   // If there are faces with boundary id other than 0, then the function
-  // interpolate_boundary_values will do nothing on these faces. For
+  // interpolate_boundary_values() will do nothing on these faces. For
   // the Laplace equation doing nothing is equivalent to assuming that
   // on those parts of the boundary a zero Neumann boundary condition holds.
   std::map<types::global_dof_index, double> boundary_values;
   VectorTools::interpolate_boundary_values(dof_handler,
-                                           0,
+                                           types::boundary_id(0),
                                            BoundaryValues<dim>(),
                                            boundary_values);
   MatrixTools::apply_boundary_values(boundary_values,
@@ -449,12 +441,10 @@ void Step4<dim>::assemble_system()
 template <int dim>
 void Step4<dim>::solve()
 {
-  SolverControl            solver_control(1000, 1e-12);
+  SolverControl            solver_control(1000, 1e-6 * system_rhs.l2_norm());
   SolverCG<Vector<double>> solver(solver_control);
   solver.solve(system_matrix, solution, system_rhs, PreconditionIdentity());
 
-  // We have made one addition, though: since we suppress output from the
-  // linear solvers, we have to print the number of iterations by hand.
   std::cout << "   " << solver_control.last_step()
             << " CG iterations needed to obtain convergence." << std::endl;
 }

@@ -1,0 +1,13 @@
+
+DEAL::FESystem<2>[FE_Q<2>(1)^2-FE_Q<2>(1)-FE_Q<2>(1)]
+DEAL::components: 4
+DEAL::blocks: 4
+DEAL::conforms H1: 1
+DEAL::n_base_elements: 3
+DEAL::degree: 1
+DEAL::FESystem<2>[FE_Q<2>(1)^2-FE_Q<2>(1)-FE_Q<2>(1)]
+DEAL::components: 4
+DEAL::blocks: 4
+DEAL::conforms H1: 1
+DEAL::n_base_elements: 3
+DEAL::degree: 1

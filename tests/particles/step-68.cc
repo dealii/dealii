@@ -1,17 +1,16 @@
-/* ---------------------------------------------------------------------
+/* ------------------------------------------------------------------------
  *
- * Copyright (C) 2020 - 2022 by the deal.II authors
+ * SPDX-License-Identifier: LGPL-2.1-or-later
+ * Copyright (C) 2020 - 2024 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
- * The deal.II library is free software; you can use it, redistribute
- * it, and/or modify it under the terms of the GNU Lesser General
- * Public License as published by the Free Software Foundation; either
- * version 2.1 of the License, or (at your option) any later version.
- * The full text of the license can be found in the file LICENSE.md at
- * the top level directory of deal.II.
+ * Part of the source code is dual licensed under Apache-2.0 WITH
+ * LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+ * governing the source code and code contributions can be found in
+ * LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
  *
- * ---------------------------------------------------------------------
+ * ------------------------------------------------------------------------
 
  *
  * Authors: Bruno Blais, Toni El Geitani Nehme, Rene Gassmoeller, Peter Munch
@@ -26,7 +25,6 @@
 #include <deal.II/base/parameter_acceptor.h>
 #include <deal.II/base/timer.h>
 
-#include <deal.II/distributed/solution_transfer.h>
 #include <deal.II/distributed/tria.h>
 
 #include <deal.II/dofs/dof_handler.h>
@@ -75,7 +73,6 @@
 
 namespace Step68
 {
-  using namespace dealii;
 
   // @sect3{Velocity profile}
 
@@ -108,8 +105,8 @@ namespace Step68
     const double T = 4;
     const double t = this->get_time();
 
-    const double px = numbers::PI * point(0);
-    const double py = numbers::PI * point(1);
+    const double px = numbers::PI * point[0];
+    const double py = numbers::PI * point[1];
     const double pt = numbers::PI / T * t;
 
     values[0] = -2 * cos(pt) * pow(sin(px), 2) * sin(py) * cos(py);
@@ -441,15 +438,13 @@ namespace Step68
       {
         // We calculate the velocity of the particles using their current
         // location.
-        Point<dim> particle_location = particle.get_location();
+        Point<dim> &particle_location = particle.get_location();
         velocity.vector_value(particle_location, particle_velocity);
 
         // This updates the position of the particles and sets the old position
         // equal to the new position of the particle.
         for (int d = 0; d < dim; ++d)
           particle_location[d] += particle_velocity[d] * dt;
-
-        particle.set_location(particle_location);
 
         // We store the processor id (a scalar) and the particle velocity (a
         // vector) in the particle properties. In this example, this is done
@@ -484,8 +479,7 @@ namespace Step68
     auto particle = particle_handler.begin();
     while (particle != particle_handler.end())
       {
-        const auto cell =
-          particle->get_surrounding_cell(background_triangulation);
+        const auto cell = particle->get_surrounding_cell();
         const auto dh_cell =
           typename DoFHandler<dim>::cell_iterator(*cell, &fluid_dh);
 
@@ -514,10 +508,9 @@ namespace Step68
                   local_dof_values[j];
               }
 
-            Point<dim> particle_location = particle->get_location();
+            Point<dim> &particle_location = particle->get_location();
             for (int d = 0; d < dim; ++d)
               particle_location[d] += particle_velocity[d] * dt;
-            p.set_location(particle_location);
 
             // Again, we store the particle velocity and the processor id in the
             // particle properties for visualization purposes.
@@ -728,7 +721,6 @@ int
 main(int argc, char *argv[])
 {
   using namespace Step68;
-  using namespace dealii;
   Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
 
   MPILogInitAll all;

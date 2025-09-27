@@ -1,26 +1,25 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2022 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 1998 - 2024 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 #ifndef dealii_logstream_h
 #define dealii_logstream_h
 
 #include <deal.II/base/config.h>
 
+#include <deal.II/base/enable_observer_pointer.h>
 #include <deal.II/base/exceptions.h>
-#include <deal.II/base/smartpointer.h>
-#include <deal.II/base/subscriptor.h>
+#include <deal.II/base/observer_pointer.h>
 #include <deal.II/base/thread_local_storage.h>
 
 #include <cmath>
@@ -78,7 +77,7 @@ DEAL_II_NAMESPACE_OPEN
  *
  * @ingroup textoutput
  */
-class LogStream : public Subscriptor
+class LogStream : public EnableObserverPointer
 {
 public:
   /**
@@ -123,7 +122,7 @@ public:
      * A pointer to the LogStream object to which the prefix is
      * applied.
      */
-    SmartPointer<LogStream, LogStream::Prefix> stream;
+    ObserverPointer<LogStream, LogStream::Prefix> stream;
   };
 
 
@@ -219,11 +218,11 @@ public:
 
 
   /**
-   * Maximum number of levels to be printed on the console. The default is 0,
-   * which will not generate any output. This function allows one to restrict
-   * console output to the highest levels of iterations. Only output with less
-   * than <tt>n</tt> prefixes is printed. By calling this function with
-   * <tt>n=0</tt>, no console output will be written. See step-3 for an
+   * Set the maximum number of levels to be printed on the console. The default
+   * is 0, which will not generate any output. This function allows one to
+   * restrict console output to the highest levels of iterations. Only output
+   * with less than <tt>n</tt> prefixes is printed. By calling this function
+   * with <tt>n=0</tt>, no console output will be written. See step-3 for an
    * example usage of this method.
    *
    * The previous value of this parameter is returned.
@@ -233,9 +232,10 @@ public:
 
 
   /**
-   * Maximum number of levels to be written to the log file. The functionality
-   * is the same as <tt>depth_console</tt>, nevertheless, this function should
-   * be used with care, since it may spoil the value of a log file.
+   * Set the maximum number of levels to be written to the log file. The
+   * functionality is the same as <tt>depth_console</tt>, nevertheless, this
+   * function should be used with care, since it may spoil the value of a log
+   * file.
    *
    * The previous value of this parameter is returned.
    */
@@ -251,7 +251,7 @@ public:
 
 
   /**
-   * set the precision for the underlying stream and returns the previous
+   * Set the precision for the underlying stream and returns the previous
    * stream precision. This function mimics
    * http://www.cplusplus.com/reference/ios/ios_base/precision/
    */
@@ -260,7 +260,7 @@ public:
 
 
   /**
-   * set the width for the underlying stream and returns the previous stream
+   * Set the width for the underlying stream and returns the previous stream
    * width. This function mimics
    * http://www.cplusplus.com/reference/ios/ios_base/width/
    */
@@ -306,10 +306,10 @@ public:
 private:
   /**
    * Internal wrapper around thread-local prefixes. This private function will
-   * return the correct internal prefix stack. More important, a new thread-
-   * local stack will be copied from the current stack of the "blessed" thread
-   * that created this LogStream instance (usually, in the case of deallog,
-   * the "main" thread).
+   * return the correct internal prefix stack. More important, a new
+   * thread-local stack will be copied from the current stack of the "blessed"
+   * thread that created this LogStream instance (usually, in the case of
+   * deallog, the "main" thread).
    */
   std::stack<std::string> &
   get_prefixes() const;
@@ -413,7 +413,45 @@ operator<<(LogStream &log, const T &t)
 
 
 /**
- * The standard log object of deal.II:
+ * The standard log object of deal.II. Take a look at the documentation of
+ * the LogStream class for more information, as well as below.
+ *
+ * The @p deallog
+ * variable (which stands for deal-log, not de-allog) represents a
+ * stream to which some parts of the library write output. For
+ * example, iterative solvers will generate diagnostics (starting
+ * residual, number of solver steps, final residual).
+ *
+ * The output of @p deallog can be written to the console, to a file,
+ * or both. Both are disabled by default since over the years we have
+ * learned that a program should only generate output when a user
+ * explicitly asks for it. But this can be changed, and to explain how
+ * this can be done, we need to explain how @p deallog works: When
+ * individual parts of the library want to log output, they open a
+ * "context" or "section" into which this output will be placed. At
+ * the end of the part that wants to write output, one exits this
+ * section again. Since a function may call another one from within
+ * the scope where this output section is open, output may in fact be
+ * nested hierarchically into these sections. The LogStream class of
+ * which @p deallog is a variable calls each of these sections a
+ * "prefix" because all output is printed with this prefix at the left
+ * end of the line, with prefixes separated by colons. There is always
+ * a default prefix called "DEAL" (a hint at deal.II's history as the
+ * successor of a previous library called "DEAL" and from which the
+ * LogStream class is one of the few pieces of code that were taken
+ * into deal.II).
+ *
+ * By default, @p logstream only outputs lines with zero prefixes --
+ * i.e., all output is disabled because the default "DEAL" prefix is
+ * always there. But one can set a different maximal number of
+ * prefixes for lines that should be output to something larger,
+ * by calling LogStream::depth_console() with an integer argument. Let's
+ * assume you call it with `2` as argument. This means that for all screen
+ * output a context that has pushed one additional prefix beyond the default
+ * "DEAL" is allowed to print its output to the screen ("console"),
+ * whereas all further nested sections that would have three or more
+ * prefixes active would write to @p deallog, but @p deallog does not
+ * forward this output to the screen.
  */
 extern LogStream deallog;
 

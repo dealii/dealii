@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2022 - 2023 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2022 - 2024 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 // Check the path of SolverGMRES with distributed vectors and
 // LinearAlgebra::OrthogonalizationStrategy::classical_gram_schmidt.
@@ -106,7 +105,7 @@ main()
     deallog << "Solve with PreconditionIdentity: " << std::endl;
     SolverControl control(40, 1e-4);
     SolverGMRES<LinearAlgebra::distributed::Vector<double>>::AdditionalData
-      data3(8);
+      data3(6);
     data3.orthogonalization_strategy =
       LinearAlgebra::OrthogonalizationStrategy::classical_gram_schmidt;
     SolverGMRES<LinearAlgebra::distributed::Vector<double>> solver(control,
@@ -128,7 +127,7 @@ main()
     deallog << "Solve with PreconditionIdentity: " << std::endl;
     SolverControl control(40, 1e-4);
     SolverGMRES<LinearAlgebra::distributed::BlockVector<double>>::AdditionalData
-      data3(8);
+      data3(6);
     data3.orthogonalization_strategy =
       LinearAlgebra::OrthogonalizationStrategy::classical_gram_schmidt;
     SolverGMRES<LinearAlgebra::distributed::BlockVector<double>> solver(control,

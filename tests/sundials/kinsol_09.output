@@ -1,0 +1,11 @@
+
+DEAL::     Computing residual at x=-69.770699970, f(x)=-176.46700446
+DEAL::     Recomputing J at x=-69.770699970
+DEAL::     Solving for dx with residual=176.46700446
+DEAL::     Computing residual at x=-69.770701010, f(x)=-176.46700550
+DEAL::     Computing residual at x=106.69630449, f(x)=203.06842599
+DEAL::     Recomputing J at x=106.69630449
+DEAL::     Solving for dx with residual=-203.06842599
+DEAL::     Computing residual at x=106.69630608, f(x)=203.06843156
+DEAL::     Computing residual at x=48.676754204, f(x)=1.4210854715e-14
+DEAL::5 residual evaluations

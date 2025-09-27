@@ -1,17 +1,16 @@
-/* ---------------------------------------------------------------------
+/* ------------------------------------------------------------------------
  *
- * Copyright (C) 2005 - 2023 by the deal.II authors
+ * SPDX-License-Identifier: LGPL-2.1-or-later
+ * Copyright (C) 2005 - 2024 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
- * The deal.II library is free software; you can use it, redistribute
- * it, and/or modify it under the terms of the GNU Lesser General
- * Public License as published by the Free Software Foundation; either
- * version 2.1 of the License, or (at your option) any later version.
- * The full text of the license can be found in the file LICENSE.md at
- * the top level directory of deal.II.
+ * Part of the source code is dual licensed under Apache-2.0 WITH
+ * LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+ * governing the source code and code contributions can be found in
+ * LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
  *
- * ---------------------------------------------------------------------
+ * ------------------------------------------------------------------------
  */
 
 
@@ -22,7 +21,6 @@
 // in the order base-lac-grid-dofs-fe-numerics, followed by C++ standard
 // include files:
 #include <deal.II/base/quadrature_lib.h>
-#include <deal.II/base/logstream.h>
 #include <deal.II/base/function.h>
 
 #include <deal.II/lac/block_vector.h>
@@ -45,7 +43,6 @@
 #include <deal.II/fe/fe_system.h>
 #include <deal.II/fe/fe_values.h>
 #include <deal.II/numerics/vector_tools.h>
-#include <deal.II/numerics/matrix_tools.h>
 #include <deal.II/numerics/data_out.h>
 
 #include <fstream>
@@ -93,9 +90,9 @@ namespace Step20
 
     const unsigned int degree;
 
-    Triangulation<dim> triangulation;
-    FESystem<dim>      fe;
-    DoFHandler<dim>    dof_handler;
+    Triangulation<dim>  triangulation;
+    const FESystem<dim> fe;
+    DoFHandler<dim>     dof_handler;
 
     // The second difference is that the sparsity pattern, the system matrix,
     // and solution and right hand side vectors are now blocked. What this
@@ -434,8 +431,8 @@ namespace Step20
   template <int dim>
   void MixedLaplaceProblem<dim>::assemble_system()
   {
-    QGauss<dim>     quadrature_formula(degree + 2);
-    QGauss<dim - 1> face_quadrature_formula(degree + 2);
+    const QGauss<dim>     quadrature_formula(degree + 2);
+    const QGauss<dim - 1> face_quadrature_formula(degree + 2);
 
     FEValues<dim>     fe_values(fe,
                             quadrature_formula,
@@ -489,6 +486,7 @@ namespace Step20
     for (const auto &cell : dof_handler.active_cell_iterators())
       {
         fe_values.reinit(cell);
+
         local_matrix = 0;
         local_rhs    = 0;
 
@@ -699,8 +697,8 @@ namespace Step20
     // points for integration. To avoid this problem, we simply use a
     // trapezoidal rule and iterate it <code>degree+2</code> times in each
     // coordinate direction (again as explained in step-7):
-    QTrapezoid<1>  q_trapez;
-    QIterated<dim> quadrature(q_trapez, degree + 2);
+    const QTrapezoid<1>  q_trapez;
+    const QIterated<dim> quadrature(q_trapez, degree + 2);
 
     // With this, we can then let the library compute the errors and output
     // them to the screen:
@@ -744,7 +742,7 @@ namespace Step20
   // @ref VVOutput "Generating graphical output"
   // section of the
   // @ref vector_valued
-  // module for more information. Finally, it seems inappropriate for higher
+  // topic for more information. Finally, it seems inappropriate for higher
   // order elements to only show a single bilinear quadrilateral per cell in
   // the graphical output. We therefore generate patches of size
   // (degree+1)x(degree+1) to capture the full information content of the

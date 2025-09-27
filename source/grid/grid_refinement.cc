@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2000 - 2022 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2000 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 
 #include <deal.II/base/template_constraints.h>
@@ -350,7 +349,7 @@ GridRefinement::refine_and_coarsen_fixed_number(
       Vector<Number> tmp(criteria);
       if (refine_cells)
         {
-          if (static_cast<size_t>(refine_cells) == criteria.size())
+          if (static_cast<std::size_t>(refine_cells) == criteria.size())
             refine(tria, criteria, std::numeric_limits<double>::lowest());
           else
             {
@@ -364,7 +363,7 @@ GridRefinement::refine_and_coarsen_fixed_number(
 
       if (coarsen_cells)
         {
-          if (static_cast<size_t>(coarsen_cells) == criteria.size())
+          if (static_cast<std::size_t>(coarsen_cells) == criteria.size())
             coarsen(tria, criteria, std::numeric_limits<double>::max());
           else
             {
@@ -404,14 +403,14 @@ GridRefinement::refine_and_coarsen_fixed_fraction(
 
   switch (norm_type)
     {
-      case VectorTools::NormType::L1_norm:
+      case VectorTools::L1_norm:
         // evaluate norms on subsets and compare them as
         //   c_0 + c_1 + ... < fraction * l1-norm(c)
         refine_and_coarsen_fixed_fraction_via_l1_norm(
           tria, criteria, top_fraction, bottom_fraction, max_n_cells);
         break;
 
-      case VectorTools::NormType::L2_norm:
+      case VectorTools::L2_norm:
         {
           // we do not want to evaluate norms on subsets as:
           //   sqrt(c_0^2 + c_1^2 + ...) < fraction * l2-norm(c)
@@ -436,7 +435,7 @@ GridRefinement::refine_and_coarsen_fixed_fraction(
         break;
 
       default:
-        Assert(false, ExcNotImplemented());
+        DEAL_II_NOT_IMPLEMENTED();
         break;
     }
 }
@@ -472,14 +471,15 @@ GridRefinement::refine_and_coarsen_optimize(Triangulation<dim, spacedim> &tria,
   double      min_cost = std::numeric_limits<double>::max();
   std::size_t min_arg  = 0;
 
+  const double reduction_factor = (1. - std::pow(2., -1. * order));
   for (std::size_t M = 0; M < criteria.size(); ++M)
     {
-      expected_error_reduction +=
-        (1 - std::pow(2., -1. * order)) * criteria(cell_indices[M]);
+      expected_error_reduction += reduction_factor * criteria(cell_indices[M]);
 
-      const double cost = std::pow(((std::pow(2., dim) - 1) * (1 + M) + N),
-                                   static_cast<double>(order) / dim) *
-                          (original_error - expected_error_reduction);
+      const double cost =
+        std::pow(((Utilities::fixed_power<dim>(2) - 1) * (1 + M) + N),
+                 static_cast<double>(order) / dim) *
+        (original_error - expected_error_reduction);
       if (cost <= min_cost)
         {
           min_cost = cost;
@@ -492,6 +492,6 @@ GridRefinement::refine_and_coarsen_optimize(Triangulation<dim, spacedim> &tria,
 
 
 // explicit instantiations
-#include "grid_refinement.inst"
+#include "grid/grid_refinement.inst"
 
 DEAL_II_NAMESPACE_CLOSE

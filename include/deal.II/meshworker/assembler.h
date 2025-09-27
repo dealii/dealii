@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2010 - 2020 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2010 - 2024 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 
 #ifndef dealii_mesh_worker_assembler_h
@@ -22,7 +21,7 @@
 #include <deal.II/algorithms/any_data.h>
 
 #include <deal.II/base/mg_level_object.h>
-#include <deal.II/base/smartpointer.h>
+#include <deal.II/base/observer_pointer.h>
 
 #include <deal.II/lac/block_vector.h>
 
@@ -54,7 +53,7 @@ namespace MeshWorker
    * This is the structure set up by the FESystem class. Globally, this means,
    * data is assembled into one residual vector and into one matrix. These
    * objects may be block vectors and block matrices, but the process of
-   * assembling ignores this fact.
+   * assembling does not care about this.
    *
    * Similarly, there is only a single cell vector and cell matrix,
    * respectively, which is indexed by all degrees of freedom of the FESystem.
@@ -66,8 +65,9 @@ namespace MeshWorker
    *
    * Here, all the blocks are treated separately (in spite of using FESystem
    * for its convenience in other places). For instance, no block matrix is
-   * assembled, but a list of blocks, which can be combined later by
-   * BlockMatrixArray. Locally, this means, that each matrix block of a system
+   * assembled, but a list of blocks, which can be blocks inside a larger block
+   * matrix but, again, the assembly process is unaware of this and does
+   * not care. Locally, this means, that each matrix block of a system
    * is generated separately and assembled into the corresponding global
    * block.
    *
@@ -167,15 +167,15 @@ namespace MeshWorker
       /**
        * A pointer to the object containing the block structure.
        */
-      SmartPointer<const BlockInfo,
-                   ResidualLocalBlocksToGlobalBlocks<VectorType>>
+      ObserverPointer<const BlockInfo,
+                      ResidualLocalBlocksToGlobalBlocks<VectorType>>
         block_info;
 
       /**
        * A pointer to the object containing constraints.
        */
-      SmartPointer<const AffineConstraints<typename VectorType::value_type>,
-                   ResidualLocalBlocksToGlobalBlocks<VectorType>>
+      ObserverPointer<const AffineConstraints<typename VectorType::value_type>,
+                      ResidualLocalBlocksToGlobalBlocks<VectorType>>
         constraints;
     };
 
@@ -272,22 +272,22 @@ namespace MeshWorker
       /**
        * The global matrices, stored as a vector of pointers.
        */
-      SmartPointer<MatrixBlockVector<MatrixType>,
-                   MatrixLocalBlocksToGlobalBlocks<MatrixType, number>>
+      ObserverPointer<MatrixBlockVector<MatrixType>,
+                      MatrixLocalBlocksToGlobalBlocks<MatrixType, number>>
         matrices;
 
       /**
        * A pointer to the object containing the block structure.
        */
-      SmartPointer<const BlockInfo,
-                   MatrixLocalBlocksToGlobalBlocks<MatrixType, number>>
+      ObserverPointer<const BlockInfo,
+                      MatrixLocalBlocksToGlobalBlocks<MatrixType, number>>
         block_info;
       /**
        * A pointer to the object containing constraints.
        */
 
-      SmartPointer<const AffineConstraints<typename MatrixType::value_type>,
-                   MatrixLocalBlocksToGlobalBlocks<MatrixType, number>>
+      ObserverPointer<const AffineConstraints<typename MatrixType::value_type>,
+                      MatrixLocalBlocksToGlobalBlocks<MatrixType, number>>
         constraints;
 
       /**
@@ -327,8 +327,8 @@ namespace MeshWorker
     public:
       using MatrixPtrVector = MGMatrixBlockVector<MatrixType>;
       using MatrixPtrVectorPtr =
-        SmartPointer<MatrixPtrVector,
-                     MGMatrixLocalBlocksToGlobalBlocks<MatrixType, number>>;
+        ObserverPointer<MatrixPtrVector,
+                        MGMatrixLocalBlocksToGlobalBlocks<MatrixType, number>>;
 
       /**
        * Constructor, initializing the #threshold, which limits how small
@@ -503,15 +503,15 @@ namespace MeshWorker
       /**
        * A pointer to the object containing the block structure.
        */
-      SmartPointer<const BlockInfo,
-                   MGMatrixLocalBlocksToGlobalBlocks<MatrixType, number>>
+      ObserverPointer<const BlockInfo,
+                      MGMatrixLocalBlocksToGlobalBlocks<MatrixType, number>>
         block_info;
 
       /**
        * A pointer to the object containing constraints.
        */
-      SmartPointer<const MGConstrainedDoFs,
-                   MGMatrixLocalBlocksToGlobalBlocks<MatrixType, number>>
+      ObserverPointer<const MGConstrainedDoFs,
+                      MGMatrixLocalBlocksToGlobalBlocks<MatrixType, number>>
         mg_constrained_dofs;
 
 

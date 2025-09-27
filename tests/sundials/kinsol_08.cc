@@ -1,17 +1,16 @@
-//-----------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-//    Copyright (C) 2017 - 2023 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2021 - 2024 by the deal.II authors
 //
-//    This file is part of the deal.II library.
+// This file is part of the deal.II library.
 //
-//    The deal.II library is free software; you can use it, redistribute
-//    it, and/or modify it under the terms of the GNU Lesser General
-//    Public License as published by the Free Software Foundation; either
-//    version 2.1 of the License, or (at your option) any later version.
-//    The full text of the license can be found in the file LICENSE.md at
-//    the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-//-----------------------------------------------------------
+// ------------------------------------------------------------------------
 
 #include <deal.II/base/parameter_handler.h>
 
@@ -65,7 +64,7 @@ main()
 
   SUNDIALS::KINSOL<VectorType> kinsol(data);
 
-  kinsol.reinit_vector = [N](VectorType &v) { v.reinit(N); };
+  kinsol.reinit_vector = [N = N](VectorType &v) { v.reinit(N); };
 
   kinsol.residual = [](const VectorType &u, VectorType &F) {
     deallog << "Evaluating the solution at u=(" << u[0] << ',' << u[1] << ')'
@@ -113,10 +112,14 @@ main()
       J_inverse.vmult(dst, rhs);
     };
 
-  kinsol.custom_setup = [](void *kinsol_mem) {
-    // test custom_setup callback by querying some information from KINSOL
+  kinsol.custom_setup = [](void *kinsol_mem [[maybe_unused]]) {
+  // test custom_setup callback by querying some information from KINSOL
+#if DEAL_II_SUNDIALS_VERSION_LT(7, 0, 0)
+    // TODO: KINSetInfoHandlerFn and KINSetPrintLevel have been removed in
+    // version 7.0, so ideally do something else here. MM
     KINSetInfoHandlerFn(kinsol_mem, kinsol_info_callback, nullptr);
     KINSetPrintLevel(kinsol_mem, 1);
+#endif
   };
 
   VectorType v(N);

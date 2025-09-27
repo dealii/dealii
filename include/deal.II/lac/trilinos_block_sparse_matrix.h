@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2008 - 2023 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2008 - 2024 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 #ifndef dealii_trilinos_block_sparse_matrix_h
 #define dealii_trilinos_block_sparse_matrix_h
@@ -66,8 +65,8 @@ namespace TrilinosWrappers
    * function, for much the same reason as is documented with the
    * BlockSparsityPattern class.
    *
-   * @ingroup Matrix1 @see
-   * @ref GlossBlockLA "Block (linear algebra)"
+   * @ingroup Matrix1
+   * @see @ref GlossBlockLA "Block (linear algebra)"
    */
   class BlockSparseMatrix : public BlockMatrixBase<SparseMatrix>
   {
@@ -207,7 +206,7 @@ namespace TrilinosWrappers
      * internal arrays, in order to be able to relay global indices into the
      * matrix to indices into the subobjects. You *must* call this function
      * each time after you have changed the size of the sub-objects. Note that
-     * this is a collective operation, i.e., it needs to be called on all MPI
+     * this is a @ref GlossCollectiveOperation "collective operation", i.e., it needs to be called on all MPI
      * processes. This command internally calls the method
      * <tt>compress()</tt>, so you don't need to call that function in case
      * you use <tt>collect_sizes()</tt>.
@@ -359,8 +358,8 @@ namespace TrilinosWrappers
     vmult(VectorType1       &dst,
           const VectorType2 &src,
           const bool         transpose,
-          const std::integral_constant<bool, true>,
-          const std::integral_constant<bool, true>) const;
+          const std::bool_constant<true>,
+          const std::bool_constant<true>) const;
 
     /**
      * Internal version of (T)vmult where the source vector is a block vector
@@ -371,8 +370,8 @@ namespace TrilinosWrappers
     vmult(VectorType1       &dst,
           const VectorType2 &src,
           const bool         transpose,
-          const std::integral_constant<bool, false>,
-          const std::integral_constant<bool, true>) const;
+          const std::bool_constant<false>,
+          const std::bool_constant<true>) const;
 
     /**
      * Internal version of (T)vmult where the source vector is a non-block
@@ -383,8 +382,8 @@ namespace TrilinosWrappers
     vmult(VectorType1       &dst,
           const VectorType2 &src,
           const bool         transpose,
-          const std::integral_constant<bool, true>,
-          const std::integral_constant<bool, false>) const;
+          const std::bool_constant<true>,
+          const std::bool_constant<false>) const;
 
     /**
      * Internal version of (T)vmult where both source vector and the
@@ -396,8 +395,8 @@ namespace TrilinosWrappers
     vmult(VectorType1       &dst,
           const VectorType2 &src,
           const bool         transpose,
-          const std::integral_constant<bool, false>,
-          const std::integral_constant<bool, false>) const;
+          const std::bool_constant<false>,
+          const std::bool_constant<false>) const;
   };
 
 
@@ -446,8 +445,8 @@ namespace TrilinosWrappers
     vmult(dst,
           src,
           false,
-          std::integral_constant<bool, IsBlockVector<VectorType1>::value>(),
-          std::integral_constant<bool, IsBlockVector<VectorType2>::value>());
+          std::bool_constant<IsBlockVector<VectorType1>::value>(),
+          std::bool_constant<IsBlockVector<VectorType2>::value>());
   }
 
 
@@ -459,8 +458,8 @@ namespace TrilinosWrappers
     vmult(dst,
           src,
           true,
-          std::integral_constant<bool, IsBlockVector<VectorType1>::value>(),
-          std::integral_constant<bool, IsBlockVector<VectorType2>::value>());
+          std::bool_constant<IsBlockVector<VectorType1>::value>(),
+          std::bool_constant<IsBlockVector<VectorType2>::value>());
   }
 
 
@@ -470,8 +469,8 @@ namespace TrilinosWrappers
   BlockSparseMatrix::vmult(VectorType1       &dst,
                            const VectorType2 &src,
                            const bool         transpose,
-                           std::integral_constant<bool, true>,
-                           std::integral_constant<bool, true>) const
+                           std::bool_constant<true>,
+                           std::bool_constant<true>) const
   {
     if (transpose == true)
       BaseClass::Tvmult_block_block(dst, src);
@@ -486,8 +485,8 @@ namespace TrilinosWrappers
   BlockSparseMatrix::vmult(VectorType1       &dst,
                            const VectorType2 &src,
                            const bool         transpose,
-                           std::integral_constant<bool, false>,
-                           std::integral_constant<bool, true>) const
+                           std::bool_constant<false>,
+                           std::bool_constant<true>) const
   {
     if (transpose == true)
       BaseClass::Tvmult_nonblock_block(dst, src);
@@ -502,8 +501,8 @@ namespace TrilinosWrappers
   BlockSparseMatrix::vmult(VectorType1       &dst,
                            const VectorType2 &src,
                            const bool         transpose,
-                           std::integral_constant<bool, true>,
-                           std::integral_constant<bool, false>) const
+                           std::bool_constant<true>,
+                           std::bool_constant<false>) const
   {
     if (transpose == true)
       BaseClass::Tvmult_block_nonblock(dst, src);
@@ -518,8 +517,8 @@ namespace TrilinosWrappers
   BlockSparseMatrix::vmult(VectorType1       &dst,
                            const VectorType2 &src,
                            const bool         transpose,
-                           std::integral_constant<bool, false>,
-                           std::integral_constant<bool, false>) const
+                           std::bool_constant<false>,
+                           std::bool_constant<false>) const
   {
     if (transpose == true)
       BaseClass::Tvmult_nonblock_nonblock(dst, src);
@@ -615,6 +614,14 @@ namespace TrilinosWrappers
 } /* namespace TrilinosWrappers */
 
 
+DEAL_II_NAMESPACE_CLOSE
+
+#else
+
+// Make sure the scripts that create the C++20 module input files have
+// something to latch on if the preprocessor #ifdef above would
+// otherwise lead to an empty content of the file.
+DEAL_II_NAMESPACE_OPEN
 DEAL_II_NAMESPACE_CLOSE
 
 #endif // DEAL_II_WITH_TRILINOS

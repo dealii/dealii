@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2001 - 2018 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2001 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 
 
@@ -35,7 +34,9 @@ main()
         full_matrix(i, i) = 1;
 
       MatrixOut matrix_out;
-      matrix_out.build_patches(full_matrix, "full_matrix");
+      matrix_out.build_patches(full_matrix,
+                               "full_matrix",
+                               {false, 1, false, false});
       matrix_out.write_gnuplot(logfile);
     };
 
@@ -58,7 +59,7 @@ main()
       MatrixOut matrix_out;
       matrix_out.build_patches(sparse_matrix,
                                "sparse_matrix",
-                               MatrixOut::Options(true));
+                               MatrixOut::Options(true, 1, false, false));
       matrix_out.write_eps(logfile);
     };
 
@@ -74,7 +75,7 @@ main()
       MatrixOut matrix_out;
       matrix_out.build_patches(full_matrix,
                                "collated_matrix",
-                               MatrixOut::Options(false, 4));
+                               MatrixOut::Options(false, 4, false, false));
       matrix_out.write_gmv(logfile);
     };
 }

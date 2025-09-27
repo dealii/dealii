@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2016 - 2023 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2016 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 
 #include <deal.II/base/array_view.h>
@@ -27,6 +26,7 @@
 #include <deal.II/fe/fe.h>
 #include <deal.II/fe/fe_tools.h>
 #include <deal.II/fe/fe_values.h>
+#include <deal.II/fe/mapping_internal.h>
 #include <deal.II/fe/mapping_manifold.h>
 
 #include <deal.II/grid/manifold.h>
@@ -64,22 +64,21 @@ MappingManifold<dim, spacedim>::InternalData::memory_consumption() const
 }
 
 
+
 template <int dim, int spacedim>
 void
-MappingManifold<dim, spacedim>::InternalData::initialize(
+MappingManifold<dim, spacedim>::InternalData::reinit(
   const UpdateFlags      update_flags,
-  const Quadrature<dim> &q,
-  const unsigned int     n_original_q_points)
+  const Quadrature<dim> &q)
 {
   // store the flags in the internal data object so we can access them
   // in fill_fe_*_values()
   this->update_each = update_flags;
 
-  // Store the quadrature
-  this->quad = q;
+  const unsigned int n_q_points = q.size();
 
-  // Resize the weights
-  this->vertex_weights.resize(GeometryInfo<dim>::vertices_per_cell);
+  // Store the quadrature
+  this->quad.initialize(q.get_points(), q.get_weights());
 
   // see if we need the (transformation) shape function values
   // and/or gradients and resize the necessary arrays
@@ -88,14 +87,15 @@ MappingManifold<dim, spacedim>::InternalData::initialize(
     compute_manifold_quadrature_weights(q);
 
   if (this->update_each & update_covariant_transformation)
-    covariant.resize(n_original_q_points);
+    covariant.resize(n_q_points);
 
   if (this->update_each & update_contravariant_transformation)
-    contravariant.resize(n_original_q_points);
+    contravariant.resize(n_q_points);
 
   if (this->update_each & update_volume_elements)
-    volume_elements.resize(n_original_q_points);
+    volume_elements.resize(n_q_points);
 }
+
 
 
 template <int dim, int spacedim>
@@ -105,7 +105,18 @@ MappingManifold<dim, spacedim>::InternalData::initialize_face(
   const Quadrature<dim> &q,
   const unsigned int     n_original_q_points)
 {
-  initialize(update_flags, q, n_original_q_points);
+  reinit(update_flags, q);
+
+  // Set to the size of a single quadrature object for faces, as the size set
+  // in in reinit() is for all points
+  if (this->update_each & update_covariant_transformation)
+    covariant.resize(n_original_q_points);
+
+  if (this->update_each & update_contravariant_transformation)
+    contravariant.resize(n_original_q_points);
+
+  if (this->update_each & update_volume_elements)
+    volume_elements.resize(n_original_q_points);
 
   if (dim > 1)
     {
@@ -140,6 +151,36 @@ MappingManifold<dim, spacedim>::InternalData::initialize_face(
 
 
 template <int dim, int spacedim>
+void
+MappingManifold<dim, spacedim>::InternalData::store_vertices(
+  const typename Triangulation<dim, spacedim>::cell_iterator &cell) const
+{
+  for (const unsigned int i : GeometryInfo<dim>::vertex_indices())
+    vertices[i] = cell->vertex(i);
+  this->cell = cell;
+}
+
+
+
+template <int dim, int spacedim>
+void
+MappingManifold<dim, spacedim>::InternalData::
+  compute_manifold_quadrature_weights(const Quadrature<dim> &quad)
+{
+  cell_manifold_quadrature_weights.resize(quad.size());
+  for (unsigned int q = 0; q < quad.size(); ++q)
+    {
+      for (const unsigned int i : GeometryInfo<dim>::vertex_indices())
+        {
+          cell_manifold_quadrature_weights[q][i] =
+            GeometryInfo<dim>::d_linear_shape_function(quad.point(q), i);
+        }
+    }
+}
+
+
+
+template <int dim, int spacedim>
 MappingManifold<dim, spacedim>::MappingManifold(
   const MappingManifold<dim, spacedim> &)
 {}
@@ -161,7 +202,7 @@ MappingManifold<dim, spacedim>::transform_real_to_unit_cell(
   const typename Triangulation<dim, spacedim>::cell_iterator &,
   const Point<spacedim> &) const
 {
-  Assert(false, ExcNotImplemented());
+  DEAL_II_NOT_IMPLEMENTED();
   return {};
 }
 
@@ -270,8 +311,7 @@ MappingManifold<dim, spacedim>::get_data(const UpdateFlags      update_flags,
 {
   std::unique_ptr<typename Mapping<dim, spacedim>::InternalDataBase> data_ptr =
     std::make_unique<InternalData>();
-  auto &data = dynamic_cast<InternalData &>(*data_ptr);
-  data.initialize(this->requires_update_flags(update_flags), q, q.size());
+  data_ptr->reinit(this->requires_update_flags(update_flags), q);
 
   return data_ptr;
 }
@@ -340,9 +380,6 @@ namespace internal
       {
         const UpdateFlags update_flags = data.update_each;
 
-        AssertDimension(data.vertices.size(),
-                        GeometryInfo<dim>::vertices_per_cell);
-
         if (update_flags & update_quadrature_points)
           {
             for (unsigned int point = 0; point < quadrature_points.size();
@@ -381,8 +418,6 @@ namespace internal
                       data.contravariant.end(),
                       DerivativeForm<1, dim, spacedim>());
 
-            AssertDimension(GeometryInfo<dim>::vertices_per_cell,
-                            data.vertices.size());
             for (unsigned int point = 0; point < n_q_points; ++point)
               {
                 // Start by figuring out how to compute the direction in
@@ -685,7 +720,7 @@ namespace internal
                           cross_product_3d(data.aux[0][i], data.aux[1][i]);
                         break;
                       default:
-                        Assert(false, ExcNotImplemented());
+                        DEAL_II_NOT_IMPLEMENTED();
                     }
               }
             else //(dim < spacedim)
@@ -732,7 +767,7 @@ namespace internal
                           }
 
                         default:
-                          Assert(false, ExcNotImplemented());
+                          DEAL_II_NOT_IMPLEMENTED();
                       }
                   }
               }
@@ -886,7 +921,7 @@ namespace internal
               }
 
             default:
-              Assert(false, ExcNotImplemented());
+              DEAL_II_NOT_IMPLEMENTED();
           }
       }
 
@@ -972,22 +1007,17 @@ namespace internal
                 Assert(rank == 2, ExcMessage("Only for rank 2"));
 
                 for (unsigned int i = 0; i < output.size(); ++i)
-                  {
-                    DerivativeForm<1, spacedim, dim> A =
-                      apply_transformation(data.covariant[i], input[i]);
-                    Tensor<2, spacedim> T =
-                      apply_transformation(data.contravariant[i],
-                                           A.transpose());
-
-                    output[i] = transpose(T);
-                    output[i] /= data.volume_elements[i];
-                  }
+                  output[i] =
+                    internal::apply_piola_gradient(data.covariant[i],
+                                                   data.contravariant[i],
+                                                   data.volume_elements[i],
+                                                   input[i]);
 
                 return;
               }
 
             default:
-              Assert(false, ExcNotImplemented());
+              DEAL_II_NOT_IMPLEMENTED();
           }
       }
 
@@ -1025,37 +1055,11 @@ namespace internal
                     "update_contravariant_transformation"));
 
                 for (unsigned int q = 0; q < output.size(); ++q)
-                  for (unsigned int i = 0; i < spacedim; ++i)
-                    {
-                      double tmp1[dim][dim];
-                      for (unsigned int J = 0; J < dim; ++J)
-                        for (unsigned int K = 0; K < dim; ++K)
-                          {
-                            tmp1[J][K] =
-                              data.contravariant[q][i][0] * input[q][0][J][K];
-                            for (unsigned int I = 1; I < dim; ++I)
-                              tmp1[J][K] +=
-                                data.contravariant[q][i][I] * input[q][I][J][K];
-                          }
-                      for (unsigned int j = 0; j < spacedim; ++j)
-                        {
-                          double tmp2[dim];
-                          for (unsigned int K = 0; K < dim; ++K)
-                            {
-                              tmp2[K] = data.covariant[q][j][0] * tmp1[0][K];
-                              for (unsigned int J = 1; J < dim; ++J)
-                                tmp2[K] += data.covariant[q][j][J] * tmp1[J][K];
-                            }
-                          for (unsigned int k = 0; k < spacedim; ++k)
-                            {
-                              output[q][i][j][k] =
-                                data.covariant[q][k][0] * tmp2[0];
-                              for (unsigned int K = 1; K < dim; ++K)
-                                output[q][i][j][k] +=
-                                  data.covariant[q][k][K] * tmp2[K];
-                            }
-                        }
-                    }
+                  output[q] =
+                    internal::apply_contravariant_hessian(data.covariant[q],
+                                                          data.contravariant[q],
+                                                          input[q]);
+
                 return;
               }
 
@@ -1067,37 +1071,9 @@ namespace internal
                     "update_covariant_transformation"));
 
                 for (unsigned int q = 0; q < output.size(); ++q)
-                  for (unsigned int i = 0; i < spacedim; ++i)
-                    {
-                      double tmp1[dim][dim];
-                      for (unsigned int J = 0; J < dim; ++J)
-                        for (unsigned int K = 0; K < dim; ++K)
-                          {
-                            tmp1[J][K] =
-                              data.covariant[q][i][0] * input[q][0][J][K];
-                            for (unsigned int I = 1; I < dim; ++I)
-                              tmp1[J][K] +=
-                                data.covariant[q][i][I] * input[q][I][J][K];
-                          }
-                      for (unsigned int j = 0; j < spacedim; ++j)
-                        {
-                          double tmp2[dim];
-                          for (unsigned int K = 0; K < dim; ++K)
-                            {
-                              tmp2[K] = data.covariant[q][j][0] * tmp1[0][K];
-                              for (unsigned int J = 1; J < dim; ++J)
-                                tmp2[K] += data.covariant[q][j][J] * tmp1[J][K];
-                            }
-                          for (unsigned int k = 0; k < spacedim; ++k)
-                            {
-                              output[q][i][j][k] =
-                                data.covariant[q][k][0] * tmp2[0];
-                              for (unsigned int K = 1; K < dim; ++K)
-                                output[q][i][j][k] +=
-                                  data.covariant[q][k][K] * tmp2[K];
-                            }
-                        }
-                    }
+                  output[q] =
+                    internal::apply_covariant_hessian(data.covariant[q],
+                                                      input[q]);
 
                 return;
               }
@@ -1118,45 +1094,17 @@ namespace internal
                     "update_volume_elements"));
 
                 for (unsigned int q = 0; q < output.size(); ++q)
-                  for (unsigned int i = 0; i < spacedim; ++i)
-                    {
-                      double factor[dim];
-                      for (unsigned int I = 0; I < dim; ++I)
-                        factor[I] =
-                          data.contravariant[q][i][I] / data.volume_elements[q];
-                      double tmp1[dim][dim];
-                      for (unsigned int J = 0; J < dim; ++J)
-                        for (unsigned int K = 0; K < dim; ++K)
-                          {
-                            tmp1[J][K] = factor[0] * input[q][0][J][K];
-                            for (unsigned int I = 1; I < dim; ++I)
-                              tmp1[J][K] += factor[I] * input[q][I][J][K];
-                          }
-                      for (unsigned int j = 0; j < spacedim; ++j)
-                        {
-                          double tmp2[dim];
-                          for (unsigned int K = 0; K < dim; ++K)
-                            {
-                              tmp2[K] = data.covariant[q][j][0] * tmp1[0][K];
-                              for (unsigned int J = 1; J < dim; ++J)
-                                tmp2[K] += data.covariant[q][j][J] * tmp1[J][K];
-                            }
-                          for (unsigned int k = 0; k < spacedim; ++k)
-                            {
-                              output[q][i][j][k] =
-                                data.covariant[q][k][0] * tmp2[0];
-                              for (unsigned int K = 1; K < dim; ++K)
-                                output[q][i][j][k] +=
-                                  data.covariant[q][k][K] * tmp2[K];
-                            }
-                        }
-                    }
+                  output[q] =
+                    internal::apply_piola_hessian(data.covariant[q],
+                                                  data.contravariant[q],
+                                                  data.volume_elements[q],
+                                                  input[q]);
 
                 return;
               }
 
             default:
-              Assert(false, ExcNotImplemented());
+              DEAL_II_NOT_IMPLEMENTED();
           }
       }
 
@@ -1195,7 +1143,7 @@ namespace internal
                 return;
               }
             default:
-              Assert(false, ExcNotImplemented());
+              DEAL_II_NOT_IMPLEMENTED();
           }
       }
     } // namespace
@@ -1229,9 +1177,7 @@ MappingManifold<dim, spacedim>::fill_fe_face_values(
     QProjector<dim>::DataSetDescriptor::face(
       ReferenceCells::get_hypercube<dim>(),
       face_no,
-      cell->face_orientation(face_no),
-      cell->face_flip(face_no),
-      cell->face_rotation(face_no),
+      cell->combined_face_orientation(face_no),
       quadrature[0].size()),
     quadrature[0],
     data,
@@ -1265,9 +1211,7 @@ MappingManifold<dim, spacedim>::fill_fe_subface_values(
       ReferenceCells::get_hypercube<dim>(),
       face_no,
       subface_no,
-      cell->face_orientation(face_no),
-      cell->face_flip(face_no),
-      cell->face_rotation(face_no),
+      cell->combined_face_orientation(face_no),
       quadrature.size(),
       cell->subface_case(face_no)),
     quadrature,
@@ -1331,7 +1275,7 @@ MappingManifold<dim, spacedim>::transform(
           input, mapping_kind, mapping_data, output);
         return;
       default:
-        Assert(false, ExcNotImplemented());
+        DEAL_II_NOT_IMPLEMENTED();
     }
 }
 
@@ -1354,33 +1298,19 @@ MappingManifold<dim, spacedim>::transform(
     {
       case mapping_covariant_gradient:
         {
-          Assert(data.update_each & update_contravariant_transformation,
+          Assert(data.update_each & update_covariant_transformation,
                  typename FEValuesBase<dim>::ExcAccessToUninitializedField(
                    "update_covariant_transformation"));
 
           for (unsigned int q = 0; q < output.size(); ++q)
-            for (unsigned int i = 0; i < spacedim; ++i)
-              for (unsigned int j = 0; j < spacedim; ++j)
-                {
-                  double tmp[dim];
-                  for (unsigned int K = 0; K < dim; ++K)
-                    {
-                      tmp[K] = data.covariant[q][j][0] * input[q][i][0][K];
-                      for (unsigned int J = 1; J < dim; ++J)
-                        tmp[K] += data.covariant[q][j][J] * input[q][i][J][K];
-                    }
-                  for (unsigned int k = 0; k < spacedim; ++k)
-                    {
-                      output[q][i][j][k] = data.covariant[q][k][0] * tmp[0];
-                      for (unsigned int K = 1; K < dim; ++K)
-                        output[q][i][j][k] += data.covariant[q][k][K] * tmp[K];
-                    }
-                }
+            output[q] =
+              internal::apply_covariant_gradient(data.covariant[q], input[q]);
+
           return;
         }
 
       default:
-        Assert(false, ExcNotImplemented());
+        DEAL_II_NOT_IMPLEMENTED();
     }
 }
 
@@ -1403,12 +1333,12 @@ MappingManifold<dim, spacedim>::transform(
           input, mapping_kind, mapping_data, output);
         return;
       default:
-        Assert(false, ExcNotImplemented());
+        DEAL_II_NOT_IMPLEMENTED();
     }
 }
 
 //--------------------------- Explicit instantiations -----------------------
-#include "mapping_manifold.inst"
+#include "fe/mapping_manifold.inst"
 
 
 DEAL_II_NAMESPACE_CLOSE

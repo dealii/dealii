@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2021 - 2022 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2021 - 2024 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE at
-// the top level of the deal.II distribution.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/function_signed_distance.h>
@@ -31,7 +30,6 @@
 
 #include "../tests.h"
 
-using namespace dealii;
 
 // Assert that the two incoming cells are the same. Throw an exception if not.
 template <int dim>
@@ -90,9 +88,10 @@ private:
   void
   setup_discrete_level_set();
 
+  template <typename IteratorType>
   void
-  test_fe_values_reinitializes_correctly(
-    NonMatching::FEValues<dim> &fe_values) const;
+  test_fe_values_reinitializes_correctly(NonMatching::FEValues<dim> &fe_values,
+                                         IteratorType cell) const;
 
   Triangulation<dim>    triangulation;
   hp::FECollection<dim> fe_collection;
@@ -141,7 +140,10 @@ Test<dim>::run()
                                          mesh_classifier,
                                          dof_handler,
                                          level_set);
-    test_fe_values_reinitializes_correctly(fe_values);
+    test_fe_values_reinitializes_correctly(fe_values,
+                                           triangulation.begin_active());
+    test_fe_values_reinitializes_correctly(fe_values,
+                                           dof_handler.begin_active());
   }
   {
     // Test with the "more advanced" constructor.
@@ -153,7 +155,10 @@ Test<dim>::run()
                                          mesh_classifier,
                                          dof_handler,
                                          level_set);
-    test_fe_values_reinitializes_correctly(fe_values);
+    test_fe_values_reinitializes_correctly(fe_values,
+                                           triangulation.begin_active());
+    test_fe_values_reinitializes_correctly(fe_values,
+                                           dof_handler.begin_active());
   }
 }
 
@@ -199,13 +204,14 @@ Test<dim>::setup_discrete_level_set()
 
 
 template <int dim>
+template <typename IteratorType>
 void
 Test<dim>::test_fe_values_reinitializes_correctly(
-  NonMatching::FEValues<dim> &fe_values) const
+  NonMatching::FEValues<dim> &fe_values,
+  IteratorType                cell) const
 {
   //  The first is inside so only the inside FEValues object should be
   //  initialized.
-  auto cell = dof_handler.begin_active();
   fe_values.reinit(cell);
 
   assert_cells_are_the_same<dim>(cell,

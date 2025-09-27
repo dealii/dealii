@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2019 - 2021 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2019 - 2024 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE at
-// the top level of the deal.II distribution.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 #include <deal.II/base/config.h>
 
@@ -94,17 +93,18 @@ namespace Differentiation
           Assert(SE::is_a_Boolean(entry.first.get_value()),
                  ExcMessage(
                    "The conditional expression must return a boolean type."));
-          piecewise_function.push_back(
-            {entry.second.get_RCP(),
-             SE::rcp_static_cast<const SE::Boolean>(entry.first.get_RCP())});
+          piecewise_function.emplace_back(
+            entry.second.get_RCP(),
+            SE::rcp_static_cast<const SE::Boolean>(entry.first.get_RCP()));
         }
 
       // Add default value
-      piecewise_function.push_back(
-        {expression_otherwise.get_RCP(), SE::boolTrue});
+      piecewise_function.emplace_back(expression_otherwise.get_RCP(),
+                                      SE::boolTrue);
 
-      // Initialize
-      expression = SE::piecewise(std::move(piecewise_function));
+      // Initialize. Note that we need to use a std::move() here for
+      // compatibility with older compilers.
+      expression = SE::piecewise(std::move(piecewise_function)); // NOLINT
     }
 
 

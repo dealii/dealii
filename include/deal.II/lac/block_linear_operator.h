@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2010 - 2022 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2015 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 #ifndef dealii_block_linear_operator_h
 #define dealii_block_linear_operator_h
@@ -600,12 +599,13 @@ block_operator(const BlockMatrixType &block_matrix)
 
   return_op.block = [&block_matrix](unsigned int i,
                                     unsigned int j) -> BlockType {
-#ifdef DEBUG
-    const unsigned int m = block_matrix.n_block_rows();
-    const unsigned int n = block_matrix.n_block_cols();
-    AssertIndexRange(i, m);
-    AssertIndexRange(j, n);
-#endif
+    if constexpr (running_in_debug_mode())
+      {
+        const unsigned int m = block_matrix.n_block_rows();
+        const unsigned int n = block_matrix.n_block_cols();
+        AssertIndexRange(i, m);
+        AssertIndexRange(j, n);
+      }
 
     return BlockType(block_matrix.block(i, j));
   };
@@ -721,13 +721,14 @@ block_diagonal_operator(const BlockMatrixType &block_matrix)
 
   return_op.block = [&block_matrix](unsigned int i,
                                     unsigned int j) -> BlockType {
-#ifdef DEBUG
-    const unsigned int m = block_matrix.n_block_rows();
-    const unsigned int n = block_matrix.n_block_cols();
-    Assert(m == n, ExcDimensionMismatch(m, n));
-    AssertIndexRange(i, m);
-    AssertIndexRange(j, n);
-#endif
+    if constexpr (running_in_debug_mode())
+      {
+        const unsigned int m = block_matrix.n_block_rows();
+        const unsigned int n = block_matrix.n_block_cols();
+        Assert(m == n, ExcDimensionMismatch(m, n));
+        AssertIndexRange(i, m);
+        AssertIndexRange(j, n);
+      }
     if (i == j)
       return BlockType(block_matrix.block(i, j));
     else

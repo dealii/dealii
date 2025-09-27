@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2020 - 2023 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2015 - 2024 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 #ifndef dealii_mapping_fe_h
 #define dealii_mapping_fe_h
@@ -186,23 +185,15 @@ public:
      */
     InternalData(const FiniteElement<dim, spacedim> &fe);
 
-    /**
-     * Initialize the object's member variables related to cell data based on
-     * the given arguments.
-     *
-     * The function also calls compute_shape_function_values() to actually set
-     * the member variables related to the values and derivatives of the
-     * mapping shape functions.
-     */
-    void
-    initialize(const UpdateFlags      update_flags,
-               const Quadrature<dim> &quadrature,
-               const unsigned int     n_original_q_points);
+    // Documentation see Mapping::InternalDataBase.
+    virtual void
+    reinit(const UpdateFlags      update_flags,
+           const Quadrature<dim> &quadrature) override;
 
     /**
      * Initialize the object's member variables related to cell and face data
      * based on the given arguments. In order to initialize cell data, this
-     * function calls initialize().
+     * function calls reinit().
      */
     void
     initialize_face(const UpdateFlags      update_flags,
@@ -332,7 +323,7 @@ public:
      * Filled once.
      */
     std::array<std::vector<Tensor<1, dim>>,
-               GeometryInfo<dim>::faces_per_cell *(dim - 1)>
+               ReferenceCells::max_n_faces<dim>() * 2>
       unit_tangentials;
 
     /**

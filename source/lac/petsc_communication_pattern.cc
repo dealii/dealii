@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2023 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2023 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 #include <deal.II/lac/petsc_communication_pattern.h>
 
@@ -29,7 +28,7 @@ DEAL_II_NAMESPACE_OPEN
         PetscErrorCode ierr = (code);                \
         AssertThrow(ierr == 0, ExcPETScError(ierr)); \
       }                                              \
-    while (0)
+    while (false)
 
 namespace PETScWrappers
 {
@@ -52,10 +51,17 @@ namespace PETScWrappers
                                const MPI_Comm                communicator)
   {
     clear();
+    AssertIndexRange(local_size, ghost_indices.size() + 1);
+    // If the size of the index set can be converted to a PetscInt then every
+    // index can also be converted
+    AssertThrowIntegerConversion(ghost_indices.size(),
+                                 static_cast<PetscInt>(ghost_indices.size()));
 
     PetscLayout layout;
     AssertPETSc(PetscLayoutCreate(communicator, &layout));
-    AssertPETSc(PetscLayoutSetLocalSize(layout, local_size));
+    const auto petsc_local_size = static_cast<PetscInt>(local_size);
+    AssertThrowIntegerConversion(local_size, petsc_local_size);
+    AssertPETSc(PetscLayoutSetLocalSize(layout, petsc_local_size));
     AssertPETSc(PetscLayoutSetUp(layout));
 
     PetscInt start, end;
@@ -89,12 +95,18 @@ namespace PETScWrappers
                                const IndexSet &ghost_indices,
                                const MPI_Comm  communicator)
   {
-    std::vector<types::global_dof_index> in_deal;
-    locally_owned_indices.fill_index_vector(in_deal);
+    // If the sizes of the index sets can be converted to PetscInts then every
+    // index can also be converted
+    AssertThrowIntegerConversion(static_cast<PetscInt>(
+                                   locally_owned_indices.size()),
+                                 locally_owned_indices.size());
+    AssertThrowIntegerConversion(static_cast<PetscInt>(ghost_indices.size()),
+                                 ghost_indices.size());
+
+    const auto            in_deal = locally_owned_indices.get_index_vector();
     std::vector<PetscInt> in_petsc(in_deal.begin(), in_deal.end());
 
-    std::vector<types::global_dof_index> out_deal;
-    ghost_indices.fill_index_vector(out_deal);
+    const auto            out_deal = ghost_indices.get_index_vector();
     std::vector<PetscInt> out_petsc(out_deal.begin(), out_deal.end());
 
     std::vector<PetscInt> dummy;
@@ -124,12 +136,14 @@ namespace PETScWrappers
       {
         if (i != numbers::invalid_dof_index)
           {
-            indices_has_clean.push_back(static_cast<PetscInt>(i));
+            const auto petsc_i = static_cast<PetscInt>(i);
+            AssertThrowIntegerConversion(i, petsc_i);
+            indices_has_clean.push_back(petsc_i);
             indices_has_loc.push_back(loc);
           }
         else
           has_invalid = true;
-        loc++;
+        ++loc;
       }
     if (!has_invalid)
       indices_has_loc.clear();
@@ -140,12 +154,14 @@ namespace PETScWrappers
       {
         if (i != numbers::invalid_dof_index)
           {
-            indices_want_clean.push_back(static_cast<PetscInt>(i));
+            const auto petsc_i = static_cast<PetscInt>(i);
+            AssertThrowIntegerConversion(i, petsc_i);
+            indices_want_clean.push_back(petsc_i);
             indices_want_loc.push_back(loc);
           }
         else
           has_invalid = true;
-        loc++;
+        ++loc;
       }
     if (!has_invalid)
       indices_want_loc.clear();
@@ -204,8 +220,12 @@ namespace PETScWrappers
     const PetscInt *ranges;
     AssertPETSc(PetscLayoutGetRanges(layout, &ranges));
 
-    PetscInt    cnt   = 0;
+    PetscInt cnt = 0;
+#  if DEAL_II_PETSC_VERSION_GTE(3, 13, 0)
     PetscMPIInt owner = 0;
+#  else
+    PetscInt owner = 0;
+#  endif
     for (const auto idx : inidx)
       {
         // short-circuit the search if the last owner owns this index too
@@ -215,7 +235,7 @@ namespace PETScWrappers
           }
         remotes[cnt].rank  = owner;
         remotes[cnt].index = idx - ranges[owner];
-        cnt++;
+        ++cnt;
       }
 
     AssertPETSc(PetscSFCreate(communicator, &sf2));
@@ -361,7 +381,7 @@ namespace PETScWrappers
     import_from_ghosted_array_finish(op, src, dst);
   }
 
-
+#  ifndef DOXYGEN
 
   // Partitioner
 
@@ -397,9 +417,6 @@ namespace PETScWrappers
                       const IndexSet &larger_ghost_indices,
                       const MPI_Comm  communicator)
   {
-    std::vector<types::global_dof_index> local_indices;
-    locally_owned_indices.fill_index_vector(local_indices);
-
     ghost_indices_data = ghost_indices;
     ghost_indices_data.subtract_set(locally_owned_indices);
     ghost_indices_data.compress();
@@ -416,7 +433,9 @@ namespace PETScWrappers
       }
 
     ghost.reinit(locally_owned_indices, ghost_indices_data, communicator);
-    larger_ghost.reinit(local_indices, expanded_ghost_indices, communicator);
+    larger_ghost.reinit(locally_owned_indices.get_index_vector(),
+                        expanded_ghost_indices,
+                        communicator);
     n_ghost_indices_data   = ghost_indices_data.n_elements();
     n_ghost_indices_larger = larger_ghost_indices.n_elements();
   }
@@ -510,11 +529,11 @@ namespace PETScWrappers
     import_from_ghosted_array_start(op, src, dst);
     import_from_ghosted_array_finish(op, src, dst);
   }
-
+#  endif
 } // namespace PETScWrappers
 
 // Explicit instantiations
-#  include "petsc_communication_pattern.inst"
+#  include "lac/petsc_communication_pattern.inst"
 
 DEAL_II_NAMESPACE_CLOSE
 

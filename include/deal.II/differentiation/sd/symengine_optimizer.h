@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2020 - 2023 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2020 - 2024 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE at
-// the top level of the deal.II distribution.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 #ifndef dealii_differentiation_sd_symengine_optimizer_h
 #define dealii_differentiation_sd_symengine_optimizer_h
@@ -34,7 +33,6 @@
 #  endif
 
 #  include <deal.II/base/exceptions.h>
-#  include <deal.II/base/logstream.h>
 #  include <deal.II/base/utilities.h>
 
 #  include <deal.II/differentiation/sd/symengine_number_types.h>
@@ -372,8 +370,8 @@ namespace Differentiation
       {
         static const bool is_supported = true;
 
-        using ReturnType = typename std::
-          conditional<std::is_same_v<ReturnType_, float>, float, double>::type;
+        using ReturnType =
+          std::conditional_t<std::is_same_v<ReturnType_, float>, float, double>;
       };
 
 
@@ -388,10 +386,10 @@ namespace Differentiation
       {
         static const bool is_supported = true;
 
-        using ReturnType = typename std::conditional<
-          std::is_same_v<ReturnType_, std::complex<float>>,
-          std::complex<float>,
-          std::complex<double>>::type;
+        using ReturnType =
+          std::conditional_t<std::is_same_v<ReturnType_, std::complex<float>>,
+                             std::complex<float>,
+                             std::complex<double>>;
       };
 
 
@@ -500,13 +498,13 @@ namespace Differentiation
                                ReturnType_>::is_supported>>
       {
         using ReturnType =
-          typename std::conditional<!boost::is_complex<ReturnType_>::value,
-                                    double,
-                                    std::complex<double>>::type;
-        using OptimizerType = typename std::conditional<
-          !boost::is_complex<ReturnType_>::value,
-          SymEngine::LambdaRealDoubleVisitor,
-          SymEngine::LambdaComplexDoubleVisitor>::type;
+          std::conditional_t<!boost::is_complex<ReturnType_>::value,
+                             double,
+                             std::complex<double>>;
+        using OptimizerType =
+          std::conditional_t<!boost::is_complex<ReturnType_>::value,
+                             SymEngine::LambdaRealDoubleVisitor,
+                             SymEngine::LambdaComplexDoubleVisitor>;
 
 
         /**
@@ -598,12 +596,12 @@ namespace Differentiation
       struct LLVMOptimizer<ReturnType_,
                            std::enable_if_t<std::is_arithmetic_v<ReturnType_>>>
       {
-        using ReturnType = typename std::
-          conditional<std::is_same_v<ReturnType_, float>, float, double>::type;
+        using ReturnType =
+          std::conditional_t<std::is_same_v<ReturnType_, float>, float, double>;
         using OptimizerType =
-          typename std::conditional<std::is_same_v<ReturnType_, float>,
-                                    SymEngine::LLVMFloatVisitor,
-                                    SymEngine::LLVMDoubleVisitor>::type;
+          std::conditional_t<std::is_same_v<ReturnType_, float>,
+                             SymEngine::LLVMFloatVisitor,
+                             SymEngine::LLVMDoubleVisitor>;
 
         /**
          * A flag to indicate if the ReturnType is supported by a
@@ -2273,14 +2271,12 @@ namespace Differentiation
       // Serialize enum classes...
       {
         const auto m =
-          static_cast<typename std::underlying_type<OptimizerType>::type>(
-            method);
+          static_cast<std::underlying_type_t<OptimizerType>>(method);
         ar &m;
       }
       {
         const auto f =
-          static_cast<typename std::underlying_type<OptimizationFlags>::type>(
-            flags);
+          static_cast<std::underlying_type_t<OptimizationFlags>>(flags);
         ar &f;
       }
 
@@ -2356,13 +2352,13 @@ namespace Differentiation
 
       // Deserialize enum classes...
       {
-        typename std::underlying_type<OptimizerType>::type m;
-        ar                                                &m;
+        std::underlying_type_t<OptimizerType> m;
+        ar                                   &m;
         method = static_cast<OptimizerType>(m);
       }
       {
-        typename std::underlying_type<OptimizationFlags>::type f;
-        ar                                                    &f;
+        std::underlying_type_t<OptimizationFlags> f;
+        ar                                       &f;
         flags = static_cast<OptimizationFlags>(f);
       }
 
@@ -2574,6 +2570,14 @@ namespace Differentiation
 } // namespace Differentiation
 
 
+DEAL_II_NAMESPACE_CLOSE
+
+#else
+
+// Make sure the scripts that create the C++20 module input files have
+// something to latch on if the preprocessor #ifdef above would
+// otherwise lead to an empty content of the file.
+DEAL_II_NAMESPACE_OPEN
 DEAL_II_NAMESPACE_CLOSE
 
 #endif // DEAL_II_WITH_SYMENGINE

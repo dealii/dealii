@@ -1,0 +1,24 @@
+470c470
+<     std::cout << "done (" << timer.cpu_time() << "s)" << std::endl;
+---
+>   //std::cout << "done (" << timer.cpu_time() << "s)" << std::endl;
+500c500
+<     std::cout << "done (" << timer.cpu_time() << "s)" << std::endl;
+---
+>   //std::cout << "done (" << timer.cpu_time() << "s)" << std::endl;
+729c729
+<     std::cout << "done (" << timer.cpu_time() << "s)" << std::endl;
+---
+>   //std::cout << "done (" << timer.cpu_time() << "s)" << std::endl;
+769c769
+<     std::cout << "done (" << timer.cpu_time() << "s)" << std::endl;
+---
+>   //std::cout << "done (" << timer.cpu_time() << "s)" << std::endl;
+851c851
+<     output_results();
+---
+>   //output_results();
+874c874
+<       param.read_parameters("step-29.prm");
+---
+>       param.read_parameters("../../../source/step-29/step-29.prm");

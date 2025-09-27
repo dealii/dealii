@@ -1,17 +1,16 @@
-/* ---------------------------------------------------------------------
+/* ------------------------------------------------------------------------
  *
- * Copyright (C) 2019 - 2023 by the deal.II authors
+ * SPDX-License-Identifier: LGPL-2.1-or-later
+ * Copyright (C) 2020 - 2024 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
- * The deal.II library is free software; you can use it, redistribute
- * it, and/or modify it under the terms of the GNU Lesser General
- * Public License as published by the Free Software Foundation; either
- * version 2.1 of the License, or (at your option) any later version.
- * The full text of the license can be found in the file LICENSE.md at
- * the top level directory of deal.II.
+ * Part of the source code is dual licensed under Apache-2.0 WITH
+ * LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+ * governing the source code and code contributions can be found in
+ * LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
  *
- * ---------------------------------------------------------------------
+ * ------------------------------------------------------------------------
  *
  * Authors: Matthias Maier, Texas A&M University;
  *          Ignacio Tomas, Texas A&M University, Sandia National Laboratories
@@ -45,7 +44,7 @@
 #include <deal.II/base/timer.h>
 #include <deal.II/base/work_stream.h>
 
-#include <deal.II/distributed/solution_transfer.h>
+#include <deal.II/numerics/solution_transfer.h>
 #include <deal.II/distributed/tria.h>
 
 #include <deal.II/dofs/dof_handler.h>
@@ -240,7 +239,7 @@ namespace Step69
     const MPI_Comm mpi_communicator;
     TimerOutput   &computing_timer;
 
-    SmartPointer<const Discretization<dim>> discretization;
+    ObserverPointer<const Discretization<dim>> discretization;
   };
 
   // @sect4{The <code>ProblemDescription</code> class}
@@ -402,8 +401,8 @@ namespace Step69
     const MPI_Comm mpi_communicator;
     TimerOutput   &computing_timer;
 
-    SmartPointer<const OfflineData<dim>>   offline_data;
-    SmartPointer<const InitialValues<dim>> initial_values;
+    ObserverPointer<const OfflineData<dim>>   offline_data;
+    ObserverPointer<const InitialValues<dim>> initial_values;
 
     SparseMatrix<double> dij_matrix;
 
@@ -455,7 +454,7 @@ namespace Step69
     const MPI_Comm mpi_communicator;
     TimerOutput   &computing_timer;
 
-    SmartPointer<const OfflineData<dim>> offline_data;
+    ObserverPointer<const OfflineData<dim>> offline_data;
 
     Vector<double> r;
 
@@ -2511,6 +2510,7 @@ namespace Step69
     for (auto &it : U)
       it.reinit(offline_data.partitioner);
 
+    // @anchor step_69-ResumeSection
     // @sect5{Resume}
     //
     // By default the boolean <code>resume</code> is set to false, i.e. the
@@ -2536,9 +2536,8 @@ namespace Step69
       {
         print_head(pcout, "resume interrupted computation");
 
-        parallel::distributed::
-          SolutionTransfer<dim, LinearAlgebra::distributed::Vector<double>>
-            solution_transfer(offline_data.dof_handler);
+        SolutionTransfer<dim, LinearAlgebra::distributed::Vector<double>>
+          solution_transfer(offline_data.dof_handler);
 
         std::vector<LinearAlgebra::distributed::Vector<double> *> vectors;
         std::transform(U.begin(),
@@ -2663,8 +2662,8 @@ namespace Step69
   // @sect5{Output and checkpointing}
 
   // We checkpoint the current state by doing the precise inverse
-  // operation to what we discussed for the <a href="Resume">resume
-  // logic</a>:
+  // operation to what we discussed for the
+  // @ref step_69-ResumeSection "resume logic":
 
   template <int dim>
   void MainLoop<dim>::checkpoint(const typename MainLoop<dim>::vector_type &U,
@@ -2674,9 +2673,8 @@ namespace Step69
   {
     print_head(pcout, "checkpoint computation");
 
-    parallel::distributed::
-      SolutionTransfer<dim, LinearAlgebra::distributed::Vector<double>>
-        solution_transfer(offline_data.dof_handler);
+    SolutionTransfer<dim, LinearAlgebra::distributed::Vector<double>>
+      solution_transfer(offline_data.dof_handler);
 
     std::vector<const LinearAlgebra::distributed::Vector<double> *> vectors;
     std::transform(U.begin(),

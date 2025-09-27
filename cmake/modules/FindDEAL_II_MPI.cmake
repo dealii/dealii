@@ -1,17 +1,16 @@
-## ---------------------------------------------------------------------
+## ------------------------------------------------------------------------
 ##
-## Copyright (C) 2012 - 2023 by the deal.II authors
+## SPDX-License-Identifier: LGPL-2.1-or-later
+## Copyright (C) 2014 - 2025 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
-## The deal.II library is free software; you can use it, redistribute
-## it, and/or modify it under the terms of the GNU Lesser General
-## Public License as published by the Free Software Foundation; either
-## version 2.1 of the License, or (at your option) any later version.
-## The full text of the license can be found in the file LICENSE.md at
-## the top level directory of deal.II.
+## Part of the source code is dual licensed under Apache-2.0 WITH
+## LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+## governing the source code and code contributions can be found in
+## LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 ##
-## ---------------------------------------------------------------------
+## ------------------------------------------------------------------------
 
 #
 # Find MPI
@@ -42,11 +41,20 @@ endif()
 # Call the system FindMPI.cmake module:
 #
 
-# in case MPIEXEC is specified first call find_program() so that in case of
-# success its subsequent runs inside find_package(MPI) do not alter the
-# desired result.
-if(DEFINED ENV{MPIEXEC})
-  find_program(MPIEXEC $ENV{MPIEXEC})
+#
+# Make sure we pick up the correct MPI implementation for the case that
+# environment variables MPIEXEC_EXECUTABLE, or MPIEXEC are set. If
+# MPIEXEC_EXECUTABLE is already set as a CMake variable simply ignore the
+# environment variables.
+#
+if(NOT MPIEXEC_EXECUTABLE)
+  if(DEFINED ENV{MPIEXEC_EXECUTABLE})
+    find_program(MPIEXEC_EXECUTABLE $ENV{MPIEXEC_EXECUTABLE})
+  elseif(DEFINED ENV{MPIEXEC})
+    find_program(MPIEXEC_EXECUTABLE $ENV{MPIEXEC})
+  endif()
+  # For backwards compatibility with old cmake versions:
+  set(MPIEXEC "${MPIEXEC_EXECUTABLE}")
 endif()
 
 find_package(MPI)
@@ -103,40 +111,42 @@ endif()
 # lld / ld.gold and missing libopen-pal.so on the link line:
 #
 
-check_compiler_setup(
-  "${DEAL_II_CXX_FLAGS_SAVED} ${DEAL_II_CXX_FLAGS}"
-  "${DEAL_II_LINKER_FLAGS_SAVED} ${DEAL_II_LINKER_FLAGS}"
-  MPI_UNDERLINKAGE_OK
-  ${MPI_CXX_LIBRARIES} ${MPI_Fortran_LIBRARIES} ${MPI_C_LIBRARIES}
-  )
-
-if(NOT MPI_UNDERLINKAGE_OK AND NOT "${MPI_CXX_LIBRARIES}" STREQUAL "")
-  # This check only works if MPI_CXX_LIBRARIES is non-empty, otherwise we will just give up
-  # and hope for the best...
-  message(STATUS "Trying to avoid underlinkage by expliclitly adding libopen-pal to link line")
-
-  list(GET MPI_CXX_LIBRARIES 0 _lib)
-  get_filename_component(_hint ${_lib} DIRECTORY)
-  deal_ii_find_library(_mpi_libopen_pal_library
-    NAMES open-pal
-    HINTS ${_hint}
-    NO_DEFAULT_PATH
-    NO_CMAKE_ENVIRONMENT_PATH
-    NO_CMAKE_PATH
-    NO_SYSTEM_ENVIRONMENT_PATH
-    NO_CMAKE_SYSTEM_PATH
-    NO_CMAKE_FIND_ROOT_PATH
+if (NOT CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
+  check_compiler_setup(
+    "${DEAL_II_CXX_FLAGS_SAVED} ${DEAL_II_CXX_FLAGS}"
+    "${DEAL_II_LINKER_FLAGS_SAVED} ${DEAL_II_LINKER_FLAGS}"
+    MPI_UNDERLINKAGE_OK
+    ${MPI_CXX_LIBRARIES} ${MPI_Fortran_LIBRARIES} ${MPI_C_LIBRARIES}
     )
 
-  #
-  # Note: We don't need to check whether the find library call is
-  # successful: If libopen-pal cannot be found then the
-  # process_feature will drop the library automatically.
-  #
-  # In this case the sanity check in cmake/setup_finalize.cmake will fail
-  # and we start dropping -fuse-ld=lld and -fuse-ld=ld.gold from the
-  # command line.
-  #
+  if(NOT MPI_UNDERLINKAGE_OK AND NOT "${MPI_CXX_LIBRARIES}" STREQUAL "")
+    # This check only works if MPI_CXX_LIBRARIES is non-empty, otherwise we will just give up
+    # and hope for the best...
+    message(STATUS "Trying to avoid underlinkage by expliclitly adding libopen-pal to link line")
+
+    list(GET MPI_CXX_LIBRARIES 0 _lib)
+    get_filename_component(_hint ${_lib} DIRECTORY)
+    deal_ii_find_library(_mpi_libopen_pal_library
+      NAMES open-pal
+      HINTS ${_hint}
+      NO_DEFAULT_PATH
+      NO_CMAKE_ENVIRONMENT_PATH
+      NO_CMAKE_PATH
+      NO_SYSTEM_ENVIRONMENT_PATH
+      NO_CMAKE_SYSTEM_PATH
+      NO_CMAKE_FIND_ROOT_PATH
+      )
+
+    #
+    # Note: We don't need to check whether the find library call is
+    # successful: If libopen-pal cannot be found then the
+    # process_feature will drop the library automatically.
+    #
+    # In this case the sanity check in cmake/setup_finalize.cmake will fail
+    # and we start dropping -fuse-ld=lld and -fuse-ld=ld.gold from the
+    # command line.
+    #
+  endif()
 endif()
 
 process_feature(MPI

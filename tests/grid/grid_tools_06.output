@@ -9,7 +9,7 @@ DEAL::
 DEAL::Triangulation: 1
 DEAL::face 1 :: 1.000 3.000 :: -1.000 3.000
 DEAL::face 2 :: -1.000 -3.000 :: 1.000 -3.000
-DEAL::orientation: 1  flip: 1  rotation: 0
+DEAL::orientation: 0  flip: 0  rotation: 0
 DEAL::
 DEAL::Test for 3D: Hypercube
 DEAL::

@@ -1,0 +1,5 @@
+975c975,976
+<     for (unsigned int cycle = 0; cycle < max_cycle; ++cycle)
+---
+>     (void)max_cycle;
+>     for (unsigned int cycle = 0; cycle < 5; ++cycle)

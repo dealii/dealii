@@ -1,0 +1,10 @@
+
+DEAL::Starting task in main()
+DEAL::  Starting task at the top
+DEAL::    Starting task in the middle
+DEAL::      Starting task at the bottom
+DEAL::        ... ... ...
+DEAL::      Ending task at the bottom
+DEAL::    Ending task in the middle
+DEAL::  Ending task at the top
+DEAL::Done in main

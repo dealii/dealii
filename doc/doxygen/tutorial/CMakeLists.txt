@@ -1,17 +1,15 @@
-## ---------------------------------------------------------------------
+## ------------------------------------------------------------------------
 ##
-## Copyright (C) 2012 - 2022 by the deal.II Authors
+## Copyright (C) 2012 - 2023 by the deal.II Authors
 ##
 ## This file is part of the deal.II library.
 ##
-## The deal.II library is free software; you can use it, redistribute
-## it, and/or modify it under the terms of the GNU Lesser General
-## Public License as published by the Free Software Foundation; either
-## version 2.1 of the License, or (at your option) any later version.
-## The full text of the license can be found in the file LICENSE.md at
-## the top level directory of deal.II.
+## Part of the source code is dual licensed under Apache-2.0 WITH
+## LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+## governing the source code and code contributions can be found in
+## LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 ##
-## ---------------------------------------------------------------------
+## ------------------------------------------------------------------------
 
 
 
@@ -117,11 +115,11 @@ foreach(_step ${_deal_ii_steps})
     OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/${_step}.cc
     COMMAND ${PERL_EXECUTABLE}
     ARGS
-      ${CMAKE_SOURCE_DIR}/doc/doxygen/scripts/program2plain
+      ${CMAKE_SOURCE_DIR}/doc/doxygen/scripts/program2plain.pl
       < ${CMAKE_SOURCE_DIR}/examples/${_step}/${_step}.cc
       > ${CMAKE_CURRENT_BINARY_DIR}/${_step}.cc
     DEPENDS
-      ${CMAKE_SOURCE_DIR}/doc/doxygen/scripts/program2plain
+      ${CMAKE_SOURCE_DIR}/doc/doxygen/scripts/program2plain.pl
       ${CMAKE_SOURCE_DIR}/examples/${_step}/${_step}.cc
     VERBATIM
     )
@@ -137,9 +135,9 @@ foreach(_step ${_deal_ii_steps})
       ${CMAKE_CURRENT_BINARY_DIR}
     DEPENDS
       ${CMAKE_SOURCE_DIR}/doc/doxygen/scripts/make_step.pl
-      ${CMAKE_SOURCE_DIR}/doc/doxygen/scripts/intro2toc
-      ${CMAKE_SOURCE_DIR}/doc/doxygen/scripts/create_anchors
-      ${CMAKE_SOURCE_DIR}/doc/doxygen/scripts/program2doxygen
+      ${CMAKE_SOURCE_DIR}/doc/doxygen/scripts/intro2toc.pl
+      ${CMAKE_SOURCE_DIR}/doc/doxygen/scripts/create_anchors.pl
+      ${CMAKE_SOURCE_DIR}/doc/doxygen/scripts/program2doxygen.pl
       ${CMAKE_SOURCE_DIR}/examples/${_step}/${_step}.cc
       ${CMAKE_SOURCE_DIR}/examples/${_step}/doc/intro.dox
       ${CMAKE_SOURCE_DIR}/examples/${_step}/doc/results.dox

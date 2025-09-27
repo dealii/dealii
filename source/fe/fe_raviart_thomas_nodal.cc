@@ -1,21 +1,20 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2003 - 2023 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2005 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 
 #include <deal.II/base/polynomial.h>
-#include <deal.II/base/polynomials_raviart_thomas.h>
+#include <deal.II/base/polynomials_vector_anisotropic.h>
 #include <deal.II/base/qprojector.h>
 #include <deal.II/base/quadrature_lib.h>
 
@@ -68,24 +67,30 @@ namespace
 template <int dim>
 FE_RaviartThomasNodal<dim>::FE_RaviartThomasNodal(const unsigned int degree)
   : FE_PolyTensor<dim>(
-      PolynomialsRaviartThomas<dim>(degree + 1, degree),
+      PolynomialsVectorAnisotropic<dim>(
+        degree + 1,
+        degree,
+        FE_RaviartThomas<dim>::get_lexicographic_numbering(degree)),
       FiniteElementData<dim>(get_rt_dpo_vector(dim, degree),
                              dim,
                              degree + 1,
                              FiniteElementData<dim>::Hdiv),
       std::vector<bool>(1, false),
       std::vector<ComponentMask>(
-        PolynomialsRaviartThomas<dim>::n_polynomials(degree + 1, degree),
+        PolynomialsVectorAnisotropic<dim>::n_polynomials(degree + 1, degree),
         ComponentMask(std::vector<bool>(dim, true))))
 {
   Assert(dim >= 2, ExcImpossibleInDim(dim));
 
   this->mapping_kind = {mapping_raviart_thomas};
 
+  const std::vector<unsigned int> numbering =
+    FE_RaviartThomas<dim>::get_lexicographic_numbering(degree);
+
   // First, initialize the generalized support points and quadrature weights,
   // since they are required for interpolation.
   this->generalized_support_points =
-    PolynomialsRaviartThomas<dim>(degree + 1, degree)
+    PolynomialsVectorAnisotropic<dim>(degree + 1, degree, numbering)
       .get_polynomial_support_points();
   AssertDimension(this->generalized_support_points.size(),
                   this->n_dofs_per_cell());
@@ -314,7 +319,7 @@ FE_RaviartThomasNodal<dim>::hp_vertex_dof_identities(
     return std::vector<std::pair<unsigned int, unsigned int>>();
   else
     {
-      Assert(false, ExcNotImplemented());
+      DEAL_II_NOT_IMPLEMENTED();
       return std::vector<std::pair<unsigned int, unsigned int>>();
     }
 }
@@ -370,7 +375,7 @@ FE_RaviartThomasNodal<dim>::hp_line_dof_identities(
     }
   else
     {
-      Assert(false, ExcNotImplemented());
+      DEAL_II_NOT_IMPLEMENTED();
       return std::vector<std::pair<unsigned int, unsigned int>>();
     }
 }
@@ -416,7 +421,7 @@ FE_RaviartThomasNodal<dim>::hp_quad_dof_identities(
     }
   else
     {
-      Assert(false, ExcNotImplemented());
+      DEAL_II_NOT_IMPLEMENTED();
       return std::vector<std::pair<unsigned int, unsigned int>>();
     }
 }
@@ -455,7 +460,7 @@ FE_RaviartThomasNodal<dim>::compare_for_domination(
         return FiniteElementDomination::no_requirements;
     }
 
-  Assert(false, ExcNotImplemented());
+  DEAL_II_NOT_IMPLEMENTED();
   return FiniteElementDomination::neither_element_dominates;
 }
 
@@ -535,7 +540,8 @@ FE_RaviartThomasNodal<dim>::get_face_interpolation_matrix(
   const Quadrature<dim> face_projection =
     QProjector<dim>::project_to_face(this->reference_cell(),
                                      quad_face_support,
-                                     0);
+                                     0,
+                                     numbers::default_geometric_orientation);
 
   for (unsigned int i = 0; i < source_fe.n_dofs_per_face(face_no); ++i)
     {
@@ -558,20 +564,21 @@ FE_RaviartThomasNodal<dim>::get_face_interpolation_matrix(
         }
     }
 
-#ifdef DEBUG
-  // make sure that the row sum of each of the matrices is 1 at this
-  // point. this must be so since the shape functions sum up to 1
-  for (unsigned int j = 0; j < source_fe.n_dofs_per_face(face_no); ++j)
+  if constexpr (running_in_debug_mode())
     {
-      double sum = 0.;
+      // make sure that the row sum of each of the matrices is 1 at this
+      // point. this must be so since the shape functions sum up to 1
+      for (unsigned int j = 0; j < source_fe.n_dofs_per_face(face_no); ++j)
+        {
+          double sum = 0.;
 
-      for (unsigned int i = 0; i < this->n_dofs_per_face(face_no); ++i)
-        sum += interpolation_matrix(j, i);
+          for (unsigned int i = 0; i < this->n_dofs_per_face(face_no); ++i)
+            sum += interpolation_matrix(j, i);
 
-      Assert(std::fabs(sum - 1) < 2e-13 * this->degree * (dim - 1),
-             ExcInternalError());
+          Assert(std::fabs(sum - 1) < 2e-13 * this->degree * (dim - 1),
+                 ExcInternalError());
+        }
     }
-#endif
 }
 
 
@@ -623,10 +630,13 @@ FE_RaviartThomasNodal<dim>::get_subface_interpolation_matrix(
   // compute the interpolation matrix by simply taking the value at the
   // support points.
   const Quadrature<dim> subface_projection =
-    QProjector<dim>::project_to_subface(this->reference_cell(),
-                                        quad_face_support,
-                                        0,
-                                        subface);
+    QProjector<dim>::project_to_subface(
+      this->reference_cell(),
+      quad_face_support,
+      0,
+      subface,
+      numbers::default_geometric_orientation,
+      RefinementCase<dim - 1>::isotropic_refinement);
 
   for (unsigned int i = 0; i < source_fe.n_dofs_per_face(face_no); ++i)
     {
@@ -649,20 +659,21 @@ FE_RaviartThomasNodal<dim>::get_subface_interpolation_matrix(
         }
     }
 
-#ifdef DEBUG
-  // make sure that the row sum of each of the matrices is 1 at this
-  // point. this must be so since the shape functions sum up to 1
-  for (unsigned int j = 0; j < source_fe.n_dofs_per_face(face_no); ++j)
+  if constexpr (running_in_debug_mode())
     {
-      double sum = 0.;
+      // make sure that the row sum of each of the matrices is 1 at this
+      // point. this must be so since the shape functions sum up to 1
+      for (unsigned int j = 0; j < source_fe.n_dofs_per_face(face_no); ++j)
+        {
+          double sum = 0.;
 
-      for (unsigned int i = 0; i < this->n_dofs_per_face(face_no); ++i)
-        sum += interpolation_matrix(j, i);
+          for (unsigned int i = 0; i < this->n_dofs_per_face(face_no); ++i)
+            sum += interpolation_matrix(j, i);
 
-      Assert(std::fabs(sum - 1) < 2e-13 * this->degree * (dim - 1),
-             ExcInternalError());
+          Assert(std::fabs(sum - 1) < 2e-13 * this->degree * (dim - 1),
+                 ExcInternalError());
+        }
     }
-#endif
 }
 
 
@@ -678,12 +689,13 @@ FE_RaviartThomasNodal<dim>::get_prolongation_matrix(
   Assert(refinement_case != RefinementCase<dim>::no_refinement,
          ExcMessage(
            "Prolongation matrices are only available for refined cells!"));
-  AssertIndexRange(child, GeometryInfo<dim>::n_children(refinement_case));
+  AssertIndexRange(
+    child, this->reference_cell().template n_children<dim>(refinement_case));
 
   // initialization upon first request
   if (this->prolongation[refinement_case - 1][child].n() == 0)
     {
-      std::lock_guard<std::mutex> lock(this->mutex);
+      std::lock_guard<std::mutex> lock(prolongation_matrix_mutex);
 
       // if matrix got updated while waiting for the lock
       if (this->prolongation[refinement_case - 1][child].n() ==
@@ -699,12 +711,13 @@ FE_RaviartThomasNodal<dim>::get_prolongation_matrix(
           std::vector<std::vector<FullMatrix<double>>> isotropic_matrices(
             RefinementCase<dim>::isotropic_refinement);
           isotropic_matrices.back().resize(
-            GeometryInfo<dim>::n_children(RefinementCase<dim>(refinement_case)),
+            this->reference_cell().template n_children<dim>(
+              RefinementCase<dim>(refinement_case)),
             FullMatrix<double>(this->n_dofs_per_cell(),
                                this->n_dofs_per_cell()));
           FETools::compute_embedding_matrices(*this, isotropic_matrices, true);
-          this_nonconst.prolongation[refinement_case - 1].swap(
-            isotropic_matrices.back());
+          this_nonconst.prolongation[refinement_case - 1] =
+            std::move(isotropic_matrices.back());
         }
       else
         {
@@ -736,12 +749,13 @@ FE_RaviartThomasNodal<dim>::get_restriction_matrix(
   Assert(refinement_case != RefinementCase<dim>::no_refinement,
          ExcMessage(
            "Restriction matrices are only available for refined cells!"));
-  AssertIndexRange(child, GeometryInfo<dim>::n_children(refinement_case));
+  AssertIndexRange(
+    child, this->reference_cell().template n_children<dim>(refinement_case));
 
   // initialization upon first request
   if (this->restriction[refinement_case - 1][child].n() == 0)
     {
-      std::lock_guard<std::mutex> lock(this->mutex);
+      std::lock_guard<std::mutex> lock(restriction_matrix_mutex);
 
       // if matrix got updated while waiting for the lock...
       if (this->restriction[refinement_case - 1][child].n() ==
@@ -757,12 +771,13 @@ FE_RaviartThomasNodal<dim>::get_restriction_matrix(
           std::vector<std::vector<FullMatrix<double>>> isotropic_matrices(
             RefinementCase<dim>::isotropic_refinement);
           isotropic_matrices.back().resize(
-            GeometryInfo<dim>::n_children(RefinementCase<dim>(refinement_case)),
+            this->reference_cell().template n_children<dim>(
+              RefinementCase<dim>(refinement_case)),
             FullMatrix<double>(this->n_dofs_per_cell(),
                                this->n_dofs_per_cell()));
           FETools::compute_projection_matrices(*this, isotropic_matrices, true);
-          this_nonconst.restriction[refinement_case - 1].swap(
-            isotropic_matrices.back());
+          this_nonconst.restriction[refinement_case - 1] =
+            std::move(isotropic_matrices.back());
         }
       else
         {
@@ -784,7 +799,7 @@ FE_RaviartThomasNodal<dim>::get_restriction_matrix(
 
 
 // explicit instantiations
-#include "fe_raviart_thomas_nodal.inst"
+#include "fe/fe_raviart_thomas_nodal.inst"
 
 
 DEAL_II_NAMESPACE_CLOSE

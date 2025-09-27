@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2023 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2023 - 2024 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 /*
  * Test if FEPointEval::evaluate() works for FESystems with FE_Q and FE_DGQ
@@ -35,7 +34,6 @@
 
 #include "../tests.h"
 
-using namespace dealii;
 
 template <int dim>
 class AnalyticalFunction : public Function<dim>
@@ -80,8 +78,8 @@ test(const FiniteElement<dim> &fe)
     std::vector<Quadrature<dim - 1>>(4, QGauss<dim - 1>(7)));
   dealii::NonMatching::MappingInfo<dim> mapping_info(mapping, update_values);
   mapping_info.reinit_faces(tria.active_cell_iterators(), quad_vec);
-  FEPointEvaluation<dim - first_selected_component, dim, dim, Number>
-    fe_point_eval(mapping_info, fe, first_selected_component);
+  FEFacePointEvaluation<dim - first_selected_component, dim, dim, Number>
+    fe_point_eval(mapping_info, fe, true, first_selected_component);
 
   std::vector<Number> buffer(fe.dofs_per_cell);
 
@@ -93,7 +91,7 @@ test(const FiniteElement<dim> &fe)
 
   fe_point_eval.evaluate(buffer, EvaluationFlags::values);
 
-  for (unsigned int q : fe_point_eval.quadrature_point_indices())
+  for (const unsigned int q : fe_point_eval.quadrature_point_indices())
     {
       deallog << "Value at q " << q << ": " << fe_point_eval.get_value(q)
               << std::endl;

@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 1999 - 2022 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 1999 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 
 #ifndef dealii_sparse_ilu_h
@@ -47,7 +46,7 @@ DEAL_II_NAMESPACE_OPEN
  *
  * Refer to SparseLUDecomposition documentation for suggested usage and state
  * management. This class is used in the
- * @ref step_22 "step-22"
+ * step-22
  * tutorial program.
  *
  * @note Instantiations for this template are provided for <tt>@<float@> and
@@ -113,8 +112,8 @@ public:
 
 
   /**
-   * Apply the transpose of the incomplete decomposition, i.e. do one forward-
-   * backward step $dst=(LU)^{-T}src$.
+   * Apply the transpose of the incomplete decomposition, i.e. do one
+   * forward-backward step $dst=(LU)^{-T}src$.
    *
    * The initialize() function needs to be called before.
    */
@@ -148,11 +147,30 @@ public:
   DeclException1(ExcZeroPivot,
                  size_type,
                  << "While computing the ILU decomposition, the algorithm "
-                    "found a zero pivot on the diagonal of row "
+                    "found a zero entry on the diagonal of row "
                  << arg1
-                 << ". This must stop the ILU algorithm because it means "
-                    "that the matrix for which you try to compute a "
-                    "decomposition is singular.");
+                 << ". The algorithm can not recover from this because it "
+                    "wants to divide by this diagonal entry."
+                    "\n\n"
+                    "There are several reasons why this could be happening. "
+                    "First, the matrix for which you try to compute a "
+                    "decomposition might be singular. Second, the order in "
+                    "which the algorithm considers might lead it to find "
+                    "a zero diagonal entry even though different pivoting "
+                    "strategies might not; the current implementation does "
+                    "not do any pivoting (i.e., it works on rows/columns "
+                    "in their natural order), and so you will trigger "
+                    "this error if, for example, you have a zero in the "
+                    "(0,0) entry of the matrix, even though this does "
+                    "not imply that the matrix is singular."
+                    "\n\n"
+                    "It is possible that you can avoid the error if "
+                    "you re-order degrees of freedom (using "
+                    "the functions in namespace DoFRenumbering). You may "
+                    "also want to consider \"strengthening the diagonal\", "
+                    "using the AdditionalData::strengthen_diagonal parameter "
+                    "you can set in the optional constructor argument of "
+                    "this class.");
   /** @} */
 };
 

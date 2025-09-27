@@ -1,32 +1,39 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2005 - 2023 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2009 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 #include <deal.II/base/index_set.h>
 #include <deal.II/base/memory_consumption.h>
 #include <deal.II/base/mpi.h>
 
 #include <deal.II/lac/exceptions.h>
+#include <deal.II/lac/trilinos_tpetra_types.h>
+
+#include <boost/container/small_vector.hpp>
 
 #include <vector>
 
 #ifdef DEAL_II_WITH_TRILINOS
+DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
 #  ifdef DEAL_II_WITH_MPI
 #    include <Epetra_MpiComm.h>
 #  endif
 #  include <Epetra_Map.h>
 #  include <Epetra_SerialComm.h>
+#  ifdef DEAL_II_TRILINOS_WITH_TPETRA
+#    include <Tpetra_Map.hpp>
+#  endif
+DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
 #endif
 
 DEAL_II_NAMESPACE_OPEN
@@ -34,6 +41,42 @@ DEAL_II_NAMESPACE_OPEN
 
 
 #ifdef DEAL_II_WITH_TRILINOS
+
+#  ifdef DEAL_II_TRILINOS_WITH_TPETRA
+
+template <typename NodeType>
+IndexSet::IndexSet(
+  const Teuchos::RCP<
+    const Tpetra::Map<int, types::signed_global_dof_index, NodeType>> &map)
+  : is_compressed(true)
+  , index_space_size(1 + map->getMaxAllGlobalIndex())
+  , largest_range(numbers::invalid_unsigned_int)
+{
+  Assert(map->getMinAllGlobalIndex() == 0,
+         ExcMessage(
+           "The Tpetra::Map does not contain the global index 0, "
+           "which means some entries are not present on any processor."));
+
+  // For a contiguous map, we do not need to go through the whole data...
+  if (map->isContiguous())
+    add_range(size_type(map->getMinGlobalIndex()),
+              size_type(map->getMaxGlobalIndex() + 1));
+  else
+    {
+#    if DEAL_II_TRILINOS_VERSION_GTE(13, 4, 0)
+      const size_type n_indices = map->getLocalNumElements();
+#    else
+      const size_type n_indices = map->getNodeNumElements();
+#    endif
+      const types::signed_global_dof_index *indices =
+        map->getMyGlobalIndices().data();
+      add_indices(indices, indices + n_indices);
+    }
+  compress();
+}
+
+#  endif // DEAL_II_TRILINOS_WITH_TPETRA
+
 
 // the 64-bit path uses a few different names, so put that into a separate
 // implementation
@@ -161,22 +204,24 @@ IndexSet::do_compress() const
     Assert(next_index == n_elements(), ExcInternalError());
   }
 
-#ifdef DEBUG
-  // A consistency check: We should only ever have added indices
-  // that are within the range of the index set. Instead of doing
-  // this in every one of the many functions that add indices,
-  // do this in the current, central location
-  for (const auto &range : ranges)
-    Assert((range.begin < index_space_size) && (range.end <= index_space_size),
-           ExcMessage("In the process of creating the current IndexSet "
-                      "object, you added indices beyond the size of the index "
-                      "space. Specifically, you added elements that form the "
-                      "range [" +
-                      std::to_string(range.begin) + "," +
-                      std::to_string(range.end) +
-                      "), but the size of the index space is only " +
-                      std::to_string(index_space_size) + "."));
-#endif
+  if constexpr (running_in_debug_mode())
+    {
+      // A consistency check: We should only ever have added indices
+      // that are within the range of the index set. Instead of doing
+      // this in every one of the many functions that add indices,
+      // do this in the current, central location
+      for (const auto &range : ranges)
+        Assert((range.begin < index_space_size) &&
+                 (range.end <= index_space_size),
+               ExcMessage(
+                 "In the process of creating the current IndexSet "
+                 "object, you added indices beyond the size of the index "
+                 "space. Specifically, you added elements that form the "
+                 "range [" +
+                 std::to_string(range.begin) + "," + std::to_string(range.end) +
+                 "), but the size of the index space is only " +
+                 std::to_string(index_space_size) + "."));
+    }
 }
 
 
@@ -235,7 +280,13 @@ IndexSet::get_view(const size_type begin, const size_type end) const
 {
   Assert(begin <= end,
          ExcMessage("End index needs to be larger or equal to begin index!"));
-  Assert(end <= size(), ExcMessage("Given range exceeds index set dimension"));
+  Assert(end <= size(),
+         ExcMessage("You are asking for a view into an IndexSet object "
+                    "that would cover the sub-range [" +
+                    std::to_string(begin) + ',' + std::to_string(end) +
+                    "). But this is not a subset of the range "
+                    "of the current object, which is [0," +
+                    std::to_string(size()) + ")."));
 
   IndexSet                           result(end - begin);
   std::vector<Range>::const_iterator r1 = ranges.begin();
@@ -257,6 +308,144 @@ IndexSet::get_view(const size_type begin, const size_type end) const
   return result;
 }
 
+
+
+IndexSet
+IndexSet::get_view(const IndexSet &mask) const
+{
+  Assert(size() == mask.size(),
+         ExcMessage("The mask must have the same size index space "
+                    "as the index set it is applied to."));
+
+  // If 'other' is an empty set, then the view is also empty:
+  if (mask == IndexSet())
+    return {};
+
+  // For everything, it is more efficient to work on compressed sets:
+  compress();
+  mask.compress();
+
+  // If 'other' has a single range, then we can just defer to the
+  // previous function
+  if (mask.ranges.size() == 1)
+    return get_view(mask.ranges[0].begin, mask.ranges[0].end);
+
+  // For the general case where the mask is an arbitrary set,
+  // the situation is slightly more complicated. We need to walk
+  // the ranges of the two index sets in parallel and search for
+  // overlaps, and then appropriately shift
+
+  // we save all new ranges to our IndexSet in an temporary vector and
+  // add all of them in one go at the end.
+  std::vector<Range> new_ranges;
+
+  std::vector<Range>::iterator own_it  = ranges.begin();
+  std::vector<Range>::iterator mask_it = mask.ranges.begin();
+
+  while ((own_it != ranges.end()) && (mask_it != mask.ranges.end()))
+    {
+      // If our own range lies completely ahead of the current
+      // range in the mask, move forward and start the loop body
+      // anew. If this was the last range, the 'while' loop above
+      // will terminate, so we don't have to check for end iterators
+      if (own_it->end <= mask_it->begin)
+        {
+          ++own_it;
+          continue;
+        }
+
+      // Do the same if the current mask range lies completely ahead of
+      // the current range of the this object:
+      if (mask_it->end <= own_it->begin)
+        {
+          ++mask_it;
+          continue;
+        }
+
+      // Now own_it and other_it overlap. Check that that is true by
+      // enumerating the cases that can happen. This is
+      // surprisingly tricky because the two intervals can intersect in
+      // a number of different ways, but there really are only the four
+      // following possibilities:
+
+      // Case 1: our interval overlaps the left end of the other interval
+      //
+      // So we need to add the elements from the first element of the mask's
+      // interval to the end of our own interval. But we need to shift the
+      // indices so that they correspond to the how many'th element within the
+      // mask this is; fortunately (because we compressed the mask), this
+      // is recorded in the mask's ranges.
+      if ((own_it->begin <= mask_it->begin) && (own_it->end <= mask_it->end))
+        {
+          new_ranges.emplace_back(mask_it->begin - mask_it->nth_index_in_set,
+                                  own_it->end - mask_it->nth_index_in_set);
+        }
+      else
+        // Case 2:our interval overlaps the tail end of the other interval
+        if ((mask_it->begin <= own_it->begin) && (mask_it->end <= own_it->end))
+          {
+            const size_type offset_within_mask_interval =
+              own_it->begin - mask_it->begin;
+            new_ranges.emplace_back(mask_it->nth_index_in_set +
+                                      offset_within_mask_interval,
+                                    mask_it->nth_index_in_set +
+                                      (mask_it->end - mask_it->begin));
+          }
+        else
+          // Case 3: Our own interval completely encloses the other interval
+          if ((own_it->begin <= mask_it->begin) &&
+              (own_it->end >= mask_it->end))
+            {
+              new_ranges.emplace_back(mask_it->begin -
+                                        mask_it->nth_index_in_set,
+                                      mask_it->end - mask_it->nth_index_in_set);
+            }
+          else
+            // Case 3: The other interval completely encloses our own interval
+            if ((mask_it->begin <= own_it->begin) &&
+                (mask_it->end >= own_it->end))
+              {
+                const size_type offset_within_mask_interval =
+                  own_it->begin - mask_it->begin;
+                new_ranges.emplace_back(mask_it->nth_index_in_set +
+                                          offset_within_mask_interval,
+                                        mask_it->nth_index_in_set +
+                                          offset_within_mask_interval +
+                                          (own_it->end - own_it->begin));
+              }
+            else
+              DEAL_II_ASSERT_UNREACHABLE();
+
+      // We considered the overlap of these two intervals. It may of course
+      // be that one of them overlaps with another one, but that can only
+      // be the case for the interval that extends further to the right. So
+      // we can safely move on from the interval that terminates earlier:
+      if (own_it->end < mask_it->end)
+        ++own_it;
+      else if (mask_it->end < own_it->end)
+        ++mask_it;
+      else
+        {
+          // The intervals ended at the same point. We can move on from both.
+          // (The algorithm would also work if we only moved on from one,
+          // but we can micro-optimize here without too much effort.)
+          ++own_it;
+          ++mask_it;
+        }
+    }
+
+  // Now turn the ranges of overlap we have accumulated into an IndexSet in
+  // its own right:
+  IndexSet result(mask.n_elements());
+  for (const auto &range : new_ranges)
+    result.add_range(range.begin, range.end);
+  result.compress();
+
+  return result;
+}
+
+
+
 std::vector<IndexSet>
 IndexSet::split_by_block(
   const std::vector<types::global_dof_index> &n_indices_per_block) const
@@ -272,17 +461,20 @@ IndexSet::split_by_block(
       start += n_block_indices;
     }
 
-#ifdef DEBUG
-  types::global_dof_index sum = 0;
-  for (const auto &partition : partitioned)
+  if constexpr (running_in_debug_mode())
     {
-      sum += partition.size();
+      types::global_dof_index sum = 0;
+      for (const auto &partition : partitioned)
+        {
+          sum += partition.size();
+        }
+      AssertDimension(sum, this->size());
     }
-  AssertDimension(sum, this->size());
-#endif
 
   return partitioned;
 }
+
+
 
 void
 IndexSet::subtract_set(const IndexSet &other)
@@ -520,6 +712,13 @@ IndexSet::add_indices(const IndexSet &other, const size_type offset)
 bool
 IndexSet::is_subset_of(const IndexSet &other) const
 {
+  Assert(size() == other.size(),
+         ExcMessage("One index set can only be a subset of another if they "
+                    "describe index spaces of the same size. The ones in "
+                    "question here have sizes " +
+                    std::to_string(size()) + " and " +
+                    std::to_string(other.size()) + "."));
+
   // See whether there are indices in the current set that are not in 'other'.
   // If so, then this is clearly not a subset of 'other'.
   IndexSet A_minus_B = *this;
@@ -749,62 +948,68 @@ IndexSet::get_index_vector() const
 
 
 
-void
-IndexSet::fill_index_vector(std::vector<size_type> &indices) const
+#ifdef DEAL_II_WITH_TRILINOS
+#  ifdef DEAL_II_TRILINOS_WITH_TPETRA
+
+template <typename NodeType>
+Tpetra::Map<int, types::signed_global_dof_index, NodeType>
+IndexSet::make_tpetra_map(const MPI_Comm communicator,
+                          const bool     overlapping) const
 {
-  indices = get_index_vector();
+  return *make_tpetra_map_rcp<NodeType>(communicator, overlapping);
 }
 
 
 
-#ifdef DEAL_II_WITH_TRILINOS
-#  ifdef DEAL_II_TRILINOS_WITH_TPETRA
-
-Tpetra::Map<int, types::signed_global_dof_index>
-IndexSet::make_tpetra_map(const MPI_Comm communicator,
-                          const bool     overlapping) const
+template <typename NodeType>
+Teuchos::RCP<Tpetra::Map<int, types::signed_global_dof_index, NodeType>>
+IndexSet::make_tpetra_map_rcp(const MPI_Comm communicator,
+                              const bool     overlapping) const
 {
   compress();
   (void)communicator;
 
-#    ifdef DEBUG
-  if (!overlapping)
+  if constexpr (running_in_debug_mode())
     {
-      const size_type n_global_elements =
-        Utilities::MPI::sum(n_elements(), communicator);
-      Assert(n_global_elements == size(),
-             ExcMessage("You are trying to create an Tpetra::Map object "
-                        "that partitions elements of an index set "
-                        "between processors. However, the union of the "
-                        "index sets on different processors does not "
-                        "contain all indices exactly once: the sum of "
-                        "the number of entries the various processors "
-                        "want to store locally is " +
-                        std::to_string(n_global_elements) +
-                        " whereas the total size of the object to be "
-                        "allocated is " +
-                        std::to_string(size()) +
-                        ". In other words, there are "
-                        "either indices that are not spoken for "
-                        "by any processor, or there are indices that are "
-                        "claimed by multiple processors."));
+      if (!overlapping)
+        {
+          const size_type n_global_elements =
+            Utilities::MPI::sum(n_elements(), communicator);
+          Assert(n_global_elements == size(),
+                 ExcMessage("You are trying to create an Tpetra::Map object "
+                            "that partitions elements of an index set "
+                            "between processors. However, the union of the "
+                            "index sets on different processors does not "
+                            "contain all indices exactly once: the sum of "
+                            "the number of entries the various processors "
+                            "want to store locally is " +
+                            std::to_string(n_global_elements) +
+                            " whereas the total size of the object to be "
+                            "allocated is " +
+                            std::to_string(size()) +
+                            ". In other words, there are "
+                            "either indices that are not spoken for "
+                            "by any processor, or there are indices that are "
+                            "claimed by multiple processors."));
+        }
     }
-#    endif
 
   // Find out if the IndexSet is ascending and 1:1. This corresponds to a
   // linear Tpetra::Map. Overlapping IndexSets are never 1:1.
   const bool linear =
     overlapping ? false : is_ascending_and_one_to_one(communicator);
   if (linear)
-    return Tpetra::Map<int, types::signed_global_dof_index>(
+    return Utilities::Trilinos::internal::make_rcp<
+      Tpetra::Map<int, types::signed_global_dof_index, NodeType>>(
       size(),
       n_elements(),
       0,
 #    ifdef DEAL_II_WITH_MPI
-      Teuchos::rcp(new Teuchos::MpiComm<int>(communicator))
+      Utilities::Trilinos::internal::make_rcp<Teuchos::MpiComm<int>>(
+        communicator)
 #    else
-      Teuchos::rcp(new Teuchos::Comm<int>())
-#    endif
+      Utilities::Trilinos::internal::make_rcp<Teuchos::Comm<int>>()
+#    endif // DEAL_II_WITH_MPI
     );
   else
     {
@@ -813,15 +1018,18 @@ IndexSet::make_tpetra_map(const MPI_Comm communicator,
       std::copy(indices.begin(), indices.end(), int_indices.begin());
       const Teuchos::ArrayView<types::signed_global_dof_index> arr_view(
         int_indices);
-      return Tpetra::Map<int, types::signed_global_dof_index>(
+
+      return Utilities::Trilinos::internal::make_rcp<
+        Tpetra::Map<int, types::signed_global_dof_index, NodeType>>(
         size(),
         arr_view,
         0,
 #    ifdef DEAL_II_WITH_MPI
-        Teuchos::rcp(new Teuchos::MpiComm<int>(communicator))
+        Utilities::Trilinos::internal::make_rcp<Teuchos::MpiComm<int>>(
+          communicator)
 #    else
-        Teuchos::rcp(new Teuchos::Comm<int>())
-#    endif
+        Utilities::Trilinos::internal::make_rcp<Teuchos::Comm<int>>()
+#    endif // DEAL_II_WITH_MPI
       );
     }
 }
@@ -836,29 +1044,30 @@ IndexSet::make_trilinos_map(const MPI_Comm communicator,
   compress();
   (void)communicator;
 
-#  ifdef DEBUG
-  if (!overlapping)
+  if constexpr (running_in_debug_mode())
     {
-      const size_type n_global_elements =
-        Utilities::MPI::sum(n_elements(), communicator);
-      Assert(n_global_elements == size(),
-             ExcMessage("You are trying to create an Epetra_Map object "
-                        "that partitions elements of an index set "
-                        "between processors. However, the union of the "
-                        "index sets on different processors does not "
-                        "contain all indices exactly once: the sum of "
-                        "the number of entries the various processors "
-                        "want to store locally is " +
-                        std::to_string(n_global_elements) +
-                        " whereas the total size of the object to be "
-                        "allocated is " +
-                        std::to_string(size()) +
-                        ". In other words, there are "
-                        "either indices that are not spoken for "
-                        "by any processor, or there are indices that are "
-                        "claimed by multiple processors."));
+      if (!overlapping)
+        {
+          const size_type n_global_elements =
+            Utilities::MPI::sum(n_elements(), communicator);
+          Assert(n_global_elements == size(),
+                 ExcMessage("You are trying to create an Epetra_Map object "
+                            "that partitions elements of an index set "
+                            "between processors. However, the union of the "
+                            "index sets on different processors does not "
+                            "contain all indices exactly once: the sum of "
+                            "the number of entries the various processors "
+                            "want to store locally is " +
+                            std::to_string(n_global_elements) +
+                            " whereas the total size of the object to be "
+                            "allocated is " +
+                            std::to_string(size()) +
+                            ". In other words, there are "
+                            "either indices that are not spoken for "
+                            "by any processor, or there are indices that are "
+                            "claimed by multiple processors."));
+        }
     }
-#  endif
 
   // Find out if the IndexSet is ascending and 1:1. This corresponds to a
   // linear EpetraMap. Overlapping IndexSets are never 1:1.
@@ -901,15 +1110,27 @@ IndexSet::make_trilinos_map(const MPI_Comm communicator,
 IS
 IndexSet::make_petsc_is(const MPI_Comm communicator) const
 {
-  std::vector<size_type> indices;
-  fill_index_vector(indices);
+  const std::vector<size_type> indices = get_index_vector();
 
-  PetscInt              n = indices.size();
-  std::vector<PetscInt> pindices(indices.begin(), indices.end());
+  // If the size of the index set can be converted to a PetscInt then every
+  // value can also be converted
+  AssertThrowIntegerConversion(static_cast<PetscInt>(size()), size());
+  const auto local_size = static_cast<PetscInt>(n_elements());
+  AssertIntegerConversion(local_size, n_elements());
+
+  size_type             i = 0;
+  std::vector<PetscInt> petsc_indices(n_elements());
+  for (const auto &index : *this)
+    {
+      const auto petsc_index = static_cast<PetscInt>(index);
+      AssertIntegerConversion(petsc_index, index);
+      petsc_indices[i] = petsc_index;
+      ++i;
+    }
 
   IS             is;
-  PetscErrorCode ierr =
-    ISCreateGeneral(communicator, n, pindices.data(), PETSC_COPY_VALUES, &is);
+  PetscErrorCode ierr = ISCreateGeneral(
+    communicator, local_size, petsc_indices.data(), PETSC_COPY_VALUES, &is);
   AssertThrow(ierr == 0, ExcPETScError(ierr));
 
   return is;
@@ -993,6 +1214,64 @@ IndexSet::memory_consumption() const
           sizeof(compress_mutex));
 }
 
+// explicit template instantiations
 
+#ifndef DOXYGEN
+#  ifdef DEAL_II_WITH_TRILINOS
+#    ifdef DEAL_II_TRILINOS_WITH_TPETRA
+
+template IndexSet::IndexSet(
+  const Teuchos::RCP<const Tpetra::Map<
+    int,
+    types::signed_global_dof_index,
+    LinearAlgebra::TpetraWrappers::TpetraTypes::NodeType<MemorySpace::Host>>>
+    &);
+
+#      if defined(KOKKOS_ENABLE_CUDA) || defined(KOKKOS_ENABLE_HIP) || \
+        defined(KOKKOS_ENABLE_SYCL)
+template IndexSet::IndexSet(
+  const Teuchos::RCP<const Tpetra::Map<
+    int,
+    types::signed_global_dof_index,
+    LinearAlgebra::TpetraWrappers::TpetraTypes::NodeType<MemorySpace::Default>>>
+    &);
+#      endif
+
+template LinearAlgebra::TpetraWrappers::TpetraTypes::MapType<MemorySpace::Host>
+dealii::IndexSet::make_tpetra_map<
+  LinearAlgebra::TpetraWrappers::TpetraTypes::NodeType<MemorySpace::Host>>(
+  const MPI_Comm,
+  bool) const;
+
+#      if defined(KOKKOS_ENABLE_CUDA) || defined(KOKKOS_ENABLE_HIP) || \
+        defined(KOKKOS_ENABLE_SYCL)
+template LinearAlgebra::TpetraWrappers::TpetraTypes::MapType<
+  MemorySpace::Default>
+dealii::IndexSet::make_tpetra_map<
+  LinearAlgebra::TpetraWrappers::TpetraTypes::NodeType<MemorySpace::Default>>(
+  const MPI_Comm,
+  bool) const;
+#      endif
+
+template Teuchos::RCP<
+  LinearAlgebra::TpetraWrappers::TpetraTypes::MapType<MemorySpace::Host>>
+dealii::IndexSet::make_tpetra_map_rcp<
+  LinearAlgebra::TpetraWrappers::TpetraTypes::NodeType<MemorySpace::Host>>(
+  const MPI_Comm,
+  bool) const;
+
+#      if defined(KOKKOS_ENABLE_CUDA) || defined(KOKKOS_ENABLE_HIP) || \
+        defined(KOKKOS_ENABLE_SYCL)
+template Teuchos::RCP<
+  LinearAlgebra::TpetraWrappers::TpetraTypes::MapType<MemorySpace::Default>>
+dealii::IndexSet::make_tpetra_map_rcp<
+  LinearAlgebra::TpetraWrappers::TpetraTypes::NodeType<MemorySpace::Default>>(
+  const MPI_Comm,
+  bool) const;
+#      endif
+
+#    endif
+#  endif
+#endif
 
 DEAL_II_NAMESPACE_CLOSE

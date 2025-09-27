@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2022 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2013 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 #include <deal.II/base/geometry_info.h>
 #include <deal.II/base/quadrature.h>
@@ -164,9 +163,9 @@ template <int spacedim>
 template <typename Number>
 void
 KellyErrorEstimator<1, spacedim>::estimate(
-  const Mapping<1, spacedim>    &mapping,
-  const DoFHandler<1, spacedim> &dof_handler,
-  const hp::QCollection<0>      &quadrature,
+  const hp::MappingCollection<1, spacedim> &mapping,
+  const DoFHandler<1, spacedim>            &dof_handler,
+  const hp::QCollection<0>                 &quadrature,
   const std::map<types::boundary_id, const Function<spacedim, Number> *>
                            &neumann_bc,
   const ReadVector<Number> &solution,
@@ -202,6 +201,46 @@ template <int spacedim>
 template <typename Number>
 void
 KellyErrorEstimator<1, spacedim>::estimate(
+  const Mapping<1, spacedim>    &mapping,
+  const DoFHandler<1, spacedim> &dof_handler,
+  const hp::QCollection<0>      &quadrature,
+  const std::map<types::boundary_id, const Function<spacedim, Number> *>
+                           &neumann_bc,
+  const ReadVector<Number> &solution,
+  Vector<float>            &error,
+  const ComponentMask      &component_mask,
+  const Function<spacedim> *coefficients,
+  const unsigned int        n_threads,
+  const types::subdomain_id subdomain_id,
+  const types::material_id  material_id,
+  const Strategy            strategy)
+{
+  // DEPRECATED
+  // just pass on to the other function
+  std::vector<const ReadVector<Number> *>  solutions(1, &solution);
+  std::vector<Vector<float> *>             errors(1, &error);
+  ArrayView<Vector<float> *>               error_view = make_array_view(errors);
+  const hp::MappingCollection<1, spacedim> mapping_collection(mapping);
+  estimate(mapping_collection,
+           dof_handler,
+           quadrature,
+           neumann_bc,
+           make_array_view(solutions),
+           error_view,
+           component_mask,
+           coefficients,
+           n_threads,
+           subdomain_id,
+           material_id,
+           strategy);
+}
+
+
+
+template <int spacedim>
+template <typename Number>
+void
+KellyErrorEstimator<1, spacedim>::estimate(
   const DoFHandler<1, spacedim> &dof_handler,
   const hp::QCollection<0>      &quadrature,
   const std::map<types::boundary_id, const Function<spacedim, Number> *>
@@ -216,7 +255,9 @@ KellyErrorEstimator<1, spacedim>::estimate(
   const Strategy            strategy)
 {
   const auto reference_cell = ReferenceCells::Line;
-  estimate(reference_cell.template get_default_linear_mapping<1, spacedim>(),
+  const hp::MappingCollection<1, spacedim> mapping(
+    reference_cell.template get_default_linear_mapping<1, spacedim>());
+  estimate(mapping,
            dof_handler,
            quadrature,
            neumann_bc,
@@ -250,7 +291,9 @@ KellyErrorEstimator<1, spacedim>::estimate(
   const Strategy                               strategy)
 {
   const auto reference_cell = ReferenceCells::Line;
-  estimate(reference_cell.template get_default_linear_mapping<1, spacedim>(),
+  const hp::MappingCollection<1, spacedim> mapping(
+    reference_cell.template get_default_linear_mapping<1, spacedim>());
+  estimate(mapping,
            dof_handler,
            quadrature,
            neumann_bc,
@@ -270,8 +313,8 @@ template <int spacedim>
 template <typename Number>
 void
 KellyErrorEstimator<1, spacedim>::estimate(
-  const Mapping<1, spacedim>    &mapping,
-  const DoFHandler<1, spacedim> &dof_handler,
+  const hp::MappingCollection<1, spacedim> &mapping,
+  const DoFHandler<1, spacedim>            &dof_handler,
   const hp::QCollection<0> &,
   const std::map<types::boundary_id, const Function<spacedim, Number> *>
                                               &neumann_bc,
@@ -389,15 +432,13 @@ KellyErrorEstimator<1, spacedim>::estimate(
 
   const hp::FECollection<1, spacedim> &fe = dof_handler.get_fe_collection();
 
-  hp::MappingCollection<1, spacedim> mapping_collection;
-  mapping_collection.push_back(mapping);
 
-  hp::FEValues<1, spacedim>     fe_values(mapping_collection,
+  hp::FEValues<1, spacedim>     fe_values(mapping,
                                       fe,
                                       q_collection,
                                       update_gradients);
   hp::FEFaceValues<1, spacedim> fe_face_values(
-    /*mapping_collection,*/ fe, q_face_collection, update_normal_vectors);
+    /*mapping,*/ fe, q_face_collection, update_normal_vectors);
 
   // loop over all cells and do something on the cells which we're told to
   // work on. note that the error indicator is only a sum over the two
@@ -529,6 +570,43 @@ void
 KellyErrorEstimator<1, spacedim>::estimate(
   const Mapping<1, spacedim>    &mapping,
   const DoFHandler<1, spacedim> &dof_handler,
+  const hp::QCollection<0>      &quadrature,
+  const std::map<types::boundary_id, const Function<spacedim, Number> *>
+                                              &neumann_bc,
+  const ArrayView<const ReadVector<Number> *> &solutions,
+  ArrayView<Vector<float> *>                  &errors,
+  const ComponentMask                         &component_mask,
+  const Function<spacedim>                    *coefficients,
+  const unsigned int                           n_threads,
+  const types::subdomain_id                    subdomain_id,
+  const types::material_id                     material_id,
+  const Strategy                               strategy)
+{
+  // DEPRECATED
+  // just pass on to the other function
+  const hp::MappingCollection<1, spacedim> mapping_collection(mapping);
+  estimate(mapping_collection,
+           dof_handler,
+           quadrature,
+           neumann_bc,
+           solutions,
+           errors,
+           component_mask,
+           coefficients,
+           n_threads,
+           subdomain_id,
+           material_id,
+           strategy);
+}
+
+
+
+template <int spacedim>
+template <typename Number>
+void
+KellyErrorEstimator<1, spacedim>::estimate(
+  const Mapping<1, spacedim>    &mapping,
+  const DoFHandler<1, spacedim> &dof_handler,
   const Quadrature<0>           &quadrature,
   const std::map<types::boundary_id, const Function<spacedim, Number> *>
                                               &neumann_bc,
@@ -541,8 +619,9 @@ KellyErrorEstimator<1, spacedim>::estimate(
   const types::material_id                     material_id,
   const Strategy                               strategy)
 {
-  const hp::QCollection<0> quadrature_collection(quadrature);
-  estimate(mapping,
+  const hp::MappingCollection<1, spacedim> mapping_collection(mapping);
+  const hp::QCollection<0>                 quadrature_collection(quadrature);
+  estimate(mapping_collection,
            dof_handler,
            quadrature_collection,
            neumann_bc,
@@ -559,7 +638,7 @@ KellyErrorEstimator<1, spacedim>::estimate(
 
 
 // explicit instantiations
-#include "error_estimator_1d.inst"
+#include "numerics/error_estimator_1d.inst"
 
 
 DEAL_II_NAMESPACE_CLOSE

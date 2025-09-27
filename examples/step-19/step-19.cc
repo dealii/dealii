@@ -1,17 +1,16 @@
-/* ---------------------------------------------------------------------
+/* ------------------------------------------------------------------------
  *
- * Copyright (C) 2020 - 2022 by the deal.II authors
+ * SPDX-License-Identifier: LGPL-2.1-or-later
+ * Copyright (C) 2020 - 2024 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
- * The deal.II library is free software; you can use it, redistribute
- * it, and/or modify it under the terms of the GNU Lesser General
- * Public License as published by the Free Software Foundation; either
- * version 2.1 of the License, or (at your option) any later version.
- * The full text of the license can be found in the file LICENSE.md at
- * the top level directory of deal.II.
+ * Part of the source code is dual licensed under Apache-2.0 WITH
+ * LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+ * governing the source code and code contributions can be found in
+ * LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
  *
- * ---------------------------------------------------------------------
+ * ------------------------------------------------------------------------
  *
  * Authors: Wolfgang Bangerth, Rene Gassmoeller, Peter Munch, 2020.
  */
@@ -62,8 +61,6 @@
 
 #include <fstream>
 
-using namespace dealii;
-
 
 // @sect3{Global definitions}
 
@@ -88,6 +85,8 @@ using namespace dealii;
 // they had started at 0).
 namespace Step19
 {
+  using namespace dealii;
+
   namespace BoundaryIds
   {
     constexpr types::boundary_id open          = 101;
@@ -136,7 +135,7 @@ namespace Step19
     void create_particles();
     void move_particles();
     void track_lost_particle(
-      const typename Particles::ParticleIterator<dim>         &particle,
+      const Particles::ParticleIterator<dim>                  &particle,
       const typename Triangulation<dim>::active_cell_iterator &cell);
 
 
@@ -144,8 +143,8 @@ namespace Step19
     void output_results() const;
 
     Triangulation<dim>        triangulation;
-    MappingQ<dim>             mapping;
-    FE_Q<dim>                 fe;
+    const MappingQ<dim>       mapping;
+    const FE_Q<dim>           fe;
     DoFHandler<dim>           dof_handler;
     AffineConstraints<double> constraints;
 
@@ -223,7 +222,7 @@ namespace Step19
   // we want to solve. Recall how the domain looks like:
   //   <p align="center">
   //     <img
-  //     src="https://www.dealii.org/images/steps/developer/step-19.geometry.png"
+  //     src="https://dealii.org/images/steps/developer/step-19.geometry.png"
   //          alt="The geometry used in this program"
   //          width="600">
   //   </p>
@@ -469,7 +468,7 @@ namespace Step19
         //   illustrates the easiest way to write this algorithm, and so we are
         //   willing to incur this cost for the moment for expository purposes.
         //   We discuss the issue in more detail in the
-        //   <a href="#extensions">"possibilities for extensions" section</a>
+        //   @ref step_19-Extensions "Possibilities for extensions" section
         //   below, and use a better approach in step-70, for example.
         if (particle_handler.n_particles_in_cell(cell) > 0)
           for (const auto &particle : particle_handler.particles_in_cell(cell))
@@ -583,7 +582,7 @@ namespace Step19
             // "quadrature" point, and extract the electric field vector from
             // the gradient in the form of a Tensor variable through the methods
             // discussed in the
-            // @ref vector_valued "vector-valued problems" documentation module.
+            // @ref vector_valued "vector-valued problems" documentation topic.
             const FEValuesExtractors::Scalar electric_potential(0);
             fe_face_values[electric_potential].get_function_gradients(
               solution, solution_gradients);

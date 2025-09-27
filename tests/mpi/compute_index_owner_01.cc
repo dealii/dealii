@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2010 - 2022 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2019 - 2024 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 
 
@@ -19,7 +18,6 @@
 // in the context of Vectors and Partitioners)
 
 #include <deal.II/base/mpi.h>
-#include <deal.II/base/mpi_compute_index_owner_internal.h>
 #include <deal.II/base/partitioner.h>
 
 #include "../tests.h"
@@ -54,17 +52,10 @@ test()
   local_relevant.print(deallog);
 
   {
-    std::vector<unsigned int> owning_ranks_of_ghosts(
-      local_relevant.n_elements());
-
-    Utilities::MPI::internal::ComputeIndexOwner::ConsensusAlgorithmsPayload
-      process(local_owned, local_relevant, comm, owning_ranks_of_ghosts, true);
-
-    Utilities::MPI::ConsensusAlgorithms::Selector<
-      std::vector<std::pair<types::global_dof_index, types::global_dof_index>>,
-      std::vector<unsigned int>>
-      consensus_algorithm;
-    consensus_algorithm.run(process, comm);
+    const auto [owning_ranks_of_ghosts, import_data] =
+      Utilities::MPI::compute_index_owner_and_requesters(local_owned,
+                                                         local_relevant,
+                                                         comm);
 
     deallog << "owning_ranks_of_ghosts:" << std::endl;
     for (auto i : owning_ranks_of_ghosts)
@@ -72,7 +63,6 @@ test()
     deallog << std::endl;
 
     deallog << "requesters:" << std::endl;
-    std::map<unsigned int, IndexSet> import_data = process.get_requesters();
     for (const auto &m : import_data)
       {
         deallog << m.first << ": ";

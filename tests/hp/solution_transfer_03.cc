@@ -1,22 +1,21 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2011 - 2023 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2013 - 2024 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 
 
 // SolutionTransfer got into trouble when interpolating between an old and a
-// new mesh where some cells are set to use FENothing, see bug #83
+// new mesh where some cells are set to use FE_Nothing, see bug #83
 // (https://code.google.com/p/dealii/issues/detail?id=83)
 //
 // the testcase is really invalid -- it forgot to call
@@ -91,21 +90,23 @@ main()
   data_out.write_vtu(deallog.get_file_stream());
 
 
-  // Interpoalte solution
+  // Interpolate solution
   SolutionTransfer<2, Vector<double>> solultion_trans(dof_handler);
-  solultion_trans.prepare_for_coarsening_and_refinement(solution);
 
-  triangulation.execute_coarsening_and_refinement();
   // Assign FE_Q_ to all cells
   cell = dof_handler.begin_active();
   for (; cell != endc; ++cell)
     {
-      cell->set_active_fe_index(0);
+      cell->set_future_fe_index(0);
     }
+
+  solultion_trans.prepare_for_coarsening_and_refinement(solution);
+
+  triangulation.execute_coarsening_and_refinement();
   dof_handler.distribute_dofs(fe_collection);
 
   Vector<double> new_solution(dof_handler.n_dofs());
-  solultion_trans.interpolate(solution, new_solution);
+  solultion_trans.interpolate(new_solution);
 
 
   // Save output

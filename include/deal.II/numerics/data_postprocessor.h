@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2007 - 2023 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2007 - 2024 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 #ifndef dealii_data_postprocessor_h
 #define dealii_data_postprocessor_h
@@ -20,8 +19,8 @@
 
 #include <deal.II/base/config.h>
 
+#include <deal.II/base/enable_observer_pointer.h>
 #include <deal.II/base/point.h>
-#include <deal.II/base/subscriptor.h>
 #include <deal.II/base/tensor.h>
 
 #include <deal.II/dofs/dof_handler.h>
@@ -32,8 +31,7 @@
 
 #include <deal.II/numerics/data_component_interpretation.h>
 
-#include <boost/any.hpp>
-
+#include <any>
 #include <string>
 #include <vector>
 
@@ -94,7 +92,7 @@ namespace DataPostprocessorInputs
    * is obvious.
    *
    * To make the cell iterator accessible nevertheless, this class uses
-   * an object of type boost::any to store the cell iterator. You can
+   * an object of type std::any to store the cell iterator. You can
    * think of this as being a void pointer that can point to anything.
    * To use what is being used therefore requires the user to know the
    * data type of the thing being pointed to.
@@ -290,11 +288,11 @@ namespace DataPostprocessorInputs
     /**
      * The place where set_cell() stores the cell. Since the actual data
      * type of the cell iterator can be many different things, the
-     * interface uses boost::any here. This makes assignment in set_cell()
+     * interface uses std::any here. This makes assignment in set_cell()
      * simple, but requires knowing the data type of the stored object in
      * get_cell().
      */
-    boost::any cell;
+    std::any cell;
 
     /**
      * The place where set_cell_and_face() stores the number of the face
@@ -581,7 +579,7 @@ namespace DataPostprocessorInputs
  * @ingroup output
  */
 template <int dim>
-class DataPostprocessor : public Subscriptor
+class DataPostprocessor : public EnableObserverPointer
 {
 public:
   /**
@@ -1371,14 +1369,14 @@ namespace DataPostprocessorInputs
   {
     // see if we had previously already stored a cell that has the same
     // data type; if so, reuse the memory location and avoid calling 'new'
-    // inside boost::any
+    // inside std::any
     if (typename DoFHandler<dim, spacedim>::cell_iterator *storage_location =
-          boost::any_cast<typename DoFHandler<dim, spacedim>::cell_iterator>(
+          std::any_cast<typename DoFHandler<dim, spacedim>::cell_iterator>(
             &cell))
       *storage_location = new_cell;
     else
       // if we had nothing stored before, or if we had stored a different
-      // data type, just let boost::any replace things
+      // data type, just let std::any replace things
       cell = new_cell;
 
     // Also reset the face number, just to make sure nobody
@@ -1406,12 +1404,12 @@ namespace DataPostprocessorInputs
   typename DoFHandler<dim, spacedim>::cell_iterator
   CommonInputs<spacedim>::get_cell() const
   {
-    Assert(cell.empty() == false,
+    Assert(cell.has_value(),
            ExcMessage(
              "You are trying to access the cell associated with a "
              "DataPostprocessorInputs::Scalar object for which no cell has "
              "been set."));
-    Assert((boost::any_cast<typename DoFHandler<dim, spacedim>::cell_iterator>(
+    Assert((std::any_cast<typename DoFHandler<dim, spacedim>::cell_iterator>(
               &cell) != nullptr),
            ExcMessage(
              "You are trying to access the cell associated with a "
@@ -1423,7 +1421,7 @@ namespace DataPostprocessorInputs
              "DoFHandler<2, 3>, but not with any other class type or dimension "
              "template argument."));
 
-    return boost::any_cast<typename DoFHandler<dim, spacedim>::cell_iterator>(
+    return std::any_cast<typename DoFHandler<dim, spacedim>::cell_iterator>(
       cell);
   }
 } // namespace DataPostprocessorInputs

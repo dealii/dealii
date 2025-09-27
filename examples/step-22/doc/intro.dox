@@ -1,5 +1,3 @@
-<br>
-
 <i>This program was contributed by Martin Kronbichler and Wolfgang
 Bangerth.
 <br>
@@ -13,7 +11,7 @@ California Institute of Technology.
 
 
 
-<a name="Intro"></a>
+<a name="step_22-Intro"></a>
 <h1>Introduction</h1>
 
 This program deals with the Stokes system of equations which reads as
@@ -85,7 +83,7 @@ equations. What boundary conditions are readily possible here will
 become clear once we discuss the weak form of the equations.
 
 The equations covered here fall into the class of vector-valued problems. A
-toplevel overview of this topic can be found in the @ref vector_valued module.
+toplevel overview of this topic can be found in the @ref vector_valued topic.
 
 
 <h3>Weak form</h3>
@@ -398,9 +396,9 @@ that
   (\textbf{v}_h, \textbf g_N)_{\Gamma_N}
 @f}
 for all test functions $\textbf{v}_h, q_h$. Assembling the linear system
-associated with this problem follows the same lines used in @ref step_20
-"step-20", step-21, and explained in detail in the @ref
-vector_valued module.
+associated with this problem follows the same lines used in
+step-20, step-21, and explained in detail in the @ref
+vector_valued topic.
 
 
 
@@ -484,11 +482,11 @@ this Schur complement in a straightforward way with the CG method:
 using no preconditioner, the condition number of the Schur complement matrix
 depends on the size ratios of the largest to the smallest cells, and one still
 needs on the order of 50-100 CG iterations. However, there is a simple cure:
-precondition with the @ref GlossMassMatrix "mass matrix" on the pressure space and we get down to a
-number between 5-15 CG iterations, pretty much independently of the structure
-of the mesh (take a look at the <a href="#Results">results section</a> of this
-program to see that indeed the number of CG iterations does not change as we
-refine the mesh).
+precondition with the @ref GlossMassMatrix "mass matrix" on the pressure space
+and we get down to a number between 5-15 CG iterations, pretty much
+independently of the structure of the mesh (take a look at the
+@ref step_22-ResultsSection "results section" of this program to see that indeed the
+number of CG iterations does not change as we refine the mesh).
 
 So all we need in addition to what we already have is the mass matrix on the
 pressure variables and we will store it in a separate object.
@@ -604,8 +602,9 @@ have to happen too often. A better approach is to use a block
 decomposition, which is based on an observation of Silvester and
 Wathen @cite SW94 and explained in much greater detail in
 @cite elman2005 . An implementation of this alternative approach is
-discussed below, in the section on a <a href="#block-schur">block Schur
-complementation preconditioner</a> in the results section of this program.
+discussed below, in the section on a
+@ref step_22-BlockSchur "block Schur complementation preconditioner"
+in the results section of this program.
 
 
 <h4> A note on the structure of the linear system </h4>
@@ -630,7 +629,7 @@ $S=B A^{-1} B^T$. But this is not quite correct.
 Think of what would happen if there are constraints on some
 pressure variables (see the
 @ref constraints "Constraints on degrees of freedom" documentation
-module), for example because we use adaptively
+topic), for example because we use adaptively
 refined meshes and continuous pressure finite elements so that there
 are hanging nodes. Another cause for such constraints are Dirichlet
 boundary conditions on the pressure. Then the AffineConstraints
@@ -760,7 +759,7 @@ right part of the top surface, and impose natural flow conditions everywhere
 else. If we are in 2d, the description is essentially the same, with the
 exception that we omit the second component of all vectors stated above.
 
-As will become apparent in the <a href="#Results">results section</a>, the
+As will become apparent in the @ref step_22-ResultsSection "results section", the
 flow field will pull material from below and move it to the left and right
 ends of the domain, as expected. The discontinuity of velocity boundary
 conditions will produce a singularity in the pressure at the center of the top
@@ -823,7 +822,7 @@ MatrixTools::apply_boundary_values for implementing Dirichlet boundary
 conditions.
 
 
-<a name="constraint-matrix">
+@anchor step_22-ConstraintMatrix
 <h4>Using AffineConstraints for increasing performance</h4>
 </a>
 
@@ -884,8 +883,8 @@ algorithm chosen below.
 As for the linear solver: as mentioned above, our implementation here uses a
 Schur complement formulation. This is not necessarily the very best choice
 but demonstrates various important techniques available in deal.II. The
-question of which solver is best is again discussed in the <a
-href="#improved-solver">section on improved solvers in the results part</a>
+question of which solver is best is again discussed in the
+@ref step_22-ImprovedSolver "section on improved solvers in the results part"
 of this program, along with code showing alternative solvers and a
 comparison of their results.
 
@@ -905,14 +904,14 @@ about 10 times faster. Even the vmult function of the SparseILU has been
 improved to save about twenty percent of time. Small improvements were
 applied here and there. Moreover, the AffineConstraints object has been used
 to eliminate a lot of entries in the sparse matrix that are eventually going
-to be zero, see <a href="#constraint-matrix">the section on using advanced
-features of the AffineConstraints class</a>.
+to be zero, see
+@ref step_22-ConstraintMatrix "the section on using advanced features of the AffineConstraints class".
 
 A profile of how many CPU instructions are spent at the various
 different places in the program during refinement cycles
 zero through three in 3d is shown here:
 
-<img src="https://www.dealii.org/images/steps/developer/step-22.profile-3.png" alt="">
+<img src="https://dealii.org/images/steps/developer/step-22.profile-3.png" alt="">
 
 As can be seen, at this refinement level approximately three quarters of the
 instruction count is spent on the actual solver (the SparseILU::vmult calls
@@ -941,7 +940,7 @@ discussion of results below as well.
 As a final point, and as a point of reference, the following picture also
 shows how the profile looked at an early stage of optimizing this program:
 
-<img src="https://www.dealii.org/images/steps/developer/step-22.profile-3.original.png" alt="">
+<img src="https://dealii.org/images/steps/developer/step-22.profile-3.original.png" alt="">
 
 As mentioned above, the runtime of this version was about four times as long as
 for the first profile, with the SparseILU decomposition taking up about 30% of

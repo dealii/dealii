@@ -1,17 +1,16 @@
-/* ---------------------------------------------------------------------
+/* ------------------------------------------------------------------------
  *
- * Copyright (C) 2008 - 2023 by the deal.II authors
+ * SPDX-License-Identifier: LGPL-2.1-or-later
+ * Copyright (C) 2014 - 2024 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
- * The deal.II library is free software; you can use it, redistribute
- * it, and/or modify it under the terms of the GNU Lesser General
- * Public License as published by the Free Software Foundation; either
- * version 2.1 of the License, or (at your option) any later version.
- * The full text of the license can be found in the file LICENSE.md at
- * the top level directory of deal.II.
+ * Part of the source code is dual licensed under Apache-2.0 WITH
+ * LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+ * governing the source code and code contributions can be found in
+ * LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
  *
- * ---------------------------------------------------------------------
+ * ------------------------------------------------------------------------
  */
 
 //
@@ -35,6 +34,7 @@
 
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/grid_tools.h>
+#include <deal.II/grid/manifold.h>
 #include <deal.II/grid/manifold_lib.h>
 
 #include <deal.II/lac/affine_constraints.h>
@@ -196,8 +196,8 @@ namespace Step22
           const TrilinosWrappers::MPI::Vector &src) const;
 
   private:
-    const SmartPointer<const Matrix>         matrix;
-    const SmartPointer<const Preconditioner> preconditioner;
+    const ObserverPointer<const Matrix>         matrix;
+    const ObserverPointer<const Preconditioner> preconditioner;
 
     mutable TrilinosWrappers::MPI::Vector tmp;
   };
@@ -252,8 +252,9 @@ namespace Step22
           const TrilinosWrappers::MPI::Vector &src) const;
 
   private:
-    const SmartPointer<const TrilinosWrappers::BlockSparseMatrix> system_matrix;
-    const SmartPointer<
+    const ObserverPointer<const TrilinosWrappers::BlockSparseMatrix>
+      system_matrix;
+    const ObserverPointer<
       const InverseMatrix<TrilinosWrappers::SparseMatrix, Preconditioner>>
                                           A_inverse;
     mutable TrilinosWrappers::MPI::Vector tmp1, tmp2;
@@ -339,10 +340,10 @@ namespace Step22
         locally_relevant_dofs.get_view(n_u, n_u + n_p));
 
       constraints.clear();
-      constraints.reinit(locally_relevant_dofs);
+      constraints.reinit(locally_owned_dofs, locally_relevant_dofs);
 
-      FEValuesExtractors::Vector velocities(0);
-      FEValuesExtractors::Scalar pressure(dim);
+      const FEValuesExtractors::Vector velocities(0);
+      const FEValuesExtractors::Scalar pressure(dim);
 
       DoFTools::make_hanging_node_constraints(dof_handler, constraints);
 #ifdef PERIODIC
@@ -641,11 +642,11 @@ namespace Step22
         Vector<double> value2(3);
 
         Point<2> point1;
-        point1(0) = 0;
-        point1(1) = .5 * (1. + 1. * i / n_points + eps);
+        point1[0] = 0;
+        point1[1] = .5 * (1. + 1. * i / n_points + eps);
         Point<2> point2;
-        point2(0) = .5 * (1. + 1. * i / n_points + eps);
-        point2(1) = 0.;
+        point2[0] = .5 * (1. + 1. * i / n_points + eps);
+        point2[1] = 0.;
 
         get_point_value(point1, 0, value1);
         get_point_value(point2, 0, value2);
@@ -730,7 +731,7 @@ namespace Step22
   {
     Vector<float> estimated_error_per_cell(triangulation.n_active_cells());
 
-    FEValuesExtractors::Scalar pressure(dim);
+    const FEValuesExtractors::Scalar pressure(dim);
     KellyErrorEstimator<dim>::estimate(
       dof_handler,
       QGauss<dim - 1>(degree + 1),
@@ -759,6 +760,9 @@ namespace Step22
       triangulation, center, inner_radius, outer_radius, 0, true);
     triangulation.set_all_manifold_ids(numbers::flat_manifold_id);
     GridTools::copy_boundary_to_manifold_id(triangulation);
+
+    for (const auto bid : triangulation.get_boundary_ids())
+      triangulation.set_manifold(bid, FlatManifold<dim>());
 
 #ifdef PERIODIC
     std::vector<GridTools::PeriodicFacePair<

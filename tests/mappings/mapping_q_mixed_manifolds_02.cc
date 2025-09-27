@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2017 - 2021 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2017 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 
 // Evaluates the area of a complex geometry when mixing different manifolds on
@@ -164,6 +163,7 @@ create_triangulation(Triangulation<2> &tria)
       if (Point<2>(X_C, Y_C).distance(cell->center()) <= R_2)
         cell->set_all_manifold_ids(MANIFOLD_ID);
     }
+  tria.set_manifold(MANIFOLD_ID, FlatManifold<2>());
 }
 
 void
@@ -182,6 +182,8 @@ create_triangulation(Triangulation<3> &tria)
       if (Point<3>(X_C, Y_C, cell->center()[2]).distance(cell->center()) <= R_2)
         cell->set_all_manifold_ids(MANIFOLD_ID);
     }
+  tria.set_manifold(0, FlatManifold<3>());
+  tria.set_manifold(MANIFOLD_ID, FlatManifold<3>());
 }
 
 template <int dim>

@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 1999 - 2022 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 1999 - 2024 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 #ifndef dealii_vector_templates_h
 #define dealii_vector_templates_h
@@ -35,6 +34,10 @@
 #  include <deal.II/lac/trilinos_vector.h>
 #endif
 
+#ifdef DEAL_II_TRILINOS_WITH_TPETRA
+#  include <deal.II/lac/trilinos_tpetra_vector.h>
+#endif
+
 
 #include <algorithm>
 #include <cmath>
@@ -49,7 +52,6 @@ DEAL_II_NAMESPACE_OPEN
 
 template <typename Number>
 Vector<Number>::Vector(const Vector<Number> &v)
-  : Subscriptor()
 {
   *this = v;
 }
@@ -172,6 +174,64 @@ Vector<Number>::Vector(const TrilinosWrappers::MPI::Vector &v)
       std::copy(start_ptr[0], start_ptr[0] + size(), begin());
 
       maybe_reset_thread_partitioner();
+    }
+}
+
+#endif
+
+
+#ifdef DEAL_II_TRILINOS_WITH_TPETRA
+
+template <typename Number>
+template <typename OtherNumber, typename MemorySpace>
+Vector<Number>::Vector(
+  const LinearAlgebra::TpetraWrappers::Vector<OtherNumber, MemorySpace> &v)
+  : values(v.size())
+{
+  static_assert(
+    std::is_same<Number, OtherNumber>::value,
+    "TpetraWrappers::Vector and dealii::Vector must use the same number type here.");
+
+  if (size() != 0)
+    {
+      // Copy the distributed vector to
+      // a local one at all processors
+      // that know about the original vector.
+      LinearAlgebra::TpetraWrappers::TpetraTypes::VectorType<OtherNumber,
+                                                             MemorySpace>
+        localized_vector(
+          complete_index_set(size())
+            .template make_tpetra_map_rcp<
+              LinearAlgebra::TpetraWrappers::TpetraTypes::NodeType<
+                MemorySpace>>(),
+          v.get_mpi_communicator());
+
+      Teuchos::RCP<const LinearAlgebra::TpetraWrappers::TpetraTypes::ImportType<
+        MemorySpace>>
+        importer = Tpetra::createImport(v.trilinos_vector().getMap(),
+                                        localized_vector.getMap());
+
+      localized_vector.doImport(v.trilinos_vector(), *importer, Tpetra::INSERT);
+
+      // get a kokkos view from the localized_vector
+#  if DEAL_II_TRILINOS_VERSION_GTE(13, 2, 0)
+      auto localized_vector_2d =
+        localized_vector.template getLocalView<Kokkos::HostSpace>(
+          Tpetra::Access::ReadOnly);
+#  else
+      localized_vector.template sync<Kokkos::HostSpace>();
+      auto localized_vector_2d =
+        localized_vector.template getLocalView<Kokkos::HostSpace>();
+#  endif
+      auto localized_vector_1d =
+        Kokkos::subview(localized_vector_2d, Kokkos::ALL(), 0);
+      const size_t local_length = localized_vector.getLocalLength();
+
+      Kokkos::DefaultHostExecutionSpace         exec;
+      Kokkos::View<Number *, Kokkos::HostSpace> values_view(values.data(),
+                                                            local_length);
+      Kokkos::deep_copy(exec, values_view, localized_vector_1d);
+      exec.fence();
     }
 }
 
@@ -561,7 +621,7 @@ template <typename Number>
 void
 Vector<Number>::extract_subvector_to(
   const ArrayView<const types::global_dof_index> &indices,
-  ArrayView<Number>                              &elements) const
+  const ArrayView<Number>                        &elements) const
 {
   AssertDimension(indices.size(), elements.size());
   for (unsigned int i = 0; i < indices.size(); ++i)
@@ -809,6 +869,72 @@ Vector<Number>::operator=(const TrilinosWrappers::MPI::Vector &v)
 
 #endif
 
+
+
+#ifdef DEAL_II_TRILINOS_WITH_TPETRA
+
+template <typename Number>
+template <typename OtherNumber, typename MemorySpace>
+Vector<Number> &
+Vector<Number>::operator=(
+  const LinearAlgebra::TpetraWrappers::Vector<OtherNumber, MemorySpace> &v)
+{
+  static_assert(
+    std::is_same<Number, OtherNumber>::value,
+    "TpetraWrappers::Vector and dealii::Vector must use the same number type here.");
+
+  if (v.size() != size())
+    reinit(v.size(), true);
+
+  if (size() != 0)
+    {
+      // Copy the distributed vector to
+      // a local one at all processors
+      // that know about the original vector.
+      LinearAlgebra::TpetraWrappers::TpetraTypes::VectorType<OtherNumber,
+                                                             MemorySpace>
+        localized_vector(
+          complete_index_set(size())
+            .template make_tpetra_map_rcp<
+              LinearAlgebra::TpetraWrappers::TpetraTypes::NodeType<
+                MemorySpace>>(),
+          v.get_mpi_communicator());
+
+      Teuchos::RCP<const LinearAlgebra::TpetraWrappers::TpetraTypes::ImportType<
+        MemorySpace>>
+        importer = Tpetra::createImport(v.trilinos_vector().getMap(),
+                                        localized_vector.getMap());
+
+      localized_vector.doImport(v.trilinos_vector(), *importer, Tpetra::INSERT);
+
+      // get a kokkos view from the localized_vector
+#  if DEAL_II_TRILINOS_VERSION_GTE(13, 2, 0)
+      auto localized_vector_2d =
+        localized_vector.template getLocalView<Kokkos::HostSpace>(
+          Tpetra::Access::ReadOnly);
+#  else
+      localized_vector.template sync<Kokkos::HostSpace>();
+      auto localized_vector_2d =
+        localized_vector.template getLocalView<Kokkos::HostSpace>();
+#  endif
+      auto localized_vector_1d =
+        Kokkos::subview(localized_vector_2d, Kokkos::ALL(), 0);
+      const size_t local_length = localized_vector.getLocalLength();
+
+      Kokkos::DefaultHostExecutionSpace         exec;
+      Kokkos::View<Number *, Kokkos::HostSpace> values_view(values.data(),
+                                                            local_length);
+      Kokkos::deep_copy(exec, values_view, localized_vector_1d);
+      exec.fence();
+    }
+
+  return *this;
+}
+
+#endif
+
+
+
 template <typename Number>
 template <typename Number2>
 bool
@@ -872,27 +998,11 @@ Vector<Number>::block_write(std::ostream &out) const
 {
   AssertThrow(out.fail() == false, ExcIO());
 
-  // other version of the following
-  //  out << size() << std::endl << '[';
-
-  // reason: operator<< seems to use some resources that lead to problems in a
-  // multithreaded environment. We convert the size index to
-  // unsigned long long int that is at least 64 bits to be able to output it on
-  // all platforms, since std::uint64_t is not in C.
-  const unsigned long long int sz = size();
-  char                         buf[16];
-
-  std::sprintf(buf, "%llu", sz);
-  std::strcat(buf, "\n[");
-
-  out.write(buf, std::strlen(buf));
+  out << std::to_string(size()) << "\n[";
   out.write(reinterpret_cast<const char *>(begin()),
             reinterpret_cast<const char *>(end()) -
               reinterpret_cast<const char *>(begin()));
-
-  // out << ']';
-  const char outro = ']';
-  out.write(&outro, 1);
+  out << ']';
 
   AssertThrow(out.fail() == false, ExcIO());
 }
@@ -918,7 +1028,6 @@ Vector<Number>::block_read(std::istream &in)
   reinit(sz, true);
 
   char c;
-  //  in >> c;
   in.read(&c, 1);
   AssertThrow(c == '[', ExcIO());
 
@@ -926,7 +1035,6 @@ Vector<Number>::block_read(std::istream &in)
           reinterpret_cast<const char *>(end()) -
             reinterpret_cast<const char *>(begin()));
 
-  //  in >> c;
   in.read(&c, 1);
   AssertThrow(c == ']', ExcIO());
 }
@@ -973,28 +1081,9 @@ Vector<Number>::do_reinit(const size_type new_size,
                           const bool      omit_zeroing_entries,
                           const bool      reset_partitioner)
 {
-  if (new_size <= size())
-    {
-      if (new_size == 0)
-        {
-          values.clear();
-        }
-      else
-        {
-          values.resize_fast(new_size);
-          if (!omit_zeroing_entries)
-            values.fill();
-        }
-    }
-  else
-    {
-      // otherwise size() < new_size and we must allocate
-      AlignedVector<Number> new_values;
-      new_values.resize_fast(new_size);
-      if (!omit_zeroing_entries)
-        new_values.fill();
-      new_values.swap(values);
-    }
+  values.resize_fast(new_size);
+  if (!omit_zeroing_entries)
+    values.fill();
 
   if (reset_partitioner)
     maybe_reset_thread_partitioner();

@@ -2,7 +2,7 @@
 # deal.II documentation.
 
 PROJECT_NAME           = "The deal.II Library"
-PROJECT_NUMBER         = "Reference documentation for deal.II version @DEAL_II_PACKAGE_VERSION@"
+PROJECT_NUMBER         = "deal.II version @DEAL_II_PACKAGE_VERSION@"
 PROJECT_LOGO           = @CMAKE_CURRENT_SOURCE_DIR@/images/logo200.png
 OUTPUT_DIRECTORY       = .
 
@@ -125,8 +125,10 @@ MATHJAX_RELPATH        = @_mathjax_relpath@
 MATHJAX_EXTENSIONS     = TeX/AMSmath TeX/AMSsymbols
 HTML_COLORSTYLE_HUE    = 220
 HTML_COLORSTYLE_SAT    = 200
-HTML_EXTRA_STYLESHEET  = @CMAKE_CURRENT_SOURCE_DIR@/stylesheet.css
-LAYOUT_FILE            = @CMAKE_CURRENT_SOURCE_DIR@/DoxygenLayout.xml
+HTML_EXTRA_STYLESHEET  = @CMAKE_CURRENT_SOURCE_DIR@/doxygen-awesome.css \
+                         @CMAKE_CURRENT_SOURCE_DIR@/custom.css
+
+LAYOUT_FILE            = @CMAKE_CURRENT_BINARY_DIR@/DoxygenLayout.xml
 
 
 #---------------------------------------------------------------------------
@@ -160,7 +162,7 @@ ENABLE_PREPROCESSING   = YES
 MACRO_EXPANSION        = YES
 EXPAND_ONLY_PREDEF     = YES
 SEARCH_INCLUDES        = YES
-INCLUDE_PATH           = @CMAKE_SOURCE_DIR@/include @CMAKE_BINARY_DIR@/include @_inst_in_dirs@
+INCLUDE_PATH           = @CMAKE_SOURCE_DIR@/include @CMAKE_BINARY_DIR@/include @_inst_in_dir@
 INCLUDE_FILE_PATTERNS  =
 
 # Set a few variables that help us generate documentation for things
@@ -176,7 +178,6 @@ INCLUDE_FILE_PATTERNS  =
 PREDEFINED             = DOXYGEN=1 \
                          DEBUG=1 \
                          DEAL_II_WARNING(x)= \
-                         DEAL_II_USE_MT_POSIX=1 \
                          DEAL_II_CONSTEXPR=constexpr \
                          DEAL_II_NAMESPACE_OPEN= \
                          DEAL_II_NAMESPACE_CLOSE= \
@@ -184,14 +185,16 @@ PREDEFINED             = DOXYGEN=1 \
                          DEAL_II_DISABLE_EXTRA_DIAGNOSTICS= \
                          DEAL_II_DEPRECATED= \
                          DEAL_II_HOST_DEVICE= \
+                         DEAL_II_HOST_DEVICE_ALWAYS_INLINE= \
                          DEAL_II_ALWAYS_INLINE= \
-                         __device__= \
                          DEAL_II_WITH_ADOLC=1 \
                          DEAL_II_ADOLC_WITH_ADVANCED_BRANCHING=1 \
                          DEAL_II_ADOLC_WITH_ATRIG_ERF=1 \
                          DEAL_II_ADOLC_WITH_TAPELESS_REFCOUNTING=1 \
+                         DEAL_II_CXX20_REQUIRES(x)= \
                          DEAL_II_DEPRECATED_EARLY= \
                          DEAL_II_DEPRECATED_EARLY_WITH_COMMENT(x)= \
+                         DEAL_II_DEPRECATED_WITH_COMMENT(x)= \
                          DEAL_II_WITH_ARBORX=1 \
                          DEAL_II_ARBORX_WITH_MPI=1 \
                          DEAL_II_WITH_ARPACK=1 \
@@ -202,7 +205,6 @@ PREDEFINED             = DOXYGEN=1 \
                          DEAL_II_CGAL_VERSION_GTE=1 \
                          DEAL_II_WITH_TASKFLOW=1 \
                          DEAL_II_WITH_COMPLEX_VALUES=1 \
-                         DEAL_II_WITH_CUDA=1 \
                          DEAL_II_WITH_GINKGO=1 \
                          DEAL_II_WITH_GMSH=1 \
                          DEAL_II_GMSH_WITH_API=1 \
@@ -215,6 +217,7 @@ PREDEFINED             = DOXYGEN=1 \
                          DEAL_II_MPI_WITH_DEVICE_SUPPORT=1 \
                          DEAL_II_MPI_VERSION_MAJOR=3 \
                          DEAL_II_MPI_VERSION_MINOR=0 \
+                         DEAL_II_WITH_MUMPS=1 \
                          DEAL_II_WITH_MUPARSER=1 \
                          DEAL_II_WITH_OPENCASCADE=1 \
                          DEAL_II_OPENCASCADE_VERSION_MAJOR=7 \
@@ -241,11 +244,14 @@ PREDEFINED             = DOXYGEN=1 \
                          DEAL_II_SYMENGINE_WITH_LLVM=1 \
                          DEAL_II_WITH_TBB=1 \
                          DEAL_II_WITH_TRILINOS=1 \
+                         DEAL_II_TRILINOS_WITH_AMESOS2=1 \
                          DEAL_II_TRILINOS_WITH_EPETRAEXT=1 \
+                         DEAL_II_TRILINOS_WITH_IFPACK2=1 \
                          DEAL_II_TRILINOS_WITH_MUELU=1 \
                          DEAL_II_TRILINOS_WITH_NOX=1 \
                          DEAL_II_TRILINOS_WITH_ROL=1 \
                          DEAL_II_TRILINOS_WITH_SACADO=1 \
+                         DEAL_II_TRILINOS_WITH_SEACAS=1 \
                          DEAL_II_TRILINOS_WITH_TPETRA=1 \
                          DEAL_II_TRILINOS_WITH_ZOLTAN=1 \
                          DEAL_II_TRILINOS_VERSION_GTE=1 \
@@ -290,6 +296,7 @@ GRAPHICAL_HIERARCHY    = NO
 DIRECTORY_GRAPH        = YES
 DOT_IMAGE_FORMAT       = svg
 MAX_DOT_GRAPH_DEPTH    = 5
+DOT_EDGE_ATTR          = "color=cornflowerblue"
 GENERATE_LEGEND        = YES
 
 DOT_CLEANUP            = YES

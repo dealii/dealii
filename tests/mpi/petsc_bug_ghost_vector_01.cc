@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2009 - 2018 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2014 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 
 
@@ -103,14 +102,13 @@ test()
     const unsigned int solid_cells_x = 20;
     const unsigned int solid_cells_y = 1;
     const unsigned int v_space_cells = 5;
-    ;
-    const double cell_size_x = 0.1;
-    const double cell_size_y = 0.1;
-    const double length      = solid_cells_x * cell_size_x,
-                 height      = static_cast<double>(h_cells * cell_size_y),
-                 h_distance  = static_cast<double>(cell_size_x * inflow_cells),
-                 v_distance  = static_cast<double>(cell_size_y * v_space_cells),
-                 solid_top   = static_cast<double>(v_distance +
+    const double       cell_size_x   = 0.1;
+    const double       cell_size_y   = 0.1;
+    const double       length        = solid_cells_x * cell_size_x,
+                 height     = static_cast<double>(h_cells * cell_size_y),
+                 h_distance = static_cast<double>(cell_size_x * inflow_cells),
+                 v_distance = static_cast<double>(cell_size_y * v_space_cells),
+                 solid_top  = static_cast<double>(v_distance +
                                                  solid_cells_y * cell_size_y),
                  total_length =
                    (inflow_cells + solid_cells_x + outflow_cells) * cell_size_x;

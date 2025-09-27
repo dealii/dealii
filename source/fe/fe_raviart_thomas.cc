@@ -1,21 +1,20 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2003 - 2023 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2003 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 
 #include <deal.II/base/polynomial.h>
-#include <deal.II/base/polynomials_raviart_thomas.h>
+#include <deal.II/base/polynomials_vector_anisotropic.h>
 #include <deal.II/base/qprojector.h>
 #include <deal.II/base/quadrature.h>
 #include <deal.II/base/quadrature_lib.h>
@@ -44,16 +43,18 @@ DEAL_II_NAMESPACE_OPEN
 template <int dim>
 FE_RaviartThomas<dim>::FE_RaviartThomas(const unsigned int deg)
   : FE_PolyTensor<dim>(
-      PolynomialsRaviartThomas<dim>(deg + 1, deg),
+      PolynomialsVectorAnisotropic<dim>(deg + 1,
+                                        deg,
+                                        get_lexicographic_numbering(deg)),
       FiniteElementData<dim>(get_dpo_vector(deg),
                              dim,
                              deg + 1,
                              FiniteElementData<dim>::Hdiv),
-      std::vector<bool>(PolynomialsRaviartThomas<dim>::n_polynomials(deg + 1,
-                                                                     deg),
-                        true),
+      std::vector<bool>(
+        PolynomialsVectorAnisotropic<dim>::n_polynomials(deg + 1, deg),
+        true),
       std::vector<ComponentMask>(
-        PolynomialsRaviartThomas<dim>::n_polynomials(deg + 1, deg),
+        PolynomialsVectorAnisotropic<dim>::n_polynomials(deg + 1, deg),
         ComponentMask(std::vector<bool>(dim, true))))
 {
   Assert(dim >= 2, ExcImpossibleInDim(dim));
@@ -93,23 +94,25 @@ FE_RaviartThomas<dim>::FE_RaviartThomas(const unsigned int deg)
 
   // TODO[TL]: for anisotropic refinement we will probably need a table of
   // submatrices with an array for each refine case
-  FullMatrix<double> face_embeddings[GeometryInfo<dim>::max_children_per_face];
-  for (unsigned int i = 0; i < GeometryInfo<dim>::max_children_per_face; ++i)
-    face_embeddings[i].reinit(this->n_dofs_per_face(face_no),
-                              this->n_dofs_per_face(face_no));
-  FETools::compute_face_embedding_matrices<dim, double>(*this,
-                                                        face_embeddings,
-                                                        0,
-                                                        0);
+  std::vector<FullMatrix<double>> face_embeddings(
+    this->reference_cell().face_reference_cell(0).template n_children<dim - 1>(
+      RefinementCase<dim - 1>::isotropic_refinement));
+  for (auto &face_embedding : face_embeddings)
+    face_embedding.reinit(this->n_dofs_per_face(face_no),
+                          this->n_dofs_per_face(face_no));
+  FETools::compute_face_embedding_matrices(*this,
+                                           make_array_view(face_embeddings),
+                                           0,
+                                           0);
   this->interface_constraints.reinit((1 << (dim - 1)) *
                                        this->n_dofs_per_face(face_no),
                                      this->n_dofs_per_face(face_no));
   unsigned int target_row = 0;
-  for (unsigned int d = 0; d < GeometryInfo<dim>::max_children_per_face; ++d)
-    for (unsigned int i = 0; i < face_embeddings[d].m(); ++i)
+  for (const auto &face_embedding : face_embeddings)
+    for (unsigned int i = 0; i < face_embedding.m(); ++i)
       {
-        for (unsigned int j = 0; j < face_embeddings[d].n(); ++j)
-          this->interface_constraints(target_row, j) = face_embeddings[d](i, j);
+        for (unsigned int j = 0; j < face_embedding.n(); ++j)
+          this->interface_constraints(target_row, j) = face_embedding(i, j);
         ++target_row;
       }
 
@@ -159,7 +162,7 @@ template <int dim>
 void
 FE_RaviartThomas<dim>::initialize_support_points(const unsigned int deg)
 {
-  QGauss<dim>        cell_quadrature(deg + 1);
+  const QGauss<dim>  cell_quadrature(deg + 1);
   const unsigned int n_interior_points = (deg > 0) ? cell_quadrature.size() : 0;
 
   // TODO: the implementation makes the assumption that all faces have the
@@ -174,7 +177,7 @@ FE_RaviartThomas<dim>::initialize_support_points(const unsigned int deg)
 
 
   this->generalized_support_points.resize(
-    GeometryInfo<dim>::faces_per_cell * n_face_points + n_interior_points);
+    this->reference_cell().n_faces() * n_face_points + n_interior_points);
   this->generalized_face_support_points[face_no].resize(n_face_points);
 
   // Number of the point being entered
@@ -182,7 +185,7 @@ FE_RaviartThomas<dim>::initialize_support_points(const unsigned int deg)
 
   if (dim > 1)
     {
-      QGauss<dim - 1>                   face_points(deg + 1);
+      const QGauss<dim - 1>             face_points(deg + 1);
       TensorProductPolynomials<dim - 1> legendre =
         Polynomials::Legendre::generate_complete_basis(deg);
 
@@ -203,18 +206,27 @@ FE_RaviartThomas<dim>::initialize_support_points(const unsigned int deg)
             }
         }
 
-      Quadrature<dim> faces =
+      const Quadrature<dim> faces =
         QProjector<dim>::project_to_all_faces(this->reference_cell(),
                                               face_points);
-      for (; current < GeometryInfo<dim>::faces_per_cell * n_face_points;
-           ++current)
+
+      for (unsigned int face_no = 0;
+           face_no < GeometryInfo<dim>::faces_per_cell;
+           ++face_no)
         {
-          // Enter the support point
-          // into the vector
-          this->generalized_support_points[current] = faces.point(
-            current +
-            QProjector<dim>::DataSetDescriptor::face(
-              this->reference_cell(), 0, true, false, false, n_face_points));
+          const auto offset = QProjector<dim>::DataSetDescriptor::face(
+            this->reference_cell(),
+            face_no,
+            numbers::default_geometric_orientation,
+            n_face_points);
+          for (unsigned int face_point = 0; face_point < n_face_points;
+               ++face_point)
+            {
+              // Enter the support point into the vector
+              this->generalized_support_points[current] =
+                faces.point(offset + face_point);
+              ++current;
+            }
         }
     }
 
@@ -430,8 +442,8 @@ FE_RaviartThomas<1>::initialize_restriction()
   // there is only one refinement case in 1d,
   // which is the isotropic one (first index of
   // the matrix array has to be 0)
-  for (unsigned int i = 0; i < GeometryInfo<1>::max_children_per_cell; ++i)
-    this->restriction[0][i].reinit(0, 0);
+  for (auto &restriction_matrix : this->restriction[0])
+    restriction_matrix.reinit(0, 0);
 }
 
 
@@ -452,18 +464,21 @@ FE_RaviartThomas<dim>::initialize_restriction()
 {
   const unsigned int iso = RefinementCase<dim>::isotropic_refinement - 1;
 
-  QGauss<dim - 1>    q_base(this->degree);
-  const unsigned int n_face_points = q_base.size();
+  const QGauss<dim - 1> q_base(this->degree);
+  const unsigned int    n_face_points = q_base.size();
   // First, compute interpolation on
   // subfaces
-  for (const unsigned int face : GeometryInfo<dim>::face_indices())
+  for (const unsigned int face : this->reference_cell().face_indices())
     {
       // The shape functions of the
       // child cell are evaluated
       // in the quadrature points
       // of a full face.
-      Quadrature<dim> q_face =
-        QProjector<dim>::project_to_face(this->reference_cell(), q_base, face);
+      const Quadrature<dim> q_face = QProjector<dim>::project_to_face(
+        this->reference_cell(),
+        q_base,
+        face,
+        numbers::default_geometric_orientation);
       // Store shape values, since the
       // evaluation suffers if not
       // ordered by point
@@ -474,15 +489,22 @@ FE_RaviartThomas<dim>::initialize_restriction()
           cached_values_on_face(i, k) = this->shape_value_component(
             i, q_face.point(k), GeometryInfo<dim>::unit_normal_direction[face]);
 
-      for (unsigned int sub = 0; sub < GeometryInfo<dim>::max_children_per_face;
+      for (unsigned int sub = 0; sub < this->reference_cell()
+                                         .face_reference_cell(face)
+                                         .template n_children<dim - 1>();
            ++sub)
         {
           // The weight functions for
           // the coarse face are
           // evaluated on the subface
           // only.
-          Quadrature<dim> q_sub = QProjector<dim>::project_to_subface(
-            this->reference_cell(), q_base, face, sub);
+          const Quadrature<dim> q_sub = QProjector<dim>::project_to_subface(
+            this->reference_cell(),
+            q_base,
+            face,
+            sub,
+            numbers::default_geometric_orientation,
+            RefinementCase<dim - 1>::isotropic_refinement);
           const unsigned int child = GeometryInfo<dim>::child_cell_on_face(
             RefinementCase<dim>::isotropic_refinement, face, sub);
 
@@ -545,9 +567,9 @@ FE_RaviartThomas<dim>::initialize_restriction()
   AssertDimension(this->n_unique_faces(), 1);
   const unsigned int face_no = 0;
 
-  QGauss<dim>        q_cell(this->degree);
+  const QGauss<dim>  q_cell(this->degree);
   const unsigned int start_cell_dofs =
-    GeometryInfo<dim>::faces_per_cell * this->n_dofs_per_face(face_no);
+    this->reference_cell().n_faces() * this->n_dofs_per_face(face_no);
 
   // Store shape values, since the
   // evaluation suffers if not
@@ -561,7 +583,8 @@ FE_RaviartThomas<dim>::initialize_restriction()
         cached_values_on_cell(i, k, d) =
           this->shape_value_component(i, q_cell.point(k), d);
 
-  for (unsigned int child = 0; child < GeometryInfo<dim>::max_children_per_cell;
+  for (unsigned int child = 0;
+       child < this->reference_cell().template n_children<dim>();
        ++child)
     {
       Quadrature<dim> q_sub =
@@ -618,6 +641,7 @@ FE_RaviartThomas<dim>::get_constant_modes() const
     for (unsigned int i = 0; i < this->n_dofs_per_cell(); ++i)
       constant_modes(d, i) = true;
   std::vector<unsigned int> components;
+  components.reserve(dim);
   for (unsigned int d = 0; d < dim; ++d)
     components.push_back(d);
   return std::pair<Table<2, bool>, std::vector<unsigned int>>(constant_modes,
@@ -637,7 +661,7 @@ FE_RaviartThomas<dim>::has_support_on_face(const unsigned int shape_index,
                                            const unsigned int face_index) const
 {
   AssertIndexRange(shape_index, this->n_dofs_per_cell());
-  AssertIndexRange(face_index, GeometryInfo<dim>::faces_per_cell);
+  AssertIndexRange(face_index, this->reference_cell().n_faces());
 
   // Return computed values if we
   // know them easily. Otherwise, it
@@ -674,6 +698,61 @@ FE_RaviartThomas<dim>::has_support_on_face(const unsigned int shape_index,
 
 
 template <int dim>
+std::vector<unsigned int>
+FE_RaviartThomas<dim>::get_lexicographic_numbering(const unsigned int degree)
+{
+  const unsigned int        n_dofs_face = Utilities::pow(degree + 1, dim - 1);
+  std::vector<unsigned int> lexicographic_numbering;
+  // component 1
+  for (unsigned int j = 0; j < n_dofs_face; ++j)
+    {
+      lexicographic_numbering.push_back(j);
+      for (unsigned int i = n_dofs_face * 2 * dim;
+           i < n_dofs_face * 2 * dim + degree;
+           ++i)
+        lexicographic_numbering.push_back(i + j * degree);
+      lexicographic_numbering.push_back(n_dofs_face + j);
+    }
+
+  // component 2
+  unsigned int layers = (dim == 3) ? degree + 1 : 1;
+  for (unsigned int k = 0; k < layers; ++k)
+    {
+      unsigned int k_add = k * (degree + 1);
+      for (unsigned int j = n_dofs_face * 2; j < n_dofs_face * 2 + degree + 1;
+           ++j)
+        lexicographic_numbering.push_back(j + k_add);
+
+      for (unsigned int i = n_dofs_face * (2 * dim + degree);
+           i < n_dofs_face * (2 * dim + degree) + degree * (degree + 1);
+           ++i)
+        {
+          lexicographic_numbering.push_back(i + k_add * degree);
+        }
+      for (unsigned int j = n_dofs_face * 3; j < n_dofs_face * 3 + degree + 1;
+           ++j)
+        lexicographic_numbering.push_back(j + k_add);
+    }
+
+  // component 3
+  if (dim == 3)
+    {
+      for (unsigned int i = 4 * n_dofs_face; i < 5 * n_dofs_face; ++i)
+        lexicographic_numbering.push_back(i);
+      for (unsigned int i = 6 * n_dofs_face + n_dofs_face * 2 * degree;
+           i < 6 * n_dofs_face + n_dofs_face * 3 * degree;
+           ++i)
+        lexicographic_numbering.push_back(i);
+      for (unsigned int i = 5 * n_dofs_face; i < 6 * n_dofs_face; ++i)
+        lexicographic_numbering.push_back(i);
+    }
+
+  return lexicographic_numbering;
+}
+
+
+
+template <int dim>
 void
 FE_RaviartThomas<dim>::convert_generalized_support_point_values_to_dof_values(
   const std::vector<Vector<double>> &support_point_values,
@@ -691,7 +770,7 @@ FE_RaviartThomas<dim>::convert_generalized_support_point_values_to_dof_values(
   std::fill(nodal_values.begin(), nodal_values.end(), 0.);
 
   const unsigned int n_face_points = boundary_weights.size(0);
-  for (const unsigned int face : GeometryInfo<dim>::face_indices())
+  for (const unsigned int face : this->reference_cell().face_indices())
     for (unsigned int k = 0; k < n_face_points; ++k)
       for (unsigned int i = 0; i < boundary_weights.size(1); ++i)
         {
@@ -707,9 +786,9 @@ FE_RaviartThomas<dim>::convert_generalized_support_point_values_to_dof_values(
   const unsigned int face_no = 0;
 
   const unsigned int start_cell_dofs =
-    GeometryInfo<dim>::faces_per_cell * this->n_dofs_per_face(face_no);
+    this->reference_cell().n_faces() * this->n_dofs_per_face(face_no);
   const unsigned int start_cell_points =
-    GeometryInfo<dim>::faces_per_cell * n_face_points;
+    this->reference_cell().n_faces() * n_face_points;
 
   for (unsigned int k = 0; k < interior_weights.size(0); ++k)
     for (unsigned int i = 0; i < interior_weights.size(1); ++i)
@@ -725,14 +804,14 @@ template <int dim>
 std::size_t
 FE_RaviartThomas<dim>::memory_consumption() const
 {
-  Assert(false, ExcNotImplemented());
+  DEAL_II_NOT_IMPLEMENTED();
   return 0;
 }
 
 
 
 // explicit instantiations
-#include "fe_raviart_thomas.inst"
+#include "fe/fe_raviart_thomas.inst"
 
 
 DEAL_II_NAMESPACE_CLOSE

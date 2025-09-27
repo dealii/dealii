@@ -3,8 +3,6 @@ DEAL::Solving problem in 2 space dimensions.
 DEAL::   Number of active cells: 8
 DEAL::   Total number of cells: 8
 DEAL::   Number of degrees of freedom: 9
-DEAL:cg::Starting value 4.18267
-DEAL:cg::Convergence step 1 value 0.00000
 DEAL::   1 CG iterations needed to obtain convergence.
 # vtk DataFile Version 3.0
 #This file was generated 
@@ -49,8 +47,6 @@ DEAL::Solving problem in 3 space dimensions.
 DEAL::   Number of active cells: 24
 DEAL::   Total number of cells: 24
 DEAL::   Number of degrees of freedom: 14
-DEAL:cg::Starting value 0.00000
-DEAL:cg::Convergence step 0 value 0.00000
 DEAL::   0 CG iterations needed to obtain convergence.
 # vtk DataFile Version 3.0
 #This file was generated 

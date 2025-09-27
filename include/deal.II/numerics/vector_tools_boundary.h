@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2023 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2020 - 2024 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 
 #ifndef dealii_vector_tools_boundary_h
@@ -49,7 +48,8 @@ namespace VectorTools
 
   /**
    * Compute constraints on the solution that corresponds to the imposition
-   * of Dirichlet boundary conditions.  This function creates a map of
+   * of Dirichlet boundary conditions on parts of the boundary.
+   * This function creates a map of
    * degrees of freedom subject to Dirichlet boundary conditions and the
    * corresponding values to be assigned to them, by interpolation around the
    * boundary. For each degree of freedom at the boundary, its boundary value
@@ -107,8 +107,35 @@ namespace VectorTools
    * corresponding boundary function, to be called separately for every
    * boundary indicator.
    *
+   * @note Mathematically, boundary conditions can only be applied to a
+   *   part of the boundary that has a nonzero $(d-1)$-dimensional measure;
+   *   in other words, it must be the union of *faces* of a mesh, rather than
+   *   a set of edges in 3d, or even just a few vertices. That is because
+   *   applying boundary conditions on individual vertices (rather than
+   *   on the entire face of which this vertex might be a part) would
+   *   correspond to using Dirac delta functions as boundary values, and
+   *   this generally leads to singular solutions that can not adequately
+   *   be resolved with the finite element method. These considerations
+   *   notwithstanding, people often do apply boundary conditions at individual
+   *   vertices -- in particular in solid mechanics, where one would then
+   *   impose constraints on one or all components of the displacement at a
+   *   vertex. This function does not support this operation: It works solely
+   *   by looping over faces, checking whether the boundary indicator of the
+   *   face is one of the ones of interest, and then considers all of the
+   *   degrees of freedom on the face; it does not consider vertices (or,
+   *   in 3d, edges) separately from the faces they are part of. But you can
+   *   impose constraints on individual vertices by looping over all cells,
+   *   over all vertices of each cell, and identifying whether this is the
+   *   vertex you care about; then you use DoFAccessor::vertex_dof_index()
+   *   to obtain the indices of the DoFs located on it. You can then
+   *   entries for these degrees of freedom by hand to the `std::map`
+   *   or AffineConstraints object you typically use to represent
+   *   boundary value constraints.
+   *
    * @note When solving a partial differential equation with boundary
-   *   conditions $u|_{\partial\Omega}=g$ (or on *parts* of the boundary),
+   *   conditions $u|_{\partial\Omega}=g$ (on the entire boundary
+   *   $\partial\Omega$, or perhaps only on parts $\Gamma\subset\partial\Omega$
+   *   of the boundary),
    *   then this boundary condition is in general not satisfiable exactly
    *   using finite elements in the form $u_h|_{\partial\Omega}=g$. That is
    *   because the function $g$ is generally not a polynomial, whereas
@@ -249,7 +276,7 @@ namespace VectorTools
    * are not set in the second operation on degrees of freedom that are
    * already constrained. This makes sure that the discretization remains
    * conforming as is needed. See the discussion on conflicting constraints in
-   * the module on @ref constraints.
+   * the topic on @ref constraints.
    *
    * For further information and details on the other function arguments, see
    * the interpolate_boundary_values() function with `std::map` arguments and
@@ -500,7 +527,7 @@ namespace VectorTools
    * are not set in the second operation on degrees of freedom that are
    * already constrained. This makes sure that the discretization remains
    * conforming as is needed. See the discussion on conflicting constraints in
-   * the module on
+   * the topic on
    * @ref constraints.
    *
    * If @p component_mapping is empty, it is assumed that the number of
@@ -510,12 +537,36 @@ namespace VectorTools
    * In 1d, projection equals interpolation. Therefore,
    * interpolate_boundary_values is called.
    *
-   * @arg @p component_mapping: if the components in @p boundary_functions and
-   * @p dof do not coincide, this vector allows them to be remapped. If the
-   * vector is not empty, it has to have one entry for each component in @p
-   * dof. This entry is the component number in @p boundary_functions that
-   * should be used for this component in @p dof. By default, no remapping is
-   * applied.
+   * @param[in] mapping The mapping that will be used in the transformations
+   * necessary to integrate along the boundary.
+   * @param[in] dof The DoFHandler that describes the finite element space and
+   * the numbering of degrees of freedom.
+   * @param[in] boundary_functions A map from boundary indicators to pointers
+   * to functions that describe the desired values on those parts of the
+   * boundary marked with this boundary indicator (see
+   * @ref GlossBoundaryIndicator "Boundary indicator").
+   * The projection happens on only those parts of the boundary whose
+   * indicators are represented in this map.
+   * @param[in] q The face quadrature used in the integration necessary to
+   * compute the @ref GlossMassMatrix "mass matrix" and right hand side of the projection.
+   * @param[out] constraints The result of this function. After the call, it
+   * will contain constraints for all indices of degrees of freedom at the
+   * boundary (as covered
+   * by the boundary parts in @p boundary_functions) to the computed dof
+   * value for this degree of freedom. For each degree of freedom at the
+   * boundary, if its index already exists in @p boundary_values then its
+   * boundary value will be overwritten, otherwise a new entry with proper
+   * index and boundary value for this degree of freedom will be inserted into
+   * @p constraints.
+   * @param[in] component_mapping It is sometimes convenient to project a
+   * vector-valued function onto only parts of a finite element space (for
+   * example, to project a function with <code>dim</code> components onto the
+   * velocity components of a <code>dim+1</code> component DoFHandler for a
+   * Stokes problem). To allow for this, this argument allows components to be
+   * remapped. If the vector is not empty, it has to have one entry for each
+   * vector component of the finite element used in @p dof. This entry is the
+   * component number in @p boundary_functions that should be used for this
+   * component in @p dof. By default, no remapping is applied.
    *
    * @ingroup constraints
    */
@@ -549,8 +600,8 @@ namespace VectorTools
   /**
    * This function is an updated version of the
    * project_boundary_values_curl_conforming function. The intention is to fix
-   * a problem when using the previous function in conjunction with non-
-   * rectangular geometries (i.e. elements with non-rectangular faces). The
+   * a problem when using the previous function in conjunction with
+   * non-rectangular geometries (i.e. elements with non-rectangular faces). The
    * L2-projection method used has been taken from the paper "Electromagnetic
    * scattering simulation using an H (curl) conforming hp-finite element
    * method in three dimensions" by PD Ledger, K Morgan and O Hassan ( Int. J.
@@ -564,9 +615,9 @@ namespace VectorTools
    * <h4>Computing constraints</h4>
    *
    * To compute the constraints we use a projection method based upon the
-   * paper mentioned above. In 2d this is done in a single stage for the edge-
-   * based shape functions, regardless of the order of the finite element. In
-   * 3d this is done in two stages, edges first and then faces.
+   * paper mentioned above. In 2d this is done in a single stage for the
+   * edge-based shape functions, regardless of the order of the finite element.
+   * In 3d this is done in two stages, edges first and then faces.
    *
    * For each cell, each edge, $e$, is projected by solving the linear system
    * $Ax=b$ where $x$ is the vector of constraints on degrees of freedom on the
@@ -605,7 +656,7 @@ namespace VectorTools
    * the Dirichlet conditions should be set first, and then completed by
    * hanging node constraints, in order to make sure that the discretization
    * remains consistent. See the discussion on conflicting constraints in the
-   * module on
+   * topic on
    * @ref constraints.
    *
    * <h4>Arguments to this function</h4>
@@ -689,7 +740,7 @@ namespace VectorTools
    * the Dirichlet conditions should be set first, and then completed by
    * hanging node constraints, in order to make sure that the discretization
    * remains consistent. See the discussion on conflicting constraints in the
-   * module on
+   * topic on
    * @ref constraints.
    *
    * The argument @p first_vector_component denotes the first vector component

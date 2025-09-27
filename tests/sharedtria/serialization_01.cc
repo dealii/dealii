@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2008 - 2018 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2023 - 2024 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 
 // Test serialization with shared triangulations.
@@ -33,7 +32,6 @@
 
 #include "../grid/tests.h"
 
-using namespace dealii;
 
 template <int dim>
 class InterpolationFunction : public Function<dim>
@@ -52,7 +50,7 @@ public:
 
 template <int dim, typename TriangulationType>
 void
-test(TriangulationType &triangulation)
+test(TriangulationType &triangulation, TriangulationType &triangulation_clean)
 {
   DoFHandler<dim> dof_handler(triangulation);
   dof_handler.distribute_dofs(FE_Q<dim>(2));
@@ -67,27 +65,49 @@ test(TriangulationType &triangulation)
 
   print_statistics(triangulation, false);
 
-  std::stringstream stream;
+  std::stringstream stream_0, stream_1;
   {
-    boost::archive::text_oarchive oa(stream);
-    oa << triangulation;
-    oa << vector;
+    boost::archive::text_oarchive oa_0(stream_0);
+    boost::archive::text_oarchive oa_1(stream_1);
+    oa_0 << triangulation;
+    oa_0 << vector;
+    oa_1 << triangulation;
+    oa_1 << vector;
   }
 
   triangulation.clear();
 
   {
-    boost::archive::text_iarchive ia(stream);
-    ia >> triangulation;
-    ia >> vector_loaded;
+    // load into existing tringulation
+    {
+      boost::archive::text_iarchive ia(stream_0);
+      ia >> triangulation;
+      ia >> vector_loaded;
+    }
+    print_statistics(triangulation, false);
+
+    // Verify that error is 0.
+    VectorType error(vector);
+    error.add(-1, vector_loaded);
+
+    deallog << (error.linfty_norm() < 1e-16 ? "PASSED" : "FAILED") << std::endl;
   }
-  print_statistics(triangulation, false);
 
-  // Verify that error is 0.
-  VectorType error(vector);
-  error.add(-1, vector_loaded);
+  {
+    // load into new tringulation
+    {
+      boost::archive::text_iarchive ia(stream_1);
+      ia >> triangulation_clean;
+      ia >> vector_loaded;
+    }
+    print_statistics(triangulation_clean, false);
 
-  deallog << (error.linfty_norm() < 1e-16 ? "PASSED" : "FAILED") << std::endl;
+    // Verify that error is 0.
+    VectorType error(vector);
+    error.add(-1, vector_loaded);
+
+    deallog << (error.linfty_norm() < 1e-16 ? "PASSED" : "FAILED") << std::endl;
+  }
 }
 
 int
@@ -108,7 +128,14 @@ main(int argc, char *argv[])
     GridGenerator::hyper_cube(triangulation);
     triangulation.refine_global(3);
 
-    test<dim>(triangulation);
+
+    parallel::shared::Triangulation<dim> triangulation_other(
+      MPI_COMM_WORLD,
+      ::Triangulation<dim>::none,
+      false,
+      parallel::shared::Triangulation<dim>::partition_zorder);
+
+    test<dim>(triangulation, triangulation_other);
   }
   deallog.pop();
 
@@ -124,7 +151,13 @@ main(int argc, char *argv[])
     GridGenerator::hyper_cube(triangulation);
     triangulation.refine_global(3);
 
-    test<dim>(triangulation);
+    parallel::shared::Triangulation<dim> triangulation_other(
+      MPI_COMM_WORLD,
+      ::Triangulation<dim>::none,
+      false,
+      parallel::shared::Triangulation<dim>::partition_zorder);
+
+    test<dim>(triangulation, triangulation_other);
   }
   deallog.pop();
 }

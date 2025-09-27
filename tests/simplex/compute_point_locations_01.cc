@@ -1,25 +1,16 @@
-// Copyright (C) 2020 - 2022 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2021 - 2024 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 #include <deal.II/base/quadrature_lib.h>
-
-#include <deal.II/fe/fe_pyramid_p.h>
-#include <deal.II/fe/fe_simplex_p.h>
-#include <deal.II/fe/fe_simplex_p_bubbles.h>
-#include <deal.II/fe/fe_tools.h>
-#include <deal.II/fe/fe_values.h>
-#include <deal.II/fe/fe_wedge_p.h>
-#include <deal.II/fe/mapping_fe.h>
 
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/grid_tools.h>
@@ -28,9 +19,8 @@
 #include "../tests.h"
 
 // Create a simplex mesh in the unit cube. Check points distribute to each cell
-// via GridTools::compute_point_locations
+// via GridTools::compute_point_locations()
 
-using namespace dealii;
 
 template <int dim>
 void
@@ -39,13 +29,9 @@ test_in_unit_cube(const std::vector<Point<dim>> &points)
   Triangulation<dim> tria;
   GridGenerator::subdivided_hyper_cube_with_simplices(tria, 1);
 
-  MappingFE<dim> mapping(FE_SimplexP<dim>(1));
-
-  const auto tria_cache =
-    std::make_unique<GridTools::Cache<dim>>(tria, mapping);
-
-  const auto point_locations =
-    GridTools::compute_point_locations(*tria_cache, points);
+  GridTools::Cache<dim> cache(tria);
+  const auto            point_locations =
+    GridTools::compute_point_locations(cache, points);
 
   const auto cells   = std::get<0>(point_locations);
   const auto qpoints = std::get<1>(point_locations);
@@ -63,8 +49,8 @@ test_in_unit_cube(const std::vector<Point<dim>> &points)
           deallog << "        physical position   : (" << points[indices[i][j]]
                   << ')' << std::endl;
           deallog << "        FE mapping position : ("
-                  << mapping.transform_unit_to_real_cell(cells[i],
-                                                         qpoints[i][j])
+                  << cache.get_mapping().transform_unit_to_real_cell(
+                       cells[i], qpoints[i][j])
                   << ')' << std::endl;
         }
     }

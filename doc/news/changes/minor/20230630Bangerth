@@ -1,7 +1,0 @@
-Fixed: It was previously possible to access the return value of a
-Threads::Task object if the underlying task had ended with an
-exception. But that return value was not initialized. This is now
-checked: You can no longer call Threads::Task::return_value() after an
-exception.
-<br>
-(Wolfgang Bangerth, 2023/06/30)

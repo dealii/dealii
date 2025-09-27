@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2005 - 2023 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2005 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 #ifndef dealii_utilities_h
 #define dealii_utilities_h
@@ -19,6 +18,7 @@
 #include <deal.II/base/config.h>
 
 #include <deal.II/base/exceptions.h>
+#include <deal.II/base/types.h>
 
 #include <boost/archive/binary_iarchive.hpp>
 #include <boost/archive/binary_oarchive.hpp>
@@ -420,6 +420,9 @@ namespace Utilities
    * In general, C++ uses mangled names to identify types. This function
    * uses boost::core::demangle to return a human readable string describing
    * the type of the variable passed as argument.
+   *
+   * While the function takes the argument `t`, it does not actually use
+   * its value but only the type of `t` for its output.
    */
   template <class T>
   std::string
@@ -429,75 +432,41 @@ namespace Utilities
    * Calculate a fixed power, provided as a template argument, of a number.
    *
    * This function provides an efficient way to calculate things like
-   * <code>t^N</code> where <code>N</code> is a known number at compile time.
+   * $t^N$ where <code>N</code> is a known number at compile time.
+   * The function computes the power of $t$ via the "recursive doubling"
+   * approach in which, for example, $t^7$ is computed as
+   * @f{align*}{
+   *   t^7 = (tttt)(tt)(t)
+   * @f}
+   * where computing $tt$ requires one product, computing $tttt$ is
+   * achieved by multiplying the previously computed $tt$ by itself
+   * (requiring another multiplication), and then the product is computed
+   * via two more multiplications for a total of 4 multiplications
+   * instead of the naively necessary 6.
    *
-   * Use this function as in <code>fixed_power@<dim@> (n)</code>.
+   * The major savings this function generates result, however, from the
+   * fact that it exploits that we have an integer power of the argument $t$.
+   * The alternative to computing such powers, `std::pow(t,7)` uses the
+   * `std::pow` function that takes the exponent as a floating point number
+   * and, because it has to cater to the complexities of the general situation,
+   * is vastly slower.
+   *
+   * Use this function as in `fixed_power<dim> (t)` or `fixed_power<7> (t)`.
    */
   template <int N, typename T>
-  T
+  constexpr T
   fixed_power(const T t);
 
   /**
    * A replacement for <code>std::pow</code> that allows compile-time
-   * calculations for constant expression arguments. The @p base must
-   * be an integer type and the exponent @p iexp must not be negative.
+   * calculations for constant expression arguments and if the exponent
+   * is a positive integer. The @p base must be an arithmetic type
+   * (i.e., an integer or floating point type),
+   * and the exponent @p iexp must not be negative.
    */
-  template <typename T>
+  template <typename T, typename = std::enable_if_t<std::is_arithmetic_v<T>>>
   constexpr DEAL_II_HOST_DEVICE T
-  pow(const T base, const int iexp)
-  {
-#if defined(DEBUG) && !defined(DEAL_II_CXX14_CONSTEXPR_BUG)
-    // Up to __builtin_expect this is the same code as in the 'Assert' macro.
-    // The call to __builtin_expect turns out to be problematic.
-#  if KOKKOS_VERSION >= 30600
-    KOKKOS_IF_ON_HOST(({
-      if (!(iexp >= 0))
-        ::dealii::deal_II_exceptions::internals::issue_error_noreturn(
-          ::dealii::deal_II_exceptions::internals::ExceptionHandling::
-            abort_or_throw_on_exception,
-          __FILE__,
-          __LINE__,
-          __PRETTY_FUNCTION__,
-          "iexp>=0",
-          "ExcMessage(\"The exponent must not be negative!\")",
-          ExcMessage("The exponent must not be negative!"));
-    }))
-#  else
-#    ifdef KOKKOS_ACTIVE_EXECUTION_MEMORY_SPACE_HOST
-    if (!(iexp >= 0))
-      ::dealii::deal_II_exceptions::internals::issue_error_noreturn(
-        ::dealii::deal_II_exceptions::internals::ExceptionHandling::
-          abort_or_throw_on_exception,
-        __FILE__,
-        __LINE__,
-        __PRETTY_FUNCTION__,
-        "iexp>=0",
-        "ExcMessage(\"The exponent must not be negative!\")",
-        ExcMessage("The exponent must not be negative!"));
-#    endif
-#  endif
-#endif
-    static_assert(std::is_integral_v<T>, "Only integral types supported");
-
-    // The "exponentiation by squaring" algorithm used below has to be expressed
-    // in an iterative version since SYCL doesn't allow recursive functions used
-    // in device code.
-
-    if (iexp <= 0)
-      return 1;
-
-    int exp = iexp;
-    T   x   = base;
-    T   y   = 1;
-    while (exp > 1)
-      {
-        if (exp % 2 == 1)
-          y *= x;
-        x *= x;
-        exp /= 2;
-      }
-    return x * y;
-  }
+  pow(const T base, const int iexp);
 
   /**
    * Optimized replacement for <tt>std::lower_bound</tt> for searching within
@@ -523,7 +492,6 @@ namespace Utilities
   template <typename Iterator, typename T>
   Iterator
   lower_bound(Iterator first, Iterator last, const T &val);
-
 
   /**
    * The same function as above, but taking an argument that is used to
@@ -607,7 +575,7 @@ namespace Utilities
    * most common use cases for this function).
    */
   template <typename T>
-  size_t
+  std::size_t
   pack(const T           &object,
        std::vector<char> &dest_buffer,
        const bool         allow_compression = true);
@@ -971,7 +939,7 @@ namespace Utilities
 namespace Utilities
 {
   template <int N, typename T>
-  inline T
+  inline constexpr T
   fixed_power(const T x)
   {
     Assert(((std::is_integral_v<T> == true) && (N >= 0)) ||
@@ -990,6 +958,34 @@ namespace Utilities
       // by repeated squaring:
       return ((N % 2 == 1) ? x * fixed_power<N / 2>(x * x) :
                              fixed_power<N / 2>(x * x));
+  }
+
+
+
+  template <typename T, typename>
+  constexpr DEAL_II_HOST_DEVICE T
+  pow(const T base, const int iexp)
+  {
+    Assert(iexp >= 0, ExcMessage("The exponent must not be negative!"));
+
+    // The "exponentiation by squaring" algorithm used below has to be expressed
+    // in an iterative version since SYCL doesn't allow recursive functions used
+    // in device code.
+
+    if (iexp <= 0)
+      return 1;
+
+    int exp = iexp;
+    T   x   = base;
+    T   y   = 1;
+    while (exp > 1)
+      {
+        if (exp % 2 == 1)
+          y *= x;
+        x *= x;
+        exp /= 2;
+      }
+    return x * y;
   }
 
 
@@ -1083,7 +1079,7 @@ namespace Utilities
                   // somehow? that
                   // shouldn't have
                   // happened
-                  Assert(false, ExcInternalError());
+                  DEAL_II_ASSERT_UNREACHABLE();
               }
           }
 
@@ -1157,7 +1153,7 @@ namespace Utilities
                                                   std::vector<char> &)
     {
       // We shouldn't get here:
-      Assert(false, ExcInternalError());
+      DEAL_II_ASSERT_UNREACHABLE();
     }
 
 
@@ -1247,7 +1243,7 @@ namespace Utilities
       T &)
     {
       // We shouldn't get here:
-      Assert(false, ExcInternalError());
+      DEAL_II_ASSERT_UNREACHABLE();
     }
 
 
@@ -1266,7 +1262,7 @@ namespace Utilities
 
       // Get the size of the vector
       typename std::vector<T>::size_type vector_size;
-      memcpy(&vector_size, &*cbegin, sizeof(vector_size));
+      std::memcpy(&vector_size, &*cbegin, sizeof(vector_size));
 
       Assert(static_cast<std::ptrdiff_t>(cend - cbegin) ==
                static_cast<std::ptrdiff_t>(sizeof(vector_size) +
@@ -1274,15 +1270,29 @@ namespace Utilities
              ExcMessage("The given buffer has the wrong size."));
       (void)cend;
 
-      // Copy the elements:
-      object.clear();
+      // Resize the output array and copy the elements into it. We need
+      // to make sure that we don't access the buffer via a
+      // reinterpret_cast<T*> because the T objects in the buffer may
+      // not be aligned properly. Rather, use memcpy, which doesn't care
+      // about alignment and is correct in this situation because we
+      // are dealing with trivially copyable objects.
+      //
+      // (Strictly speaking, this writes into the output object twice, once
+      // for the resize() operation and once during memcpy. This could be
+      // avoided by (i) checking whether the point is aligned, using for
+      // example boost::alignment::is_aligned(), and (ii) if the data
+      // is aligned, re-create the output vector using
+      //   object.clear();
+      //   object.insert (object.end(),
+      //                  (T*)(&*cbegin + sizeof(vector_size)),
+      //                  (T*)(&*cbegin + sizeof(vector_size)) + vector_size);
+      // In practice, the difference is likely rather small, assuming the
+      // compiler does not already optimize away the first initialization.
+      object.resize(vector_size);
       if (vector_size > 0)
-        {
-          const T *const buffer_data_begin =
-            reinterpret_cast<const T *>(&*cbegin + sizeof(vector_size));
-          const T *const buffer_data_end = buffer_data_begin + vector_size;
-          object.insert(object.end(), buffer_data_begin, buffer_data_end);
-        }
+        std::memcpy(object.data(),
+                    &*cbegin + sizeof(vector_size),
+                    vector_size * sizeof(T));
     }
 
 
@@ -1300,14 +1310,14 @@ namespace Utilities
       using size_type = typename std::vector<T>::size_type;
       std::vector<char>::const_iterator iterator = cbegin;
       size_type                         vector_size;
-      memcpy(&vector_size, &*iterator, sizeof(vector_size));
+      std::memcpy(&vector_size, &*iterator, sizeof(vector_size));
       object.clear();
       object.resize(vector_size);
       std::vector<size_type> sizes(vector_size);
       if (vector_size > 0)
-        memcpy(sizes.data(),
-               &*iterator + sizeof(vector_size),
-               vector_size * sizeof(size_type));
+        std::memcpy(sizes.data(),
+                    &*iterator + sizeof(vector_size),
+                    vector_size * sizeof(size_type));
 
       iterator += sizeof(vector_size) * (1 + vector_size);
       size_type aggregated_size = 0;
@@ -1319,15 +1329,15 @@ namespace Utilities
              ExcMessage("The given buffer has the wrong size."));
       (void)cend;
 
-      // Then copy the elements:
+      // Then copy the elements. As for the previous function, use memcpy
+      // rather than accessing the data via reinterpret_cast<T*> to
+      // avoid alignment issues.
       for (unsigned int i = 0; i < vector_size; ++i)
         if (sizes[i] > 0)
           {
-            object[i].insert(object[i].end(),
-                             reinterpret_cast<const T *>(&*iterator),
-                             reinterpret_cast<const T *>(&*iterator +
-                                                         sizeof(T) * sizes[i]));
-            iterator += sizeof(T) * sizes[i];
+            object[i].resize(sizes[i]);
+            std::memcpy(object[i].data(), &*iterator, sizes[i] * sizeof(T));
+            iterator += sizes[i] * sizeof(T);
           }
 
       Assert(iterator == cend,
@@ -1339,7 +1349,7 @@ namespace Utilities
 
 
   template <typename T>
-  size_t
+  std::size_t
   pack(const T           &object,
        std::vector<char> &dest_buffer,
        const bool         allow_compression)

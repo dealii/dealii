@@ -1,17 +1,16 @@
-/* ---------------------------------------------------------------------
+/* ------------------------------------------------------------------------
  *
- * Copyright (C) 2009 - 2022 by the deal.II authors
+ * SPDX-License-Identifier: LGPL-2.1-or-later
+ * Copyright (C) 2019 - 2024 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
- * The deal.II library is free software; you can use it, redistribute
- * it, and/or modify it under the terms of the GNU Lesser General
- * Public License as published by the Free Software Foundation; either
- * version 2.1 of the License, or (at your option) any later version.
- * The full text of the license can be found in the file LICENSE.md at
- * the top level directory of deal.II.
+ * Part of the source code is dual licensed under Apache-2.0 WITH
+ * LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+ * governing the source code and code contributions can be found in
+ * LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
  *
- * ---------------------------------------------------------------------
+ * ------------------------------------------------------------------------
 
  *
  * Author: Guido Kanschat, Texas A&M University, 2009
@@ -176,7 +175,7 @@ namespace Step12
 
     for (unsigned int i = 0; i < values.size(); ++i)
       {
-        if (points[i](0) < 0.5)
+        if (points[i][0] < 0.5)
           values[i] = 1.;
         else
           values[i] = 0.;
@@ -191,8 +190,8 @@ namespace Step12
     Assert(dim >= 2, ExcNotImplemented());
 
     Point<dim> wind_field;
-    wind_field(0) = -p(1);
-    wind_field(1) = p(0);
+    wind_field[0] = -p[1];
+    wind_field[1] = p[0];
     wind_field /= wind_field.norm();
 
     return wind_field;
@@ -314,6 +313,10 @@ namespace Step12
 
       for (unsigned int point = 0; point < q_points.size(); ++point)
         {
+          Assert(normals[point] ==
+                   scratch_data.fe_interface_values.normal_vector(point),
+                 ExcInternalError());
+
           const double beta_n = beta(q_points[point]) * normals[point];
 
           if (beta_n > 0)

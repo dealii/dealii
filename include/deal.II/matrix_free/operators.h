@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2011 - 2023 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2014 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 
 #ifndef dealii_matrix_free_operators_h
@@ -20,8 +19,8 @@
 
 #include <deal.II/base/config.h>
 
+#include <deal.II/base/enable_observer_pointer.h>
 #include <deal.II/base/exceptions.h>
-#include <deal.II/base/subscriptor.h>
 #include <deal.II/base/vectorization.h>
 
 #include <deal.II/lac/diagonal_matrix.h>
@@ -185,7 +184,7 @@ namespace MatrixFreeOperators
             typename VectorType = LinearAlgebra::distributed::Vector<double>,
             typename VectorizedArrayType =
               VectorizedArray<typename VectorType::value_type>>
-  class Base : public Subscriptor
+  class Base : public EnableObserverPointer
   {
   public:
     /**
@@ -535,7 +534,7 @@ namespace MatrixFreeOperators
    * prolongation phase.
    */
   template <typename OperatorType>
-  class MGInterfaceOperator : public Subscriptor
+  class MGInterfaceOperator : public EnableObserverPointer
   {
   public:
     /**
@@ -591,7 +590,7 @@ namespace MatrixFreeOperators
     /**
      * Const pointer to the operator class.
      */
-    SmartPointer<const OperatorType> mf_base_operator;
+    ObserverPointer<const OperatorType> mf_base_operator;
   };
 
 
@@ -1035,7 +1034,10 @@ namespace MatrixFreeOperators
                              false,
                              VectorizedArrayType> &fe_eval)
     : fe_eval(fe_eval)
-  {}
+  {
+    AssertDimension(fe_eval.get_shape_info().dofs_per_component_on_cell,
+                    fe_eval.get_shape_info().n_q_points);
+  }
 
 
 
@@ -1216,7 +1218,7 @@ namespace MatrixFreeOperators
   //----------------- Base operator -----------------------------
   template <int dim, typename VectorType, typename VectorizedArrayType>
   Base<dim, VectorType, VectorizedArrayType>::Base()
-    : Subscriptor()
+    : EnableObserverPointer()
     , have_interface_matrices(false)
   {}
 
@@ -1265,7 +1267,6 @@ namespace MatrixFreeOperators
   Base<dim, VectorType, VectorizedArrayType>::el(const unsigned int row,
                                                  const unsigned int col) const
   {
-    (void)col;
     Assert(row == col, ExcNotImplemented());
     Assert(inverse_diagonal_entries.get() != nullptr &&
              inverse_diagonal_entries->m() > 0,
@@ -1806,7 +1807,7 @@ namespace MatrixFreeOperators
 
   template <typename OperatorType>
   MGInterfaceOperator<OperatorType>::MGInterfaceOperator()
-    : Subscriptor()
+    : EnableObserverPointer()
     , mf_base_operator(nullptr)
   {}
 
@@ -1975,13 +1976,14 @@ namespace MatrixFreeOperators
     for (unsigned int i = 0; i < inverse_diagonal_vector.locally_owned_size();
          ++i)
       {
-#ifdef DEBUG
-        // only define the type alias in debug mode to avoid a warning
-        using Number =
-          typename Base<dim, VectorType, VectorizedArrayType>::value_type;
-        Assert(diagonal_vector.local_element(i) > Number(0),
-               ExcInternalError());
-#endif
+        if constexpr (running_in_debug_mode())
+          {
+            // only define the type alias in debug mode to avoid a warning
+            using Number =
+              typename Base<dim, VectorType, VectorizedArrayType>::value_type;
+            Assert(diagonal_vector.local_element(i) > Number(0),
+                   ExcInternalError());
+          }
         inverse_diagonal_vector.local_element(i) =
           1. / inverse_diagonal_vector.local_element(i);
       }

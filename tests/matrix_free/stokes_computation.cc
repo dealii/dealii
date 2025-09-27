@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2012 - 2022 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2018 - 2024 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 
 // test for correctness of matrix free implementation for multigrid stokes
@@ -88,7 +87,7 @@ namespace StokesClass
               class MassMatrixType,
               class PreconditionerA,
               class PreconditionerMp>
-    class BlockSchurPreconditioner : public Subscriptor
+    class BlockSchurPreconditioner : public EnableObserverPointer
     {
     public:
       /**
@@ -240,15 +239,19 @@ namespace StokesClass
           {
             if (Utilities::MPI::this_mpi_process(
                   src.block(0).get_mpi_communicator()) == 0)
-              AssertThrow(
-                false,
-                ExcMessage(
-                  std::string(
-                    "The iterative (bottom right) solver in BlockSchurPreconditioner::vmult "
-                    "did not converge to a tolerance of " +
-                    Utilities::to_string(solver_control.tolerance()) +
-                    ". It reported the following error:\n\n") +
-                  exc.what())) else throw QuietException();
+              {
+                AssertThrow(
+                  false,
+                  ExcMessage(
+                    std::string(
+                      "The iterative (bottom right) solver in BlockSchurPreconditioner::vmult "
+                      "did not converge to a tolerance of " +
+                      Utilities::to_string(solver_control.tolerance()) +
+                      ". It reported the following error:\n\n") +
+                    exc.what()));
+              }
+            else
+              throw QuietException();
           }
         dst.block(1) *= -1.0;
       }
@@ -267,7 +270,7 @@ namespace StokesClass
       // iterations of our two-stage outer GMRES iteration)
       if (do_solve_A == true)
         {
-          Assert(false, ExcNotImplemented());
+          DEAL_II_NOT_IMPLEMENTED();
         }
       else
         {
@@ -490,7 +493,7 @@ namespace StokesClass
                 Point<dim> p;
                 for (unsigned int d = 0; d < dim; ++d)
                   {
-                    p(d) = velocity.quadrature_point(q)(d)[i];
+                    p[d] = velocity.quadrature_point(q)[d][i];
                   }
                 return_value[i] = 2.0 * viscosity_function.value(p);
               }
@@ -555,7 +558,7 @@ namespace StokesClass
   void
   StokesOperator<dim, degree_v, number>::compute_diagonal()
   {
-    Assert(false, ExcNotImplemented());
+    DEAL_II_NOT_IMPLEMENTED();
   }
 
 
@@ -624,7 +627,7 @@ namespace StokesClass
               {
                 Point<dim> p;
                 for (unsigned int d = 0; d < dim; ++d)
-                  p(d) = pressure.quadrature_point(q)(d)[i];
+                  p[d] = pressure.quadrature_point(q)[d][i];
                 return_value[i] = 1.0 / viscosity_function.value(p);
               }
             one_over_viscosity(cell, q) = return_value;
@@ -803,7 +806,7 @@ namespace StokesClass
                 Point<dim> p;
                 for (unsigned int d = 0; d < dim; ++d)
                   {
-                    p(d) = velocity.quadrature_point(q)(d)[i];
+                    p[d] = velocity.quadrature_point(q)[d][i];
                   }
                 return_value[i] = 2.0 * viscosity_function.value(p);
               }
@@ -1037,7 +1040,8 @@ namespace StokesClass
 
     const IndexSet locally_relevant_dofs_u =
       DoFTools::extract_locally_relevant_dofs(dof_handler_u);
-    constraints_u.reinit(locally_relevant_dofs_u);
+    constraints_u.reinit(dof_handler_u.locally_owned_dofs(),
+                         locally_relevant_dofs_u);
     DoFTools::make_hanging_node_constraints(dof_handler_u, constraints_u);
 
     VectorTools::interpolate_boundary_values(
@@ -1046,7 +1050,8 @@ namespace StokesClass
 
     const IndexSet locally_relevant_dofs_p =
       DoFTools::extract_locally_relevant_dofs(dof_handler_p);
-    constraints_p.reinit(locally_relevant_dofs_p);
+    constraints_p.reinit(dof_handler_p.locally_owned_dofs(),
+                         locally_relevant_dofs_p);
     DoFTools::make_hanging_node_constraints(dof_handler_p, constraints_p);
     constraints_p.close();
 
@@ -1113,7 +1118,8 @@ namespace StokesClass
         const IndexSet relevant_dofs =
           DoFTools::extract_locally_relevant_level_dofs(dof_handler_u, level);
         AffineConstraints<double> level_constraints;
-        level_constraints.reinit(relevant_dofs);
+        level_constraints.reinit(dof_handler_u.locally_owned_mg_dofs(level),
+                                 relevant_dofs);
         level_constraints.add_lines(
           mg_constrained_dofs.get_boundary_indices(level));
         level_constraints.close();
@@ -1145,10 +1151,7 @@ namespace StokesClass
     stokes_matrix.initialize_dof_vector(solution);
     stokes_matrix.initialize_dof_vector(system_rhs);
 
-    solution.update_ghost_values();
     solution.collect_sizes();
-
-    system_rhs.update_ghost_values();
     system_rhs.collect_sizes();
   }
 
@@ -1171,7 +1174,8 @@ namespace StokesClass
     AffineConstraints<double> constraints_u_no_dirchlet;
     const IndexSet            locally_relevant_dofs_u =
       DoFTools::extract_locally_relevant_dofs(dof_handler_u);
-    constraints_u_no_dirchlet.reinit(locally_relevant_dofs_u);
+    constraints_u_no_dirchlet.reinit(dof_handler_u.locally_owned_dofs(),
+                                     locally_relevant_dofs_u);
     DoFTools::make_hanging_node_constraints(dof_handler_u,
                                             constraints_u_no_dirchlet);
     constraints_u_no_dirchlet.close();
@@ -1223,7 +1227,7 @@ namespace StokesClass
               {
                 Point<dim> p;
                 for (unsigned int d = 0; d < dim; ++d)
-                  p(d) = velocity.quadrature_point(q)(d)[i];
+                  p[d] = velocity.quadrature_point(q)[d][i];
 
                 Vector<double> rhs_temp(dim + 1);
                 right_hand_side.vector_value(p, rhs_temp);
@@ -1383,13 +1387,19 @@ namespace StokesClass
     solution.block(block_vel) = distributed_stokes_solution.block(block_vel);
     solution.block(block_p)   = distributed_stokes_solution.block(block_p);
 
+    LinearAlgebra::distributed::BlockVector<double> vec(
+      distributed_stokes_solution);
+    stokes_matrix.vmult(vec, distributed_stokes_solution);
+    vec -= distributed_stokes_rhs;
+
     deallog << "Solved-in "
             << (solver_control_cheap.last_step() !=
                     numbers::invalid_unsigned_int ?
                   solver_control_cheap.last_step() :
                   0)
             << " iterations, final residual: "
-            << solver_control_cheap.last_value() << std::endl;
+            << solver_control_cheap.last_value() << " and true residual "
+            << vec.l2_norm() << std::endl;
   }
 
 

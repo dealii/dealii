@@ -1,23 +1,22 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2005 - 2020 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2005 - 2024 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 
 /**
  * @defgroup Quadrature Quadrature formulas
  *
- * This module contains the base class Quadrature as well as the quadrature
+ * This group contains the base class Quadrature as well as the quadrature
  * formulas provided by deal.II. Quadrature formulas provide two essential
  * pieces of data: the locations of quadrature points on the unit cell
  * [0,1]^d, and the weight of each quadrature point.
@@ -30,7 +29,7 @@
  * coordinate direction than in another) through the QAnisotropic class, as
  * well as the definition of quadrature formulas that are not tensor products.
  *
- * In the grand scheme of things, the classes of this module interact
+ * In the grand scheme of things, the classes of this group interact
  * with a variety of other parts of the library:
  * @dot
  digraph G
@@ -133,7 +132,7 @@
  * but it provides functions for computing quadrature formulas on the
  * surfaces of higher dimensional cells.
  *
- * All other classes in this module actually implement quadrature
+ * All other classes in this group actually implement quadrature
  * rules of different order and other characteristics.
  *
  *

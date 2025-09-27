@@ -1,17 +1,16 @@
-/* ---------------------------------------------------------------------
+/* ------------------------------------------------------------------------
  *
- * Copyright (C) 2009 - 2022 by the deal.II authors
+ * SPDX-License-Identifier: LGPL-2.1-or-later
+ * Copyright (C) 2021 - 2024 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
- * The deal.II library is free software; you can use it, redistribute
- * it, and/or modify it under the terms of the GNU Lesser General
- * Public License as published by the Free Software Foundation; either
- * version 2.1 of the License, or (at your option) any later version.
- * The full text of the license can be found in the file LICENSE.md at
- * the top level directory of deal.II.
+ * Part of the source code is dual licensed under Apache-2.0 WITH
+ * LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+ * governing the source code and code contributions can be found in
+ * LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
  *
- * ---------------------------------------------------------------------
+ * ------------------------------------------------------------------------
 
  *
  * Author: Wolfgang Bangerth, Texas A&M University, 2009, 2010
@@ -93,7 +92,6 @@ namespace LA
 
 namespace Step40
 {
-  using namespace dealii;
 
   template <int dim>
   class LaplaceProblem
@@ -174,7 +172,7 @@ namespace Step40
     system_rhs.reinit(locally_owned_dofs, mpi_communicator);
 
     constraints.clear();
-    constraints.reinit(locally_relevant_dofs);
+    constraints.reinit(locally_owned_dofs, locally_relevant_dofs);
     DoFTools::make_hanging_node_constraints(dof_handler, constraints);
     VectorTools::interpolate_boundary_values(
       mapping, dof_handler, 0, Functions::ZeroFunction<dim>(), constraints);
@@ -267,11 +265,7 @@ namespace Step40
 
     SolverControl solver_control(dof_handler.n_dofs(), 1e-12);
 
-#ifdef USE_PETSC_LA
-    LA::SolverCG solver(solver_control, mpi_communicator);
-#else
-    LA::SolverCG             solver(solver_control);
-#endif
+    LA::SolverCG solver(solver_control);
 
     LA::MPI::PreconditionAMG preconditioner;
 
@@ -310,11 +304,11 @@ namespace Step40
                                       Functions::ZeroFunction<dim>(),
                                       difference,
                                       quadrature_formula,
-                                      VectorTools::NormType::L2_norm);
+                                      VectorTools::L2_norm);
 
     deallog << VectorTools::compute_global_error(triangulation,
                                                  difference,
-                                                 VectorTools::NormType::L2_norm)
+                                                 VectorTools::L2_norm)
             << std::endl;
   }
 
@@ -413,7 +407,6 @@ main(int argc, char *argv[])
 
   try
     {
-      using namespace dealii;
       using namespace Step40;
 
 

@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2023 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 1998 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 #ifndef dealii_fe_h
 #define dealii_fe_h
@@ -161,7 +160,7 @@ class FESystem;
  * done based on vector components, but based on the use of
  * @ref GlossBlock "blocks",
  * and the result is then used to substructure objects of type BlockVector,
- * BlockSparseMatrix, BlockMatrixArray, and so on. If you use non-primitive
+ * BlockSparseMatrix, and so on. If you use non-primitive
  * elements, you cannot determine the block number by
  * FiniteElement::system_to_component_index(). Instead, you can use
  * FiniteElement::system_to_block_index(). The number of blocks of a finite
@@ -297,7 +296,7 @@ class FESystem;
  * do with how they interact with mappings, quadrature, and the FEValues
  * class, you will also want to read through the
  * @ref FE_vs_Mapping_vs_FEValues
- * documentation module.
+ * documentation topic.
  *
  *
  * <h4>Interpolation matrices in one dimension</h4>
@@ -358,7 +357,7 @@ class FESystem;
  * <h4>Interpolation matrices in three dimensions</h4>
  *
  * For the interface constraints, the 3d case is similar to the 2d case. The
- * numbering for the indices $n$ on the mother face is obvious and keeps to
+ * numbering for the indices $n$ on the parent face is obvious and keeps to
  * the usual numbering of degrees of freedom on quadrilaterals.
  *
  * The numbering of the degrees of freedom on the interior of the refined
@@ -368,7 +367,7 @@ class FESystem;
  * $m=d_v...5d_v-1$ for the dofs on the vertices at the center of the bounding
  * lines of the quadrilateral, $m=5d_v..5d_v+4*d_l-1$ are for the degrees of
  * freedom on the four lines connecting the center vertex to the outer
- * boundary of the mother face, $m=5d_v+4*d_l...5d_v+4*d_l+8*d_l-1$ for the
+ * boundary of the parent face, $m=5d_v+4*d_l...5d_v+4*d_l+8*d_l-1$ for the
  * degrees of freedom on the small lines surrounding the quad, and
  * $m=5d_v+12*d_l...5d_v+12*d_l+4*d_q-1$ for the dofs on the four child faces.
  * Note the direction of the lines at the boundary of the quads, as shown
@@ -652,7 +651,8 @@ class FESystem;
  * @ingroup febase fe
  */
 template <int dim, int spacedim = dim>
-class FiniteElement : public Subscriptor, public FiniteElementData<dim>
+class FiniteElement : public EnableObserverPointer,
+                      public FiniteElementData<dim>
 {
 public:
   /**
@@ -961,10 +961,11 @@ public:
   shape_3rd_derivative(const unsigned int i, const Point<dim> &p) const;
 
   /**
-   * Just like for shape_3rd_derivative(), but this function will be called
-   * when the shape function has more than one non-zero vector component. In
-   * that case, this function should return the gradient of the @p component-
-   * th vector component of the @p ith shape function at point @p p.
+   * Just like for shape_3rd_derivative(), but this function will be
+   * called when the shape function has more than one non-zero vector
+   * component. In that case, this function should return the gradient
+   * of the @p component-th vector component of the @p ith shape
+   * function at point @p p.
    */
   virtual Tensor<3, dim>
   shape_3rd_derivative_component(const unsigned int i,
@@ -998,8 +999,9 @@ public:
   /**
    * Just like for shape_4th_derivative(), but this function will be called
    * when the shape function has more than one non-zero vector component. In
-   * that case, this function should return the gradient of the @p component-
-   * th vector component of the @p ith shape function at point @p p.
+   * that case, this function should return the gradient of the
+   * @p component-th vector component of the @p ith shape function at point
+   * @p p.
    */
   virtual Tensor<4, dim>
   shape_4th_derivative_component(const unsigned int i,
@@ -1039,6 +1041,21 @@ public:
    * FiniteElement::ExcProjectionVoid. You can check whether this would happen
    * by first calling the restriction_is_implemented() or the
    * isotropic_restriction_is_implemented() function.
+   *
+   * @note The term "restriction" is also used in the definition of multigrid
+   *   methods, but in a different context. For the current function, we are
+   *   interested in the interpolation of a finite element function from
+   *   child cells to the parent cell, and this results in a situation where
+   *   you have a function that is constant on a fine mesh, the function
+   *   "restricted" to the coarse mesh will also be constant and have the same
+   *   value. In contrast, in the multigrid context, the restriction operation
+   *   is applied to residual (rather than solution) vectors, and is usually
+   *   chosen as the transpose of the prolongation operation. For the multigrid
+   *   restriction operation, one would consequently not typically expect
+   *   that it maps a constant function to a constant function. In other words,
+   *   the *meaning* of the term "restriction" in the current context and in
+   *   the multigrid context is quite different, and the two should not
+   *   be confused.
    */
   virtual const FullMatrix<double> &
   get_restriction_matrix(const unsigned int         child,
@@ -1423,10 +1440,10 @@ public:
    * typically used.
    *
    * The use of this function is explained extensively in the step-8 and
-   * @ref step_20 "step-20"
+   * step-20
    * tutorial programs as well as in the
    * @ref vector_valued
-   * module.
+   * topic.
    */
   std::pair<unsigned int, unsigned int>
   system_to_component_index(const unsigned int index) const;
@@ -1458,19 +1475,16 @@ public:
                                  const unsigned int face_no = 0) const;
 
   /**
-   * For faces with non-standard face_orientation in 3d, the dofs on faces
-   * (quads) have to be permuted in order to be combined with the correct
-   * shape functions. Given a local dof @p index on a quad, return the local
-   * index, if the face has non-standard face_orientation, face_flip or
-   * face_rotation. In 2d and 1d there is no need for permutation and
-   * consequently an exception is thrown.
+   * Given a local dof @p index on a quad, return the local index accounting for
+   * the face orientation @p combined_orientation. This is only necessary in 3d:
+   * consequently, if this function is called in 1d or 2d then an exception is
+   * thrown.
    */
   unsigned int
-  adjust_quad_dof_index_for_face_orientation(const unsigned int index,
-                                             const unsigned int face_no,
-                                             const bool face_orientation,
-                                             const bool face_flip,
-                                             const bool face_rotation) const;
+  adjust_quad_dof_index_for_face_orientation(
+    const unsigned int                 index,
+    const unsigned int                 face_no,
+    const types::geometric_orientation combined_orientation) const;
 
   /**
    * Given an index in the natural ordering of indices on a face, return the
@@ -1497,15 +1511,9 @@ public:
    * index must be between zero and dofs_per_face.
    * @param face The number of the face this degree of freedom lives on. This
    * number must be between zero and GeometryInfo::faces_per_cell.
-   * @param face_orientation One part of the description of the orientation of
-   * the face. See
-   * @ref GlossFaceOrientation.
-   * @param face_flip One part of the description of the orientation of the
-   * face. See
-   * @ref GlossFaceOrientation.
-   * @param face_rotation One part of the description of the orientation of
-   * the face. See
-   * @ref GlossFaceOrientation.
+   * @param combined_orientation The combined orientation flag containing the
+   * orientation, rotation, and flip of the face. See
+   * @ref GlossCombinedOrientation.
    * @return The index of this degree of freedom within the set of degrees of
    * freedom on the entire cell. The returned value will be between zero and
    * dofs_per_cell.
@@ -1527,22 +1535,24 @@ public:
    * freedom actually represent.
    */
   virtual unsigned int
-  face_to_cell_index(const unsigned int face_dof_index,
-                     const unsigned int face,
-                     const bool         face_orientation = true,
-                     const bool         face_flip        = false,
-                     const bool         face_rotation    = false) const;
+  face_to_cell_index(const unsigned int                 face_dof_index,
+                     const unsigned int                 face,
+                     const types::geometric_orientation combined_orientation =
+                       numbers::default_geometric_orientation) const;
 
   /**
-   * For lines with non-standard line_orientation in 3d, the dofs on lines
-   * have to be permuted in order to be combined with the correct shape
-   * functions. Given a local dof @p index on a line, return the local index,
-   * if the line has non-standard line_orientation. In 2d and 1d there is no
-   * need for permutation, so the given index is simply returned.
+   * Given a local dof @p index on a line and the orientation @p
+   * combined_orientation of that line, return the local dof which accounts for
+   * @p combined_orientation.
+   *
+   * @note In both 1d and 2d all-quadrilateral meshes all lines have the
+   * standard orientation. However, since 2d meshes may contain both
+   * quadrilaterals and triangles, this assumption cannot be made in this class.
    */
   unsigned int
-  adjust_line_dof_index_for_line_orientation(const unsigned int index,
-                                             const bool line_orientation) const;
+  adjust_line_dof_index_for_line_orientation(
+    const unsigned int                 index,
+    const types::geometric_orientation combined_orientation) const;
 
   /**
    * Return in which of the vector components of this finite element the @p
@@ -1588,17 +1598,36 @@ public:
   is_primitive() const;
 
   /**
-   * Return whether the @p ith shape function is primitive in the sense that
-   * the shape function is non-zero in only one vector component. Non-
-   * primitive shape functions would then, for example, be those of divergence
-   * free ansatz spaces, in which the individual vector components are
-   * coupled.
+   * Return whether the @p ith shape function is primitive in the
+   * sense that the shape function is non-zero in only one vector
+   * component. Non-primitive shape functions would then, for example,
+   * be those of divergence free ansatz spaces, in which the
+   * individual vector components are coupled.
    *
    * The result of the function is @p true if and only if the result of
    * <tt>n_nonzero_components(i)</tt> is equal to one.
    */
   bool
   is_primitive(const unsigned int i) const;
+
+  /**
+   * Return a table (or sparsity pattern) with information which of the
+   * local DoFs per cell couple with each other.
+   *
+   * If the FiniteElement returns an empty (0 by 0) table, which is the
+   * default implementation for any class that does not override this
+   * function, all DoFs are assumed to couple.
+   *
+   * Otherwise, this function returns a square table with n_dofs_per_cell
+   * rows and columns. The entry (i,j) then denotes if the DoF i and j
+   * are coupled. This should be true if the support of the shape functions
+   * have a non-empty intersection.
+   *
+   * An example for an element that does make use of this feature is
+   * FE_Q_iso_Q1.
+   */
+  virtual const Table<2, bool> &
+  get_local_dof_sparsity_pattern() const;
 
   /**
    * Number of base elements in a mixed discretization.
@@ -1796,10 +1825,84 @@ public:
   unsigned int
   component_to_block_index(const unsigned int component) const;
 
+  /**
+   * For vector-valued finite elements, return whether the shape
+   * function indicated by the first argument is part of the scalar
+   * vector component indicated by the second argument. In practice,
+   * what this means is that the set of nonzero vector components of
+   * the indicated shape function includes the one vector component
+   * represented by the second argument; in other words, whether the
+   * shape function is (potentially) nonzero in the given vector
+   * component.
+   *
+   * A typical example would be in a program like step-22, where we
+   * might want to know whether a shape function of the combined,
+   * vector-valued element, corresponds to the pressure part of the
+   * solution.
+   */
+  bool
+  shape_function_belongs_to(const unsigned int                shape_function,
+                            const FEValuesExtractors::Scalar &component) const;
+
+  /**
+   * For vector-valued finite elements, return whether the shape
+   * function indicated by the first argument is part of the `dim`
+   * vector components indicated by the second argument. In practice,
+   * what this means is that the set of nonzero vector components of
+   * the indicated shape function overlaps the vector components
+   * represented by the second argument; in other words, whether the
+   * shape function is (potentially) nonzero any of the given vector
+   * components.
+   *
+   * A typical example would be in a program like step-22, where we
+   * might want to know whether a shape function of the combined,
+   * vector-valued element, corresponds to the velocity part of the
+   * solution.
+   */
+  bool
+  shape_function_belongs_to(const unsigned int                shape_function,
+                            const FEValuesExtractors::Vector &components) const;
+
+
+  /**
+   * For vector-valued finite elements, return whether the shape
+   * function indicated by the first argument is part of the `dim*(dim+1)/2`
+   * vector components indicated by the second argument. In practice,
+   * what this means is that the set of nonzero vector components of
+   * the indicated shape function overlaps the vector components
+   * represented by the second argument; in other words, whether the
+   * shape function is (potentially) nonzero any of the given
+   * components that represent a symmetric tensor.
+   *
+   * An example would be in a program like step-71, where we
+   * might want to know whether a shape function of the combined,
+   * vector-valued element, corresponds to the $H$ or $C$ part of the
+   * solution, where $H$ is a vector and $C$ is a symmetric tensor.
+   */
+  bool
+  shape_function_belongs_to(
+    const unsigned int                            shape_function,
+    const FEValuesExtractors::SymmetricTensor<2> &components) const;
+
+
+  /**
+   * For vector-valued finite elements, return whether the shape
+   * function indicated by the first argument is part of the `dim*dim`
+   * vector components indicated by the second argument. In practice,
+   * what this means is that the set of nonzero vector components of
+   * the indicated shape function overlaps the vector components
+   * represented by the second argument; in other words, whether the
+   * shape function is (potentially) nonzero any of the given
+   * components that represent a tensor.
+   */
+  bool
+  shape_function_belongs_to(
+    const unsigned int                   shape_function,
+    const FEValuesExtractors::Tensor<2> &components) const;
   /** @} */
 
   /**
-   * @name Component and block matrices
+   * @name Component and block masks
    * @{
    */
 
@@ -2014,20 +2117,29 @@ public:
 
   /**
    * Return whether a finite element has defined support points. If the result
-   * is true, then a call to the get_unit_support_points() yields a non-empty
-   * array.
+   * is true, then a call to the get_unit_support_points() yields an
+   * array with `dofs_per_cell` entries. Note that the function's name is
+   * poorly chosen: The function does not return *whether* an element has
+   * support points, but whether its implementation is able to *provide*
+   * a list of support points via get_unit_support_points().
    *
-   * The result may be false if an element is not defined by interpolating
-   * shape functions, for example by P-elements on quadrilaterals. It will
-   * usually only be true if the element constructs its shape functions by the
-   * requirement that they be one at a certain point and zero at all the
-   * points associated with the other shape functions.
+   * The result may be false if a finite element defines itself not by
+   * interpolating shape functions, but by other means. A typical example are
+   * discontinuous $P$-type elements on quadrilaterals (rather than the common
+   * $Q$-type elements on quadrilaterals). Elements will generally only return
+   * `true` if they construct their shape functions by the
+   * requirement that they be nonzero at a certain point and zero at all the
+   * points associated with the other shape functions. In other words,
+   * if the "node functionals" that form the dual space of the finite
+   * element space and are used to define the shape functions are point
+   * evaluations.
    *
    * In composed elements (i.e. for the FESystem class), the result will be
    * true if all the base elements have defined support points. FE_Nothing
-   * is a special case in FESystems, because it has 0 support points and
-   * has_support_points() is false, but an FESystem containing an FE_Nothing
-   * among other elements will return true.
+   * is a special case since it does not have support point (it has no
+   * shape functions, after all), and so returns an empty array from its
+   * get_unit_support_points() function. Nonetheless, because that array has
+   * the right size, it reports `true` in the current function.
    */
   bool
   has_support_points() const;
@@ -2079,7 +2191,10 @@ public:
   /**
    * Return whether a finite element has defined support points on faces. If
    * the result is true, then a call to the get_unit_face_support_points()
-   * yields a non-empty vector.
+   * yields an array with `dofs_per_face` entries. Note that the function's name
+   * is poorly chosen: The function does not return *whether* an element has
+   * support points, but whether its implementation is able to *provide*
+   * a list of support points via get_unit_face_support_points().
    *
    * For more information, see the documentation for the has_support_points()
    * function.
@@ -2128,11 +2243,16 @@ public:
   /**
    * Return whether a finite element has defined generalized support
    * points. If the result is true, then a call to the
-   * get_generalized_support_points() yields a non-empty vector.
+   * get_generalized_support_points() yields an
+   * array with minimal set of *unique* support points. Note that the function's
+   * name is poorly chosen: The function does not return *whether* an element
+   * has support points, but whether its implementation is able to *provide*
+   * a list of support points via get_unit_support_points().
    *
    * See the
    * @ref GlossGeneralizedSupport "glossary entry on generalized support points"
-   * for more information.
+   * or the documentation for the has_support_points() function for more
+   * information.
    */
   bool
   has_generalized_support_points() const;
@@ -2141,18 +2261,20 @@ public:
    * For a given degree of freedom, return whether it is logically associated
    * with a vertex, line, quad or hex.
    *
-   * For instance, for continuous finite elements this coincides with the
-   * lowest dimensional object the support point of the degree of freedom lies
-   * on. To give an example, for $Q_1$ elements in 3d, every degree of freedom
-   * is defined by a shape function that we get by interpolating using support
-   * points that lie on the vertices of the cell. The support of these points
-   * of course extends to all edges connected to this vertex, as well as the
-   * adjacent faces and the cell interior, but we say that logically the
-   * degree of freedom is associated with the vertex as this is the lowest-
-   * dimensional object it is associated with. Likewise, for $Q_2$ elements in
-   * 3d, the degrees of freedom with support points at edge midpoints would
-   * yield a value of GeometryPrimitive::line from this function, whereas
-   * those on the centers of faces in 3d would return GeometryPrimitive::quad.
+   * For instance, for continuous finite elements this coincides with
+   * the lowest dimensional object the support point of the degree of
+   * freedom lies on. To give an example, for $Q_1$ elements in 3d,
+   * every degree of freedom is defined by a shape function that we
+   * get by interpolating using support points that lie on the
+   * vertices of the cell. The support of these points of course
+   * extends to all edges connected to this vertex, as well as the
+   * adjacent faces and the cell interior, but we say that logically
+   * the degree of freedom is associated with the vertex as this is
+   * the lowest-dimensional object it is associated with. Likewise,
+   * for $Q_2$ elements in 3d, the degrees of freedom with support
+   * points at edge midpoints would yield a value of
+   * GeometryPrimitive::line from this function, whereas those on the
+   * centers of faces in 3d would return GeometryPrimitive::quad.
    *
    * To make this more formal, the kind of object returned by this function
    * represents the object so that the support of the shape function
@@ -2476,13 +2598,11 @@ protected:
   std::vector<Table<2, int>> adjust_quad_dof_index_for_face_orientation_table;
 
   /**
-   * For lines with non-standard line_orientation in 3d, the dofs on lines
+   * For lines with non-standard orientation in 2d or 3d, the dofs on lines
    * have to be permuted in order to be combined with the correct shape
    * functions. Given a local dof @p index on a line, return the shift in the
    * local index, if the line has non-standard line_orientation, i.e.
-   * <code>old_index + shift = new_index</code>. In 2d and 1d there is no need
-   * for permutation so the vector is empty. In 3d it has the size of
-   * #dofs_per_line.
+   * <code>old_index + shift = new_index</code>.
    *
    * The constructor of this class fills this table with zeros, i.e.,
    * no permutation at all. Derived finite element classes have to
@@ -2595,10 +2715,19 @@ protected:
   const bool cached_primitivity;
 
   /**
-   * Return the size of interface constraint matrices. Since this is needed in
-   * every derived finite element class when initializing their size, it is
-   * placed into this function, to avoid having to recompute the dimension-
-   * dependent size of these matrices each time.
+   * This table is returned by get_local_dof_sparsity_pattern(). Its meaning
+   * is described there in detail. This variable has to be
+   * filled by any class derived from FiniteElement that does not want to keep
+   * the default empty table (meaning all DoFs couple within the cell).
+   */
+  Table<2, bool> local_dof_sparsity_pattern;
+
+  /**
+   * Return the size of interface constraint matrices. Since this is
+   * needed in every derived finite element class when initializing
+   * their size, it is placed into this function, to avoid having to
+   * recompute the dimension-dependent size of these matrices each
+   * time.
    *
    * Note that some elements do not implement the interface constraints for
    * certain polynomial degrees. In this case, this function still returns the
@@ -2633,7 +2762,7 @@ protected:
    * An extensive discussion of the interaction between this function and
    * FEValues can be found in the
    * @ref FE_vs_Mapping_vs_FEValues
-   * documentation module.
+   * documentation topic.
    *
    * @see UpdateFlags
    */
@@ -2663,8 +2792,8 @@ protected:
    * last argument. This output argument is guaranteed to always be the same one
    * when used with the InternalDataBase object returned by this function. In
    * other words, the subdivision of scratch data and final data in the returned
-   * object and the @p output_data object is as follows: If data can be pre-
-   * computed on the reference cell in the exact form in which it will later
+   * object and the @p output_data object is as follows: If data can be
+   * pre-computed on the reference cell in the exact form in which it will later
    * be needed on a concrete cell, then this function should already emplace
    * it in the @p output_data object. An example are the values of shape
    * functions at quadrature points for the usual Lagrange elements which on a
@@ -2684,7 +2813,7 @@ protected:
    * An extensive discussion of the interaction between this function and
    * FEValues can be found in the
    * @ref FE_vs_Mapping_vs_FEValues
-   * documentation module. See also the documentation of the InternalDataBase
+   * documentation topic. See also the documentation of the InternalDataBase
    * class.
    *
    * @param[in] update_flags A set of UpdateFlags values that describe what
@@ -2692,9 +2821,10 @@ protected:
    * compute. This set of flags may also include information that the finite
    * element can not compute, e.g., flags that pertain to data produced by the
    * mapping. An implementation of this function needs to set up all data
-   * fields in the returned object that are necessary to produce the finite-
-   * element related data specified by these flags, and may already pre-
-   * compute part of this information as discussed above. Elements may want to
+   * fields in the returned object that are necessary to produce the
+   * finite-element related data specified by these flags, and may already
+   * pre-compute part of this information as discussed above. Elements may
+   * want to
    * store these update flags (or a subset of these flags) in
    * InternalDataBase::update_each so they know at the time when
    * FiniteElement::fill_fe_values() is called what they are supposed to
@@ -2711,10 +2841,10 @@ protected:
    * above. FEValues guarantees that this output object and the object
    * returned by the current function will always be used together.
    * @return A pointer to an object of a type derived from InternalDataBase
-   * and that derived classes can use to store scratch data that can be pre-
-   * computed, or for scratch arrays that then only need to be allocated once.
-   * The calling site assumes ownership of this object and will delete it when
-   * it is no longer necessary.
+   * and that derived classes can use to store scratch data that can be
+   * pre-computed, or for scratch arrays that then only need to be allocated
+   * once. The calling site assumes ownership of this object and will delete it
+   * when it is no longer necessary.
    */
   virtual std::unique_ptr<InternalDataBase>
   get_data(const UpdateFlags             update_flags,
@@ -2740,9 +2870,10 @@ protected:
    * compute. This set of flags may also include information that the finite
    * element can not compute, e.g., flags that pertain to data produced by the
    * mapping. An implementation of this function needs to set up all data
-   * fields in the returned object that are necessary to produce the finite-
-   * element related data specified by these flags, and may already pre-
-   * compute part of this information as discussed above. Elements may want to
+   * fields in the returned object that are necessary to produce the
+   * finite-element related data specified by these flags, and may already
+   * pre-compute part of this information as discussed above. Elements may
+   * want to
    * store these update flags (or a subset of these flags) in
    * InternalDataBase::update_each so they know at the time when
    * FiniteElement::fill_fe_face_values() is called what they are supposed to
@@ -2759,10 +2890,10 @@ protected:
    * discussed above. FEValues guarantees that this output object and the
    * object returned by the current function will always be used together.
    * @return A pointer to an object of a type derived from InternalDataBase
-   * and that derived classes can use to store scratch data that can be pre-
-   * computed, or for scratch arrays that then only need to be allocated once.
-   * The calling site assumes ownership of this object and will delete it when
-   * it is no longer necessary.
+   * and that derived classes can use to store scratch data that can be
+   * pre-computed, or for scratch arrays that then only need to be allocated
+   * once. The calling site assumes ownership of this object and will
+   * delete it when it is no longer necessary.
    */
   virtual std::unique_ptr<InternalDataBase>
   get_face_data(const UpdateFlags               update_flags,
@@ -2799,9 +2930,10 @@ protected:
    * compute. This set of flags may also include information that the finite
    * element can not compute, e.g., flags that pertain to data produced by the
    * mapping. An implementation of this function needs to set up all data
-   * fields in the returned object that are necessary to produce the finite-
-   * element related data specified by these flags, and may already pre-
-   * compute part of this information as discussed above. Elements may want to
+   * fields in the returned object that are necessary to produce the
+   * finite-element related data specified by these flags, and may already
+   * pre-compute part of this information as discussed above. Elements may
+   * want to
    * store these update flags (or a subset of these flags) in
    * InternalDataBase::update_each so they know at the time when
    * FiniteElement::fill_fe_subface_values() is called what they are supposed
@@ -2818,8 +2950,9 @@ protected:
    * discussed above. FEValues guarantees that this output object and the
    * object returned by the current function will always be used together.
    * @return A pointer to an object of a type derived from InternalDataBase
-   * and that derived classes can use to store scratch data that can be pre-
-   * computed, or for scratch arrays that then only need to be allocated once.
+   * and that derived classes can use to store scratch data that can be
+   * pre-computed, or for scratch arrays that then only need to be allocated
+   * once.
    * The calling site assumes ownership of this object and will delete it when
    * it is no longer necessary.
    */
@@ -2861,7 +2994,7 @@ protected:
    * An extensive discussion of the interaction between this function and
    * FEValues can be found in the
    * @ref FE_vs_Mapping_vs_FEValues
-   * documentation module.
+   * documentation topic.
    *
    * @param[in] cell The cell of the triangulation for which this function is
    * to compute a mapping from the reference cell to.
@@ -3077,7 +3210,7 @@ protected:
 
 
 //----------------------------------------------------------------------//
-
+#ifndef DOXYGEN
 
 template <int dim, int spacedim>
 inline std::pair<unsigned int, unsigned int>
@@ -3252,6 +3385,124 @@ FiniteElement<dim, spacedim>::system_to_block_index(
 
 template <int dim, int spacedim>
 inline bool
+FiniteElement<dim, spacedim>::shape_function_belongs_to(
+  const unsigned int                shape_function,
+  const FEValuesExtractors::Scalar &component) const
+{
+  AssertIndexRange(shape_function, this->n_dofs_per_cell());
+  AssertIndexRange(component.component, this->n_components());
+
+  if (is_primitive(shape_function))
+    return (system_to_component_table[shape_function].first ==
+            component.component);
+  else
+    return nonzero_components[shape_function][component.component];
+}
+
+
+
+template <int dim, int spacedim>
+inline bool
+FiniteElement<dim, spacedim>::shape_function_belongs_to(
+  const unsigned int                shape_function,
+  const FEValuesExtractors::Vector &components) const
+{
+  AssertIndexRange(shape_function, this->n_dofs_per_cell());
+  AssertIndexRange(components.first_vector_component, this->n_components());
+  AssertIndexRange(components.first_vector_component + dim,
+                   this->n_components() + 1);
+
+  if (is_primitive(shape_function))
+    return ((system_to_component_table[shape_function].first >=
+             components.first_vector_component) &&
+            (system_to_component_table[shape_function].first <
+             components.first_vector_component + dim));
+  else
+    // Return whether there is overlap between the nonzero components
+    // of the current shape function and the selected components of
+    // the extractor:
+    {
+      for (unsigned int i = components.first_vector_component;
+           i < components.first_vector_component + dim;
+           ++i)
+        if (nonzero_components[shape_function][i])
+          return true;
+      return false;
+    }
+}
+
+
+
+template <int dim, int spacedim>
+inline bool
+FiniteElement<dim, spacedim>::shape_function_belongs_to(
+  const unsigned int                            shape_function,
+  const FEValuesExtractors::SymmetricTensor<2> &components) const
+{
+  AssertIndexRange(shape_function, this->n_dofs_per_cell());
+  AssertIndexRange(components.first_tensor_component, this->n_components());
+  AssertIndexRange(components.first_tensor_component + dim,
+                   this->n_components() + 1);
+
+  if (is_primitive(shape_function))
+    return ((system_to_component_table[shape_function].first >=
+             components.first_tensor_component) &&
+            (system_to_component_table[shape_function].first <
+             components.first_tensor_component +
+               SymmetricTensor<2, dim>::n_independent_components));
+  else
+    // Return whether there is overlap between the nonzero components
+    // of the current shape function and the selected components of
+    // the extractor:
+    {
+      for (unsigned int i = components.first_tensor_component;
+           i < components.first_tensor_component +
+                 SymmetricTensor<2, dim>::n_independent_components;
+           ++i)
+        if (nonzero_components[shape_function][i])
+          return true;
+      return false;
+    }
+}
+
+
+
+template <int dim, int spacedim>
+inline bool
+FiniteElement<dim, spacedim>::shape_function_belongs_to(
+  const unsigned int                   shape_function,
+  const FEValuesExtractors::Tensor<2> &components) const
+{
+  AssertIndexRange(shape_function, this->n_dofs_per_cell());
+  AssertIndexRange(components.first_tensor_component, this->n_components());
+  AssertIndexRange(components.first_tensor_component + dim,
+                   this->n_components() + 1);
+
+  if (is_primitive(shape_function))
+    return ((system_to_component_table[shape_function].first >=
+             components.first_tensor_component) &&
+            (system_to_component_table[shape_function].first <
+             components.first_tensor_component +
+               Tensor<2, dim>::n_independent_components));
+  else
+    // Return whether there is overlap between the nonzero components
+    // of the current shape function and the selected components of
+    // the extractor:
+    {
+      for (unsigned int i = components.first_tensor_component;
+           i < components.first_tensor_component +
+                 Tensor<2, dim>::n_independent_components;
+           ++i)
+        if (nonzero_components[shape_function][i])
+          return true;
+      return false;
+    }
+}
+
+
+
+template <int dim, int spacedim>
+inline bool
 FiniteElement<dim, spacedim>::restriction_is_additive(
   const unsigned int index) const
 {
@@ -3314,6 +3565,15 @@ FiniteElement<dim, spacedim>::is_primitive(const unsigned int i) const
 
 
 template <int dim, int spacedim>
+inline const Table<2, bool> &
+FiniteElement<dim, spacedim>::get_local_dof_sparsity_pattern() const
+{
+  return local_dof_sparsity_pattern;
+}
+
+
+
+template <int dim, int spacedim>
 inline GeometryPrimitive
 FiniteElement<dim, spacedim>::get_associated_geometry_primitive(
   const unsigned int cell_dof_index) const
@@ -3332,7 +3592,7 @@ FiniteElement<dim, spacedim>::get_associated_geometry_primitive(
     return GeometryPrimitive::hex;
 }
 
-
+#endif
 
 DEAL_II_NAMESPACE_CLOSE
 

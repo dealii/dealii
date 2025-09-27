@@ -1,4 +1,4 @@
-<a name="Intro"></a>
+<a name="step_6-Intro"></a>
 <h1>Introduction</h1>
 
 @dealiiVideoLecture{15,16,17,17.25,17.5,17.75}
@@ -8,13 +8,28 @@ the use of adaptively (locally) refined meshes. The program is still
 based on step-4 and step-5, and, as you will see, it does not actually
 take very much code to enable adaptivity. Indeed, while we do a great
 deal of explaining, adaptive meshes can be added to an existing program
-with barely a dozen lines of additional code. The program shows what
+with less than ten lines of additional code. The program shows what
 these lines are, as well as another important ingredient of adaptive
 mesh refinement (AMR): a criterion that can be used to determine whether
 it is necessary to refine a cell because the error is large on it,
 whether the cell can be coarsened because the error is particularly
 small on it, or whether we should just leave the cell as it is. We
 will discuss all of these issues in the following.
+
+The program solves the same problem as step-5, that is, we solve the equation
+@f{align*}{
+  -\nabla \cdot a(\mathbf x) \nabla u(\mathbf x) &= 1 \qquad\qquad & \text{in}\ \Omega,
+  \\
+  u &= 0 \qquad\qquad & \text{on}\ \partial\Omega,
+@f}
+where $a(\mathbf x)$ is a spatially variable coefficient defined as
+@f{align*}{
+  a(\mathbf x) =
+  \begin{cases}
+    20 & \text{if}\ |\mathbf x|<0.5, \\
+    1  & \text{otherwise.}
+  \end{cases}
+@f}
 
 
 <h3> What adaptively refined meshes look like </h3>
@@ -84,14 +99,14 @@ simple situation:
 A more complicated two-dimensional mesh would look like this (and is
 discussed in the "Results" section below):
 
-<img src="https://www.dealii.org/images/steps/developer/step_6_grid_5_ladutenko.svg"
+<img src="https://dealii.org/images/steps/developer/step_6_grid_5_ladutenko.svg"
      alt="Fifth adaptively refined Ladutenko grid: the cells are clustered
           along the inner circle."
      width="300" height="300">
 
 Finally, a three-dimensional mesh (from step-43) with such hanging nodes is shown here:
 
-<img src="https://www.dealii.org/images/steps/developer/step-43.3d.mesh.png" alt=""
+<img src="https://dealii.org/images/steps/developer/step-43.3d.mesh.png" alt=""
      width="300" height="300">
 
 The first and third mesh are of course based on a square and a cube, but as the
@@ -218,7 +233,7 @@ In the program below, we will show how we can get these
 constraints from deal.II, and how to use them in the solution of the
 linear system of equations. Before going over the details of the program
 below, you may want to take a look at the @ref constraints documentation
-module that explains how these constraints can be computed and what classes in
+topic that explains how these constraints can be computed and what classes in
 deal.II work on them.
 
 

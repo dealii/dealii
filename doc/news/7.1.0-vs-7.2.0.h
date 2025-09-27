@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2012 - 2013 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2012 - 2024 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 /**
  * @page changes_between_7_1_and_7_2 Changes between Version 7.1 and 7.2
@@ -25,7 +24,7 @@ All entries are signed with the names of the author.
 
 <!-- ----------- INCOMPATIBILITIES ----------------- -->
 
-<a name="incompatible"></a>
+<a name="710-720-incompatible"></a>
 <h3 style="color:red">Incompatibilities</h3>
 
 <p style="color:red">
@@ -71,7 +70,7 @@ used to store boundary indicators internally.
 
 <!-- ----------- GENERAL IMPROVEMENTS ----------------- -->
 
-<a name="general"></a>
+<a name="710-720-general"></a>
 <h3>General</h3>
 
 
@@ -320,7 +319,7 @@ enabled due to a missing include file in file
 
 <!-- ----------- SPECIFIC IMPROVEMENTS ----------------- -->
 
-<a name="specific"></a>
+<a name="710-720-specific"></a>
 <h3>Specific improvements</h3>
 
 <ol>
@@ -629,7 +628,7 @@ first two of these functions. It has therefore been removed.
 
 <li> Improved: Objects of the type LogStream::Prefix can now be used
 as a safe implementation of the push and pop mechanism for log
-prefices.
+prefixes.
 <br>
 (Guido Kanschat, 2011/12/09)
 

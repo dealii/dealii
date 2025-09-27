@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
+// SPDX-License-Identifier: LGPL-2.1-or-later
 // Copyright (C) 2005 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 #ifndef dealii_mg_tools_h
 #define dealii_mg_tools_h
@@ -209,10 +208,19 @@ namespace MGTools
    * the function object that is part of the function_map argument are
    * ignored.
    *
-   * @arg <tt>boundary_indices</tt> is a vector which on return contains all
+   * @param[in] mg_dof The DoFHandler object this function should work on.
+   *
+   * @param[in] function_map A map from boundary id to the function
+   * that describes boundary values on that part of the boundary that
+   * has these boundary ids.
+   *
+   * @param[out] boundary_indices A vector which on return contains all
    * indices of degrees of freedom for each level that are at the part of the
    * boundary identified by the function_map argument. Its length has to match
    * the number of levels in the dof handler object.
+   *
+   * @param[in] component_mask An optional mask that describes for which vector
+   * components the boundary values should be applied.
    *
    * Previous content in @p boundary_indices is not overwritten,
    * but added to.

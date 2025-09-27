@@ -1,18 +1,17 @@
 #!/bin/bash
-## ---------------------------------------------------------------------
+## ------------------------------------------------------------------------
 ##
-## Copyright (C) 2018 - 2020 by the deal.II authors
+## SPDX-License-Identifier: LGPL-2.1-or-later
+## Copyright (C) 2018 - 2024 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
-## The deal.II library is free software; you can use it, redistribute
-## it, and/or modify it under the terms of the GNU Lesser General
-## Public License as published by the Free Software Foundation; either
-## version 2.1 of the License, or (at your option) any later version.
-## The full text of the license can be found in the file LICENSE.md at
-## the top level directory of deal.II.
+## Part of the source code is dual licensed under Apache-2.0 WITH
+## LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+## governing the source code and code contributions can be found in
+## LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 ##
-## ---------------------------------------------------------------------
+## ------------------------------------------------------------------------
 
 #
 # This script runs the clang-tidy tool on the deal.II code base.
@@ -26,8 +25,7 @@
 #   make sure to run this script in an empty build directory
 #
 # Requirements:
-# Clang 5.0.1+ and have clang, clang++, and run-clang-tidy.py in
-# your path.
+# Clang 5.0.1+ and have clang, clang++, and run-clang-tidy in your path.
 
 # grab first argument and make relative path an absolute one:
 SRC=$1
@@ -42,14 +40,14 @@ fi
 echo "SRC-DIR=$SRC"
 
 # enable MPI (to get MPI warnings)
-# export compile commands (so that run-clang-tidy.py works)
+# export compile commands (so that run-clang-tidy works)
 ARGS=("-D" "DEAL_II_WITH_MPI=ON" "-D" "CMAKE_EXPORT_COMPILE_COMMANDS=ON" "-D" "CMAKE_BUILD_TYPE=Debug" "$@")
 
 # for a list of checks, see /.clang-tidy
 cat "$SRC/.clang-tidy"
 
-if ! [ -x "$(command -v run-clang-tidy.py)" ] || ! [ -x "$(command -v clang++)" ]; then
-    echo "make sure clang, clang++, and run-clang-tidy.py (part of clang) are in the path"
+if ! [ -x "$(command -v run-clang-tidy)" ] || ! [ -x "$(command -v clang++)" ]; then
+    echo "make sure clang, clang++, and run-clang-tidy (part of clang) are in the path"
     exit 2
 fi
 
@@ -64,7 +62,7 @@ cmake --build . --target expand_all_instantiations || (echo "make expand_all_ins
 #
 # pipe away stderr (just contains nonsensical "x warnings generated")
 # pipe output to output.txt
-run-clang-tidy.py -p . -quiet -header-filter "$SRC/include/*" -extra-arg='-DCLANG_TIDY' 2>error.txt >output.txt
+run-clang-tidy -p . -quiet -header-filter "$SRC/include/*" -extra-arg='-DCLANG_TIDY' 2>error.txt >output.txt
 
 # grep interesting errors and make sure we remove duplicates:
 grep -E '(warning|error): ' output.txt | sort | uniq >clang-tidy.log
@@ -77,4 +75,3 @@ fi
 
 echo "OK"
 exit 0
-

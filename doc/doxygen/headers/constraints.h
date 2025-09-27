@@ -1,24 +1,23 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2010 - 2020 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2010 - 2024 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 
 /**
  * @defgroup constraints Constraints on degrees of freedom
  * @ingroup dofs
  *
- * This module deals with constraints on degrees of
+ * This documentation group deals with constraints on degrees of
  * freedom. The central class to deal with constraints is the
  * AffineConstraints class.
  *
@@ -40,7 +39,7 @@
  *   VectorTools::compute_no_normal_flux_constraints function) or
  *   prescribed tangential components, $\mathbf{n}\times\mathbf{u}=
  *   \mathbf{n}\times\mathbf{f}$ (as happens in electromagnetic problems and
- *   is handled by the VectorTools::project_boundary_values_curl_conforming
+ *   is handled by the VectorTools::project_boundary_values_curl_conforming_l2
  *   function). For the former case, imagine for example that we are at
  *   at vertex where the normal vector has the form $\frac 1{\sqrt{14}}
  *   (1,2,3)^T$ and that the $x$-, $y$- and $z$-components of the flow
@@ -443,10 +442,7 @@
  * @f[
  *   (C^T A C + Id_c) \tilde x = C^T (b - A\,k)
  * @f]
- * instead [1] (M. S. Shephard. Linear multipoint constraints applied via
- * transformation as part of a direct stiffness assembly process.
- * <i>International Journal for Numerical Methods in Engineering</i>
- * 20(11):2107-2112, 1985).
+ * instead (see, for example, @cite Shephard1984).
  *
  * Here, $A$ is a given (unconstrained) system matrix for which we only
  * assume that we can apply it to a vector but can not necessarily access

@@ -1,4 +1,0 @@
-Fixed: MGTwoLevelTransferBase now preserves the
-ghost state of the source vector in all call scenarios.
-<br>
-(Richard Schussnig, Martin Kronbichler, Peter Munch, 2023/09/04)

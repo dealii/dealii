@@ -1,19 +1,18 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2019 - 2023 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2019 - 2024 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
-// Test that Point operations on a CUDA device can be used.
+// Test that Point operations with the default Kokkos backend can be used.
 
 #include <deal.II/base/point.h>
 
@@ -55,9 +54,9 @@ test_gpu()
       auto p_3 = Point<dim, Number>::unit_vector(0);
       check[3] = p_3.norm_square();
 
-      auto entry_1 = p_1(0);
+      auto entry_1 = p_1[0];
       check[4]     = entry_1;
-      p_1(0)       = Number{1.};
+      p_1[0]       = Number{1.};
       check[5]     = p_1.norm_square();
       auto p_4     = p_1 + Tensor<1, dim, Number>{};
       check[6]     = p_4.norm_square();

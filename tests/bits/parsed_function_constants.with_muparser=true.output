@@ -1,0 +1,5 @@
+
+DEAL::Value at x=3: 10.0000
+DEAL:parameters::Function constants: f=2
+DEAL:parameters::Function expression: f*f+2*x
+DEAL:parameters::Variable names: x,t

@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2021 - 2022 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2021 - 2024 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 
 // Step-31 on a simplex mesh. Following incompatible modifications had to be
@@ -67,7 +66,6 @@
 
 namespace Step31
 {
-  using namespace dealii;
   namespace EquationData
   {
     constexpr double eta     = 1;
@@ -131,7 +129,7 @@ namespace Step31
   namespace LinearSolvers
   {
     template <class MatrixType, class PreconditionerType>
-    class InverseMatrix : public Subscriptor
+    class InverseMatrix : public EnableObserverPointer
     {
     public:
       InverseMatrix(const MatrixType         &m,
@@ -141,8 +139,8 @@ namespace Step31
       vmult(VectorType &dst, const VectorType &src) const;
 
     private:
-      const SmartPointer<const MatrixType> matrix;
-      const PreconditionerType            &preconditioner;
+      const ObserverPointer<const MatrixType> matrix;
+      const PreconditionerType               &preconditioner;
     };
     template <class MatrixType, class PreconditionerType>
     InverseMatrix<MatrixType, PreconditionerType>::InverseMatrix(
@@ -171,7 +169,7 @@ namespace Step31
         }
     }
     template <class PreconditionerTypeA, class PreconditionerTypeMp>
-    class BlockSchurPreconditioner : public Subscriptor
+    class BlockSchurPreconditioner : public EnableObserverPointer
     {
     public:
       BlockSchurPreconditioner(
@@ -184,10 +182,10 @@ namespace Step31
             const TrilinosWrappers::MPI::BlockVector &src) const;
 
     private:
-      const SmartPointer<const TrilinosWrappers::BlockSparseMatrix>
+      const ObserverPointer<const TrilinosWrappers::BlockSparseMatrix>
         stokes_matrix;
-      const SmartPointer<const InverseMatrix<TrilinosWrappers::SparseMatrix,
-                                             PreconditionerTypeMp>>
+      const ObserverPointer<const InverseMatrix<TrilinosWrappers::SparseMatrix,
+                                                PreconditionerTypeMp>>
                                             m_inverse;
       const PreconditionerTypeA            &a_preconditioner;
       mutable TrilinosWrappers::MPI::Vector tmp;
@@ -602,14 +600,23 @@ namespace Step31
     deallog << "   Rebuilding Stokes preconditioner..." << std::flush;
     assemble_stokes_preconditioner();
     Amg_preconditioner = std::make_shared<TrilinosWrappers::PreconditionAMG>();
-    std::vector<std::vector<bool>> constant_modes;
-    FEValuesExtractors::Vector     velocity_components(0);
-    DoFTools::extract_constant_modes(stokes_dof_handler,
-                                     stokes_fe.component_mask(
-                                       velocity_components),
-                                     constant_modes);
+    const FEValuesExtractors::Vector velocity_components(0);
+    const auto constant_modes = DoFTools::extract_constant_modes(
+      stokes_dof_handler, stokes_fe.component_mask(velocity_components));
+
+    std::vector<std::vector<double>> constant_modes_values(
+      constant_modes.size());
+
+    for (unsigned int i = 0; i < constant_modes.size(); ++i)
+      {
+        constant_modes_values[i].resize(constant_modes[i].size());
+
+        for (unsigned int j = 0; j < constant_modes[i].size(); ++j)
+          constant_modes_values[i][j] = constant_modes[i][j];
+      }
+
     TrilinosWrappers::PreconditionAMG::AdditionalData amg_data;
-    amg_data.constant_modes        = constant_modes;
+    amg_data.constant_modes_values = constant_modes_values;
     amg_data.elliptic              = true;
     amg_data.higher_order_elements = true;
     amg_data.smoother_sweeps       = 2;
@@ -1015,12 +1022,12 @@ namespace Step31
     std::vector<TrilinosWrappers::MPI::Vector> tmp(2);
     tmp[0].reinit(temperature_solution);
     tmp[1].reinit(temperature_solution);
-    temperature_trans.interpolate(x_temperature, tmp);
+    temperature_trans.interpolate(tmp);
     temperature_solution     = tmp[0];
     old_temperature_solution = tmp[1];
     temperature_constraints.distribute(temperature_solution);
     temperature_constraints.distribute(old_temperature_solution);
-    stokes_trans.interpolate(x_stokes, stokes_solution);
+    stokes_trans.interpolate(stokes_solution);
     stokes_constraints.distribute(stokes_solution);
     rebuild_stokes_matrix         = true;
     rebuild_temperature_matrices  = true;
@@ -1085,7 +1092,6 @@ main(int argc, char *argv[])
 {
   try
     {
-      using namespace dealii;
       using namespace Step31;
       Utilities::MPI::MPI_InitFinalize mpi_initialization(
         argc, argv, numbers::invalid_unsigned_int);

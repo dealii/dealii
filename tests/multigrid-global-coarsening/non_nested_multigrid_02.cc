@@ -1,17 +1,16 @@
-// // ---------------------------------------------------------------------
-// //
-// // Copyright (C) 2020 - 2023 by the deal.II authors
-// //
-// // This file is part of the deal.II library.
-// //
-// // The deal.II library is free software; you can use it, redistribute
-// // it, and/or modify it under the terms of the GNU Lesser General
-// // Public License as published by the Free Software Foundation; either
-// // version 2.1 of the License, or (at your option) any later version.
-// // The full text of the license can be found in the file LICENSE.md at
-// // the top level directory of deal.II.
-// //
-// // ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
+//
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2023 by the deal.II authors
+//
+// This file is part of the deal.II library.
+//
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
+//
+// ------------------------------------------------------------------------
 
 
 /**
@@ -39,8 +38,8 @@ test(const unsigned int n_refinements,
   MGLevelObject<AffineConstraints<Number>> constraints(min_level, max_level);
   MGLevelObject<MappingQ1<dim>>            mappings(min_level, max_level);
   MGLevelObject<std::shared_ptr<MGTwoLevelTransferNonNested<dim, VectorType>>>
-                                       transfers(min_level, max_level);
-  MGLevelObject<Operator<dim, Number>> operators(min_level, max_level);
+                                          transfers(min_level, max_level);
+  MGLevelObject<Operator<dim, 1, Number>> operators(min_level, max_level);
 
 
   // set up levels
@@ -75,7 +74,8 @@ test(const unsigned int n_refinements,
       // set up constraints
       const IndexSet locally_relevant_dofs =
         DoFTools::extract_locally_relevant_dofs(dof_handler);
-      constraint.reinit(locally_relevant_dofs);
+      constraint.reinit(dof_handler.locally_owned_dofs(),
+                        locally_relevant_dofs);
       VectorTools::interpolate_boundary_values(
         *_mapping, dof_handler, 0, Functions::ZeroFunction<dim>(), constraint);
       constraint.close();
@@ -97,7 +97,7 @@ test(const unsigned int n_refinements,
                                constraints[l]);
     }
 
-  MGTransferGlobalCoarsening<dim, VectorType> transfer(
+  MGTransferMatrixFree<dim, Number> transfer(
     transfers,
     [&](const auto l, auto &vec) { operators[l].initialize_dof_vector(vec); });
 

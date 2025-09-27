@@ -1,17 +1,16 @@
-## ---------------------------------------------------------------------
+## ------------------------------------------------------------------------
 ##
-## Copyright (C) 2012 - 2022 by the deal.II authors
+## SPDX-License-Identifier: LGPL-2.1-or-later
+## Copyright (C) 2012 - 2024 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
-## The deal.II library is free software; you can use it, redistribute
-## it, and/or modify it under the terms of the GNU Lesser General
-## Public License as published by the Free Software Foundation; either
-## version 2.1 of the License, or (at your option) any later version.
-## The full text of the license can be found in the file LICENSE.md at
-## the top level directory of deal.II.
+## Part of the source code is dual licensed under Apache-2.0 WITH
+## LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+## governing the source code and code contributions can be found in
+## LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 ##
-## ---------------------------------------------------------------------
+## ------------------------------------------------------------------------
 
 #
 # Set up cached variables (prior to the project(deal.II) call)
@@ -32,6 +31,7 @@
 #
 #     CMAKE_BUILD_TYPE
 #     DEAL_II_ALLOW_PLATFORM_INTROSPECTION
+#     DEAL_II_USE_LTO
 #     DEAL_II_SETUP_COVERAGE
 #     DEAL_II_UNITY_BUILD
 #     DEAL_II_EARLY_DEPRECATIONS
@@ -52,7 +52,7 @@
 #
 #     DEAL_II_WITH_64BIT_INDICES
 #     DEAL_II_WITH_COMPLEX_VALUES
-#     DEAL_II_COMPILE_EXAMPLES
+#     DEAL_II_WITH_CXX20_MODULE
 #     DEAL_II_DOXYGEN_USE_MATHJAX
 #     DEAL_II_DOXYGEN_USE_ONLINE_MATHJAX
 #     DEAL_II_CPACK_EXTERNAL_LIBS
@@ -142,14 +142,30 @@ if( NOT "${CMAKE_BUILD_TYPE}" STREQUAL "Release" AND
 endif()
 
 #
+# We do not currently support a "multiple generator" setup with our
+# concurrent configuration and set up of a debug and release flavor within
+# our "DebugRelease" target. In order to avoid confusion simply force the
+# CMAKE_CONFIGURATION_TYPES variable to match the single-generator
+# counterpart:
+#
+
+set(CMAKE_CONFIGURATION_TYPES "${CMAKE_BUILD_TYPE}")
+
+#
 # Configuration behaviour:
 #
 
 option(DEAL_II_ALLOW_PLATFORM_INTROSPECTION
-  "Allow platform introspection for CPU command sets, SSE and AVX"
+  "Allow platform introspection, i.e., allow the compiler to query the CPU instruction set available on the current machine (e.g., whether the CPU supports the SSE or AVX vector instructions) and to compile for that instruction set. This generally results in faster code, but code that may not run on other machines (including, for example, machines that may use the same file system on which you are working, but have an older CPU architecture)."
   ON
   )
 mark_as_advanced(DEAL_II_ALLOW_PLATFORM_INTROSPECTION)
+
+option(DEAL_II_USE_LTO
+  "Allow the compiler to use interprocedural and link-time optimization (LTO)."
+  OFF
+  )
+mark_as_advanced(DEAL_II_USE_LTO)
 
 option(DEAL_II_SETUP_COVERAGE
   "Setup debug compiler flags to provide additional test coverage information. Currently only gprof is supported."
@@ -332,22 +348,21 @@ unset(ENV{NVCCFLAGS})
 ########################################################################
 
 option(DEAL_II_WITH_64BIT_INDICES
-  "If set to ON, then use 64-bit data types to represent global degree of freedom indices. The default is to OFF. You only want to set this to ON if you will solve problems with more than 2^31 (approximately 2 billion) unknowns. If set to ON, you also need to ensure that both Trilinos and/or PETSc support 64-bit indices."
+  "If set to ON, then use 64-bit data types to represent global degree of freedom indices. The default is to OFF. You only want to set this to ON if you will solve problems with more than 2^31 (approximately 2 billion) unknowns."
   OFF
   )
 list(APPEND DEAL_II_FEATURES 64BIT_INDICES)
 
 option(DEAL_II_WITH_COMPLEX_VALUES
   "If set to OFF, the classes that take a number type are not explicitly instantiated for std::complex<float> and std::complex<double>. This effectively disables the support for computing with complex values. If PETSc is built with complex scalar type, this option must be ON."
-  ON
+  OFF
   )
 list(APPEND DEAL_II_FEATURES COMPLEX_VALUES)
 
-option(DEAL_II_COMPILE_EXAMPLES
-  "If set to ON, all configurable example executables will be built and installed as well. If set to OFF, the examples component only installs the source code of example steps."
-  ON
-  )
-mark_as_advanced(DEAL_II_COMPILE_EXAMPLES)
+option(DEAL_II_WITH_CXX20_MODULE
+  "If set to ON, and if compiler, cmake, and build system are suitable, also build a C++20 style module that can be imported instead of using \#include directives. This will increase build time significantly."
+  OFF)
+mark_as_advanced(DEAL_II_WITH_CXX20_MODULE)
 
 option(DEAL_II_DOXYGEN_USE_MATHJAX
   "If set to ON, doxygen documentation is generated using mathjax"

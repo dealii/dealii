@@ -21,6 +21,11 @@ DEAL::AMG:
 DEAL::check residual: 0.0231622
 DEAL::check residual: 0.0192417
 DEAL::check residual: 0.0172953
+DEAL::coarse iterations: 1
+DEAL::AMG:
+DEAL::check residual: 0.0231622
+DEAL::check residual: 0.0192417
+DEAL::check residual: 0.0172953
 DEAL::applications: 3
 DEAL::Cycle 1:
 DEAL::   Number of active cells:       484
@@ -36,6 +41,11 @@ DEAL::check residual: 0.0105349
 DEAL::check residual: 0.00947063
 DEAL::coarse iterations: 50
 DEAL::CG(AMG):
+DEAL::check residual: 0.0126770
+DEAL::check residual: 0.0105349
+DEAL::check residual: 0.00947063
+DEAL::coarse iterations: 1
+DEAL::AMG:
 DEAL::check residual: 0.0126770
 DEAL::check residual: 0.0105349
 DEAL::check residual: 0.00947063
@@ -62,6 +72,11 @@ DEAL::CG(AMG):
 DEAL::check residual: 0.00872685
 DEAL::check residual: 0.00725329
 DEAL::check residual: 0.00652099
+DEAL::coarse iterations: 20
+DEAL::AMG:
+DEAL::check residual: 0.0121261
+DEAL::check residual: 0.0132637
+DEAL::check residual: 0.0138558
 DEAL::coarse iterations: 20
 DEAL::AMG:
 DEAL::check residual: 0.0115344

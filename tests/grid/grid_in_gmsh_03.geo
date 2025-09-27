@@ -22,7 +22,3 @@ Plane Surface(2) = {2};
 
 Physical Curve("1", 10) = {2, 7, 6, 5, 4, 3};
 Physical Surface("1", 9) = {2, 1};
-
-
-
-

@@ -1,0 +1,23 @@
+
+DEAL:0:0::locally owned dofs :
+{[0,14]}
+DEAL:0:0::locally relevant dofs :
+{[0,17], [21,22]}
+DEAL:0:0::OK
+DEAL:0:0::locally owned dofs :
+{[0,14]}
+DEAL:0:0::locally relevant dofs :
+{[0,17], [21,22]}
+DEAL:0:0::OK
+
+DEAL:1:1::locally owned dofs :
+{[15,24]}
+DEAL:1:1::locally relevant dofs :
+{[2,3], [5,8], 10, [12,24]}
+DEAL:1:1::OK
+DEAL:1:1::locally owned dofs :
+{[15,24]}
+DEAL:1:1::locally relevant dofs :
+{[2,3], [5,8], 10, [12,24]}
+DEAL:1:1::OK
+

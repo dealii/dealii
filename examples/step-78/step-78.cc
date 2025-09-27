@@ -1,17 +1,16 @@
-/* ---------------------------------------------------------------------
+/* ------------------------------------------------------------------------
  *
- * Copyright (C) 2021 - 2023 by the deal.II authors
+ * SPDX-License-Identifier: LGPL-2.1-or-later
+ * Copyright (C) 2021 - 2024 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
- * The deal.II library is free software; you can use it, redistribute
- * it, and/or modify it under the terms of the GNU Lesser General
- * Public License as published by the Free Software Foundation; either
- * version 2.1 of the License, or (at your option) any later version.
- * The full text of the license can be found in the file LICENSE.md at
- * the top level directory of deal.II.
+ * Part of the source code is dual licensed under Apache-2.0 WITH
+ * LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+ * governing the source code and code contributions can be found in
+ * LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
  *
- * ---------------------------------------------------------------------
+ * ------------------------------------------------------------------------
  *
  * Author: Tyler Anderson, Colorado State University, 2021
  */
@@ -23,7 +22,6 @@
 // seen before by now:
 #include <deal.II/base/convergence_table.h>
 #include <deal.II/base/function.h>
-#include <deal.II/base/logstream.h>
 #include <deal.II/base/quadrature_lib.h>
 #include <deal.II/base/utilities.h>
 #include <deal.II/dofs/dof_handler.h>
@@ -47,6 +45,7 @@
 #include <deal.II/numerics/data_out.h>
 #include <deal.II/numerics/data_out_stack.h>
 #include <deal.II/numerics/error_estimator.h>
+#include <deal.II/numerics/matrix_creator.h>
 #include <deal.II/numerics/matrix_tools.h>
 #include <deal.II/numerics/solution_transfer.h>
 #include <deal.II/numerics/vector_tools.h>
@@ -101,7 +100,7 @@ namespace BlackScholesSolver
   double Solution<dim>::value(const Point<dim>  &p,
                               const unsigned int component) const
   {
-    return -Utilities::fixed_power<2, double>(p(component)) -
+    return -Utilities::fixed_power<2, double>(p[component]) -
            Utilities::fixed_power<2, double>(this->get_time()) + 6;
   }
 
@@ -110,7 +109,7 @@ namespace BlackScholesSolver
   Tensor<1, dim> Solution<dim>::gradient(const Point<dim>  &p,
                                          const unsigned int component) const
   {
-    return Point<dim>(-2 * p(component));
+    return Point<dim>(-2 * p[component]);
   }
 
 
@@ -148,9 +147,9 @@ namespace BlackScholesSolver
                                        const unsigned int component) const
   {
 #ifdef MMS
-    return -Utilities::fixed_power<2, double>(p(component)) + 6;
+    return -Utilities::fixed_power<2, double>(p[component]) + 6;
 #else
-    return std::max(p(component) - strike_price, 0.);
+    return std::max(p[component] - strike_price, 0.);
 #endif
   }
 
@@ -208,10 +207,10 @@ namespace BlackScholesSolver
                                          const unsigned int component) const
   {
 #ifdef MMS
-    return -Utilities::fixed_power<2, double>(p(component)) -
+    return -Utilities::fixed_power<2, double>(p[component]) -
            Utilities::fixed_power<2, double>(this->get_time()) + 6;
 #else
-    return (p(component) - strike_price) *
+    return (p[component] - strike_price) *
            exp((-interest_rate) * (this->get_time()));
 #endif
   }
@@ -248,10 +247,10 @@ namespace BlackScholesSolver
   {
 #ifdef MMS
     return 2 * (this->get_time()) -
-           Utilities::fixed_power<2, double>(asset_volatility * p(component)) -
-           2 * interest_rate * Utilities::fixed_power<2, double>(p(component)) -
+           Utilities::fixed_power<2, double>(asset_volatility * p[component]) -
+           2 * interest_rate * Utilities::fixed_power<2, double>(p[component]) -
            interest_rate *
-             (-Utilities::fixed_power<2, double>(p(component)) -
+             (-Utilities::fixed_power<2, double>(p[component]) -
               Utilities::fixed_power<2, double>(this->get_time()) + 6);
 #else
     (void)p;
@@ -318,7 +317,7 @@ namespace BlackScholesSolver
     const double strike_price;
 
     Triangulation<dim> triangulation;
-    FE_Q<dim>          fe;
+    const FE_Q<dim>    fe;
     DoFHandler<dim>    dof_handler;
 
     AffineConstraints<double> constraints;
@@ -415,7 +414,7 @@ namespace BlackScholesSolver
     // <code>current_coefficient</code> variable.
     const unsigned int dofs_per_cell = fe.dofs_per_cell;
     FullMatrix<double> cell_matrix(dofs_per_cell, dofs_per_cell);
-    QGauss<dim>        quadrature_formula(fe.degree + 1);
+    const QGauss<dim>  quadrature_formula(fe.degree + 1);
     FEValues<dim>      fe_values(fe,
                             quadrature_formula,
                             update_values | update_gradients |
@@ -675,7 +674,7 @@ namespace BlackScholesSolver
           conv_filename += "-q2";
           break;
         default:
-          Assert(false, ExcNotImplemented());
+          DEAL_II_NOT_IMPLEMENTED();
       }
     conv_filename += ".tex";
     std::ofstream table_file(conv_filename);

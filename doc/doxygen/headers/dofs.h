@@ -1,33 +1,30 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2003 - 2020 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2006 - 2024 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 
 /**
  * @defgroup dofs Degrees of Freedom
  *
- * This module groups classes and namespaces that have to do with
+ * This topic groups classes and namespaces that have to do with
  * handling degrees of freedom. The central class of this group is the
  * DoFHandler class: it is built on top of a triangulation and a
  * finite element class and allocated degrees of freedom on each cell
  * of the triangulation as required for the finite element space
- * described by the finite element object. There are other variants of
- * the DoFHandler class such as hp::DoFHandler that do similar
- * things for more special cases.
+ * described by the finite element object.
  *
  * DoFHandler objects are used together with objects of type FiniteElement
- * (or hp::FECollection in the case of hp::DoFHandler) to enumerate all the
+ * (or hp::FECollection) to enumerate all the
  * degrees of freedom that exist in a triangulation for this particular
  * finite element. As such, the combination of mesh, finite element, and
  * DoF handler object can be thought of as providing a <i>basis</i> of
@@ -38,8 +35,8 @@
  * we can describe functions in this finite dimensional space by vectors
  * of coefficients.
  *
- * DoFHandlers extend Triangulation objects (and the other classes in the @ref
- * grid module) in that they, too, offer iterators that run over all cells,
+ * DoFHandlers extend Triangulation objects (and the other classes in the
+ * @ref grid topic) in that they, too, offer iterators that run over all cells,
  * faces, or other geometric objects that make up a triangulation. These
  * iterators are derived from the triangulation iterators and therefore offer
  * the same functionality, but they also offer additional functions. For
@@ -49,7 +46,7 @@
  * the reason is that there can be more than one DoFHandler object that works
  * on the same Triangulation object.
  *
- * In addition to the DoF handler classes, this module holds a number of
+ * In addition to the DoF handler classes, this group holds a number of
  * auxiliary classes not commonly used in application programs, as well as
  * three classes that are not directly associated with the data structures of
  * the DoFHandler class. The first of these is the AffineConstraints class that
@@ -61,7 +58,7 @@
  * the DoFTools namespace offers a variety of algorithms around handling
  * degrees of freedom.
  *
- * In the grand scheme of things, the pieces of this module interact
+ * In the grand scheme of things, the pieces of this group interact
  * with a variety of other parts of the library:
  * @dot
  digraph G

@@ -1,24 +1,25 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2000 - 2021 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2013 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 
 #include <deal.II/base/quadrature_lib.h>
+#include <deal.II/base/utilities.h>
 
 #include <deal.II/fe/fe_dgq.h>
 #include <deal.II/fe/fe_nothing.h>
 #include <deal.II/fe/fe_q_iso_q1.h>
+#include <deal.II/fe/fe_tools.h>
 
 #include <deal.II/lac/vector.h>
 
@@ -27,6 +28,49 @@
 #include <vector>
 
 DEAL_II_NAMESPACE_OPEN
+
+
+namespace internal
+{
+  template <int dim>
+  Table<2, bool>
+  make_local_sparsity_pattern(unsigned int n_points_1d)
+  {
+    const unsigned int n_per_cell = Utilities::pow(n_points_1d, dim);
+
+    const std::vector<unsigned int> R =
+      FETools::lexicographic_to_hierarchic_numbering<dim>(n_points_1d - 1);
+
+    Table<2, bool> table;
+    table.reinit(n_per_cell, n_per_cell);
+    table.fill(false);
+
+    const int N1d = n_points_1d;
+    for (unsigned int i = 0; i < n_per_cell; ++i)
+      for (unsigned int j = 0; j < n_per_cell; ++j)
+        {
+          // compute l1 distance:
+          int distance = 0;
+
+          int xi = i;
+          int xj = j;
+          for (unsigned int d = 0; d < dim; ++d)
+            {
+              int current_distance = std::abs((xi % N1d) - (xj % N1d));
+              xi /= N1d;
+              xj /= N1d;
+              distance = std::max(distance, current_distance);
+              if (distance > 1)
+                break;
+            }
+
+          if (distance <= 1)
+            table(R[i], R[j]) = true;
+        }
+
+    return table;
+  }
+} // namespace internal
 
 
 
@@ -47,10 +91,12 @@ FE_Q_iso_Q1<dim, spacedim>::FE_Q_iso_Q1(const unsigned int subdivisions)
          ExcMessage("This element can only be used with a positive number of "
                     "subelements"));
 
-  QTrapezoid<1> trapez;
-  QIterated<1>  points(trapez, subdivisions);
+  const QTrapezoid<1> trapez;
+  const QIterated<1>  points(trapez, subdivisions);
 
   this->initialize(points.get_points());
+  this->local_dof_sparsity_pattern =
+    internal::make_local_sparsity_pattern<dim>(subdivisions + 1);
 }
 
 
@@ -73,6 +119,8 @@ FE_Q_iso_Q1<dim, spacedim>::FE_Q_iso_Q1(
                     "subelements"));
 
   this->initialize(support_points);
+  this->local_dof_sparsity_pattern =
+    internal::make_local_sparsity_pattern<dim>(support_points.size());
 }
 
 
@@ -174,12 +222,13 @@ FE_Q_iso_Q1<dim, spacedim>::compare_for_domination(
         return FiniteElementDomination::no_requirements;
     }
 
-  Assert(false, ExcNotImplemented());
+  DEAL_II_NOT_IMPLEMENTED();
   return FiniteElementDomination::neither_element_dominates;
 }
 
 
+
 // explicit instantiations
-#include "fe_q_iso_q1.inst"
+#include "fe/fe_q_iso_q1.inst"
 
 DEAL_II_NAMESPACE_CLOSE

@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
+// SPDX-License-Identifier: LGPL-2.1-or-later
 // Copyright (C) 1998 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 #ifndef dealii_quadrature_lib_h
 #define dealii_quadrature_lib_h
@@ -84,7 +83,7 @@ public:
    * EndPoint is used to specify which of the two endpoints of the unit interval
    * is used also as quadrature point.
    */
-  enum class EndPoint
+  enum EndPoint
   {
     /**
      * Left end point.
@@ -582,8 +581,9 @@ template <int dim>
 class QGaussRadauChebyshev : public Quadrature<dim>
 {
 public:
-  /* EndPoint is used to specify which of the two endpoints of the unit interval
-   * is used also as quadrature point
+  /**
+   * EndPoint is used to specify which of the two endpoints of the unit interval
+   * is used also as quadrature point.
    */
   enum EndPoint
   {
@@ -597,17 +597,17 @@ public:
     right
   };
   /// Generate a formula with <tt>n</tt> quadrature points
-  QGaussRadauChebyshev(const unsigned int n,
-                       EndPoint           ep = QGaussRadauChebyshev::left);
+  QGaussRadauChebyshev(
+    const unsigned int n,
+    const EndPoint     end_point = QGaussRadauChebyshev::EndPoint::left);
 
   /**
-   * Move constructor. We cannot rely on the move constructor for `Quadrature`,
-   * since it does not know about the additional member `ep` of this class.
+   * Move constructor.
    */
   QGaussRadauChebyshev(QGaussRadauChebyshev<dim> &&) noexcept = default;
 
 private:
-  const EndPoint ep;
+  const EndPoint end_point;
 };
 
 /**
@@ -1010,7 +1010,7 @@ template <>
 QGauss<1>::QGauss(const unsigned int n);
 template <>
 QGaussRadau<1>::QGaussRadau(const unsigned int             n,
-                            const QGaussRadau<1>::EndPoint end_poin);
+                            const QGaussRadau<1>::EndPoint end_point);
 template <>
 QGaussLobatto<1>::QGaussLobatto(const unsigned int n);
 

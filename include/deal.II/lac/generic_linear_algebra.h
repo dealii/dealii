@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2008 - 2020 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2012 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 #ifndef dealii_generic_linear_algebra_h
 #define dealii_generic_linear_algebra_h
@@ -25,9 +24,22 @@
 #include <deal.II/lac/sparse_matrix.h>
 #include <deal.II/lac/vector.h>
 
+#ifdef DEAL_II_WITH_PETSC
+#  include <deal.II/lac/petsc_block_sparse_matrix.h>
+#  include <deal.II/lac/petsc_precondition.h>
+#  include <deal.II/lac/petsc_solver.h>
+#  include <deal.II/lac/petsc_sparse_matrix.h>
+#endif
+
+#ifdef DEAL_II_WITH_TRILINOS
+#  include <deal.II/lac/trilinos_block_sparse_matrix.h>
+#  include <deal.II/lac/trilinos_precondition.h>
+#  include <deal.II/lac/trilinos_solver.h>
+#  include <deal.II/lac/trilinos_sparse_matrix.h>
+#endif
+
 
 DEAL_II_NAMESPACE_OPEN
-
 
 /**
  * A namespace in which the deal.II linear algebra classes are aliased to
@@ -64,17 +76,7 @@ namespace LinearAlgebraDealII
 } // namespace LinearAlgebraDealII
 
 
-DEAL_II_NAMESPACE_CLOSE
-
-
 #ifdef DEAL_II_WITH_PETSC
-
-#  include <deal.II/lac/petsc_block_sparse_matrix.h>
-#  include <deal.II/lac/petsc_precondition.h>
-#  include <deal.II/lac/petsc_solver.h>
-#  include <deal.II/lac/petsc_sparse_matrix.h>
-
-DEAL_II_NAMESPACE_OPEN
 
 /**
  * A namespace in which the wrappers to the PETSc linear algebra classes are
@@ -155,19 +157,9 @@ namespace LinearAlgebraPETSc
   } // namespace MPI
 
 } // namespace LinearAlgebraPETSc
-DEAL_II_NAMESPACE_CLOSE
-
-
 #endif // DEAL_II_WITH_PETSC
 
 #ifdef DEAL_II_WITH_TRILINOS
-
-#  include <deal.II/lac/trilinos_block_sparse_matrix.h>
-#  include <deal.II/lac/trilinos_precondition.h>
-#  include <deal.II/lac/trilinos_solver.h>
-#  include <deal.II/lac/trilinos_sparse_matrix.h>
-
-DEAL_II_NAMESPACE_OPEN
 
 /**
  * A namespace in which the wrappers to the Trilinos linear algebra classes
@@ -251,11 +243,9 @@ namespace LinearAlgebraTrilinos
 
 } // namespace LinearAlgebraTrilinos
 
-DEAL_II_NAMESPACE_CLOSE
-
 
 #endif // DEAL_II_WITH_TRILINOS
 
-
+DEAL_II_NAMESPACE_CLOSE
 
 #endif

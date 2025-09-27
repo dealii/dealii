@@ -1,5 +1,6 @@
 # This is a parameter file that can be used to reproduce the two dimensional
 # results of the tutorial program step-70.
+
 subsection Stokes Immersed Problem
   set Final time                         = 0.01
   set Homogeneous Dirichlet boundary ids = 0
@@ -24,7 +25,7 @@ subsection Stokes Immersed Problem
     set Solid grid generator              = hyper_rectangle
     set Solid grid generator arguments    = -.5, -.1: .5, .1: false
   end
-  
+
   subsection Refinement and remeshing
     set Maximum number of cells        = 20000
     set Refinement coarsening fraction = 0.3
@@ -34,7 +35,6 @@ subsection Stokes Immersed Problem
     set Refinement step frequency      = 5
     set Refinement strategy            = fixed_fraction
   end
-
 
   subsection Right hand side
     set Function constants  = 

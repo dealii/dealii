@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2012 - 2022 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2012 - 2024 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 
 
@@ -42,6 +41,7 @@
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/grid_out.h>
 #include <deal.II/grid/grid_tools.h>
+#include <deal.II/grid/manifold.h>
 #include <deal.II/grid/manifold_lib.h>
 #include <deal.II/grid/tria.h>
 
@@ -71,8 +71,8 @@ colorize_sixty_deg_hyper_shell(Triangulation<3> &tria,
           continue;
 
         double radius = cell->face(f)->center().norm() - center.norm();
-        if (std::fabs(cell->face(f)->center()(2) -
-                      sqrt(3.) * cell->face(f)->center()(0)) <
+        if (std::fabs(cell->face(f)->center()[2] -
+                      sqrt(3.) * cell->face(f)->center()[0]) <
             eps) // z = sqrt(3)x set boundary 2
           {
             cell->face(f)->set_boundary_id(2);
@@ -82,8 +82,8 @@ colorize_sixty_deg_hyper_shell(Triangulation<3> &tria,
                               cell->face(f)->line(j)->vertex(1).norm()) > eps)
                   cell->face(f)->line(j)->set_boundary_id(2);
           }
-        else if (std::fabs(cell->face(f)->center()(2) +
-                           sqrt(3.) * cell->face(f)->center()(0)) <
+        else if (std::fabs(cell->face(f)->center()[2] +
+                           sqrt(3.) * cell->face(f)->center()[0]) <
                  eps) // z = -sqrt(3)x set boundary 3
           {
             cell->face(f)->set_boundary_id(3);
@@ -93,8 +93,8 @@ colorize_sixty_deg_hyper_shell(Triangulation<3> &tria,
                               cell->face(f)->line(j)->vertex(1).norm()) > eps)
                   cell->face(f)->line(j)->set_boundary_id(3);
           }
-        else if (std::fabs(cell->face(f)->center()(2) -
-                           sqrt(3.) * cell->face(f)->center()(1)) <
+        else if (std::fabs(cell->face(f)->center()[2] -
+                           sqrt(3.) * cell->face(f)->center()[1]) <
                  eps) // z = sqrt(3)y set boundary 4
           {
             cell->face(f)->set_boundary_id(4);
@@ -104,8 +104,8 @@ colorize_sixty_deg_hyper_shell(Triangulation<3> &tria,
                               cell->face(f)->line(j)->vertex(1).norm()) > eps)
                   cell->face(f)->line(j)->set_boundary_id(4);
           }
-        else if (std::fabs(cell->face(f)->center()(2) +
-                           sqrt(3.) * cell->face(f)->center()(1)) <
+        else if (std::fabs(cell->face(f)->center()[2] +
+                           sqrt(3.) * cell->face(f)->center()[1]) <
                  eps) // z = -sqrt(3)y set boundary 5
           {
             cell->face(f)->set_boundary_id(5);
@@ -206,6 +206,9 @@ run()
 
   sixty_deg_hyper_shell(triangulation, Point<dim>(), 0.5, 1.0);
   GridTools::copy_boundary_to_manifold_id(triangulation);
+
+  for (unsigned int d = 0; d < 2 * dim; ++d)
+    triangulation.set_manifold(d, FlatManifold<dim>());
 
   static SphericalManifold<dim> boundary((Point<dim>()));
   triangulation.set_manifold(0, boundary);

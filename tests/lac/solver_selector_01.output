@@ -13,6 +13,6 @@ DEAL:cg::Convergence step 39 value 7.335e-08
 DEAL:Bicgstab::Starting value 36.00
 DEAL:Bicgstab::Convergence step 28 value 9.087e-08
 DEAL:GMRES::Starting value 34.45
-DEAL:GMRES::Convergence step 39 value 6.627e-08
+DEAL:GMRES::Convergence step 40 value 9.928e-08
 DEAL:FGMRES::Starting value 36.00
-DEAL:FGMRES::Convergence step 39 value 7.890e-08
+DEAL:FGMRES::Convergence step 40 value 9.803e-08

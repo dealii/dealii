@@ -1,17 +1,16 @@
-/* ---------------------------------------------------------------------
+/* ------------------------------------------------------------------------
  *
- * Copyright (C) 2010 - 2023 by the deal.II authors
+ * SPDX-License-Identifier: LGPL-2.1-or-later
+ * Copyright (C) 2010 - 2025 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
- * The deal.II library is free software; you can use it, redistribute
- * it, and/or modify it under the terms of the GNU Lesser General
- * Public License as published by the Free Software Foundation; either
- * version 2.1 of the License, or (at your option) any later version.
- * The full text of the license can be found in the file LICENSE.md at
- * the top level directory of deal.II.
+ * Part of the source code is dual licensed under Apache-2.0 WITH
+ * LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+ * governing the source code and code contributions can be found in
+ * LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
  *
- * ---------------------------------------------------------------------
+ * ------------------------------------------------------------------------
  *
  * Authors: Chih-Che Chueh, University of Victoria, 2010
  *          Wolfgang Bangerth, Texas A&M University, 2010
@@ -27,7 +26,6 @@
 // preconditioner classes that implement interfaces to the respective Trilinos
 // classes; some more information on these may be found in step-31.
 #include <deal.II/base/quadrature_lib.h>
-#include <deal.II/base/logstream.h>
 #include <deal.II/base/utilities.h>
 #include <deal.II/base/function.h>
 #include <deal.II/base/tensor_function.h>
@@ -256,7 +254,7 @@ namespace Step43
               std::exp(-(points[p] - centers[i]).norm_square() / (0.05 * 0.05));
 
           const double normalized_permeability =
-            std::min(std::max(permeability, 0.01), 4.);
+            std::clamp(permeability, 0.01, 4.);
 
           for (unsigned int d = 0; d < dim; ++d)
             values[p][d][d] = 1. / normalized_permeability;
@@ -300,7 +298,7 @@ namespace Step43
 
     const double numerator =
       2.0 * S * temp - S * S * (2.0 * S - 2.0 * viscosity * (1 - S));
-    const double denominator = std::pow(temp, 2.0);
+    const double denominator = Utilities::fixed_power<2>(temp);
 
     const double F_prime = numerator / denominator;
 
@@ -320,7 +318,7 @@ namespace Step43
   namespace LinearSolvers
   {
     template <class MatrixType, class PreconditionerType>
-    class InverseMatrix : public Subscriptor
+    class InverseMatrix : public EnableObserverPointer
     {
     public:
       InverseMatrix(const MatrixType         &m,
@@ -331,8 +329,8 @@ namespace Step43
       void vmult(VectorType &dst, const VectorType &src) const;
 
     private:
-      const SmartPointer<const MatrixType> matrix;
-      const PreconditionerType            &preconditioner;
+      const ObserverPointer<const MatrixType> matrix;
+      const PreconditionerType               &preconditioner;
     };
 
 
@@ -368,7 +366,7 @@ namespace Step43
     }
 
     template <class PreconditionerTypeA, class PreconditionerTypeMp>
-    class BlockSchurPreconditioner : public Subscriptor
+    class BlockSchurPreconditioner : public EnableObserverPointer
     {
     public:
       BlockSchurPreconditioner(
@@ -381,10 +379,10 @@ namespace Step43
                  const TrilinosWrappers::MPI::BlockVector &src) const;
 
     private:
-      const SmartPointer<const TrilinosWrappers::BlockSparseMatrix>
+      const ObserverPointer<const TrilinosWrappers::BlockSparseMatrix>
         darcy_matrix;
-      const SmartPointer<const InverseMatrix<TrilinosWrappers::SparseMatrix,
-                                             PreconditionerTypeMp>>
+      const ObserverPointer<const InverseMatrix<TrilinosWrappers::SparseMatrix,
+                                                PreconditionerTypeMp>>
                                  m_inverse;
       const PreconditionerTypeA &a_preconditioner;
 
@@ -505,7 +503,7 @@ namespace Step43
     const unsigned int degree;
 
     const unsigned int        darcy_degree;
-    FESystem<dim>             darcy_fe;
+    const FESystem<dim>       darcy_fe;
     DoFHandler<dim>           darcy_dof_handler;
     AffineConstraints<double> darcy_constraints;
 
@@ -522,7 +520,7 @@ namespace Step43
 
 
     const unsigned int        saturation_degree;
-    FE_Q<dim>                 saturation_fe;
+    const FE_Q<dim>           saturation_fe;
     DoFHandler<dim>           saturation_dof_handler;
     AffineConstraints<double> saturation_constraints;
 
@@ -971,8 +969,8 @@ namespace Step43
     darcy_matrix = 0;
     darcy_rhs    = 0;
 
-    QGauss<dim>     quadrature_formula(darcy_degree + 2);
-    QGauss<dim - 1> face_quadrature_formula(darcy_degree + 2);
+    const QGauss<dim>     quadrature_formula(darcy_degree + 2);
+    const QGauss<dim - 1> face_quadrature_formula(darcy_degree + 2);
 
     FEValues<dim> darcy_fe_values(darcy_fe,
                                   quadrature_formula,
@@ -1175,7 +1173,7 @@ namespace Step43
   template <int dim>
   void TwoPhaseFlowProblem<dim>::assemble_saturation_matrix()
   {
-    QGauss<dim> quadrature_formula(saturation_degree + 2);
+    const QGauss<dim> quadrature_formula(saturation_degree + 2);
 
     FEValues<dim> saturation_fe_values(saturation_fe,
                                        quadrature_formula,
@@ -1243,8 +1241,8 @@ namespace Step43
   template <int dim>
   void TwoPhaseFlowProblem<dim>::assemble_saturation_rhs()
   {
-    QGauss<dim>     quadrature_formula(saturation_degree + 2);
-    QGauss<dim - 1> face_quadrature_formula(saturation_degree + 2);
+    const QGauss<dim>     quadrature_formula(saturation_degree + 2);
+    const QGauss<dim - 1> face_quadrature_formula(saturation_degree + 2);
 
     FEValues<dim> saturation_fe_values(saturation_fe,
                                        quadrature_formula,
@@ -1690,7 +1688,7 @@ namespace Step43
       tmp_saturation[0].reinit(saturation_solution);
       tmp_saturation[1].reinit(saturation_solution);
       tmp_saturation[2].reinit(saturation_solution);
-      saturation_soltrans.interpolate(x_saturation, tmp_saturation);
+      saturation_soltrans.interpolate(tmp_saturation);
 
       saturation_solution                              = tmp_saturation[0];
       old_saturation_solution                          = tmp_saturation[1];
@@ -1704,7 +1702,7 @@ namespace Step43
       std::vector<TrilinosWrappers::MPI::BlockVector> tmp_darcy(2);
       tmp_darcy[0].reinit(darcy_solution);
       tmp_darcy[1].reinit(darcy_solution);
-      darcy_soltrans.interpolate(x_darcy, tmp_darcy);
+      darcy_soltrans.interpolate(tmp_darcy);
 
       last_computed_darcy_solution        = tmp_darcy[0];
       second_last_computed_darcy_solution = tmp_darcy[1];
@@ -1991,7 +1989,7 @@ namespace Step43
     if (timestep_number != 0)
       {
         double min_saturation = std::numeric_limits<double>::max(),
-               max_saturation = -std::numeric_limits<double>::max();
+               max_saturation = std::numeric_limits<double>::lowest();
 
         for (const auto &cell : saturation_dof_handler.active_cell_iterators())
           {
@@ -2017,7 +2015,7 @@ namespace Step43
     else
       {
         double min_saturation = std::numeric_limits<double>::max(),
-               max_saturation = -std::numeric_limits<double>::max();
+               max_saturation = std::numeric_limits<double>::lowest();
 
         for (const auto &cell : saturation_dof_handler.active_cell_iterators())
           {

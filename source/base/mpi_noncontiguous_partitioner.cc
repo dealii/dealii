@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2020 - 2023 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2020 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 #include <deal.II/base/array_view.h>
 #include <deal.II/base/mpi_noncontiguous_partitioner.h>
@@ -101,27 +100,16 @@ namespace Utilities
       recv_ranks.clear();
       recv_ptr.clear();
       recv_indices.clear();
+      recv_indices_duplicates.clear();
+      recv_indices_duplicates_ptr.clear();
       buffers.clear();
       requests.clear();
 
       // set up communication pattern
-      std::vector<unsigned int> owning_ranks_of_ghosts(
-        indexset_want.n_elements());
-
-      // set up dictionary
-      Utilities::MPI::internal::ComputeIndexOwner::ConsensusAlgorithmsPayload
-        process(indexset_has,
-                indexset_want,
-                communicator,
-                owning_ranks_of_ghosts,
-                true);
-
-      Utilities::MPI::ConsensusAlgorithms::Selector<
-        std::vector<
-          std::pair<types::global_dof_index, types::global_dof_index>>,
-        std::vector<unsigned int>>
-        consensus_algorithm;
-      consensus_algorithm.run(process, communicator);
+      const auto [owning_ranks_of_ghosts, targets_with_indexset] =
+        Utilities::MPI::compute_index_owner_and_requesters(indexset_has,
+                                                           indexset_want,
+                                                           communicator);
 
       // set up map of processes from where this rank will receive values
       {
@@ -147,8 +135,6 @@ namespace Utilities
       }
 
       {
-        const auto targets_with_indexset = process.get_requesters();
-
         send_ptr.push_back(recv_ptr.back());
         for (const auto &target_with_indexset : targets_with_indexset)
           {
@@ -232,20 +218,42 @@ namespace Utilities
       }
 
       {
-        std::vector<types::global_dof_index> temp_map_recv(
+        std::vector<std::vector<types::global_dof_index>> temp_map_recv(
           index_set_want.n_elements());
 
         for (types::global_dof_index i = 0; i < indices_want.size(); ++i)
           if (indices_want[i] != numbers::invalid_dof_index)
-            temp_map_recv[index_set_want.index_within_set(indices_want[i])] = i;
+            temp_map_recv[index_set_want.index_within_set(indices_want[i])]
+              .push_back(i);
 
-        for (auto &i : recv_indices)
-          i = temp_map_recv[i];
+        const bool use_fast_path =
+          std::all_of(temp_map_recv.begin(),
+                      temp_map_recv.end(),
+                      [&](const auto &x) { return x.size() == 1; });
+
+        if (use_fast_path)
+          {
+            for (auto &i : recv_indices)
+              i = temp_map_recv[i][0];
+          }
+        else
+          {
+            recv_indices_duplicates_ptr = {0};
+
+            for (const auto &indices : temp_map_recv)
+              {
+                for (const auto &index : indices)
+                  recv_indices_duplicates.emplace_back(index);
+
+                recv_indices_duplicates_ptr.push_back(
+                  recv_indices_duplicates.size());
+              }
+          }
       }
     }
   } // namespace MPI
 } // namespace Utilities
 
-#include "mpi_noncontiguous_partitioner.inst"
+#include "base/mpi_noncontiguous_partitioner.inst"
 
 DEAL_II_NAMESPACE_CLOSE

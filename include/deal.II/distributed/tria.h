@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2008 - 2023 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2010 - 2024 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 #ifndef dealii_distributed_tria_h
 #define dealii_distributed_tria_h
@@ -19,9 +18,9 @@
 
 #include <deal.II/base/config.h>
 
+#include <deal.II/base/enable_observer_pointer.h>
 #include <deal.II/base/mpi_stub.h>
-#include <deal.II/base/smartpointer.h>
-#include <deal.II/base/subscriptor.h>
+#include <deal.II/base/observer_pointer.h>
 #include <deal.II/base/template_constraints.h>
 
 #include <deal.II/distributed/p4est_wrappers.h>
@@ -49,10 +48,8 @@
 
 DEAL_II_NAMESPACE_OPEN
 
-#ifdef DEAL_II_WITH_P4EST
-
 // Forward declarations
-#  ifndef DOXYGEN
+#ifndef DOXYGEN
 
 namespace FETools
 {
@@ -78,7 +75,28 @@ namespace parallel
     class TemporarilyMatchRefineFlags;
   }
 } // namespace parallel
-#  endif
+
+namespace internal
+{
+  namespace parallel
+  {
+    namespace distributed
+    {
+      namespace TriangulationImplementation
+      {
+        template <int dim, int spacedim>
+        void
+        exchange_refinement_flags(
+          dealii::parallel::distributed::Triangulation<dim, spacedim> &);
+      }
+    } // namespace distributed
+  }   // namespace parallel
+} // namespace internal
+#endif
+
+
+
+#ifdef DEAL_II_WITH_P4EST
 
 namespace parallel
 {
@@ -93,7 +111,7 @@ namespace parallel
      * fully distributed mesh. Use of this class is explained in step-40,
      * step-32, the
      * @ref distributed
-     * documentation module, as well as the
+     * documentation topic, as well as the
      * @ref distributed_paper.
      * See there for more information. This class satisfies the
      * @ref ConceptMeshType "MeshType concept".
@@ -117,32 +135,68 @@ namespace parallel
      * detail in the
      * @ref distributed_paper.
      * Unfortunately, in this process, some information can get lost relating
-     * to flags that are set by user code and that are inherited from mother
+     * to flags that are set by user code and that are inherited from parent
      * to child cell but that are not moved along with a cell if that cell is
      * migrated from one processor to another.
      *
      * An example are boundary indicators. Assume, for example, that you start
      * with a single cell that is refined once globally, yielding four
      * children. If you have four processors, each one owns one cell. Assume
-     * now that processor 1 sets the boundary indicators of the external
-     * boundaries of the cell it owns to 42. Since processor 0 does not own
-     * this cell, it doesn't set the boundary indicators of its ghost cell
-     * copy of this cell. Now, assume we do several mesh refinement cycles and
-     * end up with a configuration where this processor suddenly finds itself
-     * as the owner of this cell. If boundary indicator 42 means that we need
+     * now that process 1 sets the boundary indicators of the external
+     * boundaries of the cell it owns to 42, using code such as this that
+     * is run right after creating the mesh:
+     * @code
+     *   for (const auto &cell : triangulation.active_cell_iterators())
+     *     if (cell->is_locally_owned())
+     *       for (const auto &face : cell->face_iterators())
+     *         face->set_boundary_id(42);
+     * @endcode
+     * On the other hand, process 0 does not own this cell (but has it as one
+     * of its ghost cells). Consequently, on process 0, executing the code above
+     * sets the boundary id of the cells the process owns, but not on the ghost
+     * cell and in particular not if the cell is just an artificial cell on that
+     * process (which in that case may not even correspond to an active cell
+     * on any other process). Now, assume we do several mesh refinement cycles
+     * and end up with a configuration where process 0 suddenly finds itself as
+     * the owner of this cell that was previously owned by process 1. If
+     * boundary indicator 42 means that we need
      * to integrate Neumann boundary conditions along this boundary, then
      * processor 0 will forget to do so because it has never set the boundary
      * indicator along this cell's boundary to 42.
      *
-     * The way to avoid this dilemma is to make sure that things like setting
-     * boundary indicators or material ids is done immediately every time a
-     * parallel triangulation is refined. This is not necessary for sequential
-     * triangulations because, there, these flags are inherited from mother to
-     * child cell and remain with a cell even if it is refined and the
-     * children are later coarsened again, but this does not hold for
-     * distributed triangulations. It is made even more difficult by the fact
-     * that in the process of refining a parallel distributed triangulation,
-     * the triangulation may call
+     * The way to avoid this dilemma is through one of two ways. The easier one
+     * is if you can set boundary ids and materials ids already correctly on
+     * the *coarse* mesh because a parallel::distributed::Triangulation keeps
+     * the entire coarse mesh around for its entire life time. In other words,
+     * if you can set boundary ids correctly already immediately after creating
+     * the coarse mesh (i.e., before any of its cells are ever refined), then
+     * the whole re-partitioning process will always ensure that every face
+     * inherits the boundary id from its parent which we know is already
+     * correct. This is, for example, what you would do if you had a cube domain
+     * in which each of the six faces has its own unique boundary id: You can
+     * already assign these at the very beginning, and the children will always
+     * have the right boundary id. It is important that if you want to go this
+     * way, right after creation, you assign the boundary ids for the boundary
+     * faces of *all* cells, not just the locally owned cells.
+     *
+     * In more complex cases, it is necessary to assign boundary ids later on,
+     * for example because what type a boundary face should have changes over
+     * time, changes with the solution (e.g., whether it's an inflow or outflow
+     * boundary condition), or because not all faces should have the same
+     * boundary id as their parent (say, because only part of one of the six
+     * faces of a cube should carry boundary id 42, whereas the rest should have
+     * boundary id 43; in other words, the decision must be made on a
+     * case-by-case basis on the faces of the *finest* mesh, rather than the
+     * faces of the coarse mesh). In such cases, the solution is to make sure
+     * that things like setting boundary indicators or material ids is done
+     * immediately every time a parallel triangulation is refined or
+     * partitioned. This is not necessary for sequential triangulations because,
+     * there, these flags are inherited from parent to child cell (or, for
+     * boundary ids, from parent to child face) and remain with a cell or face
+     * even if it is refined and the children are later coarsened again. But
+     * this does not hold for distributed triangulations. It is made even more
+     * difficult by the fact that in the process of refining a parallel
+     * distributed triangulation, the triangulation may call
      * dealii::Triangulation::execute_coarsening_and_refinement multiple times
      * and this function needs to know about boundaries. In other words, it is
      * <i>not</i> enough to just set boundary indicators on newly created
@@ -194,8 +248,8 @@ namespace parallel
      * that this function is in fact a member function of the class that
      * generates the mesh, for example because it needs to access run-time
      * parameters. This can be achieved as follows: assuming the
-     * <code>set_boundary_ids()</code> function has been declared as a (non-
-     * static, but possibly private) member function of the
+     * <code>set_boundary_ids()</code> function has been declared as a
+     * (non-static, but possibly private) member function of the
      * <code>MyClass</code> class, then the following will work:
      * @code
      * #include <functional>
@@ -252,7 +306,7 @@ namespace parallel
       /**
        * An alias that is used to identify cell iterators. The concept of
        * iterators is discussed at length in the
-       * @ref Iterators "iterators documentation module".
+       * @ref Iterators "iterators documentation topic".
        *
        * The current alias identifies cells in a triangulation. You can find
        * the exact type it refers to in the base class's own alias, but it
@@ -273,7 +327,7 @@ namespace parallel
        * An alias that is used to identify
        * @ref GlossActive "active cell iterators".
        * The concept of iterators is discussed at length in the
-       * @ref Iterators "iterators documentation module".
+       * @ref Iterators "iterators documentation topic".
        *
        * The current alias identifies active cells in a triangulation. You
        * can find the exact type it refers to in the base class's own alias,
@@ -375,7 +429,7 @@ namespace parallel
       virtual ~Triangulation() override;
 
       /**
-       * Reset this triangulation into a virgin state by deleting all data.
+       * Reset this triangulation into an empty state by deleting all data.
        *
        * Note that this operation is only allowed if no subscriptions to this
        * object exist any more, such as DoFHandler objects using it.
@@ -484,14 +538,17 @@ namespace parallel
        * Coarsen and refine the mesh according to refinement and coarsening
        * flags set.
        *
-       * Since the current processor only has control over those cells it owns
-       * (i.e. the ones for which <code>cell-@>subdomain_id() ==
-       * this-@>locally_owned_subdomain()</code>), refinement and coarsening
-       * flags are only respected for those locally owned cells. Flags may be
-       * set on other cells as well (and may often, in fact, if you call
-       * dealii::Triangulation::prepare_coarsening_and_refinement()) but will
-       * be largely ignored: the decision to refine the global mesh will only
-       * be affected by flags set on locally owned cells.
+       * Since the current processor only has control over those cells
+       * it owns (i.e. the ones for which <code>cell-@>subdomain_id()
+       * == this-@>locally_owned_subdomain()</code>), refinement and
+       * coarsening flags are only respected for those locally owned
+       * cells. Flags set on other cells will be ignored: the decision
+       * to refine the global mesh will only be affected by flags set
+       * on locally owned cells.
+       *
+       * This is a
+       * @ref GlossCollectiveOperation "collective operation"
+       * and needs to be called by all participating MPI ranks.
        *
        * @note This function by default partitions the mesh in such a way that
        * the number of cells on all processors is roughly equal. If you want
@@ -513,10 +570,16 @@ namespace parallel
       execute_coarsening_and_refinement() override;
 
       /**
-       * Override the implementation of prepare_coarsening_and_refinement from
-       * the base class. This is necessary if periodic boundaries are enabled
-       * and the level difference over vertices over the periodic boundary
-       * must not be more than 2:1.
+       * Prepare the triangulation for coarsening and refinement.
+       *
+       * This function performs necessary modifications of the
+       * coarsening and refinement flags to be consistent in parallel,
+       * to conform to smoothing flags set, and to conform to 2:1
+       * hanging node constraints.
+       *
+       * This is a
+       * @ref GlossCollectiveOperation "collective operation"
+       * and needs to be called by all participating MPI ranks.
        */
       virtual bool
       prepare_coarsening_and_refinement() override;
@@ -579,7 +642,9 @@ namespace parallel
       memory_consumption_p4est() const;
 
       /**
-       * A collective operation that produces a sequence of output files with
+       * A
+       * @ref GlossCollectiveOperation "collective operation"
+       * that produces a sequence of output files with
        * the given file base name that contain the mesh in VTK format.
        *
        * More than anything else, this function is useful for debugging the
@@ -599,15 +664,17 @@ namespace parallel
       get_checksum() const;
 
       /**
-       * Save the refinement information from the coarse mesh into the given
-       * file. This file needs to be reachable from all nodes in the
+       * Save the mesh and associated information into a number of files
+       * that all use the provided basename as a starting prefix, plus some
+       * suffixes that indicate the specific use of that file. These files all
+       * need to be reachable from all nodes in the
        * computation on a shared network file system. See the SolutionTransfer
        * class on how to store solution vectors into this file. Additional
        * cell-based data can be saved using
        * DistributedTriangulationBase::DataTransfer::register_data_attach().
        */
       virtual void
-      save(const std::string &filename) const override;
+      save(const std::string &file_basename) const override;
 
       /**
        * Load the refinement information saved with save() back in. The mesh
@@ -617,10 +684,10 @@ namespace parallel
        * You do not need to load with the same number of MPI processes that
        * you saved with. Rather, if a mesh is loaded with a different number
        * of MPI processes than used at the time of saving, the mesh is
-       * repartitioned that the number of cells is balanced among all processes.
-       * Individual repartitioning, e.g., based on the number of dofs or
-       * particles per cell, needs to be invoked manually by calling
-       * repartition() afterwards.
+       * repartitioned so that the number of cells is balanced among all
+       * processes. Individual repartitioning with non-identical weights for
+       * each cell, e.g., based on the number of dofs or particles per cell,
+       * needs to be invoked manually by calling repartition() afterwards.
        *
        * Cell-based data that was saved with
        * DistributedTriangulationBase::DataTransfer::register_data_attach() can
@@ -629,16 +696,7 @@ namespace parallel
        * after calling load().
        */
       virtual void
-      load(const std::string &filename) override;
-
-      /**
-       * @copydoc load()
-       *
-       * @deprecated The autopartition parameter has been removed.
-       */
-      DEAL_II_DEPRECATED
-      virtual void
-      load(const std::string &filename, const bool autopartition) override;
+      load(const std::string &file_basename) override;
 
       /**
        * Load the refinement information from a given parallel forest. This
@@ -751,8 +809,8 @@ namespace parallel
        * the refinement process. With this information, we can prepare all
        * buffers for data transfer accordingly.
        */
-      virtual void
-      update_cell_relations() override;
+      void
+      update_cell_relations();
 
       /**
        * Two arrays that store which p4est tree corresponds to which coarse
@@ -906,14 +964,6 @@ namespace parallel
        * This function is not implemented, but needs to be present for the
        * compiler.
        */
-      DEAL_II_DEPRECATED
-      virtual void
-      load(const std::string &filename, const bool autopartition) override;
-
-      /**
-       * This function is not implemented, but needs to be present for the
-       * compiler.
-       */
       virtual void
       save(const std::string &filename) const override;
 
@@ -935,8 +985,8 @@ namespace parallel
        * This function is not implemented, but needs to be present for the
        * compiler.
        */
-      virtual void
-      update_cell_relations() override;
+      void
+      update_cell_relations();
 
       /**
        * Dummy arrays. This class isn't usable but the compiler wants to see
@@ -1065,18 +1115,8 @@ namespace parallel
        * Dummy replacement to allow for better error messages when compiling
        * this class.
        */
-      DEAL_II_DEPRECATED
-      virtual void
-      load(const std::string & /*filename*/,
-           const bool /*autopartition*/) override
-      {}
-
-      /**
-       * Dummy replacement to allow for better error messages when compiling
-       * this class.
-       */
-      virtual void
-      update_cell_relations() override
+      void
+      update_cell_relations()
       {}
     };
   } // namespace distributed
@@ -1084,6 +1124,7 @@ namespace parallel
 
 
 #endif
+
 
 
 namespace parallel
@@ -1108,7 +1149,7 @@ namespace parallel
      * The use of this class is demonstrated in step-75.
      */
     template <int dim, int spacedim = dim>
-    class TemporarilyMatchRefineFlags : public Subscriptor
+    class TemporarilyMatchRefineFlags : public EnableObserverPointer
     {
     public:
       /**
@@ -1134,7 +1175,7 @@ namespace parallel
       /**
        * The modified parallel::distributed::Triangulation.
        */
-      const SmartPointer<
+      const ObserverPointer<
         dealii::parallel::distributed::Triangulation<dim, spacedim>>
         distributed_tria;
 

@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2022 - 2022 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2022 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 #ifndef dealii_sparsity_pattern_base_h
 #define dealii_sparsity_pattern_base_h
@@ -20,8 +19,9 @@
 #include <deal.II/base/config.h>
 
 #include <deal.II/base/array_view.h>
+#include <deal.II/base/enable_observer_pointer.h>
 #include <deal.II/base/exceptions.h>
-#include <deal.II/base/subscriptor.h>
+#include <deal.II/base/types.h>
 
 #include <utility>
 
@@ -36,7 +36,7 @@ DEAL_II_NAMESPACE_OPEN
  * Base class for all sparsity patterns, defining a common interface by which
  * new values can be added.
  */
-class SparsityPatternBase : public Subscriptor
+class SparsityPatternBase : public EnableObserverPointer
 {
 public:
   /**
@@ -168,10 +168,10 @@ SparsityPatternBase::n_cols() const
 
 
 inline void
-SparsityPatternBase::resize(const size_type rows, const size_type cols)
+SparsityPatternBase::resize(const size_type n_rows, const size_type n_cols)
 {
-  this->rows = rows;
-  this->cols = cols;
+  this->rows = n_rows;
+  this->cols = n_cols;
 }
 #endif
 

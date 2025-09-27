@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2015 - 2023 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2016 - 2024 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 #ifndef dealii_trilinos_epetra_vector_h
 #define dealii_trilinos_epetra_vector_h
@@ -23,14 +22,15 @@
 
 #  include <deal.II/base/index_set.h>
 #  include <deal.II/base/mpi_stub.h>
-#  include <deal.II/base/subscriptor.h>
 
 #  include <deal.II/lac/read_vector.h>
 #  include <deal.II/lac/trilinos_epetra_communication_pattern.h>
 #  include <deal.II/lac/vector_operation.h>
 #  include <deal.II/lac/vector_type_traits.h>
 
+DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
 #  include <Epetra_FEVector.h>
+DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
 
 #  include <memory>
 
@@ -52,6 +52,170 @@ namespace LinearAlgebra
   namespace EpetraWrappers
   {
     /**
+     * This class defines type aliases that are used in vector classes
+     * within the EpetraWrappers namespace.
+     */
+    class VectorTraits
+    {
+    public:
+      using value_type = double;
+      using size_type  = dealii::types::global_dof_index;
+    };
+
+    /**
+     * @cond internal
+     */
+
+    /**
+     * A namespace for internal implementation details of the TrilinosWrapper
+     * members.
+     *
+     * @ingroup TrilinosWrappers
+     */
+    namespace internal
+    {
+      /**
+       * This class implements a wrapper for accessing the Trilinos Epetra
+       * vector in the same way as we access deal.II objects: it is initialized
+       * with a vector and an element within it, and has a conversion operator
+       * to extract the scalar value of this element. It also has a variety of
+       * assignment operator for writing to this one element.
+       *
+       * @ingroup TrilinosWrappers
+       */
+      class VectorReference
+      {
+      private:
+        using value_type = VectorTraits::value_type;
+        using size_type  = VectorTraits::size_type;
+
+        /**
+         * Constructor. It is made private so as to only allow the actual vector
+         * class to create it.
+         */
+        VectorReference(Vector &vector, const size_type index);
+
+      public:
+        /**
+         * Copy constructor.
+         */
+        VectorReference(const VectorReference &) = default;
+
+        /**
+         * This looks like a copy operator, but does something different than
+         * usual. In particular, it does not copy the member variables of this
+         * reference. Rather, it handles the situation where we have two vectors
+         * @p v and @p w, and assign elements like in <tt>v(i)=w(i)</tt>. Here,
+         * both left and right hand side of the assignment have data type
+         * VectorReference, but what we really mean is to assign the vector
+         * elements represented by the two references. This operator implements
+         * this operation. Note also that this allows us to make the assignment
+         * operator const.
+         */
+        const VectorReference &
+        operator=(const VectorReference &r) const;
+
+        /**
+         * Same as above but for non-const reference objects.
+         */
+        VectorReference &
+        operator=(const VectorReference &r);
+
+        /**
+         * Set the referenced element of the vector to <tt>s</tt>.
+         */
+        const VectorReference &
+        operator=(const value_type &s) const;
+
+        /**
+         * Add <tt>s</tt> to the referenced element of the vector->
+         */
+        const VectorReference &
+        operator+=(const value_type &s) const;
+
+        /**
+         * Subtract <tt>s</tt> from the referenced element of the vector->
+         */
+        const VectorReference &
+        operator-=(const value_type &s) const;
+
+        /**
+         * Multiply the referenced element of the vector by <tt>s</tt>.
+         */
+        const VectorReference &
+        operator*=(const value_type &s) const;
+
+        /**
+         * Divide the referenced element of the vector by <tt>s</tt>.
+         */
+        const VectorReference &
+        operator/=(const value_type &s) const;
+
+        /**
+         * Convert the reference to an actual value, i.e. return the value of
+         * the referenced element of the vector.
+         */
+        operator value_type() const;
+
+        /**
+         * Exception
+         */
+        DeclException1(ExcTrilinosError,
+                       int,
+                       << "An error with error number " << arg1
+                       << " occurred while calling a Trilinos function");
+
+        /*
+         * Access to a an element that is not (locally-)owned.
+         *
+         * @ingroup Exceptions
+         */
+        DeclException4(
+          ExcAccessToNonLocalElement,
+          size_type,
+          size_type,
+          size_type,
+          size_type,
+          << "You are trying to access element " << arg1
+          << " of a distributed vector, but this element is not stored "
+          << "on the current processor. Note: There are " << arg2
+          << " elements stored "
+          << "on the current processor from within the range [" << arg3 << ','
+          << arg4 << "] but Trilinos vectors need not store contiguous "
+          << "ranges on each processor, and not every element in "
+          << "this range may in fact be stored locally."
+          << "\n\n"
+          << "A common source for this kind of problem is that you "
+          << "are passing a 'fully distributed' vector into a function "
+          << "that needs read access to vector elements that correspond "
+          << "to degrees of freedom on ghost cells (or at least to "
+          << "'locally active' degrees of freedom that are not also "
+          << "'locally owned'). You need to pass a vector that has these "
+          << "elements as ghost entries.");
+
+      private:
+        /**
+         * Point to the vector we are referencing.
+         */
+        Vector &vector;
+
+        /**
+         * Index of the referenced element of the vector.
+         */
+        const size_type index;
+
+        // Make the vector class a friend, so that it can create objects of the
+        // present type.
+        friend class ::dealii::LinearAlgebra::EpetraWrappers::Vector;
+      }; // class VectorReference
+
+    } // namespace internal
+    /**
+     * @endcond
+     */
+
+
+    /**
      * This class implements a wrapper to the Trilinos distributed vector
      * class Epetra_FEVector. This class requires Trilinos to be compiled
      * with MPI support.
@@ -59,12 +223,19 @@ namespace LinearAlgebra
      * @ingroup TrilinosWrappers
      * @ingroup Vectors
      */
-    class Vector : public ReadVector<double>, public Subscriptor
+    class Vector : public ReadVector<VectorTraits::value_type>
     {
     public:
-      using value_type = double;
-      using size_type  = types::global_dof_index;
-      using real_type  = double;
+      using value_type      = VectorTraits::value_type;
+      using size_type       = VectorTraits::size_type;
+      using real_type       = value_type;
+      using reference       = internal::VectorReference;
+      using const_reference = const internal::VectorReference;
+
+      /**
+       * @name 1: Basic Object-handling
+       */
+      /** @{ */
 
       /**
        * Constructor. Create a vector of dimension zero.
@@ -90,7 +261,7 @@ namespace LinearAlgebra
        * Reinit functionality. This function destroys the old vector content
        * and generates a new one based on the input partitioning. The flag
        * <tt>omit_zeroing_entries</tt> determines whether the vector should be
-       * filled with zero (false) or left untouched (true).
+       * filled with zeros (`false`) or left in an undetermined state (`true`).
        */
       void
       reinit(const IndexSet &parallel_partitioner,
@@ -110,12 +281,36 @@ namespace LinearAlgebra
       virtual void
       extract_subvector_to(
         const ArrayView<const types::global_dof_index> &indices,
-        ArrayView<double> &elements) const override;
+        const ArrayView<double> &elements) const override;
 
       /**
        * Copy function. This function takes a Vector and copies all the
        * elements. The Vector will have the same parallel distribution as @p
        * V.
+       *
+       * The semantics of this operator are complex. If the two vectors have
+       * the same size, and
+       * if either the left or right hand side vector of the assignment (i.e.,
+       * either the input vector on the right hand side, or the calling vector
+       * to the left of the assignment operator) currently has ghost elements,
+       * then the left hand side vector will also have ghost values and will
+       * consequently be a read-only vector (see also the
+       * @ref GlossGhostedVector "glossary entry" on the issue). Otherwise, the
+       * left hand vector will be a writable vector after this operation.
+       * These semantics facilitate having a vector with ghost elements on the
+       * left hand side of the assignment, and a vector without ghost elements
+       * on the right hand side, with the resulting left hand side vector
+       * having the correct values in both its locally owned and its ghost
+       * elements.
+       *
+       * On the other hand, if the left hand side vector does not have the
+       * correct size yet, or is perhaps an entirely uninitialized vector,
+       * then the assignment is simply a copy operation in the usual sense:
+       * In that case, if the right hand side has no ghost elements (i.e.,
+       * is a completely distributed vector), then the left hand side will
+       * have no ghost elements either. And if the right hand side has
+       * ghost elements (and is consequently read-only), then the left
+       * hand side will have these same properties after the operation.
        */
       Vector &
       operator=(const Vector &V);
@@ -142,19 +337,56 @@ namespace LinearAlgebra
         const std::shared_ptr<const Utilities::MPI::CommunicationPatternBase>
           &communication_pattern = {});
 
+      /** @} */
+
+
       /**
-       * @deprecated Use import_elements() instead.
+       * @name 2: Data-Access
        */
-      DEAL_II_DEPRECATED
-      void
-      import(
-        const ReadWriteVector<double> &V,
-        const VectorOperation::values  operation,
-        const std::shared_ptr<const Utilities::MPI::CommunicationPatternBase>
-          &communication_pattern = {})
-      {
-        import_elements(V, operation, communication_pattern);
-      }
+      /** @{ */
+
+      /**
+       * Provide access to a given element, both read and write.
+       *
+       * When using a vector distributed with MPI, this operation only makes
+       * sense for elements that are actually present on the calling processor.
+       * Otherwise, an exception is thrown.
+       */
+      reference
+      operator()(const size_type index);
+
+      /**
+       * Provide read-only access to an element.
+       *
+       * When using a vector distributed with MPI, this operation only makes
+       * sense for elements that are actually present on the calling processor.
+       * Otherwise, an exception is thrown.
+       */
+      value_type
+      operator()(const size_type index) const;
+
+      /**
+       * Provide access to a given element, both read and write.
+       *
+       * Exactly the same as operator().
+       */
+      reference
+      operator[](const size_type index);
+
+      /**
+       * Provide read-only access to an element.
+       *
+       * Exactly the same as operator().
+       */
+      value_type
+      operator[](const size_type index) const;
+
+      /** @} */
+
+      /**
+       * @name 3: Modification of vectors
+       */
+      /** @{ */
 
       /**
        * Multiply the entire vector by a fixed factor.
@@ -235,6 +467,14 @@ namespace LinearAlgebra
       bool
       all_zero() const;
 
+      /** @} */
+
+
+      /**
+       * @name 4: Scalar products, norms and related operations
+       */
+      /** @{ */
+
       /**
        * Return the mean value of the element of this vector.
        */
@@ -286,6 +526,14 @@ namespace LinearAlgebra
        */
       double
       add_and_dot(const double a, const Vector &V, const Vector &W);
+
+      /** @} */
+
+      /**
+       * @name 5: Scalar products, norms and related operations
+       */
+      /** @{ */
+
       /**
        * This function always returns false and is present only for backward
        * compatibility.
@@ -326,6 +574,14 @@ namespace LinearAlgebra
        */
       ::dealii::IndexSet
       locally_owned_elements() const;
+
+      /** @} */
+
+
+      /**
+       * @name 6: Mixed stuff
+       */
+      /** @{ */
 
       /**
        * Compress the underlying representation of the Trilinos object, i.e.
@@ -368,6 +624,8 @@ namespace LinearAlgebra
        */
       std::size_t
       memory_consumption() const;
+
+      /** @} */
 
       /**
        * The vectors have different partitioning, i.e. their IndexSet objects
@@ -417,7 +675,122 @@ namespace LinearAlgebra
        * source_stored_elements IndexSet and the current vector.
        */
       std::shared_ptr<const CommunicationPattern> epetra_comm_pattern;
+
+      // Make the reference class a friend.
+      friend class internal::VectorReference;
     };
+
+#  ifndef DOXYGEN
+
+    // VectorReference
+    namespace internal
+    {
+      inline VectorReference::VectorReference(Vector         &vector,
+                                              const size_type index)
+        : vector(vector)
+        , index(index)
+      {}
+
+
+
+      inline const VectorReference &
+      VectorReference::operator=(const VectorReference &r) const
+      {
+        // as explained in the class
+        // documentation, this is not the copy
+        // operator. so simply pass on to the
+        // "correct" assignment operator
+        *this = static_cast<value_type>(r);
+
+        return *this;
+      }
+
+
+
+      inline VectorReference &
+      VectorReference::operator=(const VectorReference &r)
+      {
+        // as above
+        *this = static_cast<value_type>(r);
+
+        return *this;
+      }
+
+
+
+      inline const VectorReference &
+      VectorReference::operator=(const value_type &value) const
+      {
+        (*vector.vector)[0][index] = value;
+
+        return *this;
+      }
+
+
+
+      inline const VectorReference &
+      VectorReference::operator+=(const value_type &value) const
+      {
+        value_type new_value       = static_cast<value_type>(*this) + value;
+        (*vector.vector)[0][index] = new_value;
+
+        return *this;
+      }
+
+
+
+      inline const VectorReference &
+      VectorReference::operator-=(const value_type &value) const
+      {
+        value_type new_value       = static_cast<value_type>(*this) - value;
+        (*vector.vector)[0][index] = new_value;
+
+        return *this;
+      }
+
+
+
+      inline const VectorReference &
+      VectorReference::operator*=(const value_type &value) const
+      {
+        value_type new_value       = static_cast<value_type>(*this) * value;
+        (*vector.vector)[0][index] = new_value;
+
+        return *this;
+      }
+
+
+
+      inline const VectorReference &
+      VectorReference::operator/=(const value_type &value) const
+      {
+        value_type new_value       = static_cast<value_type>(*this) / value;
+        (*vector.vector)[0][index] = new_value;
+
+        return *this;
+      }
+    } // namespace internal
+
+#  endif /* DOXYGEN */
+
+
+    inline internal::VectorReference
+    Vector::operator()(const size_type index)
+    {
+      return internal::VectorReference(*this, index);
+    }
+
+    inline internal::VectorReference
+    Vector::operator[](const size_type index)
+    {
+      return operator()(index);
+    }
+
+    inline Vector::value_type
+    Vector::operator[](const size_type index) const
+    {
+      return operator()(index);
+    }
 
 
     inline bool
@@ -436,6 +809,14 @@ template <>
 struct is_serial_vector<LinearAlgebra::EpetraWrappers::Vector> : std::false_type
 {};
 
+DEAL_II_NAMESPACE_CLOSE
+
+#else
+
+// Make sure the scripts that create the C++20 module input files have
+// something to latch on if the preprocessor #ifdef above would
+// otherwise lead to an empty content of the file.
+DEAL_II_NAMESPACE_OPEN
 DEAL_II_NAMESPACE_CLOSE
 
 #endif

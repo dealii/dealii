@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2021 - 2023 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2021 - 2024 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 
 #ifndef dealii_simplex_barycentric_polynomials_h
@@ -198,7 +197,7 @@ protected:
   Table<dim + 1, Number> coefficients;
 
   /**
-   * Utility function for barycentric polynomials - its convenient to loop
+   * Utility function for barycentric polynomials: it is convenient to loop
    * over all the indices at once in a dimension-independent way, but we also
    * need to access the actual indices of the underlying Table object. This
    * utility function converts an integral index into the equivalent
@@ -207,7 +206,7 @@ protected:
    */
   static TableIndices<dim + 1>
   index_to_indices(const std::size_t           &index,
-                   const TableIndices<dim + 1> &extent);
+                   const TableIndices<dim + 1> &extents);
 };
 
 /**
@@ -688,12 +687,14 @@ BarycentricPolynomial<dim, Number>::value(const Point<dim> &point) const
 
       auto temp = Number(1);
       for (unsigned int d = 0; d < dim + 1; ++d)
-        temp *= std::pow(b_point[d], indices[d]);
+        temp *= Utilities::pow(b_point[d], indices[d]);
       result += coef * temp;
     }
 
   return result;
 }
+
+
 
 template <int dim, typename Number>
 std::size_t
@@ -702,11 +703,13 @@ BarycentricPolynomial<dim, Number>::memory_consumption() const
   return coefficients.memory_consumption();
 }
 
+
+
 template <int dim, typename Number>
 TableIndices<dim + 1>
 BarycentricPolynomial<dim, Number>::index_to_indices(
   const std::size_t           &index,
-  const TableIndices<dim + 1> &extent)
+  const TableIndices<dim + 1> &extents)
 {
   TableIndices<dim + 1> result;
   auto                  temp = index;
@@ -715,12 +718,14 @@ BarycentricPolynomial<dim, Number>::index_to_indices(
     {
       std::size_t slice_size = 1;
       for (unsigned int n2 = n + 1; n2 < dim + 1; ++n2)
-        slice_size *= extent[n2];
+        slice_size *= extents[n2];
       result[n] = temp / slice_size;
       temp %= slice_size;
     }
   return result;
 }
+
+
 
 template <int dim>
 const BarycentricPolynomial<dim> &

@@ -1,24 +1,23 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2005 - 2020 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2006 - 2024 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 
 /**
  * @defgroup IO Input/Output
  *
- * This module collects the classes used for reading and writing meshes and
- * data. There are two sub-modules for each of these operations.
+ * This topic collects the classes used for reading and writing meshes and
+ * data. There are two sub-topics for each of these operations.
  */
 
 /**
@@ -32,7 +31,7 @@
  * In addition, deal.II can read an intermediate graphics format using the
  * DataOutReader. This format is used as an intermediate step between data
  * associated with a simulation and is written by the DataOutBase class (or
- * through the more derived classes described in the \ref output module). The
+ * through the more derived classes described in the \ref output topic). The
  * DataOutReader class reads this data back in, and it can then be converted
  * to any of a number of data formats supported by visualization programs.
  *
@@ -40,14 +39,6 @@
  * associated Patterns namespace) are used to deal with parameter files
  * describing run-time parameters to a program that one doesn't want to
  * hard-code within the program source.
- *
- *
- * <h3>The PathSearch class</h3>
- *
- * The PathSearch class is a helper class in input handling. It is
- * used to find a file in a list of directories, in much the same way
- * as unix systems find executables among the directories listed in
- * the <code>PATH</code> environment variable.
  *
  * @ingroup IO
  */
@@ -109,7 +100,7 @@
  * documentation of that class lists the supported formats.
  *
  * Several of the tutorial programs, notably step-1, step-6, step-9, step-10,
- * step-12b, and step-14 demonstrate the use of the GridOut class.
+ * and step-14 demonstrate the use of the GridOut class.
  *
  *
  * <h3>Matrix output</h3>
@@ -126,8 +117,8 @@
  * @defgroup textoutput Textual output
  *
  * In addition to classes that provide graphical output formats (see the @ref
- * output module), deal.II has a number of classes that facilitate textual
- * output in a number of ways. They are collected in this module. See the
+ * output topic), deal.II has a number of classes that facilitate textual
+ * output in a number of ways. They are collected in this topic. See the
  * documentation of these classes for more details.
  *
  * @ingroup IO

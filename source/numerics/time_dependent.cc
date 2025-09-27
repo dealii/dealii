@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 1999 - 2023 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 1999 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 #include <deal.II/base/memory_consumption.h>
 #include <deal.II/base/parallel.h>
@@ -99,7 +98,7 @@ TimeDependent::insert_timestep(const TimeStepBase *position,
   else
     {
       // inner time step
-      const std::vector<SmartPointer<TimeStepBase, TimeDependent>>::iterator
+      const std::vector<ObserverPointer<TimeStepBase, TimeDependent>>::iterator
         insert_position =
           std::find(timesteps.begin(), timesteps.end(), position);
       // check iterators again to satisfy coverity: both insert_position and
@@ -137,7 +136,7 @@ TimeDependent::delete_timestep(const unsigned int position)
 
   // Remember time step object for
   // later deletion and unlock
-  // SmartPointer
+  // ObserverPointer
   TimeStepBase *t     = timesteps[position];
   timesteps[position] = nullptr;
   // Now delete unsubscribed object
@@ -154,14 +153,15 @@ TimeDependent::delete_timestep(const unsigned int position)
     timesteps[position - 1]->set_next_timestep(
       (position < timesteps.size()) ?
         timesteps[position] :
-        /*null*/ SmartPointer<TimeStepBase, TimeDependent>());
+        /*null*/ ObserverPointer<TimeStepBase, TimeDependent>());
 
   // same for "previous" pointer of next
   // time step
   if (position < timesteps.size())
     timesteps[position]->set_previous_timestep(
-      (position != 0) ? timesteps[position - 1] :
-                        /*null*/ SmartPointer<TimeStepBase, TimeDependent>());
+      (position != 0) ?
+        timesteps[position - 1] :
+        /*null*/ ObserverPointer<TimeStepBase, TimeDependent>());
 }
 
 
@@ -521,7 +521,7 @@ TimeStepBase_Tria<dim>::restore_grid()
   Assert(tria == nullptr, ExcGridNotDeleted());
   Assert(refine_flags.size() == coarsen_flags.size(), ExcInternalError());
 
-  // create a virgin triangulation and
+  // create an empty triangulation and
   // set it to a copy of the coarse grid
   tria = new Triangulation<dim>();
   tria->copy_triangulation(*coarse_grid);
@@ -706,7 +706,7 @@ namespace
         return changed_grid;
       }
 
-    Assert(false, ExcInternalError());
+    DEAL_II_ASSERT_UNREACHABLE();
     return false;
   }
 
@@ -1164,7 +1164,7 @@ TimeStepBase_Tria_Flags::Flags<dim>::Flags()
   , wakeup_level_to_build_grid(0)
   , sleep_level_to_delete_grid(0)
 {
-  Assert(false, ExcInternalError());
+  DEAL_II_ASSERT_UNREACHABLE();
 }
 
 
@@ -1268,7 +1268,7 @@ TimeStepBase_Tria_Flags::RefinementData<dim>::RefinementData(
 
 
 /*-------------- Explicit Instantiations -------------------------------*/
-#include "time_dependent.inst"
+#include "numerics/time_dependent.inst"
 
 
 DEAL_II_NAMESPACE_CLOSE

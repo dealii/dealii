@@ -1,4 +1,0 @@
-Changed: You can now set MeshSmoothing flags in non-empty triangulations
-with Triangulation::set_mesh_smoothing().
-<br>
-(Marc Fehling, 2023/08/22)

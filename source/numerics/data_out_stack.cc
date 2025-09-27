@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 1999 - 2022 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 1999 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 #include <deal.II/base/memory_consumption.h>
 #include <deal.II/base/quadrature_lib.h>
@@ -61,11 +60,11 @@ DataOutStack<dim, spacedim>::new_parameter_value(const double p,
   for (typename std::vector<DataVector>::const_iterator i = dof_data.begin();
        i != dof_data.end();
        ++i)
-    Assert(i->data.size() == 0, ExcDataNotCleared());
+    Assert(i->data.empty(), ExcDataNotCleared());
   for (typename std::vector<DataVector>::const_iterator i = cell_data.begin();
        i != cell_data.end();
        ++i)
-    Assert(i->data.size() == 0, ExcDataNotCleared());
+    Assert(i->data.empty(), ExcDataNotCleared());
 }
 
 
@@ -95,26 +94,27 @@ DataOutStack<dim, spacedim>::declare_data_vector(
   const std::vector<std::string> &names,
   const VectorType                vector_type)
 {
-#ifdef DEBUG
-  // make sure this function is
-  // not called after some parameter
-  // values have already been
-  // processed
-  Assert(patches.empty(), ExcDataAlreadyAdded());
-
-  // also make sure that no name is
-  // used twice
-  for (const auto &name : names)
+  if constexpr (running_in_debug_mode())
     {
-      for (const auto &data_set : dof_data)
-        for (const auto &data_set_name : data_set.names)
-          Assert(name != data_set_name, ExcNameAlreadyUsed(name));
+      // make sure this function is
+      // not called after some parameter
+      // values have already been
+      // processed
+      Assert(patches.empty(), ExcDataAlreadyAdded());
 
-      for (const auto &data_set : cell_data)
-        for (const auto &data_set_name : data_set.names)
-          Assert(name != data_set_name, ExcNameAlreadyUsed(name));
+      // also make sure that no name is
+      // used twice
+      for (const auto &name : names)
+        {
+          for (const auto &data_set : dof_data)
+            for (const auto &data_set_name : data_set.names)
+              Assert(name != data_set_name, ExcNameAlreadyUsed(name));
+
+          for (const auto &data_set : cell_data)
+            for (const auto &data_set_name : data_set.names)
+              Assert(name != data_set_name, ExcNameAlreadyUsed(name));
+        }
     }
-#endif
 
   switch (vector_type)
     {
@@ -184,7 +184,6 @@ DataOutStack<dim, spacedim>::add_data_vector(
            names.size(), dof_handler->get_fe(0).n_components()));
   for (const auto &name : names)
     {
-      (void)name;
       Assert(name.find_first_not_of("abcdefghijklmnopqrstuvwxyz"
                                     "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
                                     "0123456789_<>()") == std::string::npos,
@@ -236,7 +235,7 @@ DataOutStack<dim, spacedim>::add_data_vector(
   // we have either return or Assert
   // statements above, so shouldn't
   // get here!
-  Assert(false, ExcInternalError());
+  DEAL_II_ASSERT_UNREACHABLE();
 }
 
 
@@ -278,8 +277,8 @@ DataOutStack<dim, spacedim>::build_patches(const unsigned int nnnn_subdivisions)
   // patch, and an object that
   // extracts the data on each
   // cell to these points
-  QTrapezoid<1>  q_trapez;
-  QIterated<dim> patch_points(q_trapez, n_subdivisions);
+  const QTrapezoid<1>  q_trapez;
+  const QIterated<dim> patch_points(q_trapez, n_subdivisions);
 
   // create collection objects from
   // single quadratures,
@@ -339,38 +338,38 @@ DataOutStack<dim, spacedim>::build_patches(const unsigned int nnnn_subdivisions)
         {
           case 1:
             patch->vertices[0] =
-              Point<dim + 1>(cell->vertex(0)(0), parameter - parameter_step);
+              Point<dim + 1>(cell->vertex(0)[0], parameter - parameter_step);
             patch->vertices[1] =
-              Point<dim + 1>(cell->vertex(1)(0), parameter - parameter_step);
-            patch->vertices[2] = Point<dim + 1>(cell->vertex(0)(0), parameter);
-            patch->vertices[3] = Point<dim + 1>(cell->vertex(1)(0), parameter);
+              Point<dim + 1>(cell->vertex(1)[0], parameter - parameter_step);
+            patch->vertices[2] = Point<dim + 1>(cell->vertex(0)[0], parameter);
+            patch->vertices[3] = Point<dim + 1>(cell->vertex(1)[0], parameter);
             break;
 
           case 2:
-            patch->vertices[0] = Point<dim + 1>(cell->vertex(0)(0),
-                                                cell->vertex(0)(1),
+            patch->vertices[0] = Point<dim + 1>(cell->vertex(0)[0],
+                                                cell->vertex(0)[1],
                                                 parameter - parameter_step);
-            patch->vertices[1] = Point<dim + 1>(cell->vertex(1)(0),
-                                                cell->vertex(1)(1),
+            patch->vertices[1] = Point<dim + 1>(cell->vertex(1)[0],
+                                                cell->vertex(1)[1],
                                                 parameter - parameter_step);
-            patch->vertices[2] = Point<dim + 1>(cell->vertex(2)(0),
-                                                cell->vertex(2)(1),
+            patch->vertices[2] = Point<dim + 1>(cell->vertex(2)[0],
+                                                cell->vertex(2)[1],
                                                 parameter - parameter_step);
-            patch->vertices[3] = Point<dim + 1>(cell->vertex(3)(0),
-                                                cell->vertex(3)(1),
+            patch->vertices[3] = Point<dim + 1>(cell->vertex(3)[0],
+                                                cell->vertex(3)[1],
                                                 parameter - parameter_step);
             patch->vertices[4] =
-              Point<dim + 1>(cell->vertex(0)(0), cell->vertex(0)(1), parameter);
+              Point<dim + 1>(cell->vertex(0)[0], cell->vertex(0)[1], parameter);
             patch->vertices[5] =
-              Point<dim + 1>(cell->vertex(1)(0), cell->vertex(1)(1), parameter);
+              Point<dim + 1>(cell->vertex(1)[0], cell->vertex(1)[1], parameter);
             patch->vertices[6] =
-              Point<dim + 1>(cell->vertex(2)(0), cell->vertex(2)(1), parameter);
+              Point<dim + 1>(cell->vertex(2)[0], cell->vertex(2)[1], parameter);
             patch->vertices[7] =
-              Point<dim + 1>(cell->vertex(3)(0), cell->vertex(3)(1), parameter);
+              Point<dim + 1>(cell->vertex(3)[0], cell->vertex(3)[1], parameter);
             break;
 
           default:
-            Assert(false, ExcNotImplemented());
+            DEAL_II_NOT_IMPLEMENTED();
         }
 
 
@@ -494,7 +493,7 @@ DataOutStack<dim, spacedim>::get_dataset_names() const
 
 
 // explicit instantiations
-#include "data_out_stack.inst"
+#include "numerics/data_out_stack.inst"
 
 
 DEAL_II_NAMESPACE_CLOSE

@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2017 - 2022 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2017 - 2024 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
 
 // test DoFTools::extract_dofs_with_support_contained_within() but
@@ -41,14 +40,14 @@ template <int dim>
 bool
 pred_left(const typename DoFHandler<dim>::active_cell_iterator &cell)
 {
-  return (cell->center()(0) < 0.49);
+  return (cell->center()[0] < 0.49);
 }
 
 template <int dim>
 bool
 pred_right(const typename DoFHandler<dim>::active_cell_iterator &cell)
 {
-  return (cell->center()(0) > 0.51);
+  return (cell->center()[0] > 0.51);
 }
 
 
@@ -56,8 +55,8 @@ template <int dim>
 bool
 pred_r(const typename Triangulation<dim>::active_cell_iterator &cell)
 {
-  return (cell->center()(0) < 0.49 && cell->center()(1) < 0.49) ||
-         (cell->center()(0) > 0.49 && cell->center()(1) > 0.49);
+  return (cell->center()[0] < 0.49 && cell->center()[1] < 0.49) ||
+         (cell->center()[0] > 0.49 && cell->center()[1] > 0.49);
 }
 
 

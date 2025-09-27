@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2010 - 2020 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2011 - 2024 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 
 #ifndef dealii_mesh_worker_simple_h
@@ -22,7 +21,7 @@
 #include <deal.II/algorithms/any_data.h>
 
 #include <deal.II/base/mg_level_object.h>
-#include <deal.II/base/smartpointer.h>
+#include <deal.II/base/observer_pointer.h>
 
 #include <deal.II/lac/block_vector.h>
 
@@ -112,8 +111,8 @@ namespace MeshWorker
       /**
        * A pointer to the object containing constraints.
        */
-      SmartPointer<const AffineConstraints<typename VectorType::value_type>,
-                   ResidualSimple<VectorType>>
+      ObserverPointer<const AffineConstraints<typename VectorType::value_type>,
+                      ResidualSimple<VectorType>>
         constraints;
     };
 
@@ -212,7 +211,7 @@ namespace MeshWorker
       /**
        * The vector of global matrices being assembled.
        */
-      std::vector<SmartPointer<MatrixType, MatrixSimple<MatrixType>>> matrix;
+      std::vector<ObserverPointer<MatrixType, MatrixSimple<MatrixType>>> matrix;
 
       /**
        * The smallest positive number that will be entered into the global
@@ -235,8 +234,8 @@ namespace MeshWorker
       /**
        * A pointer to the object containing constraints.
        */
-      SmartPointer<const AffineConstraints<typename MatrixType::value_type>,
-                   MatrixSimple<MatrixType>>
+      ObserverPointer<const AffineConstraints<typename MatrixType::value_type>,
+                      MatrixSimple<MatrixType>>
         constraints;
     };
 
@@ -379,40 +378,40 @@ namespace MeshWorker
       /**
        * The global matrix being assembled.
        */
-      SmartPointer<MGLevelObject<MatrixType>, MGMatrixSimple<MatrixType>>
+      ObserverPointer<MGLevelObject<MatrixType>, MGMatrixSimple<MatrixType>>
         matrix;
 
       /**
        * The matrix used for face flux terms across the refinement edge,
        * coupling coarse to fine.
        */
-      SmartPointer<MGLevelObject<MatrixType>, MGMatrixSimple<MatrixType>>
+      ObserverPointer<MGLevelObject<MatrixType>, MGMatrixSimple<MatrixType>>
         flux_up;
 
       /**
        * The matrix used for face flux terms across the refinement edge,
        * coupling fine to coarse.
        */
-      SmartPointer<MGLevelObject<MatrixType>, MGMatrixSimple<MatrixType>>
+      ObserverPointer<MGLevelObject<MatrixType>, MGMatrixSimple<MatrixType>>
         flux_down;
 
       /**
        * The matrix used for face contributions for continuous elements across
        * the refinement edge, coupling coarse to fine.
        */
-      SmartPointer<MGLevelObject<MatrixType>, MGMatrixSimple<MatrixType>>
+      ObserverPointer<MGLevelObject<MatrixType>, MGMatrixSimple<MatrixType>>
         interface_in;
 
       /**
        * The matrix used for face contributions for continuous elements across
        * the refinement edge, coupling fine to coarse.
        */
-      SmartPointer<MGLevelObject<MatrixType>, MGMatrixSimple<MatrixType>>
+      ObserverPointer<MGLevelObject<MatrixType>, MGMatrixSimple<MatrixType>>
         interface_out;
       /**
        * A pointer to the object containing constraints.
        */
-      SmartPointer<const MGConstrainedDoFs, MGMatrixSimple<MatrixType>>
+      ObserverPointer<const MGConstrainedDoFs, MGMatrixSimple<MatrixType>>
         mg_constrained_dofs;
 
       /**

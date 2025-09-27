@@ -90,7 +90,7 @@ definitions of the continents displayed in the file Continent_def.gif.
 By agreement with NIMA unedited SRTM-1 data for the United States and its
 territories and possessions are also being released and can be found in
 the directory /United_States_1arcsec./ Cells that straddle the border with
-neighboring countries have been masked with quarter degree quantiation
+neighboring countries have been masked with quarter degree quantization
 such that data outside the U.S. have the void value.
 
 2.3 Elevation mosaics

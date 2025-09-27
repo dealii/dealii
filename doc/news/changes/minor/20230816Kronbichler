@@ -1,7 +1,0 @@
-Improved: The classes MGSmootherRelaxation and mg::SmootherRelaxation can now
-also handle matrices of types `MGLevelObject<std::unique_ptr<...>>` or
-`MGLevelObject<std::shared_ptr<...>>` in their `initialize()` functions by the
-use of Utilities::get_underlying_value(), rather than MGLevelObject of the
-actual matrix type only.
-<br>
-(Martin Kronbichler, 2023/08/16)

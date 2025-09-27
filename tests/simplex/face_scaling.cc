@@ -22,7 +22,6 @@
 // didn't used to work with MappingFEField since it did not apply the sqrt(2)
 // factor in 2D correctly.
 
-using namespace dealii;
 
 template <int dim, int spacedim = dim>
 void
@@ -58,7 +57,6 @@ test(const Triangulation<dim, spacedim> &tria,
 int
 main(int argc, char **argv)
 {
-  using namespace dealii;
   initlog();
 
   {

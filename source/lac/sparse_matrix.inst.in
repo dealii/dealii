@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2018 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2007 - 2024 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 
 
@@ -112,15 +111,6 @@ for (S1, S2, S3 : REAL_SCALARS; V1, V2 : DEAL_II_VEC_TEMPLATES)
     template void SparseMatrix<S1>::Tvmult_add(V1<S2> &, const V2<S3> &) const;
   }
 
-for (S1 : REAL_SCALARS; S2, S3 : COMPLEX_SCALARS;
-     V1, V2 : DEAL_II_VEC_TEMPLATES)
-  {
-    template void SparseMatrix<S1>::vmult(V1<S2> &, const V2<S3> &) const;
-    template void SparseMatrix<S1>::Tvmult(V1<S2> &, const V2<S3> &) const;
-    template void SparseMatrix<S1>::vmult_add(V1<S2> &, const V2<S3> &) const;
-    template void SparseMatrix<S1>::Tvmult_add(V1<S2> &, const V2<S3> &) const;
-  }
-
 for (S1 : REAL_SCALARS)
   {
     template void SparseMatrix<S1>::vmult(
@@ -149,7 +139,48 @@ for (S1, S2, S3 : REAL_SCALARS)
                                            const bool) const;
   }
 
+// mixed instantiations
 
+for (S1 : REAL_SCALARS; S2, S3 : COMPLEX_SCALARS;
+     V1, V2 : DEAL_II_VEC_TEMPLATES)
+  {
+    template void SparseMatrix<S1>::vmult(V1<S2> &, const V2<S3> &) const;
+    template void SparseMatrix<S1>::Tvmult(V1<S2> &, const V2<S3> &) const;
+    template void SparseMatrix<S1>::vmult_add(V1<S2> &, const V2<S3> &) const;
+    template void SparseMatrix<S1>::Tvmult_add(V1<S2> &, const V2<S3> &) const;
+  }
+
+for (S1, S2 : COMPLEX_SCALARS; S3 : REAL_SCALARS;
+     V1, V2 : DEAL_II_VEC_TEMPLATES)
+  {
+    template void SparseMatrix<S1>::vmult(V1<S2> &, const V2<S3> &) const;
+    template void SparseMatrix<S1>::Tvmult(V1<S2> &, const V2<S3> &) const;
+    template void SparseMatrix<S1>::vmult_add(V1<S2> &, const V2<S3> &) const;
+    template void SparseMatrix<S1>::Tvmult_add(V1<S2> &, const V2<S3> &) const;
+  }
+
+for (S1 : COMPLEX_SCALARS; S2 : REAL_SCALARS)
+  {
+    template SparseMatrix<S1> &SparseMatrix<S1>::copy_from<S2>(
+      const SparseMatrix<S2> &);
+
+    template void SparseMatrix<S1>::copy_from<S2>(const FullMatrix<S2> &);
+
+    template void SparseMatrix<S1>::add<S2>(const S1, const SparseMatrix<S2> &);
+
+    template void SparseMatrix<S1>::add<S2>(const size_type,
+                                            const size_type,
+                                            const size_type *,
+                                            const S2 *,
+                                            const bool,
+                                            const bool);
+
+    template void SparseMatrix<S1>::set<S2>(const size_type,
+                                            const size_type,
+                                            const size_type *,
+                                            const S2 *,
+                                            const bool);
+  }
 
 // complex instantiations
 

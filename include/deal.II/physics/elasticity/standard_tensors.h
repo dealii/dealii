@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2016 - 2023 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2016 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 #ifndef dealii_elasticity_standard_tensors_h
 #define dealii_elasticity_standard_tensors_h
@@ -162,6 +161,35 @@ namespace Physics
        *
        * This definition aligns with the fourth-order symmetric tensor that
        * is returned by deviator_tensor().
+       *
+       * @note This function uses $\frac{1}{\text{dim}}$ as the factor in the
+       *   definition of the deviator, and that is unquestionably correct for
+       *   three-dimensional models. However, whether this is the correct choice
+       *   for two-dimensional models is something that depends on how one
+       *   thinks about two-dimensional models. For example, in elasticity, one
+       *   often does two-dimensional simulations that are thought of as cross
+       *   sections of three-dimensional objects that are infinite in
+       *   $z$-direction, with the assumption that the $z$-displacements are
+       *   zero and that the $x$- and $y$-displacements do not vary in
+       *   $z$-direction. Such models are often described as
+       *   "<a
+       * href="https://en.wikipedia.org/wiki/Infinitesimal_strain_theory#Plane_strain">plane
+       * strain</a>", indicating that nonzero strain components are all in the
+       *   $x$-$y$ plane. The important point here is that while we only
+       *   model two spatial variables, in the background *the model
+       *   really is three-dimensional*.  In these cases, the deviator
+       *   should really contain $\frac{1}{3}$ as the factor in front of
+       *   the divergence, and in those cases you will not want to use
+       *   the current function. On the other hand, there are of course
+       *   also models that truly are two-dimensional -- say the
+       *   simulation of transport on the earth surface, or of the
+       *   deformation of monolayers of
+       *   [graphene](https://en.wikipedia.org/wiki/Graphene) (an
+       *   inherently two-dimensional material). In those cases, the
+       *   factor $\frac{1}{2}$ chosen in the definition of this
+       *   function when using `dim==2` is correct. Whether or not the
+       *   current function is right for you in two dimensions is
+       *   therefore a question of what your model represents.
        *
        * @dealiiWriggersA{47,3.129}
        * @dealiiHolzapfelA{232,6.105}

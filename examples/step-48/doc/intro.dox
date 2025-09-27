@@ -1,4 +1,3 @@
-
 <i>
 This program was contributed by Katharina Kormann and Martin
 Kronbichler.
@@ -12,7 +11,7 @@ application: Graph partitioning and coloring&quot; by Katharina
 Kormann and Martin Kronbichler in: Proceedings of the 7th IEEE
 International Conference on e-Science, 2011.  </i>
 
-<a name="Intro"></a>
+<a name="step_48-Intro"></a>
 <h1>Introduction</h1>
 
 This program demonstrates how to use the cell-based implementation of finite

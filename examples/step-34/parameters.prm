@@ -1,29 +1,28 @@
 # Listing of Parameters
 # ---------------------
+
 set Extend solution on the -2,2 box = true
 set External refinement             = 5
 set Number of cycles                = 4
 set Run 2d simulation               = true
 set Run 3d simulation               = true
 
-
 subsection Exact solution 2d
   # Any constant used inside the function which is not a variable name.
-  set Function constants  = 
+  set Function constants =
 
   # Separate vector valued expressions by ';' as ',' is used internally by the
   # function parser.
-  set Function expression = x+y   # default: 0
+  set Function expression = x+y # default: 0
 
   # The name of the variables as they will be used in the function, separated
   # by ','.
-  set Variable names      = x,y,t
+  set Variable names = x,y,t
 end
-
 
 subsection Exact solution 3d
   # Any constant used inside the function which is not a variable name.
-  set Function constants  = 
+  set Function constants =
 
   # Separate vector valued expressions by ';' as ',' is used internally by the
   # function parser.
@@ -31,16 +30,14 @@ subsection Exact solution 3d
 
   # The name of the variables as they will be used in the function, separated
   # by ','.
-  set Variable names      = x,y,z,t
+  set Variable names = x,y,z,t
 end
-
 
 subsection Quadrature rules
   set Quadrature order          = 4
   set Quadrature type           = gauss
   set Singular quadrature order = 5
 end
-
 
 subsection Solver
   set Log frequency = 1
@@ -50,24 +47,22 @@ subsection Solver
   set Tolerance     = 1.e-10
 end
 
-
 subsection Wind function 2d
   # Any constant used inside the function which is not a variable name.
-  set Function constants  = 
+  set Function constants =
 
   # Separate vector valued expressions by ';' as ',' is used internally by the
   # function parser.
-  set Function expression = 1; 1  # default: 0; 0
+  set Function expression = 1; 1 # default: 0; 0
 
   # The name of the variables as they will be used in the function, separated
   # by ','.
-  set Variable names      = x,y,t
+  set Variable names = x,y,t
 end
-
 
 subsection Wind function 3d
   # Any constant used inside the function which is not a variable name.
-  set Function constants  = 
+  set Function constants =
 
   # Separate vector valued expressions by ';' as ',' is used internally by the
   # function parser.
@@ -75,5 +70,5 @@ subsection Wind function 3d
 
   # The name of the variables as they will be used in the function, separated
   # by ','.
-  set Variable names      = x,y,z,t
+  set Variable names = x,y,z,t
 end

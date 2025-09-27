@@ -1,5 +1,3 @@
-<br>
-
 <i>This program was contributed by Jörg Frohne (University of Siegen,
 Germany) while on a long-term visit to Texas A&amp;M University, with significant
 contributions by Timo Heister and Wolfgang Bangerth.
@@ -15,7 +13,7 @@ in the following paper:
 
 
 
-<a name="Intro"></a>
+<a name="step_42-Intro"></a>
 <h3>Introduction</h3>
 
 This example is an extension of step-41, considering a 3d contact problem with an
@@ -29,7 +27,7 @@ solution will look like (the deformable body is a cube - only half of
 which is actually shown -, the obstacle corresponds
 to a Chinese character that is discussed below):
 
-<img src="https://www.dealii.org/images/steps/developer/step-42.CellConstitutionLi2.png" alt="">
+<img src="https://dealii.org/images/steps/developer/step-42.CellConstitutionLi2.png" alt="">
 
 
 This problem description implies that we have to take care of an additional
@@ -321,7 +319,7 @@ method for the contact. It works as follows:
  Here,
  $P_{\mathcal{A}}(U)$ is the projection of the active
  components in $\mathcal{A}$ to the gap
- @f{gather*}P_{\mathcal{A}}(U)_p \dealcoloneq \begin{cases}{
+ @f{gather*}P_{\mathcal{A}}(U)_p \dealcoloneq \begin{cases}
  U_p, & \textrm{if}\quad p\notin\mathcal{A}\\
  g_{h,p}, & \textrm{if}\quad
  p\in\mathcal{A},
@@ -346,7 +344,7 @@ we can choose $B$ to be a matrix that has only one entry per row,
 set strategy for non-linear multibody contact problems, Comput. Methods Appl. Mech. Engrg.
 194, 2005, pp. 3147-3166).
 The vector $G$ is defined by a suitable approximation $g_h$ of the gap $g$
-@f{gather*}G_p = \begin{cases}{
+@f{gather*}G_p = \begin{cases}
 g_{h,p}, & \text{if}\quad p\in\mathcal{S}\\
 0, & \text{if}\quad p\notin\mathcal{S}.
 \end{cases}@f}
@@ -405,7 +403,7 @@ Compared to step-41, the programs has a few new classes:
   looks as follows (see also the picture at
   the top of this section on how the end result looks like):
 
-  <img src="https://www.dealii.org/images/steps/developer/step-42.character.png" alt="" width="25%">
+  <img src="https://dealii.org/images/steps/developer/step-42.character.png" alt="" width="25%">
 </ul>
 
 Other than that, let us comment only on the following aspects:

@@ -10,110 +10,95 @@
 #
 # Also see https://git-scm.com/docs/git-check-mailmap
 
-
-# adam4130 <adam4130@users.noreply.github.com>
-Adam Lee <adam4130@users.noreply.github.com>
-
-# tcclevenger <tcleven@clemson.edu>
-Thomas C. Clevenger <tcleven@clemson.edu>
-
-# Roland <roland.richter@ntnu.no>
-Roland Richter <roland.richter@ntnu.no>
-
-# saratro <sara.tro@colorado.edu>
-Sara Tro <sara.tro@colorado.edu>
-
-# rfildes <rfildes@ucdavis.edu>
-Rebecca Fildes <rfildes@ucdavis.edu>
-
-# notxor <pmnotxor@gmx.at>
-Daniel Jodlbauer <pmnotxor@gmx.at>
-
-# marcfehling <marc.fehling@gmx.net>
-Marc Fehling <marc.fehling@gmx.net>
-
-# rebeccampereira <rpereira2@umassd.edu>
-Rebecca Pereira <rpereira2@umassd.edu>
-
-# peterrum <peterrmuench@gmail.com>
-Peter Munch <peterrmuench@gmail.com>
-
-# ManaswineeB <bezba004@umn.edu>
-Manaswinee Bezbaruah <bezba004@umn.edu>
-
-# blaisb <blais.bruno@gmail.com>
-Bruno Blais <blais.bruno@gmail.com>
-
-# grahambenharper <grahambenharper@gmail.com>
-Graham Harper <grahambenharper@gmail.com>
-
-# kirana-bergstrom <kirana.bergstrom@ucdenver.edu>
-Kirana Bergstrom <kirana.bergstrom@ucdenver.edu>
-
-# luz.paz <luzpaz@users.noreply.github.com>
-unknown luzpaz <luzpaz@users.noreply.github.com>
-
-# zhuoranwang@ZhuorandeMacBook-Pro.local
-Zhuoran Wang <zhrwang@rams.colostate.edu> <zhuoranwang@ZhuorandeMacBook-Pro.local>
-
-# Wolfgang Bangerth <bangerth@gluon.math.colostate.edu>
-Wolfgang Bangerth <bangerth@colostate.edu> <bangerth@gluon.math.colostate.edu>
-
-# Matthias Maier
-Matthias Maier <tamiko@43-1.org> <tamiko@kyomu.43-1.org>
-Matthias Maier <tamiko@43-1.org> <tamiko+GITHUB@kyomu.43-1.org>
-Matthias Maier <tamiko@43-1.org> <matthias.maier@iwr.uni-heidelberg.de>
-Matthias Maier <tamiko@43-1.org> <maier@tamu.edu>
-
-# Manu Jayadharan
-Manu Jayadharan <maj136@pitt.edu> <35903705+mjayadharan@users.noreply.github.com>
-
-# aggarwal-ashna <53831151+aggarwal-ashna@users.noreply.github.com>
 Ashna Aggarwal <aaggarwal01@ucla.edu> <53831151+aggarwal-ashna@users.noreply.github.com>
-
-# LiMaIG <lmig@math.umd.edu>
-Lise-Marie Imbert-Gerard <lmig@math.umd.edu>
-Lise-Marie Imbert-Gerard <lmig@math.umd.edu> <imbertgerard@cims.nyu.edu>
-
-# agrayver <agrayver@erdw.ethz.ch>
+Giovanni Alzetta <giovannialzetta@hotmail.it>
+Tyler Anderson <tyand96@gmail.com>
+Daniel Arndt <arndtd@ornl.gov> <6da@ornl.gov>
+Daniel Arndt <daniel.arndt@iwr.uni-heidelberg.de> <darndt@simserv02.iwr.uni-heidelberg.de>
+Rajat Arora <rajat.arora9464@gmail.com
+Wolfgang Bangerth <bangerth@colostate.edu> <bangerth@gluon.math.colostate.edu>
+Mauro Bardelloni <esenonfossiio@gmail.com>
+Nicolas Barnafi <nabw91@gmail.com>
+Maximilian Bergbauer <maximilian.bergbauer@tum.de> <bergbauer@lnm.mw.tum.de>
+Kirana Bergstrom <kirana.bergstrom@ucdenver.edu>
+Manaswinee Bezbaruah <bezba004@umn.edu>
+Bruno Blais <blais.bruno@gmail.com>
+Vishal Boddu <vishal.boddu@fau.de>
+Benjamin Brands <benjamin.brands@fau.de>
+Ángel R. Carballo <angel.rcarballo@udc.es>
+Fabian Castelli <fabian.castelli@kit.edu> <50630942+gfcas@users.noreply.github.com>
+Nicola Cavallini <nicola.cavallini@sissa.it>
+Nicola Cavallini <nicola.cavallini@unipv.it>
+Praveen Chandrashekar <cpraveen@gmail.com>
+Thomas C. Clevenger <tcleven@clemson.edu>
+Sam Cox <spc29@le.ac.uk>
+Marc Fehling <marc.fehling@gmx.net>
+Rebecca Fildes <rfildes@ucdavis.edu>
+Menno Fraters <menno.fraters@hotmail.com>
+Menno Fraters <menno.fraters@outlook.com>
+Nicola Giuliani <ngiuliani@sissa.it> <nicolagiuliani@dhcp-129-199.sissa.it>
+Anne Glerum <a.c.glerum@uu.nl>
+Krishnakumar Gopalakrishnan <krishna.kumar@ucl.ac.uk> <krishnakumarg1984@users.noreply.github.com>
+Krishnakumar Gopalakrishnan <krishna.kumar@ucl.ac.uk> <krishnak@vt.edu>
 Alexander Grayver <agrayver@erdw.ethz.ch>
 Alexander Grayver <agrayver@erdw.ethz.ch> <agrayver@agrayver-VirtualBox.(none)>
-
-#
-Krishnakumar Gopalakrishnan <krishna.kumar@ucl.ac.uk>
-Krishnakumar Gopalakrishnan <krishna.kumar@ucl.ac.uk> <krishnak@vt.edu>
-Krishnakumar Gopalakrishnan <krishna.kumar@ucl.ac.uk> <krishnakumarg1984@users.noreply.github.com>
-
-#
-Menno Fraters <menno.fraters@outlook.com>
-
-#
-Ignacio Tomas <itomas@sandia.gov>
-
-#
+Joshua Hanophy <josh.hanophy@gmail.com>
+Mike Harmon <mdh266@gmail.com>
+Graham Harper <grahambenharper@gmail.com>
 Nicole Hayes <hayesni4@msu.edu>
-
-#
-Buğrahan Temür <bugrahan.temuer@tum.de> <bugrahan.temur@gmail.com>
-
-#
-Daniel Arndt <arndtd@ornl.gov> <6da@ornl.gov>
-
-#
-Luz Paz <luzpaz@pm.me>
-
-#
-Magdalena Schreter <magdalena.schreter@tum.de> <schreter.magdalena@gmail.com>
-
-#
-Maximilian Bergbauer <maximilian.bergbauer@tum.de> <bergbauer@lnm.mw.tum.de>
-
-#
-Nicolas Barnafi <nabw91@gmail.com>
-
-#
+Johannes Heinz <johannes.heinz@tuwien.ac.at> <43043310+jh66637@users.noreply.github.com>
+Dakshina Ilangovan <dakshinai@tamu.edu> <dakshina.ilangova@0785d39b-7218-0410-832d-ea1e28bc413d>
+Lise-Marie Imbert-Gerard <lmig@math.umd.edu>
+Lise-Marie Imbert-Gerard <lmig@math.umd.edu> <imbertgerard@cims.nyu.edu>
+Samuel Imfeld <sml.imfeld@gmail.com>
 Vladimir Ivannikov <vladimir.ivannikov@hzg.de> <vovannikov@yandex.ru>
-
-#
+Manu Jayadharan <maj136@pitt.edu> <35903705+mjayadharan@users.noreply.github.com>
+Daniel Jodlbauer <pmnotxor@gmx.at>
+Daniel Jodlbauer <pmnotxor@gmx.at> <jdschule@gmx.at>
+Eldar Khattatov <eld.khattatov@gmail.com>
+Eldar Khattatov <elk58@pitt.edu>
+Sebastian Kinnewig <sebastian@kinnewig.org> <35812030+kinnewig@users.noreply.github.com>
+Sebastian Kinnewig <sebastian@kinnewig.org> <Sebastian@Kinnewig.org>
+Ingo Kligge <ingo.kligge@tu-dortmund.de>
+Alex Kokomov <kokomovalex@gmail.com>
+Adam Kosik <adam.kosik@atlas.cz>
+Konstantin Ladutenko <kostyfisik@gmail.com> <kostyfisik@users.noreply.github.com>
+Adam Lee <adam4130@users.noreply.github.com>
+Pablo Lucero <pablo.lucero@iwr.uni-heidelberg.de>
+Matthias Maier <tamiko@43-1.org> <maier@tamu.edu>
+Matthias Maier <tamiko@43-1.org> <matthias.maier@iwr.uni-heidelberg.de>
+Matthias Maier <tamiko@43-1.org> <tamiko+GITHUB@kyomu.43-1.org>
+Matthias Maier <tamiko@43-1.org> <tamiko@kyomu.43-1.org>
+Jonathan L. Matthews <mrjonmatthews@gmail.com>
+Peter Munch <peterrmuench@gmail.com>
+Luz Paz <luzpaz@pm.me>
+Luz Paz <luzpaz@pm.me> <luzpaz@users.noreply.github.com>
+Rebecca Pereira <rpereira2@umassd.edu>
+Giuseppe Pitton <gpitton@sissa.it>
+Lei Qiao <qiaol618@gmail.com>
+Reza Rastak <reza.rastak@gmail.com> <rezarastak@users.noreply.github.com>
+Roland Richter <roland.richter@ntnu.no>
+Alberto Sartori <alberto.sartori86@gmail.com>
+David Schneider <dav.schneider@tum.de>
+Magdalena Schreter <magdalena.schreter@tum.de> <schreter.magdalena@gmail.com>
+Richard Schussnig <richard.schussnig@gmx.at> <69867655+richardschu@users.noreply.github.com>
+Krishanu Sen <krishanu.sen25@gmail.com>
+Norman Shakir <shakirbsm@gmail.com>:w
+Daniel Shapero <shapero.daniel@gmail.com>
+Konrad Simon <konrad.simon@uni-hamburg.de>
+Florian Sonner <florian.sonner@iwr.uni-heidelberg.de>
+Sebastian Stark <stark.sebastian@gmx.de> <45016248+starki0815@users.noreply.github.com>
+Martin Steigemann <msteigemann@yahoo.de>
+Jan Philipp Thiele <thiele@wias-berlin.de> <54978337+jpthiele@users.noreply.github.com>
+Ignacio Tomas <itomas@sandia.gov>
+Sara Tro <sara.tro@colorado.edu>
+Jiaxin Wang <jxw.sissa@gmail.com> <jiaxin@Jiaxins-MacBook-Pro.local>
+Zhuoran Wang <zhrwang@rams.colostate.edu> <zhuoranwang@ZhuorandeMacBook-Pro.local>
+Zhuoran Wang <zhrwang@rams.colostate.edu> <30611255+sophy1029@users.noreply.github.com>
+Xiaoyu Wei <wxy0516@gmail.com> <xywei@users.noreply.github.com>
+Michał Wichrowski <mtwichrowski@gmail.com> <32612987+mwichro@users.noreply.github.com>
+Julius Witte <julius.witte@iwr.uni-heidelberg.de>
+Jaeryun Yim <jaeryun.yim@gmail.com>
+Toby D. Young <oneliefleft@gmail.com>
 Vladimir Yushutin <vyushut@clemson.edu> <117186319+vyushut@users.noreply.github.com>
 Vladimir Yushutin <vyushut@clemson.edu> <vyushutin@clemson.edu>

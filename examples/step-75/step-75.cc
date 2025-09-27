@@ -1,17 +1,16 @@
-/* ---------------------------------------------------------------------
+/* ------------------------------------------------------------------------
  *
- * Copyright (C) 2021 - 2023 by the deal.II authors
+ * SPDX-License-Identifier: LGPL-2.1-or-later
+ * Copyright (C) 2021 - 2024 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
- * The deal.II library is free software; you can use it, redistribute
- * it, and/or modify it under the terms of the GNU Lesser General
- * Public License as published by the Free Software Foundation; either
- * version 2.1 of the License, or (at your option) any later version.
- * The full text of the license can be found in the file LICENSE.md at
- * the top level directory of deal.II.
+ * Part of the source code is dual licensed under Apache-2.0 WITH
+ * LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+ * governing the source code and code contributions can be found in
+ * LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
  *
- * ---------------------------------------------------------------------
+ * ------------------------------------------------------------------------
  *
  * Authors: Marc Fehling, Colorado State University, 2021
  *          Peter Munch, Technical University of Munich and Helmholtz-Zentrum
@@ -214,7 +213,7 @@ namespace Step75
   // points. Here, we introduce an alias to FEEvaluation with the correct
   // template parameters so that we do not have to worry about them later on.
   template <int dim, typename number>
-  class LaplaceOperator : public Subscriptor
+  class LaplaceOperator : public EnableObserverPointer
   {
   public:
     using VectorType = LinearAlgebra::distributed::Vector<number>;
@@ -325,11 +324,9 @@ namespace Step75
     // operator is applied to a vector with only the Dirichlet values set. The
     // result is the negative right-hand-side vector.
     {
-      AffineConstraints<number> constraints_without_dbc;
-
-      const IndexSet locally_relevant_dofs =
-        DoFTools::extract_locally_relevant_dofs(dof_handler);
-      constraints_without_dbc.reinit(locally_relevant_dofs);
+      AffineConstraints<number> constraints_without_dbc(
+        dof_handler.locally_owned_dofs(),
+        DoFTools::extract_locally_relevant_dofs(dof_handler));
 
       DoFTools::make_hanging_node_constraints(dof_handler,
                                               constraints_without_dbc);
@@ -379,7 +376,7 @@ namespace Step75
   template <int dim, typename number>
   number LaplaceOperator<dim, number>::el(unsigned int, unsigned int) const
   {
-    Assert(false, ExcNotImplemented());
+    DEAL_II_NOT_IMPLEMENTED();
     return 0;
   }
 
@@ -460,7 +457,7 @@ namespace Step75
 
         TrilinosWrappers::SparsityPattern dsp(
           dof_handler.locally_owned_dofs(),
-          dof_handler.get_triangulation().get_communicator());
+          dof_handler.get_triangulation().get_mpi_communicator());
 
         DoFTools::make_sparsity_pattern(dof_handler, dsp, this->constraints);
 
@@ -638,16 +635,16 @@ namespace Step75
   // The above function deals with the actual solution for a given sequence of
   // multigrid objects. This functions creates the actual multigrid levels, in
   // particular the operators, and the transfer operator as a
-  // MGTransferGlobalCoarsening object.
+  // MGTransferMatrixFree object.
   template <typename VectorType, typename OperatorType, int dim>
-  void solve_with_gmg(SolverControl                   &solver_control,
-                      const OperatorType              &system_matrix,
-                      VectorType                      &dst,
-                      const VectorType                &src,
-                      const MultigridParameters       &mg_data,
-                      const hp::MappingCollection<dim> mapping_collection,
-                      const DoFHandler<dim>           &dof_handler,
-                      const hp::QCollection<dim>      &quadrature_collection)
+  void solve_with_gmg(SolverControl                    &solver_control,
+                      const OperatorType               &system_matrix,
+                      VectorType                       &dst,
+                      const VectorType                 &src,
+                      const MultigridParameters        &mg_data,
+                      const hp::MappingCollection<dim> &mapping_collection,
+                      const DoFHandler<dim>            &dof_handler,
+                      const hp::QCollection<dim>       &quadrature_collection)
   {
     // Create a DoFHandler and operator for each multigrid level,
     // as well as, create transfer operators. To be able to
@@ -735,7 +732,7 @@ namespace Step75
               {
                 if (cell->is_locally_owned())
                   cell->set_active_fe_index(cell_other->active_fe_index());
-                cell_other++;
+                ++cell_other;
               }
           }
         else // coarse level
@@ -760,7 +757,7 @@ namespace Step75
 
                     cell->set_active_fe_index(fe_index_for_degree[next_degree]);
                   }
-                cell_other++;
+                ++cell_other;
               }
           }
 
@@ -779,9 +776,8 @@ namespace Step75
         const auto &dof_handler = dof_handlers[level];
         auto       &constraint  = constraints[level];
 
-        const IndexSet locally_relevant_dofs =
-          DoFTools::extract_locally_relevant_dofs(dof_handler);
-        constraint.reinit(locally_relevant_dofs);
+        constraint.reinit(dof_handler.locally_owned_dofs(),
+                          DoFTools::extract_locally_relevant_dofs(dof_handler));
 
         DoFTools::make_hanging_node_constraints(dof_handler, constraint);
         VectorTools::interpolate_boundary_values(mapping_collection,
@@ -808,7 +804,7 @@ namespace Step75
                                   constraints[level + 1],
                                   constraints[level]);
 
-    MGTransferGlobalCoarsening<dim, VectorType> transfer(
+    MGTransferMatrixFree<dim, typename VectorType::value_type> transfer(
       transfers, [&](const auto l, auto &vec) {
         operators[l]->initialize_dof_vector(vec);
       });
@@ -1117,7 +1113,7 @@ namespace Step75
     system_rhs.reinit(locally_owned_dofs, mpi_communicator);
 
     constraints.clear();
-    constraints.reinit(locally_relevant_dofs);
+    constraints.reinit(locally_owned_dofs, locally_relevant_dofs);
     DoFTools::make_hanging_node_constraints(dof_handler, constraints);
     VectorTools::interpolate_boundary_values(
       mapping_collection, dof_handler, 0, Solution<dim>(), constraints);
@@ -1142,6 +1138,11 @@ namespace Step75
   // which will then output all information. Output of local quantities is
   // limited to the first 8 processes to avoid cluttering the terminal.
   //
+  // On all other processes, the containers for the collected data remain empty.
+  // To ensure that we do not access invalid memory with the insertion operator
+  // (`<<`) on these processes, we need to check that the containers are not
+  // empty.
+  //
   // Furthermore, we would like to print the frequencies of the polynomial
   // degrees in the numerical discretization. Since this information is only
   // stored locally, we will count the finite elements on locally owned cells
@@ -1164,7 +1165,8 @@ namespace Step75
         Utilities::MPI::gather(mpi_communicator,
                                triangulation.n_locally_owned_active_cells());
       for (unsigned int i = 0; i < first_n_processes; ++i)
-        pcout << ' ' << n_active_cells_per_subdomain[i];
+        if (n_active_cells_per_subdomain.size() > 0)
+          pcout << ' ' << n_active_cells_per_subdomain[i];
       if (output_cropped)
         pcout << " ...";
       pcout << std::endl;
@@ -1179,7 +1181,8 @@ namespace Step75
         Utilities::MPI::gather(mpi_communicator,
                                dof_handler.n_locally_owned_dofs());
       for (unsigned int i = 0; i < first_n_processes; ++i)
-        pcout << ' ' << n_dofs_per_subdomain[i];
+        if (n_dofs_per_subdomain.size() > 0)
+          pcout << ' ' << n_dofs_per_subdomain[i];
       if (output_cropped)
         pcout << " ...";
       pcout << std::endl;
@@ -1196,7 +1199,8 @@ namespace Step75
             << std::endl
             << "     by partition:              ";
       for (unsigned int i = 0; i < first_n_processes; ++i)
-        pcout << ' ' << n_constraints_per_subdomain[i];
+        if (n_constraints_per_subdomain.size() > 0)
+          pcout << ' ' << n_constraints_per_subdomain[i];
       if (output_cropped)
         pcout << " ...";
       pcout << std::endl;

@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2016 - 2023 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2016 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 #ifndef dealii_p4est_wrappers_h
 #define dealii_p4est_wrappers_h
@@ -21,6 +20,9 @@
 #include <deal.II/base/geometry_info.h>
 
 #ifdef DEAL_II_WITH_P4EST
+
+#  include <deal.II/base/mpi_stub.h>
+
 #  include <p4est_bits.h>
 #  include <p4est_communication.h>
 #  include <p4est_extended.h>
@@ -84,49 +86,51 @@ namespace internal
     template <>
     struct types<2>
     {
-      using connectivity     = p4est_connectivity_t;
-      using forest           = p4est_t;
-      using tree             = p4est_tree_t;
-      using quadrant         = p4est_quadrant_t;
-      using quadrant_coord   = p4est_qcoord_t;
-      using topidx           = p4est_topidx_t;
-      using locidx           = p4est_locidx_t;
-      using gloidx           = p4est_gloidx_t;
-      using balance_type     = p4est_connect_type_t;
-      using ghost            = p4est_ghost_t;
-      using transfer_context = p4est_transfer_context_t;
-#  ifdef P4EST_SEARCH_LOCAL
+      using connectivity              = p4est_connectivity_t;
+      using forest                    = p4est_t;
+      using tree                      = p4est_tree_t;
+      using quadrant                  = p4est_quadrant_t;
+      using quadrant_coord            = p4est_qcoord_t;
+      using topidx                    = p4est_topidx_t;
+      using locidx                    = p4est_locidx_t;
+      using gloidx                    = p4est_gloidx_t;
+      using balance_type              = p4est_connect_type_t;
+      using ghost                     = p4est_ghost_t;
+      using transfer_context          = p4est_transfer_context_t;
       using search_partition_callback = p4est_search_partition_t;
-#  endif
     };
 
     template <>
     struct types<3>
     {
-      using connectivity     = p8est_connectivity_t;
-      using forest           = p8est_t;
-      using tree             = p8est_tree_t;
-      using quadrant         = p8est_quadrant_t;
-      using quadrant_coord   = p4est_qcoord_t;
-      using topidx           = p4est_topidx_t;
-      using locidx           = p4est_locidx_t;
-      using gloidx           = p4est_gloidx_t;
-      using balance_type     = p8est_connect_type_t;
-      using ghost            = p8est_ghost_t;
-      using transfer_context = p8est_transfer_context_t;
-#  ifdef P4EST_SEARCH_LOCAL
+      using connectivity              = p8est_connectivity_t;
+      using forest                    = p8est_t;
+      using tree                      = p8est_tree_t;
+      using quadrant                  = p8est_quadrant_t;
+      using quadrant_coord            = p4est_qcoord_t;
+      using topidx                    = p4est_topidx_t;
+      using locidx                    = p4est_locidx_t;
+      using gloidx                    = p4est_gloidx_t;
+      using balance_type              = p8est_connect_type_t;
+      using ghost                     = p8est_ghost_t;
+      using transfer_context          = p8est_transfer_context_t;
       using search_partition_callback = p8est_search_partition_t;
-#  endif
     };
 
 
 
     /**
-     * A structure whose explicit specializations contain pointers to the
+     * A structure whose explicit specializations represent the
      * relevant p4est_* and p8est_* functions. Using this structure, for
-     * example by saying functions<dim>::quadrant_compare, we can write code
-     * in a dimension independent way, either calling p4est_quadrant_compare
-     * or p8est_quadrant_compare, depending on template argument.
+     * example by saying functions<dim>::quadrant_compare(...), we can write
+     * code in a dimension independent way, either calling
+     * p4est_quadrant_compare or p8est_quadrant_compare, depending on template
+     * argument.
+     *
+     * In most cases, the members of this class are simply pointers to
+     * p4est_* or p8est_* functions. In one case, it's simply a static
+     * member function that dispatches to things p4est chooses to
+     * implement via a macro.
      */
     template <int dim>
     struct functions;
@@ -145,6 +149,9 @@ namespace internal
       static void (&quadrant_set_morton)(types<2>::quadrant *quadrant,
                                          int                 level,
                                          std::uint64_t       id);
+
+      static void
+      quadrant_init(types<2>::quadrant &q);
 
       static int (&quadrant_is_equal)(const types<2>::quadrant *q1,
                                       const types<2>::quadrant *q2);
@@ -316,14 +323,12 @@ namespace internal
 
       static void (&transfer_custom_end)(types<2>::transfer_context *tc);
 
-#  ifdef P4EST_SEARCH_LOCAL
       static void (&search_partition)(
         types<2>::forest                   *forest,
         int                                 call_post,
         types<2>::search_partition_callback quadrant_fn,
         types<2>::search_partition_callback point_fn,
         sc_array_t                         *points);
-#  endif
 
       static void (&quadrant_coord_to_vertex)(
         types<2>::connectivity  *connectivity,
@@ -348,6 +353,9 @@ namespace internal
       static void (&quadrant_set_morton)(types<3>::quadrant *quadrant,
                                          int                 level,
                                          std::uint64_t       id);
+
+      static void
+      quadrant_init(types<3>::quadrant &q);
 
       static int (&quadrant_is_equal)(const types<3>::quadrant *q1,
                                       const types<3>::quadrant *q2);
@@ -516,14 +524,12 @@ namespace internal
 
       static void (&transfer_custom_end)(types<3>::transfer_context *tc);
 
-#  ifdef P4EST_SEARCH_LOCAL
       static void (&search_partition)(
         types<3>::forest                   *forest,
         int                                 call_post,
         types<3>::search_partition_callback quadrant_fn,
         types<3>::search_partition_callback point_fn,
         sc_array_t                         *points);
-#  endif
 
       static void (&quadrant_coord_to_vertex)(
         types<3>::connectivity  *connectivity,
@@ -642,6 +648,14 @@ namespace internal
   } // namespace p4est
 } // namespace internal
 
+DEAL_II_NAMESPACE_CLOSE
+
+#else
+
+// Make sure the scripts that create the C++20 module input files have
+// something to latch on if the preprocessor #ifdef above would
+// otherwise lead to an empty content of the file.
+DEAL_II_NAMESPACE_OPEN
 DEAL_II_NAMESPACE_CLOSE
 
 #endif // DEAL_II_WITH_P4EST

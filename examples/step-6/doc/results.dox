@@ -7,26 +7,26 @@ Cycle 0:
    Number of active cells:       20
    Number of degrees of freedom: 89
 Cycle 1:
-   Number of active cells:       44
-   Number of degrees of freedom: 209
+   Number of active cells:       38
+   Number of degrees of freedom: 183
 Cycle 2:
-   Number of active cells:       92
-   Number of degrees of freedom: 449
+   Number of active cells:       71
+   Number of degrees of freedom: 325
 Cycle 3:
-   Number of active cells:       200
-   Number of degrees of freedom: 921
+   Number of active cells:       146
+   Number of degrees of freedom: 689
 Cycle 4:
-   Number of active cells:       440
-   Number of degrees of freedom: 2017
+   Number of active cells:       284
+   Number of degrees of freedom: 1373
 Cycle 5:
-   Number of active cells:       956
-   Number of degrees of freedom: 4425
+   Number of active cells:       599
+   Number of degrees of freedom: 2769
 Cycle 6:
-   Number of active cells:       1916
-   Number of degrees of freedom: 8993
+   Number of active cells:       1241
+   Number of degrees of freedom: 5833
 Cycle 7:
-   Number of active cells:       3860
-   Number of degrees of freedom: 18353
+   Number of active cells:       2507
+   Number of degrees of freedom: 11916
 @endcode
 
 
@@ -46,52 +46,52 @@ refinement.
 The program outputs the solution and mesh in each cycle of the
 refinement loop. The solution looks as follows:
 
-<img src="https://www.dealii.org/images/steps/developer/step-6.solution.9.2.png" alt="">
+<img src="https://dealii.org/images/steps/developer/step-6.solution.9.2.png" alt="">
 
 It is interesting to follow how the program arrives at the final mesh:
 
 <div class="twocolumn" style="width: 80%">
   <div>
-    <img src="https://www.dealii.org/images/steps/developer/step_6_grid_0.svg"
+    <img src="https://dealii.org/images/steps/developer/step_6_grid_0.svg"
          alt="Initial grid: the five-cell circle grid with one global refinement."
          width="300" height="300">
   </div>
   <div>
-    <img src="https://www.dealii.org/images/steps/developer/step_6_grid_1.svg"
+    <img src="https://dealii.org/images/steps/developer/step_6_grid_1.svg"
          alt="First grid: the five-cell circle grid with two global refinements."
          width="300" height="300">
   </div>
   <div>
-    <img src="https://www.dealii.org/images/steps/developer/step_6_grid_2.svg"
+    <img src="https://dealii.org/images/steps/developer/step_6_grid_2.svg"
          alt="Second grid: the five-cell circle grid with one adaptive refinement."
          width="300" height="300">
   </div>
   <div>
-    <img src="https://www.dealii.org/images/steps/developer/step_6_grid_3.svg"
+    <img src="https://dealii.org/images/steps/developer/step_6_grid_3.svg"
          alt="Third grid: the five-cell circle grid with two adaptive
          refinements, showing clustering around the inner circle."
          width="300" height="300">
   </div>
   <div>
-    <img src="https://www.dealii.org/images/steps/developer/step_6_grid_4.svg"
+    <img src="https://dealii.org/images/steps/developer/step_6_grid_4.svg"
          alt="Fourth grid: the five-cell circle grid with three adaptive
          refinements, showing clustering around the inner circle."
          width="300" height="300">
   </div>
   <div>
-    <img src="https://www.dealii.org/images/steps/developer/step_6_grid_5.svg"
+    <img src="https://dealii.org/images/steps/developer/step_6_grid_5.svg"
          alt="Fifth grid: the five-cell circle grid with four adaptive
          refinements, showing clustering around the inner circle."
          width="300" height="300">
   </div>
   <div>
-    <img src="https://www.dealii.org/images/steps/developer/step_6_grid_6.svg"
+    <img src="https://dealii.org/images/steps/developer/step_6_grid_6.svg"
          alt="Sixth grid: the five-cell circle grid with five adaptive
          refinements, showing clustering around the inner circle."
          width="300" height="300">
   </div>
   <div>
-    <img src="https://www.dealii.org/images/steps/developer/step_6_grid_7.svg"
+    <img src="https://dealii.org/images/steps/developer/step_6_grid_7.svg"
          alt="Last grid: the five-cell circle grid with six adaptive
          refinements, showing that most cells are clustered around the inner circle."
          width="300" height="300">
@@ -111,7 +111,7 @@ from the optimal square.
 
 
 
-<a name="extensions"></a>
+<a name="step-6-extensions"></a>
 <h3>Possibilities for extensions</h3>
 
 <h4>Solvers and preconditioners</h4>
@@ -162,10 +162,10 @@ following results (left: iterations; right: CPU time):
 <table width="60%" align="center">
   <tr>
     <td align="center">
-      <img src="https://www.dealii.org/images/steps/developer/step-6.q2.dofs_vs_iterations.png" alt="">
+      <img src="https://dealii.org/images/steps/developer/step-6.q2.dofs_vs_iterations.png" alt="">
     </td>
     <td align="center">
-      <img src="https://www.dealii.org/images/steps/developer/step-6.q2.dofs_vs_time.png" alt="">
+      <img src="https://dealii.org/images/steps/developer/step-6.q2.dofs_vs_time.png" alt="">
     </td>
   </tr>
 </table>
@@ -186,10 +186,10 @@ If one makes this change, the results are as follows:
 <table width="60%" align="center">
   <tr>
     <td align="center">
-      <img src="https://www.dealii.org/images/steps/developer/step-6.q1.dofs_vs_iterations.png" alt="">
+      <img src="https://dealii.org/images/steps/developer/step-6.q1.dofs_vs_iterations.png" alt="">
     </td>
     <td align="center">
-      <img src="https://www.dealii.org/images/steps/developer/step-6.q1.dofs_vs_time.png" alt="">
+      <img src="https://dealii.org/images/steps/developer/step-6.q1.dofs_vs_time.png" alt="">
     </td>
   </tr>
 </table>
@@ -304,7 +304,7 @@ kind:
 
   <div class="onecolumn" style="width: 80%">
     <div>
-      <img src="https://www.dealii.org/images/steps/developer/step_6_bad_grid_4.svg"
+      <img src="https://dealii.org/images/steps/developer/step_6_bad_grid_4.svg"
            alt="Grid where some central cells are nearly triangular."
            width="300" height="300">
     </div>
@@ -403,33 +403,33 @@ This code then generates the following, much better sequence of meshes:
 
 <div class="twocolumn" style="width: 80%">
   <div>
-    <img src="https://www.dealii.org/images/steps/developer/step_6_grid_0_ladutenko.svg"
+    <img src="https://dealii.org/images/steps/developer/step_6_grid_0_ladutenko.svg"
          alt="Initial grid: the Ladutenko grid with one global refinement."
          width="300" height="300">
   </div>
   <div>
-    <img src="https://www.dealii.org/images/steps/developer/step_6_grid_1_ladutenko.svg"
+    <img src="https://dealii.org/images/steps/developer/step_6_grid_1_ladutenko.svg"
          alt="First adaptively refined Ladutenko grid."
          width="300" height="300">
   </div>
   <div>
-    <img src="https://www.dealii.org/images/steps/developer/step_6_grid_2_ladutenko.svg"
+    <img src="https://dealii.org/images/steps/developer/step_6_grid_2_ladutenko.svg"
          alt="Second adaptively refined Ladutenko grid."
          width="300" height="300">
   </div>
   <div>
-    <img src="https://www.dealii.org/images/steps/developer/step_6_grid_3_ladutenko.svg"
+    <img src="https://dealii.org/images/steps/developer/step_6_grid_3_ladutenko.svg"
          alt="Third adaptively refined Ladutenko grid."
          width="300" height="300">
   </div>
   <div>
-    <img src="https://www.dealii.org/images/steps/developer/step_6_grid_4_ladutenko.svg"
+    <img src="https://dealii.org/images/steps/developer/step_6_grid_4_ladutenko.svg"
          alt="Fourth adaptively refined Ladutenko grid. The cells are clustered
          along the inner circle."
          width="300" height="300">
   </div>
   <div>
-    <img src="https://www.dealii.org/images/steps/developer/step_6_grid_5_ladutenko.svg"
+    <img src="https://dealii.org/images/steps/developer/step_6_grid_5_ladutenko.svg"
          alt="Fifth adaptively refined Ladutenko grid: the cells are clustered
          along the inner circle."
          width="300" height="300">
@@ -442,7 +442,7 @@ step-49, step-53, and step-54, among other tutorial programs that cover
 the issue. step-65 shows another, less manual way to achieve a mesh
 well fit to the problem here.
 Information on curved domains can also be found in the
-documentation module on @ref manifold "Manifold descriptions".
+documentation topic on @ref manifold "Manifold descriptions".
 
 Why does it make sense to choose a mesh that tracks the internal
 interface? There are a number of reasons, but the most essential one
@@ -593,25 +593,18 @@ double coefficient (const Point<dim> &p)
   else if ((p[0] >= 0) && (p[1] >= 0))    // upper right quadrant
     return 1000;
   else
-    {
-      Assert(false, ExcInternalError());
-      return 0;
-    }
+    DEAL_II_ASSERT_UNREACHABLE();
 }
 @endcode
-(Adding the <code>Assert</code> at the end ensures that either an exception
+(Adding the `DEAL_II_ASSERT_UNREACHABLE();` call at the end ensures that either an exception
 is thrown or that the program aborts if we ever get to that point
 -- which of course we shouldn't,
-but this is a good way to insure yourself: we all make mistakes by
+but this is a good way to insure yourself: We all make mistakes by
 sometimes not thinking of all cases, for example by checking
 for <code>p[0]</code> to be less than and greater than zero,
 rather than greater-or-equal to zero, and thereby forgetting
 some cases that would otherwise lead to bugs that are awkward
-to find. The <code>return 0;</code> at the end is only there to
-avoid compiler warnings that the function does not end in a
-<code>return</code> statement -- the compiler cannot see that the
-function would never actually get to that point because of the
-preceding <code>Assert</code> statement.)
+to find.)
 
 By playing with such cases where four or more sectors come
 together and on which the coefficient has different values, one can

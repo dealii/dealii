@@ -61,5 +61,3 @@ plot "7500-line-0.txt" using 2:1 w l ls 1 title "Refinement 0", \
 "7500-line-4.txt" using 2:1 w l ls 5 title "Refinement 4", \
 "ref_2d_ghia_u.txt" using 7:1 ls 10 pt 4 w p  title "Reference [Ghia 82]", \
 "ref_2d_erturk_u.txt" using 5:1 ls 11 pt 6 w p  title "Reference [Erturk]"
-
-

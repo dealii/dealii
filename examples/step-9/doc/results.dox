@@ -8,65 +8,85 @@ each of these grids. First for the console output:
 Cycle 0:
    Number of active cells:              64
    Number of degrees of freedom:        1681
-   Iterations required for convergence: 298
-   Max norm of residual:                3.60316e-12
+   Iterations required for convergence: 338
+   Norm of residual at convergence:     2.9177e-11
+   Grid written to grid-0.vtu
+   Solution written to solution-0.vtu
 Cycle 1:
-   Number of active cells:              124
-   Number of degrees of freedom:        3537
-   Iterations required for convergence: 415
-   Max norm of residual:                3.70682e-12
+   Number of active cells:              121
+   Number of degrees of freedom:        3436
+   Iterations required for convergence: 448
+   Norm of residual at convergence:     2.40051e-11
+   Grid written to grid-1.vtu
+   Solution written to solution-1.vtu
 Cycle 2:
-   Number of active cells:              247
-   Number of degrees of freedom:        6734
-   Iterations required for convergence: 543
-   Max norm of residual:                7.19716e-13
+   Number of active cells:              238
+   Number of degrees of freedom:        6487
+   Iterations required for convergence: 535
+   Norm of residual at convergence:     2.06897e-11
+   Grid written to grid-2.vtu
+   Solution written to solution-2.vtu
 Cycle 3:
-   Number of active cells:              502
-   Number of degrees of freedom:        14105
-   Iterations required for convergence: 666
-   Max norm of residual:                3.45628e-13
+   Number of active cells:              481
+   Number of degrees of freedom:        13510
+   Iterations required for convergence: 669
+   Norm of residual at convergence:     1.41502e-11
+   Grid written to grid-3.vtu
+   Solution written to solution-3.vtu
 Cycle 4:
-   Number of active cells:              1003
-   Number of degrees of freedom:        27462
-   Iterations required for convergence: 1064
-   Max norm of residual:                1.86495e-13
+   Number of active cells:              958
+   Number of degrees of freedom:        26137
+   Iterations required for convergence: 1039
+   Norm of residual at convergence:     1.27042e-11
+   Grid written to grid-4.vtu
+   Solution written to solution-4.vtu
 Cycle 5:
-   Number of active cells:              1993
-   Number of degrees of freedom:        55044
-   Iterations required for convergence: 1251
-   Max norm of residual:                1.28765e-13
+   Number of active cells:              1906
+   Number of degrees of freedom:        52832
+   Iterations required for convergence: 1345
+   Norm of residual at convergence:     1.00694e-11
+   Grid written to grid-5.vtu
+   Solution written to solution-5.vtu
 Cycle 6:
-   Number of active cells:              3985
-   Number of degrees of freedom:        108492
-   Iterations required for convergence: 2035
-   Max norm of residual:                6.78085e-14
+   Number of active cells:              3829
+   Number of degrees of freedom:        104339
+   Iterations required for convergence: 1976
+   Norm of residual at convergence:     7.43452e-12
+   Grid written to grid-6.vtu
+   Solution written to solution-6.vtu
 Cycle 7:
-   Number of active cells:              7747
-   Number of degrees of freedom:        210612
-   Iterations required for convergence: 2187
-   Max norm of residual:                2.61457e-14
+   Number of active cells:              7414
+   Number of degrees of freedom:        201946
+   Iterations required for convergence: 2256
+   Norm of residual at convergence:     7.88403e-12
+   Grid written to grid-7.vtu
+   Solution written to solution-7.vtu
 Cycle 8:
-   Number of active cells:              15067
-   Number of degrees of freedom:        406907
-   Iterations required for convergence: 3079
-   Max norm of residual:                2.9932e-14
+   Number of active cells:              14413
+   Number of degrees of freedom:        389558
+   Iterations required for convergence: 2968
+   Norm of residual at convergence:     6.72725e-12
+   Grid written to grid-8.vtu
+   Solution written to solution-8.vtu
 Cycle 9:
-   Number of active cells:              29341
-   Number of degrees of freedom:        780591
-   Iterations required for convergence: 3913
-   Max norm of residual:                8.15689e-15
+   Number of active cells:              28141
+   Number of degrees of freedom:        750187
+   Iterations required for convergence: 3885
+   Norm of residual at convergence:     5.86246e-12
+   Grid written to grid-9.vtu
+   Solution written to solution-9.vtu
 @endcode
 
 Quite a number of cells are used on the finest level to resolve the features of
 the solution. Here are the fourth and tenth grids:
 <div class="twocolumn" style="width: 80%">
   <div>
-    <img src="https://www.dealii.org/images/steps/developer/step-9-grid-3.png"
+    <img src="https://dealii.org/images/steps/developer/step-9-grid-3.png"
          alt="Fourth grid in the refinement cycle, showing some adaptivity to features."
          width="400" height="400">
   </div>
   <div>
-    <img src="https://www.dealii.org/images/steps/developer/step-9-grid-9.png"
+    <img src="https://dealii.org/images/steps/developer/step-9-grid-9.png"
          alt="Tenth grid in the refinement cycle, showing that the waves are fully captured."
          width="400" height="400">
   </div>
@@ -74,13 +94,13 @@ the solution. Here are the fourth and tenth grids:
 and the fourth and tenth solutions:
 <div class="twocolumn" style="width: 80%">
   <div>
-    <img src="https://www.dealii.org/images/steps/developer/step-9-solution-3.png"
+    <img src="https://dealii.org/images/steps/developer/step-9-solution-3.png"
          alt="Fourth solution, showing that we resolve most features but some
          are sill unresolved and appear blury."
          width="400" height="400">
   </div>
   <div>
-    <img src="https://www.dealii.org/images/steps/developer/step-9-solution-9.png"
+    <img src="https://dealii.org/images/steps/developer/step-9-solution-9.png"
          alt="Tenth solution, showing a fully resolved flow."
          width="400" height="400">
   </div>
@@ -88,14 +108,14 @@ and the fourth and tenth solutions:
 and both the grid and solution zoomed in:
 <div class="twocolumn" style="width: 80%">
   <div>
-    <img src="https://www.dealii.org/images/steps/developer/step-9-solution-3-zoom.png"
+    <img src="https://dealii.org/images/steps/developer/step-9-solution-3-zoom.png"
          alt="Detail of the fourth solution, showing that we resolve most
          features but some are sill unresolved and appear blury. In particular,
          the larger cells need to be refined."
          width="400" height="400">
   </div>
   <div>
-    <img src="https://www.dealii.org/images/steps/developer/step-9-solution-9-zoom.png"
+    <img src="https://dealii.org/images/steps/developer/step-9-solution-9-zoom.png"
          alt="Detail of the tenth solution, showing that we needed a lot more
          cells than were present in the fourth solution."
          width="400" height="400">

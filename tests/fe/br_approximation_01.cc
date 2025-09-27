@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2004 - 2023 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2006 - 2024 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 
 // projects the shape functions from the Bernardi-Raugel elements
@@ -134,10 +133,10 @@ double
 TestDef1<dim>::value(const Point<dim> &p, const unsigned int component) const
 {
   Point<2> center;
-  center(0)    = 0.5;
-  center(1)    = 0.5;
+  center[0]    = 0.5;
+  center[1]    = 0.5;
   double rad   = p.distance(center),
-         phi_p = atan2(p(0) - center(0), p(1) - center(1));
+         phi_p = atan2(p[0] - center[0], p[1] - center[1]);
 
   if (component == 0)
     return rad * (sin(phi + phi_p) - sin(phi_p));
@@ -188,7 +187,7 @@ template <int dim>
 double
 TestDef2<dim>::value(const Point<dim> &p, const unsigned int component) const
 {
-  double x = p(0), y = p(1);
+  double x = p[0], y = p[1];
 
   if (component == 0)
     return scale * x;
@@ -240,7 +239,7 @@ template <int dim>
 double
 TestDef3<dim>::value(const Point<dim> &p, const unsigned int component) const
 {
-  double y = p(1);
+  double y = p[1];
 
   if (component == 0)
     return scale * y;
@@ -297,7 +296,7 @@ template <int dim>
 double
 TestPoly<dim>::value(const Point<dim> &p, const unsigned int component) const
 {
-  double x = p(0), y = p(1);
+  double x = p[0], y = p[1];
 
   if (component == 0)
     return polys[0].value(x) + polys[1].value(y);
@@ -456,15 +455,16 @@ main()
     MappingQ1Eulerian<2> mapping_euler(*dof_handler_def, deformation);
 
     // Try rotating the elements
-    for (double rotat = 0; rotat < 2 * numbers::PI; rotat += 0.25 * numbers::PI)
+    for (double rotate = 0; rotate < 2 * numbers::PI;
+         rotate += 0.25 * numbers::PI)
       {
         // Rotate element
         VectorTools::project(*dof_handler_def,
                              hn_constraints_def,
                              QGauss<2>(6),
-                             TestDef1<2>(2, rotat),
+                             TestDef1<2>(2, rotate),
                              deformation);
-        deallog << "phi = " << rotat << std::endl;
+        deallog << "phi = " << rotate << std::endl;
         TestProjection(mapping_euler, dof_handler);
       }
 

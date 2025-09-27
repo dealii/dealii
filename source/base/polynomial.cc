@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2000 - 2022 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2000 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/memory_consumption.h>
@@ -24,24 +23,9 @@
 #include <algorithm>
 #include <cmath>
 #include <limits>
-#include <memory>
+#include <shared_mutex>
 
 DEAL_II_NAMESPACE_OPEN
-
-
-
-// have a lock that guarantees that at most one thread is changing and
-// accessing the @p{coefficients} arrays of classes implementing
-// polynomials with tables. make this lock local to this file.
-//
-// having only one lock for all of these classes is probably not going
-// to be a problem since we only need it on very rare occasions. if
-// someone finds this is a bottleneck, feel free to replace it by a
-// more fine-grained solution
-namespace
-{
-  std::mutex coefficients_lock;
-}
 
 
 
@@ -81,8 +65,8 @@ namespace Polynomials
     for (unsigned int i = 0; i < supp.size(); ++i)
       if (i != center)
         {
-          lagrange_support_points.push_back(supp[i](0));
-          tmp_lagrange_weight *= supp[center](0) - supp[i](0);
+          lagrange_support_points.push_back(supp[i][0]);
+          tmp_lagrange_weight *= supp[center][0] - supp[i][0];
         }
 
     // check for underflow and overflow
@@ -586,7 +570,7 @@ namespace Polynomials
         std::vector<Point<1>> points(n + 1);
         const double          one_over_n = 1. / n;
         for (unsigned int k = 0; k <= n; ++k)
-          points[k](0) = static_cast<double>(k) * one_over_n;
+          points[k][0] = static_cast<double>(k) * one_over_n;
         return points;
       }
     } // namespace LagrangeEquidistantImplementation
@@ -665,7 +649,7 @@ namespace Polynomials
             break;
           }
         default:
-          Assert(false, ExcInternalError())
+          DEAL_II_ASSERT_UNREACHABLE();
       }
 
     Assert(x != nullptr, ExcInternalError());
@@ -726,7 +710,7 @@ namespace Polynomials
     // Gauss-Legendre quadrature formula
     if (k > 0)
       {
-        QGauss<1> gauss(k);
+        const QGauss<1> gauss(k);
         for (unsigned int i = 0; i < k; ++i)
           this->lagrange_support_points[i] = gauss.get_points()[i][0];
       }
@@ -861,12 +845,12 @@ namespace Polynomials
 
   // ------------------ class Hierarchical --------------- //
 
-
   // Reserve space for polynomials up to degree 19. Should be sufficient
   // for the start.
   std::vector<std::unique_ptr<const std::vector<double>>>
     Hierarchical::recursive_coefficients(20);
 
+  std::shared_mutex Hierarchical::coefficients_lock;
 
 
   Hierarchical::Hierarchical(const unsigned int k)
@@ -879,131 +863,139 @@ namespace Polynomials
   Hierarchical::compute_coefficients(const unsigned int k_)
   {
     unsigned int k = k_;
-
-    // first make sure that no other
-    // thread intercepts the operation
-    // of this function
-    // for this, acquire the lock
-    // until we quit this function
-    std::lock_guard<std::mutex> lock(coefficients_lock);
-
     // The first 2 coefficients
     // are hard-coded
     if (k == 0)
       k = 1;
-    // check: does the information
-    // already exist?
-    if ((recursive_coefficients.size() < k + 1) ||
-        (recursive_coefficients[k].get() == nullptr))
-      // no, then generate the
-      // respective coefficients
+
+    // First see whether the coefficients we need have already been
+    // computed. This is a read operation, and so we can do that
+    // with a shared lock.
+    //
+    // (We could have gotten away without any lock at all if the
+    // inner pointers were std::atomic<std::unique_ptr<...>>, but
+    // first, there is no such specialization of std::atomic that
+    // is mutex-free, and then there is also the issue that the
+    // outer vector may be resized and that can definitely not
+    // be guarded against without a mutex of some sort.)
+    {
+      std::shared_lock<std::shared_mutex> lock(coefficients_lock);
+
+      if ((recursive_coefficients.size() >= k + 1) &&
+          (recursive_coefficients[k].get() != nullptr))
+        return;
+    }
+
+    // Having gotten here, we know that we need to compute a new set
+    // of coefficients. This has to happen under a unique lock because
+    // we're not only reading, but writing into the data structures:
+    std::unique_lock<std::shared_mutex> lock(coefficients_lock);
+
+    // First make sure that there is enough
+    // space in the array for the
+    // coefficients, so we have to resize
+    // it to size k+1
+
+    // but it's more complicated than
+    // that: we call this function
+    // recursively, so if we simply
+    // resize it to k+1 here, then
+    // compute the coefficients for
+    // degree k-1 by calling this
+    // function recursively, then it will
+    // reset the size to k -- not enough
+    // for what we want to do below. the
+    // solution therefore is to only
+    // resize the size if we are going to
+    // *increase* it
+    if (recursive_coefficients.size() < k + 1)
+      recursive_coefficients.resize(k + 1);
+
+    if (k <= 1)
       {
-        // make sure that there is enough
-        // space in the array for the
-        // coefficients, so we have to resize
-        // it to size k+1
+        // create coefficients
+        // vectors for k=0 and k=1
+        //
+        // allocate the respective
+        // amount of memory and
+        // later assign it to the
+        // coefficients array to
+        // make it const
+        std::vector<double> c0(2);
+        c0[0] = 1.;
+        c0[1] = -1.;
 
-        // but it's more complicated than
-        // that: we call this function
-        // recursively, so if we simply
-        // resize it to k+1 here, then
-        // compute the coefficients for
-        // degree k-1 by calling this
-        // function recursively, then it will
-        // reset the size to k -- not enough
-        // for what we want to do below. the
-        // solution therefore is to only
-        // resize the size if we are going to
-        // *increase* it
-        if (recursive_coefficients.size() < k + 1)
-          recursive_coefficients.resize(k + 1);
+        std::vector<double> c1(2);
+        c1[0] = 0.;
+        c1[1] = 1.;
 
-        if (k <= 1)
+        // now make these arrays
+        // const
+        recursive_coefficients[0] =
+          std::make_unique<const std::vector<double>>(std::move(c0));
+        recursive_coefficients[1] =
+          std::make_unique<const std::vector<double>>(std::move(c1));
+      }
+    else if (k == 2)
+      {
+        coefficients_lock.unlock();
+        compute_coefficients(1);
+        coefficients_lock.lock();
+
+        std::vector<double> c2(3);
+
+        const double a = 1.; // 1./8.;
+
+        c2[0] = 0. * a;
+        c2[1] = -4. * a;
+        c2[2] = 4. * a;
+
+        recursive_coefficients[2] =
+          std::make_unique<const std::vector<double>>(std::move(c2));
+      }
+    else
+      {
+        // for larger numbers,
+        // compute the coefficients
+        // recursively. to do so,
+        // we have to release the
+        // lock temporarily to
+        // allow the called
+        // function to acquire it
+        // itself
+        coefficients_lock.unlock();
+        compute_coefficients(k - 1);
+        coefficients_lock.lock();
+
+        std::vector<double> ck(k + 1);
+
+        const double a = 1.; // 1./(2.*k);
+
+        ck[0] = -a * (*recursive_coefficients[k - 1])[0];
+
+        for (unsigned int i = 1; i <= k - 1; ++i)
+          ck[i] = a * (2. * (*recursive_coefficients[k - 1])[i - 1] -
+                       (*recursive_coefficients[k - 1])[i]);
+
+        ck[k] = a * 2. * (*recursive_coefficients[k - 1])[k - 1];
+        // for even degrees, we need
+        // to add a multiple of
+        // basis fcn phi_2
+        if ((k % 2) == 0)
           {
-            // create coefficients
-            // vectors for k=0 and k=1
-            //
-            // allocate the respective
-            // amount of memory and
-            // later assign it to the
-            // coefficients array to
-            // make it const
-            std::vector<double> c0(2);
-            c0[0] = 1.;
-            c0[1] = -1.;
+            double b = 1.; // 8.;
+            // for (unsigned int i=1; i<=k; ++i)
+            //  b /= 2.*i;
 
-            std::vector<double> c1(2);
-            c1[0] = 0.;
-            c1[1] = 1.;
-
-            // now make these arrays
-            // const
-            recursive_coefficients[0] =
-              std::make_unique<const std::vector<double>>(std::move(c0));
-            recursive_coefficients[1] =
-              std::make_unique<const std::vector<double>>(std::move(c1));
+            ck[1] += b * (*recursive_coefficients[2])[1];
+            ck[2] += b * (*recursive_coefficients[2])[2];
           }
-        else if (k == 2)
-          {
-            coefficients_lock.unlock();
-            compute_coefficients(1);
-            coefficients_lock.lock();
-
-            std::vector<double> c2(3);
-
-            const double a = 1.; // 1./8.;
-
-            c2[0] = 0. * a;
-            c2[1] = -4. * a;
-            c2[2] = 4. * a;
-
-            recursive_coefficients[2] =
-              std::make_unique<const std::vector<double>>(std::move(c2));
-          }
-        else
-          {
-            // for larger numbers,
-            // compute the coefficients
-            // recursively. to do so,
-            // we have to release the
-            // lock temporarily to
-            // allow the called
-            // function to acquire it
-            // itself
-            coefficients_lock.unlock();
-            compute_coefficients(k - 1);
-            coefficients_lock.lock();
-
-            std::vector<double> ck(k + 1);
-
-            const double a = 1.; // 1./(2.*k);
-
-            ck[0] = -a * (*recursive_coefficients[k - 1])[0];
-
-            for (unsigned int i = 1; i <= k - 1; ++i)
-              ck[i] = a * (2. * (*recursive_coefficients[k - 1])[i - 1] -
-                           (*recursive_coefficients[k - 1])[i]);
-
-            ck[k] = a * 2. * (*recursive_coefficients[k - 1])[k - 1];
-            // for even degrees, we need
-            // to add a multiple of
-            // basis fcn phi_2
-            if ((k % 2) == 0)
-              {
-                double b = 1.; // 8.;
-                // for (unsigned int i=1; i<=k; ++i)
-                //  b /= 2.*i;
-
-                ck[1] += b * (*recursive_coefficients[2])[1];
-                ck[2] += b * (*recursive_coefficients[2])[2];
-              }
-            // finally assign the newly
-            // created vector to the
-            // const pointer in the
-            // coefficients array
-            recursive_coefficients[k] =
-              std::make_unique<const std::vector<double>>(std::move(ck));
-          }
+        // finally assign the newly
+        // created vector to the
+        // const pointer in the
+        // coefficients array
+        recursive_coefficients[k] =
+          std::make_unique<const std::vector<double>>(std::move(ck));
       }
   }
 
@@ -1012,14 +1004,13 @@ namespace Polynomials
   const std::vector<double> &
   Hierarchical::get_coefficients(const unsigned int k)
   {
-    // first make sure the coefficients
-    // get computed if so necessary
+    // First make sure the coefficients get computed if so necessary
     compute_coefficients(k);
 
-    // then get a pointer to the array
-    // of coefficients. do that in a MT
-    // safe way
-    std::lock_guard<std::mutex> lock(coefficients_lock);
+    // Then get a pointer to the array of coefficients. Do that in a MT
+    // safe way, but since we're only reading information we can do
+    // that with a shared lock
+    std::shared_lock<std::shared_mutex> lock(coefficients_lock);
     return *recursive_coefficients[k];
   }
 
@@ -1148,8 +1139,8 @@ namespace Polynomials
       // Note that the polynomials are not yet normalized here, which is not
       // necessary because we are only looking for the x_star where the matrix
       // entry is zero, for which the constants do not matter.
-      QGauss<1> gauss(degree + 1);
-      double    integral_left = 0, integral_right = 0;
+      const QGauss<1> gauss(degree + 1);
+      double          integral_left = 0, integral_right = 0;
       for (unsigned int q = 0; q < gauss.size(); ++q)
         {
           const double x               = gauss.point(q)[0];

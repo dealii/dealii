@@ -1,25 +1,25 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2021 - 2023 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2021 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 #ifndef dealii_hp_collection_h
 #define dealii_hp_collection_h
 
 #include <deal.II/base/config.h>
 
+#include <deal.II/base/enable_observer_pointer.h>
+#include <deal.II/base/exceptions.h>
 #include <deal.II/base/memory_consumption.h>
-#include <deal.II/base/subscriptor.h>
 
 #include <iterator>
 #include <memory>
@@ -29,6 +29,16 @@ DEAL_II_NAMESPACE_OPEN
 
 namespace hp
 {
+  /**
+   * Exception thrown when comparing hp::Collection iterators into different
+   * objects.
+   *
+   * @ingroup Exceptions
+   */
+  DeclExceptionMsg(ExcDifferentCollection,
+                   "You are trying to compare iterators into different "
+                   "hp::Collection objects.");
+
   /**
    * An iterator for hp::Collection.
    */
@@ -65,10 +75,7 @@ namespace hp
     bool
     operator==(const CollectionIterator<T> &other) const
     {
-      Assert(
-        this->data == other.data,
-        ExcMessage(
-          "You are trying to compare iterators into different hp::Collection objects."));
+      Assert(this->data == other.data, ExcDifferentCollection());
       return this->index == other.index;
     }
 
@@ -78,11 +85,48 @@ namespace hp
     bool
     operator!=(const CollectionIterator<T> &other) const
     {
-      Assert(
-        this->data == other.data,
-        ExcMessage(
-          "You are trying to compare iterators into different hp::Collection objects."));
+      Assert(this->data == other.data, ExcDifferentCollection());
       return this->index != other.index;
+    }
+
+    /**
+     * Compare indices.
+     */
+    bool
+    operator<(const CollectionIterator<T> &other) const
+    {
+      Assert(this->data == other.data, ExcDifferentCollection());
+      return this->index < other.index;
+    }
+
+    /**
+     * Compare indices.
+     */
+    bool
+    operator<=(const CollectionIterator<T> &other) const
+    {
+      Assert(this->data == other.data, ExcDifferentCollection());
+      return this->index <= other.index;
+    }
+
+    /**
+     * Compare indices.
+     */
+    bool
+    operator>(const CollectionIterator<T> &other) const
+    {
+      Assert(this->data == other.data, ExcDifferentCollection());
+      return this->index > other.index;
+    }
+
+    /**
+     * Compare indices.
+     */
+    bool
+    operator>=(const CollectionIterator<T> &other) const
+    {
+      Assert(this->data == other.data, ExcDifferentCollection());
+      return this->index >= other.index;
     }
 
     /**
@@ -104,7 +148,7 @@ namespace hp
     operator++()
     {
       AssertIndexRange(index + 1, data->size() + 1);
-      index++;
+      ++index;
       return *this;
     }
 
@@ -153,7 +197,7 @@ namespace hp
     operator-(const CollectionIterator<T> &other) const
     {
       return static_cast<std::ptrdiff_t>(index) -
-             static_cast<ptrdiff_t>(other.index);
+             static_cast<std::ptrdiff_t>(other.index);
     }
 
   private:
@@ -173,12 +217,12 @@ namespace hp
    *
    * It implements the concepts stated in the
    * @ref hpcollection
-   * module described in the doxygen documentation.
+   * topic described in the doxygen documentation.
    *
    * @ingroup hp hpcollection
    */
   template <typename T>
-  class Collection : public Subscriptor
+  class Collection : public EnableObserverPointer
   {
   public:
     /**
@@ -208,6 +252,13 @@ namespace hp
      */
     unsigned int
     size() const;
+
+    /**
+     * The return value of this function is equivalent to
+     * <code>size() == 0</code>
+     */
+    bool
+    empty() const;
 
     /**
      * Determine an estimate for the memory consumption (in bytes) of this
@@ -265,6 +316,15 @@ namespace hp
   Collection<T>::size() const
   {
     return entries.size();
+  }
+
+
+
+  template <typename T>
+  inline bool
+  Collection<T>::empty() const
+  {
+    return this->size() == 0;
   }
 
 

@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2007 - 2022 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2007 - 2024 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 
 // Plot flow functions in library and check their consistency
@@ -50,11 +49,11 @@ check_function(const Functions::FlowFunction<dim> &f,
       for (unsigned int ix = 0; ix < 2; ++ix)
         {
           if (dim > 0)
-            patches[0].vertices[vertex_number](0) = -1. + 2. * ix;
+            patches[0].vertices[vertex_number][0] = -1. + 2. * ix;
           if (dim > 1)
-            patches[0].vertices[vertex_number](1) = -1. + 2. * iy;
+            patches[0].vertices[vertex_number][1] = -1. + 2. * iy;
           if (dim > 2)
-            patches[0].vertices[vertex_number](2) = -1. + 2. * iz;
+            patches[0].vertices[vertex_number][2] = -1. + 2. * iz;
           ++vertex_number;
         }
   for (const unsigned int i : GeometryInfo<dim>::face_indices())
@@ -78,11 +77,11 @@ check_function(const Functions::FlowFunction<dim> &f,
       for (unsigned int ix = 0; ix <= sub; ++ix)
         {
           if (dim > 0)
-            points[vertex_number](0) = -1. + ix * h;
+            points[vertex_number][0] = -1. + ix * h;
           if (dim > 1)
-            points[vertex_number](1) = -1. + iy * h;
+            points[vertex_number][1] = -1. + iy * h;
           if (dim > 2)
-            points[vertex_number](2) = -1. + iz * h;
+            points[vertex_number][2] = -1. + iz * h;
           ++vertex_number;
         }
 

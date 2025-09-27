@@ -1,0 +1,412 @@
+
+DEAL::cylinder_shell colorized with default aspect ratio
+DEAL::cell:
+DEAL::boundary id = 2 center = 5.45581 0.491031 0.00000 faceidx = 0
+DEAL::boundary id = 1 center = 5.95179 0.535671 0.333333 faceidx = 35
+DEAL::boundary id = 0 center = 4.95982 0.446392 0.333333 faceidx = 140
+DEAL::cell:
+DEAL::boundary id = 2 center = 5.28045 1.45731 0.00000 faceidx = 1
+DEAL::boundary id = 1 center = 5.76049 1.58980 0.333333 faceidx = 38
+DEAL::boundary id = 0 center = 4.80041 1.32483 0.333333 faceidx = 141
+DEAL::cell:
+DEAL::boundary id = 2 center = 4.93538 2.37675 0.00000 faceidx = 2
+DEAL::boundary id = 1 center = 5.38405 2.59282 0.333333 faceidx = 41
+DEAL::boundary id = 0 center = 4.48671 2.16069 0.333333 faceidx = 142
+DEAL::cell:
+DEAL::boundary id = 2 center = 4.43168 3.21980 0.00000 faceidx = 3
+DEAL::boundary id = 1 center = 4.83456 3.51251 0.333333 faceidx = 44
+DEAL::boundary id = 0 center = 4.02880 2.92710 0.333333 faceidx = 143
+DEAL::cell:
+DEAL::boundary id = 2 center = 3.78554 3.95937 0.00000 faceidx = 4
+DEAL::boundary id = 1 center = 4.12968 4.31931 0.333333 faceidx = 47
+DEAL::boundary id = 0 center = 3.44140 3.59943 0.333333 faceidx = 144
+DEAL::cell:
+DEAL::boundary id = 2 center = 3.01774 4.57167 0.00000 faceidx = 5
+DEAL::boundary id = 1 center = 3.29208 4.98728 0.333333 faceidx = 50
+DEAL::boundary id = 0 center = 2.74340 4.15607 0.333333 faceidx = 145
+DEAL::cell:
+DEAL::boundary id = 2 center = 2.15294 5.03704 0.00000 faceidx = 6
+DEAL::boundary id = 1 center = 2.34866 5.49496 0.333333 faceidx = 53
+DEAL::boundary id = 0 center = 1.95721 4.57913 0.333333 faceidx = 146
+DEAL::cell:
+DEAL::boundary id = 2 center = 1.21894 5.34052 0.00000 faceidx = 7
+DEAL::boundary id = 1 center = 1.32975 5.82602 0.333333 faceidx = 56
+DEAL::boundary id = 0 center = 1.10813 4.85502 0.333333 faceidx = 147
+DEAL::cell:
+DEAL::boundary id = 2 center = 0.245763 5.47234 0.00000 faceidx = 8
+DEAL::boundary id = 1 center = 0.268105 5.96983 0.333333 faceidx = 59
+DEAL::boundary id = 0 center = 0.223421 4.97486 0.333333 faceidx = 148
+DEAL::cell:
+DEAL::boundary id = 2 center = -0.735311 5.42828 0.00000 faceidx = 9
+DEAL::boundary id = 1 center = -0.802157 5.92176 0.333333 faceidx = 62
+DEAL::boundary id = 0 center = -0.668464 4.93480 0.333333 faceidx = 149
+DEAL::cell:
+DEAL::boundary id = 2 center = -1.69275 5.20975 0.00000 faceidx = 10
+DEAL::boundary id = 1 center = -1.84664 5.68337 0.333333 faceidx = 65
+DEAL::boundary id = 0 center = -1.53886 4.73614 0.333333 faceidx = 150
+DEAL::cell:
+DEAL::boundary id = 2 center = -2.59579 4.82378 0.00000 faceidx = 11
+DEAL::boundary id = 1 center = -2.83177 5.26230 0.333333 faceidx = 68
+DEAL::boundary id = 0 center = -2.35981 4.38525 0.333333 faceidx = 151
+DEAL::cell:
+DEAL::boundary id = 2 center = -3.41539 4.28276 0.00000 faceidx = 12
+DEAL::boundary id = 1 center = -3.72588 4.67210 0.333333 faceidx = 71
+DEAL::boundary id = 0 center = -3.10490 3.89342 0.333333 faceidx = 152
+DEAL::cell:
+DEAL::boundary id = 2 center = -4.12522 3.60410 0.00000 faceidx = 13
+DEAL::boundary id = 1 center = -4.50024 3.93174 0.333333 faceidx = 74
+DEAL::boundary id = 0 center = -3.75020 3.27645 0.333333 faceidx = 153
+DEAL::cell:
+DEAL::boundary id = 2 center = -4.70246 2.80959 0.00000 faceidx = 14
+DEAL::boundary id = 1 center = -5.12996 3.06501 0.333333 faceidx = 77
+DEAL::boundary id = 0 center = -4.27496 2.55417 0.333333 faceidx = 154
+DEAL::cell:
+DEAL::boundary id = 2 center = -5.12856 1.92478 0.00000 faceidx = 15
+DEAL::boundary id = 1 center = -5.59480 2.09976 0.333333 faceidx = 80
+DEAL::boundary id = 0 center = -4.66233 1.74980 0.333333 faceidx = 155
+DEAL::cell:
+DEAL::boundary id = 2 center = -5.38983 0.978109 0.00000 faceidx = 16
+DEAL::boundary id = 1 center = -5.87981 1.06703 0.333333 faceidx = 83
+DEAL::boundary id = 0 center = -4.89984 0.889190 0.333333 faceidx = 156
+DEAL::cell:
+DEAL::boundary id = 2 center = -5.47786 6.80012e-16 0.00000 faceidx = 17
+DEAL::boundary id = 1 center = -5.97585 7.21645e-16 0.333333 faceidx = 86
+DEAL::boundary id = 0 center = -4.97987 6.10623e-16 0.333333 faceidx = 157
+DEAL::cell:
+DEAL::boundary id = 2 center = -5.38983 -0.978109 0.00000 faceidx = 18
+DEAL::boundary id = 1 center = -5.87981 -1.06703 0.333333 faceidx = 89
+DEAL::boundary id = 0 center = -4.89984 -0.889190 0.333333 faceidx = 158
+DEAL::cell:
+DEAL::boundary id = 2 center = -5.12856 -1.92478 0.00000 faceidx = 19
+DEAL::boundary id = 1 center = -5.59480 -2.09976 0.333333 faceidx = 92
+DEAL::boundary id = 0 center = -4.66233 -1.74980 0.333333 faceidx = 159
+DEAL::cell:
+DEAL::boundary id = 2 center = -4.70246 -2.80959 0.00000 faceidx = 20
+DEAL::boundary id = 1 center = -5.12996 -3.06501 0.333333 faceidx = 95
+DEAL::boundary id = 0 center = -4.27496 -2.55417 0.333333 faceidx = 160
+DEAL::cell:
+DEAL::boundary id = 2 center = -4.12522 -3.60410 0.00000 faceidx = 21
+DEAL::boundary id = 1 center = -4.50024 -3.93174 0.333333 faceidx = 98
+DEAL::boundary id = 0 center = -3.75020 -3.27645 0.333333 faceidx = 161
+DEAL::cell:
+DEAL::boundary id = 2 center = -3.41539 -4.28276 0.00000 faceidx = 22
+DEAL::boundary id = 1 center = -3.72588 -4.67210 0.333333 faceidx = 101
+DEAL::boundary id = 0 center = -3.10490 -3.89342 0.333333 faceidx = 162
+DEAL::cell:
+DEAL::boundary id = 2 center = -2.59579 -4.82378 0.00000 faceidx = 23
+DEAL::boundary id = 1 center = -2.83177 -5.26230 0.333333 faceidx = 104
+DEAL::boundary id = 0 center = -2.35981 -4.38525 0.333333 faceidx = 163
+DEAL::cell:
+DEAL::boundary id = 2 center = -1.69275 -5.20975 0.00000 faceidx = 24
+DEAL::boundary id = 1 center = -1.84664 -5.68337 0.333333 faceidx = 107
+DEAL::boundary id = 0 center = -1.53886 -4.73614 0.333333 faceidx = 164
+DEAL::cell:
+DEAL::boundary id = 2 center = -0.735311 -5.42828 0.00000 faceidx = 25
+DEAL::boundary id = 1 center = -0.802157 -5.92176 0.333333 faceidx = 110
+DEAL::boundary id = 0 center = -0.668464 -4.93480 0.333333 faceidx = 165
+DEAL::cell:
+DEAL::boundary id = 2 center = 0.245763 -5.47234 0.00000 faceidx = 26
+DEAL::boundary id = 1 center = 0.268105 -5.96983 0.333333 faceidx = 113
+DEAL::boundary id = 0 center = 0.223421 -4.97486 0.333333 faceidx = 166
+DEAL::cell:
+DEAL::boundary id = 2 center = 1.21894 -5.34052 0.00000 faceidx = 27
+DEAL::boundary id = 1 center = 1.32975 -5.82602 0.333333 faceidx = 116
+DEAL::boundary id = 0 center = 1.10813 -4.85502 0.333333 faceidx = 167
+DEAL::cell:
+DEAL::boundary id = 2 center = 2.15294 -5.03704 0.00000 faceidx = 28
+DEAL::boundary id = 1 center = 2.34866 -5.49496 0.333333 faceidx = 119
+DEAL::boundary id = 0 center = 1.95721 -4.57913 0.333333 faceidx = 168
+DEAL::cell:
+DEAL::boundary id = 2 center = 3.01774 -4.57167 0.00000 faceidx = 29
+DEAL::boundary id = 1 center = 3.29208 -4.98728 0.333333 faceidx = 122
+DEAL::boundary id = 0 center = 2.74340 -4.15607 0.333333 faceidx = 169
+DEAL::cell:
+DEAL::boundary id = 2 center = 3.78554 -3.95937 0.00000 faceidx = 30
+DEAL::boundary id = 1 center = 4.12968 -4.31931 0.333333 faceidx = 125
+DEAL::boundary id = 0 center = 3.44140 -3.59943 0.333333 faceidx = 170
+DEAL::cell:
+DEAL::boundary id = 2 center = 4.43168 -3.21980 0.00000 faceidx = 31
+DEAL::boundary id = 1 center = 4.83456 -3.51251 0.333333 faceidx = 128
+DEAL::boundary id = 0 center = 4.02880 -2.92710 0.333333 faceidx = 171
+DEAL::cell:
+DEAL::boundary id = 2 center = 4.93538 -2.37675 0.00000 faceidx = 32
+DEAL::boundary id = 1 center = 5.38405 -2.59282 0.333333 faceidx = 131
+DEAL::boundary id = 0 center = 4.48671 -2.16069 0.333333 faceidx = 172
+DEAL::cell:
+DEAL::boundary id = 2 center = 5.28045 -1.45731 0.00000 faceidx = 33
+DEAL::boundary id = 1 center = 5.76049 -1.58980 0.333333 faceidx = 134
+DEAL::boundary id = 0 center = 4.80041 -1.32483 0.333333 faceidx = 173
+DEAL::cell:
+DEAL::boundary id = 2 center = 5.45581 -0.491031 0.00000 faceidx = 34
+DEAL::boundary id = 1 center = 5.95179 -0.535671 0.333333 faceidx = 137
+DEAL::boundary id = 0 center = 4.95982 -0.446392 0.333333 faceidx = 174
+DEAL::cell:
+DEAL::boundary id = 1 center = 5.95179 0.535671 1.00000 faceidx = 175
+DEAL::boundary id = 0 center = 4.95982 0.446392 1.00000 faceidx = 280
+DEAL::cell:
+DEAL::boundary id = 1 center = 5.76049 1.58980 1.00000 faceidx = 178
+DEAL::boundary id = 0 center = 4.80041 1.32483 1.00000 faceidx = 281
+DEAL::cell:
+DEAL::boundary id = 1 center = 5.38405 2.59282 1.00000 faceidx = 181
+DEAL::boundary id = 0 center = 4.48671 2.16069 1.00000 faceidx = 282
+DEAL::cell:
+DEAL::boundary id = 1 center = 4.83456 3.51251 1.00000 faceidx = 184
+DEAL::boundary id = 0 center = 4.02880 2.92710 1.00000 faceidx = 283
+DEAL::cell:
+DEAL::boundary id = 1 center = 4.12968 4.31931 1.00000 faceidx = 187
+DEAL::boundary id = 0 center = 3.44140 3.59943 1.00000 faceidx = 284
+DEAL::cell:
+DEAL::boundary id = 1 center = 3.29208 4.98728 1.00000 faceidx = 190
+DEAL::boundary id = 0 center = 2.74340 4.15607 1.00000 faceidx = 285
+DEAL::cell:
+DEAL::boundary id = 1 center = 2.34866 5.49496 1.00000 faceidx = 193
+DEAL::boundary id = 0 center = 1.95721 4.57913 1.00000 faceidx = 286
+DEAL::cell:
+DEAL::boundary id = 1 center = 1.32975 5.82602 1.00000 faceidx = 196
+DEAL::boundary id = 0 center = 1.10813 4.85502 1.00000 faceidx = 287
+DEAL::cell:
+DEAL::boundary id = 1 center = 0.268105 5.96983 1.00000 faceidx = 199
+DEAL::boundary id = 0 center = 0.223421 4.97486 1.00000 faceidx = 288
+DEAL::cell:
+DEAL::boundary id = 1 center = -0.802157 5.92176 1.00000 faceidx = 202
+DEAL::boundary id = 0 center = -0.668464 4.93480 1.00000 faceidx = 289
+DEAL::cell:
+DEAL::boundary id = 1 center = -1.84664 5.68337 1.00000 faceidx = 205
+DEAL::boundary id = 0 center = -1.53886 4.73614 1.00000 faceidx = 290
+DEAL::cell:
+DEAL::boundary id = 1 center = -2.83177 5.26230 1.00000 faceidx = 208
+DEAL::boundary id = 0 center = -2.35981 4.38525 1.00000 faceidx = 291
+DEAL::cell:
+DEAL::boundary id = 1 center = -3.72588 4.67210 1.00000 faceidx = 211
+DEAL::boundary id = 0 center = -3.10490 3.89342 1.00000 faceidx = 292
+DEAL::cell:
+DEAL::boundary id = 1 center = -4.50024 3.93174 1.00000 faceidx = 214
+DEAL::boundary id = 0 center = -3.75020 3.27645 1.00000 faceidx = 293
+DEAL::cell:
+DEAL::boundary id = 1 center = -5.12996 3.06501 1.00000 faceidx = 217
+DEAL::boundary id = 0 center = -4.27496 2.55417 1.00000 faceidx = 294
+DEAL::cell:
+DEAL::boundary id = 1 center = -5.59480 2.09976 1.00000 faceidx = 220
+DEAL::boundary id = 0 center = -4.66233 1.74980 1.00000 faceidx = 295
+DEAL::cell:
+DEAL::boundary id = 1 center = -5.87981 1.06703 1.00000 faceidx = 223
+DEAL::boundary id = 0 center = -4.89984 0.889190 1.00000 faceidx = 296
+DEAL::cell:
+DEAL::boundary id = 1 center = -5.97585 7.21645e-16 1.00000 faceidx = 226
+DEAL::boundary id = 0 center = -4.97987 6.10623e-16 1.00000 faceidx = 297
+DEAL::cell:
+DEAL::boundary id = 1 center = -5.87981 -1.06703 1.00000 faceidx = 229
+DEAL::boundary id = 0 center = -4.89984 -0.889190 1.00000 faceidx = 298
+DEAL::cell:
+DEAL::boundary id = 1 center = -5.59480 -2.09976 1.00000 faceidx = 232
+DEAL::boundary id = 0 center = -4.66233 -1.74980 1.00000 faceidx = 299
+DEAL::cell:
+DEAL::boundary id = 1 center = -5.12996 -3.06501 1.00000 faceidx = 235
+DEAL::boundary id = 0 center = -4.27496 -2.55417 1.00000 faceidx = 300
+DEAL::cell:
+DEAL::boundary id = 1 center = -4.50024 -3.93174 1.00000 faceidx = 238
+DEAL::boundary id = 0 center = -3.75020 -3.27645 1.00000 faceidx = 301
+DEAL::cell:
+DEAL::boundary id = 1 center = -3.72588 -4.67210 1.00000 faceidx = 241
+DEAL::boundary id = 0 center = -3.10490 -3.89342 1.00000 faceidx = 302
+DEAL::cell:
+DEAL::boundary id = 1 center = -2.83177 -5.26230 1.00000 faceidx = 244
+DEAL::boundary id = 0 center = -2.35981 -4.38525 1.00000 faceidx = 303
+DEAL::cell:
+DEAL::boundary id = 1 center = -1.84664 -5.68337 1.00000 faceidx = 247
+DEAL::boundary id = 0 center = -1.53886 -4.73614 1.00000 faceidx = 304
+DEAL::cell:
+DEAL::boundary id = 1 center = -0.802157 -5.92176 1.00000 faceidx = 250
+DEAL::boundary id = 0 center = -0.668464 -4.93480 1.00000 faceidx = 305
+DEAL::cell:
+DEAL::boundary id = 1 center = 0.268105 -5.96983 1.00000 faceidx = 253
+DEAL::boundary id = 0 center = 0.223421 -4.97486 1.00000 faceidx = 306
+DEAL::cell:
+DEAL::boundary id = 1 center = 1.32975 -5.82602 1.00000 faceidx = 256
+DEAL::boundary id = 0 center = 1.10813 -4.85502 1.00000 faceidx = 307
+DEAL::cell:
+DEAL::boundary id = 1 center = 2.34866 -5.49496 1.00000 faceidx = 259
+DEAL::boundary id = 0 center = 1.95721 -4.57913 1.00000 faceidx = 308
+DEAL::cell:
+DEAL::boundary id = 1 center = 3.29208 -4.98728 1.00000 faceidx = 262
+DEAL::boundary id = 0 center = 2.74340 -4.15607 1.00000 faceidx = 309
+DEAL::cell:
+DEAL::boundary id = 1 center = 4.12968 -4.31931 1.00000 faceidx = 265
+DEAL::boundary id = 0 center = 3.44140 -3.59943 1.00000 faceidx = 310
+DEAL::cell:
+DEAL::boundary id = 1 center = 4.83456 -3.51251 1.00000 faceidx = 268
+DEAL::boundary id = 0 center = 4.02880 -2.92710 1.00000 faceidx = 311
+DEAL::cell:
+DEAL::boundary id = 1 center = 5.38405 -2.59282 1.00000 faceidx = 271
+DEAL::boundary id = 0 center = 4.48671 -2.16069 1.00000 faceidx = 312
+DEAL::cell:
+DEAL::boundary id = 1 center = 5.76049 -1.58980 1.00000 faceidx = 274
+DEAL::boundary id = 0 center = 4.80041 -1.32483 1.00000 faceidx = 313
+DEAL::cell:
+DEAL::boundary id = 1 center = 5.95179 -0.535671 1.00000 faceidx = 277
+DEAL::boundary id = 0 center = 4.95982 -0.446392 1.00000 faceidx = 314
+DEAL::cell:
+DEAL::boundary id = 3 center = 5.45581 0.491031 2.00000 faceidx = 316
+DEAL::boundary id = 1 center = 5.95179 0.535671 1.66667 faceidx = 315
+DEAL::boundary id = 0 center = 4.95982 0.446392 1.66667 faceidx = 420
+DEAL::cell:
+DEAL::boundary id = 3 center = 5.28045 1.45731 2.00000 faceidx = 319
+DEAL::boundary id = 1 center = 5.76049 1.58980 1.66667 faceidx = 318
+DEAL::boundary id = 0 center = 4.80041 1.32483 1.66667 faceidx = 421
+DEAL::cell:
+DEAL::boundary id = 3 center = 4.93538 2.37675 2.00000 faceidx = 322
+DEAL::boundary id = 1 center = 5.38405 2.59282 1.66667 faceidx = 321
+DEAL::boundary id = 0 center = 4.48671 2.16069 1.66667 faceidx = 422
+DEAL::cell:
+DEAL::boundary id = 3 center = 4.43168 3.21980 2.00000 faceidx = 325
+DEAL::boundary id = 1 center = 4.83456 3.51251 1.66667 faceidx = 324
+DEAL::boundary id = 0 center = 4.02880 2.92710 1.66667 faceidx = 423
+DEAL::cell:
+DEAL::boundary id = 3 center = 3.78554 3.95937 2.00000 faceidx = 328
+DEAL::boundary id = 1 center = 4.12968 4.31931 1.66667 faceidx = 327
+DEAL::boundary id = 0 center = 3.44140 3.59943 1.66667 faceidx = 424
+DEAL::cell:
+DEAL::boundary id = 3 center = 3.01774 4.57167 2.00000 faceidx = 331
+DEAL::boundary id = 1 center = 3.29208 4.98728 1.66667 faceidx = 330
+DEAL::boundary id = 0 center = 2.74340 4.15607 1.66667 faceidx = 425
+DEAL::cell:
+DEAL::boundary id = 3 center = 2.15294 5.03704 2.00000 faceidx = 334
+DEAL::boundary id = 1 center = 2.34866 5.49496 1.66667 faceidx = 333
+DEAL::boundary id = 0 center = 1.95721 4.57913 1.66667 faceidx = 426
+DEAL::cell:
+DEAL::boundary id = 3 center = 1.21894 5.34052 2.00000 faceidx = 337
+DEAL::boundary id = 1 center = 1.32975 5.82602 1.66667 faceidx = 336
+DEAL::boundary id = 0 center = 1.10813 4.85502 1.66667 faceidx = 427
+DEAL::cell:
+DEAL::boundary id = 3 center = 0.245763 5.47234 2.00000 faceidx = 340
+DEAL::boundary id = 1 center = 0.268105 5.96983 1.66667 faceidx = 339
+DEAL::boundary id = 0 center = 0.223421 4.97486 1.66667 faceidx = 428
+DEAL::cell:
+DEAL::boundary id = 3 center = -0.735311 5.42828 2.00000 faceidx = 343
+DEAL::boundary id = 1 center = -0.802157 5.92176 1.66667 faceidx = 342
+DEAL::boundary id = 0 center = -0.668464 4.93480 1.66667 faceidx = 429
+DEAL::cell:
+DEAL::boundary id = 3 center = -1.69275 5.20975 2.00000 faceidx = 346
+DEAL::boundary id = 1 center = -1.84664 5.68337 1.66667 faceidx = 345
+DEAL::boundary id = 0 center = -1.53886 4.73614 1.66667 faceidx = 430
+DEAL::cell:
+DEAL::boundary id = 3 center = -2.59579 4.82378 2.00000 faceidx = 349
+DEAL::boundary id = 1 center = -2.83177 5.26230 1.66667 faceidx = 348
+DEAL::boundary id = 0 center = -2.35981 4.38525 1.66667 faceidx = 431
+DEAL::cell:
+DEAL::boundary id = 3 center = -3.41539 4.28276 2.00000 faceidx = 352
+DEAL::boundary id = 1 center = -3.72588 4.67210 1.66667 faceidx = 351
+DEAL::boundary id = 0 center = -3.10490 3.89342 1.66667 faceidx = 432
+DEAL::cell:
+DEAL::boundary id = 3 center = -4.12522 3.60410 2.00000 faceidx = 355
+DEAL::boundary id = 1 center = -4.50024 3.93174 1.66667 faceidx = 354
+DEAL::boundary id = 0 center = -3.75020 3.27645 1.66667 faceidx = 433
+DEAL::cell:
+DEAL::boundary id = 3 center = -4.70246 2.80959 2.00000 faceidx = 358
+DEAL::boundary id = 1 center = -5.12996 3.06501 1.66667 faceidx = 357
+DEAL::boundary id = 0 center = -4.27496 2.55417 1.66667 faceidx = 434
+DEAL::cell:
+DEAL::boundary id = 3 center = -5.12856 1.92478 2.00000 faceidx = 361
+DEAL::boundary id = 1 center = -5.59480 2.09976 1.66667 faceidx = 360
+DEAL::boundary id = 0 center = -4.66233 1.74980 1.66667 faceidx = 435
+DEAL::cell:
+DEAL::boundary id = 3 center = -5.38983 0.978109 2.00000 faceidx = 364
+DEAL::boundary id = 1 center = -5.87981 1.06703 1.66667 faceidx = 363
+DEAL::boundary id = 0 center = -4.89984 0.889190 1.66667 faceidx = 436
+DEAL::cell:
+DEAL::boundary id = 3 center = -5.47786 6.80012e-16 2.00000 faceidx = 367
+DEAL::boundary id = 1 center = -5.97585 7.21645e-16 1.66667 faceidx = 366
+DEAL::boundary id = 0 center = -4.97987 6.10623e-16 1.66667 faceidx = 437
+DEAL::cell:
+DEAL::boundary id = 3 center = -5.38983 -0.978109 2.00000 faceidx = 370
+DEAL::boundary id = 1 center = -5.87981 -1.06703 1.66667 faceidx = 369
+DEAL::boundary id = 0 center = -4.89984 -0.889190 1.66667 faceidx = 438
+DEAL::cell:
+DEAL::boundary id = 3 center = -5.12856 -1.92478 2.00000 faceidx = 373
+DEAL::boundary id = 1 center = -5.59480 -2.09976 1.66667 faceidx = 372
+DEAL::boundary id = 0 center = -4.66233 -1.74980 1.66667 faceidx = 439
+DEAL::cell:
+DEAL::boundary id = 3 center = -4.70246 -2.80959 2.00000 faceidx = 376
+DEAL::boundary id = 1 center = -5.12996 -3.06501 1.66667 faceidx = 375
+DEAL::boundary id = 0 center = -4.27496 -2.55417 1.66667 faceidx = 440
+DEAL::cell:
+DEAL::boundary id = 3 center = -4.12522 -3.60410 2.00000 faceidx = 379
+DEAL::boundary id = 1 center = -4.50024 -3.93174 1.66667 faceidx = 378
+DEAL::boundary id = 0 center = -3.75020 -3.27645 1.66667 faceidx = 441
+DEAL::cell:
+DEAL::boundary id = 3 center = -3.41539 -4.28276 2.00000 faceidx = 382
+DEAL::boundary id = 1 center = -3.72588 -4.67210 1.66667 faceidx = 381
+DEAL::boundary id = 0 center = -3.10490 -3.89342 1.66667 faceidx = 442
+DEAL::cell:
+DEAL::boundary id = 3 center = -2.59579 -4.82378 2.00000 faceidx = 385
+DEAL::boundary id = 1 center = -2.83177 -5.26230 1.66667 faceidx = 384
+DEAL::boundary id = 0 center = -2.35981 -4.38525 1.66667 faceidx = 443
+DEAL::cell:
+DEAL::boundary id = 3 center = -1.69275 -5.20975 2.00000 faceidx = 388
+DEAL::boundary id = 1 center = -1.84664 -5.68337 1.66667 faceidx = 387
+DEAL::boundary id = 0 center = -1.53886 -4.73614 1.66667 faceidx = 444
+DEAL::cell:
+DEAL::boundary id = 3 center = -0.735311 -5.42828 2.00000 faceidx = 391
+DEAL::boundary id = 1 center = -0.802157 -5.92176 1.66667 faceidx = 390
+DEAL::boundary id = 0 center = -0.668464 -4.93480 1.66667 faceidx = 445
+DEAL::cell:
+DEAL::boundary id = 3 center = 0.245763 -5.47234 2.00000 faceidx = 394
+DEAL::boundary id = 1 center = 0.268105 -5.96983 1.66667 faceidx = 393
+DEAL::boundary id = 0 center = 0.223421 -4.97486 1.66667 faceidx = 446
+DEAL::cell:
+DEAL::boundary id = 3 center = 1.21894 -5.34052 2.00000 faceidx = 397
+DEAL::boundary id = 1 center = 1.32975 -5.82602 1.66667 faceidx = 396
+DEAL::boundary id = 0 center = 1.10813 -4.85502 1.66667 faceidx = 447
+DEAL::cell:
+DEAL::boundary id = 3 center = 2.15294 -5.03704 2.00000 faceidx = 400
+DEAL::boundary id = 1 center = 2.34866 -5.49496 1.66667 faceidx = 399
+DEAL::boundary id = 0 center = 1.95721 -4.57913 1.66667 faceidx = 448
+DEAL::cell:
+DEAL::boundary id = 3 center = 3.01774 -4.57167 2.00000 faceidx = 403
+DEAL::boundary id = 1 center = 3.29208 -4.98728 1.66667 faceidx = 402
+DEAL::boundary id = 0 center = 2.74340 -4.15607 1.66667 faceidx = 449
+DEAL::cell:
+DEAL::boundary id = 3 center = 3.78554 -3.95937 2.00000 faceidx = 406
+DEAL::boundary id = 1 center = 4.12968 -4.31931 1.66667 faceidx = 405
+DEAL::boundary id = 0 center = 3.44140 -3.59943 1.66667 faceidx = 450
+DEAL::cell:
+DEAL::boundary id = 3 center = 4.43168 -3.21980 2.00000 faceidx = 409
+DEAL::boundary id = 1 center = 4.83456 -3.51251 1.66667 faceidx = 408
+DEAL::boundary id = 0 center = 4.02880 -2.92710 1.66667 faceidx = 451
+DEAL::cell:
+DEAL::boundary id = 3 center = 4.93538 -2.37675 2.00000 faceidx = 412
+DEAL::boundary id = 1 center = 5.38405 -2.59282 1.66667 faceidx = 411
+DEAL::boundary id = 0 center = 4.48671 -2.16069 1.66667 faceidx = 452
+DEAL::cell:
+DEAL::boundary id = 3 center = 5.28045 -1.45731 2.00000 faceidx = 415
+DEAL::boundary id = 1 center = 5.76049 -1.58980 1.66667 faceidx = 414
+DEAL::boundary id = 0 center = 4.80041 -1.32483 1.66667 faceidx = 453
+DEAL::cell:
+DEAL::boundary id = 3 center = 5.45581 -0.491031 2.00000 faceidx = 418
+DEAL::boundary id = 1 center = 5.95179 -0.535671 1.66667 faceidx = 417
+DEAL::boundary id = 0 center = 4.95982 -0.446392 1.66667 faceidx = 454
+DEAL::cylinder_shell colorized with 3:2 ratio 
+DEAL::cell:
+DEAL::boundary id = 2 center = 1.37500 2.38157 0.00000 faceidx = 0
+DEAL::boundary id = 1 center = 1.50000 2.59808 0.500000 faceidx = 3
+DEAL::boundary id = 0 center = 1.25000 2.16506 0.500000 faceidx = 12
+DEAL::cell:
+DEAL::boundary id = 2 center = -2.75000 1.11022e-15 0.00000 faceidx = 1
+DEAL::boundary id = 1 center = -3.00000 8.88178e-16 0.500000 faceidx = 6
+DEAL::boundary id = 0 center = -2.50000 8.88178e-16 0.500000 faceidx = 13
+DEAL::cell:
+DEAL::boundary id = 2 center = 1.37500 -2.38157 0.00000 faceidx = 2
+DEAL::boundary id = 1 center = 1.50000 -2.59808 0.500000 faceidx = 9
+DEAL::boundary id = 0 center = 1.25000 -2.16506 0.500000 faceidx = 14
+DEAL::cell:
+DEAL::boundary id = 3 center = 1.37500 2.38157 2.00000 faceidx = 16
+DEAL::boundary id = 1 center = 1.50000 2.59808 1.50000 faceidx = 15
+DEAL::boundary id = 0 center = 1.25000 2.16506 1.50000 faceidx = 24
+DEAL::cell:
+DEAL::boundary id = 3 center = -2.75000 1.11022e-15 2.00000 faceidx = 19
+DEAL::boundary id = 1 center = -3.00000 8.88178e-16 1.50000 faceidx = 18
+DEAL::boundary id = 0 center = -2.50000 8.88178e-16 1.50000 faceidx = 25
+DEAL::cell:
+DEAL::boundary id = 3 center = 1.37500 -2.38157 2.00000 faceidx = 22
+DEAL::boundary id = 1 center = 1.50000 -2.59808 1.50000 faceidx = 21
+DEAL::boundary id = 0 center = 1.25000 -2.16506 1.50000 faceidx = 26

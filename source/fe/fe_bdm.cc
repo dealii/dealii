@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2003 - 2023 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2010 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 
 #include <deal.II/base/polynomials_p.h>
@@ -91,7 +90,8 @@ FE_BDM<dim>::FE_BDM(const unsigned int deg)
   for (unsigned int i = 0; i < GeometryInfo<dim>::max_children_per_face; ++i)
     face_embeddings[i].reinit(this->n_dofs_per_face(face_no),
                               this->n_dofs_per_face(face_no));
-  FETools::compute_face_embedding_matrices(*this, face_embeddings, 0, 0, 1.);
+  FETools::compute_face_embedding_matrices(
+    *this, make_array_view(face_embeddings), 0, 0, 1.);
   this->interface_constraints.reinit((1 << (dim - 1)) *
                                        this->n_dofs_per_face(face_no),
                                      this->n_dofs_per_face(face_no));
@@ -360,7 +360,7 @@ FE_BDM<dim>::initialize_support_points(const unsigned int deg)
   // up to deg, which means we need dg+1 points in each direction. The
   // fact that we do not have tensor product polynomials will be
   // considered later. In 2d, we can use point values.
-  QGauss<dim - 1> face_points(deg + 1);
+  const QGauss<dim - 1> face_points(deg + 1);
 
   // TODO: the implementation makes the assumption that all faces have the
   // same number of dofs
@@ -376,27 +376,31 @@ FE_BDM<dim>::initialize_support_points(const unsigned int deg)
   // deg-2, thus we use deg points. Note that deg>=1 and the lowest
   // order element has no points in the cell, such that we have to
   // distinguish this case.
-  QGauss<dim> cell_points(deg == 1 ? 0 : deg);
+  const QGauss<dim> cell_points(deg == 1 ? 0 : deg);
 
   // Compute the size of the whole support point set
   const unsigned int npoints =
-    cell_points.size() + GeometryInfo<dim>::faces_per_cell * face_points.size();
+    GeometryInfo<dim>::faces_per_cell * face_points.size() + cell_points.size();
 
   this->generalized_support_points.resize(npoints);
 
-  Quadrature<dim> faces =
+  const Quadrature<dim> faces =
     QProjector<dim>::project_to_all_faces(this->reference_cell(), face_points);
-  for (unsigned int k = 0;
-       k < face_points.size() * GeometryInfo<dim>::faces_per_cell;
-       ++k)
-    this->generalized_support_points[k] = faces.point(
-      k +
-      QProjector<dim>::DataSetDescriptor::face(this->reference_cell(),
-                                               0,
-                                               true,
-                                               false,
-                                               false,
-                                               this->n_dofs_per_face(face_no)));
+
+  for (unsigned int face_no = 0; face_no < GeometryInfo<dim>::faces_per_cell;
+       ++face_no)
+    {
+      const auto offset = QProjector<dim>::DataSetDescriptor::face(
+        this->reference_cell(),
+        face_no,
+        numbers::default_geometric_orientation,
+        face_points.size());
+      for (unsigned int face_point = 0; face_point < face_points.size();
+           ++face_point)
+        this->generalized_support_points[face_points.size() * face_no +
+                                         face_point] =
+          faces.point(offset + face_point);
+    }
 
   // Currently, for backward compatibility, we do not use moments, but
   // point values on faces in 2d. In 3d, this is impossible, since the
@@ -428,6 +432,6 @@ FE_BDM<dim>::initialize_support_points(const unsigned int deg)
 
 
 /*-------------- Explicit Instantiations -------------------------------*/
-#include "fe_bdm.inst"
+#include "fe/fe_bdm.inst"
 
 DEAL_II_NAMESPACE_CLOSE

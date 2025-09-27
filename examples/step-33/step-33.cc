@@ -1,17 +1,16 @@
-/* ---------------------------------------------------------------------
+/* ------------------------------------------------------------------------
  *
- * Copyright (C) 2007 - 2023 by the deal.II authors
+ * SPDX-License-Identifier: LGPL-2.1-or-later
+ * Copyright (C) 2008 - 2024 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
- * The deal.II library is free software; you can use it, redistribute
- * it, and/or modify it under the terms of the GNU Lesser General
- * Public License as published by the Free Software Foundation; either
- * version 2.1 of the License, or (at your option) any later version.
- * The full text of the license can be found in the file LICENSE.md at
- * the top level directory of deal.II.
+ * Part of the source code is dual licensed under Apache-2.0 WITH
+ * LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+ * governing the source code and code contributions can be found in
+ * LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
  *
- * ---------------------------------------------------------------------
+ * ------------------------------------------------------------------------
  *
  * Author: David Neckels, Boulder, Colorado, 2007, 2008
  */
@@ -418,7 +417,7 @@ namespace Step33
               }
 
             default:
-              Assert(false, ExcNotImplemented());
+              DEAL_II_NOT_IMPLEMENTED();
           }
     }
 
@@ -1632,7 +1631,7 @@ namespace Step33
   // $\mathbf{z}_i$ is the $i$th vector valued test function.
   //   Furthermore, the scalar product
   // $\left(\mathbf{F}(\mathbf{w}), \nabla\mathbf{z}_i\right)_K$ is
-  // understood as $\int_K \sum_{c=1}^{\text{n_components}}
+  // understood as $\int_K \sum_{c=1}^{\text{n\_components}}
   // \sum_{d=1}^{\text{dim}} \mathbf{F}(\mathbf{w})_{cd}
   // \frac{\partial z^c_i}{x_d}$ where $z^c_i$ is the $c$th component of
   // the $i$th test function.
@@ -1805,27 +1804,27 @@ namespace Step33
     // however, simplify it a bit taking into account that the $i$th
     // (vector-valued) test function $\mathbf{z}_i$ has in reality only a
     // single nonzero component (more on this topic can be found in the @ref
-    // vector_valued module). It will be represented by the variable
+    // vector_valued topic). It will be represented by the variable
     // <code>component_i</code> below. With this, the residual term can be
     // re-written as
     // @f{eqnarray*}{
     // R_i &=&
     // \left(\frac{(\mathbf{w}_{n+1} -
-    // \mathbf{w}_n)_{\text{component_i}}}{\delta
-    // t},(\mathbf{z}_i)_{\text{component_i}}\right)_K
+    // \mathbf{w}_n)_{\text{component\_i}}}{\delta
+    // t},(\mathbf{z}_i)_{\text{component\_i}}\right)_K
     // \\ &-& \sum_{d=1}^{\text{dim}} \left(  \theta \mathbf{F}
-    // ({\mathbf{w}^k_{n+1}})_{\text{component_i},d} + (1-\theta)
-    // \mathbf{F} ({\mathbf{w}_{n}})_{\text{component_i},d}  ,
-    // \frac{\partial(\mathbf{z}_i)_{\text{component_i}}} {\partial
+    // ({\mathbf{w}^k_{n+1}})_{\text{component\_i},d} + (1-\theta)
+    // \mathbf{F} ({\mathbf{w}_{n}})_{\text{component\_i},d}  ,
+    // \frac{\partial(\mathbf{z}_i)_{\text{component\_i}}} {\partial
     // x_d}\right)_K
     // \\ &+& \sum_{d=1}^{\text{dim}} h^{\eta} \left( \theta \frac{\partial
-    // (\mathbf{w}^k_{n+1})_{\text{component_i}}}{\partial x_d} + (1-\theta)
-    // \frac{\partial (\mathbf{w}_n)_{\text{component_i}}}{\partial x_d} ,
-    // \frac{\partial (\mathbf{z}_i)_{\text{component_i}}}{\partial x_d}
+    // (\mathbf{w}^k_{n+1})_{\text{component\_i}}}{\partial x_d} + (1-\theta)
+    // \frac{\partial (\mathbf{w}_n)_{\text{component\_i}}}{\partial x_d} ,
+    // \frac{\partial (\mathbf{z}_i)_{\text{component\_i}}}{\partial x_d}
     // \right)_K
-    // \\ &-& \left( \theta\mathbf{G}({\mathbf{w}^k_n+1} )_{\text{component_i}}
-    // + (1-\theta)\mathbf{G}({\mathbf{w}_n})_{\text{component_i}} ,
-    // (\mathbf{z}_i)_{\text{component_i}} \right)_K ,
+    // \\ &-& \left( \theta\mathbf{G}({\mathbf{w}^k_n+1} )_{\text{component\_i}}
+    // + (1-\theta)\mathbf{G}({\mathbf{w}_n})_{\text{component\_i}} ,
+    // (\mathbf{z}_i)_{\text{component\_i}} \right)_K ,
     // @f}
     // where integrals are
     // understood to be evaluated through summation over quadrature points.
@@ -2054,7 +2053,7 @@ namespace Step33
           alpha = face_diameter / (2.0 * parameters.time_step);
           break;
         default:
-          Assert(false, ExcNotImplemented());
+          DEAL_II_NOT_IMPLEMENTED();
           alpha = 1;
       }
 
@@ -2210,7 +2209,7 @@ namespace Step33
           }
       }
 
-    Assert(false, ExcNotImplemented());
+    DEAL_II_NOT_IMPLEMENTED();
     return {0, 0};
   }
 
@@ -2301,7 +2300,7 @@ namespace Step33
     std::vector<Vector<double>> transfer_out = {
       Vector<double>(dof_handler.n_dofs()),
       Vector<double>(dof_handler.n_dofs())};
-    soltrans.interpolate(transfer_in, transfer_out);
+    soltrans.interpolate(transfer_out);
 
     old_solution = std::move(transfer_out[0]);
     predictor    = std::move(transfer_out[1]);
@@ -2556,6 +2555,11 @@ int main(int argc, char *argv[])
 
       Utilities::MPI::MPI_InitFinalize mpi_initialization(
         argc, argv, numbers::invalid_unsigned_int);
+
+      AssertThrow(
+        Utilities::MPI::n_mpi_processes(MPI_COMM_WORLD) == 1,
+        ExcMessage(
+          "This program does not support parallel computing via MPI."));
 
       ConservationLaw<2> cons(argv[1]);
       cons.run();

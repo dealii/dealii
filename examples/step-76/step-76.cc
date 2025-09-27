@@ -1,17 +1,16 @@
-/* ---------------------------------------------------------------------
+/* ------------------------------------------------------------------------
  *
- * Copyright (C) 2020 - 2023 by the deal.II authors
+ * SPDX-License-Identifier: LGPL-2.1-or-later
+ * Copyright (C) 2021 - 2024 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
- * The deal.II library is free software; you can use it, redistribute
- * it, and/or modify it under the terms of the GNU Lesser General
- * Public License as published by the Free Software Foundation; either
- * version 2.1 of the License, or (at your option) any later version.
- * The full text of the license can be found in the file LICENSE.md at
- * the top level directory of deal.II.
+ * Part of the source code is dual licensed under Apache-2.0 WITH
+ * LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+ * governing the source code and code contributions can be found in
+ * LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
  *
- * ---------------------------------------------------------------------
+ * ------------------------------------------------------------------------
  *
  * Authors: Martin Kronbichler, Peter Munch, David Schneider, 2020
  */
@@ -21,7 +20,6 @@
 // The same includes as in step-67:
 #include <deal.II/base/conditional_ostream.h>
 #include <deal.II/base/function.h>
-#include <deal.II/base/logstream.h>
 #include <deal.II/base/time_stepping.h>
 #include <deal.II/base/timer.h>
 #include <deal.II/base/utilities.h>
@@ -152,8 +150,6 @@ namespace Euler_DG
                            VectorType     &vec_ri,
                            VectorType     &vec_ki) const
     {
-      AssertDimension(ai.size() + 1, bi.size());
-
       vec_ki.swap(solution);
 
       double sum_previous_bi = 0;
@@ -259,7 +255,7 @@ namespace Euler_DG
           }
 
         default:
-          Assert(false, ExcNotImplemented());
+          DEAL_II_NOT_IMPLEMENTED();
           return 0.;
       }
   }
@@ -380,7 +376,7 @@ namespace Euler_DG
 
         default:
           {
-            Assert(false, ExcNotImplemented());
+            DEAL_II_NOT_IMPLEMENTED();
             return {};
           }
       }
@@ -526,7 +522,7 @@ namespace Euler_DG
       }
     else
       {
-        Assert(false, ExcNotImplemented());
+        DEAL_II_NOT_IMPLEMENTED();
       }
 #else
     (void)subcommunicator;
@@ -664,10 +660,11 @@ namespace Euler_DG
           dim,
           n_points_1d,
           n_points_1d,
-          VectorizedArrayType>
-          eval(AlignedVector<VectorizedArrayType>(),
+          VectorizedArrayType,
+          Number>
+          eval({},
                data.get_shape_info().data[0].shape_gradients_collocation_eo,
-               AlignedVector<VectorizedArrayType>());
+               {});
 
         AlignedVector<VectorizedArrayType> buffer(phi.static_n_q_points *
                                                   phi.n_components);
@@ -742,17 +739,19 @@ namespace Euler_DG
               for (unsigned int c = 0; c < dim + 2; ++c)
                 {
                   if (dim >= 1 && body_force.get() == nullptr)
-                    eval.template gradients<0, false, false>(
-                      gradient_ptr + phi.static_n_q_points * 0, values_ptr);
+                    eval.template gradients<0, false, false, dim>(gradient_ptr,
+                                                                  values_ptr);
                   else if (dim >= 1)
-                    eval.template gradients<0, false, true>(
-                      gradient_ptr + phi.static_n_q_points * 0, values_ptr);
+                    eval.template gradients<0, false, true, dim>(gradient_ptr,
+                                                                 values_ptr);
                   if (dim >= 2)
-                    eval.template gradients<1, false, true>(
-                      gradient_ptr + phi.static_n_q_points * 1, values_ptr);
+                    eval.template gradients<1, false, true, dim>(gradient_ptr +
+                                                                   1,
+                                                                 values_ptr);
                   if (dim >= 3)
-                    eval.template gradients<2, false, true>(
-                      gradient_ptr + phi.static_n_q_points * 2, values_ptr);
+                    eval.template gradients<2, false, true, dim>(gradient_ptr +
+                                                                   2,
+                                                                 values_ptr);
 
                   values_ptr += phi.static_n_q_points;
                   gradient_ptr += phi.static_n_q_points * dim;
@@ -1168,8 +1167,7 @@ namespace Euler_DG
 
         for (unsigned int v = 0; v < data.n_active_entries_per_cell_batch(cell);
              ++v)
-          for (unsigned int d = 0; d < 3; ++d)
-            max_transport = std::max(max_transport, local_max[v]);
+          max_transport = std::max(max_transport, local_max[v]);
       }
 
     max_transport = Utilities::MPI::max(max_transport, MPI_COMM_WORLD);
@@ -1202,9 +1200,9 @@ namespace Euler_DG
     Triangulation<dim> triangulation;
 #endif
 
-    FESystem<dim>   fe;
-    MappingQ<dim>   mapping;
-    DoFHandler<dim> dof_handler;
+    const FESystem<dim> fe;
+    const MappingQ<dim> mapping;
+    DoFHandler<dim>     dof_handler;
 
     TimerOutput timer;
 
@@ -1399,7 +1397,7 @@ namespace Euler_DG
           }
 
         default:
-          Assert(false, ExcNotImplemented());
+          DEAL_II_NOT_IMPLEMENTED();
       }
 
     triangulation.refine_global(n_global_refinements);
@@ -1605,8 +1603,6 @@ int main(int argc, char **argv)
 
   try
     {
-      deallog.depth_console(0);
-
       EulerProblem<dimension> euler_problem;
       euler_problem.run();
     }

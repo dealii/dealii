@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2022 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2022 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 // Convert a deal.II cell to a cgal Surface_mesh.
 
@@ -19,13 +18,15 @@
 
 #include <deal.II/base/point.h>
 
+#include <deal.II/cgal/surface_mesh.h>
+
 #include <deal.II/fe/mapping_q.h>
 
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/tria.h>
 
 #include <CGAL/IO/io.h>
-#include <deal.II/cgal/surface_mesh.h>
+#include <CGAL/Polygon_mesh_processing/orientation.h>
 
 #include "../tests.h"
 
@@ -56,7 +57,24 @@ test()
       const auto cell = tria.begin_active();
       dealii_cell_to_cgal_surface_mesh(cell, *mapping, mesh);
 
-      Assert(mesh.is_valid(), dealii::ExcMessage("The CGAL mesh is not valid"));
+      Assert(mesh.is_valid(), ExcMessage("The CGAL mesh is not valid"));
+
+      if (dim == 3)
+        {
+          // is closed/oriented only for 3 dimensional objects important
+          Assert(CGAL::is_closed(mesh),
+                 ExcMessage("The CGAL mesh is not closed"));
+
+          // orientation not supported for wedges, this needs special treatment
+          if (r_cell != ref_cells[3][2])
+            {
+              Assert(
+                CGAL::Polygon_mesh_processing::is_outward_oriented(mesh),
+                ExcMessage(
+                  "The normal vectors of the CGAL mesh are not oriented outwards"));
+            }
+        }
+
       deallog << "deal vertices: " << cell->n_vertices() << ", cgal vertices "
               << mesh.num_vertices() << std::endl;
       deallog << "deal faces: " << cell->n_faces() << ", cgal faces "

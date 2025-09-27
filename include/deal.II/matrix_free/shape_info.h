@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2011 - 2023 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2012 - 2024 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 
 #ifndef dealii_matrix_free_shape_info_h
@@ -240,8 +239,8 @@ namespace internal
       AlignedVector<Number> shape_values_eo;
 
       /**
-       * Stores the shape gradients in a different format, namely the so-
-       * called even-odd scheme where the symmetries in shape_gradients are
+       * Stores the shape gradients in a different format, namely the
+       * so-called even-odd scheme where the symmetries in shape_gradients are
        * used for faster evaluation.
        */
       AlignedVector<Number> shape_gradients_eo;
@@ -375,7 +374,7 @@ namespace internal
        * quadrature points for all faces, orientations, and directions
        * (no tensor-product structure exploited).
        */
-      Table<4, Number> shape_gradients_face;
+      Table<3, Number> shape_gradients_face;
     };
 
 
@@ -417,8 +416,8 @@ namespace internal
        * Initializes the data fields. Takes a one-dimensional quadrature
        * formula and a finite element as arguments and evaluates the shape
        * functions, gradients and Hessians on the one-dimensional unit cell.
-       * This function assumes that the finite element is derived from a one-
-       * dimensional element by a tensor product and that the zeroth shape
+       * This function assumes that the finite element is derived from a
+       * one-dimensional element by a tensor product and that the zeroth shape
        * function in zero evaluates to one.
        */
       template <int dim, int spacedim, int dim_q>
@@ -431,9 +430,9 @@ namespace internal
        * Return whether an element is supported by MatrixFree.
        *
        * The following scalar elements are supported:
-       * - FENothing, FE_DGP, and FE_Q_DG0
+       * - FE_Nothing, FE_DGP, and FE_Q_DG0
        * - polynomial tensor-product elements based on
-       *   Polynomials::Polynomial (FE_Q, FE_DG_Q, FE_DGQArbitraryNodes,
+       *   Polynomials::Polynomial (FE_Q, FE_DGQ, FE_DGQArbitraryNodes,
        *   FE_DGQHermite, FE_DGQLegendre) or Polynomials::PiecewisePolynomial
        *   (FE_Q_iso_Q1).
        * - elements for simplex, pyramids, and wedges (FE_SimplexP,

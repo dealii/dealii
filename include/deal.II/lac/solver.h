@@ -1,24 +1,24 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2022 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 1998 - 2024 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 #ifndef dealii_solver_h
 #define dealii_solver_h
 
 #include <deal.II/base/config.h>
 
-#include <deal.II/base/subscriptor.h>
+#include <deal.II/base/enable_observer_pointer.h>
+#include <deal.II/base/template_constraints.h>
 
 #include <deal.II/lac/solver_control.h>
 #include <deal.II/lac/vector_memory.h>
@@ -337,7 +337,8 @@ class Vector;
  * @ingroup Solvers
  */
 template <typename VectorType = Vector<double>>
-class SolverBase : public Subscriptor
+DEAL_II_CXX20_REQUIRES(concepts::is_vector_space_vector<VectorType>)
+class SolverBase : public EnableObserverPointer
 {
 public:
   /**
@@ -473,11 +474,11 @@ protected:
 
 
 /*-------------------------------- Inline functions ------------------------*/
-
+#ifndef DOXYGEN
 
 template <typename VectorType>
-inline SolverControl::State
-SolverBase<VectorType>::StateCombiner::operator()(
+DEAL_II_CXX20_REQUIRES(concepts::is_vector_space_vector<VectorType>)
+inline SolverControl::State SolverBase<VectorType>::StateCombiner::operator()(
   const SolverControl::State state1,
   const SolverControl::State state2) const
 {
@@ -492,10 +493,11 @@ SolverBase<VectorType>::StateCombiner::operator()(
 
 
 template <typename VectorType>
+DEAL_II_CXX20_REQUIRES(concepts::is_vector_space_vector<VectorType>)
 template <typename Iterator>
 inline SolverControl::State
-SolverBase<VectorType>::StateCombiner::operator()(const Iterator begin,
-                                                  const Iterator end) const
+  SolverBase<VectorType>::StateCombiner::operator()(const Iterator begin,
+                                                    const Iterator end) const
 {
   Assert(begin != end,
          ExcMessage("You can't combine iterator states if no state is given."));
@@ -512,6 +514,7 @@ SolverBase<VectorType>::StateCombiner::operator()(const Iterator begin,
 
 
 template <typename VectorType>
+DEAL_II_CXX20_REQUIRES(concepts::is_vector_space_vector<VectorType>)
 inline SolverBase<VectorType>::SolverBase(
   SolverControl            &solver_control,
   VectorMemory<VectorType> &vector_memory)
@@ -531,6 +534,7 @@ inline SolverBase<VectorType>::SolverBase(
 
 
 template <typename VectorType>
+DEAL_II_CXX20_REQUIRES(concepts::is_vector_space_vector<VectorType>)
 inline SolverBase<VectorType>::SolverBase(SolverControl &solver_control)
   : // use the static memory object this class owns
   memory(static_vector_memory)
@@ -549,8 +553,8 @@ inline SolverBase<VectorType>::SolverBase(SolverControl &solver_control)
 
 
 template <typename VectorType>
-inline boost::signals2::connection
-SolverBase<VectorType>::connect(
+DEAL_II_CXX20_REQUIRES(concepts::is_vector_space_vector<VectorType>)
+inline boost::signals2::connection SolverBase<VectorType>::connect(
   const std::function<SolverControl::State(const unsigned int iteration,
                                            const double       check_value,
                                            const VectorType  &current_iterate)>
@@ -559,7 +563,7 @@ SolverBase<VectorType>::connect(
   return iteration_status.connect(slot);
 }
 
-
+#endif
 
 DEAL_II_NAMESPACE_CLOSE
 

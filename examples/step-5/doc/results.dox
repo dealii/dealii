@@ -7,32 +7,32 @@ Cycle 0:
    Number of active cells: 20
    Total number of cells: 20
    Number of degrees of freedom: 25
-   13 CG iterations needed to obtain convergence.
+   8 CG iterations needed to obtain convergence.
 Cycle 1:
    Number of active cells: 80
    Total number of cells: 100
    Number of degrees of freedom: 89
-   18 CG iterations needed to obtain convergence.
+   12 CG iterations needed to obtain convergence.
 Cycle 2:
    Number of active cells: 320
    Total number of cells: 420
    Number of degrees of freedom: 337
-   29 CG iterations needed to obtain convergence.
+   21 CG iterations needed to obtain convergence.
 Cycle 3:
    Number of active cells: 1280
    Total number of cells: 1700
    Number of degrees of freedom: 1313
-   52 CG iterations needed to obtain convergence.
+   38 CG iterations needed to obtain convergence.
 Cycle 4:
    Number of active cells: 5120
    Total number of cells: 6820
    Number of degrees of freedom: 5185
-   95 CG iterations needed to obtain convergence.
+   70 CG iterations needed to obtain convergence.
 Cycle 5:
    Number of active cells: 20480
    Total number of cells: 27300
    Number of degrees of freedom: 20609
-   182 CG iterations needed to obtain convergence.
+   136 CG iterations needed to obtain convergence.
 @endcode
 
 
@@ -45,26 +45,26 @@ format. They are depicted in the following:
 <table width="100%">
   <tr>
     <td>
-      <img src="https://www.dealii.org/images/steps/developer/step-5.solution-0-r9.2.png" alt="">
+      <img src="https://dealii.org/images/steps/developer/step-5.solution-0-r9.2.png" alt="">
     </td>
     <td>
-      <img src="https://www.dealii.org/images/steps/developer/step-5.solution-1-r9.2.png" alt="">
-    </td>
-  </tr>
-  <tr>
-    <td>
-      <img src="https://www.dealii.org/images/steps/developer/step-5.solution-2-r9.2.png" alt="">
-    </td>
-    <td>
-      <img src="https://www.dealii.org/images/steps/developer/step-5.solution-3-r9.2.png" alt="">
+      <img src="https://dealii.org/images/steps/developer/step-5.solution-1-r9.2.png" alt="">
     </td>
   </tr>
   <tr>
     <td>
-      <img src="https://www.dealii.org/images/steps/developer/step-5.solution-4-r9.2.png" alt="">
+      <img src="https://dealii.org/images/steps/developer/step-5.solution-2-r9.2.png" alt="">
     </td>
     <td>
-      <img src="https://www.dealii.org/images/steps/developer/step-5.solution-5-r9.2.png" alt="">
+      <img src="https://dealii.org/images/steps/developer/step-5.solution-3-r9.2.png" alt="">
+    </td>
+  </tr>
+  <tr>
+    <td>
+      <img src="https://dealii.org/images/steps/developer/step-5.solution-4-r9.2.png" alt="">
+    </td>
+    <td>
+      <img src="https://dealii.org/images/steps/developer/step-5.solution-5-r9.2.png" alt="">
     </td>
   </tr>
 </table>

@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2019 - 2020 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2020 - 2024 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 #include <deal.II/base/parameter_handler.h>
 
@@ -93,9 +92,17 @@ fail()
     }
   catch (const std::exception &exc)
     {
+      // Print everything after the "violated condition" part
+      // of the error message, assuming the condition is shown.
+      // If it isn't (because the condition was simply 'false' and
+      // so the error printing part suppresses this part), then
+      // show the part after "Additional information":
       std::string error = exc.what();
-      auto        start = error.find("The violated condition was:");
-      if (start != std::string::npos)
+      if (auto start = error.find("The violated condition was:");
+          start != std::string::npos)
+        deallog << error.substr(start) << std::endl;
+      else if (auto start = error.find("Additional information:");
+               start != std::string::npos)
         deallog << error.substr(start) << std::endl;
     }
 
@@ -106,9 +113,13 @@ fail()
     }
   catch (const std::exception &exc)
     {
+      // Same as above:
       std::string error = exc.what();
-      auto        start = error.find("The violated condition was:");
-      if (start != std::string::npos)
+      if (auto start = error.find("The violated condition was:");
+          start != std::string::npos)
+        deallog << error.substr(start) << std::endl;
+      else if (auto start = error.find("Additional information:");
+               start != std::string::npos)
         deallog << error.substr(start) << std::endl;
     }
 }

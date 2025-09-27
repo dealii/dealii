@@ -16,13 +16,13 @@ as it should.
 <table align="center" class="tutorial" cellspacing="3" cellpadding="3">
   <tr>
      <td align="center">
-        <img src="https://www.dealii.org/images/steps/developer/step-44.Q1-P0_convergence.png" alt="">
+        <img src="https://dealii.org/images/steps/developer/step-44.Q1-P0_convergence.png" alt="">
 	<p align="center">
         Convergence of the $Q_1-DGPM_0-DGPM_0$ formulation in 3-d.
 	</p>
     </td>
     <td align="center">
-        <img src="https://www.dealii.org/images/steps/developer/step-44.Q2-P1_convergence.png" alt="">
+        <img src="https://dealii.org/images/steps/developer/step-44.Q2-P1_convergence.png" alt="">
 	<p align="center">
         Convergence of the $Q_2-DGPM_1-DGPM_1$ formulation in 3-d.
 	</p>
@@ -138,19 +138,19 @@ and is opposite to the physically realistic interpretation of pressure.
 <table align="center" class="tutorial" cellspacing="3" cellpadding="3">
   <tr>
     <td align="center">
-        <img src="https://www.dealii.org/images/steps/developer/step-44.Q1-P0_gr_1_p_ratio_80-displacement.png" alt="">
+        <img src="https://dealii.org/images/steps/developer/step-44.Q1-P0_gr_1_p_ratio_80-displacement.png" alt="">
 	<p align="center">
         Z-displacement solution for the 3-d problem.
 	</p>
     </td>
     <td align="center">
-        <img src="https://www.dealii.org/images/steps/developer/step-44.Q1-P0_gr_1_p_ratio_80-pressure.png" alt="">
+        <img src="https://dealii.org/images/steps/developer/step-44.Q1-P0_gr_1_p_ratio_80-pressure.png" alt="">
 	<p align="center">
         Discontinuous piece-wise constant pressure field.
 	</p>
     </td>
      <td align="center">
-        <img src="https://www.dealii.org/images/steps/developer/step-44.Q1-P0_gr_1_p_ratio_80-dilatation.png" alt="">
+        <img src="https://dealii.org/images/steps/developer/step-44.Q1-P0_gr_1_p_ratio_80-dilatation.png" alt="">
 	<p align="center">
         Discontinuous piece-wise constant dilatation field.
 	</p>
@@ -179,19 +179,19 @@ and could be smoothed on a continuous grid for the post-processing purposes.
 <table align="center" class="tutorial" cellspacing="3" cellpadding="3">
   <tr>
     <td align="center">
-        <img src="https://www.dealii.org/images/steps/developer/step-44.Q2-P1_gr_3_p_ratio_80-displacement.png" alt="">
+        <img src="https://dealii.org/images/steps/developer/step-44.Q2-P1_gr_3_p_ratio_80-displacement.png" alt="">
 	<p align="center">
         Z-displacement solution for the 3-d problem.
 	</p>
     </td>
     <td align="center">
-        <img src="https://www.dealii.org/images/steps/developer/step-44.Q2-P1_gr_3_p_ratio_80-pressure.png" alt="">
+        <img src="https://dealii.org/images/steps/developer/step-44.Q2-P1_gr_3_p_ratio_80-pressure.png" alt="">
 	<p align="center">
         Discontinuous linear pressure field.
 	</p>
     </td>
     <td align="center">
-        <img src="https://www.dealii.org/images/steps/developer/step-44.Q2-P1_gr_3_p_ratio_80-dilatation.png" alt="">
+        <img src="https://dealii.org/images/steps/developer/step-44.Q2-P1_gr_3_p_ratio_80-dilatation.png" alt="">
 	<p align="center">
         Discontinuous linear dilatation field.
 	</p>
@@ -224,7 +224,7 @@ some finite-strain problems involving alternative constitutive models.
 <table align="center" class="tutorial" cellspacing="3" cellpadding="3">
   <tr>
      <td align="center">
-        <img src="https://www.dealii.org/images/steps/developer/step-44.Normalised_runtime.png" alt="">
+        <img src="https://dealii.org/images/steps/developer/step-44.Normalised_runtime.png" alt="">
 	<p align="center">
         Runtime on a 4-core machine, normalised against the lowest grid resolution $Q_1-DGPM_0-DGPM_0$ solution that utilised a SSOR preconditioner.
 	</p>
@@ -242,13 +242,13 @@ displacement field, although qualitatively similar, is different to that of the 
 <table align="center" class="tutorial" cellspacing="3" cellpadding="3">
   <tr>
     <td align="center">
-        <img src="https://www.dealii.org/images/steps/developer/step-44.2d-gr_2.png" alt="">
+        <img src="https://dealii.org/images/steps/developer/step-44.2d-gr_2.png" alt="">
 	<p align="center">
         Y-displacement solution in 2-d for 2 global grid refinement levels.
 	</p>
     </td>
     <td align="center">
-        <img src="https://www.dealii.org/images/steps/developer/step-44.2d-gr_5.png" alt="">
+        <img src="https://dealii.org/images/steps/developer/step-44.2d-gr_5.png" alt="">
 	<p align="center">
         Y-displacement solution in 2-d for 5 global grid refinement levels.
 	</p>
@@ -256,7 +256,7 @@ displacement field, although qualitatively similar, is different to that of the 
   </tr>
 </table>
 
-<a name="extensions"></a>
+<a name="step-44-extensions"></a>
 <h3>Possibilities for extensions</h3>
 
 There are a number of obvious extensions for this work:
@@ -285,11 +285,17 @@ There are a number of obvious extensions for this work:
   include dynamic effects would be necessary to study problems where
   inertial effects are important, e.g. problems involving impact.
 - Load and solution limiting procedures may be necessary for highly
-  nonlinear problems. It is possible to add a linesearch algorithm to
+  nonlinear problems. It is possible to add a line search algorithm to
   limit the step size within a Newton increment to ensure optimum
   convergence. It may also be necessary to use a load limiting method,
   such as the Riks method, to solve unstable problems involving
   geometric instability such as buckling and snap-through.
+- While we're on the topic of nonlinear solvers: As mentioned in the
+  introduction, we should really not have to implement a full-fledged
+  Newton scheme ourselves. There are implementations that have line
+  search and other algorithmic improvements already built in. step-77
+  demonstrates how this can be done, and it would not be terribly
+  difficult to adapt the current program to that as well.
 - Many physical problems involve contact. It is possible to include
   the effect of frictional or frictionless contact between objects
   into this program. This would involve the addition of an extra term

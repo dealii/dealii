@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2017 - 2023 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2017 - 2024 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 #ifndef dealii_physics_notation_h
 #define dealii_physics_notation_h
@@ -248,33 +247,7 @@ namespace Physics
      * include no such factors.
      *
      * Some useful references that show how this notation works include, amongst
-     * others,
-     * @code{.bib}
-     * @article{Nagel2016,
-     *   author  = {Nagel, T. and G{\"o}rke, U-J. and Moerman, K. and Kolditz,
-     *              O.},
-     *   title   = {On advantages of the Kelvin mapping in finite element
-     *              implementations of deformation processes},
-     *   journal = {Environmental Earth Sciences},
-     *   year    = {2016},
-     *   volume  = {75},
-     *   number  = {11},
-     *   pages   = {937}
-     * }
-     * @endcode
-     * and
-     * @code{.bib}
-     * @article{Dellinger1998,
-     *   author  = {Dellinger, J. and Vasicek, D. and Sondergeld, C.},
-     *   title   = {Kelvin notation for stabilizing elastic-constant inversion},
-     *   journal = {Revue de l'Institut Fran{\c{c}}ais du P{\'e}trole},
-     *   year    = {1998},
-     *   volume  = {53},
-     *   number  = {5},
-     *   pages   = {709--719},
-     *   url     = {http://sepwww.stanford.edu/oldsep/joe/Reprints/8IWSA.pdf},
-     * }
-     * @endcode
+     * others, @cite Nagel2016 and @cite Dellinger1998
      * as well as the online reference found on
      * <a
      * href="https://en.wikipedia.org/wiki/Voigt_notation#Mandel_notation">this

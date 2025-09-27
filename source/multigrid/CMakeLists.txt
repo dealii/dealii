@@ -1,24 +1,23 @@
-## ---------------------------------------------------------------------
+## ------------------------------------------------------------------------
 ##
-## Copyright (C) 2012 - 2023 by the deal.II authors
+## SPDX-License-Identifier: LGPL-2.1-or-later
+## Copyright (C) 2012 - 2025 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
-## The deal.II library is free software; you can use it, redistribute
-## it, and/or modify it under the terms of the GNU Lesser General
-## Public License as published by the Free Software Foundation; either
-## version 2.1 of the License, or (at your option) any later version.
-## The full text of the license can be found in the file LICENSE.md at
-## the top level directory of deal.II.
+## Part of the source code is dual licensed under Apache-2.0 WITH
+## LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+## governing the source code and code contributions can be found in
+## LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 ##
-## ---------------------------------------------------------------------
+## ------------------------------------------------------------------------
 
 set(_unity_include_src
   mg_base.cc
+  mg_constrained_dofs.cc
   mg_level_global_transfer.cc
   mg_transfer_block.cc
   mg_transfer_component.cc
-  mg_transfer_global_coarsening.cc
   mg_transfer_internal.cc
   mg_transfer_prebuilt.cc
   multigrid.cc
@@ -26,6 +25,7 @@ set(_unity_include_src
 
 set(_separate_src
   mg_tools.cc
+  mg_transfer_global_coarsening.cc
   mg_transfer_matrix_free.cc
   )
 
@@ -40,6 +40,7 @@ setup_source_list("${_unity_include_src}"
 
 set(_inst
   mg_base.inst.in
+  mg_constrained_dofs.inst.in
   mg_level_global_transfer.inst.in
   mg_tools.inst.in
   mg_transfer_block.inst.in
@@ -51,9 +52,11 @@ set(_inst
   multigrid.inst.in
   )
 
-file(GLOB _header
+file(GLOB _header CONFIGURE_DEPENDS
   ${CMAKE_SOURCE_DIR}/include/deal.II/multigrid/*.h
   )
 
 define_object_library(object_multigrid OBJECT ${_src} ${_header} ${_inst})
 expand_instantiations(object_multigrid "${_inst}")
+
+collect_source_and_header_files("${_unity_include_src};${_separate_src}" "${_header}")

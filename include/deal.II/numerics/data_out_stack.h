@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 1999 - 2023 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 1999 - 2024 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 #ifndef dealii_data_out_stack_h
 #define dealii_data_out_stack_h
@@ -20,7 +19,7 @@
 #include <deal.II/base/config.h>
 
 #include <deal.II/base/data_out_base.h>
-#include <deal.II/base/smartpointer.h>
+#include <deal.II/base/observer_pointer.h>
 
 #include <deal.II/lac/vector.h>
 
@@ -51,8 +50,8 @@ class DoFHandler;
  * We will explain the concept for a time dependent problem, but instead of
  * the time any parameter can be substituted. In our example, a solution of an
  * equation is computed for each discrete time level. This is then added to an
- * object of the present class and after all time levels are added, a space-
- * time plot will be written in any of the output formats supported by the
+ * object of the present class and after all time levels are added, a
+ * space-time plot will be written in any of the output formats supported by the
  * base class. Upon output, the (spatial) solution on each time level is
  * extended into the time direction by writing it twice, once for the time
  * level itself and once for a time equal to the time level minus a given time
@@ -324,7 +323,7 @@ private:
    * DoF handler to be used for the data corresponding to the present
    * parameter value.
    */
-  SmartPointer<const DoFHandler<dim, spacedim>, DataOutStack<dim, spacedim>>
+  ObserverPointer<const DoFHandler<dim, spacedim>, DataOutStack<dim, spacedim>>
     dof_handler;
 
   /**

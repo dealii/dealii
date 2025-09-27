@@ -1,12 +1,10 @@
-<br>
-
 <i>This program was contributed by Luca Heltai (thanks to Michael
 Gratton for pointing out what the exact solution should have been in
 the three dimensional case).  </i>
 
 @dealiiTutorialDOI{10.5281/zenodo.495473,https://zenodo.org/badge/DOI/10.5281/zenodo.495473.svg}
 
-<a name="Intro"></a>
+<a name="step_34-Intro"></a>
 
 <h1>Introduction</h1>
 
@@ -655,15 +653,11 @@ will be <code>Triangulation@<2,3@></code>, and correspondingly we will use
 <code>DoFHandler@<2,3@></code> as the DoF handler class and
 <code>FE_Q@<2,3@></code> for finite elements.
 
-Some further details on what one can do with things that live on
-curved manifolds can be found in the report
-<a target="_top"
-href="http://www.dealii.org/reports/codimension-one/desimone-heltai-manigrasso.pdf"><i>Tools
-for the Solution of PDEs Defined on Curved Manifolds with the deal.II
-Library</i> by A. DeSimone, L. Heltai, C. Manigrasso</a>. In addition, the
-step-38 tutorial program extends what we show here to cases where the equation
-posed on the manifold is not an integral operator but in fact involves
-derivatives.
+Some further details on what one can do with things that live on curved
+manifolds can be found in the paper @cite HeltaiBangerthKronbichler-2021. In
+addition, the step-38 tutorial program extends what we show here to cases where
+the equation posed on the manifold is not an integral operator but in fact
+involves derivatives.
 
 
 <h3>Testcase</h3>
@@ -675,15 +669,15 @@ will then be attached to the triangulation to allow mesh refinement
 that respects the continuous geometry behind the discrete initial
 mesh.
 
-For a sphere of radius $a$ translating at a velocity of $U$ in the $x$ direction, the potential reads
+For a sphere of radius $a$ in dimension $d$, translating at a velocity of $U$ in the $x$ direction, the potential reads
 @f{align*}{
-\phi = -\frac{1}{2}U \left(\frac{a}{r}\right)3 r \cos\theta
+\phi = -\frac{1}{d-1} U \left(\frac{a^d}{r^{d-1}}\right) \cos\theta
 @f}
 see, e.g. J. N. Newman, <i>Marine Hydrodynamics</i>, 1977,
-pp. 127. For unit speed and radius, and restricting $(x,y,z)$ to lie
+pp. 133 @cite Newman1977. For unit speed and radius, and restricting the point to lie
 on the surface of the sphere,
 $\phi = -x/2$. In the test problem,
-the flow is $(1,1,1)$, so the appropriate exact solution on the
+the flow is unitary in each coordinate direction, i.e., $(1,1)$ in dimension two and $(1,1,1)$ in dimension #3#, so the appropriate exact solution on the
 surface of the sphere is the superposition of the above solution with
-the analogous solution along the $y$ and $z$ axes, or $\phi =
-\frac{1}{2}(x + y + z)$.
+the analogous solutions along the other axes, or $\phi =
+(x + y)$ in dimension two and $\phi = \frac{1}{2}(x + y + z)$ in dimension three.

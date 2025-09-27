@@ -1,20 +1,23 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2019 - 2021 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2020 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 
 // Test MatrixFreeTools::compute_diagonal() for a Laplace operator
+// If the flag 'use_categorization = true' is set, additional categorization
+// of cells according to their material_id is performed and enforced in
+// MatrixFree via MF::AD::cell_vectorization_categories_strict See
+// https://github.com/dealii/dealii/issues/16250 for more details.
 
 #include "compute_diagonal_util.h"
 
@@ -25,7 +28,7 @@ template <int dim,
           typename Number              = double,
           typename VectorizedArrayType = VectorizedArray<Number>>
 void
-test()
+test(bool use_categorization = false)
 {
   parallel::distributed::Triangulation<dim> tria(MPI_COMM_WORLD);
 
@@ -38,6 +41,15 @@ test()
       cell->set_refine_flag();
   tria.execute_coarsening_and_refinement();
 
+  if (use_categorization)
+    {
+      for (auto &cell : tria.active_cell_iterators())
+        if (cell->is_active() && cell->is_locally_owned() &&
+            cell->center()[0] < 0.0)
+          cell->set_material_id(42);
+        else
+          cell->set_material_id(0);
+    }
   const FE_Q<dim>     fe_q(fe_degree);
   const FESystem<dim> fe(fe_q, n_components);
 
@@ -59,6 +71,18 @@ test()
   typename MatrixFree<dim, Number, VectorizedArrayType>::AdditionalData
     additional_data;
   additional_data.mapping_update_flags = update_values | update_gradients;
+
+  if (use_categorization)
+    {
+      additional_data.cell_vectorization_category.resize(tria.n_active_cells());
+      for (const auto &cell : tria.active_cell_iterators())
+        if (cell->is_locally_owned())
+          additional_data
+            .cell_vectorization_category[cell->active_cell_index()] =
+            cell->material_id();
+
+      additional_data.cell_vectorization_categories_strict = true;
+    }
 
   MappingQ<dim> mapping(1);
   QGauss<1>     quad(fe_degree + 1);
@@ -96,4 +120,9 @@ main(int argc, char **argv)
 
   test<2, 1, 2, 1, float>(); // scalar
   test<2, 1, 2, 2, float>(); // vector
+
+  // Same as above, but testing additional categorization of vectorized cell
+  // batches
+  test<2, 1, 2, 1, float>(true); // scalar
+  test<2, 1, 2, 2, float>(true); // vector
 }

@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2008 - 2018 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2017 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 
 // create a shared tria mesh and partition
@@ -63,7 +62,7 @@ compare_meshes(parallel::shared::Triangulation<dim>      &shared_tria,
     {
       AssertThrow(shared_map[it->first] == it->second,
                   ExcMessage(
-                    "Not all CellIds map to correct level subdomain_ids."))
+                    "Not all CellIds map to correct level subdomain_ids."));
     }
 
 
@@ -88,14 +87,14 @@ compare_meshes(parallel::shared::Triangulation<dim>      &shared_tria,
     {
       if (cell1->level_subdomain_id() != numbers::artificial_subdomain_id)
         Assert(p4est_known_cells.find(cell1->id()) != p4est_known_cells.end(),
-               ExcMessage("Cell not known by processor."))
+               ExcMessage("Cell not known by processor."));
     }
   cell2 = p4est_tria.begin(), endc2 = p4est_tria.end();
   for (; cell2 != endc2; ++cell2)
     {
       if (cell2->level_subdomain_id() != numbers::artificial_subdomain_id)
         Assert(shared_known_cells.find(cell2->id()) != shared_known_cells.end(),
-               ExcMessage("Cell not known by processor."))
+               ExcMessage("Cell not known by processor."));
     }
 }
 

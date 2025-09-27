@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2020 - 2021 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2021 - 2024 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 
 
@@ -50,13 +49,13 @@ test(const unsigned int version)
 
   if (version == 0 || version == 1)
     GridGenerator::reference_cell(tria, ReferenceCells::Tetrahedron);
-  else if (version == 2)
+  else if (version == 2 || version == 3)
     GridGenerator::subdivided_hyper_cube_with_simplices(tria, 1);
 
   print(tria, "tria.0.vtk");
   if (version == 0 || version == 2)
     tria.refine_global(1);
-  else if (version == 1)
+  else if (version == 1 || version == 3)
     tria.refine_global(2);
 
   print(tria, "tria.1.vtk");
@@ -69,4 +68,5 @@ main()
   test(0); // coarse grid: 1 tet, n_refinements: 1
   test(1); // coarse grid: 1 tet, n_refinements: 2
   test(2); // coarse grid: 5 tets (cube), n_refinements: 1
+  test(3); // coarse grid: 5 tets (cube), n_refinements: 2
 }

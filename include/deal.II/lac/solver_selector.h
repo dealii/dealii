@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 1999 - 2022 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 1999 - 2024 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 #ifndef dealii_solver_selector_h
 #define dealii_solver_selector_h
@@ -19,7 +18,8 @@
 
 #include <deal.II/base/config.h>
 
-#include <deal.II/base/smartpointer.h>
+#include <deal.II/base/observer_pointer.h>
+#include <deal.II/base/template_constraints.h>
 
 #include <deal.II/lac/precondition.h>
 #include <deal.II/lac/solver.h>
@@ -88,7 +88,8 @@ DEAL_II_NAMESPACE_OPEN
  * access to that new solver.
  */
 template <typename VectorType = Vector<double>>
-class SolverSelector : public Subscriptor
+DEAL_II_CXX20_REQUIRES(concepts::is_vector_space_vector<VectorType>)
+class SolverSelector : public EnableObserverPointer
 {
 public:
   /**
@@ -116,12 +117,14 @@ public:
    * Solver procedure. Calls the @p solve function of the @p solver whose @p
    * SolverName was specified in the constructor.
    */
-  template <class Matrix, class Preconditioner>
-  void
-  solve(const Matrix         &A,
-        VectorType           &x,
-        const VectorType     &b,
-        const Preconditioner &precond) const;
+  template <typename MatrixType, typename PreconditionerType>
+  DEAL_II_CXX20_REQUIRES(
+    (concepts::is_linear_operator_on<MatrixType, VectorType> &&
+     concepts::is_linear_operator_on<PreconditionerType, VectorType>))
+  void solve(const MatrixType         &A,
+             VectorType               &x,
+             const VectorType         &b,
+             const PreconditionerType &precond) const;
 
   /**
    * Select a new solver. Note that all solver names used in this class are
@@ -203,7 +206,7 @@ protected:
    * Stores the @p SolverControl that is needed in the constructor of each @p
    * Solver class. This can be changed with @p set_control().
    */
-  SmartPointer<SolverControl, SolverSelector<VectorType>> control;
+  ObserverPointer<SolverControl, SolverSelector<VectorType>> control;
 
   /**
    * Stores the name of the solver.
@@ -247,6 +250,7 @@ private:
 
 
 template <typename VectorType>
+DEAL_II_CXX20_REQUIRES(concepts::is_vector_space_vector<VectorType>)
 SolverSelector<VectorType>::SolverSelector(const std::string &name,
                                            SolverControl     &solver_control)
   : solver_name(name)
@@ -256,8 +260,8 @@ SolverSelector<VectorType>::SolverSelector(const std::string &name,
 
 
 template <typename VectorType>
-void
-SolverSelector<VectorType>::select(const std::string &name)
+DEAL_II_CXX20_REQUIRES(concepts::is_vector_space_vector<VectorType>)
+void SolverSelector<VectorType>::select(const std::string &name)
 {
   solver_name = name;
 }
@@ -265,12 +269,15 @@ SolverSelector<VectorType>::select(const std::string &name)
 
 
 template <typename VectorType>
-template <class Matrix, class Preconditioner>
-void
-SolverSelector<VectorType>::solve(const Matrix         &A,
-                                  VectorType           &x,
-                                  const VectorType     &b,
-                                  const Preconditioner &precond) const
+DEAL_II_CXX20_REQUIRES(concepts::is_vector_space_vector<VectorType>)
+template <typename MatrixType, typename PreconditionerType>
+DEAL_II_CXX20_REQUIRES(
+  (concepts::is_linear_operator_on<MatrixType, VectorType> &&
+   concepts::is_linear_operator_on<PreconditionerType, VectorType>))
+void SolverSelector<VectorType>::solve(const MatrixType         &A,
+                                       VectorType               &x,
+                                       const VectorType         &b,
+                                       const PreconditionerType &precond) const
 {
   if (solver_name == "richardson")
     {
@@ -309,8 +316,8 @@ SolverSelector<VectorType>::solve(const Matrix         &A,
 
 
 template <typename VectorType>
-void
-SolverSelector<VectorType>::set_control(SolverControl &ctrl)
+DEAL_II_CXX20_REQUIRES(concepts::is_vector_space_vector<VectorType>)
+void SolverSelector<VectorType>::set_control(SolverControl &ctrl)
 {
   control = &ctrl;
 }
@@ -318,8 +325,8 @@ SolverSelector<VectorType>::set_control(SolverControl &ctrl)
 
 
 template <typename VectorType>
-std::string
-SolverSelector<VectorType>::get_solver_names()
+DEAL_II_CXX20_REQUIRES(concepts::is_vector_space_vector<VectorType>)
+std::string SolverSelector<VectorType>::get_solver_names()
 {
   return "richardson|cg|bicgstab|gmres|fgmres|minres";
 }
@@ -327,8 +334,8 @@ SolverSelector<VectorType>::get_solver_names()
 
 
 template <typename VectorType>
-void
-SolverSelector<VectorType>::set_data(
+DEAL_II_CXX20_REQUIRES(concepts::is_vector_space_vector<VectorType>)
+void SolverSelector<VectorType>::set_data(
   const typename SolverGMRES<VectorType>::AdditionalData &data)
 {
   gmres_data = data;
@@ -337,8 +344,8 @@ SolverSelector<VectorType>::set_data(
 
 
 template <typename VectorType>
-void
-SolverSelector<VectorType>::set_data(
+DEAL_II_CXX20_REQUIRES(concepts::is_vector_space_vector<VectorType>)
+void SolverSelector<VectorType>::set_data(
   const typename SolverFGMRES<VectorType>::AdditionalData &data)
 {
   fgmres_data = data;
@@ -347,8 +354,8 @@ SolverSelector<VectorType>::set_data(
 
 
 template <typename VectorType>
-void
-SolverSelector<VectorType>::set_data(
+DEAL_II_CXX20_REQUIRES(concepts::is_vector_space_vector<VectorType>)
+void SolverSelector<VectorType>::set_data(
   const typename SolverRichardson<VectorType>::AdditionalData &data)
 {
   richardson_data = data;
@@ -357,8 +364,8 @@ SolverSelector<VectorType>::set_data(
 
 
 template <typename VectorType>
-void
-SolverSelector<VectorType>::set_data(
+DEAL_II_CXX20_REQUIRES(concepts::is_vector_space_vector<VectorType>)
+void SolverSelector<VectorType>::set_data(
   const typename SolverCG<VectorType>::AdditionalData &data)
 {
   cg_data = data;
@@ -367,8 +374,8 @@ SolverSelector<VectorType>::set_data(
 
 
 template <typename VectorType>
-void
-SolverSelector<VectorType>::set_data(
+DEAL_II_CXX20_REQUIRES(concepts::is_vector_space_vector<VectorType>)
+void SolverSelector<VectorType>::set_data(
   const typename SolverMinRes<VectorType>::AdditionalData &data)
 {
   minres_data = data;
@@ -377,8 +384,8 @@ SolverSelector<VectorType>::set_data(
 
 
 template <typename VectorType>
-void
-SolverSelector<VectorType>::set_data(
+DEAL_II_CXX20_REQUIRES(concepts::is_vector_space_vector<VectorType>)
+void SolverSelector<VectorType>::set_data(
   const typename SolverBicgstab<VectorType>::AdditionalData &data)
 {
   bicgstab_data = data;

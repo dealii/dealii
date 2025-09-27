@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2002 - 2022 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2002 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 #ifndef dealii_sparse_matrix_ez_templates_h
 #define dealii_sparse_matrix_ez_templates_h
@@ -41,7 +40,7 @@ SparseMatrixEZ<number>::SparseMatrixEZ()
 
 template <typename number>
 SparseMatrixEZ<number>::SparseMatrixEZ(const SparseMatrixEZ<number> &m)
-  : Subscriptor(m)
+  : EnableObserverPointer(m)
   , n_columns(0)
   , increment(m.increment)
   , saved_default_row_length(m.saved_default_row_length)
@@ -70,7 +69,6 @@ template <typename number>
 SparseMatrixEZ<number> &
 SparseMatrixEZ<number>::operator=(const SparseMatrixEZ<number> &m)
 {
-  (void)m;
   Assert(m.empty(),
          ExcMessage("This operator can only be called if the provided right "
                     "hand side is an empty matrix. This operator can not be "
@@ -84,7 +82,6 @@ template <typename number>
 SparseMatrixEZ<number> &
 SparseMatrixEZ<number>::operator=(const double d)
 {
-  (void)d;
   Assert(d == 0, ExcScalarAssignmentOnlyForZeroValue());
 
   typename std::vector<Entry>::iterator       e   = data.begin();
@@ -102,11 +99,11 @@ SparseMatrixEZ<number>::operator=(const double d)
 
 template <typename number>
 void
-SparseMatrixEZ<number>::reinit(const size_type n_rows,
-                               const size_type n_cols,
-                               size_type       default_row_length,
-                               unsigned int    default_increment,
-                               size_type       reserve)
+SparseMatrixEZ<number>::reinit(const size_type    n_rows,
+                               const size_type    n_cols,
+                               const size_type    default_row_length,
+                               const unsigned int default_increment,
+                               const size_type    reserve)
 {
   clear();
 
@@ -485,7 +482,8 @@ SparseMatrixEZ<number>::print_formatted(std::ostream      &out,
                                         const bool         scientific,
                                         const unsigned int width_,
                                         const char        *zero_string,
-                                        const double       denominator) const
+                                        const double       denominator,
+                                        const char        *separator) const
 {
   AssertThrow(out.fail() == false, ExcIO());
   Assert(m() != 0, ExcNotInitialized());
@@ -516,9 +514,9 @@ SparseMatrixEZ<number>::print_formatted(std::ostream      &out,
         {
           const Entry *entry = locate(i, j);
           if (entry)
-            out << std::setw(width) << entry->value * denominator << ' ';
+            out << std::setw(width) << entry->value * denominator << separator;
           else
-            out << std::setw(width) << zero_string << ' ';
+            out << std::setw(width) << zero_string << separator;
         }
       out << std::endl;
     };

@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2009 - 2018 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2013 - 2024 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 
 
@@ -61,9 +60,9 @@ test()
   // DoFRenumbering::component_wise(dof_handler);
   deallog << "Number of dofs: " << dof_handler.n_dofs() << std::endl;
 
-  AffineConstraints<double>  constraints;
-  FEValuesExtractors::Vector velocities(1);
-  ComponentMask              mask = fe.component_mask(velocities);
+  AffineConstraints<double>        constraints;
+  const FEValuesExtractors::Vector velocities(1);
+  ComponentMask                    mask = fe.component_mask(velocities);
 
   deallog << "ComponentMask " << mask[0] << mask[1] << mask[2] << std::endl;
   DoFTools::make_zero_boundary_constraints(dof_handler, constraints, mask);

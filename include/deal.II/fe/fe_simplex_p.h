@@ -1,17 +1,16 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2020 - 2023 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2021 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 #ifndef dealii_fe_fe_p_h
 #define dealii_fe_fe_p_h
@@ -20,6 +19,7 @@
 
 #include <deal.II/base/mutex.h>
 #include <deal.II/base/polynomials_barycentric.h>
+#include <deal.II/base/types.h>
 
 #include <deal.II/fe/fe_poly.h>
 
@@ -43,6 +43,7 @@ public:
   FE_SimplexPoly(
     const BarycentricPolynomials<dim>              polynomials,
     const FiniteElementData<dim>                  &fe_data,
+    const bool                                     prolongation_is_additive,
     const std::vector<Point<dim>>                 &unit_support_points,
     const std::vector<std::vector<Point<dim - 1>>> unit_face_support_points,
     const FullMatrix<double>                      &interface_constraints);
@@ -64,6 +65,15 @@ public:
     const unsigned int         child,
     const RefinementCase<dim> &refinement_case =
       RefinementCase<dim>::isotropic_refinement) const override;
+
+  /**
+   * @see FiniteElement::face_to_cell_index()
+   */
+  virtual unsigned int
+  face_to_cell_index(const unsigned int                 face_dof_index,
+                     const unsigned int                 face,
+                     const types::geometric_orientation combined_orientation =
+                       numbers::default_geometric_orientation) const override;
 
   /**
    * @copydoc dealii::FiniteElement::get_restriction_matrix()
@@ -110,9 +120,11 @@ public:
 
 protected:
   /**
-   * Mutex used to guard computation of some internal lookup tables.
+   * Mutex variables used for protecting the initialization of restriction
+   * and embedding matrices.
    */
-  mutable Threads::Mutex mutex;
+  mutable Threads::Mutex restriction_matrix_mutex;
+  mutable Threads::Mutex prolongation_matrix_mutex;
 };
 
 
@@ -120,7 +132,8 @@ protected:
 /**
  * Implementation of a scalar Lagrange finite element $P_k$ that yields
  * the finite element space of continuous, piecewise polynomials of
- * degree $k$.
+ * degree $k$. The corresponding element on hypercube cells is FE_Q, on
+ * wegdes it is FE_WedgeP, and on pyramids it is FE_PyramidP.
  *
  * Also see
  * @ref simplex "Simplex support".
@@ -224,6 +237,17 @@ public:
   std::vector<std::pair<unsigned int, unsigned int>>
   hp_line_dof_identities(
     const FiniteElement<dim, spacedim> &fe_other) const override;
+
+  /**
+   * @copydoc dealii::FiniteElement::get_restriction_matrix()
+   *
+   * @note Only implemented for RefinementCase::isotropic_refinement.
+   */
+  virtual const FullMatrix<double> &
+  get_restriction_matrix(
+    const unsigned int         child,
+    const RefinementCase<dim> &refinement_case =
+      RefinementCase<dim>::isotropic_refinement) const override;
 };
 
 DEAL_II_NAMESPACE_CLOSE

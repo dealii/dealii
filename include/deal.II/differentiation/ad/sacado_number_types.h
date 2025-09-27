@@ -1,22 +1,38 @@
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //
-// Copyright (C) 2016 - 2023 by the deal.II authors
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2017 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
-// ---------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 #ifndef dealii_differentiation_ad_sacado_number_types_h
 #define dealii_differentiation_ad_sacado_number_types_h
 
 #include <deal.II/base/config.h>
+
+#include <deal.II/base/exceptions.h>
+#include <deal.II/base/numbers.h>
+
+#include <deal.II/differentiation/ad/ad_number_traits.h>
+#include <deal.II/differentiation/ad/ad_number_types.h>
+
+#ifdef DEAL_II_TRILINOS_WITH_SACADO
+// It appears that some versions of Trilinos do not directly or indirectly
+// include all the headers for all forward and reverse Sacado AD types
+// in Sacado.hpp, so we also directly include these here as a precaution:
+#  include <Sacado.hpp>
+#  include <Sacado_Fad_DFad.hpp>
+#  include <Sacado_trad.hpp>
+
+#  include <complex>
+#endif
 
 #include <type_traits>
 
@@ -61,28 +77,8 @@ namespace Differentiation
 } // namespace Differentiation
 
 
-DEAL_II_NAMESPACE_CLOSE
-
-
 
 #ifdef DEAL_II_TRILINOS_WITH_SACADO
-
-#  include <deal.II/base/exceptions.h>
-#  include <deal.II/base/numbers.h>
-
-#  include <deal.II/differentiation/ad/ad_number_traits.h>
-#  include <deal.II/differentiation/ad/ad_number_types.h>
-
-// It appears that some versions of Trilinos do not directly or indirectly
-// include all the headers for all forward and reverse Sacado AD types
-// in Sacado.hpp, so we also directly include these here as a precaution:
-#  include <Sacado.hpp>
-#  include <Sacado_Fad_DFad.hpp>
-#  include <Sacado_trad.hpp>
-
-#  include <complex>
-
-DEAL_II_NAMESPACE_OPEN
 
 
 namespace Differentiation
@@ -186,7 +182,7 @@ namespace Differentiation
       template <typename Number>
       struct SacadoNumberInfo<
         Number,
-        std::enable_if_t<std::is_arithmetic<std::decay_t<Number>>::value>>
+        std::enable_if_t<std::is_arithmetic_v<std::decay_t<Number>>>>
       {
         static const unsigned int n_supported_derivative_levels = 0;
       };
@@ -902,10 +898,9 @@ namespace Differentiation
 #  endif // DOXYGEN
 
 
+#endif // DEAL_II_TRILINOS_WITH_SACADO
+
 
 DEAL_II_NAMESPACE_CLOSE
-
-
-#endif // DEAL_II_TRILINOS_WITH_SACADO
 
 #endif
