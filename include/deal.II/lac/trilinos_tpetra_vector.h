@@ -214,6 +214,10 @@ namespace LinearAlgebra
          */
         operator Number() const;
 
+        void
+        update_ghost_values()
+        {}
+
         /**
          * Exception
          */
@@ -628,6 +632,13 @@ namespace LinearAlgebra
            const Number                       a,
            const Vector<Number, MemorySpace> &V);
 
+      void
+      sadd(const Number s, const Vector<Number, MemorySpace> &V)
+      {
+        sadd(s, 1., V);
+      }
+
+
       /**
        * A collective set operation: instead of setting individual elements of a
        * vector, this function allows to set a whole set of elements at once.
@@ -638,6 +649,14 @@ namespace LinearAlgebra
       set(const size_type  n_elements,
           const size_type *indices,
           const Number    *values);
+
+      void
+      set(const std::vector<size_type> &indices,
+          const std::vector<Number>    &values)
+      {
+        AssertDimension(indices.size(), values.size());
+        set(indices.size(), indices.data(), values.data());
+      }
 
       /**
        * Scale each element of this vector by the corresponding element in the
