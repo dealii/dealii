@@ -157,7 +157,7 @@ MGLevelGlobalTransfer<VectorType>::memory_consumption() const
 
 namespace
 {
-  template <int dim, int spacedim, typename Number>
+  template <int dim, int spacedim, typename Number, typename MemorySpace>
   void
   fill_internal(
     const DoFHandler<dim, spacedim>                &mg_dof,
@@ -167,8 +167,9 @@ namespace
     std::vector<Table<2, unsigned int>>            &copy_indices,
     std::vector<Table<2, unsigned int>>            &copy_indices_global_mine,
     std::vector<Table<2, unsigned int>>            &copy_indices_level_mine,
-    LinearAlgebra::distributed::Vector<Number>     &ghosted_global_vector,
-    MGLevelObject<LinearAlgebra::distributed::Vector<Number>>
+    LinearAlgebra::distributed::Vector<Number, MemorySpace>
+      &ghosted_global_vector,
+    MGLevelObject<LinearAlgebra::distributed::Vector<Number, MemorySpace>>
       &ghosted_level_vector)
   {
     // first go to the usual routine...
@@ -312,7 +313,7 @@ MGLevelGlobalTransfer<LinearAlgebra::distributed::Vector<Number, MemorySpace>>::
     {
       // note: variables not needed
       std::vector<Table<2, unsigned int>> solution_copy_indices_global_mine;
-      MGLevelObject<LinearAlgebra::distributed::Vector<Number>>
+      MGLevelObject<LinearAlgebra::distributed::Vector<Number, MemorySpace>>
         solution_ghosted_level_vector;
 
       fill_internal(mg_dof,
