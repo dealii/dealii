@@ -3252,7 +3252,7 @@ GridIn<dim, spacedim>::read_partitioned_msh(const std::string &file_prefix,
           coords[3 * i + d];
     }
 
-  // --- Collect physical groups for boundary and manifold info ---
+  // --- Collect physical groups for boundary and material info ---
   std::map<std::pair<int, int>, types::boundary_id> entity_to_boundary;
   std::map<std::pair<int, int>, types::material_id> entity_to_material;
 
@@ -3284,53 +3284,44 @@ GridIn<dim, spacedim>::read_partitioned_msh(const std::string &file_prefix,
 
   std::map<std::set<unsigned int>, types::boundary_id> boundary_face_map;
 
-  // Process all (dim-1)-dimensional entities for boundary/manifold assignment
+  // Process all (dim-1)-dimensional entities for boundary assignment
   for (const auto &e : entities)
-    {
-      if (e.first == dim - 1) // Faces in 3D, edges in 2D, vertices in 1D
-        {
-          types::boundary_id boundary_id = numbers::invalid_boundary_id;
+    if (auto it = entity_to_boundary.find({e.first, e.second});
+        e.first == dim - 1 && it != entity_to_boundary.end())
+      {
+        const types::boundary_id boundary_id = it->second;
 
-          // Check for boundary ID
-          if (auto it = entity_to_boundary.find({e.first, e.second});
-              it != entity_to_boundary.end())
-            boundary_id = it->second;
+        std::vector<int>                      element_types;
+        std::vector<std::vector<std::size_t>> element_ids, element_nodes;
 
-          if (boundary_id != numbers::invalid_boundary_id)
-            {
-              std::vector<int>                      element_types;
-              std::vector<std::vector<std::size_t>> element_ids, element_nodes;
+        // Get all elements on this (dim-1)-entity
+        gmsh::model::mesh::getElements(
+          element_types, element_ids, element_nodes, e.first, e.second);
 
-              // Get all elements on this (dim-1)-entity
-              gmsh::model::mesh::getElements(
-                element_types, element_ids, element_nodes, e.first, e.second);
+        for (unsigned int i = 0; i < element_types.size(); ++i)
+          {
+            if (element_ids[i].empty())
+              continue;
 
-              for (unsigned int i = 0; i < element_types.size(); ++i)
-                {
-                  if (element_ids[i].empty())
-                    continue;
+            const unsigned int n_nodes_per_elem =
+              element_nodes[i].size() / element_ids[i].size();
 
-                  const unsigned int n_nodes_per_elem =
-                    element_nodes[i].size() / element_ids[i].size();
+            for (unsigned int j = 0; j < element_ids[i].size(); ++j)
+              {
+                std::set<unsigned int> face_vertices;
+                for (unsigned int k = 0; k < n_nodes_per_elem; ++k)
+                  {
+                    std::size_t node_tag =
+                      element_nodes[i][j * n_nodes_per_elem + k];
+                    face_vertices.insert(node_tag_to_index[node_tag]);
+                  }
 
-                  for (unsigned int j = 0; j < element_ids[i].size(); ++j)
-                    {
-                      std::set<unsigned int> face_vertices;
-                      for (unsigned int k = 0; k < n_nodes_per_elem; ++k)
-                        {
-                          std::size_t node_tag =
-                            element_nodes[i][j * n_nodes_per_elem + k];
-                          face_vertices.insert(node_tag_to_index[node_tag]);
-                        }
-
-                      // Store boundary IDs for this face
-                      if (boundary_id != numbers::invalid_boundary_id)
-                        boundary_face_map[face_vertices] = boundary_id;
-                    }
-                }
-            }
-        }
-    }
+                // Store boundary IDs for this face
+                if (boundary_id != numbers::invalid_boundary_id)
+                  boundary_face_map[face_vertices] = boundary_id;
+              }
+          }
+      }
 
 
 

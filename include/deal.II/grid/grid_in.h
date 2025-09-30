@@ -618,11 +618,11 @@ public:
    * This will partition the mesh `{mesh_file_name}` into `n_partitions` parts,
    * include ghost cells, and write each partition to a separate file in `msh`
    * format. The same effect can be achieved by using the GMSH GUI to partition
-   * the mesh and export the individual parts, but make sure you enable the
+   * the mesh and export the individual parts, but make sure to enable the
    * export of ghost cells when doing so.
    *
    * The `msh` format is not the only one that is supported. For example: If we
-   * have a `vtk` mesh file named `input_file.vtk`, you could use the command:
+   * have a `vtk` mesh file named `mesh_file.vtk`, you could use the command:
    * @code
    * gmsh -format msh -part 4 -part_ghosts -part_split mesh_file.vtk
    * @endcode
