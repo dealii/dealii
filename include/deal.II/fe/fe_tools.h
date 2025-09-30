@@ -950,10 +950,27 @@ namespace FETools
    */
   template <int dim>
   std::pair<std::vector<unsigned int>, std::vector<unsigned int>>
-  cell_to_face_patch(const unsigned int &degree,
-                     const unsigned int &direction,
-                     const bool         &cell_hierarchical_numbering,
-                     const bool         &is_continuous);
+  cell_to_face_patch_numbering(const unsigned int &degree,
+                               const unsigned int &direction,
+                               const bool         &cell_hierarchical_numbering,
+                               const bool         &is_continuous);
+
+
+  /**
+   * @copydoc FETools::cell_to_face_patch_numbering()
+   *
+   * @deprecated Use FETools::cell_to_face_patch_numbering() instead.
+   */
+  template <int dim>
+  DEAL_II_DEPRECATED_EARLY_WITH_COMMENT(
+    "Use FETools::cell_to_face_patch_numbering() instead.")
+  std::pair<
+    std::vector<unsigned int>,
+    std::vector<unsigned int>> cell_to_face_patch(const unsigned int &degree,
+                                                  const unsigned int &direction,
+                                                  const bool &
+                                                    cell_hierarchical_numbering,
+                                                  const bool &is_continuous);
 
   /**
    * Given an index of a face DoF, compute the cell DoF index. This function is

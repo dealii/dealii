@@ -175,6 +175,9 @@ Timer::Timer(const MPI_Comm mpi_communicator, const bool sync_lap_times_)
 void
 Timer::start()
 {
+  if (running == false)
+    ++n_timed_laps;
+
   running = true;
 #ifdef DEAL_II_WITH_MPI
   if (sync_lap_times)
@@ -287,9 +290,18 @@ Timer::reset()
 {
   wall_times.reset();
   cpu_times.reset();
-  running = false;
+  running      = false;
+  n_timed_laps = 0;
   internal::TimerImplementation::clear_timing_data(last_lap_wall_time_data);
   internal::TimerImplementation::clear_timing_data(accumulated_wall_time_data);
+}
+
+
+
+unsigned int
+Timer::n_laps() const
+{
+  return n_timed_laps;
 }
 
 
@@ -301,6 +313,8 @@ TimerOutput::TimerOutput(std::ostream         &stream,
                          const OutputType      output_type)
   : output_frequency(output_frequency)
   , output_type(output_type)
+  , timer_all()
+  , sections()
   , out_stream(stream, true)
   , output_is_enabled(true)
   , mpi_communicator(MPI_COMM_SELF)
@@ -313,6 +327,8 @@ TimerOutput::TimerOutput(ConditionalOStream   &stream,
                          const OutputType      output_type)
   : output_frequency(output_frequency)
   , output_type(output_type)
+  , timer_all()
+  , sections()
   , out_stream(stream)
   , output_is_enabled(true)
   , mpi_communicator(MPI_COMM_SELF)
@@ -326,6 +342,8 @@ TimerOutput::TimerOutput(const MPI_Comm        mpi_communicator,
                          const OutputType      output_type)
   : output_frequency(output_frequency)
   , output_type(output_type)
+  , timer_all(mpi_communicator, /* sync_lap_times */ false)
+  , sections()
   , out_stream(stream, true)
   , output_is_enabled(true)
   , mpi_communicator(mpi_communicator)
@@ -339,6 +357,8 @@ TimerOutput::TimerOutput(const MPI_Comm        mpi_communicator,
                          const OutputType      output_type)
   : output_frequency(output_frequency)
   , output_type(output_type)
+  , timer_all(mpi_communicator, /* sync_lap_times */ false)
+  , sections()
   , out_stream(stream)
   , output_is_enabled(true)
   , mpi_communicator(mpi_communicator)
@@ -546,19 +566,19 @@ TimerOutput::print_summary() const
       // in case we want to write CPU times
       if (output_type != wall_times)
         {
-          double total_cpu_time =
-            Utilities::MPI::sum(timer_all.cpu_time(), mpi_communicator);
+          double total_cpu_time = timer_all.cpu_time();
 
-          // check that the sum of all times is less or equal than the total
-          // time. otherwise, we might have generated a lot of overhead in this
-          // function.
-          double check_time = 0.;
+          // check that the sum of all section times is less or equal than the
+          // total time. otherwise, we might have generated a lot of overhead in
+          // this function.
+          double total_cpu_time_in_sections = 0.;
           for (const auto &i : sections)
-            check_time += i.second.total_cpu_time;
+            total_cpu_time_in_sections += i.second.total_cpu_time;
 
-          const double time_gap = check_time - total_cpu_time;
-          if (time_gap > 0.0)
-            total_cpu_time = check_time;
+          const double section_overhead =
+            total_cpu_time_in_sections - total_cpu_time;
+          if (section_overhead > 0.0)
+            total_cpu_time = total_cpu_time_in_sections;
 
           // generate a nice table
           out_stream << "\n\n"
@@ -624,10 +644,10 @@ TimerOutput::print_summary() const
                      << "------------+------------+\n"
                      << std::endl;
 
-          if (time_gap > 0.0)
+          if (section_overhead > 0.0)
             out_stream
               << std::endl
-              << "Note: The sum of counted times is " << time_gap
+              << "Note: The sum of section times is " << section_overhead
               << " seconds larger than the total time.\n"
               << "(Timer function may have introduced too much overhead, or different\n"
               << "section timers may have run at the same time.)" << std::endl;
@@ -636,7 +656,7 @@ TimerOutput::print_summary() const
       // in case we want to write out wallclock times
       if (output_type != cpu_times)
         {
-          double total_wall_time = timer_all.wall_time();
+          const double total_wall_time = timer_all.wall_time();
 
           // now generate a nice table
           out_stream << "\n\n"
@@ -707,19 +727,18 @@ TimerOutput::print_summary() const
     // output_type == cpu_and_wall_times_grouped
     {
       const double total_wall_time = timer_all.wall_time();
-      double       total_cpu_time =
-        Utilities::MPI::sum(timer_all.cpu_time(), mpi_communicator);
+      double       total_cpu_time  = timer_all.cpu_time();
 
       // check that the sum of all times is less or equal than the total time.
       // otherwise, we might have generated a lot of overhead in this function.
-      double check_time = 0.;
-
+      double total_cpu_time_in_sections = 0.;
       for (const auto &i : sections)
-        check_time += i.second.total_cpu_time;
+        total_cpu_time_in_sections += i.second.total_cpu_time;
 
-      const double time_gap = check_time - total_cpu_time;
-      if (time_gap > 0.0)
-        total_cpu_time = check_time;
+      const double section_overhead =
+        total_cpu_time_in_sections - total_cpu_time;
+      if (section_overhead > 0.0)
+        total_cpu_time = total_cpu_time_in_sections;
 
       // generate a nice table
       out_stream << "\n\n+---------------------------------------------"
@@ -820,10 +839,10 @@ TimerOutput::print_summary() const
                  << "------------+------------+" << std::endl
                  << std::endl;
 
-      if (output_type != wall_times && time_gap > 0.0)
+      if (output_type != wall_times && section_overhead > 0.0)
         out_stream
           << std::endl
-          << "Note: The sum of counted times is " << time_gap
+          << "Note: The sum of section times is " << section_overhead
           << " seconds larger than the total time.\n"
           << "(Timer function may have introduced too much overhead, or different\n"
           << "section timers may have run at the same time.)" << std::endl;

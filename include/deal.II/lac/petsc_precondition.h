@@ -98,7 +98,10 @@ namespace PETScWrappers
     /**
      * Explicitly call setup. This is usually not needed since PETSc will
      * automatically call the setup function when needed.
+     *
+     * @deprecated setup() is now explicitly called during initialize().
      */
+    DEAL_II_DEPRECATED_EARLY
     void
     setup();
 

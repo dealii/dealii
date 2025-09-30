@@ -29,8 +29,14 @@
 #include <boost/serialization/serialization.hpp>
 
 #ifdef DEAL_II_GMSH_WITH_API
+#  include <deal.II/base/config.h>
+
+#  include <deal.II/grid/cell_id.h>
+#  include <deal.II/grid/tria_description.h>
+
 #  include <gmsh.h>
 #endif
+
 
 #include <algorithm>
 #include <cctype>
@@ -3131,6 +3137,235 @@ GridIn<dim, spacedim>::read_msh(const std::string &fname)
 }
 #endif
 
+
+
+#ifdef DEAL_II_GMSH_WITH_API
+template <int dim, int spacedim>
+void
+GridIn<dim, spacedim>::read_partitioned_msh(const std::string &file_prefix,
+                                            const std::string &file_suffix)
+{
+  auto *parallel_tria =
+    dynamic_cast<parallel::fullydistributed::Triangulation<dim, spacedim> *>(
+      tria.get());
+
+  // Check that the cast succeeded
+  AssertThrow(parallel_tria != nullptr,
+              ExcMessage("Triangulation is not fully distributed!"));
+
+  // Now it’s safe to call get_communicator()
+  MPI_Comm mpi_comm = parallel_tria->get_communicator();
+
+  const unsigned int nprocs = Utilities::MPI::n_mpi_processes(mpi_comm);
+  const unsigned int rank   = Utilities::MPI::this_mpi_process(mpi_comm);
+
+  std::string fname =
+    file_prefix + "_" + std::to_string(rank + 1) + "." + file_suffix;
+
+  if (nprocs == 1)
+    {
+      fname = file_prefix + "." + file_suffix;
+
+      AssertThrow(std::filesystem::exists(fname),
+                  ExcMessage("Missing mesh file: " + fname));
+    }
+  else
+    {
+      for (unsigned int i = 1; i <= nprocs; ++i)
+        {
+          const std::string check_fname =
+            file_prefix + "_" + std::to_string(i) + "." + file_suffix;
+
+          AssertThrow(std::filesystem::exists(check_fname),
+                      ExcMessage("Missing mesh file: " + check_fname));
+        }
+
+      const std::string extra_fname =
+        file_prefix + "_" + std::to_string(nprocs + 1) + "." + file_suffix;
+      AssertThrow(!std::filesystem::exists(extra_fname),
+                  ExcMessage("Expected " + std::to_string(nprocs) +
+                             " mesh files, but found extra: " + extra_fname));
+    }
+
+  const std::map<int, std::uint8_t> gmsh_to_dealii_type = {
+    {15, 0}, {1, 1}, {2, 2}, {3, 3}, {4, 4}, {7, 5}, {6, 6}, {5, 7}};
+
+  const std::array<std::vector<unsigned int>, 8> gmsh_to_dealii = {
+    {{0},
+     {0, 1},
+     {0, 1, 2},
+     {0, 1, 3, 2},
+     {0, 1, 2, 3},
+     {0, 1, 3, 2, 4},
+     {0, 1, 2, 3, 4, 5},
+     {0, 1, 3, 2, 4, 5, 7, 6}}};
+
+
+  gmsh::initialize();
+  gmsh::option::setNumber("General.Verbosity", 0);
+  gmsh::open(fname);
+
+  std::map<unsigned long, unsigned int> ghost_map;
+
+  std::vector<std::pair<int, int>> entities;
+  gmsh::model::getEntities(entities);
+
+  for (const auto &e : entities)
+    {
+      const int entity_dim = e.first;
+      const int entity_tag = e.second;
+
+      if (entity_dim == dim)
+        {
+          std::vector<std::size_t> element_tags;
+          std::vector<int>         partitions;
+
+          gmsh::model::mesh::getGhostElements(entity_dim,
+                                              entity_tag,
+                                              element_tags,
+                                              partitions);
+
+          for (std::size_t i = 0; i < element_tags.size(); ++i)
+            ghost_map[element_tags[i]] =
+              static_cast<unsigned int>(partitions[i] - 1);
+        }
+    }
+
+  std::vector<std::size_t> node_tags;
+  std::vector<double>      coords, parametric_coords;
+  gmsh::model::mesh::getNodes(node_tags, coords, parametric_coords);
+
+  TriangulationDescription::Description<dim, spacedim>
+    triangulation_description;
+  triangulation_description.comm = mpi_comm;
+
+  triangulation_description.cell_infos.resize(1);
+  triangulation_description.coarse_cell_vertices.resize(node_tags.size(),
+                                                        Point<spacedim>());
+
+  std::map<std::size_t, unsigned int> node_tag_to_index;
+  for (unsigned int i = 0; i < node_tags.size(); ++i)
+    {
+      node_tag_to_index[node_tags[i]] = i;
+      for (unsigned int d = 0; d < spacedim; ++d)
+        triangulation_description.coarse_cell_vertices[i][d] =
+          coords[3 * i + d];
+    }
+
+  // Count total volume elements and reserve space
+  std::size_t total_volume_elements = 0;
+  for (const auto &e : entities)
+    {
+      if (e.first == dim)
+        {
+          std::vector<int>                      count_element_types;
+          std::vector<std::vector<std::size_t>> count_element_ids,
+            count_element_nodes;
+          gmsh::model::mesh::getElements(count_element_types,
+                                         count_element_ids,
+                                         count_element_nodes,
+                                         e.first,
+                                         e.second);
+
+          for (unsigned int i = 0; i < count_element_ids.size(); ++i)
+            total_volume_elements += count_element_ids[i].size();
+        }
+    }
+
+  // Reserve space for all vectors that will grow during processing
+  triangulation_description.coarse_cells.reserve(total_volume_elements);
+  triangulation_description.coarse_cell_index_to_coarse_cell_id.reserve(
+    total_volume_elements);
+  triangulation_description.cell_infos[0].reserve(total_volume_elements);
+
+  for (const auto &e : entities)
+    {
+      const int entity_dim = e.first;
+      const int entity_tag = e.second;
+
+      if (entity_dim == dim)
+        {
+          std::vector<int>                      element_types;
+          std::vector<std::vector<std::size_t>> element_ids, element_nodes;
+
+          gmsh::model::mesh::getElements(
+            element_types, element_ids, element_nodes, entity_dim, entity_tag);
+          for (unsigned int i = 0; i < element_types.size(); ++i)
+            {
+              if (element_ids[i].empty())
+                continue;
+
+              const unsigned int n_vertices =
+                element_nodes[i].size() / element_ids[i].size();
+
+              for (unsigned int j = 0; j < element_ids[i].size(); ++j)
+                {
+                  CellData<dim> cell(n_vertices);
+                  cell.material_id = 0;
+
+                  const auto &type = gmsh_to_dealii_type.at(element_types[i]);
+
+                  for (unsigned int v = 0; v < n_vertices; ++v)
+                    {
+                      const std::size_t node_tag =
+                        element_nodes[i]
+                                     [j * n_vertices + gmsh_to_dealii[type][v]];
+                      AssertThrow(node_tag_to_index.find(node_tag) !=
+                                    node_tag_to_index.end(),
+                                  ExcMessage("Node tag " +
+                                             std::to_string(node_tag) +
+                                             " not found in node list!"));
+                      cell.vertices[v] = node_tag_to_index[node_tag];
+                    }
+
+                  triangulation_description.coarse_cells.push_back(cell);
+                  triangulation_description.coarse_cell_index_to_coarse_cell_id
+                    .push_back(element_ids[i][j]);
+
+                  TriangulationDescription::CellData<dim> cell_info;
+                  cell_info.id =
+                    CellId(element_ids[i][j], {}).template to_binary<dim>();
+
+                  auto it = ghost_map.find(element_ids[i][j]);
+                  if (it != ghost_map.end())
+                    cell_info.subdomain_id = it->second;
+                  else
+                    cell_info.subdomain_id = rank;
+
+                  cell_info.level_subdomain_id = cell_info.subdomain_id;
+
+                  triangulation_description.cell_infos[0].push_back(cell_info);
+                }
+            }
+        }
+    }
+
+  triangulation_description.settings =
+    TriangulationDescription::Settings::default_setting;
+
+  parallel_tria->create_triangulation(triangulation_description);
+
+
+#  ifdef DEAL_II_WITH_MPI
+  MPI_Barrier(mpi_comm);
+#  endif
+
+  gmsh::clear();
+  gmsh::finalize();
+}
+#else
+template <int dim, int spacedim>
+void
+GridIn<dim, spacedim>::read_partitioned_msh(const std::string &,
+                                            const std::string &)
+{
+  AssertThrow(
+    false,
+    ExcMessage(
+      "GridIn::read_partitioned_msh() requires the Gmsh API "
+      "to be installed, but it was not found when configuring deal.II."));
+}
+#endif // DEAL_II_GMSH_WITH_API
 
 
 template <int dim, int spacedim>

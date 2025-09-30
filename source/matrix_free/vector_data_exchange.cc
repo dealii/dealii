@@ -17,7 +17,6 @@
 #include <deal.II/base/mpi.templates.h>
 #include <deal.II/base/mpi_consensus_algorithms.h>
 #include <deal.II/base/partitioner.h>
-#include <deal.II/base/timer.h>
 
 #include <deal.II/matrix_free/vector_data_exchange.h>
 
