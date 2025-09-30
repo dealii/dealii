@@ -19,10 +19,25 @@
 
 #include <deal.II/base/enable_observer_pointer.h>
 #include <deal.II/base/exceptions.h>
+#include <deal.II/base/index_set.h>
 
 #include <deal.II/lac/full_matrix.h>
 #include <deal.II/lac/sparse_matrix.h>
 #include <deal.II/lac/vector.h>
+
+#ifdef DEAL_II_WITH_MPI
+#  include <deal.II/base/partitioner.h>
+#endif
+
+#ifdef DEAL_II_WITH_TRILINOS
+#  include <deal.II/lac/trilinos_sparse_matrix.h>
+#  include <deal.II/lac/trilinos_vector.h>
+#endif
+
+#ifdef DEAL_II_WITH_PETSC
+#  include <deal.II/lac/petsc_sparse_matrix.h>
+#  include <deal.II/lac/petsc_vector.h>
+#endif
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -253,6 +268,33 @@ private:
    * not.
    */
   bool converged;
+
+  /**
+   * IndexSet storing the locally owned rows of the matrix.
+   */
+  IndexSet locally_owned_rows;
+
+  /**
+   * IndexSet storing the locally owned column indexes of the column scaling.
+   */
+  IndexSet locally_owned_cols;
+
+  /**
+   * IndexSet storing the ghost column indexes of the column scaling.
+   */
+  IndexSet ghost_columns;
+
+  /**
+   * Vector storing the owner rank of each ghost column index.
+   */
+  std::vector<types::global_dof_index> ghost_column_owners;
+
+#ifdef DEAL_II_WITH_MPI
+  /**
+   * Partitioner for communications.
+   */
+  Utilities::MPI::Partitioner partitioner;
+#endif
 
   /**
    * Implementation of the l1 scaling iterations in the symmetry preserving
