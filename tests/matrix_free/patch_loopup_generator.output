@@ -1,0 +1,151 @@
+
+DEAL::=========================================
+DEAL::===========START GENERATION==============
+DEAL::=========================================
+DEAL::
+DEAL::
+DEAL::Number of DoFs: 25
+DEAL::Internal DoF numbering: 0 6 1 4 8 5 2 7 3 
+DEAL::Number of interior DoFs: 9
+DEAL::Number of boundary DoFs: 16
+DEAL::DoF indices for cell 0 after renumbering: 9 10 11 14 0 1 16 3 4 
+DEAL::DoF indices for cell 1 after renumbering: 11 12 13 1 2 15 4 5 17 
+DEAL::DoF indices for cell 2 after renumbering: 16 3 4 18 6 7 20 21 22 
+DEAL::DoF indices for cell 3 after renumbering: 4 5 17 7 8 19 22 23 24 
+DEAL::Skipped DoF local indices for cell 0: 0 1 2 3 6 
+DEAL::Skipped DoF local indices for cell 1: 0 1 2 5 8 
+DEAL::Skipped DoF local indices for cell 2: 0 3 6 7 8 
+DEAL::Skipped DoF local indices for cell 3: 2 5 6 7 8 
+DEAL::Cell 0 to Patch mapping (cell_dof_idx, patch_dof_idx): (4, 0 , 0) (5, 1 , 0) (7, 3 , 0) (8, 4 , 0) 
+DEAL::Number of non-overlapping DoFs : 4
+DEAL::Cell 1 to Patch mapping (cell_dof_idx, patch_dof_idx): (4, 2 , 0) (7, 5 , 0) (3, 1 , 1) (6, 4 , 1) 
+DEAL::Number of non-overlapping DoFs : 2
+DEAL::Cell 2 to Patch mapping (cell_dof_idx, patch_dof_idx): (4, 6 , 0) (5, 7 , 0) (1, 3 , 1) (2, 4 , 1) 
+DEAL::Number of non-overlapping DoFs : 2
+DEAL::Cell 3 to Patch mapping (cell_dof_idx, patch_dof_idx): (4, 8 , 0) (0, 4 , 1) (1, 5 , 1) (3, 7 , 1) 
+DEAL::Number of non-overlapping DoFs : 1
+DEAL::
+================================
+
+DEAL::template <>
+struct CellPatchLookup<2, 2>
+ {
+using Index = unsigned int;
+DEAL::  using Pair = std::pair<Index, Index>;
+
+ static constexpr  Index  n_cells = 4 ;
+DEAL:: static constexpr  Index  n_patch_dofs = 9 ;
+DEAL::static constexpr std::array<Index, 4> n_skipped_dofs = {{5, 5, 5, 5}}; 
+
+DEAL::static constexpr std::array<std::array< Index , 5>, 4> skipped_dofs = {{
+DEAL::{{0, 1, 2, 3, 6}},
+DEAL::{{0, 1, 2, 5, 8}},
+DEAL::{{0, 3, 6, 7, 8}},
+DEAL::{{2, 5, 6, 7, 8}}
+DEAL::}};
+DEAL::
+ 
+DEAL::static constexpr std::array< Index, 4> n_cell_to_patch = {{4, 4, 4, 4}}; 
+
+DEAL::static constexpr std::array<std::array<Pair, 4>, 4> cell_to_patch = {{
+DEAL::{{Pair{4, 0}, Pair{5, 1}, Pair{7, 3}, Pair{8, 4}}},
+DEAL::{{Pair{4, 2}, Pair{7, 5}, Pair{3, 1}, Pair{6, 4}}},
+DEAL::{{Pair{4, 6}, Pair{5, 7}, Pair{1, 3}, Pair{2, 4}}},
+DEAL::{{Pair{4, 8}, Pair{0, 4}, Pair{1, 5}, Pair{3, 7}}}
+DEAL::}};
+DEAL::
+DEAL::static constexpr std::array<Index, 4> n_non_overlapping = {{4, 2, 2, 1}};
+
+DEAL::};
+DEAL::
+DEAL::
+DEAL::=========================================
+DEAL::=============END GENERATION==============
+DEAL::=========================================
+DEAL::=========================================
+DEAL::===========START GENERATION==============
+DEAL::=========================================
+DEAL::
+DEAL::
+DEAL::Number of DoFs: 125
+DEAL::Internal DoF numbering: 0 10 1 8 24 9 2 11 3 16 22 17 20 26 21 18 23 19 4 14 5 12 25 13 6 15 7 
+DEAL::Number of interior DoFs: 27
+DEAL::Number of boundary DoFs: 98
+DEAL::DoF indices for cell 0 after renumbering: 27 28 29 32 33 34 37 38 39 52 53 54 57 0 1 59 3 4 68 69 70 73 9 10 75 12 13 
+DEAL::DoF indices for cell 1 after renumbering: 29 30 31 34 35 36 39 40 41 54 55 56 1 2 58 4 5 60 70 71 72 10 11 74 13 14 76 
+DEAL::DoF indices for cell 2 after renumbering: 37 38 39 42 43 44 47 48 49 59 3 4 61 6 7 63 64 65 75 12 13 77 15 16 79 80 81 
+DEAL::DoF indices for cell 3 after renumbering: 39 40 41 44 45 46 49 50 51 4 5 60 7 8 62 65 66 67 13 14 76 16 17 78 81 82 83 
+DEAL::DoF indices for cell 4 after renumbering: 68 69 70 73 9 10 75 12 13 84 85 86 89 18 19 91 21 22 100 101 102 105 106 107 110 111 112 
+DEAL::DoF indices for cell 5 after renumbering: 70 71 72 10 11 74 13 14 76 86 87 88 19 20 90 22 23 92 102 103 104 107 108 109 112 113 114 
+DEAL::DoF indices for cell 6 after renumbering: 75 12 13 77 15 16 79 80 81 91 21 22 93 24 25 95 96 97 110 111 112 115 116 117 120 121 122 
+DEAL::DoF indices for cell 7 after renumbering: 13 14 76 16 17 78 81 82 83 22 23 92 25 26 94 97 98 99 112 113 114 117 118 119 122 123 124 
+DEAL::Skipped DoF local indices for cell 0: 0 1 2 3 4 5 6 7 8 9 10 11 12 15 18 19 20 21 24 
+DEAL::Skipped DoF local indices for cell 1: 0 1 2 3 4 5 6 7 8 9 10 11 14 17 18 19 20 23 26 
+DEAL::Skipped DoF local indices for cell 2: 0 1 2 3 4 5 6 7 8 9 12 15 16 17 18 21 24 25 26 
+DEAL::Skipped DoF local indices for cell 3: 0 1 2 3 4 5 6 7 8 11 14 15 16 17 20 23 24 25 26 
+DEAL::Skipped DoF local indices for cell 4: 0 1 2 3 6 9 10 11 12 15 18 19 20 21 22 23 24 25 26 
+DEAL::Skipped DoF local indices for cell 5: 0 1 2 5 8 9 10 11 14 17 18 19 20 21 22 23 24 25 26 
+DEAL::Skipped DoF local indices for cell 6: 0 3 6 7 8 9 12 15 16 17 18 19 20 21 22 23 24 25 26 
+DEAL::Skipped DoF local indices for cell 7: 2 5 6 7 8 11 14 15 16 17 18 19 20 21 22 23 24 25 26 
+DEAL::Cell 0 to Patch mapping (cell_dof_idx, patch_dof_idx): (13, 0 , 0) (14, 1 , 0) (16, 3 , 0) (17, 4 , 0) (22, 9 , 0) (23, 10 , 0) (25, 12 , 0) (26, 13 , 0) 
+DEAL::Number of non-overlapping DoFs : 8
+DEAL::Cell 1 to Patch mapping (cell_dof_idx, patch_dof_idx): (13, 2 , 0) (16, 5 , 0) (22, 11 , 0) (25, 14 , 0) (12, 1 , 1) (15, 4 , 1) (21, 10 , 1) (24, 13 , 1) 
+DEAL::Number of non-overlapping DoFs : 4
+DEAL::Cell 2 to Patch mapping (cell_dof_idx, patch_dof_idx): (13, 6 , 0) (14, 7 , 0) (22, 15 , 0) (23, 16 , 0) (10, 3 , 1) (11, 4 , 1) (19, 12 , 1) (20, 13 , 1) 
+DEAL::Number of non-overlapping DoFs : 4
+DEAL::Cell 3 to Patch mapping (cell_dof_idx, patch_dof_idx): (13, 8 , 0) (22, 17 , 0) (9, 4 , 1) (10, 5 , 1) (12, 7 , 1) (18, 13 , 1) (19, 14 , 1) (21, 16 , 1) 
+DEAL::Number of non-overlapping DoFs : 2
+DEAL::Cell 4 to Patch mapping (cell_dof_idx, patch_dof_idx): (13, 18 , 0) (14, 19 , 0) (16, 21 , 0) (17, 22 , 0) (4, 9 , 1) (5, 10 , 1) (7, 12 , 1) (8, 13 , 1) 
+DEAL::Number of non-overlapping DoFs : 4
+DEAL::Cell 5 to Patch mapping (cell_dof_idx, patch_dof_idx): (13, 20 , 0) (16, 23 , 0) (3, 10 , 1) (4, 11 , 1) (6, 13 , 1) (7, 14 , 1) (12, 19 , 1) (15, 22 , 1) 
+DEAL::Number of non-overlapping DoFs : 2
+DEAL::Cell 6 to Patch mapping (cell_dof_idx, patch_dof_idx): (13, 24 , 0) (14, 25 , 0) (1, 12 , 1) (2, 13 , 1) (4, 15 , 1) (5, 16 , 1) (10, 21 , 1) (11, 22 , 1) 
+DEAL::Number of non-overlapping DoFs : 2
+DEAL::Cell 7 to Patch mapping (cell_dof_idx, patch_dof_idx): (13, 26 , 0) (0, 13 , 1) (1, 14 , 1) (3, 16 , 1) (4, 17 , 1) (9, 22 , 1) (10, 23 , 1) (12, 25 , 1) 
+DEAL::Number of non-overlapping DoFs : 1
+DEAL::
+================================
+
+DEAL::template <>
+struct CellPatchLookup<3, 2>
+ {
+using Index = unsigned int;
+DEAL::  using Pair = std::pair<Index, Index>;
+
+ static constexpr  Index  n_cells = 8 ;
+DEAL:: static constexpr  Index  n_patch_dofs = 27 ;
+DEAL::static constexpr std::array<Index, 8> n_skipped_dofs = {{19, 19, 19, 19, 19, 19, 19, 19}}; 
+
+DEAL::static constexpr std::array<std::array< Index , 19>, 8> skipped_dofs = {{
+DEAL::{{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 15, 18, 19, 20, 21, 24}},
+DEAL::{{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 14, 17, 18, 19, 20, 23, 26}},
+DEAL::{{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 12, 15, 16, 17, 18, 21, 24, 25, 26}},
+DEAL::{{0, 1, 2, 3, 4, 5, 6, 7, 8, 11, 14, 15, 16, 17, 20, 23, 24, 25, 26}},
+DEAL::{{0, 1, 2, 3, 6, 9, 10, 11, 12, 15, 18, 19, 20, 21, 22, 23, 24, 25, 26}},
+DEAL::{{0, 1, 2, 5, 8, 9, 10, 11, 14, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26}},
+DEAL::{{0, 3, 6, 7, 8, 9, 12, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26}},
+DEAL::{{2, 5, 6, 7, 8, 11, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26}}
+DEAL::}};
+DEAL::
+ 
+DEAL::static constexpr std::array< Index, 8> n_cell_to_patch = {{8, 8, 8, 8, 8, 8, 8, 8}}; 
+
+DEAL::static constexpr std::array<std::array<Pair, 8>, 8> cell_to_patch = {{
+DEAL::{{Pair{13, 0}, Pair{14, 1}, Pair{16, 3}, Pair{17, 4}, Pair{22, 9}, Pair{23, 10}, Pair{25, 12}, Pair{26, 13}}},
+DEAL::{{Pair{13, 2}, Pair{16, 5}, Pair{22, 11}, Pair{25, 14}, Pair{12, 1}, Pair{15, 4}, Pair{21, 10}, Pair{24, 13}}},
+DEAL::{{Pair{13, 6}, Pair{14, 7}, Pair{22, 15}, Pair{23, 16}, Pair{10, 3}, Pair{11, 4}, Pair{19, 12}, Pair{20, 13}}},
+DEAL::{{Pair{13, 8}, Pair{22, 17}, Pair{9, 4}, Pair{10, 5}, Pair{12, 7}, Pair{18, 13}, Pair{19, 14}, Pair{21, 16}}},
+DEAL::{{Pair{13, 18}, Pair{14, 19}, Pair{16, 21}, Pair{17, 22}, Pair{4, 9}, Pair{5, 10}, Pair{7, 12}, Pair{8, 13}}},
+DEAL::{{Pair{13, 20}, Pair{16, 23}, Pair{3, 10}, Pair{4, 11}, Pair{6, 13}, Pair{7, 14}, Pair{12, 19}, Pair{15, 22}}},
+DEAL::{{Pair{13, 24}, Pair{14, 25}, Pair{1, 12}, Pair{2, 13}, Pair{4, 15}, Pair{5, 16}, Pair{10, 21}, Pair{11, 22}}},
+DEAL::{{Pair{13, 26}, Pair{0, 13}, Pair{1, 14}, Pair{3, 16}, Pair{4, 17}, Pair{9, 22}, Pair{10, 23}, Pair{12, 25}}}
+DEAL::}};
+DEAL::
+DEAL::static constexpr std::array<Index, 8> n_non_overlapping = {{8, 4, 4, 2, 4, 2, 2, 1}};
+
+DEAL::};
+DEAL::
+DEAL::
+DEAL::=========================================
+DEAL::=============END GENERATION==============
+DEAL::=========================================
