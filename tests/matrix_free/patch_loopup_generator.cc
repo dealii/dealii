@@ -1,3 +1,4 @@
+
 // ------------------------------------------------------------------------
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
@@ -12,8 +13,25 @@
 //
 // ------------------------------------------------------------------------
 
-// check basic functionality of PatchStorage: initialization on a mesh with a
-// single patch
+
+// Generate compile-time lookup tables that map local cell DoF indices into a
+// single-patch numbering used by matrix-free patch ops. Intended for a
+// single-patch mesh obtained by refining the unit hypercube once.
+//
+//  - Build a hypercube triangulation, refine once, use FE_Q(fe_degree).
+//  - Distribute DoFs, renumber so boundary DoFs are moved to the back.
+//  - Use FEEvaluation's internal ordering to get local->global indices.
+//  - Record per-cell skipped (boundary) local indices and per-cell
+//    (local_index -> patch_index) mappings; mark overlaps (first occurrence
+//    is non-overlapping). Unused entries are filled with
+// numbers::invalid_unsigned_int.
+//  - Write support-point gnuplot data and emit a C++ template specialization
+//    (printed to deallog or stdout) with the constexpr arrays.
+//
+// Usage: ./patch_loopup_generator [fe_degree] (default fe_degree = 2)
+//
+// Assumptions: single patch (2^dim children), interior DoFs occupy indices
+// [0, n_interior_dofs) after renumbering.
 
 #include <deal.II/base/numbers.h>
 #include <deal.II/base/point.h>
