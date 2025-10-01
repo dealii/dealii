@@ -199,6 +199,16 @@ main(int argc, char **argv)
   test<2, 5>();
   test<2, 6>();
   test<2, 7>();
+
+
+  test<3, 1>();
+  test<3, 2>();
+  test<3, 3>();
+
+  test<3, 4>();
+  test<3, 5>();
+  test<3, 6>();
+  test<3, 7>();
   deallog << "Tests finished." << std::endl;
 
   return 0; // Indicate success
