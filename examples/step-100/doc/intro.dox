@@ -159,9 +159,9 @@ In addition, the continuity requirements along faces and edges (the skeleton of 
     H^{-1/2}(\partial K)              & = \text{tr}_{\text{div}}(H(\text{div}, \Omega_h)) := \prod_{K \in \Omega_h}  (\mathbf{n}_K \cdot \textbf{v} ) \big|_{\partial K}
 @f}
 
-<h4>Application to the accoustic Helmholtz equation</h4>
+<h4>Application to the acoustic Helmholtz equation</h4>
 
-<!-- Application to ultra-weak form of Helmhotlz equation-->
+<!-- Application to ultra-weak form of Helmholtz equation-->
 Now if we apply the DPG method to the acoustic Helmholtz ultraweak formulation presented above, we get the following :
 @f{align*}{
 & p^* \in L^2(\Omega), \mathbf{u} \in (L^2(\Omega))^d \\
