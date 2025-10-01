@@ -40,6 +40,3 @@ As an extension to get a feeling of the method, one could first try to implement
     \mathbf{u} & = \frac{1}{c_s} \begin{pmatrix} \cos(\theta) \sin(\phi)  \\ \sin(\theta) \sin(\phi) \\ \cos(\phi) \end{pmatrix} e^{-i k (x \cos(\theta) \sin{\phi} + y \sin(\theta) \sin(\phi) + z \cos(\phi))}.
 @f}
 Another interesting extension would be to reconstruct the residual $\Psi^r$ when the solutions on the faces and interior dofs are known and use it to build an error estimator that can be utilized for adaptive hp-refinement. Finally, if one is interested more specifically in time-harmonic problems, the implementation of an adequate preconditioner to improve the algorithm convergence of the linear solver would  remedy to one of the inherent difficulties for this type of problem.
-
-
-
