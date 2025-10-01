@@ -22,7 +22,7 @@ set(FEATURE_TRILINOS_DEPENDS MPI)
 # A list of optional Trilinos modules we use:
 #
 set(_deal_ii_trilinos_optional_modules
-  Amesos2 Belos EpetraExt Ifpack2 Kokkos MueLu NOX ROL Sacado SEACAS Tpetra Xpetra Zoltan 
+  Amesos2 Belos EpetraExt Ifpack2 Kokkos MueLu NOX ROL Sacado SEACAS ShyLU_DDFROSch Tpetra Xpetra Zoltan 
 )
 
 #
@@ -396,6 +396,107 @@ macro(feature_trilinos_find_external var)
         reset_cmake_required()
       endif()
 
+    endif()
+
+    if(TRILINOS_WITH_SHYLU_DDFROSCH)
+      #
+      # Check if FROSch is actually usable.
+      #
+      list(APPEND CMAKE_REQUIRED_INCLUDES ${Trilinos_INCLUDE_DIRS})
+      list(APPEND CMAKE_REQUIRED_INCLUDES ${MPI_CXX_INCLUDE_PATH})
+
+      list(APPEND CMAKE_REQUIRED_LIBRARIES ${DEAL_II_LIBRARIES} ${Trilinos_LIBRARIES} ${MPI_LIBRARIES})
+      list(APPEND CMAKE_REQUIRED_FLAGS ${TRILINOS_CXX_FLAGS})
+
+      # For the case of Trilinos being compiled with openmp support the
+      # following Tpetra test needs -fopenmp to succeed. Make sure that we
+      # supply the correct compiler and linker flags:
+      add_flags(CMAKE_REQUIRED_FLAGS "${DEAL_II_CXX_FLAGS} ${DEAL_II_LINKER_FLAGS}")
+
+      if(DEAL_II_WITH_64BIT_INDICES)
+        set(_global_index_type "long long")
+      else()
+        set(_global_index_type "int")
+      endif()
+
+      if(TRILINOS_VERSION VERSION_GREATER 14.2)
+        set(_node_type "Tpetra::KokkosClassic::DefaultNode::DefaultNodeType")
+      else()
+        set(_node_type "KokkosClassic::DefaultNode::DefaultNodeType")
+      endif()
+
+      CHECK_CXX_SOURCE_COMPILES(
+        "
+        #include <Teuchos_RCP.hpp>
+        #include <Xpetra_DefaultPlatform.hpp>
+        #include <Xpetra_MapFactory_decl.hpp>
+        #include <Xpetra_CrsMatrixWrap.hpp>
+        
+        #include <Galeri_XpetraMaps.hpp>
+        #include <Galeri_XpetraProblemFactory.hpp>
+        
+        #include <FROSch_Tools_decl.hpp>
+        #include <FROSch_Tools_def.hpp>
+        #include <FROSch_OneLevelPreconditioner_def.hpp>
+        
+        int
+        main(int argc, char *argv[])
+        {
+          Teuchos::GlobalMPISession mpiSession(&argc, &argv, NULL);
+        
+          using SC = double;
+          using LO = int;
+          using GO = ${_global_index_type};
+          using NO = ${_node_type};
+        
+          Teuchos::RCP<const Teuchos::Comm<int>> comm =
+            Teuchos::rcp(new Teuchos::SerialComm<int>());
+          Teuchos::RCP<Teuchos::ParameterList> parameters =
+            Teuchos::rcp(new Teuchos::ParameterList());
+        
+          Teuchos::RCP<Xpetra::Matrix<SC, LO, GO, NO>> dummy_matrix;
+          { // The Matrix must not be empty
+            Teuchos::ParameterList GaleriList;
+            GaleriList.set(\"nx\", 10);
+            GaleriList.set(\"ny\", 10);
+            GaleriList.set(\"nz\", 10);
+            GaleriList.set(\"mx\", 1);
+            GaleriList.set(\"my\", 1);
+            GaleriList.set(\"mz\", 1);
+            auto nodeMap = Galeri::Xpetra::CreateMap<LO, GO, NO>(Xpetra::UseTpetra,
+                                                                 \"Cartesian2D\",
+                                                                 comm,
+                                                                 GaleriList);
+            auto problem =
+              Galeri::Xpetra::BuildProblem<SC,
+                                           LO,
+                                           GO,
+                                           Xpetra::Map<LO, GO, NO>,
+                                           Xpetra::CrsMatrixWrap<SC, LO, GO, NO>,
+                                           Xpetra::MultiVector<SC, LO, GO, NO>>(
+                \"Laplace2D\", nodeMap, GaleriList);
+            dummy_matrix = problem->BuildMatrix();
+          }
+        
+          Teuchos::rcp(
+            new FROSch::OneLevelPreconditioner<SC, LO, GO, NO>(dummy_matrix.getConst(),
+                                                               parameters));
+        
+          return 0;
+        }
+        "
+        TRILINOS_SHYLU_DDFROSCH_IS_FUNCTIONAL
+      )
+
+      reset_cmake_required()
+
+      if(NOT TRILINOS_SHYLU_DDFROSCH_IS_FUNCTIONAL)
+        message(
+          STATUS
+          "FROSch was found but is not usable! Disabling FROSch support."
+        )
+        set(TRILINOS_WITH_SHYLU_DDFROSCH OFF)
+      endif()
     endif()
 
     if(TRILINOS_WITH_XPETRA)
