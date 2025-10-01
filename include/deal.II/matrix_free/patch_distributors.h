@@ -95,7 +95,7 @@ namespace PatchDistributors
    * It supports arbitrary polynomial degree values (subject to the
    * degree >= 1 assertion).
    */
-  template <PatchDoFsOrder dofs_set_type, int dim, int degree>
+  template <int dim, int degree, PatchDoFsOrder dofs_set_type>
   class Dynamic
   {
   public:
@@ -126,11 +126,23 @@ namespace PatchDistributors
     const constexpr static std::size_t n_dofs =
       Utilities::fixed_power<dim>(n_dofs_per_patch_1d);
 
-    const static unsigned int n_patch_dofs =
+    const static unsigned int n_patch_dofs_static =
       Utilities::fixed_power<dim>(n_dofs_per_patch_1d);
 
     const static unsigned int n_interior_patch_dofs =
       Utilities::fixed_power<dim>(n_dofs_per_patch_1d - 2);
+
+
+    static constexpr unsigned int
+    n_patch_dofs() noexcept
+    {
+      if constexpr (dofs_set_type == FEQinterior)
+        return n_interior_patch_dofs;
+      if constexpr (dofs_set_type == FEQall)
+        return n_patch_dofs_static;
+      Assert(false, ExcNotImplemented());
+      return 0;
+    }
   };
 
 
@@ -244,12 +256,12 @@ namespace PatchDistributors
 
 
 
-  template <PatchDoFsOrder dofs_set_type, int dim, int degree>
+  template <int dim, int degree, PatchDoFsOrder dofs_set_type>
   template <typename RegularOperation,
             typename DuplicatesOperation,
             typename SkippedOperation>
   inline void
-  Dynamic<dofs_set_type, dim, degree>::loop(
+  Dynamic<dim, degree, dofs_set_type>::loop(
     const RegularOperation    &regular_operation,
     const DuplicatesOperation &duplicates_operation,
     const SkippedOperation    &skipped_operation) const

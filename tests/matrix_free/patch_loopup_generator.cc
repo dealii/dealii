@@ -33,6 +33,9 @@
 // Assumptions: single patch (2^dim children), interior DoFs occupy indices
 // [0, n_interior_dofs) after renumbering.
 
+// Uncomment to write output to std::cout instead of deallog
+// #define USE_STDCOUT
+
 #include <deal.II/base/numbers.h>
 #include <deal.II/base/point.h>
 
