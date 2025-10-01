@@ -224,15 +224,15 @@ public:
   scale_system_solution(VectorType &sol) const;
 
   /**
-   * Return a const reference to the row scaling (i.e. the diagonal of the row
-   * scaling matrix).
+   * Return a const reference to the (local in distributed setting) row scaling
+   * (i.e. the diagonal of the row scaling matrix).
    */
   const Vector<double> &
   get_row_scaling() const;
 
   /**
-   * Return a const reference to the column scaling (i.e. the diagonal of the
-   * column scaling matrix).
+   * Return a const reference to the (local in distributed setting) column
+   * scaling (i.e. the diagonal of the column scaling matrix).
    */
   const Vector<double> &
   get_column_scaling() const;
@@ -252,14 +252,14 @@ private:
   AdditionalData control;
 
   /**
-   * Vector that contains the row scaling (i.e. the diagonal of the row
-   * scaling matrix).
+   * Vector that contains the (local in distributed setting) row scaling (i.e.
+   * the diagonal of the row scaling matrix).
    */
   Vector<double> row_scaling;
 
   /**
-   * Vector that contains the column scaling (i.e. the diagonal of the column
-   * scaling matrix).
+   * Vector that contains the (local in distributed setting) column scaling
+   * (i.e. the diagonal of the column scaling matrix).
    */
   Vector<double> column_scaling;
 

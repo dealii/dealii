@@ -159,23 +159,23 @@ MatrixScaling::scale_matrix(Matrix &matrix)
         {
           case MatrixScaling::AdditionalData::ScalingAlgorithm::sinkhorn_knopp:
             {
-              // sk_scaling(matrix,
-              //            control.sinkhorn_knopp_parameters.max_iterations);
+              sk_scaling(matrix,
+                         control.sinkhorn_knopp_parameters.max_iterations);
             }
             break;
           case MatrixScaling::AdditionalData::ScalingAlgorithm::
             l1_linf_symmetry_preserving:
             {
-              // if (control.l1linf_parameters.start_inf_norm_steps > 0 &&
-              //     !converged)
-              //   linfty_scaling(matrix,
-              //                  control.l1linf_parameters.start_inf_norm_steps);
+              if (control.l1linf_parameters.start_inf_norm_steps > 0 &&
+                  !converged)
+                linfty_scaling(matrix,
+                               control.l1linf_parameters.start_inf_norm_steps);
               if (control.l1linf_parameters.l1_norm_steps > 0 && !converged)
                 l1_scaling(matrix, control.l1linf_parameters.l1_norm_steps);
-              // if (control.l1linf_parameters.end_inf_norm_steps > 0 &&
-              //     !converged)
-              //   linfty_scaling(matrix,
-              //                  control.l1linf_parameters.end_inf_norm_steps);
+              if (control.l1linf_parameters.end_inf_norm_steps > 0 &&
+                  !converged)
+                linfty_scaling(matrix,
+                               control.l1linf_parameters.end_inf_norm_steps);
             }
             break;
         }
@@ -194,8 +194,11 @@ void
 MatrixScaling::scale_linear_system(Matrix &matrix, VectorType &rhs)
 {
   AssertDimension(matrix.m(), rhs.size());
+  AssertDimension(matrix.m(), matrix.n());
 
-  if constexpr (is_supported_matrix<Matrix>())
+  if constexpr (is_supported_matrix<Matrix>() ||
+                std::is_same_v<Matrix, TrilinosWrappers::SparseMatrix> ||
+                std::is_same_v<Matrix, PETScWrappers::MPI::SparseMatrix>)
     scale_matrix(matrix);
   else
     Assert(false, ExcNotImplemented());
@@ -209,6 +212,22 @@ MatrixScaling::scale_linear_system(Matrix &matrix, VectorType &rhs)
       for (unsigned int i = 0; i < rhs.size(); ++i)
         rhs[i] *= row_scaling[i];
     }
+  else if constexpr (std::is_same_v<VectorType,
+                                    TrilinosWrappers::MPI::Vector> ||
+                     std::is_same_v<VectorType, PETScWrappers::MPI::Vector>)
+    {
+      Assert(matrix.locally_owned_range_indices() ==
+               rhs.locally_owned_elements(),
+             ExcMessage("Matrix and vector must have the same partitioning"));
+      std::vector<double> local_updates(row_scaling.size());
+      for (auto i : locally_owned_rows)
+        {
+          auto local_idx           = partitioner.global_to_local(i);
+          local_updates[local_idx] = rhs[i] * row_scaling[local_idx];
+        }
+      rhs.set(locally_owned_rows.get_index_vector(), local_updates);
+      rhs.compress(VectorOperation::insert);
+    }
   else
     Assert(false, ExcNotImplemented());
 }
@@ -219,16 +238,33 @@ template <class VectorType>
 void
 MatrixScaling::scale_system_solution(VectorType &sol) const
 {
-  AssertDimension(sol.size(), column_scaling.size());
-
   if constexpr (std::is_same_v<VectorType, dealii::Vector<double>> ||
                 std::is_same_v<VectorType, dealii::Vector<float>>)
-    sol.scale(column_scaling);
+    {
+      AssertDimension(sol.size(), column_scaling.size());
+      sol.scale(column_scaling);
+    }
   else if constexpr (std::is_same_v<VectorType, dealii::BlockVector<double>> ||
                      std::is_same_v<VectorType, dealii::BlockVector<float>>)
     {
+      AssertDimension(sol.size(), column_scaling.size());
       for (unsigned int i = 0; i < sol.size(); ++i)
         sol[i] *= column_scaling[i];
+    }
+  else if constexpr (std::is_same_v<VectorType,
+                                    TrilinosWrappers::MPI::Vector> ||
+                     std::is_same_v<VectorType, PETScWrappers::MPI::Vector>)
+    {
+      Assert(locally_owned_cols == sol.locally_owned_elements(),
+             ExcMessage("Matrix and vector must have the same partitioning"));
+      std::vector<double> local_updates(column_scaling.size());
+      for (auto i : locally_owned_cols)
+        {
+          auto local_idx           = partitioner.global_to_local(i);
+          local_updates[local_idx] = sol[i] * column_scaling[local_idx];
+        }
+      sol.set(locally_owned_cols.get_index_vector(), local_updates);
+      sol.compress(VectorOperation::insert);
     }
   else
     Assert(false, ExcNotImplemented());
@@ -320,8 +356,6 @@ MatrixScaling::l1_scaling(Matrix &matrix, const unsigned int nsteps)
   else if constexpr (std::is_same_v<Matrix, TrilinosWrappers::SparseMatrix> ||
                      std::is_same_v<Matrix, PETScWrappers::MPI::SparseMatrix>)
     {
-      // To implement
-
       Vector<double> local_row_norms(locally_owned_rows.n_elements());
       Vector<double> local_col_norms(locally_owned_cols.n_elements());
       std::map<types::global_dof_index, double>
@@ -379,6 +413,29 @@ MatrixScaling::l1_scaling(Matrix &matrix, const unsigned int nsteps)
                   local_col_norms[local_idx] += contribution;
                 }
             }
+
+          // Convergence check
+          {
+            Vector<double> row_norms_check = local_row_norms;
+            Vector<double> col_norms_check = local_col_norms;
+
+            row_norms_check.add(-1.0);
+            col_norms_check.add(-1.0);
+
+            bool local_not_converged =
+              !(row_norms_check.l1_norm() < control.scaling_tolerance &&
+                col_norms_check.l1_norm() < control.scaling_tolerance);
+
+            bool any_not_converged =
+              Utilities::MPI::logical_or(local_not_converged,
+                                         matrix.get_mpi_communicator());
+
+            if (!any_not_converged)
+              {
+                converged = true;
+                break;
+              }
+          }
 
           for (unsigned int i = 0; i < local_row_norms.size(); ++i)
             row_scaling[i] /= std::sqrt(local_row_norms[i]);
@@ -450,9 +507,15 @@ MatrixScaling::l1_scaling(Matrix &matrix, const unsigned int nsteps)
                                    std::sqrt(col_norms *
                                              local_row_norms[local_row_idx]));
                     }
-                  matrix.compress(VectorOperation::insert);
+                  // This is atrocious, PETSc needs it, this NEEDS to be changed
+                  if constexpr (std::is_same_v<
+                                  Matrix,
+                                  PETScWrappers::MPI::SparseMatrix>)
+                    matrix.compress(VectorOperation::insert);
                 }
             }
+          if constexpr (std::is_same_v<Matrix, TrilinosWrappers::SparseMatrix>)
+            matrix.compress(VectorOperation::insert);
         }
     }
 }
@@ -463,55 +526,229 @@ template <class Matrix>
 void
 MatrixScaling::linfty_scaling(Matrix &matrix, const unsigned int nsteps)
 {
-  using Number = typename Matrix::value_type;
-
-  Vector<Number> row_norms(matrix.m());
-  Vector<Number> col_norms(matrix.n());
-
-  for (unsigned int i = 0; i < nsteps; i++)
+  if constexpr (is_supported_matrix<Matrix>())
     {
-      row_norms = 0;
-      col_norms = 0;
+      using Number = typename Matrix::value_type;
 
-      for (unsigned int row = 0; row < matrix.m(); ++row)
+      Vector<Number> row_norms(matrix.m());
+      Vector<Number> col_norms(matrix.n());
+
+      for (unsigned int i = 0; i < nsteps; i++)
         {
-          for (auto it = matrix.begin(row); it != matrix.end(row); ++it)
+          row_norms = 0;
+          col_norms = 0;
+
+          for (unsigned int row = 0; row < matrix.m(); ++row)
             {
-              row_norms[row] = std::max(row_norms[row], std::abs(it->value()));
-              col_norms[it->column()] =
-                std::max(col_norms[it->column()], std::abs(it->value()));
+              for (auto it = matrix.begin(row); it != matrix.end(row); ++it)
+                {
+                  row_norms[row] =
+                    std::max(row_norms[row], std::abs(it->value()));
+                  col_norms[it->column()] =
+                    std::max(col_norms[it->column()], std::abs(it->value()));
+                }
+            }
+
+          // Check convergence. Sum and add again. Alternative is copying every
+          // time the whole vectors and subtractin -1
+          row_norms.add(-1.0);
+          col_norms.add(-1.0);
+          if (row_norms.linfty_norm() < control.scaling_tolerance &&
+              col_norms.linfty_norm() < control.scaling_tolerance)
+            {
+              converged = true;
+              break;
+            }
+          row_norms.add(1.0);
+          col_norms.add(1.0);
+
+          for (unsigned int row = 0; row < matrix.m(); ++row)
+            {
+              for (auto it = matrix.begin(row); it != matrix.end(row); ++it)
+                {
+                  // it->value() /=
+                  //   std::sqrt(row_norms[row] * col_norms[it->column()]);
+                  matrix.set(row,
+                             it->column(),
+                             it->value() / std::sqrt(row_norms[row] *
+                                                     col_norms[it->column()]));
+                }
+              row_scaling[row] /= std::sqrt(row_norms[row]);
+            }
+          for (unsigned int col = 0; col < matrix.n(); ++col)
+            {
+              column_scaling[col] /= std::sqrt(col_norms[col]);
             }
         }
+    }
+  else if constexpr (std::is_same_v<Matrix, TrilinosWrappers::SparseMatrix> ||
+                     std::is_same_v<Matrix, PETScWrappers::MPI::SparseMatrix>)
+    {
+      Vector<double> local_row_norms(locally_owned_rows.n_elements());
+      Vector<double> local_col_norms(locally_owned_cols.n_elements());
+      std::map<types::global_dof_index, double>
+        partial_column_norms; // column -> local norm
 
-      // Check convergence. Sum and add again. Alternative is copying every time
-      // the whole vectors and subtractin -1
-      row_norms.add(-1.0);
-      col_norms.add(-1.0);
-      if (row_norms.linfty_norm() < control.scaling_tolerance &&
-          col_norms.linfty_norm() < control.scaling_tolerance)
+      for (unsigned int i = 0; i < nsteps; i++)
         {
-          converged = true;
-          break;
-        }
-      row_norms.add(1.0);
-      col_norms.add(1.0);
+          local_row_norms = 0;
+          local_col_norms = 0;
+          partial_column_norms.clear();
 
-      for (unsigned int row = 0; row < matrix.m(); ++row)
-        {
-          for (auto it = matrix.begin(row); it != matrix.end(row); ++it)
+          for (auto row = locally_owned_rows.begin();
+               row != locally_owned_rows.end();
+               ++row)
             {
-              // it->value() /=
-              //   std::sqrt(row_norms[row] * col_norms[it->column()]);
-              matrix.set(row,
-                         it->column(),
-                         it->value() /
-                           std::sqrt(row_norms[row] * col_norms[it->column()]));
+              auto local_row_idx = partitioner.global_to_local(*row);
+              for (auto it = matrix.begin(*row); it != matrix.end(*row); ++it)
+                {
+                  local_row_norms[local_row_idx] =
+                    std::max(local_row_norms[local_row_idx],
+                             std::abs(it->value()));
+                  partial_column_norms[it->column()] =
+                    std::max(partial_column_norms[it->column()],
+                             std::abs(it->value()));
+                }
             }
-          row_scaling[row] /= std::sqrt(row_norms[row]);
-        }
-      for (unsigned int col = 0; col < matrix.n(); ++col)
-        {
-          column_scaling[col] /= std::sqrt(col_norms[col]);
+          // Communicate partial column norms
+          std::map<unsigned int,
+                   std::vector<std::pair<types::global_dof_index, double>>>
+            send_data;
+
+          for (const auto &[col_idx, norm_value] : partial_column_norms)
+            {
+              if (locally_owned_cols.is_element(col_idx))
+                {
+                  unsigned int local_idx = partitioner.global_to_local(col_idx);
+                  local_col_norms[local_idx] = norm_value;
+                }
+              else
+                {
+                  auto ghost_pos = ghost_columns.index_within_set(col_idx);
+                  unsigned int target_rank = ghost_column_owners[ghost_pos];
+
+                  send_data[target_rank].emplace_back(col_idx, norm_value);
+                }
+            }
+
+          auto received_data =
+            Utilities::MPI::some_to_some(matrix.get_mpi_communicator(),
+                                         send_data);
+
+          // Process received data and fill local_col_norms
+          for (const auto &[sender_rank, pairs] : received_data)
+            {
+              for (const auto &[global_col, contribution] : pairs)
+                {
+                  unsigned int local_idx =
+                    partitioner.global_to_local(global_col);
+                  local_col_norms[local_idx] =
+                    std::max(local_col_norms[local_idx], contribution);
+                }
+            }
+
+          // Convergence check
+          {
+            Vector<double> row_norms_check = local_row_norms;
+            Vector<double> col_norms_check = local_col_norms;
+
+            row_norms_check.add(-1.0);
+            col_norms_check.add(-1.0);
+
+            bool local_not_converged =
+              !(row_norms_check.linfty_norm() < control.scaling_tolerance &&
+                col_norms_check.linfty_norm() < control.scaling_tolerance);
+
+            bool any_not_converged =
+              Utilities::MPI::logical_or(local_not_converged,
+                                         matrix.get_mpi_communicator());
+
+            if (!any_not_converged)
+              {
+                converged = true;
+                break;
+              }
+          }
+
+          for (unsigned int i = 0; i < local_row_norms.size(); ++i)
+            row_scaling[i] /= std::sqrt(local_row_norms[i]);
+          for (unsigned int i = 0; i < local_col_norms.size(); ++i)
+            column_scaling[i] /= std::sqrt(local_col_norms[i]);
+
+          // Communicate column norm values to all ranks that need them
+          std::map<unsigned int,
+                   std::vector<std::pair<types::global_dof_index, double>>>
+            send_column_norms;
+
+          // For each rank that requested column norm data from me,
+          // send them the corresponding column norms updated
+          for (const auto &[sender_rank, pairs] : received_data)
+            {
+              for (const auto &[global_col, norm_contribution] : pairs)
+                {
+                  // I received norm data for global_col, so sender_rank needs
+                  // my scaling value for global_col
+                  if (locally_owned_cols.is_element(global_col))
+                    {
+                      unsigned int local_idx =
+                        partitioner.global_to_local(global_col);
+                      send_column_norms[sender_rank].emplace_back(
+                        global_col, local_col_norms[local_idx]);
+                    }
+                }
+            }
+
+          auto received_column_norms =
+            Utilities::MPI::some_to_some(matrix.get_mpi_communicator(),
+                                         send_column_norms);
+
+          std::map<types::global_dof_index, double> ghost_column_norms_lookup;
+          for (const auto &[sender_rank, pairs] : received_column_norms)
+            {
+              for (const auto &[col_id, norm_val] : pairs)
+                {
+                  ghost_column_norms_lookup[col_id] = norm_val;
+                }
+            }
+
+          // scale the matrix
+          for (auto row = locally_owned_rows.begin();
+               row != locally_owned_rows.end();
+               ++row)
+            {
+              auto local_row_idx = partitioner.global_to_local(*row);
+              for (auto it = matrix.begin(*row); it != matrix.end(*row); ++it)
+                {
+                  if (locally_owned_cols.is_element(it->column()))
+                    {
+                      unsigned int local_col_idx =
+                        partitioner.global_to_local(it->column());
+                      matrix.set(*row,
+                                 it->column(),
+                                 it->value() /
+                                   std::sqrt(local_col_norms[local_col_idx] *
+                                             local_row_norms[local_row_idx]));
+                    }
+                  else
+                    {
+                      double col_norms =
+                        ghost_column_norms_lookup[it->column()];
+
+                      matrix.set(*row,
+                                 it->column(),
+                                 it->value() /
+                                   std::sqrt(col_norms *
+                                             local_row_norms[local_row_idx]));
+                    }
+                  // This is atrocious, PETSc needs it, this NEEDS to be changed
+                  if constexpr (std::is_same_v<
+                                  Matrix,
+                                  PETScWrappers::MPI::SparseMatrix>)
+                    matrix.compress(VectorOperation::insert);
+                }
+            }
+          if constexpr (std::is_same_v<Matrix, TrilinosWrappers::SparseMatrix>)
+            matrix.compress(VectorOperation::insert);
         }
     }
 }
@@ -522,141 +759,608 @@ template <class Matrix>
 void
 MatrixScaling::sk_scaling(Matrix &matrix, const unsigned int nsteps)
 {
-  using Number = typename Matrix::value_type;
-
-  Vector<Number> row_norms(matrix.m());
-  Vector<Number> col_norms(matrix.n());
-
-  switch (control.sinkhorn_knopp_parameters.norm_type)
+  if constexpr (is_supported_matrix<Matrix>())
     {
-      case MatrixScaling::AdditionalData::SKParameters::NormType::l1:
+      using Number = typename Matrix::value_type;
+
+      Vector<Number> row_norms(matrix.m());
+      Vector<Number> col_norms(matrix.n());
+
+      switch (control.sinkhorn_knopp_parameters.norm_type)
         {
-          // Row_norms_0 to start the procedure
-          row_norms = 0;
-          for (unsigned int row = 0; row < matrix.m(); ++row)
-            for (auto it = matrix.begin(row); it != matrix.end(row); ++it)
-              row_norms[row] += std::abs(it->value());
-
-          for (unsigned int i = 0; i < nsteps; i++)
+          case MatrixScaling::AdditionalData::SKParameters::NormType::l1:
             {
-              // Row step
-              col_norms = 0;
-              for (unsigned int row = 0; row < matrix.m(); ++row)
-                {
-                  for (auto it = matrix.begin(row); it != matrix.end(row); ++it)
-                    {
-                      // it->value() /= row_norms[row];
-                      matrix.set(row,
-                                 it->column(),
-                                 it->value() / row_norms[row]);
-                      col_norms[it->column()] += std::abs(it->value());
-                    }
-                  row_scaling[row] /= row_norms[row];
-                }
-              // Here exit condition only on columns, rows are already
-              // normalized
-              col_norms.add(-1.0);
-              if (col_norms.l1_norm() < control.scaling_tolerance)
-                {
-                  converged = true;
-                  break;
-                }
-              col_norms.add(1.0);
-
-              // Column step
+              // Row_norms_0 to start the procedure
               row_norms = 0;
               for (unsigned int row = 0; row < matrix.m(); ++row)
-                {
-                  for (auto it = matrix.begin(row); it != matrix.end(row); ++it)
-                    {
-                      // it->value() /= col_norms[it->column()];
-                      matrix.set(row,
-                                 it->column(),
-                                 it->value() / col_norms[it->column()]);
-                      row_norms[row] += std::abs(it->value());
-                    }
-                }
-              for (unsigned int col = 0; col < matrix.n(); ++col)
-                {
-                  column_scaling[col] /= col_norms[col];
-                }
-              // Here exit condition only on rows, columns are already
-              // normalized
-              row_norms.add(-1.0);
-              if (row_norms.l1_norm() < control.scaling_tolerance)
-                {
-                  converged = true;
-                  break;
-                }
-              row_norms.add(1.0);
-            }
-        }
-        break;
-      case MatrixScaling::AdditionalData::SKParameters::NormType::l_infinity:
-        {
-          // Row_norms_0 to start the procedure
-          row_norms = 0;
-          for (unsigned int row = 0; row < matrix.m(); ++row)
-            for (auto it = matrix.begin(row); it != matrix.end(row); ++it)
-              row_norms[row] += std::max(row_norms[row], std::abs(it->value()));
+                for (auto it = matrix.begin(row); it != matrix.end(row); ++it)
+                  row_norms[row] += std::abs(it->value());
 
-          for (unsigned int i = 0; i < nsteps; i++)
-            {
-              // Row step
-              col_norms = 0;
-              for (unsigned int row = 0; row < matrix.m(); ++row)
+              for (unsigned int i = 0; i < nsteps; i++)
                 {
-                  for (auto it = matrix.begin(row); it != matrix.end(row); ++it)
+                  // Row step
+                  col_norms = 0;
+                  for (unsigned int row = 0; row < matrix.m(); ++row)
                     {
-                      // it->value() /= row_norms[row];
-                      matrix.set(row,
-                                 it->column(),
-                                 it->value() / row_norms[row]);
-                      col_norms[it->column()] =
-                        std::max(col_norms[it->column()],
-                                 std::abs(it->value()));
+                      for (auto it = matrix.begin(row); it != matrix.end(row);
+                           ++it)
+                        {
+                          // it->value() /= row_norms[row];
+                          matrix.set(row,
+                                     it->column(),
+                                     it->value() / row_norms[row]);
+                          col_norms[it->column()] += std::abs(it->value());
+                        }
+                      row_scaling[row] /= row_norms[row];
                     }
-                  row_scaling[row] /= row_norms[row];
+                  // Here exit condition only on columns, rows are already
+                  // normalized
+                  col_norms.add(-1.0);
+                  if (col_norms.l1_norm() < control.scaling_tolerance)
+                    {
+                      converged = true;
+                      break;
+                    }
+                  col_norms.add(1.0);
+
+                  // Column step
+                  row_norms = 0;
+                  for (unsigned int row = 0; row < matrix.m(); ++row)
+                    {
+                      for (auto it = matrix.begin(row); it != matrix.end(row);
+                           ++it)
+                        {
+                          // it->value() /= col_norms[it->column()];
+                          matrix.set(row,
+                                     it->column(),
+                                     it->value() / col_norms[it->column()]);
+                          row_norms[row] += std::abs(it->value());
+                        }
+                    }
+                  for (unsigned int col = 0; col < matrix.n(); ++col)
+                    {
+                      column_scaling[col] /= col_norms[col];
+                    }
+                  // Here exit condition only on rows, columns are already
+                  // normalized
+                  row_norms.add(-1.0);
+                  if (row_norms.l1_norm() < control.scaling_tolerance)
+                    {
+                      converged = true;
+                      break;
+                    }
+                  row_norms.add(1.0);
                 }
-              // Here exit condition only on columns, rows are already
-              // normalized
-              col_norms.add(-1.0);
-              if (col_norms.linfty_norm() < control.scaling_tolerance)
-                {
-                  converged = true;
-                  break;
-                }
-              col_norms.add(1.0);
-              // Column step
+            }
+            break;
+          case MatrixScaling::AdditionalData::SKParameters::NormType::
+            l_infinity:
+            {
+              // Row_norms_0 to start the procedure
               row_norms = 0;
               for (unsigned int row = 0; row < matrix.m(); ++row)
+                for (auto it = matrix.begin(row); it != matrix.end(row); ++it)
+                  row_norms[row] +=
+                    std::max(row_norms[row], std::abs(it->value()));
+
+              for (unsigned int i = 0; i < nsteps; i++)
                 {
-                  for (auto it = matrix.begin(row); it != matrix.end(row); ++it)
+                  // Row step
+                  col_norms = 0;
+                  for (unsigned int row = 0; row < matrix.m(); ++row)
                     {
-                      // it->value() /= col_norms[it->column()];
-                      matrix.set(row,
-                                 it->column(),
-                                 it->value() / col_norms[it->column()]);
-                      row_norms[row] +=
-                        std::max(row_norms[row], std::abs(it->value()));
+                      for (auto it = matrix.begin(row); it != matrix.end(row);
+                           ++it)
+                        {
+                          // it->value() /= row_norms[row];
+                          matrix.set(row,
+                                     it->column(),
+                                     it->value() / row_norms[row]);
+                          col_norms[it->column()] =
+                            std::max(col_norms[it->column()],
+                                     std::abs(it->value()));
+                        }
+                      row_scaling[row] /= row_norms[row];
                     }
+                  // Here exit condition only on columns, rows are already
+                  // normalized
+                  col_norms.add(-1.0);
+                  if (col_norms.linfty_norm() < control.scaling_tolerance)
+                    {
+                      converged = true;
+                      break;
+                    }
+                  col_norms.add(1.0);
+                  // Column step
+                  row_norms = 0;
+                  for (unsigned int row = 0; row < matrix.m(); ++row)
+                    {
+                      for (auto it = matrix.begin(row); it != matrix.end(row);
+                           ++it)
+                        {
+                          // it->value() /= col_norms[it->column()];
+                          matrix.set(row,
+                                     it->column(),
+                                     it->value() / col_norms[it->column()]);
+                          row_norms[row] +=
+                            std::max(row_norms[row], std::abs(it->value()));
+                        }
+                    }
+                  for (unsigned int col = 0; col < matrix.n(); ++col)
+                    {
+                      column_scaling[col] /= col_norms[col];
+                    }
+                  // Here exit condition only on rows, columns are already
+                  // normalized
+                  row_norms.add(-1.0);
+                  if (row_norms.linfty_norm() < control.scaling_tolerance)
+                    {
+                      converged = true;
+                      break;
+                    }
+                  row_norms.add(1.0);
                 }
-              for (unsigned int col = 0; col < matrix.n(); ++col)
-                {
-                  column_scaling[col] /= col_norms[col];
-                }
-              // Here exit condition only on rows, columns are already
-              // normalized
-              row_norms.add(-1.0);
-              if (row_norms.linfty_norm() < control.scaling_tolerance)
-                {
-                  converged = true;
-                  break;
-                }
-              row_norms.add(1.0);
             }
+            break;
         }
-        break;
+    }
+  else if constexpr (std::is_same_v<Matrix, TrilinosWrappers::SparseMatrix> ||
+                     std::is_same_v<Matrix, PETScWrappers::MPI::SparseMatrix>)
+    {
+      Vector<double> local_row_norms(locally_owned_rows.n_elements());
+      Vector<double> local_col_norms(locally_owned_cols.n_elements());
+      std::map<types::global_dof_index, double>
+        partial_column_norms; // column -> local norm
+
+      switch (control.sinkhorn_knopp_parameters.norm_type)
+        {
+          case MatrixScaling::AdditionalData::SKParameters::NormType::l1:
+            {
+              // Row_norms_0 to start the procedure
+              local_row_norms = 0;
+              for (auto row = locally_owned_rows.begin();
+                   row != locally_owned_rows.end();
+                   ++row)
+                {
+                  auto local_row_idx = partitioner.global_to_local(*row);
+                  for (auto it = matrix.begin(*row); it != matrix.end(*row);
+                       ++it)
+                    local_row_norms[local_row_idx] += std::abs(it->value());
+                }
+
+              for (unsigned int i = 0; i < nsteps; i++)
+                {
+                  // Row step
+                  local_col_norms = 0;
+                  partial_column_norms.clear();
+
+                  for (auto row = locally_owned_rows.begin();
+                       row != locally_owned_rows.end();
+                       ++row)
+                    {
+                      auto local_row_idx = partitioner.global_to_local(*row);
+                      for (auto it = matrix.begin(*row); it != matrix.end(*row);
+                           ++it)
+                        {
+                          partial_column_norms[it->column()] += std::abs(
+                            it->value() / local_row_norms[local_row_idx]);
+                          matrix.set(*row,
+                                     it->column(),
+                                     it->value() /
+                                       local_row_norms[local_row_idx]);
+                          // This is atrocious, PETSc needs it, this NEEDS to be
+                          // changed
+                          if constexpr (std::is_same_v<
+                                          Matrix,
+                                          PETScWrappers::MPI::SparseMatrix>)
+                            matrix.compress(VectorOperation::insert);
+                        }
+                      row_scaling[local_row_idx] /=
+                        local_row_norms[local_row_idx];
+                    }
+                  if constexpr (std::is_same_v<Matrix,
+                                               TrilinosWrappers::SparseMatrix>)
+                    matrix.compress(VectorOperation::insert);
+
+                  // Communicate partial column norms
+                  std::map<
+                    unsigned int,
+                    std::vector<std::pair<types::global_dof_index, double>>>
+                    send_data;
+
+                  for (const auto &[col_idx, norm_value] : partial_column_norms)
+                    {
+                      if (locally_owned_cols.is_element(col_idx))
+                        {
+                          unsigned int local_idx =
+                            partitioner.global_to_local(col_idx);
+                          local_col_norms[local_idx] += norm_value;
+                        }
+                      else
+                        {
+                          auto ghost_pos =
+                            ghost_columns.index_within_set(col_idx);
+                          unsigned int target_rank =
+                            ghost_column_owners[ghost_pos];
+
+                          send_data[target_rank].emplace_back(col_idx,
+                                                              norm_value);
+                        }
+                    }
+
+                  auto received_data =
+                    Utilities::MPI::some_to_some(matrix.get_mpi_communicator(),
+                                                 send_data);
+
+                  // Process received data and fill local_col_norms
+                  for (const auto &[sender_rank, pairs] : received_data)
+                    {
+                      for (const auto &[global_col, contribution] : pairs)
+                        {
+                          unsigned int local_idx =
+                            partitioner.global_to_local(global_col);
+                          local_col_norms[local_idx] += contribution;
+                        }
+                    }
+                  // Convergence check only on columns
+                  {
+                    Vector<double> col_norms_check = local_col_norms;
+
+                    col_norms_check.add(-1.0);
+
+                    bool local_not_converged =
+                      !(col_norms_check.l1_norm() < control.scaling_tolerance);
+
+                    bool any_not_converged =
+                      Utilities::MPI::logical_or(local_not_converged,
+                                                 matrix.get_mpi_communicator());
+
+                    if (!any_not_converged)
+                      {
+                        converged = true;
+                        break;
+                      }
+                  }
+
+                  // Column step
+                  local_row_norms = 0;
+
+                  // Communicate column norm values to all ranks that need them
+                  std::map<
+                    unsigned int,
+                    std::vector<std::pair<types::global_dof_index, double>>>
+                    send_column_norms;
+
+                  // For each rank that requested column norm data from me,
+                  // send them the corresponding column norms updated
+                  for (const auto &[sender_rank, pairs] : received_data)
+                    {
+                      for (const auto &[global_col, norm_contribution] : pairs)
+                        {
+                          // I received norm data for global_col, so sender_rank
+                          // needs my scaling value for global_col
+                          if (locally_owned_cols.is_element(global_col))
+                            {
+                              unsigned int local_idx =
+                                partitioner.global_to_local(global_col);
+                              send_column_norms[sender_rank].emplace_back(
+                                global_col, local_col_norms[local_idx]);
+                            }
+                        }
+                    }
+
+                  auto received_column_norms =
+                    Utilities::MPI::some_to_some(matrix.get_mpi_communicator(),
+                                                 send_column_norms);
+
+                  std::map<types::global_dof_index, double>
+                    ghost_column_norms_lookup;
+                  for (const auto &[sender_rank, pairs] : received_column_norms)
+                    {
+                      for (const auto &[col_id, norm_val] : pairs)
+                        {
+                          ghost_column_norms_lookup[col_id] = norm_val;
+                        }
+                    }
+
+                  for (auto row = locally_owned_rows.begin();
+                       row != locally_owned_rows.end();
+                       ++row)
+                    {
+                      auto local_row_idx = partitioner.global_to_local(*row);
+                      for (auto it = matrix.begin(*row); it != matrix.end(*row);
+                           ++it)
+                        {
+                          if (locally_owned_cols.is_element(it->column()))
+                            {
+                              unsigned int local_col_idx =
+                                partitioner.global_to_local(it->column());
+
+                              local_row_norms[local_row_idx] += std::abs(
+                                it->value() / local_col_norms[local_col_idx]);
+
+                              matrix.set(*row,
+                                         it->column(),
+                                         it->value() /
+                                           local_col_norms[local_col_idx]);
+                            }
+                          else
+                            {
+                              double col_norms =
+                                ghost_column_norms_lookup[it->column()];
+
+                              local_row_norms[local_row_idx] +=
+                                std::abs(it->value() / col_norms);
+
+                              matrix.set(*row,
+                                         it->column(),
+                                         it->value() / col_norms);
+                            }
+                          // This is atrocious, PETSc needs it, this NEEDS to be
+                          // changed
+                          if constexpr (std::is_same_v<
+                                          Matrix,
+                                          PETScWrappers::MPI::SparseMatrix>)
+                            matrix.compress(VectorOperation::insert);
+                        }
+                    }
+                  if constexpr (std::is_same_v<Matrix,
+                                               TrilinosWrappers::SparseMatrix>)
+                    matrix.compress(VectorOperation::insert);
+                  for (unsigned int i = 0; i < local_col_norms.size(); ++i)
+                    column_scaling[i] /= local_col_norms[i];
+
+                  // Convergence check
+                  {
+                    Vector<double> row_norms_check = local_row_norms;
+
+                    row_norms_check.add(-1.0);
+
+                    bool local_not_converged =
+                      !(row_norms_check.l1_norm() < control.scaling_tolerance);
+
+                    bool any_not_converged =
+                      Utilities::MPI::logical_or(local_not_converged,
+                                                 matrix.get_mpi_communicator());
+
+                    if (!any_not_converged)
+                      {
+                        converged = true;
+                        break;
+                      }
+                  }
+                }
+            }
+            break;
+          case MatrixScaling::AdditionalData::SKParameters::NormType::
+            l_infinity:
+            {
+              // Row_norms_0 to start the procedure
+              local_row_norms = 0;
+              for (auto row = locally_owned_rows.begin();
+                   row != locally_owned_rows.end();
+                   ++row)
+                {
+                  auto local_row_idx = partitioner.global_to_local(*row);
+                  for (auto it = matrix.begin(*row); it != matrix.end(*row);
+                       ++it)
+                    local_row_norms[local_row_idx] =
+                      std::max(local_row_norms[local_row_idx],
+                               std::abs(it->value()));
+                }
+
+              for (unsigned int i = 0; i < nsteps; i++)
+                {
+                  // Row step
+                  local_col_norms = 0;
+                  partial_column_norms.clear();
+
+                  for (auto row = locally_owned_rows.begin();
+                       row != locally_owned_rows.end();
+                       ++row)
+                    {
+                      auto local_row_idx = partitioner.global_to_local(*row);
+                      for (auto it = matrix.begin(*row); it != matrix.end(*row);
+                           ++it)
+                        {
+                          partial_column_norms[it->column()] =
+                            std::max(partial_column_norms[it->column()],
+                                     std::abs(it->value() /
+                                              local_row_norms[local_row_idx]));
+                          matrix.set(*row,
+                                     it->column(),
+                                     it->value() /
+                                       local_row_norms[local_row_idx]);
+
+                          // This is atrocious, PETSc needs it, this NEEDS to be
+                          // changed
+                          if constexpr (std::is_same_v<
+                                          Matrix,
+                                          PETScWrappers::MPI::SparseMatrix>)
+                            matrix.compress(VectorOperation::insert);
+                        }
+                      row_scaling[local_row_idx] /=
+                        local_row_norms[local_row_idx];
+                    }
+                  if constexpr (std::is_same_v<Matrix,
+                                               TrilinosWrappers::SparseMatrix>)
+                    matrix.compress(VectorOperation::insert);
+
+                  // Communicate partial column norms
+                  std::map<
+                    unsigned int,
+                    std::vector<std::pair<types::global_dof_index, double>>>
+                    send_data;
+
+                  for (const auto &[col_idx, norm_value] : partial_column_norms)
+                    {
+                      if (locally_owned_cols.is_element(col_idx))
+                        {
+                          unsigned int local_idx =
+                            partitioner.global_to_local(col_idx);
+                          local_col_norms[local_idx] = norm_value;
+                        }
+                      else
+                        {
+                          auto ghost_pos =
+                            ghost_columns.index_within_set(col_idx);
+                          unsigned int target_rank =
+                            ghost_column_owners[ghost_pos];
+
+                          send_data[target_rank].emplace_back(col_idx,
+                                                              norm_value);
+                        }
+                    }
+
+                  auto received_data =
+                    Utilities::MPI::some_to_some(matrix.get_mpi_communicator(),
+                                                 send_data);
+
+                  // Process received data and fill local_col_norms
+                  for (const auto &[sender_rank, pairs] : received_data)
+                    {
+                      for (const auto &[global_col, contribution] : pairs)
+                        {
+                          unsigned int local_idx =
+                            partitioner.global_to_local(global_col);
+                          local_col_norms[local_idx] =
+                            std::max(local_col_norms[local_idx], contribution);
+                        }
+                    }
+                  // Convergence check only on columns
+                  {
+                    Vector<double> col_norms_check = local_col_norms;
+
+                    col_norms_check.add(-1.0);
+
+                    bool local_not_converged = !(col_norms_check.linfty_norm() <
+                                                 control.scaling_tolerance);
+
+                    bool any_not_converged =
+                      Utilities::MPI::logical_or(local_not_converged,
+                                                 matrix.get_mpi_communicator());
+
+                    if (!any_not_converged)
+                      {
+                        converged = true;
+                        break;
+                      }
+                  }
+
+                  // Column step
+                  local_row_norms = 0;
+
+                  // Communicate column norm values to all ranks that need them
+                  std::map<
+                    unsigned int,
+                    std::vector<std::pair<types::global_dof_index, double>>>
+                    send_column_norms;
+
+                  // For each rank that requested column norm data from me,
+                  // send them the corresponding column norms updated
+                  for (const auto &[sender_rank, pairs] : received_data)
+                    {
+                      for (const auto &[global_col, norm_contribution] : pairs)
+                        {
+                          // I received norm data for global_col, so sender_rank
+                          // needs my scaling value for global_col
+                          if (locally_owned_cols.is_element(global_col))
+                            {
+                              unsigned int local_idx =
+                                partitioner.global_to_local(global_col);
+                              send_column_norms[sender_rank].emplace_back(
+                                global_col, local_col_norms[local_idx]);
+                            }
+                        }
+                    }
+
+                  auto received_column_norms =
+                    Utilities::MPI::some_to_some(matrix.get_mpi_communicator(),
+                                                 send_column_norms);
+
+                  std::map<types::global_dof_index, double>
+                    ghost_column_norms_lookup;
+                  for (const auto &[sender_rank, pairs] : received_column_norms)
+                    {
+                      for (const auto &[col_id, norm_val] : pairs)
+                        {
+                          ghost_column_norms_lookup[col_id] = norm_val;
+                        }
+                    }
+
+                  for (auto row = locally_owned_rows.begin();
+                       row != locally_owned_rows.end();
+                       ++row)
+                    {
+                      auto local_row_idx = partitioner.global_to_local(*row);
+                      for (auto it = matrix.begin(*row); it != matrix.end(*row);
+                           ++it)
+                        {
+                          if (locally_owned_cols.is_element(it->column()))
+                            {
+                              unsigned int local_col_idx =
+                                partitioner.global_to_local(it->column());
+
+                              local_row_norms[local_row_idx] =
+                                std::max(local_row_norms[local_row_idx],
+                                         std::abs(
+                                           it->value() /
+                                           local_col_norms[local_col_idx]));
+                              matrix.set(*row,
+                                         it->column(),
+                                         it->value() /
+                                           local_col_norms[local_col_idx]);
+                            }
+                          else
+                            {
+                              double col_norms =
+                                ghost_column_norms_lookup[it->column()];
+
+                              local_row_norms[local_row_idx] =
+                                std::max(local_row_norms[local_row_idx],
+                                         std::abs(it->value() / col_norms));
+
+                              matrix.set(*row,
+                                         it->column(),
+                                         it->value() / col_norms);
+                            }
+                          // This is atrocious, PETSc needs it, this NEEDS to be
+                          // changed
+                          if constexpr (std::is_same_v<
+                                          Matrix,
+                                          PETScWrappers::MPI::SparseMatrix>)
+                            matrix.compress(VectorOperation::insert);
+                        }
+                    }
+                  if constexpr (std::is_same_v<Matrix,
+                                               TrilinosWrappers::SparseMatrix>)
+                    matrix.compress(VectorOperation::insert);
+                  for (unsigned int i = 0; i < local_col_norms.size(); ++i)
+                    column_scaling[i] /= local_col_norms[i];
+
+                  // Convergence check
+                  {
+                    Vector<double> row_norms_check = local_row_norms;
+
+                    row_norms_check.add(-1.0);
+
+                    bool local_not_converged = !(row_norms_check.linfty_norm() <
+                                                 control.scaling_tolerance);
+
+                    bool any_not_converged =
+                      Utilities::MPI::logical_or(local_not_converged,
+                                                 matrix.get_mpi_communicator());
+
+                    if (!any_not_converged)
+                      {
+                        converged = true;
+                        break;
+                      }
+                  }
+                }
+            }
+            break;
+        }
     }
 }
 
