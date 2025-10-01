@@ -310,7 +310,7 @@ public:
      * @return `true` if there is no conflict, `false` otherwise.
      */
     bool
-    has_no_conflict_with(const RegularPatch &other) const;
+    has_conflict_with(const RegularPatch &other) const;
 
 
     /**
@@ -437,7 +437,7 @@ public:
 
     // Add other necessary members and methods for GeneralPatch
     // For example:
-    // bool has_no_conflict_with(const GeneralPatch &other) const;
+    // bool has_conflict_with(const GeneralPatch &other) const;
     // bool is_partially_ghosted() const;
 
   private:

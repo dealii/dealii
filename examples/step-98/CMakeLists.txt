@@ -40,16 +40,14 @@ endif()
 #
 # Are all dependencies fulfilled?
 #
-if(NOT DEAL_II_WITH_MPI OR NOT DEAL_II_WITH_P4EST OR NOT DEAL_II_WITH_TRILINOS)
+if(NOT DEAL_II_WITH_MPI OR NOT DEAL_II_WITH_P4EST)
   message(FATAL_ERROR "
 Error! This tutorial requires a deal.II library that was configured with the following options:
     DEAL_II_WITH_MPI = ON
     DEAL_II_WITH_P4EST = ON
-    DEAL_II_WITH_TRILINOS = ON
 However, the deal.II library found at ${DEAL_II_PATH} was configured with these options:
     DEAL_II_WITH_MPI = ${DEAL_II_WITH_MPI}
     DEAL_II_WITH_P4EST = ${DEAL_II_WITH_P4EST}
-    DEAL_II_WITH_TRILINOS = ${DEAL_II_WITH_TRILINOS}
 This conflicts with the requirements."
   )
 endif()

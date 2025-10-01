@@ -17,6 +17,8 @@
 #define dealii__fe_patch_evaluation_h
 
 
+#include <deal.II/base/utilities.h>
+
 #include <deal.II/matrix_free/fe_evaluation.h>
 #include <deal.II/matrix_free/patch_storage.h>
 
@@ -135,7 +137,9 @@ public:
 
   static constexpr int fe_degree =
     internal::extract_degree(static_cast<FEEvaluationType *>(nullptr));
-  const static unsigned int n_dofs_per_cell = std::pow(fe_degree + 1, dim);
+  const static unsigned int n_dofs_per_cell =
+    Utilities::fixed_power<dim>(fe_degree + 1);
+
 
   const static unsigned int n_evaluators =
     internal::n_evaluators_v<n_lanes, n_cells, vectorization>();
@@ -409,7 +413,8 @@ template <typename FEEval,
 FEPatchEvaluation<FEEval, Distributor, vectorization>::FEPatchEvaluation(
   const PatchStorageType &storage,
   const FEEval           &fe_eval)
-  : fe_evaluations(internal::make_array<n_evaluators>(fe_eval))
+  : fe_evaluations(
+      internal::make_array<n_evaluators, FEEvaluationType>(fe_eval))
   , cell_dofs_view_raw(
       internal::
         create_cell_dofs_view_array<FEEvaluationType, n_cells, Number, n_lanes>(
@@ -595,9 +600,26 @@ FEPatchEvaluation<FEEval, Distributor, vectorization>::
   Assert(current_patch_index != numbers::invalid_unsigned_int,
          ExcNotInitialized());
 
-  distributor.distribute_patch_to_local(cell_dofs_view_raw,
-                                        patch_vector,
-                                        copy_duplicates);
+  const auto regular_operation = [&](const unsigned int patch_index,
+                                     const unsigned int cell,
+                                     const unsigned int cell_index) {
+    cell_dofs_view_raw[cell][cell_index] = patch_vector[patch_index];
+  };
+
+  const auto overlap_operation = [&](const unsigned int patch_index,
+                                     const unsigned int cell,
+                                     const unsigned int cell_index) {
+    if (copy_duplicates)
+      cell_dofs_view_raw[cell][cell_index] = patch_vector[patch_index];
+    else
+      cell_dofs_view_raw[cell][cell_index] = 0;
+  };
+
+  const auto skipped_operation = [&](const unsigned int cell,
+                                     const unsigned int cell_index) {
+    cell_dofs_view_raw[cell][cell_index] = 0;
+  };
+  distributor.loop(regular_operation, overlap_operation, skipped_operation);
 }
 
 template <typename FEEval,
@@ -613,9 +635,22 @@ FEPatchEvaluation<FEEval, Distributor, vectorization>::gather_local_to_patch(
   Assert(current_patch_index != numbers::invalid_unsigned_int,
          ExcNotInitialized());
 
-  distributor.gather_local_to_patch(cell_dofs_view_raw,
-                                    patch_vector,
-                                    sum_overlapping);
+
+  const auto regular_operation = [&](const unsigned int patch_index,
+                                     const unsigned int cell,
+                                     const unsigned int cell_index) {
+    patch_vector[patch_index] = cell_dofs_view_raw[cell][cell_index];
+  };
+
+  const auto overlap_operation = [&](const unsigned int patch_index,
+                                     const unsigned int cell,
+                                     const unsigned int cell_index) {
+    if (sum_overlapping)
+      patch_vector[patch_index] += cell_dofs_view_raw[cell][cell_index];
+  };
+
+  distributor.loop(regular_operation, overlap_operation, [](const auto &...) {
+  });
 }
 
 template <typename FEEval,
