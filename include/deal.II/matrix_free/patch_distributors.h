@@ -24,22 +24,122 @@
 
 
 
+DEAL_II_NAMESPACE_OPEN
+
+
 /**
  * @brief This namespace provides tools for distributing and gathering data
  * between patch vectors and local cell storage in the context of matrix-free
  * vertex-patch smoothers
  */
-DEAL_II_NAMESPACE_OPEN
-
-
 namespace PatchDistributors
 {
 
+  /**
+   * Selection of which patch degrees of freedom (DoFs) to include.
+   *
+   * FEQinterior  - Only strictly interior DoFs of the geometric patch (boundary
+   *                DoFs are omitted).
+   * FEQall       - All DoFs in the geometric patch are included (boundary +
+   * interior).
+   */
+  enum PatchDoFsOrder
+  {
+    FEQinterior,
+    FEQall
+  };
 
-  template <int dim, int degree>
-  struct CellPatchLookup
-  {};
 
+  /**
+   * @brief Dynamic patch distributor for matrix-free patch operations.
+   *
+   * This class provides tools that
+   * describe the layout of local patches (collections of 2^dim neighbor cells)
+   * used by FEPatchEvaluation. The implementation aims to avoid
+   * large precomputed index tables by evaluating global/local indices on the
+   * fly and to support arbitrary polynomial degrees >= 1.
+   *
+   *
+   * The PatchDoFsOrder enum (used via the template parameter dofs_set_type)
+   * controls which subset of patch degrees of freedom (DoFs) are considered:
+   *
+   * - FEQinterior:
+   *   The patch excludes DoFs that lie on the boundary of the geometric patch.
+   *   In other words, DoFs on the patch boundary are "skipped" and not part of
+   *   the patch vector. This reduces the effective patch size (fewer patch
+   *   entries) and is useful for operations that only need strictly interior
+   *   DoFs of the patch (e.g., interior-only evaluations or halo-free updates).
+   *
+   * - FEQall:
+   *   The patch includes all DoFs in the geometric patch, including boundary
+   *   DoFs. The patch storage is therefore larger compared to FEQinterior.
+   *
+   * Effect on loops and mappings
+   * ---------------------------
+   * The choice of dofs_set_type affects index ranges (start/end), the
+   * one-dimensional number of patch DoFs, and consequently all mapping and
+   * distribution/gathering loops. Code paths branch so that interior-only
+   * iterations skip boundary entries, while the "all" variant iterates over the
+   * full set of patch DoFs.
+   *
+   * Usage note
+   * ----------
+   * Select FEQinterior when you want a compact patch representation that omits
+   * boundary DoFs (e.g., when assembling strictly interior contributions).
+   * Choose FEQall when operations must see or modify boundary DoFs as well.
+   *
+   *
+   * All sizes are compile-time constants where feasible. The distributor
+   * does not precompute or store large index tables: global/local indices
+   * for patch entries are evaluated on the fly, keeping memory usage low.
+   * It supports arbitrary polynomial degree values (subject to the
+   * degree >= 1 assertion).
+   */
+  template <PatchDoFsOrder dofs_set_type, int dim, int degree>
+  class Dynamic
+  {
+  public:
+    template <typename RegularOperation,
+              typename DuplicatesOperation,
+              typename SkippedOperation>
+
+    /**
+     * Loops over the cell-to-patch mappings, applying different
+     * operations based on whether a DoF is non-overlapping, overlapping, or
+     * skipped.
+     */
+    void
+    loop(const RegularOperation    &regular_operation,
+         const DuplicatesOperation &duplicates_operation,
+         const SkippedOperation    &skipped_operation) const;
+
+    const static unsigned int dimension = dim;
+
+    static_assert(dim == 1 || dim == 2 || dim == 3,
+                  "This distributor only supports dim = 1, 2, or 3");
+    static_assert(degree >= 1, "This distributor only supports degree >= 1");
+
+    const constexpr static std::size_t n_cells             = 2;
+    const constexpr static std::size_t dofs_per_cell_1d    = degree + 1;
+    const constexpr static std::size_t n_dofs_per_patch_1d = 2 * degree + 1;
+
+    const constexpr static std::size_t n_dofs =
+      Utilities::fixed_power<dim>(n_dofs_per_patch_1d);
+
+    const static unsigned int n_patch_dofs =
+      Utilities::fixed_power<dim>(n_dofs_per_patch_1d);
+
+    const static unsigned int n_interior_patch_dofs =
+      Utilities::fixed_power<dim>(n_dofs_per_patch_1d - 2);
+  };
+
+
+  namespace internal
+  {
+    template <int dim, int degree>
+    struct CellPatchLookup
+    {};
+  } // namespace internal
 
 
   /**
@@ -58,7 +158,7 @@ namespace PatchDistributors
   template <int dim, int degree>
   struct Lookup
   {
-    using Cell2Patch = CellPatchLookup<dim, degree>;
+    using Cell2Patch = internal::CellPatchLookup<dim, degree>;
 
     static const constexpr unsigned int n_cells = Cell2Patch::n_cells;
     static const constexpr unsigned int n_patch_dofs_static =
@@ -66,19 +166,19 @@ namespace PatchDistributors
 
 
     /**
-     * @brief Loops over the cell-to-patch mappings, applying different
+     * Loops over the cell-to-patch mappings, applying different
      * operations based on whether a DoF is non-overlapping, overlapping, or
      * skipped.
      *
      * This is the core loop used by `distribute_patch_to_local` and
-     * `gather_local_to_patch`. It iterates through all cells in the patch.
-     * For each cell, it first calls `regular_operation` for DoFs that are
-     * unique to this cell within the patch context (non-overlapping). Then, it
-     * calls `overlapping_operation` for DoFs that are shared with other cells
-     * in the patch. Finally, it iterates through all cells again and calls
-     * `skipped_operation` for DoFs that exist in the cell's local storage but
-     * are not part of the patch vector (e.g., interior DoFs when the patch
-     * represents a vertex or edge).
+     * `gather_local_to_patch` in FEPatchEvaluation. It iterates through all
+     * cells in the patch. For each cell, it first calls `regular_operation` for
+     * DoFs that are unique to this cell within the patch context
+     * (non-overlapping). Then, it calls `overlapping_operation` for DoFs that
+     * are shared with other cells in the patch. Finally, it iterates through
+     * all cells again and calls `skipped_operation` for DoFs that exist in the
+     * cell's local storage but are not part of the patch vector (e.g., interior
+     * DoFs when the patch represents a vertex or edge).
      *
      * @tparam RegularOperation Functor type for non-overlapping DoFs. Must be
      * callable with `(unsigned int patch_index, unsigned int cell, unsigned int
@@ -142,537 +242,756 @@ namespace PatchDistributors
 //---------------------------------------------------------------------------
 #ifndef DOXYGEN
 
-  template <>
-  struct CellPatchLookup<1, 1>
+
+
+  template <PatchDoFsOrder dofs_set_type, int dim, int degree>
+  template <typename RegularOperation,
+            typename DuplicatesOperation,
+            typename SkippedOperation>
+  inline void
+  Dynamic<dofs_set_type, dim, degree>::loop(
+    const RegularOperation    &regular_operation,
+    const DuplicatesOperation &duplicates_operation,
+    const SkippedOperation    &skipped_operation) const
   {
-    using Index = unsigned int;
-    using Pair  = std::pair<Index, Index>;
+    const bool         interior  = dofs_set_type == FEQinterior;
+    const unsigned int start_dof = interior ? 1 : 0;
+    const unsigned int end_dof   = n_dofs_per_patch_1d - start_dof;
+    const unsigned int n_patch_1d =
+      interior ? n_dofs_per_patch_1d - 2 : n_dofs_per_patch_1d;
 
-    static constexpr Index                n_cells        = 2;
-    static constexpr Index                n_patch_dofs   = 1;
-    static constexpr std::array<Index, 2> n_skipped_dofs = {{1, 1}};
+    const auto cell_index = [&](const unsigned int cell_index_i,
+                                const unsigned int cell_index_j,
+                                const unsigned int cell_index_k) {
+      return cell_index_i * n_cells * n_cells + cell_index_j * n_cells +
+             cell_index_k;
+    };
 
-    static constexpr std::array<std::array<Index, 1>, 2> skipped_dofs = {
-      {{{0}}, {{1}}}};
+    const auto dof_index = [&](const unsigned int local_index_i,
+                               const unsigned int local_index_j,
+                               const unsigned int local_index_k) {
+      return local_index_i * dofs_per_cell_1d * dofs_per_cell_1d +
+             local_index_j * dofs_per_cell_1d + local_index_k;
+    };
+
+    for (unsigned int i = (dim > 2 ? start_dof : 0);
+         i < (dim > 2 ? end_dof : 1);
+         ++i)
+      for (unsigned int j = (dim > 1 ? start_dof : 0);
+           j < (dim > 1 ? end_dof : 1);
+           ++j)
+        for (unsigned int k = start_dof; k < end_dof; ++k)
+          {
+            unsigned int patch_index =
+              (i - (interior && dim > 2)) * n_patch_1d * n_patch_1d +
+              (j - (interior && dim > 1)) * n_patch_1d + (k - start_dof);
+
+            const unsigned cell_index_i = i / dofs_per_cell_1d;
+            const unsigned cell_index_j = j / dofs_per_cell_1d;
+            const unsigned cell_index_k = k / dofs_per_cell_1d;
+
+            const unsigned cell =
+              cell_index(cell_index_i, cell_index_j, cell_index_k);
+
+            const unsigned local_index_i = i % dofs_per_cell_1d + cell_index_i;
+            const unsigned local_index_j = j % dofs_per_cell_1d + cell_index_j;
+            const unsigned local_index_k = k % dofs_per_cell_1d + cell_index_k;
+
+            const unsigned dof =
+              dof_index(local_index_i, local_index_j, local_index_k);
+
+            // if (regular_operation)
+            regular_operation(patch_index, cell, dof);
+            // if (duplicates_operation)
+            {
+              if (i == dofs_per_cell_1d - 1)
+                duplicates_operation(patch_index,
+                                     cell_index(1, cell_index_j, cell_index_k),
+                                     dof_index(0,
+                                               local_index_j,
+                                               local_index_k));
+
+              if (j == dofs_per_cell_1d - 1)
+                duplicates_operation(patch_index,
+                                     cell_index(cell_index_i, 1, cell_index_k),
+                                     dof_index(local_index_i,
+                                               0,
+                                               local_index_k));
+
+              if (k == dofs_per_cell_1d - 1)
+                duplicates_operation(patch_index,
+                                     cell_index(cell_index_i, cell_index_j, 1),
+                                     dof_index(local_index_i,
+                                               local_index_j,
+                                               0));
+            }
+          }
+
+    for (unsigned int i = (dim > 2 ? start_dof : 0);
+         i < (dim > 2 ? end_dof : 1);
+         ++i)
+      {
+        const unsigned j = dofs_per_cell_1d - 1;
+        const unsigned k = dofs_per_cell_1d - 1;
+
+        unsigned int patch_index =
+          (i - (interior && dim > 2)) * n_patch_1d * n_patch_1d +
+          (j - (interior && dim > 1)) * n_patch_1d + (k - start_dof);
 
 
-    static constexpr std::array<Index, 2> n_cell_to_patch = {{1, 1}};
+        const unsigned cell_index_i  = i / dofs_per_cell_1d;
+        const unsigned cell          = cell_index(cell_index_i, 1, 1);
+        const unsigned local_index_i = i % dofs_per_cell_1d + cell_index_i;
+        const unsigned dof           = dof_index(local_index_i, 0, 0);
 
-    static constexpr std::array<std::array<Pair, 1>, 2> cell_to_patch = {
-      {{{Pair{1, 0}}}, {{Pair{0, 0}}}}};
+        duplicates_operation(patch_index, cell, dof);
+      }
 
-    static constexpr std::array<Index, 2> n_non_overlapping = {{1, 0}};
-  };
+    // Handle skipped boundary DoFs (when dofs_set_type == FEQinterior)
+    if constexpr (dofs_set_type == FEQinterior)
+      {
+        // Loop over all cells in the patch
+        for (unsigned int cell_k_idx = 0; cell_k_idx < (dim > 2 ? 2 : 1);
+             ++cell_k_idx)
+          for (unsigned int cell_j_idx = 0; cell_j_idx < (dim > 1 ? 2 : 1);
+               ++cell_j_idx)
+            for (unsigned int cell_i_idx = 0; cell_i_idx < 2; ++cell_i_idx)
+              {
+                const unsigned int current_cell_idx =
+                  cell_index(cell_i_idx, cell_j_idx, cell_k_idx);
 
 
-  template <>
-  struct CellPatchLookup<1, 2>
+                for (unsigned int j = 0; j < (dim > 1 ? dofs_per_cell_1d : 1);
+                     ++j)
+                  for (unsigned int i = 0; i < (dim > 2 ? dofs_per_cell_1d : 1);
+                       ++i)
+                    {
+                      unsigned int k = cell_k_idx * (dofs_per_cell_1d - 1);
+                      skipped_operation(current_cell_idx, dof_index(i, j, k));
+                    }
+
+                if constexpr (dim == 1)
+                  continue;
+
+                const unsigned int k_begin = (cell_k_idx == 0) ? 1 : 0;
+                const unsigned int k_end =
+                  (cell_k_idx == 0) ? dofs_per_cell_1d : (dofs_per_cell_1d - 1);
+
+                for (unsigned int k = k_begin; k < k_end; ++k)
+                  for (unsigned int i = 0; i < (dim > 2 ? dofs_per_cell_1d : 1);
+                       ++i)
+                    {
+                      unsigned int j = cell_j_idx * (dofs_per_cell_1d - 1);
+                      skipped_operation(current_cell_idx, dof_index(i, j, k));
+                    }
+                if constexpr (dim == 2)
+                  continue;
+
+                const unsigned int j_begin = (cell_j_idx == 0) ? 1 : 0;
+                const unsigned int j_end =
+                  (cell_j_idx == 0) ? dofs_per_cell_1d : (dofs_per_cell_1d - 1);
+
+                for (unsigned int j = j_begin; j < j_end; ++j)
+                  for (unsigned int k = k_begin; k < k_end; ++k)
+                    {
+                      unsigned int i = cell_i_idx * (dofs_per_cell_1d - 1);
+                      skipped_operation(current_cell_idx, dof_index(i, j, k));
+                    }
+              }
+      }
+  }
+  //---------------------------------------------------------------------------
+
+
+  namespace internal
   {
-    using Index = unsigned int;
-    using Pair  = std::pair<Index, Index>;
+    template <>
+    struct CellPatchLookup<1, 1>
+    {
+      using Index = unsigned int;
+      using Pair  = std::pair<Index, Index>;
 
-    static constexpr Index                n_cells        = 2;
-    static constexpr Index                n_patch_dofs   = 3;
-    static constexpr std::array<Index, 2> n_skipped_dofs = {{1, 1}};
+      static constexpr Index                n_cells        = 2;
+      static constexpr Index                n_patch_dofs   = 1;
+      static constexpr std::array<Index, 2> n_skipped_dofs = {{1, 1}};
 
-    static constexpr std::array<std::array<Index, 1>, 2> skipped_dofs = {
-      {{{0}}, {{2}}}};
+      static constexpr std::array<std::array<Index, 1>, 2> skipped_dofs = {
+        {{{0}}, {{1}}}};
 
 
-    static constexpr std::array<Index, 2> n_cell_to_patch = {{2, 2}};
+      static constexpr std::array<Index, 2> n_cell_to_patch = {{1, 1}};
 
-    static constexpr std::array<std::array<Pair, 2>, 2> cell_to_patch = {
-      {{{Pair{1, 0}, Pair{2, 1}}}, {{Pair{1, 2}, Pair{0, 1}}}}};
+      static constexpr std::array<std::array<Pair, 1>, 2> cell_to_patch = {
+        {{{Pair{1, 0}}}, {{Pair{0, 0}}}}};
 
-    static constexpr std::array<Index, 2> n_non_overlapping = {{2, 1}};
-  };
+      static constexpr std::array<Index, 2> n_non_overlapping = {{1, 0}};
+    };
 
 
-  template <>
-  struct CellPatchLookup<1, 3>
-  {
-    using Index = unsigned int;
-    using Pair  = std::pair<Index, Index>;
+    template <>
+    struct CellPatchLookup<1, 2>
+    {
+      using Index = unsigned int;
+      using Pair  = std::pair<Index, Index>;
 
-    static constexpr Index                n_cells        = 2;
-    static constexpr Index                n_patch_dofs   = 5;
-    static constexpr std::array<Index, 2> n_skipped_dofs = {{1, 1}};
+      static constexpr Index                n_cells        = 2;
+      static constexpr Index                n_patch_dofs   = 3;
+      static constexpr std::array<Index, 2> n_skipped_dofs = {{1, 1}};
 
-    static constexpr std::array<std::array<Index, 1>, 2> skipped_dofs = {
-      {{{0}}, {{3}}}};
+      static constexpr std::array<std::array<Index, 1>, 2> skipped_dofs = {
+        {{{0}}, {{2}}}};
 
 
-    static constexpr std::array<Index, 2> n_cell_to_patch = {{3, 3}};
+      static constexpr std::array<Index, 2> n_cell_to_patch = {{2, 2}};
 
-    static constexpr std::array<std::array<Pair, 3>, 2> cell_to_patch = {
-      {{{Pair{1, 0}, Pair{2, 1}, Pair{3, 2}}},
-       {{Pair{1, 3}, Pair{2, 4}, Pair{0, 2}}}}};
+      static constexpr std::array<std::array<Pair, 2>, 2> cell_to_patch = {
+        {{{Pair{1, 0}, Pair{2, 1}}}, {{Pair{1, 2}, Pair{0, 1}}}}};
 
-    static constexpr std::array<Index, 2> n_non_overlapping = {{3, 2}};
-  };
+      static constexpr std::array<Index, 2> n_non_overlapping = {{2, 1}};
+    };
 
 
-  template <>
-  struct CellPatchLookup<2, 1>
-  {
-    using Index = unsigned int;
-    using Pair  = std::pair<Index, Index>;
+    template <>
+    struct CellPatchLookup<1, 3>
+    {
+      using Index = unsigned int;
+      using Pair  = std::pair<Index, Index>;
 
-    static constexpr Index                n_cells        = 4;
-    static constexpr Index                n_patch_dofs   = 1;
-    static constexpr std::array<Index, 4> n_skipped_dofs = {{3, 3, 3, 3}};
+      static constexpr Index                n_cells        = 2;
+      static constexpr Index                n_patch_dofs   = 5;
+      static constexpr std::array<Index, 2> n_skipped_dofs = {{1, 1}};
 
-    static constexpr std::array<std::array<Index, 3>, 4> skipped_dofs = {
-      {{{0, 1, 2}}, {{0, 1, 3}}, {{0, 2, 3}}, {{1, 2, 3}}}};
+      static constexpr std::array<std::array<Index, 1>, 2> skipped_dofs = {
+        {{{0}}, {{3}}}};
 
 
-    static constexpr std::array<Index, 4> n_cell_to_patch = {{1, 1, 1, 1}};
+      static constexpr std::array<Index, 2> n_cell_to_patch = {{3, 3}};
 
-    static constexpr std::array<std::array<Pair, 1>, 4> cell_to_patch = {
-      {{{Pair{3, 0}}}, {{Pair{2, 0}}}, {{Pair{1, 0}}}, {{Pair{0, 0}}}}};
+      static constexpr std::array<std::array<Pair, 3>, 2> cell_to_patch = {
+        {{{Pair{1, 0}, Pair{2, 1}, Pair{3, 2}}},
+         {{Pair{1, 3}, Pair{2, 4}, Pair{0, 2}}}}};
 
-    static constexpr std::array<Index, 4> n_non_overlapping = {{1, 0, 0, 0}};
-  };
+      static constexpr std::array<Index, 2> n_non_overlapping = {{3, 2}};
+    };
 
 
+    template <>
+    struct CellPatchLookup<2, 1>
+    {
+      using Index = unsigned int;
+      using Pair  = std::pair<Index, Index>;
 
-  template <>
-  struct CellPatchLookup<2, 2>
-  {
-    using Index                         = unsigned int;
-    using Pair                          = std::pair<Index, Index>;
-    static constexpr Index n_cells      = 4;
-    static constexpr Index n_patch_dofs = 9;
+      static constexpr Index                n_cells        = 4;
+      static constexpr Index                n_patch_dofs   = 1;
+      static constexpr std::array<Index, 4> n_skipped_dofs = {{3, 3, 3, 3}};
 
-    static constexpr std::array<Index, 4> n_skipped_dofs = {{5, 5, 5, 5}};
+      static constexpr std::array<std::array<Index, 3>, 4> skipped_dofs = {
+        {{{0, 1, 2}}, {{0, 1, 3}}, {{0, 2, 3}}, {{1, 2, 3}}}};
 
-    static constexpr std::array<std::array<Index, 5>, 4> skipped_dofs = {
-      {{{0, 1, 2, 3, 6}},
-       {{0, 1, 2, 5, 8}},
-       {{0, 3, 6, 7, 8}},
-       {{2, 5, 6, 7, 8}}}};
 
+      static constexpr std::array<Index, 4> n_cell_to_patch = {{1, 1, 1, 1}};
 
-    static constexpr std::array<Index, 4> n_cell_to_patch = {{4, 4, 4, 4}};
+      static constexpr std::array<std::array<Pair, 1>, 4> cell_to_patch = {
+        {{{Pair{3, 0}}}, {{Pair{2, 0}}}, {{Pair{1, 0}}}, {{Pair{0, 0}}}}};
 
-    static constexpr std::array<std::array<Pair, 4>, 4> cell_to_patch = {
-      {{{Pair{4, 0}, Pair{5, 1}, Pair{7, 3}, Pair{8, 4}}},
-       {{Pair{4, 2}, Pair{7, 5}, Pair{3, 1}, Pair{6, 4}}},
-       {{Pair{4, 6}, Pair{5, 7}, Pair{1, 3}, Pair{2, 4}}},
-       {{Pair{4, 8}, Pair{0, 4}, Pair{1, 5}, Pair{3, 7}}}}};
+      static constexpr std::array<Index, 4> n_non_overlapping = {{1, 0, 0, 0}};
+    };
 
-    static constexpr std::array<Index, 4> n_non_overlapping = {{4, 2, 2, 1}};
-  };
-
-
-
-  template <>
-  struct CellPatchLookup<2, 3>
-  {
-    using Index = unsigned int;
-    using Pair  = std::pair<Index, Index>;
-
-    static constexpr Index n_cells      = 4;
-    static constexpr Index n_patch_dofs = 25;
-
-    static constexpr std::array<Index, 4> n_skipped_dofs = {{7, 7, 7, 7}};
-
-    static constexpr std::array<std::array<Index, 7>, 4> skipped_dofs = {
-      {{{0, 1, 2, 3, 4, 8, 12}},
-       {{0, 1, 2, 3, 7, 11, 15}},
-       {{0, 4, 8, 12, 13, 14, 15}},
-       {{3, 7, 11, 12, 13, 14, 15}}}};
-
-
-    static constexpr std::array<Index, 4> n_cell_to_patch = {{9, 9, 9, 9}};
-
-    static constexpr std::array<std::array<Pair, 9>, 4> cell_to_patch = {
-      {{{Pair{5, 0},
-         Pair{6, 1},
-         Pair{7, 2},
-         Pair{9, 5},
-         Pair{10, 6},
-         Pair{11, 7},
-         Pair{13, 10},
-         Pair{14, 11},
-         Pair{15, 12}}},
-       {{Pair{5, 3},
-         Pair{6, 4},
-         Pair{9, 8},
-         Pair{10, 9},
-         Pair{13, 13},
-         Pair{14, 14},
-         Pair{4, 2},
-         Pair{8, 7},
-         Pair{12, 12}}},
-       {{Pair{5, 15},
-         Pair{6, 16},
-         Pair{7, 17},
-         Pair{9, 20},
-         Pair{10, 21},
-         Pair{11, 22},
-         Pair{1, 10},
-         Pair{2, 11},
-         Pair{3, 12}}},
-       {{Pair{5, 18},
-         Pair{6, 19},
-         Pair{9, 23},
-         Pair{10, 24},
-         Pair{0, 12},
-         Pair{1, 13},
-         Pair{2, 14},
-         Pair{4, 17},
-         Pair{8, 22}}}}};
-
-    static constexpr std::array<Index, 4> n_non_overlapping = {{9, 6, 6, 4}};
-  };
-
-  template <>
-  struct CellPatchLookup<2, 4>
-  {
-    using Index                    = unsigned int;
-    using Pair                     = std::pair<Index, Index>;
-    static constexpr Index n_cells = 4;
-
-    static constexpr Index n_patch_dofs = 49;
-
-    static constexpr std::array<Index, 4> n_skipped_dofs = {{9, 9, 9, 9}};
-
-    static constexpr std::array<std::array<Index, 9>, 4> skipped_dofs = {
-      {{{0, 1, 2, 3, 4, 5, 10, 15, 20}},
-       {{0, 1, 2, 3, 4, 9, 14, 19, 24}},
-       {{0, 5, 10, 15, 20, 21, 22, 23, 24}},
-       {{4, 9, 14, 19, 20, 21, 22, 23, 24}}}};
-
-
-    static constexpr std::array<Index, 4> n_cell_to_patch = {{16, 16, 16, 16}};
-
-    static constexpr std::array<std::array<Pair, 16>, 4> cell_to_patch = {
-      {{{Pair{6, 0},
-         Pair{7, 1},
-         Pair{8, 2},
-         Pair{9, 3},
-         Pair{11, 7},
-         Pair{12, 8},
-         Pair{13, 9},
-         Pair{14, 10},
-         Pair{16, 14},
-         Pair{17, 15},
-         Pair{18, 16},
-         Pair{19, 17},
-         Pair{21, 21},
-         Pair{22, 22},
-         Pair{23, 23},
-         Pair{24, 24}}},
-       {{Pair{6, 4},
-         Pair{7, 5},
-         Pair{8, 6},
-         Pair{11, 11},
-         Pair{12, 12},
-         Pair{13, 13},
-         Pair{16, 18},
-         Pair{17, 19},
-         Pair{18, 20},
-         Pair{21, 25},
-         Pair{22, 26},
-         Pair{23, 27},
-         Pair{5, 3},
-         Pair{10, 10},
-         Pair{15, 17},
-         Pair{20, 24}}},
-       {{Pair{6, 28},
-         Pair{7, 29},
-         Pair{8, 30},
-         Pair{9, 31},
-         Pair{11, 35},
-         Pair{12, 36},
-         Pair{13, 37},
-         Pair{14, 38},
-         Pair{16, 42},
-         Pair{17, 43},
-         Pair{18, 44},
-         Pair{19, 45},
-         Pair{1, 21},
-         Pair{2, 22},
-         Pair{3, 23},
-         Pair{4, 24}}},
-       {{Pair{6, 32},
-         Pair{7, 33},
-         Pair{8, 34},
-         Pair{11, 39},
-         Pair{12, 40},
-         Pair{13, 41},
-         Pair{16, 46},
-         Pair{17, 47},
-         Pair{18, 48},
-         Pair{0, 24},
-         Pair{1, 25},
-         Pair{2, 26},
-         Pair{3, 27},
-         Pair{5, 31},
-         Pair{10, 38},
-         Pair{15, 45}}}}};
-
-    static constexpr std::array<Index, 4> n_non_overlapping = {{16, 12, 12, 9}};
-  };
-
-
-
-  template <>
-  struct CellPatchLookup<3, 1>
-  {
-    using Index = unsigned int;
-    using Pair  = std::pair<Index, Index>;
-
-    static constexpr Index                n_cells        = 8;
-    static constexpr Index                n_patch_dofs   = 1;
-    static constexpr std::array<Index, 8> n_skipped_dofs = {
-      {7, 7, 7, 7, 7, 7, 7, 7}};
-
-    static constexpr std::array<std::array<Index, 7>, 8> skipped_dofs = {
-      {{{0, 1, 2, 3, 4, 5, 6}},
-       {{0, 1, 2, 3, 4, 5, 7}},
-       {{0, 1, 2, 3, 4, 6, 7}},
-       {{0, 1, 2, 3, 5, 6, 7}},
-       {{0, 1, 2, 4, 5, 6, 7}},
-       {{0, 1, 3, 4, 5, 6, 7}},
-       {{0, 2, 3, 4, 5, 6, 7}},
-       {{1, 2, 3, 4, 5, 6, 7}}}};
-
-
-    static constexpr std::array<Index, 8> n_cell_to_patch = {
-      {1, 1, 1, 1, 1, 1, 1, 1}};
-
-    static constexpr std::array<std::array<Pair, 1>, 8> cell_to_patch = {
-      {{{Pair{7, 0}}},
-       {{Pair{6, 0}}},
-       {{Pair{5, 0}}},
-       {{Pair{4, 0}}},
-       {{Pair{3, 0}}},
-       {{Pair{2, 0}}},
-       {{Pair{1, 0}}},
-       {{Pair{0, 0}}}}};
-
-    static constexpr std::array<Index, 8> n_non_overlapping = {
-      {1, 0, 0, 0, 0, 0, 0, 0}};
-  };
-
-
-
-  template <>
-  struct CellPatchLookup<3, 2>
-  {
-    using Index = unsigned int;
-    using Pair  = std::pair<Index, Index>;
-
-    static constexpr Index                n_cells        = 8;
-    static constexpr Index                n_patch_dofs   = 27;
-    static constexpr std::array<Index, 8> n_skipped_dofs = {
-      {19, 19, 19, 19, 19, 19, 19, 19}};
-
-    static constexpr std::array<std::array<Index, 19>, 8> skipped_dofs = {
-      {{{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 15, 18, 19, 20, 21, 24}},
-       {{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 14, 17, 18, 19, 20, 23, 26}},
-       {{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 12, 15, 16, 17, 18, 21, 24, 25, 26}},
-       {{0, 1, 2, 3, 4, 5, 6, 7, 8, 11, 14, 15, 16, 17, 20, 23, 24, 25, 26}},
-       {{0, 1, 2, 3, 6, 9, 10, 11, 12, 15, 18, 19, 20, 21, 22, 23, 24, 25, 26}},
-       {{0, 1, 2, 5, 8, 9, 10, 11, 14, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26}},
-       {{0, 3, 6, 7, 8, 9, 12, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26}},
-       {{2,
-         5,
-         6,
-         7,
-         8,
-         11,
-         14,
-         15,
-         16,
-         17,
-         18,
-         19,
-         20,
-         21,
-         22,
-         23,
-         24,
-         25,
-         26}}}};
-
-
-    static constexpr std::array<Index, 8> n_cell_to_patch = {
-      {8, 8, 8, 8, 8, 8, 8, 8}};
-
-    static constexpr std::array<std::array<Pair, 8>, 8> cell_to_patch = {
-      {{{Pair{13, 0},
-         Pair{14, 1},
-         Pair{16, 3},
-         Pair{17, 4},
-         Pair{22, 9},
-         Pair{23, 10},
-         Pair{25, 12},
-         Pair{26, 13}}},
-       {{Pair{13, 2},
-         Pair{16, 5},
-         Pair{22, 11},
-         Pair{25, 14},
-         Pair{12, 1},
-         Pair{15, 4},
-         Pair{21, 10},
-         Pair{24, 13}}},
-       {{Pair{13, 6},
-         Pair{14, 7},
-         Pair{22, 15},
-         Pair{23, 16},
-         Pair{10, 3},
-         Pair{11, 4},
-         Pair{19, 12},
-         Pair{20, 13}}},
-       {{Pair{13, 8},
-         Pair{22, 17},
-         Pair{9, 4},
-         Pair{10, 5},
-         Pair{12, 7},
-         Pair{18, 13},
-         Pair{19, 14},
-         Pair{21, 16}}},
-       {{Pair{13, 18},
-         Pair{14, 19},
-         Pair{16, 21},
-         Pair{17, 22},
-         Pair{4, 9},
-         Pair{5, 10},
-         Pair{7, 12},
-         Pair{8, 13}}},
-       {{Pair{13, 20},
-         Pair{16, 23},
-         Pair{3, 10},
-         Pair{4, 11},
-         Pair{6, 13},
-         Pair{7, 14},
-         Pair{12, 19},
-         Pair{15, 22}}},
-       {{Pair{13, 24},
-         Pair{14, 25},
-         Pair{1, 12},
-         Pair{2, 13},
-         Pair{4, 15},
-         Pair{5, 16},
-         Pair{10, 21},
-         Pair{11, 22}}},
-       {{Pair{13, 26},
-         Pair{0, 13},
-         Pair{1, 14},
-         Pair{3, 16},
-         Pair{4, 17},
-         Pair{9, 22},
-         Pair{10, 23},
-         Pair{12, 25}}}}};
-
-    static constexpr std::array<Index, 8> n_non_overlapping = {
-      {8, 4, 4, 2, 4, 2, 2, 1}};
-  };
-
-
-
-  template <>
-  struct CellPatchLookup<3, 3>
-  {
-    using Index = unsigned int;
-    using Pair  = std::pair<Index, Index>;
-
-    static constexpr Index                n_cells        = 8;
-    static constexpr Index                n_patch_dofs   = 125;
-    static constexpr std::array<Index, 8> n_skipped_dofs = {
-      {37, 37, 37, 37, 37, 37, 37, 37}};
-
-    static constexpr std::array<std::array<Index, 37>, 8> skipped_dofs = {
-      {{{0,  1,  2,  3,  4,  5,  6,  7,  8,  9,  10, 11, 12,
-         13, 14, 15, 16, 17, 18, 19, 20, 24, 28, 32, 33, 34,
-         35, 36, 40, 44, 48, 49, 50, 51, 52, 56, 60}},
-       {{0,  1,  2,  3,  4,  5,  6,  7,  8,  9,  10, 11, 12,
-         13, 14, 15, 16, 17, 18, 19, 23, 27, 31, 32, 33, 34,
-         35, 39, 43, 47, 48, 49, 50, 51, 55, 59, 63}},
-       {{0,  1,  2,  3,  4,  5,  6,  7,  8,  9,  10, 11, 12,
-         13, 14, 15, 16, 20, 24, 28, 29, 30, 31, 32, 36, 40,
-         44, 45, 46, 47, 48, 52, 56, 60, 61, 62, 63}},
-       {{0,  1,  2,  3,  4,  5,  6,  7,  8,  9,  10, 11, 12,
-         13, 14, 15, 19, 23, 27, 28, 29, 30, 31, 35, 39, 43,
-         44, 45, 46, 47, 51, 55, 59, 60, 61, 62, 63}},
-       {{0,  1,  2,  3,  4,  8,  12, 16, 17, 18, 19, 20, 24,
-         28, 32, 33, 34, 35, 36, 40, 44, 48, 49, 50, 51, 52,
-         53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63}},
-       {{0,  1,  2,  3,  7,  11, 15, 16, 17, 18, 19, 23, 27,
-         31, 32, 33, 34, 35, 39, 43, 47, 48, 49, 50, 51, 52,
-         53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63}},
-       {{0,  4,  8,  12, 13, 14, 15, 16, 20, 24, 28, 29, 30,
-         31, 32, 36, 40, 44, 45, 46, 47, 48, 49, 50, 51, 52,
-         53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63}},
-       {{3,  7,  11, 12, 13, 14, 15, 19, 23, 27, 28, 29, 30,
-         31, 35, 39, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52,
-         53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63}}}};
-
-
-    static constexpr std::array<Index, 8> n_cell_to_patch = {
-      {27, 27, 27, 27, 27, 27, 27, 27}};
-
-    static constexpr std::array<std::array<Pair, 27>, 8> cell_to_patch = {
-      {{{Pair{21, 0},  Pair{22, 1},  Pair{23, 2},  Pair{25, 5},  Pair{26, 6},
-         Pair{27, 7},  Pair{29, 10}, Pair{30, 11}, Pair{31, 12}, Pair{37, 25},
-         Pair{38, 26}, Pair{39, 27}, Pair{41, 30}, Pair{42, 31}, Pair{43, 32},
-         Pair{45, 35}, Pair{46, 36}, Pair{47, 37}, Pair{53, 50}, Pair{54, 51},
-         Pair{55, 52}, Pair{57, 55}, Pair{58, 56}, Pair{59, 57}, Pair{61, 60},
-         Pair{62, 61}, Pair{63, 62}}},
-       {{Pair{21, 3},  Pair{22, 4},  Pair{25, 8},  Pair{26, 9},  Pair{29, 13},
-         Pair{30, 14}, Pair{37, 28}, Pair{38, 29}, Pair{41, 33}, Pair{42, 34},
-         Pair{45, 38}, Pair{46, 39}, Pair{53, 53}, Pair{54, 54}, Pair{57, 58},
-         Pair{58, 59}, Pair{61, 63}, Pair{62, 64}, Pair{20, 2},  Pair{24, 7},
-         Pair{28, 12}, Pair{36, 27}, Pair{40, 32}, Pair{44, 37}, Pair{52, 52},
-         Pair{56, 57}, Pair{60, 62}}},
-       {{Pair{21, 15}, Pair{22, 16}, Pair{23, 17}, Pair{25, 20}, Pair{26, 21},
-         Pair{27, 22}, Pair{37, 40}, Pair{38, 41}, Pair{39, 42}, Pair{41, 45},
-         Pair{42, 46}, Pair{43, 47}, Pair{53, 65}, Pair{54, 66}, Pair{55, 67},
-         Pair{57, 70}, Pair{58, 71}, Pair{59, 72}, Pair{17, 10}, Pair{18, 11},
-         Pair{19, 12}, Pair{33, 35}, Pair{34, 36}, Pair{35, 37}, Pair{49, 60},
-         Pair{50, 61}, Pair{51, 62}}},
-       {{Pair{21, 18}, Pair{22, 19}, Pair{25, 23}, Pair{26, 24}, Pair{37, 43},
-         Pair{38, 44}, Pair{41, 48}, Pair{42, 49}, Pair{53, 68}, Pair{54, 69},
-         Pair{57, 73}, Pair{58, 74}, Pair{16, 12}, Pair{17, 13}, Pair{18, 14},
-         Pair{20, 17}, Pair{24, 22}, Pair{32, 37}, Pair{33, 38}, Pair{34, 39},
-         Pair{36, 42}, Pair{40, 47}, Pair{48, 62}, Pair{49, 63}, Pair{50, 64},
-         Pair{52, 67}, Pair{56, 72}}},
-       {{Pair{21, 75},  Pair{22, 76},  Pair{23, 77},  Pair{25, 80},
-         Pair{26, 81},  Pair{27, 82},  Pair{29, 85},  Pair{30, 86},
-         Pair{31, 87},  Pair{37, 100}, Pair{38, 101}, Pair{39, 102},
-         Pair{41, 105}, Pair{42, 106}, Pair{43, 107}, Pair{45, 110},
-         Pair{46, 111}, Pair{47, 112}, Pair{5, 50},   Pair{6, 51},
-         Pair{7, 52},   Pair{9, 55},   Pair{10, 56},  Pair{11, 57},
-         Pair{13, 60},  Pair{14, 61},  Pair{15, 62}}},
-       {{Pair{21, 78},  Pair{22, 79},  Pair{25, 83},  Pair{26, 84},
-         Pair{29, 88},  Pair{30, 89},  Pair{37, 103}, Pair{38, 104},
-         Pair{41, 108}, Pair{42, 109}, Pair{45, 113}, Pair{46, 114},
-         Pair{4, 52},   Pair{5, 53},   Pair{6, 54},   Pair{8, 57},
-         Pair{9, 58},   Pair{10, 59},  Pair{12, 62},  Pair{13, 63},
-         Pair{14, 64},  Pair{20, 77},  Pair{24, 82},  Pair{28, 87},
-         Pair{36, 102}, Pair{40, 107}, Pair{44, 112}}},
-       {{Pair{21, 90},  Pair{22, 91},  Pair{23, 92},  Pair{25, 95},
-         Pair{26, 96},  Pair{27, 97},  Pair{37, 115}, Pair{38, 116},
-         Pair{39, 117}, Pair{41, 120}, Pair{42, 121}, Pair{43, 122},
-         Pair{1, 60},   Pair{2, 61},   Pair{3, 62},   Pair{5, 65},
-         Pair{6, 66},   Pair{7, 67},   Pair{9, 70},   Pair{10, 71},
-         Pair{11, 72},  Pair{17, 85},  Pair{18, 86},  Pair{19, 87},
-         Pair{33, 110}, Pair{34, 111}, Pair{35, 112}}},
-       {{Pair{21, 93},  Pair{22, 94},  Pair{25, 98},  Pair{26, 99},
-         Pair{37, 118}, Pair{38, 119}, Pair{41, 123}, Pair{42, 124},
-         Pair{0, 62},   Pair{1, 63},   Pair{2, 64},   Pair{4, 67},
-         Pair{5, 68},   Pair{6, 69},   Pair{8, 72},   Pair{9, 73},
-         Pair{10, 74},  Pair{16, 87},  Pair{17, 88},  Pair{18, 89},
-         Pair{20, 92},  Pair{24, 97},  Pair{32, 112}, Pair{33, 113},
-         Pair{34, 114}, Pair{36, 117}, Pair{40, 122}}}}};
-
-    static constexpr std::array<Index, 8> n_non_overlapping = {
-      {27, 18, 18, 12, 18, 12, 12, 8}};
-  };
 
+
+    template <>
+    struct CellPatchLookup<2, 2>
+    {
+      using Index                         = unsigned int;
+      using Pair                          = std::pair<Index, Index>;
+      static constexpr Index n_cells      = 4;
+      static constexpr Index n_patch_dofs = 9;
+
+      static constexpr std::array<Index, 4> n_skipped_dofs = {{5, 5, 5, 5}};
+
+      static constexpr std::array<std::array<Index, 5>, 4> skipped_dofs = {
+        {{{0, 1, 2, 3, 6}},
+         {{0, 1, 2, 5, 8}},
+         {{0, 3, 6, 7, 8}},
+         {{2, 5, 6, 7, 8}}}};
+
+
+      static constexpr std::array<Index, 4> n_cell_to_patch = {{4, 4, 4, 4}};
+
+      static constexpr std::array<std::array<Pair, 4>, 4> cell_to_patch = {
+        {{{Pair{4, 0}, Pair{5, 1}, Pair{7, 3}, Pair{8, 4}}},
+         {{Pair{4, 2}, Pair{7, 5}, Pair{3, 1}, Pair{6, 4}}},
+         {{Pair{4, 6}, Pair{5, 7}, Pair{1, 3}, Pair{2, 4}}},
+         {{Pair{4, 8}, Pair{0, 4}, Pair{1, 5}, Pair{3, 7}}}}};
+
+      static constexpr std::array<Index, 4> n_non_overlapping = {{4, 2, 2, 1}};
+    };
+
+
+
+    template <>
+    struct CellPatchLookup<2, 3>
+    {
+      using Index = unsigned int;
+      using Pair  = std::pair<Index, Index>;
+
+      static constexpr Index n_cells      = 4;
+      static constexpr Index n_patch_dofs = 25;
+
+      static constexpr std::array<Index, 4> n_skipped_dofs = {{7, 7, 7, 7}};
+
+      static constexpr std::array<std::array<Index, 7>, 4> skipped_dofs = {
+        {{{0, 1, 2, 3, 4, 8, 12}},
+         {{0, 1, 2, 3, 7, 11, 15}},
+         {{0, 4, 8, 12, 13, 14, 15}},
+         {{3, 7, 11, 12, 13, 14, 15}}}};
+
+
+      static constexpr std::array<Index, 4> n_cell_to_patch = {{9, 9, 9, 9}};
+
+      static constexpr std::array<std::array<Pair, 9>, 4> cell_to_patch = {
+        {{{Pair{5, 0},
+           Pair{6, 1},
+           Pair{7, 2},
+           Pair{9, 5},
+           Pair{10, 6},
+           Pair{11, 7},
+           Pair{13, 10},
+           Pair{14, 11},
+           Pair{15, 12}}},
+         {{Pair{5, 3},
+           Pair{6, 4},
+           Pair{9, 8},
+           Pair{10, 9},
+           Pair{13, 13},
+           Pair{14, 14},
+           Pair{4, 2},
+           Pair{8, 7},
+           Pair{12, 12}}},
+         {{Pair{5, 15},
+           Pair{6, 16},
+           Pair{7, 17},
+           Pair{9, 20},
+           Pair{10, 21},
+           Pair{11, 22},
+           Pair{1, 10},
+           Pair{2, 11},
+           Pair{3, 12}}},
+         {{Pair{5, 18},
+           Pair{6, 19},
+           Pair{9, 23},
+           Pair{10, 24},
+           Pair{0, 12},
+           Pair{1, 13},
+           Pair{2, 14},
+           Pair{4, 17},
+           Pair{8, 22}}}}};
+
+      static constexpr std::array<Index, 4> n_non_overlapping = {{9, 6, 6, 4}};
+    };
+
+    template <>
+    struct CellPatchLookup<2, 4>
+    {
+      using Index                    = unsigned int;
+      using Pair                     = std::pair<Index, Index>;
+      static constexpr Index n_cells = 4;
+
+      static constexpr Index n_patch_dofs = 49;
+
+      static constexpr std::array<Index, 4> n_skipped_dofs = {{9, 9, 9, 9}};
+
+      static constexpr std::array<std::array<Index, 9>, 4> skipped_dofs = {
+        {{{0, 1, 2, 3, 4, 5, 10, 15, 20}},
+         {{0, 1, 2, 3, 4, 9, 14, 19, 24}},
+         {{0, 5, 10, 15, 20, 21, 22, 23, 24}},
+         {{4, 9, 14, 19, 20, 21, 22, 23, 24}}}};
+
+
+      static constexpr std::array<Index, 4> n_cell_to_patch = {
+        {16, 16, 16, 16}};
+
+      static constexpr std::array<std::array<Pair, 16>, 4> cell_to_patch = {
+        {{{Pair{6, 0},
+           Pair{7, 1},
+           Pair{8, 2},
+           Pair{9, 3},
+           Pair{11, 7},
+           Pair{12, 8},
+           Pair{13, 9},
+           Pair{14, 10},
+           Pair{16, 14},
+           Pair{17, 15},
+           Pair{18, 16},
+           Pair{19, 17},
+           Pair{21, 21},
+           Pair{22, 22},
+           Pair{23, 23},
+           Pair{24, 24}}},
+         {{Pair{6, 4},
+           Pair{7, 5},
+           Pair{8, 6},
+           Pair{11, 11},
+           Pair{12, 12},
+           Pair{13, 13},
+           Pair{16, 18},
+           Pair{17, 19},
+           Pair{18, 20},
+           Pair{21, 25},
+           Pair{22, 26},
+           Pair{23, 27},
+           Pair{5, 3},
+           Pair{10, 10},
+           Pair{15, 17},
+           Pair{20, 24}}},
+         {{Pair{6, 28},
+           Pair{7, 29},
+           Pair{8, 30},
+           Pair{9, 31},
+           Pair{11, 35},
+           Pair{12, 36},
+           Pair{13, 37},
+           Pair{14, 38},
+           Pair{16, 42},
+           Pair{17, 43},
+           Pair{18, 44},
+           Pair{19, 45},
+           Pair{1, 21},
+           Pair{2, 22},
+           Pair{3, 23},
+           Pair{4, 24}}},
+         {{Pair{6, 32},
+           Pair{7, 33},
+           Pair{8, 34},
+           Pair{11, 39},
+           Pair{12, 40},
+           Pair{13, 41},
+           Pair{16, 46},
+           Pair{17, 47},
+           Pair{18, 48},
+           Pair{0, 24},
+           Pair{1, 25},
+           Pair{2, 26},
+           Pair{3, 27},
+           Pair{5, 31},
+           Pair{10, 38},
+           Pair{15, 45}}}}};
+
+      static constexpr std::array<Index, 4> n_non_overlapping = {
+        {16, 12, 12, 9}};
+    };
+
+
+
+    template <>
+    struct CellPatchLookup<3, 1>
+    {
+      using Index = unsigned int;
+      using Pair  = std::pair<Index, Index>;
+
+      static constexpr Index                n_cells        = 8;
+      static constexpr Index                n_patch_dofs   = 1;
+      static constexpr std::array<Index, 8> n_skipped_dofs = {
+        {7, 7, 7, 7, 7, 7, 7, 7}};
+
+      static constexpr std::array<std::array<Index, 7>, 8> skipped_dofs = {
+        {{{0, 1, 2, 3, 4, 5, 6}},
+         {{0, 1, 2, 3, 4, 5, 7}},
+         {{0, 1, 2, 3, 4, 6, 7}},
+         {{0, 1, 2, 3, 5, 6, 7}},
+         {{0, 1, 2, 4, 5, 6, 7}},
+         {{0, 1, 3, 4, 5, 6, 7}},
+         {{0, 2, 3, 4, 5, 6, 7}},
+         {{1, 2, 3, 4, 5, 6, 7}}}};
+
+
+      static constexpr std::array<Index, 8> n_cell_to_patch = {
+        {1, 1, 1, 1, 1, 1, 1, 1}};
+
+      static constexpr std::array<std::array<Pair, 1>, 8> cell_to_patch = {
+        {{{Pair{7, 0}}},
+         {{Pair{6, 0}}},
+         {{Pair{5, 0}}},
+         {{Pair{4, 0}}},
+         {{Pair{3, 0}}},
+         {{Pair{2, 0}}},
+         {{Pair{1, 0}}},
+         {{Pair{0, 0}}}}};
+
+      static constexpr std::array<Index, 8> n_non_overlapping = {
+        {1, 0, 0, 0, 0, 0, 0, 0}};
+    };
+
+
+
+    template <>
+    struct CellPatchLookup<3, 2>
+    {
+      using Index = unsigned int;
+      using Pair  = std::pair<Index, Index>;
+
+      static constexpr Index                n_cells        = 8;
+      static constexpr Index                n_patch_dofs   = 27;
+      static constexpr std::array<Index, 8> n_skipped_dofs = {
+        {19, 19, 19, 19, 19, 19, 19, 19}};
+
+      static constexpr std::array<std::array<Index, 19>, 8> skipped_dofs = {
+        {{{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 15, 18, 19, 20, 21, 24}},
+         {{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 14, 17, 18, 19, 20, 23, 26}},
+         {{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 12, 15, 16, 17, 18, 21, 24, 25, 26}},
+         {{0, 1, 2, 3, 4, 5, 6, 7, 8, 11, 14, 15, 16, 17, 20, 23, 24, 25, 26}},
+         {{0,
+           1,
+           2,
+           3,
+           6,
+           9,
+           10,
+           11,
+           12,
+           15,
+           18,
+           19,
+           20,
+           21,
+           22,
+           23,
+           24,
+           25,
+           26}},
+         {{0,
+           1,
+           2,
+           5,
+           8,
+           9,
+           10,
+           11,
+           14,
+           17,
+           18,
+           19,
+           20,
+           21,
+           22,
+           23,
+           24,
+           25,
+           26}},
+         {{0,
+           3,
+           6,
+           7,
+           8,
+           9,
+           12,
+           15,
+           16,
+           17,
+           18,
+           19,
+           20,
+           21,
+           22,
+           23,
+           24,
+           25,
+           26}},
+         {{2,
+           5,
+           6,
+           7,
+           8,
+           11,
+           14,
+           15,
+           16,
+           17,
+           18,
+           19,
+           20,
+           21,
+           22,
+           23,
+           24,
+           25,
+           26}}}};
+
+
+      static constexpr std::array<Index, 8> n_cell_to_patch = {
+        {8, 8, 8, 8, 8, 8, 8, 8}};
+
+      static constexpr std::array<std::array<Pair, 8>, 8> cell_to_patch = {
+        {{{Pair{13, 0},
+           Pair{14, 1},
+           Pair{16, 3},
+           Pair{17, 4},
+           Pair{22, 9},
+           Pair{23, 10},
+           Pair{25, 12},
+           Pair{26, 13}}},
+         {{Pair{13, 2},
+           Pair{16, 5},
+           Pair{22, 11},
+           Pair{25, 14},
+           Pair{12, 1},
+           Pair{15, 4},
+           Pair{21, 10},
+           Pair{24, 13}}},
+         {{Pair{13, 6},
+           Pair{14, 7},
+           Pair{22, 15},
+           Pair{23, 16},
+           Pair{10, 3},
+           Pair{11, 4},
+           Pair{19, 12},
+           Pair{20, 13}}},
+         {{Pair{13, 8},
+           Pair{22, 17},
+           Pair{9, 4},
+           Pair{10, 5},
+           Pair{12, 7},
+           Pair{18, 13},
+           Pair{19, 14},
+           Pair{21, 16}}},
+         {{Pair{13, 18},
+           Pair{14, 19},
+           Pair{16, 21},
+           Pair{17, 22},
+           Pair{4, 9},
+           Pair{5, 10},
+           Pair{7, 12},
+           Pair{8, 13}}},
+         {{Pair{13, 20},
+           Pair{16, 23},
+           Pair{3, 10},
+           Pair{4, 11},
+           Pair{6, 13},
+           Pair{7, 14},
+           Pair{12, 19},
+           Pair{15, 22}}},
+         {{Pair{13, 24},
+           Pair{14, 25},
+           Pair{1, 12},
+           Pair{2, 13},
+           Pair{4, 15},
+           Pair{5, 16},
+           Pair{10, 21},
+           Pair{11, 22}}},
+         {{Pair{13, 26},
+           Pair{0, 13},
+           Pair{1, 14},
+           Pair{3, 16},
+           Pair{4, 17},
+           Pair{9, 22},
+           Pair{10, 23},
+           Pair{12, 25}}}}};
+
+      static constexpr std::array<Index, 8> n_non_overlapping = {
+        {8, 4, 4, 2, 4, 2, 2, 1}};
+    };
+
+
+
+    template <>
+    struct CellPatchLookup<3, 3>
+    {
+      using Index = unsigned int;
+      using Pair  = std::pair<Index, Index>;
+
+      static constexpr Index                n_cells        = 8;
+      static constexpr Index                n_patch_dofs   = 125;
+      static constexpr std::array<Index, 8> n_skipped_dofs = {
+        {37, 37, 37, 37, 37, 37, 37, 37}};
+
+      static constexpr std::array<std::array<Index, 37>, 8> skipped_dofs = {
+        {{{0,  1,  2,  3,  4,  5,  6,  7,  8,  9,  10, 11, 12,
+           13, 14, 15, 16, 17, 18, 19, 20, 24, 28, 32, 33, 34,
+           35, 36, 40, 44, 48, 49, 50, 51, 52, 56, 60}},
+         {{0,  1,  2,  3,  4,  5,  6,  7,  8,  9,  10, 11, 12,
+           13, 14, 15, 16, 17, 18, 19, 23, 27, 31, 32, 33, 34,
+           35, 39, 43, 47, 48, 49, 50, 51, 55, 59, 63}},
+         {{0,  1,  2,  3,  4,  5,  6,  7,  8,  9,  10, 11, 12,
+           13, 14, 15, 16, 20, 24, 28, 29, 30, 31, 32, 36, 40,
+           44, 45, 46, 47, 48, 52, 56, 60, 61, 62, 63}},
+         {{0,  1,  2,  3,  4,  5,  6,  7,  8,  9,  10, 11, 12,
+           13, 14, 15, 19, 23, 27, 28, 29, 30, 31, 35, 39, 43,
+           44, 45, 46, 47, 51, 55, 59, 60, 61, 62, 63}},
+         {{0,  1,  2,  3,  4,  8,  12, 16, 17, 18, 19, 20, 24,
+           28, 32, 33, 34, 35, 36, 40, 44, 48, 49, 50, 51, 52,
+           53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63}},
+         {{0,  1,  2,  3,  7,  11, 15, 16, 17, 18, 19, 23, 27,
+           31, 32, 33, 34, 35, 39, 43, 47, 48, 49, 50, 51, 52,
+           53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63}},
+         {{0,  4,  8,  12, 13, 14, 15, 16, 20, 24, 28, 29, 30,
+           31, 32, 36, 40, 44, 45, 46, 47, 48, 49, 50, 51, 52,
+           53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63}},
+         {{3,  7,  11, 12, 13, 14, 15, 19, 23, 27, 28, 29, 30,
+           31, 35, 39, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52,
+           53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63}}}};
+
+
+      static constexpr std::array<Index, 8> n_cell_to_patch = {
+        {27, 27, 27, 27, 27, 27, 27, 27}};
+
+      static constexpr std::array<std::array<Pair, 27>, 8> cell_to_patch = {
+        {{{Pair{21, 0},  Pair{22, 1},  Pair{23, 2},  Pair{25, 5},  Pair{26, 6},
+           Pair{27, 7},  Pair{29, 10}, Pair{30, 11}, Pair{31, 12}, Pair{37, 25},
+           Pair{38, 26}, Pair{39, 27}, Pair{41, 30}, Pair{42, 31}, Pair{43, 32},
+           Pair{45, 35}, Pair{46, 36}, Pair{47, 37}, Pair{53, 50}, Pair{54, 51},
+           Pair{55, 52}, Pair{57, 55}, Pair{58, 56}, Pair{59, 57}, Pair{61, 60},
+           Pair{62, 61}, Pair{63, 62}}},
+         {{Pair{21, 3},  Pair{22, 4},  Pair{25, 8},  Pair{26, 9},  Pair{29, 13},
+           Pair{30, 14}, Pair{37, 28}, Pair{38, 29}, Pair{41, 33}, Pair{42, 34},
+           Pair{45, 38}, Pair{46, 39}, Pair{53, 53}, Pair{54, 54}, Pair{57, 58},
+           Pair{58, 59}, Pair{61, 63}, Pair{62, 64}, Pair{20, 2},  Pair{24, 7},
+           Pair{28, 12}, Pair{36, 27}, Pair{40, 32}, Pair{44, 37}, Pair{52, 52},
+           Pair{56, 57}, Pair{60, 62}}},
+         {{Pair{21, 15}, Pair{22, 16}, Pair{23, 17}, Pair{25, 20}, Pair{26, 21},
+           Pair{27, 22}, Pair{37, 40}, Pair{38, 41}, Pair{39, 42}, Pair{41, 45},
+           Pair{42, 46}, Pair{43, 47}, Pair{53, 65}, Pair{54, 66}, Pair{55, 67},
+           Pair{57, 70}, Pair{58, 71}, Pair{59, 72}, Pair{17, 10}, Pair{18, 11},
+           Pair{19, 12}, Pair{33, 35}, Pair{34, 36}, Pair{35, 37}, Pair{49, 60},
+           Pair{50, 61}, Pair{51, 62}}},
+         {{Pair{21, 18}, Pair{22, 19}, Pair{25, 23}, Pair{26, 24}, Pair{37, 43},
+           Pair{38, 44}, Pair{41, 48}, Pair{42, 49}, Pair{53, 68}, Pair{54, 69},
+           Pair{57, 73}, Pair{58, 74}, Pair{16, 12}, Pair{17, 13}, Pair{18, 14},
+           Pair{20, 17}, Pair{24, 22}, Pair{32, 37}, Pair{33, 38}, Pair{34, 39},
+           Pair{36, 42}, Pair{40, 47}, Pair{48, 62}, Pair{49, 63}, Pair{50, 64},
+           Pair{52, 67}, Pair{56, 72}}},
+         {{Pair{21, 75},  Pair{22, 76},  Pair{23, 77},  Pair{25, 80},
+           Pair{26, 81},  Pair{27, 82},  Pair{29, 85},  Pair{30, 86},
+           Pair{31, 87},  Pair{37, 100}, Pair{38, 101}, Pair{39, 102},
+           Pair{41, 105}, Pair{42, 106}, Pair{43, 107}, Pair{45, 110},
+           Pair{46, 111}, Pair{47, 112}, Pair{5, 50},   Pair{6, 51},
+           Pair{7, 52},   Pair{9, 55},   Pair{10, 56},  Pair{11, 57},
+           Pair{13, 60},  Pair{14, 61},  Pair{15, 62}}},
+         {{Pair{21, 78},  Pair{22, 79},  Pair{25, 83},  Pair{26, 84},
+           Pair{29, 88},  Pair{30, 89},  Pair{37, 103}, Pair{38, 104},
+           Pair{41, 108}, Pair{42, 109}, Pair{45, 113}, Pair{46, 114},
+           Pair{4, 52},   Pair{5, 53},   Pair{6, 54},   Pair{8, 57},
+           Pair{9, 58},   Pair{10, 59},  Pair{12, 62},  Pair{13, 63},
+           Pair{14, 64},  Pair{20, 77},  Pair{24, 82},  Pair{28, 87},
+           Pair{36, 102}, Pair{40, 107}, Pair{44, 112}}},
+         {{Pair{21, 90},  Pair{22, 91},  Pair{23, 92},  Pair{25, 95},
+           Pair{26, 96},  Pair{27, 97},  Pair{37, 115}, Pair{38, 116},
+           Pair{39, 117}, Pair{41, 120}, Pair{42, 121}, Pair{43, 122},
+           Pair{1, 60},   Pair{2, 61},   Pair{3, 62},   Pair{5, 65},
+           Pair{6, 66},   Pair{7, 67},   Pair{9, 70},   Pair{10, 71},
+           Pair{11, 72},  Pair{17, 85},  Pair{18, 86},  Pair{19, 87},
+           Pair{33, 110}, Pair{34, 111}, Pair{35, 112}}},
+         {{Pair{21, 93},  Pair{22, 94},  Pair{25, 98},  Pair{26, 99},
+           Pair{37, 118}, Pair{38, 119}, Pair{41, 123}, Pair{42, 124},
+           Pair{0, 62},   Pair{1, 63},   Pair{2, 64},   Pair{4, 67},
+           Pair{5, 68},   Pair{6, 69},   Pair{8, 72},   Pair{9, 73},
+           Pair{10, 74},  Pair{16, 87},  Pair{17, 88},  Pair{18, 89},
+           Pair{20, 92},  Pair{24, 97},  Pair{32, 112}, Pair{33, 113},
+           Pair{34, 114}, Pair{36, 117}, Pair{40, 122}}}}};
+
+      static constexpr std::array<Index, 8> n_non_overlapping = {
+        {27, 18, 18, 12, 18, 12, 12, 8}};
+    };
+  } // namespace internal
 
 #endif // DOXYGEN
 } // namespace PatchDistributors
