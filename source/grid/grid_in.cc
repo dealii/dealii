@@ -3153,7 +3153,7 @@ GridIn<dim, spacedim>::read_partitioned_msh(const std::string &file_prefix,
   AssertThrow(parallel_tria != nullptr,
               ExcMessage("Triangulation is not fully distributed!"));
 
-  // Now it’s safe to call get_communicator()
+  // Now it's safe to call get_communicator()
   MPI_Comm mpi_comm = parallel_tria->get_communicator();
 
   const unsigned int nprocs = Utilities::MPI::n_mpi_processes(mpi_comm);
@@ -3260,17 +3260,14 @@ GridIn<dim, spacedim>::read_partitioned_msh(const std::string &file_prefix,
   std::vector<std::pair<int, int>> physical_groups;
   gmsh::model::getPhysicalGroups(physical_groups);
 
-  for (const auto &pg : physical_groups)
+  for (const auto &[physical_dim, physical_tag] : physical_groups)
     {
-      int physical_dim = pg.first;
-      int physical_tag = pg.second;
-
       std::vector<int> physical_entities;
       gmsh::model::getEntitiesForPhysicalGroup(physical_dim,
                                                physical_tag,
                                                physical_entities);
 
-      for (int ent : physical_entities)
+      for (const int ent : physical_entities)
         {
           // Assign boundary ID for faces (dim-1)
           if (physical_dim == dim - 1)
@@ -3286,50 +3283,51 @@ GridIn<dim, spacedim>::read_partitioned_msh(const std::string &file_prefix,
 
   // Process all (dim-1)-dimensional entities for boundary assignment
   for (const auto &e : entities)
-    if (auto it = entity_to_boundary.find({e.first, e.second});
-        e.first == dim - 1 && it != entity_to_boundary.end())
-      {
-        const types::boundary_id boundary_id = it->second;
+    if (e.first == dim - 1)
+      if (auto it = entity_to_boundary.find({e.first, e.second});
+          it != entity_to_boundary.end())
+        {
+          const types::boundary_id boundary_id = it->second;
 
-        std::vector<int>                      element_types;
-        std::vector<std::vector<std::size_t>> element_ids, element_nodes;
+          std::vector<int>                      element_types;
+          std::vector<std::vector<std::size_t>> element_ids, element_nodes;
 
-        // Get all elements on this (dim-1)-entity
-        gmsh::model::mesh::getElements(
-          element_types, element_ids, element_nodes, e.first, e.second);
+          // Get all elements on this (dim-1)-entity
+          gmsh::model::mesh::getElements(
+            element_types, element_ids, element_nodes, e.first, e.second);
 
-        for (unsigned int i = 0; i < element_types.size(); ++i)
-          {
-            if (element_ids[i].empty())
-              continue;
+          for (unsigned int i = 0; i < element_types.size(); ++i)
+            {
+              if (element_ids[i].empty())
+                continue;
 
-            const unsigned int n_nodes_per_elem =
-              element_nodes[i].size() / element_ids[i].size();
+              const unsigned int n_nodes_per_elem =
+                element_nodes[i].size() / element_ids[i].size();
 
-            for (unsigned int j = 0; j < element_ids[i].size(); ++j)
-              {
-                std::set<unsigned int> face_vertices;
-                for (unsigned int k = 0; k < n_nodes_per_elem; ++k)
-                  {
-                    std::size_t node_tag =
-                      element_nodes[i][j * n_nodes_per_elem + k];
-                    face_vertices.insert(node_tag_to_index[node_tag]);
-                  }
+              for (unsigned int j = 0; j < element_ids[i].size(); ++j)
+                {
+                  std::set<unsigned int> face_vertices;
+                  for (unsigned int k = 0; k < n_nodes_per_elem; ++k)
+                    {
+                      std::size_t node_tag =
+                        element_nodes[i][j * n_nodes_per_elem + k];
+                      face_vertices.insert(node_tag_to_index[node_tag]);
+                    }
 
-                // Store boundary IDs for this face
-                if (boundary_id != numbers::invalid_boundary_id)
-                  boundary_face_map[face_vertices] = boundary_id;
-              }
-          }
-      }
+                  // Store boundary IDs for this face
+                  if (boundary_id != numbers::invalid_boundary_id)
+                    boundary_face_map[face_vertices] = boundary_id;
+                }
+            }
+        }
 
 
 
   // Count total volume elements and reserve space
   std::size_t total_volume_elements = 0;
-  for (const auto &e : entities)
+  for (const auto &[entity_dim, entity_tag] : entities)
     {
-      if (e.first == dim)
+      if (entity_dim == dim) // we only care about cells here
         {
           std::vector<int>                      count_element_types;
           std::vector<std::vector<std::size_t>> count_element_ids,
@@ -3338,8 +3336,8 @@ GridIn<dim, spacedim>::read_partitioned_msh(const std::string &file_prefix,
           gmsh::model::mesh::getElements(count_element_types,
                                          count_element_ids,
                                          count_element_nodes,
-                                         e.first,
-                                         e.second);
+                                         entity_dim,
+                                         entity_tag);
 
           for (unsigned int i = 0; i < count_element_ids.size(); ++i)
             total_volume_elements += count_element_ids[i].size();
@@ -3352,11 +3350,8 @@ GridIn<dim, spacedim>::read_partitioned_msh(const std::string &file_prefix,
     total_volume_elements);
   triangulation_description.cell_infos[0].reserve(total_volume_elements);
 
-  for (const auto &e : entities)
+  for (const auto &[entity_dim, entity_tag] : entities)
     {
-      const int entity_dim = e.first;
-      const int entity_tag = e.second;
-
       if (entity_dim == dim)
         {
           std::vector<int>                      element_types;
@@ -3378,7 +3373,7 @@ GridIn<dim, spacedim>::read_partitioned_msh(const std::string &file_prefix,
                   CellData<dim> cell(n_vertices);
 
                   cell.material_id = numbers::invalid_material_id;
-                  if (auto it = entity_to_material.find({dim, e.second});
+                  if (auto it = entity_to_material.find({dim, entity_tag});
                       it != entity_to_material.end())
                     cell.material_id = it->second;
 
@@ -3502,7 +3497,8 @@ GridIn<dim, spacedim>::read_partitioned_msh(const std::string &file_prefix,
 
 
 #  ifdef DEAL_II_WITH_MPI
-  MPI_Barrier(mpi_comm);
+  const int mpi_ierr = MPI_Barrier(mpi_comm);
+  AssertThrowMPI(mpi_ierr);
 #  endif
 
   gmsh::clear();
