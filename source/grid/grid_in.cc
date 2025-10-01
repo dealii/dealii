@@ -3252,6 +3252,79 @@ GridIn<dim, spacedim>::read_partitioned_msh(const std::string &file_prefix,
           coords[3 * i + d];
     }
 
+  // --- Collect physical groups for boundary and material info ---
+  std::map<std::pair<int, int>, types::boundary_id> entity_to_boundary;
+  std::map<std::pair<int, int>, types::material_id> entity_to_material;
+
+
+  std::vector<std::pair<int, int>> physical_groups;
+  gmsh::model::getPhysicalGroups(physical_groups);
+
+  for (const auto &pg : physical_groups)
+    {
+      int physical_dim = pg.first;
+      int physical_tag = pg.second;
+
+      std::vector<int> physical_entities;
+      gmsh::model::getEntitiesForPhysicalGroup(physical_dim,
+                                               physical_tag,
+                                               physical_entities);
+
+      for (int ent : physical_entities)
+        {
+          // Assign boundary ID for faces (dim-1)
+          if (physical_dim == dim - 1)
+            entity_to_boundary[{physical_dim, ent}] = physical_tag;
+          if (physical_dim == dim) // Volume materials
+            entity_to_material[{physical_dim, ent}] = physical_tag;
+        }
+    }
+
+  // --- Build boundary face map for all (dim-1) entities ---
+
+  std::map<std::set<unsigned int>, types::boundary_id> boundary_face_map;
+
+  // Process all (dim-1)-dimensional entities for boundary assignment
+  for (const auto &e : entities)
+    if (auto it = entity_to_boundary.find({e.first, e.second});
+        e.first == dim - 1 && it != entity_to_boundary.end())
+      {
+        const types::boundary_id boundary_id = it->second;
+
+        std::vector<int>                      element_types;
+        std::vector<std::vector<std::size_t>> element_ids, element_nodes;
+
+        // Get all elements on this (dim-1)-entity
+        gmsh::model::mesh::getElements(
+          element_types, element_ids, element_nodes, e.first, e.second);
+
+        for (unsigned int i = 0; i < element_types.size(); ++i)
+          {
+            if (element_ids[i].empty())
+              continue;
+
+            const unsigned int n_nodes_per_elem =
+              element_nodes[i].size() / element_ids[i].size();
+
+            for (unsigned int j = 0; j < element_ids[i].size(); ++j)
+              {
+                std::set<unsigned int> face_vertices;
+                for (unsigned int k = 0; k < n_nodes_per_elem; ++k)
+                  {
+                    std::size_t node_tag =
+                      element_nodes[i][j * n_nodes_per_elem + k];
+                    face_vertices.insert(node_tag_to_index[node_tag]);
+                  }
+
+                // Store boundary IDs for this face
+                if (boundary_id != numbers::invalid_boundary_id)
+                  boundary_face_map[face_vertices] = boundary_id;
+              }
+          }
+      }
+
+
+
   // Count total volume elements and reserve space
   std::size_t total_volume_elements = 0;
   for (const auto &e : entities)
@@ -3261,6 +3334,7 @@ GridIn<dim, spacedim>::read_partitioned_msh(const std::string &file_prefix,
           std::vector<int>                      count_element_types;
           std::vector<std::vector<std::size_t>> count_element_ids,
             count_element_nodes;
+
           gmsh::model::mesh::getElements(count_element_types,
                                          count_element_ids,
                                          count_element_nodes,
@@ -3290,6 +3364,7 @@ GridIn<dim, spacedim>::read_partitioned_msh(const std::string &file_prefix,
 
           gmsh::model::mesh::getElements(
             element_types, element_ids, element_nodes, entity_dim, entity_tag);
+
           for (unsigned int i = 0; i < element_types.size(); ++i)
             {
               if (element_ids[i].empty())
@@ -3301,7 +3376,11 @@ GridIn<dim, spacedim>::read_partitioned_msh(const std::string &file_prefix,
               for (unsigned int j = 0; j < element_ids[i].size(); ++j)
                 {
                   CellData<dim> cell(n_vertices);
-                  cell.material_id = 0;
+
+                  cell.material_id = numbers::invalid_material_id;
+                  if (auto it = entity_to_material.find({dim, e.second});
+                      it != entity_to_material.end())
+                    cell.material_id = it->second;
 
                   const auto &type = gmsh_to_dealii_type.at(element_types[i]);
 
@@ -3318,10 +3397,6 @@ GridIn<dim, spacedim>::read_partitioned_msh(const std::string &file_prefix,
                       cell.vertices[v] = node_tag_to_index[node_tag];
                     }
 
-                  triangulation_description.coarse_cells.push_back(cell);
-                  triangulation_description.coarse_cell_index_to_coarse_cell_id
-                    .push_back(element_ids[i][j]);
-
                   TriangulationDescription::CellData<dim> cell_info;
                   cell_info.id =
                     CellId(element_ids[i][j], {}).template to_binary<dim>();
@@ -3334,6 +3409,86 @@ GridIn<dim, spacedim>::read_partitioned_msh(const std::string &file_prefix,
 
                   cell_info.level_subdomain_id = cell_info.subdomain_id;
 
+
+                  // --- Universal boundary ID assignment for faces ---
+                  if constexpr (dim > 0)
+                    {
+                      // Determine reference cell type from number of vertices
+                      const ReferenceCell ref_cell =
+                        ReferenceCell::n_vertices_to_type(dim, n_vertices);
+
+                      // Number of faces for this reference cell
+                      const unsigned int n_faces = ref_cell.n_faces();
+
+                      for (unsigned int f = 0; f < n_faces; ++f)
+                        {
+                          std::set<unsigned int> face_vertices;
+
+                          if constexpr (dim == 1)
+                            {
+                              // In 1D, faces are vertices
+                              face_vertices.insert(cell.vertices[f]);
+                            }
+                          else if constexpr (dim == 2)
+                            {
+                              // In 2D, manually handle triangles and quads
+                              if (ref_cell == ReferenceCells::Triangle)
+                                {
+                                  // Triangle: face f connects vertices f and
+                                  // (f+1)%3
+                                  face_vertices.insert(cell.vertices[f]);
+                                  face_vertices.insert(
+                                    cell.vertices[(f + 1) % 3]);
+                                }
+                              else if (ref_cell ==
+                                       ReferenceCells::Quadrilateral)
+                                {
+                                  const unsigned int n_face_vertices =
+                                    ref_cell.face_reference_cell(f)
+                                      .n_vertices();
+                                  for (unsigned int fv = 0;
+                                       fv < n_face_vertices;
+                                       ++fv)
+                                    {
+                                      const unsigned int vertex_index =
+                                        ref_cell.face_to_cell_vertices(
+                                          f,
+                                          fv,
+                                          numbers::
+                                            default_geometric_orientation);
+                                      face_vertices.insert(
+                                        cell.vertices[vertex_index]);
+                                    }
+                                }
+                            }
+                          else if constexpr (dim == 3)
+                            {
+                              // In 3D, get face vertices from reference cell
+                              const unsigned int n_face_vertices =
+                                ref_cell.face_reference_cell(f).n_vertices();
+                              for (unsigned int fv = 0; fv < n_face_vertices;
+                                   ++fv)
+                                {
+                                  const unsigned int vertex_index =
+                                    ref_cell.face_to_cell_vertices(
+                                      f,
+                                      fv,
+                                      numbers::default_geometric_orientation);
+                                  face_vertices.insert(
+                                    cell.vertices[vertex_index]);
+                                }
+                            }
+
+                          // Assign boundary ID if found
+                          if (auto it = boundary_face_map.find(face_vertices);
+                              it != boundary_face_map.end())
+                            cell_info.boundary_ids.emplace_back(f, it->second);
+                        }
+                    }
+
+                  triangulation_description.coarse_cells.push_back(cell);
+                  triangulation_description.coarse_cell_index_to_coarse_cell_id
+                    .push_back(element_ids[i][j]);
                   triangulation_description.cell_infos[0].push_back(cell_info);
                 }
             }
