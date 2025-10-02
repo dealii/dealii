@@ -12,7 +12,7 @@
 //
 // ------------------------------------------------------------------------
 
-// The same as patch_smoother_02, but using Dynamic PatchDistributor.
+// The same as patch_smoother_03, but using Dynamic PatchDistributor and FEQall.
 // check FEPatchEvaluation by comparing A*x computed locally with A*x computed
 // globally via FEEvaluation
 
@@ -129,7 +129,7 @@ test()
 
   using PatchEval = FEPatchEvaluation<
     FEEval,
-    PatchDistributors::Dynamic<dim, fe_degree, PatchDistributors::FEQinterior>>;
+    PatchDistributors::Dynamic<dim, fe_degree, PatchDistributors::FEQall>>;
 
   // Test constructor and  move constructor: consistency of cell_dofs_view_raw
   // can fail. If so, it will be detected in reinit(). PatchEval
