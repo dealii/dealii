@@ -52,12 +52,22 @@ DEAL_II_NAMESPACE_OPEN
  * algorithm that preserves symmetry described in this <a
  * href="https://doi.org/10.1137/110825753">article</a>.
  *
+ * The parallel implementation with MPI of the algorithms follows the
+ * description in this <a
+ * href="https://doi.org/10.1007/978-3-540-92859-1_27">article</a>. The
+ * diagonals of the scaling matrices are distributed between the MPI processes
+ * following the row distribution of the matrix. The diagonal of the column
+ * scaling is distributed in a balanced way if the scaled matrix is not square.
+ *
  *  <h4>Instantiations</h4>
  *
  * There are instantiations of this class for SparseMatrix<double>,
  * SparseMatrix<float>, FullMatrix<double>, FullMatrix<float>,
  * BlockSparseMatrix<float>, BlockSparseMatrix<double>, SparseMatrixEZ<double>
  * and SparseMatrixEZ<float>.
+ *
+ * The distributed matrices supported are TrilinosWrappers::SparseMatrix and
+ * PETScWrappers::MPI::SparseMatrix.
  */
 class MatrixScaling : public EnableObserverPointer
 {
@@ -215,24 +225,24 @@ public:
   scale_linear_system(Matrix &matrix, VectorType &rhs);
 
   /**
-   * Scale the linear system solution vector according to the column scaling.
-   * This function should be called after solving the scaled system obtained
-   * by calling <tt>scale_linear_system()</tt>.
+   * Scale back the linear system solution vector according to the column
+   * scaling. This function should be called after solving the scaled system
+   * obtained by calling <tt>scale_linear_system()</tt>.
    */
   template <class VectorType>
   void
   scale_system_solution(VectorType &sol) const;
 
   /**
-   * Return a const reference to the (local in distributed setting) row scaling
-   * (i.e. the diagonal of the row scaling matrix).
+   * Return a const reference to the (locally owned in distributed setting) row
+   * scaling (i.e. the diagonal of the row scaling matrix).
    */
   const Vector<double> &
   get_row_scaling() const;
 
   /**
-   * Return a const reference to the (local in distributed setting) column
-   * scaling (i.e. the diagonal of the column scaling matrix).
+   * Return a const reference to the (locally owned in distributed setting)
+   * column scaling (i.e. the diagonal of the column scaling matrix).
    */
   const Vector<double> &
   get_column_scaling() const;
@@ -252,14 +262,14 @@ private:
   AdditionalData control;
 
   /**
-   * Vector that contains the (local in distributed setting) row scaling (i.e.
-   * the diagonal of the row scaling matrix).
+   * Vector that contains the (locally owned in distributed setting) row scaling
+   * (i.e. the diagonal of the row scaling matrix).
    */
   Vector<double> row_scaling;
 
   /**
-   * Vector that contains the (local in distributed setting) column scaling
-   * (i.e. the diagonal of the column scaling matrix).
+   * Vector that contains the (locally owned in distributed setting) column
+   * scaling (i.e. the diagonal of the column scaling matrix).
    */
   Vector<double> column_scaling;
 
@@ -270,7 +280,7 @@ private:
   bool converged;
 
   /**
-   * IndexSet storing the locally owned rows of the matrix.
+   * IndexSet storing the locally owned rows of the row scaling.
    */
   IndexSet locally_owned_rows;
 
@@ -280,12 +290,14 @@ private:
   IndexSet locally_owned_cols;
 
   /**
-   * IndexSet storing the ghost column indexes of the column scaling.
+   * IndexSet storing the ghost column indexes of the column scaling. Here are
+   * stored the columns indices that will require the scaling from other MPI
+   * ranks.
    */
   IndexSet ghost_columns;
 
   /**
-   * Vector storing the owner rank of each ghost column index.
+   * Vector storing the owner MPI rank of each ghost column index.
    */
   std::vector<types::global_dof_index> ghost_column_owners;
 

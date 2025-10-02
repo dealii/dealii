@@ -62,6 +62,7 @@ is_supported_matrix()
 }
 
 
+
 MatrixScaling::MatrixScaling(const AdditionalData &control)
   : control(control)
   , row_scaling()
@@ -388,7 +389,7 @@ MatrixScaling::l1_scaling(Matrix &matrix, const unsigned int nsteps)
               if (locally_owned_cols.is_element(col_idx))
                 {
                   unsigned int local_idx = partitioner.global_to_local(col_idx);
-                  local_col_norms[local_idx] += norm_value;
+                  local_col_norms[local_idx] = norm_value;
                 }
               else
                 {
