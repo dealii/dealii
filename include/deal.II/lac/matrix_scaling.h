@@ -330,6 +330,75 @@ private:
   template <class Matrix>
   void
   sk_scaling(Matrix &matrix, const unsigned int nsteps);
+
+  /*
+   * Check convergence of the sequential scaling algorithms. Only on either row
+   * or columns for SK scaling.
+   */
+  template <typename Number>
+  bool
+  check_convergence(Vector<Number>    row_col_norm,
+                    const std::string norm_type) const;
+
+  /*
+   * Check convergence of the sequential scaling algorithms. On both row
+   * and columns for symmetry preserving scaling.
+   */
+  template <typename Number>
+  bool
+  check_convergence(Vector<Number>    row_norm,
+                    Vector<Number>    col_norm,
+                    const std::string norm_type) const;
+
+#ifdef DEAL_II_WITH_MPI
+  /*
+   * Check convergence of the parallel scaling algorithm. Only on either row
+   * or columns for SK scaling.
+   */
+  bool
+  check_convergence(Vector<double>    local_row_col_norm,
+                    const std::string norm_type,
+                    const MPI_Comm    mpi_communicator) const;
+
+  /*
+   * Check convergence of the parallel scaling algorithm. Only on both row
+   * and columns for symmetry preserving scaling.
+   */
+  bool
+  check_convergence(Vector<double>    local_row_norm,
+                    Vector<double>    local_col_norm,
+                    const std::string norm_type,
+                    const MPI_Comm    mpi_communicator) const;
+
+  /*
+   * Fill the send_data map with the partial column norms that need to be sent
+   * to other MPI processes. Prepare the local_col_norms vector. This is a
+   * helper function for the distributed implementation of the scaling
+   * algorithms.
+   */
+  void
+  send_prepare_col_norms(
+    std::map<unsigned int,
+             std::vector<std::pair<types::global_dof_index, double>>>
+                                                    &send_data,
+    const std::map<types::global_dof_index, double> &partial_column_norms,
+    Vector<double>                                  &local_col_norms);
+
+  /*
+   * Fill the send_column_norms map with the updated column norms that need to
+   * be sent to other MPI processes. This is a helper function for the
+   * distributed implementation of the scaling algorithms.
+   */
+  void
+  send_prepare_updated_col_norms(
+    std::map<unsigned int,
+             std::vector<std::pair<types::global_dof_index, double>>>
+      &send_column_norms,
+    const std::map<unsigned int,
+                   std::vector<std::pair<types::global_dof_index, double>>>
+                         &received_data,
+    const Vector<double> &local_col_norms);
+#endif
 };
 
 DEAL_II_NAMESPACE_CLOSE

@@ -297,6 +297,150 @@ MatrixScaling::is_converged() const
 
 
 
+template <typename Number>
+bool
+MatrixScaling::check_convergence(Vector<Number> row_col_norm,
+                                 std::string    norm_type) const
+{
+  row_col_norm.add(-1.0);
+  if (norm_type == "l1")
+    return row_col_norm.l1_norm() < control.scaling_tolerance;
+  else if (norm_type == "linfty")
+    return row_col_norm.linfty_norm() < control.scaling_tolerance;
+  else
+    Assert(false, ExcNotImplemented());
+}
+
+
+
+template <typename Number>
+bool
+MatrixScaling::check_convergence(Vector<Number> row_norm,
+                                 Vector<Number> col_norm,
+                                 std::string    norm_type) const
+{
+  row_norm.add(-1.0);
+  col_norm.add(-1.0);
+  if (norm_type == "l1")
+    return (row_norm.l1_norm() < control.scaling_tolerance &&
+            col_norm.l1_norm() < control.scaling_tolerance);
+  else if (norm_type == "linfty")
+    return (row_norm.linfty_norm() < control.scaling_tolerance &&
+            col_norm.linfty_norm() < control.scaling_tolerance);
+  else
+    Assert(false, ExcNotImplemented());
+}
+
+
+
+#ifdef DEAL_II_WITH_MPI
+bool
+MatrixScaling::check_convergence(Vector<double>    local_row_col_norm,
+                                 const std::string norm_type,
+                                 const MPI_Comm    mpi_communicator) const
+{
+  local_row_col_norm.add(-1.0);
+  bool local_not_converged;
+
+  if (norm_type == "l1")
+    local_not_converged =
+      !(local_row_col_norm.l1_norm() < control.scaling_tolerance);
+  else if (norm_type == "linfty")
+    local_not_converged =
+      !(local_row_col_norm.linfty_norm() < control.scaling_tolerance);
+
+  bool any_not_converged =
+    Utilities::MPI::logical_or(local_not_converged, mpi_communicator);
+
+  return !any_not_converged;
+}
+
+
+
+bool
+MatrixScaling::check_convergence(Vector<double>    local_row_norm,
+                                 Vector<double>    local_col_norm,
+                                 const std::string norm_type,
+                                 const MPI_Comm    mpi_communicator) const
+{
+  local_row_norm.add(-1.0);
+  local_col_norm.add(-1.0);
+  bool local_not_converged;
+
+  if (norm_type == "l1")
+    local_not_converged =
+      !(local_row_norm.l1_norm() < control.scaling_tolerance &&
+        local_col_norm.l1_norm() < control.scaling_tolerance);
+  else if (norm_type == "linfty")
+    local_not_converged =
+      !(local_row_norm.linfty_norm() < control.scaling_tolerance &&
+        local_col_norm.linfty_norm() < control.scaling_tolerance);
+
+  bool any_not_converged =
+    Utilities::MPI::logical_or(local_not_converged, mpi_communicator);
+
+  return !any_not_converged;
+}
+
+
+
+void
+MatrixScaling::send_prepare_col_norms(
+  std::map<unsigned int,
+           std::vector<std::pair<types::global_dof_index, double>>> &send_data,
+  const std::map<types::global_dof_index, double> &partial_column_norms,
+  Vector<double>                                  &local_col_norms)
+{
+  for (const auto &[col_idx, norm_value] : partial_column_norms)
+    {
+      if (locally_owned_cols.is_element(col_idx))
+        {
+          unsigned int local_idx     = partitioner.global_to_local(col_idx);
+          local_col_norms[local_idx] = norm_value;
+        }
+      else
+        {
+          auto         ghost_pos   = ghost_columns.index_within_set(col_idx);
+          unsigned int target_rank = ghost_column_owners[ghost_pos];
+
+          send_data[target_rank].emplace_back(col_idx, norm_value);
+        }
+    }
+}
+
+
+
+void
+MatrixScaling::send_prepare_updated_col_norms(
+  std::map<unsigned int,
+           std::vector<std::pair<types::global_dof_index, double>>>
+    &send_column_norms,
+  const std::map<unsigned int,
+                 std::vector<std::pair<types::global_dof_index, double>>>
+                       &received_data,
+  const Vector<double> &local_col_norms)
+{
+  // For each rank that requested column norm data from me,
+  // send them the corresponding column norms updated
+  for (const auto &[sender_rank, pairs] : received_data)
+    {
+      for (const auto &[global_col, norm_contribution] : pairs)
+        {
+          // I received norm data for global_col, so sender_rank needs
+          // my scaling value for global_col
+          if (locally_owned_cols.is_element(global_col))
+            {
+              unsigned int local_idx = partitioner.global_to_local(global_col);
+              send_column_norms[sender_rank].emplace_back(
+                global_col, local_col_norms[local_idx]);
+            }
+        }
+    }
+}
+#endif
+
+
+
 template <class Matrix>
 void
 MatrixScaling::l1_scaling(Matrix &matrix, const unsigned int nsteps)
@@ -322,25 +466,16 @@ MatrixScaling::l1_scaling(Matrix &matrix, const unsigned int nsteps)
                 }
             }
 
-          // Check convergence. Subtract and add again. Alternative is copying
-          // every time the whole vectors and subtracting -1
-          row_norms.add(-1.0);
-          col_norms.add(-1.0);
-          if (row_norms.l1_norm() < control.scaling_tolerance &&
-              col_norms.l1_norm() < control.scaling_tolerance)
+          if (check_convergence(row_norms, col_norms, "l1"))
             {
               converged = true;
               break;
             }
-          row_norms.add(1.0);
-          col_norms.add(1.0);
 
           for (unsigned int row = 0; row < matrix.m(); ++row)
             {
               for (auto it = matrix.begin(row); it != matrix.end(row); ++it)
                 {
-                  // it->value() /=
-                  //   std::sqrt(row_norms[row] * col_norms[it->column()]);
                   matrix.set(row,
                              it->column(),
                              it->value() / std::sqrt(row_norms[row] *
@@ -384,21 +519,9 @@ MatrixScaling::l1_scaling(Matrix &matrix, const unsigned int nsteps)
                    std::vector<std::pair<types::global_dof_index, double>>>
             send_data;
 
-          for (const auto &[col_idx, norm_value] : partial_column_norms)
-            {
-              if (locally_owned_cols.is_element(col_idx))
-                {
-                  unsigned int local_idx = partitioner.global_to_local(col_idx);
-                  local_col_norms[local_idx] = norm_value;
-                }
-              else
-                {
-                  auto ghost_pos = ghost_columns.index_within_set(col_idx);
-                  unsigned int target_rank = ghost_column_owners[ghost_pos];
-
-                  send_data[target_rank].emplace_back(col_idx, norm_value);
-                }
-            }
+          send_prepare_col_norms(send_data,
+                                 partial_column_norms,
+                                 local_col_norms);
 
           auto received_data =
             Utilities::MPI::some_to_some(matrix.get_mpi_communicator(),
@@ -415,28 +538,14 @@ MatrixScaling::l1_scaling(Matrix &matrix, const unsigned int nsteps)
                 }
             }
 
-          // Convergence check
-          {
-            Vector<double> row_norms_check = local_row_norms;
-            Vector<double> col_norms_check = local_col_norms;
-
-            row_norms_check.add(-1.0);
-            col_norms_check.add(-1.0);
-
-            bool local_not_converged =
-              !(row_norms_check.l1_norm() < control.scaling_tolerance &&
-                col_norms_check.l1_norm() < control.scaling_tolerance);
-
-            bool any_not_converged =
-              Utilities::MPI::logical_or(local_not_converged,
-                                         matrix.get_mpi_communicator());
-
-            if (!any_not_converged)
-              {
-                converged = true;
-                break;
-              }
-          }
+          if (check_convergence(local_row_norms,
+                                local_col_norms,
+                                "l1",
+                                matrix.get_mpi_communicator()))
+            {
+              converged = true;
+              break;
+            }
 
           for (unsigned int i = 0; i < local_row_norms.size(); ++i)
             row_scaling[i] /= std::sqrt(local_row_norms[i]);
@@ -448,23 +557,9 @@ MatrixScaling::l1_scaling(Matrix &matrix, const unsigned int nsteps)
                    std::vector<std::pair<types::global_dof_index, double>>>
             send_column_norms;
 
-          // For each rank that requested column norm data from me,
-          // send them the corresponding column norms updated
-          for (const auto &[sender_rank, pairs] : received_data)
-            {
-              for (const auto &[global_col, norm_contribution] : pairs)
-                {
-                  // I received norm data for global_col, so sender_rank needs
-                  // my scaling value for global_col
-                  if (locally_owned_cols.is_element(global_col))
-                    {
-                      unsigned int local_idx =
-                        partitioner.global_to_local(global_col);
-                      send_column_norms[sender_rank].emplace_back(
-                        global_col, local_col_norms[local_idx]);
-                    }
-                }
-            }
+          send_prepare_updated_col_norms(send_column_norms,
+                                         received_data,
+                                         local_col_norms);
 
           auto received_column_norms =
             Utilities::MPI::some_to_some(matrix.get_mpi_communicator(),
@@ -550,25 +645,16 @@ MatrixScaling::linfty_scaling(Matrix &matrix, const unsigned int nsteps)
                 }
             }
 
-          // Check convergence. Sum and add again. Alternative is copying every
-          // time the whole vectors and subtractin -1
-          row_norms.add(-1.0);
-          col_norms.add(-1.0);
-          if (row_norms.linfty_norm() < control.scaling_tolerance &&
-              col_norms.linfty_norm() < control.scaling_tolerance)
+          if (check_convergence(row_norms, col_norms, "linfty"))
             {
               converged = true;
               break;
             }
-          row_norms.add(1.0);
-          col_norms.add(1.0);
 
           for (unsigned int row = 0; row < matrix.m(); ++row)
             {
               for (auto it = matrix.begin(row); it != matrix.end(row); ++it)
                 {
-                  // it->value() /=
-                  //   std::sqrt(row_norms[row] * col_norms[it->column()]);
                   matrix.set(row,
                              it->column(),
                              it->value() / std::sqrt(row_norms[row] *
@@ -616,21 +702,9 @@ MatrixScaling::linfty_scaling(Matrix &matrix, const unsigned int nsteps)
                    std::vector<std::pair<types::global_dof_index, double>>>
             send_data;
 
-          for (const auto &[col_idx, norm_value] : partial_column_norms)
-            {
-              if (locally_owned_cols.is_element(col_idx))
-                {
-                  unsigned int local_idx = partitioner.global_to_local(col_idx);
-                  local_col_norms[local_idx] = norm_value;
-                }
-              else
-                {
-                  auto ghost_pos = ghost_columns.index_within_set(col_idx);
-                  unsigned int target_rank = ghost_column_owners[ghost_pos];
-
-                  send_data[target_rank].emplace_back(col_idx, norm_value);
-                }
-            }
+          send_prepare_col_norms(send_data,
+                                 partial_column_norms,
+                                 local_col_norms);
 
           auto received_data =
             Utilities::MPI::some_to_some(matrix.get_mpi_communicator(),
@@ -648,28 +722,14 @@ MatrixScaling::linfty_scaling(Matrix &matrix, const unsigned int nsteps)
                 }
             }
 
-          // Convergence check
-          {
-            Vector<double> row_norms_check = local_row_norms;
-            Vector<double> col_norms_check = local_col_norms;
-
-            row_norms_check.add(-1.0);
-            col_norms_check.add(-1.0);
-
-            bool local_not_converged =
-              !(row_norms_check.linfty_norm() < control.scaling_tolerance &&
-                col_norms_check.linfty_norm() < control.scaling_tolerance);
-
-            bool any_not_converged =
-              Utilities::MPI::logical_or(local_not_converged,
-                                         matrix.get_mpi_communicator());
-
-            if (!any_not_converged)
-              {
-                converged = true;
-                break;
-              }
-          }
+          if (check_convergence(local_row_norms,
+                                local_col_norms,
+                                "linfty",
+                                matrix.get_mpi_communicator()))
+            {
+              converged = true;
+              break;
+            }
 
           for (unsigned int i = 0; i < local_row_norms.size(); ++i)
             row_scaling[i] /= std::sqrt(local_row_norms[i]);
@@ -681,23 +741,9 @@ MatrixScaling::linfty_scaling(Matrix &matrix, const unsigned int nsteps)
                    std::vector<std::pair<types::global_dof_index, double>>>
             send_column_norms;
 
-          // For each rank that requested column norm data from me,
-          // send them the corresponding column norms updated
-          for (const auto &[sender_rank, pairs] : received_data)
-            {
-              for (const auto &[global_col, norm_contribution] : pairs)
-                {
-                  // I received norm data for global_col, so sender_rank needs
-                  // my scaling value for global_col
-                  if (locally_owned_cols.is_element(global_col))
-                    {
-                      unsigned int local_idx =
-                        partitioner.global_to_local(global_col);
-                      send_column_norms[sender_rank].emplace_back(
-                        global_col, local_col_norms[local_idx]);
-                    }
-                }
-            }
+          send_prepare_updated_col_norms(send_column_norms,
+                                         received_data,
+                                         local_col_norms);
 
           auto received_column_norms =
             Utilities::MPI::some_to_some(matrix.get_mpi_communicator(),
@@ -786,7 +832,6 @@ MatrixScaling::sk_scaling(Matrix &matrix, const unsigned int nsteps)
                       for (auto it = matrix.begin(row); it != matrix.end(row);
                            ++it)
                         {
-                          // it->value() /= row_norms[row];
                           matrix.set(row,
                                      it->column(),
                                      it->value() / row_norms[row]);
@@ -794,15 +839,12 @@ MatrixScaling::sk_scaling(Matrix &matrix, const unsigned int nsteps)
                         }
                       row_scaling[row] /= row_norms[row];
                     }
-                  // Here exit condition only on columns, rows are already
-                  // normalized
-                  col_norms.add(-1.0);
-                  if (col_norms.l1_norm() < control.scaling_tolerance)
+
+                  if (check_convergence(col_norms, "l1"))
                     {
                       converged = true;
                       break;
                     }
-                  col_norms.add(1.0);
 
                   // Column step
                   row_norms = 0;
@@ -811,7 +853,6 @@ MatrixScaling::sk_scaling(Matrix &matrix, const unsigned int nsteps)
                       for (auto it = matrix.begin(row); it != matrix.end(row);
                            ++it)
                         {
-                          // it->value() /= col_norms[it->column()];
                           matrix.set(row,
                                      it->column(),
                                      it->value() / col_norms[it->column()]);
@@ -822,15 +863,12 @@ MatrixScaling::sk_scaling(Matrix &matrix, const unsigned int nsteps)
                     {
                       column_scaling[col] /= col_norms[col];
                     }
-                  // Here exit condition only on rows, columns are already
-                  // normalized
-                  row_norms.add(-1.0);
-                  if (row_norms.l1_norm() < control.scaling_tolerance)
+
+                  if (check_convergence(row_norms, "l1"))
                     {
                       converged = true;
                       break;
                     }
-                  row_norms.add(1.0);
                 }
             }
             break;
@@ -853,7 +891,6 @@ MatrixScaling::sk_scaling(Matrix &matrix, const unsigned int nsteps)
                       for (auto it = matrix.begin(row); it != matrix.end(row);
                            ++it)
                         {
-                          // it->value() /= row_norms[row];
                           matrix.set(row,
                                      it->column(),
                                      it->value() / row_norms[row]);
@@ -863,15 +900,13 @@ MatrixScaling::sk_scaling(Matrix &matrix, const unsigned int nsteps)
                         }
                       row_scaling[row] /= row_norms[row];
                     }
-                  // Here exit condition only on columns, rows are already
-                  // normalized
-                  col_norms.add(-1.0);
-                  if (col_norms.linfty_norm() < control.scaling_tolerance)
+
+                  if (check_convergence(col_norms, "linfty"))
                     {
                       converged = true;
                       break;
                     }
-                  col_norms.add(1.0);
+
                   // Column step
                   row_norms = 0;
                   for (unsigned int row = 0; row < matrix.m(); ++row)
@@ -879,7 +914,6 @@ MatrixScaling::sk_scaling(Matrix &matrix, const unsigned int nsteps)
                       for (auto it = matrix.begin(row); it != matrix.end(row);
                            ++it)
                         {
-                          // it->value() /= col_norms[it->column()];
                           matrix.set(row,
                                      it->column(),
                                      it->value() / col_norms[it->column()]);
@@ -891,15 +925,12 @@ MatrixScaling::sk_scaling(Matrix &matrix, const unsigned int nsteps)
                     {
                       column_scaling[col] /= col_norms[col];
                     }
-                  // Here exit condition only on rows, columns are already
-                  // normalized
-                  row_norms.add(-1.0);
-                  if (row_norms.linfty_norm() < control.scaling_tolerance)
+
+                  if (check_convergence(row_norms, "linfty"))
                     {
                       converged = true;
                       break;
                     }
-                  row_norms.add(1.0);
                 }
             }
             break;
@@ -969,25 +1000,9 @@ MatrixScaling::sk_scaling(Matrix &matrix, const unsigned int nsteps)
                     std::vector<std::pair<types::global_dof_index, double>>>
                     send_data;
 
-                  for (const auto &[col_idx, norm_value] : partial_column_norms)
-                    {
-                      if (locally_owned_cols.is_element(col_idx))
-                        {
-                          unsigned int local_idx =
-                            partitioner.global_to_local(col_idx);
-                          local_col_norms[local_idx] += norm_value;
-                        }
-                      else
-                        {
-                          auto ghost_pos =
-                            ghost_columns.index_within_set(col_idx);
-                          unsigned int target_rank =
-                            ghost_column_owners[ghost_pos];
-
-                          send_data[target_rank].emplace_back(col_idx,
-                                                              norm_value);
-                        }
-                    }
+                  send_prepare_col_norms(send_data,
+                                         partial_column_norms,
+                                         local_col_norms);
 
                   auto received_data =
                     Utilities::MPI::some_to_some(matrix.get_mpi_communicator(),
@@ -1003,25 +1018,15 @@ MatrixScaling::sk_scaling(Matrix &matrix, const unsigned int nsteps)
                           local_col_norms[local_idx] += contribution;
                         }
                     }
+
                   // Convergence check only on columns
-                  {
-                    Vector<double> col_norms_check = local_col_norms;
-
-                    col_norms_check.add(-1.0);
-
-                    bool local_not_converged =
-                      !(col_norms_check.l1_norm() < control.scaling_tolerance);
-
-                    bool any_not_converged =
-                      Utilities::MPI::logical_or(local_not_converged,
-                                                 matrix.get_mpi_communicator());
-
-                    if (!any_not_converged)
-                      {
-                        converged = true;
-                        break;
-                      }
-                  }
+                  if (check_convergence(local_col_norms,
+                                        "l1",
+                                        matrix.get_mpi_communicator()))
+                    {
+                      converged = true;
+                      break;
+                    }
 
                   // Column step
                   local_row_norms = 0;
@@ -1032,23 +1037,9 @@ MatrixScaling::sk_scaling(Matrix &matrix, const unsigned int nsteps)
                     std::vector<std::pair<types::global_dof_index, double>>>
                     send_column_norms;
 
-                  // For each rank that requested column norm data from me,
-                  // send them the corresponding column norms updated
-                  for (const auto &[sender_rank, pairs] : received_data)
-                    {
-                      for (const auto &[global_col, norm_contribution] : pairs)
-                        {
-                          // I received norm data for global_col, so sender_rank
-                          // needs my scaling value for global_col
-                          if (locally_owned_cols.is_element(global_col))
-                            {
-                              unsigned int local_idx =
-                                partitioner.global_to_local(global_col);
-                              send_column_norms[sender_rank].emplace_back(
-                                global_col, local_col_norms[local_idx]);
-                            }
-                        }
-                    }
+                  send_prepare_updated_col_norms(send_column_norms,
+                                                 received_data,
+                                                 local_col_norms);
 
                   auto received_column_norms =
                     Utilities::MPI::some_to_some(matrix.get_mpi_communicator(),
@@ -1111,25 +1102,13 @@ MatrixScaling::sk_scaling(Matrix &matrix, const unsigned int nsteps)
                   for (unsigned int i = 0; i < local_col_norms.size(); ++i)
                     column_scaling[i] /= local_col_norms[i];
 
-                  // Convergence check
-                  {
-                    Vector<double> row_norms_check = local_row_norms;
-
-                    row_norms_check.add(-1.0);
-
-                    bool local_not_converged =
-                      !(row_norms_check.l1_norm() < control.scaling_tolerance);
-
-                    bool any_not_converged =
-                      Utilities::MPI::logical_or(local_not_converged,
-                                                 matrix.get_mpi_communicator());
-
-                    if (!any_not_converged)
-                      {
-                        converged = true;
-                        break;
-                      }
-                  }
+                  if (check_convergence(local_row_norms,
+                                        "l1",
+                                        matrix.get_mpi_communicator()))
+                    {
+                      converged = true;
+                      break;
+                    }
                 }
             }
             break;
@@ -1193,25 +1172,9 @@ MatrixScaling::sk_scaling(Matrix &matrix, const unsigned int nsteps)
                     std::vector<std::pair<types::global_dof_index, double>>>
                     send_data;
 
-                  for (const auto &[col_idx, norm_value] : partial_column_norms)
-                    {
-                      if (locally_owned_cols.is_element(col_idx))
-                        {
-                          unsigned int local_idx =
-                            partitioner.global_to_local(col_idx);
-                          local_col_norms[local_idx] = norm_value;
-                        }
-                      else
-                        {
-                          auto ghost_pos =
-                            ghost_columns.index_within_set(col_idx);
-                          unsigned int target_rank =
-                            ghost_column_owners[ghost_pos];
-
-                          send_data[target_rank].emplace_back(col_idx,
-                                                              norm_value);
-                        }
-                    }
+                  send_prepare_col_norms(send_data,
+                                         partial_column_norms,
+                                         local_col_norms);
 
                   auto received_data =
                     Utilities::MPI::some_to_some(matrix.get_mpi_communicator(),
@@ -1228,25 +1191,14 @@ MatrixScaling::sk_scaling(Matrix &matrix, const unsigned int nsteps)
                             std::max(local_col_norms[local_idx], contribution);
                         }
                     }
-                  // Convergence check only on columns
-                  {
-                    Vector<double> col_norms_check = local_col_norms;
 
-                    col_norms_check.add(-1.0);
-
-                    bool local_not_converged = !(col_norms_check.linfty_norm() <
-                                                 control.scaling_tolerance);
-
-                    bool any_not_converged =
-                      Utilities::MPI::logical_or(local_not_converged,
-                                                 matrix.get_mpi_communicator());
-
-                    if (!any_not_converged)
-                      {
-                        converged = true;
-                        break;
-                      }
-                  }
+                  if (check_convergence(local_col_norms,
+                                        "linfty",
+                                        matrix.get_mpi_communicator()))
+                    {
+                      converged = true;
+                      break;
+                    }
 
                   // Column step
                   local_row_norms = 0;
@@ -1257,23 +1209,9 @@ MatrixScaling::sk_scaling(Matrix &matrix, const unsigned int nsteps)
                     std::vector<std::pair<types::global_dof_index, double>>>
                     send_column_norms;
 
-                  // For each rank that requested column norm data from me,
-                  // send them the corresponding column norms updated
-                  for (const auto &[sender_rank, pairs] : received_data)
-                    {
-                      for (const auto &[global_col, norm_contribution] : pairs)
-                        {
-                          // I received norm data for global_col, so sender_rank
-                          // needs my scaling value for global_col
-                          if (locally_owned_cols.is_element(global_col))
-                            {
-                              unsigned int local_idx =
-                                partitioner.global_to_local(global_col);
-                              send_column_norms[sender_rank].emplace_back(
-                                global_col, local_col_norms[local_idx]);
-                            }
-                        }
-                    }
+                  send_prepare_updated_col_norms(send_column_norms,
+                                                 received_data,
+                                                 local_col_norms);
 
                   auto received_column_norms =
                     Utilities::MPI::some_to_some(matrix.get_mpi_communicator(),
@@ -1339,25 +1277,13 @@ MatrixScaling::sk_scaling(Matrix &matrix, const unsigned int nsteps)
                   for (unsigned int i = 0; i < local_col_norms.size(); ++i)
                     column_scaling[i] /= local_col_norms[i];
 
-                  // Convergence check
-                  {
-                    Vector<double> row_norms_check = local_row_norms;
-
-                    row_norms_check.add(-1.0);
-
-                    bool local_not_converged = !(row_norms_check.linfty_norm() <
-                                                 control.scaling_tolerance);
-
-                    bool any_not_converged =
-                      Utilities::MPI::logical_or(local_not_converged,
-                                                 matrix.get_mpi_communicator());
-
-                    if (!any_not_converged)
-                      {
-                        converged = true;
-                        break;
-                      }
-                  }
+                  if (check_convergence(local_row_norms,
+                                        "linfty",
+                                        matrix.get_mpi_communicator()))
+                    {
+                      converged = true;
+                      break;
+                    }
                 }
             }
             break;
