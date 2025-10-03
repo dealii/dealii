@@ -20,14 +20,11 @@
 #include <deal.II/base/enable_observer_pointer.h>
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/index_set.h>
+#include <deal.II/base/partitioner.h>
 
 #include <deal.II/lac/full_matrix.h>
 #include <deal.II/lac/sparse_matrix.h>
 #include <deal.II/lac/vector.h>
-
-#ifdef DEAL_II_WITH_MPI
-#  include <deal.II/base/partitioner.h>
-#endif
 
 #ifdef DEAL_II_WITH_TRILINOS
 #  include <deal.II/lac/trilinos_sparse_matrix.h>
@@ -299,14 +296,12 @@ private:
   /**
    * Vector storing the owner MPI rank of each ghost column index.
    */
-  std::vector<types::global_dof_index> ghost_column_owners;
+  std::vector<unsigned int> ghost_column_owners;
 
-#ifdef DEAL_II_WITH_MPI
   /**
    * Partitioner for communications.
    */
   Utilities::MPI::Partitioner partitioner;
-#endif
 
   /**
    * Implementation of the l1 scaling iterations in the symmetry preserving
@@ -337,8 +332,8 @@ private:
    */
   template <typename Number>
   bool
-  check_convergence(Vector<Number>    row_col_norm,
-                    const std::string norm_type) const;
+  check_convergence(Vector<Number>     row_col_norm,
+                    const std::string &norm_type) const;
 
   /*
    * Check convergence of the sequential scaling algorithms. On both row
@@ -346,29 +341,28 @@ private:
    */
   template <typename Number>
   bool
-  check_convergence(Vector<Number>    row_norm,
-                    Vector<Number>    col_norm,
-                    const std::string norm_type) const;
+  check_convergence(Vector<Number>     row_norm,
+                    Vector<Number>     col_norm,
+                    const std::string &norm_type) const;
 
-#ifdef DEAL_II_WITH_MPI
   /*
    * Check convergence of the parallel scaling algorithm. Only on either row
    * or columns for SK scaling.
    */
   bool
-  check_convergence(Vector<double>    local_row_col_norm,
-                    const std::string norm_type,
-                    const MPI_Comm    mpi_communicator) const;
+  check_convergence(Vector<double>     local_row_col_norm,
+                    const std::string &norm_type,
+                    const MPI_Comm     mpi_communicator) const;
 
   /*
    * Check convergence of the parallel scaling algorithm. Only on both row
    * and columns for symmetry preserving scaling.
    */
   bool
-  check_convergence(Vector<double>    local_row_norm,
-                    Vector<double>    local_col_norm,
-                    const std::string norm_type,
-                    const MPI_Comm    mpi_communicator) const;
+  check_convergence(Vector<double>     local_row_norm,
+                    Vector<double>     local_col_norm,
+                    const std::string &norm_type,
+                    const MPI_Comm     mpi_communicator) const;
 
   /*
    * Fill the send_data map with the partial column norms that need to be sent
@@ -398,7 +392,6 @@ private:
                    std::vector<std::pair<types::global_dof_index, double>>>
                          &received_data,
     const Vector<double> &local_col_norms);
-#endif
 };
 
 DEAL_II_NAMESPACE_CLOSE
