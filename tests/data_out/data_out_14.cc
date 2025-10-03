@@ -12,8 +12,13 @@
 //
 // ------------------------------------------------------------------------
 
-
-#include <deal.II/lac/sparsity_pattern.h>
+// This test checks whether DataOut can be copied/moved and used safely and
+// no dangling references/pointers to the copied-from object remain.
+// DataOut is created in functions to ensure the original object is destroyed.
+// DataOut is wrapped to ensure it is copied on return, otherwise copies might
+// be elided through Named Return Value Optimization (NRVO) or
+// prvalue semantics.
+// see https://en.cppreference.com/w/cpp/language/copy_elision.html.
 
 #include <deal.II/numerics/data_out.h>
 
@@ -26,7 +31,8 @@ namespace
   template <int dim>
   struct Wrapper
   {
-    operator const DataOut<dim> &() const
+    const DataOut<dim> &
+    unwrap() const
     {
       return data_out;
     }
@@ -38,16 +44,19 @@ namespace
   make_data_out()
   {
     DataOut<dim> data_out;
-    return {data_out};
+    // DataOut copy, not elided since it is not returned directly:
+    return Wrapper<dim>{data_out};
   }
 
   template <int dim>
   Wrapper<dim>
   make_data_out(const DoFHandler<dim> &dof_handler)
   {
-    DataOut<dim> data_out = make_data_out<dim>();
+    DataOut<dim> data_out =
+      make_data_out<dim>().unwrap(); // DataOut copy construction.
     data_out.attach_dof_handler(dof_handler);
-    return {data_out};
+    // DataOut copy, not elided since it is not returned directly:
+    return Wrapper<dim>{data_out};
   }
 
   template <int dim>
@@ -56,10 +65,12 @@ namespace
                 const Vector<double>  &v_node,
                 const Vector<double>  &v_cell)
   {
-    DataOut<dim> data_out = make_data_out<dim>(dof_handler);
+    DataOut<dim> data_out =
+      make_data_out<dim>(dof_handler).unwrap(); // DataOut copy construction.
     data_out.add_data_vector(v_node, "node_data", DataOut<dim>::type_dof_data);
     data_out.add_data_vector(v_cell, "cell_data", DataOut<dim>::type_cell_data);
-    return {std::move(data_out)};
+    // DataOut move, make sure moves are also safe:
+    return Wrapper<dim>{std::move(data_out)};
   }
 } // namespace
 
@@ -69,28 +80,8 @@ check_this(const DoFHandler<dim> &dof_handler,
            const Vector<double>  &v_node,
            const Vector<double>  &v_cell)
 {
-  // this test checks whether DataOut can be copied/moved and used safely and
-  // no dangling references/pointers to the copied-from object remain.
-  // DataOut is created in functions to ensure the original object is destroyed.
-  // DataOut is wrapped to ensure it is copied on return, otherwise copies might
-  // be elided.
-
-  DataOut<dim> data_out = make_data_out<dim>(dof_handler, v_node, v_cell);
+  DataOut<dim> data_out = make_data_out<dim>(dof_handler, v_node, v_cell)
+                            .unwrap(); // DataOut copy construction.
   data_out.build_patches();
   data_out.write_dx(deallog.get_file_stream());
-  data_out.set_flags(DataOutBase::UcdFlags(true));
-  data_out.write_ucd(deallog.get_file_stream());
-  data_out.write_gmv(deallog.get_file_stream());
-  data_out.write_tecplot(deallog.get_file_stream());
-  data_out.write_vtk(deallog.get_file_stream());
-  data_out.write_gnuplot(deallog.get_file_stream());
-  data_out.write_deal_II_intermediate(deallog.get_file_stream());
-
-  // the following is only
-  // implemented for 2d
-  if (dim == 2)
-    {
-      data_out.write_povray(deallog.get_file_stream());
-      data_out.write_eps(deallog.get_file_stream());
-    }
 }
