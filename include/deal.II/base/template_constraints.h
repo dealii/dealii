@@ -22,6 +22,8 @@
 #include <deal.II/base/mpi_stub.h>
 #include <deal.II/base/std_cxx20/type_traits.h>
 
+#include <deal.II/lac/vector_operation.h>
+
 #include <complex>
 #include <type_traits>
 #include <utility>
@@ -978,7 +980,8 @@ namespace concepts
                                             VectorType                      W,
                                             typename VectorType::value_type a,
                                             typename VectorType::value_type b,
-                                            typename VectorType::value_type s) {
+                                            typename VectorType::value_type s,
+                                            VectorOperation::values operation) {
     // Check local type requirements:
     typename VectorType::value_type;
     typename VectorType::size_type;
@@ -1047,6 +1050,11 @@ namespace concepts
     {
       U.get_mpi_communicator()
     } -> std::same_as<MPI_Comm>;
+
+    // Synchronization:
+    {
+      U.compress(operation)
+    } -> std::same_as<void>;
   };
 
 
