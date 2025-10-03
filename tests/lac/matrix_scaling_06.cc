@@ -226,7 +226,7 @@ test_scaling_linsys()
       SolverControl                   solver_control(1000, 1e-12);
       PETScWrappers::SolverCG         solver(solver_control);
       PETScWrappers::PreconditionNone preconditioner;
-      preconditioner.initialize(matrix); // ← INITIALIZE IT!
+      preconditioner.initialize(matrix);
       solver.solve(matrix, x, rhs, preconditioner);
     }
 
@@ -237,7 +237,6 @@ test_scaling_linsys()
     }
   deallog << std::endl;
 
-  // fin qui tutto ok adesso
   MatrixType matrix_copy;
   matrix_copy.reinit(locally_owned_dofs,
                      locally_owned_dofs,

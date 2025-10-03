@@ -119,6 +119,12 @@ MatrixScaling::scale_matrix(Matrix &matrix)
                      std::is_same_v<Matrix, PETScWrappers::MPI::SparseMatrix>)
     {
       locally_owned_rows = matrix.locally_owned_range_indices();
+
+      // If the matrix is square then use the same partitioning for
+      // columns and rows to easily scale a linear system, otherwise create a
+      // new balanced partitioning for the columns. We do this because
+      // distributed matrices do not really distribute columns, but only rows:
+      // we want to avoid saving the whole column scaling on each MPI rank
       if (matrix.n() == matrix.m())
         locally_owned_cols = locally_owned_rows;
       else
@@ -580,35 +586,37 @@ MatrixScaling::l1_scaling(Matrix &matrix, const unsigned int nsteps)
                ++row)
             {
               auto local_row_idx = partitioner.global_to_local(*row);
+              auto row_size      = matrix.row_length(*row);
+              std::vector<double>                  values(row_size);
+              std::vector<types::global_dof_index> columns(row_size);
+              unsigned int                         idx = 0;
               for (auto it = matrix.begin(*row); it != matrix.end(*row); ++it)
                 {
                   if (locally_owned_cols.is_element(it->column()))
                     {
                       unsigned int local_col_idx =
                         partitioner.global_to_local(it->column());
-                      matrix.set(*row,
-                                 it->column(),
-                                 it->value() /
-                                   std::sqrt(local_col_norms[local_col_idx] *
-                                             local_row_norms[local_row_idx]));
+                      columns[idx] = it->column();
+                      values[idx] =
+                        it->value() / std::sqrt(local_col_norms[local_col_idx] *
+                                                local_row_norms[local_row_idx]);
+                      ++idx;
                     }
                   else
                     {
                       double col_norms =
                         ghost_column_norms_lookup[it->column()];
-
-                      matrix.set(*row,
-                                 it->column(),
-                                 it->value() /
-                                   std::sqrt(col_norms *
-                                             local_row_norms[local_row_idx]));
+                      columns[idx] = it->column();
+                      values[idx] =
+                        it->value() /
+                        std::sqrt(col_norms * local_row_norms[local_row_idx]);
+                      ++idx;
                     }
-                  // This is atrocious, PETSc needs it, this NEEDS to be changed
-                  if constexpr (std::is_same_v<
-                                  Matrix,
-                                  PETScWrappers::MPI::SparseMatrix>)
-                    matrix.compress(VectorOperation::insert);
                 }
+              matrix.set(*row, columns, values);
+              if constexpr (std::is_same_v<Matrix,
+                                           PETScWrappers::MPI::SparseMatrix>)
+                matrix.compress(VectorOperation::insert);
             }
           if constexpr (std::is_same_v<Matrix, TrilinosWrappers::SparseMatrix>)
             matrix.compress(VectorOperation::insert);
@@ -764,35 +772,37 @@ MatrixScaling::linfty_scaling(Matrix &matrix, const unsigned int nsteps)
                ++row)
             {
               auto local_row_idx = partitioner.global_to_local(*row);
+              auto row_size      = matrix.row_length(*row);
+              std::vector<double>                  values(row_size);
+              std::vector<types::global_dof_index> columns(row_size);
+              unsigned int                         idx = 0;
               for (auto it = matrix.begin(*row); it != matrix.end(*row); ++it)
                 {
                   if (locally_owned_cols.is_element(it->column()))
                     {
                       unsigned int local_col_idx =
                         partitioner.global_to_local(it->column());
-                      matrix.set(*row,
-                                 it->column(),
-                                 it->value() /
-                                   std::sqrt(local_col_norms[local_col_idx] *
-                                             local_row_norms[local_row_idx]));
+                      columns[idx] = it->column();
+                      values[idx] =
+                        it->value() / std::sqrt(local_col_norms[local_col_idx] *
+                                                local_row_norms[local_row_idx]);
+                      ++idx;
                     }
                   else
                     {
                       double col_norms =
                         ghost_column_norms_lookup[it->column()];
-
-                      matrix.set(*row,
-                                 it->column(),
-                                 it->value() /
-                                   std::sqrt(col_norms *
-                                             local_row_norms[local_row_idx]));
+                      columns[idx] = it->column();
+                      values[idx] =
+                        it->value() /
+                        std::sqrt(col_norms * local_row_norms[local_row_idx]);
+                      ++idx;
                     }
-                  // This is atrocious, PETSc needs it, this NEEDS to be changed
-                  if constexpr (std::is_same_v<
-                                  Matrix,
-                                  PETScWrappers::MPI::SparseMatrix>)
-                    matrix.compress(VectorOperation::insert);
                 }
+              matrix.set(*row, columns, values);
+              if constexpr (std::is_same_v<Matrix,
+                                           PETScWrappers::MPI::SparseMatrix>)
+                matrix.compress(VectorOperation::insert);
             }
           if constexpr (std::is_same_v<Matrix, TrilinosWrappers::SparseMatrix>)
             matrix.compress(VectorOperation::insert);
@@ -971,22 +981,26 @@ MatrixScaling::sk_scaling(Matrix &matrix, const unsigned int nsteps)
                        ++row)
                     {
                       auto local_row_idx = partitioner.global_to_local(*row);
+                      auto row_size      = matrix.row_length(*row);
+                      std::vector<double>                  values(row_size);
+                      std::vector<types::global_dof_index> columns(row_size);
+                      unsigned int                         idx = 0;
                       for (auto it = matrix.begin(*row); it != matrix.end(*row);
                            ++it)
                         {
                           partial_column_norms[it->column()] += std::abs(
                             it->value() / local_row_norms[local_row_idx]);
-                          matrix.set(*row,
-                                     it->column(),
-                                     it->value() /
-                                       local_row_norms[local_row_idx]);
-                          // This is atrocious, PETSc needs it, this NEEDS to be
-                          // changed
-                          if constexpr (std::is_same_v<
-                                          Matrix,
-                                          PETScWrappers::MPI::SparseMatrix>)
-                            matrix.compress(VectorOperation::insert);
+                          columns[idx] = it->column();
+                          values[idx] =
+                            it->value() / local_row_norms[local_row_idx];
+                          ++idx;
                         }
+                      matrix.set(*row, columns, values);
+                      if constexpr (std::is_same_v<
+                                      Matrix,
+                                      PETScWrappers::MPI::SparseMatrix>)
+                        matrix.compress(VectorOperation::insert);
+
                       row_scaling[local_row_idx] /=
                         local_row_norms[local_row_idx];
                     }
@@ -1060,6 +1074,10 @@ MatrixScaling::sk_scaling(Matrix &matrix, const unsigned int nsteps)
                        ++row)
                     {
                       auto local_row_idx = partitioner.global_to_local(*row);
+                      auto row_size      = matrix.row_length(*row);
+                      std::vector<double>                  values(row_size);
+                      std::vector<types::global_dof_index> columns(row_size);
+                      unsigned int                         idx = 0;
                       for (auto it = matrix.begin(*row); it != matrix.end(*row);
                            ++it)
                         {
@@ -1071,10 +1089,10 @@ MatrixScaling::sk_scaling(Matrix &matrix, const unsigned int nsteps)
                               local_row_norms[local_row_idx] += std::abs(
                                 it->value() / local_col_norms[local_col_idx]);
 
-                              matrix.set(*row,
-                                         it->column(),
-                                         it->value() /
-                                           local_col_norms[local_col_idx]);
+                              columns[idx] = it->column();
+                              values[idx] =
+                                it->value() / local_col_norms[local_col_idx];
+                              ++idx;
                             }
                           else
                             {
@@ -1084,17 +1102,16 @@ MatrixScaling::sk_scaling(Matrix &matrix, const unsigned int nsteps)
                               local_row_norms[local_row_idx] +=
                                 std::abs(it->value() / col_norms);
 
-                              matrix.set(*row,
-                                         it->column(),
-                                         it->value() / col_norms);
+                              columns[idx] = it->column();
+                              values[idx]  = it->value() / col_norms;
+                              ++idx;
                             }
-                          // This is atrocious, PETSc needs it, this NEEDS to be
-                          // changed
-                          if constexpr (std::is_same_v<
-                                          Matrix,
-                                          PETScWrappers::MPI::SparseMatrix>)
-                            matrix.compress(VectorOperation::insert);
                         }
+                      matrix.set(*row, columns, values);
+                      if constexpr (std::is_same_v<
+                                      Matrix,
+                                      PETScWrappers::MPI::SparseMatrix>)
+                        matrix.compress(VectorOperation::insert);
                     }
                   if constexpr (std::is_same_v<Matrix,
                                                TrilinosWrappers::SparseMatrix>)
@@ -1140,6 +1157,10 @@ MatrixScaling::sk_scaling(Matrix &matrix, const unsigned int nsteps)
                        ++row)
                     {
                       auto local_row_idx = partitioner.global_to_local(*row);
+                      auto row_size      = matrix.row_length(*row);
+                      std::vector<double>                  values(row_size);
+                      std::vector<types::global_dof_index> columns(row_size);
+                      unsigned int                         idx = 0;
                       for (auto it = matrix.begin(*row); it != matrix.end(*row);
                            ++it)
                         {
@@ -1147,18 +1168,17 @@ MatrixScaling::sk_scaling(Matrix &matrix, const unsigned int nsteps)
                             std::max(partial_column_norms[it->column()],
                                      std::abs(it->value() /
                                               local_row_norms[local_row_idx]));
-                          matrix.set(*row,
-                                     it->column(),
-                                     it->value() /
-                                       local_row_norms[local_row_idx]);
-
-                          // This is atrocious, PETSc needs it, this NEEDS to be
-                          // changed
-                          if constexpr (std::is_same_v<
-                                          Matrix,
-                                          PETScWrappers::MPI::SparseMatrix>)
-                            matrix.compress(VectorOperation::insert);
+                          columns[idx] = it->column();
+                          values[idx] =
+                            it->value() / local_row_norms[local_row_idx];
+                          ++idx;
                         }
+                      matrix.set(*row, columns, values);
+                      if constexpr (std::is_same_v<
+                                      Matrix,
+                                      PETScWrappers::MPI::SparseMatrix>)
+                        matrix.compress(VectorOperation::insert);
+
                       row_scaling[local_row_idx] /=
                         local_row_norms[local_row_idx];
                     }
@@ -1232,6 +1252,10 @@ MatrixScaling::sk_scaling(Matrix &matrix, const unsigned int nsteps)
                        ++row)
                     {
                       auto local_row_idx = partitioner.global_to_local(*row);
+                      auto row_size      = matrix.row_length(*row);
+                      std::vector<double>                  values(row_size);
+                      std::vector<types::global_dof_index> columns(row_size);
+                      unsigned int                         idx = 0;
                       for (auto it = matrix.begin(*row); it != matrix.end(*row);
                            ++it)
                         {
@@ -1245,10 +1269,11 @@ MatrixScaling::sk_scaling(Matrix &matrix, const unsigned int nsteps)
                                          std::abs(
                                            it->value() /
                                            local_col_norms[local_col_idx]));
-                              matrix.set(*row,
-                                         it->column(),
-                                         it->value() /
-                                           local_col_norms[local_col_idx]);
+
+                              columns[idx] = it->column();
+                              values[idx] =
+                                it->value() / local_col_norms[local_col_idx];
+                              ++idx;
                             }
                           else
                             {
@@ -1259,17 +1284,16 @@ MatrixScaling::sk_scaling(Matrix &matrix, const unsigned int nsteps)
                                 std::max(local_row_norms[local_row_idx],
                                          std::abs(it->value() / col_norms));
 
-                              matrix.set(*row,
-                                         it->column(),
-                                         it->value() / col_norms);
+                              columns[idx] = it->column();
+                              values[idx]  = it->value() / col_norms;
+                              ++idx;
                             }
-                          // This is atrocious, PETSc needs it, this NEEDS to be
-                          // changed
-                          if constexpr (std::is_same_v<
-                                          Matrix,
-                                          PETScWrappers::MPI::SparseMatrix>)
-                            matrix.compress(VectorOperation::insert);
                         }
+                      matrix.set(*row, columns, values);
+                      if constexpr (std::is_same_v<
+                                      Matrix,
+                                      PETScWrappers::MPI::SparseMatrix>)
+                        matrix.compress(VectorOperation::insert);
                     }
                   if constexpr (std::is_same_v<Matrix,
                                                TrilinosWrappers::SparseMatrix>)
