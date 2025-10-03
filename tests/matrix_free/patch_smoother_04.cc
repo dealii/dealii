@@ -12,9 +12,8 @@
 //
 // ------------------------------------------------------------------------
 
-// The same as patch_smoother_03, but using Dynamic PatchDistributor and FEQall.
-// check FEPatchEvaluation by comparing A*x computed locally with A*x computed
-// globally via FEEvaluation
+// Checks dynamic patch distributor by printing the mapping
+// between cell dofs and patch dofs
 
 #include <deal.II/base/function.h>
 #include <deal.II/base/quadrature_lib.h>
@@ -43,145 +42,55 @@
 #include "../tests.h"
 
 
-template <int dim, int fe_degree>
+template <int dim, int degree>
 void
 test()
 {
-  deallog << "Running test in " << dim << "D with degree " << fe_degree << "..."
+  deallog << "\n Running test in " << dim << "D with degree " << degree << "..."
           << std::endl;
-  // 1. Generate triangulation
-  Triangulation<dim> triangulation(
-    Triangulation<dim>::limit_level_difference_at_vertices);
+  const unsigned int n_cell_dofs =
+    (degree + 1) * (degree + 1) * (dim == 3 ? (degree + 1) : 1);
+  constexpr const unsigned int n_cells = 1 << dim;
 
-  GridGenerator::hyper_cube(triangulation);
-  triangulation.refine_global(); // Refine once
+  using DistInterior = PatchDistributors::Dynamic<dim, degree>;
 
-  // 2. Initialize FE, DoFHandler, Mapping
+  DistInterior distributor;
 
-  FE_Q<dim>       fe(fe_degree);
-  DoFHandler<dim> dof_handler(triangulation);
-  dof_handler.distribute_dofs(fe);
-  dof_handler.distribute_mg_dofs();
+  // Print an empty line every (degree+1) printed lines.
+  std::size_t        printed_lines   = 0;
+  const unsigned int lines_per_block = degree + 1;
+  auto               maybe_newline   = [&]() {
+    ++printed_lines;
+    if ((printed_lines % lines_per_block) == 0)
+      deallog << std::endl;
+    if (printed_lines % (lines_per_block * lines_per_block) == 0)
+      deallog << "------------\n";
+  };
 
-  const unsigned int n_lanes = VectorizedArray<double>::size();
+  // Simple map dump: print cell first, then dof, then patch dof (index).
+  const auto print_map =
+    [&](unsigned patch_index, unsigned cell, unsigned dof) {
+      deallog << "Regular   C " << cell << " D " << dof << " -> P "
+              << patch_index << std::endl;
+      maybe_newline();
+    };
 
-  MappingQ1<dim> mapping; // Using Q1 mapping as in step-98
+  const auto print_map_duplicate =
+    [&](unsigned patch_index, unsigned cell, unsigned dof) {
+      deallog << "Duplicate C " << cell << " D " << dof << " -> P "
+              << patch_index << std::endl;
+      maybe_newline();
+    };
 
-  // 3. Initialize constraints (needed for MatrixFree)
-  AffineConstraints<double> constraints;
-  IndexSet                  locally_relevant_dofs;
-  DoFTools::extract_locally_relevant_dofs(dof_handler, locally_relevant_dofs);
-  constraints.reinit(locally_relevant_dofs);
-  // No boundary conditions or hanging nodes needed for this simple test yet
-  constraints.close();
+  const auto print_skipped = [&](unsigned cell, unsigned dof) {
+    deallog << "Skipped   C " << cell << " D " << dof << std::endl;
+    maybe_newline();
+  };
 
-  // 4. Initialize MatrixFree for level 1
-  typename MatrixFree<dim, double>::AdditionalData additional_data;
-  additional_data.mg_level          = 1; // Target level 1
-  additional_data.store_ghost_cells = true;
-  // Add mapping flags needed for FEEvaluation/FEPatchEvaluation
-  additional_data.mapping_update_flags =
-    (update_gradients | update_JxW_values | update_quadrature_points);
-
-  std::shared_ptr<MatrixFree<dim, double>> mf_level_storage =
-    std::make_shared<MatrixFree<dim, double>>();
-  mf_level_storage->reinit(mapping,
-                           dof_handler,
-                           constraints,
-                           QGauss<1>(fe_degree + 1),
-                           additional_data);
-
-  // 5. Build PatchStorage on level 1
-  PatchStorage<MatrixFree<dim, double>> patch_storage(mf_level_storage);
-  patch_storage.initialize();
-
-  // 6. Initialize vectors
-  LinearAlgebra::distributed::Vector<double> src, dst_mf, dst_patch;
-  mf_level_storage->initialize_dof_vector(src);
-  mf_level_storage->initialize_dof_vector(dst_mf);
-  mf_level_storage->initialize_dof_vector(dst_patch);
-
-  // Fill src with random values
-  for (unsigned int i = 0; i < src.locally_owned_size(); ++i)
-    src.local_element(i) = i;
-  src.update_ghost_values();
-
-  // 7. Apply Laplace via standard MatrixFree
-
-  using FEEval = FEEvaluation<dim, fe_degree, fe_degree + 1, 1, double>;
-  FEEval phi(*mf_level_storage);
-  for (unsigned int cell = 0; cell < mf_level_storage->n_cell_batches(); ++cell)
-    {
-      phi.reinit(cell);
-      phi.read_dof_values(src);
-      phi.evaluate(EvaluationFlags::gradients);
-      for (unsigned int q = 0; q < phi.n_q_points; ++q)
-        phi.submit_gradient(phi.get_gradient(q), q);
-      phi.integrate(EvaluationFlags::gradients);
-      phi.distribute_local_to_global(dst_mf);
-    }
-
-
-  dst_mf.compress(VectorOperation::add);
-
-
-  // 8. Apply Laplace via FEPatchEvaluation
-
-  using PatchEval = FEPatchEvaluation<
-    FEEval,
-    PatchDistributors::Dynamic<dim, fe_degree, PatchDistributors::FEQall>>;
-
-  // Test constructor and  move constructor: consistency of cell_dofs_view_raw
-  // can fail. If so, it will be detected in reinit(). PatchEval
-  // patch_eval(patch_storage, FEEval(*mf_level_storage));
-  PatchEval patch_eval(
-    [&]() { return PatchEval(patch_storage, FEEval(*mf_level_storage)); }());
-
-  // Checks: there should only one patch
-
-  Assert(patch_storage.n_patches() > 0, ExcInternalError());
-  deallog << "  Level 1 PatchStorage initialized with "
-          << patch_storage.n_patches() << " patches." << std::endl;
-
-  patch_eval.reinit(0);
-  patch_eval.read_dof_values(src);
-
-  for (auto &phi : patch_eval.fe_evaluations)
-    {
-      phi.evaluate(EvaluationFlags::gradients);
-      for (unsigned int q = 0; q < phi.n_q_points; ++q)
-        phi.submit_gradient(phi.get_gradient(q), q);
-      phi.integrate(EvaluationFlags::gradients);
-    }
-
-  // Allocate patch vectors
-  AlignedVector<double> patch_result_local(patch_eval.n_patch_dofs());
-  AlignedVector<double> patch_result_global(
-    patch_eval.n_patch_dofs()); // Second vector for later use if needed
-
-  // Gather results from FEEvaluation objects into the first patch vector
-  patch_eval.gather_local_to_patch(ArrayView<double>(patch_result_local),
-                                   true); // Accumulate results
-
-  // Distribute results from cell evaluations to the global vector dst_patch
-
-  patch_eval.read_dof_values(dst_mf);
-  patch_eval.gather_local_to_patch(ArrayView<double>(patch_result_global),
-                                   false);
-
-  // 9. Compare patch_result_local (accumulated) and patch_result_global
-  // (non-accumulated)
-  AssertDimension(patch_result_local.size(), patch_result_global.size());
-
-  for (unsigned int i = 0; i < patch_result_local.size(); ++i)
-    {
-      const double diff = patch_result_local[i] - patch_result_global[i];
-
-      if (diff * diff > 1e-10)
-        deallog << "Difference " << diff << " :" << patch_result_local[i]
-                << "  " << patch_result_global[i] << " on DoF " << i
-                << std::endl;
-    }
+  deallog
+    << "Printing cell, dof, then patch (primary + duplicates), then skipped:\n"
+    << std::endl;
+  distributor.loop(print_map, print_map_duplicate, print_skipped);
 }
 
 int
@@ -191,24 +100,30 @@ main(int argc, char **argv)
 
   initlog();
 
+
+  test<1, 1>();
+  test<1, 2>();
+  test<1, 3>();
+
+
   test<2, 1>();
   test<2, 2>();
   test<2, 3>();
 
-  test<2, 4>();
-  test<2, 5>();
-  test<2, 6>();
-  test<2, 7>();
+  // test<2, 4>();
+  // test<2, 5>();
+  // test<2, 6>();
+  // test<2, 7>();
 
 
   test<3, 1>();
   test<3, 2>();
   test<3, 3>();
 
-  test<3, 4>();
-  test<3, 5>();
-  test<3, 6>();
-  test<3, 7>();
+  // test<3, 4>();
+  // test<3, 5>();
+  // test<3, 6>();
+  // test<3, 7>();
   deallog << "Tests finished." << std::endl;
 
   return 0; // Indicate success

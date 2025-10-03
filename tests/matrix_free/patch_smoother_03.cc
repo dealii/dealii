@@ -127,9 +127,8 @@ test()
 
   // 8. Apply Laplace via FEPatchEvaluation
 
-  using PatchEval = FEPatchEvaluation<
-    FEEval,
-    PatchDistributors::Dynamic<dim, fe_degree, PatchDistributors::FEQinterior>>;
+  using PatchEval =
+    FEPatchEvaluation<FEEval, PatchDistributors::Dynamic<dim, fe_degree>>;
 
   // Test constructor and  move constructor: consistency of cell_dofs_view_raw
   // can fail. If so, it will be detected in reinit(). PatchEval

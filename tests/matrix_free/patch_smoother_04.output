@@ -1,30 +1,1323 @@
 
-DEAL::Running test in 2D with degree 1...
-DEAL::  Level 1 PatchStorage initialized with 1 patches.
-DEAL::Running test in 2D with degree 2...
-DEAL::  Level 1 PatchStorage initialized with 1 patches.
-DEAL::Running test in 2D with degree 3...
-DEAL::  Level 1 PatchStorage initialized with 1 patches.
-DEAL::Running test in 2D with degree 4...
-DEAL::  Level 1 PatchStorage initialized with 1 patches.
-DEAL::Running test in 2D with degree 5...
-DEAL::  Level 1 PatchStorage initialized with 1 patches.
-DEAL::Running test in 2D with degree 6...
-DEAL::  Level 1 PatchStorage initialized with 1 patches.
-DEAL::Running test in 2D with degree 7...
-DEAL::  Level 1 PatchStorage initialized with 1 patches.
-DEAL::Running test in 3D with degree 1...
-DEAL::  Level 1 PatchStorage initialized with 1 patches.
-DEAL::Running test in 3D with degree 2...
-DEAL::  Level 1 PatchStorage initialized with 1 patches.
-DEAL::Running test in 3D with degree 3...
-DEAL::  Level 1 PatchStorage initialized with 1 patches.
-DEAL::Running test in 3D with degree 4...
-DEAL::  Level 1 PatchStorage initialized with 1 patches.
-DEAL::Running test in 3D with degree 5...
-DEAL::  Level 1 PatchStorage initialized with 1 patches.
-DEAL::Running test in 3D with degree 6...
-DEAL::  Level 1 PatchStorage initialized with 1 patches.
-DEAL::Running test in 3D with degree 7...
-DEAL::  Level 1 PatchStorage initialized with 1 patches.
-DEAL::Tests finished.
+DEAL::
+ Running test in 1D with degree 1...
+DEAL::Printing cell, dof, then patch (primary + duplicates), then skipped:
+
+DEAL::Skipped   C 0 D 0
+DEAL::Regular   C 0 D 1 -> P 0
+DEAL::
+DEAL::Duplicate C 1 D 0 -> P 0
+DEAL::Skipped   C 1 D 1
+DEAL::
+DEAL::------------
+
+ Running test in 1D with degree 2...
+DEAL::Printing cell, dof, then patch (primary + duplicates), then skipped:
+
+DEAL::Skipped   C 0 D 0
+DEAL::Regular   C 0 D 1 -> P 0
+DEAL::Regular   C 0 D 2 -> P 1
+DEAL::
+DEAL::Duplicate C 1 D 0 -> P 1
+DEAL::Regular   C 1 D 1 -> P 2
+DEAL::Skipped   C 1 D 2
+DEAL::
+DEAL::
+ Running test in 1D with degree 3...
+DEAL::Printing cell, dof, then patch (primary + duplicates), then skipped:
+
+DEAL::Skipped   C 0 D 0
+DEAL::Regular   C 0 D 1 -> P 0
+DEAL::Regular   C 0 D 2 -> P 1
+DEAL::Regular   C 0 D 3 -> P 2
+DEAL::
+DEAL::Duplicate C 1 D 0 -> P 2
+DEAL::Regular   C 1 D 1 -> P 3
+DEAL::Regular   C 1 D 2 -> P 4
+DEAL::Skipped   C 1 D 3
+DEAL::
+DEAL::
+ Running test in 2D with degree 1...
+DEAL::Printing cell, dof, then patch (primary + duplicates), then skipped:
+
+DEAL::Skipped   C 0 D 0
+DEAL::Skipped   C 0 D 1
+DEAL::
+DEAL::Skipped   C 0 D 2
+DEAL::Regular   C 0 D 3 -> P 0
+DEAL::
+DEAL::------------
+Skipped   C 1 D 0
+DEAL::Skipped   C 1 D 1
+DEAL::
+DEAL::Duplicate C 1 D 2 -> P 0
+DEAL::Skipped   C 1 D 3
+DEAL::
+DEAL::------------
+Skipped   C 2 D 0
+DEAL::Duplicate C 2 D 1 -> P 0
+DEAL::
+DEAL::Skipped   C 2 D 2
+DEAL::Skipped   C 2 D 3
+DEAL::
+DEAL::------------
+Duplicate C 3 D 0 -> P 0
+DEAL::Skipped   C 3 D 1
+DEAL::
+DEAL::Skipped   C 3 D 2
+DEAL::Skipped   C 3 D 3
+DEAL::
+DEAL::------------
+
+ Running test in 2D with degree 2...
+DEAL::Printing cell, dof, then patch (primary + duplicates), then skipped:
+
+DEAL::Skipped   C 0 D 0
+DEAL::Skipped   C 0 D 1
+DEAL::Skipped   C 0 D 2
+DEAL::
+DEAL::Skipped   C 0 D 3
+DEAL::Regular   C 0 D 4 -> P 0
+DEAL::Regular   C 0 D 5 -> P 1
+DEAL::
+DEAL::Skipped   C 0 D 6
+DEAL::Regular   C 0 D 7 -> P 3
+DEAL::Regular   C 0 D 8 -> P 4
+DEAL::
+DEAL::------------
+Skipped   C 1 D 0
+DEAL::Skipped   C 1 D 1
+DEAL::Skipped   C 1 D 2
+DEAL::
+DEAL::Duplicate C 1 D 3 -> P 1
+DEAL::Regular   C 1 D 4 -> P 2
+DEAL::Skipped   C 1 D 5
+DEAL::
+DEAL::Duplicate C 1 D 6 -> P 4
+DEAL::Regular   C 1 D 7 -> P 5
+DEAL::Skipped   C 1 D 8
+DEAL::
+DEAL::------------
+Skipped   C 2 D 0
+DEAL::Duplicate C 2 D 1 -> P 3
+DEAL::Duplicate C 2 D 2 -> P 4
+DEAL::
+DEAL::Skipped   C 2 D 3
+DEAL::Regular   C 2 D 4 -> P 6
+DEAL::Regular   C 2 D 5 -> P 7
+DEAL::
+DEAL::Skipped   C 2 D 6
+DEAL::Skipped   C 2 D 7
+DEAL::Skipped   C 2 D 8
+DEAL::
+DEAL::------------
+Duplicate C 3 D 0 -> P 4
+DEAL::Duplicate C 3 D 1 -> P 5
+DEAL::Skipped   C 3 D 2
+DEAL::
+DEAL::Duplicate C 3 D 3 -> P 7
+DEAL::Regular   C 3 D 4 -> P 8
+DEAL::Skipped   C 3 D 5
+DEAL::
+DEAL::Skipped   C 3 D 6
+DEAL::Skipped   C 3 D 7
+DEAL::Skipped   C 3 D 8
+DEAL::
+DEAL::------------
+
+ Running test in 2D with degree 3...
+DEAL::Printing cell, dof, then patch (primary + duplicates), then skipped:
+
+DEAL::Skipped   C 0 D 0
+DEAL::Skipped   C 0 D 1
+DEAL::Skipped   C 0 D 2
+DEAL::Skipped   C 0 D 3
+DEAL::
+DEAL::Skipped   C 0 D 4
+DEAL::Regular   C 0 D 5 -> P 0
+DEAL::Regular   C 0 D 6 -> P 1
+DEAL::Regular   C 0 D 7 -> P 2
+DEAL::
+DEAL::Skipped   C 0 D 8
+DEAL::Regular   C 0 D 9 -> P 5
+DEAL::Regular   C 0 D 10 -> P 6
+DEAL::Regular   C 0 D 11 -> P 7
+DEAL::
+DEAL::Skipped   C 0 D 12
+DEAL::Regular   C 0 D 13 -> P 10
+DEAL::Regular   C 0 D 14 -> P 11
+DEAL::Regular   C 0 D 15 -> P 12
+DEAL::
+DEAL::------------
+Skipped   C 1 D 0
+DEAL::Skipped   C 1 D 1
+DEAL::Skipped   C 1 D 2
+DEAL::Skipped   C 1 D 3
+DEAL::
+DEAL::Duplicate C 1 D 4 -> P 2
+DEAL::Regular   C 1 D 5 -> P 3
+DEAL::Regular   C 1 D 6 -> P 4
+DEAL::Skipped   C 1 D 7
+DEAL::
+DEAL::Duplicate C 1 D 8 -> P 7
+DEAL::Regular   C 1 D 9 -> P 8
+DEAL::Regular   C 1 D 10 -> P 9
+DEAL::Skipped   C 1 D 11
+DEAL::
+DEAL::Duplicate C 1 D 12 -> P 12
+DEAL::Regular   C 1 D 13 -> P 13
+DEAL::Regular   C 1 D 14 -> P 14
+DEAL::Skipped   C 1 D 15
+DEAL::
+DEAL::------------
+Skipped   C 2 D 0
+DEAL::Duplicate C 2 D 1 -> P 10
+DEAL::Duplicate C 2 D 2 -> P 11
+DEAL::Duplicate C 2 D 3 -> P 12
+DEAL::
+DEAL::Skipped   C 2 D 4
+DEAL::Regular   C 2 D 5 -> P 15
+DEAL::Regular   C 2 D 6 -> P 16
+DEAL::Regular   C 2 D 7 -> P 17
+DEAL::
+DEAL::Skipped   C 2 D 8
+DEAL::Regular   C 2 D 9 -> P 20
+DEAL::Regular   C 2 D 10 -> P 21
+DEAL::Regular   C 2 D 11 -> P 22
+DEAL::
+DEAL::Skipped   C 2 D 12
+DEAL::Skipped   C 2 D 13
+DEAL::Skipped   C 2 D 14
+DEAL::Skipped   C 2 D 15
+DEAL::
+DEAL::------------
+Duplicate C 3 D 0 -> P 12
+DEAL::Duplicate C 3 D 1 -> P 13
+DEAL::Duplicate C 3 D 2 -> P 14
+DEAL::Skipped   C 3 D 3
+DEAL::
+DEAL::Duplicate C 3 D 4 -> P 17
+DEAL::Regular   C 3 D 5 -> P 18
+DEAL::Regular   C 3 D 6 -> P 19
+DEAL::Skipped   C 3 D 7
+DEAL::
+DEAL::Duplicate C 3 D 8 -> P 22
+DEAL::Regular   C 3 D 9 -> P 23
+DEAL::Regular   C 3 D 10 -> P 24
+DEAL::Skipped   C 3 D 11
+DEAL::
+DEAL::Skipped   C 3 D 12
+DEAL::Skipped   C 3 D 13
+DEAL::Skipped   C 3 D 14
+DEAL::Skipped   C 3 D 15
+DEAL::
+DEAL::------------
+
+ Running test in 3D with degree 1...
+DEAL::Printing cell, dof, then patch (primary + duplicates), then skipped:
+
+DEAL::Skipped   C 0 D 0
+DEAL::Skipped   C 0 D 1
+DEAL::
+DEAL::Skipped   C 0 D 2
+DEAL::Skipped   C 0 D 3
+DEAL::
+DEAL::------------
+Skipped   C 0 D 4
+DEAL::Skipped   C 0 D 5
+DEAL::
+DEAL::Skipped   C 0 D 6
+DEAL::Regular   C 0 D 7 -> P 0
+DEAL::
+DEAL::------------
+Skipped   C 1 D 0
+DEAL::Skipped   C 1 D 1
+DEAL::
+DEAL::Skipped   C 1 D 2
+DEAL::Skipped   C 1 D 3
+DEAL::
+DEAL::------------
+Skipped   C 1 D 4
+DEAL::Skipped   C 1 D 5
+DEAL::
+DEAL::Duplicate C 1 D 6 -> P 0
+DEAL::Skipped   C 1 D 7
+DEAL::
+DEAL::------------
+Skipped   C 2 D 0
+DEAL::Skipped   C 2 D 1
+DEAL::
+DEAL::Skipped   C 2 D 2
+DEAL::Skipped   C 2 D 3
+DEAL::
+DEAL::------------
+Skipped   C 2 D 4
+DEAL::Duplicate C 2 D 5 -> P 0
+DEAL::
+DEAL::Skipped   C 2 D 6
+DEAL::Skipped   C 2 D 7
+DEAL::
+DEAL::------------
+Skipped   C 3 D 0
+DEAL::Skipped   C 3 D 1
+DEAL::
+DEAL::Skipped   C 3 D 2
+DEAL::Skipped   C 3 D 3
+DEAL::
+DEAL::------------
+Duplicate C 3 D 4 -> P 0
+DEAL::Skipped   C 3 D 5
+DEAL::
+DEAL::Skipped   C 3 D 6
+DEAL::Skipped   C 3 D 7
+DEAL::
+DEAL::------------
+Skipped   C 4 D 0
+DEAL::Skipped   C 4 D 1
+DEAL::
+DEAL::Skipped   C 4 D 2
+DEAL::Duplicate C 4 D 3 -> P 0
+DEAL::
+DEAL::------------
+Skipped   C 4 D 4
+DEAL::Skipped   C 4 D 5
+DEAL::
+DEAL::Skipped   C 4 D 6
+DEAL::Skipped   C 4 D 7
+DEAL::
+DEAL::------------
+Skipped   C 5 D 0
+DEAL::Skipped   C 5 D 1
+DEAL::
+DEAL::Duplicate C 5 D 2 -> P 0
+DEAL::Skipped   C 5 D 3
+DEAL::
+DEAL::------------
+Skipped   C 5 D 4
+DEAL::Skipped   C 5 D 5
+DEAL::
+DEAL::Skipped   C 5 D 6
+DEAL::Skipped   C 5 D 7
+DEAL::
+DEAL::------------
+Skipped   C 6 D 0
+DEAL::Duplicate C 6 D 1 -> P 0
+DEAL::
+DEAL::Skipped   C 6 D 2
+DEAL::Skipped   C 6 D 3
+DEAL::
+DEAL::------------
+Skipped   C 6 D 4
+DEAL::Skipped   C 6 D 5
+DEAL::
+DEAL::Skipped   C 6 D 6
+DEAL::Skipped   C 6 D 7
+DEAL::
+DEAL::------------
+Duplicate C 7 D 0 -> P 0
+DEAL::Skipped   C 7 D 1
+DEAL::
+DEAL::Skipped   C 7 D 2
+DEAL::Skipped   C 7 D 3
+DEAL::
+DEAL::------------
+Skipped   C 7 D 4
+DEAL::Skipped   C 7 D 5
+DEAL::
+DEAL::Skipped   C 7 D 6
+DEAL::Skipped   C 7 D 7
+DEAL::
+DEAL::------------
+
+ Running test in 3D with degree 2...
+DEAL::Printing cell, dof, then patch (primary + duplicates), then skipped:
+
+DEAL::Skipped   C 0 D 0
+DEAL::Skipped   C 0 D 1
+DEAL::Skipped   C 0 D 2
+DEAL::
+DEAL::Skipped   C 0 D 3
+DEAL::Skipped   C 0 D 4
+DEAL::Skipped   C 0 D 5
+DEAL::
+DEAL::Skipped   C 0 D 6
+DEAL::Skipped   C 0 D 7
+DEAL::Skipped   C 0 D 8
+DEAL::
+DEAL::------------
+Skipped   C 0 D 9
+DEAL::Skipped   C 0 D 10
+DEAL::Skipped   C 0 D 11
+DEAL::
+DEAL::Skipped   C 0 D 12
+DEAL::Regular   C 0 D 13 -> P 0
+DEAL::Regular   C 0 D 14 -> P 1
+DEAL::
+DEAL::Skipped   C 0 D 15
+DEAL::Regular   C 0 D 16 -> P 3
+DEAL::Regular   C 0 D 17 -> P 4
+DEAL::
+DEAL::------------
+Skipped   C 0 D 18
+DEAL::Skipped   C 0 D 19
+DEAL::Skipped   C 0 D 20
+DEAL::
+DEAL::Skipped   C 0 D 21
+DEAL::Regular   C 0 D 22 -> P 9
+DEAL::Regular   C 0 D 23 -> P 10
+DEAL::
+DEAL::Skipped   C 0 D 24
+DEAL::Regular   C 0 D 25 -> P 12
+DEAL::Regular   C 0 D 26 -> P 13
+DEAL::
+DEAL::------------
+Skipped   C 1 D 0
+DEAL::Skipped   C 1 D 1
+DEAL::Skipped   C 1 D 2
+DEAL::
+DEAL::Skipped   C 1 D 3
+DEAL::Skipped   C 1 D 4
+DEAL::Skipped   C 1 D 5
+DEAL::
+DEAL::Skipped   C 1 D 6
+DEAL::Skipped   C 1 D 7
+DEAL::Skipped   C 1 D 8
+DEAL::
+DEAL::------------
+Skipped   C 1 D 9
+DEAL::Skipped   C 1 D 10
+DEAL::Skipped   C 1 D 11
+DEAL::
+DEAL::Duplicate C 1 D 12 -> P 1
+DEAL::Regular   C 1 D 13 -> P 2
+DEAL::Skipped   C 1 D 14
+DEAL::
+DEAL::Duplicate C 1 D 15 -> P 4
+DEAL::Regular   C 1 D 16 -> P 5
+DEAL::Skipped   C 1 D 17
+DEAL::
+DEAL::------------
+Skipped   C 1 D 18
+DEAL::Skipped   C 1 D 19
+DEAL::Skipped   C 1 D 20
+DEAL::
+DEAL::Duplicate C 1 D 21 -> P 10
+DEAL::Regular   C 1 D 22 -> P 11
+DEAL::Skipped   C 1 D 23
+DEAL::
+DEAL::Duplicate C 1 D 24 -> P 13
+DEAL::Regular   C 1 D 25 -> P 14
+DEAL::Skipped   C 1 D 26
+DEAL::
+DEAL::------------
+Skipped   C 2 D 0
+DEAL::Skipped   C 2 D 1
+DEAL::Skipped   C 2 D 2
+DEAL::
+DEAL::Skipped   C 2 D 3
+DEAL::Skipped   C 2 D 4
+DEAL::Skipped   C 2 D 5
+DEAL::
+DEAL::Skipped   C 2 D 6
+DEAL::Skipped   C 2 D 7
+DEAL::Skipped   C 2 D 8
+DEAL::
+DEAL::------------
+Skipped   C 2 D 9
+DEAL::Duplicate C 2 D 10 -> P 3
+DEAL::Duplicate C 2 D 11 -> P 4
+DEAL::
+DEAL::Skipped   C 2 D 12
+DEAL::Regular   C 2 D 13 -> P 6
+DEAL::Regular   C 2 D 14 -> P 7
+DEAL::
+DEAL::Skipped   C 2 D 15
+DEAL::Skipped   C 2 D 16
+DEAL::Skipped   C 2 D 17
+DEAL::
+DEAL::------------
+Skipped   C 2 D 18
+DEAL::Duplicate C 2 D 19 -> P 12
+DEAL::Duplicate C 2 D 20 -> P 13
+DEAL::
+DEAL::Skipped   C 2 D 21
+DEAL::Regular   C 2 D 22 -> P 15
+DEAL::Regular   C 2 D 23 -> P 16
+DEAL::
+DEAL::Skipped   C 2 D 24
+DEAL::Skipped   C 2 D 25
+DEAL::Skipped   C 2 D 26
+DEAL::
+DEAL::------------
+Skipped   C 3 D 0
+DEAL::Skipped   C 3 D 1
+DEAL::Skipped   C 3 D 2
+DEAL::
+DEAL::Skipped   C 3 D 3
+DEAL::Skipped   C 3 D 4
+DEAL::Skipped   C 3 D 5
+DEAL::
+DEAL::Skipped   C 3 D 6
+DEAL::Skipped   C 3 D 7
+DEAL::Skipped   C 3 D 8
+DEAL::
+DEAL::------------
+Duplicate C 3 D 9 -> P 4
+DEAL::Duplicate C 3 D 10 -> P 5
+DEAL::Skipped   C 3 D 11
+DEAL::
+DEAL::Duplicate C 3 D 12 -> P 7
+DEAL::Regular   C 3 D 13 -> P 8
+DEAL::Skipped   C 3 D 14
+DEAL::
+DEAL::Skipped   C 3 D 15
+DEAL::Skipped   C 3 D 16
+DEAL::Skipped   C 3 D 17
+DEAL::
+DEAL::------------
+Duplicate C 3 D 18 -> P 13
+DEAL::Duplicate C 3 D 19 -> P 14
+DEAL::Skipped   C 3 D 20
+DEAL::
+DEAL::Duplicate C 3 D 21 -> P 16
+DEAL::Regular   C 3 D 22 -> P 17
+DEAL::Skipped   C 3 D 23
+DEAL::
+DEAL::Skipped   C 3 D 24
+DEAL::Skipped   C 3 D 25
+DEAL::Skipped   C 3 D 26
+DEAL::
+DEAL::------------
+Skipped   C 4 D 0
+DEAL::Skipped   C 4 D 1
+DEAL::Skipped   C 4 D 2
+DEAL::
+DEAL::Skipped   C 4 D 3
+DEAL::Duplicate C 4 D 4 -> P 9
+DEAL::Duplicate C 4 D 5 -> P 10
+DEAL::
+DEAL::Skipped   C 4 D 6
+DEAL::Duplicate C 4 D 7 -> P 12
+DEAL::Duplicate C 4 D 8 -> P 13
+DEAL::
+DEAL::------------
+Skipped   C 4 D 9
+DEAL::Skipped   C 4 D 10
+DEAL::Skipped   C 4 D 11
+DEAL::
+DEAL::Skipped   C 4 D 12
+DEAL::Regular   C 4 D 13 -> P 18
+DEAL::Regular   C 4 D 14 -> P 19
+DEAL::
+DEAL::Skipped   C 4 D 15
+DEAL::Regular   C 4 D 16 -> P 21
+DEAL::Regular   C 4 D 17 -> P 22
+DEAL::
+DEAL::------------
+Skipped   C 4 D 18
+DEAL::Skipped   C 4 D 19
+DEAL::Skipped   C 4 D 20
+DEAL::
+DEAL::Skipped   C 4 D 21
+DEAL::Skipped   C 4 D 22
+DEAL::Skipped   C 4 D 23
+DEAL::
+DEAL::Skipped   C 4 D 24
+DEAL::Skipped   C 4 D 25
+DEAL::Skipped   C 4 D 26
+DEAL::
+DEAL::------------
+Skipped   C 5 D 0
+DEAL::Skipped   C 5 D 1
+DEAL::Skipped   C 5 D 2
+DEAL::
+DEAL::Duplicate C 5 D 3 -> P 10
+DEAL::Duplicate C 5 D 4 -> P 11
+DEAL::Skipped   C 5 D 5
+DEAL::
+DEAL::Duplicate C 5 D 6 -> P 13
+DEAL::Duplicate C 5 D 7 -> P 14
+DEAL::Skipped   C 5 D 8
+DEAL::
+DEAL::------------
+Skipped   C 5 D 9
+DEAL::Skipped   C 5 D 10
+DEAL::Skipped   C 5 D 11
+DEAL::
+DEAL::Duplicate C 5 D 12 -> P 19
+DEAL::Regular   C 5 D 13 -> P 20
+DEAL::Skipped   C 5 D 14
+DEAL::
+DEAL::Duplicate C 5 D 15 -> P 22
+DEAL::Regular   C 5 D 16 -> P 23
+DEAL::Skipped   C 5 D 17
+DEAL::
+DEAL::------------
+Skipped   C 5 D 18
+DEAL::Skipped   C 5 D 19
+DEAL::Skipped   C 5 D 20
+DEAL::
+DEAL::Skipped   C 5 D 21
+DEAL::Skipped   C 5 D 22
+DEAL::Skipped   C 5 D 23
+DEAL::
+DEAL::Skipped   C 5 D 24
+DEAL::Skipped   C 5 D 25
+DEAL::Skipped   C 5 D 26
+DEAL::
+DEAL::------------
+Skipped   C 6 D 0
+DEAL::Duplicate C 6 D 1 -> P 12
+DEAL::Duplicate C 6 D 2 -> P 13
+DEAL::
+DEAL::Skipped   C 6 D 3
+DEAL::Duplicate C 6 D 4 -> P 15
+DEAL::Duplicate C 6 D 5 -> P 16
+DEAL::
+DEAL::Skipped   C 6 D 6
+DEAL::Skipped   C 6 D 7
+DEAL::Skipped   C 6 D 8
+DEAL::
+DEAL::------------
+Skipped   C 6 D 9
+DEAL::Duplicate C 6 D 10 -> P 21
+DEAL::Duplicate C 6 D 11 -> P 22
+DEAL::
+DEAL::Skipped   C 6 D 12
+DEAL::Regular   C 6 D 13 -> P 24
+DEAL::Regular   C 6 D 14 -> P 25
+DEAL::
+DEAL::Skipped   C 6 D 15
+DEAL::Skipped   C 6 D 16
+DEAL::Skipped   C 6 D 17
+DEAL::
+DEAL::------------
+Skipped   C 6 D 18
+DEAL::Skipped   C 6 D 19
+DEAL::Skipped   C 6 D 20
+DEAL::
+DEAL::Skipped   C 6 D 21
+DEAL::Skipped   C 6 D 22
+DEAL::Skipped   C 6 D 23
+DEAL::
+DEAL::Skipped   C 6 D 24
+DEAL::Skipped   C 6 D 25
+DEAL::Skipped   C 6 D 26
+DEAL::
+DEAL::------------
+Duplicate C 7 D 0 -> P 13
+DEAL::Duplicate C 7 D 1 -> P 14
+DEAL::Skipped   C 7 D 2
+DEAL::
+DEAL::Duplicate C 7 D 3 -> P 16
+DEAL::Duplicate C 7 D 4 -> P 17
+DEAL::Skipped   C 7 D 5
+DEAL::
+DEAL::Skipped   C 7 D 6
+DEAL::Skipped   C 7 D 7
+DEAL::Skipped   C 7 D 8
+DEAL::
+DEAL::------------
+Duplicate C 7 D 9 -> P 22
+DEAL::Duplicate C 7 D 10 -> P 23
+DEAL::Skipped   C 7 D 11
+DEAL::
+DEAL::Duplicate C 7 D 12 -> P 25
+DEAL::Regular   C 7 D 13 -> P 26
+DEAL::Skipped   C 7 D 14
+DEAL::
+DEAL::Skipped   C 7 D 15
+DEAL::Skipped   C 7 D 16
+DEAL::Skipped   C 7 D 17
+DEAL::
+DEAL::------------
+Skipped   C 7 D 18
+DEAL::Skipped   C 7 D 19
+DEAL::Skipped   C 7 D 20
+DEAL::
+DEAL::Skipped   C 7 D 21
+DEAL::Skipped   C 7 D 22
+DEAL::Skipped   C 7 D 23
+DEAL::
+DEAL::Skipped   C 7 D 24
+DEAL::Skipped   C 7 D 25
+DEAL::Skipped   C 7 D 26
+DEAL::
+DEAL::------------
+
+ Running test in 3D with degree 3...
+DEAL::Printing cell, dof, then patch (primary + duplicates), then skipped:
+
+DEAL::Skipped   C 0 D 0
+DEAL::Skipped   C 0 D 1
+DEAL::Skipped   C 0 D 2
+DEAL::Skipped   C 0 D 3
+DEAL::
+DEAL::Skipped   C 0 D 4
+DEAL::Skipped   C 0 D 5
+DEAL::Skipped   C 0 D 6
+DEAL::Skipped   C 0 D 7
+DEAL::
+DEAL::Skipped   C 0 D 8
+DEAL::Skipped   C 0 D 9
+DEAL::Skipped   C 0 D 10
+DEAL::Skipped   C 0 D 11
+DEAL::
+DEAL::Skipped   C 0 D 12
+DEAL::Skipped   C 0 D 13
+DEAL::Skipped   C 0 D 14
+DEAL::Skipped   C 0 D 15
+DEAL::
+DEAL::------------
+Skipped   C 0 D 16
+DEAL::Skipped   C 0 D 17
+DEAL::Skipped   C 0 D 18
+DEAL::Skipped   C 0 D 19
+DEAL::
+DEAL::Skipped   C 0 D 20
+DEAL::Regular   C 0 D 21 -> P 0
+DEAL::Regular   C 0 D 22 -> P 1
+DEAL::Regular   C 0 D 23 -> P 2
+DEAL::
+DEAL::Skipped   C 0 D 24
+DEAL::Regular   C 0 D 25 -> P 5
+DEAL::Regular   C 0 D 26 -> P 6
+DEAL::Regular   C 0 D 27 -> P 7
+DEAL::
+DEAL::Skipped   C 0 D 28
+DEAL::Regular   C 0 D 29 -> P 10
+DEAL::Regular   C 0 D 30 -> P 11
+DEAL::Regular   C 0 D 31 -> P 12
+DEAL::
+DEAL::------------
+Skipped   C 0 D 32
+DEAL::Skipped   C 0 D 33
+DEAL::Skipped   C 0 D 34
+DEAL::Skipped   C 0 D 35
+DEAL::
+DEAL::Skipped   C 0 D 36
+DEAL::Regular   C 0 D 37 -> P 25
+DEAL::Regular   C 0 D 38 -> P 26
+DEAL::Regular   C 0 D 39 -> P 27
+DEAL::
+DEAL::Skipped   C 0 D 40
+DEAL::Regular   C 0 D 41 -> P 30
+DEAL::Regular   C 0 D 42 -> P 31
+DEAL::Regular   C 0 D 43 -> P 32
+DEAL::
+DEAL::Skipped   C 0 D 44
+DEAL::Regular   C 0 D 45 -> P 35
+DEAL::Regular   C 0 D 46 -> P 36
+DEAL::Regular   C 0 D 47 -> P 37
+DEAL::
+DEAL::------------
+Skipped   C 0 D 48
+DEAL::Skipped   C 0 D 49
+DEAL::Skipped   C 0 D 50
+DEAL::Skipped   C 0 D 51
+DEAL::
+DEAL::Skipped   C 0 D 52
+DEAL::Regular   C 0 D 53 -> P 50
+DEAL::Regular   C 0 D 54 -> P 51
+DEAL::Regular   C 0 D 55 -> P 52
+DEAL::
+DEAL::Skipped   C 0 D 56
+DEAL::Regular   C 0 D 57 -> P 55
+DEAL::Regular   C 0 D 58 -> P 56
+DEAL::Regular   C 0 D 59 -> P 57
+DEAL::
+DEAL::Skipped   C 0 D 60
+DEAL::Regular   C 0 D 61 -> P 60
+DEAL::Regular   C 0 D 62 -> P 61
+DEAL::Regular   C 0 D 63 -> P 62
+DEAL::
+DEAL::------------
+Skipped   C 1 D 0
+DEAL::Skipped   C 1 D 1
+DEAL::Skipped   C 1 D 2
+DEAL::Skipped   C 1 D 3
+DEAL::
+DEAL::Skipped   C 1 D 4
+DEAL::Skipped   C 1 D 5
+DEAL::Skipped   C 1 D 6
+DEAL::Skipped   C 1 D 7
+DEAL::
+DEAL::Skipped   C 1 D 8
+DEAL::Skipped   C 1 D 9
+DEAL::Skipped   C 1 D 10
+DEAL::Skipped   C 1 D 11
+DEAL::
+DEAL::Skipped   C 1 D 12
+DEAL::Skipped   C 1 D 13
+DEAL::Skipped   C 1 D 14
+DEAL::Skipped   C 1 D 15
+DEAL::
+DEAL::------------
+Skipped   C 1 D 16
+DEAL::Skipped   C 1 D 17
+DEAL::Skipped   C 1 D 18
+DEAL::Skipped   C 1 D 19
+DEAL::
+DEAL::Duplicate C 1 D 20 -> P 2
+DEAL::Regular   C 1 D 21 -> P 3
+DEAL::Regular   C 1 D 22 -> P 4
+DEAL::Skipped   C 1 D 23
+DEAL::
+DEAL::Duplicate C 1 D 24 -> P 7
+DEAL::Regular   C 1 D 25 -> P 8
+DEAL::Regular   C 1 D 26 -> P 9
+DEAL::Skipped   C 1 D 27
+DEAL::
+DEAL::Duplicate C 1 D 28 -> P 12
+DEAL::Regular   C 1 D 29 -> P 13
+DEAL::Regular   C 1 D 30 -> P 14
+DEAL::Skipped   C 1 D 31
+DEAL::
+DEAL::------------
+Skipped   C 1 D 32
+DEAL::Skipped   C 1 D 33
+DEAL::Skipped   C 1 D 34
+DEAL::Skipped   C 1 D 35
+DEAL::
+DEAL::Duplicate C 1 D 36 -> P 27
+DEAL::Regular   C 1 D 37 -> P 28
+DEAL::Regular   C 1 D 38 -> P 29
+DEAL::Skipped   C 1 D 39
+DEAL::
+DEAL::Duplicate C 1 D 40 -> P 32
+DEAL::Regular   C 1 D 41 -> P 33
+DEAL::Regular   C 1 D 42 -> P 34
+DEAL::Skipped   C 1 D 43
+DEAL::
+DEAL::Duplicate C 1 D 44 -> P 37
+DEAL::Regular   C 1 D 45 -> P 38
+DEAL::Regular   C 1 D 46 -> P 39
+DEAL::Skipped   C 1 D 47
+DEAL::
+DEAL::------------
+Skipped   C 1 D 48
+DEAL::Skipped   C 1 D 49
+DEAL::Skipped   C 1 D 50
+DEAL::Skipped   C 1 D 51
+DEAL::
+DEAL::Duplicate C 1 D 52 -> P 52
+DEAL::Regular   C 1 D 53 -> P 53
+DEAL::Regular   C 1 D 54 -> P 54
+DEAL::Skipped   C 1 D 55
+DEAL::
+DEAL::Duplicate C 1 D 56 -> P 57
+DEAL::Regular   C 1 D 57 -> P 58
+DEAL::Regular   C 1 D 58 -> P 59
+DEAL::Skipped   C 1 D 59
+DEAL::
+DEAL::Duplicate C 1 D 60 -> P 62
+DEAL::Regular   C 1 D 61 -> P 63
+DEAL::Regular   C 1 D 62 -> P 64
+DEAL::Skipped   C 1 D 63
+DEAL::
+DEAL::------------
+Skipped   C 2 D 0
+DEAL::Skipped   C 2 D 1
+DEAL::Skipped   C 2 D 2
+DEAL::Skipped   C 2 D 3
+DEAL::
+DEAL::Skipped   C 2 D 4
+DEAL::Skipped   C 2 D 5
+DEAL::Skipped   C 2 D 6
+DEAL::Skipped   C 2 D 7
+DEAL::
+DEAL::Skipped   C 2 D 8
+DEAL::Skipped   C 2 D 9
+DEAL::Skipped   C 2 D 10
+DEAL::Skipped   C 2 D 11
+DEAL::
+DEAL::Skipped   C 2 D 12
+DEAL::Skipped   C 2 D 13
+DEAL::Skipped   C 2 D 14
+DEAL::Skipped   C 2 D 15
+DEAL::
+DEAL::------------
+Skipped   C 2 D 16
+DEAL::Duplicate C 2 D 17 -> P 10
+DEAL::Duplicate C 2 D 18 -> P 11
+DEAL::Duplicate C 2 D 19 -> P 12
+DEAL::
+DEAL::Skipped   C 2 D 20
+DEAL::Regular   C 2 D 21 -> P 15
+DEAL::Regular   C 2 D 22 -> P 16
+DEAL::Regular   C 2 D 23 -> P 17
+DEAL::
+DEAL::Skipped   C 2 D 24
+DEAL::Regular   C 2 D 25 -> P 20
+DEAL::Regular   C 2 D 26 -> P 21
+DEAL::Regular   C 2 D 27 -> P 22
+DEAL::
+DEAL::Skipped   C 2 D 28
+DEAL::Skipped   C 2 D 29
+DEAL::Skipped   C 2 D 30
+DEAL::Skipped   C 2 D 31
+DEAL::
+DEAL::------------
+Skipped   C 2 D 32
+DEAL::Duplicate C 2 D 33 -> P 35
+DEAL::Duplicate C 2 D 34 -> P 36
+DEAL::Duplicate C 2 D 35 -> P 37
+DEAL::
+DEAL::Skipped   C 2 D 36
+DEAL::Regular   C 2 D 37 -> P 40
+DEAL::Regular   C 2 D 38 -> P 41
+DEAL::Regular   C 2 D 39 -> P 42
+DEAL::
+DEAL::Skipped   C 2 D 40
+DEAL::Regular   C 2 D 41 -> P 45
+DEAL::Regular   C 2 D 42 -> P 46
+DEAL::Regular   C 2 D 43 -> P 47
+DEAL::
+DEAL::Skipped   C 2 D 44
+DEAL::Skipped   C 2 D 45
+DEAL::Skipped   C 2 D 46
+DEAL::Skipped   C 2 D 47
+DEAL::
+DEAL::------------
+Skipped   C 2 D 48
+DEAL::Duplicate C 2 D 49 -> P 60
+DEAL::Duplicate C 2 D 50 -> P 61
+DEAL::Duplicate C 2 D 51 -> P 62
+DEAL::
+DEAL::Skipped   C 2 D 52
+DEAL::Regular   C 2 D 53 -> P 65
+DEAL::Regular   C 2 D 54 -> P 66
+DEAL::Regular   C 2 D 55 -> P 67
+DEAL::
+DEAL::Skipped   C 2 D 56
+DEAL::Regular   C 2 D 57 -> P 70
+DEAL::Regular   C 2 D 58 -> P 71
+DEAL::Regular   C 2 D 59 -> P 72
+DEAL::
+DEAL::Skipped   C 2 D 60
+DEAL::Skipped   C 2 D 61
+DEAL::Skipped   C 2 D 62
+DEAL::Skipped   C 2 D 63
+DEAL::
+DEAL::------------
+Skipped   C 3 D 0
+DEAL::Skipped   C 3 D 1
+DEAL::Skipped   C 3 D 2
+DEAL::Skipped   C 3 D 3
+DEAL::
+DEAL::Skipped   C 3 D 4
+DEAL::Skipped   C 3 D 5
+DEAL::Skipped   C 3 D 6
+DEAL::Skipped   C 3 D 7
+DEAL::
+DEAL::Skipped   C 3 D 8
+DEAL::Skipped   C 3 D 9
+DEAL::Skipped   C 3 D 10
+DEAL::Skipped   C 3 D 11
+DEAL::
+DEAL::Skipped   C 3 D 12
+DEAL::Skipped   C 3 D 13
+DEAL::Skipped   C 3 D 14
+DEAL::Skipped   C 3 D 15
+DEAL::
+DEAL::------------
+Duplicate C 3 D 16 -> P 12
+DEAL::Duplicate C 3 D 17 -> P 13
+DEAL::Duplicate C 3 D 18 -> P 14
+DEAL::Skipped   C 3 D 19
+DEAL::
+DEAL::Duplicate C 3 D 20 -> P 17
+DEAL::Regular   C 3 D 21 -> P 18
+DEAL::Regular   C 3 D 22 -> P 19
+DEAL::Skipped   C 3 D 23
+DEAL::
+DEAL::Duplicate C 3 D 24 -> P 22
+DEAL::Regular   C 3 D 25 -> P 23
+DEAL::Regular   C 3 D 26 -> P 24
+DEAL::Skipped   C 3 D 27
+DEAL::
+DEAL::Skipped   C 3 D 28
+DEAL::Skipped   C 3 D 29
+DEAL::Skipped   C 3 D 30
+DEAL::Skipped   C 3 D 31
+DEAL::
+DEAL::------------
+Duplicate C 3 D 32 -> P 37
+DEAL::Duplicate C 3 D 33 -> P 38
+DEAL::Duplicate C 3 D 34 -> P 39
+DEAL::Skipped   C 3 D 35
+DEAL::
+DEAL::Duplicate C 3 D 36 -> P 42
+DEAL::Regular   C 3 D 37 -> P 43
+DEAL::Regular   C 3 D 38 -> P 44
+DEAL::Skipped   C 3 D 39
+DEAL::
+DEAL::Duplicate C 3 D 40 -> P 47
+DEAL::Regular   C 3 D 41 -> P 48
+DEAL::Regular   C 3 D 42 -> P 49
+DEAL::Skipped   C 3 D 43
+DEAL::
+DEAL::Skipped   C 3 D 44
+DEAL::Skipped   C 3 D 45
+DEAL::Skipped   C 3 D 46
+DEAL::Skipped   C 3 D 47
+DEAL::
+DEAL::------------
+Duplicate C 3 D 48 -> P 62
+DEAL::Duplicate C 3 D 49 -> P 63
+DEAL::Duplicate C 3 D 50 -> P 64
+DEAL::Skipped   C 3 D 51
+DEAL::
+DEAL::Duplicate C 3 D 52 -> P 67
+DEAL::Regular   C 3 D 53 -> P 68
+DEAL::Regular   C 3 D 54 -> P 69
+DEAL::Skipped   C 3 D 55
+DEAL::
+DEAL::Duplicate C 3 D 56 -> P 72
+DEAL::Regular   C 3 D 57 -> P 73
+DEAL::Regular   C 3 D 58 -> P 74
+DEAL::Skipped   C 3 D 59
+DEAL::
+DEAL::Skipped   C 3 D 60
+DEAL::Skipped   C 3 D 61
+DEAL::Skipped   C 3 D 62
+DEAL::Skipped   C 3 D 63
+DEAL::
+DEAL::------------
+Skipped   C 4 D 0
+DEAL::Skipped   C 4 D 1
+DEAL::Skipped   C 4 D 2
+DEAL::Skipped   C 4 D 3
+DEAL::
+DEAL::Skipped   C 4 D 4
+DEAL::Duplicate C 4 D 5 -> P 50
+DEAL::Duplicate C 4 D 6 -> P 51
+DEAL::Duplicate C 4 D 7 -> P 52
+DEAL::
+DEAL::Skipped   C 4 D 8
+DEAL::Duplicate C 4 D 9 -> P 55
+DEAL::Duplicate C 4 D 10 -> P 56
+DEAL::Duplicate C 4 D 11 -> P 57
+DEAL::
+DEAL::Skipped   C 4 D 12
+DEAL::Duplicate C 4 D 13 -> P 60
+DEAL::Duplicate C 4 D 14 -> P 61
+DEAL::Duplicate C 4 D 15 -> P 62
+DEAL::
+DEAL::------------
+Skipped   C 4 D 16
+DEAL::Skipped   C 4 D 17
+DEAL::Skipped   C 4 D 18
+DEAL::Skipped   C 4 D 19
+DEAL::
+DEAL::Skipped   C 4 D 20
+DEAL::Regular   C 4 D 21 -> P 75
+DEAL::Regular   C 4 D 22 -> P 76
+DEAL::Regular   C 4 D 23 -> P 77
+DEAL::
+DEAL::Skipped   C 4 D 24
+DEAL::Regular   C 4 D 25 -> P 80
+DEAL::Regular   C 4 D 26 -> P 81
+DEAL::Regular   C 4 D 27 -> P 82
+DEAL::
+DEAL::Skipped   C 4 D 28
+DEAL::Regular   C 4 D 29 -> P 85
+DEAL::Regular   C 4 D 30 -> P 86
+DEAL::Regular   C 4 D 31 -> P 87
+DEAL::
+DEAL::------------
+Skipped   C 4 D 32
+DEAL::Skipped   C 4 D 33
+DEAL::Skipped   C 4 D 34
+DEAL::Skipped   C 4 D 35
+DEAL::
+DEAL::Skipped   C 4 D 36
+DEAL::Regular   C 4 D 37 -> P 100
+DEAL::Regular   C 4 D 38 -> P 101
+DEAL::Regular   C 4 D 39 -> P 102
+DEAL::
+DEAL::Skipped   C 4 D 40
+DEAL::Regular   C 4 D 41 -> P 105
+DEAL::Regular   C 4 D 42 -> P 106
+DEAL::Regular   C 4 D 43 -> P 107
+DEAL::
+DEAL::Skipped   C 4 D 44
+DEAL::Regular   C 4 D 45 -> P 110
+DEAL::Regular   C 4 D 46 -> P 111
+DEAL::Regular   C 4 D 47 -> P 112
+DEAL::
+DEAL::------------
+Skipped   C 4 D 48
+DEAL::Skipped   C 4 D 49
+DEAL::Skipped   C 4 D 50
+DEAL::Skipped   C 4 D 51
+DEAL::
+DEAL::Skipped   C 4 D 52
+DEAL::Skipped   C 4 D 53
+DEAL::Skipped   C 4 D 54
+DEAL::Skipped   C 4 D 55
+DEAL::
+DEAL::Skipped   C 4 D 56
+DEAL::Skipped   C 4 D 57
+DEAL::Skipped   C 4 D 58
+DEAL::Skipped   C 4 D 59
+DEAL::
+DEAL::Skipped   C 4 D 60
+DEAL::Skipped   C 4 D 61
+DEAL::Skipped   C 4 D 62
+DEAL::Skipped   C 4 D 63
+DEAL::
+DEAL::------------
+Skipped   C 5 D 0
+DEAL::Skipped   C 5 D 1
+DEAL::Skipped   C 5 D 2
+DEAL::Skipped   C 5 D 3
+DEAL::
+DEAL::Duplicate C 5 D 4 -> P 52
+DEAL::Duplicate C 5 D 5 -> P 53
+DEAL::Duplicate C 5 D 6 -> P 54
+DEAL::Skipped   C 5 D 7
+DEAL::
+DEAL::Duplicate C 5 D 8 -> P 57
+DEAL::Duplicate C 5 D 9 -> P 58
+DEAL::Duplicate C 5 D 10 -> P 59
+DEAL::Skipped   C 5 D 11
+DEAL::
+DEAL::Duplicate C 5 D 12 -> P 62
+DEAL::Duplicate C 5 D 13 -> P 63
+DEAL::Duplicate C 5 D 14 -> P 64
+DEAL::Skipped   C 5 D 15
+DEAL::
+DEAL::------------
+Skipped   C 5 D 16
+DEAL::Skipped   C 5 D 17
+DEAL::Skipped   C 5 D 18
+DEAL::Skipped   C 5 D 19
+DEAL::
+DEAL::Duplicate C 5 D 20 -> P 77
+DEAL::Regular   C 5 D 21 -> P 78
+DEAL::Regular   C 5 D 22 -> P 79
+DEAL::Skipped   C 5 D 23
+DEAL::
+DEAL::Duplicate C 5 D 24 -> P 82
+DEAL::Regular   C 5 D 25 -> P 83
+DEAL::Regular   C 5 D 26 -> P 84
+DEAL::Skipped   C 5 D 27
+DEAL::
+DEAL::Duplicate C 5 D 28 -> P 87
+DEAL::Regular   C 5 D 29 -> P 88
+DEAL::Regular   C 5 D 30 -> P 89
+DEAL::Skipped   C 5 D 31
+DEAL::
+DEAL::------------
+Skipped   C 5 D 32
+DEAL::Skipped   C 5 D 33
+DEAL::Skipped   C 5 D 34
+DEAL::Skipped   C 5 D 35
+DEAL::
+DEAL::Duplicate C 5 D 36 -> P 102
+DEAL::Regular   C 5 D 37 -> P 103
+DEAL::Regular   C 5 D 38 -> P 104
+DEAL::Skipped   C 5 D 39
+DEAL::
+DEAL::Duplicate C 5 D 40 -> P 107
+DEAL::Regular   C 5 D 41 -> P 108
+DEAL::Regular   C 5 D 42 -> P 109
+DEAL::Skipped   C 5 D 43
+DEAL::
+DEAL::Duplicate C 5 D 44 -> P 112
+DEAL::Regular   C 5 D 45 -> P 113
+DEAL::Regular   C 5 D 46 -> P 114
+DEAL::Skipped   C 5 D 47
+DEAL::
+DEAL::------------
+Skipped   C 5 D 48
+DEAL::Skipped   C 5 D 49
+DEAL::Skipped   C 5 D 50
+DEAL::Skipped   C 5 D 51
+DEAL::
+DEAL::Skipped   C 5 D 52
+DEAL::Skipped   C 5 D 53
+DEAL::Skipped   C 5 D 54
+DEAL::Skipped   C 5 D 55
+DEAL::
+DEAL::Skipped   C 5 D 56
+DEAL::Skipped   C 5 D 57
+DEAL::Skipped   C 5 D 58
+DEAL::Skipped   C 5 D 59
+DEAL::
+DEAL::Skipped   C 5 D 60
+DEAL::Skipped   C 5 D 61
+DEAL::Skipped   C 5 D 62
+DEAL::Skipped   C 5 D 63
+DEAL::
+DEAL::------------
+Skipped   C 6 D 0
+DEAL::Duplicate C 6 D 1 -> P 60
+DEAL::Duplicate C 6 D 2 -> P 61
+DEAL::Duplicate C 6 D 3 -> P 62
+DEAL::
+DEAL::Skipped   C 6 D 4
+DEAL::Duplicate C 6 D 5 -> P 65
+DEAL::Duplicate C 6 D 6 -> P 66
+DEAL::Duplicate C 6 D 7 -> P 67
+DEAL::
+DEAL::Skipped   C 6 D 8
+DEAL::Duplicate C 6 D 9 -> P 70
+DEAL::Duplicate C 6 D 10 -> P 71
+DEAL::Duplicate C 6 D 11 -> P 72
+DEAL::
+DEAL::Skipped   C 6 D 12
+DEAL::Skipped   C 6 D 13
+DEAL::Skipped   C 6 D 14
+DEAL::Skipped   C 6 D 15
+DEAL::
+DEAL::------------
+Skipped   C 6 D 16
+DEAL::Duplicate C 6 D 17 -> P 85
+DEAL::Duplicate C 6 D 18 -> P 86
+DEAL::Duplicate C 6 D 19 -> P 87
+DEAL::
+DEAL::Skipped   C 6 D 20
+DEAL::Regular   C 6 D 21 -> P 90
+DEAL::Regular   C 6 D 22 -> P 91
+DEAL::Regular   C 6 D 23 -> P 92
+DEAL::
+DEAL::Skipped   C 6 D 24
+DEAL::Regular   C 6 D 25 -> P 95
+DEAL::Regular   C 6 D 26 -> P 96
+DEAL::Regular   C 6 D 27 -> P 97
+DEAL::
+DEAL::Skipped   C 6 D 28
+DEAL::Skipped   C 6 D 29
+DEAL::Skipped   C 6 D 30
+DEAL::Skipped   C 6 D 31
+DEAL::
+DEAL::------------
+Skipped   C 6 D 32
+DEAL::Duplicate C 6 D 33 -> P 110
+DEAL::Duplicate C 6 D 34 -> P 111
+DEAL::Duplicate C 6 D 35 -> P 112
+DEAL::
+DEAL::Skipped   C 6 D 36
+DEAL::Regular   C 6 D 37 -> P 115
+DEAL::Regular   C 6 D 38 -> P 116
+DEAL::Regular   C 6 D 39 -> P 117
+DEAL::
+DEAL::Skipped   C 6 D 40
+DEAL::Regular   C 6 D 41 -> P 120
+DEAL::Regular   C 6 D 42 -> P 121
+DEAL::Regular   C 6 D 43 -> P 122
+DEAL::
+DEAL::Skipped   C 6 D 44
+DEAL::Skipped   C 6 D 45
+DEAL::Skipped   C 6 D 46
+DEAL::Skipped   C 6 D 47
+DEAL::
+DEAL::------------
+Skipped   C 6 D 48
+DEAL::Skipped   C 6 D 49
+DEAL::Skipped   C 6 D 50
+DEAL::Skipped   C 6 D 51
+DEAL::
+DEAL::Skipped   C 6 D 52
+DEAL::Skipped   C 6 D 53
+DEAL::Skipped   C 6 D 54
+DEAL::Skipped   C 6 D 55
+DEAL::
+DEAL::Skipped   C 6 D 56
+DEAL::Skipped   C 6 D 57
+DEAL::Skipped   C 6 D 58
+DEAL::Skipped   C 6 D 59
+DEAL::
+DEAL::Skipped   C 6 D 60
+DEAL::Skipped   C 6 D 61
+DEAL::Skipped   C 6 D 62
+DEAL::Skipped   C 6 D 63
+DEAL::
+DEAL::------------
+Duplicate C 7 D 0 -> P 62
+DEAL::Duplicate C 7 D 1 -> P 63
+DEAL::Duplicate C 7 D 2 -> P 64
+DEAL::Skipped   C 7 D 3
+DEAL::
+DEAL::Duplicate C 7 D 4 -> P 67
+DEAL::Duplicate C 7 D 5 -> P 68
+DEAL::Duplicate C 7 D 6 -> P 69
+DEAL::Skipped   C 7 D 7
+DEAL::
+DEAL::Duplicate C 7 D 8 -> P 72
+DEAL::Duplicate C 7 D 9 -> P 73
+DEAL::Duplicate C 7 D 10 -> P 74
+DEAL::Skipped   C 7 D 11
+DEAL::
+DEAL::Skipped   C 7 D 12
+DEAL::Skipped   C 7 D 13
+DEAL::Skipped   C 7 D 14
+DEAL::Skipped   C 7 D 15
+DEAL::
+DEAL::------------
+Duplicate C 7 D 16 -> P 87
+DEAL::Duplicate C 7 D 17 -> P 88
+DEAL::Duplicate C 7 D 18 -> P 89
+DEAL::Skipped   C 7 D 19
+DEAL::
+DEAL::Duplicate C 7 D 20 -> P 92
+DEAL::Regular   C 7 D 21 -> P 93
+DEAL::Regular   C 7 D 22 -> P 94
+DEAL::Skipped   C 7 D 23
+DEAL::
+DEAL::Duplicate C 7 D 24 -> P 97
+DEAL::Regular   C 7 D 25 -> P 98
+DEAL::Regular   C 7 D 26 -> P 99
+DEAL::Skipped   C 7 D 27
+DEAL::
+DEAL::Skipped   C 7 D 28
+DEAL::Skipped   C 7 D 29
+DEAL::Skipped   C 7 D 30
+DEAL::Skipped   C 7 D 31
+DEAL::
+DEAL::------------
+Duplicate C 7 D 32 -> P 112
+DEAL::Duplicate C 7 D 33 -> P 113
+DEAL::Duplicate C 7 D 34 -> P 114
+DEAL::Skipped   C 7 D 35
+DEAL::
+DEAL::Duplicate C 7 D 36 -> P 117
+DEAL::Regular   C 7 D 37 -> P 118
+DEAL::Regular   C 7 D 38 -> P 119
+DEAL::Skipped   C 7 D 39
+DEAL::
+DEAL::Duplicate C 7 D 40 -> P 122
+DEAL::Regular   C 7 D 41 -> P 123
+DEAL::Regular   C 7 D 42 -> P 124
+DEAL::Skipped   C 7 D 43
+DEAL::
+DEAL::Skipped   C 7 D 44
+DEAL::Skipped   C 7 D 45
+DEAL::Skipped   C 7 D 46
+DEAL::Skipped   C 7 D 47
+DEAL::
+DEAL::------------
+Skipped   C 7 D 48
+DEAL::Skipped   C 7 D 49
+DEAL::Skipped   C 7 D 50
+DEAL::Skipped   C 7 D 51
+DEAL::
+DEAL::Skipped   C 7 D 52
+DEAL::Skipped   C 7 D 53
+DEAL::Skipped   C 7 D 54
+DEAL::Skipped   C 7 D 55
+DEAL::
+DEAL::Skipped   C 7 D 56
+DEAL::Skipped   C 7 D 57
+DEAL::Skipped   C 7 D 58
+DEAL::Skipped   C 7 D 59
+DEAL::
+DEAL::Skipped   C 7 D 60
+DEAL::Skipped   C 7 D 61
+DEAL::Skipped   C 7 D 62
+DEAL::Skipped   C 7 D 63
+DEAL::
+DEAL::------------
+Tests finished.

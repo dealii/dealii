@@ -36,21 +36,6 @@ namespace PatchDistributors
 {
 
   /**
-   * Selection of which patch degrees of freedom (DoFs) to include.
-   *
-   * FEQinterior  - Only strictly interior DoFs of the geometric patch (boundary
-   *                DoFs are omitted).
-   * FEQall       - All DoFs in the geometric patch are included (boundary +
-   * interior).
-   */
-  enum PatchDoFsOrder
-  {
-    FEQinterior,
-    FEQall
-  };
-
-
-  /**
    * @brief Dynamic patch distributor for matrix-free patch operations.
    *
    * This class provides tools that
@@ -60,90 +45,63 @@ namespace PatchDistributors
    * fly and to support arbitrary polynomial degrees >= 1.
    *
    *
-   * The PatchDoFsOrder enum (used via the template parameter dofs_set_type)
-   * controls which subset of patch degrees of freedom (DoFs) are considered:
-   *
-   * - FEQinterior:
-   *   The patch excludes DoFs that lie on the boundary of the geometric patch.
-   *   In other words, DoFs on the patch boundary are "skipped" and not part of
-   *   the patch vector. This reduces the effective patch size (fewer patch
-   *   entries) and is useful for operations that only need strictly interior
-   *   DoFs of the patch (e.g., interior-only evaluations or halo-free updates).
-   *
-   * - FEQall:
-   *   The patch includes all DoFs in the geometric patch, including boundary
-   *   DoFs. The patch storage is therefore larger compared to FEQinterior.
-   *
-   * Effect on loops and mappings
-   * ---------------------------
-   * The choice of dofs_set_type affects index ranges (start/end), the
-   * one-dimensional number of patch DoFs, and consequently all mapping and
-   * distribution/gathering loops. Code paths branch so that interior-only
-   * iterations skip boundary entries, while the "all" variant iterates over the
-   * full set of patch DoFs.
-   *
-   * Usage note
-   * ----------
-   * Select FEQinterior when you want a compact patch representation that omits
-   * boundary DoFs (e.g., when assembling strictly interior contributions).
-   * Choose FEQall when operations must see or modify boundary DoFs as well.
-   *
-   *
    * All sizes are compile-time constants where feasible. The distributor
    * does not precompute or store large index tables: global/local indices
    * for patch entries are evaluated on the fly, keeping memory usage low.
    * It supports arbitrary polynomial degree values (subject to the
    * degree >= 1 assertion).
    */
-  template <int dim, int degree, PatchDoFsOrder dofs_set_type>
+  template <int dim, int degree>
   class Dynamic
   {
   public:
-    template <typename RegularOperation,
-              typename DuplicatesOperation,
-              typename SkippedOperation>
-
-    /**
-     * Loops over the cell-to-patch mappings, applying different
-     * operations based on whether a DoF is non-overlapping, overlapping, or
-     * skipped.
-     */
-    void
-    loop(const RegularOperation    &regular_operation,
-         const DuplicatesOperation &duplicates_operation,
-         const SkippedOperation    &skipped_operation) const;
-
-    const static unsigned int dimension = dim;
+    const static int dimension = dim;
 
     static_assert(dim == 1 || dim == 2 || dim == 3,
                   "This distributor only supports dim = 1, 2, or 3");
     static_assert(degree >= 1, "This distributor only supports degree >= 1");
 
-    const constexpr static std::size_t n_cells             = 2;
-    const constexpr static std::size_t dofs_per_cell_1d    = degree + 1;
-    const constexpr static std::size_t n_dofs_per_patch_1d = 2 * degree + 1;
+    const constexpr static std::size_t n_cells_1d          = 2;
+    const constexpr static std::size_t n_dofs_per_patch_1d = 2 * degree - 1;
+    const constexpr static std::size_t n_dofs_per_line     = degree + 1;
 
-    const constexpr static std::size_t n_dofs =
-      Utilities::fixed_power<dim>(n_dofs_per_patch_1d);
+    const constexpr static std::size_t skip_size = n_dofs_per_line - 2;
+
+    template <typename RegularOperation,
+              typename DuplicatesOperation,
+              typename SkippedOperation>
+    void
+    loop(const RegularOperation    &regular_operation,
+         const DuplicatesOperation &duplicates_operation,
+         const SkippedOperation    &skipped_operation) const;
+
+
+
+    constexpr std::size_t
+    n_patch_dofs() const
+    {
+      return n_patch_dofs_static;
+    }
 
     const static unsigned int n_patch_dofs_static =
       Utilities::fixed_power<dim>(n_dofs_per_patch_1d);
 
-    const static unsigned int n_interior_patch_dofs =
-      Utilities::fixed_power<dim>(n_dofs_per_patch_1d - 2);
 
-
-    static constexpr unsigned int
-    n_patch_dofs() noexcept
-    {
-      if constexpr (dofs_set_type == FEQinterior)
-        return n_interior_patch_dofs;
-      if constexpr (dofs_set_type == FEQall)
-        return n_patch_dofs_static;
-      Assert(false, ExcNotImplemented());
-      return 0;
-    }
+  private:
+    template <int entry_dim,
+              typename RegularOperation,
+              typename DuplicatesOperation,
+              typename SkippedOperation>
+    void
+    do_entry(const DuplicatesOperation &regular_operation,
+             const SkippedOperation    &duplicates_operation,
+             const RegularOperation    &skipped_operation,
+             const std::size_t         &cell_index,
+             std::size_t               &dof_cell,
+             std::size_t               &dof_patch,
+             const bool                &skip_only) const;
   };
+
 
 
   namespace internal
@@ -256,161 +214,159 @@ namespace PatchDistributors
 
 
 
-  template <int dim, int degree, PatchDoFsOrder dofs_set_type>
+  template <int dim, int degree>
+  template <int entry_dim,
+            typename RegularOperation,
+            typename DuplicatesOperation,
+            typename SkippedOperation>
+  void
+  Dynamic<dim, degree>::do_entry(const DuplicatesOperation &regular_operation,
+                                 const SkippedOperation &duplicates_operation,
+                                 const RegularOperation &skipped_operation,
+                                 const std::size_t      &cell_index,
+                                 std::size_t            &dof_cell,
+                                 std::size_t            &dof_patch,
+                                 const bool             &skip_only) const
+  {
+    const bool is_boundary_left = (cell_index & (1 << (entry_dim - 1))) == 0;
+
+
+
+    const constexpr std::size_t patch_skip = []() constexpr -> std::size_t {
+      static_assert(entry_dim >= 1 && entry_dim <= dim,
+                    "Implemented for entry_dim in [1, dim]");
+
+      if constexpr (entry_dim == 1)
+        return static_cast<std::size_t>(1);
+      else if constexpr (entry_dim == 2)
+        return skip_size;
+
+      return skip_size * n_dofs_per_patch_1d;
+    }();
+
+
+
+    auto boundary_operation = [&]() {
+      if constexpr (entry_dim == 1)
+        {
+          skipped_operation(cell_index, dof_cell);
+          ++dof_cell;
+        }
+      else
+        {
+          do_entry<entry_dim - 1>(regular_operation,
+                                  duplicates_operation,
+                                  skipped_operation,
+                                  cell_index,
+                                  dof_cell,
+                                  dof_patch,
+                                  true);
+        }
+    };
+
+    auto middle_operation = [&]() {
+      if constexpr (entry_dim == 1)
+        {
+          if (skip_only)
+            skipped_operation(cell_index, dof_cell);
+          else
+            {
+              regular_operation(dof_patch, cell_index, dof_cell);
+              dof_patch += patch_skip;
+            }
+          ++dof_cell;
+        }
+      else
+        {
+          do_entry<entry_dim - 1>(regular_operation,
+                                  duplicates_operation,
+                                  skipped_operation,
+                                  cell_index,
+                                  dof_cell,
+                                  dof_patch,
+                                  skip_only);
+          if (!skip_only)
+            dof_patch += patch_skip;
+        }
+    };
+
+    auto overlap_operation = [&]() {
+      if constexpr (entry_dim == 1)
+        {
+          if (skip_only)
+            skipped_operation(cell_index, dof_cell);
+          else
+            {
+              duplicates_operation(dof_patch, cell_index, dof_cell);
+              dof_patch += patch_skip;
+            }
+          ++dof_cell;
+        }
+      else
+        {
+          do_entry<entry_dim - 1>(duplicates_operation,
+                                  duplicates_operation,
+                                  skipped_operation,
+                                  cell_index,
+                                  dof_cell,
+                                  dof_patch,
+                                  skip_only);
+          if (!skip_only)
+            dof_patch += patch_skip;
+        }
+    };
+
+
+    if (is_boundary_left)
+      boundary_operation();
+    else
+      overlap_operation();
+
+    for (std::size_t d = 1; d < n_dofs_per_line - 1; ++d)
+      middle_operation();
+
+    if (is_boundary_left)
+      middle_operation();
+    else
+      boundary_operation();
+  }
+
+
+
+  template <int dim, int degree>
   template <typename RegularOperation,
             typename DuplicatesOperation,
             typename SkippedOperation>
-  inline void
-  Dynamic<dim, degree, dofs_set_type>::loop(
-    const RegularOperation    &regular_operation,
-    const DuplicatesOperation &duplicates_operation,
-    const SkippedOperation    &skipped_operation) const
+  void
+  Dynamic<dim, degree>::loop(const RegularOperation    &regular_operation,
+                             const DuplicatesOperation &duplicates_operation,
+                             const SkippedOperation    &skipped_operation) const
   {
-    const bool         interior  = dofs_set_type == FEQinterior;
-    const unsigned int start_dof = interior ? 1 : 0;
-    const unsigned int end_dof   = n_dofs_per_patch_1d - start_dof;
-    const unsigned int n_patch_1d =
-      interior ? n_dofs_per_patch_1d - 2 : n_dofs_per_patch_1d;
-
-    const auto cell_index = [&](const unsigned int cell_index_i,
-                                const unsigned int cell_index_j,
-                                const unsigned int cell_index_k) {
-      return cell_index_i * n_cells * n_cells + cell_index_j * n_cells +
-             cell_index_k;
-    };
-
-    const auto dof_index = [&](const unsigned int local_index_i,
-                               const unsigned int local_index_j,
-                               const unsigned int local_index_k) {
-      return local_index_i * dofs_per_cell_1d * dofs_per_cell_1d +
-             local_index_j * dofs_per_cell_1d + local_index_k;
-    };
-
-    for (unsigned int i = (dim > 2 ? start_dof : 0);
-         i < (dim > 2 ? end_dof : 1);
-         ++i)
-      for (unsigned int j = (dim > 1 ? start_dof : 0);
-           j < (dim > 1 ? end_dof : 1);
-           ++j)
-        for (unsigned int k = start_dof; k < end_dof; ++k)
+    for (std::size_t k = 0; k < (dim > 2 ? n_cells_1d : 1); ++k)
+      for (std::size_t j = 0; j < (dim > 1 ? n_cells_1d : 1); ++j)
+        for (std::size_t i = 0; i < n_cells_1d; ++i)
           {
-            unsigned int patch_index =
-              (i - (interior && dim > 2)) * n_patch_1d * n_patch_1d +
-              (j - (interior && dim > 1)) * n_patch_1d + (k - start_dof);
+            const std::size_t cell_index =
+              i + n_cells_1d * (j + n_cells_1d * k);
 
-            const unsigned cell_index_i = i / dofs_per_cell_1d;
-            const unsigned cell_index_j = j / dofs_per_cell_1d;
-            const unsigned cell_index_k = k / dofs_per_cell_1d;
+            // TODO: make it a compile-time lookup table
+            std::size_t patch_index_i = i * skip_size;
+            std::size_t patch_index_j = j * skip_size;
+            std::size_t patch_index_k = k * skip_size;
+            std::size_t dof_patch =
+              patch_index_i + n_dofs_per_patch_1d * patch_index_j +
+              n_dofs_per_patch_1d * n_dofs_per_patch_1d * patch_index_k;
 
-            const unsigned cell =
-              cell_index(cell_index_i, cell_index_j, cell_index_k);
+            std::size_t dof_cell = 0;
 
-            const unsigned local_index_i = i % dofs_per_cell_1d + cell_index_i;
-            const unsigned local_index_j = j % dofs_per_cell_1d + cell_index_j;
-            const unsigned local_index_k = k % dofs_per_cell_1d + cell_index_k;
-
-            const unsigned dof =
-              dof_index(local_index_i, local_index_j, local_index_k);
-
-            // if (regular_operation)
-            regular_operation(patch_index, cell, dof);
-            // if (duplicates_operation)
-            {
-              if (i == dofs_per_cell_1d - 1)
-                duplicates_operation(patch_index,
-                                     cell_index(1, cell_index_j, cell_index_k),
-                                     dof_index(0,
-                                               local_index_j,
-                                               local_index_k));
-
-              if (j == dofs_per_cell_1d - 1)
-                duplicates_operation(patch_index,
-                                     cell_index(cell_index_i, 1, cell_index_k),
-                                     dof_index(local_index_i,
-                                               0,
-                                               local_index_k));
-
-              if (k == dofs_per_cell_1d - 1)
-                duplicates_operation(patch_index,
-                                     cell_index(cell_index_i, cell_index_j, 1),
-                                     dof_index(local_index_i,
-                                               local_index_j,
-                                               0));
-            }
+            do_entry<dim>(regular_operation,
+                          duplicates_operation,
+                          skipped_operation,
+                          cell_index,
+                          dof_cell,
+                          dof_patch,
+                          false);
           }
-
-    for (unsigned int i = (dim > 2 ? start_dof : 0);
-         i < (dim > 2 ? end_dof : 1);
-         ++i)
-      {
-        const unsigned j = dofs_per_cell_1d - 1;
-        const unsigned k = dofs_per_cell_1d - 1;
-
-        unsigned int patch_index =
-          (i - (interior && dim > 2)) * n_patch_1d * n_patch_1d +
-          (j - (interior && dim > 1)) * n_patch_1d + (k - start_dof);
-
-
-        const unsigned cell_index_i  = i / dofs_per_cell_1d;
-        const unsigned cell          = cell_index(cell_index_i, 1, 1);
-        const unsigned local_index_i = i % dofs_per_cell_1d + cell_index_i;
-        const unsigned dof           = dof_index(local_index_i, 0, 0);
-
-        duplicates_operation(patch_index, cell, dof);
-      }
-
-    // Handle skipped boundary DoFs (when dofs_set_type == FEQinterior)
-    if constexpr (dofs_set_type == FEQinterior)
-      {
-        // Loop over all cells in the patch
-        for (unsigned int cell_k_idx = 0; cell_k_idx < (dim > 2 ? 2 : 1);
-             ++cell_k_idx)
-          for (unsigned int cell_j_idx = 0; cell_j_idx < (dim > 1 ? 2 : 1);
-               ++cell_j_idx)
-            for (unsigned int cell_i_idx = 0; cell_i_idx < 2; ++cell_i_idx)
-              {
-                const unsigned int current_cell_idx =
-                  cell_index(cell_i_idx, cell_j_idx, cell_k_idx);
-
-
-                for (unsigned int j = 0; j < (dim > 1 ? dofs_per_cell_1d : 1);
-                     ++j)
-                  for (unsigned int i = 0; i < (dim > 2 ? dofs_per_cell_1d : 1);
-                       ++i)
-                    {
-                      unsigned int k = cell_k_idx * (dofs_per_cell_1d - 1);
-                      skipped_operation(current_cell_idx, dof_index(i, j, k));
-                    }
-
-                if constexpr (dim == 1)
-                  continue;
-
-                const unsigned int k_begin = (cell_k_idx == 0) ? 1 : 0;
-                const unsigned int k_end =
-                  (cell_k_idx == 0) ? dofs_per_cell_1d : (dofs_per_cell_1d - 1);
-
-                for (unsigned int k = k_begin; k < k_end; ++k)
-                  for (unsigned int i = 0; i < (dim > 2 ? dofs_per_cell_1d : 1);
-                       ++i)
-                    {
-                      unsigned int j = cell_j_idx * (dofs_per_cell_1d - 1);
-                      skipped_operation(current_cell_idx, dof_index(i, j, k));
-                    }
-                if constexpr (dim == 2)
-                  continue;
-
-                const unsigned int j_begin = (cell_j_idx == 0) ? 1 : 0;
-                const unsigned int j_end =
-                  (cell_j_idx == 0) ? dofs_per_cell_1d : (dofs_per_cell_1d - 1);
-
-                for (unsigned int j = j_begin; j < j_end; ++j)
-                  for (unsigned int k = k_begin; k < k_end; ++k)
-                    {
-                      unsigned int i = cell_i_idx * (dofs_per_cell_1d - 1);
-                      skipped_operation(current_cell_idx, dof_index(i, j, k));
-                    }
-              }
-      }
   }
   //---------------------------------------------------------------------------
 
