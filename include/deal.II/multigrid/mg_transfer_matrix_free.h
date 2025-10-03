@@ -1187,13 +1187,19 @@ private:
 
   /**
    * Function to initialize internal level vectors.
+   *
+   * If force_same_partitioner is set to true, the vector is guaranteed to be
+   * initialized with the same partitioner as the one stored in this class.
+   * Otherwise, the vector may keep its own pre-existing partitioner if it has
+   * the same size and local size as the one stored in this class.
    */
   template <class InVector>
   void
   initialize_dof_vector(const unsigned int level,
                         VectorType        &vector,
                         const InVector    &vector_reference,
-                        const bool         omit_zeroing_entries) const;
+                        const bool         omit_zeroing_entries,
+                        const bool force_same_partitioner = false) const;
 
   /**
    * Check that the internal DoFHandler is compatible with the external one
@@ -1507,7 +1513,8 @@ MGTransferMatrixFree<dim, Number, MemorySpace>::initialize_dof_vector(
   const unsigned int level,
   VectorType        &vec,
   const InVector    &vec_reference,
-  const bool         omit_zeroing_entries) const
+  const bool         omit_zeroing_entries,
+  const bool         force_same_partitioner) const
 {
   std::shared_ptr<const Utilities::MPI::Partitioner> partitioner;
 
@@ -1534,7 +1541,7 @@ MGTransferMatrixFree<dim, Number, MemorySpace>::initialize_dof_vector(
     }
 
   // yes: vectors are compatible
-  if (vec.size() == partitioner->size() &&
+  if (!force_same_partitioner && vec.size() == partitioner->size() &&
       vec.locally_owned_size() == partitioner->locally_owned_size())
     {
       if (omit_zeroing_entries == false)
@@ -1565,7 +1572,11 @@ MGTransferMatrixFree<dim, Number, MemorySpace>::copy_to_mg(
          this->perform_renumbered_plain_copy == false) ||
         level != dst.max_level();
 
-      this->initialize_dof_vector(level, dst[level], src, !zero_out_values);
+      this->initialize_dof_vector(level,
+                                  dst[level],
+                                  src,
+                                  !zero_out_values,
+                                  /* force_same_partitioner = */ true);
     }
 
   if (this->perform_plain_copy)
