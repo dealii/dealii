@@ -1,0 +1,26 @@
+
+DEAL::==================================================
+DEAL::Generating mesh... done.
+DEAL::Number of active cells: 64
+DEAL::==================================================
+DEAL::Initializing p-multigrid hierarchy:
+DEAL::  Number of levels: 2
+DEAL::--------------------------------------------------
+DEAL::  Level 0:
+DEAL::    Degree: 1
+DEAL::    Block 0: 125 DoFs
+DEAL::    Block 1: 125 DoFs
+DEAL::--------------------------------------------------
+DEAL::  Level 1:
+DEAL::    Degree: 2
+DEAL::    Block 0: 729 DoFs
+DEAL::    Block 1: 729 DoFs
+DEAL::--------------------------------------------------
+DEAL::  Initializing transfer operators
+DEAL::  Initializing smoothers
+DEAL::  Initializing coarse solver
+DEAL::  Initializing multigrid preconditioner
+DEAL::==================================================
+DEAL::Applying multigrid preconditioner
+DEAL::  ||x||_2 = 1.00000
+DEAL::  ||y||_2 = 0.981678
