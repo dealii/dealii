@@ -50,6 +50,7 @@ namespace PatchDistributors
    * for patch entries are evaluated on the fly, keeping memory usage low.
    * It supports arbitrary polynomial degree values (subject to the
    * degree >= 1 assertion).
+   *
    */
   template <int dim, int degree>
   class Dynamic
@@ -67,6 +68,23 @@ namespace PatchDistributors
 
     const constexpr static std::size_t skip_size = n_dofs_per_line - 2;
 
+    /**
+     * Iterate over all patches managed by this distributor and invoke the
+     * appropriate user-provided callback for each patch.
+     *
+     * The function visits every patch known to the distributor and dispatches
+     * it to one of the three callables depending on the patch state:
+     * - regular_operation: called for patches that should be processed normally
+     *   (typically locally owned patches),
+     * - duplicates_operation: called for patches that represent
+     * duplicated/shared data and require duplicate-specific handling,
+     * - skipped_operation: called for patches that must be ignored/skipped.
+     *
+     * Each argument must be a callable (function, functor or lambda) compatible
+     * with the distributor's patch descriptor. The exact parameter types and
+     * return values are determined by those callables. The iteration order is
+     * unspecified. This method is const and does not modify the distributor.
+     */
     template <typename RegularOperation,
               typename DuplicatesOperation,
               typename SkippedOperation>
@@ -77,6 +95,11 @@ namespace PatchDistributors
 
 
 
+    /**
+     * Return the number of degrees of freedom per patch.
+     *
+     * This value is a compile-time constant.
+     */
     constexpr std::size_t
     n_patch_dofs() const
     {
@@ -88,6 +111,33 @@ namespace PatchDistributors
 
 
   private:
+    /**
+     *
+     * The base case for the recursion is a 1D entry (a line). For each degree
+     * of freedom on the line, it determines if the DoF is regular, a
+     * duplicate, or should be skipped, and then invokes the corresponding
+     * operation (`regular_operation`, `duplicates_operation`, or
+     * `skipped_operation`).
+     *
+     * For higher-dimensional entries (dim > 1), the function recursively calls
+     * itself for each of the sub-entities that form the boundary of the
+     * current entry. For a plane it will loop over all lines in the plane.
+     *
+     * The function updates the `dof_cell` and `dof_patch` counters as it
+     * processes the degrees of freedom.
+     *
+     * @param[in] regular_operation Functor to be called for regular DoFs.
+     * @param[in] duplicates_operation Functor to be called for duplicate DoFs.
+     * @param[in] skipped_operation Functor to be called for skipped DoFs.
+     * @param[in] cell_index The index of the cell being processed.
+     * @param[in,out] dof_cell A running counter for the DoF index within the
+     *                         cell.
+     * @param[in,out] dof_patch A running counter for the DoF index within the
+     *                          patch.
+     * @param[in] skip_only A flag that, if true,indicates that all DoF on the
+     *                     current entry should be treated as skipped. This is
+     * used to optimize the recursion for entries that are fully skipped.
+     */
     template <int entry_dim,
               typename RegularOperation,
               typename DuplicatesOperation,
@@ -342,6 +392,12 @@ namespace PatchDistributors
                              const DuplicatesOperation &duplicates_operation,
                              const SkippedOperation    &skipped_operation) const
   {
+    // Warning: @mwichro spent more then a week on optimizing this loop, but it
+    // still remains singifficantly slower that the version with precomputed
+    // tables. In fact, lookup tables are almost as fast as fast as direct
+    // array access.
+    //  So if you want to improve its performance, be aware that it is not easy.
+
     for (std::size_t k = 0; k < (dim > 2 ? n_cells_1d : 1); ++k)
       for (std::size_t j = 0; j < (dim > 1 ? n_cells_1d : 1); ++j)
         for (std::size_t i = 0; i < n_cells_1d; ++i)
