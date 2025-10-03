@@ -397,8 +397,13 @@ private:
  * sections that perform certain aspects of the program. A section can be
  * entered several times. By changing the options in OutputFrequency and
  * OutputType, the user can choose whether output should be generated every
- * time a section is joined or just in the end of the program. Moreover, it is
+ * time a section is joined or just at the end of the program. Moreover, it is
  * possible to show CPU times, wall times, or both.
+ *
+ * To ensure output from this class is properly synchronized in parallel
+ * programs and to simplify internal data handling, output from this class can
+ * only be generated, if no subsection is currently being timed. I.e. all
+ * subsections have to be closed before producing output or accessing data.
  *
  * The class is used in a substantial number of tutorial programs that collect
  * timing data. step-77 is an example of a relatively simple sequential program
@@ -447,7 +452,7 @@ private:
  * | Setup dof system                |         1 |      3.97s |       4.5% |
  * +---------------------------------+-----------+------------+------------+
  * @endcode
- * The output will see that we entered the assembly and solve section twice,
+ * The output shows that we entered the assembly and solve section twice,
  * and reports how much time we spent there. Moreover, the class measures the
  * total time spent from start to termination of the TimerOutput object. In
  * this case, we did a lot of other stuff, so that the time proportions of the

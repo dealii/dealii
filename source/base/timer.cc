@@ -501,6 +501,11 @@ TimerOutput::leave_subsection(const std::string &section_name)
 std::map<std::string, double>
 TimerOutput::get_summary_data(const OutputData kind) const
 {
+  Assert(
+    active_sections.empty(),
+    ExcMessage(
+      "Cannot access data from TimerOutput while inside a timed section."));
+
   std::map<std::string, double> output;
   for (const auto &section : sections)
     {
@@ -527,6 +532,10 @@ TimerOutput::get_summary_data(const OutputData kind) const
 void
 TimerOutput::print_summary() const
 {
+  Assert(active_sections.empty(),
+         ExcMessage(
+           "Cannot print data from TimerOutput while inside a timed section."));
+
   // we are going to change the precision and width of output below. store the
   // old values so the get restored when exiting this function
   const boost::io::ios_base_all_saver restore_stream(out_stream.get_stream());
@@ -838,6 +847,10 @@ void
 TimerOutput::print_wall_time_statistics(const MPI_Comm mpi_comm,
                                         const double   quantile) const
 {
+  Assert(active_sections.empty(),
+         ExcMessage(
+           "Cannot print data from TimerOutput while inside a timed section."));
+
   // we are going to change the precision and width of output below. store the
   // old values so the get restored when exiting this function
   const boost::io::ios_base_all_saver restore_stream(out_stream.get_stream());
