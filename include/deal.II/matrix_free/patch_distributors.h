@@ -28,7 +28,7 @@ DEAL_II_NAMESPACE_OPEN
 
 
 /**
- * @brief This namespace provides tools for distributing and gathering data
+ * This namespace provides tools for distributing and gathering data
  * between patch vectors and local cell storage in the context of matrix-free
  * vertex-patch smoothers
  */
@@ -36,7 +36,7 @@ namespace PatchDistributors
 {
 
   /**
-   * @brief Dynamic patch distributor for matrix-free patch operations.
+   * Dynamic patch distributor for matrix-free patch operations.
    *
    * This class provides tools that
    * describe the layout of local patches (collections of 2^dim neighbor cells)
@@ -106,6 +106,17 @@ namespace PatchDistributors
       return n_patch_dofs_static;
     }
 
+    /**
+     * Reinit that accepts arbitrary parameters but performs no
+     * work. The Dynamic distributor has no runtime-dependent state to
+     * reinitialize, so this function is a no-op and exists only for API
+     * compatibility.
+     */
+    template <typename... Args>
+    void
+    reinit(const Args &&...) noexcept
+    {}
+
     const static unsigned int n_patch_dofs_static =
       Utilities::fixed_power<dim>(n_dofs_per_patch_1d);
 
@@ -163,7 +174,7 @@ namespace PatchDistributors
 
 
   /**
-   * @brief Provides lookup tables and methods for distributing and gathering
+   * Provides lookup tables and methods for distributing and gathering
    * data between a patch vector and local cell storage.
    *
    * This struct relies on a specialization of `CellPatchLookup` for the given
@@ -174,11 +185,16 @@ namespace PatchDistributors
    *
    * @tparam dim The spatial dimension.
    * @tparam degree The polynomial degree of the finite element.
+   * @tparam lookup A struct that provides the necessary mapping
+   * information between patch DoFs and cell-local DoFs. This defaults to
+   * `internal::CellPatchLookup<dim, degree>`.
    */
-  template <int dim, int degree>
+  template <int dim,
+            int degree,
+            class lookup = internal::CellPatchLookup<dim, degree>>
   struct Lookup
   {
-    using Cell2Patch = internal::CellPatchLookup<dim, degree>;
+    using Cell2Patch = lookup;
 
     static const constexpr unsigned int n_cells = Cell2Patch::n_cells;
     static const constexpr unsigned int n_patch_dofs_static =
@@ -256,6 +272,17 @@ namespace PatchDistributors
     {
       return n_patch_dofs_static;
     }
+
+    /**
+     * Reinit that accepts arbitrary parameters but performs no
+     * work. The Dynamic distributor has no runtime-dependent state to
+     * reinitialize, so this function is a no-op and exists only for API
+     * compatibility.
+     */
+    template <typename... Args>
+    void
+    reinit(const Args &&...) noexcept
+    {}
   };
 
 
