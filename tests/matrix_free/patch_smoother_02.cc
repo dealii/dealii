@@ -64,7 +64,7 @@ test()
 
   const unsigned int n_lanes = VectorizedArray<double>::size();
 
-  MappingQ1<dim> mapping; // Using Q1 mapping as in step-98
+  MappingQ1<dim> mapping; // Using Q1 mapping as in step-94
 
   // 3. Initialize constraints (needed for MatrixFree)
   AffineConstraints<double> constraints;

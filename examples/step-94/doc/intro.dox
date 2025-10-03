@@ -1,4 +1,4 @@
-This tutorial program, step-98, demonstrates the implementation and application of geometric multigrid (GMG) methods
+This tutorial program, step-94, demonstrates the implementation and application of geometric multigrid (GMG) methods
 combined with patch smoothers with localized residual computations. It builds upon the concepts introduced in step-37.
 
 The work is based on the algorithms described in the following paper:
