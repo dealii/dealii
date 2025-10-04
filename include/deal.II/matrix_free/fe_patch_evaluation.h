@@ -112,14 +112,51 @@ namespace internal
  * freedom (DoFs) between the patch representation and the local cell-based
  * representation used by FEEvaluation.
  *
- * @tparam FEEval The underlying FEEvaluation type used for cell-local
- *   evaluations.
- * @tparam Distributor A class responsible for mapping between patch DoFs and
- *   local cell DoFs. It handles potential overlaps and duplications.
- * @tparam vectorizaton Specifies the vectorization strategy. Currently, only
- *   `within_patch` is supported, implying vectorization occurs across
- *   lanes within a single patch evaluation. `over_patches` is reserved for
- *   future use.
+ * The Distributor must provide the following interface (prototypes only):
+ *
+ * @code
+ * unsigned int n_patch_dofs() const;
+ *
+ * template <typename RegularOp, typename OverlapOp, typename SkippedOp>
+ * void loop(RegularOp regular_op,
+ *           OverlapOp overlap_op,
+ *           SkippedOp skipped_op) const;
+ *
+ * // Reinitialize distributor mapping for a new patch.
+ * void reinit(...);
+ * @endcode
+ *
+ * Semantics expected by FEPatchEvaluation:
+ *  - distribute_patch_to_local:
+ *      * regular_op(patch_index, cell, cell_index) writes the patch value to
+ *        the corresponding local slot.
+ *      * overlap_op(patch_index, cell, cell_index) is used for DoFs shared by
+ *        multiple cells; FEPatchEvaluation either writes the value or zeros
+ *        the slot depending on copy_duplicates.
+ *      * skipped_op(cell, cell_index) zeros out padded/unused local slots.
+ *
+ *  - gather_local_to_patch:
+ *      * regular_op(patch_index, cell, cell_index) reads the local slot into
+ *        the patch vector.
+ *      * overlap_op(patch_index, cell, cell_index) accumulates contributions
+ *        from multiple local slots when sum_overlapping == true.
+ *      * skipped slots are ignored.
+ *
+ * Reinitialization note:
+ *  - FEPatchEvaluation::reinit(...) will invoke the distributor's reinit
+ *    to update its mapping for the new patch. The exact signature of that
+ *    call and the form of any orientation data passed is not finalized yet.
+ *    For the time being, all available distributors assume the standard
+ *    (canonical) cell orientation and therefore do not require an explicit
+ *    orientation argument, and the reinit call is a just a placeholder.
+ *
+ * Note: See PatchDistributors::Lookup for a concrete example implementation
+ * based on precomputed lookup tables.
+ *
+ * @tparam FEEval      The underlying FEEvaluation type used for cell-local evaluations.
+ * @tparam Distributor A class responsible for mapping between patch DoFs and local cell DoFs.
+ * @tparam vectorization Specifies the vectorization strategy. Currently only
+ *                       within_patch is supported.
  */
 template <typename FEEval,
           typename Distributor,
