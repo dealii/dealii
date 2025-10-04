@@ -186,10 +186,8 @@ public:
    * <code>sync_lap_times</code> is <code>true</code> then the lap times are
    * synchronized over all processors in the communicator (i.e., the lap times
    * are set to the maximum lap time).
-   *
-   * @return Return the accumulated CPU time of the current processor in seconds.
    */
-  double
+  void
   stop();
 
   /**

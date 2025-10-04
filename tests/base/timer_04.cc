@@ -49,7 +49,8 @@ main()
   AssertThrow(old_cpu_time > 0., ExcInternalError());
 
   burn(50);
-  AssertThrow(t.stop() > 0., ExcInternalError());
+  t.stop();
+  AssertThrow(t.cpu_time() > 0., ExcInternalError());
 
   AssertThrow(t.wall_time() > old_wall_time, ExcInternalError());
   AssertThrow(t.cpu_time() > old_cpu_time, ExcInternalError());

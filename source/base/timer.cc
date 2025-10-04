@@ -192,7 +192,7 @@ Timer::start()
 
 
 
-double
+void
 Timer::stop()
 {
   if (running)
@@ -228,7 +228,6 @@ Timer::stop()
                                       wall_times.accumulated_time),
                                     mpi_communicator);
     }
-  return internal::TimerImplementation::to_seconds(cpu_times.accumulated_time);
 }
 
 
