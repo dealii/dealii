@@ -99,12 +99,12 @@ struct CPUClock
  *   timer.reset();
  * @endcode
  *
- * Alternatively, you can also restart the timer instead of resetting it. The
- * times between successive calls to start() and stop() (i.e., the laps) will
- * then be accumulated. The usage of this class is also explained in the
+ * Alternatively, you can also start the timer again instead of resetting it.
+ * The times between successive calls to start() and stop() (i.e., the laps)
+ * will then be accumulated. The usage of this class is also explained in the
  * step-28 tutorial program.
  *
- * @note The TimerOutput (combined with TimerOutput::Scope) class provide a
+ * @note The TimerOutput (combined with TimerOutput::Scope) classes provide a
  * convenient way to time multiple named sections and summarize the output.
  *
  * @note Implementation of this class is system dependent. In particular, CPU
@@ -593,7 +593,7 @@ class TimerOutput
 {
 public:
   /**
-   * Helper class to enter/exit sections in TimerOutput be constructing a
+   * Helper class to enter/exit sections in TimerOutput by constructing a
    * simple scope-based object. The purpose of this class is explained in the
    * documentation of TimerOutput.
    */
@@ -602,18 +602,19 @@ public:
   public:
     /**
      * Enter the given section in the timer. Exit automatically when calling
-     * stop() or destructor runs.
+     * stop() or when the destructor runs.
      */
     Scope(dealii::TimerOutput &timer_, const std::string &section_name);
 
     /**
-     * Destructor calls stop()
+     * Destructor calls Scope::stop().
      */
     ~Scope();
 
     /**
      * In case you want to exit the scope before the destructor is executed,
-     * call this function.
+     * call this function. The function leaves the current subsection of
+     * the stored TimerOutput object.
      */
     void
     stop();
