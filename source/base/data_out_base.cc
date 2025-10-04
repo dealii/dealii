@@ -8174,6 +8174,73 @@ DataOutInterface<dim, spacedim>::write_xdmf_file(
 
 
 
+template <int dim>
+void
+export_line_segments(
+  const std::vector<std::pair<Point<dim>, Point<dim>>> &point_pairs,
+  const std::string &filename_without_extension,
+  const MPI_Comm    &mpi_communicator = MPI_COMM_WORLD)
+{
+  const unsigned int n_mpi_process =
+    Utilities::MPI::n_mpi_processes(mpi_communicator);
+  const unsigned int this_mpi_process =
+    Utilities::MPI::this_mpi_process(MPI_COMM_WORLD);
+
+  using LineOutData = DataOutBase::Patch<1, dim>;
+  std::vector<LineOutData> patches_output;
+  patches_output.reserve(point_pairs.size());
+
+  // Create a reference cell for the line segments.
+  // We use a 1-dimensional hypercube as the reference cell.
+  const ReferenceCell reference_cell = ReferenceCells::get_hypercube<1>();
+
+  for (unsigned int segment_index = 0; segment_index < point_pairs.size();
+       ++segment_index)
+    {
+      LineOutData link_out;
+      link_out.patch_index    = segment_index;
+      link_out.reference_cell = reference_cell;
+
+      link_out.vertices[0] = point_pairs[segment_index].first;
+      link_out.vertices[1] = point_pairs[segment_index].second;
+      patches_output.emplace_back(std::move(link_out));
+    }
+  std::vector<std::string> piece_names(n_mpi_process);
+  for (unsigned int i = 0; i < n_mpi_process; ++i)
+    piece_names[i] = filename_without_extension + ".proc" +
+                     Utilities::int_to_string(i, 4) + ".vtu";
+  const std::string new_file = piece_names[this_mpi_process];
+
+  const std::string out_pvtu = filename_without_extension + ".pvtu";
+
+
+  std::ofstream out(new_file);
+  std::vector<
+    std::tuple<unsigned int,
+               unsigned int,
+               std::string,
+               DataComponentInterpretation::DataComponentInterpretation>>
+    vector_data_ranges;
+
+  DataOutBase::write_vtu(patches_output,
+                         /*data names*/ {},
+                         vector_data_ranges,
+                         DataOutBase::VtkFlags(),
+                         out);
+
+  if (this_mpi_process == 0)
+    {
+      std::ofstream pvtu_output(out_pvtu);
+      DataOutBase::write_pvtu_record(pvtu_output,
+                                     piece_names,
+                                     /*data_names*/ {},
+                                     vector_data_ranges,
+                                     DataOutBase::VtkFlags());
+    }
+}
+
+
+
 /*
  * Write the data in this DataOutInterface to a DataOutFilter object. Filtering
  * is performed based on the DataOutFilter flags.
