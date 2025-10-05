@@ -1041,6 +1041,8 @@ TimerOutput::enable_output()
   out_stream.set_condition(true);
 }
 
+
+
 void
 TimerOutput::reset()
 {
@@ -1049,6 +1051,8 @@ TimerOutput::reset()
   active_sections.clear();
   timer_all.restart();
 }
+
+
 
 TimerOutput::Scope::~Scope()
 {
