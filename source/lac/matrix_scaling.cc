@@ -312,7 +312,10 @@ MatrixScaling::check_convergence(Vector<Number>     row_col_norm,
   else if (norm_type == "linfty")
     return row_col_norm.linfty_norm() < control.scaling_tolerance;
   else
-    Assert(false, ExcNotImplemented());
+    {
+      Assert(false, ExcNotImplemented());
+      return false;
+    }
 }
 
 
@@ -332,7 +335,10 @@ MatrixScaling::check_convergence(Vector<Number>     row_norm,
     return (row_norm.linfty_norm() < control.scaling_tolerance &&
             col_norm.linfty_norm() < control.scaling_tolerance);
   else
-    Assert(false, ExcNotImplemented());
+    {
+      Assert(false, ExcNotImplemented());
+      return false;
+    }
 }
 
 
@@ -351,6 +357,11 @@ MatrixScaling::check_convergence(Vector<double>     local_row_col_norm,
   else if (norm_type == "linfty")
     local_not_converged =
       !(local_row_col_norm.linfty_norm() < control.scaling_tolerance);
+  else
+    {
+      Assert(false, ExcNotImplemented());
+      return false;
+    }
 
   bool any_not_converged =
     Utilities::MPI::logical_or(local_not_converged, mpi_communicator);
@@ -378,6 +389,11 @@ MatrixScaling::check_convergence(Vector<double>     local_row_norm,
     local_not_converged =
       !(local_row_norm.linfty_norm() < control.scaling_tolerance &&
         local_col_norm.linfty_norm() < control.scaling_tolerance);
+  else
+    {
+      Assert(false, ExcNotImplemented());
+      return false;
+    }
 
   bool any_not_converged =
     Utilities::MPI::logical_or(local_not_converged, mpi_communicator);
