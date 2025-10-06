@@ -744,6 +744,21 @@ namespace StandardExceptions
     "output.");
 
   /**
+   * This function requires support for the NetCDF library.
+   */
+  DeclExceptionMsg(
+    ExcNeedsNetCDF,
+    "You are attempting to use functionality that requires that deal.II is configured "
+    "with NetCDF support. However, when you called 'cmake', NetCDF support "
+    "was not detected."
+    "\n\n"
+    "You will have to ensure that your system has a usable NetCDF "
+    "installation and re-install deal.II, making sure that cmake "
+    "finds the NetCDF installation. You can check this by "
+    "looking at the summary printed at the end of the cmake "
+    "output.");
+
+  /**
    * This function requires support for the MPI library.
    */
   DeclExceptionMsg(
