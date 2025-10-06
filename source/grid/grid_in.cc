@@ -2190,6 +2190,7 @@ GridIn<dim, spacedim>::read_comsol_mphtxt(std::istream &in)
 }
 
 
+
 template <int dim, int spacedim>
 void
 GridIn<dim, spacedim>::read_msh(std::istream &input_stream)
@@ -2250,11 +2251,11 @@ GridIn<dim, spacedim>::read_msh(std::istream &input_stream)
 
       in >> version >> file_type >> data_size;
 
-      Assert((version >= 2.0) && (version <= 4.1), ExcNotImplemented());
+      AssertThrow((version >= 2.0) && (version <= 4.1), ExcNotImplemented());
       gmsh_file_format = static_cast<unsigned int>(version * 10);
 
-      Assert(file_type == 0, ExcNotImplemented());
-      Assert(data_size == sizeof(double), ExcNotImplemented());
+      AssertThrow(file_type == 0, ExcNotImplemented());
+      AssertThrow(data_size == sizeof(double), ExcNotImplemented());
 
       // read the end of the header and the first line of the nodes
       // description to synch ourselves with the format 1 handling above
@@ -2723,15 +2724,18 @@ GridIn<dim, spacedim>::read_msh(std::istream &input_stream)
                   }
 
                 // to make sure that the cast won't fail
-                Assert(material_id <=
-                         std::numeric_limits<types::material_id>::max(),
-                       ExcIndexRange(
-                         material_id,
-                         0,
-                         std::numeric_limits<types::material_id>::max()));
+                AssertThrow(material_id <=
+                              std::numeric_limits<types::material_id>::max(),
+                            ExcIndexRange(
+                              material_id,
+                              0,
+                              std::numeric_limits<types::material_id>::max()));
                 // we use only material_ids in the range from 0 to
                 // numbers::invalid_material_id-1
-                AssertIndexRange(material_id, numbers::invalid_material_id);
+                AssertThrow(material_id < numbers::invalid_material_id,
+                            ExcIndexRange(material_id,
+                                          0,
+                                          numbers::invalid_material_id));
 
                 cell.material_id = material_id;
 
@@ -2759,16 +2763,18 @@ GridIn<dim, spacedim>::read_msh(std::istream &input_stream)
                   subcelldata.boundary_lines.back().vertices[1];
 
                 // to make sure that the cast won't fail
-                Assert(material_id <=
-                         std::numeric_limits<types::boundary_id>::max(),
-                       ExcIndexRange(
-                         material_id,
-                         0,
-                         std::numeric_limits<types::boundary_id>::max()));
+                AssertThrow(material_id <=
+                              std::numeric_limits<types::boundary_id>::max(),
+                            ExcIndexRange(
+                              material_id,
+                              0,
+                              std::numeric_limits<types::boundary_id>::max()));
                 // we use only boundary_ids in the range from 0 to
                 // numbers::internal_face_boundary_id-1
-                AssertIndexRange(material_id,
-                                 numbers::internal_face_boundary_id);
+                AssertThrow(material_id < numbers::internal_face_boundary_id,
+                            ExcIndexRange(material_id,
+                                          0,
+                                          numbers::internal_face_boundary_id));
 
                 subcelldata.boundary_lines.back().boundary_id =
                   static_cast<types::boundary_id>(material_id);
@@ -2810,16 +2816,18 @@ GridIn<dim, spacedim>::read_msh(std::istream &input_stream)
                   in >> subcelldata.boundary_quads.back().vertices[i];
 
                 // to make sure that the cast won't fail
-                Assert(material_id <=
-                         std::numeric_limits<types::boundary_id>::max(),
-                       ExcIndexRange(
-                         material_id,
-                         0,
-                         std::numeric_limits<types::boundary_id>::max()));
+                AssertThrow(material_id <=
+                              std::numeric_limits<types::boundary_id>::max(),
+                            ExcIndexRange(
+                              material_id,
+                              0,
+                              std::numeric_limits<types::boundary_id>::max()));
                 // we use only boundary_ids in the range from 0 to
                 // numbers::internal_face_boundary_id-1
-                AssertIndexRange(material_id,
-                                 numbers::internal_face_boundary_id);
+                AssertThrow(material_id < numbers::internal_face_boundary_id,
+                            ExcIndexRange(material_id,
+                                          0,
+                                          numbers::internal_face_boundary_id));
 
                 subcelldata.boundary_quads.back().boundary_id =
                   static_cast<types::boundary_id>(material_id);
@@ -2834,8 +2842,9 @@ GridIn<dim, spacedim>::read_msh(std::istream &input_stream)
                   else
                     {
                       // no such vertex index
-                      Assert(false,
-                             ExcInvalidVertexIndex(cell_per_entity, vertex));
+                      AssertThrow(false,
+                                  ExcInvalidVertexIndex(cell_per_entity,
+                                                        vertex));
                       vertex = numbers::invalid_unsigned_int;
                     }
               }
