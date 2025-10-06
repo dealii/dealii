@@ -77,25 +77,27 @@ public:
   {
     /**
      * Supported scaling algorithms within <tt>MatrixScaling</tt>.
-     *
-     * The Sinkhorn-Knopp algorithm (also known as RAS algorithm) alternatingly
-     * scales rows and columns by the chosen vector norm (l1 or l_infinity) and
-     * attempts to make the matrix doubly stochastic (if all the entries are
-     * non-negative). The algorithm does not preserve symmetry.
-     *
-     * The symmetry preserving algorithm instead simultaneously scales rows and
-     * columns preserving symmetry. The symmetry preserving algorithm
-     * alternates l_infinity norm scaling with l_1 norm scaling as it has been
-     * shown to yield the best results scaling linear systems.
-     *
-     * Convergence is not needed to obtain a good scaling and reaching it might
-     * require a lot of iterations and thus time. Convergence is not guaranteed
-     * for all kind of matrices. For more details check out the articles cited
-     * in the class description.
      */
     enum class ScalingAlgorithm
     {
+      //! Sinkhorn-Knopp scaling algorithm
+      /**
+       * The Sinkhorn-Knopp algorithm (also known as RAS algorithm)
+       * alternatingly scales rows and columns by the chosen <tt>NormType</tt>
+       * and attempts to make the matrix doubly stochastic (if all the entries
+       * are non-negative). The algorithm does not preserve symmetry.
+       */
       sinkhorn_knopp,
+
+      //! Symmetry preserving scaling algorithm
+      /**
+       * The symmetry preserving algorithm simultaneously scales rows and
+       * columns preserving symmetry. The symmetry preserving algorithm
+       * alternates l_infinity norm scaling with l_1 norm scaling as it has been
+       * shown to yield the best results scaling linear systems. The number of
+       * scaling steps in each norm is determined by the
+       * <tt>l1linfParameters</tt> struct
+       */
       l1_linf_symmetry_preserving
     };
 
@@ -111,7 +113,10 @@ public:
        */
       enum class NormType
       {
+        //! l_1 vector norm
         l1,
+
+        //! l_infinity vector norm
         l_infty
       };
 
@@ -177,6 +182,10 @@ public:
      * Tolerance for the scaling algorithms. Convergence is achieved if the
      * difference in norm between a vector of all ones and the row and column
      * norms vectors is below this tolerance.
+     * Convergence is not needed to obtain a good scaling and reaching it might
+     * require a lot of iterations and thus time. Convergence is not guaranteed
+     * for all kind of matrices. For more details check out the articles cited
+     * in the class description.
      */
     double scaling_tolerance;
 
