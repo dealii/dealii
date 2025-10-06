@@ -77,6 +77,21 @@ public:
   {
     /**
      * Supported scaling algorithms within <tt>MatrixScaling</tt>.
+     *
+     * The Sinkhorn-Knopp algorithm (also known as RAS algorithm) alternatingly
+     * scales rows and columns by the chosen vector norm (l1 or l_infinity) and
+     * attempts to make the matrix doubly stochastic (if all the entries are
+     * non-negative). The algorithm does not preserve symmetry.
+     *
+     * The symmetry preserving algorithm instead simultaneously scales rows and
+     * columns preserving symmetry. The symmetry preserving algorithm
+     * alternates l_infinity norm scaling with l_1 norm scaling as it has been
+     * shown to yield the best results scaling linear systems.
+     *
+     * Convergence is not needed to obtain a good scaling and reaching it might
+     * require a lot of iterations and thus time. Convergence is not guaranteed
+     * for all kind of matrices. For more details check out the articles cited
+     * in the class description.
      */
     enum class ScalingAlgorithm
     {
@@ -90,22 +105,21 @@ public:
     struct SKParameters
     {
       /**
-       * Scaling norm available to use in the Sinkhorn-Knopp algorithm.
+       * Scaling norm available to use in the Sinkhorn-Knopp algorithm. By
+       * setting this parameter the SK algorithm alternatingly scales rows and
+       * column using the selected vector norm type.
        */
       enum class NormType
       {
         l1,
-        l_infinity
+        l_infty
       };
 
       /**
        * Construct a new SKParameters object with the given parameters.
        */
       explicit SKParameters(const NormType     norm_type      = NormType::l1,
-                            const unsigned int max_iterations = 20)
-        : max_iterations(max_iterations)
-        , norm_type(norm_type)
-      {}
+                            const unsigned int max_iterations = 20);
 
       /**
        * Maximum number of iterations to perform in the SK algorithm.
@@ -130,11 +144,7 @@ public:
        */
       explicit l1linfParameters(const unsigned int start_inf_norm_steps = 1,
                                 const unsigned int l1_norm_steps        = 3,
-                                const unsigned int end_inf_norm_steps   = 1)
-        : start_inf_norm_steps(start_inf_norm_steps)
-        , l1_norm_steps(l1_norm_steps)
-        , end_inf_norm_steps(end_inf_norm_steps)
-      {}
+                                const unsigned int end_inf_norm_steps   = 1);
 
       /**
        * Number of initial linfty norm scaling steps.
@@ -160,12 +170,8 @@ public:
       const ScalingAlgorithm alg =
         ScalingAlgorithm::l1_linf_symmetry_preserving,
       const SKParameters     sk_params     = SKParameters(),
-      const l1linfParameters l1linf_params = l1linfParameters())
-      : scaling_tolerance(scaling_tolerance)
-      , algorithm(alg)
-      , sinkhorn_knopp_parameters(sk_params)
-      , l1linf_parameters(l1linf_params)
-    {}
+      const l1linfParameters l1linf_params = l1linfParameters());
+
 
     /**
      * Tolerance for the scaling algorithms. Convergence is achieved if the

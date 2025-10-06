@@ -154,7 +154,7 @@ test_diagonal(unsigned int scaling_steps)
   additional_data.algorithm =
     MatrixScaling::AdditionalData::ScalingAlgorithm::sinkhorn_knopp;
   additional_data.sinkhorn_knopp_parameters.norm_type =
-    MatrixScaling::AdditionalData::SKParameters::NormType::l_infinity;
+    MatrixScaling::AdditionalData::SKParameters::NormType::l_infty;
   MatrixScaling scaler(additional_data);
   scaler.scale_matrix(matrix);
 

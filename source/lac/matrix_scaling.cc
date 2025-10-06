@@ -63,6 +63,39 @@ is_supported_matrix()
 
 
 
+MatrixScaling::AdditionalData::SKParameters::SKParameters(
+  const NormType     norm_type,
+  const unsigned int max_iterations)
+  : max_iterations(max_iterations)
+  , norm_type(norm_type)
+{}
+
+
+
+MatrixScaling::AdditionalData::l1linfParameters::l1linfParameters(
+  const unsigned int start_inf_norm_steps,
+  const unsigned int l1_norm_steps,
+  const unsigned int end_inf_norm_steps)
+  : start_inf_norm_steps(start_inf_norm_steps)
+  , l1_norm_steps(l1_norm_steps)
+  , end_inf_norm_steps(end_inf_norm_steps)
+{}
+
+
+
+MatrixScaling::AdditionalData::AdditionalData(
+  const double           scaling_tolerance,
+  const ScalingAlgorithm alg,
+  const SKParameters     sk_params,
+  const l1linfParameters l1linf_params)
+  : scaling_tolerance(scaling_tolerance)
+  , algorithm(alg)
+  , sinkhorn_knopp_parameters(sk_params)
+  , l1linf_parameters(l1linf_params)
+{}
+
+
+
 MatrixScaling::MatrixScaling(const AdditionalData &control)
   : control(control)
   , row_scaling()
@@ -886,8 +919,7 @@ MatrixScaling::sk_scaling(Matrix &matrix, const unsigned int nsteps)
                 }
             }
             break;
-          case MatrixScaling::AdditionalData::SKParameters::NormType::
-            l_infinity:
+          case MatrixScaling::AdditionalData::SKParameters::NormType::l_infty:
             {
               // Row_norms_0 to start the procedure
               row_norms = 0;
@@ -1126,8 +1158,7 @@ MatrixScaling::sk_scaling(Matrix &matrix, const unsigned int nsteps)
                 }
             }
             break;
-          case MatrixScaling::AdditionalData::SKParameters::NormType::
-            l_infinity:
+          case MatrixScaling::AdditionalData::SKParameters::NormType::l_infty:
             {
               // Row_norms_0 to start the procedure
               local_row_norms = 0;
