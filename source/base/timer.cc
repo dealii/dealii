@@ -175,7 +175,10 @@ Timer::Timer(const MPI_Comm mpi_communicator, const bool sync_lap_times_)
 void
 Timer::start()
 {
-  if (running == false)
+  // Make sure only one thread at a time starts or resets the timer
+  std::lock_guard<std::mutex> lock(mutex);
+
+  if (is_running() == false)
     ++n_timed_laps;
 
   running = true;
@@ -195,39 +198,49 @@ Timer::start()
 void
 Timer::stop()
 {
-  if (running)
+  // Make sure only one thread at a time stops the timer
+  std::lock_guard<std::mutex> lock(mutex);
+
+  AssertThrow(is_running() == true,
+              ExcMessage(
+                "This timer is not running and hence cannot be stopped."));
+
+  running = false;
+
+  wall_times.last_lap_time =
+    wall_clock_type::now() - wall_times.current_lap_start_time;
+  cpu_times.last_lap_time =
+    cpu_clock_type::now() - cpu_times.current_lap_start_time;
+
+  last_lap_wall_time_data =
+    Utilities::MPI::min_max_avg(internal::TimerImplementation::to_seconds(
+                                  wall_times.last_lap_time),
+                                mpi_communicator);
+  if (sync_lap_times)
     {
-      running = false;
-
-      wall_times.last_lap_time =
-        wall_clock_type::now() - wall_times.current_lap_start_time;
-      cpu_times.last_lap_time =
-        cpu_clock_type::now() - cpu_times.current_lap_start_time;
-
-      last_lap_wall_time_data =
+      wall_times.last_lap_time = internal::TimerImplementation::from_seconds<
+        decltype(wall_times)::duration_type>(last_lap_wall_time_data.max);
+      cpu_times.last_lap_time = internal::TimerImplementation::from_seconds<
+        decltype(cpu_times)::duration_type>(
         Utilities::MPI::min_max_avg(internal::TimerImplementation::to_seconds(
-                                      wall_times.last_lap_time),
-                                    mpi_communicator);
-      if (sync_lap_times)
-        {
-          wall_times.last_lap_time =
-            internal::TimerImplementation::from_seconds<
-              decltype(wall_times)::duration_type>(last_lap_wall_time_data.max);
-          cpu_times.last_lap_time = internal::TimerImplementation::from_seconds<
-            decltype(cpu_times)::duration_type>(
-            Utilities::MPI::min_max_avg(
-              internal::TimerImplementation::to_seconds(
-                cpu_times.last_lap_time),
-              mpi_communicator)
-              .max);
-        }
-      wall_times.accumulated_time += wall_times.last_lap_time;
-      cpu_times.accumulated_time += cpu_times.last_lap_time;
-      accumulated_wall_time_data =
-        Utilities::MPI::min_max_avg(internal::TimerImplementation::to_seconds(
-                                      wall_times.accumulated_time),
-                                    mpi_communicator);
+                                      cpu_times.last_lap_time),
+                                    mpi_communicator)
+          .max);
     }
+  wall_times.accumulated_time += wall_times.last_lap_time;
+  cpu_times.accumulated_time += cpu_times.last_lap_time;
+  accumulated_wall_time_data =
+    Utilities::MPI::min_max_avg(internal::TimerImplementation::to_seconds(
+                                  wall_times.accumulated_time),
+                                mpi_communicator);
+}
+
+
+
+bool
+Timer::is_running() const
+{
+  return running;
 }
 
 
@@ -235,7 +248,7 @@ Timer::stop()
 double
 Timer::cpu_time() const
 {
-  if (running)
+  if (is_running())
     {
       const double running_time = internal::TimerImplementation::to_seconds(
         cpu_clock_type::now() - cpu_times.current_lap_start_time +
@@ -264,7 +277,7 @@ double
 Timer::wall_time() const
 {
   wall_clock_type::duration current_elapsed_wall_time;
-  if (running)
+  if (is_running())
     current_elapsed_wall_time = wall_clock_type::now() -
                                 wall_times.current_lap_start_time +
                                 wall_times.accumulated_time;
@@ -435,7 +448,13 @@ TimerOutput::enter_subsection(const std::string &section_name)
         sections[section_name] = Timer(mpi_communicator, false);
     }
   else
-    sections[section_name].start();
+    {
+      Assert(sections[section_name].is_running() == false,
+             ExcMessage("Cannot enter the already active section <" +
+                        section_name + ">."));
+
+      sections[section_name].start();
+    }
 
   active_sections.push_back(section_name);
 }
@@ -464,6 +483,10 @@ TimerOutput::leave_subsection(const std::string &section_name)
   // active section.
   const std::string actual_section_name =
     (section_name.empty() ? active_sections.back() : section_name);
+
+  Assert(sections[actual_section_name].is_running() == true,
+         ExcMessage("Cannot leave section <" + actual_section_name +
+                    ">, because it has not been entered."));
 
   sections[actual_section_name].stop();
 

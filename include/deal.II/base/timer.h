@@ -204,6 +204,12 @@ public:
   restart();
 
   /**
+   * Returns true if the timer is currently running, false otherwise.
+   */
+  bool
+  is_running() const;
+
+  /**
    * Return the current accumulated wall time (including the current lap, if
    * the timer is running) in seconds without stopping the timer.
    *
@@ -384,6 +390,17 @@ private:
    * the current lap is included in the count.
    */
   unsigned int n_timed_laps;
+
+  /**
+   * A lock that makes sure that this class gives reasonable results even when
+   * used with several threads. Note that thread-safety with a timer that is
+   * shared between different threads is hard to establish, and it is in
+   * particular discouraged to have multiple threads starting and stopping
+   * the timer. This case only works if each thread makes sure the timer
+   * is not already running before starting it, and stopping the timer
+   * before any other thread can use it.
+   */
+  Threads::Mutex mutex;
 };
 
 
