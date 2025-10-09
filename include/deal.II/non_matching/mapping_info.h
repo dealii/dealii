@@ -279,10 +279,21 @@ namespace NonMatching
     MappingInfo(const MappingInfo &) = delete;
 
     /**
+     * Do not allow moving this object.
+     */
+    MappingInfo(MappingInfo &&) = delete;
+
+    /**
      * Do not allow copy assignment of this class.
      */
     MappingInfo &
     operator=(const MappingInfo &) = delete;
+
+    /**
+     * Do not allow move assignment of this class.
+     */
+    MappingInfo &
+    operator=(MappingInfo &&) = delete;
 
     /**
      * Compute the mapping information for the incoming cell and unit
