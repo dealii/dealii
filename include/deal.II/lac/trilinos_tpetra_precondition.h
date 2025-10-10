@@ -1333,6 +1333,8 @@ namespace LinearAlgebra
      * An important algorithmic component of FROSch are extension-based
      * coarse spaces, which allow for the construction of preconditioners using
      * only algebraic information or only little geometric information.
+     * For a detailed description of the coarse spaces we refer to the
+     * publication paper of FROSch @cite{Heinlein2020}.
      *
      * @ingroup TpetraWrappers
      * @ingroup Preconditioners
@@ -1410,11 +1412,10 @@ namespace LinearAlgebra
          * Available options:
          * <ul>
          * <li> "IPOUHarmonicCoarseOperator" </li>
-         * <li> "GDSWCoarseOperator" </li>
-         * <li> "RGDSWCoarseOperator" </li>
+         * <li> "GDSWCoarseOperator" (Generalized Dryja–Smith–Widlund) </li>
+         * <li> "RGDSWCoarseOperator" (Reduced dimension GDSW) </li>
          * </ul>
          *
-         * TODO: Short description of each operator!
          */
         std::string coarse_operator_type;
 
