@@ -232,13 +232,16 @@ namespace Step95
     ObserverPointer<const MatrixFree<dim, Number, VectorizedArrayType>>
       matrix_free;
     ObserverPointer<
-      const NonMatching::MappingInfo<dim, dim, VectorizedArrayType>>
+      const NonMatching::MappingInfo<dim, dim, VectorizedArrayType>,
+      std::integral_constant<int, 1>>
       mapping_info_cell;
     ObserverPointer<
-      const NonMatching::MappingInfo<dim, dim, VectorizedArrayType>>
+      const NonMatching::MappingInfo<dim, dim, VectorizedArrayType>,
+      std::integral_constant<int, 2>>
       mapping_info_surface;
     ObserverPointer<
-      const NonMatching::MappingInfo<dim, dim, VectorizedArrayType>>
+      const NonMatching::MappingInfo<dim, dim, VectorizedArrayType>,
+      std::integral_constant<int, 3>>
       mapping_info_faces;
 
     std::unique_ptr<GenericCellEvaluator> evaluator_cell;
