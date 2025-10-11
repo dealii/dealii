@@ -45,7 +45,7 @@ DEAL_II_NAMESPACE_OPEN
 namespace internal
 {
   class MGTwoLevelTransferImplementation;
-}
+} // namespace internal
 
 template <int dim,
           typename Number,
@@ -111,10 +111,6 @@ namespace mg
 
 /**
  * An abstract base class for transfer operators between two multigrid levels.
- * The implementation of
- * restriction and prolongation between levels is delegated to derived classes,
- * which implement prolongate_and_add_internal() and restrict_and_add_internal()
- * accordingly.
  */
 template <typename VectorType>
 class MGTwoLevelTransferBase : public EnableObserverPointer
@@ -133,26 +129,26 @@ public:
     "type LinearAlgebra::distributed::Vector.");
 
   /**
-   * The scalar type used by the vector-type template argument.
+   * Partitioner needed by the intermediate vector.
    */
-  using Number = typename VectorType::value_type;
+  std::shared_ptr<const Utilities::MPI::Partitioner> partitioner_coarse;
 
   /**
-   * Default constructor.
+   * Partitioner needed by the intermediate vector.
    */
-  MGTwoLevelTransferBase();
+  std::shared_ptr<const Utilities::MPI::Partitioner> partitioner_fine;
 
   /**
    * Perform prolongation on a solution vector.
    */
-  void
-  prolongate_and_add(VectorType &dst, const VectorType &src) const;
+  virtual void
+  prolongate_and_add(VectorType &dst, const VectorType &src) const = 0;
 
   /**
    * Perform restriction on a residual vector.
    */
-  void
-  restrict_and_add(VectorType &dst, const VectorType &src) const;
+  virtual void
+  restrict_and_add(VectorType &dst, const VectorType &src) const = 0;
 
   /**
    * Perform interpolation of a solution vector from the fine level to the
@@ -181,123 +177,151 @@ public:
    */
   virtual std::size_t
   memory_consumption() const = 0;
-
-protected:
-  /**
-   * Perform prolongation on vectors with correct ghosting.
-   */
-  virtual void
-  prolongate_and_add_internal(VectorType &dst, const VectorType &src) const = 0;
-
-  /**
-   * Perform restriction on vectors with correct ghosting.
-   */
-  virtual void
-  restrict_and_add_internal(VectorType &dst, const VectorType &src) const = 0;
-
-  /**
-   * A wrapper around update_ghost_values() optimized in case the
-   * present vector has the same parallel layout of one of the external
-   * partitioners.
-   */
-  void
-  update_ghost_values(const VectorType &vec) const;
-
-  /**
-   * A wrapper around compress() optimized in case the
-   * present vector has the same parallel layout of one of the external
-   * partitioners.
-   */
-  void
-  compress(VectorType &vec, const VectorOperation::values op) const;
-
-  /**
-   * A wrapper around zero_out_ghost_values() optimized in case the
-   * present vector has the same parallel layout of one of the external
-   * partitioners.
-   */
-  void
-  zero_out_ghost_values(const VectorType &vec) const;
-
-  /**
-   * Enable inplace vector operations if external and internal vectors
-   * are compatible.
-   */
-  template <int dim, std::size_t width, typename IndexType>
-  std::pair<bool, bool>
-  internal_enable_inplace_operations_if_possible(
-    const std::shared_ptr<const Utilities::MPI::Partitioner>
-      &partitioner_coarse,
-    const std::shared_ptr<const Utilities::MPI::Partitioner> &partitioner_fine,
-    bool &vec_fine_needs_ghost_update,
-    internal::MatrixFreeFunctions::
-      ConstraintInfo<dim, VectorizedArray<Number, width>, IndexType>
-                              &constraint_info_coarse,
-    std::vector<unsigned int> &dof_indices_fine);
-
-  /**
-   * Flag if the finite elements on the fine cells are continuous. If yes,
-   * the multiplicity of DoF sharing a vertex/line as well as constraints have
-   * to be taken into account via weights.
-   */
-  bool fine_element_is_continuous;
-
-public:
-  /**
-   * Partitioner needed by the intermediate vector.
-   */
-  std::shared_ptr<const Utilities::MPI::Partitioner> partitioner_coarse;
-
-  /**
-   * Partitioner needed by the intermediate vector.
-   */
-  std::shared_ptr<const Utilities::MPI::Partitioner> partitioner_fine;
-
-protected:
-  /**
-   * Internal vector on which the actual prolongation/restriction is performed.
-   */
-  mutable VectorType vec_coarse;
-
-  /**
-   * Internal vector needed for collecting all degrees of freedom of the fine
-   * cells. It is only initialized if the fine-level DoF indices touch DoFs
-   * other than the locally active ones (which we always assume can be
-   * accessed by the given vectors in the prolongate/restrict functions),
-   * otherwise it is left at size zero.
-   */
-  mutable VectorType vec_fine;
-
-  /**
-   * Bool indicating whether fine vector has relevant ghost values.
-   */
-  bool vec_fine_needs_ghost_update;
-
-  /**
-   * Embedded partitioner for efficient communication if locally relevant DoFs
-   * are a subset of an external Partitioner object.
-   */
-  std::shared_ptr<const Utilities::MPI::Partitioner>
-    partitioner_coarse_embedded;
-
-  /**
-   * Embedded partitioner for efficient communication if locally relevant DoFs
-   * are a subset of an external Partitioner object.
-   */
-  std::shared_ptr<const Utilities::MPI::Partitioner> partitioner_fine_embedded;
-
-  /**
-   * Buffer for efficient communication if locally relevant DoFs
-   * are a subset of an external Partitioner object.
-   */
-  mutable AlignedVector<Number> buffer_coarse_embedded;
-
-  /**
-   * Buffer for efficient communication if locally relevant DoFs
-   * are a subset of an external Partitioner object.
-   */
-  mutable AlignedVector<Number> buffer_fine_embedded;
 };
+
+
+
+namespace internal
+{
+  /**
+   * Base class for MGTwoLevelTransferNonNested and MGTwoLevelTransfer.
+   */
+  template <typename VectorType>
+  class MGTwoLevelTransferCore : public MGTwoLevelTransferBase<VectorType>
+  {
+  public:
+    /**
+     * The scalar type used by the vector-type template argument.
+     */
+    using Number = typename VectorType::value_type;
+
+    /**
+     * Constructor.
+     */
+    MGTwoLevelTransferCore();
+
+    /**
+     * @copydoc MGTwoLevelTransferBase::prolongate_and_add
+     */
+    void
+    prolongate_and_add(VectorType &dst, const VectorType &src) const override;
+
+    /**
+     * @copydoc MGTwoLevelTransferBase::restrict_and_add
+     */
+    void
+    restrict_and_add(VectorType &dst, const VectorType &src) const override;
+
+  protected:
+    /**
+     * Perform prolongation on vectors with correct ghosting.
+     */
+    virtual void
+    prolongate_and_add_internal(VectorType       &dst,
+                                const VectorType &src) const = 0;
+
+    /**
+     * Perform restriction on vectors with correct ghosting.
+     */
+    virtual void
+    restrict_and_add_internal(VectorType &dst, const VectorType &src) const = 0;
+
+    /**
+     * A wrapper around update_ghost_values() optimized in case the
+     * present vector has the same parallel layout of one of the external
+     * partitioners.
+     */
+    void
+    update_ghost_values(const VectorType &vec) const;
+
+    /**
+     * A wrapper around compress() optimized in case the
+     * present vector has the same parallel layout of one of the external
+     * partitioners.
+     */
+    void
+    compress(VectorType &vec, const VectorOperation::values op) const;
+
+    /**
+     * A wrapper around zero_out_ghost_values() optimized in case the
+     * present vector has the same parallel layout of one of the external
+     * partitioners.
+     */
+    void
+    zero_out_ghost_values(const VectorType &vec) const;
+
+    /**
+     * Enable inplace vector operations if external and internal vectors
+     * are compatible.
+     */
+    template <int dim, std::size_t width, typename IndexType>
+    std::pair<bool, bool>
+    internal_enable_inplace_operations_if_possible(
+      const std::shared_ptr<const Utilities::MPI::Partitioner>
+        &partitioner_coarse,
+      const std::shared_ptr<const Utilities::MPI::Partitioner>
+           &partitioner_fine,
+      bool &vec_fine_needs_ghost_update,
+      internal::MatrixFreeFunctions::
+        ConstraintInfo<dim, VectorizedArray<Number, width>, IndexType>
+                                &constraint_info_coarse,
+      std::vector<unsigned int> &dof_indices_fine);
+
+    /**
+     * Flag if the finite elements on the fine cells are continuous. If yes,
+     * the multiplicity of DoF sharing a vertex/line as well as constraints have
+     * to be taken into account via weights.
+     */
+    bool fine_element_is_continuous;
+
+  protected:
+    /**
+     * Internal vector on which the actual prolongation/restriction is
+     * performed.
+     */
+    mutable VectorType vec_coarse;
+
+    /**
+     * Internal vector needed for collecting all degrees of freedom of the fine
+     * cells. It is only initialized if the fine-level DoF indices touch DoFs
+     * other than the locally active ones (which we always assume can be
+     * accessed by the given vectors in the prolongate/restrict functions),
+     * otherwise it is left at size zero.
+     */
+    mutable VectorType vec_fine;
+
+    /**
+     * Bool indicating whether fine vector has relevant ghost values.
+     */
+    bool vec_fine_needs_ghost_update;
+
+    /**
+     * Embedded partitioner for efficient communication if locally relevant DoFs
+     * are a subset of an external Partitioner object.
+     */
+    std::shared_ptr<const Utilities::MPI::Partitioner>
+      partitioner_coarse_embedded;
+
+    /**
+     * Embedded partitioner for efficient communication if locally relevant DoFs
+     * are a subset of an external Partitioner object.
+     */
+    std::shared_ptr<const Utilities::MPI::Partitioner>
+      partitioner_fine_embedded;
+
+    /**
+     * Buffer for efficient communication if locally relevant DoFs
+     * are a subset of an external Partitioner object.
+     */
+    mutable AlignedVector<Number> buffer_coarse_embedded;
+
+    /**
+     * Buffer for efficient communication if locally relevant DoFs
+     * are a subset of an external Partitioner object.
+     */
+    mutable AlignedVector<Number> buffer_fine_embedded;
+  };
+} // namespace internal
 
 
 
@@ -327,7 +351,7 @@ protected:
  * point, and we fall back to the first option in such a case.
  */
 template <int dim, typename VectorType>
-class MGTwoLevelTransfer : public MGTwoLevelTransferBase<VectorType>
+class MGTwoLevelTransfer : public internal::MGTwoLevelTransferCore<VectorType>
 {
 public:
   static_assert(
@@ -627,6 +651,138 @@ private:
 
   friend class internal::MGTwoLevelTransferImplementation;
 
+  friend class MGTransferMatrixFree<dim, Number, MemorySpace::Host>;
+
+  friend class MGTransferMatrixFree<dim, Number, MemorySpace::Default>;
+};
+
+
+/**
+ * A transfer class supporting device vectors via copying them to the host and
+ * using an internal transfer of type MGTwoLevelTransfer defined on the
+ * host.
+ */
+template <int dim, typename VectorType>
+class MGTwoLevelTransferCopyToHost : public MGTwoLevelTransferBase<VectorType>
+{
+public:
+  static_assert(
+    std::is_same_v<
+      VectorType,
+      LinearAlgebra::distributed::Vector<typename VectorType::value_type,
+                                         MemorySpace::Default>>,
+    "type LinearAlgebra::distributed::Vector. This class should not be used for host vectors since it would perform redundant transfers. Use MGTwoLevelTransfer instead.");
+
+
+  /**
+   * The scalar type used by the vector-type template argument.
+   */
+  using Number = typename VectorType::value_type;
+
+  /*
+   * The vector type used by vectors defined on the host.
+   */
+  using VectorTypeHost =
+    LinearAlgebra::distributed::Vector<Number, MemorySpace::Host>;
+
+  /**
+   * Default constructor.
+   */
+  MGTwoLevelTransferCopyToHost() = default;
+
+  /**
+   * See MGTwoLevelTransfer
+   */
+  void
+  reinit(const DoFHandler<dim>           &dof_handler_fine,
+         const DoFHandler<dim>           &dof_handler_coarse,
+         const AffineConstraints<Number> &constraint_fine =
+           AffineConstraints<Number>(),
+         const AffineConstraints<Number> &constraint_coarse =
+           AffineConstraints<Number>(),
+         const unsigned int mg_level_fine   = numbers::invalid_unsigned_int,
+         const unsigned int mg_level_coarse = numbers::invalid_unsigned_int);
+
+  /**
+   * See MGTwoLevelTransfer
+   */
+  void
+  reinit(const MatrixFree<dim, Number> &matrix_free_fine,
+         const unsigned int             dof_no_fine,
+         const MatrixFree<dim, Number> &matrix_free_coarse,
+         const unsigned int             dof_no_coarse);
+
+  /**
+   * @copydoc MGTwoLevelTransfer::fast_polynomial_transfer_supported
+   */
+  bool
+  fast_polynomial_transfer_supported(const unsigned int fe_degree_fine,
+                                     const unsigned int fe_degree_coarse);
+
+  /**
+   * @copydoc MGTwoLevelTransfer::prolongate_and_add
+   */
+  void
+  prolongate_and_add(VectorType &dst, const VectorType &src) const override;
+
+  /**
+   * @copydoc MGTwoLevelTransfer::restrict_and_add
+   */
+  void
+  restrict_and_add(VectorType &dst, const VectorType &src) const override;
+
+  /**
+   * @copydoc MGTwoLevelTransfer::interpolate
+   */
+  void
+  interpolate(VectorType &dst, const VectorType &src) const override;
+
+  /**
+   * @copydoc MGTwoLevelTransfer::enable_inplace_operations_if_possible
+   */
+  std::pair<bool, bool>
+  enable_inplace_operations_if_possible(
+    const std::shared_ptr<const Utilities::MPI::Partitioner>
+      &partitioner_coarse,
+    const std::shared_ptr<const Utilities::MPI::Partitioner> &partitioner_fine)
+    override;
+
+  /**
+   * @copydoc MGTwoLevelTransfer::memory_consumption
+   */
+  std::size_t
+  memory_consumption() const override;
+
+private:
+  /**
+   * The internal transfer defined on the host which handles all operations.
+   */
+  MGTwoLevelTransfer<dim, VectorTypeHost> host_transfer;
+
+  /**
+   * Temporary vector used for the host transfer.
+   */
+  mutable VectorTypeHost host_vector_coarse;
+
+  /**
+   * Temporary vector used for the host transfer.
+   */
+  mutable VectorTypeHost host_vector_fine;
+
+  /**
+   * Copies a device vector to a host vector.
+   */
+  void
+  copy_to_host(VectorTypeHost &dst, const VectorType &src) const;
+
+  /**
+   * Copies a host vector to a device vector.
+   */
+  void
+  copy_from_host(VectorType &dst, const VectorTypeHost &src) const;
+
+  friend class internal::MGTwoLevelTransferImplementation;
+
   friend class MGTransferMatrixFree<dim,
                                     Number,
                                     typename VectorType::memory_space>;
@@ -638,7 +794,8 @@ private:
  * Class for transfer between two non-nested multigrid levels.
  */
 template <int dim, typename VectorType>
-class MGTwoLevelTransferNonNested : public MGTwoLevelTransferBase<VectorType>
+class MGTwoLevelTransferNonNested
+  : public internal::MGTwoLevelTransferCore<VectorType>
 {
 private:
   static_assert(
@@ -1210,9 +1367,12 @@ private:
   assert_dof_handler(const DoFHandler<dim> &dof_handler_out) const;
 
   /**
-   * Internal transfer operator for local smoothing.
+   * Internal transfer operator for local smoothing on the host.
    */
-  MGLevelObject<MGTwoLevelTransfer<dim, VectorType>> internal_transfer;
+  MGLevelObject<MGTwoLevelTransfer<
+    dim,
+    LinearAlgebra::distributed::Vector<Number, dealii::MemorySpace::Host>>>
+    internal_transfer;
 
   /**
    * Collection of the two-level transfer operators.
@@ -1456,6 +1616,150 @@ private:
 #ifndef DOXYGEN
 
 /* ----------------------- Inline functions --------------------------------- */
+
+template <int dim, typename VectorType>
+void
+MGTwoLevelTransferCopyToHost<dim, VectorType>::reinit(
+  const DoFHandler<dim>           &dof_handler_fine,
+  const DoFHandler<dim>           &dof_handler_coarse,
+  const AffineConstraints<Number> &constraint_fine,
+  const AffineConstraints<Number> &constraint_coarse,
+  const unsigned int               mg_level_fine,
+  const unsigned int               mg_level_coarse)
+{
+  host_transfer.reinit(dof_handler_fine,
+                       dof_handler_coarse,
+                       constraint_fine,
+                       constraint_coarse,
+                       mg_level_fine,
+                       mg_level_coarse);
+}
+
+template <int dim, typename VectorType>
+void
+MGTwoLevelTransferCopyToHost<dim, VectorType>::reinit(
+  const MatrixFree<dim, Number> &matrix_free_fine,
+  const unsigned int             dof_no_fine,
+  const MatrixFree<dim, Number> &matrix_free_coarse,
+  const unsigned int             dof_no_coarse)
+{
+  host_transfer.reinit(matrix_free_fine,
+                       dof_no_fine,
+                       matrix_free_coarse,
+                       dof_no_coarse);
+}
+
+
+template <int dim, typename VectorType>
+bool
+MGTwoLevelTransferCopyToHost<dim, VectorType>::
+  fast_polynomial_transfer_supported(const unsigned int fe_degree_fine,
+                                     const unsigned int fe_degree_coarse)
+{
+  return host_transfer.fast_polynomial_transfer_supported(fe_degree_fine,
+                                                          fe_degree_coarse);
+}
+
+template <int dim, typename VectorType>
+void
+MGTwoLevelTransferCopyToHost<dim, VectorType>::prolongate_and_add(
+  VectorType       &dst,
+  const VectorType &src) const
+{
+  if (host_vector_coarse.size() == 0)
+    host_vector_coarse.reinit(src.get_partitioner());
+  if (host_vector_fine.size() == 0)
+    host_vector_fine.reinit(dst.get_partitioner());
+
+  copy_to_host(host_vector_fine, dst);
+  copy_to_host(host_vector_coarse, src);
+
+  host_transfer.prolongate_and_add(host_vector_fine, host_vector_coarse);
+
+  copy_from_host(dst, host_vector_fine);
+}
+
+template <int dim, typename VectorType>
+void
+MGTwoLevelTransferCopyToHost<dim, VectorType>::restrict_and_add(
+  VectorType       &dst,
+  const VectorType &src) const
+{
+  if (host_vector_coarse.size() == 0)
+    host_vector_coarse.reinit(dst.get_partitioner());
+  if (host_vector_fine.size() == 0)
+    host_vector_fine.reinit(src.get_partitioner());
+
+  copy_to_host(host_vector_coarse, dst);
+  copy_to_host(host_vector_fine, src);
+
+  host_transfer.restrict_and_add(host_vector_coarse, host_vector_fine);
+
+  copy_from_host(dst, host_vector_coarse);
+}
+
+template <int dim, typename VectorType>
+void
+MGTwoLevelTransferCopyToHost<dim, VectorType>::interpolate(
+  VectorType       &dst,
+  const VectorType &src) const
+{
+  if (host_vector_coarse.size() == 0)
+    host_vector_coarse.reinit(dst.get_partitioner());
+  if (host_vector_fine.size() == 0)
+    host_vector_fine.reinit(src.get_partitioner());
+
+  copy_to_host(host_vector_fine, src);
+
+  host_transfer.interpolate(host_vector_coarse, host_vector_fine);
+
+  copy_from_host(dst, host_vector_coarse);
+}
+
+template <int dim, typename VectorType>
+std::pair<bool, bool>
+MGTwoLevelTransferCopyToHost<dim, VectorType>::
+  enable_inplace_operations_if_possible(
+    const std::shared_ptr<const Utilities::MPI::Partitioner>
+      &partitioner_coarse,
+    const std::shared_ptr<const Utilities::MPI::Partitioner> &partitioner_fine)
+{
+  return host_transfer.enable_inplace_operations_if_possible(partitioner_coarse,
+                                                             partitioner_fine);
+}
+
+template <int dim, typename VectorType>
+std::size_t
+MGTwoLevelTransferCopyToHost<dim, VectorType>::memory_consumption() const
+{
+  return host_transfer.memory_consumption();
+}
+
+template <int dim, typename VectorType>
+void
+MGTwoLevelTransferCopyToHost<dim, VectorType>::copy_to_host(
+  VectorTypeHost   &dst,
+  const VectorType &src) const
+{
+  LinearAlgebra::ReadWriteVector<Number> rw_vector(
+    src.get_partitioner()->locally_owned_range());
+  rw_vector.import_elements(src, VectorOperation::insert);
+
+  dst.import_elements(rw_vector, VectorOperation::insert);
+}
+
+template <int dim, typename VectorType>
+void
+MGTwoLevelTransferCopyToHost<dim, VectorType>::copy_from_host(
+  VectorType           &dst,
+  const VectorTypeHost &src) const
+{
+  LinearAlgebra::ReadWriteVector<Number> rw_vector(
+    src.get_partitioner()->locally_owned_range());
+  rw_vector.import_elements(src, VectorOperation::insert);
+
+  dst.import_elements(rw_vector, VectorOperation::insert);
+}
 
 
 

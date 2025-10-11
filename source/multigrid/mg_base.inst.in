@@ -20,3 +20,11 @@ for (VEC : VECTOR_TYPES)
     template class MGSmootherBase<VEC>;
     template class MGCoarseGridBase<VEC>;
   }
+
+for (S1 : REAL_SCALARS)
+  {
+    template class MGTransferBase<
+      LinearAlgebra::distributed::Vector<S1, MemorySpace::Default>>;
+    template class MGSmootherBase<
+      LinearAlgebra::distributed::Vector<S1, MemorySpace::Default>>;
+  }

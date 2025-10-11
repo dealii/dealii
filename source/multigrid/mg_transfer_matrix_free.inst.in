@@ -15,8 +15,11 @@
 
 for (S1 : REAL_SCALARS)
   {
-    template class MGTwoLevelTransferBase<
-      LinearAlgebra::distributed::Vector<S1, ::dealii::MemorySpace::Host>>;
+    namespace internal
+    \{
+      template class MGTwoLevelTransferCore<
+        LinearAlgebra::distributed::Vector<S1, ::dealii::MemorySpace::Host>>;
+    \}
   }
 
 for (deal_II_dimension : DIMENSIONS; S1 : REAL_SCALARS)
@@ -27,6 +30,10 @@ for (deal_II_dimension : DIMENSIONS; S1 : REAL_SCALARS)
       deal_II_dimension,
       LinearAlgebra::distributed::Vector<S1>>;
 
+    template class MGTwoLevelTransferCopyToHost<
+      deal_II_dimension,
+      LinearAlgebra::distributed::Vector<S1, ::dealii::MemorySpace::Default>>;
+
     template class MGTransferBlockMatrixFreeBase<
       deal_II_dimension,
       S1,
@@ -36,4 +43,8 @@ for (deal_II_dimension : DIMENSIONS; S1 : REAL_SCALARS)
     template class MGTransferMatrixFree<deal_II_dimension,
                                         S1,
                                         ::dealii::MemorySpace::Host>;
+
+    template class MGTransferMatrixFree<deal_II_dimension,
+                                        S1,
+                                        ::dealii::MemorySpace::Default>;
   }
