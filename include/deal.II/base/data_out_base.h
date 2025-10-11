@@ -2397,6 +2397,36 @@ namespace DataOutBase
                       const MPI_Comm     comm);
 
   /**
+   * Exports a collection of line segments to VTK files for visualization.
+   *
+   * This function takes a vector of line segments, each defined by a pair of
+   * start and end points, and writes them to one or more `.vtu` files. In an
+   * MPI parallel setting, each process writes its own file (e.g.,
+   * `filename.proc0000.vtu`, `filename.proc0001.vtu`, etc.). Additionally,
+   * process 0 writes a `.pvtu` file that aggregates all the individual `.vtu`
+   * files, allowing visualization software to load the entire distributed data
+   * set as a single entity.
+   *
+   * The function is intended for visualizing geometric entities like shift
+   * vectors for the Shifted Boundary Method or other line-based data. No data
+   * is associated with the lines; only their geometry is exported.
+   *
+   * @param filename_without_extension The base name for the output files. The
+   *        function will append suffixes like `.procXXXX.vtu` and `.pvtu`.
+   * @param point_pairs A vector where each element is a `std::pair` of `Point<dim>`,
+   *        representing the start and end points of a line segment to be
+   *        exported.
+   *  @param mpi_communicator The MPI communicator over which the data is
+   *       distributed.
+   */
+  template <int dim>
+  void
+  export_line_segments(
+    const std::vector<std::pair<Point<dim>, Point<dim>>> &point_pairs,
+    const std::string &filename_without_extension,
+    const MPI_Comm    &mpi_communicator = MPI_COMM_WORLD);
+
+  /**
    * DataOutFilter is an intermediate data format that reduces the amount of
    * data that will be written to files. The object filled by this function
    * can then later be used again to write data in a concrete file format;
