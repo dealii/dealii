@@ -1,0 +1,159 @@
+
+DEAL:0::Trilinos matrix
+(0,0) 1.00000
+(0,9) 1.00000
+(1,1) 2.00000
+(2,2) 3.00000
+(3,3) 4.00000
+(4,4) 5.00000
+DEAL:0::Reciprocal of scaling vectors squared
+DEAL:0::2.00000 2.00000 3.00000 4.00000 5.00000
+DEAL:0::2.00000 2.00000 3.00000 4.00000 5.00000
+DEAL:0::Scaled matrix
+(0,0) 0.500000
+(0,9) 0.500000
+(1,1) 1.00000
+(2,2) 1.00000
+(3,3) 1.00000
+(4,4) 1.00000
+DEAL:0::Converged? true
+DEAL:0::Trilinos diagonal matrix
+(0,0) 1.00000
+(1,1) 2.00000
+(2,2) 3.00000
+(3,3) 4.00000
+(4,4) 5.00000
+DEAL:0::Reciprocal of scaling vectors squared
+DEAL:0::1.00000 4.00000 9.00000 16.0000 25.0000
+DEAL:0::1.00000 1.00000 1.00000 1.00000 1.00000
+DEAL:0::Scaled matrix
+(0,0) 1.00000
+(1,1) 1.00000
+(2,2) 1.00000
+(3,3) 1.00000
+(4,4) 1.00000
+DEAL:0::Converged? true
+DEAL:0::Trilinos linear system test
+DEAL:0::Original system solution:
+DEAL:0::1.00000 0.500000 0.333333 0.250000 0.200000
+DEAL:0::Scaled system solution (should match original):
+DEAL:0::1.00000 0.500000 0.333333 0.250000 0.200000
+DEAL:0::PETSc matrix
+(0,0) 1.00000
+(0,9) 1.00000
+(1,1) 2.00000
+(2,2) 3.00000
+(3,3) 4.00000
+(4,4) 5.00000
+DEAL:0::Reciprocal of scaling vectors squared
+DEAL:0::2.00000 2.00000 3.00000 4.00000 5.00000
+DEAL:0::2.00000 2.00000 3.00000 4.00000 5.00000
+DEAL:0::Scaled matrix
+(0,0) 0.500000
+(0,9) 0.500000
+(1,1) 1.00000
+(2,2) 1.00000
+(3,3) 1.00000
+(4,4) 1.00000
+DEAL:0::Converged? true
+DEAL:0::PETSc diagonal matrix
+(0,0) 1.00000
+(1,1) 2.00000
+(2,2) 3.00000
+(3,3) 4.00000
+(4,4) 5.00000
+DEAL:0::Reciprocal of scaling vectors squared
+DEAL:0::1.00000 4.00000 9.00000 16.0000 25.0000
+DEAL:0::1.00000 1.00000 1.00000 1.00000 1.00000
+DEAL:0::Scaled matrix
+(0,0) 1.00000
+(1,1) 1.00000
+(2,2) 1.00000
+(3,3) 1.00000
+(4,4) 1.00000
+DEAL:0::Converged? true
+DEAL:0::PETSc linear system test
+DEAL:0::Original system solution:
+DEAL:0::1.00000 0.500000 0.333333 0.250000 0.200000
+DEAL:0::Scaled system solution (should match original):
+DEAL:0::1.00000 0.500000 0.333333 0.250000 0.200000
+
+DEAL:1::Trilinos matrix
+(5,5) 6.00000
+(6,6) 7.00000
+(7,7) 8.00000
+(8,8) 9.00000
+(9,9) 1.00000
+(9,0) 1.00000
+DEAL:1::Reciprocal of scaling vectors squared
+DEAL:1::6.00000 7.00000 8.00000 9.00000 2.00000
+DEAL:1::6.00000 7.00000 8.00000 9.00000 2.00000
+DEAL:1::Scaled matrix
+(5,5) 1.00000
+(6,6) 1.00000
+(7,7) 1.00000
+(8,8) 1.00000
+(9,9) 0.500000
+(9,0) 0.500000
+DEAL:1::Converged? true
+DEAL:1::Trilinos diagonal matrix
+(5,5) 6.00000
+(6,6) 7.00000
+(7,7) 8.00000
+(8,8) 9.00000
+(9,9) 10.0000
+DEAL:1::Reciprocal of scaling vectors squared
+DEAL:1::36.0000 49.0000 64.0000 81.0000 100.000
+DEAL:1::1.00000 1.00000 1.00000 1.00000 1.00000
+DEAL:1::Scaled matrix
+(5,5) 1.00000
+(6,6) 1.00000
+(7,7) 1.00000
+(8,8) 1.00000
+(9,9) 1.00000
+DEAL:1::Converged? true
+DEAL:1::Trilinos linear system test
+DEAL:1::Original system solution:
+DEAL:1::0.166667 0.142857 0.125000 0.111111 0.100000
+DEAL:1::Scaled system solution (should match original):
+DEAL:1::0.166667 0.142857 0.125000 0.111111 0.100000
+DEAL:1::PETSc matrix
+(5,5) 6.00000
+(6,6) 7.00000
+(7,7) 8.00000
+(8,8) 9.00000
+(9,0) 1.00000
+(9,9) 1.00000
+DEAL:1::Reciprocal of scaling vectors squared
+DEAL:1::6.00000 7.00000 8.00000 9.00000 2.00000
+DEAL:1::6.00000 7.00000 8.00000 9.00000 2.00000
+DEAL:1::Scaled matrix
+(5,5) 1.00000
+(6,6) 1.00000
+(7,7) 1.00000
+(8,8) 1.00000
+(9,0) 0.500000
+(9,9) 0.500000
+DEAL:1::Converged? true
+DEAL:1::PETSc diagonal matrix
+(5,5) 6.00000
+(6,6) 7.00000
+(7,7) 8.00000
+(8,8) 9.00000
+(9,9) 10.0000
+DEAL:1::Reciprocal of scaling vectors squared
+DEAL:1::36.0000 49.0000 64.0000 81.0000 100.000
+DEAL:1::1.00000 1.00000 1.00000 1.00000 1.00000
+DEAL:1::Scaled matrix
+(5,5) 1.00000
+(6,6) 1.00000
+(7,7) 1.00000
+(8,8) 1.00000
+(9,9) 1.00000
+DEAL:1::Converged? true
+DEAL:1::PETSc linear system test
+DEAL:1::Original system solution:
+DEAL:1::0.166667 0.142857 0.125000 0.111111 0.100000
+DEAL:1::Scaled system solution (should match original):
+DEAL:1::0.166667 0.142857 0.125000 0.111111 0.100000
+
