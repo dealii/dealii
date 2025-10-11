@@ -111,6 +111,18 @@ struct CPUClock
  * times are accumulated from summing across all threads and will usually
  * exceed the wall times.
  *
+ * @note If this class is constructed with an MPI communicator
+ * and <code>sync_lap_times</code> is set to <code>true</code>, then
+ * all of the operations of this class are collective operations
+ * that have to be performed on all MPI ranks. It is impossible to query a
+ * timer object on only some of the MPI ranks. This in particular means that
+ * you should not query information from this class in destructors of other
+ * objects, because destructors may be triggered during exception handling.
+ * If only some of the MPI ranks threw an exception the communication will
+ * cause a deadlock and your program will hang without output. The only two safe
+ * operations you can do with this class in a destructor are to
+ * destroy the object or to call stop().
+ *
  * @ingroup utilities
  */
 class Timer
@@ -342,19 +354,47 @@ private:
   using cpu_clock_type = CPUClock;
 
   /**
-   * Collection of wall time measurements.
+   * Collection of wall time measurements. Marked as mutable
+   * for the reasons outlined in the documentation of Timer::is_synchronized.
    */
-  ClockMeasurements<wall_clock_type> wall_times;
+  mutable ClockMeasurements<wall_clock_type> wall_times;
 
   /**
-   * Collection of CPU time measurements.
+   * Collection of CPU time measurements. Marked as mutable
+   * for the reasons outlined in the documentation of Timer::is_synchronized.
    */
-  ClockMeasurements<cpu_clock_type> cpu_times;
+  mutable ClockMeasurements<cpu_clock_type> cpu_times;
 
   /**
    * Whether or not the timer is presently running.
    */
   bool running;
+
+  /**
+   * After a lap has been stopped it is necessary to
+   * update the accumulated wall time and CPU time
+   * with the results of the last lap. However, if sync_lap_times
+   * is set to <code>true</code> this requires MPI communication
+   * in parallel models before the update. We delay this communication
+   * and the update until the results are needed instead of immediately
+   * updating after calling stop(). This is useful because it avoids
+   * MPI communication if the timer is stopped because of
+   * stack unwinding during exception handling.
+   * In serial models this function simply updates the accumulated
+   * wall time and CPU time with the last lap time.
+   */
+  void
+  synchronize_and_update() const;
+
+  /**
+   * Store whether the timer results are currently synchronized
+   * across MPI processes. Marked as mutable, as synchronization
+   * is delayed until the results are needed for the reasons
+   * discussed in the documentation of synchronize_and_update().
+   * This means output functions marked as const like cpu_time()
+   * will still update this variable if necessary.
+   */
+  mutable bool is_synchronized;
 
   /**
    * The communicator over which various time values are synchronized and
@@ -364,25 +404,28 @@ private:
   MPI_Comm mpi_communicator;
 
   /**
-   * Store whether or not the wall time and CPU time are synchronized across
-   * the communicator in Timer::start() and Timer::stop().
+   * Store whether or not the wall time and CPU time will be synchronized across
+   * the communicator in synchronize_and_update().
    */
   bool sync_lap_times;
 
   /**
    * A structure for parallel wall time measurement that includes the minimum,
    * maximum, and average over all processors known to the MPI communicator of
-   * the last lap time.
+   * the last lap time. Marked as mutable for the reasons outlined in the
+   * documentation of Timer::is_synchronized.
    */
-  Utilities::MPI::MinMaxAvg last_lap_wall_time_data;
+  mutable Utilities::MPI::MinMaxAvg last_lap_wall_time_data;
 
   /**
    * A structure for parallel wall time measurement that includes the minimum
    * time recorded among all processes, the maximum time as well as the
    * average time defined as the sum of all individual times divided by the
    * number of MPI processes in the MPI_Comm for the total run time.
+   * Marked as mutable for the reasons outlined in the
+   * documentation of Timer::is_synchronized.
    */
-  Utilities::MPI::MinMaxAvg accumulated_wall_time_data;
+  mutable Utilities::MPI::MinMaxAvg accumulated_wall_time_data;
 
   /**
    * The number of laps that have been timed. If
@@ -400,7 +443,7 @@ private:
    * is not already running before starting it, and stopping the timer
    * before any other thread can use it.
    */
-  Threads::Mutex mutex;
+  mutable Threads::Mutex mutex;
 };
 
 
@@ -952,6 +995,9 @@ Timer::restart()
 inline const Utilities::MPI::MinMaxAvg &
 Timer::get_last_lap_wall_time_data() const
 {
+  if (running == false)
+    synchronize_and_update();
+
   return last_lap_wall_time_data;
 }
 
@@ -960,6 +1006,9 @@ Timer::get_last_lap_wall_time_data() const
 inline const Utilities::MPI::MinMaxAvg &
 Timer::get_accumulated_wall_time_data() const
 {
+  if (running == false)
+    synchronize_and_update();
+
   return accumulated_wall_time_data;
 }
 
