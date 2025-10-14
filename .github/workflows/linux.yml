@@ -51,7 +51,7 @@ jobs:
         ubuntu_version: [jammy, noble]
 
     container:
-      image: dealii/dependencies:${{ matrix.ubuntu_version }}
+      image: dealii/dependencies:${{ matrix.ubuntu_version }}-v9.6.0
       options: --user root
 
     steps:
@@ -119,7 +119,7 @@ jobs:
             flags: -mno-outline-atomics
 
     container:
-      image: dealii/dependencies:${{ matrix.ubuntu_version }}
+      image: dealii/dependencies:${{ matrix.ubuntu_version }}-v9.6.0
       options: --user root --env OMPI_ALLOW_RUN_AS_ROOT=1 --env OMPI_ALLOW_RUN_AS_ROOT_CONFIRM=1
 
     steps:
@@ -187,7 +187,7 @@ jobs:
         ubuntu_version: [jammy, noble]
 
     container:
-      image: dealii/dependencies:${{ matrix.ubuntu_version }}
+      image: dealii/dependencies:${{ matrix.ubuntu_version }}-v9.6.0
       options: --user root --env OMPI_ALLOW_RUN_AS_ROOT=1 --env OMPI_ALLOW_RUN_AS_ROOT_CONFIRM=1
 
     steps:
