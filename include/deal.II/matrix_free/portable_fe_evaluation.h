@@ -124,13 +124,13 @@ namespace Portable
      * Constructor. You will need to provide a pointer to the
      * Portable::MatrixFree::Data object, which is typically provided to the
      * functor inside the
-     * Portable::MatrixFree::cell_loop() and the index @p dof_index of the DoFHandler
-     * if more than one was provided when the Portable::MatrixFree object was
-     * initialized.
+     * Portable::MatrixFree::cell_loop() and the index @p dof_handler_index
+     * of the DoFHandler if more than one was provided when the
+     * Portable::MatrixFree object was initialized.
      */
     DEAL_II_HOST_DEVICE
     explicit FEEvaluation(const data_type   *data,
-                          const unsigned int dof_index = 0);
+                          const unsigned int dof_handler_index = 0);
 
     /**
      * Return the index of the current cell.
@@ -277,13 +277,13 @@ namespace Portable
             typename Number>
   DEAL_II_HOST_DEVICE
   FEEvaluation<dim, fe_degree, n_q_points_1d, n_components_, Number>::
-    FEEvaluation(const data_type *data, const unsigned int dof_index)
+    FEEvaluation(const data_type *data, const unsigned int dof_handler_index)
     : data(data)
     , precomputed_data(data->precomputed_data)
     , shared_data(data->shared_data)
     , cell_id(data->team_member.league_rank())
   {
-    AssertIndexRange(dof_index, data->n_dofhandler);
+    AssertIndexRange(dof_handler_index, data->n_dofhandler);
   }
 
 
