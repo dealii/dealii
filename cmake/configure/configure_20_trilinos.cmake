@@ -448,11 +448,11 @@ macro(feature_trilinos_find_external var)
           using LO = int;
           using GO = ${_global_index_type};
           using NO = ${_node_type};
+          using PL = Teuchos::ParameterList;
         
           Teuchos::RCP<const Teuchos::Comm<int>> comm =
             Teuchos::rcp(new Teuchos::SerialComm<int>());
-          Teuchos::RCP<Teuchos::ParameterList> parameters =
-            Teuchos::rcp(new Teuchos::ParameterList());
+          Teuchos::RCP<PL> parameters = Teuchos::rcp(new PL());
         
           Teuchos::RCP<Xpetra::Matrix<SC, LO, GO, NO>> dummy_matrix;
           { // The Matrix must not be empty
