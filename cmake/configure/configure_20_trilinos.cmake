@@ -405,7 +405,7 @@ macro(feature_trilinos_find_external var)
       list(APPEND CMAKE_REQUIRED_INCLUDES ${Trilinos_INCLUDE_DIRS})
       list(APPEND CMAKE_REQUIRED_INCLUDES ${MPI_CXX_INCLUDE_PATH})
 
-      list(APPEND CMAKE_REQUIRED_LIBRARIES ${DEAL_II_LIBRARIES} ${Trilinos_LIBRARIES} ${MPI_LIBRARIES})
+      list(APPEND CMAKE_REQUIRED_LIBRARIES ${Trilinos_LIBRARIES} ${MPI_LIBRARIES})
       list(APPEND CMAKE_REQUIRED_FLAGS ${TRILINOS_CXX_FLAGS})
 
       # For the case of Trilinos being compiled with openmp support the
@@ -419,68 +419,19 @@ macro(feature_trilinos_find_external var)
         set(_global_index_type "int")
       endif()
 
-      if(TRILINOS_VERSION VERSION_GREATER 14.2)
-        set(_node_type "Tpetra::KokkosClassic::DefaultNode::DefaultNodeType")
-      else()
-        set(_node_type "KokkosClassic::DefaultNode::DefaultNodeType")
-      endif()
-
       CHECK_CXX_SOURCE_COMPILES(
         "
         #include <Teuchos_RCP.hpp>
         #include <Xpetra_DefaultPlatform.hpp>
         #include <Xpetra_MapFactory_decl.hpp>
-        #include <Xpetra_CrsMatrixWrap.hpp>
-        
-        #include <Galeri_XpetraMaps.hpp>
-        #include <Galeri_XpetraProblemFactory.hpp>
         
         #include <FROSch_Tools_decl.hpp>
         #include <FROSch_Tools_def.hpp>
-        #include <FROSch_OneLevelPreconditioner_def.hpp>
         
-        int
-        main(int argc, char *argv[])
+        int main()
         {
-          Teuchos::GlobalMPISession mpiSession(&argc, &argv, NULL);
-        
-          using SC = double;
-          using LO = int;
-          using GO = ${_global_index_type};
-          using NO = ${_node_type};
-          using PL = Teuchos::ParameterList;
-        
-          Teuchos::RCP<const Teuchos::Comm<int>> comm =
-            Teuchos::rcp(new Teuchos::SerialComm<int>());
-          Teuchos::RCP<PL> parameters = Teuchos::rcp(new PL());
-        
-          Teuchos::RCP<Xpetra::Matrix<SC, LO, GO, NO>> dummy_matrix;
-          { // The Matrix must not be empty
-            Teuchos::ParameterList GaleriList;
-            GaleriList.set(\"nx\", 10);
-            GaleriList.set(\"ny\", 10);
-            GaleriList.set(\"nz\", 10);
-            GaleriList.set(\"mx\", 1);
-            GaleriList.set(\"my\", 1);
-            GaleriList.set(\"mz\", 1);
-            auto nodeMap = Galeri::Xpetra::CreateMap<LO, GO, NO>(Xpetra::UseTpetra,
-                                                                 \"Cartesian2D\",
-                                                                 comm,
-                                                                 GaleriList);
-            auto problem =
-              Galeri::Xpetra::BuildProblem<SC,
-                                           LO,
-                                           GO,
-                                           Xpetra::Map<LO, GO, NO>,
-                                           Xpetra::CrsMatrixWrap<SC, LO, GO, NO>,
-                                           Xpetra::MultiVector<SC, LO, GO, NO>>(
-                \"Laplace2D\", nodeMap, GaleriList);
-            dummy_matrix = problem->BuildMatrix();
-          }
-        
-          Teuchos::rcp(
-            new FROSch::OneLevelPreconditioner<SC, LO, GO, NO>(dummy_matrix.getConst(),
-                                                               parameters));
+          FROSch::OverlappingData<int, ${_global_index_type}> overlapping_data(0,1,1);
+          (void)overlapping_data;
         
           return 0;
         }
