@@ -15,6 +15,9 @@
 #
 # Configuration for the PSBLAS library:
 #
+
+set(FEATURE_PSBLAS_DEPENDS MPI)
+
 macro(feature_psblas_find_external var)
     find_package(DEAL_II_PSBLAS)
 
