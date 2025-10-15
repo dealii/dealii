@@ -686,7 +686,8 @@ namespace Utilities
                      argv,
                      InitializeLibrary::MPI | InitializeLibrary::Kokkos |
                        InitializeLibrary::SLEPc | InitializeLibrary::PETSc |
-                       InitializeLibrary::Zoltan | InitializeLibrary::P4EST,
+                       InitializeLibrary::Zoltan | InitializeLibrary::P4EST |
+                       InitializeLibrary::PSBLAS,
                      max_num_threads)
     {}
 
