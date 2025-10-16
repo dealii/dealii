@@ -176,6 +176,12 @@ if(DEAL_II_WITH_SCALAPACK)
   )
 endif()
 
+if(DEAL_II_WITH_PSBLAS)
+  set(_unity_include_src
+    ${_unity_include_src}
+    psblas_vector.cc
+  )
+endif()
 
 # determined by profiling
 set(_n_includes_per_unity_file 20)
