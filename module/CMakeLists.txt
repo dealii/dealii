@@ -169,6 +169,7 @@ if(DEAL_II_WITH_CXX20_MODULE)
     "${CMAKE_CURRENT_SOURCE_DIR}/interface_module_partitions/taskflow.ccm"
     "${CMAKE_CURRENT_SOURCE_DIR}/interface_module_partitions/tbb.ccm"
     "${CMAKE_CURRENT_SOURCE_DIR}/interface_module_partitions/trilinos.ccm"
+    "${CMAKE_CURRENT_SOURCE_DIR}/interface_module_partitions/psblas.ccm"
     "${CMAKE_CURRENT_SOURCE_DIR}/interface_module_partitions/umfpack.ccm"
     "${CMAKE_CURRENT_SOURCE_DIR}/interface_module_partitions/vtk.ccm"
     "${CMAKE_CURRENT_SOURCE_DIR}/interface_module_partitions/zlib.ccm"
