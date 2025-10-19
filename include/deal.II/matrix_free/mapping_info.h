@@ -259,8 +259,9 @@ namespace internal
       initialize_faces_by_cells(
         const dealii::Triangulation<dim>                         &tria,
         const std::vector<std::pair<unsigned int, unsigned int>> &cells,
-        const FaceInfo<VectorizedArrayType::size()>              &face_info,
-        const dealii::hp::MappingCollection<dim>                 &mapping);
+        const std::vector<unsigned int>             &active_fe_index,
+        const FaceInfo<VectorizedArrayType::size()> &face_info,
+        const dealii::hp::MappingCollection<dim>    &mapping);
     };
 
 
