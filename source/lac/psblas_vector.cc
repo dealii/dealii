@@ -25,7 +25,7 @@
 
 DEAL_II_NAMESPACE_OPEN
 
-namespace PSCToolkit
+namespace PSCToolkitWrappers
 {
 
   Vector::Vector()
@@ -110,25 +110,25 @@ namespace PSCToolkit
         const std::vector<types::global_dof_index> &indexes =
           local_partitioning.get_index_vector();
 
-        psb_i_t number_of_local_indexes =
+        const auto number_of_local_indexes =
           indexes.size(); // Number of local indexes
-        // Copy the indexes into a psb_l_t array called vl
-        psb_l_t *vl =
-          (psb_l_t *)malloc(number_of_local_indexes * sizeof(psb_l_t));
-        for (psb_i_t i = 0; i < number_of_local_indexes; ++i)
+
+        std::vector<psb_l_t> vl(number_of_local_indexes);
+        for (std::size_t i = 0; i < number_of_local_indexes; ++i)
           {
-            vl[i] = static_cast<psb_l_t>(indexes[i]);
+            const auto psblas_index = static_cast<psb_l_t>(indexes[i]);
+            AssertIntegerConversion(psblas_index, indexes[i]);
+            vl[i] = psblas_index;
           }
 
         // Insert the indexes into the descriptor
         psblas_context = InitFinalize::get_psblas_context();
         ierr           = psb_c_cdall_vl(number_of_local_indexes,
-                              vl,
+                              vl.data(),
                               *psblas_context,
                               psblas_descriptor.get());
 
         // Free the vl array
-        free(vl);
         Assert(ierr == 0, ExcInitializePSBLASDescriptor(ierr));
       }
 
@@ -175,19 +175,19 @@ namespace PSCToolkit
         const std::vector<types::global_dof_index> &indexes =
           local_partitioning.get_index_vector();
 
-        psb_i_t number_of_local_indexes =
+        const auto number_of_local_indexes =
           indexes.size(); // Number of local indexes
-        // Copy the indexes into a psb_l_t array called vl
-        psb_l_t *vl =
-          (psb_l_t *)malloc(number_of_local_indexes * sizeof(psb_l_t));
-        psb_i_t *lidx =
-          (psb_i_t *)malloc(number_of_local_indexes * sizeof(psb_i_t));
 
-
-        for (psb_i_t i = 0; i < number_of_local_indexes; ++i)
+        std::vector<psb_l_t> vl(number_of_local_indexes);
+        std::vector<psb_i_t> lidx(number_of_local_indexes);
+        for (std::size_t i = 0; i < number_of_local_indexes; ++i)
           {
-            vl[i]   = static_cast<psb_l_t>(indexes[i]);
-            lidx[i] = i;
+            const auto psblas_index = static_cast<psb_l_t>(indexes[i]);
+            const auto idx          = static_cast<psb_i_t>(i);
+            AssertIntegerConversion(psblas_index, indexes[i]);
+            AssertIntegerConversion(idx, i);
+            vl[i]   = psblas_index;
+            lidx[i] = idx;
           }
 
         // Ghost case. From the manual:
@@ -199,14 +199,11 @@ namespace PSCToolkit
         // Insert the indexes into the descriptor
         psblas_context = InitFinalize::get_psblas_context();
         ierr           = psb_c_cdall_vl_lidx(number_of_local_indexes,
-                                   vl,
-                                   lidx,
+                                   vl.data(),
+                                   lidx.data(),
                                    *psblas_context,
                                    psblas_descriptor.get());
 
-        // Free vl array
-        free(vl);
-        free(lidx);
         Assert(ierr == 0, ExcInitializePSBLASDescriptor(ierr));
 
         // ... insert the ghost indices ...
@@ -214,24 +211,25 @@ namespace PSCToolkit
           ghost_indices.get_index_vector();
         const auto number_of_ghost_indices = ghost_indexes.size();
 
-        psb_l_t *global_ghost_indices =
-          (psb_l_t *)malloc(number_of_ghost_indices * sizeof(psb_l_t));
-        psb_i_t *local_ghost_indices =
-          (psb_i_t *)malloc(number_of_ghost_indices * sizeof(psb_i_t));
+        std::vector<psb_l_t> global_ghost_indices(number_of_ghost_indices);
+        std::vector<psb_i_t> local_ghost_indices(number_of_ghost_indices);
 
         psb_i_t extended_idx_counter = number_of_local_indexes;
         for (std::size_t i = 0; i < number_of_ghost_indices; ++i)
           {
-            global_ghost_indices[i] = static_cast<psb_l_t>(ghost_indexes[i]);
-            local_ghost_indices[i]  = extended_idx_counter++;
+            const auto psblas_index = static_cast<psb_l_t>(ghost_indexes[i]);
+            AssertIntegerConversion(psblas_index, ghost_indexes[i]);
+            global_ghost_indices[i] = psblas_index;
+            const auto idx = static_cast<psb_i_t>(extended_idx_counter);
+            AssertIntegerConversion(idx, extended_idx_counter);
+            local_ghost_indices[i] = extended_idx_counter++;
           }
 
+
         ierr = psb_c_cdins_lidx(number_of_ghost_indices,
-                                global_ghost_indices,
-                                local_ghost_indices,
+                                global_ghost_indices.data(),
+                                local_ghost_indices.data(),
                                 psblas_descriptor.get());
-        free(global_ghost_indices);
-        free(local_ghost_indices);
 
         Assert(ierr == 0, ExcCallingPSBLASFunction(ierr, "psb_c_cdins_lidx"));
       }
@@ -425,22 +423,13 @@ namespace PSCToolkit
     Assert(start_ptr != nullptr,
            ExcMessage("Error getting underlying PSBLAS vector."));
 
-    const value_type *ptr = start_ptr, *eptr = start_ptr + locally_owned_size();
-    bool              flag = true;
-    while (ptr != eptr)
-      {
-        if (*ptr != value_type())
-          {
-            flag = false;
-            break;
-          }
-        ++ptr;
-      }
+    const bool has_nonzero_local =
+      std::any_of(start_ptr,
+                  start_ptr + locally_owned_size(),
+                  [](const value_type &val) { return val != value_type(); });
 
-    unsigned int has_nonzero = flag ? 0 : 1;
-
-    // check that the vector is zero on all processors
-    unsigned int num_nonzero = Utilities::MPI::sum(has_nonzero, communicator);
+    unsigned int num_nonzero =
+      Utilities::MPI::sum(has_nonzero_local ? 1 : 0, communicator);
     return num_nonzero == 0;
   }
 
@@ -522,21 +511,24 @@ namespace PSCToolkit
 
     // Allocate memory for row indices and values. We need to subtract the
     // current value in order to set the value.
-    psb_l_t *irw = (psb_l_t *)malloc(nz * sizeof(psb_l_t));
-    psb_d_t *val = (psb_d_t *)malloc(nz * sizeof(psb_d_t));
+    std::vector<psb_l_t> irw(nz);
+    std::vector<psb_d_t> val(nz);
     for (psb_i_t i = 0; i < nz; ++i)
       {
-        irw[i] = static_cast<psb_l_t>(indices[i]);
+        const auto psblas_index = static_cast<psb_l_t>(indices[i]);
+        AssertIntegerConversion(psblas_index, indices[i]);
+        irw[i] = psblas_index;
         val[i] = values[i] -
                  psb_c_dgetelem(psblas_vector, irw[i], psblas_descriptor.get());
       }
 
-    int ierr =
-      psb_c_dgeins(nz /*nz*/, irw, val, psblas_vector, psblas_descriptor.get());
+    int ierr = psb_c_dgeins(nz /*nz*/,
+                            irw.data(),
+                            val.data(),
+                            psblas_vector,
+                            psblas_descriptor.get());
 
     // Free allocated memory
-    free(irw);
-    free(val);
     Assert(ierr == 0, ExcInsertionInPSBLASVector(ierr));
   }
 
@@ -554,19 +546,22 @@ namespace PSCToolkit
     psb_i_t nz = indices.size(); // Number of non-zero entries
 
     // Allocate memory for row indices and values
-    psb_l_t *irw = (psb_l_t *)malloc(nz * sizeof(psb_l_t));
-    psb_d_t *val = (psb_d_t *)malloc(nz * sizeof(psb_d_t));
+    std::vector<psb_l_t> irw(nz);
+    std::vector<psb_d_t> val(nz);
     for (psb_i_t i = 0; i < nz; ++i)
       {
-        irw[i] = static_cast<psb_l_t>(indices[i]);
+        const auto psblas_index = static_cast<psb_l_t>(indices[i]);
+        AssertIntegerConversion(psblas_index, indices[i]);
+        irw[i] = psblas_index;
         val[i] = values[i];
       }
 
-    int ierr =
-      psb_c_dgeins(nz /*nz*/, irw, val, psblas_vector, psblas_descriptor.get());
-    // Free allocated memory
-    free(irw);
-    free(val);
+    int ierr = psb_c_dgeins(nz /*nz*/,
+                            irw.data(),
+                            val.data(),
+                            psblas_vector,
+                            psblas_descriptor.get());
+
     Assert(ierr == 0, ExcInsertionInPSBLASVector(ierr));
   }
 
@@ -734,7 +729,7 @@ namespace PSCToolkit
   }
 
 
-} // namespace PSCToolkit
+} // namespace PSCToolkitWrappers
 
 DEAL_II_NAMESPACE_CLOSE
 #endif

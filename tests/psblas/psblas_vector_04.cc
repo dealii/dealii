@@ -58,13 +58,13 @@ main(int argc, char **argv)
   else if (id == 1)
     locally_relevant_dofs.add_range(12, 15);
 
-  PSCToolkit::Vector x(locally_owned_dofs, mpi_communicator);
+  PSCToolkitWrappers::Vector x(locally_owned_dofs, mpi_communicator);
 
   for (const types::global_dof_index idx : locally_owned_dofs)
     x(idx) += idx;
   x.compress(VectorOperation::add);
 
-  PSCToolkit::Vector y;
+  PSCToolkitWrappers::Vector y;
   y.reinit(locally_owned_dofs, mpi_communicator);
   for (const types::global_dof_index idx : locally_owned_dofs)
     y(idx) += idx + 0.5;
@@ -105,7 +105,7 @@ main(int argc, char **argv)
     }
 
   // Test add_and_dot()
-  PSCToolkit::Vector w;
+  PSCToolkitWrappers::Vector w;
   x.reinit(locally_owned_dofs, mpi_communicator);
   y.reinit(locally_owned_dofs, mpi_communicator);
   w.reinit(locally_owned_dofs, mpi_communicator);
@@ -124,7 +124,7 @@ main(int argc, char **argv)
          ExcMessage("Test for add_and_dot() failed."));
 
   //  Test equ(), while there we also use operator[]
-  PSCToolkit::Vector v;
+  PSCToolkitWrappers::Vector v;
   v.reinit(locally_owned_dofs, mpi_communicator);
   v.equ(1.0, x);
   for (const types::global_dof_index idx : locally_owned_dofs)
@@ -133,7 +133,7 @@ main(int argc, char **argv)
   deallog << "Ok" << std::endl;
 
   // Test reinit(const Vector &v, const bool omit_zeroing_entries=false)
-  PSCToolkit::Vector z;
+  PSCToolkitWrappers::Vector z;
   z.reinit(x, true);
   for (const types::global_dof_index idx : locally_owned_dofs)
     AssertThrow(z[idx] == 0.0, ExcMessage("Entry not zero."));
@@ -147,7 +147,7 @@ main(int argc, char **argv)
     AssertThrow(z[idx] == 2.0, ExcMessage("Entry not correct after add()."));
 
   // Test scale(V)
-  PSCToolkit::Vector scale_vector;
+  PSCToolkitWrappers::Vector scale_vector;
   scale_vector.reinit(locally_owned_dofs, mpi_communicator);
   scale_vector = 2.0;
   z.scale(scale_vector);

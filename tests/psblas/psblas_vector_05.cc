@@ -78,7 +78,8 @@ main(int argc, char **argv)
 
   AffineConstraints<double> constraints;
 
-  PSCToolkit::Vector psblas_rhs_vector(locally_owned_dofs, mpi_communicator);
+  PSCToolkitWrappers::Vector psblas_rhs_vector(locally_owned_dofs,
+                                               mpi_communicator);
   PETScWrappers::MPI::Vector petsc_test_vector;
   petsc_test_vector.reinit(locally_owned_dofs, mpi_communicator);
 

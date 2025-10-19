@@ -57,13 +57,14 @@ main(int argc, char **argv)
   else if (id == 1)
     locally_relevant_dofs.add_range(12, 15);
 
-  PSCToolkit::Vector psblas_vector(locally_owned_dofs, mpi_communicator);
+  PSCToolkitWrappers::Vector psblas_vector(locally_owned_dofs,
+                                           mpi_communicator);
 
   for (const types::global_dof_index idx : locally_owned_dofs)
     psblas_vector(idx) += idx;
   psblas_vector.compress(VectorOperation::add);
 
-  PSCToolkit::Vector test_ghosted;
+  PSCToolkitWrappers::Vector test_ghosted;
   test_ghosted.reinit(locally_owned_dofs,
                       locally_relevant_dofs,
                       mpi_communicator);

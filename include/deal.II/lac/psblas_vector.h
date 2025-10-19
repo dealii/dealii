@@ -37,7 +37,7 @@
 
 DEAL_II_NAMESPACE_OPEN
 
-namespace PSCToolkit
+namespace PSCToolkitWrappers
 {
 
   namespace internal
@@ -921,32 +921,32 @@ namespace PSCToolkit
   /* ----------------------------- Inline functions ---------------- */
 
 
-  inline PSCToolkit::Vector::value_type *
-  PSCToolkit::Vector::begin()
+  inline PSCToolkitWrappers::Vector::value_type *
+  PSCToolkitWrappers::Vector::begin()
   {
     return psb_c_dvect_f_get_pnt(psblas_vector);
   }
 
 
 
-  inline const PSCToolkit::Vector::value_type *
-  PSCToolkit::Vector::begin() const
+  inline const PSCToolkitWrappers::Vector::value_type *
+  PSCToolkitWrappers::Vector::begin() const
   {
     return psb_c_dvect_f_get_pnt(psblas_vector);
   }
 
 
 
-  inline PSCToolkit::Vector::value_type *
-  PSCToolkit::Vector::end()
+  inline PSCToolkitWrappers::Vector::value_type *
+  PSCToolkitWrappers::Vector::end()
   {
     return psb_c_dvect_f_get_pnt(psblas_vector) + locally_owned_size();
   }
 
 
 
-  inline const PSCToolkit::Vector::value_type *
-  PSCToolkit::Vector::end() const
+  inline const PSCToolkitWrappers::Vector::value_type *
+  PSCToolkitWrappers::Vector::end() const
   {
     return psb_c_dvect_f_get_pnt(psblas_vector) + locally_owned_size();
   }
@@ -1098,13 +1098,13 @@ namespace PSCToolkit
   }
 
 
-} // namespace PSCToolkit
+} // namespace PSCToolkitWrappers
 
 /**
- * Declare PSCToolkit::Vector as distributed vector.
+ * Declare PSCToolkitWrappers::Vector as distributed vector.
  */
 template <>
-struct is_serial_vector<PSCToolkit::Vector> : std::false_type
+struct is_serial_vector<PSCToolkitWrappers::Vector> : std::false_type
 {};
 DEAL_II_NAMESPACE_CLOSE
 
