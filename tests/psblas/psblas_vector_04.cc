@@ -29,8 +29,8 @@
 
 using namespace dealii;
 
-// Test for swap(), add(), sadd(), and add_and_dot(), and equ() for PSBLAS
-// vectors
+// Test for swap(), add(), sadd(), and add_and_dot(), equ(), and so on for
+// PSBLAS vectors
 
 int
 main(int argc, char **argv)
@@ -140,6 +140,28 @@ main(int argc, char **argv)
 
   // Test all_zeros()
   AssertThrow(z.all_zero(), ExcMessage("Vector must be all zeros."));
+
+  // Test add(scalar)
+  z.add(2.0);
+  for (const types::global_dof_index idx : locally_owned_dofs)
+    AssertThrow(z[idx] == 2.0, ExcMessage("Entry not correct after add()."));
+
+  // Test scale(V)
+  PSCToolkit::Vector scale_vector;
+  scale_vector.reinit(locally_owned_dofs, mpi_communicator);
+  scale_vector = 2.0;
+  z.scale(scale_vector);
+  for (const types::global_dof_index idx : locally_owned_dofs)
+    AssertThrow(z[idx] == 4.0, ExcMessage("Entry not correct after scale()."));
+
+  // Test mean_value()
+  AssertThrow(z.mean_value() == 4.0, ExcMessage("Mean value not correct."));
+
+  // Test add(V)
+  z = 0.;
+  z += v;
+  for (const types::global_dof_index idx : locally_owned_dofs)
+    AssertThrow(z[idx] == v[idx], ExcMessage("Add vector failed."));
 
   return 0;
 }

@@ -95,15 +95,15 @@ namespace PSCToolkit
   {
     Assert(communicator != MPI_COMM_NULL,
            ExcMessage("MPI_COMM_NULL passed to Vector::reinit()."));
-    communicator   = comm;
-    ghosted        = false;
-    owned_elements = local_partitioning;
+    communicator                 = comm;
+    ghosted                      = false;
+    const bool is_vector_changed = size() != local_partitioning.size();
+    owned_elements               = local_partitioning;
 
     int err;
-
     // we do not need to create a new descriptor if the existing one has already
     // been assembled
-    if (psblas_descriptor.get() == nullptr)
+    if (psblas_descriptor.get() == nullptr || is_vector_changed == true)
       {
         psblas_descriptor = std::shared_ptr<psb_c_descriptor>(
           psb_c_new_descriptor(), internal::PSBLASDescriptorDeleter{});
@@ -146,7 +146,7 @@ namespace PSCToolkit
         Assert(err == 0,
                internal::ExcCallingPSBLASFunction(err, "psb_c_dvect_set_scal"));
       }
-    state       = internal::State::Build;
+    state       = internal::State::Assembled;
     last_action = VectorOperation::unknown;
   }
 
@@ -159,15 +159,16 @@ namespace PSCToolkit
   {
     Assert(comm != MPI_COMM_NULL,
            ExcMessage("MPI_COMM_NULL passed to Vector::reinit()."));
-    communicator   = comm;
-    ghosted        = true;
-    owned_elements = local_partitioning;
+    communicator                 = comm;
+    ghosted                      = true;
+    const bool is_vector_changed = size() != local_partitioning.size();
 
-    ghost_indices = ghosts;
+    owned_elements = local_partitioning;
+    ghost_indices  = ghosts;
     ghost_indices.subtract_set(local_partitioning);
 
     int err;
-    if (psblas_descriptor.get() == nullptr)
+    if (psblas_descriptor.get() == nullptr || is_vector_changed == true)
       {
         psblas_descriptor = std::shared_ptr<psb_c_descriptor>(
           psb_c_new_descriptor(), internal::PSBLASDescriptorDeleter{});
@@ -245,7 +246,7 @@ namespace PSCToolkit
     err = psb_c_cdasb(psblas_descriptor.get());
 
     Assert(err == 0, internal::ExcInitializePSBLASVector(err));
-    state       = internal::State::Build;
+    state       = internal::State::Assembled;
     last_action = VectorOperation::unknown;
   }
 
@@ -405,6 +406,21 @@ namespace PSCToolkit
 
 
 
+  Vector::value_type
+  Vector::mean_value() const
+  {
+    const value_type *start_ptr = psb_c_dvect_f_get_pnt(psblas_vector);
+    const value_type *end_ptr   = start_ptr + locally_owned_size();
+
+    value_type local_sum_of_values = 0.0;
+    for (const value_type *ptr = start_ptr; ptr != end_ptr; ++ptr)
+      local_sum_of_values += *ptr;
+
+    return Utilities::MPI::sum(local_sum_of_values, communicator) / size();
+  }
+
+
+
   bool
   Vector::all_zero() const
   {
@@ -467,6 +483,21 @@ namespace PSCToolkit
                         psblas_descriptor.get());
   }
 
+
+
+  Vector &
+  Vector::operator+=(const Vector &v)
+  {
+    AssertDimension(size(), v.size());
+    Assert(!has_ghost_elements(), ExcGhostsPresent());
+    int err = psb_c_dgeaxpby(value_type(1.0),
+                             v.psblas_vector,
+                             1.0,
+                             psblas_vector,
+                             psblas_descriptor.get());
+    AssertThrow(err == 0, internal::ExcAXPBY(err));
+    return *this;
+  }
 
 
   Vector &
@@ -562,6 +593,22 @@ namespace PSCToolkit
 
 
   void
+  Vector::add(const value_type s)
+  {
+    AssertIsFinite(s);
+    Assert(!has_ghost_elements(), ExcGhostsPresent());
+    value_type *start_ptr = psb_c_dvect_f_get_pnt(psblas_vector);
+    value_type *end_ptr   = start_ptr + locally_owned_size();
+    while (start_ptr != end_ptr)
+      {
+        *start_ptr += s;
+        ++start_ptr;
+      }
+  }
+
+
+
+  void
   Vector::sadd(const value_type s, const Vector &V)
   {
     Assert(!has_ghost_elements(), ExcGhostsPresent());
@@ -583,6 +630,23 @@ namespace PSCToolkit
     int err = psb_c_dgeaxpby(
       a, V.psblas_vector, s, psblas_vector, psblas_descriptor.get());
     Assert(err == 0, internal::ExcAXPBY(err));
+  }
+
+
+  void
+  Vector::scale(const Vector &v)
+  {
+    Assert(!has_ghost_elements(), ExcGhostsPresent());
+    AssertDimension(size(), v.size());
+    value_type *start_ptr   = psb_c_dvect_f_get_pnt(psblas_vector);
+    value_type *start_ptr_v = psb_c_dvect_f_get_pnt(v.psblas_vector);
+    value_type *end_ptr     = start_ptr + locally_owned_size();
+    while (start_ptr != end_ptr)
+      {
+        *start_ptr *= (*start_ptr_v);
+        ++start_ptr;
+        ++start_ptr_v;
+      }
   }
 
 

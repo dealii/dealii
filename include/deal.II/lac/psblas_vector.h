@@ -21,8 +21,9 @@
 #include <deal.II/base/index_set.h>
 #include <deal.II/base/types.h>
 
-#include "deal.II/lac/vector_operation.h"
 #include <deal.II/lac/read_vector.h>
+#include <deal.II/lac/vector_operation.h>
+#include <deal.II/lac/vector_type_traits.h>
 
 #include <memory.h>
 
@@ -617,6 +618,20 @@ namespace PSCToolkit
     add(const value_type s, const Vector &V);
 
     /**
+     * Addition of <tt>s</tt> to all compoents.
+     */
+    void
+    add(const value_type s);
+
+    /**
+     * Scale each element of this vector by the corresponding element in the
+     * argument. This function is mostly meant to simulate multiplication (and
+     * immediate re-assignment) by a diagonal scaling matrix.
+     */
+    void
+    scale(const Vector &v);
+
+    /**
      * Performs a combined operation of a vector addition and a subsequent
      * inner product, returning the value of the inner product. In other
      * words, the result of this function is the same as if the user called
@@ -682,6 +697,12 @@ namespace PSCToolkit
      */
     Vector &
     operator-=(const Vector &v);
+
+    /**
+     * Add the given vector from the present one.
+     */
+    Vector &
+    operator+=(const Vector &v);
 
     /**
      * Set all components of the vector to the given number @p s. Simply pass
@@ -829,6 +850,12 @@ namespace PSCToolkit
     l2_norm() const;
 
     /**
+     * Compute the mean value of the vector.
+     */
+    Vector::value_type
+    mean_value() const;
+
+    /**
      * Return whether the vector contains only elements with value zero. This
      * is a @ref GlossCollectiveOperation "collective operation". This function is expensive, because
      * potentially all elements have to be checked.
@@ -881,7 +908,8 @@ namespace PSCToolkit
     bool ghosted;
 
     /**
-     * State of the vector (building or assembled).
+     * State of the descriptor associated with the vector. Its state can be
+     * either default, building or assembled).
      */
     internal::State state;
 
@@ -1077,7 +1105,16 @@ namespace PSCToolkit
 
 
 } // namespace PSCToolkit
+
+/**
+ * Declare PSCToolkit::Vector as distributed vector.
+ */
+template <>
+struct is_serial_vector<PSCToolkit::Vector> : std::false_type
+{};
 DEAL_II_NAMESPACE_CLOSE
+
+
 
 #endif // DEAL_II_WITH_PSBLAS
 #endif // dealii_psblas_vector_h
