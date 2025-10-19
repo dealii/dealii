@@ -56,6 +56,213 @@ namespace PSCToolkit
     };
 
     /**
+     * Enum to indicate the state of the vector (building or assembled).
+     * TODO[MF]: use the same also when I'll introduce the matrix class. Move to
+     * a common .h file?
+     */
+
+    enum State
+    {
+      /**
+       * State entered after the default constructor, before any allocation.
+       * In this state, no operations are possible.
+       */
+      Default,
+      /**
+       * State entered after the first allocation, and before the first
+       * assembly; in this state it is possible to add communication
+       * requirements among different processes.
+       */
+      Build,
+      /*
+       * State entered after the assembly; computations such as matrix-vector
+       * products, are only possible in this state.
+       */
+      Assembled
+    };
+
+  } // namespace internal
+
+  class Vector : public ReadVector<double>
+  {
+  private:
+    /**
+     * This class provides a wrappers for accessing psblas vector elements.
+     */
+    class VectorReference
+    {
+    private:
+      using size_type = types::global_dof_index;
+
+      using value_type = double;
+
+      /**
+       * Constructor.
+       */
+      VectorReference(Vector &vector, const size_type index)
+        : vector(vector)
+        , index(index)
+      {}
+
+    public:
+      /**
+       * Set the referenced element of the vector to <tt>s</tt>.
+       */
+      const VectorReference &
+      operator=(const value_type &s) const
+      {
+        Assert(!vector.has_ghost_elements(), ExcGhostsPresent());
+        Assert(
+          vector.owned_elements.is_element(index),
+          ExcMessage(
+            "You are trying to write to an element of the vector that is not "
+            "locally owned. This is not allowed for the current interface to"
+            " PSBLAS vectors."));
+
+        // Make sure the operation is consistent with the last one
+        Assert(vector.last_action == VectorOperation::insert ||
+                 vector.last_action == VectorOperation::unknown,
+               ExcWrongMode(VectorOperation::insert, vector.last_action));
+
+        std::vector<size_type>  idx{index};
+        std::vector<value_type> value{s};
+        vector.set(idx, value);
+        vector.last_action = VectorOperation::insert;
+        return *this;
+      }
+
+      /**
+       * Add <tt>s</tt> to the referenced element of the vector.
+       */
+      const VectorReference &
+      operator+=(const value_type &s) const
+      {
+        Assert(!vector.has_ghost_elements(), ExcGhostsPresent());
+        Assert(vector.last_action == VectorOperation::add ||
+                 vector.last_action == VectorOperation::unknown,
+               ExcWrongMode(VectorOperation::add, vector.last_action));
+
+        vector.last_action = VectorOperation::add;
+
+        // First check for early return
+        if (s == 0.)
+          return *this;
+
+        std::vector<size_type>  idx{index};
+        std::vector<value_type> value{s};
+        vector.add(idx, value);
+        return *this;
+      }
+
+      /**
+       * Subtract <tt>s</tt> to the referenced element of the vector.
+       */
+      const VectorReference &
+      operator-=(const value_type &s) const
+      {
+        Assert(!vector.has_ghost_elements(), ExcGhostsPresent());
+        Assert(vector.last_action == VectorOperation::add ||
+                 vector.last_action == VectorOperation::unknown,
+               ExcWrongMode(VectorOperation::add, vector.last_action));
+
+        vector.last_action = VectorOperation::add;
+
+        // First check for early return
+        if (s == 0.)
+          return *this;
+
+        std::vector<size_type>  idx{index};
+        std::vector<value_type> value{-s};
+        vector.add(idx, value);
+        return *this;
+      }
+
+      /**
+       * Multiply <tt>s</tt> to the referenced element of the vector.
+       */
+      const VectorReference &
+      operator*=(const value_type &s) const
+      {
+        Assert(!vector.has_ghost_elements(), ExcGhostsPresent());
+        Assert((vector.last_action == VectorOperation::insert) ||
+                 (vector.last_action == VectorOperation::unknown),
+               ExcWrongMode(VectorOperation::insert, vector.last_action));
+
+        vector.last_action = VectorOperation::insert;
+        if (s == 1.)
+          return *this;
+
+        std::vector<size_type>  idx{index};
+        value_type              new_value = static_cast<value_type>(*this) * s;
+        std::vector<value_type> value{new_value};
+        vector.set(idx, value);
+
+        return *this;
+      }
+
+      /**
+       * Divide <tt>s</tt> to the referenced element of the vector.
+       */
+      const VectorReference &
+      operator/=(const value_type &s) const
+      {
+        Assert(!vector.has_ghost_elements(), ExcGhostsPresent());
+
+        Assert((vector.last_action == VectorOperation::insert) ||
+                 (vector.last_action == VectorOperation::unknown),
+               ExcWrongMode(VectorOperation::insert, vector.last_action));
+        std::vector<size_type>  idx{index};
+        value_type              new_value = static_cast<value_type>(*this) / s;
+        std::vector<value_type> value{new_value};
+        vector.set(idx, value);
+        vector.last_action = VectorOperation::insert;
+        return *this;
+      }
+
+      /*
+       * Convert the reference to an actual value, i.e. return the value of
+       * the referenced element of the vector.
+       */
+      operator value_type() const
+      {
+        AssertIndexRange(index, vector.size());
+        if (vector.ghosted)
+          {
+            AssertThrow(vector.ghost_indices.is_element(index) ||
+                          vector.owned_elements.is_element(index),
+                        ExcMessage(
+                          "You are trying to access an element of a vector "
+                          "that is neither a locally owned element nor a "
+                          "ghost element of the vector."));
+          }
+        else
+          {
+            AssertThrow(
+              vector.owned_elements.is_element(index),
+              ExcAccessToNonlocalElement(index,
+                                         *vector.owned_elements.begin(),
+                                         (*vector.owned_elements.begin() +
+                                          vector.locally_owned_size())));
+          }
+        return psb_c_dgetelem(vector.psblas_vector,
+                              index,
+                              vector.psblas_descriptor.get());
+      };
+
+    private:
+      Vector &vector;
+
+      const size_type index;
+
+      friend class Vector;
+    };
+
+  public:
+    using size_type = dealii::types::global_dof_index;
+
+    using value_type = double;
+
+    /**
      * Exception
      */
     DeclException1(ExcInitializePSBLASVector,
@@ -193,219 +400,6 @@ namespace PSCToolkit
       << "'locally active' degrees of freedom that are not also "
       << "'locally owned'). You need to pass a vector that has these "
       << "elements as ghost entries.");
-
-
-    /**
-     * Enum to indicate the state of the vector (building or assembled).
-     * TODO[MF]: use the same also when I'll introduce the matrix class. Move to
-     * a common .h file?
-     */
-
-    enum State
-    {
-      /**
-       * State entered after the default constructor, before any allocation.
-       * In this state, no operations are possible.
-       */
-      Default,
-      /**
-       * State entered after the first allocation, and before the first
-       * assembly; in this state it is possible to add communication
-       * requirements among different processes.
-       */
-      Build,
-      /*
-       * State entered after the assembly; computations such as matrix-vector
-       * products, are only possible in this state.
-       */
-      Assembled
-    };
-
-  } // namespace internal
-
-  class Vector : public ReadVector<double>
-  {
-  private:
-    /**
-     * This class provides a wrappers for accessing psblas vector elements.
-     */
-    class VectorReference
-    {
-    private:
-      using size_type = types::global_dof_index;
-
-      using value_type = double;
-
-      /**
-       * Constructor.
-       */
-      VectorReference(Vector &vector, const size_type index)
-        : vector(vector)
-        , index(index)
-      {}
-
-    public:
-      /**
-       * Set the referenced element of the vector to <tt>s</tt>.
-       */
-      const VectorReference &
-      operator=(const value_type &s) const
-      {
-        Assert(!vector.has_ghost_elements(), ExcGhostsPresent());
-        Assert(
-          vector.owned_elements.is_element(index),
-          ExcMessage(
-            "You are trying to write to an element of the vector that is not "
-            "locally owned. This is not allowed for the current interface to"
-            " PSBLAS vectors."));
-
-        // Make sure the operation is consistent with the last one
-        Assert(vector.last_action == VectorOperation::insert ||
-                 vector.last_action == VectorOperation::unknown,
-               internal::ExcWrongMode(VectorOperation::insert,
-                                      vector.last_action));
-
-        std::vector<size_type>  idx{index};
-        std::vector<value_type> value{s};
-        vector.set(idx, value);
-        vector.last_action = VectorOperation::insert;
-        return *this;
-      }
-
-      /**
-       * Add <tt>s</tt> to the referenced element of the vector.
-       */
-      const VectorReference &
-      operator+=(const value_type &s) const
-      {
-        Assert(!vector.has_ghost_elements(), ExcGhostsPresent());
-        Assert(vector.last_action == VectorOperation::add ||
-                 vector.last_action == VectorOperation::unknown,
-               internal::ExcWrongMode(VectorOperation::add,
-                                      vector.last_action));
-
-        vector.last_action = VectorOperation::add;
-
-        // First check for early return
-        if (s == 0.)
-          return *this;
-
-        std::vector<size_type>  idx{index};
-        std::vector<value_type> value{s};
-        vector.add(idx, value);
-        return *this;
-      }
-
-      /**
-       * Subtract <tt>s</tt> to the referenced element of the vector.
-       */
-      const VectorReference &
-      operator-=(const value_type &s) const
-      {
-        Assert(!vector.has_ghost_elements(), ExcGhostsPresent());
-        Assert(vector.last_action == VectorOperation::add ||
-                 vector.last_action == VectorOperation::unknown,
-               internal::ExcWrongMode(VectorOperation::add,
-                                      vector.last_action));
-
-        vector.last_action = VectorOperation::add;
-
-        // First check for early return
-        if (s == 0.)
-          return *this;
-
-        std::vector<size_type>  idx{index};
-        std::vector<value_type> value{-s};
-        vector.add(idx, value);
-        return *this;
-      }
-
-      /**
-       * Multiply <tt>s</tt> to the referenced element of the vector.
-       */
-      const VectorReference &
-      operator*=(const value_type &s) const
-      {
-        Assert(!vector.has_ghost_elements(), ExcGhostsPresent());
-        Assert((vector.last_action == VectorOperation::insert) ||
-                 (vector.last_action == VectorOperation::unknown),
-               internal::ExcWrongMode(VectorOperation::insert,
-                                      vector.last_action));
-
-        vector.last_action = VectorOperation::insert;
-        if (s == 1.)
-          return *this;
-
-        std::vector<size_type>  idx{index};
-        value_type              new_value = static_cast<value_type>(*this) * s;
-        std::vector<value_type> value{new_value};
-        vector.set(idx, value);
-
-        return *this;
-      }
-
-      /**
-       * Divide <tt>s</tt> to the referenced element of the vector.
-       */
-      const VectorReference &
-      operator/=(const value_type &s) const
-      {
-        Assert(!vector.has_ghost_elements(), ExcGhostsPresent());
-
-        Assert((vector.last_action == VectorOperation::insert) ||
-                 (vector.last_action == VectorOperation::unknown),
-               internal::ExcWrongMode(VectorOperation::insert,
-                                      vector.last_action));
-        std::vector<size_type>  idx{index};
-        value_type              new_value = static_cast<value_type>(*this) / s;
-        std::vector<value_type> value{new_value};
-        vector.set(idx, value);
-        vector.last_action = VectorOperation::insert;
-        return *this;
-      }
-
-      /*
-       * Convert the reference to an actual value, i.e. return the value of
-       * the referenced element of the vector.
-       */
-      operator value_type() const
-      {
-        AssertIndexRange(index, vector.size());
-        if (vector.ghosted)
-          {
-            AssertThrow(vector.ghost_indices.is_element(index) ||
-                          vector.owned_elements.is_element(index),
-                        ExcMessage(
-                          "You are trying to access an element of a vector "
-                          "that is neither a locally owned element nor a "
-                          "ghost element of the vector."));
-          }
-        else
-          {
-            AssertThrow(vector.owned_elements.is_element(index),
-                        internal::ExcAccessToNonlocalElement(
-                          index,
-                          *vector.owned_elements.begin(),
-                          (*vector.owned_elements.begin() +
-                           vector.locally_owned_size())));
-          }
-        return psb_c_dgetelem(vector.psblas_vector,
-                              index,
-                              vector.psblas_descriptor.get());
-      };
-
-    private:
-      Vector &vector;
-
-      const size_type index;
-
-      friend class Vector;
-    };
-
-  public:
-    using size_type = dealii::types::global_dof_index;
-
-    using value_type = double;
 
     /**
      *Default constructor. Generates an empty (zero-size) vector.

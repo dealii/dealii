@@ -13,8 +13,6 @@
 // ------------------------------------------------------------------------
 
 
-#include "deal.II/base/exception_macros.h"
-#include "deal.II/base/exceptions.h"
 #include <deal.II/base/memory_consumption.h>
 #include <deal.II/base/mpi.h>
 
@@ -56,9 +54,9 @@ namespace PSCToolkit
   {
     if (state != internal::State::Default)
       {
-        int err;
-        err = psb_c_dgefree(psblas_vector, psblas_descriptor.get());
-        Assert(err == 0, internal::ExcFreePSBLASVector(err));
+        int ierr;
+        ierr = psb_c_dgefree(psblas_vector, psblas_descriptor.get());
+        AssertNothrow(ierr == 0, ExcFreePSBLASVector(ierr));
       }
   }
 
@@ -100,7 +98,7 @@ namespace PSCToolkit
     const bool is_vector_changed = size() != local_partitioning.size();
     owned_elements               = local_partitioning;
 
-    int err;
+    int ierr;
     // we do not need to create a new descriptor if the existing one has already
     // been assembled
     if (psblas_descriptor.get() == nullptr || is_vector_changed == true)
@@ -124,27 +122,27 @@ namespace PSCToolkit
 
         // Insert the indexes into the descriptor
         psblas_context = InitFinalize::get_psblas_context();
-        err            = psb_c_cdall_vl(number_of_local_indexes,
-                             vl,
-                             *psblas_context,
-                             psblas_descriptor.get());
+        ierr           = psb_c_cdall_vl(number_of_local_indexes,
+                              vl,
+                              *psblas_context,
+                              psblas_descriptor.get());
 
         // Free the vl array
         free(vl);
-        Assert(err == 0, internal::ExcInitializePSBLASDescriptor(err));
+        Assert(ierr == 0, ExcInitializePSBLASDescriptor(ierr));
       }
 
     // Create a new PSBLAS vector and allocate mem space for vector
     psblas_vector = psb_c_new_dvector();
 
-    err = psb_c_dgeall_remote(psblas_vector, psblas_descriptor.get());
-    Assert(err == 0, internal::ExcInitializePSBLASVector(err));
+    ierr = psb_c_dgeall_remote(psblas_vector, psblas_descriptor.get());
+    Assert(ierr == 0, ExcInitializePSBLASVector(ierr));
 
     if (omit_zeroing_entries == false)
       {
-        err = psb_c_dvect_set_scal(psblas_vector, 0.0);
-        Assert(err == 0,
-               internal::ExcCallingPSBLASFunction(err, "psb_c_dvect_set_scal"));
+        ierr = psb_c_dvect_set_scal(psblas_vector, 0.0);
+        Assert(ierr == 0,
+               ExcCallingPSBLASFunction(ierr, "psb_c_dvect_set_scal"));
       }
     state       = internal::State::Assembled;
     last_action = VectorOperation::unknown;
@@ -167,7 +165,7 @@ namespace PSCToolkit
     ghost_indices  = ghosts;
     ghost_indices.subtract_set(local_partitioning);
 
-    int err;
+    int ierr;
     if (psblas_descriptor.get() == nullptr || is_vector_changed == true)
       {
         psblas_descriptor = std::shared_ptr<psb_c_descriptor>(
@@ -200,21 +198,21 @@ namespace PSCToolkit
 
         // Insert the indexes into the descriptor
         psblas_context = InitFinalize::get_psblas_context();
-        err            = psb_c_cdall_vl_lidx(number_of_local_indexes,
-                                  vl,
-                                  lidx,
-                                  *psblas_context,
-                                  psblas_descriptor.get());
+        ierr           = psb_c_cdall_vl_lidx(number_of_local_indexes,
+                                   vl,
+                                   lidx,
+                                   *psblas_context,
+                                   psblas_descriptor.get());
 
         // Free vl array
         free(vl);
         free(lidx);
-        Assert(err == 0, internal::ExcInitializePSBLASDescriptor(err));
+        Assert(ierr == 0, ExcInitializePSBLASDescriptor(ierr));
 
         // ... insert the ghost indices ...
         const std::vector<types::global_dof_index> &ghost_indexes =
           ghost_indices.get_index_vector();
-        const int number_of_ghost_indices = ghost_indexes.size();
+        const auto number_of_ghost_indices = ghost_indexes.size();
 
         psb_l_t *global_ghost_indices =
           (psb_l_t *)malloc(number_of_ghost_indices * sizeof(psb_l_t));
@@ -222,30 +220,29 @@ namespace PSCToolkit
           (psb_i_t *)malloc(number_of_ghost_indices * sizeof(psb_i_t));
 
         psb_i_t extended_idx_counter = number_of_local_indexes;
-        for (psb_i_t i = 0; i < number_of_ghost_indices; ++i)
+        for (std::size_t i = 0; i < number_of_ghost_indices; ++i)
           {
             global_ghost_indices[i] = static_cast<psb_l_t>(ghost_indexes[i]);
             local_ghost_indices[i]  = extended_idx_counter++;
           }
 
-        err = psb_c_cdins_lidx(number_of_ghost_indices,
-                               global_ghost_indices,
-                               local_ghost_indices,
-                               psblas_descriptor.get());
+        ierr = psb_c_cdins_lidx(number_of_ghost_indices,
+                                global_ghost_indices,
+                                local_ghost_indices,
+                                psblas_descriptor.get());
         free(global_ghost_indices);
         free(local_ghost_indices);
 
-        Assert(err == 0,
-               internal::ExcCallingPSBLASFunction(err, "psb_c_cdins_lidx"));
+        Assert(ierr == 0, ExcCallingPSBLASFunction(ierr, "psb_c_cdins_lidx"));
       }
     // ... create and finalize vector
     psblas_vector = psb_c_new_dvector();
-    err           = psb_c_dgeall_remote(psblas_vector, psblas_descriptor.get());
+    ierr          = psb_c_dgeall_remote(psblas_vector, psblas_descriptor.get());
 
     // ...and descriptor
-    err = psb_c_cdasb(psblas_descriptor.get());
+    ierr = psb_c_cdasb(psblas_descriptor.get());
 
-    Assert(err == 0, internal::ExcInitializePSBLASVector(err));
+    Assert(ierr == 0, ExcInitializePSBLASVector(ierr));
     state       = internal::State::Assembled;
     last_action = VectorOperation::unknown;
   }
@@ -263,10 +260,9 @@ namespace PSCToolkit
                v.get_mpi_communicator());
         if (!omit_zeroing_entries)
           {
-            int err = psb_c_dvect_set_scal(psblas_vector, 0.0);
-            Assert(err == 0,
-                   internal::ExcCallingPSBLASFunction(err,
-                                                      "psb_c_dvect_set_scal"));
+            int ierr = psb_c_dvect_set_scal(psblas_vector, 0.0);
+            Assert(ierr == 0,
+                   ExcCallingPSBLASFunction(ierr, "psb_c_dvect_set_scal"));
           }
       }
     else
@@ -283,11 +279,11 @@ namespace PSCToolkit
   Vector::operator=(const Vector &v)
   {
     Assert(v.last_action == VectorOperation::unknown,
-           internal::ExcWrongMode(VectorOperation::unknown, v.last_action));
+           ExcWrongMode(VectorOperation::unknown, v.last_action));
     Assert(last_action == VectorOperation::unknown,
-           internal::ExcWrongMode(VectorOperation::unknown, last_action));
+           ExcWrongMode(VectorOperation::unknown, last_action));
     Assert(v.state == internal::State::Assembled,
-           internal::ExcInvalidStateAssembled(v.state));
+           ExcInvalidStateAssembled(v.state));
 
     // Vectors can have different sizes. If so, we first resize the vector
     if (size() != v.size())
@@ -303,9 +299,9 @@ namespace PSCToolkit
       }
 
     // copy local values using axpby routine
-    int err = psb_c_dgeaxpby(
+    int ierr = psb_c_dgeaxpby(
       1.0, v.psblas_vector, 0.0, psblas_vector, psblas_descriptor.get());
-    AssertThrow(err == 0, internal::ExcAXPBY(err));
+    AssertThrow(ierr == 0, ExcAXPBY(ierr));
 
     // If current vector has ghost elements, update them
     if (has_ghost_elements())
@@ -322,10 +318,9 @@ namespace PSCToolkit
   Vector::operator=(const value_type s)
   {
     AssertIsFinite(s);
-    Assert(state != internal::State::Default, internal::ExcInvalidState(state));
-    int err = psb_c_dvect_set_scal(psblas_vector, s);
-    Assert(err == 0,
-           internal::ExcCallingPSBLASFunction(err, "psb_c_dvect_set_scal"));
+    Assert(state != internal::State::Default, ExcInvalidState(state));
+    int ierr = psb_c_dvect_set_scal(psblas_vector, s);
+    Assert(ierr == 0, ExcCallingPSBLASFunction(ierr, "psb_c_dvect_set_scal"));
     return *this;
   }
 
@@ -360,8 +355,8 @@ namespace PSCToolkit
   {
     if (state != internal::State::Default)
       {
-        int err = psb_c_dgefree(psblas_vector, psblas_descriptor.get());
-        Assert(err == 0, internal::ExcFreePSBLASVector(err));
+        int ierr = psb_c_dgefree(psblas_vector, psblas_descriptor.get());
+        Assert(ierr == 0, ExcFreePSBLASVector(ierr));
 
         // Reset the vector
         psblas_vector = nullptr;
@@ -380,7 +375,7 @@ namespace PSCToolkit
   Vector::linfty_norm() const
   {
     Assert(state == internal::State::Assembled,
-           internal::ExcInvalidStateAssembled(state));
+           ExcInvalidStateAssembled(state));
     return psb_c_dgenrmi(psblas_vector, psblas_descriptor.get());
   }
 
@@ -390,7 +385,7 @@ namespace PSCToolkit
   Vector::l1_norm() const
   {
     Assert(state == internal::State::Assembled,
-           internal::ExcInvalidStateAssembled(state));
+           ExcInvalidStateAssembled(state));
     return psb_c_dgeasum(psblas_vector, psblas_descriptor.get());
   }
 
@@ -400,7 +395,7 @@ namespace PSCToolkit
   Vector::l2_norm() const
   {
     Assert(state == internal::State::Assembled,
-           internal::ExcInvalidStateAssembled(state));
+           ExcInvalidStateAssembled(state));
     return psb_c_dgenrm2(psblas_vector, psblas_descriptor.get());
   }
 
@@ -459,9 +454,9 @@ namespace PSCToolkit
     AssertIsFinite(a);
 
     // do the analogous to VecAXPBY(vector, a, 0.0, v.vector) in PETSc
-    int err = psb_c_dgeaxpby(
+    int ierr = psb_c_dgeaxpby(
       a, v.psblas_vector, 0.0, psblas_vector, psblas_descriptor.get());
-    AssertThrow(err == 0, internal::ExcAXPBY(err));
+    AssertThrow(ierr == 0, ExcAXPBY(ierr));
   }
 
 
@@ -490,12 +485,12 @@ namespace PSCToolkit
   {
     AssertDimension(size(), v.size());
     Assert(!has_ghost_elements(), ExcGhostsPresent());
-    int err = psb_c_dgeaxpby(value_type(1.0),
-                             v.psblas_vector,
-                             1.0,
-                             psblas_vector,
-                             psblas_descriptor.get());
-    AssertThrow(err == 0, internal::ExcAXPBY(err));
+    int ierr = psb_c_dgeaxpby(value_type(1.0),
+                              v.psblas_vector,
+                              1.0,
+                              psblas_vector,
+                              psblas_descriptor.get());
+    AssertThrow(ierr == 0, ExcAXPBY(ierr));
     return *this;
   }
 
@@ -505,12 +500,12 @@ namespace PSCToolkit
   {
     AssertDimension(size(), v.size());
     Assert(!has_ghost_elements(), ExcGhostsPresent());
-    int err = psb_c_dgeaxpby(value_type(-1.0),
-                             v.psblas_vector,
-                             1.0,
-                             psblas_vector,
-                             psblas_descriptor.get());
-    AssertThrow(err == 0, internal::ExcAXPBY(err));
+    int ierr = psb_c_dgeaxpby(value_type(-1.0),
+                              v.psblas_vector,
+                              1.0,
+                              psblas_vector,
+                              psblas_descriptor.get());
+    AssertThrow(ierr == 0, ExcAXPBY(ierr));
     return *this;
   }
 
@@ -520,7 +515,7 @@ namespace PSCToolkit
               const std::vector<Vector::value_type> &values)
   {
     Assert(!has_ghost_elements(), ExcGhostsPresent());
-    Assert(state != internal::State::Default, internal::ExcInvalidState(state));
+    Assert(state != internal::State::Default, ExcInvalidState(state));
     AssertDimension(indices.size(), values.size());
 
     psb_i_t nz = indices.size(); // Number of non-zero entries
@@ -536,13 +531,13 @@ namespace PSCToolkit
                  psb_c_dgetelem(psblas_vector, irw[i], psblas_descriptor.get());
       }
 
-    int err =
+    int ierr =
       psb_c_dgeins(nz /*nz*/, irw, val, psblas_vector, psblas_descriptor.get());
 
     // Free allocated memory
     free(irw);
     free(val);
-    Assert(err == 0, internal::ExcInsertionInPSBLASVector(err));
+    Assert(ierr == 0, ExcInsertionInPSBLASVector(ierr));
   }
 
 
@@ -552,7 +547,7 @@ namespace PSCToolkit
               const std::vector<Vector::value_type> &values)
   {
     Assert(!has_ghost_elements(), ExcGhostsPresent());
-    Assert(state != internal::State::Default, internal::ExcInvalidState(state));
+    Assert(state != internal::State::Default, ExcInvalidState(state));
     Assert(indices.size() == values.size(),
            ExcMessage("Indices and values size mismatch."));
 
@@ -567,12 +562,12 @@ namespace PSCToolkit
         val[i] = values[i];
       }
 
-    int err =
+    int ierr =
       psb_c_dgeins(nz /*nz*/, irw, val, psblas_vector, psblas_descriptor.get());
     // Free allocated memory
     free(irw);
     free(val);
-    Assert(err == 0, internal::ExcInsertionInPSBLASVector(err));
+    Assert(ierr == 0, ExcInsertionInPSBLASVector(ierr));
   }
 
 
@@ -582,12 +577,12 @@ namespace PSCToolkit
   {
     AssertIsFinite(s);
     Assert(!has_ghost_elements(), ExcGhostsPresent());
-    int err = psb_c_dgeaxpby(s,
-                             V.psblas_vector,
-                             value_type(1.0),
-                             psblas_vector,
-                             psblas_descriptor.get());
-    Assert(err == 0, internal::ExcAXPBY(err));
+    int ierr = psb_c_dgeaxpby(s,
+                              V.psblas_vector,
+                              value_type(1.0),
+                              psblas_vector,
+                              psblas_descriptor.get());
+    Assert(ierr == 0, ExcAXPBY(ierr));
   }
 
 
@@ -613,12 +608,12 @@ namespace PSCToolkit
   {
     Assert(!has_ghost_elements(), ExcGhostsPresent());
     AssertIsFinite(s);
-    int err = psb_c_dgeaxpby(value_type(1.0),
-                             V.psblas_vector,
-                             s,
-                             psblas_vector,
-                             psblas_descriptor.get());
-    Assert(err == 0, internal::ExcAXPBY(err));
+    int ierr = psb_c_dgeaxpby(value_type(1.0),
+                              V.psblas_vector,
+                              s,
+                              psblas_vector,
+                              psblas_descriptor.get());
+    Assert(ierr == 0, ExcAXPBY(ierr));
   }
 
 
@@ -627,9 +622,9 @@ namespace PSCToolkit
   {
     Assert(!has_ghost_elements(), ExcGhostsPresent());
     AssertIsFinite(s);
-    int err = psb_c_dgeaxpby(
+    int ierr = psb_c_dgeaxpby(
       a, V.psblas_vector, s, psblas_vector, psblas_descriptor.get());
-    Assert(err == 0, internal::ExcAXPBY(err));
+    Assert(ierr == 0, ExcAXPBY(ierr));
   }
 
 
@@ -691,7 +686,7 @@ namespace PSCToolkit
                       "vectors."));
     AssertThrow(operation == VectorOperation::values::add, ExcNotImplemented());
     // We check the state of the vector...
-    Assert(state != internal::State::Default, internal::ExcInvalidDefault());
+    Assert(state != internal::State::Default, ExcInvalidDefault());
     // ... and if the last action was compatible with what we want to do
     AssertThrow(
       last_action == VectorOperation::unknown || last_action == operation,
@@ -699,17 +694,17 @@ namespace PSCToolkit
         "Missing compress() or calling with wrong VectorOperation argument."));
 
     // We check if the descriptor has already been assembled somewhere
-    int err;
+    int ierr;
     if (!psb_c_cd_is_asb(psblas_descriptor.get()))
       {
-        err = psb_c_cdasb(psblas_descriptor.get());
-        Assert(err == 0, internal::ExcAssemblePSBLASDescriptor(err));
+        ierr = psb_c_cdasb(psblas_descriptor.get());
+        Assert(ierr == 0, ExcAssemblePSBLASDescriptor(ierr));
       }
 
     // finally, we perform the assemble operation
-    err = psb_c_dgeasb(psblas_vector, psblas_descriptor.get());
+    ierr = psb_c_dgeasb(psblas_vector, psblas_descriptor.get());
 
-    Assert(err == 0, internal::ExcAssemblePSBLASVector(err));
+    Assert(ierr == 0, ExcAssemblePSBLASVector(ierr));
     state       = internal::State::Assembled;
     last_action = VectorOperation::unknown;
   }
@@ -721,8 +716,8 @@ namespace PSCToolkit
   {
     if (ghosted)
       {
-        int err = psb_c_dhalo(psblas_vector, psblas_descriptor.get());
-        Assert(err == 0, ExcMessage("Error while updating ghost values."));
+        int ierr = psb_c_dhalo(psblas_vector, psblas_descriptor.get());
+        Assert(ierr == 0, ExcMessage("Error while updating ghost values."));
       }
   }
 

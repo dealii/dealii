@@ -1,3 +1,5 @@
+// ------------------------------------------------------------------------
+//
 // SPDX-License-Identifier: LGPL-2.1-or-later
 // Copyright (C) 2017 - 2022 by the deal.II authors
 //
@@ -9,6 +11,7 @@
 // LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
 // ------------------------------------------------------------------------
+
 #include "deal.II/base/types.h"
 #include <deal.II/base/exception_macros.h>
 #include <deal.II/base/logstream.h>
