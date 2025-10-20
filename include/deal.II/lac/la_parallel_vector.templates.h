@@ -1807,7 +1807,10 @@ namespace LinearAlgebra
     bool
     Vector<Number, MemorySpaceType>::all_zero() const
     {
-      return (linfty_norm() == 0) ? true : false;
+      const bool local_all_zero =
+        std::all_of(begin(), end(), numbers::value_is_zero<Number>);
+      return Utilities::MPI::logical_and(local_all_zero,
+                                         get_mpi_communicator());
     }
 
 

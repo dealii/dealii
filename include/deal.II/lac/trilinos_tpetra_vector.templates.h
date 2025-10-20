@@ -813,27 +813,14 @@ namespace LinearAlgebra
     bool
     Vector<Number, MemorySpace>::all_zero() const
     {
-      // get a representation of the vector and
-      // loop over all the elements
-      Teuchos::ArrayRCP<const Number> data       = vector->getData();
-      const size_type                 n_elements = vector->getLocalLength();
-      unsigned int                    flag       = 0;
-      for (size_type i = 0; i < n_elements; ++i)
-        {
-          if (data[i] != Number(0))
-            {
-              flag = 1;
-              break;
-            }
-        }
+      Teuchos::ArrayRCP<const Number> data = vector->getData();
 
-      // Check that the vector is zero on _all_ processors.
-      unsigned int num_nonzero =
-        Utilities::MPI::sum(flag,
-                            Utilities::Trilinos::teuchos_comm_to_mpi_comm(
-                              vector->getMap()->getComm()));
-
-      return num_nonzero == 0;
+      const bool local_all_zero =
+        std::all_of(data.begin(),
+                    data.begin() + locally_owned_size(),
+                    numbers::value_is_zero<Number>);
+      return Utilities::MPI::logical_and(local_all_zero,
+                                         get_mpi_communicator());
     }
 
 

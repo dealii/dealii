@@ -754,7 +754,7 @@ namespace PETScWrappers
     const bool local_all_zero =
       std::all_of(start_ptr,
                   start_ptr + locally_owned_size(),
-                  [](const PetscScalar &v) { return v == PetscScalar(); });
+                  numbers::value_is_zero<PetscScalar>);
 
     ierr = VecRestoreArrayRead(vector, &start_ptr);
     AssertThrow(ierr == 0, ExcPETScError(ierr));
