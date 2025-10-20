@@ -747,31 +747,19 @@ namespace PETScWrappers
   bool
   VectorBase::all_zero() const
   {
-    // get a representation of the vector and
-    // loop over all the elements
     const PetscScalar *start_ptr;
     PetscErrorCode     ierr = VecGetArrayRead(vector, &start_ptr);
     AssertThrow(ierr == 0, ExcPETScError(ierr));
 
-    const PetscScalar *ptr  = start_ptr,
-                      *eptr = start_ptr + locally_owned_size();
-    bool flag               = true;
-    while (ptr != eptr)
-      {
-        if (*ptr != value_type())
-          {
-            flag = false;
-            break;
-          }
-        ++ptr;
-      }
+    const bool local_all_zero =
+      std::all_of(start_ptr,
+                  start_ptr + locally_owned_size(),
+                  [](const PetscScalar &v) { return v == PetscScalar(); });
 
-    // restore the representation of the
-    // vector
     ierr = VecRestoreArrayRead(vector, &start_ptr);
     AssertThrow(ierr == 0, ExcPETScError(ierr));
 
-    return flag;
+    return Utilities::MPI::logical_and(local_all_zero, get_mpi_communicator());
   }
 
 
