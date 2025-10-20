@@ -920,6 +920,28 @@ namespace Utilities
                const ArrayView<T>       &results);
 
     /**
+     * Performs a <i>logical and</i> operation over all processors of the value
+     * @p t. The <i>logical and</i> operator `&&` returns the boolean value
+     * `true` if all operands are `true` and returns `false` otherwise.
+     *
+     * This function is collective over all processors given in the
+     * @ref GlossMPICommunicator "communicator".
+     * If deal.II is not configured for use of MPI, this function simply
+     * returns the value of @p value. This function corresponds to the
+     * <code>MPI_Allreduce</code> function, i.e., all processors receive the
+     * result of this operation.
+     *
+     * @note Sometimes, not all processors need a result and in that case one
+     * would call the <code>MPI_Reduce</code> function instead of the
+     * <code>MPI_Allreduce</code> function. The latter is at most twice as
+     * expensive, so if you are concerned about performance, it may be
+     * worthwhile investigating whether your algorithm indeed needs the result
+     * everywhere.
+     */
+    bool
+    logical_and(const bool t, const MPI_Comm mpi_communicator);
+
+    /**
      * A data structure to store the result of the min_max_avg() function.
      * The structure stores the minimum, maximum, and average of one
      * value contributed by each processor that participates in an
@@ -1782,6 +1804,19 @@ namespace Utilities
                            ArrayView<const T>(values, N),
                            mpi_communicator,
                            ArrayView<T>(results, N));
+    }
+
+
+
+    inline bool
+    logical_and(const bool t, const MPI_Comm mpi_communicator)
+    {
+      bool return_value = false;
+      internal::all_reduce(MPI_LAND,
+                           ArrayView<const bool>(&t, 1),
+                           mpi_communicator,
+                           ArrayView<bool>(&return_value, 1));
+      return return_value;
     }
 
 
