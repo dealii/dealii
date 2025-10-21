@@ -28,7 +28,12 @@ main()
 
   dealii::FullMatrix<double> A(2, 2);
   dealii::FullMatrix<double> B(2, 2);
-  dealii::FullMatrix<double> C(4, 4);
+  dealii::FullMatrix<double> C(2, 2);
+  dealii::FullMatrix<double> result1(4, 4);
+  dealii::FullMatrix<double> result2(4, 4);
+
+  dealii::FullMatrix<double> result3;
+  dealii::FullMatrix<double> result3_ref;
 
   A(0, 0) = 1;
   A(0, 1) = 2;
@@ -40,14 +45,67 @@ main()
   B(1, 0) = 7;
   B(1, 1) = 8;
 
-  C.kronecker_product(A, B);
+  C(0, 0) = 9;
+  C(0, 1) = 10;
+  C(1, 0) = 11;
+  C(1, 1) = 12;
+
+
+  result1.kronecker_product(A, B);
+
+  for (unsigned int i = 0; i < result2.m(); ++i)
+    for (unsigned int j = 0; j < result2.n(); ++j)
+      result2(i, j) = 1.0;
+
+  result2.kronecker_product(A, B, true);
+
+  for (unsigned int i = 0; i < result2.m(); ++i)
+    for (unsigned int j = 0; j < result2.n(); ++j)
+      {
+        result2(i, j) -= 1.0;
+        {
+          if (std::abs(result1(i, j) - result2(i, j)) > 1e-12)
+            {
+              deallog << "Kronecker product with adding=true failed at (" << i
+                      << "," << j << "): " << result1(i, j) << " vs "
+                      << result2(i, j) << std::endl;
+            }
+        }
+      }
 
 
   std::stringstream sstring;
   sstring << "Result"
           << "\n";
-  C.print_formatted(sstring, 4, true, 10, "0.");
+  result2.print_formatted(sstring, 4, true, 10, "0.");
   deallog << sstring.str() << std::endl;
+
+  result3.kronecker_product(A, B, C);
+  result3_ref.kronecker_product(result1, C);
+
+  // Check whether result3 and result3_ref are identical
+  if (result3.m() != result3_ref.m() || result3.n() != result3_ref.n())
+    {
+      deallog << "result3 and result3_ref have different sizes: ("
+              << result3.m() << "," << result3.n() << ") vs ("
+              << result3_ref.m() << "," << result3_ref.n() << ")" << std::endl;
+    }
+  else
+    {
+      for (unsigned int i = 0; i < result3.m(); ++i)
+        for (unsigned int j = 0; j < result3.n(); ++j)
+          {
+            const double diff = std::abs(result3(i, j) - result3_ref(i, j));
+            if (diff > 1e-12)
+              {
+                deallog << "result3 differs from result3_ref at (" << i << ","
+                        << j << "): " << result3(i, j) << " vs "
+                        << result3_ref(i, j) << " (diff=" << diff << ")"
+                        << std::endl;
+              }
+          }
+    }
+
 
   return 0;
 }

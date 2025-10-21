@@ -435,6 +435,21 @@ FullMatrix<number>::swap_col(const size_type i, const size_type j)
 
 template <typename number>
 void
+FullMatrix<number>::permute(const std::vector<unsigned int> &row_perm,
+                            const std::vector<unsigned int> &col_perm)
+{
+  AssertDimension(row_perm.size(), this->m());
+  AssertDimension(col_perm.size(), this->n());
+
+  FullMatrix<number> tmp = *this; // copy current matrix
+  for (unsigned int i = 0; i < this->m(); ++i)
+    for (unsigned int j = 0; j < this->n(); ++j)
+      (*this)(row_perm[i], col_perm[j]) = tmp(i, j);
+}
+
+
+template <typename number>
+void
 FullMatrix<number>::diagadd(const number src)
 {
   Assert(!this->empty(), ExcEmptyMatrix());

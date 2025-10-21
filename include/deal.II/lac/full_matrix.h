@@ -745,6 +745,18 @@ public:
   swap_col(const size_type i, const size_type j);
 
   /**
+   * Permute rows and columns of the matrix according to the given
+   * permutations.
+   *
+   * The two permutation vectors <tt>row_perm</tt> and <tt>col_perm</tt>
+   * operate in a way, such that <tt>result(i,j) = this(row_perm[i],
+   * col_perm[j])</tt>.
+   */
+  void
+  permute(const std::vector<unsigned int> &row_perm,
+          const std::vector<unsigned int> &col_perm);
+
+  /**
    * Add constant to diagonal elements of this, i.e. add a multiple of the
    * identity matrix.
    */
@@ -995,12 +1007,24 @@ public:
    * @param A The first matrix (m x n).
    * @param B The second matrix (p x q).
    * @param adding If `true`, the result is added to the current matrix. If
-   *               `false` (default), the current matrix is overwritten.
+   *               `false`, the current matrix is overwritten.
    */
   void
   kronecker_product(const FullMatrix<number> &A,
                     const FullMatrix<number> &B,
-                    const bool                adding = false);
+                    const bool                adding);
+
+
+  /**
+   *  Compute the Kronecker product of multiple matrices. The adding parameter
+   *  is set to false.
+   */
+  template <typename... Rest>
+  void
+  kronecker_product(const dealii::FullMatrix<number> &A,
+                    const dealii::FullMatrix<number> &B,
+                    const Rest &...rest);
+
 
   /**
    * Matrix-vector-multiplication.
@@ -1483,6 +1507,25 @@ FullMatrix<number>::print(StreamType        &s,
   s.precision(old_precision);
   s.width(old_width);
 }
+
+
+template <typename number>
+template <typename... Rest>
+void
+FullMatrix<number>::kronecker_product(const FullMatrix<number> &A,
+                                      const FullMatrix<number> &B,
+                                      const Rest &...rest)
+{
+  this->kronecker_product(A, B, false); // tmp := A ⊗ B
+
+
+  if constexpr (sizeof...(rest) != 0)
+    {
+      FullMatrix<number> tmp = *this;
+      this->kronecker_product(tmp, rest...);
+    }
+}
+
 
 
 #endif // DOXYGEN
