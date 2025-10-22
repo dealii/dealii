@@ -16,24 +16,24 @@
 
 for (S : REAL_SCALARS)
   {
-    template void MatrixScaling::scale_matrix(SparseMatrix<S> &);
-    template void MatrixScaling::scale_linear_system(SparseMatrix<S> &,
+    template bool MatrixScaling::scale_matrix(SparseMatrix<S> &);
+    template bool MatrixScaling::scale_linear_system(SparseMatrix<S> &,
                                                      Vector<S> &);
 
-    template void MatrixScaling::scale_matrix(SparseMatrixEZ<S> &);
-    template void MatrixScaling::scale_linear_system(SparseMatrixEZ<S> &,
+    template bool MatrixScaling::scale_matrix(SparseMatrixEZ<S> &);
+    template bool MatrixScaling::scale_linear_system(SparseMatrixEZ<S> &,
                                                      Vector<S> &);
 
-    template void MatrixScaling::scale_matrix(BlockSparseMatrix<S> &);
-    template void MatrixScaling::scale_linear_system(BlockSparseMatrix<S> &,
+    template bool MatrixScaling::scale_matrix(BlockSparseMatrix<S> &);
+    template bool MatrixScaling::scale_linear_system(BlockSparseMatrix<S> &,
                                                      BlockVector<S> &);
 
-    template void MatrixScaling::scale_matrix(BlockSparseMatrixEZ<S> &);
-    template void MatrixScaling::scale_linear_system(BlockSparseMatrixEZ<S> &,
+    template bool MatrixScaling::scale_matrix(BlockSparseMatrixEZ<S> &);
+    template bool MatrixScaling::scale_linear_system(BlockSparseMatrixEZ<S> &,
                                                      BlockVector<S> &);
 
-    template void MatrixScaling::scale_matrix(FullMatrix<S> &);
-    template void MatrixScaling::scale_linear_system(FullMatrix<S> &,
+    template bool MatrixScaling::scale_matrix(FullMatrix<S> &);
+    template bool MatrixScaling::scale_linear_system(FullMatrix<S> &,
                                                      Vector<S> &);
 
     template void MatrixScaling::scale_system_solution(Vector<S> &) const;

@@ -34,6 +34,8 @@ main(int argc, char **argv)
 {
   initlog();
 
+  bool converged;
+
   unsigned int           dim = 5;
   DynamicSparsityPattern dsp(dim, dim);
 
@@ -59,10 +61,9 @@ main(int argc, char **argv)
   deallog << "Sparse Matrix: " << std::endl;
 
   B.print(deallog);
-  scaler.scale_matrix(B);
+  converged = scaler.scale_matrix(B);
 
-  deallog << "Converged? " << (scaler.is_converged() ? "True" : "False")
-          << std::endl;
+  deallog << "Converged? " << (converged ? "True" : "False") << std::endl;
 
 
   deallog << "Scaled Sparse Matrix: " << std::endl;
@@ -83,10 +84,9 @@ main(int argc, char **argv)
   deallog << "Full Matrix: " << std::endl;
 
   A.print(deallog);
-  scaler.scale_matrix(A);
+  converged = scaler.scale_matrix(A);
 
-  deallog << "Converged? " << (scaler.is_converged() ? "True" : "False")
-          << std::endl;
+  deallog << "Converged? " << (converged ? "True" : "False") << std::endl;
 
   deallog << "Scaled Full Matrix: " << std::endl;
   A.print(deallog);

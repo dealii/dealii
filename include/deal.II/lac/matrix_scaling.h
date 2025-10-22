@@ -41,20 +41,16 @@ DEAL_II_NAMESPACE_OPEN
 /**
  * This class provides access to various matrix scaling algorithms. The
  * scaling algorithms scale the matrix in place by the action of two diagonal
- * matrices: one acting on the rows and one acting on the columns. The diagonals
- * of the two scaling matrices applied on the last scaled matrix are stored in
- * the class as vectors. The algorithms implemented here are the Sinkhorn-Knopp
- * algorithm described in this <a
- * href="https://doi.org/10.1137/060659624">article</a> and the scaling
- * algorithm that preserves symmetry described in this <a
- * href="https://doi.org/10.1137/110825753">article</a>.
+ * matrices: one acting on the rows and one acting on the columns. The
+ * algorithms implemented here are the Sinkhorn-Knopp algorithm described in
+ * @cite Knight2008 and the scaling algorithm that preserves symmetry described
+ * in @cite Knight2014.
  *
  * The parallel implementation with MPI of the algorithms follows the
- * description in this <a
- * href="https://doi.org/10.1007/978-3-540-92859-1_27">article</a>. The
- * diagonals of the scaling matrices are distributed between the MPI processes
- * following the row distribution of the matrix. The diagonal of the column
- * scaling is distributed in a balanced way if the scaled matrix is not square.
+ * description in @cite Amestoy2008. The diagonals of the scaling matrices are
+ * distributed between the MPI processes following the row distribution of the
+ * matrix. The diagonal of the column scaling is distributed in a balanced way
+ * if the scaled matrix is not square.
  *
  *  <h4>Instantiations</h4>
  *
@@ -220,9 +216,13 @@ public:
   /**
    * Scale the input <tt>matrix</tt> in place according to the selected
    * algorithm in <tt>AdditionalData</tt>.
+   *
+   * The function returns whether the scaling algorithm has converged or not.
+   * Convergence is not necessary to have a good scaling but it can be helpful
+   * to know if it was achieved.
    */
   template <class Matrix>
-  void
+  bool
   scale_matrix(Matrix &matrix);
 
   /**
@@ -231,9 +231,13 @@ public:
    * vector <tt>rhs</tt> according to the row scaling. The solution of the
    * scaled system can be scaled back to the original system by calling
    * <tt>scale_system_solution()</tt>.
+   *
+   * The function returns whether the scaling algorithm has converged or not.
+   * Convergence is not necessary to have a good scaling but it can be helpful
+   * to know if it was achieved.
    */
   template <class Matrix, class VectorType>
-  void
+  bool
   scale_linear_system(Matrix &matrix, VectorType &rhs);
 
   /**
@@ -258,14 +262,6 @@ public:
    */
   const Vector<double> &
   get_column_scaling() const;
-
-  /**
-   * Return whether the scaling algorithm has converged or not. Convergence is
-   * not necessary to have a good scaling but it can be helpful to know if it
-   * was achieved.
-   */
-  bool
-  is_converged() const;
 
 private:
   /**
@@ -324,7 +320,7 @@ private:
    */
   template <class Matrix>
   void
-  l1_scaling(Matrix &matrix, const unsigned int nsteps);
+  do_l1_scaling(Matrix &matrix, const unsigned int nsteps);
 
   /**
    * Implementation of the linfty scaling iterations in the symmetry preserving
@@ -332,14 +328,14 @@ private:
    */
   template <class Matrix>
   void
-  linfty_scaling(Matrix &matrix, const unsigned int nsteps);
+  do_linfty_scaling(Matrix &matrix, const unsigned int nsteps);
 
   /**
    * Implementation of the Sinkhorn-Knopp scaling iterations.
    */
   template <class Matrix>
   void
-  sk_scaling(Matrix &matrix, const unsigned int nsteps);
+  do_sk_scaling(Matrix &matrix, const unsigned int nsteps);
 
   /*
    * Check convergence of the sequential scaling algorithms. Only on either row

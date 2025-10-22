@@ -106,7 +106,7 @@ MatrixScaling::MatrixScaling(const AdditionalData &control)
 
 
 template <class Matrix>
-void
+bool
 MatrixScaling::scale_matrix(Matrix &matrix)
 {
   // Check for unsupported matrix types
@@ -127,25 +127,30 @@ MatrixScaling::scale_matrix(Matrix &matrix)
         {
           case MatrixScaling::AdditionalData::ScalingAlgorithm::sinkhorn_knopp:
             {
-              sk_scaling(matrix,
-                         control.sinkhorn_knopp_parameters.max_iterations);
+              do_sk_scaling(matrix,
+                            control.sinkhorn_knopp_parameters.max_iterations);
             }
-            break;
+            {
+              break;
+            }
+
           case MatrixScaling::AdditionalData::ScalingAlgorithm::
             l1_linf_symmetry_preserving:
             {
               if (control.l1linf_parameters.start_inf_norm_steps > 0 &&
                   !converged)
-                linfty_scaling(matrix,
-                               control.l1linf_parameters.start_inf_norm_steps);
+                do_linfty_scaling(
+                  matrix, control.l1linf_parameters.start_inf_norm_steps);
               if (control.l1linf_parameters.l1_norm_steps > 0 && !converged)
-                l1_scaling(matrix, control.l1linf_parameters.l1_norm_steps);
+                do_l1_scaling(matrix, control.l1linf_parameters.l1_norm_steps);
               if (control.l1linf_parameters.end_inf_norm_steps > 0 &&
                   !converged)
-                linfty_scaling(matrix,
-                               control.l1linf_parameters.end_inf_norm_steps);
+                do_linfty_scaling(matrix,
+                                  control.l1linf_parameters.end_inf_norm_steps);
             }
-            break;
+            {
+              break;
+            }
         }
     }
   else if constexpr (std::is_same_v<Matrix, TrilinosWrappers::SparseMatrix> ||
@@ -197,25 +202,30 @@ MatrixScaling::scale_matrix(Matrix &matrix)
         {
           case MatrixScaling::AdditionalData::ScalingAlgorithm::sinkhorn_knopp:
             {
-              sk_scaling(matrix,
-                         control.sinkhorn_knopp_parameters.max_iterations);
+              do_sk_scaling(matrix,
+                            control.sinkhorn_knopp_parameters.max_iterations);
             }
-            break;
+            {
+              break;
+            }
+
           case MatrixScaling::AdditionalData::ScalingAlgorithm::
             l1_linf_symmetry_preserving:
             {
               if (control.l1linf_parameters.start_inf_norm_steps > 0 &&
                   !converged)
-                linfty_scaling(matrix,
-                               control.l1linf_parameters.start_inf_norm_steps);
+                do_linfty_scaling(
+                  matrix, control.l1linf_parameters.start_inf_norm_steps);
               if (control.l1linf_parameters.l1_norm_steps > 0 && !converged)
-                l1_scaling(matrix, control.l1linf_parameters.l1_norm_steps);
+                do_l1_scaling(matrix, control.l1linf_parameters.l1_norm_steps);
               if (control.l1linf_parameters.end_inf_norm_steps > 0 &&
                   !converged)
-                linfty_scaling(matrix,
-                               control.l1linf_parameters.end_inf_norm_steps);
+                do_linfty_scaling(matrix,
+                                  control.l1linf_parameters.end_inf_norm_steps);
             }
-            break;
+            {
+              break;
+            }
         }
     }
   else
@@ -223,12 +233,14 @@ MatrixScaling::scale_matrix(Matrix &matrix)
       (void)matrix;
       Assert(false, ExcNotImplemented());
     }
+
+  return converged;
 }
 
 
 
 template <class Matrix, class VectorType>
-void
+bool
 MatrixScaling::scale_linear_system(Matrix &matrix, VectorType &rhs)
 {
   AssertDimension(matrix.m(), rhs.size());
@@ -268,6 +280,8 @@ MatrixScaling::scale_linear_system(Matrix &matrix, VectorType &rhs)
     }
   else
     Assert(false, ExcNotImplemented());
+
+  return converged;
 }
 
 
@@ -322,14 +336,6 @@ const Vector<double> &
 MatrixScaling::get_column_scaling() const
 {
   return column_scaling;
-}
-
-
-
-bool
-MatrixScaling::is_converged() const
-{
-  return converged;
 }
 
 
@@ -494,7 +500,7 @@ MatrixScaling::send_prepare_updated_col_norms(
 
 template <class Matrix>
 void
-MatrixScaling::l1_scaling(Matrix &matrix, const unsigned int nsteps)
+MatrixScaling::do_l1_scaling(Matrix &matrix, const unsigned int nsteps)
 {
   if constexpr (is_supported_matrix<Matrix>())
     {
@@ -669,7 +675,7 @@ MatrixScaling::l1_scaling(Matrix &matrix, const unsigned int nsteps)
 
 template <class Matrix>
 void
-MatrixScaling::linfty_scaling(Matrix &matrix, const unsigned int nsteps)
+MatrixScaling::do_linfty_scaling(Matrix &matrix, const unsigned int nsteps)
 {
   if constexpr (is_supported_matrix<Matrix>())
     {
@@ -851,7 +857,7 @@ MatrixScaling::linfty_scaling(Matrix &matrix, const unsigned int nsteps)
 
 template <class Matrix>
 void
-MatrixScaling::sk_scaling(Matrix &matrix, const unsigned int nsteps)
+MatrixScaling::do_sk_scaling(Matrix &matrix, const unsigned int nsteps)
 {
   if constexpr (is_supported_matrix<Matrix>())
     {
@@ -918,7 +924,10 @@ MatrixScaling::sk_scaling(Matrix &matrix, const unsigned int nsteps)
                     }
                 }
             }
-            break;
+            {
+              break;
+            }
+
           case MatrixScaling::AdditionalData::SKParameters::NormType::l_infty:
             {
               // Row_norms_0 to start the procedure
@@ -979,7 +988,9 @@ MatrixScaling::sk_scaling(Matrix &matrix, const unsigned int nsteps)
                     }
                 }
             }
-            break;
+            {
+              break;
+            }
         }
     }
   else if constexpr (std::is_same_v<Matrix, TrilinosWrappers::SparseMatrix> ||
@@ -1157,7 +1168,10 @@ MatrixScaling::sk_scaling(Matrix &matrix, const unsigned int nsteps)
                     }
                 }
             }
-            break;
+            {
+              break;
+            }
+
           case MatrixScaling::AdditionalData::SKParameters::NormType::l_infty:
             {
               // Row_norms_0 to start the procedure
@@ -1331,7 +1345,9 @@ MatrixScaling::sk_scaling(Matrix &matrix, const unsigned int nsteps)
                     }
                 }
             }
-            break;
+            {
+              break;
+            }
         }
     }
 }
@@ -1339,8 +1355,8 @@ MatrixScaling::sk_scaling(Matrix &matrix, const unsigned int nsteps)
 
 
 #define InstantiateMatrixScaling(MATRIX, VECTOR)                        \
-  template void MatrixScaling::scale_matrix(MATRIX &);                  \
-  template void MatrixScaling::scale_linear_system(MATRIX &, VECTOR &); \
+  template bool MatrixScaling::scale_matrix(MATRIX &);                  \
+  template bool MatrixScaling::scale_linear_system(MATRIX &, VECTOR &); \
   template void MatrixScaling::scale_system_solution(VECTOR &) const;
 
 #ifdef DEAL_II_WITH_TRILINOS
