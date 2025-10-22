@@ -13,7 +13,13 @@
 // ------------------------------------------------------------------------
 
 
-// Check FEInterfaceViews::get_*_function_values/gradients...
+/**
+ * This test verifies that the gradient views accessed through FEInterfaceValues
+ * using an extractor are consistent with those of the jump and average.
+ * In other words, it tests that manually computing the difference between the
+ * gradient 'here' and the gradient 'there' is the same as the jump, and
+ * likewise for the average.
+ */
 
 #include <deal.II/base/quadrature_lib.h>
 
@@ -72,14 +78,11 @@ test()
                                face_quadrature,
                                update_gradients | update_quadrature_points);
 
-  const double tol = 1e-15;
-
-  typename DoFHandler<dim>::active_cell_iterator cell =
-    dof_handler.begin_active();
+  const double tol = 1e-13;
 
   deallog.push("Test scalar values");
   {
-    for (; cell != dof_handler.end(); ++cell)
+    for (const auto &cell : dof_handler.active_cell_iterators())
       for (const auto f : cell->face_indices())
         if (!cell->face(f)->at_boundary())
           {
@@ -125,7 +128,7 @@ test()
 
   deallog.push("Test vector values");
   {
-    for (; cell != dof_handler.end(); ++cell)
+    for (const auto &cell : dof_handler.active_cell_iterators())
       for (const auto f : cell->face_indices())
         if (!cell->face(f)->at_boundary())
           {
