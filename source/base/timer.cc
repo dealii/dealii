@@ -163,6 +163,7 @@ Timer::Timer()
 
 Timer::Timer(const MPI_Comm mpi_communicator, const bool sync_lap_times_)
   : running(false)
+  , is_synchronized(true)
   , mpi_communicator(mpi_communicator)
   , sync_lap_times(sync_lap_times_)
 {
@@ -175,13 +176,24 @@ Timer::Timer(const MPI_Comm mpi_communicator, const bool sync_lap_times_)
 void
 Timer::start()
 {
+  // If the data of the last lap has not been synchronized so far,
+  // synchronize now, before starting to measure a new lap.
+  if (is_running() == false)
+    synchronize_and_update();
+
   // Make sure only one thread at a time starts or resets the timer
+  // Note that the location of this line, after the call to
+  // synchronize_and_update(), but before the number of laps is increased
+  // is critical, since the same mutex is locked inside
+  // synchronize_and_update().
   std::lock_guard<std::mutex> lock(mutex);
 
   if (is_running() == false)
-    ++n_timed_laps;
+    {
+      ++n_timed_laps;
+      running = true;
+    }
 
-  running = true;
 #ifdef DEAL_II_WITH_MPI
   if (sync_lap_times)
     {
@@ -205,34 +217,13 @@ Timer::stop()
               ExcMessage(
                 "This timer is not running and hence cannot be stopped."));
 
-  running = false;
+  running         = false;
+  is_synchronized = false;
 
   wall_times.last_lap_time =
     wall_clock_type::now() - wall_times.current_lap_start_time;
   cpu_times.last_lap_time =
     cpu_clock_type::now() - cpu_times.current_lap_start_time;
-
-  last_lap_wall_time_data =
-    Utilities::MPI::min_max_avg(internal::TimerImplementation::to_seconds(
-                                  wall_times.last_lap_time),
-                                mpi_communicator);
-  if (sync_lap_times)
-    {
-      wall_times.last_lap_time = internal::TimerImplementation::from_seconds<
-        decltype(wall_times)::duration_type>(last_lap_wall_time_data.max);
-      cpu_times.last_lap_time = internal::TimerImplementation::from_seconds<
-        decltype(cpu_times)::duration_type>(
-        Utilities::MPI::min_max_avg(internal::TimerImplementation::to_seconds(
-                                      cpu_times.last_lap_time),
-                                    mpi_communicator)
-          .max);
-    }
-  wall_times.accumulated_time += wall_times.last_lap_time;
-  cpu_times.accumulated_time += cpu_times.last_lap_time;
-  accumulated_wall_time_data =
-    Utilities::MPI::min_max_avg(internal::TimerImplementation::to_seconds(
-                                  wall_times.accumulated_time),
-                                mpi_communicator);
 }
 
 
@@ -257,6 +248,8 @@ Timer::cpu_time() const
     }
   else
     {
+      synchronize_and_update();
+
       return Utilities::MPI::sum(internal::TimerImplementation::to_seconds(
                                    cpu_times.accumulated_time),
                                  mpi_communicator);
@@ -268,6 +261,9 @@ Timer::cpu_time() const
 double
 Timer::last_cpu_time() const
 {
+  if (running == false)
+    synchronize_and_update();
+
   return internal::TimerImplementation::to_seconds(cpu_times.last_lap_time);
 }
 
@@ -278,11 +274,17 @@ Timer::wall_time() const
 {
   wall_clock_type::duration current_elapsed_wall_time;
   if (is_running())
-    current_elapsed_wall_time = wall_clock_type::now() -
-                                wall_times.current_lap_start_time +
-                                wall_times.accumulated_time;
+    {
+      current_elapsed_wall_time = wall_clock_type::now() -
+                                  wall_times.current_lap_start_time +
+                                  wall_times.accumulated_time;
+    }
   else
-    current_elapsed_wall_time = wall_times.accumulated_time;
+    {
+      synchronize_and_update();
+
+      current_elapsed_wall_time = wall_times.accumulated_time;
+    }
 
   return internal::TimerImplementation::to_seconds(current_elapsed_wall_time);
 }
@@ -292,7 +294,63 @@ Timer::wall_time() const
 double
 Timer::last_wall_time() const
 {
+  if (running == false)
+    synchronize_and_update();
+
   return internal::TimerImplementation::to_seconds(wall_times.last_lap_time);
+}
+
+
+
+void
+Timer::synchronize_and_update() const
+{
+  Assert(
+    running == false,
+    ExcMessage(
+      "Timer::synchronize_and_update() should not be called while the timer is running."));
+
+  // Make sure only one thread synchronizes the shared state
+  // and all other threads wait until synchronization is done.
+  std::lock_guard<std::mutex> lock(mutex);
+
+  if (is_synchronized == false)
+    {
+      last_lap_wall_time_data =
+        Utilities::MPI::min_max_avg(internal::TimerImplementation::to_seconds(
+                                      wall_times.last_lap_time),
+                                    mpi_communicator);
+
+      const Utilities::MPI::MinMaxAvg last_lap_cpu_time_data =
+        Utilities::MPI::min_max_avg(internal::TimerImplementation::to_seconds(
+                                      cpu_times.last_lap_time),
+                                    mpi_communicator);
+
+      if (sync_lap_times)
+        {
+          wall_times.last_lap_time =
+            internal::TimerImplementation::from_seconds<
+              decltype(wall_times)::duration_type>(last_lap_wall_time_data.max);
+
+          cpu_times.last_lap_time = internal::TimerImplementation::from_seconds<
+            decltype(cpu_times)::duration_type>(last_lap_cpu_time_data.max);
+        }
+
+      // This looks like we should set last_lap_time to 0 after
+      // updating the accumulated time but both numbers may
+      // be requested after the update. We therefore instead ensure
+      // that synchronize_and_update() is only executed once after
+      // each lap, by setting is_synchronized to true below.
+      wall_times.accumulated_time += wall_times.last_lap_time;
+      cpu_times.accumulated_time += cpu_times.last_lap_time;
+
+      accumulated_wall_time_data =
+        Utilities::MPI::min_max_avg(internal::TimerImplementation::to_seconds(
+                                      wall_times.accumulated_time),
+                                    mpi_communicator);
+
+      is_synchronized = true;
+    }
 }
 
 
@@ -302,8 +360,9 @@ Timer::reset()
 {
   wall_times.reset();
   cpu_times.reset();
-  running      = false;
-  n_timed_laps = 0;
+  running         = false;
+  n_timed_laps    = 0;
+  is_synchronized = true;
   internal::TimerImplementation::clear_timing_data(last_lap_wall_time_data);
   internal::TimerImplementation::clear_timing_data(accumulated_wall_time_data);
 }
@@ -490,10 +549,16 @@ TimerOutput::leave_subsection(const std::string &section_name)
 
   sections[actual_section_name].stop();
 
-  // in case we have to print out something, do that here...
+  // In case we have to print out something, do that here,
+  // but only if no exceptions are currently uncaught.
+  // If there are uncaught exceptions we are currently in the
+  // process of stack unwinding, and the code below would trigger
+  // MPI communication, which leads to a deadlock if not all
+  // processes threw the exception. Avoid this deadlock by not
+  // writing output in this case.
   if ((output_frequency == every_call ||
        output_frequency == every_call_and_summary) &&
-      output_is_enabled == true)
+      output_is_enabled == true && std::uncaught_exceptions() == 0)
     {
       std::string        output_time;
       std::ostringstream cpu;
