@@ -46,7 +46,7 @@ namespace Portable
    *
    * @tparam dim Dimension in which this class is to be used
    *
-   * @tparam fe_degree Degree of the tensor prodict finite element with fe_degree+1
+   * @tparam fe_degree Degree of the tensor product finite element with fe_degree+1
    * degrees of freedom per coordinate direction
    *
    * @tparam n_q_points_1d Number of points in the quadrature formular in 1d,
@@ -153,7 +153,7 @@ namespace Portable
      * the current cell, and store them internally. Similar functionality as
      * the function DoFAccessor::get_interpolated_dof_values when no
      * constraints are present, but it also includes constraints from hanging
-     * nodes, so once can see it as a similar function to
+     * nodes, so one can see it as a similar function to
      * AffineConstraints::read_dof_values() as well.
      */
     DEAL_II_HOST_DEVICE void
