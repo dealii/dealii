@@ -466,7 +466,7 @@ namespace Portable
 
     // clang-format off
     /**
-     * This method runs the loop over all cells and apply the local operation on
+     * This method runs the loop over all cells and applies the local operation on
      * each element in parallel. @p func is a functor which is applied on each color.
      *
      * @p func needs to define
