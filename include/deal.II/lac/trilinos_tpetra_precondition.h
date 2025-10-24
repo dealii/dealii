@@ -1373,7 +1373,8 @@ namespace LinearAlgebra
          * Tell FROSch how to combine the values from the overlap.
          * When using "Restricted" as combine mode, the resulting
          * preconditioner will not be symmetrical, and therefore can not
-         * be used along with CG and rather has to be used with GMRES.
+         * be used along with CG and rather has to be used with GMRES
+         * or another linear solver that can deal with non-symmetric problems.
          * However, Overlapping Restricted Additive Schwarz (ORAS)
          * preconditioners lead to better condition numbers.
          *
