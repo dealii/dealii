@@ -161,9 +161,8 @@ namespace LinearAlgebra
       : precondition_type(precondition_type)
     {
       // Check if the precondition type does exist
-      if (!((precondition_type == "One Level") ||
-            (precondition_type == "Two Level")))
-        AssertThrow(false, dealii::ExcNotImplemented());
+        AssertThrow(((precondition_type == "One Level") ||
+            (precondition_type == "Two Level"))), dealii::ExcNotImplemented());
     }
 
 
