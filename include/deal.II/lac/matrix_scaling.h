@@ -66,6 +66,18 @@ class MatrixScaling : public EnableObserverPointer
 {
 public:
   /**
+   * Vectorial norms used to check convergence in the scaling algorithms.
+   */
+  enum class ConvergenceNormType
+  {
+    //! l_1 vector norm
+    l1,
+
+    //! l_infinity vector norm
+    l_infty
+  };
+
+  /**
    * AdditionalData allows to choose the scaling algorithm and contains
    * parameters for the scaling algorithms.
    */
@@ -223,7 +235,7 @@ public:
    */
   template <class Matrix>
   bool
-  scale_matrix(Matrix &matrix);
+  find_scaling_and_scale_matrix(Matrix &matrix);
 
   /**
    * Scale the system <tt>matrix</tt> in place according to the selected
@@ -238,12 +250,12 @@ public:
    */
   template <class Matrix, class VectorType>
   bool
-  scale_linear_system(Matrix &matrix, VectorType &rhs);
+  find_scaling_and_scale_linear_system(Matrix &matrix, VectorType &rhs);
 
   /**
    * Scale back the linear system solution vector according to the column
    * scaling. This function should be called after solving the scaled system
-   * obtained by calling <tt>scale_linear_system()</tt>.
+   * obtained by calling <tt>find_scaling_and_scale_linear_system()</tt>.
    */
   template <class VectorType>
   void
@@ -282,12 +294,6 @@ private:
   Vector<double> column_scaling;
 
   /**
-   * Flag that indicates whether the last scaling algorithm run converged or
-   * not.
-   */
-  bool converged;
-
-  /**
    * IndexSet storing the locally owned rows of the row scaling.
    */
   IndexSet locally_owned_rows;
@@ -316,25 +322,28 @@ private:
 
   /**
    * Implementation of the l1 scaling iterations in the symmetry preserving
-   * algorithm.
+   * algorithm. The function returns whether the scaling algorithm has converged
+   * or not.
    */
   template <class Matrix>
-  void
+  bool
   do_l1_scaling(Matrix &matrix, const unsigned int nsteps);
 
   /**
    * Implementation of the linfty scaling iterations in the symmetry preserving
-   * algorithm.
+   * algorithm. The function returns whether the scaling algorithm has converged
+   * or not.
    */
   template <class Matrix>
-  void
+  bool
   do_linfty_scaling(Matrix &matrix, const unsigned int nsteps);
 
   /**
-   * Implementation of the Sinkhorn-Knopp scaling iterations.
+   * Implementation of the Sinkhorn-Knopp scaling iterations. The function
+   * returns whether the scaling algorithm has converged or not.
    */
   template <class Matrix>
-  void
+  bool
   do_sk_scaling(Matrix &matrix, const unsigned int nsteps);
 
   /*
@@ -343,8 +352,8 @@ private:
    */
   template <typename Number>
   bool
-  check_convergence(Vector<Number>     row_col_norm,
-                    const std::string &norm_type) const;
+  check_convergence(const Vector<Number>      &row_col_norm,
+                    const ConvergenceNormType &norm_type) const;
 
   /*
    * Check convergence of the sequential scaling algorithms. On both row
@@ -352,28 +361,28 @@ private:
    */
   template <typename Number>
   bool
-  check_convergence(Vector<Number>     row_norm,
-                    Vector<Number>     col_norm,
-                    const std::string &norm_type) const;
+  check_convergence(const Vector<Number>      &row_norm,
+                    const Vector<Number>      &col_norm,
+                    const ConvergenceNormType &norm_type) const;
 
   /*
    * Check convergence of the parallel scaling algorithm. Only on either row
    * or columns for SK scaling.
    */
   bool
-  check_convergence(Vector<double>     local_row_col_norm,
-                    const std::string &norm_type,
-                    const MPI_Comm     mpi_communicator) const;
+  check_convergence(const Vector<double>      &local_row_col_norm,
+                    const ConvergenceNormType &norm_type,
+                    const MPI_Comm             mpi_communicator) const;
 
   /*
    * Check convergence of the parallel scaling algorithm. Only on both row
    * and columns for symmetry preserving scaling.
    */
   bool
-  check_convergence(Vector<double>     local_row_norm,
-                    Vector<double>     local_col_norm,
-                    const std::string &norm_type,
-                    const MPI_Comm     mpi_communicator) const;
+  check_convergence(const Vector<double>      &local_row_norm,
+                    const Vector<double>      &local_col_norm,
+                    const ConvergenceNormType &norm_type,
+                    const MPI_Comm             mpi_communicator) const;
 
   /*
    * Fill the send_data map with the partial column norms that need to be sent
@@ -383,11 +392,11 @@ private:
    */
   void
   send_prepare_col_norms(
+    const std::map<types::global_dof_index, double> &partial_column_norms,
     std::map<unsigned int,
              std::vector<std::pair<types::global_dof_index, double>>>
-                                                    &send_data,
-    const std::map<types::global_dof_index, double> &partial_column_norms,
-    Vector<double>                                  &local_col_norms);
+                   &send_data,
+    Vector<double> &local_col_norms);
 
   /*
    * Fill the send_column_norms map with the updated column norms that need to
@@ -396,13 +405,13 @@ private:
    */
   void
   send_prepare_updated_col_norms(
-    std::map<unsigned int,
-             std::vector<std::pair<types::global_dof_index, double>>>
-      &send_column_norms,
     const std::map<unsigned int,
                    std::vector<std::pair<types::global_dof_index, double>>>
                          &received_data,
-    const Vector<double> &local_col_norms);
+    const Vector<double> &local_col_norms,
+    std::map<unsigned int,
+             std::vector<std::pair<types::global_dof_index, double>>>
+      &send_column_norms);
 };
 
 DEAL_II_NAMESPACE_CLOSE

@@ -47,7 +47,7 @@ main(int argc, char **argv)
 
   B.print(oss1);
   deallog << oss1.str();
-  scaler.scale_matrix(B);
+  scaler.find_scaling_and_scale_matrix(B);
 
   deallog << "Scaled Sparse Matrix EZ: " << std::endl;
   B.print(oss2);

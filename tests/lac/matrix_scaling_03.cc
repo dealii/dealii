@@ -61,7 +61,7 @@ main(int argc, char **argv)
   deallog << "Sparse Matrix: " << std::endl;
 
   B.print(deallog);
-  converged = scaler.scale_matrix(B);
+  converged = scaler.find_scaling_and_scale_matrix(B);
 
   deallog << "Converged? " << (converged ? "True" : "False") << std::endl;
 
@@ -84,7 +84,7 @@ main(int argc, char **argv)
   deallog << "Full Matrix: " << std::endl;
 
   A.print(deallog);
-  converged = scaler.scale_matrix(A);
+  converged = scaler.find_scaling_and_scale_matrix(A);
 
   deallog << "Converged? " << (converged ? "True" : "False") << std::endl;
 

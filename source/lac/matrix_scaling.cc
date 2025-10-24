@@ -46,10 +46,10 @@ namespace PETScWrappers
 
 #include "lac/matrix_scaling.inst"
 
-// Check for unsupported matrix types
+// Check if the matrix type is sequential
 template <typename Matrix>
 constexpr bool
-is_supported_matrix()
+is_sequential_matrix()
 {
   return std::is_same_v<Matrix, dealii::SparseMatrix<double>> ||
          std::is_same_v<Matrix, dealii::SparseMatrix<float>> ||
@@ -100,22 +100,20 @@ MatrixScaling::MatrixScaling(const AdditionalData &control)
   : control(control)
   , row_scaling()
   , column_scaling()
-  , converged(false)
 {}
 
 
 
 template <class Matrix>
 bool
-MatrixScaling::scale_matrix(Matrix &matrix)
+MatrixScaling::find_scaling_and_scale_matrix(Matrix &matrix)
 {
-  // Check for unsupported matrix types
-  if constexpr (is_supported_matrix<Matrix>())
+  bool converged = false;
+
+  if constexpr (is_sequential_matrix<Matrix>())
     {
       const auto n_rows = matrix.m();
       const auto n_cols = matrix.n();
-
-      converged = false;
 
       row_scaling.reinit(n_rows);
       column_scaling.reinit(n_cols);
@@ -127,10 +125,10 @@ MatrixScaling::scale_matrix(Matrix &matrix)
         {
           case MatrixScaling::AdditionalData::ScalingAlgorithm::sinkhorn_knopp:
             {
-              do_sk_scaling(matrix,
-                            control.sinkhorn_knopp_parameters.max_iterations);
-            }
-            {
+              converged =
+                do_sk_scaling(matrix,
+                              control.sinkhorn_knopp_parameters.max_iterations);
+
               break;
             }
 
@@ -139,18 +137,22 @@ MatrixScaling::scale_matrix(Matrix &matrix)
             {
               if (control.l1linf_parameters.start_inf_norm_steps > 0 &&
                   !converged)
-                do_linfty_scaling(
+                converged = do_linfty_scaling(
                   matrix, control.l1linf_parameters.start_inf_norm_steps);
               if (control.l1linf_parameters.l1_norm_steps > 0 && !converged)
-                do_l1_scaling(matrix, control.l1linf_parameters.l1_norm_steps);
+                converged =
+                  do_l1_scaling(matrix,
+                                control.l1linf_parameters.l1_norm_steps);
               if (control.l1linf_parameters.end_inf_norm_steps > 0 &&
                   !converged)
-                do_linfty_scaling(matrix,
-                                  control.l1linf_parameters.end_inf_norm_steps);
-            }
-            {
+                converged = do_linfty_scaling(
+                  matrix, control.l1linf_parameters.end_inf_norm_steps);
+
               break;
             }
+
+          default:
+            DEAL_II_ASSERT_UNREACHABLE();
         }
     }
   else if constexpr (std::is_same_v<Matrix, TrilinosWrappers::SparseMatrix> ||
@@ -170,7 +172,6 @@ MatrixScaling::scale_matrix(Matrix &matrix)
           Utilities::MPI::create_evenly_distributed_partitioning(
             matrix.get_mpi_communicator(), matrix.n());
 
-      converged = false;
       ghost_columns.clear();
       ghost_columns.set_size(matrix.n());
 
@@ -202,10 +203,10 @@ MatrixScaling::scale_matrix(Matrix &matrix)
         {
           case MatrixScaling::AdditionalData::ScalingAlgorithm::sinkhorn_knopp:
             {
-              do_sk_scaling(matrix,
-                            control.sinkhorn_knopp_parameters.max_iterations);
-            }
-            {
+              converged =
+                do_sk_scaling(matrix,
+                              control.sinkhorn_knopp_parameters.max_iterations);
+
               break;
             }
 
@@ -214,18 +215,22 @@ MatrixScaling::scale_matrix(Matrix &matrix)
             {
               if (control.l1linf_parameters.start_inf_norm_steps > 0 &&
                   !converged)
-                do_linfty_scaling(
+                converged = do_linfty_scaling(
                   matrix, control.l1linf_parameters.start_inf_norm_steps);
               if (control.l1linf_parameters.l1_norm_steps > 0 && !converged)
-                do_l1_scaling(matrix, control.l1linf_parameters.l1_norm_steps);
+                converged =
+                  do_l1_scaling(matrix,
+                                control.l1linf_parameters.l1_norm_steps);
               if (control.l1linf_parameters.end_inf_norm_steps > 0 &&
                   !converged)
-                do_linfty_scaling(matrix,
-                                  control.l1linf_parameters.end_inf_norm_steps);
-            }
-            {
+                converged = do_linfty_scaling(
+                  matrix, control.l1linf_parameters.end_inf_norm_steps);
+
               break;
             }
+
+          default:
+            DEAL_II_ASSERT_UNREACHABLE();
         }
     }
   else
@@ -241,17 +246,15 @@ MatrixScaling::scale_matrix(Matrix &matrix)
 
 template <class Matrix, class VectorType>
 bool
-MatrixScaling::scale_linear_system(Matrix &matrix, VectorType &rhs)
+MatrixScaling::find_scaling_and_scale_linear_system(Matrix     &matrix,
+                                                    VectorType &rhs)
 {
   AssertDimension(matrix.m(), rhs.size());
   AssertDimension(matrix.m(), matrix.n());
 
-  if constexpr (is_supported_matrix<Matrix>() ||
-                std::is_same_v<Matrix, TrilinosWrappers::SparseMatrix> ||
-                std::is_same_v<Matrix, PETScWrappers::MPI::SparseMatrix>)
-    scale_matrix(matrix);
-  else
-    Assert(false, ExcNotImplemented());
+  bool converged = false;
+
+  converged = find_scaling_and_scale_matrix(matrix);
 
   if constexpr (std::is_same_v<VectorType, dealii::Vector<double>> ||
                 std::is_same_v<VectorType, dealii::Vector<float>>)
@@ -342,18 +345,35 @@ MatrixScaling::get_column_scaling() const
 
 template <typename Number>
 bool
-MatrixScaling::check_convergence(Vector<Number>     row_col_norm,
-                                 const std::string &norm_type) const
+MatrixScaling::check_convergence(
+  const Vector<Number>                     &row_col_norm,
+  const MatrixScaling::ConvergenceNormType &norm_type) const
 {
-  row_col_norm.add(-1.0);
-  if (norm_type == "l1")
-    return row_col_norm.l1_norm() < control.scaling_tolerance;
-  else if (norm_type == "linfty")
-    return row_col_norm.linfty_norm() < control.scaling_tolerance;
-  else
+  Number convergence_norm = 0;
+  switch (norm_type)
     {
-      Assert(false, ExcNotImplemented());
-      return false;
+      case ConvergenceNormType::l1:
+        {
+          for (const auto &val : row_col_norm)
+            convergence_norm += std::abs(val - Number(1.0));
+
+          return convergence_norm < control.scaling_tolerance;
+        }
+
+      case ConvergenceNormType::l_infty:
+        {
+          for (const auto &val : row_col_norm)
+            convergence_norm =
+              std::max(convergence_norm, std::abs(val - Number(1.0)));
+
+          return convergence_norm < control.scaling_tolerance;
+        }
+
+      default:
+        {
+          DEAL_II_ASSERT_UNREACHABLE();
+          return false;
+        }
     }
 }
 
@@ -361,48 +381,86 @@ MatrixScaling::check_convergence(Vector<Number>     row_col_norm,
 
 template <typename Number>
 bool
-MatrixScaling::check_convergence(Vector<Number>     row_norm,
-                                 Vector<Number>     col_norm,
-                                 const std::string &norm_type) const
+MatrixScaling::check_convergence(
+  const Vector<Number>                     &row_norm,
+  const Vector<Number>                     &col_norm,
+  const MatrixScaling::ConvergenceNormType &norm_type) const
 {
-  row_norm.add(-1.0);
-  col_norm.add(-1.0);
-  if (norm_type == "l1")
-    return (row_norm.l1_norm() < control.scaling_tolerance &&
-            col_norm.l1_norm() < control.scaling_tolerance);
-  else if (norm_type == "linfty")
-    return (row_norm.linfty_norm() < control.scaling_tolerance &&
-            col_norm.linfty_norm() < control.scaling_tolerance);
-  else
+  Number convergence_row_norm = 0;
+  Number convergence_col_norm = 0;
+  switch (norm_type)
     {
-      Assert(false, ExcNotImplemented());
-      return false;
+      case ConvergenceNormType::l1:
+        {
+          for (const auto &val : row_norm)
+            convergence_row_norm += std::abs(val - Number(1.0));
+          for (const auto &val : col_norm)
+            convergence_col_norm += std::abs(val - Number(1.0));
+
+          return (convergence_row_norm < control.scaling_tolerance &&
+                  convergence_col_norm < control.scaling_tolerance);
+        }
+
+      case ConvergenceNormType::l_infty:
+        {
+          for (const auto &val : row_norm)
+            convergence_row_norm =
+              std::max(convergence_row_norm, std::abs(val - Number(1.0)));
+          for (const auto &val : col_norm)
+            convergence_col_norm =
+              std::max(convergence_col_norm, std::abs(val - Number(1.0)));
+
+          return (convergence_row_norm < control.scaling_tolerance &&
+                  convergence_col_norm < control.scaling_tolerance);
+        }
+
+      default:
+        {
+          DEAL_II_ASSERT_UNREACHABLE();
+          return false;
+        }
     }
 }
 
 
 
 bool
-MatrixScaling::check_convergence(Vector<double>     local_row_col_norm,
-                                 const std::string &norm_type,
-                                 const MPI_Comm     mpi_communicator) const
+MatrixScaling::check_convergence(
+  const Vector<double>                     &local_row_col_norm,
+  const MatrixScaling::ConvergenceNormType &norm_type,
+  const MPI_Comm                            mpi_communicator) const
 {
-  local_row_col_norm.add(-1.0);
-  bool local_not_converged;
+  double convergence_norm = 0;
+  bool   local_not_converged;
 
-  if (norm_type == "l1")
-    local_not_converged =
-      !(local_row_col_norm.l1_norm() < control.scaling_tolerance);
-  else if (norm_type == "linfty")
-    local_not_converged =
-      !(local_row_col_norm.linfty_norm() < control.scaling_tolerance);
-  else
+  switch (norm_type)
     {
-      Assert(false, ExcNotImplemented());
-      return false;
+      case ConvergenceNormType::l1:
+        {
+          for (const auto &val : local_row_col_norm)
+            convergence_norm += std::abs(val - 1.0);
+
+          local_not_converged = !(convergence_norm < control.scaling_tolerance);
+          break;
+        }
+
+      case ConvergenceNormType::l_infty:
+        {
+          for (const auto &val : local_row_col_norm)
+            convergence_norm = std::max(convergence_norm, std::abs(val - 1.0));
+
+          local_not_converged = !(convergence_norm < control.scaling_tolerance);
+          break;
+        }
+
+      default:
+        {
+          DEAL_II_ASSERT_UNREACHABLE();
+          return false;
+        }
     }
 
-  bool any_not_converged =
+  const bool any_not_converged =
     Utilities::MPI::logical_or(local_not_converged, mpi_communicator);
 
   return !any_not_converged;
@@ -411,30 +469,54 @@ MatrixScaling::check_convergence(Vector<double>     local_row_col_norm,
 
 
 bool
-MatrixScaling::check_convergence(Vector<double>     local_row_norm,
-                                 Vector<double>     local_col_norm,
-                                 const std::string &norm_type,
-                                 const MPI_Comm     mpi_communicator) const
+MatrixScaling::check_convergence(
+  const Vector<double>                     &local_row_norm,
+  const Vector<double>                     &local_col_norm,
+  const MatrixScaling::ConvergenceNormType &norm_type,
+  const MPI_Comm                            mpi_communicator) const
 {
-  local_row_norm.add(-1.0);
-  local_col_norm.add(-1.0);
-  bool local_not_converged;
+  double convergence_row_norm = 0;
+  double convergence_col_norm = 0;
+  bool   local_not_converged;
 
-  if (norm_type == "l1")
-    local_not_converged =
-      !(local_row_norm.l1_norm() < control.scaling_tolerance &&
-        local_col_norm.l1_norm() < control.scaling_tolerance);
-  else if (norm_type == "linfty")
-    local_not_converged =
-      !(local_row_norm.linfty_norm() < control.scaling_tolerance &&
-        local_col_norm.linfty_norm() < control.scaling_tolerance);
-  else
+  switch (norm_type)
     {
-      Assert(false, ExcNotImplemented());
-      return false;
+      case ConvergenceNormType::l1:
+        {
+          for (const auto &val : local_row_norm)
+            convergence_row_norm += std::abs(val - 1.0);
+          for (const auto &val : local_col_norm)
+            convergence_col_norm += std::abs(val - 1.0);
+
+          local_not_converged =
+            !(convergence_row_norm < control.scaling_tolerance &&
+              convergence_col_norm < control.scaling_tolerance);
+          break;
+        }
+
+      case ConvergenceNormType::l_infty:
+        {
+          for (const auto &val : local_row_norm)
+            convergence_row_norm =
+              std::max(convergence_row_norm, std::abs(val - 1.0));
+          for (const auto &val : local_col_norm)
+            convergence_col_norm =
+              std::max(convergence_col_norm, std::abs(val - 1.0));
+
+          local_not_converged =
+            !(convergence_row_norm < control.scaling_tolerance &&
+              convergence_col_norm < control.scaling_tolerance);
+          break;
+        }
+
+      default:
+        {
+          DEAL_II_ASSERT_UNREACHABLE();
+          return false;
+        }
     }
 
-  bool any_not_converged =
+  const bool any_not_converged =
     Utilities::MPI::logical_or(local_not_converged, mpi_communicator);
 
   return !any_not_converged;
@@ -444,10 +526,10 @@ MatrixScaling::check_convergence(Vector<double>     local_row_norm,
 
 void
 MatrixScaling::send_prepare_col_norms(
+  const std::map<types::global_dof_index, double> &partial_column_norms,
   std::map<unsigned int,
            std::vector<std::pair<types::global_dof_index, double>>> &send_data,
-  const std::map<types::global_dof_index, double> &partial_column_norms,
-  Vector<double>                                  &local_col_norms)
+  Vector<double> &local_col_norms)
 {
   for (const auto &[col_idx, norm_value] : partial_column_norms)
     {
@@ -470,13 +552,13 @@ MatrixScaling::send_prepare_col_norms(
 
 void
 MatrixScaling::send_prepare_updated_col_norms(
-  std::map<unsigned int,
-           std::vector<std::pair<types::global_dof_index, double>>>
-    &send_column_norms,
   const std::map<unsigned int,
                  std::vector<std::pair<types::global_dof_index, double>>>
                        &received_data,
-  const Vector<double> &local_col_norms)
+  const Vector<double> &local_col_norms,
+  std::map<unsigned int,
+           std::vector<std::pair<types::global_dof_index, double>>>
+    &send_column_norms)
 {
   // For each rank that requested column norm data from me,
   // send them the corresponding column norms updated
@@ -499,10 +581,10 @@ MatrixScaling::send_prepare_updated_col_norms(
 
 
 template <class Matrix>
-void
+bool
 MatrixScaling::do_l1_scaling(Matrix &matrix, const unsigned int nsteps)
 {
-  if constexpr (is_supported_matrix<Matrix>())
+  if constexpr (is_sequential_matrix<Matrix>())
     {
       using Number = typename Matrix::value_type;
 
@@ -523,11 +605,10 @@ MatrixScaling::do_l1_scaling(Matrix &matrix, const unsigned int nsteps)
                 }
             }
 
-          if (check_convergence(row_norms, col_norms, "l1"))
-            {
-              converged = true;
-              break;
-            }
+          if (check_convergence(row_norms,
+                                col_norms,
+                                MatrixScaling::ConvergenceNormType::l1))
+            return true;
 
           for (unsigned int row = 0; row < matrix.m(); ++row)
             {
@@ -574,8 +655,8 @@ MatrixScaling::do_l1_scaling(Matrix &matrix, const unsigned int nsteps)
                    std::vector<std::pair<types::global_dof_index, double>>>
             send_data;
 
-          send_prepare_col_norms(send_data,
-                                 partial_column_norms,
+          send_prepare_col_norms(partial_column_norms,
+                                 send_data,
                                  local_col_norms);
 
           auto received_data =
@@ -595,12 +676,10 @@ MatrixScaling::do_l1_scaling(Matrix &matrix, const unsigned int nsteps)
 
           if (check_convergence(local_row_norms,
                                 local_col_norms,
-                                "l1",
+                                MatrixScaling::ConvergenceNormType::l1,
                                 matrix.get_mpi_communicator()))
-            {
-              converged = true;
-              break;
-            }
+            return true;
+
 
           for (unsigned int i = 0; i < local_row_norms.size(); ++i)
             row_scaling[i] /= std::sqrt(local_row_norms[i]);
@@ -612,9 +691,9 @@ MatrixScaling::do_l1_scaling(Matrix &matrix, const unsigned int nsteps)
                    std::vector<std::pair<types::global_dof_index, double>>>
             send_column_norms;
 
-          send_prepare_updated_col_norms(send_column_norms,
-                                         received_data,
-                                         local_col_norms);
+          send_prepare_updated_col_norms(received_data,
+                                         local_col_norms,
+                                         send_column_norms);
 
           auto received_column_norms =
             Utilities::MPI::some_to_some(matrix.get_mpi_communicator(),
@@ -669,15 +748,16 @@ MatrixScaling::do_l1_scaling(Matrix &matrix, const unsigned int nsteps)
             matrix.compress(VectorOperation::insert);
         }
     }
+  return false;
 }
 
 
 
 template <class Matrix>
-void
+bool
 MatrixScaling::do_linfty_scaling(Matrix &matrix, const unsigned int nsteps)
 {
-  if constexpr (is_supported_matrix<Matrix>())
+  if constexpr (is_sequential_matrix<Matrix>())
     {
       using Number = typename Matrix::value_type;
 
@@ -700,11 +780,11 @@ MatrixScaling::do_linfty_scaling(Matrix &matrix, const unsigned int nsteps)
                 }
             }
 
-          if (check_convergence(row_norms, col_norms, "linfty"))
-            {
-              converged = true;
-              break;
-            }
+          if (check_convergence(row_norms,
+                                col_norms,
+                                MatrixScaling::ConvergenceNormType::l_infty))
+            return true;
+
 
           for (unsigned int row = 0; row < matrix.m(); ++row)
             {
@@ -755,8 +835,8 @@ MatrixScaling::do_linfty_scaling(Matrix &matrix, const unsigned int nsteps)
                    std::vector<std::pair<types::global_dof_index, double>>>
             send_data;
 
-          send_prepare_col_norms(send_data,
-                                 partial_column_norms,
+          send_prepare_col_norms(partial_column_norms,
+                                 send_data,
                                  local_col_norms);
 
           auto received_data =
@@ -777,12 +857,9 @@ MatrixScaling::do_linfty_scaling(Matrix &matrix, const unsigned int nsteps)
 
           if (check_convergence(local_row_norms,
                                 local_col_norms,
-                                "linfty",
+                                MatrixScaling::ConvergenceNormType::l_infty,
                                 matrix.get_mpi_communicator()))
-            {
-              converged = true;
-              break;
-            }
+            return true;
 
           for (unsigned int i = 0; i < local_row_norms.size(); ++i)
             row_scaling[i] /= std::sqrt(local_row_norms[i]);
@@ -794,9 +871,9 @@ MatrixScaling::do_linfty_scaling(Matrix &matrix, const unsigned int nsteps)
                    std::vector<std::pair<types::global_dof_index, double>>>
             send_column_norms;
 
-          send_prepare_updated_col_norms(send_column_norms,
-                                         received_data,
-                                         local_col_norms);
+          send_prepare_updated_col_norms(received_data,
+                                         local_col_norms,
+                                         send_column_norms);
 
           auto received_column_norms =
             Utilities::MPI::some_to_some(matrix.get_mpi_communicator(),
@@ -851,15 +928,16 @@ MatrixScaling::do_linfty_scaling(Matrix &matrix, const unsigned int nsteps)
             matrix.compress(VectorOperation::insert);
         }
     }
+  return false;
 }
 
 
 
 template <class Matrix>
-void
+bool
 MatrixScaling::do_sk_scaling(Matrix &matrix, const unsigned int nsteps)
 {
-  if constexpr (is_supported_matrix<Matrix>())
+  if constexpr (is_sequential_matrix<Matrix>())
     {
       using Number = typename Matrix::value_type;
 
@@ -893,11 +971,9 @@ MatrixScaling::do_sk_scaling(Matrix &matrix, const unsigned int nsteps)
                       row_scaling[row] /= row_norms[row];
                     }
 
-                  if (check_convergence(col_norms, "l1"))
-                    {
-                      converged = true;
-                      break;
-                    }
+                  if (check_convergence(col_norms,
+                                        MatrixScaling::ConvergenceNormType::l1))
+                    return true;
 
                   // Column step
                   row_norms = 0;
@@ -917,14 +993,10 @@ MatrixScaling::do_sk_scaling(Matrix &matrix, const unsigned int nsteps)
                       column_scaling[col] /= col_norms[col];
                     }
 
-                  if (check_convergence(row_norms, "l1"))
-                    {
-                      converged = true;
-                      break;
-                    }
+                  if (check_convergence(row_norms,
+                                        MatrixScaling::ConvergenceNormType::l1))
+                    return true;
                 }
-            }
-            {
               break;
             }
 
@@ -956,11 +1028,9 @@ MatrixScaling::do_sk_scaling(Matrix &matrix, const unsigned int nsteps)
                       row_scaling[row] /= row_norms[row];
                     }
 
-                  if (check_convergence(col_norms, "linfty"))
-                    {
-                      converged = true;
-                      break;
-                    }
+                  if (check_convergence(
+                        col_norms, MatrixScaling::ConvergenceNormType::l_infty))
+                    return true;
 
                   // Column step
                   row_norms = 0;
@@ -981,16 +1051,15 @@ MatrixScaling::do_sk_scaling(Matrix &matrix, const unsigned int nsteps)
                       column_scaling[col] /= col_norms[col];
                     }
 
-                  if (check_convergence(row_norms, "linfty"))
-                    {
-                      converged = true;
-                      break;
-                    }
+                  if (check_convergence(
+                        row_norms, MatrixScaling::ConvergenceNormType::l_infty))
+                    return true;
                 }
-            }
-            {
               break;
             }
+
+          default:
+            DEAL_II_ASSERT_UNREACHABLE();
         }
     }
   else if constexpr (std::is_same_v<Matrix, TrilinosWrappers::SparseMatrix> ||
@@ -1056,8 +1125,8 @@ MatrixScaling::do_sk_scaling(Matrix &matrix, const unsigned int nsteps)
                     std::vector<std::pair<types::global_dof_index, double>>>
                     send_data;
 
-                  send_prepare_col_norms(send_data,
-                                         partial_column_norms,
+                  send_prepare_col_norms(partial_column_norms,
+                                         send_data,
                                          local_col_norms);
 
                   auto received_data =
@@ -1077,12 +1146,9 @@ MatrixScaling::do_sk_scaling(Matrix &matrix, const unsigned int nsteps)
 
                   // Convergence check only on columns
                   if (check_convergence(local_col_norms,
-                                        "l1",
+                                        MatrixScaling::ConvergenceNormType::l1,
                                         matrix.get_mpi_communicator()))
-                    {
-                      converged = true;
-                      break;
-                    }
+                    return true;
 
                   // Column step
                   local_row_norms = 0;
@@ -1093,9 +1159,9 @@ MatrixScaling::do_sk_scaling(Matrix &matrix, const unsigned int nsteps)
                     std::vector<std::pair<types::global_dof_index, double>>>
                     send_column_norms;
 
-                  send_prepare_updated_col_norms(send_column_norms,
-                                                 received_data,
-                                                 local_col_norms);
+                  send_prepare_updated_col_norms(received_data,
+                                                 local_col_norms,
+                                                 send_column_norms);
 
                   auto received_column_norms =
                     Utilities::MPI::some_to_some(matrix.get_mpi_communicator(),
@@ -1160,15 +1226,10 @@ MatrixScaling::do_sk_scaling(Matrix &matrix, const unsigned int nsteps)
                     column_scaling[i] /= local_col_norms[i];
 
                   if (check_convergence(local_row_norms,
-                                        "l1",
+                                        MatrixScaling::ConvergenceNormType::l1,
                                         matrix.get_mpi_communicator()))
-                    {
-                      converged = true;
-                      break;
-                    }
+                    return true;
                 }
-            }
-            {
               break;
             }
 
@@ -1229,8 +1290,8 @@ MatrixScaling::do_sk_scaling(Matrix &matrix, const unsigned int nsteps)
                     std::vector<std::pair<types::global_dof_index, double>>>
                     send_data;
 
-                  send_prepare_col_norms(send_data,
-                                         partial_column_norms,
+                  send_prepare_col_norms(partial_column_norms,
+                                         send_data,
                                          local_col_norms);
 
                   auto received_data =
@@ -1249,13 +1310,11 @@ MatrixScaling::do_sk_scaling(Matrix &matrix, const unsigned int nsteps)
                         }
                     }
 
-                  if (check_convergence(local_col_norms,
-                                        "linfty",
-                                        matrix.get_mpi_communicator()))
-                    {
-                      converged = true;
-                      break;
-                    }
+                  if (check_convergence(
+                        local_col_norms,
+                        MatrixScaling::ConvergenceNormType::l_infty,
+                        matrix.get_mpi_communicator()))
+                    return true;
 
                   // Column step
                   local_row_norms = 0;
@@ -1266,9 +1325,9 @@ MatrixScaling::do_sk_scaling(Matrix &matrix, const unsigned int nsteps)
                     std::vector<std::pair<types::global_dof_index, double>>>
                     send_column_norms;
 
-                  send_prepare_updated_col_norms(send_column_norms,
-                                                 received_data,
-                                                 local_col_norms);
+                  send_prepare_updated_col_norms(received_data,
+                                                 local_col_norms,
+                                                 send_column_norms);
 
                   auto received_column_norms =
                     Utilities::MPI::some_to_some(matrix.get_mpi_communicator(),
@@ -1336,27 +1395,28 @@ MatrixScaling::do_sk_scaling(Matrix &matrix, const unsigned int nsteps)
                   for (unsigned int i = 0; i < local_col_norms.size(); ++i)
                     column_scaling[i] /= local_col_norms[i];
 
-                  if (check_convergence(local_row_norms,
-                                        "linfty",
-                                        matrix.get_mpi_communicator()))
-                    {
-                      converged = true;
-                      break;
-                    }
+                  if (check_convergence(
+                        local_row_norms,
+                        MatrixScaling::ConvergenceNormType::l_infty,
+                        matrix.get_mpi_communicator()))
+                    return true;
                 }
-            }
-            {
               break;
             }
+
+          default:
+            DEAL_II_ASSERT_UNREACHABLE();
         }
     }
+  return false;
 }
 
 
 
-#define InstantiateMatrixScaling(MATRIX, VECTOR)                        \
-  template bool MatrixScaling::scale_matrix(MATRIX &);                  \
-  template bool MatrixScaling::scale_linear_system(MATRIX &, VECTOR &); \
+#define InstantiateMatrixScaling(MATRIX, VECTOR)                               \
+  template bool MatrixScaling::find_scaling_and_scale_matrix(MATRIX &);        \
+  template bool MatrixScaling::find_scaling_and_scale_linear_system(MATRIX &,  \
+                                                                    VECTOR &); \
   template void MatrixScaling::scale_system_solution(VECTOR &) const;
 
 #ifdef DEAL_II_WITH_TRILINOS

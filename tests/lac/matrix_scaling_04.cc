@@ -74,7 +74,7 @@ main(int argc, char **argv)
   Binv.initialize(B);
   Binv.vmult(x, rhs);
 
-  scaler.scale_linear_system(B, rhs);
+  scaler.find_scaling_and_scale_linear_system(B, rhs);
   scaler.scale_system_solution(rhs);
 
   deallog << "Scaled Block Sparse Matrix: " << std::endl;

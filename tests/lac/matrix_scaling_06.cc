@@ -100,7 +100,7 @@ test(unsigned int scaling_steps)
   MatrixScaling::AdditionalData additional_data;
   additional_data.l1linf_parameters.l1_norm_steps = scaling_steps;
   MatrixScaling scaler(additional_data);
-  converged = scaler.scale_matrix(matrix);
+  converged = scaler.find_scaling_and_scale_matrix(matrix);
 
   const Vector<double> &row_scaling    = scaler.get_row_scaling();
   const Vector<double> &column_scaling = scaler.get_column_scaling();
@@ -159,7 +159,7 @@ test_diagonal(unsigned int scaling_steps)
   additional_data.sinkhorn_knopp_parameters.norm_type =
     MatrixScaling::AdditionalData::SKParameters::NormType::l_infty;
   MatrixScaling scaler(additional_data);
-  converged = scaler.scale_matrix(matrix);
+  converged = scaler.find_scaling_and_scale_matrix(matrix);
 
   const Vector<double> &row_scaling    = scaler.get_row_scaling();
   const Vector<double> &column_scaling = scaler.get_column_scaling();
@@ -251,7 +251,7 @@ test_scaling_linsys()
   MatrixScaling::AdditionalData control;
   MatrixScaling                 scaler(control);
 
-  scaler.scale_linear_system(matrix_copy, rhs_copy);
+  scaler.find_scaling_and_scale_linear_system(matrix_copy, rhs_copy);
 
 
   if constexpr (std::is_same_v<MatrixType, TrilinosWrappers::SparseMatrix>)

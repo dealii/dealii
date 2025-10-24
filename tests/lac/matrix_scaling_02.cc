@@ -72,7 +72,7 @@ main(int argc, char **argv)
     deallog << x[i] << " ";
   deallog << std::endl;
 
-  scaler.scale_linear_system(B, rhs);
+  scaler.find_scaling_and_scale_linear_system(B, rhs);
   scaler.scale_system_solution(rhs);
 
   deallog << "Solution of Ax=b scaled: " << std::endl;
@@ -91,7 +91,7 @@ main(int argc, char **argv)
     deallog << x[i] << " ";
   deallog << std::endl;
 
-  scaler.scale_linear_system(A, rhs);
+  scaler.find_scaling_and_scale_linear_system(A, rhs);
   scaler.scale_system_solution(rhs);
 
   deallog << "Solution of Ax=b scaled: " << std::endl;

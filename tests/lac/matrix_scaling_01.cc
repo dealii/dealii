@@ -55,7 +55,7 @@ main(int argc, char **argv)
   deallog << "Sparse Matrix: " << std::endl;
 
   B.print(deallog);
-  scaler.scale_matrix(B);
+  scaler.find_scaling_and_scale_matrix(B);
 
   deallog << "Scaled Sparse Matrix: " << std::endl;
   B.print(deallog);
@@ -75,7 +75,7 @@ main(int argc, char **argv)
   deallog << "Full Matrix: " << std::endl;
 
   A.print(deallog);
-  scaler.scale_matrix(A);
+  scaler.find_scaling_and_scale_matrix(A);
   deallog << "Scaled Full Matrix: " << std::endl;
   A.print(deallog);
 
