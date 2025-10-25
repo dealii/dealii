@@ -612,7 +612,7 @@ namespace PSCToolkitWrappers
     add(const value_type s, const Vector &V);
 
     /**
-     * Addition of <tt>s</tt> to all compoents.
+     * Addition of <tt>s</tt> to all components.
      */
     void
     add(const value_type s);

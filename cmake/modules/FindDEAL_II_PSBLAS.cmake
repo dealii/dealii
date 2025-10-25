@@ -95,4 +95,3 @@ process_feature(PSBLAS
   CLEAR
     ${_psblas_library_variables} ${_additional_libraries} PSBLAS_INCLUDE_DIR
   )
- 
