@@ -700,6 +700,18 @@ namespace Particles
     get_property_pool() const;
 
     /**
+     * Return a constant reference to the triangulation underlying this object.
+     */
+    const Triangulation<dim, spacedim> &
+    get_triangulation() const;
+
+    /**
+     * Return a constant reference to the mapping underlying this object.
+     */
+    const Mapping<dim, spacedim> &
+    get_mapping() const;
+
+    /**
      * Find and update the cells containing each particle for all locally owned
      * particles. If particles moved out of the local subdomain
      * they will be sent to their new process and inserted there.
@@ -1362,6 +1374,32 @@ namespace Particles
       output_vector.compress(VectorOperation::add);
     else
       output_vector.compress(VectorOperation::insert);
+  }
+
+
+
+  template <int dim, int spacedim>
+  inline const Triangulation<dim, spacedim> &
+  ParticleHandler<dim, spacedim>::get_triangulation() const
+  {
+    Assert(triangulation != nullptr,
+           ExcMessage("This ParticleHandler object has not been associated "
+                      "with a triangulation."));
+
+    return *triangulation;
+  }
+
+
+
+  template <int dim, int spacedim>
+  inline const Mapping<dim, spacedim> &
+  ParticleHandler<dim, spacedim>::get_mapping() const
+  {
+    Assert(mapping != nullptr,
+           ExcMessage("This ParticleHandler object has not been associated "
+                      "with a mapping."));
+
+    return *mapping;
   }
 
 } // namespace Particles
