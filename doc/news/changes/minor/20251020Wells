@@ -1,0 +1,5 @@
+Improved: The various all_zero() functions (e.g., Vector::all_zero())
+now consistently use `std::all_of()` to detect nonzero entries instead of
+norms or ad-hoc loops.
+<br>
+(David Wells, 2025/10/20)
