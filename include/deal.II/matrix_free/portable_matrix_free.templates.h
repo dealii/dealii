@@ -659,18 +659,19 @@ namespace Portable
   {
     const unsigned int n_q_points = Functor::n_q_points;
 
-    for (unsigned int i = 0; i < n_colors; ++i)
-      if (n_cells[i] > 0)
+    for (unsigned int color = 0; color < n_colors; ++color)
+      if (n_cells[color] > 0)
         {
-          auto color_data = get_data(i);
+          auto color_data = get_data(color);
 
           MemorySpace::Default::kokkos_space::execution_space exec;
           Kokkos::TeamPolicy<
             MemorySpace::Default::kokkos_space::execution_space>
-            team_policy(exec, n_cells[i], Kokkos::AUTO);
+            team_policy(exec, n_cells[color], Kokkos::AUTO);
 
           Kokkos::parallel_for(
-            "dealii::MatrixFree::evaluate_coeff_cell_loop",
+            "dealii::MatrixFree::evaluate_coeff_cell_loop color " +
+              std::to_string(color),
             team_policy,
             KOKKOS_LAMBDA(const Kokkos::TeamPolicy<
                           MemorySpace::Default::kokkos_space::execution_space>::
@@ -706,13 +707,13 @@ namespace Portable
 
     // For each color, add local_to_global, inv_jacobian, JxW, and q_points.
     // FIXME
-    for (unsigned int i = 0; i < n_colors; ++i)
+    for (unsigned int color = 0; color < n_colors; ++color)
       {
-        bytes += n_cells[i] * padding_length * sizeof(unsigned int) +
-                 n_cells[i] * padding_length * dim * dim * sizeof(Number) +
-                 n_cells[i] * padding_length * sizeof(Number) +
-                 n_cells[i] * padding_length * sizeof(point_type) +
-                 n_cells[i] * sizeof(unsigned int);
+        bytes += n_cells[color] * padding_length * sizeof(unsigned int) +
+                 n_cells[color] * padding_length * dim * dim * sizeof(Number) +
+                 n_cells[color] * padding_length * sizeof(Number) +
+                 n_cells[color] * padding_length * sizeof(point_type) +
+                 n_cells[color] * sizeof(unsigned int);
       }
 
     return bytes;
@@ -953,17 +954,18 @@ namespace Portable
         partitioner = std::make_shared<Utilities::MPI::Partitioner>(
           dof_handler->locally_owned_dofs(), locally_relevant_dofs, *comm);
       }
-    for (unsigned int i = 0; i < n_colors; ++i)
+    for (unsigned int color = 0; color < n_colors; ++color)
       {
-        n_cells[i] = graph[i].size();
-        helper.fill_data(i, graph[i], partitioner);
+        n_cells[color] = graph[color].size();
+        helper.fill_data(color, graph[color], partitioner);
       }
 
     // Setup row starts
     if (n_colors > 0)
       row_start[0] = 0;
-    for (unsigned int i = 1; i < n_colors; ++i)
-      row_start[i] = row_start[i - 1] + n_cells[i - 1] * get_padding_length();
+    for (unsigned int color = 1; color < n_colors; ++color)
+      row_start[color] =
+        row_start[color - 1] + n_cells[color - 1] * get_padding_length();
 
     // Constrained indices
     n_constrained_dofs = constraints.n_constraints();
@@ -1040,7 +1042,8 @@ namespace Portable
             ApplyKernel<dim, Number, Functor, IsBlockVector<VectorType>::value>
               apply_kernel(func, get_data(color), src, dst);
 
-          Kokkos::parallel_for("dealii::MatrixFree::serial_cell_loop",
+          Kokkos::parallel_for("dealii::MatrixFree::serial_cell_loop color " +
+                                 std::to_string(color),
                                team_policy,
                                apply_kernel);
         }
@@ -1096,7 +1099,7 @@ namespace Portable
                   func, get_data(0), src, dst);
 
                 Kokkos::parallel_for(
-                  "dealii::MatrixFree::distributed_cell_loop_0",
+                  "dealii::MatrixFree::distributed_cell_loop color 0",
                   team_policy,
                   apply_kernel);
               }
@@ -1114,7 +1117,7 @@ namespace Portable
                   func, get_data(1), src, dst);
 
                 Kokkos::parallel_for(
-                  "dealii::MatrixFree::distributed_cell_loop_1",
+                  "dealii::MatrixFree::distributed_cell_loop color 1",
                   team_policy,
                   apply_kernel);
 
@@ -1137,7 +1140,7 @@ namespace Portable
                   func, get_data(2), src, dst);
 
                 Kokkos::parallel_for(
-                  "dealii::MatrixFree::distributed_cell_loop_2",
+                  "dealii::MatrixFree::distributed_cell_loop color 2",
                   team_policy,
                   apply_kernel);
               }
@@ -1146,27 +1149,21 @@ namespace Portable
         else
           {
             src.update_ghost_values();
-            std::vector<
-              Kokkos::View<Number *, MemorySpace::Default::kokkos_space>>
-              values_colors(n_colors);
-            std::vector<
-              Kokkos::View<Number *[dim], MemorySpace::Default::kokkos_space>>
-              gradients_colors(n_colors);
 
             // Execute the loop on the cells
-            for (unsigned int i = 0; i < n_colors; ++i)
-              if (n_cells[i] > 0)
+            for (unsigned int color = 0; color < n_colors; ++color)
+              if (n_cells[color] > 0)
                 {
                   Kokkos::TeamPolicy<
                     MemorySpace::Default::kokkos_space::execution_space>
-                    team_policy(exec, n_cells[i], Kokkos::AUTO);
+                    team_policy(exec, n_cells[color], Kokkos::AUTO);
 
                   internal::ApplyKernel<dim, Number, Functor, false>
-                    apply_kernel(func, get_data(i), src, dst);
+                    apply_kernel(func, get_data(color), src, dst);
 
                   Kokkos::parallel_for(
-                    "dealii::MatrixFree::distributed_cell_loop_" +
-                      std::to_string(i),
+                    "dealii::MatrixFree::distributed_cell_loop color " +
+                      std::to_string(color),
                     team_policy,
                     apply_kernel);
                 }
@@ -1186,19 +1183,19 @@ namespace Portable
         ghosted_dst.zero_out_ghost_values();
 
         // Execute the loop on the cells
-        for (unsigned int i = 0; i < n_colors; ++i)
-          if (n_cells[i] > 0)
+        for (unsigned int color = 0; color < n_colors; ++color)
+          if (n_cells[color] > 0)
             {
               Kokkos::TeamPolicy<
                 MemorySpace::Default::kokkos_space::execution_space>
-                team_policy(exec, n_cells[i], Kokkos::AUTO);
+                team_policy(exec, n_cells[color], Kokkos::AUTO);
 
               internal::ApplyKernel<dim, Number, Functor, false> apply_kernel(
-                func, get_data(i), ghosted_src, ghosted_dst);
+                func, get_data(color), ghosted_src, ghosted_dst);
 
               Kokkos::parallel_for(
-                "dealii::MatrixFree::distributed_cell_loop_" +
-                  std::to_string(i),
+                "dealii::MatrixFree::distributed_cell_loop color " +
+                  std::to_string(color),
                 team_policy,
                 apply_kernel);
             }
