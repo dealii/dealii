@@ -316,10 +316,10 @@ namespace FEValuesExtractors
    * In other words, an object of this type can be initialized with a scalar,
    * vector, tensor, or any other of the `FEValuesExtractors` data types.
    */
-  using ExtractorVariant = std::variant<FEValuesExtractors::Scalar,
-                                        FEValuesExtractors::Vector,
-                                        FEValuesExtractors::Tensor<2>,
-                                        FEValuesExtractors::SymmetricTensor<2>>;
+  using AnyExtractor = std::variant<FEValuesExtractors::Scalar,
+                                    FEValuesExtractors::Vector,
+                                    FEValuesExtractors::Tensor<2>,
+                                    FEValuesExtractors::SymmetricTensor<2>>;
 } // namespace FEValuesExtractors
 
 

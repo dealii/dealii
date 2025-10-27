@@ -756,8 +756,8 @@ namespace DoFRenumbering
     template <int dim, int spacedim>
     std::vector<unsigned int>
     generate_component_order(
-      const std::vector<FEValuesExtractors::ExtractorVariant> &order,
-      const unsigned int                                       fe_n_components)
+      const std::vector<FEValuesExtractors::AnyExtractor> &order,
+      const unsigned int                                   fe_n_components)
     {
       // Initialize `component_order` with invalid unsigned ints representing
       // unassigned state.
@@ -840,7 +840,7 @@ namespace DoFRenumbering
   template <int dim, int spacedim>
   void
   component_wise(DoFHandler<dim, spacedim> &dof_handler,
-                 const std::vector<FEValuesExtractors::ExtractorVariant> &order)
+                 const std::vector<FEValuesExtractors::AnyExtractor> &order)
   {
     // The function acts as a wrapper around the above-implemented function.
 
@@ -878,7 +878,7 @@ namespace DoFRenumbering
   void
   component_wise(DoFHandler<dim, spacedim> &dof_handler,
                  const unsigned int         level,
-                 const std::vector<FEValuesExtractors::ExtractorVariant> &order)
+                 const std::vector<FEValuesExtractors::AnyExtractor> &order)
   {
     // The function acts as a wrapper around the above-implemented function.
 

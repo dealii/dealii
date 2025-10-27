@@ -1,0 +1,417 @@
+
+DEAL:1d::FE: FESystem<1>[FE_Q<1>(2)-FE_DGQ<1>(1)-FE_Q<1>(2)], n_dofs_per_cell=8
+DEAL:1d::FESystem local dof index i=0 | system component=0
+DEAL:1d::FESystem local dof index i=1 | system component=2
+DEAL:1d::FESystem local dof index i=2 | system component=0
+DEAL:1d::FESystem local dof index i=3 | system component=2
+DEAL:1d::FESystem local dof index i=4 | system component=0
+DEAL:1d::FESystem local dof index i=5 | system component=1
+DEAL:1d::FESystem local dof index i=6 | system component=1
+DEAL:1d::FESystem local dof index i=7 | system component=2
+DEAL:1d:Initial  ::Cell 3.4 -- 0 1 2 3 4 5 6 7
+DEAL:1d:Initial  ::Cell 3.5 -- 2 3 8 9 10 11 12 13
+DEAL:1d:Initial  ::Cell 3.6 -- 8 9 14 15 16 17 18 19
+DEAL:1d:Initial  ::Cell 3.7 -- 14 15 20 21 22 23 24 25
+DEAL:1d:Initial  ::Cell 4.0 -- 26 27 28 29 30 31 32 33
+DEAL:1d:Initial  ::Cell 4.1 -- 28 29 34 35 36 37 38 39
+DEAL:1d:Initial  ::Cell 4.2 -- 34 35 40 41 42 43 44 45
+DEAL:1d:Initial  ::Cell 4.3 -- 40 41 46 47 48 49 50 51
+DEAL:1d:Initial  ::Cell 4.4 -- 46 47 52 53 54 55 56 57
+DEAL:1d:Initial  ::Cell 4.5 -- 52 53 58 59 60 61 62 63
+DEAL:1d:Initial  ::Cell 4.6 -- 58 59 64 65 66 67 68 69
+DEAL:1d:Initial  ::Cell 4.7 -- 64 65 0 1 70 71 72 73
+DEAL:1d:Initial  :DoF bounds::Component 0: [0 70]
+DEAL:1d:Initial  :DoF bounds::Component 1: [5 72]
+DEAL:1d:Initial  :DoF bounds::Component 2: [1 73]
+DEAL:1d:Initial  :DoF bounds::Overlap: true
+DEAL:1d:Reordered::Cell 3.4 -- 24 49 25 50 26 0 1 51
+DEAL:1d:Reordered::Cell 3.5 -- 25 50 27 52 28 2 3 53
+DEAL:1d:Reordered::Cell 3.6 -- 27 52 29 54 30 4 5 55
+DEAL:1d:Reordered::Cell 3.7 -- 29 54 31 56 32 6 7 57
+DEAL:1d:Reordered::Cell 4.0 -- 33 58 34 59 35 8 9 60
+DEAL:1d:Reordered::Cell 4.1 -- 34 59 36 61 37 10 11 62
+DEAL:1d:Reordered::Cell 4.2 -- 36 61 38 63 39 12 13 64
+DEAL:1d:Reordered::Cell 4.3 -- 38 63 40 65 41 14 15 66
+DEAL:1d:Reordered::Cell 4.4 -- 40 65 42 67 43 16 17 68
+DEAL:1d:Reordered::Cell 4.5 -- 42 67 44 69 45 18 19 70
+DEAL:1d:Reordered::Cell 4.6 -- 44 69 46 71 47 20 21 72
+DEAL:1d:Reordered::Cell 4.7 -- 46 71 24 49 48 22 23 73
+DEAL:1d:Reordered:DoF bounds::Component 0: [24 48]
+DEAL:1d:Reordered:DoF bounds::Component 1: [0 23]
+DEAL:1d:Reordered:DoF bounds::Component 2: [49 73]
+DEAL:1d:Reordered:DoF bounds::Overlap: false
+DEAL:1d:Reordered:Component DoF Order::Requested: 1 0 2
+DEAL:1d:Reordered:Component DoF Order::Resultant: 1 0 2
+DEAL:1d:Reordered:Component DoF Order::Correct:  true
+DEAL:1d::FE: FESystem<1>[FE_DGP<1>(2)^2-FE_DGQ<1>(1)], n_dofs_per_cell=8
+DEAL:1d::FESystem local dof index i=0 | system component=0
+DEAL:1d::FESystem local dof index i=1 | system component=0
+DEAL:1d::FESystem local dof index i=2 | system component=0
+DEAL:1d::FESystem local dof index i=3 | system component=1
+DEAL:1d::FESystem local dof index i=4 | system component=1
+DEAL:1d::FESystem local dof index i=5 | system component=1
+DEAL:1d::FESystem local dof index i=6 | system component=2
+DEAL:1d::FESystem local dof index i=7 | system component=2
+DEAL:1d:Initial  ::Cell 3.4 -- 0 1 2 3 4 5 6 7
+DEAL:1d:Initial  ::Cell 3.5 -- 8 9 10 11 12 13 14 15
+DEAL:1d:Initial  ::Cell 3.6 -- 16 17 18 19 20 21 22 23
+DEAL:1d:Initial  ::Cell 3.7 -- 24 25 26 27 28 29 30 31
+DEAL:1d:Initial  ::Cell 4.0 -- 32 33 34 35 36 37 38 39
+DEAL:1d:Initial  ::Cell 4.1 -- 40 41 42 43 44 45 46 47
+DEAL:1d:Initial  ::Cell 4.2 -- 48 49 50 51 52 53 54 55
+DEAL:1d:Initial  ::Cell 4.3 -- 56 57 58 59 60 61 62 63
+DEAL:1d:Initial  ::Cell 4.4 -- 64 65 66 67 68 69 70 71
+DEAL:1d:Initial  ::Cell 4.5 -- 72 73 74 75 76 77 78 79
+DEAL:1d:Initial  ::Cell 4.6 -- 80 81 82 83 84 85 86 87
+DEAL:1d:Initial  ::Cell 4.7 -- 88 89 90 91 92 93 94 95
+DEAL:1d:Initial  :DoF bounds::Component 0: [0 90]
+DEAL:1d:Initial  :DoF bounds::Component 1: [3 93]
+DEAL:1d:Initial  :DoF bounds::Component 2: [6 95]
+DEAL:1d:Initial  :DoF bounds::Overlap: true
+DEAL:1d:Reordered::Cell 3.4 -- 36 37 38 0 1 2 72 73
+DEAL:1d:Reordered::Cell 3.5 -- 39 40 41 3 4 5 74 75
+DEAL:1d:Reordered::Cell 3.6 -- 42 43 44 6 7 8 76 77
+DEAL:1d:Reordered::Cell 3.7 -- 45 46 47 9 10 11 78 79
+DEAL:1d:Reordered::Cell 4.0 -- 48 49 50 12 13 14 80 81
+DEAL:1d:Reordered::Cell 4.1 -- 51 52 53 15 16 17 82 83
+DEAL:1d:Reordered::Cell 4.2 -- 54 55 56 18 19 20 84 85
+DEAL:1d:Reordered::Cell 4.3 -- 57 58 59 21 22 23 86 87
+DEAL:1d:Reordered::Cell 4.4 -- 60 61 62 24 25 26 88 89
+DEAL:1d:Reordered::Cell 4.5 -- 63 64 65 27 28 29 90 91
+DEAL:1d:Reordered::Cell 4.6 -- 66 67 68 30 31 32 92 93
+DEAL:1d:Reordered::Cell 4.7 -- 69 70 71 33 34 35 94 95
+DEAL:1d:Reordered:DoF bounds::Component 0: [36 71]
+DEAL:1d:Reordered:DoF bounds::Component 1: [0 35]
+DEAL:1d:Reordered:DoF bounds::Component 2: [72 95]
+DEAL:1d:Reordered:DoF bounds::Overlap: false
+DEAL:1d:Reordered:Component DoF Order::Requested: 1 0 2
+DEAL:1d:Reordered:Component DoF Order::Resultant: 1 0 2
+DEAL:1d:Reordered:Component DoF Order::Correct:  true
+DEAL:2d::FE: FESystem<2>[FE_Q<2>(2)-FE_DGQ<2>(1)-FE_Q<2>(2)], n_dofs_per_cell=22
+DEAL:2d::FESystem local dof index i=0 | system component=0
+DEAL:2d::FESystem local dof index i=1 | system component=2
+DEAL:2d::FESystem local dof index i=2 | system component=0
+DEAL:2d::FESystem local dof index i=3 | system component=2
+DEAL:2d::FESystem local dof index i=4 | system component=0
+DEAL:2d::FESystem local dof index i=5 | system component=2
+DEAL:2d::FESystem local dof index i=6 | system component=0
+DEAL:2d::FESystem local dof index i=7 | system component=2
+DEAL:2d::FESystem local dof index i=8 | system component=0
+DEAL:2d::FESystem local dof index i=9 | system component=2
+DEAL:2d::FESystem local dof index i=10 | system component=0
+DEAL:2d::FESystem local dof index i=11 | system component=2
+DEAL:2d::FESystem local dof index i=12 | system component=0
+DEAL:2d::FESystem local dof index i=13 | system component=2
+DEAL:2d::FESystem local dof index i=14 | system component=0
+DEAL:2d::FESystem local dof index i=15 | system component=2
+DEAL:2d::FESystem local dof index i=16 | system component=0
+DEAL:2d::FESystem local dof index i=17 | system component=1
+DEAL:2d::FESystem local dof index i=18 | system component=1
+DEAL:2d::FESystem local dof index i=19 | system component=1
+DEAL:2d::FESystem local dof index i=20 | system component=1
+DEAL:2d::FESystem local dof index i=21 | system component=2
+DEAL:2d:Initial  ::Cell 1.1 -- 0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21
+DEAL:2d:Initial  ::Cell 1.2 -- 22 23 4 5 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41
+DEAL:2d:Initial  ::Cell 1.3 -- 4 5 6 7 26 27 42 43 30 31 44 45 14 15 46 47 48 49 50 51 52 53
+DEAL:2d:Initial  ::Cell 1.4 -- 54 55 22 23 56 57 58 59 60 61 62 63 64 65 66 67 68 69 70 71 72 73
+DEAL:2d:Initial  ::Cell 1.5 -- 22 23 24 25 58 59 74 75 62 63 76 77 28 29 78 79 80 81 82 83 84 85
+DEAL:2d:Initial  ::Cell 1.6 -- 56 57 58 59 86 87 88 89 90 91 92 93 66 67 94 95 96 97 98 99 100 101
+DEAL:2d:Initial  ::Cell 1.7 -- 58 59 74 75 88 89 102 103 92 93 104 105 78 79 106 107 108 109 110 111 112 113
+DEAL:2d:Initial  ::Cell 1.8 -- 24 25 26 27 74 75 114 115 76 77 116 117 34 35 118 119 120 121 122 123 124 125
+DEAL:2d:Initial  ::Cell 1.9 -- 26 27 42 43 114 115 126 127 116 117 128 129 46 47 130 131 132 133 134 135 136 137
+DEAL:2d:Initial  ::Cell 1.10 -- 74 75 114 115 102 103 138 139 104 105 140 141 118 119 142 143 144 145 146 147 148 149
+DEAL:2d:Initial  ::Cell 1.11 -- 114 115 126 127 138 139 150 151 140 141 152 153 130 131 154 155 156 157 158 159 160 161
+DEAL:2d:Initial  ::Cell 1.12 -- 2 3 162 163 6 7 164 165 10 11 166 167 168 169 170 171 172 173 174 175 176 177
+DEAL:2d:Initial  ::Cell 1.13 -- 162 163 178 179 164 165 180 181 166 167 182 183 184 185 186 187 188 189 190 191 192 193
+DEAL:2d:Initial  ::Cell 1.14 -- 6 7 164 165 42 43 126 127 44 45 194 195 170 171 128 129 196 197 198 199 200 201
+DEAL:2d:Initial  ::Cell 1.15 -- 164 165 180 181 126 127 150 151 194 195 202 203 186 187 152 153 204 205 206 207 208 209
+DEAL:2d:Initial  ::Cell 1.16 -- 86 87 88 89 210 211 212 213 214 215 216 217 94 95 218 219 220 221 222 223 224 225
+DEAL:2d:Initial  ::Cell 1.17 -- 88 89 102 103 212 213 138 139 216 217 142 143 106 107 226 227 228 229 230 231 232 233
+DEAL:2d:Initial  ::Cell 1.18 -- 210 211 212 213 178 179 180 181 234 235 236 237 218 219 182 183 238 239 240 241 242 243
+DEAL:2d:Initial  ::Cell 1.19 -- 212 213 138 139 180 181 150 151 236 237 154 155 226 227 202 203 244 245 246 247 248 249
+DEAL:2d:Initial  ::Cell 2.0 -- 54 55 250 251 252 253 254 255 256 257 258 259 260 261 262 263 264 265 266 267 268 269
+DEAL:2d:Initial  ::Cell 2.1 -- 250 251 0 1 254 255 270 271 258 259 272 273 274 275 276 277 278 279 280 281 282 283
+DEAL:2d:Initial  ::Cell 2.2 -- 252 253 254 255 22 23 284 285 286 287 288 289 262 263 290 291 292 293 294 295 296 297
+DEAL:2d:Initial  ::Cell 2.3 -- 254 255 270 271 284 285 4 5 288 289 298 299 276 277 300 301 302 303 304 305 306 307
+DEAL:2d:Initial  :DoF bounds::Component 0: [0 302]
+DEAL:2d:Initial  :DoF bounds::Component 1: [17 306]
+DEAL:2d:Initial  :DoF bounds::Component 2: [1 307]
+DEAL:2d:Initial  :DoF bounds::Overlap: true
+DEAL:2d:Reordered::Cell 1.1 -- 92 200 93 201 94 202 95 203 96 204 97 205 98 206 99 207 100 0 1 2 3 208
+DEAL:2d:Reordered::Cell 1.2 -- 101 209 94 202 102 210 103 211 104 212 105 213 106 214 107 215 108 4 5 6 7 216
+DEAL:2d:Reordered::Cell 1.3 -- 94 202 95 203 103 211 109 217 105 213 110 218 99 207 111 219 112 8 9 10 11 220
+DEAL:2d:Reordered::Cell 1.4 -- 113 221 101 209 114 222 115 223 116 224 117 225 118 226 119 227 120 12 13 14 15 228
+DEAL:2d:Reordered::Cell 1.5 -- 101 209 102 210 115 223 121 229 117 225 122 230 104 212 123 231 124 16 17 18 19 232
+DEAL:2d:Reordered::Cell 1.6 -- 114 222 115 223 125 233 126 234 127 235 128 236 119 227 129 237 130 20 21 22 23 238
+DEAL:2d:Reordered::Cell 1.7 -- 115 223 121 229 126 234 131 239 128 236 132 240 123 231 133 241 134 24 25 26 27 242
+DEAL:2d:Reordered::Cell 1.8 -- 102 210 103 211 121 229 135 243 122 230 136 244 107 215 137 245 138 28 29 30 31 246
+DEAL:2d:Reordered::Cell 1.9 -- 103 211 109 217 135 243 139 247 136 244 140 248 111 219 141 249 142 32 33 34 35 250
+DEAL:2d:Reordered::Cell 1.10 -- 121 229 135 243 131 239 143 251 132 240 144 252 137 245 145 253 146 36 37 38 39 254
+DEAL:2d:Reordered::Cell 1.11 -- 135 243 139 247 143 251 147 255 144 252 148 256 141 249 149 257 150 40 41 42 43 258
+DEAL:2d:Reordered::Cell 1.12 -- 93 201 151 259 95 203 152 260 97 205 153 261 154 262 155 263 156 44 45 46 47 264
+DEAL:2d:Reordered::Cell 1.13 -- 151 259 157 265 152 260 158 266 153 261 159 267 160 268 161 269 162 48 49 50 51 270
+DEAL:2d:Reordered::Cell 1.14 -- 95 203 152 260 109 217 139 247 110 218 163 271 155 263 140 248 164 52 53 54 55 272
+DEAL:2d:Reordered::Cell 1.15 -- 152 260 158 266 139 247 147 255 163 271 165 273 161 269 148 256 166 56 57 58 59 274
+DEAL:2d:Reordered::Cell 1.16 -- 125 233 126 234 167 275 168 276 169 277 170 278 129 237 171 279 172 60 61 62 63 280
+DEAL:2d:Reordered::Cell 1.17 -- 126 234 131 239 168 276 143 251 170 278 145 253 133 241 173 281 174 64 65 66 67 282
+DEAL:2d:Reordered::Cell 1.18 -- 167 275 168 276 157 265 158 266 175 283 176 284 171 279 159 267 177 68 69 70 71 285
+DEAL:2d:Reordered::Cell 1.19 -- 168 276 143 251 158 266 147 255 176 284 149 257 173 281 165 273 178 72 73 74 75 286
+DEAL:2d:Reordered::Cell 2.0 -- 113 221 179 287 180 288 181 289 182 290 183 291 184 292 185 293 186 76 77 78 79 294
+DEAL:2d:Reordered::Cell 2.1 -- 179 287 92 200 181 289 187 295 183 291 188 296 189 297 190 298 191 80 81 82 83 299
+DEAL:2d:Reordered::Cell 2.2 -- 180 288 181 289 101 209 192 300 193 301 194 302 185 293 195 303 196 84 85 86 87 304
+DEAL:2d:Reordered::Cell 2.3 -- 181 289 187 295 192 300 94 202 194 302 197 305 190 298 198 306 199 88 89 90 91 307
+DEAL:2d:Reordered:DoF bounds::Component 0: [92 199]
+DEAL:2d:Reordered:DoF bounds::Component 1: [0 91]
+DEAL:2d:Reordered:DoF bounds::Component 2: [200 307]
+DEAL:2d:Reordered:DoF bounds::Overlap: false
+DEAL:2d:Reordered:Component DoF Order::Requested: 1 0 2
+DEAL:2d:Reordered:Component DoF Order::Resultant: 1 0 2
+DEAL:2d:Reordered:Component DoF Order::Correct:  true
+DEAL:2d::FE: FESystem<2>[FE_DGP<2>(2)^2-FE_DGQ<2>(1)], n_dofs_per_cell=16
+DEAL:2d::FESystem local dof index i=0 | system component=0
+DEAL:2d::FESystem local dof index i=1 | system component=0
+DEAL:2d::FESystem local dof index i=2 | system component=0
+DEAL:2d::FESystem local dof index i=3 | system component=0
+DEAL:2d::FESystem local dof index i=4 | system component=0
+DEAL:2d::FESystem local dof index i=5 | system component=0
+DEAL:2d::FESystem local dof index i=6 | system component=1
+DEAL:2d::FESystem local dof index i=7 | system component=1
+DEAL:2d::FESystem local dof index i=8 | system component=1
+DEAL:2d::FESystem local dof index i=9 | system component=1
+DEAL:2d::FESystem local dof index i=10 | system component=1
+DEAL:2d::FESystem local dof index i=11 | system component=1
+DEAL:2d::FESystem local dof index i=12 | system component=2
+DEAL:2d::FESystem local dof index i=13 | system component=2
+DEAL:2d::FESystem local dof index i=14 | system component=2
+DEAL:2d::FESystem local dof index i=15 | system component=2
+DEAL:2d:Initial  ::Cell 1.1 -- 0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15
+DEAL:2d:Initial  ::Cell 1.2 -- 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31
+DEAL:2d:Initial  ::Cell 1.3 -- 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47
+DEAL:2d:Initial  ::Cell 1.4 -- 48 49 50 51 52 53 54 55 56 57 58 59 60 61 62 63
+DEAL:2d:Initial  ::Cell 1.5 -- 64 65 66 67 68 69 70 71 72 73 74 75 76 77 78 79
+DEAL:2d:Initial  ::Cell 1.6 -- 80 81 82 83 84 85 86 87 88 89 90 91 92 93 94 95
+DEAL:2d:Initial  ::Cell 1.7 -- 96 97 98 99 100 101 102 103 104 105 106 107 108 109 110 111
+DEAL:2d:Initial  ::Cell 1.8 -- 112 113 114 115 116 117 118 119 120 121 122 123 124 125 126 127
+DEAL:2d:Initial  ::Cell 1.9 -- 128 129 130 131 132 133 134 135 136 137 138 139 140 141 142 143
+DEAL:2d:Initial  ::Cell 1.10 -- 144 145 146 147 148 149 150 151 152 153 154 155 156 157 158 159
+DEAL:2d:Initial  ::Cell 1.11 -- 160 161 162 163 164 165 166 167 168 169 170 171 172 173 174 175
+DEAL:2d:Initial  ::Cell 1.12 -- 176 177 178 179 180 181 182 183 184 185 186 187 188 189 190 191
+DEAL:2d:Initial  ::Cell 1.13 -- 192 193 194 195 196 197 198 199 200 201 202 203 204 205 206 207
+DEAL:2d:Initial  ::Cell 1.14 -- 208 209 210 211 212 213 214 215 216 217 218 219 220 221 222 223
+DEAL:2d:Initial  ::Cell 1.15 -- 224 225 226 227 228 229 230 231 232 233 234 235 236 237 238 239
+DEAL:2d:Initial  ::Cell 1.16 -- 240 241 242 243 244 245 246 247 248 249 250 251 252 253 254 255
+DEAL:2d:Initial  ::Cell 1.17 -- 256 257 258 259 260 261 262 263 264 265 266 267 268 269 270 271
+DEAL:2d:Initial  ::Cell 1.18 -- 272 273 274 275 276 277 278 279 280 281 282 283 284 285 286 287
+DEAL:2d:Initial  ::Cell 1.19 -- 288 289 290 291 292 293 294 295 296 297 298 299 300 301 302 303
+DEAL:2d:Initial  ::Cell 2.0 -- 304 305 306 307 308 309 310 311 312 313 314 315 316 317 318 319
+DEAL:2d:Initial  ::Cell 2.1 -- 320 321 322 323 324 325 326 327 328 329 330 331 332 333 334 335
+DEAL:2d:Initial  ::Cell 2.2 -- 336 337 338 339 340 341 342 343 344 345 346 347 348 349 350 351
+DEAL:2d:Initial  ::Cell 2.3 -- 352 353 354 355 356 357 358 359 360 361 362 363 364 365 366 367
+DEAL:2d:Initial  :DoF bounds::Component 0: [0 357]
+DEAL:2d:Initial  :DoF bounds::Component 1: [6 363]
+DEAL:2d:Initial  :DoF bounds::Component 2: [12 367]
+DEAL:2d:Initial  :DoF bounds::Overlap: true
+DEAL:2d:Reordered::Cell 1.1 -- 138 139 140 141 142 143 0 1 2 3 4 5 276 277 278 279
+DEAL:2d:Reordered::Cell 1.2 -- 144 145 146 147 148 149 6 7 8 9 10 11 280 281 282 283
+DEAL:2d:Reordered::Cell 1.3 -- 150 151 152 153 154 155 12 13 14 15 16 17 284 285 286 287
+DEAL:2d:Reordered::Cell 1.4 -- 156 157 158 159 160 161 18 19 20 21 22 23 288 289 290 291
+DEAL:2d:Reordered::Cell 1.5 -- 162 163 164 165 166 167 24 25 26 27 28 29 292 293 294 295
+DEAL:2d:Reordered::Cell 1.6 -- 168 169 170 171 172 173 30 31 32 33 34 35 296 297 298 299
+DEAL:2d:Reordered::Cell 1.7 -- 174 175 176 177 178 179 36 37 38 39 40 41 300 301 302 303
+DEAL:2d:Reordered::Cell 1.8 -- 180 181 182 183 184 185 42 43 44 45 46 47 304 305 306 307
+DEAL:2d:Reordered::Cell 1.9 -- 186 187 188 189 190 191 48 49 50 51 52 53 308 309 310 311
+DEAL:2d:Reordered::Cell 1.10 -- 192 193 194 195 196 197 54 55 56 57 58 59 312 313 314 315
+DEAL:2d:Reordered::Cell 1.11 -- 198 199 200 201 202 203 60 61 62 63 64 65 316 317 318 319
+DEAL:2d:Reordered::Cell 1.12 -- 204 205 206 207 208 209 66 67 68 69 70 71 320 321 322 323
+DEAL:2d:Reordered::Cell 1.13 -- 210 211 212 213 214 215 72 73 74 75 76 77 324 325 326 327
+DEAL:2d:Reordered::Cell 1.14 -- 216 217 218 219 220 221 78 79 80 81 82 83 328 329 330 331
+DEAL:2d:Reordered::Cell 1.15 -- 222 223 224 225 226 227 84 85 86 87 88 89 332 333 334 335
+DEAL:2d:Reordered::Cell 1.16 -- 228 229 230 231 232 233 90 91 92 93 94 95 336 337 338 339
+DEAL:2d:Reordered::Cell 1.17 -- 234 235 236 237 238 239 96 97 98 99 100 101 340 341 342 343
+DEAL:2d:Reordered::Cell 1.18 -- 240 241 242 243 244 245 102 103 104 105 106 107 344 345 346 347
+DEAL:2d:Reordered::Cell 1.19 -- 246 247 248 249 250 251 108 109 110 111 112 113 348 349 350 351
+DEAL:2d:Reordered::Cell 2.0 -- 252 253 254 255 256 257 114 115 116 117 118 119 352 353 354 355
+DEAL:2d:Reordered::Cell 2.1 -- 258 259 260 261 262 263 120 121 122 123 124 125 356 357 358 359
+DEAL:2d:Reordered::Cell 2.2 -- 264 265 266 267 268 269 126 127 128 129 130 131 360 361 362 363
+DEAL:2d:Reordered::Cell 2.3 -- 270 271 272 273 274 275 132 133 134 135 136 137 364 365 366 367
+DEAL:2d:Reordered:DoF bounds::Component 0: [138 275]
+DEAL:2d:Reordered:DoF bounds::Component 1: [0 137]
+DEAL:2d:Reordered:DoF bounds::Component 2: [276 367]
+DEAL:2d:Reordered:DoF bounds::Overlap: false
+DEAL:2d:Reordered:Component DoF Order::Requested: 1 0 2
+DEAL:2d:Reordered:Component DoF Order::Resultant: 1 0 2
+DEAL:2d:Reordered:Component DoF Order::Correct:  true
+DEAL:3d::FE: FESystem<3>[FE_Q<3>(2)-FE_DGQ<3>(1)-FE_Q<3>(2)], n_dofs_per_cell=62
+DEAL:3d::FESystem local dof index i=0 | system component=0
+DEAL:3d::FESystem local dof index i=1 | system component=2
+DEAL:3d::FESystem local dof index i=2 | system component=0
+DEAL:3d::FESystem local dof index i=3 | system component=2
+DEAL:3d::FESystem local dof index i=4 | system component=0
+DEAL:3d::FESystem local dof index i=5 | system component=2
+DEAL:3d::FESystem local dof index i=6 | system component=0
+DEAL:3d::FESystem local dof index i=7 | system component=2
+DEAL:3d::FESystem local dof index i=8 | system component=0
+DEAL:3d::FESystem local dof index i=9 | system component=2
+DEAL:3d::FESystem local dof index i=10 | system component=0
+DEAL:3d::FESystem local dof index i=11 | system component=2
+DEAL:3d::FESystem local dof index i=12 | system component=0
+DEAL:3d::FESystem local dof index i=13 | system component=2
+DEAL:3d::FESystem local dof index i=14 | system component=0
+DEAL:3d::FESystem local dof index i=15 | system component=2
+DEAL:3d::FESystem local dof index i=16 | system component=0
+DEAL:3d::FESystem local dof index i=17 | system component=2
+DEAL:3d::FESystem local dof index i=18 | system component=0
+DEAL:3d::FESystem local dof index i=19 | system component=2
+DEAL:3d::FESystem local dof index i=20 | system component=0
+DEAL:3d::FESystem local dof index i=21 | system component=2
+DEAL:3d::FESystem local dof index i=22 | system component=0
+DEAL:3d::FESystem local dof index i=23 | system component=2
+DEAL:3d::FESystem local dof index i=24 | system component=0
+DEAL:3d::FESystem local dof index i=25 | system component=2
+DEAL:3d::FESystem local dof index i=26 | system component=0
+DEAL:3d::FESystem local dof index i=27 | system component=2
+DEAL:3d::FESystem local dof index i=28 | system component=0
+DEAL:3d::FESystem local dof index i=29 | system component=2
+DEAL:3d::FESystem local dof index i=30 | system component=0
+DEAL:3d::FESystem local dof index i=31 | system component=2
+DEAL:3d::FESystem local dof index i=32 | system component=0
+DEAL:3d::FESystem local dof index i=33 | system component=2
+DEAL:3d::FESystem local dof index i=34 | system component=0
+DEAL:3d::FESystem local dof index i=35 | system component=2
+DEAL:3d::FESystem local dof index i=36 | system component=0
+DEAL:3d::FESystem local dof index i=37 | system component=2
+DEAL:3d::FESystem local dof index i=38 | system component=0
+DEAL:3d::FESystem local dof index i=39 | system component=2
+DEAL:3d::FESystem local dof index i=40 | system component=0
+DEAL:3d::FESystem local dof index i=41 | system component=2
+DEAL:3d::FESystem local dof index i=42 | system component=0
+DEAL:3d::FESystem local dof index i=43 | system component=2
+DEAL:3d::FESystem local dof index i=44 | system component=0
+DEAL:3d::FESystem local dof index i=45 | system component=2
+DEAL:3d::FESystem local dof index i=46 | system component=0
+DEAL:3d::FESystem local dof index i=47 | system component=2
+DEAL:3d::FESystem local dof index i=48 | system component=0
+DEAL:3d::FESystem local dof index i=49 | system component=2
+DEAL:3d::FESystem local dof index i=50 | system component=0
+DEAL:3d::FESystem local dof index i=51 | system component=2
+DEAL:3d::FESystem local dof index i=52 | system component=0
+DEAL:3d::FESystem local dof index i=53 | system component=1
+DEAL:3d::FESystem local dof index i=54 | system component=1
+DEAL:3d::FESystem local dof index i=55 | system component=1
+DEAL:3d::FESystem local dof index i=56 | system component=1
+DEAL:3d::FESystem local dof index i=57 | system component=1
+DEAL:3d::FESystem local dof index i=58 | system component=1
+DEAL:3d::FESystem local dof index i=59 | system component=1
+DEAL:3d::FESystem local dof index i=60 | system component=1
+DEAL:3d::FESystem local dof index i=61 | system component=2
+DEAL:3d:Initial  ::Cell 1.1 -- 0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 57 58 59 60 61
+DEAL:3d:Initial  ::Cell 1.2 -- 62 63 4 5 64 65 66 67 68 69 12 13 70 71 72 73 74 75 76 77 78 79 80 81 82 83 84 85 86 87 88 89 90 91 36 37 92 93 94 95 96 97 98 99 100 101 102 103 104 105 106 107 108 109 110 111 112 113 114 115 116 117
+DEAL:3d:Initial  ::Cell 1.3 -- 4 5 6 7 66 67 118 119 12 13 14 15 72 73 120 121 76 77 122 123 22 23 124 125 84 85 126 127 30 31 128 129 36 37 38 39 94 95 130 131 98 99 132 133 46 47 134 135 136 137 138 139 140 141 142 143 144 145 146 147 148 149
+DEAL:3d:Initial  ::Cell 1.4 -- 150 151 8 9 68 69 12 13 152 153 154 155 156 157 158 159 160 161 24 25 162 163 86 87 164 165 166 167 168 169 170 171 172 173 174 175 176 177 178 179 180 181 182 183 184 185 186 187 188 189 190 191 192 193 194 195 196 197 198 199 200 201
+DEAL:3d:Initial  ::Cell 1.5 -- 8 9 10 11 12 13 14 15 154 155 202 203 158 159 204 205 24 25 26 27 28 29 30 31 166 167 206 207 208 209 210 211 174 175 212 213 178 179 214 215 182 183 216 217 218 219 220 221 50 51 222 223 224 225 226 227 228 229 230 231 232 233
+DEAL:3d:Initial  ::Cell 1.6 -- 68 69 12 13 70 71 72 73 156 157 158 159 234 235 236 237 82 83 84 85 86 87 88 89 238 239 240 241 170 171 242 243 176 177 178 179 244 245 246 247 248 249 250 251 186 187 252 253 106 107 254 255 256 257 258 259 260 261 262 263 264 265
+DEAL:3d:Initial  ::Cell 1.7 -- 12 13 14 15 72 73 120 121 158 159 204 205 236 237 266 267 84 85 126 127 30 31 128 129 240 241 268 269 210 211 270 271 178 179 214 215 246 247 272 273 250 251 274 275 220 221 276 277 138 139 278 279 280 281 282 283 284 285 286 287 288 289
+DEAL:3d:Initial  ::Cell 2.0 -- 290 291 292 293 294 295 296 297 298 299 300 301 302 303 304 305 306 307 308 309 310 311 312 313 314 315 316 317 318 319 320 321 322 323 324 325 326 327 328 329 330 331 332 333 334 335 336 337 338 339 340 341 342 343 344 345 346 347 348 349 350 351
+DEAL:3d:Initial  ::Cell 2.1 -- 292 293 0 1 296 297 352 353 300 301 354 355 304 305 356 357 308 309 358 359 360 361 362 363 316 317 364 365 366 367 368 369 324 325 370 371 328 329 372 373 332 333 374 375 376 377 378 379 380 381 382 383 384 385 386 387 388 389 390 391 392 393
+DEAL:3d:Initial  ::Cell 2.2 -- 294 295 296 297 62 63 394 395 302 303 304 305 396 397 398 399 400 401 402 403 312 313 404 405 406 407 408 409 320 321 410 411 326 327 328 329 412 413 414 415 416 417 418 419 336 337 420 421 422 423 424 425 426 427 428 429 430 431 432 433 434 435
+DEAL:3d:Initial  ::Cell 2.3 -- 296 297 352 353 394 395 4 5 304 305 356 357 398 399 436 437 402 403 438 439 362 363 440 441 408 409 442 443 368 369 444 445 328 329 372 373 414 415 446 447 418 419 448 449 378 379 450 451 452 453 454 455 456 457 458 459 460 461 462 463 464 465
+DEAL:3d:Initial  ::Cell 2.4 -- 298 299 300 301 302 303 304 305 150 151 466 467 468 469 470 471 314 315 316 317 318 319 320 321 472 473 474 475 476 477 478 479 480 481 482 483 484 485 486 487 488 489 490 491 492 493 494 495 340 341 496 497 498 499 500 501 502 503 504 505 506 507
+DEAL:3d:Initial  ::Cell 2.5 -- 300 301 354 355 304 305 356 357 466 467 8 9 470 471 508 509 316 317 364 365 366 367 368 369 474 475 510 511 512 513 514 515 482 483 516 517 486 487 518 519 490 491 520 521 522 523 524 525 382 383 526 527 528 529 530 531 532 533 534 535 536 537
+DEAL:3d:Initial  ::Cell 2.6 -- 302 303 304 305 396 397 398 399 468 469 470 471 68 69 538 539 406 407 408 409 320 321 410 411 540 541 542 543 478 479 544 545 484 485 486 487 546 547 548 549 550 551 552 553 494 495 554 555 424 425 556 557 558 559 560 561 562 563 564 565 566 567
+DEAL:3d:Initial  ::Cell 2.7 -- 304 305 356 357 398 399 436 437 470 471 508 509 538 539 12 13 408 409 442 443 368 369 444 445 542 543 568 569 514 515 570 571 486 487 518 519 548 549 572 573 552 553 574 575 524 525 576 577 454 455 578 579 580 581 582 583 584 585 586 587 588 589
+DEAL:3d:Initial  :DoF bounds::Component 0: [0 580]
+DEAL:3d:Initial  :DoF bounds::Component 1: [53 588]
+DEAL:3d:Initial  :DoF bounds::Component 2: [1 589]
+DEAL:3d:Initial  :DoF bounds::Overlap: true
+DEAL:3d:Reordered::Cell 1.1 -- 120 355 121 356 122 357 123 358 124 359 125 360 126 361 127 362 128 363 129 364 130 365 131 366 132 367 133 368 134 369 135 370 136 371 137 372 138 373 139 374 140 375 141 376 142 377 143 378 144 379 145 380 146 0 1 2 3 4 5 6 7 381
+DEAL:3d:Reordered::Cell 1.2 -- 147 382 122 357 148 383 149 384 150 385 126 361 151 386 152 387 153 388 154 389 155 390 156 391 157 392 158 393 159 394 160 395 161 396 138 373 162 397 163 398 164 399 165 400 166 401 167 402 168 403 169 404 170 8 9 10 11 12 13 14 15 405
+DEAL:3d:Reordered::Cell 1.3 -- 122 357 123 358 149 384 171 406 126 361 127 362 152 387 172 407 154 389 173 408 131 366 174 409 158 393 175 410 135 370 176 411 138 373 139 374 163 398 177 412 165 400 178 413 143 378 179 414 180 415 181 416 182 16 17 18 19 20 21 22 23 417
+DEAL:3d:Reordered::Cell 1.4 -- 183 418 124 359 150 385 126 361 184 419 185 420 186 421 187 422 188 423 132 367 189 424 159 394 190 425 191 426 192 427 193 428 194 429 195 430 196 431 197 432 198 433 199 434 200 435 201 436 202 437 203 438 204 24 25 26 27 28 29 30 31 439
+DEAL:3d:Reordered::Cell 1.5 -- 124 359 125 360 126 361 127 362 185 420 205 440 187 422 206 441 132 367 133 368 134 369 135 370 191 426 207 442 208 443 209 444 195 430 210 445 197 432 211 446 199 434 212 447 213 448 214 449 145 380 215 450 216 32 33 34 35 36 37 38 39 451
+DEAL:3d:Reordered::Cell 1.6 -- 150 385 126 361 151 386 152 387 186 421 187 422 217 452 218 453 157 392 158 393 159 394 160 395 219 454 220 455 193 428 221 456 196 431 197 432 222 457 223 458 224 459 225 460 201 436 226 461 169 404 227 462 228 40 41 42 43 44 45 46 47 463
+DEAL:3d:Reordered::Cell 1.7 -- 126 361 127 362 152 387 172 407 187 422 206 441 218 453 229 464 158 393 175 410 135 370 176 411 220 455 230 465 209 444 231 466 197 432 211 446 223 458 232 467 225 460 233 468 214 449 234 469 181 416 235 470 236 48 49 50 51 52 53 54 55 471
+DEAL:3d:Reordered::Cell 2.0 -- 237 472 238 473 239 474 240 475 241 476 242 477 243 478 244 479 245 480 246 481 247 482 248 483 249 484 250 485 251 486 252 487 253 488 254 489 255 490 256 491 257 492 258 493 259 494 260 495 261 496 262 497 263 56 57 58 59 60 61 62 63 498
+DEAL:3d:Reordered::Cell 2.1 -- 238 473 120 355 240 475 264 499 242 477 265 500 244 479 266 501 246 481 267 502 268 503 269 504 250 485 270 505 271 506 272 507 254 489 273 508 256 491 274 509 258 493 275 510 276 511 277 512 278 513 279 514 280 64 65 66 67 68 69 70 71 515
+DEAL:3d:Reordered::Cell 2.2 -- 239 474 240 475 147 382 281 516 243 478 244 479 282 517 283 518 284 519 285 520 248 483 286 521 287 522 288 523 252 487 289 524 255 490 256 491 290 525 291 526 292 527 293 528 260 495 294 529 295 530 296 531 297 72 73 74 75 76 77 78 79 532
+DEAL:3d:Reordered::Cell 2.3 -- 240 475 264 499 281 516 122 357 244 479 266 501 283 518 298 533 285 520 299 534 269 504 300 535 288 523 301 536 272 507 302 537 256 491 274 509 291 526 303 538 293 528 304 539 277 512 305 540 306 541 307 542 308 80 81 82 83 84 85 86 87 543
+DEAL:3d:Reordered::Cell 2.4 -- 241 476 242 477 243 478 244 479 183 418 309 544 310 545 311 546 249 484 250 485 251 486 252 487 312 547 313 548 314 549 315 550 316 551 317 552 318 553 319 554 320 555 321 556 322 557 323 558 262 497 324 559 325 88 89 90 91 92 93 94 95 560
+DEAL:3d:Reordered::Cell 2.5 -- 242 477 265 500 244 479 266 501 309 544 124 359 311 546 326 561 250 485 270 505 271 506 272 507 313 548 327 562 328 563 329 564 317 552 330 565 319 554 331 566 321 556 332 567 333 568 334 569 279 514 335 570 336 96 97 98 99 100 101 102 103 571
+DEAL:3d:Reordered::Cell 2.6 -- 243 478 244 479 282 517 283 518 310 545 311 546 150 385 337 572 287 522 288 523 252 487 289 524 338 573 339 574 315 550 340 575 318 553 319 554 341 576 342 577 343 578 344 579 323 558 345 580 296 531 346 581 347 104 105 106 107 108 109 110 111 582
+DEAL:3d:Reordered::Cell 2.7 -- 244 479 266 501 283 518 298 533 311 546 326 561 337 572 126 361 288 523 301 536 272 507 302 537 339 574 348 583 329 564 349 584 319 554 331 566 342 577 350 585 344 579 351 586 334 569 352 587 307 542 353 588 354 112 113 114 115 116 117 118 119 589
+DEAL:3d:Reordered:DoF bounds::Component 0: [120 354]
+DEAL:3d:Reordered:DoF bounds::Component 1: [0 119]
+DEAL:3d:Reordered:DoF bounds::Component 2: [355 589]
+DEAL:3d:Reordered:DoF bounds::Overlap: false
+DEAL:3d:Reordered:Component DoF Order::Requested: 1 0 2
+DEAL:3d:Reordered:Component DoF Order::Resultant: 1 0 2
+DEAL:3d:Reordered:Component DoF Order::Correct:  true
+DEAL:3d::FE: FESystem<3>[FE_DGP<3>(2)^2-FE_DGQ<3>(1)], n_dofs_per_cell=28
+DEAL:3d::FESystem local dof index i=0 | system component=0
+DEAL:3d::FESystem local dof index i=1 | system component=0
+DEAL:3d::FESystem local dof index i=2 | system component=0
+DEAL:3d::FESystem local dof index i=3 | system component=0
+DEAL:3d::FESystem local dof index i=4 | system component=0
+DEAL:3d::FESystem local dof index i=5 | system component=0
+DEAL:3d::FESystem local dof index i=6 | system component=0
+DEAL:3d::FESystem local dof index i=7 | system component=0
+DEAL:3d::FESystem local dof index i=8 | system component=0
+DEAL:3d::FESystem local dof index i=9 | system component=0
+DEAL:3d::FESystem local dof index i=10 | system component=1
+DEAL:3d::FESystem local dof index i=11 | system component=1
+DEAL:3d::FESystem local dof index i=12 | system component=1
+DEAL:3d::FESystem local dof index i=13 | system component=1
+DEAL:3d::FESystem local dof index i=14 | system component=1
+DEAL:3d::FESystem local dof index i=15 | system component=1
+DEAL:3d::FESystem local dof index i=16 | system component=1
+DEAL:3d::FESystem local dof index i=17 | system component=1
+DEAL:3d::FESystem local dof index i=18 | system component=1
+DEAL:3d::FESystem local dof index i=19 | system component=1
+DEAL:3d::FESystem local dof index i=20 | system component=2
+DEAL:3d::FESystem local dof index i=21 | system component=2
+DEAL:3d::FESystem local dof index i=22 | system component=2
+DEAL:3d::FESystem local dof index i=23 | system component=2
+DEAL:3d::FESystem local dof index i=24 | system component=2
+DEAL:3d::FESystem local dof index i=25 | system component=2
+DEAL:3d::FESystem local dof index i=26 | system component=2
+DEAL:3d::FESystem local dof index i=27 | system component=2
+DEAL:3d:Initial  ::Cell 1.1 -- 0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27
+DEAL:3d:Initial  ::Cell 1.2 -- 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55
+DEAL:3d:Initial  ::Cell 1.3 -- 56 57 58 59 60 61 62 63 64 65 66 67 68 69 70 71 72 73 74 75 76 77 78 79 80 81 82 83
+DEAL:3d:Initial  ::Cell 1.4 -- 84 85 86 87 88 89 90 91 92 93 94 95 96 97 98 99 100 101 102 103 104 105 106 107 108 109 110 111
+DEAL:3d:Initial  ::Cell 1.5 -- 112 113 114 115 116 117 118 119 120 121 122 123 124 125 126 127 128 129 130 131 132 133 134 135 136 137 138 139
+DEAL:3d:Initial  ::Cell 1.6 -- 140 141 142 143 144 145 146 147 148 149 150 151 152 153 154 155 156 157 158 159 160 161 162 163 164 165 166 167
+DEAL:3d:Initial  ::Cell 1.7 -- 168 169 170 171 172 173 174 175 176 177 178 179 180 181 182 183 184 185 186 187 188 189 190 191 192 193 194 195
+DEAL:3d:Initial  ::Cell 2.0 -- 196 197 198 199 200 201 202 203 204 205 206 207 208 209 210 211 212 213 214 215 216 217 218 219 220 221 222 223
+DEAL:3d:Initial  ::Cell 2.1 -- 224 225 226 227 228 229 230 231 232 233 234 235 236 237 238 239 240 241 242 243 244 245 246 247 248 249 250 251
+DEAL:3d:Initial  ::Cell 2.2 -- 252 253 254 255 256 257 258 259 260 261 262 263 264 265 266 267 268 269 270 271 272 273 274 275 276 277 278 279
+DEAL:3d:Initial  ::Cell 2.3 -- 280 281 282 283 284 285 286 287 288 289 290 291 292 293 294 295 296 297 298 299 300 301 302 303 304 305 306 307
+DEAL:3d:Initial  ::Cell 2.4 -- 308 309 310 311 312 313 314 315 316 317 318 319 320 321 322 323 324 325 326 327 328 329 330 331 332 333 334 335
+DEAL:3d:Initial  ::Cell 2.5 -- 336 337 338 339 340 341 342 343 344 345 346 347 348 349 350 351 352 353 354 355 356 357 358 359 360 361 362 363
+DEAL:3d:Initial  ::Cell 2.6 -- 364 365 366 367 368 369 370 371 372 373 374 375 376 377 378 379 380 381 382 383 384 385 386 387 388 389 390 391
+DEAL:3d:Initial  ::Cell 2.7 -- 392 393 394 395 396 397 398 399 400 401 402 403 404 405 406 407 408 409 410 411 412 413 414 415 416 417 418 419
+DEAL:3d:Initial  :DoF bounds::Component 0: [0 401]
+DEAL:3d:Initial  :DoF bounds::Component 1: [10 411]
+DEAL:3d:Initial  :DoF bounds::Component 2: [20 419]
+DEAL:3d:Initial  :DoF bounds::Overlap: true
+DEAL:3d:Reordered::Cell 1.1 -- 150 151 152 153 154 155 156 157 158 159 0 1 2 3 4 5 6 7 8 9 300 301 302 303 304 305 306 307
+DEAL:3d:Reordered::Cell 1.2 -- 160 161 162 163 164 165 166 167 168 169 10 11 12 13 14 15 16 17 18 19 308 309 310 311 312 313 314 315
+DEAL:3d:Reordered::Cell 1.3 -- 170 171 172 173 174 175 176 177 178 179 20 21 22 23 24 25 26 27 28 29 316 317 318 319 320 321 322 323
+DEAL:3d:Reordered::Cell 1.4 -- 180 181 182 183 184 185 186 187 188 189 30 31 32 33 34 35 36 37 38 39 324 325 326 327 328 329 330 331
+DEAL:3d:Reordered::Cell 1.5 -- 190 191 192 193 194 195 196 197 198 199 40 41 42 43 44 45 46 47 48 49 332 333 334 335 336 337 338 339
+DEAL:3d:Reordered::Cell 1.6 -- 200 201 202 203 204 205 206 207 208 209 50 51 52 53 54 55 56 57 58 59 340 341 342 343 344 345 346 347
+DEAL:3d:Reordered::Cell 1.7 -- 210 211 212 213 214 215 216 217 218 219 60 61 62 63 64 65 66 67 68 69 348 349 350 351 352 353 354 355
+DEAL:3d:Reordered::Cell 2.0 -- 220 221 222 223 224 225 226 227 228 229 70 71 72 73 74 75 76 77 78 79 356 357 358 359 360 361 362 363
+DEAL:3d:Reordered::Cell 2.1 -- 230 231 232 233 234 235 236 237 238 239 80 81 82 83 84 85 86 87 88 89 364 365 366 367 368 369 370 371
+DEAL:3d:Reordered::Cell 2.2 -- 240 241 242 243 244 245 246 247 248 249 90 91 92 93 94 95 96 97 98 99 372 373 374 375 376 377 378 379
+DEAL:3d:Reordered::Cell 2.3 -- 250 251 252 253 254 255 256 257 258 259 100 101 102 103 104 105 106 107 108 109 380 381 382 383 384 385 386 387
+DEAL:3d:Reordered::Cell 2.4 -- 260 261 262 263 264 265 266 267 268 269 110 111 112 113 114 115 116 117 118 119 388 389 390 391 392 393 394 395
+DEAL:3d:Reordered::Cell 2.5 -- 270 271 272 273 274 275 276 277 278 279 120 121 122 123 124 125 126 127 128 129 396 397 398 399 400 401 402 403
+DEAL:3d:Reordered::Cell 2.6 -- 280 281 282 283 284 285 286 287 288 289 130 131 132 133 134 135 136 137 138 139 404 405 406 407 408 409 410 411
+DEAL:3d:Reordered::Cell 2.7 -- 290 291 292 293 294 295 296 297 298 299 140 141 142 143 144 145 146 147 148 149 412 413 414 415 416 417 418 419
+DEAL:3d:Reordered:DoF bounds::Component 0: [150 299]
+DEAL:3d:Reordered:DoF bounds::Component 1: [0 149]
+DEAL:3d:Reordered:DoF bounds::Component 2: [300 419]
+DEAL:3d:Reordered:DoF bounds::Overlap: false
+DEAL:3d:Reordered:Component DoF Order::Requested: 1 0 2
+DEAL:3d:Reordered:Component DoF Order::Resultant: 1 0 2
+DEAL:3d:Reordered:Component DoF Order::Correct:  true
