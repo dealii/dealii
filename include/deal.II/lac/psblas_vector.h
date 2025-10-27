@@ -447,7 +447,7 @@ namespace PSCToolkitWrappers
      */
     void
     reinit(const IndexSet &local_partitioning,
-           const MPI_Comm  communicator         = MPI_COMM_WORLD,
+           const MPI_Comm  communicator,
            const bool      omit_zeroing_entries = false);
 
     /**
@@ -476,7 +476,7 @@ namespace PSCToolkitWrappers
     void
     reinit(const IndexSet &local_partitioning,
            const IndexSet &ghost_indices,
-           const MPI_Comm  communicator = MPI_COMM_WORLD);
+           const MPI_Comm  communicator);
 
 
     /**
