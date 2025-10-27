@@ -1,0 +1,8 @@
+Changed: The ParticleHandler class now provides references to the underlying
+triangulation and mapping through member functions get_triangulation() and
+get_mapping(). In addition, the member functions get_particle_positions(
+VectorType &) and get_particle_positions(std::vector<Point<spacedim>> &) are
+marked as const member functions, so that they can be called from const
+ParticleHandler objects.
+<br>
+(Yimin Jin, 2025/10/27)
