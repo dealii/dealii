@@ -81,7 +81,7 @@ namespace internal
     return numbers::invalid_unsigned_int;
   }
 
-  // helper functions for RegularPatch constructor
+  // helper functions for RegularVertexPatch constructor
   template <int dim>
   std::vector<typename Triangulation<dim>::cell_iterator>
   order_patch(
@@ -161,6 +161,221 @@ namespace internal
 
 
 #endif // DOXYGEN
+
+/**
+ * Represents a regular patch, i.e., a patch centered at a vertex
+ * with exactly 2^dim cells.
+ *
+ * Stores the cell indices and potentially orientation information. Provides
+ * methods to check constructibility and access cell data.
+ *
+ * @tparam dim The spatial dimension.
+ */
+template <int dim>
+struct RegularVertexPatch
+{
+  /**
+   * Type used to represent a unique index for each cell.
+   */
+  using CellIndex = unsigned int;
+
+  /**
+   * Alias for the cell iterator type of the underlying Triangulation.
+   */
+  using CellIterator = typename Triangulation<dim>::cell_iterator;
+
+  /**
+   * Type used to represent the orientation of a cell within a regular patch.
+   */
+  using CellOrientation = unsigned int;
+
+  const static constexpr int dimension        = dim;
+  const static bool          is_constant_size = true;
+  const static unsigned int  n_cells          = 1 << dim;
+
+
+  /**
+   *  Constructor for a RegularVertexPatch.
+   *
+   * Orders the cells within the patch based on the central vertex index and
+   * potentially generates orientation information. Asserts that the input
+   * `patch` set contains exactly `n_cells`.
+   *
+   * @param patch A set of `CellIndex` objects representing the cells in the
+   * patch.
+   * @param vertex_index The global index of the central vertex.
+   * @param index2cell A function object that converts a `CellIndex` to a
+   * `CellIterator`.
+   */
+  RegularVertexPatch(
+    const std::set<CellIndex>                            &patch,
+    const types::global_vertex_index                     &vertex_index,
+    const std::function<CellIterator(const CellIndex &)> &index2cell);
+
+
+
+  /**
+   *  Returns the number of cells in the patch (always `n_cells`).
+   */
+  constexpr unsigned int
+  size() const
+  {
+    return n_cells;
+  }
+  /**
+   *  Checks if this patch conflicts with another patch for parallel
+   * processing (e.g., based on shared DoFs).
+   * @param other The other RegularVertexPatch to check against.
+   * @return `true` if there is no conflict, `false` otherwise.
+   */
+  bool
+  has_conflict_with(const RegularVertexPatch &other) const;
+
+
+  /**
+   *  Provides read-only access to the array of cell indices forming
+   * the patch.
+   * @return A constant reference to the array of `CellIndex`.
+   */
+  const auto &
+  get_cells() const
+  {
+    return cells;
+  }
+
+
+  /**
+   *  Gets the orientation information for a specific cell within the
+   * patch.
+   * @param cell_index The local index of the cell within the patch (0 to
+   * n_cells-1).
+   * @return A constant reference to the `CellOrientation`.
+   */
+  const auto &
+  get_orientation(const unsigned int &cell_index) const
+  {
+    AssertIndexRange(cell_index, size());
+    return orientations[cell_index];
+  }
+
+
+  /**
+   *  Static method to check if a given set of cells can form a
+   * regular patch.
+   *
+   * Currently, this simply checks if the number of cells in the input `patch`
+   * is equal to `n_cells`.
+   *
+   * @param patch A set of `CellIndex` objects.
+   * @param vertex_index The global index of the potential central vertex
+   * (unused).
+   * @param index2cell A function object to convert `CellIndex` to
+   * `CellIterator` (unused).
+   * @return `true` if the patch can be constructed as a RegularVertexPatch,
+   * `false` otherwise.
+   */
+  static bool
+  is_constructible(
+    const std::set<CellIndex>                            &patch,
+    const types::global_vertex_index                     &vertex_index,
+    const std::function<CellIterator(const CellIndex &)> &index2cell)
+  {
+    (void)vertex_index;
+    (void)index2cell;
+    if (patch.size() == n_cells)
+      return true;
+    return false;
+  }
+
+
+  /**
+   *  Checks if any cell within this patch is a ghost cell on the
+   * current MPI process.
+   * @return `true` if the patch contains at least one ghost cell, `false`
+   * otherwise.
+   */
+  bool
+  is_partially_ghosted() const
+  {
+    return partially_ghosted;
+  }
+
+private:
+  std::array<CellIndex, n_cells>       cells;
+  std::array<CellOrientation, n_cells> orientations;
+
+
+  bool partially_ghosted;
+};
+
+/**
+ *  Represents a general patch, i.e., a patch that is not regular
+ * (typically near boundaries or excluded vertices).
+ *
+ * Stores a variable number of cell indices.
+ *
+ * @tparam dim The spatial dimension.
+ */
+template <int dim>
+struct GeneralVertexPatch
+{
+  /**
+   * Type used to represent a unique index for each cell.
+   */
+  using CellIndex = unsigned int;
+
+  /**
+   * Alias for the cell iterator type of the underlying Triangulation.
+   */
+  using CellIterator = typename Triangulation<dim>::cell_iterator;
+
+  const static constexpr int dimension        = dim;
+  const static bool          is_constant_size = false;
+
+  /**
+   *  Constructor for a GeneralVertexPatch.
+   *
+   * @param patch A set of `CellIndex` objects representing the cells in the
+   * patch.
+   * @param vertex_index The global index of the central vertex (unused in
+   * current implementation).
+   * @param index2cell A function object that converts a `CellIndex` to a
+   * `CellIterator` (unused in current implementation).
+   */
+  GeneralVertexPatch(
+    const std::set<CellIndex>                            &patch,
+    const types::global_vertex_index                     &vertex_index,
+    const std::function<CellIterator(const CellIndex &)> &index2cell);
+
+  /**
+   *  Returns the number of cells in the patch.
+   */
+  unsigned int
+  size() const
+  {
+    return cells.size();
+  }
+
+  /**
+   *  Provides read-only access to the vector of cell indices forming
+   * the patch.
+   * @return A constant reference to the vector of `CellIndex`.
+   */
+  const auto &
+  get_cells() const
+  {
+    return cells;
+  }
+
+  // Add other necessary members and methods for GeneralVertexPatch
+  // For example:
+  // bool has_conflict_with(const GeneralVertexPatch &other) const;
+  // bool is_partially_ghosted() const;
+
+private:
+  std::vector<CellIndex> cells;
+  // Add other necessary private members
+};
 
 /**
  * Manages the storage and categorization of cell patches centered around
@@ -262,188 +477,14 @@ public:
 
 
   /**
-   * Represents a regular patch, i.e., a patch centered at a vertex
-   * with exactly 2^dim cells.
-   *
-   * Stores the cell indices and potentially orientation information. Provides
-   * methods to check constructibility and access cell data.
+   * Alias for RegularVertexPatch with the current dimension.
    */
-  struct RegularPatch
-  {
-    const static constexpr int dimension        = dim;
-    const static bool          is_constant_size = true;
-    const static unsigned int  n_cells          = 1 << dim;
-
-
-    /**
-     *  Constructor for a RegularPatch.
-     *
-     * Orders the cells within the patch based on the central vertex index and
-     * potentially generates orientation information. Asserts that the input
-     * `patch` set contains exactly `n_cells`.
-     *
-     * @param patch A set of `CellIndex` objects representing the cells in the
-     * patch.
-     * @param vertex_index The global index of the central vertex.
-     * @param index2cell A function object that converts a `CellIndex` to a
-     * `CellIterator`.
-     */
-    RegularPatch(
-      const std::set<CellIndex>                            &patch,
-      const types::global_vertex_index                     &vertex_index,
-      const std::function<CellIterator(const CellIndex &)> &index2cell);
-
-
-
-    /**
-     *  Returns the number of cells in the patch (always `n_cells`).
-     */
-    constexpr unsigned int
-    size() const
-    {
-      return n_cells;
-    }
-    /**
-     *  Checks if this patch conflicts with another patch for parallel
-     * processing (e.g., based on shared DoFs).
-     * @param other The other RegularPatch to check against.
-     * @return `true` if there is no conflict, `false` otherwise.
-     */
-    bool
-    has_conflict_with(const RegularPatch &other) const;
-
-
-    /**
-     *  Provides read-only access to the array of cell indices forming
-     * the patch.
-     * @return A constant reference to the array of `CellIndex`.
-     */
-    const auto &
-    get_cells() const
-    {
-      return cells;
-    }
-
-
-    /**
-     *  Gets the orientation information for a specific cell within the
-     * patch.
-     * @param cell_index The local index of the cell within the patch (0 to
-     * n_cells-1).
-     * @return A constant reference to the `CellOrientation`.
-     */
-    const auto &
-    get_orientation(const unsigned int &cell_index) const
-    {
-      AssertIndexRange(cell_index, size());
-      return orientations[cell_index];
-    }
-
-
-    /**
-     *  Static method to check if a given set of cells can form a
-     * regular patch.
-     *
-     * Currently, this simply checks if the number of cells in the input `patch`
-     * is equal to `n_cells`.
-     *
-     * @param patch A set of `CellIndex` objects.
-     * @param vertex_index The global index of the potential central vertex
-     * (unused).
-     * @param index2cell A function object to convert `CellIndex` to
-     * `CellIterator` (unused).
-     * @return `true` if the patch can be constructed as a RegularPatch,
-     * `false` otherwise.
-     */
-    static bool
-    is_constructible(
-      const std::set<CellIndex>                            &patch,
-      const types::global_vertex_index                     &vertex_index,
-      const std::function<CellIterator(const CellIndex &)> &index2cell)
-    {
-      (void)vertex_index;
-      (void)index2cell;
-      if (patch.size() == n_cells)
-        return true;
-      return false;
-    }
-
-
-    /**
-     *  Checks if any cell within this patch is a ghost cell on the
-     * current MPI process.
-     * @return `true` if the patch contains at least one ghost cell, `false`
-     * otherwise.
-     */
-    bool
-    is_partially_ghosted() const
-    {
-      return partially_ghosted;
-    }
-
-  private:
-    std::array<CellIndex, n_cells>       cells;
-    std::array<CellOrientation, n_cells> orientations;
-
-
-    bool partially_ghosted;
-  };
+  using RegularPatch = RegularVertexPatch<dim>;
 
   /**
-   *  Represents a general patch, i.e., a patch that is not regular
-   * (typically near boundaries or excluded vertices).
-   *
-   * Stores a variable number of cell indices.
+   * Alias for GeneralVertexPatch with the current dimension.
    */
-  struct GeneralPatch
-  {
-    const static constexpr int dimension        = dim;
-    const static bool          is_constant_size = false;
-
-    /**
-     *  Constructor for a GeneralPatch.
-     *
-     * @param patch A set of `CellIndex` objects representing the cells in the
-     * patch.
-     * @param vertex_index The global index of the central vertex (unused in
-     * current implementation).
-     * @param index2cell A function object that converts a `CellIndex` to a
-     * `CellIterator` (unused in current implementation).
-     */
-    GeneralPatch(
-      const std::set<CellIndex>                            &patch,
-      const types::global_vertex_index                     &vertex_index,
-      const std::function<CellIterator(const CellIndex &)> &index2cell);
-
-    /**
-     *  Returns the number of cells in the patch.
-     */
-    unsigned int
-    size() const
-    {
-      return cells.size();
-    }
-
-    /**
-     *  Provides read-only access to the vector of cell indices forming
-     * the patch.
-     * @return A constant reference to the vector of `CellIndex`.
-     */
-    const auto &
-    get_cells() const
-    {
-      return cells;
-    }
-
-    // Add other necessary members and methods for GeneralPatch
-    // For example:
-    // bool has_conflict_with(const GeneralPatch &other) const;
-    // bool is_partially_ghosted() const;
-
-  private:
-    std::vector<CellIndex> cells;
-    // Add other necessary private members
-  };
+  using GeneralPatch = GeneralVertexPatch<dim>;
 
 
   /**
@@ -715,18 +756,17 @@ private:
 
 
 // ============================================================================
-// RegularPatch constructor definitions moved here
+// RegularVertexPatch constructor definitions
 // ============================================================================
 // dim==2
-template <class MFType>
-PatchStorage<MFType>::RegularPatch::RegularPatch(
+template <int dim>
+RegularVertexPatch<dim>::RegularVertexPatch(
   const std::set<CellIndex>                            &patch,
   const types::global_vertex_index                     &vertex_index,
   const std::function<CellIterator(const CellIndex &)> &index2cell)
 {
   if constexpr (dim == 2)
     {
-      const static unsigned int         dim = 2;
       std::map<CellIterator, CellIndex> iterator2index;
       std::set<CellIterator>            cells_iterators;
 
@@ -760,7 +800,6 @@ PatchStorage<MFType>::RegularPatch::RegularPatch(
 
   if constexpr (dim == 3)
     {
-      const unsigned int                            dim             = 3;
       const static std::array<std::size_t, n_cells> vindex2position = {
         {7, 6, 5, 4, 3, 2, 1}}; // TODO: Check this order {7, 6, 5, 4, 3, 2,
                                 // 1, 0}?
@@ -790,10 +829,10 @@ PatchStorage<MFType>::RegularPatch::RegularPatch(
 }
 
 // ============================================================================
-// GeneralPatch constructor definition (example)
+// GeneralVertexPatch constructor definition
 // ============================================================================
-template <class MFType>
-PatchStorage<MFType>::GeneralPatch::GeneralPatch(
+template <int dim>
+GeneralVertexPatch<dim>::GeneralVertexPatch(
   const std::set<CellIndex> &patch,
   const types::global_vertex_index & /*vertex_index*/,
   const std::function<CellIterator(const CellIndex &)> & /*index2cell*/)
