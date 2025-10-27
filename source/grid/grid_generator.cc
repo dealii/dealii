@@ -8227,17 +8227,17 @@ namespace GridGenerator
                                     Triangulation<dim, spacedim> &out_tria,
                                     const unsigned int            n_divisions)
   {
-    if (dim == 1)
+    if constexpr (dim == 1)
       {
         out_tria.copy_triangulation(in_tria);
         return;
       }
-    if (dim == 2)
+    else if constexpr (dim == 2)
       AssertThrow(
         n_divisions == 2 || n_divisions == 8,
         ExcMessage(
           "Quadrilaterals must be split into either 2 or 8 triangles."));
-    if (dim == 3)
+    else if constexpr (dim == 3)
       AssertThrow(n_divisions == 6 || n_divisions == 24,
                   ExcMessage(
                     "Hexahedra must be split into either 6 or 24 tetrahedra."));
