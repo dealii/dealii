@@ -8745,6 +8745,167 @@ namespace GridGenerator
 
   template <int dim, int spacedim>
   void
+  convert_simplex_to_hypercube_mesh(const Triangulation<dim, spacedim> &in_tria,
+                                    Triangulation<dim, spacedim> &out_tria)
+  {
+    if constexpr (dim == 1)
+      {
+        out_tria.copy_triangulation(in_tria);
+        return;
+      }
+
+    AssertThrow(
+      in_tria.all_reference_cells_are_simplex(),
+      ExcMessage(
+        "GridGenerator::convert_simplex_to_hypercube_mesh() expects "
+        "a Triangulation that consists only of triangles/tetrahedra."));
+
+    Triangulation<dim, spacedim> temp_tria;
+    if (in_tria.n_global_levels() > 1)
+      {
+        AssertThrow(!in_tria.has_hanging_nodes(), ExcNotImplemented());
+        flatten_triangulation(in_tria, temp_tria);
+      }
+    const Triangulation<dim, spacedim> &ref_tria =
+      in_tria.n_global_levels() > 1 ? temp_tria : in_tria;
+
+    // First set up all of the vertices of the new mesh, along with
+    // a map that maps from edges/faces/cells to their new midpoints
+    std::vector<Point<spacedim>> vertices = ref_tria.get_vertices();
+    vertices.reserve(ref_tria.get_vertices().size() + ref_tria.n_lines() +
+                     (dim > 2 ? ref_tria.n_quads() : 0) + ref_tria.n_cells());
+    std::map<typename Triangulation<dim, spacedim>::line_iterator, unsigned int>
+      line_to_midpoint_vertex_map;
+    std::map<typename Triangulation<dim, spacedim>::face_iterator, unsigned int>
+      face_to_midpoint_vertex_map;
+    std::map<typename Triangulation<dim, spacedim>::cell_iterator, unsigned int>
+      cell_to_midpoint_vertex_map;
+    for (const auto &cell : ref_tria.active_cell_iterators())
+      {
+        // First the faces that bound the cell. Make sure we touch
+        // every face only once
+        for (const auto &face : cell->face_iterators())
+          if (face_to_midpoint_vertex_map.find(face) ==
+              face_to_midpoint_vertex_map.end())
+            {
+              // Add the new vertex to the list of vertices
+              {
+                const Point<spacedim> new_vertex = face->center();
+                vertices.push_back(new_vertex);
+              }
+
+              // Also keep track of the index given to this vertex:
+              face_to_midpoint_vertex_map[face] = vertices.size() - 1;
+
+              // If we're in 3d, we also need to separately deal with the edges:
+              if constexpr (dim == 3)
+                for (unsigned int l = 0; l < face->n_lines(); ++l)
+                  {
+                    const typename Triangulation<dim, spacedim>::line_iterator
+                      line = face->line(l);
+                    if (line_to_midpoint_vertex_map.find(line) ==
+                        line_to_midpoint_vertex_map.end())
+                      {
+                        // Add the new vertex to the list of vertices
+                        {
+                          const Point<spacedim> new_vertex = line->center();
+                          vertices.push_back(new_vertex);
+                        }
+
+                        // Also keep track of the index given to this vertex:
+                        line_to_midpoint_vertex_map[line] = vertices.size() - 1;
+                      }
+                  }
+            }
+
+        // Now for the cell midpoint:
+        // Add the new vertex to the list of vertices
+        {
+          const Point<spacedim> new_vertex = cell->center();
+          vertices.push_back(new_vertex);
+        }
+
+        // Also keep track of the index given to this vertex:
+        cell_to_midpoint_vertex_map[cell] = vertices.size() - 1;
+      }
+    // Check that we counted correctly:
+    Assert(vertices.size() ==
+             ref_tria.get_vertices().size() + ref_tria.n_lines() +
+               (dim > 2 ? ref_tria.n_quads() : 0) + ref_tria.n_cells(),
+           ExcInternalError());
+
+    // Now create new cells. Each cell will be subdivided into (dim+1)
+    // new cells (i.e., one new cell adjacent to each vertex of the old
+    // cell).
+    std::vector<CellData<dim>> cell_data;
+    cell_data.reserve(ref_tria.n_cells() * (dim + 1));
+
+    for (const auto &cell : ref_tria.active_cell_iterators())
+      for (unsigned int v = 0; v < cell->n_vertices(); ++v)
+        {
+          CellData<dim> new_cell;
+
+          if constexpr (dim == 2)
+            {
+              // In triangles, lines 'v' and 'v+2' (mod 3) are adjacent
+              // to vertex v. Make a quad out of the old vertex, the
+              // line midpoints, and the new cell midpoint
+              new_cell.vertices = {
+                cell->vertex_index(v),
+                face_to_midpoint_vertex_map[cell->line(v)],
+                face_to_midpoint_vertex_map[cell->line((v + 2) % 3)],
+                cell_to_midpoint_vertex_map[cell]};
+            }
+          else
+            Assert(false,
+                   ExcNotImplemented()); // 3d case not currently implemented
+
+          new_cell.material_id = cell->material_id();
+          new_cell.manifold_id = cell->manifold_id();
+
+          cell_data.emplace_back(std::move(new_cell));
+        }
+
+    // Next also collect information about boundary indicators:
+    SubCellData subcell_data;
+    for (const auto &cell : ref_tria.active_cell_iterators())
+      for (const auto &face : cell->face_iterators())
+        if (face->at_boundary() && (face->boundary_id() != 0))
+          // The face is at the boundary and doesn't have the default boundary
+          // id:
+          {
+            if constexpr (dim == 2)
+              {
+                CellData<dim - 1> child_face_1, child_face_2;
+                child_face_1.vertices    = {face->vertex_index(0),
+                                            face_to_midpoint_vertex_map[face]};
+                child_face_1.boundary_id = face->boundary_id();
+                child_face_2.vertices    = {face_to_midpoint_vertex_map[face],
+                                            face->vertex_index(1)};
+                child_face_2.boundary_id = face->boundary_id();
+                subcell_data.boundary_lines.emplace_back(
+                  std::move(child_face_1));
+                subcell_data.boundary_lines.emplace_back(
+                  std::move(child_face_2));
+              }
+          }
+
+    // In a final step, actually create the triangulation and reset manifold
+    // ids (because manifolds cannot be reliably transferred from hypercube
+    // meshes to simplex meshes, given that manifolds object are typically
+    // specific for one cell type.
+    out_tria.clear();
+    out_tria.create_triangulation(vertices, cell_data, subcell_data);
+
+    for (const auto i : out_tria.get_manifold_ids())
+      if (i != numbers::flat_manifold_id)
+        out_tria.set_manifold(i, FlatManifold<dim, spacedim>());
+  }
+
+
+
+  template <int dim, int spacedim>
+  void
   alfeld_split_of_simplex_mesh(const Triangulation<dim, spacedim> &in_tria,
                                Triangulation<dim, spacedim>       &out_tria)
   {
