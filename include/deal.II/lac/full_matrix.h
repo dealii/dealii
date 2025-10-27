@@ -745,6 +745,22 @@ public:
   swap_col(const size_type i, const size_type j);
 
   /**
+   * Permute rows and columns of the matrix according to the given
+   * permutations.
+   *
+   * The permutation vectors @p row_perm and @p col_perm map source indices
+   * to destination positions: the element originally at (i,j) is moved to
+   * (*this)(row_perm[i], col_perm[j]).  Equivalently, after the call
+   * new(row_perm[i], col_perm[j]) = old(i,j) for all valid i and j.
+   *
+   * The implementation makes a temporary copy of the original matrix and
+   * writes its entries into the permuted positions in *this.
+   */
+  void
+  permute(const std::vector<unsigned int> &row_perm,
+          const std::vector<unsigned int> &col_perm);
+
+  /**
    * Add constant to diagonal elements of this, i.e. add a multiple of the
    * identity matrix.
    */
