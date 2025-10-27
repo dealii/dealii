@@ -9465,22 +9465,25 @@ namespace GridGenerator
   void
   subdivided_hyper_cube_with_simplices(Triangulation<dim, spacedim> &tria,
                                        const unsigned int repetitions,
-                                       const double       p1,
-                                       const double       p2,
+                                       const double       left,
+                                       const double       right,
                                        const bool         colorize)
   {
     if (dim == 2)
       {
-        subdivided_hyper_rectangle_with_simplices(
-          tria, {{repetitions, repetitions}}, {p1, p1}, {p2, p2}, colorize);
+        subdivided_hyper_rectangle_with_simplices(tria,
+                                                  {{repetitions, repetitions}},
+                                                  {left, left},
+                                                  {right, right},
+                                                  colorize);
       }
     else if (dim == 3)
       {
         subdivided_hyper_rectangle_with_simplices(
           tria,
           {{repetitions, repetitions, repetitions}},
-          {p1, p1, p1},
-          {p2, p2, p2},
+          {left, left, left},
+          {right, right, right},
           colorize);
       }
     else
