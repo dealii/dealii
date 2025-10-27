@@ -562,7 +562,7 @@ namespace Particles
     template <typename VectorType>
     void
     get_particle_positions(VectorType &output_vector,
-                           const bool  add_to_output_vector = false);
+                           const bool  add_to_output_vector = false) const;
 
     /**
      * Gather the position of the particles within the particle handler in
@@ -580,7 +580,7 @@ namespace Particles
      */
     void
     get_particle_positions(std::vector<Point<spacedim>> &positions,
-                           const bool add_to_output_vector = false);
+                           const bool add_to_output_vector = false) const;
 
     /**
      * This function allows to register three additional functions that are
@@ -1355,7 +1355,7 @@ namespace Particles
   inline void
   ParticleHandler<dim, spacedim>::get_particle_positions(
     VectorType &output_vector,
-    const bool  add_to_output_vector)
+    const bool  add_to_output_vector) const
   {
     AssertDimension(output_vector.size(),
                     get_next_free_particle_index() * spacedim);
