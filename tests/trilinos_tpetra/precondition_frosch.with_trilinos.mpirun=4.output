@@ -1,9 +1,5 @@
 
 DEAL:01089:FROSch - one level::Solver stopped within 15 - 17 iterations
 DEAL:01089:FROSch - two level::Solver stopped within 7 - 9 iterations
-DEAL:01089:FROSch - RIBBIT::Error: 
-    You are trying to use functionality in deal.II that is currently not implemented. In many cases, this indicates that there simply didn't appear much of a need for it, or that the author of the original code did not have the time to implement a particular case. If you hit this exception, it is therefore worth the time to look into the code to find out whether you may be able to implement the missing functionality. If you do, please consider providing a patch to the deal.II development sources (see the deal.II website on how to contribute).
 DEAL:04225:FROSch - one level::Solver  stopped within 23 - 25 iterations
 DEAL:04225:FROSch - two level::Solver  stopped within 11 - 13 iterations
-DEAL:04225:FROSch - RIBBIT::Error: 
-    You are trying to use functionality in deal.II that is currently not implemented. In many cases, this indicates that there simply didn't appear much of a need for it, or that the author of the original code did not have the time to implement a particular case. If you hit this exception, it is therefore worth the time to look into the code to find out whether you may be able to implement the missing functionality. If you do, please consider providing a patch to the deal.II development sources (see the deal.II website on how to contribute).

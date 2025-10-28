@@ -1341,19 +1341,100 @@ namespace LinearAlgebra
     {
     public:
       /**
-       * @brief The set of additional parameters to tune the FROSch preconditioner.
+       * Enumeration object to select the preconditioner type
+       */
+      enum PreconditionerType
+      {
+        /**
+         * Create a one-level preconditioner.
+         */
+        OneLevel,
+        /**
+         * Create a two-level preconditioner, i.e. add a coarse-level.
+         */
+        TwoLevel
+      };
+
+      /**
+       * Enumeration object that is used by AdditionalData to tell FROSch which
+       * direct solver to use.
+       */
+      enum SolverName
+      {
+        /**
+         * Default solver.
+         */
+        KLU,
+        /**
+         * Rrequires Trilinos Amesos2 to be configured to use UMFPACK.
+         */
+        UMFPACK,
+        /**
+         * Requires Trilinos Amesos2 to be configured to use MUMPS.
+         */
+        MUMPS,
+        /**
+         * Rrequires Trilinos Amesos2 to be configured to use SuperLU_dist.
+         */
+        SuperLU_dist
+      };
+
+      /**
+       * Enumeration object that is used by AdditionalData to tell FROSch
+       * how to combine the values in the overlap.
+       */
+      enum CombineMethod
+      {
+        /**
+         * Restrict the overlapping domains, back to the non-overlapping
+         * domains. This leads to a non-symmetric preconditioner.
+         */
+        Restricted,
+        /*
+         * Take the average on the overlap.
+         */
+        Averaging,
+        /*
+         * Add up the values on the overlap.
+         */
+        Full
+      };
+
+      /**
+       * Enumeration object that is used by AdditionalData to tell FROSch
+       * what coarse space to use.
+       */
+      enum CoarseType
+      {
+        /**
+         * Default.
+         */
+        IPOUHarmonicCoarseOperator,
+        /**
+         * Generalized Dryja–Smith–Widlund coarse space.
+         */
+        GDSWCoarseOperator,
+        /**
+         * Reduced dimension generalized Dryja–Smith–Widlund coarse space
+         */
+        RGDSWCoarseOperator
+      };
+
+      /**
+       * The set of additional parameters to tune the FROSch preconditioner.
        *
        */
       struct AdditionalData
       {
         AdditionalData(
-          const int          overlap                   = 1,
-          const unsigned int dimension                 = 2,
-          const std::string  combine_values_in_overlap = "Restricted",
-          const std::string  subdomain_solver          = "KLU",
-          const std::string  coarse_operator_type      = "IPOUHarmonicCoarseOperator",
-          const std::string  extension_solver          = "KLU",
-          const std::string  coarse_solver             = "KLU");
+          const int                overlap                   = 1,
+          const int                dimension                 = 2,
+          const enum CombineMethod combine_values_in_overlap = Restricted,
+          const enum SolverName    subdomain_solver          = KLU,
+          const enum CoarseType    coarse_operator_type =
+            IPOUHarmonicCoarseOperator,
+          const enum SolverName extension_solver = KLU,
+          const enum SolverName coarse_solver    = KLU);
 
         /**
          * The overlap between the subdomains.
@@ -1364,7 +1445,7 @@ namespace LinearAlgebra
          * The dimension of the problem
          *
          */
-        unsigned int dimension;
+        int dimension;
         /**
          * The combine method in the overlap.
          *
@@ -1387,7 +1468,7 @@ namespace LinearAlgebra
          * <li> "Full" </li>
          * </ul>
          */
-        std::string combine_values_in_overlap;
+        enum CombineMethod combine_values_in_overlap;
 
         /**
          * Specify the direct solver for the subdomains.
@@ -1402,7 +1483,7 @@ namespace LinearAlgebra
          * </ul>
          *
          */
-        std::string subdomain_solver;
+        enum SolverName subdomain_solver;
 
         /**
          * Specify the coarse space operator. Only used by two-level methods.
@@ -1415,21 +1496,21 @@ namespace LinearAlgebra
          * </ul>
          *
          */
-        std::string coarse_operator_type;
+        enum CoarseType coarse_operator_type;
 
         /**
          * The solver used for the extension space problem.
          * For the available options, see the description of the
          * subdomain_solver.
          */
-        std::string extension_solver;
+        enum SolverName extension_solver;
 
         /**
          * The solver used for the coarse space problem.
          * For the available options, see the description of the
          * subdomain_solver.
          */
-        std::string coarse_solver;
+        enum SolverName coarse_solver;
       };
 
       /**
@@ -1437,13 +1518,14 @@ namespace LinearAlgebra
        *
        *  Available options:
        *  <ul>
-       *  <li> "One Level" </li>
-       *  <li> "Two Level" </li>
+       *  <li> "OneLevel" </li>
+       *  <li> "TwoLevel" </li>
        *  </ul>
        *
        * @param precondition_type the type of FROSch preconditioner to use
        */
-      PreconditionFROSch(std::string precondition_type = "One Level");
+      PreconditionFROSch(
+        const enum PreconditionerType precondition_type = OneLevel);
 
       /**
        * Set the parameter list for the preconditioner.
@@ -1467,7 +1549,8 @@ namespace LinearAlgebra
                  const AdditionalData &additional_data = AdditionalData());
 
       /**
-       * Compute the preconditioner based on the given matrix, the dof_handler and parameters.
+       * Compute the preconditioner based on the given matrix, the dof_handler
+       * and parameters.
        *
        * With the additional geometric information form the triangulation and
        * the dof handler the preconditioner can be better adapted to the actual
@@ -1483,7 +1566,7 @@ namespace LinearAlgebra
                  const AdditionalData &additional_data = AdditionalData());
 
     protected:
-      std::string precondition_type;
+      const enum PreconditionerType precondition_type;
 
       bool user_provided_parameter_list;
     };

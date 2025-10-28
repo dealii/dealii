@@ -77,12 +77,10 @@ private:
 
   AffineConstraints<double> constraints;
 
-  LinearAlgebra::TpetraWrappers::SparseMatrix<double, MemorySpace::Default>
-    system_matrix;
+  LinearAlgebra::TpetraWrappers::SparseMatrix<double> system_matrix;
 
-  LinearAlgebra::TpetraWrappers::Vector<double, MemorySpace::Default> solution;
-  LinearAlgebra::TpetraWrappers::Vector<double, MemorySpace::Default>
-    system_rhs;
+  LinearAlgebra::TpetraWrappers::Vector<double> solution;
+  LinearAlgebra::TpetraWrappers::Vector<double> system_rhs;
 };
 
 
@@ -258,15 +256,13 @@ Step4<dim>::solve(int cycle)
   {
     deallog.push("FROSch - one level");
     // Note: The numer of iteration depends on the number of MPI-ranks.
-    static constexpr std::array<unsigned int, 2> lower{{15, 23}};
-    LinearAlgebra::TpetraWrappers::PreconditionFROSch<double,
-                                                      MemorySpace::Default>
-      preconditioner("One Level");
+    static constexpr std::array<unsigned int, 2>              lower{{15, 23}};
+    LinearAlgebra::TpetraWrappers::PreconditionFROSch<double> preconditioner(
+      LinearAlgebra::TpetraWrappers::PreconditionFROSch<double>::OneLevel);
     solution = 0;
     SolverControl solver_control(1000, 1e-10);
-    SolverGMRES<
-      LinearAlgebra::TpetraWrappers::Vector<double, MemorySpace::Default>>
-      solver(solver_control);
+    SolverGMRES<LinearAlgebra::TpetraWrappers::Vector<double>> solver(
+      solver_control);
     preconditioner.initialize(system_matrix);
     check_solver_within_range(
       solver.solve(system_matrix, solution, system_rhs, preconditioner),
@@ -279,41 +275,19 @@ Step4<dim>::solve(int cycle)
   {
     deallog.push("FROSch - two level");
     // Note: The numer of iteration depends on the number of MPI-ranks.
-    static constexpr std::array<unsigned int, 2> lower{{7, 11}};
-    LinearAlgebra::TpetraWrappers::PreconditionFROSch<double,
-                                                      MemorySpace::Default>
-      preconditioner("One Level");
+    static constexpr std::array<unsigned int, 2>              lower{{7, 11}};
+    LinearAlgebra::TpetraWrappers::PreconditionFROSch<double> preconditioner(
+      LinearAlgebra::TpetraWrappers::PreconditionFROSch<double>::TwoLevel);
     solution = 0;
     SolverControl solver_control(1000, 1e-10);
-    SolverGMRES<
-      LinearAlgebra::TpetraWrappers::Vector<double, MemorySpace::Default>>
-      solver(solver_control);
+    SolverGMRES<LinearAlgebra::TpetraWrappers::Vector<double>> solver(
+      solver_control);
     preconditioner.initialize(system_matrix, dof_handler);
     check_solver_within_range(
       solver.solve(system_matrix, solution, system_rhs, preconditioner),
       solver_control.last_step(),
       lower[cycle],
       lower[cycle] + 2);
-    deallog.pop();
-  }
-
-  {
-    // Make sure the FROSch preconditioner throws an Exception for an
-    // unsupported precondition method.
-    // RIBBIT ('Frosch' is the german word for 'frog', and 'ribbit' is the
-    // sound the frog makes) is of course a made up precondition method name.
-    deallog.push("FROSch - RIBBIT");
-    try
-      {
-        LinearAlgebra::TpetraWrappers::PreconditionFROSch<double,
-                                                          MemorySpace::Default>
-          preconditioner("RIBBIT");
-      }
-    catch (dealii::ExceptionBase &exc)
-      {
-        deallog << "Error: " << std::endl;
-        exc.print_info(deallog.get_file_stream());
-      }
     deallog.pop();
   }
 

@@ -90,25 +90,69 @@ namespace LinearAlgebra
                             "AlgebraicOverlappingOperator");
         parameter_list->set("Dimension", additional_data.dimension);
         parameter_list->set("Overlap", additional_data.overlap);
-        parameter_list->set("CoarseOperator Type",
-                            additional_data.coarse_operator_type);
+
+        std::string coarse_operator_string;
+        switch (additional_data.coarse_operator_type)
+          {
+            case PreconditionFROSch<Number,
+                                    MemorySpace>::IPOUHarmonicCoarseOperator:
+              coarse_operator_string = "IPOUHarmonicCoarseOperator";
+              break;
+            case PreconditionFROSch<Number, MemorySpace>::GDSWCoarseOperator:
+              coarse_operator_string = "GDSWCoarseOperator";
+              break;
+            case PreconditionFROSch<Number, MemorySpace>::RGDSWCoarseOperator:
+              coarse_operator_string = "RGDSWCoarseOperator";
+              break;
+            default:
+              DEAL_II_NOT_IMPLEMENTED();
+          }
+        parameter_list->set("CoarseOperator Type", coarse_operator_string);
 
         { /* sublist: AlgebraicOverlappingOperator */
           Teuchos::RCP<Teuchos::ParameterList> operator_parameter_list =
             Teuchos::rcp(
               new Teuchos::ParameterList("AlgebraicOverlappingOperator"));
-
-          operator_parameter_list->set(
-            "Combine Values in Overlap",
-            additional_data.combine_values_in_overlap);
+          switch (additional_data.combine_values_in_overlap)
+            {
+              case PreconditionFROSch<Number, MemorySpace>::Restricted:
+                operator_parameter_list->set("Combine Values in Overlap",
+                                             "Restricted");
+                break;
+              case PreconditionFROSch<Number, MemorySpace>::Averaging:
+                operator_parameter_list->set("Combine Values in Overlap",
+                                             "Averaging");
+                break;
+              case PreconditionFROSch<Number, MemorySpace>::Full:
+                operator_parameter_list->set("Combine Values in Overlap",
+                                             "Full");
+                break;
+              default:
+                DEAL_II_NOT_IMPLEMENTED();
+            }
           operator_parameter_list->set("Adding Layers Strategy", "CrsMatrix");
 
           { /* sub-sublist: Solver */
             Teuchos::RCP<Teuchos::ParameterList> solver_parameter_list =
               Teuchos::rcp(new Teuchos::ParameterList("Solver"));
             solver_parameter_list->set("SolverType", "Amesos2");
-            solver_parameter_list->set("Solver",
-                                       additional_data.subdomain_solver);
+            switch (additional_data.subdomain_solver)
+              {
+                case PreconditionFROSch<Number, MemorySpace>::KLU:
+                  solver_parameter_list->set("Solver", "KLU");
+                  break;
+                case PreconditionFROSch<Number, MemorySpace>::UMFPACK:
+                  solver_parameter_list->set("Solver", "UMFPACK");
+                  break;
+                case PreconditionFROSch<Number, MemorySpace>::MUMPS:
+                  solver_parameter_list->set("Solver", "MUMPS");
+                  break;
+                case PreconditionFROSch<Number, MemorySpace>::SuperLU_dist:
+                  solver_parameter_list->set("Solver", "SuperLU_dist");
+                  break;
+                default:
+                  DEAL_II_NOT_IMPLEMENTED();
+              }
 
             operator_parameter_list->set("Solver", *solver_parameter_list);
           }
@@ -119,16 +163,32 @@ namespace LinearAlgebra
 
         { /* sublist: <coarse_operator_type> */
           Teuchos::RCP<Teuchos::ParameterList>
-            coarse_operator_type_parameter_list = Teuchos::rcp(
-              new Teuchos::ParameterList(additional_data.coarse_operator_type));
+            coarse_operator_type_parameter_list =
+              Teuchos::rcp(new Teuchos::ParameterList(coarse_operator_string));
 
           { /* sub-sublist: ExtensionSolver */
             Teuchos::RCP<Teuchos::ParameterList>
               extension_solver_parameter_list =
                 Teuchos::rcp(new Teuchos::ParameterList("ExtensionSolver"));
             extension_solver_parameter_list->set("SolverType", "Amesos2");
-            extension_solver_parameter_list->set(
-              "Solver", additional_data.extension_solver);
+            switch (additional_data.extension_solver)
+              {
+                case PreconditionFROSch<Number, MemorySpace>::KLU:
+                  extension_solver_parameter_list->set("Solver", "KLU");
+                  break;
+                case PreconditionFROSch<Number, MemorySpace>::UMFPACK:
+                  extension_solver_parameter_list->set("Solver", "UMFPACK");
+                  break;
+                case PreconditionFROSch<Number, MemorySpace>::MUMPS:
+                  extension_solver_parameter_list->set("Solver", "MUMPS");
+                  break;
+                case PreconditionFROSch<Number, MemorySpace>::SuperLU_dist:
+                  extension_solver_parameter_list->set("Solver",
+                                                       "SuperLU_dist");
+                  break;
+                default:
+                  DEAL_II_NOT_IMPLEMENTED();
+              }
 
             coarse_operator_type_parameter_list->set(
               "ExtensionSolver", *extension_solver_parameter_list);
@@ -138,14 +198,29 @@ namespace LinearAlgebra
             Teuchos::RCP<Teuchos::ParameterList> coarse_solver_parameter_list =
               Teuchos::rcp(new Teuchos::ParameterList("CoarseSolver"));
             coarse_solver_parameter_list->set("SolverType", "Amesos2");
-            coarse_solver_parameter_list->set("Solver",
-                                              additional_data.coarse_solver);
+            switch (additional_data.coarse_solver)
+              {
+                case PreconditionFROSch<Number, MemorySpace>::KLU:
+                  coarse_solver_parameter_list->set("Solver", "KLU");
+                  break;
+                case PreconditionFROSch<Number, MemorySpace>::UMFPACK:
+                  coarse_solver_parameter_list->set("Solver", "UMFPACK");
+                  break;
+                case PreconditionFROSch<Number, MemorySpace>::MUMPS:
+                  coarse_solver_parameter_list->set("Solver", "MUMPS");
+                  break;
+                case PreconditionFROSch<Number, MemorySpace>::SuperLU_dist:
+                  coarse_solver_parameter_list->set("Solver", "SuperLU_dist");
+                  break;
+                default:
+                  DEAL_II_NOT_IMPLEMENTED();
+              }
 
             coarse_operator_type_parameter_list->set(
               "CoarseSolver", *coarse_solver_parameter_list);
           }
 
-          parameter_list->set(additional_data.coarse_operator_type,
+          parameter_list->set(coarse_operator_string,
                               *coarse_operator_type_parameter_list);
         }
 
@@ -157,14 +232,10 @@ namespace LinearAlgebra
 
     template <typename Number, typename MemorySpace>
     PreconditionFROSch<Number, MemorySpace>::PreconditionFROSch(
-      std::string precondition_type)
+      const enum PreconditionerType precondition_type)
       : precondition_type(precondition_type)
       , user_provided_parameter_list(false)
-    {
-      // Check if the precondition type does exist
-        AssertThrow(((precondition_type == "One Level") ||
-            (precondition_type == "Two Level"))), dealii::ExcNotImplemented());
-    }
+    {}
 
 
 
@@ -181,13 +252,13 @@ namespace LinearAlgebra
 
     template <typename Number, typename MemorySpace>
     PreconditionFROSch<Number, MemorySpace>::AdditionalData::AdditionalData(
-      const int          overlap,
-      const unsigned int dimension,
-      const std::string  combine_values_in_overlap,
-      const std::string  subdomain_solver,
-      const std::string  coarse_operator_type,
-      const std::string  extension_solver,
-      const std::string  coarse_solver)
+      const int                overlap,
+      const int                dimension,
+      const enum CombineMethod combine_values_in_overlap,
+      const enum SolverName    subdomain_solver,
+      const enum CoarseType    coarse_operator_type,
+      const enum SolverName    extension_solver,
+      const enum SolverName    coarse_solver)
       : overlap(overlap)
       , dimension(dimension)
       , combine_values_in_overlap(combine_values_in_overlap)
@@ -230,58 +301,65 @@ namespace LinearAlgebra
         Teuchos::rcp(new XpetraTypes::CrsMatrixWrapType<Number, MemorySpace>(
           xpetra_crsmatrix));
 
-      if (precondition_type == "One Level")
+      switch (precondition_type)
         {
-          // The one-level Schwarz preconditioner object
-          Teuchos::RCP<XpetraTypes::FROSchOneLevelType<Number, MemorySpace>>
-            prec(new XpetraTypes::FROSchOneLevelType<Number, MemorySpace>(
-              xpetra_matrix,
-              Teuchos::rcpFromRef<Teuchos::ParameterList>(
-                this->parameter_list)));
+          case OneLevel:
+            {
+              // The one-level Schwarz preconditioner object
+              Teuchos::RCP<XpetraTypes::FROSchOneLevelType<Number, MemorySpace>>
+                prec(new XpetraTypes::FROSchOneLevelType<Number, MemorySpace>(
+                  xpetra_matrix,
+                  Teuchos::rcpFromRef<Teuchos::ParameterList>(
+                    this->parameter_list)));
 
-          // Initialize
-          prec->initialize(false);
+              // Initialize
+              prec->initialize(false);
 
-          // THIS ACTUALLY COMPUTES THE PRECONDITIONER
-          prec->compute();
+              // THIS ACTUALLY COMPUTES THE PRECONDITIONER
+              prec->compute();
 
-          // convert the FROSch preconditioner into a Xpetra::Operator
-          Teuchos::RCP<XpetraTypes::LinearOperator<Number, MemorySpace>>
-            xpetra_prec = Teuchos::rcp_dynamic_cast<
-              XpetraTypes::LinearOperator<Number, MemorySpace>>(prec);
+              // convert the FROSch preconditioner into a Xpetra::Operator
+              Teuchos::RCP<XpetraTypes::LinearOperator<Number, MemorySpace>>
+                xpetra_prec = Teuchos::rcp_dynamic_cast<
+                  XpetraTypes::LinearOperator<Number, MemorySpace>>(prec);
 
-          // convert the FROSch preconditioner into a Tpetra::Operator
-          // (The OneLevelOperator is derived from the Xpetra::Operator)
-          this->preconditioner =
-            internal::XpetraToTpetra<Number, MemorySpace>(xpetra_prec);
+              // convert the FROSch preconditioner into a Tpetra::Operator
+              // (The OneLevelOperator is derived from the Xpetra::Operator)
+              this->preconditioner =
+                internal::XpetraToTpetra<Number, MemorySpace>(xpetra_prec);
+
+              break;
+            }
+          case TwoLevel:
+            {
+              // The one-level Schwarz preconditioner object
+              Teuchos::RCP<XpetraTypes::FROSchTwoLevelType<Number, MemorySpace>>
+                prec(new XpetraTypes::FROSchTwoLevelType<Number, MemorySpace>(
+                  xpetra_matrix,
+                  Teuchos::rcpFromRef<Teuchos::ParameterList>(
+                    this->parameter_list)));
+
+              // Initialize
+              prec->initialize(false);
+
+              // THIS ACTUALLY COMPUTES THE PRECONDITIONER
+              prec->compute();
+
+              // convert the FROSch preconditioner into a Xpetra::Operator
+              Teuchos::RCP<XpetraTypes::LinearOperator<Number, MemorySpace>>
+                xpetra_prec = Teuchos::rcp_dynamic_cast<
+                  XpetraTypes::LinearOperator<Number, MemorySpace>>(prec);
+
+              // convert the FROSch preconditioner into a Tpetra::Operator
+              // (The OneLevelOperator is derived from the Xpetra::Operator)
+              this->preconditioner =
+                internal::XpetraToTpetra<Number, MemorySpace>(xpetra_prec);
+
+              break;
+            }
+          default:
+            DEAL_II_NOT_IMPLEMENTED();
         }
-      else if (precondition_type == "Two Level")
-        {
-          // The one-level Schwarz preconditioner object
-          Teuchos::RCP<XpetraTypes::FROSchTwoLevelType<Number, MemorySpace>>
-            prec(new XpetraTypes::FROSchTwoLevelType<Number, MemorySpace>(
-              xpetra_matrix,
-              Teuchos::rcpFromRef<Teuchos::ParameterList>(
-                this->parameter_list)));
-
-          // Initialize
-          prec->initialize(false);
-
-          // THIS ACTUALLY COMPUTES THE PRECONDITIONER
-          prec->compute();
-
-          // convert the FROSch preconditioner into a Xpetra::Operator
-          Teuchos::RCP<XpetraTypes::LinearOperator<Number, MemorySpace>>
-            xpetra_prec = Teuchos::rcp_dynamic_cast<
-              XpetraTypes::LinearOperator<Number, MemorySpace>>(prec);
-
-          // convert the FROSch preconditioner into a Tpetra::Operator
-          // (The OneLevelOperator is derived from the Xpetra::Operator)
-          this->preconditioner =
-            internal::XpetraToTpetra<Number, MemorySpace>(xpetra_prec);
-        }
-      else
-        AssertThrow(false, dealii::ExcNotImplemented());
     }
 
 
@@ -381,72 +459,80 @@ namespace LinearAlgebra
           0,
           uniqueMap->getComm());
 
-      if (precondition_type == "One Level")
+      switch (precondition_type)
         {
-          // The one-level Schwarz preconditioner object
-          Teuchos::RCP<XpetraTypes::FROSchOneLevelType<Number, MemorySpace>>
-            prec(new XpetraTypes::FROSchOneLevelType<Number, MemorySpace>(
-              xpetra_matrix,
-              Teuchos::rcpFromRef<Teuchos::ParameterList>(
-                this->parameter_list)));
+          case OneLevel:
+            {
+              // The one-level Schwarz preconditioner object
+              Teuchos::RCP<XpetraTypes::FROSchOneLevelType<Number, MemorySpace>>
+                prec(new XpetraTypes::FROSchOneLevelType<Number, MemorySpace>(
+                  xpetra_matrix,
+                  Teuchos::rcpFromRef<Teuchos::ParameterList>(
+                    this->parameter_list)));
 
-          // Initialize
-          prec->initialize(overlap, repeated_map);
+              // Initialize
+              prec->initialize(overlap, repeated_map);
 
-          // THIS ACTUALLY COMPUTES THE PRECONDITIONER
-          prec->compute();
+              // THIS ACTUALLY COMPUTES THE PRECONDITIONER
+              prec->compute();
 
-          // convert the FROSch preconditioner into a Xpetra::Operator
-          Teuchos::RCP<XpetraTypes::LinearOperator<Number, MemorySpace>>
-            xpetra_prec = Teuchos::rcp_dynamic_cast<
-              XpetraTypes::LinearOperator<Number, MemorySpace>>(prec);
+              // convert the FROSch preconditioner into a Xpetra::Operator
+              Teuchos::RCP<XpetraTypes::LinearOperator<Number, MemorySpace>>
+                xpetra_prec = Teuchos::rcp_dynamic_cast<
+                  XpetraTypes::LinearOperator<Number, MemorySpace>>(prec);
 
-          // convert the FROSch preconditioner into a Tpetra::Operator
-          // (The OneLevelOperator is derived from the Xpetra::Operator)
-          this->preconditioner =
-            internal::XpetraToTpetra<Number, MemorySpace>(xpetra_prec);
+              // convert the FROSch preconditioner into a Tpetra::Operator
+              // (The OneLevelOperator is derived from the Xpetra::Operator)
+              this->preconditioner =
+                internal::XpetraToTpetra<Number, MemorySpace>(xpetra_prec);
+
+              break;
+            }
+          case TwoLevel:
+            {
+              // The two-level Schwarz preconditioner object
+              Teuchos::RCP<XpetraTypes::FROSchTwoLevelType<Number, MemorySpace>>
+                prec(new XpetraTypes::FROSchTwoLevelType<Number, MemorySpace>(
+                  xpetra_matrix,
+                  Teuchos::rcpFromRef<Teuchos::ParameterList>(
+                    this->parameter_list)));
+
+              // Initialize
+              const unsigned int dimension =
+                this->parameter_list.get("Dimension", 2);
+              AssertThrow(
+                n_dofs_per_cell == (GeometryInfo<dim>::vertices_per_cell *
+                                    dof_handler.get_fe().n_dofs_per_vertex()),
+                ExcMessage(
+                  "Currently, the deal.II - FROSch interface for two-level "
+                  "preconditioners is only implemented for the case where "
+                  "the DoFs are located only on vertices."));
+              prec->initialize(dimension,
+                               dof_handler.get_fe().n_dofs_per_vertex(),
+                               overlap,
+                               FROSch::null,
+                               FROSch::null,
+                               FROSch::NodeWise,
+                               repeated_map);
+
+              // THIS ACTUALLY COMPUTES THE PRECONDITIONER
+              prec->compute();
+
+              // convert the FROSch preconditioner into a Xpetra::Operator
+              Teuchos::RCP<XpetraTypes::LinearOperator<Number, MemorySpace>>
+                xpetra_prec = Teuchos::rcp_dynamic_cast<
+                  XpetraTypes::LinearOperator<Number, MemorySpace>>(prec);
+
+              // convert the FROSch preconditioner into a Tpetra::Operator
+              // (The OneLevelOperator is derived from the Xpetra::Operator)
+              this->preconditioner =
+                internal::XpetraToTpetra<Number, MemorySpace>(xpetra_prec);
+
+              break;
+            }
+          default:
+            DEAL_II_NOT_IMPLEMENTED();
         }
-      else if (precondition_type == "Two Level")
-        {
-          // The two-level Schwarz preconditioner object
-          Teuchos::RCP<XpetraTypes::FROSchTwoLevelType<Number, MemorySpace>>
-            prec(new XpetraTypes::FROSchTwoLevelType<Number, MemorySpace>(
-              xpetra_matrix,
-              Teuchos::rcpFromRef<Teuchos::ParameterList>(
-                this->parameter_list)));
-
-          // Initialize
-          const unsigned int dimension = this->parameter_list.get("Dimension", 2);
-          AssertThrow(
-            n_dofs_per_cell == (GeometryInfo<dim>::vertices_per_cell *
-                                dof_handler.get_fe().n_dofs_per_vertex()),
-            ExcMessage(
-              "Currently, the deal.II - FROSch interface for two-level "
-              "preconditioners is only implemented for the case where "
-              "the DoFs are located only on vertices."));
-          prec->initialize(dimension,
-                           dof_handler.get_fe().n_dofs_per_vertex(),
-                           overlap,
-                           FROSch::null,
-                           FROSch::null,
-                           FROSch::NodeWise,
-                           repeated_map);
-
-          // THIS ACTUALLY COMPUTES THE PRECONDITIONER
-          prec->compute();
-
-          // convert the FROSch preconditioner into a Xpetra::Operator
-          Teuchos::RCP<XpetraTypes::LinearOperator<Number, MemorySpace>>
-            xpetra_prec = Teuchos::rcp_dynamic_cast<
-              XpetraTypes::LinearOperator<Number, MemorySpace>>(prec);
-
-          // convert the FROSch preconditioner into a Tpetra::Operator
-          // (The OneLevelOperator is derived from the Xpetra::Operator)
-          this->preconditioner =
-            internal::XpetraToTpetra<Number, MemorySpace>(xpetra_prec);
-        }
-      else
-        AssertThrow(false, dealii::ExcNotImplemented());
     }
 
 #  endif // DEAL_II_TRILINOS_WITH_SHYLU_DDFROSCH
