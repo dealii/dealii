@@ -89,6 +89,7 @@ export
 #if DEAL_II_KOKKOS_VERSION_GTE(4, 3, 0)
     using ::Kokkos::kokkos_swap;
 #endif
+    using ::Kokkos::LAnd;
     using ::Kokkos::make_pair;
     using ::Kokkos::Max;
     using ::Kokkos::MDRangePolicy;
