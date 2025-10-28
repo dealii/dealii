@@ -309,10 +309,7 @@ Vector<Number>::all_zero() const
 {
   Assert(size() != 0, ExcEmptyObject());
 
-  for (size_type i = 0; i < size(); ++i)
-    if (values[i] != Number())
-      return false;
-  return true;
+  return std::all_of(begin(), end(), numbers::value_is_zero<Number>);
 }
 
 

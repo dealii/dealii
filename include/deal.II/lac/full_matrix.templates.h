@@ -122,13 +122,9 @@ FullMatrix<number>::all_zero() const
 {
   Assert(!this->empty(), ExcEmptyMatrix());
 
-  const number       *p = this->values.data();
-  const number *const e = this->values.data() + this->n_elements();
-  while (p != e)
-    if (*p++ != number(0.0))
-      return false;
-
-  return true;
+  return std::all_of(this->values.begin(),
+                     this->values.end(),
+                     numbers::value_is_zero<number>);
 }
 
 

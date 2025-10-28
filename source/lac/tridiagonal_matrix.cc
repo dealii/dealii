@@ -53,24 +53,15 @@ TridiagonalMatrix<number>::all_zero() const
 {
   Assert(state == matrix, ExcState(state));
 
-  typename std::vector<number>::const_iterator i;
-  typename std::vector<number>::const_iterator e;
-
-  e = diagonal.end();
-  for (i = diagonal.begin(); i != e; ++i)
-    if (std::abs(*i) != 0.)
-      return false;
-
-  e = left.end();
-  for (i = left.begin(); i != e; ++i)
-    if (std::abs(*i) != 0.)
-      return false;
-
-  e = right.end();
-  for (i = right.begin(); i != e; ++i)
-    if (std::abs(*i) != 0.)
-      return false;
-  return true;
+  return std::all_of(left.begin(),
+                     left.end(),
+                     numbers::value_is_zero<number>) &&
+         std::all_of(diagonal.begin(),
+                     diagonal.end(),
+                     numbers::value_is_zero<number>) &&
+         std::all_of(right.begin(),
+                     right.end(),
+                     numbers::value_is_zero<number>);
 }
 
 
