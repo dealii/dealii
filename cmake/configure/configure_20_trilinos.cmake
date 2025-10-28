@@ -533,6 +533,18 @@ macro(feature_trilinos_configure_external)
   endforeach()
 
   #
+  # For gcc-11 (or older) we need to manually disable preprocessor warnings
+  # in order to avoid flooding the screen with Epetra deprecation notices.
+  # Newer versions support selectively setting the "-Wno-cpp" flag via a
+  # compiler pragma.
+  #
+  if(TRILINOS_VERSION VERSION_GREATER_EQUAL 16.0)
+    if(CMAKE_CXX_COMPILER_ID MATCHES "GNU" AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS "12.0")
+      enable_if_supported(DEAL_II_WARNING_FLAGS "-Wno-cpp")
+    endif()
+  endif()
+
+  #
   # Figure out all the possible instantiations we need:
   #
 

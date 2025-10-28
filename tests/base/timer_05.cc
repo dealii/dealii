@@ -79,7 +79,8 @@ test_timer(Timer &t)
   assert_min_max_avg_invalid(t.get_accumulated_wall_time_data());
 
   burn(50);
-  AssertThrow(t.stop() > 0., ExcInternalError());
+  t.stop();
+  AssertThrow(t.cpu_time() > 0., ExcInternalError());
   assert_min_max_avg_valid(t.get_last_lap_wall_time_data());
   assert_min_max_avg_valid(t.get_accumulated_wall_time_data());
 

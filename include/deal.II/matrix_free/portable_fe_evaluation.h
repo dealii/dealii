@@ -46,7 +46,7 @@ namespace Portable
    *
    * @tparam dim Dimension in which this class is to be used
    *
-   * @tparam fe_degree Degree of the tensor prodict finite element with fe_degree+1
+   * @tparam fe_degree Degree of the tensor product finite element with fe_degree+1
    * degrees of freedom per coordinate direction
    *
    * @tparam n_q_points_1d Number of points in the quadrature formular in 1d,
@@ -124,13 +124,13 @@ namespace Portable
      * Constructor. You will need to provide a pointer to the
      * Portable::MatrixFree::Data object, which is typically provided to the
      * functor inside the
-     * Portable::MatrixFree::cell_loop() and the index @p dof_index of the DoFHandler
-     * if more than one was provided when the Portable::MatrixFree object was
-     * initialized.
+     * Portable::MatrixFree::cell_loop() and the index @p dof_handler_index
+     * of the DoFHandler if more than one was provided when the
+     * Portable::MatrixFree object was initialized.
      */
     DEAL_II_HOST_DEVICE
     explicit FEEvaluation(const data_type   *data,
-                          const unsigned int dof_index = 0);
+                          const unsigned int dof_handler_index = 0);
 
     /**
      * Return the index of the current cell.
@@ -153,7 +153,7 @@ namespace Portable
      * the current cell, and store them internally. Similar functionality as
      * the function DoFAccessor::get_interpolated_dof_values when no
      * constraints are present, but it also includes constraints from hanging
-     * nodes, so once can see it as a similar function to
+     * nodes, so one can see it as a similar function to
      * AffineConstraints::read_dof_values() as well.
      */
     DEAL_II_HOST_DEVICE void
@@ -277,13 +277,13 @@ namespace Portable
             typename Number>
   DEAL_II_HOST_DEVICE
   FEEvaluation<dim, fe_degree, n_q_points_1d, n_components_, Number>::
-    FEEvaluation(const data_type *data, const unsigned int dof_index)
+    FEEvaluation(const data_type *data, const unsigned int dof_handler_index)
     : data(data)
     , precomputed_data(data->precomputed_data)
     , shared_data(data->shared_data)
     , cell_id(data->team_member.league_rank())
   {
-    AssertIndexRange(dof_index, data->n_dofhandler);
+    AssertIndexRange(dof_handler_index, data->n_dofhandler);
   }
 
 

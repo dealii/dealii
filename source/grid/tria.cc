@@ -15844,7 +15844,7 @@ void Triangulation<dim, spacedim>::execute_coarsening_and_refinement()
   // some difficulty in the past (see the
   // deal.II/coarsening_* tests)
   if (smooth_grid & limit_level_difference_at_vertices)
-    Assert(satisfies_level1_at_vertex_rule(*this) == true, ExcInternalError());
+    Assert(satisfies_level1_at_vertex_rule(*this), ExcInternalError());
 
   // Inform all listeners about beginning of refinement.
   signals.pre_refinement();

@@ -226,12 +226,13 @@ namespace Portable
           ExcMessage(
             "Overlapping communication and computation requires device-aware MPI."));
 #endif
-        if (overlap_communication_computation == true)
-          AssertThrow(
-            use_coloring == false || overlap_communication_computation == false,
-            ExcMessage(
-              "Overlapping communication and coloring are incompatible options. Only one of them can be enabled."));
+
+        AssertThrow(
+          use_coloring == false || overlap_communication_computation == false,
+          ExcMessage(
+            "Overlapping communication and coloring are incompatible options. Only one of them can be enabled."));
       }
+
       /**
        * This flag is used to determine which quantities should be cached. This
        * class can cache data needed for gradient computations (inverse
@@ -465,7 +466,7 @@ namespace Portable
 
     // clang-format off
     /**
-     * This method runs the loop over all cells and apply the local operation on
+     * This method runs the loop over all cells and applies the local operation on
      * each element in parallel. @p func is a functor which is applied on each color.
      *
      * @p func needs to define

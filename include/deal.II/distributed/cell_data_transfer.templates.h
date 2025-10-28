@@ -34,36 +34,6 @@
 
 DEAL_II_NAMESPACE_OPEN
 
-
-namespace internal
-{
-  namespace parallel
-  {
-    namespace distributed
-    {
-      namespace CellDataTransferImplementation
-      {
-        template <typename VectorType>
-        void
-        post_unpack_action(std::vector<VectorType *> &all_out)
-        {
-          for (auto &out : all_out)
-            out->compress(VectorOperation::insert);
-        }
-
-        template <typename value_type>
-        void
-        post_unpack_action(std::vector<std::vector<value_type> *> &)
-        {
-          // Do nothing for std::vector as VectorType.
-        }
-      } // namespace CellDataTransferImplementation
-    }   // namespace distributed
-  }     // namespace parallel
-} // namespace internal
-
-
-
 namespace parallel
 {
   namespace distributed
@@ -189,8 +159,25 @@ namespace parallel
           this->unpack_callback(cell, status, data_range, all_out);
         });
 
-      dealii::internal::parallel::distributed::CellDataTransferImplementation::
-        post_unpack_action(all_out);
+      using Number = typename VectorType::value_type;
+#  ifdef DEAL_II_HAVE_CXX20
+      if constexpr (concepts::is_vector_space_vector<VectorType>)
+        for (auto &out : all_out)
+          out->compress(VectorOperation::insert);
+#  else
+      // ad-hoc definition of the concept: all deal.II vectors inherit from
+      // ReadVector, but ReadWriteVector doesn't have compress() (since it
+      // doesn't assign unique index spaces to ranks)
+      static_assert(std::is_base_of_v<ReadVector<Number>, VectorType> ||
+                      std::is_same_v<std::vector<Number>, VectorType>,
+                    "This function is only implemented for deal.II vectors and "
+                    "std::vector.");
+      if constexpr (std::is_base_of_v<ReadVector<Number>, VectorType> &&
+                    !std::is_same_v<LinearAlgebra::ReadWriteVector<Number>,
+                                    VectorType>)
+        for (auto &out : all_out)
+          out->compress(VectorOperation::insert);
+#  endif
 
       input_vectors.clear();
       handle = numbers::invalid_unsigned_int;

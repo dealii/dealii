@@ -1350,8 +1350,8 @@ namespace BlockMatrixIterators
       {
         // we were asked to create the end
         // iterator for this matrix
-        this->row_block = numbers::invalid_size_type;
-        this->col_block = numbers::invalid_size_type;
+        this->row_block = numbers::invalid_unsigned_int;
+        this->col_block = numbers::invalid_unsigned_int;
       }
   }
 
@@ -1360,7 +1360,8 @@ namespace BlockMatrixIterators
   inline typename Accessor<BlockMatrixType, false>::size_type
   Accessor<BlockMatrixType, false>::row() const
   {
-    Assert(this->row_block != numbers::invalid_size_type, ExcIteratorPastEnd());
+    Assert(this->row_block != numbers::invalid_unsigned_int,
+           ExcIteratorPastEnd());
 
     return (matrix->row_block_indices.local_to_global(this->row_block, 0) +
             base_iterator->row());
@@ -1371,7 +1372,8 @@ namespace BlockMatrixIterators
   inline typename Accessor<BlockMatrixType, false>::size_type
   Accessor<BlockMatrixType, false>::column() const
   {
-    Assert(this->col_block != numbers::invalid_size_type, ExcIteratorPastEnd());
+    Assert(this->col_block != numbers::invalid_unsigned_int,
+           ExcIteratorPastEnd());
 
     return (matrix->column_block_indices.local_to_global(this->col_block, 0) +
             base_iterator->column());
@@ -1382,8 +1384,10 @@ namespace BlockMatrixIterators
   inline typename Accessor<BlockMatrixType, false>::value_type
   Accessor<BlockMatrixType, false>::value() const
   {
-    Assert(this->row_block != numbers::invalid_size_type, ExcIteratorPastEnd());
-    Assert(this->col_block != numbers::invalid_size_type, ExcIteratorPastEnd());
+    Assert(this->row_block != numbers::invalid_unsigned_int,
+           ExcIteratorPastEnd());
+    Assert(this->col_block != numbers::invalid_unsigned_int,
+           ExcIteratorPastEnd());
 
     return base_iterator->value();
   }
@@ -1395,8 +1399,10 @@ namespace BlockMatrixIterators
   Accessor<BlockMatrixType, false>::set_value(
     typename Accessor<BlockMatrixType, false>::value_type newval) const
   {
-    Assert(this->row_block != numbers::invalid_size_type, ExcIteratorPastEnd());
-    Assert(this->col_block != numbers::invalid_size_type, ExcIteratorPastEnd());
+    Assert(this->row_block != numbers::invalid_unsigned_int,
+           ExcIteratorPastEnd());
+    Assert(this->col_block != numbers::invalid_unsigned_int,
+           ExcIteratorPastEnd());
 
     base_iterator->value() = newval;
   }
@@ -1407,8 +1413,10 @@ namespace BlockMatrixIterators
   inline void
   Accessor<BlockMatrixType, false>::advance()
   {
-    Assert(this->row_block != numbers::invalid_size_type, ExcIteratorPastEnd());
-    Assert(this->col_block != numbers::invalid_size_type, ExcIteratorPastEnd());
+    Assert(this->row_block != numbers::invalid_unsigned_int,
+           ExcIteratorPastEnd());
+    Assert(this->col_block != numbers::invalid_unsigned_int,
+           ExcIteratorPastEnd());
 
     // Remember current row inside block
     size_type local_row = base_iterator->row();
@@ -1454,8 +1462,8 @@ namespace BlockMatrixIterators
                 ++this->row_block;
                 if (this->row_block == matrix->n_block_rows())
                   {
-                    this->row_block = numbers::invalid_size_type;
-                    this->col_block = numbers::invalid_size_type;
+                    this->row_block = numbers::invalid_unsigned_int;
+                    this->col_block = numbers::invalid_unsigned_int;
                     return;
                   }
               }
@@ -1480,8 +1488,8 @@ namespace BlockMatrixIterators
       // have to have the same
       // base_iterator representation, but
       // valid iterators have to
-      return (((this->row_block == numbers::invalid_size_type) &&
-               (this->col_block == numbers::invalid_size_type)) ||
+      return (((this->row_block == numbers::invalid_unsigned_int) &&
+               (this->col_block == numbers::invalid_unsigned_int)) ||
               (base_iterator == a.base_iterator));
 
     return false;

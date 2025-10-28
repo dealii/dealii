@@ -324,8 +324,8 @@ namespace GridGenerator
   void
   subdivided_hyper_rectangle(Triangulation<dim>                     &tria,
                              const std::vector<std::vector<double>> &step_sizes,
-                             const Point<dim>                       &p_1,
-                             const Point<dim>                       &p_2,
+                             const Point<dim>                       &p1,
+                             const Point<dim>                       &p2,
                              const bool colorize = false);
 
   /**

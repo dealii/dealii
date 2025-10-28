@@ -497,8 +497,7 @@
                 to provide performance portable algorithms for geometric search, similarly to nanoflann and Boost
                 Geometry.
                 To use a self compiled version, pass <code>-DARBORX_DIR=/path/to/arborx</code> to the deal.II CMake
-                call. To use <a href="https://github.com/arborx/ArborX" target="_top">ArborX</a>, deal.II needs to be
-                configured with <a href="https://github.com/kokkos/kokkos" target="_top">Kokkos</a> support.
+                call.
             </p>
         </dd>
 
@@ -655,8 +654,8 @@
                 C++ for writing performance portable applications targeting all major HPC platforms.
                 To use a self compiled version, pass <code>-DKOKKOS_DIR=/path/to/kokkos</code> to the deal.II CMake
                 call. We currently require Kokkos version 3.4 or newer (when bundled in Trilinos) or 3.7 or newer
-		when configured separately. For device support we require 3.7 or newer (stand-alone or part of Trilinos
-		16 or newer).
+		when configured separately. For device support we require 4.0 or newer (stand-alone or part of Trilinos
+		14 or newer).
 		<br/>
                 The compiler must be able to compile code for all enabled backends. In case CUDA is enabled in Kokkos
                 and nvcc should be used as device compiler,

@@ -1,0 +1,7 @@
+
+DEAL:0::Rank 0 owns 51 cells and 42 vertices.
+DEAL:0::Rank 0 owns 36 cells and has 15 ghost cells.
+
+DEAL:1::Rank 1 owns 50 cells and 42 vertices.
+DEAL:1::Rank 1 owns 36 cells and has 14 ghost cells.
+
