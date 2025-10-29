@@ -995,12 +995,42 @@ public:
    * @param A The first matrix (m x n).
    * @param B The second matrix (p x q).
    * @param adding If `true`, the result is added to the current matrix. If
-   *               `false` (default), the current matrix is overwritten.
+   *               `false`, the current matrix is overwritten.
+   *
+   * Note that if `adding` is not provided, the function below is called
+   * resulting in `adding` being `false`.
    */
   void
   kronecker_product(const FullMatrix<number> &A,
                     const FullMatrix<number> &B,
-                    const bool                adding = false);
+                    const bool                adding);
+
+
+  /**
+   * Compute the Kronecker product of multiple FullMatrix objects.
+   *
+   * This variadic overload computes $A_1 \otimes A_2 \otimes \cdots \otimes
+   * A_k$ by performing a left-associative fold: first $T_2 := A_1 \otimes
+   * A_2$, then $T_3 := T_2 \otimes A_3$, and so on until all factors are
+   * consumed. The resulting matrix has size \f[ \left(\prod_{i=1}^k
+   * \mathrm{rows}(A_i)\right) \times \left(\prod_{i=1}^k
+   * \mathrm{cols}(A_i)\right). \f]
+   *
+   * All arguments must be FullMatrix<number> objects.
+   * For example, to compute $A_1 \otimes A_2 \otimes A_3$ call
+   * @code
+   * result.kronecker_product(A_1, A_2, A_3);
+   * @endcode
+   *
+   * The result overwrites the current object. The order of the input arguments
+   * is significant: $A_1$ is the left-most factor in the Kronecker product.
+   */
+  template <typename... Rest>
+  void
+  kronecker_product(const FullMatrix<number> &A,
+                    const FullMatrix<number> &B,
+                    const Rest &...rest);
+
 
   /**
    * Matrix-vector-multiplication.
@@ -1483,6 +1513,31 @@ FullMatrix<number>::print(StreamType        &s,
   s.precision(old_precision);
   s.width(old_width);
 }
+
+
+template <typename number>
+template <typename... Rest>
+void
+FullMatrix<number>::kronecker_product(const FullMatrix<number> &A,
+                                      const FullMatrix<number> &B,
+                                      const Rest &...rest)
+{
+  this->kronecker_product(A, B, false); // tmp := A ⊗ B
+
+  static_assert(
+    (std::is_same_v<std::remove_cv_t<std::remove_reference_t<Rest>>,
+                    FullMatrix<number>> &&
+     ...),
+    "kronecker_product: all variadic arguments must be dealii::FullMatrix<number>");
+
+  if constexpr (sizeof...(rest) != 0)
+    {
+      // copy the current object into tmp and proceed with the next factor
+      FullMatrix<number> tmp = *this;
+      this->kronecker_product(tmp, rest...);
+    }
+}
+
 
 
 #endif // DOXYGEN
