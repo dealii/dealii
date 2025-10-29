@@ -1,0 +1,4 @@
+New: Added variadic template overloads for FullMatrix::kronecker_product()
+to compute the Kronecker product of multiple matrices in a single call.
+<br>
+(Michał Wichrowski, 2025/10/21)
