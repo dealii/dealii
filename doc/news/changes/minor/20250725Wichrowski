@@ -1,0 +1,4 @@
+New: The ClosestSurfacePoint class in the Tools Shifted Boundary Method
+computes the closest point on a surface defined by a level set function.
+<br>
+(Michał Wichrowski, 2025/07/25)
