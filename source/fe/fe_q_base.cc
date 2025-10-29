@@ -146,10 +146,9 @@ struct FE_Q_Base<xdim, xspacedim>::Implementation
     // polynomials, this is a little more complicated. Then we would evaluate
     // at a number of points and invert the interpolation matrix A.
     //
-    // Note, that we build up these matrices for all subfaces at once, rather
+    // Note that we build up these matrices for all subfaces at once, rather
     // than considering them separately. the reason is that we finally will
-    // want to have them in this order anyway, as this is the format we need
-    // inside deal.II
+    // want to have them in this order inside deal.II
 
     // In the following the points x_i are constructed in following order
     // (n=degree-1)
