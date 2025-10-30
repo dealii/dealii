@@ -1212,7 +1212,8 @@ GridOut::write_ucd(const Triangulation<dim, spacedim> &tria,
       // May, 1992, p. E6
       //
       // note: vertex numbers are 1-base
-      for (const unsigned int vertex : GeometryInfo<dim>::vertex_indices())
+      Assert(cell->reference_cell().is_hyper_cube(), ExcNotImplemented());
+      for (const unsigned int vertex : cell->vertex_indices())
         out << cell->vertex_index(GeometryInfo<dim>::ucd_to_deal[vertex]) + 1
             << ' ';
       out << '\n';
