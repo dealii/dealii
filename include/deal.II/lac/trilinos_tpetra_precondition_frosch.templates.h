@@ -20,6 +20,10 @@
 #include <deal.II/base/geometry_info.h>
 #include <deal.II/base/index_set.h>
 
+#include <deal.II/grid/tria.h>
+#include <deal.II/distributed/shared_tria.h>
+#include <deal.II/distributed/tria.h>
+
 #include <deal.II/lac/trilinos_tpetra_types.h>
 #include <deal.II/lac/trilinos_xpetra_types.h>
 
