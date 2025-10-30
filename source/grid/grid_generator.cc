@@ -8570,11 +8570,12 @@ namespace GridGenerator
                     cell_data.vertices[i] =
                       local_vertex_indices[index_vertices[i]];
                   }
-                cells.push_back(cell_data);
+                cells.emplace_back(std::move(cell_data));
               }
             else if (dim == 2 && struct_dim == 1) // an edge of a simplex
               {
                 Assert(index_vertices.size() == 2, ExcInternalError());
+
                 CellData<1> boundary_line(2);
                 boundary_line.boundary_id = material_or_boundary_id;
                 boundary_line.manifold_id = manifold_id;
@@ -8585,11 +8586,13 @@ namespace GridGenerator
                     boundary_line.vertices[i] =
                       local_vertex_indices[index_vertices[i]];
                   }
-                subcell_data.boundary_lines.push_back(boundary_line);
+                subcell_data.boundary_lines.emplace_back(
+                  std::move(boundary_line));
               }
             else if (dim == 3 && struct_dim == 2) // a face of a tetrahedron
               {
                 Assert(index_vertices.size() == 3, ExcInternalError());
+
                 CellData<2> boundary_quad(3);
                 boundary_quad.material_id = material_or_boundary_id;
                 boundary_quad.manifold_id = manifold_id;
@@ -8600,11 +8603,13 @@ namespace GridGenerator
                     boundary_quad.vertices[i] =
                       local_vertex_indices[index_vertices[i]];
                   }
-                subcell_data.boundary_quads.push_back(boundary_quad);
+                subcell_data.boundary_quads.emplace_back(
+                  std::move(boundary_quad));
               }
             else if (dim == 3 && struct_dim == 1) // an edge of a tetrahedron
               {
                 Assert(index_vertices.size() == 2, ExcInternalError());
+
                 CellData<1> boundary_line(2);
                 boundary_line.boundary_id = material_or_boundary_id;
                 boundary_line.manifold_id = manifold_id;
@@ -8615,7 +8620,8 @@ namespace GridGenerator
                     boundary_line.vertices[i] =
                       local_vertex_indices[index_vertices[i]];
                   }
-                subcell_data.boundary_lines.push_back(boundary_line);
+                subcell_data.boundary_lines.emplace_back(
+                  std::move(boundary_line));
               }
             else
               {
@@ -8728,7 +8734,7 @@ namespace GridGenerator
                 edge_data.boundary_id = edge->boundary_id();
                 edge_data.manifold_id = edge->manifold_id();
 
-                subcell_data.boundary_lines.push_back(std::move(edge_data));
+                subcell_data.boundary_lines.emplace_back(std::move(edge_data));
               }
           }
       }
@@ -8864,11 +8870,12 @@ namespace GridGenerator
               cell_data.material_id =
                 material_or_boundary_id;           // inherit material id
               cell_data.manifold_id = manifold_id; // inherit cell-manifold id
-              cells.push_back(cell_data);
+              cells.emplace_back(std::move(cell_data));
             }
           else if (dim == 2 && struct_dim == 1) // an edge of a simplex
             {
               Assert(index_vertices.size() == 2, ExcInternalError());
+
               CellData<1> boundary_line(2);
               boundary_line.boundary_id = material_or_boundary_id;
               boundary_line.manifold_id = manifold_id;
@@ -8879,11 +8886,13 @@ namespace GridGenerator
                   boundary_line.vertices[i] =
                     local_vertex_indices[index_vertices[i]];
                 }
-              subcell_data.boundary_lines.push_back(boundary_line);
+              subcell_data.boundary_lines.emplace_back(
+                std::move(boundary_line));
             }
           else if (dim == 3 && struct_dim == 2) // a face of a tetrahedron
             {
               Assert(index_vertices.size() == 3, ExcInternalError());
+
               CellData<2> boundary_quad(3);
               boundary_quad.material_id = material_or_boundary_id;
               boundary_quad.manifold_id = manifold_id;
@@ -8894,11 +8903,13 @@ namespace GridGenerator
                   boundary_quad.vertices[i] =
                     local_vertex_indices[index_vertices[i]];
                 }
-              subcell_data.boundary_quads.push_back(boundary_quad);
+              subcell_data.boundary_quads.emplace_back(
+                std::move(boundary_quad));
             }
           else if (dim == 3 && struct_dim == 1) // an edge of a tetrahedron
             {
               Assert(index_vertices.size() == 2, ExcInternalError());
+
               CellData<1> boundary_line(2);
               boundary_line.boundary_id = material_or_boundary_id;
               boundary_line.manifold_id = manifold_id;
@@ -8909,7 +8920,8 @@ namespace GridGenerator
                   boundary_line.vertices[i] =
                     local_vertex_indices[index_vertices[i]];
                 }
-              subcell_data.boundary_lines.push_back(boundary_line);
+              subcell_data.boundary_lines.emplace_back(
+                std::move(boundary_line));
             }
           else
             {
@@ -9140,10 +9152,10 @@ namespace GridGenerator
                     edge.boundary_id = 0;
                     edge.manifold_id = face->line(e)->manifold_id();
 
-                    subcell_data.boundary_lines.push_back(edge);
+                    subcell_data.boundary_lines.emplace_back(std::move(edge));
                   }
 
-              cells.push_back(c_data);
+              cells.emplace_back(std::move(c_data));
               temporary_mapping_level0.push_back(std::make_pair(face, i));
             }
         }
@@ -9325,14 +9337,14 @@ namespace GridGenerator
               {
                 CellData<dim> tri;
                 tri.vertices = {quad[0], quad[1], quad[2]};
-                cells.push_back(tri);
+                cells.emplace_back(std::move(tri));
               }
 
               // TRI cell 1
               {
                 CellData<dim> tri;
                 tri.vertices = {quad[3], quad[2], quad[1]};
-                cells.push_back(tri);
+                cells.emplace_back(std::move(tri));
               }
             }
       }
@@ -9383,7 +9395,7 @@ namespace GridGenerator
                   else
                     cell.vertices = {{quad[0], quad[1], quad[3], quad[5]}};
 
-                  cells.push_back(cell);
+                  cells.emplace_back(std::move(cell));
                 }
 
                 // TET cell 1
@@ -9393,7 +9405,7 @@ namespace GridGenerator
                     cell.vertices = {{quad[2], quad[1], quad[3], quad[7]}};
                   else
                     cell.vertices = {{quad[0], quad[3], quad[2], quad[6]}};
-                  cells.push_back(cell);
+                  cells.emplace_back(std::move(cell));
                 }
 
                 // TET cell 2
@@ -9403,7 +9415,7 @@ namespace GridGenerator
                     cell.vertices = {{quad[1], quad[4], quad[5], quad[7]}};
                   else
                     cell.vertices = {{quad[0], quad[4], quad[5], quad[6]}};
-                  cells.push_back(cell);
+                  cells.emplace_back(std::move(cell));
                 }
 
                 // TET cell 3
@@ -9413,7 +9425,7 @@ namespace GridGenerator
                     cell.vertices = {{quad[2], quad[4], quad[7], quad[6]}};
                   else
                     cell.vertices = {{quad[3], quad[5], quad[7], quad[6]}};
-                  cells.push_back(cell);
+                  cells.emplace_back(std::move(cell));
                 }
 
                 // TET cell 4
@@ -9423,7 +9435,7 @@ namespace GridGenerator
                     cell.vertices = {{quad[1], quad[2], quad[4], quad[7]}};
                   else
                     cell.vertices = {{quad[0], quad[3], quad[6], quad[5]}};
-                  cells.push_back(cell);
+                  cells.emplace_back(std::move(cell));
                 }
               }
       }
