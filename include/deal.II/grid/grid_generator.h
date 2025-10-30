@@ -2532,6 +2532,62 @@ namespace GridGenerator
                                                                         24u));
 
   /**
+   * This function converts a mesh consisting exclusively of simplex cells
+   * (i.e., triangles or tetrahedra) into one consisting exclusively of
+   * hypercube cells (i.e., quadrilaterals or hexahedra).
+   *
+   * For `dim==2`, this function performs the conversion by splitting each
+   * triangle into three quadrilaterals by creating vertices at edge mid-points
+   * along with the barycenters of cells.
+   * Also see
+   * @ref simplex "Simplex support".
+   *
+   * @note This function is currently not implemented for `dim==3`.
+   *
+   * Material ID and boundary IDs are inherited upon conversion.
+   *
+   * As an example, the following image shows how a single triangle is
+   * subdivided into three quadrilaterals:
+   *
+   * @image html "convert_simplex_to_hypercube_mesh_visualization_1.png"
+   *
+   * Perhaps more interestingly, the following two pictures show a zoom-in of a
+   * mesh for a high-lift wing configuration that was originally meshed with
+   * triangles, and then subdivided by this function into quadrilaterals:
+   *
+   * @image html "convert_simplex_to_hypercube_mesh_visualization_2.png"
+   * @image html "convert_simplex_to_hypercube_mesh_visualization_3.png"
+   *
+   * @param[in] in_tria The triangulation containing quadrilateral or
+   *   hexahedral elements.
+   *
+   * @param[out] out_tria The converted triangulation containing triangular or
+   *   tetrahedral elements.
+   *
+   * @note No manifold objects are copied by this function: you must
+   *   copy existing manifold objects from @p in_tria to @p out_tria, e.g.,
+   *   with the following code:
+   * @code
+   * for (const auto i : in_tria.get_manifold_ids())
+   *   if (i != numbers::flat_manifold_id)
+   *     out_tria.set_manifold(i, in_tria.get_manifold(i));
+   * @endcode
+   *
+   * Also see
+   * @ref simplex "Simplex support".
+   *
+   * @note This function is available through the python interface as
+   * `in_tria.convert_hypercube_to_simplex_mesh(out_tria)`.
+   *
+   * @note in 1d this function copies @p in_tria into @p out_tria since 1d
+   * elements (lines) are both hypercubes and simplices.
+   */
+  template <int dim, int spacedim>
+  void
+  convert_simplex_to_hypercube_mesh(const Triangulation<dim, spacedim> &in_tria,
+                                    Triangulation<dim, spacedim> &out_tria);
+
+  /**
    * Perform an Alfeld split (also called barycentric refinement) of a simplex
    * mesh.
    *
