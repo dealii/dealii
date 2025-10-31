@@ -1540,8 +1540,22 @@ namespace GridGenerator
    *
    * The 3d grids with 12 and 96 cells are plotted below:
    *
-   * @image html hypershell3d-12.png
-   * @image html hypershell3d-96.png
+   * <table align="center" class="doxtable">
+   *   <tr>
+   *     <td>
+   *       \htmlonly <style>div.image
+   *         img[src="hypershell3d-12.png"]{width:40%}</style>
+   *       \endhtmlonly
+   *       @image html hypershell3d-12.png
+   *     </td>
+   *     <td>
+   *       \htmlonly <style>div.image
+   *         img[src="hypershell3d-96.png"]{width:40%}</style>
+   *       \endhtmlonly
+   *       @image html hypershell3d-96.png
+   *     </td>
+   *   </tr>
+   * </table>
    *
    * @note This function is declared to exist for triangulations of all space
    * dimensions, but throws an error if called in 1d.
@@ -1585,8 +1599,22 @@ namespace GridGenerator
    * The grids with a 30% offset of the inner shell in the x direction, 12
    * initial cells and 3 levels of global refinement are plotted below:
    *
-   * @image html eccentric_hyper_shell_2D.png
-   * @image html eccentric_hyper_shell_3D.png
+   * <table align="center" class="doxtable">
+   *   <tr>
+   *     <td>
+   *       \htmlonly <style>div.image
+   *         img[src="eccentric_hyper_shell_2D.png"]{width:40%}</style>
+   *       \endhtmlonly
+   *       @image html eccentric_hyper_shell_2D.png
+   *     </td>
+   *     <td>
+   *       \htmlonly <style>div.image
+   *         img[src="eccentric_hyper_shell_3D.png"]{width:40%}</style>
+   *       \endhtmlonly
+   *       @image html eccentric_hyper_shell_3D.png
+   *     </td>
+   *   </tr>
+   * </table>
    *
    * @note Because it uses the definition of the hyper shell, this function is
    * declared to exist for triangulations of all space dimensions, but throws an
@@ -1996,9 +2024,22 @@ namespace GridGenerator
    * The above snippet of code generates the following grid for `dim` equal to
    * two and three respectively
    *
-   * @image html grid_generator_implicit_function_2d.png
-   *
-   * @image html grid_generator_implicit_function_3d.png
+   * <table align="center" class="doxtable">
+   *   <tr>
+   *     <td>
+   *       \htmlonly <style>div.image
+   *         img[src="grid_generator_implicit_function_2d.png"]{width:40%}</style>
+   *       \endhtmlonly
+   *       @image html grid_generator_implicit_function_2d.png
+   *     </td>
+   *     <td>
+   *       \htmlonly <style>div.image
+   *         img[src="grid_generator_implicit_function_3d.png"]{width:40%}</style>
+   *       \endhtmlonly
+   *       @image html grid_generator_implicit_function_3d.png
+   *     </td>
+   *   </tr>
+   * </table>
    *
    * Also see
    * @ref simplex "Simplex support".
@@ -2555,8 +2596,22 @@ namespace GridGenerator
    * mesh for a high-lift wing configuration that was originally meshed with
    * triangles, and then subdivided by this function into quadrilaterals:
    *
-   * @image html "convert_simplex_to_hypercube_mesh_visualization_2.png"
-   * @image html "convert_simplex_to_hypercube_mesh_visualization_3.png"
+   * <table align="center" class="doxtable">
+   *   <tr>
+   *     <td>
+   *       \htmlonly <style>div.image
+   *         img[src="convert_simplex_to_hypercube_mesh_visualization_2.png"]{width:40%}</style>
+   *       \endhtmlonly
+   *       @image html convert_simplex_to_hypercube_mesh_visualization_2.png
+   *     </td>
+   *     <td>
+   *       \htmlonly <style>div.image
+   *         img[src="convert_simplex_to_hypercube_mesh_visualization_3.png"]{width:40%}</style>
+   *       \endhtmlonly
+   *       @image html convert_simplex_to_hypercube_mesh_visualization_3.png
+   *     </td>
+   *   </tr>
+   * </table>
    *
    * @param[in] in_tria The triangulation containing quadrilateral or
    *   hexahedral elements.
