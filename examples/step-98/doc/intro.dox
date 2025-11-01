@@ -34,7 +34,7 @@ assumed to be homogeneous, linear, lossless, and isotropic.
 
 @htmlonly
 <p align="center">
-  <img src="https://www.dealii.org/images/steps/developer/step-98-solenoid.svg" alt="The solenoid" height="425">
+  <img src="https://dealii.org/images/steps/developer/step-98-solenoid.svg" alt="The solenoid" height="425">
 </p>
 @endhtmlonly
 
@@ -67,7 +67,7 @@ the magnetic field equals zero everywhere outside the solenoid.
 
 @htmlonly
 <p align="center">
-  <img src="https://www.dealii.org/images/steps/developer/step-98-domain.svg" alt="The domain" height="496">
+  <img src="https://dealii.org/images/steps/developer/step-98-domain.svg" alt="The domain" height="496">
 </p>
 @endhtmlonly
 
@@ -101,11 +101,9 @@ A straightforward evaluation of divergence yields
 \vec{\nabla} \cdot \vec{T} = 0,
 \f]
 which is the Coulomb gauge. That is to say, the current vector potential is
-gauged by the symmetry of the problem. For this reason, we can
-predict the closed-form analytical expression for the current vector potential
-in advance despite the fact that we are not going to gauge our vector potentials
-explicitly, see the discussion on gauging in step-97. It is easy to verify
-that the following expression
+gauged by the symmetry of the problem. For this reason, we can predict the
+closed-form analytical expression for the current vector potential in advance.
+It is easy to verify that the following expression
 @anchor Step98_Expression_T
 \f[
 \vec{T} = \left\{
@@ -134,10 +132,10 @@ the three-dimensional Cartesian coordinate system:
 \vec{A} = A_x(x,y)\hat{i} + A_y(x,y)\hat{j} + 0\hat{k}.
 \f]
 We cannot specify the divergence of this field. That is to say, this field is
-ungauged. As we are not going to gauge our vector potentials explicitly, the
-conservative part of the solution, $\vec{A}$, will remain unknown. For this
-reason we cannot write down a closed-form analytical expression for $\vec{A}$.
-However, for the experiments with the $\eta^2$ parameter in section
+ungauged. As we are not going to gauge it explicitly, the conservative part of
+the solution, $\vec{A}$, will remain unknown. For this reason we cannot write
+down a closed-form analytical expression for $\vec{A}$. However, for the
+experiments with the $\eta^2$ parameter in section
 [Possibilities for extensions](@ref Step98_PossibilitiesForExtensions) it would
 be handy to have a closed-form analytical expression for $\vec{A}$ gauged by the
 Coulomb gauge. Such expression can be derived by integrating the expression for
@@ -165,9 +163,13 @@ A_{\phi}(r) = \left\{
 & \dfrac{\mu_0 K_0}{2}(b_2^2-a_2^2)\bigg[\dfrac{1}{2} r +
 \dfrac{1}{2}\dfrac{1}{r}b_1^2(\mu_r-1) \bigg]&&\text{if }&& b_1 \le r \le a_2\\
 & \dfrac{\mu_0 K_0}{2}(b_2^2-a_2^2)\bigg[ \dfrac{1}{2} \mu_r r\bigg] &&\text{if
-}&& r \le b_1.
+}&& r \le b_1,
 \end{aligned}
 \right.
+\f]
+where
+\f[
+\mu_r = \frac{\mu_1}{\mu_0}.
 \f]
 A straightforward evaluation of divergence yields
 \f[
@@ -213,7 +215,7 @@ three-dimensional problem domain as shown in the figure below.
 
 @htmlonly
 <p align="center">
-  <img src="https://www.dealii.org/images/steps/developer/step-98-3Dto2D.svg" alt="Problem reduction" height="283">
+  <img src="https://dealii.org/images/steps/developer/step-98-3Dto2D.svg" alt="Problem reduction" height="283">
 </p>
 @endhtmlonly
 Due to symmetry all vectors in the initial three-dimensional problem domain can be
@@ -251,16 +253,16 @@ equation.
 If the magnetic vector potential is an in-plane vector and the initial three
 dimensional problem exhibits rotation symmetry (number 4 in the table),
 the two-dimensional problem cannot be formulated. To see why, let us consider
-a toroidal inductor. The insert A) in the figure below illustrates the top
+a toroidal inductor. Insert A) in the figure below illustrates the top
 view of the inductor.
 @htmlonly
 <p align="center">
-  <img src="https://www.dealii.org/images/steps/developer/step-98-toroid.svg" alt="Toroidal coil" height="283">
+  <img src="https://dealii.org/images/steps/developer/step-98-toroid.svg" alt="Toroidal coil" height="283">
 </p>
 @endhtmlonly
 A portion of the inductor is cut off to reveal the windings. Suppose we model
 the current in the windings by a current density $\vec{J}_f$ in two dimensions
-as illustrated by the insert B). Then the current density in the inner rim of
+as illustrated by insert B). Then the current density in the inner rim of
 the coil will be higher than the current density in the outer rim. Consequently,
 we must assume that the current is injected into the two-dimensional problem
 domain so the disparity between current densities in the inner and the outer
@@ -548,7 +550,7 @@ two-dimensional space dissociates in two diagrams as illustrated by the figure b
 
 @htmlonly
 <p align="center">
-  <img src="https://www.dealii.org/images/steps/developer/step-98-diagram-2d.svg" alt="The Bossavit's diagrams in 2D" height="283">
+  <img src="https://dealii.org/images/steps/developer/step-98-diagram-2d.svg" alt="The Bossavit's diagrams in 2D" height="283">
 </p>
 @endhtmlonly
 
@@ -560,7 +562,7 @@ the equation we would like to solve,
 =  \vec{J}_f,
 \f]
 belongs to the scalar diagram. It is represented by the red path that links
-$\vec{A}$ and $\vec{J}_f$, see the insert A). Second, we
+$\vec{A}$ and $\vec{J}_f$, see insert A). Second, we
 observe that the magnetic field $B$ in the scalar diagram belongs to the $L_2$
 functions space. Third, we look at the table below and conclude that the
 physical quantities that belong to the $L_2$ function space are modeled by the
@@ -805,18 +807,25 @@ from $H(\text{curl})$ to $H(L_2)$.
 
 The coarse mesh is constructed with a help of gmsh. The circle.geo file contains
 the description of the mesh. The mesh file, circle.msh, can be generated by
-executing the following command:
+executing the following command.
 @code
 gmsh -format msh2 -2 -v 0 circle.geo
 @endcode
-The step-98 program loads circle.msh and refines the mesh globally if the mesh
-refinement parameter, $r$, is greater than zero.
+The step-98 program loads circle.msh and refines the mesh globally `r` times,
+where `r` is the mesh refinement parameter.
 
 The mesh is a discretized version of the problem domain shown in the second
 figure on this page. The mesh is constructed such that all circles in the
 problem domain are delineated by cell faces. That is, no circle runs through
-a mesh cell. The figure below illustrates the mesh. The main elements of the
-mesh are listed below.
+a mesh cell. The following figure illustrates the mesh with `r=2`.
+
+@htmlonly
+<p align="center">
+	<img src="https://dealii.org/images/steps/developer/step-98-mesh.svg" alt="The mesh" height="531">
+</p>
+@endhtmlonly
+
+The main elements of the mesh are listed below.
 
 - The square with a side of $2d_1$ in the middle of the mesh. The purpose of
   this square is instrumental. This is the only way to construct a mesh that has
@@ -831,21 +840,88 @@ mesh are listed below.
 - The circle of radius of $d_2$. The boundary of the problem domain. The
   boundary condition is applied to this circle.
 
-The program uses four meshes of different degrees of refinement. Note that only
-globally refined meshes are used. There are no non-conforming cells, hanging
-nodes, and hanging node constrains in this tutorial. We will use constrains only
-for the purpose of enforcing the Dirichlet boundary condition.
+In this tutorial program  all IDs (boundary, material, and manifold) are
+assigned in the circle.geo file. The program just uploads the mesh together with
+the IDs. Note also that we will use the second version of the function
+GridIn::read_msh as we would like to pass all IDs to the deal.II via physical
+names, not via physical tags. For example, the circle.geo file contains the
+following lines.
+@code
+Physical Curve("BoundaryID: 1", 2) =
+{21, 22, 40, 60, 79, 99, 119, 139};
+@endcode
+Here "BoundaryID: 1" is the physical name and 2 next to it is the physical tag.
+The faces that have elementary tags listed in the curly brackets will be
+grouped into a singe boundary with boundary ID=1. The physical tag 2 will be
+discarded.
+
+The table below lists the manifold IDs assigned to various constituents of the
+mesh and the corresponding manifolds.
+
+|Manifold ID |Manifold                              |
+|------------|--------------------------------------|
+|1           | SphericalManifold                    |
+|2           | FlatManifold                         |
+|3           | TransfiniteInterpolationManifold     |
+
+The next table lists the material IDs and the corresponding materials.
+
+|Material ID |Material                                                                |
+|------------|------------------------------------------------------------------------|
+|1           | Free space, $\mu=\mu_0$, $\vec{J}_f = 0$.                              |
+|2           | Magnetic material, $\mu=\mu_1$, $\vec{J}_f = 0$.                       |
+|3           | Current-carrying windings of the coil, $\mu=\mu_0$, $\vec{J}_f \ne 0$. |
+
+The boundary ID=-1 is reserved for internal boundaries (interfaces between
+dissimilar materials and interfaced between regions of dissimilar geometries),
+see the documentation of the second version of the GridIn::read_msh function.
+
+The following table summarizes the boundary IDs.
+
+|Boundary ID |Boundary                                                  |
+|------------|----------------------------------------------------------|
+| 1          | The outer boundary of the mesh                           |
+|-1          | All circular interfaces between dissimilar materials and boundary of the square region in the middle of the mesh  |
+
+The figure below illustrates the geometry of the mesh together with the assigned
+IDs.
 
 @htmlonly
 <p align="center">
-	<img src="https://www.dealii.org/images/steps/developer/step-98-mesh.svg" alt="The mesh" height="531">
+	<img src="https://dealii.org/images/steps/developer/step-98-mesh-ids.svg" alt="The mesh IDs"	height="390">
 </p>
 @endhtmlonly
+
+The assignment of the boundary and material ID is quite straightforward. The
+assignment of the manifold IDs deserves an explanation. All circular boundaries
+and interfaces are marked with the manifold ID=1 what corresponds to the
+spherical manifold. Only the first global refinement in deal.II will apply this
+manifold, see the [manifold topic](@ref manifold). As soon as we will refine
+globally more than one time, we attach the spherical manifold (ID=1) to the
+surfaces between the circular boundaries and interfaces. This will allow the
+faces of the cells created by the refinement process to inherit the manifold
+ID=1. This way cells with circular faces will be created everywhere in between
+the circular boundaries. The square boundary in the middle of the mesh and the
+area inside it receive the manifold ID=2 what corresponds to the flat manifold.
+The flat manifold is appropriate for rectangular cells, see, the documentation
+of the function GridGenerator::plate_with_a_hole, instance. The area in between
+the square and the innermost circle is attached to the transfinite interpolation
+manifold (ID=3). It allows us to accurately fuse the rectangular cells with the
+cell that have circular faces, see the documentation of the
+TransfiniteInterpolationManifold class template.
+
+The program uses four meshes of different degrees of refinement. Note that only
+globally refined meshes are used. There are no non-conforming cells, hanging
+nodes, and hanging node constrains in this tutorial. We will use constrains only
+for the purpose of enforcing the Dirichlet boundary condition and for
+distributing the components of the local (cell specific) system matrices and
+right-hand sides to the global matrix and right-hand side by calling the function
+AffineConstraints::distribute_local_to_global.
 
 <h3>Overview of the program</h3>
 
 The program runs in a loop. In each iteration of the loop a different refinement
-parameter, $r$, is assumed. Each iteration consists of four stages:
+parameter, `r`, is assumed. Each iteration consists of four stages:
 
 - The current vector potential, $T$, is computed given the closed-form
   analytical [expression](@ref Step98_Expression_Jf) for the free-current
@@ -880,16 +956,26 @@ below.
 | 3               | SolverA              |
 | 4               | ProjectorHcurlToL2   |
 
-The name space `ExactSolutions` contains exact closed-form analytical
-expressions for $B$, $\vec{J}_f$, and $T$.
+Each of the four name spaces contains a solver which solves for a potential
+($\vec{T}$ or $\vec{A}$) or converts a potential into a measurable field
+($\vec{J}_f$ or $\vec{B}$). All four solvers have a lot in common. Each solver
+setups the simulation, solves the system of linear equations, saves the
+results, etc. The code common for all solvers is implemented in the `BaseSolver`
+class template. The `BaseSolver` class, the classes that implement permeability
+and the free-current density on the right-hand sides of the div-grad partial
+differential equation, as well as a number of helper classes are collected in
+the name space `BaseClasses`.
 
-Note that computing the error norm at the third stage makes no sense as we apply
-implicit gauge and the conservative portion of the computed magnetic vector
-potential is unknown, see Step-97. We judge the quality of the simulation at the
-third stage indirectly by evaluating the quality of the magnetic field computed
-at the fourth stage. We, however, compute the error norm at the third stage
-anyway as it can be used for experimenting with the gauging parameter $\eta^2$
-in section
+The name space `ExactSolutions` contains exact closed-form analytical
+expressions for $B$, $\vec{J}_f$, $T$, and $\vec{A}$.
+
+Note that computing the error norm for $\vec{A}$ at the third stage makes no
+sense as we apply implicit gauge and the conservative portion of the computed
+magnetic vector potential is unknown, see Step-97. We judge the quality of the
+simulation at the third stage indirectly by evaluating the quality of the
+magnetic field computed at the fourth stage. We, however, compute the error norm
+at the third stage anyway as it can be used for experimenting with the gauging
+parameter $\eta^2$ in section
 [Possibilities for extensions](@ref Step98_PossibilitiesForExtensions).
 In the default configuration, $\eta^2=0$, `table_A` contains no useful
 information.

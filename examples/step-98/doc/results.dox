@@ -11,73 +11,73 @@ The program assumes the finite elements of the lowermost degree, i.e., $p' = 1$
 for the FE_Q finite elements and $p=0$ for other finite elements. To change the
 degree of the finite elements, say $p' = 3$ and $p = 2$, one needs to change
 the setting `Settings::fe_degree = 2` and rebuild the program. The degree of the
-FE_Q finite elements will be calculated automatically as $p'= p + 1$.
+FE_Q finite elements will be computed automatically as $p'= p + 1$.
 
 The program dumps a number of files in the current directory. In the default
 configuration these files are:
 - vtu files. They contain the computed vector fields. Recall that the spherical
-  manifold is attached to many cell faces. Consequently, these cell faces are
-  curved. They look more like segments of a circle. Furthermore, the shape
-  functions are mapped from the reference cell to the real mesh cells by the
-  second-order mapping to accommodate the cells with curved faces. For these
-  reasons, one needs to use a visualization software that can deal with curved
-  faces and the higher-order mapping. A fresh version of ParaView is recommended.
-  Visit will not do. The <a href="https://github.com/dealii/dealii/wiki/Notes-on-visualizing-high-order-output">
-  Notes on visualizing high order output</a> provide more information on this topic.
+  manifold and transfinite interpolation manifold are attached to many cell faces.
+  Consequently, these cell faces are curved. Furthermore, the shape functions are
+  mapped from the reference cell to the real mesh cells by the second-order mapping
+  to accommodate the cells with curved faces. For these reasons, one needs to use a
+  visualization software that can deal with curved faces and the higher-order mapping.
+  A fresh version of ParaView is recommended. Visit will not do. The
+  <a href="https://github.com/dealii/dealii/wiki/Notes-on-visualizing-high-order-output"> Notes on visualizing high order output</a>
+  provide more information on this topic.
 - tex files. These files contain the convergence tables.
 
 The following provides examples of the convergence tables simulated with the
 default settings for three different degrees of the finite elements,
 $p = 0, 1, 2$ (recall that $p' = p + 1$).
 
-| p'| r | cells |  dofs  |$\|e\|_{L^2}$|$\alpha_{L^2}$|
-|---|---|-------|--------|----------|------|
-| 1 | 0 | 144   | 153    | 7.47e-04 | -    |
-| 1 | 1 | 576   | 593    | 3.54e-04 | 1.08 |
-| 1 | 2 | 2304  | 2337   | 1.25e-04 | 1.50 |
-| 1 | 3 | 9216  | 9281   | 3.58e-05 | 1.81 |
-| 2 | 0 | 144   | 593    | 1.38e-05 | -    |
-| 2 | 1 | 576   | 2337   | 7.60e-07 | 4.18 |
-| 2 | 2 | 2304  | 9281   | 4.85e-08 | 3.97 |
-| 2 | 3 | 9216  | 36993  | 3.04e-09 | 3.99 |
-| 3 | 0 | 144   | 1321   | 1.38e-05 | -    |
-| 3 | 1 | 576   | 5233   | 7.60e-07 | 4.18 |
-| 3 | 2 | 2304  | 20833  | 4.68e-08 | 4.02 |
-| 3 | 3 | 9216  | 83137  | 2.98e-09 | 3.97 |
+| p'| r | cells |  dofs |$\|e\|_{L^2}$|$\alpha_{L^2}$|
+|---|---|-------|-------|----------|------|
+| 1 | 1 | 144   | 153   | 7.47e-04 | -    |
+| 1 | 2 | 576   | 593   | 1.86e-04 | 2.01 |
+| 1 | 3 | 2304  | 2337  | 4.64e-05 | 2.00 |
+| 1 | 4 | 9216  | 9281  | 1.16e-05 | 2.00 |
+| 2 | 1 | 144   | 593   | 1.38e-05 | -    |
+| 2 | 2 | 576   | 2337  | 8.72e-07 | 3.98 |
+| 2 | 3 | 2304  | 9281  | 5.48e-08 | 3.99 |
+| 2 | 4 | 9216  | 36993 | 3.45e-09 | 3.99 |
+| 3 | 1 | 144   | 1321  | 1.38e-05 | -    |
+| 3 | 2 | 576   | 5233  | 8.72e-07 | 3.98 |
+| 3 | 3 | 2304  | 20833 | 5.48e-08 | 3.99 |
+| 3 | 4 | 9216  | 83137 | 3.51e-09 | 3.97 |
 
 **Table 1. Convergence table. Current vector potential, $T$.
 
-| p | r | cells |  dofs   |$\|e\|_{L^2}$|$\alpha_{L^2}$|
-|---|---|-------|---------|----------|------|
-| 0 | 0 | 144   | 296     | 2.50e-02 | -    |
-| 0 | 1 | 576   | 1168    | 2.33e-02 | 0.11 |
-| 0 | 2 | 2304  | 4640    | 1.41e-02 | 0.72 |
-| 0 | 3 | 9216  | 18496   | 7.61e-03 | 0.89 |
-| 1 | 0 | 144   | 1168    | 3.04e-04 | -    |
-| 1 | 1 | 576   | 4640    | 1.98e-05 | 3.94 |
-| 1 | 2 | 2304  | 18496   | 2.83e-06 | 2.81 |
-| 1 | 3 | 9216  | 73856   | 3.31e-07 | 3.09 |
-| 2 | 0 | 144   | 2616    | 3.04e-04 | -    |
-| 2 | 1 | 576   | 10416   | 1.91e-05 | 3.99 |
-| 2 | 2 | 2304  | 41568   | 1.70e-06 | 3.49 |
-| 2 | 3 | 9216  | 166080  | 1.51e-07 | 3.50 |
+| p | r | cells |  dofs  |$\|e\|_{L^2}$|$\alpha_{L^2}$|
+|---|---|-------|--------|----------|------|
+| 0 | 1 | 144   | 296    | 2.50e-02 | -    |
+| 0 | 2 | 576   | 1168   | 1.25e-02 | 1.00 |
+| 0 | 3 | 2304  | 4640   | 6.27e-03 | 1.00 |
+| 0 | 4 | 9216  | 18496  | 3.13e-03 | 1.00 |
+| 1 | 1 | 144   | 1168   | 3.04e-04 | -    |
+| 1 | 2 | 576   | 4640   | 3.80e-05 | 3.00 |
+| 1 | 3 | 2304  | 18496  | 4.74e-06 | 3.00 |
+| 1 | 4 | 9216  | 73856  | 5.91e-07 | 3.00 |
+| 2 | 1 | 144   | 2616   | 3.04e-04 | -    |
+| 2 | 2 | 576   | 10416  | 3.79e-05 | 3.00 |
+| 2 | 3 | 2304  | 41568  | 4.74e-06 | 3.00 |
+| 2 | 4 | 9216  | 166080 | 5.91e-07 | 3.00 |
 
 **Table 2. Convergence table. Free-current density, $\vec{J}_f$.
 
-| p | r | cells |  dofs  |$\|e\|_{L^2}$|$\alpha_{L^2}$|
-|---|---|-------|--------|----------|------|
-| 0 | 0 | 144   | 144    | 2.01e-08 | -    |
-| 0 | 1 | 576   | 576    | 9.84e-09 | 1.03 |
-| 0 | 2 | 2304  | 2304   | 4.87e-09 | 1.01 |
-| 0 | 3 | 9216  | 9216   | 2.43e-09 | 1.01 |
-| 1 | 0 | 144   | 576    | 4.29e-10 | -    |
-| 1 | 1 | 576   | 2304   | 3.54e-10 | 0.28 |
-| 1 | 2 | 2304  | 9216   | 1.23e-10 | 1.53 |
-| 1 | 3 | 9216  | 36864  | 3.43e-11 | 1.84 |
-| 2 | 0 | 144   | 1296   | 2.32e-11 | -    |
-| 2 | 1 | 576   | 5184   | 1.35e-12 | 4.10 |
-| 2 | 2 | 2304  | 20736  | 9.35e-14 | 3.85 |
-| 2 | 3 | 9216  | 82944  | 7.41e-15 | 3.66 |
+| p | r | cells |  dofs |$\|e\|_{L^2}$|$\alpha_{L^2}$|
+|---|---|-------|-------|----------|------|
+| 0 | 1 | 144   | 144   | 2.01e-08 | -    |
+| 0 | 2 | 576   | 576   | 9.72e-09 | 1.05 |
+| 0 | 3 | 2304  | 2304  | 4.81e-09 | 1.02 |
+| 0 | 4 | 9216  | 9216  | 2.40e-09 | 1.00 |
+| 1 | 1 | 144   | 576   | 4.15e-10 | -    |
+| 1 | 2 | 576   | 2304  | 1.02e-10 | 2.02 |
+| 1 | 3 | 2304  | 9216  | 2.54e-11 | 2.01 |
+| 1 | 4 | 9216  | 36864 | 6.36e-12 | 2.00 |
+| 2 | 1 | 144   | 1296  | 2.32e-11 | -    |
+| 2 | 2 | 576   | 5184  | 1.46e-12 | 3.99 |
+| 2 | 3 | 2304  | 20736 | 9.15e-14 | 3.99 |
+| 2 | 4 | 9216  | 82944 | 5.94e-15 | 3.95 |
 
 **Table 3. Convergence table. Magnetic field, $B$.
 
@@ -100,28 +100,28 @@ If `Settings::log_cg_convergence = true`, the program saves the convergence data
 of the CG solver into csv files.
 
 The figures below illustrate the current vector potential, $T$, the free-current
-density, $\vec{J}_f$, and magnetic field, $B$, calculated with the following
-settings: $p = 2$ and $r = 3$. Visual inspection of the magnetic vector
+density, $\vec{J}_f$, and magnetic field, $B$, computed with the following
+settings: $p = 2$ and $r = 4$. Visual inspection of the magnetic vector
 potential, $\vec{A}$, is not very informative as its conservative portion is
 unknown.
 
 @htmlonly
 <p align="center">
-  <img src="https://www.dealii.org/images/steps/developer/step-98-result-T.svg"
+  <img src="https://dealii.org/images/steps/developer/step-98-result-T.svg"
   alt="The result - current vector potential" height="531">
 </p>
 @endhtmlonly
 
 @htmlonly
 <p align="center">
-  <img src="https://www.dealii.org/images/steps/developer/step-98-result-Jf.svg"
+  <img src="https://dealii.org/images/steps/developer/step-98-result-Jf.svg"
   alt="The result - free current density" height="531">
 </p>
 @endhtmlonly
 
 @htmlonly
 <p align="center">
-  <img src="https://www.dealii.org/images/steps/developer/step-98-result-B.svg"
+  <img src="https://dealii.org/images/steps/developer/step-98-result-B.svg"
   alt="The result - magnetic field" height="531">
 </p>
 @endhtmlonly
@@ -154,48 +154,52 @@ What the $\eta^2$ gauging term does depends on the value of $\eta^2$. The table
 below attempts to express this very point.
 @htmlonly
 <p align="center">
-  <img src="https://www.dealii.org/images/steps/developer/step-98-eta.svg"
+  <img src="https://dealii.org/images/steps/developer/step-98-eta.svg"
   alt="The result - eta-squared table" height="1062">
 </p>
 @endhtmlonly
 
 This table presents four simulations for four different values of $\eta^2$. In
 all four simulations the degree of the finite elements and the mesh refinement
-parameter were $p=2$ and $r=0$, respectively. The setting
+parameter were $p=2$ and $r=1$, respectively. The setting
 `Settings::project_exact_solution` was set to `true`.
 
-The plot of $|\vec{A}(x,y)|$ at the setting $\eta^2=0$ can make any cubism
-painter proud. This is due to the fact that the solution, $\vec{A}$, is
-contaminated by an unknown conservative vector field. The magnetic field, $B$,
-at this setting looks perfectly normal as the conservative portion of $\vec{A}$
-is filtered out by the process of computing the magnetic field,
-$B = \vec{\nabla}\overset{S}{\times}\vec{A}$. At the setting
-$\eta^2=\dfrac{10^{-10}}{\mu_0}$ the computed magnetic vector potential (the
-orange curve in the $|\vec{A}(x,0)|$ plot) looks exactly the same as the
-projected exact solution (the blue curve). At this value of $\eta^2$ the gauge
-acts like the Coulomb gauge. At the setting $\eta^2=\dfrac{10^{-6}}{\mu_0}$ the
-solenoidal part of the computed magnetic vector potential deviates from the
-exact solution. We can deduce this from the fact that the computed magnetic
-field deviates from the projected exact magnetic field on the $B(x,0)$ plot.
-The error in the solenoidal part of the calculated $\vec{A}$ is due to the fact
-that introduction of the gauging term, $\eta^2\vec{A}$, modifies the initial
+At the setting $\eta^2=\dfrac{10^{-10}}{\mu_0}$ the computed magnetic vector
+potential (the orange curve on the $|\vec{A}(x,0)|$ plot) looks exactly the same
+as the projected exact solution gauged by the Coulomb gauge (the blue curve). At
+this value of $\eta^2$ the term $\eta^2\vec{A}$ acts like the Coulomb gauge.
+At the default setting, $\eta^2=0$, the solution, $\vec{A}$, is contaminated by
+an unknown conservative vector field. The computed magnetic field, $B$, at this
+setting looks exactly as the corresponding exact solution because the
+conservative portion of $\vec{A}$ is filtered out by the process of computing
+the magnetic field, $B = \vec{\nabla}\overset{S}{\times}\vec{A}$. At the setting
+$\eta^2=\dfrac{10^{-6}}{\mu_0}$ the solenoidal part of the computed magnetic
+vector potential deviates from the exact solution. We can deduce this from the
+fact that the computed magnetic
+field deviates from the exact expression for the magnetic field on the $B(x,0)$
+plot. The error in the solenoidal part of the computed $\vec{A}$ is due to
+the fact that introduction of the gauging term, $\eta^2\vec{A}$, modifies the
+initial
 curl-curl equation. So, strictly speaking, we are solving a different partial
 differential equation. If $\eta^2$ is small, the difference between the initial
 curl-curl equation and the curl-curl equation modified by adding the gauging
-term is negligible. Consequently, the error in the solenoidal part of calculated
-$\vec{A}$ is negligible as well. Evidently, in this particular case "small"
-means $\eta^2 << \dfrac{10^{-6}}{\mu_0}$.
+term is negligible. Consequently, the error in the solenoidal part of the
+computed $\vec{A}$ is negligible as well. Evidently, in this particular case
+"small" means $\eta^2 << \dfrac{10^{-6}}{\mu_0}$.
 
-Normally, we are interested in measurable fields such as magnetic field
-and consider the magnetic vector potential as a useful tool for computing
-measurable fields. We can tolerate the presence of an unknown conservative
-component in the magnetic vector potential. In such disposition we need to
-keep $\eta^2$ as small as possible, i.e., as far away as possible from the
-situation shown in last column of the table.
+Normally, we are interested in measurable fields such as magnetic field and
+consider the magnetic vector potential as a useful tool for computing measurable
+fields. We can tolerate the presence of an unknown conservative component in the
+magnetic vector potential, i.e., the situation illustrated by the first two rows
+in the table above. In such disposition we need to keep $\eta^2$ as small as
+possible, i.e., as far away as possible from the situation shown in last row of
+the table. In this tutorial program we set $\eta^2$ to zero and increase it just
+a bit in if the conjugate gradient algorithm cannot converge.
 
 Suppose for a moment that we would like to have the solution to the curl-curl
-equation in terms of the purely solenoidal magnetic vector potential, $\vec{A}$.
-To get such a solution we need to tweak the $\eta^2$ parameter. By contemplating
+equation in terms of a purely solenoidal magnetic vector potential, $\vec{A}$,
+that is, a solution gauged by the Coulomb gauge. To get such a solution we need
+to tweak the $\eta^2$ parameter. By contemplating
 the table above one can hypothesize that there exists an optimal value of the
 gauging parameter, $\eta^2_{opt}$, at which the $L^2$ error norm computed for
 $\vec{A}$ is minimal. The optimal value should be somewhere in between
@@ -208,12 +212,15 @@ real-life simulation there is no expression of the exact solution. Try to
 think of a method of blind (meaning without the exact solution) estimation of
 $\eta^2_{opt}$. Try to implement and test your ideas.
 
-As discussed in step-97, the $\eta^2$ trick is a horrible crime. It is very
-important to keep $\eta^2$ small so the solution is not afflicted by the error
-as illustrated by the last row of the table above. But then how do we define
-"small", exactly. In practice it will be somewhat difficult to estimate the
-error in the solenoidal component of $\vec{A}$ caused by adding the gauging term
-to the curl-curl equation. We would be far better off without the $\eta^2$
-trick. The hypre AMS @cite hypre1998b can solve the systems of linear equations
-yielded by the curl-curl equation without the $\eta^2$ trick, ($\beta=0$ in
-@cite hypre1998b). Try to implement the hypre AMS.
+Adding the gauging term, $\eta^2\vec{A}$, to the curl-curl equation converts
+a positive semidefinite system matrix into a positive definite matrix. Strictly
+speaking, adding the gauging term modifies the initial curl-curl equation. For
+this reason, it is important to keep $\eta^2$ small so the solution is not
+afflicted by the error induced by adding the gauging term. The definition of
+"small" here is a bit fuzzy. In absence of the exact solution setting $\eta^2$
+at the acceptable level of the error in the solenoidal component of $\vec{A}$
+is difficult. It is better to discard the gauging term and use a more
+sophisticated linear solver. The hypre AMS @cite hypre1998b can solve the
+systems of linear equations yielded by the curl-curl equation without the
+$\eta^2$ gauging term, ($\beta=0$ in @cite hypre1998b). Try to implement the
+hypre AMS.

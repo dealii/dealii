@@ -1,8 +1,8 @@
-583c583
-<     std::ifstream ifs("circle.msh");
+1256c1256
+<     gridin.read_msh("circle.msh");
 ---
->     std::ifstream ifs("../../../source/step-98/circle.msh");
-2459c2459
-<     for (unsigned int r = 0; r < 4; r++) // Mesh refinement parameter.
+>     gridin.read_msh("../../../source/step-98/circle.msh");
+1703c1703
+<     for (unsigned int r = 1; r < 5; r++) // Mesh refinement parameter.
 ---
->     for (unsigned int r = 0; r < 1; r++) // Mesh refinement parameter.
+>     for (unsigned int r = 1; r < 2; r++) // Mesh refinement parameter.
