@@ -1,5 +1,0 @@
-New: There function GridGenerator::hyper_ball() now also works for
-`dim=2`, `spacedim=3`, where it creates a two-dimensional disk
-embedded in three-dimensional space.
-<br>
-(Wolfgang Bangerth, 2025/01/23)

@@ -25,12 +25,14 @@
 #  include <deal.II/lac/la_parallel_vector.h>
 #  include <deal.II/lac/trilinos_vector.h>
 
+DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
 #  include <Epetra_Map.h>
 #  include <Epetra_MpiComm.h>
 #  include <Epetra_MultiVector.h>
 #  include <Epetra_RowMatrix.h>
 #  include <Epetra_Vector.h>
 #  include <Teuchos_ParameterList.hpp>
+DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
 
 #  include <memory>
 

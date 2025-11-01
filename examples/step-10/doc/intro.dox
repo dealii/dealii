@@ -1,4 +1,4 @@
-<a name="step-10-Intro"></a>
+<a name="step_10-Intro"></a>
 <h1>Introduction</h1>
 
 
@@ -6,8 +6,8 @@ This is a rather short example which only shows some aspects of using
 higher order mappings. By <em>mapping</em> we mean the transformation
 between the unit cell (i.e. the unit line, square, or cube) to the
 cells in real space. In all the previous examples, we have implicitly
-used linear or d-linear mappings; you will not have noticed this at
-all, since this is what happens if you do not do anything
+used linear or d-linear mappings; you will not have noticed reading through
+deal.II-based codes since this is what happens if you do not do anything
 special. However, if your domain has curved boundaries, there are
 cases where the piecewise linear approximation of the boundary
 (i.e. by straight line segments) is not sufficient, and you want that
@@ -18,28 +18,28 @@ we say that this is a quadratic or $Q_2$ approximation. If we
 use piecewise graphs of cubic polynomials, then this is a $Q_3$
 approximation, and so on.
 
-
-
 For some differential equations, it is known that piecewise linear
 approximations of the boundary, i.e. $Q_1$ mappings, are not
 sufficient if the boundary of the exact domain is curved. Examples are the
 biharmonic equation using $C^1$ elements, or the Euler
 equations of gas dynamics on domains with curved reflective boundaries. In these cases,
-it is necessary to compute the integrals using a higher order
+it is necessary to compute the integrals of the bilinear form, the right hand side,
+or in postprocessing using a higher order
 mapping. If we do not use such a higher
 order mapping, the order of approximation of the boundary dominates
 the order of convergence of the entire numerical scheme, irrespective
 of the order of convergence of the discretization in the interior of
-the domain.
-
-
+the domain. A discussion of this phenomenon in the context of fluid
+flow can be found, for example,
+in @cite 2024:orlando.benacchio.ea:impact
+and @cite 2024:orlando.benacchio.ea:robust .
 
 Rather than demonstrating the use of higher order mappings with one of
-these more complicated examples, we do only a brief computation:
-calculating the value of $\pi=3.141592653589793238462643\ldots$ by two
+these more complicated examples, we here demonstrate how the use of
+curved boundaries makes the computation of integrals much more accurate.
+Specifically, we use integrals for which we know the exact answer: Namely,
+we compute the value of $\pi=3.141592653589793238462643\ldots$ by two
 different methods.
-
-
 
 The first method uses a triangulated approximation of the circle with unit
 radius and integrates a unit magnitude constant function ($f = 1$) over it. Of
@@ -52,12 +52,9 @@ of the computed area of the circle and their convergence towards $\pi$ under
 mesh refinement for different mappings. We will also find a convergence
 behavior that is surprising at first, but has a good explanation.
 
-
-
 The second method works similarly, but this time does not use the area
 of the triangulated unit circle, but rather its perimeter. $\pi$ is then
 approximated by half of the perimeter, as we choose the radius equal to one.
-
 
 @note This tutorial shows in essence how to choose a particular
 mapping for integrals, by attaching a particular geometry to the

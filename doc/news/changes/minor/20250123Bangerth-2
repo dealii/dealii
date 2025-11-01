@@ -1,6 +1,0 @@
-Deprecated: The functions IndexSet::pop_front() and
-IndexSet::pop_back() are now deprecated. An IndexSet should be seen as
-a set, not an ordered collection, and so speaking of "front" and
-"back" is not well defined.
-<br>
-(Wolfgang Bangerth, 2025/01/23)

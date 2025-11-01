@@ -775,29 +775,6 @@ namespace PETScWrappers
   }
 
 
-  namespace internal
-  {
-    template <typename T>
-    bool
-    is_non_negative(const T &t)
-    {
-      return t >= 0;
-    }
-
-
-
-    template <typename T>
-    bool
-    is_non_negative(const std::complex<T> &)
-    {
-      Assert(false,
-             ExcMessage("You can't ask a complex value "
-                        "whether it is non-negative."));
-      return true;
-    }
-  } // namespace internal
-
-
 
   VectorBase &
   VectorBase::operator*=(const PetscScalar a)

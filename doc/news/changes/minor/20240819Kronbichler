@@ -1,6 +1,0 @@
-Changed: The concepts::is_vector_space_vector now also requires the vector
-class to provide a function `VectorType::get_mpi_communicator() -> MPI_Comm`,
-which returns the underlying MPI communicator or, if a sequential vector,
-@p MPI_COMM_SELF.
-<br>
-(Martin Kronbichler, David Wells, 2024/08/19)

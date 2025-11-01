@@ -24,7 +24,7 @@ use warnings;
 use File::Find qw(find);
 
 my @html;
-my $link_start = '<link rel="canonical" href="https://www.dealii.org/current/doxygen/';
+my $link_start = '<link rel="canonical" href="https://dealii.org/current/doxygen/';
 
 find(sub {
 	  if ($_ =~ /\.html$/)

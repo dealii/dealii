@@ -69,7 +69,7 @@
 set_if_empty(DEAL_II_PACKAGE_NAME "deal.II")
 
 set_if_empty(DEAL_II_PACKAGE_VENDOR
-  "The deal.II Authors <https://www.dealii.org/>"
+  "The deal.II Authors <https://dealii.org/>"
   )
 set_if_empty(DEAL_II_PACKAGE_DESCRIPTION
   "Library for solving partial differential equations with the finite element method"

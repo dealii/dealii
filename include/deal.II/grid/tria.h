@@ -1823,7 +1823,7 @@ public:
    *
    * @deprecated Use get_mpi_communicator() instead.
    */
-  DEAL_II_DEPRECATED_EARLY_WITH_COMMENT(
+  DEAL_II_DEPRECATED_WITH_COMMENT(
     "Access the MPI communicator with get_mpi_communicator() instead.")
   MPI_Comm
   get_communicator() const;
@@ -4944,10 +4944,14 @@ Triangulation<1, 3>::prepare_coarsening_and_refinement();
 // instantiations.
 //
 // Unfortunately, this does not seem to work when building modules
-// because the compiler (well, Clang at least) then just doesn't
+// with clang++ versions before 22 because they then just don't
 // instantiate these classes at all, even though their members are
 // defined and explicitly instantiated in a .cc file.
-#  ifndef DEAL_II_BUILDING_CXX20_MODULE
+//
+// See https://github.com/llvm/llvm-project/issues/153225 for the
+// corresponding bug report.
+#  if !(defined(DEAL_II_BUILDING_CXX20_MODULE) && defined(__clang__) && \
+        (__clang_major__ < 22))
 extern template class Triangulation<1, 1>;
 extern template class Triangulation<1, 2>;
 extern template class Triangulation<1, 3>;

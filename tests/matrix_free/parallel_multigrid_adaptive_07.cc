@@ -252,7 +252,8 @@ do_test(const std::vector<const DoFHandler<dim> *> &dof)
   std::vector<const AffineConstraints<double> *> constraints_ptrs(dof.size());
   for (unsigned int i = 0; i < dof.size(); ++i)
     {
-      constraints[i].reinit(locally_relevant_dofs[i]);
+      constraints[i].reinit(dof[i]->locally_owned_dofs(),
+                            locally_relevant_dofs[i]);
       DoFTools::make_hanging_node_constraints(*dof[i], constraints[i]);
       VectorTools::interpolate_boundary_values(*dof[i],
                                                dirichlet_boundary,
@@ -301,7 +302,8 @@ do_test(const std::vector<const DoFHandler<dim> *> &dof)
         // this is to make it consistent with parallel_multigrid_adaptive.cc
         AffineConstraints<double> hanging_node_constraints;
 
-        hanging_node_constraints.reinit(locally_relevant_dofs[b]);
+        hanging_node_constraints.reinit(dof[b]->locally_owned_dofs(),
+                                        locally_relevant_dofs[b]);
         DoFTools::make_hanging_node_constraints(*dof[b],
                                                 hanging_node_constraints);
         hanging_node_constraints.close();
@@ -350,7 +352,8 @@ do_test(const std::vector<const DoFHandler<dim> *> &dof)
         {
           const IndexSet relevant_dofs =
             DoFTools::extract_locally_relevant_level_dofs(*dof[i], level);
-          level_constraints[i].reinit(relevant_dofs);
+          level_constraints[i].reinit(dof[i]->locally_owned_mg_dofs(level),
+                                      relevant_dofs);
           level_constraints[i].add_lines(
             mg_constrained_dofs[i].get_boundary_indices(level));
           level_constraints[i].close();

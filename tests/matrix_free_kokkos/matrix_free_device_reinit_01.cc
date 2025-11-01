@@ -58,7 +58,7 @@ test()
   deallog << "locally relevant dofs :" << std::endl;
   owned_set.print(deallog.get_file_stream());
 
-  AffineConstraints<double> constraints(relevant_set);
+  AffineConstraints<double> constraints(owned_set, relevant_set);
   DoFTools::make_hanging_node_constraints(dof, constraints);
   VectorTools::interpolate_boundary_values(dof,
                                            0,

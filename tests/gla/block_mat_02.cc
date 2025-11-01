@@ -97,7 +97,7 @@ test()
 
   stokes_relevant_set.print(deallog.get_file_stream());
 
-  AffineConstraints<double> cm(stokes_relevant_set);
+  AffineConstraints<double> cm(stokes_index_set, stokes_relevant_set);
 
   DoFTools::make_hanging_node_constraints(stokes_dof_handler, cm);
 
@@ -190,7 +190,7 @@ test_LA_Trilinos()
     stokes_relevant_set.get_view(n_u, n_u + n_p));
   stokes_relevant_set.print(deallog.get_file_stream());
 
-  AffineConstraints<double> cm(stokes_relevant_set);
+  AffineConstraints<double> cm(stokes_index_set, stokes_relevant_set);
 
   DoFTools::make_hanging_node_constraints(stokes_dof_handler, cm);
 

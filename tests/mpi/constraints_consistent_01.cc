@@ -58,7 +58,7 @@ check(parallel::distributed::Triangulation<dim> &tria)
   AffineConstraints<double> constraints;
 
   constraints.clear();
-  constraints.reinit(locally_relevant_dofs);
+  constraints.reinit(locally_owned_dofs, locally_relevant_dofs);
   DoFTools::make_hanging_node_constraints(dof_handler, constraints);
 
   for (unsigned int id = 0; id < 1; ++id)

@@ -21,6 +21,7 @@
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/index_set.h>
 #include <deal.II/base/point.h>
+#include <deal.II/base/types.h>
 
 #include <deal.II/dofs/dof_handler.h>
 
@@ -734,7 +735,7 @@ namespace DoFTools
    * global system matrix and right hand side, and to extend the solution
    * vectors from the true degrees of freedom also to the constraint nodes.
    * This function is explained in detail in the
-   * @ref step_6 "step-6"
+   * step-6
    * tutorial program and is used in almost all following programs as well.
    *
    * This function does not clear the AffineConstraints object before use, in
@@ -1377,7 +1378,7 @@ namespace DoFTools
    * @deprecated
    */
   template <int dim, int spacedim>
-  DEAL_II_DEPRECATED_EARLY_WITH_COMMENT(
+  DEAL_II_DEPRECATED_WITH_COMMENT(
     "Use the other function that returns the constant modes by value, rather than via an argument.")
   void extract_constant_modes(const DoFHandler<dim, spacedim> &dof_handler,
                               const ComponentMask             &component_mask,
@@ -1398,7 +1399,7 @@ namespace DoFTools
    * @deprecated
    */
   template <int dim, int spacedim>
-  DEAL_II_DEPRECATED_EARLY_WITH_COMMENT(
+  DEAL_II_DEPRECATED_WITH_COMMENT(
     "Use the other function that returns the constant modes by value, rather than via an argument.")
   void extract_level_constant_modes(
     const unsigned int               level,
@@ -1949,28 +1950,30 @@ namespace DoFTools
    * contains the mapping from the block indices to the corresponding vertex
    * indices.
    *
-   * @arg <tt>block_list</tt>: the SparsityPattern into which the patches will
+   * @param block_list The SparsityPattern into which the patches will
    * be stored.
    *
-   * @arg <tt>dof_handler</tt>: the multilevel dof handler providing the
+   * @param dof_handler The multilevel dof handler providing the
    * topology operated on.
    *
-   * @arg <tt>interior_dofs_only</tt>: for each patch of cells around a
+   * @param level The multigrid level of the DoFHandler on which to operate.
+   *
+   * @param interior_dofs_only for each patch of cells around a
    * vertex, collect only the interior degrees of freedom of the patch and
    * disregard those on the boundary of the patch. This is for instance the
    * setting for smoothers of Arnold-Falk-Winther type.
    *
-   * @arg <tt>boundary_patches</tt>: include patches around vertices at the
+   * @param boundary_patches include patches around vertices at the
    * boundary of the domain. If not, only patches around interior vertices
    * will be generated.
    *
-   * @arg <tt>level_boundary_patches</tt>: same for refinement edges towards
+   * @param level_boundary_patches same for refinement edges towards
    * coarser cells.
    *
-   * @arg <tt>single_cell_patches</tt>: if not true, patches containing a
+   * @param single_cell_patches if not true, patches containing a
    * single cell are eliminated.
    *
-   * @arg <tt>invert_vertex_mapping</tt>: if true, then the return value
+   * @param invert_vertex_mapping if true, then the return value
    * contains one vertex index for each block; if false, then the return value
    * contains one block index or <tt>invalid_unsigned_int</tt> for each vertex.
    */
@@ -2031,18 +2034,20 @@ namespace DoFTools
    * are possible, in particular changing <tt>boundary_dofs</tt> for
    * non-essential boundary conditions.
    *
-   * @arg <tt>block_list</tt>: the SparsityPattern into which the patches will
+   * @param block_list The SparsityPattern into which the patches will
    * be stored.
    *
-   * @arg <tt>dof_handler</tt>: The multilevel dof handler providing the
+   * @param dof_handler The multilevel dof handler providing the
    * topology operated on.
    *
-   * @arg <tt>interior_dofs_only</tt>: for each patch of cells around a
+   * @param level The multigrid level of the DoFHandler on which to operate.
+   *
+   * @param interior_dofs_only for each patch of cells around a
    * vertex, collect only the interior degrees of freedom of the patch and
    * disregard those on the boundary of the patch. This is for instance the
    * setting for smoothers of Arnold-Falk-Winther type.
    *
-   * @arg <tt>boundary_dofs</tt>: include degrees of freedom, which would have
+   * @param boundary_dofs include degrees of freedom, which would have
    * excluded by <tt>interior_dofs_only</tt>, but are lying on the boundary of
    * the domain, and thus need smoothing. This parameter has no effect if
    * <tt>interior_dofs_only</tt> is false.
@@ -2063,15 +2068,15 @@ namespace DoFTools
    * make_child_patches() and make_vertex_patches(), which may produce an
    * empty patch list.
    *
-   * @arg <tt>block_list</tt>: the SparsityPattern into which the patches will
+   * @param block_list The SparsityPattern into which the patches will
    * be stored.
    *
-   * @arg <tt>dof_handler</tt>: The multilevel dof handler providing the
+   * @param dof_handler The multilevel dof handler providing the
    * topology operated on.
    *
-   * @arg <tt>level</tt> The grid level used for building the list.
+   * @param level The grid level used for building the list.
    *
-   * @arg <tt>interior_dofs_only</tt>: if true, exclude degrees of freedom on
+   * @param interior_dofs_only if true, exclude degrees of freedom on
    * the boundary of the domain.
    */
   template <int dim, int spacedim>

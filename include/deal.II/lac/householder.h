@@ -107,9 +107,9 @@ public:
    * Solve the least-squares problem for the right hand side <tt>src</tt>. The
    * returned scalar value is the Euclidean norm of the approximation error.
    *
-   * @arg @c dst contains the solution of the least squares problem on return.
+   * @param dst Contains the solution of the least squares problem on return.
    *
-   * @arg @c src contains the right hand side <i>b</i> of the least squares
+   * @param src Contains the right hand side <i>b</i> of the least squares
    * problem. It will be changed during the algorithm and is unusable on
    * return.
    */

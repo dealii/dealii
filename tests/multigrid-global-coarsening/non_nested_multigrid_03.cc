@@ -65,7 +65,8 @@ test(const unsigned int n_refinements, const unsigned int fe_degree_fine)
       // set up constraints
       const IndexSet locally_relevant_dofs =
         DoFTools::extract_locally_relevant_dofs(dof_handler);
-      constraint.reinit(locally_relevant_dofs);
+      constraint.reinit(dof_handler.locally_owned_dofs(),
+                        locally_relevant_dofs);
       VectorTools::interpolate_boundary_values(
         mapping, dof_handler, 0, Functions::ZeroFunction<dim>(), constraint);
       constraint.close();
@@ -89,7 +90,7 @@ test(const unsigned int n_refinements, const unsigned int fe_degree_fine)
                                constraints[l]);
     }
 
-  MGTransferGlobalCoarsening<dim, VectorType> transfer(
+  MGTransferMatrixFree<dim, Number> transfer(
     transfers,
     [&](const auto l, auto &vec) { operators[l].initialize_dof_vector(vec); });
 

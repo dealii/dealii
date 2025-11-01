@@ -6,7 +6,7 @@ subsection Stokes Immersed Problem
   set Homogeneous Dirichlet boundary ids = 0
   set Initial fluid refinement           = 5
   set Initial solid refinement           = 5
-  set Particle insertion refinement      = 4
+  set Particle insertion refinement      = 3
   set Nitsche penalty term               = 100
   set Number of time steps               = 501
   set Velocity degree                    = 2

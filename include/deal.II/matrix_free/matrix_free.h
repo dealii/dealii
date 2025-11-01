@@ -482,19 +482,23 @@ public:
 
     /**
      * This data structure allows to assign a fraction of cells to different
-     * categories when building the information for vectorization. It is used
+     * categories when building batches of cells for vectorizatios. It is used
      * implicitly when working with hp-adaptivity (with each active index
      * being a category) but can also be useful in other contexts where one
-     * would like to control which cells together can form a batch of cells.
+     * would like to control which cells can be placed into the same batch.
      * Such an example is "local time stepping", where cells of different
      * categories progress with different time-step sizes and, as a
-     * consequence, can only processed together with cells with the same
+     * consequence, can only be processed together with cells with the same
      * category.
      *
-     * This array is accessed by the number given by cell->active_cell_index()
-     * when working on the active cells (with
-     * @p mg_level set to numbers::invalid_unsigned_int) and by cell->index()
-     * for the level cells.
+     * This array works by assigned each active cell, accessed by the number
+     * given by cell->active_cell_index() when working on the active cells
+     * (with @p mg_level set to numbers::invalid_unsigned_int) and by
+     * cell->index() for the level cells, an integer number. Cells given the
+     * same number are eligible to be placed in the same batch, with the
+     * possibility to merge cells of a lower number with the next higher
+     * categories according to the variable
+     * @p cell_vectorization_categories_strict.
      *
      * @note This field is empty upon construction of AdditionalData. It is
      * the responsibility of the user to resize this field to
@@ -505,12 +509,12 @@ public:
 
     /**
      * By default, the different categories in @p cell_vectorization_category
-     * can be mixed and the algorithm is allowed to merge lower categories with
-     * the next higher categories if it is necessary inside the algorithm. This
-     * gives a better utilization of the vectorization but might need special
-     * treatment, in particular for face integrals. If set to @p true, the
-     * algorithm will instead keep different categories separate and not mix
-     * them in a single vectorized array.
+     * can be mixed and the algorithm is allowed to merge lower categories
+     * with the next higher categories if it is necessary to avoid only
+     * partially filled batches. This gives a better utilization of the
+     * vectorization but might need special treatment, in particular for face
+     * integrals. If set to @p true, the algorithm will instead keep different
+     * categories separate and not mix them in a single vectorized array.
      */
     bool cell_vectorization_categories_strict;
 

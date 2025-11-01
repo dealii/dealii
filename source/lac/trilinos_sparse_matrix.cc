@@ -29,6 +29,7 @@
 
 #  include <boost/container/small_vector.hpp>
 
+DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
 #  ifdef DEAL_II_TRILINOS_WITH_EPETRAEXT
 #    include <EpetraExt_MatrixMatrix.h>
 #  endif
@@ -36,6 +37,7 @@
 #  include <Teuchos_RCP.hpp>
 #  include <ml_epetra_utils.h>
 #  include <ml_struct.h>
+DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
 
 #  include <memory>
 

@@ -32,6 +32,7 @@ import re
 match_imports = re.compile(r"import *: *(.*);")
 match_exports = re.compile(r"export module dealii *: *(.*);")
 
+
 # For a given .cc file, read through all the lines and extract the
 # ones that correspond to export or import statements. For those, add
 # a link to the graph.

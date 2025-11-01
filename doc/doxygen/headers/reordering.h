@@ -77,11 +77,11 @@
  * proceed in exactly the same way as the 2D case.
  *
  * Each line has both a unique index and a canonical vertex ordering. For
- * example, consider two triangles with vertices `{15, 20, 25}` and `{20, 15,
- * 3}`. The order of the vertices on each cell is defined by the CellData
- * objects passed to Triangulation::create_triangulation(): typically, the order
- * of the vertices is arbitrary aside from the constraint that they form a cell
- * whose mapping to the reference cell has a positive Jacobian (see
+ * example, consider two triangular cells with vertex numbers `{15, 20, 25}` and
+ * `{20, 15, 3}`. The order of the vertices on each cell is defined by the
+ * CellData objects passed to Triangulation::create_triangulation(): typically,
+ * the order of the vertices is arbitrary aside from the constraint that they
+ * form a cell whose mapping to the reference cell has a positive Jacobian (see
  * Triangulation::Triangulation() for more information on whether or not this
  * should be checked). In this example, the first line of the first cell is
  * `{15, 20}` whereas the first line of the second cell is `{20, 15}`. In

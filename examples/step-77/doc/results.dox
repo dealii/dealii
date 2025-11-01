@@ -1,3 +1,4 @@
+@anchor step_77-ResultsSection
 <h1>Results</h1>
 
 When running the program, you get output that looks like this:
@@ -154,7 +155,7 @@ of each mesh refinement cycle, and it looks as follows:
 <table width="60%" align="center">
   <tr>
     <td align="center">
-      <img src="https://www.dealii.org/images/steps/developer/step-77.solution.png" alt="">
+      <img src="https://dealii.org/images/steps/developer/step-77.solution.png" alt="">
     </td>
   </tr>
 </table>

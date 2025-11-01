@@ -1,5 +1,0 @@
-Improved: DoFRenumbering::matrix_free_data_locality() now also works for
-elements that are not FE_Q, simply using the ordering of the degrees of
-freedom on the cells.
-<br>
-(Martin Kronbichler, 2024/11/01)

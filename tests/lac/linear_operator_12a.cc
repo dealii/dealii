@@ -185,18 +185,17 @@ Step4<dim>::setup_system()
 {
   dof_handler.distribute_dofs(fe);
 
+  const IndexSet &locally_owned_dofs = dof_handler.locally_owned_dofs();
+  const IndexSet  locally_relevant_dofs =
+    DoFTools::extract_locally_relevant_dofs(dof_handler);
+
   constraints.clear();
-  constraints.reinit(dof_handler.locally_owned_dofs(),
-                     DoFTools::extract_locally_relevant_dofs(dof_handler));
+  constraints.reinit(locally_owned_dofs, locally_relevant_dofs);
   VectorTools::interpolate_boundary_values(dof_handler,
                                            0,
                                            BoundaryValues<dim>(),
                                            constraints);
   constraints.close();
-
-  const IndexSet &locally_owned_dofs = dof_handler.locally_owned_dofs();
-  const IndexSet  locally_relevant_dofs =
-    DoFTools::extract_locally_relevant_dofs(dof_handler);
 
   DynamicSparsityPattern dsp(locally_relevant_dofs);
   DoFTools::make_sparsity_pattern(dof_handler, dsp, constraints, false);

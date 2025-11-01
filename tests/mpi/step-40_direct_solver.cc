@@ -140,7 +140,7 @@ namespace Step40
     system_rhs = PetscScalar();
 
     constraints.clear();
-    constraints.reinit(locally_relevant_dofs);
+    constraints.reinit(locally_owned_dofs, locally_relevant_dofs);
     DoFTools::make_hanging_node_constraints(dof_handler, constraints);
     VectorTools::interpolate_boundary_values(dof_handler,
                                              0,
@@ -245,7 +245,7 @@ namespace Step40
       dof_handler.n_locally_owned_dofs());
 
     SolverControl solver_control(dof_handler.n_dofs(), 1e-12);
-    PETScWrappers::SparseDirectMUMPS solver(solver_control, mpi_communicator);
+    PETScWrappers::SparseDirectMUMPS solver(solver_control);
     solver.set_symmetric_mode(true);
     solver.solve(system_matrix, completely_distributed_solution, system_rhs);
 

@@ -91,7 +91,7 @@ test()
     DoFTools::extract_locally_relevant_dofs(dofh);
 
   AffineConstraints<double> cm;
-  cm.reinit(locally_relevant_set);
+  cm.reinit(dofh.locally_owned_dofs(), locally_relevant_set);
   DoFTools::make_hanging_node_constraints(dofh, cm);
 
   std::map<types::boundary_id, const Function<dim> *> dirichlet_boundary;

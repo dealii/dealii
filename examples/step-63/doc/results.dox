@@ -23,7 +23,7 @@ ordering we set in `setup_smoother()`. We can visualize this numbering. The
 following pictures show the cell numbering of the active cells in downstream,
 random, and upstream numbering (left to right):
 
-<img src="https://www.dealii.org/images/steps/developer/step-63-cell-order.png" alt="">
+<img src="https://dealii.org/images/steps/developer/step-63-cell-order.png" alt="">
 
 Let us start with the additive smoothers. The following table shows
 the number of iterations necessary to obtain convergence from GMRES:

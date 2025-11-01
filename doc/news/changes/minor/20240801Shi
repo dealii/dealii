@@ -1,7 +1,0 @@
-Fix: Corrected pointer iteration range in VectorBase::mean_value()
-and VectorBase::lp_norm() in PETScWrappers namespace to proper handle
-distributed PETSc vectors. Now pointers obtained via VecGetArrayRead()
-iterate only over locally_owned_size(), and results are correctly
-aggregated across processes.
-<br>
-(Qingyuan Shi, 2024/08/01)

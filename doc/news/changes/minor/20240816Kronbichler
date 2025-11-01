@@ -1,4 +1,0 @@
-Improved: The classical Gram--Schmidt orthonormalization in SolverGMRES now
-uses SIMD-optimized routines also for dealii::Vector and dealii::BlockVector.
-<br>
-(Martin Kronbichler, 2024/08/16)

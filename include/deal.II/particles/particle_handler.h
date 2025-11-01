@@ -562,7 +562,7 @@ namespace Particles
     template <typename VectorType>
     void
     get_particle_positions(VectorType &output_vector,
-                           const bool  add_to_output_vector = false);
+                           const bool  add_to_output_vector = false) const;
 
     /**
      * Gather the position of the particles within the particle handler in
@@ -580,7 +580,7 @@ namespace Particles
      */
     void
     get_particle_positions(std::vector<Point<spacedim>> &positions,
-                           const bool add_to_output_vector = false);
+                           const bool add_to_output_vector = false) const;
 
     /**
      * This function allows to register three additional functions that are
@@ -698,6 +698,18 @@ namespace Particles
      */
     PropertyPool<dim, spacedim> &
     get_property_pool() const;
+
+    /**
+     * Return a constant reference to the triangulation underlying this object.
+     */
+    const Triangulation<dim, spacedim> &
+    get_triangulation() const;
+
+    /**
+     * Return a constant reference to the mapping underlying this object.
+     */
+    const Mapping<dim, spacedim> &
+    get_mapping() const;
 
     /**
      * Find and update the cells containing each particle for all locally owned
@@ -1343,7 +1355,7 @@ namespace Particles
   inline void
   ParticleHandler<dim, spacedim>::get_particle_positions(
     VectorType &output_vector,
-    const bool  add_to_output_vector)
+    const bool  add_to_output_vector) const
   {
     AssertDimension(output_vector.size(),
                     get_next_free_particle_index() * spacedim);
@@ -1362,6 +1374,32 @@ namespace Particles
       output_vector.compress(VectorOperation::add);
     else
       output_vector.compress(VectorOperation::insert);
+  }
+
+
+
+  template <int dim, int spacedim>
+  inline const Triangulation<dim, spacedim> &
+  ParticleHandler<dim, spacedim>::get_triangulation() const
+  {
+    Assert(triangulation != nullptr,
+           ExcMessage("This ParticleHandler object has not been associated "
+                      "with a triangulation."));
+
+    return *triangulation;
+  }
+
+
+
+  template <int dim, int spacedim>
+  inline const Mapping<dim, spacedim> &
+  ParticleHandler<dim, spacedim>::get_mapping() const
+  {
+    Assert(mapping != nullptr,
+           ExcMessage("This ParticleHandler object has not been associated "
+                      "with a mapping."));
+
+    return *mapping;
   }
 
 } // namespace Particles

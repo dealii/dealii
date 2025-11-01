@@ -28,12 +28,12 @@ pressures $p^\circ$ on the two adjacent cells.
 
 <table align="center">
   <tr>
-    <td><img src="https://www.dealii.org/images/steps/developer/step-61.wg000_2d_2.png" alt=""></td>
-    <td><img src="https://www.dealii.org/images/steps/developer/step-61.wg000_3d_2.png" alt=""></td>
+    <td><img src="https://dealii.org/images/steps/developer/step-61.wg000_2d_2.png" alt=""></td>
+    <td><img src="https://dealii.org/images/steps/developer/step-61.wg000_3d_2.png" alt=""></td>
   </tr>
   <tr>
-    <td><img src="https://www.dealii.org/images/steps/developer/step-61.wg000_2d_4.png" alt=""></td>
-    <td><img src="https://www.dealii.org/images/steps/developer/step-61.wg000_3d_4.png" alt=""></td>
+    <td><img src="https://dealii.org/images/steps/developer/step-61.wg000_2d_4.png" alt=""></td>
+    <td><img src="https://dealii.org/images/steps/developer/step-61.wg000_3d_4.png" alt=""></td>
   </tr>
 </table>
 
@@ -89,8 +89,8 @@ each face.
 
 <table align="center">
   <tr>
-    <td><img src="https://www.dealii.org/images/steps/developer/step-61.wg111_2d_4.png" alt=""></td>
-    <td><img src="https://www.dealii.org/images/steps/developer/step-61.wg111_3d_4.png" alt=""></td>
+    <td><img src="https://dealii.org/images/steps/developer/step-61.wg111_2d_4.png" alt=""></td>
+    <td><img src="https://dealii.org/images/steps/developer/step-61.wg111_3d_4.png" alt=""></td>
   </tr>
 </table>
 
@@ -142,8 +142,8 @@ we divide each 2d cell interior into 4 subcells in order to provide a better
 visualization of the quadratic polynomials.
 <table align="center">
   <tr>
-    <td><img src="https://www.dealii.org/images/steps/developer/step-61.wg222_2d_5.png" alt=""></td>
-    <td><img src="https://www.dealii.org/images/steps/developer/step-61.wg222_3d_5.png" alt=""></td>
+    <td><img src="https://dealii.org/images/steps/developer/step-61.wg222_2d_5.png" alt=""></td>
+    <td><img src="https://dealii.org/images/steps/developer/step-61.wg222_3d_5.png" alt=""></td>
   </tr>
 </table>
 

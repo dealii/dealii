@@ -30,36 +30,36 @@ uniformly refined grid (right).
 
 <div class="twocolumn" style="width: 80%">
   <div>
-    <img src="https://www.dealii.org/images/steps/developer/step_10_ball_0_q1.svg"
+    <img src="https://dealii.org/images/steps/developer/step_10_ball_0_q1.svg"
          alt="Five-cell discretization of the disk."
          width="400" height="400">
   </div>
   <div>
-    <img src="https://www.dealii.org/images/steps/developer/step_10_ball_1_q1.svg"
+    <img src="https://dealii.org/images/steps/developer/step_10_ball_1_q1.svg"
          alt="20-cell discretization of the disk (i.e., five cells
               refined once)."
          width="400" height="400">
   </div>
   <div>
-    <img src="https://www.dealii.org/images/steps/developer/step_10_ball_0_q2.svg"
+    <img src="https://dealii.org/images/steps/developer/step_10_ball_0_q2.svg"
          alt="Five-cell discretization of the disk with quadratic edges. The
               boundary is nearly indistinguishable from the actual circle."
          width="400" height="400"
          >
   </div>
   <div>
-    <img src="https://www.dealii.org/images/steps/developer/step_10_ball_1_q2.svg"
+    <img src="https://dealii.org/images/steps/developer/step_10_ball_1_q2.svg"
          alt="20-cell discretization with quadratic edges."
          width="400" height="400">
   </div>
   <div>
-    <img src="https://www.dealii.org/images/steps/developer/step_10_ball_0_q3.svg"
+    <img src="https://dealii.org/images/steps/developer/step_10_ball_0_q3.svg"
          alt="Five-cell discretization of the disk with cubic edges. The
               boundary is nearly indistinguishable from the actual circle."
          width="400" height="400">
   </div>
   <div>
-    <img src="https://www.dealii.org/images/steps/developer/step_10_ball_1_q3.svg"
+    <img src="https://dealii.org/images/steps/developer/step_10_ball_1_q3.svg"
          alt="20-cell discretization with cubic edges."
          width="400" height="400">
   </div>
@@ -73,13 +73,13 @@ red line marks the actual circle:
 
 <div class="twocolumn" style="width: 80%">
   <div>
-    <img src="https://www.dealii.org/images/steps/developer/step_10_exact_vs_interpolate_q2.svg"
+    <img src="https://dealii.org/images/steps/developer/step_10_exact_vs_interpolate_q2.svg"
          alt="Close-up of quadratic discretization. The distance between the
          quadratic interpolant and the actual circle is small."
          width="400" height="400">
   </div>
   <div>
-    <img src="https://www.dealii.org/images/steps/developer/step_10_exact_vs_interpolate_q3.svg"
+    <img src="https://dealii.org/images/steps/developer/step_10_exact_vs_interpolate_q3.svg"
          alt="Close-up of cubic discretization. The distance between the
          cubic interpolant and the actual circle is very small."
          width="400" height="400">
@@ -199,7 +199,7 @@ cells      eval.pi            error
   and errors change from release to release at these round-off levels,
   though the overall order of errors should of course remain the same.
   See also the comment below in the section on
-  <a href="#extensions">Possibilities for extensions</a> about how to compute
+  @ref step_10-Extensions "Possibilities for extensions" about how to compute
   these results more accurately.
 
 One of the immediate observations from the output above is that in all cases
@@ -229,8 +229,8 @@ eigenfunctions of the Laplace-Beltrami operator", submitted, 2018.)
 
 
 
+@anchor step_10-Extensions
 <h3>Possibilities for extensions</h3>
-<a name="step-10-extensions"></a>
 
 As the table of numbers copied from the output of the program shows above,
 it is not very difficult to compute the value of $\pi$ to 13 or 15 digits. But,

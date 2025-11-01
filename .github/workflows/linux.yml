@@ -2,6 +2,9 @@ name: linux
 
 on:
   push:
+    branches:
+      - 'master'
+      - 'dealii-*'
   pull_request:
     types:
     - opened
@@ -48,11 +51,11 @@ jobs:
         ubuntu_version: [jammy, noble]
 
     container:
-      image: dealii/dependencies:${{ matrix.ubuntu_version }}
+      image: dealii/dependencies:${{ matrix.ubuntu_version }}-v9.7.1
       options: --user root
 
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v5
     - name: info
       run: |
         python --version
@@ -116,11 +119,11 @@ jobs:
             flags: -mno-outline-atomics
 
     container:
-      image: dealii/dependencies:${{ matrix.ubuntu_version }}
+      image: dealii/dependencies:${{ matrix.ubuntu_version }}-v9.7.1
       options: --user root --env OMPI_ALLOW_RUN_AS_ROOT=1 --env OMPI_ALLOW_RUN_AS_ROOT_CONFIRM=1
 
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v5
     - name: info
       run: |
         mpicc -v
@@ -184,11 +187,11 @@ jobs:
         ubuntu_version: [jammy, noble]
 
     container:
-      image: dealii/dependencies:${{ matrix.ubuntu_version }}
+      image: dealii/dependencies:${{ matrix.ubuntu_version }}-v9.7.1
       options: --user root --env OMPI_ALLOW_RUN_AS_ROOT=1 --env OMPI_ALLOW_RUN_AS_ROOT_CONFIRM=1
 
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v5
     - name: info
       run: |
         mpicc -v
@@ -244,7 +247,7 @@ jobs:
     # if: ${{ github.event_name == 'push' || !github.event.pull_request.draft }}
 
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v5
     - uses: rscohn2/setup-oneapi@v0
       with:
         components: |
@@ -293,13 +296,13 @@ jobs:
         ctest -VV
 
   #################
-  # debug-cuda-11 #
+  # debug-cuda-12 #
   #################
 
-  debug-cuda-11:
-    # simple parallel debug build using cuda-11
+  debug-cuda-12:
+    # simple parallel debug build using cuda-12
 
-    name: jammy debug cuda-11
+    name: jammy debug cuda-12
     runs-on: [ubuntu-22.04]
 
     #
@@ -314,7 +317,7 @@ jobs:
       CUDA_ROOT: /usr/local/cuda
 
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v5
     - name: modules
       run: |
         wget https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2204/x86_64/cuda-ubuntu2204.pin
@@ -322,10 +325,10 @@ jobs:
         sudo apt-key adv --fetch-keys https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2204/x86_64/3bf863cc.pub
         sudo add-apt-repository "deb http://developer.download.nvidia.com/compute/cuda/repos/ubuntu2204/x86_64/ /"
         sudo apt-get install -y software-properties-common
-        sudo add-apt-repository ppa:ginggs/deal.ii-9.4.0-backports
+        sudo add-apt-repository ppa:ginggs/deal.ii-9.6.0-backports
         sudo apt-get update
         sudo apt-get install -yq --no-install-recommends \
-            cuda-toolkit-11-8 \
+            cuda-toolkit-12-3 \
             libp4est-dev \
             libopenmpi-dev \
             numdiff \
@@ -358,10 +361,10 @@ jobs:
       run: |
         mpicc -v
         cmake --version
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v5
       with:
         repository: kokkos/kokkos
-        ref: 3.7.00
+        ref: 4.0.01
         path: kokkos
     - name: compile and install kokkos
       working-directory: kokkos
@@ -374,7 +377,7 @@ jobs:
               -D Kokkos_ENABLE_CUDA=ON \
               -D Kokkos_ENABLE_CUDA_LAMBDA=ON \
               -D Kokkos_ENABLE_CUDA_CONSTEXPR=ON \
-              -D Kokkos_ARCH_VOLTA70=ON \
+              -D Kokkos_ARCH_AMPERE80=ON \
               ..
         make install
     - name: configure deal.II
@@ -405,13 +408,13 @@ jobs:
         make compile_test_executables
 
   #######################
-  # debug-cuda-11-clang #
+  # debug-cuda-12-clang #
   #######################
 
-  debug-cuda-11-clang:
-    # simple parallel debug build using cuda-11 and clang
+  debug-cuda-12-clang:
+    # simple parallel debug build using cuda-12 and clang
 
-    name: jammy debug cuda-11 clang
+    name: jammy debug cuda-12 clang
     runs-on: [ubuntu-22.04]
 
     #
@@ -426,21 +429,21 @@ jobs:
       CUDA_ROOT: /usr/local/cuda
 
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v5
     - name: modules
       run: |
         wget https://apt.llvm.org/llvm.sh
         chmod +x llvm.sh
-        sudo ./llvm.sh 18
+        sudo ./llvm.sh 19
         wget https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2204/x86_64/cuda-ubuntu2204.pin
         sudo mv cuda-ubuntu2204.pin /etc/apt/preferences.d/cuda-repository-pin-600
         sudo apt-key adv --fetch-keys https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2204/x86_64/3bf863cc.pub
         sudo add-apt-repository "deb http://developer.download.nvidia.com/compute/cuda/repos/ubuntu2204/x86_64/ /"
         sudo apt-get install -y software-properties-common
-        sudo add-apt-repository ppa:ginggs/deal.ii-9.4.0-backports
+        sudo add-apt-repository ppa:ginggs/deal.ii-9.6.0-backports
         sudo apt-get update
         sudo apt-get install -yq --no-install-recommends \
-            cuda-toolkit-11-8 \
+            cuda-toolkit-12-3 \
             libp4est-dev \
             libopenmpi-dev \
             numdiff \
@@ -450,12 +453,12 @@ jobs:
     - name: info
       run: |
         mpicc -v
-        clang++-18 -v
+        clang++-19 -v
         cmake --version
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v5
       with:
         repository: kokkos/kokkos
-        ref: 3.7.00
+        ref: 4.0.01
         path: kokkos
     - name: compile and install kokkos
       working-directory: kokkos
@@ -463,11 +466,11 @@ jobs:
         mkdir build
         cd build
         cmake -D BUILD_SHARED_LIBS=ON \
-              -D CMAKE_CXX_COMPILER=clang++-18 \
+              -D CMAKE_CXX_COMPILER=clang++-19 \
               -D CMAKE_INSTALL_PREFIX=${GITHUB_WORKSPACE}/../kokkos-install \
               -D Kokkos_ENABLE_CUDA=ON \
               -D Kokkos_ARCH_NATIVE=ON \
-              -D Kokkos_ARCH_VOLTA70=ON \
+              -D Kokkos_ARCH_AMPERE80=ON \
               ..
         make install
     - name: configure deal.II
@@ -475,7 +478,7 @@ jobs:
         mkdir build
         cd build
         cmake -D CMAKE_BUILD_TYPE=Debug \
-              -D CMAKE_CXX_COMPILER=clang++-18 \
+              -D CMAKE_CXX_COMPILER=clang++-19 \
               -D DEAL_II_FORCE_BUNDLED_BOOST=ON \
               -D DEAL_II_CXX_FLAGS="-std=c++17" \
               -D DEAL_II_EARLY_DEPRECATIONS=ON \
@@ -497,3 +500,74 @@ jobs:
         make setup_tests_matrix_free_kokkos
         cd tests/matrix_free_kokkos
         make compile_test_executables
+
+  ####################
+  # clang-20-modules #
+  ####################
+
+  clang-20-modules:
+    # simple build testing C++20 modules
+
+    name: debian bookworm clang-20 modules
+    runs-on: [ubuntu-latest]
+    container:
+      image: gcc:15-bookworm
+
+    # The following condition only runs the workflow on 'push' or if the
+    # 'pull_request' is not a draft. This is only useful for hackathons or
+    # other situations when the CI is massively overburdened with pull
+    # requests.
+    #
+    # if: ${{ github.event_name == 'push' || !github.event.pull_request.draft }}
+
+    steps:
+    - name: modules
+      run: |
+        apt-get update
+        apt-get install -yq --no-install-recommends \
+            ninja-build wget lsb-release software-properties-common gnupg
+        wget -qO- https://apt.llvm.org/llvm-snapshot.gpg.key | tee /etc/apt/trusted.gpg.d/apt.llvm.org.asc
+        echo "deb http://apt.llvm.org/bookworm/ llvm-toolchain-bookworm-20 main" | tee /etc/apt/sources.list.d/llvm.list
+        echo "deb-src http://apt.llvm.org/bookworm/ llvm-toolchain-bookworm-20 main" | tee -a /etc/apt/sources.list.d/llvm.list
+        apt-get update && apt-get install -yq --no-install-recommends \
+             libc++-20-dev clang-tools-20 clang-20
+    - uses: lukka/get-cmake@v3.28.3
+    - uses: actions/checkout@v5
+      with:
+        repository: kokkos/kokkos
+        ref: release-candidate-4.7.00
+        path: kokkos
+    - name: compile and install kokkos
+      working-directory: kokkos
+      run: |
+        mkdir build
+        cd build
+        cmake -GNinja \
+              -D BUILD_SHARED_LIBS=ON \
+              -D CMAKE_CXX_COMPILER=clang++-20 \
+              -D CMAKE_CXX_STANDARD=23 \
+              -D CMAKE_INSTALL_PREFIX=${GITHUB_WORKSPACE}/../kokkos-install \
+              ..
+        ninja install
+    - uses: actions/checkout@v5
+    - name: configure deal.II
+      run: |
+        mkdir build
+        cd build
+        export CXXFLAGS="-stdlib=libc++"
+        export LDFLAGS="-stdlib=libc++"
+        cmake -D CMAKE_BUILD_TYPE=Debug \
+              -D CMAKE_CXX_STANDARD=23 \
+              -D CMAKE_C_COMPILER=clang-20 \
+              -D CMAKE_CXX_COMPILER=clang++-20 \
+              -D DEAL_II_EARLY_DEPRECATIONS=ON \
+              -D DEAL_II_WITH_CXX20_MODULE=ON \
+              -D KOKKOS_DIR=${GITHUB_WORKSPACE}/../kokkos-install \
+              -G Ninja \
+              ..
+    - name: print detailed.log
+      run: cat build/detailed.log
+    - name: build deal.II
+      run: |
+        cd build
+        ninja --verbose dealii_module_debug

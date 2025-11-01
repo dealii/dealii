@@ -174,6 +174,13 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
       template Quadrature<deal_II_dimension>
       compute_nodal_quadrature(
         const FiniteElement<deal_II_dimension, deal_II_space_dimension> &);
+
+      template unsigned int
+      face_to_cell_index(
+        const FiniteElement<deal_II_dimension, deal_II_space_dimension> &,
+        const unsigned int,
+        const unsigned int,
+        const types::geometric_orientation);
 #endif
 
 #if deal_II_dimension == deal_II_space_dimension
@@ -261,6 +268,18 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
 
       template std::vector<unsigned int>
       lexicographic_to_hierarchic_numbering<deal_II_dimension>(unsigned int);
+
+      template std::pair<std::vector<unsigned int>, std::vector<unsigned int>>
+      cell_to_face_patch<deal_II_dimension>(const unsigned int &,
+                                            const unsigned int &,
+                                            const bool &,
+                                            const bool &);
+
+      template std::pair<std::vector<unsigned int>, std::vector<unsigned int>>
+      cell_to_face_patch_numbering<deal_II_dimension>(const unsigned int &,
+                                                      const unsigned int &,
+                                                      const bool &,
+                                                      const bool &);
 
 #endif
     \}

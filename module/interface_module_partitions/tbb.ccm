@@ -1,0 +1,84 @@
+// ------------------------------------------------------------------------
+//
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2025 by the deal.II authors
+//
+// This file is part of the deal.II library.
+//
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
+//
+// ------------------------------------------------------------------------
+
+
+// It is very inefficient in the module system to have repeated
+// #includes in many module partition files because when you 'import'
+// those partitions, you also have to load everything they
+// #included. In other words, you get the same content *many times*,
+// once from each imported partition, rather than only once via the
+// old-style #include system. We deal with this by wrapping all of our
+// external packages into partitions that we can 'import' wherever we
+// need.
+
+// This is the file that wraps everything we need from TBB into one
+// module partition.
+
+
+module;
+
+#include <deal.II/base/config.h>
+
+#ifdef DEAL_II_WITH_TBB
+#  include <tbb/blocked_range.h>
+#  include <tbb/concurrent_unordered_map.h>
+#  include <tbb/parallel_for.h>
+#  include <tbb/parallel_reduce.h>
+#  include <tbb/partitioner.h>
+#  include <tbb/task.h>
+#  include <tbb/task_group.h>
+#  ifdef DEAL_II_TBB_WITH_ONEAPI
+#    include <tbb/parallel_pipeline.h>
+#  else
+#    include <tbb/pipeline.h>
+#  endif
+#  ifdef DEAL_II_TBB_WITH_ONEAPI
+#    include <tbb/global_control.h>
+#  else
+#    include <tbb/task_scheduler_init.h>
+#  endif
+#endif
+
+
+export module dealii.external.tbb;
+
+#ifdef DEAL_II_WITH_TBB
+
+export
+{
+  namespace tbb
+  {
+    using ::tbb::affinity_partitioner;
+    using ::tbb::auto_partitioner;
+    using ::tbb::blocked_range;
+    using ::tbb::concurrent_unordered_map;
+    using ::tbb::filter;
+    using ::tbb::filter_mode;
+    using ::tbb::flow_control;
+    using ::tbb::make_filter;
+    using ::tbb::parallel_for;
+    using ::tbb::parallel_pipeline;
+    using ::tbb::parallel_reduce;
+    using ::tbb::task_group;
+
+#  ifdef DEAL_II_TBB_WITH_ONEAPI
+    using ::tbb::global_control;
+#  else
+    using ::tbb::task_scheduler_init;
+#  endif
+
+  } // namespace tbb
+}
+
+#endif

@@ -1,7 +1,7 @@
 ## ------------------------------------------------------------------------
 ##
 ## SPDX-License-Identifier: LGPL-2.1-or-later
-## Copyright (C) 2013 - 2014 by the deal.II authors
+## Copyright (C) 2013 - 2025 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -115,45 +115,6 @@ endmacro()
 
 
 #
-# Threading Building Blocks library
-#
-
-if( NOT CMAKE_SYSTEM_NAME MATCHES "CYGWIN"
-    AND NOT CMAKE_SYSTEM_NAME MATCHES "Windows" )
-  #
-  # Cygwin is unsupported by tbb, Windows due to the way we compile tbb...
-  #
-  set(FEATURE_TBB_HAVE_BUNDLED TRUE)
-
-  option(DEAL_II_FORCE_BUNDLED_TBB
-    "Always use the bundled tbb library instead of an external one."
-    OFF)
-
-  set(TBB_FOLDER "${CMAKE_SOURCE_DIR}/bundled/tbb-2018_U2")
-endif()
-
-macro(feature_tbb_configure_bundled)
-  set(TBB_VERSION "2018.0")
-  set(TBB_VERSION_MAJOR "2018")
-  set(TBB_VERSION_MINOR "0")
-
-  #
-  # We have to disable a bunch of warnings:
-  #
-  enable_if_supported(DEAL_II_WARNING_FLAGS "-Wno-parentheses")
-
-  #
-  # tbb uses dlopen/dlclose, so link against libdl.so as well:
-  #
-  list(APPEND DEAL_II_LIBRARIES ${CMAKE_DL_LIBS})
-
-  list(APPEND DEAL_II_BUNDLED_INCLUDE_DIRS ${TBB_FOLDER}/include)
-
-  set(DEAL_II_TBB_WITH_ONEAPI FALSE)
-endmacro()
-
-
-#
 # UMFPACK, AMD and UFCONFIG:
 #
 
@@ -195,4 +156,21 @@ macro(feature_muparser_configure_bundled)
   set(MUPARSER_VERSION_SUBMINOR "3")
 
   list(APPEND DEAL_II_BUNDLED_INCLUDE_DIRS ${MUPARSER_FOLDER}/include)
+endmacro()
+
+
+#
+# magic_enum
+#
+
+set(FEATURE_MAGIC_ENUM_HAVE_BUNDLED TRUE)
+
+option(DEAL_II_FORCE_BUNDLED_MAGIC_ENUM
+  "Always use the bundled magic_enum header library instead of an external one."
+  OFF)
+
+set(MAGIC_ENUM_FOLDER "${CMAKE_SOURCE_DIR}/bundled/magic_enum-v0.9.7/")
+
+macro(feature_magic_enum_configure_bundled)
+  list(APPEND DEAL_II_BUNDLED_INCLUDE_DIRS ${MAGIC_ENUM_FOLDER}/include/magic_enum)
 endmacro()

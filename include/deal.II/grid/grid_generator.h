@@ -324,8 +324,8 @@ namespace GridGenerator
   void
   subdivided_hyper_rectangle(Triangulation<dim>                     &tria,
                              const std::vector<std::vector<double>> &step_sizes,
-                             const Point<dim>                       &p_1,
-                             const Point<dim>                       &p_2,
+                             const Point<dim>                       &p1,
+                             const Point<dim>                       &p2,
                              const bool colorize = false);
 
   /**
@@ -546,6 +546,103 @@ namespace GridGenerator
                         const unsigned int  n_shells           = 2,
                         const double        skewness           = 2.0,
                         const bool          colorize           = false);
+
+  /**
+   * Generate a grid consisting of a channel with a cylinder where the length,
+   * the height and the depth (in 3D) of the channel can be defined by the user.
+   * This generator is a generalized version of
+   * GridGenerator::channel_with_cylinder. It can be used for benchmarking
+   * Navier-Stokes solvers for various flows around a cylinder cases in 2D or
+   * 3D. The main limitation of this generator is that the diameter of the
+   * cylinder is fixed at one and that the dimensions of the channel along the x
+   * and y dimensions must be an integer multiple of this diameter.
+   * Consequently, the length before the cylinder
+   * ($L_{pre}$), the length after the cylinder ($L_{post}$), the height below
+   * ($H_{below}$) and the height above ($H_{above}$) must be integer values.
+   * The depth of the channel ($W$) can be any real positive number. The
+   * geometry consists of a channel of size $[-L_{pre}, -H_{below}] \times
+   * [L_{post}, H_{above}] \times [0, W] $ (where the $z$ dimension is omitted
+   * in 2d) with a cylinder, parallel to the $z$ axis with diameter $1$,
+   * centered at $(0, 0, 0)$. The channel has three distinct regions: <ol>
+   *   <li>If @p n_shells is greater than zero, then there are that many shells
+   *   centered around the cylinder,</li>
+   *   <li>a blending region between the shells and the rest of the
+   *   triangulation, and</li>
+   *   <li>a bulk region consisting of Cartesian cells.</li>
+   * </ol>
+   * Here is an example of a grid (without additional global refinement)
+   * where the arguments were {8,16,8,8} and
+   * the default arguments are used for the number of shells and skewness:
+   *
+   * @image html custom_channel_with_cylinder.png
+   *
+   * The resulting Triangulation uses three manifolds: a PolarManifold (in 2d)
+   * or CylindricalManifold (in 3d) with manifold id $0$, a
+   * TransfiniteInterpolationManifold with manifold id $1$, and a FlatManifold
+   * everywhere else. For more information on this topic see
+   * @ref GlossManifoldIndicator "the glossary entry on manifold indicators".
+   * The
+   * cell faces on the cylinder and surrounding shells have manifold ids of
+   * $0$, while the cell volumes adjacent to the shells (or, if they do not
+   * exist, the cylinder) have a manifold id of $1$. Put another way: this
+   * grid uses TransfiniteInterpolationManifold to smoothly transition from
+   * the shells (generated with GridGenerator::concentric_hyper_shells) to the
+   * bulk region. All other cell volumes and faces have manifold id
+   * numbers::flat_manifold_id and use FlatManifold. All cells with id
+   * numbers::flat_manifold_id are rectangular prisms aligned with the
+   * coordinate axes.
+   *
+   *
+   * @param tria Triangulation to be created. Must be empty upon calling this
+   * function.
+   *
+   * @param lengths_and_heights  A vector containing the distance of the domain to the center of the cylinder.
+   * The vector must contain 4 unsigned integers which consist in the length (in
+   * number of cylinder diameter) before the cylinder, after the cylinder, below
+   * the cylinder and above the cylinder.
+   *
+   * @param depth The depth of the simulation domain (in 3D, the z axis)
+   *
+   * @param depth_division The number of division along the z axis
+   *
+   * @param shell_region_radius Radius of the layer of shells around the cylinder.
+   * This value should be between larger than 0.5 (the radius of the cylinder)
+   * and smaller than 1 (the half-length of the box around the cylinder).
+   *
+   * @param n_shells Number of shells to use in the shell layer.
+   *
+   * @param skewness Parameter controlling how close the shells are
+   * to the cylinder: see the mathematical definition given in
+   * GridGenerator::concentric_hyper_shells.
+   *
+   * @param use_transfinite_region If `true`, then a tranfinite manifold is used
+   * in the intermediary region between the cylindrical hypershell and the
+   * channel.
+   *
+   * @param colorize If `true`, then assign different boundary ids to
+   * different parts of the boundary. For more
+   * information on boundary indicators see
+   * @ref GlossBoundaryIndicator "this glossary entry".
+   * The left boundary (at $x = -L_{pre}$) is assigned an id of $0$, the right
+   * boundary (at $x = L_{post}$) is assigned an id of $1$; the boundary of
+   * the obstacle in the middle (i.e., the circle in 2d or the cylinder
+   * walls in 3d) is assigned an id of $2$, the bottom wall (at $y=-H$) is
+   * assigned and id of $/$, the top wall (at $y=H$) is assigned an id of $4$.
+   * In 3D, the front wall ($z=0$) is assigned an id of $5$ and the back wall
+   * ($z=W$) is assigned an id of $6$.
+   */
+  template <int dim>
+  void
+  uniform_channel_with_cylinder(
+    Triangulation<dim>              &tria,
+    const std::vector<unsigned int> &lengths_and_heights,
+    const double                     depth                  = 1,
+    const unsigned int               depth_division         = 1,
+    const double                     shell_region_radius    = 0.75,
+    const unsigned int               n_shells               = 2,
+    const double                     skewness               = 2.0,
+    const bool                       use_transfinite_region = false,
+    const bool                       colorize               = false);
 
   /**
    * A general @p dim -dimensional cell (a segment if dim is 1, a quadrilateral
@@ -2435,6 +2532,62 @@ namespace GridGenerator
                                                                         24u));
 
   /**
+   * This function converts a mesh consisting exclusively of simplex cells
+   * (i.e., triangles or tetrahedra) into one consisting exclusively of
+   * hypercube cells (i.e., quadrilaterals or hexahedra).
+   *
+   * For `dim==2`, this function performs the conversion by splitting each
+   * triangle into three quadrilaterals by creating vertices at edge mid-points
+   * along with the barycenters of cells.
+   * Also see
+   * @ref simplex "Simplex support".
+   *
+   * @note This function is currently not implemented for `dim==3`.
+   *
+   * Material ID and boundary IDs are inherited upon conversion.
+   *
+   * As an example, the following image shows how a single triangle is
+   * subdivided into three quadrilaterals:
+   *
+   * @image html "convert_simplex_to_hypercube_mesh_visualization_1.png"
+   *
+   * Perhaps more interestingly, the following two pictures show a zoom-in of a
+   * mesh for a high-lift wing configuration that was originally meshed with
+   * triangles, and then subdivided by this function into quadrilaterals:
+   *
+   * @image html "convert_simplex_to_hypercube_mesh_visualization_2.png"
+   * @image html "convert_simplex_to_hypercube_mesh_visualization_3.png"
+   *
+   * @param[in] in_tria The triangulation containing quadrilateral or
+   *   hexahedral elements.
+   *
+   * @param[out] out_tria The converted triangulation containing triangular or
+   *   tetrahedral elements.
+   *
+   * @note No manifold objects are copied by this function: you must
+   *   copy existing manifold objects from @p in_tria to @p out_tria, e.g.,
+   *   with the following code:
+   * @code
+   * for (const auto i : in_tria.get_manifold_ids())
+   *   if (i != numbers::flat_manifold_id)
+   *     out_tria.set_manifold(i, in_tria.get_manifold(i));
+   * @endcode
+   *
+   * Also see
+   * @ref simplex "Simplex support".
+   *
+   * @note This function is available through the python interface as
+   * `in_tria.convert_hypercube_to_simplex_mesh(out_tria)`.
+   *
+   * @note in 1d this function copies @p in_tria into @p out_tria since 1d
+   * elements (lines) are both hypercubes and simplices.
+   */
+  template <int dim, int spacedim>
+  void
+  convert_simplex_to_hypercube_mesh(const Triangulation<dim, spacedim> &in_tria,
+                                    Triangulation<dim, spacedim> &out_tria);
+
+  /**
    * Perform an Alfeld split (also called barycentric refinement) of a simplex
    * mesh.
    *
@@ -2614,9 +2767,9 @@ namespace GridGenerator
      *
      \htmlonly <style>div.image
      *
-     img[src="https://www.dealii.org/images/grids/airfoils_naca_joukowski.png"]{width:50%;}</style>
+     img[src="https://dealii.org/images/grids/airfoils_naca_joukowski.png"]{width:50%;}</style>
      \endhtmlonly
-     * @image html https://www.dealii.org/images/grids/airfoils_naca_joukowski.png
+     * @image html https://dealii.org/images/grids/airfoils_naca_joukowski.png
      */
     template <int dim>
     void

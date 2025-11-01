@@ -1,5 +1,0 @@
-Fixed: MatrixFreeTools::compute_diagonal() used
-to use first_selected_component also for accessing
-(block) vectors. This has been fixed.
-<br>
-(Peter Munch, Nils Much, 2024/07/30)

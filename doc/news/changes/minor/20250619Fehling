@@ -1,3 +1,0 @@
-Changed: ParameterHandler::print_parameters now pretty prints XML output.
-<br>
-(Marc Fehling, 2025/06/19)

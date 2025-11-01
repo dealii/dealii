@@ -1,7 +1,0 @@
-New: Parameter entries in the ParameterHandler class can now be marked as
-deprecated using the function 'mark_as_deprecated'. If deprecated parameters
-are found in a parameter file an exception of type
-'ExcEncounteredDeprecatedEntries' is thrown that can be caught in
-the calling code, or if ignored will emit an error message.
-<br>
-(Rene Gassmoeller, 2024/08/11)

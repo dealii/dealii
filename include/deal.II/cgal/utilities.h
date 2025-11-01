@@ -30,6 +30,10 @@
 
 #  include <boost/hana.hpp>
 
+#  include <CGAL/version.h>
+#  if CGAL_VERSION_MAJOR >= 6
+#    include <CGAL/Installation/internal/disable_deprecation_warnings_and_errors.h>
+#  endif
 #  include <CGAL/Cartesian.h>
 #  include <CGAL/Complex_2_in_triangulation_3.h>
 #  include <CGAL/Exact_predicates_exact_constructions_kernel.h>

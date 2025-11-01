@@ -18,7 +18,8 @@
 
 #include <deal.II/fe/mapping.h>
 
-#include <deal.II/grid/tria.h>
+#include <deal.II/grid/grid_tools_topology.h>
+#include <deal.II/grid/tria.h> //should be ok to delete is in grid tools
 
 #ifdef DEAL_II_WITH_CGAL
 
@@ -76,111 +77,64 @@ namespace CGALWrappers
 
 
   template <typename KernelType>
-  CGAL::Polygon_2<KernelType>
+  CGAL::Polygon_with_holes_2<KernelType>
   dealii_tria_to_cgal_polygon(const Triangulation<2, 2> &tria,
                               const Mapping<2, 2>       &mapping)
   {
-    // This map holds the two vertex indices of each face.
-    // Counterclockwise first vertex index on first position,
-    // counterclockwise second vertex index on second position.
-    std::map<unsigned int, unsigned int> face_vertex_indices;
-    std::map<unsigned int, Point<2>>     vertex_to_point;
+    // Outer boundary vertices counter clockwise
+    // and hole vertices clockwise ordered
+    auto boundaries =
+      GridTools::extract_ordered_boundary_vertices(tria, mapping);
 
-    // Iterate over all active cells at the boundary
-    for (const auto &cell : tria.active_cell_iterators())
+    CGAL::Polygon_2<KernelType>              outer_boundary;
+    std::vector<CGAL::Polygon_2<KernelType>> holes;
+    holes.reserve(boundaries.size() - 1);
+
+    for (const auto &boundary : boundaries)
       {
-        for (const unsigned int f : cell->face_indices())
+        // Add vertices of current boundary to polygon
+        CGAL::Polygon_2<KernelType> current_polygon;
+        for (const auto &vertices : boundary)
           {
-            if (cell->face(f)->at_boundary())
-              {
-                // get mapped vertices of the cell
-                const auto         v_mapped = mapping.get_vertices(cell);
-                const unsigned int v0       = cell->face(f)->vertex_index(0);
-                const unsigned int v1       = cell->face(f)->vertex_index(1);
-
-                if (cell->reference_cell() == ReferenceCells::Triangle)
-                  {
-                    // add indices and first mapped vertex of the face
-                    vertex_to_point[v0]     = v_mapped[f];
-                    face_vertex_indices[v0] = v1;
-                  }
-                else if (cell->reference_cell() ==
-                         ReferenceCells::Quadrilateral)
-                  {
-                    // Ensure that vertex indices of the face are in
-                    // counterclockwise order inserted in the map.
-                    if (f == 0 || f == 3)
-                      {
-                        // add indices and first mapped vertex of the face
-                        vertex_to_point[v1] =
-                          v_mapped[GeometryInfo<2>::face_to_cell_vertices(f,
-                                                                          1)];
-                        face_vertex_indices[v1] = v0;
-                      }
-                    else
-                      {
-                        // add indices and first mapped vertex of the face
-                        vertex_to_point[v0] =
-                          v_mapped[GeometryInfo<2>::face_to_cell_vertices(f,
-                                                                          0)];
-                        face_vertex_indices[v0] = v1;
-                      }
-                  }
-                else
-                  {
-                    DEAL_II_ASSERT_UNREACHABLE();
-                  }
-              }
+            current_polygon.push_back(
+              dealii_point_to_cgal_point<CGAL::Point_2<KernelType>, 2>(
+                vertices.second));
+          }
+        // Decide if outer boundary or hole
+        if (current_polygon.is_counterclockwise_oriented())
+          {
+            outer_boundary = current_polygon;
+          }
+        else
+          {
+            holes.push_back(current_polygon);
           }
       }
+    return CGAL::Polygon_with_holes_2<KernelType>(outer_boundary,
+                                                  holes.begin(),
+                                                  holes.end());
+  }
 
-    CGAL::Polygon_2<KernelType> polygon;
 
-    // Vertex to start counterclockwise insertion
-    const unsigned int start_index   = face_vertex_indices.begin()->first;
-    unsigned int       current_index = start_index;
-
-    // As long as still entries in the map, use last vertex index to
-    // find next vertex index in counterclockwise order
-    while (face_vertex_indices.size() > 0)
-      {
-        const auto vertex_it = vertex_to_point.find(current_index);
-        Assert(vertex_it != vertex_to_point.end(),
-               ExcMessage("This should not occur, please report bug"));
-
-        polygon.push_back(
-          dealii_point_to_cgal_point<CGAL::Point_2<KernelType>, 2>(
-            vertex_it->second));
-        vertex_to_point.erase(vertex_it);
-
-        const auto it = face_vertex_indices.find(current_index);
-        // If the boundary is one closed loop, the next vertex index
-        // must exist as key until the map is empty.
-        Assert(it != face_vertex_indices.end(),
-               ExcMessage("Triangulation might contain holes"));
-
-        current_index = it->second;
-        face_vertex_indices.erase(it);
-
-        // Ensure that last vertex index is the start index.
-        // This condition can be used to extend the code for
-        // trianglations with holes
-        Assert(
-          !(face_vertex_indices.size() == 0 && current_index != start_index),
-          ExcMessage(
-            "This should not occur, reasons might be a non closed boundary or a bug in this function"));
-      }
-
-    return polygon;
+  template <typename KernelType>
+  CGAL::Polygon_with_holes_2<KernelType>
+  polygon_to_polygon_with_holes(
+    const CGAL::Polygon_2<KernelType>              &boundary_outside,
+    const std::vector<CGAL::Polygon_2<KernelType>> &boundary_holes)
+  {
+    return CGAL::Polygon_with_holes_2<KernelType>(boundary_outside,
+                                                  boundary_holes.begin(),
+                                                  boundary_holes.end());
   }
 
 
 
   template <typename KernelType>
   std::vector<CGAL::Polygon_with_holes_2<KernelType>>
-  compute_boolean_operation(const CGAL::Polygon_2<KernelType> &polygon_1,
-                            const CGAL::Polygon_2<KernelType> &polygon_2,
-                            const BooleanOperation &boolean_operation)
+  compute_boolean_operation(
+    const CGAL::Polygon_with_holes_2<KernelType> &polygon_1,
+    const CGAL::Polygon_with_holes_2<KernelType> &polygon_2,
+    const BooleanOperation                       &boolean_operation)
   {
     Assert(!(boolean_operation == BooleanOperation::compute_corefinement),
            ExcMessage("Corefinement has no usecase for 2D polygons"));

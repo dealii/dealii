@@ -1,4 +1,4 @@
-<a name="step-1-Intro"></a>
+<a name="step_1-Intro"></a>
 <h1>Introduction</h1>
 
 <h3> About the tutorial </h3>
@@ -168,8 +168,8 @@ consider them equivalent.
 
 What this program shows, then, is how to create a Triangulation
 object, and to operate on it. The underlying concept of a
-Triangulation is that it is a *container*, i.e., a class that stores a
-*collection of cells*. As is common in modern programming languages,
+Triangulation is that it is a *container*, i.e., a class that stores
+a *collection of cells*. As is common in modern programming languages,
 the key operation on containers is that one can *iterate* over its
 elements, and that's exactly what we will do below.
 
@@ -184,8 +184,14 @@ of the tutorial. (Since there are so many loops over cells in finite
 element programs, the @ref Iterators topic talks about them in more
 detail.)
 
-The program is otherwise small enough that it doesn't need a whole lot
-of introduction.
+In the program shown below, we will use meshes of quadrilaterals
+because, historically, this is what deal.II supported in 2d. However,
+deal.II's Triangulation class is quite happy to also store triangles
+these days (and tetrahedra, wedges, pyramids, and hexehedra in 3d),
+and you can find a section further down below on this page explaining
+how you can switch from quadrilaterals to triangles. The program is
+otherwise small enough that it doesn't need a whole lot of
+introduction.
 
 @dealiiVideoLecture{5,6}
 
@@ -236,7 +242,7 @@ are worthwhile browsing through before you start any large-scale programming:
   [this more in-depth reference](https://www.learncpp.com/).
   If all you want is to look up a
   fact (say, the name of a member function of `std::vector`, or the
-  order of function arguments of `std::snprintf`, then
+  order of function arguments of `std::accumulate()`, then
   [cppreference.org](https://en.cppreference.com/) is the place many
   of us go to.
 

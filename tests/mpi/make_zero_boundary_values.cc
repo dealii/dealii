@@ -53,7 +53,8 @@ test()
   // locally relevant dofs, so do the test again with that
   {
     const IndexSet relevant_set = DoFTools::extract_locally_relevant_dofs(dofh);
-    AffineConstraints<double> boundary_values(relevant_set);
+    AffineConstraints<double> boundary_values(dofh.locally_owned_dofs(),
+                                              relevant_set);
     DoFTools::make_zero_boundary_constraints(dofh, boundary_values);
     if (Utilities::MPI::this_mpi_process(MPI_COMM_WORLD) == 0)
       boundary_values.print(deallog.get_file_stream());

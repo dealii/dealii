@@ -16,10 +16,14 @@
 
 #ifdef DEAL_II_WITH_ARBORX
 
+#  include <ArborX.hpp>
+
 DEAL_II_NAMESPACE_OPEN
 
 namespace ArborXWrappers
 {
+#  if ARBORX_VERSION_MAJOR < 2
+
   namespace
   {
     template <int dim, typename Number>
@@ -213,12 +217,200 @@ namespace ArborXWrappers
   {
     return n_nearest_neighbors;
   }
+#  else
+  template <int dim, typename Number>
+  PointIntersectPredicate<dim, Number>::PointIntersectPredicate(
+    const std::vector<dealii::Point<dim, Number>> &points)
+    : points(points)
+  {}
+
+
+
+  template <int dim, typename Number>
+  std::size_t
+  PointIntersectPredicate<dim, Number>::size() const
+  {
+    return points.size();
+  }
+
+
+
+  template <int dim, typename Number>
+  const dealii::Point<dim, Number> &
+  PointIntersectPredicate<dim, Number>::get(unsigned int i) const
+  {
+    return points[i];
+  }
+
+
+  template <int dim, typename Number>
+  PointNearestPredicate<dim, Number>::PointNearestPredicate(
+    const std::vector<dealii::Point<dim, Number>> &points,
+    const unsigned int                             n_nearest_neighbors)
+    : points(points)
+    , n_nearest_neighbors(n_nearest_neighbors)
+  {}
+
+
+
+  template <int dim, typename Number>
+  unsigned int
+  PointNearestPredicate<dim, Number>::get_n_nearest_neighbors() const
+  {
+    return n_nearest_neighbors;
+  }
+
+
+
+  template <int dim, typename Number>
+  std::size_t
+  PointNearestPredicate<dim, Number>::size() const
+  {
+    return points.size();
+  }
+
+
+
+  template <int dim, typename Number>
+  const dealii::Point<dim, Number> &
+  PointNearestPredicate<dim, Number>::get(unsigned int i) const
+  {
+    return points[i];
+  }
+
+
+  // ------------------- BoundingBoxPredicate ------------------- //
+  template <int dim, typename Number>
+  BoundingBoxIntersectPredicate<dim, Number>::BoundingBoxIntersectPredicate(
+    const std::vector<dealii::BoundingBox<dim, Number>> &bb)
+    : bounding_boxes(bb)
+  {}
+
+
+
+  template <int dim, typename Number>
+  std::size_t
+  BoundingBoxIntersectPredicate<dim, Number>::size() const
+  {
+    return bounding_boxes.size();
+  }
+
+
+
+  template <int dim, typename Number>
+  const dealii::BoundingBox<dim, Number> &
+  BoundingBoxIntersectPredicate<dim, Number>::get(unsigned int i) const
+  {
+    return bounding_boxes[i];
+  }
+
+
+
+  template <int dim, typename Number>
+  BoundingBoxNearestPredicate<dim, Number>::BoundingBoxNearestPredicate(
+    const std::vector<dealii::BoundingBox<dim, Number>> &bounding_boxes,
+    const unsigned int                                   n_nearest_neighbors)
+    : bounding_boxes(bounding_boxes)
+    , n_nearest_neighbors(n_nearest_neighbors)
+  {}
+
+
+
+  template <int dim, typename Number>
+  unsigned int
+  BoundingBoxNearestPredicate<dim, Number>::get_n_nearest_neighbors() const
+  {
+    return n_nearest_neighbors;
+  }
+
+
+
+  template <int dim, typename Number>
+  std::size_t
+  BoundingBoxNearestPredicate<dim, Number>::size() const
+  {
+    return bounding_boxes.size();
+  }
+
+
+
+  template <int dim, typename Number>
+  const dealii::BoundingBox<dim, Number> &
+  BoundingBoxNearestPredicate<dim, Number>::get(unsigned int i) const
+  {
+    return bounding_boxes[i];
+  }
+
+  // ------------------- SpherePredicate ------------------- //
+  template <int dim, typename Number>
+  SphereIntersectPredicate<dim, Number>::SphereIntersectPredicate(
+    const std::vector<std::pair<dealii::Point<dim, Number>, Number>> &spheres)
+    : spheres(spheres)
+  {}
+
+
+
+  template <int dim, typename Number>
+  std::size_t
+  SphereIntersectPredicate<dim, Number>::size() const
+  {
+    return spheres.size();
+  }
+
+
+
+  template <int dim, typename Number>
+  const std::pair<dealii::Point<dim, Number>, Number> &
+  SphereIntersectPredicate<dim, Number>::get(unsigned int i) const
+  {
+    return spheres[i];
+  }
+
+
+
+  template <int dim, typename Number>
+  SphereNearestPredicate<dim, Number>::SphereNearestPredicate(
+    const std::vector<std::pair<dealii::Point<dim, Number>, Number>> &spheres,
+    const unsigned int n_nearest_neighbors)
+    : spheres(spheres)
+    , n_nearest_neighbors(n_nearest_neighbors)
+  {}
+
+
+
+  template <int dim, typename Number>
+  unsigned int
+  SphereNearestPredicate<dim, Number>::get_n_nearest_neighbors() const
+  {
+    return n_nearest_neighbors;
+  }
+
+
+
+  template <int dim, typename Number>
+  std::size_t
+  SphereNearestPredicate<dim, Number>::size() const
+  {
+    return spheres.size();
+  }
+
+
+
+  template <int dim, typename Number>
+  const std::pair<dealii::Point<dim, Number>, Number> &
+  SphereNearestPredicate<dim, Number>::get(unsigned int i) const
+  {
+    return spheres[i];
+  }
+#  endif
 } // namespace ArborXWrappers
+
 
 DEAL_II_NAMESPACE_CLOSE
 
 namespace ArborX
 {
+#  if ARBORX_VERSION_MAJOR < 2
   namespace
   {
     template <int dim, typename Number>
@@ -310,6 +502,44 @@ namespace ArborX
     // the sphere is 3d
     return {to_arborx_point(v[i].first), static_cast<float>(v[i].second)};
   }
+
+#  else
+  template <typename T>
+  std::size_t
+  AccessTraits<
+    std::vector<T>,
+    std::enable_if_t<
+      std::is_same_v<T, dealii::Point<T::dimension, float>> ||
+      std::is_same_v<T, dealii::Point<T::dimension, double>> ||
+      std::is_same_v<T, dealii::BoundingBox<T::dimension, float>> ||
+      std::is_same_v<T, dealii::BoundingBox<T::dimension, double>> ||
+      std::is_same_v<T, std::pair<dealii::Point<T::dimension, float>, float>> ||
+      std::is_same_v<T,
+                     std::pair<dealii::Point<T::dimension, double>, double>>>>::
+    size(const std::vector<T> &v)
+  {
+    return v.size();
+  }
+
+
+
+  template <typename T>
+  T
+  AccessTraits<
+    std::vector<T>,
+    std::enable_if_t<
+      std::is_same_v<T, dealii::Point<T::dimension, float>> ||
+      std::is_same_v<T, dealii::Point<T::dimension, double>> ||
+      std::is_same_v<T, dealii::BoundingBox<T::dimension, float>> ||
+      std::is_same_v<T, dealii::BoundingBox<T::dimension, double>> ||
+      std::is_same_v<T, std::pair<dealii::Point<T::dimension, float>, float>> ||
+      std::is_same_v<T,
+                     std::pair<dealii::Point<T::dimension, double>, double>>>>::
+    get(const std::vector<T> &v, std::size_t i)
+  {
+    return v[i];
+  }
+#  endif
 } // namespace ArborX
 
 // ----------------------- Instantiations --------------------//

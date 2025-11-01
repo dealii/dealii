@@ -1,6 +1,0 @@
-New: The new functions DoFTools::extract_rigig_body_modes
-and DoFTools::extract_level_rigig_body_modes
-allow you to extract translational and rotational modes,
-need to set up AMG for solving elasticity problems.
-<br>
-(Marco Feder, Peter Munch, Richard Schussnig, 2024/08/10)

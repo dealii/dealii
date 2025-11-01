@@ -185,6 +185,36 @@ namespace GridTools
   get_all_vertices_at_boundary(const Triangulation<dim, spacedim> &tria);
 
   /**
+   * Return a std::vector that contains a map for each closed boundary.
+   * Each closed boundary is described by a std:vector of pairs
+   * `vertex index , Point<spacedim>`.
+   *
+   * The vertices are in counter-clockwise ordering for the outer boundary.
+   * The vertices are in clockwise ordering for inner boundaries (holes).
+   *
+   * It is generally not guaranteed that the first entry of the vector is the
+   * outer boundary. However, when cell 0 is located on the outer boundary this
+   * is the case.
+   *
+   * The mapping argument enables the use of e.g. MappingQEulerian.
+   *
+   * @param[in] tria The Triangulation object.
+   * @param[in] mapping The mapping used to map the vertices of the cell
+   */
+  template <int dim, int spacedim>
+  std::vector<std::vector<std::pair<unsigned int, Point<spacedim>>>>
+  extract_ordered_boundary_vertices(
+    const Triangulation<dim, spacedim> &tria,
+    const Mapping<dim, spacedim>       &mapping =
+      (ReferenceCells::get_hypercube<dim>()
+#ifndef _MSC_VER
+         .template get_default_linear_mapping<dim, spacedim>()
+#else
+         .ReferenceCell::get_default_linear_mapping<dim, spacedim>()
+#endif
+         ));
+
+  /**
    * Remove hanging nodes from a grid. If the @p isotropic parameter is set
    * to @p false (default) this function detects cells with hanging nodes and
    * refines the neighbours in the direction that removes hanging nodes.

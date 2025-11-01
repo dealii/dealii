@@ -374,7 +374,7 @@ namespace MatrixFreeTools
    * Compute the matrix representation of a linear operator (@p matrix), given
    * @p matrix_free and the local cell integral operation @p cell_operation,
    * interior face integral operation @p face_operation, and boundary face
-   * integal operation @p boundary_operation.
+   * integral operation @p boundary_operation.
    *
    * The parameters @p dof_no, @p quad_no, and @p first_selected_component are
    * passed to the constructor of the FEEvaluation that is internally set up.
@@ -824,6 +824,7 @@ namespace MatrixFreeTools
         const std::array<unsigned int, n_lanes> &cells =
           this->phi->get_cell_ids();
 
+        std::vector<unsigned int> inverse_lookup_count(dofs_per_cell);
         for (unsigned int v = 0; v < n_lanes_filled; ++v)
           {
             Assert(cells[v] != numbers::invalid_unsigned_int,
@@ -1069,7 +1070,9 @@ namespace MatrixFreeTools
                               c_pool.col.size());
 
               c_pool.inverse_lookup_origins.resize(c_pool.col.size());
-              std::vector<unsigned int> inverse_lookup_count(dofs_per_cell);
+              std::fill(inverse_lookup_count.begin(),
+                        inverse_lookup_count.end(),
+                        0u);
               for (unsigned int row = 0; row < c_pool.row.size() - 1; ++row)
                 for (unsigned int col = c_pool.row[row];
                      col < c_pool.row[row + 1];

@@ -41,14 +41,13 @@ if(ArborX_FOUND)
   if(ArborX_VERSION VERSION_LESS 1.3)
     message(STATUS "Found ArborX version ${ArborX_VERSION} but the minimum version supported is 1.3")
     unset(ArborX_FOUND)
-  elseif(ArborX_VERSION VERSION_GREATER_EQUAL 2.0)
-    message(STATUS "Found ArborX version ${ArborX_VERSION}. The 2.X series is not currently supported")
-    unset(ArborX_FOUND)
   endif()
 endif()
 
 
 if(ArborX_FOUND)
+  set(ARBORX_VERSION ${ArborX_VERSION})
+
   get_property(ARBORX_INSTALL_INCLUDE_DIR TARGET ArborX::ArborX PROPERTY INTERFACE_INCLUDE_DIRECTORIES)
 
   #

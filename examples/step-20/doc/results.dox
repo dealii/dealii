@@ -1,3 +1,4 @@
+@anchor step_20-ResultsSection
 <h1>Results</h1>
 
 <h3>Output of the program and graphical visualization</h3>
@@ -30,9 +31,9 @@ pressure:
 
 <table style="width:60%" align="center">
   <tr>
-    <td><img src="https://www.dealii.org/images/steps/developer/step-20.u_new.jpg" width="400" alt=""></td>
-    <td><img src="https://www.dealii.org/images/steps/developer/step-20.v_new.jpg" width="400" alt=""></td>
-    <td><img src="https://www.dealii.org/images/steps/developer/step-20.p_new.jpg" width="400" alt=""></td>
+    <td><img src="https://dealii.org/images/steps/developer/step-20.u_new.jpg" width="400" alt=""></td>
+    <td><img src="https://dealii.org/images/steps/developer/step-20.v_new.jpg" width="400" alt=""></td>
+    <td><img src="https://dealii.org/images/steps/developer/step-20.p_new.jpg" width="400" alt=""></td>
   </tr>
 </table>
 
@@ -207,8 +208,8 @@ x- and y-velocity:
 
 <table style="width:60%" align="center">
   <tr>
-    <td><img src="https://www.dealii.org/images/steps/developer/step-20.u-wiggle.png" alt=""></td>
-    <td><img src="https://www.dealii.org/images/steps/developer/step-20.v-wiggle.png" alt=""></td>
+    <td><img src="https://dealii.org/images/steps/developer/step-20.u-wiggle.png" alt=""></td>
+    <td><img src="https://dealii.org/images/steps/developer/step-20.v-wiggle.png" alt=""></td>
   </tr>
 </table>
 
@@ -279,7 +280,7 @@ A piecewise constant interpolation of the diagonal elements of the
 inverse of this tensor (i.e., of <code>normalized_permeability</code>)
 looks as follows:
 
-<img src="https://www.dealii.org/images/steps/developer/step-20.k-random.png" alt="">
+<img src="https://dealii.org/images/steps/developer/step-20.k-random.png" alt="">
 
 
 With a permeability field like this, we would get x-velocities and pressures as
@@ -287,8 +288,8 @@ follows:
 
 <table style="width:60%" align="center">
   <tr>
-    <td><img src="https://www.dealii.org/images/steps/developer/step-20.u-random.png" alt=""></td>
-    <td><img src="https://www.dealii.org/images/steps/developer/step-20.p-random.png" alt=""></td>
+    <td><img src="https://dealii.org/images/steps/developer/step-20.u-random.png" alt=""></td>
+    <td><img src="https://dealii.org/images/steps/developer/step-20.p-random.png" alt=""></td>
   </tr>
 </table>
 
@@ -302,7 +303,7 @@ the best one conceivable (nor is it intended to be a particularly good
 one). Better ones can be found in the literature and can be built using the
 same block matrix techniques that were introduced here. We pick up on this
 theme again in step-22, where we first build a Schur complement solver for the
-Stokes equation as we did here, and then in the <a
-href="step_22.html#improved-solver">Improved Solvers</a> section discuss better
+Stokes equation as we did here, and then in the
+@ref step_22-ImprovedSolver "Improved Solvers" section discuss better
 ways based on solving the system as a whole but preconditioning based on
 individual blocks. We will also come back to this in step-43.

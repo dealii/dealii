@@ -33,10 +33,14 @@
 
 
 #ifdef DEAL_II_WITH_TRILINOS
+
+DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
 #  include <Epetra_Map.h>
 #  ifdef DEAL_II_TRILINOS_WITH_TPETRA
 #    include <Tpetra_Map.hpp>
 #  endif
+DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
+
 #endif
 
 #ifdef DEAL_II_WITH_PETSC
@@ -490,7 +494,7 @@ public:
    *   set; it should not be seen as a sorted container in which it is clear
    *   what element is stored "last".
    */
-  DEAL_II_DEPRECATED_EARLY
+  DEAL_II_DEPRECATED
   size_type
   pop_back();
 
@@ -502,7 +506,7 @@ public:
    *   set; it should not be seen as a sorted container in which it is clear
    *   what element is stored "first".
    */
-  DEAL_II_DEPRECATED_EARLY
+  DEAL_II_DEPRECATED
   size_type
   pop_front();
 
@@ -516,16 +520,6 @@ public:
    */
   std::vector<size_type>
   get_index_vector() const;
-
-  /**
-   * Fill the given vector with all indices contained in this IndexSet.
-   *
-   * This function is equivalent to calling get_index_vector() and
-   * assigning the result to the @p indices argument.
-   */
-  DEAL_II_DEPRECATED
-  void
-  fill_index_vector(std::vector<size_type> &indices) const;
 
   /**
    * Fill the given vector with either zero or one elements, providing a

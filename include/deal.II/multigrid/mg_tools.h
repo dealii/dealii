@@ -208,10 +208,19 @@ namespace MGTools
    * the function object that is part of the function_map argument are
    * ignored.
    *
-   * @arg <tt>boundary_indices</tt> is a vector which on return contains all
+   * @param[in] mg_dof The DoFHandler object this function should work on.
+   *
+   * @param[in] function_map A map from boundary id to the function
+   * that describes boundary values on that part of the boundary that
+   * has these boundary ids.
+   *
+   * @param[out] boundary_indices A vector which on return contains all
    * indices of degrees of freedom for each level that are at the part of the
    * boundary identified by the function_map argument. Its length has to match
    * the number of levels in the dof handler object.
+   *
+   * @param[in] component_mask An optional mask that describes for which vector
+   * components the boundary values should be applied.
    *
    * Previous content in @p boundary_indices is not overwritten,
    * but added to.

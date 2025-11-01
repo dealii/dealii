@@ -104,11 +104,11 @@ to degree six:
 
 <div class="twocolumn" style="width: 80%; text-align: center;">
   <div>
-    <img src="https://www.dealii.org/images/steps/developer/step-75.subdomains-07.svg"
+    <img src="https://dealii.org/images/steps/developer/step-75.subdomains-07.svg"
          alt="Partitioning after seven refinements.">
   </div>
   <div>
-    <img src="https://www.dealii.org/images/steps/developer/step-75.fedegrees-07.svg"
+    <img src="https://dealii.org/images/steps/developer/step-75.fedegrees-07.svg"
          alt="Local approximation degrees after seven refinements.">
   </div>
 </div>

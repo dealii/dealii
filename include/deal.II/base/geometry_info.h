@@ -787,13 +787,13 @@ public:
   /**
    * Default constructor. Initialize the refinement case with no_refinement.
    */
-  RefinementCase();
+  constexpr RefinementCase();
 
   /**
    * Constructor. Take and store a value indicating a particular refinement
    * from the list of possible refinements specified in the base class.
    */
-  RefinementCase(
+  constexpr RefinementCase(
     const typename RefinementPossibilities<dim>::Possibilities refinement_case);
 
   /**
@@ -801,7 +801,7 @@ public:
    * a bit field. To avoid implicit conversions to and from integral values,
    * this constructor is marked as explicit.
    */
-  explicit RefinementCase(const std::uint8_t refinement_case);
+  constexpr explicit RefinementCase(const std::uint8_t refinement_case);
 
   /**
    * Return the numeric value stored by this class. While the presence of this
@@ -815,20 +815,20 @@ public:
    * base class to actual numerical values (the array indices).
    */
   DEAL_II_HOST_DEVICE
-  operator std::uint8_t() const;
+  constexpr operator std::uint8_t() const;
 
   /**
    * Return the union of the refinement flags represented by the current
    * object and the one given as argument.
    */
-  RefinementCase
+  constexpr RefinementCase
   operator|(const RefinementCase &r) const;
 
   /**
    * Return the intersection of the refinement flags represented by the
    * current object and the one given as argument.
    */
-  RefinementCase
+  constexpr RefinementCase
   operator&(const RefinementCase &r) const;
 
   /**
@@ -838,7 +838,7 @@ public:
    * if the current value is <code>isotropic_refinement</code> then the result
    * will be <code>no_refinement</code>; etc.
    */
-  RefinementCase
+  constexpr RefinementCase
   operator~() const;
 
 
@@ -847,7 +847,7 @@ public:
    * as argument. For example, if <code>i=0</code> then the returned value is
    * <tt>RefinementPossibilities<dim>::cut_x</tt>.
    */
-  static RefinementCase
+  static constexpr RefinementCase
   cut_axis(const unsigned int i);
 
   /**
@@ -858,13 +858,13 @@ public:
    * `{ RefinementCase::no_refinement, RefinementCase::cut_x,
    * RefinementCase::cut_y, RefinementCase::cut_xy }`.
    */
-  static std::array<RefinementCase<dim>, n_refinement_cases>
+  static constexpr std::array<RefinementCase<dim>, n_refinement_cases>
   all_refinement_cases();
 
   /**
    * Return the amount of memory occupied by an object of this type.
    */
-  static std::size_t
+  static constexpr std::size_t
   memory_consumption();
 
   /**
@@ -2722,7 +2722,7 @@ namespace internal
 
 
 template <int dim>
-inline RefinementCase<dim>
+inline constexpr RefinementCase<dim>
 RefinementCase<dim>::cut_axis(const unsigned int)
 {
   DEAL_II_ASSERT_UNREACHABLE();
@@ -2731,7 +2731,7 @@ RefinementCase<dim>::cut_axis(const unsigned int)
 
 
 template <>
-inline RefinementCase<1>
+inline constexpr RefinementCase<1>
 RefinementCase<1>::cut_axis(const unsigned int i)
 {
   AssertIndexRange(i, 1);
@@ -2743,7 +2743,7 @@ RefinementCase<1>::cut_axis(const unsigned int i)
 
 
 template <>
-inline RefinementCase<2>
+inline constexpr RefinementCase<2>
 RefinementCase<2>::cut_axis(const unsigned int i)
 {
   AssertIndexRange(i, 2);
@@ -2756,7 +2756,7 @@ RefinementCase<2>::cut_axis(const unsigned int i)
 
 
 template <>
-inline RefinementCase<3>
+inline constexpr RefinementCase<3>
 RefinementCase<3>::cut_axis(const unsigned int i)
 {
   AssertIndexRange(i, 3);
@@ -2770,7 +2770,7 @@ RefinementCase<3>::cut_axis(const unsigned int i)
 
 
 template <>
-inline std::array<RefinementCase<1>, 2>
+inline constexpr std::array<RefinementCase<1>, 2>
 RefinementCase<1>::all_refinement_cases()
 {
   return {{RefinementPossibilities<1>::no_refinement,
@@ -2780,7 +2780,7 @@ RefinementCase<1>::all_refinement_cases()
 
 
 template <>
-inline std::array<RefinementCase<2>, 4>
+inline constexpr std::array<RefinementCase<2>, 4>
 RefinementCase<2>::all_refinement_cases()
 {
   return {{RefinementPossibilities<2>::no_refinement,
@@ -2792,7 +2792,7 @@ RefinementCase<2>::all_refinement_cases()
 
 
 template <>
-inline std::array<RefinementCase<3>, 8>
+inline constexpr std::array<RefinementCase<3>, 8>
 RefinementCase<3>::all_refinement_cases()
 {
   return {{RefinementPossibilities<3>::no_refinement,
@@ -2808,14 +2808,14 @@ RefinementCase<3>::all_refinement_cases()
 
 
 template <int dim>
-inline RefinementCase<dim>::RefinementCase()
+inline constexpr RefinementCase<dim>::RefinementCase()
   : value(RefinementPossibilities<dim>::no_refinement)
 {}
 
 
 
 template <int dim>
-inline RefinementCase<dim>::RefinementCase(
+inline constexpr RefinementCase<dim>::RefinementCase(
   const typename RefinementPossibilities<dim>::Possibilities refinement_case)
   : value(refinement_case)
 {
@@ -2832,7 +2832,8 @@ inline RefinementCase<dim>::RefinementCase(
 
 
 template <int dim>
-inline RefinementCase<dim>::RefinementCase(const std::uint8_t refinement_case)
+inline constexpr RefinementCase<dim>::RefinementCase(
+  const std::uint8_t refinement_case)
   : value(refinement_case)
 {
   // check that only those bits of
@@ -2848,7 +2849,8 @@ inline RefinementCase<dim>::RefinementCase(const std::uint8_t refinement_case)
 
 
 template <int dim>
-inline DEAL_II_HOST_DEVICE RefinementCase<dim>::operator std::uint8_t() const
+inline constexpr DEAL_II_HOST_DEVICE
+  RefinementCase<dim>::operator std::uint8_t() const
 {
   return value;
 }
@@ -2856,7 +2858,7 @@ inline DEAL_II_HOST_DEVICE RefinementCase<dim>::operator std::uint8_t() const
 
 
 template <int dim>
-inline RefinementCase<dim>
+inline constexpr RefinementCase<dim>
 RefinementCase<dim>::operator|(const RefinementCase<dim> &r) const
 {
   return RefinementCase<dim>(static_cast<std::uint8_t>(value | r.value));
@@ -2865,7 +2867,7 @@ RefinementCase<dim>::operator|(const RefinementCase<dim> &r) const
 
 
 template <int dim>
-inline RefinementCase<dim>
+inline constexpr RefinementCase<dim>
 RefinementCase<dim>::operator&(const RefinementCase<dim> &r) const
 {
   return RefinementCase<dim>(static_cast<std::uint8_t>(value & r.value));
@@ -2874,7 +2876,7 @@ RefinementCase<dim>::operator&(const RefinementCase<dim> &r) const
 
 
 template <int dim>
-inline RefinementCase<dim>
+inline constexpr RefinementCase<dim>
 RefinementCase<dim>::operator~() const
 {
   return RefinementCase<dim>(static_cast<std::uint8_t>(
@@ -2884,7 +2886,7 @@ RefinementCase<dim>::operator~() const
 
 
 template <int dim>
-inline std::size_t
+inline constexpr std::size_t
 RefinementCase<dim>::memory_consumption()
 {
   return sizeof(RefinementCase<dim>);

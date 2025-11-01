@@ -2,7 +2,7 @@
 Bangerth.</i>
 <br>
 
-<a name="step-93-Intro"></a>
+<a name="step_93-Intro"></a>
 <h1>Introduction</h1>
 
 In all previous tutorial programs, we have only ever dealt with
@@ -31,7 +31,7 @@ functions and that, after discretization of the whole problem, are not
 tied to one of the cells of the mesh. As a consequence, we call these
 unknowns *non-local degrees of freedom* to represent that they are not
 tied to a specific locality: They represent something that does not
-depend to the spatial variable $\mathbf x$ at all, and is not the
+depend on the spatial variable $\mathbf x$ at all, and is not the
 result of a discretization process.
 
 Before going into how we solve this issue, let us first state the concrete set of equations.
@@ -95,7 +95,7 @@ where
 
 Note the application of integration by parts above, which makes use of the Dirichlet boundary conditions to eliminate the boundary integral. In practice, we assume that each $f_k$ is something simple. In this example step, each $f_k$ is a characteristic function as mentioned, and $m=4$. These functions, plotted together, look like this:
 
-<center><img src="https://www.dealii.org/images/steps/developer/step-93.shape_of_characteristic_functions.png"
+<center><img src="https://dealii.org/images/steps/developer/step-93.shape_of_characteristic_functions.png"
          alt="Visualization of four characteristic functions together on the same plot"
          width="50%"></center>
 

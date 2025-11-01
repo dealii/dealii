@@ -28,7 +28,9 @@
 #    include <deal.II/lac/trilinos_parallel_block_vector.h>
 #    include <deal.II/lac/trilinos_vector.h>
 
+DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
 #    include <Epetra_MpiComm.h>
+DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
 #  endif
 #endif
 
@@ -70,7 +72,7 @@ InitFinalize::InitFinalize([[maybe_unused]] int    &argc,
                            const unsigned int       max_num_threads)
   : libraries(libraries)
 {
-  [[maybe_unused]] static bool constructor_has_already_run = false;
+  static bool constructor_has_already_run = false;
   Assert(constructor_has_already_run == false,
          ExcMessage("You can only create a single object of this class "
                     "in a program since it initializes the MPI system."));

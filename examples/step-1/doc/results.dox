@@ -11,10 +11,10 @@ should look like this:
 <table width="60%" align="center">
   <tr>
     <td align="center">
-      <img src="https://www.dealii.org/images/steps/developer/step-1.grid-1-r9.2.png" alt="">
+      <img src="https://dealii.org/images/steps/developer/step-1.grid-1-r9.2.png" alt="">
     </td>
     <td align="center">
-      <img src="https://www.dealii.org/images/steps/developer/step-1.grid-2-r9.2.png" alt="">
+      <img src="https://dealii.org/images/steps/developer/step-1.grid-2-r9.2.png" alt="">
     </td>
   </tr>
 </table>
@@ -51,7 +51,8 @@ already. For example, here are two ideas:
   function by `GridGenerator::reference_cell(triangulation,
   ReferenceCells::Triangle);`. This will give you the following output
   in `grid-1.svg`:
-  <img src="https://www.dealii.org/images/steps/developer/step-1.grid-1-triangle.png" alt="">
+  <br>
+  <img src="https://dealii.org/images/steps/developer/step-1.grid-1-triangle.png" alt="" style="width:25%">
 
 - You can start with a quadrilateral mesh and convert it to a
   triangular mesh. For example, in the `first_grid()` function,
@@ -72,7 +73,8 @@ already. For example, here are two ideas:
                                                     triangulation);
   @endcode
   This produces the following mesh:
-  <img src="https://www.dealii.org/images/steps/developer/step-1.grid-1-triangle-2.png" alt="">
+  <br>
+  <img src="https://dealii.org/images/steps/developer/step-1.grid-1-triangle-2.png" alt="" style="width:25%">
 
   You can do the same in the `second_grid()` function by replacing
   @code
@@ -103,7 +105,8 @@ already. For example, here are two ideas:
       triangulation.set_manifold(i, triangulation_quad.get_manifold(i));
   @endcode
   This results in this picture:
-  <img src="https://www.dealii.org/images/steps/developer/step-1.grid-2-triangle.png" alt="">
+  <br>
+  <img src="https://dealii.org/images/steps/developer/step-1.grid-2-triangle.png" alt="" style="width:25%">
 
 
 
@@ -182,7 +185,7 @@ advice we will provide in this program: learn how to use a debugger as soon as
 possible. It will be time well invested.
 (@dealiiVideoLectureSeeAlso{25}) The deal.II Frequently Asked
 Questions (FAQ) page linked to from the top-level <a
-href="http://www.dealii.org/">deal.II webpage</a> also provides a good number
+href="http://dealii.org/">deal.II webpage</a> also provides a good number
 of hints on debugging deal.II programs.
 
 

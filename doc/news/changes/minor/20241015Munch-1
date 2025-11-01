@@ -1,6 +1,0 @@
-Improved: The new function LAPACKFullMatrix::get_state() allows to
-query the current state of LAPACKFullMatrix, which allows to decide
-which method (e.g., LAPACKFullMatrix::solve() vs.
-LAPACKFullMatrix::vmult()) to use.
-<br>
-(Peter Munch, 2024/10/15)

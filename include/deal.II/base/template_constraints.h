@@ -22,6 +22,8 @@
 #include <deal.II/base/mpi_stub.h>
 #include <deal.II/base/std_cxx20/type_traits.h>
 
+#include <deal.II/lac/vector_operation.h>
+
 #include <complex>
 #include <type_traits>
 #include <utility>
@@ -310,17 +312,6 @@ using begin_and_end_t =
 template <typename T>
 constexpr bool has_begin_and_end =
   internal::is_supported_operation<begin_and_end_t, T>;
-
-
-/**
- * A `using` declaration to make the
- * [std::identity_type](https://en.cppreference.com/w/cpp/types/type_identity)
- * class available under the name that deal.II has used for a long time.
- *
- * @deprecated Use `std_cxx20::type_identity` instead.
- */
-template <typename T>
-using identity DEAL_II_DEPRECATED = std_cxx20::type_identity<T>;
 
 
 /**
@@ -614,12 +605,6 @@ class BlockVector;
 
 namespace LinearAlgebra
 {
-  template <typename Number>
-  class Vector;
-
-  template <typename Number>
-  class BlockVector;
-
   namespace distributed
   {
     template <typename Number, typename MemorySpace>
@@ -744,10 +729,6 @@ namespace concepts
     template <typename Number>
     inline constexpr bool is_dealii_vector_type<dealii::BlockVector<Number>> =
       true;
-
-    template <typename Number>
-    inline constexpr bool
-      is_dealii_vector_type<dealii::LinearAlgebra::BlockVector<Number>> = true;
 
     template <typename Number, typename MemorySpace>
     inline constexpr bool is_dealii_vector_type<
@@ -999,7 +980,8 @@ namespace concepts
                                             VectorType                      W,
                                             typename VectorType::value_type a,
                                             typename VectorType::value_type b,
-                                            typename VectorType::value_type s) {
+                                            typename VectorType::value_type s,
+                                            VectorOperation::values operation) {
     // Check local type requirements:
     typename VectorType::value_type;
     typename VectorType::size_type;
@@ -1068,6 +1050,11 @@ namespace concepts
     {
       U.get_mpi_communicator()
     } -> std::same_as<MPI_Comm>;
+
+    // Synchronization:
+    {
+      U.compress(operation)
+    } -> std::same_as<void>;
   };
 
 

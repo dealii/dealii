@@ -222,7 +222,7 @@ namespace Step19
   // we want to solve. Recall how the domain looks like:
   //   <p align="center">
   //     <img
-  //     src="https://www.dealii.org/images/steps/developer/step-19.geometry.png"
+  //     src="https://dealii.org/images/steps/developer/step-19.geometry.png"
   //          alt="The geometry used in this program"
   //          width="600">
   //   </p>
@@ -468,7 +468,7 @@ namespace Step19
         //   illustrates the easiest way to write this algorithm, and so we are
         //   willing to incur this cost for the moment for expository purposes.
         //   We discuss the issue in more detail in the
-        //   <a href="#extensions">"possibilities for extensions" section</a>
+        //   @ref step_19-Extensions "Possibilities for extensions" section
         //   below, and use a better approach in step-70, for example.
         if (particle_handler.n_particles_in_cell(cell) > 0)
           for (const auto &particle : particle_handler.particles_in_cell(cell))

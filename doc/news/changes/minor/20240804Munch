@@ -1,5 +1,0 @@
-Fixed: MatrixFreeTools::compute_matrix() now
-correctly handles the case that individual
-components are requested.
-<br>
-(Peter Munch, 2024/08/04)

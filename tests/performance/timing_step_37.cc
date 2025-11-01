@@ -372,7 +372,7 @@ LaplaceProblem<dim>::setup_dofs()
     DoFTools::extract_locally_relevant_dofs(dof_handler);
 
   constraints.clear();
-  constraints.reinit(locally_relevant_dofs);
+  constraints.reinit(dof_handler.locally_owned_dofs(), locally_relevant_dofs);
   DoFTools::make_hanging_node_constraints(dof_handler, constraints);
   VectorTools::interpolate_boundary_values(
     mapping, dof_handler, 0, Functions::ZeroFunction<dim>(), constraints);
@@ -393,7 +393,7 @@ LaplaceProblem<dim>::setup_dofs()
       const IndexSet relevant_dofs =
         DoFTools::extract_locally_relevant_level_dofs(dof_handler, level);
       AffineConstraints<double> level_constraints;
-      level_constraints.reinit(relevant_dofs);
+      level_constraints.reinit(dof_handler.locally_owned_dofs(), relevant_dofs);
       level_constraints.add_lines(
         mg_constrained_dofs.get_boundary_indices(level));
       level_constraints.close();
@@ -442,7 +442,7 @@ LaplaceProblem<dim>::setup_matrix_free()
       const IndexSet relevant_dofs =
         DoFTools::extract_locally_relevant_level_dofs(dof_handler, level);
       AffineConstraints<double> level_constraints;
-      level_constraints.reinit(relevant_dofs);
+      level_constraints.reinit(dof_handler.locally_owned_dofs(), relevant_dofs);
       level_constraints.add_lines(
         mg_constrained_dofs.get_boundary_indices(level));
       level_constraints.close();

@@ -1,5 +1,0 @@
-New: The new functions get_normal_hessian() and submit_normal_hessian() for
-FEFaceEvaluation implement second derivatives in normal direction for the
-matrix-free framework.
-<br>
-(Maximilian Bergbauer, Andreas Koch, 2024/09/18)

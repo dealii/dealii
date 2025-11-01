@@ -98,7 +98,7 @@ test(const unsigned int flag)
     DoFTools::extract_locally_relevant_dofs(dh);
 
   AffineConstraints<double> cm;
-  cm.reinit(locally_relevant_set);
+  cm.reinit(dh.locally_owned_dofs(), locally_relevant_set);
   DoFTools::make_hanging_node_constraints(dh, cm);
   cm.close();
 

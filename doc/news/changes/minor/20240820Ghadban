@@ -1,4 +1,0 @@
-New: FESystem::compare_for_domination() now accepts two FESystem objects
-with different number of base elements.
-<br>
-(Mohamad Ghadban,  2024/08/20)

@@ -2046,9 +2046,9 @@ namespace internal
 
       // count the number of objects, of unused single objects and of
       // unused pairs of objects
-      [[maybe_unused]] unsigned int n_quads          = 0;
-      unsigned int                  n_unused_pairs   = 0;
-      unsigned int                  n_unused_singles = 0;
+      unsigned int n_quads          = 0;
+      unsigned int n_unused_pairs   = 0;
+      unsigned int n_unused_singles = 0;
       for (unsigned int i = 0; i < tria_faces.quads.used.size(); ++i)
         {
           if (tria_faces.quads.used[i])
@@ -2274,9 +2274,9 @@ namespace internal
 
           // count the number of objects, of unused single objects and of
           // unused pairs of objects
-          [[maybe_unused]] unsigned int n_objects        = 0;
-          unsigned int                  n_unused_pairs   = 0;
-          unsigned int                  n_unused_singles = 0;
+          unsigned int n_objects        = 0;
+          unsigned int n_unused_pairs   = 0;
+          unsigned int n_unused_singles = 0;
           for (unsigned int i = 0; i < tria_objects.used.size(); ++i)
             {
               if (tria_objects.used[i])
@@ -5078,7 +5078,7 @@ namespace internal
 
                 triangulation.vertices[next_unused_vertex] = line->center(true);
 
-                [[maybe_unused]] bool pair_found = false;
+                bool pair_found = false;
                 for (; next_unused_line != endl; ++next_unused_line)
                   if (!next_unused_line->used() &&
                       !(++next_unused_line)->used())
@@ -5843,7 +5843,7 @@ namespace internal
                 // now that we created the right point, make up the
                 // two child lines.  To this end, find a pair of
                 // unused lines
-                [[maybe_unused]] bool pair_found = false;
+                bool pair_found = false;
                 for (; next_unused_line != endl; ++next_unused_line)
                   if (!next_unused_line->used() &&
                       !(++next_unused_line)->used())
@@ -12296,8 +12296,7 @@ void Triangulation<dim, spacedim>::set_all_manifold_ids_on_boundary(
     ExcMessage(
       "Error: set_all_manifold_ids_on_boundary() can not be called on an empty Triangulation."));
 
-  [[maybe_unused]] bool boundary_found = false;
-
+  bool boundary_found = false;
   for (const auto &cell : this->active_cell_iterators())
     {
       // loop on faces
@@ -15845,7 +15844,7 @@ void Triangulation<dim, spacedim>::execute_coarsening_and_refinement()
   // some difficulty in the past (see the
   // deal.II/coarsening_* tests)
   if (smooth_grid & limit_level_difference_at_vertices)
-    Assert(satisfies_level1_at_vertex_rule(*this) == true, ExcInternalError());
+    Assert(satisfies_level1_at_vertex_rule(*this), ExcInternalError());
 
   // Inform all listeners about beginning of refinement.
   signals.pre_refinement();

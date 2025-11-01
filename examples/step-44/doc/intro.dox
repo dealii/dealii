@@ -6,7 +6,7 @@ Forschungsgemeinschaft, DFG), grant STE 544/39-1,  and the National Research Fou
 
 @dealiiTutorialDOI{10.5281/zenodo.439772,https://zenodo.org/badge/DOI/10.5281/zenodo.439772.svg}
 
-<a name="step-44-Intro"></a>
+<a name="step_44-Intro"></a>
 <h1>Introduction</h1>
 
 The subject of this tutorial is nonlinear solid mechanics.
@@ -713,7 +713,7 @@ This benchmark problem is taken from
   291-304.
   DOI: <a href="http://doi.org/10.1016/S0045-7949(99)00137-6">10.1016/S0045-7949(99)00137-6</a>
 
- <img src="https://www.dealii.org/images/steps/developer/step-44.setup.png" alt="">
+ <img src="https://dealii.org/images/steps/developer/step-44.setup.png" alt="">
 
 The material is quasi-incompressible neo-Hookean with <a href="http://en.wikipedia.org/wiki/Shear_modulus">shear modulus</a> $\mu = 80.194e6$ and $\nu = 0.4999$.
 For such a choice of material properties a conventional single-field $Q_1$ approach would lock.

@@ -1,6 +1,0 @@
-Updated: The interface of Rol::VectorAdaptor class now uses `ROL::Ptr`.
-It is a shared pointer wrapper for either `Teuchos::RCP` or
-`std::shared_ptr`, and can be specified while configuring Trilinos.
-See `Trilinos/packages/rol/cmake/BuildOptions.cmake` for details.
-<br>
-(Marc Fehling, 2024/11/28)

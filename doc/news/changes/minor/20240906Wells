@@ -1,4 +1,0 @@
-Fixed: Triangulation::get_boundary_ids() does not return duplicates when
-`dim == 1` any more.
-<br>
-(David Wells, 2024/09/06)

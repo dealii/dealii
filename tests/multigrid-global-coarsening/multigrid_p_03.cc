@@ -83,7 +83,8 @@ test(const unsigned int n_refinements,
 
       const IndexSet relevant_dofs =
         DoFTools::extract_locally_relevant_level_dofs(dof_handler, level);
-      constraint.reinit(relevant_dofs);
+      constraint.reinit(dof_handler.locally_owned_mg_dofs(level),
+                        relevant_dofs);
       constraint.add_lines(mg_constrained_dofs.get_boundary_indices(level));
       constraint.close();
 
@@ -102,7 +103,7 @@ test(const unsigned int n_refinements,
                             level,
                             level);
 
-  MGTransferGlobalCoarsening<dim, VectorType> transfer(
+  MGTransferMatrixFree<dim, Number> transfer(
     transfers,
     [&](const auto l, auto &vec) { operators[l].initialize_dof_vector(vec); });
 

@@ -310,7 +310,7 @@ namespace Step36
     // ensure that we can ignore them should they show up in our
     // computations.
     double min_spurious_eigenvalue = std::numeric_limits<double>::max(),
-           max_spurious_eigenvalue = -std::numeric_limits<double>::max();
+           max_spurious_eigenvalue = std::numeric_limits<double>::lowest();
 
     for (unsigned int i = 0; i < dof_handler.n_dofs(); ++i)
       if (constraints.is_constrained(i))

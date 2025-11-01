@@ -1,4 +1,0 @@
-Improved: Local operation classes of the portable matrix-free
-infrastructure do not need n_dofs_1d anymore.
-<br>
-(Peter Munch, 2024/01/28)

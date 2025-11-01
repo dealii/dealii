@@ -1,4 +1,0 @@
-New: Utilities::MPI::NoncontiguousPartitioner::export_to_ghosted_array()
-can now handle multiple components.
-<br>
-(Peter Munch, 2024/09/25)

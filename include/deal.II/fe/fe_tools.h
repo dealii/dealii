@@ -928,6 +928,69 @@ namespace FETools
   lexicographic_to_hierarchic_numbering(unsigned int degree);
 
   /**
+   * Given the polynomial degree, direction, and numbering options, this
+   * function returns a pair of vectors mapping cell DoFs to face patch DoFs
+   * in lexicographic order.
+   *
+   * This function works for scalar finite elements, specifically those derived
+   * from FE_Q and FE_DGQ. It computes the mapping from the DoFs of
+   * two adjacent cells sharing a face perpendicular to @p direction in
+   * reference space, to the DoFs on the face patch. The result is a pair of
+   * vectors: the first for the DoFs on the first cell, the second for the
+   * DoFs on the second cell. The @p cell_hierarchical_numbering flag
+   * determines whether hierarchical or lexicographic numbering is assumed for
+   * the cell DoFs. The @p is_continuous flag indicates whether the finite
+   * element space is continuous (i.e., FE_Q).
+   *
+   * @param degree Polynomial degree of the finite element.
+   * @param direction Axis perpendicular to the considered face.
+   * @param cell_hierarchical_numbering If true, use hierarchical numbering for cell DoFs.
+   * @param is_continuous If true, assumes the finite element space is continuous (FE_Q).
+   * @return A pair of vectors mapping cell DoFs to face patch DoFs in lexicographic order.
+   */
+  template <int dim>
+  std::pair<std::vector<unsigned int>, std::vector<unsigned int>>
+  cell_to_face_patch_numbering(const unsigned int &degree,
+                               const unsigned int &direction,
+                               const bool         &cell_hierarchical_numbering,
+                               const bool         &is_continuous);
+
+
+  /**
+   * @copydoc FETools::cell_to_face_patch_numbering()
+   *
+   * @deprecated Use FETools::cell_to_face_patch_numbering() instead.
+   */
+  template <int dim>
+  DEAL_II_DEPRECATED_EARLY_WITH_COMMENT(
+    "Use FETools::cell_to_face_patch_numbering() instead.")
+  std::pair<
+    std::vector<unsigned int>,
+    std::vector<unsigned int>> cell_to_face_patch(const unsigned int &degree,
+                                                  const unsigned int &direction,
+                                                  const bool &
+                                                    cell_hierarchical_numbering,
+                                                  const bool &is_continuous);
+
+  /**
+   * Given an index of a face DoF, compute the cell DoF index. This function is
+   * intended for use with single-component interpolatory elements like
+   * FE_SimplexP and FE_Q_Base in which DoFs defined on lines or quadrilaterals
+   * are rotated along with the face.
+   *
+   * @note Most applications should call FiniteElement::face_to_cell_index()
+   * instead, which may use this function in its implementation.
+   *
+   * @see FiniteElement::face_to_cell_index()
+   */
+  template <int dim, int spacedim>
+  unsigned int
+  face_to_cell_index(const FiniteElement<dim, spacedim> &fe,
+                     const unsigned int                  face_dof_index,
+                     const unsigned int                  face_no,
+                     const types::geometric_orientation  combined_orientation);
+
+  /**
    * A namespace that contains functions that help setting up internal
    * data structures when implementing FiniteElement which are build
    * from simpler ("base") elements, for example FESystem. The things
@@ -1067,7 +1130,7 @@ namespace FETools
      * individual shape functions that do not depend on whether the
      * composed element uses the tensor product or combination
      * strategy outlined in the documentation of the
-     * FETools::Composition namespace. Consequently, this function
+     * FETools::Compositing namespace. Consequently, this function
      * does not have a @p do_tensor_product argument.
      */
     template <int dim, int spacedim>
@@ -1099,7 +1162,7 @@ namespace FETools
      * individual shape functions that do not depend on whether the
      * composed element uses the tensor product or combination
      * strategy outlined in the documentation of the
-     * FETools::Composition namespace. Consequently, this function
+     * FETools::Compositing namespace. Consequently, this function
      * does not have a @p do_tensor_product argument.
      *
      * @deprecated Use the versions of this function that take a
@@ -1323,7 +1386,7 @@ namespace FETools
    * Note also that this table exists once for each space dimension. If you
    * have a program that works with finite elements in different space
    * dimensions (for example,
-   * @ref step_4 "step-4"
+   * step-4
    * does something like this), then you should call this function for each
    * space dimension for which you want your finite element added to the map.
    */

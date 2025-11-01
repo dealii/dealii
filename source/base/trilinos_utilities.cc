@@ -16,12 +16,14 @@
 #include <deal.II/base/trilinos_utilities.h>
 
 #ifdef DEAL_II_WITH_TRILINOS
+DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
 #  ifdef DEAL_II_WITH_MPI
 #    include <Epetra_MpiComm.h>
 #    include <Teuchos_DefaultComm.hpp>
 #  endif
 #  include <Epetra_SerialComm.h>
 #  include <Teuchos_RCP.hpp>
+DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
 #endif
 
 DEAL_II_NAMESPACE_OPEN

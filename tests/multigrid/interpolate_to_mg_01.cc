@@ -14,7 +14,7 @@
 
 
 // test function MGTransferMatrixFree::interpolate_to_mg() for periodic
-// boundaries
+// boundaries and min_level=0 and 1
 
 #include <deal.II/base/utilities.h>
 
@@ -59,7 +59,7 @@ public:
 
 template <int dim>
 void
-test()
+test(const unsigned int min_level)
 {
   const unsigned int fe_degree = 1;
 
@@ -85,7 +85,7 @@ test()
     DoFTools::extract_locally_relevant_dofs(dof_handler);
 
   AffineConstraints<double> constraints;
-  constraints.reinit(locally_relevant_dofs);
+  constraints.reinit(dof_handler.locally_owned_dofs(), locally_relevant_dofs);
   DoFTools::make_hanging_node_constraints(dof_handler, constraints);
 
   std::vector<
@@ -109,18 +109,29 @@ test()
   MGTransferMatrixFree<dim, double>                         mg_transfer;
 
   unsigned int n_tria_levels = tria.n_global_levels();
-  mg_qsol.resize(0, n_tria_levels - 1);
+  mg_qsol.resize(min_level, n_tria_levels - 1);
 
   mg_constrained_dofs.initialize(dof_handler);
   mg_transfer.initialize_constraints(mg_constrained_dofs);
-  mg_transfer.build(dof_handler);
+
+  std::vector<std::shared_ptr<const Utilities::MPI::Partitioner>>
+    external_partitioners(n_tria_levels);
+
+  for (unsigned int l = min_level; l < n_tria_levels; ++l)
+    external_partitioners[l] =
+      std::make_shared<const Utilities::MPI::Partitioner>(
+        dof_handler.locally_owned_mg_dofs(l),
+        DoFTools::extract_locally_active_level_dofs(dof_handler, l),
+        dof_handler.get_mpi_communicator());
+
+  mg_transfer.build(dof_handler, external_partitioners);
 
   mg_transfer.interpolate_to_mg(dof_handler, mg_qsol, qsol);
 
   for (unsigned int i = mg_qsol.min_level(); i <= mg_qsol.max_level(); ++i)
     deallog << mg_qsol[i].l2_norm() << std::endl;
 
-  deallog << "OK" << std::endl;
+  deallog << "OK" << std::endl << std::endl;
 }
 
 
@@ -131,5 +142,6 @@ main(int argc, char *argv[])
   Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
   MPILogInitAll                    all;
 
-  test<2>();
+  test<2>(0);
+  test<2>(1);
 }

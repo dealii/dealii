@@ -13,6 +13,7 @@ is funded by the Austrian Science Fund (FWF) Schrödinger Fellowship  (J4577).
 
 @dealiiTutorialDOI{10.5281/zenodo.8411345,https://zenodo.org/badge/DOI/10.5281/zenodo.8411345.svg}
 
+<a name="step_87-Intro"></a>
 <h1>Introduction</h1>
 
 This tutorial presents the advanced point-evaluation functionalities of
@@ -188,7 +189,7 @@ bubble in the following figure.
 <table align="center" class="doxtable">
   <tr>
     <td>
-        @image html https://www.dealii.org/images/steps/developer/step_87_rising_bubble.png
+        @image html https://dealii.org/images/steps/developer/step_87_rising_bubble.png
     </td>
   </tr>
 </table>

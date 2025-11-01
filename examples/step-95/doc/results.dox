@@ -1,0 +1,63 @@
+<h1>Results</h1>
+
+<h3>Convergence study</h3>
+
+The results of the convergence studies are shown in the tables below.
+
+For $p=1$ we get (for continuous elements, FE_Q):
+
+| Cycle | Mesh size | $L^2$-Error | EOC  |
+|:-----:|:---------:|:-----------:|:----:|
+|   0   |  0.3025   |  8.3792e-02 |  -   |
+|   1   |  0.1513   |  1.9073e-02 | 2.14 |
+|   2   |  0.0756   |  4.2112e-03 | 2.18 |
+|   3   |  0.0378   |  9.4586e-04 | 2.15 |
+
+We see that the $L^2$ error decreases as we refine and that the estimated
+order of convergence, EOC, is close to 2.
+
+For $p=2$ we get (again for continuous elements):
+
+| Cycle | Mesh size | $L^2$-Error | EOC  |
+|:-----:|:---------:|:-----------:|:----:|
+|   0   |  0.3025   |  1.2442e-04 |  -   |
+|   1   |  0.1513   |  9.6514e-06 | 3.69 |
+|   2   |  0.0756   |  8.3693e-07 | 3.53 |
+|   3   |  0.0378   |  7.4062e-08 | 3.50 |
+
+If we increase the degree of the finite element for both the level-set and
+the solution we observe EOC close to 3.
+
+We repeat the experiment for for discontinuous elements (FE_DGQ), where we get for $p=1$:
+
+| Cycle | Mesh size | $L^2$-Error | EOC  |
+|:-----:|:---------:|:-----------:|:----:|
+|   0   |  0.3025   | 7.8706e-02  |  -   |
+|   1   |  0.1513   | 1.8413e-02  | 2.10 |
+|   2   |  0.0756   | 4.0863e-03  | 2.17 |
+|   3   |  0.0378   | 9.3191e-04  | 2.13 |
+
+For $p=2$ we get (again for discontinuous elements):
+
+| Cycle | Mesh size | $L^2$-Error | EOC  |
+|:-----:|:---------:|:-----------:|:----:|
+|   0   |  0.3025   | 1.5622e-04  |  -   |
+|   1   |  0.1513   | 1.0739e-05  | 3.86 |
+|   2   |  0.0756   | 1.0044e-06  | 3.42 |
+|   3   |  0.0378   | 7.9919e-08  | 3.65 |
+
+We observe optimal order convergence also for DG.
+
+<h3>Possibilities for extension</h3>
+
+This tutorial could be easily extended to time dependent problems like the heat equation by adding a mass operator and a
+time integration scheme in the solver class.
+
+Another option would be to implement a different ghost penalty like the volume based ghost penalty to allow
+stabilization for arbitrary polynomial degree of the shape functions.
+
+Also, the preconditioner could be extended to a more robust scheme like multigrid.
+
+If you are interested in the mentioned possibilities for extensions we recommend our paper "High-performance matrix-free
+unfitted finite element operator evaluation" @cite bergbauer2024 where volume ghost-penalty and multigrid preconditioning  already have been
+addressed.

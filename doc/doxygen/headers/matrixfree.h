@@ -563,4 +563,350 @@ digraph G
  * and/or gradients) and the underlying shape functions, to the
  * MatrixFree::loop for avoiding to manually set this kind of information at a
  * second spot.
+ *
+ * <h3>Representation of constraints with matrix-free operators</h3>
+ *
+ * The MatrixFree object creates an efficient internal representation of
+ * constraints, in order to more efficiently deal with resolving the
+ * constraints while the entries of solution vectors are read on each cell
+ * (done by FEEvaluation::read_dof_values()). This means that
+ * AffineConstraints::distribute() is not necessary to be called on an input
+ * vector to a matrix-free loop to get a local solution representation that is
+ * compatible with the constraints. Likewise, the contribution of integrals
+ * from constrained to unconstrained entries is done within
+ * FEEvaluation::distribute_local_to_global() or
+ * FEEvaluation::integrate_scatter(), replacing the slower function
+ * AffineConstraints::distribute_local_to_global(). There is one downside with
+ * this integrated approach, namely when considering larger-scale applications
+ * with different kinds of constraints, in particular inhomogeneous
+ * constraints that might possibly change from one time-step (with an
+ * associated solve of a linear system) to the next.
+ *
+ * At this point, it is useful to clarify the concept of a homogeneous
+ * operator, which is the basic case discussed in the step-37 tutorial program
+ * with homogeneous Dirichlet boundary conditions, and where a matrix-free
+ * operator can be easily set up. In the form discussed there, the solution
+ * $u_h$ is represented by a linear combination of the basis functions using
+ * only the unknown coefficients $U_j$. A more general finite element problem
+ * might involve non-zero boundary values, which include an affine
+ * contribution in the solution $u_h$ and represented by inhomogeneous
+ * constraints. For a more detailed explanation of constraints, see also the
+ * introduction of AffineConstraints.  The affine contribution ends up at the
+ * right-hand side of the linear system, whereas the actually unknown
+ * coefficients are determined by solving a linear system. Let us discuss this
+ * case for both continuous finite elements, where those inhomogeneous
+ * boundary values are typically imposed strongly, and for discontinuous
+ * elements with a weak imposition of data separately in the next two
+ * subsections.
+ *
+ * <h4>Representation of inhomogeneous Dirichlet boundary conditions for
+ * continuous finite elements</h4>
+ *
+ * In analogy to the case of setting up a classical matrix-based linear
+ * system, the contributions of inhomogeneous data need to be split off from
+ * the part involving the unknown solution coefficients. For explaining how to
+ * split the contributions, let us start by looking at a solution
+ * representation of the form
+ * @f{eqnarray*}{
+ * u_h(\mathbf{x}) = \sum_{j\in \mathcal N} \varphi_i(\mathbf{x}) U_j =
+ * \sum_{j\in \mathcal N \setminus \mathcal N_D} \varphi_j(\mathbf{x}) U_j +
+ * \sum_{j\in \mathcal N_D} \varphi_j(\mathbf{x}) g_j.
+ * @f}
+ * Here, $U_j$ denotes the nodal values of the solution and $\mathcal N$
+ * denotes the set of all nodes. The set $\mathcal N_D\subset \mathcal N$ is
+ * the subset of the nodes that are subject to Dirichlet boundary conditions
+ * where the solution is forced to equal $U_j = g_j = g(\mathbf{x}_j)$ as the
+ * interpolation of boundary values on the Dirichlet-constrained node points
+ * $j\in \mathcal N_D$.
+ *
+ * This form of the solution can be inserted into a general PDE system with
+ * bilinear form $b(\varphi, u)$ and linear form $f(\varphi)$ (for the
+ * Laplacian considered in step-37, we have $b(\varphi, u) = (\nabla \varphi,
+ * \nabla u)_\Omega$ and $f(\varphi) = (\varphi, f)_\Omega$), which needs to
+ * be fulfilled for all basis function $\varphi$ in some discrete function
+ * space. We separate the unknown coefficients $U_j$ from known quantities,
+ * which are moved to the right-hand side. A finite element problem seeks for
+ * the coefficients $(U_j)_{j \in \mathcal N \setminus \mathcal N_D}$ such
+ * that there holds for all test functions $\varphi_i,\ i \in \mathcal N
+ * \setminus \mathcal N_D$
+ * @f{eqnarray*}{
+ * b(\varphi_i, u_h) &=& f(\varphi_i) \quad \Rightarrow \                \
+ * \sum_{j\in \mathcal N \setminus \mathcal N_D}b(\varphi_i, \varphi_j) \, U_j &=&
+ * f(\varphi_i) -\sum_{j\in \mathcal N_D} b(\varphi_i,\varphi_j)\, g_j.
+ * @f}
+ *
+ * For matrix-based methods, the contributions resulting from inhomogeneous
+ * constraints are inserted into the right-hand side vector by the function
+ * AffineConstraints::distribute_local_to_global(). A similar operation is
+ * performed by MatrixTools::apply_boundary_values(). More precisely, the
+ * contribution from the cell matrix associated with unknown coefficients
+ * $U_j$ end up in the matrix, whereas the information from an inhomogeneous
+ * constraint $g_j$ is subtracted from the entry $i$ of the vector, multiplied
+ * by the local $(i,j)$ entry of the cell matrix as the weight.  However, a
+ * matrix-free operator cannot make use of this infrastructure. This is the
+ * result of the main architecture of matrix-free methods, which evaluate the
+ * operator action, i.e., the left-hand side represented by the weak form
+ * above, within facilities like iterative solvers, where the contribution
+ * ending up in a possible right-hand side is ignored. Recall that the
+ * right-hand side is set up in a different stage of the solution
+ * algorithm. It is therefore crucial to think of the operator evaluation in
+ * terms of the solution as two parts, a part representing the homogeneous PDE
+ * operator (subject to zero Dirichlet conditions) and a part that represents
+ * the inhomogeneity.
+ *
+ * As a result, evaluators defined by MatrixFree::cell_loop() or
+ * MatrixFree::loop() represent the matrix-vector product of a
+ * <b>homogeneous</b> operator (the left-hand side of the last formula). In
+ * this setup, it does not matter whether the AffineConstraints object passed
+ * to the MatrixFree::reinit() contains inhomogeneous constraints or not, the
+ * MatrixFree::cell_loop() call will only resolve the homogeneous part of the
+ * constraints as long as it represents a <b>linear</b> operator.
+ *
+ * For the right-hand side computation, where the contribution of
+ * inhomogeneous conditions ends up, different evaluation functions compared
+ * to the above setting are necessary, and we need to explicitly generate the
+ * data that enters the right-hand side rather than using a byproduct of the
+ * matrix assembly. The generic approach is to evaluate the differential
+ * operator using the terms involving $g_j$ in the equation above, using a
+ * vector that only contains the Dirichlet values and zeros elsewhere:
+ *
+ * @code
+ * // interpolate boundary values on vector solution
+ * std::map<types::global_dof_index, double> boundary_values;
+ * VectorTools::interpolate_boundary_values(mapping,
+ *                                          dof_handler,
+ *                                          map_of_boundary_ids_and_functions,
+ *                                          boundary_values);
+ * for (const auto [boundary_dof_index, boundary_value] : boundary_values)
+ *   if (solution.locally_owned_elements().is_element(boundary_dof_index))
+ *     solution(boundary_dof_index) = boundary_value;
+ * @endcode
+ * or, equivalently, if the inhomogeneous constraints are contained in
+ * an AffineConstraints object,
+ * @code
+ * solution = 0;
+ * inhomogeneous_constraints.distribute(solution);
+ *@endcode
+ *
+ * Note, however, that this step only sets entries in constrained DoFs, which
+ * would be ignored by FEEvaluation::read_dof_values() that gets used to
+ * define the terms in $\sum_{j\in \mathcal N_D} b(\varphi_i,\varphi_j)\, g_j$
+ * with the chosen vector `solution`. There are therefore two general options
+ * to solve this situation:
+ *
+ * <h5> Using FEEvaluation::read_dof_values_plain() that does not resolve
+ * constraints </h5>
+ *
+ * To account for the case where constrained degrees of freedom contain data
+ * that is generated from inhomogeneous data, the built-in resolution of
+ * constraints for a homogeneous operator of FEEvaluation::read_dof_values()
+ * can be by-passed, using the function FEEvaluation::read_dof_values_plain()
+ * instead. An example code could look as follows:
+ * @code
+ * {
+ *   solution = 0;
+ *   inhomogeneous_constraints.distribute(solution);
+ *   solution.update_ghost_values();
+ *   system_rhs = 0;
+ *
+ *   const Table<2, VectorizedArray<double>> &coefficient = system_matrix.get_coefficient();
+ *   FEEvaluation<dim, degree_finite_element> phi(*system_matrix.get_matrix_free());
+ *   for (unsigned int cell = 0;
+ *        cell < system_matrix.get_matrix_free()->n_cell_batches();
+ *        ++cell)
+ *     {
+ *       phi.reinit(cell);
+ *       phi.read_dof_values_plain(solution);
+ *
+ *       // Implement the underlying differential equation, using the same
+ *       // of phi.evaluate(...), operation at quadrature points and
+ *       // phi.integrate(...) as in the evaluation of the matrix-vector
+ *       // product, but use a negative sign for the contribution.
+ *       // Furthermore, also add the terms to be added to the
+ *       // right-hand side of the PDE problem here.
+ *
+ *       phi.distribute_local_to_global(system_rhs);
+ *     }
+ *   system_rhs.compress(VectorOperation::add);
+ * }
+ * @endcode
+ *
+ * Notice the use of FEEvaluation::read_dof_values_plain() in this function,
+ * which ignores all constraints. Due to this setup, the code must make sure
+ * that other (homogeneous) constraints, e.g. by hanging nodes or periodicity,
+ * are correctly distributed to the input vector already because none of the
+ * constraints is considered in FEEvaluation::read_dof_values_plain().
+ *
+ * Note that the negative sign for the terms containing the $g_j$ terms
+ * (representing a subtraction of boundary data) according to the formula at
+ * the beginning of this subsection is following a more general concept,
+ * namely Newton's method for nonlinear equations applied to a linear
+ * system. As an initial guess for the variable @p solution, the inhomogeneous
+ * Dirichlet boundary conditions has been used, leading to the residual $r = f
+ * - Au_0$. The linear system would then be solved as $\Delta u = A^{-1}
+ * (f-Au)$, and we would conclude the step by computing the actual solution $u
+ * = u_0 + \Delta u$. For a linear system, we reach the exact solution after a
+ * single iteration. For a general non-linear system, the code described above
+ * would be part of a @p assemble_residual() function, where the residual is
+ * computed for a complete representation of a solution field (with initially
+ * un-converged state but correct value for the inhomogeneously constrained
+ * unknowns), which gets updated increments with zero boundary data, i.e., a
+ * homogeneous operator.
+ *
+ * This scenario is explained in the step-50 and step-66 tutorial programs.
+ *
+ * <h5> Using a second AffineConstraints object without Dirichlet conditions </h5>
+ *
+ * It is also possible to avoid going through AffineConstraints::distribute()
+ * to interpolate all constraints, which might be desirable for high-order
+ * finite elements on meshes with many hanging nodes with fast solvers where
+ * the generic algorithms of the AffineConstraints::distribute() function can
+ * be expensive. This works by equipping MatrixFree::reinit() with a second
+ * DoFHandler / AffineConstraints pair (using the same DoFHandler as for the
+ * original homogeneous operator), where the second AffineConstraints object
+ * only contains homogeneous constraints (such as hanging nodes or periodicity
+ * or Dirichlet boundaries that are always zero). This can be set up as
+ * follows (for the example of a single DoFHandler; it is of course also
+ * possible to add additional DoFHandler objects to create even more
+ * complicated scenarios):
+ *
+ * @code
+ * template <int dim>
+ * void ApplicationProblem<dim>::setup_matrix_free()
+ * {
+ *   typename MatrixFree<dim, NumberType>::AdditionalData additional_data;
+ *   additional_data.mapping_update_flags =
+ *     (update_gradients | update_JxW_values | update_quadrature_points);
+ *   matrix_free.reinit(mapping,
+ *                      {{&dof_handler, &dof_handler}},
+ *                      std::vector<const AffineConstraints<NumberType> *>
+ *                        {{&all_constraints, &constraints_homogeneous}},
+ *                      QGauss<1>(fe.degree + 1),
+ *                      additional_data);
+ * }
+ *   inhomogeneous_operator.initialize(matrix_free);
+ * @endcode
+ *
+ * In this code, we assume that `all_constraints` contains all constraints to
+ * be resolved for the homogeneous operator (which would also be used when
+ * assembling a matrix/right-hand side system with
+ * AffineConstraints::distribute_local_to_global()), whereas
+ * `constraints_homogeneous` refers to only those constraints that are known
+ * to be always homogeneous, e.g. hanging nodes and periodicity. In setting up
+ * those constraints, we would of course share the construction to make sure
+ * the two objects are in sync for the common constraints of both objects.  In
+ * the two local evaluators for the residual computation (picking up
+ * inhomogeneous constraints) and the actual matrix-vector product, we would
+ * then select the following evaluators:
+ *
+ * @code
+ * template <int dim>
+ * void
+ * ApplicationProblem<dim>::local_residual(
+ *   const MatrixFree<dim, NumberType>           &matrix_free,
+ *   VectorType                                  &residual,
+ *   const VectorType                            &solution,
+ *   const std::pair<unsigned int, unsigned int> &range)
+ * {
+ *   FEEvaluation<dim, fe_degree> eval_inhomogeneous(matrix_free, 1);
+ *   FEEvaluation<dim, fe_degree> eval_homogeneous(matrix_free, 0);
+ *
+ *   for (unsigned int cell = range.first; cell < range.second; ++cell)
+ *     {
+ *       eval_inhomogeneous.reinit(cell);
+ *       eval_inhomogeneous.read_dof_values(solution);
+ *       eval_inhomogeneous.evaluate(EvaluationFlags::values |
+ *                             EvaluationFlags::gradients);
+ *       eval_homogeneous.reinit(cell);
+ *       for (const auto q : eval_homogeneous.quadrature_point_indices())
+ *         {
+ *           const auto val  = eval_inhomogeneous.get_value(q);
+ *           const auto grad = eval_inhomogeneous.get_gradient(q);
+ *           // evaluate PDE and possible forcing terms
+ *           eval_homogeneous.submit_value(..., q);
+ *           eval_homogeneous.submit_gradient(..., q);
+ *         }
+ *       eval_homogeneous.integrate(EvaluationFlags::values |
+ *                                    EvaluationFlags::gradients);
+ *       eval_homogeneous.distribute_local_to_global(residual);
+ *     }
+ * }
+ * @endcode
+ *
+ * Notice how we set up the inhomogeneous evaluator (associated with reading
+ * the solution field including some constraints) with the index '1',
+ * corresponding to the second dof_handler / constraints pair we passed to the
+ * `setup_matrix_free()` function above, and use that to read the full
+ * underlying field. At the same time, we consider a separate evaluator,
+ * initialized with index '0', for the homogeneous part (corresponding to test
+ * functions) that gets used during the integration part. This makes sure the
+ * residual is posed for the system that includes the constraints from the
+ * boundary in a correct way.
+ *
+ * For completeness, the evaluation of the homogeneous operator (matrix-vector
+ * product) would operate solely with the first constraints object of index
+ * '0'.
+ * @code
+ * template <int dim>
+ * void
+ * ApplicationProblem<dim>::local_matrix_vector_product(
+ *   const MatrixFree<dim, NumberType>           &matrix_free,
+ *   VectorType                                  &dst,
+ *   const VectorType                            &src,
+ *   const std::pair<unsigned int, unsigned int> &range)
+ * {
+ *   FEEvaluation<dim, fe_degree> eval_homogeneous(matrix_free, 0);
+ *
+ *   for (unsigned int cell = range.first; cell < range.second; ++cell)
+ *     {
+ *       eval_homogeneous.reinit(cell);
+ *       eval_homogeneous.read_dof_values(solution);
+ *       eval_homogeneous.evaluate(EvaluationFlags::values |
+ *                           EvaluationFlags::gradients);
+ *       for (const auto q : eval_homogeneous.quadrature_point_indices())
+ *         {
+ *           const auto val  = eval_homogeneous.get_value(q);
+ *           const auto grad = eval_homogeneous.get_gradient(q);
+ *           // evaluate PDE with homogeneousogeneous terms
+ *           eval_homogeneous.submit_value(..., q);
+ *           eval_homogeneous.submit_gradient(..., q);
+ *         }
+ *       eval_homogeneous.integrate(EvaluationFlags::values |
+ *                                    EvaluationFlags::gradients);
+ *       eval_homogeneous.distribute_local_to_global(residual);
+ *     }
+ * }
+ * @endcode
+ *
+ * <h4>Representation of inhomogeneous Dirichlet boundary conditions for
+ * discontinuous elements</h4>
+ *
+ * For discontinuous elements, boundary conditions are typically imposed
+ * weakly. This means that contributions from a given field at the boundary
+ * need to be evaluated at the location of quadrature points explicitly within
+ * the integrals. As a result, the handling with matrix-free operators is
+ * similar to the case with matrices, as calculations are needed in both
+ * cases. The step-59 tutorial program contains the main concepts. Those can
+ * be summarized as follows:
+ * <ol>
+ * <li>We set up an operator that only evaluates the homogeneous part of
+ * the underlying PDE problem for the use as linear operator (matrix) within
+ * an iterative solver.</li>
+ * <li>We set up an additional operator to only evaluate inhomogeneous parts
+ * in the PDE. This can include both the source term of a linear PDE and
+ * inhomogeneous Dirichlet or Neumann data.</li>
+ * <li>For a non-linear problem, the previous function is replaced by one
+ * that evaluates the full operator, including both the solution interpolation
+ * from the current linearization point and the inhomogeneous data, alongside
+ * with the homogeneous part from the first bullet point.</li>
+ * <li>Since no data is imposed via constraints here, the same FEEvaluation
+ * object can be used (i.e., from the same DoFHandler/AffineConstraints pair),
+ * but with different interpretations and terms in the two cases. It
+ * depends on the chosen discretization as to how the two cases look like
+ * specifically.</li>
+ * </ol>
+ *
+ * We note that explicit time integrators, such as the one used in the
+ * step-67, step-76 and step-89 tutorial programs, use the full operator as
+ * described in the third bullet point of the list.
  */

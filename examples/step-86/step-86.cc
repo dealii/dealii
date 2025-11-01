@@ -203,7 +203,7 @@ namespace Step86
     // the same degrees of freedom, but with zero values even if the boundary
     // values for the solution are non-zero; we will keep this modified set of
     // constraints in `homogeneous_constraints`.
-    AffineConstraints<double> hanging_nodes_constraints;
+    AffineConstraints<double> hanging_node_constraints;
     AffineConstraints<double> current_constraints;
     AffineConstraints<double> homogeneous_constraints;
 
@@ -309,6 +309,17 @@ namespace Step86
   // derivative of the solution when computing the residual. We use the
   // `homogeneous_constraints` object for this purpose.
   //
+  // Note one detail here: The function
+  // AffineConstraints::make_consistent_in_parallel() might expand the
+  // underlying IndexSet for locally stored lines of the
+  // `hanging_node_constraints` object depending on how constraints are set up
+  // in parallel. Thus, at the point where we want to create a second affine
+  // constraints object that gets the information from the hanging node
+  // constraints, we need to make sure to use the local lines stored in the
+  // hanging node constraints, not the `locally_relevant_dofs` that object was
+  // originally initialized to. If this is not respected, errors might appear
+  // during the course of the simulation.
+  //
   // Finally, we create the actual non-homogeneous `current_constraints` by
   // calling `update_current_constraints). These are also used during the
   // assembly and during the residual evaluation.
@@ -330,26 +341,28 @@ namespace Step86
       DoFTools::extract_locally_relevant_dofs(dof_handler);
 
 
-    hanging_nodes_constraints.clear();
-    hanging_nodes_constraints.reinit(locally_owned_dofs, locally_relevant_dofs);
+    hanging_node_constraints.clear();
+    hanging_node_constraints.reinit(locally_owned_dofs, locally_relevant_dofs);
     DoFTools::make_hanging_node_constraints(dof_handler,
-                                            hanging_nodes_constraints);
-    hanging_nodes_constraints.make_consistent_in_parallel(locally_owned_dofs,
-                                                          locally_relevant_dofs,
-                                                          mpi_communicator);
-    hanging_nodes_constraints.close();
+                                            hanging_node_constraints);
+    hanging_node_constraints.make_consistent_in_parallel(locally_owned_dofs,
+                                                         locally_relevant_dofs,
+                                                         mpi_communicator);
+    hanging_node_constraints.close();
 
 
     homogeneous_constraints.clear();
-    homogeneous_constraints.reinit(locally_owned_dofs, locally_relevant_dofs);
-    homogeneous_constraints.merge(hanging_nodes_constraints);
+    homogeneous_constraints.reinit(locally_owned_dofs,
+                                   hanging_node_constraints.get_local_lines());
+    homogeneous_constraints.merge(hanging_node_constraints);
     VectorTools::interpolate_boundary_values(dof_handler,
                                              0,
                                              Functions::ZeroFunction<dim>(),
                                              homogeneous_constraints);
-    homogeneous_constraints.make_consistent_in_parallel(locally_owned_dofs,
-                                                        locally_relevant_dofs,
-                                                        mpi_communicator);
+    homogeneous_constraints.make_consistent_in_parallel(
+      locally_owned_dofs,
+      hanging_node_constraints.get_local_lines(),
+      mpi_communicator);
     homogeneous_constraints.close();
 
 
@@ -894,7 +907,7 @@ namespace Step86
     solution_trans.interpolate(all_out_ptr);
 
     for (PETScWrappers::MPI::Vector &v : all_out)
-      hanging_nodes_constraints.distribute(v);
+      hanging_node_constraints.distribute(v);
   }
 
 
@@ -912,15 +925,17 @@ namespace Step86
   template <int dim>
   void HeatEquation<dim>::update_current_constraints(const double time)
   {
-    if (current_constraints.n_constraints() == 0 ||
+    if (Utilities::MPI::sum(current_constraints.n_constraints(),
+                            mpi_communicator) == 0 ||
         time != boundary_values_function.get_time())
       {
         TimerOutput::Scope t(computing_timer, "update current constraints");
 
         boundary_values_function.set_time(time);
         current_constraints.clear();
-        current_constraints.reinit(locally_owned_dofs, locally_relevant_dofs);
-        current_constraints.merge(hanging_nodes_constraints);
+        current_constraints.reinit(locally_owned_dofs,
+                                   hanging_node_constraints.get_local_lines());
+        current_constraints.merge(hanging_node_constraints);
         VectorTools::interpolate_boundary_values(dof_handler,
                                                  0,
                                                  boundary_values_function,

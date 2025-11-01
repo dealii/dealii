@@ -34,7 +34,9 @@ main()
         full_matrix(i, i) = 1;
 
       MatrixOut matrix_out;
-      matrix_out.build_patches(full_matrix, "full_matrix");
+      matrix_out.build_patches(full_matrix,
+                               "full_matrix",
+                               {false, 1, false, false});
       matrix_out.write_gnuplot(logfile);
     };
 

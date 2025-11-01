@@ -1,8 +1,0 @@
-Deprecated: The Utilities::MPI::ConsensusAlgorithms::Payload base
-class has been deprecated. It used to serve as an interface class for
-the algorithms in namespace Utilities::MPI::ConsensusAlgorithms, but
-we have since come up with ways of formulating these algorithms in
-terms of function objects that are more flexible than the base
-class/virtual function interface now deprecated.
-<br>
-(Wolfgang Bangerth, 2024/11/12)

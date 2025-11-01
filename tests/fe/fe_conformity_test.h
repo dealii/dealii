@@ -12,7 +12,8 @@
 //
 // ------------------------------------------------------------------------
 
-#pragma once
+#ifndef dealii_tests_fe_conformity_test_h
+#define dealii_tests_fe_conformity_test_h
 
 #include <deal.II/base/quadrature_lib.h>
 #include <deal.II/base/tensor.h>
@@ -516,3 +517,5 @@ namespace FEConforimityTest
     run_test();
   }
 } // namespace FEConforimityTest
+
+#endif

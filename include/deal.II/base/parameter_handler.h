@@ -626,7 +626,7 @@ class MultipleParameterLoop;
  *     prm.parse_input ("prmtest.prm");
  *     // print parameters to std::cout as ASCII text
  *     std::cout << "\n\n";
- *     prm.print_parameters (std::cout, ParameterHandler::Text);
+ *     prm.print_parameters (std::cout, ParameterHandler::PRM);
  *     // get parameters into the program
  *     std::cout << "\n\n" << "Getting parameters:" << std::endl;
  *     p.get_parameters (prm);
@@ -1722,8 +1722,9 @@ public:
                  std::string,
                  std::string,
                  << "There are unequal numbers of 'subsection' and 'end' "
-                    "statements in the parameter file <"
-                 << arg1 << ">." << (arg2.size() > 0 ? "\n" + arg2 : ""));
+                    "statements in the parameter file"
+                 << (arg1.empty() ? "" : (" <" + arg1 + ">")) << "."
+                 << (arg2.empty() ? "" : ("\n" + arg2)));
 
   /**
    * Exception for when, during parsing of a parameter file, the parser
@@ -1733,8 +1734,9 @@ public:
                  int,
                  std::string,
                  std::string,
-                 << "Line <" << arg1 << "> of file <" << arg2
-                 << ">: You are trying to enter a subsection '" << arg3
+                 << "Line <" << arg1 << ">"
+                 << (arg2.empty() ? "" : (" of file <" + arg2 + ">"))
+                 << ": You are trying to enter a subsection '" << arg3
                  << "', but the ParameterHandler object does "
                  << "not know of any such subsection.");
 
@@ -1747,27 +1749,28 @@ public:
                  int,
                  std::string,
                  std::string,
-                 << "Line <" << arg1 << "> of file <" << arg2 << ">: " << arg3);
+                 << "Line <" << arg1 << ">"
+                 << (arg2.empty() ? "" : (" of file <" + arg2 + ">")) << ": "
+                 << arg3);
 
   /**
    * Exception for an entry in a parameter file that does not match the
    * provided pattern. The arguments are, in order, the line number, file
    * name, entry value, entry name, and a description of the pattern.
    */
-  DeclException5(ExcInvalidEntryForPattern,
-                 int,
-                 std::string,
-                 std::string,
-                 std::string,
-                 std::string,
-                 << "Line <" << arg1 << "> of file <" << arg2
-                 << ">:\n"
-                    "    The entry value \n"
-                 << "        " << arg3 << '\n'
-                 << "    for the entry named\n"
-                 << "        " << arg4 << '\n'
-                 << "    does not match the given pattern:\n"
-                 << "        " << arg5);
+  DeclException5(
+    ExcInvalidEntryForPattern,
+    int,
+    std::string,
+    std::string,
+    std::string,
+    std::string,
+    << "In line <" << arg1 << ">"
+    << (arg2.empty() ? "" : (" of file <" + arg2 + ">")) << ": The value <"
+    << arg3 << "> for the parameter entry named <" << arg4
+    << "> does not match the pattern expected for this parameter.\n"
+       "The expected pattern for this parameter is:\n"
+    << arg5);
 
   /**
    * Exception for when an XML file cannot be read at all. This happens when
@@ -1789,8 +1792,9 @@ public:
     int,
     std::string,
     std::string,
-    << "Line <" << arg1 << "> of file <" << arg2
-    << ">: This line "
+    << "Line <" << arg1 << ">"
+    << (arg2.empty() ? "" : (" of file <" + arg2 + ">"))
+    << ": This line "
        "contains an 'include' or 'INCLUDE' statement, but the given "
        "file to include <"
     << arg3 << "> cannot be opened.");

@@ -1,4 +1,4 @@
-<a name="step-6-Intro"></a>
+<a name="step_6-Intro"></a>
 <h1>Introduction</h1>
 
 @dealiiVideoLecture{15,16,17,17.25,17.5,17.75}
@@ -99,14 +99,14 @@ simple situation:
 A more complicated two-dimensional mesh would look like this (and is
 discussed in the "Results" section below):
 
-<img src="https://www.dealii.org/images/steps/developer/step_6_grid_5_ladutenko.svg"
+<img src="https://dealii.org/images/steps/developer/step_6_grid_5_ladutenko.svg"
      alt="Fifth adaptively refined Ladutenko grid: the cells are clustered
           along the inner circle."
      width="300" height="300">
 
 Finally, a three-dimensional mesh (from step-43) with such hanging nodes is shown here:
 
-<img src="https://www.dealii.org/images/steps/developer/step-43.3d.mesh.png" alt=""
+<img src="https://dealii.org/images/steps/developer/step-43.3d.mesh.png" alt=""
      width="300" height="300">
 
 The first and third mesh are of course based on a square and a cube, but as the

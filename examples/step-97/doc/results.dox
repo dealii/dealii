@@ -88,14 +88,14 @@ potentials is not very informative as their conservative portions are unknown.
 
 @htmlonly
 <p align="center">
-  <img src="images/steps/developer/step-97-Jf.svg" alt="The result - free-current
+  <img src="https://dealii.org/images/steps/developer/step-97-Jf.svg" alt="The result - free-current
  density" height="531">
 </p>
 @endhtmlonly
 
 @htmlonly
 <p align="center">
-  <img src="images/steps/developer/step-97-B.svg" alt="The result - magnetic field
+  <img src="https://dealii.org/images/steps/developer/step-97-B.svg" alt="The result - magnetic field
  density" height="531">
 </p>
 @endhtmlonly

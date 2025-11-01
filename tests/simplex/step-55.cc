@@ -465,7 +465,8 @@ namespace Step55
     // to put this function call in, in case adaptive refinement gets
     // introduced later.
     {
-      constraints.reinit(locally_relevant_dofs);
+      constraints.reinit(dof_handler.locally_owned_dofs(),
+                         locally_relevant_dofs);
 
       const FEValuesExtractors::Vector velocities(0);
       DoFTools::make_hanging_node_constraints(dof_handler, constraints);

@@ -16,7 +16,6 @@
 #include <deal.II/base/logstream.h>
 #include <deal.II/base/memory_consumption.h>
 #include <deal.II/base/parameter_handler.h>
-#include <deal.II/base/path_search.h>
 #include <deal.II/base/utilities.h>
 
 #define BOOST_BIND_GLOBAL_PLACEHOLDERS
@@ -614,7 +613,10 @@ ParameterHandler::parse_input_from_string(const std::string &s,
                                           const bool         skip_undefined)
 {
   std::istringstream input_stream(s);
-  parse_input(input_stream, "input string", last_line, skip_undefined);
+  parse_input(input_stream,
+              /* filename is unknown: */ "",
+              last_line,
+              skip_undefined);
 }
 
 
@@ -2066,9 +2068,11 @@ ParameterHandler::scan_line(std::string        line,
           if (entries->get<std::string>(path + path_separator +
                                         "deprecation_status") == "true")
             {
-              std::cerr << "Warning in line <" << current_line_n
-                        << "> of file <" << input_filename
-                        << ">: You are using the deprecated spelling <"
+              std::cerr << "Warning in line <" << current_line_n << ">"
+                        << (input_filename.empty() ?
+                              "" :
+                              (" of file <" + input_filename + ">"))
+                        << ": You are using the deprecated spelling <"
                         << entry_name << "> of the parameter <"
                         << entries->get<std::string>(path + path_separator +
                                                      "alias")
@@ -2143,12 +2147,18 @@ ParameterHandler::scan_line(std::string        line,
         }
       else
         {
-          AssertThrow(
-            skip_undefined,
-            ExcCannotParseLine(current_line_n,
-                               input_filename,
-                               ("No entry with name <" + entry_name +
-                                "> was declared in the current subsection.")));
+          AssertThrow(skip_undefined,
+                      ExcCannotParseLine(
+                        current_line_n,
+                        input_filename,
+                        ("You are trying to set a value for parameter <" +
+                         entry_name +
+                         ">, but no such parameter was declared in the "
+                         "current subsection. Did you mis-spell the name "
+                         "of the parameter, or are trying to set a parameter "
+                         "that has been removed in a previous version of the "
+                         "program? Or does the parameter belong to a different "
+                         "subsection?")));
         }
     }
   // an include statement?

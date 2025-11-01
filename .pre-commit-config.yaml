@@ -1,6 +1,6 @@
 repos:
 - repo: https://github.com/pre-commit/pre-commit-hooks
-  rev: v5.0.0
+  rev: v6.0.0
   hooks:
   - id: check-added-large-files
     args: [--maxkb=8192]
@@ -28,7 +28,7 @@ repos:
         )
     exclude: ^bundled/
 - repo: https://github.com/gitleaks/gitleaks
-  rev: v8.27.2
+  rev: v8.28.0
   hooks:
   - id: gitleaks
 - repo: https://github.com/pre-commit/mirrors-clang-format
@@ -41,8 +41,17 @@ repos:
             \.cc |
             \.h
         )$
+- repo: https://github.com/psf/black-pre-commit-mirror
+  rev: 25.9.0
+  hooks:
+    - id: black
+      exclude: |
+        (?x)(
+            ^bundled/ |
+            ^contrib/utilities/dotgdbinit.py
+        )
 - repo: https://github.com/crate-ci/typos
-  rev: v1.33.1
+  rev: v1.36.3
   hooks:
   - id: typos
     files: (?x) ^(doc|examples|include|source|tests)/
@@ -51,5 +60,10 @@ repos:
   - id: detect-include-cycles
     name: Detect '#include' cycles
     entry: python contrib/utilities/detect_include_cycles.py
+    pass_filenames: false
+    language: system
+  - id: detect-merges-in-feature-branch
+    name: Detect merge commits in current feature branch
+    entry: bash contrib/utilities/detect_merges_from_master_in_feature_branch.sh
     pass_filenames: false
     language: system

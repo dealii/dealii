@@ -61,7 +61,8 @@ merge_check()
 
       // check that the `merge' function
       // works correctly
-      AffineConstraints<double> c1(local_lines), c2(local_lines);
+      AffineConstraints<double> c1(local_lines, local_lines),
+        c2(local_lines, local_lines);
 
       // enter simple line
       c1.add_line(index_0);

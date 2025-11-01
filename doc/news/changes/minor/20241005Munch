@@ -1,4 +1,0 @@
-Improved: TableHandler now correctly outputs Integers if
-TableHandler::set_scientific() is set.
-<br>
-(Peter Munch, 2024/10/05)

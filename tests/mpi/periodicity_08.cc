@@ -142,7 +142,7 @@ test()
   /// creating combined hanging node and periodic constraint matrix
   AffineConstraints<double> constraints;
   constraints.clear();
-  constraints.reinit(locally_relevant_dofs);
+  constraints.reinit(dof_handler.locally_owned_dofs(), locally_relevant_dofs);
 
   for (int d = 0; d < dim; ++d)
     DoFTools::make_periodicity_constraints(

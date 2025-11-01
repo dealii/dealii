@@ -20,11 +20,13 @@
 #  include <deal.II/lac/trilinos_sparse_matrix.h>
 #  include <deal.II/lac/vector.h>
 
+DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
 #  include <Epetra_MultiVector.h>
 #  include <Ifpack.h>
 #  include <Ifpack_Chebyshev.h>
 #  include <Teuchos_ParameterList.hpp>
 #  include <Teuchos_RCP.hpp>
+DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
 
 DEAL_II_NAMESPACE_OPEN
 

@@ -1,6 +1,0 @@
-Improved: A default expression can now be use when
-declaring a ParsedFunction. This change allows for
-a default value different than zero which wasn't
-previously possible.
-<br>
-(Olivier Gaboriault, 2025/02/28)

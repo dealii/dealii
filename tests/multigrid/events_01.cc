@@ -148,7 +148,8 @@ namespace Step50
 
     solution.reinit(mg_dof_handler.locally_owned_dofs(), MPI_COMM_WORLD);
     system_rhs.reinit(mg_dof_handler.locally_owned_dofs(), MPI_COMM_WORLD);
-    constraints.reinit(locally_relevant_set);
+    constraints.reinit(mg_dof_handler.locally_owned_dofs(),
+                       locally_relevant_set);
     DoFTools::make_hanging_node_constraints(mg_dof_handler, constraints);
 
     std::map<types::boundary_id, const Function<dim> *> dirichlet_boundary;
@@ -282,7 +283,8 @@ namespace Step50
       {
         const IndexSet dofset =
           DoFTools::extract_locally_relevant_level_dofs(mg_dof_handler, level);
-        boundary_constraints[level].reinit(dofset);
+        boundary_constraints[level].reinit(
+          mg_dof_handler.locally_owned_mg_dofs(level), dofset);
         boundary_constraints[level].add_lines(
           mg_constrained_dofs.get_refinement_edge_indices(level));
         boundary_constraints[level].add_lines(

@@ -332,7 +332,7 @@ namespace Differentiation
     {
       static_assert(std::is_same_v<ad_type, adouble>,
                     "Incorrect template type selected for taped ad_type");
-      static_assert(is_taped == true, "Incorrect setting for taping");
+      static_assert(is_taped, "Incorrect setting for taping");
     };
 
 
@@ -354,7 +354,7 @@ namespace Differentiation
     {
       static_assert(std::is_same_v<ad_type, std::complex<adouble>>,
                     "Incorrect template type selected for taped ad_type");
-      static_assert(is_taped == true, "Incorrect setting for taping");
+      static_assert(is_taped, "Incorrect setting for taping");
     };
 
 
@@ -375,7 +375,7 @@ namespace Differentiation
     {
       static_assert(std::is_same_v<ad_type, adtl::adouble>,
                     "Incorrect template type selected for tapeless ad_type");
-      static_assert(is_tapeless == true, "Incorrect setting for taping");
+      static_assert(is_tapeless, "Incorrect setting for taping");
     };
 
 
@@ -398,7 +398,7 @@ namespace Differentiation
     {
       static_assert(std::is_same_v<ad_type, std::complex<adtl::adouble>>,
                     "Incorrect template type selected for tapeless ad_type");
-      static_assert(is_tapeless == true, "Incorrect setting for taping");
+      static_assert(is_tapeless, "Incorrect setting for taping");
     };
 
 

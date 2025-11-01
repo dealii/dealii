@@ -77,7 +77,7 @@ test()
     DoFTools::extract_locally_relevant_dofs(dh);
 
   AffineConstraints<double> constraints;
-  constraints.reinit(locally_relevant_dofs);
+  constraints.reinit(dh.locally_owned_dofs(), locally_relevant_dofs);
   DoFTools::make_hanging_node_constraints(dh, constraints);
 
   deallog << "OK" << std::endl;

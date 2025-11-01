@@ -1,5 +1,0 @@
-New: The TaskResult::emplace_object() function sets the value of a
-TaskResult object to a specific value without requiring running a
-function on a separate task.
-<br>
-(Wolfgang Bangerth, 2024/08/21)

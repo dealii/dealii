@@ -261,9 +261,11 @@ namespace internal
       insert_constraint(const size_type constrained_local_dof);
 
       /**
-       * Return the number of constrained dofs in the structure. Constrained
-       * dofs do not contribute directly to the matrix, but are needed in order
-       * to set matrix diagonals and resolve inhomogeneities.
+       * Return the number of degrees of freedom for which this object
+       * stores constraints. Note that this is the number of degrees
+       * of freedom for which the *current* MPI process stores
+       * constraints, not the total number of constrained degrees of
+       * freedom across all processes.
        */
       size_type
       n_constraints() const;
@@ -490,6 +492,44 @@ namespace internal
  * be set using the set_inhomogeneity() function. After all constraints have
  * been added, you need to call close(), which compresses the storage format
  * and sorts the entries.
+ *
+ *
+ * <h3>Interpretation of constraints</h3>
+ *
+ * Whereas this class *stores* constraints in the form
+ * @f[
+ *  x_i = \sum_j a_{ij} x_j + b_i,
+ * @f]
+ * this does not mean that one should consider the $x_j$ to be unconstrained
+ * variables that can be computed on their own, and the $x_i$ then to be
+ * constrained variables whose values are determined by the unconstrained
+ * degrees of freedom. Rather, at a conceptual level, one *should* think
+ * of these constraints as of the form
+ * @f[
+ *  x_i - \sum_j a_{ij} x_j = b_i,
+ * @f]
+ * where it is clear that *all* of the variables that appear on the left
+ * are degrees of freedom, and that there just happens to be a constraint that
+ * couples all of them via an equation, without designating any of the variables
+ * as conceptually different from the other.
+ *
+ * To give an example that is also used in the @ref constraints
+ * documentation module, a typical hanging node constraint has the form
+ * $x_2=\frac 12 x_0 + \frac 12 x_1$ in a situation like the following:
+ *       @image html hp-refinement-simple.png
+ * We often talk about this situation as saying that we need the hanging
+ * node $x_2$ to have the specific value $\frac 12 x_0 + \frac 12 x_1$ to
+ * ensure that the solution is continuous at this node. This suggests that
+ * $x_0$ and $x_1$ are unconstrained degrees of freedom that can be computed
+ * on their own (or, to be more precise: from a linear system that is formed
+ * by only the equations for all unconstrained degrees of freedom), and that
+ * we can compute the constrained DoFs like $x_2$ from them in a follow-up
+ * step. Alas, this is not the correct view: If we wanted to remove $x_2$
+ * from the linear system, for example by removing row and column 2, then
+ * we will only get the same solution for $x_0$ and $x_1$ if we *also*
+ * modify the remaining equations. It is precisely these modifications that
+ * this class efficiently implements.
+ *
  *
  * @note Many of the algorithms this class implements are discussed in the
  * @ref hp_paper.

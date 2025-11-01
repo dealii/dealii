@@ -91,7 +91,7 @@ test()
   const IndexSet locally_relevant_set =
     DoFTools::extract_locally_relevant_dofs(mg_dof_handler);
 
-  constraints.reinit(locally_relevant_set);
+  constraints.reinit(mg_dof_handler.locally_owned_dofs(), locally_relevant_set);
   DoFTools::make_hanging_node_constraints(mg_dof_handler, constraints);
 
   const std::set<types::boundary_id> dirichlet_boundary_ids = {0};

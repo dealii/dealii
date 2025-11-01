@@ -172,7 +172,7 @@ namespace Step40
     system_rhs.reinit(locally_owned_dofs, mpi_communicator);
 
     constraints.clear();
-    constraints.reinit(locally_relevant_dofs);
+    constraints.reinit(locally_owned_dofs, locally_relevant_dofs);
     DoFTools::make_hanging_node_constraints(dof_handler, constraints);
     VectorTools::interpolate_boundary_values(
       mapping, dof_handler, 0, Functions::ZeroFunction<dim>(), constraints);
@@ -265,11 +265,7 @@ namespace Step40
 
     SolverControl solver_control(dof_handler.n_dofs(), 1e-12);
 
-#ifdef USE_PETSC_LA
-    LA::SolverCG solver(solver_control, mpi_communicator);
-#else
-    LA::SolverCG             solver(solver_control);
-#endif
+    LA::SolverCG solver(solver_control);
 
     LA::MPI::PreconditionAMG preconditioner;
 

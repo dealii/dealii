@@ -216,7 +216,7 @@ namespace Step27
     system_rhs.reinit(locally_owned_dofs, mpi_communicator);
 
     constraints.clear();
-    constraints.reinit(locally_relevant_dofs);
+    constraints.reinit(locally_owned_dofs, locally_relevant_dofs);
     DoFTools::make_hanging_node_constraints(dof_handler, constraints);
     VectorTools::interpolate_boundary_values(dof_handler,
                                              0,
@@ -335,7 +335,7 @@ namespace Step27
       // Loss of precision with a factor of 1e-12 with Trilinos
       false,
       false);
-    LA::SolverCG cg(solver_control, mpi_communicator);
+    LA::SolverCG cg(solver_control);
 
     LA::MPI::PreconditionAMG                 preconditioner;
     LA::MPI::PreconditionAMG::AdditionalData data;

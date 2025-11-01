@@ -265,7 +265,7 @@ tracer particles.
 
 <p align="center">
    <div class="img" align="center">
-      <img src="https://www.dealii.org/images/steps/developer/step-70.2d_tracing.gif"
+      <img src="https://dealii.org/images/steps/developer/step-70.2d_tracing.gif"
            alt = ""
            width="500">
     </div>
@@ -281,46 +281,49 @@ Time : 0, time step: 0.002
    Number of degrees of freedom: 9539 (8450+1089 -- 0+0)
 Tracer particles: 337
 Solid particles: 9216
-   Solved in 158 iterations.
+   Solved in 162 iterations.
    Number of degrees of freedom: 9845 (8722+1123 -- 9216+337)
 Cycle 1:
 Time : 0.002, time step: 0.002
-   Solved in 142 iterations.
+   Solved in 146 iterations.
 Cycle 2:
 Time : 0.004, time step: 0.002
-   Solved in 121 iterations.
+   Solved in 119 iterations.
 Cycle 3:
 Time : 0.006, time step: 0.002
-   Solved in 121 iterations.
+   Solved in 128 iterations.
 
 ...
 
 Cycle 499:
 Time : 0.998, time step: 0.002
-   Solved in 199 iterations.
+   Solved in 198 iterations.
 Cycle 500:
 Time : 1, time step: 0.002
    Solved in 196 iterations.
 
+
 +---------------------------------------------+------------+------------+
-| Total wallclock time elapsed since start    |       302s |            |
+| Total wallclock time elapsed since start    |       115s |            |
 |                                             |            |            |
 | Section                         | no. calls |  wall time | % of total |
 +---------------------------------+-----------+------------+------------+
-| Assemble Nitsche terms          |       501 |      43.3s |        14% |
-| Assemble Stokes terms           |       501 |      21.5s |       7.1% |
-| Initial setup                   |         1 |  0.000792s |         0% |
-| Output fluid                    |       502 |      31.8s |        11% |
-| Output solid particles          |       502 |      32.2s |        11% |
-| Output tracer particles         |       502 |      0.61s |       0.2% |
-| Refine                          |       100 |      4.68s |       1.5% |
-| Set solid particle position     |       500 |      3.34s |       1.1% |
-| Set tracer particle motion      |       501 |     0.729s |      0.24% |
-| Setup dofs                      |       101 |       2.2s |      0.73% |
-| Solve                           |       501 |       164s |        54% |
+| Assemble Nitsche terms          |       501 |      15.3s |        13% |
+| Assemble Stokes terms           |       501 |      8.96s |       7.8% |
+| Initial setup                   |         1 |  0.000388s |         0% |
+| Output fluid                    |       502 |      5.08s |       4.4% |
+| Output solid particles          |       502 |      2.73s |       2.4% |
+| Output tracer particles         |       502 |      1.35s |       1.2% |
+| Refine                          |       100 |      1.88s |       1.6% |
+| Set solid particle position     |       500 |     0.519s |      0.45% |
+| Set tracer particle motion      |       501 |     0.162s |      0.14% |
+| Setup dofs                      |       101 |      1.05s |      0.92% |
+| Solve                           |       501 |      78.7s |        69% |
 +---------------------------------+-----------+------------+------------+
 @endcode
 
+Note that the timing information above was produced with an example that
+was compiled in release mode, and the times of course depend on your processor.
 You may notice that assembling the coupling system is more expensive than
 assembling the Stokes part. This depends highly on the number of Gauss points
 (solid particles) that are used to apply the Nitsche restriction.
@@ -354,7 +357,7 @@ after one time unit of flow.
 
 <p align="center">
    <div class="img" align="center">
-      <img src="https://www.dealii.org/images/steps/developer/step-70.tracer_comparison.png"
+      <img src="https://dealii.org/images/steps/developer/step-70.tracer_comparison.png"
            alt = ""
            width="500">
     </div>

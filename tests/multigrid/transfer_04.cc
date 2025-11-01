@@ -130,7 +130,8 @@ check_fe(FiniteElement<dim> &fe)
   AffineConstraints<double> hanging_node_constraints;
   const IndexSet            locally_relevant_set =
     DoFTools::extract_locally_relevant_dofs(dofh);
-  hanging_node_constraints.reinit(locally_relevant_set);
+  hanging_node_constraints.reinit(dofh.locally_owned_dofs(),
+                                  locally_relevant_set);
   DoFTools::make_hanging_node_constraints(dofh, hanging_node_constraints);
   hanging_node_constraints.close();
 

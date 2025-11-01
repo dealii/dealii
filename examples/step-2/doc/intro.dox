@@ -1,4 +1,4 @@
-<a name="step-2-Intro"></a>
+<a name="step_2-Intro"></a>
 <h1>Introduction</h1>
 
 @dealiiVideoLecture{9}
@@ -81,7 +81,7 @@ and a finite element, and enumerate the degrees of freedom. In the
 current context, this means simply giving each vertex of the mesh a
 DoF index. Once that has happened, we will output in a picture which
 vertex ended up with which DoF index. You can find the corresponding
-pictures in the <a href="#Results">results section</a> of this tutorial.
+pictures in the @ref step_2-ResultsSection "results section" of this tutorial.
 
 It is probably worth pointing out that where each DoF is geometrically
 located is not a question we typically ask in finite element
@@ -184,4 +184,4 @@ get without explicit renumbering.
 In the program below, we will use the algorithm of Cuthill and McKee to do
 so. We will show the sparsity pattern for both the original enumeration of
 degrees of freedom and of the renumbered version below,
-in the <a href="#Results">results section</a>.
+in the @ref step_2-ResultsSection "results section".

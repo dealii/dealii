@@ -1,8 +1,0 @@
-Fixed: The function GridGenerator::quarter_hyper_shell would colorize
-the boundary ids of the triangulation incorrectly if the created shell
-was too thin. In particular the top and bottom boundary ids would
-not be set. This did not matter for the bottom boundary since it is 0,
-which is also the default value, but the top boundary would not be
-marked correctly for these geometries. This is fixed now.
-<br>
-(Rene Gassmoeller, 2025/06/18)

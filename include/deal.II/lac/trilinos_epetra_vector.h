@@ -28,7 +28,9 @@
 #  include <deal.II/lac/vector_operation.h>
 #  include <deal.II/lac/vector_type_traits.h>
 
+DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
 #  include <Epetra_FEVector.h>
+DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
 
 #  include <memory>
 
@@ -334,20 +336,6 @@ namespace LinearAlgebra
         VectorOperation::values        operation,
         const std::shared_ptr<const Utilities::MPI::CommunicationPatternBase>
           &communication_pattern = {});
-
-      /**
-       * @deprecated Use import_elements() instead.
-       */
-      DEAL_II_DEPRECATED
-      void
-      import(
-        const ReadWriteVector<double> &V,
-        const VectorOperation::values  operation,
-        const std::shared_ptr<const Utilities::MPI::CommunicationPatternBase>
-          &communication_pattern = {})
-      {
-        import_elements(V, operation, communication_pattern);
-      }
 
       /** @} */
 

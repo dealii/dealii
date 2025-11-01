@@ -37,7 +37,8 @@ merge_check()
   local_lines.compress();
 
   // works correctly
-  AffineConstraints<double> c1(local_lines), c2(local_lines);
+  AffineConstraints<double> c1(local_lines, local_lines),
+    c2(local_lines, local_lines);
   for (types::global_dof_index i = 99999800; i < local_lines.size(); ++i)
     if (i % 2 == 1)
       c1.constrain_dof_to_zero(i);
