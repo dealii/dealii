@@ -1,0 +1,109 @@
+// ------------------------------------------------------------------------
+//
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 1998 - 2018 by the deal.II authors
+//
+// This file is part of the deal.II library.
+//
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
+//
+// ------------------------------------------------------------------------
+
+
+
+for (deal_II_dimension : DIMENSIONS)
+  {
+    template class FE_NedelecNodal<deal_II_dimension>;
+  }
+
+for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS;
+     deal_II_scalar : REAL_SCALARS)
+  {
+#if deal_II_dimension <= deal_II_space_dimension
+    template internal::MatrixFreeFunctions::ShapeInfo<
+      deal_II_scalar>::ShapeInfo(const Quadrature<deal_II_dimension> &,
+                                 const FiniteElement<deal_II_dimension,
+                                                     deal_II_space_dimension> &,
+                                 const unsigned int);
+
+    template void
+    internal::MatrixFreeFunctions::ShapeInfo<deal_II_scalar>::reinit(
+      const Quadrature<deal_II_dimension> &,
+      const FiniteElement<deal_II_dimension, deal_II_space_dimension> &,
+      const unsigned int);
+
+#  if deal_II_dimension > 1
+    template internal::MatrixFreeFunctions::ShapeInfo<
+      deal_II_scalar>::ShapeInfo(const Quadrature<1> &,
+                                 const FiniteElement<deal_II_dimension,
+                                                     deal_II_space_dimension> &,
+                                 const unsigned int);
+
+    template void
+    internal::MatrixFreeFunctions::ShapeInfo<deal_II_scalar>::reinit(
+      const Quadrature<1> &,
+      const FiniteElement<deal_II_dimension, deal_II_space_dimension> &,
+      const unsigned int);
+#  endif
+#endif
+  }
+
+for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
+  {
+#if deal_II_dimension <= deal_II_space_dimension
+    template bool
+    internal::MatrixFreeFunctions::ShapeInfo<double>::is_supported(
+      const FiniteElement<deal_II_dimension, deal_II_space_dimension> &);
+#endif
+  }
+
+
+
+for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS;
+     deal_II_scalar_vectorized : REAL_SCALARS_VECTORIZED)
+  {
+#if deal_II_dimension <= deal_II_space_dimension
+    template internal::MatrixFreeFunctions::
+      ShapeInfo<deal_II_scalar_vectorized>::ShapeInfo(
+        const Quadrature<deal_II_dimension> &,
+        const FiniteElement<deal_II_dimension, deal_II_space_dimension> &,
+        const unsigned int);
+
+    template void
+    internal::MatrixFreeFunctions::ShapeInfo<deal_II_scalar_vectorized>::reinit(
+      const Quadrature<deal_II_dimension> &,
+      const FiniteElement<deal_II_dimension, deal_II_space_dimension> &,
+      const unsigned int);
+
+#  if deal_II_dimension > 1
+    template internal::MatrixFreeFunctions::
+      ShapeInfo<deal_II_scalar_vectorized>::ShapeInfo(
+        const Quadrature<1> &,
+        const FiniteElement<deal_II_dimension, deal_II_space_dimension> &,
+        const unsigned int);
+
+    template void
+    internal::MatrixFreeFunctions::ShapeInfo<deal_II_scalar_vectorized>::reinit(
+      const Quadrature<1> &,
+      const FiniteElement<deal_II_dimension, deal_II_space_dimension> &,
+      const unsigned int);
+#  endif
+#endif
+  }
+
+for (deal_II_scalar_vectorized : REAL_SCALARS_VECTORIZED)
+  {
+    template struct internal::MatrixFreeFunctions::ShapeInfo<
+      deal_II_scalar_vectorized>;
+  }
+
+for (deal_II_dimension : DIMENSIONS; deal_II_scalar : REAL_SCALARS)
+  {
+    template void FE_NedelecNodal<deal_II_dimension>::fill_shape_info(
+      internal::MatrixFreeFunctions::ShapeInfo<deal_II_scalar> *,
+      const Quadrature<deal_II_dimension> &,
+      const unsigned int) const;
+  }
