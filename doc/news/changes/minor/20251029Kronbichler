@@ -1,0 +1,4 @@
+New: FEPointEvaluation can now evaluate from a list of values
+that represent multiple components of a scalar FiniteElement.
+<br>
+(Martin Kronbichler, 2025/10/29)

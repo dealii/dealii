@@ -1161,7 +1161,15 @@ public:
    * passed to the evaluate() function.
    *
    * @param fe The FiniteElement object that is used for the evaluation, which
-   * is typically the same on all cells to be evaluated.
+   * is typically the same on all cells to be evaluated. For the case multiple
+   * components are set as template argument @p n_components of this class,
+   * there are two supported modes of evaluation. One is multi-component
+   * FiniteElement objects, where the chosen template argument together with
+   * the parameter @p first_selected_component selects a subset of components
+   * for evaluation. A second mode is to provide a scalar FiniteElement
+   * object, but select multiple components by the template argument
+   * @p n_components. Then, the class expects the different components to be
+   * sorted one after the other.
    *
    * @param update_flags Specify the quantities to be computed by the mapping
    * during the call of reinit(). During evaluate() or integrate(), this data
@@ -1946,8 +1954,9 @@ void
 FEPointEvaluationBase<n_components_, dim, spacedim, Number>::setup(
   const unsigned int first_selected_component)
 {
-  AssertIndexRange(first_selected_component + n_components,
-                   fe->n_components() + 1);
+  if (fe->n_components() > 1)
+    AssertIndexRange(first_selected_component + n_components,
+                     fe->n_components() + 1);
 
   shapes.reserve(100);
 
@@ -1955,12 +1964,18 @@ FEPointEvaluationBase<n_components_, dim, spacedim, Number>::setup(
   unsigned int base_element_number = 0;
   component_in_base_element        = 0;
   unsigned int component           = 0;
+
   for (; base_element_number < fe->n_base_elements(); ++base_element_number)
     if (component + fe->element_multiplicity(base_element_number) >
         first_selected_component)
       {
-        if (first_selected_component + n_components >
-            component + fe->element_multiplicity(base_element_number))
+        // check if we have multiple base elements and span across those base
+        // elements; if there is a single base element, we can also support
+        // evaluation of multiple vectors despite a single component in the
+        // finite element
+        if (fe->n_components() > 1 &&
+            first_selected_component + n_components >
+              component + fe->element_multiplicity(base_element_number))
           same_base_element = false;
         component_in_base_element = first_selected_component - component;
         break;
@@ -2522,7 +2537,12 @@ FEPointEvaluation<n_components_, dim, spacedim, Number>::evaluate(
   if (this->n_q_points == 0)
     return;
 
-  AssertDimension(solution_values.size(), this->fe->dofs_per_cell);
+  if (this->fe->n_components() > 1)
+    AssertDimension(solution_values.size(), this->fe->dofs_per_cell);
+  else
+    AssertDimension(solution_values.size(),
+                    n_components * this->fe->dofs_per_cell);
+
   if (this->fast_path)
     {
       if (this->use_linear_path)
@@ -2667,11 +2687,22 @@ FEPointEvaluation<n_components_, dim, spacedim, Number>::prepare_evaluate_fast(
         }
       else
         {
-          const unsigned int *renumber_ptr = this->renumber.data() + offset;
-          for (unsigned int i = 0; i < dofs_per_comp; ++i)
-            ETT::read_value(solution_values[renumber_ptr[i]],
-                            comp,
-                            this->solution_renumbered[i]);
+          // Consider the case where multiple copies should be evaluated from
+          // a scalar base element, in that case we should only pick the
+          // scalar renumbering
+          if (n_components > this->fe->n_components())
+            for (unsigned int i = 0; i < dofs_per_comp; ++i)
+              ETT::read_value(solution_values[this->renumber[i] + offset],
+                              comp,
+                              this->solution_renumbered[i]);
+          else
+            {
+              const unsigned int *renumber_ptr = this->renumber.data() + offset;
+              for (unsigned int i = 0; i < dofs_per_comp; ++i)
+                ETT::read_value(solution_values[renumber_ptr[i]],
+                                comp,
+                                this->solution_renumbered[i]);
+            }
         }
     }
 }
@@ -2978,14 +3009,30 @@ FEPointEvaluation<n_components_, dim, spacedim, Number>::finish_integrate_fast(
         }
       else
         {
-          const unsigned int *renumber_ptr = this->renumber.data() + offset;
-          for (unsigned int i = 0; i < dofs_per_comp; ++i)
-            if (sum_into_values)
-              solution_values[renumber_ptr[i]] +=
-                ETT::sum_value(comp, this->solution_renumbered_vectorized[i]);
-            else
-              solution_values[renumber_ptr[i]] =
-                ETT::sum_value(comp, this->solution_renumbered_vectorized[i]);
+          // Consider the case where multiple copies should be evaluated from
+          // a scalar base element, in that case we should only pick the
+          // scalar renumbering
+          if (n_components > this->fe->n_components())
+            for (unsigned int i = 0; i < dofs_per_comp; ++i)
+              if (sum_into_values)
+                solution_values[this->renumber[i] + offset] +=
+                  ETT::sum_value(comp, this->solution_renumbered_vectorized[i]);
+              else
+                solution_values[this->renumber[i] + offset] =
+                  ETT::sum_value(comp, this->solution_renumbered_vectorized[i]);
+          else
+            {
+              const unsigned int *renumber_ptr = this->renumber.data() + offset;
+              for (unsigned int i = 0; i < dofs_per_comp; ++i)
+                if (sum_into_values)
+                  solution_values[renumber_ptr[i]] +=
+                    ETT::sum_value(comp,
+                                   this->solution_renumbered_vectorized[i]);
+                else
+                  solution_values[renumber_ptr[i]] =
+                    ETT::sum_value(comp,
+                                   this->solution_renumbered_vectorized[i]);
+            }
         }
     }
 }
@@ -3184,7 +3231,12 @@ FEPointEvaluation<n_components_, dim, spacedim, Number>::do_integrate(
     ExcMessage(
       "JxW pointer is not set! If you do not want to integrate() use test_and_sum()"));
 
-  AssertDimension(solution_values.size(), this->fe->dofs_per_cell);
+  if (this->fe->n_components() > 1)
+    AssertDimension(solution_values.size(), this->fe->dofs_per_cell);
+  else
+    AssertDimension(solution_values.size(),
+                    n_components * this->fe->dofs_per_cell);
+
   if (this->fast_path)
     {
       if (this->use_linear_path)
@@ -3381,10 +3433,19 @@ FEFacePointEvaluation<n_components_, dim, spacedim, Number>::do_evaluate(
             }
           else
             {
-              const unsigned int *renumber_ptr = this->renumber.data() + offset;
-              for (unsigned int i = 0; i < dofs_per_comp; ++i)
-                this->scratch_data_scalar[i + comp * dofs_per_comp] =
-                  solution_values[renumber_ptr[i]];
+              if (n_components > this->fe->n_components())
+                for (unsigned int i = 0; i < dofs_per_comp; ++i)
+                  ETT::read_value(solution_values[this->renumber[i] + offset],
+                                  comp,
+                                  this->solution_renumbered[i]);
+              else
+                {
+                  const unsigned int *renumber_ptr =
+                    this->renumber.data() + offset;
+                  for (unsigned int i = 0; i < dofs_per_comp; ++i)
+                    this->scratch_data_scalar[i + comp * dofs_per_comp] =
+                      solution_values[renumber_ptr[i]];
+                }
             }
         }
       input = this->scratch_data_scalar.data();
@@ -3589,14 +3650,28 @@ FEFacePointEvaluation<n_components_, dim, spacedim, Number>::do_integrate(
             }
           else
             {
-              const unsigned int *renumber_ptr = this->renumber.data() + offset;
-              for (unsigned int i = 0; i < dofs_per_comp; ++i)
-                if (sum_into_values)
-                  solution_values[renumber_ptr[i]] +=
-                    output[i + comp * dofs_per_comp];
-                else
-                  solution_values[renumber_ptr[i]] =
-                    output[i + comp * dofs_per_comp];
+              if (n_components > this->fe->n_components())
+                for (unsigned int i = 0; i < dofs_per_comp; ++i)
+                  if (sum_into_values)
+                    solution_values[this->renumber[i] + offset] +=
+                      ETT::sum_value(comp,
+                                     this->solution_renumbered_vectorized[i]);
+                  else
+                    solution_values[this->renumber[i] + offset] =
+                      ETT::sum_value(comp,
+                                     this->solution_renumbered_vectorized[i]);
+              else
+                {
+                  const unsigned int *renumber_ptr =
+                    this->renumber.data() + offset;
+                  for (unsigned int i = 0; i < dofs_per_comp; ++i)
+                    if (sum_into_values)
+                      solution_values[renumber_ptr[i]] +=
+                        output[i + comp * dofs_per_comp];
+                    else
+                      solution_values[renumber_ptr[i]] =
+                        output[i + comp * dofs_per_comp];
+                }
             }
         }
     }
