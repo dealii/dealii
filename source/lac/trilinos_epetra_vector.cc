@@ -409,28 +409,14 @@ namespace LinearAlgebra
     bool
     Vector::all_zero() const
     {
-      // get a representation of the vector and
-      // loop over all the elements
-      double       *start_ptr = (*vector)[0];
-      const double *ptr = start_ptr, *eptr = start_ptr + vector->MyLength();
-      unsigned int  flag = 0;
-      while (ptr != eptr)
-        {
-          if (*ptr != 0)
-            {
-              flag = 1;
-              break;
-            }
-          ++ptr;
-        }
+      const double *start_ptr = (*vector)[0];
 
-      // Check that the vector is zero on _all_ processors.
-      const Epetra_MpiComm *mpi_comm =
-        dynamic_cast<const Epetra_MpiComm *>(&vector->Map().Comm());
-      Assert(mpi_comm != nullptr, ExcInternalError());
-      unsigned int num_nonzero = Utilities::MPI::sum(flag, mpi_comm->Comm());
+      const bool local_all_zero = std::all_of(start_ptr,
+                                              start_ptr + locally_owned_size(),
+                                              numbers::value_is_zero<double>);
 
-      return num_nonzero == 0;
+      return Utilities::MPI::logical_and(local_all_zero,
+                                         get_mpi_communicator());
     }
 
 

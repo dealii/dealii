@@ -1348,6 +1348,12 @@ namespace LinearAlgebra
       linfty_norm_local() const;
 
       /**
+       * Local part of all_zero().
+       */
+      bool
+      all_zero_local() const;
+
+      /**
        * Local part of the addition followed by an inner product of two
        * vectors. The same applies for complex-valued vectors as for
        * the add_and_dot() function.

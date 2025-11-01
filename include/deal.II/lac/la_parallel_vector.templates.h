@@ -117,6 +117,14 @@ namespace LinearAlgebra
           const unsigned int /*size*/,
           RealType & /*max*/)
         {}
+
+        static void
+        all_zero_local(
+          const ::dealii::MemorySpace::MemorySpaceData<Number, MemorySpaceType>
+            & /*data*/,
+          const unsigned int /*size*/,
+          bool & /*result*/)
+        {}
       };
 
       template <typename Number>
@@ -319,6 +327,18 @@ namespace LinearAlgebra
             max =
               std::max(numbers::NumberTraits<Number>::abs(data.values[i]), max);
         }
+
+        static void
+        all_zero_local(const ::dealii::MemorySpace::MemorySpaceData<
+                         Number,
+                         ::dealii::MemorySpace::Host> &data,
+                       const unsigned int              size,
+                       bool                           &result)
+        {
+          result = std::all_of(&data.values(0),
+                               &data.values(0) + size,
+                               numbers::value_is_zero<Number>);
+        }
       };
 
       template <typename Number>
@@ -498,6 +518,32 @@ namespace LinearAlgebra
 #endif
             },
             Kokkos::Max<RealType, Kokkos::HostSpace>(result));
+        }
+
+        static void
+        all_zero_local(const ::dealii::MemorySpace::MemorySpaceData<
+                         Number,
+                         ::dealii::MemorySpace::Default> &data,
+                       const unsigned int                 size,
+                       bool                              &result)
+        {
+          // TODO: once we require Kokkos 4.0 or newer we can use booleans here
+          // instead of int
+          int int_result = 1;
+          typename ::dealii::MemorySpace::Default::kokkos_space::execution_space
+            exec;
+          Kokkos::parallel_reduce(
+            "dealii::all_zero_local",
+            Kokkos::RangePolicy<
+              ::dealii::MemorySpace::Default::kokkos_space::execution_space>(
+              exec, 0, size),
+            KOKKOS_LAMBDA(size_type i, int &update) {
+              update =
+                (update && numbers::value_is_zero<Number>(data.values(i)));
+            },
+            Kokkos::LAnd<int, Kokkos::HostSpace>(int_result));
+
+          result = static_cast<bool>(int_result);
         }
       };
     } // namespace internal
@@ -1805,9 +1851,26 @@ namespace LinearAlgebra
 
     template <typename Number, typename MemorySpaceType>
     bool
+    Vector<Number, MemorySpaceType>::all_zero_local() const
+    {
+      bool result = true;
+
+      const size_type locally_owned_size = partitioner->locally_owned_size();
+      internal::la_parallel_vector_templates_functions<
+        Number,
+        MemorySpaceType>::all_zero_local(data, locally_owned_size, result);
+
+      return result;
+    }
+
+
+
+    template <typename Number, typename MemorySpaceType>
+    bool
     Vector<Number, MemorySpaceType>::all_zero() const
     {
-      return (linfty_norm() == 0) ? true : false;
+      return Utilities::MPI::logical_and(all_zero_local(),
+                                         get_mpi_communicator());
     }
 
 

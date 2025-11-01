@@ -50,6 +50,7 @@ constexpr MPI_Request MPI_REQUEST_NULL = 0;
 constexpr MPI_Op      MPI_MIN          = 0;
 constexpr MPI_Op      MPI_MAX          = 0;
 constexpr MPI_Op      MPI_SUM          = 0;
+constexpr MPI_Op      MPI_LAND         = 0;
 constexpr MPI_Op      MPI_LOR          = 0;
 
 DEAL_II_NAMESPACE_CLOSE

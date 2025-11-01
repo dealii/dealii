@@ -685,18 +685,13 @@ namespace LinearAlgebra
     {
       Assert(this->n_blocks() > 0, ExcEmptyObject());
 
-      // use int instead of bool
-      int local_result = -1;
-      for (unsigned int i = 0; i < this->n_blocks(); ++i)
-        local_result =
-          std::max(local_result,
-                   (this->block(i).linfty_norm_local() == 0) ? -1 : 0);
+      const bool local_all_zero =
+        std::all_of(this->components.begin(),
+                    this->components.end(),
+                    [](const auto &block) { return block.all_zero_local(); });
 
-      if (this->block(0).partitioner->n_mpi_processes() > 1)
-        return -Utilities::MPI::max(
-          local_result, this->block(0).partitioner->get_mpi_communicator());
-      else
-        return local_result != 0;
+      return Utilities::MPI::logical_and(
+        local_all_zero, this->block(0).partitioner->get_mpi_communicator());
     }
 
 
