@@ -21,6 +21,9 @@
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/memory_space.h>
 
+#include <deal.II/dofs/dof_handler.h>
+
+#include <deal.II/lac/trilinos_xpetra_types.h>
 #include <deal.II/lac/vector.h>
 
 #ifdef DEAL_II_TRILINOS_WITH_TPETRA
@@ -29,6 +32,7 @@
 
 #  include <deal.II/lac/la_parallel_vector.h>
 #  include <deal.II/lac/trilinos_tpetra_sparse_matrix.h>
+#  include <deal.II/lac/trilinos_xpetra_types.h>
 
 #  include <Teuchos_BLAS_types.hpp>
 #  include <Teuchos_ConfigDefs.hpp>
@@ -1315,6 +1319,258 @@ namespace LinearAlgebra
                  const AdditionalData &additional_data = AdditionalData());
     };
 #  endif // DEAL_II_TRILINOS_WITH_IFPACK2
+
+
+
+#  ifdef DEAL_II_TRILINOS_WITH_SHYLU_DDFROSCH
+    /**
+     * FROSch (Fast and Robust Overlapping Schwarz) is a parallel domain
+     * decomposition preconditioning package within Trilinos and allows for the
+     * construction of one- and two-level Schwarz preconditioners.
+     * An important algorithmic component of FROSch are extension-based
+     * coarse spaces, which allow for the construction of preconditioners using
+     * only algebraic information or only little geometric information.
+     * For a detailed description of the coarse spaces we refer to the
+     * publication paper of FROSch @cite{Heinlein2020}.
+     *
+     * @ingroup TpetraWrappers
+     * @ingroup Preconditioners
+     */
+    template <typename Number, typename MemorySpace = dealii::MemorySpace::Host>
+    class PreconditionFROSch : public PreconditionBase<Number, MemorySpace>
+    {
+    public:
+      /**
+       * Enumeration object to select the preconditioner type
+       */
+      enum PreconditionerType
+      {
+        /**
+         * Create a one-level preconditioner.
+         */
+        OneLevel,
+        /**
+         * Create a two-level preconditioner, i.e. add a coarse-level.
+         */
+        TwoLevel
+      };
+
+      /**
+       * Enumeration object that is used by AdditionalData to tell FROSch which
+       * direct solver to use.
+       */
+      enum SolverName
+      {
+        /**
+         * Default solver.
+         */
+        KLU,
+        /**
+         * Rrequires Trilinos Amesos2 to be configured to use UMFPACK.
+         */
+        UMFPACK,
+        /**
+         * Requires Trilinos Amesos2 to be configured to use MUMPS.
+         */
+        MUMPS,
+        /**
+         * Rrequires Trilinos Amesos2 to be configured to use SuperLU_dist.
+         */
+        SuperLU_dist
+      };
+
+      /**
+       * Enumeration object that is used by AdditionalData to tell FROSch
+       * how to combine the values in the overlap.
+       */
+      enum CombineMethod
+      {
+        /**
+         * Restrict the overlapping domains, back to the non-overlapping
+         * domains. This leads to a non-symmetric preconditioner.
+         */
+        Restricted,
+        /*
+         * Take the average on the overlap.
+         */
+        Averaging,
+        /*
+         * Add up the values on the overlap.
+         */
+        Full
+      };
+
+      /**
+       * Enumeration object that is used by AdditionalData to tell FROSch
+       * what coarse space to use.
+       */
+      enum CoarseType
+      {
+        /**
+         * Default.
+         */
+        IPOUHarmonicCoarseOperator,
+        /**
+         * Generalized Dryja–Smith–Widlund coarse space.
+         */
+        GDSWCoarseOperator,
+        /**
+         * Reduced dimension generalized Dryja–Smith–Widlund coarse space
+         */
+        RGDSWCoarseOperator
+      };
+
+      /**
+       * The set of additional parameters to tune the FROSch preconditioner.
+       *
+       */
+      struct AdditionalData
+      {
+        AdditionalData(
+          const int                overlap                   = 1,
+          const int                dimension                 = 2,
+          const enum CombineMethod combine_values_in_overlap = Restricted,
+          const enum SolverName    subdomain_solver          = KLU,
+          const enum CoarseType    coarse_operator_type =
+            IPOUHarmonicCoarseOperator,
+          const enum SolverName extension_solver = KLU,
+          const enum SolverName coarse_solver    = KLU);
+
+        /**
+         * The overlap between the subdomains.
+         *
+         */
+        int overlap;
+        /**
+         * The dimension of the problem
+         *
+         */
+        int dimension;
+        /**
+         * The combine method in the overlap.
+         *
+         * Tell FROSch how to combine the values from the overlap.
+         * When using "Restricted" as combine mode, the resulting
+         * preconditioner will not be symmetrical, and therefore can not
+         * be used along with CG and rather has to be used with GMRES
+         * or another linear solver that can deal with non-symmetric problems.
+         * However, Overlapping Restricted Additive Schwarz (ORAS)
+         * preconditioners lead to better condition numbers.
+         *
+         * So a good choice for the combine mode for non-symmetical problems is
+         * "Restricted". To preserve the symmetry the combine Method "Full" can
+         * be used.
+         *
+         * The options are:
+         * <ul>
+         * <li> "Restricted" </li>
+         * <li> "Averaging" </li>
+         * <li> "Full" </li>
+         * </ul>
+         */
+        enum CombineMethod combine_values_in_overlap;
+
+        /**
+         * Specify the direct solver for the subdomains.
+         *
+         * The available options depend on how Trilinos was configured.
+         * Some common available options are:
+         * <ul>
+         * <li> "KLU" (default) </li>
+         * <li> "UMFPACK" </li>
+         * <li> "MUMPS" (requires Trilinos Amesos2 to be configured to use MUMPS) </li>
+         * <li> "SuperLU_dist" (requires Trilinos Amesos2 to be configured to use SuperLU_dist) </li>
+         * </ul>
+         *
+         */
+        enum SolverName subdomain_solver;
+
+        /**
+         * Specify the coarse space operator. Only used by two-level methods.
+         *
+         * Available options:
+         * <ul>
+         * <li> "IPOUHarmonicCoarseOperator" </li>
+         * <li> "GDSWCoarseOperator" (Generalized Dryja–Smith–Widlund) </li>
+         * <li> "RGDSWCoarseOperator" (Reduced dimension GDSW) </li>
+         * </ul>
+         *
+         */
+        enum CoarseType coarse_operator_type;
+
+        /**
+         * The solver used for the extension space problem.
+         * For the available options, see the description of the
+         * subdomain_solver.
+         */
+        enum SolverName extension_solver;
+
+        /**
+         * The solver used for the coarse space problem.
+         * For the available options, see the description of the
+         * subdomain_solver.
+         */
+        enum SolverName coarse_solver;
+      };
+
+      /**
+       * Construct a FROSch preconditioner.
+       *
+       *  Available options:
+       *  <ul>
+       *  <li> "OneLevel" </li>
+       *  <li> "TwoLevel" </li>
+       *  </ul>
+       *
+       * @param precondition_type the type of FROSch preconditioner to use
+       */
+      PreconditionFROSch(
+        const enum PreconditionerType precondition_type = OneLevel);
+
+      /**
+       * Set the parameter list for the preconditioner.
+       *
+       * This list will be passed to FROSch during
+       * initialization.
+       *
+       * @param parameter_list
+       */
+      void
+      set_parameter_list(const Teuchos::ParameterList &parameter_list);
+
+      /**
+       * Compute the preconditioner based on the given matrix and parameters.
+       *
+       * @param A The matrix to base the preconditioner on.
+       * @param additional_data The set of parameters to tune the preconditioner.
+       */
+      void
+      initialize(const SparseMatrix<Number, MemorySpace> &A,
+                 const AdditionalData &additional_data = AdditionalData());
+
+      /**
+       * Compute the preconditioner based on the given matrix, the dof_handler
+       * and parameters.
+       *
+       * With the additional geometric information form the triangulation and
+       * the dof handler the preconditioner can be better adapted to the actual
+       * problem.
+       * @param A The matrix to base the preconditioner on.
+       * @param dof_handler The dof_handler that corresponds to the system matrix.
+       * @param additional_data The set of parameters to tune the preconditioner.
+       */
+      template <int dim, int spacedim = dim>
+      void
+      initialize(const SparseMatrix<Number, MemorySpace> &A,
+                 DoFHandler<dim, spacedim>               &dof_handler,
+                 const AdditionalData &additional_data = AdditionalData());
+
+    protected:
+      const enum PreconditionerType precondition_type;
+
+      bool user_provided_parameter_list;
+    };
+#  endif // DEAL_II_TRILINOS_WITH_SHYLU_DDFROSCH
 
   } // namespace TpetraWrappers
 } // namespace LinearAlgebra

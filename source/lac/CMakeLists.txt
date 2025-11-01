@@ -160,6 +160,13 @@ if(DEAL_II_WITH_TRILINOS)
     )
   endif()
 
+  if(DEAL_II_TRILINOS_WITH_SHYLU_DDFROSCH)
+    set(_separate_src
+      ${_separate_src}
+      trilinos_tpetra_precondition_frosch.cc
+    )
+  endif()
+
   set(_inst
     ${_inst}
     trilinos_sparse_matrix.inst.in
