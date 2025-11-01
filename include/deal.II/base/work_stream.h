@@ -715,17 +715,17 @@ namespace WorkStream
     /**
      * Mostly a copy of the 2nd implementation of the Workstream paper taking
      * advantage of thread local lists for re-use. Uses taskflow for task
-     * scheduling rather than TBB. Currently does not support chunking.
+     * scheduling rather than TBB.
      */
 
 
     namespace taskflow_no_coloring
     {
       /**
-       * The main run function for the taskflow colorless implementation. The
-       * last two arguments in this function are for chunking support which
-       * currently does not exist but ideally will later. For now they are
-       * ignored but still here to permit existing programs to function
+       * The main run function for the taskflow colorless implementation. Queue
+       * length is relevant to the parallel pipeline implementation using TBB
+       * but not used by taskflow. The parameter is kept here to maintain
+       * support for calls to workstream written for TBB.
        */
       template <typename Worker,
                 typename Copier,
@@ -1208,15 +1208,15 @@ namespace WorkStream
     /**
      * Mostly a copy of the 3rd implementation of the Workstream paper taking
      * advantage of thread local lists for re-use. Uses taskflow for task
-     * scheduling rather than TBB. Currently does not support chunking.
+     * scheduling rather than TBB.
      */
     namespace taskflow_colored
     {
       /**
-       * The main run function for the taskflow colored implementation. The
-       * last two arguments in this function are for chunking support which
-       * currently does not exist but ideally will later. For now they are
-       * ignored but still here to permit existing programs to function.
+       * The main run function for the taskflow colored implementation. Queue
+       * length is relevant to the parallel pipeline implementation using TBB
+       * but not used by taskflow. The parameter is kept here to maintain
+       * support for calls to workstream written for TBB.
        */
       template <typename Worker,
                 typename Copier,
