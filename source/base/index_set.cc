@@ -1155,7 +1155,7 @@ IndexSet::is_ascending_and_one_to_one(const MPI_Comm communicator) const
 #ifdef DEAL_II_WITH_MPI
   // Non-contiguous IndexSets can't be linear.
   const bool all_contiguous =
-    (Utilities::MPI::min(is_contiguous() ? 1 : 0, communicator) == 1);
+    Utilities::MPI::logical_and(is_contiguous(), communicator);
   if (!all_contiguous)
     return false;
 

@@ -1419,9 +1419,8 @@ namespace internal
               }
           });
 
-        return Utilities::MPI::min(static_cast<unsigned int>(flag),
-                                   dof_handler_fine.get_mpi_communicator()) ==
-               1;
+        return Utilities::MPI::logical_and(
+          flag, dof_handler_fine.get_mpi_communicator());
       }
     else
       {
@@ -3490,15 +3489,13 @@ namespace internal
         partitioner->locally_owned_range())
       return false;
 
-    const int ghosts_locally_contained =
-      ((external_partitioner->ghost_indices() & partitioner->ghost_indices()) ==
-       partitioner->ghost_indices()) ?
-        1 :
-        0;
+    const bool ghosts_locally_contained =
+      (external_partitioner->ghost_indices() & partitioner->ghost_indices()) ==
+      partitioner->ghost_indices();
 
     // check if ghost values are contained in external partititioner
-    return Utilities::MPI::min(ghosts_locally_contained,
-                               partitioner->get_mpi_communicator()) == 1;
+    return Utilities::MPI::logical_and(ghosts_locally_contained,
+                                       partitioner->get_mpi_communicator());
   }
 
   inline std::shared_ptr<Utilities::MPI::Partitioner>
@@ -3720,8 +3717,7 @@ MGTwoLevelTransfer<dim, VectorType>::reinit(
         all_cells_found &= (owning_ranks[i] != numbers::invalid_unsigned_int);
 
       do_polynomial_transfer =
-        Utilities::MPI::min(static_cast<unsigned int>(all_cells_found),
-                            communicator) == 1;
+        Utilities::MPI::logical_and(all_cells_found, communicator);
     }
 
   if (do_polynomial_transfer)

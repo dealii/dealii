@@ -3252,12 +3252,9 @@ namespace internal
         // is also supported.
         const bool uses_sequential_numbering =
           new_numbers.size() == this->dof_handler->n_dofs();
-        bool all_use_sequential_numbering = false;
-        Utilities::MPI::internal::all_reduce<bool>(
-          MPI_LAND,
-          ArrayView<const bool>(&uses_sequential_numbering, 1),
-          tr->get_mpi_communicator(),
-          ArrayView<bool>(&all_use_sequential_numbering, 1));
+        const bool all_use_sequential_numbering =
+          Utilities::MPI::logical_and(uses_sequential_numbering,
+                                      tr->get_mpi_communicator());
         if (all_use_sequential_numbering)
           {
             global_gathered_numbers = new_numbers;

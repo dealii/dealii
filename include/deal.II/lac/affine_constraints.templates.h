@@ -613,10 +613,9 @@ AffineConstraints<number>::make_consistent_in_parallel(
 
       // 4) Stop loop if converged.
       const bool constraints_converged =
-        (Utilities::MPI::min(
-           (constraints_to_make_consistent == constraints_made_consistent ? 1 :
-                                                                            0),
-           mpi_communicator) == 1);
+        Utilities::MPI::logical_and(constraints_to_make_consistent ==
+                                      constraints_made_consistent,
+                                    mpi_communicator);
       if (constraints_converged)
         break;
     }
@@ -1149,7 +1148,7 @@ template <typename number>
 bool
 AffineConstraints<number>::is_closed(const MPI_Comm comm) const
 {
-  return Utilities::MPI::min(static_cast<unsigned int>(is_closed()), comm) == 1;
+  return Utilities::MPI::logical_and(is_closed(), comm);
 }
 
 

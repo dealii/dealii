@@ -679,8 +679,8 @@ namespace DoFRenumbering
 
     // If we don't have a renumbering (i.e., when there is 1 component) then
     // return
-    if (Utilities::MPI::max(renumbering.size(),
-                            dof_handler.get_mpi_communicator()) == 0)
+    if (Utilities::MPI::logical_and(renumbering.size() == 0,
+                                    dof_handler.get_mpi_communicator()))
       return;
 
     // verify that the last numbered
@@ -725,8 +725,8 @@ namespace DoFRenumbering
 
     // If we don't have a renumbering (i.e., when there is 1 component) then
     // return
-    if (Utilities::MPI::max(renumbering.size(),
-                            dof_handler.get_mpi_communicator()) == 0)
+    if (Utilities::MPI::logical_and(renumbering.size() == 0,
+                                    dof_handler.get_mpi_communicator()))
       return;
 
     // verify that the last numbered
