@@ -345,18 +345,6 @@ namespace PETScWrappers
 
 
 
-    bool
-    Vector::all_zero() const
-    {
-      unsigned int has_nonzero = VectorBase::all_zero() ? 0 : 1;
-      // in parallel, check that the vector
-      // is zero on _all_ processors.
-      unsigned int num_nonzero =
-        Utilities::MPI::sum(has_nonzero, this->get_mpi_communicator());
-      return num_nonzero == 0;
-    }
-
-
     void
     Vector::print(std::ostream      &out,
                   const unsigned int precision,

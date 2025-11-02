@@ -1593,11 +1593,9 @@ template <typename VectorType>
 bool
 BlockVectorBase<VectorType>::all_zero() const
 {
-  for (size_type i = 0; i < n_blocks(); ++i)
-    if (components[i].all_zero() == false)
-      return false;
-
-  return true;
+  return std::all_of(components.begin(), components.end(), [](const auto &v) {
+    return v.all_zero();
+  });
 }
 
 
