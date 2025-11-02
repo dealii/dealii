@@ -298,7 +298,7 @@ MGLevelGlobalTransfer<LinearAlgebra::distributed::Vector<Number, MemorySpace>>::
   // global and level dof indices, we must also fill the solution indices
   // which contain additional indices, otherwise they can re-use the
   // indices of the standard transfer.
-  int have_refinement_edge_dofs = 0;
+  bool have_refinement_edge_dofs = false;
   if (mg_constrained_dofs != nullptr)
     for (unsigned int level = 0;
          level < mg_dof.get_triangulation().n_global_levels();
@@ -306,10 +306,10 @@ MGLevelGlobalTransfer<LinearAlgebra::distributed::Vector<Number, MemorySpace>>::
       if (mg_constrained_dofs->get_refinement_edge_indices(level).n_elements() >
           0)
         {
-          have_refinement_edge_dofs = 1;
+          have_refinement_edge_dofs = true;
           break;
         }
-  if (Utilities::MPI::max(have_refinement_edge_dofs, mpi_communicator) == 1)
+  if (Utilities::MPI::logical_or(have_refinement_edge_dofs, mpi_communicator))
     {
       // note: variables not needed
       std::vector<Table<2, unsigned int>> solution_copy_indices_global_mine;
