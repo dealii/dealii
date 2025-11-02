@@ -26,7 +26,7 @@ set(CLEAN_UP_FILES *.vtu *.tex)
 
 cmake_minimum_required(VERSION 3.13.4)
 
-find_package(deal.II 9.7.0
+find_package(deal.II 9.8.0
         HINTS ${deal.II_DIR} ${DEAL_II_DIR} ../ ../../ $ENV{DEAL_II_DIR}
 )
 if(NOT ${deal.II_FOUND})
@@ -35,6 +35,16 @@ if(NOT ${deal.II_FOUND})
           "You may want to either pass a flag -DDEAL_II_DIR=/path/to/deal.II to cmake\n"
           "or set an environment variable \"DEAL_II_DIR\" that contains this path."
   )
+endif()
+
+#
+# Are all dependencies fulfilled?
+#
+if(NOT DEAL_II_GMSH_WITH_API)
+  message(FATAL_ERROR "
+Error! This tutorial requires a deal.II library that was configured with the following options:
+    DEAL_II_GMSH_WITH_API = ON"
+    )
 endif()
 
 deal_ii_initialize_cached_variables()
