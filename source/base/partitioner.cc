@@ -482,8 +482,7 @@ namespace Utilities
     bool
     Partitioner::is_globally_compatible(const Partitioner &part) const
     {
-      return Utilities::MPI::min(static_cast<int>(is_compatible(part)),
-                                 communicator) == 1;
+      return Utilities::MPI::logical_and(is_compatible(part), communicator);
     }
 
 
