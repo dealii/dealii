@@ -21,7 +21,8 @@ for (deal_II_dimension : DIMENSIONS)
 
 for (deal_II_scalar : REAL_SCALARS)
   {
-    template struct internal::MatrixFreeFunctions::UnivariateShapeData<deal_II_scalar>;
+    template struct internal::MatrixFreeFunctions::UnivariateShapeData<
+      deal_II_scalar>;
   }
 
 for (deal_II_dimension : DIMENSIONS; deal_II_scalar : REAL_SCALARS)
