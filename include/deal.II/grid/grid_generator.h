@@ -2887,9 +2887,9 @@ namespace GridGenerator
    * each cell divided into simplices.
    *
    * The hypercube volume is the tensor product interval
-   * $[left,right]^{\text{dim}}$ in the present number of dimensions, where
-   * the limits are given as arguments. They default to zero and unity, then
-   * producing the unit hypercube.
+   * $[\text{left},\text{right}]^{\text{dim}}$ in the present number of
+   * dimensions, where the limits are given as arguments. They default to zero
+   * and one, then producing the unit hypercube.
    *
    * @note This function takes the mesh produced by subdivided_hyper_cube()
    * and further subdivides each cell into 2 triangles (for @p dim 2) or
@@ -2902,8 +2902,8 @@ namespace GridGenerator
   void
   subdivided_hyper_cube_with_simplices(Triangulation<dim, spacedim> &tria,
                                        const unsigned int repetitions,
-                                       const double       p1       = 0.0,
-                                       const double       p2       = 1.0,
+                                       const double       left     = 0.0,
+                                       const double       right    = 1.0,
                                        const bool         colorize = false);
 
   /** @} */
