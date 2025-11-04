@@ -2911,11 +2911,11 @@ GridIn<dim, spacedim>::read_msh(std::istream &input_stream)
 
 
 
-#ifdef DEAL_II_GMSH_WITH_API
 template <int dim, int spacedim>
 void
 GridIn<dim, spacedim>::read_msh(const std::string &fname)
 {
+#ifdef DEAL_II_GMSH_WITH_API
   Assert(tria != nullptr, ExcNoTriangulationSelected());
   // gmsh -> deal.II types
   const std::map<int, std::uint8_t> gmsh_to_dealii_type = {
@@ -3143,17 +3143,20 @@ GridIn<dim, spacedim>::read_msh(const std::string &fname)
 
   gmsh::clear();
   gmsh::finalize();
-}
+#else
+  (void)fname;
+  AssertThrow(false, ExcNeedsGMSHAPI());
 #endif
+}
 
 
 
-#ifdef DEAL_II_GMSH_WITH_API
 template <int dim, int spacedim>
 void
 GridIn<dim, spacedim>::read_partitioned_msh(const std::string &file_prefix,
                                             const std::string &file_suffix)
 {
+#ifdef DEAL_II_GMSH_WITH_API
   auto *parallel_tria =
     dynamic_cast<parallel::fullydistributed::Triangulation<dim, spacedim> *>(
       tria.get());
@@ -3512,20 +3515,12 @@ GridIn<dim, spacedim>::read_partitioned_msh(const std::string &file_prefix,
 
   gmsh::clear();
   gmsh::finalize();
-}
 #else
-template <int dim, int spacedim>
-void
-GridIn<dim, spacedim>::read_partitioned_msh(const std::string &,
-                                            const std::string &)
-{
-  AssertThrow(
-    false,
-    ExcMessage(
-      "GridIn::read_partitioned_msh() requires the Gmsh API "
-      "to be installed, but it was not found when configuring deal.II."));
+  (void)file_prefix;
+  (void)file_suffix;
+  AssertThrow(false, ExcNeedsGMSHAPI());
+#endif
 }
-#endif // DEAL_II_GMSH_WITH_API
 
 
 template <int dim, int spacedim>

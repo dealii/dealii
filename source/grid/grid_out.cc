@@ -1442,12 +1442,12 @@ GridOut::write_xfig(const Triangulation<2> &tria,
 
 
 
-#ifdef DEAL_II_GMSH_WITH_API
 template <int dim, int spacedim>
 void
 GridOut::write_msh(const Triangulation<dim, spacedim> &tria,
                    const std::string                  &filename) const
 {
+#ifdef DEAL_II_GMSH_WITH_API
   // mesh Type renumbering
   const std::array<int, 8> dealii_to_gmsh_type = {{15, 1, 2, 3, 4, 7, 6, 5}};
 
@@ -1638,8 +1638,12 @@ GridOut::write_msh(const Triangulation<dim, spacedim> &tria,
   gmsh::write(filename);
   gmsh::clear();
   gmsh::finalize();
-}
+#else
+  (void)tria;
+  (void)filename;
+  AssertThrow(false, ExcNeedsGMSHAPI());
 #endif
+}
 
 
 
