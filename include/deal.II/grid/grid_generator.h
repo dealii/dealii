@@ -927,13 +927,13 @@ namespace GridGenerator
    *   <tr>
    *     <td>
    *       \htmlonly <style>div.image
-   *         img[src="hyper_ball_balanced_2d.png"]{width:40%}</style>
+   *         img[src="hyper_ball_balanced_2d.png"]{width:60%}</style>
    *       \endhtmlonly
    *       @image html hyper_ball_balanced_2d.png
    *     </td>
    *     <td>
    *       \htmlonly <style>div.image
-   *         img[src="hyper_ball_balanced_3d.png"]{width:40%}</style>
+   *         img[src="hyper_ball_balanced_3d.png"]{width:60%}</style>
    *       \endhtmlonly
    *       @image html hyper_ball_balanced_3d.png
    *     </td>
@@ -1544,13 +1544,13 @@ namespace GridGenerator
    *   <tr>
    *     <td>
    *       \htmlonly <style>div.image
-   *         img[src="hypershell3d-12.png"]{width:40%}</style>
+   *         img[src="hypershell3d-12.png"]{width:90%}</style>
    *       \endhtmlonly
    *       @image html hypershell3d-12.png
    *     </td>
    *     <td>
    *       \htmlonly <style>div.image
-   *         img[src="hypershell3d-96.png"]{width:40%}</style>
+   *         img[src="hypershell3d-96.png"]{width:90%}</style>
    *       \endhtmlonly
    *       @image html hypershell3d-96.png
    *     </td>
@@ -1603,13 +1603,13 @@ namespace GridGenerator
    *   <tr>
    *     <td>
    *       \htmlonly <style>div.image
-   *         img[src="eccentric_hyper_shell_2D.png"]{width:40%}</style>
+   *         img[src="eccentric_hyper_shell_2D.png"]{width:90%}</style>
    *       \endhtmlonly
    *       @image html eccentric_hyper_shell_2D.png
    *     </td>
    *     <td>
    *       \htmlonly <style>div.image
-   *         img[src="eccentric_hyper_shell_3D.png"]{width:40%}</style>
+   *         img[src="eccentric_hyper_shell_3D.png"]{width:90%}</style>
    *       \endhtmlonly
    *       @image html eccentric_hyper_shell_3D.png
    *     </td>
@@ -2028,13 +2028,13 @@ namespace GridGenerator
    *   <tr>
    *     <td>
    *       \htmlonly <style>div.image
-   *         img[src="grid_generator_implicit_function_2d.png"]{width:40%}</style>
+   *         img[src="grid_generator_implicit_function_2d.png"]{width:90%}</style>
    *       \endhtmlonly
    *       @image html grid_generator_implicit_function_2d.png
    *     </td>
    *     <td>
    *       \htmlonly <style>div.image
-   *         img[src="grid_generator_implicit_function_3d.png"]{width:40%}</style>
+   *         img[src="grid_generator_implicit_function_3d.png"]{width:90%}</style>
    *       \endhtmlonly
    *       @image html grid_generator_implicit_function_3d.png
    *     </td>
@@ -2600,13 +2600,13 @@ namespace GridGenerator
    *   <tr>
    *     <td>
    *       \htmlonly <style>div.image
-   *         img[src="convert_simplex_to_hypercube_mesh_visualization_2.png"]{width:40%}</style>
+   *         img[src="convert_simplex_to_hypercube_mesh_visualization_2.png"]{width:90%}</style>
    *       \endhtmlonly
    *       @image html convert_simplex_to_hypercube_mesh_visualization_2.png
    *     </td>
    *     <td>
    *       \htmlonly <style>div.image
-   *         img[src="convert_simplex_to_hypercube_mesh_visualization_3.png"]{width:40%}</style>
+   *         img[src="convert_simplex_to_hypercube_mesh_visualization_3.png"]{width:90%}</style>
    *       \endhtmlonly
    *       @image html convert_simplex_to_hypercube_mesh_visualization_3.png
    *     </td>
