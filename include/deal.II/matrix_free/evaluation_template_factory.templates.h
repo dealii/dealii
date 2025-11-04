@@ -37,7 +37,10 @@ namespace internal
     FEEvaluationData<dim, Number, false>  &fe_eval)
   {
     instantiation_helper_run<1, FEEvaluationImplSelector<dim, Number, false>>(
-      fe_eval.get_shape_info().data[0].fe_degree,
+      (fe_eval.get_shape_info().data[0].element_type ==
+       MatrixFreeFunctions::tensor_nedelec) ?
+        fe_eval.get_shape_info().data[1].fe_degree :
+        fe_eval.get_shape_info().data[0].fe_degree,
       fe_eval.get_shape_info().data[0].n_q_points_1d,
       n_components,
       evaluation_flag,
@@ -57,7 +60,10 @@ namespace internal
     const bool                             sum_into_values_array)
   {
     instantiation_helper_run<1, FEEvaluationImplSelector<dim, Number, true>>(
-      fe_eval.get_shape_info().data[0].fe_degree,
+      (fe_eval.get_shape_info().data[0].element_type ==
+       MatrixFreeFunctions::tensor_nedelec) ?
+        fe_eval.get_shape_info().data[1].fe_degree :
+        fe_eval.get_shape_info().data[0].fe_degree,
       fe_eval.get_shape_info().data[0].n_q_points_1d,
       n_components,
       integration_flag,
