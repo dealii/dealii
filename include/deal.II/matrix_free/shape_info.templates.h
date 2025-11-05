@@ -324,19 +324,6 @@ namespace internal
             face_orientations_quad = compute_orientation_table(n_q_points_1d);
           return;
         }
-      else if (dynamic_cast<const FE_NedelecNodal<dim> *>(
-                 &fe_in.base_element(base_element_number)))
-        {
-          const auto quad = quad_in.get_tensor_basis()[0];
-          dynamic_cast<const FE_NedelecNodal<dim> *>(
-            &fe_in.base_element(base_element_number))
-            ->fill_shape_info(this, quad_in);
-
-          const unsigned int n_q_points_1d = quad.size();
-          if (dim == 3)
-            face_orientations_quad = compute_orientation_table(n_q_points_1d);
-          return;
-        }
       else if (quad_in.is_tensor_product() == false ||
                dynamic_cast<const FE_SimplexPoly<dim, spacedim> *>(
                  &fe_in.base_element(base_element_number)) != nullptr ||
