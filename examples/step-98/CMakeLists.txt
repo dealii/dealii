@@ -43,7 +43,6 @@ endif()
 if(NOT DEAL_II_GMSH_WITH_API)
   message(FATAL_ERROR "
 Error! This tutorial requires a deal.II library that was configured with the following options:
-    DEAL_II_WITH_GMSH = ON
     DEAL_II_GMSH_WITH_API = ON"
     )
 endif()
