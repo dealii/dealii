@@ -163,6 +163,7 @@ if(DEAL_II_WITH_CXX20_MODULE)
     "${CMAKE_CURRENT_SOURCE_DIR}/interface_module_partitions/opencascade.ccm"
     "${CMAKE_CURRENT_SOURCE_DIR}/interface_module_partitions/p4est.ccm"
     "${CMAKE_CURRENT_SOURCE_DIR}/interface_module_partitions/petsc.ccm"
+    "${CMAKE_CURRENT_SOURCE_DIR}/interface_module_partitions/psblas.ccm"
     "${CMAKE_CURRENT_SOURCE_DIR}/interface_module_partitions/slepc.ccm"
     "${CMAKE_CURRENT_SOURCE_DIR}/interface_module_partitions/std.ccm"
     "${CMAKE_CURRENT_SOURCE_DIR}/interface_module_partitions/sundials.ccm"
