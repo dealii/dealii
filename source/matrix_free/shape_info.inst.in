@@ -93,3 +93,11 @@ for (deal_II_scalar_vectorized : REAL_SCALARS_VECTORIZED)
     template struct internal::MatrixFreeFunctions::ShapeInfo<
       deal_II_scalar_vectorized>;
   }
+
+for (deal_II_dimension : DIMENSIONS; deal_II_scalar : REAL_SCALARS)
+  {
+    template void FE_NedelecNodal<deal_II_dimension>::fill_shape_info(
+      internal::MatrixFreeFunctions::ShapeInfo<deal_II_scalar> *,
+      const Quadrature<deal_II_dimension> &,
+      const unsigned int) const;
+  }
