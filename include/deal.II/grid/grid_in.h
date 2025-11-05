@@ -502,7 +502,6 @@ public:
   void
   read_msh(std::istream &in);
 
-#ifdef DEAL_II_GMSH_WITH_API
   /**
    * Read grid data using Gmsh API. Any file supported by Gmsh can be passed as
    * argument. The format is deduced from the filename extension.
@@ -556,14 +555,13 @@ public:
    * as a boundary or material id.  Physical surface numbers created in Gmsh,
    * which can be seen in the .geo file, become material IDs.
    *
-   *
    * Also see
    * @ref simplex "Simplex support".
+   *
+   * @note This function requires the GMSH API.
    */
   void
   read_msh(const std::string &filename);
-#endif
-
 
   /**
    * Read a partitioned GMSH file and create a fully distributed triangulation
@@ -622,11 +620,12 @@ public:
    * cells) or as @ref GlossMaterialId "material indicators" (for cells). It
    * does not set manifold ids, and it does not attach manifold descriptions to
    * the triangulation.
+   *
+   * @note This function requires the GMSH API.
    */
   void
   read_partitioned_msh(const std::string &file_prefix,
                        const std::string &file_suffix = "msh");
-
 
   /**
    * Read grid data from a `.mphtxt` file. `.mphtxt` is one of the file formats
