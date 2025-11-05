@@ -1,0 +1,10 @@
+PSBLAS Solver Options:
+  Maximum iterations (itmax): 1000
+  Trace frequency (itrace): 1
+  Restart depth (irst): 30
+  Stopping criterion (istop): 2
+  Tolerance (eps): 1e-06
+  Iterations performed (iter): 0
+  Final error (err): 0
+Process 0 of  2 solved the system in 52 iterations with error: 6.52197e-07
+Process 1 of  2 solved the system in 52 iterations with error: 6.52197e-07
