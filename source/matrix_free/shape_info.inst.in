@@ -101,3 +101,4 @@ for (deal_II_dimension : DIMENSIONS; deal_II_scalar : REAL_SCALARS)
       const Quadrature<deal_II_dimension> &,
       const unsigned int) const;
   }
+  
