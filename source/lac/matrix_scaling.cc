@@ -24,6 +24,8 @@
 #include <deal.II/lac/sparse_matrix_ez.h>
 #include <deal.II/lac/vector.h>
 
+#include <boost/serialization/utility.hpp>
+
 DEAL_II_NAMESPACE_OPEN
 
 namespace TrilinosWrappers
