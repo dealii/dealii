@@ -12055,6 +12055,7 @@ DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
 Triangulation<dim, spacedim>::Triangulation(
   Triangulation<dim, spacedim> &&tria) noexcept
   : EnableObserverPointer(std::move(tria))
+  , cell_attached_data(std::move(tria.cell_attached_data))
   , smooth_grid(tria.smooth_grid)
   , reference_cells(std::move(tria.reference_cells))
   , periodic_face_pairs_level_0(std::move(tria.periodic_face_pairs_level_0))
@@ -12084,6 +12085,7 @@ Triangulation<dim, spacedim> &Triangulation<dim, spacedim>::operator=(
 {
   EnableObserverPointer::operator=(std::move(tria));
 
+  cell_attached_data           = std::move(tria.cell_attached_data);
   smooth_grid                  = tria.smooth_grid;
   reference_cells              = std::move(tria.reference_cells);
   periodic_face_pairs_level_0  = std::move(tria.periodic_face_pairs_level_0);
