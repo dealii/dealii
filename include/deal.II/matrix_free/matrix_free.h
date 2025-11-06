@@ -1683,10 +1683,11 @@ public:
    * accessed in matrix-vector products and result in too much data sent
    * around which impacts the performance.
    */
-  template <typename Number2>
+  template <typename Number2, typename MemorySpace>
   void
-  initialize_dof_vector(LinearAlgebra::distributed::Vector<Number2> &vec,
-                        const unsigned int dof_handler_index = 0) const;
+  initialize_dof_vector(
+    LinearAlgebra::distributed::Vector<Number2, MemorySpace> &vec,
+    const unsigned int dof_handler_index = 0) const;
 
   /**
    * Return the partitioner that represents the locally owned data and the
@@ -2421,11 +2422,11 @@ MatrixFree<dim, Number, VectorizedArrayType>::initialize_dof_vector(
 
 
 template <int dim, typename Number, typename VectorizedArrayType>
-template <typename Number2>
+template <typename Number2, typename MemorySpace>
 inline void
 MatrixFree<dim, Number, VectorizedArrayType>::initialize_dof_vector(
-  LinearAlgebra::distributed::Vector<Number2> &vec,
-  const unsigned int                           comp) const
+  LinearAlgebra::distributed::Vector<Number2, MemorySpace> &vec,
+  const unsigned int                                        comp) const
 {
   AssertIndexRange(comp, n_components());
   vec.reinit(dof_info[comp].vector_partitioner, task_info.communicator_sm);
