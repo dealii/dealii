@@ -525,6 +525,9 @@ namespace Portable
   typename MatrixFree<dim, Number>::PrecomputedData
   MatrixFree<dim, Number>::get_data(unsigned int color) const
   {
+    Assert(n_cells[color] > 0,
+           ExcMessage(
+             "Current MPI process does not own any cells of the given color."));
     PrecomputedData data_copy;
     if (q_points.size() > 0)
       data_copy.q_points = q_points[color];
