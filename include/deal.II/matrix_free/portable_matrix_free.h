@@ -202,6 +202,8 @@ namespace Portable
     using point_type    = Point<dim, Number>;
     using CellFilter =
       FilteredIterator<typename DoFHandler<dim>::active_cell_iterator>;
+    using LevelCellFilter =
+      FilteredIterator<typename DoFHandler<dim>::level_cell_iterator>;
 
     /**
      * Standardized data struct to pipe additional data to MatrixFree.
@@ -211,14 +213,17 @@ namespace Portable
       /**
        * Constructor.
        */
-      AdditionalData(const UpdateFlags mapping_update_flags =
-                       update_gradients | update_JxW_values |
-                       update_quadrature_points,
-                     const bool use_coloring                      = false,
-                     const bool overlap_communication_computation = false)
+      AdditionalData(
+        const UpdateFlags mapping_update_flags = update_gradients |
+                                                 update_JxW_values |
+                                                 update_quadrature_points,
+        const bool         use_coloring                      = false,
+        const bool         overlap_communication_computation = false,
+        const unsigned int mg_level = numbers::invalid_unsigned_int)
         : mapping_update_flags(mapping_update_flags)
         , use_coloring(use_coloring)
         , overlap_communication_computation(overlap_communication_computation)
+        , mg_level(mg_level)
       {
 #ifndef DEAL_II_MPI_WITH_DEVICE_SUPPORT
         AssertThrow(
@@ -256,6 +261,14 @@ namespace Portable
        * MPI and use_coloring must be false.
        */
       bool overlap_communication_computation;
+
+      /**
+       * This parameter specifies the level in the triangulation from which the
+       * indices are to be used. If the level is set to
+       * numbers::invalid_unsigned_int (default value), the active cells are
+       * gone through, otherwise the cells in the given local smoothing level.
+       */
+      unsigned int mg_level;
     };
 
     /**
@@ -556,6 +569,14 @@ namespace Portable
     get_dof_handler() const;
 
     /**
+     * Return the local smoothing multigrid level that this object has been
+     * initialized with. The level is `numbers::invalid_unsigned_int` for active
+     * cells.
+     */
+    unsigned int
+    get_mg_level() const;
+
+    /**
      * Return an approximation of the memory consumption of this class in bytes.
      */
     std::size_t
@@ -628,6 +649,12 @@ namespace Portable
      *  MPI and use_coloring must be false.
      */
     bool overlap_communication_computation;
+
+    /**
+     * Multigrid level for which this MatrixFree object is initialized.
+     * If set to numbers::invalid_unsigned_int, this operates on active cells.
+     */
+    unsigned int mg_level;
 
     /**
      * Total number of degrees of freedom.
@@ -776,9 +803,16 @@ namespace Portable
     const DoFHandler<dim> *dof_handler;
 
     /**
-     * Colored graphed of locally owned active cells.
+     * Colored graph of locally owned active cells (used when mg_level ==
+     * invalid).
      */
     std::vector<std::vector<CellFilter>> graph;
+
+    /**
+     * Colored graph of locally owned level cells (used when mg_level !=
+     * invalid).
+     */
+    std::vector<std::vector<LevelCellFilter>> level_graph;
 
     friend class internal::ReinitHelper<dim, Number>;
   };
@@ -997,6 +1031,15 @@ namespace Portable
     Assert(dof_handler != nullptr, ExcNotInitialized());
 
     return *dof_handler;
+  }
+
+
+
+  template <int dim, typename Number>
+  inline unsigned int
+  MatrixFree<dim, Number>::get_mg_level() const
+  {
+    return mg_level;
   }
 
 #endif
