@@ -1393,10 +1393,12 @@ namespace MatrixFreeTools
     {
     public:
       ComputeDiagonalCellAction(
+        const unsigned int                     dof_handler_index,
         const QuadOperation                   &quad_operation,
         const EvaluationFlags::EvaluationFlags evaluation_flags,
         const EvaluationFlags::EvaluationFlags integration_flags)
-        : m_quad_operation(quad_operation)
+        : m_dof_handler_index(dof_handler_index)
+        , m_quad_operation(quad_operation)
         , m_evaluation_flags(evaluation_flags)
         , m_integration_flags(integration_flags)
       {}
@@ -1408,9 +1410,9 @@ namespace MatrixFreeTools
       {
         Portable::
           FEEvaluation<dim, fe_degree, n_q_points_1d, n_components, Number>
-            fe_eval(data);
+            fe_eval(data, m_dof_handler_index);
         const typename Portable::MatrixFree<dim, Number>::PrecomputedData
-                 *gpu_data = data->precomputed_data;
+                 *gpu_data = &data->precomputed_data[m_dof_handler_index];
         const int cell     = data->cell_index;
 
         constexpr int dofs_per_cell = decltype(fe_eval)::tensor_dofs_per_cell;
@@ -1445,7 +1447,9 @@ namespace MatrixFreeTools
                 data->team_member,
                 gpu_data->constraint_weights,
                 gpu_data->constraint_mask(cell * n_components + c),
-                Kokkos::subview(data->shared_data->values, Kokkos::ALL, c));
+                Kokkos::subview(data->shared_data[m_dof_handler_index].values,
+                                Kokkos::ALL,
+                                c));
 
             fe_eval.evaluate(m_evaluation_flags);
             fe_eval.apply_for_each_quad_point(m_quad_operation);
@@ -1456,7 +1460,9 @@ namespace MatrixFreeTools
                 data->team_member,
                 gpu_data->constraint_weights,
                 gpu_data->constraint_mask(cell * n_components + c),
-                Kokkos::subview(data->shared_data->values, Kokkos::ALL, c));
+                Kokkos::subview(data->shared_data[m_dof_handler_index].values,
+                                Kokkos::ALL,
+                                c));
 
             Kokkos::single(Kokkos::PerTeam(data->team_member), [&] {
               if constexpr (n_components == 1)
@@ -1484,8 +1490,9 @@ namespace MatrixFreeTools
               Kokkos::TeamThreadRange(data->team_member, dofs_per_cell),
               [&](const int &i) {
                 dst[gpu_data->local_to_global(i, cell)] +=
-                  data->shared_data->values(i % (dofs_per_cell / n_components),
-                                            i / (dofs_per_cell / n_components));
+                  data->shared_data[m_dof_handler_index].values(
+                    i % (dofs_per_cell / n_components),
+                    i / (dofs_per_cell / n_components));
               });
           }
         else
@@ -1494,9 +1501,10 @@ namespace MatrixFreeTools
               Kokkos::TeamThreadRange(data->team_member, dofs_per_cell),
               [&](const int &i) {
                 Kokkos::atomic_add(&dst[gpu_data->local_to_global(i, cell)],
-                                   data->shared_data->values(
-                                     i % (dofs_per_cell / n_components),
-                                     i / (dofs_per_cell / n_components)));
+                                   data->shared_data[m_dof_handler_index]
+                                     .values(i % (dofs_per_cell / n_components),
+                                             i /
+                                               (dofs_per_cell / n_components)));
               });
           }
       };
@@ -1505,6 +1513,7 @@ namespace MatrixFreeTools
         dealii::Utilities::pow(n_q_points_1d, dim);
 
     private:
+      const unsigned int                     m_dof_handler_index;
       const QuadOperation                    m_quad_operation;
       const EvaluationFlags::EvaluationFlags m_evaluation_flags;
       const EvaluationFlags::EvaluationFlags m_integration_flags;
@@ -1547,7 +1556,7 @@ namespace MatrixFreeTools
                                         n_components,
                                         Number,
                                         QuadOperation>
-      cell_action(quad_operation, evaluation_flags, integration_flags);
+      cell_action(dof_no, quad_operation, evaluation_flags, integration_flags);
     LinearAlgebra::distributed::Vector<Number, MemorySpace> dummy;
     matrix_free.cell_loop(cell_action, dummy, diagonal_global);
 
