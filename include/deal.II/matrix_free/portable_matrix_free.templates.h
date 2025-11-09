@@ -241,7 +241,12 @@ namespace Portable
       auto cell = graph.cbegin(), end_cell = graph.cend();
       for (unsigned int cell_id = 0; cell != end_cell; ++cell, ++cell_id)
         {
-          (*cell)->get_dof_indices(local_dof_indices);
+          // Get DOF indices - use mg_dof_indices for level cells
+          if (data->get_mg_level() == numbers::invalid_unsigned_int)
+            (*cell)->get_dof_indices(local_dof_indices);
+          else
+            (*cell)->get_mg_dof_indices(local_dof_indices);
+
           // When using MPI, we need to transform the local_dof_indices, which
           // contain global numbers of dof indices in the MPI universe, to get
           // local (to the current MPI process) dof indices.
@@ -315,6 +320,23 @@ namespace Portable
       std::vector<types::global_dof_index> local_dof_indices(
         cell->get_fe().n_dofs_per_cell());
       cell->get_dof_indices(local_dof_indices);
+      constraints.resolve_indices(local_dof_indices);
+
+      return local_dof_indices;
+    }
+
+
+
+    template <int dim, typename number>
+    std::vector<types::global_dof_index>
+    get_conflict_indices(
+      const FilteredIterator<typename DoFHandler<dim>::level_cell_iterator>
+                                      &cell,
+      const AffineConstraints<number> &constraints)
+    {
+      std::vector<types::global_dof_index> local_dof_indices(
+        cell->get_fe().n_dofs_per_cell());
+      cell->get_mg_dof_indices(local_dof_indices);
       constraints.resolve_indices(local_dof_indices);
 
       return local_dof_indices;
@@ -445,6 +467,7 @@ namespace Portable
   template <int dim, typename Number>
   MatrixFree<dim, Number>::MatrixFree()
     : my_id(-1)
+    , mg_level(numbers::invalid_unsigned_int)
     , n_dofs(0)
     , padding_length(0)
     , dof_handler(nullptr)
@@ -788,8 +811,11 @@ namespace Portable
     this->use_coloring = additional_data.use_coloring;
     this->overlap_communication_computation =
       additional_data.overlap_communication_computation;
+    this->mg_level = additional_data.mg_level;
 
-    n_dofs = dof_handler->n_dofs();
+    n_dofs = (mg_level == numbers::invalid_unsigned_int) ?
+               dof_handler->n_dofs() :
+               dof_handler->n_dofs(mg_level);
 
     const FiniteElement<dim> &fe = dof_handler->get_fe();
 
@@ -873,94 +899,153 @@ namespace Portable
     Kokkos::deep_copy(constraint_weights, constraint_weights_host);
 
     // Create a graph coloring
-    CellFilter begin(iterator_filter, dof_handler->begin_active());
-    CellFilter end(iterator_filter, dof_handler->end());
-
-    if (begin != end)
+    // Depending on mg_level, we use either active or level cell iterators
+    if (mg_level == numbers::invalid_unsigned_int)
       {
-        if (additional_data.use_coloring)
+        // Use active cells
+        CellFilter begin(iterator_filter, dof_handler->begin_active());
+        CellFilter end(iterator_filter, dof_handler->end());
+
+        if (begin != end)
           {
-            const auto fun = [&](const CellFilter &filter) {
-              return internal::get_conflict_indices<dim, Number>(filter,
-                                                                 constraints);
-            };
-            graph = GraphColoring::make_graph_coloring(begin, end, fun);
-          }
-        else
-          {
-            graph.clear();
-            if (additional_data.overlap_communication_computation)
+            if (additional_data.use_coloring)
               {
-                // We create one color (1) with the cells on the boundary of the
-                // local domain and two colors (0 and 2) with the interior
-                // cells.
-                graph.resize(3, std::vector<CellFilter>());
-
-                std::vector<bool> ghost_vertices(
-                  dof_handler->get_triangulation().n_vertices(), false);
-
-                for (const auto &cell :
-                     dof_handler->get_triangulation().active_cell_iterators())
-                  if (cell->is_ghost())
-                    for (unsigned int i = 0;
-                         i < GeometryInfo<dim>::vertices_per_cell;
-                         i++)
-                      ghost_vertices[cell->vertex_index(i)] = true;
-
-                std::vector<dealii::FilteredIterator<dealii::TriaActiveIterator<
-                  dealii::DoFCellAccessor<dim, dim, false>>>>
-                  inner_cells;
-
-                for (auto cell = begin; cell != end; ++cell)
+                const auto fun = [&](const CellFilter &filter) {
+                  return internal::get_conflict_indices<dim, Number>(
+                    filter, constraints);
+                };
+                graph = GraphColoring::make_graph_coloring(begin, end, fun);
+              }
+            else
+              {
+                graph.clear();
+                if (additional_data.overlap_communication_computation)
                   {
-                    bool ghost_vertex = false;
+                    // We create one color (1) with the cells on the boundary of
+                    // the local domain and two colors (0 and 2) with the
+                    // interior cells.
+                    graph.resize(3, std::vector<CellFilter>());
 
-                    for (unsigned int i = 0;
-                         i < GeometryInfo<dim>::vertices_per_cell;
-                         i++)
-                      if (ghost_vertices[cell->vertex_index(i)])
-                        {
-                          ghost_vertex = true;
-                          break;
-                        }
+                    std::vector<bool> ghost_vertices(
+                      dof_handler->get_triangulation().n_vertices(), false);
 
-                    if (ghost_vertex)
-                      graph[1].emplace_back(cell);
-                    else
-                      inner_cells.emplace_back(cell);
+                    for (const auto &cell : dof_handler->get_triangulation()
+                                              .active_cell_iterators())
+                      if (cell->is_ghost())
+                        for (unsigned int i = 0;
+                             i < GeometryInfo<dim>::vertices_per_cell;
+                             i++)
+                          ghost_vertices[cell->vertex_index(i)] = true;
+
+                    std::vector<
+                      dealii::FilteredIterator<dealii::TriaActiveIterator<
+                        dealii::DoFCellAccessor<dim, dim, false>>>>
+                      inner_cells;
+
+                    for (auto cell = begin; cell != end; ++cell)
+                      {
+                        bool ghost_vertex = false;
+
+                        for (unsigned int i = 0;
+                             i < GeometryInfo<dim>::vertices_per_cell;
+                             i++)
+                          if (ghost_vertices[cell->vertex_index(i)])
+                            {
+                              ghost_vertex = true;
+                              break;
+                            }
+
+                        if (ghost_vertex)
+                          graph[1].emplace_back(cell);
+                        else
+                          inner_cells.emplace_back(cell);
+                      }
+                    for (unsigned i = 0; i < inner_cells.size(); ++i)
+                      if (i < inner_cells.size() / 2)
+                        graph[0].emplace_back(inner_cells[i]);
+                      else
+                        graph[2].emplace_back(inner_cells[i]);
                   }
-                for (unsigned i = 0; i < inner_cells.size(); ++i)
-                  if (i < inner_cells.size() / 2)
-                    graph[0].emplace_back(inner_cells[i]);
-                  else
-                    graph[2].emplace_back(inner_cells[i]);
+                else
+                  {
+                    // If we are not using coloring, all the cells belong to the
+                    // same color.
+                    graph.resize(1, std::vector<CellFilter>());
+                    for (auto cell = begin; cell != end; ++cell)
+                      graph[0].emplace_back(cell);
+                  }
+              }
+          }
+        n_colors = graph.size();
+      }
+    else
+      {
+        // Use level cells - use LocallyOwnedLevelCell filter for level cells
+        IteratorFilters::LocallyOwnedLevelCell locally_owned_level_cell_filter;
+        LevelCellFilter begin(locally_owned_level_cell_filter,
+                              dof_handler->begin_mg(mg_level));
+        LevelCellFilter end(locally_owned_level_cell_filter,
+                            dof_handler->end_mg(mg_level));
+
+        if (begin != end)
+          {
+            if (additional_data.use_coloring)
+              {
+                const auto fun = [&](const LevelCellFilter &filter) {
+                  return internal::get_conflict_indices<dim, Number>(
+                    filter, constraints);
+                };
+                level_graph =
+                  GraphColoring::make_graph_coloring(begin, end, fun);
               }
             else
               {
                 // If we are not using coloring, all the cells belong to the
-                // same color.
-                graph.resize(1, std::vector<CellFilter>());
+                // same color
+                level_graph.clear();
+                level_graph.resize(1, std::vector<LevelCellFilter>());
                 for (auto cell = begin; cell != end; ++cell)
-                  graph[0].emplace_back(cell);
+                  level_graph[0].emplace_back(cell);
               }
           }
+        n_colors = level_graph.size();
       }
-    n_colors = graph.size();
 
     helper.resize(n_colors);
 
     IndexSet locally_relevant_dofs;
     if (comm)
       {
-        locally_relevant_dofs =
-          DoFTools::extract_locally_relevant_dofs(*dof_handler);
+        if (mg_level == numbers::invalid_unsigned_int)
+          locally_relevant_dofs =
+            DoFTools::extract_locally_relevant_dofs(*dof_handler);
+        else
+          locally_relevant_dofs =
+            DoFTools::extract_locally_relevant_level_dofs(*dof_handler,
+                                                          mg_level);
         partitioner = std::make_shared<Utilities::MPI::Partitioner>(
-          dof_handler->locally_owned_dofs(), locally_relevant_dofs, *comm);
+          (mg_level == numbers::invalid_unsigned_int) ?
+            dof_handler->locally_owned_dofs() :
+            dof_handler->locally_owned_mg_dofs(mg_level),
+          locally_relevant_dofs,
+          *comm);
       }
-    for (unsigned int color = 0; color < n_colors; ++color)
+
+    if (mg_level == numbers::invalid_unsigned_int)
       {
-        n_cells[color] = graph[color].size();
-        helper.fill_data(color, graph[color], partitioner);
+        for (unsigned int color = 0; color < n_colors; ++color)
+          {
+            n_cells[color] = graph[color].size();
+            helper.fill_data(color, graph[color], partitioner);
+          }
+      }
+    else
+      {
+        for (unsigned int color = 0; color < n_colors; ++color)
+          {
+            n_cells[color] = level_graph[color].size();
+            helper.fill_data(color, level_graph[color], partitioner);
+          }
       }
 
     // Setup row starts
@@ -996,8 +1081,11 @@ namespace Portable
           }
         else
           {
-            const unsigned int n_local_dofs = dof_handler->n_dofs();
-            unsigned int       i_constraint = 0;
+            const unsigned int n_local_dofs =
+              (mg_level == numbers::invalid_unsigned_int) ?
+                dof_handler->n_dofs() :
+                dof_handler->n_dofs(mg_level);
+            unsigned int i_constraint = 0;
             for (unsigned int i = 0; i < n_local_dofs; ++i)
               {
                 if (constraints.is_constrained(i))
