@@ -1501,8 +1501,6 @@ namespace MatrixFreeTools
           }
       };
 
-      static constexpr unsigned int n_local_dofs =
-        dealii::Utilities::pow(fe_degree + 1, dim) * n_components;
       static constexpr unsigned int n_q_points =
         dealii::Utilities::pow(n_q_points_1d, dim);
 

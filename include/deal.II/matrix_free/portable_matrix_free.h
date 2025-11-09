@@ -488,7 +488,6 @@ namespace Portable
      *   const typename Portable::MatrixFree<dim, Number>::Data *data,
      *   const DeviceVector<Number>                             &src,
      *   DeviceVector<Number>                                   &dst) const;
-     *   static const unsigned int n_local_dofs;
      *   static const unsigned int n_q_points;
      * \endcode
      */
@@ -508,7 +507,6 @@ namespace Portable
      * \code
      *  DEAL_II_HOST_DEVICE void operator()(
      *    const typename Portable::MatrixFree<dim, Number>::Data *data);
-     * static const unsigned int n_local_dofs;
      * static const unsigned int n_q_points;
      * \endcode
      */

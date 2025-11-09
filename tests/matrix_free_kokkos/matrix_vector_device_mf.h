@@ -67,8 +67,6 @@ template <int dim, int fe_degree, typename Number, int n_q_points_1d>
 class HelmholtzOperator
 {
 public:
-  static const unsigned int n_local_dofs =
-    dealii::Utilities::pow(fe_degree + 1, dim);
   static const unsigned int n_q_points =
     dealii::Utilities::pow(n_q_points_1d, dim);
 
@@ -119,8 +117,6 @@ public:
              const unsigned int                                      q) const;
 
   static const unsigned int n_dofs_1d = fe_degree + 1;
-  static const unsigned int n_local_dofs =
-    dealii::Utilities::pow(fe_degree + 1, dim);
   static const unsigned int n_q_points =
     dealii::Utilities::pow(n_q_points_1d, dim);
 
