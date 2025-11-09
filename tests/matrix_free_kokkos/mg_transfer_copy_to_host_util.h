@@ -65,13 +65,43 @@ print(const LinearAlgebra::distributed::Vector<Number, MemorySpace::Host> &vec)
 
 template <typename Number>
 void
+print_if_non_zero(const LinearAlgebra::distributed::Vector<Number> &vec,
+                  const Number                                      tolerance)
+{
+  for (const auto &v : vec)
+    if (std::abs(v) > tolerance)
+      deallog << v << " ";
+    else
+      deallog << 0.0 << " ";
+  deallog << std::endl;
+}
+
+template <typename Number>
+void
 copy_to_host(
-  LinearAlgebra::distributed::Vector<Number, dealii::MemorySpace::Host>  &dst,
-  const LinearAlgebra::distributed::Vector<Number, MemorySpace::Default> &src)
+  LinearAlgebra::distributed::Vector<Number, dealii::MemorySpace::Host> &dst,
+  const LinearAlgebra::distributed::Vector<Number, dealii::MemorySpace::Default>
+    &src)
 {
   LinearAlgebra::ReadWriteVector<Number> rw_vector(
     src.get_partitioner()->locally_owned_range());
   rw_vector.import_elements(src, VectorOperation::insert);
+
+  dst.reinit(src.get_partitioner());
+  dst.import_elements(rw_vector, VectorOperation::insert);
+}
+
+template <typename Number>
+void
+copy_from_host(
+  LinearAlgebra::distributed::Vector<Number, dealii::MemorySpace::Default> &dst,
+  const LinearAlgebra::distributed::Vector<Number, dealii::MemorySpace::Host>
+    &src)
+{
+  LinearAlgebra::ReadWriteVector<Number> rw_vector(
+    src.get_partitioner()->locally_owned_range());
+  rw_vector.import_elements(src, VectorOperation::insert);
+
 
   dst.reinit(src.get_partitioner());
   dst.import_elements(rw_vector, VectorOperation::insert);
@@ -106,8 +136,8 @@ test_copy_to_host_transfer_operator(
   initialize_dof_vector(dst, dof_handler_fine, mg_level_fine);
   initialize_dof_vector(src, dof_handler_coarse, mg_level_coarse);
 
-  initialize_dof_vector(src_host, dof_handler_fine, mg_level_fine);
-  initialize_dof_vector(dst_host, dof_handler_coarse, mg_level_coarse);
+  initialize_dof_vector(dst_host, dof_handler_fine, mg_level_fine);
+  initialize_dof_vector(src_host, dof_handler_coarse, mg_level_coarse);
 
   // test prolongation
   {
