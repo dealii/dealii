@@ -40,8 +40,6 @@ public:
              const Portable::DeviceVector<double>                   &src,
              Portable::DeviceVector<double>                         &dst) const;
 
-  static const unsigned int n_local_dofs =
-    dealii::Utilities::pow(fe_degree + 1, dim);
   static const unsigned int n_q_points =
     dealii::Utilities::pow(fe_degree + 1, dim);
 };

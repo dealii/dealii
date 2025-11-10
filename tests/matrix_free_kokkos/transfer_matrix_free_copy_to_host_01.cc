@@ -213,8 +213,6 @@ public:
     phi.distribute_local_to_global(dst);
   }
 
-  static const unsigned int n_local_dofs =
-    Utilities::pow(fe_degree + 1, dim) * n_components;
   static const unsigned int n_q_points = Utilities::pow(fe_degree + 1, dim);
 };
 
