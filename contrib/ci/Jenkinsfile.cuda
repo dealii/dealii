@@ -1,0 +1,138 @@
+#!groovy
+
+/*
+
+This Jenkins job runs a build with a CUDA GU with Ubuntu
+
+See https://ci.tjhei.info/job/dealii-cuda/ for details.
+
+*/
+
+/*
+Settings to apply inside Jenkins:
+  - discover pull requests (remove branches/master)
+  - Strategy: merged PR
+  - enable "Disable GitHub Multibranch Status Plugin"
+  - trigger build on pull request comment: .* /rebuild.* (without space!)
+  - Jenkinsfile: choose contrib/ci/Jenkinsfile.cuda
+  - scan: every 4 hours
+  - discard: 5+ items
+*/
+
+// load library https://github.com/tjhei/jenkins-stuff to provide
+// killold.killOldBuilds() function:
+@Library('tjhei') _
+
+pipeline
+{
+  agent none
+
+  stages
+  {
+    stage("abort old")
+    {
+      agent none
+      steps
+      {
+        githubNotify context: 'Jenkins: CUDA', description: 'initializing...',  status: 'PENDING'
+        // kill older builds in this PR:
+        script { killold.killOldBuilds() }
+      }
+    }
+
+    stage("main")
+    {
+      agent
+      {
+        node
+        {
+          label 'cuda'
+        }
+      }
+
+      post { cleanup { cleanWs() } }
+
+      stages
+      {
+        stage("check")
+        {
+          when {
+            not {
+              anyOf {
+                branch 'master'
+                branch pattern: "dealii*", comparator: "GLOB"
+              }
+            }
+          }
+
+          steps
+          {
+            githubNotify context: 'Jenkins: CUDA', description: 'pending...',  status: 'PENDING'
+            sh '''
+               wget -q -O - https://api.github.com/repos/dealii/dealii/issues/${CHANGE_ID}/labels | grep 'ready to test' || \
+               { echo "This commit will only be tested when it has the label 'ready to test'. Trigger a rebuild by adding a comment that contains '/rebuild'..."; exit 1; }
+               '''
+          }
+          post
+          {
+            failure
+            {
+              githubNotify context: 'Jenkins: CUDA', description: 'need ready to test label and /rebuild',  status: 'PENDING'
+              script
+              {
+                currentBuild.result='NOT_BUILT'
+              }
+            }
+          }
+        }
+
+        stage('build')
+        {
+          steps
+          {
+            timeout(time: 2, unit: 'HOURS')
+            {
+              sh "echo \"building on node ${env.NODE_NAME}\""
+              sh '''#!/bin/bash
+                    set -e
+                    set -x
+                    mkdir build && cd build
+                    cmake \
+                      -D DEAL_II_WITH_MPI=ON \
+                      -D CMAKE_CXX_COMPILER=${KOKKOS_DIR}/bin/nvcc_wrapper \
+                      -D DEAL_II_EARLY_DEPRECATIONS=ON \
+                      -D CMAKE_BUILD_TYPE=Debug \
+                      -D DEAL_II_WITH_KOKKOS=ON \
+                      -D KOKKOS_DIR=${KOKKOS_DIR} \
+                      -D DEAL_II_MPI_WITH_DEVICE_SUPPORT=OFF \
+                      -G Ninja \
+                      $WORKSPACE/
+                    ninja -j 14
+                    ninja setup_tests_matrix_free_kokkos
+                    ctest -j 14 --output-on-failure --schedule-random --no-compress-output -T test
+                 '''
+              githubNotify context: 'Jenkins: CUDA', description: 'OK',  status: 'SUCCESS'
+            }
+          }
+
+          post
+          {
+            always
+            {
+              sh "cp build/Testing/*/*.xml $WORKSPACE/ || true"
+              xunit tools: [CTest(pattern: '*.xml')]
+              sh "cp build/detailed.log $WORKSPACE/detailed-cuda.log || true"
+              archiveArtifacts artifacts: 'detailed-cuda.log', fingerprint: true
+            }
+
+            failure
+            {
+              githubNotify context: 'Jenkins: CUDA', description: 'build failed',  status: 'FAILURE'
+            }
+          }
+        }
+
+      }
+    }
+  }
+}
