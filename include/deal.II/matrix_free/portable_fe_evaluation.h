@@ -115,7 +115,8 @@ namespace Portable
 
     /**
      * Number of tensor degrees of freedom of all component determined from
-     * the given template argument `fe_degree`.
+     * the given template argument `fe_degree`. This is the total number of
+     * local DoFs in a cell.
      */
     static constexpr unsigned int tensor_dofs_per_cell =
       tensor_dofs_per_component * n_components;

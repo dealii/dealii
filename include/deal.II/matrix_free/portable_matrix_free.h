@@ -700,7 +700,6 @@ namespace Portable
     unsigned int mg_level;
 
     /**
-     * Total number of degrees of freedom.
      * Store data that is specific to each DoFHandler.
      */
     struct PerDoFHandlerData
@@ -896,6 +895,7 @@ namespace Portable
       Kokkos::MemoryTraits<Kokkos::Unmanaged>>;
 
     /**
+     * Allocate Kokkos Views of the right size.
      */
     DEAL_II_HOST_DEVICE
     void

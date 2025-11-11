@@ -807,20 +807,33 @@ namespace Portable
   std::size_t
   MatrixFree<dim, Number>::memory_consumption() const
   {
-    // First compute the size of n_cells, row_starts, kernel launch parameters,
-    // and constrained_dofs
-    std::size_t bytes = n_cells.size() * sizeof(unsigned int) * 2;
-    // n_constrained_dofs * sizeof(unsigned int);
+    // TODO: move this into MemoryConsumption namespace:
+    auto mem = [](const auto &kokkos_view) -> std::size_t {
+      return kokkos_view.span() * sizeof(typename std::remove_reference_t<
+                                         decltype(kokkos_view)>::value_type);
+    };
 
-    // For each color, add local_to_global, inv_jacobian, JxW, and q_points.
-    // FIXME
+    std::size_t bytes = sizeof(*this) +
+                        MemoryConsumption::memory_consumption(row_start) +
+                        MemoryConsumption::memory_consumption(graph) +
+                        MemoryConsumption::memory_consumption(level_graph);
+
     for (unsigned int color = 0; color < n_colors; ++color)
+      bytes += mem(q_points[color]);
+
+    for (const PerDoFHandlerData &pdhd : dof_handler_data)
       {
-        bytes += n_cells[color] * padding_length * sizeof(unsigned int) +
-                 n_cells[color] * padding_length * dim * dim * sizeof(Number) +
-                 n_cells[color] * padding_length * sizeof(Number) +
-                 n_cells[color] * padding_length * sizeof(point_type) +
-                 n_cells[color] * sizeof(unsigned int);
+        bytes += sizeof(PerDoFHandlerData) + mem(pdhd.shape_values) +
+                 mem(pdhd.shape_gradients) + mem(pdhd.co_shape_gradients) +
+                 mem(pdhd.constraint_weights) + mem(pdhd.constrained_dofs);
+
+        if (pdhd.partitioner)
+          bytes += pdhd.partitioner->memory_consumption();
+
+        for (unsigned int color = 0; color < n_colors; ++color)
+          bytes += mem(pdhd.local_to_global[color]) +
+                   mem(pdhd.inv_jacobian[color]) + mem(pdhd.JxW[color]) +
+                   mem(pdhd.constraint_mask[color]);
       }
 
     return bytes;
@@ -907,7 +920,7 @@ namespace Portable
     q_points_per_cell = Utilities::fixed_power<dim>(n_q_points_1d);
 
 
-    // * Perform Graph coloring
+    // Perform Graph coloring
     {
       const Triangulation<dim> &tria = dof_handler_[0]->get_triangulation();
       graph.clear();
@@ -1063,7 +1076,7 @@ namespace Portable
     }
 
 
-    // * Fill PerDoFHandlerData
+    // Fill PerDoFHandlerData
 
     const unsigned int n_dof_handler = dof_handler_.size();
     dof_handler_data.resize(n_dof_handler);
