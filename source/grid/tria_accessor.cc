@@ -2376,12 +2376,13 @@ CellAccessor<dim, spacedim>::get_cells_adjacent_to_line(
   AssertIndexRange(i, this->n_lines());
 
   // We explicitly allow the call of the get_cells_adjacent_to_line() before
-  // prepare_line_to_adjacent_cells_map() was called, as this happens during
+  // compute_line_to_adjacent_cells_map() was called, as this happens during
   // the initialization of the FE element (e.g., in FE_NedelecSZ).
-  if (this->tria->line_to_adjacent_cells_map.n_elements() == 0)
+  if (!this->tria->line_to_adjacent_cells_map.has_value())
     return std::set<TriaActiveIterator<CellAccessor<dim, spacedim>>>();
 
-  return this->tria->line_to_adjacent_cells_map(this->active_cell_index(), i);
+  const auto &map = this->tria->line_to_adjacent_cells_map;
+  return map.value()[this->active_cell_index()][i];
 }
 
 

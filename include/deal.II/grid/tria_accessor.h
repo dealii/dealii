@@ -4145,8 +4145,10 @@ public:
    *
    * @note This information is not computed by default, as the computation
    * is quite expensive. Before using this function,
-   * 'Triangulation::prepare_line_to_adjacent_cells_map()' has to be called
+   * Triangulation::compute_line_to_adjacent_cells_map() has to be called
    * once on the underlying triangulation.
+   *
+   * This is only implemented for the case where dim==3.
    */
   std::set<TriaActiveIterator<CellAccessor<dim, spacedim>>>
   get_cells_adjacent_to_line(const unsigned int i) const;

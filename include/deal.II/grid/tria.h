@@ -2108,10 +2108,12 @@ public:
   flip_all_direction_flags();
 
   /**
-   * (Re-)Create the information of adjacent cells for each line.
+   * (Re-)Create the information of adjacent cells for each line,
+   * which can be accessed via TriaAccessor::get_cells_adjacent_to_line.
+   * Note that this information is only built for the case where dim==3.
    */
   void
-  prepare_line_to_adjacent_cells_map();
+  compute_line_to_adjacent_cells_map();
 
   /**
    * @name Mesh refinement
@@ -4053,8 +4055,13 @@ protected:
    * The table stores the neighboring cells for each line.
    * This allows for quick access to the adjacent cells,
    * given the cell and the line number.
+   *
+   * This map is destroyed upon mesh refinement, and can be
+   * rebuilt by calling compute_line_to_adjacent_cells_map(). If
+   * that function is not called, the map does not exist.
    */
-  Table<2, std::set<active_cell_iterator>> line_to_adjacent_cells_map;
+  std::optional<Table<2, std::set<active_cell_iterator>>>
+    line_to_adjacent_cells_map;
 
   /**
    * Write a bool vector to the given stream, writing a pre- and a postfix
