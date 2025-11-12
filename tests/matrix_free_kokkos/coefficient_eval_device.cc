@@ -61,7 +61,7 @@ DummyOperator<dim, fe_degree>::operator()(
 
       auto point = data->get_quadrature_point(data->cell_index, q_point);
       dst[pos] =
-        dim == 2 ? point[0] + point[1] : point[0] + point[1] + point[2];
+        (dim == 2) ? (point[0] + point[1]) : (point[0] + point[1] + point[2]);
     });
 }
 
@@ -144,7 +144,7 @@ test()
   for (unsigned int color = 0; color < n_colors; ++color)
     {
       typename Portable::MatrixFree<dim, double>::PrecomputedData gpu_data =
-        mf_data.get_data(color);
+        mf_data.get_data(0, color);
       const unsigned int n_cells = gpu_data.n_cells;
       auto gpu_data_host         = Portable::copy_mf_data_to_host<dim, double>(
         gpu_data, additional_data.mapping_update_flags);
