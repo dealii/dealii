@@ -24,6 +24,7 @@
 #include <deal.II/base/observer_pointer.h>
 #include <deal.II/base/partitioner.h>
 #include <deal.II/base/point.h>
+#include <deal.II/base/table.h>
 
 #include <deal.II/grid/cell_id.h>
 #include <deal.II/grid/cell_status.h>
@@ -44,6 +45,7 @@
 #include <map>
 #include <memory>
 #include <numeric>
+#include <set>
 #include <vector>
 
 
@@ -2106,6 +2108,12 @@ public:
   flip_all_direction_flags();
 
   /**
+   * (Re-)Create the information of adjacent cells for each line.
+   */
+  void
+  prepare_line_to_adjacent_cells_map();
+
+  /**
    * @name Mesh refinement
    * @{
    */
@@ -4040,6 +4048,13 @@ protected:
    * (also in the distributed case).
    */
   std::vector<ReferenceCell> reference_cells;
+
+  /**
+   * The table stores the neighboring cells for each line.
+   * This allows for quick access to the adjacent cells,
+   * given the cell and the line number.
+   */
+  Table<2, std::set<active_cell_iterator>> line_to_adjacent_cells_map;
 
   /**
    * Write a bool vector to the given stream, writing a pre- and a postfix

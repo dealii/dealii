@@ -12864,6 +12864,51 @@ void Triangulation<dim, spacedim>::flip_all_direction_flags()
 
 template <int dim, int spacedim>
 DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
+void Triangulation<dim, spacedim>::prepare_line_to_adjacent_cells_map()
+{
+  if (dim == 3)
+    {
+      // Compute the vertex to cell map
+      const std::vector<std::set<active_cell_iterator>> vertex_to_cell =
+        GridTools::vertex_to_cell_map(*this);
+
+      // Compute the line-neighbors
+      this->line_to_adjacent_cells_map.reinit(
+        this->n_active_cells(), GeometryInfo<dim>::lines_per_cell);
+
+      // Loop over all cells -> lines -> vertices
+      for (const auto &cell : this->active_cell_iterators())
+        for (unsigned int line : cell->line_indices())
+          {
+            unsigned int vertex_0 = cell->vertex_index(
+              GeometryInfo<dim>::line_to_cell_vertices(line, 0));
+            unsigned int vertex_1 = cell->vertex_index(
+              GeometryInfo<dim>::line_to_cell_vertices(line, 1));
+            const std::set<
+              typename Triangulation<dim, spacedim>::active_cell_iterator>
+              &adjacent_cells_to_vertex_0 = vertex_to_cell[vertex_0];
+            const std::set<
+              typename Triangulation<dim, spacedim>::active_cell_iterator>
+              &adjacent_cells_to_vertex_1 = vertex_to_cell[vertex_1];
+
+            // add all cells that are adjacent to vertex_0 and vertex_1
+            std::set_intersection(
+              adjacent_cells_to_vertex_0.begin(),
+              adjacent_cells_to_vertex_0.end(),
+              adjacent_cells_to_vertex_1.begin(),
+              adjacent_cells_to_vertex_1.end(),
+              std::inserter(
+                line_to_adjacent_cells_map(cell->active_cell_index(), line),
+                line_to_adjacent_cells_map(cell->active_cell_index(), line)
+                  .begin()));
+          }
+    }
+}
+
+
+
+template <int dim, int spacedim>
+DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
 void Triangulation<dim, spacedim>::set_all_refine_flags()
 {
   Assert(n_cells() > 0,
@@ -15861,6 +15906,11 @@ void Triangulation<dim, spacedim>::execute_coarsening_and_refinement()
   this->unpack_data_serial();
 
   reset_cell_vertex_indices_cache();
+
+  // If the line_to_adjacent_cell_map is populated, clear it, as it must
+  // be recomputed every time the mesh changes.
+  if (line_to_adjacent_cells_map.n_elements() != 0)
+    line_to_adjacent_cells_map.clear();
 
   // verify a case with which we have had
   // some difficulty in the past (see the
