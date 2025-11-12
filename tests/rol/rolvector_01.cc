@@ -1,7 +1,7 @@
 // ------------------------------------------------------------------------
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
-// Copyright (C) 2017 - 2024 by the deal.II authors
+// Copyright (C) 2017 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -12,11 +12,11 @@
 //
 // ------------------------------------------------------------------------
 
-// Test to check Rol::VectorAdaptor::set() and Rol::VectorAdaptor::plus().
+// Test to check ROLVector::set() and ROLVector::plus().
 
 #include <deal.II/lac/generic_linear_algebra.h>
 
-#include <deal.II/optimization/rol/vector_adaptor.h>
+#include <deal.II/trilinos/rol_vector.h>
 
 #include "../tests.h"
 
@@ -25,25 +25,25 @@ template <typename VectorType>
 void
 test(const VectorType &given_vector)
 {
-  ROL::Ptr<VectorType> given_vector_rcp =
+  ROL::Ptr<VectorType> given_vector_ptr =
     ROL::makePtr<VectorType>(given_vector);
 
   // --- Testing the constructor
-  Rol::VectorAdaptor<VectorType> given_vector_rol(given_vector_rcp);
+  TrilinosWrappers::ROLVector<VectorType> given_vector_rol(given_vector_ptr);
   AssertThrow(given_vector == *given_vector_rol.getVector(),
               ExcInternalError());
 
 
-  ROL::Ptr<VectorType>           w_rcp = ROL::makePtr<VectorType>();
-  Rol::VectorAdaptor<VectorType> w_rol(w_rcp);
+  ROL::Ptr<VectorType>                    w_ptr = ROL::makePtr<VectorType>();
+  TrilinosWrappers::ROLVector<VectorType> w_rol(w_ptr);
 
-  // --- Testing VectorAdaptor::set()
+  // --- Testing ROLVector::set()
   {
     w_rol.set(given_vector_rol);
     AssertThrow(given_vector == *w_rol.getVector(), ExcInternalError());
   }
 
-  // --- Testing VectorAdaptor::plus()
+  // --- Testing ROLVector::plus()
   {
     VectorType u;
     u = given_vector;
