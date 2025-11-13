@@ -69,9 +69,10 @@ namespace Portable
       void
       resize(const unsigned int n_colors);
 
-      template <typename CellFilter>
+      template <typename ExecutionSpace, typename CellFilter>
       void
       fill_data(
+        ExecutionSpace                                           &exec_space,
         const unsigned int                                        color,
         const std::vector<CellFilter>                            &graph,
         const std::shared_ptr<const Utilities::MPI::Partitioner> &partitioner);
@@ -154,9 +155,10 @@ namespace Portable
 
 
     template <int dim, typename Number>
-    template <typename CellFilter>
+    template <typename ExecutionSpace, typename CellFilter>
     void
     ReinitHelper<dim, Number>::fill_data(
+      ExecutionSpace                                           &exec_space,
       const unsigned int                                        color,
       const std::vector<CellFilter>                            &graph,
       const std::shared_ptr<const Utilities::MPI::Partitioner> &partitioner)
@@ -309,15 +311,21 @@ namespace Portable
         }
 
       // Copy the data to the device
-      Kokkos::deep_copy(dof_data.constraint_mask[color], constraint_mask_host);
-      Kokkos::deep_copy(dof_data.local_to_global[color], local_to_global_host);
+      Kokkos::deep_copy(exec_space,
+                        dof_data.constraint_mask[color],
+                        constraint_mask_host);
+      Kokkos::deep_copy(exec_space,
+                        dof_data.local_to_global[color],
+                        local_to_global_host);
       if (update_flags & update_quadrature_points && dof_handler_index == 0)
-        Kokkos::deep_copy(data->q_points[color], q_points_host);
+        Kokkos::deep_copy(exec_space, data->q_points[color], q_points_host);
 
       if (update_flags & update_JxW_values)
-        Kokkos::deep_copy(dof_data.JxW[color], JxW_host);
+        Kokkos::deep_copy(exec_space, dof_data.JxW[color], JxW_host);
       if (update_flags & update_gradients)
-        Kokkos::deep_copy(dof_data.inv_jacobian[color], inv_jacobian_host);
+        Kokkos::deep_copy(exec_space,
+                          dof_data.inv_jacobian[color],
+                          inv_jacobian_host);
     }
 
 
@@ -1081,6 +1089,8 @@ namespace Portable
     const unsigned int n_dof_handler = dof_handler_.size();
     dof_handler_data.resize(n_dof_handler);
 
+    ::dealii::MemorySpace::Default::kokkos_space::execution_space exec_space;
+
     for (unsigned int c = 0; c < n_dof_handler; ++c)
       {
         PerDoFHandlerData &data = dof_handler_data[c];
@@ -1118,7 +1128,8 @@ namespace Portable
           Kokkos::View<Number *, MemorySpace::Default::kokkos_space>(
             Kokkos::view_alloc("shape_values", Kokkos::WithoutInitializing),
             size_shape_values);
-        Kokkos::deep_copy(data.shape_values,
+        Kokkos::deep_copy(exec_space,
+                          data.shape_values,
                           Kokkos::View<Number *, Kokkos::HostSpace>(
                             shape_info.data.front().shape_values.data(),
                             size_shape_values));
@@ -1130,7 +1141,8 @@ namespace Portable
                 Kokkos::view_alloc("shape_gradients",
                                    Kokkos::WithoutInitializing),
                 size_shape_values);
-            Kokkos::deep_copy(data.shape_gradients,
+            Kokkos::deep_copy(exec_space,
+                              data.shape_gradients,
                               Kokkos::View<Number *, Kokkos::HostSpace>(
                                 shape_info.data.front().shape_gradients.data(),
                                 size_shape_values));
@@ -1142,6 +1154,7 @@ namespace Portable
                                    Kokkos::WithoutInitializing),
                 n_q_points_1d * n_q_points_1d);
             Kokkos::deep_copy(
+              exec_space,
               data.co_shape_gradients,
               Kokkos::View<Number *, Kokkos::HostSpace>(
                 shape_info.data.front().shape_gradients_collocation.data(),
@@ -1171,7 +1184,9 @@ namespace Portable
             constraint_weights_host[i] =
               shape_info.data.front().subface_interpolation_matrices[0][i];
           }
-        Kokkos::deep_copy(data.constraint_weights, constraint_weights_host);
+        Kokkos::deep_copy(exec_space,
+                          data.constraint_weights,
+                          constraint_weights_host);
 
         helper.resize(n_colors);
 
@@ -1198,14 +1213,20 @@ namespace Portable
           {
             for (unsigned int color = 0; color < n_colors; ++color)
               {
-                helper.fill_data(color, graph[color], data.partitioner);
+                helper.fill_data(exec_space,
+                                 color,
+                                 graph[color],
+                                 data.partitioner);
               }
           }
         else
           {
             for (unsigned int color = 0; color < n_colors; ++color)
               {
-                helper.fill_data(color, level_graph[color], data.partitioner);
+                helper.fill_data(exec_space,
+                                 color,
+                                 level_graph[color],
+                                 data.partitioner);
               }
           }
 
@@ -1265,10 +1286,17 @@ namespace Portable
                          Kokkos::MemoryTraits<Kokkos::Unmanaged>>
               constrained_dofs_host_view(constrained_dofs_host.data(),
                                          constrained_dofs_host.size());
-            Kokkos::deep_copy(data.constrained_dofs,
+            Kokkos::deep_copy(exec_space,
+                              data.constrained_dofs,
                               constrained_dofs_host_view);
           }
       }
+
+#if DEAL_II_KOKKOS_VERSION_GTE(3, 6, 0)
+    exec_space.fence("MatrixFree::internal_reinit(): end");
+#else
+    exec_space.fence();
+#endif
   }
 
 
