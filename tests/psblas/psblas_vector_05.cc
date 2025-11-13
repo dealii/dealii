@@ -25,11 +25,11 @@
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/grid_tools.h>
 
-#include "deal.II/lac/vector.h"
-#include "deal.II/lac/vector_operation.h"
 #include <deal.II/lac/affine_constraints.h>
 #include <deal.II/lac/petsc_vector.h>
 #include <deal.II/lac/psblas_vector.h>
+#include <deal.II/lac/vector.h>
+#include <deal.II/lac/vector_operation.h>
 
 #include <psb_c_dbase.h>
 
