@@ -12,9 +12,9 @@
 //
 // ------------------------------------------------------------------------
 
-#include "deal.II/base/types.h"
 #include <deal.II/base/exception_macros.h>
 #include <deal.II/base/logstream.h>
+#include <deal.II/base/types.h>
 
 #include <deal.II/distributed/fully_distributed_tria.h>
 #include <deal.II/distributed/tria.h>
