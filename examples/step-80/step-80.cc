@@ -26,6 +26,8 @@
 #include <deal.II/lac/linear_operator_tools.h>
 #include <deal.II/lac/block_linear_operator.h>
 
+#include <deal.II/lac/affine_constraints.templates.h>
+
 #include <boost/algorithm/string.hpp>
 
 #define FORCE_USE_OF_TRILINOS
@@ -992,8 +994,8 @@ namespace Step80
           cell->get_dof_indices(local_dof_indices);
           fluid_constraints.distribute_local_to_global(cell_rhs,
                                                        local_dof_indices,
-                                                       fluid_system_rhs); //,
-          // cell_matrix); // This should be here [TBD]
+                                                       fluid_system_rhs,
+                                                       cell_matrix);
         }
 
     fluid_system_rhs.compress(VectorOperation::add);
@@ -1347,6 +1349,15 @@ namespace Step80
 
     const auto system = block_operator<4, 4, BVec>(system_array);
 
+    BVec block_system_rhs, block_system_solution;
+    system.reinit_range_vector(block_system_rhs, false);
+    system.reinit_domain_vector(block_system_solution, false);
+
+    block_system_rhs.block(0) = fluid_system_rhs.block(0);
+    block_system_rhs.block(1) = solid_system_rhs.block(0);
+    block_system_rhs.block(2) = solid_system_rhs.block(1);
+    block_system_rhs.block(3) = fluid_system_rhs.block(1);
+
     const auto AA  = block_operator<2, 2, BVec>(AA_array);
     const auto BB  = block_operator<2, 2, BVec>(BB_array);
     const auto BBt = transpose_operator(BB);
@@ -1377,8 +1388,22 @@ namespace Step80
 
     fluid_constraints.set_zero(fluid_solution);
 
-    solver.solve(fluid_matrix, fluid_solution, fluid_system_rhs, P);
 
+    // solver.solve(fluid_matrix, fluid_solution, fluid_system_rhs, P);
+    const auto id = identity_operator<BVec>(system);
+
+    pcout << "Call vmult" << std::endl;
+    system.vmult(block_system_solution, block_system_rhs);
+    pcout << "Call solve" << std::endl;
+
+    solver.solve(system,
+                 block_system_solution,
+                 block_system_rhs,
+                 PreconditionIdentity());
+    fluid_solution.block(0) = block_system_solution.block(0);
+    solid_solution.block(0) = block_system_solution.block(1);
+    solid_solution.block(1) = block_system_solution.block(2);
+    fluid_solution.block(1) = block_system_solution.block(3);
 
     pcout << "   Solved in " << solver_control.last_step() << " iterations."
           << std::endl;
