@@ -21,7 +21,7 @@
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/manifold_lib.h>
 
-#include "deal.II/lac/affine_constraints.h"
+#include <deal.II/lac/affine_constraints.h>
 #include <deal.II/lac/la_parallel_block_vector.h>
 
 #include <deal.II/matrix_free/portable_fe_evaluation.h>
@@ -208,10 +208,6 @@ test()
   dof3.distribute_dofs(fe3);
 
   std::vector<const DoFHandler<dim> *> dof_handler_vec = {&dof1, &dof2, &dof3};
-
-  AffineConstraints<double> constraints;
-  DoFTools::make_hanging_node_constraints(dof, constraints);
-  constraints.close();
 
   AffineConstraints<double> constraints1, constraints2, constraints3;
   DoFTools::make_hanging_node_constraints(dof1, constraints1);
