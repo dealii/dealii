@@ -219,11 +219,13 @@ namespace Portable
                                                  update_quadrature_points,
         const bool         use_coloring                      = false,
         const bool         overlap_communication_computation = false,
-        const unsigned int mg_level = numbers::invalid_unsigned_int)
+        const unsigned int mg_level  = numbers::invalid_unsigned_int,
+        const unsigned int team_size = numbers::invalid_unsigned_int)
         : mapping_update_flags(mapping_update_flags)
         , use_coloring(use_coloring)
         , overlap_communication_computation(overlap_communication_computation)
         , mg_level(mg_level)
+        , team_size(team_size)
       {
 #ifndef DEAL_II_MPI_WITH_DEVICE_SUPPORT
         AssertThrow(
@@ -269,6 +271,12 @@ namespace Portable
        * gone through, otherwise the cells in the given local smoothing level.
        */
       unsigned int mg_level;
+
+      /**
+       * The team size used by the underlying kokkos team policy. If -1 is
+       * provided then Kokkos::AUTO will be used.
+       */
+      unsigned int team_size;
     };
 
     /**
@@ -698,6 +706,12 @@ namespace Portable
      * If set to numbers::invalid_unsigned_int, this operates on active cells.
      */
     unsigned int mg_level;
+
+    /**
+     * The team size used by the underlying kokkos team policy. If -1 is
+     * provided then Kokkos::AUTO will be used.
+     */
+    unsigned int team_size;
 
     /**
      * Store data that is specific to each DoFHandler.
