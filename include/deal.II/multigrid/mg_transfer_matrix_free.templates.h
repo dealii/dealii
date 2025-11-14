@@ -2742,16 +2742,16 @@ namespace internal
 
 
 
-  template <typename VectorType>
-  MGTwoLevelTransferCore<VectorType>::MGTwoLevelTransferCore()
+  template <int dim, typename VectorType>
+  MGTwoLevelTransferCore<dim, VectorType>::MGTwoLevelTransferCore()
     : vec_fine_needs_ghost_update(true)
   {}
 
 
 
-  template <typename VectorType>
+  template <int dim, typename VectorType>
   void
-  MGTwoLevelTransferCore<VectorType>::prolongate_and_add(
+  MGTwoLevelTransferCore<dim, VectorType>::prolongate_and_add(
     VectorType       &dst,
     const VectorType &src) const
   {
@@ -2838,9 +2838,9 @@ namespace internal
 
 
 
-  template <typename VectorType>
+  template <int dim, typename VectorType>
   void
-  MGTwoLevelTransferCore<VectorType>::restrict_and_add(
+  MGTwoLevelTransferCore<dim, VectorType>::restrict_and_add(
     VectorType       &dst,
     const VectorType &src) const
   {
@@ -3516,10 +3516,10 @@ namespace internal
 
 
 
-  template <typename VectorType>
-  template <int dim, std::size_t width, typename IndexType>
+  template <int dim, typename VectorType>
+  template <std::size_t width, typename IndexType>
   std::pair<bool, bool>
-  MGTwoLevelTransferCore<VectorType>::
+  MGTwoLevelTransferCore<dim, VectorType>::
     internal_enable_inplace_operations_if_possible(
       const std::shared_ptr<const Utilities::MPI::Partitioner>
         &external_partitioner_coarse,
@@ -3941,11 +3941,21 @@ MGTwoLevelTransfer<dim, VectorType>::memory_consumption() const
 }
 
 
+
+template <int dim, typename VectorType>
+std::pair<const DoFHandler<dim> *, unsigned int>
+MGTwoLevelTransfer<dim, VectorType>::get_dof_handler_fine() const
+{
+  return {this->dof_handler_fine, this->mg_level_fine};
+}
+
+
+
 namespace internal
 {
-  template <typename VectorType>
+  template <int dim, typename VectorType>
   void
-  MGTwoLevelTransferCore<VectorType>::update_ghost_values(
+  MGTwoLevelTransferCore<dim, VectorType>::update_ghost_values(
     const VectorType &vec) const
   {
     if ((vec.get_partitioner().get() == this->partitioner_coarse.get()) &&
@@ -3964,9 +3974,9 @@ namespace internal
 
 
 
-  template <typename VectorType>
+  template <int dim, typename VectorType>
   void
-  MGTwoLevelTransferCore<VectorType>::compress(
+  MGTwoLevelTransferCore<dim, VectorType>::compress(
     VectorType                   &vec,
     const VectorOperation::values op) const
   {
@@ -3988,9 +3998,9 @@ namespace internal
 
 
 
-  template <typename VectorType>
+  template <int dim, typename VectorType>
   void
-  MGTwoLevelTransferCore<VectorType>::zero_out_ghost_values(
+  MGTwoLevelTransferCore<dim, VectorType>::zero_out_ghost_values(
     const VectorType &vec) const
   {
     if ((vec.get_partitioner().get() == this->partitioner_coarse.get()) &&
@@ -4079,41 +4089,14 @@ MGTransferMatrixFree<dim, Number, MemorySpace>::get_dof_handler_fine() const
     // single level: the information cannot be retrieved
     return {nullptr, numbers::invalid_unsigned_int};
 
-  if (const auto t = dynamic_cast<const MGTwoLevelTransfer<
+  if (const auto t = dynamic_cast<const MGTwoLevelTransferBase<
         dim,
         LinearAlgebra::distributed::Vector<Number, MemorySpace>> *>(
         this->transfer[this->transfer.max_level()].get()))
     {
-      return {t->dof_handler_fine, t->mg_level_fine};
+      return t->get_dof_handler_fine();
     }
 
-
-  if constexpr (std::is_same_v<MemorySpace, ::dealii::MemorySpace::Host>)
-    {
-      // MGTwoLevelTransferNonNested transfer is only instantiated for Host
-      // memory:
-      if (const auto t = dynamic_cast<const MGTwoLevelTransferNonNested<
-            dim,
-            LinearAlgebra::distributed::Vector<Number, MemorySpace>> *>(
-            this->transfer[this->transfer.max_level()].get()))
-        {
-          return {t->dof_handler_fine, t->mg_level_fine};
-        }
-    }
-
-  if constexpr (std::is_same_v<MemorySpace, ::dealii::MemorySpace::Default>)
-    {
-      // MGTwoLevelTransferCopyToHost should only be instantiated on device
-      // memory:
-      if (const auto t = dynamic_cast<const MGTwoLevelTransferCopyToHost<
-            dim,
-            LinearAlgebra::distributed::Vector<Number, MemorySpace>> *>(
-            this->transfer[this->transfer.max_level()].get()))
-        {
-          return {(t->host_transfer).dof_handler_fine,
-                  (t->host_transfer).mg_level_fine};
-        }
-    }
   {
     DEAL_II_NOT_IMPLEMENTED();
     return {nullptr, numbers::invalid_unsigned_int};
@@ -5625,6 +5608,15 @@ MGTwoLevelTransferNonNested<dim, VectorType>::memory_consumption() const
   // TODO: add consumption for rpe, mapping_info and constraint_info.
 
   return size;
+}
+
+
+
+template <int dim, typename VectorType>
+std::pair<const DoFHandler<dim> *, unsigned int>
+MGTwoLevelTransferNonNested<dim, VectorType>::get_dof_handler_fine() const
+{
+  return {this->dof_handler_fine, this->mg_level_fine};
 }
 
 
