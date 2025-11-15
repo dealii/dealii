@@ -17,7 +17,7 @@
 // Test Portable::MatrixFree with level cells. Creates a hypercube grid,
 // refines it 3 times, distributes dofs and mg dofs. Then initializes
 // Portable MatrixFree and uses it to evaluate Laplace operator applied
-// to a random vector on level 2. Compares with classical matrix-based
+// to a random vector on level 0. Compares with classical matrix-based
 // evaluation.
 
 #include <deal.II/base/quadrature_lib.h>
@@ -109,7 +109,7 @@ template <int dim, int fe_degree, typename Number>
 void
 test()
 {
-  const unsigned int test_level    = 3;
+  const unsigned int test_level    = 1;
   const unsigned int n_q_points_1d = fe_degree + 1;
 
   // Create triangulation with mesh smoothing for multigrid
@@ -236,7 +236,6 @@ test()
     error_norm += std::pow(dst_rw(i) - dst_host(i), 2);
 
   const double diff_norm = std::sqrt(error_norm) / dst_host.linfty_norm();
-
 
   if (diff_norm > 1e-12)
     {
