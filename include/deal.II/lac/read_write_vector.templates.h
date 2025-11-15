@@ -261,6 +261,10 @@ namespace LinearAlgebra
   ReadWriteVector<Number>::reinit(
     const TrilinosWrappers::MPI::Vector &trilinos_vec)
   {
+#  ifdef DEAL_II_TRILINOS_WITH_TPETRA
+    (void)trilinos_vec;
+    Assert(false, ExcNotImplemented());
+#  else
     // TODO: We could avoid copying the data by just using a view into the
     // trilinos data but only if Number=double. Also update documentation that
     // the argument's lifetime needs to be longer then. If we do this, we need
@@ -274,6 +278,7 @@ namespace LinearAlgebra
     AssertThrow(ierr == 0, ExcTrilinosError(ierr));
 
     std::copy(start_ptr, start_ptr + leading_dimension, values.data());
+#  endif
   }
 #endif
 
@@ -499,11 +504,11 @@ namespace LinearAlgebra
 
 #ifdef DEAL_II_TRILINOS_WITH_TPETRA
   template <typename Number>
-  template <typename NodeType, typename Dummy>
-  std::enable_if_t<std::is_same_v<Dummy, Number> &&
-                   dealii::is_tpetra_type<Number>::value>
+  template <typename NodeType, typename OtherNumber>
+  void
   ReadWriteVector<Number>::import_elements(
-    const Tpetra::Vector<Number, int, types::signed_global_dof_index, NodeType>
+    const Tpetra::
+      Vector<OtherNumber, int, types::signed_global_dof_index, NodeType>
                            &vector,
     const IndexSet         &source_elements,
     VectorOperation::values operation,
@@ -778,7 +783,7 @@ namespace LinearAlgebra
       AssertThrow(false, ExcNotImplemented());
   }
 
-
+#  ifndef DEAL_II_TRILINOS_WITH_TPETRA
   template <typename Number>
   void
   ReadWriteVector<Number>::import_elements(
@@ -800,16 +805,12 @@ namespace LinearAlgebra
                     trilinos_vec.get_mpi_communicator(),
                     communication_pattern);
   }
-
-
-
-#  ifdef DEAL_II_TRILINOS_WITH_TPETRA
+#  else
   template <typename Number>
-  template <typename MemorySpace, typename Dummy>
-  std::enable_if_t<std::is_same_v<Dummy, Number> &&
-                   dealii::is_tpetra_type<Number>::value>
+  template <typename MemorySpace, typename OtherNumber>
+  void
   ReadWriteVector<Number>::import_elements(
-    const LinearAlgebra::TpetraWrappers::Vector<Number, MemorySpace>
+    const LinearAlgebra::TpetraWrappers::Vector<OtherNumber, MemorySpace>
                            &trilinos_vec,
     VectorOperation::values operation,
     const std::shared_ptr<const Utilities::MPI::CommunicationPatternBase>
