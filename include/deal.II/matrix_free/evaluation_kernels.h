@@ -2072,6 +2072,172 @@ namespace internal
 
 
   /**
+   * Specialization for MatrixFreeFunctions::tensor_nedelec, which use
+   * specific sum-factorization kernels and with normal/tangential shape_data
+   */
+  template <int dim, int fe_degree, int n_q_points_1d, typename Number>
+  struct FEEvaluationImpl<MatrixFreeFunctions::tensor_nedelec,
+                          dim,
+                          fe_degree,
+                          n_q_points_1d,
+                          Number>
+  {
+    using Number2 =
+      typename FEEvaluationData<dim, Number, false>::shape_info_number_type;
+
+    template <bool integrate>
+    static void
+    evaluate_or_integrate(
+      const EvaluationFlags::EvaluationFlags evaluation_flag,
+      Number                                *values_dofs_actual,
+      FEEvaluationData<dim, Number, false>  &fe_eval,
+      const bool                             add_into_values_array = false);
+  };
+
+
+
+  template <int dim, int fe_degree, int n_q_points_1d, typename Number>
+  template <bool integrate>
+  inline void
+  FEEvaluationImpl<MatrixFreeFunctions::tensor_nedelec,
+                   dim,
+                   fe_degree,
+                   n_q_points_1d,
+                   Number>::
+    evaluate_or_integrate(
+      const EvaluationFlags::EvaluationFlags evaluation_flag,
+      Number                                *values_dofs,
+      FEEvaluationData<dim, Number, false>  &fe_eval,
+      const bool                             add)
+  {
+    Assert(dim == 2 || dim == 3,
+           ExcMessage("Only dim = 2,3 implemented for Nedelec "
+                      "evaluation/integration"));
+
+    if (evaluation_flag == EvaluationFlags::nothing)
+      return;
+
+    AssertDimension(fe_eval.get_shape_info().data.size(), 2);
+    AssertDimension(n_q_points_1d,
+                    fe_eval.get_shape_info().data[0].n_q_points_1d);
+    AssertDimension(n_q_points_1d,
+                    fe_eval.get_shape_info().data[1].n_q_points_1d);
+    AssertDimension(fe_degree, fe_eval.get_shape_info().data[0].fe_degree + 1);
+    AssertDimension(fe_degree, fe_eval.get_shape_info().data[1].fe_degree);
+
+
+    const auto        &shape_data = fe_eval.get_shape_info().data;
+    const unsigned int dofs_per_component =
+      Utilities::pow(fe_degree + 1, dim - 1) * (fe_degree);
+    const unsigned int n_points  = Utilities::pow(n_q_points_1d, dim);
+    Number            *gradients = fe_eval.begin_gradients();
+    Number            *values    = fe_eval.begin_values();
+
+    if (integrate)
+      {
+        EvaluatorTensorProductAnisotropic<dim,
+                                          fe_degree,
+                                          n_q_points_1d,
+                                          false,
+                                          MatrixFreeFunctions::tensor_nedelec>
+          eval;
+
+        const bool do_values = evaluation_flag & EvaluationFlags::values;
+        if ((evaluation_flag & EvaluationFlags::gradients) != 0u)
+          integrate_gradients_collocation<n_q_points_1d, dim>(shape_data[0],
+                                                              values,
+                                                              gradients,
+                                                              do_values);
+
+        if constexpr (dim > 2)
+          eval.template tangential<2, 0>(shape_data[1], values, values);
+        eval.template tangential<1, 0>(shape_data[1], values, values);
+        eval.template normal<0>(shape_data[0], values, values_dofs, add);
+
+
+
+        values += n_points;
+        gradients += n_points * dim;
+        values_dofs += dofs_per_component;
+
+        if ((evaluation_flag & EvaluationFlags::gradients) != 0u)
+          integrate_gradients_collocation<n_q_points_1d, dim>(shape_data[0],
+                                                              values,
+                                                              gradients,
+                                                              do_values);
+
+        if constexpr (dim > 2)
+          eval.template tangential<2, 1>(shape_data[1], values, values);
+        eval.template tangential<0, 1>(shape_data[1], values, values);
+        eval.template normal<1>(shape_data[0], values, values_dofs, add);
+
+        if constexpr (dim > 2)
+          {
+            values += n_points;
+            gradients += n_points * dim;
+            values_dofs += dofs_per_component;
+
+            if ((evaluation_flag & EvaluationFlags::gradients) != 0u)
+              integrate_gradients_collocation<n_q_points_1d, dim>(shape_data[0],
+                                                                  values,
+                                                                  gradients,
+                                                                  do_values);
+
+            eval.template tangential<1, 2>(shape_data[1], values, values);
+            eval.template tangential<0, 2>(shape_data[1], values, values);
+            eval.template normal<2>(shape_data[0], values, values_dofs, add);
+          }
+      }
+    else
+      {
+        EvaluatorTensorProductAnisotropic<dim,
+                                          fe_degree,
+                                          n_q_points_1d,
+                                          true,
+                                          MatrixFreeFunctions::tensor_nedelec>
+          eval;
+        eval.template normal<0>(shape_data[0], values_dofs, values);
+        eval.template tangential<1, 0>(shape_data[1], values, values);
+        if constexpr (dim > 2)
+          eval.template tangential<2, 0>(shape_data[1], values, values);
+        if ((evaluation_flag & EvaluationFlags::gradients) != 0u)
+          evaluate_gradients_collocation<n_q_points_1d, dim>(shape_data[0],
+                                                             values,
+                                                             gradients);
+
+        values += n_points;
+        gradients += n_points * dim;
+        values_dofs += dofs_per_component;
+
+        eval.template normal<1>(shape_data[0], values_dofs, values);
+        eval.template tangential<0, 1>(shape_data[1], values, values);
+        if constexpr (dim > 2)
+          eval.template tangential<2, 1>(shape_data[1], values, values);
+        if ((evaluation_flag & EvaluationFlags::gradients) != 0u)
+          evaluate_gradients_collocation<n_q_points_1d, dim>(shape_data[0],
+                                                             values,
+                                                             gradients);
+
+        if constexpr (dim > 2)
+          {
+            values += n_points;
+            gradients += n_points * dim;
+            values_dofs += dofs_per_component;
+
+            eval.template normal<2>(shape_data[0], values_dofs, values);
+            eval.template tangential<0, 2>(shape_data[1], values, values);
+            eval.template tangential<1, 2>(shape_data[1], values, values);
+            if ((evaluation_flag & EvaluationFlags::gradients) != 0u)
+              evaluate_gradients_collocation<n_q_points_1d, dim>(shape_data[0],
+                                                                 values,
+                                                                 gradients);
+          }
+      }
+  }
+
+
+
+  /**
    * This class chooses an appropriate evaluation/integration strategy based on
    * the template parameters and the shape_info variable which contains runtime
    * parameters for the strategy underlying FEEvaluation::evaluate(), i.e.
@@ -2108,7 +2274,8 @@ namespace internal
       Assert(fe_eval.get_shape_info().data.size() == 1 ||
                (fe_eval.get_shape_info().data.size() == dim &&
                 element_type == ElementType::tensor_general) ||
-               element_type == ElementType::tensor_raviart_thomas,
+               element_type == ElementType::tensor_raviart_thomas ||
+               element_type == ElementType::tensor_nedelec,
              ExcNotImplemented());
 
       EvaluationFlags::EvaluationFlags actual_flag = evaluation_flag;
@@ -2234,6 +2401,28 @@ namespace internal
             {
               Assert(false,
                      ExcNotImplemented("Raviart-Thomas currently only possible "
+                                       "in 2d/3d and with templated degree"));
+            }
+        }
+      else if (element_type == ElementType::tensor_nedelec)
+        {
+          if constexpr (fe_degree > 0 && n_q_points_1d > 0 && dim > 1)
+            {
+              FEEvaluationImpl<ElementType::tensor_nedelec,
+                               dim,
+                               fe_degree,
+                               n_q_points_1d,
+                               Number>::
+                template evaluate_or_integrate<do_integrate>(
+                  actual_flag,
+                  const_cast<Number *>(values_dofs),
+                  fe_eval,
+                  sum_into_values_array);
+            }
+          else
+            {
+              Assert(false,
+                     ExcNotImplemented("Nedelec currently only possible "
                                        "in 2d/3d and with templated degree"));
             }
         }
