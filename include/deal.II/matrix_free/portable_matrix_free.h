@@ -587,9 +587,21 @@ namespace Portable
 
     /**
      * Return the colored graph of locally owned active cells.
+     *
+     * @warning if MatrixFree is initialized for a specific multigrid level,
+     * this function will throw an exception.
      */
     const std::vector<std::vector<CellFilter>> &
     get_colored_graph() const;
+
+    /**
+     * Return the colored graph of locally owned level cells.
+     *
+     * @warning if MatrixFree is initialized for active cells,
+     * this function will throw an exception.
+     */
+    const std::vector<std::vector<LevelCellFilter>> &
+    get_colored_level_graph() const;
 
     /**
      * Return the partitioner that represents the locally owned data and the
@@ -617,6 +629,24 @@ namespace Portable
      */
     unsigned int
     get_mg_level() const;
+
+    /**
+     * Return the cell iterator for a given batch and color.
+     *
+     * @param batch The batch index (color index in the internal storage)
+     * @param color The lane index (must be 0 for GPU implementations)
+     * @param dof_handler_index Index of the DoFHandler (default 0)
+     */
+    typename DoFHandler<dim>::cell_iterator
+    get_cell_iterator(const unsigned int batch,
+                      const unsigned int color,
+                      const unsigned int dof_handler_index = 0) const;
+
+    /**
+     * Return the entries (cells) per color.
+     */
+    unsigned int
+    n_cells_per_color(const unsigned int color) const;
 
     /**
      * Return an approximation of the memory consumption of this class in bytes.
@@ -857,6 +887,12 @@ namespace Portable
      */
     std::vector<unsigned int> row_start;
 
+    /**
+     * Mapping from batch (color) and lane (always 0 for GPU) to the cell index
+     * and level. For each color/batch, stores the cell indices in order.
+     */
+    std::vector<std::vector<std::pair<unsigned int, unsigned int>>>
+      cell_level_index;
 
     /**
      * Colored graph of locally owned active cells (used when mg_level ==
@@ -1080,7 +1116,28 @@ namespace Portable
     FilteredIterator<typename DoFHandler<dim>::active_cell_iterator>>> &
   MatrixFree<dim, Number>::get_colored_graph() const
   {
+    AssertThrow(
+      mg_level == numbers::invalid_unsigned_int,
+      ExcMessage(
+        "The MatrixFree object has been initialized for a specific "
+        "multigrid level. This function is only available when working "
+        "on active cells."));
     return graph;
+  }
+
+
+
+  template <int dim, typename Number>
+  inline const std::vector<std::vector<
+    FilteredIterator<typename DoFHandler<dim>::level_cell_iterator>>> &
+  MatrixFree<dim, Number>::get_colored_level_graph() const
+  {
+    AssertThrow(
+      mg_level != numbers::invalid_unsigned_int,
+      ExcMessage("The MatrixFree object has been initialized for active cells. "
+                 "This function is only available when working on a specific "
+                 "multigrid level."));
+    return level_graph;
   }
 
 
@@ -1098,6 +1155,15 @@ namespace Portable
 
 
   template <int dim, typename Number>
+  inline unsigned int
+  MatrixFree<dim, Number>::get_mg_level() const
+  {
+    return mg_level;
+  }
+
+
+
+  template <int dim, typename Number>
   inline const DoFHandler<dim> &
   MatrixFree<dim, Number>::get_dof_handler(
     const unsigned int dof_handler_index) const
@@ -1109,12 +1175,33 @@ namespace Portable
   }
 
 
+  template <int dim, typename Number>
+  typename DoFHandler<dim>::cell_iterator
+  MatrixFree<dim, Number>::get_cell_iterator(
+    const unsigned int batch,
+    const unsigned int color,
+    const unsigned int dof_handler_index) const
+  {
+    AssertIndexRange(color, cell_level_index.size());
+    AssertIndexRange(batch, cell_level_index[color].size());
+
+    const std::pair<unsigned int, unsigned int> &index =
+      cell_level_index[color][batch];
+    return typename DoFHandler<dim>::cell_iterator(
+      &(get_dof_handler(dof_handler_index).get_triangulation()),
+      index.first,
+      index.second,
+      &get_dof_handler(dof_handler_index));
+  }
+
+
 
   template <int dim, typename Number>
   inline unsigned int
-  MatrixFree<dim, Number>::get_mg_level() const
+  MatrixFree<dim, Number>::n_cells_per_color(const unsigned int color) const
   {
-    return mg_level;
+    AssertIndexRange(color, n_cells.size());
+    return n_cells[color];
   }
 
 #endif
