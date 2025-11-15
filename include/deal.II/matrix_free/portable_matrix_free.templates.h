@@ -145,6 +145,9 @@ namespace Portable
       dof_data.local_to_global.resize(n_colors);
       dof_data.constraint_mask.resize(n_colors);
 
+      // Resize the cell_level_index mapping
+      data->cell_level_index.resize(n_colors);
+
       if (update_flags & update_JxW_values)
         dof_data.JxW.resize(n_colors);
 
@@ -245,6 +248,10 @@ namespace Portable
           Kokkos::create_mirror_view(dof_data.inv_jacobian[color]);
 #endif
 
+      // Resize the cell_level_index for this color to store cell level and
+      // index pairs per cell.
+      data->cell_level_index[color].resize(n_cells);
+
       auto triacell = graph.cbegin(), end_cell = graph.cend();
       for (unsigned int cell_id = 0; triacell != end_cell;
            ++triacell, ++cell_id)
@@ -252,6 +259,10 @@ namespace Portable
           typename DoFHandler<dim>::active_cell_iterator cell =
             (*triacell)->as_dof_handler_iterator(*dof_data.dof_handler);
 
+
+          // Store the level and index of this cell for get_cell_iterator()
+          data->cell_level_index[color][cell_id] =
+            std::make_pair(cell->level(), cell->index());
 
           if (data->get_mg_level() == numbers::invalid_unsigned_int)
             cell->get_dof_indices(local_dof_indices);

@@ -1,0 +1,3 @@
+New: In Portable::MatrixFree methods get_cell_iterator() has been added.
+<br>
+(Michał Wichrowski, 2025/11/11)
