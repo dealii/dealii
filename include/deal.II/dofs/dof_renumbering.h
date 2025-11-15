@@ -714,7 +714,9 @@ namespace DoFRenumbering
    * the above function with `std::vector<unsigned int>{0, 0, 1}` for dim=2,
    * while calling with `{pressure, velocities}` would result in a call to above
    * function with `std::vector<unsigned int>{1, 1, 0}` as the
-   * `target_component` argument.
+   * `target_component` argument. Components attributed to each of the
+   * extractors are blocked together.
+   *
    *
    * The initializer list of extractors must cover all finite-element
    * components, and each component must be covered by exactly one extractor.

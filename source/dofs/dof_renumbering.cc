@@ -807,7 +807,7 @@ namespace DoFRenumbering
             }
           else
             {
-              Assert(
+              AssertThrow(
                 false,
                 ExcNotImplemented(
                   "An unsupported ExtractorVariant was passed in the component_wise extractor_order argument."));
@@ -819,7 +819,10 @@ namespace DoFRenumbering
                i < start_component_index + n_components;
                ++i)
             {
-              Assert(
+              AssertThrow(i < component_order.size(),
+                          ExcIndexRange(i, 0, component_order.size()));
+
+              AssertThrow(
                 component_order[i] == numbers::invalid_unsigned_int,
                 ExcMessage(
                   "A component which has already been assigned a block "
@@ -856,7 +859,7 @@ namespace DoFRenumbering
                                 dof_handler.get_fe().n_components()));
 
     // All entries must be assigned
-    Assert(
+    AssertThrow(
       std::none_of(component_order.begin(),
                    component_order.end(),
                    [](unsigned int value) {
@@ -894,7 +897,7 @@ namespace DoFRenumbering
                                 dof_handler.get_fe().n_components()));
 
     // All entries must be assigned.
-    Assert(
+    AssertThrow(
       std::none_of(component_order.begin(),
                    component_order.end(),
                    [](unsigned int value) {
