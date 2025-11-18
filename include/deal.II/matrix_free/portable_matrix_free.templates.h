@@ -249,8 +249,11 @@ namespace Portable
       for (unsigned int cell_id = 0; triacell != end_cell;
            ++triacell, ++cell_id)
         {
-          typename DoFHandler<dim>::active_cell_iterator cell =
-            (*triacell)->as_dof_handler_iterator(*dof_data.dof_handler);
+          typename DoFHandler<dim>::cell_iterator cell(
+            &(dof_data.dof_handler->get_triangulation()),
+            (*triacell)->level(),
+            (*triacell)->index(),
+            dof_data.dof_handler);
 
 
           if (data->get_mg_level() == numbers::invalid_unsigned_int)
