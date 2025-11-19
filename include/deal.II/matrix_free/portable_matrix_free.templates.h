@@ -781,9 +781,13 @@ namespace Portable
             colored_data[di] = get_data(di, color);
 
           MemorySpace::Default::kokkos_space::execution_space exec;
-          Kokkos::TeamPolicy<
-            MemorySpace::Default::kokkos_space::execution_space>
-            team_policy(exec, n_cells[color], Kokkos::AUTO);
+
+          using TeamPolicy = Kokkos::TeamPolicy<
+            MemorySpace::Default::kokkos_space::execution_space>;
+          auto team_policy =
+            (this->team_size == numbers::invalid_unsigned_int) ?
+              TeamPolicy(exec, n_cells[color], Kokkos::AUTO) :
+              TeamPolicy(exec, n_cells[color], this->team_size);
 
           Kokkos::parallel_for(
             "dealii::MatrixFree::evaluate_coeff_cell_loop color " +
@@ -919,6 +923,7 @@ namespace Portable
       update_flags |= update_JxW_values;
 
     this->use_coloring = additional_data.use_coloring;
+    this->team_size    = additional_data.team_size;
     this->overlap_communication_computation =
       additional_data.overlap_communication_computation;
     this->mg_level = additional_data.mg_level;
@@ -1318,9 +1323,12 @@ namespace Portable
         {
           MemorySpace::Default::kokkos_space::execution_space exec;
 
-          Kokkos::TeamPolicy<
-            MemorySpace::Default::kokkos_space::execution_space>
-            team_policy(exec, n_cells[color], Kokkos::AUTO);
+          using TeamPolicy = Kokkos::TeamPolicy<
+            MemorySpace::Default::kokkos_space::execution_space>;
+          auto team_policy =
+            (this->team_size == numbers::invalid_unsigned_int) ?
+              TeamPolicy(exec, n_cells[color], Kokkos::AUTO) :
+              TeamPolicy(exec, n_cells[color], this->team_size);
 
           for (unsigned int di = 0; di < dof_handler_data.size(); ++di)
             colored_data[di] = get_data(di, color);
@@ -1446,9 +1454,12 @@ namespace Portable
           {
             // helper to process one color
             auto do_color = [&](const unsigned int color) {
-              Kokkos::TeamPolicy<
-                MemorySpace::Default::kokkos_space::execution_space>
-                team_policy(exec, n_cells[color], Kokkos::AUTO);
+              using TeamPolicy = Kokkos::TeamPolicy<
+                MemorySpace::Default::kokkos_space::execution_space>;
+              auto team_policy =
+                (this->team_size == numbers::invalid_unsigned_int) ?
+                  TeamPolicy(exec, n_cells[color], Kokkos::AUTO) :
+                  TeamPolicy(exec, n_cells[color], this->team_size);
 
               for (unsigned int di = 0; di < dof_handler_data.size(); ++di)
                 colored_data[di] = get_data(di, color);
@@ -1499,9 +1510,12 @@ namespace Portable
             for (unsigned int color = 0; color < n_colors; ++color)
               if (n_cells[color] > 0)
                 {
-                  Kokkos::TeamPolicy<
-                    MemorySpace::Default::kokkos_space::execution_space>
-                    team_policy(exec, n_cells[color], Kokkos::AUTO);
+                  using TeamPolicy = Kokkos::TeamPolicy<
+                    MemorySpace::Default::kokkos_space::execution_space>;
+                  auto team_policy =
+                    (this->team_size == numbers::invalid_unsigned_int) ?
+                      TeamPolicy(exec, n_cells[color], Kokkos::AUTO) :
+                      TeamPolicy(exec, n_cells[color], this->team_size);
 
                   for (unsigned int di = 0; di < dof_handler_data.size(); ++di)
                     colored_data[di] = get_data(di, color);
@@ -1542,9 +1556,12 @@ namespace Portable
         for (unsigned int color = 0; color < n_colors; ++color)
           if (n_cells[color] > 0)
             {
-              Kokkos::TeamPolicy<
-                MemorySpace::Default::kokkos_space::execution_space>
-                team_policy(exec, n_cells[color], Kokkos::AUTO);
+              using TeamPolicy = Kokkos::TeamPolicy<
+                MemorySpace::Default::kokkos_space::execution_space>;
+              auto team_policy =
+                (this->team_size == numbers::invalid_unsigned_int) ?
+                  TeamPolicy(exec, n_cells[color], Kokkos::AUTO) :
+                  TeamPolicy(exec, n_cells[color], this->team_size);
 
               for (unsigned int di = 0; di < dof_handler_data.size(); ++di)
                 colored_data[di] = get_data(di, color);
