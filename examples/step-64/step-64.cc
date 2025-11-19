@@ -601,6 +601,7 @@ namespace Step64
     additional_data.smoothing_range     = 15.;
     additional_data.degree              = 5;
     additional_data.eig_cg_n_iterations = 10;
+    additional_data.constraints.copy_from(constraints);
     additional_data.preconditioner =
       system_matrix_dev->get_matrix_diagonal_inverse();
 
