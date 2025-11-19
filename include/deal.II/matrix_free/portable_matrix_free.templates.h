@@ -1344,13 +1344,51 @@ namespace Portable
   template <typename Functor>
   void
   MatrixFree<dim, Number>::distributed_cell_loop(
-    const Functor &,
+    const Functor &func,
     const LinearAlgebra::distributed::BlockVector<Number, MemorySpace::Default>
-      &,
-    LinearAlgebra::distributed::BlockVector<Number, MemorySpace::Default> &)
+                                                                          &src,
+    LinearAlgebra::distributed::BlockVector<Number, MemorySpace::Default> &dst)
     const
   {
-    Assert(false, ExcNotImplemented());
+    MemorySpace::Default::kokkos_space::execution_space exec;
+
+    Kokkos::Array<PrecomputedData, n_max_dof_handlers> colored_data;
+
+    if (overlap_communication_computation)
+      {
+        Assert(
+          false,
+          ExcNotImplemented(
+            "distributed_cell_loop() with BlockVector and overlapping communication is not implemented."));
+      }
+    else
+      {
+        src.update_ghost_values();
+
+        // Execute the loop on the cells
+        for (unsigned int color = 0; color < n_colors; ++color)
+          if (n_cells[color] > 0)
+            {
+              Kokkos::TeamPolicy<
+                MemorySpace::Default::kokkos_space::execution_space>
+                team_policy(exec, n_cells[color], Kokkos::AUTO);
+
+              for (unsigned int di = 0; di < dof_handler_data.size(); ++di)
+                colored_data[di] = get_data(di, color);
+
+              internal::ApplyKernel<dim, Number, Functor, true> apply_kernel(
+                func, dof_handler_data.size(), colored_data, src, dst);
+
+              Kokkos::parallel_for(
+                "dealii::MatrixFree::distributed_cell_loop color " +
+                  std::to_string(color),
+                team_policy,
+                apply_kernel);
+            }
+        dst.compress(VectorOperation::add);
+      }
+
+    src.zero_out_ghost_values();
   }
 
 
@@ -1365,13 +1403,41 @@ namespace Portable
   {
     MemorySpace::Default::kokkos_space::execution_space exec;
 
-    AssertThrow(dof_handler_data.size() == 1, ExcNotImplemented());
-    const unsigned int dof_handler_index = 0;
+    // Find the correct DoFHandler based on the partitioner of the vector if
+    // possible. If we have only one DoFHandler we assume this is what the user
+    // wanted to do.
+    unsigned int dof_handler_index = 0;
+    if (dof_handler_data.size() > 1)
+      {
+        dof_handler_index = numbers::invalid_unsigned_int;
+
+        for (unsigned int i = 0; i < dof_handler_data.size(); ++i)
+          {
+            if (src.get_partitioner().get() ==
+                dof_handler_data[i].partitioner.get())
+              {
+                Assert(
+                  src.get_partitioner().get() == dst.get_partitioner().get(),
+                  ExcMessage(
+                    "distributed_cell_loop() requires partitioners of both vectors to be equal when using >1 DoFHandler."));
+                dof_handler_index = i;
+                break;
+              }
+          }
+      }
+
+    AssertThrow(
+      dof_handler_index != numbers::invalid_unsigned_int,
+      ExcMessage(
+        "Could not identify a matching DoFHandler for the vector partitioner in distributed_cell_loop()."));
+
 
     // in case we have compatible partitioners, we can simply use the provided
     // vectors
-    if (src.get_partitioner().get() == dof_handler_data[0].partitioner.get() &&
-        dst.get_partitioner().get() == dof_handler_data[0].partitioner.get())
+    if (src.get_partitioner().get() ==
+          dof_handler_data[dof_handler_index].partitioner.get() &&
+        dst.get_partitioner().get() ==
+          dof_handler_data[dof_handler_index].partitioner.get())
       {
         Kokkos::Array<PrecomputedData, n_max_dof_handlers> colored_data;
 
@@ -1457,6 +1523,10 @@ namespace Portable
       }
     else
       {
+        Assert(dof_handler_index == 0,
+               ExcInternalError(
+                 "creating vectors only works when we have 1 DoFHandler"));
+
         // Create the ghosted source and the ghosted destination
         LinearAlgebra::distributed::Vector<Number, MemorySpace::Default>
           ghosted_src(dof_handler_data[dof_handler_index].partitioner);
