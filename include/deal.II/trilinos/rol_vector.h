@@ -19,6 +19,7 @@
 
 #ifdef DEAL_II_TRILINOS_WITH_ROL
 #  include <deal.II/base/exceptions.h>
+#  include <deal.II/base/mpi.h>
 
 #  include <deal.II/lac/vector.h>
 
@@ -464,17 +465,26 @@ namespace TrilinosWrappers
   ROLVector<VectorType>::reduce(
     const ROL::Elementwise::ReductionOp<value_type> &r) const
   {
-    typename VectorType::value_type result = r.initialValue();
+    value_type result = r.initialValue();
 
+    // local reduction
     const typename VectorType::iterator vend = vector_ptr->end();
 
     for (typename VectorType::iterator iterator = vector_ptr->begin();
          iterator != vend;
          iterator++)
       r.reduce(*iterator, result);
-    // Parallel reduction among processes is handled internally.
 
-    return result;
+    // global reduction
+    const auto combiner = [&r](const value_type a,
+                               const value_type b) -> value_type {
+      auto out = b;
+      r.reduce(a, out);
+      return out;
+    };
+
+    return Utilities::MPI::all_reduce<value_type>(
+      result, vector_ptr->get_mpi_communicator(), combiner);
   }
 
 
