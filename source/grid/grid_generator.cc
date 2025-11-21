@@ -9696,9 +9696,6 @@ namespace GridGenerator
     const unsigned int               depth,
     const bool                       colorize)
   {
-    const types::manifold_id polar_manifold_id = 0;
-    const types::manifold_id tfi_manifold_id   = 1;
-
     const double radius = 0.5;
     const double box_radius = 1;
 
