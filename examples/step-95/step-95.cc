@@ -270,11 +270,11 @@ namespace Step95
               &mapping_info_faces_in,
     const bool is_dg_in)
   {
+    is_dg                = is_dg_in;
     matrix_free          = &matrix_free_in;
     mapping_info_cell    = &mapping_info_cell_in;
     mapping_info_surface = &mapping_info_surface_in;
-    mapping_info_faces   = &mapping_info_faces_in;
-    is_dg                = is_dg_in;
+    mapping_info_faces   = is_dg ? (&mapping_info_faces_in) : nullptr;
 
     const auto &fe = matrix_free->get_dof_handler().get_fe();
 

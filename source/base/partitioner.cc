@@ -209,7 +209,7 @@ namespace Utilities
       n_ghost_indices_data = ghost_indices_data.n_elements();
 
       have_ghost_indices =
-        Utilities::MPI::max(n_ghost_indices_data, communicator) > 0;
+        Utilities::MPI::logical_or(n_ghost_indices_data > 0, communicator);
 
       // In the rest of this function, we determine the point-to-point
       // communication pattern of the partitioner. We make up a list with both
@@ -482,8 +482,7 @@ namespace Utilities
     bool
     Partitioner::is_globally_compatible(const Partitioner &part) const
     {
-      return Utilities::MPI::min(static_cast<int>(is_compatible(part)),
-                                 communicator) == 1;
+      return Utilities::MPI::logical_and(is_compatible(part), communicator);
     }
 
 

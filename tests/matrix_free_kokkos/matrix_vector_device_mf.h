@@ -67,8 +67,6 @@ template <int dim, int fe_degree, typename Number, int n_q_points_1d>
 class HelmholtzOperator
 {
 public:
-  static const unsigned int n_local_dofs =
-    dealii::Utilities::pow(fe_degree + 1, dim);
   static const unsigned int n_q_points =
     dealii::Utilities::pow(n_q_points_1d, dim);
 
@@ -93,8 +91,8 @@ HelmholtzOperator<dim, fe_degree, Number, n_q_points_1d>::operator()(
   const Portable::DeviceVector<Number>                   &src,
   Portable::DeviceVector<Number>                         &dst) const
 {
-  Portable::FEEvaluation<dim, fe_degree, n_q_points_1d, 1, Number> fe_eval(
-    data);
+  Portable::FEEvaluation<dim, fe_degree, n_q_points_1d, 1, Number> fe_eval(data,
+                                                                           0);
   fe_eval.read_dof_values(src);
   fe_eval.evaluate(EvaluationFlags::values | EvaluationFlags::gradients);
   fe_eval.apply_for_each_quad_point(
@@ -119,8 +117,6 @@ public:
              const unsigned int                                      q) const;
 
   static const unsigned int n_dofs_1d = fe_degree + 1;
-  static const unsigned int n_local_dofs =
-    dealii::Utilities::pow(fe_degree + 1, dim);
   static const unsigned int n_q_points =
     dealii::Utilities::pow(n_q_points_1d, dim);
 

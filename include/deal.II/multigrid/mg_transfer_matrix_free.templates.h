@@ -1419,9 +1419,8 @@ namespace internal
               }
           });
 
-        return Utilities::MPI::min(static_cast<unsigned int>(flag),
-                                   dof_handler_fine.get_mpi_communicator()) ==
-               1;
+        return Utilities::MPI::logical_and(
+          flag, dof_handler_fine.get_mpi_communicator());
       }
     else
       {
@@ -2741,61 +2740,59 @@ namespace internal
     mutable std::vector<MPI_Request> requests;
   };
 
-} // namespace internal
+
+
+  template <typename VectorType>
+  MGTwoLevelTransferCore<VectorType>::MGTwoLevelTransferCore()
+    : vec_fine_needs_ghost_update(true)
+  {}
 
 
 
-template <typename VectorType>
-MGTwoLevelTransferBase<VectorType>::MGTwoLevelTransferBase()
-  : vec_fine_needs_ghost_update(true)
-{}
+  template <typename VectorType>
+  void
+  MGTwoLevelTransferCore<VectorType>::prolongate_and_add(
+    VectorType       &dst,
+    const VectorType &src) const
+  {
+    const bool  use_dst_inplace = this->vec_fine.size() == 0;
+    auto *const vec_fine_ptr    = use_dst_inplace ? &dst : &this->vec_fine;
+    Assert(vec_fine_ptr->get_partitioner().get() ==
+             this->partitioner_fine.get(),
+           ExcInternalError());
+
+    const bool        use_src_inplace = this->vec_coarse.size() == 0;
+    const auto *const vec_coarse_ptr =
+      use_src_inplace ? &src : &this->vec_coarse;
+    Assert(vec_coarse_ptr->get_partitioner().get() ==
+             this->partitioner_coarse.get(),
+           ExcInternalError());
+
+    const bool src_ghosts_have_been_set = src.has_ghost_elements();
+
+    if (use_src_inplace == false)
+      this->vec_coarse.copy_locally_owned_data_from(src);
+
+    if ((use_src_inplace == false) || (src_ghosts_have_been_set == false))
+      this->update_ghost_values(*vec_coarse_ptr);
+
+    if (use_dst_inplace == false)
+      *vec_fine_ptr = Number(0.);
+
+    this->prolongate_and_add_internal(*vec_fine_ptr, *vec_coarse_ptr);
+
+    if (this->vec_fine_needs_ghost_update || use_dst_inplace == false)
+      this->compress(*vec_fine_ptr, VectorOperation::add);
+
+    if (use_dst_inplace == false)
+      dst += this->vec_fine;
+
+    if (use_src_inplace && (src_ghosts_have_been_set == false))
+      this->zero_out_ghost_values(*vec_coarse_ptr);
+  }
 
 
 
-template <typename VectorType>
-void
-MGTwoLevelTransferBase<VectorType>::prolongate_and_add(
-  VectorType       &dst,
-  const VectorType &src) const
-{
-  const bool  use_dst_inplace = this->vec_fine.size() == 0;
-  auto *const vec_fine_ptr    = use_dst_inplace ? &dst : &this->vec_fine;
-  Assert(vec_fine_ptr->get_partitioner().get() == this->partitioner_fine.get(),
-         ExcInternalError());
-
-  const bool        use_src_inplace = this->vec_coarse.size() == 0;
-  const auto *const vec_coarse_ptr = use_src_inplace ? &src : &this->vec_coarse;
-  Assert(vec_coarse_ptr->get_partitioner().get() ==
-           this->partitioner_coarse.get(),
-         ExcInternalError());
-
-  const bool src_ghosts_have_been_set = src.has_ghost_elements();
-
-  if (use_src_inplace == false)
-    this->vec_coarse.copy_locally_owned_data_from(src);
-
-  if ((use_src_inplace == false) || (src_ghosts_have_been_set == false))
-    this->update_ghost_values(*vec_coarse_ptr);
-
-  if (use_dst_inplace == false)
-    *vec_fine_ptr = Number(0.);
-
-  this->prolongate_and_add_internal(*vec_fine_ptr, *vec_coarse_ptr);
-
-  if (this->vec_fine_needs_ghost_update || use_dst_inplace == false)
-    this->compress(*vec_fine_ptr, VectorOperation::add);
-
-  if (use_dst_inplace == false)
-    dst += this->vec_fine;
-
-  if (use_src_inplace && (src_ghosts_have_been_set == false))
-    this->zero_out_ghost_values(*vec_coarse_ptr);
-}
-
-
-
-namespace internal
-{
   // Helper class to compute correct weights, which works by simply using
   // the degrees of freedom stored in MatrixFree, bypassing the hanging node
   // interpolation matrices.
@@ -2838,7 +2835,60 @@ namespace internal
         false);
     }
   };
+
+
+
+  template <typename VectorType>
+  void
+  MGTwoLevelTransferCore<VectorType>::restrict_and_add(
+    VectorType       &dst,
+    const VectorType &src) const
+  {
+    const bool        use_src_inplace = this->vec_fine.size() == 0;
+    const auto *const vec_fine_ptr = use_src_inplace ? &src : &this->vec_fine;
+    Assert(vec_fine_ptr->get_partitioner().get() ==
+             this->partitioner_fine.get(),
+           ExcInternalError());
+
+    const bool  use_dst_inplace = this->vec_coarse.size() == 0;
+    auto *const vec_coarse_ptr  = use_dst_inplace ? &dst : &this->vec_coarse;
+    Assert(vec_coarse_ptr->get_partitioner().get() ==
+             this->partitioner_coarse.get(),
+           ExcInternalError());
+
+    const bool src_ghosts_have_been_set = src.has_ghost_elements();
+
+    if (use_src_inplace == false)
+      this->vec_fine.copy_locally_owned_data_from(src);
+
+    if ((use_src_inplace == false) ||
+        (vec_fine_needs_ghost_update && (src_ghosts_have_been_set == false)))
+      this->update_ghost_values(*vec_fine_ptr);
+
+    if (use_dst_inplace == false)
+      *vec_coarse_ptr = Number(0.0);
+
+    // since we might add into the ghost values and call compress
+    this->zero_out_ghost_values(*vec_coarse_ptr);
+
+    this->restrict_and_add_internal(*vec_coarse_ptr, *vec_fine_ptr);
+
+    // clean up related to update_ghost_values()
+    if (vec_fine_needs_ghost_update == false && use_src_inplace == false)
+      this->zero_out_ghost_values(*vec_fine_ptr); // internal vector (DG)
+    else if (vec_fine_needs_ghost_update && use_src_inplace == false)
+      vec_fine_ptr->set_ghost_state(false); // internal vector (CG)
+    else if (vec_fine_needs_ghost_update && (src_ghosts_have_been_set == false))
+      this->zero_out_ghost_values(*vec_fine_ptr); // external vector
+
+    this->compress(*vec_coarse_ptr, VectorOperation::add);
+
+    if (use_dst_inplace == false)
+      dst += this->vec_coarse;
+  }
 } // namespace internal
+
+
 
 template <int dim, typename VectorType>
 void
@@ -3033,58 +3083,6 @@ MGTwoLevelTransfer<dim, VectorType>::prolongate_and_add_internal(
         }
     }
 }
-
-
-
-template <typename VectorType>
-void
-MGTwoLevelTransferBase<VectorType>::restrict_and_add(
-  VectorType       &dst,
-  const VectorType &src) const
-{
-  const bool        use_src_inplace = this->vec_fine.size() == 0;
-  const auto *const vec_fine_ptr    = use_src_inplace ? &src : &this->vec_fine;
-  Assert(vec_fine_ptr->get_partitioner().get() == this->partitioner_fine.get(),
-         ExcInternalError());
-
-  const bool  use_dst_inplace = this->vec_coarse.size() == 0;
-  auto *const vec_coarse_ptr  = use_dst_inplace ? &dst : &this->vec_coarse;
-  Assert(vec_coarse_ptr->get_partitioner().get() ==
-           this->partitioner_coarse.get(),
-         ExcInternalError());
-
-  const bool src_ghosts_have_been_set = src.has_ghost_elements();
-
-  if (use_src_inplace == false)
-    this->vec_fine.copy_locally_owned_data_from(src);
-
-  if ((use_src_inplace == false) ||
-      (vec_fine_needs_ghost_update && (src_ghosts_have_been_set == false)))
-    this->update_ghost_values(*vec_fine_ptr);
-
-  if (use_dst_inplace == false)
-    *vec_coarse_ptr = Number(0.0);
-
-  // since we might add into the ghost values and call compress
-  this->zero_out_ghost_values(*vec_coarse_ptr);
-
-  this->restrict_and_add_internal(*vec_coarse_ptr, *vec_fine_ptr);
-
-  // clean up related to update_ghost_values()
-  if (vec_fine_needs_ghost_update == false && use_src_inplace == false)
-    this->zero_out_ghost_values(*vec_fine_ptr); // internal vector (DG)
-  else if (vec_fine_needs_ghost_update && use_src_inplace == false)
-    vec_fine_ptr->set_ghost_state(false); // internal vector (CG)
-  else if (vec_fine_needs_ghost_update && (src_ghosts_have_been_set == false))
-    this->zero_out_ghost_values(*vec_fine_ptr); // external vector
-
-  this->compress(*vec_coarse_ptr, VectorOperation::add);
-
-  if (use_dst_inplace == false)
-    dst += this->vec_coarse;
-}
-
-
 
 template <int dim, typename VectorType>
 void
@@ -3491,15 +3489,13 @@ namespace internal
         partitioner->locally_owned_range())
       return false;
 
-    const int ghosts_locally_contained =
-      ((external_partitioner->ghost_indices() & partitioner->ghost_indices()) ==
-       partitioner->ghost_indices()) ?
-        1 :
-        0;
+    const bool ghosts_locally_contained =
+      (external_partitioner->ghost_indices() & partitioner->ghost_indices()) ==
+      partitioner->ghost_indices();
 
     // check if ghost values are contained in external partititioner
-    return Utilities::MPI::min(ghosts_locally_contained,
-                               partitioner->get_mpi_communicator()) == 1;
+    return Utilities::MPI::logical_and(ghosts_locally_contained,
+                                       partitioner->get_mpi_communicator());
   }
 
   inline std::shared_ptr<Utilities::MPI::Partitioner>
@@ -3517,85 +3513,85 @@ namespace internal
 
     return embedded_partitioner;
   }
+
+
+
+  template <typename VectorType>
+  template <int dim, std::size_t width, typename IndexType>
+  std::pair<bool, bool>
+  MGTwoLevelTransferCore<VectorType>::
+    internal_enable_inplace_operations_if_possible(
+      const std::shared_ptr<const Utilities::MPI::Partitioner>
+        &external_partitioner_coarse,
+      const std::shared_ptr<const Utilities::MPI::Partitioner>
+           &external_partitioner_fine,
+      bool &vec_fine_needs_ghost_update,
+      internal::MatrixFreeFunctions::
+        ConstraintInfo<dim, VectorizedArray<Number, width>, IndexType>
+                                &constraint_info_coarse,
+      std::vector<unsigned int> &dof_indices_fine)
+  {
+    std::pair<bool, bool> success_flags = {false, false};
+
+    if (this->partitioner_coarse->is_globally_compatible(
+          *external_partitioner_coarse))
+      {
+        this->vec_coarse.reinit(0);
+        this->partitioner_coarse = external_partitioner_coarse;
+        success_flags.first      = true;
+      }
+    else if (internal::is_partitioner_contained(this->partitioner_coarse,
+                                                external_partitioner_coarse))
+      {
+        this->vec_coarse.reinit(0);
+
+        for (auto &i : constraint_info_coarse.dof_indices)
+          i = external_partitioner_coarse->global_to_local(
+            this->partitioner_coarse->local_to_global(i));
+
+        for (auto &i : constraint_info_coarse.plain_dof_indices)
+          i = external_partitioner_coarse->global_to_local(
+            this->partitioner_coarse->local_to_global(i));
+
+        this->partitioner_coarse_embedded =
+          internal::create_embedded_partitioner(this->partitioner_coarse,
+                                                external_partitioner_coarse);
+
+        this->partitioner_coarse = external_partitioner_coarse;
+        success_flags.first      = true;
+      }
+
+    vec_fine_needs_ghost_update =
+      Utilities::MPI::max(this->partitioner_fine->ghost_indices().n_elements(),
+                          this->partitioner_fine->get_mpi_communicator()) != 0;
+
+    if (this->partitioner_fine->is_globally_compatible(
+          *external_partitioner_fine))
+      {
+        this->vec_fine.reinit(0);
+        this->partitioner_fine = external_partitioner_fine;
+        success_flags.second   = true;
+      }
+    else if (internal::is_partitioner_contained(this->partitioner_fine,
+                                                external_partitioner_fine))
+      {
+        this->vec_fine.reinit(0);
+
+        for (auto &i : dof_indices_fine)
+          i = external_partitioner_fine->global_to_local(
+            this->partitioner_fine->local_to_global(i));
+
+        this->partitioner_fine_embedded =
+          internal::create_embedded_partitioner(this->partitioner_fine,
+                                                external_partitioner_fine);
+
+        this->partitioner_fine = external_partitioner_fine;
+        success_flags.second   = true;
+      }
+
+    return success_flags;
+  }
 } // namespace internal
-
-
-
-template <typename VectorType>
-template <int dim, std::size_t width, typename IndexType>
-std::pair<bool, bool>
-MGTwoLevelTransferBase<VectorType>::
-  internal_enable_inplace_operations_if_possible(
-    const std::shared_ptr<const Utilities::MPI::Partitioner>
-      &external_partitioner_coarse,
-    const std::shared_ptr<const Utilities::MPI::Partitioner>
-         &external_partitioner_fine,
-    bool &vec_fine_needs_ghost_update,
-    internal::MatrixFreeFunctions::
-      ConstraintInfo<dim, VectorizedArray<Number, width>, IndexType>
-                              &constraint_info_coarse,
-    std::vector<unsigned int> &dof_indices_fine)
-{
-  std::pair<bool, bool> success_flags = {false, false};
-
-  if (this->partitioner_coarse->is_globally_compatible(
-        *external_partitioner_coarse))
-    {
-      this->vec_coarse.reinit(0);
-      this->partitioner_coarse = external_partitioner_coarse;
-      success_flags.first      = true;
-    }
-  else if (internal::is_partitioner_contained(this->partitioner_coarse,
-                                              external_partitioner_coarse))
-    {
-      this->vec_coarse.reinit(0);
-
-      for (auto &i : constraint_info_coarse.dof_indices)
-        i = external_partitioner_coarse->global_to_local(
-          this->partitioner_coarse->local_to_global(i));
-
-      for (auto &i : constraint_info_coarse.plain_dof_indices)
-        i = external_partitioner_coarse->global_to_local(
-          this->partitioner_coarse->local_to_global(i));
-
-      this->partitioner_coarse_embedded =
-        internal::create_embedded_partitioner(this->partitioner_coarse,
-                                              external_partitioner_coarse);
-
-      this->partitioner_coarse = external_partitioner_coarse;
-      success_flags.first      = true;
-    }
-
-  vec_fine_needs_ghost_update =
-    Utilities::MPI::max(this->partitioner_fine->ghost_indices().n_elements(),
-                        this->partitioner_fine->get_mpi_communicator()) != 0;
-
-  if (this->partitioner_fine->is_globally_compatible(
-        *external_partitioner_fine))
-    {
-      this->vec_fine.reinit(0);
-      this->partitioner_fine = external_partitioner_fine;
-      success_flags.second   = true;
-    }
-  else if (internal::is_partitioner_contained(this->partitioner_fine,
-                                              external_partitioner_fine))
-    {
-      this->vec_fine.reinit(0);
-
-      for (auto &i : dof_indices_fine)
-        i = external_partitioner_fine->global_to_local(
-          this->partitioner_fine->local_to_global(i));
-
-      this->partitioner_fine_embedded =
-        internal::create_embedded_partitioner(this->partitioner_fine,
-                                              external_partitioner_fine);
-
-      this->partitioner_fine = external_partitioner_fine;
-      success_flags.second   = true;
-    }
-
-  return success_flags;
-}
 
 
 
@@ -3721,8 +3717,7 @@ MGTwoLevelTransfer<dim, VectorType>::reinit(
         all_cells_found &= (owning_ranks[i] != numbers::invalid_unsigned_int);
 
       do_polynomial_transfer =
-        Utilities::MPI::min(static_cast<unsigned int>(all_cells_found),
-                            communicator) == 1;
+        Utilities::MPI::logical_and(all_cells_found, communicator);
     }
 
   if (do_polynomial_transfer)
@@ -3946,71 +3941,72 @@ MGTwoLevelTransfer<dim, VectorType>::memory_consumption() const
 }
 
 
-
-template <typename VectorType>
-void
-MGTwoLevelTransferBase<VectorType>::update_ghost_values(
-  const VectorType &vec) const
+namespace internal
 {
-  if ((vec.get_partitioner().get() == this->partitioner_coarse.get()) &&
-      (this->partitioner_coarse_embedded != nullptr))
-    internal::SimpleVectorDataExchange<Number>(
-      this->partitioner_coarse_embedded, this->buffer_coarse_embedded)
-      .update_ghost_values(vec);
-  else if ((vec.get_partitioner().get() == this->partitioner_fine.get()) &&
-           (this->partitioner_fine_embedded != nullptr))
-    internal::SimpleVectorDataExchange<Number>(this->partitioner_fine_embedded,
-                                               this->buffer_fine_embedded)
-      .update_ghost_values(vec);
-  else
-    vec.update_ghost_values();
-}
+  template <typename VectorType>
+  void
+  MGTwoLevelTransferCore<VectorType>::update_ghost_values(
+    const VectorType &vec) const
+  {
+    if ((vec.get_partitioner().get() == this->partitioner_coarse.get()) &&
+        (this->partitioner_coarse_embedded != nullptr))
+      internal::SimpleVectorDataExchange<Number>(
+        this->partitioner_coarse_embedded, this->buffer_coarse_embedded)
+        .update_ghost_values(vec);
+    else if ((vec.get_partitioner().get() == this->partitioner_fine.get()) &&
+             (this->partitioner_fine_embedded != nullptr))
+      internal::SimpleVectorDataExchange<Number>(
+        this->partitioner_fine_embedded, this->buffer_fine_embedded)
+        .update_ghost_values(vec);
+    else
+      vec.update_ghost_values();
+  }
 
 
 
-template <typename VectorType>
-void
-MGTwoLevelTransferBase<VectorType>::compress(
-  VectorType                   &vec,
-  const VectorOperation::values op) const
-{
-  Assert(op == VectorOperation::add, ExcNotImplemented());
+  template <typename VectorType>
+  void
+  MGTwoLevelTransferCore<VectorType>::compress(
+    VectorType                   &vec,
+    const VectorOperation::values op) const
+  {
+    Assert(op == VectorOperation::add, ExcNotImplemented());
 
-  if ((vec.get_partitioner().get() == this->partitioner_coarse.get()) &&
-      (this->partitioner_coarse_embedded != nullptr))
-    internal::SimpleVectorDataExchange<Number>(
-      this->partitioner_coarse_embedded, this->buffer_coarse_embedded)
-      .compress(vec);
-  else if ((vec.get_partitioner().get() == this->partitioner_fine.get()) &&
-           (this->partitioner_fine_embedded != nullptr))
-    internal::SimpleVectorDataExchange<Number>(this->partitioner_fine_embedded,
-                                               this->buffer_fine_embedded)
-      .compress(vec);
-  else
-    vec.compress(op);
-}
+    if ((vec.get_partitioner().get() == this->partitioner_coarse.get()) &&
+        (this->partitioner_coarse_embedded != nullptr))
+      internal::SimpleVectorDataExchange<Number>(
+        this->partitioner_coarse_embedded, this->buffer_coarse_embedded)
+        .compress(vec);
+    else if ((vec.get_partitioner().get() == this->partitioner_fine.get()) &&
+             (this->partitioner_fine_embedded != nullptr))
+      internal::SimpleVectorDataExchange<Number>(
+        this->partitioner_fine_embedded, this->buffer_fine_embedded)
+        .compress(vec);
+    else
+      vec.compress(op);
+  }
 
 
 
-template <typename VectorType>
-void
-MGTwoLevelTransferBase<VectorType>::zero_out_ghost_values(
-  const VectorType &vec) const
-{
-  if ((vec.get_partitioner().get() == this->partitioner_coarse.get()) &&
-      (this->partitioner_coarse_embedded != nullptr))
-    internal::SimpleVectorDataExchange<Number>(
-      this->partitioner_coarse_embedded, this->buffer_coarse_embedded)
-      .zero_out_ghost_values(vec);
-  else if ((vec.get_partitioner().get() == (this->partitioner_fine.get()) &&
-            this->partitioner_fine_embedded != nullptr))
-    internal::SimpleVectorDataExchange<Number>(this->partitioner_fine_embedded,
-                                               this->buffer_fine_embedded)
-      .zero_out_ghost_values(vec);
-  else
-    vec.zero_out_ghost_values();
-}
-
+  template <typename VectorType>
+  void
+  MGTwoLevelTransferCore<VectorType>::zero_out_ghost_values(
+    const VectorType &vec) const
+  {
+    if ((vec.get_partitioner().get() == this->partitioner_coarse.get()) &&
+        (this->partitioner_coarse_embedded != nullptr))
+      internal::SimpleVectorDataExchange<Number>(
+        this->partitioner_coarse_embedded, this->buffer_coarse_embedded)
+        .zero_out_ghost_values(vec);
+    else if ((vec.get_partitioner().get() == (this->partitioner_fine.get()) &&
+              this->partitioner_fine_embedded != nullptr))
+      internal::SimpleVectorDataExchange<Number>(
+        this->partitioner_fine_embedded, this->buffer_fine_embedded)
+        .zero_out_ghost_values(vec);
+    else
+      vec.zero_out_ghost_values();
+  }
+} // namespace internal
 
 
 template <int dim, typename Number, typename MemorySpace>
@@ -4091,6 +4087,7 @@ MGTransferMatrixFree<dim, Number, MemorySpace>::get_dof_handler_fine() const
       return {t->dof_handler_fine, t->mg_level_fine};
     }
 
+
   if constexpr (std::is_same_v<MemorySpace, ::dealii::MemorySpace::Host>)
     {
       // MGTwoLevelTransferNonNested transfer is only instantiated for Host
@@ -4104,6 +4101,19 @@ MGTransferMatrixFree<dim, Number, MemorySpace>::get_dof_handler_fine() const
         }
     }
 
+  if constexpr (std::is_same_v<MemorySpace, ::dealii::MemorySpace::Default>)
+    {
+      // MGTwoLevelTransferCopyToHost should only be instantiated on device
+      // memory:
+      if (const auto t = dynamic_cast<const MGTwoLevelTransferCopyToHost<
+            dim,
+            LinearAlgebra::distributed::Vector<Number, MemorySpace>> *>(
+            this->transfer[this->transfer.max_level()].get()))
+        {
+          return {(t->host_transfer).dof_handler_fine,
+                  (t->host_transfer).mg_level_fine};
+        }
+    }
   {
     DEAL_II_NOT_IMPLEMENTED();
     return {nullptr, numbers::invalid_unsigned_int};
@@ -4297,22 +4307,35 @@ MGTransferMatrixFree<dim, Number, MemorySpace>::build(
   const std::vector<std::shared_ptr<const Utilities::MPI::Partitioner>>
     &external_partitioners)
 {
-  const bool use_local_smoothing =
-    this->transfer.n_levels() == 0 || this->internal_transfer.n_levels() > 0;
-
-  if (use_local_smoothing)
+  // Local smoothing is not supported on the device
+  if constexpr (std::is_same_v<MemorySpace, dealii::MemorySpace::Host>)
     {
-      this->initialize_internal_transfer(dof_handler,
-                                         this->mg_constrained_dofs);
-      this->initialize_transfer_references(internal_transfer);
+      const bool use_local_smoothing = this->transfer.n_levels() == 0 ||
+                                       this->internal_transfer.n_levels() > 0;
+
+      if (use_local_smoothing)
+        {
+          this->initialize_internal_transfer(dof_handler,
+                                             this->mg_constrained_dofs);
+          this->initialize_transfer_references(internal_transfer);
+        }
+
+      this->build(external_partitioners);
+
+      {
+        if (use_local_smoothing)
+          this->fill_and_communicate_copy_indices(dof_handler);
+        else
+          this->fill_and_communicate_copy_indices_global_coarsening(
+            dof_handler);
+      }
     }
-
-  this->build(external_partitioners);
-
-  if (use_local_smoothing)
-    this->fill_and_communicate_copy_indices(dof_handler);
   else
-    this->fill_and_communicate_copy_indices_global_coarsening(dof_handler);
+    {
+      this->build(external_partitioners);
+
+      this->fill_and_communicate_copy_indices_global_coarsening(dof_handler);
+    }
 }
 
 
@@ -4324,22 +4347,35 @@ MGTransferMatrixFree<dim, Number, MemorySpace>::build(
   const std::function<void(const unsigned int, VectorType &)>
     &initialize_dof_vector)
 {
-  const bool use_local_smoothing =
-    this->transfer.n_levels() == 0 || this->internal_transfer.n_levels() > 0;
-
-  if (use_local_smoothing)
+  // Local smoothing is not supported on the device
+  if constexpr (std::is_same_v<MemorySpace, dealii::MemorySpace::Host>)
     {
-      this->initialize_internal_transfer(dof_handler,
-                                         this->mg_constrained_dofs);
-      this->initialize_transfer_references(internal_transfer);
+      const bool use_local_smoothing = this->transfer.n_levels() == 0 ||
+                                       this->internal_transfer.n_levels() > 0;
+
+      if (use_local_smoothing)
+        {
+          this->initialize_internal_transfer(dof_handler,
+                                             this->mg_constrained_dofs);
+          this->initialize_transfer_references(internal_transfer);
+        }
+
+      this->build(initialize_dof_vector);
+
+      {
+        if (use_local_smoothing)
+          this->fill_and_communicate_copy_indices(dof_handler);
+        else
+          this->fill_and_communicate_copy_indices_global_coarsening(
+            dof_handler);
+      }
     }
-
-  this->build(initialize_dof_vector);
-
-  if (use_local_smoothing)
-    this->fill_and_communicate_copy_indices(dof_handler);
   else
-    this->fill_and_communicate_copy_indices_global_coarsening(dof_handler);
+    {
+      this->build(initialize_dof_vector);
+
+      this->fill_and_communicate_copy_indices_global_coarsening(dof_handler);
+    }
 }
 
 

@@ -17,3 +17,9 @@ for (VEC : VECTOR_TYPES)
   {
     template class Multigrid<VEC>;
   }
+
+for (S1 : REAL_SCALARS)
+  {
+    template class Multigrid<
+      LinearAlgebra::distributed::Vector<S1, MemorySpace::Default>>;
+  }

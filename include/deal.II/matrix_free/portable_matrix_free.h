@@ -202,6 +202,8 @@ namespace Portable
     using point_type    = Point<dim, Number>;
     using CellFilter =
       FilteredIterator<typename DoFHandler<dim>::active_cell_iterator>;
+    using LevelCellFilter =
+      FilteredIterator<typename DoFHandler<dim>::level_cell_iterator>;
 
     /**
      * Standardized data struct to pipe additional data to MatrixFree.
@@ -211,14 +213,19 @@ namespace Portable
       /**
        * Constructor.
        */
-      AdditionalData(const UpdateFlags mapping_update_flags =
-                       update_gradients | update_JxW_values |
-                       update_quadrature_points,
-                     const bool use_coloring                      = false,
-                     const bool overlap_communication_computation = false)
+      AdditionalData(
+        const UpdateFlags mapping_update_flags = update_gradients |
+                                                 update_JxW_values |
+                                                 update_quadrature_points,
+        const bool         use_coloring                      = false,
+        const bool         overlap_communication_computation = false,
+        const unsigned int mg_level  = numbers::invalid_unsigned_int,
+        const unsigned int team_size = numbers::invalid_unsigned_int)
         : mapping_update_flags(mapping_update_flags)
         , use_coloring(use_coloring)
         , overlap_communication_computation(overlap_communication_computation)
+        , mg_level(mg_level)
+        , team_size(team_size)
       {
 #ifndef DEAL_II_MPI_WITH_DEVICE_SUPPORT
         AssertThrow(
@@ -226,12 +233,13 @@ namespace Portable
           ExcMessage(
             "Overlapping communication and computation requires device-aware MPI."));
 #endif
-        if (overlap_communication_computation == true)
-          AssertThrow(
-            use_coloring == false || overlap_communication_computation == false,
-            ExcMessage(
-              "Overlapping communication and coloring are incompatible options. Only one of them can be enabled."));
+
+        AssertThrow(
+          use_coloring == false || overlap_communication_computation == false,
+          ExcMessage(
+            "Overlapping communication and coloring are incompatible options. Only one of them can be enabled."));
       }
+
       /**
        * This flag is used to determine which quantities should be cached. This
        * class can cache data needed for gradient computations (inverse
@@ -255,6 +263,20 @@ namespace Portable
        * MPI and use_coloring must be false.
        */
       bool overlap_communication_computation;
+
+      /**
+       * This parameter specifies the level in the triangulation from which the
+       * indices are to be used. If the level is set to
+       * numbers::invalid_unsigned_int (default value), the active cells are
+       * gone through, otherwise the cells in the given local smoothing level.
+       */
+      unsigned int mg_level;
+
+      /**
+       * The team size used by the underlying kokkos team policy. If -1 is
+       * provided then Kokkos::AUTO will be used.
+       */
+      unsigned int team_size;
     };
 
     /**
@@ -375,10 +397,11 @@ namespace Portable
        */
       TeamHandle team_member;
 
-      const unsigned int       n_dofhandler;
-      const int                cell_index;
-      const PrecomputedData   *precomputed_data;
-      SharedData<dim, Number> *shared_data;
+      const unsigned int n_dof_handler;
+      const int          cell_index;
+      const Kokkos::Array<PrecomputedData, n_max_dof_handlers>
+        &precomputed_data;
+      Kokkos::Array<SharedData<dim, Number>, n_max_dof_handlers> &shared_data;
 
       /**
        * Return the quadrature point index local. The index is
@@ -389,7 +412,17 @@ namespace Portable
                        const unsigned int n_q_points,
                        const unsigned int q_point) const
       {
-        return (precomputed_data->row_start / precomputed_data->padding_length +
+        Assert(precomputed_data[0].n_cells ==
+                 precomputed_data[0].q_points.extent(1),
+               ExcInternalError());
+        Assert(n_q_points == precomputed_data[0].q_points.extent(0),
+               ExcMessage("Incorrect argument value: n_q_points"));
+
+        AssertIndexRange(cell, precomputed_data[0].n_cells);
+        AssertIndexRange(q_point, precomputed_data[0].q_points.extent(0));
+
+        return (precomputed_data[0].row_start /
+                  precomputed_data[0].padding_length +
                 cell) *
                  n_q_points +
                q_point;
@@ -404,7 +437,12 @@ namespace Portable
       get_quadrature_point(const unsigned int cell,
                            const unsigned int q_point) const
       {
-        return precomputed_data->q_points(q_point, cell);
+        Assert(precomputed_data[0].n_cells ==
+                 precomputed_data[0].q_points.extent(1),
+               ExcInternalError());
+        AssertIndexRange(cell, precomputed_data[0].n_cells);
+        AssertIndexRange(q_point, precomputed_data[0].q_points.extent(0));
+        return precomputed_data[0].q_points(q_point, cell);
       }
     };
 
@@ -457,15 +495,39 @@ namespace Portable
            const Quadrature<1>             &quad,
            const AdditionalData            &additional_data = AdditionalData());
 
+
+    /**
+     * Reinit with a list of DoFHandler objects.
+     */
+    template <typename IteratorFiltersType>
+    void
+    reinit(const Mapping<dim>                                   &mapping,
+           const std::vector<const DoFHandler<dim> *>           &dof_handler,
+           const std::vector<const AffineConstraints<Number> *> &constraints,
+           const Quadrature<1>                                  &quad,
+           const IteratorFiltersType &iterator_filter,
+           const AdditionalData      &additional_data = AdditionalData());
+
+    /**
+     * Same as above using Iterators::LocallyOwnedCell() as predicate.
+     */
+    void
+    reinit(const Mapping<dim>                                   &mapping,
+           const std::vector<const DoFHandler<dim> *>           &dof_handler,
+           const std::vector<const AffineConstraints<Number> *> &constraints,
+           const Quadrature<1>                                  &quad,
+           const AdditionalData &additional_data = AdditionalData());
+
     /**
      * Return the Data structure associated with @p color.
      */
     PrecomputedData
-    get_data(unsigned int color) const;
+    get_data(const unsigned int dof_handler_index,
+             const unsigned int color) const;
 
     // clang-format off
     /**
-     * This method runs the loop over all cells and apply the local operation on
+     * This method runs the loop over all cells and applies the local operation on
      * each element in parallel. @p func is a functor which is applied on each color.
      *
      * @p func needs to define
@@ -474,7 +536,6 @@ namespace Portable
      *   const typename Portable::MatrixFree<dim, Number>::Data *data,
      *   const DeviceVector<Number>                             &src,
      *   DeviceVector<Number>                                   &dst) const;
-     *   static const unsigned int n_local_dofs;
      *   static const unsigned int n_q_points;
      * \endcode
      */
@@ -494,7 +555,6 @@ namespace Portable
      * \code
      *  DEAL_II_HOST_DEVICE void operator()(
      *    const typename Portable::MatrixFree<dim, Number>::Data *data);
-     * static const unsigned int n_local_dofs;
      * static const unsigned int n_q_points;
      * \endcode
      */
@@ -523,11 +583,15 @@ namespace Portable
      * Initialize a distributed vector. The local elements correspond to the
      * locally owned degrees of freedom and the ghost elements correspond to the
      * (additional) locally relevant dofs.
+     *
+     * If the MatrixFree class is initialized with more than one DoFHandler, it
+     * can be chosen with @p dof_handler_index.
      */
     template <typename MemorySpaceType>
     void
     initialize_dof_vector(
-      LinearAlgebra::distributed::Vector<Number, MemorySpaceType> &vec) const;
+      LinearAlgebra::distributed::Vector<Number, MemorySpaceType> &vec,
+      const unsigned int dof_handler_index = 0) const;
 
     /**
      * Return the colored graph of locally owned active cells.
@@ -546,13 +610,21 @@ namespace Portable
      * be reused from one vector to another.
      */
     const std::shared_ptr<const Utilities::MPI::Partitioner> &
-    get_vector_partitioner() const;
+    get_vector_partitioner(const unsigned int dof_handler_index = 0) const;
 
     /**
-     * Return the DoFHandler.
+     * Return the DoFHandler with index `dof_handler_index`.
      */
     const DoFHandler<dim> &
-    get_dof_handler() const;
+    get_dof_handler(const unsigned int dof_handler_index = 0) const;
+
+    /**
+     * Return the local smoothing multigrid level that this object has been
+     * initialized with. The level is `numbers::invalid_unsigned_int` for active
+     * cells.
+     */
+    unsigned int
+    get_mg_level() const;
 
     /**
      * Return an approximation of the memory consumption of this class in bytes.
@@ -566,13 +638,14 @@ namespace Portable
      */
     template <typename IteratorFiltersType>
     void
-    internal_reinit(const Mapping<dim>                    &mapping,
-                    const DoFHandler<dim>                 &dof_handler,
-                    const AffineConstraints<Number>       &constraints,
-                    const Quadrature<1>                   &quad,
-                    const IteratorFiltersType             &iterator_filter,
-                    const std::shared_ptr<const MPI_Comm> &comm,
-                    const AdditionalData                   additional_data);
+    internal_reinit(
+      const Mapping<dim>                                   &mapping,
+      const std::vector<const DoFHandler<dim> *>           &dof_handler,
+      const std::vector<const AffineConstraints<Number> *> &constraints,
+      const Quadrature<1>                                  &quad,
+      const IteratorFiltersType                            &iterator_filter,
+      const std::shared_ptr<const MPI_Comm>                &comm,
+      const AdditionalData                                  additional_data);
 
     /**
      * Helper function. Loop over all the cells and apply the functor on each
@@ -629,46 +702,141 @@ namespace Portable
     bool overlap_communication_computation;
 
     /**
-     * Total number of degrees of freedom.
+     * Multigrid level for which this MatrixFree object is initialized.
+     * If set to numbers::invalid_unsigned_int, this operates on active cells.
      */
-    types::global_dof_index n_dofs;
+    unsigned int mg_level;
 
     /**
-     * Encodes the type of element detected at construction. FEEvaluation
-     * will select the most efficient algorithm based on the given element
-     * type.
+     * The team size used by the underlying kokkos team policy. If -1 is
+     * provided then Kokkos::AUTO will be used.
      */
-    ::dealii::internal::MatrixFreeFunctions::ElementType element_type;
+    unsigned int team_size;
 
     /**
-     * Size of the scratch pad for temporary storage in shared memory.
+     * Store data that is specific to each DoFHandler.
      */
-    unsigned int scratch_pad_size;
+    struct PerDoFHandlerData
+    {
+      /**
+       * Total number of degrees of freedom.
+       */
+      types::global_dof_index n_dofs;
+
+      /**
+       * Encodes the type of element detected at construction. FEEvaluation
+       * will select the most efficient algorithm based on the given element
+       * type.
+       */
+      ::dealii::internal::MatrixFreeFunctions::ElementType element_type;
+
+      /**
+       * Size of the scratch pad for temporary storage in shared memory.
+       */
+      unsigned int scratch_pad_size;
+
+      /**
+       * Degree of the finite element used.
+       */
+      unsigned int fe_degree;
+
+      /**
+       * Number of components.
+       */
+      unsigned int n_components;
+
+      /**
+       * Number of scalar degrees of freedom per cell.
+       */
+      unsigned int scalar_dofs_per_cell;
+
+      /**
+       * Number of degrees of freedom per cell.
+       */
+      unsigned int dofs_per_cell;
+
+      /**
+       * Number of constrained degrees of freedom.
+       */
+      unsigned int n_constrained_dofs;
+
+      /**
+       * Map the position in the local vector to the position in the global
+       * vector.
+       */
+      std::vector<Kokkos::View<types::global_dof_index **,
+                               MemorySpace::Default::kokkos_space>>
+        local_to_global;
+
+      /**
+       * Vector of Kokkos::View of the inverse Jacobian associated to the cells
+       * of each color.
+       */
+      std::vector<
+        Kokkos::View<Number **[dim][dim], MemorySpace::Default::kokkos_space>>
+        inv_jacobian;
+
+      /**
+       * Vector of Kokkos::View to the Jacobian times the weights associated to
+       * the cells of each color.
+       */
+      std::vector<Kokkos::View<Number **, MemorySpace::Default::kokkos_space>>
+        JxW;
+
+      /**
+       * Kokkos::View to the constrained degrees of freedom.
+       */
+      Kokkos::View<types::global_dof_index *,
+                   MemorySpace::Default::kokkos_space>
+        constrained_dofs;
+
+      /**
+       * Mask deciding where constraints are set on a given cell.
+       */
+      std::vector<
+        Kokkos::View<dealii::internal::MatrixFreeFunctions::ConstraintKinds *,
+                     MemorySpace::Default::kokkos_space>>
+        constraint_mask;
+
+      /**
+       * Values of the shape functions.
+       */
+      Kokkos::View<Number *, MemorySpace::Default::kokkos_space> shape_values;
+
+      /**
+       * Gradients of the shape functions.
+       */
+      Kokkos::View<Number *, MemorySpace::Default::kokkos_space>
+        shape_gradients;
+
+      /**
+       * Gradients of the shape functions for collocation methods.
+       */
+      Kokkos::View<Number *, MemorySpace::Default::kokkos_space>
+        co_shape_gradients;
+
+      /**
+       * Weights used when resolving hanging nodes.
+       */
+      Kokkos::View<Number *, MemorySpace::Default::kokkos_space>
+        constraint_weights;
+
+      /**
+       * Pointer to the DoFHandler object.
+       */
+      const DoFHandler<dim> *dof_handler;
+
+      /**
+       * Shared pointer to a Partitioner for distributed Vectors used in
+       * cell_loop. When MPI is not used the pointer is null.
+       */
+      std::shared_ptr<const Utilities::MPI::Partitioner> partitioner;
+    };
 
     /**
-     * Degree of the finite element used.
+     * Store information necessary for each DoFHandler
      */
-    unsigned int fe_degree;
-
-    /**
-     * Number of components.
-     */
-    unsigned int n_components;
-
-    /**
-     * Number of scalar degrees of freedom per cell.
-     */
-    unsigned int scalar_dofs_per_cell;
-
-    /**
-     * Number of degrees of freedom per cell.
-     */
-    unsigned int dofs_per_cell;
-
-    /**
-     * Number of constrained degrees of freedom.
-     */
-    unsigned int n_constrained_dofs;
+    std::vector<PerDoFHandlerData> dof_handler_data;
 
     /**
      * Number of quadrature points per cells.
@@ -693,72 +861,6 @@ namespace Portable
       q_points;
 
     /**
-     * Map the position in the local vector to the position in the global
-     * vector.
-     */
-    std::vector<Kokkos::View<types::global_dof_index **,
-                             MemorySpace::Default::kokkos_space>>
-      local_to_global;
-
-    /**
-     * Vector of Kokkos::View of the inverse Jacobian associated to the cells of
-     * each color.
-     */
-    std::vector<
-      Kokkos::View<Number **[dim][dim], MemorySpace::Default::kokkos_space>>
-      inv_jacobian;
-
-    /**
-     * Vector of Kokkos::View to the Jacobian times the weights associated to
-     * the cells of each color.
-     */
-    std::vector<Kokkos::View<Number **, MemorySpace::Default::kokkos_space>>
-      JxW;
-
-    /**
-     * Kokkos::View to the constrained degrees of freedom.
-     */
-    Kokkos::View<types::global_dof_index *, MemorySpace::Default::kokkos_space>
-      constrained_dofs;
-
-    /**
-     * Mask deciding where constraints are set on a given cell.
-     */
-    std::vector<
-      Kokkos::View<dealii::internal::MatrixFreeFunctions::ConstraintKinds *,
-                   MemorySpace::Default::kokkos_space>>
-      constraint_mask;
-
-    /**
-     * Values of the shape functions.
-     */
-    Kokkos::View<Number *, MemorySpace::Default::kokkos_space> shape_values;
-
-    /**
-     * Gradients of the shape functions.
-     */
-    Kokkos::View<Number *, MemorySpace::Default::kokkos_space> shape_gradients;
-
-    /**
-     * Gradients of the shape functions for collocation methods.
-     */
-    Kokkos::View<Number *, MemorySpace::Default::kokkos_space>
-      co_shape_gradients;
-
-    /**
-     * Weights used when resolving hanging nodes.
-     */
-    Kokkos::View<Number *, MemorySpace::Default::kokkos_space>
-      constraint_weights;
-
-    /**
-     * Shared pointer to a Partitioner for distributed Vectors used in
-     * cell_loop. When MPI is not used the pointer is null.
-     */
-    std::shared_ptr<const Utilities::MPI::Partitioner> partitioner;
-
-
-    /**
      * Length of the padding (closest power of two larger than or equal to
      * the number of thread).
      */
@@ -769,15 +871,18 @@ namespace Portable
      */
     std::vector<unsigned int> row_start;
 
-    /**
-     * Pointer to the DoFHandler associated with the object.
-     */
-    const DoFHandler<dim> *dof_handler;
 
     /**
-     * Colored graphed of locally owned active cells.
+     * Colored graph of locally owned active cells (used when mg_level ==
+     * invalid).
      */
     std::vector<std::vector<CellFilter>> graph;
+
+    /**
+     * Colored graph of locally owned level cells (used when mg_level !=
+     * invalid).
+     */
+    std::vector<std::vector<LevelCellFilter>> level_graph;
 
     friend class internal::ReinitHelper<dim, Number>;
   };
@@ -787,6 +892,9 @@ namespace Portable
   template <int dim, typename Number>
   struct SharedData
   {
+    using TeamHandle = Kokkos::TeamPolicy<
+      MemorySpace::Default::kokkos_space::execution_space>::member_type;
+
     using SharedViewValues = Kokkos::View<
       Number **,
       MemorySpace::Default::kokkos_space::execution_space::scratch_memory_space,
@@ -800,14 +908,25 @@ namespace Portable
       MemorySpace::Default::kokkos_space::execution_space::scratch_memory_space,
       Kokkos::MemoryTraits<Kokkos::Unmanaged>>;
 
+    /**
+     * Allocate Kokkos Views of the right size.
+     */
     DEAL_II_HOST_DEVICE
-    SharedData(const SharedViewValues     &values,
-               const SharedViewGradients  &gradients,
-               const SharedViewScratchPad &scratch_pad)
-      : values(values)
-      , gradients(gradients)
-      , scratch_pad(scratch_pad)
-    {}
+    void
+    reinit(const TeamHandle                                        &team_handle,
+           const unsigned int                                       n_q_points,
+           const typename MatrixFree<dim, Number>::PrecomputedData &gpu_data)
+    {
+      values      = SharedViewValues(team_handle.team_shmem(),
+                                n_q_points,
+                                gpu_data.n_components);
+      gradients   = SharedViewGradients(team_handle.team_shmem(),
+                                      n_q_points,
+                                      dim,
+                                      gpu_data.n_components);
+      scratch_pad = SharedViewScratchPad(team_handle.team_shmem(),
+                                         gpu_data.scratch_pad_size);
+    }
 
     /**
      * Memory for dof and quad values.
@@ -982,20 +1101,34 @@ namespace Portable
 
   template <int dim, typename Number>
   inline const std::shared_ptr<const Utilities::MPI::Partitioner> &
-  MatrixFree<dim, Number>::get_vector_partitioner() const
+  MatrixFree<dim, Number>::get_vector_partitioner(
+    const unsigned int dof_handler_index) const
   {
-    return partitioner;
+    Assert(dof_handler_data.size() > 0, ExcNotInitialized());
+    AssertIndexRange(dof_handler_index, dof_handler_data.size());
+    return dof_handler_data[dof_handler_index].partitioner;
   }
 
 
 
   template <int dim, typename Number>
   inline const DoFHandler<dim> &
-  MatrixFree<dim, Number>::get_dof_handler() const
+  MatrixFree<dim, Number>::get_dof_handler(
+    const unsigned int dof_handler_index) const
   {
-    Assert(dof_handler != nullptr, ExcNotInitialized());
+    Assert(dof_handler_data.size() > 0, ExcNotInitialized());
+    AssertIndexRange(dof_handler_index, dof_handler_data.size());
 
-    return *dof_handler;
+    return *dof_handler_data[dof_handler_index].dof_handler;
+  }
+
+
+
+  template <int dim, typename Number>
+  inline unsigned int
+  MatrixFree<dim, Number>::get_mg_level() const
+  {
+    return mg_level;
   }
 
 #endif

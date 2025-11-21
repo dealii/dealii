@@ -159,25 +159,15 @@ namespace PETScWrappers
     {
       // only do something if the sizes
       // mismatch (may not be true for every proc)
+      const bool update_size =
+        Utilities::MPI::logical_or((size() != n) ||
+                                     (locally_owned_size() != local_sz),
+                                   get_mpi_communicator());
 
-      int k_global, k = ((size() != n) || (locally_owned_size() != local_sz));
-      {
-        const int ierr =
-          MPI_Allreduce(&k, &k_global, 1, MPI_INT, MPI_LOR, communicator);
-        AssertThrowMPI(ierr);
-      }
-
-      if (k_global || has_ghost_elements())
+      if (update_size || has_ghost_elements())
         {
-          // FIXME: I'd like to use this here,
-          // but somehow it leads to odd errors
-          // somewhere down the line in some of
-          // the tests:
-          //         const PetscErrorCode ierr = VecSetSizes (vector, n, n);
-          //         AssertThrow (ierr == 0, ExcPETScError(ierr));
-
-          // so let's go the slow way:
-
+          // PETSc doesn't support resizing non-empty vectors so create a new
+          // one:
           const PetscErrorCode ierr = VecDestroy(&vector);
           AssertThrow(ierr == 0, ExcPETScError(ierr));
 
@@ -343,18 +333,6 @@ namespace PETScWrappers
         }
     }
 
-
-
-    bool
-    Vector::all_zero() const
-    {
-      unsigned int has_nonzero = VectorBase::all_zero() ? 0 : 1;
-      // in parallel, check that the vector
-      // is zero on _all_ processors.
-      unsigned int num_nonzero =
-        Utilities::MPI::sum(has_nonzero, this->get_mpi_communicator());
-      return num_nonzero == 0;
-    }
 
 
     void

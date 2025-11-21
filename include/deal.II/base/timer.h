@@ -99,17 +99,29 @@ struct CPUClock
  *   timer.reset();
  * @endcode
  *
- * Alternatively, you can also restart the timer instead of resetting it. The
- * times between successive calls to start() and stop() (i.e., the laps) will
- * then be accumulated. The usage of this class is also explained in the
+ * Alternatively, you can also start the timer again instead of resetting it.
+ * The times between successive calls to start() and stop() (i.e., the laps)
+ * will then be accumulated. The usage of this class is also explained in the
  * step-28 tutorial program.
  *
- * @note The TimerOutput (combined with TimerOutput::Scope) class provide a
+ * @note The TimerOutput (combined with TimerOutput::Scope) classes provide a
  * convenient way to time multiple named sections and summarize the output.
  *
  * @note Implementation of this class is system dependent. In particular, CPU
  * times are accumulated from summing across all threads and will usually
  * exceed the wall times.
+ *
+ * @note If this class is constructed with an MPI communicator
+ * and <code>sync_lap_times</code> is set to <code>true</code>, then
+ * all of the operations of this class are collective operations
+ * that have to be performed on all MPI ranks. It is impossible to query a
+ * timer object on only some of the MPI ranks. This in particular means that
+ * you should not query information from this class in destructors of other
+ * objects, because destructors may be triggered during exception handling.
+ * If only some of the MPI ranks threw an exception the communication will
+ * cause a deadlock and your program will hang without output. The only two safe
+ * operations you can do with this class in a destructor are to
+ * destroy the object or to call stop().
  *
  * @ingroup utilities
  */
@@ -186,10 +198,8 @@ public:
    * <code>sync_lap_times</code> is <code>true</code> then the lap times are
    * synchronized over all processors in the communicator (i.e., the lap times
    * are set to the maximum lap time).
-   *
-   * @return Return the accumulated CPU time of the current processor in seconds.
    */
-  double
+  void
   stop();
 
   /**
@@ -204,6 +214,12 @@ public:
    */
   void
   restart();
+
+  /**
+   * Returns true if the timer is currently running, false otherwise.
+   */
+  bool
+  is_running() const;
 
   /**
    * Return the current accumulated wall time (including the current lap, if
@@ -260,7 +276,7 @@ public:
 
   /**
    * Return the number of laps that have been timed by calling
-   * stop() since creation of the timer or the last
+   * start() since creation of the timer or the last
    * call to reset(). If a timer is currently running
    * the current lap is included in the count.
    */
@@ -338,19 +354,47 @@ private:
   using cpu_clock_type = CPUClock;
 
   /**
-   * Collection of wall time measurements.
+   * Collection of wall time measurements. Marked as mutable
+   * for the reasons outlined in the documentation of Timer::is_synchronized.
    */
-  ClockMeasurements<wall_clock_type> wall_times;
+  mutable ClockMeasurements<wall_clock_type> wall_times;
 
   /**
-   * Collection of CPU time measurements.
+   * Collection of CPU time measurements. Marked as mutable
+   * for the reasons outlined in the documentation of Timer::is_synchronized.
    */
-  ClockMeasurements<cpu_clock_type> cpu_times;
+  mutable ClockMeasurements<cpu_clock_type> cpu_times;
 
   /**
    * Whether or not the timer is presently running.
    */
   bool running;
+
+  /**
+   * After a lap has been stopped it is necessary to
+   * update the accumulated wall time and CPU time
+   * with the results of the last lap. However, if sync_lap_times
+   * is set to <code>true</code> this requires MPI communication
+   * in parallel models before the update. We delay this communication
+   * and the update until the results are needed instead of immediately
+   * updating after calling stop(). This is useful because it avoids
+   * MPI communication if the timer is stopped because of
+   * stack unwinding during exception handling.
+   * In serial models this function simply updates the accumulated
+   * wall time and CPU time with the last lap time.
+   */
+  void
+  synchronize_and_update() const;
+
+  /**
+   * Store whether the timer results are currently synchronized
+   * across MPI processes. Marked as mutable, as synchronization
+   * is delayed until the results are needed for the reasons
+   * discussed in the documentation of synchronize_and_update().
+   * This means output functions marked as const like cpu_time()
+   * will still update this variable if necessary.
+   */
+  mutable bool is_synchronized;
 
   /**
    * The communicator over which various time values are synchronized and
@@ -360,25 +404,28 @@ private:
   MPI_Comm mpi_communicator;
 
   /**
-   * Store whether or not the wall time and CPU time are synchronized across
-   * the communicator in Timer::start() and Timer::stop().
+   * Store whether or not the wall time and CPU time will be synchronized across
+   * the communicator in synchronize_and_update().
    */
   bool sync_lap_times;
 
   /**
    * A structure for parallel wall time measurement that includes the minimum,
    * maximum, and average over all processors known to the MPI communicator of
-   * the last lap time.
+   * the last lap time. Marked as mutable for the reasons outlined in the
+   * documentation of Timer::is_synchronized.
    */
-  Utilities::MPI::MinMaxAvg last_lap_wall_time_data;
+  mutable Utilities::MPI::MinMaxAvg last_lap_wall_time_data;
 
   /**
    * A structure for parallel wall time measurement that includes the minimum
    * time recorded among all processes, the maximum time as well as the
    * average time defined as the sum of all individual times divided by the
    * number of MPI processes in the MPI_Comm for the total run time.
+   * Marked as mutable for the reasons outlined in the
+   * documentation of Timer::is_synchronized.
    */
-  Utilities::MPI::MinMaxAvg accumulated_wall_time_data;
+  mutable Utilities::MPI::MinMaxAvg accumulated_wall_time_data;
 
   /**
    * The number of laps that have been timed. If
@@ -386,6 +433,17 @@ private:
    * the current lap is included in the count.
    */
   unsigned int n_timed_laps;
+
+  /**
+   * A lock that makes sure that this class gives reasonable results even when
+   * used with several threads. Note that thread-safety with a timer that is
+   * shared between different threads is hard to establish, and it is in
+   * particular discouraged to have multiple threads starting and stopping
+   * the timer. This case only works if each thread makes sure the timer
+   * is not already running before starting it, and stopping the timer
+   * before any other thread can use it.
+   */
+  mutable Threads::Mutex mutex;
 };
 
 
@@ -397,8 +455,13 @@ private:
  * sections that perform certain aspects of the program. A section can be
  * entered several times. By changing the options in OutputFrequency and
  * OutputType, the user can choose whether output should be generated every
- * time a section is joined or just in the end of the program. Moreover, it is
+ * time a section is joined or just at the end of the program. Moreover, it is
  * possible to show CPU times, wall times, or both.
+ *
+ * To ensure output from this class is properly synchronized in parallel
+ * programs and to simplify internal data handling, output from this class can
+ * only be generated, if no subsection is currently being timed. I.e. all
+ * subsections have to be closed before producing output or accessing data.
  *
  * The class is used in a substantial number of tutorial programs that collect
  * timing data. step-77 is an example of a relatively simple sequential program
@@ -447,7 +510,7 @@ private:
  * | Setup dof system                |         1 |      3.97s |       4.5% |
  * +---------------------------------+-----------+------------+------------+
  * @endcode
- * The output will see that we entered the assembly and solve section twice,
+ * The output shows that we entered the assembly and solve section twice,
  * and reports how much time we spent there. Moreover, the class measures the
  * total time spent from start to termination of the TimerOutput object. In
  * this case, we did a lot of other stuff, so that the time proportions of the
@@ -588,7 +651,7 @@ class TimerOutput
 {
 public:
   /**
-   * Helper class to enter/exit sections in TimerOutput be constructing a
+   * Helper class to enter/exit sections in TimerOutput by constructing a
    * simple scope-based object. The purpose of this class is explained in the
    * documentation of TimerOutput.
    */
@@ -597,18 +660,19 @@ public:
   public:
     /**
      * Enter the given section in the timer. Exit automatically when calling
-     * stop() or destructor runs.
+     * stop() or when the destructor runs.
      */
     Scope(dealii::TimerOutput &timer_, const std::string &section_name);
 
     /**
-     * Destructor calls stop()
+     * Destructor calls Scope::stop().
      */
     ~Scope();
 
     /**
      * In case you want to exit the scope before the destructor is executed,
-     * call this function.
+     * call this function. The function leaves the current subsection of
+     * the stored TimerOutput object.
      */
     void
     stop();
@@ -879,21 +943,9 @@ private:
   Timer timer_all;
 
   /**
-   * A structure that groups all information that we collect about each of the
-   * sections.
-   */
-  struct Section
-  {
-    Timer        timer;
-    double       total_cpu_time;
-    double       total_wall_time;
-    unsigned int n_calls;
-  };
-
-  /**
    * A list of all the sections and their information.
    */
-  std::map<std::string, Section> sections;
+  std::map<std::string, Timer> sections;
 
   /**
    * The stream object to which we are to output.
@@ -943,6 +995,9 @@ Timer::restart()
 inline const Utilities::MPI::MinMaxAvg &
 Timer::get_last_lap_wall_time_data() const
 {
+  if (running == false)
+    synchronize_and_update();
+
   return last_lap_wall_time_data;
 }
 
@@ -951,6 +1006,9 @@ Timer::get_last_lap_wall_time_data() const
 inline const Utilities::MPI::MinMaxAvg &
 Timer::get_accumulated_wall_time_data() const
 {
+  if (running == false)
+    synchronize_and_update();
+
   return accumulated_wall_time_data;
 }
 

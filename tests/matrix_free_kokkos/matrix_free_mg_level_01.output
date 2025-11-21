@@ -1,0 +1,9 @@
+
+DEAL:2d::Testing Portable::MatrixFree on level 3
+DEAL:2d::Number of dofs on level 3: 81
+DEAL:2d::Norm of difference OK 
+DEAL:2d::
+DEAL:2d::Testing Portable::MatrixFree on level 3
+DEAL:2d::Number of dofs on level 3: 289
+DEAL:2d::Norm of difference OK 
+DEAL:2d::

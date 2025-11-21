@@ -46,7 +46,7 @@ namespace Portable
    *
    * @tparam dim Dimension in which this class is to be used
    *
-   * @tparam fe_degree Degree of the tensor prodict finite element with fe_degree+1
+   * @tparam fe_degree Degree of the tensor product finite element with fe_degree+1
    * degrees of freedom per coordinate direction
    *
    * @tparam n_q_points_1d Number of points in the quadrature formular in 1d,
@@ -115,7 +115,8 @@ namespace Portable
 
     /**
      * Number of tensor degrees of freedom of all component determined from
-     * the given template argument `fe_degree`.
+     * the given template argument `fe_degree`. This is the total number of
+     * local DoFs in a cell.
      */
     static constexpr unsigned int tensor_dofs_per_cell =
       tensor_dofs_per_component * n_components;
@@ -124,13 +125,13 @@ namespace Portable
      * Constructor. You will need to provide a pointer to the
      * Portable::MatrixFree::Data object, which is typically provided to the
      * functor inside the
-     * Portable::MatrixFree::cell_loop() and the index @p dof_index of the DoFHandler
-     * if more than one was provided when the Portable::MatrixFree object was
-     * initialized.
+     * Portable::MatrixFree::cell_loop() and the index @p dof_handler_index
+     * of the DoFHandler if more than one was provided when the
+     * Portable::MatrixFree object was initialized.
      */
     DEAL_II_HOST_DEVICE
     explicit FEEvaluation(const data_type   *data,
-                          const unsigned int dof_index = 0);
+                          const unsigned int dof_handler_index = 0);
 
     /**
      * Return the index of the current cell.
@@ -153,7 +154,7 @@ namespace Portable
      * the current cell, and store them internally. Similar functionality as
      * the function DoFAccessor::get_interpolated_dof_values when no
      * constraints are present, but it also includes constraints from hanging
-     * nodes, so once can see it as a similar function to
+     * nodes, so one can see it as a similar function to
      * AffineConstraints::read_dof_values() as well.
      */
     DEAL_II_HOST_DEVICE void
@@ -262,6 +263,7 @@ namespace Portable
     apply_for_each_quad_point(const Functor &func);
 
   private:
+    const unsigned int                                       dof_handler_index;
     const typename MatrixFree<dim, Number>::Data            *data;
     const typename MatrixFree<dim, Number>::PrecomputedData *precomputed_data;
     SharedData<dim, Number>                                 *shared_data;
@@ -277,13 +279,25 @@ namespace Portable
             typename Number>
   DEAL_II_HOST_DEVICE
   FEEvaluation<dim, fe_degree, n_q_points_1d, n_components_, Number>::
-    FEEvaluation(const data_type *data, const unsigned int dof_index)
-    : data(data)
-    , precomputed_data(data->precomputed_data)
-    , shared_data(data->shared_data)
+    FEEvaluation(const data_type *data, const unsigned int dof_handler_index)
+    : dof_handler_index(dof_handler_index)
+    , data(data)
+    , precomputed_data(&data->precomputed_data[dof_handler_index])
+    , shared_data(&data->shared_data[dof_handler_index])
     , cell_id(data->team_member.league_rank())
   {
-    AssertIndexRange(dof_index, data->n_dofhandler);
+    AssertIndexRange(dof_handler_index, data->n_dof_handler);
+
+    Assert(
+      n_components_ == precomputed_data->n_components,
+      ExcMessage(
+        "Portable::FEEvaluation initialized with wrong number of components. Should be " +
+        Utilities::to_string(precomputed_data->n_components) +
+        " but the template argument 4 is set to " +
+        Utilities::to_string(n_components_)));
+
+    // TODO: check fe_degree is correct by storing the used FE degree
+    // inside PrecomputedData.
   }
 
 
@@ -418,7 +432,7 @@ namespace Portable
           ElementType::tensor_symmetric_collocation)
       {
         internal::FEEvaluationImplCollocation<dim, fe_degree, Number>::evaluate(
-          n_components, evaluation_flag, data);
+          dof_handler_index, n_components, evaluation_flag, data);
       }
     // '<=' on type means tensor_symmetric or tensor_symmetric_hermite, see
     // shape_info.h for more details
@@ -430,13 +444,16 @@ namespace Portable
           dim,
           fe_degree,
           n_q_points_1d,
-          Number>::evaluate(n_components, evaluation_flag, data);
+          Number>::evaluate(dof_handler_index,
+                            n_components,
+                            evaluation_flag,
+                            data);
       }
     else if (fe_degree >= 0 && precomputed_data->element_type <=
                                  ElementType::tensor_symmetric_no_collocation)
       {
         internal::FEEvaluationImpl<dim, fe_degree, n_q_points_1d, Number>::
-          evaluate(n_components, evaluation_flag, data);
+          evaluate(dof_handler_index, n_components, evaluation_flag, data);
       }
     else
       {
@@ -463,7 +480,7 @@ namespace Portable
           ElementType::tensor_symmetric_collocation)
       {
         internal::FEEvaluationImplCollocation<dim, fe_degree, Number>::
-          integrate(n_components, integration_flag, data);
+          integrate(dof_handler_index, n_components, integration_flag, data);
       }
     // '<=' on type means tensor_symmetric or tensor_symmetric_hermite, see
     // shape_info.h for more details
@@ -475,13 +492,16 @@ namespace Portable
           dim,
           fe_degree,
           n_q_points_1d,
-          Number>::integrate(n_components, integration_flag, data);
+          Number>::integrate(dof_handler_index,
+                             n_components,
+                             integration_flag,
+                             data);
       }
     else if (fe_degree >= 0 && precomputed_data->element_type <=
                                  ElementType::tensor_symmetric_no_collocation)
       {
         internal::FEEvaluationImpl<dim, fe_degree, n_q_points_1d, Number>::
-          integrate(n_components, integration_flag, data);
+          integrate(dof_handler_index, n_components, integration_flag, data);
       }
     else
       {

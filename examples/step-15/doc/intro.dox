@@ -154,11 +154,12 @@ and the right hand side $b^{n}$ is given by:
 @f]
 
 
-<h3> Questions about the appropriate solver </h3>
+<h3> Choosing the most appropriate linear solver </h3>
 
-The matrix that corresponds to the Newton step above can be reformulated to
-show its structure a bit better. Rewriting it slightly, we get that it has the
-form
+The selection of an efficient linear solver relies on understanding the structural properties
+of the matrix corresponding to the Newton step above. To examine these properties, we
+can recognize that the matrix $A$ can be understood to correspond to the following form that involves a $d \times d$ dimensional (in $d$ space dimensions) submatrix $B$ of
+the form
 @f[
   A_{ij}
   =
@@ -168,8 +169,7 @@ form
     \nabla \varphi_j
   \right),
 @f]
-where the matrix $B$ (of size $d \times d$ in $d$ space dimensions) is given
-by the following expression:
+where $B$ is given by:
 @f[
   B
   =
@@ -187,18 +187,20 @@ by the following expression:
   \right\}.
 @f]
 From this expression, it is obvious that
-$B$ is symmetric, and so $A$ is symmetric as well.
-On the other hand, $B$ is also positive definite, which confers the same
-property onto $A$. This can be seen by noting that the vector $v_1 =
+$B$ is symmetric. Furthermore, we can derive that $B$ is positive definite.
+This can be seen by noting that the vector $v_1 =
 \frac{\nabla u^n}{|\nabla u^n|}$ is an eigenvector of $B$ with eigenvalue
-$\lambda_1=a_n \left(1-\frac{|\nabla u^n|^2}{1+|\nabla u^n|^2}\right) > 0$ while all vectors $v_2\ldots v_d$
-that are perpendicular to $v_1$ and each other are eigenvectors with
-eigenvalue $a_n$. Since all eigenvalues are positive, $B$ is positive definite
-and so is $A$. We can thus use the CG method for solving the Newton steps.
-(The fact that the matrix $A$ is symmetric and positive definite should not come
-as a surprise. It results from taking the derivative of an operator that
-results from taking the derivative of an energy functional: the minimal
-surface equation simply minimizes some non-quadratic energy. Consequently,
+$\lambda_1=a_n \left(1-\frac{|\nabla u^n|^2}{1+|\nabla u^n|^2}\right) > 0$ while
+all vectors $v_2\ldots v_d$ that are perpendicular to $v_1$ and each other are
+eigenvectors with eigenvalue $a_n$. Since all eigenvalues are positive, $B$ is
+positive definite and so is $A$.
+
+Since the properties of $B$ are directly inherited from $A$, $A$ must also be
+symmetric and positive definite. We can thus select the Conjugate Gradient (CG) method for solving
+the Newton steps. (The fact that the matrix $A$ is symmetric and positive
+definite should not come as a surprise. It results from taking the derivative
+of an operator that results from taking the derivative of an energy functional:
+the minimal surface equation simply minimizes some non-quadratic energy. Consequently,
 the Newton matrix, as the matrix of second derivatives of a scalar energy,
 must be symmetric since the derivative with regard to the $i$th and $j$th
 degree of freedom should clearly commute. Likewise, if the energy functional

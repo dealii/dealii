@@ -63,20 +63,23 @@ namespace Portable
         const ::dealii::internal::MatrixFreeFunctions::ShapeInfo<Number>
                               &shape_info,
         const DoFHandler<dim> &dof_handler,
-        const UpdateFlags     &update_flags);
+        const UpdateFlags     &update_flags,
+        const unsigned int     dof_handler_index);
 
       void
       resize(const unsigned int n_colors);
 
-      template <typename CellFilter>
+      template <typename ExecutionSpace, typename CellFilter>
       void
       fill_data(
+        ExecutionSpace                                           &exec_space,
         const unsigned int                                        color,
         const std::vector<CellFilter>                            &graph,
         const std::shared_ptr<const Utilities::MPI::Partitioner> &partitioner);
 
     private:
       MatrixFree<dim, Number> *data;
+      const unsigned int       dof_handler_index;
       // Local buffer
       std::vector<types::global_dof_index> local_dof_indices;
       FEValues<dim>                        fe_values;
@@ -104,24 +107,28 @@ namespace Portable
       const ::dealii::internal::MatrixFreeFunctions::ShapeInfo<Number>
                             &shape_info,
       const DoFHandler<dim> &dof_handler,
-      const UpdateFlags     &update_flags)
+      const UpdateFlags     &update_flags,
+      const unsigned int     dof_handler_index)
       : data(data)
+      , dof_handler_index(dof_handler_index)
       , fe_values(mapping,
                   fe,
                   Quadrature<dim>(quad),
                   update_inverse_jacobians | update_quadrature_points |
                     update_values | update_gradients | update_JxW_values)
       , lexicographic_inv(shape_info.lexicographic_numbering)
-      , fe_degree(data->fe_degree)
-      , n_components(data->n_components)
-      , scalar_dofs_per_cell(data->scalar_dofs_per_cell)
-      , dofs_per_cell(data->dofs_per_cell)
+      , fe_degree(data->dof_handler_data[dof_handler_index].fe_degree)
+      , n_components(data->dof_handler_data[dof_handler_index].n_components)
+      , scalar_dofs_per_cell(
+          data->dof_handler_data[dof_handler_index].scalar_dofs_per_cell)
+      , dofs_per_cell(data->dof_handler_data[dof_handler_index].dofs_per_cell)
       , q_points_per_cell(data->q_points_per_cell)
       , update_flags(update_flags)
       , padding_length(data->get_padding_length())
       , hanging_nodes(dof_handler.get_triangulation())
     {
-      local_dof_indices.resize(data->dofs_per_cell);
+      local_dof_indices.resize(
+        data->dof_handler_data[dof_handler_index].dofs_per_cell);
       lexicographic_dof_indices.resize(dofs_per_cell);
       fe_values.always_allow_check_for_cell_similarity(true);
     }
@@ -132,38 +139,38 @@ namespace Portable
     void
     ReinitHelper<dim, Number>::resize(const unsigned int n_colors)
     {
-      // We need at least three colors when we are using device-aware MPI and
-      // overlapping the communication
-      data->n_cells.resize(std::max(n_colors, 3U), 0);
-      data->local_to_global.resize(n_colors);
-      data->constraint_mask.resize(n_colors);
+      typename MatrixFree<dim, Number>::PerDoFHandlerData &dof_data =
+        data->dof_handler_data[dof_handler_index];
 
-      data->row_start.resize(n_colors);
-
-      if (update_flags & update_quadrature_points)
-        data->q_points.resize(n_colors);
+      dof_data.local_to_global.resize(n_colors);
+      dof_data.constraint_mask.resize(n_colors);
 
       if (update_flags & update_JxW_values)
-        data->JxW.resize(n_colors);
+        dof_data.JxW.resize(n_colors);
 
       if (update_flags & update_gradients)
-        data->inv_jacobian.resize(n_colors);
+        dof_data.inv_jacobian.resize(n_colors);
     }
 
 
 
     template <int dim, typename Number>
-    template <typename CellFilter>
+    template <typename ExecutionSpace, typename CellFilter>
     void
     ReinitHelper<dim, Number>::fill_data(
+      ExecutionSpace                                           &exec_space,
       const unsigned int                                        color,
       const std::vector<CellFilter>                            &graph,
       const std::shared_ptr<const Utilities::MPI::Partitioner> &partitioner)
     {
       const unsigned int n_cells = data->n_cells[color];
 
+      typename MatrixFree<dim, Number>::PerDoFHandlerData &dof_data =
+        data->dof_handler_data[dof_handler_index];
+
+
       // Create the Views
-      data->local_to_global[color] =
+      dof_data.local_to_global[color] =
         Kokkos::View<types::global_dof_index **,
                      MemorySpace::Default::kokkos_space>(
           Kokkos::view_alloc("local_to_global_" + std::to_string(color),
@@ -171,7 +178,7 @@ namespace Portable
           dofs_per_cell,
           n_cells);
 
-      if (update_flags & update_quadrature_points)
+      if (update_flags & update_quadrature_points && dof_handler_index == 0)
         data->q_points[color] =
           Kokkos::View<Point<dim, Number> **,
                        MemorySpace::Default::kokkos_space>(
@@ -181,7 +188,7 @@ namespace Portable
             n_cells);
 
       if (update_flags & update_JxW_values)
-        data->JxW[color] =
+        dof_data.JxW[color] =
           Kokkos::View<Number **, MemorySpace::Default::kokkos_space>(
             Kokkos::view_alloc("JxW_" + std::to_string(color),
                                Kokkos::WithoutInitializing),
@@ -189,7 +196,7 @@ namespace Portable
             n_cells);
 
       if (update_flags & update_gradients)
-        data->inv_jacobian[color] =
+        dof_data.inv_jacobian[color] =
           Kokkos::View<Number **[dim][dim], MemorySpace::Default::kokkos_space>(
             Kokkos::view_alloc("inv_jacobian_" + std::to_string(color),
                                Kokkos::WithoutInitializing),
@@ -197,51 +204,63 @@ namespace Portable
             n_cells);
 
       // Initialize to zero, i.e., unconstrained cell
-      data->constraint_mask[color] =
+      dof_data.constraint_mask[color] =
         Kokkos::View<dealii::internal::MatrixFreeFunctions::ConstraintKinds *,
                      MemorySpace::Default::kokkos_space>(
           "constraint_mask_" + std::to_string(color), n_cells * n_components);
 
       // Create the host mirrow Views and fill them
       auto constraint_mask_host =
-        Kokkos::create_mirror_view(data->constraint_mask[color]);
+        Kokkos::create_mirror_view(dof_data.constraint_mask[color]);
 
       typename std::remove_reference_t<
         decltype(data->q_points[color])>::HostMirror q_points_host;
-      typename std::remove_reference_t<decltype(data->JxW[color])>::HostMirror
-        JxW_host;
       typename std::remove_reference_t<
-        decltype(data->inv_jacobian[color])>::HostMirror inv_jacobian_host;
+        decltype(dof_data.JxW[color])>::HostMirror JxW_host;
+      typename std::remove_reference_t<
+        decltype(dof_data.inv_jacobian[color])>::HostMirror inv_jacobian_host;
 #if DEAL_II_KOKKOS_VERSION_GTE(3, 6, 0)
       auto local_to_global_host =
         Kokkos::create_mirror_view(Kokkos::WithoutInitializing,
-                                   data->local_to_global[color]);
-      if (update_flags & update_quadrature_points)
+                                   dof_data.local_to_global[color]);
+      if (update_flags & update_quadrature_points && dof_handler_index == 0)
         q_points_host = Kokkos::create_mirror_view(Kokkos::WithoutInitializing,
                                                    data->q_points[color]);
       if (update_flags & update_JxW_values)
         JxW_host = Kokkos::create_mirror_view(Kokkos::WithoutInitializing,
-                                              data->JxW[color]);
+                                              dof_data.JxW[color]);
       if (update_flags & update_gradients)
         inv_jacobian_host =
           Kokkos::create_mirror_view(Kokkos::WithoutInitializing,
-                                     data->inv_jacobian[color]);
+                                     dof_data.inv_jacobian[color]);
 #else
       auto local_to_global_host =
-        Kokkos::create_mirror_view(data->local_to_global[color]);
-      if (update_flags & update_quadrature_points)
+        Kokkos::create_mirror_view(dof_data.local_to_global[color]);
+      if (update_flags & update_quadrature_points && dof_handler_index == 0)
         q_points_host = Kokkos::create_mirror_view(data->q_points[color]);
       if (update_flags & update_JxW_values)
-        JxW_host = Kokkos::create_mirror_view(data->JxW[color]);
+        JxW_host = Kokkos::create_mirror_view(dof_data.JxW[color]);
       if (update_flags & update_gradients)
         inv_jacobian_host =
-          Kokkos::create_mirror_view(data->inv_jacobian[color]);
+          Kokkos::create_mirror_view(dof_data.inv_jacobian[color]);
 #endif
 
-      auto cell = graph.cbegin(), end_cell = graph.cend();
-      for (unsigned int cell_id = 0; cell != end_cell; ++cell, ++cell_id)
+      auto triacell = graph.cbegin(), end_cell = graph.cend();
+      for (unsigned int cell_id = 0; triacell != end_cell;
+           ++triacell, ++cell_id)
         {
-          (*cell)->get_dof_indices(local_dof_indices);
+          typename DoFHandler<dim>::cell_iterator cell(
+            &(dof_data.dof_handler->get_triangulation()),
+            (*triacell)->level(),
+            (*triacell)->index(),
+            dof_data.dof_handler);
+
+
+          if (data->get_mg_level() == numbers::invalid_unsigned_int)
+            cell->get_dof_indices(local_dof_indices);
+          else
+            cell->get_mg_dof_indices(local_dof_indices);
+
           // When using MPI, we need to transform the local_dof_indices, which
           // contain global numbers of dof indices in the MPI universe, to get
           // local (to the current MPI process) dof indices.
@@ -258,19 +277,21 @@ namespace Portable
             cell_id_view(&constraint_mask_host[cell_id * n_components],
                          n_components);
 
-          hanging_nodes.setup_constraints(*cell,
-                                          partitioner,
-                                          {lexicographic_inv},
-                                          lexicographic_dof_indices,
-                                          cell_id_view);
+          // Local smoothing levels do not have hanging nodes
+          if (data->get_mg_level() == numbers::invalid_unsigned_int)
+            hanging_nodes.setup_constraints(cell,
+                                            partitioner,
+                                            {lexicographic_inv},
+                                            lexicographic_dof_indices,
+                                            cell_id_view);
 
           for (unsigned int i = 0; i < dofs_per_cell; ++i)
             local_to_global_host(i, cell_id) = lexicographic_dof_indices[i];
 
-          fe_values.reinit(*cell);
+          fe_values.reinit(cell);
 
           // Quadrature points
-          if (update_flags & update_quadrature_points)
+          if (update_flags & update_quadrature_points && dof_handler_index == 0)
             {
               for (unsigned int i = 0; i < q_points_per_cell; ++i)
                 q_points_host(i, cell_id) = fe_values.quadrature_point(i);
@@ -293,14 +314,21 @@ namespace Portable
         }
 
       // Copy the data to the device
-      Kokkos::deep_copy(data->constraint_mask[color], constraint_mask_host);
-      Kokkos::deep_copy(data->local_to_global[color], local_to_global_host);
-      if (update_flags & update_quadrature_points)
-        Kokkos::deep_copy(data->q_points[color], q_points_host);
+      Kokkos::deep_copy(exec_space,
+                        dof_data.constraint_mask[color],
+                        constraint_mask_host);
+      Kokkos::deep_copy(exec_space,
+                        dof_data.local_to_global[color],
+                        local_to_global_host);
+      if (update_flags & update_quadrature_points && dof_handler_index == 0)
+        Kokkos::deep_copy(exec_space, data->q_points[color], q_points_host);
+
       if (update_flags & update_JxW_values)
-        Kokkos::deep_copy(data->JxW[color], JxW_host);
+        Kokkos::deep_copy(exec_space, dof_data.JxW[color], JxW_host);
       if (update_flags & update_gradients)
-        Kokkos::deep_copy(data->inv_jacobian[color], inv_jacobian_host);
+        Kokkos::deep_copy(exec_space,
+                          dof_data.inv_jacobian[color],
+                          inv_jacobian_host);
     }
 
 
@@ -315,6 +343,23 @@ namespace Portable
       std::vector<types::global_dof_index> local_dof_indices(
         cell->get_fe().n_dofs_per_cell());
       cell->get_dof_indices(local_dof_indices);
+      constraints.resolve_indices(local_dof_indices);
+
+      return local_dof_indices;
+    }
+
+
+
+    template <int dim, typename number>
+    std::vector<types::global_dof_index>
+    get_conflict_indices(
+      const FilteredIterator<typename DoFHandler<dim>::level_cell_iterator>
+                                      &cell,
+      const AffineConstraints<number> &constraints)
+    {
+      std::vector<types::global_dof_index> local_dof_indices(
+        cell->get_fe().n_dofs_per_cell());
+      cell->get_mg_dof_indices(local_dof_indices);
       constraints.resolve_indices(local_dof_indices);
 
       return local_dof_indices;
@@ -356,35 +401,45 @@ namespace Portable
                      Kokkos::MemoryTraits<Kokkos::Unmanaged>>;
 
       ApplyKernel(
-        Functor                                                 func,
-        const typename MatrixFree<dim, Number>::PrecomputedData gpu_data,
+        Functor                                 func,
+        const unsigned int                      n_dof_handler,
+        const Kokkos::Array<typename MatrixFree<dim, Number>::PrecomputedData,
+                            n_max_dof_handlers> precomputed_data,
         const LinearAlgebra::distributed::Vector<Number, MemorySpace::Default>
                                                                          &src,
         LinearAlgebra::distributed::Vector<Number, MemorySpace::Default> &dst)
         : func(func)
-        , gpu_data(gpu_data)
+        , n_dof_handler(n_dof_handler)
+        , precomputed_data(precomputed_data)
         , src(DeviceVector<Number>(src.get_values(), src.locally_owned_size()))
         , dst(DeviceVector<Number>(dst.get_values(), dst.locally_owned_size()))
       {}
 
       ApplyKernel(
-        Functor                                                 func,
-        const typename MatrixFree<dim, Number>::PrecomputedData gpu_data,
+        Functor                                 func,
+        const unsigned int                      n_dof_handler,
+        const Kokkos::Array<typename MatrixFree<dim, Number>::PrecomputedData,
+                            n_max_dof_handlers> precomputed_data,
         const LinearAlgebra::distributed::BlockVector<Number,
                                                       MemorySpace::Default>
           &src,
         LinearAlgebra::distributed::BlockVector<Number, MemorySpace::Default>
           &dst)
         : func(func)
-        , gpu_data(gpu_data)
+        , n_dof_handler(n_dof_handler)
+        , precomputed_data(precomputed_data)
         , src(src)
         , dst(dst)
       {}
 
-      Functor                                                 func;
-      const typename MatrixFree<dim, Number>::PrecomputedData gpu_data;
-      const DeviceBlockVector<Number>                         src;
-      DeviceBlockVector<Number>                               dst;
+      Functor            func;
+      const unsigned int n_dof_handler;
+      const Kokkos::Array<typename MatrixFree<dim, Number>::PrecomputedData,
+                          n_max_dof_handlers>
+        precomputed_data;
+
+      const DeviceBlockVector<Number> src;
+      DeviceBlockVector<Number>       dst;
 
 
       // Provide the shared memory capacity. This function takes the team_size
@@ -392,12 +447,18 @@ namespace Portable
       std::size_t
       team_shmem_size(int /*team_size*/) const
       {
-        return SharedViewValues::shmem_size(Functor::n_q_points,
-                                            gpu_data.n_components) +
-               SharedViewGradients::shmem_size(Functor::n_q_points,
-                                               dim,
-                                               gpu_data.n_components) +
-               SharedViewScratchPad::shmem_size(gpu_data.scratch_pad_size);
+        std::size_t result = 0;
+        for (unsigned int d = 0; d < n_dof_handler; ++d)
+          result +=
+            SharedViewValues::shmem_size(Functor::n_q_points,
+                                         precomputed_data[d].n_components) +
+            SharedViewGradients::shmem_size(Functor::n_q_points,
+                                            dim,
+                                            precomputed_data[d].n_components) +
+            SharedViewScratchPad::shmem_size(
+              precomputed_data[d].scratch_pad_size);
+
+        return result;
       }
 
 
@@ -405,26 +466,20 @@ namespace Portable
       void
       operator()(const TeamHandle &team_member) const
       {
-        // Get the scratch memory
-        SharedViewValues     values(team_member.team_shmem(),
+        // Allocate the scratch memory
+        Kokkos::Array<SharedData<dim, Number>, n_max_dof_handlers> shared_data;
+        for (unsigned int d = 0; d < n_dof_handler; ++d)
+          shared_data[d].reinit(team_member,
                                 Functor::n_q_points,
-                                gpu_data.n_components);
-        SharedViewGradients  gradients(team_member.team_shmem(),
-                                      Functor::n_q_points,
-                                      dim,
-                                      gpu_data.n_components);
-        SharedViewScratchPad scratch_pad(team_member.team_shmem(),
-                                         gpu_data.scratch_pad_size);
-
-        SharedData<dim, Number> shared_data(values, gradients, scratch_pad);
+                                precomputed_data[d]);
 
         const int cell_index = team_member.league_rank();
 
         typename MatrixFree<dim, Number>::Data data{team_member,
-                                                    /* n_dofhandler */ 1,
+                                                    n_dof_handler,
                                                     cell_index,
-                                                    &gpu_data,
-                                                    &shared_data};
+                                                    precomputed_data,
+                                                    shared_data};
 
         if constexpr (IsBlock)
           {
@@ -445,24 +500,24 @@ namespace Portable
   template <int dim, typename Number>
   MatrixFree<dim, Number>::MatrixFree()
     : my_id(-1)
-    , n_dofs(0)
+    , mg_level(numbers::invalid_unsigned_int)
     , padding_length(0)
-    , dof_handler(nullptr)
   {}
-
 
 
   template <int dim, typename Number>
   template <typename IteratorFiltersType>
   void
-  MatrixFree<dim, Number>::reinit(const Mapping<dim>              &mapping,
-                                  const DoFHandler<dim>           &dof_handler,
-                                  const AffineConstraints<Number> &constraints,
-                                  const Quadrature<1>             &quad,
-                                  const IteratorFiltersType &iterator_filter,
-                                  const AdditionalData      &additional_data)
+  MatrixFree<dim, Number>::reinit(
+    const Mapping<dim>                                   &mapping,
+    const std::vector<const DoFHandler<dim> *>           &dof_handler,
+    const std::vector<const AffineConstraints<Number> *> &constraints,
+    const Quadrature<1>                                  &quad,
+    const IteratorFiltersType                            &iterator_filter,
+    const AdditionalData                                 &additional_data)
   {
-    const auto &triangulation = dof_handler.get_triangulation();
+    const auto &triangulation = dof_handler[0]->get_triangulation();
+
     if (const auto parallel_triangulation =
           dynamic_cast<const parallel::TriangulationBase<dim> *>(
             &triangulation))
@@ -482,6 +537,27 @@ namespace Portable
                       iterator_filter,
                       nullptr,
                       additional_data);
+  }
+
+  template <int dim, typename Number>
+  template <typename IteratorFiltersType>
+  void
+  MatrixFree<dim, Number>::reinit(const Mapping<dim>              &mapping,
+                                  const DoFHandler<dim>           &dof_handler,
+                                  const AffineConstraints<Number> &constraints,
+                                  const Quadrature<1>             &quad,
+                                  const IteratorFiltersType &iterator_filter,
+                                  const AdditionalData      &additional_data)
+  {
+    const std::vector<const DoFHandler<dim> *> x_dof_handler = {&dof_handler};
+    const std::vector<const AffineConstraints<Number> *> x_constraints = {
+      &constraints};
+    reinit(mapping,
+           x_dof_handler,
+           x_constraints,
+           quad,
+           iterator_filter,
+           additional_data);
   }
 
 
@@ -522,29 +598,58 @@ namespace Portable
 
 
   template <int dim, typename Number>
-  typename MatrixFree<dim, Number>::PrecomputedData
-  MatrixFree<dim, Number>::get_data(unsigned int color) const
+  void
+  MatrixFree<dim, Number>::reinit(
+    const Mapping<dim>                                   &mapping,
+    const std::vector<const DoFHandler<dim> *>           &dof_handler,
+    const std::vector<const AffineConstraints<Number> *> &constraints,
+    const Quadrature<1>                                  &quad,
+    const AdditionalData                                 &additional_data)
   {
+    IteratorFilters::LocallyOwnedCell locally_owned_cell_filter;
+    reinit(mapping,
+           dof_handler,
+           constraints,
+           quad,
+           locally_owned_cell_filter,
+           additional_data);
+  }
+
+
+
+  template <int dim, typename Number>
+  typename MatrixFree<dim, Number>::PrecomputedData
+  MatrixFree<dim, Number>::get_data(const unsigned int dof_handler_index,
+                                    const unsigned int color) const
+  {
+    Assert(n_cells[color] > 0,
+           ExcMessage(
+             "Current MPI process does not own any cells of the given color."));
+
+    AssertIndexRange(dof_handler_index, dof_handler_data.size());
+    const PerDoFHandlerData &data = dof_handler_data[dof_handler_index];
+
     PrecomputedData data_copy;
     if (q_points.size() > 0)
       data_copy.q_points = q_points[color];
-    if (inv_jacobian.size() > 0)
-      data_copy.inv_jacobian = inv_jacobian[color];
-    if (JxW.size() > 0)
-      data_copy.JxW = JxW[color];
-    data_copy.local_to_global    = local_to_global[color];
-    data_copy.constraint_mask    = constraint_mask[color];
-    data_copy.shape_values       = shape_values;
-    data_copy.shape_gradients    = shape_gradients;
-    data_copy.co_shape_gradients = co_shape_gradients;
-    data_copy.constraint_weights = constraint_weights;
+
+    if (data.inv_jacobian.size() > 0)
+      data_copy.inv_jacobian = data.inv_jacobian[color];
+    if (data.JxW.size() > 0)
+      data_copy.JxW = data.JxW[color];
+    data_copy.local_to_global    = data.local_to_global[color];
+    data_copy.constraint_mask    = data.constraint_mask[color];
+    data_copy.shape_values       = data.shape_values;
+    data_copy.shape_gradients    = data.shape_gradients;
+    data_copy.co_shape_gradients = data.co_shape_gradients;
+    data_copy.constraint_weights = data.constraint_weights;
     data_copy.n_cells            = n_cells[color];
-    data_copy.n_components       = n_components;
+    data_copy.n_components       = data.n_components;
     data_copy.padding_length     = padding_length;
     data_copy.row_start          = row_start[color];
     data_copy.use_coloring       = use_coloring;
-    data_copy.element_type       = element_type;
-    data_copy.scratch_pad_size   = scratch_pad_size;
+    data_copy.element_type       = data.element_type;
+    data_copy.scratch_pad_size   = data.scratch_pad_size;
 
     return data_copy;
   }
@@ -564,14 +669,16 @@ namespace Portable
            ExcMessage("src and dst vectors have different size."));
     // FIXME When using C++17, we can use KOKKOS_CLASS_LAMBDA and this
     // work-around can be removed.
-    auto               constr_dofs = constrained_dofs;
+
+    Assert(dof_handler_data.size() == 1, ExcNotImplemented());
+    auto               constr_dofs = dof_handler_data[0].constrained_dofs;
     const unsigned int size = internal::VectorLocalSize<VectorType>::get(dst);
     const Number      *src_ptr = src.get_values();
     Number            *dst_ptr = dst.get_values();
     Kokkos::parallel_for(
       "dealii::copy_constrained_values",
       Kokkos::RangePolicy<MemorySpace::Default::kokkos_space::execution_space>(
-        0, n_constrained_dofs),
+        0, dof_handler_data[0].n_constrained_dofs),
       KOKKOS_LAMBDA(int dof) {
         // When working with distributed vectors, the constrained dofs are
         // computed for ghosted vectors but we want to copy the values of the
@@ -596,16 +703,19 @@ namespace Portable
     Number *dst_ptr = dst.get_values();
     // FIXME When using C++17, we can use KOKKOS_CLASS_LAMBDA and this
     // work-around can be removed.
-    auto constr_dofs = constrained_dofs;
+
+    Assert(dof_handler_data.size() == 1, ExcNotImplemented());
+    auto constr_dofs = dof_handler_data[0].constrained_dofs;
     // When working with distributed vectors, the constrained dofs are
     // computed for ghosted vectors but we want to set the values of the
     // constrained dofs of non-ghosted vectors.
     const unsigned int size =
-      partitioner ? dst.locally_owned_size() : dst.size();
+      dof_handler_data[0].partitioner ? dst.locally_owned_size() : dst.size();
+
     Kokkos::parallel_for(
       "dealii::set_constrained_values",
       Kokkos::RangePolicy<MemorySpace::Default::kokkos_space::execution_space>(
-        0, n_constrained_dofs),
+        0, dof_handler_data[0].n_constrained_dofs),
       KOKKOS_LAMBDA(int dof) {
         if (constr_dofs[dof] < size)
           dst_ptr[constr_dofs[dof]] = val;
@@ -618,12 +728,15 @@ namespace Portable
   template <typename MemorySpaceType>
   void
   MatrixFree<dim, Number>::initialize_dof_vector(
-    LinearAlgebra::distributed::Vector<Number, MemorySpaceType> &vec) const
+    LinearAlgebra::distributed::Vector<Number, MemorySpaceType> &vec,
+    const unsigned int dof_handler_index) const
   {
-    if (partitioner)
-      vec.reinit(partitioner);
+    AssertIndexRange(dof_handler_index, dof_handler_data.size());
+
+    if (dof_handler_data[dof_handler_index].partitioner)
+      vec.reinit(dof_handler_data[dof_handler_index].partitioner);
     else
-      vec.reinit(n_dofs);
+      vec.reinit(dof_handler_data[dof_handler_index].n_dofs);
   }
 
 
@@ -644,7 +757,7 @@ namespace Portable
                                      const VectorType &src,
                                      VectorType       &dst) const
   {
-    if (partitioner)
+    if (dof_handler_data[0].partitioner)
       distributed_cell_loop(func, src, dst);
     else
       serial_cell_loop(func, src, dst);
@@ -658,37 +771,47 @@ namespace Portable
   MatrixFree<dim, Number>::evaluate_coefficients(Functor func) const
   {
     const unsigned int n_q_points = Functor::n_q_points;
+    Kokkos::Array<PrecomputedData, n_max_dof_handlers> colored_data;
+    const unsigned int n_dof_handler = dof_handler_data.size();
 
-    for (unsigned int i = 0; i < n_colors; ++i)
-      if (n_cells[i] > 0)
+    for (unsigned int color = 0; color < n_colors; ++color)
+      if (n_cells[color] > 0)
         {
-          auto color_data = get_data(i);
+          for (unsigned int di = 0; di < n_dof_handler; ++di)
+            colored_data[di] = get_data(di, color);
 
           MemorySpace::Default::kokkos_space::execution_space exec;
-          Kokkos::TeamPolicy<
-            MemorySpace::Default::kokkos_space::execution_space>
-            team_policy(exec, n_cells[i], Kokkos::AUTO);
+
+          using TeamPolicy = Kokkos::TeamPolicy<
+            MemorySpace::Default::kokkos_space::execution_space>;
+          auto team_policy =
+            (this->team_size == numbers::invalid_unsigned_int) ?
+              TeamPolicy(exec, n_cells[color], Kokkos::AUTO) :
+              TeamPolicy(exec, n_cells[color], this->team_size);
 
           Kokkos::parallel_for(
-            "dealii::MatrixFree::evaluate_coeff_cell_loop",
+            "dealii::MatrixFree::evaluate_coeff_cell_loop color " +
+              std::to_string(color),
             team_policy,
             KOKKOS_LAMBDA(const Kokkos::TeamPolicy<
                           MemorySpace::Default::kokkos_space::execution_space>::
                             member_type &team_member) {
-              Kokkos::parallel_for(Kokkos::TeamVectorRange(team_member,
-                                                           n_q_points),
-                                   [&](const int q_point) {
-                                     const int cell_index =
-                                       team_member.league_rank();
+              Kokkos::parallel_for(
+                Kokkos::TeamVectorRange(team_member, n_q_points),
+                [&](const int q_point) {
+                  const int cell_index = team_member.league_rank();
 
-                                     Data data{team_member,
-                                               /* n_dofhandler */ 1,
-                                               cell_index,
-                                               &color_data,
-                                               /* shared_data */ nullptr};
+                  Kokkos::Array<SharedData<dim, Number>, n_max_dof_handlers>
+                    shared_data;
 
-                                     func(&data, cell_index, q_point);
-                                   });
+                  Data data{team_member,
+                            n_dof_handler,
+                            cell_index,
+                            colored_data,
+                            shared_data};
+
+                  func(&data, cell_index, q_point);
+                });
             });
         }
   }
@@ -699,20 +822,33 @@ namespace Portable
   std::size_t
   MatrixFree<dim, Number>::memory_consumption() const
   {
-    // First compute the size of n_cells, row_starts, kernel launch parameters,
-    // and constrained_dofs
-    std::size_t bytes = n_cells.size() * sizeof(unsigned int) * 2 +
-                        n_constrained_dofs * sizeof(unsigned int);
+    // TODO: move this into MemoryConsumption namespace:
+    auto mem = [](const auto &kokkos_view) -> std::size_t {
+      return kokkos_view.span() * sizeof(typename std::remove_reference_t<
+                                         decltype(kokkos_view)>::value_type);
+    };
 
-    // For each color, add local_to_global, inv_jacobian, JxW, and q_points.
-    // FIXME
-    for (unsigned int i = 0; i < n_colors; ++i)
+    std::size_t bytes = sizeof(*this) +
+                        MemoryConsumption::memory_consumption(row_start) +
+                        MemoryConsumption::memory_consumption(graph) +
+                        MemoryConsumption::memory_consumption(level_graph);
+
+    for (unsigned int color = 0; color < n_colors; ++color)
+      bytes += mem(q_points[color]);
+
+    for (const PerDoFHandlerData &pdhd : dof_handler_data)
       {
-        bytes += n_cells[i] * padding_length * sizeof(unsigned int) +
-                 n_cells[i] * padding_length * dim * dim * sizeof(Number) +
-                 n_cells[i] * padding_length * sizeof(Number) +
-                 n_cells[i] * padding_length * sizeof(point_type) +
-                 n_cells[i] * sizeof(unsigned int);
+        bytes += sizeof(PerDoFHandlerData) + mem(pdhd.shape_values) +
+                 mem(pdhd.shape_gradients) + mem(pdhd.co_shape_gradients) +
+                 mem(pdhd.constraint_weights) + mem(pdhd.constrained_dofs);
+
+        if (pdhd.partitioner)
+          bytes += pdhd.partitioner->memory_consumption();
+
+        for (unsigned int color = 0; color < n_colors; ++color)
+          bytes += mem(pdhd.local_to_global[color]) +
+                   mem(pdhd.inv_jacobian[color]) + mem(pdhd.JxW[color]) +
+                   mem(pdhd.constraint_mask[color]);
       }
 
     return bytes;
@@ -767,254 +903,408 @@ namespace Portable
   template <typename IteratorFiltersType>
   void
   MatrixFree<dim, Number>::internal_reinit(
-    const Mapping<dim>                    &mapping,
-    const DoFHandler<dim>                 &dof_handler_,
-    const AffineConstraints<Number>       &constraints,
-    const Quadrature<1>                   &quad,
-    const IteratorFiltersType             &iterator_filter,
-    const std::shared_ptr<const MPI_Comm> &comm,
-    const AdditionalData                   additional_data)
+    const Mapping<dim>                                   &mapping,
+    const std::vector<const DoFHandler<dim> *>           &dof_handler_,
+    const std::vector<const AffineConstraints<Number> *> &constraints_,
+    const Quadrature<1>                                  &quad,
+    const IteratorFiltersType                            &iterator_filter,
+    const std::shared_ptr<const MPI_Comm>                &comm,
+    const AdditionalData                                  additional_data)
   {
-    dof_handler = &dof_handler_;
+    Assert(
+      dof_handler_.size() == constraints_.size(),
+      ExcMessage(
+        "Please supply the same number of constraint objects and DoFHandler."));
+    Assert(dof_handler_.size() > 0,
+           ExcMessage("Please supply at least one DoFHandler."));
 
     UpdateFlags update_flags = additional_data.mapping_update_flags;
     if (update_flags & update_gradients)
       update_flags |= update_JxW_values;
 
     this->use_coloring = additional_data.use_coloring;
+    this->team_size    = additional_data.team_size;
     this->overlap_communication_computation =
       additional_data.overlap_communication_computation;
+    this->mg_level = additional_data.mg_level;
 
-    n_dofs = dof_handler->n_dofs();
-
-    const FiniteElement<dim> &fe = dof_handler->get_fe();
-
-    fe_degree = fe.degree;
-    // TODO this should be a templated parameter
-    const unsigned int n_dofs_1d     = fe_degree + 1;
     const unsigned int n_q_points_1d = quad.size();
-
-    // TODO remove the limitation in the future
-    AssertThrow(n_dofs_1d <= n_q_points_1d,
-                ExcMessage("n_q_points_1d must be greater than or equal to "
-                           "fe_degree + 1."));
-
     // Set padding length to the closest power of two larger than or equal to
     // the number of threads.
-    padding_length = 1 << static_cast<unsigned int>(std::ceil(
+    padding_length    = 1 << static_cast<unsigned int>(std::ceil(
                        dim * std::log2(static_cast<float>(n_q_points_1d))));
+    q_points_per_cell = Utilities::fixed_power<dim>(n_q_points_1d);
 
-    dofs_per_cell        = fe.n_dofs_per_cell();
-    n_components         = fe.n_components();
-    scalar_dofs_per_cell = dofs_per_cell / n_components;
-    q_points_per_cell    = Utilities::fixed_power<dim>(n_q_points_1d);
 
-    ::dealii::internal::MatrixFreeFunctions::ShapeInfo<Number> shape_info(quad,
-                                                                          fe);
+    // Perform Graph coloring
+    {
+      const Triangulation<dim> &tria = dof_handler_[0]->get_triangulation();
+      graph.clear();
+      level_graph.clear();
 
-    this->element_type     = shape_info.element_type;
-    this->scratch_pad_size = internal::compute_scratch_pad_size(
-      shape_info.element_type, dim, fe_degree, n_q_points_1d);
+      if (mg_level == numbers::invalid_unsigned_int)
+        {
+          CellFilter begin(iterator_filter, dof_handler_[0]->begin_active());
+          CellFilter end(iterator_filter, dof_handler_[0]->end());
 
-    unsigned int size_shape_values = n_dofs_1d * n_q_points_1d;
+          if (begin != end)
+            {
+              if (additional_data.use_coloring)
+                {
+                  // TODO: we would need to handle constraints[c] for all c here
+                  Assert(dof_handler_.size() == 1, ExcNotImplemented());
+                  const AffineConstraints<Number> *constraints =
+                    constraints_[0];
 
-    shape_values = Kokkos::View<Number *, MemorySpace::Default::kokkos_space>(
-      Kokkos::view_alloc("shape_values", Kokkos::WithoutInitializing),
-      size_shape_values);
-    Kokkos::deep_copy(shape_values,
-                      Kokkos::View<Number *, Kokkos::HostSpace>(
-                        shape_info.data.front().shape_values.data(),
-                        size_shape_values));
+                  const auto fun = [&](const CellFilter &filter) {
+                    return internal::get_conflict_indices<dim, Number>(
+                      filter, *constraints);
+                  };
+                  graph = GraphColoring::make_graph_coloring(begin, end, fun);
+                }
+              else
+                {
+                  if (additional_data.overlap_communication_computation)
+                    {
+                      // We create one color (1) with the cells on the boundary
+                      // of the local domain and two colors (0 and 2) with the
+                      // interior cells.
+                      graph.resize(3, std::vector<CellFilter>());
 
-    if (update_flags & update_gradients)
+                      std::vector<bool> ghost_vertices(tria.n_vertices(),
+                                                       false);
+
+                      for (const auto &cell : tria.active_cell_iterators())
+                        if (cell->is_ghost())
+                          for (unsigned int i = 0;
+                               i < GeometryInfo<dim>::vertices_per_cell;
+                               i++)
+                            ghost_vertices[cell->vertex_index(i)] = true;
+
+                      std::vector<
+                        dealii::FilteredIterator<dealii::TriaActiveIterator<
+                          dealii::DoFCellAccessor<dim, dim, false>>>>
+                        inner_cells;
+
+                      for (auto cell = begin; cell != end; ++cell)
+                        {
+                          bool ghost_vertex = false;
+
+                          for (unsigned int i = 0;
+                               i < GeometryInfo<dim>::vertices_per_cell;
+                               i++)
+                            if (ghost_vertices[cell->vertex_index(i)])
+                              {
+                                ghost_vertex = true;
+                                break;
+                              }
+
+                          if (ghost_vertex)
+                            graph[1].emplace_back(cell);
+                          else
+                            inner_cells.emplace_back(cell);
+                        }
+                      for (unsigned i = 0; i < inner_cells.size(); ++i)
+                        if (i < inner_cells.size() / 2)
+                          graph[0].emplace_back(inner_cells[i]);
+                        else
+                          graph[2].emplace_back(inner_cells[i]);
+                    }
+                  else
+                    {
+                      // If we are not using coloring, all the cells belong to
+                      // the same color.
+                      graph.resize(1, std::vector<CellFilter>());
+                      for (auto cell = begin; cell != end; ++cell)
+                        graph[0].emplace_back(cell);
+                    }
+                }
+            }
+          n_colors = graph.size();
+        }
+      else
+        {
+          // Use level cells - use LocallyOwnedLevelCell filter for level cells
+          IteratorFilters::LocallyOwnedLevelCell
+                          locally_owned_level_cell_filter;
+          LevelCellFilter begin(locally_owned_level_cell_filter,
+                                dof_handler_[0]->begin_mg(mg_level));
+          LevelCellFilter end(locally_owned_level_cell_filter,
+                              dof_handler_[0]->end_mg(mg_level));
+
+          Assert(additional_data.overlap_communication_computation == false,
+                 ExcNotImplemented());
+
+          if (begin != end)
+            {
+              if (additional_data.use_coloring)
+                {
+                  // TODO: we would need to handle constraints[c] for all c here
+                  Assert(dof_handler_.size() == 1, ExcNotImplemented());
+                  const AffineConstraints<Number> *constraints =
+                    constraints_[0];
+
+                  const auto fun = [&](const LevelCellFilter &filter) {
+                    return internal::get_conflict_indices<dim, Number>(
+                      filter, *constraints);
+                  };
+                  level_graph =
+                    GraphColoring::make_graph_coloring(begin, end, fun);
+                }
+              else
+                {
+                  // If we are not using coloring, all the cells belong to the
+                  // same color
+                  level_graph.resize(1, std::vector<LevelCellFilter>());
+                  for (auto cell = begin; cell != end; ++cell)
+                    level_graph[0].emplace_back(cell);
+                }
+            }
+          n_colors = level_graph.size();
+        }
+
+      // We need at least three colors when we are using device-aware MPI and
+      // overlapping the communication
+      n_cells.resize(std::max(n_colors, 3U), 0);
+
+      for (unsigned int color = 0; color < n_colors; ++color)
+        {
+          if (mg_level == numbers::invalid_unsigned_int)
+            n_cells[color] = graph[color].size();
+          else
+            n_cells[color] = level_graph[color].size();
+        }
+
+      if (update_flags & update_quadrature_points)
+        q_points.resize(n_colors);
+    }
+
+
+    { // Setup row starts
+
+      row_start.resize(n_colors);
+
+      if (n_colors > 0)
+        row_start[0] = 0;
+      for (unsigned int color = 1; color < n_colors; ++color)
+        row_start[color] =
+          row_start[color - 1] + n_cells[color - 1] * get_padding_length();
+    }
+
+
+    // Fill PerDoFHandlerData
+
+    const unsigned int n_dof_handler = dof_handler_.size();
+    dof_handler_data.resize(n_dof_handler);
+
+    ::dealii::MemorySpace::Default::kokkos_space::execution_space exec_space;
+
+    for (unsigned int c = 0; c < n_dof_handler; ++c)
       {
-        shape_gradients =
+        PerDoFHandlerData &data = dof_handler_data[c];
+        data.dof_handler        = dof_handler_[c];
+
+        data.n_dofs = (mg_level == numbers::invalid_unsigned_int) ?
+                        data.dof_handler->n_dofs() :
+                        data.dof_handler->n_dofs(mg_level);
+
+        const FiniteElement<dim> &fe = data.dof_handler->get_fe();
+
+        data.fe_degree = fe.degree;
+        // TODO this should be a templated parameter
+        const unsigned int n_dofs_1d = data.fe_degree + 1;
+
+        // TODO remove the limitation in the future
+        AssertThrow(n_dofs_1d <= n_q_points_1d,
+                    ExcMessage("n_q_points_1d must be greater than or equal to "
+                               "fe_degree + 1."));
+
+        data.dofs_per_cell        = fe.n_dofs_per_cell();
+        data.n_components         = fe.n_components();
+        data.scalar_dofs_per_cell = data.dofs_per_cell / data.n_components;
+
+        ::dealii::internal::MatrixFreeFunctions::ShapeInfo<Number> shape_info(
+          quad, fe);
+
+        data.element_type     = shape_info.element_type;
+        data.scratch_pad_size = internal::compute_scratch_pad_size(
+          shape_info.element_type, dim, fe.degree, n_q_points_1d);
+
+        unsigned int size_shape_values = n_dofs_1d * n_q_points_1d;
+
+        data.shape_values =
           Kokkos::View<Number *, MemorySpace::Default::kokkos_space>(
-            Kokkos::view_alloc("shape_gradients", Kokkos::WithoutInitializing),
+            Kokkos::view_alloc("shape_values", Kokkos::WithoutInitializing),
             size_shape_values);
-        Kokkos::deep_copy(shape_gradients,
+        Kokkos::deep_copy(exec_space,
+                          data.shape_values,
                           Kokkos::View<Number *, Kokkos::HostSpace>(
-                            shape_info.data.front().shape_gradients.data(),
+                            shape_info.data.front().shape_values.data(),
                             size_shape_values));
 
-
-        co_shape_gradients =
-          Kokkos::View<Number *, MemorySpace::Default::kokkos_space>(
-            Kokkos::view_alloc("co_shape_gradients",
-                               Kokkos::WithoutInitializing),
-            n_q_points_1d * n_q_points_1d);
-        Kokkos::deep_copy(
-          co_shape_gradients,
-          Kokkos::View<Number *, Kokkos::HostSpace>(
-            shape_info.data.front().shape_gradients_collocation.data(),
-            n_q_points_1d * n_q_points_1d));
-      }
-
-    internal::ReinitHelper<dim, Number> helper(
-      this, mapping, fe, quad, shape_info, *dof_handler, update_flags);
-
-    const unsigned int constraint_weights_size =
-      shape_info.data.front().subface_interpolation_matrices[0].size();
-    constraint_weights =
-      Kokkos::View<Number *, MemorySpace::Default::kokkos_space>(
-        Kokkos::view_alloc("constraint_weights", Kokkos::WithoutInitializing),
-        constraint_weights_size);
-    auto constraint_weights_host =
-      Kokkos::create_mirror_view(constraint_weights);
-    for (unsigned int i = 0; i < constraint_weights_size; ++i)
-      {
-        constraint_weights_host[i] =
-          shape_info.data.front().subface_interpolation_matrices[0][i];
-      }
-    Kokkos::deep_copy(constraint_weights, constraint_weights_host);
-
-    // Create a graph coloring
-    CellFilter begin(iterator_filter, dof_handler->begin_active());
-    CellFilter end(iterator_filter, dof_handler->end());
-
-    if (begin != end)
-      {
-        if (additional_data.use_coloring)
+        if (update_flags & update_gradients)
           {
-            const auto fun = [&](const CellFilter &filter) {
-              return internal::get_conflict_indices<dim, Number>(filter,
-                                                                 constraints);
-            };
-            graph = GraphColoring::make_graph_coloring(begin, end, fun);
+            data.shape_gradients =
+              Kokkos::View<Number *, MemorySpace::Default::kokkos_space>(
+                Kokkos::view_alloc("shape_gradients",
+                                   Kokkos::WithoutInitializing),
+                size_shape_values);
+            Kokkos::deep_copy(exec_space,
+                              data.shape_gradients,
+                              Kokkos::View<Number *, Kokkos::HostSpace>(
+                                shape_info.data.front().shape_gradients.data(),
+                                size_shape_values));
+
+
+            data.co_shape_gradients =
+              Kokkos::View<Number *, MemorySpace::Default::kokkos_space>(
+                Kokkos::view_alloc("co_shape_gradients",
+                                   Kokkos::WithoutInitializing),
+                n_q_points_1d * n_q_points_1d);
+            Kokkos::deep_copy(
+              exec_space,
+              data.co_shape_gradients,
+              Kokkos::View<Number *, Kokkos::HostSpace>(
+                shape_info.data.front().shape_gradients_collocation.data(),
+                n_q_points_1d * n_q_points_1d));
+          }
+
+        internal::ReinitHelper<dim, Number> helper(this,
+                                                   mapping,
+                                                   fe,
+                                                   quad,
+                                                   shape_info,
+                                                   *data.dof_handler,
+                                                   update_flags,
+                                                   c);
+
+        const unsigned int constraint_weights_size =
+          shape_info.data.front().subface_interpolation_matrices[0].size();
+        data.constraint_weights =
+          Kokkos::View<Number *, MemorySpace::Default::kokkos_space>(
+            Kokkos::view_alloc("constraint_weights",
+                               Kokkos::WithoutInitializing),
+            constraint_weights_size);
+        auto constraint_weights_host =
+          Kokkos::create_mirror_view(data.constraint_weights);
+        for (unsigned int i = 0; i < constraint_weights_size; ++i)
+          {
+            constraint_weights_host[i] =
+              shape_info.data.front().subface_interpolation_matrices[0][i];
+          }
+        Kokkos::deep_copy(exec_space,
+                          data.constraint_weights,
+                          constraint_weights_host);
+
+        helper.resize(n_colors);
+
+        IndexSet locally_relevant_dofs;
+        if (comm)
+          {
+            if (mg_level == numbers::invalid_unsigned_int)
+              locally_relevant_dofs =
+                DoFTools::extract_locally_relevant_dofs(*data.dof_handler);
+            else
+              locally_relevant_dofs =
+                DoFTools::extract_locally_relevant_level_dofs(*data.dof_handler,
+                                                              mg_level);
+
+            data.partitioner = std::make_shared<Utilities::MPI::Partitioner>(
+              (mg_level == numbers::invalid_unsigned_int) ?
+                data.dof_handler->locally_owned_dofs() :
+                data.dof_handler->locally_owned_mg_dofs(mg_level),
+              locally_relevant_dofs,
+              *comm);
+          }
+
+        if (mg_level == numbers::invalid_unsigned_int)
+          {
+            for (unsigned int color = 0; color < n_colors; ++color)
+              {
+                helper.fill_data(exec_space,
+                                 color,
+                                 graph[color],
+                                 data.partitioner);
+              }
           }
         else
           {
-            graph.clear();
-            if (additional_data.overlap_communication_computation)
+            for (unsigned int color = 0; color < n_colors; ++color)
               {
-                // We create one color (1) with the cells on the boundary of the
-                // local domain and two colors (0 and 2) with the interior
-                // cells.
-                graph.resize(3, std::vector<CellFilter>());
+                helper.fill_data(exec_space,
+                                 color,
+                                 level_graph[color],
+                                 data.partitioner);
+              }
+          }
 
-                std::vector<bool> ghost_vertices(
-                  dof_handler->get_triangulation().n_vertices(), false);
+        // Constrained indices
+        const AffineConstraints<Number> &constraints = *constraints_[c];
+        data.n_constrained_dofs = constraints.n_constraints();
 
-                for (const auto &cell :
-                     dof_handler->get_triangulation().active_cell_iterators())
-                  if (cell->is_ghost())
-                    for (unsigned int i = 0;
-                         i < GeometryInfo<dim>::vertices_per_cell;
-                         i++)
-                      ghost_vertices[cell->vertex_index(i)] = true;
+        if (data.n_constrained_dofs > 0)
+          {
+            std::vector<dealii::types::global_dof_index> constrained_dofs_host(
+              data.n_constrained_dofs);
 
-                std::vector<dealii::FilteredIterator<dealii::TriaActiveIterator<
-                  dealii::DoFCellAccessor<dim, dim, false>>>>
-                  inner_cells;
-
-                for (auto cell = begin; cell != end; ++cell)
+            if (data.partitioner)
+              {
+                const unsigned int n_local_dofs =
+                  locally_relevant_dofs.n_elements();
+                unsigned int i_constraint = 0;
+                for (unsigned int i = 0; i < n_local_dofs; ++i)
                   {
-                    bool ghost_vertex = false;
-
-                    for (unsigned int i = 0;
-                         i < GeometryInfo<dim>::vertices_per_cell;
-                         i++)
-                      if (ghost_vertices[cell->vertex_index(i)])
-                        {
-                          ghost_vertex = true;
-                          break;
-                        }
-
-                    if (ghost_vertex)
-                      graph[1].emplace_back(cell);
-                    else
-                      inner_cells.emplace_back(cell);
+                    // is_constrained uses a global dof id but
+                    // constrained_dofs_host works on the local id
+                    if (constraints.is_constrained(
+                          data.partitioner->local_to_global(i)))
+                      {
+                        constrained_dofs_host[i_constraint] = i;
+                        ++i_constraint;
+                      }
                   }
-                for (unsigned i = 0; i < inner_cells.size(); ++i)
-                  if (i < inner_cells.size() / 2)
-                    graph[0].emplace_back(inner_cells[i]);
-                  else
-                    graph[2].emplace_back(inner_cells[i]);
               }
             else
               {
-                // If we are not using coloring, all the cells belong to the
-                // same color.
-                graph.resize(1, std::vector<CellFilter>());
-                for (auto cell = begin; cell != end; ++cell)
-                  graph[0].emplace_back(cell);
-              }
-          }
-      }
-    n_colors = graph.size();
+                const unsigned int n_local_dofs =
+                  (mg_level == numbers::invalid_unsigned_int) ?
+                    data.dof_handler->n_dofs() :
+                    data.dof_handler->n_dofs(mg_level);
 
-    helper.resize(n_colors);
-
-    IndexSet locally_relevant_dofs;
-    if (comm)
-      {
-        locally_relevant_dofs =
-          DoFTools::extract_locally_relevant_dofs(*dof_handler);
-        partitioner = std::make_shared<Utilities::MPI::Partitioner>(
-          dof_handler->locally_owned_dofs(), locally_relevant_dofs, *comm);
-      }
-    for (unsigned int i = 0; i < n_colors; ++i)
-      {
-        n_cells[i] = graph[i].size();
-        helper.fill_data(i, graph[i], partitioner);
-      }
-
-    // Setup row starts
-    if (n_colors > 0)
-      row_start[0] = 0;
-    for (unsigned int i = 1; i < n_colors; ++i)
-      row_start[i] = row_start[i - 1] + n_cells[i - 1] * get_padding_length();
-
-    // Constrained indices
-    n_constrained_dofs = constraints.n_constraints();
-
-    if (n_constrained_dofs != 0)
-      {
-        std::vector<dealii::types::global_dof_index> constrained_dofs_host(
-          n_constrained_dofs);
-
-        if (partitioner)
-          {
-            const unsigned int n_local_dofs =
-              locally_relevant_dofs.n_elements();
-            unsigned int i_constraint = 0;
-            for (unsigned int i = 0; i < n_local_dofs; ++i)
-              {
-                // is_constrained uses a global dof id but
-                // constrained_dofs_host works on the local id
-                if (constraints.is_constrained(partitioner->local_to_global(i)))
+                unsigned int i_constraint = 0;
+                for (unsigned int i = 0; i < n_local_dofs; ++i)
                   {
-                    constrained_dofs_host[i_constraint] = i;
-                    ++i_constraint;
+                    if (constraints.is_constrained(i))
+                      {
+                        constrained_dofs_host[i_constraint] = i;
+                        ++i_constraint;
+                      }
                   }
               }
-          }
-        else
-          {
-            const unsigned int n_local_dofs = dof_handler->n_dofs();
-            unsigned int       i_constraint = 0;
-            for (unsigned int i = 0; i < n_local_dofs; ++i)
-              {
-                if (constraints.is_constrained(i))
-                  {
-                    constrained_dofs_host[i_constraint] = i;
-                    ++i_constraint;
-                  }
-              }
-          }
 
-        constrained_dofs = Kokkos::View<types::global_dof_index *,
-                                        MemorySpace::Default::kokkos_space>(
-          Kokkos::view_alloc("constrained_dofs", Kokkos::WithoutInitializing),
-          n_constrained_dofs);
+            data.constrained_dofs =
+              Kokkos::View<types::global_dof_index *,
+                           MemorySpace::Default::kokkos_space>(
+                Kokkos::view_alloc("constrained_dofs",
+                                   Kokkos::WithoutInitializing),
+                data.n_constrained_dofs);
 
-        Kokkos::View<types::global_dof_index *,
-                     MemorySpace::Default::kokkos_space,
-                     Kokkos::MemoryTraits<Kokkos::Unmanaged>>
-          constrained_dofs_host_view(constrained_dofs_host.data(),
-                                     constrained_dofs_host.size());
-        Kokkos::deep_copy(constrained_dofs, constrained_dofs_host_view);
+            Kokkos::View<types::global_dof_index *,
+                         MemorySpace::Default::kokkos_space,
+                         Kokkos::MemoryTraits<Kokkos::Unmanaged>>
+              constrained_dofs_host_view(constrained_dofs_host.data(),
+                                         constrained_dofs_host.size());
+            Kokkos::deep_copy(exec_space,
+                              data.constrained_dofs,
+                              constrained_dofs_host_view);
+          }
       }
+
+#if DEAL_II_KOKKOS_VERSION_GTE(3, 6, 0)
+    exec_space.fence("MatrixFree::internal_reinit(): end");
+#else
+    exec_space.fence();
+#endif
   }
 
 
@@ -1026,21 +1316,30 @@ namespace Portable
                                             const VectorType &src,
                                             VectorType       &dst) const
   {
-    // Execute the loop on the cells
+    Kokkos::Array<PrecomputedData, n_max_dof_handlers> colored_data;
+
     for (unsigned int color = 0; color < n_colors; ++color)
       if (n_cells[color] > 0)
         {
           MemorySpace::Default::kokkos_space::execution_space exec;
-          Kokkos::TeamPolicy<
-            MemorySpace::Default::kokkos_space::execution_space>
-            team_policy(exec, n_cells[color], Kokkos::AUTO);
 
+          using TeamPolicy = Kokkos::TeamPolicy<
+            MemorySpace::Default::kokkos_space::execution_space>;
+          auto team_policy =
+            (this->team_size == numbers::invalid_unsigned_int) ?
+              TeamPolicy(exec, n_cells[color], Kokkos::AUTO) :
+              TeamPolicy(exec, n_cells[color], this->team_size);
+
+          for (unsigned int di = 0; di < dof_handler_data.size(); ++di)
+            colored_data[di] = get_data(di, color);
 
           internal::
             ApplyKernel<dim, Number, Functor, IsBlockVector<VectorType>::value>
-              apply_kernel(func, get_data(color), src, dst);
+              apply_kernel(
+                func, dof_handler_data.size(), colored_data, src, dst);
 
-          Kokkos::parallel_for("dealii::MatrixFree::serial_cell_loop",
+          Kokkos::parallel_for("dealii::MatrixFree::serial_cell_loop color " +
+                                 std::to_string(color),
                                team_policy,
                                apply_kernel);
         }
@@ -1053,13 +1352,51 @@ namespace Portable
   template <typename Functor>
   void
   MatrixFree<dim, Number>::distributed_cell_loop(
-    const Functor &,
+    const Functor &func,
     const LinearAlgebra::distributed::BlockVector<Number, MemorySpace::Default>
-      &,
-    LinearAlgebra::distributed::BlockVector<Number, MemorySpace::Default> &)
+                                                                          &src,
+    LinearAlgebra::distributed::BlockVector<Number, MemorySpace::Default> &dst)
     const
   {
-    Assert(false, ExcNotImplemented());
+    MemorySpace::Default::kokkos_space::execution_space exec;
+
+    Kokkos::Array<PrecomputedData, n_max_dof_handlers> colored_data;
+
+    if (overlap_communication_computation)
+      {
+        Assert(
+          false,
+          ExcNotImplemented(
+            "distributed_cell_loop() with BlockVector and overlapping communication is not implemented."));
+      }
+    else
+      {
+        src.update_ghost_values();
+
+        // Execute the loop on the cells
+        for (unsigned int color = 0; color < n_colors; ++color)
+          if (n_cells[color] > 0)
+            {
+              Kokkos::TeamPolicy<
+                MemorySpace::Default::kokkos_space::execution_space>
+                team_policy(exec, n_cells[color], Kokkos::AUTO);
+
+              for (unsigned int di = 0; di < dof_handler_data.size(); ++di)
+                colored_data[di] = get_data(di, color);
+
+              internal::ApplyKernel<dim, Number, Functor, true> apply_kernel(
+                func, dof_handler_data.size(), colored_data, src, dst);
+
+              Kokkos::parallel_for(
+                "dealii::MatrixFree::distributed_cell_loop color " +
+                  std::to_string(color),
+                team_policy,
+                apply_kernel);
+            }
+        dst.compress(VectorOperation::add);
+      }
+
+    src.zero_out_ghost_values();
   }
 
 
@@ -1074,49 +1411,83 @@ namespace Portable
   {
     MemorySpace::Default::kokkos_space::execution_space exec;
 
+    // Find the correct DoFHandler based on the partitioner of the vector if
+    // possible. If we have only one DoFHandler we assume this is what the user
+    // wanted to do.
+    unsigned int dof_handler_index = 0;
+    if (dof_handler_data.size() > 1)
+      {
+        dof_handler_index = numbers::invalid_unsigned_int;
+
+        for (unsigned int i = 0; i < dof_handler_data.size(); ++i)
+          {
+            if (src.get_partitioner().get() ==
+                dof_handler_data[i].partitioner.get())
+              {
+                Assert(
+                  src.get_partitioner().get() == dst.get_partitioner().get(),
+                  ExcMessage(
+                    "distributed_cell_loop() requires partitioners of both vectors to be equal when using >1 DoFHandler."));
+                dof_handler_index = i;
+                break;
+              }
+          }
+      }
+
+    AssertThrow(
+      dof_handler_index != numbers::invalid_unsigned_int,
+      ExcMessage(
+        "Could not identify a matching DoFHandler for the vector partitioner in distributed_cell_loop()."));
+
+
     // in case we have compatible partitioners, we can simply use the provided
     // vectors
-    if (src.get_partitioner().get() == partitioner.get() &&
-        dst.get_partitioner().get() == partitioner.get())
+    if (src.get_partitioner().get() ==
+          dof_handler_data[dof_handler_index].partitioner.get() &&
+        dst.get_partitioner().get() ==
+          dof_handler_data[dof_handler_index].partitioner.get())
       {
+        Kokkos::Array<PrecomputedData, n_max_dof_handlers> colored_data;
+
         // This code is inspired to the code in TaskInfo::loop.
         if (overlap_communication_computation)
           {
+            // helper to process one color
+            auto do_color = [&](const unsigned int color) {
+              using TeamPolicy = Kokkos::TeamPolicy<
+                MemorySpace::Default::kokkos_space::execution_space>;
+              auto team_policy =
+                (this->team_size == numbers::invalid_unsigned_int) ?
+                  TeamPolicy(exec, n_cells[color], Kokkos::AUTO) :
+                  TeamPolicy(exec, n_cells[color], this->team_size);
+
+              for (unsigned int di = 0; di < dof_handler_data.size(); ++di)
+                colored_data[di] = get_data(di, color);
+
+              internal::ApplyKernel<dim, Number, Functor, false> apply_kernel(
+                func, dof_handler_data.size(), colored_data, src, dst);
+
+              Kokkos::parallel_for(
+                "dealii::MatrixFree::distributed_cell_loop color " +
+                  std::to_string(color),
+                team_policy,
+                apply_kernel);
+            };
+
             src.update_ghost_values_start(0);
 
             // In parallel, it's possible that some processors do not own any
             // cells.
             if (n_cells[0] > 0)
-              {
-                Kokkos::TeamPolicy<
-                  MemorySpace::Default::kokkos_space::execution_space>
-                  team_policy(exec, n_cells[0], Kokkos::AUTO);
+              do_color(0);
 
-                internal::ApplyKernel<dim, Number, Functor, false> apply_kernel(
-                  func, get_data(0), src, dst);
-
-                Kokkos::parallel_for(
-                  "dealii::MatrixFree::distributed_cell_loop_0",
-                  team_policy,
-                  apply_kernel);
-              }
             src.update_ghost_values_finish();
 
             // In serial this color does not exist because there are no ghost
             // cells
             if (n_cells[1] > 0)
               {
-                Kokkos::TeamPolicy<
-                  MemorySpace::Default::kokkos_space::execution_space>
-                  team_policy(exec, n_cells[1], Kokkos::AUTO);
-
-                internal::ApplyKernel<dim, Number, Functor, false> apply_kernel(
-                  func, get_data(1), src, dst);
-
-                Kokkos::parallel_for(
-                  "dealii::MatrixFree::distributed_cell_loop_1",
-                  team_policy,
-                  apply_kernel);
+                do_color(1);
 
                 // We need a synchronization point because we don't want
                 // device-aware MPI to start the MPI communication until the
@@ -1128,77 +1499,83 @@ namespace Portable
             // When the mesh is coarse it is possible that some processors do
             // not own any cells
             if (n_cells[2] > 0)
-              {
-                Kokkos::TeamPolicy<
-                  MemorySpace::Default::kokkos_space::execution_space>
-                  team_policy(exec, n_cells[2], Kokkos::AUTO);
-
-                internal::ApplyKernel<dim, Number, Functor, false> apply_kernel(
-                  func, get_data(2), src, dst);
-
-                Kokkos::parallel_for(
-                  "dealii::MatrixFree::distributed_cell_loop_2",
-                  team_policy,
-                  apply_kernel);
-              }
+              do_color(2);
             dst.compress_finish(VectorOperation::add);
           }
         else
           {
             src.update_ghost_values();
-            std::vector<
-              Kokkos::View<Number *, MemorySpace::Default::kokkos_space>>
-              values_colors(n_colors);
-            std::vector<
-              Kokkos::View<Number *[dim], MemorySpace::Default::kokkos_space>>
-              gradients_colors(n_colors);
 
             // Execute the loop on the cells
-            for (unsigned int i = 0; i < n_colors; ++i)
-              if (n_cells[i] > 0)
+            for (unsigned int color = 0; color < n_colors; ++color)
+              if (n_cells[color] > 0)
                 {
-                  Kokkos::TeamPolicy<
-                    MemorySpace::Default::kokkos_space::execution_space>
-                    team_policy(exec, n_cells[i], Kokkos::AUTO);
+                  using TeamPolicy = Kokkos::TeamPolicy<
+                    MemorySpace::Default::kokkos_space::execution_space>;
+                  auto team_policy =
+                    (this->team_size == numbers::invalid_unsigned_int) ?
+                      TeamPolicy(exec, n_cells[color], Kokkos::AUTO) :
+                      TeamPolicy(exec, n_cells[color], this->team_size);
+
+                  for (unsigned int di = 0; di < dof_handler_data.size(); ++di)
+                    colored_data[di] = get_data(di, color);
 
                   internal::ApplyKernel<dim, Number, Functor, false>
-                    apply_kernel(func, get_data(i), src, dst);
+                    apply_kernel(
+                      func, dof_handler_data.size(), colored_data, src, dst);
 
                   Kokkos::parallel_for(
-                    "dealii::MatrixFree::distributed_cell_loop_" +
-                      std::to_string(i),
+                    "dealii::MatrixFree::distributed_cell_loop color " +
+                      std::to_string(color),
                     team_policy,
                     apply_kernel);
                 }
             dst.compress(VectorOperation::add);
           }
+
         src.zero_out_ghost_values();
       }
     else
       {
+        Assert(dof_handler_index == 0,
+               ExcInternalError(
+                 "creating vectors only works when we have 1 DoFHandler"));
+
         // Create the ghosted source and the ghosted destination
         LinearAlgebra::distributed::Vector<Number, MemorySpace::Default>
-          ghosted_src(partitioner);
+          ghosted_src(dof_handler_data[dof_handler_index].partitioner);
         LinearAlgebra::distributed::Vector<Number, MemorySpace::Default>
           ghosted_dst(ghosted_src);
         ghosted_src = src;
         ghosted_dst = dst;
         ghosted_dst.zero_out_ghost_values();
 
+        Kokkos::Array<PrecomputedData, n_max_dof_handlers> colored_data;
+
         // Execute the loop on the cells
-        for (unsigned int i = 0; i < n_colors; ++i)
-          if (n_cells[i] > 0)
+        for (unsigned int color = 0; color < n_colors; ++color)
+          if (n_cells[color] > 0)
             {
-              Kokkos::TeamPolicy<
-                MemorySpace::Default::kokkos_space::execution_space>
-                team_policy(exec, n_cells[i], Kokkos::AUTO);
+              using TeamPolicy = Kokkos::TeamPolicy<
+                MemorySpace::Default::kokkos_space::execution_space>;
+              auto team_policy =
+                (this->team_size == numbers::invalid_unsigned_int) ?
+                  TeamPolicy(exec, n_cells[color], Kokkos::AUTO) :
+                  TeamPolicy(exec, n_cells[color], this->team_size);
+
+              for (unsigned int di = 0; di < dof_handler_data.size(); ++di)
+                colored_data[di] = get_data(di, color);
 
               internal::ApplyKernel<dim, Number, Functor, false> apply_kernel(
-                func, get_data(i), ghosted_src, ghosted_dst);
+                func,
+                dof_handler_data.size(),
+                colored_data,
+                ghosted_src,
+                ghosted_dst);
 
               Kokkos::parallel_for(
-                "dealii::MatrixFree::distributed_cell_loop_" +
-                  std::to_string(i),
+                "dealii::MatrixFree::distributed_cell_loop color " +
+                  std::to_string(color),
                 team_policy,
                 apply_kernel);
             }

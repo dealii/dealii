@@ -1,0 +1,17 @@
+
+DEAL:0::Rank 0 owns 38 cells and 38 vertices.
+DEAL:0::Rank 0 owns 30 cells and has 8 ghost cells.
+DEAL:0::Rank 0 boundary ID counts:
+DEAL:0::  ID 1: 6 faces
+DEAL:0::  ID 2: 6 faces
+DEAL:0::Rank 0 material ID counts:
+DEAL:0::  ID 1: 30 cells
+
+DEAL:1::Rank 1 owns 38 cells and 38 vertices.
+DEAL:1::Rank 1 owns 28 cells and has 10 ghost cells.
+DEAL:1::Rank 1 boundary ID counts:
+DEAL:1::  ID 1: 7 faces
+DEAL:1::  ID 2: 3 faces
+DEAL:1::Rank 1 material ID counts:
+DEAL:1::  ID 1: 28 cells
+

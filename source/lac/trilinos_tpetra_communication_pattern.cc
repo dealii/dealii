@@ -12,10 +12,10 @@
 //
 // ------------------------------------------------------------------------
 
-#include "deal.II/base/memory_space.h"
+#include <deal.II/base/memory_space.h>
 
-#include "deal.II/lac/trilinos_tpetra_types.h"
 #include <deal.II/lac/trilinos_tpetra_communication_pattern.h>
+#include <deal.II/lac/trilinos_tpetra_types.h>
 
 #ifdef DEAL_II_TRILINOS_WITH_TPETRA
 
