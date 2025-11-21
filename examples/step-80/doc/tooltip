@@ -1,1 +1,1 @@
-A fluid structure interaction problem, using a penalty term.
+Fluid-structure interaction with a distributed Lagrange multiplier coupling between an incompressible fluid and a compressible solid.
