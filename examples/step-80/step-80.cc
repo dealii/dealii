@@ -27,6 +27,7 @@
 #include <deal.II/lac/block_linear_operator.h>
 
 #include <deal.II/lac/affine_constraints.templates.h>
+#include <deal.II/fe/mapping_fe_field.h>
 
 #include <boost/algorithm/string.hpp>
 #include <deal.II/numerics/vector_tools_interpolate.h>
@@ -108,45 +109,6 @@ namespace LA
 namespace Step80
 {
   using namespace dealii;
-
-
-
-  template <int spacedim>
-  class InitialDisplacement : public Function<spacedim>
-  {
-  public:
-    InitialDisplacement()
-      : Function<spacedim>(2 * spacedim)
-    {}
-
-    virtual void vector_value(const Point<spacedim> &s,
-                              Vector<double>        &values) const override
-    {
-      values[0] = -0.2 * s[0];
-      values[1] = -0.2 * s[1];
-    }
-  };
-
-
-
-  template <int spacedim>
-  class InitialPosition : public Function<spacedim>
-  {
-  public:
-    InitialPosition()
-      : Function<spacedim>(2 * spacedim)
-    {}
-
-    virtual void vector_value(const Point<spacedim> &s,
-                              Vector<double>        &values) const override
-    {
-      // X(s,0) = s
-      values[0] = s[0];
-      values[1] = s[1];
-    }
-  };
-
-
 
   std::pair<unsigned int, unsigned int>
   get_dimension_and_spacedimension(const ParameterHandler &prm)
@@ -241,6 +203,12 @@ namespace Step80
       solid_rhs;
     mutable ParameterAcceptorProxy<Functions::ParsedFunction<spacedim>>
       navier_stokes_bc;
+    mutable ParameterAcceptorProxy<Functions::ParsedFunction<spacedim>>
+      navier_stokes_initial_conditions;
+    mutable ParameterAcceptorProxy<Functions::ParsedFunction<spacedim>>
+      initial_displacement;
+    mutable ParameterAcceptorProxy<Functions::ParsedFunction<spacedim>>
+      reference_configuration;
   };
 
 
@@ -252,6 +220,11 @@ namespace Step80
     , navier_stokes_rhs("Navier-Stokes right hand side", spacedim + 1)
     , solid_rhs("Solid right hand side", 2 * spacedim)
     , navier_stokes_bc("Navier-Stokes boundary conditions", spacedim + 1)
+    , navier_stokes_initial_conditions("Navier-Stokes initial conditions",
+                                       spacedim + 1)
+    , initial_displacement("Initial displacement and multiplier", 2 * spacedim)
+    , reference_configuration("Reference configuration and multiplier",
+                              2 * spacedim)
   {
     add_parameter(
       "Velocity degree", velocity_degree, "", this->prm, Patterns::Integer(1));
@@ -371,6 +344,7 @@ namespace Step80
 
     void initial_setup();
     void setup_dofs();
+    void interpolate_initial_conditions();
     void setup_coupling();
 
     void assemble_navier_stokes_system(const double &time_step);
@@ -389,6 +363,8 @@ namespace Step80
                           const unsigned int                          iter,
                           const double time) const;
 
+    void update_particle_positions();
+
     const NavierStokesImmersedProblemParameters<dim, spacedim> &par;
 
     MPI_Comm mpi_communicator;
@@ -406,7 +382,8 @@ namespace Step80
     DoFHandler<spacedim>      fluid_dh;
     DoFHandler<dim, spacedim> solid_dh;
 
-    std::unique_ptr<MappingFEField<dim, spacedim>> solid_mapping;
+    std::unique_ptr<MappingFEField<dim, spacedim, LA::MPI::BlockVector>>
+      solid_mapping;
 
     std::vector<types::global_dof_index> fluid_dofs_per_block;
     std::vector<types::global_dof_index> solid_dofs_per_block;
@@ -435,6 +412,8 @@ namespace Step80
     LA::MPI::BlockVector fluid_system_rhs;
 
     LA::MPI::BlockVector solid_solution;
+    LA::MPI::BlockVector reference_configuration;
+    LA::MPI::BlockVector current_position;
     LA::MPI::BlockVector solid_locally_relevant_solution;
     LA::MPI::BlockVector solid_locally_relevant_solution_old;
     LA::MPI::BlockVector solid_system_rhs;
@@ -609,12 +588,11 @@ namespace Step80
     std::vector<bool> components(2 * spacedim, false);
     components[spacedim] = true;
 
-    Particles::Generators::dof_support_points(
-      solid_dh,
-      global_fluid_bounding_boxes,
-      solid_particle_handler,
-      StaticMappingQ1<spacedim>::mapping,
-      ComponentMask(components));
+    Particles::Generators::dof_support_points(solid_dh,
+                                              global_fluid_bounding_boxes,
+                                              solid_particle_handler,
+                                              *solid_mapping,
+                                              ComponentMask(components));
 
     pcout << "Solid particles: " << solid_particle_handler.n_global_particles()
           << std::endl;
@@ -681,22 +659,12 @@ namespace Step80
 
       DoFTools::make_hanging_node_constraints(fluid_dh, fluid_constraints);
       for (const auto id : par.dirichlet_ids)
-        {
-          if (id == 3)
-            VectorTools::interpolate_boundary_values(fluid_dh,
-                                                     id,
-                                                     par.navier_stokes_bc,
-                                                     fluid_constraints,
-                                                     fluid_fe->component_mask(
-                                                       velocity));
-          else
-            VectorTools::interpolate_boundary_values(
-              fluid_dh,
-              id,
-              Functions::ConstantFunction<spacedim>(0.0, spacedim + 1),
-              fluid_constraints,
-              fluid_fe->component_mask(velocity));
-        }
+        VectorTools::interpolate_boundary_values(fluid_dh,
+                                                 id,
+                                                 par.navier_stokes_bc,
+                                                 fluid_constraints,
+                                                 fluid_fe->component_mask(
+                                                   velocity));
 
       fluid_constraints.close();
     }
@@ -854,7 +822,42 @@ namespace Step80
         locally_relevant_solid_dofs);
 
       solid_matrix.reinit(solid_owned_dofs, dsp, mpi_communicator);
+
+      reference_configuration.reinit(solid_locally_relevant_solution);
+      current_position.reinit(solid_locally_relevant_solution);
     }
+  }
+
+
+
+  template <int dim, int spacedim>
+  void
+  NavierStokesImmersedProblem<dim, spacedim>::interpolate_initial_conditions()
+  {
+    VectorTools::interpolate(fluid_dh,
+                             par.navier_stokes_initial_conditions,
+                             fluid_locally_relevant_solution,
+                             ComponentMask(fluid_fe->component_mask(velocity)));
+
+    VectorTools::interpolate(solid_dh,
+                             par.reference_configuration,
+                             reference_configuration,
+                             ComponentMask(
+                               solid_fe->component_mask(displacement)));
+
+    VectorTools::interpolate(solid_dh,
+                             par.initial_displacement,
+                             solid_locally_relevant_solution,
+                             ComponentMask(
+                               solid_fe->component_mask(displacement)));
+
+    current_position = reference_configuration;
+    current_position += solid_locally_relevant_solution;
+    solid_mapping =
+      std::make_unique<MappingFEField<dim, spacedim, LA::MPI::BlockVector>>(
+        solid_dh,
+        current_position,
+        ComponentMask(solid_fe->component_mask(displacement)));
   }
 
 
@@ -1334,6 +1337,15 @@ namespace Step80
     block_system_rhs.block(3) = fluid_system_rhs.block(1);
     block_system_solution.reinit(block_system_rhs);
 
+
+    // Update rhs vectors with previous solution contributions
+    // g_1
+    mass_matrix_fluid.block(0, 0).vmult_add(
+      block_system_rhs.block(0), fluid_locally_relevant_solution.block(0));
+    // g_2
+    solid_matrix.block(1, 0).vmult_add(
+      block_system_rhs.block(2), solid_locally_relevant_solution.block(0));
+
     SolverControl solver_control(100000000, 1e-3, false, false);
 
     SolverGMRES<LA::MPI::BlockVector> solver(solver_control);
@@ -1515,6 +1527,7 @@ namespace Step80
       std::ofstream ofile(par.output_directory + "/" + "solution-solid.pvd");
       DataOutBase::write_pvd_record(ofile, times_and_names);
     }
+    output_particles(solid_particle_handler, "solid-particles", cycle, time);
   }
 
 
@@ -1543,6 +1556,21 @@ namespace Step80
     DataOutBase::write_pvd_record(ofile, times_and_names[fprefix]);
   }
 
+  template <int dim, int spacedim>
+  inline void
+  NavierStokesImmersedProblem<dim, spacedim>::update_particle_positions()
+  {
+    // After the first time step, we displace the solid body to take
+    // into account the fact it has moved
+    pcout << "Number of particles "
+          << solid_particle_handler.n_global_particles() << std::endl;
+
+    current_position = reference_configuration;
+    current_position += solid_locally_relevant_solution;
+    solid_particle_handler.set_particle_positions(current_position.block(0),
+                                                  false);
+  };
+
 
 
   template <int dim, int spacedim>
@@ -1566,10 +1594,6 @@ namespace Step80
     double       time         = 0;
     unsigned int output_cycle = 0;
 
-    // fluid initially at rest
-    fluid_locally_relevant_solution = 0.;
-
-    LA::MPI::BlockVector initial_position;
     for (unsigned int cycle = 0; cycle < par.number_of_time_steps;
          ++cycle, time += time_step)
       {
@@ -1582,78 +1606,27 @@ namespace Step80
             make_grid();
             initial_setup();
             setup_dofs();
+            interpolate_initial_conditions();
             setup_solid_particles();
-            // output_results(output_cycle, time);
+            output_results(output_cycle, time);
 
             assemble_navier_stokes_system(time_step);
             assemble_elasticity_system(time_step);
-
-            // initial condition for solid
-            VectorTools::interpolate(solid_dh,
-                                     InitialDisplacement<spacedim>(),
-                                     solid_locally_relevant_solution,
-                                     ComponentMask(
-                                       solid_fe->component_mask(displacement)));
-
-            // save initial position
-            initial_position.reinit(solid_locally_relevant_solution);
-            VectorTools::interpolate(solid_dh,
-                                     InitialPosition<spacedim>(),
-                                     initial_position,
-                                     ComponentMask(
-                                       solid_fe->component_mask(displacement)));
-
-            solid_particle_handler.set_particle_positions(
-              solid_locally_relevant_solution.block(0),
-              true); // displace particles
-
-            // {
-            //   // TimerOutput::Scope t(computing_timer, "Output solid
-            //   // particles");
-            //   output_particles(solid_particle_handler,
-            //                    "solid",
-            //                    output_cycle,
-            //                    time);
-            // }
           }
         else
           {
-            // After the first time step, we displace the solid body to take
-            // into account the fact it has moved
-            pcout << "Number of particles "
-                  << solid_particle_handler.n_global_particles() << std::endl;
-
-            LA::MPI::Vector current_position(initial_position.block(0));
-            //  Update current position: X_new = X_0 + displacement
-            current_position += solid_locally_relevant_solution.block(0);
-            solid_particle_handler.set_particle_positions(current_position,
-                                                          false);
           }
 
         setup_coupling();
         assemble_coupling();
 
-        // Update rhs vectors
-        // g_1
-        mass_matrix_fluid.block(0, 0).vmult(
-          fluid_system_rhs.block(0), fluid_locally_relevant_solution.block(0));
-        // g_2
-        solid_matrix.block(1, 0).vmult(
-          solid_system_rhs.block(1), solid_locally_relevant_solution.block(0));
-
         solve();
+
+        update_particle_positions();
 
         if (cycle % par.output_frequency == 0)
           {
-            output_results(output_cycle, time);
-            {
-              // TimerOutput::Scope t(computing_timer, "Output solid
-              // particles");
-              output_particles(solid_particle_handler,
-                               "solid",
-                               output_cycle,
-                               time);
-            }
+            output_results(output_cycle + 1, time + time_step);
             ++output_cycle;
           }
         // if (cycle % par.refinement_frequency == 0 &&
