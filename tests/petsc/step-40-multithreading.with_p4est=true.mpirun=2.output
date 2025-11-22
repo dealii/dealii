@@ -1,0 +1,25 @@
+
+DEAL:0::Running on 2 MPI rank(s)...
+DEAL:0::Cycle 0:
+DEAL:0::   Number of active cells:       1024
+DEAL:0::   Number of degrees of freedom: 4225
+DEAL:0::Solver stopped within 5 - 10 iterations
+DEAL:0::
+DEAL:0::Cycle 1:
+DEAL:0::   Number of active cells:       1966
+DEAL:0::   Number of degrees of freedom: 8453
+DEAL:0::Solver stopped within 5 - 10 iterations
+DEAL:0::
+
+DEAL:1::Running on 2 MPI rank(s)...
+DEAL:1::Cycle 0:
+DEAL:1::   Number of active cells:       1024
+DEAL:1::   Number of degrees of freedom: 4225
+DEAL:1::Solver stopped within 5 - 10 iterations
+DEAL:1::
+DEAL:1::Cycle 1:
+DEAL:1::   Number of active cells:       1966
+DEAL:1::   Number of degrees of freedom: 8453
+DEAL:1::Solver stopped within 5 - 10 iterations
+DEAL:1::
+
