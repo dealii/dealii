@@ -149,12 +149,7 @@ namespace Step80
   public:
     NavierStokesImmersedProblemParameters();
 
-    void set_time(const double &time) const
-    {
-      navier_stokes_rhs.set_time(time);
-      solid_rhs.set_time(time);
-      navier_stokes_bc.set_time(time);
-    }
+    void set_time(const double &time) const;
 
     std::string output_directory = ".";
 
@@ -197,18 +192,19 @@ namespace Step80
     unsigned int max_cells            = 20000;
     int          refinement_frequency = 5;
 
-    mutable ParameterAcceptorProxy<Functions::ParsedFunction<spacedim>>
-      navier_stokes_rhs;
-    mutable ParameterAcceptorProxy<Functions::ParsedFunction<spacedim>>
-      solid_rhs;
-    mutable ParameterAcceptorProxy<Functions::ParsedFunction<spacedim>>
-      navier_stokes_bc;
-    mutable ParameterAcceptorProxy<Functions::ParsedFunction<spacedim>>
-      navier_stokes_initial_conditions;
-    mutable ParameterAcceptorProxy<Functions::ParsedFunction<spacedim>>
-      initial_displacement;
-    mutable ParameterAcceptorProxy<Functions::ParsedFunction<spacedim>>
-      reference_configuration;
+    using PrmFunction =
+      ParameterAcceptorProxy<Functions::ParsedFunction<spacedim>>;
+
+    // These functions depend on time, so we need to be able to set their
+    // internal time. Make them mutable for that reason.
+    mutable PrmFunction navier_stokes_rhs;
+    mutable PrmFunction solid_rhs;
+    mutable PrmFunction navier_stokes_bc;
+
+    // These functions do not depend on time, so they don't need to be mutable
+    PrmFunction navier_stokes_initial_conditions;
+    PrmFunction solid_initial_displacement;
+    PrmFunction solid_reference_configuration;
   };
 
 
@@ -222,9 +218,10 @@ namespace Step80
     , navier_stokes_bc("Navier-Stokes boundary conditions", spacedim + 1)
     , navier_stokes_initial_conditions("Navier-Stokes initial conditions",
                                        spacedim + 1)
-    , initial_displacement("Initial displacement and multiplier", 2 * spacedim)
-    , reference_configuration("Reference configuration and multiplier",
-                              2 * spacedim)
+    , solid_initial_displacement("Initial displacement and multiplier",
+                                 2 * spacedim)
+    , solid_reference_configuration("Reference configuration and multiplier",
+                                    2 * spacedim)
   {
     add_parameter(
       "Velocity degree", velocity_degree, "", this->prm, Patterns::Integer(1));
@@ -322,6 +319,40 @@ namespace Step80
                     " This should not happen: aborting."));
       this->enter_my_subsection(this->prm);
     });
+
+    // Give reasonable default values for the various functions
+    auto set_expression = [&](PrmFunction       &function,
+                              const std::string &expression) {
+      function.declare_parameters_call_back.connect(
+        [&]() { function.prm.set("Function expression", expression); });
+    };
+
+    if (spacedim == 2)
+      {
+        set_expression(navier_stokes_rhs, "0; -9.81; 0");
+        set_expression(navier_stokes_bc, "if(y>0.99999, 1,0); 0; 0");
+        set_expression(navier_stokes_initial_conditions, "0; 0; 0");
+        set_expression(solid_rhs, "0; 0; 0; 0");
+        set_expression(solid_reference_configuration, "x; y; 0; 0");
+        set_expression(solid_initial_displacement, "0; 0; 0; 0");
+      }
+    else if (spacedim == 3)
+      {
+        set_expression(navier_stokes_rhs, "0; 0; -9.81; 0");
+        set_expression(navier_stokes_bc, "if(y>0.99999, 1,0); 0; 0; 0");
+        set_expression(navier_stokes_initial_conditions, "0; 0; 0; 0");
+        set_expression(solid_rhs, "0; 0; 0; 0; 0; 0");
+        set_expression(solid_reference_configuration, "x; y; z; 0; 0; 0");
+        set_expression(solid_initial_displacement, "0; 0; 0; 0; 0; 0");
+      }
+  }
+  template <int dim, int spacedim>
+  inline void NavierStokesImmersedProblemParameters<dim, spacedim>::set_time(
+    const double &time) const
+  {
+    navier_stokes_rhs.set_time(time);
+    solid_rhs.set_time(time);
+    navier_stokes_bc.set_time(time);
   }
 
 
@@ -840,13 +871,13 @@ namespace Step80
                              ComponentMask(fluid_fe->component_mask(velocity)));
 
     VectorTools::interpolate(solid_dh,
-                             par.reference_configuration,
+                             par.solid_reference_configuration,
                              reference_configuration,
                              ComponentMask(
                                solid_fe->component_mask(displacement)));
 
     VectorTools::interpolate(solid_dh,
-                             par.initial_displacement,
+                             par.solid_initial_displacement,
                              solid_locally_relevant_solution,
                              ComponentMask(
                                solid_fe->component_mask(displacement)));
@@ -1065,7 +1096,8 @@ namespace Step80
   //                         cell_matrix(i, j) +=
   //                           (par.density * phi_u[i] * phi_u[j] +
   //                            par.viscosity * time_step *
-  //                              scalar_product(grad_phi_u[i], grad_phi_u[j]) -
+  //                              scalar_product(grad_phi_u[i], grad_phi_u[j])
+  //                              -
   //                            time_step * div_phi_u[i] * phi_p[j] -
   //                            time_step * phi_p[i] * div_phi_u[j]) *
   //                           fe_values.JxW(q);
