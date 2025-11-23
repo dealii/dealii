@@ -1161,7 +1161,7 @@ namespace Step75
             << triangulation.n_global_active_cells() << std::endl
             << "     by partition:              ";
 
-      std::vector<unsigned int> n_active_cells_per_subdomain =
+      const std::vector<unsigned int> n_active_cells_per_subdomain =
         Utilities::MPI::gather(mpi_communicator,
                                triangulation.n_locally_owned_active_cells());
       for (unsigned int i = 0; i < first_n_processes; ++i)
@@ -1195,7 +1195,7 @@ namespace Step75
       pcout << "   Number of constraints:        "
             << std::accumulate(n_constraints_per_subdomain.begin(),
                                n_constraints_per_subdomain.end(),
-                               0)
+                               types::global_dof_index(0))
             << std::endl
             << "     by partition:              ";
       for (unsigned int i = 0; i < first_n_processes; ++i)
