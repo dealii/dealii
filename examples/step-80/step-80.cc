@@ -1677,7 +1677,10 @@ namespace Step80
       std::ofstream ofile(par.output_directory + "/" + "solution-solid.pvd");
       DataOutBase::write_pvd_record(ofile, times_and_names);
     }
-    output_particles(solid_particle_handler, "solid-particles", cycle, time);
+    output_particles(solid_particle_handler,
+                     "solution-solid-particles",
+                     cycle,
+                     time);
   }
 
 
