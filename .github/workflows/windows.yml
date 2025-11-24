@@ -46,7 +46,7 @@ jobs:
         os: [windows-2022, windows-2025]
 
     steps:
-    - uses: actions/checkout@v5
+    - uses: actions/checkout@v6
     - name: set up path
       # needed to use GNU patch instead of Strawberry Perl patch
       run: |
