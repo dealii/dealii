@@ -336,33 +336,10 @@ namespace Step80
                     " This should not happen: aborting."));
       this->enter_my_subsection(this->prm);
     });
-
-    // Give reasonable default values for the various functions
-    auto set_expression = [&](PrmFunction       &function,
-                              const std::string &expression) {
-      function.declare_parameters_call_back.connect(
-        [&]() { function.prm.set("Function expression", expression); });
-    };
-
-    if (spacedim == 2)
-      {
-        set_expression(navier_stokes_rhs, "0; -9.81; 0");
-        set_expression(navier_stokes_bc, "if(y>0.99999, 1,0); 0; 0");
-        set_expression(navier_stokes_initial_conditions, "0; 0; 0");
-        set_expression(solid_rhs, "0; 0; 0; 0");
-        set_expression(solid_reference_configuration, "x; y; 0; 0");
-        set_expression(solid_initial_displacement, "0; 0; 0; 0");
-      }
-    else if (spacedim == 3)
-      {
-        set_expression(navier_stokes_rhs, "0; 0; -9.81; 0");
-        set_expression(navier_stokes_bc, "if(y>0.99999, 1,0); 0; 0; 0");
-        set_expression(navier_stokes_initial_conditions, "0; 0; 0; 0");
-        set_expression(solid_rhs, "0; 0; 0; 0; 0; 0");
-        set_expression(solid_reference_configuration, "x; y; z; 0; 0; 0");
-        set_expression(solid_initial_displacement, "0; 0; 0; 0; 0; 0");
-      }
   }
+
+
+
   template <int dim, int spacedim>
   inline void NavierStokesImmersedProblemParameters<dim, spacedim>::set_time(
     const double &time) const
