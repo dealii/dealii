@@ -861,6 +861,11 @@ namespace Step80
       solid_locally_relevant_solution.reinit(solid_owned_dofs,
                                              solid_relevant_dofs,
                                              mpi_communicator);
+
+      solid_locally_relevant_solution_old.reinit(solid_owned_dofs,
+                                                 solid_relevant_dofs,
+                                                 mpi_communicator);
+
       solid_system_rhs.reinit(solid_owned_dofs, mpi_communicator);
       solid_solution.reinit(solid_owned_dofs, mpi_communicator);
 
@@ -897,7 +902,7 @@ namespace Step80
   {
     VectorTools::interpolate(fluid_dh,
                              par.navier_stokes_initial_conditions,
-                             fluid_locally_relevant_solution,
+                             fluid_locally_relevant_solution_old,
                              ComponentMask(fluid_fe->component_mask(velocity)));
 
     VectorTools::interpolate(solid_dh,
@@ -908,12 +913,12 @@ namespace Step80
 
     VectorTools::interpolate(solid_dh,
                              par.solid_initial_displacement,
-                             solid_locally_relevant_solution,
+                             solid_locally_relevant_solution_old,
                              ComponentMask(
                                solid_fe->component_mask(displacement)));
 
     current_position = reference_configuration;
-    current_position += solid_locally_relevant_solution;
+    current_position += solid_locally_relevant_solution_old;
     solid_mapping =
       std::make_unique<MappingFEField<dim, spacedim, LA::MPI::BlockVector>>(
         solid_dh,
@@ -950,8 +955,7 @@ namespace Step80
   NavierStokesImmersedProblem<dim, spacedim>::assemble_navier_stokes_system(
     const double &time_step)
   {
-    fluid_matrix     = 0;
-    fluid_system_rhs = 0;
+    fluid_matrix = 0;
 
     // TimerOutput::Scope t(computing_timer, "Assemble Navier-Stokes terms");
 
@@ -965,13 +969,9 @@ namespace Step80
     const unsigned int dofs_per_cell = fluid_fe->n_dofs_per_cell();
     const unsigned int n_q_points    = quadrature_formula.size();
 
-    FullMatrix<double> cell_matrix(dofs_per_cell, dofs_per_cell);
-    FullMatrix<double> cell_preconditioner(dofs_per_cell, dofs_per_cell);
-    FullMatrix<double> cell_mass_matrix(dofs_per_cell, dofs_per_cell);
-    Vector<double>     cell_rhs(dofs_per_cell);
-
-    std::vector<Vector<double>> rhs_values(n_q_points,
-                                           Vector<double>(spacedim + 1));
+    FullMatrix<double> cell_fluid_matrix(dofs_per_cell, dofs_per_cell);
+    FullMatrix<double> cell_fluid_preconditioner(dofs_per_cell, dofs_per_cell);
+    FullMatrix<double> cell_fluid_mass_matrix(dofs_per_cell, dofs_per_cell);
 
     std::vector<Tensor<1, spacedim>> phi_u(dofs_per_cell);
     std::vector<Tensor<2, spacedim>> grad_phi_u(dofs_per_cell);
@@ -985,18 +985,11 @@ namespace Step80
     for (const auto &cell : fluid_dh.active_cell_iterators())
       if (cell->is_locally_owned())
         {
-          cell_matrix         = 0;
-          cell_preconditioner = 0;
-          cell_mass_matrix    = 0;
-          cell_rhs            = 0;
+          cell_fluid_matrix         = 0;
+          cell_fluid_preconditioner = 0;
+          cell_fluid_mass_matrix    = 0;
 
           fe_values.reinit(cell);
-          par.navier_stokes_rhs.vector_value_list(
-            fe_values.get_quadrature_points(), rhs_values);
-          fe_values[velocity].get_function_values(
-            fluid_locally_relevant_solution, u);
-          fe_values[velocity].get_function_gradients(
-            fluid_locally_relevant_solution, grad_u);
           for (unsigned int q = 0; q < n_q_points; ++q)
             {
               for (unsigned int k = 0; k < dofs_per_cell; ++k)
@@ -1012,42 +1005,34 @@ namespace Step80
                 {
                   for (unsigned int j = 0; j < dofs_per_cell; ++j)
                     {
-                      cell_matrix(i, j) +=
+                      cell_fluid_matrix(i, j) +=
                         ((par.density / time_step) * phi_u[i] * phi_u[j] +
                          par.viscosity *
                            scalar_product(grad_phi_u[i], grad_phi_u[j]) -
                          div_phi_u[i] * phi_p[j] - phi_p[i] * div_phi_u[j]) *
                         fe_values.JxW(q);
 
-                      cell_preconditioner(i, j) += (par.density / time_step) *
-                                                   phi_p[i] * phi_p[j] *
-                                                   fe_values.JxW(q);
+                      cell_fluid_preconditioner(i, j) +=
+                        (par.density / time_step) * phi_p[i] * phi_p[j] *
+                        fe_values.JxW(q);
 
-                      cell_mass_matrix(i, j) += (par.density / time_step) *
-                                                phi_u[i] * phi_u[j] *
-                                                fe_values.JxW(q);
+                      cell_fluid_mass_matrix(i, j) +=
+                        (par.density / time_step) * phi_u[i] * phi_u[j] *
+                        fe_values.JxW(q);
                     }
-
-                  const unsigned int component_i =
-                    fluid_fe->system_to_component_index(i).first;
-                  cell_rhs(i) += par.density * fe_values.shape_value(i, q) *
-                                 rhs_values[q](component_i) * fe_values.JxW(q);
                 }
             }
 
 
           cell->get_dof_indices(local_dof_indices);
-          fluid_constraints.distribute_local_to_global(cell_matrix,
-                                                       cell_rhs,
+          fluid_constraints.distribute_local_to_global(cell_fluid_matrix,
                                                        local_dof_indices,
-                                                       fluid_matrix,
-                                                       fluid_system_rhs);
+                                                       fluid_matrix);
 
-          fluid_constraints.distribute_local_to_global(cell_preconditioner,
-                                                       local_dof_indices,
-                                                       fluid_preconditioner);
+          fluid_constraints.distribute_local_to_global(
+            cell_fluid_preconditioner, local_dof_indices, fluid_preconditioner);
 
-          fluid_constraints.distribute_local_to_global(cell_mass_matrix,
+          fluid_constraints.distribute_local_to_global(cell_fluid_mass_matrix,
                                                        local_dof_indices,
                                                        mass_matrix_fluid);
         }
@@ -1055,7 +1040,6 @@ namespace Step80
     fluid_matrix.compress(VectorOperation::add);
     fluid_preconditioner.compress(VectorOperation::add);
     mass_matrix_fluid.compress(VectorOperation::add);
-    fluid_system_rhs.compress(VectorOperation::add);
   }
 
 
@@ -1242,7 +1226,8 @@ namespace Step80
     QGauss<spacedim>   quadrature_formula(solid_fe->degree + 1);
     FEValues<spacedim> fe_values_rhs(*solid_fe,
                                      quadrature_formula,
-                                     update_values | update_JxW_values);
+                                     update_values | update_quadrature_points |
+                                       update_JxW_values);
 
     FEValues<spacedim> fe_values_matrix(*solid_fe,
                                         quadrature_formula,
@@ -1282,17 +1267,15 @@ namespace Step80
             {
               for (unsigned int i = 0; i < dofs_per_cell; ++i)
                 {
-                  const auto phi_w = fe_values_rhs[displacement].value(i, q);
-
-                  cell_rhs(i) +=
-                    w_old[q] / time_step * phi_w * fe_values_rhs.JxW(q);
+                  const auto &phi_w = fe_values_rhs[displacement].value(i, q);
 
                   const auto comp_i =
                     solid_fe->system_to_component_index(i).first;
 
-                  if (comp_i < spacedim)
-                    cell_rhs(i) += solid_rhs_values[q](comp_i) * phi_w[comp_i] *
-                                   fe_values_rhs.JxW(q);
+                  cell_rhs(i) += (w_old[q] / time_step * phi_w +
+                                  solid_rhs_values[q](comp_i) *
+                                    fe_values_rhs.shape_value(i, q)) *
+                                 fe_values_rhs.JxW(q);
                 }
             }
           cell->get_dof_indices(local_dof_indices);
@@ -1530,16 +1513,17 @@ namespace Step80
 
     fluid_constraints.distribute(fluid_solution);
 
+    fluid_locally_relevant_solution = fluid_solution;
+    solid_locally_relevant_solution = solid_solution;
+
     const double mean_pressure =
       VectorTools::compute_mean_value(fluid_dh,
                                       QGauss<spacedim>(par.velocity_degree + 2),
                                       fluid_locally_relevant_solution,
                                       spacedim);
+
     fluid_solution.block(1).add(-mean_pressure);
     fluid_locally_relevant_solution.block(1) = fluid_solution.block(1);
-
-    fluid_locally_relevant_solution = fluid_solution;
-    solid_locally_relevant_solution = solid_solution;
   }
 
 
@@ -1804,6 +1788,9 @@ namespace Step80
         // if (cycle % par.refinement_frequency == 0 &&
         //     cycle != par.number_of_time_steps - 1)
         //   refine_and_transfer();
+
+        fluid_locally_relevant_solution_old = fluid_locally_relevant_solution;
+        solid_locally_relevant_solution_old = solid_locally_relevant_solution;
       }
   }
 } // namespace Step80
