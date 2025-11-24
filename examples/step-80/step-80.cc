@@ -664,7 +664,7 @@ namespace Step80
   template <int dim, int spacedim>
   void NavierStokesImmersedProblem<dim, spacedim>::initial_setup()
   {
-    // TimerOutput::Scope t(computing_timer, "Initial setup");
+    TimerOutput::Scope t(computing_timer, "Initial setup");
 
     fluid_fe =
       std::make_unique<FESystem<spacedim>>(FE_Q<spacedim>(par.velocity_degree),
@@ -685,7 +685,7 @@ namespace Step80
   template <int dim, int spacedim>
   void NavierStokesImmersedProblem<dim, spacedim>::setup_dofs()
   {
-    // TimerOutput::Scope t(computing_timer, "Setup dofs");
+    TimerOutput::Scope t(computing_timer, "Setup dofs");
 
     fluid_dh.distribute_dofs(*fluid_fe);
 
@@ -957,7 +957,7 @@ namespace Step80
   {
     fluid_matrix = 0;
 
-    // TimerOutput::Scope t(computing_timer, "Assemble Navier-Stokes terms");
+    TimerOutput::Scope t(computing_timer, "Assemble Navier-Stokes terms");
 
     QGauss<spacedim>   quadrature_formula(fluid_fe->degree + 1);
     FEValues<spacedim> fe_values(*fluid_fe,
@@ -1049,8 +1049,7 @@ namespace Step80
   {
     fluid_system_rhs = 0;
 
-    // TimerOutput::Scope t(computing_timer, "Assemble Navier-Stokes rhs
-    // terms");
+    TimerOutput::Scope t(computing_timer, "Assemble Navier-Stokes rhs terms");
 
     QGauss<spacedim>   quadrature_formula(fluid_fe->degree + 1);
     FEValues<spacedim> fe_values(*fluid_fe,
@@ -1145,7 +1144,7 @@ namespace Step80
   {
     solid_matrix = 0;
 
-    // TimerOutput::Scope t(computing_timer, "Assemble Elasticity terms");
+    TimerOutput::Scope t(computing_timer, "Assemble Elasticity terms");
 
     QGauss<spacedim>   quadrature_formula(solid_fe->degree + 1);
     FEValues<spacedim> fe_values(*solid_fe,
@@ -1221,7 +1220,7 @@ namespace Step80
   {
     solid_system_rhs = 0;
 
-    // TimerOutput::Scope t(computing_timer, "Assemble Elastic rhs terms");
+    TimerOutput::Scope t(computing_timer, "Assemble Elastic rhs terms");
 
     QGauss<spacedim>   quadrature_formula(solid_fe->degree + 1);
     FEValues<spacedim> fe_values_rhs(*solid_fe,
@@ -1337,7 +1336,7 @@ namespace Step80
   void NavierStokesImmersedProblem<dim, spacedim>::assemble_coupling_sparsity(
     BlockDynamicSparsityPattern &dsp)
   {
-    // TimerOutput::Scope t(computing_timer, "Assemble Coupling sparsity");
+    TimerOutput::Scope t(computing_timer, "Assemble Coupling sparsity");
 
     std::vector<types::global_dof_index> fluid_dof_indices(
       fluid_fe->n_dofs_per_cell());
@@ -1381,7 +1380,7 @@ namespace Step80
   template <int dim, int spacedim>
   void NavierStokesImmersedProblem<dim, spacedim>::assemble_coupling()
   {
-    // TimerOutput::Scope t(computing_timer, "Assemble Coupling terms");
+    TimerOutput::Scope t(computing_timer, "Assemble Coupling terms");
 
     std::vector<types::global_dof_index> fluid_dof_indices(
       fluid_fe->n_dofs_per_cell());
@@ -1449,7 +1448,7 @@ namespace Step80
   template <int dim, int spacedim>
   void NavierStokesImmersedProblem<dim, spacedim>::solve()
   {
-    // TimerOutput::Scope t(computing_timer, "Solve");
+    TimerOutput::Scope t(computing_timer, "Solve");
 
     using Vec   = LA::MPI::Vector;
     using LinOp = LinearOperator<Vec>;
@@ -1532,7 +1531,7 @@ namespace Step80
   template <int dim, int spacedim>
   void NavierStokesImmersedProblem<dim, spacedim>::refine_and_transfer()
   {
-    // TimerOutput::Scope t(computing_timer, "Refine");
+    TimerOutput::Scope t(computing_timer, "Refine");
 
     Vector<float> error_per_cell(fluid_tria.n_active_cells());
     KellyErrorEstimator<spacedim>::estimate(fluid_dh,
@@ -1601,7 +1600,7 @@ namespace Step80
   {
     // Fluid solution
     {
-      // TimerOutput::Scope t(computing_timer, "Output fluid");
+      TimerOutput::Scope t(computing_timer, "Output fluid");
 
       std::vector<std::string> solution_names(spacedim, "velocity");
       solution_names.emplace_back("pressure");
@@ -1639,7 +1638,7 @@ namespace Step80
 
     // Solid solution
     {
-      // TimerOutput::Scope t(computing_timer, "Output solid");
+      TimerOutput::Scope t(computing_timer, "Output solid");
 
       std::vector<std::string> solution_names(2 * spacedim);
       for (unsigned int i = 0; i < spacedim; ++i)
