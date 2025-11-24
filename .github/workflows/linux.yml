@@ -55,7 +55,7 @@ jobs:
       options: --user root
 
     steps:
-    - uses: actions/checkout@v5
+    - uses: actions/checkout@v6
     - name: info
       run: |
         python --version
@@ -123,7 +123,7 @@ jobs:
       options: --user root --env OMPI_ALLOW_RUN_AS_ROOT=1 --env OMPI_ALLOW_RUN_AS_ROOT_CONFIRM=1
 
     steps:
-    - uses: actions/checkout@v5
+    - uses: actions/checkout@v6
     - name: info
       run: |
         mpicc -v
@@ -191,7 +191,7 @@ jobs:
       options: --user root --env OMPI_ALLOW_RUN_AS_ROOT=1 --env OMPI_ALLOW_RUN_AS_ROOT_CONFIRM=1
 
     steps:
-    - uses: actions/checkout@v5
+    - uses: actions/checkout@v6
     - name: info
       run: |
         mpicc -v
@@ -247,7 +247,7 @@ jobs:
     # if: ${{ github.event_name == 'push' || !github.event.pull_request.draft }}
 
     steps:
-    - uses: actions/checkout@v5
+    - uses: actions/checkout@v6
     - uses: rscohn2/setup-oneapi@v0
       with:
         components: |
@@ -317,7 +317,7 @@ jobs:
       CUDA_ROOT: /usr/local/cuda
 
     steps:
-    - uses: actions/checkout@v5
+    - uses: actions/checkout@v6
     - name: modules
       run: |
         wget https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2204/x86_64/cuda-ubuntu2204.pin
@@ -361,7 +361,7 @@ jobs:
       run: |
         mpicc -v
         cmake --version
-    - uses: actions/checkout@v5
+    - uses: actions/checkout@v6
       with:
         repository: kokkos/kokkos
         ref: 4.0.01
@@ -429,7 +429,7 @@ jobs:
       CUDA_ROOT: /usr/local/cuda
 
     steps:
-    - uses: actions/checkout@v5
+    - uses: actions/checkout@v6
     - name: modules
       run: |
         wget https://apt.llvm.org/llvm.sh
@@ -455,7 +455,7 @@ jobs:
         mpicc -v
         clang++-19 -v
         cmake --version
-    - uses: actions/checkout@v5
+    - uses: actions/checkout@v6
       with:
         repository: kokkos/kokkos
         ref: 4.0.01
@@ -532,7 +532,7 @@ jobs:
         apt-get update && apt-get install -yq --no-install-recommends \
              libc++-20-dev clang-tools-20 clang-20
     - uses: lukka/get-cmake@v3.28.3
-    - uses: actions/checkout@v5
+    - uses: actions/checkout@v6
       with:
         repository: kokkos/kokkos
         ref: release-candidate-4.7.00
@@ -549,7 +549,7 @@ jobs:
               -D CMAKE_INSTALL_PREFIX=${GITHUB_WORKSPACE}/../kokkos-install \
               ..
         ninja install
-    - uses: actions/checkout@v5
+    - uses: actions/checkout@v6
     - name: configure deal.II
       run: |
         mkdir build
