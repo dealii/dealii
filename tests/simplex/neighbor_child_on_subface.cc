@@ -12,7 +12,7 @@
 //
 // ------------------------------------------------------------------------
 
-// Test neighbor_child_on_subface for triangles
+// Test neighbor_child_on_subface for triangles and quads
 
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/grid_refinement.h>
@@ -83,11 +83,11 @@ test(const bool refine_triangle, const bool standard_oriented_quad, const bool s
   auto child_cell_1 = neighbor->neighbor_child_on_subface(0, 0);
   auto child_cell_2 = neighbor->neighbor_child_on_subface(0, 1);
 
-  deallog << child_cell_1->vertex(1) - child_1->vertex(0) << " "
-          << child_cell_1->vertex(2) - child_1->vertex(1) << std::endl;
+  deallog << child_cell_1->vertex(1) << " " << child_1->vertex(0) << " "
+          << child_cell_1->vertex(2) << " " << child_1->vertex(1) << std::endl;
 
-  deallog << child_cell_2->vertex(1) - child_2->vertex(0) << " "
-          << child_cell_2->vertex(2) - child_2->vertex(1) << std::endl;
+  deallog << child_cell_2->vertex(1) << " " << child_2->vertex(0) << " "
+          << child_cell_2->vertex(2) << " " << child_2->vertex(1) << std::endl;
 }
 
 int
@@ -95,7 +95,12 @@ main()
 {
   using namespace dealii;
   initlog();
-  test<2>(true, true, true);
+
+  for(unsigned int i = 0; i < 2; ++i)
+    for(unsigned int j = 0; i < 2; ++i)
+      for(unsigned int k = 0; i < 2; ++i)
+        test<2>(i,k,k);
+
 
   return 0;
 }
