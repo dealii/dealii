@@ -126,6 +126,9 @@ namespace PETScWrappers
                    true);
         }
 
+      if (ghosted)
+        release_ghost_form();
+
       PetscErrorCode ierr = VecCopy(v.vector, vector);
       AssertThrow(ierr == 0, ExcPETScError(ierr));
 
@@ -135,6 +138,8 @@ namespace PETScWrappers
           AssertThrow(ierr == 0, ExcPETScError(ierr));
           ierr = VecGhostUpdateEnd(vector, INSERT_VALUES, SCATTER_FORWARD);
           AssertThrow(ierr == 0, ExcPETScError(ierr));
+
+          acquire_ghost_form();
         }
       return *this;
     }
@@ -166,6 +171,9 @@ namespace PETScWrappers
 
       if (update_size || has_ghost_elements())
         {
+          if (has_ghost_elements())
+            release_ghost_form();
+
           // PETSc doesn't support resizing non-empty vectors so create a new
           // one:
           const PetscErrorCode ierr = VecDestroy(&vector);
@@ -178,6 +186,9 @@ namespace PETScWrappers
       // desired
       if (omit_zeroing_entries == false)
         *this = 0;
+
+      if (has_ghost_elements())
+        acquire_ghost_form();
     }
 
 
@@ -210,6 +221,9 @@ namespace PETScWrappers
                    const IndexSet &ghost,
                    const MPI_Comm  comm)
     {
+      if (ghosted)
+        release_ghost_form();
+
       const PetscErrorCode ierr = VecDestroy(&vector);
       AssertThrow(ierr == 0, ExcPETScError(ierr));
 
@@ -224,6 +238,9 @@ namespace PETScWrappers
     void
     Vector::reinit(const IndexSet &local, const MPI_Comm comm)
     {
+      if (ghosted)
+        release_ghost_form();
+
       const PetscErrorCode ierr = VecDestroy(&vector);
       AssertThrow(ierr == 0, ExcPETScError(ierr));
 
@@ -331,6 +348,8 @@ namespace PETScWrappers
                           end - begin +
                             static_cast<PetscInt>(ghost_indices.n_elements()));
         }
+
+      acquire_ghost_form();
     }
 
 
