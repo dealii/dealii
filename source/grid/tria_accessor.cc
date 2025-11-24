@@ -3041,7 +3041,7 @@ CellAccessor<dim, spacedim>::neighbor_child_on_subface(
           const unsigned int neighbor_neighbor =
             this->neighbor_of_neighbor(face);
           const unsigned int neighbor_child_index =
-            neighbor->reference_cell() == ReferenceCells::Triangle ?
+            neighbor->reference_cell() == ReferenceCells::Triangle ? //Or check refinement case here??
               neighbor->reference_cell().child_cell_on_face(
                 neighbor_neighbor,
                 subface,
