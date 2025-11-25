@@ -2469,11 +2469,11 @@ MatrixFree<dim, Number, VectorizedArrayType>::n_components() const
 template <int dim, typename Number, typename VectorizedArrayType>
 inline unsigned int
 MatrixFree<dim, Number, VectorizedArrayType>::n_base_elements(
-  const unsigned int dof_no) const
+  const unsigned int dof_handler_index) const
 {
   AssertDimension(dof_handlers.size(), dof_info.size());
-  AssertIndexRange(dof_no, dof_handlers.size());
-  return dof_handlers[dof_no]->get_fe().n_base_elements();
+  AssertIndexRange(dof_handler_index, dof_handlers.size());
+  return dof_handlers[dof_handler_index]->get_fe().n_base_elements();
 }
 
 
@@ -2702,15 +2702,16 @@ MatrixFree<dim, Number, VectorizedArrayType>::get_cell_active_fe_index(
   const std::pair<unsigned int, unsigned int> range,
   const unsigned int                          dof_handler_index) const
 {
-  const unsigned int dof_no =
+  const unsigned int dof_handler_index_local =
     dof_handler_index == numbers::invalid_unsigned_int ?
       first_hp_dof_handler_index :
       dof_handler_index;
 
-  const auto &fe_indices = dof_info[dof_no].cell_active_fe_index;
+  const auto &fe_indices =
+    dof_info[dof_handler_index_local].cell_active_fe_index;
 
   if (fe_indices.empty() == true ||
-      dof_handlers[dof_no]->get_fe_collection().size() == 1)
+      dof_handlers[dof_handler_index_local]->get_fe_collection().size() == 1)
     return 0;
 
   const auto index = fe_indices[range.first];
@@ -2730,12 +2731,13 @@ MatrixFree<dim, Number, VectorizedArrayType>::get_face_active_fe_index(
   const bool                                  is_interior_face,
   const unsigned int                          dof_handler_index) const
 {
-  const unsigned int dof_no =
+  const unsigned int dof_handler_index_local =
     dof_handler_index == numbers::invalid_unsigned_int ?
       first_hp_dof_handler_index :
       dof_handler_index;
 
-  const auto &fe_indices = dof_info[dof_no].cell_active_fe_index;
+  const auto &fe_indices =
+    dof_info[dof_handler_index_local].cell_active_fe_index;
 
   if (fe_indices.empty() == true)
     return 0;
@@ -2989,17 +2991,19 @@ MatrixFree<dim, Number, VectorizedArrayType>::get_cell_category(
 {
   AssertIndexRange(0, dof_info.size());
 
-  const unsigned int dof_no =
+  const unsigned int dof_handler_index_local =
     dof_handler_index == numbers::invalid_unsigned_int ?
       first_hp_dof_handler_index :
       dof_handler_index;
 
-  AssertIndexRange(cell_batch_index,
-                   dof_info[dof_no].cell_active_fe_index.size());
-  if (dof_info[dof_no].cell_active_fe_index.empty())
+  AssertIndexRange(
+    cell_batch_index,
+    dof_info[dof_handler_index_local].cell_active_fe_index.size());
+  if (dof_info[dof_handler_index_local].cell_active_fe_index.empty())
     return 0;
   else
-    return dof_info[dof_no].cell_active_fe_index[cell_batch_index];
+    return dof_info[dof_handler_index_local]
+      .cell_active_fe_index[cell_batch_index];
 }
 
 
@@ -3010,13 +3014,13 @@ MatrixFree<dim, Number, VectorizedArrayType>::get_face_category(
   const unsigned int face_batch_index,
   const unsigned int dof_handler_index) const
 {
-  const unsigned int dof_no =
+  const unsigned int dof_handler_index_local =
     dof_handler_index == numbers::invalid_unsigned_int ?
       first_hp_dof_handler_index :
       dof_handler_index;
 
   AssertIndexRange(face_batch_index, face_info.faces.size());
-  if (dof_info[dof_no].cell_active_fe_index.empty())
+  if (dof_info[dof_handler_index_local].cell_active_fe_index.empty())
     return std::make_pair(0U, 0U);
 
   std::pair<unsigned int, unsigned int> result = std::make_pair(0U, 0U);
@@ -3025,11 +3029,11 @@ MatrixFree<dim, Number, VectorizedArrayType>::get_face_category(
        face_info.faces[face_batch_index].cells_interior[v] !=
          numbers::invalid_unsigned_int;
        ++v)
-    result.first = std::max(
-      result.first,
-      dof_info[dof_no].cell_active_fe_index[face_info.faces[face_batch_index]
-                                              .cells_interior[v] /
-                                            VectorizedArrayType::size()]);
+    result.first =
+      std::max(result.first,
+               dof_info[dof_handler_index_local].cell_active_fe_index
+                 [face_info.faces[face_batch_index].cells_interior[v] /
+                  VectorizedArrayType::size()]);
   if (face_info.faces[face_batch_index].cells_exterior[0] !=
       numbers::invalid_unsigned_int)
     for (unsigned int v = 0;
@@ -3037,11 +3041,11 @@ MatrixFree<dim, Number, VectorizedArrayType>::get_face_category(
          face_info.faces[face_batch_index].cells_exterior[v] !=
            numbers::invalid_unsigned_int;
          ++v)
-      result.second = std::max(
-        result.second,
-        dof_info[dof_no].cell_active_fe_index[face_info.faces[face_batch_index]
-                                                .cells_exterior[v] /
-                                              VectorizedArrayType::size()]);
+      result.second =
+        std::max(result.second,
+                 dof_info[dof_handler_index_local].cell_active_fe_index
+                   [face_info.faces[face_batch_index].cells_exterior[v] /
+                    VectorizedArrayType::size()]);
   else
     result.second = numbers::invalid_unsigned_int;
   return result;

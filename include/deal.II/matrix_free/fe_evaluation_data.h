@@ -670,7 +670,7 @@ protected:
    */
   FEEvaluationData(const InitializationData &initialization_data,
                    const bool                is_interior_face,
-                   const unsigned int        quad_no,
+                   const unsigned int        quadrature_index,
                    const unsigned int        first_selected_component);
 
   /**
@@ -712,7 +712,7 @@ protected:
    * quadrature formulas available in the MatrixFree objects pass to derived
    * classes.
    */
-  const unsigned int quad_no;
+  const unsigned int quadrature_index;
 
   /**
    * Stores the number of components in the finite element as detected in the
@@ -1069,12 +1069,12 @@ template <int dim, typename Number, bool is_face>
 inline FEEvaluationData<dim, Number, is_face>::FEEvaluationData(
   const InitializationData &initialization_data,
   const bool                is_interior_face,
-  const unsigned int        quad_no,
+  const unsigned int        quadrature_index,
   const unsigned int        first_selected_component)
   : data(initialization_data.shape_info)
   , dof_info(initialization_data.dof_info)
   , mapping_data(initialization_data.mapping_data)
-  , quad_no(quad_no)
+  , quadrature_index(quadrature_index)
   , n_fe_components(dof_info != nullptr ? dof_info->start_components.back() : 0)
   , first_selected_component(first_selected_component)
   , active_fe_index(initialization_data.active_fe_index)
@@ -1128,7 +1128,7 @@ inline FEEvaluationData<dim, Number, is_face>::FEEvaluationData(
   : data(nullptr)
   , dof_info(nullptr)
   , mapping_data(nullptr)
-  , quad_no(numbers::invalid_unsigned_int)
+  , quadrature_index(numbers::invalid_unsigned_int)
   , n_fe_components(n_fe_components)
   , first_selected_component(first_selected_component)
   , active_fe_index(numbers::invalid_unsigned_int)
@@ -1170,7 +1170,7 @@ template <int dim, typename Number, bool is_face>
 inline FEEvaluationData<dim, Number, is_face> &
 FEEvaluationData<dim, Number, is_face>::operator=(const FEEvaluationData &other)
 {
-  AssertDimension(quad_no, other.quad_no);
+  AssertDimension(quadrature_index, other.quadrature_index);
   AssertDimension(n_fe_components, other.n_fe_components);
   AssertDimension(first_selected_component, other.first_selected_component);
   AssertDimension(active_fe_index, other.active_fe_index);
@@ -1581,7 +1581,7 @@ template <int dim, typename Number, bool is_face>
 inline unsigned int
 FEEvaluationData<dim, Number, is_face>::get_quadrature_index() const
 {
-  return quad_no;
+  return quadrature_index;
 }
 
 

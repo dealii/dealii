@@ -3746,24 +3746,24 @@ template <int dim, typename VectorType>
 void
 MGTwoLevelTransfer<dim, VectorType>::reinit(
   const MatrixFree<dim, Number> &matrix_free_fine,
-  const unsigned int             dof_no_fine,
+  const unsigned int             dof_handler_index_fine,
   const MatrixFree<dim, Number> &matrix_free_coarse,
-  const unsigned int             dof_no_coarse)
+  const unsigned int             dof_handler_index_coarse)
 {
   matrix_free_data = std::make_unique<MatrixFreeRelatedData>();
 
   MatrixFreeRelatedData &data = *matrix_free_data;
   data.matrix_free_fine       = &matrix_free_fine;
   data.matrix_free_coarse     = &matrix_free_coarse;
-  AssertIndexRange(dof_no_fine, matrix_free_fine.n_components());
-  data.dof_handler_index_fine = dof_no_fine;
-  AssertIndexRange(dof_no_coarse, matrix_free_coarse.n_components());
-  data.dof_handler_index_coarse = dof_no_coarse;
+  AssertIndexRange(dof_handler_index_fine, matrix_free_fine.n_components());
+  data.dof_handler_index_fine = dof_handler_index_fine;
+  AssertIndexRange(dof_handler_index_coarse, matrix_free_coarse.n_components());
+  data.dof_handler_index_coarse = dof_handler_index_coarse;
 
   const DoFHandler<dim> &dof_fine =
-    matrix_free_fine.get_dof_handler(dof_no_fine);
+    matrix_free_fine.get_dof_handler(dof_handler_index_fine);
   const DoFHandler<dim> &dof_coarse =
-    matrix_free_coarse.get_dof_handler(dof_no_coarse);
+    matrix_free_coarse.get_dof_handler(dof_handler_index_coarse);
 
   Assert(&dof_fine.get_triangulation() == &dof_coarse.get_triangulation(),
          ExcMessage("You can only use this class if both MatrixFree objects "
@@ -3822,10 +3822,11 @@ MGTwoLevelTransfer<dim, VectorType>::reinit(
   if (fe_fine.dofs_per_vertex > 0)
     {
       VectorType weight_vector;
-      matrix_free_fine.initialize_dof_vector(weight_vector, dof_no_fine);
+      matrix_free_fine.initialize_dof_vector(weight_vector,
+                                             dof_handler_index_fine);
 
       internal::FEEvaluationNoConstraints<dim, Number> evaluator(
-        matrix_free_fine, dof_no_fine);
+        matrix_free_fine, dof_handler_index_fine);
       for (unsigned int cell = 0; cell < matrix_free_fine.n_cell_batches();
            ++cell)
         {
@@ -3841,7 +3842,7 @@ MGTwoLevelTransfer<dim, VectorType>::reinit(
           weight_vector.local_element(i) =
             Number(1.) / weight_vector.local_element(i);
       for (const unsigned int index :
-           matrix_free_fine.get_constrained_dofs(dof_no_fine))
+           matrix_free_fine.get_constrained_dofs(dof_handler_index_fine))
         weight_vector.local_element(index) = 0;
       weight_vector.update_ghost_values();
 
@@ -3890,9 +3891,10 @@ MGTwoLevelTransfer<dim, VectorType>::reinit(
   // We internally call the ghost updates through the matrix-free framework
   this->vec_fine_needs_ghost_update = false;
 
-  this->partitioner_fine = matrix_free_fine.get_vector_partitioner(dof_no_fine);
+  this->partitioner_fine =
+    matrix_free_fine.get_vector_partitioner(dof_handler_index_fine);
   this->partitioner_coarse =
-    matrix_free_coarse.get_vector_partitioner(dof_no_coarse);
+    matrix_free_coarse.get_vector_partitioner(dof_handler_index_coarse);
 }
 
 
