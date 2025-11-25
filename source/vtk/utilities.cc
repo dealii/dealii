@@ -34,8 +34,15 @@
 #  include <deal.II/grid/tria_description.h>
 #  include <deal.II/grid/tria_iterator.h>
 
+#  include <deal.II/lac/vector.h>
+
+// Make sure that the VTK version macros are available
+#  include <vtkVersionQuick.h>
+// Other VTK headers
 #  include <vtkCellData.h>
-#  include <vtkCleanUnstructuredGrid.h>
+#  if VTK_VERSION_NUMBER_QUICK >= VTK_VERSION_CHECK(9, 5, 0)
+#    include <vtkCleanUnstructuredGrid.h>
+#  endif
 #  include <vtkDataArray.h>
 #  include <vtkPointData.h>
 #  include <vtkSmartPointer.h>
@@ -66,6 +73,7 @@ namespace VTKWrappers
     vtkUnstructuredGrid *grid = reader->GetOutput();
     AssertThrow(grid, ExcMessage("Failed to read VTK file: " + vtk_filename));
 
+#  if VTK_VERSION_NUMBER_QUICK >= VTK_VERSION_CHECK(9, 5, 0)
     auto cleaner = vtkSmartPointer<vtkCleanUnstructuredGrid>::New();
 
     // Cleanup the triangulation if requested
@@ -77,6 +85,7 @@ namespace VTKWrappers
         AssertThrow(grid,
                     ExcMessage("Failed to clean VTK file: " + vtk_filename));
       }
+#  endif
 
     // Read points
     vtkPoints                   *vtk_points = grid->GetPoints();
