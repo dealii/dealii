@@ -20,6 +20,8 @@
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/point.h>
 
+#include <deal.II/grid/tria.h>
+
 #ifdef DEAL_II_WITH_VTK
 
 #  include <vtkDoubleArray.h>
@@ -51,6 +53,23 @@ namespace VTKWrappers
   template <int dim>
   inline vtkSmartPointer<vtkDoubleArray>
   dealii_point_to_vtk_array(const dealii::Point<dim> &p);
+
+  /**
+   * @brief Read a VTK mesh file and populate a deal.II Triangulation.
+   *
+   * This function reads the mesh from the specified VTK file and fills the
+   * given Triangulation object. If cleanup is true, overlapping points in the
+   * VTK file are merged using VTK's cleaning utilities.
+   *
+   * @param vtk_filename The name of the input VTK file.
+   * @param tria The Triangulation object to populate.
+   * @param cleanup If true, merge overlapping points in the VTK file (default: true).
+   */
+  template <int dim, int spacedim>
+  void
+  read_vtk(const std::string            &vtk_filename,
+           Triangulation<dim, spacedim> &tria,
+           const bool                    cleanup = true);
 
 #  ifndef DOXYGEN
   // Template implementations
