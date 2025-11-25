@@ -120,6 +120,68 @@ namespace Step80
 {
   using namespace dealii;
 
+  template <typename VectorType, typename BlockVectorType>
+  class StokesDLMALPreconditioner
+  {
+  public:
+    using PayloadType = dealii::TrilinosWrappers::internal::
+      LinearOperatorImplementation::TrilinosPayload;
+
+    StokesDLMALPreconditioner(
+      const LinearOperator<VectorType, VectorType> A11_inv_,
+      const LinearOperator<VectorType, VectorType> A22_inv_,
+      const LinearOperator<VectorType, VectorType> A12_,
+      const LinearOperator<VectorType, VectorType> Bt_,
+      const LinearOperator<VectorType, VectorType> Ct_,
+      const LinearOperator<VectorType, VectorType> invW_,
+      const LinearOperator<VectorType, VectorType> invMp_,
+      const LinearOperator<VectorType, VectorType> M_,
+      const double                                 gamma_fluid_,
+      const double                                 gamma_solid_,
+      const double                                 gamma_grad_div_)
+    {
+      // Aug_inv = Aug_inv_;
+      A11_inv        = A11_inv_;
+      A22_inv        = A22_inv_;
+      A12            = A12_;
+      Bt             = Bt_;
+      Ct             = Ct_;
+      invW           = invW_;
+      invMp          = invMp_;
+      M              = M_; // immersed
+      gamma_fluid    = gamma_fluid_;
+      gamma_solid    = gamma_solid_;
+      gamma_grad_div = gamma_grad_div_;
+    }
+
+    void vmult(BlockVectorType &v, const BlockVectorType &u) const
+    {
+      v.block(0) = 0.;
+      v.block(1) = 0.;
+      v.block(2) = 0.;
+      v.block(3) = 0.;
+
+      v.block(3) = -gamma_grad_div * invMp * u.block(3);
+      v.block(2) = -gamma_fluid * invW * u.block(2);
+      v.block(1) = A22_inv * (u.block(1) - M * v.block(2));
+      v.block(0) = A11_inv * (u.block(0) - A12 * v.block(1) - Ct * v.block(2) -
+                              Bt * v.block(3));
+    }
+
+    // LinearOperator<Vector<double>> Aug_inv;
+    LinearOperator<VectorType, VectorType> A11_inv;
+    LinearOperator<VectorType, VectorType> A22_inv;
+    LinearOperator<VectorType, VectorType> A12;
+    LinearOperator<VectorType, VectorType> Ct;
+    LinearOperator<VectorType, VectorType> Bt;
+    LinearOperator<VectorType, VectorType> invW;
+    LinearOperator<VectorType, VectorType> invMp;
+    LinearOperator<VectorType, VectorType> M;
+    double                                 gamma_fluid;
+    double                                 gamma_solid;
+    double                                 gamma_grad_div;
+  };
+
   std::pair<unsigned int, unsigned int>
   get_dimension_and_spacedimension(const ParameterHandler &prm)
   {
@@ -991,8 +1053,7 @@ namespace Step80
                         fe_values.JxW(q);
 
                       cell_fluid_preconditioner(i, j) +=
-                        (par.density / time_step) * phi_p[i] * phi_p[j] *
-                        fe_values.JxW(q);
+                        phi_p[i] * phi_p[j] * fe_values.JxW(q);
 
                       cell_fluid_mass_matrix(i, j) +=
                         (par.density / time_step) * phi_u[i] * phi_u[j] *
@@ -1435,6 +1496,7 @@ namespace Step80
     const auto A  = LinOp(fluid_matrix.block(0, 0));
     const auto B  = LinOp(fluid_matrix.block(1, 0));
     const auto Bt = LinOp(fluid_matrix.block(0, 1));
+    const auto Mp = LinOp(fluid_preconditioner.block(1, 1));
     const auto Z6 = 0.0 * LinOp(fluid_matrix.block(1, 1));
 
     const auto K  = LinOp(solid_matrix.block(0, 0));
@@ -1455,13 +1517,72 @@ namespace Step80
     const auto Z4 = 0.0 * M;
     using BVec    = typename LA::MPI::BlockVector;
 
-    auto                                CtM          = Ct * M;
-    auto                                MC           = M * C;
+    auto CtM = Ct * M;
+    auto MC  = M * C;
+
+    const double gamma_AL_background = 5;
+    const double gamma_AL_immersed   = 5;
+
+    // Inversion of the mass matrices
+    SolverControl inner_solver_control(100, 1e-14, false, false);
+    SolverCG<TrilinosWrappers::MPI::Vector> cg_solver(inner_solver_control);
+
+    TrilinosWrappers::PreconditionILU Mp_inv_ilu;
+    Mp_inv_ilu.initialize(fluid_preconditioner.block(1, 1));
+    auto invMp = inverse_operator(Mp, cg_solver, Mp_inv_ilu);
+
+    TrilinosWrappers::PreconditionILU W_inv_ilu;
+    W_inv_ilu.initialize(solid_matrix.block(1, 1));
+    auto invM = inverse_operator(M, cg_solver, W_inv_ilu);
+    auto invW = invM * invM;
+
+    auto A11_aug = A + gamma_AL_background * CtM * invW * MC +
+                   gamma_AL_background * Bt * invMp * B;
+    auto A22_aug = K + gamma_AL_immersed * Dt * invW * D;
+    auto A12_aug = gamma_AL_background * CtM * invW * D;
+    auto A21_aug = gamma_AL_immersed * Dt * invW * MC;
+
+    SolverControl inner_solver_control_lagrangian(100000, 1e-4, false, false);
+    SolverCG<Vec> cg_solver_lagrangian(inner_solver_control_lagrangian);
+
+    TrilinosWrappers::PreconditionAMG amg_A;
+    amg_A.initialize(fluid_matrix.block(0, 0));
+    auto Ainv = inverse_operator(
+      A11_aug,
+      cg_solver_lagrangian,
+      PreconditionIdentity()); // inverse of fluid velocity block
+
+    TrilinosWrappers::PreconditionAMG amg_K;
+    amg_K.initialize(solid_matrix.block(0, 0));
+    auto Kinv = inverse_operator(
+      A22_aug,
+      cg_solver_lagrangian,
+      PreconditionIdentity()); // inverse of solid displacement block
+
+    StokesDLMALPreconditioner<Vec, BVec> prec_AL(Ainv,
+                                                 Kinv,
+                                                 A12_aug,
+                                                 Bt,
+                                                 CtM,
+                                                 invW,
+                                                 invMp,
+                                                 Dt,
+                                                 gamma_AL_background,
+                                                 gamma_AL_immersed,
+                                                 gamma_AL_background);
+
+
+    // std::array<std::array<LinOp, 4>, 4> system_array = {
+    //   {{{A, Z1t, CtM, Bt}},  // vel
+    //    {{Z1, K, Dt, Z2t}},   // disp
+    //    {{MC, D, Z4, Z3}},    // lagr
+    //    {{B, Z2, Z3t, Z6}}}}; // pres
+
     std::array<std::array<LinOp, 4>, 4> system_array = {
-      {{{A, Z1t, CtM, Bt}},  // vel
-       {{Z1, K, Dt, Z2t}},   // disp
-       {{MC, D, Z4, Z3}},    // lagr
-       {{B, Z2, Z3t, Z6}}}}; // pres
+      {{{A11_aug, A12_aug, CtM, Bt}}, // vel
+       {{A21_aug, A22_aug, Dt, Z2t}}, // disp
+       {{MC, D, Z4, Z3}},             // lagr
+       {{B, Z2, Z3t, Z6}}}};          // pres
 
     const auto system = block_operator<4, 4, BVec>(system_array);
     BVec       block_system_rhs(4), block_system_solution(4);
@@ -1469,18 +1590,29 @@ namespace Step80
     block_system_rhs.block(1) = solid_system_rhs.block(0);
     block_system_rhs.block(2) = solid_system_rhs.block(1);
     block_system_rhs.block(3) = fluid_system_rhs.block(1);
+
+    block_system_rhs.block(0) +=
+      gamma_AL_background * CtM * invW * block_system_rhs.block(2);
+    block_system_rhs.block(1) +=
+      gamma_AL_immersed * Dt * invW * block_system_rhs.block(2);
+
+
     block_system_solution.reinit(block_system_rhs);
+    block_system_solution.block(0) =
+      fluid_locally_relevant_solution.block(0); // u
+    block_system_solution.block(1) =
+      solid_locally_relevant_solution.block(0); // w
+    block_system_solution.block(2) =
+      solid_locally_relevant_solution.block(1); // lambda
+    block_system_solution.block(3) =
+      fluid_locally_relevant_solution.block(1); // p
 
-    SolverControl solver_control(100000000, 1e-3, false, false);
-
-    SolverGMRES<LA::MPI::BlockVector> solver(solver_control);
+    SolverControl                      solver_control(200, 1e-5, true, false);
+    SolverFGMRES<LA::MPI::BlockVector> solver(solver_control);
 
     fluid_constraints.set_zero(fluid_solution);
 
-    solver.solve(system,
-                 block_system_solution,
-                 block_system_rhs,
-                 PreconditionIdentity());
+    solver.solve(system, block_system_solution, block_system_rhs, prec_AL);
     fluid_solution.block(0) = block_system_solution.block(0);
     solid_solution.block(0) = block_system_solution.block(1);
     solid_solution.block(1) = block_system_solution.block(2);
@@ -1783,7 +1915,7 @@ int main(int argc, char *argv[])
 {
   using namespace Step80;
   using namespace dealii;
-  deallog.depth_console(1);
+  deallog.depth_console(10);
   try
     {
       Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
