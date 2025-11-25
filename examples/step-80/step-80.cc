@@ -1243,12 +1243,13 @@ namespace Step80
             {
               for (unsigned int i = 0; i < dofs_per_cell; ++i)
                 {
-                  const auto &phi_w = fe_values_rhs[displacement].value(i, q);
+                  const auto &phi_w =
+                    fe_values_rhs[lagrange_multiplier].value(i, q);
 
                   const auto comp_i =
                     solid_fe->system_to_component_index(i).first;
 
-                  cell_rhs(i) += (w_old[q] / time_step * phi_w +
+                  cell_rhs(i) += (-w_old[q] / time_step * phi_w +
                                   solid_rhs_values[q](comp_i) *
                                     fe_values_rhs.shape_value(i, q)) *
                                  fe_values_rhs.JxW(q);
