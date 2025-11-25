@@ -431,7 +431,7 @@ namespace Step80
     AffineConstraints<double> solid_constraints;
 
     LA::MPI::BlockSparseMatrix fluid_matrix; // velocity and pressure
-    LA::MPI::BlockSparseMatrix mass_matrix_fluid;
+    LA::MPI::BlockSparseMatrix fluid_mass_matrix;
     LA::MPI::BlockSparseMatrix fluid_preconditioner;
 
     LA::MPI::BlockSparseMatrix
@@ -445,11 +445,12 @@ namespace Step80
     LA::MPI::BlockVector fluid_system_rhs;
 
     LA::MPI::BlockVector solid_solution;
-    LA::MPI::BlockVector reference_configuration;
-    LA::MPI::BlockVector current_position;
     LA::MPI::BlockVector solid_locally_relevant_solution;
     LA::MPI::BlockVector solid_locally_relevant_solution_old;
     LA::MPI::BlockVector solid_system_rhs;
+
+    LA::MPI::BlockVector solid_reference_configuration;
+    LA::MPI::BlockVector solid_current_position;
 
     Particles::ParticleHandler<spacedim> tracer_particle_handler;
     Particles::ParticleHandler<spacedim> solid_particle_handler;
@@ -763,7 +764,7 @@ namespace Step80
     }
 
     {
-      mass_matrix_fluid.clear();
+      fluid_mass_matrix.clear();
 
       Table<2, DoFTools::Coupling> coupling(spacedim + 1, spacedim + 1);
       for (unsigned int c = 0; c < spacedim + 1; ++c)
@@ -787,7 +788,7 @@ namespace Step80
         mpi_communicator,
         locally_relevant_fluid_dofs);
 
-      mass_matrix_fluid.reinit(fluid_owned_dofs, dsp, mpi_communicator);
+      fluid_mass_matrix.reinit(fluid_owned_dofs, dsp, mpi_communicator);
     }
 
 
@@ -866,8 +867,8 @@ namespace Step80
 
       solid_matrix.reinit(solid_owned_dofs, dsp, mpi_communicator);
 
-      reference_configuration.reinit(solid_locally_relevant_solution);
-      current_position.reinit(solid_locally_relevant_solution);
+      solid_reference_configuration.reinit(solid_locally_relevant_solution);
+      solid_current_position.reinit(solid_locally_relevant_solution);
     }
   }
 
@@ -884,7 +885,7 @@ namespace Step80
 
     VectorTools::interpolate(solid_dh,
                              par.solid_reference_configuration,
-                             reference_configuration,
+                             solid_reference_configuration,
                              ComponentMask(
                                solid_fe->component_mask(displacement)));
 
@@ -894,12 +895,12 @@ namespace Step80
                              ComponentMask(
                                solid_fe->component_mask(displacement)));
 
-    current_position = reference_configuration;
-    current_position += solid_locally_relevant_solution_old;
+    solid_current_position = solid_reference_configuration;
+    solid_current_position += solid_locally_relevant_solution_old;
     solid_mapping =
       std::make_unique<MappingFEField<dim, spacedim, LA::MPI::BlockVector>>(
         solid_dh,
-        current_position,
+        solid_current_position,
         ComponentMask(solid_fe->component_mask(displacement)));
   }
 
@@ -1011,12 +1012,12 @@ namespace Step80
 
           fluid_constraints.distribute_local_to_global(cell_fluid_mass_matrix,
                                                        local_dof_indices,
-                                                       mass_matrix_fluid);
+                                                       fluid_mass_matrix);
         }
 
     fluid_matrix.compress(VectorOperation::add);
     fluid_preconditioner.compress(VectorOperation::add);
-    mass_matrix_fluid.compress(VectorOperation::add);
+    fluid_mass_matrix.compress(VectorOperation::add);
   }
 
 
@@ -1695,10 +1696,10 @@ namespace Step80
     pcout << "Number of particles "
           << solid_particle_handler.n_global_particles() << std::endl;
 
-    current_position = reference_configuration;
-    current_position += solid_locally_relevant_solution;
-    solid_particle_handler.set_particle_positions(current_position.block(0),
-                                                  false);
+    solid_current_position = solid_reference_configuration;
+    solid_current_position += solid_locally_relevant_solution;
+    solid_particle_handler.set_particle_positions(
+      solid_current_position.block(0), false);
   };
 
 
