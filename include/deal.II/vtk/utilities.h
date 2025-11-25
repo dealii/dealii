@@ -94,6 +94,24 @@ namespace VTKWrappers
             const bool                    cleanup            = true,
             const double                  relative_tolerance = 0.0);
 
+  /**
+   * Read cell data (scalar or vector) from a VTK file and store it in the
+   * output vector.
+   *
+   * This function reads the specified cell data array (scalar or vector) from
+   * the given VTK file and stores it in the provided output vector. For vector
+   * data, all components are stored in row-major order (cell0_comp0,
+   * cell0_comp1, ..., cell1_comp0, ...).
+   *
+   * @param vtk_filename The name of the input VTK file.
+   * @param cell_data_name The name of the cell data array to read.
+   * @param output_vector The vector to store the cell data values.
+   */
+  void
+  read_cell_data(const std::string &vtk_filename,
+                 const std::string &cell_data_name,
+                 Vector<double>    &output_vector);
+
 #  ifndef DOXYGEN
   // Template implementations
 
