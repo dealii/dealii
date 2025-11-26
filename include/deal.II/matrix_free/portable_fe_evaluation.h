@@ -69,14 +69,15 @@ namespace Portable
   {
   public:
     /**
-     * An alias for scalar quantities.
+     * An alias for the value type. This is @p Number for scalar problems
+     * and Tensor<1, n_components> for vector-valued problems.
      */
     using value_type = std::conditional_t<(n_components_ == 1),
                                           Number,
                                           Tensor<1, n_components_, Number>>;
 
     /**
-     * An alias for vectorial quantities.
+     * An alias for the gradient type.
      */
     using gradient_type = std::conditional_t<
       n_components_ == 1,
@@ -189,72 +190,83 @@ namespace Portable
     integrate(const EvaluationFlags::EvaluationFlags integration_flag);
 
     /**
-     * Same as above, except that the quadrature point is computed from thread
-     * id.
+     * Return the value of the finite element function at the quadrature point
+     * with index @p q_point after a call to evaluate() with
+     * EvaluationFlags::values set.
      */
     DEAL_II_HOST_DEVICE value_type
     get_value(int q_point) const;
 
     /**
-     * Same as above, except that the local dof index is computed from the
-     * thread id.
+     * Return the value stored for the local degree of freedom with index
+     * @p dof_index. This accesses the data loaded by read_dof_values().
      */
     DEAL_II_HOST_DEVICE value_type
-    get_dof_value(int q_point) const;
+    get_dof_value(int dof_index) const;
 
     /**
-     * Same as above, except that the quadrature point is computed from the
-     * thread id.
+     * Submit the value @p val_in at quadrature point @p q_point for
+     * subsequent integration via integrate() with EvaluationFlags::values
+     * set.
      */
     DEAL_II_HOST_DEVICE void
     submit_value(const value_type &val_in, int q_point);
 
     /**
-     * Same as above, except that the local dof index is computed from the
-     * thread id.
+     * Submit the value @p value for the local degree of freedom with index
+     * @p dof_index, to be written out by a subsequent call to
+     * distribute_local_to_global().
      */
     DEAL_II_HOST_DEVICE void
-    submit_dof_value(const value_type &val_in, int q_point);
+    submit_dof_value(const value_type &value, int dof_index);
 
     /**
-     * Same as above, except that the quadrature point is computed from the
-     * thread id.
+     * Return the gradient of the finite element function at the quadrature
+     * point with index @p q_point after a call to evaluate() with
+     * EvaluationFlags::gradients set.
      */
     DEAL_II_HOST_DEVICE gradient_type
     get_gradient(int q_point) const;
 
     /**
-     * Same as above, except that the quadrature point is computed from the
-     * thread id.
+     * Submit the gradient @p gradient at quadrature point @p q_point for
+     * subsequent integration via integrate() with EvaluationFlags::gradients
+     * set.
      */
     DEAL_II_HOST_DEVICE void
-    submit_gradient(const gradient_type &grad_in, int q_point);
+    submit_gradient(const gradient_type &gradient, int q_point);
 
     /**
-     * Same as above, except that the quadrature point is computed from the
-     * thread id.
+     * Return the symmetric gradient of the finite element function at
+     * quadrature point @p q_point after a call to evaluate() with
+     * EvaluationFlags::gradients set. This function is only available when
+     * the number of components equals the dimension (n_components==dim).
      */
     DEAL_II_HOST_DEVICE
     SymmetricTensor<2, dim, Number>
-    get_symmetric_gradient(int point) const;
+    get_symmetric_gradient(int q_point) const;
 
     /**
-     * Same as above, except that the quadrature point is computed from the
-     * thread id.
+     * Submit the symmetric gradient @p sym_grad at quadrature point @p q_point
+     * for subsequent integration via integrate() with
+     * EvaluationFlags::gradients set. This function is only available when
+     * the number of components equals the dimension (n_components_==dim).
      */
     DEAL_II_HOST_DEVICE void
-    submit_symmetric_gradient(const SymmetricTensor<2, dim, Number> &grad_in,
+    submit_symmetric_gradient(const SymmetricTensor<2, dim, Number> &sym_grad,
                               int                                    q_point);
 
     // clang-format off
     /**
-     * Same as above, except that the functor @p func only takes a single input
-     * argument (fe_eval) and computes the quadrature point from the thread id.
+     * Apply the functor @p func to each quadrature point in parallel.
+     * The functor is invoked with the FEEvaluation object and the quadrature
+     * point index as arguments.
      *
      * @p func needs to define
      * \code
      * DEAL_II_HOST_DEVICE void operator()(
-     *   Portable::FEEvaluation<dim, fe_degree, n_q_points_1d, n_components, Number> *fe_eval) const;
+     *   Portable::FEEvaluation<dim, fe_degree, n_q_points_1d, n_components, Number> *fe_eval,
+     *   int q_point) const;
      * \endcode
      */
     // clang-format on
@@ -552,19 +564,20 @@ namespace Portable
                                             n_components_,
                                             Number>::value_type
   FEEvaluation<dim, fe_degree, n_q_points_1d, n_components_, Number>::
-    get_dof_value(int dof) const
+    get_dof_value(int dof_index) const
   {
-    Assert(dof >= 0 && dof < static_cast<int>(tensor_dofs_per_component),
+    Assert(dof_index >= 0 &&
+             dof_index < static_cast<int>(tensor_dofs_per_component),
            ExcInternalError());
     if constexpr (n_components_ == 1)
       {
-        return shared_data->values(dof, 0);
+        return shared_data->values(dof_index, 0);
       }
     else
       {
         value_type result;
         for (unsigned int c = 0; c < n_components; ++c)
-          result[c] = shared_data->values(dof, c);
+          result[c] = shared_data->values(dof_index, c);
         return result;
       }
   }
@@ -578,19 +591,19 @@ namespace Portable
             typename Number>
   DEAL_II_HOST_DEVICE void
   FEEvaluation<dim, fe_degree, n_q_points_1d, n_components_, Number>::
-    submit_value(const value_type &val_in, int q_point)
+    submit_value(const value_type &value, int q_point)
   {
     Assert(q_point >= 0 && q_point < n_q_points, ExcInternalError());
     if constexpr (n_components_ == 1)
       {
         shared_data->values(q_point, 0) =
-          val_in * precomputed_data->JxW(q_point, cell_id);
+          value * precomputed_data->JxW(q_point, cell_id);
       }
     else
       {
         for (unsigned int c = 0; c < n_components; ++c)
           shared_data->values(q_point, c) =
-            val_in[c] * precomputed_data->JxW(q_point, cell_id);
+            value[c] * precomputed_data->JxW(q_point, cell_id);
       }
   }
 
@@ -603,17 +616,18 @@ namespace Portable
             typename Number>
   DEAL_II_HOST_DEVICE void
   FEEvaluation<dim, fe_degree, n_q_points_1d, n_components_, Number>::
-    submit_dof_value(const value_type &val_in, int dof)
+    submit_dof_value(const value_type &value, int dof_index)
   {
-    Assert(dof >= 0 && dof < tensor_dofs_per_component, ExcInternalError());
+    Assert(dof_index >= 0 && dof_index < tensor_dofs_per_component,
+           ExcInternalError());
     if constexpr (n_components_ == 1)
       {
-        shared_data->values(dof, 0) = val_in;
+        shared_data->values(dof_index, 0) = value;
       }
     else
       {
         for (unsigned int c = 0; c < n_components; ++c)
-          shared_data->values(dof, c) = val_in[c];
+          shared_data->values(dof_index, c) = value[c];
       }
   }
 
@@ -673,7 +687,7 @@ namespace Portable
             typename Number>
   DEAL_II_HOST_DEVICE void
   FEEvaluation<dim, fe_degree, n_q_points_1d, n_components_, Number>::
-    submit_gradient(const gradient_type &grad_in, int q_point)
+    submit_gradient(const gradient_type &gradient, int q_point)
   {
     Assert(q_point >= 0 && q_point < n_q_points, ExcInternalError());
     if constexpr (n_components_ == 1)
@@ -684,7 +698,7 @@ namespace Portable
             for (unsigned int d_2 = 0; d_2 < dim; ++d_2)
               tmp +=
                 precomputed_data->inv_jacobian(q_point, cell_id, d_1, d_2) *
-                grad_in[d_2];
+                gradient[d_2];
             shared_data->gradients(q_point, d_1, 0) =
               tmp * precomputed_data->JxW(q_point, cell_id);
           }
@@ -698,7 +712,7 @@ namespace Portable
               for (unsigned int d_2 = 0; d_2 < dim; ++d_2)
                 tmp +=
                   precomputed_data->inv_jacobian(q_point, cell_id, d_1, d_2) *
-                  grad_in[c][d_2];
+                  gradient[c][d_2];
               shared_data->gradients(q_point, d_1, c) =
                 tmp * precomputed_data->JxW(q_point, cell_id);
             }
