@@ -36,11 +36,9 @@
 
 #  include <deal.II/lac/vector.h>
 
-// Make sure that the VTK version macros are available
-#  include <vtkVersionQuick.h>
 // Other VTK headers
 #  include <vtkCellData.h>
-#  if VTK_VERSION_NUMBER_QUICK >= VTK_VERSION_CHECK(9, 5, 0)
+#  if DEAL_II_VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 3, 0)
 #    include <vtkCleanUnstructuredGrid.h>
 #  endif
 #  include <vtkDataArray.h>
@@ -57,9 +55,10 @@ namespace VTKWrappers
 {
   template <int dim, int spacedim>
   void
-  read_vtk(const std::string            &vtk_filename,
-           Triangulation<dim, spacedim> &tria,
-           const bool                    cleanup)
+  read_tria(const std::string            &vtk_filename,
+            Triangulation<dim, spacedim> &tria,
+            const bool                    cleanup,
+            const double                  relative_tolerance)
   {
     auto reader = vtkSmartPointer<vtkUnstructuredGridReader>::New();
     {
@@ -73,12 +72,14 @@ namespace VTKWrappers
     vtkUnstructuredGrid *grid = reader->GetOutput();
     AssertThrow(grid, ExcMessage("Failed to read VTK file: " + vtk_filename));
 
-#  if VTK_VERSION_NUMBER_QUICK >= VTK_VERSION_CHECK(9, 5, 0)
+#  if DEAL_II_VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 3, 0)
     auto cleaner = vtkSmartPointer<vtkCleanUnstructuredGrid>::New();
 
     // Cleanup the triangulation if requested
     if (cleanup)
       {
+        cleaner->SetToleranceIsAbsolute(false);
+        cleaner->SetTolerance(relative_tolerance);
         cleaner->SetInputData(grid);
         cleaner->Update();
         grid = cleaner->GetOutput();
@@ -86,8 +87,9 @@ namespace VTKWrappers
                     ExcMessage("Failed to clean VTK file: " + vtk_filename));
       }
 #  else
-    (void)cleanup; // avoid unused variable warning
-    deallog << "VTK version < 9.5: skipping cleanup step." << std::endl;
+    (void)cleanup;            // avoid unused variable warning
+    (void)relative_tolerance; // avoid unused variable warning
+    deallog << "VTK version < 9.3: skipping cleanup step." << std::endl;
 #  endif
 
     // Read points
@@ -234,7 +236,10 @@ namespace VTKWrappers
 {
   template <int dim, int spacedim>
   void
-  read_vtk(const std::string &, Triangulation<dim, spacedim> &, const bool)
+  read_tria(const std::string &,
+            Triangulation<dim, spacedim> &,
+            const bool,
+            const double)
   {
     AssertThrow(false, ExcMessage("deal.II is not built with VTK support."));
   }

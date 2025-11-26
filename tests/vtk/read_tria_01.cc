@@ -31,8 +31,8 @@ test(const std::string &filename)
   Triangulation<dim, spacedim> triangulation;
   deallog << "Reading Triangulation<" << dim << ", " << spacedim
           << "> from file: " << filename << std::endl;
-  VTKWrappers::read_vtk(std::string(SOURCE_DIR) + "/" + filename,
-                        triangulation);
+  VTKWrappers::read_tria(std::string(SOURCE_DIR) + "/" + filename,
+                         triangulation);
 
   deallog << "Number of active cells: " << triangulation.n_active_cells()
           << std::endl;
