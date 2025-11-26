@@ -59,14 +59,14 @@ namespace dealii
 
     explicit FEEvaluationShift(
       const MatrixFree<dim, Number, VectorizedArrayType> &matrix_free,
-      const unsigned int                                  dof_no  = 0,
-      const unsigned int                                  quad_no = 0,
-      const unsigned int first_selected_component                 = 0,
+      const unsigned int                                  dof_handler_index = 0,
+      const unsigned int                                  quadrature_index  = 0,
+      const unsigned int first_selected_component                           = 0,
       const unsigned int active_fe_index   = numbers::invalid_unsigned_int,
       const unsigned int active_quad_index = numbers::invalid_unsigned_int)
       : BaseClass(matrix_free,
-                  dof_no,
-                  quad_no,
+                  dof_handler_index,
+                  quadrature_index,
                   first_selected_component,
                   active_fe_index,
                   active_quad_index)
@@ -165,7 +165,7 @@ namespace dealii
            const internal::MatrixFreeFunctions::ShapeInfo<Number> *shape_info)
   {
     Assert(
-      this->quad_no <
+      this->quadrature_index <
         this->matrix_free->get_mapping_info().face_data_by_cells.size(),
       ExcMessage(
         "You must set MatrixFree::AdditionalData::mapping_update_flags_faces_by_cells to use the present reinit method."));

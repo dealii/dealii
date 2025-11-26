@@ -447,9 +447,9 @@ public:
    */
   void
   reinit(const MatrixFree<dim, Number> &matrix_free_fine,
-         const unsigned int             dof_no_fine,
+         const unsigned int             dof_handler_index_fine,
          const MatrixFree<dim, Number> &matrix_free_coarse,
-         const unsigned int             dof_no_coarse);
+         const unsigned int             dof_handler_index_coarse);
 
   /**
    * Check if a fast templated version of the polynomial transfer between
@@ -708,9 +708,9 @@ public:
    */
   void
   reinit(const MatrixFree<dim, Number> &matrix_free_fine,
-         const unsigned int             dof_no_fine,
+         const unsigned int             dof_handler_index_fine,
          const MatrixFree<dim, Number> &matrix_free_coarse,
-         const unsigned int             dof_no_coarse);
+         const unsigned int             dof_handler_index_coarse);
 
   /**
    * @copydoc MGTwoLevelTransfer::fast_polynomial_transfer_supported
@@ -1639,14 +1639,14 @@ template <int dim, typename VectorType>
 void
 MGTwoLevelTransferCopyToHost<dim, VectorType>::reinit(
   const MatrixFree<dim, Number> &matrix_free_fine,
-  const unsigned int             dof_no_fine,
+  const unsigned int             dof_handler_index_fine,
   const MatrixFree<dim, Number> &matrix_free_coarse,
-  const unsigned int             dof_no_coarse)
+  const unsigned int             dof_handler_index_coarse)
 {
   host_transfer.reinit(matrix_free_fine,
-                       dof_no_fine,
+                       dof_handler_index_fine,
                        matrix_free_coarse,
-                       dof_no_coarse);
+                       dof_handler_index_coarse);
 }
 
 

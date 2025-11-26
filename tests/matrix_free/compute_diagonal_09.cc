@@ -14,7 +14,8 @@
 
 
 
-// Similar to compute_diagonal_08 but with different dof_no and quad_no.
+// Similar to compute_diagonal_08 but with different dof_handler_index and
+// quadrature_index.
 
 #include <deal.II/fe/fe_dgq.h>
 
