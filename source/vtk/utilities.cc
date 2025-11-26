@@ -85,6 +85,9 @@ namespace VTKWrappers
         AssertThrow(grid,
                     ExcMessage("Failed to clean VTK file: " + vtk_filename));
       }
+#  else
+    (void)cleanup; // avoid unused variable warning
+    deallog << "VTK version < 9.5: skipping cleanup step." << std::endl;
 #  endif
 
     // Read points
