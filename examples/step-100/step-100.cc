@@ -1269,7 +1269,7 @@ namespace Step100
                             (current_element_trial_i == 1))
                           {
                             g_vector(i) -=
-                              ((0) * u_hat_n_conj[i]).real() * JxW_face;
+                              ((0.) * u_hat_n_conj[i]).real() * JxW_face;
                           }
                         else if ((current_element_trial_i == 2) ||
                                  (current_element_trial_i == 3))
