@@ -53,9 +53,11 @@
 #include <deal.II/numerics/data_out_faces.h>
 #include <deal.II/numerics/vector_tools.h>
 
-#include <chrono>
 #include <fstream>
 #include <iostream>
+
+
+const long double pi = 3.141592653589793238462643;
 
 namespace Step100
 {
@@ -526,7 +528,7 @@ namespace Step100
 
     AssertThrow(wavenumber > 0, ExcMessage("The wavenumber must be positive."));
 
-    AssertThrow(theta >= 0 && theta <= M_PI / 2,
+    AssertThrow(theta >= 0 && theta <= pi / 2,
                 ExcMessage(
                   "The angle theta must be in the interval [0, pi/2]."));
   }
@@ -1867,8 +1869,8 @@ int main()
       // <code>theta</code> in radians.
       int    degree       = 2;
       int    delta_degree = 1;
-      double wavenumber   = 20 * M_PI;
-      double theta        = M_PI / 4.;
+      double wavenumber   = 20 * pi;
+      double theta        = pi / 4.;
 
       std::cout << "===========================================" << std::endl
                 << "Trial order: " << degree << std::endl
