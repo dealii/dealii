@@ -9692,30 +9692,32 @@ namespace GridGenerator
   void
   uniform_channel_with_sphere(
     Triangulation<3>                &tria,
-    const std::vector<unsigned int> &lengths_and_heights,
-    const unsigned int               depth,
+    const std::vector<unsigned int> &lengths_heights_widths,
+    const bool                       use_transfinite_region,
     const bool                       colorize)
   {
     const double radius = 0.5;
     const double box_radius = 1;
 
-    const unsigned int length_pre   = lengths_and_heights[0];
-    const unsigned int length_post  = lengths_and_heights[1];
-    const unsigned int height_below = lengths_and_heights[2];
-    const unsigned int height_above = lengths_and_heights[3];
+    const unsigned int length_pre   = lengths_heights_widths[0];
+    const unsigned int length_post  = lengths_heights_widths[1];
+    const unsigned int height_below = lengths_heights_widths[2];
+    const unsigned int height_above = lengths_heights_widths[3];
+    const unsigned int width_front  = lengths_heights_widths[4];
+    const unsigned int width_back   = lengths_heights_widths[5];
 
-    // Length, height and depth (with box counted, in box length unit)
+    // Repetitions for resp. length, height and width (with box counted, in box length unit)
     const unsigned int length_repetitions = length_pre + length_post + 1;
     const unsigned int height_repetitions = height_below + height_above + 1;
-    const unsigned int depth_repetitions = depth * 2 + 1;    
+    const unsigned int width_repetitions = width_front + width_back + 1;
 
     // Triangulation of channel (points are shifted by box boundaries)
     Triangulation<3> bulk_tria;
     GridGenerator::subdivided_hyper_rectangle(
       bulk_tria,
-      {length_repetitions, height_repetitions, depth_repetitions},
-      Point<3>(-double(1 + length_pre * 2), -double(1 + height_below * 2), -double(1 + depth * 2)),
-      Point<3>(double(1 + length_post * 2), double(1 + height_above * 2), double(1 + depth * 2)));
+      {length_repetitions, height_repetitions, width_repetitions},
+      Point<3>(-double(1 + length_pre * 2), -double(1 + height_below * 2), -double(1 + width_front * 2)),
+      Point<3>(double(1 + length_post * 2), double(1 + height_above * 2), double(1 + width_back * 2)));
 
     std::set<Triangulation<3>::active_cell_iterator> cells_to_remove;
     for (const auto &cell : bulk_tria.active_cell_iterators())
@@ -9760,10 +9762,16 @@ namespace GridGenerator
     }
 
     tria.set_manifold(1, SphericalManifold<3>());
-    TransfiniteInterpolationManifold<3> transfinite_manifold;
-    transfinite_manifold.initialize(tria);
-    tria.set_manifold(0, transfinite_manifold);
-
+    
+    if (use_transfinite_region)
+    {
+      TransfiniteInterpolationManifold<3> transfinite_manifold;
+      transfinite_manifold.initialize(tria);
+      tria.set_manifold(0, transfinite_manifold);
+    }
+    else
+      tria.set_manifold(0, FlatManifold<3>());
+    
     // Set boundary IDs
     if (colorize)
     {
@@ -9772,10 +9780,10 @@ namespace GridGenerator
         if (face->at_boundary())
         {
           const Point<3> center = face->center();
-          // Inlet (left)
+          // Left
           if (std::abs(center[0] - (-static_cast<double>(1 + length_pre * 2))) < tol)
             face->set_boundary_id(0);
-          // Outlet (right)
+          // Right
           else if (std::abs(center[0] - static_cast<double>(1 + length_post * 2)) < tol)
             face->set_boundary_id(1);
           // Sphere boundary
@@ -9788,10 +9796,10 @@ namespace GridGenerator
           else if (std::abs(center[1] - static_cast<double>(1 + height_above * 2)) < tol)
             face->set_boundary_id(4);
           // Front (z negative)
-          else if (std::abs(center[2] - (-static_cast<double>(1 + depth * 2) )) < tol)
+          else if (std::abs(center[2] - (-static_cast<double>(1 + width_front * 2) )) < tol)
             face->set_boundary_id(5);
           // Back (z positive)
-          else if (std::abs(center[2] - static_cast<double>(1 + depth * 2)) < tol)
+          else if (std::abs(center[2] - static_cast<double>(1 + width_back * 2)) < tol)
             face->set_boundary_id(6);
         }
     }
@@ -9803,17 +9811,19 @@ namespace GridGenerator
   void
   uniform_channel_with_sphere(Triangulation<1> &,
                               const std::vector<unsigned int> &,
-                              const unsigned int,
+                              const bool,
                               const bool)
   {
     DEAL_II_NOT_IMPLEMENTED();
   }
 
+
+
   template <>
   void
   uniform_channel_with_sphere(Triangulation<2> &,
                               const std::vector<unsigned int> &,
-                              const unsigned int,
+                              const bool,
                               const bool)
   {
     DEAL_II_NOT_IMPLEMENTED();

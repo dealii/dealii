@@ -134,7 +134,7 @@ namespace GridGenerator
         parse_and_create<dim,
                          dim,
                          const std::vector<unsigned int> &,
-                         const unsigned int,
+                         const bool,
                          const bool>(uniform_channel_with_sphere, arguments, tria);
       else if (name == "enclosed_hyper_cube")
         parse_and_create<dim, dim, double, double, double, bool>(
