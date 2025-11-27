@@ -1,0 +1,13 @@
+
+DEAL:0:0::velocity error: 0.169655 pressure error: 0.0105872
+DEAL:0:0::velocity error: 0.0207098 pressure error: 0.000505650
+DEAL:0:0::velocity error: 0.00257692 pressure error: 2.27825e-05
+DEAL:0:0::velocity error: 0.000322286 pressure error: 1.01172e-06
+DEAL:0:0::OK
+
+DEAL:1:1::velocity error: 0.169655 pressure error: 0.0105872
+DEAL:1:1::velocity error: 0.0207098 pressure error: 0.000505650
+DEAL:1:1::velocity error: 0.00257692 pressure error: 2.27825e-05
+DEAL:1:1::velocity error: 0.000322286 pressure error: 1.01172e-06
+DEAL:1:1::OK
+
