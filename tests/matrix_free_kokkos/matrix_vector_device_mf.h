@@ -56,7 +56,7 @@ HelmholtzOperatorQuad<dim, fe_degree, Number, n_q_points_1d>::operator()(
   int q_point) const
 {
   unsigned int pos = fe_eval->get_matrix_free_data()->local_q_point_id(
-    fe_eval->get_current_cell_index(), n_q_points, q_point);
+    fe_eval->get_current_cell_index(), q_point);
   fe_eval->submit_value(coef[pos] * fe_eval->get_value(q_point), q_point);
   fe_eval->submit_gradient(fe_eval->get_gradient(q_point), q_point);
 }
@@ -133,7 +133,7 @@ VaryingCoefficientFunctor<dim, fe_degree, Number, n_q_points_1d>::operator()(
   const unsigned int                                      cell,
   const unsigned int                                      q) const
 {
-  const unsigned int pos     = gpu_data->local_q_point_id(cell, n_q_points, q);
+  const unsigned int pos     = gpu_data->local_q_point_id(cell, q);
   const auto         q_point = gpu_data->get_quadrature_point(cell, q);
 
 

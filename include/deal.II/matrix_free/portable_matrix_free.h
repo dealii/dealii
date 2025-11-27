@@ -397,6 +397,7 @@ namespace Portable
        */
       TeamHandle team_member;
 
+      const unsigned int n_q_points;
       const unsigned int n_dof_handler;
       const int          cell_index;
       const Kokkos::Array<PrecomputedData, n_max_dof_handlers>
@@ -406,20 +407,35 @@ namespace Portable
       /**
        * Return the quadrature point index local. The index is
        * only unique for a given MPI process.
+       *
+       * @deprecated Use local_q_point_id() with two arguments instead.
+       */
+      DEAL_II_DEPRECATED DEAL_II_HOST_DEVICE unsigned int
+      local_q_point_id(const unsigned int cell,
+                       const unsigned int n_q_points_,
+                       const unsigned int q_point) const
+      {
+        Assert(n_q_points_ == n_q_points,
+               ExcMessage("Incorrect argument value: n_q_points"));
+        return local_q_point_id(cell, q_point);
+      }
+
+      /**
+       * Return the quadrature point index of the given cell and @p q_point index.
+       * The index returned is only unique for a given MPI process.
        */
       DEAL_II_HOST_DEVICE unsigned int
       local_q_point_id(const unsigned int cell,
-                       const unsigned int n_q_points,
                        const unsigned int q_point) const
       {
+        AssertIndexRange(cell, precomputed_data[0].n_cells);
+        AssertIndexRange(q_point, n_q_points);
+
         Assert(precomputed_data[0].n_cells ==
                  precomputed_data[0].q_points.extent(1),
-               ExcInternalError());
+               ExcInternalError("q_points array has wrong size"));
         Assert(n_q_points == precomputed_data[0].q_points.extent(0),
-               ExcMessage("Incorrect argument value: n_q_points"));
-
-        AssertIndexRange(cell, precomputed_data[0].n_cells);
-        AssertIndexRange(q_point, precomputed_data[0].q_points.extent(0));
+               ExcInternalError("q_points array has wrong size"));
 
         return (precomputed_data[0].row_start /
                   precomputed_data[0].padding_length +
@@ -427,6 +443,7 @@ namespace Portable
                  n_q_points +
                q_point;
       }
+
 
 
       /**
@@ -441,7 +458,9 @@ namespace Portable
                  precomputed_data[0].q_points.extent(1),
                ExcInternalError());
         AssertIndexRange(cell, precomputed_data[0].n_cells);
-        AssertIndexRange(q_point, precomputed_data[0].q_points.extent(0));
+        AssertIndexRange(q_point, n_q_points);
+        Assert(n_q_points == precomputed_data[0].q_points.extent(0),
+               ExcInternalError());
         return precomputed_data[0].q_points(q_point, cell);
       }
     };
