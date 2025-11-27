@@ -40,7 +40,10 @@
 <     for (unsigned int cycle = 0; cycle < 8; ++cycle)
 ---
 >     for (unsigned int cycle = 0; cycle < 4; ++cycle)
-1872c1841
+1818,1819d1786
+<         std::cout << "===========================================" << std::endl
+<                   << "Cycle " << cycle << ':' << std::endl;
+1872c1839
 <       double wavenumber   = 20 * pi;
 ---
 >       double wavenumber   = 4 * pi;
