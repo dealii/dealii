@@ -1,26 +1,22 @@
-547,549d546
+549,551d548
 <     std::cout << std::endl
 <               << "Number of dofs for the interior: "
 <               << dof_handler_trial_interior.n_dofs() << std::endl;
-553,554d549
+555,556d551
 <     std::cout << "Number of dofs for the skeleton: "
 <               << dof_handler_trial_skeleton.n_dofs() << std::endl;
-558,559d552
+560,561d554
 <     std::cout << "Number of dofs for the test space: "
 <               << dof_handler_test.n_dofs() << std::endl;
-1442d1434
+1444d1436
 <     std::cout << std::endl << "Solving the DPG system..." << std::endl;
-1444c1436
-<     SolverControl solver_control(100000, 1e-10 * system_rhs.l2_norm());
----
->     SolverControl solver_control(100000, 1e-12 * system_rhs.l2_norm());
-1452,1456d1443
+1454,1458d1445
 <     std::cout << "   " << solver_control.last_step()
 <               << " CG iterations needed to obtain convergence. \n"
 <               << std::endl;
 < 
 <     error_table.add_value("n_iter", solver_control.last_step());
-1747,1762d1733
+1749,1764d1735
 <     std::cout << "Velocity real part L2 error is : "
 <               << std::sqrt(L2_error_u_real) << std::endl;
 <     std::cout << "Velocity imag part L2 error is : "
@@ -37,17 +33,14 @@
 <               << std::sqrt(L2_error_p_hat_real) << std::endl;
 <     std::cout << "Pressure skeleton imag part L2 error is : "
 <               << std::sqrt(L2_error_p_hat_imag) << std::endl;
-1796,1797d1766
+1798,1799d1768
 <     std::cout << "Number of active cells: " << triangulation.n_active_cells()
 <               << std::endl;
-1814c1783
+1816c1785
 <     for (unsigned int cycle = 0; cycle < 8; ++cycle)
 ---
 >     for (unsigned int cycle = 0; cycle < 4; ++cycle)
-1816,1817d1784
-<         std::cout << "===========================================" << std::endl
-<                   << "Cycle " << cycle << ':' << std::endl;
-1870c1837
-<       double wavenumber   = 20 * M_PI;
+1872c1841
+<       double wavenumber   = 20 * pi;
 ---
->       double wavenumber   = 4 * M_PI;
+>       double wavenumber   = 4 * pi;
