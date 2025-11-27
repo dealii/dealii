@@ -268,10 +268,12 @@ namespace Portable
      *   Portable::FEEvaluation<dim, fe_degree, n_q_points_1d, n_components, Number> *fe_eval,
      *   int q_point) const;
      * \endcode
+     *
+     * @deprecated Use MatrixFree::Data::for_each_quad_point() instead.
      */
     // clang-format on
     template <typename Functor>
-    DEAL_II_HOST_DEVICE void
+    DEAL_II_DEPRECATED DEAL_II_HOST_DEVICE void
     apply_for_each_quad_point(const Functor &func);
 
   private:

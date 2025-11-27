@@ -463,6 +463,23 @@ namespace Portable
                ExcInternalError());
         return precomputed_data[0].q_points(q_point, cell);
       }
+
+      /**
+       * Apply the given functor to each quadrature point in parallel.
+       *
+       * @p func needs to define
+       * \code
+       * DEAL_II_HOST_DEVICE void operator()(const int &q_point) const;
+       * \endcode
+       */
+      template <typename Functor>
+      DEAL_II_HOST_DEVICE void
+      for_each_quad_point(const Functor &func) const
+      {
+        Kokkos::parallel_for(Kokkos::TeamThreadRange(team_member, n_q_points),
+                             [&](const int &q) { func(q); });
+        team_member.team_barrier();
+      }
     };
 
     /**

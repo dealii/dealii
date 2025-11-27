@@ -133,31 +133,6 @@ private:
 
 
 template <int dim, int fe_degree, int n_components, typename Number>
-class LaplaceOperatorQuad
-{
-public:
-  DEAL_II_HOST_DEVICE
-  LaplaceOperatorQuad(const unsigned int version)
-    : version(version)
-  {}
-
-  DEAL_II_HOST_DEVICE void
-  operator()(
-    Portable::FEEvaluation<dim, fe_degree, fe_degree + 1, n_components, Number>
-             *phi,
-    const int q) const
-  {
-    if (version == 0 || version == 2)
-      phi->submit_value(phi->get_value(q), q);
-    if (version == 1 || version == 2)
-      phi->submit_gradient(phi->get_gradient(q), q);
-  }
-
-private:
-  const unsigned int version;
-};
-
-template <int dim, int fe_degree, int n_components, typename Number>
 class LaplaceOperatorLocal
 {
 public:
@@ -181,8 +156,12 @@ public:
     else if (version == 2)
       phi.evaluate(EvaluationFlags::values | EvaluationFlags::gradients);
 
-    phi.apply_for_each_quad_point(
-      LaplaceOperatorQuad<dim, fe_degree, n_components, Number>(version));
+    data->for_each_quad_point([&](const int &q_point) {
+      if (version == 0 || version == 2)
+        phi.submit_value(phi.get_value(q_point), q_point);
+      if (version == 1 || version == 2)
+        phi.submit_gradient(phi.get_gradient(q_point), q_point);
+    });
 
     if (version == 0)
       phi.integrate(EvaluationFlags::values);

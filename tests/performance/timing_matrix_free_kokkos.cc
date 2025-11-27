@@ -139,8 +139,11 @@ public:
       gpu_data);
     fe_eval.read_dof_values(src);
     fe_eval.evaluate(EvaluationFlags::gradients);
-    fe_eval.apply_for_each_quad_point(
-      LaplaceOperatorQuad<dim, fe_degree, Number>());
+
+    LaplaceOperatorQuad<dim, fe_degree, Number> quad;
+    gpu_data->for_each_quad_point(
+      [&](const int &q_point) { quad(&fe_eval, q_point); });
+
     fe_eval.integrate(EvaluationFlags::gradients);
     fe_eval.distribute_local_to_global(dst);
   }

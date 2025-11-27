@@ -1453,7 +1453,8 @@ namespace MatrixFreeTools
                                 c));
 
             fe_eval.evaluate(m_evaluation_flags);
-            fe_eval.apply_for_each_quad_point(m_quad_operation);
+            data->for_each_quad_point(
+              [&](const int &q_point) { m_quad_operation(&fe_eval, q_point); });
             fe_eval.integrate(m_integration_flags);
 
             Portable::internal::

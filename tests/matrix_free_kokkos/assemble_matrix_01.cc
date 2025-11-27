@@ -41,22 +41,6 @@
 
 
 template <int dim, int fe_degree>
-class DeviceOperatorQuad
-{
-public:
-  DEAL_II_HOST_DEVICE void
-  operator()(
-    Portable::FEEvaluation<dim, fe_degree, fe_degree + 1, dim, double> *fe_eval,
-    const int q_point) const
-  {
-    fe_eval->submit_symmetric_gradient(fe_eval->get_symmetric_gradient(q_point),
-                                       q_point);
-  }
-};
-
-
-
-template <int dim, int fe_degree>
 class LocalDeviceOperator
 {
 public:
@@ -69,7 +53,12 @@ public:
       data);
     fe_eval.read_dof_values(src);
     fe_eval.evaluate(EvaluationFlags::gradients);
-    fe_eval.apply_for_each_quad_point(DeviceOperatorQuad<dim, fe_degree>());
+
+    data->for_each_quad_point([&](const int &q_point) {
+      fe_eval.submit_symmetric_gradient(fe_eval.get_symmetric_gradient(q_point),
+                                        q_point);
+    });
+
     fe_eval.integrate(EvaluationFlags::gradients);
     fe_eval.distribute_local_to_global(dst);
   }
