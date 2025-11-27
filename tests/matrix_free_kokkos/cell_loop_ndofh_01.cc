@@ -69,17 +69,13 @@ public:
   void
   test()
   {
-    LinearAlgebra::distributed::BlockVector<Number, MemorySpace::Default> dst(
-      3);
-    LinearAlgebra::distributed::BlockVector<Number, MemorySpace::Default> src(
-      3);
+    LinearAlgebra::distributed::BlockVector<Number, MemorySpace::Default> dst;
+    LinearAlgebra::distributed::BlockVector<Number, MemorySpace::Default> src;
+    data.initialize_dof_vector(dst);
+    data.initialize_dof_vector(src);
 
     for (unsigned int i = 0; i < 3; ++i)
-      {
-        data.initialize_dof_vector(dst.block(i), i);
-        data.initialize_dof_vector(src.block(i), i);
-        src.block(i).add(1.0 + 1.0 * i);
-      }
+      src.block(i).add(1.0 + 1.0 * i);
 
     for (unsigned int i = 0; i < 3; ++i)
       {
@@ -128,17 +124,14 @@ public:
   void
   test() const
   {
-    LinearAlgebra::distributed::BlockVector<Number, MemorySpace::Default> dst(
-      3);
-    LinearAlgebra::distributed::BlockVector<Number, MemorySpace::Default> src(
-      3);
+    LinearAlgebra::distributed::BlockVector<Number, MemorySpace::Default> dst;
+    LinearAlgebra::distributed::BlockVector<Number, MemorySpace::Default> src;
+
+    data.initialize_dof_vector(src);
+    data.initialize_dof_vector(dst);
 
     for (unsigned int i = 0; i < 3; ++i)
-      {
-        data.initialize_dof_vector(dst.block(i), i);
-        data.initialize_dof_vector(src.block(i), i);
-        src.block(i).add(1.0 + 1.0 * i);
-      }
+      src.block(i).add(1.0 + 1.0 * i);
 
     data.cell_loop(*this, src, dst);
 

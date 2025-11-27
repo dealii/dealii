@@ -594,6 +594,18 @@ namespace Portable
       const unsigned int dof_handler_index = 0) const;
 
     /**
+     * Initialize a distributed block vector. The local elements correspond to
+     * the locally owned degrees of freedom and the ghost elements correspond to
+     * the (additional) locally relevant dofs. This version creates one block
+     * for each DoFHandler provided when the MatrixFree class was initialized.
+     */
+    template <typename MemorySpaceType>
+    void
+    initialize_dof_vector(
+      LinearAlgebra::distributed::BlockVector<Number, MemorySpaceType> &vec)
+      const;
+
+    /**
      * Return the colored graph of locally owned active cells.
      */
     const std::vector<std::vector<CellFilter>> &
