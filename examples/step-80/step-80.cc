@@ -1540,8 +1540,8 @@ namespace Step80
     auto A11_aug = A + gamma_AL_background * Ct * M * C +
                    gamma_AL_background * Bt * invMp * B;
     auto A22_aug = (1 / time_step) * K + gamma_AL_immersed * Dt * invW * D;
-    auto A12_aug = gamma_AL_background * CtM * invW * D;
-    auto A21_aug = gamma_AL_immersed * Dt * invW * MC;
+    auto A12_aug = gamma_AL_background * Ct * D;
+    auto A21_aug = gamma_AL_immersed * Dt * C;
 
     SolverControl inner_solver_control_lagrangian(100000, 1e-4, false, false);
     SolverCG<Vec> cg_solver_lagrangian(inner_solver_control_lagrangian);
