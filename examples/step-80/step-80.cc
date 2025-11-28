@@ -67,6 +67,8 @@ namespace LA
 
 #include <deal.II/fe/fe_nothing.h>
 #include <deal.II/fe/fe_q.h>
+#include <deal.II/fe/fe_dgp.h>
+#include <deal.II/fe/fe_dgp_nonparametric.h>
 #include <deal.II/fe/fe_system.h>
 #include <deal.II/fe/fe_values.h>
 #include <deal.II/fe/mapping_fe_field.h>
@@ -106,7 +108,6 @@ namespace LA
 #  include <TopoDS.hxx>
 #endif
 
-#include <fstream>
 #include <iostream>
 #include <memory>
 
@@ -232,7 +233,9 @@ namespace Step80
 
     std::string output_directory = ".";
 
-    unsigned int velocity_degree = 2;
+    unsigned int velocity_degree            = 2;
+    unsigned int displacement_degree        = 1;
+    unsigned int lagrange_multiplier_degree = 0;
 
     unsigned int number_of_time_steps = 501;
     double       final_time           = 1.0;
@@ -271,6 +274,16 @@ namespace Step80
     unsigned int max_cells            = 20000;
     int          refinement_frequency = 5;
 
+    double gamma_AL_background = 100;
+    double gamma_AL_immersed   = 1e-2;
+
+    unsigned int inner_max_iterations            = 100;
+    double       inner_tolerance                 = 1e-14;
+    unsigned int outer_max_iterations            = 1000;
+    double       outer_tolerance                 = 1e-8;
+    unsigned int inner_lagrangian_max_iterations = 1000;
+    double       inner_lagrangian_tolerance      = 1e-4;
+
     using PrmFunction =
       ParameterAcceptorProxy<Functions::ParsedFunction<spacedim>>;
 
@@ -304,6 +317,16 @@ namespace Step80
   {
     add_parameter(
       "Velocity degree", velocity_degree, "", this->prm, Patterns::Integer(1));
+    add_parameter("Displacement degree",
+                  displacement_degree,
+                  "",
+                  this->prm,
+                  Patterns::Integer(1));
+    add_parameter("Lagrange multiplier degree",
+                  lagrange_multiplier_degree,
+                  "",
+                  this->prm,
+                  Patterns::Integer(0));
 
     add_parameter("Number of time steps", number_of_time_steps);
     add_parameter("Output frequency", output_frequency);
@@ -373,6 +396,21 @@ namespace Step80
       add_parameter("Refinement coarsening fraction", coarsening_fraction);
       add_parameter("Refinement fraction", refinement_fraction);
       add_parameter("Maximum number of cells", max_cells);
+    }
+    leave_subsection();
+
+    enter_subsection("Solver parameters");
+    {
+      add_parameter("Gamma AL background", gamma_AL_background);
+      add_parameter("Gamma AL immersed", gamma_AL_immersed);
+      add_parameter("Inner solver maximum iterations", inner_max_iterations);
+      add_parameter("Inner solver tolerance", inner_tolerance);
+      add_parameter("Outer solver maximum iterations", outer_max_iterations);
+      add_parameter("Outer solver tolerance", outer_tolerance);
+      add_parameter("Inner Lagrangian solver maximum iterations",
+                    inner_lagrangian_max_iterations);
+      add_parameter("Inner Lagrangian solver tolerance",
+                    inner_lagrangian_tolerance);
     }
     leave_subsection();
 
@@ -499,7 +537,7 @@ namespace Step80
     LA::MPI::BlockSparseMatrix
       solid_matrix; // displacement and Lagrange multiplier
     LA::MPI::BlockSparseMatrix
-      coupling_matrix; // between displacement and velocity
+      coupling_interpolation_matrix; // between displacement and velocity
 
     LA::MPI::BlockVector fluid_solution;
     LA::MPI::BlockVector fluid_locally_relevant_solution;
@@ -686,7 +724,7 @@ namespace Step80
     solid_particle_handler.initialize(fluid_tria,
                                       StaticMappingQ1<spacedim>::mapping);
     std::vector<bool> components(2 * spacedim, false);
-    components[spacedim] = true;
+    components[0] = true;
 
     Particles::Generators::dof_support_points(solid_dh,
                                               global_fluid_bounding_boxes,
@@ -694,8 +732,13 @@ namespace Step80
                                               *solid_mapping,
                                               ComponentMask(components));
 
-    pcout << "Solid particles: " << solid_particle_handler.n_global_particles()
-          << std::endl;
+    pcout << "   Number of particles (solid support points): "
+          << solid_particle_handler.n_global_particles() << " ("
+          << solid_particle_handler.n_global_particles() * spacedim
+          << " displacement dofs)" << std::endl;
+
+    AssertDimension(solid_particle_handler.n_global_particles() * spacedim,
+                    solid_solution.block(0).size());
   }
 
 
@@ -715,9 +758,11 @@ namespace Step80
 
     // Solid displacement and Lagrange multiplier (same degree for both)
     solid_fe = std::make_unique<FESystem<spacedim>>(
-      FE_Q<dim, spacedim>(par.velocity_degree - 1),
+      FE_Q<dim, spacedim>(par.displacement_degree),
       spacedim,
-      FE_Q<dim, spacedim>(par.velocity_degree - 1),
+      par.lagrange_multiplier_degree == 0 ?
+        *FE_DGQ<dim, spacedim>(0).clone() :
+        *FE_Q<dim, spacedim>(par.lagrange_multiplier_degree).clone(),
       spacedim);
   }
 
@@ -739,7 +784,7 @@ namespace Step80
     const unsigned int n_u = fluid_dofs_per_block[0],
                        n_p = fluid_dofs_per_block[1];
 
-    pcout << "   Number of degrees of freedom for NavierStokes equation: "
+    pcout << "   Number of degrees of freedom for Navier-Stokes equation: "
           << fluid_dh.n_dofs() << " (" << n_u << '+' << n_p << ')' << std::endl;
 
     fluid_owned_dofs.resize(2);
@@ -942,20 +987,23 @@ namespace Step80
   {
     VectorTools::interpolate(fluid_dh,
                              par.navier_stokes_initial_conditions,
-                             fluid_locally_relevant_solution_old,
+                             fluid_solution,
                              ComponentMask(fluid_fe->component_mask(velocity)));
+    fluid_locally_relevant_solution_old = fluid_solution;
 
     VectorTools::interpolate(solid_dh,
                              par.solid_reference_configuration,
-                             solid_reference_configuration,
+                             solid_solution,
                              ComponentMask(
                                solid_fe->component_mask(displacement)));
+    solid_reference_configuration = solid_solution;
 
     VectorTools::interpolate(solid_dh,
                              par.solid_initial_displacement,
-                             solid_locally_relevant_solution_old,
+                             solid_solution,
                              ComponentMask(
                                solid_fe->component_mask(displacement)));
+    solid_locally_relevant_solution_old = solid_solution;
 
     solid_current_position = solid_reference_configuration;
     solid_current_position += solid_locally_relevant_solution_old;
@@ -974,17 +1022,17 @@ namespace Step80
     BlockDynamicSparsityPattern dsp(fluid_dofs_per_block, solid_dofs_per_block);
     assemble_coupling_sparsity(dsp);
 
-    coupling_matrix.clear();
-    coupling_matrix.reinit(fluid_dofs_per_block.size(),
-                           solid_dofs_per_block.size());
+    coupling_interpolation_matrix.clear();
+    coupling_interpolation_matrix.reinit(fluid_dofs_per_block.size(),
+                                         solid_dofs_per_block.size());
     for (unsigned int i = 0; i < fluid_dofs_per_block.size(); ++i)
       for (unsigned int j = 0; j < solid_dofs_per_block.size(); ++j)
-        coupling_matrix.block(i, j).reinit(fluid_owned_dofs[i],
-                                           solid_owned_dofs[j],
-                                           dsp.block(i, j),
-                                           mpi_communicator,
-                                           true);
-    coupling_matrix.collect_sizes();
+        coupling_interpolation_matrix.block(i, j).reinit(fluid_owned_dofs[i],
+                                                         solid_owned_dofs[j],
+                                                         dsp.block(i, j),
+                                                         mpi_communicator,
+                                                         true);
+    coupling_interpolation_matrix.collect_sizes();
   }
 
 
@@ -1380,7 +1428,6 @@ namespace Step80
 
     std::vector<types::global_dof_index> fluid_dof_indices(
       fluid_fe->n_dofs_per_cell());
-    std::vector<types::global_dof_index> solid_dof_indices;
 
     FullMatrix<double> local_matrix;
 
@@ -1407,8 +1454,7 @@ namespace Step80
 
                 if (comp_i < spacedim)
                   dsp.add(fluid_dof_indices[i],
-                          solid_dofs_per_block[0] +
-                            global_particle_id * spacedim + comp_i);
+                          global_particle_id * spacedim + comp_i);
               }
           }
         particle = pic.end();
@@ -1457,7 +1503,7 @@ namespace Step80
 
             for (unsigned int d = 0; d < spacedim; ++d)
               solid_dof_indices[local_solid_dof_index++] =
-                solid_dofs_per_block[0] + global_particle_id * spacedim + d;
+                global_particle_id * spacedim + d;
 
             for (unsigned int i = 0; i < fluid_fe->n_dofs_per_cell(); ++i)
               {
@@ -1471,15 +1517,16 @@ namespace Step80
             local_pic_index++;
           }
 
-        fluid_constraints.distribute_local_to_global(local_matrix,
-                                                     fluid_dof_indices,
-                                                     solid_constraints,
-                                                     solid_dof_indices,
-                                                     coupling_matrix);
+        fluid_constraints.distribute_local_to_global(
+          local_matrix,
+          fluid_dof_indices,
+          solid_constraints,
+          solid_dof_indices,
+          coupling_interpolation_matrix);
         particle = pic.end();
       }
 
-    coupling_matrix.compress(VectorOperation::add);
+    coupling_interpolation_matrix.compress(VectorOperation::add);
   }
 
 
@@ -1494,37 +1541,37 @@ namespace Step80
     using LinOp = LinearOperator<Vec>;
 
     const auto A  = LinOp(fluid_matrix.block(0, 0));
-    const auto B  = LinOp(fluid_matrix.block(1, 0));
     const auto Bt = LinOp(fluid_matrix.block(0, 1));
-    const auto Mp = LinOp(fluid_preconditioner.block(1, 1));
+    const auto B  = LinOp(fluid_matrix.block(1, 0));
     const auto Z6 = 0.0 * LinOp(fluid_matrix.block(1, 1));
+    const auto Mp = LinOp(fluid_preconditioner.block(1, 1));
 
     const auto K  = LinOp(solid_matrix.block(0, 0));
-    const auto D  = LinOp(solid_matrix.block(1, 0));
     const auto Dt = LinOp(solid_matrix.block(0, 1));
+    const auto D  = LinOp(solid_matrix.block(1, 0));
     const auto M  = LinOp(solid_matrix.block(1, 1));
 
-    const auto Z1t = 0.0 * LinOp(coupling_matrix.block(0, 0));
-    const auto Ct  = LinOp(coupling_matrix.block(0, 1));
-    const auto Z2t = 0.0 * LinOp(coupling_matrix.block(1, 0));
-    const auto Z3t = 0.0 * LinOp(coupling_matrix.block(1, 1));
+    const auto Pt  = LinOp(coupling_interpolation_matrix.block(0, 0));
+    const auto Z1t = 0.0 * LinOp(coupling_interpolation_matrix.block(0, 1));
+    const auto Z2t = 0.0 * LinOp(coupling_interpolation_matrix.block(1, 0));
+    const auto Z3t = 0.0 * LinOp(coupling_interpolation_matrix.block(1, 1));
 
+    const auto P  = transpose_operator(Pt);
     const auto Z1 = transpose_operator(Z1t);
     const auto Z2 = transpose_operator(Z2t);
-    const auto C  = transpose_operator(Ct);
     const auto Z3 = transpose_operator(Z3t);
 
     const auto Z4 = 0.0 * M;
     using BVec    = typename LA::MPI::BlockVector;
 
-    auto CtM = Ct * M;
-    auto MC  = M * C;
-
-    const double gamma_AL_background = 100;
-    const double gamma_AL_immersed   = 1e-2 * time_step;
+    auto Ct = Pt * Dt;
+    auto C  = D * P;
 
     // Inversion of the mass matrices
-    SolverControl inner_solver_control(100, 1e-14, false, false);
+    SolverControl inner_solver_control(par.inner_max_iterations,
+                                       par.inner_tolerance,
+                                       false,
+                                       false);
     SolverCG<TrilinosWrappers::MPI::Vector> cg_solver(inner_solver_control);
 
     TrilinosWrappers::PreconditionILU Mp_inv_ilu;
@@ -1533,42 +1580,39 @@ namespace Step80
 
     TrilinosWrappers::PreconditionILU W_inv_ilu;
     W_inv_ilu.initialize(solid_matrix.block(1, 1));
-    auto         invM = inverse_operator(M, cg_solver, W_inv_ilu);
+    const auto   invM = inverse_operator(M, cg_solver, W_inv_ilu);
     const double h    = GridTools::maximal_cell_diameter(solid_tria);
-    auto         invW = invM;
+    const auto   invW = invM;
 
-    auto A11_aug = A + gamma_AL_background * Ct * M * C +
-                   gamma_AL_background * Bt * invMp * B;
-    auto A22_aug = (1 / time_step) * K + gamma_AL_immersed * Dt * invW * D;
-    auto A12_aug = gamma_AL_background * Ct * D;
-    auto A21_aug = gamma_AL_immersed * Dt * C;
+    auto A11_aug = A + par.gamma_AL_background * Ct * invW * C +
+                   par.gamma_AL_background * Bt * invMp * B;
+    auto A22_aug =
+      (1 / time_step) * K + par.gamma_AL_immersed * time_step * Dt * invM * D;
+    (1 / time_step) * K + par.gamma_AL_immersed *time_step *Dt *invM *D;
+    auto A12_aug = par.gamma_AL_background * Ct * invW * D;
+    auto A21_aug = par.gamma_AL_immersed * time_step * Dt * invW * C;
 
-    SolverControl inner_solver_control_lagrangian(100000, 1e-4, false, false);
+    SolverControl inner_solver_control_lagrangian(
+      par.inner_lagrangian_max_iterations,
+      par.inner_lagrangian_tolerance,
+      false,
+      false);
     SolverCG<Vec> cg_solver_lagrangian(inner_solver_control_lagrangian);
 
     TrilinosWrappers::PreconditionAMG amg_A;
     amg_A.initialize(fluid_matrix.block(0, 0));
-    auto Ainv = inverse_operator(A11_aug,
-                                 cg_solver_lagrangian,
-                                 amg_A); // inverse of fluid velocity block
+    auto A11_aug_inv =
+      inverse_operator(A11_aug,
+                       cg_solver_lagrangian,
+                       amg_A); // inverse of fluid velocity block
 
     TrilinosWrappers::PreconditionAMG amg_K;
     amg_K.initialize(solid_matrix.block(0, 0));
-    auto Kinv = inverse_operator(A22_aug,
-                                 cg_solver_lagrangian,
-                                 amg_K); // inverse of solid displacement block
+    auto A22_aug_inv =
+      inverse_operator(A22_aug,
+                       cg_solver_lagrangian,
+                       amg_K); // inverse of solid displacement block
 
-    StokesDLMALPreconditioner<Vec, BVec> prec_AL(Ainv,
-                                                 Kinv,
-                                                 A12_aug,
-                                                 Bt,
-                                                 CtM,
-                                                 invW,
-                                                 invMp,
-                                                 Dt,
-                                                 gamma_AL_background,
-                                                 gamma_AL_immersed,
-                                                 gamma_AL_background);
 
 
     // std::array<std::array<LinOp, 4>, 4> system_array = {
@@ -1578,22 +1622,39 @@ namespace Step80
     //    {{B, Z2, Z3t, Z6}}}}; // pres
 
     std::array<std::array<LinOp, 4>, 4> system_array = {
-      {{{A11_aug, A12_aug, CtM, Bt}}, // vel
+      {{{A11_aug, A12_aug, Ct, Bt}},  // vel
        {{A21_aug, A22_aug, Dt, Z2t}}, // disp
-       {{MC, D, Z4, Z3}},             // lagr
+       {{C, D, Z4, Z3}},              // lagr
        {{B, Z2, Z3t, Z6}}}};          // pres
 
     const auto system = block_operator<4, 4, BVec>(system_array);
-    BVec       block_system_rhs(4), block_system_solution(4);
+
+    auto prec_AL = system;
+
+    prec_AL.vmult = [&](auto &v, const auto &u) {
+      v.block(0) = 0.;
+      v.block(1) = 0.;
+      v.block(2) = 0.;
+      v.block(3) = 0.;
+
+      v.block(3) = -par.gamma_AL_background * invMp * u.block(3);
+      v.block(2) = -par.gamma_AL_immersed * time_step * invW * u.block(2);
+      v.block(1) = A22_aug_inv * (u.block(1) - Dt * v.block(2));
+      v.block(0) = A11_aug_inv * (u.block(0) - A12_aug * v.block(1) -
+                                  Ct * v.block(2) - Bt * v.block(3));
+    };
+
+
+    BVec block_system_rhs(4), block_system_solution(4);
     block_system_rhs.block(0) = fluid_system_rhs.block(0);
     block_system_rhs.block(1) = solid_system_rhs.block(0);
     block_system_rhs.block(2) = solid_system_rhs.block(1);
     block_system_rhs.block(3) = fluid_system_rhs.block(1);
 
     block_system_rhs.block(0) +=
-      gamma_AL_background * CtM * invW * block_system_rhs.block(2);
+      par.gamma_AL_background * Ct * invW * block_system_rhs.block(2);
     block_system_rhs.block(1) +=
-      gamma_AL_immersed * Dt * invW * block_system_rhs.block(2);
+      par.gamma_AL_immersed * time_step * Dt * invW * block_system_rhs.block(2);
 
 
     block_system_solution.reinit(block_system_rhs);
@@ -1606,7 +1667,10 @@ namespace Step80
     block_system_solution.block(3) =
       fluid_locally_relevant_solution.block(1); // p
 
-    SolverControl                      solver_control(200, 1e-5, true, false);
+    SolverControl                      solver_control(par.outer_max_iterations,
+                                 par.outer_tolerance,
+                                 true,
+                                 false);
     SolverFGMRES<LA::MPI::BlockVector> solver(solver_control);
 
     fluid_constraints.set_zero(fluid_solution);
