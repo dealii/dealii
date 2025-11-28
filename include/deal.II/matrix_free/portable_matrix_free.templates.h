@@ -742,6 +742,22 @@ namespace Portable
 
 
   template <int dim, typename Number>
+  template <typename MemorySpaceType>
+  void
+  MatrixFree<dim, Number>::initialize_dof_vector(
+    LinearAlgebra::distributed::BlockVector<Number, MemorySpaceType> &vec) const
+  {
+    vec.reinit(dof_handler_data.size());
+
+    for (unsigned int i = 0; i < dof_handler_data.size(); ++i)
+      this->initialize_dof_vector(vec.block(i), i);
+
+    vec.collect_sizes();
+  }
+
+
+
+  template <int dim, typename Number>
   unsigned int
   MatrixFree<dim, Number>::get_padding_length() const
   {
