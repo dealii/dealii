@@ -66,6 +66,7 @@ template <int dim, typename Number, typename MemorySpace, typename MeshType>
 void
 test_interpolation(
   const MGTwoLevelTransferBase<
+    dim,
     LinearAlgebra::distributed::Vector<Number, MemorySpace>> &transfer,
   const MeshType                                             &dof_handler_fine,
   const MeshType              &dof_handler_coarse,
