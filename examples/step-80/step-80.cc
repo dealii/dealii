@@ -448,7 +448,7 @@ namespace Step80
     void assemble_coupling_sparsity(BlockDynamicSparsityPattern &dsp);
     void assemble_coupling();
 
-    void solve();
+    void solve(const double time_step);
 
     void refine_and_transfer();
 
@@ -1234,7 +1234,7 @@ namespace Step80
                          // lagrange * disp
                          (phi_lagrange[i] * phi_w[j] / time_step) -
                          // disp * lagrange
-                         phi_w[i] * phi_lagrange[j] +
+                         (phi_w[i] * phi_lagrange[j] / time_step) +
                          // lagr * lagr
                          phi_lagrange[i] * phi_lagrange[j]) *
                         // JxW
@@ -1348,7 +1348,7 @@ namespace Step80
                              // lagrange * disp
                              (phi_lagrange[i] * phi_w[j] / time_step) -
                              // disp * lagrange
-                             phi_w[i] * phi_lagrange[j] +
+                             (phi_w[i] * phi_lagrange[j] / time_step) +
                              // lagr * lagr
                              phi_lagrange[i] * phi_lagrange[j]) *
                             // JxW
@@ -1486,7 +1486,7 @@ namespace Step80
 
   // @sect4{Solving the coupled system}
   template <int dim, int spacedim>
-  void NavierStokesImmersedProblem<dim, spacedim>::solve()
+  void NavierStokesImmersedProblem<dim, spacedim>::solve(const double time_step)
   {
     TimerOutput::Scope t(computing_timer, "Solve");
 
@@ -1520,8 +1520,8 @@ namespace Step80
     auto CtM = Ct * M;
     auto MC  = M * C;
 
-    const double gamma_AL_background = 5;
-    const double gamma_AL_immersed   = 5;
+    const double gamma_AL_background = 100;
+    const double gamma_AL_immersed   = 1e-2 * time_step;
 
     // Inversion of the mass matrices
     SolverControl inner_solver_control(100, 1e-14, false, false);
@@ -1533,12 +1533,13 @@ namespace Step80
 
     TrilinosWrappers::PreconditionILU W_inv_ilu;
     W_inv_ilu.initialize(solid_matrix.block(1, 1));
-    auto invM = inverse_operator(M, cg_solver, W_inv_ilu);
-    auto invW = invM * invM;
+    auto         invM = inverse_operator(M, cg_solver, W_inv_ilu);
+    const double h    = GridTools::maximal_cell_diameter(solid_tria);
+    auto         invW = invM;
 
-    auto A11_aug = A + gamma_AL_background * CtM * invW * MC +
+    auto A11_aug = A + gamma_AL_background * Ct * M * C +
                    gamma_AL_background * Bt * invMp * B;
-    auto A22_aug = K + gamma_AL_immersed * Dt * invW * D;
+    auto A22_aug = (1 / time_step) * K + gamma_AL_immersed * Dt * invW * D;
     auto A12_aug = gamma_AL_background * CtM * invW * D;
     auto A21_aug = gamma_AL_immersed * Dt * invW * MC;
 
@@ -1547,17 +1548,15 @@ namespace Step80
 
     TrilinosWrappers::PreconditionAMG amg_A;
     amg_A.initialize(fluid_matrix.block(0, 0));
-    auto Ainv = inverse_operator(
-      A11_aug,
-      cg_solver_lagrangian,
-      PreconditionIdentity()); // inverse of fluid velocity block
+    auto Ainv = inverse_operator(A11_aug,
+                                 cg_solver_lagrangian,
+                                 amg_A); // inverse of fluid velocity block
 
     TrilinosWrappers::PreconditionAMG amg_K;
     amg_K.initialize(solid_matrix.block(0, 0));
-    auto Kinv = inverse_operator(
-      A22_aug,
-      cg_solver_lagrangian,
-      PreconditionIdentity()); // inverse of solid displacement block
+    auto Kinv = inverse_operator(A22_aug,
+                                 cg_solver_lagrangian,
+                                 amg_K); // inverse of solid displacement block
 
     StokesDLMALPreconditioner<Vec, BVec> prec_AL(Ainv,
                                                  Kinv,
@@ -1889,7 +1888,7 @@ namespace Step80
         setup_coupling();
         assemble_coupling();
 
-        solve();
+        solve(time_step);
 
         update_particle_positions();
 
