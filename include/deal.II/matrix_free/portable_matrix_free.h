@@ -627,6 +627,14 @@ namespace Portable
     get_mg_level() const;
 
     /**
+     * Return the flag indicating whether overlap MPI communication with
+     * computation is used as was set by
+     * AdditionalData::overlap_communication_computation.
+     */
+    bool
+    use_overlap_communication_computation() const;
+
+    /**
      * Return an approximation of the memory consumption of this class in bytes.
      */
     std::size_t
@@ -1129,6 +1137,15 @@ namespace Portable
   MatrixFree<dim, Number>::get_mg_level() const
   {
     return mg_level;
+  }
+
+
+
+  template <int dim, typename Number>
+  inline bool
+  MatrixFree<dim, Number>::use_overlap_communication_computation() const
+  {
+    return overlap_communication_computation;
   }
 
 #endif
