@@ -2644,7 +2644,7 @@ ReferenceCell::face_to_cell_lines(
              {{3, 4, 5, X}},
              {{6, 7, 0, 3}},
              {{7, 8, 1, 4}},
-             {{8, 6, 5, 2}}}};
+             {{8, 6, 2, 5}}}};
 
           return table[face][standard_to_real_face_line(
             line, face, combined_face_orientation)];
