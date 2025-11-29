@@ -121,68 +121,6 @@ namespace Step80
 {
   using namespace dealii;
 
-  template <typename VectorType, typename BlockVectorType>
-  class StokesDLMALPreconditioner
-  {
-  public:
-    using PayloadType = dealii::TrilinosWrappers::internal::
-      LinearOperatorImplementation::TrilinosPayload;
-
-    StokesDLMALPreconditioner(
-      const LinearOperator<VectorType, VectorType> A11_inv_,
-      const LinearOperator<VectorType, VectorType> A22_inv_,
-      const LinearOperator<VectorType, VectorType> A12_,
-      const LinearOperator<VectorType, VectorType> Bt_,
-      const LinearOperator<VectorType, VectorType> Ct_,
-      const LinearOperator<VectorType, VectorType> invW_,
-      const LinearOperator<VectorType, VectorType> invMp_,
-      const LinearOperator<VectorType, VectorType> M_,
-      const double                                 gamma_fluid_,
-      const double                                 gamma_solid_,
-      const double                                 gamma_grad_div_)
-    {
-      // Aug_inv = Aug_inv_;
-      A11_inv        = A11_inv_;
-      A22_inv        = A22_inv_;
-      A12            = A12_;
-      Bt             = Bt_;
-      Ct             = Ct_;
-      invW           = invW_;
-      invMp          = invMp_;
-      M              = M_; // immersed
-      gamma_fluid    = gamma_fluid_;
-      gamma_solid    = gamma_solid_;
-      gamma_grad_div = gamma_grad_div_;
-    }
-
-    void vmult(BlockVectorType &v, const BlockVectorType &u) const
-    {
-      v.block(0) = 0.;
-      v.block(1) = 0.;
-      v.block(2) = 0.;
-      v.block(3) = 0.;
-
-      v.block(3) = -gamma_grad_div * invMp * u.block(3);
-      v.block(2) = -gamma_fluid * invW * u.block(2);
-      v.block(1) = A22_inv * (u.block(1) - M * v.block(2));
-      v.block(0) = A11_inv * (u.block(0) - A12 * v.block(1) - Ct * v.block(2) -
-                              Bt * v.block(3));
-    }
-
-    // LinearOperator<Vector<double>> Aug_inv;
-    LinearOperator<VectorType, VectorType> A11_inv;
-    LinearOperator<VectorType, VectorType> A22_inv;
-    LinearOperator<VectorType, VectorType> A12;
-    LinearOperator<VectorType, VectorType> Ct;
-    LinearOperator<VectorType, VectorType> Bt;
-    LinearOperator<VectorType, VectorType> invW;
-    LinearOperator<VectorType, VectorType> invMp;
-    LinearOperator<VectorType, VectorType> M;
-    double                                 gamma_fluid;
-    double                                 gamma_solid;
-    double                                 gamma_grad_div;
-  };
-
   std::pair<unsigned int, unsigned int>
   get_dimension_and_spacedimension(const ParameterHandler &prm)
   {
@@ -1578,17 +1516,19 @@ namespace Step80
     Mp_inv_ilu.initialize(fluid_preconditioner.block(1, 1));
     auto invMp = inverse_operator(Mp, cg_solver, Mp_inv_ilu);
 
-    TrilinosWrappers::PreconditionILU W_inv_ilu;
-    W_inv_ilu.initialize(solid_matrix.block(1, 1));
-    const auto   invM = inverse_operator(M, cg_solver, W_inv_ilu);
-    const double h    = GridTools::maximal_cell_diameter(solid_tria);
-    const auto   invW = invM;
+    TrilinosWrappers::PreconditionILU invM_ilu;
+    invM_ilu.initialize(solid_matrix.block(1, 1));
+    const auto   invM_ilu_op = linear_operator(M, invM_ilu);
+    const auto   invM        = inverse_operator(M, cg_solver, invM_ilu);
+    const double h           = GridTools::maximal_cell_diameter(solid_tria);
+    // const auto         invW = invM * invM;
+    const auto invW = invM_ilu_op * invM_ilu_op;
 
     auto A11_aug = A + par.gamma_AL_background * Ct * invW * C +
                    par.gamma_AL_background * Bt * invMp * B;
     auto A22_aug =
-      (1 / time_step) * K + par.gamma_AL_immersed * time_step * Dt * invM * D;
-    (1 / time_step) * K + par.gamma_AL_immersed *time_step *Dt *invM *D;
+      (1 / time_step) * K + par.gamma_AL_immersed * time_step * Dt * invW * D;
+    (1 / time_step) * K + par.gamma_AL_immersed *time_step *Dt *invW *D;
     auto A12_aug = par.gamma_AL_background * Ct * invW * D;
     auto A21_aug = par.gamma_AL_immersed * time_step * Dt * invW * C;
 
@@ -1612,7 +1552,6 @@ namespace Step80
       inverse_operator(A22_aug,
                        cg_solver_lagrangian,
                        amg_K); // inverse of solid displacement block
-
 
 
     // std::array<std::array<LinOp, 4>, 4> system_array = {
@@ -1698,7 +1637,6 @@ namespace Step80
     fluid_solution.block(1).add(-mean_pressure);
     fluid_locally_relevant_solution.block(1) = fluid_solution.block(1);
   }
-
 
 
   // @sect4{Mesh refinement}
