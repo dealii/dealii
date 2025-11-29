@@ -218,9 +218,9 @@ namespace Step80
     unsigned int inner_max_iterations            = 100;
     double       inner_tolerance                 = 1e-14;
     unsigned int outer_max_iterations            = 1000;
-    double       outer_tolerance                 = 1e-8;
+    double       outer_tolerance                 = 1e-5;
     unsigned int inner_lagrangian_max_iterations = 1000;
-    double       inner_lagrangian_tolerance      = 1e-4;
+    double       inner_lagrangian_tolerance      = 1e-2;
 
     using PrmFunction =
       ParameterAcceptorProxy<Functions::ParsedFunction<spacedim>>;
@@ -1502,8 +1502,8 @@ namespace Step80
     const auto Z4 = 0.0 * M;
     using BVec    = typename LA::MPI::BlockVector;
 
-    auto C  = D * P;
-    auto Ct = Pt * Dt;
+    auto C  = -1.0 * D * P;
+    auto Ct = -1.0 * Pt * Dt;
 
     // Inversion of the mass matrices
     SolverControl inner_solver_control(par.inner_max_iterations,
