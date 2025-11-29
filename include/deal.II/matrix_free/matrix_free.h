@@ -1690,6 +1690,19 @@ public:
     const unsigned int dof_handler_index = 0) const;
 
   /**
+   * Specialization of the method initialize_dof_vector() for the class
+   * LinearAlgebra::distributed::BlockVector@<Number@>.
+   *
+   * This function initializes a block vector with one block for every
+   * DoFHandler passed to reinit().
+   *
+   */
+  template <typename Number2, typename MemorySpace>
+  void
+  initialize_dof_vector(
+    LinearAlgebra::distributed::BlockVector<Number2, MemorySpace> &vec) const;
+
+  /**
    * Return the partitioner that represents the locally owned data and the
    * ghost indices where access is needed to for the cell loop. The
    * partitioner is constructed from the locally owned dofs and ghost dofs
@@ -2430,6 +2443,21 @@ MatrixFree<dim, Number, VectorizedArrayType>::initialize_dof_vector(
 {
   AssertIndexRange(comp, n_components());
   vec.reinit(dof_info[comp].vector_partitioner, task_info.communicator_sm);
+}
+
+
+
+template <int dim, typename Number, typename VectorizedArrayType>
+template <typename Number2, typename MemorySpace>
+inline void
+MatrixFree<dim, Number, VectorizedArrayType>::initialize_dof_vector(
+  LinearAlgebra::distributed::BlockVector<Number2, MemorySpace> &vec) const
+{
+  vec.reinit(n_components());
+  for (unsigned int c = 0; c < n_components(); ++c)
+    this->initialize_dof_vector(vec.block(c), c);
+
+  vec.collect_sizes();
 }
 
 
