@@ -1564,8 +1564,8 @@ namespace Step80
     const auto Z4 = 0.0 * M;
     using BVec    = typename LA::MPI::BlockVector;
 
-    auto Ct = Pt * Dt;
     auto C  = D * P;
+    auto Ct = Pt * Dt;
 
     // Inversion of the mass matrices
     SolverControl inner_solver_control(par.inner_max_iterations,
