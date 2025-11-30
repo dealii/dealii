@@ -2497,14 +2497,15 @@ namespace DoFTools
                                                  q_coll_dummy,
                                                  update_quadrature_points);
 
+        const IndexSet &locally_owned_dofs = dof_handler.locally_owned_dofs();
         std::vector<types::global_dof_index> local_dof_indices;
         for (const auto &cell : dof_handler.active_cell_iterators())
-          // Only work on locally relevant cells. Exclude cells
+          // Only work on locally owned cells. Exclude cells
           // without DoFs (e.g., if a cell has FE_Nothing associated
           // with it) because that trips up internal assertions about
           // using FEValues with quadrature formulas without
           // quadrature points.
-          if ((cell->is_artificial() == false) &&
+          if ((cell->is_locally_owned()) &&
               (cell->get_fe().n_dofs_per_cell() > 0))
             {
               hp_fe_values.reinit(cell);
@@ -2555,7 +2556,8 @@ namespace DoFTools
                             }
                         }
 
-                      support_points[local_dof_indices[i]] = points[i];
+                      if (locally_owned_dofs.is_element(local_dof_indices[i]))
+                        support_points[local_dof_indices[i]] = points[i];
                     }
                 }
             }
