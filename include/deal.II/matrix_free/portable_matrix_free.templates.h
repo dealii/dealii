@@ -22,6 +22,7 @@
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/graph_coloring.h>
 #include <deal.II/base/memory_space.h>
+#include <deal.II/base/work_stream.h>
 
 #include <deal.II/dofs/dof_tools.h>
 
@@ -80,19 +81,16 @@ namespace Portable
     private:
       MatrixFree<dim, Number> *data;
       const unsigned int       dof_handler_index;
-      // Local buffer
-      std::vector<types::global_dof_index> local_dof_indices;
-      FEValues<dim>                        fe_values;
+      FEValues<dim>            fe_values;
       // Convert the default dof numbering to a lexicographic one
-      const std::vector<unsigned int>     &lexicographic_inv;
-      std::vector<types::global_dof_index> lexicographic_dof_indices;
-      const unsigned int                   fe_degree;
-      const unsigned int                   n_components;
-      const unsigned int                   scalar_dofs_per_cell;
-      const unsigned int                   dofs_per_cell;
-      const unsigned int                   q_points_per_cell;
-      const UpdateFlags                   &update_flags;
-      const unsigned int                   padding_length;
+      const std::vector<unsigned int> &lexicographic_inv;
+      const unsigned int               fe_degree;
+      const unsigned int               n_components;
+      const unsigned int               scalar_dofs_per_cell;
+      const unsigned int               dofs_per_cell;
+      const unsigned int               q_points_per_cell;
+      const UpdateFlags               &update_flags;
+      const unsigned int               padding_length;
       dealii::internal::MatrixFreeFunctions::HangingNodes<dim> hanging_nodes;
     };
 
@@ -127,9 +125,6 @@ namespace Portable
       , padding_length(data->get_padding_length())
       , hanging_nodes(dof_handler.get_triangulation())
     {
-      local_dof_indices.resize(
-        data->dof_handler_data[dof_handler_index].dofs_per_cell);
-      lexicographic_dof_indices.resize(dofs_per_cell);
       fe_values.always_allow_check_for_cell_similarity(true);
     }
 
@@ -244,74 +239,112 @@ namespace Portable
         inv_jacobian_host =
           Kokkos::create_mirror_view(dof_data.inv_jacobian[color]);
 #endif
+      struct ScratchData
+      {
+        FEValues<dim>                        fe_values;
+        std::vector<types::global_dof_index> local_dof_indices;
+        std::vector<types::global_dof_index> lexicographic_dof_indices;
 
-      auto triacell = graph.cbegin(), end_cell = graph.cend();
-      for (unsigned int cell_id = 0; triacell != end_cell;
-           ++triacell, ++cell_id)
-        {
-          typename DoFHandler<dim>::cell_iterator cell(
-            &(dof_data.dof_handler->get_triangulation()),
-            (*triacell)->level(),
-            (*triacell)->index(),
-            dof_data.dof_handler);
+        explicit ScratchData(const FEValues<dim> &fe_values)
+          : fe_values(fe_values.get_mapping(),
+                      fe_values.get_fe(),
+                      fe_values.get_quadrature(),
+                      fe_values.get_update_flags())
+          , local_dof_indices(fe_values.dofs_per_cell)
+          , lexicographic_dof_indices(fe_values.dofs_per_cell)
+        {}
 
 
-          if (data->get_mg_level() == numbers::invalid_unsigned_int)
-            cell->get_dof_indices(local_dof_indices);
-          else
-            cell->get_mg_dof_indices(local_dof_indices);
+        ScratchData(const ScratchData &scratch)
+          : fe_values(scratch.fe_values.get_mapping(),
+                      scratch.fe_values.get_fe(),
+                      scratch.fe_values.get_quadrature(),
+                      scratch.fe_values.get_update_flags())
+          , local_dof_indices(scratch.local_dof_indices.size())
+          , lexicographic_dof_indices(scratch.lexicographic_dof_indices.size())
+        {}
+      };
 
-          // When using MPI, we need to transform the local_dof_indices, which
-          // contain global numbers of dof indices in the MPI universe, to get
-          // local (to the current MPI process) dof indices.
-          if (partitioner)
-            for (auto &index : local_dof_indices)
-              index = partitioner->global_to_local(index);
+      auto worker = [&](const unsigned int cell_id,
+                        ScratchData       &scratch_data,
+                        int & /*copy_data*/) {
+        std::vector<types::global_dof_index> &local_dof_indices =
+          scratch_data.local_dof_indices;
+        FEValues<dim> &fe_values = scratch_data.fe_values;
+        std::vector<types::global_dof_index> &lexicographic_dof_indices =
+          scratch_data.lexicographic_dof_indices;
 
-          for (unsigned int i = 0; i < dofs_per_cell; ++i)
-            lexicographic_dof_indices[i] =
-              local_dof_indices[lexicographic_inv[i]];
+        auto triacell = graph[cell_id];
 
-          const ArrayView<
-            dealii::internal::MatrixFreeFunctions::ConstraintKinds>
-            cell_id_view(&constraint_mask_host[cell_id * n_components],
-                         n_components);
+        typename DoFHandler<dim>::cell_iterator cell(
+          &(dof_data.dof_handler->get_triangulation()),
+          triacell->level(),
+          triacell->index(),
+          dof_data.dof_handler);
 
-          // Local smoothing levels do not have hanging nodes
-          if (data->get_mg_level() == numbers::invalid_unsigned_int)
-            hanging_nodes.setup_constraints(cell,
-                                            partitioner,
-                                            {lexicographic_inv},
-                                            lexicographic_dof_indices,
-                                            cell_id_view);
+        if (data->get_mg_level() == numbers::invalid_unsigned_int)
+          cell->get_dof_indices(local_dof_indices);
+        else
+          cell->get_mg_dof_indices(local_dof_indices);
 
-          for (unsigned int i = 0; i < dofs_per_cell; ++i)
-            local_to_global_host(i, cell_id) = lexicographic_dof_indices[i];
+        // When using MPI, we need to transform the local_dof_indices, which
+        // contain global numbers of dof indices in the MPI universe, to get
+        // local (to the current MPI process) dof indices.
+        if (partitioner)
+          for (auto &index : local_dof_indices)
+            index = partitioner->global_to_local(index);
 
-          fe_values.reinit(cell);
+        for (unsigned int i = 0; i < dofs_per_cell; ++i)
+          lexicographic_dof_indices[i] =
+            local_dof_indices[lexicographic_inv[i]];
 
-          // Quadrature points
-          if (update_flags & update_quadrature_points && dof_handler_index == 0)
-            {
-              for (unsigned int i = 0; i < q_points_per_cell; ++i)
-                q_points_host(i, cell_id) = fe_values.quadrature_point(i);
-            }
+        const ArrayView<dealii::internal::MatrixFreeFunctions::ConstraintKinds>
+          cell_id_view(&constraint_mask_host[cell_id * n_components],
+                       n_components);
 
-          if (update_flags & update_JxW_values)
-            {
-              for (unsigned int i = 0; i < q_points_per_cell; ++i)
-                JxW_host(i, cell_id) = fe_values.JxW(i);
-            }
+        // Local smoothing levels do not have hanging nodes
+        if (data->get_mg_level() == numbers::invalid_unsigned_int)
+          hanging_nodes.setup_constraints(cell,
+                                          partitioner,
+                                          {lexicographic_inv},
+                                          lexicographic_dof_indices,
+                                          cell_id_view);
 
-          if (update_flags & update_gradients)
-            {
-              for (unsigned int i = 0; i < q_points_per_cell; ++i)
-                for (unsigned int d = 0; d < dim; ++d)
-                  for (unsigned int e = 0; e < dim; ++e)
-                    inv_jacobian_host(i, cell_id, d, e) =
-                      fe_values.inverse_jacobian(i)[d][e];
-            }
-        }
+        for (unsigned int i = 0; i < dofs_per_cell; ++i)
+          local_to_global_host(i, cell_id) = lexicographic_dof_indices[i];
+
+        fe_values.reinit(cell);
+
+        // Quadrature points
+        if (update_flags & update_quadrature_points && dof_handler_index == 0)
+          {
+            for (unsigned int i = 0; i < q_points_per_cell; ++i)
+              q_points_host(i, cell_id) = fe_values.quadrature_point(i);
+          }
+
+        if (update_flags & update_JxW_values)
+          {
+            for (unsigned int i = 0; i < q_points_per_cell; ++i)
+              JxW_host(i, cell_id) = fe_values.JxW(i);
+          }
+
+        if (update_flags & update_gradients)
+          {
+            for (unsigned int i = 0; i < q_points_per_cell; ++i)
+              for (unsigned int d = 0; d < dim; ++d)
+                for (unsigned int e = 0; e < dim; ++e)
+                  inv_jacobian_host(i, cell_id, d, e) =
+                    fe_values.inverse_jacobian(i)[d][e];
+          }
+      };
+
+
+      WorkStream::run(0,
+                      graph.size(),
+                      worker,
+                      std::function<void(const int)>(),
+                      ScratchData(fe_values),
+                      0);
 
       // Copy the data to the device
       Kokkos::deep_copy(exec_space,
