@@ -285,15 +285,9 @@ do_test(const std::vector<const DoFHandler<dim> *> &dof)
   fine_matrix.initialize(fine_level_data);
   fine_matrix.compute_diagonal();
 
-  LinearAlgebra::distributed::BlockVector<number> in(nb), sol(nb);
-  for (unsigned int b = 0; b < nb; ++b)
-    {
-      fine_level_data->initialize_dof_vector(in.block(b), b);
-      fine_level_data->initialize_dof_vector(sol.block(b), b);
-    }
-
-  in.collect_sizes();
-  sol.collect_sizes();
+  LinearAlgebra::distributed::BlockVector<number> in, sol;
+  fine_level_data->initialize_dof_vector(in);
+  fine_level_data->initialize_dof_vector(sol);
 
   // set constant rhs vector
   {
