@@ -2283,13 +2283,17 @@ namespace DoFTools
    * object is deleted in this function.
    * @param[in] mask An optional component mask that restricts the
    * components from which the support points are extracted.
+   * @param[in] map_locally_relevant_dofs If this is set to false, then
+   * only the support points of locally owned DoFs are mapped. If true, then the
+   * support points of all locally relevant DoFs are mapped.
    */
   template <int dim, int spacedim>
   void
   map_dofs_to_support_points(const Mapping<dim, spacedim>    &mapping,
                              const DoFHandler<dim, spacedim> &dof_handler,
                              std::vector<Point<spacedim>>    &support_points,
-                             const ComponentMask             &mask = {});
+                             const ComponentMask             &mask = {},
+                             const bool map_locally_relevant_dofs  = true);
 
   /**
    * Same as the previous function but for the hp-case.
@@ -2300,7 +2304,8 @@ namespace DoFTools
     const hp::MappingCollection<dim, spacedim> &mapping,
     const DoFHandler<dim, spacedim>            &dof_handler,
     std::vector<Point<spacedim>>               &support_points,
-    const ComponentMask                        &mask = {});
+    const ComponentMask                        &mask = {},
+    const bool map_locally_relevant_dofs             = true);
 
   /**
    * This function is a version of the above map_dofs_to_support_points
@@ -2328,6 +2333,9 @@ namespace DoFTools
    *   which cell of the triangulation.
    * @param[in] mask An optional component mask that restricts the
    *   components from which the support points are extracted.
+   * @param[in] map_locally_relevant_dofs If this is set to false, then
+   * only the support points of locally owned DoFs are mapped. If true, then the
+   * support points of all locally relevant DoFs are mapped.
    * @return A map that for every locally relevant DoF
    *   index contains the corresponding location in real space coordinates.
    */
@@ -2335,7 +2343,8 @@ namespace DoFTools
   std::map<types::global_dof_index, Point<spacedim>>
   map_dofs_to_support_points(const Mapping<dim, spacedim>    &mapping,
                              const DoFHandler<dim, spacedim> &dof_handler,
-                             const ComponentMask             &mask = {});
+                             const ComponentMask             &mask = {},
+                             const bool map_locally_relevant_dofs  = true);
 
   /**
    * Same as the previous function but for the hp-case.
@@ -2345,7 +2354,8 @@ namespace DoFTools
   map_dofs_to_support_points(
     const hp::MappingCollection<dim, spacedim> &mapping,
     const DoFHandler<dim, spacedim>            &dof_handler,
-    const ComponentMask                        &mask = {});
+    const ComponentMask                        &mask = {},
+    const bool map_locally_relevant_dofs             = true);
 
   /**
    * A version of the function of same name that returns the map via its third
@@ -2358,7 +2368,8 @@ namespace DoFTools
     const Mapping<dim, spacedim>                       &mapping,
     const DoFHandler<dim, spacedim>                    &dof_handler,
     std::map<types::global_dof_index, Point<spacedim>> &support_points,
-    const ComponentMask                                &mask = {});
+    const ComponentMask                                &mask = {},
+    const bool map_locally_relevant_dofs                     = true);
 
   /**
    * A version of the function of same name that returns the map via its third
@@ -2371,7 +2382,8 @@ namespace DoFTools
     const hp::MappingCollection<dim, spacedim>         &mapping,
     const DoFHandler<dim, spacedim>                    &dof_handler,
     std::map<types::global_dof_index, Point<spacedim>> &support_points,
-    const ComponentMask                                &mask = {});
+    const ComponentMask                                &mask = {},
+    const bool map_locally_relevant_dofs                     = true);
 
 
   /**
