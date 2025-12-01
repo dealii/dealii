@@ -93,7 +93,7 @@ namespace Step64
     const unsigned int                                      cell,
     const unsigned int                                      q) const
   {
-    const unsigned int pos = gpu_data->local_q_point_id(cell, n_q_points, q);
+    const unsigned int pos     = gpu_data->local_q_point_id(cell, q);
     const Point<dim>   q_point = gpu_data->get_quadrature_point(cell, q);
 
     double p_square = 0.;
@@ -154,9 +154,8 @@ namespace Step64
     const typename Portable::MatrixFree<dim, double>::Data *data =
       fe_eval->get_matrix_free_data();
 
-    const unsigned int position =
-      data->local_q_point_id(cell_index, n_q_points, q_point);
-    auto coeff = coef[position];
+    const unsigned int position = data->local_q_point_id(cell_index, q_point);
+    auto               coeff    = coef[position];
 
     auto value = fe_eval->get_value(q_point);
 

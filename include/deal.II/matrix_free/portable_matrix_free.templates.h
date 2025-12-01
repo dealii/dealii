@@ -509,6 +509,7 @@ namespace Portable
         const int cell_index = team_member.league_rank();
 
         typename MatrixFree<dim, Number>::Data data{team_member,
+                                                    Functor::n_q_points,
                                                     n_dof_handler,
                                                     cell_index,
                                                     precomputed_data,
@@ -854,6 +855,7 @@ namespace Portable
                     shared_data;
 
                   Data data{team_member,
+                            n_q_points,
                             n_dof_handler,
                             cell_index,
                             colored_data,
