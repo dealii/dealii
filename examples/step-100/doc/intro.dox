@@ -17,6 +17,10 @@ This equation naturally arises when one is interested in time-harmonic processes
 
 Among the numerical difficulties that arise from this equation, one that is really challenging is the indefiniteness of the operator. It hinders the ability of classical iterative methods to solve the linear system of equations. Furthermore, most blackbox preconditioners fail to improve convergence as explained in details by <a href="https://www.unige.ch/~gander/Preprints/HelmholtzReview.pdf">O. Ernst and M. J. Gander.</a> A solution to this problem is to make our discretized system of equations positive definite, which brings us to the subject of this tutorial, the <a href="https://www.cambridge.org/core/services/aop-cambridge-core/content/view/71BCF32CDE92B0924051FA31E8F54DC2/S0962492924000102a.pdf/discontinuous_petrovgalerkin_method.pdf"> Discontinuous Petrov-Galerkin (DPG) method</a>. This approach can be classified as a residual minimization method and always yields an Hermitian positive definite stiffness matrix system. It follows that using this method allows for the use of the preconditioned conjugate gradient (CG) linear solver instead of a direct solver.
 
+The numerical implementation of DPG shares many similarities with hybridizable discontinuous Galerkin (HDG) methods. In particular, it relies on trace elements to couple neighboring cells and on discontinuous Galerkin elements for the interior unknowns. The resulting linear system has a structure analogous to that of HDG methods, allowing static condensation to reduce the system size by eliminating interior unknowns through a Schur-complement procedure.
+
+For readers who want to learn more about the implementation of trace unknowns, static condensation, and HDG formulations, step-51 provides a detailed introduction.
+
 
 <h3>The time-harmonic Helmholtz equation</h3>
 
@@ -65,7 +69,6 @@ It has been shown from previous DPG studies that the ultraweak formulation of th
 
 <h3>The Discontinuous Petrov-Galerkin Method</h3>
 
-<!-- Introduction of the DPG method. -->
 There are numerous papers that describe the mathematics behind the DPG method, here we will focus mainly on the key elements necessary to understand the numerical implementation. Let’s start with a standard abstract problem defined on the product of the trial and test Hilbert spaces $U \times V$ such that:
 @f{equation*}{
     \begin{cases}
@@ -130,10 +133,6 @@ where the $\dagger$ symbol is used to denote the conjugate transpose operation. 
 
 <h4>Polynomial space</h4>
 
-<!-- Interpolation space for the trace and within the elmeent (trial space) -->
-<!-- Test space minimal order of the test space -->
-<!-- Energy norm -->
-
 As presented above, the DPG method is based on the idea that the test space is not bound to the same space as the one for the trial space and that it can be chosen to maximize the accuracy and the stability of the numerical method. Consequently, to implement the DPG method for any set of equations, one needs to be able to discretize the whole exact sequence of energy spaces, which in 3D takes the form:
 @f[
     H^1
@@ -161,7 +160,6 @@ In addition, the continuity requirements along faces and edges (the skeleton of 
 
 <h4>Application to the acoustic Helmholtz equation</h4>
 
-<!-- Application to ultra-weak form of Helmholtz equation-->
 Now if we apply the DPG method to the acoustic Helmholtz ultraweak formulation presented above, we get the following :
 @f{align*}{
 & p^* \in L^2(\Omega), \mathbf{u} \in (L^2(\Omega))^d \\
