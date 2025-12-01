@@ -141,10 +141,6 @@ public:
     Portable::FEEvaluation<dim, degree_u, n_q_points_1d, dim, Number> &fe_u,
     Portable::FEEvaluation<dim, degree_p, n_q_points_1d, 1, Number>   &fe_p,
     int q_point) const;
-
-private:
-  const typename Portable::MatrixFree<dim, Number>::Data *gpu_data;
-  int                                                     cell;
 };
 
 
