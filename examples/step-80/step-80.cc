@@ -1532,7 +1532,8 @@ namespace Step80
     M_inv_ilu.initialize(solid_matrix.block(1, 1));
     auto         invM = inverse_operator(M, cg_solver, M_inv_ilu);
     const double h    = GridTools::maximal_cell_diameter(solid_tria);
-    const auto   invW = invM;
+    //  const auto   invW = invM;
+    const auto invW = linear_operator(M, M_inv_ilu);
 
     const auto gamma1 = par.gamma_AL_background;
     const auto gamma2 = par.gamma_AL_immersed * time_step;
