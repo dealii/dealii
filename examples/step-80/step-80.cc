@@ -121,67 +121,7 @@ namespace Step80
 {
   using namespace dealii;
 
-  template <typename VectorType, typename BlockVectorType>
-  class StokesDLMALPreconditioner
-  {
-  public:
-    using PayloadType = dealii::TrilinosWrappers::internal::
-      LinearOperatorImplementation::TrilinosPayload;
 
-    StokesDLMALPreconditioner(
-      const LinearOperator<VectorType, VectorType> A11_inv_,
-      const LinearOperator<VectorType, VectorType> A22_inv_,
-      const LinearOperator<VectorType, VectorType> A12_,
-      const LinearOperator<VectorType, VectorType> Bt_,
-      const LinearOperator<VectorType, VectorType> Ct_,
-      const LinearOperator<VectorType, VectorType> invW_,
-      const LinearOperator<VectorType, VectorType> invMp_,
-      const LinearOperator<VectorType, VectorType> M_,
-      const double                                 gamma_fluid_,
-      const double                                 gamma_solid_,
-      const double                                 gamma_grad_div_)
-    {
-      // Aug_inv = Aug_inv_;
-      A11_inv        = A11_inv_;
-      A22_inv        = A22_inv_;
-      A12            = A12_;
-      Bt             = Bt_;
-      Ct             = Ct_;
-      invW           = invW_;
-      invMp          = invMp_;
-      M              = M_; // immersed
-      gamma_fluid    = gamma_fluid_;
-      gamma_solid    = gamma_solid_;
-      gamma_grad_div = gamma_grad_div_;
-    }
-
-    void vmult(BlockVectorType &v, const BlockVectorType &u) const
-    {
-      v.block(0) = 0.;
-      v.block(1) = 0.;
-      v.block(2) = 0.;
-      v.block(3) = 0.;
-
-      v.block(3) = -gamma_grad_div * invMp * u.block(3);
-      v.block(2) = -gamma_fluid * invW * u.block(2);
-      v.block(1) = A22_inv * (u.block(1) - M * v.block(2));
-      v.block(0) = A11_inv * (u.block(0) - A12 * v.block(1) - Ct * v.block(2) -
-                              Bt * v.block(3));
-    }
-
-    // LinearOperator<Vector<double>> Aug_inv;
-    LinearOperator<VectorType, VectorType> A11_inv;
-    LinearOperator<VectorType, VectorType> A22_inv;
-    LinearOperator<VectorType, VectorType> A12;
-    LinearOperator<VectorType, VectorType> Ct;
-    LinearOperator<VectorType, VectorType> Bt;
-    LinearOperator<VectorType, VectorType> invW;
-    LinearOperator<VectorType, VectorType> invMp;
-    LinearOperator<VectorType, VectorType> M;
-    double                                 gamma_fluid;
-    double                                 gamma_solid;
-    double                                 gamma_grad_div;
-  };
 
   std::pair<unsigned int, unsigned int>
   get_dimension_and_spacedimension(const ParameterHandler &prm)
@@ -1574,8 +1514,8 @@ namespace Step80
     const auto Z4 = 0.0 * M;
     using BVec    = typename LA::MPI::BlockVector;
 
-    auto MC  = -time_step * D * P;
-    auto CtM = -time_step * Pt * Dt;
+    auto C  = -time_step * D * P;
+    auto Ct = -time_step * Pt * Dt;
 
     // Inversion of the mass matrices
     SolverControl inner_solver_control(par.inner_max_iterations,
@@ -1597,10 +1537,10 @@ namespace Step80
     const auto gamma1 = par.gamma_AL_background;
     const auto gamma2 = par.gamma_AL_immersed * time_step;
 
-    auto A11_aug = A + gamma1 * Pt * M * P + gamma1 * Bt * invMp * B;
+    auto A11_aug = A + gamma1 * Ct * invW * C + gamma1 * Bt * invMp * B;
     auto A22_aug = (1 / time_step) * K + gamma2 * Dt * invW * D;
-    auto A12_aug = gamma1 * CtM * invW * D;
-    auto A21_aug = gamma2 * Dt * invW * MC;
+    auto A12_aug = gamma1 * Ct * invW * D;
+    auto A21_aug = gamma2 * Dt * invW * C;
 
     SolverControl inner_solver_control_lagrangian(
       par.inner_lagrangian_max_iterations,
@@ -1623,18 +1563,6 @@ namespace Step80
                        cg_solver_lagrangian,
                        amg_K); // inverse of solid displacement block
 
-    StokesDLMALPreconditioner<Vec, BVec> prec_AL(A11_aug_inv,
-                                                 A22_aug_inv,
-                                                 A12_aug,
-                                                 Bt,
-                                                 CtM,
-                                                 invW,
-                                                 invMp,
-                                                 Dt,
-                                                 gamma1,
-                                                 gamma2,
-                                                 gamma1);
-
 
     // std::array<std::array<LinOp, 4>, 4> system_array = {
     //   {{{A, Z1t, CtM, Bt}},  // vel
@@ -1643,20 +1571,36 @@ namespace Step80
     //    {{B, Z2, Z3t, Z6}}}}; // pres
 
     std::array<std::array<LinOp, 4>, 4> system_array = {
-      {{{A11_aug, A12_aug, CtM, Bt}}, // vel
+      {{{A11_aug, A12_aug, Ct, Bt}},  // vel
        {{A21_aug, A22_aug, Dt, Z2t}}, // disp
-       {{MC, D, Z4, Z3}},             // lagr
+       {{C, D, Z4, Z3}},              // lagr
        {{B, Z2, Z3t, Z6}}}};          // pres
 
-    const auto system = block_operator<4, 4, BVec>(system_array);
-    BVec       block_system_rhs(4), block_system_solution(4);
+    const auto system  = block_operator<4, 4, BVec>(system_array);
+    auto       prec_AL = system;
+
+    prec_AL.vmult = [&](auto &v, const auto &u) {
+      v.block(0) = 0.;
+      v.block(1) = 0.;
+      v.block(2) = 0.;
+      v.block(3) = 0.;
+
+      v.block(3) = -gamma1 * invMp * u.block(3);
+      v.block(2) = -gamma1 * invW * u.block(2);
+      v.block(1) = A22_aug_inv * (u.block(1) - Dt * v.block(2));
+      v.block(0) = A11_aug_inv * (u.block(0) - A12_aug * v.block(1) -
+                                  Ct * v.block(2) - Bt * v.block(3));
+    };
+
+
+
+    BVec block_system_rhs(4), block_system_solution(4);
     block_system_rhs.block(0) = fluid_system_rhs.block(0);
     block_system_rhs.block(1) = solid_system_rhs.block(0);
     block_system_rhs.block(2) = solid_system_rhs.block(1);
     block_system_rhs.block(3) = fluid_system_rhs.block(1);
 
-    block_system_rhs.block(0) +=
-      gamma1 * CtM * invW * block_system_rhs.block(2);
+    block_system_rhs.block(0) += gamma1 * Ct * invW * block_system_rhs.block(2);
     block_system_rhs.block(1) += gamma2 * Dt * invW * block_system_rhs.block(2);
 
 
