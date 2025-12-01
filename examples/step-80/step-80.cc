@@ -481,6 +481,8 @@ namespace Step80
     LA::MPI::BlockVector fluid_locally_relevant_solution;
     LA::MPI::BlockVector fluid_locally_relevant_solution_old;
     LA::MPI::BlockVector fluid_system_rhs;
+    LA::MPI::BlockVector fluid_dual_of_constant_pressure;
+    LA::MPI::BlockVector fluid_constant_pressure;
 
     LA::MPI::BlockVector solid_solution;
     LA::MPI::BlockVector solid_locally_relevant_solution;
@@ -846,6 +848,15 @@ namespace Step80
                                                mpi_communicator);
     fluid_system_rhs.reinit(fluid_owned_dofs, mpi_communicator);
     fluid_solution.reinit(fluid_owned_dofs, mpi_communicator);
+    fluid_dual_of_constant_pressure.reinit(fluid_owned_dofs, mpi_communicator);
+
+    VectorTools::create_right_hand_side(
+      fluid_dh,
+      QGauss<spacedim>(fluid_fe->degree + 1),
+      ComponentSelectFunction<spacedim>(spacedim, 1.0, spacedim + 1),
+      fluid_dual_of_constant_pressure,
+      fluid_constraints);
+
 
     // Setup system for the solid mechanics component
     {
@@ -1518,19 +1529,20 @@ namespace Step80
 
     TrilinosWrappers::PreconditionILU invM_ilu;
     invM_ilu.initialize(solid_matrix.block(1, 1));
-    const auto   invM_ilu_op = linear_operator(M, invM_ilu);
-    const auto   invM        = inverse_operator(M, cg_solver, invM_ilu);
-    const double h           = GridTools::maximal_cell_diameter(solid_tria);
-    // const auto         invW = invM * invM;
-    const auto invW = invM_ilu_op * invM_ilu_op;
+    const auto   invM = inverse_operator(M, cg_solver, invM_ilu);
+    const double h    = GridTools::maximal_cell_diameter(solid_tria);
+    const auto   invW = invM * invM;
+    // const auto   invM_ilu_op = linear_operator(M, invM_ilu);
+    // const auto invW = invM_ilu_op * invM_ilu_op;
 
-    auto A11_aug = A + par.gamma_AL_background * Ct * invW * C +
-                   par.gamma_AL_background * Bt * invMp * B;
-    auto A22_aug =
-      (1 / time_step) * K + par.gamma_AL_immersed * time_step * Dt * invW * D;
-    (1 / time_step) * K + par.gamma_AL_immersed *time_step *Dt *invW *D;
-    auto A12_aug = par.gamma_AL_background * Ct * invW * D;
-    auto A21_aug = par.gamma_AL_immersed * time_step * Dt * invW * C;
+    const auto gamma1 = par.gamma_AL_background;
+    const auto gamma2 = par.gamma_AL_immersed * time_step;
+
+    auto A11_aug = A + gamma1 * (Ct * invW * C + Bt * invMp * B);
+    auto A22_aug = (1 / time_step) * K + gamma2 * Dt * invW * D;
+
+    auto A12_aug = gamma1 * Ct * invW * D;
+    auto A21_aug = gamma2 * Dt * invW * C;
 
     SolverControl inner_solver_control_lagrangian(
       par.inner_lagrangian_max_iterations,
@@ -1576,8 +1588,8 @@ namespace Step80
       v.block(2) = 0.;
       v.block(3) = 0.;
 
-      v.block(3) = -par.gamma_AL_background * invMp * u.block(3);
-      v.block(2) = -par.gamma_AL_immersed * time_step * invW * u.block(2);
+      v.block(3) = -gamma1 * invMp * u.block(3);
+      v.block(2) = -gamma2 * invW * u.block(2);
       v.block(1) = A22_aug_inv * (u.block(1) - Dt * v.block(2));
       v.block(0) = A11_aug_inv * (u.block(0) - A12_aug * v.block(1) -
                                   Ct * v.block(2) - Bt * v.block(3));
@@ -1590,11 +1602,8 @@ namespace Step80
     block_system_rhs.block(2) = solid_system_rhs.block(1);
     block_system_rhs.block(3) = fluid_system_rhs.block(1);
 
-    block_system_rhs.block(0) +=
-      par.gamma_AL_background * Ct * invW * block_system_rhs.block(2);
-    block_system_rhs.block(1) +=
-      par.gamma_AL_immersed * time_step * Dt * invW * block_system_rhs.block(2);
-
+    block_system_rhs.block(0) += gamma1 * Ct * invW * block_system_rhs.block(2);
+    block_system_rhs.block(1) += gamma2 * Dt * invW * block_system_rhs.block(2);
 
     block_system_solution.reinit(block_system_rhs);
     block_system_solution.block(0) =
@@ -1625,18 +1634,22 @@ namespace Step80
 
     fluid_constraints.distribute(fluid_solution);
 
+    if (fluid_constant_pressure.size() == 0)
+      {
+        fluid_constant_pressure.reinit(fluid_solution);
+        fluid_constant_pressure.block(1) =
+          invMp * fluid_dual_of_constant_pressure.block(1);
+      }
+
+    const auto avg_pressure = fluid_dual_of_constant_pressure * fluid_solution;
+
+    fluid_solution.block(1).add(-avg_pressure,
+                                fluid_constant_pressure.block(1));
+
     fluid_locally_relevant_solution = fluid_solution;
     solid_locally_relevant_solution = solid_solution;
-
-    const double mean_pressure =
-      VectorTools::compute_mean_value(fluid_dh,
-                                      QGauss<spacedim>(par.velocity_degree + 2),
-                                      fluid_locally_relevant_solution,
-                                      spacedim);
-
-    fluid_solution.block(1).add(-mean_pressure);
-    fluid_locally_relevant_solution.block(1) = fluid_solution.block(1);
   }
+
 
 
   // @sect4{Mesh refinement}
