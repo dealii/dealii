@@ -1,56 +1,53 @@
 set dimension       = 2
 set space dimension = 2
 subsection Navier-Stokes Immersed Problem
+  set Velocity degree                       = 2
+  set Displacement degree                   = 2
+  set Lagrange multiplier degree            = 1
   set Density                               = 1
   set Dirichlet boundary ids                = 0,1,2,3
-  set Final time                            = 1
+  set Final time                            = 20
   set Fluid bounding boxes extraction level = 1
-  set Initial fluid refinement              = 4
-  set Initial solid refinement              = 2
-  set Lame lambda                           = 1
-  set Lame mu                               = 1
-  set Number of time steps                  = 11
+  set Initial fluid refinement              = 5
+  set Initial solid refinement              = 3
+  set Lame lambda                           = 1000
+  set Lame mu                               = 1000
+  set Number of time steps                  = 101
   set Output directory                      = .
   set Output frequency                      = 1
   set Tracer particle insertion refinement  = 3
-  set Velocity degree                       = 2
   set Viscosity                             = 1
   subsection Grid generation
-    set Fluid grid generator                     = hyper_rectangle
     set Fluid grid generator                     = hyper_cube
-    set Fluid grid generator arguments           = -2,-1: 2,1: false
     set Fluid grid generator arguments           = -1: 1: true
     set Solid grid generator                     = hyper_ball
     set Solid grid generator arguments           = -.1, 0.0: 0.3: false
     set Tracer particle grid generator           = hyper_ball
     set Tracer particle grid generator arguments = 0.3, 0.3: 0.1: false
   end
-  subsection Navier-Stokes boundary conditions
-    set Function constants  =
-    set Function expression = 1; 0; 0
-    set Function expression = if(y>0.9999, 1, 0);0;0
-    set Variable names      = x,y,t
-  end
-  subsection Navier-Stokes initial conditions
-    set Function constants  =
-    set Function expression = if(y>0.9999, 1, 0);0;0
-    set Function expression = 1; 0; 0
-    set Function expression = 0; 0; 0
-    set Variable names      = x,y,t
-  end
   subsection Initial displacement and multiplier
     set Function constants  =
     set Function expression = 0; 0; 0; 0
     set Variable names      = x,y,t
   end
-  subsection Reference configuration and multiplier
+  subsection Navier-Stokes boundary conditions
     set Function constants  =
-    set Function expression = x; y; 0; 0
+    set Function expression = if(y>0.9999, 1, 0);0;0
+    set Variable names      = x,y,t
+  end
+  subsection Navier-Stokes initial conditions
+    set Function constants  =
+    set Function expression = 0; 0; 0
     set Variable names      = x,y,t
   end
   subsection Navier-Stokes right hand side
     set Function constants  =
     set Function expression = 0;0;0
+    set Variable names      = x,y,t
+  end
+  subsection Reference configuration and multiplier
+    set Function constants  =
+    set Function expression = x; y; 0; 0
     set Variable names      = x,y,t
   end
   subsection Refinement and remeshing
@@ -66,5 +63,15 @@ subsection Navier-Stokes Immersed Problem
     set Function constants  =
     set Function expression = 0;0;0;0
     set Variable names      = x,y,t
+  end
+  subsection Solver parameters
+    set Gamma AL background                        = 100
+    set Gamma AL immersed                          = 0.01
+    set Inner Lagrangian solver maximum iterations = 1000
+    set Inner Lagrangian solver tolerance          = 1e-4
+    set Inner solver maximum iterations            = 100
+    set Inner solver tolerance                     = 1e-14
+    set Outer solver maximum iterations            = 1000
+    set Outer solver tolerance                     = 1e-5
   end
 end
