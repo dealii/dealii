@@ -692,8 +692,8 @@ namespace Step80
     fluid_fe =
       std::make_unique<FESystem<spacedim>>(FE_Q<spacedim>(par.velocity_degree),
                                            spacedim,
-                                           FE_Q<spacedim>(
-                                             //  FE_DGPNonparametric<spacedim>(
+                                           //  FE_Q<spacedim>(
+                                           FE_DGP<spacedim>(
                                              par.velocity_degree - 1),
                                            1);
 
@@ -703,7 +703,7 @@ namespace Step80
       spacedim,
       par.lagrange_multiplier_degree == 0 ?
         *FE_DGQ<dim, spacedim>(0).clone() :
-        *FE_Q<dim, spacedim>(par.lagrange_multiplier_degree).clone(),
+        *FE_DGQ<dim, spacedim>(par.lagrange_multiplier_degree).clone(),
       spacedim);
   }
 
@@ -1948,10 +1948,11 @@ int main(int argc, char *argv[])
 {
   using namespace Step80;
   using namespace dealii;
-  deallog.depth_console(10);
   try
     {
       Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
+      deallog.depth_console(
+        Utilities::MPI::this_mpi_process(MPI_COMM_WORLD) == 0 ? 10 : 0);
 
       std::string prm_file;
       if (argc > 1)
