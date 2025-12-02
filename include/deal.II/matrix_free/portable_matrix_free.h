@@ -995,30 +995,51 @@ namespace Portable
     /**
      * Kokkos::View of quadrature points on the host.
      */
+#if DEAL_II_KOKKOS_VERSION_GTE(5, 0, 0)
+    typename Kokkos::View<Point<dim, Number> **,
+                          MemorySpace::Default::kokkos_space>::host_mirror_type
+#else
     typename Kokkos::View<Point<dim, Number> **,
                           MemorySpace::Default::kokkos_space>::HostMirror
+#endif
       q_points;
 
     /**
      * Map the position in the local vector to the position in the global
      * vector.
      */
+#if DEAL_II_KOKKOS_VERSION_GTE(5, 0, 0)
+    typename Kokkos::View<types::global_dof_index **,
+                          MemorySpace::Default::kokkos_space>::host_mirror_type
+#else
     typename Kokkos::View<types::global_dof_index **,
                           MemorySpace::Default::kokkos_space>::HostMirror
+#endif
       local_to_global;
 
     /**
      * Kokkos::View of inverse Jacobians on the host.
      */
+#if DEAL_II_KOKKOS_VERSION_GTE(5, 0, 0)
+    typename Kokkos::View<Number **[dim][dim],
+                          MemorySpace::Default::kokkos_space>::host_mirror_type
+#else
     typename Kokkos::View<Number **[dim][dim],
                           MemorySpace::Default::kokkos_space>::HostMirror
+#endif
       inv_jacobian;
 
     /**
      * Kokkos::View of Jacobian times the weights on the host.
      */
+#if DEAL_II_KOKKOS_VERSION_GTE(5, 0, 0)
     typename Kokkos::View<Number **,
-                          MemorySpace::Default::kokkos_space>::HostMirror JxW;
+                          MemorySpace::Default::kokkos_space>::host_mirror_type
+#else
+    typename Kokkos::View<Number **,
+                          MemorySpace::Default::kokkos_space>::HostMirror
+#endif
+      JxW;
 
     /**
      * Number of cells.
@@ -1038,9 +1059,16 @@ namespace Portable
     /**
      * Mask deciding where constraints are set on a given cell.
      */
+#if DEAL_II_KOKKOS_VERSION_GTE(5, 0, 0)
     typename Kokkos::View<
       dealii::internal::MatrixFreeFunctions::ConstraintKinds *,
-      MemorySpace::Default::kokkos_space>::HostMirror constraint_mask;
+      MemorySpace::Default::kokkos_space>::host_mirror_type
+#else
+    typename Kokkos::View<
+      dealii::internal::MatrixFreeFunctions::ConstraintKinds *,
+      MemorySpace::Default::kokkos_space>::HostMirror
+#endif
+      constraint_mask;
 
     /**
      * If true, use graph coloring has been used and we can simply add into

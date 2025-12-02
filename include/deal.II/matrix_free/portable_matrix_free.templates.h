@@ -208,12 +208,21 @@ namespace Portable
       auto constraint_mask_host =
         Kokkos::create_mirror_view(dof_data.constraint_mask[color]);
 
+#if DEAL_II_KOKKOS_VERSION_GTE(5, 0, 0)
+      typename std::remove_reference_t<
+        decltype(data->q_points[color])>::host_mirror_type q_points_host;
+      typename std::remove_reference_t<
+        decltype(dof_data.JxW[color])>::host_mirror_type JxW_host;
+      typename std::remove_reference_t<decltype(dof_data.inv_jacobian[color])>::
+        host_mirror_type inv_jacobian_host;
+#else
       typename std::remove_reference_t<
         decltype(data->q_points[color])>::HostMirror q_points_host;
       typename std::remove_reference_t<
         decltype(dof_data.JxW[color])>::HostMirror JxW_host;
       typename std::remove_reference_t<
         decltype(dof_data.inv_jacobian[color])>::HostMirror inv_jacobian_host;
+#endif
 #if DEAL_II_KOKKOS_VERSION_GTE(3, 6, 0)
       auto local_to_global_host =
         Kokkos::create_mirror_view(Kokkos::WithoutInitializing,
