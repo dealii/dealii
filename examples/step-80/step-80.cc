@@ -170,12 +170,19 @@ namespace Step80
     NavierStokesImmersedProblemParameters();
 
     void set_time(const double &time) const;
+    void initialize_finite_elements_from_names();
 
     std::string output_directory = ".";
 
-    unsigned int velocity_degree            = 2;
-    unsigned int displacement_degree        = 1;
-    unsigned int lagrange_multiplier_degree = 0;
+    std::string velocity_fe_name;
+    std::string pressure_fe_name;
+    std::string displacement_fe_name;
+    std::string lagrange_multiplier_fe_name;
+
+    std::unique_ptr<FiniteElement<spacedim>>      velocity_fe;
+    std::unique_ptr<FiniteElement<spacedim>>      pressure_fe;
+    std::unique_ptr<FiniteElement<dim, spacedim>> displacement_fe;
+    std::unique_ptr<FiniteElement<dim, spacedim>> lagrange_multiplier_fe;
 
     unsigned int number_of_time_steps = 501;
     double       final_time           = 1.0;
@@ -255,18 +262,30 @@ namespace Step80
     , solid_reference_configuration("Reference configuration and multiplier",
                                     2 * spacedim)
   {
-    add_parameter(
-      "Velocity degree", velocity_degree, "", this->prm, Patterns::Integer(1));
-    add_parameter("Displacement degree",
-                  displacement_degree,
-                  "",
-                  this->prm,
-                  Patterns::Integer(1));
-    add_parameter("Lagrange multiplier degree",
-                  lagrange_multiplier_degree,
-                  "",
-                  this->prm,
-                  Patterns::Integer(0));
+    velocity_fe_name            = "FE_Q<" + std::to_string(spacedim) + ">(2)";
+    pressure_fe_name            = "FE_DGP<" + std::to_string(spacedim) + ">(1)";
+    displacement_fe_name        = "FE_Q<" + std::to_string(dim) + ">(1)";
+    lagrange_multiplier_fe_name = "FE_DGQ<" + std::to_string(dim) + ">(0)";
+    initialize_finite_elements_from_names();
+
+    enter_subsection("Finite element spaces");
+    {
+      add_parameter("Velocity",
+                    velocity_fe_name,
+                    "Finite element used for the fluid velocity (scalar FE "
+                    "description)");
+      add_parameter("Pressure",
+                    pressure_fe_name,
+                    "Finite element used for the fluid pressure (scalar FE "
+                    "description)");
+      add_parameter("Displacement",
+                    displacement_fe_name,
+                    "Finite element used for the solid displacement");
+      add_parameter("Lagrange multiplier",
+                    lagrange_multiplier_fe_name,
+                    "Finite element used for the solid Lagrange multiplier");
+    }
+    leave_subsection();
 
     add_parameter("Number of time steps", number_of_time_steps);
     add_parameter("Output frequency", output_frequency);
@@ -275,31 +294,19 @@ namespace Step80
 
     add_parameter("Final time", final_time);
 
-    add_parameter("Viscosity", viscosity);
-
-    add_parameter("Density", density);
-
-    add_parameter("Lame mu", lame_mu);
-
-    add_parameter("Lame lambda", lame_lambda);
-
-    add_parameter("Initial fluid refinement",
-                  initial_fluid_refinement,
-                  "Initial mesh refinement used for the fluid domain Omega");
-
-    add_parameter("Initial solid refinement",
-                  initial_solid_refinement,
-                  "Initial mesh refinement used for the solid domain Gamma");
+    enter_subsection("Physical properties");
+    {
+      add_parameter("Viscosity", viscosity);
+      add_parameter("Density", density);
+      add_parameter("Lame mu", lame_mu);
+      add_parameter("Lame lambda", lame_lambda);
+    }
+    leave_subsection();
 
     add_parameter("Fluid bounding boxes extraction level",
                   fluid_rtree_extraction_level,
                   "Extraction level of the rtree used to construct global "
                   "bounding boxes");
-
-    add_parameter(
-      "Tracer particle insertion refinement",
-      particle_insertion_refinement,
-      "Refinement of the volumetric mesh used to insert the particles");
 
     add_parameter(
       "Dirichlet boundary ids",
@@ -308,6 +315,19 @@ namespace Step80
 
     enter_subsection("Grid generation");
     {
+      add_parameter(
+        "Tracer particle insertion refinement",
+        particle_insertion_refinement,
+        "Refinement of the volumetric mesh used to insert the particles");
+
+      add_parameter("Initial fluid refinement",
+                    initial_fluid_refinement,
+                    "Initial mesh refinement used for the fluid domain Omega");
+
+      add_parameter("Initial solid refinement",
+                    initial_solid_refinement,
+                    "Initial mesh refinement used for the solid domain Gamma");
+
       add_parameter("Fluid grid generator", name_of_fluid_grid);
       add_parameter("Fluid grid generator arguments", arguments_for_fluid_grid);
 
@@ -375,6 +395,7 @@ namespace Step80
                     "file do not match the ones of the running application."
                     " This should not happen: aborting."));
       this->enter_my_subsection(this->prm);
+      initialize_finite_elements_from_names();
     });
   }
 
@@ -387,6 +408,20 @@ namespace Step80
     navier_stokes_rhs.set_time(time);
     solid_rhs.set_time(time);
     navier_stokes_bc.set_time(time);
+  }
+
+
+
+  template <int dim, int spacedim>
+  void NavierStokesImmersedProblemParameters<dim, spacedim>::
+    initialize_finite_elements_from_names()
+  {
+    velocity_fe = FETools::get_fe_by_name<spacedim>(velocity_fe_name);
+    pressure_fe = FETools::get_fe_by_name<spacedim>(pressure_fe_name);
+    displacement_fe =
+      FETools::get_fe_by_name<dim, spacedim>(displacement_fe_name);
+    lagrange_multiplier_fe =
+      FETools::get_fe_by_name<dim, spacedim>(lagrange_multiplier_fe_name);
   }
 
 
@@ -499,6 +534,9 @@ namespace Step80
 
     IndexSet locally_owned_tracer_particle_coordinates;
     IndexSet locally_relevant_tracer_particle_coordinates;
+
+    IndexSet locally_owned_solid_particle_coordinates;
+    IndexSet locally_relevant_solid_particle_coordinates;
 
     LA::MPI::Vector tracer_particle_velocity;
     LA::MPI::Vector relevant_tracer_particle_displacements;
@@ -689,22 +727,16 @@ namespace Step80
   {
     TimerOutput::Scope t(computing_timer, "Initial setup");
 
-    fluid_fe =
-      std::make_unique<FESystem<spacedim>>(FE_Q<spacedim>(par.velocity_degree),
-                                           spacedim,
-                                           //  FE_Q<spacedim>(
-                                           FE_DGP<spacedim>(
-                                             par.velocity_degree - 1),
-                                           1);
+    fluid_fe = std::make_unique<FESystem<spacedim>>(*par.velocity_fe,
+                                                    spacedim,
+                                                    *par.pressure_fe,
+                                                    1);
 
     // Solid displacement and Lagrange multiplier (same degree for both)
-    solid_fe = std::make_unique<FESystem<spacedim>>(
-      FE_Q<dim, spacedim>(par.displacement_degree),
-      spacedim,
-      par.lagrange_multiplier_degree == 0 ?
-        *FE_DGQ<dim, spacedim>(0).clone() :
-        *FE_DGQ<dim, spacedim>(par.lagrange_multiplier_degree).clone(),
-      spacedim);
+    solid_fe = std::make_unique<FESystem<spacedim>>(*par.displacement_fe,
+                                                    spacedim,
+                                                    *par.lagrange_multiplier_fe,
+                                                    spacedim);
   }
 
 
@@ -1661,7 +1693,7 @@ namespace Step80
     Vector<float> error_per_cell(fluid_tria.n_active_cells());
     KellyErrorEstimator<spacedim>::estimate(fluid_dh,
                                             QGauss<spacedim - 1>(
-                                              par.velocity_degree + 1),
+                                              fluid_fe->degree + 1),
                                             {},
                                             fluid_locally_relevant_solution,
                                             error_per_cell,
@@ -1850,16 +1882,12 @@ namespace Step80
     // according to the solid mesh, but particles are distributed according
     // to the fluid mesh. We need an intermediate vector with locally_relevant
     // index sets that match the particle distribution.
-    const IndexSet locally_owned_particle_coords =
+    locally_owned_solid_particle_coordinates =
       solid_particle_handler.locally_owned_particle_ids().tensor_product(
         complete_index_set(spacedim));
 
-    const IndexSet locally_relevant_particle_coords =
-      locally_owned_particle_coords;
-
     LA::MPI::Vector particle_positions;
-    particle_positions.reinit(locally_owned_particle_coords,
-                              locally_relevant_particle_coords,
+    particle_positions.reinit(locally_owned_solid_particle_coordinates,
                               mpi_communicator);
 
     // Copy the current positions into the particle positions vector
