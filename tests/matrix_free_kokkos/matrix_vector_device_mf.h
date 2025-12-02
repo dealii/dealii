@@ -42,9 +42,7 @@ public:
     dealii::Utilities::pow(n_q_points_1d, dim);
 
 private:
-  const typename Portable::MatrixFree<dim, Number>::Data *gpu_data;
-  Number                                                 *coef;
-  int                                                     cell;
+  Number *coef;
 };
 
 
@@ -135,8 +133,6 @@ VaryingCoefficientFunctor<dim, fe_degree, Number, n_q_points_1d>::operator()(
 {
   const unsigned int pos     = gpu_data->local_q_point_id(cell, q);
   const auto         q_point = gpu_data->get_quadrature_point(cell, q);
-
-
 
   Number p_square = 0.;
   for (unsigned int i = 0; i < dim; ++i)
