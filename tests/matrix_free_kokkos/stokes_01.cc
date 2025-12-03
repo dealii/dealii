@@ -299,20 +299,13 @@ test(unsigned int n_refinements)
 
   PortableMFStokesOperator<dim, degree_u, degree_p> stokes_operator(mf_data);
 
-  LinearAlgebra::distributed::BlockVector<Number, MemorySpace::Default> src(2);
-  src.block(0).reinit(mf_data.get_vector_partitioner(0));
-  src.block(1).reinit(mf_data.get_vector_partitioner(1));
-  src.collect_sizes();
-  LinearAlgebra::distributed::BlockVector<Number, MemorySpace::Default> dst(2);
-  dst.block(0).reinit(mf_data.get_vector_partitioner(0));
-  dst.block(1).reinit(mf_data.get_vector_partitioner(1));
-  dst.collect_sizes();
+  LinearAlgebra::distributed::BlockVector<Number, MemorySpace::Default> src;
+  mf_data.initialize_dof_vector(src);
+  LinearAlgebra::distributed::BlockVector<Number, MemorySpace::Default> dst;
+  mf_data.initialize_dof_vector(dst);
 
-  LinearAlgebra::distributed::BlockVector<Number, MemorySpace::Host> src_host(
-    2);
-  src_host.block(0).reinit(mf_data.get_vector_partitioner(0));
-  src_host.block(1).reinit(mf_data.get_vector_partitioner(1));
-  src_host.collect_sizes();
+  LinearAlgebra::distributed::BlockVector<Number, MemorySpace::Host> src_host;
+  mf_data.initialize_dof_vector(src_host);
 
   VectorTools::interpolate(dof_u, VelocitySolution<dim>(), src_host.block(0));
   VectorTools::interpolate(dof_p, PressureSolution<dim>(), src_host.block(1));
