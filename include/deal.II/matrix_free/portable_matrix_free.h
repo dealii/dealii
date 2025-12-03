@@ -996,7 +996,7 @@ namespace Portable
      * Kokkos::View of quadrature points on the host.
      */
     typename Kokkos::View<Point<dim, Number> **,
-                          MemorySpace::Default::kokkos_space>::HostMirror
+                          MemorySpace::Default::kokkos_space>::host_mirror_type
       q_points;
 
     /**
@@ -1004,21 +1004,22 @@ namespace Portable
      * vector.
      */
     typename Kokkos::View<types::global_dof_index **,
-                          MemorySpace::Default::kokkos_space>::HostMirror
+                          MemorySpace::Default::kokkos_space>::host_mirror_type
       local_to_global;
 
     /**
      * Kokkos::View of inverse Jacobians on the host.
      */
     typename Kokkos::View<Number **[dim][dim],
-                          MemorySpace::Default::kokkos_space>::HostMirror
+                          MemorySpace::Default::kokkos_space>::host_mirror_type
       inv_jacobian;
 
     /**
      * Kokkos::View of Jacobian times the weights on the host.
      */
     typename Kokkos::View<Number **,
-                          MemorySpace::Default::kokkos_space>::HostMirror JxW;
+                          MemorySpace::Default::kokkos_space>::host_mirror_type
+      JxW;
 
     /**
      * Number of cells.
@@ -1040,7 +1041,7 @@ namespace Portable
      */
     typename Kokkos::View<
       dealii::internal::MatrixFreeFunctions::ConstraintKinds *,
-      MemorySpace::Default::kokkos_space>::HostMirror constraint_mask;
+      MemorySpace::Default::kokkos_space>::host_mirror_type constraint_mask;
 
     /**
      * If true, use graph coloring has been used and we can simply add into
