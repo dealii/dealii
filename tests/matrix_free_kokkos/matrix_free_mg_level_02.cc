@@ -94,8 +94,11 @@ public:
       data);
     fe_eval.read_dof_values(src);
     fe_eval.evaluate(EvaluationFlags::gradients);
-    fe_eval.apply_for_each_quad_point(
-      LaplaceOperatorQuad<dim, fe_degree, Number, n_q_points_1d>());
+
+    LaplaceOperatorQuad<dim, fe_degree, Number, n_q_points_1d> quad;
+    data->for_each_quad_point(
+      [&](const int &q_point) { quad(&fe_eval, q_point); });
+
     fe_eval.integrate(EvaluationFlags::gradients);
     fe_eval.distribute_local_to_global(dst);
   }

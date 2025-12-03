@@ -208,8 +208,11 @@ namespace Step64
       data);
     fe_eval.read_dof_values(src);
     fe_eval.evaluate(EvaluationFlags::values | EvaluationFlags::gradients);
-    fe_eval.apply_for_each_quad_point(
-      HelmholtzOperatorQuad<dim, fe_degree>(coef));
+
+    HelmholtzOperatorQuad<dim, fe_degree> quad(coef);
+    data->for_each_quad_point(
+      [&](const int &q_point) { quad(&fe_eval, q_point); });
+
     fe_eval.integrate(EvaluationFlags::values | EvaluationFlags::gradients);
     fe_eval.distribute_local_to_global(dst);
   }

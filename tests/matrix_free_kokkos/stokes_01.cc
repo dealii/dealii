@@ -203,12 +203,16 @@ StokesOperator<dim, degree_u, degree_p, Number, n_q_points_1d>::operator()(
   fe_u.evaluate(EvaluationFlags::gradients);
   fe_p.evaluate(EvaluationFlags::values);
 
-  StokesOperatorQuad<dim, degree_u, degree_p, Number, n_q_points_1d> quad;
+  data->for_each_quad_point([&](const int &q_point) {
+    const Tensor<2, dim, Number> gradient_u = fe_u.get_gradient(q_point);
+    Tensor<2, dim, Number>       vel_term   = gradient_u;
+    for (unsigned int d = 0; d < dim; ++d)
+      vel_term[d][d] -= fe_p.get_value(q_point);
+    fe_u.submit_gradient(vel_term, q_point);
 
-  Kokkos::parallel_for(Kokkos::TeamThreadRange(data->team_member, n_q_points),
-                       [&](const int &q) { quad(fe_u, fe_p, q); });
-
-  data->team_member.team_barrier();
+    const Number pressure_term = trace(gradient_u);
+    fe_p.submit_value(pressure_term, q_point);
+  });
 
   fe_u.integrate(EvaluationFlags::gradients);
   fe_p.integrate(EvaluationFlags::values);
