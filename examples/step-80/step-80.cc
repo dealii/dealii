@@ -21,6 +21,7 @@
 // that guide readers through the main components. The headers below
 // provide linear algebra back ends, particles, mappings, and CAD
 // support needed for the immersed compressible solid/fluid coupling.
+#include <deal.II/base/data_out_base.h>
 #include <deal.II/base/function.h>
 #include <deal.II/base/quadrature_lib.h>
 #include <deal.II/base/timer.h>
@@ -1755,6 +1756,9 @@ namespace Step80
     const unsigned int cycle,
     double             time) const
   {
+    DataOutBase::VtkFlags flags;
+    flags.write_higher_order_cells = true;
+
     // Fluid solution
     {
       TimerOutput::Scope t(computing_timer, "Output fluid");
@@ -1773,6 +1777,7 @@ namespace Step80
                                solution_names,
                                DataOut<spacedim>::type_dof_data,
                                data_component_interpretation);
+      data_out.set_flags(flags);
 
 
       Vector<float> subdomain(fluid_tria.n_active_cells());
@@ -1815,6 +1820,7 @@ namespace Step80
                                DataOut<spacedim>::type_dof_data,
                                data_component_interpretation);
 
+      data_out.set_flags(flags);
 
       Vector<float> subdomain(solid_tria.n_active_cells());
       for (unsigned int i = 0; i < subdomain.size(); ++i)
