@@ -310,17 +310,17 @@ namespace ArborXWrappers
     {
       if constexpr (dim == 1)
         {
-          return {p[0]};
+          return {{p[0]}};
         }
 
       if constexpr (dim == 2)
         {
-          return {p[0], p[1]};
+          return {{p[0], p[1]}};
         }
 
       if constexpr (dim == 3)
         {
-          return {p[0], p[1], p[2]};
+          return {{p[0], p[1], p[2]}};
         }
     }
 
