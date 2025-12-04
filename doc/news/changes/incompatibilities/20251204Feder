@@ -1,0 +1,3 @@
+Changed: The function DoFTools::map_dofs_to_support_points now only maps locally owned DoFs instead of locally relevant DoFs.
+<br>
+(Marco Feder, 2025/12/04)
