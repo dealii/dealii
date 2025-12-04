@@ -422,8 +422,7 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
         const Mapping<deal_II_dimension, deal_II_space_dimension> &,
         const DoFHandler<deal_II_dimension, deal_II_space_dimension> &,
         std::vector<Point<deal_II_space_dimension>> &,
-        const ComponentMask &,
-        const bool);
+        const ComponentMask &);
 
       template void
       map_dofs_to_support_points<deal_II_dimension, deal_II_space_dimension>(
@@ -431,8 +430,7 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
           &,
         const DoFHandler<deal_II_dimension, deal_II_space_dimension> &,
         std::vector<Point<deal_II_space_dimension>> &,
-        const ComponentMask &,
-        const bool);
+        const ComponentMask &);
 
       // This function is deprecated:
       template void
@@ -440,8 +438,7 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
         const Mapping<deal_II_dimension, deal_II_space_dimension> &,
         const DoFHandler<deal_II_dimension, deal_II_space_dimension> &,
         std::map<types::global_dof_index, Point<deal_II_space_dimension>> &,
-        const ComponentMask &,
-        const bool);
+        const ComponentMask &);
 
       // This function is deprecated:
       template void
@@ -450,23 +447,20 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
           &,
         const DoFHandler<deal_II_dimension, deal_II_space_dimension> &,
         std::map<types::global_dof_index, Point<deal_II_space_dimension>> &,
-        const ComponentMask &,
-        const bool);
+        const ComponentMask &);
 
       template std::map<types::global_dof_index, Point<deal_II_space_dimension>>
       map_dofs_to_support_points<deal_II_dimension, deal_II_space_dimension>(
         const Mapping<deal_II_dimension, deal_II_space_dimension> &,
         const DoFHandler<deal_II_dimension, deal_II_space_dimension> &,
-        const ComponentMask &,
-        const bool);
+        const ComponentMask &);
 
       template std::map<types::global_dof_index, Point<deal_II_space_dimension>>
       map_dofs_to_support_points<deal_II_dimension, deal_II_space_dimension>(
         const hp::MappingCollection<deal_II_dimension, deal_II_space_dimension>
           &,
         const DoFHandler<deal_II_dimension, deal_II_space_dimension> &,
-        const ComponentMask &,
-        const bool);
+        const ComponentMask &);
     \}
 #endif
   }

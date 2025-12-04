@@ -57,11 +57,19 @@ test()
   std::map<types::global_dof_index, Point<dim>> support_points_0;
   DoFTools::map_dofs_to_support_points(mapping, dof, support_points_0, mask);
 
+  AssertThrow((support_points_0.size() == dof.n_locally_owned_dofs() / 2),
+              ExcMessage("Size of support points map does not match number of "
+                         "locally owned dofs"));
+
   mask.set(0, false);
   mask.set(1, true);
 
   std::map<types::global_dof_index, Point<dim>> support_points_1;
   DoFTools::map_dofs_to_support_points(mapping, dof, support_points_1, mask);
+
+  AssertThrow((support_points_1.size() == dof.n_locally_owned_dofs() / 2),
+              ExcMessage("Size of support points map does not match number of "
+                         "locally owned dofs"));
 
   auto it_0 = support_points_0.begin();
   auto it_1 = support_points_1.begin();
