@@ -1,7 +1,7 @@
 // ------------------------------------------------------------------------
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
-// Copyright (C) 2005 - 2024 by the deal.II authors
+// Copyright (C) 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -248,146 +248,137 @@ std::vector<unsigned int>
 FE_NedelecNodal<dim>::get_lexicographic_numbering(
   const unsigned int degree) const
 {
-  const unsigned int n_pols = (dim == 2) ?
-                                (degree + 1) * (degree + 2) :
-                                (degree + 1) * (degree + 2) * (degree + 2);
+  const unsigned int n_dofs_edges =
+    (dim == 2) ? 4 * (degree + 1) : 12 * (degree + 1);
+  const unsigned int n_dofs_faces_3D = 2 * 6 * (degree * (degree + 1));
+  const unsigned     n_dofs_per_component_face = degree * (degree + 1);
+  const unsigned int n_dofs_D_1 =
+    (dim == 2) ? n_dofs_edges : n_dofs_edges + n_dofs_faces_3D;
+  std::vector<unsigned int> lexicographic_renumbering(
+    (dim == 2) ? 2 * (degree + 1) * (degree + 2) :
+                 3 * (degree + 1) * (degree + 2) * (degree + 2));
+  unsigned int ind_lex_numbering = 0;
 
-  std::vector<unsigned int> renumber_hierarchic_to_lexicographic;
-
-  // Edges 0-3
-  for (unsigned int i = 0; i < degree + 1; ++i)
-    renumber_hierarchic_to_lexicographic.push_back(n_pols + i * (degree + 2));
-  for (unsigned int i = 0; i < degree + 1; ++i)
-    renumber_hierarchic_to_lexicographic.push_back(n_pols + degree + 1 +
-                                                   i * (degree + 2));
-  for (unsigned int i = 0; i < degree + 1; ++i)
-    renumber_hierarchic_to_lexicographic.push_back(i);
-  for (unsigned int i = 0; i < degree + 1; ++i)
-    renumber_hierarchic_to_lexicographic.push_back((degree + 1) * (degree + 1) +
-                                                   i);
-  if (dim == 2)
+  // Component 1
+  for (unsigned int i = 2 * (degree + 1); i < 3 * (degree + 1); ++i)
+    lexicographic_renumbering[ind_lex_numbering++] = i;
+  const unsigned int n_dofs_before =
+    n_dofs_edges + ((dim == 3) ? 8 * n_dofs_per_component_face : 0);
+  for (unsigned int i = n_dofs_before;
+       i < n_dofs_before + n_dofs_per_component_face;
+       ++i)
+    lexicographic_renumbering[ind_lex_numbering++] = i;
+  for (unsigned int i = 3 * (degree + 1); i < 4 * (degree + 1); ++i)
+    lexicographic_renumbering[ind_lex_numbering++] = i;
+  if (dim == 3)
     {
-      // Quads for 2D
-      for (unsigned int j = 1; j < degree + 1; ++j)
-        for (unsigned int i = 0; i < degree + 1; ++i)
-          renumber_hierarchic_to_lexicographic.push_back(j * (degree + 1) + i);
-      for (unsigned int j = 0; j < degree + 1; ++j)
-        for (unsigned int i = 1; i < degree + 1; ++i)
-          renumber_hierarchic_to_lexicographic.push_back(n_pols +
-                                                         j * (degree + 2) + i);
-    }
-  else if (dim == 3)
-    {
-      // Edges 4-7
-      const unsigned int offset_z = (degree + 1) * (degree + 1) * (degree + 2);
-      for (unsigned int i = 0; i < degree + 1; ++i)
-        renumber_hierarchic_to_lexicographic.push_back(
-          n_pols + i * (degree + 2) + offset_z);
-      for (unsigned int i = 0; i < degree + 1; ++i)
-        renumber_hierarchic_to_lexicographic.push_back(
-          n_pols + degree + 1 + i * (degree + 2) + offset_z);
-      for (unsigned int i = 0; i < degree + 1; ++i)
-        renumber_hierarchic_to_lexicographic.push_back(i + offset_z);
-      for (unsigned int i = 0; i < degree + 1; ++i)
-        renumber_hierarchic_to_lexicographic.push_back(
-          (degree + 1) * (degree + 1) + i + offset_z);
-
-      // Edges 8-11
-      for (unsigned int i = 0; i < degree + 1; ++i)
-        renumber_hierarchic_to_lexicographic.push_back(
-          2 * n_pols + i * (degree + 2) * (degree + 2));
-      for (unsigned int i = 0; i < degree + 1; ++i)
-        renumber_hierarchic_to_lexicographic.push_back(
-          2 * n_pols + degree + 1 + i * (degree + 2) * (degree + 2));
-      for (unsigned int i = 0; i < degree + 1; ++i)
-        renumber_hierarchic_to_lexicographic.push_back(
-          2 * n_pols + (degree + 1) * (degree + 2) +
-          i * (degree + 2) * (degree + 2));
-      for (unsigned int i = 0; i < degree + 1; ++i)
-        renumber_hierarchic_to_lexicographic.push_back(
-          2 * n_pols + (degree + 2) * (degree + 2) - 1 +
-          i * (degree + 2) * (degree + 2));
-
-      // Quad 0
-      for (unsigned int j = 1; j < degree + 1; ++j)
-        for (unsigned int i = 0; i < degree + 1; ++i)
-          renumber_hierarchic_to_lexicographic.push_back(
-            n_pols + i * (degree + 2) + j * (degree + 2) * (degree + 1));
-      for (unsigned int j = 0; j < degree + 1; ++j)
-        for (unsigned int i = 1; i < degree + 1; ++i)
-          renumber_hierarchic_to_lexicographic.push_back(
-            2 * n_pols + i * (degree + 2) + j * (degree + 2) * (degree + 2));
-      // Quad 1
-      for (unsigned int j = 1; j < degree + 1; ++j)
-        for (unsigned int i = 0; i < degree + 1; ++i)
-          renumber_hierarchic_to_lexicographic.push_back(
-            n_pols + degree + 1 + i * (degree + 2) +
-            j * (degree + 2) * (degree + 1));
-      for (unsigned int j = 0; j < degree + 1; ++j)
-        for (unsigned int i = 1; i < degree + 1; ++i)
-          renumber_hierarchic_to_lexicographic.push_back(
-            2 * n_pols + degree + 1 + i * (degree + 2) +
-            j * (degree + 2) * (degree + 2));
-      // Quad 2
-      for (unsigned int j = 1; j < degree + 1; ++j)
-        for (unsigned int i = 0; i < degree + 1; ++i)
-          renumber_hierarchic_to_lexicographic.push_back(i + j * (degree + 2) *
-                                                               (degree + 1));
-      for (unsigned int j = 0; j < degree + 1; ++j)
-        for (unsigned int i = 1; i < degree + 1; ++i)
-          renumber_hierarchic_to_lexicographic.push_back(
-            2 * n_pols + i + j * (degree + 2) * (degree + 2));
-      // Quad 3
-      for (unsigned int j = 1; j < degree + 1; ++j)
-        for (unsigned int i = 0; i < degree + 1; ++i)
-          renumber_hierarchic_to_lexicographic.push_back(
-            (degree + 1) * (degree + 1) + i + j * (degree + 2) * (degree + 1));
-      for (unsigned int j = 0; j < degree + 1; ++j)
-        for (unsigned int i = 1; i < degree + 1; ++i)
-          renumber_hierarchic_to_lexicographic.push_back(
-            2 * n_pols + (degree + 1) * (degree + 2) + i +
-            j * (degree + 2) * (degree + 2));
-      // Quad 4
-      for (unsigned int j = 1; j < degree + 1; ++j)
-        for (unsigned int i = 0; i < degree + 1; ++i)
-          renumber_hierarchic_to_lexicographic.push_back(i + j * (degree + 1));
-      for (unsigned int j = 0; j < degree + 1; ++j)
-        for (unsigned int i = 1; i < degree + 1; ++i)
-          renumber_hierarchic_to_lexicographic.push_back(n_pols + i +
-                                                         j * (degree + 2));
-      // Quad 5
-      for (unsigned int j = 1; j < degree + 1; ++j)
-        for (unsigned int i = 0; i < degree + 1; ++i)
-          renumber_hierarchic_to_lexicographic.push_back(
-            (degree + 1) * (degree + 1) * (degree + 2) + i + j * (degree + 1));
-      for (unsigned int j = 0; j < degree + 1; ++j)
-        for (unsigned int i = 1; i < degree + 1; ++i)
-          renumber_hierarchic_to_lexicographic.push_back(
-            n_pols + (degree + 1) * (degree + 1) * (degree + 2) + i +
-            j * (degree + 2));
-
-      // Hexes
-      for (unsigned int k = 1; k < degree + 1; ++k)
-        for (unsigned int j = 1; j < degree + 1; ++j)
-          for (unsigned int i = 0; i < degree + 1; ++i)
-            renumber_hierarchic_to_lexicographic.push_back(
-              k * (degree + 1) * (degree + 2) + j * (degree + 1) + i);
-      for (unsigned int k = 1; k < degree + 1; ++k)
-        for (unsigned int j = 0; j < degree + 1; ++j)
-          for (unsigned int i = 1; i < degree + 1; ++i)
-            renumber_hierarchic_to_lexicographic.push_back(
-              n_pols + k * (degree + 2) * (degree + 1) + j * (degree + 2) + i);
-      for (unsigned int k = 0; k < degree + 1; ++k)
-        for (unsigned int j = 1; j < degree + 1; ++j)
-          for (unsigned int i = 1; i < degree + 1; ++i)
-            renumber_hierarchic_to_lexicographic.push_back(
-              2 * n_pols + k * (degree + 2) * (degree + 2) + j * (degree + 2) +
-              i);
+      for (unsigned int i = 0; i < degree; ++i)
+        {
+          for (unsigned int j = 0; j < degree + 1; ++j)
+            lexicographic_renumbering[ind_lex_numbering++] =
+              n_dofs_edges + 4 * n_dofs_per_component_face + i * (degree + 1) +
+              j;
+          for (unsigned int j = 0; j < n_dofs_per_component_face; ++j)
+            lexicographic_renumbering[ind_lex_numbering++] =
+              n_dofs_D_1 + i * n_dofs_per_component_face + j;
+          for (unsigned int j = 0; j < degree + 1; ++j)
+            lexicographic_renumbering[ind_lex_numbering++] =
+              n_dofs_edges + 6 * n_dofs_per_component_face + i * (degree + 1) +
+              j;
+        }
+      for (unsigned int i = 6 * (degree + 1); i < 7 * (degree + 1); ++i)
+        lexicographic_renumbering[ind_lex_numbering++] = i;
+      for (unsigned int i = n_dofs_edges + 10 * n_dofs_per_component_face;
+           i < n_dofs_edges + 11 * n_dofs_per_component_face;
+           ++i)
+        lexicographic_renumbering[ind_lex_numbering++] = i;
+      for (unsigned int i = 7 * (degree + 1); i < 8 * (degree + 1); ++i)
+        lexicographic_renumbering[ind_lex_numbering++] = i;
     }
 
-  return Utilities::invert_permutation(renumber_hierarchic_to_lexicographic);
+  // Component 2
+  unsigned int n_dofs_faces_before =
+    n_dofs_edges + ((dim == 3) ? 9 : 1) * n_dofs_per_component_face;
+  for (unsigned int i = 0; i < degree + 1; ++i)
+    {
+      lexicographic_renumbering[ind_lex_numbering++] = i;
+      for (unsigned int j = n_dofs_faces_before + i * degree;
+           j < n_dofs_faces_before + (i + 1) * degree;
+           ++j)
+        {
+          lexicographic_renumbering[ind_lex_numbering++] = j;
+        }
+      lexicographic_renumbering[ind_lex_numbering++] = (degree + 1) + i;
+    }
+
+  if (dim == 3)
+    {
+      for (unsigned int i = 0; i < n_dofs_per_component_face; ++i)
+        {
+          lexicographic_renumbering[ind_lex_numbering++] = n_dofs_edges + i;
+          for (unsigned int j = 0; j < degree; j++)
+            {
+              lexicographic_renumbering[ind_lex_numbering++] =
+                n_dofs_D_1 + n_dofs_per_component_face * degree + i * degree +
+                j;
+            }
+          lexicographic_renumbering[ind_lex_numbering++] =
+            n_dofs_edges + 2 * n_dofs_per_component_face + i;
+        }
+      unsigned int n_dofs_before = n_dofs_edges + 11 * degree * (degree + 1);
+      for (unsigned int i = 0; i < degree + 1; i++)
+        {
+          lexicographic_renumbering[ind_lex_numbering++] = 4 * (degree + 1) + i;
+          for (unsigned int j = 0; j < degree; j++)
+            {
+              lexicographic_renumbering[ind_lex_numbering++] =
+                n_dofs_before + i * degree + j;
+            }
+          lexicographic_renumbering[ind_lex_numbering++] = 5 * (degree + 1) + i;
+        }
+    }
+  // Component 3
+  if (dim == 3)
+    {
+      for (unsigned int i = 0; i < degree + 1; i++)
+        {
+          lexicographic_renumbering[ind_lex_numbering++] = 8 * (degree + 1) + i;
+          unsigned int n_dofs_before =
+            n_dofs_edges + 5 * n_dofs_per_component_face;
+          for (unsigned int j = 0; j < degree; j++)
+            {
+              lexicographic_renumbering[ind_lex_numbering++] =
+                n_dofs_before + i * degree + j;
+            }
+          lexicographic_renumbering[ind_lex_numbering++] = 9 * (degree + 1) + i;
+          for (unsigned int j = 0; j < degree; ++j)
+            {
+              lexicographic_renumbering[ind_lex_numbering++] =
+                n_dofs_edges + n_dofs_per_component_face + i * degree + j;
+              n_dofs_before = n_dofs_D_1 +
+                              2 * degree * n_dofs_per_component_face +
+                              i * degree * degree + j * degree;
+              for (unsigned int k = 0; k < degree; k++)
+                {
+                  lexicographic_renumbering[ind_lex_numbering++] =
+                    n_dofs_before + k;
+                }
+              lexicographic_renumbering[ind_lex_numbering++] =
+                n_dofs_edges + 3 * n_dofs_per_component_face + i * degree + j;
+            }
+          lexicographic_renumbering[ind_lex_numbering++] =
+            10 * (degree + 1) + i;
+          for (unsigned int j = 0; j < degree; j++)
+            {
+              lexicographic_renumbering[ind_lex_numbering++] =
+                n_dofs_edges + 7 * n_dofs_per_component_face + i * degree + j;
+            }
+          lexicographic_renumbering[ind_lex_numbering++] =
+            11 * (degree + 1) + i;
+        }
+    }
+  return lexicographic_renumbering;
 }
-
 
 
 template <int dim>

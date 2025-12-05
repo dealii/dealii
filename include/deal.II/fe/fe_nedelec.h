@@ -667,21 +667,19 @@ private:
  * <h3>Description of node values</h3>
  *
  * For this N&eacute;d&eacute;lec element, the node values are not cell and face
- * moments with respect to certain polynomials, but the values at quadrature
- * points. Following the general scheme for numbering degrees of freedom, the
- * node values on faces (edges in 2d, quads in 3d) are first, face by face,
- * according to the natural ordering of the faces of a cell. The interior
- * degrees of freedom are last.
+ * moments with respect to certain polynomials like for FE_NedelecSZ, but the
+ * values at quadrature points. Following the general scheme for numbering
+ * degrees of freedom, the node values on faces (edges in 2d, quads in 3d) are
+ * first, face by face, according to the natural ordering of the faces of a
+ * cell. The interior degrees of freedom are last.
  *
- * For an N&eacute;d&eacute;lec-element of degree <i>k</i>, we choose
- * <i>(k+2)</i> and <i>(k+1)</i> points in tangential and normal direction,
- * respectively: as defined by QGaussLobatto. For degree $k=0$, the midpoint is
- * chosen. These points are ordered then lexicographically.
- *
- * The polynomials are the tensor product of Lagrange polynomials on the points
- * of a QGaussLobatto formula with $(k+1)$ points in the normal direction with
- * Lagrange polynomials on the points of a QGaussLobatto quadrature formula
- * with $(k+2)$ points in the tangential direction.
+ * For an N&eacute;d&eacute;lec-element of degree <i>k</i>, the polynomials are
+ * the tensor product of Lagrange polynomials on the points of a QGaussLobatto
+ * formula with $(k+1)$ points in the normal direction with Lagrange polynomials
+ * on the points of a QGaussLobatto quadrature formula with $(k+2)$ points
+ * in the tangential direction. For degree $k=0$, the midpoint is chosen.
+ * Within each entity (edge, face, volume), these points are ordered
+ * lexicographically.
  *
  * @note The degree stored in the member variable
  * FiniteElementData<dim>::degree is higher by one than the constructor
