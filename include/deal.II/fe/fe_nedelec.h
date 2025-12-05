@@ -21,12 +21,15 @@
 #include <deal.II/base/mutex.h>
 #include <deal.II/base/polynomial.h>
 #include <deal.II/base/polynomials_nedelec.h>
+#include <deal.II/base/polynomials_vector_anisotropic.h>
 #include <deal.II/base/table.h>
 #include <deal.II/base/tensor.h>
 #include <deal.II/base/tensor_product_polynomials.h>
 
 #include <deal.II/fe/fe.h>
 #include <deal.II/fe/fe_poly_tensor.h>
+
+#include <deal.II/matrix_free/shape_info.h>
 
 #include <vector>
 
@@ -653,6 +656,93 @@ private:
   // Allow access from other dimensions.
   template <int dim1>
   friend class FE_Nedelec;
+};
+
+
+
+/**
+ * The N&eacute;d&eacute;lec elements with node functionals defined as point
+ * values in Gauss-Lobatto points.
+ *
+ * <h3>Description of node values</h3>
+ *
+ * For this N&eacute;d&eacute;lec element, the node values are not cell and face
+ * moments with respect to certain polynomials like for FE_NedelecSZ, but the
+ * values at quadrature points. Following the general scheme for numbering
+ * degrees of freedom, the node values on faces (edges in 2d, quads in 3d) are
+ * first, face by face, according to the natural ordering of the faces of a
+ * cell. The interior degrees of freedom are last.
+ *
+ * For an N&eacute;d&eacute;lec-element of degree <i>k</i>, the polynomials are
+ * the tensor product of Lagrange polynomials on the points of a QGaussLobatto
+ * formula with $(k+1)$ points in the normal direction with Lagrange polynomials
+ * on the points of a QGaussLobatto quadrature formula with $(k+2)$ points
+ * in the tangential direction. For degree $k=0$, the midpoint is chosen.
+ * Within each entity (edge, face, volume), these points are ordered
+ * lexicographically.
+ *
+ * @note The degree stored in the member variable
+ * FiniteElementData<dim>::degree is higher by one than the constructor
+ * argument!
+ */
+template <int dim>
+class FE_NedelecNodal : public FE_PolyTensor<dim>
+{
+public:
+  /**
+   * Constructor for the Nedelec element of given @p order. The maximal
+   * polynomial degree of the shape functions is `order+1` (in each variable;
+   * the total polynomial degree may be higher). If `order = 0`, the element is
+   * linear and has degrees of freedom only on the edges. If `order >=1` the
+   * element has degrees of freedom on the edges, faces and volume. For example
+   * the 3d version of FE_Nedelec has 12 degrees of freedom for `order = 0`
+   * and 54 for `degree = 1`.
+   */
+  FE_NedelecNodal(const unsigned int p);
+
+  /**
+   * Return a string that uniquely identifies a finite element. This class
+   * returns <tt>FE_NedelecNodal<dim>(degree)</tt>, with @p dim and @p
+   * degree replaced by appropriate values.
+   */
+  virtual std::string
+  get_name() const override;
+
+  // Documentation inherited from the base class.
+  virtual std::unique_ptr<FiniteElement<dim, dim>>
+  clone() const override;
+
+  // Documentation inherited from the base class.
+  virtual void
+  convert_generalized_support_point_values_to_dof_values(
+    const std::vector<Vector<double>> &support_point_values,
+    std::vector<double>               &nodal_values) const override;
+
+  /**
+   * Compute the lexicographic to hierarchic numbering underlying this class,
+   * necessary for the creation of the respective vector polynomial space.
+   */
+  std::vector<unsigned int>
+  get_lexicographic_numbering(const unsigned int degree) const;
+
+  /**
+   * @copydoc FiniteElement::compare_for_domination()
+   */
+  virtual FiniteElementDomination::Domination
+  compare_for_domination(const FiniteElement<dim> &fe_other,
+                         const unsigned int codim = 0) const override final;
+
+
+  /**
+   * Fills data of univariate shape functions in ShapeInfo through taking
+   * a given one-dimensional quadrature formula. The method evaluates the shape
+   * functions and gradients on the one-dimensional unit cell.
+   */
+  template <typename Number, int dim_q>
+  void
+  fill_shape_info(internal::MatrixFreeFunctions::ShapeInfo<Number> *shape_info,
+                  const Quadrature<dim_q>                          &quad_in,
+                  const unsigned int base_element_number = 0) const;
 };
 
 /* -------------- declaration of explicit specializations ------------- */
