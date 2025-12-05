@@ -17,6 +17,7 @@
 #include <deal.II/base/memory_consumption.h>
 #include <deal.II/base/mpi.h>
 #include <deal.II/base/mpi_large_count.h>
+#include <deal.II/base/numbers.h>
 #include <deal.II/base/parameter_handler.h>
 #include <deal.II/base/thread_management.h>
 #include <deal.II/base/utilities.h>
@@ -4998,17 +4999,17 @@ namespace DataOutBase
     // http://www.visitusers.org/index.php?title=Time_and_Cycle_in_VTK_files
     {
       const unsigned int n_metadata =
-        ((flags.cycle != std::numeric_limits<unsigned int>::min() ? 1 : 0) +
-         (flags.time != std::numeric_limits<double>::min() ? 1 : 0));
+        ((flags.cycle != numbers::invalid_unsigned_int ? 1 : 0) +
+         (flags.time != std::numeric_limits<double>::lowest() ? 1 : 0));
       if (n_metadata > 0)
         {
           out << "FIELD FieldData " << n_metadata << '\n';
 
-          if (flags.cycle != std::numeric_limits<unsigned int>::min())
+          if (flags.cycle != numbers::invalid_unsigned_int)
             {
               out << "CYCLE 1 1 int\n" << flags.cycle << '\n';
             }
-          if (flags.time != std::numeric_limits<double>::min())
+          if (flags.time != std::numeric_limits<double>::lowest())
             {
               out << "TIME 1 1 double\n" << flags.time << '\n';
             }
@@ -5352,18 +5353,18 @@ namespace DataOutBase
     // http://www.visitusers.org/index.php?title=Time_and_Cycle_in_VTK_files
     {
       const unsigned int n_metadata =
-        ((flags.cycle != std::numeric_limits<unsigned int>::min() ? 1 : 0) +
-         (flags.time != std::numeric_limits<double>::min() ? 1 : 0));
+        ((flags.cycle != numbers::invalid_unsigned_int ? 1 : 0) +
+         (flags.time != std::numeric_limits<double>::lowest() ? 1 : 0));
       if (n_metadata > 0)
         out << "<FieldData>\n";
 
-      if (flags.cycle != std::numeric_limits<unsigned int>::min())
+      if (flags.cycle != numbers::invalid_unsigned_int)
         {
           out
             << "<DataArray type=\"Float32\" Name=\"CYCLE\" NumberOfTuples=\"1\" format=\"ascii\">"
             << flags.cycle << "</DataArray>\n";
         }
-      if (flags.time != std::numeric_limits<double>::min())
+      if (flags.time != std::numeric_limits<double>::lowest())
         {
           out
             << "<DataArray type=\"Float32\" Name=\"TIME\" NumberOfTuples=\"1\" format=\"ascii\">"
@@ -6155,18 +6156,18 @@ namespace DataOutBase
     // http://www.visitusers.org/index.php?title=Time_and_Cycle_in_VTK_files
     {
       const unsigned int n_metadata =
-        ((flags.cycle != std::numeric_limits<unsigned int>::min() ? 1 : 0) +
-         (flags.time != std::numeric_limits<double>::min() ? 1 : 0));
+        ((flags.cycle != numbers::invalid_unsigned_int ? 1 : 0) +
+         (flags.time != std::numeric_limits<double>::lowest() ? 1 : 0));
       if (n_metadata > 0)
         out << "    <FieldData>\n";
 
-      if (flags.cycle != std::numeric_limits<unsigned int>::min())
+      if (flags.cycle != numbers::invalid_unsigned_int)
         {
           out
             << "    <DataArray type=\"Float32\" Name=\"CYCLE\" NumberOfTuples=\"1\" format=\"ascii\">"
             << flags.cycle << "</DataArray>\n";
         }
-      if (flags.time != std::numeric_limits<double>::min())
+      if (flags.time != std::numeric_limits<double>::lowest())
         {
           out
             << "    <DataArray type=\"Float32\" Name=\"TIME\" NumberOfTuples=\"1\" format=\"ascii\">"
