@@ -20,6 +20,7 @@
 
 #include <deal.II/base/geometry_info.h>
 #include <deal.II/base/mpi_stub.h>
+#include <deal.II/base/numbers.h>
 #include <deal.II/base/point.h>
 #include <deal.II/base/table.h>
 
@@ -1211,7 +1212,7 @@ namespace DataOutBase
      */
     explicit VtkFlags(
       const double           time  = std::numeric_limits<double>::min(),
-      const unsigned int     cycle = std::numeric_limits<unsigned int>::min(),
+      const unsigned int     cycle = numbers::invalid_unsigned_int,
       const bool             print_date_and_time = true,
       const CompressionLevel compression_level   = CompressionLevel::best_speed,
       const bool             write_higher_order_cells          = false,
@@ -3427,8 +3428,8 @@ public:
   void
   serialize(Archive &ar, const unsigned int /*version*/)
   {
-    ar &valid &h5_sol_filename &h5_mesh_filename &entry_time &num_nodes
-      &num_cells &dimension &space_dimension &cell_type &attribute_dims;
+    ar & valid & h5_sol_filename & h5_mesh_filename & entry_time & num_nodes &
+      num_cells & dimension & space_dimension & cell_type & attribute_dims;
   }
 
   /**
