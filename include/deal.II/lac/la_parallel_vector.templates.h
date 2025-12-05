@@ -1002,11 +1002,20 @@ namespace LinearAlgebra
     void
     Vector<Number, MemorySpaceType>::zero_out_ghost_values() const
     {
-      Kokkos::pair<size_type, size_type> range(
-        partitioner->locally_owned_size(),
-        partitioner->locally_owned_size() + partitioner->n_ghost_indices());
-      if (data.values.size() > 0)
-        Kokkos::deep_copy(Kokkos::subview(data.values, range), 0);
+      // Avoid some overhead, especially on Kokkos versions before 4.6,
+      // in Kokkos::deep_copy, by directly calling (sequential) memset.
+      if (std::is_same_v<MemorySpaceType, MemorySpace::Host>)
+        std::memset(data.values.data() + partitioner->locally_owned_size(),
+                    0,
+                    partitioner->n_ghost_indices() * sizeof(Number));
+      else
+        {
+          Kokkos::pair<size_type, size_type> range(
+            partitioner->locally_owned_size(),
+            partitioner->locally_owned_size() + partitioner->n_ghost_indices());
+          if (data.values.size() > 0)
+            Kokkos::deep_copy(Kokkos::subview(data.values, range), Number(0));
+        }
 
       vector_is_ghosted = false;
     }
