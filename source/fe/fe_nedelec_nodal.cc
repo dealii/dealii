@@ -49,12 +49,13 @@ namespace
   get_nedelec_dpo_vector(const unsigned int dim, const unsigned int degree)
   {
     std::vector<unsigned int> dpo(dim + 1);
-    dpo[0] = 0;
-    dpo[1] = degree + 1;
-    dpo[2] = 2 * degree * (degree + 1);
-
-    if (dim == 3)
-      dpo[3] = 3 * degree * degree * (degree + 1);
+    dpo[0]                               = 0;
+    dpo[1]                               = degree + 1;
+    unsigned int dofs_per_face_component = degree + 1;
+    for (unsigned int d = 2; d < dim; ++d)
+      dofs_per_face_component *= degree;
+    dpo[dim - 1] = (dim - 1) * dofs_per_face_component;
+    dpo[dim]     = dim * degree * dofs_per_face_component;
 
     return dpo;
   }
