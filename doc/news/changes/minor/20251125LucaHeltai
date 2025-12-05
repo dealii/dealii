@@ -1,0 +1,5 @@
+New: VTKWrappers::read_vtk() can now read any unstructured vtk file using the
+native VTK library. This includes binary vtk files, and any format supported by
+vtkUnstructuredGridReader.
+<br>
+(Luca Heltai, 2025/11/25)

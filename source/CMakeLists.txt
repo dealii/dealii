@@ -66,6 +66,7 @@ add_subdirectory(non_matching)
 add_subdirectory(sundials)
 add_subdirectory(trilinos)
 add_subdirectory(arborx)
+add_subdirectory(vtk)
 
 #
 # Set up and configure the two library targets dealii_debug and
