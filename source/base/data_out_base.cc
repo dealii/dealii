@@ -6147,6 +6147,36 @@ namespace DataOutBase
     out
       << "<VTKFile type=\"PUnstructuredGrid\" version=\"0.1\" byte_order=\"LittleEndian\">\n";
     out << "  <PUnstructuredGrid GhostLevel=\"0\">\n";
+
+    // first up: metadata
+    //
+    // if desired, output time and cycle of the simulation, following the
+    // instructions at
+    // http://www.visitusers.org/index.php?title=Time_and_Cycle_in_VTK_files
+    {
+      const unsigned int n_metadata =
+        ((flags.cycle != std::numeric_limits<unsigned int>::min() ? 1 : 0) +
+         (flags.time != std::numeric_limits<double>::min() ? 1 : 0));
+      if (n_metadata > 0)
+        out << "    <FieldData>\n";
+
+      if (flags.cycle != std::numeric_limits<unsigned int>::min())
+        {
+          out
+            << "    <DataArray type=\"Float32\" Name=\"CYCLE\" NumberOfTuples=\"1\" format=\"ascii\">"
+            << flags.cycle << "</DataArray>\n";
+        }
+      if (flags.time != std::numeric_limits<double>::min())
+        {
+          out
+            << "    <DataArray type=\"Float32\" Name=\"TIME\" NumberOfTuples=\"1\" format=\"ascii\">"
+            << flags.time << "</DataArray>\n";
+        }
+
+      if (n_metadata > 0)
+        out << "    </FieldData>\n";
+    }
+
     out << "    <PPointData Scalars=\"scalars\">\n";
 
     // We need to output in the same order as the write_vtu function does:
