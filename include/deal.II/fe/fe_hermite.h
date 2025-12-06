@@ -164,6 +164,15 @@ public:
   get_lexicographic_to_hierarchic_numbering() const;
 
   /**
+   * Returns a table of local DoF indices on a cell, which correspond
+   * to the DoFs linked to non-zero values of a specified normal
+   * derivative.
+   */
+  Table<2, unsigned int>
+  get_dofs_corresponding_to_outward_normal_derivatives(
+    const unsigned int derivative_order) const;
+
+  /**
    * This re-implements FiniteElement::fill_fe_values() for a Hermite
    * polynomial basis, to account for the more complicated shape function
    * re-scaling that a Hermite basis requires. On a non-uniform grid,
@@ -249,8 +258,6 @@ protected:
     return data_ptr;
   }
 
-
-
 private:
   /**
    * Variable storing the order of the highest derivative that the current
@@ -260,8 +267,6 @@ private:
    * of $f$, as an example.
    */
   unsigned int regularity;
-
-
 
 public:
   /**
