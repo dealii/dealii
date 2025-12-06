@@ -1,0 +1,5 @@
+Changed: The class Rol::VectorAdaptor has been renamed TrilinosWrappers::ROLVector.
+Its corresponding header file has been moved from `deal.II/optimization/rol/vector_adaptor.h`
+to `deal.II/trilinos/rol_vector.h`.
+<br>
+(Marc Fehling, 2025/11/12)
