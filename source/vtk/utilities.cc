@@ -229,6 +229,37 @@ namespace VTKWrappers
     // Create triangulation
     tria.create_triangulation(points, cells, SubCellData());
   }
+
+
+
+  void
+  read_cell_data(const std::string &vtk_filename,
+                 const std::string &cell_data_name,
+                 Vector<double>    &output_vector)
+  {
+    {
+      // check that the file exists
+      std::ifstream file(vtk_filename);
+      AssertThrow(file.good(),
+                  ExcMessage("VTK file not found: " + vtk_filename));
+    }
+    auto reader = vtkSmartPointer<vtkUnstructuredGridReader>::New();
+    reader->SetFileName(vtk_filename.c_str());
+    reader->Update();
+    vtkUnstructuredGrid *grid = reader->GetOutput();
+    AssertThrow(grid, ExcMessage("Failed to read VTK file: " + vtk_filename));
+    vtkDataArray *data_array =
+      grid->GetCellData()->GetArray(cell_data_name.c_str());
+    AssertThrow(data_array,
+                ExcMessage("Cell data array '" + cell_data_name +
+                           "' not found in VTK file: " + vtk_filename));
+    vtkIdType n_tuples     = data_array->GetNumberOfTuples();
+    int       n_components = data_array->GetNumberOfComponents();
+    output_vector.reinit(n_tuples * n_components);
+    for (vtkIdType i = 0; i < n_tuples; ++i)
+      for (int j = 0; j < n_components; ++j)
+        output_vector[i * n_components + j] = data_array->GetComponent(i, j);
+  }
 #else
 DEAL_II_NAMESPACE_OPEN
 
@@ -240,6 +271,12 @@ namespace VTKWrappers
             Triangulation<dim, spacedim> &,
             const bool,
             const double)
+  {
+    AssertThrow(false, ExcMessage("deal.II is not built with VTK support."));
+  }
+
+  void
+  read_cell_data(const std::string &, const std::string &, Vector<double> &)
   {
     AssertThrow(false, ExcMessage("deal.II is not built with VTK support."));
   }
