@@ -600,11 +600,30 @@ namespace Portable
 
     /**
      * Copy the values of the constrained entries from @p src to @p dst. This is
-     * used to impose zero Dirichlet boundary condition.
+     * used to impose zero Dirichlet boundary conditions.
+     *
+     * @p dof_handler_index is used to select the DoFHandler object.
      */
     template <typename VectorType>
     void
-    copy_constrained_values(const VectorType &src, VectorType &dst) const;
+    copy_constrained_values(const VectorType  &src,
+                            VectorType        &dst,
+                            const unsigned int dof_handler_index = 0) const;
+
+    /**
+     * Copy the values of the constrained entries from @p src to @p dst. This is
+     * used to impose zero Dirichlet boundary conditions.
+     *
+     * This is a specialization for BlockVector and will copy the constrained
+     * values for all DoFHandlers. The number of blocks in @p src and @p dst must
+     * be equal to the number of DoFHandlers of this MatrixFree object.
+     */
+    void
+    copy_constrained_values(
+      const LinearAlgebra::distributed::BlockVector<Number,
+                                                    MemorySpace::Default> &src,
+      LinearAlgebra::distributed::BlockVector<Number, MemorySpace::Default>
+        &dst) const;
 
     /**
      * Set the entries in @p dst corresponding to constrained values to @p val.
