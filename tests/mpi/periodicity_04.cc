@@ -232,11 +232,19 @@ check(const unsigned int orientation, bool reverse)
           const std::vector<std::pair<types::global_dof_index, double>>
             *entries = constraints.get_constraint_entries(line);
           Assert(entries->size() == 1, ExcInternalError());
-          const Point<dim> point1     = support_points[line];
-          const Point<dim> point2     = support_points[(*entries)[0].first];
-          Tensor<1, dim>   difference = point1 - point2;
-          difference[dim - 1]         = 0.;
-          AssertThrow(difference.norm() < 1.e-9, ExcInternalError());
+
+          // Only check constraints where both the constrained DoF and the
+          // DoF it depends on are locally owned (and thus in support_points)
+          if (support_points.find(line) != support_points.end() &&
+              support_points.find((*entries)[0].first) != support_points.end())
+            {
+              const Point<dim> point1     = support_points[line];
+              const Point<dim> point2     = support_points[(*entries)[0].first];
+              Tensor<1, dim>   difference = point1 - point2;
+              difference[dim - 1]         = 0.;
+              AssertThrow(difference.norm() < 1.e-9, ExcInternalError());
+            }
+
           if (locally_owned_dofs.is_element(line))
             ++n_local_constraints;
         }
