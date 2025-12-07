@@ -20,7 +20,29 @@
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/point.h>
 
+#include <deal.II/grid/tria.h>
+
 #ifdef DEAL_II_WITH_VTK
+
+// Make sure that the VTK version macros are available.
+#  include <vtkVersion.h>
+
+// VTK_VERSION_CHECK is defined by the header above for 9.3.0 and above, but
+// we provide a fallback older versions.
+#  ifndef VTK_VERSION_CHECK
+#    define VTK_VERSION_CHECK(major, minor, build) \
+      (10000000000ULL * (major) + 100000000ULL * (minor) + (build))
+#  endif
+
+// Normalize the version macro name to cover both the quick (>=9.3) and
+// legacy (<9.3) headers.
+#  if defined(VTK_VERSION_NUMBER_QUICK)
+#    define DEAL_II_VTK_VERSION_NUMBER VTK_VERSION_NUMBER_QUICK
+#  elif defined(VTK_VERSION_NUMBER)
+#    define DEAL_II_VTK_VERSION_NUMBER VTK_VERSION_NUMBER
+#  else
+#    define DEAL_II_VTK_VERSION_NUMBER 0
+#  endif
 
 #  include <vtkDoubleArray.h>
 
@@ -51,6 +73,26 @@ namespace VTKWrappers
   template <int dim>
   inline vtkSmartPointer<vtkDoubleArray>
   dealii_point_to_vtk_array(const dealii::Point<dim> &p);
+
+  /**
+   * @brief Read a VTK mesh file and populate a deal.II Triangulation.
+   *
+   * This function reads the mesh from the specified VTK file and fills the
+   * given Triangulation object. If cleanup is true, overlapping points in the
+   * VTK file are merged using VTK's cleaning utilities.
+   *
+   * @param vtk_filename The name of the input VTK file.
+   * @param tria The Triangulation object to populate.
+   * @param cleanup If true, merge overlapping points in the VTK file (default: true).
+   * @param relative_tolerance Relative tolerance used when merging points via
+   * VTK's cleaning utilities (default: 0).
+   */
+  template <int dim, int spacedim>
+  void
+  read_tria(const std::string            &vtk_filename,
+            Triangulation<dim, spacedim> &tria,
+            const bool                    cleanup            = true,
+            const double                  relative_tolerance = 0.0);
 
 #  ifndef DOXYGEN
   // Template implementations
