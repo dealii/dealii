@@ -1565,7 +1565,9 @@ namespace MatrixFreeTools
     LinearAlgebra::distributed::Vector<Number, MemorySpace> dummy;
     matrix_free.cell_loop(cell_action, dummy, diagonal_global);
 
-    matrix_free.set_constrained_values(Number(1.), diagonal_global);
+    matrix_free.set_constrained_values(Number(1.),
+                                       diagonal_global,
+                                       dof_handler_index);
   }
 
   template <int dim,

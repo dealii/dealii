@@ -607,13 +607,17 @@ namespace Portable
     copy_constrained_values(const VectorType &src, VectorType &dst) const;
 
     /**
-     * Set the entries in @p dst corresponding to constrained values to @p val.
+     * Set the entries in @p dst corresponding to constrained values to @p value.
      * The main purpose of this function is to set the constrained entries of
      * the source vector used in cell_loop() to zero.
+     *
+     * @p dof_handler_index is used to select the DoFHandler object.
      */
     template <typename VectorType>
     void
-    set_constrained_values(const Number val, VectorType &dst) const;
+    set_constrained_values(const Number       value,
+                           VectorType        &dst,
+                           const unsigned int dof_handler_index = 0) const;
 
     /**
      * Initialize a distributed vector. The local elements correspond to the

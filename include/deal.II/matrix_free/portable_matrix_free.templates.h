@@ -728,31 +728,38 @@ namespace Portable
   template <int dim, typename Number>
   template <typename VectorType>
   void
-  MatrixFree<dim, Number>::set_constrained_values(Number      val,
-                                                  VectorType &dst) const
+  MatrixFree<dim, Number>::set_constrained_values(
+    Number             value,
+    VectorType        &dst,
+    const unsigned int dof_handler_index) const
   {
     static_assert(
       std::is_same_v<Number, typename VectorType::value_type>,
       "VectorType::value_type and Number should be of the same type.");
+
+    AssertIndexRange(dof_handler_index, dof_handler_data.size());
+    Assert(dst.size() == dof_handler_data[dof_handler_index].n_dofs,
+           ExcMessage("dst vector has the wrong size."));
+
     Number *dst_ptr = dst.get_values();
     // FIXME When using C++17, we can use KOKKOS_CLASS_LAMBDA and this
     // work-around can be removed.
 
-    Assert(dof_handler_data.size() == 1, ExcNotImplemented());
-    auto constr_dofs = dof_handler_data[0].constrained_dofs;
+    auto constr_dofs = dof_handler_data[dof_handler_index].constrained_dofs;
     // When working with distributed vectors, the constrained dofs are
     // computed for ghosted vectors but we want to set the values of the
     // constrained dofs of non-ghosted vectors.
-    const unsigned int size =
-      dof_handler_data[0].partitioner ? dst.locally_owned_size() : dst.size();
+    const unsigned int size = dof_handler_data[dof_handler_index].partitioner ?
+                                dst.locally_owned_size() :
+                                dst.size();
 
     Kokkos::parallel_for(
       "dealii::set_constrained_values",
       Kokkos::RangePolicy<MemorySpace::Default::kokkos_space::execution_space>(
-        0, dof_handler_data[0].n_constrained_dofs),
+        0, dof_handler_data[dof_handler_index].n_constrained_dofs),
       KOKKOS_LAMBDA(int dof) {
         if (constr_dofs[dof] < size)
-          dst_ptr[constr_dofs[dof]] = val;
+          dst_ptr[constr_dofs[dof]] = value;
       });
   }
 
