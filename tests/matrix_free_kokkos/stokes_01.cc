@@ -129,49 +129,6 @@ template <int dim,
           int degree_p,
           typename Number,
           int n_q_points_1d>
-class StokesOperatorQuad
-{
-public:
-  DEAL_II_HOST_DEVICE
-  StokesOperatorQuad()
-  {}
-
-  DEAL_II_HOST_DEVICE void
-  operator()(
-    Portable::FEEvaluation<dim, degree_u, n_q_points_1d, dim, Number> &fe_u,
-    Portable::FEEvaluation<dim, degree_p, n_q_points_1d, 1, Number>   &fe_p,
-    int q_point) const;
-};
-
-
-
-template <int dim,
-          int degree_u,
-          int degree_p,
-          typename Number,
-          int n_q_points_1d>
-DEAL_II_HOST_DEVICE void
-StokesOperatorQuad<dim, degree_u, degree_p, Number, n_q_points_1d>::operator()(
-  Portable::FEEvaluation<dim, degree_u, n_q_points_1d, dim, Number> &fe_u,
-  Portable::FEEvaluation<dim, degree_p, n_q_points_1d, 1, Number>   &fe_p,
-  int q_point) const
-{
-  const Tensor<2, dim, Number> gradient_u = fe_u.get_gradient(q_point);
-  Tensor<2, dim, Number>       vel_term   = gradient_u;
-  for (unsigned int d = 0; d < dim; ++d)
-    vel_term[d][d] -= fe_p.get_value(q_point);
-  fe_u.submit_gradient(vel_term, q_point);
-
-  const Number pressure_term = trace(gradient_u);
-  fe_p.submit_value(pressure_term, q_point);
-}
-
-
-template <int dim,
-          int degree_u,
-          int degree_p,
-          typename Number,
-          int n_q_points_1d>
 class StokesOperator
 {
 public:
