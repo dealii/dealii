@@ -31,6 +31,7 @@
 #include <deal.II/fe/mapping_q1.h>
 
 #include <deal.II/lac/block_vector_base.h>
+#include <deal.II/lac/la_parallel_block_vector.h>
 
 #include <deal.II/matrix_free/portable_hanging_nodes_internal.h>
 #include <deal.II/matrix_free/portable_matrix_free.h>
@@ -693,26 +694,33 @@ namespace Portable
   template <int dim, typename Number>
   template <typename VectorType>
   void
-  MatrixFree<dim, Number>::copy_constrained_values(const VectorType &src,
-                                                   VectorType       &dst) const
+  MatrixFree<dim, Number>::copy_constrained_values(
+    const VectorType  &src,
+    VectorType        &dst,
+    const unsigned int dof_handler_index) const
   {
     static_assert(
       std::is_same_v<Number, typename VectorType::value_type>,
       "VectorType::value_type and Number should be of the same type.");
-    Assert(src.size() == dst.size(),
-           ExcMessage("src and dst vectors have different size."));
+
+    AssertIndexRange(dof_handler_index, dof_handler_data.size());
+
+    Assert(src.size() == dof_handler_data[dof_handler_index].n_dofs,
+           ExcMessage("src vector has the wrong size."));
+    Assert(dst.size() == dof_handler_data[dof_handler_index].n_dofs,
+           ExcMessage("dst vector has the wrong size."));
+
     // FIXME When using C++17, we can use KOKKOS_CLASS_LAMBDA and this
     // work-around can be removed.
 
-    Assert(dof_handler_data.size() == 1, ExcNotImplemented());
-    auto               constr_dofs = dof_handler_data[0].constrained_dofs;
+    auto constr_dofs = dof_handler_data[dof_handler_index].constrained_dofs;
     const unsigned int size = internal::VectorLocalSize<VectorType>::get(dst);
     const Number      *src_ptr = src.get_values();
     Number            *dst_ptr = dst.get_values();
     Kokkos::parallel_for(
       "dealii::copy_constrained_values",
       Kokkos::RangePolicy<MemorySpace::Default::kokkos_space::execution_space>(
-        0, dof_handler_data[0].n_constrained_dofs),
+        0, dof_handler_data[dof_handler_index].n_constrained_dofs),
       KOKKOS_LAMBDA(int dof) {
         // When working with distributed vectors, the constrained dofs are
         // computed for ghosted vectors but we want to copy the values of the
@@ -721,6 +729,28 @@ namespace Portable
         if (constrained_dof < size)
           dst_ptr[constrained_dof] = src_ptr[constrained_dof];
       });
+  }
+
+
+
+  template <int dim, typename Number>
+  void
+  MatrixFree<dim, Number>::copy_constrained_values(
+    const LinearAlgebra::distributed::BlockVector<Number, MemorySpace::Default>
+                                                                          &src,
+    LinearAlgebra::distributed::BlockVector<Number, MemorySpace::Default> &dst)
+    const
+  {
+    Assert(src.size() == dst.size(),
+           ExcMessage("src and dst vectors have different size."));
+
+    Assert(src.n_blocks() == dof_handler_data.size(),
+           ExcMessage("src vector does not have one block per DoFHandler."));
+    Assert(dst.n_blocks() == dof_handler_data.size(),
+           ExcMessage("dst vector does not have one block per DoFHandler."));
+
+    for (unsigned int i = 0; i < dof_handler_data.size(); ++i)
+      copy_constrained_values(src.block(i), dst.block(i), i);
   }
 
 

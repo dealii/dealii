@@ -201,8 +201,8 @@ public:
     StokesOperator<dim, degree_u, degree_p, Number, n_q_points_1d>
       stokes_operator;
     data.cell_loop(stokes_operator, src, dst);
-    // TODO: the following is not supported for block vectors right now
-    // data.copy_constrained_values(src, dst);
+
+    data.copy_constrained_values(src, dst);
   }
 };
 
@@ -277,8 +277,6 @@ test(unsigned int n_refinements)
 
   src_host.block(0).import_elements(dst.block(0), VectorOperation::insert);
   src_host.block(1).import_elements(dst.block(1), VectorOperation::insert);
-
-  constraints_u.set_zero(src_host.block(0));
 
   LinearAlgebra::distributed::Vector<Number, MemorySpace::Host> f_host;
   f_host.reinit(mf_data.get_vector_partitioner(0));
