@@ -1,0 +1,6 @@
+New: The new function VTKWrappers::vtk_to_finite_element() generates a
+FiniteElement object from a VTK supported file. The generated FiniteElement can
+be used to create a field that is compatible with the field data contained in
+the file.
+<br>
+(Luca Heltai, 2025/12/09)
