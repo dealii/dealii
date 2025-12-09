@@ -2468,22 +2468,28 @@ namespace DoFTools
           dof_handler.get_fe_collection();
         hp::QCollection<dim> q_coll_dummy;
 
-        for (unsigned int fe_index = 0; fe_index < fe_collection.size();
-             ++fe_index)
-          {
-            // check whether every FE in the collection has support points
-            Assert((fe_collection[fe_index].n_dofs_per_cell() == 0) ||
-                     (fe_collection[fe_index].has_support_points()),
-                   typename FiniteElement<dim>::ExcFEHasNoSupportPoints());
-            q_coll_dummy.push_back(Quadrature<dim>(
-              fe_collection[fe_index].get_unit_support_points()));
-          }
-
         // Take care of components
         const ComponentMask mask =
           (in_mask.size() == 0 ?
              ComponentMask(fe_collection.n_components(), true) :
              in_mask);
+
+        for (unsigned int fe_index = 0; fe_index < fe_collection.size();
+             ++fe_index)
+          {
+            // check whether every FE in the collection has support points
+            Assert(
+              (fe_collection[fe_index].get_sub_fe(mask).n_dofs_per_cell() ==
+               0) ||
+                (fe_collection[fe_index].get_sub_fe(mask).has_support_points()),
+              typename FiniteElement<dim>::ExcFEHasNoSupportPoints());
+            q_coll_dummy.push_back(
+              Quadrature<dim>(fe_collection[fe_index]
+                                .get_sub_fe(mask)
+                                .get_unit_support_points()));
+          }
+
+
 
         // Now loop over all cells and enquire the support points on each
         // of these. we use dummy quadrature formulas where the quadrature
@@ -2517,6 +2523,12 @@ namespace DoFTools
 
               const std::vector<Point<spacedim>> &points =
                 fe_values.get_quadrature_points();
+
+              // When using a component mask, the quadrature points only
+              // correspond to the selected components (via get_sub_fe(mask)).
+              // So we map between the DoF indices and the filtered support
+              // point indices.
+              unsigned int point_index = 0;
               for (unsigned int i = 0; i < cell->get_fe().n_dofs_per_cell();
                    ++i)
                 {
@@ -2526,6 +2538,9 @@ namespace DoFTools
                   // insert the values into the map if it is a valid component
                   if (mask[dof_comp])
                     {
+                      // make sure we do not go out of bounds
+                      Assert(point_index < points.size(), ExcInternalError());
+
                       // For continuous elements, we encounter some DoFs more
                       // than once, namely from each cell that is adjacent to a
                       // DoF. If everything is alright then a DoF should have
@@ -2550,14 +2565,17 @@ namespace DoFTools
                           if (it != support_points.end())
                             {
                               const auto p = cell->get_fe().tensor_degree();
-                              Assert((it->second - points[i]).norm() <
+                              Assert((it->second - points[point_index]).norm() <
                                        cell->diameter() / (4.0 * p * p),
                                      ExcInternalError());
                             }
                         }
 
                       if (locally_owned_dofs.is_element(local_dof_indices[i]))
-                        support_points[local_dof_indices[i]] = points[i];
+                        support_points[local_dof_indices[i]] =
+                          points[point_index];
+
+                      ++point_index;
                     }
                 }
             }
