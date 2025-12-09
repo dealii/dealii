@@ -25,6 +25,7 @@
 #  include <deal.II/fe/fe_dgq.h>
 #  include <deal.II/fe/fe_nothing.h>
 #  include <deal.II/fe/fe_q.h>
+#  include <deal.II/fe/fe_simplex_p.h>
 #  include <deal.II/fe/fe_system.h>
 
 #  include <deal.II/grid/grid_in.h>
@@ -311,6 +312,141 @@ namespace VTKWrappers
       for (int j = 0; j < n_components; ++j)
         output_vector[i * n_components + j] = data_array->GetComponent(i, j);
   }
+
+
+
+  template <int dim, int spacedim>
+  std::pair<std::unique_ptr<FiniteElement<dim, spacedim>>,
+            std::vector<std::string>>
+  vtk_to_finite_element(const std::string &vtk_filename)
+  {
+    std::vector<std::string> data_names;
+    auto reader = vtkSmartPointer<vtkUnstructuredGridReader>::New();
+    reader->SetFileName(vtk_filename.c_str());
+    reader->Update();
+    vtkUnstructuredGrid *grid = reader->GetOutput();
+    AssertThrow(grid, ExcMessage("Failed to read VTK file: " + vtk_filename));
+
+    vtkCellData  *cell_data  = grid->GetCellData();
+    vtkPointData *point_data = grid->GetPointData();
+
+    std::vector<std::shared_ptr<FiniteElement<dim, spacedim>>> fe_collection;
+    std::vector<unsigned int> n_components_collection;
+
+    bool            is_simplex    = false;
+    const vtkIdType n_cells_check = grid->GetNumberOfCells();
+    for (vtkIdType i = 0; i < n_cells_check; ++i)
+      {
+        vtkCell *cell = grid->GetCell(i);
+        if (!cell)
+          continue;
+        const int cell_type = cell->GetCellType();
+        if constexpr (dim == 2)
+          {
+            if (cell_type == VTK_TRIANGLE)
+              {
+                is_simplex = true;
+                break;
+              }
+          }
+        else if constexpr (dim == 3)
+          {
+            if (cell_type == VTK_TETRA)
+              {
+                is_simplex = true;
+                break;
+              }
+          }
+        else
+          {
+            is_simplex = false;
+            break;
+          }
+      }
+
+    // Query point data fields
+    for (int i = 0; i < point_data->GetNumberOfArrays(); ++i)
+      {
+        vtkDataArray *arr = point_data->GetArray(i);
+        if (!arr)
+          continue;
+        std::string name   = arr->GetName();
+        int         n_comp = arr->GetNumberOfComponents();
+
+        if (is_simplex)
+          {
+            if (n_comp == 1)
+              fe_collection.push_back(
+                std::make_shared<FE_SimplexP<dim, spacedim>>(1));
+            else
+              // Use FESystem for vector fields
+              fe_collection.push_back(std::make_shared<FESystem<dim, spacedim>>(
+                FE_SimplexP<dim, spacedim>(1), n_comp));
+          }
+        else
+          {
+            if (n_comp == 1)
+              fe_collection.push_back(std::make_shared<FE_Q<dim, spacedim>>(1));
+            else
+              // Use FESystem for vector fields
+              fe_collection.push_back(std::make_shared<FESystem<dim, spacedim>>(
+                FE_Q<dim, spacedim>(1), n_comp));
+          }
+        n_components_collection.push_back(n_comp);
+        data_names.push_back(name);
+      }
+
+    // Query cell data fields
+    for (int i = 0; i < cell_data->GetNumberOfArrays(); ++i)
+      {
+        vtkDataArray *arr = cell_data->GetArray(i);
+        if (!arr)
+          continue;
+        std::string name   = arr->GetName();
+        int         n_comp = arr->GetNumberOfComponents();
+        if (is_simplex)
+          {
+            if (n_comp == 1)
+              fe_collection.push_back(
+                std::make_shared<FE_SimplexDGP<dim, spacedim>>(0));
+            else
+              // Use FESystem for vector fields
+              fe_collection.push_back(std::make_shared<FESystem<dim, spacedim>>(
+                FE_SimplexDGP<dim, spacedim>(0), n_comp));
+          }
+        else
+          {
+            if (n_comp == 1)
+              fe_collection.push_back(
+                std::make_shared<FE_DGQ<dim, spacedim>>(0));
+            else
+              // Use FESystem for vector fields
+              fe_collection.push_back(std::make_shared<FESystem<dim, spacedim>>(
+                FE_DGQ<dim, spacedim>(0), n_comp));
+          }
+        n_components_collection.push_back(n_comp);
+        data_names.push_back(name);
+      }
+
+
+    // Build a FESystem with all fields
+    std::vector<const FiniteElement<dim, spacedim> *> fe_ptrs;
+    std::vector<unsigned int>                         multiplicities;
+    for (const auto &fe : fe_collection)
+      {
+        fe_ptrs.push_back(fe.get());
+        multiplicities.push_back(1);
+      }
+    if (fe_ptrs.empty())
+      return std::make_pair(std::make_unique<FE_Nothing<dim, spacedim>>(),
+                            std::vector<std::string>());
+    else
+      {
+        return std::make_pair(
+          std::make_unique<FESystem<dim, spacedim>>(fe_ptrs, multiplicities),
+          data_names);
+      }
+  }
 #else
 DEAL_II_NAMESPACE_OPEN
 
@@ -334,6 +470,14 @@ namespace VTKWrappers
 
   void
   read_vertex_data(const std::string &, const std::string &, Vector<double> &)
+  {
+    AssertThrow(false, ExcMessage("deal.II is not built with VTK support."));
+  }
+
+  template <int dim, int spacedim>
+  std::pair<std::unique_ptr<FiniteElement<dim, spacedim>>,
+            std::vector<std::string>>
+  vtk_to_finite_element(const std::string &)
   {
     AssertThrow(false, ExcMessage("deal.II is not built with VTK support."));
   }

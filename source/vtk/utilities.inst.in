@@ -20,5 +20,11 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
       Triangulation<deal_II_dimension, deal_II_space_dimension> &,
       const bool,
       const double);
+
+    template std::pair<std::unique_ptr<FiniteElement<deal_II_dimension,
+                                                     deal_II_space_dimension>>,
+                       std::vector<std::string>>
+    vtk_to_finite_element<deal_II_dimension, deal_II_space_dimension>(
+      const std::string &);
 #endif
   }
