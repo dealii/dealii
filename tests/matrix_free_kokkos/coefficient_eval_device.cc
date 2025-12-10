@@ -144,7 +144,7 @@ test()
   for (unsigned int color = 0; color < n_colors; ++color)
     {
       typename Portable::MatrixFree<dim, double>::PrecomputedData gpu_data =
-        mf_data.get_data(0, color);
+        mf_data.get_data(color, 0);
       const unsigned int n_cells = gpu_data.n_cells;
       auto gpu_data_host         = Portable::copy_mf_data_to_host<dim, double>(
         gpu_data, additional_data.mapping_update_flags);

@@ -558,8 +558,8 @@ namespace Portable
      * Return the Data structure associated with @p color.
      */
     PrecomputedData
-    get_data(const unsigned int dof_handler_index,
-             const unsigned int color) const;
+    get_data(const unsigned int color,
+             const unsigned int dof_handler_index = 0) const;
 
     // clang-format off
     /**
