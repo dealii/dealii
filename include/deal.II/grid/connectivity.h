@@ -110,20 +110,6 @@ namespace internal
       }
 
       /**
-       * Index of the @p line-th lines of @p face-th surface.
-       */
-      virtual unsigned int
-      nth_line_of_surface(const unsigned int line,
-                          const unsigned int face) const
-      {
-        DEAL_II_NOT_IMPLEMENTED();
-        (void)line;
-        (void)face;
-
-        return 0;
-      }
-
-      /**
        * Vertex indices of the @p line-th lines of @p face-th surface.
        */
       virtual const std::array<unsigned int, 2> &
@@ -410,16 +396,6 @@ namespace internal
         return 3;
       }
 
-      unsigned int
-      nth_line_of_surface(const unsigned int line,
-                          const unsigned int face) const override
-      {
-        const static dealii::ndarray<unsigned int, 4, 3> table = {
-          {{{0, 1, 2}}, {{0, 3, 4}}, {{2, 5, 3}}, {{1, 4, 5}}}};
-
-        return table[face][line];
-      }
-
       const std::array<unsigned int, 2> &
       vertices_of_nth_line_of_surface(const unsigned int line,
                                       const unsigned int face) const override
@@ -530,20 +506,6 @@ namespace internal
           return 4;
 
         return 3;
-      }
-
-      unsigned int
-      nth_line_of_surface(const unsigned int line,
-                          const unsigned int face) const override
-      {
-        const static dealii::ndarray<unsigned int, 5, 4> table = {
-          {{{0, 1, 2, 3}},
-           {{0, 6, 4, numbers::invalid_unsigned_int}},
-           {{1, 5, 7, numbers::invalid_unsigned_int}},
-           {{2, 4, 5, numbers::invalid_unsigned_int}},
-           {{3, 7, 6, numbers::invalid_unsigned_int}}}};
-
-        return table[face][line];
       }
 
       const std::array<unsigned int, 2> &
@@ -665,22 +627,6 @@ namespace internal
         return 3;
       }
 
-      unsigned int
-      nth_line_of_surface(const unsigned int line,
-                          const unsigned int face) const override
-      {
-        static const unsigned int X = static_cast<unsigned int>(-1);
-
-        const static dealii::ndarray<unsigned int, 5, 4> table = {
-          {{{0, 2, 1, X}},
-           {{3, 4, 5, X}},
-           {{6, 7, 0, 3}},
-           {{7, 8, 1, 4}},
-           {{8, 6, 2, 5}}}};
-
-        return table[face][line];
-      }
-
       const std::array<unsigned int, 2> &
       vertices_of_nth_line_of_surface(const unsigned int line,
                                       const unsigned int face) const override
@@ -794,21 +740,6 @@ namespace internal
       {
         (void)surface;
         return 4;
-      }
-
-      unsigned int
-      nth_line_of_surface(const unsigned int line,
-                          const unsigned int face) const override
-      {
-        const static dealii::ndarray<unsigned int, 6, 4> table = {
-          {{{8, 10, 0, 4}},
-           {{9, 11, 1, 5}},
-           {{2, 6, 8, 9}},
-           {{3, 7, 10, 11}},
-           {{0, 1, 2, 3}},
-           {{4, 5, 6, 7}}}};
-
-        return table[face][line];
       }
 
       const std::array<unsigned int, 2> &
