@@ -1390,7 +1390,8 @@ namespace internal
                 {
                   // determine global index of line
                   const unsigned int local_line_index =
-                    cell_type->nth_line_of_surface(l, f_index);
+                    cell_type->get_reference_cell().face_to_cell_lines(
+                      f_index, l, numbers::default_geometric_orientation);
                   const unsigned int global_line_index =
                     con_cl.col[con_cl.ptr[c] + local_line_index];
                   con_ql.col[con_ql.ptr[f] + l] = global_line_index;
@@ -1479,8 +1480,9 @@ namespace internal
 
               for (; l < cell_type->n_lines_of_surface(f); ++l)
                 key[l] =
-                  temp1
-                    .col[temp1.ptr[c] + cell_type->nth_line_of_surface(l, f)] +
+                  temp1.col[temp1.ptr[c] +
+                            cell_type->get_reference_cell().face_to_cell_lines(
+                              f, l, numbers::default_geometric_orientation)] +
                   1 /*offset!*/;
 
               for (; l < key.size(); ++l)
