@@ -40,10 +40,24 @@ namespace internal
      */
     struct CellTypeBase
     {
+      CellTypeBase(const ReferenceCell &reference_cell)
+        : reference_cell(reference_cell)
+      {}
+
       /**
        * Default destructor.
        */
       virtual ~CellTypeBase() = default;
+
+      /**
+       * Return the ReferenceCell object that corresponds to the current cell
+       * type.
+       */
+      ReferenceCell
+      get_reference_cell() const
+      {
+        return reference_cell;
+      }
 
       /**
        * Number of sub-entities of dimension @p d.
@@ -124,6 +138,12 @@ namespace internal
 
         return table;
       }
+
+    private:
+      /**
+       * The reference cell represented by the current object.
+       */
+      const ReferenceCell reference_cell;
     };
 
 
@@ -133,6 +153,13 @@ namespace internal
      */
     struct CellTypeLine : public CellTypeBase
     {
+      /**
+       * Constructor.
+       */
+      CellTypeLine()
+        : CellTypeBase(ReferenceCells::Line)
+      {}
+
       dealii::ArrayView<const unsigned int>
       vertices_of_entity(const unsigned int d,
                          const unsigned int e) const override
@@ -181,6 +208,13 @@ namespace internal
      */
     struct CellTypeTriangle : public CellTypeBase
     {
+      /**
+       * Constructor.
+       */
+      CellTypeTriangle()
+        : CellTypeBase(ReferenceCells::Triangle)
+      {}
+
       dealii::ArrayView<const unsigned int>
       vertices_of_entity(const unsigned int d,
                          const unsigned int e) const override
@@ -238,6 +272,13 @@ namespace internal
      */
     struct CellTypeQuadrilateral : public CellTypeBase
     {
+      /**
+       * Constructor.
+       */
+      CellTypeQuadrilateral()
+        : CellTypeBase(ReferenceCells::Quadrilateral)
+      {}
+
       dealii::ArrayView<const unsigned int>
       vertices_of_entity(const unsigned int d,
                          const unsigned int e) const override
@@ -295,6 +336,13 @@ namespace internal
      */
     struct CellTypeTetrahedron : public CellTypeBase
     {
+      /**
+       * Constructor.
+       */
+      CellTypeTetrahedron()
+        : CellTypeBase(ReferenceCells::Tetrahedron)
+      {}
+
       dealii::ArrayView<const unsigned int>
       vertices_of_entity(const unsigned int d,
                          const unsigned int e) const override
@@ -393,6 +441,13 @@ namespace internal
 
     struct CellTypePyramid : public CellTypeBase
     {
+      /**
+       * Constructor.
+       */
+      CellTypePyramid()
+        : CellTypeBase(ReferenceCells::Pyramid)
+      {}
+
       dealii::ArrayView<const unsigned int>
       vertices_of_entity(const unsigned int d,
                          const unsigned int e) const override
@@ -515,6 +570,13 @@ namespace internal
      */
     struct CellTypeWedge : public CellTypeBase
     {
+      /**
+       * Constructor.
+       */
+      CellTypeWedge()
+        : CellTypeBase(ReferenceCells::Wedge)
+      {}
+
       dealii::ArrayView<const unsigned int>
       vertices_of_entity(const unsigned int d,
                          const unsigned int e) const override
@@ -643,6 +705,13 @@ namespace internal
      */
     struct CellTypeHexahedron : public CellTypeBase
     {
+      /**
+       * Constructor.
+       */
+      CellTypeHexahedron()
+        : CellTypeBase(ReferenceCells::Hexahedron)
+      {}
+
       dealii::ArrayView<const unsigned int>
       vertices_of_entity(const unsigned int d,
                          const unsigned int e) const override
