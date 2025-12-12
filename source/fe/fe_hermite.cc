@@ -237,14 +237,12 @@ namespace internal
    * cases for different element dimensions are all defined separately
    * due to the requirement for different levels of nesting of for loops.
    */
-  template <int xdim, int xspacedim = xdim, typename xNumber = double>
   class Rescaler
   {
   public:
     template <int spacedim, typename Number>
     void
     rescale_fe_hermite_values(
-      Rescaler<1, spacedim, Number> & /*rescaler*/,
       const FE_Hermite<1, spacedim>                         &fe_herm,
       const typename Mapping<1, spacedim>::InternalDataBase &mapping_data,
       Table<2, Number>                                      &value_list)
@@ -299,7 +297,6 @@ namespace internal
     template <int spacedim, typename Number>
     void
     rescale_fe_hermite_values(
-      Rescaler<2, spacedim, Number> & /*rescaler*/,
       const FE_Hermite<2, spacedim>                         &fe_herm,
       const typename Mapping<2, spacedim>::InternalDataBase &mapping_data,
       Table<2, Number>                                      &value_list)
@@ -369,7 +366,6 @@ namespace internal
     template <int spacedim, typename Number>
     void
     rescale_fe_hermite_values(
-      Rescaler<3, spacedim, Number> & /*rescaler*/,
       const FE_Hermite<3, spacedim>                         &fe_herm,
       const typename Mapping<3, spacedim>::InternalDataBase &mapping_data,
       Table<2, Number>                                      &value_list)
@@ -739,6 +735,78 @@ FE_Hermite<dim, spacedim>::get_lexicographic_to_hierarchic_numbering() const
 
 
 template <int dim, int spacedim>
+Table<2, unsigned int>
+FE_Hermite<dim, spacedim>::get_dofs_corresponding_to_outward_normal_derivatives(
+  const unsigned int derivative_order) const
+{
+  /*
+   * Create a look-up table for finding relevant dofs on all
+   * 2*dim faces of reference cell
+   */
+  const unsigned int degree        = this->degree;
+  const unsigned int regularity    = this->get_regularity();
+  const unsigned int dofs_per_face = this->n_dofs_per_face();
+  AssertIndexRange(derivative_order, regularity + 1);
+  AssertDimension(dofs_per_face,
+                  (regularity + 1) * Utilities::pow(degree + 1, dim - 1));
+
+  const unsigned int relevant_dofs_per_face = dofs_per_face / (regularity + 1);
+  Table<2, unsigned int> dofs_on_each_face(2 * dim, relevant_dofs_per_face);
+
+  /*
+   * Use knowledge of the local degree numbering for this version,
+   * saving expensive calls to reinit().
+   */
+  const std::vector<unsigned int> l2h =
+    get_lexicographic_to_hierarchic_numbering();
+  const unsigned int dofs_per_cell = Utilities::pow(degree + 1, dim);
+  AssertDimension(dofs_per_cell, l2h.size());
+  (void)dofs_per_cell;
+
+  /*
+   * The following loop uses the variables batch_size, batch_index
+   * and local_index to simplify calculations. The idea is to find
+   * relevant DoFs in batches, with each batch representing a
+   * set of DoFs of interest on a given face that occur consecutively
+   * in the ordering of all DoFs on the reference cell.
+   * To quickly summarise what the variables mean:
+   * sublist_index: index of a DoF in the list of relevant DoF indices
+   * index: index of a DoF in the list of all DoFs on the cell
+   * batch_size: Number of consecutive DoFs in the ordering that are
+   *             all of interest,
+   * batch index: Index of the current batch in the list of batches
+   * local_index: Index of the current DoF within a batch
+   *
+   * The variable correction is used because the pattern of relevant
+   * DoFs on opposite face pairs is always the same, just separated by
+   * a constant offset value in the indices, so it's easier to calculate
+   * the pattern once and find this offset value.
+   */
+  for (unsigned int d = 0, batch_size = 1; d < dim;
+       ++d, batch_size *= degree + 1)
+    for (unsigned int sublist_index = 0; sublist_index < relevant_dofs_per_face;
+         ++sublist_index)
+      {
+        const unsigned int local_index = sublist_index % batch_size;
+        const unsigned int batch_index = sublist_index / batch_size;
+
+        unsigned int index =
+          local_index +
+          (batch_index * (degree + 1) + derivative_order) * batch_size;
+        unsigned int correction = batch_size * (regularity + 1);
+        Assert(index + correction < dofs_per_cell,
+               ExcDimensionMismatch(index + correction, dofs_per_cell));
+
+        dofs_on_each_face(2 * d, sublist_index)     = l2h[index];
+        dofs_on_each_face(2 * d + 1, sublist_index) = l2h[index + correction];
+      }
+
+  return dofs_on_each_face;
+}
+
+
+
+template <int dim, int spacedim>
 void
 FE_Hermite<dim, spacedim>::fill_fe_values(
   const typename Triangulation<dim, spacedim>::cell_iterator &,
@@ -771,12 +839,11 @@ FE_Hermite<dim, spacedim>::fill_fe_values(
   if ((flags & update_values) &&
       (cell_similarity != CellSimilarity::translation))
     {
-      internal::Rescaler<dim, spacedim, double> shape_fix;
+      internal::Rescaler shape_fix;
       for (unsigned int i = 0; i < output_data.shape_values.size(0); ++i)
         for (unsigned int q = 0; q < output_data.shape_values.size(1); ++q)
           output_data.shape_values(i, q) = fe_data.shape_values(i, q);
-      shape_fix.rescale_fe_hermite_values(shape_fix,
-                                          *this,
+      shape_fix.rescale_fe_hermite_values(*this,
                                           mapping_internal,
                                           output_data.shape_values);
     }
@@ -790,9 +857,8 @@ FE_Hermite<dim, spacedim>::fill_fe_values(
                           mapping_internal,
                           make_array_view(output_data.shape_gradients, k));
 
-      internal::Rescaler<dim, spacedim, Tensor<1, spacedim>> grad_fix;
-      grad_fix.rescale_fe_hermite_values(grad_fix,
-                                         *this,
+      internal::Rescaler grad_fix;
+      grad_fix.rescale_fe_hermite_values(*this,
                                          mapping_internal,
                                          output_data.shape_gradients);
     }
@@ -806,9 +872,8 @@ FE_Hermite<dim, spacedim>::fill_fe_values(
                           mapping_internal,
                           make_array_view(output_data.shape_hessians, k));
 
-      internal::Rescaler<dim, spacedim, Tensor<2, spacedim>> hessian_fix;
-      hessian_fix.rescale_fe_hermite_values(hessian_fix,
-                                            *this,
+      internal::Rescaler hessian_fix;
+      hessian_fix.rescale_fe_hermite_values(*this,
                                             mapping_internal,
                                             output_data.shape_hessians);
     }
@@ -823,12 +888,9 @@ FE_Hermite<dim, spacedim>::fill_fe_values(
                           make_array_view(output_data.shape_3rd_derivatives,
                                           k));
 
-      internal::Rescaler<dim, spacedim, Tensor<3, spacedim>> third_dev_fix;
+      internal::Rescaler third_dev_fix;
       third_dev_fix.rescale_fe_hermite_values(
-        third_dev_fix,
-        *this,
-        mapping_internal,
-        output_data.shape_3rd_derivatives);
+        *this, mapping_internal, output_data.shape_3rd_derivatives);
     }
 }
 
@@ -889,9 +951,8 @@ FE_Hermite<dim, spacedim>::fill_fe_face_values(
         for (unsigned int i = 0; i < quadrature[0].size(); ++i)
           output_data.shape_values(k, i) = fe_data.shape_values[k][i + offset];
 
-      internal::Rescaler<dim, spacedim, double> shape_face_fix;
-      shape_face_fix.rescale_fe_hermite_values(shape_face_fix,
-                                               *this,
+      internal::Rescaler shape_face_fix;
+      shape_face_fix.rescale_fe_hermite_values(*this,
                                                mapping_internal,
                                                output_data.shape_values);
     }
@@ -907,9 +968,8 @@ FE_Hermite<dim, spacedim>::fill_fe_face_values(
                           mapping_internal,
                           make_array_view(output_data.shape_gradients, k));
 
-      internal::Rescaler<dim, spacedim, Tensor<1, spacedim>> grad_face_fix;
-      grad_face_fix.rescale_fe_hermite_values(grad_face_fix,
-                                              *this,
+      internal::Rescaler grad_face_fix;
+      grad_face_fix.rescale_fe_hermite_values(*this,
                                               mapping_internal,
                                               output_data.shape_gradients);
     }
@@ -925,9 +985,8 @@ FE_Hermite<dim, spacedim>::fill_fe_face_values(
                           mapping_internal,
                           make_array_view(output_data.shape_hessians, k));
 
-      internal::Rescaler<dim, spacedim, Tensor<2, spacedim>> hessian_face_fix;
-      hessian_face_fix.rescale_fe_hermite_values(hessian_face_fix,
-                                                 *this,
+      internal::Rescaler hessian_face_fix;
+      hessian_face_fix.rescale_fe_hermite_values(*this,
                                                  mapping_internal,
                                                  output_data.shape_hessians);
     }
@@ -944,12 +1003,9 @@ FE_Hermite<dim, spacedim>::fill_fe_face_values(
                           make_array_view(output_data.shape_3rd_derivatives,
                                           k));
 
-      internal::Rescaler<dim, spacedim, Tensor<3, spacedim>> shape_3rd_face_fix;
+      internal::Rescaler shape_3rd_face_fix;
       shape_3rd_face_fix.rescale_fe_hermite_values(
-        shape_3rd_face_fix,
-        *this,
-        mapping_internal,
-        output_data.shape_3rd_derivatives);
+        *this, mapping_internal, output_data.shape_3rd_derivatives);
     }
 }
 
