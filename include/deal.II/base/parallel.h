@@ -556,7 +556,7 @@ namespace parallel
 
         taskflow.for_each_by_index(
           range,
-          [&, begin](tf::IndexRange<integral_type> subrange) {
+          [&, begin](const tf::IndexRange<integral_type> &subrange) {
             integral_type subrange_begin =
               begin + static_cast<integral_type>(subrange.begin());
 
@@ -579,7 +579,7 @@ namespace parallel
 
         taskflow.for_each_by_index(
           range,
-          [&, begin](tf::IndexRange<std::size_t> subrange) {
+          [&, begin](const tf::IndexRange<std::size_t> &subrange) {
             Iterator subrange_begin = begin;
             std::advance(subrange_begin, static_cast<diff_t>(subrange.begin()));
 
