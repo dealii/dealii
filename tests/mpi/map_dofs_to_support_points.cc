@@ -58,12 +58,12 @@ test()
   // the result of the call above is
   // supposed to be a map that
   // contains exactly the locally
-  // relevant dofs, so test this
-  const IndexSet relevant_set = DoFTools::extract_locally_relevant_dofs(dofh);
+  // owned dofs, so test this
+  const IndexSet &locally_owned_dofs = dofh.locally_owned_dofs();
 
   for (unsigned int i = 0; i < dofh.n_dofs(); ++i)
     {
-      if (relevant_set.is_element(i))
+      if (locally_owned_dofs.is_element(i))
         {
           AssertThrow(points.find(i) != points.end(), ExcInternalError());
         }
