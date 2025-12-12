@@ -448,19 +448,19 @@ public:
   refinement_cases() const;
 
   /**
-   * Return the reference-cell type of face @p face_no of the current
+   * Return the reference-cell type of face @p face_index of the current
    * object. For example, if the current object is
-   * ReferenceCells::Tetrahedron, then `face_no` must be between
+   * ReferenceCells::Tetrahedron, then `face_index` must be
    * in the interval $[0,4)$ and the function will always return
    * ReferenceCells::Triangle. If the current object is
-   * ReferenceCells::Hexahedron, then `face_no` must be between
+   * ReferenceCells::Hexahedron, then `face_index` must be
    * in the interval $[0,6)$ and the function will always return
    * ReferenceCells::Quadrilateral. For wedges and pyramids, the
    * returned object may be either ReferenceCells::Triangle or
    * ReferenceCells::Quadrilateral, depending on the given index.
    */
   ReferenceCell
-  face_reference_cell(const unsigned int face_no) const;
+  face_reference_cell(const unsigned int face_index) const;
 
   /**
    * @}
