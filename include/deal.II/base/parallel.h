@@ -542,13 +542,60 @@ namespace parallel
                           const Function                             &f,
                           const unsigned int                          grainsize)
   {
-#ifndef DEAL_II_WITH_TBB
-    // make sure we don't get compiler
-    // warnings about unused arguments
-    (void)grainsize;
+#ifdef DEAL_II_WITH_TASKFLOW
+    tf::Executor &executor = MultithreadInfo::get_taskflow_executor();
+    tf::Taskflow  taskflow;
 
-    f(begin, end);
-#else
+    if constexpr (std::is_integral_v<Iterator>)
+      {
+        // Integral "iterator" types (e.g., int): use plain arithmetic
+        using integral_type = Iterator;
+
+        const integral_type           n = end - begin;
+        tf::IndexRange<integral_type> range(0, n, 1);
+
+        taskflow.for_each_by_index(
+          range,
+          [&, begin](tf::IndexRange<integral_type> subrange) {
+            integral_type subrange_begin =
+              begin + static_cast<integral_type>(subrange.begin());
+
+            integral_type subrange_end =
+              subrange_begin + static_cast<integral_type>(subrange.size());
+
+            f(subrange_begin, subrange_end);
+          },
+          tf::GuidedPartitioner(grainsize));
+      }
+    else
+      {
+        // Non-integral iterator types: advance from 'begin' using
+        // std::distance/std::advance
+        using diff_t = typename std::iterator_traits<Iterator>::difference_type;
+
+        const diff_t                n_diff = std::distance(begin, end);
+        const std::size_t           n      = static_cast<std::size_t>(n_diff);
+        tf::IndexRange<std::size_t> range(0, n, 1);
+
+        taskflow.for_each_by_index(
+          range,
+          [&, begin](tf::IndexRange<std::size_t> subrange) {
+            Iterator subrange_begin = begin;
+            std::advance(subrange_begin, static_cast<diff_t>(subrange.begin()));
+
+            Iterator subrange_end = subrange_begin;
+            std::advance(subrange_end, static_cast<diff_t>(subrange.size()));
+
+            f(subrange_begin, subrange_end);
+          },
+          tf::GuidedPartitioner(grainsize));
+      }
+
+    if (executor.this_worker_id() != -1)
+      executor.corun(taskflow);
+    else
+      executor.run(taskflow).wait();
+#elif defined(DEAL_II_WITH_TBB)
     internal::parallel_for(
       begin,
       end,
@@ -556,6 +603,12 @@ namespace parallel
         internal::apply_to_subranges<Iterator, Function>(range, f);
       },
       grainsize);
+#else
+    // make sure we don't get compiler
+    // warnings about unused arguments
+    (void)grainsize;
+
+    f(begin, end);
 #endif
   }
 
