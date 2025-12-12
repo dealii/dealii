@@ -98,18 +98,6 @@ namespace internal
       }
 
       /**
-       * Number of lines of @p face-th surface.
-       */
-      virtual unsigned int
-      n_lines_of_surface(const unsigned int face) const
-      {
-        DEAL_II_NOT_IMPLEMENTED();
-        (void)face;
-
-        return 0;
-      }
-
-      /**
        * Vertex indices of the @p line-th lines of @p face-th surface.
        */
       virtual const std::array<unsigned int, 2> &
@@ -389,13 +377,6 @@ namespace internal
         return table[d];
       }
 
-      unsigned int
-      n_lines_of_surface(const unsigned int line) const override
-      {
-        (void)line;
-        return 3;
-      }
-
       const std::array<unsigned int, 2> &
       vertices_of_nth_line_of_surface(const unsigned int line,
                                       const unsigned int face) const override
@@ -497,15 +478,6 @@ namespace internal
       {
         static std::array<unsigned int, 4> table = {{5, 8, 5, 1}};
         return table[d];
-      }
-
-      unsigned int
-      n_lines_of_surface(const unsigned int surface) const override
-      {
-        if (surface == 0)
-          return 4;
-
-        return 3;
       }
 
       const std::array<unsigned int, 2> &
@@ -618,15 +590,6 @@ namespace internal
         return table[d];
       }
 
-      unsigned int
-      n_lines_of_surface(const unsigned int surface) const override
-      {
-        if (surface > 1)
-          return 4;
-
-        return 3;
-      }
-
       const std::array<unsigned int, 2> &
       vertices_of_nth_line_of_surface(const unsigned int line,
                                       const unsigned int face) const override
@@ -733,13 +696,6 @@ namespace internal
       {
         static std::array<unsigned int, 4> table = {{8, 12, 6, 1}};
         return table[d];
-      }
-
-      unsigned int
-      n_lines_of_surface(const unsigned int surface) const override
-      {
-        (void)surface;
-        return 4;
       }
 
       const std::array<unsigned int, 2> &
@@ -1282,7 +1238,9 @@ namespace internal
             {
               const unsigned int f = con_cq.col[f_];
 
-              con_ql.ptr[f + 1] = cell_type->n_lines_of_surface(f_index);
+              con_ql.ptr[f + 1] = cell_type->get_reference_cell()
+                                    .face_reference_cell(f_index)
+                                    .n_lines();
             }
         }
 
@@ -1315,8 +1273,9 @@ namespace internal
               quad_t_id[f] = cell_type->type_of_entity(2, f_index);
 
               // loop over lines
-              for (unsigned int l = 0;
-                   l < cell_type->n_lines_of_surface(f_index);
+              for (unsigned int l = 0; l < cell_type->get_reference_cell()
+                                             .face_reference_cell(f_index)
+                                             .n_lines();
                    ++l)
                 {
                   // determine global index of line
@@ -1404,12 +1363,17 @@ namespace internal
             connectivity.entity_orientations(2),
             [&](auto key, const auto &cell_type, const auto &c, const auto &f) {
               //  to ensure same enumeration as in deal.II
-              AssertIndexRange(cell_type->n_lines_of_surface(f),
+              AssertIndexRange(cell_type->get_reference_cell()
+                                 .face_reference_cell(f)
+                                 .n_lines(),
                                key.size() + 1);
 
               unsigned int l = 0;
 
-              for (; l < cell_type->n_lines_of_surface(f); ++l)
+              for (; l < cell_type->get_reference_cell()
+                           .face_reference_cell(f)
+                           .n_lines();
+                   ++l)
                 key[l] =
                   temp1.col[temp1.ptr[c] +
                             cell_type->get_reference_cell().face_to_cell_lines(
