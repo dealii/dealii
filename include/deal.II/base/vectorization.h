@@ -4904,17 +4904,10 @@ vectorized_load_and_transpose(const unsigned int          n_entries,
   // shuffles on 4 numbers rather than 16.
   const unsigned int n_chunks = n_entries / 4;
 
-  // To avoid warnings about uninitialized variables, need to initialize one
-  // variable to a pre-existing value in out, which will never get used in
-  // the end. Keep the initialization outside the loop because of a bug in
-  // gcc-9.1 which generates a "vmovapd" instruction instead of "vmovupd" in
-  // case t3 is initialized to zero (inside/outside of loop), see
-  // https://gcc.gnu.org/bugzilla/show_bug.cgi?id=90991
-  __m512 t0, t1, t2, t3;
-  if (n_chunks > 0)
-    t3 = out[0].data;
   for (unsigned int i = 0; i < n_chunks; ++i)
     {
+      __m512 t0, t1, t2, t3 = {};
+
       t0 = _mm512_insertf32x4(t3, _mm_loadu_ps(in + offsets[0] + 4 * i), 0);
       t0 = _mm512_insertf32x4(t0, _mm_loadu_ps(in + offsets[4] + 4 * i), 1);
       t0 = _mm512_insertf32x4(t0, _mm_loadu_ps(in + offsets[8] + 4 * i), 2);
@@ -4963,11 +4956,10 @@ vectorized_load_and_transpose(const unsigned int             n_entries,
 
   const unsigned int n_chunks = n_entries / 4;
 
-  __m512 t0, t1, t2, t3;
-  if (n_chunks > 0)
-    t3 = out[0].data;
   for (unsigned int i = 0; i < n_chunks; ++i)
     {
+      __m512 t0, t1, t2, t3 = {};
+
       t0 = _mm512_insertf32x4(t3, _mm_loadu_ps(in[0] + 4 * i), 0);
       t0 = _mm512_insertf32x4(t0, _mm_loadu_ps(in[4] + 4 * i), 1);
       t0 = _mm512_insertf32x4(t0, _mm_loadu_ps(in[8] + 4 * i), 2);
