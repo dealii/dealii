@@ -654,8 +654,8 @@ namespace Portable
 
   template <int dim, typename Number>
   typename MatrixFree<dim, Number>::PrecomputedData
-  MatrixFree<dim, Number>::get_data(const unsigned int dof_handler_index,
-                                    const unsigned int color) const
+  MatrixFree<dim, Number>::get_data(const unsigned int color,
+                                    const unsigned int dof_handler_index) const
   {
     Assert(n_cells[color] > 0,
            ExcMessage(
@@ -865,7 +865,7 @@ namespace Portable
       if (n_cells[color] > 0)
         {
           for (unsigned int di = 0; di < n_dof_handler; ++di)
-            colored_data[di] = get_data(di, color);
+            colored_data[di] = get_data(color, di);
 
           MemorySpace::Default::kokkos_space::execution_space exec;
 
@@ -1419,7 +1419,7 @@ namespace Portable
               TeamPolicy(exec, n_cells[color], this->team_size);
 
           for (unsigned int di = 0; di < dof_handler_data.size(); ++di)
-            colored_data[di] = get_data(di, color);
+            colored_data[di] = get_data(color, di);
 
           internal::
             ApplyKernel<dim, Number, Functor, IsBlockVector<VectorType>::value>
@@ -1470,7 +1470,7 @@ namespace Portable
                 team_policy(exec, n_cells[color], Kokkos::AUTO);
 
               for (unsigned int di = 0; di < dof_handler_data.size(); ++di)
-                colored_data[di] = get_data(di, color);
+                colored_data[di] = get_data(color, di);
 
               internal::ApplyKernel<dim, Number, Functor, true> apply_kernel(
                 func, dof_handler_data.size(), colored_data, src, dst);
@@ -1550,7 +1550,7 @@ namespace Portable
                   TeamPolicy(exec, n_cells[color], this->team_size);
 
               for (unsigned int di = 0; di < dof_handler_data.size(); ++di)
-                colored_data[di] = get_data(di, color);
+                colored_data[di] = get_data(color, di);
 
               internal::ApplyKernel<dim, Number, Functor, false> apply_kernel(
                 func, dof_handler_data.size(), colored_data, src, dst);
@@ -1606,7 +1606,7 @@ namespace Portable
                       TeamPolicy(exec, n_cells[color], this->team_size);
 
                   for (unsigned int di = 0; di < dof_handler_data.size(); ++di)
-                    colored_data[di] = get_data(di, color);
+                    colored_data[di] = get_data(color, di);
 
                   internal::ApplyKernel<dim, Number, Functor, false>
                     apply_kernel(
@@ -1652,7 +1652,7 @@ namespace Portable
                   TeamPolicy(exec, n_cells[color], this->team_size);
 
               for (unsigned int di = 0; di < dof_handler_data.size(); ++di)
-                colored_data[di] = get_data(di, color);
+                colored_data[di] = get_data(color, di);
 
               internal::ApplyKernel<dim, Number, Functor, false> apply_kernel(
                 func,
