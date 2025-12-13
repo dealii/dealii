@@ -109,7 +109,14 @@ namespace parallel
         x_end,
         [&](const auto &item) { functor(item); },
         tf::StaticPartitioner(grainsize));
-      executor.run(taskflow).wait();
+
+      // Schedule the work. If we are within a task, we are required to use
+      // corun() without wait() to avoid a potential deadlock as described in
+      // https://taskflow.github.io/taskflow/ExecuteTaskflow.html#ExecuteATaskflowFromAnInternalWorker:
+      if (executor.this_worker_id() != -1)
+        executor.corun(taskflow);
+      else
+        executor.run(taskflow).wait();
     }
 #endif
 
@@ -591,10 +598,14 @@ namespace parallel
           tf::GuidedPartitioner(grainsize));
       }
 
+    // Schedule the work. If we are within a task, we are required to use
+    // corun() without wait() to avoid a potential deadlock as described in
+    // https://taskflow.github.io/taskflow/ExecuteTaskflow.html#ExecuteATaskflowFromAnInternalWorker:
     if (executor.this_worker_id() != -1)
       executor.corun(taskflow);
     else
       executor.run(taskflow).wait();
+
 #elif defined(DEAL_II_WITH_TBB)
     internal::parallel_for(
       begin,

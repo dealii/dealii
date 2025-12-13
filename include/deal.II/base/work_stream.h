@@ -899,7 +899,14 @@ namespace WorkStream
         // Now we run all the tasks in the task graph. They will be run in
         // parallel and are eligible to run when their dependencies established
         // above are met.
-        executor.run(taskflow).wait();
+
+        // Schedule the work. If we are within a task, we are required to use
+        // corun() without wait() to avoid a potential deadlock as described in
+        // https://taskflow.github.io/taskflow/ExecuteTaskflow.html#ExecuteATaskflowFromAnInternalWorker:
+        if (executor.this_worker_id() != -1)
+          executor.corun(taskflow);
+        else
+          executor.run(taskflow).wait();
       }
     } // namespace taskflow_no_coloring
 #  endif
@@ -1411,7 +1418,14 @@ namespace WorkStream
 
               last_task = task;
             }
-        executor.run(taskflow).wait();
+
+        // Schedule the work. If we are within a task, we are required to use
+        // corun() without wait() to avoid a potential deadlock as described in
+        // https://taskflow.github.io/taskflow/ExecuteTaskflow.html#ExecuteATaskflowFromAnInternalWorker:
+        if (executor.this_worker_id() != -1)
+          executor.corun(taskflow);
+        else
+          executor.run(taskflow).wait();
       }
 
     }    // namespace taskflow_colored
