@@ -18,12 +18,9 @@
 // Gauss points rather than Gauss-Lobatto points where the mass matrix is
 // diagonal
 
-#include <deal.II/base/function.h>
 #include <deal.II/base/quadrature_lib.h>
 
 #include <deal.II/fe/fe_dgq.h>
-
-#include <deal.II/grid/grid_tools.h>
 
 #include "../tests.h"
 

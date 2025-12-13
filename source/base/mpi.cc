@@ -295,8 +295,7 @@ namespace Utilities
       // If all processes report that they have unique destinations,
       // then we can short-cut the process using a consensus algorithm (which
       // is implemented only for the case of unique destinations):
-      if (Utilities::MPI::min((my_destinations_are_unique ? 1 : 0), mpi_comm) ==
-          1)
+      if (Utilities::MPI::logical_and(my_destinations_are_unique, mpi_comm))
         {
           return ConsensusAlgorithms::nbx<char, char>(
             destinations, {}, {}, {}, mpi_comm);
@@ -390,9 +389,7 @@ namespace Utilities
 
       // If all processes report that they have unique destinations,
       // then we can short-cut the process using a consensus algorithm:
-
-      if (Utilities::MPI::min((my_destinations_are_unique ? 1 : 0), mpi_comm) ==
-          1)
+      if (Utilities::MPI::logical_and(my_destinations_are_unique, mpi_comm))
         {
           return ConsensusAlgorithms::nbx<char, char>(
                    destinations, {}, {}, {}, mpi_comm)
@@ -686,7 +683,8 @@ namespace Utilities
                      argv,
                      InitializeLibrary::MPI | InitializeLibrary::Kokkos |
                        InitializeLibrary::SLEPc | InitializeLibrary::PETSc |
-                       InitializeLibrary::Zoltan | InitializeLibrary::P4EST,
+                       InitializeLibrary::Zoltan | InitializeLibrary::P4EST |
+                       InitializeLibrary::PSBLAS,
                      max_num_threads)
     {}
 

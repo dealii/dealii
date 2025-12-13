@@ -1367,11 +1367,8 @@ namespace FETools
           }
       }
 
-    // For each index i of the
-    // unstructured cellwise
-    // numbering, renumbering
-    // contains the index of the
-    // cell-block numbering
+    // For each index i of the unstructured cellwise numbering, renumbering
+    // contains the index of the cell-block numbering
     for (unsigned int i = 0; i < element.n_dofs_per_cell(); ++i)
       {
         std::pair<std::pair<unsigned int, unsigned int>, unsigned int> indices =
@@ -1456,17 +1453,13 @@ namespace FETools
         // too bad....
       }
 
-    // uh, so this was not the
-    // case. hm. then do it the hard
-    // way. note that this will only
-    // work if the element is
-    // primitive, so check this first
+    // uh, so this was not the case. hm. then do it the hard way. note that
+    // this will only work if the element is primitive, so check this first
     Assert(fe1.is_primitive() == true, ExcFENotPrimitive());
     Assert(fe2.is_primitive() == true, ExcFENotPrimitive());
 
-    // Initialize FEValues for fe1 at
-    // the unit support points of the
-    // fe2 element.
+    // Initialize FEValues for fe1 at the unit support points of the fe2
+    // element.
     const std::vector<Point<dim>> &fe2_support_points =
       fe2.get_unit_support_points();
 
@@ -1876,11 +1869,9 @@ namespace FETools
         Assert(matrices[i].m() == n, ExcDimensionMismatch(matrices[i].m(), n));
       }
 
-    // In order to make the loops below
-    // simpler, we introduce vectors
-    // containing for indices 0-n the
-    // number of the corresponding
-    // shape value on the cell.
+    // In order to make the loops below simpler, we introduce vectors
+    // containing for indices 0-n the number of the corresponding shape value
+    // on the cell.
     std::vector<unsigned int> face_c_dofs(n);
     std::vector<unsigned int> face_f_dofs(n);
     {
@@ -1937,21 +1928,16 @@ namespace FETools
       Assert(face_dof == fe.n_dofs_per_face(face_no), ExcInternalError());
     }
 
-    // Set up meshes, one with a single
-    // reference cell and refine it once
+    // Set up meshes, one with a single reference cell and refine it once
     Triangulation<dim, spacedim> tria;
     GridGenerator::hyper_cube(tria, 0, 1);
     tria.refine_global(1);
     MappingCartesian<dim> mapping;
 
-    // Setup quadrature and FEValues
-    // for a face. We cannot use
-    // FEFaceValues and
-    // FESubfaceValues because of
-    // some nifty handling of
-    // refinement cases. Guido stops
-    // disliking and instead starts
-    // hating the anisotropic implementation
+    // Setup quadrature and FEValues for a face. We cannot use FEFaceValues
+    // and FESubfaceValues because of some nifty handling of refinement
+    // cases. Guido stops disliking and instead starts hating the anisotropic
+    // implementation
     QGauss<dim - 1>       q_gauss(degree + 1);
     const Quadrature<dim> q_fine =
       QProjector<dim>::project_to_face(fe.reference_cell(),
@@ -1966,19 +1952,13 @@ namespace FETools
                        update_quadrature_points | update_JxW_values |
                          update_values);
 
-    // We search for the polynomial on
-    // the small cell, being equal to
-    // the coarse polynomial in all
-    // quadrature points.
+    // We search for the polynomial on the small cell, being equal to the
+    // coarse polynomial in all quadrature points.
 
-    // First build the matrix for this
-    // least squares problem. This
-    // contains the values of the fine
-    // cell polynomials in the fine
-    // cell grid points.
+    // First build the matrix for this least squares problem. This contains
+    // the values of the fine cell polynomials in the fine cell grid points.
 
-    // This matrix is the same for all
-    // children.
+    // This matrix is the same for all children.
     fine.reinit(tria.begin_active());
     FullMatrix<number> A(nq * nd, n);
     for (unsigned int j = 0; j < n; ++j)
@@ -2023,16 +2003,12 @@ namespace FETools
 
         FullMatrix<double> &this_matrix = matrices[cell_number];
 
-        // Compute this once for each
-        // coarse grid basis function
+        // Compute this once for each coarse grid basis function
         for (unsigned int i = 0; i < n; ++i)
           {
-            // The right hand side of
-            // the least squares
-            // problem consists of the
-            // function values of the
-            // coarse grid function in
-            // each quadrature point.
+            // The right hand side of the least squares problem consists of
+            // the function values of the coarse grid function in each
+            // quadrature point.
             for (unsigned int k = 0; k < nq; ++k)
               if (nd != dim)
                 for (unsigned int d = 0; d < nd; ++d)
@@ -2048,25 +2024,21 @@ namespace FETools
                       v_coarse(k * nd + d) =
                         coarse.shape_value_component(face_c_dofs[i], k, d);
                 }
-            // solve the least squares
-            // problem.
+
             const double result = H.least_squares(v_fine, v_coarse);
             Assert(result <= threshold, FETools::ExcLeastSquaresError(result));
             // Avoid compiler warnings in Release mode
             (void)result;
             (void)threshold;
 
-            // Copy into the result
-            // matrix. Since the matrix
-            // maps a coarse grid
-            // function to a fine grid
-            // function, the columns
-            // are fine grid.
+            // Copy into the result matrix. Since the matrix maps a coarse
+            // grid function to a fine grid function, the columns are fine
+            // grid.
             for (unsigned int j = 0; j < n; ++j)
               this_matrix(j, i) = v_fine(j);
           }
-        // Remove small entries from
-        // the matrix
+
+        // Remove small entries from the matrix
         for (unsigned int i = 0; i < this_matrix.m(); ++i)
           for (unsigned int j = 0; j < this_matrix.n(); ++j)
             if (std::fabs(this_matrix(i, j)) < 1e-12)
@@ -2093,8 +2065,7 @@ namespace FETools
     const auto &q_fine =
       reference_cell.get_gauss_type_quadrature<dim>(degree + 1);
 
-    // prepare FEValues, quadrature etc on
-    // coarse cell
+    // prepare FEValues, quadrature etc on coarse cell
     const unsigned int nq = q_fine.size();
 
     // create mass matrix on coarse cell.
@@ -2311,9 +2282,8 @@ namespace FETools
   {
     namespace FEToolsGetFEHelper
     {
-      // TODO: this encapsulates the call to the
-      // dimension-dependent fe_name_map so that we
-      // have a unique interface. could be done
+      // TODO: this encapsulates the call to the dimension-dependent
+      // fe_name_map so that we have a unique interface. could be done
       // smarter?
       template <int dim, int spacedim>
       std::unique_ptr<FiniteElement<dim, spacedim>>
@@ -2323,92 +2293,62 @@ namespace FETools
                        std::unique_ptr<const EnableObserverPointer>>
           &fe_name_map)
       {
-        // Extract the name of the
-        // finite element class, which only
-        // contains characters, numbers and
-        // underscores.
+        // Extract the name of the finite element class, which only contains
+        // characters, numbers and underscores.
         unsigned int      name_end = name.find_first_not_of(std::string(
           "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_"));
         const std::string name_part(name, 0, name_end);
         name.erase(0, name_part.size());
 
-        // now things get a little more
-        // complicated: FESystem. it's
-        // more complicated, since we
-        // have to figure out what the
-        // base elements are. this can
-        // only be done recursively
+        // now things get a little more complicated: FESystem. it's more
+        // complicated, since we have to figure out what the base elements
+        // are. this can only be done recursively
         if (name_part == "FESystem")
           {
-            // next we have to get at the
-            // base elements. start with
-            // the first. wrap the whole
-            // block into try-catch to
-            // make sure we destroy the
-            // pointers we got from
-            // recursive calls if one of
-            // these calls should throw
-            // an exception
+            // next we have to get at the base elements. start with the
+            // first. wrap the whole block into try-catch to make sure we
+            // destroy the pointers we got from recursive calls if one of
+            // these calls should throw an exception
             std::vector<std::unique_ptr<const FiniteElement<dim, spacedim>>>
                                       base_fes;
             std::vector<unsigned int> base_multiplicities;
 
-            // Now, just the [...]
-            // part should be left.
+            // Now, just the [...]  part should be left.
             if (name.empty() || name[0] != '[')
               throw "Invalid first character in " + name;
             do
               {
-                // Erase the
-                // leading '[' or '-'
+                // Erase the leading '[' or '-'
                 name.erase(0, 1);
-                // Now, the name of the
-                // first base element is
-                // first... Let's get it
+                // Now, the name of the first base element is first... Let's
+                // get it
                 base_fes.push_back(
                   get_fe_by_name_ext<dim, spacedim>(name, fe_name_map));
-                // next check whether
-                // FESystem placed a
-                // multiplicity after
-                // the element name
+                // next check whether FESystem placed a multiplicity after the
+                // element name
                 if (name[0] == '^')
                   {
-                    // yes. Delete the '^'
-                    // and read this
-                    // multiplicity
+                    // yes. Delete the '^' and read this multiplicity
                     name.erase(0, 1);
 
                     const std::pair<int, unsigned int> tmp =
                       Utilities::get_integer_at_position(name, 0);
                     name.erase(0, tmp.second);
-                    // add to length,
-                    // including the '^'
+                    // add to length, including the '^'
                     base_multiplicities.push_back(tmp.first);
                   }
                 else
-                  // no, so
-                  // multiplicity is
-                  // 1
+                  // no, so multiplicity is 1
                   base_multiplicities.push_back(1);
 
-                // so that's it for
-                // this base
-                // element. base
-                // elements are
-                // separated by '-',
-                // and the list is
-                // terminated by ']',
-                // so loop while the
-                // next character is
-                // '-'
+                // so that's it for this base element. base elements are
+                // separated by '-', and the list is terminated by ']', so
+                // loop while the next character is '-'
               }
             while (name[0] == '-');
 
-            // so we got to the end
-            // of the '-' separated
-            // list. make sure that
-            // we actually had a ']'
-            // there
+            // so we got to the end of the '-' separated list. make sure that
+            // we actually had a ']' there
             if (name.empty() || name[0] != ']')
               throw "Invalid first character in " + name;
             name.erase(0, 1);
@@ -2434,12 +2374,9 @@ namespace FETools
             // remove the () from FE_Nothing()
             name.erase(0, 2);
 
-            // this is a bit of a hack, as
-            // FE_Nothing does not take a
-            // degree, but it does take an
-            // argument, which defaults to 1,
-            // so this properly returns
-            // FE_Nothing()
+            // this is a bit of a hack, as FE_Nothing does not take a degree,
+            // but it does take an argument, which defaults to 1, so this
+            // properly returns FE_Nothing()
             const EnableObserverPointer *ptr =
               fe_name_map.find(name_part)->second.get();
             const FETools::FEFactoryBase<dim, spacedim> *fef =
@@ -2533,15 +2470,11 @@ namespace FETools
               }
           }
 
-
-        // hm, if we have come thus far, we
-        // didn't know what to do with the
-        // string we got. so do as the docs
-        // say: raise an exception
+        // hm, if we have come thus far, we didn't know what to do with the
+        // string we got. so do as the docs say: raise an exception
         AssertThrow(false, FETools::ExcInvalidFEName(name_part));
 
-        // make some compilers happy that
-        // do not realize that we can't get
+        // make some compilers happy that do not realize that we can't get
         // here after throwing
         return nullptr;
       }
@@ -2582,17 +2515,14 @@ namespace FETools
           }
       }
 
-    // Create a version of the name
-    // string where all template
-    // parameters are eliminated.
+    // Create a version of the name string where all template parameters are
+    // eliminated.
     for (unsigned int pos1 = name.find('<'); pos1 < name.size();
          pos1              = name.find('<'))
       {
         const unsigned int pos2 = name.find('>');
-        // If there is only a single
-        // character between those two,
-        // it should be 'd' or the number
-        // representing the dimension.
+        // If there is only a single character between those two, it should be
+        // 'd' or the number representing the dimension.
         if (pos2 - pos1 == 2)
           {
             const char dimchar = '0' + dim;
@@ -2604,21 +2534,17 @@ namespace FETools
         else
           Assert(pos2 - pos1 == 4, ExcInvalidFEName(name));
 
-        // If pos1==pos2, then we are
-        // probably at the end of the
-        // string
+        // If pos1==pos2, then we are probably at the end of the string
         if (pos2 != pos1)
           name.erase(pos1, pos2 - pos1 + 1);
       }
-    // Replace all occurrences of "^dim"
-    // by "^d" to be handled by the
-    // next loop
+    // Replace all occurrences of "^dim" by "^d" to be handled by the next
+    // loop
     for (unsigned int pos = name.find("^dim"); pos < name.size();
          pos              = name.find("^dim"))
       name.erase(pos + 2, 2);
 
-    // Replace all occurrences of "^d"
-    // by using the actual dimension
+    // Replace all occurrences of "^d" by using the actual dimension
     for (unsigned int pos = name.find("^d"); pos < name.size();
          pos              = name.find("^d"))
       name.at(pos + 1) = '0' + dim;
@@ -2628,8 +2554,7 @@ namespace FETools
         auto fe =
           internal::FEToolsGetFEHelper::get_fe_by_name<dim, spacedim>(name);
 
-        // Make sure the auxiliary function
-        // ate up all characters of the name.
+        // Make sure the auxiliary function ate up all characters of the name.
         AssertThrow(name.empty(),
                     ExcInvalidFEName(parameter_name +
                                      std::string(" extra characters after "
@@ -2655,8 +2580,7 @@ namespace FETools
   {
     Assert(fe.n_components() == 1, ExcNotImplemented());
 
-    // first build the matrices M and Q
-    // described in the documentation
+    // first build the matrices M and Q described in the documentation
     FullMatrix<double> M(fe.n_dofs_per_cell(), fe.n_dofs_per_cell());
     FullMatrix<double> Q(fe.n_dofs_per_cell(), rhs_quadrature.size());
 
@@ -2711,14 +2635,14 @@ namespace FETools
     const std::vector<Tensor<1, dim>> &vector_of_tensors_at_qp,
     std::vector<Tensor<1, dim>>       &vector_of_tensors_at_nodes)
   {
-    // check that the number columns of the projection_matrix
-    // matches the size of the vector_of_tensors_at_qp
+    // check that the number columns of the projection_matrix matches the size
+    // of the vector_of_tensors_at_qp
     Assert(projection_matrix.n_cols() == vector_of_tensors_at_qp.size(),
            ExcDimensionMismatch(projection_matrix.n_cols(),
                                 vector_of_tensors_at_qp.size()));
 
-    // check that the number rows of the projection_matrix
-    // matches the size of the vector_of_tensors_at_nodes
+    // check that the number rows of the projection_matrix matches the size of
+    // the vector_of_tensors_at_nodes
     Assert(projection_matrix.n_rows() == vector_of_tensors_at_nodes.size(),
            ExcDimensionMismatch(projection_matrix.n_rows(),
                                 vector_of_tensors_at_nodes.size()));
@@ -2737,11 +2661,10 @@ namespace FETools
       {
         component_at_qp = 0;
 
-        // populate the vector of components at the qps
-        // from vector_of_tensors_at_qp
-        // vector_of_tensors_at_qp data is in form:
+        // populate the vector of components at the qps from
+        // vector_of_tensors_at_qp vector_of_tensors_at_qp data is in form:
         //      columns:        0, 1, ...,  dim
-        //      rows:           0,1,....,  n_quad_points
+        //      rows:           0, 1, ...,  n_quad_points
         // so extract the ii'th column of vector_of_tensors_at_qp
         for (unsigned int q = 0; q < n_quad_points; ++q)
           {
@@ -2752,8 +2675,8 @@ namespace FETools
         // component_at_node = projection_matrix_u * component_at_qp
         projection_matrix.vmult(component_at_node, component_at_qp);
 
-        // rewrite the projection of the components
-        // back into the vector of tensors
+        // rewrite the projection of the components back into the vector of
+        // tensors
         for (unsigned int nn = 0; nn < n_support_points; ++nn)
           {
             vector_of_tensors_at_nodes[nn][ii] = component_at_node(nn);
@@ -2807,11 +2730,10 @@ namespace FETools
         const unsigned int row    = row_column_index[0];
         const unsigned int column = row_column_index[1];
 
-        //  populate the vector of components at the qps
-        //  from vector_of_tensors_at_qp
-        //  vector_of_tensors_at_qp is in form:
-        //      columns:       0, 1, ..., n_independent_components
-        //      rows:           0,1,....,  n_quad_points
+        //  populate the vector of components at the qps from
+        //  vector_of_tensors_at_qp vector_of_tensors_at_qp is in form:
+        //      columns:       0, 1, ...,  n_independent_components
+        //      rows:          0, 1, ...,  n_quad_points
         //  so extract the ii'th column of vector_of_tensors_at_qp
         for (unsigned int q = 0; q < n_quad_points; ++q)
           {
@@ -2848,10 +2770,7 @@ namespace FETools
     Assert(lhs_quadrature.size() > fe.degree,
            ExcNotGreaterThan(lhs_quadrature.size(), fe.degree));
 
-
-
-    // build the matrices M and Q
-    // described in the documentation
+    // build the matrices M and Q described in the documentation
     FullMatrix<double> M(fe.n_dofs_per_cell(), fe.n_dofs_per_cell());
     FullMatrix<double> Q(fe.n_dofs_per_cell(), rhs_quadrature.size());
 
@@ -3248,10 +3167,10 @@ namespace FETools
 
   template <int dim>
   std::pair<std::vector<unsigned int>, std::vector<unsigned int>>
-  cell_to_face_patch(const unsigned int &degree,
-                     const unsigned int &direction,
-                     const bool         &cell_hierarchical_numbering,
-                     const bool         &is_continuous)
+  cell_to_face_patch_numbering(const unsigned int &degree,
+                               const unsigned int &direction,
+                               const bool         &cell_hierarchical_numbering,
+                               const bool         &is_continuous)
   {
     AssertThrow(dim > 1, ExcInvalidFEDimension(1, dim));
     AssertThrow(direction < dim, ExcInvalidFEDimension(direction, dim));
@@ -3341,6 +3260,155 @@ namespace FETools
     return std::make_pair(results[0], results[1]);
   }
 
+
+
+  template <int dim>
+  std::pair<std::vector<unsigned int>, std::vector<unsigned int>>
+  cell_to_face_patch(const unsigned int &degree,
+                     const unsigned int &direction,
+                     const bool         &cell_hierarchical_numbering,
+                     const bool         &is_continuous)
+  {
+    return cell_to_face_patch_numbering<dim>(degree,
+                                             direction,
+                                             cell_hierarchical_numbering,
+                                             is_continuous);
+  }
+
+  template <int dim, int spacedim>
+  unsigned int
+  face_to_cell_index(const FiniteElement<dim, spacedim> &fe,
+                     const unsigned int                  face_dof_index,
+                     const unsigned int                  face_no,
+                     const types::geometric_orientation  combined_orientation)
+  {
+    const auto reference_cell = fe.reference_cell();
+
+    Assert(fe.n_blocks() == 1, ExcNotImplemented());
+    Assert(fe.n_components() == 1, ExcNotImplemented());
+
+    AssertIndexRange(face_dof_index, fe.n_dofs_per_face(face_no));
+    AssertIndexRange(face_no, reference_cell.n_faces());
+    AssertIndexRange(combined_orientation,
+                     reference_cell.n_face_orientations(face_no));
+
+    if (face_dof_index < fe.get_first_face_line_index(face_no))
+      // DoF is on a vertex
+      {
+        // get the number of the vertex on the face that corresponds to this
+        // DoF, along with the number of the DoF on this vertex
+        const unsigned int face_vertex =
+          face_dof_index / fe.n_dofs_per_vertex();
+        const unsigned int dof_index_on_vertex =
+          face_dof_index % fe.n_dofs_per_vertex();
+
+        // then get the number of this vertex on the cell and translate
+        // this to a DoF number on the cell
+        return reference_cell.face_to_cell_vertices(face_no,
+                                                    face_vertex,
+                                                    combined_orientation) *
+                 fe.n_dofs_per_vertex() +
+               dof_index_on_vertex;
+      }
+    else if (face_dof_index < fe.get_first_face_quad_index(face_no))
+      // DoF is on a line
+      {
+        // do the same kind of translation as before. we need to only consider
+        // DoFs on the lines, i.e., ignoring those on the vertices
+        const unsigned int index =
+          face_dof_index - fe.get_first_face_line_index(face_no);
+
+        const unsigned int face_line         = index / fe.n_dofs_per_line();
+        const unsigned int dof_index_on_line = index % fe.n_dofs_per_line();
+
+        unsigned int adjusted_dof_index_on_line = 0;
+        switch (dim)
+          {
+            case 1:
+              DEAL_II_ASSERT_UNREACHABLE();
+              break;
+
+            case 2:
+              if (combined_orientation ==
+                  numbers::default_geometric_orientation)
+                adjusted_dof_index_on_line = dof_index_on_line;
+              else
+                adjusted_dof_index_on_line =
+                  fe.n_dofs_per_line() - dof_index_on_line - 1;
+              break;
+
+            case 3:
+              {
+                // Line orientations are not consistent between faces of some
+                // reference cells (such as tetrahedra): e.g., a tet's first
+                // line is (0, 1) on face 0 and (1, 0) on face 1. Hence we have
+                // to determine the relative line orientation to determine how
+                // to index dofs along lines.
+                //
+                // face_to_cell_line_orientation() may only be called with
+                // canonical (face, line) pairs. Extract that information and
+                // then also the new canonical face_line_index.
+                const auto cell_line_index =
+                  reference_cell.face_to_cell_lines(face_no,
+                                                    face_line,
+                                                    combined_orientation);
+                const auto [canonical_face, canonical_line] =
+                  reference_cell.standard_line_to_face_and_line_index(
+                    cell_line_index);
+                // Here we don't take into account what the actual orientation
+                // of the line is: that's usually handled inside, e.g.,
+                // face->get_dof_indices().
+                const auto face_line_orientation =
+                  reference_cell.face_to_cell_line_orientation(
+                    canonical_line,
+                    canonical_face,
+                    combined_orientation,
+                    /*combined_line_orientation =*/
+                    numbers::default_geometric_orientation);
+
+                if (face_line_orientation ==
+                    numbers::default_geometric_orientation)
+                  adjusted_dof_index_on_line = dof_index_on_line;
+                else
+                  {
+                    Assert(face_line_orientation ==
+                             numbers::reverse_line_orientation,
+                           ExcInternalError());
+                    adjusted_dof_index_on_line =
+                      fe.n_dofs_per_line() - dof_index_on_line - 1;
+                  }
+              }
+              break;
+
+            default:
+              DEAL_II_ASSERT_UNREACHABLE();
+          }
+
+        return (fe.get_first_line_index() +
+                reference_cell.face_to_cell_lines(face_no,
+                                                  face_line,
+                                                  combined_orientation) *
+                  fe.n_dofs_per_line() +
+                adjusted_dof_index_on_line);
+      }
+    else
+      // DoF is on a quad
+      {
+        Assert(dim >= 3, ExcInternalError());
+
+        // ignore vertex and line dofs
+        const unsigned int index =
+          face_dof_index - fe.get_first_face_quad_index(face_no);
+
+        // Rotating DoFs defined on quadrilateral or triangular faces may
+        // require additional information about how those elements distribute
+        // DoFs on their faces: no elements actually support this yet
+        Assert((fe.n_dofs_per_quad(face_no) <= 1) ||
+                 combined_orientation == numbers::default_geometric_orientation,
+               ExcNotImplemented());
+        return fe.get_first_quad_index(face_no) + index;
+      }
+  }
 } // namespace FETools
 
 

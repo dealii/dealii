@@ -402,7 +402,7 @@ private:
     PreconditionChebyshev<LaplaceOperator<dim, float>, VectorTypeMG>;
   mg::SmootherRelaxation<SmootherType, VectorTypeMG> mg_smoother;
 
-  MGLevelObject<std::unique_ptr<MGTwoLevelTransferBase<VectorTypeMG>>>
+  MGLevelObject<std::unique_ptr<MGTwoLevelTransferBase<dim, VectorTypeMG>>>
                                                                  mg_transfers;
   std::unique_ptr<MGTransferGlobalCoarsening<dim, VectorTypeMG>> mg_transfer;
 };

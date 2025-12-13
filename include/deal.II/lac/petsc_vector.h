@@ -176,11 +176,14 @@ namespace PETScWrappers
        * Constructor. Set dimension to @p n and initialize all elements with
        * zero.
        *
-       * @arg locally_owned_size denotes the size of the chunk that shall be
-       * stored on the present process.
-       *
-       * @arg communicator denotes the MPI communicator over which the
+       * @param[in] communicator The MPI communicator over which the
        * different parts of the vector shall communicate
+       *
+       * @param[in] n The total size of the vector to be created, i.e.,
+       *   the sum of all locally owned sizes over all processes.
+       *
+       * @param[in] locally_owned_size The size of the chunk that shall be
+       * stored on the present process.
        *
        * The constructor is made explicit to avoid accidents like this:
        * <tt>v=0;</tt>. Presumably, the user wants to set every element of the
@@ -196,11 +199,13 @@ namespace PETScWrappers
        * Copy-constructor from deal.II vectors. Sets the dimension to that of
        * the given vector, and copies all elements.
        *
-       * @arg locally_owned_size denotes the size of the chunk that shall be
-       * stored on the present process.
-       *
-       * @arg communicator denotes the MPI communicator over which the
+       * @param[in] communicator The MPI communicator over which the
        * different parts of the vector shall communicate
+       *
+       * @param[in] v The vector to be copied.
+       *
+       * @param[in] locally_owned_size The size of the chunk that shall be
+       * stored on the present process.
        */
       template <typename Number>
       explicit Vector(const MPI_Comm                communicator,
@@ -398,15 +403,6 @@ namespace PETScWrappers
             const unsigned int precision  = 3,
             const bool         scientific = true,
             const bool         across     = true) const;
-
-      /**
-       * @copydoc PETScWrappers::VectorBase::all_zero()
-       *
-       * @note This function overloads the one in the base class to make this
-       * a @ref GlossCollectiveOperation "collective operation".
-       */
-      bool
-      all_zero() const;
 
     protected:
       /**

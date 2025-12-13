@@ -1,6 +1,6 @@
 repos:
 - repo: https://github.com/pre-commit/pre-commit-hooks
-  rev: v5.0.0
+  rev: v6.0.0
   hooks:
   - id: check-added-large-files
     args: [--maxkb=8192]
@@ -28,7 +28,7 @@ repos:
         )
     exclude: ^bundled/
 - repo: https://github.com/gitleaks/gitleaks
-  rev: v8.27.2
+  rev: v8.28.0
   hooks:
   - id: gitleaks
 - repo: https://github.com/pre-commit/mirrors-clang-format
@@ -42,7 +42,7 @@ repos:
             \.h
         )$
 - repo: https://github.com/psf/black-pre-commit-mirror
-  rev: 25.1.0
+  rev: 25.9.0
   hooks:
     - id: black
       exclude: |
@@ -51,7 +51,7 @@ repos:
             ^contrib/utilities/dotgdbinit.py
         )
 - repo: https://github.com/crate-ci/typos
-  rev: v1.33.1
+  rev: v1.36.3
   hooks:
   - id: typos
     files: (?x) ^(doc|examples|include|source|tests)/

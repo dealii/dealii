@@ -106,7 +106,7 @@ For all these reasons, for the present program, we choose to use the
 Rothe method for discretization, i.e. we first discretize in time and
 then in space. We will not actually use adaptive meshes at all, since
 this involves a large amount of additional code, but we will comment
-on this some more in the @ref step_23-Results "results section below".
+on this some more in the @ref step_23-ResultsSection "results section below".
 
 
 <h4>Rothe's method!</h4>

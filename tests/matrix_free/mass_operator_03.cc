@@ -18,7 +18,6 @@
 // MatrixFreeOperators::MassOperator for FE_Q_Hierarchical
 // This caused problems with positivity of the lumped mass matrix
 
-#include <deal.II/base/function.h>
 #include <deal.II/base/utilities.h>
 
 #include <deal.II/distributed/tria.h>

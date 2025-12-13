@@ -144,6 +144,9 @@ namespace LinearAlgebra
               .template make_tpetra_map_rcp<TpetraTypes::NodeType<MemorySpace>>(
                 communicator, true));
 
+          nonlocal_entries = parallel_partitioner;
+          nonlocal_entries.subtract_set(locally_owned_entries);
+
           compressed = true;
         }
       else
@@ -155,7 +158,7 @@ namespace LinearAlgebra
           vector = Utilities::Trilinos::internal::make_rcp<
             TpetraTypes::VectorType<Number, MemorySpace>>(map);
 
-          IndexSet nonlocal_entries(ghost_entries);
+          nonlocal_entries = ghost_entries;
           nonlocal_entries.subtract_set(locally_owned_entries);
           nonlocal_vector = Utilities::Trilinos::internal::make_rcp<
             TpetraTypes::VectorType<Number, MemorySpace>>(
@@ -239,6 +242,9 @@ namespace LinearAlgebra
               .template make_tpetra_map_rcp<TpetraTypes::NodeType<MemorySpace>>(
                 communicator, true));
 
+          nonlocal_entries = parallel_partitioner;
+          nonlocal_entries.subtract_set(locally_owned_entries);
+
           compressed = true;
         }
       else
@@ -257,7 +263,7 @@ namespace LinearAlgebra
           else
             vector->putScalar(0);
 
-          IndexSet nonlocal_entries(ghost_entries);
+          nonlocal_entries = ghost_entries;
           nonlocal_entries.subtract_set(locally_owned_entries);
 
           nonlocal_vector = Utilities::Trilinos::internal::make_rcp<
@@ -807,27 +813,14 @@ namespace LinearAlgebra
     bool
     Vector<Number, MemorySpace>::all_zero() const
     {
-      // get a representation of the vector and
-      // loop over all the elements
-      Teuchos::ArrayRCP<const Number> data       = vector->getData();
-      const size_type                 n_elements = vector->getLocalLength();
-      unsigned int                    flag       = 0;
-      for (size_type i = 0; i < n_elements; ++i)
-        {
-          if (data[i] != Number(0))
-            {
-              flag = 1;
-              break;
-            }
-        }
+      Teuchos::ArrayRCP<const Number> data = vector->getData();
 
-      // Check that the vector is zero on _all_ processors.
-      unsigned int num_nonzero =
-        Utilities::MPI::sum(flag,
-                            Utilities::Trilinos::teuchos_comm_to_mpi_comm(
-                              vector->getMap()->getComm()));
-
-      return num_nonzero == 0;
+      const bool local_all_zero =
+        std::all_of(data.begin(),
+                    data.begin() + locally_owned_size(),
+                    numbers::value_is_zero<Number>);
+      return Utilities::MPI::logical_and(local_all_zero,
+                                         get_mpi_communicator());
     }
 
 
@@ -1048,7 +1041,9 @@ namespace LinearAlgebra
     IndexSet
     Vector<Number, MemorySpace>::locally_owned_elements() const
     {
-      return IndexSet(vector->getMap());
+      IndexSet locally_owned_entries(vector->getMap());
+      locally_owned_entries.subtract_set(nonlocal_entries);
+      return locally_owned_entries;
     }
 
 

@@ -239,7 +239,7 @@ step-21. (We wouldn't have had that stability condition if we treated the
 advection term implicitly since the BDF-2 scheme is A-stable, at the price
 that we needed to build a new temperature matrix at each time step.) We will
 discuss the exact choice of time step in the
-@ref step_31-Results "results section", but for the moment of importance is
+@ref step_31-ResultsSection "results section", but for the moment of importance is
 that this CFL condition means that the time step size $k$ may change from time
 step to time step, and that we have to modify the above formula slightly. If
 $k_n,k_{n-1}$ are the time steps sizes of the current and previous time
@@ -446,7 +446,7 @@ follows:
 
 Here, $\beta$ is a stabilization constant (a dimensional analysis
 reveals that it is unitless and therefore independent of scaling; we will
-discuss its choice in the @ref step_31-Results "results section" and
+discuss its choice in the @ref step_31-ResultsSection "results section" and
 $c(\mathbf{u},T)$ is a normalization constant that must have units
 $\frac{m^{\alpha-1}K^\alpha}{s}$. We will choose it as
 $c(\mathbf{u},T) =

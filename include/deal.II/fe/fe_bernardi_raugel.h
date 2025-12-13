@@ -75,7 +75,7 @@ public:
    * Constructor for the Bernardi-Raugel element of degree @p p. The only
    * supported degree is 1.
    *
-   * @arg p: The degree of the element $p=1$ for $BR_1$.
+   * @param p The degree of the element $p=1$ for $BR_1$.
    */
   FE_BernardiRaugel(const unsigned int p = 1);
 

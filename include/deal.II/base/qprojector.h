@@ -587,11 +587,6 @@ QProjector<3>::project_to_subface(const ReferenceCell     &reference_cell,
                                   std::vector<Point<3>>   &q_points,
                                   const RefinementCase<2> &face_ref_case);
 
-template <>
-Quadrature<1>
-QProjector<1>::project_to_all_subfaces(const ReferenceCell &reference_cell,
-                                       const Quadrature<0> &quadrature);
-
 
 #endif // DOXYGEN
 DEAL_II_NAMESPACE_CLOSE

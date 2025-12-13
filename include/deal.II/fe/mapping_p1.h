@@ -228,7 +228,7 @@ public:
     /**
      * Linear component of the transformation (the contravariant).
      */
-    mutable DerivativeForm<1, dim, spacedim> linear_component;
+    mutable DerivativeForm<1, dim, spacedim> contravariant;
 
     /**
      * Covariant form of the linear transformation.
@@ -238,7 +238,7 @@ public:
     /**
      * Determinant of linear_component.
      */
-    mutable double determinant;
+    mutable double volume_element;
 
     /**
      * Quadrature. May be an amalgamation of rules created by, e.g.,

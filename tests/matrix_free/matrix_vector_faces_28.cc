@@ -17,7 +17,6 @@
 // check that MatrixFree::update_mapping() works as expected. The test is
 // otherwise similar to matrix_vector_faces_03.
 
-#include <deal.II/base/function.h>
 
 #include <deal.II/fe/fe_dgq.h>
 #include <deal.II/fe/fe_q.h>

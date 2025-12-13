@@ -50,7 +50,8 @@ macro(feature_scalapack_find_external var)
           "SCALAPACK symbol check for pdsyevr_ and pssyevr_ failed! "
           "This usually means that your SCALAPACK installation is incomplete "
           "or the link line is broken. Consult\n"
-          "  CMakeFiles/CMakeError.log\n"
+          "  CMakeFiles/CMakeError.log or\n"
+          "  CMakeFiles/CMakeConfigureLog.yaml\n"
           "for further information.\n"
           )
         set(${var} FALSE)

@@ -1,0 +1,3 @@
+New: Added FullMatrix::permute() method to permute rows and columns of a matrix.
+<br>
+(Michał Wichrowski, 2025/10/20)

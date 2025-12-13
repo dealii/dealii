@@ -2460,7 +2460,8 @@ namespace DoFTools
       map_dofs_to_support_points(
         const hp::MappingCollection<dim, spacedim> &mapping,
         const DoFHandler<dim, spacedim>            &dof_handler,
-        const ComponentMask                        &in_mask)
+        const ComponentMask                        &in_mask,
+        const bool                                  map_locally_relevant_dofs)
       {
         std::map<types::global_dof_index, Point<spacedim>> support_points;
 
@@ -2497,6 +2498,7 @@ namespace DoFTools
                                                  q_coll_dummy,
                                                  update_quadrature_points);
 
+        const IndexSet &locally_owned_dofs = dof_handler.locally_owned_dofs();
         std::vector<types::global_dof_index> local_dof_indices;
         for (const auto &cell : dof_handler.active_cell_iterators())
           // Only work on locally relevant cells. Exclude cells
@@ -2524,7 +2526,41 @@ namespace DoFTools
 
                   // insert the values into the map if it is a valid component
                   if (mask[dof_comp])
-                    support_points[local_dof_indices[i]] = points[i];
+                    {
+                      // For continuous elements, we encounter some DoFs more
+                      // than once, namely from each cell that is adjacent to a
+                      // DoF. If everything is alright then a DoF should have
+                      // the same support point on all elements over which it
+                      // has support.
+                      //
+                      // This assertion verifies exactly that: if a DoF is
+                      // encountered more than once in this function, then its
+                      // support point should be the same (up to a numerical
+                      // tolerance).
+                      if constexpr (running_in_debug_mode())
+                        {
+                          const auto it =
+                            support_points.find(local_dof_indices[i]);
+                          // if we have degree p Lagrange elements and width dx
+                          // cells, then points are approximately dx / (p ** 2)
+                          // apart. Make that tolerance stricter (we should
+                          // catch other errors), but not much stricter so that
+                          // we don't unnecessarily constrain huge elements
+                          // which may exhibit major roundoff problems when we
+                          // subtract
+                          if (it != support_points.end())
+                            {
+                              const auto p = cell->get_fe().tensor_degree();
+                              Assert((it->second - points[i]).norm() <
+                                       cell->diameter() / (4.0 * p * p),
+                                     ExcInternalError());
+                            }
+                        }
+
+                      if (map_locally_relevant_dofs ||
+                          locally_owned_dofs.is_element(local_dof_indices[i]))
+                        support_points[local_dof_indices[i]] = points[i];
+                    }
                 }
             }
 
@@ -2537,14 +2573,15 @@ namespace DoFTools
       map_dofs_to_support_points_vector(
         const hp::MappingCollection<dim, spacedim> &mapping,
         const DoFHandler<dim, spacedim>            &dof_handler,
-        const ComponentMask                        &mask)
+        const ComponentMask                        &mask,
+        const bool                                  map_locally_relevant_dofs)
       {
         std::vector<Point<spacedim>> support_points(dof_handler.n_dofs());
 
         // get the data in the form of the map as above
         const std::map<types::global_dof_index, Point<spacedim>>
-          x_support_points =
-            map_dofs_to_support_points(mapping, dof_handler, mask);
+          x_support_points = map_dofs_to_support_points(
+            mapping, dof_handler, mask, map_locally_relevant_dofs);
 
         // now convert from the map to the linear vector. make sure every
         // entry really appeared in the map
@@ -2567,7 +2604,8 @@ namespace DoFTools
   map_dofs_to_support_points(const Mapping<dim, spacedim>    &mapping,
                              const DoFHandler<dim, spacedim> &dof_handler,
                              std::vector<Point<spacedim>>    &support_points,
-                             const ComponentMask             &mask)
+                             const ComponentMask             &mask,
+                             const bool map_locally_relevant_dofs)
   {
     AssertDimension(support_points.size(), dof_handler.n_dofs());
     Assert((dynamic_cast<
@@ -2581,10 +2619,8 @@ namespace DoFTools
     // gets a MappingCollection
     const hp::MappingCollection<dim, spacedim> mapping_collection(mapping);
 
-    support_points =
-      internal::map_dofs_to_support_points_vector(mapping_collection,
-                                                  dof_handler,
-                                                  mask);
+    support_points = internal::map_dofs_to_support_points_vector(
+      mapping_collection, dof_handler, mask, map_locally_relevant_dofs);
   }
 
 
@@ -2594,7 +2630,8 @@ namespace DoFTools
     const hp::MappingCollection<dim, spacedim> &mapping,
     const DoFHandler<dim, spacedim>            &dof_handler,
     std::vector<Point<spacedim>>               &support_points,
-    const ComponentMask                        &mask)
+    const ComponentMask                        &mask,
+    const bool                                  map_locally_relevant_dofs)
   {
     AssertDimension(support_points.size(), dof_handler.n_dofs());
     Assert((dynamic_cast<
@@ -2606,8 +2643,8 @@ namespace DoFTools
 
     // Let the internal function do all the work, just make sure that it
     // gets a MappingCollection
-    support_points =
-      internal::map_dofs_to_support_points_vector(mapping, dof_handler, mask);
+    support_points = internal::map_dofs_to_support_points_vector(
+      mapping, dof_handler, mask, map_locally_relevant_dofs);
   }
 
 
@@ -2618,7 +2655,8 @@ namespace DoFTools
     const Mapping<dim, spacedim>                       &mapping,
     const DoFHandler<dim, spacedim>                    &dof_handler,
     std::map<types::global_dof_index, Point<spacedim>> &support_points,
-    const ComponentMask                                &mask)
+    const ComponentMask                                &mask,
+    const bool map_locally_relevant_dofs)
   {
     support_points.clear();
 
@@ -2626,9 +2664,8 @@ namespace DoFTools
     // gets a MappingCollection
     const hp::MappingCollection<dim, spacedim> mapping_collection(mapping);
 
-    support_points = internal::map_dofs_to_support_points(mapping_collection,
-                                                          dof_handler,
-                                                          mask);
+    support_points = internal::map_dofs_to_support_points(
+      mapping_collection, dof_handler, mask, map_locally_relevant_dofs);
   }
 
 
@@ -2639,14 +2676,15 @@ namespace DoFTools
     const hp::MappingCollection<dim, spacedim>         &mapping,
     const DoFHandler<dim, spacedim>                    &dof_handler,
     std::map<types::global_dof_index, Point<spacedim>> &support_points,
-    const ComponentMask                                &mask)
+    const ComponentMask                                &mask,
+    const bool map_locally_relevant_dofs)
   {
     support_points.clear();
 
     // Let the internal function do all the work, just make sure that it
     // gets a MappingCollection
-    support_points =
-      internal::map_dofs_to_support_points(mapping, dof_handler, mask);
+    support_points = internal::map_dofs_to_support_points(
+      mapping, dof_handler, mask, map_locally_relevant_dofs);
   }
 
 
@@ -2654,7 +2692,8 @@ namespace DoFTools
   std::map<types::global_dof_index, Point<spacedim>>
   map_dofs_to_support_points(const Mapping<dim, spacedim>    &mapping,
                              const DoFHandler<dim, spacedim> &dof_handler,
-                             const ComponentMask             &mask)
+                             const ComponentMask             &mask,
+                             const bool map_locally_relevant_dofs)
   {
     // Let the internal function do all the work, just make sure that it
     // gets a MappingCollection
@@ -2662,7 +2701,8 @@ namespace DoFTools
 
     return internal::map_dofs_to_support_points(mapping_collection,
                                                 dof_handler,
-                                                mask);
+                                                mask,
+                                                map_locally_relevant_dofs);
   }
 
 
@@ -2671,9 +2711,13 @@ namespace DoFTools
   map_dofs_to_support_points(
     const hp::MappingCollection<dim, spacedim> &mapping,
     const DoFHandler<dim, spacedim>            &dof_handler,
-    const ComponentMask                        &mask)
+    const ComponentMask                        &mask,
+    const bool                                  map_locally_relevant_dofs)
   {
-    return internal::map_dofs_to_support_points(mapping, dof_handler, mask);
+    return internal::map_dofs_to_support_points(mapping,
+                                                dof_handler,
+                                                mask,
+                                                map_locally_relevant_dofs);
   }
 
 

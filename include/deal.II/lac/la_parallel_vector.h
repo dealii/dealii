@@ -902,7 +902,11 @@ namespace LinearAlgebra
       locally_owned_elements() const;
 
       /**
-       * Print the vector to the output stream @p out.
+       * Print the vector to the output stream @p out. @p precision denotes the
+       * desired precision with which values shall be printed, @p scientific
+       * whether scientific notation shall be used. If @p across is @p true
+       * then the vector is printed in a line, while if @p false then the
+       * elements are printed on a separate line each.
        */
       void
       print(std::ostream      &out,
@@ -1342,6 +1346,12 @@ namespace LinearAlgebra
        */
       real_type
       linfty_norm_local() const;
+
+      /**
+       * Local part of all_zero().
+       */
+      bool
+      all_zero_local() const;
 
       /**
        * Local part of the addition followed by an inner product of two

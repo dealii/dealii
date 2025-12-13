@@ -408,8 +408,8 @@ inconvenience this causes.
 
  <li>
   New: The ordering strategy DoFRenumbering::lexicographic() has been added.
-  (Micha
-   Wichrowski, 2025/07/01)
+  <br>
+  (Michał Wichrowski, 2025/07/01)
  </li>
 
  <li>
@@ -554,16 +554,15 @@ inconvenience this causes.
   New: A new function FETools::cell_to_face_lexicographic() to generate a
   mapping from cell-local DoFs to lexicographic ordering of DoFs on two adjacent cells
   has been added.
-  (Micha
-   Wichrowski, 2025/05/03)
+  <br>
+  (Michał Wichrowski, 2025/05/03)
  </li>
 
  <li>
   Added: 1D matrices: mass, laplace, ghost penalty.
   FullMatrix::kronecker_product.
   <br>
-  (Micha
-   Wichrowski, 2025/05/01)
+  (Michał Wichrowski, 2025/05/01)
  </li>
 
  <li>
@@ -617,6 +616,14 @@ inconvenience this causes.
   at once. For more details, see @cite Greif2017.
   <br>
   (Wyatt Smith, Matthias Maier, 2025/04/10)
+ </li>
+
+ <li>
+  Improved: Portable::MatrixFree now uses a more beneficial indexing into
+  multi-dimensional arrays for the cell degrees of freedom and quadrature
+  data, leading to more coalesced access on GPUs.
+  <br>
+  (Martin Kronbichler, Urvij Saroliya, 2025/04/04)
  </li>
 
  <li>
@@ -674,9 +681,10 @@ inconvenience this causes.
  </li>
 
  <li>
-  New: Matrix-Free now can build data structures for ghosted cells. The functionality can be accessed  by AdditionalData::store_ghost_cells.
-  (Micha
-   Wichrowski, 2025/01/30)
+  New: Matrix-Free now can build data structures for ghosted cells. The
+  functionality can be accessed  by AdditionalData::store_ghost_cells.
+  <br>
+  (Michał Wichrowski, 2025/01/30)
  </li>
 
  <li>
@@ -740,6 +748,14 @@ inconvenience this causes.
   Deprecated: The function parallel::transform() has been deprecated.
   <br>
   (Wolfgang Bangerth, 2024/12/18)
+ </li>
+
+ <li>
+  Fixed: For `dim = 1`, the setup of MatrixFree did not correctly
+  identify faces between cells of different refinement level. This is
+  now fixed.
+  <br>
+  (Sean Johnson, 2024/12/12)
  </li>
 
  <li>

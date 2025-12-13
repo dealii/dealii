@@ -17,7 +17,6 @@
 // similar to matrix_vector_faces_13 (integrate_scatter, renumbered degrees of
 // freedom) but testing a vmult_add operation
 
-#include <deal.II/base/function.h>
 #include <deal.II/base/quadrature_lib.h>
 
 #include <deal.II/distributed/tria.h>

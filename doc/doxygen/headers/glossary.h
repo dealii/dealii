@@ -2479,10 +2479,14 @@
  * The full reference for this paper is as follows:
  * @code{.bib}
 @Article{TKB16,
-  author =       {Bruno Turcksin and Martin Kronbichler and Wolfgang Bangerth},
-  title =        {\textit{WorkStream} -- a design pattern for multicore-enabled finite element computations},
-  journal =      {accepted for publication in the ACM Trans. Math. Softw.},
-  year =         2016
+  author    = {Bruno Turcksin and Martin Kronbichler and Wolfgang Bangerth},
+  title     = {{WorkStream} -- a design pattern for multicore-enabled finite element computations},
+  journal   = {ACM Transactions on Mathematical Software},
+  year      = {2016},
+  month     = aug,
+  volume    = {43}
+  number    = {1},
+  pages     = {1–29}
 }
  * @endcode
  * It is available from <a href="https://www.math.colostate.edu/~bangerth/publications.html">https://www.math.colostate.edu/~bangerth/publications.html</a>, also see <a href="https://dealii.org/publications.html#details">deal.II publications</a> for details.

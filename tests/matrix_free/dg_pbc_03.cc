@@ -18,7 +18,6 @@
 // adaptivity and periodic boundary conditions, using a similar test tas he
 // dg_pbc_02 test, but for the active cells
 
-#include <deal.II/base/function.h>
 
 #include <deal.II/fe/fe_dgq.h>
 #include <deal.II/fe/mapping_q1.h>

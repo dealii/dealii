@@ -1,0 +1,5 @@
+Changed: The function Timer::stop() no longer returns the CPU time after
+stopping the timer. This functionality is covered by the existing function
+Timer::cpu_time(), which should be called instead.
+<br>
+(Rene Gassmoeller, 2025/10/04)

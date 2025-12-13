@@ -1,0 +1,93 @@
+
+# vtk DataFile Version 3.0
+Triangulation generated with deal.II
+ASCII
+DATASET UNSTRUCTURED_GRID
+POINTS 19 double
+0.00000 0.00000 0
+1.00000 0.00000 0
+0.00000 1.00000 0
+0.500000 0.00000 0
+0.500000 0.500000 0
+0.00000 0.500000 0
+0.250000 0.00000 0
+0.250000 0.250000 0
+0.00000 0.250000 0
+0.166667 0.166667 0
+0.750000 0.00000 0
+0.750000 0.250000 0
+0.500000 0.250000 0
+0.666667 0.166667 0
+0.250000 0.500000 0
+0.250000 0.750000 0
+0.00000 0.750000 0
+0.166667 0.666667 0
+0.333333 0.333333 0
+
+CELLS 24 96
+4 0 6 9 8
+4 3 7 9 6
+4 5 8 9 7
+4 3 10 13 12
+4 1 11 13 10
+4 4 12 13 11
+4 5 14 17 16
+4 4 15 17 14
+4 2 16 17 15
+4 3 12 18 7
+4 4 14 18 12
+4 5 7 18 14
+2 0 6
+2 0 8
+2 1 10
+2 1 11
+2 2 15
+2 2 16
+2 3 6
+2 3 10
+2 4 11
+2 4 15
+2 5 8
+2 5 16
+
+CELL_TYPES 24
+9 9 9 9 9 9 9 9 9 9 9 9 
+3 3 3 3 3 3 3 3 3 3 3 3 
+
+
+CELL_DATA 24
+SCALARS MaterialID int 1
+LOOKUP_TABLE default
+2 2 2 3 3 3 4 4 4 5 5 5 
+45 46 47 48 49 50 45 47 48 49 46 50 
+
+
+SCALARS ManifoldID int 1
+LOOKUP_TABLE default
+-1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 
+-1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 
+
+DEAL::0.0, material id=2
+DEAL::0.1, material id=2
+DEAL::0.2, material id=2
+DEAL::0.3, material id=3
+DEAL::0.4, material id=3
+DEAL::0.5, material id=3
+DEAL::0.6, material id=4
+DEAL::0.7, material id=4
+DEAL::0.8, material id=4
+DEAL::0.9, material id=5
+DEAL::0.10, material id=5
+DEAL::0.11, material id=5
+DEAL::1, boundary id=46
+DEAL::0, boundary id=45
+DEAL::6, boundary id=45
+DEAL::15, boundary id=46
+DEAL::8, boundary id=47
+DEAL::2, boundary id=47
+DEAL::3, boundary id=48
+DEAL::10, boundary id=48
+DEAL::17, boundary id=50
+DEAL::13, boundary id=49
+DEAL::4, boundary id=49
+DEAL::5, boundary id=50

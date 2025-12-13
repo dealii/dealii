@@ -21,6 +21,7 @@
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/index_set.h>
 #include <deal.II/base/point.h>
+#include <deal.II/base/types.h>
 
 #include <deal.II/dofs/dof_handler.h>
 
@@ -1949,28 +1950,30 @@ namespace DoFTools
    * contains the mapping from the block indices to the corresponding vertex
    * indices.
    *
-   * @arg <tt>block_list</tt>: the SparsityPattern into which the patches will
+   * @param block_list The SparsityPattern into which the patches will
    * be stored.
    *
-   * @arg <tt>dof_handler</tt>: the multilevel dof handler providing the
+   * @param dof_handler The multilevel dof handler providing the
    * topology operated on.
    *
-   * @arg <tt>interior_dofs_only</tt>: for each patch of cells around a
+   * @param level The multigrid level of the DoFHandler on which to operate.
+   *
+   * @param interior_dofs_only for each patch of cells around a
    * vertex, collect only the interior degrees of freedom of the patch and
    * disregard those on the boundary of the patch. This is for instance the
    * setting for smoothers of Arnold-Falk-Winther type.
    *
-   * @arg <tt>boundary_patches</tt>: include patches around vertices at the
+   * @param boundary_patches include patches around vertices at the
    * boundary of the domain. If not, only patches around interior vertices
    * will be generated.
    *
-   * @arg <tt>level_boundary_patches</tt>: same for refinement edges towards
+   * @param level_boundary_patches same for refinement edges towards
    * coarser cells.
    *
-   * @arg <tt>single_cell_patches</tt>: if not true, patches containing a
+   * @param single_cell_patches if not true, patches containing a
    * single cell are eliminated.
    *
-   * @arg <tt>invert_vertex_mapping</tt>: if true, then the return value
+   * @param invert_vertex_mapping if true, then the return value
    * contains one vertex index for each block; if false, then the return value
    * contains one block index or <tt>invalid_unsigned_int</tt> for each vertex.
    */
@@ -2031,18 +2034,20 @@ namespace DoFTools
    * are possible, in particular changing <tt>boundary_dofs</tt> for
    * non-essential boundary conditions.
    *
-   * @arg <tt>block_list</tt>: the SparsityPattern into which the patches will
+   * @param block_list The SparsityPattern into which the patches will
    * be stored.
    *
-   * @arg <tt>dof_handler</tt>: The multilevel dof handler providing the
+   * @param dof_handler The multilevel dof handler providing the
    * topology operated on.
    *
-   * @arg <tt>interior_dofs_only</tt>: for each patch of cells around a
+   * @param level The multigrid level of the DoFHandler on which to operate.
+   *
+   * @param interior_dofs_only for each patch of cells around a
    * vertex, collect only the interior degrees of freedom of the patch and
    * disregard those on the boundary of the patch. This is for instance the
    * setting for smoothers of Arnold-Falk-Winther type.
    *
-   * @arg <tt>boundary_dofs</tt>: include degrees of freedom, which would have
+   * @param boundary_dofs include degrees of freedom, which would have
    * excluded by <tt>interior_dofs_only</tt>, but are lying on the boundary of
    * the domain, and thus need smoothing. This parameter has no effect if
    * <tt>interior_dofs_only</tt> is false.
@@ -2063,15 +2068,15 @@ namespace DoFTools
    * make_child_patches() and make_vertex_patches(), which may produce an
    * empty patch list.
    *
-   * @arg <tt>block_list</tt>: the SparsityPattern into which the patches will
+   * @param block_list The SparsityPattern into which the patches will
    * be stored.
    *
-   * @arg <tt>dof_handler</tt>: The multilevel dof handler providing the
+   * @param dof_handler The multilevel dof handler providing the
    * topology operated on.
    *
-   * @arg <tt>level</tt> The grid level used for building the list.
+   * @param level The grid level used for building the list.
    *
-   * @arg <tt>interior_dofs_only</tt>: if true, exclude degrees of freedom on
+   * @param interior_dofs_only if true, exclude degrees of freedom on
    * the boundary of the domain.
    */
   template <int dim, int spacedim>
@@ -2278,13 +2283,17 @@ namespace DoFTools
    * object is deleted in this function.
    * @param[in] mask An optional component mask that restricts the
    * components from which the support points are extracted.
+   * @param[in] map_locally_relevant_dofs If this is set to false, then
+   * only the support points of locally owned DoFs are mapped. If true, then the
+   * support points of all locally relevant DoFs are mapped.
    */
   template <int dim, int spacedim>
   void
   map_dofs_to_support_points(const Mapping<dim, spacedim>    &mapping,
                              const DoFHandler<dim, spacedim> &dof_handler,
                              std::vector<Point<spacedim>>    &support_points,
-                             const ComponentMask             &mask = {});
+                             const ComponentMask             &mask = {},
+                             const bool map_locally_relevant_dofs  = true);
 
   /**
    * Same as the previous function but for the hp-case.
@@ -2295,7 +2304,8 @@ namespace DoFTools
     const hp::MappingCollection<dim, spacedim> &mapping,
     const DoFHandler<dim, spacedim>            &dof_handler,
     std::vector<Point<spacedim>>               &support_points,
-    const ComponentMask                        &mask = {});
+    const ComponentMask                        &mask = {},
+    const bool map_locally_relevant_dofs             = true);
 
   /**
    * This function is a version of the above map_dofs_to_support_points
@@ -2323,6 +2333,9 @@ namespace DoFTools
    *   which cell of the triangulation.
    * @param[in] mask An optional component mask that restricts the
    *   components from which the support points are extracted.
+   * @param[in] map_locally_relevant_dofs If this is set to false, then
+   * only the support points of locally owned DoFs are mapped. If true, then the
+   * support points of all locally relevant DoFs are mapped.
    * @return A map that for every locally relevant DoF
    *   index contains the corresponding location in real space coordinates.
    */
@@ -2330,7 +2343,8 @@ namespace DoFTools
   std::map<types::global_dof_index, Point<spacedim>>
   map_dofs_to_support_points(const Mapping<dim, spacedim>    &mapping,
                              const DoFHandler<dim, spacedim> &dof_handler,
-                             const ComponentMask             &mask = {});
+                             const ComponentMask             &mask = {},
+                             const bool map_locally_relevant_dofs  = true);
 
   /**
    * Same as the previous function but for the hp-case.
@@ -2340,7 +2354,8 @@ namespace DoFTools
   map_dofs_to_support_points(
     const hp::MappingCollection<dim, spacedim> &mapping,
     const DoFHandler<dim, spacedim>            &dof_handler,
-    const ComponentMask                        &mask = {});
+    const ComponentMask                        &mask = {},
+    const bool map_locally_relevant_dofs             = true);
 
   /**
    * A version of the function of same name that returns the map via its third
@@ -2353,7 +2368,8 @@ namespace DoFTools
     const Mapping<dim, spacedim>                       &mapping,
     const DoFHandler<dim, spacedim>                    &dof_handler,
     std::map<types::global_dof_index, Point<spacedim>> &support_points,
-    const ComponentMask                                &mask = {});
+    const ComponentMask                                &mask = {},
+    const bool map_locally_relevant_dofs                     = true);
 
   /**
    * A version of the function of same name that returns the map via its third
@@ -2366,7 +2382,8 @@ namespace DoFTools
     const hp::MappingCollection<dim, spacedim>         &mapping,
     const DoFHandler<dim, spacedim>                    &dof_handler,
     std::map<types::global_dof_index, Point<spacedim>> &support_points,
-    const ComponentMask                                &mask = {});
+    const ComponentMask                                &mask = {},
+    const bool map_locally_relevant_dofs                     = true);
 
 
   /**

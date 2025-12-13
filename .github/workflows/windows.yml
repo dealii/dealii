@@ -43,10 +43,10 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [windows-2022]
+        os: [windows-2022, windows-2025]
 
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v6
     - name: set up path
       # needed to use GNU patch instead of Strawberry Perl patch
       run: |
@@ -69,13 +69,13 @@ jobs:
         ctest --test-dir build --build-config Debug --extra-verbose
     - name: upload library
       # run only if a PR is merged into master
-      if: ${{ github.ref == 'refs/heads/master' && matrix.os == 'windows-2022' }}
-      uses: actions/upload-artifact@v4
+      if: ${{ github.ref == 'refs/heads/master' && matrix.os == 'windows-2025' }}
+      uses: actions/upload-artifact@v5
       with:
         name: dealii-${{ matrix.os }}
         path: c:/project
     - name: upload CMakeConfigureLog
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v5
       if: always()
       continue-on-error: true
       with:

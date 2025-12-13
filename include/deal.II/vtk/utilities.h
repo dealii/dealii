@@ -20,7 +20,29 @@
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/point.h>
 
+#include <deal.II/grid/tria.h>
+
 #ifdef DEAL_II_WITH_VTK
+
+// Make sure that the VTK version macros are available.
+#  include <vtkVersion.h>
+
+// VTK_VERSION_CHECK is defined by the header above for 9.3.0 and above, but
+// we provide a fallback older versions.
+#  ifndef VTK_VERSION_CHECK
+#    define VTK_VERSION_CHECK(major, minor, build) \
+      (10000000000ULL * (major) + 100000000ULL * (minor) + (build))
+#  endif
+
+// Normalize the version macro name to cover both the quick (>=9.3) and
+// legacy (<9.3) headers.
+#  if defined(VTK_VERSION_NUMBER_QUICK)
+#    define DEAL_II_VTK_VERSION_NUMBER VTK_VERSION_NUMBER_QUICK
+#  elif defined(VTK_VERSION_NUMBER)
+#    define DEAL_II_VTK_VERSION_NUMBER VTK_VERSION_NUMBER
+#  else
+#    define DEAL_II_VTK_VERSION_NUMBER 0
+#  endif
 
 #  include <vtkDoubleArray.h>
 
@@ -51,6 +73,44 @@ namespace VTKWrappers
   template <int dim>
   inline vtkSmartPointer<vtkDoubleArray>
   dealii_point_to_vtk_array(const dealii::Point<dim> &p);
+
+  /**
+   * @brief Read a VTK mesh file and populate a deal.II Triangulation.
+   *
+   * This function reads the mesh from the specified VTK file and fills the
+   * given Triangulation object. If cleanup is true, overlapping points in the
+   * VTK file are merged using VTK's cleaning utilities.
+   *
+   * @param vtk_filename The name of the input VTK file.
+   * @param tria The Triangulation object to populate.
+   * @param cleanup If true, merge overlapping points in the VTK file (default: true).
+   * @param relative_tolerance Relative tolerance used when merging points via
+   * VTK's cleaning utilities (default: 0).
+   */
+  template <int dim, int spacedim>
+  void
+  read_tria(const std::string            &vtk_filename,
+            Triangulation<dim, spacedim> &tria,
+            const bool                    cleanup            = true,
+            const double                  relative_tolerance = 0.0);
+
+  /**
+   * Read cell data (scalar or vector) from a VTK file and store it in the
+   * output vector.
+   *
+   * This function reads the specified cell data array (scalar or vector) from
+   * the given VTK file and stores it in the provided output vector. For vector
+   * data, all components are stored in row-major order (cell0_comp0,
+   * cell0_comp1, ..., cell1_comp0, ...).
+   *
+   * @param vtk_filename The name of the input VTK file.
+   * @param cell_data_name The name of the cell data array to read.
+   * @param output_vector The vector to store the cell data values.
+   */
+  void
+  read_cell_data(const std::string &vtk_filename,
+                 const std::string &cell_data_name,
+                 Vector<double>    &output_vector);
 
 #  ifndef DOXYGEN
   // Template implementations

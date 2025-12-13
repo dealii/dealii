@@ -15,28 +15,21 @@
 #ifndef dealii_closest_surface_point
 #define dealii_closest_surface_point
 
-
 #include <deal.II/base/config.h>
 
-#include <deal.II/base/quadrature.h>
+#include <deal.II/base/point.h>
 
 #include <deal.II/dofs/dof_handler.h>
 
 #include <deal.II/fe/fe.h>
-#include <deal.II/fe/mapping_q1.h>
+#include <deal.II/fe/mapping.h>
 
-#include <deal.II/lac/full_matrix.h>
 #include <deal.II/lac/read_vector.h>
-#include <deal.II/lac/vector.h>
-
-#include <deal.II/numerics/vector_tools.h>
 
 DEAL_II_NAMESPACE_OPEN
 
 namespace NonMatching
 {
-
-
   /**
    * @brief A class for computing the closest points on a surface defined by a level set function.
    *
@@ -111,10 +104,10 @@ namespace NonMatching
       const std::vector<Point<dim>> &quadrature_points) const;
 
   private:
-    AdditionalData            data;
-    const DoFHandler<dim>    &dof_handler;
-    const ReadVector<Number> &level_set;
-    Mapping<dim>             &mapping;
+    AdditionalData                            data;
+    ObserverPointer<const DoFHandler<dim>>    dof_handler;
+    ObserverPointer<const ReadVector<Number>> level_set;
+    ObserverPointer<Mapping<dim>>             mapping;
 
 
 

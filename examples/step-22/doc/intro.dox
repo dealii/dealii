@@ -485,7 +485,7 @@ needs on the order of 50-100 CG iterations. However, there is a simple cure:
 precondition with the @ref GlossMassMatrix "mass matrix" on the pressure space
 and we get down to a number between 5-15 CG iterations, pretty much
 independently of the structure of the mesh (take a look at the
-@ref step_22-Results "results section" of this program to see that indeed the
+@ref step_22-ResultsSection "results section" of this program to see that indeed the
 number of CG iterations does not change as we refine the mesh).
 
 So all we need in addition to what we already have is the mass matrix on the
@@ -759,7 +759,7 @@ right part of the top surface, and impose natural flow conditions everywhere
 else. If we are in 2d, the description is essentially the same, with the
 exception that we omit the second component of all vectors stated above.
 
-As will become apparent in the @ref step_22-Results "results section", the
+As will become apparent in the @ref step_22-ResultsSection "results section", the
 flow field will pull material from below and move it to the left and right
 ends of the domain, as expected. The discontinuity of velocity boundary
 conditions will produce a singularity in the pressure at the center of the top

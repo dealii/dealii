@@ -9,7 +9,7 @@ Award No. EAR-1550901 and The University of California-Davis.
 
 Stefano Zampini (King Abdullah University of Science and Technology)
 contributed the results obtained with the PETSc variant of this program
-discussed in the @ref step_77-Results "results section" below.
+discussed in the @ref step_77-ResultsSection "results section" below.
 </i>
 <br>
 
@@ -169,7 +169,7 @@ functionality, and we better use it.
   of the former two packages instead: Basically everything that we
   say and do below will also be true and work for these other packages!
   (We will also come back to this point in the
-  @ref step_77-Results "results section"
+  @ref step_77-ResultsSection "results section"
   below.)
 
 

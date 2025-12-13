@@ -224,7 +224,7 @@ solver to a hybrid multigrid solver.
 We will create a custom hybrid multigrid preconditioner with the special
 level requirements as described above with the help of the existing
 global-coarsening infrastructure via the use of
-MGTransferGlobalCoarsening.
+MGTransferMatrixFree.
 
 
 <h3>The test case</h3>

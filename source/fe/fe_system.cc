@@ -1994,7 +1994,10 @@ FESystem<dim, spacedim>::initialize(
             }
           Assert(index == n_dofs_per_quad, ExcInternalError());
         }
+    });
 
+  if (dim > 1)
+    init_tasks += Threads::new_task([&]() {
       // additionally compose the permutation information for lines
       // Do not use `this` in Assert because nvcc when using C++20 assumes that
       // `this` is an integer and we get the following error: base operand of

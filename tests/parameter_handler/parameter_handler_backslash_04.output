@@ -1,17 +1,9 @@
 
-DEAL::ExcInvalidEntryForPattern (current_line_n, input_filename, entry_value, entry_name, patterns[pattern_index]->description())
-Line <4> of file <prm/parameter_handler_backslash_04.prm>:
-    The entry value
-        a,\ b,
-    for the entry named
-        Function
-    does not match the given pattern:
-        [List of <[Selection a|b|c|d|e|f|g|h ]> of length 0...4294967295 (inclusive)]
-DEAL::ExcInvalidEntryForPattern (current_line_n, input_filename, entry_value, entry_name, patterns[pattern_index]->description())
-Line <4> of file <input file>:
-    The entry value
-        a,\ b,
-    for the entry named
-        Function
-    does not match the given pattern:
-        [List of <[Selection a|b|c|d|e|f|g|h ]> of length 0...4294967295 (inclusive)]
+DEAL::ExcInvalidEntryForPattern( current_line_n, input_filename, entry_value, entry_name, patterns[pattern_index]->description())
+    In file <parameter_handler_backslash_04.prm>: The value <a,\ b,> for the parameter entry named <Function> does not match the pattern expected for this parameter.
+The expected pattern for this parameter is:
+[List of <[Selection a|b|c|d|e|f|g|h ]> of length 0...4294967295 (inclusive)]
+DEAL::ExcInvalidEntryForPattern( current_line_n, input_filename, entry_value, entry_name, patterns[pattern_index]->description())
+    In line <4> of file <input file>: The value <a,\ b,> for the parameter entry named <Function> does not match the pattern expected for this parameter.
+The expected pattern for this parameter is:
+[List of <[Selection a|b|c|d|e|f|g|h ]> of length 0...4294967295 (inclusive)]

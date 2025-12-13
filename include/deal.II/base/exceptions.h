@@ -820,6 +820,21 @@ namespace StandardExceptions
     "looking at the summary printed at the end of the cmake "
     "output.");
 
+  /**
+   * This function requires support for the GMSH API.
+   */
+  DeclExceptionMsg(
+    ExcNeedsGMSHAPI,
+    "You are attempting to use functionality that is only available if deal.II "
+    "was configured to use GMSH's API, but cmake did not find a valid GMSH "
+    "library."
+    "\n\n"
+    "You will have to ensure that your system has a usable GMSH "
+    "installation (including both the gmsh executable and the GMSH library) "
+    "and re-install deal.II, making sure that cmake finds the GMSH "
+    "installation. You can check this by looking at the summary printed at the "
+    "end of the cmake output.");
+
 #ifdef DEAL_II_WITH_MPI
   /**
    * Exception for MPI errors. This exception is only defined if
