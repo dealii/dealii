@@ -157,9 +157,9 @@ namespace internal
 
     private:
       // for setup
-      ConstraintValues<double>               constraint_values;
-      std::vector<std::vector<unsigned int>> dof_indices_per_cell;
-      std::vector<std::vector<unsigned int>> plain_dof_indices_per_cell;
+      ConstraintValues<double>            constraint_values;
+      std::vector<std::vector<IndexType>> dof_indices_per_cell;
+      std::vector<std::vector<IndexType>> plain_dof_indices_per_cell;
       std::vector<std::vector<std::pair<unsigned short, unsigned short>>>
         constraint_indicator_per_cell;
 
@@ -619,6 +619,7 @@ namespace internal
       AssertDimension(constraint_pool_data.size(), length);
 
       this->dof_indices_per_cell.clear();
+      this->plain_dof_indices_per_cell.clear();
       constraint_indicator_per_cell.clear();
 
       if (hanging_nodes &&
@@ -749,6 +750,7 @@ namespace internal
       AssertDimension(constraint_pool_data.size(), length);
 
       this->dof_indices_per_cell.clear();
+      this->plain_dof_indices_per_cell.clear();
       constraint_indicator_per_cell.clear();
 
       if (hanging_nodes &&

@@ -2009,6 +2009,37 @@ namespace internal
         transfer.partitioner_fine = transfer.constraint_info_fine.finalize(
           dof_handler_fine.get_mpi_communicator());
         transfer.vec_fine.reinit(transfer.partitioner_fine);
+
+        if constexpr (running_in_debug_mode())
+          {
+            // We would like to assert that no strange indices were added in
+            // the transfer. Unfortunately, we can only do this if we're
+            // working with the multigrid indices within the DoFHandler, not
+            // when the transfer comes from different DoFHandler object, as
+            // the latter might have unrelated parallel partitions.
+            if (mg_level_fine != numbers::invalid_unsigned_int)
+              {
+                Utilities::MPI::Partitioner part_check(
+                  dof_handler_fine.locally_owned_mg_dofs(mg_level_fine),
+                  DoFTools::extract_locally_relevant_level_dofs(
+                    dof_handler_fine, mg_level_fine),
+                  dof_handler_fine.get_mpi_communicator());
+                Assert(transfer.partitioner_fine->ghost_indices().is_subset_of(
+                         part_check.ghost_indices()),
+                       ExcMessage(
+                         "The setup of ghost indices failed, because the set "
+                         "of ghost indices identified for the transfer is "
+                         "not a subset of the locally relevant dofs on level " +
+                         std::to_string(mg_level_fine) + " with " +
+                         std::to_string(
+                           dof_handler_fine.n_dofs(mg_level_fine)) +
+                         " dofs in total, which means we do not understand "
+                         "the indices that were collected. This is very "
+                         "likely a bug in deal.II, and could e.g. be caused "
+                         "by some integer type narrowing between 64 bit and "
+                         "32 bit integers."));
+              }
+          }
       }
 
 
@@ -4185,9 +4216,17 @@ MGTransferMatrixFree<dim, Number, MemorySpace>::
 
       for (unsigned int i = 0; i < dof_indices_in.size(); ++i)
         if (is_out.is_element(dof_indices_out[i]))
-          this->copy_indices[0](1,
-                                is_out.index_within_set(dof_indices_out[i])) =
-            is_in.index_within_set(dof_indices_in[i]);
+          {
+            Assert(is_in.index_within_set(dof_indices_in[i]) <
+                     static_cast<types::global_dof_index>(
+                       std::numeric_limits<unsigned int>::max()),
+                   ExcMessage("Index overflow: This class supports at most "
+                              "2^32-1 locally owned DoFs."));
+            this->copy_indices[0](1,
+                                  is_out.index_within_set(dof_indices_out[i])) =
+              static_cast<unsigned int>(
+                is_in.index_within_set(dof_indices_in[i]));
+          }
     });
 
 
