@@ -22,21 +22,13 @@
 #include <deal.II/lac/matrix_scaling.h>
 #include <deal.II/lac/sparse_matrix.h>
 #include <deal.II/lac/sparse_matrix_ez.h>
+#include <deal.II/lac/trilinos_tpetra_to_trilinos_wrappers.h>
 #include <deal.II/lac/vector.h>
 
 #include <boost/serialization/utility.hpp>
 
 DEAL_II_NAMESPACE_OPEN
 
-namespace TrilinosWrappers
-{
-  class SparseMatrix;
-  namespace MPI
-  {
-    class SparseMatrix;
-    class Vector;
-  } // namespace MPI
-} // namespace TrilinosWrappers
 namespace PETScWrappers
 {
   namespace MPI
