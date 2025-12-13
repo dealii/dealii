@@ -586,6 +586,32 @@ public:
   read_cell_data(const AlignedVector<T> &array) const;
 
   /**
+   * Provides a unified interface to access data in a Table of
+   * VectorizedArray fields for cell data. The source table has dimension D
+   * where the first dimension indexes cell batches. This function extracts
+   * data for the current cells and stores it in a destination table of
+   * dimension D-1, effectively removing the batch dimension. For each lane,
+   * the function copies data from src[batch][...][lane] to dst[...][lane]
+   * based on the cell IDs. It is implemented both for cells and faces
+   * (access data to the associated cell).
+   *
+   * The underlying type T can be both the Number type as given by the class
+   * template (i.e., VectorizedArrayType) as well as std::array with as many
+   * entries as n_lanes.
+   *
+   * dst must already be sized correctly: for each dimension d in [0,D-2]
+   * dst.size(d) must equal src.size(d+1), and the innermost array size must be
+   * equal to the number of lanes (n_lanes) or the corresponding array
+   * length of T. Furthermore, dst must be pre-filled with valid entries:
+   * entries corresponding to inactive lanes (for which the current cell id is
+   * numbers::invalid_unsigned_int) will NOT be written to by this function,
+   * i.e., those lanes remain as initially provided in dst.
+   */
+  template <typename T, int D>
+  void
+  read_cell_data(const Table<D, T> &src, Table<D - 1, T> &dst) const;
+
+  /**
    * Provides a unified interface to set data in a vector of
    * VectorizedArray fields of length MatrixFree::n_cell_batches() +
    * MatrixFree::n_ghost_cell_batches() for cell data. It is implemented
@@ -644,7 +670,7 @@ protected:
    */
   FEEvaluationData(const InitializationData &initialization_data,
                    const bool                is_interior_face,
-                   const unsigned int        quad_no,
+                   const unsigned int        quadrature_index,
                    const unsigned int        first_selected_component);
 
   /**
@@ -686,7 +712,7 @@ protected:
    * quadrature formulas available in the MatrixFree objects pass to derived
    * classes.
    */
-  const unsigned int quad_no;
+  const unsigned int quadrature_index;
 
   /**
    * Stores the number of components in the finite element as detected in the
@@ -955,7 +981,7 @@ protected:
    * @note Only available for `dof_access_index == dof_access_cell` and
    * `is_interior_face == false`.
    */
-  std::array<std::uint8_t, n_lanes> face_orientations;
+  std::array<types::geometric_orientation, n_lanes> face_orientations;
 
   /**
    * Stores the subface index of the given face. Usually, this variable takes
@@ -1043,12 +1069,12 @@ template <int dim, typename Number, bool is_face>
 inline FEEvaluationData<dim, Number, is_face>::FEEvaluationData(
   const InitializationData &initialization_data,
   const bool                is_interior_face,
-  const unsigned int        quad_no,
+  const unsigned int        quadrature_index,
   const unsigned int        first_selected_component)
   : data(initialization_data.shape_info)
   , dof_info(initialization_data.dof_info)
   , mapping_data(initialization_data.mapping_data)
-  , quad_no(quad_no)
+  , quadrature_index(quadrature_index)
   , n_fe_components(dof_info != nullptr ? dof_info->start_components.back() : 0)
   , first_selected_component(first_selected_component)
   , active_fe_index(initialization_data.active_fe_index)
@@ -1102,7 +1128,7 @@ inline FEEvaluationData<dim, Number, is_face>::FEEvaluationData(
   : data(nullptr)
   , dof_info(nullptr)
   , mapping_data(nullptr)
-  , quad_no(numbers::invalid_unsigned_int)
+  , quadrature_index(numbers::invalid_unsigned_int)
   , n_fe_components(n_fe_components)
   , first_selected_component(first_selected_component)
   , active_fe_index(numbers::invalid_unsigned_int)
@@ -1144,7 +1170,7 @@ template <int dim, typename Number, bool is_face>
 inline FEEvaluationData<dim, Number, is_face> &
 FEEvaluationData<dim, Number, is_face>::operator=(const FEEvaluationData &other)
 {
-  AssertDimension(quad_no, other.quad_no);
+  AssertDimension(quadrature_index, other.quadrature_index);
   AssertDimension(n_fe_components, other.n_fe_components);
   AssertDimension(first_selected_component, other.first_selected_component);
   AssertDimension(active_fe_index, other.active_fe_index);
@@ -1184,7 +1210,7 @@ FEEvaluationData<dim, Number, is_face>::operator=(const FEEvaluationData &other)
          internal::MatrixFreeFunctions::DoFInfo::dof_access_face_exterior) :
       internal::MatrixFreeFunctions::DoFInfo::dof_access_cell;
   face_numbers[0]         = 0;
-  face_orientations[0]    = 0;
+  face_orientations[0]    = numbers::default_geometric_orientation;
   subface_index           = 0;
   cell_type               = internal::MatrixFreeFunctions::general;
   divergence_is_requested = false;
@@ -1275,7 +1301,7 @@ FEEvaluationData<dim, Number, is_face>::reinit_face(
   // internal::MatrixFreeFunctions::FaceToCellTopology::face_orientation.
   face_orientations[0] = (is_interior_face() == (face.face_orientation >= 8)) ?
                            (face.face_orientation % 8) :
-                           0;
+                           numbers::default_geometric_orientation;
 
   if (is_interior_face())
     cell_ids = face.cells_interior;
@@ -1555,7 +1581,7 @@ template <int dim, typename Number, bool is_face>
 inline unsigned int
 FEEvaluationData<dim, Number, is_face>::get_quadrature_index() const
 {
-  return quad_no;
+  return quadrature_index;
 }
 
 
@@ -1736,6 +1762,55 @@ FEEvaluationData<dim, Number, is_face>::read_cell_data(
                                         local = global;
                                       });
   return out;
+}
+
+
+template <int dim, typename Number, bool is_face>
+template <typename T, int D>
+void
+FEEvaluationData<dim, Number, is_face>::read_cell_data(
+  const Table<D, T> &src,
+  Table<D - 1, T>   &dst) const
+{
+  static_assert(D >= 2, "Table dimension must be at least 2");
+
+
+  for (unsigned int d = 0; d < D - 1; ++d)
+    Assert(dst.size(d) == src.size(d + 1),
+           ExcMessage("Dimension mismatch between src and dst tables."));
+
+  for (unsigned int lane = 0; lane < n_lanes; ++lane)
+    if (this->get_cell_ids()[lane] != numbers::invalid_unsigned_int)
+      {
+        const unsigned int src_index  = this->get_cell_ids()[lane] / n_lanes;
+        const unsigned int array_lane = this->get_cell_ids()[lane] % n_lanes;
+
+        AssertIndexRange(src_index, src.size(0));
+
+        // Copy data following the pattern:
+        // dst[i][j][lane] = src[batch][i][j][lane]
+        auto copy_recursively = [&](auto         self,
+                                    auto       &&dst_slice,
+                                    const auto  &src_slice,
+                                    unsigned int depth) -> void {
+          if constexpr (std::is_same_v<std::decay_t<decltype(dst_slice)>, T>)
+            {
+              // Base case: we've reached the innermost level (the array)
+              dst_slice[lane] = src_slice[array_lane];
+            }
+          else
+            {
+              // Recursive case: iterate through this dimension. 'depth'
+              // corresponds to the dimension index in the original 'src'
+              // table.
+              AssertIndexRange(depth, D);
+              for (unsigned int i = 0; i < src.size(depth); ++i)
+                self(self, dst_slice[i], src_slice[i], depth + 1);
+            }
+        };
+
+        copy_recursively(copy_recursively, dst, src[src_index], 1);
+      }
 }
 
 

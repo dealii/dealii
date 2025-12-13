@@ -635,7 +635,7 @@ namespace Step75
   // The above function deals with the actual solution for a given sequence of
   // multigrid objects. This functions creates the actual multigrid levels, in
   // particular the operators, and the transfer operator as a
-  // MGTransferGlobalCoarsening object.
+  // MGTransferMatrixFree object.
   template <typename VectorType, typename OperatorType, int dim>
   void solve_with_gmg(SolverControl                    &solver_control,
                       const OperatorType               &system_matrix,
@@ -804,7 +804,7 @@ namespace Step75
                                   constraints[level + 1],
                                   constraints[level]);
 
-    MGTransferGlobalCoarsening<dim, VectorType> transfer(
+    MGTransferMatrixFree<dim, typename VectorType::value_type> transfer(
       transfers, [&](const auto l, auto &vec) {
         operators[l]->initialize_dof_vector(vec);
       });
@@ -1161,7 +1161,7 @@ namespace Step75
             << triangulation.n_global_active_cells() << std::endl
             << "     by partition:              ";
 
-      std::vector<unsigned int> n_active_cells_per_subdomain =
+      const std::vector<unsigned int> n_active_cells_per_subdomain =
         Utilities::MPI::gather(mpi_communicator,
                                triangulation.n_locally_owned_active_cells());
       for (unsigned int i = 0; i < first_n_processes; ++i)
@@ -1195,7 +1195,7 @@ namespace Step75
       pcout << "   Number of constraints:        "
             << std::accumulate(n_constraints_per_subdomain.begin(),
                                n_constraints_per_subdomain.end(),
-                               0)
+                               types::global_dof_index(0))
             << std::endl
             << "     by partition:              ";
       for (unsigned int i = 0; i < first_n_processes; ++i)

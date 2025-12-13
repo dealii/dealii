@@ -1,0 +1,5 @@
+Enable Taskflow-based parallelization of parallel::apply_to_subranges().
+This functionality is missed in the current code, which only supports
+TBB and sequential execution.
+<br>
+(Qingyuan Shi, 2025/12/10)

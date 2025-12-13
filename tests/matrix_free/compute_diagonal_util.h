@@ -66,13 +66,13 @@ public:
                                              Number,
                                              VectorizedArrayType> &)>
                          &cell_operation,
-       const unsigned int dof_no  = 0,
-       const unsigned int quad_no = 0)
+       const unsigned int dof_handler_index = 0,
+       const unsigned int quadrature_index  = 0)
     : matrix_free(matrix_free)
     , constraints(constraints)
     , cell_operation(cell_operation)
-    , dof_no(dof_no)
-    , quad_no(quad_no)
+    , dof_handler_index(dof_handler_index)
+    , quadrature_index(quadrature_index)
   {}
 
   void
@@ -88,7 +88,7 @@ public:
                              (Utilities::MPI::n_mpi_processes(
                                 matrix_free.get_task_info().communicator) == 1);
 
-    const auto &dof_handler = matrix_free.get_dof_handler(dof_no);
+    const auto &dof_handler = matrix_free.get_dof_handler(dof_handler_index);
 
     if (test_matrix)
       {
@@ -103,7 +103,7 @@ public:
     double error_local_1, error_local_2, error_global;
 
     {
-      matrix_free.initialize_dof_vector(diagonal_global, dof_no);
+      matrix_free.initialize_dof_vector(diagonal_global, dof_handler_index);
       MatrixFreeTools::compute_diagonal<dim,
                                         fe_degree,
                                         n_points,
@@ -113,8 +113,8 @@ public:
         matrix_free,
         diagonal_global,
         [&](auto &phi) { this->cell_operation(phi); },
-        dof_no,
-        quad_no);
+        dof_handler_index,
+        quadrature_index);
 
       diagonal_global.print(deallog.get_file_stream());
       error_local_1 = diagonal_global.l2_norm();
@@ -123,13 +123,13 @@ public:
 
     {
       VectorType diagonal_global;
-      matrix_free.initialize_dof_vector(diagonal_global, dof_no);
+      matrix_free.initialize_dof_vector(diagonal_global, dof_handler_index);
       MatrixFreeTools::compute_diagonal(matrix_free,
                                         diagonal_global,
                                         &Test::cell_function,
                                         this,
-                                        dof_no,
-                                        quad_no);
+                                        dof_handler_index,
+                                        quadrature_index);
 
       diagonal_global.print(deallog.get_file_stream());
       error_local_2 = diagonal_global.l2_norm();
@@ -151,8 +151,8 @@ public:
           constraints,
           A1,
           [&](auto &phi) { this->cell_operation(phi); },
-          dof_no,
-          quad_no);
+          dof_handler_index,
+          quadrature_index);
       }
 
     if (test_matrix)
@@ -162,17 +162,18 @@ public:
                                         A2,
                                         &Test::cell_function,
                                         this,
-                                        dof_no,
-                                        quad_no);
+                                        dof_handler_index,
+                                        quadrature_index);
       }
 
     // compute diagonal globally
     {
       VectorType src, temp;
 
-      matrix_free.initialize_dof_vector(src, dof_no);
-      matrix_free.initialize_dof_vector(diagonal_global_reference, dof_no);
-      matrix_free.initialize_dof_vector(temp, dof_no);
+      matrix_free.initialize_dof_vector(src, dof_handler_index);
+      matrix_free.initialize_dof_vector(diagonal_global_reference,
+                                        dof_handler_index);
+      matrix_free.initialize_dof_vector(temp, dof_handler_index);
 
       for (unsigned int i = 0; i < src.size(); ++i)
         {
@@ -239,7 +240,7 @@ public:
                  n_components,
                  Number,
                  VectorizedArrayType>
-      phi(data, pair, dof_no, quad_no);
+      phi(data, pair, dof_handler_index, quadrature_index);
     for (auto cell = pair.first; cell < pair.second; ++cell)
       {
         phi.reinit(cell);
@@ -269,6 +270,6 @@ public:
                                         Number,
                                         VectorizedArrayType> &)>
                      cell_operation;
-  const unsigned int dof_no;
-  const unsigned int quad_no;
+  const unsigned int dof_handler_index;
+  const unsigned int quadrature_index;
 };

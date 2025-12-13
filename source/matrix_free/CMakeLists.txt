@@ -45,6 +45,7 @@ set(_inst
   fe_point_evaluation.inst.in
   mapping_info.inst.in
   matrix_free.inst.in
+  portable_matrix_free.inst.in
   shape_info.inst.in
   )
 

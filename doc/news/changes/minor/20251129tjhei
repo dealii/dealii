@@ -1,0 +1,4 @@
+New: A new overload of MatrixFree::initialize_dof_vector() for BlockVector creates a block
+for each DoFHandler passed to MatrixFree::reinit().
+<br>
+(Timo Heister, 2025/11/29)

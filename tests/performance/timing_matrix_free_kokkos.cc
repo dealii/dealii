@@ -139,14 +139,16 @@ public:
       gpu_data);
     fe_eval.read_dof_values(src);
     fe_eval.evaluate(EvaluationFlags::gradients);
-    fe_eval.apply_for_each_quad_point(
-      LaplaceOperatorQuad<dim, fe_degree, Number>());
+
+    LaplaceOperatorQuad<dim, fe_degree, Number> quad;
+    gpu_data->for_each_quad_point(
+      [&](const int &q_point) { quad(&fe_eval, q_point); });
+
     fe_eval.integrate(EvaluationFlags::gradients);
     fe_eval.distribute_local_to_global(dst);
   }
-  static const unsigned int n_dofs_1d    = fe_degree + 1;
-  static const unsigned int n_local_dofs = Utilities::pow(fe_degree + 1, dim);
-  static const unsigned int n_q_points   = Utilities::pow(fe_degree + 1, dim);
+  static const unsigned int n_dofs_1d  = fe_degree + 1;
+  static const unsigned int n_q_points = Utilities::pow(fe_degree + 1, dim);
 };
 
 template <int dim, int fe_degree, typename Number>

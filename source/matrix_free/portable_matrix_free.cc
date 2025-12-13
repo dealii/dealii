@@ -16,45 +16,6 @@
 
 DEAL_II_NAMESPACE_OPEN
 
-#ifndef DOXYGEN
-
-namespace Portable
-{
-  // Do not instantiate for dim = 1
-  template class MatrixFree<2, float>;
-  template class MatrixFree<2, double>;
-  template class MatrixFree<3, float>;
-  template class MatrixFree<3, double>;
-
-  template void
-  MatrixFree<2, float>::initialize_dof_vector(
-    LinearAlgebra::distributed::Vector<float, MemorySpace::Host> &vec) const;
-  template void
-  MatrixFree<2, float>::initialize_dof_vector(
-    LinearAlgebra::distributed::Vector<float, MemorySpace::Default> &vec) const;
-  template void
-  MatrixFree<2, double>::initialize_dof_vector(
-    LinearAlgebra::distributed::Vector<double, MemorySpace::Host> &vec) const;
-  template void
-  MatrixFree<2, double>::initialize_dof_vector(
-    LinearAlgebra::distributed::Vector<double, MemorySpace::Default> &vec)
-    const;
-  template void
-  MatrixFree<3, float>::initialize_dof_vector(
-    LinearAlgebra::distributed::Vector<float, MemorySpace::Host> &vec) const;
-  template void
-  MatrixFree<3, float>::initialize_dof_vector(
-    LinearAlgebra::distributed::Vector<float, MemorySpace::Default> &vec) const;
-  template void
-  MatrixFree<3, double>::initialize_dof_vector(
-    LinearAlgebra::distributed::Vector<double, MemorySpace::Host> &vec) const;
-  template void
-  MatrixFree<3, double>::initialize_dof_vector(
-    LinearAlgebra::distributed::Vector<double, MemorySpace::Default> &vec)
-    const;
-
-} // namespace Portable
-
-#endif
+#include "matrix_free/portable_matrix_free.inst"
 
 DEAL_II_NAMESPACE_CLOSE

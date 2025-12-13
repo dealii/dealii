@@ -716,8 +716,8 @@ namespace parallel
                   });
 
     // return true if at least one process has a coarser cell
-    return Utilities::MPI::max(have_coarser_cell ? 1 : 0,
-                               this->mpi_communicator) != 0;
+    return Utilities::MPI::logical_or(have_coarser_cell,
+                                      this->mpi_communicator);
   }
 
 

@@ -261,8 +261,8 @@ namespace VectorTools
             use_lumped = true;
         }
       use_lumped =
-        bool(Utilities::MPI::min(int(use_lumped),
-                                 work_result.get_mpi_communicator()));
+        Utilities::MPI::logical_and(use_lumped,
+                                    work_result.get_mpi_communicator());
 
       if (use_lumped)
         mass_matrix.compute_lumped_diagonal();

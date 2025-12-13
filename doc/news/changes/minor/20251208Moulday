@@ -1,0 +1,5 @@
+Improved: The Taskflow based WorkStream::run using graph coloring has been
+improved to be significantly more performant in the cases where work units are
+very cheap.
+<br>
+(Ryan Moulday, Timo Heister, 2025/12/08)

@@ -55,6 +55,10 @@ DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
 #  include <zoltan_cpp.h>
 #endif
 
+#ifdef DEAL_II_WITH_PSBLAS
+#  include <psb_c_base.h>
+#endif
+
 #include <set>
 #include <string>
 
@@ -160,6 +164,19 @@ InitFinalize::InitFinalize([[maybe_unused]] int    &argc,
       sc_init(MPI_COMM_WORLD, 0, 0, nullptr, SC_LP_SILENT);
 #  endif
       p4est_init(nullptr, SC_LP_SILENT);
+    }
+#endif
+
+    // Initialize PSBLAS
+#ifdef DEAL_II_WITH_PSBLAS
+  if (static_cast<bool>(libraries & InitializeLibrary::PSBLAS))
+    {
+      cctxt = psb_c_new_ctxt();
+      Assert(cctxt != nullptr,
+             ExcMessage(
+               "Failed to create PSBLAS context during MPI initialization."));
+      psb_c_init(cctxt);
+      psb_c_set_index_base(0); // Set index base to 0 (PSBLAS default is 1)
     }
 #endif
 
@@ -328,7 +345,17 @@ InitFinalize::unregister_request(MPI_Request &request)
 
 std::set<MPI_Request *> InitFinalize::requests;
 
+#ifdef DEAL_II_WITH_PSBLAS
 
+psb_c_ctxt *InitFinalize::cctxt;
+
+psb_c_ctxt *
+InitFinalize::get_psblas_context()
+{
+  Assert(cctxt != nullptr, ExcMessage("PSBLAS context was not initialized."));
+  return cctxt;
+}
+#endif
 
 void
 InitFinalize::finalize()
@@ -406,6 +433,14 @@ InitFinalize::finalize()
       // Note: p4est has no finalize function
       if (static_cast<bool>(libraries & InitializeLibrary::P4EST))
         sc_finalize();
+#endif
+
+#ifdef DEAL_II_WITH_PSBLAS
+      if (static_cast<bool>(libraries & InitializeLibrary::PSBLAS))
+        {
+          psb_c_exit_ctxt(*cctxt);
+          free(cctxt);
+        }
 #endif
 
 

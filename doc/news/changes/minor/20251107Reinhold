@@ -1,0 +1,5 @@
+Fixed: Move constructor and assignment operator of Triangulation<dim> did not
+move the data member cell_data_attached_data. This led to failures when trying
+to use a moved to Triangulation e.g. for refinement.
+<br>
+(Alexander Reinhold, 2025/11/07)

@@ -49,11 +49,11 @@
 #include <deal.II/lac/sparse_direct.h>
 #include <deal.II/lac/sparse_ilu.h>
 
-#include "deal.II/numerics/vector_tools_mean_value.h"
 #include <deal.II/numerics/data_out.h>
 #include <deal.II/numerics/error_estimator.h>
 #include <deal.II/numerics/matrix_tools.h>
 #include <deal.II/numerics/vector_tools.h>
+#include <deal.II/numerics/vector_tools_mean_value.h>
 
 #include <fstream>
 #include <iostream>

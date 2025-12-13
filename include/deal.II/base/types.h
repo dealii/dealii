@@ -366,6 +366,20 @@ namespace numbers
     static_cast<types::geometric_orientation>(0b001);
 
   /**
+   * Value indicating an invalid or unset orientation.
+   *
+   * This value is an example of an
+   * @ref GlossInvalidValue "invalid value".
+   * See there for more information.
+   *
+   * See the
+   * @ref GlossCombinedOrientation "glossary"
+   * for more information.
+   */
+  constexpr types::geometric_orientation invalid_geometric_orientation =
+    static_cast<types::geometric_orientation>(-1);
+
+  /**
    * A special id for an invalid subdomain id. This value may not be used as a
    * valid id but is used, for example, for default arguments to indicate a
    * subdomain id that is not to be used.

@@ -940,10 +940,9 @@ namespace internal
         compressed_set.add_indices(ghost_indices.begin(), ghost_indices.end());
         compressed_set.subtract_set(part.locally_owned_range());
         const bool all_ghosts_equal =
-          Utilities::MPI::min<int>(static_cast<int>(
-                                     compressed_set.n_elements() ==
-                                     part.ghost_indices().n_elements()),
-                                   part.get_mpi_communicator()) != 0;
+          Utilities::MPI::logical_and(compressed_set.n_elements() ==
+                                        part.ghost_indices().n_elements(),
+                                      part.get_mpi_communicator());
 
         std::shared_ptr<const Utilities::MPI::Partitioner> temp_0;
 
@@ -1082,9 +1081,8 @@ namespace internal
                   has_noncontiguous_cell = true;
               });
               has_noncontiguous_cell =
-                Utilities::MPI::min<int>(static_cast<int>(
-                                           has_noncontiguous_cell),
-                                         part.get_mpi_communicator()) != 0;
+                Utilities::MPI::logical_and(has_noncontiguous_cell,
+                                            part.get_mpi_communicator());
 
               std::sort(ghost_indices.begin(), ghost_indices.end());
               IndexSet compressed_set(part.size());
@@ -1092,10 +1090,9 @@ namespace internal
                                          ghost_indices.end());
               compressed_set.subtract_set(part.locally_owned_range());
               const bool all_ghosts_equal =
-                Utilities::MPI::min<int>(static_cast<int>(
-                                           compressed_set.n_elements() ==
-                                           part.ghost_indices().n_elements()),
-                                         part.get_mpi_communicator()) != 0;
+                Utilities::MPI::logical_and(compressed_set.n_elements() ==
+                                              part.ghost_indices().n_elements(),
+                                            part.get_mpi_communicator());
               if (all_ghosts_equal || has_noncontiguous_cell)
                 vector_partitioner_values = vector_partitioner;
               else
@@ -1166,10 +1163,9 @@ namespace internal
                                          ghost_indices.end());
               compressed_set.subtract_set(part.locally_owned_range());
               const bool all_ghosts_equal =
-                Utilities::MPI::min<int>(static_cast<int>(
-                                           compressed_set.n_elements() ==
-                                           part.ghost_indices().n_elements()),
-                                         part.get_mpi_communicator()) != 0;
+                Utilities::MPI::logical_and(compressed_set.n_elements() ==
+                                              part.ghost_indices().n_elements(),
+                                            part.get_mpi_communicator());
               if (all_ghosts_equal)
                 vector_partitioner_gradients = vector_partitioner;
               else

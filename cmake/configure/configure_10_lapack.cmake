@@ -70,8 +70,8 @@ macro(feature_lapack_find_external var)
     if(NOT LAPACK_SYMBOL_CHECK)
       message(STATUS
         "Could not find a sufficient BLAS/LAPACK installation: "
-        "BLAS/LAPACK symbol check failed! Consult CMakeFiles/CMakeError.log "
-        "for further information."
+        "BLAS/LAPACK symbol check failed! Consult CMakeFiles/CMakeError.log or "
+        "CMakeFiles/CMakeConfigureLog.yaml for further information."
         )
       set(LAPACK_ADDITIONAL_ERROR_STRING
         ${LAPACK_ADDITIONAL_ERROR_STRING}
@@ -79,7 +79,8 @@ macro(feature_lapack_find_external var)
         "BLAS/LAPACK symbol check failed! This usually means that your "
         "BLAS/LAPACK installation is incomplete or the link line is "
         "broken. Consult\n"
-        "  CMakeFiles/CMakeError.log\n"
+        "  CMakeFiles/CMakeError.log or\n"
+        "  CMakeFiles/CMakeConfigureLog.yaml\n"
         "for further information.\n"
         )
       set(${var} FALSE)

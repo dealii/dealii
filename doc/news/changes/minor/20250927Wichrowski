@@ -1,0 +1,5 @@
+New: A safety factor that multiplies the maximum eigenvalue estimate for
+PreconditionChebyshev and PreconditionRelaxation
+can now be provided via AdditionalData.
+<br>
+(Michał Wichrowski, 2025/09/27)

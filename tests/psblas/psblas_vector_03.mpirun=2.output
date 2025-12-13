@@ -1,0 +1,31 @@
+
+DEAL:0::Extracted values for owned indices: 
+DEAL:0::0.00000
+DEAL:0::1.00000
+DEAL:0::2.00000
+DEAL:0::3.00000
+DEAL:0::4.00000
+DEAL:0::Extracted values for owned + ghosted indices: 
+DEAL:0::0.00000
+DEAL:0::1.00000
+DEAL:0::2.00000
+DEAL:0::3.00000
+DEAL:0::4.00000
+DEAL:0::15.0000
+DEAL:0::16.0000
+
+DEAL:1::Extracted values for owned indices: 
+DEAL:1::15.0000
+DEAL:1::16.0000
+DEAL:1::17.0000
+DEAL:1::18.0000
+DEAL:1::19.0000
+DEAL:1::Extracted values for owned + ghosted indices: 
+DEAL:1::15.0000
+DEAL:1::16.0000
+DEAL:1::17.0000
+DEAL:1::18.0000
+DEAL:1::19.0000
+DEAL:1::13.0000
+DEAL:1::14.0000
+

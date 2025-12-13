@@ -1098,7 +1098,6 @@ public:
   void
   write_msh(const Triangulation<dim, spacedim> &tria, std::ostream &out) const;
 
-#ifdef DEAL_II_GMSH_WITH_API
   /**
    * Write the triangulation in any format supported by gmsh API.
    *
@@ -1138,12 +1137,13 @@ public:
    * The special boundary id `-1` is used to indicate internal boundaries. The
    * internal boundaries must be specified whenever it is necessary to specify
    * a non-flat manifold id.
+   *
+   * @note This function requires the GMSH API.
    */
   template <int dim, int spacedim>
   void
   write_msh(const Triangulation<dim, spacedim> &tria,
             const std::string                  &filename) const;
-#endif
 
   /**
    * Write the triangulation in the ucd format.

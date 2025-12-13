@@ -25,6 +25,10 @@
 
 #include <set>
 
+#ifdef DEAL_II_WITH_PSBLAS
+#  include <psb_c_dbase.h>
+#endif
+
 DEAL_II_NAMESPACE_OPEN
 
 /**
@@ -60,7 +64,11 @@ enum class InitializeLibrary
   /**
    * Initialize/finalize P4EST and SC.
    */
-  P4EST = 32
+  P4EST = 32,
+  /**
+   * Initialize/finalize P4EST and SC.
+   */
+  PSBLAS = 64
 };
 
 
@@ -175,6 +183,14 @@ public:
   static void
   unregister_request(MPI_Request &request);
 
+#ifdef DEAL_II_WITH_PSBLAS
+  /**
+   * Returns a pointer to the PSBLAS context.
+   */
+  static psb_c_ctxt *
+  get_psblas_context();
+#endif
+
   /**
    * A structure that has boost::signal objects to register a call back
    * to run after MPI init or finalize.
@@ -213,6 +229,10 @@ private:
 
 #ifdef DEAL_II_WITH_PETSC
   bool finalize_petscslepc;
+#endif
+
+#ifdef DEAL_II_WITH_PSBLAS
+  static psb_c_ctxt *cctxt;
 #endif
 };
 

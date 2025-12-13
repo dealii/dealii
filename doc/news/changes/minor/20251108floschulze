@@ -1,0 +1,6 @@
+Changed: Time step information is saved for pvtu output. In addition the default
+value of VtkFlags::cycle is changed to numbers::invalid_unsigned_int and
+VtkFlags::time to std::numeric_limits<double>::lowest() to ensure it is added to
+the output at the first time step (cycle=0).
+<br>
+(Florian Schulze, 2025/11/08)

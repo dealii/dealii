@@ -20,6 +20,7 @@
 
 #include <deal.II/base/geometry_info.h>
 #include <deal.II/base/mpi_stub.h>
+#include <deal.II/base/numbers.h>
 #include <deal.II/base/point.h>
 #include <deal.II/base/table.h>
 
@@ -1145,7 +1146,7 @@ namespace DataOutBase
      * the instructions provided in
      * http://www.visitusers.org/index.php?title=Time_and_Cycle_in_VTK_files
      * unless it is at its default value of
-     * @verbatim std::numeric_limits<unsigned int>::min() @endverbatim.
+     * @verbatim numbers::invalid_unsigned_int @endverbatim.
      */
     unsigned int cycle;
 
@@ -1210,8 +1211,8 @@ namespace DataOutBase
      * to the argument names of this function.
      */
     explicit VtkFlags(
-      const double           time  = std::numeric_limits<double>::min(),
-      const unsigned int     cycle = std::numeric_limits<unsigned int>::min(),
+      const double           time  = std::numeric_limits<double>::lowest(),
+      const unsigned int     cycle = numbers::invalid_unsigned_int,
       const bool             print_date_and_time = true,
       const CompressionLevel compression_level   = CompressionLevel::best_speed,
       const bool             write_higher_order_cells          = false,

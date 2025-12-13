@@ -1,0 +1,4 @@
+Changed: The TimerOutput class no longer supports producing output while actively timing a subsection.
+This feature was removed to simplify internal data storage and to avoid inconsistencies in parallel computations.
+<br>
+(Rene Gassmoeller, 2025/10/02)

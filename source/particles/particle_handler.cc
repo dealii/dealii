@@ -1105,7 +1105,7 @@ namespace Particles
   void
   ParticleHandler<dim, spacedim>::get_particle_positions(
     std::vector<Point<spacedim>> &positions,
-    const bool                    add_to_output_vector)
+    const bool                    add_to_output_vector) const
   {
     // There should be one point per particle to gather
     AssertDimension(positions.size(), n_locally_owned_particles());

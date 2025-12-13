@@ -142,9 +142,11 @@ namespace Functions
      *  @endcode
      *
      * These constants can be used in the declaration of the function
-     * expression, which follows the convention of the FunctionParser class.
-     * In order to specify vector functions, semicolons have to be used to
-     * separate the different components, e.g.:
+     * expression, which follows the convention of the FunctionParser class. The
+     * constants `pi`, `PI`, `Pi`, (for the value of π) and `E` (for the Nepero
+     * number) are predefined. If want to override these constants, you can do
+     * so in the Function constants entry. In order to specify vector functions,
+     * semicolons have to be used to separate the different components, e.g.:
      *
      *  @code
      *

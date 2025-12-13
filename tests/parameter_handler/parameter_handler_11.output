@@ -1,9 +1,5 @@
 
-DEAL::ExcInvalidEntryForPattern (current_line_n, input_filename, entry_value, entry_name, patterns[pattern_index]->description())
-Line <1> of file <input file>:
-    The entry value 
-        3.1415 something
-    for the entry named
-        test_1
-    does not match the given pattern:
-        [Double -MAX_DOUBLE...MAX_DOUBLE (inclusive)]
+DEAL::ExcInvalidEntryForPattern( current_line_n, input_filename, entry_value, entry_name, patterns[pattern_index]->description())
+    In line <1> of file <input file>: The value <3.1415 something> for the parameter entry named <test_1> does not match the pattern expected for this parameter.
+The expected pattern for this parameter is:
+[Double -MAX_DOUBLE...MAX_DOUBLE (inclusive)]

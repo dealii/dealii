@@ -111,7 +111,7 @@ pipeline
                   time ninja test # quicktests
                   time ctest --rerun-failed --output-on-failure -R quick_tests/
                   time ninja setup_tests
-                  time ctest -R "all-headers|mpirun" --schedule-random --output-on-failure --schedule-random -j $NP --no-compress-output -T test
+                  time ctest -R "all-headers|mpirun" --output-on-failure --schedule-random -j $NP --no-compress-output -T test
                  '''
               githubNotify context: 'Jenkins: MPI', description: 'OK',  status: 'SUCCESS'
             }

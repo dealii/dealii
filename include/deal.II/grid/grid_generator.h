@@ -324,8 +324,8 @@ namespace GridGenerator
   void
   subdivided_hyper_rectangle(Triangulation<dim>                     &tria,
                              const std::vector<std::vector<double>> &step_sizes,
-                             const Point<dim>                       &p_1,
-                             const Point<dim>                       &p_2,
+                             const Point<dim>                       &p1,
+                             const Point<dim>                       &p2,
                              const bool colorize = false);
 
   /**
@@ -927,13 +927,13 @@ namespace GridGenerator
    *   <tr>
    *     <td>
    *       \htmlonly <style>div.image
-   *         img[src="hyper_ball_balanced_2d.png"]{width:40%}</style>
+   *         img[src="hyper_ball_balanced_2d.png"]{width:60%}</style>
    *       \endhtmlonly
    *       @image html hyper_ball_balanced_2d.png
    *     </td>
    *     <td>
    *       \htmlonly <style>div.image
-   *         img[src="hyper_ball_balanced_3d.png"]{width:40%}</style>
+   *         img[src="hyper_ball_balanced_3d.png"]{width:60%}</style>
    *       \endhtmlonly
    *       @image html hyper_ball_balanced_3d.png
    *     </td>
@@ -1540,8 +1540,22 @@ namespace GridGenerator
    *
    * The 3d grids with 12 and 96 cells are plotted below:
    *
-   * @image html hypershell3d-12.png
-   * @image html hypershell3d-96.png
+   * <table align="center" class="doxtable">
+   *   <tr>
+   *     <td>
+   *       \htmlonly <style>div.image
+   *         img[src="hypershell3d-12.png"]{width:90%}</style>
+   *       \endhtmlonly
+   *       @image html hypershell3d-12.png
+   *     </td>
+   *     <td>
+   *       \htmlonly <style>div.image
+   *         img[src="hypershell3d-96.png"]{width:90%}</style>
+   *       \endhtmlonly
+   *       @image html hypershell3d-96.png
+   *     </td>
+   *   </tr>
+   * </table>
    *
    * @note This function is declared to exist for triangulations of all space
    * dimensions, but throws an error if called in 1d.
@@ -1585,8 +1599,22 @@ namespace GridGenerator
    * The grids with a 30% offset of the inner shell in the x direction, 12
    * initial cells and 3 levels of global refinement are plotted below:
    *
-   * @image html eccentric_hyper_shell_2D.png
-   * @image html eccentric_hyper_shell_3D.png
+   * <table align="center" class="doxtable">
+   *   <tr>
+   *     <td>
+   *       \htmlonly <style>div.image
+   *         img[src="eccentric_hyper_shell_2D.png"]{width:90%}</style>
+   *       \endhtmlonly
+   *       @image html eccentric_hyper_shell_2D.png
+   *     </td>
+   *     <td>
+   *       \htmlonly <style>div.image
+   *         img[src="eccentric_hyper_shell_3D.png"]{width:90%}</style>
+   *       \endhtmlonly
+   *       @image html eccentric_hyper_shell_3D.png
+   *     </td>
+   *   </tr>
+   * </table>
    *
    * @note Because it uses the definition of the hyper shell, this function is
    * declared to exist for triangulations of all space dimensions, but throws an
@@ -1996,9 +2024,22 @@ namespace GridGenerator
    * The above snippet of code generates the following grid for `dim` equal to
    * two and three respectively
    *
-   * @image html grid_generator_implicit_function_2d.png
-   *
-   * @image html grid_generator_implicit_function_3d.png
+   * <table align="center" class="doxtable">
+   *   <tr>
+   *     <td>
+   *       \htmlonly <style>div.image
+   *         img[src="grid_generator_implicit_function_2d.png"]{width:90%}</style>
+   *       \endhtmlonly
+   *       @image html grid_generator_implicit_function_2d.png
+   *     </td>
+   *     <td>
+   *       \htmlonly <style>div.image
+   *         img[src="grid_generator_implicit_function_3d.png"]{width:90%}</style>
+   *       \endhtmlonly
+   *       @image html grid_generator_implicit_function_3d.png
+   *     </td>
+   *   </tr>
+   * </table>
    *
    * Also see
    * @ref simplex "Simplex support".
@@ -2532,6 +2573,76 @@ namespace GridGenerator
                                                                         24u));
 
   /**
+   * This function converts a mesh consisting exclusively of simplex cells
+   * (i.e., triangles or tetrahedra) into one consisting exclusively of
+   * hypercube cells (i.e., quadrilaterals or hexahedra).
+   *
+   * For `dim==2`, this function performs the conversion by splitting each
+   * triangle into three quadrilaterals by creating vertices at edge mid-points
+   * along with the barycenters of cells.
+   * Also see
+   * @ref simplex "Simplex support".
+   *
+   * @note This function is currently not implemented for `dim==3`.
+   *
+   * Material ID and boundary IDs are inherited upon conversion.
+   *
+   * As an example, the following image shows how a single triangle is
+   * subdivided into three quadrilaterals:
+   *
+   * @image html "convert_simplex_to_hypercube_mesh_visualization_1.png"
+   *
+   * Perhaps more interestingly, the following two pictures show a zoom-in of a
+   * mesh for a high-lift wing configuration that was originally meshed with
+   * triangles, and then subdivided by this function into quadrilaterals:
+   *
+   * <table align="center" class="doxtable">
+   *   <tr>
+   *     <td>
+   *       \htmlonly <style>div.image
+   *         img[src="convert_simplex_to_hypercube_mesh_visualization_2.png"]{width:90%}</style>
+   *       \endhtmlonly
+   *       @image html convert_simplex_to_hypercube_mesh_visualization_2.png
+   *     </td>
+   *     <td>
+   *       \htmlonly <style>div.image
+   *         img[src="convert_simplex_to_hypercube_mesh_visualization_3.png"]{width:90%}</style>
+   *       \endhtmlonly
+   *       @image html convert_simplex_to_hypercube_mesh_visualization_3.png
+   *     </td>
+   *   </tr>
+   * </table>
+   *
+   * @param[in] in_tria The triangulation containing quadrilateral or
+   *   hexahedral elements.
+   *
+   * @param[out] out_tria The converted triangulation containing triangular or
+   *   tetrahedral elements.
+   *
+   * @note No manifold objects are copied by this function: you must
+   *   copy existing manifold objects from @p in_tria to @p out_tria, e.g.,
+   *   with the following code:
+   * @code
+   * for (const auto i : in_tria.get_manifold_ids())
+   *   if (i != numbers::flat_manifold_id)
+   *     out_tria.set_manifold(i, in_tria.get_manifold(i));
+   * @endcode
+   *
+   * Also see
+   * @ref simplex "Simplex support".
+   *
+   * @note This function is available through the python interface as
+   * `in_tria.convert_hypercube_to_simplex_mesh(out_tria)`.
+   *
+   * @note in 1d this function copies @p in_tria into @p out_tria since 1d
+   * elements (lines) are both hypercubes and simplices.
+   */
+  template <int dim, int spacedim>
+  void
+  convert_simplex_to_hypercube_mesh(const Triangulation<dim, spacedim> &in_tria,
+                                    Triangulation<dim, spacedim> &out_tria);
+
+  /**
    * Perform an Alfeld split (also called barycentric refinement) of a simplex
    * mesh.
    *
@@ -2776,9 +2887,9 @@ namespace GridGenerator
    * each cell divided into simplices.
    *
    * The hypercube volume is the tensor product interval
-   * $[left,right]^{\text{dim}}$ in the present number of dimensions, where
-   * the limits are given as arguments. They default to zero and unity, then
-   * producing the unit hypercube.
+   * $[\text{left},\text{right}]^{\text{dim}}$ in the present number of
+   * dimensions, where the limits are given as arguments. They default to zero
+   * and one, then producing the unit hypercube.
    *
    * @note This function takes the mesh produced by subdivided_hyper_cube()
    * and further subdivides each cell into 2 triangles (for @p dim 2) or
@@ -2791,8 +2902,8 @@ namespace GridGenerator
   void
   subdivided_hyper_cube_with_simplices(Triangulation<dim, spacedim> &tria,
                                        const unsigned int repetitions,
-                                       const double       p1       = 0.0,
-                                       const double       p2       = 1.0,
+                                       const double       left     = 0.0,
+                                       const double       right    = 1.0,
                                        const bool         colorize = false);
 
   /** @} */

@@ -21,7 +21,7 @@
 #include <deal.II/base/parameter_handler.h>
 #include <deal.II/base/parsed_function.h>
 
-#include "deal.II/matrix_free/matrix_free.h"
+#include <deal.II/matrix_free/matrix_free.h>
 
 #include "../tests.h"
 

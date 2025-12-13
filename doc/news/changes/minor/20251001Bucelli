@@ -1,0 +1,3 @@
+Fixed: `MGTransferMatrixFree::initialize_dof_vector()` optionally forces the target vector to have the same partitioner as stored in the transfer operator. This fixes a bug where the two partitioners were assumed to be the same in `MGTwoLevelTransfer::restrict_and_add()`, triggering an assertion in debug mode for block-based systems.
+<br>
+(Michele Bucelli, 2025/10/01)

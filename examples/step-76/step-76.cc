@@ -150,8 +150,6 @@ namespace Euler_DG
                            VectorType     &vec_ri,
                            VectorType     &vec_ki) const
     {
-      AssertDimension(ai.size() + 1, bi.size());
-
       vec_ki.swap(solution);
 
       double sum_previous_bi = 0;

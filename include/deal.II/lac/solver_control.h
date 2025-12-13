@@ -256,13 +256,19 @@ public:
   set_tolerance(const double);
 
   /**
-   * Enables writing residuals of each step into a vector for later analysis.
+   * Enables writing residuals of each step into a vector for later analysis
+   * via the get_history_data() function.
    */
   void
   enable_history_data();
 
   /**
-   * Provide read access to the collected residual data.
+   * Provide read access to the collected residual data. The vector stores the
+   * residual passed to the check() function every time that function is called.
+   * In practice, for most solvers, that means that it contains one entry
+   * for each solver iteration, though solvers may also check the residual
+   * once before they start iterations, and/or after restarts for solvers
+   * that support restarts (e.g., the SolverGMRES class).
    */
   const std::vector<double> &
   get_history_data() const;

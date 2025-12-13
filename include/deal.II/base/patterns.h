@@ -2392,7 +2392,7 @@ namespace Patterns
 #ifdef DEAL_II_WITH_MAGIC_ENUM
     // Enums
     template <class T>
-    struct Convert<T, typename std::enable_if<std::is_enum<T>::value>::type>
+    struct Convert<T, typename std::enable_if_t<std::is_enum_v<T>>>
     {
       static std::unique_ptr<Patterns::PatternBase>
       to_pattern()

@@ -34,6 +34,19 @@ if(NOT ${deal.II_FOUND})
     )
 endif()
 
+#
+# Are all dependencies fulfilled?
+#
+if(NOT DEAL_II_WITH_P4EST)
+  message(FATAL_ERROR "
+Error! This tutorial requires a deal.II library that was configured with the following options:
+    DEAL_II_WITH_P4EST = ON
+However, the deal.II library found at ${DEAL_II_PATH} was configured with these options:
+    DEAL_II_WITH_P4EST = ${DEAL_II_WITH_P4EST}
+This conflicts with the requirements of this tutorial."
+    )
+endif()
+
 deal_ii_initialize_cached_variables()
 project(${TARGET})
 deal_ii_invoke_autopilot()

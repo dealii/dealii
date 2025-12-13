@@ -969,14 +969,14 @@ TensorProductMatrixSymmetricSum<dim, Number, n_rows_1d>::vmult(
 
   const unsigned int n_rows_1d_non_templated = this->mass_matrix[0].n_rows();
 
-  if (n_rows_1d != -1)
-    internal::TensorProductMatrixSymmetricSum::vmult<
-      n_rows_1d == -1 ? 0 : n_rows_1d>(dst,
-                                       src,
-                                       tmp_array,
-                                       n_rows_1d_non_templated,
-                                       mass_matrix,
-                                       derivative_matrix);
+  if constexpr (n_rows_1d != -1)
+    internal::TensorProductMatrixSymmetricSum::vmult<n_rows_1d>(
+      dst,
+      src,
+      tmp_array,
+      n_rows_1d_non_templated,
+      mass_matrix,
+      derivative_matrix);
   else
     internal::TensorProductMatrixSymmetricSum::select_vmult<1>(
       dst,
@@ -1011,9 +1011,8 @@ TensorProductMatrixSymmetricSum<dim, Number, n_rows_1d>::apply_inverse(
 
   const unsigned int n_rows_1d_non_templated = this->mass_matrix[0].n_rows();
 
-  if (n_rows_1d != -1)
-    internal::TensorProductMatrixSymmetricSum::apply_inverse<
-      n_rows_1d == -1 ? 0 : n_rows_1d>(
+  if constexpr (n_rows_1d != -1)
+    internal::TensorProductMatrixSymmetricSum::apply_inverse<n_rows_1d>(
       dst, src, n_rows_1d_non_templated, eigenvectors, eigenvalues);
   else
     internal::TensorProductMatrixSymmetricSum::select_apply_inverse<1>(
@@ -1507,9 +1506,8 @@ TensorProductMatrixSymmetricSumCollection<dim, Number, n_rows_1d>::
             vector_ptr[translated_index + 1] - vector_ptr[translated_index];
         }
 
-      if (n_rows_1d != -1)
-        internal::TensorProductMatrixSymmetricSum::apply_inverse<
-          n_rows_1d == -1 ? 0 : n_rows_1d>(
+      if constexpr (n_rows_1d != -1)
+        internal::TensorProductMatrixSymmetricSum::apply_inverse<n_rows_1d>(
           dst, src, n_rows_1d_non_templated, eigenvectors, eigenvalues);
       else
         internal::TensorProductMatrixSymmetricSum::select_apply_inverse<1>(
@@ -1546,14 +1544,14 @@ TensorProductMatrixSymmetricSumCollection<dim, Number, n_rows_1d>::
             vector_n_rows_1d[translated_index];
       }
 
-      if (n_rows_1d != -1)
-        internal::TensorProductMatrixSymmetricSum::apply_inverse<
-          n_rows_1d == -1 ? 0 : n_rows_1d>(dst,
-                                           src,
-                                           n_rows_1d_non_templated,
-                                           eigenvectors,
-                                           {},
-                                           inverted_eigenvalues);
+      if constexpr (n_rows_1d != -1)
+        internal::TensorProductMatrixSymmetricSum::apply_inverse<n_rows_1d>(
+          dst,
+          src,
+          n_rows_1d_non_templated,
+          eigenvectors,
+          {},
+          inverted_eigenvalues);
       else
         internal::TensorProductMatrixSymmetricSum::select_apply_inverse<1>(
           dst,

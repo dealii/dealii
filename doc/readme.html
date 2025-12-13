@@ -57,8 +57,7 @@
         written in
         <a href="https://en.cppreference.com/w/">C++</a>, with configuration and build support provided by
         <a href="https://cmake.org/">CMake</a>.
-        Until deal.II version 9.5, deal.II used the C++14
-        standard; subsequent versions require C++17 (see
+        deal.II requires C++17 (see
         <a href="https://open-std.org/JTC1/SC22/WG21/docs/standards">here</a>
         for PDFs of the various C++ standards).
     </p>
@@ -572,7 +571,7 @@
                 shapes, convex hull algorithms, shape reconstruction, AABB and
                 KD trees.
 
-                The CGAL Wrappers use c++17 features. In order to use CGAL, add
+                In order to use CGAL, add
                 <code>-DCGAL_DIR=/path/to/cgal</code> to the deal.II CMake call,
                 and make sure that <code>DEAL_II_HAVE_CXX17</code> is enabled.
             </p>

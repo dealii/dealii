@@ -792,17 +792,17 @@ namespace Step89
                 remote_face_ids, matrix_free.get_boundary_id(face)))
             {
               // If @c face is non-matching we have to query values via the
-              // FERemoteEvaluaton objects. This is done by passing the
-              // corresponding FERemoteEvaluaton objects to the function that
+              // FERemoteEvaluation objects. This is done by passing the
+              // corresponding FERemoteEvaluation objects to the function that
               // evaluates the kernel. As mentioned above, each side of the
               // non-matching interface is traversed separately and we do not
               // have to consider the neighbor in the kernel. Note, that the
-              // values in the FERemoteEvaluaton objects are already updated at
+              // values in the FERemoteEvaluation objects are already updated at
               // this point.
 
               // For point-to-point interpolation we simply use the
-              // corresponding FERemoteEvaluaton objects in combination with the
-              // standard FEFaceEvaluation objects.
+              // corresponding FERemoteEvaluation objects in combination with
+              // the standard FEFaceEvaluation objects.
               velocity_r.reinit(face);
               pressure_r.reinit(face);
 

@@ -1758,21 +1758,19 @@ public:
    * provided pattern. The arguments are, in order, the line number, file
    * name, entry value, entry name, and a description of the pattern.
    */
-  DeclException5(ExcInvalidEntryForPattern,
-                 int,
-                 std::string,
-                 std::string,
-                 std::string,
-                 std::string,
-                 << "Line <" << arg1 << ">"
-                 << (arg2.empty() ? "" : (" of file <" + arg2 + ">"))
-                 << ":\n"
-                    "    The entry value \n"
-                 << "        " << arg3 << '\n'
-                 << "    for the entry named\n"
-                 << "        " << arg4 << '\n'
-                 << "    does not match the given pattern:\n"
-                 << "        " << arg5);
+  DeclException5(
+    ExcInvalidEntryForPattern,
+    int,
+    std::string,
+    std::string,
+    std::string,
+    std::string,
+    << "In line <" << arg1 << ">"
+    << (arg2.empty() ? "" : (" of file <" + arg2 + ">")) << ": The value <"
+    << arg3 << "> for the parameter entry named <" << arg4
+    << "> does not match the pattern expected for this parameter.\n"
+       "The expected pattern for this parameter is:\n"
+    << arg5);
 
   /**
    * Exception for when an XML file cannot be read at all. This happens when

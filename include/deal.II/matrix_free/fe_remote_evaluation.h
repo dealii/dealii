@@ -469,8 +469,8 @@ namespace Utilities
    * accompanied by a lambda function that marks the vertices of cells to be
    * considered during the search of remote points (quadrature points of faces
    * with given boundary face ID).
-   * @param[in] quad_no Quadrature number in @p matrix_free.
-   * @param[in] dof_no DoFHandler number in @p matrix_free.
+   * @param[in] quadrature_index Quadrature number in @p matrix_free.
+   * @param[in] dof_handler_index DoFHandler number in @p matrix_free.
    * @param[in] tolerance Tolerance to find remote points.
    */
   template <int dim,
@@ -482,9 +482,9 @@ namespace Utilities
     const std::vector<
       std::pair<types::boundary_id, std::function<std::vector<bool>()>>>
                       &non_matching_faces_marked_vertices,
-    const unsigned int quad_no   = 0,
-    const unsigned int dof_no    = 0,
-    const double       tolerance = 1e-9);
+    const unsigned int quadrature_index  = 0,
+    const unsigned int dof_handler_index = 0,
+    const double       tolerance         = 1e-9);
 
 
 
@@ -499,7 +499,7 @@ namespace Utilities
    * accompanied by a lambda function that marks the vertices of cells to be
    * considered during the process of computing intersections.
    * @param[in] n_q_pnts_1D The number of 1D quadrature points per intersection.
-   * @param[in] dof_no DoFHandler number in @p matrix_free.
+   * @param[in] dof_handler_index DoFHandler number in @p matrix_free.
    * distributed to each intersection (given for one coordinate direction).
    * @param[in] nm_mapping_info In case nm_mapping_info is not a `nullptr` it is
    * set up for cell based loops, such that it can be used in combination with
@@ -516,7 +516,7 @@ namespace Utilities
       std::pair<types::boundary_id, std::function<std::vector<bool>()>>>
                       &non_matching_faces_marked_vertices,
     const unsigned int n_q_pnts_1D,
-    const unsigned int dof_no                                   = 0,
+    const unsigned int dof_handler_index                        = 0,
     NonMatching::MappingInfo<dim, dim, Number> *nm_mapping_info = nullptr,
     const double                                tolerance       = 1e-9);
 } // namespace Utilities
@@ -1085,11 +1085,11 @@ namespace Utilities
     const std::vector<
       std::pair<types::boundary_id, std::function<std::vector<bool>()>>>
                       &non_matching_faces_marked_vertices,
-    const unsigned int quad_no,
-    const unsigned int dof_no,
+    const unsigned int quadrature_index,
+    const unsigned int dof_handler_index,
     const double       tolerance)
   {
-    const auto &dof_handler = matrix_free.get_dof_handler(dof_no);
+    const auto &dof_handler = matrix_free.get_dof_handler(dof_handler_index);
     const auto &tria        = dof_handler.get_triangulation();
     const auto &mapping     = *matrix_free.get_mapping_info().mapping;
 
@@ -1144,8 +1144,8 @@ namespace Utilities
         // at the faces on the non-matching interface.
         FEFaceEvaluation<dim, -1, 0, 1, Number> phi(matrix_free,
                                                     true,
-                                                    dof_no,
-                                                    quad_no);
+                                                    dof_handler_index,
+                                                    quadrature_index);
 
         // Iterate over the boundary faces.
         for (unsigned int bface = 0;
@@ -1230,11 +1230,11 @@ namespace Utilities
       std::pair<types::boundary_id, std::function<std::vector<bool>()>>>
                       &non_matching_faces_marked_vertices,
     const unsigned int n_q_pnts_1D,
-    const unsigned int dof_no,
+    const unsigned int dof_handler_index,
     NonMatching::MappingInfo<dim, dim, Number> *nm_mapping_info,
     const double                                tolerance)
   {
-    const auto &dof_handler = matrix_free.get_dof_handler(dof_no);
+    const auto &dof_handler = matrix_free.get_dof_handler(dof_handler_index);
     const auto &tria        = dof_handler.get_triangulation();
     const auto &mapping     = *matrix_free.get_mapping_info().mapping;
 

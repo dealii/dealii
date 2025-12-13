@@ -13,7 +13,7 @@
 // ------------------------------------------------------------------------
 
 
-#include "deal.II/lac/trilinos_tpetra_precondition.templates.h"
+#include <deal.II/lac/trilinos_tpetra_precondition.templates.h>
 
 #ifdef DEAL_II_TRILINOS_WITH_TPETRA
 #  ifdef DEAL_II_TRILINOS_WITH_IFPACK2

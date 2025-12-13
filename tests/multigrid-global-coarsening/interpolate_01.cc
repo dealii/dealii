@@ -14,7 +14,7 @@
 
 
 /**
- * Test MGTransferGlobalCoarsening::interpolate_to_mg() for FE_Q and FE_DGQ.
+ * Test MGTransferMatrixFree::interpolate_to_mg() for FE_Q and FE_DGQ.
  */
 
 #include <deal.II/base/conditional_ostream.h>
@@ -145,7 +145,7 @@ test(const unsigned int n_refinements,
   for (unsigned int l = min_level; l < max_level; ++l)
     transfers[l + 1].reinit(dof_handlers[l + 1], dof_handlers[l]);
 
-  MGTransferGlobalCoarsening<dim, VectorType> transfer(
+  MGTransferMatrixFree<dim, Number> transfer(
     transfers, [&](const auto l, auto &vec) {
       vec.reinit(create_partitioner(dof_handlers[l]));
     });

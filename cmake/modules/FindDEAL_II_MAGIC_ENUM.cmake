@@ -1,7 +1,7 @@
 ## ------------------------------------------------------------------------
 ##
 ## SPDX-License-Identifier: LGPL-2.1-or-later
-## Copyright (C) 2012 - 2024 by the deal.II authors
+## Copyright (C) 2024 - 2025 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -13,7 +13,7 @@
 ## ------------------------------------------------------------------------
 
 #
-# Try to find the MAGIC ENUM library
+# Try to find the MAGIC_ENUM library
 #
 # This module exports
 #
@@ -30,7 +30,6 @@ deal_ii_find_path(MAGIC_ENUM_INCLUDE_DIR magic_enum.hpp
   )
 
 process_feature(MAGIC_ENUM
-  LIBRARIES
   INCLUDE_DIRS
     REQUIRED MAGIC_ENUM_INCLUDE_DIR
   CLEAR MAGIC_ENUM_INCLUDE_DIR

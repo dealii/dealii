@@ -1032,7 +1032,7 @@ namespace LinearAlgebra
     void
     SparsityPattern<MemorySpace>::print_gnuplot(std::ostream &out) const
     {
-      Assert(graph->isFillComplete() == true, ExcInternalError());
+      Assert(graph->isFillComplete(), ExcInternalError());
 
       for (unsigned int row = 0; row < local_size(); ++row)
         {

@@ -42,9 +42,7 @@ public:
     dealii::Utilities::pow(n_q_points_1d, dim);
 
 private:
-  const typename Portable::MatrixFree<dim, Number>::Data *gpu_data;
-  Number                                                 *coef;
-  int                                                     cell;
+  Number *coef;
 };
 
 
@@ -56,7 +54,7 @@ HelmholtzOperatorQuad<dim, fe_degree, Number, n_q_points_1d>::operator()(
   int q_point) const
 {
   unsigned int pos = fe_eval->get_matrix_free_data()->local_q_point_id(
-    fe_eval->get_current_cell_index(), n_q_points, q_point);
+    fe_eval->get_current_cell_index(), q_point);
   fe_eval->submit_value(coef[pos] * fe_eval->get_value(q_point), q_point);
   fe_eval->submit_gradient(fe_eval->get_gradient(q_point), q_point);
 }
@@ -67,8 +65,6 @@ template <int dim, int fe_degree, typename Number, int n_q_points_1d>
 class HelmholtzOperator
 {
 public:
-  static const unsigned int n_local_dofs =
-    dealii::Utilities::pow(fe_degree + 1, dim);
   static const unsigned int n_q_points =
     dealii::Utilities::pow(n_q_points_1d, dim);
 
@@ -93,12 +89,15 @@ HelmholtzOperator<dim, fe_degree, Number, n_q_points_1d>::operator()(
   const Portable::DeviceVector<Number>                   &src,
   Portable::DeviceVector<Number>                         &dst) const
 {
-  Portable::FEEvaluation<dim, fe_degree, n_q_points_1d, 1, Number> fe_eval(
-    data);
+  Portable::FEEvaluation<dim, fe_degree, n_q_points_1d, 1, Number> fe_eval(data,
+                                                                           0);
   fe_eval.read_dof_values(src);
   fe_eval.evaluate(EvaluationFlags::values | EvaluationFlags::gradients);
-  fe_eval.apply_for_each_quad_point(
-    HelmholtzOperatorQuad<dim, fe_degree, Number, n_q_points_1d>(coef));
+
+  HelmholtzOperatorQuad<dim, fe_degree, Number, n_q_points_1d> quad(coef);
+  data->for_each_quad_point(
+    [&](const int &q_point) { quad(&fe_eval, q_point); });
+
   fe_eval.integrate(EvaluationFlags::values | EvaluationFlags::gradients);
   fe_eval.distribute_local_to_global(dst);
 }
@@ -119,8 +118,6 @@ public:
              const unsigned int                                      q) const;
 
   static const unsigned int n_dofs_1d = fe_degree + 1;
-  static const unsigned int n_local_dofs =
-    dealii::Utilities::pow(fe_degree + 1, dim);
   static const unsigned int n_q_points =
     dealii::Utilities::pow(n_q_points_1d, dim);
 
@@ -137,10 +134,8 @@ VaryingCoefficientFunctor<dim, fe_degree, Number, n_q_points_1d>::operator()(
   const unsigned int                                      cell,
   const unsigned int                                      q) const
 {
-  const unsigned int pos     = gpu_data->local_q_point_id(cell, n_q_points, q);
+  const unsigned int pos     = gpu_data->local_q_point_id(cell, q);
   const auto         q_point = gpu_data->get_quadrature_point(cell, q);
-
-
 
   Number p_square = 0.;
   for (unsigned int i = 0; i < dim; ++i)

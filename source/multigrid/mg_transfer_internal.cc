@@ -417,14 +417,11 @@ namespace internal
 
       // check if the given partitioner's ghosts represent a superset of the
       // ghosts we require in this function
-      const int ghosts_locally_contained =
-        (external_partitioner.get() != nullptr &&
-         (external_partitioner->ghost_indices() & ghosted_dofs) ==
-           ghosted_dofs) ?
-          1 :
-          0;
+      const bool ghosts_locally_contained =
+        external_partitioner.get() != nullptr &&
+        (external_partitioner->ghost_indices() & ghosted_dofs) == ghosted_dofs;
       if (external_partitioner.get() != nullptr &&
-          Utilities::MPI::min(ghosts_locally_contained, communicator) == 1)
+          Utilities::MPI::logical_and(ghosts_locally_contained, communicator))
         {
           // shift the local number of the copy indices according to the new
           // partitioner that we are going to use during the access to the

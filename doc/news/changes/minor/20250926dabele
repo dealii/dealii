@@ -1,0 +1,3 @@
+Fixed: Resolved an access violation when using a dealii::DataOut object that has been copied or moved.
+<br>
+(Daniel Abele, 2025/09/26)

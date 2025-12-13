@@ -506,8 +506,8 @@ class PreconditionMG : public EnableObserverPointer
 {
 public:
   /**
-   * Constructor. Arguments are the multigrid object, pre-smoother,
-   * post-smoother and coarse grid solver.
+   * Constructor. Arguments are the associated DoFHandler (@p dof_handler),
+   * the multigrid object (@p mg) and the grid transfer object (@p transfer).
    */
   PreconditionMG(const DoFHandler<dim> &dof_handler,
                  Multigrid<VectorType> &mg,

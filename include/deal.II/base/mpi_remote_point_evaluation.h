@@ -326,6 +326,9 @@ namespace Utilities
        *   specify the number of components @p n_components. This allows to
        *   provide unrolled tensors, which is useful, e.g., if its dimension
        *   and its rank is not known at compile time.
+       *
+       * @note The @p evaluation_function will be called sequentially and not
+       * from multiple threads at the same time.
        */
       template <typename DataType, unsigned int n_components = 1>
       void
@@ -360,6 +363,9 @@ namespace Utilities
        *   specify the number of components @p n_components. This allows to
        *   provide unrolled tensors, which is useful, e.g., if its dimension
        *   and its rank is not known at compile time.
+       *
+       * @note The @p evaluation_function will be called sequentially and not
+       * from multiple threads at the same time.
        */
       template <typename DataType, unsigned int n_components = 1>
       void

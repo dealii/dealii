@@ -1,0 +1,5 @@
+Add: Introduce a fully vectorizable function to approximate the exponential
+function. The function offers faster computation than std::exp while maintaining
+high accuracy and supports SIMD/vectorized operations.
+<br>
+(Julian Brotz, 2025/12/02)

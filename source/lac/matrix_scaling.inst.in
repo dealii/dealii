@@ -1,0 +1,45 @@
+// ------------------------------------------------------------------------
+//
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2001 - 2025 by the deal.II authors
+//
+// This file is part of the deal.II library.
+//
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
+//
+// ------------------------------------------------------------------------
+
+
+
+for (S : REAL_SCALARS)
+  {
+    template bool MatrixScaling::find_scaling_and_scale_matrix(
+      SparseMatrix<S> &);
+    template bool MatrixScaling::find_scaling_and_scale_linear_system(
+      SparseMatrix<S> &, Vector<S> &);
+
+    template bool MatrixScaling::find_scaling_and_scale_matrix(
+      SparseMatrixEZ<S> &);
+    template bool MatrixScaling::find_scaling_and_scale_linear_system(
+      SparseMatrixEZ<S> &, Vector<S> &);
+
+    template bool MatrixScaling::find_scaling_and_scale_matrix(
+      BlockSparseMatrix<S> &);
+    template bool MatrixScaling::find_scaling_and_scale_linear_system(
+      BlockSparseMatrix<S> &, BlockVector<S> &);
+
+    template bool MatrixScaling::find_scaling_and_scale_matrix(
+      BlockSparseMatrixEZ<S> &);
+    template bool MatrixScaling::find_scaling_and_scale_linear_system(
+      BlockSparseMatrixEZ<S> &, BlockVector<S> &);
+
+    template bool MatrixScaling::find_scaling_and_scale_matrix(FullMatrix<S> &);
+    template bool MatrixScaling::find_scaling_and_scale_linear_system(
+      FullMatrix<S> &, Vector<S> &);
+
+    template void MatrixScaling::scale_system_solution(Vector<S> &) const;
+    template void MatrixScaling::scale_system_solution(BlockVector<S> &) const;
+  }

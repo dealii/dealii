@@ -44,11 +44,16 @@ namespace internal
    */
   inline std::tuple<bool, bool, bool>
   split_face_orientation(
-    const types::geometric_orientation combined_face_orientation)
+    const types::geometric_orientation combined_orientation)
   {
-    return {!Utilities::get_bit(combined_face_orientation, 0),
-            Utilities::get_bit(combined_face_orientation, 1),
-            Utilities::get_bit(combined_face_orientation, 2)};
+    Assert(combined_orientation != numbers::invalid_geometric_orientation,
+           ExcMessage(
+             "The provided orientation value is not valid. This typically "
+             "means this value was initialized to an invalid value and not "
+             "correctly set later."));
+    return {!Utilities::get_bit(combined_orientation, 0),
+            Utilities::get_bit(combined_orientation, 1),
+            Utilities::get_bit(combined_orientation, 2)};
   }
 
 

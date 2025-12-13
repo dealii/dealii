@@ -103,14 +103,16 @@ test(const unsigned int n_refinements, const unsigned int fe_degree)
 
 
 
-  MGTransferGlobalCoarsening<dim, VectorType> transfer(
-    transfers, [&](const auto l, auto &vec) { vec.reinit(partitioners[l]); });
+  MGTransferMatrixFree<dim, Number> transfer(transfers,
+                                             [&](const auto l, auto &vec) {
+                                               vec.reinit(partitioners[l]);
+                                             });
 
-  MGTransferGlobalCoarsening<dim, VectorType> transfer_system(
+  MGTransferMatrixFree<dim, Number> transfer_system(
     transfers_system,
     [&](const auto l, auto &vec) { vec.reinit(partitioners_system[l]); });
 
-  MGTransferBlockGlobalCoarsening<dim, VectorType> transfer_block(transfer);
+  MGTransferBlockMatrixFree<dim, Number> transfer_block(transfer);
 
   LinearAlgebra::distributed::BlockVector<Number> vec_block(dim);
   for (unsigned int d = 0; d < dim; ++d)

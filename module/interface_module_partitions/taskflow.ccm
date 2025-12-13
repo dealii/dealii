@@ -46,6 +46,8 @@ export
   {
     using ::tf::Executor;
     using ::tf::Future;
+    using ::tf::GuidedPartitioner;
+    using ::tf::IndexRange;
     using ::tf::StaticPartitioner;
     using ::tf::Task;
     using ::tf::Taskflow;

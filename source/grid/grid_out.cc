@@ -1212,7 +1212,8 @@ GridOut::write_ucd(const Triangulation<dim, spacedim> &tria,
       // May, 1992, p. E6
       //
       // note: vertex numbers are 1-base
-      for (const unsigned int vertex : GeometryInfo<dim>::vertex_indices())
+      Assert(cell->reference_cell().is_hyper_cube(), ExcNotImplemented());
+      for (const unsigned int vertex : cell->vertex_indices())
         out << cell->vertex_index(GeometryInfo<dim>::ucd_to_deal[vertex]) + 1
             << ' ';
       out << '\n';
@@ -1441,12 +1442,12 @@ GridOut::write_xfig(const Triangulation<2> &tria,
 
 
 
-#ifdef DEAL_II_GMSH_WITH_API
 template <int dim, int spacedim>
 void
 GridOut::write_msh(const Triangulation<dim, spacedim> &tria,
                    const std::string                  &filename) const
 {
+#ifdef DEAL_II_GMSH_WITH_API
   // mesh Type renumbering
   const std::array<int, 8> dealii_to_gmsh_type = {{15, 1, 2, 3, 4, 7, 6, 5}};
 
@@ -1637,8 +1638,12 @@ GridOut::write_msh(const Triangulation<dim, spacedim> &tria,
   gmsh::write(filename);
   gmsh::clear();
   gmsh::finalize();
-}
+#else
+  (void)tria;
+  (void)filename;
+  AssertThrow(false, ExcNeedsGMSHAPI());
 #endif
+}
 
 
 

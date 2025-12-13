@@ -960,7 +960,7 @@ TableHandler::add_value(const std::string &key, const T value)
 
       while (columns[key].entries.size() + 1 < max_col_length)
         {
-          columns[key].entries.push_back(internal::TableEntry(T()));
+          columns[key].entries.emplace_back(T());
           const internal::TableEntry &entry = columns[key].entries.back();
           entry.cache_string(columns[key].scientific, columns[key].precision);
           columns[key].max_length =
@@ -971,7 +971,7 @@ TableHandler::add_value(const std::string &key, const T value)
     }
 
   // now push the value given to this function
-  columns[key].entries.push_back(internal::TableEntry(value));
+  columns[key].entries.emplace_back(value);
   const internal::TableEntry &entry = columns[key].entries.back();
   entry.cache_string(columns[key].scientific, columns[key].precision);
   columns[key].max_length =

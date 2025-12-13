@@ -950,10 +950,45 @@ namespace FETools
    */
   template <int dim>
   std::pair<std::vector<unsigned int>, std::vector<unsigned int>>
-  cell_to_face_patch(const unsigned int &degree,
-                     const unsigned int &direction,
-                     const bool         &cell_hierarchical_numbering,
-                     const bool         &is_continuous);
+  cell_to_face_patch_numbering(const unsigned int &degree,
+                               const unsigned int &direction,
+                               const bool         &cell_hierarchical_numbering,
+                               const bool         &is_continuous);
+
+
+  /**
+   * @copydoc FETools::cell_to_face_patch_numbering()
+   *
+   * @deprecated Use FETools::cell_to_face_patch_numbering() instead.
+   */
+  template <int dim>
+  DEAL_II_DEPRECATED_EARLY_WITH_COMMENT(
+    "Use FETools::cell_to_face_patch_numbering() instead.")
+  std::pair<
+    std::vector<unsigned int>,
+    std::vector<unsigned int>> cell_to_face_patch(const unsigned int &degree,
+                                                  const unsigned int &direction,
+                                                  const bool &
+                                                    cell_hierarchical_numbering,
+                                                  const bool &is_continuous);
+
+  /**
+   * Given an index of a face DoF, compute the cell DoF index. This function is
+   * intended for use with single-component interpolatory elements like
+   * FE_SimplexP and FE_Q_Base in which DoFs defined on lines or quadrilaterals
+   * are rotated along with the face.
+   *
+   * @note Most applications should call FiniteElement::face_to_cell_index()
+   * instead, which may use this function in its implementation.
+   *
+   * @see FiniteElement::face_to_cell_index()
+   */
+  template <int dim, int spacedim>
+  unsigned int
+  face_to_cell_index(const FiniteElement<dim, spacedim> &fe,
+                     const unsigned int                  face_dof_index,
+                     const unsigned int                  face_no,
+                     const types::geometric_orientation  combined_orientation);
 
   /**
    * A namespace that contains functions that help setting up internal
@@ -1095,7 +1130,7 @@ namespace FETools
      * individual shape functions that do not depend on whether the
      * composed element uses the tensor product or combination
      * strategy outlined in the documentation of the
-     * FETools::Composition namespace. Consequently, this function
+     * FETools::Compositing namespace. Consequently, this function
      * does not have a @p do_tensor_product argument.
      */
     template <int dim, int spacedim>
@@ -1127,7 +1162,7 @@ namespace FETools
      * individual shape functions that do not depend on whether the
      * composed element uses the tensor product or combination
      * strategy outlined in the documentation of the
-     * FETools::Composition namespace. Consequently, this function
+     * FETools::Compositing namespace. Consequently, this function
      * does not have a @p do_tensor_product argument.
      *
      * @deprecated Use the versions of this function that take a

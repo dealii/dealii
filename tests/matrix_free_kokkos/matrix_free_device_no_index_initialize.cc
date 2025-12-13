@@ -32,8 +32,7 @@ template <int dim,
 class MatrixFreeTest
 {
 public:
-  static const unsigned int n_local_dofs = Utilities::pow(fe_degree + 1, dim);
-  static const unsigned int n_q_points   = Utilities::pow(n_q_points_1d, dim);
+  static const unsigned int n_q_points = Utilities::pow(n_q_points_1d, dim);
 
   MatrixFreeTest(const Portable::MatrixFree<dim, Number> &data_in)
     : data(data_in){};
@@ -45,6 +44,8 @@ public:
   {
     Portable::FEEvaluation<dim, fe_degree, n_q_points_1d, 1, Number> fe_eval(
       data);
+
+    const unsigned int n_local_dofs = decltype(fe_eval)::tensor_dofs_per_cell;
 
     // set to unit vector
     auto fe_eval_ptr = &fe_eval;
@@ -91,9 +92,7 @@ protected:
   const Portable::MatrixFree<dim, Number> &data;
 };
 
-template <int dim, int fe_degree, int n_q_points_1d, typename Number>
-const unsigned int
-  MatrixFreeTest<dim, fe_degree, n_q_points_1d, Number>::n_local_dofs;
+
 
 template <int dim, int fe_degree, int n_q_points_1d, typename Number>
 const unsigned int

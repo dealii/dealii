@@ -217,8 +217,8 @@ sufficiently small; you need a finer mesh.
 
 In other words, when we look at these sorts of numbers, we generally
 need to compare against a "scale". One way to do that is to not look
-at the *absolute* error $\|u-u_h\|$ in whatever norm, but at the
-*relative* error $\|u-u_h\|/\|u\|$. If this ratio is $10^{-5}$, then
+at the *absolute* error $\|u-u_h\|$ in whatever norm, but at the *relative*
+error $\|u-u_h\|/\|u\|$. If this ratio is $10^{-5}$, then
 you know that *on average*, the difference between $u$ and $u_h$ is
 0.001 per cent -- probably small enough for engineering purposes.
 
@@ -262,14 +262,14 @@ norms into one global norm as we already do in the program, by calling
 
 <h3> Possibilities for extensions </h3>
 
-<h4> Higher Order Elements </h4>
+<h4> Higher order elements </h4>
 
 Go ahead and run the program with higher order elements ($Q_3$, $Q_4$, ...). You
 will notice that assertions in several parts of the code will trigger (for
 example in the generation of the filename for the data output). You might have to address these,
 but it should not be very hard to get the program to work!
 
-<h4> Convergence Comparison </h4>
+<h4> Convergence comparison </h4>
 
 Is $Q_1$ or $Q_2$ better? What about adaptive versus global refinement? A (somewhat
 unfair but typical) metric to compare them, is to look at the error as a
@@ -302,3 +302,49 @@ To see how a comparison of this kind could work, take a look at
 that illustrates the error as a function of compute time for
 a number of polynomial degrees (as well as a number of different ways
 to discretize the equation used there).
+
+
+@anchor step_7-ResultsSection-bad-sign
+<h4> Switching the sign of alpha in the equation </h4>
+
+The equation we are solving here is
+@f[
+  -\Delta u + \alpha u = f,
+@f]
+with $\alpha=1$. This is sometimes called "the Helmholtz equation with
+the good sign" because the fact that $\alpha>0$ makes the equation
+fairly easy to solve: The solution minimizes a quadratic energy
+@f[
+  E(u) = \int_\Omega \frac 12 |\nabla u|^2 + \frac 12 \alpha u^2 - fu,
+@f]
+with a unique minimizer,
+which translates into the fact that the bilinear form we use is
+[coercive](https://en.wikipedia.org/wiki/Coercive_function#Coercive_operators_and_forms);
+a different way of putting this is by saying that the operator
+$-\Delta + \alpha$ is positive definite and
+[elliptic](https://en.wikipedia.org/wiki/Elliptic_operator). Solutions of
+such equations are typically nice and smooth, and we have many good methods
+of solving them efficiently and to high accuracy.
+
+All of this is, in general, not true if $\alpha<0$. As long as $\alpha$ is not
+equal to the negative of one of the eigenvalues of the Laplace operator,
+the equation
+@f[
+  -\Delta u + \alpha u = f,
+@f]
+still has a solution even for $\alpha<0$, but the matrix you get is in
+general not nearly as easy to invert as for $\alpha\ge 0$. Moreover,
+unless you pick a specific $f$, you will see that the solution is not
+nice and smooth any more: Solutions of the "Helmholtz equation with the
+bad sign" (i.e., with $\alpha<0$) are in general oscillatory, and the more
+negative $\alpha$ is, the shorter the wave length of these oscillations.
+
+You can easily try all of this out with
+the program here by changing the bilinear form in the program. (Of course,
+if you want to still want to compute errors, you will also have to make
+sure that the desired solution and the right hand side match.) The only
+other place you have to change is the solver: The matrix you are now
+building is no longer positive definite, and so the SolverCG class
+(implementing the Conjugate Gradient method) is no longer appropriate.
+Instead, try SolverGMRES -- a method that can deal with matrices that are
+not definite.

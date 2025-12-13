@@ -1,0 +1,2 @@
+Changed: renamed FETools::cell_to_face_patch_numbering(...); the old cell_to_face_patch() was marked deprecated.
+(Michał Wichrowski, 2025/09/15)

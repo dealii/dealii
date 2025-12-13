@@ -1,0 +1,15 @@
+
+DEAL:0::Running on 2 MPI rank(s)...
+DEAL:0::Triangulation has 51 active cells.
+DEAL:0::Rank 0: Local cells = 51, Global cells = 72
+DEAL:0::   Number of active cells:       72
+DEAL:0::   Number of degrees of freedom: 169
+DEAL:0::Solver stopped within 1 - 9 iterations
+
+DEAL:1::Running on 2 MPI rank(s)...
+DEAL:1::Triangulation has 50 active cells.
+DEAL:1::Rank 1: Local cells = 50, Global cells = 72
+DEAL:1::   Number of active cells:       72
+DEAL:1::   Number of degrees of freedom: 169
+DEAL:1::Solver stopped within 1 - 9 iterations
+

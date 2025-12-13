@@ -1,0 +1,3 @@
+New: Portable::MatrixFree is now able to support actions on multigrid levels to support local smoothing multigrid.
+<br>
+(Michał Wichrowski, 2025/11/05)

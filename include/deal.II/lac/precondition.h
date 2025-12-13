@@ -136,7 +136,8 @@ namespace internal
       const unsigned int        eig_cg_n_iterations,
       const double              eig_cg_residual,
       const double              max_eigenvalue,
-      const EigenvalueAlgorithm eigenvalue_algorithm);
+      const EigenvalueAlgorithm eigenvalue_algorithm,
+      const double              safety_factor = 1.2);
 
     /**
      * Copy assignment operator.
@@ -189,6 +190,14 @@ namespace internal
      * Stores the preconditioner object that the Chebyshev is wrapped around.
      */
     EigenvalueAlgorithm eigenvalue_algorithm;
+
+    /**
+     * Safety factor that is multiplied to the estimated maximum eigenvalue
+     * before it is used in the preconditioner. This should be larger than 1
+     * (default: 1.2) to ensure that the maximum eigenvalue is not
+     * underestimated.
+     */
+    double safety_factor;
 
     /**
      * Preconditioner.
@@ -559,8 +568,8 @@ private:
  * For this purpose, the user needs to set the relaxation parameter
  * to zero. Internally, the minimum and maximum eigenvalues of the
  * preconditioned system are estimated by an eigenvalue algorithm, and the
- * resulting estimate is multiplied by the 1.2 for safety reasons. For more
- * details on the underlying algorithms, see PreconditionChebyshev.
+ * resulting estimate is multiplied by the safety factor (1.2 by default). For
+ * more details on the underlying algorithms, see PreconditionChebyshev.
  */
 template <typename MatrixType         = SparseMatrix<double>,
           typename PreconditionerType = IdentityMatrix>
@@ -591,7 +600,8 @@ public:
                    const double              eig_cg_residual     = 1e-2,
                    const double              max_eigenvalue      = 1,
                    const EigenvalueAlgorithm eigenvalue_algorithm =
-                     EigenvalueAlgorithm::lanczos);
+                     EigenvalueAlgorithm::lanczos,
+                   const double safety_factor = 1.2);
 
     /**
      * Relaxation parameter.
@@ -1985,7 +1995,7 @@ public:
  * underlying solver or eigenvalue algorithm in the given number of
  * iterations, even if the solver did not converge in the requested number of
  * iterations. Finally, the maximum eigenvalue is multiplied by a safety
- * factor of 1.2.
+ * factor.
  *
  * Due to the cost of the eigenvalue estimate, this class is most appropriate
  * if it is applied repeatedly, e.g. in a smoother for a geometric multigrid
@@ -2142,7 +2152,8 @@ public:
       const double              max_eigenvalue      = 1,
       const EigenvalueAlgorithm eigenvalue_algorithm =
         EigenvalueAlgorithm::lanczos,
-      const PolynomialType polynomial_type = PolynomialType::first_kind);
+      const PolynomialType polynomial_type = PolynomialType::first_kind,
+      const double         safety_factor   = 1.2);
 
     /**
      * This determines the degree of the Chebyshev polynomial. The degree of
@@ -2434,9 +2445,16 @@ namespace internal
     const MatrixType                                            *matrix_ptr,
     VectorType                                                  &solution_old,
     VectorType                                                  &temp_vector1,
-    const unsigned int                                           degree)
+    const unsigned int                                           degree,
+    const double                                                 safety_factor)
   {
     Assert(data.preconditioner.get() != nullptr, ExcNotInitialized());
+
+    Assert(
+      safety_factor >= 1.,
+      ExcMessage(
+        "The safety factor must be at least 1.0 to ensure the maximum eigenvalue is "
+        "not underestimated. Please set safety_factor >= 1.0 in your AdditionalData."));
 
     EigenvalueInformation info{};
 
@@ -2503,7 +2521,7 @@ namespace internal
             // include a safety factor since the CG method will in general not
             // be converged
             info.max_eigenvalue_estimate =
-              1.2 * eigenvalue_tracker.values.back();
+              safety_factor * eigenvalue_tracker.values.back();
           }
       }
     else
@@ -2847,8 +2865,12 @@ PreconditionRelaxation<MatrixType, PreconditionerType>::estimate_eigenvalues(
       solution_old.reinit(src);
       temp_vector1.reinit(src, true);
 
-      info = internal::estimate_eigenvalues<MatrixType>(
-        data, A, solution_old, temp_vector1, data.n_iterations);
+      info = internal::estimate_eigenvalues<MatrixType>(data,
+                                                        A,
+                                                        solution_old,
+                                                        temp_vector1,
+                                                        data.n_iterations,
+                                                        data.safety_factor);
 
       const double alpha =
         (data.smoothing_range > 1. ?
@@ -3025,12 +3047,14 @@ namespace internal
       const unsigned int        eig_cg_n_iterations,
       const double              eig_cg_residual,
       const double              max_eigenvalue,
-      const EigenvalueAlgorithm eigenvalue_algorithm)
+      const EigenvalueAlgorithm eigenvalue_algorithm,
+      const double              safety_factor)
     : smoothing_range(smoothing_range)
     , eig_cg_n_iterations(eig_cg_n_iterations)
     , eig_cg_residual(eig_cg_residual)
     , max_eigenvalue(max_eigenvalue)
     , eigenvalue_algorithm(eigenvalue_algorithm)
+    , safety_factor(safety_factor)
   {}
 
 
@@ -3046,6 +3070,7 @@ namespace internal
     max_eigenvalue       = other_data.max_eigenvalue;
     preconditioner       = other_data.preconditioner;
     eigenvalue_algorithm = other_data.eigenvalue_algorithm;
+    safety_factor        = other_data.safety_factor;
     constraints.copy_from(other_data.constraints);
 
     return *this;
@@ -3060,13 +3085,15 @@ inline PreconditionRelaxation<MatrixType, PreconditionerType>::AdditionalData::
                  const unsigned int        eig_cg_n_iterations,
                  const double              eig_cg_residual,
                  const double              max_eigenvalue,
-                 const EigenvalueAlgorithm eigenvalue_algorithm)
+                 const EigenvalueAlgorithm eigenvalue_algorithm,
+                 const double              safety_factor)
   : internal::EigenvalueAlgorithmAdditionalData<PreconditionerType>(
       smoothing_range,
       eig_cg_n_iterations,
       eig_cg_residual,
       max_eigenvalue,
-      eigenvalue_algorithm)
+      eigenvalue_algorithm,
+      safety_factor)
   , relaxation(relaxation)
   , n_iterations(n_iterations)
 {}
@@ -3745,13 +3772,15 @@ inline PreconditionChebyshev<MatrixType, VectorType, PreconditionerType>::
                                  const double              eig_cg_residual,
                                  const double              max_eigenvalue,
                                  const EigenvalueAlgorithm eigenvalue_algorithm,
-                                 const PolynomialType      polynomial_type)
+                                 const PolynomialType      polynomial_type,
+                                 const double              safety_factor)
   : internal::EigenvalueAlgorithmAdditionalData<PreconditionerType>(
       smoothing_range,
       eig_cg_n_iterations,
       eig_cg_residual,
       max_eigenvalue,
-      eigenvalue_algorithm)
+      eigenvalue_algorithm,
+      safety_factor)
   , degree(degree)
   , polynomial_type(polynomial_type)
 {}
@@ -3817,8 +3846,12 @@ PreconditionChebyshev<MatrixType, VectorType, PreconditionerType>::
   solution_old.reinit(src);
   temp_vector1.reinit(src, true);
 
-  auto info = internal::estimate_eigenvalues<MatrixType>(
-    data, matrix_ptr, solution_old, temp_vector1, data.degree);
+  auto info = internal::estimate_eigenvalues<MatrixType>(data,
+                                                         matrix_ptr,
+                                                         solution_old,
+                                                         temp_vector1,
+                                                         data.degree,
+                                                         data.safety_factor);
 
   const double alpha = (data.smoothing_range > 1. ?
                           info.max_eigenvalue_estimate / data.smoothing_range :

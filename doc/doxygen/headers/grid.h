@@ -23,9 +23,9 @@
  * levels. In addition to cells, the geometric objects that make up a
  * triangulation are the faces of cells (and in 3d the edges of cells)
  * as well as the vertices of the cells. Note that we abuse the word
- * <i>triangulation</i> somewhat, since deal.II only implements
+ * <i>triangulation</i> somewhat, since deal.II implements
  * triangulations made up of linear, quadrilateral, and hexahedral
- * cells; triangles and tetrahedra are not supported.
+ * cells in addition to triangles and tetrahedra (see @ref simplex).
  *
  * This collection of cells is managed by the Triangulation class and
  * derived classes such as parallel::distributed::Triangulation and

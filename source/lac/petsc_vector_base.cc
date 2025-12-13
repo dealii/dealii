@@ -123,6 +123,8 @@ namespace PETScWrappers
     : vector(nullptr)
     , ghosted(false)
     , last_action(VectorOperation::unknown)
+    , ghost_vector(nullptr)
+    , ghost_vector_array(nullptr)
   {}
 
 
@@ -131,12 +133,16 @@ namespace PETScWrappers
     : ghosted(v.ghosted)
     , ghost_indices(v.ghost_indices)
     , last_action(VectorOperation::unknown)
+    , ghost_vector(nullptr)
+    , ghost_vector_array(nullptr)
   {
     PetscErrorCode ierr = VecDuplicate(v.vector, &vector);
     AssertThrow(ierr == 0, ExcPETScError(ierr));
 
     ierr = VecCopy(v.vector, vector);
     AssertThrow(ierr == 0, ExcPETScError(ierr));
+    if (ghosted)
+      acquire_ghost_form();
   }
 
 
@@ -145,17 +151,24 @@ namespace PETScWrappers
     : vector(v)
     , ghosted(false)
     , last_action(VectorOperation::unknown)
+    , ghost_vector(nullptr)
+    , ghost_vector_array(nullptr)
   {
     const PetscErrorCode ierr =
       PetscObjectReference(reinterpret_cast<PetscObject>(vector));
     AssertNothrow(ierr == 0, ExcPETScError(ierr));
     this->determine_ghost_indices();
+    if (ghosted)
+      acquire_ghost_form();
   }
 
 
 
   VectorBase::~VectorBase()
   {
+    if (ghosted)
+      release_ghost_form();
+
     const PetscErrorCode ierr = VecDestroy(&vector);
     AssertNothrow(ierr == 0, ExcPETScError(ierr));
   }
@@ -167,6 +180,10 @@ namespace PETScWrappers
   {
     AssertThrow(last_action == VectorOperation::unknown,
                 ExcMessage("Cannot assign a new Vec"));
+
+    if (ghosted)
+      release_ghost_form();
+
     PetscErrorCode ierr =
       PetscObjectReference(reinterpret_cast<PetscObject>(v));
     AssertThrow(ierr == 0, ExcPETScError(ierr));
@@ -174,6 +191,8 @@ namespace PETScWrappers
     AssertThrow(ierr == 0, ExcPETScError(ierr));
     vector = v;
     this->determine_ghost_indices();
+    if (ghosted)
+      acquire_ghost_form();
   }
 
 
@@ -337,9 +356,48 @@ namespace PETScWrappers
   }
 
 
+
+  void
+  VectorBase::acquire_ghost_form()
+  {
+    AssertThrow(ghosted, ExcMessage("Vector is not ghosted"));
+
+    AssertThrow(ghost_vector == nullptr && ghost_vector_array == nullptr,
+                ExcInternalError(
+                  "Ghost vector is already acquired for the vector."));
+
+    PetscErrorCode ierr = VecGhostGetLocalForm(vector, &ghost_vector);
+    AssertThrow(ierr == 0, ExcPETScError(ierr));
+    ierr = VecGetArrayRead(ghost_vector, &ghost_vector_array);
+    AssertThrow(ierr == 0, ExcPETScError(ierr));
+  }
+
+
+
+  void
+  VectorBase::release_ghost_form()
+  {
+    AssertThrow(ghost_vector != nullptr,
+                ExcInternalError("Ghost vector is not acquired"));
+
+    PetscErrorCode ierr =
+      VecRestoreArrayRead(ghost_vector, &ghost_vector_array);
+    AssertThrow(ierr == 0, ExcPETScError(ierr));
+    ierr = VecGhostRestoreLocalForm(vector, &ghost_vector);
+    AssertThrow(ierr == 0, ExcPETScError(ierr));
+
+    ghost_vector       = nullptr;
+    ghost_vector_array = nullptr;
+  }
+
+
+
   void
   VectorBase::clear()
   {
+    if (ghosted)
+      release_ghost_form();
+
     const PetscErrorCode ierr = VecDestroy(&vector);
     AssertThrow(ierr == 0, ExcPETScError(ierr));
 
@@ -747,55 +805,20 @@ namespace PETScWrappers
   bool
   VectorBase::all_zero() const
   {
-    // get a representation of the vector and
-    // loop over all the elements
     const PetscScalar *start_ptr;
     PetscErrorCode     ierr = VecGetArrayRead(vector, &start_ptr);
     AssertThrow(ierr == 0, ExcPETScError(ierr));
 
-    const PetscScalar *ptr  = start_ptr,
-                      *eptr = start_ptr + locally_owned_size();
-    bool flag               = true;
-    while (ptr != eptr)
-      {
-        if (*ptr != value_type())
-          {
-            flag = false;
-            break;
-          }
-        ++ptr;
-      }
+    const bool local_all_zero =
+      std::all_of(start_ptr,
+                  start_ptr + locally_owned_size(),
+                  numbers::value_is_zero<PetscScalar>);
 
-    // restore the representation of the
-    // vector
     ierr = VecRestoreArrayRead(vector, &start_ptr);
     AssertThrow(ierr == 0, ExcPETScError(ierr));
 
-    return flag;
+    return Utilities::MPI::logical_and(local_all_zero, get_mpi_communicator());
   }
-
-
-  namespace internal
-  {
-    template <typename T>
-    bool
-    is_non_negative(const T &t)
-    {
-      return t >= 0;
-    }
-
-
-
-    template <typename T>
-    bool
-    is_non_negative(const std::complex<T> &)
-    {
-      Assert(false,
-             ExcMessage("You can't ask a complex value "
-                        "whether it is non-negative."));
-      return true;
-    }
-  } // namespace internal
 
 
 
@@ -1028,6 +1051,8 @@ namespace PETScWrappers
     IndexSet t(this->ghost_indices);
     this->ghost_indices = v.ghost_indices;
     v.ghost_indices     = t;
+    std::swap(this->ghost_vector, v.ghost_vector);
+    std::swap(this->ghost_vector_array, v.ghost_vector_array);
   }
 
 

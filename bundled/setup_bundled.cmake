@@ -1,7 +1,7 @@
 ## ------------------------------------------------------------------------
 ##
 ## SPDX-License-Identifier: LGPL-2.1-or-later
-## Copyright (C) 2013 - 2014 by the deal.II authors
+## Copyright (C) 2013 - 2025 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -156,4 +156,21 @@ macro(feature_muparser_configure_bundled)
   set(MUPARSER_VERSION_SUBMINOR "3")
 
   list(APPEND DEAL_II_BUNDLED_INCLUDE_DIRS ${MUPARSER_FOLDER}/include)
+endmacro()
+
+
+#
+# magic_enum
+#
+
+set(FEATURE_MAGIC_ENUM_HAVE_BUNDLED TRUE)
+
+option(DEAL_II_FORCE_BUNDLED_MAGIC_ENUM
+  "Always use the bundled magic_enum header library instead of an external one."
+  OFF)
+
+set(MAGIC_ENUM_FOLDER "${CMAKE_SOURCE_DIR}/bundled/magic_enum-v0.9.7/")
+
+macro(feature_magic_enum_configure_bundled)
+  list(APPEND DEAL_II_BUNDLED_INCLUDE_DIRS ${MAGIC_ENUM_FOLDER}/include/magic_enum)
 endmacro()

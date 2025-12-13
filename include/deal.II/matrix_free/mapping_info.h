@@ -277,10 +277,10 @@ namespace internal
     {
       static const MappingInfoStorage<dim, dim, VectorizedArrayType> &
       get(const MappingInfo<dim, Number, VectorizedArrayType> &mapping_info,
-          const unsigned int                                   quad_no)
+          const unsigned int                                   quadrature_index)
       {
-        AssertIndexRange(quad_no, mapping_info.cell_data.size());
-        return mapping_info.cell_data[quad_no];
+        AssertIndexRange(quadrature_index, mapping_info.cell_data.size());
+        return mapping_info.cell_data[quadrature_index];
       }
     };
 
@@ -289,10 +289,10 @@ namespace internal
     {
       static const MappingInfoStorage<dim - 1, dim, VectorizedArrayType> &
       get(const MappingInfo<dim, Number, VectorizedArrayType> &mapping_info,
-          const unsigned int                                   quad_no)
+          const unsigned int                                   quadrature_index)
       {
-        AssertIndexRange(quad_no, mapping_info.face_data.size());
-        return mapping_info.face_data[quad_no];
+        AssertIndexRange(quadrature_index, mapping_info.face_data.size());
+        return mapping_info.face_data[quadrature_index];
       }
     };
 

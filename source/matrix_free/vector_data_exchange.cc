@@ -17,7 +17,6 @@
 #include <deal.II/base/mpi.templates.h>
 #include <deal.II/base/mpi_consensus_algorithms.h>
 #include <deal.II/base/partitioner.h>
-#include <deal.II/base/timer.h>
 
 #include <deal.II/matrix_free/vector_data_exchange.h>
 
@@ -1089,7 +1088,7 @@ namespace internal
         requests.resize(sm_ghost_ranks.size() + sm_import_ranks.size() +
                         ghost_targets_data.size() + import_targets_data.size());
 
-        int dummy;
+        int dummy = 0;
         for (unsigned int i = 0; i < sm_ghost_ranks.size(); ++i)
           {
             const int ierr = MPI_Isend(&dummy,

@@ -1,0 +1,7 @@
+Changed: The TimerOutput class now reports CPU time spent in sections
+as the sum over all processes in the given MPI communicator.
+Previously, it would only report for each section the CPU time on the current
+process. This meant the time spent in sections would not add up to the total
+CPU time, which was always reported as the sum over all MPI processes.
+<br>
+(Rene Gassmoeller, 2025/09/24)

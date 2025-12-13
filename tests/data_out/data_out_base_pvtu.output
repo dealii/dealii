@@ -4,6 +4,10 @@
 -->
 <VTKFile type="PUnstructuredGrid" version="0.1" byte_order="LittleEndian">
   <PUnstructuredGrid GhostLevel="0">
+    <FieldData>
+    <DataArray type="Float32" Name="CYCLE" NumberOfTuples="1" format="ascii">0</DataArray>
+    <DataArray type="Float32" Name="TIME" NumberOfTuples="1" format="ascii">0</DataArray>
+    </FieldData>
     <PPointData Scalars="scalars">
     <PDataArray type="Float32" Name="x1" format="ascii"/>
     <PDataArray type="Float32" Name="x2" format="ascii"/>

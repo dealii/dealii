@@ -29,12 +29,21 @@ https://github.com/kokkos/kokkos.
 
 
 taskflow-*
---------------
+----------
 
 Contains the taskflow project licensed under the MIT license.
 
 A full version of the project project can be downloaded at
 https://taskflow.github.io/.
+
+
+magic_enum-*
+------------
+
+Contains the magic_enum project licensed under the MIT license.
+
+A full version of the project project can be downloaded at
+https://github.com/Neargye/magic_enum.
 
 
 muparser_*

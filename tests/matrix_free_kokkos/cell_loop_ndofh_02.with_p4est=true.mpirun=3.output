@@ -1,0 +1,110 @@
+
+DEAL:0::Testing FESystem<2>[FE_Q<2>(1)-FE_Q<2>(2)-FESystem<2>[FE_DGQ<2>(0)^2]]
+DEAL:0::*** block = 0
+
+Process #0
+Local range: [0, 9), global size: 25
+Vector data:
+1.000e+00 2.000e+00 2.000e+00 4.000e+00 2.000e+00 4.000e+00 2.000e+00 4.000e+00 4.000e+00 
+DEAL:0::*** block = 1
+
+Process #0
+Local range: [0, 25), global size: 81
+Vector data:
+2.000e+00 4.000e+00 4.000e+00 8.000e+00 2.000e+00 4.000e+00 2.000e+00 4.000e+00 2.000e+00 4.000e+00 8.000e+00 4.000e+00 2.000e+00 4.000e+00 2.000e+00 4.000e+00 8.000e+00 2.000e+00 4.000e+00 4.000e+00 2.000e+00 8.000e+00 4.000e+00 4.000e+00 2.000e+00 
+DEAL:0::*** block = 2
+
+Process #0
+Local range: [0, 8), global size: 32
+Vector data:
+3.000e+00 3.000e+00 3.000e+00 3.000e+00 3.000e+00 3.000e+00 3.000e+00 3.000e+00 
+DEAL:0::OK.
+DEAL:0::*** all blocks together:
+
+Process #0
+Local range: [0, 9), global size: 25
+Vector data:
+1.000e+00 2.000e+00 2.000e+00 4.000e+00 2.000e+00 4.000e+00 2.000e+00 4.000e+00 4.000e+00 
+Process #0
+Local range: [0, 25), global size: 81
+Vector data:
+2.000e+00 4.000e+00 4.000e+00 8.000e+00 2.000e+00 4.000e+00 2.000e+00 4.000e+00 2.000e+00 4.000e+00 8.000e+00 4.000e+00 2.000e+00 4.000e+00 2.000e+00 4.000e+00 8.000e+00 2.000e+00 4.000e+00 4.000e+00 2.000e+00 8.000e+00 4.000e+00 4.000e+00 2.000e+00 
+Process #0
+Local range: [0, 8), global size: 32
+Vector data:
+3.000e+00 3.000e+00 3.000e+00 3.000e+00 3.000e+00 3.000e+00 3.000e+00 3.000e+00 
+DEAL:0::OK.
+
+DEAL:1::Testing FESystem<2>[FE_Q<2>(1)-FE_Q<2>(2)-FESystem<2>[FE_DGQ<2>(0)^2]]
+DEAL:1::*** block = 0
+
+Process #1
+Local range: [9, 21), global size: 25
+Vector data:
+2.000e+00 4.000e+00 1.000e+00 2.000e+00 4.000e+00 2.000e+00 2.000e+00 4.000e+00 4.000e+00 1.000e+00 2.000e+00 2.000e+00 
+DEAL:1::*** block = 1
+
+Process #1
+Local range: [25, 65), global size: 81
+Vector data:
+4.000e+00 8.000e+00 4.000e+00 2.000e+00 4.000e+00 2.000e+00 2.000e+00 4.000e+00 2.000e+00 2.000e+00 4.000e+00 2.000e+00 8.000e+00 4.000e+00 4.000e+00 2.000e+00 4.000e+00 2.000e+00 4.000e+00 2.000e+00 4.000e+00 8.000e+00 2.000e+00 4.000e+00 4.000e+00 2.000e+00 8.000e+00 4.000e+00 4.000e+00 2.000e+00 2.000e+00 4.000e+00 2.000e+00 4.000e+00 2.000e+00 2.000e+00 4.000e+00 4.000e+00 2.000e+00 2.000e+00 
+DEAL:1::*** block = 2
+
+Process #1
+Local range: [8, 24), global size: 32
+Vector data:
+3.000e+00 3.000e+00 3.000e+00 3.000e+00 3.000e+00 3.000e+00 3.000e+00 3.000e+00 3.000e+00 3.000e+00 3.000e+00 3.000e+00 3.000e+00 3.000e+00 3.000e+00 3.000e+00 
+DEAL:1::OK.
+DEAL:1::*** all blocks together:
+
+Process #1
+Local range: [9, 21), global size: 25
+Vector data:
+2.000e+00 4.000e+00 1.000e+00 2.000e+00 4.000e+00 2.000e+00 2.000e+00 4.000e+00 4.000e+00 1.000e+00 2.000e+00 2.000e+00 
+Process #1
+Local range: [25, 65), global size: 81
+Vector data:
+4.000e+00 8.000e+00 4.000e+00 2.000e+00 4.000e+00 2.000e+00 2.000e+00 4.000e+00 2.000e+00 2.000e+00 4.000e+00 2.000e+00 8.000e+00 4.000e+00 4.000e+00 2.000e+00 4.000e+00 2.000e+00 4.000e+00 2.000e+00 4.000e+00 8.000e+00 2.000e+00 4.000e+00 4.000e+00 2.000e+00 8.000e+00 4.000e+00 4.000e+00 2.000e+00 2.000e+00 4.000e+00 2.000e+00 4.000e+00 2.000e+00 2.000e+00 4.000e+00 4.000e+00 2.000e+00 2.000e+00 
+Process #1
+Local range: [8, 24), global size: 32
+Vector data:
+3.000e+00 3.000e+00 3.000e+00 3.000e+00 3.000e+00 3.000e+00 3.000e+00 3.000e+00 3.000e+00 3.000e+00 3.000e+00 3.000e+00 3.000e+00 3.000e+00 3.000e+00 3.000e+00 
+DEAL:1::OK.
+
+
+DEAL:2::Testing FESystem<2>[FE_Q<2>(1)-FE_Q<2>(2)-FESystem<2>[FE_DGQ<2>(0)^2]]
+DEAL:2::*** block = 0
+
+Process #2
+Local range: [21, 25), global size: 25
+Vector data:
+4.000e+00 2.000e+00 2.000e+00 1.000e+00 
+DEAL:2::*** block = 1
+
+Process #2
+Local range: [65, 81), global size: 81
+Vector data:
+8.000e+00 4.000e+00 4.000e+00 2.000e+00 4.000e+00 2.000e+00 4.000e+00 2.000e+00 4.000e+00 4.000e+00 2.000e+00 2.000e+00 2.000e+00 2.000e+00 2.000e+00 2.000e+00 
+DEAL:2::*** block = 2
+
+Process #2
+Local range: [24, 32), global size: 32
+Vector data:
+3.000e+00 3.000e+00 3.000e+00 3.000e+00 3.000e+00 3.000e+00 3.000e+00 3.000e+00 
+DEAL:2::OK.
+DEAL:2::*** all blocks together:
+
+Process #2
+Local range: [21, 25), global size: 25
+Vector data:
+4.000e+00 2.000e+00 2.000e+00 1.000e+00 
+Process #2
+Local range: [65, 81), global size: 81
+Vector data:
+8.000e+00 4.000e+00 4.000e+00 2.000e+00 4.000e+00 2.000e+00 4.000e+00 2.000e+00 4.000e+00 4.000e+00 2.000e+00 2.000e+00 2.000e+00 2.000e+00 2.000e+00 2.000e+00 
+Process #2
+Local range: [24, 32), global size: 32
+Vector data:
+3.000e+00 3.000e+00 3.000e+00 3.000e+00 3.000e+00 3.000e+00 3.000e+00 3.000e+00 
+DEAL:2::OK.
+

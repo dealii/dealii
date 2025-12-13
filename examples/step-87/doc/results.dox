@@ -257,7 +257,7 @@ the computational mesh. This is useful if one wants to output the results
 on a coarser mesh or one does not want to output 3D results but instead 2D
 slices. In addition, MGTwoLevelTransferNonNested allows to prolongate solutions
 and restrict residuals between two independent meshes. By passing a sequence
-of such two-level transfer operators to MGTransferMF and, finally, to Multigrid,
+of such two-level transfer operators to MGTransferMatrixFree and, finally, to Multigrid,
 non-nested multigrid can be computed.
 - Utilities::MPI::RemotePointEvaluation can be used to couple non-matching
 grids via surfaces (example: fluid-structure interaction, independently created

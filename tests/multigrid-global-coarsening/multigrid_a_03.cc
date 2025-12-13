@@ -77,7 +77,7 @@ test(const unsigned int n_refinements, const unsigned int fe_degree_fine)
     }
 
   // set up transfer operator
-  MGTransferGlobalCoarsening<dim, VectorType> transfer(mg_constrained_dofs);
+  MGTransferMatrixFree<dim, Number> transfer(mg_constrained_dofs);
 
   transfer.build(dof_handler, [&](const auto l, auto &vec) {
     operators[l].initialize_dof_vector(vec);

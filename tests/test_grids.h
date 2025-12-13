@@ -139,7 +139,7 @@ namespace TestGrids
    * x-coordinate direction.
    *
    * The domain this grid represents covers $[0,n_cells] \times [0,1]^{d-1}$.
-   * Thus, integer division of the x-cordinate $x // 1$ on any point in this
+   * Thus, integer division of the x-coordinate $x // 1$ on any point in this
    * triangulation gives you the index of the cell the point is located in.
    */
   template <int dim, int spacedim>
