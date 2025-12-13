@@ -112,9 +112,16 @@ namespace internal
       tensor_raviart_thomas = 7,
 
       /**
+       * Special case of the FE_NedelecNodal element with anisotropic
+       * tensor product shape functions, i.e degree (k + 1) in tangential
+       * direction, and k in normal direction.
+       */
+      tensor_nedelec = 8,
+
+      /**
        * Shape functions without a tensor product properties.
        */
-      tensor_none = 8
+      tensor_none = 9
 
 
     };
