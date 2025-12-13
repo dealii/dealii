@@ -1,0 +1,4 @@
+New: The function VTKWrappers::read_vertex_data() allows to read vertex data
+from vtk files using the VTK library.
+<br>
+(Luca Heltai, 2025/11/25)
