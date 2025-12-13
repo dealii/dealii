@@ -634,12 +634,40 @@ namespace PETScWrappers
 #endif
 
 #ifdef DEAL_II_WITH_TRILINOS
+
+#  ifdef DEAL_II_TRILINOS_WITH_TPETRA
+namespace LinearAlgebra::TpetraWrappers
+{
+  template <typename Number, typename MemorySpace>
+  class Vector;
+
+  template <typename Number, typename MemorySpace>
+  class BlockVector;
+} // namespace LinearAlgebra::TpetraWrappers
+#  endif
+
+#  ifdef DEAL_II_TRILINOS_WITH_TPETRA
+namespace MemorySpace
+{
+  struct Host;
+}
+#  endif
+
 namespace TrilinosWrappers
 {
   namespace MPI
   {
+#  ifdef DEAL_II_TRILINOS_WITH_TPETRA
+    using Vector =
+      ::dealii::LinearAlgebra::TpetraWrappers::Vector<double,
+                                                      MemorySpace::Host>;
+    using BlockVector =
+      ::dealii::LinearAlgebra::TpetraWrappers::BlockVector<double,
+                                                           MemorySpace::Host>;
+#  else
     class Vector;
     class BlockVector;
+#  endif
   } // namespace MPI
 } // namespace TrilinosWrappers
 
