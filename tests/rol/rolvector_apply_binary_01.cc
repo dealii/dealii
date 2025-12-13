@@ -1,7 +1,7 @@
 // ------------------------------------------------------------------------
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
-// Copyright (C) 2017 - 2024 by the deal.II authors
+// Copyright (C) 2017 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -12,12 +12,12 @@
 //
 // ------------------------------------------------------------------------
 
-// Check the Rol::VectorAdaptor with MPI fully distributed vectors
-// using ROL::Vector's checkVector method.
+// Check the ROLVector's applyBinary function applied to a fully
+// distributed (MPI) vector.
 
 #include <deal.II/lac/generic_linear_algebra.h>
 
-#include <deal.II/optimization/rol/vector_adaptor.h>
+#include <deal.II/trilinos/rol_vector.h>
 
 #include "../tests.h"
 
@@ -32,7 +32,7 @@ prepare_vector(VectorType &v)
                      numproc =
                        dealii::Utilities::MPI::n_mpi_processes(MPI_COMM_WORLD);
 
-  const unsigned int set = 200;
+  const unsigned int set = 10;
   AssertIndexRange(numproc, set - 2);
   const unsigned int local_size  = set - myid;
   unsigned int       global_size = 0;
@@ -60,10 +60,11 @@ template <typename VectorType>
 void
 test()
 {
-  VectorType a, b, c;
+  VectorType a, b;
   prepare_vector(a);
   prepare_vector(b);
-  prepare_vector(c);
+
+  Testing::srand(1);
 
   for (auto iterator = a.begin(); iterator != a.end(); ++iterator)
     *iterator = static_cast<double>(Testing::rand()) / RAND_MAX;
@@ -71,31 +72,27 @@ test()
   for (auto iterator = b.begin(); iterator != b.end(); ++iterator)
     *iterator = static_cast<double>(Testing::rand()) / RAND_MAX;
 
-  for (auto iterator = c.begin(); iterator != c.end(); ++iterator)
-    *iterator = static_cast<double>(Testing::rand()) / RAND_MAX;
-
   a.compress(VectorOperation::insert);
   b.compress(VectorOperation::insert);
-  c.compress(VectorOperation::insert);
 
   ROL::Ptr<VectorType> a_ptr = ROL::makePtr<VectorType>(a);
   ROL::Ptr<VectorType> b_ptr = ROL::makePtr<VectorType>(b);
-  ROL::Ptr<VectorType> c_ptr = ROL::makePtr<VectorType>(c);
+
+  ROL::Elementwise::Multiply<double> mult;
+  ROL::Elementwise::Plus<double>     plus;
 
   // --- Testing the constructor
-  Rol::VectorAdaptor<VectorType> a_rol(a_ptr);
-  Rol::VectorAdaptor<VectorType> b_rol(b_ptr);
-  Rol::VectorAdaptor<VectorType> c_rol(c_ptr);
+  TrilinosWrappers::ROLVector<VectorType> a_rol(a_ptr);
+  TrilinosWrappers::ROLVector<VectorType> b_rol(b_ptr);
 
-  ROL::Ptr<std::ostream> out_stream;
-  ROL::nullstream        bhs; // outputs nothing
+  a_rol.print(std::cout);
+  b_rol.print(std::cout);
 
-  if (dealii::Utilities::MPI::this_mpi_process(MPI_COMM_WORLD) == 0)
-    out_stream = ROL::makePtrFromRef<std::ostream>(std::cout);
-  else
-    out_stream = ROL::makePtrFromRef<std::ostream>(bhs);
+  a_rol.applyBinary(mult, b_rol);
+  a_rol.print(std::cout);
 
-  a_rol.checkVector(b_rol, c_rol, true, *out_stream);
+  a_rol.applyBinary(plus, b_rol);
+  a_rol.print(std::cout);
 }
 
 
