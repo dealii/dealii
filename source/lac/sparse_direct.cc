@@ -12,15 +12,18 @@
 //
 // ------------------------------------------------------------------------
 
+
 #include <deal.II/base/memory_consumption.h>
 #include <deal.II/base/numbers.h>
 
 #include <deal.II/lac/block_sparse_matrix.h>
+#include <deal.II/lac/la_parallel_vector.h>
 #include <deal.II/lac/sparse_direct.h>
 #include <deal.II/lac/sparse_matrix.h>
 #include <deal.II/lac/vector.h>
 
 #include <complex>
+#include <type_traits>
 #include <vector>
 
 #ifdef DEAL_II_WITH_UMFPACK
@@ -1327,9 +1330,13 @@ SparseDirectMUMPS::vmult(VectorType &dst, const VectorType &src) const
     }
   else if constexpr (std::is_same_v<VectorType,
                                     TrilinosWrappers::MPI::Vector> ||
-                     std::is_same_v<VectorType, PETScWrappers::MPI::Vector>)
+                     std::is_same_v<VectorType, PETScWrappers::MPI::Vector> ||
+                     std::is_same_v<VectorType,
+                                    LinearAlgebra::distributed::Vector<double>>)
     {
-      if constexpr (std::is_same_v<VectorType, TrilinosWrappers::MPI::Vector>)
+      if constexpr (std::is_same_v<VectorType, TrilinosWrappers::MPI::Vector> ||
+                    std::is_same_v<VectorType,
+                                   LinearAlgebra::distributed::Vector<double>>)
         id.rhs_loc = const_cast<double *>(src.begin());
       else if constexpr (std::is_same_v<VectorType, PETScWrappers::MPI::Vector>)
         {
@@ -1344,6 +1351,9 @@ SparseDirectMUMPS::vmult(VectorType &dst, const VectorType &src) const
             &local_array);
 #  endif
         }
+      else
+        Assert(false, ExcInternalError());
+
 
 
       if (Utilities::MPI::this_mpi_process(mpi_communicator) == 0)
@@ -1359,14 +1369,81 @@ SparseDirectMUMPS::vmult(VectorType &dst, const VectorType &src) const
       // Copy solution into the given vector
       // For MUMPS with centralized solution (icntl[20]=0), the solution is only
       // on the root process (0) and needs to be distributed to all processes
-      if (Utilities::MPI::this_mpi_process(mpi_communicator) == 0)
+
+      // Get locally owned range for this process
+      const IndexSet &locally_owned = dst.locally_owned_elements();
+      const size_type local_size    = locally_owned.n_elements();
+
+      std::vector<double> local_values(local_size);
+
+      const unsigned int n_procs =
+        Utilities::MPI::n_mpi_processes(mpi_communicator);
+      const unsigned int my_rank =
+        Utilities::MPI::this_mpi_process(mpi_communicator);
+
+      std::vector<int> sizes(n_procs);
+      std::vector<int> displs(n_procs);
+
+      int my_size_int  = local_size;
+      int my_start_int = locally_owned.nth_index_in_set(0);
+
+      if (my_rank == 0)
         {
-          // Set all the values in the dst vector
-          for (size_type i = 0; i < n; ++i)
-            dst[i] = rhs[i];
+          // Rank 0: store its own info and receive from others
+          sizes[0]  = my_size_int;
+          displs[0] = my_start_int;
+
+          for (unsigned int proc = 1; proc < n_procs; ++proc)
+            {
+              MPI_Recv(&sizes[proc],
+                       1,
+                       MPI_INT,
+                       proc,
+                       0,
+                       mpi_communicator,
+                       MPI_STATUS_IGNORE);
+              MPI_Recv(&displs[proc],
+                       1,
+                       MPI_INT,
+                       proc,
+                       1,
+                       mpi_communicator,
+                       MPI_STATUS_IGNORE);
+            }
+        }
+      else
+        {
+          // other processes send their partition info to rank 0
+          MPI_Send(&my_size_int, 1, MPI_INT, 0, 0, mpi_communicator);
+          MPI_Send(&my_start_int, 1, MPI_INT, 0, 1, mpi_communicator);
         }
 
-      // Ensure the distributed vector has the correct values everywhere
+      // distribute the solution from 0 to other processes
+      if (my_rank == 0)
+        MPI_Scatterv(rhs.data(),
+                     sizes.data(),
+                     displs.data(),
+                     MPI_DOUBLE,
+                     local_values.data(),
+                     my_size_int,
+                     MPI_DOUBLE,
+                     0,
+                     mpi_communicator);
+      else
+        MPI_Scatterv(nullptr,
+                     nullptr,
+                     nullptr,
+                     MPI_DOUBLE,
+                     local_values.data(),
+                     my_size_int,
+                     MPI_DOUBLE,
+                     0,
+                     mpi_communicator); // Other ranks receive their portion
+
+      // Set local values in dst vector
+      size_type idx = 0;
+      for (const types::global_dof_index local_idx : locally_owned)
+        dst[local_idx] = local_values[idx++];
       dst.compress(VectorOperation::insert);
 
       rhs.resize(0); // remove rhs again
@@ -1472,18 +1549,19 @@ InstantiateMUMPSMatVec(TrilinosWrappers::MPI::Vector)
   InstantiateMUMPSMatVec(PETScWrappers::MPI::Vector)
 #  endif
     InstantiateMUMPSMatVec(Vector<double>)
+      InstantiateMUMPSMatVec(LinearAlgebra::distributed::Vector<double>)
 
 #  define InstantiateMUMPS(MATRIX) \
     template void SparseDirectMUMPS::initialize(const MATRIX &);
 
-      InstantiateMUMPS(SparseMatrix<double>)
-        InstantiateMUMPS(SparseMatrix<float>)
+        InstantiateMUMPS(SparseMatrix<double>)
+          InstantiateMUMPS(SparseMatrix<float>)
 #  ifdef DEAL_II_WITH_TRILINOS
-          InstantiateMUMPS(TrilinosWrappers::SparseMatrix)
+            InstantiateMUMPS(TrilinosWrappers::SparseMatrix)
 #  endif
 #  ifdef DEAL_II_WITH_PETSC
-            InstantiateMUMPS(PETScWrappers::SparseMatrix)
-              InstantiateMUMPS(PETScWrappers::MPI::SparseMatrix)
+              InstantiateMUMPS(PETScWrappers::SparseMatrix)
+                InstantiateMUMPS(PETScWrappers::MPI::SparseMatrix)
 #  endif
   // InstantiateMUMPS(SparseMatrixEZ<double>)
   // InstantiateMUMPS(SparseMatrixEZ<float>)
