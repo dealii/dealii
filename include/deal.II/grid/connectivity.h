@@ -1041,8 +1041,28 @@ namespace internal
 
               ad_entity_vertices.emplace_back(entity_vertices);
 
-              ad_entity_types.emplace_back(
-                cell_type->type_of_entity(face_dimensionality, e));
+              if (face_dimensionality ==
+                  cell_type->get_reference_cell().get_dimension() - 1)
+                ad_entity_types.emplace_back(
+                  cell_type->get_reference_cell().face_reference_cell(e));
+              else if (face_dimensionality ==
+                       cell_type->get_reference_cell().get_dimension() - 2)
+                {
+                  // Since we only deal with meshes up to dimension 3,
+                  // something that has co-dimensionality -2 must either be
+                  // a vertex or a line, regardless of what the object we are
+                  // working on actually us:
+                  if (face_dimensionality == 0)
+                    ad_entity_types.emplace_back(ReferenceCells::Vertex);
+                  else if (face_dimensionality == 1)
+                    ad_entity_types.emplace_back(ReferenceCells::Line);
+                  else
+                    // But it's probably useful to be conservative if someone
+                    // ever comes along to implement 4d meshes:
+                    DEAL_II_ASSERT_UNREACHABLE();
+                }
+              else
+                DEAL_II_ASSERT_UNREACHABLE();
 
               if (compatibility_mode)
                 ad_compatibility.emplace_back(
@@ -1269,14 +1289,10 @@ namespace internal
                   numbers::default_geometric_orientation)
                 continue;
 
-              // determine entity type of face
-              quad_t_id[f] = cell_type->type_of_entity(2, f_index);
-
-              // loop over lines
-              for (unsigned int l = 0; l < cell_type->get_reference_cell()
-                                             .face_reference_cell(f_index)
-                                             .n_lines();
-                   ++l)
+              // loop over the lines of this face
+              quad_t_id[f] =
+                cell_type->get_reference_cell().face_reference_cell(f_index);
+              for (unsigned int l = 0; l < quad_t_id[f].n_lines(); ++l)
                 {
                   // determine global index of line
                   const unsigned int local_line_index =
