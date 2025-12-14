@@ -85,19 +85,6 @@ namespace internal
       }
 
       /**
-       * Geometric entity type of the @p e-th sub-entity of dimension @p d.
-       */
-      virtual ReferenceCell
-      type_of_entity(const unsigned int d, const unsigned int e) const
-      {
-        DEAL_II_NOT_IMPLEMENTED();
-        (void)d;
-        (void)e;
-
-        return ReferenceCells::Vertex;
-      }
-
-      /**
        * Vertex indices of the @p line-th lines of @p face-th surface.
        */
       virtual const std::array<unsigned int, 2> &
@@ -154,19 +141,6 @@ namespace internal
         return {};
       }
 
-      ReferenceCell
-      type_of_entity(const unsigned int d, const unsigned int e) const override
-      {
-        (void)e;
-
-        if (d == 1)
-          return ReferenceCells::Line;
-
-        DEAL_II_NOT_IMPLEMENTED();
-
-        return ReferenceCells::Vertex;
-      }
-
       unsigned int
       n_entities(const unsigned int d) const override
       {
@@ -215,22 +189,6 @@ namespace internal
         return {};
       }
 
-      virtual ReferenceCell
-      type_of_entity(const unsigned int d, const unsigned int e) const override
-      {
-        (void)e;
-
-        if (d == 2)
-          return ReferenceCells::Triangle;
-
-        if (d == 1)
-          return ReferenceCells::Line;
-
-        DEAL_II_NOT_IMPLEMENTED();
-
-        return ReferenceCells::Vertex;
-      }
-
       unsigned int
       n_entities(const unsigned int d) const override
       {
@@ -277,22 +235,6 @@ namespace internal
         DEAL_II_NOT_IMPLEMENTED();
 
         return {};
-      }
-
-      virtual ReferenceCell
-      type_of_entity(const unsigned int d, const unsigned int e) const override
-      {
-        (void)e;
-
-        if (d == 2)
-          return ReferenceCells::Quadrilateral;
-
-        if (d == 1)
-          return ReferenceCells::Line;
-
-        DEAL_II_NOT_IMPLEMENTED();
-
-        return ReferenceCells::Vertex;
       }
 
       unsigned int
@@ -349,25 +291,6 @@ namespace internal
         DEAL_II_NOT_IMPLEMENTED();
 
         return {};
-      }
-
-      virtual ReferenceCell
-      type_of_entity(const unsigned int d, const unsigned int e) const override
-      {
-        (void)e;
-
-        if (d == 3)
-          return ReferenceCells::Tetrahedron;
-
-        if (d == 2)
-          return ReferenceCells::Triangle;
-
-        if (d == 1)
-          return ReferenceCells::Line;
-
-        DEAL_II_NOT_IMPLEMENTED();
-
-        return ReferenceCells::Vertex;
       }
 
       unsigned int
@@ -450,27 +373,6 @@ namespace internal
         DEAL_II_NOT_IMPLEMENTED();
 
         return {};
-      }
-
-      virtual ReferenceCell
-      type_of_entity(const unsigned int d, const unsigned int e) const override
-      {
-        (void)e;
-
-        if (d == 3)
-          return ReferenceCells::Pyramid;
-
-        if (d == 2 && e == 0)
-          return ReferenceCells::Quadrilateral;
-        else if (d == 2)
-          return ReferenceCells::Triangle;
-
-        if (d == 1)
-          return ReferenceCells::Line;
-
-        DEAL_II_NOT_IMPLEMENTED();
-
-        return ReferenceCells::Vertex;
       }
 
       unsigned int
@@ -562,27 +464,6 @@ namespace internal
         return {};
       }
 
-      virtual ReferenceCell
-      type_of_entity(const unsigned int d, const unsigned int e) const override
-      {
-        (void)e;
-
-        if (d == 3)
-          return ReferenceCells::Wedge;
-
-        if (d == 2 && e > 1)
-          return ReferenceCells::Quadrilateral;
-        else if (d == 2)
-          return ReferenceCells::Triangle;
-
-        if (d == 1)
-          return ReferenceCells::Line;
-
-        DEAL_II_NOT_IMPLEMENTED();
-
-        return ReferenceCells::Vertex;
-      }
-
       unsigned int
       n_entities(const unsigned int d) const override
       {
@@ -670,25 +551,6 @@ namespace internal
         DEAL_II_NOT_IMPLEMENTED();
 
         return {};
-      }
-
-      virtual ReferenceCell
-      type_of_entity(const unsigned int d, const unsigned int e) const override
-      {
-        (void)e;
-
-        if (d == 3)
-          return ReferenceCells::Hexahedron;
-
-        if (d == 2)
-          return ReferenceCells::Quadrilateral;
-
-        if (d == 1)
-          return ReferenceCells::Line;
-
-        DEAL_II_NOT_IMPLEMENTED();
-
-        return ReferenceCells::Vertex;
       }
 
       unsigned int
