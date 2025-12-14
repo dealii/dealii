@@ -13,6 +13,7 @@
 // ------------------------------------------------------------------------
 
 
+#include "deal.II/base/exception_macros.h"
 #include <deal.II/base/memory_consumption.h>
 #include <deal.II/base/numbers.h>
 
@@ -1352,7 +1353,7 @@ SparseDirectMUMPS::vmult(VectorType &dst, const VectorType &src) const
 #  endif
         }
       else
-        Assert(false, ExcInternalError());
+        DEAL_II_ASSERT_UNREACHABLE();
 
 
 
@@ -1376,69 +1377,35 @@ SparseDirectMUMPS::vmult(VectorType &dst, const VectorType &src) const
 
       std::vector<double> local_values(local_size);
 
-      const unsigned int n_procs =
-        Utilities::MPI::n_mpi_processes(mpi_communicator);
       const unsigned int my_rank =
         Utilities::MPI::this_mpi_process(mpi_communicator);
-
-      std::vector<int> sizes(n_procs);
-      std::vector<int> displs(n_procs);
 
       int my_size_int  = local_size;
       int my_start_int = locally_owned.nth_index_in_set(0);
 
+      std::vector<int> sizes =
+        Utilities::MPI::gather(mpi_communicator, my_size_int, 0);
+      std::vector<int> displs =
+        Utilities::MPI::gather(mpi_communicator, my_start_int, 0);
+
+      // create a vector of vectors to send the local parts to each process
+      std::vector<std::vector<double>> objects_to_send;
       if (my_rank == 0)
         {
-          // Rank 0: store its own info and receive from others
-          sizes[0]  = my_size_int;
-          displs[0] = my_start_int;
-
-          for (unsigned int proc = 1; proc < n_procs; ++proc)
+          const unsigned int n_procs =
+            Utilities::MPI::n_mpi_processes(mpi_communicator);
+          objects_to_send.resize(n_procs);
+          for (unsigned int proc = 0; proc < n_procs; ++proc)
             {
-              MPI_Recv(&sizes[proc],
-                       1,
-                       MPI_INT,
-                       proc,
-                       0,
-                       mpi_communicator,
-                       MPI_STATUS_IGNORE);
-              MPI_Recv(&displs[proc],
-                       1,
-                       MPI_INT,
-                       proc,
-                       1,
-                       mpi_communicator,
-                       MPI_STATUS_IGNORE);
+              objects_to_send[proc].resize(sizes[proc]);
+              for (int i = 0; i < sizes[proc]; ++i)
+                objects_to_send[proc][i] = rhs[displs[proc] + i];
             }
         }
-      else
-        {
-          // other processes send their partition info to rank 0
-          MPI_Send(&my_size_int, 1, MPI_INT, 0, 0, mpi_communicator);
-          MPI_Send(&my_start_int, 1, MPI_INT, 0, 1, mpi_communicator);
-        }
 
-      // distribute the solution from 0 to other processes
-      if (my_rank == 0)
-        MPI_Scatterv(rhs.data(),
-                     sizes.data(),
-                     displs.data(),
-                     MPI_DOUBLE,
-                     local_values.data(),
-                     my_size_int,
-                     MPI_DOUBLE,
-                     0,
-                     mpi_communicator);
-      else
-        MPI_Scatterv(nullptr,
-                     nullptr,
-                     nullptr,
-                     MPI_DOUBLE,
-                     local_values.data(),
-                     my_size_int,
-                     MPI_DOUBLE,
-                     0,
-                     mpi_communicator); // Other ranks receive their portion
+      // distribute the solution from rank 0 to other processes
+      local_values =
+        Utilities::MPI::scatter(mpi_communicator, objects_to_send, 0);
 
       // Set local values in dst vector
       size_type idx = 0;
