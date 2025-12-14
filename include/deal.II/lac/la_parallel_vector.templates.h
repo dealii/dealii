@@ -1005,9 +1005,10 @@ namespace LinearAlgebra
       // Avoid some overhead, especially on Kokkos versions before 4.6,
       // in Kokkos::deep_copy, by directly calling (sequential) memset.
       if (std::is_same_v<MemorySpaceType, MemorySpace::Host>)
-        std::memset(data.values.data() + partitioner->locally_owned_size(),
-                    0,
-                    partitioner->n_ghost_indices() * sizeof(Number));
+        std::fill(data.values.data() + partitioner->locally_owned_size(),
+                  data.values.data() + partitioner->locally_owned_size() +
+                    partitioner->n_ghost_indices(),
+                  Number(0));
       else
         {
           Kokkos::pair<size_type, size_type> range(
