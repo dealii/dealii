@@ -40,16 +40,6 @@ template <typename number>
 class BlockSparseMatrix;
 #  endif
 
-namespace TrilinosWrappers
-{
-#  ifdef DEAL_II_TRILINOS_WITH_TPETRA
-  using BlockSparseMatrix = ::dealii::LinearAlgebra::TpetraWrappers::
-    BlockSparseMatrix<double, MemorySpace::Host>;
-#  else
-
-#  endif
-} // namespace TrilinosWrappers
-
 #  ifndef DEAL_II_TRILINOS_WITH_TPETRA
 namespace TrilinosWrappers
 {

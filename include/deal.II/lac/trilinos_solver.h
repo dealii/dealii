@@ -27,6 +27,7 @@
 #  include <deal.II/lac/solver_control.h>
 #  include <deal.II/lac/trilinos_tpetra_precondition.h>
 #  include <deal.II/lac/vector.h>
+#  include <deal.II/lac/trilinos_tpetra_to_trilinos_wrappers.h>
 
 DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
 
@@ -53,24 +54,6 @@ DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
 #  include <memory>
 
 DEAL_II_NAMESPACE_OPEN
-
-#  ifndef DOXYGEN
-namespace TrilinosWrappers
-{
-#    ifdef DEAL_II_TRILINOS_WITH_TPETRA
-  // forward declarations
-  using SparseMatrix =
-    ::dealii::LinearAlgebra::TpetraWrappers::SparseMatrix<double,
-                                                          MemorySpace::Host>;
-  using PreconditionBase = ::dealii::LinearAlgebra::TpetraWrappers::
-    PreconditionBase<double, MemorySpace::Host>;
-#    else
-  // forward declarations
-  class SparseMatrix;
-  class PreconditionBase;
-#    endif
-} // namespace TrilinosWrappers
-#  endif
 
 namespace TrilinosWrappers
 {

@@ -27,6 +27,7 @@
 #include <deal.II/base/partitioner.h>
 
 #include <deal.II/lac/read_vector.h>
+#include <deal.II/lac/trilinos_tpetra_to_trilinos_wrappers.h>
 #include <deal.II/lac/vector_operation.h>
 #include <deal.II/lac/vector_type_traits.h>
 
@@ -67,22 +68,6 @@ namespace PETScWrappers
     class Vector;
   }
 } // namespace PETScWrappers
-#  endif
-
-#  ifdef DEAL_II_WITH_TRILINOS
-namespace TrilinosWrappers
-{
-  namespace MPI
-  {
-#    ifdef DEAL_II_TRILINOS_WITH_TPETRA
-    using Vector =
-      ::dealii::LinearAlgebra::TpetraWrappers::Vector<double,
-                                                      MemorySpace::Host>;
-#    else
-    class Vector;
-#    endif
-  } // namespace MPI
-} // namespace TrilinosWrappers
 #  endif
 #endif
 

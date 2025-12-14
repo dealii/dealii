@@ -73,22 +73,6 @@ namespace PETScWrappers
 } // namespace PETScWrappers
 #  endif
 
-#  ifdef DEAL_II_WITH_TRILINOS
-namespace TrilinosWrappers
-{
-  namespace MPI
-  {
-#    ifdef DEAL_II_TRILINOS_WITH_TPETRA
-    using Vector =
-      ::dealii::LinearAlgebra::TpetraWrappers::Vector<double,
-                                                      MemorySpace::Host>;
-#    else
-    class Vector;
-#    endif
-  } // namespace MPI
-} // namespace TrilinosWrappers
-#  endif
-
 #endif
 
 namespace LinearAlgebra

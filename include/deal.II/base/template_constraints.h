@@ -22,6 +22,7 @@
 #include <deal.II/base/mpi_stub.h>
 #include <deal.II/base/std_cxx20/type_traits.h>
 
+#include <deal.II/lac/trilinos_tpetra_to_trilinos_wrappers.h>
 #include <deal.II/lac/vector_operation.h>
 
 #include <complex>
@@ -635,65 +636,12 @@ namespace PETScWrappers
 
 #ifdef DEAL_II_WITH_TRILINOS
 
-#  ifdef DEAL_II_TRILINOS_WITH_TPETRA
-namespace LinearAlgebra::TpetraWrappers
-{
-  template <typename Number, typename MemorySpace>
-  class Vector;
-
-  template <typename Number, typename MemorySpace>
-  class BlockVector;
-} // namespace LinearAlgebra::TpetraWrappers
-#  endif
-
-#  ifdef DEAL_II_TRILINOS_WITH_TPETRA
-namespace MemorySpace
-{
-  struct Host;
-}
-#  endif
-
-namespace TrilinosWrappers
-{
-  namespace MPI
-  {
-#  ifdef DEAL_II_TRILINOS_WITH_TPETRA
-    using Vector =
-      ::dealii::LinearAlgebra::TpetraWrappers::Vector<double,
-                                                      MemorySpace::Host>;
-    using BlockVector =
-      ::dealii::LinearAlgebra::TpetraWrappers::BlockVector<double,
-                                                           MemorySpace::Host>;
-#  else
-    class Vector;
-    class BlockVector;
-#  endif
-  } // namespace MPI
-} // namespace TrilinosWrappers
-
 namespace LinearAlgebra
 {
   namespace EpetraWrappers
   {
     class Vector;
   }
-
-#  ifdef DEAL_II_TRILINOS_WITH_TPETRA
-  namespace TpetraWrappers
-  {
-    template <typename Number, typename MemorySpace>
-    class Vector;
-
-    template <typename Number, typename MemorySpace>
-    class BlockVector;
-
-    template <typename Number, typename MemorySpace>
-    class SparseMatrix;
-
-    template <typename Number, typename MemorySpace>
-    class BlockSparseMatrix;
-  } // namespace TpetraWrappers
-#  endif
 } // namespace LinearAlgebra
 #endif
 

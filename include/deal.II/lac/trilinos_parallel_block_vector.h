@@ -24,46 +24,19 @@
 #  include <deal.II/lac/block_vector_base.h>
 #  include <deal.II/lac/exceptions.h>
 #  include <deal.II/lac/trilinos_tpetra_block_vector.h>
+#  include <deal.II/lac/trilinos_tpetra_to_trilinos_wrappers.h>
 #  include <deal.II/lac/trilinos_vector.h>
 
 #  include <functional>
 
 DEAL_II_NAMESPACE_OPEN
 
-#  ifdef DEAL_II_TRILINOS_WITH_TPETRA
-namespace TrilinosWrappers::MPI
-{
-  using BlockVector =
-    ::dealii::LinearAlgebra::TpetraWrappers::BlockVector<double,
-                                                         MemorySpace::Host>;
-}
-#  else
+#  ifndef DEAL_II_TRILINOS_WITH_TPETRA
 
 // forward declaration
 #    ifndef DOXYGEN
 template <typename Number>
 class BlockVectorBase;
-
-namespace TrilinosWrappers
-{
-  // forward declaration
-  namespace MPI
-  {
-#      ifdef DEAL_II_TRILINOS_WITH_TPETRA
-    using BlockVector =
-      ::dealii::LinearAlgebra::TpetraWrappers::BlockVector<double,
-                                                           MemorySpace::Host>;
-#      else
-    class BlockVector;
-#      endif
-  } // namespace MPI
-#      ifdef DEAL_II_TRILINOS_WITH_TPETRA
-  using BlockSparseMatrix = ::dealii::LinearAlgebra::TpetraWrappers::
-    BlockSparseMatrix<double, MemorySpace::Host>;
-#      else
-  class BlockSparseMatrix;
-#      endif
-} // namespace TrilinosWrappers
 #    endif
 
 /**

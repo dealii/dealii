@@ -22,6 +22,7 @@
 
 #include <deal.II/lac/block_indices.h>
 #include <deal.II/lac/block_vector_base.h>
+#include <deal.II/lac/trilinos_tpetra_to_trilinos_wrappers.h>
 #include <deal.II/lac/vector_operation.h>
 #include <deal.II/lac/vector_type_traits.h>
 
@@ -29,27 +30,6 @@
 #include <vector>
 
 DEAL_II_NAMESPACE_OPEN
-
-
-// Forward declaration
-#ifndef DOXYGEN
-#  ifdef DEAL_II_WITH_TRILINOS
-namespace TrilinosWrappers
-{
-  namespace MPI
-  {
-#    ifdef DEAL_II_TRILINOS_WITH_TPETRA
-    using BlockVector =
-      ::dealii::LinearAlgebra::TpetraWrappers::BlockVector<double,
-                                                           MemorySpace::Host>;
-#    else
-    class BlockVector;
-#    endif
-  } // namespace MPI
-} // namespace TrilinosWrappers
-#  endif
-#endif
-
 
 /**
  * @addtogroup Vectors

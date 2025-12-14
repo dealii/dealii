@@ -65,11 +65,7 @@ class DynamicSparsityPattern;
 
 namespace TrilinosWrappers
 {
-#      ifdef DEAL_II_TRILINOS_WITH_TPETRA
-  using SparseMatrix =
-    ::dealii::LinearAlgebra::TpetraWrappers::SparseMatrix<double,
-                                                          MemorySpace::Host>;
-#      else
+#      ifndef DEAL_II_TRILINOS_WITH_TPETRA
   class SparseMatrix;
   class SparsityPattern;
 

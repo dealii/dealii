@@ -185,7 +185,7 @@ namespace LinearAlgebra
         /**
          * Declare type for container size.
          */
-        using size_type = types::global_dof_index;
+        using size_type = types::signed_global_dof_index;
 
         /**
          * Constructor. Create an iterator into the matrix @p matrix for the
@@ -1093,15 +1093,13 @@ namespace LinearAlgebra
         // If at end of line: do one step, then cycle until we find a row with a
         // nonzero number of entries that is stored locally.
         if (accessor.a_index >=
-            static_cast<dealii::types::signed_global_dof_index>(
-              accessor.colnum_cache->size()))
+              accessor.colnum_cache->size())
           {
             accessor.a_index = 0;
             ++accessor.a_row;
 
             while (accessor.a_row <
-                   static_cast<dealii::types::signed_global_dof_index>(
-                     accessor.sparsity_pattern->n_rows()))
+                     accessor.sparsity_pattern->n_rows())
               {
                 const auto row_length =
                   accessor.sparsity_pattern->row_length(accessor.a_row);

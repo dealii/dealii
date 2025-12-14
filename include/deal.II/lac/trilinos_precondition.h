@@ -21,45 +21,8 @@
 #ifdef DEAL_II_TRILINOS_WITH_TPETRA
 
 #  include <deal.II/lac/trilinos_tpetra_precondition.h>
+#  include <deal.II/lac/trilinos_tpetra_to_trilinos_wrappers.h>
 
-DEAL_II_NAMESPACE_OPEN
-namespace TrilinosWrappers
-{
-  using PreconditionBase = ::dealii::LinearAlgebra::TpetraWrappers::
-    PreconditionBase<double, MemorySpace::Host>;
-  using PreconditionIdentity = ::dealii::LinearAlgebra::TpetraWrappers::
-    PreconditionIdentity<double, MemorySpace::Host>;
-  using PreconditionIfpackBase = ::dealii::LinearAlgebra::TpetraWrappers::
-    PreconditionIfpackBase<double, MemorySpace::Host>;
-  using PreconditionIfpack = ::dealii::LinearAlgebra::TpetraWrappers::
-    PreconditionIfpack<double, MemorySpace::Host>;
-  using PreconditionJacobi = ::dealii::LinearAlgebra::TpetraWrappers::
-    PreconditionJacobi<double, MemorySpace::Host>;
-  using PreconditionL1Jacobi = ::dealii::LinearAlgebra::TpetraWrappers::
-    PreconditionL1Jacobi<double, MemorySpace::Host>;
-  using PreconditionL1GaussSeidel = ::dealii::LinearAlgebra::TpetraWrappers::
-    PreconditionL1GaussSeidel<double, MemorySpace::Host>;
-  using PreconditionSOR =
-    ::dealii::LinearAlgebra::TpetraWrappers::PreconditionSOR<double,
-                                                             MemorySpace::Host>;
-  using PreconditionSSOR = ::dealii::LinearAlgebra::TpetraWrappers::
-    PreconditionSSOR<double, MemorySpace::Host>;
-  using PreconditionChebyshev = ::dealii::LinearAlgebra::TpetraWrappers::
-    PreconditionChebyshev<double, MemorySpace::Host>;
-  using PreconditionILU =
-    ::dealii::LinearAlgebra::TpetraWrappers::PreconditionILU<double,
-                                                             MemorySpace::Host>;
-  using PreconditionILUT = ::dealii::LinearAlgebra::TpetraWrappers::
-    PreconditionILUT<double, MemorySpace::Host>;
-  using PreconditionBlockJacobi = ::dealii::LinearAlgebra::TpetraWrappers::
-    PreconditionBlockJacobi<double, MemorySpace::Host>;
-  using PreconditionBlockSOR = ::dealii::LinearAlgebra::TpetraWrappers::
-    PreconditionBlockSOR<double, MemorySpace::Host>;
-  using PreconditionBlockSSOR = ::dealii::LinearAlgebra::TpetraWrappers::
-    PreconditionBlockSSOR<double, MemorySpace::Host>;
-} // namespace TrilinosWrappers
-
-DEAL_II_NAMESPACE_CLOSE
 #else
 
 #  ifdef DEAL_II_WITH_TRILINOS
