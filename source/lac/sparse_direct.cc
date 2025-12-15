@@ -13,7 +13,6 @@
 // ------------------------------------------------------------------------
 
 
-#include "deal.II/base/exception_macros.h"
 #include <deal.II/base/memory_consumption.h>
 #include <deal.II/base/numbers.h>
 
@@ -1375,18 +1374,15 @@ SparseDirectMUMPS::vmult(VectorType &dst, const VectorType &src) const
       const IndexSet &locally_owned = dst.locally_owned_elements();
       const size_type local_size    = locally_owned.n_elements();
 
-      std::vector<double> local_values(local_size);
-
       const unsigned int my_rank =
         Utilities::MPI::this_mpi_process(mpi_communicator);
 
-      int my_size_int  = local_size;
-      int my_start_int = locally_owned.nth_index_in_set(0);
-
-      std::vector<int> sizes =
-        Utilities::MPI::gather(mpi_communicator, my_size_int, 0);
-      std::vector<int> displs =
-        Utilities::MPI::gather(mpi_communicator, my_start_int, 0);
+      const std::vector<size_type> sizes =
+        Utilities::MPI::gather(mpi_communicator, local_size, 0);
+      const std::vector<types::global_dof_index> displs =
+        Utilities::MPI::gather(mpi_communicator,
+                               locally_owned.nth_index_in_set(0),
+                               0);
 
       // create a vector of vectors to send the local parts to each process
       std::vector<std::vector<double>> objects_to_send;
@@ -1398,13 +1394,14 @@ SparseDirectMUMPS::vmult(VectorType &dst, const VectorType &src) const
           for (unsigned int proc = 0; proc < n_procs; ++proc)
             {
               objects_to_send[proc].resize(sizes[proc]);
-              for (int i = 0; i < sizes[proc]; ++i)
+              for (types::global_dof_index i = 0; i < sizes[proc]; ++i)
                 objects_to_send[proc][i] = rhs[displs[proc] + i];
             }
         }
 
+
       // distribute the solution from rank 0 to other processes
-      local_values =
+      const std::vector<double> local_values =
         Utilities::MPI::scatter(mpi_communicator, objects_to_send, 0);
 
       // Set local values in dst vector

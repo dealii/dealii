@@ -469,7 +469,10 @@ private:
  *
  * There are instantiations of this class for SparseMatrix<double>,
  * SparseMatrix<float>, BlockSparseMatrix<double>, and
- * BlockSparseMatrix<float>.
+ * BlockSparseMatrix<float>. This class supports several vector types for use
+ * with vmult() and Tvmult(), including Vector<double>, BlockVector<double>,
+ * TrilinosWrappers::MPI::Vector, PETScWrappers::MPI::Vector, and
+ * LinearAlgebra::distributed::Vector<double>.
  *
  * @ingroup Solvers Preconditioners
  */
