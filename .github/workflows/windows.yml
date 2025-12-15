@@ -70,12 +70,12 @@ jobs:
     - name: upload library
       # run only if a PR is merged into master
       if: ${{ github.ref == 'refs/heads/master' && matrix.os == 'windows-2025' }}
-      uses: actions/upload-artifact@v5
+      uses: actions/upload-artifact@v6
       with:
         name: dealii-${{ matrix.os }}
         path: c:/project
     - name: upload CMakeConfigureLog
-      uses: actions/upload-artifact@v5
+      uses: actions/upload-artifact@v6
       if: always()
       continue-on-error: true
       with:
