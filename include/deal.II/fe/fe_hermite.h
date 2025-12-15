@@ -108,7 +108,7 @@ public:
 
   // Other functions
   /**
-   * Returns <code>FE_Hermite<dim,spacedim>(fe_degree)</code> as a
+   * Return <code>FE_Hermite<dim,spacedim>(fe_degree)</code> as a
    * <code>std::string</code> with @p dim, @p spacedim and @p fe_degree
    * replaced with the correct values.
    */
@@ -156,12 +156,40 @@ public:
                          const unsigned int codim) const override;
 
   /**
-   * Returns the mapping between lexicographic and hierarchic numbering
+   * Return the mapping between lexicographic and hierarchic numbering
    * schemes for Hermite. See the class documentation for diagrams of
    * examples of lexicographic numbering for Hermite elements.
    */
   std::vector<unsigned int>
   get_lexicographic_to_hierarchic_numbering() const;
+
+  /**
+   * Return a table of local DoF indices on a cell, which correspond to the
+   * DoFs linked to non-zero values of a specified order of the derivative.
+   *
+   * The purpose of this function is to help with the imposition of boundary
+   * conditions given the special structure of the Hermite basis: Not all
+   * shape functions associated with the vertices of a face are actually
+   * contributing to a certain kind of boundary conditions, say Dirichlet
+   * conditions: Only the value degrees of freedom (as seen in the direction
+   * normal to the face) of the polynomial basis in that node should be
+   * constrained to zero, whereas the derivative degrees of freedom should be
+   * left unconstrained. Similarly, one can impose Neumann boundary conditions
+   * by constraining solely the normal derivative degrees of freedom on the
+   * face.
+   *
+   * The table will provide one row for each of the `2 * dim` faces of a cell,
+   * and each row contains a list of degrees of freedom in the local numbering
+   * of cell degrees of freedom subject to the given `derivative_order` on the
+   * particular face. In some sense, this function is an extension of the
+   * generic FiniteElement::face_to_cell_index(), with the difference that a
+   * complete list of unknowns is returned and that the selection is
+   * restricted to only those degrees of freedom representing the derivative
+   * order specified as input argument.
+   */
+  Table<2, unsigned int>
+  get_dofs_corresponding_to_outward_normal_derivatives(
+    const unsigned int derivative_order) const;
 
   /**
    * This re-implements FiniteElement::fill_fe_values() for a Hermite
@@ -249,8 +277,6 @@ protected:
     return data_ptr;
   }
 
-
-
 private:
   /**
    * Variable storing the order of the highest derivative that the current
@@ -261,11 +287,9 @@ private:
    */
   unsigned int regularity;
 
-
-
 public:
   /**
-   * Returns the regularity of the Hermite FE basis.
+   * Return the regularity of the Hermite FE basis.
    */
   inline unsigned int
   get_regularity() const
