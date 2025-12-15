@@ -1,0 +1,4 @@
+Add: Add support for LinearAlgebra::distributed::Vector to the SparseDirectMUMPS
+class.
+<br>
+(Marco Feder, 2025/12/14)
