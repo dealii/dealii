@@ -1075,7 +1075,9 @@ namespace internal
 
                   ++n_unique_entities;
                   n_unique_entity_vertices +=
-                    cell_types[ad_entity_types[offset_i]]->n_entities(0);
+                    cell_types[ad_entity_types[offset_i]]
+                      ->get_reference_cell()
+                      .n_vertices();
 
                   new_key = ad_compatibility[offset_i];
                 }
