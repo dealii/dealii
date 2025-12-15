@@ -706,6 +706,17 @@ public:
   }
 
   /**
+   * Return the nearest integer not greater than x.
+   */
+  VectorizedArray
+  get_floor() const
+  {
+    VectorizedArray res;
+    res.data = std::floor(data);
+    return res;
+  }
+
+  /**
    * Actual data field. To be consistent with the standard layout type and to
    * enable interaction with external SIMD functionality, this member is
    * declared public.
@@ -1226,6 +1237,17 @@ public:
   }
 
   /**
+   * Return the nearest integer not greater than x.
+   */
+  VectorizedArray
+  get_floor() const
+  {
+    VectorizedArray res;
+    res.data = vrndmq_f64(data);
+    return res;
+  }
+
+  /**
    * Actual data field. To be consistent with the standard layout type and to
    * enable interaction with external SIMD functionality, this member is
    * declared public.
@@ -1497,6 +1519,18 @@ public:
   sum() const
   {
     return vaddvq_f32(data);
+  }
+
+
+  /**
+   * Return the nearest integer not greater than x.
+   */
+  VectorizedArray
+  get_floor() const
+  {
+    VectorizedArray res;
+    res.data = vrndmq_f32(data);
+    return res;
   }
 
   /**
@@ -1825,6 +1859,18 @@ public:
     __m128d t1 = _mm_unpackhi_pd(data, data);
     __m128d t2 = _mm_add_pd(data, t1);
     return _mm_cvtsd_f64(t2);
+  }
+
+  /**
+   * Return the nearest integer not greater than x.
+   */
+  VectorizedArray
+  get_floor() const
+  {
+    VectorizedArray res;
+    for (std::size_t i = 0; i < 2; ++i)
+      res.data[i] = std::floor(data[i]);
+    return res;
   }
 
   /**
@@ -2300,6 +2346,18 @@ public:
     __m128 t3 = _mm_shuffle_ps(t2, t2, 1);
     __m128 t4 = _mm_add_ss(t2, t3);
     return _mm_cvtss_f32(t4);
+  }
+
+  /**
+   * Return the nearest integer not greater than x.
+   */
+  VectorizedArray
+  get_floor() const
+  {
+    VectorizedArray res;
+    for (std::size_t i = 0; i < 4; ++i)
+      res.data[i] = std::floor(data[i]);
+    return res;
   }
 
   /**
@@ -2848,6 +2906,17 @@ public:
     VectorizedArray<double, 2> t1;
     t1.data = _mm_add_pd(this->get_lower(), this->get_upper());
     return t1.sum();
+  }
+
+  /**
+   * Return the nearest integer not greater than x.
+   */
+  VectorizedArray
+  get_floor() const
+  {
+    VectorizedArray res;
+    res.data = _mm256_floor_pd(data);
+    return res;
   }
 
   /**
@@ -3418,6 +3487,17 @@ public:
     VectorizedArray<float, 4> t1;
     t1.data = _mm_add_ps(this->get_lower(), this->get_upper());
     return t1.sum();
+  }
+
+  /**
+   * Return the nearest integer not greater than x.
+   */
+  VectorizedArray
+  get_floor() const
+  {
+    VectorizedArray res;
+    res.data = _mm256_floor_ps(data);
+    return res;
   }
 
   /**
@@ -4058,6 +4138,17 @@ public:
   }
 
   /**
+   * Return the nearest integer not greater than x.
+   */
+  VectorizedArray
+  get_floor() const
+  {
+    VectorizedArray res;
+    res.data = _mm512_roundscale_pd(data, _MM_FROUND_TO_NEG_INF);
+    return res;
+  }
+
+  /**
    * Actual data field. To be consistent with the standard layout type and to
    * enable interaction with external SIMD functionality, this member is
    * declared public.
@@ -4679,6 +4770,18 @@ public:
   }
 
   /**
+   * Return the nearest integer not greater than x.
+   */
+  DEAL_II_ALWAYS_INLINE
+  VectorizedArray
+  get_floor() const
+  {
+    VectorizedArray res;
+    res.data = _mm512_roundscale_ps(data, _MM_FROUND_TO_NEG_INF);
+    return res;
+  }
+
+  /**
    * Actual data field. To be consistent with the standard layout type and to
    * enable interaction with external SIMD functionality, this member is
    * declared public.
@@ -4801,17 +4904,10 @@ vectorized_load_and_transpose(const unsigned int          n_entries,
   // shuffles on 4 numbers rather than 16.
   const unsigned int n_chunks = n_entries / 4;
 
-  // To avoid warnings about uninitialized variables, need to initialize one
-  // variable to a pre-existing value in out, which will never get used in
-  // the end. Keep the initialization outside the loop because of a bug in
-  // gcc-9.1 which generates a "vmovapd" instruction instead of "vmovupd" in
-  // case t3 is initialized to zero (inside/outside of loop), see
-  // https://gcc.gnu.org/bugzilla/show_bug.cgi?id=90991
-  __m512 t0, t1, t2, t3;
-  if (n_chunks > 0)
-    t3 = out[0].data;
   for (unsigned int i = 0; i < n_chunks; ++i)
     {
+      __m512 t0, t1, t2, t3 = {};
+
       t0 = _mm512_insertf32x4(t3, _mm_loadu_ps(in + offsets[0] + 4 * i), 0);
       t0 = _mm512_insertf32x4(t0, _mm_loadu_ps(in + offsets[4] + 4 * i), 1);
       t0 = _mm512_insertf32x4(t0, _mm_loadu_ps(in + offsets[8] + 4 * i), 2);
@@ -4860,11 +4956,10 @@ vectorized_load_and_transpose(const unsigned int             n_entries,
 
   const unsigned int n_chunks = n_entries / 4;
 
-  __m512 t0, t1, t2, t3;
-  if (n_chunks > 0)
-    t3 = out[0].data;
   for (unsigned int i = 0; i < n_chunks; ++i)
     {
+      __m512 t0, t1, t2, t3 = {};
+
       t0 = _mm512_insertf32x4(t3, _mm_loadu_ps(in[0] + 4 * i), 0);
       t0 = _mm512_insertf32x4(t0, _mm_loadu_ps(in[4] + 4 * i), 1);
       t0 = _mm512_insertf32x4(t0, _mm_loadu_ps(in[8] + 4 * i), 2);

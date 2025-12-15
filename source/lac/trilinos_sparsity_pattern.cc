@@ -1040,7 +1040,7 @@ namespace TrilinosWrappers
   void
   SparsityPattern::print_gnuplot(std::ostream &out) const
   {
-    Assert(graph->Filled() == true, ExcInternalError());
+    Assert(graph->Filled(), ExcInternalError());
     for (dealii::types::global_dof_index row = 0; row < local_size(); ++row)
       {
         int *indices;

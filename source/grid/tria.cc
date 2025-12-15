@@ -6825,9 +6825,9 @@ namespace internal
                                 array<std::array<unsigned int, 3>, 6>
                                   table = {{{{0, 1, 2}}, // 0
                                             {{1, 0, 2}},
-                                            {{1, 2, 0}}, // 2
+                                            {{2, 0, 1}}, // 2
                                             {{0, 2, 1}},
-                                            {{2, 0, 1}}, // 4
+                                            {{1, 2, 0}}, // 4
                                             {{2, 1, 0}}}};
 
                               const auto combined_orientation =
@@ -12055,6 +12055,7 @@ DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
 Triangulation<dim, spacedim>::Triangulation(
   Triangulation<dim, spacedim> &&tria) noexcept
   : EnableObserverPointer(std::move(tria))
+  , cell_attached_data(std::move(tria.cell_attached_data))
   , smooth_grid(tria.smooth_grid)
   , reference_cells(std::move(tria.reference_cells))
   , periodic_face_pairs_level_0(std::move(tria.periodic_face_pairs_level_0))
@@ -12084,6 +12085,7 @@ Triangulation<dim, spacedim> &Triangulation<dim, spacedim>::operator=(
 {
   EnableObserverPointer::operator=(std::move(tria));
 
+  cell_attached_data           = std::move(tria.cell_attached_data);
   smooth_grid                  = tria.smooth_grid;
   reference_cells              = std::move(tria.reference_cells);
   periodic_face_pairs_level_0  = std::move(tria.periodic_face_pairs_level_0);
@@ -15844,7 +15846,7 @@ void Triangulation<dim, spacedim>::execute_coarsening_and_refinement()
   // some difficulty in the past (see the
   // deal.II/coarsening_* tests)
   if (smooth_grid & limit_level_difference_at_vertices)
-    Assert(satisfies_level1_at_vertex_rule(*this) == true, ExcInternalError());
+    Assert(satisfies_level1_at_vertex_rule(*this), ExcInternalError());
 
   // Inform all listeners about beginning of refinement.
   signals.pre_refinement();

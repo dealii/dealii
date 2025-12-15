@@ -1,0 +1,28 @@
+
+DEAL::Dim: 1. Components: 0. Value: 1.50000
+DEAL::Tested on: 
+DEAL:parameters:Function 1 - 0::Function constants: f=1
+DEAL:parameters:Function 1 - 0::Function expression: f + 0.5
+DEAL:parameters:Function 1 - 0::Variable names: x,t
+DEAL::Dim: 2. Components: 0. Value: 1.50000
+DEAL::Dim: 2. Components: 1. Value: 2.50000
+DEAL::Tested on: 
+DEAL:parameters:Function 2 - 0::Function constants: f=1
+DEAL:parameters:Function 2 - 0::Function expression: f + 0.5
+DEAL:parameters:Function 2 - 0::Variable names: x,y,t
+DEAL:parameters:Function 2 - 1::Function constants: f=2
+DEAL:parameters:Function 2 - 1::Function expression: f + 0.5; f + 0.5
+DEAL:parameters:Function 2 - 1::Variable names: x,y,t
+DEAL::Dim: 3. Components: 0. Value: 1.50000
+DEAL::Dim: 3. Components: 1. Value: 2.50000
+DEAL::Dim: 3. Components: 2. Value: 3.50000
+DEAL::Tested on: 
+DEAL:parameters:Function 3 - 0::Function constants: f=1
+DEAL:parameters:Function 3 - 0::Function expression: f + 0.5
+DEAL:parameters:Function 3 - 0::Variable names: x,y,z,t
+DEAL:parameters:Function 3 - 1::Function constants: f=2
+DEAL:parameters:Function 3 - 1::Function expression: f + 0.5; f + 0.5
+DEAL:parameters:Function 3 - 1::Variable names: x,y,z,t
+DEAL:parameters:Function 3 - 2::Function constants: f=3
+DEAL:parameters:Function 3 - 2::Function expression: f + 0.5; f + 0.5; f + 0.5
+DEAL:parameters:Function 3 - 2::Variable names: x,y,z,t

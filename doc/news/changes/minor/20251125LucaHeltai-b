@@ -1,0 +1,3 @@
+New: The function VTKWrappers::read_cell_data() allows to read cell data contained in a VTK file using the VTK library.
+<br>
+(Luca Heltai, 2025/11/25)

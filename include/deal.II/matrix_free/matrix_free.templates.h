@@ -2168,9 +2168,8 @@ MatrixFree<dim, Number, VectorizedArrayType>::initialize_indices(
       }
 
     is_non_buffering_sm_supported =
-      Utilities::MPI::min(static_cast<unsigned int>(
-                            is_non_buffering_sm_supported),
-                          task_info.communicator);
+      Utilities::MPI::logical_and(is_non_buffering_sm_supported,
+                                  task_info.communicator);
 
     const MPI_Comm communicator_sm = this->task_info.communicator_sm;
 

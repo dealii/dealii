@@ -112,7 +112,7 @@ namespace mg
 /**
  * An abstract base class for transfer operators between two multigrid levels.
  */
-template <typename VectorType>
+template <int dim, typename VectorType>
 class MGTwoLevelTransferBase : public EnableObserverPointer
 {
 public:
@@ -177,6 +177,13 @@ public:
    */
   virtual std::size_t
   memory_consumption() const = 0;
+
+
+  /**
+   * Return the DoFHandler associated with the fine level and the level index.
+   */
+  virtual std::pair<const DoFHandler<dim> *, unsigned int>
+  get_dof_handler_fine() const = 0;
 };
 
 
@@ -186,8 +193,8 @@ namespace internal
   /**
    * Base class for MGTwoLevelTransferNonNested and MGTwoLevelTransfer.
    */
-  template <typename VectorType>
-  class MGTwoLevelTransferCore : public MGTwoLevelTransferBase<VectorType>
+  template <int dim, typename VectorType>
+  class MGTwoLevelTransferCore : public MGTwoLevelTransferBase<dim, VectorType>
   {
   public:
     /**
@@ -254,7 +261,7 @@ namespace internal
      * Enable inplace vector operations if external and internal vectors
      * are compatible.
      */
-    template <int dim, std::size_t width, typename IndexType>
+    template <std::size_t width, typename IndexType>
     std::pair<bool, bool>
     internal_enable_inplace_operations_if_possible(
       const std::shared_ptr<const Utilities::MPI::Partitioner>
@@ -351,7 +358,8 @@ namespace internal
  * point, and we fall back to the first option in such a case.
  */
 template <int dim, typename VectorType>
-class MGTwoLevelTransfer : public internal::MGTwoLevelTransferCore<VectorType>
+class MGTwoLevelTransfer
+  : public internal::MGTwoLevelTransferCore<dim, VectorType>
 {
 public:
   static_assert(
@@ -447,9 +455,9 @@ public:
    */
   void
   reinit(const MatrixFree<dim, Number> &matrix_free_fine,
-         const unsigned int             dof_no_fine,
+         const unsigned int             dof_handler_index_fine,
          const MatrixFree<dim, Number> &matrix_free_coarse,
-         const unsigned int             dof_no_coarse);
+         const unsigned int             dof_handler_index_coarse);
 
   /**
    * Check if a fast templated version of the polynomial transfer between
@@ -485,6 +493,12 @@ public:
    */
   std::size_t
   memory_consumption() const override;
+
+  /**
+   * Return the DoFHandler associated with the fine level and the level index.
+   */
+  std::pair<const DoFHandler<dim> *, unsigned int>
+  get_dof_handler_fine() const override;
 
 protected:
   void
@@ -663,7 +677,8 @@ private:
  * host.
  */
 template <int dim, typename VectorType>
-class MGTwoLevelTransferCopyToHost : public MGTwoLevelTransferBase<VectorType>
+class MGTwoLevelTransferCopyToHost
+  : public MGTwoLevelTransferBase<dim, VectorType>
 {
 public:
   static_assert(
@@ -708,9 +723,9 @@ public:
    */
   void
   reinit(const MatrixFree<dim, Number> &matrix_free_fine,
-         const unsigned int             dof_no_fine,
+         const unsigned int             dof_handler_index_fine,
          const MatrixFree<dim, Number> &matrix_free_coarse,
-         const unsigned int             dof_no_coarse);
+         const unsigned int             dof_handler_index_coarse);
 
   /**
    * @copydoc MGTwoLevelTransfer::fast_polynomial_transfer_supported
@@ -752,6 +767,12 @@ public:
    */
   std::size_t
   memory_consumption() const override;
+
+  /**
+   * Return the DoFHandler associated with the fine level and the level index.
+   */
+  std::pair<const DoFHandler<dim> *, unsigned int>
+  get_dof_handler_fine() const override;
 
 private:
   /**
@@ -795,7 +816,7 @@ private:
  */
 template <int dim, typename VectorType>
 class MGTwoLevelTransferNonNested
-  : public internal::MGTwoLevelTransferCore<VectorType>
+  : public internal::MGTwoLevelTransferCore<dim, VectorType>
 {
 private:
   static_assert(
@@ -903,6 +924,12 @@ public:
    */
   std::size_t
   memory_consumption() const override;
+
+  /**
+   * Return the DoFHandler associated with the fine level and the level index.
+   */
+  std::pair<const DoFHandler<dim> *, unsigned int>
+  get_dof_handler_fine() const override;
 
   /**
    * Connect a function to mg::SignalsNonNested::prolongation_cell_loop.
@@ -1377,7 +1404,8 @@ private:
   /**
    * Collection of the two-level transfer operators.
    */
-  MGLevelObject<ObserverPointer<MGTwoLevelTransferBase<VectorType>>> transfer;
+  MGLevelObject<ObserverPointer<MGTwoLevelTransferBase<dim, VectorType>>>
+    transfer;
 
   /**
    * External partitioners used during initialize_dof_vector().
@@ -1639,14 +1667,14 @@ template <int dim, typename VectorType>
 void
 MGTwoLevelTransferCopyToHost<dim, VectorType>::reinit(
   const MatrixFree<dim, Number> &matrix_free_fine,
-  const unsigned int             dof_no_fine,
+  const unsigned int             dof_handler_index_fine,
   const MatrixFree<dim, Number> &matrix_free_coarse,
-  const unsigned int             dof_no_coarse)
+  const unsigned int             dof_handler_index_coarse)
 {
   host_transfer.reinit(matrix_free_fine,
-                       dof_no_fine,
+                       dof_handler_index_fine,
                        matrix_free_coarse,
-                       dof_no_coarse);
+                       dof_handler_index_coarse);
 }
 
 
@@ -1736,6 +1764,14 @@ MGTwoLevelTransferCopyToHost<dim, VectorType>::memory_consumption() const
 }
 
 template <int dim, typename VectorType>
+std::pair<const DoFHandler<dim> *, unsigned int>
+MGTwoLevelTransferCopyToHost<dim, VectorType>::get_dof_handler_fine() const
+{
+  return host_transfer.get_dof_handler_fine();
+}
+
+
+template <int dim, typename VectorType>
 void
 MGTwoLevelTransferCopyToHost<dim, VectorType>::copy_to_host(
   VectorTypeHost   &dst,
@@ -1803,8 +1839,8 @@ MGTransferMatrixFree<dim, Number, MemorySpace>::initialize_transfer_references(
 
   // Note that transfer[min_level] is empty and never used:
   for (unsigned int l = min_level + 1; l <= max_level; ++l)
-    this->transfer[l] = &const_cast<MGTwoLevelTransferBase<VectorType> &>(
-      static_cast<const MGTwoLevelTransferBase<VectorType> &>(
+    this->transfer[l] = &const_cast<MGTwoLevelTransferBase<dim, VectorType> &>(
+      static_cast<const MGTwoLevelTransferBase<dim, VectorType> &>(
         Utilities::get_underlying_value(transfer[l])));
 }
 

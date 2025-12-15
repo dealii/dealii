@@ -1,0 +1,6 @@
+Added: FE_Hermite has now a new function
+FE_Hermite::get_dofs_corresponding_to_outward_normal_derivatives() that
+returns those cell unknowns that have a particular derivative index nonzero on
+all faces, which helps with the implementation of boundary conditions.
+<br>
+(Ivy Weber, Martin Kronbichler, 2025/12/11)

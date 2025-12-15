@@ -650,15 +650,14 @@ protected:
    * Constructor. Made protected to prevent users from directly using this
    * class. Takes all data stored in MatrixFree. If applied to problems with
    * more than one finite element or more than one quadrature formula selected
-   * during construction of @p matrix_free, @p dof_no, @p
-   * first_selected_component and @p quad_no allow to select the appropriate
-   * components.
+   * during construction @p dof_handler_index, @p first_selected_component and
+   * @p quadrature_index allow to select the appropriate components.
    */
   FEEvaluationBase(
     const MatrixFree<dim, Number, VectorizedArrayType> &matrix_free,
-    const unsigned int                                  dof_no,
+    const unsigned int                                  dof_handler_index,
     const unsigned int first_selected_component,
-    const unsigned int quad_no,
+    const unsigned int quadrature_index,
     const unsigned int fe_degree,
     const unsigned int n_q_points,
     const bool         is_interior_face,
@@ -1480,15 +1479,15 @@ public:
    *
    * @param matrix_free Data object that contains all data
    *
-   * @param dof_no If matrix_free was set up with multiple DoFHandler
+   * @param dof_handler_index If matrix_free was set up with multiple DoFHandler
    * objects, this parameter selects to which DoFHandler/AffineConstraints pair
    * the given evaluator should be attached to.
    *
-   * @param quad_no If matrix_free was set up with multiple Quadrature
+   * @param quadrature_index If matrix_free was set up with multiple Quadrature
    * objects, this parameter selects the appropriate number of the quadrature
    * formula.
    *
-   * @param first_selected_component If the dof_handler selected by dof_no
+   * @param first_selected_component If the dof_handler selected by dof_handler_index
    * uses an FESystem consisting of more than one component, this parameter
    * allows for selecting the component where the current evaluation routine
    * should start. Note that one evaluator does not support combining
@@ -1508,9 +1507,9 @@ public:
    */
   FEEvaluation(
     const MatrixFree<dim, Number, VectorizedArrayType> &matrix_free,
-    const unsigned int                                  dof_no  = 0,
-    const unsigned int                                  quad_no = 0,
-    const unsigned int first_selected_component                 = 0,
+    const unsigned int                                  dof_handler_index = 0,
+    const unsigned int                                  quadrature_index  = 0,
+    const unsigned int first_selected_component                           = 0,
     const unsigned int active_fe_index   = numbers::invalid_unsigned_int,
     const unsigned int active_quad_index = numbers::invalid_unsigned_int);
 
@@ -1523,9 +1522,9 @@ public:
    */
   FEEvaluation(const MatrixFree<dim, Number, VectorizedArrayType> &matrix_free,
                const std::pair<unsigned int, unsigned int>        &range,
-               const unsigned int                                  dof_no  = 0,
-               const unsigned int                                  quad_no = 0,
-               const unsigned int first_selected_component                 = 0);
+               const unsigned int dof_handler_index        = 0,
+               const unsigned int quadrature_index         = 0,
+               const unsigned int first_selected_component = 0);
 
   /**
    * Constructor that comes with reduced functionality and works similar as
@@ -1959,15 +1958,15 @@ public:
    * as the interior side, so if the outer normal vector to that side is
    * desired, it must be multiplied by -1.
    *
-   * @param dof_no If matrix_free was set up with multiple DoFHandler
+   * @param dof_handler_index If matrix_free was set up with multiple DoFHandler
    * objects, this parameter selects to which DoFHandler/AffineConstraints pair
    * the given evaluator should be attached to.
    *
-   * @param quad_no If matrix_free was set up with multiple Quadrature
+   * @param quadrature_index If matrix_free was set up with multiple Quadrature
    * objects, this parameter selects the appropriate number of the quadrature
    * formula.
    *
-   * @param first_selected_component If the dof_handler selected by dof_no
+   * @param first_selected_component If the dof_handler selected by dof_handler_index
    * uses an FESystem consisting of more than one base element, this parameter
    * selects the number of the base element in FESystem. Note that this does
    * not directly relate to the component of the respective element due to the
@@ -1988,9 +1987,9 @@ public:
   FEFaceEvaluation(
     const MatrixFree<dim, Number, VectorizedArrayType> &matrix_free,
     const bool                                          is_interior_face = true,
-    const unsigned int                                  dof_no           = 0,
-    const unsigned int                                  quad_no          = 0,
-    const unsigned int first_selected_component                          = 0,
+    const unsigned int                                  dof_handler_index = 0,
+    const unsigned int                                  quadrature_index  = 0,
+    const unsigned int first_selected_component                           = 0,
     const unsigned int active_fe_index   = numbers::invalid_unsigned_int,
     const unsigned int active_quad_index = numbers::invalid_unsigned_int,
     const unsigned int face_type         = numbers::invalid_unsigned_int);
@@ -2006,9 +2005,9 @@ public:
     const MatrixFree<dim, Number, VectorizedArrayType> &matrix_free,
     const std::pair<unsigned int, unsigned int>        &range,
     const bool                                          is_interior_face = true,
-    const unsigned int                                  dof_no           = 0,
-    const unsigned int                                  quad_no          = 0,
-    const unsigned int first_selected_component                          = 0);
+    const unsigned int                                  dof_handler_index = 0,
+    const unsigned int                                  quadrature_index  = 0,
+    const unsigned int first_selected_component                           = 0);
 
   /**
    * Initializes the operation pointer to the current face. This method is the
@@ -2299,9 +2298,9 @@ namespace internal
     InitializationData
     extract_initialization_data(
       const MatrixFree<dim, Number, VectorizedArrayType> &matrix_free,
-      const unsigned int                                  dof_no,
+      const unsigned int                                  dof_handler_index,
       const unsigned int first_selected_component,
-      const unsigned int quad_no,
+      const unsigned int quadrature_index,
       const unsigned int fe_degree,
       const unsigned int n_q_points,
       const unsigned int active_fe_index_given,
@@ -2311,11 +2310,11 @@ namespace internal
     typename FEEvaluationData<dim, VectorizedArrayType, is_face>::
       InitializationData init_data;
 
-    init_data.dof_info = &matrix_free.get_dof_info(dof_no);
+    init_data.dof_info = &matrix_free.get_dof_info(dof_handler_index);
     init_data.mapping_data =
       &internal::MatrixFreeFunctions::
         MappingInfoCellsOrFaces<dim, Number, is_face, VectorizedArrayType>::get(
-          matrix_free.get_mapping_info(), quad_no);
+          matrix_free.get_mapping_info(), quadrature_index);
 
     init_data.active_fe_index =
       fe_degree != numbers::invalid_unsigned_int ?
@@ -2337,8 +2336,8 @@ namespace internal
         init_data.mapping_data->quad_index_from_n_q_points(n_q_points);
 
     init_data.shape_info = &matrix_free.get_shape_info(
-      dof_no,
-      quad_no,
+      dof_handler_index,
+      quadrature_index,
       init_data.dof_info->component_to_base_index[first_selected_component],
       init_data.active_fe_index,
       init_data.active_quad_index);
@@ -2369,9 +2368,9 @@ inline FEEvaluationBase<dim,
                         VectorizedArrayType>::
   FEEvaluationBase(
     const MatrixFree<dim, Number, VectorizedArrayType> &matrix_free,
-    const unsigned int                                  dof_no,
+    const unsigned int                                  dof_handler_index,
     const unsigned int first_selected_component,
-    const unsigned int quad_no,
+    const unsigned int quadrature_index,
     const unsigned int fe_degree,
     const unsigned int n_q_points,
     const bool         is_interior_face,
@@ -2380,16 +2379,16 @@ inline FEEvaluationBase<dim,
     const unsigned int face_type)
   : FEEvaluationData<dim, VectorizedArrayType, is_face>(
       internal::extract_initialization_data<is_face>(matrix_free,
-                                                     dof_no,
+                                                     dof_handler_index,
                                                      first_selected_component,
-                                                     quad_no,
+                                                     quadrature_index,
                                                      fe_degree,
                                                      n_q_points,
                                                      active_fe_index,
                                                      active_quad_index,
                                                      face_type),
       is_interior_face,
-      quad_no,
+      quadrature_index,
       first_selected_component)
   , scratch_data_array(matrix_free.acquire_scratch_data())
   , matrix_free(&matrix_free)
@@ -6111,14 +6110,14 @@ inline FEEvaluation<dim,
                     VectorizedArrayType>::
   FEEvaluation(const MatrixFree<dim, Number, VectorizedArrayType> &matrix_free,
                const unsigned int                                  fe_no,
-               const unsigned int                                  quad_no,
+               const unsigned int quadrature_index,
                const unsigned int first_selected_component,
                const unsigned int active_fe_index,
                const unsigned int active_quad_index)
   : BaseClass(matrix_free,
               fe_no,
               first_selected_component,
-              quad_no,
+              quadrature_index,
               fe_degree,
               static_n_q_points,
               true /*note: this is not a face*/,
@@ -6148,14 +6147,14 @@ inline FEEvaluation<dim,
                     VectorizedArrayType>::
   FEEvaluation(const MatrixFree<dim, Number, VectorizedArrayType> &matrix_free,
                const std::pair<unsigned int, unsigned int>        &range,
-               const unsigned int                                  dof_no,
-               const unsigned int                                  quad_no,
+               const unsigned int dof_handler_index,
+               const unsigned int quadrature_index,
                const unsigned int first_selected_component)
   : FEEvaluation(matrix_free,
-                 dof_no,
-                 quad_no,
+                 dof_handler_index,
+                 quadrature_index,
                  first_selected_component,
-                 matrix_free.get_cell_active_fe_index(range, dof_no))
+                 matrix_free.get_cell_active_fe_index(range, dof_handler_index))
 {}
 
 
@@ -6315,10 +6314,10 @@ FEEvaluation<dim,
              n_components_,
              Number,
              VectorizedArrayType>::
-  check_template_arguments(const unsigned int dof_no,
+  check_template_arguments(const unsigned int dof_handler_index,
                            const unsigned int first_selected_component)
 {
-  (void)dof_no;
+  (void)dof_handler_index;
   (void)first_selected_component;
 
   Assert(
@@ -6355,8 +6354,10 @@ FEEvaluation<dim,
           message += ",Number>(data";
           if (first_selected_component != numbers::invalid_unsigned_int)
             {
-              message += ", " + Utilities::int_to_string(dof_no) + ", ";
-              message += Utilities::int_to_string(this->quad_no) + ", ";
+              message +=
+                ", " + Utilities::int_to_string(dof_handler_index) + ", ";
+              message +=
+                Utilities::int_to_string(this->quadrature_index) + ", ";
               message += Utilities::int_to_string(first_selected_component);
             }
           message += ")\n";
@@ -6366,12 +6367,12 @@ FEEvaluation<dim,
           unsigned int proposed_dof_comp  = numbers::invalid_unsigned_int,
                        proposed_fe_comp   = numbers::invalid_unsigned_int,
                        proposed_quad_comp = numbers::invalid_unsigned_int;
-          if (dof_no != numbers::invalid_unsigned_int)
+          if (dof_handler_index != numbers::invalid_unsigned_int)
             {
               if (static_cast<unsigned int>(fe_degree) ==
                   this->data->data.front().fe_degree)
                 {
-                  proposed_dof_comp = dof_no;
+                  proposed_dof_comp = dof_handler_index;
                   proposed_fe_comp  = first_selected_component;
                 }
               else
@@ -6393,7 +6394,7 @@ FEEvaluation<dim,
               if (n_q_points ==
                   this->mapping_data->descriptor[this->active_quad_index]
                     .n_q_points)
-                proposed_quad_comp = this->quad_no;
+                proposed_quad_comp = this->quadrature_index;
               else
                 for (unsigned int no = 0;
                      no <
@@ -6420,7 +6421,7 @@ FEEvaluation<dim,
               message += Utilities::int_to_string(n_q_points_1d);
               message += "," + Utilities::int_to_string(n_components);
               message += ",Number>(data";
-              if (dof_no != numbers::invalid_unsigned_int)
+              if (dof_handler_index != numbers::invalid_unsigned_int)
                 {
                   message +=
                     ", " + Utilities::int_to_string(proposed_dof_comp) + ", ";
@@ -6430,11 +6431,11 @@ FEEvaluation<dim,
                 }
               message += ")?\n";
               std::string correct_pos;
-              if (proposed_dof_comp != dof_no)
+              if (proposed_dof_comp != dof_handler_index)
                 correct_pos = " ^ ";
               else
                 correct_pos = "   ";
-              if (proposed_quad_comp != this->quad_no)
+              if (proposed_quad_comp != this->quadrature_index)
                 correct_pos += " ^ ";
               else
                 correct_pos += "   ";
@@ -6457,10 +6458,11 @@ FEEvaluation<dim,
           message += Utilities::int_to_string(proposed_n_q_points_1d);
           message += "," + Utilities::int_to_string(n_components);
           message += ",Number>(data";
-          if (dof_no != numbers::invalid_unsigned_int)
+          if (dof_handler_index != numbers::invalid_unsigned_int)
             {
-              message += ", " + Utilities::int_to_string(dof_no) + ", ";
-              message += Utilities::int_to_string(this->quad_no);
+              message +=
+                ", " + Utilities::int_to_string(dof_handler_index) + ", ";
+              message += Utilities::int_to_string(this->quadrature_index);
               message +=
                 ", " + Utilities::int_to_string(first_selected_component);
             }
@@ -6482,7 +6484,7 @@ FEEvaluation<dim,
                    n_q_points == this->n_quadrature_points,
                  ExcMessage(message));
         }
-      if (dof_no != numbers::invalid_unsigned_int)
+      if (dof_handler_index != numbers::invalid_unsigned_int)
         AssertDimension(
           n_q_points,
           this->mapping_data->descriptor[this->active_quad_index].n_q_points);
@@ -7280,16 +7282,16 @@ inline FEFaceEvaluation<dim,
   FEFaceEvaluation(
     const MatrixFree<dim, Number, VectorizedArrayType> &matrix_free,
     const bool                                          is_interior_face,
-    const unsigned int                                  dof_no,
-    const unsigned int                                  quad_no,
+    const unsigned int                                  dof_handler_index,
+    const unsigned int                                  quadrature_index,
     const unsigned int first_selected_component,
     const unsigned int active_fe_index,
     const unsigned int active_quad_index,
     const unsigned int face_type)
   : BaseClass(matrix_free,
-              dof_no,
+              dof_handler_index,
               first_selected_component,
-              quad_no,
+              quadrature_index,
               fe_degree,
               static_n_q_points,
               is_interior_face,
@@ -7319,13 +7321,13 @@ inline FEFaceEvaluation<dim,
     const MatrixFree<dim, Number, VectorizedArrayType> &matrix_free,
     const std::pair<unsigned int, unsigned int>        &range,
     const bool                                          is_interior_face,
-    const unsigned int                                  dof_no,
-    const unsigned int                                  quad_no,
+    const unsigned int                                  dof_handler_index,
+    const unsigned int                                  quadrature_index,
     const unsigned int first_selected_component)
   : FEFaceEvaluation(matrix_free,
                      is_interior_face,
-                     dof_no,
-                     quad_no,
+                     dof_handler_index,
+                     quadrature_index,
                      first_selected_component,
                      matrix_free.get_face_active_fe_index(range,
                                                           is_interior_face),
@@ -7437,7 +7439,7 @@ FEFaceEvaluation<dim,
                                               const unsigned int face_number)
 {
   Assert(
-    this->quad_no <
+    this->quadrature_index <
       this->matrix_free->get_mapping_info().face_data_by_cells.size(),
     ExcMessage(
       "You must set MatrixFree::AdditionalData::mapping_update_flags_faces_by_cells to use the present reinit method."));
@@ -7553,25 +7555,25 @@ FEFaceEvaluation<dim,
 
   const unsigned int offsets =
     this->matrix_free->get_mapping_info()
-      .face_data_by_cells[this->quad_no]
+      .face_data_by_cells[this->quadrature_index]
       .data_index_offsets[cell_index * GeometryInfo<dim>::faces_per_cell +
                           face_number];
   AssertIndexRange(offsets,
                    this->matrix_free->get_mapping_info()
-                     .face_data_by_cells[this->quad_no]
+                     .face_data_by_cells[this->quadrature_index]
                      .JxW_values.size());
   this->J_value = &this->matrix_free->get_mapping_info()
-                     .face_data_by_cells[this->quad_no]
+                     .face_data_by_cells[this->quadrature_index]
                      .JxW_values[offsets];
   this->normal_vectors = &this->matrix_free->get_mapping_info()
-                            .face_data_by_cells[this->quad_no]
+                            .face_data_by_cells[this->quadrature_index]
                             .normal_vectors[offsets];
   this->jacobian = &this->matrix_free->get_mapping_info()
-                      .face_data_by_cells[this->quad_no]
+                      .face_data_by_cells[this->quadrature_index]
                       .jacobians[!this->is_interior_face()][offsets];
   this->normal_x_jacobian =
     &this->matrix_free->get_mapping_info()
-       .face_data_by_cells[this->quad_no]
+       .face_data_by_cells[this->quadrature_index]
        .normals_times_jacobians[!this->is_interior_face()][offsets];
   this->jacobian_gradients =
     this->mapping_data->jacobian_gradients[!this->is_interior_face()].data() +
@@ -7583,20 +7585,20 @@ FEFaceEvaluation<dim,
     offsets;
 
   if (this->matrix_free->get_mapping_info()
-        .face_data_by_cells[this->quad_no]
+        .face_data_by_cells[this->quadrature_index]
         .quadrature_point_offsets.empty() == false)
     {
       const unsigned int index =
         this->cell * GeometryInfo<dim>::faces_per_cell + this->face_numbers[0];
       AssertIndexRange(index,
                        this->matrix_free->get_mapping_info()
-                         .face_data_by_cells[this->quad_no]
+                         .face_data_by_cells[this->quadrature_index]
                          .quadrature_point_offsets.size());
       this->quadrature_points = this->matrix_free->get_mapping_info()
-                                  .face_data_by_cells[this->quad_no]
+                                  .face_data_by_cells[this->quadrature_index]
                                   .quadrature_points.data() +
                                 this->matrix_free->get_mapping_info()
-                                  .face_data_by_cells[this->quad_no]
+                                  .face_data_by_cells[this->quadrature_index]
                                   .quadrature_point_offsets[index];
     }
 

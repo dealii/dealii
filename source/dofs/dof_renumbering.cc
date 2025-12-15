@@ -679,8 +679,8 @@ namespace DoFRenumbering
 
     // If we don't have a renumbering (i.e., when there is 1 component) then
     // return
-    if (Utilities::MPI::max(renumbering.size(),
-                            dof_handler.get_mpi_communicator()) == 0)
+    if (Utilities::MPI::logical_and(renumbering.size() == 0,
+                                    dof_handler.get_mpi_communicator()))
       return;
 
     // verify that the last numbered
@@ -725,8 +725,8 @@ namespace DoFRenumbering
 
     // If we don't have a renumbering (i.e., when there is 1 component) then
     // return
-    if (Utilities::MPI::max(renumbering.size(),
-                            dof_handler.get_mpi_communicator()) == 0)
+    if (Utilities::MPI::logical_and(renumbering.size() == 0,
+                                    dof_handler.get_mpi_communicator()))
       return;
 
     // verify that the last numbered
@@ -1055,9 +1055,13 @@ namespace DoFRenumbering
     Assert(result == 0 || result == dof_handler.n_dofs(level),
            ExcInternalError());
 
-    if (Utilities::MPI::max(renumbering.size(),
-                            dof_handler.get_mpi_communicator()) > 0)
-      dof_handler.renumber_dofs(level, renumbering);
+    // If we don't have a renumbering (i.e., when there is 1 component) then
+    // return
+    if (Utilities::MPI::logical_and(renumbering.size() == 0,
+                                    dof_handler.get_mpi_communicator()))
+      return;
+
+    dof_handler.renumber_dofs(level, renumbering);
   }
 
 
@@ -2262,11 +2266,13 @@ namespace DoFRenumbering
       dof_handler.n_locally_owned_dofs(), numbers::invalid_dof_index);
     compute_support_point_wise(renumbering, dof_handler);
 
-    // If there is only one component then there is nothing to do, so check
-    // first:
-    if (Utilities::MPI::max(renumbering.size(),
-                            dof_handler.get_mpi_communicator()) > 0)
-      dof_handler.renumber_dofs(renumbering);
+    // If we don't have a renumbering (i.e., when there is 1 component) then
+    // return
+    if (Utilities::MPI::logical_and(renumbering.size() == 0,
+                                    dof_handler.get_mpi_communicator()))
+      return;
+
+    dof_handler.renumber_dofs(renumbering);
   }
 
 

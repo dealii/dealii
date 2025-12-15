@@ -86,8 +86,8 @@ MGLevelGlobalTransfer<VectorType>::fill_and_communicate_copy_indices(
         dynamic_cast<const parallel::TriangulationBase<dim, spacedim> *>(
           &mg_dof.get_triangulation()))
     perform_plain_copy =
-      (Utilities::MPI::min(my_perform_plain_copy ? 1 : 0,
-                           ptria->get_mpi_communicator()) == 1);
+      Utilities::MPI::logical_and(my_perform_plain_copy,
+                                  ptria->get_mpi_communicator());
   else
     perform_plain_copy = my_perform_plain_copy;
 }
@@ -298,7 +298,7 @@ MGLevelGlobalTransfer<LinearAlgebra::distributed::Vector<Number, MemorySpace>>::
   // global and level dof indices, we must also fill the solution indices
   // which contain additional indices, otherwise they can re-use the
   // indices of the standard transfer.
-  int have_refinement_edge_dofs = 0;
+  bool have_refinement_edge_dofs = false;
   if (mg_constrained_dofs != nullptr)
     for (unsigned int level = 0;
          level < mg_dof.get_triangulation().n_global_levels();
@@ -306,10 +306,10 @@ MGLevelGlobalTransfer<LinearAlgebra::distributed::Vector<Number, MemorySpace>>::
       if (mg_constrained_dofs->get_refinement_edge_indices(level).n_elements() >
           0)
         {
-          have_refinement_edge_dofs = 1;
+          have_refinement_edge_dofs = true;
           break;
         }
-  if (Utilities::MPI::max(have_refinement_edge_dofs, mpi_communicator) == 1)
+  if (Utilities::MPI::logical_or(have_refinement_edge_dofs, mpi_communicator))
     {
       // note: variables not needed
       std::vector<Table<2, unsigned int>> solution_copy_indices_global_mine;
@@ -363,11 +363,10 @@ MGLevelGlobalTransfer<LinearAlgebra::distributed::Vector<Number, MemorySpace>>::
   // now do a global reduction over all processors to see what operation
   // they can agree upon
   perform_plain_copy =
-    Utilities::MPI::min(static_cast<int>(my_perform_plain_copy),
-                        mpi_communicator);
+    Utilities::MPI::logical_and(my_perform_plain_copy, mpi_communicator);
   perform_renumbered_plain_copy =
-    Utilities::MPI::min(static_cast<int>(my_perform_renumbered_plain_copy),
-                        mpi_communicator);
+    Utilities::MPI::logical_and(my_perform_renumbered_plain_copy,
+                                mpi_communicator);
 
   // if we do a plain copy, no need to hold additional ghosted vectors
   if (perform_renumbered_plain_copy)

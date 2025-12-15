@@ -59,7 +59,9 @@ check(std::ostream &out)
 
   std::vector<std::string> filenames = names;
 
-  DataOutX x;
+  DataOutX              x;
+  DataOutBase::VtkFlags vtk_flags(0., 0);
+  x.set_flags(vtk_flags);
   x.write_pvtu_record(out, filenames);
 }
 

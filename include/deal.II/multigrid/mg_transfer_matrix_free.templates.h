@@ -1419,9 +1419,8 @@ namespace internal
               }
           });
 
-        return Utilities::MPI::min(static_cast<unsigned int>(flag),
-                                   dof_handler_fine.get_mpi_communicator()) ==
-               1;
+        return Utilities::MPI::logical_and(
+          flag, dof_handler_fine.get_mpi_communicator());
       }
     else
       {
@@ -2010,6 +2009,37 @@ namespace internal
         transfer.partitioner_fine = transfer.constraint_info_fine.finalize(
           dof_handler_fine.get_mpi_communicator());
         transfer.vec_fine.reinit(transfer.partitioner_fine);
+
+        if constexpr (running_in_debug_mode())
+          {
+            // We would like to assert that no strange indices were added in
+            // the transfer. Unfortunately, we can only do this if we're
+            // working with the multigrid indices within the DoFHandler, not
+            // when the transfer comes from different DoFHandler object, as
+            // the latter might have unrelated parallel partitions.
+            if (mg_level_fine != numbers::invalid_unsigned_int)
+              {
+                Utilities::MPI::Partitioner part_check(
+                  dof_handler_fine.locally_owned_mg_dofs(mg_level_fine),
+                  DoFTools::extract_locally_relevant_level_dofs(
+                    dof_handler_fine, mg_level_fine),
+                  dof_handler_fine.get_mpi_communicator());
+                Assert(transfer.partitioner_fine->ghost_indices().is_subset_of(
+                         part_check.ghost_indices()),
+                       ExcMessage(
+                         "The setup of ghost indices failed, because the set "
+                         "of ghost indices identified for the transfer is "
+                         "not a subset of the locally relevant dofs on level " +
+                         std::to_string(mg_level_fine) + " with " +
+                         std::to_string(
+                           dof_handler_fine.n_dofs(mg_level_fine)) +
+                         " dofs in total, which means we do not understand "
+                         "the indices that were collected. This is very "
+                         "likely a bug in deal.II, and could e.g. be caused "
+                         "by some integer type narrowing between 64 bit and "
+                         "32 bit integers."));
+              }
+          }
       }
 
 
@@ -2743,16 +2773,16 @@ namespace internal
 
 
 
-  template <typename VectorType>
-  MGTwoLevelTransferCore<VectorType>::MGTwoLevelTransferCore()
+  template <int dim, typename VectorType>
+  MGTwoLevelTransferCore<dim, VectorType>::MGTwoLevelTransferCore()
     : vec_fine_needs_ghost_update(true)
   {}
 
 
 
-  template <typename VectorType>
+  template <int dim, typename VectorType>
   void
-  MGTwoLevelTransferCore<VectorType>::prolongate_and_add(
+  MGTwoLevelTransferCore<dim, VectorType>::prolongate_and_add(
     VectorType       &dst,
     const VectorType &src) const
   {
@@ -2839,9 +2869,9 @@ namespace internal
 
 
 
-  template <typename VectorType>
+  template <int dim, typename VectorType>
   void
-  MGTwoLevelTransferCore<VectorType>::restrict_and_add(
+  MGTwoLevelTransferCore<dim, VectorType>::restrict_and_add(
     VectorType       &dst,
     const VectorType &src) const
   {
@@ -3490,15 +3520,13 @@ namespace internal
         partitioner->locally_owned_range())
       return false;
 
-    const int ghosts_locally_contained =
-      ((external_partitioner->ghost_indices() & partitioner->ghost_indices()) ==
-       partitioner->ghost_indices()) ?
-        1 :
-        0;
+    const bool ghosts_locally_contained =
+      (external_partitioner->ghost_indices() & partitioner->ghost_indices()) ==
+      partitioner->ghost_indices();
 
     // check if ghost values are contained in external partititioner
-    return Utilities::MPI::min(ghosts_locally_contained,
-                               partitioner->get_mpi_communicator()) == 1;
+    return Utilities::MPI::logical_and(ghosts_locally_contained,
+                                       partitioner->get_mpi_communicator());
   }
 
   inline std::shared_ptr<Utilities::MPI::Partitioner>
@@ -3519,10 +3547,10 @@ namespace internal
 
 
 
-  template <typename VectorType>
-  template <int dim, std::size_t width, typename IndexType>
+  template <int dim, typename VectorType>
+  template <std::size_t width, typename IndexType>
   std::pair<bool, bool>
-  MGTwoLevelTransferCore<VectorType>::
+  MGTwoLevelTransferCore<dim, VectorType>::
     internal_enable_inplace_operations_if_possible(
       const std::shared_ptr<const Utilities::MPI::Partitioner>
         &external_partitioner_coarse,
@@ -3720,8 +3748,7 @@ MGTwoLevelTransfer<dim, VectorType>::reinit(
         all_cells_found &= (owning_ranks[i] != numbers::invalid_unsigned_int);
 
       do_polynomial_transfer =
-        Utilities::MPI::min(static_cast<unsigned int>(all_cells_found),
-                            communicator) == 1;
+        Utilities::MPI::logical_and(all_cells_found, communicator);
     }
 
   if (do_polynomial_transfer)
@@ -3750,24 +3777,24 @@ template <int dim, typename VectorType>
 void
 MGTwoLevelTransfer<dim, VectorType>::reinit(
   const MatrixFree<dim, Number> &matrix_free_fine,
-  const unsigned int             dof_no_fine,
+  const unsigned int             dof_handler_index_fine,
   const MatrixFree<dim, Number> &matrix_free_coarse,
-  const unsigned int             dof_no_coarse)
+  const unsigned int             dof_handler_index_coarse)
 {
   matrix_free_data = std::make_unique<MatrixFreeRelatedData>();
 
   MatrixFreeRelatedData &data = *matrix_free_data;
   data.matrix_free_fine       = &matrix_free_fine;
   data.matrix_free_coarse     = &matrix_free_coarse;
-  AssertIndexRange(dof_no_fine, matrix_free_fine.n_components());
-  data.dof_handler_index_fine = dof_no_fine;
-  AssertIndexRange(dof_no_coarse, matrix_free_coarse.n_components());
-  data.dof_handler_index_coarse = dof_no_coarse;
+  AssertIndexRange(dof_handler_index_fine, matrix_free_fine.n_components());
+  data.dof_handler_index_fine = dof_handler_index_fine;
+  AssertIndexRange(dof_handler_index_coarse, matrix_free_coarse.n_components());
+  data.dof_handler_index_coarse = dof_handler_index_coarse;
 
   const DoFHandler<dim> &dof_fine =
-    matrix_free_fine.get_dof_handler(dof_no_fine);
+    matrix_free_fine.get_dof_handler(dof_handler_index_fine);
   const DoFHandler<dim> &dof_coarse =
-    matrix_free_coarse.get_dof_handler(dof_no_coarse);
+    matrix_free_coarse.get_dof_handler(dof_handler_index_coarse);
 
   Assert(&dof_fine.get_triangulation() == &dof_coarse.get_triangulation(),
          ExcMessage("You can only use this class if both MatrixFree objects "
@@ -3826,10 +3853,11 @@ MGTwoLevelTransfer<dim, VectorType>::reinit(
   if (fe_fine.dofs_per_vertex > 0)
     {
       VectorType weight_vector;
-      matrix_free_fine.initialize_dof_vector(weight_vector, dof_no_fine);
+      matrix_free_fine.initialize_dof_vector(weight_vector,
+                                             dof_handler_index_fine);
 
       internal::FEEvaluationNoConstraints<dim, Number> evaluator(
-        matrix_free_fine, dof_no_fine);
+        matrix_free_fine, dof_handler_index_fine);
       for (unsigned int cell = 0; cell < matrix_free_fine.n_cell_batches();
            ++cell)
         {
@@ -3845,7 +3873,7 @@ MGTwoLevelTransfer<dim, VectorType>::reinit(
           weight_vector.local_element(i) =
             Number(1.) / weight_vector.local_element(i);
       for (const unsigned int index :
-           matrix_free_fine.get_constrained_dofs(dof_no_fine))
+           matrix_free_fine.get_constrained_dofs(dof_handler_index_fine))
         weight_vector.local_element(index) = 0;
       weight_vector.update_ghost_values();
 
@@ -3894,9 +3922,10 @@ MGTwoLevelTransfer<dim, VectorType>::reinit(
   // We internally call the ghost updates through the matrix-free framework
   this->vec_fine_needs_ghost_update = false;
 
-  this->partitioner_fine = matrix_free_fine.get_vector_partitioner(dof_no_fine);
+  this->partitioner_fine =
+    matrix_free_fine.get_vector_partitioner(dof_handler_index_fine);
   this->partitioner_coarse =
-    matrix_free_coarse.get_vector_partitioner(dof_no_coarse);
+    matrix_free_coarse.get_vector_partitioner(dof_handler_index_coarse);
 }
 
 
@@ -3945,11 +3974,21 @@ MGTwoLevelTransfer<dim, VectorType>::memory_consumption() const
 }
 
 
+
+template <int dim, typename VectorType>
+std::pair<const DoFHandler<dim> *, unsigned int>
+MGTwoLevelTransfer<dim, VectorType>::get_dof_handler_fine() const
+{
+  return {this->dof_handler_fine, this->mg_level_fine};
+}
+
+
+
 namespace internal
 {
-  template <typename VectorType>
+  template <int dim, typename VectorType>
   void
-  MGTwoLevelTransferCore<VectorType>::update_ghost_values(
+  MGTwoLevelTransferCore<dim, VectorType>::update_ghost_values(
     const VectorType &vec) const
   {
     if ((vec.get_partitioner().get() == this->partitioner_coarse.get()) &&
@@ -3968,9 +4007,9 @@ namespace internal
 
 
 
-  template <typename VectorType>
+  template <int dim, typename VectorType>
   void
-  MGTwoLevelTransferCore<VectorType>::compress(
+  MGTwoLevelTransferCore<dim, VectorType>::compress(
     VectorType                   &vec,
     const VectorOperation::values op) const
   {
@@ -3992,9 +4031,9 @@ namespace internal
 
 
 
-  template <typename VectorType>
+  template <int dim, typename VectorType>
   void
-  MGTwoLevelTransferCore<VectorType>::zero_out_ghost_values(
+  MGTwoLevelTransferCore<dim, VectorType>::zero_out_ghost_values(
     const VectorType &vec) const
   {
     if ((vec.get_partitioner().get() == this->partitioner_coarse.get()) &&
@@ -4083,41 +4122,14 @@ MGTransferMatrixFree<dim, Number, MemorySpace>::get_dof_handler_fine() const
     // single level: the information cannot be retrieved
     return {nullptr, numbers::invalid_unsigned_int};
 
-  if (const auto t = dynamic_cast<const MGTwoLevelTransfer<
+  if (const auto t = dynamic_cast<const MGTwoLevelTransferBase<
         dim,
         LinearAlgebra::distributed::Vector<Number, MemorySpace>> *>(
         this->transfer[this->transfer.max_level()].get()))
     {
-      return {t->dof_handler_fine, t->mg_level_fine};
+      return t->get_dof_handler_fine();
     }
 
-
-  if constexpr (std::is_same_v<MemorySpace, ::dealii::MemorySpace::Host>)
-    {
-      // MGTwoLevelTransferNonNested transfer is only instantiated for Host
-      // memory:
-      if (const auto t = dynamic_cast<const MGTwoLevelTransferNonNested<
-            dim,
-            LinearAlgebra::distributed::Vector<Number, MemorySpace>> *>(
-            this->transfer[this->transfer.max_level()].get()))
-        {
-          return {t->dof_handler_fine, t->mg_level_fine};
-        }
-    }
-
-  if constexpr (std::is_same_v<MemorySpace, ::dealii::MemorySpace::Default>)
-    {
-      // MGTwoLevelTransferCopyToHost should only be instantiated on device
-      // memory:
-      if (const auto t = dynamic_cast<const MGTwoLevelTransferCopyToHost<
-            dim,
-            LinearAlgebra::distributed::Vector<Number, MemorySpace>> *>(
-            this->transfer[this->transfer.max_level()].get()))
-        {
-          return {(t->host_transfer).dof_handler_fine,
-                  (t->host_transfer).mg_level_fine};
-        }
-    }
   {
     DEAL_II_NOT_IMPLEMENTED();
     return {nullptr, numbers::invalid_unsigned_int};
@@ -4204,9 +4216,17 @@ MGTransferMatrixFree<dim, Number, MemorySpace>::
 
       for (unsigned int i = 0; i < dof_indices_in.size(); ++i)
         if (is_out.is_element(dof_indices_out[i]))
-          this->copy_indices[0](1,
-                                is_out.index_within_set(dof_indices_out[i])) =
-            is_in.index_within_set(dof_indices_in[i]);
+          {
+            Assert(is_in.index_within_set(dof_indices_in[i]) <
+                     static_cast<types::global_dof_index>(
+                       std::numeric_limits<unsigned int>::max()),
+                   ExcMessage("Index overflow: This class supports at most "
+                              "2^32-1 locally owned DoFs."));
+            this->copy_indices[0](1,
+                                  is_out.index_within_set(dof_indices_out[i])) =
+              static_cast<unsigned int>(
+                is_in.index_within_set(dof_indices_in[i]));
+          }
     });
 
 
@@ -5629,6 +5649,15 @@ MGTwoLevelTransferNonNested<dim, VectorType>::memory_consumption() const
   // TODO: add consumption for rpe, mapping_info and constraint_info.
 
   return size;
+}
+
+
+
+template <int dim, typename VectorType>
+std::pair<const DoFHandler<dim> *, unsigned int>
+MGTwoLevelTransferNonNested<dim, VectorType>::get_dof_handler_fine() const
+{
+  return {this->dof_handler_fine, this->mg_level_fine};
 }
 
 

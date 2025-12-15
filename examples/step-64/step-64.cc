@@ -73,11 +73,9 @@ namespace Step64
                const unsigned int                                      q) const;
 
     // Since Portable::MatrixFree::Data doesn't know about the size of its
-    // arrays, we need to store the number of quadrature points and the
-    // number of degrees of freedom in this class to do necessary index
-    // conversions.
-    static const unsigned int n_local_dofs = Utilities::pow(fe_degree + 1, dim);
-    static const unsigned int n_q_points   = Utilities::pow(fe_degree + 1, dim);
+    // arrays, we need to store the number of quadrature points in this class
+    // to be able to do necessary index conversions.
+    static const unsigned int n_q_points = Utilities::pow(fe_degree + 1, dim);
 
   private:
     double *coef;
@@ -95,7 +93,7 @@ namespace Step64
     const unsigned int                                      cell,
     const unsigned int                                      q) const
   {
-    const unsigned int pos = gpu_data->local_q_point_id(cell, n_q_points, q);
+    const unsigned int pos     = gpu_data->local_q_point_id(cell, q);
     const Point<dim>   q_point = gpu_data->get_quadrature_point(cell, q);
 
     double p_square = 0.;
@@ -135,8 +133,6 @@ namespace Step64
     static const unsigned int n_q_points =
       dealii::Utilities::pow(fe_degree + 1, dim);
 
-    static const unsigned int n_local_dofs = n_q_points;
-
   private:
     double *coef;
   };
@@ -158,9 +154,8 @@ namespace Step64
     const typename Portable::MatrixFree<dim, double>::Data *data =
       fe_eval->get_matrix_free_data();
 
-    const unsigned int position =
-      data->local_q_point_id(cell_index, n_q_points, q_point);
-    auto coeff = coef[position];
+    const unsigned int position = data->local_q_point_id(cell_index, q_point);
+    auto               coeff    = coef[position];
 
     auto value = fe_eval->get_value(q_point);
 
@@ -179,10 +174,8 @@ namespace Step64
   {
   public:
     // Again, the Portable::MatrixFree object doesn't know about the number
-    // of degrees of freedom and the number of quadrature points so we need
-    // to store these for index calculations in the call operator.
-    static constexpr unsigned int n_local_dofs =
-      Utilities::pow(fe_degree + 1, dim);
+    // of quadrature points so we need to store these for index calculations
+    // in the call operator.
     static constexpr unsigned int n_q_points =
       Utilities::pow(fe_degree + 1, dim);
 
@@ -215,8 +208,11 @@ namespace Step64
       data);
     fe_eval.read_dof_values(src);
     fe_eval.evaluate(EvaluationFlags::values | EvaluationFlags::gradients);
-    fe_eval.apply_for_each_quad_point(
-      HelmholtzOperatorQuad<dim, fe_degree>(coef));
+
+    HelmholtzOperatorQuad<dim, fe_degree> quad(coef);
+    data->for_each_quad_point(
+      [&](const int &q_point) { quad(&fe_eval, q_point); });
+
     fe_eval.integrate(EvaluationFlags::values | EvaluationFlags::gradients);
     fe_eval.distribute_local_to_global(dst);
   }
@@ -607,6 +603,7 @@ namespace Step64
     additional_data.smoothing_range     = 15.;
     additional_data.degree              = 5;
     additional_data.eig_cg_n_iterations = 10;
+    additional_data.constraints.copy_from(constraints);
     additional_data.preconditioner =
       system_matrix_dev->get_matrix_diagonal_inverse();
 

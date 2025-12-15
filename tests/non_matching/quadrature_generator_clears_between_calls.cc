@@ -22,7 +22,7 @@
 
 #include <deal.II/hp/q_collection.h>
 
-#include "deal.II/non_matching/quadrature_generator.h"
+#include <deal.II/non_matching/quadrature_generator.h>
 
 #include "../tests.h"
 

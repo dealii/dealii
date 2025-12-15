@@ -1130,7 +1130,7 @@ namespace FETools
      * individual shape functions that do not depend on whether the
      * composed element uses the tensor product or combination
      * strategy outlined in the documentation of the
-     * FETools::Composition namespace. Consequently, this function
+     * FETools::Compositing namespace. Consequently, this function
      * does not have a @p do_tensor_product argument.
      */
     template <int dim, int spacedim>
@@ -1162,7 +1162,7 @@ namespace FETools
      * individual shape functions that do not depend on whether the
      * composed element uses the tensor product or combination
      * strategy outlined in the documentation of the
-     * FETools::Composition namespace. Consequently, this function
+     * FETools::Compositing namespace. Consequently, this function
      * does not have a @p do_tensor_product argument.
      *
      * @deprecated Use the versions of this function that take a

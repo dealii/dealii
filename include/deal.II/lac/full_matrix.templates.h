@@ -122,13 +122,9 @@ FullMatrix<number>::all_zero() const
 {
   Assert(!this->empty(), ExcEmptyMatrix());
 
-  const number       *p = this->values.data();
-  const number *const e = this->values.data() + this->n_elements();
-  while (p != e)
-    if (*p++ != number(0.0))
-      return false;
-
-  return true;
+  return std::all_of(this->values.begin(),
+                     this->values.end(),
+                     numbers::value_is_zero<number>);
 }
 
 
@@ -430,6 +426,21 @@ FullMatrix<number>::swap_col(const size_type i, const size_type j)
 
   for (size_type k = 0; k < m(); ++k)
     std::swap((*this)(k, i), (*this)(k, j));
+}
+
+
+template <typename number>
+void
+FullMatrix<number>::permute(const std::vector<unsigned int> &row_perm,
+                            const std::vector<unsigned int> &col_perm)
+{
+  AssertDimension(row_perm.size(), this->m());
+  AssertDimension(col_perm.size(), this->n());
+
+  FullMatrix<number> tmp = *this; // copy current matrix
+  for (unsigned int i = 0; i < this->m(); ++i)
+    for (unsigned int j = 0; j < this->n(); ++j)
+      (*this)(row_perm[i], col_perm[j]) = tmp(i, j);
 }
 
 

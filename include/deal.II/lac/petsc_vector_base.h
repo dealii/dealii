@@ -851,6 +851,30 @@ namespace PETScWrappers
      */
     void
     determine_ghost_indices();
+
+    /**
+     * The ghost elements of the vector. Valid when
+     * acquire_ghost_form() has been called.
+     */
+    Vec ghost_vector;
+
+    /**
+     * The locally stored elements of the vector. Valid when
+     * acquire_ghost_form() has been called.
+     */
+    const PetscScalar *ghost_vector_array;
+
+    /**
+     * Acquire the ghost form of the vector.
+     */
+    void
+    acquire_ghost_form();
+
+    /**
+     * Release the ghost form of the vector.
+     */
+    void
+    release_ghost_form();
   };
 
 
@@ -1228,20 +1252,17 @@ namespace PETScWrappers
         // ghost elements whose
         // position we can get from
         // an index set
+
+        Assert(ghost_vector != nullptr && ghost_vector_array != nullptr,
+               ExcInternalError(
+                 "Ghost elements are not acquired for the vector."));
+
         PetscInt       begin, end;
         PetscErrorCode ierr = VecGetOwnershipRange(vector, &begin, &end);
         AssertThrow(ierr == 0, ExcPETScError(ierr));
 
-        Vec locally_stored_elements = nullptr;
-        ierr = VecGhostGetLocalForm(vector, &locally_stored_elements);
-        AssertThrow(ierr == 0, ExcPETScError(ierr));
-
         PetscInt lsize;
-        ierr = VecGetSize(locally_stored_elements, &lsize);
-        AssertThrow(ierr == 0, ExcPETScError(ierr));
-
-        const PetscScalar *ptr;
-        ierr = VecGetArrayRead(locally_stored_elements, &ptr);
+        ierr = VecGetSize(ghost_vector, &lsize);
         AssertThrow(ierr == 0, ExcPETScError(ierr));
 
         auto input  = indices_begin;
@@ -1253,7 +1274,7 @@ namespace PETScWrappers
             if (index >= begin && index < end)
               {
                 // local entry
-                *output = *(ptr + index - begin);
+                *output = *(ghost_vector_array + index - begin);
               }
             else
               {
@@ -1261,18 +1282,12 @@ namespace PETScWrappers
                 const auto ghost_index = ghost_indices.index_within_set(*input);
 
                 AssertIndexRange(ghost_index + end - begin, lsize);
-                *output = *(ptr + ghost_index + end - begin);
+                *output = *(ghost_vector_array + ghost_index + end - begin);
               }
 
             ++input;
             ++output;
           }
-
-        ierr = VecRestoreArrayRead(locally_stored_elements, &ptr);
-        AssertThrow(ierr == 0, ExcPETScError(ierr));
-
-        ierr = VecGhostRestoreLocalForm(vector, &locally_stored_elements);
-        AssertThrow(ierr == 0, ExcPETScError(ierr));
       }
     // if the vector is local or the
     // caller, then simply access the

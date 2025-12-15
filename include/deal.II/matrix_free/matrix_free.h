@@ -482,19 +482,23 @@ public:
 
     /**
      * This data structure allows to assign a fraction of cells to different
-     * categories when building the information for vectorization. It is used
+     * categories when building batches of cells for vectorizatios. It is used
      * implicitly when working with hp-adaptivity (with each active index
      * being a category) but can also be useful in other contexts where one
-     * would like to control which cells together can form a batch of cells.
+     * would like to control which cells can be placed into the same batch.
      * Such an example is "local time stepping", where cells of different
      * categories progress with different time-step sizes and, as a
-     * consequence, can only processed together with cells with the same
+     * consequence, can only be processed together with cells with the same
      * category.
      *
-     * This array is accessed by the number given by cell->active_cell_index()
-     * when working on the active cells (with
-     * @p mg_level set to numbers::invalid_unsigned_int) and by cell->index()
-     * for the level cells.
+     * This array works by assigned each active cell, accessed by the number
+     * given by cell->active_cell_index() when working on the active cells
+     * (with @p mg_level set to numbers::invalid_unsigned_int) and by
+     * cell->index() for the level cells, an integer number. Cells given the
+     * same number are eligible to be placed in the same batch, with the
+     * possibility to merge cells of a lower number with the next higher
+     * categories according to the variable
+     * @p cell_vectorization_categories_strict.
      *
      * @note This field is empty upon construction of AdditionalData. It is
      * the responsibility of the user to resize this field to
@@ -505,12 +509,12 @@ public:
 
     /**
      * By default, the different categories in @p cell_vectorization_category
-     * can be mixed and the algorithm is allowed to merge lower categories with
-     * the next higher categories if it is necessary inside the algorithm. This
-     * gives a better utilization of the vectorization but might need special
-     * treatment, in particular for face integrals. If set to @p true, the
-     * algorithm will instead keep different categories separate and not mix
-     * them in a single vectorized array.
+     * can be mixed and the algorithm is allowed to merge lower categories
+     * with the next higher categories if it is necessary to avoid only
+     * partially filled batches. This gives a better utilization of the
+     * vectorization but might need special treatment, in particular for face
+     * integrals. If set to @p true, the algorithm will instead keep different
+     * categories separate and not mix them in a single vectorized array.
      */
     bool cell_vectorization_categories_strict;
 
@@ -1679,10 +1683,24 @@ public:
    * accessed in matrix-vector products and result in too much data sent
    * around which impacts the performance.
    */
-  template <typename Number2>
+  template <typename Number2, typename MemorySpace>
   void
-  initialize_dof_vector(LinearAlgebra::distributed::Vector<Number2> &vec,
-                        const unsigned int dof_handler_index = 0) const;
+  initialize_dof_vector(
+    LinearAlgebra::distributed::Vector<Number2, MemorySpace> &vec,
+    const unsigned int dof_handler_index = 0) const;
+
+  /**
+   * Specialization of the method initialize_dof_vector() for the class
+   * LinearAlgebra::distributed::BlockVector@<Number@>.
+   *
+   * This function initializes a block vector with one block for every
+   * DoFHandler passed to reinit().
+   *
+   */
+  template <typename Number2, typename MemorySpace>
+  void
+  initialize_dof_vector(
+    LinearAlgebra::distributed::BlockVector<Number2, MemorySpace> &vec) const;
 
   /**
    * Return the partitioner that represents the locally owned data and the
@@ -2417,14 +2435,29 @@ MatrixFree<dim, Number, VectorizedArrayType>::initialize_dof_vector(
 
 
 template <int dim, typename Number, typename VectorizedArrayType>
-template <typename Number2>
+template <typename Number2, typename MemorySpace>
 inline void
 MatrixFree<dim, Number, VectorizedArrayType>::initialize_dof_vector(
-  LinearAlgebra::distributed::Vector<Number2> &vec,
-  const unsigned int                           comp) const
+  LinearAlgebra::distributed::Vector<Number2, MemorySpace> &vec,
+  const unsigned int                                        comp) const
 {
   AssertIndexRange(comp, n_components());
   vec.reinit(dof_info[comp].vector_partitioner, task_info.communicator_sm);
+}
+
+
+
+template <int dim, typename Number, typename VectorizedArrayType>
+template <typename Number2, typename MemorySpace>
+inline void
+MatrixFree<dim, Number, VectorizedArrayType>::initialize_dof_vector(
+  LinearAlgebra::distributed::BlockVector<Number2, MemorySpace> &vec) const
+{
+  vec.reinit(n_components());
+  for (unsigned int c = 0; c < n_components(); ++c)
+    this->initialize_dof_vector(vec.block(c), c);
+
+  vec.collect_sizes();
 }
 
 
@@ -2464,11 +2497,11 @@ MatrixFree<dim, Number, VectorizedArrayType>::n_components() const
 template <int dim, typename Number, typename VectorizedArrayType>
 inline unsigned int
 MatrixFree<dim, Number, VectorizedArrayType>::n_base_elements(
-  const unsigned int dof_no) const
+  const unsigned int dof_handler_index) const
 {
   AssertDimension(dof_handlers.size(), dof_info.size());
-  AssertIndexRange(dof_no, dof_handlers.size());
-  return dof_handlers[dof_no]->get_fe().n_base_elements();
+  AssertIndexRange(dof_handler_index, dof_handlers.size());
+  return dof_handlers[dof_handler_index]->get_fe().n_base_elements();
 }
 
 
@@ -2697,15 +2730,16 @@ MatrixFree<dim, Number, VectorizedArrayType>::get_cell_active_fe_index(
   const std::pair<unsigned int, unsigned int> range,
   const unsigned int                          dof_handler_index) const
 {
-  const unsigned int dof_no =
+  const unsigned int dof_handler_index_local =
     dof_handler_index == numbers::invalid_unsigned_int ?
       first_hp_dof_handler_index :
       dof_handler_index;
 
-  const auto &fe_indices = dof_info[dof_no].cell_active_fe_index;
+  const auto &fe_indices =
+    dof_info[dof_handler_index_local].cell_active_fe_index;
 
   if (fe_indices.empty() == true ||
-      dof_handlers[dof_no]->get_fe_collection().size() == 1)
+      dof_handlers[dof_handler_index_local]->get_fe_collection().size() == 1)
     return 0;
 
   const auto index = fe_indices[range.first];
@@ -2725,12 +2759,13 @@ MatrixFree<dim, Number, VectorizedArrayType>::get_face_active_fe_index(
   const bool                                  is_interior_face,
   const unsigned int                          dof_handler_index) const
 {
-  const unsigned int dof_no =
+  const unsigned int dof_handler_index_local =
     dof_handler_index == numbers::invalid_unsigned_int ?
       first_hp_dof_handler_index :
       dof_handler_index;
 
-  const auto &fe_indices = dof_info[dof_no].cell_active_fe_index;
+  const auto &fe_indices =
+    dof_info[dof_handler_index_local].cell_active_fe_index;
 
   if (fe_indices.empty() == true)
     return 0;
@@ -2984,17 +3019,19 @@ MatrixFree<dim, Number, VectorizedArrayType>::get_cell_category(
 {
   AssertIndexRange(0, dof_info.size());
 
-  const unsigned int dof_no =
+  const unsigned int dof_handler_index_local =
     dof_handler_index == numbers::invalid_unsigned_int ?
       first_hp_dof_handler_index :
       dof_handler_index;
 
-  AssertIndexRange(cell_batch_index,
-                   dof_info[dof_no].cell_active_fe_index.size());
-  if (dof_info[dof_no].cell_active_fe_index.empty())
+  AssertIndexRange(
+    cell_batch_index,
+    dof_info[dof_handler_index_local].cell_active_fe_index.size());
+  if (dof_info[dof_handler_index_local].cell_active_fe_index.empty())
     return 0;
   else
-    return dof_info[dof_no].cell_active_fe_index[cell_batch_index];
+    return dof_info[dof_handler_index_local]
+      .cell_active_fe_index[cell_batch_index];
 }
 
 
@@ -3005,13 +3042,13 @@ MatrixFree<dim, Number, VectorizedArrayType>::get_face_category(
   const unsigned int face_batch_index,
   const unsigned int dof_handler_index) const
 {
-  const unsigned int dof_no =
+  const unsigned int dof_handler_index_local =
     dof_handler_index == numbers::invalid_unsigned_int ?
       first_hp_dof_handler_index :
       dof_handler_index;
 
   AssertIndexRange(face_batch_index, face_info.faces.size());
-  if (dof_info[dof_no].cell_active_fe_index.empty())
+  if (dof_info[dof_handler_index_local].cell_active_fe_index.empty())
     return std::make_pair(0U, 0U);
 
   std::pair<unsigned int, unsigned int> result = std::make_pair(0U, 0U);
@@ -3020,11 +3057,11 @@ MatrixFree<dim, Number, VectorizedArrayType>::get_face_category(
        face_info.faces[face_batch_index].cells_interior[v] !=
          numbers::invalid_unsigned_int;
        ++v)
-    result.first = std::max(
-      result.first,
-      dof_info[dof_no].cell_active_fe_index[face_info.faces[face_batch_index]
-                                              .cells_interior[v] /
-                                            VectorizedArrayType::size()]);
+    result.first =
+      std::max(result.first,
+               dof_info[dof_handler_index_local].cell_active_fe_index
+                 [face_info.faces[face_batch_index].cells_interior[v] /
+                  VectorizedArrayType::size()]);
   if (face_info.faces[face_batch_index].cells_exterior[0] !=
       numbers::invalid_unsigned_int)
     for (unsigned int v = 0;
@@ -3032,11 +3069,11 @@ MatrixFree<dim, Number, VectorizedArrayType>::get_face_category(
          face_info.faces[face_batch_index].cells_exterior[v] !=
            numbers::invalid_unsigned_int;
          ++v)
-      result.second = std::max(
-        result.second,
-        dof_info[dof_no].cell_active_fe_index[face_info.faces[face_batch_index]
-                                                .cells_exterior[v] /
-                                              VectorizedArrayType::size()]);
+      result.second =
+        std::max(result.second,
+                 dof_info[dof_handler_index_local].cell_active_fe_index
+                   [face_info.faces[face_batch_index].cells_exterior[v] /
+                    VectorizedArrayType::size()]);
   else
     result.second = numbers::invalid_unsigned_int;
   return result;

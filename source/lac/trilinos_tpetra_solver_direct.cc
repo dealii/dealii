@@ -12,7 +12,7 @@
 //
 // ------------------------------------------------------------------------
 
-#include "deal.II/lac/trilinos_tpetra_solver_direct.templates.h"
+#include <deal.II/lac/trilinos_tpetra_solver_direct.templates.h>
 
 #ifdef DEAL_II_TRILINOS_WITH_TPETRA
 #  ifdef DEAL_II_TRILINOS_WITH_AMESOS2

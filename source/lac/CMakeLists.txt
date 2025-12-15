@@ -25,6 +25,7 @@ set(_unity_include_src
   la_parallel_vector.cc
   la_parallel_block_vector.cc
   matrix_out.cc
+  matrix_scaling.cc
   precondition_block.cc
   precondition_block_ez.cc
   relaxation_block.cc
@@ -66,6 +67,7 @@ set(_inst
   lapack_full_matrix.inst.in
   la_parallel_vector.inst.in
   la_parallel_block_vector.inst.in
+  matrix_scaling.inst.in
   precondition_block.inst.in
   petsc_communication_pattern.inst.in
   relaxation_block.inst.in
@@ -176,6 +178,12 @@ if(DEAL_II_WITH_SCALAPACK)
   )
 endif()
 
+if(DEAL_II_WITH_PSBLAS)
+  set(_unity_include_src
+    ${_unity_include_src}
+    psblas_vector.cc
+  )
+endif()
 
 # determined by profiling
 set(_n_includes_per_unity_file 20)

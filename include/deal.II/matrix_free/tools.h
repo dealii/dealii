@@ -79,7 +79,7 @@ namespace MatrixFreeTools
    * @p matrix_free and the local cell integral operation @p cell_operation. The
    * vector is initialized to the right size in the function.
    *
-   * The parameters @p dof_no, @p quad_no, and @p first_selected_component are
+   * The parameters @p dof_handler_index, @p quadrature_index, and @p first_selected_component are
    * passed to the constructor of the FEEvaluation that is internally set up.
    *
    * The parameter @p first_vector_component is used to select the right
@@ -103,8 +103,8 @@ namespace MatrixFreeTools
                                           Number,
                                           VectorizedArrayType> &)>
                       &cell_operation,
-    const unsigned int dof_no                   = 0,
-    const unsigned int quad_no                  = 0,
+    const unsigned int dof_handler_index        = 0,
+    const unsigned int quadrature_index         = 0,
     const unsigned int first_selected_component = 0,
     const unsigned int first_vector_component   = 0);
 
@@ -125,10 +125,10 @@ namespace MatrixFreeTools
     const QuadOperation                                     &quad_operation,
     EvaluationFlags::EvaluationFlags                         evaluation_flags,
     EvaluationFlags::EvaluationFlags                         integration_flags,
-    const unsigned int                                       dof_no  = 0,
-    const unsigned int                                       quad_no = 0,
-    const unsigned int first_selected_component                      = 0,
-    const unsigned int first_vector_component                        = 0);
+    const unsigned int dof_handler_index        = 0,
+    const unsigned int quadrature_index         = 0,
+    const unsigned int first_selected_component = 0,
+    const unsigned int first_vector_component   = 0);
 
   /**
    * Same as above but with a class and a function pointer.
@@ -152,8 +152,8 @@ namespace MatrixFreeTools
                                                Number,
                                                VectorizedArrayType> &) const,
     const CLASS       *owning_class,
-    const unsigned int dof_no                   = 0,
-    const unsigned int quad_no                  = 0,
+    const unsigned int dof_handler_index        = 0,
+    const unsigned int quadrature_index         = 0,
     const unsigned int first_selected_component = 0,
     const unsigned int first_vector_component   = 0);
 
@@ -166,7 +166,7 @@ namespace MatrixFreeTools
    * integral operation @p boundary_operation. The
    * vector is initialized to the right size in the function.
    *
-   * The parameters @p dof_no, @p quad_no, and @p first_selected_component are
+   * The parameters @p dof_handler_index, @p quadrature_index, and @p first_selected_component are
    * passed to the constructor of the FEEvaluation that is internally set up.
    */
   template <int dim,
@@ -207,8 +207,8 @@ namespace MatrixFreeTools
                                               Number,
                                               VectorizedArrayType> &)>
                       &boundary_operation,
-    const unsigned int dof_no                   = 0,
-    const unsigned int quad_no                  = 0,
+    const unsigned int dof_handler_index        = 0,
+    const unsigned int quadrature_index         = 0,
     const unsigned int first_selected_component = 0,
     const unsigned int first_vector_component   = 0);
 
@@ -256,8 +256,8 @@ namespace MatrixFreeTools
                                                        VectorizedArrayType> &)
       const,
     const CLASS       *owning_class,
-    const unsigned int dof_no                   = 0,
-    const unsigned int quad_no                  = 0,
+    const unsigned int dof_handler_index        = 0,
+    const unsigned int quadrature_index         = 0,
     const unsigned int first_selected_component = 0,
     const unsigned int first_vector_component   = 0);
 
@@ -268,7 +268,7 @@ namespace MatrixFreeTools
    * @p matrix_free and the local cell integral operation @p cell_operation.
    * Constrained entries on the diagonal are set to one.
    *
-   * The parameters @p dof_no, @p quad_no, and @p first_selected_component are
+   * The parameters @p dof_handler_index, @p quadrature_index, and @p first_selected_component are
    * passed to the constructor of the FEEvaluation that is internally set up.
    */
   template <int dim,
@@ -290,8 +290,8 @@ namespace MatrixFreeTools
                                           Number,
                                           VectorizedArrayType> &)>
                       &cell_operation,
-    const unsigned int dof_no                   = 0,
-    const unsigned int quad_no                  = 0,
+    const unsigned int dof_handler_index        = 0,
+    const unsigned int quadrature_index         = 0,
     const unsigned int first_selected_component = 0);
 
 
@@ -319,8 +319,8 @@ namespace MatrixFreeTools
                                                Number,
                                                VectorizedArrayType> &) const,
     const CLASS       *owning_class,
-    const unsigned int dof_no                   = 0,
-    const unsigned int quad_no                  = 0,
+    const unsigned int dof_handler_index        = 0,
+    const unsigned int quadrature_index         = 0,
     const unsigned int first_selected_component = 0);
 
 
@@ -376,7 +376,7 @@ namespace MatrixFreeTools
    * interior face integral operation @p face_operation, and boundary face
    * integral operation @p boundary_operation.
    *
-   * The parameters @p dof_no, @p quad_no, and @p first_selected_component are
+   * The parameters @p dof_handler_index, @p quadrature_index, and @p first_selected_component are
    * passed to the constructor of the FEEvaluation that is internally set up.
    */
   template <int dim,
@@ -418,8 +418,8 @@ namespace MatrixFreeTools
                                               Number,
                                               VectorizedArrayType> &)>
                       &boundary_operation,
-    const unsigned int dof_no                   = 0,
-    const unsigned int quad_no                  = 0,
+    const unsigned int dof_handler_index        = 0,
+    const unsigned int quadrature_index         = 0,
     const unsigned int first_selected_component = 0);
 
 
@@ -467,8 +467,8 @@ namespace MatrixFreeTools
                                                        VectorizedArrayType> &)
       const,
     const CLASS       *owning_class,
-    const unsigned int dof_no                   = 0,
-    const unsigned int quad_no                  = 0,
+    const unsigned int dof_handler_index        = 0,
+    const unsigned int quadrature_index         = 0,
     const unsigned int first_selected_component = 0);
 
 
@@ -824,6 +824,7 @@ namespace MatrixFreeTools
         const std::array<unsigned int, n_lanes> &cells =
           this->phi->get_cell_ids();
 
+        std::vector<unsigned int> inverse_lookup_count(dofs_per_cell);
         for (unsigned int v = 0; v < n_lanes_filled; ++v)
           {
             Assert(cells[v] != numbers::invalid_unsigned_int,
@@ -1069,7 +1070,9 @@ namespace MatrixFreeTools
                               c_pool.col.size());
 
               c_pool.inverse_lookup_origins.resize(c_pool.col.size());
-              std::vector<unsigned int> inverse_lookup_count(dofs_per_cell);
+              std::fill(inverse_lookup_count.begin(),
+                        inverse_lookup_count.end(),
+                        0u);
               for (unsigned int row = 0; row < c_pool.row.size() - 1; ++row)
                 for (unsigned int col = c_pool.row[row];
                      col < c_pool.row[row + 1];
@@ -1339,8 +1342,8 @@ namespace MatrixFreeTools
     is_fe_nothing(
       const MatrixFree<dim, Number, VectorizedArrayType> &matrix_free,
       const std::pair<unsigned int, unsigned int>        &range,
-      const unsigned int                                  dof_no,
-      const unsigned int                                  quad_no,
+      const unsigned int                                  dof_handler_index,
+      const unsigned int                                  quadrature_index,
       const unsigned int first_selected_component,
       const unsigned int fe_degree,
       const unsigned int n_q_points_1d,
@@ -1352,20 +1355,21 @@ namespace MatrixFreeTools
 
       unsigned int active_fe_index = 0;
       if (!is_face)
-        active_fe_index = matrix_free.get_cell_active_fe_index(range, dof_no);
+        active_fe_index =
+          matrix_free.get_cell_active_fe_index(range, dof_handler_index);
       else if (is_interior_face)
         active_fe_index =
-          matrix_free.get_face_range_category(range, dof_no).first;
+          matrix_free.get_face_range_category(range, dof_handler_index).first;
       else
         active_fe_index =
-          matrix_free.get_face_range_category(range, dof_no).second;
+          matrix_free.get_face_range_category(range, dof_handler_index).second;
 
       const auto init_data = dealii::internal::
         extract_initialization_data<is_face, dim, Number, VectorizedArrayType>(
           matrix_free,
-          dof_no,
+          dof_handler_index,
           first_selected_component,
-          quad_no,
+          quadrature_index,
           fe_degree,
           static_n_q_points,
           active_fe_index,
@@ -1390,10 +1394,12 @@ namespace MatrixFreeTools
     {
     public:
       ComputeDiagonalCellAction(
+        const unsigned int                     dof_handler_index,
         const QuadOperation                   &quad_operation,
         const EvaluationFlags::EvaluationFlags evaluation_flags,
         const EvaluationFlags::EvaluationFlags integration_flags)
-        : m_quad_operation(quad_operation)
+        : m_dof_handler_index(dof_handler_index)
+        , m_quad_operation(quad_operation)
         , m_evaluation_flags(evaluation_flags)
         , m_integration_flags(integration_flags)
       {}
@@ -1405,9 +1411,9 @@ namespace MatrixFreeTools
       {
         Portable::
           FEEvaluation<dim, fe_degree, n_q_points_1d, n_components, Number>
-            fe_eval(data);
+            fe_eval(data, m_dof_handler_index);
         const typename Portable::MatrixFree<dim, Number>::PrecomputedData
-                 *gpu_data = data->precomputed_data;
+                 *gpu_data = &data->precomputed_data[m_dof_handler_index];
         const int cell     = data->cell_index;
 
         constexpr int dofs_per_cell = decltype(fe_eval)::tensor_dofs_per_cell;
@@ -1442,10 +1448,13 @@ namespace MatrixFreeTools
                 data->team_member,
                 gpu_data->constraint_weights,
                 gpu_data->constraint_mask(cell * n_components + c),
-                Kokkos::subview(data->shared_data->values, Kokkos::ALL, c));
+                Kokkos::subview(data->shared_data[m_dof_handler_index].values,
+                                Kokkos::ALL,
+                                c));
 
             fe_eval.evaluate(m_evaluation_flags);
-            fe_eval.apply_for_each_quad_point(m_quad_operation);
+            data->for_each_quad_point(
+              [&](const int &q_point) { m_quad_operation(&fe_eval, q_point); });
             fe_eval.integrate(m_integration_flags);
 
             Portable::internal::
@@ -1453,7 +1462,9 @@ namespace MatrixFreeTools
                 data->team_member,
                 gpu_data->constraint_weights,
                 gpu_data->constraint_mask(cell * n_components + c),
-                Kokkos::subview(data->shared_data->values, Kokkos::ALL, c));
+                Kokkos::subview(data->shared_data[m_dof_handler_index].values,
+                                Kokkos::ALL,
+                                c));
 
             Kokkos::single(Kokkos::PerTeam(data->team_member), [&] {
               if constexpr (n_components == 1)
@@ -1481,8 +1492,9 @@ namespace MatrixFreeTools
               Kokkos::TeamThreadRange(data->team_member, dofs_per_cell),
               [&](const int &i) {
                 dst[gpu_data->local_to_global(i, cell)] +=
-                  data->shared_data->values(i % (dofs_per_cell / n_components),
-                                            i / (dofs_per_cell / n_components));
+                  data->shared_data[m_dof_handler_index].values(
+                    i % (dofs_per_cell / n_components),
+                    i / (dofs_per_cell / n_components));
               });
           }
         else
@@ -1491,19 +1503,19 @@ namespace MatrixFreeTools
               Kokkos::TeamThreadRange(data->team_member, dofs_per_cell),
               [&](const int &i) {
                 Kokkos::atomic_add(&dst[gpu_data->local_to_global(i, cell)],
-                                   data->shared_data->values(
-                                     i % (dofs_per_cell / n_components),
-                                     i / (dofs_per_cell / n_components)));
+                                   data->shared_data[m_dof_handler_index]
+                                     .values(i % (dofs_per_cell / n_components),
+                                             i /
+                                               (dofs_per_cell / n_components)));
               });
           }
       };
 
-      static constexpr unsigned int n_local_dofs =
-        dealii::Utilities::pow(fe_degree + 1, dim) * n_components;
       static constexpr unsigned int n_q_points =
         dealii::Utilities::pow(n_q_points_1d, dim);
 
     private:
+      const unsigned int                     m_dof_handler_index;
       const QuadOperation                    m_quad_operation;
       const EvaluationFlags::EvaluationFlags m_evaluation_flags;
       const EvaluationFlags::EvaluationFlags m_integration_flags;
@@ -1527,13 +1539,13 @@ namespace MatrixFreeTools
     const QuadOperation                                     &quad_operation,
     EvaluationFlags::EvaluationFlags                         evaluation_flags,
     EvaluationFlags::EvaluationFlags                         integration_flags,
-    const unsigned int                                       dof_no,
-    const unsigned int                                       quad_no,
+    const unsigned int                                       dof_handler_index,
+    const unsigned int                                       quadrature_index,
     const unsigned int first_selected_component,
     const unsigned int first_vector_component)
   {
-    Assert(dof_no == 0, ExcNotImplemented());
-    Assert(quad_no == 0, ExcNotImplemented());
+    Assert(dof_handler_index == 0, ExcNotImplemented());
+    Assert(quadrature_index == 0, ExcNotImplemented());
     Assert(first_selected_component == 0, ExcNotImplemented());
     Assert(first_vector_component == 0, ExcNotImplemented());
 
@@ -1546,11 +1558,16 @@ namespace MatrixFreeTools
                                         n_components,
                                         Number,
                                         QuadOperation>
-      cell_action(quad_operation, evaluation_flags, integration_flags);
+      cell_action(dof_handler_index,
+                  quad_operation,
+                  evaluation_flags,
+                  integration_flags);
     LinearAlgebra::distributed::Vector<Number, MemorySpace> dummy;
     matrix_free.cell_loop(cell_action, dummy, diagonal_global);
 
-    matrix_free.set_constrained_values(Number(1.), diagonal_global);
+    matrix_free.set_constrained_values(Number(1.),
+                                       diagonal_global,
+                                       dof_handler_index);
   }
 
   template <int dim,
@@ -1571,8 +1588,8 @@ namespace MatrixFreeTools
                                           Number,
                                           VectorizedArrayType> &)>
                       &cell_operation,
-    const unsigned int dof_no,
-    const unsigned int quad_no,
+    const unsigned int dof_handler_index,
+    const unsigned int quadrature_index,
     const unsigned int first_selected_component,
     const unsigned int first_vector_component)
   {
@@ -1587,8 +1604,8 @@ namespace MatrixFreeTools
                                  cell_operation,
                                  {},
                                  {},
-                                 dof_no,
-                                 quad_no,
+                                 dof_handler_index,
+                                 quadrature_index,
                                  first_selected_component,
                                  first_vector_component);
   }
@@ -1612,8 +1629,8 @@ namespace MatrixFreeTools
                                                Number,
                                                VectorizedArrayType> &) const,
     const CLASS       *owning_class,
-    const unsigned int dof_no,
-    const unsigned int quad_no,
+    const unsigned int dof_handler_index,
+    const unsigned int quadrature_index,
     const unsigned int first_selected_component,
     const unsigned int first_vector_component)
   {
@@ -1627,8 +1644,8 @@ namespace MatrixFreeTools
       matrix_free,
       diagonal_global,
       [&](auto &phi) { (owning_class->*cell_operation)(phi); },
-      dof_no,
-      quad_no,
+      dof_handler_index,
+      quadrature_index,
       first_selected_component,
       first_vector_component);
   }
@@ -1671,8 +1688,8 @@ namespace MatrixFreeTools
                                               Number,
                                               VectorizedArrayType> &)>
                       &boundary_operation,
-    const unsigned int dof_no,
-    const unsigned int quad_no,
+    const unsigned int dof_handler_index,
+    const unsigned int quadrature_index,
     const unsigned int first_selected_component,
     const unsigned int first_vector_component)
   {
@@ -1686,7 +1703,7 @@ namespace MatrixFreeTools
         BlockVectorSelector<VectorType, IsBlockVector<VectorType>::value>::
           get_vector_component(diagonal_global, d + first_vector_component);
 
-    const auto &dof_info = matrix_free.get_dof_info(dof_no);
+    const auto &dof_info = matrix_free.get_dof_info(dof_handler_index);
 
     if (dof_info.start_components.back() == 1)
       for (unsigned int comp = 0; comp < n_components; ++comp)
@@ -1725,8 +1742,8 @@ namespace MatrixFreeTools
     internal::ComputeMatrixScratchData<dim, VectorizedArrayType, false>
       data_cell;
 
-    data_cell.dof_numbers               = {dof_no};
-    data_cell.quad_numbers              = {quad_no};
+    data_cell.dof_numbers               = {dof_handler_index};
+    data_cell.quad_numbers              = {quadrature_index};
     data_cell.n_components              = {n_components};
     data_cell.first_selected_components = {first_selected_component};
     data_cell.batch_type                = {0};
@@ -1739,13 +1756,17 @@ namespace MatrixFreeTools
 
         if (!internal::is_fe_nothing<false>(matrix_free,
                                             range,
-                                            dof_no,
-                                            quad_no,
+                                            dof_handler_index,
+                                            quadrature_index,
                                             first_selected_component,
                                             fe_degree,
                                             n_q_points_1d))
-          phi.emplace_back(std::make_unique<FEEvalType>(
-            matrix_free, range, dof_no, quad_no, first_selected_component));
+          phi.emplace_back(
+            std::make_unique<FEEvalType>(matrix_free,
+                                         range,
+                                         dof_handler_index,
+                                         quadrature_index,
+                                         first_selected_component));
 
         return phi;
       };
@@ -1763,9 +1784,9 @@ namespace MatrixFreeTools
     internal::ComputeMatrixScratchData<dim, VectorizedArrayType, true>
       data_face;
 
-    data_face.dof_numbers               = {dof_no, dof_no};
-    data_face.quad_numbers              = {quad_no, quad_no};
-    data_face.n_components              = {n_components, n_components};
+    data_face.dof_numbers  = {dof_handler_index, dof_handler_index};
+    data_face.quad_numbers = {quadrature_index, quadrature_index};
+    data_face.n_components = {n_components, n_components};
     data_face.first_selected_components = {first_selected_component,
                                            first_selected_component};
     data_face.batch_type                = {1, 2};
@@ -1778,16 +1799,16 @@ namespace MatrixFreeTools
 
         if (!internal::is_fe_nothing<true>(matrix_free,
                                            range,
-                                           dof_no,
-                                           quad_no,
+                                           dof_handler_index,
+                                           quadrature_index,
                                            first_selected_component,
                                            fe_degree,
                                            n_q_points_1d,
                                            true) &&
             !internal::is_fe_nothing<true>(matrix_free,
                                            range,
-                                           dof_no,
-                                           quad_no,
+                                           dof_handler_index,
+                                           quadrature_index,
                                            first_selected_component,
                                            fe_degree,
                                            n_q_points_1d,
@@ -1797,15 +1818,15 @@ namespace MatrixFreeTools
               std::make_unique<FEFaceEvalType>(matrix_free,
                                                range,
                                                true,
-                                               dof_no,
-                                               quad_no,
+                                               dof_handler_index,
+                                               quadrature_index,
                                                first_selected_component));
             phi.emplace_back(
               std::make_unique<FEFaceEvalType>(matrix_free,
                                                range,
                                                false,
-                                               dof_no,
-                                               quad_no,
+                                               dof_handler_index,
+                                               quadrature_index,
                                                first_selected_component));
           }
 
@@ -1829,31 +1850,36 @@ namespace MatrixFreeTools
     internal::ComputeMatrixScratchData<dim, VectorizedArrayType, true>
       data_boundary;
 
-    data_boundary.dof_numbers               = {dof_no};
-    data_boundary.quad_numbers              = {quad_no};
+    data_boundary.dof_numbers               = {dof_handler_index};
+    data_boundary.quad_numbers              = {quadrature_index};
     data_boundary.n_components              = {n_components};
     data_boundary.first_selected_components = {first_selected_component};
     data_boundary.batch_type                = {1};
 
-    data_boundary
-      .op_create = [&](const std::pair<unsigned int, unsigned int> &range) {
-      std::vector<
-        std::unique_ptr<FEEvaluationData<dim, VectorizedArrayType, true>>>
-        phi;
+    data_boundary.op_create =
+      [&](const std::pair<unsigned int, unsigned int> &range) {
+        std::vector<
+          std::unique_ptr<FEEvaluationData<dim, VectorizedArrayType, true>>>
+          phi;
 
-      if (!internal::is_fe_nothing<true>(matrix_free,
-                                         range,
-                                         dof_no,
-                                         quad_no,
-                                         first_selected_component,
-                                         fe_degree,
-                                         n_q_points_1d,
-                                         true))
-        phi.emplace_back(std::make_unique<FEFaceEvalType>(
-          matrix_free, range, true, dof_no, quad_no, first_selected_component));
+        if (!internal::is_fe_nothing<true>(matrix_free,
+                                           range,
+                                           dof_handler_index,
+                                           quadrature_index,
+                                           first_selected_component,
+                                           fe_degree,
+                                           n_q_points_1d,
+                                           true))
+          phi.emplace_back(
+            std::make_unique<FEFaceEvalType>(matrix_free,
+                                             range,
+                                             true,
+                                             dof_handler_index,
+                                             quadrature_index,
+                                             first_selected_component));
 
-      return phi;
-    };
+        return phi;
+      };
 
     data_boundary.op_reinit = [](auto &phi, const unsigned batch) {
       if (phi.size() == 1)
@@ -2033,8 +2059,8 @@ namespace MatrixFreeTools
                                                        VectorizedArrayType> &)
       const,
     const CLASS       *owning_class,
-    const unsigned int dof_no,
-    const unsigned int quad_no,
+    const unsigned int dof_handler_index,
+    const unsigned int quadrature_index,
     const unsigned int first_selected_component,
     const unsigned int first_vector_component)
   {
@@ -2052,8 +2078,8 @@ namespace MatrixFreeTools
         (owning_class->*face_operation)(phi_m, phi_p);
       },
       [&](auto &phi) { (owning_class->*boundary_operation)(phi); },
-      dof_no,
-      quad_no,
+      dof_handler_index,
+      quadrature_index,
       first_selected_component,
       first_vector_component);
   }
@@ -2126,8 +2152,8 @@ namespace MatrixFreeTools
                                           Number,
                                           VectorizedArrayType> &)>
                       &cell_operation,
-    const unsigned int dof_no,
-    const unsigned int quad_no,
+    const unsigned int dof_handler_index,
+    const unsigned int quadrature_index,
     const unsigned int first_selected_component)
   {
     compute_matrix<dim,
@@ -2142,8 +2168,8 @@ namespace MatrixFreeTools
                                cell_operation,
                                {},
                                {},
-                               dof_no,
-                               quad_no,
+                               dof_handler_index,
+                               quadrature_index,
                                first_selected_component);
   }
 
@@ -2167,8 +2193,8 @@ namespace MatrixFreeTools
                                                Number,
                                                VectorizedArrayType> &) const,
     const CLASS       *owning_class,
-    const unsigned int dof_no,
-    const unsigned int quad_no,
+    const unsigned int dof_handler_index,
+    const unsigned int quadrature_index,
     const unsigned int first_selected_component)
   {
     compute_matrix<dim,
@@ -2182,8 +2208,8 @@ namespace MatrixFreeTools
       constraints,
       matrix,
       [&](auto &phi) { (owning_class->*cell_operation)(phi); },
-      dof_no,
-      quad_no,
+      dof_handler_index,
+      quadrature_index,
       first_selected_component);
   }
 
@@ -2226,8 +2252,8 @@ namespace MatrixFreeTools
                                               Number,
                                               VectorizedArrayType> &)>
                       &boundary_operation,
-    const unsigned int dof_no,
-    const unsigned int quad_no,
+    const unsigned int dof_handler_index,
+    const unsigned int quadrature_index,
     const unsigned int first_selected_component)
   {
     using FEEvalType = FEEvaluation<dim,
@@ -2247,8 +2273,8 @@ namespace MatrixFreeTools
     internal::ComputeMatrixScratchData<dim, VectorizedArrayType, false>
       data_cell;
 
-    data_cell.dof_numbers               = {dof_no};
-    data_cell.quad_numbers              = {quad_no};
+    data_cell.dof_numbers               = {dof_handler_index};
+    data_cell.quad_numbers              = {quadrature_index};
     data_cell.n_components              = {n_components};
     data_cell.first_selected_components = {first_selected_component};
     data_cell.batch_type                = {0};
@@ -2261,13 +2287,17 @@ namespace MatrixFreeTools
 
         if (!internal::is_fe_nothing<false>(matrix_free,
                                             range,
-                                            dof_no,
-                                            quad_no,
+                                            dof_handler_index,
+                                            quadrature_index,
                                             first_selected_component,
                                             fe_degree,
                                             n_q_points_1d))
-          phi.emplace_back(std::make_unique<FEEvalType>(
-            matrix_free, range, dof_no, quad_no, first_selected_component));
+          phi.emplace_back(
+            std::make_unique<FEEvalType>(matrix_free,
+                                         range,
+                                         dof_handler_index,
+                                         quadrature_index,
+                                         first_selected_component));
 
         return phi;
       };
@@ -2285,9 +2315,9 @@ namespace MatrixFreeTools
     internal::ComputeMatrixScratchData<dim, VectorizedArrayType, true>
       data_face;
 
-    data_face.dof_numbers               = {dof_no, dof_no};
-    data_face.quad_numbers              = {quad_no, quad_no};
-    data_face.n_components              = {n_components, n_components};
+    data_face.dof_numbers  = {dof_handler_index, dof_handler_index};
+    data_face.quad_numbers = {quadrature_index, quadrature_index};
+    data_face.n_components = {n_components, n_components};
     data_face.first_selected_components = {first_selected_component,
                                            first_selected_component};
     data_face.batch_type                = {1, 2};
@@ -2300,16 +2330,16 @@ namespace MatrixFreeTools
 
         if (!internal::is_fe_nothing<true>(matrix_free,
                                            range,
-                                           dof_no,
-                                           quad_no,
+                                           dof_handler_index,
+                                           quadrature_index,
                                            first_selected_component,
                                            fe_degree,
                                            n_q_points_1d,
                                            true) &&
             !internal::is_fe_nothing<true>(matrix_free,
                                            range,
-                                           dof_no,
-                                           quad_no,
+                                           dof_handler_index,
+                                           quadrature_index,
                                            first_selected_component,
                                            fe_degree,
                                            n_q_points_1d,
@@ -2319,15 +2349,15 @@ namespace MatrixFreeTools
               std::make_unique<FEFaceEvalType>(matrix_free,
                                                range,
                                                true,
-                                               dof_no,
-                                               quad_no,
+                                               dof_handler_index,
+                                               quadrature_index,
                                                first_selected_component));
             phi.emplace_back(
               std::make_unique<FEFaceEvalType>(matrix_free,
                                                range,
                                                false,
-                                               dof_no,
-                                               quad_no,
+                                               dof_handler_index,
+                                               quadrature_index,
                                                first_selected_component));
           }
 
@@ -2351,31 +2381,36 @@ namespace MatrixFreeTools
     internal::ComputeMatrixScratchData<dim, VectorizedArrayType, true>
       data_boundary;
 
-    data_boundary.dof_numbers               = {dof_no};
-    data_boundary.quad_numbers              = {quad_no};
+    data_boundary.dof_numbers               = {dof_handler_index};
+    data_boundary.quad_numbers              = {quadrature_index};
     data_boundary.n_components              = {n_components};
     data_boundary.first_selected_components = {first_selected_component};
     data_boundary.batch_type                = {1};
 
-    data_boundary
-      .op_create = [&](const std::pair<unsigned int, unsigned int> &range) {
-      std::vector<
-        std::unique_ptr<FEEvaluationData<dim, VectorizedArrayType, true>>>
-        phi;
+    data_boundary.op_create =
+      [&](const std::pair<unsigned int, unsigned int> &range) {
+        std::vector<
+          std::unique_ptr<FEEvaluationData<dim, VectorizedArrayType, true>>>
+          phi;
 
-      if (!internal::is_fe_nothing<true>(matrix_free,
-                                         range,
-                                         dof_no,
-                                         quad_no,
-                                         first_selected_component,
-                                         fe_degree,
-                                         n_q_points_1d,
-                                         true))
-        phi.emplace_back(std::make_unique<FEFaceEvalType>(
-          matrix_free, range, true, dof_no, quad_no, first_selected_component));
+        if (!internal::is_fe_nothing<true>(matrix_free,
+                                           range,
+                                           dof_handler_index,
+                                           quadrature_index,
+                                           first_selected_component,
+                                           fe_degree,
+                                           n_q_points_1d,
+                                           true))
+          phi.emplace_back(
+            std::make_unique<FEFaceEvalType>(matrix_free,
+                                             range,
+                                             true,
+                                             dof_handler_index,
+                                             quadrature_index,
+                                             first_selected_component));
 
-      return phi;
-    };
+        return phi;
+      };
 
     data_boundary.op_reinit = [](auto &phi, const unsigned batch) {
       if (phi.size() == 1)
@@ -2628,8 +2663,8 @@ namespace MatrixFreeTools
                                                        VectorizedArrayType> &)
       const,
     const CLASS       *owning_class,
-    const unsigned int dof_no,
-    const unsigned int quad_no,
+    const unsigned int dof_handler_index,
+    const unsigned int quadrature_index,
     const unsigned int first_selected_component)
   {
     compute_matrix<dim,
@@ -2647,8 +2682,8 @@ namespace MatrixFreeTools
         (owning_class->*face_operation)(phi_m, phi_p);
       },
       [&](auto &phi) { (owning_class->*boundary_operation)(phi); },
-      dof_no,
-      quad_no,
+      dof_handler_index,
+      quadrature_index,
       first_selected_component);
   }
 
