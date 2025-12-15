@@ -490,6 +490,95 @@ namespace Particles
 
 
   template <int dim, int spacedim>
+  std::vector<typename ParticleHandler<dim, spacedim>::particle_iterator_range>
+  ParticleHandler<dim, spacedim>::particles_in_descendant_active_cells(
+    const typename Triangulation<dim, spacedim>::cell_iterator &cell,
+    const int relative_level) const
+  {
+    // Currently this function is not implemented for parallel triangulations.
+    // This is planned to be added in the future.
+    Assert(
+      (dynamic_cast<
+         const dealii::parallel::distributed::Triangulation<dim, spacedim> *>(
+         triangulation.get()) == nullptr) &&
+        (dynamic_cast<
+           const dealii::parallel::shared::Triangulation<dim, spacedim> *>(
+           triangulation.get()) == nullptr),
+      ExcMessage(
+        "This function is not yet implemented for parallel triangulations. This is work in progress."));
+
+    Assert(relative_level >= 0,
+           ExcMessage("The relative level must be non-negative."));
+
+    Assert(
+      cell->level() >= relative_level,
+      ExcMessage(
+        "The cell level must be greater than or equal to the requested relative parent level."));
+
+    if (cell->is_active() && relative_level == 0)
+      return {particles_in_cell(
+        typename Triangulation<dim, spacedim>::active_cell_iterator(cell))};
+
+    using cell_iterator = typename Triangulation<dim, spacedim>::cell_iterator;
+
+    // Find the root cell at the requested relative level
+    cell_iterator root_cell = cell;
+    for (int i = 0; i < relative_level; ++i)
+      root_cell = root_cell->parent();
+
+    std::vector<particle_iterator_range> result;
+    result.reserve(root_cell->n_active_descendants());
+
+    // Depth-first traversal collecting particles from active cells
+    const auto collect_particles = [&](const auto          &collect_particles,
+                                       const cell_iterator &cell) -> void {
+      if (cell->has_children())
+        for (const cell_iterator &child : cell->child_iterators())
+          collect_particles(collect_particles, child);
+      else
+        result.emplace_back(particles_in_cell(
+          typename Triangulation<dim, spacedim>::active_cell_iterator(cell)));
+    };
+
+    collect_particles(collect_particles, root_cell);
+    return result;
+  }
+
+
+
+  template <int dim, int spacedim>
+  std::map<typename Triangulation<dim, spacedim>::cell_iterator,
+           std::vector<
+             typename ParticleHandler<dim, spacedim>::particle_iterator_range>>
+  ParticleHandler<dim, spacedim>::particles_in_active_subtrees_of_parent_cells(
+    const int level) const
+  {
+    // Currently this function is not implemented for parallel triangulations.
+    // This is planned to be added in the future.
+    Assert(
+      (dynamic_cast<
+         const dealii::parallel::distributed::Triangulation<dim, spacedim> *>(
+         triangulation.get()) == nullptr) &&
+        (dynamic_cast<
+           const dealii::parallel::shared::Triangulation<dim, spacedim> *>(
+           triangulation.get()) == nullptr),
+      ExcMessage(
+        "This function is not yet implemented for parallel triangulations. This is work in progress."));
+
+    using cell_iterator = typename Triangulation<dim, spacedim>::cell_iterator;
+
+    std::map<cell_iterator, std::vector<particle_iterator_range>> result;
+
+    for (const cell_iterator &cell :
+         triangulation->cell_iterators_on_level(level))
+      result.emplace(cell, particles_in_descendant_active_cells(cell, 0));
+
+    return result;
+  }
+
+
+
+  template <int dim, int spacedim>
   void
   ParticleHandler<dim, spacedim>::remove_particle(
     const ParticleHandler<dim, spacedim>::particle_iterator &particle)
