@@ -3040,12 +3040,13 @@ CellAccessor<dim, spacedim>::neighbor_child_on_subface(
 
           const unsigned int neighbor_neighbor =
             this->neighbor_of_neighbor(face);
-          
+
           // if the refinement case is isotropic then ask the reference cell
-          // if not we are on a quad and can ask GeometryInfo, we check for that above
+          // if not we are on a quad and can ask GeometryInfo, we check for that
+          // above
           const unsigned int neighbor_child_index =
-           neighbor->refinement_case() ==
-                     RefinementCase<2>::isotropic_refinement ?
+            neighbor->refinement_case() ==
+                RefinementCase<2>::isotropic_refinement ?
               neighbor->reference_cell().child_cell_on_face(
                 neighbor_neighbor,
                 subface,
