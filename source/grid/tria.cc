@@ -6977,11 +6977,11 @@ namespace internal
                       // algorithm for orientation correction of vertex indices
                       // and reinterpret the output. The only problem is child 3
                       // in triangles, however it is always in the center so no
-                      // correction is nesseccary at all.
+                      // correction is necessary at all.
                       switch (face_ref_cell_type)
                         {
                           case ReferenceCells::Triangle:
-                            // Complicated way to query private atribute
+                            // Complicated way to query private attribute
                             // `ReferenceCell::triangle_vertex_permutations[face_orientation][vertex]`
                             if (child != 3)
                               return ReferenceCells::Tetrahedron

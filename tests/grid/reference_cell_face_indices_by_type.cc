@@ -63,7 +63,7 @@ execute_test(std::initializer_list<ReferenceCell> cell_types,
             }
         }
 
-      // Some comandline output
+      // Some commandline output
       deallog << "Testing " << tested_cell_type.to_string() << std::endl;
       deallog << "received data face info" << std::endl
               << "id type" << std::endl;
@@ -75,7 +75,7 @@ execute_test(std::initializer_list<ReferenceCell> cell_types,
 
       // 1. check list for length (must be exactly of n_faces())
       AssertThrow(returned_face_indices.size() == cell->n_faces(),
-                  ExcMessage("Too many or not enogh face indices were given"));
+                  ExcMessage("Too many or not enough face indices were given"));
 
       // 2. Check if every face index is contained exactly once
       for (unsigned int current_index = 0; current_index < cell->n_faces();
@@ -87,7 +87,7 @@ execute_test(std::initializer_list<ReferenceCell> cell_types,
           for (auto face_info : returned_face_indices)
             if (face_info.face_id == current_index)
               {
-                // index mustn't be found alredy
+                // index mustn't be found twice
                 AssertThrow(
                   !found_index,
                   ExcMessage(
@@ -95,11 +95,11 @@ execute_test(std::initializer_list<ReferenceCell> cell_types,
                 found_index = true;
               }
 
-          // Check wether we found the index
+          // Check whether we found the index
           AssertThrow(found_index, ExcMessage("A face index is missing."));
         }
 
-      // 3. Check wether face indices were filtered correctly
+      // 3. Check whether face indices were filtered correctly
       for (auto face_info : returned_face_indices)
         AssertThrow(
           cell->face(face_info.face_id)->reference_cell() ==
