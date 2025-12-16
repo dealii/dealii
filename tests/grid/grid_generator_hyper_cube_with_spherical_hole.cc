@@ -12,7 +12,7 @@
 //
 // ------------------------------------------------------------------------
 
-// Test output for GridGenerator::uniform_channel_with_sphere()
+// Test output for GridGenerator::hyper_cube_with_spherical_hole()
 
 #include <deal.II/base/tensor.h>
 
@@ -29,8 +29,8 @@ dim_3(std::ostream &os)
 {
   const unsigned int d = 3;
   Triangulation<d>   tr;
-  GridGenerator::uniform_channel_with_sphere(
-    tr, {1,6,1,1,1,1}, 0.5, 0.6, true, true);
+  GridGenerator::hyper_cube_with_spherical_hole(
+    tr, 0.5, 0.6, true);
   GridOut gout;
   gout.write_vtk(tr, os);
 }
