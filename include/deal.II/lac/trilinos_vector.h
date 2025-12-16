@@ -1968,6 +1968,10 @@ namespace TrilinosWrappers
                         const Vector        &V,
                         const Vector        &W)
     {
+      // if we have ghost values, do not allow
+      // writing to this vector at all.
+      Assert(!has_ghost_elements(), ExcGhostsPresent());
+
       this->add(a, V);
       return *this * W;
     }
@@ -1982,6 +1986,9 @@ namespace TrilinosWrappers
     inline Vector &
     Vector::operator*=(const TrilinosScalar a)
     {
+      // if we have ghost values, do not allow
+      // writing to this vector at all.
+      Assert(!has_ghost_elements(), ExcGhostsPresent());
       AssertIsFinite(a);
 
       const int ierr = vector->Scale(a);
@@ -1995,6 +2002,9 @@ namespace TrilinosWrappers
     inline Vector &
     Vector::operator/=(const TrilinosScalar a)
     {
+      // if we have ghost values, do not allow
+      // writing to this vector at all.
+      Assert(!has_ghost_elements(), ExcGhostsPresent());
       AssertIsFinite(a);
 
       const TrilinosScalar factor = 1. / a;
@@ -2012,6 +2022,9 @@ namespace TrilinosWrappers
     inline Vector &
     Vector::operator+=(const Vector &v)
     {
+      // if we have ghost values, do not allow
+      // writing to this vector at all.
+      Assert(!has_ghost_elements(), ExcGhostsPresent());
       AssertDimension(size(), v.size());
       Assert(vector->Map().SameAs(v.vector->Map()),
              ExcDifferentParallelPartitioning());
@@ -2027,6 +2040,9 @@ namespace TrilinosWrappers
     inline Vector &
     Vector::operator-=(const Vector &v)
     {
+      // if we have ghost values, do not allow
+      // writing to this vector at all.
+      Assert(!has_ghost_elements(), ExcGhostsPresent());
       AssertDimension(size(), v.size());
       Assert(vector->Map().SameAs(v.vector->Map()),
              ExcDifferentParallelPartitioning());

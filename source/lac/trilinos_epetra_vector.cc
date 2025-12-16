@@ -181,6 +181,9 @@ namespace LinearAlgebra
     Vector &
     Vector::operator=(const double s)
     {
+      // if we have ghost values, do not allow
+      // writing to this vector at all.
+      Assert(!has_ghost_elements(), ExcGhostsPresent());
       Assert(s == 0., ExcMessage("Only 0 can be assigned to a vector."));
 
       const int ierr = vector->PutScalar(s);
@@ -249,7 +252,11 @@ namespace LinearAlgebra
     Vector &
     Vector::operator*=(const double factor)
     {
+      // if we have ghost values, do not allow
+      // writing to this vector at all.
+      Assert(!has_ghost_elements(), ExcGhostsPresent());
       AssertIsFinite(factor);
+
       vector->Scale(factor);
 
       return *this;
@@ -260,8 +267,12 @@ namespace LinearAlgebra
     Vector &
     Vector::operator/=(const double factor)
     {
+      // if we have ghost values, do not allow
+      // writing to this vector at all.
+      Assert(!has_ghost_elements(), ExcGhostsPresent());
       AssertIsFinite(factor);
       Assert(factor != 0., ExcZero());
+
       *this *= 1. / factor;
 
       return *this;
@@ -272,6 +283,10 @@ namespace LinearAlgebra
     Vector &
     Vector::operator+=(const Vector &V)
     {
+      // if we have ghost values, do not allow
+      // writing to this vector at all.
+      Assert(!has_ghost_elements(), ExcGhostsPresent());
+
       // If the maps are the same we can Update right away.
       if (vector->Map().SameAs(V.trilinos_vector().Map()))
         {
@@ -298,6 +313,10 @@ namespace LinearAlgebra
     Vector &
     Vector::operator-=(const Vector &V)
     {
+      // if we have ghost values, do not allow
+      // writing to this vector at all.
+      Assert(!has_ghost_elements(), ExcGhostsPresent());
+
       this->add(-1., V);
 
       return *this;
@@ -325,7 +344,11 @@ namespace LinearAlgebra
     void
     Vector::add(const double a)
     {
+      // if we have ghost values, do not allow
+      // writing to this vector at all.
+      Assert(!has_ghost_elements(), ExcGhostsPresent());
       AssertIsFinite(a);
+
       const unsigned local_size(vector->MyLength());
       for (unsigned int i = 0; i < local_size; ++i)
         (*vector)[0][i] += a;
@@ -336,6 +359,9 @@ namespace LinearAlgebra
     void
     Vector::add(const double a, const Vector &V)
     {
+      // if we have ghost values, do not allow
+      // writing to this vector at all.
+      Assert(!has_ghost_elements(), ExcGhostsPresent());
       AssertIsFinite(a);
       Assert(vector->Map().SameAs(V.trilinos_vector().Map()),
              ExcDifferentParallelPartitioning());
@@ -352,6 +378,9 @@ namespace LinearAlgebra
                 const double  b,
                 const Vector &W)
     {
+      // if we have ghost values, do not allow
+      // writing to this vector at all.
+      Assert(!has_ghost_elements(), ExcGhostsPresent());
       Assert(vector->Map().SameAs(V.trilinos_vector().Map()),
              ExcDifferentParallelPartitioning());
       Assert(vector->Map().SameAs(W.trilinos_vector().Map()),
@@ -369,6 +398,10 @@ namespace LinearAlgebra
     void
     Vector::sadd(const double s, const double a, const Vector &V)
     {
+      // if we have ghost values, do not allow
+      // writing to this vector at all.
+      Assert(!has_ghost_elements(), ExcGhostsPresent());
+
       *this *= s;
       Vector tmp(V);
       tmp *= a;
@@ -380,6 +413,9 @@ namespace LinearAlgebra
     void
     Vector::scale(const Vector &scaling_factors)
     {
+      // if we have ghost values, do not allow
+      // writing to this vector at all.
+      Assert(!has_ghost_elements(), ExcGhostsPresent());
       Assert(vector->Map().SameAs(scaling_factors.trilinos_vector().Map()),
              ExcDifferentParallelPartitioning());
 
@@ -393,6 +429,10 @@ namespace LinearAlgebra
     void
     Vector::equ(const double a, const Vector &V)
     {
+      // if we have ghost values, do not allow
+      // writing to this vector at all.
+      Assert(!has_ghost_elements(), ExcGhostsPresent());
+
       // If we don't have the same map, copy.
       if (vector->Map().SameAs(V.trilinos_vector().Map()) == false)
         this->sadd(0., a, V);
@@ -424,6 +464,8 @@ namespace LinearAlgebra
     double
     Vector::mean_value() const
     {
+      Assert(!has_ghost_elements(), ExcGhostsPresent());
+
       double mean_value(0.);
 
       int ierr = vector->MeanValue(&mean_value);
@@ -437,7 +479,9 @@ namespace LinearAlgebra
     double
     Vector::l1_norm() const
     {
-      double norm(0.);
+      Assert(!has_ghost_elements(), ExcGhostsPresent());
+
+      double norm = 0;
       int    ierr = vector->Norm1(&norm);
       Assert(ierr == 0, ExcTrilinosError(ierr));
 
@@ -449,7 +493,9 @@ namespace LinearAlgebra
     double
     Vector::l2_norm() const
     {
-      double norm(0.);
+      Assert(!has_ghost_elements(), ExcGhostsPresent());
+
+      double norm = 0;
       int    ierr = vector->Norm2(&norm);
       Assert(ierr == 0, ExcTrilinosError(ierr));
 
@@ -461,7 +507,7 @@ namespace LinearAlgebra
     double
     Vector::linfty_norm() const
     {
-      double norm(0.);
+      double norm = 0;
       int    ierr = vector->NormInf(&norm);
       Assert(ierr == 0, ExcTrilinosError(ierr));
 
@@ -473,6 +519,8 @@ namespace LinearAlgebra
     double
     Vector::add_and_dot(const double a, const Vector &V, const Vector &W)
     {
+      Assert(!has_ghost_elements(), ExcGhostsPresent());
+
       this->add(a, V);
 
       return *this * W;

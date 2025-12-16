@@ -558,7 +558,9 @@ namespace LinearAlgebra
     Vector<Number, MemorySpace> &
     Vector<Number, MemorySpace>::operator*=(const Number factor)
     {
+      Assert(!has_ghost_elements(), ExcGhostsPresent());
       AssertIsFinite(factor);
+
       vector->scale(factor);
 
       return *this;
@@ -570,8 +572,10 @@ namespace LinearAlgebra
     Vector<Number, MemorySpace> &
     Vector<Number, MemorySpace>::operator/=(const Number factor)
     {
+      Assert(!has_ghost_elements(), ExcGhostsPresent());
       AssertIsFinite(factor);
       Assert(factor != Number(0.), ExcZero());
+
       *this *= Number(1.) / factor;
 
       return *this;
@@ -584,6 +588,8 @@ namespace LinearAlgebra
     Vector<Number, MemorySpace>::operator+=(
       const Vector<Number, MemorySpace> &V)
     {
+      Assert(!has_ghost_elements(), ExcGhostsPresent());
+
       // If the maps are the same we can update right away.
       if (vector->getMap()->isSameAs(*(V.trilinos_vector().getMap())))
         {
@@ -618,6 +624,8 @@ namespace LinearAlgebra
     Vector<Number, MemorySpace>::operator-=(
       const Vector<Number, MemorySpace> &V)
     {
+      Assert(!has_ghost_elements(), ExcGhostsPresent());
+
       this->add(-1., V);
 
       return *this;
@@ -921,6 +929,7 @@ namespace LinearAlgebra
       const Vector<Number, MemorySpace> &V,
       const Vector<Number, MemorySpace> &W)
     {
+      Assert(!has_ghost_elements(), ExcGhostsPresent());
       AssertIsFinite(a);
 
       this->add(a, V);
