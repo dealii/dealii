@@ -505,7 +505,21 @@ namespace Threads
       if (MultithreadInfo::n_threads() > 1)
         {
 #ifdef DEAL_II_WITH_TASKFLOW
-
+          // If we are creating the task from a thread not managed by the
+          // current Taskflow executor, then emplace the new task and run it
+          // asynchronously. Otherwise, we would be asking Taskflow to emplace
+          // a new task with the same executor, which may lead to deadlocks
+          // (see
+          // https://taskflow.github.io/taskflow/ExecuteTaskflow.html#ExecuteATaskflowFromAnInternalWorker
+          // and the discussion in
+          // https://github.com/dealii/dealii/issues/19079). As a consequence,
+          // we let the code fall through to the code at the bottom of the
+          // function that executes the task right there and then,
+          // synchronously.
+          //
+          // In practice, this means that one can't use task-based programming
+          // in a nested way. That's unfortunate but it is what it is for
+          // now.
           if (MultithreadInfo::get_taskflow_executor().this_worker_id() < 0)
             {
               task_data = std::make_shared<TaskData>(
