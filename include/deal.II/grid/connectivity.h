@@ -38,26 +38,16 @@ namespace internal
      * Interface of geometric cell entities with the focus on creating a
      * reduced connectivity table.
      */
-    struct CellTypeBase
+    struct CellTypeBase : public ReferenceCell
     {
       CellTypeBase(const ReferenceCell &reference_cell)
-        : reference_cell(reference_cell)
+        : ReferenceCell(reference_cell)
       {}
 
       /**
        * Default destructor.
        */
       virtual ~CellTypeBase() = default;
-
-      /**
-       * Return the ReferenceCell object that corresponds to the current cell
-       * type.
-       */
-      ReferenceCell
-      get_reference_cell() const
-      {
-        return reference_cell;
-      }
 
       /**
        * Number of sub-entities of dimension @p d.
@@ -99,12 +89,6 @@ namespace internal
 
         return table;
       }
-
-    private:
-      /**
-       * The reference cell represented by the current object.
-       */
-      const ReferenceCell reference_cell;
     };
 
 
@@ -903,12 +887,9 @@ namespace internal
 
               ad_entity_vertices.emplace_back(entity_vertices);
 
-              if (face_dimensionality ==
-                  cell_type->get_reference_cell().get_dimension() - 1)
-                ad_entity_types.emplace_back(
-                  cell_type->get_reference_cell().face_reference_cell(e));
-              else if (face_dimensionality ==
-                       cell_type->get_reference_cell().get_dimension() - 2)
+              if (face_dimensionality == cell_type->get_dimension() - 1)
+                ad_entity_types.emplace_back(cell_type->face_reference_cell(e));
+              else if (face_dimensionality == cell_type->get_dimension() - 2)
                 {
                   // Since we only deal with meshes up to dimension 3,
                   // something that has co-dimensionality -2 must either be
@@ -957,9 +938,7 @@ namespace internal
 
                   ++n_unique_entities;
                   n_unique_entity_vertices +=
-                    cell_types[ad_entity_types[offset_i]]
-                      ->get_reference_cell()
-                      .n_vertices();
+                    cell_types[ad_entity_types[offset_i]]->n_vertices();
 
                   new_key = ad_compatibility[offset_i];
                 }
@@ -1122,9 +1101,8 @@ namespace internal
             {
               const unsigned int f = con_cq.col[f_];
 
-              con_ql.ptr[f + 1] = cell_type->get_reference_cell()
-                                    .face_reference_cell(f_index)
-                                    .n_lines();
+              con_ql.ptr[f + 1] =
+                cell_type->face_reference_cell(f_index).n_lines();
             }
         }
 
@@ -1154,13 +1132,12 @@ namespace internal
                 continue;
 
               // loop over the lines of this face
-              quad_t_id[f] =
-                cell_type->get_reference_cell().face_reference_cell(f_index);
+              quad_t_id[f] = cell_type->face_reference_cell(f_index);
               for (unsigned int l = 0; l < quad_t_id[f].n_lines(); ++l)
                 {
                   // determine global index of line
                   const unsigned int local_line_index =
-                    cell_type->get_reference_cell().face_to_cell_lines(
+                    cell_type->face_to_cell_lines(
                       f_index, l, numbers::default_geometric_orientation);
                   const unsigned int global_line_index =
                     con_cl.col[con_cl.ptr[c] + local_line_index];
@@ -1249,30 +1226,25 @@ namespace internal
                 const unsigned int &c,
                 const unsigned int &f) {
               //  to ensure same enumeration as in deal.II
-              AssertIndexRange(cell_type->get_reference_cell()
-                                 .face_reference_cell(f)
-                                 .n_lines(),
+              AssertIndexRange(cell_type->face_reference_cell(f).n_lines(),
                                key.size() + 1);
 
               unsigned int l = 0;
 
-              for (; l < cell_type->get_reference_cell()
-                           .face_reference_cell(f)
-                           .n_lines();
-                   ++l)
+              for (; l < cell_type->face_reference_cell(f).n_lines(); ++l)
                 {
                   AssertIndexRange(l, key.size());
                   AssertIndexRange(c, temp1.ptr.size());
-                  AssertIndexRange(
-                    temp1.ptr[c] +
-                      cell_type->get_reference_cell().face_to_cell_lines(
-                        f, l, numbers::default_geometric_orientation),
-                    temp1.col.size());
+                  AssertIndexRange(temp1.ptr[c] +
+                                     cell_type->face_to_cell_lines(
+                                       f,
+                                       l,
+                                       numbers::default_geometric_orientation),
+                                   temp1.col.size());
                   key[l] =
-                    temp1
-                      .col[temp1.ptr[c] +
-                           cell_type->get_reference_cell().face_to_cell_lines(
-                             f, l, numbers::default_geometric_orientation)] +
+                    temp1.col[temp1.ptr[c] +
+                              cell_type->face_to_cell_lines(
+                                f, l, numbers::default_geometric_orientation)] +
                     1 /*offset!*/;
                 }
 
