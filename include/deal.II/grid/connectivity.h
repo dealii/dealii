@@ -1241,7 +1241,13 @@ namespace internal
             connectivity.entity_to_entities(3, 2),
             connectivity.entity_to_entities(2, 0),
             connectivity.entity_orientations(2),
-            [&](auto key, const auto &cell_type, const auto &c, const auto &f) {
+            [&](auto key, // of type std::array<unsigned int, max_n_vertices>
+                          // but max_n_vertices is not known here
+                const std::shared_ptr<
+                  dealii::internal::TriangulationImplementation::CellTypeBase>
+                                   &cell_type,
+                const unsigned int &c,
+                const unsigned int &f) {
               //  to ensure same enumeration as in deal.II
               AssertIndexRange(cell_type->get_reference_cell()
                                  .face_reference_cell(f)
@@ -1254,11 +1260,21 @@ namespace internal
                            .face_reference_cell(f)
                            .n_lines();
                    ++l)
-                key[l] =
-                  temp1.col[temp1.ptr[c] +
-                            cell_type->get_reference_cell().face_to_cell_lines(
-                              f, l, numbers::default_geometric_orientation)] +
-                  1 /*offset!*/;
+                {
+                  AssertIndexRange(l, key.size());
+                  AssertIndexRange(c, temp1.ptr.size());
+                  AssertIndexRange(
+                    temp1.ptr[c] +
+                      cell_type->get_reference_cell().face_to_cell_lines(
+                        f, l, numbers::default_geometric_orientation),
+                    temp1.col.size());
+                  key[l] =
+                    temp1
+                      .col[temp1.ptr[c] +
+                           cell_type->get_reference_cell().face_to_cell_lines(
+                             f, l, numbers::default_geometric_orientation)] +
+                    1 /*offset!*/;
+                }
 
               for (; l < key.size(); ++l)
                 key[l] = 0;
