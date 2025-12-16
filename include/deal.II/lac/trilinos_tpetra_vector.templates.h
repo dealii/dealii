@@ -909,7 +909,7 @@ namespace LinearAlgebra
     typename Vector<Number, MemorySpace>::real_type
     Vector<Number, MemorySpace>::norm_sqr() const
     {
-      Vector<Number, MemorySpace>::real_type d = l2_norm();
+      const Vector<Number, MemorySpace>::real_type d = l2_norm();
       return d * d;
     }
 
