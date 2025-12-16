@@ -1021,7 +1021,7 @@ public:
    * Return a vector of vertex indices for all new cells required for isotropic
    * refinement.
    */
-  constexpr dealii::ndarray<unsigned int, 8, 4>
+  constexpr dealii::ndarray<unsigned int, 8, 8>
   new_isotropic_child_cell_vertices(const unsigned int refinement_choice) const;
 
   /**
@@ -1464,9 +1464,9 @@ ReferenceCell::faces_for_given_vertex(const unsigned int vertex) const
 
 constexpr dealii::ndarray<unsigned int, 12, 4>
 ReferenceCell::new_isotropic_child_face_lines(
-  const unsigned int refienement_choice) const
+  const unsigned int refinement_choice) const
 {
-  // AssertIndexRange(refienement_choice, n_isotropic_refinement_choices());
+  // AssertIndexRange(refinement_choice, n_isotropic_refinement_choices());
   const unsigned int X = numbers::invalid_unsigned_int;
   switch (this->kind)
     {
@@ -1512,7 +1512,28 @@ ReferenceCell::new_isotropic_child_face_lines(
                 {{X, X, X, X}},
                 {{X, X, X, X}},
                 {{X, X, X, X}}}}}};
-          return new_quad_lines_tet[refienement_choice];
+          return new_quad_lines_tet[refinement_choice];
+        }
+
+      case ReferenceCells::Pyramid:
+        DEAL_II_NOT_IMPLEMENTED();
+
+      case ReferenceCells::Wedge:
+        {
+          constexpr dealii::ndarray<unsigned int, 12, 4> new_quad_lines_wedge =
+            {{{{2, 20, 11, X}}, // mid tri
+              {{3, 6, 18, X}},
+              {{19, 7, 10, X}},
+              {{18, 19, 20, X}},
+              {{4, 0, 14, 18}}, // lower
+              {{0, 8, 12, 20}},
+              {{8, 4, 13, 19}},
+              {{5, 1, 18, 15}}, // upper
+              {{1, 9, 20, 17}},
+              {{9, 5, 19, 16}},
+              {{X, X, X, X}},
+              {{X, X, X, X}}}};
+          return new_quad_lines_wedge;
         }
 
       case ReferenceCells::Hexahedron:
@@ -1532,8 +1553,9 @@ ReferenceCell::new_isotropic_child_face_lines(
              {{25, 7, 27, 13}}}};
           return new_quad_lines_hex;
         }
+
       default:
-        DEAL_II_NOT_IMPLEMENTED();
+        DEAL_II_ASSERT_UNREACHABLE();
     }
 
   return {};
@@ -1543,76 +1565,103 @@ ReferenceCell::new_isotropic_child_face_lines(
 
 constexpr dealii::ndarray<unsigned int, 12, 4, 2>
 ReferenceCell::new_isotropic_child_face_line_vertices(
-  const unsigned int refienement_choice) const
+  const unsigned int refinement_choice) const
 {
-  // AssertIndexRange(refienement_choice, n_isotropic_refinement_choices());
+  // AssertIndexRange(refinement_choice, n_isotropic_refinement_choices());
   const unsigned int X = numbers::invalid_unsigned_int;
   switch (this->kind)
     {
       case ReferenceCells::Tetrahedron:
         {
-          constexpr dealii::ndarray<unsigned int, 3, 12, 4, 2> table_tet = {
-            {// new line is (6, 8)
-             {{{{{{6, 4}}, {{4, 7}}, {{7, 6}}, {{X, X}}}},
-               {{{{4, 5}}, {{5, 8}}, {{8, 4}}, {{X, X}}}},
-               {{{{5, 6}}, {{6, 9}}, {{9, 5}}, {{X, X}}}},
-               {{{{7, 8}}, {{8, 9}}, {{9, 7}}, {{X, X}}}},
-               {{{{4, 6}}, {{6, 8}}, {{8, 4}}, {{X, X}}}},
-               {{{{6, 5}}, {{5, 8}}, {{8, 6}}, {{X, X}}}},
-               {{{{8, 7}}, {{7, 6}}, {{6, 8}}, {{X, X}}}},
-               {{{{9, 6}}, {{6, 8}}, {{8, 9}}, {{X, X}}}},
+          constexpr dealii::ndarray<unsigned int, 3, 12, 4, 2>
+            quad_lines_vertices_tet = {
+              {// new line is (6, 8)
+               {{{{{{6, 4}}, {{4, 7}}, {{7, 6}}, {{X, X}}}},
+                 {{{{4, 5}}, {{5, 8}}, {{8, 4}}, {{X, X}}}},
+                 {{{{5, 6}}, {{6, 9}}, {{9, 5}}, {{X, X}}}},
+                 {{{{7, 8}}, {{8, 9}}, {{9, 7}}, {{X, X}}}},
+                 {{{{4, 6}}, {{6, 8}}, {{8, 4}}, {{X, X}}}},
+                 {{{{6, 5}}, {{5, 8}}, {{8, 6}}, {{X, X}}}},
+                 {{{{8, 7}}, {{7, 6}}, {{6, 8}}, {{X, X}}}},
+                 {{{{9, 6}}, {{6, 8}}, {{8, 9}}, {{X, X}}}},
+                 {{{{X, X}}, {{X, X}}, {{X, X}}, {{X, X}}}},
+                 {{{{X, X}}, {{X, X}}, {{X, X}}, {{X, X}}}},
+                 {{{{X, X}}, {{X, X}}, {{X, X}}, {{X, X}}}},
+                 {{{{X, X}}, {{X, X}}, {{X, X}}, {{X, X}}}}}},
+               // new line is (5, 7)
+               {{{{{{6, 4}}, {{4, 7}}, {{7, 6}}, {{X, X}}}},
+                 {{{{4, 5}}, {{5, 8}}, {{8, 4}}, {{X, X}}}},
+                 {{{{5, 6}}, {{6, 9}}, {{9, 5}}, {{X, X}}}},
+                 {{{{7, 8}}, {{8, 9}}, {{9, 7}}, {{X, X}}}},
+                 {{{{5, 4}}, {{4, 7}}, {{7, 5}}, {{X, X}}}},
+                 {{{{6, 5}}, {{5, 7}}, {{7, 6}}, {{X, X}}}},
+                 {{{{8, 7}}, {{7, 5}}, {{5, 8}}, {{X, X}}}},
+                 {{{{7, 9}}, {{9, 5}}, {{5, 7}}, {{X, X}}}},
+                 {{{{X, X}}, {{X, X}}, {{X, X}}, {{X, X}}}},
+                 {{{{X, X}}, {{X, X}}, {{X, X}}, {{X, X}}}},
+                 {{{{X, X}}, {{X, X}}, {{X, X}}, {{X, X}}}},
+                 {{{{X, X}}, {{X, X}}, {{X, X}}, {{X, X}}}}}},
+               // new line is (4, 9)
+               {{{{{{6, 4}}, {{4, 7}}, {{7, 6}}, {{X, X}}}},
+                 {{{{4, 5}}, {{5, 8}}, {{8, 4}}, {{X, X}}}},
+                 {{{{5, 6}}, {{6, 9}}, {{9, 5}}, {{X, X}}}},
+                 {{{{7, 8}}, {{8, 9}}, {{9, 7}}, {{X, X}}}},
+                 {{{{5, 4}}, {{4, 9}}, {{9, 5}}, {{X, X}}}},
+                 {{{{4, 6}}, {{6, 9}}, {{9, 4}}, {{X, X}}}},
+                 {{{{7, 4}}, {{4, 9}}, {{9, 7}}, {{X, X}}}},
+                 {{{{4, 8}}, {{8, 9}}, {{9, 4}}, {{X, X}}}},
+                 {{{{X, X}}, {{X, X}}, {{X, X}}, {{X, X}}}},
+                 {{{{X, X}}, {{X, X}}, {{X, X}}, {{X, X}}}},
+                 {{{{X, X}}, {{X, X}}, {{X, X}}, {{X, X}}}},
+                 {{{{X, X}}, {{X, X}}, {{X, X}}, {{X, X}}}}}}}};
+          return quad_lines_vertices_tet[refinement_choice];
+        }
+
+      case ReferenceCells::Pyramid:
+        DEAL_II_NOT_IMPLEMENTED();
+
+      case ReferenceCells::Wedge:
+        {
+          constexpr dealii::ndarray<unsigned int, 12, 4, 2>
+            quad_lines_vertices_wedge = {
+              {// mid tri
+               {{{{12, 15}}, {{15, 17}}, {{17, 12}}, {{X, X}}}},
+               {{{{15, 13}}, {{13, 16}}, {{16, 15}}, {{X, X}}}},
+               {{{{17, 16}}, {{16, 14}}, {{14, 17}}, {{X, X}}}},
+               {{{{15, 16}}, {{16, 17}}, {{17, 15}}, {{X, X}}}},
+               // lower
+               {{{{7, 16}}, {{6, 15}}, {{7, 6}}, {{16, 15}}}},
+               {{{{6, 15}}, {{8, 17}}, {{6, 8}}, {{15, 17}}}},
+               {{{{8, 17}}, {{7, 16}}, {{8, 7}}, {{17, 16}}}},
+               // upper
+               {{{{16, 10}}, {{15, 9}}, {{16, 15}}, {{10, 9}}}},
+               {{{{15, 9}}, {{17, 11}}, {{15, 17}}, {{9, 11}}}},
+               {{{{17, 11}}, {{16, 10}}, {{17, 16}}, {{11, 10}}}},
                {{{{X, X}}, {{X, X}}, {{X, X}}, {{X, X}}}},
-               {{{{X, X}}, {{X, X}}, {{X, X}}, {{X, X}}}},
-               {{{{X, X}}, {{X, X}}, {{X, X}}, {{X, X}}}},
-               {{{{X, X}}, {{X, X}}, {{X, X}}, {{X, X}}}}}},
-             // new line is (5, 7)
-             {{{{{{6, 4}}, {{4, 7}}, {{7, 6}}, {{X, X}}}},
-               {{{{4, 5}}, {{5, 8}}, {{8, 4}}, {{X, X}}}},
-               {{{{5, 6}}, {{6, 9}}, {{9, 5}}, {{X, X}}}},
-               {{{{7, 8}}, {{8, 9}}, {{9, 7}}, {{X, X}}}},
-               {{{{5, 4}}, {{4, 7}}, {{7, 5}}, {{X, X}}}},
-               {{{{6, 5}}, {{5, 7}}, {{7, 6}}, {{X, X}}}},
-               {{{{8, 7}}, {{7, 5}}, {{5, 8}}, {{X, X}}}},
-               {{{{7, 9}}, {{9, 5}}, {{5, 7}}, {{X, X}}}},
-               {{{{X, X}}, {{X, X}}, {{X, X}}, {{X, X}}}},
-               {{{{X, X}}, {{X, X}}, {{X, X}}, {{X, X}}}},
-               {{{{X, X}}, {{X, X}}, {{X, X}}, {{X, X}}}},
-               {{{{X, X}}, {{X, X}}, {{X, X}}, {{X, X}}}}}},
-             // new line is (4, 9)
-             {{{{{{6, 4}}, {{4, 7}}, {{7, 6}}, {{X, X}}}},
-               {{{{4, 5}}, {{5, 8}}, {{8, 4}}, {{X, X}}}},
-               {{{{5, 6}}, {{6, 9}}, {{9, 5}}, {{X, X}}}},
-               {{{{7, 8}}, {{8, 9}}, {{9, 7}}, {{X, X}}}},
-               {{{{5, 4}}, {{4, 9}}, {{9, 5}}, {{X, X}}}},
-               {{{{4, 6}}, {{6, 9}}, {{9, 4}}, {{X, X}}}},
-               {{{{7, 4}}, {{4, 9}}, {{9, 7}}, {{X, X}}}},
-               {{{{4, 8}}, {{8, 9}}, {{9, 4}}, {{X, X}}}},
-               {{{{X, X}}, {{X, X}}, {{X, X}}, {{X, X}}}},
-               {{{{X, X}}, {{X, X}}, {{X, X}}, {{X, X}}}},
-               {{{{X, X}}, {{X, X}}, {{X, X}}, {{X, X}}}},
-               {{{{X, X}}, {{X, X}}, {{X, X}}, {{X, X}}}}}}}};
-          return table_tet[refienement_choice];
+               {{{{X, X}}, {{X, X}}, {{X, X}}, {{X, X}}}}}};
+          return quad_lines_vertices_wedge;
         }
 
       case ReferenceCells::Hexahedron:
         {
-          constexpr dealii::ndarray<unsigned int, 12, 4, 2> table_hex = {
-            {{{{{10, 22}}, {{24, 26}}, {{10, 24}}, {{22, 26}}}},
-             {{{{24, 26}}, {{11, 23}}, {{24, 11}}, {{26, 23}}}},
-             {{{{22, 14}}, {{26, 25}}, {{22, 26}}, {{14, 25}}}},
-             {{{{26, 25}}, {{23, 15}}, {{26, 23}}, {{25, 15}}}},
-             {{{{8, 24}}, {{20, 26}}, {{8, 20}}, {{24, 26}}}},
-             {{{{20, 26}}, {{12, 25}}, {{20, 12}}, {{26, 25}}}},
-             {{{{24, 9}}, {{26, 21}}, {{24, 26}}, {{9, 21}}}},
-             {{{{26, 21}}, {{25, 13}}, {{26, 25}}, {{21, 13}}}},
-             {{{{16, 20}}, {{22, 26}}, {{16, 22}}, {{20, 26}}}},
-             {{{{22, 26}}, {{17, 21}}, {{22, 17}}, {{26, 21}}}},
-             {{{{20, 18}}, {{26, 23}}, {{20, 26}}, {{18, 23}}}},
-             {{{{26, 23}}, {{21, 19}}, {{26, 21}}, {{23, 19}}}}}};
-          return table_hex;
+          constexpr dealii::ndarray<unsigned int, 12, 4, 2>
+            quad_lines_vertices_hex = {
+              {{{{{10, 22}}, {{24, 26}}, {{10, 24}}, {{22, 26}}}},
+               {{{{24, 26}}, {{11, 23}}, {{24, 11}}, {{26, 23}}}},
+               {{{{22, 14}}, {{26, 25}}, {{22, 26}}, {{14, 25}}}},
+               {{{{26, 25}}, {{23, 15}}, {{26, 23}}, {{25, 15}}}},
+               {{{{8, 24}}, {{20, 26}}, {{8, 20}}, {{24, 26}}}},
+               {{{{20, 26}}, {{12, 25}}, {{20, 12}}, {{26, 25}}}},
+               {{{{24, 9}}, {{26, 21}}, {{24, 26}}, {{9, 21}}}},
+               {{{{26, 21}}, {{25, 13}}, {{26, 25}}, {{21, 13}}}},
+               {{{{16, 20}}, {{22, 26}}, {{16, 22}}, {{20, 26}}}},
+               {{{{22, 26}}, {{17, 21}}, {{22, 17}}, {{26, 21}}}},
+               {{{{20, 18}}, {{26, 23}}, {{20, 26}}, {{18, 23}}}},
+               {{{{26, 23}}, {{21, 19}}, {{26, 21}}, {{23, 19}}}}}};
+          return quad_lines_vertices_hex;
         }
       default:
-        DEAL_II_NOT_IMPLEMENTED();
+        DEAL_II_ASSERT_UNREACHABLE();
     }
 
   return {};
@@ -1622,9 +1671,9 @@ ReferenceCell::new_isotropic_child_face_line_vertices(
 
 constexpr dealii::ndarray<unsigned int, 8, 6>
 ReferenceCell::new_isotropic_child_cell_faces(
-  const unsigned int refienement_choice) const
+  const unsigned int refinement_choice) const
 {
-  // AssertIndexRange(refienement_choice, n_isotropic_refinement_choices());
+  // AssertIndexRange(refinement_choice, n_isotropic_refinement_choices());
   const unsigned int X = numbers::invalid_unsigned_int;
   switch (this->kind)
     {
@@ -1662,7 +1711,29 @@ ReferenceCell::new_isotropic_child_cell_faces(
                {{19, 5, 0, 6, X, X}},
                {{23, 1, 4, 7, X, X}},
              }}}};
-          return cell_quads_tet[refienement_choice];
+          return cell_quads_tet[refinement_choice];
+        }
+      case ReferenceCells::Pyramid:
+        DEAL_II_NOT_IMPLEMENTED();
+
+      case ReferenceCells::Wedge:
+        {
+          // Considerations that went into creating this table
+          // - Keep aspect ratio of 1.0 if parent had 1.0 (this is why the
+          //   centre wedge is rotated by 180° compared to the parent)
+          // - Order of children is similar to the order of a reference triangle
+          //   in the x-y-plane (i.e. like the top triangle of the parent)
+          dealii::ndarray<unsigned int, 8, 6> cell_quads_wedge = {{
+            {{23, 0, 10, 5, 19, X}}, // bottom children
+            {{22, 1, 11, 14, 4, X}}, //
+            {{24, 2, 6, 15, 18, X}}, //
+            {{25, 3, 6, 5, 4, X}},   //
+            {{0, 26, 12, 8, 21, X}}, // top children
+            {{1, 27, 13, 16, 7, X}}, //
+            {{2, 28, 9, 17, 20, X}}, //
+            {{3, 29, 9, 8, 7, X}}    //
+          }};
+          return cell_quads_wedge;
         }
 
       case ReferenceCells::Hexahedron:
@@ -1680,7 +1751,7 @@ ReferenceCell::new_isotropic_child_cell_faces(
           return cell_quads_hex;
         }
       default:
-        DEAL_II_NOT_IMPLEMENTED();
+        DEAL_II_ASSERT_UNREACHABLE();
     }
 
   return {};
@@ -1688,48 +1759,83 @@ ReferenceCell::new_isotropic_child_cell_faces(
 
 
 
-constexpr dealii::ndarray<unsigned int, 8, 4>
+constexpr dealii::ndarray<unsigned int, 8, 8>
 ReferenceCell::new_isotropic_child_cell_vertices(
-  const unsigned int refienement_choice) const
+  const unsigned int refinement_choice) const
 {
-  // AssertIndexRange(refienement_choice, n_isotropic_refinement_choices());
+  // AssertIndexRange(refinement_choice, n_isotropic_refinement_choices());
+
+  constexpr unsigned int X = numbers::invalid_unsigned_int;
 
   switch (this->kind)
     {
       case ReferenceCells::Tetrahedron:
         {
-          constexpr dealii::ndarray<unsigned int, 3, 8, 4> cell_vertices_tet = {
+          constexpr dealii::ndarray<unsigned int, 3, 8, 8> cell_vertices_tet = {
             {// new line is (6,8)
-             {{{{0, 4, 6, 7}},
-               {{4, 1, 5, 8}},
-               {{6, 5, 2, 9}},
-               {{7, 8, 9, 3}},
-               {{4, 5, 6, 8}},
-               {{4, 7, 8, 6}},
-               {{6, 9, 7, 8}},
-               {{5, 8, 9, 6}}}},
+             {{{{0, 4, 6, 7, X, X, X, X}},
+               {{4, 1, 5, 8, X, X, X, X}},
+               {{6, 5, 2, 9, X, X, X, X}},
+               {{7, 8, 9, 3, X, X, X, X}},
+               {{4, 5, 6, 8, X, X, X, X}},
+               {{4, 7, 8, 6, X, X, X, X}},
+               {{6, 9, 7, 8, X, X, X, X}},
+               {{5, 8, 9, 6, X, X, X, X}}}},
              // new line is (5,7)
-             {{{{0, 4, 6, 7}},
-               {{4, 1, 5, 8}},
-               {{6, 5, 2, 9}},
-               {{7, 8, 9, 3}},
-               {{4, 5, 6, 7}},
-               {{4, 7, 8, 5}},
-               {{6, 9, 7, 5}},
-               {{5, 8, 9, 7}}}},
+             {{{{0, 4, 6, 7, X, X, X, X}},
+               {{4, 1, 5, 8, X, X, X, X}},
+               {{6, 5, 2, 9, X, X, X, X}},
+               {{7, 8, 9, 3, X, X, X, X}},
+               {{4, 5, 6, 7, X, X, X, X}},
+               {{4, 7, 8, 5, X, X, X, X}},
+               {{6, 9, 7, 5, X, X, X, X}},
+               {{5, 8, 9, 7, X, X, X, X}}}},
              // new line is (4,9)
-             {{{{0, 4, 6, 7}},
-               {{4, 1, 5, 8}},
-               {{6, 5, 2, 9}},
-               {{7, 8, 9, 3}},
-               {{4, 5, 6, 9}},
-               {{4, 7, 8, 9}},
-               {{6, 9, 7, 4}},
-               {{5, 8, 9, 4}}}}}};
-          return cell_vertices_tet[refienement_choice];
+             {{{{0, 4, 6, 7, X, X, X, X}},
+               {{4, 1, 5, 8, X, X, X, X}},
+               {{6, 5, 2, 9, X, X, X, X}},
+               {{7, 8, 9, 3, X, X, X, X}},
+               {{4, 5, 6, 9, X, X, X, X}},
+               {{4, 7, 8, 9, X, X, X, X}},
+               {{6, 9, 7, 4, X, X, X, X}},
+               {{5, 8, 9, 4, X, X, X, X}}}}}};
+          return cell_vertices_tet[refinement_choice];
         }
-      default:
+      case ReferenceCells::Pyramid:
         DEAL_II_NOT_IMPLEMENTED();
+
+      case ReferenceCells::Wedge:
+        {
+          constexpr dealii::ndarray<unsigned int, 8, 8> cell_vertices_wedge = {{
+            {{0, 6, 8, 12, 15, 17, X, X}},   // bottom children
+            {{6, 1, 7, 15, 13, 16, X, X}},   //
+            {{8, 7, 2, 17, 16, 14, X, X}},   //
+            {{7, 8, 6, 16, 17, 15, X, X}},   //
+            {{12, 15, 17, 3, 9, 11, X, X}},  // top children
+            {{15, 13, 16, 9, 4, 10, X, X}},  //
+            {{17, 16, 14, 11, 10, 5, X, X}}, //
+            {{16, 17, 15, 10, 11, 9, X, X}}  //
+          }};
+          return cell_vertices_wedge;
+        }
+
+      case ReferenceCells::Hexahedron:
+        {
+          constexpr dealii::ndarray<unsigned int, 8, 8> cell_vertices_hex = {{
+            {{0, 10, 8, 24, 16, 22, 20, 26}},  // bottom children
+            {{10, 1, 24, 9, 22, 17, 26, 21}},  //
+            {{8, 24, 2, 11, 20, 26, 18, 23}},  //
+            {{24, 9, 11, 3, 26, 21, 23, 19}},  //
+            {{16, 22, 20, 26, 4, 14, 12, 25}}, // top children
+            {{22, 17, 26, 21, 14, 5, 25, 13}}, //
+            {{20, 26, 18, 23, 12, 25, 6, 15}}, //
+            {{26, 21, 23, 19, 25, 13, 15, 7}}  //
+          }};
+          return cell_vertices_hex;
+        }
+
+      default:
+        DEAL_II_ASSERT_UNREACHABLE();
     }
 
   return {};
@@ -2167,6 +2273,7 @@ ReferenceCell::n_isotropic_children() const
       case ReferenceCells::Pyramid:
         // We haven't yet decided how to refine pyramids. Update this when we
         // have
+        // TODO: Add pyramid
         return 0;
       case ReferenceCells::Wedge:
         return 8;
