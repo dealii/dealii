@@ -1,0 +1,509 @@
+// ------------------------------------------------------------------------
+//
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2017 - 2025 by the deal.II authors
+//
+// This file is part of the deal.II library.
+//
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
+//
+// ------------------------------------------------------------------------
+
+#ifndef dealii_trilinos_rol_vector_h
+#define dealii_trilinos_rol_vector_h
+
+#include <deal.II/base/config.h>
+
+#ifdef DEAL_II_TRILINOS_WITH_ROL
+#  include <deal.II/base/exceptions.h>
+
+#  include <deal.II/lac/vector.h>
+
+#  include <ROL_Vector.hpp>
+
+#  include <limits>
+#  include <type_traits>
+
+
+DEAL_II_NAMESPACE_OPEN
+
+namespace TrilinosWrappers
+{
+  /**
+   * An adaptor that provides an interface to the
+   * <a href="https://trilinos.org/docs/dev/packages/rol/doc/html/index.html">
+   * Rapid Optimization Library</a> (ROL), a Trilinos package.
+   *
+   * This class provides the implementation of the ROL::Vector interface
+   * for vectors of type <tt>VectorType</tt>. It supports vectors that satisfy
+   * the following requirements:
+   *
+   * The <tt>VectorType</tt> should contain the following types.
+   * ```
+   * VectorType::size_type;  // The type for size of the vector.
+   * VectorType::value_type; // The type for elements stored in the vector.
+   * VectorType::real_type;  // The type for real-valued numbers.
+   * ```
+   *
+   * However, ROL doesn't distinguish ROLVector::value_type from
+   * ROLVector::real_type. This is due to ROL's assumption that the
+   * ROLVector::value_type itself is a type for real-valued numbers.
+   * Therefore, ROLVector supports vectors whose real_type is
+   * convertible to value_type in the sense that
+   * <code>std::is_convertible_v<real_type, value_type></code> yields
+   * <code>true</code>.
+   *
+   * The <tt>VectorType</tt> should contain the following methods.
+   * @code
+   * // Reinitialize the current vector using a given vector's
+   * // size (and the parallel distribution) without copying
+   * // the elements.
+   * VectorType::reinit(const VectorType &, ...);
+   *
+   * // Globally add a given vector to the current.
+   * VectorType::operator+=(const VectorType &);
+   *
+   * // Scale all elements by a given scalar.
+   * VectorType::operator*=(const VectorType::value_type &);
+   *
+   * // Perform dot product with a given vector.
+   * VectorType::operator*=(const VectorType &);
+   *
+   * // Scale all elements of the current vector and globally
+   * // add a given vector to it.
+   * VectorType::add(const VectorType::value_type, const VectorType &);
+   *
+   * // Copies the data of a given vector to the current.
+   * // Resize the current vector if necessary (MPI safe).
+   * VectorType::operation=(const VectorType &);
+   *
+   * // Return the global size of the current vector.
+   * VectorType::size();
+   *
+   * // Return L^2 norm of the current vector
+   * VectorType::l2_norm();
+   *
+   * // Iterator to the start of the (locally owned) element
+   * // of the current vector.
+   * VectorType::begin();
+   *
+   * // Iterator to the one past the last (locally owned)
+   * // element of the current vector.
+   * VectorType::end();
+   *
+   * // Compress the vector i.e., flush the buffers of the
+   * // vector object if it has any.
+   * VectorType::compress(VectorOperation::insert);
+   * @endcode
+   *
+   * @note The current implementation in ROL doesn't support vector sizes above
+   * the largest value of int type. Some of the vectors in deal.II (see
+   * @ref Vector)
+   * may not satisfy the above requirements.
+   */
+  template <typename VectorType>
+  class ROLVector : public ROL::Vector<typename VectorType::value_type>
+  {
+    /**
+     * An alias for size type of <tt>VectorType</tt>.
+     */
+    using size_type = typename VectorType::size_type;
+
+    /**
+     * An alias for element type stored in the <tt>VectorType</tt>.
+     */
+    using value_type = typename VectorType::value_type;
+
+    /**
+     * An alias for real-valued numbers.
+     */
+    using real_type = typename VectorType::real_type;
+
+    static_assert(std::is_convertible_v<real_type, value_type>,
+                  "The real_type of the current VectorType is not "
+                  "convertible to the value_type.");
+
+  private:
+    /**
+     * ROL pointer to the underlying vector of type <tt>VectorType</tt>.
+     */
+    ROL::Ptr<VectorType> vector_ptr;
+
+  public:
+    /**
+     * Constructor.
+     */
+    ROLVector(const ROL::Ptr<VectorType> &vector_ptr);
+
+    /**
+     * Return the ROL pointer to the wrapper vector, #vector_ptr.
+     */
+    ROL::Ptr<VectorType>
+    getVector();
+
+    /**
+     * Return the ROL pointer to const vector.
+     */
+    ROL::Ptr<const VectorType>
+    getVector() const;
+
+    /**
+     * Return the dimension (global vector size) of the wrapped vector.
+     */
+    int
+    dimension() const;
+
+    /**
+     * Set the wrapper vector to a given ROL::Vector @p rol_vector by
+     * overwriting its contents.
+     *
+     * If the current wrapper vector has ghost elements,
+     * then <code> VectorType::operator=(const VectorType&) </code> should still
+     * be allowed on it.
+     */
+    void
+    set(const ROL::Vector<value_type> &rol_vector);
+
+    /**
+     * Perform addition.
+     */
+    void
+    plus(const ROL::Vector<value_type> &rol_vector);
+
+    /**
+     * Scale the wrapper vector by @p alpha and add ROL::Vector @p rol_vector
+     * to it.
+     */
+    void
+    axpy(const value_type alpha, const ROL::Vector<value_type> &rol_vector);
+
+    /**
+     * Scale the wrapper vector.
+     */
+    void
+    scale(const value_type alpha);
+
+    /**
+     * Return the dot product with a given ROL::Vector @p rol_vector.
+     */
+    value_type
+    dot(const ROL::Vector<value_type> &rol_vector) const;
+
+    /**
+     * Return the $L^{2}$ norm of the wrapped vector.
+     *
+     * The returned type is of ROLVector::value_type so as to maintain
+     * consistency with ROL::Vector<ROLVector::value_type> and
+     * more importantly to not to create an overloaded version namely,
+     * <code> ROLVector::real_type norm() const; </code>
+     * if real_type and value_type are not of the same type.
+     */
+    value_type
+    norm() const;
+
+    /**
+     * Return a clone of the wrapped vector.
+     */
+    ROL::Ptr<ROL::Vector<value_type>>
+    clone() const;
+
+    /**
+     * Create and return a ROL pointer to the basis vector corresponding to the
+     * @p i ${}^{th}$ element of the wrapper vector.
+     */
+    ROL::Ptr<ROL::Vector<value_type>>
+    basis(const int i) const;
+
+    /**
+     * Apply unary function @p f to all the elements of the wrapped vector.
+     */
+    void
+    applyUnary(const ROL::Elementwise::UnaryFunction<value_type> &f);
+
+    /**
+     * Apply binary function @p f along with ROL::Vector @p rol_vector to all
+     * the elements of the wrapped vector.
+     */
+    void
+    applyBinary(const ROL::Elementwise::BinaryFunction<value_type> &f,
+                const ROL::Vector<value_type>                      &rol_vector);
+
+    /**
+     * Return the accumulated value on applying reduction operation @p r on
+     * all the elements of the wrapped vector.
+     */
+    value_type
+    reduce(const ROL::Elementwise::ReductionOp<value_type> &r) const;
+
+    /**
+     * Print the wrapped vector to the output stream @p outStream.
+     */
+    void
+    print(std::ostream &outStream) const;
+  };
+
+
+  /*------------------------------member definitions--------------------------*/
+#  ifndef DOXYGEN
+
+
+  template <typename VectorType>
+  ROLVector<VectorType>::ROLVector(const ROL::Ptr<VectorType> &vector_ptr)
+    : vector_ptr(vector_ptr)
+  {}
+
+
+
+  template <typename VectorType>
+  ROL::Ptr<VectorType>
+  ROLVector<VectorType>::getVector()
+  {
+    return vector_ptr;
+  }
+
+
+
+  template <typename VectorType>
+  ROL::Ptr<const VectorType>
+  ROLVector<VectorType>::getVector() const
+  {
+    return vector_ptr;
+  }
+
+
+
+  template <typename VectorType>
+  void
+  ROLVector<VectorType>::set(const ROL::Vector<value_type> &rol_vector)
+  {
+    const ROLVector &vector_adaptor =
+      dynamic_cast<const ROLVector &>(rol_vector);
+
+    (*vector_ptr) = *(vector_adaptor.getVector());
+  }
+
+
+
+  template <typename VectorType>
+  void
+  ROLVector<VectorType>::plus(const ROL::Vector<value_type> &rol_vector)
+  {
+    Assert(this->dimension() == rol_vector.dimension(),
+           ExcDimensionMismatch(this->dimension(), rol_vector.dimension()));
+
+    const ROLVector &vector_adaptor =
+      dynamic_cast<const ROLVector &>(rol_vector);
+
+    *vector_ptr += *(vector_adaptor.getVector());
+  }
+
+
+
+  template <typename VectorType>
+  void
+  ROLVector<VectorType>::axpy(const value_type               alpha,
+                              const ROL::Vector<value_type> &rol_vector)
+  {
+    Assert(this->dimension() == rol_vector.dimension(),
+           ExcDimensionMismatch(this->dimension(), rol_vector.dimension()));
+
+    const ROLVector &vector_adaptor =
+      dynamic_cast<const ROLVector &>(rol_vector);
+
+    vector_ptr->add(alpha, *(vector_adaptor.getVector()));
+  }
+
+
+
+  template <typename VectorType>
+  int
+  ROLVector<VectorType>::dimension() const
+  {
+    Assert(vector_ptr->size() < std::numeric_limits<int>::max(),
+           ExcMessage("The size of the vector being used is greater than "
+                      "largest value of type int."));
+    return static_cast<int>(vector_ptr->size());
+  }
+
+
+
+  template <typename VectorType>
+  void
+  ROLVector<VectorType>::scale(const value_type alpha)
+  {
+    (*vector_ptr) *= alpha;
+  }
+
+
+
+  template <typename VectorType>
+  typename VectorType::value_type
+  ROLVector<VectorType>::dot(const ROL::Vector<value_type> &rol_vector) const
+  {
+    Assert(this->dimension() == rol_vector.dimension(),
+           ExcDimensionMismatch(this->dimension(), rol_vector.dimension()));
+
+    const ROLVector &vector_adaptor =
+      dynamic_cast<const ROLVector &>(rol_vector);
+
+    return (*vector_ptr) * (*vector_adaptor.getVector());
+  }
+
+
+
+  template <typename VectorType>
+  typename VectorType::value_type
+  ROLVector<VectorType>::norm() const
+  {
+    return vector_ptr->l2_norm();
+  }
+
+
+
+  template <typename VectorType>
+  ROL::Ptr<ROL::Vector<typename VectorType::value_type>>
+  ROLVector<VectorType>::clone() const
+  {
+    ROL::Ptr<VectorType> vec_ptr = ROL::makePtr<VectorType>(*vector_ptr);
+
+    return ROL::makePtr<ROLVector>(vec_ptr);
+  }
+
+
+
+  template <typename VectorType>
+  ROL::Ptr<ROL::Vector<typename VectorType::value_type>>
+  ROLVector<VectorType>::basis(const int i) const
+  {
+    ROL::Ptr<VectorType> vec_ptr = ROL::makePtr<VectorType>();
+
+    // Zero all the entries in dealii vector.
+    vec_ptr->reinit(*vector_ptr, false);
+
+    if (vector_ptr->locally_owned_elements().is_element(i))
+      vec_ptr->operator[](i) = 1.;
+
+    if (vec_ptr->has_ghost_elements())
+      {
+        vec_ptr->update_ghost_values();
+      }
+    else
+      {
+        vec_ptr->compress(VectorOperation::insert);
+      }
+
+    return ROL::makePtr<ROLVector>(vec_ptr);
+  }
+
+
+
+  template <typename VectorType>
+  void
+  ROLVector<VectorType>::applyUnary(
+    const ROL::Elementwise::UnaryFunction<value_type> &f)
+  {
+    const typename VectorType::iterator vend = vector_ptr->end();
+
+    for (typename VectorType::iterator iterator = vector_ptr->begin();
+         iterator != vend;
+         iterator++)
+      *iterator = f.apply(*iterator);
+
+    if (vector_ptr->has_ghost_elements())
+      {
+        vector_ptr->update_ghost_values();
+      }
+    else
+      {
+        vector_ptr->compress(VectorOperation::insert);
+      }
+  }
+
+
+
+  template <typename VectorType>
+  void
+  ROLVector<VectorType>::applyBinary(
+    const ROL::Elementwise::BinaryFunction<value_type> &f,
+    const ROL::Vector<value_type>                      &rol_vector)
+  {
+    Assert(this->dimension() == rol_vector.dimension(),
+           ExcDimensionMismatch(this->dimension(), rol_vector.dimension()));
+
+    const ROLVector &vector_adaptor =
+      dynamic_cast<const ROLVector &>(rol_vector);
+
+    const VectorType &given_rol_vector = *(vector_adaptor.getVector());
+
+    const typename VectorType::iterator       vend   = vector_ptr->end();
+    const typename VectorType::const_iterator rolend = given_rol_vector.end();
+
+    typename VectorType::const_iterator r_iterator = given_rol_vector.begin();
+    for (typename VectorType::iterator l_iterator = vector_ptr->begin();
+         l_iterator != vend && r_iterator != rolend;
+         l_iterator++, r_iterator++)
+      *l_iterator = f.apply(*l_iterator, *r_iterator);
+
+    if (vector_ptr->has_ghost_elements())
+      {
+        vector_ptr->update_ghost_values();
+      }
+    else
+      {
+        vector_ptr->compress(VectorOperation::insert);
+      }
+  }
+
+
+
+  template <typename VectorType>
+  typename VectorType::value_type
+  ROLVector<VectorType>::reduce(
+    const ROL::Elementwise::ReductionOp<value_type> &r) const
+  {
+    typename VectorType::value_type result = r.initialValue();
+
+    const typename VectorType::iterator vend = vector_ptr->end();
+
+    for (typename VectorType::iterator iterator = vector_ptr->begin();
+         iterator != vend;
+         iterator++)
+      r.reduce(*iterator, result);
+    // Parallel reduction among processes is handled internally.
+
+    return result;
+  }
+
+
+
+  template <typename VectorType>
+  void
+  ROLVector<VectorType>::print(std::ostream &outStream) const
+  {
+    vector_ptr->print(outStream);
+  }
+
+
+#  endif // DOXYGEN
+
+
+} // namespace TrilinosWrappers
+
+
+DEAL_II_NAMESPACE_CLOSE
+
+
+#else
+
+// Make sure the scripts that create the C++20 module input files have
+// something to latch on if the preprocessor #ifdef above would
+// otherwise lead to an empty content of the file.
+DEAL_II_NAMESPACE_OPEN
+DEAL_II_NAMESPACE_CLOSE
+
+#endif // DEAL_II_TRILINOS_WITH_ROL
+
+#endif // dealii_trilinos_rol_vector_h
