@@ -366,10 +366,11 @@ public:
 
   /**
    * Return an object that can be thought of as an array containing the indices
-   * of the givent cell's faces of the desired type @p face_ref_type.
+   * of the givent cell's faces of the desired type @p face_ref_type. Indices
+   * form a continuous range that is empty in case no face of such type exists.
    */
   std_cxx20::ranges::iota_view<unsigned int, unsigned int>
-  face_indices_by_type(ReferenceCell face_ref_type) const;
+  face_indices_by_type(const ReferenceCell &face_ref_type) const;
 
   /**
    * Return the number of refinement directions of the cell.
@@ -2131,10 +2132,8 @@ ReferenceCell::face_indices() const
 
 
 inline std_cxx20::ranges::iota_view<unsigned int, unsigned int>
-ReferenceCell::face_indices_by_type(ReferenceCell face_ref_type) const
+ReferenceCell::face_indices_by_type(const ReferenceCell &face_ref_type) const
 {
-  // Somewhat of a duplicate of internal::TriangulationImplementation::CellTypeX
-  // type_of_entity().
   switch (this->kind)
     {
       case ReferenceCells::Vertex:
