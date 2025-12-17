@@ -148,13 +148,13 @@ namespace TrilinosWrappers
     /**
      * Global dimension of the optimization space.
      */
-    IndexSet::size_type global_dimension;
+    dealii::types::global_dof_index global_dimension;
 
     /**
      * Prefix sum of the number of elements in the optimization space of lower
      * rank MPI processes.
      */
-    IndexSet::size_type prefix_sum;
+    dealii::types::global_dof_index prefix_sum;
 
   public:
     /**
@@ -342,7 +342,7 @@ namespace TrilinosWrappers
 
     // The return type of ROL::Vector::dimension() has to be int,
     // so we check this requirement of ROL here.
-    Assert(global_dimension < static_cast<types::global_dof_index>(
+    Assert(global_dimension < static_cast<dealii::types::global_dof_index>(
                                 std::numeric_limits<int>::max()),
            ExcMessage("The number of elements to optimize is greater than the "
                       "largest value of type int."));
