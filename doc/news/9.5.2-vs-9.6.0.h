@@ -1047,7 +1047,7 @@ inconvenience this causes.
 
  <li>
   Fixed: The function GridTools::compute_active_cell_halo_layer() now
-  also supports perodic meshes.
+  also supports periodic meshes.
   <br>
   (Peter Munch, 2024/02/12)
  </li>

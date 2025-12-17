@@ -607,7 +607,7 @@ namespace Differentiation
       /**
        * Negation operator.
        *
-       * Return a the result of pre-multipying this object's @p expression
+       * Return a the result of pre-multiplying this object's @p expression
        * by <tt>-1</tt>.
        *
        * @note This operation is not performed in-place.

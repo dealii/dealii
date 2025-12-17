@@ -173,19 +173,19 @@ create_sampling_points<2>(std::vector<Point<2>> &sampling_points_left,
   const double offset = 0.1;
   const double step   = (1.0 - 2 * offset) / (N - 1);
 
-  unsigned int indx = 0;
+  unsigned int index = 0;
 
   for (unsigned int j = 0; j < N; j++)
     for (unsigned int i = 0; i < N; i++)
       {
-        indx = i + N * j;
+        index = i + N * j;
 
-        sampling_points_left.at(indx)[0] = offset + step * i;
-        sampling_points_left.at(indx)[1] = offset + step * j;
+        sampling_points_left.at(index)[0] = offset + step * i;
+        sampling_points_left.at(index)[1] = offset + step * j;
 
-        sampling_points_right.at(indx)[0] =
-          2.0 - sampling_points_left.at(indx)[0];
-        sampling_points_right.at(indx)[1] = sampling_points_left.at(indx)[1];
+        sampling_points_right.at(index)[0] =
+          2.0 - sampling_points_left.at(index)[0];
+        sampling_points_right.at(index)[1] = sampling_points_left.at(index)[1];
       }
 }
 
@@ -198,22 +198,24 @@ create_sampling_points<3>(std::vector<Point<3>> &sampling_points_left,
   const double offset = 0.1;
   const double step   = (1.0 - 2 * offset) / (N - 1);
 
-  unsigned int indx = 0;
+  unsigned int index = 0;
 
   for (unsigned int k = 0; k < N; k++)
     for (unsigned int j = 0; j < N; j++)
       for (unsigned int i = 0; i < N; i++)
         {
-          indx = i + N * j + N * N * k;
+          index = i + N * j + N * N * k;
 
-          sampling_points_left.at(indx)[0] = offset + step * i;
-          sampling_points_left.at(indx)[1] = offset + step * j;
-          sampling_points_left.at(indx)[2] = offset + step * k;
+          sampling_points_left.at(index)[0] = offset + step * i;
+          sampling_points_left.at(index)[1] = offset + step * j;
+          sampling_points_left.at(index)[2] = offset + step * k;
 
-          sampling_points_right.at(indx)[0] =
-            2.0 - sampling_points_left.at(indx)[0];
-          sampling_points_right.at(indx)[1] = sampling_points_left.at(indx)[1];
-          sampling_points_right.at(indx)[2] = sampling_points_left.at(indx)[2];
+          sampling_points_right.at(index)[0] =
+            2.0 - sampling_points_left.at(index)[0];
+          sampling_points_right.at(index)[1] =
+            sampling_points_left.at(index)[1];
+          sampling_points_right.at(index)[2] =
+            sampling_points_left.at(index)[2];
         }
 }
 

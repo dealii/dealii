@@ -381,9 +381,9 @@ void SolverIDR<VectorType>::solve(const MatrixType         &A,
           for (unsigned int b = 0;
                b < internal::SolverIDRImplementation::n_blocks(tmp_q);
                ++b)
-            for (auto indx : internal::SolverIDRImplementation::block(tmp_q, b)
-                               .locally_owned_elements())
-              internal::SolverIDRImplementation::block(tmp_q, b)(indx) =
+            for (auto index : internal::SolverIDRImplementation::block(tmp_q, b)
+                                .locally_owned_elements())
+              internal::SolverIDRImplementation::block(tmp_q, b)(index) =
                 normal_distribution(rng);
           tmp_q.compress(VectorOperation::insert);
         }

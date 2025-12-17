@@ -394,7 +394,7 @@ inconvenience this causes.
  </li>
 
  <li>
-  Changed: The SynchronousIteartors::iterators member variable has been
+  Changed: The SynchronousIterators::iterators member variable has been
   made private, as mentioned in the changelog of the previous
   release. It can be accessed via SynchronousIterators::operator*(),
   however.
@@ -2504,7 +2504,7 @@ inconvenience this causes.
 
  <li>
   Deprecated: internal::bool2type and int2type has been deprecated
-  in favor of std::intergral_constant.
+  in favor of std::integral_constant.
   <br>
   (Daniel Arndt, 2017/08/10)
  </li>

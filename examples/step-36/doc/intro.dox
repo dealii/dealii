@@ -233,7 +233,7 @@ the various eigenfunctions we want to compute. Moreover, the
 <code>main</code> function, which has the top-level control over
 everything here, initializes and finalizes the interface to SLEPc and
 PETSc simultaneously via <code>SlepcInitialize</code> and
-<code>SlepFinalize</code>.</li>
+<code>SlepcFinalize</code>.</li>
 
 <li>We use PETSc matrices and vectors as in step-17 and
 step-18 since that is what the SLEPc eigenvalue solvers

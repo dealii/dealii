@@ -127,7 +127,7 @@ SystemTest<dim>::check_numbering()
     };
 
 
-  // Now: Componentwise reodering of the dofs
+  // Now: Componentwise reordering of the dofs
 
   deallog << "  Now we renumber the DoFs anti-component-wise:" << std::endl;
   deallog << "  *********************************************" << std::endl;
