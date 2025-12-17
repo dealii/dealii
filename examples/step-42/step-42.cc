@@ -1983,7 +1983,7 @@ namespace Step42
     distributed_active_set_vector = 0.;
     for (const auto index : active_set)
       distributed_active_set_vector[index] = 1.;
-    distributed_lambda.compress(VectorOperation::insert);
+    distributed_active_set_vector.compress(VectorOperation::insert);
 
     TrilinosWrappers::MPI::Vector active_set_vector(locally_relevant_dofs,
                                                     mpi_communicator);
