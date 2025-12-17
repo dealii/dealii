@@ -2436,7 +2436,8 @@ CellAccessor<dim, spacedim>::neighbor_of_neighbor_internal(
   // the grid, this cell is just on
   // the opposite side of the
   // neighbor that the neighbor is of
-  // this cell. for example in 2d, if
+  // this cell. on structured grids
+  // for example in 2d, if
   // we want to know the
   // neighbor_of_neighbor if
   // neighbor==1 (the right
@@ -2444,34 +2445,37 @@ CellAccessor<dim, spacedim>::neighbor_of_neighbor_internal(
   // (the left neighbor) in most
   // cases. look up this relationship
   // in the table provided by
-  // GeometryInfo and try it
+  // reference cell and try it.
+  // on mixed meshes we cannot get any
+  // meaningful information about the opposite
+  // face, so guess simply zero
   const unsigned int this_face_index = face_index(neighbor);
 
   const unsigned int neighbor_guess =
-    GeometryInfo<dim>::opposite_face[neighbor];
+    this->reference_cell() == neighbor_cell->reference_cell() ?
+      this->reference_cell().opposite_face_index(neighbor) :
+      0;
 
-  if (neighbor_guess < neighbor_cell->n_faces() &&
-      neighbor_cell->face_index(neighbor_guess) == this_face_index)
+  if (neighbor_cell->face_index(neighbor_guess) == this_face_index)
     return neighbor_guess;
-  else
-    // if the guess was false, then
-    // we need to loop over all
-    // neighbors and find the number
-    // the hard way
-    {
-      for (const unsigned int face_no : neighbor_cell->face_indices())
-        if (neighbor_cell->face_index(face_no) == this_face_index)
-          return face_no;
 
-      // running over all neighbors
-      // faces we did not find the
-      // present face. Thereby the
-      // neighbor must be coarser
-      // than the present
-      // cell. Return an invalid
-      // unsigned int in this case.
-      return numbers::invalid_unsigned_int;
-    }
+  // if the guess was false, then
+  // we need to loop over all
+  // neighbors and find the number
+  // the hard way
+  for (const unsigned int face_no : neighbor_cell->face_indices())
+    if (face_no != neighbor_guess)
+      if (neighbor_cell->face_index(face_no) == this_face_index)
+        return face_no;
+
+  // running over all neighbors
+  // faces we did not find the
+  // present face. Thereby the
+  // neighbor must be coarser
+  // than the present
+  // cell. Return an invalid
+  // unsigned int in this case.
+  return numbers::invalid_unsigned_int;
 }
 
 
@@ -2532,9 +2536,14 @@ CellAccessor<dim, spacedim>::neighbor_of_coarser_neighbor(
           // (the left neighbor) in most
           // cases. look up this relationship
           // in the table provided by
-          // GeometryInfo and try it
+          // the reference cell and try it
+          // on mixed meshes we cannot get any
+          // meaningful information about the
+          // opposite face, so guess simply zero
           const unsigned int face_no_guess =
-            GeometryInfo<2>::opposite_face[neighbor];
+            this->reference_cell() == neighbor_cell->reference_cell() ?
+              this->reference_cell().opposite_face_index(neighbor) :
+              0;
 
           const TriaIterator<TriaAccessor<dim - 1, dim, spacedim>> face_guess =
             neighbor_cell->face(face_no_guess);
@@ -2584,9 +2593,13 @@ CellAccessor<dim, spacedim>::neighbor_of_coarser_neighbor(
           // for example in 2d, if we want to know the neighbor_of_neighbor if
           // neighbor==1 (the right neighbor), then we will get 0 (the left
           // neighbor) in most cases. look up this relationship in the table
-          // provided by GeometryInfo and try it
+          // provided by the reference cell and try it
+          // on mixed meshes we cannot get any meaningful information about the
+          // opposite face, so guess simply zero
           const unsigned int face_no_guess =
-            GeometryInfo<3>::opposite_face[neighbor];
+            this->reference_cell() == neighbor_cell->reference_cell() ?
+              this->reference_cell().opposite_face_index(neighbor) :
+              0;
 
           const TriaIterator<TriaAccessor<dim - 1, dim, spacedim>> face_guess =
             neighbor_cell->face(face_no_guess);
