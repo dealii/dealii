@@ -359,7 +359,8 @@ namespace TrilinosWrappers
 
     // The return type of ROL::Vector::dimension() has to be int,
     // so we check this requirement of ROL here.
-    Assert(global_dimension < std::numeric_limits<int>::max(),
+    Assert(global_dimension < static_cast<types::global_dof_index>(
+                                std::numeric_limits<int>::max()),
            ExcMessage("The number of elements to optimize is greater than the "
                       "largest value of type int."));
   }
@@ -390,7 +391,9 @@ namespace TrilinosWrappers
   {
     const ROLVector &other = dynamic_cast<const ROLVector &>(other_);
 
-    (*vector_ptr)      = *(other.getVector());
+    // Perform a deep copy of the vector pointed to by vector_ptr.
+    (*vector_ptr) = *(other.getVector());
+
     optimization_space = other.optimization_space;
     global_dimension   = other.global_dimension;
     prefix_sum         = other.prefix_sum;
