@@ -1,0 +1,80 @@
+
+DEAL::Testing Line
+DEAL::received data face info
+DEAL::id type
+DEAL:: 1 Vertex
+DEAL:: 0 Vertex
+DEAL::face: 0 of type Vertex
+DEAL::face: 1 of type Vertex
+DEAL::Testing Tri
+DEAL::received data face info
+DEAL::id type
+DEAL:: 2 Line
+DEAL:: 1 Line
+DEAL:: 0 Line
+DEAL::face: 0 of type Line
+DEAL::face: 1 of type Line
+DEAL::face: 2 of type Line
+DEAL::Testing Quad
+DEAL::received data face info
+DEAL::id type
+DEAL:: 3 Line
+DEAL:: 2 Line
+DEAL:: 1 Line
+DEAL:: 0 Line
+DEAL::face: 0 of type Line
+DEAL::face: 1 of type Line
+DEAL::face: 2 of type Line
+DEAL::face: 3 of type Line
+DEAL::Testing Tet
+DEAL::received data face info
+DEAL::id type
+DEAL:: 3 Tri
+DEAL:: 2 Tri
+DEAL:: 1 Tri
+DEAL:: 0 Tri
+DEAL::face: 0 of type Tri
+DEAL::face: 1 of type Tri
+DEAL::face: 2 of type Tri
+DEAL::face: 3 of type Tri
+DEAL::Testing Pyramid
+DEAL::received data face info
+DEAL::id type
+DEAL:: 0 Quad
+DEAL:: 4 Tri
+DEAL:: 3 Tri
+DEAL:: 2 Tri
+DEAL:: 1 Tri
+DEAL::face: 0 of type Quad
+DEAL::face: 1 of type Tri
+DEAL::face: 2 of type Tri
+DEAL::face: 3 of type Tri
+DEAL::face: 4 of type Tri
+DEAL::Testing Wedge
+DEAL::received data face info
+DEAL::id type
+DEAL:: 4 Quad
+DEAL:: 3 Quad
+DEAL:: 2 Quad
+DEAL:: 1 Tri
+DEAL:: 0 Tri
+DEAL::face: 0 of type Tri
+DEAL::face: 1 of type Tri
+DEAL::face: 2 of type Quad
+DEAL::face: 3 of type Quad
+DEAL::face: 4 of type Quad
+DEAL::Testing Hex
+DEAL::received data face info
+DEAL::id type
+DEAL:: 5 Quad
+DEAL:: 4 Quad
+DEAL:: 3 Quad
+DEAL:: 2 Quad
+DEAL:: 1 Quad
+DEAL:: 0 Quad
+DEAL::face: 0 of type Quad
+DEAL::face: 1 of type Quad
+DEAL::face: 2 of type Quad
+DEAL::face: 3 of type Quad
+DEAL::face: 4 of type Quad
+DEAL::face: 5 of type Quad

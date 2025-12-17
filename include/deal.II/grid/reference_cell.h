@@ -365,6 +365,14 @@ public:
   face_indices() const;
 
   /**
+   * Return an object that can be thought of as an array containing the indices
+   * of the givent cell's faces of the desired type @p face_ref_type. Indices
+   * form a continuous range that is empty in case no face of such type exists.
+   */
+  std_cxx20::ranges::iota_view<unsigned int, unsigned int>
+  face_indices_by_type(const ReferenceCell &face_ref_type) const;
+
+  /**
    * Return the number of refinement directions of the cell.
    */
   unsigned int
@@ -1545,63 +1553,63 @@ ReferenceCell::new_isotropic_child_face_line_vertices(
       case ReferenceCells::Tetrahedron:
         {
           constexpr dealii::ndarray<unsigned int, 3, 12, 4, 2> table_tet = {
-            {// new line is (6, 8)
-             {{{{{{6, 4}}, {{4, 7}}, {{7, 6}}, {{X, X}}}},
-               {{{{4, 5}}, {{5, 8}}, {{8, 4}}, {{X, X}}}},
-               {{{{5, 6}}, {{6, 9}}, {{9, 5}}, {{X, X}}}},
-               {{{{7, 8}}, {{8, 9}}, {{9, 7}}, {{X, X}}}},
-               {{{{4, 6}}, {{6, 8}}, {{8, 4}}, {{X, X}}}},
-               {{{{6, 5}}, {{5, 8}}, {{8, 6}}, {{X, X}}}},
-               {{{{8, 7}}, {{7, 6}}, {{6, 8}}, {{X, X}}}},
-               {{{{9, 6}}, {{6, 8}}, {{8, 9}}, {{X, X}}}},
-               {{{{X, X}}, {{X, X}}, {{X, X}}, {{X, X}}}},
-               {{{{X, X}}, {{X, X}}, {{X, X}}, {{X, X}}}},
-               {{{{X, X}}, {{X, X}}, {{X, X}}, {{X, X}}}},
-               {{{{X, X}}, {{X, X}}, {{X, X}}, {{X, X}}}}}},
-             // new line is (5, 7)
-             {{{{{{6, 4}}, {{4, 7}}, {{7, 6}}, {{X, X}}}},
-               {{{{4, 5}}, {{5, 8}}, {{8, 4}}, {{X, X}}}},
-               {{{{5, 6}}, {{6, 9}}, {{9, 5}}, {{X, X}}}},
-               {{{{7, 8}}, {{8, 9}}, {{9, 7}}, {{X, X}}}},
-               {{{{5, 4}}, {{4, 7}}, {{7, 5}}, {{X, X}}}},
-               {{{{6, 5}}, {{5, 7}}, {{7, 6}}, {{X, X}}}},
-               {{{{8, 7}}, {{7, 5}}, {{5, 8}}, {{X, X}}}},
-               {{{{7, 9}}, {{9, 5}}, {{5, 7}}, {{X, X}}}},
-               {{{{X, X}}, {{X, X}}, {{X, X}}, {{X, X}}}},
-               {{{{X, X}}, {{X, X}}, {{X, X}}, {{X, X}}}},
-               {{{{X, X}}, {{X, X}}, {{X, X}}, {{X, X}}}},
-               {{{{X, X}}, {{X, X}}, {{X, X}}, {{X, X}}}}}},
-             // new line is (4, 9)
-             {{{{{{6, 4}}, {{4, 7}}, {{7, 6}}, {{X, X}}}},
-               {{{{4, 5}}, {{5, 8}}, {{8, 4}}, {{X, X}}}},
-               {{{{5, 6}}, {{6, 9}}, {{9, 5}}, {{X, X}}}},
-               {{{{7, 8}}, {{8, 9}}, {{9, 7}}, {{X, X}}}},
-               {{{{5, 4}}, {{4, 9}}, {{9, 5}}, {{X, X}}}},
-               {{{{4, 6}}, {{6, 9}}, {{9, 4}}, {{X, X}}}},
-               {{{{7, 4}}, {{4, 9}}, {{9, 7}}, {{X, X}}}},
-               {{{{4, 8}}, {{8, 9}}, {{9, 4}}, {{X, X}}}},
-               {{{{X, X}}, {{X, X}}, {{X, X}}, {{X, X}}}},
-               {{{{X, X}}, {{X, X}}, {{X, X}}, {{X, X}}}},
-               {{{{X, X}}, {{X, X}}, {{X, X}}, {{X, X}}}},
-               {{{{X, X}}, {{X, X}}, {{X, X}}, {{X, X}}}}}}}};
+              {// new line is (6, 8)
+               {{{{{{6, 4}}, {{4, 7}}, {{7, 6}}, {{X, X}}}},
+                 {{{{4, 5}}, {{5, 8}}, {{8, 4}}, {{X, X}}}},
+                 {{{{5, 6}}, {{6, 9}}, {{9, 5}}, {{X, X}}}},
+                 {{{{7, 8}}, {{8, 9}}, {{9, 7}}, {{X, X}}}},
+                 {{{{4, 6}}, {{6, 8}}, {{8, 4}}, {{X, X}}}},
+                 {{{{6, 5}}, {{5, 8}}, {{8, 6}}, {{X, X}}}},
+                 {{{{8, 7}}, {{7, 6}}, {{6, 8}}, {{X, X}}}},
+                 {{{{9, 6}}, {{6, 8}}, {{8, 9}}, {{X, X}}}},
+                 {{{{X, X}}, {{X, X}}, {{X, X}}, {{X, X}}}},
+                 {{{{X, X}}, {{X, X}}, {{X, X}}, {{X, X}}}},
+                 {{{{X, X}}, {{X, X}}, {{X, X}}, {{X, X}}}},
+                 {{{{X, X}}, {{X, X}}, {{X, X}}, {{X, X}}}}}},
+               // new line is (5, 7)
+               {{{{{{6, 4}}, {{4, 7}}, {{7, 6}}, {{X, X}}}},
+                 {{{{4, 5}}, {{5, 8}}, {{8, 4}}, {{X, X}}}},
+                 {{{{5, 6}}, {{6, 9}}, {{9, 5}}, {{X, X}}}},
+                 {{{{7, 8}}, {{8, 9}}, {{9, 7}}, {{X, X}}}},
+                 {{{{5, 4}}, {{4, 7}}, {{7, 5}}, {{X, X}}}},
+                 {{{{6, 5}}, {{5, 7}}, {{7, 6}}, {{X, X}}}},
+                 {{{{8, 7}}, {{7, 5}}, {{5, 8}}, {{X, X}}}},
+                 {{{{7, 9}}, {{9, 5}}, {{5, 7}}, {{X, X}}}},
+                 {{{{X, X}}, {{X, X}}, {{X, X}}, {{X, X}}}},
+                 {{{{X, X}}, {{X, X}}, {{X, X}}, {{X, X}}}},
+                 {{{{X, X}}, {{X, X}}, {{X, X}}, {{X, X}}}},
+                 {{{{X, X}}, {{X, X}}, {{X, X}}, {{X, X}}}}}},
+               // new line is (4, 9)
+               {{{{{{6, 4}}, {{4, 7}}, {{7, 6}}, {{X, X}}}},
+                 {{{{4, 5}}, {{5, 8}}, {{8, 4}}, {{X, X}}}},
+                 {{{{5, 6}}, {{6, 9}}, {{9, 5}}, {{X, X}}}},
+                 {{{{7, 8}}, {{8, 9}}, {{9, 7}}, {{X, X}}}},
+                 {{{{5, 4}}, {{4, 9}}, {{9, 5}}, {{X, X}}}},
+                 {{{{4, 6}}, {{6, 9}}, {{9, 4}}, {{X, X}}}},
+                 {{{{7, 4}}, {{4, 9}}, {{9, 7}}, {{X, X}}}},
+                 {{{{4, 8}}, {{8, 9}}, {{9, 4}}, {{X, X}}}},
+                 {{{{X, X}}, {{X, X}}, {{X, X}}, {{X, X}}}},
+                 {{{{X, X}}, {{X, X}}, {{X, X}}, {{X, X}}}},
+                 {{{{X, X}}, {{X, X}}, {{X, X}}, {{X, X}}}},
+                 {{{{X, X}}, {{X, X}}, {{X, X}}, {{X, X}}}}}}}};
           return table_tet[refienement_choice];
         }
 
       case ReferenceCells::Hexahedron:
         {
           constexpr dealii::ndarray<unsigned int, 12, 4, 2> table_hex = {
-            {{{{{10, 22}}, {{24, 26}}, {{10, 24}}, {{22, 26}}}},
-             {{{{24, 26}}, {{11, 23}}, {{24, 11}}, {{26, 23}}}},
-             {{{{22, 14}}, {{26, 25}}, {{22, 26}}, {{14, 25}}}},
-             {{{{26, 25}}, {{23, 15}}, {{26, 23}}, {{25, 15}}}},
-             {{{{8, 24}}, {{20, 26}}, {{8, 20}}, {{24, 26}}}},
-             {{{{20, 26}}, {{12, 25}}, {{20, 12}}, {{26, 25}}}},
-             {{{{24, 9}}, {{26, 21}}, {{24, 26}}, {{9, 21}}}},
-             {{{{26, 21}}, {{25, 13}}, {{26, 25}}, {{21, 13}}}},
-             {{{{16, 20}}, {{22, 26}}, {{16, 22}}, {{20, 26}}}},
-             {{{{22, 26}}, {{17, 21}}, {{22, 17}}, {{26, 21}}}},
-             {{{{20, 18}}, {{26, 23}}, {{20, 26}}, {{18, 23}}}},
-             {{{{26, 23}}, {{21, 19}}, {{26, 21}}, {{23, 19}}}}}};
+              {{{{{10, 22}}, {{24, 26}}, {{10, 24}}, {{22, 26}}}},
+               {{{{24, 26}}, {{11, 23}}, {{24, 11}}, {{26, 23}}}},
+               {{{{22, 14}}, {{26, 25}}, {{22, 26}}, {{14, 25}}}},
+               {{{{26, 25}}, {{23, 15}}, {{26, 23}}, {{25, 15}}}},
+               {{{{8, 24}}, {{20, 26}}, {{8, 20}}, {{24, 26}}}},
+               {{{{20, 26}}, {{12, 25}}, {{20, 12}}, {{26, 25}}}},
+               {{{{24, 9}}, {{26, 21}}, {{24, 26}}, {{9, 21}}}},
+               {{{{26, 21}}, {{25, 13}}, {{26, 25}}, {{21, 13}}}},
+               {{{{16, 20}}, {{22, 26}}, {{16, 22}}, {{20, 26}}}},
+               {{{{22, 26}}, {{17, 21}}, {{22, 17}}, {{26, 21}}}},
+               {{{{20, 18}}, {{26, 23}}, {{20, 26}}, {{18, 23}}}},
+               {{{{26, 23}}, {{21, 19}}, {{26, 21}}, {{23, 19}}}}}};
           return table_hex;
         }
       default:
@@ -2013,6 +2021,73 @@ ReferenceCell::face_indices() const
 {
   return std_cxx20::ranges::iota_view<unsigned int, unsigned int>(0U,
                                                                   n_faces());
+}
+
+
+
+inline std_cxx20::ranges::iota_view<unsigned int, unsigned int>
+ReferenceCell::face_indices_by_type(const ReferenceCell &face_ref_type) const
+{
+  switch (this->kind)
+    {
+      case ReferenceCells::Vertex:
+        return this->face_indices(); // no faces
+      case ReferenceCells::Line:
+        if (face_ref_type == ReferenceCells::Vertex)
+          return this->face_indices();
+        else
+          return std_cxx20::ranges::iota_view<unsigned int, unsigned int>(0U,
+                                                                          0U);
+      case ReferenceCells::Triangle:
+      case ReferenceCells::Quadrilateral:
+        if (face_ref_type == ReferenceCells::Line)
+          return this->face_indices();
+        else
+          return std_cxx20::ranges::iota_view<unsigned int, unsigned int>(0U,
+                                                                          0U);
+      case ReferenceCells::Tetrahedron:
+        if (face_ref_type == ReferenceCells::Triangle)
+          return this->face_indices();
+        else
+          return std_cxx20::ranges::iota_view<unsigned int, unsigned int>(0U,
+                                                                          0U);
+      case ReferenceCells::Pyramid:
+        switch (face_ref_type)
+          {
+            case ReferenceCells::Triangle:
+              return std_cxx20::ranges::iota_view<unsigned int, unsigned int>(
+                1U, 5U);
+            case ReferenceCells::Quadrilateral:
+              return std_cxx20::ranges::iota_view<unsigned int, unsigned int>(
+                0U, 1U);
+            default:
+              return std_cxx20::ranges::iota_view<unsigned int, unsigned int>(
+                0U, 0U);
+          }
+      case ReferenceCells::Wedge:
+        switch (face_ref_type)
+          {
+            case ReferenceCells::Triangle:
+              return std_cxx20::ranges::iota_view<unsigned int, unsigned int>(
+                0U, 2U);
+            case ReferenceCells::Quadrilateral:
+              return std_cxx20::ranges::iota_view<unsigned int, unsigned int>(
+                2U, 5U);
+            default:
+              return std_cxx20::ranges::iota_view<unsigned int, unsigned int>(
+                0U, 0U);
+          }
+      case ReferenceCells::Hexahedron:
+        if (face_ref_type == ReferenceCells::Quadrilateral)
+          return this->face_indices();
+        else
+          return std_cxx20::ranges::iota_view<unsigned int, unsigned int>(0U,
+                                                                          0U);
+      default:
+        DEAL_II_NOT_IMPLEMENTED();
+    }
+
+  return std_cxx20::ranges::iota_view<unsigned int, unsigned int>(0U, 0U);
 }
 
 
