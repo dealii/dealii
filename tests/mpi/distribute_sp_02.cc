@@ -77,10 +77,10 @@ test_mpi()
   // checking...
   for (unsigned int r = 0; r < num_local; ++r)
     {
-      unsigned int indx = r + myid * num_local;
-      unsigned int len  = csp.row_length(indx);
+      unsigned int index = r + myid * num_local;
+      unsigned int len   = csp.row_length(index);
 
-      // std::cout << "myid=" << myid << " idx=" << indx << " len=" << len
+      // std::cout << "myid=" << myid << " idx=" << index << " len=" << len
       // <<std::endl;
 
       if (myid > 0 && myid < numprocs - 1)
@@ -88,11 +88,11 @@ test_mpi()
       if (myid == 0 || myid == numprocs - 1)
         Assert(len == 2, ExcInternalError());
 
-      Assert(csp.exists(indx, myid), ExcInternalError());
+      Assert(csp.exists(index, myid), ExcInternalError());
       if (myid > 0)
-        Assert(csp.exists(indx, myid - 1), ExcInternalError());
+        Assert(csp.exists(index, myid - 1), ExcInternalError());
       if (myid < numprocs - 1)
-        Assert(csp.exists(indx, myid + 1), ExcInternalError());
+        Assert(csp.exists(index, myid + 1), ExcInternalError());
     }
 
 
@@ -125,10 +125,10 @@ test_mpi()
   // checking...
   for (unsigned int r = 0; r < num_local; ++r)
     {
-      unsigned int indx = r + myid * num_local;
-      unsigned int len  = csp.row_length(indx);
+      unsigned int index = r + myid * num_local;
+      unsigned int len   = csp.row_length(index);
 
-      // std::cout << "myid=" << myid << " idx=" << indx << " len=" << len
+      // std::cout << "myid=" << myid << " idx=" << index << " len=" << len
       // <<std::endl;
 
       if (myid > 0 && myid < numprocs - 1)
@@ -136,11 +136,11 @@ test_mpi()
       if (myid == numprocs - 1 || myid == 0)
         Assert(len == 2, ExcInternalError());
 
-      Assert(csp.exists(indx, myid), ExcInternalError());
+      Assert(csp.exists(index, myid), ExcInternalError());
       if (myid > 0)
-        Assert(csp.exists(indx, myid - 1), ExcInternalError());
+        Assert(csp.exists(index, myid - 1), ExcInternalError());
       if (myid < numprocs - 1)
-        Assert(csp.exists(indx, myid + 1), ExcInternalError());
+        Assert(csp.exists(index, myid + 1), ExcInternalError());
     }
 
   if (myid == 0)

@@ -338,7 +338,7 @@ namespace Step69
   // "implementation" for the class member
   // <code>parse_parameters_call_back()</code> which is automatically
   // called when invoking ParameterAcceptor::initialize() for every class
-  // that inherits from ParameterAceptor.
+  // that inherits from ParameterAcceptor.
   template <int dim>
   class InitialValues : public ParameterAcceptor
   {
@@ -1627,7 +1627,7 @@ namespace Step69
   // <code>parse_parameters_call_back</code> slot to the respective signal.
   //
   // The <code>parse_parameters_call_back</code> slot will be invoked from
-  // ParameterAceptor after the call to ParameterAcceptor::initialize(). In
+  // ParameterAcceptor after the call to ParameterAcceptor::initialize(). In
   // that regard, its use is appropriate for situations where the
   // parameters have to be postprocessed (in some sense) or some
   // consistency condition between the parameters has to be checked.
@@ -2460,7 +2460,7 @@ namespace Step69
     // string argument). ParameterAcceptor handles a global
     // ParameterHandler that is initialized with subsections and parameter
     // declarations for all class instances that are derived from
-    // ParameterAceptor. The call to initialize enters the subsection for
+    // ParameterAcceptor. The call to initialize enters the subsection for
     // each each derived class, and sets all variables that were added
     // using ParameterAcceptor::add_parameter()
 
