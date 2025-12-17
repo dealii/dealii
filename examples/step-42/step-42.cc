@@ -2030,7 +2030,7 @@ namespace Step42
     // <code>.visit</code> file.
     const std::string pvtu_filename = data_out.write_vtu_with_pvtu_record(
       output_dir, "solution", current_refinement_cycle, mpi_communicator, 2);
-    pcout << pvtu_filename << std::endl;
+    pcout << output_dir << pvtu_filename << std::endl;
 
     TrilinosWrappers::MPI::Vector tmp(solution);
     tmp *= -1;
