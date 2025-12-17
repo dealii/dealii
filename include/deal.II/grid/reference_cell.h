@@ -720,6 +720,34 @@ public:
     const types::geometric_orientation line_orientation) const;
 
   /**
+   * @brief Return the index of the face opposite to a given face on the reference cell.
+   *
+   * This function returns the face index that is considered opposite to
+   * @p face_no on the reference cell. For hypercube elements, faces come
+   * in natural opposite pairs, such as left/right or top/bottom for a
+   * quadrilateral.
+   *
+   * For simplex reference cells, the notion of an opposite face is not
+   * geometrically meaningful. In these cases, the function returns the next
+   * face index by cycling through the indices.
+   *
+   * For pyramid reference cells, the function returns the index of the
+   * quadrilateral face when given the face index of the quadrilateral. For the
+   * triangular faces, it returns the opposite triangular face index.
+   *
+   * For wedge reference cells, the function returns the opposite triangular
+   * face when one of the triangular face indices is given. For quadrilateral
+   * faces of a wedge, again the function cycles through the face indices of the
+   * quadrilaterals.
+   *
+   * @param[in] face_no Index of a face of the current cell.
+   * @return Index of the face considered opposite to @p face_no on the
+   *         reference cell.
+   */
+  unsigned int
+  opposite_face_index(const unsigned int face_no) const;
+
+  /**
    * @}
    */
 
@@ -3606,7 +3634,69 @@ ReferenceCell::face_to_cell_line_orientation(
     return numbers::default_geometric_orientation;
 }
 
-
+inline unsigned int
+ReferenceCell::opposite_face_index(const unsigned int face_no) const
+{
+  AssertIndexRange(face_no, n_faces());
+  switch (this->kind)
+    {
+      case ReferenceCells::Vertex:
+        DEAL_II_NOT_IMPLEMENTED();
+      case ReferenceCells::Quadrilateral:
+        {
+          return GeometryInfo<2>::opposite_face[face_no];
+        }
+      case ReferenceCells::Hexahedron:
+        {
+          return GeometryInfo<3>::opposite_face[face_no];
+        }
+      case ReferenceCells::Line:
+      case ReferenceCells::Triangle:
+      case ReferenceCells::Tetrahedron:
+        {
+          return (face_no + 1) % (this->get_dimension() + 1);
+        }
+      case ReferenceCells::Pyramid:
+        {
+          switch (face_no)
+            {
+              case 0:
+                return 0;
+              case 1:
+                return 2;
+              case 2:
+                return 1;
+              case 3:
+                return 4;
+              case 4:
+                return 3;
+              default:
+                return numbers::invalid_unsigned_int;
+            }
+        }
+      case ReferenceCells::Wedge:
+        {
+          switch (face_no)
+            {
+              case 0:
+                return 1;
+              case 1:
+                return 0;
+              case 2:
+                return 3;
+              case 3:
+                return 4;
+              case 4:
+                return 2;
+              default:
+                return numbers::invalid_unsigned_int;
+            }
+        }
+      default:
+        DEAL_II_ASSERT_UNREACHABLE();
+    }
+  return numbers::invalid_unsigned_int;
+}
 
 namespace internal
 {
