@@ -62,5 +62,5 @@ Solver stopped within 6 - 8 iterations
       Residual of the non-contact part of the system: 8.20097e-14
          with a damping parameter alpha = 1
       Active set did not change!
-      Writing graphical output... solution_00.pvtu
+      Writing graphical output... p1_adaptive/solution_00.pvtu
 Contact force = 37.3058
