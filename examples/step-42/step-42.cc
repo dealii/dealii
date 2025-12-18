@@ -58,6 +58,7 @@
 #include <deal.II/fe/fe_q.h>
 #include <deal.II/fe/fe_system.h>
 #include <deal.II/fe/fe_values.h>
+#include <deal.II/fe/mapping_q_eulerian.h>
 
 #include <deal.II/numerics/vector_tools.h>
 #include <deal.II/numerics/data_out.h>
@@ -616,7 +617,6 @@ namespace Step42
     void solve_newton_system();
     void solve_newton();
     void refine_grid();
-    void move_mesh(const TrilinosWrappers::MPI::Vector &displacement) const;
     void output_results(const unsigned int current_refinement_cycle);
 
     void output_contact_force() const;
@@ -1899,51 +1899,11 @@ namespace Step42
   }
 
 
-  // @sect4{PlasticityContactProblem::move_mesh}
-
-  // The remaining three functions before we get to <code>run()</code>
-  // have to do with generating output. The following one is an attempt
-  // at showing the deformed body in its deformed configuration. To this
-  // end, this function takes a displacement vector field and moves every
-  // vertex of the (local part) of the mesh by the previously computed
-  // displacement. We will call this function with the current
-  // displacement field before we generate graphical output, and we will
-  // call it again after generating graphical output with the negative
-  // displacement field to undo the changes to the mesh so made.
-  //
-  // The function itself is pretty straightforward. All we have to do
-  // is keep track which vertices we have already touched, as we
-  // encounter the same vertices multiple times as we loop over cells.
-  template <int dim>
-  void PlasticityContactProblem<dim>::move_mesh(
-    const TrilinosWrappers::MPI::Vector &displacement) const
-  {
-    std::vector<bool> vertex_touched(triangulation.n_vertices(), false);
-
-    for (const auto &cell : dof_handler.active_cell_iterators())
-      if (cell->is_locally_owned())
-        for (const auto v : cell->vertex_indices())
-          if (vertex_touched[cell->vertex_index(v)] == false)
-            {
-              vertex_touched[cell->vertex_index(v)] = true;
-
-              Point<dim> vertex_displacement;
-              for (unsigned int d = 0; d < dim; ++d)
-                vertex_displacement[d] =
-                  displacement(cell->vertex_dof_index(v, d));
-
-              cell->vertex(v) += vertex_displacement;
-            }
-  }
-
-
-
   // @sect4{PlasticityContactProblem::output_results}
 
   // Next is the function we use to actually generate graphical output. The
   // function is a bit tedious, but not actually particularly complicated.
-  // It moves the mesh at the top (and moves it back at the end), then
-  // computes the contact forces along the contact surface. We can do
+  // It computes the contact forces along the contact surface. We can do
   // so (as shown in the accompanying paper) by taking the untreated
   // residual vector and identifying which degrees of freedom
   // correspond to those with contact by asking whether they have an
@@ -1952,6 +1912,17 @@ namespace Step42
   // vectors (i.e., vectors without ghost elements) but that when we
   // want to generate output, we need vectors that do indeed have
   // ghost entries for all locally relevant degrees of freedom.
+  //
+  // In order to more easily visualize the deformation of the object due
+  // to the external obstacle, we output the mesh not in the reference
+  // (undeformed) configuration, but in the *deformed* configuration that
+  // is obtained by adding to each vertex location that computed deformation
+  // vector. This is easily done via the MappingQEulerian class that
+  // represents the mapping from the reference cell to a cell that is
+  // described by the cell's vertices' reference coordinates *plus* a
+  // previously computed deformation vector -- here simply the computed
+  // solution of the problem. This mapping is given to the call of
+  // DataOut::build_patches().
   template <int dim>
   void PlasticityContactProblem<dim>::output_results(
     const unsigned int current_refinement_cycle)
@@ -1959,8 +1930,6 @@ namespace Step42
     TimerOutput::Scope t(computing_timer, "Graphical output");
 
     pcout << "      Writing graphical output... " << std::flush;
-
-    move_mesh(solution);
 
     // Calculation of the contact forces
     TrilinosWrappers::MPI::Vector distributed_lambda(locally_owned_dofs,
@@ -2017,7 +1986,8 @@ namespace Step42
     data_out.add_data_vector(fraction_of_plastic_q_points_per_cell,
                              "fraction_of_plastic_q_points");
 
-    data_out.build_patches();
+    data_out.build_patches(MappingQEulerian<dim, TrilinosWrappers::MPI::Vector>(
+      fe.degree, dof_handler, solution));
 
     // In the remainder of the function, we generate one VTU file on
     // every processor, indexed by the subdomain id of this processor.
@@ -2030,10 +2000,6 @@ namespace Step42
     const std::string pvtu_filename = data_out.write_vtu_with_pvtu_record(
       output_dir, "solution", current_refinement_cycle, mpi_communicator, 2);
     pcout << output_dir << pvtu_filename << std::endl;
-
-    TrilinosWrappers::MPI::Vector tmp(solution);
-    tmp *= -1;
-    move_mesh(tmp);
   }
 
 

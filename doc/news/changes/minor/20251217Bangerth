@@ -1,0 +1,8 @@
+Changed: step-42 used to create output of the solid object in the
+deformed configuration by deforming the mesh with the solution before
+output, creating output in the deformed configuration, and then
+undoing the mesh deformation. But we can do all of this without
+deforming the mesh at all: The MappingQEulerian class can do that more
+easily, and step-42 has been changed to use this approach now.
+<br>
+(Wolfgang Bangerth, 2025/12/17)
