@@ -4619,7 +4619,7 @@ namespace internal
 
            .-6-.-7-.         The directions are:  .->-.->-.
            1   9   3                              ^   ^   ^
-           .-10.11-.                             .->-.->-.
+           .-10.11-.                              .->-.->-.
            0   8   2                              ^   ^   ^
            .-4-.-5-.                              .->-.->-.
 
@@ -4641,13 +4641,13 @@ namespace internal
            Third:
            Set up an array of neighbors:
 
-           6  7
-           .--.--.
+             6  7
+            .--.--.
            1|  |  |3
-           .--.--.
+            .--.--.
            0|  |  |2
-           .--.--.
-           4   5
+            .--.--.
+             4   5
 
            We need this array for two reasons: first to get the lines which will
            bound the four subcells (if the neighboring cell is refined, these
@@ -5299,7 +5299,10 @@ namespace internal
           // Assign lines to child cells:
           constexpr unsigned int X = numbers::invalid_unsigned_int;
           static constexpr dealii::ndarray<unsigned int, 4, 4> tri_child_lines =
-            {{{{0, 8, 5, X}}, {{1, 2, 6, X}}, {{7, 3, 4, X}}, {{6, 7, 8, X}}}};
+            {{{{0, 8, 5, X}}, //
+              {{1, 2, 6, X}}, //
+              {{7, 3, 4, X}}, //
+              {{6, 7, 8, X}}}};
           static constexpr dealii::ndarray<unsigned int, 4, 4>
             quad_child_lines = {{{{0, 8, 4, 10}},
                                  {{8, 2, 5, 11}},
@@ -5991,7 +5994,7 @@ namespace internal
         // and faces in pairs for refinement of old lines/face. And lines and
         // faces stored individually for the ones created in the interior
         // of an existing cell
-        {
+        { // STORAGE
           unsigned int needed_vertices     = 0;
           unsigned int needed_lines_single = 0;
           unsigned int needed_faces_single = 0;
@@ -6035,16 +6038,20 @@ namespace internal
                     // edges that bound this cell. They may of course already be
                     // refined, so we only *mark* them for refinement by setting
                     // the user flags
+
+                    // Faces
                     for (const auto face : cell->face_indices())
                       if (cell->face(face)->n_children() == 0)
                         cell->face(face)->set_user_flag();
                       else
+                        // Check that the child of the cell has enough children
                         Assert(cell->face(face)->n_children() ==
                                  cell->reference_cell()
                                    .face_reference_cell(face)
                                    .n_isotropic_children(),
                                ExcInternalError());
 
+                    // Edges
                     for (const auto line : cell->line_indices())
                       if (cell->line(line)->has_children() == false)
                         cell->line(line)->set_user_flag();
@@ -6132,7 +6139,7 @@ namespace internal
               triangulation.vertices.resize(needed_vertices, Point<spacedim>());
               triangulation.vertices_used.resize(needed_vertices, false);
             }
-        }
+        } // STORAGE
 
         //-----------------------------------------
         // Before we start with the actual refinement, we do some
@@ -6173,8 +6180,8 @@ namespace internal
           return next_vertex;
         };
 
-        // LINES
-        {
+
+        { // LINES
           typename Triangulation<dim, spacedim>::active_line_iterator
             line = triangulation.begin_active_line(),
             endl = triangulation.end_line();
@@ -6228,8 +6235,7 @@ namespace internal
             }
         }
 
-        // FACES (i.e., quads or triangles, or both)
-        {
+        { // FACES (i.e., quads or triangles, or both)
           typename Triangulation<dim, spacedim>::face_iterator
             face = triangulation.begin_face(),
             endf = triangulation.end_face();
@@ -6241,8 +6247,8 @@ namespace internal
 
               const auto reference_face_type = face->reference_cell();
 
-              // 1) create new lines (property is set later)
-              // maximum of 4 new lines (4 quadrilateral, 3 triangle)
+              // 1) Create new lines (property is set later).
+              // Maximum of 4 new lines (4 quadrilateral, 3 triangle).
               std::array<raw_line_iterator, 4> new_lines;
               if (reference_face_type == ReferenceCells::Quadrilateral)
                 {
@@ -6273,10 +6279,11 @@ namespace internal
                     AssertIsNotUsed(new_lines[line]);
                 }
 
-              // 2) create new face (properties are set below). Both triangles
-              // and quads are divided in four. (For historical reasons, we
-              // only have 'raw_quad_iterator', not 'raw_face_iterator', but the
-              // former also works if a face is actually a triangle.)
+              // 2) Create new face (properties are set below).
+              // Both triangles and quads are divided in four. (For historical
+              // reasons, we only have `raw_quad_iterator`, not
+              // `raw_face_iterator`, but the former also works if a face is
+              // actually a triangle.)
               std::array<raw_quad_iterator, 4> new_faces;
               for (unsigned int f = 0; f < 2; ++f)
                 {
@@ -6289,6 +6296,7 @@ namespace internal
 
                   face->set_children(2 * f, new_faces[2 * f]->index());
                 }
+              // Tell the original face that is has been isotropically refined.
               face->set_refinement_case(RefinementCase<2>::cut_xy);
 
               if constexpr (running_in_debug_mode())
@@ -6297,7 +6305,12 @@ namespace internal
                     AssertIsNotUsed(quad);
                 }
 
-              // 3) set vertex indices and set new vertex
+              // 3) Create an ordered list of vertices.
+              // The order is determined by the physical position of the
+              // vertices within the face reference cell, enabling easy
+              // identification/lookup by the vertex's index in this list.
+              // Additionally the center vertex required for quadrilaterals is
+              // created.
 
               // Maximum of 9 vertices per refined face (9 for Quadrilateral, 6
               // for Triangle)
@@ -6320,7 +6333,9 @@ namespace internal
                     face->center(true, true);
                 }
 
-              // 4) set new lines on these faces and their properties
+              // 4) Set new lines on these faces and their properties.
+              // 'magic numbers' in `line_vertices_X` are indices in the list
+              // created in step 3).
               std::array<raw_line_iterator, 12> lines;
               unsigned int                      n_lines = 0;
               for (unsigned int l = 0; l < face->n_lines(); ++l)
@@ -6335,6 +6350,11 @@ namespace internal
               for (unsigned int i = 0; i < n_lines; ++i)
                 line_indices[i] = lines[i]->index();
 
+              // 2---7---3   .-6-.-7-.   .---.---.
+              // |   |   |   1   9   3   | 2 | 3 |
+              // 4---8---5   .-10.11-.   .---.---.
+              // |   |   |   0   8   2   | 0 | 1 |
+              // 0---6---1   .-4-.-5-.   .---.---.
               static constexpr dealii::ndarray<unsigned int, 12, 2>
                 line_vertices_quad{{{{0, 4}},
                                     {{4, 2}},
@@ -6355,6 +6375,15 @@ namespace internal
                                  {{1, 9, 10, 6}},
                                  {{9, 3, 11, 7}}}};
 
+              //  2                *                *             .
+              //  |\               |\               |\            .
+              //  v  ^             4  3             |  \          .
+              //  |    \           |    \           | 2  \        .
+              //  5--<--4          *--7--*          *-----*       .
+              //  |\    |\         |\    |\         |\  3 |\      .
+              //  v  ^  ^  ^       5  8  6  2       |  \  |  \    .
+              //  |    \|    \     |    \|    \     | 0  \| 1  \  .
+              //  0-->--3-->--1    *--0--*--1--*    *-----*-----* .
               static constexpr dealii::ndarray<unsigned int, 12, 2>
                 line_vertices_tri{{{{0, 3}},
                                    {{3, 1}},
@@ -6375,6 +6404,10 @@ namespace internal
                                {{7, 3, 4, X}},
                                {{6, 7, 8, X}}}};
 
+              // The defined lines in `line_vertices_tri` do not satisfy the
+              // expected orientations of all the children's reference cells.
+              // This table specifies the expected line orientations (i.e.
+              // vertex order) necessary for `set_line_orientation(...)`.
               static constexpr dealii::ndarray<unsigned int, 4, 4, 2>
                 tri_line_vertices_tri{
                   {{{{{0, 3}}, {{3, 5}}, {{5, 0}}, {{X, X}}}},
@@ -6382,6 +6415,7 @@ namespace internal
                    {{{{5, 4}}, {{4, 2}}, {{2, 5}}, {{X, X}}}},
                    {{{{3, 4}}, {{4, 5}}, {{5, 3}}, {{X, X}}}}}};
 
+              // Select lookup table according to reference cell of parent.
               const auto &line_vertices =
                 (reference_face_type == ReferenceCells::Quadrilateral) ?
                   line_vertices_quad :
@@ -6391,6 +6425,9 @@ namespace internal
                   quad_lines_quad :
                   tri_lines_tri;
 
+              // The first 2*face->n_lines() lines are already created by
+              // refining the original lines on the face. Therefore, only the
+              // subsequent face->n_lines() lines need to be processed now.
               for (unsigned int i = 0, j = 2 * face->n_lines();
                    i < face->n_lines();
                    ++i, ++j)
@@ -6407,13 +6444,14 @@ namespace internal
                   new_line->set_manifold_id(face->manifold_id());
                 }
 
-              // 5) set properties of faces
+              // 5) Set properties of faces
               for (unsigned int i = 0; i < new_faces.size(); ++i)
                 {
+                  // 5.a) Create faces
                   auto &new_face = new_faces[i];
 
-                  // TODO: we assume here that all children have the same type
-                  // as the parent
+                  // We assume here that all children have the same type as the
+                  // parent face.
                   triangulation.faces->set_quad_type(new_face->index(),
                                                      reference_face_type);
 
@@ -6440,9 +6478,10 @@ namespace internal
 
                   [[maybe_unused]] std::set<unsigned int> s;
 
-                  // ... and fix orientation of lines of face for triangles,
-                  // using an expensive algorithm, quadrilaterals are treated
-                  // a few lines below by a cheaper algorithm
+                  // 5.b.I) Fix orientation of lines of face
+                  // For triangles an expensive algorithm is used,
+                  // quadrilaterals are treated a few lines below by a cheaper
+                  // algorithm
                   if (reference_face_type == ReferenceCells::Triangle)
                     {
                       for (const auto f : new_face->line_indices())
@@ -6484,19 +6523,22 @@ namespace internal
               if (reference_face_type == ReferenceCells::Quadrilateral)
                 {
                   static constexpr dealii::ndarray<unsigned int, 4, 2>
-                    quad_child_boundary_lines{
-                      {{{0, 2}}, {{1, 3}}, {{0, 1}}, {{2, 3}}}};
+                    quad_child_line_vertices{{{{0, 2}}, //
+                                              {{1, 3}}, //
+                                              {{0, 1}}, //
+                                              {{2, 3}}}};
 
                   for (unsigned int i = 0; i < 4; ++i)
                     for (unsigned int j = 0; j < 2; ++j)
-                      new_faces[quad_child_boundary_lines[i][j]]
+                      new_faces[quad_child_line_vertices[i][j]]
                         ->set_line_orientation(i, face->line_orientation(i));
                 }
 
               face->clear_user_flag();
             }
-        }
+        } // FACES
 
+        // Cells
         typename Triangulation<3, spacedim>::DistortedCellList
           cells_with_distorted_children;
 
@@ -6511,6 +6553,7 @@ namespace internal
                      cell->level() >= static_cast<int>(level),
                    ExcInternalError());
 
+            // Iterate over all active cells in the current level
             for (; cell != triangulation.end() &&
                    cell->level() == static_cast<int>(level);
                  ++cell)
@@ -6570,7 +6613,8 @@ namespace internal
                     auto &new_face = new_faces[i];
 
                     // TODO: faces of children have the same type as the faces
-                    //  of the parent
+                    // of the parent (doesn't work for parents with different
+                    // face types)
                     triangulation.faces->set_quad_type(
                       new_face->index(),
                       reference_cell_type.face_reference_cell(0));
@@ -6594,9 +6638,12 @@ namespace internal
                   typename Triangulation<dim, spacedim>::raw_cell_iterator,
                   8>
                   new_cells;
-                {
+                { // SETUP_CELLS
                   for (unsigned int i = 0; i < n_new_cells; ++i)
                     {
+                      // Since we search for pairs of hexes (next_free_hex
+                      // returns a pair) we need to search only every other
+                      // time.
                       if (i % 2 == 0)
                         next_unused_cell =
                           triangulation.levels[level + 1]->cells.next_free_hex(
@@ -6613,6 +6660,7 @@ namespace internal
                         ->reference_cell[new_cell->index()] =
                         reference_cell_type;
 
+                      // Copy parent data to child.
                       AssertIsNotUsed(new_cell);
                       new_cell->set_used_flag();
                       new_cell->clear_user_flag();
@@ -6622,29 +6670,35 @@ namespace internal
                       new_cell->set_manifold_id(cell->manifold_id());
                       new_cell->set_subdomain_id(cell->subdomain_id());
 
+                      // Why every other? See
+                      // TriangulationImplementation::TriaLevel::parents
                       if (i % 2)
                         new_cell->set_parent(cell->index());
 
                       // set the orientation flag to its default state for all
                       // faces initially. later on go the other way round and
                       // reset faces that are at the boundary of the mother cube
+                      // TODO: This might only be necessary for Hexes. For all
+                      // other cells the orientation is calculated for all faces
+                      // one by one. (Only a guess though).
                       for (const auto f : new_cell->face_indices())
                         new_cell->set_combined_face_orientation(
                           f, numbers::default_geometric_orientation);
                     }
                   for (unsigned int i = 0; i < n_new_cells / 2; ++i)
                     cell->set_children(2 * i, new_cells[2 * i]->index());
-                }
+                } // SETUP_CELLS
 
-                {
+                { // CREATE_CELLS
                   // load vertex indices
                   std::array<unsigned int, 27> vertex_indices = {};
 
-                  {
+                  { // GET_VERTICES
+                    // Continuous counter variable
                     unsigned int k = 0;
 
-                    // avoid a compiler warning by fixing the max number of
-                    // loop iterations to 8
+                    // Avoid a compiler warning by fixing max number of
+                    // iterations to 8.
                     const unsigned int n_vertices =
                       std::min(cell->n_vertices(), 8u);
                     for (unsigned int i = 0; i < n_vertices; ++i)
@@ -6653,13 +6707,6 @@ namespace internal
                     const std::array<unsigned int, 12> line_indices =
                       TriaAccessorImplementation::Implementation::
                         get_line_indices_of_cell(*cell);
-
-                    // For the tetrahedron the parent consists of the vertices
-                    // 0,1,2,3, the new vertices 4-9 are defined as the
-                    // midpoints of the edges: 4 -> (0,1), 5 -> (1,2), 6 ->
-                    // (2,0), 7 -> (0,3), 8 -> (1,3), 9 -> (2,3).
-                    // Order is defined by the reference cell, see
-                    // https://dealii.org/developer/doxygen/deal.II/group__simplex.html#simplex_reference_cells.
 
                     // Avoid a compiler warning by fixing the max number of loop
                     // iterations to 12
@@ -6687,7 +6734,8 @@ namespace internal
                         triangulation.vertices[current_vertex] =
                           cell->center(true, true);
                       }
-                  }
+                  } // GET_VERTICES
+
 
                   unsigned int chosen_line_tetrahedron = 0;
                   // set up new lines
@@ -6776,26 +6824,55 @@ namespace internal
                         for (unsigned int f = 0, k = 0; f < 6; ++f)
                           for (unsigned int c = 0; c < 4; ++c, ++k)
                             {
+                              // To retrieve the newly created lines within a
+                              // quad, it is sufficient to query children 0 and
+                              // 3 (or 1 and 2), as they border all relevant
+                              // lines. Specifically, we are interested in lines
+                              // 1 and 3 of child 0, and lines 0 and 2 of
+                              // child 3. This is currently implemented in
+                              // `temp` below (where the first index is the
+                              // child and the second is the child's line
+                              // index). A more readable implementation is
+                              // provided right below; however, it cannot be
+                              // (nicely) used to mimic the existing table's
+                              // behavior. Modifications to this behavior would
+                              // result in extensive rewriting of tables in
+                              // `ReferenceCell`.
+                              //
+                              // static constexpr std::
+                              //   pair<unsigned int,
+                              //        std::array<unsigned int, 2>>
+                              //     quad_relevant_children_and_lines = {
+                              //       {0, {1, 3}}, {3, {0, 2}}};
+
                               static constexpr dealii::
                                 ndarray<unsigned int, 4, 2>
-                                  temp = {
-                                    {{{0, 1}}, {{3, 0}}, {{0, 3}}, {{3, 2}}}};
+                                  quad_relevant_children_and_lines = {
+                                    {{{0, 1}}, //
+                                     {{3, 0}}, //
+                                     {{0, 3}}, //
+                                     {{3, 2}}}};
 
+                              // Get the orientation corrected line index of the
+                              // child while using the fact that quad children
+                              // share their physical orientation with the
+                              // parent.
                               relevant_lines[k] =
                                 cell->face(f)
                                   ->isotropic_child(
                                     GeometryInfo<dim>::
                                       standard_to_real_face_vertex(
-                                        temp[c][0],
+                                        quad_relevant_children_and_lines[c][0],
                                         cell->face_orientation(f),
                                         cell->face_flip(f),
                                         cell->face_rotation(f)))
-                                  ->line(GeometryInfo<dim>::
-                                           standard_to_real_face_line(
-                                             temp[c][1],
-                                             cell->face_orientation(f),
-                                             cell->face_flip(f),
-                                             cell->face_rotation(f)));
+                                  ->line(
+                                    GeometryInfo<dim>::
+                                      standard_to_real_face_line(
+                                        quad_relevant_children_and_lines[c][1],
+                                        cell->face_orientation(f),
+                                        cell->face_flip(f),
+                                        cell->face_rotation(f)));
                             }
 
                         for (unsigned int i = 0, k = 24; i < 6; ++i, ++k)
@@ -6803,39 +6880,42 @@ namespace internal
                       }
                     else if (reference_cell_type == ReferenceCells::Tetrahedron)
                       {
-                        // The order of the lines is defined by the ordering
-                        // of the faces of the reference cell and the ordering
-                        // of the lines within a face.
-                        // Each face is split into 4 child triangles, the
-                        // relevant lines are defined by the vertices of the
-                        // center triangles: 0 -> (4,5), 1 -> (5,6), 2 -> (4,6),
-                        // 3 -> (4,7), 4 -> (7,8), 5 -> (4,8), 6 -> (6,9), 7 ->
-                        // (9,7), 8 -> (6,7), 9 -> (5,8), 10 -> (8,9), 11 ->
-                        // (5,9), Line 12  is determined by
-                        // chosen_line_tetrahedron i.e. (6,8), (5,7) or (4,9)
-
                         relevant_lines.resize(13);
 
                         unsigned int k = 0;
                         for (unsigned int f = 0; f < 4; ++f)
                           for (unsigned int l = 0; l < 3; ++l, ++k)
                             {
-                              // TODO: add comment
+                              // Permutations of reference cell indices against
+                              // real world indices given the real world
+                              // orientation of the face.
                               static const std::
                                 array<std::array<unsigned int, 3>, 6>
-                                  table = {{{{0, 1, 2}}, // 0
-                                            {{1, 0, 2}},
-                                            {{2, 0, 1}}, // 2
-                                            {{0, 2, 1}},
-                                            {{1, 2, 0}}, // 4
-                                            {{2, 1, 0}}}};
+                                  // Extract newly created lines surrounding the
+                                  // center children (child 3 ) of the refined
+                                  // triangular faces in a predictable manner
+                                  // (i.e., the lines always appear at the same
+                                  // location within the to be refined 3d
+                                  // reference cell), the orientation of the
+                                  // face must be considered. This orientation
+                                  // correction is implemented via the table
+                                  // below relating the lines of the oriented
+                                  // face to their counterparts on the reference
+                                  // cell face.
+                                  tri_line_perm = {{{{0, 1, 2}}, // 0
+                                                    {{1, 0, 2}},
+                                                    {{2, 0, 1}}, // 2
+                                                    {{0, 2, 1}},
+                                                    {{1, 2, 0}}, // 4
+                                                    {{2, 1, 0}}}};
 
                               const auto combined_orientation =
                                 cell->combined_face_orientation(f);
                               relevant_lines[k] =
                                 cell->face(f)
                                   ->child(3 /*center triangle*/)
-                                  ->line(table[combined_orientation][l]);
+                                  ->line(
+                                    tri_line_perm[combined_orientation][l]);
                             }
 
                         relevant_lines[k++] = new_lines[0];
@@ -6850,35 +6930,37 @@ namespace internal
                          ++i)
                       relevant_line_indices[i] = relevant_lines[i]->index();
 
-                    // It is easiest to start at table cell_vertices,
-                    // there the vertices are listed which build up the
-                    // 8 child tets. To build the child tets, 8 new faces are
-                    // needed. The the vertices, which define the lines of these
-                    // new faces are listed in table_tet. Now only the
-                    // corresponding index of the lines and quads have to be
-                    // listed in new_quad_lines_tet and cell_quads_tet.
+
+                    // New faces (internal to the parent) are required for the
+                    // creation of children. The lines bounding these new faces
+                    // are stored in `relevant_lines`. The exact assignment of
+                    // these lines is then determined using the lookup table
+                    // retrieved below, by providing the appropriate indices
+                    // into `relevant_lines`.
                     const auto &new_face_lines =
                       cell->reference_cell().new_isotropic_child_face_lines(
                         chosen_line_tetrahedron);
 
-                    // The first 4 define the faces which cut off the
-                    // parent tetrahedron at the edges. the numbers are the
-                    // index of the relevant_lines defined above the last 4
-                    // faces cut apart the remaining octahedron, such that all
-                    // of these contain line number 12. the ordering of the
-                    // faces is arbitrary, the ordering within the faces has to
-                    // follow the righthand convention for triangles
-                    // The table defines the vertices of the lines above
-                    // see relevant_lines for mapping between line indices and
-                    // vertex numbering
-                    const auto table =
+                    // The created lines might be oriented according to the
+                    // expectation of the face's reference cell. Consequently,
+                    // an additional lookup table is necessary to define the
+                    // correct line connectivity desired by the reference cell.
+                    // This is very similar to the refinement of triangles in 2d
+                    // where the same problem occurred.
+                    const auto &new_face_lines_vert =
                       cell->reference_cell()
                         .new_isotropic_child_face_line_vertices(
                           chosen_line_tetrahedron);
 
+                    // When fixing the orientation of lines for hexes the
+                    // calculated orientation of one line can be used for some
+                    // other lines as well. This connection is described in this
+                    // table.
                     static constexpr dealii::ndarray<unsigned int, 4, 2>
-                      representative_lines{
-                        {{{0, 2}}, {{2, 0}}, {{3, 3}}, {{1, 1}}}};
+                      representative_lines{{{{0, 2}}, //
+                                            {{2, 0}}, //
+                                            {{3, 3}}, //
+                                            {{1, 1}}}};
 
                     for (unsigned int q = 0; q < n_new_faces; ++q)
                       {
@@ -6922,8 +7004,8 @@ namespace internal
                                  ->vertex_index(1)}};
 
                             const std::array<unsigned int, 2> vertices_1 = {
-                              {vertex_indices[table[q][l][0]],
-                               vertex_indices[table[q][l][1]]}};
+                              {vertex_indices[new_face_lines_vert[q][l][0]],
+                               vertex_indices[new_face_lines_vert[q][l][1]]}};
 
                             const auto orientation =
                               ReferenceCells::Line.get_combined_orientation(
@@ -6956,6 +7038,7 @@ namespace internal
                         for (unsigned int f = 0, k = n_new_faces; f < 6; ++f)
                           for (unsigned int c = 0; c < 4; ++c, ++k)
                             face_indices[k] =
+                              // Correct once again for orientation.
                               cell->face(f)->isotropic_child_index(
                                 GeometryInfo<dim>::standard_to_real_face_vertex(
                                   c,
@@ -6965,12 +7048,6 @@ namespace internal
                       }
                     else if (reference_cell_type == ReferenceCells::Tetrahedron)
                       {
-                        // list of the indices of the surfaces which define the
-                        // 8 new tets. the indices 0-7 are the new quads defined
-                        // above (so 0-3 cut off the corners and 4-7 separate
-                        // the remaining octahedral), the indices between 8-11
-                        // are the children of the first face, from 12-15 of the
-                        // second, etc.
                         for (unsigned int i = 0; i < n_new_faces; ++i)
                           face_indices[i] = new_faces[i]->index();
 
@@ -6991,14 +7068,10 @@ namespace internal
                         DEAL_II_NOT_IMPLEMENTED();
                       }
 
-                    // indices of the faces which define the new tets
-                    // the ordering of the tets is arbitrary
-                    // the first 4 determine the tets cutting of the corners
-                    // the last 4 are ordered after their appearance in the
-                    // faces.
-                    // the ordering within the faces is determined by
-                    // convention for the tetrahedron unit cell, see
-                    // cell_vertices_tet below
+                    // Similar to the faces described above, we need to identify
+                    // which faces (specified by their indices in
+                    // `face_indices`) bound the new cells. This information is
+                    // stored in the ReferenceCell and retrieved here.
                     const auto cell_faces =
                       cell->reference_cell().new_isotropic_child_cell_faces(
                         chosen_line_tetrahedron);
@@ -7019,8 +7092,10 @@ namespace internal
                                face_indices[cell_faces[c][3]]});
 
 
-                            // for tets, we need to go through the faces and
-                            // figure the orientation out the hard way
+                            // Fix orientation of faces.
+                            // For all reference cells except for Hexes, we need
+                            // to go through the faces and figure the
+                            // orientation out the hard way
                             for (const auto f : new_cell->face_indices())
                               {
                                 const auto &face = new_cell->face(f);
@@ -7033,13 +7108,10 @@ namespace internal
                                    face->vertex_index(1),
                                    face->vertex_index(2)}};
 
-                                // the 8 child tets are each defined by 4
-                                // vertices the ordering of the tets has to be
-                                // consistent with above the ordering within the
-                                // tets is given by the reference tet i.e.
-                                // looking at the fifth line the first 3
-                                // vertices are given by face 11, the last
-                                // vertex is the remaining of the tet
+                                // We also need to account for potential
+                                // orientation mismatches between the face and
+                                // the cell's ReferenceCell. (See the discussion
+                                // above in new face creation for more details.)
                                 const auto new_cell_vertices =
                                   cell->reference_cell()
                                     .new_isotropic_child_cell_vertices(
@@ -7051,11 +7123,26 @@ namespace internal
                                 for (unsigned int face_vertex_no :
                                      face->vertex_indices())
                                   {
+                                    // Calculate index for vertex
+                                    // `face_vertex_no` of face `f` as an index
+                                    // in the cells reference cells indices.
                                     const auto cell_vertex_no =
                                       reference_cell.face_to_cell_vertices(
                                         f,
                                         face_vertex_no,
                                         numbers::default_geometric_orientation);
+
+                                    // Get according index from
+                                    // `vertex_indices`. Use `cell_vertex_no` as
+                                    // the index in the table describing which
+                                    // vertices belong to which cell and then
+                                    // get that index. Use `cell_vertex_no` to
+                                    // look up the specific vertex (more
+                                    // precisely the index in `vertex_indices`)
+                                    // within the cell's connectivity table
+                                    // `new_cell_vertices` and retrieve the
+                                    // corresponding vertex (index) from
+                                    // `vertex_indices`.
                                     vertices_1[face_vertex_no] = vertex_indices
                                       [new_cell_vertices[cell_vertex_no]];
                                   }
@@ -7080,10 +7167,10 @@ namespace internal
                           DEAL_II_NOT_IMPLEMENTED();
                       }
 
-                    // for hexes, we can simply inherit the orientation values
+                    // For hexes, we can simply inherit the orientation values
                     // from the parent on the outer faces; the inner faces can
                     // be skipped as their orientation is always the default
-                    // one set above
+                    // one set above.
                     static constexpr dealii::ndarray<unsigned int, 6, 4>
                       face_to_child_indices_hex{{{{0, 2, 4, 6}},
                                                  {{1, 3, 5, 7}},
@@ -7102,8 +7189,9 @@ namespace internal
                                 f, combined_orientation);
                         }
                   }
-                }
+                } // CREATE_CELLS
 
+                // Check for distorted children
                 if (check_for_distorted_cells &&
                     has_distorted_children<dim, spacedim>(cell))
                   cells_with_distorted_children.distorted_cells.push_back(cell);
@@ -17563,17 +17651,17 @@ bool Triangulation<dim, spacedim>::prepare_coarsening_and_refinement()
                                     // there is a 'horizontal' refinement of the
                                     // face marked with #####
                                     //
-                                    //                            / /
-                                    //                           / /
-                                    //                          *---------------*
-                                    //                          |               |
-                                    //                          |               |
-                                    //                          |               |
-                                    //                          |               |
-                                    //                          |               |
-                                    //                          |               | /
-                                    //                          |               |/
-                                    //                          *---------------*
+                                    //                         /               /
+                                    //                        /               /
+                                    //                       *---------------*
+                                    //                       |               |
+                                    //                       |               |
+                                    //                       |               |
+                                    //                       |               |
+                                    //                       |               |
+                                    //                       |               | /
+                                    //                       |               |/
+                                    //                       *---------------*
                                     //
                                     //
                                     //     *---------------*
@@ -17594,17 +17682,17 @@ bool Triangulation<dim, spacedim>::prepare_coarsening_and_refinement()
                                     // refined according to cut_z, then
                                     // everything is ok:
                                     //
-                                    //                            / /
-                                    //                           / /
-                                    //                          *---------------*
-                                    //                          |               |
-                                    //                          |               | /
-                                    //                          |               |/
-                                    //                          *---------------*
-                                    //                          |               |
-                                    //                          |               | /
-                                    //                          |               |/
-                                    //                          *---------------*
+                                    //                         /               /
+                                    //                        /               /
+                                    //                       *---------------*
+                                    //                       |               |
+                                    //                       |               | /
+                                    //                       |               |/
+                                    //                       *---------------*
+                                    //                       |               |
+                                    //                       |               | /
+                                    //                       |               |/
+                                    //                       *---------------*
                                     //
                                     //
                                     //     *---------------*
@@ -17627,17 +17715,17 @@ bool Triangulation<dim, spacedim>::prepare_coarsening_and_refinement()
                                     // a refinement of face ##### with both
                                     // cut_x and cut_y, which is not possible:
                                     //
-                                    //                            /       / /
-                                    //                           /       / /
-                                    //                          *-------*-------*
-                                    //                          |       |       |
-                                    //                          |       |       | /
-                                    //                          |       |       |/
-                                    //                          *-------*-------*
-                                    //                          |       |       |
-                                    //                          |       |       | /
-                                    //                          |       |       |/
-                                    //                          *-------*-------*
+                                    //                         /       /       /
+                                    //                        /       /       /
+                                    //                       *-------*-------*
+                                    //                       |       |       |
+                                    //                       |       |       | /
+                                    //                       |       |       |/
+                                    //                       *-------*-------*
+                                    //                       |       |       |
+                                    //                       |       |       | /
+                                    //                       |       |       |/
+                                    //                       *-------*-------*
                                     //
                                     //
                                     //     *---------------*
@@ -17655,17 +17743,17 @@ bool Triangulation<dim, spacedim>::prepare_coarsening_and_refinement()
                                     // thus, in this case we also need to refine
                                     // our current cell in the new direction:
                                     //
-                                    //                            /       / /
-                                    //                           /       / /
-                                    //                          *-------*-------*
-                                    //                          |       |       |
-                                    //                          |       |       | /
-                                    //                          |       |       |/
-                                    //                          *-------*-------*
-                                    //                          |       |       |
-                                    //                          |       |       | /
-                                    //                          |       |       |/
-                                    //                          *-------*-------*
+                                    //                         /       /       /
+                                    //                        /       /       /
+                                    //                       *-------*-------*
+                                    //                       |       |       |
+                                    //                       |       |       | /
+                                    //                       |       |       |/
+                                    //                       *-------*-------*
+                                    //                       |       |       |
+                                    //                       |       |       | /
+                                    //                       |       |       |/
+                                    //                       *-------*-------*
                                     //
                                     //
                                     //     *-------*-------*
