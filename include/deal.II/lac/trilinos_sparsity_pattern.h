@@ -309,9 +309,17 @@ namespace TrilinosWrappers
      * for the deal.II DynamicSparsityPattern classes. However, a good
      * estimate will reduce the setup time of the sparsity pattern.
      */
+    DEAL_II_DEPRECATED_WITH_COMMENT(
+      "Use the overload specifying the number of entries per row")
+    SparsityPattern(const size_type m, const size_type n)
+      : SparsityPattern(m, n, 0)
+    {
+      std::abort();
+    }
+
     SparsityPattern(const size_type m,
                     const size_type n,
-                    const size_type n_entries_per_row = 0);
+                    const size_type n_entries_per_row);
 
     /**
      * Generate a sparsity pattern that is completely stored locally, having
