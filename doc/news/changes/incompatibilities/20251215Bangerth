@@ -1,0 +1,28 @@
+Changed: Most of the parallel vector classes (in particular those
+wrapping the functionality in the PETSc, Trilinos Epetra, and Trilinos
+Tpetra packages) observe semantics whereby vectors that have ghost
+elements need to be treated as unchangeable. This is because whenever
+you change a locally-owned element of such a vector, this change is
+not propagated to those processes that store this element among their
+ghost elements. As a consequence, these processes view of the vector
+is now no longer in sync with the view on that process that owns the
+element, and that is a common source of very hard to find bugs.
+
+As a consequence, many functions inside these vector classes that
+modify the vector check that the vector has no ghost elements. But
+some did not, such as TrilinosWrappers::MPI::Vector::operator+=(),
+TrilinosWrappers::MPI::Vector::operator-=(),
+TrilinosWrappers::MPI::Vector::operator*=(),
+TrilinosWrappers::MPI::Vector::operator/=(), and the corresponding
+functions in the Epetra and Tpetra wrappers, along with an assortment
+of other non-`const` functions in these classes.
+
+This oversight has now been fixed. We know that some of these
+functions are used in parallel contexts in application codes that will
+now no longer work and will need to be fixed. For this, you will want
+to perform the modifying operations on full-distributed vectors (i.e.,
+vectors of the same type that store no ghost elements) and then copy
+the result into the ghosted vector.
+
+<br>
+(Wolfgang Bangerth, 2025/12/15)
