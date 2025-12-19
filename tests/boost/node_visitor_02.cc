@@ -12,8 +12,8 @@
 //
 // ------------------------------------------------------------------------
 
-// Use information from NodeVisitor to print show explicitly the boxes
-// associated to each parent node on the previous level
+// Use extract_children_of_level() to explicitly print the boxes associated to
+// each parent node on the previous level.
 
 #include <deal.II/base/bounding_box.h>
 #include <deal.II/base/bounding_box_data_out.h>

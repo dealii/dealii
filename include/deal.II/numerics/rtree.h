@@ -25,6 +25,7 @@
 #include <deal.II/boost_adaptors/segment.h>
 
 DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
+#include <boost/geometry/algorithms/buffer.hpp>
 #include <boost/geometry/algorithms/distance.hpp>
 #include <boost/geometry/index/rtree.hpp>
 #include <boost/geometry/strategies/strategies.hpp>
@@ -143,6 +144,19 @@ template <typename LeafType,
             boost::geometry::index::indexable<LeafType>>
 using RTree =
   boost::geometry::index::rtree<LeafType, IndexType, IndexableGetter>;
+
+/**
+ * An alias to a view of an RTree.
+ *
+ * This is a convenience alias to refer to the view type of an RTree. This is
+ * the only way to access the internal structure of the RTree in a read-only
+ * fashion.
+ *
+ * @tparam RTreeType
+ */
+template <typename RTreeType>
+using RTreeView =
+  boost::geometry::index::detail::rtree::utilities::view<RTreeType>;
 
 /**
  * Construct the correct RTree object by passing an iterator range.
@@ -305,100 +319,323 @@ RTree<typename ContainerType::size_type,
 pack_rtree_of_indices(const ContainerType &container);
 
 /**
- * Helper structure that allows one to extract a level from an RTree as a vector
- * of BoundingBox objects.
+ * A depth-first visitor for RTree that invokes user-provided lambdas.
  *
- * This structure implements a boost::geometry::index::detail::rtree::visitor
- * object, allowing one to visit any existing RTree object, and return the
- * vector of bounding boxes associated to a specific target level of the tree.
+ * This is a convenience visitor for the RTree data structure that forwards each
+ * traversal event to four (optional) independent callables:
+ * - an internal node visitor (called once per internal node, before
+ * descending),
+ * - a leaf visitor (called once per leaf node, before its elements),
+ * - an element visitor (called once per value stored in a leaf),
+ * - an indexable visitor (called once per value, after translating Value ->
+ * Indexable with the tree's indexable getter).
  *
- * Although possible, direct usage of this structure is cumbersome. The
- * suggested usage of this class is through the helper function
- * extract_rtree_level().
+ * The traversal is depth-first: starting from the root, internal nodes are
+ * visited, their children are recursed immediately, and leaf elements are
+ * delivered in the order stored inside each leaf. This allows users to plug
+ * lambdas directly without defining a specific visitor class.
+ *
+ * Example (taken from one of the tests): build a tree from 8 random points,
+ * then hook all four callbacks:
+ *
+ * @code
+ * std::vector<Point<2>> pts(8);
+ * for (auto &p : pts)
+ *   p = random_point<2>();
+ *
+ * auto tree = pack_rtree_of_indices<bgi::linear<2>>(pts);
+ *
+ * // internal node visitor
+ * auto internal =
+ *   [](std::size_t level, auto &parent, const BoundingBox<2> &box, auto &child)
+ * { std::cout << "Internal node (level " << level << ") box "
+ *               << Patterns::Tools::to_string(box.get_boundary_points())
+ *               << std::endl;
+ * };
+ *
+ * // leaf visitor
+ * auto leaf = [](std::size_t level, auto &, const BoundingBox<2> &box, auto &)
+ * { std::cout << "    Leaf      (level " << level << ") box "
+ *             << Patterns::Tools::to_string(box.get_boundary_points())
+ *             << std::endl;
+ * };
+ *
+ * // element visitor (receives the stored value)
+ * auto element = [](auto &, const auto &value) {
+ *   std::cout << "        element " << value;
+ * };
+ *
+ * // indexable visitor (receives the indexable geometry)
+ * auto indexable = [](auto &, const auto &indexable) {
+ *   std::cout << ",  indexable " << indexable << std::endl;
+ * };
+ *
+ * std::cout << "Visiting R-tree with " << pts.size() << " points, and "
+ *           << n_levels(tree) << " levels." << std::endl;
+ *
+ * visit_rtree(tree, internal, leaf, element, indexable);
+ * @endcode
+ *
+ * A possible output (indices and boxes depend on the random points) is:
+ * @code
+ * Internal node (level 0) box 0.277775, 0.197551 : 0.911647, 0.55397
+ *     Leaf      (level 1) box 0.277775, 0.513401 : 0.364784, 0.55397
+ *         element 4,  indexable 0.277775 0.55397
+ *         element 6,  indexable 0.364784 0.513401
+ *     Leaf      (level 1) box 0.840188, 0.197551 : 0.911647, 0.394383
+ *         element 0,  indexable 0.840188 0.394383
+ *         element 2,  indexable 0.911647 0.197551
+ * Internal node (level 0) box 0.335223, 0.628871 : 0.95223, 0.916195
+ *     Leaf      (level 1) box 0.335223, 0.628871 : 0.477397, 0.76823
+ *         element 3,  indexable 0.335223 0.76823
+ *         element 5,  indexable 0.477397 0.628871
+ *     Leaf      (level 1) box 0.783099, 0.79844 : 0.95223, 0.916195
+ *         element 1,  indexable 0.783099 0.79844
+ *         element 7,  indexable 0.95223 0.916195
+ * @endcode
+ *
+ * This structure exists to make it easy to instrument or analyze an rtree
+ * (bounding boxes, counts, aggregations, debug prints, etc.) without writing
+ * the boilerplate of a custom visitor type every time.
+ *
+ * Users can call directly the function visit_rtree() (see below) instead of
+ * instantiating this class.
  */
-template <typename Value,
-          typename Options,
-          typename Translator,
-          typename Box,
-          typename Allocators>
-struct ExtractLevelVisitor
+template <typename RTreeType>
+struct RTreeFunctionalVisitor
   : public boost::geometry::index::detail::rtree::visitor<
-      Value,
-      typename Options::parameters_type,
-      Box,
-      Allocators,
-      typename Options::node_tag,
-      true>::type
+      typename RTreeView<RTreeType>::value_type,
+      typename RTreeView<RTreeType>::options_type::parameters_type,
+      typename RTreeView<RTreeType>::box_type,
+      typename RTreeView<RTreeType>::allocators_type,
+      typename RTreeView<RTreeType>::options_type::node_tag,
+      true>
 {
   /**
-   * Construct a vector @p boxes of BoundingBox objects corresponding to the
-   * @p target_level of the tree.
+   * Spatial dimension of the indexable geometry stored in the tree.
    */
-  inline ExtractLevelVisitor(
-    const Translator  &translator,
-    const unsigned int target_level,
-    std::vector<BoundingBox<boost::geometry::dimension<Box>::value>> &boxes);
+  static constexpr unsigned int dim =
+    boost::geometry::dimension<typename RTreeType::indexable_type>::value;
 
   /**
-   * An alias that identifies an InternalNode of the tree.
+   * Internal node type exposed by Boost for this R-tree configuration.
    */
-  using InternalNode =
+  using internal_node_type =
     typename boost::geometry::index::detail::rtree::internal_node<
-      Value,
-      typename Options::parameters_type,
-      Box,
-      Allocators,
-      typename Options::node_tag>::type;
+      typename RTreeView<RTreeType>::value_type,
+      typename RTreeView<RTreeType>::options_type::parameters_type,
+      typename RTreeView<RTreeType>::box_type,
+      typename RTreeView<RTreeType>::allocators_type,
+      typename RTreeView<RTreeType>::options_type::node_tag>::type;
 
   /**
-   * An alias that identifies a Leaf of the tree.
+   * Leaf type exposed by Boost for this R-tree configuration
    */
-  using Leaf = typename boost::geometry::index::detail::rtree::leaf<
-    Value,
-    typename Options::parameters_type,
-    Box,
-    Allocators,
-    typename Options::node_tag>::type;
+  using leaf_type = typename boost::geometry::index::detail::rtree::leaf<
+    typename RTreeView<RTreeType>::value_type,
+    typename RTreeView<RTreeType>::options_type::parameters_type,
+    typename RTreeView<RTreeType>::box_type,
+    typename RTreeView<RTreeType>::allocators_type,
+    typename RTreeView<RTreeType>::options_type::node_tag>::type;
 
   /**
-   * Implements the visitor interface for InternalNode objects. If the node
-   * belongs to the @p target_level, then fill the bounding box vector.
+   * Value stored in leaves (matches RTreeType::value_type).
    */
-  inline void
-  operator()(const InternalNode &node);
+  using value_type = typename RTreeType::value_type;
 
   /**
-   * Implements the visitor interface for Leaf objects.
+   * Indexable geometry obtained from a value via the tree's getter.
    */
-  inline void
-  operator()(const Leaf &);
+  using indexable_type = typename RTreeType::indexable_type;
 
   /**
-   * Translator interface, required by the boost implementation of the rtree.
+   * Translator (indexable getter) associated with the tree view.
    */
-  const Translator &translator;
+  using translator_type = typename RTreeView<RTreeType>::translator_type;
 
   /**
-   * Store the level we are currently visiting.
+   * Optional callback invoked once per internal node, before descending into
+   * its children.
+   *
+   * This function is only called when the child is an internal_node_type. If
+   * the child is a leaf_type, the leaf_visitor is called instead.
+   *
+   * Arguments:
+   * - level: depth excluding the root (root's children are at level 0; the
+   *   maximum value is @p n_levels(tree)-1),
+   * - parent_node: the internal node being visited (the current parent),
+   * - node_bounding_box: bounding box of the child about to be traversed,
+   * - node: the child internal node
    */
-  std::size_t level;
+  std::function<void(const std::size_t        &level,
+                     const internal_node_type &parent_node,
+                     const BoundingBox<dim>   &node_bounding_box,
+                     const internal_node_type &node)>
+    internal_node_visitor;
 
   /**
-   * The level we want to extract from the RTree object.
+   * Optional callback invoked once per leaf node, before iterating its
+   * elements.
+   *
+   * Arguments mirror the internal callback, but the last argument is the child
+   * leaf node.
    */
-  const std::size_t target_level;
+  std::function<void(const std::size_t        &level,
+                     const internal_node_type &parent_node,
+                     const BoundingBox<dim>   &node_bounding_box,
+                     const leaf_type          &leaf)>
+    leaf_visitor;
 
   /**
-   * A reference to the input vector of BoundingBox objects.
+   * Optional callback invoked for each value stored in a leaf.
+   *
+   * Arguments:
+   * - leaf: the leaf holding the value,
+   * - value: the stored value_type.
    */
-  std::vector<BoundingBox<boost::geometry::dimension<Box>::value>> &boxes;
+  std::function<void(const leaf_type &leaf, const value_type &value)>
+    element_visitor;
+
+  /**
+   * Optional callback invoked for each value after translating it to the
+   * corresponding indexable type via the tree's indexable getter. If the tree
+   * is built without an indexable getter, this function is in fact identical to
+   * the element_visitor, and therefore both can be used interchangeably.
+   *
+   * Arguments:
+   * - leaf: the leaf holding the value,
+   * - indexable: the Indexable associated with the value.
+   */
+  std::function<void(const leaf_type &leaf, const indexable_type &indexable)>
+    indexable_visitor;
+
+  /**
+   * Implements the internal-node branch of the
+   * `boost::geometry::index::detail::rtree::visitor` interface so this
+   * functor can be passed to apply_visitor() when traversing an rtree.
+   */
+  void
+  operator()(internal_node_type &node);
+
+  /**
+   * Implements the leaf branch of the
+   * `boost::geometry::index::detail::rtree::visitor` interface so this
+   * functor can be passed to apply_visitor() when traversing an rtree.
+   */
+  void
+  operator()(leaf_type &leaf);
+
+  /**
+   * Constructor wiring optional callbacks and starting a traversal of the
+   * provided rtree through apply_visitor().
+   *
+   * You may call this constructor directly, but the preferred way is to use
+   * the visit_rtree() function below.
+   */
+  RTreeFunctionalVisitor(
+    const RTreeType &tree,
+    const std::function<void(const std::size_t        &level,
+                             const internal_node_type &parent_node,
+                             const BoundingBox<dim>   &node_bounding_box,
+                             const internal_node_type &node)>
+      &internal_node_visitor                                       = {},
+    const std::function<void(const std::size_t        &level,
+                             const internal_node_type &parent_node,
+                             const BoundingBox<dim>   &node_bounding_box,
+                             const leaf_type &leaf)> &leaf_visitor = {},
+    const std::function<void(const leaf_type &leaf, const value_type &value)>
+      &element_visitor = {},
+    const std::function<void(const leaf_type      &leaf,
+                             const indexable_type &indexable)>
+      &indexable_visitor = {});
+
+  std::size_t     current_level;
+  translator_type translator;
 };
+
+/**
+ * Depth-first traversal helper for any R-tree instance.
+ *
+ * This function instantiates RTreeFunctionalVisitor<RTreeType> and walks the
+ * tree depth-first, invoking the provided callbacks at three granularities:
+ * internal nodes, leaf nodes, and leaf elements (values and/or indexables).
+ *
+ * @tparam RTreeType The concrete boost::geometry::index::rtree type.
+ * @param tree The R-tree instance to traverse (passed by non-const reference so
+ * the visitor signature matches Boost's visitor API; traversal itself is
+ * read-only).
+ * @param internal_node_visitor Optional callback invoked once per internal node
+ * before its children are visited. Signature:
+ * @code
+ * void(std::size_t level,
+ *      const internal_node_type &parent,
+ *      const BoundingBox<dim> &child_box,
+ *      const internal_node_type &child);
+ * @endcode
+ * The @p level is the depth of the child without counting the root (root's
+ * children are level 0, and the maximum value is @p n_levels(tree)-1). The
+ * @p child_box is the bounding box stored alongside the child pointer in the
+ * parent.
+ * @param leaf_visitor Optional callback invoked once per leaf node before its
+ * elements are iterated. Signature:
+ * @code
+ * void(std::size_t level,
+ *      const internal_node_type &parent,
+ *      const BoundingBox<dim> &leaf_box,
+ *      const leaf_type &leaf);
+ * @endcode
+ * @param element_visitor Optional callback invoked for each value stored in a
+ * leaf. Signature:
+ * @code
+ * void(const leaf_type &leaf,
+ *      const value_type &value);
+ * @endcode
+ * @param indexable_visitor Optional callback invoked for each value after it is
+ * translated to its indexable counterpart via the tree's indexable getter.
+ * Signature:
+ * @code
+ * void(const leaf_type &leaf,
+ *      const indexable_type &indexable);
+ * @endcode
+ *
+ * The traversal order is depth-first: an internal node triggers its callback
+ * and immediately recurses into each child (internal or leaf); leaves trigger
+ * their callback and then the element/indexable callbacks for each stored
+ * value.
+ *
+ * For an end-to-end usage example and sample output, see the documentation of
+ * RTreeFunctionalVisitor.
+ */
+template <typename RTreeType>
+void
+visit_rtree(
+  const RTreeType &tree,
+  const std::function<void(
+    const std::size_t &,
+    const typename RTreeFunctionalVisitor<RTreeType>::internal_node_type &,
+    const BoundingBox<RTreeFunctionalVisitor<RTreeType>::dim> &,
+    const typename RTreeFunctionalVisitor<RTreeType>::internal_node_type &)>
+    &internal_node_visitor = {},
+  const std::function<
+    void(const std::size_t &,
+         const typename RTreeFunctionalVisitor<RTreeType>::internal_node_type &,
+         const BoundingBox<RTreeFunctionalVisitor<RTreeType>::dim> &,
+         const typename RTreeFunctionalVisitor<RTreeType>::leaf_type &)>
+    &leaf_visitor = {},
+  const std::function<
+    void(const typename RTreeFunctionalVisitor<RTreeType>::leaf_type &,
+         const typename RTreeFunctionalVisitor<RTreeType>::value_type &)>
+    &element_visitor = {},
+  const std::function<
+    void(const typename RTreeFunctionalVisitor<RTreeType>::leaf_type &,
+         const typename RTreeFunctionalVisitor<RTreeType>::indexable_type &)>
+    &indexable_visitor = {});
+
 
 /**
  * Given a RTree object @p rtree, and a target level @p level, return a vector
  * of BoundingBox objects containing all the bounding boxes that make the given
- * @p level of the @p rtree. This function is a convenient wrapper around the
- * ExtractLevelVisitor class. It is used in step-70.
+ * @p level of the @p rtree. This function is used in step-70.
  *
  * Since an RTree object is a balanced tree, you can expect each entry of the
  * resulting vector to contain roughly the same number of children, and
@@ -522,77 +759,119 @@ pack_rtree_of_indices(const ContainerType &container)
 
 
 
-template <typename Value,
-          typename Options,
-          typename Translator,
-          typename Box,
-          typename Allocators>
-ExtractLevelVisitor<Value, Options, Translator, Box, Allocators>::
-  ExtractLevelVisitor(
-    const Translator  &translator,
-    const unsigned int target_level,
-    std::vector<BoundingBox<boost::geometry::dimension<Box>::value>> &boxes)
-  : translator(translator)
-  , level(0)
-  , target_level(target_level)
-  , boxes(boxes)
-{}
-
-
-
-template <typename Value,
-          typename Options,
-          typename Translator,
-          typename Box,
-          typename Allocators>
+template <typename RTreeType>
 void
-ExtractLevelVisitor<Value, Options, Translator, Box, Allocators>::operator()(
-  const ExtractLevelVisitor::InternalNode &node)
+RTreeFunctionalVisitor<RTreeType>::operator()(internal_node_type &node)
 {
-  using ElementsType =
-    typename boost::geometry::index::detail::rtree::elements_type<
-      InternalNode>::type;
-
-  const auto &elements = boost::geometry::index::detail::rtree::elements(node);
-
-  if (level == target_level)
+  const std::size_t level_backup = current_level;
+  for (const auto &element :
+       boost::geometry::index::detail::rtree::elements(node))
     {
-      const auto offset = boxes.size();
-      boxes.resize(offset + elements.size());
+      BoundingBox<dim> box;
+      boost::geometry::convert(element.first, box);
 
-      unsigned int i = offset;
-      for (typename ElementsType::const_iterator it = elements.begin();
-           it != elements.end();
-           ++it)
+      const std::size_t child_level = level_backup;
+
+      if (auto *leaf_ptr = boost::get<leaf_type>(&*element.second))
         {
-          boost::geometry::convert(it->first, boxes[i]);
-          ++i;
+          if (leaf_visitor)
+            leaf_visitor(child_level, node, box, *leaf_ptr);
         }
-      return;
+      else if (auto *internal_ptr =
+                 boost::get<internal_node_type>(&*element.second))
+        {
+          if (internal_node_visitor)
+            internal_node_visitor(child_level, node, box, *internal_ptr);
+        }
+
+      current_level = child_level + 1;
+      boost::geometry::index::detail::rtree::apply_visitor(*this,
+                                                           *element.second);
     }
-
-  const std::size_t level_backup = level;
-  ++level;
-
-  for (typename ElementsType::const_iterator it = elements.begin();
-       it != elements.end();
-       ++it)
-    {
-      boost::geometry::index::detail::rtree::apply_visitor(*this, *it->second);
-    }
-
-  level = level_backup;
+  current_level = level_backup;
 }
 
-template <typename Value,
-          typename Options,
-          typename Translator,
-          typename Box,
-          typename Allocators>
+
+
+template <typename RTreeType>
 void
-ExtractLevelVisitor<Value, Options, Translator, Box, Allocators>::operator()(
-  const ExtractLevelVisitor::Leaf &)
-{}
+RTreeFunctionalVisitor<RTreeType>::operator()(leaf_type &leaf)
+{
+  for (const auto &element :
+       boost::geometry::index::detail::rtree::elements(leaf))
+    {
+      if (element_visitor)
+        element_visitor(leaf, element);
+      if (indexable_visitor)
+        {
+          auto idx = translator(element);
+          indexable_visitor(leaf, idx);
+        }
+    }
+}
+
+
+
+template <typename RTreeType>
+RTreeFunctionalVisitor<RTreeType>::RTreeFunctionalVisitor(
+  const RTreeType &tree,
+  const std::function<void(const std::size_t        &level,
+                           const internal_node_type &parent_node,
+                           const BoundingBox<dim>   &node_bounding_box,
+                           const internal_node_type &node)>
+                                                   &internal_node_visitor,
+  const std::function<void(const std::size_t        &level,
+                           const internal_node_type &parent_node,
+                           const BoundingBox<dim>   &node_bounding_box,
+                           const leaf_type          &leaf)> &leaf_visitor,
+  const std::function<void(const leaf_type &leaf, const value_type &value)>
+                                                             &element_visitor,
+  const std::function<void(const leaf_type      &leaf,
+                           const indexable_type &indexable)> &indexable_visitor)
+  : internal_node_visitor(internal_node_visitor)
+  , leaf_visitor(leaf_visitor)
+  , element_visitor(element_visitor)
+  , indexable_visitor(indexable_visitor)
+  , current_level(0)
+  , translator(RTreeView<RTreeType>(tree).translator())
+{
+  RTreeView<RTreeType> rtv(tree);
+  rtv.apply_visitor(*this);
+}
+
+
+
+template <typename RTreeType>
+void
+visit_rtree(
+  const RTreeType &tree,
+  const std::function<void(
+    const std::size_t &,
+    const typename RTreeFunctionalVisitor<RTreeType>::internal_node_type &,
+    const BoundingBox<RTreeFunctionalVisitor<RTreeType>::dim> &,
+    const typename RTreeFunctionalVisitor<RTreeType>::internal_node_type &)>
+    &internal_node_visitor,
+  const std::function<
+    void(const std::size_t &,
+         const typename RTreeFunctionalVisitor<RTreeType>::internal_node_type &,
+         const BoundingBox<RTreeFunctionalVisitor<RTreeType>::dim> &,
+         const typename RTreeFunctionalVisitor<RTreeType>::leaf_type &)>
+    &leaf_visitor,
+  const std::function<
+    void(const typename RTreeFunctionalVisitor<RTreeType>::leaf_type &,
+         const typename RTreeFunctionalVisitor<RTreeType>::value_type &)>
+    &element_visitor,
+  const std::function<
+    void(const typename RTreeFunctionalVisitor<RTreeType>::leaf_type &,
+         const typename RTreeFunctionalVisitor<RTreeType>::indexable_type &)>
+    &indexable_visitor)
+{
+  RTreeFunctionalVisitor<RTreeType> visitor(tree,
+                                            internal_node_visitor,
+                                            leaf_visitor,
+                                            element_visitor,
+                                            indexable_visitor);
+}
 
 
 
@@ -604,32 +883,49 @@ extract_rtree_level(const Rtree &tree, const unsigned int level)
   constexpr unsigned int dim =
     boost::geometry::dimension<typename Rtree::indexable_type>::value;
 
-  using RtreeView =
-    boost::geometry::index::detail::rtree::utilities::view<Rtree>;
-  RtreeView rtv(tree);
-
   std::vector<BoundingBox<dim>> boxes;
 
-  if (rtv.depth() == 0)
+  unsigned int n_levels_in_tree = n_levels(tree);
+
+  if (n_levels_in_tree == 0)
     {
-      // The below algorithm does not work for `rtv.depth()==0`, which might
-      // happen if the number entries in the tree is too small.
-      // In this case, simply return a single bounding box.
+      // The algorithm below does not work for `n_levels_in_tree==0`, which
+      // might happen if the number entries in the tree is too small. In this
+      // case, simply return a single bounding box.
       boxes.resize(1);
       boost::geometry::convert(tree.bounds(), boxes[0]);
     }
   else
     {
       const unsigned int target_level =
-        std::min<unsigned int>(level, rtv.depth() - 1);
+        std::min<unsigned int>(level, n_levels_in_tree - 1);
 
-      ExtractLevelVisitor<typename RtreeView::value_type,
-                          typename RtreeView::options_type,
-                          typename RtreeView::translator_type,
-                          typename RtreeView::box_type,
-                          typename RtreeView::allocators_type>
-        extract_level_visitor(rtv.translator(), target_level, boxes);
-      rtv.apply_visitor(extract_level_visitor);
+      using Visitor      = RTreeFunctionalVisitor<Rtree>;
+      using InternalNode = typename Visitor::internal_node_type;
+      using LeafNode     = typename Visitor::leaf_type;
+      std::function<void(const std::size_t &,
+                         const InternalNode &,
+                         const BoundingBox<dim> &,
+                         const InternalNode &)>
+        node_visitor = [&](const std::size_t &current_level,
+                           const InternalNode &,
+                           const BoundingBox<dim> &box,
+                           const InternalNode &) {
+          if (current_level == target_level)
+            boxes.push_back(box);
+        };
+      std::function<void(const std::size_t &,
+                         const InternalNode &,
+                         const BoundingBox<dim> &,
+                         const LeafNode &)>
+        leaf_visitor = [&](const std::size_t &current_level,
+                           const InternalNode &,
+                           const BoundingBox<dim> &box,
+                           const LeafNode &) {
+          if (current_level == target_level)
+            boxes.push_back(box);
+        };
+      visit_rtree(tree, node_visitor, leaf_visitor);
     }
 
   return boxes;
@@ -646,179 +942,6 @@ n_levels(const Rtree &tree)
 }
 
 
-template <typename Value,
-          typename Options,
-          typename Translator,
-          typename Box,
-          typename Allocators>
-struct NodeVisitor : public boost::geometry::index::detail::rtree::visitor<
-                       Value,
-                       typename Options::parameters_type,
-                       Box,
-                       Allocators,
-                       typename Options::node_tag,
-                       true>::type
-{
-  inline NodeVisitor(
-    const Translator &translator,
-    unsigned int      target_level,
-    std::vector<
-      std::vector<BoundingBox<boost::geometry::dimension<Box>::value>>> &boxes);
-
-
-  /**
-   * An alias that identifies an InternalNode of the tree.
-   */
-  using InternalNode =
-    typename boost::geometry::index::detail::rtree::internal_node<
-      Value,
-      typename Options::parameters_type,
-      Box,
-      Allocators,
-      typename Options::node_tag>::type;
-
-  /**
-   * An alias that identifies a Leaf of the tree.
-   */
-  using Leaf = typename boost::geometry::index::detail::rtree::leaf<
-    Value,
-    typename Options::parameters_type,
-    Box,
-    Allocators,
-    typename Options::node_tag>::type;
-
-  /**
-   * Implements the visitor interface for InternalNode objects. If the node
-   * belongs to the level next to @p target_level, then fill the bounding box vector for that node.
-   */
-  inline void
-  operator()(const InternalNode &node);
-
-  /**
-   * Implements the visitor interface for Leaf objects.
-   */
-  inline void
-  operator()(const Leaf &);
-
-  /**
-   * Translator interface, required by the boost implementation of the rtree.
-   */
-  const Translator &translator;
-
-  /**
-   * Store the level we are currently visiting.
-   */
-  std::size_t level;
-
-  /**
-   * Index used to keep track of the number of different visited nodes during
-   * recursion/
-   */
-  std::size_t node_counter;
-
-  /**
-   * The level where children are living.
-   * Before: "we want to extract from the RTree object."
-   */
-  const std::size_t target_level;
-
-  /**
-   * A reference to the input vector of vector of BoundingBox objects. This
-   * vector v has the following property: v[i] = vector with all
-   * of the BoundingBox bounded by the i-th node of the Rtree.
-   */
-  std::vector<std::vector<BoundingBox<boost::geometry::dimension<Box>::value>>>
-    &boxes_in_boxes;
-};
-
-
-
-template <typename Value,
-          typename Options,
-          typename Translator,
-          typename Box,
-          typename Allocators>
-NodeVisitor<Value, Options, Translator, Box, Allocators>::NodeVisitor(
-  const Translator  &translator,
-  const unsigned int target_level,
-  std::vector<std::vector<BoundingBox<boost::geometry::dimension<Box>::value>>>
-    &bb_in_boxes)
-  : translator(translator)
-  , level(0)
-  , node_counter(0)
-  , target_level(target_level)
-  , boxes_in_boxes(bb_in_boxes)
-{}
-
-
-
-template <typename Value,
-          typename Options,
-          typename Translator,
-          typename Box,
-          typename Allocators>
-void
-NodeVisitor<Value, Options, Translator, Box, Allocators>::operator()(
-  const NodeVisitor::InternalNode &node)
-{
-  using elements_type =
-    typename boost::geometry::index::detail::rtree::elements_type<
-      InternalNode>::type; //  pairs of bounding box and pointer to child node
-  const elements_type &elements =
-    boost::geometry::index::detail::rtree::elements(node);
-
-  if (level == target_level)
-    {
-      const unsigned int n_children = elements.size();
-      const auto         offset     = boxes_in_boxes.size();
-      boxes_in_boxes.resize(offset + n_children);
-    }
-
-  if (level == target_level + 1)
-    {
-      // I have now access to children of level target_level
-      boxes_in_boxes[node_counter].resize(elements.size()); // number of bboxes
-      unsigned int i = 0;
-      for (typename elements_type::const_iterator it = elements.begin();
-           it != elements.end();
-           ++it)
-        {
-          boost::geometry::convert(it->first, boxes_in_boxes[node_counter][i]);
-          ++i;
-        }
-      // Children have been stored, go to the next parent.
-      ++node_counter;
-      return;
-    }
-
-  std::size_t level_backup = level;
-  ++level;
-
-  for (typename elements_type::const_iterator it = elements.begin();
-       it != elements.end();
-       ++it)
-    {
-      boost::geometry::index::detail::rtree::apply_visitor(*this, *it->second);
-    }
-
-  level = level_backup;
-}
-
-
-
-template <typename Value,
-          typename Options,
-          typename Translator,
-          typename Box,
-          typename Allocators>
-void
-NodeVisitor<Value, Options, Translator, Box, Allocators>::operator()(
-  const NodeVisitor::Leaf &)
-{
-  // No children for leaf nodes.
-  boxes_in_boxes.clear();
-}
-
 template <typename Rtree>
 inline std::vector<std::vector<BoundingBox<
   boost::geometry::dimension<typename Rtree::indexable_type>::value>>>
@@ -827,13 +950,11 @@ extract_children_of_level(const Rtree &tree, const unsigned int level)
   constexpr unsigned int dim =
     boost::geometry::dimension<typename Rtree::indexable_type>::value;
 
-  using RtreeView =
-    boost::geometry::index::detail::rtree::utilities::view<Rtree>;
-  RtreeView rtv(tree);
+  unsigned int n_levels_in_tree = n_levels(tree);
 
   std::vector<std::vector<BoundingBox<dim>>> boxes_in_boxes;
 
-  if (rtv.depth() == 0)
+  if (n_levels_in_tree == 0)
     {
       // The below algorithm does not work for `rtv.depth()==0`, which might
       // happen if the number entries in the tree is too small.
@@ -845,15 +966,41 @@ extract_children_of_level(const Rtree &tree, const unsigned int level)
   else
     {
       const unsigned int target_level =
-        std::min<unsigned int>(level, rtv.depth() - 1);
+        std::min<unsigned int>(level, n_levels_in_tree - 1);
 
-      NodeVisitor<typename RtreeView::value_type,
-                  typename RtreeView::options_type,
-                  typename RtreeView::translator_type,
-                  typename RtreeView::box_type,
-                  typename RtreeView::allocators_type>
-        node_visitor(rtv.translator(), target_level, boxes_in_boxes);
-      rtv.apply_visitor(node_visitor);
+      // Track all nodes on target_level and collect their children (level
+      // target_level+1) grouped per parent. Depth-first visitation guarantees
+      // children immediately follow their parent, so a simple counter suffices.
+      std::size_t current_parent_index = 0;
+      std::size_t node_counter         = 0;
+
+      const auto internal = [&](const std::size_t current_level,
+                                const auto &,
+                                const BoundingBox<dim> &child_box,
+                                const auto &) {
+        // Register nodes that live on the target level so their children can
+        // be grouped.
+        if (current_level == target_level)
+          {
+            current_parent_index = node_counter++;
+            boxes_in_boxes.emplace_back();
+            return;
+          }
+
+        // Record children of nodes on the target level.
+        if (current_level == target_level + 1)
+          boxes_in_boxes[current_parent_index].push_back(child_box);
+      };
+
+      const auto leaf = [&](const std::size_t current_level,
+                            const auto &,
+                            const BoundingBox<dim> &child_box,
+                            const auto &) {
+        if (current_level == target_level + 1)
+          boxes_in_boxes[current_parent_index].push_back(child_box);
+      };
+
+      visit_rtree(tree, internal, leaf);
     }
 
   return boxes_in_boxes;

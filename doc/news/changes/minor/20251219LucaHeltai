@@ -1,0 +1,6 @@
+New: Implemented a new RTreeFunctionalVisitor class and corresponding
+visit_rtree() function that allow to visit (read only) a boost RTree data
+structure, executing a user provided function for each node, leaf, or element
+of the tree.
+<br>
+(Luca Heltai, 2025/12/19)
