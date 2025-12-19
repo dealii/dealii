@@ -829,7 +829,18 @@ namespace internal
       unsigned int n_entities = 0;
 
       for (const auto &c : cell_types_index)
-        n_entities += cell_types[c]->n_entities(face_dimensionality);
+        {
+          // Make sure that there are only two possibilities for
+          // face_dimensionality that we can cover with the ?: statement below:
+          Assert((face_dimensionality == cell_types[c]->get_dimension() - 1) ||
+                   ((cell_types[c]->get_dimension() == 3) &&
+                    (face_dimensionality == 1)),
+                 ExcInternalError());
+          n_entities +=
+            (face_dimensionality == cell_types[c]->get_dimension() - 1 ?
+               cell_types[c]->n_faces() :
+               cell_types[c]->n_lines());
+        }
 
       // step 1: store each d-dimensional entity of a cell (described by their
       // vertices) into a vector and create a key for them
@@ -858,16 +869,25 @@ namespace internal
       for (unsigned int c = 0, counter = 0; c < cell_types_index.size(); ++c)
         {
           const auto &cell_type = cell_types[cell_types_index[c]];
-          ptr_d[c + 1] = ptr_d[c] + cell_type->n_entities(face_dimensionality);
+
+          // Make sure that there are only two possibilities for
+          // face_dimensionality that we can cover with the ?: statement below:
+          Assert((face_dimensionality == cell_type->get_dimension() - 1) ||
+                   ((cell_type->get_dimension() == 3) &&
+                    (face_dimensionality == 1)),
+                 ExcInternalError());
+          const unsigned int n_face_entities =
+            (face_dimensionality == cell_type->get_dimension() - 1 ?
+               cell_type->n_faces() :
+               cell_type->n_lines());
+          ptr_d[c + 1] = ptr_d[c] + n_face_entities;
 
           // ... collect vertices of cell
           const dealii::ArrayView<const unsigned int> local_vertices(
             cell_vertices.data() + cell_ptr[c], cell_ptr[c + 1] - cell_ptr[c]);
 
           // ... loop over all its entities
-          for (unsigned int e = 0;
-               e < cell_type->n_entities(face_dimensionality);
-               ++e)
+          for (unsigned int e = 0; e < n_face_entities; ++e)
             {
               // ... determine global entity vertices
               const auto &local_entity_vertices =
@@ -1017,9 +1037,18 @@ namespace internal
       for (const auto &c : cell_types_index)
         {
           const auto &cell_type = cell_types[c];
-          for (unsigned int e = 0;
-               e < cell_type->n_entities(face_dimensionality);
-               ++e)
+
+          // Make sure that there are only two possibilities for
+          // face_dimensionality that we can cover with the ?: statement below:
+          Assert((face_dimensionality == cell_type->get_dimension() - 1) ||
+                   ((cell_type->get_dimension() == 3) &&
+                    (face_dimensionality == 1)),
+                 ExcInternalError());
+          const unsigned int n_face_entities =
+            (face_dimensionality == cell_type->get_dimension() - 1 ?
+               cell_type->n_faces() :
+               cell_type->n_lines());
+          for (unsigned int e = 0; e < n_face_entities; ++e)
             max_n_vertices = std::max(
               max_n_vertices,
               cell_type->vertices_of_entity(face_dimensionality, e).size());
