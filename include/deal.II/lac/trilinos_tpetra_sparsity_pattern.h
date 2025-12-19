@@ -310,26 +310,19 @@ namespace LinearAlgebra
        * $m$ rows and $n$ columns. The resulting matrix will be completely
        * stored locally, too.
        *
-       * It is possible to specify the number of columns entries per row using
-       * the optional @p n_entries_per_row argument. However, this value does
-       * not need to be accurate or even given at all, since one does usually
-       * not have this kind of information before building the sparsity pattern
-       * (the usual case when the function DoFTools::make_sparsity_pattern() is
-       * called). The entries are allocated dynamically in a similar manner as
-       * for the deal.II DynamicSparsityPattern classes. However, a good
-       * estimate will reduce the setup time of the sparsity pattern.
+       * An upper bound for the number of entries per row has to be provided.
        */
       SparsityPattern(const size_type m,
                       const size_type n,
-                      const size_type n_entries_per_row = 0);
+                      const size_type n_entries_per_row);
 
       /**
        * Generate a sparsity pattern that is completely stored locally, having
        * $m$ rows and $n$ columns. The resulting matrix will be completely
        * stored locally, too.
        *
-       * The vector <tt>n_entries_per_row</tt> specifies the number of entries
-       * in each row (an information usually not available, though).
+       * The vector <tt>n_entries_per_row</tt> specifies the maximum number of
+       * entries in each row.
        */
       SparsityPattern(const size_type               m,
                       const size_type               n,
@@ -358,16 +351,12 @@ namespace LinearAlgebra
        * $m$ rows and $n$ columns. The resulting matrix will be completely
        * stored locally.
        *
-       * The number of columns entries per row is specified as the maximum
-       * number of entries argument.  This does not need to be an accurate
-       * number since the entries are allocated dynamically in a similar manner
-       * as for the deal.II DynamicSparsityPattern classes, but a good estimate
-       * will reduce the setup time of the sparsity pattern.
+       * An upper bound for the number of entries per row has to be provided.
        */
       void
       reinit(const size_type m,
              const size_type n,
-             const size_type n_entries_per_row = 0);
+             const size_type n_entries_per_row);
 
       /**
        * Initialize a sparsity pattern that is completely stored locally, having
@@ -438,17 +427,11 @@ namespace LinearAlgebra
       /**
        * Constructor for a square sparsity pattern using an IndexSet and an MPI
        * communicator for the description of the %parallel partitioning.
-       * Moreover, the number of nonzero entries in the rows of the sparsity
-       * pattern can be specified. Note that this number does not need to be
-       * exact, and it is even allowed that the actual sparsity structure has
-       * more nonzero entries than specified in the constructor. However it is
-       * still advantageous to provide good estimates here since a good value
-       * will avoid repeated allocation of memory, which considerably increases
-       * the performance when creating the sparsity pattern.
+       * An upper bound for the number of entries per row has to be provided.
        */
       SparsityPattern(const IndexSet &parallel_partitioning,
-                      const MPI_Comm  communicator      = MPI_COMM_WORLD,
-                      const size_type n_entries_per_row = 0);
+                      const MPI_Comm  communicator,
+                      const size_type n_entries_per_row);
 
       /**
        * Same as before, but now use the exact number of nonzero entries in
@@ -480,8 +463,8 @@ namespace LinearAlgebra
        */
       SparsityPattern(const IndexSet &row_parallel_partitioning,
                       const IndexSet &col_parallel_partitioning,
-                      const MPI_Comm  communicator      = MPI_COMM_WORLD,
-                      const size_type n_entries_per_row = 0);
+                      const MPI_Comm  communicator,
+                      const size_type n_entries_per_row);
 
       /**
        * This constructor is similar to the one above, but it now takes two
@@ -528,8 +511,8 @@ namespace LinearAlgebra
       SparsityPattern(const IndexSet &row_parallel_partitioning,
                       const IndexSet &col_parallel_partitioning,
                       const IndexSet &writable_rows,
-                      const MPI_Comm  communicator      = MPI_COMM_WORLD,
-                      const size_type n_entries_per_row = 0);
+                      const MPI_Comm  communicator,
+                      const size_type n_entries_per_row);
 
       /**
        * Reinitialization function for generating a square sparsity pattern
@@ -548,8 +531,8 @@ namespace LinearAlgebra
        */
       void
       reinit(const IndexSet &parallel_partitioning,
-             const MPI_Comm  communicator      = MPI_COMM_WORLD,
-             const size_type n_entries_per_row = 0);
+             const MPI_Comm  communicator,
+             const size_type n_entries_per_row);
 
       /**
        * Same as before, but now use the exact number of nonzero entries in
@@ -585,8 +568,8 @@ namespace LinearAlgebra
       void
       reinit(const IndexSet &row_parallel_partitioning,
              const IndexSet &col_parallel_partitioning,
-             const MPI_Comm  communicator      = MPI_COMM_WORLD,
-             const size_type n_entries_per_row = 0);
+             const MPI_Comm  communicator,
+             const size_type n_entries_per_row);
 
       /**
        * This reinit function is used to specify general matrices, possibly non-
@@ -617,8 +600,8 @@ namespace LinearAlgebra
       reinit(const IndexSet &row_parallel_partitioning,
              const IndexSet &col_parallel_partitioning,
              const IndexSet &writeable_rows,
-             const MPI_Comm  communicator      = MPI_COMM_WORLD,
-             const size_type n_entries_per_row = 0);
+             const MPI_Comm  communicator,
+             const size_type n_entries_per_row);
 
       /**
        * Same as before, but now using a vector <tt>n_entries_per_row</tt> for
@@ -644,7 +627,7 @@ namespace LinearAlgebra
       reinit(const IndexSet            &row_parallel_partitioning,
              const IndexSet            &col_parallel_partitioning,
              const SparsityPatternType &nontrilinos_sparsity_pattern,
-             const MPI_Comm             communicator  = MPI_COMM_WORLD,
+             const MPI_Comm             communicator = MPI_COMM_WORLD,
              const bool                 exchange_data = false);
 
       /**
@@ -659,7 +642,7 @@ namespace LinearAlgebra
       void
       reinit(const IndexSet            &parallel_partitioning,
              const SparsityPatternType &nontrilinos_sparsity_pattern,
-             const MPI_Comm             communicator  = MPI_COMM_WORLD,
+             const MPI_Comm             communicator = MPI_COMM_WORLD,
              const bool                 exchange_data = false);
       /** @} */
       /**
