@@ -627,7 +627,7 @@ namespace LinearAlgebra
       reinit(const IndexSet            &row_parallel_partitioning,
              const IndexSet            &col_parallel_partitioning,
              const SparsityPatternType &nontrilinos_sparsity_pattern,
-             const MPI_Comm             communicator = MPI_COMM_WORLD,
+             const MPI_Comm             communicator  = MPI_COMM_WORLD,
              const bool                 exchange_data = false);
 
       /**
@@ -642,7 +642,7 @@ namespace LinearAlgebra
       void
       reinit(const IndexSet            &parallel_partitioning,
              const SparsityPatternType &nontrilinos_sparsity_pattern,
-             const MPI_Comm             communicator = MPI_COMM_WORLD,
+             const MPI_Comm             communicator  = MPI_COMM_WORLD,
              const bool                 exchange_data = false);
       /** @} */
       /**
