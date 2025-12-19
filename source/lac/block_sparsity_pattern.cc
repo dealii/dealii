@@ -562,7 +562,8 @@ namespace TrilinosWrappers
       for (size_type j = 0; j < parallel_partitioning.size(); ++j)
         this->block(i, j).reinit(parallel_partitioning[i],
                                  parallel_partitioning[j],
-                                 communicator);
+                                 communicator,
+                                 0);
     this->collect_sizes();
   }
 
@@ -613,7 +614,8 @@ namespace TrilinosWrappers
       for (size_type j = 0; j < parallel_partitioning.size(); ++j)
         this->block(i, j).reinit(parallel_partitioning[i],
                                  parallel_partitioning[j],
-                                 communicator);
+                                 communicator,
+                                 0);
     this->collect_sizes();
   }
 

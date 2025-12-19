@@ -456,6 +456,16 @@ namespace TrilinosWrappers
                     const MPI_Comm  communicator,
                     const size_type n_entries_per_row);
 
+
+    DEAL_II_DEPRECATED_EARLY_WITH_COMMENT(
+      "Use the overload specifying the number of entries per row!")
+    SparsityPattern(const IndexSet &parallel_partitioning,
+                    const MPI_Comm  communicator)
+      : SparsityPattern(parallel_partitioning, communicator, 0)
+    {
+      std::abort();
+    }
+
     DEAL_II_DEPRECATED_EARLY_WITH_COMMENT(
       "Use the overload specifying the MPI communicator and the number of entries per row!")
     SparsityPattern(const IndexSet &parallel_partitioning)
@@ -498,10 +508,23 @@ namespace TrilinosWrappers
                     const size_type n_entries_per_row);
 
     DEAL_II_DEPRECATED_EARLY_WITH_COMMENT(
+      "Use the overload specifying the number of entries per row!")
+    SparsityPattern(const IndexSet &row_parallel_partitioning,
+                    const IndexSet &col_parallel_partitioning,
+                    const MPI_Comm  communicator)
+      : SparsityPattern(row_parallel_partitioning,
+                        col_parallel_partitioning,
+                        communicator,
+                        0)
+    {
+      std::abort();
+    }
+
+    DEAL_II_DEPRECATED_EARLY_WITH_COMMENT(
       "Use the overload specifying the MPI communicator and the number of entries per row!")
     SparsityPattern(const IndexSet &row_parallel_partitioning,
                     const IndexSet &col_parallel_partitioning)
-      : SparsityPattern(row_paralell_partitioning,
+      : SparsityPattern(row_parallel_partitioning,
                         col_parallel_partitioning,
                         MPI_COMM_WORLD,
                         0)
@@ -558,6 +581,21 @@ namespace TrilinosWrappers
                     const size_type n_entries_per_row);
 
     DEAL_II_DEPRECATED_EARLY_WITH_COMMENT(
+      "Use the overload specifying the number of entries per row!")
+    SparsityPattern(const IndexSet &row_parallel_partitioning,
+                    const IndexSet &col_parallel_partitioning,
+                    const IndexSet &writable_rows,
+                    const MPI_Comm  communicator)
+      : SparsityPattern(row_parallel_partitioning,
+                        col_parallel_partitioning,
+                        writable_rows,
+                        communicator,
+                        0)
+    {
+      std::abort();
+    }
+
+    DEAL_II_DEPRECATED_EARLY_WITH_COMMENT(
       "Use the overload specifying the MPI communicator and the number of entries per row!")
     SparsityPattern(const IndexSet &row_parallel_partitioning,
                     const IndexSet &col_parallel_partitioning,
@@ -590,6 +628,15 @@ namespace TrilinosWrappers
     reinit(const IndexSet &parallel_partitioning,
            const MPI_Comm  communicator,
            const size_type n_entries_per_row);
+
+    DEAL_II_DEPRECATED_EARLY_WITH_COMMENT(
+      "Use the overload specifying the number of entries per row!")
+    void
+    reinit(const IndexSet &parallel_partitioning, const MPI_Comm communicator)
+    {
+      reinit(parallel_partitioning, communicator, 0);
+      std::abort();
+    }
 
     DEAL_II_DEPRECATED_EARLY_WITH_COMMENT(
       "Use the overload specifying the MPI communicator and the number of entries per row!")
@@ -638,6 +685,20 @@ namespace TrilinosWrappers
            const size_type n_entries_per_row);
 
     DEAL_II_DEPRECATED_EARLY_WITH_COMMENT(
+      "Use the overload specifying the number of entries per row!")
+    void
+    reinit(const IndexSet &row_parallel_partitioning,
+           const IndexSet &col_parallel_partitioning,
+           const MPI_Comm  communicator)
+    {
+      reinit(row_parallel_partitioning,
+             col_parallel_partitioning,
+             communicator,
+             0);
+      std::abort();
+    }
+
+    DEAL_II_DEPRECATED_EARLY_WITH_COMMENT(
       "Use the overload specifying the MPI communicator and the number of entries per row!")
     void
     reinit(const IndexSet &row_parallel_partitioning,
@@ -681,6 +742,22 @@ namespace TrilinosWrappers
            const IndexSet &writeable_rows,
            const MPI_Comm  communicator,
            const size_type n_entries_per_row);
+
+    DEAL_II_DEPRECATED_EARLY_WITH_COMMENT(
+      "Use the overload specifying the number of entries per row!")
+    void
+    reinit(const IndexSet &row_parallel_partitioning,
+           const IndexSet &col_parallel_partitioning,
+           const IndexSet &writeable_rows,
+           const MPI_Comm  communicator)
+    {
+      reinit(row_parallel_partitioning,
+             col_parallel_partitioning,
+             writeable_rows,
+             communicator,
+             0);
+      std::abort();
+    }
 
     DEAL_II_DEPRECATED_EARLY_WITH_COMMENT(
       "Use the overload specifying the MPI communicator and the number of entries per row!")

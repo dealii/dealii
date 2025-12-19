@@ -757,8 +757,16 @@ DEAL_II_NAMESPACE_OPEN // Do not convert for module purposes
                  const unsigned int n_max_entries_per_row);
 
     DEAL_II_DEPRECATED_EARLY_WITH_COMMENT(
+      "Use the overload specifying the number of entries per row!")
+    SparseMatrix(const IndexSet &parallel_partitioning,
+                 const MPI_Comm  communicator)
+      : SparseMatrix(parallel_partitioning, communicator, 0)
+    {
+      std::abort();
+    }
+
+    DEAL_II_DEPRECATED_EARLY_WITH_COMMENT(
       "Use the overload specifying the MPI communicator and the number of entries per row!")
-    void
     SparseMatrix(const IndexSet &parallel_partitioning)
       : SparseMatrix(parallel_partitioning, MPI_COMM_WORLD, 0)
     {
@@ -796,8 +804,20 @@ DEAL_II_NAMESPACE_OPEN // Do not convert for module purposes
                  const size_type n_max_entries_per_row);
 
     DEAL_II_DEPRECATED_EARLY_WITH_COMMENT(
+      "Use the overload specifying the number of entries per row!")
+    SparseMatrix(const IndexSet &row_parallel_partitioning,
+                 const IndexSet &col_parallel_partitioning,
+                 const MPI_Comm  communicator)
+      : SparseMatrix(row_parallel_partitioning,
+                     col_parallel_partitioning,
+                     communicator,
+                     0)
+    {
+      std::abort();
+    }
+
+    DEAL_II_DEPRECATED_EARLY_WITH_COMMENT(
       "Use the overload specifying the MPI communicator and the number of entries per row!")
-    void
     SparseMatrix(const IndexSet &row_parallel_partitioning,
                  const IndexSet &col_parallel_partitioning)
       : SparseMatrix(row_parallel_partitioning,

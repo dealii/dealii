@@ -273,7 +273,7 @@ namespace LinearAlgebra
        * prior to use (in the compress() step).
        */
       SparseMatrix(const IndexSet    &parallel_partitioning,
-                   const MPI_Comm     communicator          = MPI_COMM_WORLD,
+                   const MPI_Comm     communicator,
                    const unsigned int n_max_entries_per_row);
 
       /**
@@ -304,7 +304,7 @@ namespace LinearAlgebra
        */
       SparseMatrix(const IndexSet &row_parallel_partitioning,
                    const IndexSet &col_parallel_partitioning,
-                   const MPI_Comm  communicator          = MPI_COMM_WORLD,
+                   const MPI_Comm  communicator,
                    const size_type n_max_entries_per_row);
 
       /**
