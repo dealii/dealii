@@ -2663,16 +2663,11 @@ ReferenceCell::face_to_cell_lines(
           break;
         }
       case ReferenceCells::Triangle:
-        {
-          return face;
-        }
       case ReferenceCells::Quadrilateral:
         {
-          const auto [face_orientation, face_rotation, face_flip] =
-            internal::split_face_orientation(combined_face_orientation);
-
-          return GeometryInfo<2>::face_to_cell_lines(
-            face, line, face_orientation, face_flip, face_rotation);
+          // 2d cells have only one line per face, so the line we are
+          // looking for is actually the face we were given:
+          return face;
         }
       case ReferenceCells::Tetrahedron:
         {
