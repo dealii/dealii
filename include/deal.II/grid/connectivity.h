@@ -35,129 +35,6 @@ namespace internal
   namespace TriangulationImplementation
   {
     /**
-     * Interface of geometric cell entities with the focus on creating a
-     * reduced connectivity table.
-     */
-    struct CellTypeBase : public ReferenceCell
-    {
-      CellTypeBase(const ReferenceCell &reference_cell)
-        : ReferenceCell(reference_cell)
-      {}
-
-      /**
-       * Default destructor.
-       */
-      virtual ~CellTypeBase() = default;
-    };
-
-
-
-    /**
-     * Implementation for lines.
-     */
-    struct CellTypeLine : public CellTypeBase
-    {
-      /**
-       * Constructor.
-       */
-      CellTypeLine()
-        : CellTypeBase(ReferenceCells::Line)
-      {}
-    };
-
-
-
-    /**
-     * Implementation for triangles.
-     */
-    struct CellTypeTriangle : public CellTypeBase
-    {
-      /**
-       * Constructor.
-       */
-      CellTypeTriangle()
-        : CellTypeBase(ReferenceCells::Triangle)
-      {}
-    };
-
-
-
-    /**
-     * Implementation for quadrilaterals.
-     */
-    struct CellTypeQuadrilateral : public CellTypeBase
-    {
-      /**
-       * Constructor.
-       */
-      CellTypeQuadrilateral()
-        : CellTypeBase(ReferenceCells::Quadrilateral)
-      {}
-    };
-
-
-
-    /**
-     * Implementation for tetrahedrons.
-     */
-    struct CellTypeTetrahedron : public CellTypeBase
-    {
-      /**
-       * Constructor.
-       */
-      CellTypeTetrahedron()
-        : CellTypeBase(ReferenceCells::Tetrahedron)
-      {}
-    };
-
-
-    /**
-     * Implementation for pyramids.
-     */
-
-    struct CellTypePyramid : public CellTypeBase
-    {
-      /**
-       * Constructor.
-       */
-      CellTypePyramid()
-        : CellTypeBase(ReferenceCells::Pyramid)
-      {}
-    };
-
-
-
-    /**
-     * Implementation for wedges.
-     */
-    struct CellTypeWedge : public CellTypeBase
-    {
-      /**
-       * Constructor.
-       */
-      CellTypeWedge()
-        : CellTypeBase(ReferenceCells::Wedge)
-      {}
-    };
-
-
-
-    /**
-     * Implementation for hexahedra.
-     */
-    struct CellTypeHexahedron : public CellTypeBase
-    {
-      /**
-       * Constructor.
-       */
-      CellTypeHexahedron()
-        : CellTypeBase(ReferenceCells::Hexahedron)
-      {}
-    };
-
-
-
-    /**
      * Compressed row storage sparse matrix. This class is similar to
      * SparsityPattern but reduced to the bare minimum as needed here - in the
      * context of setting up the connectivity - and allowing direct simplified
@@ -396,14 +273,14 @@ namespace internal
     template <int max_n_vertices, typename FU>
     void
     build_face_entities_templated(
-      const unsigned int                                face_dimensionality,
-      const std::vector<std::shared_ptr<CellTypeBase>> &cell_types,
-      const std::vector<ReferenceCell>                 &cell_types_index,
-      const CRS<unsigned int>                          &crs,
-      CRS<unsigned int>                                &crs_d,        // result
-      CRS<unsigned int>                                &crs_0,        // result
-      TriaObjectsOrientations                          &orientations, // result
-      const FU                                         &second_key_function)
+      const unsigned int                                 face_dimensionality,
+      const std::vector<std::shared_ptr<ReferenceCell>> &cell_types,
+      const std::vector<ReferenceCell>                  &cell_types_index,
+      const CRS<unsigned int>                           &crs,
+      CRS<unsigned int>                                 &crs_d,        // result
+      CRS<unsigned int>                                 &crs_0,        // result
+      TriaObjectsOrientations                           &orientations, // result
+      const FU                                          &second_key_function)
     {
       const bool compatibility_mode = true;
 
@@ -631,14 +508,14 @@ namespace internal
     template <typename FU>
     void
     build_face_entities(
-      const unsigned int                                face_dimensionality,
-      const std::vector<std::shared_ptr<CellTypeBase>> &cell_types,
-      const std::vector<ReferenceCell>                 &cell_types_index,
-      const CRS<unsigned int>                          &crs,
-      CRS<unsigned int>                                &crs_d,
-      CRS<unsigned int>                                &crs_0,
-      TriaObjectsOrientations                          &orientations,
-      const FU                                         &second_key_function)
+      const unsigned int                                 face_dimensionality,
+      const std::vector<std::shared_ptr<ReferenceCell>> &cell_types,
+      const std::vector<ReferenceCell>                  &cell_types_index,
+      const CRS<unsigned int>                           &crs,
+      CRS<unsigned int>                                 &crs_d,
+      CRS<unsigned int>                                 &crs_0,
+      TriaObjectsOrientations                           &orientations,
+      const FU                                          &second_key_function)
     {
       unsigned int max_n_vertices = 0;
 
@@ -700,17 +577,17 @@ namespace internal
      */
     inline void
     build_intersection(
-      const std::vector<std::shared_ptr<CellTypeBase>> &cell_types,
-      const std::vector<ReferenceCell>                 &cell_types_index,
-      const CRS<unsigned int>                          &con_cv,
-      const CRS<unsigned int>                          &con_cl,
-      const CRS<unsigned int>                          &con_lv,
-      const CRS<unsigned int>                          &con_cq,
-      const CRS<unsigned int>                          &con_qv,
-      const TriaObjectsOrientations                    &ori_cq,
-      CRS<unsigned int>                                &con_ql,   // result
-      TriaObjectsOrientations                          &ori_ql,   // result
-      std::vector<ReferenceCell>                       &quad_t_id // result
+      const std::vector<std::shared_ptr<ReferenceCell>> &cell_types,
+      const std::vector<ReferenceCell>                  &cell_types_index,
+      const CRS<unsigned int>                           &con_cv,
+      const CRS<unsigned int>                           &con_cl,
+      const CRS<unsigned int>                           &con_lv,
+      const CRS<unsigned int>                           &con_cq,
+      const CRS<unsigned int>                           &con_qv,
+      const TriaObjectsOrientations                     &ori_cq,
+      CRS<unsigned int>                                 &con_ql,   // result
+      TriaObjectsOrientations                           &ori_ql,   // result
+      std::vector<ReferenceCell>                        &quad_t_id // result
     )
     {
       // reset output
@@ -813,10 +690,11 @@ namespace internal
      */
     template <typename T>
     Connectivity<T>
-    build_connectivity(const unsigned int                                dim,
-                       const std::vector<std::shared_ptr<CellTypeBase>> &cell_t,
-                       const std::vector<ReferenceCell> &cell_t_id,
-                       const CRS<T>                     &con_cv)
+    build_connectivity(
+      const unsigned int                                 dim,
+      const std::vector<std::shared_ptr<ReferenceCell>> &cell_t,
+      const std::vector<ReferenceCell>                  &cell_t_id,
+      const CRS<T>                                      &con_cv)
     {
       Connectivity<T> connectivity(dim, cell_t_id);
 
@@ -855,11 +733,9 @@ namespace internal
             connectivity.entity_orientations(2),
             [&](auto key, // of type std::array<unsigned int, max_n_vertices>
                           // but max_n_vertices is not known here
-                const std::shared_ptr<
-                  dealii::internal::TriangulationImplementation::CellTypeBase>
-                                   &cell_type,
-                const unsigned int &c,
-                const unsigned int &f) {
+                const std::shared_ptr<ReferenceCell> &cell_type,
+                const unsigned int                   &c,
+                const unsigned int                   &f) {
               //  to ensure same enumeration as in deal.II
               AssertIndexRange(cell_type->face_reference_cell(f).n_lines(),
                                key.size() + 1);
@@ -922,21 +798,22 @@ namespace internal
       AssertThrow(cells.size() > 0, ExcMessage("No cells have been provided!"));
 
       // vector of possible cell entity types
-      std::vector<std::shared_ptr<CellTypeBase>> cell_types_impl(8);
+      std::vector<std::shared_ptr<ReferenceCell>> cell_types_impl(8);
 
-      cell_types_impl[ReferenceCells::Line] = std::make_shared<CellTypeLine>();
+      cell_types_impl[ReferenceCells::Line] =
+        std::make_shared<ReferenceCell>(ReferenceCells::Line);
       cell_types_impl[ReferenceCells::Triangle] =
-        std::make_shared<CellTypeTriangle>();
+        std::make_shared<ReferenceCell>(ReferenceCells::Triangle);
       cell_types_impl[ReferenceCells::Quadrilateral] =
-        std::make_shared<CellTypeQuadrilateral>();
+        std::make_shared<ReferenceCell>(ReferenceCells::Quadrilateral);
       cell_types_impl[ReferenceCells::Tetrahedron] =
-        std::make_shared<CellTypeTetrahedron>();
+        std::make_shared<ReferenceCell>(ReferenceCells::Tetrahedron);
       cell_types_impl[ReferenceCells::Pyramid] =
-        std::make_shared<CellTypePyramid>();
+        std::make_shared<ReferenceCell>(ReferenceCells::Pyramid);
       cell_types_impl[ReferenceCells::Wedge] =
-        std::make_shared<CellTypeWedge>();
+        std::make_shared<ReferenceCell>(ReferenceCells::Wedge);
       cell_types_impl[ReferenceCells::Hexahedron] =
-        std::make_shared<CellTypeHexahedron>();
+        std::make_shared<ReferenceCell>(ReferenceCells::Hexahedron);
 
       // determine cell types and process vertices
       std::vector<T> cell_vertices;
