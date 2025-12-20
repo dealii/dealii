@@ -48,22 +48,6 @@ namespace internal
        * Default destructor.
        */
       virtual ~CellTypeBase() = default;
-
-      /**
-       * Vertex indices of the @p line-th lines of @p face-th surface.
-       */
-      virtual const std::array<unsigned int, 2> &
-      vertices_of_nth_line_of_surface(const unsigned int line,
-                                      const unsigned int face) const
-      {
-        DEAL_II_NOT_IMPLEMENTED();
-        (void)line;
-        (void)face;
-
-        const static std::array<unsigned int, 2> table = {};
-
-        return table;
-      }
     };
 
 
@@ -124,19 +108,6 @@ namespace internal
       CellTypeTetrahedron()
         : CellTypeBase(ReferenceCells::Tetrahedron)
       {}
-
-      const std::array<unsigned int, 2> &
-      vertices_of_nth_line_of_surface(const unsigned int line,
-                                      const unsigned int face) const override
-      {
-        const static dealii::ndarray<unsigned int, 4, 3, 2> table = {
-          {{{{{0, 1}}, {{1, 2}}, {{2, 0}}}},
-           {{{{1, 0}}, {{0, 3}}, {{3, 1}}}},
-           {{{{0, 2}}, {{2, 3}}, {{3, 0}}}},
-           {{{{2, 1}}, {{1, 3}}, {{3, 2}}}}}};
-
-        return table[face][line];
-      }
     };
 
 
@@ -152,22 +123,6 @@ namespace internal
       CellTypePyramid()
         : CellTypeBase(ReferenceCells::Pyramid)
       {}
-
-      const std::array<unsigned int, 2> &
-      vertices_of_nth_line_of_surface(const unsigned int line,
-                                      const unsigned int face) const override
-      {
-        static const unsigned int X = static_cast<unsigned int>(-1);
-
-        const static dealii::ndarray<unsigned int, 5, 4, 2> table = {
-          {{{{{0, 2}}, {{1, 3}}, {{0, 1}}, {{2, 3}}}},
-           {{{{0, 2}}, {{2, 4}}, {{4, 0}}, {{X, X}}}},
-           {{{{3, 1}}, {{1, 4}}, {{4, 3}}, {{X, X}}}},
-           {{{{1, 0}}, {{0, 4}}, {{4, 1}}, {{X, X}}}},
-           {{{{2, 3}}, {{3, 4}}, {{4, 2}}, {{X, X}}}}}};
-
-        return table[face][line];
-      }
     };
 
 
@@ -183,22 +138,6 @@ namespace internal
       CellTypeWedge()
         : CellTypeBase(ReferenceCells::Wedge)
       {}
-
-      const std::array<unsigned int, 2> &
-      vertices_of_nth_line_of_surface(const unsigned int line,
-                                      const unsigned int face) const override
-      {
-        static const unsigned int X = static_cast<unsigned int>(-1);
-
-        const static dealii::ndarray<unsigned int, 5, 4, 2> table = {
-          {{{{{1, 0}}, {{0, 2}}, {{2, 1}}, {{X, X}}}},
-           {{{{3, 4}}, {{4, 5}}, {{5, 3}}, {{X, X}}}},
-           {{{{0, 3}}, {{1, 4}}, {{0, 1}}, {{3, 4}}}},
-           {{{{1, 4}}, {{2, 5}}, {{1, 2}}, {{4, 5}}}},
-           {{{{2, 5}}, {{0, 3}}, {{2, 0}}, {{5, 3}}}}}};
-
-        return table[face][line];
-      }
     };
 
 
@@ -214,21 +153,6 @@ namespace internal
       CellTypeHexahedron()
         : CellTypeBase(ReferenceCells::Hexahedron)
       {}
-
-      const std::array<unsigned int, 2> &
-      vertices_of_nth_line_of_surface(const unsigned int line,
-                                      const unsigned int face) const override
-      {
-        const static dealii::ndarray<unsigned int, 6, 4, 2> table = {
-          {{{{{0, 4}}, {{2, 6}}, {{0, 2}}, {{4, 6}}}},
-           {{{{1, 5}}, {{3, 7}}, {{1, 3}}, {{5, 7}}}},
-           {{{{0, 1}}, {{4, 5}}, {{0, 4}}, {{1, 5}}}},
-           {{{{2, 3}}, {{6, 7}}, {{2, 6}}, {{3, 7}}}},
-           {{{{0, 2}}, {{1, 3}}, {{0, 1}}, {{2, 3}}}},
-           {{{{4, 6}}, {{5, 7}}, {{4, 5}}, {{6, 7}}}}}};
-
-        return table[face][line];
-      }
     };
 
 
