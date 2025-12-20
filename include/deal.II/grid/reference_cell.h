@@ -366,7 +366,7 @@ public:
 
   /**
    * Return an object that can be thought of as an array containing the indices
-   * of the givent cell's faces of the desired type @p face_ref_type. Indices
+   * of the given cell's faces of the desired type @p face_ref_type. Indices
    * form a continuous range that is empty in case no face of such type exists.
    */
   std_cxx20::ranges::iota_view<unsigned int, unsigned int>

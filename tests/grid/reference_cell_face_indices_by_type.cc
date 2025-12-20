@@ -15,7 +15,7 @@
 
 // Test ReferenceCell::face_indices_by_type()
 
-#include "deal.II/base/exceptions.h"
+#include <deal.II/base/exceptions.h>
 
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/reference_cell.h>
