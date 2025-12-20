@@ -50,31 +50,6 @@ namespace internal
       virtual ~CellTypeBase() = default;
 
       /**
-       * Number of sub-entities of dimension @p d.
-       */
-      virtual unsigned int
-      n_entities(const unsigned int d) const
-      {
-        DEAL_II_NOT_IMPLEMENTED();
-        (void)d;
-
-        return 0;
-      }
-
-      /**
-       * Number of vertices of the @p e-th sub-entity of dimension @p d.
-       */
-      virtual dealii::ArrayView<const unsigned int>
-      vertices_of_entity(const unsigned int d, const unsigned int e) const
-      {
-        DEAL_II_NOT_IMPLEMENTED();
-        (void)d;
-        (void)e;
-
-        return {};
-      }
-
-      /**
        * Vertex indices of the @p line-th lines of @p face-th surface.
        */
       virtual const std::array<unsigned int, 2> &
@@ -104,33 +79,6 @@ namespace internal
       CellTypeLine()
         : CellTypeBase(ReferenceCells::Line)
       {}
-
-      dealii::ArrayView<const unsigned int>
-      vertices_of_entity(const unsigned int d,
-                         const unsigned int e) const override
-      {
-        (void)e;
-
-        if (d == 1)
-          {
-            static const std::array<unsigned int, 2> table = {{0, 1}};
-
-            AssertDimension(e, 0);
-
-            return {table};
-          }
-
-        DEAL_II_NOT_IMPLEMENTED();
-
-        return {};
-      }
-
-      unsigned int
-      n_entities(const unsigned int d) const override
-      {
-        static std::array<unsigned int, 2> table = {{2, 1}};
-        return table[d];
-      }
     };
 
 
@@ -146,39 +94,6 @@ namespace internal
       CellTypeTriangle()
         : CellTypeBase(ReferenceCells::Triangle)
       {}
-
-      dealii::ArrayView<const unsigned int>
-      vertices_of_entity(const unsigned int d,
-                         const unsigned int e) const override
-      {
-        if (d == 2)
-          {
-            static const std::array<unsigned int, 3> table = {{0, 1, 2}};
-
-            AssertDimension(e, 0);
-
-            return {table};
-          }
-
-        if (d == 1)
-          {
-            static const dealii::ndarray<unsigned int, 3, 2> table = {
-              {{{0, 1}}, {{1, 2}}, {{2, 0}}}};
-
-            return {table[e]};
-          }
-
-        DEAL_II_NOT_IMPLEMENTED();
-
-        return {};
-      }
-
-      unsigned int
-      n_entities(const unsigned int d) const override
-      {
-        static std::array<unsigned int, 3> table = {{3, 3, 1}};
-        return table[d];
-      }
     };
 
 
@@ -194,39 +109,6 @@ namespace internal
       CellTypeQuadrilateral()
         : CellTypeBase(ReferenceCells::Quadrilateral)
       {}
-
-      dealii::ArrayView<const unsigned int>
-      vertices_of_entity(const unsigned int d,
-                         const unsigned int e) const override
-      {
-        if (d == 2)
-          {
-            static const std::array<unsigned int, 4> table = {{0, 1, 2, 3}};
-
-            AssertDimension(e, 0);
-
-            return {table};
-          }
-
-        if (d == 1)
-          {
-            static const dealii::ndarray<unsigned int, 4, 2> table = {
-              {{{0, 2}}, {{1, 3}}, {{0, 1}}, {{2, 3}}}};
-
-            return {table[e]};
-          }
-
-        DEAL_II_NOT_IMPLEMENTED();
-
-        return {};
-      }
-
-      unsigned int
-      n_entities(const unsigned int d) const override
-      {
-        static std::array<unsigned int, 3> table = {{4, 4, 1}};
-        return table[d];
-      }
     };
 
 
@@ -242,47 +124,6 @@ namespace internal
       CellTypeTetrahedron()
         : CellTypeBase(ReferenceCells::Tetrahedron)
       {}
-
-      dealii::ArrayView<const unsigned int>
-      vertices_of_entity(const unsigned int d,
-                         const unsigned int e) const override
-      {
-        if (d == 3)
-          {
-            static const std::array<unsigned int, 4> table = {{0, 1, 2, 3}};
-
-            AssertDimension(e, 0);
-
-            return {table};
-          }
-
-        if (d == 2)
-          {
-            static const dealii::ndarray<unsigned int, 4, 3> table = {
-              {{{0, 1, 2}}, {{1, 0, 3}}, {{0, 2, 3}}, {{2, 1, 3}}}};
-
-            return {table[e]};
-          }
-
-        if (d == 1)
-          {
-            static const dealii::ndarray<unsigned int, 6, 2> table = {
-              {{{0, 1}}, {{1, 2}}, {{2, 0}}, {{0, 3}}, {{1, 3}}, {{2, 3}}}};
-
-            return {table[e]};
-          }
-
-        DEAL_II_NOT_IMPLEMENTED();
-
-        return {};
-      }
-
-      unsigned int
-      n_entities(const unsigned int d) const override
-      {
-        static std::array<unsigned int, 4> table = {{4, 6, 4, 1}};
-        return table[d];
-      }
 
       const std::array<unsigned int, 2> &
       vertices_of_nth_line_of_surface(const unsigned int line,
@@ -311,60 +152,6 @@ namespace internal
       CellTypePyramid()
         : CellTypeBase(ReferenceCells::Pyramid)
       {}
-
-      dealii::ArrayView<const unsigned int>
-      vertices_of_entity(const unsigned int d,
-                         const unsigned int e) const override
-      {
-        if (d == 3)
-          {
-            static const std::array<unsigned int, 5> table = {{0, 1, 2, 3, 4}};
-
-            AssertDimension(e, 0);
-
-            return {table};
-          }
-
-        if (d == 2)
-          {
-            if (e == 0)
-              {
-                static const std::array<unsigned int, 4> table = {{0, 1, 2, 3}};
-                return {table};
-              }
-
-            static const dealii::ndarray<unsigned int, 4, 3> table = {
-              {{{0, 2, 4}}, {{3, 1, 4}}, {{1, 0, 4}}, {{2, 3, 4}}}};
-
-            return {table[e - 1]};
-          }
-
-        if (d == 1)
-          {
-            static const dealii::ndarray<unsigned int, 8, 2> table = {
-              {{{0, 2}},
-               {{1, 3}},
-               {{0, 1}},
-               {{2, 3}},
-               {{0, 4}},
-               {{1, 4}},
-               {{2, 4}},
-               {{3, 4}}}};
-
-            return {table[e]};
-          }
-
-        DEAL_II_NOT_IMPLEMENTED();
-
-        return {};
-      }
-
-      unsigned int
-      n_entities(const unsigned int d) const override
-      {
-        static std::array<unsigned int, 4> table = {{5, 8, 5, 1}};
-        return table[d];
-      }
 
       const std::array<unsigned int, 2> &
       vertices_of_nth_line_of_surface(const unsigned int line,
@@ -397,64 +184,6 @@ namespace internal
         : CellTypeBase(ReferenceCells::Wedge)
       {}
 
-      dealii::ArrayView<const unsigned int>
-      vertices_of_entity(const unsigned int d,
-                         const unsigned int e) const override
-      {
-        if (d == 3)
-          {
-            static const std::array<unsigned int, 6> table = {
-              {0, 1, 2, 3, 4, 5}};
-
-            AssertDimension(e, 0);
-
-            return {table};
-          }
-
-        if (d == 2)
-          {
-            if (e == 0 || e == 1)
-              {
-                static const dealii::ndarray<unsigned int, 2, 3> table = {
-                  {{{1, 0, 2}}, {{3, 4, 5}}}};
-
-                return {table[e]};
-              }
-
-            static const dealii::ndarray<unsigned int, 3, 4> table = {
-              {{{0, 1, 3, 4}}, {{1, 2, 4, 5}}, {{2, 0, 5, 3}}}};
-
-            return {table[e - 2]};
-          }
-
-        if (d == 1)
-          {
-            static const dealii::ndarray<unsigned int, 9, 2> table = {
-              {{{0, 1}},
-               {{1, 2}},
-               {{2, 0}},
-               {{3, 4}},
-               {{4, 5}},
-               {{5, 3}},
-               {{0, 3}},
-               {{1, 4}},
-               {{2, 5}}}};
-
-            return {table[e]};
-          }
-
-        DEAL_II_NOT_IMPLEMENTED();
-
-        return {};
-      }
-
-      unsigned int
-      n_entities(const unsigned int d) const override
-      {
-        static std::array<unsigned int, 4> table = {{6, 9, 5, 1}};
-        return table[d];
-      }
-
       const std::array<unsigned int, 2> &
       vertices_of_nth_line_of_surface(const unsigned int line,
                                       const unsigned int face) const override
@@ -485,64 +214,6 @@ namespace internal
       CellTypeHexahedron()
         : CellTypeBase(ReferenceCells::Hexahedron)
       {}
-
-      dealii::ArrayView<const unsigned int>
-      vertices_of_entity(const unsigned int d,
-                         const unsigned int e) const override
-      {
-        if (d == 3)
-          {
-            static const std::array<unsigned int, 8> table = {
-              {0, 1, 2, 3, 4, 5, 6, 7}};
-
-            AssertDimension(e, 0);
-
-            return {table};
-          }
-
-        if (d == 2)
-          {
-            static const dealii::ndarray<unsigned int, 6, 4> table = {
-              {{{0, 2, 4, 6}},
-               {{1, 3, 5, 7}},
-               {{0, 4, 1, 5}},
-               {{2, 6, 3, 7}},
-               {{0, 1, 2, 3}},
-               {{4, 5, 6, 7}}}};
-
-            return {table[e]};
-          }
-
-        if (d == 1)
-          {
-            static const dealii::ndarray<unsigned int, 12, 2> table = {
-              {{{0, 2}},
-               {{1, 3}},
-               {{0, 1}},
-               {{2, 3}},
-               {{4, 6}},
-               {{5, 7}},
-               {{4, 5}},
-               {{6, 7}},
-               {{0, 4}},
-               {{1, 5}},
-               {{2, 6}},
-               {{3, 7}}}};
-
-            return {table[e]};
-          }
-
-        DEAL_II_NOT_IMPLEMENTED();
-
-        return {};
-      }
-
-      unsigned int
-      n_entities(const unsigned int d) const override
-      {
-        static std::array<unsigned int, 4> table = {{8, 12, 6, 1}};
-        return table[d];
-      }
 
       const std::array<unsigned int, 2> &
       vertices_of_nth_line_of_surface(const unsigned int line,
@@ -829,7 +500,18 @@ namespace internal
       unsigned int n_entities = 0;
 
       for (const auto &c : cell_types_index)
-        n_entities += cell_types[c]->n_entities(face_dimensionality);
+        {
+          // Make sure that there are only two possibilities for
+          // face_dimensionality that we can cover with the ?: statement below:
+          Assert((face_dimensionality == cell_types[c]->get_dimension() - 1) ||
+                   ((cell_types[c]->get_dimension() == 3) &&
+                    (face_dimensionality == 1)),
+                 ExcInternalError());
+          n_entities +=
+            (face_dimensionality == cell_types[c]->get_dimension() - 1 ?
+               cell_types[c]->n_faces() :
+               cell_types[c]->n_lines());
+        }
 
       // step 1: store each d-dimensional entity of a cell (described by their
       // vertices) into a vector and create a key for them
@@ -858,27 +540,49 @@ namespace internal
       for (unsigned int c = 0, counter = 0; c < cell_types_index.size(); ++c)
         {
           const auto &cell_type = cell_types[cell_types_index[c]];
-          ptr_d[c + 1] = ptr_d[c] + cell_type->n_entities(face_dimensionality);
+
+          // Make sure that there are only two possibilities for
+          // face_dimensionality that we can cover with the ?: statement below:
+          Assert((face_dimensionality == cell_type->get_dimension() - 1) ||
+                   ((cell_type->get_dimension() == 3) &&
+                    (face_dimensionality == 1)),
+                 ExcInternalError());
+          const unsigned int n_face_entities =
+            (face_dimensionality == cell_type->get_dimension() - 1 ?
+               cell_type->n_faces() :
+               cell_type->n_lines());
+          ptr_d[c + 1] = ptr_d[c] + n_face_entities;
 
           // ... collect vertices of cell
           const dealii::ArrayView<const unsigned int> local_vertices(
             cell_vertices.data() + cell_ptr[c], cell_ptr[c + 1] - cell_ptr[c]);
 
           // ... loop over all its entities
-          for (unsigned int e = 0;
-               e < cell_type->n_entities(face_dimensionality);
-               ++e)
+          for (unsigned int e = 0; e < n_face_entities; ++e)
             {
               // ... determine global entity vertices
-              const auto &local_entity_vertices =
-                cell_type->vertices_of_entity(face_dimensionality, e);
-
               std::array<unsigned int, max_n_vertices> entity_vertices;
               std::fill(entity_vertices.begin(), entity_vertices.end(), 0);
 
-              for (unsigned int i = 0; i < local_entity_vertices.size(); ++i)
+              // Same as above, make sure that there are only two possibilities
+              // for face_dimensionality that we can cover with the ?: statement
+              // below:
+              Assert((face_dimensionality == cell_type->get_dimension() - 1) ||
+                       ((cell_type->get_dimension() == 3) &&
+                        (face_dimensionality == 1)),
+                     ExcInternalError());
+              for (unsigned int i = 0;
+                   i < (face_dimensionality == cell_type->get_dimension() - 1 ?
+                          cell_type->face_reference_cell(e).n_vertices() :
+                          ReferenceCells::Line.n_vertices());
+                   ++i)
                 entity_vertices[i] =
-                  local_vertices[local_entity_vertices[i]] + offset;
+                  local_vertices
+                    [face_dimensionality == cell_type->get_dimension() - 1 ?
+                       cell_type->face_to_cell_vertices(
+                         e, i, numbers::default_geometric_orientation) :
+                       cell_type->line_to_cell_vertices(e, i)] +
+                  offset;
 
               // ... create key
               std::array<unsigned int, max_n_vertices> key = entity_vertices;
@@ -1012,18 +716,23 @@ namespace internal
       TriaObjectsOrientations                          &orientations,
       const FU                                         &second_key_function)
     {
-      std::size_t max_n_vertices = 0;
+      unsigned int max_n_vertices = 0;
 
+      // If we are dealing with faces of cells, figure out how many vertices
+      // each face may have. Otherwise, we're in 3d and are dealing with
+      // lines, for which we know the number of vertices:
       for (const auto &c : cell_types_index)
-        {
-          const auto &cell_type = cell_types[c];
-          for (unsigned int e = 0;
-               e < cell_type->n_entities(face_dimensionality);
-               ++e)
-            max_n_vertices = std::max(
-              max_n_vertices,
-              cell_type->vertices_of_entity(face_dimensionality, e).size());
-        }
+        if (face_dimensionality == cell_types[c]->get_dimension() - 1)
+          {
+            for (unsigned int f = 0; f < cell_types[c]->n_faces(); ++f)
+              max_n_vertices =
+                std::max(max_n_vertices,
+                         cell_types[c]->face_reference_cell(f).n_vertices());
+          }
+        else if (face_dimensionality == 1)
+          max_n_vertices = std::max(max_n_vertices, 2u);
+        else
+          DEAL_II_ASSERT_UNREACHABLE();
 
       if (max_n_vertices == 2)
         build_face_entities_templated<2>(face_dimensionality,
