@@ -546,7 +546,7 @@ namespace TrilinosWrappers
   {
     for (size_type i = 0; i < row_indices.size(); ++i)
       for (size_type j = 0; j < col_indices.size(); ++j)
-        this->block(i, j).reinit(row_indices[i], col_indices[j]);
+        this->block(i, j).reinit(row_indices[i], col_indices[j], 0);
     this->collect_sizes();
   }
 
@@ -583,7 +583,8 @@ namespace TrilinosWrappers
         this->block(i, j).reinit(row_parallel_partitioning[i],
                                  col_parallel_partitioning[j],
                                  writable_rows[i],
-                                 communicator);
+                                 communicator,
+                                 0);
     this->collect_sizes();
   }
 
@@ -597,7 +598,7 @@ namespace TrilinosWrappers
       row_block_sizes.size(), col_block_sizes.size());
     for (size_type i = 0; i < row_block_sizes.size(); ++i)
       for (size_type j = 0; j < col_block_sizes.size(); ++j)
-        this->block(i, j).reinit(row_block_sizes[i], col_block_sizes[j]);
+        this->block(i, j).reinit(row_block_sizes[i], col_block_sizes[j], 0);
     this->collect_sizes();
   }
 
@@ -633,7 +634,8 @@ namespace TrilinosWrappers
       for (size_type j = 0; j < col_parallel_partitioning.size(); ++j)
         this->block(i, j).reinit(row_parallel_partitioning[i],
                                  col_parallel_partitioning[j],
-                                 communicator);
+                                 communicator,
+                                 0);
     this->collect_sizes();
   }
 
@@ -654,7 +656,8 @@ namespace TrilinosWrappers
         this->block(i, j).reinit(row_parallel_partitioning[i],
                                  col_parallel_partitioning[j],
                                  writable_rows[i],
-                                 communicator);
+                                 communicator,
+                                 0);
     this->collect_sizes();
   }
 

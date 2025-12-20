@@ -45,7 +45,7 @@ test()
 
   // create an empty sparsity pattern
   TrilinosWrappers::SparsityPattern sparsity;
-  sparsity.reinit(dof_handler.n_dofs(), dof_handler.n_dofs());
+  sparsity.reinit(dof_handler.n_dofs(), dof_handler.n_dofs(), 0);
   DoFTools::make_sparsity_pattern(dof_handler,
                                   coupling,
                                   sparsity,

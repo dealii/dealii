@@ -57,7 +57,8 @@ test()
   sparsity.reinit(system_partitioning,
                   system_partitioning,
                   system_relevant_set,
-                  MPI_COMM_WORLD);
+                  MPI_COMM_WORLD,
+                  9);
   DoFTools::make_sparsity_pattern(dof_handler,
                                   coupling,
                                   sparsity,

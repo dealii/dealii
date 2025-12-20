@@ -1741,21 +1741,22 @@ namespace Step32
     temperature_stiffness_matrix.clear();
     temperature_matrix.clear();
 
-    TrilinosWrappers::SparsityPattern sp(temperature_partitioner,
-                                         temperature_partitioner,
-                                         temperature_relevant_partitioner,
-                                         MPI_COMM_WORLD);
+    DynamicSparsityPattern dsp(temperature_relevant_partitioner);
+
     DoFTools::make_sparsity_pattern(temperature_dof_handler,
                                     sp,
                                     temperature_constraints,
                                     false,
                                     Utilities::MPI::this_mpi_process(
                                       MPI_COMM_WORLD));
-    sp.compress();
+    SparsityTools::distribute_sparsity_pattern(dsp,
+                                               temperature_partitioner,
+                                               MPI_COMM_WORLD,
+                                               temperature_relevant_dofs);
 
-    temperature_matrix.reinit(sp);
-    temperature_mass_matrix.reinit(sp);
-    temperature_stiffness_matrix.reinit(sp);
+    temperature_matrix.reinit(dsp);
+    temperature_mass_matrix.reinit(dsp);
+    temperature_stiffness_matrix.reinit(dsp);
   }
 
 
