@@ -33,6 +33,7 @@
 #  include <deal.II/base/multithread_info.h>
 
 #  include <taskflow/algorithm/for_each.hpp>
+#  include <taskflow/algorithm/reduce.hpp>
 #  include <taskflow/taskflow.hpp>
 #endif
 
@@ -563,7 +564,7 @@ namespace parallel
 
         taskflow.for_each_by_index(
           range,
-          [&, begin](const tf::IndexRange<integral_type> &subrange) {
+          [&f, begin](const tf::IndexRange<integral_type> &subrange) {
             integral_type subrange_begin =
               begin + static_cast<integral_type>(subrange.begin());
 
@@ -586,7 +587,7 @@ namespace parallel
 
         taskflow.for_each_by_index(
           range,
-          [&, begin](const tf::IndexRange<std::size_t> &subrange) {
+          [&f, begin](const tf::IndexRange<std::size_t> &subrange) {
             Iterator subrange_begin = begin;
             std::advance(subrange_begin, static_cast<diff_t>(subrange.begin()));
 
@@ -615,6 +616,8 @@ namespace parallel
       },
       grainsize);
 #else
+    // Serial fallback
+
     // make sure we don't get compiler
     // warnings about unused arguments
     (void)grainsize;
@@ -762,13 +765,75 @@ namespace parallel
                               const std_cxx20::type_identity_t<Iterator> &end,
                               const unsigned int grainsize)
   {
-#ifndef DEAL_II_WITH_TBB
-    // make sure we don't get compiler
-    // warnings about unused arguments
-    (void)grainsize;
+#ifdef DEAL_II_WITH_TASKFLOW
+    tf::Executor &executor = MultithreadInfo::get_taskflow_executor();
+    tf::Taskflow  taskflow;
 
-    return f(begin, end);
-#else
+    ResultType result = ResultType(0);
+
+    if constexpr (std::is_integral_v<Iterator>)
+      {
+        // Integral "iterator" types (e.g., int): use plain arithmetic
+        using integral_type = Iterator;
+
+        const integral_type n = end - begin;
+
+        taskflow.reduce_by_index(
+          tf::IndexRange<integral_type>(0, n, 1),
+          result,
+          [&f, begin](const tf::IndexRange<integral_type> &subrange,
+                      std::optional<ResultType>            running_total) {
+            ResultType partial = running_total ? *running_total : ResultType(0);
+
+            integral_type subrange_begin =
+              begin + static_cast<integral_type>(subrange.begin());
+            integral_type subrange_end =
+              subrange_begin + static_cast<integral_type>(subrange.size());
+
+            partial += f(subrange_begin, subrange_end);
+            return partial;
+          },
+          std::plus<ResultType>(),
+          tf::GuidedPartitioner(grainsize));
+      }
+    else
+      {
+        // Non-integral iterator types: advance from 'begin' using
+        // std::distance/std::advance
+        using diff_t = typename std::iterator_traits<Iterator>::difference_type;
+        const diff_t n_diff = std::distance(begin, end);
+
+        const std::size_t n = static_cast<std::size_t>(n_diff);
+
+        taskflow.reduce_by_index(
+          tf::IndexRange<std::size_t>(0, n, 1),
+          result,
+          [&f, begin](const tf::IndexRange<std::size_t> &subrange,
+                      std::optional<ResultType>          running_total) {
+            ResultType partial = running_total ? *running_total : ResultType(0);
+
+            Iterator subrange_begin = begin;
+            std::advance(subrange_begin, static_cast<diff_t>(subrange.begin()));
+            Iterator subrange_end = subrange_begin;
+            std::advance(subrange_end, static_cast<diff_t>(subrange.size()));
+
+            partial += f(subrange_begin, subrange_end);
+            return partial;
+          },
+          std::plus<ResultType>(),
+          tf::GuidedPartitioner(grainsize));
+      }
+
+    // Schedule the work. If we are within a task, we are required to use
+    // corun() without wait() to avoid a potential deadlock as described in
+    // https://taskflow.github.io/taskflow/ExecuteTaskflow.html#ExecuteATaskflowFromAnInternalWorker:
+    if (executor.this_worker_id() != -1)
+      executor.corun(taskflow);
+    else
+      executor.run(taskflow).wait();
+
+    return result;
+#elif defined(DEAL_II_WITH_TBB)
     return tbb::parallel_reduce(
       tbb::blocked_range<Iterator>(begin, end, grainsize),
       ResultType(0),
@@ -779,6 +844,14 @@ namespace parallel
       },
       std::plus<ResultType>(),
       tbb::auto_partitioner());
+#else
+    // Serial fallback
+
+    // make sure we don't get compiler
+    // warnings about unused arguments
+    (void)grainsize;
+
+    return f(begin, end);
 #endif
   }
 
@@ -897,13 +970,30 @@ namespace parallel
     const std::size_t end,
     const std::size_t minimum_parallel_grain_size) const
   {
-#ifndef DEAL_II_WITH_TBB
-    // make sure we don't get compiler
-    // warnings about unused arguments
-    (void)minimum_parallel_grain_size;
+#ifdef DEAL_II_WITH_TASKFLOW
+    tf::Executor &executor = MultithreadInfo::get_taskflow_executor();
+    tf::Taskflow  taskflow;
 
-    apply_to_subrange(begin, end);
-#else
+    const std::size_t n = end - begin;
+
+    taskflow.for_each_by_index(
+      tf::IndexRange<std::size_t>(0, n, 1),
+      [this, begin](const tf::IndexRange<std::size_t> &subrange) {
+        const std::size_t subrange_begin = begin + subrange.begin();
+        const std::size_t subrange_end   = subrange_begin + subrange.size();
+        apply_to_subrange(subrange_begin, subrange_end);
+      },
+      tf::GuidedPartitioner(minimum_parallel_grain_size));
+
+    // Schedule the work. If we are within a task, we are required to use
+    // corun() without wait() to avoid a potential deadlock as described in
+    // https://taskflow.github.io/taskflow/ExecuteTaskflow.html#ExecuteATaskflowFromAnInternalWorker:
+    if (executor.this_worker_id() != -1)
+      executor.corun(taskflow);
+    else
+      executor.run(taskflow).wait();
+
+#elif defined(DEAL_II_WITH_TBB)
     internal::parallel_for(
       begin,
       end,
@@ -911,6 +1001,15 @@ namespace parallel
         apply_to_subrange(range.begin(), range.end());
       },
       minimum_parallel_grain_size);
+
+#else
+    // Serial fallback
+
+    // make sure we don't get compiler
+    // warnings about unused arguments
+    (void)minimum_parallel_grain_size;
+
+    apply_to_subrange(begin, end);
 #endif
   }
 
