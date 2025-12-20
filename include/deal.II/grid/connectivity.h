@@ -829,15 +829,28 @@ namespace internal
           for (unsigned int e = 0; e < n_face_entities; ++e)
             {
               // ... determine global entity vertices
-              const auto &local_entity_vertices =
-                cell_type->vertices_of_entity(face_dimensionality, e);
-
               std::array<unsigned int, max_n_vertices> entity_vertices;
               std::fill(entity_vertices.begin(), entity_vertices.end(), 0);
 
-              for (unsigned int i = 0; i < local_entity_vertices.size(); ++i)
+              // Same as above, make sure that there are only two possibilities
+              // for face_dimensionality that we can cover with the ?: statement
+              // below:
+              Assert((face_dimensionality == cell_type->get_dimension() - 1) ||
+                       ((cell_type->get_dimension() == 3) &&
+                        (face_dimensionality == 1)),
+                     ExcInternalError());
+              for (unsigned int i = 0;
+                   i < (face_dimensionality == cell_type->get_dimension() - 1 ?
+                          cell_type->face_reference_cell(e).n_vertices() :
+                          ReferenceCells::Line.n_vertices());
+                   ++i)
                 entity_vertices[i] =
-                  local_vertices[local_entity_vertices[i]] + offset;
+                  local_vertices
+                    [face_dimensionality == cell_type->get_dimension() - 1 ?
+                       cell_type->face_to_cell_vertices(
+                         e, i, numbers::default_geometric_orientation) :
+                       cell_type->line_to_cell_vertices(e, i)] +
+                  offset;
 
               // ... create key
               std::array<unsigned int, max_n_vertices> key = entity_vertices;
@@ -971,27 +984,23 @@ namespace internal
       TriaObjectsOrientations                          &orientations,
       const FU                                         &second_key_function)
     {
-      std::size_t max_n_vertices = 0;
+      unsigned int max_n_vertices = 0;
 
+      // If we are dealing with faces of cells, figure out how many vertices
+      // each face may have. Otherwise, we're in 3d and are dealing with
+      // lines, for which we know the number of vertices:
       for (const auto &c : cell_types_index)
-        {
-          const auto &cell_type = cell_types[c];
-
-          // Make sure that there are only two possibilities for
-          // face_dimensionality that we can cover with the ?: statement below:
-          Assert((face_dimensionality == cell_type->get_dimension() - 1) ||
-                   ((cell_type->get_dimension() == 3) &&
-                    (face_dimensionality == 1)),
-                 ExcInternalError());
-          const unsigned int n_face_entities =
-            (face_dimensionality == cell_type->get_dimension() - 1 ?
-               cell_type->n_faces() :
-               cell_type->n_lines());
-          for (unsigned int e = 0; e < n_face_entities; ++e)
-            max_n_vertices = std::max(
-              max_n_vertices,
-              cell_type->vertices_of_entity(face_dimensionality, e).size());
-        }
+        if (face_dimensionality == cell_types[c]->get_dimension() - 1)
+          {
+            for (unsigned int f = 0; f < cell_types[c]->n_faces(); ++f)
+              max_n_vertices =
+                std::max(max_n_vertices,
+                         cell_types[c]->face_reference_cell(f).n_vertices());
+          }
+        else if (face_dimensionality == 1)
+          max_n_vertices = std::max(max_n_vertices, 2u);
+        else
+          DEAL_II_ASSERT_UNREACHABLE();
 
       if (max_n_vertices == 2)
         build_face_entities_templated<2>(face_dimensionality,
