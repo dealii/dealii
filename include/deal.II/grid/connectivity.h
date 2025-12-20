@@ -50,18 +50,6 @@ namespace internal
       virtual ~CellTypeBase() = default;
 
       /**
-       * Number of sub-entities of dimension @p d.
-       */
-      virtual unsigned int
-      n_entities(const unsigned int d) const
-      {
-        DEAL_II_NOT_IMPLEMENTED();
-        (void)d;
-
-        return 0;
-      }
-
-      /**
        * Number of vertices of the @p e-th sub-entity of dimension @p d.
        */
       virtual dealii::ArrayView<const unsigned int>
@@ -124,13 +112,6 @@ namespace internal
 
         return {};
       }
-
-      unsigned int
-      n_entities(const unsigned int d) const override
-      {
-        static std::array<unsigned int, 2> table = {{2, 1}};
-        return table[d];
-      }
     };
 
 
@@ -172,13 +153,6 @@ namespace internal
 
         return {};
       }
-
-      unsigned int
-      n_entities(const unsigned int d) const override
-      {
-        static std::array<unsigned int, 3> table = {{3, 3, 1}};
-        return table[d];
-      }
     };
 
 
@@ -219,13 +193,6 @@ namespace internal
         DEAL_II_NOT_IMPLEMENTED();
 
         return {};
-      }
-
-      unsigned int
-      n_entities(const unsigned int d) const override
-      {
-        static std::array<unsigned int, 3> table = {{4, 4, 1}};
-        return table[d];
       }
     };
 
@@ -275,13 +242,6 @@ namespace internal
         DEAL_II_NOT_IMPLEMENTED();
 
         return {};
-      }
-
-      unsigned int
-      n_entities(const unsigned int d) const override
-      {
-        static std::array<unsigned int, 4> table = {{4, 6, 4, 1}};
-        return table[d];
       }
 
       const std::array<unsigned int, 2> &
@@ -357,13 +317,6 @@ namespace internal
         DEAL_II_NOT_IMPLEMENTED();
 
         return {};
-      }
-
-      unsigned int
-      n_entities(const unsigned int d) const override
-      {
-        static std::array<unsigned int, 4> table = {{5, 8, 5, 1}};
-        return table[d];
       }
 
       const std::array<unsigned int, 2> &
@@ -448,13 +401,6 @@ namespace internal
         return {};
       }
 
-      unsigned int
-      n_entities(const unsigned int d) const override
-      {
-        static std::array<unsigned int, 4> table = {{6, 9, 5, 1}};
-        return table[d];
-      }
-
       const std::array<unsigned int, 2> &
       vertices_of_nth_line_of_surface(const unsigned int line,
                                       const unsigned int face) const override
@@ -535,13 +481,6 @@ namespace internal
         DEAL_II_NOT_IMPLEMENTED();
 
         return {};
-      }
-
-      unsigned int
-      n_entities(const unsigned int d) const override
-      {
-        static std::array<unsigned int, 4> table = {{8, 12, 6, 1}};
-        return table[d];
       }
 
       const std::array<unsigned int, 2> &
