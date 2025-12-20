@@ -591,7 +591,22 @@ public:
                         const unsigned int vertex) const;
 
   /**
-   * Map face line number to cell line number.
+   * Map face line number to cell line number. In other words, for a given
+   * face and a line (edge) of this face, return the how many'th line within
+   * this cell we are talking about.
+   *
+   * If the current object is ReferenceCells::Vertex or ReferenceCells::Line,
+   * then this function throws an exception because for these reference cells,
+   * faces have no lines. For two-dimensional reference cells (i.e., if the
+   * current object is ReferenceCells::Triangle or
+   * ReferenceCells::Quadrilateral), each face consists of (is identical to)
+   * exactly one line and the function consequently returns `face`. For
+   * three-dimensional reference cells, each face is bounded by several lines
+   * and the the function's mapping is more complicated.
+   *
+   * @pre `face < this->n_faces()`
+   * @pre `line < this->face_reference_cell(face).n_lines()`
+   * @post The return value `r` satisfies `r<n_lines()`.
    */
   unsigned int
   face_to_cell_lines(const unsigned int                 face,
@@ -2622,16 +2637,17 @@ ReferenceCell::face_to_cell_lines(
     {
       case ReferenceCells::Vertex:
         {
-          DEAL_II_NOT_IMPLEMENTED();
+          // We can't get here based on the assertions above: vertices
+          // have no faces.
+          DEAL_II_ASSERT_UNREACHABLE();
           break;
         }
       case ReferenceCells::Line:
         {
-          const auto [face_orientation, face_rotation, face_flip] =
-            internal::split_face_orientation(combined_face_orientation);
-
-          return GeometryInfo<1>::face_to_cell_lines(
-            face, line, face_orientation, face_flip, face_rotation);
+          // We can't get here based on the assertions above: lines
+          // have vertices as faces, which have no bounding lines.
+          DEAL_II_ASSERT_UNREACHABLE();
+          break;
         }
       case ReferenceCells::Triangle:
         {
