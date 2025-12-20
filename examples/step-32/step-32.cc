@@ -1744,15 +1744,16 @@ namespace Step32
     DynamicSparsityPattern dsp(temperature_relevant_partitioner);
 
     DoFTools::make_sparsity_pattern(temperature_dof_handler,
-                                    sp,
+                                    dsp,
                                     temperature_constraints,
                                     false,
                                     Utilities::MPI::this_mpi_process(
                                       MPI_COMM_WORLD));
-    SparsityTools::distribute_sparsity_pattern(dsp,
-                                               temperature_partitioner,
-                                               MPI_COMM_WORLD,
-                                               temperature_relevant_dofs);
+    SparsityTools::distribute_sparsity_pattern(
+      dsp,
+      temperature_partitioner,
+      MPI_COMM_WORLD,
+      temperature_relevant_partitioner);
 
     temperature_matrix.reinit(dsp);
     temperature_mass_matrix.reinit(dsp);

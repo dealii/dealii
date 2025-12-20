@@ -1014,7 +1014,7 @@ namespace Step42
       DynamicSparsityPattern dsp(locally_owned_dofs);
 
       DoFTools::make_sparsity_pattern(dof_handler,
-                                      sp,
+                                      dsp,
                                       constraints_dirichlet_and_hanging_nodes,
                                       false,
                                       Utilities::MPI::this_mpi_process(

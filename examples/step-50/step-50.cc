@@ -533,7 +533,6 @@ namespace Step50
         case Settings::gmg_mb:
         case Settings::amg:
           {
-#ifdef USE_PETSC_LA
             DynamicSparsityPattern dsp(locally_relevant_dofs);
             DoFTools::make_sparsity_pattern(dof_handler, dsp, constraints);
 
@@ -546,16 +545,6 @@ namespace Step50
                                  locally_owned_dofs,
                                  dsp,
                                  mpi_communicator);
-#else
-            TrilinosWrappers::SparsityPattern dsp(locally_owned_dofs,
-                                                  locally_owned_dofs,
-                                                  locally_relevant_dofs,
-                                                  mpi_communicator,
-                                                  0);
-            DoFTools::make_sparsity_pattern(dof_handler, dsp, constraints);
-            dsp.compress();
-            system_matrix.reinit(dsp);
-#endif
 
             break;
           }
@@ -653,7 +642,6 @@ namespace Step50
                                                                 level);
 
                 {
-#ifdef USE_PETSC_LA
                   DynamicSparsityPattern dsp(dof_set);
                   MGTools::make_sparsity_pattern(dof_handler, dsp, level);
                   dsp.compress();
@@ -668,21 +656,9 @@ namespace Step50
                     dof_handler.locally_owned_mg_dofs(level),
                     dsp,
                     mpi_communicator);
-#else
-                  TrilinosWrappers::SparsityPattern dsp(
-                    dof_handler.locally_owned_mg_dofs(level),
-                    dof_handler.locally_owned_mg_dofs(level),
-                    dof_set,
-                    mpi_communicator);
-                  MGTools::make_sparsity_pattern(dof_handler, dsp, level);
-
-                  dsp.compress();
-                  mg_matrix[level].reinit(dsp);
-#endif
                 }
 
                 {
-#ifdef USE_PETSC_LA
                   DynamicSparsityPattern dsp(dof_set);
                   MGTools::make_interface_sparsity_pattern(dof_handler,
                                                            mg_constrained_dofs,
@@ -700,20 +676,6 @@ namespace Step50
                     dof_handler.locally_owned_mg_dofs(level),
                     dsp,
                     mpi_communicator);
-#else
-                  TrilinosWrappers::SparsityPattern dsp(
-                    dof_handler.locally_owned_mg_dofs(level),
-                    dof_handler.locally_owned_mg_dofs(level),
-                    dof_set,
-                    mpi_communicator);
-
-                  MGTools::make_interface_sparsity_pattern(dof_handler,
-                                                           mg_constrained_dofs,
-                                                           dsp,
-                                                           level);
-                  dsp.compress();
-                  mg_interface_in[level].reinit(dsp);
-#endif
                 }
               }
             break;
