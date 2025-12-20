@@ -599,7 +599,20 @@ public:
                      const types::geometric_orientation face_orientation) const;
 
   /**
-   * Map face vertex number to cell vertex number.
+   * Map face vertex number to cell vertex number. In other words, for a given
+   * face and a vertex of this face, return the how many'th vertex within
+   * this cell we are talking about.
+   *
+   * If the current object is ReferenceCells::Vertex,
+   * then this function throws an exception because vertex objects have no
+   * faces. For ReferenceCells::Line, the faces each have (and are identical to)
+   * one vertex and so the function simply returns `face`. For two- and
+   * three-dimensional reference cells each face is bounded by several vertices
+   * and the the function's mapping is more complicated.
+   *
+   * @pre `face < this->n_faces()`
+   * @pre `vertex < this->face_reference_cell(face).n_vertices()`
+   * @post The return value `r` satisfies `r<n_vertices()`.
    */
   unsigned int
   face_to_cell_vertices(
@@ -2708,7 +2721,9 @@ ReferenceCell::face_to_cell_vertices(
     {
       case ReferenceCells::Vertex:
         {
-          DEAL_II_NOT_IMPLEMENTED();
+          // We can't get here based on the assertions above: vertices
+          // have no faces.
+          DEAL_II_ASSERT_UNREACHABLE();
           break;
         }
       case ReferenceCells::Line:
