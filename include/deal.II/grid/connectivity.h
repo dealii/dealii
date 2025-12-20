@@ -50,19 +50,6 @@ namespace internal
       virtual ~CellTypeBase() = default;
 
       /**
-       * Number of vertices of the @p e-th sub-entity of dimension @p d.
-       */
-      virtual dealii::ArrayView<const unsigned int>
-      vertices_of_entity(const unsigned int d, const unsigned int e) const
-      {
-        DEAL_II_NOT_IMPLEMENTED();
-        (void)d;
-        (void)e;
-
-        return {};
-      }
-
-      /**
        * Vertex indices of the @p line-th lines of @p face-th surface.
        */
       virtual const std::array<unsigned int, 2> &
@@ -92,26 +79,6 @@ namespace internal
       CellTypeLine()
         : CellTypeBase(ReferenceCells::Line)
       {}
-
-      dealii::ArrayView<const unsigned int>
-      vertices_of_entity(const unsigned int d,
-                         const unsigned int e) const override
-      {
-        (void)e;
-
-        if (d == 1)
-          {
-            static const std::array<unsigned int, 2> table = {{0, 1}};
-
-            AssertDimension(e, 0);
-
-            return {table};
-          }
-
-        DEAL_II_NOT_IMPLEMENTED();
-
-        return {};
-      }
     };
 
 
@@ -127,32 +94,6 @@ namespace internal
       CellTypeTriangle()
         : CellTypeBase(ReferenceCells::Triangle)
       {}
-
-      dealii::ArrayView<const unsigned int>
-      vertices_of_entity(const unsigned int d,
-                         const unsigned int e) const override
-      {
-        if (d == 2)
-          {
-            static const std::array<unsigned int, 3> table = {{0, 1, 2}};
-
-            AssertDimension(e, 0);
-
-            return {table};
-          }
-
-        if (d == 1)
-          {
-            static const dealii::ndarray<unsigned int, 3, 2> table = {
-              {{{0, 1}}, {{1, 2}}, {{2, 0}}}};
-
-            return {table[e]};
-          }
-
-        DEAL_II_NOT_IMPLEMENTED();
-
-        return {};
-      }
     };
 
 
@@ -168,32 +109,6 @@ namespace internal
       CellTypeQuadrilateral()
         : CellTypeBase(ReferenceCells::Quadrilateral)
       {}
-
-      dealii::ArrayView<const unsigned int>
-      vertices_of_entity(const unsigned int d,
-                         const unsigned int e) const override
-      {
-        if (d == 2)
-          {
-            static const std::array<unsigned int, 4> table = {{0, 1, 2, 3}};
-
-            AssertDimension(e, 0);
-
-            return {table};
-          }
-
-        if (d == 1)
-          {
-            static const dealii::ndarray<unsigned int, 4, 2> table = {
-              {{{0, 2}}, {{1, 3}}, {{0, 1}}, {{2, 3}}}};
-
-            return {table[e]};
-          }
-
-        DEAL_II_NOT_IMPLEMENTED();
-
-        return {};
-      }
     };
 
 
@@ -209,40 +124,6 @@ namespace internal
       CellTypeTetrahedron()
         : CellTypeBase(ReferenceCells::Tetrahedron)
       {}
-
-      dealii::ArrayView<const unsigned int>
-      vertices_of_entity(const unsigned int d,
-                         const unsigned int e) const override
-      {
-        if (d == 3)
-          {
-            static const std::array<unsigned int, 4> table = {{0, 1, 2, 3}};
-
-            AssertDimension(e, 0);
-
-            return {table};
-          }
-
-        if (d == 2)
-          {
-            static const dealii::ndarray<unsigned int, 4, 3> table = {
-              {{{0, 1, 2}}, {{1, 0, 3}}, {{0, 2, 3}}, {{2, 1, 3}}}};
-
-            return {table[e]};
-          }
-
-        if (d == 1)
-          {
-            static const dealii::ndarray<unsigned int, 6, 2> table = {
-              {{{0, 1}}, {{1, 2}}, {{2, 0}}, {{0, 3}}, {{1, 3}}, {{2, 3}}}};
-
-            return {table[e]};
-          }
-
-        DEAL_II_NOT_IMPLEMENTED();
-
-        return {};
-      }
 
       const std::array<unsigned int, 2> &
       vertices_of_nth_line_of_surface(const unsigned int line,
@@ -271,53 +152,6 @@ namespace internal
       CellTypePyramid()
         : CellTypeBase(ReferenceCells::Pyramid)
       {}
-
-      dealii::ArrayView<const unsigned int>
-      vertices_of_entity(const unsigned int d,
-                         const unsigned int e) const override
-      {
-        if (d == 3)
-          {
-            static const std::array<unsigned int, 5> table = {{0, 1, 2, 3, 4}};
-
-            AssertDimension(e, 0);
-
-            return {table};
-          }
-
-        if (d == 2)
-          {
-            if (e == 0)
-              {
-                static const std::array<unsigned int, 4> table = {{0, 1, 2, 3}};
-                return {table};
-              }
-
-            static const dealii::ndarray<unsigned int, 4, 3> table = {
-              {{{0, 2, 4}}, {{3, 1, 4}}, {{1, 0, 4}}, {{2, 3, 4}}}};
-
-            return {table[e - 1]};
-          }
-
-        if (d == 1)
-          {
-            static const dealii::ndarray<unsigned int, 8, 2> table = {
-              {{{0, 2}},
-               {{1, 3}},
-               {{0, 1}},
-               {{2, 3}},
-               {{0, 4}},
-               {{1, 4}},
-               {{2, 4}},
-               {{3, 4}}}};
-
-            return {table[e]};
-          }
-
-        DEAL_II_NOT_IMPLEMENTED();
-
-        return {};
-      }
 
       const std::array<unsigned int, 2> &
       vertices_of_nth_line_of_surface(const unsigned int line,
@@ -350,57 +184,6 @@ namespace internal
         : CellTypeBase(ReferenceCells::Wedge)
       {}
 
-      dealii::ArrayView<const unsigned int>
-      vertices_of_entity(const unsigned int d,
-                         const unsigned int e) const override
-      {
-        if (d == 3)
-          {
-            static const std::array<unsigned int, 6> table = {
-              {0, 1, 2, 3, 4, 5}};
-
-            AssertDimension(e, 0);
-
-            return {table};
-          }
-
-        if (d == 2)
-          {
-            if (e == 0 || e == 1)
-              {
-                static const dealii::ndarray<unsigned int, 2, 3> table = {
-                  {{{1, 0, 2}}, {{3, 4, 5}}}};
-
-                return {table[e]};
-              }
-
-            static const dealii::ndarray<unsigned int, 3, 4> table = {
-              {{{0, 1, 3, 4}}, {{1, 2, 4, 5}}, {{2, 0, 5, 3}}}};
-
-            return {table[e - 2]};
-          }
-
-        if (d == 1)
-          {
-            static const dealii::ndarray<unsigned int, 9, 2> table = {
-              {{{0, 1}},
-               {{1, 2}},
-               {{2, 0}},
-               {{3, 4}},
-               {{4, 5}},
-               {{5, 3}},
-               {{0, 3}},
-               {{1, 4}},
-               {{2, 5}}}};
-
-            return {table[e]};
-          }
-
-        DEAL_II_NOT_IMPLEMENTED();
-
-        return {};
-      }
-
       const std::array<unsigned int, 2> &
       vertices_of_nth_line_of_surface(const unsigned int line,
                                       const unsigned int face) const override
@@ -431,57 +214,6 @@ namespace internal
       CellTypeHexahedron()
         : CellTypeBase(ReferenceCells::Hexahedron)
       {}
-
-      dealii::ArrayView<const unsigned int>
-      vertices_of_entity(const unsigned int d,
-                         const unsigned int e) const override
-      {
-        if (d == 3)
-          {
-            static const std::array<unsigned int, 8> table = {
-              {0, 1, 2, 3, 4, 5, 6, 7}};
-
-            AssertDimension(e, 0);
-
-            return {table};
-          }
-
-        if (d == 2)
-          {
-            static const dealii::ndarray<unsigned int, 6, 4> table = {
-              {{{0, 2, 4, 6}},
-               {{1, 3, 5, 7}},
-               {{0, 4, 1, 5}},
-               {{2, 6, 3, 7}},
-               {{0, 1, 2, 3}},
-               {{4, 5, 6, 7}}}};
-
-            return {table[e]};
-          }
-
-        if (d == 1)
-          {
-            static const dealii::ndarray<unsigned int, 12, 2> table = {
-              {{{0, 2}},
-               {{1, 3}},
-               {{0, 1}},
-               {{2, 3}},
-               {{4, 6}},
-               {{5, 7}},
-               {{4, 5}},
-               {{6, 7}},
-               {{0, 4}},
-               {{1, 5}},
-               {{2, 6}},
-               {{3, 7}}}};
-
-            return {table[e]};
-          }
-
-        DEAL_II_NOT_IMPLEMENTED();
-
-        return {};
-      }
 
       const std::array<unsigned int, 2> &
       vertices_of_nth_line_of_surface(const unsigned int line,
