@@ -550,7 +550,8 @@ namespace Step50
             TrilinosWrappers::SparsityPattern dsp(locally_owned_dofs,
                                                   locally_owned_dofs,
                                                   locally_relevant_dofs,
-                                                  mpi_communicator);
+                                                  mpi_communicator,
+                                                  0);
             DoFTools::make_sparsity_pattern(dof_handler, dsp, constraints);
             dsp.compress();
             system_matrix.reinit(dsp);

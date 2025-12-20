@@ -1010,18 +1010,21 @@ namespace Step42
     // with the obstacle, but we then immediately set the Newton matrix back
     // to zero.
     {
-      TimerOutput::Scope                t(computing_timer, "Setup: matrix");
-      TrilinosWrappers::SparsityPattern sp(locally_owned_dofs,
-                                           mpi_communicator);
+      TimerOutput::Scope     t(computing_timer, "Setup: matrix");
+      DynamicSparsityPattern dsp(locally_owned_dofs);
 
       DoFTools::make_sparsity_pattern(dof_handler,
                                       sp,
                                       constraints_dirichlet_and_hanging_nodes,
                                       false,
                                       Utilities::MPI::this_mpi_process(
-                                        mpi_communicator));
-      sp.compress();
-      newton_matrix.reinit(sp);
+                                        MPI_COMM_WORLD));
+      SparsityTools::distribute_sparsity_pattern(dsp,
+                                                 locally_owned_dofs,
+                                                 MPI_COMM_WORLD,
+                                                 locally_relevant_dofs);
+
+      newton_matrix.reinit(dsp);
 
 
       TrilinosWrappers::SparseMatrix &mass_matrix = newton_matrix;
