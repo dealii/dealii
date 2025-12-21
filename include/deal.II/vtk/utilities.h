@@ -24,26 +24,6 @@
 
 #ifdef DEAL_II_WITH_VTK
 
-// Make sure that the VTK version macros are available.
-#  include <vtkVersion.h>
-
-// VTK_VERSION_CHECK is defined by the header above for 9.3.0 and above, but
-// we provide a fallback older versions.
-#  ifndef VTK_VERSION_CHECK
-#    define VTK_VERSION_CHECK(major, minor, build) \
-      (10000000000ULL * (major) + 100000000ULL * (minor) + (build))
-#  endif
-
-// Normalize the version macro name to cover both the quick (>=9.3) and
-// legacy (<9.3) headers.
-#  if defined(VTK_VERSION_NUMBER_QUICK)
-#    define DEAL_II_VTK_VERSION_NUMBER VTK_VERSION_NUMBER_QUICK
-#  elif defined(VTK_VERSION_NUMBER)
-#    define DEAL_II_VTK_VERSION_NUMBER VTK_VERSION_NUMBER
-#  else
-#    define DEAL_II_VTK_VERSION_NUMBER 0
-#  endif
-
 #  include <vtkDoubleArray.h>
 
 DEAL_II_NAMESPACE_OPEN
