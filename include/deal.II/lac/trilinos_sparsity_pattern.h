@@ -393,7 +393,7 @@ namespace TrilinosWrappers
      * columns.
      */
     template <typename SparsityPatternType>
-    void
+    std::enable_if_t<!std::is_integral_v<SparsityPatternType>>
     copy_from(const SparsityPatternType &nontrilinos_sparsity_pattern);
 
     /**
@@ -711,7 +711,7 @@ namespace TrilinosWrappers
      * patterns of type DynamicSparsityPattern.
      */
     template <typename SparsityPatternType>
-    void
+    std::enable_if_t<!std::is_integral_v<SparsityPatternType>>
     reinit(const IndexSet            &row_parallel_partitioning,
            const IndexSet            &col_parallel_partitioning,
            const SparsityPatternType &nontrilinos_sparsity_pattern,
@@ -727,7 +727,7 @@ namespace TrilinosWrappers
      * input sparsity patterns of type DynamicSparsityPattern.
      */
     template <typename SparsityPatternType>
-    void
+    std::enable_if_t<!std::is_integral_v<SparsityPatternType>>
     reinit(const IndexSet            &parallel_partitioning,
            const SparsityPatternType &nontrilinos_sparsity_pattern,
            const MPI_Comm             communicator  = MPI_COMM_WORLD,
