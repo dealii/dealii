@@ -1011,7 +1011,7 @@ namespace Step42
     // to zero.
     {
       TimerOutput::Scope     t(computing_timer, "Setup: matrix");
-      DynamicSparsityPattern dsp(locally_owned_dofs);
+      DynamicSparsityPattern dsp(locally_relevant_dofs);
 
       DoFTools::make_sparsity_pattern(dof_handler,
                                       dsp,
@@ -1024,7 +1024,10 @@ namespace Step42
                                                  MPI_COMM_WORLD,
                                                  locally_relevant_dofs);
 
-      newton_matrix.reinit(dsp);
+      newton_matrix.reinit(locally_owned_dofs,
+                           locally_owned_dofs,
+                           dsp,
+                           MPI_COMM_WORLD);
 
 
       TrilinosWrappers::SparseMatrix &mass_matrix = newton_matrix;

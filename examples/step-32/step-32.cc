@@ -1755,9 +1755,18 @@ namespace Step32
       MPI_COMM_WORLD,
       temperature_relevant_partitioner);
 
-    temperature_matrix.reinit(dsp);
-    temperature_mass_matrix.reinit(dsp);
-    temperature_stiffness_matrix.reinit(dsp);
+    temperature_matrix.reinit(temperature_partitioner,
+                              temperature_partitioner,
+                              dsp,
+                              MPI_COMM_WORLD);
+    temperature_mass_matrix.reinit(temperature_partitioner,
+                                   temperature_partitioner,
+                                   dsp,
+                                   MPI_COMM_WORLD);
+    temperature_stiffness_matrix.reinit(temperature_partitioner,
+                                        temperature_partitioner,
+                                        dsp,
+                                        MPI_COMM_WORLD);
   }
 
 
