@@ -230,9 +230,11 @@ macro(deal_ii_invoke_autopilot)
     if(${DEAL_II_BUILD_TYPE} MATCHES "Debug")
       add_custom_target(debug
         COMMAND ${CMAKE_COMMAND} -DCMAKE_BUILD_TYPE=Debug ${CMAKE_SOURCE_DIR}
-        COMMAND ${CMAKE_COMMAND} -E echo "***"
-        COMMAND ${CMAKE_COMMAND} -E echo "*** Switched to Debug mode. Now recompile with: ${_make_command}"
-        COMMAND ${CMAKE_COMMAND} -E echo "***"
+        COMMAND ${CMAKE_COMMAND} -E echo "###"
+        COMMAND ${CMAKE_COMMAND} -E echo "#"
+        COMMAND ${CMAKE_COMMAND} -E echo "#   Switched to Debug configuration. Now recompile with: ${_make_command}"
+        COMMAND ${CMAKE_COMMAND} -E echo "#"
+        COMMAND ${CMAKE_COMMAND} -E echo "###"
         COMMENT "Switching CMAKE_BUILD_TYPE to Debug"
         VERBATIM
         )
@@ -241,9 +243,11 @@ macro(deal_ii_invoke_autopilot)
     if(${DEAL_II_BUILD_TYPE} MATCHES "Release")
       add_custom_target(release
         COMMAND ${CMAKE_COMMAND} -DCMAKE_BUILD_TYPE=Release ${CMAKE_SOURCE_DIR}
-        COMMAND ${CMAKE_COMMAND} -E echo "***"
-        COMMAND ${CMAKE_COMMAND} -E echo "*** Switched to Release mode. Now recompile with: ${_make_command}"
-        COMMAND ${CMAKE_COMMAND} -E echo "***"
+        COMMAND ${CMAKE_COMMAND} -E echo "###"
+        COMMAND ${CMAKE_COMMAND} -E echo "#"
+        COMMAND ${CMAKE_COMMAND} -E echo "#   Switched to Release configuration. Now recompile with: ${_make_command}"
+        COMMAND ${CMAKE_COMMAND} -E echo "#"
+        COMMAND ${CMAKE_COMMAND} -E echo "###"
         COMMENT "Switching CMAKE_BUILD_TYPE to Release"
         VERBATIM
         )
