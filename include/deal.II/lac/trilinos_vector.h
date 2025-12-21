@@ -25,6 +25,8 @@
 
 #  include <deal.II/lac/exceptions.h>
 #  include <deal.II/lac/read_vector.h>
+#  include <deal.II/lac/trilinos_tpetra_block_vector.h>
+#  include <deal.II/lac/trilinos_tpetra_sparse_matrix.h>
 #  include <deal.II/lac/vector.h>
 #  include <deal.II/lac/vector_operation.h>
 #  include <deal.II/lac/vector_type_traits.h>
@@ -43,15 +45,24 @@ DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
 
 DEAL_II_NAMESPACE_OPEN
 
+#  ifdef DEAL_II_TRILINOS_WITH_TPETRA
+namespace TrilinosWrappers::MPI
+{
+  using Vector =
+    ::dealii::LinearAlgebra::TpetraWrappers::Vector<double, MemorySpace::Host>;
+
+}
+#  else
+
 // Forward declarations
-#  ifndef DOXYGEN
+#    ifndef DOXYGEN
 namespace LinearAlgebra
 {
   // Forward declaration
   template <typename Number>
   class ReadWriteVector;
 } // namespace LinearAlgebra
-#  endif
+#    endif
 
 /**
  * @addtogroup TrilinosWrappers
@@ -199,7 +210,7 @@ namespace TrilinosWrappers
    * @endcond
    */
 
-#  ifndef DEAL_II_WITH_64BIT_INDICES
+#    ifndef DEAL_II_WITH_64BIT_INDICES
     // define a helper function that queries the global ID of local ID of
   // an Epetra_BlockMap object  by calling either the 32- or 64-bit
   // function necessary.
@@ -208,7 +219,7 @@ namespace TrilinosWrappers
   {
     return map.GID(i);
   }
-#  else
+#    else
     // define a helper function that queries the global ID of local ID of
   // an Epetra_BlockMap object  by calling either the 32- or 64-bit
   // function necessary.
@@ -217,7 +228,7 @@ namespace TrilinosWrappers
   {
     return map.GID64(i);
   }
-#  endif
+#    endif
 
   /**
    * Namespace for Trilinos vector classes that work in parallel over MPI.
@@ -1414,7 +1425,7 @@ namespace TrilinosWrappers
     }
   } // namespace MPI
 
-#  ifndef DOXYGEN
+#    ifndef DOXYGEN
 
   namespace internal
   {
@@ -1790,11 +1801,11 @@ namespace TrilinosWrappers
     inline Vector::size_type
     Vector::size() const
     {
-#    ifndef DEAL_II_WITH_64BIT_INDICES
+#      ifndef DEAL_II_WITH_64BIT_INDICES
       return vector->Map().MaxAllGID() + 1 - vector->Map().MinAllGID();
-#    else
+#      else
       return vector->Map().MaxAllGID64() + 1 - vector->Map().MinAllGID64();
-#    endif
+#      endif
     }
 
 
@@ -1810,16 +1821,16 @@ namespace TrilinosWrappers
     inline std::pair<Vector::size_type, Vector::size_type>
     Vector::local_range() const
     {
-#    ifndef DEAL_II_WITH_64BIT_INDICES
+#      ifndef DEAL_II_WITH_64BIT_INDICES
       const TrilinosWrappers::types::int_type begin = vector->Map().MinMyGID();
       const TrilinosWrappers::types::int_type end =
         vector->Map().MaxMyGID() + 1;
-#    else
+#      else
       const TrilinosWrappers::types::int_type begin =
         vector->Map().MinMyGID64();
       const TrilinosWrappers::types::int_type end =
         vector->Map().MaxMyGID64() + 1;
-#    endif
+#      endif
 
       Assert(
         end - begin == vector->Map().NumMyElements(),
@@ -2273,7 +2284,7 @@ namespace TrilinosWrappers
     }
   } /* end of namespace MPI */
 
-#  endif /* DOXYGEN */
+#    endif /* DOXYGEN */
 
 } /* end of namespace TrilinosWrappers */
 
@@ -2330,7 +2341,7 @@ template <>
 struct is_serial_vector<TrilinosWrappers::MPI::Vector> : std::false_type
 {};
 
-
+#  endif
 DEAL_II_NAMESPACE_CLOSE
 
 #else
