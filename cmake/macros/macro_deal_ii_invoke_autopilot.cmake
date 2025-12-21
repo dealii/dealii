@@ -87,6 +87,16 @@ macro(deal_ii_invoke_autopilot)
   # Define and set up a compilation target:
   add_executable(${TARGET} ${TARGET_SRC})
 
+  add_custom_target(build_message
+    COMMAND ${CMAKE_COMMAND} -E echo "###"
+    COMMAND ${CMAKE_COMMAND} -E echo "#"
+    COMMAND ${CMAKE_COMMAND} -E echo "#   Building ${TARGET} with build type ${CMAKE_BUILD_TYPE}"
+    COMMAND ${CMAKE_COMMAND} -E echo "#"
+    COMMAND ${CMAKE_COMMAND} -E echo "###"
+    VERBATIM
+    )
+  add_dependencies(${TARGET} build_message)
+
   #
   # To ensure maximal compatibility with existing user codes we use the
   # deal_ii_setup_target() macro when setting up the target for a standard
