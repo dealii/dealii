@@ -87,15 +87,15 @@ macro(deal_ii_invoke_autopilot)
   # Define and set up a compilation target:
   add_executable(${TARGET} ${TARGET_SRC})
 
-  add_custom_target(build_message
+  add_custom_target(build_message ALL
+    DEPENDS ${TARGET}
     COMMAND ${CMAKE_COMMAND} -E echo "###"
     COMMAND ${CMAKE_COMMAND} -E echo "#"
-    COMMAND ${CMAKE_COMMAND} -E echo "#   Building ${TARGET} with build type ${CMAKE_BUILD_TYPE}"
+    COMMAND ${CMAKE_COMMAND} -E echo "#   Target ${TARGET} was built in ${CMAKE_BUILD_TYPE} mode"
     COMMAND ${CMAKE_COMMAND} -E echo "#"
     COMMAND ${CMAKE_COMMAND} -E echo "###"
     VERBATIM
     )
-  add_dependencies(${TARGET} build_message)
 
   #
   # To ensure maximal compatibility with existing user codes we use the
