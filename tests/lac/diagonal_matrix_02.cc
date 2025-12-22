@@ -87,7 +87,9 @@ test(const bool hanging_nodes = true)
   // assemble trilinos sparse matrix
   TrilinosWrappers::SparseMatrix sparse_matrix;
   {
-    TrilinosWrappers::SparsityPattern csp(owned_set, MPI_COMM_WORLD);
+    TrilinosWrappers::SparsityPattern csp(owned_set,
+                                          MPI_COMM_WORLD,
+                                          std::pow(2 * fe_degree + 1, dim));
     DoFTools::make_sparsity_pattern(dof,
                                     csp,
                                     constraints,

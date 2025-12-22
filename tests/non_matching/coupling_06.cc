@@ -96,7 +96,8 @@ test()
 
   TrilinosWrappers::SparsityPattern sparsity(space_locally_owned_dofs,
                                              locally_owned_dofs,
-                                             comm);
+                                             comm,
+                                             std::pow(2 * fe.degree + 1, dim));
   NonMatching::create_coupling_sparsity_pattern(
     cache, space_dh, dh, quad, sparsity);
   sparsity.compress();
@@ -105,7 +106,8 @@ test()
   NonMatching::create_coupling_mass_matrix(cache, space_dh, dh, quad, coupling);
   coupling.compress(VectorOperation::add);
 
-  TrilinosWrappers::SparsityPattern mass_sparsity(locally_owned_dofs, comm);
+  TrilinosWrappers::SparsityPattern mass_sparsity(
+    locally_owned_dofs, comm, std::pow(2 * fe.degree + 1, dim));
   DoFTools::make_sparsity_pattern(dh, mass_sparsity);
   mass_sparsity.compress();
 

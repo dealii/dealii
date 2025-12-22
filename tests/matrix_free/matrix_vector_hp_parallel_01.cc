@@ -138,7 +138,8 @@ test()
   constraints.close();
 
   TrilinosWrappers::SparsityPattern dsp(dof.locally_owned_dofs(),
-                                        MPI_COMM_WORLD);
+                                        MPI_COMM_WORLD,
+                                        std::pow(2 * max_degree + 1, dim));
   DoFTools::make_sparsity_pattern(dof, dsp, constraints, false);
   dsp.compress();
 
