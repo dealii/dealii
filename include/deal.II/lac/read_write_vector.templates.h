@@ -568,7 +568,7 @@ namespace LinearAlgebra
 
 #  if DEAL_II_TRILINOS_VERSION_GTE(13, 2, 0)
     auto vector_2d = target_vector.template getLocalView<Kokkos::HostSpace>(
-      Tpetra::Access::ReadOnly);
+      Tpetra::Access::ReadOnlyStruct{});
 #  else
     target_vector.template sync<Kokkos::HostSpace>();
     auto vector_2d = target_vector.template getLocalView<Kokkos::HostSpace>();

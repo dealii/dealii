@@ -179,6 +179,15 @@ export
   // objects:
   using ::operator<<;
 
+#  ifdef DEAL_II_TRILINOS_WITH_AMESOS2
+  namespace Amesos2
+  {
+    using ::Amesos2::create;
+    using ::Amesos2::query;
+    using ::Amesos2::Solver;
+  }; // namespace Amesos2
+#  endif
+
   namespace Belos
   {
     using ::Belos::BlockCGSolMgr;
@@ -196,6 +205,45 @@ export
   {
     using ::EpetraExt::MatrixMatrix;
   }
+#  ifdef DEAL_II_TRILINOS_WITH_IFPACK2
+  namespace Ifpack2
+  {
+    using ::Ifpack2::Factory;
+    using ::Ifpack2::IdentitySolver;
+    using ::Ifpack2::Preconditioner;
+  }; // namespace Ifpack2
+#  endif
+
+#  ifdef DEAL_II_TRILINOS_WITH_TPETRA
+  namespace Tpetra
+  {
+    // FIXME still has internal linkage
+    namespace Access
+    {
+      // FIXME still has internal linkage
+      // using ::Tpetra::Access::ReadOnly;
+      // using ::Tpetra::Access::ReadWrite;
+      using ::Tpetra::Access::ReadOnlyStruct;
+      using ::Tpetra::Access::ReadWriteStruct;
+    } // namespace Access
+    namespace KokkosCompat
+    {
+      using ::Tpetra::KokkosCompat::KokkosDeviceWrapperNode;
+    }
+    using ::Tpetra::CombineMode;
+    using ::Tpetra::createExport;
+    using ::Tpetra::createImport;
+    using ::Tpetra::CrsGraph;
+    using ::Tpetra::CrsMatrix;
+    using ::Tpetra::Export;
+    using ::Tpetra::Import;
+    using ::Tpetra::Map;
+    using ::Tpetra::MultiVector;
+    using ::Tpetra::Operator;
+    using ::Tpetra::RowMatrix;
+    using ::Tpetra::Vector;
+  } // namespace Tpetra
+#  endif
 
   namespace NOX
   {
@@ -310,6 +358,7 @@ export
     using ::Teuchos::Comm;
     using ::Teuchos::Copy;
     using ::Teuchos::ETransp;
+    using ::Teuchos::getFancyOStream;
 #  if DEAL_II_TRILINOS_VERSION_GTE(14, 0, 0)
     using ::Teuchos::make_rcp;
 #  endif // !DEAL_II_TRILINOS_VERSION_GTE(14, 0, 0)

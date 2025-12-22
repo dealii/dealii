@@ -301,7 +301,7 @@ namespace LinearAlgebra
       AssertDimension(indices.size(), elements.size());
 
       auto vector_2d = vector->template getLocalView<Kokkos::HostSpace>(
-        Tpetra::Access::ReadOnly);
+        Tpetra::Access::ReadOnlyStruct{});
       auto vector_1d = Kokkos::subview(vector_2d, Kokkos::ALL(), 0);
 
       for (unsigned int i = 0; i < indices.size(); ++i)
@@ -355,7 +355,7 @@ namespace LinearAlgebra
           // Create a read-only Kokkos view from the source vector
           auto source_vector_2d =
             V.vector->template getLocalView<Kokkos::HostSpace>(
-              Tpetra::Access::ReadOnly);
+              Tpetra::Access::ReadOnlyStruct{});
 
           auto source_vector_1d =
             Kokkos::subview(source_vector_2d, Kokkos::ALL(), 0);
@@ -363,7 +363,7 @@ namespace LinearAlgebra
           // Create a read/write Kokkos view from the target vector
           auto target_vector_2d =
             vector->template getLocalView<Kokkos::HostSpace>(
-              Tpetra::Access::ReadWrite);
+              Tpetra::Access::ReadWriteStruct{});
           auto target_vector_1d =
             Kokkos::subview(target_vector_2d, Kokkos::ALL(), 0);
 
@@ -518,7 +518,7 @@ namespace LinearAlgebra
 
       {
         auto x_2d = source_vector.template getLocalView<Kokkos::HostSpace>(
-          Tpetra::Access::ReadWrite);
+          Tpetra::Access::ReadWriteStruct{});
         auto x_1d = Kokkos::subview(x_2d, Kokkos::ALL(), 0);
 
         const size_t localLength = source_vector.getLocalLength();
@@ -699,7 +699,7 @@ namespace LinearAlgebra
       Assert(!has_ghost_elements(), ExcGhostsPresent());
 
       auto vector_2d = vector->template getLocalView<Kokkos::HostSpace>(
-        Tpetra::Access::ReadWrite);
+        Tpetra::Access::ReadWriteStruct{});
       auto vector_1d = Kokkos::subview(vector_2d, Kokkos::ALL(), 0);
 
       const size_t localLength = vector->getLocalLength();
@@ -952,9 +952,9 @@ namespace LinearAlgebra
         return false;
 
       auto this_vector_2d = vector->template getLocalView<Kokkos::HostSpace>(
-        Tpetra::Access::ReadOnly);
+        Tpetra::Access::ReadOnlyStruct{});
       auto other_vector_2d = v.vector->template getLocalView<Kokkos::HostSpace>(
-        Tpetra::Access::ReadOnly);
+        Tpetra::Access::ReadOnlyStruct{});
 
       auto this_vector_1d  = Kokkos::subview(this_vector_2d, Kokkos::ALL(), 0);
       auto other_vector_1d = Kokkos::subview(other_vector_2d, Kokkos::ALL(), 0);
@@ -1143,7 +1143,7 @@ namespace LinearAlgebra
         out.setf(std::ios::fixed, std::ios::floatfield);
 
       auto vector_2d = vector->template getLocalView<Kokkos::HostSpace>(
-        Tpetra::Access::ReadOnly);
+        Tpetra::Access::ReadOnlyStruct{});
 
       auto         vector_1d    = Kokkos::subview(vector_2d, Kokkos::ALL(), 0);
       const size_t local_length = vector->getLocalLength();

@@ -217,7 +217,7 @@ Vector<Number>::Vector(
 #  if DEAL_II_TRILINOS_VERSION_GTE(13, 2, 0)
       auto localized_vector_2d =
         localized_vector.template getLocalView<Kokkos::HostSpace>(
-          Tpetra::Access::ReadOnly);
+          Tpetra::Access::ReadOnlyStruct{});
 #  else
       localized_vector.template sync<Kokkos::HostSpace>();
       auto localized_vector_2d =
@@ -908,7 +908,7 @@ Vector<Number>::operator=(
 #  if DEAL_II_TRILINOS_VERSION_GTE(13, 2, 0)
       auto localized_vector_2d =
         localized_vector.template getLocalView<Kokkos::HostSpace>(
-          Tpetra::Access::ReadOnly);
+          Tpetra::Access::ReadOnlyStruct{});
 #  else
       localized_vector.template sync<Kokkos::HostSpace>();
       auto localized_vector_2d =

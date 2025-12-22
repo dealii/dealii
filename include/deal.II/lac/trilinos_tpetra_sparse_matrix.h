@@ -1670,9 +1670,9 @@ namespace LinearAlgebra
 } // namespace LinearAlgebra
 
 
-DEAL_II_NAMESPACE_CLOSE
+DEAL_II_NAMESPACE_CLOSE // Do not convert for module purposes
 
-namespace std
+  namespace std
 {
   template <typename Number, typename MemorySpace, bool Constness>
   struct iterator_traits<
@@ -1692,11 +1692,10 @@ namespace std
 /* ------------------------- Inline functions ---------------------- */
 
 
-DEAL_II_NAMESPACE_OPEN
+DEAL_II_NAMESPACE_OPEN // Do not convert for module purposes
 
-namespace LinearAlgebra
+  namespace LinearAlgebra
 {
-
   namespace TpetraWrappers
   {
     template <typename Number, typename MemorySpace>
