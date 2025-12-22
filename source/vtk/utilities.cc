@@ -280,6 +280,37 @@ namespace VTKWrappers
       for (int j = 0; j < n_components; ++j)
         output_vector[i * n_components + j] = data_array->GetComponent(i, j);
   }
+
+
+
+  void
+  read_vertex_data(const std::string &vtk_filename,
+                   const std::string &point_data_name,
+                   Vector<double>    &output_vector)
+  {
+    {
+      // check that the file exists
+      std::ifstream file(vtk_filename);
+      AssertThrow(file.good(),
+                  ExcMessage("VTK file not found: " + vtk_filename));
+    }
+    auto reader = vtkSmartPointer<vtkUnstructuredGridReader>::New();
+    reader->SetFileName(vtk_filename.c_str());
+    reader->Update();
+    vtkUnstructuredGrid *grid = reader->GetOutput();
+    AssertThrow(grid, ExcMessage("Failed to read VTK file: " + vtk_filename));
+    vtkDataArray *data_array =
+      grid->GetPointData()->GetArray(point_data_name.c_str());
+    AssertThrow(data_array,
+                ExcMessage("Point data array '" + point_data_name +
+                           "' not found in VTK file: " + vtk_filename));
+    vtkIdType n_tuples     = data_array->GetNumberOfTuples();
+    int       n_components = data_array->GetNumberOfComponents();
+    output_vector.reinit(n_tuples * n_components);
+    for (vtkIdType i = 0; i < n_tuples; ++i)
+      for (int j = 0; j < n_components; ++j)
+        output_vector[i * n_components + j] = data_array->GetComponent(i, j);
+  }
 #else
 DEAL_II_NAMESPACE_OPEN
 
@@ -297,6 +328,12 @@ namespace VTKWrappers
 
   void
   read_cell_data(const std::string &, const std::string &, Vector<double> &)
+  {
+    AssertThrow(false, ExcMessage("deal.II is not built with VTK support."));
+  }
+
+  void
+  read_vertex_data(const std::string &, const std::string &, Vector<double> &)
   {
     AssertThrow(false, ExcMessage("deal.II is not built with VTK support."));
   }

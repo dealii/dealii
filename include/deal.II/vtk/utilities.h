@@ -92,6 +92,24 @@ namespace VTKWrappers
                  const std::string &cell_data_name,
                  Vector<double>    &output_vector);
 
+  /**
+   * Read vertex data from a VTK file and store it in the output vector.
+   *
+   * This function reads the specified vertex data array (scalar or vector) from
+   * the given VTK file and stores it in the provided output vector.
+   *
+   * For vector data, all components are stored in row-major order
+   * (vertex0_comp0, vertex0_comp1, ..., vertex1_comp0, ...).
+   *
+   * @param vtk_filename The name of the input VTK file.
+   * @param vertex_data_name The name of the vertex data array to read.
+   * @param output_vector The vector to store the vertex data values.
+   */
+  void
+  read_vertex_data(const std::string &vtk_filename,
+                   const std::string &vertex_data_name,
+                   Vector<double>    &output_vector);
+
 #  ifndef DOXYGEN
   // Template implementations
 
