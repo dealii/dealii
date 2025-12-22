@@ -273,14 +273,14 @@ namespace internal
     template <int max_n_vertices, typename FU>
     void
     build_face_entities_templated(
-      const unsigned int                                 face_dimensionality,
-      const std::vector<std::shared_ptr<ReferenceCell>> &cell_types,
-      const std::vector<ReferenceCell>                  &cell_types_index,
-      const CRS<unsigned int>                           &crs,
-      CRS<unsigned int>                                 &crs_d,        // result
-      CRS<unsigned int>                                 &crs_0,        // result
-      TriaObjectsOrientations                           &orientations, // result
-      const FU                                          &second_key_function)
+      const unsigned int                face_dimensionality,
+      const std::vector<ReferenceCell> &cell_types,
+      const std::vector<ReferenceCell> &cell_types_index,
+      const CRS<unsigned int>          &crs,
+      CRS<unsigned int>                &crs_d,        // result
+      CRS<unsigned int>                &crs_0,        // result
+      TriaObjectsOrientations          &orientations, // result
+      const FU                         &second_key_function)
     {
       const bool compatibility_mode = true;
 
@@ -304,14 +304,14 @@ namespace internal
         {
           // Make sure that there are only two possibilities for
           // face_dimensionality that we can cover with the ?: statement below:
-          Assert((face_dimensionality == cell_types[c]->get_dimension() - 1) ||
-                   ((cell_types[c]->get_dimension() == 3) &&
+          Assert((face_dimensionality == cell_types[c].get_dimension() - 1) ||
+                   ((cell_types[c].get_dimension() == 3) &&
                     (face_dimensionality == 1)),
                  ExcInternalError());
           n_entities +=
-            (face_dimensionality == cell_types[c]->get_dimension() - 1 ?
-               cell_types[c]->n_faces() :
-               cell_types[c]->n_lines());
+            (face_dimensionality == cell_types[c].get_dimension() - 1 ?
+               cell_types[c].n_faces() :
+               cell_types[c].n_lines());
         }
 
       // step 1: store each d-dimensional entity of a cell (described by their
@@ -344,14 +344,14 @@ namespace internal
 
           // Make sure that there are only two possibilities for
           // face_dimensionality that we can cover with the ?: statement below:
-          Assert((face_dimensionality == cell_type->get_dimension() - 1) ||
-                   ((cell_type->get_dimension() == 3) &&
+          Assert((face_dimensionality == cell_type.get_dimension() - 1) ||
+                   ((cell_type.get_dimension() == 3) &&
                     (face_dimensionality == 1)),
                  ExcInternalError());
           const unsigned int n_face_entities =
-            (face_dimensionality == cell_type->get_dimension() - 1 ?
-               cell_type->n_faces() :
-               cell_type->n_lines());
+            (face_dimensionality == cell_type.get_dimension() - 1 ?
+               cell_type.n_faces() :
+               cell_type.n_lines());
           ptr_d[c + 1] = ptr_d[c] + n_face_entities;
 
           // ... collect vertices of cell
@@ -368,21 +368,21 @@ namespace internal
               // Same as above, make sure that there are only two possibilities
               // for face_dimensionality that we can cover with the ?: statement
               // below:
-              Assert((face_dimensionality == cell_type->get_dimension() - 1) ||
-                       ((cell_type->get_dimension() == 3) &&
+              Assert((face_dimensionality == cell_type.get_dimension() - 1) ||
+                       ((cell_type.get_dimension() == 3) &&
                         (face_dimensionality == 1)),
                      ExcInternalError());
               for (unsigned int i = 0;
-                   i < (face_dimensionality == cell_type->get_dimension() - 1 ?
-                          cell_type->face_reference_cell(e).n_vertices() :
+                   i < (face_dimensionality == cell_type.get_dimension() - 1 ?
+                          cell_type.face_reference_cell(e).n_vertices() :
                           ReferenceCells::Line.n_vertices());
                    ++i)
                 entity_vertices[i] =
                   local_vertices
-                    [face_dimensionality == cell_type->get_dimension() - 1 ?
-                       cell_type->face_to_cell_vertices(
+                    [face_dimensionality == cell_type.get_dimension() - 1 ?
+                       cell_type.face_to_cell_vertices(
                          e, i, numbers::default_geometric_orientation) :
-                       cell_type->line_to_cell_vertices(e, i)] +
+                       cell_type.line_to_cell_vertices(e, i)] +
                   offset;
 
               // ... create key
@@ -392,9 +392,9 @@ namespace internal
 
               ad_entity_vertices.emplace_back(entity_vertices);
 
-              if (face_dimensionality == cell_type->get_dimension() - 1)
-                ad_entity_types.emplace_back(cell_type->face_reference_cell(e));
-              else if (face_dimensionality == cell_type->get_dimension() - 2)
+              if (face_dimensionality == cell_type.get_dimension() - 1)
+                ad_entity_types.emplace_back(cell_type.face_reference_cell(e));
+              else if (face_dimensionality == cell_type.get_dimension() - 2)
                 {
                   // Since we only deal with meshes up to dimension 3,
                   // something that has co-dimensionality -2 must either be
@@ -443,7 +443,7 @@ namespace internal
 
                   ++n_unique_entities;
                   n_unique_entity_vertices +=
-                    cell_types[ad_entity_types[offset_i]]->n_vertices();
+                    cell_types[ad_entity_types[offset_i]].n_vertices();
 
                   new_key = ad_compatibility[offset_i];
                 }
@@ -507,15 +507,14 @@ namespace internal
      */
     template <typename FU>
     void
-    build_face_entities(
-      const unsigned int                                 face_dimensionality,
-      const std::vector<std::shared_ptr<ReferenceCell>> &cell_types,
-      const std::vector<ReferenceCell>                  &cell_types_index,
-      const CRS<unsigned int>                           &crs,
-      CRS<unsigned int>                                 &crs_d,
-      CRS<unsigned int>                                 &crs_0,
-      TriaObjectsOrientations                           &orientations,
-      const FU                                          &second_key_function)
+    build_face_entities(const unsigned int                face_dimensionality,
+                        const std::vector<ReferenceCell> &cell_types,
+                        const std::vector<ReferenceCell> &cell_types_index,
+                        const CRS<unsigned int>          &crs,
+                        CRS<unsigned int>                &crs_d,
+                        CRS<unsigned int>                &crs_0,
+                        TriaObjectsOrientations          &orientations,
+                        const FU                         &second_key_function)
     {
       unsigned int max_n_vertices = 0;
 
@@ -523,12 +522,12 @@ namespace internal
       // each face may have. Otherwise, we're in 3d and are dealing with
       // lines, for which we know the number of vertices:
       for (const auto &c : cell_types_index)
-        if (face_dimensionality == cell_types[c]->get_dimension() - 1)
+        if (face_dimensionality == cell_types[c].get_dimension() - 1)
           {
-            for (unsigned int f = 0; f < cell_types[c]->n_faces(); ++f)
+            for (unsigned int f = 0; f < cell_types[c].n_faces(); ++f)
               max_n_vertices =
                 std::max(max_n_vertices,
-                         cell_types[c]->face_reference_cell(f).n_vertices());
+                         cell_types[c].face_reference_cell(f).n_vertices());
           }
         else if (face_dimensionality == 1)
           max_n_vertices = std::max(max_n_vertices, 2u);
@@ -576,18 +575,17 @@ namespace internal
      * Furthermore, the type of the quad is determined.
      */
     inline void
-    build_intersection(
-      const std::vector<std::shared_ptr<ReferenceCell>> &cell_types,
-      const std::vector<ReferenceCell>                  &cell_types_index,
-      const CRS<unsigned int>                           &con_cv,
-      const CRS<unsigned int>                           &con_cl,
-      const CRS<unsigned int>                           &con_lv,
-      const CRS<unsigned int>                           &con_cq,
-      const CRS<unsigned int>                           &con_qv,
-      const TriaObjectsOrientations                     &ori_cq,
-      CRS<unsigned int>                                 &con_ql,   // result
-      TriaObjectsOrientations                           &ori_ql,   // result
-      std::vector<ReferenceCell>                        &quad_t_id // result
+    build_intersection(const std::vector<ReferenceCell> &cell_types,
+                       const std::vector<ReferenceCell> &cell_types_index,
+                       const CRS<unsigned int>          &con_cv,
+                       const CRS<unsigned int>          &con_cl,
+                       const CRS<unsigned int>          &con_lv,
+                       const CRS<unsigned int>          &con_cq,
+                       const CRS<unsigned int>          &con_qv,
+                       const TriaObjectsOrientations    &ori_cq,
+                       CRS<unsigned int>                &con_ql,   // result
+                       TriaObjectsOrientations          &ori_ql,   // result
+                       std::vector<ReferenceCell>       &quad_t_id // result
     )
     {
       // reset output
@@ -612,7 +610,7 @@ namespace internal
               const unsigned int f = con_cq.col[f_];
 
               con_ql.ptr[f + 1] =
-                cell_type->face_reference_cell(f_index).n_lines();
+                cell_type.face_reference_cell(f_index).n_lines();
             }
         }
 
@@ -642,12 +640,12 @@ namespace internal
                 continue;
 
               // loop over the lines of this face
-              quad_t_id[f] = cell_type->face_reference_cell(f_index);
+              quad_t_id[f] = cell_type.face_reference_cell(f_index);
               for (unsigned int l = 0; l < quad_t_id[f].n_lines(); ++l)
                 {
                   // determine global index of line
                   const unsigned int local_line_index =
-                    cell_type->face_to_cell_lines(
+                    cell_type.face_to_cell_lines(
                       f_index, l, numbers::default_geometric_orientation);
                   const unsigned int global_line_index =
                     con_cl.col[con_cl.ptr[c] + local_line_index];
@@ -657,7 +655,7 @@ namespace internal
                   bool same = true;
                   for (unsigned int v = 0; v < 2; ++v)
                     if (con_cv.col[con_cv.ptr[c] +
-                                   cell_type->face_and_line_to_cell_vertices(
+                                   cell_type.face_and_line_to_cell_vertices(
                                      f_index,
                                      l,
                                      v,
@@ -690,11 +688,10 @@ namespace internal
      */
     template <typename T>
     Connectivity<T>
-    build_connectivity(
-      const unsigned int                                 dim,
-      const std::vector<std::shared_ptr<ReferenceCell>> &cell_t,
-      const std::vector<ReferenceCell>                  &cell_t_id,
-      const CRS<T>                                      &con_cv)
+    build_connectivity(const unsigned int                dim,
+                       const std::vector<ReferenceCell> &cell_t,
+                       const std::vector<ReferenceCell> &cell_t_id,
+                       const CRS<T>                     &con_cv)
     {
       Connectivity<T> connectivity(dim, cell_t_id);
 
@@ -733,28 +730,28 @@ namespace internal
             connectivity.entity_orientations(2),
             [&](auto key, // of type std::array<unsigned int, max_n_vertices>
                           // but max_n_vertices is not known here
-                const std::shared_ptr<ReferenceCell> &cell_type,
-                const unsigned int                   &c,
-                const unsigned int                   &f) {
+                const ReferenceCell &cell_type,
+                const unsigned int  &c,
+                const unsigned int  &f) {
               //  to ensure same enumeration as in deal.II
-              AssertIndexRange(cell_type->face_reference_cell(f).n_lines(),
+              AssertIndexRange(cell_type.face_reference_cell(f).n_lines(),
                                key.size() + 1);
 
               unsigned int l = 0;
 
-              for (; l < cell_type->face_reference_cell(f).n_lines(); ++l)
+              for (; l < cell_type.face_reference_cell(f).n_lines(); ++l)
                 {
                   AssertIndexRange(l, key.size());
                   AssertIndexRange(c, temp1.ptr.size());
                   AssertIndexRange(temp1.ptr[c] +
-                                     cell_type->face_to_cell_lines(
+                                     cell_type.face_to_cell_lines(
                                        f,
                                        l,
                                        numbers::default_geometric_orientation),
                                    temp1.col.size());
                   key[l] =
                     temp1.col[temp1.ptr[c] +
-                              cell_type->face_to_cell_lines(
+                              cell_type.face_to_cell_lines(
                                 f, l, numbers::default_geometric_orientation)] +
                     1 /*offset!*/;
                 }
@@ -798,22 +795,17 @@ namespace internal
       AssertThrow(cells.size() > 0, ExcMessage("No cells have been provided!"));
 
       // vector of possible cell entity types
-      std::vector<std::shared_ptr<ReferenceCell>> cell_types_impl(8);
+      std::vector<ReferenceCell> cell_types_impl(8);
 
-      cell_types_impl[ReferenceCells::Line] =
-        std::make_shared<ReferenceCell>(ReferenceCells::Line);
-      cell_types_impl[ReferenceCells::Triangle] =
-        std::make_shared<ReferenceCell>(ReferenceCells::Triangle);
+      cell_types_impl[ReferenceCells::Line]     = ReferenceCells::Line;
+      cell_types_impl[ReferenceCells::Triangle] = ReferenceCells::Triangle;
       cell_types_impl[ReferenceCells::Quadrilateral] =
-        std::make_shared<ReferenceCell>(ReferenceCells::Quadrilateral);
+        ReferenceCells::Quadrilateral;
       cell_types_impl[ReferenceCells::Tetrahedron] =
-        std::make_shared<ReferenceCell>(ReferenceCells::Tetrahedron);
-      cell_types_impl[ReferenceCells::Pyramid] =
-        std::make_shared<ReferenceCell>(ReferenceCells::Pyramid);
-      cell_types_impl[ReferenceCells::Wedge] =
-        std::make_shared<ReferenceCell>(ReferenceCells::Wedge);
-      cell_types_impl[ReferenceCells::Hexahedron] =
-        std::make_shared<ReferenceCell>(ReferenceCells::Hexahedron);
+        ReferenceCells::Tetrahedron;
+      cell_types_impl[ReferenceCells::Pyramid]    = ReferenceCells::Pyramid;
+      cell_types_impl[ReferenceCells::Wedge]      = ReferenceCells::Wedge;
+      cell_types_impl[ReferenceCells::Hexahedron] = ReferenceCells::Hexahedron;
 
       // determine cell types and process vertices
       std::vector<T> cell_vertices;
@@ -861,7 +853,7 @@ namespace internal
                  ExcNotImplemented());
           AssertIndexRange(static_cast<std::uint8_t>(reference_cell),
                            cell_types_impl.size());
-          Assert(cell_types_impl[reference_cell].get() != nullptr,
+          Assert(cell_types_impl[reference_cell] != ReferenceCells::Invalid,
                  ExcNotImplemented());
 
           cell_types_indices.push_back(reference_cell);
