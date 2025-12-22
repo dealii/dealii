@@ -21,7 +21,7 @@
 #       
 
 get_merge_commits_since_master () {
-  echo "$(git log --merges --pretty=format:"%h" master..)"
+  echo "$(git log --merges --pretty=format:"%h" origin/master..)"
 }
 
 get_commit_parents () {
