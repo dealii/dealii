@@ -37,7 +37,7 @@
 #  include <deal.II/lac/vector.h>
 
 // Make sure that the VTK version macros are available.
-#  include <vtkVersion.h>
+#  include <vtkVersion.h> // Do not convert for module purposes
 
 // VTK_VERSION_CHECK is defined by the header above for 9.3.0 and above, but
 // we provide a fallback older versions.
