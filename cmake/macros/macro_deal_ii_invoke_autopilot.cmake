@@ -84,18 +84,11 @@ macro(deal_ii_invoke_autopilot)
     endif()
   endif()
 
-  # Define and set up a compilation target:
-  add_executable(${TARGET} ${TARGET_SRC})
+  #
+  # Define and set up the compilation target:
+  #
 
-  add_custom_target(build_message ALL
-    DEPENDS ${TARGET}
-    COMMAND ${CMAKE_COMMAND} -E echo "###"
-    COMMAND ${CMAKE_COMMAND} -E echo "#"
-    COMMAND ${CMAKE_COMMAND} -E echo "#   Target ${TARGET} was built in ${CMAKE_BUILD_TYPE} mode"
-    COMMAND ${CMAKE_COMMAND} -E echo "#"
-    COMMAND ${CMAKE_COMMAND} -E echo "###"
-    VERBATIM
-    )
+  add_executable(${TARGET} ${TARGET_SRC})
 
   #
   # To ensure maximal compatibility with existing user codes we use the
@@ -130,6 +123,24 @@ macro(deal_ii_invoke_autopilot)
     set(TARGET_RUN ${TARGET})
   endif()
 
+  #
+  # Print a status message explaining how the target was built:
+  #
+
+  add_custom_target(build_message ALL
+    DEPENDS ${TARGET}
+    COMMAND ${CMAKE_COMMAND} -E echo "###"
+    COMMAND ${CMAKE_COMMAND} -E echo "#"
+    COMMAND ${CMAKE_COMMAND} -E echo "#   Target ${TARGET} was built in $<$<CONFIG:Release>:Release>$<$<CONFIG:Debug>:Debug> configuration."
+    COMMAND ${CMAKE_COMMAND} -E echo "#"
+    COMMAND ${CMAKE_COMMAND} -E echo "###"
+    VERBATIM
+    )
+
+  #
+  # Define a run target:
+  #
+
   if(CMAKE_SYSTEM_NAME MATCHES "(CYGWIN|Windows)")
     #
     # Hack for Cygwin and Windows targets: Export PATH to point to the
@@ -156,10 +167,18 @@ macro(deal_ii_invoke_autopilot)
   endif()
 
   if(NOT "${TARGET_RUN}" STREQUAL "")
+    add_custom_target(run_message
+      DEPENDS ${TARGET} build_message
+      COMMAND ${CMAKE_COMMAND} -E echo "###"
+      COMMAND ${CMAKE_COMMAND} -E echo "#"
+      COMMAND ${CMAKE_COMMAND} -E echo "#   Running ${TARGET} in $<$<CONFIG:Release>:Release>$<$<CONFIG:Debug>:Debug> configuration."
+      COMMAND ${CMAKE_COMMAND} -E echo "#"
+      COMMAND ${CMAKE_COMMAND} -E echo "###"
+      VERBATIM
+      )
     add_custom_target(run
+      DEPENDS ${TARGET} run_message
       COMMAND ${_command}
-      DEPENDS ${TARGET}
-      COMMENT "Run ${TARGET} with $<$<CONFIG:Release>:Release>$<$<CONFIG:Debug>:Debug> configuration"
       )
     set(_run_targets
       "#      ${_make_command} run            - to (compile, link and) run the program\n"
