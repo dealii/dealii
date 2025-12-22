@@ -64,6 +64,6 @@ repos:
     language: system
   - id: detect-merges-in-feature-branch
     name: Detect merge commits in current feature branch
-    entry: bash contrib/utilities/detect_merges_from_master_in_feature_branch.sh
+    entry: bash contrib/utilities/detect_merges_from_master_in_feature_branch.sh remotes/origin/master
     pass_filenames: false
     language: system
