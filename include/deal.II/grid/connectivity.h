@@ -853,12 +853,14 @@ namespace internal
                   con_ql.col[con_ql.ptr[f] + l] = global_line_index;
 
                   // determine orientation of line
-                  const auto line_vertices_1_ref =
-                    cell_type->vertices_of_nth_line_of_surface(l, f_index);
-
                   bool same = true;
-                  for (unsigned int v = 0; v < line_vertices_1_ref.size(); ++v)
-                    if (con_cv.col[con_cv.ptr[c] + line_vertices_1_ref[v]] !=
+                  for (unsigned int v = 0; v < 2; ++v)
+                    if (con_cv.col[con_cv.ptr[c] +
+                                   cell_type->face_and_line_to_cell_vertices(
+                                     f_index,
+                                     l,
+                                     v,
+                                     numbers::default_geometric_orientation)] !=
                         con_lv.col[con_lv.ptr[global_line_index] + v])
                       {
                         same = false;

@@ -636,6 +636,33 @@ public:
     const types::geometric_orientation face_orientation) const;
 
   /**
+   * Map the vertex number of a specific line of a face to cell vertex number.
+   * In other words, for a given face, a line (edge) of this face, and a vertex
+   * of this line, return the how many'th vertex within
+   * this cell we are talking about.
+   *
+   * If the current object is ReferenceCells::Vertex or ReferenceCells::Line,
+   * then this function throws an exception because these objects have no
+   * faces or because the faces are points that have no lines. For
+   * two-dimensional reference cells, each face is composed of (and is identical
+   * to) exactly one line and so the function simply returns
+   * `face_to_cell_vertices(face, vertex, face_orientation)`. For
+   * three-dimensional reference cells each face is bounded by several vertices
+   * and the the function's mapping is more complicated.
+   *
+   * @pre `face < this->n_faces()`
+   * @pre `line < this->face_reference_cell(face).n_lines()`
+   * @pre `vertex < 2`
+   * @post The return value `r` satisfies `r<n_vertices()`.
+   */
+  unsigned int
+  face_and_line_to_cell_vertices(
+    const unsigned int                 face,
+    const unsigned int                 line,
+    const unsigned int                 vertex,
+    const types::geometric_orientation face_orientation) const;
+
+  /**
    * For a given face, in standard orientation, return the location of one
    * of its vertices in the ambient space of the cell. For example, for a
    * square or triangular 2d cell, the zeroth vertex of its zeroth face
@@ -2804,6 +2831,112 @@ ReferenceCell::face_to_cell_vertices(
 
           return GeometryInfo<3>::face_to_cell_vertices(
             face, vertex, face_orientation, face_flip, face_rotation);
+        }
+      default:
+        DEAL_II_NOT_IMPLEMENTED();
+    }
+
+  return numbers::invalid_unsigned_int;
+}
+
+
+
+inline unsigned int
+ReferenceCell::face_and_line_to_cell_vertices(
+  const unsigned int                 face,
+  const unsigned int                 line,
+  const unsigned int                 vertex,
+  const types::geometric_orientation combined_face_orientation) const
+{
+  AssertIndexRange(face, n_faces());
+  AssertIndexRange(line, this->face_reference_cell(face).n_lines());
+  AssertIndexRange(vertex, 2);
+  AssertIndexRange(combined_face_orientation, n_face_orientations(face));
+
+  switch (this->kind)
+    {
+      case ReferenceCells::Vertex:
+        {
+          // We can't get here based on the assertions above: vertices
+          // have no faces.
+          DEAL_II_ASSERT_UNREACHABLE();
+          break;
+        }
+      case ReferenceCells::Line:
+        {
+          // We can't get here based on the assertions above: Lines'
+          // faces are vertices that have no lines as sub-objects.
+          DEAL_II_ASSERT_UNREACHABLE();
+          break;
+        }
+      case ReferenceCells::Triangle:
+      case ReferenceCells::Quadrilateral:
+        {
+          // For 2d objects, each face has (and is identical to) exactly
+          // one line, so we can ask the other function:
+          return face_to_cell_vertices(face, vertex, combined_face_orientation);
+        }
+      case ReferenceCells::Tetrahedron:
+        {
+          Assert(combined_face_orientation ==
+                   numbers::default_geometric_orientation,
+                 ExcNotImplemented());
+
+          const static dealii::ndarray<unsigned int, 4, 3, 2> table = {
+            {{{{{0, 1}}, {{1, 2}}, {{2, 0}}}},
+             {{{{1, 0}}, {{0, 3}}, {{3, 1}}}},
+             {{{{0, 2}}, {{2, 3}}, {{3, 0}}}},
+             {{{{2, 1}}, {{1, 3}}, {{3, 2}}}}}};
+
+          return table[face][line][vertex];
+        }
+      case ReferenceCells::Pyramid:
+        {
+          Assert(combined_face_orientation ==
+                   numbers::default_geometric_orientation,
+                 ExcNotImplemented());
+
+          static const unsigned int X = static_cast<unsigned int>(-1);
+          const static dealii::ndarray<unsigned int, 5, 4, 2> table = {
+            {{{{{0, 2}}, {{1, 3}}, {{0, 1}}, {{2, 3}}}},
+             {{{{0, 2}}, {{2, 4}}, {{4, 0}}, {{X, X}}}},
+             {{{{3, 1}}, {{1, 4}}, {{4, 3}}, {{X, X}}}},
+             {{{{1, 0}}, {{0, 4}}, {{4, 1}}, {{X, X}}}},
+             {{{{2, 3}}, {{3, 4}}, {{4, 2}}, {{X, X}}}}}};
+
+          return table[face][line][vertex];
+        }
+      case ReferenceCells::Wedge:
+        {
+          Assert(combined_face_orientation ==
+                   numbers::default_geometric_orientation,
+                 ExcNotImplemented());
+
+          static const unsigned int X = static_cast<unsigned int>(-1);
+          const static dealii::ndarray<unsigned int, 5, 4, 2> table = {
+            {{{{{1, 0}}, {{0, 2}}, {{2, 1}}, {{X, X}}}},
+             {{{{3, 4}}, {{4, 5}}, {{5, 3}}, {{X, X}}}},
+             {{{{0, 3}}, {{1, 4}}, {{0, 1}}, {{3, 4}}}},
+             {{{{1, 4}}, {{2, 5}}, {{1, 2}}, {{4, 5}}}},
+             {{{{2, 5}}, {{0, 3}}, {{2, 0}}, {{5, 3}}}}}};
+
+          return table[face][line][vertex];
+        }
+      case ReferenceCells::Hexahedron:
+        {
+          Assert(combined_face_orientation ==
+                   numbers::default_geometric_orientation,
+                 ExcNotImplemented());
+
+          const static dealii::ndarray<unsigned int, 6, 4, 2> table = {
+            {{{{{0, 4}}, {{2, 6}}, {{0, 2}}, {{4, 6}}}},
+             {{{{1, 5}}, {{3, 7}}, {{1, 3}}, {{5, 7}}}},
+             {{{{0, 1}}, {{4, 5}}, {{0, 4}}, {{1, 5}}}},
+             {{{{2, 3}}, {{6, 7}}, {{2, 6}}, {{3, 7}}}},
+             {{{{0, 2}}, {{1, 3}}, {{0, 1}}, {{2, 3}}}},
+             {{{{4, 6}}, {{5, 7}}, {{4, 5}}, {{6, 7}}}}}};
+
+          return table[face][line][vertex];
         }
       default:
         DEAL_II_NOT_IMPLEMENTED();
