@@ -95,7 +95,9 @@ for line in lines:
         line
     ) or header_to_partition_maps.matches_external_header_include(line):
         if "Do not convert for module purposes" in line:
-            raise "It is not allowed to escape the conversion of include statements in header files."
+            raise RuntimeError(
+                "It is not allowed to escape the conversion of include statements in header files."
+            )
         else:
             pass
 
