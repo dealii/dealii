@@ -152,12 +152,21 @@ main(int argc, char **argv)
 
   MPILogInitAll log(true);
 
-  deallog << "Trilinos matrices" << std::endl;
+  deallog << "Trilinos matrices and vectors" << std::endl;
   test<2, TrilinosWrappers::SparseMatrix, TrilinosWrappers::MPI::Vector>();
   test<3, TrilinosWrappers::SparseMatrix, TrilinosWrappers::MPI::Vector>();
 
 
-  deallog << "PETSc matrices" << std::endl;
+  deallog << "PETSc matrices and vectors" << std::endl;
   test<2, PETScWrappers::MPI::SparseMatrix, PETScWrappers::MPI::Vector>();
   test<3, PETScWrappers::MPI::SparseMatrix, PETScWrappers::MPI::Vector>();
+
+  deallog << "Trilinos matrices and LinearAlgebra::distributed::Vector"
+          << std::endl;
+  test<2,
+       TrilinosWrappers::SparseMatrix,
+       LinearAlgebra::distributed::Vector<double>>();
+  test<3,
+       TrilinosWrappers::SparseMatrix,
+       LinearAlgebra::distributed::Vector<double>>();
 }
