@@ -365,6 +365,14 @@ public:
   face_indices() const;
 
   /**
+   * Return an object that can be thought of as an array containing the indices
+   * of the given cell's faces of the desired type @p face_ref_type. Indices
+   * form a continuous range that is empty in case no face of such type exists.
+   */
+  std_cxx20::ranges::iota_view<unsigned int, unsigned int>
+  face_indices_by_type(const ReferenceCell &face_ref_type) const;
+
+  /**
    * Return the number of refinement directions of the cell.
    */
   unsigned int
@@ -2096,6 +2104,73 @@ ReferenceCell::face_indices() const
 {
   return std_cxx20::ranges::iota_view<unsigned int, unsigned int>(0U,
                                                                   n_faces());
+}
+
+
+
+inline std_cxx20::ranges::iota_view<unsigned int, unsigned int>
+ReferenceCell::face_indices_by_type(const ReferenceCell &face_ref_type) const
+{
+  switch (this->kind)
+    {
+      case ReferenceCells::Vertex:
+        return this->face_indices(); // no faces
+      case ReferenceCells::Line:
+        if (face_ref_type == ReferenceCells::Vertex)
+          return this->face_indices();
+        else
+          return std_cxx20::ranges::iota_view<unsigned int, unsigned int>(0U,
+                                                                          0U);
+      case ReferenceCells::Triangle:
+      case ReferenceCells::Quadrilateral:
+        if (face_ref_type == ReferenceCells::Line)
+          return this->face_indices();
+        else
+          return std_cxx20::ranges::iota_view<unsigned int, unsigned int>(0U,
+                                                                          0U);
+      case ReferenceCells::Tetrahedron:
+        if (face_ref_type == ReferenceCells::Triangle)
+          return this->face_indices();
+        else
+          return std_cxx20::ranges::iota_view<unsigned int, unsigned int>(0U,
+                                                                          0U);
+      case ReferenceCells::Pyramid:
+        switch (face_ref_type)
+          {
+            case ReferenceCells::Triangle:
+              return std_cxx20::ranges::iota_view<unsigned int, unsigned int>(
+                1U, 5U);
+            case ReferenceCells::Quadrilateral:
+              return std_cxx20::ranges::iota_view<unsigned int, unsigned int>(
+                0U, 1U);
+            default:
+              return std_cxx20::ranges::iota_view<unsigned int, unsigned int>(
+                0U, 0U);
+          }
+      case ReferenceCells::Wedge:
+        switch (face_ref_type)
+          {
+            case ReferenceCells::Triangle:
+              return std_cxx20::ranges::iota_view<unsigned int, unsigned int>(
+                0U, 2U);
+            case ReferenceCells::Quadrilateral:
+              return std_cxx20::ranges::iota_view<unsigned int, unsigned int>(
+                2U, 5U);
+            default:
+              return std_cxx20::ranges::iota_view<unsigned int, unsigned int>(
+                0U, 0U);
+          }
+      case ReferenceCells::Hexahedron:
+        if (face_ref_type == ReferenceCells::Quadrilateral)
+          return this->face_indices();
+        else
+          return std_cxx20::ranges::iota_view<unsigned int, unsigned int>(0U,
+                                                                          0U);
+      default:
+        DEAL_II_NOT_IMPLEMENTED();
+    }
+
+  return std_cxx20::ranges::iota_view<unsigned int, unsigned int>(0U, 0U);
 }
 
 
