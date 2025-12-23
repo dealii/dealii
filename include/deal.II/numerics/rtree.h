@@ -481,25 +481,25 @@ struct RTreeFunctionalVisitor
    * Compile-time flags indicating if internal visitor was provided.
    */
   static constexpr bool has_internal_visitor =
-    !std::is_same<InternalVisitor, empty_visitor>::value;
+    !std::is_same_v<InternalVisitor, empty_visitor>;
 
   /**
    * Compile-time flags indicating if leaf visitor was provided.
    */
   static constexpr bool has_leaf_visitor =
-    !std::is_same<LeafVisitor, empty_visitor>::value;
+    !std::is_same_v<LeafVisitor, empty_visitor>;
 
   /**
    * Compile-time flags indicating if element visitor was provided.
    */
   static constexpr bool has_element_visitor =
-    !std::is_same<ElementVisitor, empty_visitor>::value;
+    !std::is_same_v<ElementVisitor, empty_visitor>;
 
   /**
    * Compile-time flags indicating if indexable visitor was provided.
    */
   static constexpr bool has_indexable_visitor =
-    !std::is_same<IndexableVisitor, empty_visitor>::value;
+    !std::is_same_v<IndexableVisitor, empty_visitor>;
 
   /**
    * Optional callback invoked once per internal node, before descending into
