@@ -1,0 +1,16 @@
+
+DEAL::Visiting R-tree with 8 points, and 2 levels.
+DEAL::Internal node (level 0) box 0.277775, 0.197551 : 0.911647, 0.55397
+DEAL::    Leaf      (level 1) box 0.277775, 0.513401 : 0.364784, 0.55397
+DEAL::        element 4,  indexable 0.277775 0.553970
+DEAL::        element 6,  indexable 0.364784 0.513401
+DEAL::    Leaf      (level 1) box 0.840188, 0.197551 : 0.911647, 0.394383
+DEAL::        element 0,  indexable 0.840188 0.394383
+DEAL::        element 2,  indexable 0.911647 0.197551
+DEAL::Internal node (level 0) box 0.335223, 0.628871 : 0.95223, 0.916195
+DEAL::    Leaf      (level 1) box 0.335223, 0.628871 : 0.477397, 0.76823
+DEAL::        element 3,  indexable 0.335223 0.768230
+DEAL::        element 5,  indexable 0.477397 0.628871
+DEAL::    Leaf      (level 1) box 0.783099, 0.79844 : 0.95223, 0.916195
+DEAL::        element 1,  indexable 0.783099 0.798440
+DEAL::        element 7,  indexable 0.952230 0.916195
