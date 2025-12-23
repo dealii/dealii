@@ -3037,7 +3037,7 @@ namespace TrilinosWrappers
       &) const;
 
 #    ifdef DEAL_II_TRILINOS_WITH_TPETRA
-#      if defined(HAVE_TPETRA_INST_DOUBLE)
+#      if defined(DEAL_II_TRILINOS_WITH_TPETRA_INST_DOUBLE)
   template void
   SparseMatrix::vmult(
     dealii::LinearAlgebra::TpetraWrappers::Vector<double, MemorySpace::Host> &,
@@ -3053,7 +3053,7 @@ namespace TrilinosWrappers
     const;
 #      endif
 
-#      if defined(HAVE_TPETRA_INST_FLOAT)
+#      if defined(DEAL_II_TRILINOS_WITH_TPETRA_INST_FLOAT)
   template void
   SparseMatrix::vmult(
     dealii::LinearAlgebra::TpetraWrappers::Vector<float, MemorySpace::Host> &,
@@ -3089,7 +3089,7 @@ namespace TrilinosWrappers
       &) const;
 
 #    ifdef DEAL_II_TRILINOS_WITH_TPETRA
-#      if defined(HAVE_TPETRA_INST_DOUBLE)
+#      if defined(DEAL_II_TRILINOS_WITH_TPETRA_INST_DOUBLE)
   template void
   SparseMatrix::Tvmult(
     dealii::LinearAlgebra::TpetraWrappers::Vector<double, MemorySpace::Host> &,
@@ -3105,7 +3105,7 @@ namespace TrilinosWrappers
     const;
 #      endif
 
-#      if defined(HAVE_TPETRA_INST_FLOAT)
+#      if defined(DEAL_II_TRILINOS_WITH_TPETRA_INST_FLOAT)
   template void
   SparseMatrix::Tvmult(
     dealii::LinearAlgebra::TpetraWrappers::Vector<float, MemorySpace::Host> &,
@@ -3141,7 +3141,7 @@ namespace TrilinosWrappers
       &) const;
 
 #    ifdef DEAL_II_TRILINOS_WITH_TPETRA
-#      if defined(HAVE_TPETRA_INST_DOUBLE)
+#      if defined(DEAL_II_TRILINOS_WITH_TPETRA_INST_DOUBLE)
   template void
   SparseMatrix::vmult_add(
     dealii::LinearAlgebra::TpetraWrappers::Vector<double, MemorySpace::Host> &,
@@ -3157,7 +3157,7 @@ namespace TrilinosWrappers
     const;
 #      endif
 
-#      if defined(HAVE_TPETRA_INST_FLOAT)
+#      if defined(DEAL_II_TRILINOS_WITH_TPETRA_INST_FLOAT)
   template void
   SparseMatrix::vmult_add(
     dealii::LinearAlgebra::TpetraWrappers::Vector<float, MemorySpace::Host> &,
@@ -3200,7 +3200,7 @@ namespace TrilinosWrappers
 
 
 #    ifdef DEAL_II_TRILINOS_WITH_TPETRA
-#      if defined(HAVE_TPETRA_INST_DOUBLE)
+#      if defined(DEAL_II_TRILINOS_WITH_TPETRA_INST_DOUBLE)
   template void
   SparseMatrix::Tvmult_add(
     dealii::LinearAlgebra::TpetraWrappers::Vector<double, MemorySpace::Host> &,
@@ -3216,7 +3216,7 @@ namespace TrilinosWrappers
     const;
 #      endif
 
-#      if defined(HAVE_TPETRA_INST_FLOAT)
+#      if defined(DEAL_II_TRILINOS_WITH_TPETRA_INST_FLOAT)
   template void
   SparseMatrix::Tvmult_add(
     dealii::LinearAlgebra::TpetraWrappers::Vector<float, MemorySpace::Host> &,

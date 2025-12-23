@@ -30,7 +30,7 @@ namespace LinearAlgebra
     // any mistake in the vector class declaration would
     // show up in uses of this class later on as well.
 
-#  ifdef HAVE_TPETRA_INST_FLOAT
+#  ifdef DEAL_II_TRILINOS_WITH_TPETRA_INST_FLOAT
 #    ifdef DEAL_II_HAVE_CXX20
     static_assert(
       concepts::is_vector_space_vector<BlockVector<float, MemorySpace::Host>>);
@@ -40,7 +40,7 @@ namespace LinearAlgebra
     template class BlockVector<float, MemorySpace::Host>;
     template class BlockVector<float, MemorySpace::Default>;
 #  endif
-#  ifdef HAVE_TPETRA_INST_DOUBLE
+#  ifdef DEAL_II_TRILINOS_WITH_TPETRA_INST_DOUBLE
 #    ifdef DEAL_II_HAVE_CXX20
     static_assert(
       concepts::is_vector_space_vector<BlockVector<double, MemorySpace::Host>>);
@@ -51,7 +51,7 @@ namespace LinearAlgebra
     template class BlockVector<double, MemorySpace::Default>;
 #  endif
 #  ifdef DEAL_II_WITH_COMPLEX_VALUES
-#    ifdef HAVE_TPETRA_INST_COMPLEX_FLOAT
+#    ifdef DEAL_II_TRILINOS_WITH_TPETRA_INST_COMPLEX_FLOAT
 #      ifdef DEAL_II_HAVE_CXX20
     static_assert(concepts::is_vector_space_vector<
                   BlockVector<std::complex<float>, MemorySpace::Host>>);
@@ -61,7 +61,7 @@ namespace LinearAlgebra
     template class BlockVector<std::complex<float>, MemorySpace::Host>;
     template class BlockVector<std::complex<float>, MemorySpace::Default>;
 #    endif
-#    ifdef HAVE_TPETRA_INST_COMPLEX_DOUBLE
+#    ifdef DEAL_II_TRILINOS_WITH_TPETRA_INST_COMPLEX_DOUBLE
 #      ifdef DEAL_II_HAVE_CXX20
     static_assert(concepts::is_vector_space_vector<
                   BlockVector<std::complex<double>, MemorySpace::Host>>);
