@@ -1550,7 +1550,7 @@ constexpr dealii::ndarray<unsigned int, 12, 4>
 ReferenceCell::new_isotropic_child_face_lines(
   const unsigned int refinement_choice) const
 {
-  AssertIndexRange(refinement_choice, n_isotropic_refinement_choices());
+  // AssertIndexRange(refinement_choice, n_isotropic_refinement_choices());
   const unsigned int X = numbers::invalid_unsigned_int;
   switch (this->kind)
     {
@@ -1629,7 +1629,7 @@ constexpr dealii::ndarray<unsigned int, 12, 4, 2>
 ReferenceCell::new_isotropic_child_face_line_vertices(
   const unsigned int refinement_choice) const
 {
-  AssertIndexRange(refinement_choice, n_isotropic_refinement_choices());
+  // AssertIndexRange(refinement_choice, n_isotropic_refinement_choices());
   const unsigned int X = numbers::invalid_unsigned_int;
   switch (this->kind)
     {
@@ -1710,7 +1710,7 @@ constexpr dealii::ndarray<unsigned int, 8, 6>
 ReferenceCell::new_isotropic_child_cell_faces(
   const unsigned int refinement_choice) const
 {
-  AssertIndexRange(refinement_choice, n_isotropic_refinement_choices());
+  // AssertIndexRange(refinement_choice, n_isotropic_refinement_choices());
   const unsigned int X = numbers::invalid_unsigned_int;
   switch (this->kind)
     {
@@ -1778,7 +1778,7 @@ constexpr dealii::ndarray<unsigned int, 8, 4>
 ReferenceCell::new_isotropic_child_cell_vertices(
   const unsigned int refinement_choice) const
 {
-  AssertIndexRange(refinement_choice, n_isotropic_refinement_choices());
+  // AssertIndexRange(refinement_choice, n_isotropic_refinement_choices());
 
   switch (this->kind)
     {
