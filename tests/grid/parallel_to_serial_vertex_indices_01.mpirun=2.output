@@ -1,0 +1,39 @@
+
+DEAL:0::Test 1d in 1d
+DEAL:0:: serial vertices: 5, parallel vertices: 4 (owned vertices: 4)
+DEAL:0::Checked 3 locally owned vertices.
+DEAL:0::Test 1d in 2d
+DEAL:0:: serial vertices: 5, parallel vertices: 4 (owned vertices: 4)
+DEAL:0::Checked 3 locally owned vertices.
+DEAL:0::Test 1d in 3d
+DEAL:0:: serial vertices: 5, parallel vertices: 4 (owned vertices: 4)
+DEAL:0::Checked 3 locally owned vertices.
+DEAL:0::Test 2d in 2d
+DEAL:0:: serial vertices: 16, parallel vertices: 16 (owned vertices: 16)
+DEAL:0::Checked 9 locally owned vertices.
+DEAL:0::Test 2d in 3d
+DEAL:0:: serial vertices: 16, parallel vertices: 16 (owned vertices: 16)
+DEAL:0::Checked 9 locally owned vertices.
+DEAL:0::Test 3d in 3d
+DEAL:0:: serial vertices: 27, parallel vertices: 27 (owned vertices: 27)
+DEAL:0::Checked 18 locally owned vertices.
+
+DEAL:1::Test 1d in 1d
+DEAL:1:: serial vertices: 5, parallel vertices: 4 (owned vertices: 2)
+DEAL:1::Checked 2 locally owned vertices.
+DEAL:1::Test 1d in 2d
+DEAL:1:: serial vertices: 5, parallel vertices: 4 (owned vertices: 2)
+DEAL:1::Checked 2 locally owned vertices.
+DEAL:1::Test 1d in 3d
+DEAL:1:: serial vertices: 5, parallel vertices: 4 (owned vertices: 2)
+DEAL:1::Checked 2 locally owned vertices.
+DEAL:1::Test 2d in 2d
+DEAL:1:: serial vertices: 16, parallel vertices: 15 (owned vertices: 7)
+DEAL:1::Checked 7 locally owned vertices.
+DEAL:1::Test 2d in 3d
+DEAL:1:: serial vertices: 16, parallel vertices: 15 (owned vertices: 7)
+DEAL:1::Checked 7 locally owned vertices.
+DEAL:1::Test 3d in 3d
+DEAL:1:: serial vertices: 27, parallel vertices: 27 (owned vertices: 9)
+DEAL:1::Checked 9 locally owned vertices.
+
