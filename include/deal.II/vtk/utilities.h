@@ -20,6 +20,8 @@
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/point.h>
 
+#include <deal.II/fe/fe.h>
+
 #include <deal.II/grid/tria.h>
 
 #ifdef DEAL_II_WITH_VTK
@@ -109,6 +111,37 @@ namespace VTKWrappers
   read_vertex_data(const std::string &vtk_filename,
                    const std::string &vertex_data_name,
                    Vector<double>    &output_vector);
+
+  /**
+   * Create a FiniteElement representation for data stored in a VTK file.
+   *
+   * This function inspects the specified VTK file and builds a FiniteElement
+   * (typically an FESystem) that can store the data fields contained in the
+   * file. It returns a pair consisting of a std::unique_ptr to the constructed
+   * FiniteElement and a vector of field names corresponding to the VTK data
+   * arrays.
+   *
+   * Only meshes with a single cell type are supported (either all quads/hexes
+   * or all triangles/tetrahedra). Mixed meshes are not supported. The mesh type
+   * is inferred from the first cell encountered in the VTK file.
+   *
+   * Mapping rules:
+   * - Vertex data (VTK point data):
+   *   - quad/hex meshes: represented by FE_Q(1) blocks;
+   *   - simplex meshes: represented by FE_SimplexP(1) blocks.
+   * - Cell data (VTK cell data):
+   *   - quad/hex meshes: represented by FE_DGQ(0) blocks;
+   *   - simplex meshes: represented by FE_SimplexDGP(0) blocks.
+   *
+   *   Vector-valued cell or vertex data are represented as an FESystem of the
+   *   scalar cell element repeated for each component.
+   *
+   * @param vtk_filename The path to the input VTK file.
+   */
+  template <int dim, int spacedim>
+  std::pair<std::unique_ptr<FiniteElement<dim, spacedim>>,
+            std::vector<std::string>>
+  vtk_to_finite_element(const std::string &vtk_filename);
 
 #  ifndef DOXYGEN
   // Template implementations
