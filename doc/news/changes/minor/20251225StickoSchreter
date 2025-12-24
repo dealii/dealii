@@ -1,0 +1,5 @@
+New: Make NonMatching::MeshClassifier handle the case where the zero contour of
+a level set function aligns perfectly with a face in the mesh, by adding a new
+entry, "aligned", in the enum LocationToLevelSet.
+<br>
+(Simon Sticko, Magdalena Schreter-Fleischhacker, 2025/12/25)
