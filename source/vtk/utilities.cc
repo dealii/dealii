@@ -68,12 +68,56 @@
 #  include <vtkUnstructuredGrid.h>
 #  include <vtkUnstructuredGridReader.h>
 
+#  include <fstream>
 #  include <stdexcept>
 
 DEAL_II_NAMESPACE_OPEN
 
 namespace VTKWrappers
 {
+  namespace internal
+  {
+    vtkSmartPointer<vtkUnstructuredGrid>
+    load_vtk_file(const std::string &vtk_filename,
+                  const bool         cleanup,
+                  const double       relative_tolerance)
+    {
+      // check that the file exists
+      std::ifstream file(vtk_filename);
+      AssertThrow(file.good(),
+                  ExcMessage("VTK file not found: " + vtk_filename));
+
+      vtkSmartPointer<vtkUnstructuredGrid> out =
+        vtkSmartPointer<vtkUnstructuredGrid>::New();
+
+      auto reader = vtkSmartPointer<vtkUnstructuredGridReader>::New();
+      reader->SetFileName(vtk_filename.c_str());
+      reader->Update();
+      out->ShallowCopy(reader->GetOutput());
+
+#  if DEAL_II_VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 3, 0)
+      if (cleanup)
+        {
+          auto cleaner = vtkSmartPointer<vtkCleanUnstructuredGrid>::New();
+          cleaner->SetToleranceIsAbsolute(false);
+          cleaner->SetTolerance(relative_tolerance);
+          cleaner->SetInputData(out);
+          cleaner->Update();
+          out->ShallowCopy(cleaner->GetOutput());
+        }
+#  else
+      (void)cleanup;            // avoid unused variable warning
+      (void)relative_tolerance; // avoid unused variable warning
+      deallog << "VTK version < 9.3: skipping cleanup step." << std::endl;
+#  endif
+
+      AssertThrow(out, ExcMessage("Failed to read VTK file: " + vtk_filename));
+      return out;
+    }
+  } // namespace internal
+
+
+
   template <int dim, int spacedim>
   void
   read_tria(const std::string            &vtk_filename,
@@ -81,37 +125,8 @@ namespace VTKWrappers
             const bool                    cleanup,
             const double                  relative_tolerance)
   {
-    auto reader = vtkSmartPointer<vtkUnstructuredGridReader>::New();
-    {
-      // check that the file exists
-      std::ifstream file(vtk_filename);
-      AssertThrow(file.good(),
-                  ExcMessage("VTK file not found: " + vtk_filename));
-    }
-    reader->SetFileName(vtk_filename.c_str());
-    reader->Update();
-    vtkUnstructuredGrid *grid = reader->GetOutput();
-    AssertThrow(grid, ExcMessage("Failed to read VTK file: " + vtk_filename));
-
-#  if DEAL_II_VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 3, 0)
-    auto cleaner = vtkSmartPointer<vtkCleanUnstructuredGrid>::New();
-
-    // Cleanup the triangulation if requested
-    if (cleanup)
-      {
-        cleaner->SetToleranceIsAbsolute(false);
-        cleaner->SetTolerance(relative_tolerance);
-        cleaner->SetInputData(grid);
-        cleaner->Update();
-        grid = cleaner->GetOutput();
-        AssertThrow(grid,
-                    ExcMessage("Failed to clean VTK file: " + vtk_filename));
-      }
-#  else
-    (void)cleanup;            // avoid unused variable warning
-    (void)relative_tolerance; // avoid unused variable warning
-    deallog << "VTK version < 9.3: skipping cleanup step." << std::endl;
-#  endif
+    vtkSmartPointer<vtkUnstructuredGrid> grid =
+      internal::load_vtk_file(vtk_filename, cleanup, relative_tolerance);
 
     // Read points
     vtkPoints                   *vtk_points = grid->GetPoints();
@@ -194,7 +209,8 @@ namespace VTKWrappers
                 for (unsigned int j = 0; j < 8; ++j)
                   cell_data.vertices[j] = cell->GetPointId(j);
                 cell_data.material_id = 0;
-                // Numbering of vertices in VTK files is different from deal.II
+                // Numbering of vertices in VTK files is different from
+                // deal.II
                 std::swap(cell_data.vertices[2], cell_data.vertices[3]);
                 std::swap(cell_data.vertices[6], cell_data.vertices[7]);
                 cells.push_back(cell_data);
@@ -256,19 +272,12 @@ namespace VTKWrappers
   void
   read_cell_data(const std::string &vtk_filename,
                  const std::string &cell_data_name,
-                 Vector<double>    &output_vector)
+                 Vector<double>    &output_vector,
+                 const bool         cleanup,
+                 const double       relative_tolerance)
   {
-    {
-      // check that the file exists
-      std::ifstream file(vtk_filename);
-      AssertThrow(file.good(),
-                  ExcMessage("VTK file not found: " + vtk_filename));
-    }
-    auto reader = vtkSmartPointer<vtkUnstructuredGridReader>::New();
-    reader->SetFileName(vtk_filename.c_str());
-    reader->Update();
-    vtkUnstructuredGrid *grid = reader->GetOutput();
-    AssertThrow(grid, ExcMessage("Failed to read VTK file: " + vtk_filename));
+    vtkSmartPointer<vtkUnstructuredGrid> grid =
+      internal::load_vtk_file(vtk_filename, cleanup, relative_tolerance);
     vtkDataArray *data_array =
       grid->GetCellData()->GetArray(cell_data_name.c_str());
     AssertThrow(data_array,
@@ -286,24 +295,17 @@ namespace VTKWrappers
 
   void
   read_vertex_data(const std::string &vtk_filename,
-                   const std::string &point_data_name,
-                   Vector<double>    &output_vector)
+                   const std::string &vertex_data_name,
+                   Vector<double>    &output_vector,
+                   const bool         cleanup,
+                   const double       relative_tolerance)
   {
-    {
-      // check that the file exists
-      std::ifstream file(vtk_filename);
-      AssertThrow(file.good(),
-                  ExcMessage("VTK file not found: " + vtk_filename));
-    }
-    auto reader = vtkSmartPointer<vtkUnstructuredGridReader>::New();
-    reader->SetFileName(vtk_filename.c_str());
-    reader->Update();
-    vtkUnstructuredGrid *grid = reader->GetOutput();
-    AssertThrow(grid, ExcMessage("Failed to read VTK file: " + vtk_filename));
+    vtkSmartPointer<vtkUnstructuredGrid> grid =
+      internal::load_vtk_file(vtk_filename, cleanup, relative_tolerance);
     vtkDataArray *data_array =
-      grid->GetPointData()->GetArray(point_data_name.c_str());
+      grid->GetPointData()->GetArray(vertex_data_name.c_str());
     AssertThrow(data_array,
-                ExcMessage("Point data array '" + point_data_name +
+                ExcMessage("Point data array '" + vertex_data_name +
                            "' not found in VTK file: " + vtk_filename));
     vtkIdType n_tuples     = data_array->GetNumberOfTuples();
     int       n_components = data_array->GetNumberOfComponents();
@@ -315,17 +317,69 @@ namespace VTKWrappers
 
 
 
+  void
+  read_all_data(const std::string &vtk_filename,
+                Vector<double>    &output_vector,
+                const bool         cleanup,
+                const double       relative_tolerance)
+  {
+    vtkSmartPointer<vtkUnstructuredGrid> grid =
+      internal::load_vtk_file(vtk_filename, cleanup, relative_tolerance);
+
+    std::vector<double> data;
+
+    vtkPointData *point_data = grid->GetPointData();
+    if (point_data)
+      {
+        for (int i = 0; i < point_data->GetNumberOfArrays(); ++i)
+          {
+            vtkDataArray *data_array = point_data->GetArray(i);
+            if (!data_array)
+              continue;
+            vtkIdType    n_tuples     = data_array->GetNumberOfTuples();
+            int          n_components = data_array->GetNumberOfComponents();
+            unsigned int current_size = data.size();
+            data.resize(current_size + n_tuples * n_components, 0.0);
+            for (vtkIdType tuple_idx = 0; tuple_idx < n_tuples; ++tuple_idx)
+              for (int comp_idx = 0; comp_idx < n_components; ++comp_idx)
+                data[current_size + tuple_idx * n_components + comp_idx] =
+                  data_array->GetComponent(tuple_idx, comp_idx);
+          }
+      }
+
+    vtkCellData *cell_data = grid->GetCellData();
+    if (cell_data)
+      {
+        for (int i = 0; i < cell_data->GetNumberOfArrays(); ++i)
+          {
+            vtkDataArray *data_array = cell_data->GetArray(i);
+            if (!data_array)
+              continue;
+            vtkIdType    n_tuples     = data_array->GetNumberOfTuples();
+            int          n_components = data_array->GetNumberOfComponents();
+            unsigned int current_size = data.size();
+            data.resize(current_size + n_tuples * n_components, true);
+            for (vtkIdType tuple_idx = 0; tuple_idx < n_tuples; ++tuple_idx)
+              for (int comp_idx = 0; comp_idx < n_components; ++comp_idx)
+                data[current_size + tuple_idx * n_components + comp_idx] =
+                  data_array->GetComponent(tuple_idx, comp_idx);
+          }
+      }
+    output_vector.reinit(data.size());
+    std::copy(data.begin(), data.end(), output_vector.begin());
+  }
+
+
+
   template <int dim, int spacedim>
   std::pair<std::unique_ptr<FiniteElement<dim, spacedim>>,
             std::vector<std::string>>
   vtk_to_finite_element(const std::string &vtk_filename)
   {
     std::vector<std::string> data_names;
-    auto reader = vtkSmartPointer<vtkUnstructuredGridReader>::New();
-    reader->SetFileName(vtk_filename.c_str());
-    reader->Update();
-    vtkUnstructuredGrid *grid = reader->GetOutput();
-    AssertThrow(grid, ExcMessage("Failed to read VTK file: " + vtk_filename));
+
+    vtkSmartPointer<vtkUnstructuredGrid> grid =
+      internal::load_vtk_file(vtk_filename, false, 0.0);
 
     vtkCellData  *cell_data  = grid->GetCellData();
     vtkPointData *point_data = grid->GetPointData();
@@ -470,6 +524,12 @@ namespace VTKWrappers
 
   void
   read_vertex_data(const std::string &, const std::string &, Vector<double> &)
+  {
+    AssertThrow(false, ExcMessage("deal.II is not built with VTK support."));
+  }
+
+  void
+  read_all_data(const std::string &, Vector<double> &, const bool, const double)
   {
     AssertThrow(false, ExcMessage("deal.II is not built with VTK support."));
   }

@@ -27,6 +27,10 @@
 #ifdef DEAL_II_WITH_VTK
 
 #  include <vtkDoubleArray.h>
+#  include <vtkSmartPointer.h>
+#  include <vtkUnstructuredGrid.h>
+
+#  include <string>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -45,6 +49,28 @@ DEAL_II_NAMESPACE_OPEN
  */
 namespace VTKWrappers
 {
+  namespace internal
+  {
+    /**
+     * Load a VTK file containing an unstructured grid and return the
+     * unstructured grid object.
+     *
+     * If cleanup is true, overlapping points in the VTK file are merged using
+     * VTK's cleaning utilities (only available in VTK >= 9.3).
+     *
+     * If the read operation fails, an exception is thrown.
+     *
+     * @param vtk_filename
+     * @param cleanup
+     * @param relative_tolerance
+     * @return vtkUnstructuredGrid*
+     */
+    vtkSmartPointer<vtkUnstructuredGrid>
+    load_vtk_file(const std::string &vtk_filename,
+                  const bool         cleanup            = true,
+                  const double       relative_tolerance = 0.0);
+  } // namespace internal
+
   /**
    * Convert from a deal.II Point to a VTK double array.
    *
@@ -92,7 +118,9 @@ namespace VTKWrappers
   void
   read_cell_data(const std::string &vtk_filename,
                  const std::string &cell_data_name,
-                 Vector<double>    &output_vector);
+                 Vector<double>    &output_vector,
+                 const bool         cleanup            = true,
+                 const double       relative_tolerance = 0.0);
 
   /**
    * Read vertex data from a VTK file and store it in the output vector.
@@ -110,7 +138,36 @@ namespace VTKWrappers
   void
   read_vertex_data(const std::string &vtk_filename,
                    const std::string &vertex_data_name,
-                   Vector<double>    &output_vector);
+                   Vector<double>    &output_vector,
+                   const bool         cleanup            = true,
+                   const double       relative_tolerance = 0.0);
+
+  /**
+   * Read all field data from a VTK file and store it in the output vector.
+   *
+   * This function reads all field data arrays (scalar or vector, cell or point
+   * data) from the given VTK file and stores it in the provided output vector.
+   *
+   * The data is output in the following way:
+   * - first all vertex data (point data) in the order they are found in the
+   *   VTK file, with all components stored in row-major order (vertex0_comp0,
+   *   vertex0_comp1, ..., vertex1_comp0, ...)
+   * - then all cell data (cell data) in the order they are found in the VTK
+   * file, with all components stored in row-major order (cell0_comp0,
+   * cell0_comp1, ...).
+   *
+   * This is equivalent to calling read_vertex_data() for each vertex data
+   * field, and then read_cell_data() for each cell data field, and
+   * concatenating the resulting vectors in a single long vector.
+   *
+   * @param vtk_filename The name of the input VTK file.
+   * @param output_vector The vector to store the vertex data values.
+   */
+  void
+  read_all_data(const std::string &vtk_filename,
+                Vector<double>    &output_vector,
+                const bool         cleanup            = true,
+                const double       relative_tolerance = 0.0);
 
   /**
    * Create a FiniteElement representation for data stored in a VTK file.
