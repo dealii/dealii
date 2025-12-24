@@ -114,6 +114,10 @@ namespace VTKWrappers
    * @param vtk_filename The name of the input VTK file.
    * @param cell_data_name The name of the cell data array to read.
    * @param output_vector The vector to store the cell data values.
+   * @param cleanup If true, merge overlapping points in the VTK file (default:
+   * true).
+   * @param relative_tolerance Relative tolerance used when merging points via
+   * VTK's cleaning utilities (default: 0).
    */
   void
   read_cell_data(const std::string &vtk_filename,
@@ -134,6 +138,10 @@ namespace VTKWrappers
    * @param vtk_filename The name of the input VTK file.
    * @param vertex_data_name The name of the vertex data array to read.
    * @param output_vector The vector to store the vertex data values.
+   * @param cleanup If true, merge overlapping points in the VTK file (default:
+   * true).
+   * @param relative_tolerance Relative tolerance used when merging points via
+   * VTK's cleaning utilities (default: 0).
    */
   void
   read_vertex_data(const std::string &vtk_filename,
@@ -162,6 +170,10 @@ namespace VTKWrappers
    *
    * @param vtk_filename The name of the input VTK file.
    * @param output_vector The vector to store the vertex data values.
+   * @param cleanup If true, merge overlapping points in the VTK file (default:
+   * true).
+   * @param relative_tolerance Relative tolerance used when merging points via
+   * VTK's cleaning utilities (default: 0).
    */
   void
   read_all_data(const std::string &vtk_filename,
