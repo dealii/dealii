@@ -823,9 +823,9 @@ namespace internal
             ReferenceCell::n_vertices_to_type(dim, cell.vertices.size()));
 
           // create CRS of vertices (to remove template argument dim)
-          for (const auto &vertex : cell.vertices)
-            cell_vertices.push_back(vertex);
-
+          cell_vertices.insert(cell_vertices.end(),
+                               cell.vertices.begin(),
+                               cell.vertices.end());
           cell_vertices_ptr.push_back(cell_vertices.size());
         }
 
