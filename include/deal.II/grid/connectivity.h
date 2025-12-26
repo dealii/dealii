@@ -52,9 +52,10 @@ namespace internal
       /**
        * Constructor which allows to set the internal fields directly.
        */
-      CRS(const std::vector<std::size_t> &ptr, const std::vector<T> &col)
-        : ptr(ptr)
-        , col(col)
+      CRS(const std::vector<std::size_t> &offsets,
+          const std::vector<T>           &elements)
+        : ptr(offsets)
+        , col(elements)
       {}
 
       // row index
@@ -790,9 +791,9 @@ namespace internal
                                                      cell.vertices.size();
                                             }));
 
-      std::vector<std::size_t> cell_vertices_ptr;
-      cell_vertices_ptr.reserve(cells.size() + 1);
-      cell_vertices_ptr.push_back(0);
+      std::vector<std::size_t> cell_vertices_offsets;
+      cell_vertices_offsets.reserve(cells.size() + 1);
+      cell_vertices_offsets.push_back(0);
 
       std::vector<ReferenceCell> cell_types;
       cell_types.reserve(cells.size());
@@ -826,13 +827,13 @@ namespace internal
           cell_vertices.insert(cell_vertices.end(),
                                cell.vertices.begin(),
                                cell.vertices.end());
-          cell_vertices_ptr.push_back(cell_vertices.size());
+          cell_vertices_offsets.push_back(cell_vertices.size());
         }
 
       // do the actual work
       return build_connectivity<T>(dim,
                                    cell_types,
-                                   {cell_vertices_ptr, cell_vertices});
+                                   {cell_vertices_offsets, cell_vertices});
     }
   } // namespace TriangulationImplementation
 } // namespace internal
