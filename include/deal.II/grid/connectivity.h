@@ -48,22 +48,27 @@ namespace internal
        * Default constructor.
        */
       CRS()
-        : ptr{0} {};
+        : offsets{0} {};
 
       /**
        * Constructor which allows to set the internal fields directly.
        */
       CRS(const std::vector<std::size_t> &offsets,
-          const std::vector<T>           &elements)
-        : ptr(offsets)
-        , col(elements)
+          const std::vector<T>           &columns)
+        : offsets(offsets)
+        , columns(columns)
       {}
 
-      // row index
-      std::vector<std::size_t> ptr;
+      /**
+       * For each row in the CRS, store the corresponding offsets in the
+       * 'elements' array.
+       */
+      std::vector<std::size_t> offsets;
 
-      // column index
-      std::vector<T> col;
+      /**
+       * The elements (typically column indices) stored in the CRS.
+       */
+      std::vector<T> columns;
     };
 
 
@@ -223,41 +228,44 @@ namespace internal
     void
     determine_neighbors(const CRS<T> &con_cf, CRS<T> &con_cc)
     {
-      const auto &col_cf = con_cf.col;
-      const auto &ptr_cf = con_cf.ptr;
+      const auto &columns_cf = con_cf.columns;
+      const auto &offsets_cf = con_cf.offsets;
 
-      auto &col_cc = con_cc.col;
-      auto &ptr_cc = con_cc.ptr;
+      auto &columns_cc = con_cc.columns;
+      auto &offsets_cc = con_cc.offsets;
 
       const unsigned int n_faces =
-        *std::max_element(col_cf.begin(), col_cf.end()) + 1;
+        *std::max_element(columns_cf.begin(), columns_cf.end()) + 1;
 
       // clear and initialize with -1 (assume that all faces are at the
       // boundary)
-      col_cc = std::vector<T>(col_cf.size(), -1);
-      ptr_cc = ptr_cf;
+      columns_cc = std::vector<T>(columns_cf.size(), -1);
+      offsets_cc = offsets_cf;
 
       std::vector<std::pair<T, unsigned int>> neighbors(n_faces, {-1, -1});
 
       // loop over all cells
-      for (unsigned int i_0 = 0; i_0 < ptr_cf.size() - 1; ++i_0)
+      for (unsigned int i_0 = 0; i_0 < offsets_cf.size() - 1; ++i_0)
         {
           // ... and all its faces
-          for (std::size_t j_0 = ptr_cf[i_0]; j_0 < ptr_cf[i_0 + 1]; ++j_0)
+          for (std::size_t j_0 = offsets_cf[i_0]; j_0 < offsets_cf[i_0 + 1];
+               ++j_0)
             {
-              if (neighbors[col_cf[j_0]].first == static_cast<unsigned int>(-1))
+              if (neighbors[columns_cf[j_0]].first ==
+                  static_cast<unsigned int>(-1))
                 {
                   // face is visited the first time -> save the visiting cell
                   // and the face pointer
-                  neighbors[col_cf[j_0]] = std::pair<T, unsigned int>(i_0, j_0);
+                  neighbors[columns_cf[j_0]] =
+                    std::pair<T, unsigned int>(i_0, j_0);
                 }
               else
                 {
                   // face is visited the second time -> now we know the cells
                   // on both sides of the face and we can determine for both
                   // cells the neighbor
-                  col_cc[j_0] = neighbors[col_cf[j_0]].first;
-                  col_cc[neighbors[col_cf[j_0]].second] = i_0;
+                  columns_cc[j_0] = neighbors[columns_cf[j_0]].first;
+                  columns_cc[neighbors[columns_cf[j_0]].second] = i_0;
                 }
             }
         }
@@ -285,19 +293,19 @@ namespace internal
     {
       const bool compatibility_mode = true;
 
-      const std::vector<std::size_t>  &cell_ptr      = crs.ptr;
-      const std::vector<unsigned int> &cell_vertices = crs.col;
-      std::vector<std::size_t>        &ptr_d         = crs_d.ptr;
-      std::vector<unsigned int>       &col_d         = crs_d.col;
+      const std::vector<std::size_t>  &cell_offsets  = crs.offsets;
+      const std::vector<unsigned int> &cell_vertices = crs.columns;
+      std::vector<std::size_t>        &offsets_d     = crs_d.offsets;
+      std::vector<unsigned int>       &columns_d     = crs_d.columns;
 
       // note: we do not pre-allocate memory for these arrays because it turned
       // out that counting unique entities is more expensive than push_back().
-      std::vector<std::size_t>  &ptr_0 = crs_0.ptr;
-      std::vector<unsigned int> &col_0 = crs_0.col;
+      std::vector<std::size_t>  &offsets_0 = crs_0.offsets;
+      std::vector<unsigned int> &columns_0 = crs_0.columns;
 
       // clear
-      ptr_0 = {};
-      col_0 = {};
+      offsets_0 = {};
+      columns_0 = {};
 
       unsigned int n_entities = 0;
 
@@ -331,8 +339,8 @@ namespace internal
       ad_entity_types.reserve(n_entities);
       ad_compatibility.reserve(n_entities);
 
-      ptr_d.resize(cell_types.size() + 1);
-      ptr_d[0] = 0;
+      offsets_d.resize(cell_types.size() + 1);
+      offsets_d[0] = 0;
 
       static const unsigned int offset = 1;
 
@@ -351,11 +359,12 @@ namespace internal
             (face_dimensionality == cell_type.get_dimension() - 1 ?
                cell_type.n_faces() :
                cell_type.n_lines());
-          ptr_d[c + 1] = ptr_d[c] + n_face_entities;
+          offsets_d[c + 1] = offsets_d[c] + n_face_entities;
 
           // ... collect vertices of cell
           const dealii::ArrayView<const unsigned int> local_vertices(
-            cell_vertices.data() + cell_ptr[c], cell_ptr[c + 1] - cell_ptr[c]);
+            cell_vertices.data() + cell_offsets[c],
+            cell_offsets[c + 1] - cell_offsets[c]);
 
           // ... loop over all its entities
           for (unsigned int e = 0; e < n_face_entities; ++e)
@@ -417,7 +426,7 @@ namespace internal
             }
         }
 
-      col_d.resize(keys.size());
+      columns_d.resize(keys.size());
       orientations.reinit(keys.size());
 
       // step 2: sort according to key so that entities with same key can be
@@ -452,8 +461,8 @@ namespace internal
 
           std::sort(keys.begin(), keys.end());
 
-          ptr_0.reserve(n_unique_entities + 1);
-          col_0.reserve(n_unique_entity_vertices);
+          offsets_0.reserve(n_unique_entities + 1);
+          columns_0.reserve(n_unique_entity_vertices);
         }
 
 
@@ -473,10 +482,10 @@ namespace internal
               ref_key     = std::get<0>(keys[i]);
               ref_indices = ad_entity_vertices[offset_i];
 
-              ptr_0.push_back(col_0.size());
+              offsets_0.push_back(columns_0.size());
               for (const auto j : ad_entity_vertices[offset_i])
                 if (j != 0)
-                  col_0.push_back(j - offset);
+                  columns_0.push_back(j - offset);
             }
           else
             {
@@ -493,9 +502,9 @@ namespace internal
                                     ref_indices.begin() +
                                       ad_entity_types[offset_i].n_vertices())));
             }
-          col_d[offset_i] = counter;
+          columns_d[offset_i] = counter;
         }
-      ptr_0.push_back(col_0.size());
+      offsets_0.push_back(columns_0.size());
     }
 
 
@@ -582,48 +591,48 @@ namespace internal
     )
     {
       // reset output
-      con_ql.ptr = {};
-      con_ql.col = {};
+      con_ql.offsets = {};
+      con_ql.columns = {};
 
-      con_ql.ptr.resize(con_qv.ptr.size());
-      con_ql.ptr[0] = 0;
+      con_ql.offsets.resize(con_qv.offsets.size());
+      con_ql.offsets[0] = 0;
 
-      quad_t_id.resize(con_qv.ptr.size() - 1);
+      quad_t_id.resize(con_qv.offsets.size() - 1);
 
       // count the number of lines of each face
-      for (unsigned int c = 0; c < con_cq.ptr.size() - 1; ++c)
+      for (unsigned int c = 0; c < con_cq.offsets.size() - 1; ++c)
         {
           // loop over faces
-          for (unsigned int f_ = con_cq.ptr[c], f_index = 0;
-               f_ < con_cq.ptr[c + 1];
+          for (unsigned int f_ = con_cq.offsets[c], f_index = 0;
+               f_ < con_cq.offsets[c + 1];
                ++f_, ++f_index)
             {
-              const unsigned int f = con_cq.col[f_];
+              const unsigned int f = con_cq.columns[f_];
 
-              con_ql.ptr[f + 1] =
+              con_ql.offsets[f + 1] =
                 cell_types[c].face_reference_cell(f_index).n_lines();
             }
         }
 
       // use the counts to determine the offsets -> prefix sum
-      for (unsigned int i = 0; i < con_ql.ptr.size() - 1; ++i)
-        con_ql.ptr[i + 1] += con_ql.ptr[i];
+      for (unsigned int i = 0; i < con_ql.offsets.size() - 1; ++i)
+        con_ql.offsets[i + 1] += con_ql.offsets[i];
 
       // allocate memory
-      con_ql.col.resize(con_ql.ptr.back());
-      ori_ql.reinit(con_ql.ptr.back());
+      con_ql.columns.resize(con_ql.offsets.back());
+      ori_ql.reinit(con_ql.offsets.back());
 
       // loop over cells
-      for (unsigned int c = 0; c < con_cq.ptr.size() - 1; ++c)
+      for (unsigned int c = 0; c < con_cq.offsets.size() - 1; ++c)
         {
           const ReferenceCell cell_type = cell_types[c];
 
           // loop over faces
-          for (unsigned int f_ = con_cq.ptr[c], f_index = 0;
-               f_ < con_cq.ptr[c + 1];
+          for (unsigned int f_ = con_cq.offsets[c], f_index = 0;
+               f_ < con_cq.offsets[c + 1];
                ++f_, ++f_index)
             {
-              const unsigned int f = con_cq.col[f_];
+              const unsigned int f = con_cq.columns[f_];
 
               // only faces with default orientation have to do something
               if (ori_cq.get_combined_orientation(f_) !=
@@ -639,19 +648,20 @@ namespace internal
                     cell_type.face_to_cell_lines(
                       f_index, l, numbers::default_geometric_orientation);
                   const unsigned int global_line_index =
-                    con_cl.col[con_cl.ptr[c] + local_line_index];
-                  con_ql.col[con_ql.ptr[f] + l] = global_line_index;
+                    con_cl.columns[con_cl.offsets[c] + local_line_index];
+                  con_ql.columns[con_ql.offsets[f] + l] = global_line_index;
 
                   // determine orientation of line
                   bool same = true;
                   for (unsigned int v = 0; v < 2; ++v)
-                    if (con_cv.col[con_cv.ptr[c] +
+                    if (con_cv
+                          .columns[con_cv.offsets[c] +
                                    cell_type.face_and_line_to_cell_vertices(
                                      f_index,
                                      l,
                                      v,
                                      numbers::default_geometric_orientation)] !=
-                        con_lv.col[con_lv.ptr[global_line_index] + v])
+                        con_lv.columns[con_lv.offsets[global_line_index] + v])
                       {
                         same = false;
                         break;
@@ -659,7 +669,7 @@ namespace internal
 
                   // ... comparison gives orientation
                   ori_ql.set_combined_orientation(
-                    con_ql.ptr[f] + l,
+                    con_ql.offsets[f] + l,
                     same ? numbers::default_geometric_orientation :
                            numbers::reverse_line_orientation);
                 }
@@ -730,17 +740,19 @@ namespace internal
               for (; l < cell_type.face_reference_cell(f).n_lines(); ++l)
                 {
                   AssertIndexRange(l, key.size());
-                  AssertIndexRange(c, temp1.ptr.size());
-                  AssertIndexRange(temp1.ptr[c] +
+                  AssertIndexRange(c, temp1.offsets.size());
+                  AssertIndexRange(temp1.offsets[c] +
                                      cell_type.face_to_cell_lines(
                                        f,
                                        l,
                                        numbers::default_geometric_orientation),
-                                   temp1.col.size());
+                                   temp1.columns.size());
                   key[l] =
-                    temp1.col[temp1.ptr[c] +
-                              cell_type.face_to_cell_lines(
-                                f, l, numbers::default_geometric_orientation)] +
+                    temp1.columns[temp1.offsets[c] +
+                                  cell_type.face_to_cell_lines(
+                                    f,
+                                    l,
+                                    numbers::default_geometric_orientation)] +
                     1 /*offset!*/;
                 }
 
