@@ -781,13 +781,14 @@ namespace internal
 
       // determine cell types and process vertices
       std::vector<T> cell_vertices;
-      cell_vertices.reserve(
-        std::accumulate(cells.begin(),
-                        cells.end(),
-                        0,
-                        [](const auto &result, const auto &cell) {
-                          return result + cell.vertices.size();
-                        }));
+      cell_vertices.reserve(std::accumulate(cells.begin(),
+                                            cells.end(),
+                                            0u,
+                                            [](const unsigned int   accumulator,
+                                               const CellData<dim> &cell) {
+                                              return accumulator +
+                                                     cell.vertices.size();
+                                            }));
 
       std::vector<std::size_t> cell_vertices_ptr;
       cell_vertices_ptr.reserve(cells.size() + 1);
