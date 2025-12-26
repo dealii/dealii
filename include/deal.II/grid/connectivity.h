@@ -819,12 +819,8 @@ namespace internal
                   "CellData."));
             }
 
-          const ReferenceCell reference_cell =
-            ReferenceCell::n_vertices_to_type(dim, cell.vertices.size());
-
-          Assert(reference_cell != ReferenceCells::Invalid,
-                 ExcNotImplemented());
-          cell_types.push_back(reference_cell);
+          cell_types.push_back(
+            ReferenceCell::n_vertices_to_type(dim, cell.vertices.size()));
 
           // create CRS of vertices (to remove template argument dim)
           for (const auto &vertex : cell.vertices)
