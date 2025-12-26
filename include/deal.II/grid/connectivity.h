@@ -25,6 +25,7 @@
 #include <deal.II/grid/tria_objects_orientations.h>
 
 #include <numeric>
+#include <vector>
 
 
 DEAL_II_NAMESPACE_OPEN
