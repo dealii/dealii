@@ -274,7 +274,7 @@ namespace internal
     void
     build_face_entities_templated(
       const unsigned int                face_dimensionality,
-      const std::vector<ReferenceCell> &cell_types_index,
+      const std::vector<ReferenceCell> &cell_types,
       const CRS<unsigned int>          &crs,
       CRS<unsigned int>                &crs_d,        // result
       CRS<unsigned int>                &crs_0,        // result
@@ -299,7 +299,7 @@ namespace internal
 
       unsigned int n_entities = 0;
 
-      for (const auto &c : cell_types_index)
+      for (const auto &c : cell_types)
         {
           // Make sure that there are only two possibilities for
           // face_dimensionality that we can cover with the ?: statement below:
@@ -329,15 +329,15 @@ namespace internal
       ad_entity_types.reserve(n_entities);
       ad_compatibility.reserve(n_entities);
 
-      ptr_d.resize(cell_types_index.size() + 1);
+      ptr_d.resize(cell_types.size() + 1);
       ptr_d[0] = 0;
 
       static const unsigned int offset = 1;
 
       // loop over all cells
-      for (unsigned int c = 0, counter = 0; c < cell_types_index.size(); ++c)
+      for (unsigned int c = 0, counter = 0; c < cell_types.size(); ++c)
         {
-          const auto &cell_type = cell_types_index[c];
+          const auto &cell_type = cell_types[c];
 
           // Make sure that there are only two possibilities for
           // face_dimensionality that we can cover with the ?: statement below:
@@ -505,7 +505,7 @@ namespace internal
     template <typename FU>
     void
     build_face_entities(const unsigned int                face_dimensionality,
-                        const std::vector<ReferenceCell> &cell_types_index,
+                        const std::vector<ReferenceCell> &cell_types,
                         const CRS<unsigned int>          &crs,
                         CRS<unsigned int>                &crs_d,
                         CRS<unsigned int>                &crs_0,
@@ -517,7 +517,7 @@ namespace internal
       // If we are dealing with faces of cells, figure out how many vertices
       // each face may have. Otherwise, we're in 3d and are dealing with
       // lines, for which we know the number of vertices:
-      for (const auto &c : cell_types_index)
+      for (const auto &c : cell_types)
         if (face_dimensionality == c.get_dimension() - 1)
           {
             for (unsigned int f = 0; f < c.n_faces(); ++f)
@@ -531,7 +531,7 @@ namespace internal
 
       if (max_n_vertices == 2)
         build_face_entities_templated<2>(face_dimensionality,
-                                         cell_types_index,
+                                         cell_types,
                                          crs,
                                          crs_d,
                                          crs_0,
@@ -539,7 +539,7 @@ namespace internal
                                          second_key_function);
       else if (max_n_vertices == 3)
         build_face_entities_templated<3>(face_dimensionality,
-                                         cell_types_index,
+                                         cell_types,
                                          crs,
                                          crs_d,
                                          crs_0,
@@ -547,7 +547,7 @@ namespace internal
                                          second_key_function);
       else if (max_n_vertices == 4)
         build_face_entities_templated<4>(face_dimensionality,
-                                         cell_types_index,
+                                         cell_types,
                                          crs,
                                          crs_d,
                                          crs_0,
@@ -567,7 +567,7 @@ namespace internal
      * Furthermore, the type of the quad is determined.
      */
     inline void
-    build_intersection(const std::vector<ReferenceCell> &cell_types_index,
+    build_intersection(const std::vector<ReferenceCell> &cell_types,
                        const CRS<unsigned int>          &con_cv,
                        const CRS<unsigned int>          &con_cl,
                        const CRS<unsigned int>          &con_lv,
@@ -599,7 +599,7 @@ namespace internal
               const unsigned int f = con_cq.col[f_];
 
               con_ql.ptr[f + 1] =
-                cell_types_index[c].face_reference_cell(f_index).n_lines();
+                cell_types[c].face_reference_cell(f_index).n_lines();
             }
         }
 
@@ -614,7 +614,7 @@ namespace internal
       // loop over cells
       for (unsigned int c = 0; c < con_cq.ptr.size() - 1; ++c)
         {
-          const ReferenceCell cell_type = cell_types_index[c];
+          const ReferenceCell cell_type = cell_types[c];
 
           // loop over faces
           for (unsigned int f_ = con_cq.ptr[c], f_index = 0;
@@ -678,10 +678,10 @@ namespace internal
     template <typename T>
     Connectivity<T>
     build_connectivity(const unsigned int                dim,
-                       const std::vector<ReferenceCell> &cell_t_id,
+                       const std::vector<ReferenceCell> &cell_types,
                        const CRS<T>                     &con_cv)
     {
-      Connectivity<T> connectivity(dim, cell_t_id);
+      Connectivity<T> connectivity(dim, cell_types);
 
       CRS<T> temp1; // needed for 3d
 
@@ -793,8 +793,8 @@ namespace internal
       cell_vertices_ptr.reserve(cells.size() + 1);
       cell_vertices_ptr.push_back(0);
 
-      std::vector<ReferenceCell> cell_types_indices;
-      cell_types_indices.reserve(cells.size());
+      std::vector<ReferenceCell> cell_types;
+      cell_types.reserve(cells.size());
 
       // loop over cells and create CRS
       for (const auto &cell : cells)
@@ -823,7 +823,7 @@ namespace internal
 
           Assert(reference_cell != ReferenceCells::Invalid,
                  ExcNotImplemented());
-          cell_types_indices.push_back(reference_cell);
+          cell_types.push_back(reference_cell);
 
           // create CRS of vertices (to remove template argument dim)
           for (const auto &vertex : cell.vertices)
@@ -834,7 +834,7 @@ namespace internal
 
       // do the actual work
       return build_connectivity<T>(dim,
-                                   cell_types_indices,
+                                   cell_types,
                                    {cell_vertices_ptr, cell_vertices});
     }
   } // namespace TriangulationImplementation
