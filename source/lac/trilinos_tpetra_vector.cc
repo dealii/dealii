@@ -30,7 +30,7 @@ namespace LinearAlgebra
     // any mistake in the vector class declaration would
     // show up in uses of this class later on as well.
 
-#  ifdef HAVE_TPETRA_INST_FLOAT
+#  ifdef DEAL_II_TRILINOS_WITH_TPETRA_INST_FLOAT
 #    ifdef DEAL_II_HAVE_CXX20
     static_assert(
       concepts::is_vector_space_vector<Vector<float, MemorySpace::Host>>);
@@ -52,7 +52,7 @@ namespace LinearAlgebra
     } // namespace internal
 #  endif
 
-#  ifdef HAVE_TPETRA_INST_DOUBLE
+#  ifdef DEAL_II_TRILINOS_WITH_TPETRA_INST_DOUBLE
 #    ifdef DEAL_II_HAVE_CXX20
     static_assert(
       concepts::is_vector_space_vector<Vector<double, MemorySpace::Host>>);
@@ -75,7 +75,7 @@ namespace LinearAlgebra
 #  endif
 
 #  ifdef DEAL_II_WITH_COMPLEX_VALUES
-#    ifdef HAVE_TPETRA_INST_COMPLEX_FLOAT
+#    ifdef DEAL_II_TRILINOS_WITH_TPETRA_INST_COMPLEX_FLOAT
 #      ifdef DEAL_II_HAVE_CXX20
     static_assert(concepts::is_vector_space_vector<
                   Vector<std::complex<float>, MemorySpace::Host>>);
@@ -97,7 +97,7 @@ namespace LinearAlgebra
     } // namespace internal
 #    endif
 
-#    ifdef HAVE_TPETRA_INST_COMPLEX_DOUBLE
+#    ifdef DEAL_II_TRILINOS_WITH_TPETRA_INST_COMPLEX_DOUBLE
 #      ifdef DEAL_II_HAVE_CXX20
     static_assert(concepts::is_vector_space_vector<
                   Vector<std::complex<double>, MemorySpace::Host>>);

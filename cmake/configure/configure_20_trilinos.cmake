@@ -250,10 +250,10 @@ macro(feature_trilinos_find_external var)
         # that we can populate our DEAL_II_EXPAND_TPETRA correctly. We need
         # to dof this here prior to the call to reset_cmake_required().
         #
-        check_cxx_symbol_exists(HAVE_TPETRA_INST_DOUBLE "TpetraCore_config.h" _tpetra_inst_double)
-        check_cxx_symbol_exists(HAVE_TPETRA_INST_FLOAT "TpetraCore_config.h" _tpetra_inst_float)
-        check_cxx_symbol_exists(HAVE_TPETRA_INST_COMPLEX_DOUBLE "TpetraCore_config.h" _tpetra_inst_complex_double)
-        check_cxx_symbol_exists(HAVE_TPETRA_INST_COMPLEX_FLOAT "TpetraCore_config.h" _tpetra_inst_complex_float)
+        check_cxx_symbol_exists(HAVE_TPETRA_INST_DOUBLE "TpetraCore_config.h" DEAL_II_TRILINOS_WITH_TPETRA_INST_DOUBLE)
+        check_cxx_symbol_exists(HAVE_TPETRA_INST_FLOAT "TpetraCore_config.h" DEAL_II_TRILINOS_WITH_TPETRA_INST_FLOAT)
+        check_cxx_symbol_exists(HAVE_TPETRA_INST_COMPLEX_DOUBLE "TpetraCore_config.h" DEAL_II_TRILINOS_WITH_TPETRA_INST_COMPLEX_DOUBLE)
+        check_cxx_symbol_exists(HAVE_TPETRA_INST_COMPLEX_FLOAT "TpetraCore_config.h" DEAL_II_TRILINOS_WITH_TPETRA_INST_COMPLEX_FLOAT)
       else()
         message(STATUS "Tpetra was found but is not usable due to a mismatch in ordinal number types.")
         set(TRILINOS_WITH_TPETRA OFF)
@@ -437,7 +437,7 @@ macro(feature_trilinos_configure_external)
   set(DEAL_II_EXPAND_EPETRA_VECTOR "LinearAlgebra::EpetraWrappers::Vector")
 
   if(${DEAL_II_TRILINOS_WITH_TPETRA})
-    if(_tpetra_inst_double)
+    if(DEAL_II_TRILINOS_WITH_TPETRA_INST_DOUBLE)
       set(DEAL_II_EXPAND_TPETRA_TYPES "double")
       set(DEAL_II_EXPAND_TPETRA_VECTOR_DOUBLE
         "LinearAlgebra::TpetraWrappers::Vector<double, MemorySpace::Host>"
@@ -447,7 +447,7 @@ macro(feature_trilinos_configure_external)
         "LinearAlgebra::TpetraWrappers::BlockVector<double, MemorySpace::Default>")
     endif()
 
-    if(_tpetra_inst_float)
+    if(DEAL_II_TRILINOS_WITH_TPETRA_INST_FLOAT)
       set(DEAL_II_EXPAND_TPETRA_VECTOR_FLOAT
         "LinearAlgebra::TpetraWrappers::Vector<float, MemorySpace::Host>"
         "LinearAlgebra::TpetraWrappers::Vector<float, MemorySpace::Default>")
@@ -457,7 +457,7 @@ macro(feature_trilinos_configure_external)
     endif()
 
     if(${DEAL_II_WITH_COMPLEX_NUMBERS})
-      if(_tpetra_inst_complex_double)
+      if(DEAL_II_TRILINOS_WITH_TPETRA_INST_COMPLEX_DOUBLE)
         set(DEAL_II_EXPAND_TPETRA_VECTOR_COMPLEX_DOUBLE
           "LinearAlgebra::TpetraWrappers::Vector<std::complex<double>, MemorySpace::Host>"
           "LinearAlgebra::TpetraWrappers::Vector<std::complex<double>, MemorySpace::Default>")
@@ -466,7 +466,7 @@ macro(feature_trilinos_configure_external)
           "LinearAlgebra::TpetraWrappers::BlockVector<std::complex<double>, MemorySpace::Default>")
       endif()
 
-      if(_tpetra_inst_complex_float)
+      if(DEAL_II_TRILINOS_WITH_TPETRA_INST_COMPLEX_FLOAT)
         set(DEAL_II_EXPAND_TPETRA_VECTOR_COMPLEX_FLOAT
           "LinearAlgebra::TpetraWrappers::Vector<std::complex<float>, MemorySpace::Host>"
           "LinearAlgebra::TpetraWrappers::Vector<std::complex<float>, MemorySpace::Default>")

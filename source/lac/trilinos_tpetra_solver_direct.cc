@@ -25,7 +25,7 @@ namespace LinearAlgebra
 {
   namespace TpetraWrappers
   {
-#      ifdef HAVE_TPETRA_INST_FLOAT
+#      ifdef DEAL_II_TRILINOS_WITH_TPETRA_INST_FLOAT
     template class SolverDirectBase<float, MemorySpace::Host>;
     template class SolverDirect<float, MemorySpace::Host>;
     template class SolverDirectKLU2<float, MemorySpace::Host>;
@@ -35,7 +35,7 @@ namespace LinearAlgebra
     template class SolverDirectKLU2<float, MemorySpace::Default>;
 #      endif
 
-#      ifdef HAVE_TPETRA_INST_DOUBLE
+#      ifdef DEAL_II_TRILINOS_WITH_TPETRA_INST_DOUBLE
     template class SolverDirectBase<double, MemorySpace::Host>;
     template class SolverDirect<double, MemorySpace::Host>;
     template class SolverDirectKLU2<double, MemorySpace::Host>;
@@ -45,7 +45,7 @@ namespace LinearAlgebra
     template class SolverDirectKLU2<double, MemorySpace::Default>;
 #      endif
 #      ifdef DEAL_II_WITH_COMPLEX_VALUES
-#        ifdef HAVE_TPETRA_INST_COMPLEX_FLOAT
+#        ifdef DEAL_II_TRILINOS_WITH_TPETRA_INST_COMPLEX_FLOAT
     template class SolverDirectBase<std::complex<float>, MemorySpace::Host>;
     template class SolverDirect<std::complex<float>, MemorySpace::Host>;
     template class SolverDirectKLU2<std::complex<float>, MemorySpace::Host>;
@@ -54,7 +54,7 @@ namespace LinearAlgebra
     template class SolverDirect<std::complex<float>, MemorySpace::Default>;
     template class SolverDirectKLU2<std::complex<float>, MemorySpace::Default>;
 #        endif
-#        ifdef HAVE_TPETRA_INST_COMPLEX_DOUBLE
+#        ifdef DEAL_II_TRILINOS_WITH_TPETRA_INST_COMPLEX_DOUBLE
     template class SolverDirectBase<std::complex<double>, MemorySpace::Host>;
     template class SolverDirect<std::complex<double>, MemorySpace::Host>;
     template class SolverDirectKLU2<std::complex<double>, MemorySpace::Host>;

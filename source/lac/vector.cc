@@ -83,7 +83,7 @@ Vector<int>::lp_norm(const real_type) const
 }
 
 #ifdef DEAL_II_TRILINOS_WITH_TPETRA
-#  ifdef HAVE_TPETRA_INST_FLOAT
+#  ifdef DEAL_II_TRILINOS_WITH_TPETRA_INST_FLOAT
 template Vector<float>::Vector(
   const LinearAlgebra::TpetraWrappers::Vector<float, MemorySpace::Host> &);
 template Vector<float>::Vector(
@@ -96,7 +96,7 @@ Vector<float>::operator=<float>(
   const LinearAlgebra::TpetraWrappers::Vector<float, MemorySpace::Default> &);
 #  endif
 
-#  ifdef HAVE_TPETRA_INST_DOUBLE
+#  ifdef DEAL_II_TRILINOS_WITH_TPETRA_INST_DOUBLE
 template Vector<double>::Vector(
   const LinearAlgebra::TpetraWrappers::Vector<double, MemorySpace::Host> &);
 template Vector<double>::Vector(
@@ -110,7 +110,7 @@ Vector<double>::operator=<double>(
 #  endif
 
 #  ifdef DEAL_II_WITH_COMPLEX_VALUES
-#    ifdef HAVE_TPETRA_INST_COMPLEX_FLOAT
+#    ifdef DEAL_II_TRILINOS_WITH_TPETRA_INST_COMPLEX_FLOAT
 template Vector<std::complex<float>>::Vector(
   const LinearAlgebra::TpetraWrappers::Vector<std::complex<float>,
                                               MemorySpace::Host> &);
@@ -127,7 +127,7 @@ Vector<std::complex<float>>::operator=<std::complex<float>>(
                                               MemorySpace::Default> &);
 #    endif
 
-#    ifdef HAVE_TPETRA_INST_COMPLEX_DOUBLE
+#    ifdef DEAL_II_TRILINOS_WITH_TPETRA_INST_COMPLEX_DOUBLE
 template Vector<std::complex<double>>::Vector(
   const LinearAlgebra::TpetraWrappers::Vector<std::complex<double>,
                                               MemorySpace::Host> &);

@@ -26,7 +26,7 @@ namespace LinearAlgebra
 {
   namespace TpetraWrappers
   {
-#      ifdef HAVE_TPETRA_INST_FLOAT
+#      ifdef DEAL_II_TRILINOS_WITH_TPETRA_INST_FLOAT
     template class PreconditionBase<float, MemorySpace::Host>;
     template class PreconditionIdentity<float, MemorySpace::Host>;
     template class PreconditionIfpackBase<float, MemorySpace::Host>;
@@ -60,7 +60,7 @@ namespace LinearAlgebra
     template class PreconditionILUT<float, MemorySpace::Default>;
 #      endif
 
-#      ifdef HAVE_TPETRA_INST_DOUBLE
+#      ifdef DEAL_II_TRILINOS_WITH_TPETRA_INST_DOUBLE
     template class PreconditionBase<double, MemorySpace::Host>;
     template class PreconditionIdentity<double, MemorySpace::Host>;
     template class PreconditionIfpackBase<double, MemorySpace::Host>;
@@ -94,7 +94,7 @@ namespace LinearAlgebra
     template class PreconditionILUT<double, MemorySpace::Default>;
 #      endif
 #      ifdef DEAL_II_WITH_COMPLEX_VALUES
-#        ifdef HAVE_TPETRA_INST_COMPLEX_FLOAT
+#        ifdef DEAL_II_TRILINOS_WITH_TPETRA_INST_COMPLEX_FLOAT
     template class PreconditionBase<std::complex<float>, MemorySpace::Host>;
     template class PreconditionIdentity<std::complex<float>, MemorySpace::Host>;
     template class PreconditionIfpackBase<std::complex<float>,
@@ -142,7 +142,7 @@ namespace LinearAlgebra
     template class PreconditionILU<std::complex<float>, MemorySpace::Default>;
     template class PreconditionILUT<std::complex<float>, MemorySpace::Default>;
 #        endif
-#        ifdef HAVE_TPETRA_INST_COMPLEX_DOUBLE
+#        ifdef DEAL_II_TRILINOS_WITH_TPETRA_INST_COMPLEX_DOUBLE
     template class PreconditionBase<std::complex<double>, MemorySpace::Host>;
     template class PreconditionIdentity<std::complex<double>,
                                         MemorySpace::Host>;
