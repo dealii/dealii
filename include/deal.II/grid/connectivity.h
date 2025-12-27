@@ -25,6 +25,7 @@
 #include <deal.II/grid/tria_objects_orientations.h>
 
 #include <numeric>
+#include <vector>
 
 
 DEAL_II_NAMESPACE_OPEN
@@ -47,21 +48,27 @@ namespace internal
        * Default constructor.
        */
       CRS()
-        : ptr{0} {};
+        : offsets{0} {};
 
       /**
        * Constructor which allows to set the internal fields directly.
        */
-      CRS(const std::vector<std::size_t> &ptr, const std::vector<T> &col)
-        : ptr(ptr)
-        , col(col)
+      CRS(const std::vector<std::size_t> &offsets,
+          const std::vector<T>           &columns)
+        : offsets(offsets)
+        , columns(columns)
       {}
 
-      // row index
-      std::vector<std::size_t> ptr;
+      /**
+       * For each row in the CRS, store the corresponding offsets in the
+       * 'elements' array.
+       */
+      std::vector<std::size_t> offsets;
 
-      // column index
-      std::vector<T> col;
+      /**
+       * The elements (typically column indices) stored in the CRS.
+       */
+      std::vector<T> columns;
     };
 
 
@@ -221,41 +228,44 @@ namespace internal
     void
     determine_neighbors(const CRS<T> &con_cf, CRS<T> &con_cc)
     {
-      const auto &col_cf = con_cf.col;
-      const auto &ptr_cf = con_cf.ptr;
+      const auto &columns_cf = con_cf.columns;
+      const auto &offsets_cf = con_cf.offsets;
 
-      auto &col_cc = con_cc.col;
-      auto &ptr_cc = con_cc.ptr;
+      auto &columns_cc = con_cc.columns;
+      auto &offsets_cc = con_cc.offsets;
 
       const unsigned int n_faces =
-        *std::max_element(col_cf.begin(), col_cf.end()) + 1;
+        *std::max_element(columns_cf.begin(), columns_cf.end()) + 1;
 
       // clear and initialize with -1 (assume that all faces are at the
       // boundary)
-      col_cc = std::vector<T>(col_cf.size(), -1);
-      ptr_cc = ptr_cf;
+      columns_cc = std::vector<T>(columns_cf.size(), -1);
+      offsets_cc = offsets_cf;
 
       std::vector<std::pair<T, unsigned int>> neighbors(n_faces, {-1, -1});
 
       // loop over all cells
-      for (unsigned int i_0 = 0; i_0 < ptr_cf.size() - 1; ++i_0)
+      for (unsigned int i_0 = 0; i_0 < offsets_cf.size() - 1; ++i_0)
         {
           // ... and all its faces
-          for (std::size_t j_0 = ptr_cf[i_0]; j_0 < ptr_cf[i_0 + 1]; ++j_0)
+          for (std::size_t j_0 = offsets_cf[i_0]; j_0 < offsets_cf[i_0 + 1];
+               ++j_0)
             {
-              if (neighbors[col_cf[j_0]].first == static_cast<unsigned int>(-1))
+              if (neighbors[columns_cf[j_0]].first ==
+                  static_cast<unsigned int>(-1))
                 {
                   // face is visited the first time -> save the visiting cell
                   // and the face pointer
-                  neighbors[col_cf[j_0]] = std::pair<T, unsigned int>(i_0, j_0);
+                  neighbors[columns_cf[j_0]] =
+                    std::pair<T, unsigned int>(i_0, j_0);
                 }
               else
                 {
                   // face is visited the second time -> now we know the cells
                   // on both sides of the face and we can determine for both
                   // cells the neighbor
-                  col_cc[j_0] = neighbors[col_cf[j_0]].first;
-                  col_cc[neighbors[col_cf[j_0]].second] = i_0;
+                  columns_cc[j_0] = neighbors[columns_cf[j_0]].first;
+                  columns_cc[neighbors[columns_cf[j_0]].second] = i_0;
                 }
             }
         }
@@ -275,7 +285,6 @@ namespace internal
     build_face_entities_templated(
       const unsigned int                face_dimensionality,
       const std::vector<ReferenceCell> &cell_types,
-      const std::vector<ReferenceCell> &cell_types_index,
       const CRS<unsigned int>          &crs,
       CRS<unsigned int>                &crs_d,        // result
       CRS<unsigned int>                &crs_0,        // result
@@ -284,34 +293,32 @@ namespace internal
     {
       const bool compatibility_mode = true;
 
-      const std::vector<std::size_t>  &cell_ptr      = crs.ptr;
-      const std::vector<unsigned int> &cell_vertices = crs.col;
-      std::vector<std::size_t>        &ptr_d         = crs_d.ptr;
-      std::vector<unsigned int>       &col_d         = crs_d.col;
+      const std::vector<std::size_t>  &cell_offsets  = crs.offsets;
+      const std::vector<unsigned int> &cell_vertices = crs.columns;
+      std::vector<std::size_t>        &offsets_d     = crs_d.offsets;
+      std::vector<unsigned int>       &columns_d     = crs_d.columns;
 
       // note: we do not pre-allocate memory for these arrays because it turned
       // out that counting unique entities is more expensive than push_back().
-      std::vector<std::size_t>  &ptr_0 = crs_0.ptr;
-      std::vector<unsigned int> &col_0 = crs_0.col;
+      std::vector<std::size_t>  &offsets_0 = crs_0.offsets;
+      std::vector<unsigned int> &columns_0 = crs_0.columns;
 
       // clear
-      ptr_0 = {};
-      col_0 = {};
+      offsets_0 = {};
+      columns_0 = {};
 
       unsigned int n_entities = 0;
 
-      for (const auto &c : cell_types_index)
+      for (const auto &c : cell_types)
         {
           // Make sure that there are only two possibilities for
           // face_dimensionality that we can cover with the ?: statement below:
-          Assert((face_dimensionality == cell_types[c].get_dimension() - 1) ||
-                   ((cell_types[c].get_dimension() == 3) &&
-                    (face_dimensionality == 1)),
+          Assert((face_dimensionality == c.get_dimension() - 1) ||
+                   ((c.get_dimension() == 3) && (face_dimensionality == 1)),
                  ExcInternalError());
           n_entities +=
-            (face_dimensionality == cell_types[c].get_dimension() - 1 ?
-               cell_types[c].n_faces() :
-               cell_types[c].n_lines());
+            (face_dimensionality == c.get_dimension() - 1 ? c.n_faces() :
+                                                            c.n_lines());
         }
 
       // step 1: store each d-dimensional entity of a cell (described by their
@@ -332,15 +339,15 @@ namespace internal
       ad_entity_types.reserve(n_entities);
       ad_compatibility.reserve(n_entities);
 
-      ptr_d.resize(cell_types_index.size() + 1);
-      ptr_d[0] = 0;
+      offsets_d.resize(cell_types.size() + 1);
+      offsets_d[0] = 0;
 
       static const unsigned int offset = 1;
 
       // loop over all cells
-      for (unsigned int c = 0, counter = 0; c < cell_types_index.size(); ++c)
+      for (unsigned int c = 0, counter = 0; c < cell_types.size(); ++c)
         {
-          const auto &cell_type = cell_types[cell_types_index[c]];
+          const auto &cell_type = cell_types[c];
 
           // Make sure that there are only two possibilities for
           // face_dimensionality that we can cover with the ?: statement below:
@@ -352,11 +359,12 @@ namespace internal
             (face_dimensionality == cell_type.get_dimension() - 1 ?
                cell_type.n_faces() :
                cell_type.n_lines());
-          ptr_d[c + 1] = ptr_d[c] + n_face_entities;
+          offsets_d[c + 1] = offsets_d[c] + n_face_entities;
 
           // ... collect vertices of cell
           const dealii::ArrayView<const unsigned int> local_vertices(
-            cell_vertices.data() + cell_ptr[c], cell_ptr[c + 1] - cell_ptr[c]);
+            cell_vertices.data() + cell_offsets[c],
+            cell_offsets[c + 1] - cell_offsets[c]);
 
           // ... loop over all its entities
           for (unsigned int e = 0; e < n_face_entities; ++e)
@@ -418,7 +426,7 @@ namespace internal
             }
         }
 
-      col_d.resize(keys.size());
+      columns_d.resize(keys.size());
       orientations.reinit(keys.size());
 
       // step 2: sort according to key so that entities with same key can be
@@ -443,7 +451,7 @@ namespace internal
 
                   ++n_unique_entities;
                   n_unique_entity_vertices +=
-                    cell_types[ad_entity_types[offset_i]].n_vertices();
+                    ad_entity_types[offset_i].n_vertices();
 
                   new_key = ad_compatibility[offset_i];
                 }
@@ -453,8 +461,8 @@ namespace internal
 
           std::sort(keys.begin(), keys.end());
 
-          ptr_0.reserve(n_unique_entities + 1);
-          col_0.reserve(n_unique_entity_vertices);
+          offsets_0.reserve(n_unique_entities + 1);
+          columns_0.reserve(n_unique_entity_vertices);
         }
 
 
@@ -474,10 +482,10 @@ namespace internal
               ref_key     = std::get<0>(keys[i]);
               ref_indices = ad_entity_vertices[offset_i];
 
-              ptr_0.push_back(col_0.size());
+              offsets_0.push_back(columns_0.size());
               for (const auto j : ad_entity_vertices[offset_i])
                 if (j != 0)
-                  col_0.push_back(j - offset);
+                  columns_0.push_back(j - offset);
             }
           else
             {
@@ -494,9 +502,9 @@ namespace internal
                                     ref_indices.begin() +
                                       ad_entity_types[offset_i].n_vertices())));
             }
-          col_d[offset_i] = counter;
+          columns_d[offset_i] = counter;
         }
-      ptr_0.push_back(col_0.size());
+      offsets_0.push_back(columns_0.size());
     }
 
 
@@ -509,7 +517,6 @@ namespace internal
     void
     build_face_entities(const unsigned int                face_dimensionality,
                         const std::vector<ReferenceCell> &cell_types,
-                        const std::vector<ReferenceCell> &cell_types_index,
                         const CRS<unsigned int>          &crs,
                         CRS<unsigned int>                &crs_d,
                         CRS<unsigned int>                &crs_0,
@@ -521,13 +528,12 @@ namespace internal
       // If we are dealing with faces of cells, figure out how many vertices
       // each face may have. Otherwise, we're in 3d and are dealing with
       // lines, for which we know the number of vertices:
-      for (const auto &c : cell_types_index)
-        if (face_dimensionality == cell_types[c].get_dimension() - 1)
+      for (const auto &c : cell_types)
+        if (face_dimensionality == c.get_dimension() - 1)
           {
-            for (unsigned int f = 0; f < cell_types[c].n_faces(); ++f)
+            for (unsigned int f = 0; f < c.n_faces(); ++f)
               max_n_vertices =
-                std::max(max_n_vertices,
-                         cell_types[c].face_reference_cell(f).n_vertices());
+                std::max(max_n_vertices, c.face_reference_cell(f).n_vertices());
           }
         else if (face_dimensionality == 1)
           max_n_vertices = std::max(max_n_vertices, 2u);
@@ -537,7 +543,6 @@ namespace internal
       if (max_n_vertices == 2)
         build_face_entities_templated<2>(face_dimensionality,
                                          cell_types,
-                                         cell_types_index,
                                          crs,
                                          crs_d,
                                          crs_0,
@@ -546,7 +551,6 @@ namespace internal
       else if (max_n_vertices == 3)
         build_face_entities_templated<3>(face_dimensionality,
                                          cell_types,
-                                         cell_types_index,
                                          crs,
                                          crs_d,
                                          crs_0,
@@ -555,7 +559,6 @@ namespace internal
       else if (max_n_vertices == 4)
         build_face_entities_templated<4>(face_dimensionality,
                                          cell_types,
-                                         cell_types_index,
                                          crs,
                                          crs_d,
                                          crs_0,
@@ -576,7 +579,6 @@ namespace internal
      */
     inline void
     build_intersection(const std::vector<ReferenceCell> &cell_types,
-                       const std::vector<ReferenceCell> &cell_types_index,
                        const CRS<unsigned int>          &con_cv,
                        const CRS<unsigned int>          &con_cl,
                        const CRS<unsigned int>          &con_lv,
@@ -589,50 +591,48 @@ namespace internal
     )
     {
       // reset output
-      con_ql.ptr = {};
-      con_ql.col = {};
+      con_ql.offsets = {};
+      con_ql.columns = {};
 
-      con_ql.ptr.resize(con_qv.ptr.size());
-      con_ql.ptr[0] = 0;
+      con_ql.offsets.resize(con_qv.offsets.size());
+      con_ql.offsets[0] = 0;
 
-      quad_t_id.resize(con_qv.ptr.size() - 1);
+      quad_t_id.resize(con_qv.offsets.size() - 1);
 
       // count the number of lines of each face
-      for (unsigned int c = 0; c < con_cq.ptr.size() - 1; ++c)
+      for (unsigned int c = 0; c < con_cq.offsets.size() - 1; ++c)
         {
-          const auto &cell_type = cell_types[cell_types_index[c]];
-
           // loop over faces
-          for (unsigned int f_ = con_cq.ptr[c], f_index = 0;
-               f_ < con_cq.ptr[c + 1];
+          for (unsigned int f_ = con_cq.offsets[c], f_index = 0;
+               f_ < con_cq.offsets[c + 1];
                ++f_, ++f_index)
             {
-              const unsigned int f = con_cq.col[f_];
+              const unsigned int f = con_cq.columns[f_];
 
-              con_ql.ptr[f + 1] =
-                cell_type.face_reference_cell(f_index).n_lines();
+              con_ql.offsets[f + 1] =
+                cell_types[c].face_reference_cell(f_index).n_lines();
             }
         }
 
       // use the counts to determine the offsets -> prefix sum
-      for (unsigned int i = 0; i < con_ql.ptr.size() - 1; ++i)
-        con_ql.ptr[i + 1] += con_ql.ptr[i];
+      for (unsigned int i = 0; i < con_ql.offsets.size() - 1; ++i)
+        con_ql.offsets[i + 1] += con_ql.offsets[i];
 
       // allocate memory
-      con_ql.col.resize(con_ql.ptr.back());
-      ori_ql.reinit(con_ql.ptr.back());
+      con_ql.columns.resize(con_ql.offsets.back());
+      ori_ql.reinit(con_ql.offsets.back());
 
       // loop over cells
-      for (unsigned int c = 0; c < con_cq.ptr.size() - 1; ++c)
+      for (unsigned int c = 0; c < con_cq.offsets.size() - 1; ++c)
         {
-          const auto &cell_type = cell_types[cell_types_index[c]];
+          const ReferenceCell cell_type = cell_types[c];
 
           // loop over faces
-          for (unsigned int f_ = con_cq.ptr[c], f_index = 0;
-               f_ < con_cq.ptr[c + 1];
+          for (unsigned int f_ = con_cq.offsets[c], f_index = 0;
+               f_ < con_cq.offsets[c + 1];
                ++f_, ++f_index)
             {
-              const unsigned int f = con_cq.col[f_];
+              const unsigned int f = con_cq.columns[f_];
 
               // only faces with default orientation have to do something
               if (ori_cq.get_combined_orientation(f_) !=
@@ -648,19 +648,20 @@ namespace internal
                     cell_type.face_to_cell_lines(
                       f_index, l, numbers::default_geometric_orientation);
                   const unsigned int global_line_index =
-                    con_cl.col[con_cl.ptr[c] + local_line_index];
-                  con_ql.col[con_ql.ptr[f] + l] = global_line_index;
+                    con_cl.columns[con_cl.offsets[c] + local_line_index];
+                  con_ql.columns[con_ql.offsets[f] + l] = global_line_index;
 
                   // determine orientation of line
                   bool same = true;
                   for (unsigned int v = 0; v < 2; ++v)
-                    if (con_cv.col[con_cv.ptr[c] +
+                    if (con_cv
+                          .columns[con_cv.offsets[c] +
                                    cell_type.face_and_line_to_cell_vertices(
                                      f_index,
                                      l,
                                      v,
                                      numbers::default_geometric_orientation)] !=
-                        con_lv.col[con_lv.ptr[global_line_index] + v])
+                        con_lv.columns[con_lv.offsets[global_line_index] + v])
                       {
                         same = false;
                         break;
@@ -668,7 +669,7 @@ namespace internal
 
                   // ... comparison gives orientation
                   ori_ql.set_combined_orientation(
-                    con_ql.ptr[f] + l,
+                    con_ql.offsets[f] + l,
                     same ? numbers::default_geometric_orientation :
                            numbers::reverse_line_orientation);
                 }
@@ -689,11 +690,10 @@ namespace internal
     template <typename T>
     Connectivity<T>
     build_connectivity(const unsigned int                dim,
-                       const std::vector<ReferenceCell> &cell_t,
-                       const std::vector<ReferenceCell> &cell_t_id,
+                       const std::vector<ReferenceCell> &cell_types,
                        const CRS<T>                     &con_cv)
     {
-      Connectivity<T> connectivity(dim, cell_t_id);
+      Connectivity<T> connectivity(dim, cell_types);
 
       CRS<T> temp1; // needed for 3d
 
@@ -706,7 +706,6 @@ namespace internal
 
           build_face_entities(
             1,
-            cell_t,
             connectivity.entity_types(dim),
             con_cv,
             dim == 2 ? connectivity.entity_to_entities(2, 1) : temp1,
@@ -722,7 +721,6 @@ namespace internal
         {
           build_face_entities(
             2,
-            cell_t,
             connectivity.entity_types(3),
             con_cv,
             connectivity.entity_to_entities(3, 2),
@@ -742,17 +740,19 @@ namespace internal
               for (; l < cell_type.face_reference_cell(f).n_lines(); ++l)
                 {
                   AssertIndexRange(l, key.size());
-                  AssertIndexRange(c, temp1.ptr.size());
-                  AssertIndexRange(temp1.ptr[c] +
+                  AssertIndexRange(c, temp1.offsets.size());
+                  AssertIndexRange(temp1.offsets[c] +
                                      cell_type.face_to_cell_lines(
                                        f,
                                        l,
                                        numbers::default_geometric_orientation),
-                                   temp1.col.size());
+                                   temp1.columns.size());
                   key[l] =
-                    temp1.col[temp1.ptr[c] +
-                              cell_type.face_to_cell_lines(
-                                f, l, numbers::default_geometric_orientation)] +
+                    temp1.columns[temp1.offsets[c] +
+                                  cell_type.face_to_cell_lines(
+                                    f,
+                                    l,
+                                    numbers::default_geometric_orientation)] +
                     1 /*offset!*/;
                 }
 
@@ -763,8 +763,7 @@ namespace internal
             });
 
           // create connectivity: quad -> line
-          build_intersection(cell_t,
-                             connectivity.entity_types(3),
+          build_intersection(connectivity.entity_types(3),
                              con_cv,
                              temp1,
                              connectivity.entity_to_entities(1, 0),
@@ -794,35 +793,23 @@ namespace internal
     {
       AssertThrow(cells.size() > 0, ExcMessage("No cells have been provided!"));
 
-      // vector of possible cell entity types
-      std::vector<ReferenceCell> cell_types_impl(8);
-
-      cell_types_impl[ReferenceCells::Line]     = ReferenceCells::Line;
-      cell_types_impl[ReferenceCells::Triangle] = ReferenceCells::Triangle;
-      cell_types_impl[ReferenceCells::Quadrilateral] =
-        ReferenceCells::Quadrilateral;
-      cell_types_impl[ReferenceCells::Tetrahedron] =
-        ReferenceCells::Tetrahedron;
-      cell_types_impl[ReferenceCells::Pyramid]    = ReferenceCells::Pyramid;
-      cell_types_impl[ReferenceCells::Wedge]      = ReferenceCells::Wedge;
-      cell_types_impl[ReferenceCells::Hexahedron] = ReferenceCells::Hexahedron;
-
       // determine cell types and process vertices
       std::vector<T> cell_vertices;
-      cell_vertices.reserve(
-        std::accumulate(cells.begin(),
-                        cells.end(),
-                        0,
-                        [](const auto &result, const auto &cell) {
-                          return result + cell.vertices.size();
-                        }));
+      cell_vertices.reserve(std::accumulate(cells.begin(),
+                                            cells.end(),
+                                            0u,
+                                            [](const unsigned int   accumulator,
+                                               const CellData<dim> &cell) {
+                                              return accumulator +
+                                                     cell.vertices.size();
+                                            }));
 
-      std::vector<std::size_t> cell_vertices_ptr;
-      cell_vertices_ptr.reserve(cells.size() + 1);
-      cell_vertices_ptr.push_back(0);
+      std::vector<std::size_t> cell_vertices_offsets;
+      cell_vertices_offsets.reserve(cells.size() + 1);
+      cell_vertices_offsets.push_back(0);
 
-      std::vector<ReferenceCell> cell_types_indices;
-      cell_types_indices.reserve(cells.size());
+      std::vector<ReferenceCell> cell_types;
+      cell_types.reserve(cells.size());
 
       // loop over cells and create CRS
       for (const auto &cell : cells)
@@ -846,30 +833,20 @@ namespace internal
                   "CellData."));
             }
 
-          const ReferenceCell reference_cell =
-            ReferenceCell::n_vertices_to_type(dim, cell.vertices.size());
-
-          Assert(reference_cell != ReferenceCells::Invalid,
-                 ExcNotImplemented());
-          AssertIndexRange(static_cast<std::uint8_t>(reference_cell),
-                           cell_types_impl.size());
-          Assert(cell_types_impl[reference_cell] != ReferenceCells::Invalid,
-                 ExcNotImplemented());
-
-          cell_types_indices.push_back(reference_cell);
+          cell_types.push_back(
+            ReferenceCell::n_vertices_to_type(dim, cell.vertices.size()));
 
           // create CRS of vertices (to remove template argument dim)
-          for (const auto &vertex : cell.vertices)
-            cell_vertices.push_back(vertex);
-
-          cell_vertices_ptr.push_back(cell_vertices.size());
+          cell_vertices.insert(cell_vertices.end(),
+                               cell.vertices.begin(),
+                               cell.vertices.end());
+          cell_vertices_offsets.push_back(cell_vertices.size());
         }
 
       // do the actual work
       return build_connectivity<T>(dim,
-                                   cell_types_impl,
-                                   cell_types_indices,
-                                   {cell_vertices_ptr, cell_vertices});
+                                   cell_types,
+                                   {cell_vertices_offsets, cell_vertices});
     }
   } // namespace TriangulationImplementation
 } // namespace internal
