@@ -1,0 +1,6 @@
+Improved: Class DataOut_DoFData attempts now to automatically merge 
+scalar output components into vectors and tensors if the corresponding
+components are located next to each other and have the same name. 
+This is particularly relevant for scalar DoFHandler's.
+<br>
+(Vladimir Ivannikov, 2023/04/25)
