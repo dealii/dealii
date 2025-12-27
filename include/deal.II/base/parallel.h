@@ -549,78 +549,102 @@ namespace parallel
                           const Function                             &f,
                           const unsigned int                          grainsize)
   {
+    Assert(grainsize > 0, ExcMessage("Grainsize must be a positive number."));
+
+    // Count elements in the range
+    const std::size_t n = [&]() -> auto {
+      if constexpr (std::is_integral_v<Iterator>)
+        return static_cast<std::size_t>(end - begin);
+      else
+        return static_cast<std::size_t>(std::distance(begin, end));
+    }();
+
+    const bool worth_doing_in_parallel =
+      (MultithreadInfo::n_threads() > 1) && (n > grainsize);
+
 #ifdef DEAL_II_WITH_TASKFLOW
-    tf::Executor &executor = MultithreadInfo::get_taskflow_executor();
-    tf::Taskflow  taskflow;
 
-    if constexpr (std::is_integral_v<Iterator>)
+    if (worth_doing_in_parallel)
       {
-        // Integral "iterator" types (e.g., int): use plain arithmetic
-        using integral_type = Iterator;
+        tf::Executor &executor = MultithreadInfo::get_taskflow_executor();
+        tf::Taskflow  taskflow;
 
-        const integral_type           n = end - begin;
-        tf::IndexRange<integral_type> range(0, n, 1);
+        if constexpr (std::is_integral_v<Iterator>)
+          {
+            // Integral "iterator" types (e.g., int): use plain arithmetic
+            using integral_type = Iterator;
 
-        taskflow.for_each_by_index(
-          range,
-          [&, begin](const tf::IndexRange<integral_type> &subrange) {
-            integral_type subrange_begin =
-              begin + static_cast<integral_type>(subrange.begin());
+            tf::IndexRange<integral_type> range(0, n, 1);
 
-            integral_type subrange_end =
-              subrange_begin + static_cast<integral_type>(subrange.size());
+            taskflow.for_each_by_index(
+              range,
+              [&, begin](const tf::IndexRange<integral_type> &subrange) {
+                integral_type subrange_begin =
+                  begin + static_cast<integral_type>(subrange.begin());
 
-            f(subrange_begin, subrange_end);
-          },
-          tf::GuidedPartitioner(grainsize));
+                integral_type subrange_end =
+                  subrange_begin + static_cast<integral_type>(subrange.size());
+
+                f(subrange_begin, subrange_end);
+              },
+              tf::GuidedPartitioner(grainsize));
+          }
+        else
+          {
+            // Non-integral iterator types: advance from 'begin' using
+            // std::distance/std::advance
+            using diff_t =
+              typename std::iterator_traits<Iterator>::difference_type;
+
+            tf::IndexRange<std::size_t> range(0, n, 1);
+
+            taskflow.for_each_by_index(
+              range,
+              [&, begin](const tf::IndexRange<std::size_t> &subrange) {
+                Iterator subrange_begin = begin;
+                std::advance(subrange_begin,
+                             static_cast<diff_t>(subrange.begin()));
+
+                Iterator subrange_end = subrange_begin;
+                std::advance(subrange_end,
+                             static_cast<diff_t>(subrange.size()));
+
+                f(subrange_begin, subrange_end);
+              },
+              tf::GuidedPartitioner(grainsize));
+          }
+
+        // Schedule the work. If we are within a task, we are required to use
+        // corun() without wait() to avoid a potential deadlock as described in
+        // https://taskflow.github.io/taskflow/ExecuteTaskflow.html#ExecuteATaskflowFromAnInternalWorker:
+        if (executor.this_worker_id() != -1)
+          executor.corun(taskflow);
+        else
+          executor.run(taskflow).wait();
+
+        return;
       }
-    else
-      {
-        // Non-integral iterator types: advance from 'begin' using
-        // std::distance/std::advance
-        using diff_t = typename std::iterator_traits<Iterator>::difference_type;
-
-        const diff_t                n_diff = std::distance(begin, end);
-        const std::size_t           n      = static_cast<std::size_t>(n_diff);
-        tf::IndexRange<std::size_t> range(0, n, 1);
-
-        taskflow.for_each_by_index(
-          range,
-          [&, begin](const tf::IndexRange<std::size_t> &subrange) {
-            Iterator subrange_begin = begin;
-            std::advance(subrange_begin, static_cast<diff_t>(subrange.begin()));
-
-            Iterator subrange_end = subrange_begin;
-            std::advance(subrange_end, static_cast<diff_t>(subrange.size()));
-
-            f(subrange_begin, subrange_end);
-          },
-          tf::GuidedPartitioner(grainsize));
-      }
-
-    // Schedule the work. If we are within a task, we are required to use
-    // corun() without wait() to avoid a potential deadlock as described in
-    // https://taskflow.github.io/taskflow/ExecuteTaskflow.html#ExecuteATaskflowFromAnInternalWorker:
-    if (executor.this_worker_id() != -1)
-      executor.corun(taskflow);
-    else
-      executor.run(taskflow).wait();
 
 #elif defined(DEAL_II_WITH_TBB)
-    internal::parallel_for(
-      begin,
-      end,
-      [&f](const tbb::blocked_range<Iterator> &range) {
-        internal::apply_to_subranges<Iterator, Function>(range, f);
-      },
-      grainsize);
-#else
-    // make sure we don't get compiler
-    // warnings about unused arguments
-    (void)grainsize;
 
-    f(begin, end);
+    if (worth_doing_in_parallel)
+      {
+        internal::parallel_for(
+          begin,
+          end,
+          [&f](const tbb::blocked_range<Iterator> &range) {
+            internal::apply_to_subranges<Iterator, Function>(range, f);
+          },
+          grainsize);
+
+        return;
+      }
+
 #endif
+
+    // Without library support (taskflow or TBB) or if not worth running in
+    // parallel, we just call the function directly with the whole range:
+    f(begin, end);
   }
 
 
