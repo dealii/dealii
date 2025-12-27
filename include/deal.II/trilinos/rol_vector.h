@@ -387,14 +387,7 @@ namespace TrilinosWrappers
     if (vector_ptr->locally_owned_elements().is_element(i))
       vec_ptr->operator[](i) = 1.;
 
-    if (vec_ptr->has_ghost_elements())
-      {
-        vec_ptr->update_ghost_values();
-      }
-    else
-      {
-        vec_ptr->compress(VectorOperation::insert);
-      }
+    vec_ptr->compress(VectorOperation::insert);
 
     return ROL::makePtr<ROLVector>(vec_ptr);
   }
@@ -413,14 +406,7 @@ namespace TrilinosWrappers
          iterator++)
       *iterator = f.apply(*iterator);
 
-    if (vector_ptr->has_ghost_elements())
-      {
-        vector_ptr->update_ghost_values();
-      }
-    else
-      {
-        vector_ptr->compress(VectorOperation::insert);
-      }
+    vector_ptr->compress(VectorOperation::insert);
   }
 
 
@@ -448,14 +434,7 @@ namespace TrilinosWrappers
          l_iterator++, r_iterator++)
       *l_iterator = f.apply(*l_iterator, *r_iterator);
 
-    if (vector_ptr->has_ghost_elements())
-      {
-        vector_ptr->update_ghost_values();
-      }
-    else
-      {
-        vector_ptr->compress(VectorOperation::insert);
-      }
+    vector_ptr->compress(VectorOperation::insert);
   }
 
 
