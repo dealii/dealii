@@ -90,17 +90,9 @@ test()
   b.compress(VectorOperation::insert);
   c.compress(VectorOperation::insert);
 
-  a.update_ghost_values();
-  b.update_ghost_values();
-  c.update_ghost_values();
-
-  ROL::Ptr<VectorType> a_ptr = ROL::makePtr<VectorType>(a);
-  ROL::Ptr<VectorType> b_ptr = ROL::makePtr<VectorType>(b);
-  ROL::Ptr<VectorType> c_ptr = ROL::makePtr<VectorType>(c);
-
-  a_ptr->update_ghost_values();
-  b_ptr->update_ghost_values();
-  c_ptr->update_ghost_values();
+  ROL::Ptr<VectorType> a_ptr = ROL::makePtrFromRef<VectorType>(a);
+  ROL::Ptr<VectorType> b_ptr = ROL::makePtrFromRef<VectorType>(b);
+  ROL::Ptr<VectorType> c_ptr = ROL::makePtrFromRef<VectorType>(c);
 
   // --- Testing the constructor
   TrilinosWrappers::ROLVector<VectorType> a_rol(a_ptr);
