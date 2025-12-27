@@ -375,7 +375,7 @@ public:
   /**
    * Return the number of refinement directions of the cell.
    */
-  unsigned int
+  constexpr unsigned int
   n_isotropic_refinement_choices() const;
 
   /**
@@ -1550,7 +1550,8 @@ constexpr dealii::ndarray<unsigned int, 12, 4>
 ReferenceCell::new_isotropic_child_face_lines(
   const unsigned int refinement_choice) const
 {
-  // AssertIndexRange(refinement_choice, n_isotropic_refinement_choices());
+  AssertIndexRange(refinement_choice, n_isotropic_refinement_choices());
+
   const unsigned int X = numbers::invalid_unsigned_int;
   switch (this->kind)
     {
@@ -1629,7 +1630,8 @@ constexpr dealii::ndarray<unsigned int, 12, 4, 2>
 ReferenceCell::new_isotropic_child_face_line_vertices(
   const unsigned int refinement_choice) const
 {
-  // AssertIndexRange(refinement_choice, n_isotropic_refinement_choices());
+  AssertIndexRange(refinement_choice, n_isotropic_refinement_choices());
+
   const unsigned int X = numbers::invalid_unsigned_int;
   switch (this->kind)
     {
@@ -2177,7 +2179,7 @@ ReferenceCell::face_indices_by_type(const ReferenceCell &face_ref_type) const
 
 
 
-inline unsigned int
+inline constexpr unsigned int
 ReferenceCell::n_isotropic_refinement_choices() const
 {
   switch (this->kind)
