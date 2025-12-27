@@ -47,15 +47,27 @@ namespace NonMatching
    * inside      if $\psi(x) < 0$,
    * outside     if $\psi(x) > 0$,
    * intersected if $\psi(x)$ varies in sign,
+   * aligned     if $\psi(x) = 0$,
    *
-   * over the cell/face. The value "unassigned" is used to describe that the
-   * location of a cell/face has not yet been determined.
+   * over the cell/face.
+   *
+   * The "aligned" state is specifically introduced to address scenarios
+   * where faces/cells lie exactly on the zero contour of the level set
+   * function, $\psi(x) = 0$. A face is marked as `aligned` if all vertices or
+   * degrees of freedom on the face satisfy $\psi(x) = 0$. This indicates that
+   * the face lies exactly on the zero contour of the level set function. Such
+   * classification allows for special handling of faces that are precisely
+   * aligned with the interface, distinct from "intersected" faces.
+   *
+   * The value "unassigned" is used to describe that the location of a cell/face
+   * has not yet been determined.
    */
   enum class LocationToLevelSet
   {
     inside,
     outside,
     intersected,
+    aligned,
     unassigned
   };
 
@@ -64,12 +76,12 @@ namespace NonMatching
    * Class responsible for determining how the active cells and faces of a
    * triangulation relate to the sign of a level set function. When calling the
    * reclassify() function each of the active cells and faces are categorized as
-   * one of the values of LocationToLevelSet: inside, outside or intersected,
-   * depending on the sign of the level set function over the cell/face. This
-   * information is typically required in immersed/cut finite element methods,
-   * both when distributing degrees of freedom over the triangulation and when
-   * the system is assembled. The given class would then be used in the
-   * following way:
+   * one of the values of LocationToLevelSet: inside, outside, intersected or
+   * aligned, depending on the sign of the level set function over the
+   * cell/face. This information is typically required in immersed/cut finite
+   * element methods, both when distributing degrees of freedom over the
+   * triangulation and when the system is assembled. The given class would then
+   * be used in the following way:
    *
    * @code
    * Vector<double> &level_set = ...
@@ -83,22 +95,66 @@ namespace NonMatching
    * The level set function can either be described as a discrete function by a
    * (DoFHandler, Vector)-pair or as a general Function. In the case of a
    * discrete function, LocationToLevelSet for a given face is determined
-   * by looking at the local degrees of freedom on the face. Since the Lagrange
-   * basis functions are not positive definite, positive/negative definite
-   * dof values do not imply that the interpolated function is
+   * by looking at the signs of the local degrees of freedom on the face. Since
+   * the Lagrange basis functions are not positive definite, positive/negative
+   * definite dof values do not imply that the interpolated function is
    * positive/negative definite. Thus, to classify a face this class internally
    * transforms the local dofs to a basis spanning the same polynomial space
    * over the face but where definite dof values imply a definite function.
    * Currently, only the case of FE_Q-elements is implemented, where we
-   * internally change basis to FE_Bernstein. For cells, LocationToLevelSet is
-   * determined from the faces of the cell. That is, if all faces of the cell
-   * are inside/outside the LocationToLevelSet of the cell is set to
-   * inside/outside. LocationToLevelSet of the cell is set to intersected if at
-   * least one face is intersected or if its faces have different
-   * LocationToLevelSet. Note that, this procedure will incorrectly classify the
-   * cell as inside/outside, if the mesh refinement is so low that the whole
-   * zero-contour is contained in a single cell (so that none of its faces are
-   * intersected).
+   * internally change basis to FE_Bernstein.
+   *
+   * For cells, the LocationToLevelSet is determined from the faces of the cell.
+   * Specifically:
+   * 1. If all faces are inside or outside, the LocationToLevelSet of the cell
+   *    is set to inside or outside, respectively.
+   * 2. If at least one face is intersected the LocationToLevelSet of the cell
+   *    is set to intersected.
+   * 3. If one face is aligned and the remaining inside, the LocationToLevelSet
+   *    of the cell is set to intersected.
+   * 4. If one face is aligned and the remaining outside, the LocationToLevelSet
+   *    of the cell is set to outside.
+   * 5. If all faces are aligned, the LocationToLevelSet of the cell is set to
+   *    aligned, indicating that the level set function is zero over the whole
+   *    cell.
+   * 6. If some faces are inside and some are outside, the LocationToLevelSet
+   *    of the cell is set to intersected.
+   *
+   * Bullets 3 and 4 handles the rare case where one face is perfectly aligned
+   * with the zero contour of the level set function. The cells are classified
+   * as in the following figure:
+   *
+   *  ```
+   *          aligned face
+   *  +-------------+-------------+
+   *  |             |             |
+   *  | intersected |   outside   |
+   *  |             |             |
+   *  |   cell 1    |    cell 2   |
+   *  +-------------+-------------+
+   *  ```
+   *
+   * That is, the cell where the level set function is negative (except for the
+   * face) is classified as intersected and the cell where the level set
+   * function is positive as outside. The reasoning behind this is the
+   * following. When this class is used, we typically iterate over all the cells
+   * in the triangulation and check which LocationToLevelSet they have. On the
+   * cells that are intersected, we typically integrate over the zero
+   * contour of the level set function (see e.g. Step-85). If we had defined
+   * both cells as intersected, we would have integrated over the zero contour
+   * twice. Conversely if we would have defined cell 1 as inside and cell 2 as
+   * outside, we would have missed to integrate over the zero contour. With the
+   * definition in the figure, we only integrate over the zero contour once.
+   *
+   * Bullet 6 above handles another corner case: In 2D, the zero contour can cut
+   * the cell diagonally, exactly through the vertices, so that two of the faces
+   * are inside and two are outside. Here, none of the faces are intersected
+   * even though the cell clearly is.
+
+   * Note that, the procedure above, where we classify the cell based on the
+   * faces, will incorrectly classify the cell as inside/outside, if the mesh
+   * refinement is so low that the whole zero contour is contained in a single
+   * cell (so that none of its faces are intersected).
    *
    * When the level set function is described as a Function, the level set
    * function is locally interpolated to an FE_Q element and we proceed in the
