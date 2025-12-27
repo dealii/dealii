@@ -2843,11 +2843,9 @@ ReferenceCell::face_to_cell_vertices(
         }
       case ReferenceCells::Line:
         {
-          const auto [face_orientation, face_rotation, face_flip] =
-            internal::split_face_orientation(combined_face_orientation);
-
-          return GeometryInfo<1>::face_to_cell_vertices(
-            face, vertex, face_orientation, face_flip, face_rotation);
+          // A line has only one vertex per face, so the vertex we are
+          // looking for is actually the face we were given:
+          return face;
         }
       case ReferenceCells::Triangle:
         {
