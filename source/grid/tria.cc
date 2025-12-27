@@ -28,6 +28,7 @@
 #include <deal.II/grid/grid_tools.h>
 #include <deal.II/grid/magic_numbers.h>
 #include <deal.II/grid/manifold.h>
+#include <deal.II/grid/reference_cell.h>
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_description.h>
@@ -49,6 +50,7 @@
 #include <map>
 #include <memory>
 #include <numeric>
+#include <vector>
 
 
 DEAL_II_NAMESPACE_OPEN
@@ -6013,25 +6015,34 @@ namespace internal
                              RefinementCase<dim>::cut_xyz,
                            ExcInternalError());
 
+                    // get reference cell type of current cell
+                    const auto cell_reference_cell = cell->reference_cell();
+
                     // Now count up how many new cells, faces, edges, and
                     // vertices we will need to allocate to do this refinement.
-                    new_cells += cell->reference_cell().n_isotropic_children();
+                    new_cells += cell_reference_cell.n_isotropic_children();
 
-                    if (cell->reference_cell() == ReferenceCells::Hexahedron)
+                    switch (cell_reference_cell)
                       {
-                        ++needed_vertices;
-                        needed_lines_single += 6;
-                        needed_faces_single += 12;
-                      }
-                    else if (cell->reference_cell() ==
-                             ReferenceCells::Tetrahedron)
-                      {
-                        needed_lines_single += 1;
-                        needed_faces_single += 8;
-                      }
-                    else
-                      {
-                        DEAL_II_ASSERT_UNREACHABLE();
+                        case ReferenceCells::Tetrahedron:
+                          needed_lines_single += 1;
+                          needed_faces_single += 8;
+                          break;
+
+                        case ReferenceCells::Pyramid:
+                        case ReferenceCells::Wedge:
+                          DEAL_II_NOT_IMPLEMENTED();
+                          break;
+
+                        case ReferenceCells::Hexahedron:
+                          // One vertex in the center of the parent
+                          ++needed_vertices;
+                          needed_lines_single += 6;
+                          needed_faces_single += 12;
+                          break;
+
+                        default:
+                          DEAL_II_ASSERT_UNREACHABLE();
                       }
 
                     // Also check whether we have to refine any of the faces and
@@ -6250,27 +6261,28 @@ namespace internal
               // 1) Create new lines (property is set later).
               // Maximum of 4 new lines (4 quadrilateral, 3 triangle).
               std::array<raw_line_iterator, 4> new_lines;
-              if (reference_face_type == ReferenceCells::Quadrilateral)
+              switch (reference_face_type)
                 {
-                  for (unsigned int l = 0; l < 2; ++l)
-                    {
-                      auto next_unused_line =
+                  case ReferenceCells::Triangle:
+                    for (unsigned int l = 0; l < 3; ++l)
+                      new_lines[l] =
                         triangulation.faces->lines
-                          .template next_free_pair_object<1>(triangulation);
-                      new_lines[2 * l]     = next_unused_line;
-                      new_lines[2 * l + 1] = ++next_unused_line;
-                    }
-                }
-              else if (reference_face_type == ReferenceCells::Triangle)
-                {
-                  for (unsigned int l = 0; l < 3; ++l)
-                    new_lines[l] =
-                      triangulation.faces->lines
-                        .template next_free_single_object<1>(triangulation);
-                }
-              else
-                {
-                  DEAL_II_NOT_IMPLEMENTED();
+                          .template next_free_single_object<1>(triangulation);
+                    break;
+
+                  case ReferenceCells::Quadrilateral:
+                    for (unsigned int l = 0; l < 2; ++l)
+                      {
+                        auto next_unused_line =
+                          triangulation.faces->lines
+                            .template next_free_pair_object<1>(triangulation);
+                        new_lines[2 * l]     = next_unused_line;
+                        new_lines[2 * l + 1] = ++next_unused_line;
+                      }
+                    break;
+
+                  default:
+                    DEAL_II_NOT_IMPLEMENTED();
                 }
 
               if constexpr (running_in_debug_mode())
@@ -6455,19 +6467,26 @@ namespace internal
                   triangulation.faces->set_quad_type(new_face->index(),
                                                      reference_face_type);
 
-                  if (reference_face_type == ReferenceCells::Triangle)
-                    new_face->set_bounding_object_indices(
-                      {line_indices[face_lines[i][0]],
-                       line_indices[face_lines[i][1]],
-                       line_indices[face_lines[i][2]]});
-                  else if (reference_face_type == ReferenceCells::Quadrilateral)
-                    new_face->set_bounding_object_indices(
-                      {line_indices[face_lines[i][0]],
-                       line_indices[face_lines[i][1]],
-                       line_indices[face_lines[i][2]],
-                       line_indices[face_lines[i][3]]});
-                  else
-                    DEAL_II_NOT_IMPLEMENTED();
+                  switch (reference_face_type)
+                    {
+                      case ReferenceCells::Triangle:
+                        new_face->set_bounding_object_indices(
+                          {line_indices[face_lines[i][0]],
+                           line_indices[face_lines[i][1]],
+                           line_indices[face_lines[i][2]]});
+                        break;
+
+                      case ReferenceCells::Quadrilateral:
+                        new_face->set_bounding_object_indices(
+                          {line_indices[face_lines[i][0]],
+                           line_indices[face_lines[i][1]],
+                           line_indices[face_lines[i][2]],
+                           line_indices[face_lines[i][3]]});
+                        break;
+
+                      default:
+                        DEAL_II_NOT_IMPLEMENTED();
+                    }
 
                   new_face->set_used_flag();
                   new_face->clear_user_flag();
@@ -6518,8 +6537,8 @@ namespace internal
                     }
                 }
 
-              // fix orientation of lines of faces for quadrilaterals with
-              // cheap algorithm
+              // 5.b.II) Fix orientation of lines of faces for quadrilaterals
+              // with cheap algorithm.
               if (reference_face_type == ReferenceCells::Quadrilateral)
                 {
                   static constexpr dealii::ndarray<unsigned int, 4, 2>
@@ -6562,29 +6581,41 @@ namespace internal
                     RefinementCase<dim>::no_refinement)
                   continue;
 
+                // Copy the requested refinement case to the cell's actual
+                // refinement flag, informing the cell how it has been refined.
                 const RefinementCase<dim> ref_case = cell->refine_flag_set();
                 cell->clear_refine_flag();
                 cell->set_refinement_case(ref_case);
 
-                unsigned int n_new_lines = 0;
-                unsigned int n_new_faces = 0;
-                unsigned int n_new_cells = 0;
+                const auto &cell_reference_cell = cell->reference_cell();
 
-                const auto &reference_cell_type = cell->reference_cell();
-                if (reference_cell_type == ReferenceCells::Hexahedron)
+                unsigned int       n_new_lines = 0;
+                unsigned int       n_new_faces = 0;
+                const unsigned int n_new_cells =
+                  cell_reference_cell.n_isotropic_children();
+
+                // Must match the information used close the beginning of this
+                // function.
+                switch (cell_reference_cell)
                   {
-                    n_new_lines = 6;
-                    n_new_faces = 12;
-                    n_new_cells = 8;
+                    case ReferenceCells::Tetrahedron:
+                      n_new_lines = 1;
+                      n_new_faces = 8;
+                      break;
+
+                    case ReferenceCells::Pyramid:
+                    case ReferenceCells::Wedge:
+                      DEAL_II_NOT_IMPLEMENTED();
+                      break;
+
+                    case ReferenceCells::Hexahedron:
+                      n_new_lines = 6;
+                      n_new_faces = 12;
+                      break;
+
+                    default:
+                      DEAL_II_ASSERT_UNREACHABLE();
                   }
-                else if (reference_cell_type == ReferenceCells::Tetrahedron)
-                  {
-                    n_new_lines = 1;
-                    n_new_faces = 8;
-                    n_new_cells = 8;
-                  }
-                else
-                  DEAL_II_NOT_IMPLEMENTED();
 
                 std::array<raw_line_iterator, 6> new_lines;
                 for (unsigned int i = 0; i < n_new_lines; ++i)
@@ -6617,7 +6648,7 @@ namespace internal
                     // face types)
                     triangulation.faces->set_quad_type(
                       new_face->index(),
-                      reference_cell_type.face_reference_cell(0));
+                      cell_reference_cell.face_reference_cell(0));
 
                     AssertIsNotUsed(new_face);
                     new_face->set_used_flag();
@@ -6658,7 +6689,7 @@ namespace internal
                       // children have the same type as the parent
                       triangulation.levels[new_cell->level()]
                         ->reference_cell[new_cell->index()] =
-                        reference_cell_type;
+                        cell_reference_cell;
 
                       // Copy parent data to child.
                       AssertIsNotUsed(new_cell);
@@ -6694,10 +6725,10 @@ namespace internal
                   std::array<unsigned int, 27> vertex_indices = {};
 
                   { // GET_VERTICES
-                    // Continuous counter variable
+                    // continuous counter variable
                     unsigned int k = 0;
 
-                    // Avoid a compiler warning by fixing max number of
+                    // avoid a compiler warning by fixing max number of
                     // iterations to 8.
                     const unsigned int n_vertices =
                       std::min(cell->n_vertices(), 8u);
@@ -6719,7 +6750,7 @@ namespace internal
                         vertex_indices[k++] = line->child(0)->vertex_index(1);
                       }
 
-                    if (reference_cell_type == ReferenceCells::Hexahedron)
+                    if (cell_reference_cell == ReferenceCells::Hexahedron)
                       {
                         for (const unsigned int i : cell->face_indices())
                           vertex_indices[k++] =
@@ -6739,78 +6770,97 @@ namespace internal
 
                   unsigned int chosen_line_tetrahedron = 0;
                   // set up new lines
-                  if (reference_cell_type == ReferenceCells::Hexahedron)
+                  switch (cell_reference_cell)
                     {
-                      static constexpr dealii::ndarray<unsigned int, 6, 2>
-                        new_line_vertices = {{{{22, 26}},
-                                              {{26, 23}},
-                                              {{20, 26}},
-                                              {{26, 21}},
-                                              {{24, 26}},
-                                              {{26, 25}}}};
-                      for (unsigned int i = 0; i < n_new_lines; ++i)
-                        new_lines[i]->set_bounding_object_indices(
-                          {vertex_indices[new_line_vertices[i][0]],
-                           vertex_indices[new_line_vertices[i][1]]});
-                    }
-                  else if (reference_cell_type == ReferenceCells::Tetrahedron)
-                    {
-                      // in the tetrahedron case, we have the three
-                      // possibilities (6,8), (5,7), (4,9) -> pick the
-                      // shortest line to guarantee the best possible aspect
-                      // ratios
-                      static constexpr dealii::ndarray<unsigned int, 3, 2>
-                        new_line_vertices = {{{{6, 8}}, {{5, 7}}, {{4, 9}}}};
-
-                      // choose line to cut either by refinement case or by
-                      // shortest distance between edge midpoints
-                      std::uint8_t refinement_choice = cell->refine_choice();
-                      if (refinement_choice ==
-                          static_cast<char>(
-                            IsotropicRefinementChoice::isotropic_refinement))
+                      case ReferenceCells::Tetrahedron:
                         {
-                          const auto &vertices = triangulation.get_vertices();
-                          double      min_distance =
-                            std::numeric_limits<double>::infinity();
-                          for (unsigned int i = 0; i < new_line_vertices.size();
-                               ++i)
+                          // in the tetrahedron case, we have the three
+                          // possibilities (6,8), (5,7), (4,9) -> pick the
+                          // shortest line to guarantee the best possible aspect
+                          // ratios
+                          static constexpr dealii::ndarray<unsigned int, 3, 2>
+                            new_line_vertices = {{{{6, 8}}, //
+                                                  {{5, 7}}, //
+                                                  {{4, 9}}}};
+
+                          // choose line to cut either by refinement case or by
+                          // shortest distance between edge midpoints
+                          std::uint8_t refinement_choice =
+                            cell->refine_choice();
+                          if (refinement_choice ==
+                              static_cast<char>(IsotropicRefinementChoice::
+                                                  isotropic_refinement))
                             {
-                              const double current_distance =
-                                vertices
-                                  [vertex_indices[new_line_vertices[i][0]]]
-                                    .distance(
-                                      vertices[vertex_indices
-                                                 [new_line_vertices[i][1]]]);
-                              if (current_distance < min_distance)
+                              const auto &vertices =
+                                triangulation.get_vertices();
+                              double min_distance =
+                                std::numeric_limits<double>::infinity();
+                              for (unsigned int i = 0;
+                                   i < new_line_vertices.size();
+                                   ++i)
                                 {
-                                  chosen_line_tetrahedron = i;
-                                  min_distance            = current_distance;
+                                  const double current_distance =
+                                    vertices[vertex_indices
+                                               [new_line_vertices[i][0]]]
+                                      .distance(
+                                        vertices[vertex_indices
+                                                   [new_line_vertices[i][1]]]);
+                                  if (current_distance < min_distance)
+                                    {
+                                      chosen_line_tetrahedron = i;
+                                      min_distance = current_distance;
+                                    }
                                 }
                             }
+                          else if (refinement_choice ==
+                                   static_cast<char>(
+                                     IsotropicRefinementChoice::cut_tet_68))
+                            chosen_line_tetrahedron = 0;
+                          else if (refinement_choice ==
+                                   static_cast<char>(
+                                     IsotropicRefinementChoice::cut_tet_57))
+                            chosen_line_tetrahedron = 1;
+                          else if (refinement_choice ==
+                                   static_cast<char>(
+                                     IsotropicRefinementChoice::cut_tet_49))
+                            chosen_line_tetrahedron = 2;
+                          else
+                            DEAL_II_NOT_IMPLEMENTED();
+
+                          cell->set_refinement_case(
+                            RefinementCase<dim>(chosen_line_tetrahedron + 1));
+
+                          new_lines[0]->set_bounding_object_indices(
+                            {vertex_indices
+                               [new_line_vertices[chosen_line_tetrahedron][0]],
+                             vertex_indices[new_line_vertices
+                                              [chosen_line_tetrahedron][1]]});
                         }
-                      else if (refinement_choice ==
-                               static_cast<char>(
-                                 IsotropicRefinementChoice::cut_tet_68))
-                        chosen_line_tetrahedron = 0;
-                      else if (refinement_choice ==
-                               static_cast<char>(
-                                 IsotropicRefinementChoice::cut_tet_57))
-                        chosen_line_tetrahedron = 1;
-                      else if (refinement_choice ==
-                               static_cast<char>(
-                                 IsotropicRefinementChoice::cut_tet_49))
-                        chosen_line_tetrahedron = 2;
-                      else
+                        break;
+
+                      case ReferenceCells::Pyramid:
+                      case ReferenceCells::Wedge:
                         DEAL_II_NOT_IMPLEMENTED();
+                        break;
 
-                      cell->set_refinement_case(
-                        RefinementCase<dim>(chosen_line_tetrahedron + 1));
+                      case ReferenceCells::Hexahedron:
+                        {
+                          static constexpr dealii::ndarray<unsigned int, 6, 2>
+                            new_line_vertices = {{{{22, 26}},
+                                                  {{26, 23}},
+                                                  {{20, 26}},
+                                                  {{26, 21}},
+                                                  {{24, 26}},
+                                                  {{26, 25}}}};
+                          for (unsigned int i = 0; i < n_new_lines; ++i)
+                            new_lines[i]->set_bounding_object_indices(
+                              {vertex_indices[new_line_vertices[i][0]],
+                               vertex_indices[new_line_vertices[i][1]]});
+                        }
+                        break;
 
-                      new_lines[0]->set_bounding_object_indices(
-                        {vertex_indices
-                           [new_line_vertices[chosen_line_tetrahedron][0]],
-                         vertex_indices
-                           [new_line_vertices[chosen_line_tetrahedron][1]]});
+                      default:
+                        DEAL_II_ASSERT_UNREACHABLE();
                     }
 
                   // set up new faces
@@ -6818,7 +6868,7 @@ namespace internal
                     boost::container::small_vector<raw_line_iterator, 30>
                       relevant_lines;
 
-                    if (reference_cell_type == ReferenceCells::Hexahedron)
+                    if (cell_reference_cell == ReferenceCells::Hexahedron)
                       {
                         relevant_lines.resize(30);
                         for (unsigned int f = 0, k = 0; f < 6; ++f)
@@ -6878,7 +6928,7 @@ namespace internal
                         for (unsigned int i = 0, k = 24; i < 6; ++i, ++k)
                           relevant_lines[k] = new_lines[i];
                       }
-                    else if (reference_cell_type == ReferenceCells::Tetrahedron)
+                    else if (cell_reference_cell == ReferenceCells::Tetrahedron)
                       {
                         relevant_lines.resize(13);
 
@@ -6985,14 +7035,14 @@ namespace internal
                         // (this saves expensive operations), for tets we do
                         // all lines manually
                         const unsigned int n_compute_lines =
-                          reference_cell_type == ReferenceCells::Hexahedron ?
+                          cell_reference_cell == ReferenceCells::Hexahedron ?
                             1 :
                             new_face->n_lines();
                         for (unsigned int line = 0; line < n_compute_lines;
                              ++line)
                           {
                             const unsigned int l =
-                              (reference_cell_type ==
+                              (cell_reference_cell ==
                                ReferenceCells::Hexahedron) ?
                                 representative_lines[q % 4][0] :
                                 line;
@@ -7017,7 +7067,7 @@ namespace internal
                             // on a hex, inject the status of the current line
                             // also to the line on the other quad along the
                             // same direction
-                            if (reference_cell_type ==
+                            if (cell_reference_cell ==
                                 ReferenceCells::Hexahedron)
                               new_faces[representative_lines[q % 4][1] + q -
                                         (q % 4)]
@@ -7030,7 +7080,7 @@ namespace internal
                   {
                     std::array<int, 36> face_indices;
 
-                    if (reference_cell_type == ReferenceCells::Hexahedron)
+                    if (cell_reference_cell == ReferenceCells::Hexahedron)
                       {
                         for (unsigned int i = 0; i < n_new_faces; ++i)
                           face_indices[i] = new_faces[i]->index();
@@ -7046,7 +7096,7 @@ namespace internal
                                   cell->face_flip(f),
                                   cell->face_rotation(f)));
                       }
-                    else if (reference_cell_type == ReferenceCells::Tetrahedron)
+                    else if (cell_reference_cell == ReferenceCells::Tetrahedron)
                       {
                         for (unsigned int i = 0; i < n_new_faces; ++i)
                           face_indices[i] = new_faces[i]->index();
@@ -7058,7 +7108,7 @@ namespace internal
                                 cell->combined_face_orientation(f);
                               face_indices[k] = cell->face(f)->child_index(
                                 (c == 3) ? 3 :
-                                           reference_cell_type
+                                           cell_reference_cell
                                              .standard_to_real_face_vertex(
                                                c, f, combined_orientation));
                             }
@@ -7178,7 +7228,7 @@ namespace internal
                                                  {{2, 3, 6, 7}},
                                                  {{0, 1, 2, 3}},
                                                  {{4, 5, 6, 7}}}};
-                    if (cell->n_faces() == 6)
+                    if (cell_reference_cell == ReferenceCells::Hexahedron)
                       for (const auto f : cell->face_indices())
                         {
                           const auto combined_orientation =
