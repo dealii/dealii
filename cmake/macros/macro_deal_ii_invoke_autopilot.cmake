@@ -84,7 +84,10 @@ macro(deal_ii_invoke_autopilot)
     endif()
   endif()
 
-  # Define and set up a compilation target:
+  #
+  # Define and set up the compilation target:
+  #
+
   add_executable(${TARGET} ${TARGET_SRC})
 
   #
@@ -120,6 +123,24 @@ macro(deal_ii_invoke_autopilot)
     set(TARGET_RUN ${TARGET})
   endif()
 
+  #
+  # Print a status message explaining how the target was built:
+  #
+
+  add_custom_target(build_message ALL
+    DEPENDS ${TARGET}
+    COMMAND ${CMAKE_COMMAND} -E echo "###"
+    COMMAND ${CMAKE_COMMAND} -E echo "#"
+    COMMAND ${CMAKE_COMMAND} -E echo "#   Target ${TARGET} was built in $<$<CONFIG:Release>:Release>$<$<CONFIG:Debug>:Debug> configuration."
+    COMMAND ${CMAKE_COMMAND} -E echo "#"
+    COMMAND ${CMAKE_COMMAND} -E echo "###"
+    VERBATIM
+    )
+
+  #
+  # Define a run target:
+  #
+
   if(CMAKE_SYSTEM_NAME MATCHES "(CYGWIN|Windows)")
     #
     # Hack for Cygwin and Windows targets: Export PATH to point to the
@@ -146,10 +167,18 @@ macro(deal_ii_invoke_autopilot)
   endif()
 
   if(NOT "${TARGET_RUN}" STREQUAL "")
+    add_custom_target(run_message
+      DEPENDS ${TARGET} build_message
+      COMMAND ${CMAKE_COMMAND} -E echo "###"
+      COMMAND ${CMAKE_COMMAND} -E echo "#"
+      COMMAND ${CMAKE_COMMAND} -E echo "#   Running ${TARGET} in $<$<CONFIG:Release>:Release>$<$<CONFIG:Debug>:Debug> configuration."
+      COMMAND ${CMAKE_COMMAND} -E echo "#"
+      COMMAND ${CMAKE_COMMAND} -E echo "###"
+      VERBATIM
+      )
     add_custom_target(run
+      DEPENDS ${TARGET} run_message
       COMMAND ${_command}
-      DEPENDS ${TARGET}
-      COMMENT "Run ${TARGET} with $<$<CONFIG:Release>:Release>$<$<CONFIG:Debug>:Debug> configuration"
       )
     set(_run_targets
       "#      ${_make_command} run            - to (compile, link and) run the program\n"
@@ -201,9 +230,11 @@ macro(deal_ii_invoke_autopilot)
     if(${DEAL_II_BUILD_TYPE} MATCHES "Debug")
       add_custom_target(debug
         COMMAND ${CMAKE_COMMAND} -DCMAKE_BUILD_TYPE=Debug ${CMAKE_SOURCE_DIR}
-        COMMAND ${CMAKE_COMMAND} -E echo "***"
-        COMMAND ${CMAKE_COMMAND} -E echo "*** Switched to Debug mode. Now recompile with: ${_make_command}"
-        COMMAND ${CMAKE_COMMAND} -E echo "***"
+        COMMAND ${CMAKE_COMMAND} -E echo "###"
+        COMMAND ${CMAKE_COMMAND} -E echo "#"
+        COMMAND ${CMAKE_COMMAND} -E echo "#   Switched to Debug configuration. Now recompile with: ${_make_command}"
+        COMMAND ${CMAKE_COMMAND} -E echo "#"
+        COMMAND ${CMAKE_COMMAND} -E echo "###"
         COMMENT "Switching CMAKE_BUILD_TYPE to Debug"
         VERBATIM
         )
@@ -212,9 +243,11 @@ macro(deal_ii_invoke_autopilot)
     if(${DEAL_II_BUILD_TYPE} MATCHES "Release")
       add_custom_target(release
         COMMAND ${CMAKE_COMMAND} -DCMAKE_BUILD_TYPE=Release ${CMAKE_SOURCE_DIR}
-        COMMAND ${CMAKE_COMMAND} -E echo "***"
-        COMMAND ${CMAKE_COMMAND} -E echo "*** Switched to Release mode. Now recompile with: ${_make_command}"
-        COMMAND ${CMAKE_COMMAND} -E echo "***"
+        COMMAND ${CMAKE_COMMAND} -E echo "###"
+        COMMAND ${CMAKE_COMMAND} -E echo "#"
+        COMMAND ${CMAKE_COMMAND} -E echo "#   Switched to Release configuration. Now recompile with: ${_make_command}"
+        COMMAND ${CMAKE_COMMAND} -E echo "#"
+        COMMAND ${CMAKE_COMMAND} -E echo "###"
         COMMENT "Switching CMAKE_BUILD_TYPE to Release"
         VERBATIM
         )
