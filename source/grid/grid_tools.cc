@@ -1755,6 +1755,40 @@ namespace GridTools
 
 
   template <int dim, int spacedim>
+  std::vector<types::global_vertex_index>
+  parallel_to_serial_vertex_indices(
+    const Triangulation<dim, spacedim> &serial_tria,
+    const Triangulation<dim, spacedim> &parallel_tria)
+  {
+    const auto locally_owned_indices =
+      GridTools::get_locally_owned_vertices(parallel_tria);
+    std::vector<types::global_vertex_index> vertex_map(
+      parallel_tria.n_vertices(), numbers::invalid_unsigned_int);
+
+    // Assumption: serial and parallel meshes have the same ordering of cells.
+    auto serial_cell   = serial_tria.begin_active();
+    auto parallel_cell = parallel_tria.begin_active();
+    for (; parallel_cell != parallel_tria.end(); ++parallel_cell)
+      if (parallel_cell->is_locally_owned())
+        {
+          // Advanced serial cell until we reach the same cell index of the
+          // parallel cell
+          while (serial_cell->id() < parallel_cell->id())
+            ++serial_cell;
+          for (const unsigned int &v : serial_cell->vertex_indices())
+            {
+              const auto serial_index   = serial_cell->vertex_index(v);
+              const auto parallel_index = parallel_cell->vertex_index(v);
+              if (locally_owned_indices[parallel_index])
+                vertex_map[parallel_index] = serial_index;
+            }
+        }
+    return vertex_map;
+  }
+
+
+
+  template <int dim, int spacedim>
   void
   partition_triangulation(const unsigned int               n_partitions,
                           Triangulation<dim, spacedim>    &triangulation,
