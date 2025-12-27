@@ -1,0 +1,27 @@
+
+size:2 locally_owned_size:1 :
+[0]: 1.000e+00
+size:2 locally_owned_size:1 :
+[0]: 0.000e+00
+Process #0
+Local range: [0, 1), global size: 2
+Vector data:
+1.000e+00 
+Process #0
+Local range: [0, 1), global size: 2
+Vector data:
+0.000e+00 
+
+size:2 locally_owned_size:1 :
+[1]: 0.000e+00
+size:2 locally_owned_size:1 :
+[1]: 1.000e+00
+Process #1
+Local range: [1, 2), global size: 2
+Vector data:
+0.000e+00 
+Process #1
+Local range: [1, 2), global size: 2
+Vector data:
+1.000e+00 
+
