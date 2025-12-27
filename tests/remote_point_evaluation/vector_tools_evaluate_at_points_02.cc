@@ -206,7 +206,8 @@ public:
       TrilinosWrappers::SparseMatrix A;
 
       TrilinosWrappers::SparsityPattern dsp(dof_handler.locally_owned_dofs(),
-                                            get_mpi_comm(dof_handler));
+                                            get_mpi_comm(dof_handler),
+                                            std::pow(2 * fe.degree + 1, dim));
       DoFTools::make_sparsity_pattern(dof_handler, dsp, constraints, false);
       dsp.compress();
       A.reinit(dsp);

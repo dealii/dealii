@@ -166,7 +166,10 @@ test(const Triangulation<dim, spacedim> &tria,
 
 
 #ifdef DEAL_II_WITH_TRILINOS
-  TrilinosWrappers::SparsityPattern dsp(dof_handler.locally_owned_dofs(), comm);
+  TrilinosWrappers::SparsityPattern dsp(
+    dof_handler.locally_owned_dofs(),
+    comm,
+    std::pow(2 * dof_handler.get_fe().degree + 1, dim));
 #else
   DynamicSparsityPattern dsp(dof_handler.n_dofs());
 #endif

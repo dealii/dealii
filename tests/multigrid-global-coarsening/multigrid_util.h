@@ -169,7 +169,8 @@ public:
             dof_handler.locally_owned_mg_dofs(
               this->matrix_free.get_mg_level()) :
             dof_handler.locally_owned_dofs(),
-          matrix_free.get_task_info().communicator);
+          matrix_free.get_task_info().communicator,
+          std::pow(2 * dof_handler.get_fe().degree + 1, dim));
 
         if (this->matrix_free.get_mg_level() != numbers::invalid_unsigned_int)
           MGTools::make_sparsity_pattern(dof_handler,

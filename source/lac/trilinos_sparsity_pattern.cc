@@ -356,7 +356,7 @@ namespace TrilinosWrappers
 
 
     template <typename SparsityPatternType>
-    void
+    std::enable_if_t<!std::is_integral_v<SparsityPatternType>>
     reinit_sp(const Epetra_Map                   &row_map,
               const Epetra_Map                   &col_map,
               const SparsityPatternType          &sp,
@@ -583,7 +583,7 @@ namespace TrilinosWrappers
 
 
   template <typename SparsityPatternType>
-  void
+  std::enable_if_t<!std::is_integral_v<SparsityPatternType>>
   SparsityPattern::reinit(
     const IndexSet            &row_parallel_partitioning,
     const IndexSet            &col_parallel_partitioning,
@@ -609,7 +609,7 @@ namespace TrilinosWrappers
 
 
   template <typename SparsityPatternType>
-  void
+  std::enable_if_t<!std::is_integral_v<SparsityPatternType>>
   SparsityPattern::reinit(
     const IndexSet            &parallel_partitioning,
     const SparsityPatternType &nontrilinos_sparsity_pattern,
@@ -660,7 +660,7 @@ namespace TrilinosWrappers
 
 
   template <typename SparsityPatternType>
-  void
+  std::enable_if_t<!std::is_integral_v<SparsityPatternType>>
   SparsityPattern::copy_from(const SparsityPatternType &sp)
   {
     SparsityPatternBase::resize(sp.n_rows(), sp.n_cols());

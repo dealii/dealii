@@ -2198,7 +2198,8 @@ namespace TrilinosWrappers
                                 inputleft.locally_owned_domain_indices() :
                                 inputleft.locally_owned_range_indices(),
                               inputright.locally_owned_domain_indices(),
-                              inputleft.get_mpi_communicator());
+                              inputleft.get_mpi_communicator(),
+                              0);
 
 #  ifdef DEAL_II_TRILINOS_WITH_EPETRAEXT
       EpetraExt::MatrixMatrix::Multiply(inputleft.trilinos_matrix(),

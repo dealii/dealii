@@ -110,8 +110,12 @@ test()
   const unsigned int local_offset(n_local_rows * my_rank);
   partitioning.add_range(local_offset, local_offset + n_local_rows);
   partitioning.compress();
-  TrilinosWrappers::SparseMatrix a(partitioning);
-  TrilinosWrappers::SparseMatrix b(partitioning);
+  TrilinosWrappers::SparseMatrix a(partitioning,
+                                   MPI_COMM_WORLD,
+                                   n_entries_per_row);
+  TrilinosWrappers::SparseMatrix b(partitioning,
+                                   MPI_COMM_WORLD,
+                                   n_entries_per_row);
   if (my_rank == 0)
     {
       value_rank_0(a);
