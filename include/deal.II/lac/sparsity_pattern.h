@@ -594,7 +594,7 @@ public:
 
   /**
    * This function can be used as a replacement for reinit(), subsequent calls
-   * to add() and a final call to close() if you know exactly in advance the
+   * to add() and a final call to compress() if you know exactly in advance the
    * entries that will form the matrix sparsity pattern.
    *
    * The first two parameters determine the size of the matrix. For the two
