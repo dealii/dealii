@@ -19,6 +19,7 @@
 #include <deal.II/base/config.h>
 
 #include <deal.II/base/exceptions.h>
+#include <deal.II/base/multithread_info.h>
 #include <deal.II/base/mutex.h>
 #include <deal.II/base/std_cxx20/type_traits.h>
 #include <deal.II/base/synchronous_iterator.h>
@@ -30,7 +31,6 @@
 #include <tuple>
 
 #ifdef DEAL_II_WITH_TASKFLOW
-#  include <deal.II/base/multithread_info.h>
 
 #  include <taskflow/algorithm/for_each.hpp>
 #  include <taskflow/taskflow.hpp>
@@ -563,7 +563,6 @@ namespace parallel
       (MultithreadInfo::n_threads() > 1) && (n > grainsize);
 
 #ifdef DEAL_II_WITH_TASKFLOW
-
     if (worth_doing_in_parallel)
       {
         tf::Executor &executor = MultithreadInfo::get_taskflow_executor();
@@ -624,9 +623,7 @@ namespace parallel
 
         return;
       }
-
 #elif defined(DEAL_II_WITH_TBB)
-
     if (worth_doing_in_parallel)
       {
         internal::parallel_for(
@@ -639,7 +636,8 @@ namespace parallel
 
         return;
       }
-
+#else
+    (void)worth_doing_in_parallel;
 #endif
 
     // Without library support (taskflow or TBB) or if not worth running in
