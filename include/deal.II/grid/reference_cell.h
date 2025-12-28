@@ -157,20 +157,20 @@ public:
    * ReferenceCells::Line, ReferenceCells::Quadrilateral, or
    * ReferenceCells::Hexahedron.
    */
-  bool
+  constexpr bool
   is_hyper_cube() const;
 
   /**
    * Return true if the object is a Vertex, Line, Triangle, or Tetrahedron.
    */
-  bool
+  constexpr bool
   is_simplex() const;
 
   /**
    * Return the dimension of the reference cell represented by the current
    * object.
    */
-  unsigned int
+  constexpr unsigned int
   get_dimension() const;
 
   /**
@@ -309,7 +309,7 @@ public:
    * cell in question. A vertex is a "corner" (a zero-dimensional
    * object) of the reference cell.
    */
-  unsigned int
+  constexpr unsigned int
   n_vertices() const;
 
   /**
@@ -339,7 +339,7 @@ public:
    * cell in question. A line is an "edge" (a one-dimensional
    * object) of the reference cell.
    */
-  unsigned int
+  constexpr unsigned int
   n_lines() const;
 
   /**
@@ -354,7 +354,7 @@ public:
    * cell in question. A face is a `(dim-1)`-dimensional
    * object bounding the reference cell.
    */
-  unsigned int
+  constexpr unsigned int
   n_faces() const;
 
   /**
@@ -395,7 +395,7 @@ public:
    * obtain four children. Similar constructions can be done for
    * the other reference cell types.
    */
-  unsigned int
+  constexpr unsigned int
   n_isotropic_children() const;
 
   /**
@@ -467,7 +467,7 @@ public:
    * returned object may be either ReferenceCells::Triangle or
    * ReferenceCells::Quadrilateral, depending on the given index.
    */
-  ReferenceCell
+  constexpr ReferenceCell
   face_reference_cell(const unsigned int face_index) const;
 
   /**
@@ -1825,7 +1825,7 @@ ReferenceCell::new_isotropic_child_cell_vertices(
 
 
 
-inline bool
+inline constexpr bool
 ReferenceCell::is_hyper_cube() const
 {
   return (*this == ReferenceCells::Vertex || *this == ReferenceCells::Line ||
@@ -1835,7 +1835,7 @@ ReferenceCell::is_hyper_cube() const
 
 
 
-inline bool
+inline constexpr bool
 ReferenceCell::is_simplex() const
 {
   return (*this == ReferenceCells::Vertex || *this == ReferenceCells::Line ||
@@ -1845,7 +1845,7 @@ ReferenceCell::is_simplex() const
 
 
 
-inline unsigned int
+inline constexpr unsigned int
 ReferenceCell::get_dimension() const
 {
   switch (this->kind)
@@ -1888,7 +1888,7 @@ ReferenceCell::get_midpoint_quadrature() const
 
 
 
-inline unsigned int
+inline constexpr unsigned int
 ReferenceCell::n_vertices() const
 {
   switch (this->kind)
@@ -1918,7 +1918,7 @@ ReferenceCell::n_vertices() const
 
 
 
-inline unsigned int
+inline constexpr unsigned int
 ReferenceCell::n_lines() const
 {
   switch (this->kind)
@@ -2073,7 +2073,7 @@ ReferenceCell::vertex(const unsigned int v) const
 }
 
 
-inline unsigned int
+inline constexpr unsigned int
 ReferenceCell::n_faces() const
 {
   switch (this->kind)
@@ -2235,7 +2235,7 @@ ReferenceCell::get_isotropic_refinement_choice(
 
 
 
-inline unsigned int
+inline constexpr unsigned int
 ReferenceCell::n_isotropic_children() const
 {
   switch (this->kind)
@@ -2396,7 +2396,7 @@ ReferenceCell::refinement_cases() const
 
 
 
-inline ReferenceCell
+inline constexpr ReferenceCell
 ReferenceCell::face_reference_cell(const unsigned int face_no) const
 {
   AssertIndexRange(face_no, n_faces());
