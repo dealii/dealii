@@ -53,26 +53,26 @@ template <typename Number>
 struct is_tpetra_type : std::false_type
 {};
 
-#  ifdef HAVE_TPETRA_INST_FLOAT
+#  ifdef DEAL_II_TRILINOS_WITH_TPETRA_INST_FLOAT
 template <>
 struct is_tpetra_type<float> : std::true_type
 {};
 #  endif
 
-#  ifdef HAVE_TPETRA_INST_DOUBLE
+#  ifdef DEAL_II_TRILINOS_WITH_TPETRA_INST_DOUBLE
 template <>
 struct is_tpetra_type<double> : std::true_type
 {};
 #  endif
 
 #  ifdef DEAL_II_WITH_COMPLEX_VALUES
-#    ifdef HAVE_TPETRA_INST_COMPLEX_FLOAT
+#    ifdef DEAL_II_TRILINOS_WITH_TPETRA_INST_COMPLEX_FLOAT
 template <>
 struct is_tpetra_type<std::complex<float>> : std::true_type
 {};
 #    endif
 
-#    ifdef HAVE_TPETRA_INST_COMPLEX_DOUBLE
+#    ifdef DEAL_II_TRILINOS_WITH_TPETRA_INST_COMPLEX_DOUBLE
 template <>
 struct is_tpetra_type<std::complex<double>> : std::true_type
 {};
@@ -1111,7 +1111,7 @@ namespace LinearAlgebra
       Assert(!has_ghost_elements(), ExcGhostsPresent());
 
       auto vector_2d_local = vector->template getLocalView<Kokkos::HostSpace>(
-        Tpetra::Access::ReadWrite);
+        Tpetra::Access::ReadWriteStruct{});
 
       // Having extracted a view into the multivectors above, now also
       // extract a view into the one vector we actually store. We can
@@ -1183,7 +1183,7 @@ namespace LinearAlgebra
 #  if DEAL_II_TRILINOS_VERSION_GTE(13, 2, 0)
                   auto vector_2d_nonlocal =
                     nonlocal_vector->template getLocalView<Kokkos::HostSpace>(
-                      Tpetra::Access::ReadWrite);
+                      Tpetra::Access::ReadWriteStruct{});
 #  else
                   auto vector_2d_nonlocal =
                     nonlocal_vector->template getLocalView<Kokkos::HostSpace>();
@@ -1230,7 +1230,7 @@ namespace LinearAlgebra
 
 #  if DEAL_II_TRILINOS_VERSION_GTE(13, 2, 0)
       auto vector_2d_local = vector->template getLocalView<Kokkos::HostSpace>(
-        Tpetra::Access::ReadWrite);
+        Tpetra::Access::ReadWriteStruct{});
 #  else
       vector->template sync<Kokkos::HostSpace>();
 
@@ -1307,7 +1307,7 @@ namespace LinearAlgebra
 #  if DEAL_II_TRILINOS_VERSION_GTE(13, 2, 0)
                   auto vector_2d_nonlocal =
                     nonlocal_vector->template getLocalView<Kokkos::HostSpace>(
-                      Tpetra::Access::ReadWrite);
+                      Tpetra::Access::ReadWriteStruct{});
 #  else
                   auto vector_2d_nonlocal =
                     nonlocal_vector->template getLocalView<Kokkos::HostSpace>();

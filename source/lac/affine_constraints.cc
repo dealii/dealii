@@ -139,7 +139,8 @@ INSTANTIATE_DLTG_MATRIX(TrilinosWrappers::SparseMatrix);
 INSTANTIATE_DLTG_MATRIX(TrilinosWrappers::BlockSparseMatrix);
 
 #  ifndef DOXYGEN
-#    if defined(DEAL_II_TRILINOS_WITH_TPETRA) && defined(HAVE_TPETRA_INST_FLOAT)
+#    if defined(DEAL_II_TRILINOS_WITH_TPETRA) && \
+      defined(DEAL_II_TRILINOS_WITH_TPETRA_INST_FLOAT)
 // FIXME: This mixed variant is needed for multigrid and matrix free.
 template void
 dealii::AffineConstraints<double>::distribute<
