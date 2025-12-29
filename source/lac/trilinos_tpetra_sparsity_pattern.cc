@@ -123,7 +123,12 @@ namespace LinearAlgebra
       , column_space_map(std::move(other.column_space_map))
       , graph(std::move(other.graph))
       , nonlocal_graph(std::move(other.nonlocal_graph))
-    {}
+    {
+      Assert(
+        is_compressed(),
+        ExcMessage(
+          "The sparsity pattern must be compressed before calling this function!"));
+    }
 
 
 
@@ -414,9 +419,6 @@ namespace LinearAlgebra
                                                  col_map,
                                                  n_entries_per_row);
 
-        AssertDimension(sp.n_rows(), graph->getGlobalNumRows());
-        AssertDimension(sp.n_cols(), graph->getGlobalNumEntries());
-
         std::vector<TrilinosWrappers::types::int_type> row_indices;
 
         for (size_type<MemorySpace> row = first_row; row < last_row; ++row)
@@ -460,6 +462,12 @@ namespace LinearAlgebra
             communicator, false);
       SparsityPatternImpl::reinit_sp<MemorySpace>(
         map, map, n_entries_per_row, column_space_map, graph, nonlocal_graph);
+      if (n_entries_per_row == 0)
+        {
+          dsp.reinit(parallel_partitioning.size(),
+                     parallel_partitioning.size(),
+                     parallel_partitioning);
+        }
     }
 
 
@@ -507,6 +515,12 @@ namespace LinearAlgebra
                                                   column_space_map,
                                                   graph,
                                                   nonlocal_graph);
+      if (n_entries_per_row == 0)
+        {
+          dsp.reinit(row_parallel_partitioning.size(),
+                     col_parallel_partitioning.size(),
+                     row_parallel_partitioning);
+        }
     }
 
 
@@ -590,6 +604,13 @@ namespace LinearAlgebra
         }
       else
         Assert(nonlocal_partitioner.n_elements() == 0, ExcInternalError());
+
+      if (n_entries_per_row == 0)
+        {
+          dsp.reinit(row_parallel_partitioning.size(),
+                     col_parallel_partitioning.size(),
+                     writable_rows);
+        }
     }
 
 
@@ -742,6 +763,15 @@ namespace LinearAlgebra
     SparsityPattern<MemorySpace>::compress()
     {
       Assert(column_space_map.get(), ExcInternalError());
+
+      if (dsp.n_rows() > 0)
+        {
+          this->copy_from(dsp);
+          dsp.reinit(0, 0);
+          compress();
+          return;
+        }
+
       if (nonlocal_graph.get() != nullptr)
         {
 #  if DEAL_II_TRILINOS_VERSION_GTE(14, 0, 0)
