@@ -2122,13 +2122,13 @@ namespace internal
                     fe_eval.get_shape_info().data[0].n_q_points_1d);
     AssertDimension(n_q_points_1d,
                     fe_eval.get_shape_info().data[1].n_q_points_1d);
-    AssertDimension(fe_degree, fe_eval.get_shape_info().data[0].fe_degree + 1);
-    AssertDimension(fe_degree, fe_eval.get_shape_info().data[1].fe_degree);
+    AssertDimension(fe_degree, fe_eval.get_shape_info().data[0].fe_degree);
+    AssertDimension(fe_degree, fe_eval.get_shape_info().data[1].fe_degree - 1);
 
 
     const auto        &shape_data = fe_eval.get_shape_info().data;
     const unsigned int dofs_per_component =
-      Utilities::pow(fe_degree + 1, dim - 1) * (fe_degree);
+      Utilities::pow(fe_degree + 2, dim - 1) * (fe_degree + 1);
     const unsigned int n_points  = Utilities::pow(n_q_points_1d, dim);
     Number            *gradients = fe_eval.begin_gradients();
     Number            *values    = fe_eval.begin_values();
@@ -2406,7 +2406,7 @@ namespace internal
         }
       else if (element_type == ElementType::tensor_nedelec)
         {
-          if constexpr (fe_degree > 0 && n_q_points_1d > 0 && dim > 1)
+          if constexpr (fe_degree >= 0 && n_q_points_1d > 0 && dim > 1)
             {
               FEEvaluationImpl<ElementType::tensor_nedelec,
                                dim,

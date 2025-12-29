@@ -2162,15 +2162,9 @@ namespace internal
            const int  subface_index_1d = 0)
     {
       AssertIndexRange(direction, dim);
-      AssertDimension((element_type == MatrixFreeFunctions::tensor_nedelec) ?
-                        fe_degree - 1 :
-                        fe_degree,
-                      data.fe_degree);
+      AssertDimension(fe_degree, data.fe_degree);
       AssertDimension(n_q_points_1d, data.n_q_points_1d);
-      constexpr int n_rows =
-        (element_type == MatrixFreeFunctions::tensor_raviart_thomas) ?
-          fe_degree + 1 :
-          fe_degree;
+      constexpr int  n_rows    = fe_degree + 1;
       constexpr int  n_columns = n_q_points_1d;
       constexpr int  mm        = contract_over_rows ? n_rows : n_columns;
       constexpr int  nn        = contract_over_rows ? n_columns : n_rows;
@@ -2186,13 +2180,13 @@ namespace internal
         Utilities::pow((element_type ==
                         MatrixFreeFunctions::tensor_raviart_thomas) ?
                          fe_degree :
-                         fe_degree + 1,
+                         fe_degree + 2,
                        direction);
       constexpr int n_blocks2 =
         Utilities::pow((element_type ==
                         MatrixFreeFunctions::tensor_raviart_thomas) ?
                          fe_degree :
-                         fe_degree + 1,
+                         fe_degree + 2,
                        dim - direction - 1);
       constexpr int              stride_in  = contract_over_rows ? 1 : stride;
       constexpr int              stride_out = contract_over_rows ? stride : 1;
@@ -2245,7 +2239,7 @@ namespace internal
       AssertDimension((element_type ==
                        MatrixFreeFunctions::tensor_raviart_thomas) ?
                         fe_degree - 1 :
-                        fe_degree,
+                        fe_degree + 1,
                       data.fe_degree);
       AssertDimension(n_q_points_1d, data.n_q_points_1d);
       static_assert(direction != normal_direction,
@@ -2254,7 +2248,7 @@ namespace internal
       constexpr int internal_dof =
         (element_type == MatrixFreeFunctions::tensor_raviart_thomas) ?
           fe_degree :
-          fe_degree + 1;
+          fe_degree + 2;
       constexpr int  n_rows    = std::max(internal_dof, 0);
       constexpr int  n_columns = n_q_points_1d;
       const Number2 *shape_data =

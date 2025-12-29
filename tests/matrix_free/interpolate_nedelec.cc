@@ -148,7 +148,7 @@ public:
 
 template <int dim,
           int fe_degree,
-          int n_q_points_1d = fe_degree + 1,
+          int n_q_points_1d = fe_degree + 2,
           typename Number   = double>
 class MatrixFreeTest
 {
@@ -280,8 +280,8 @@ do_test(const DoFHandler<dim>           &dof,
     mf_data.reinit(MappingQ1<dim>{}, dof, constraints, quad, data);
   }
 
-  MatrixFreeTest<dim, fe_degree, fe_degree + 1, number> mf(mf_data);
-  MatrixFreeTest<dim, fe_degree, fe_degree + 1, number> mfConstFunction(mf_data,
+  MatrixFreeTest<dim, fe_degree, fe_degree + 2, number> mf(mf_data);
+  MatrixFreeTest<dim, fe_degree, fe_degree + 2, number> mfConstFunction(mf_data,
                                                                         true);
   mf.test_functions(interpolated);
   mfConstFunction.test_functions(interpolatedConst);
@@ -299,13 +299,13 @@ test()
   tria.refine_global(1);
 
   {
-    FE_NedelecNodal<dim> fe(fe_degree - 1);
+    FE_NedelecNodal<dim> fe(fe_degree);
     DoFHandler<dim>      dof(tria);
     dof.distribute_dofs(fe);
 
     AffineConstraints<double> constraints;
     constraints.close();
-    if (fe_degree > 2)
+    if (fe_degree > 1)
       do_test<dim, -1, double>(dof, constraints);
     else
       do_test<dim, fe_degree, double>(dof, constraints);
@@ -322,15 +322,15 @@ main()
   deallog << std::setprecision(5);
   {
     deallog.push("2d");
+    test<2, 0>();
     test<2, 1>();
     test<2, 2>();
     test<2, 3>();
-    test<2, 4>();
     deallog.pop();
     deallog.push("3d");
+    test<3, 0>();
     test<3, 1>();
     test<3, 2>();
-    test<3, 3>();
     deallog.pop();
   }
 }

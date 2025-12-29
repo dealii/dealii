@@ -5955,7 +5955,9 @@ inline DEAL_II_ALWAYS_INLINE
   if (dim > 1 && this->data->element_type ==
                    internal::MatrixFreeFunctions::ElementType::tensor_nedelec)
     {
-      // Piola transformation required.
+      // Piola transformation required: Since the transformation for Nedelec
+      // is constructed to give a curl based on a scaled version of the
+      // reference curl, this function turns out to be particularly simple.
       if constexpr (running_in_debug_mode())
         {
           Assert(this->gradients_quad_initialized == true,
@@ -6283,7 +6285,7 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
                "update_value"));
 #  ifdef DEBUG
       Assert(this->is_reinitialized, ExcNotInitialized());
-      this->values_quad_submitted = true;
+      this->gradients_quad_submitted = true;
 #  endif
 
       const std::size_t    nqp_d     = this->n_quadrature_points * dim;
@@ -6645,16 +6647,12 @@ FEEvaluation<dim,
 
   if constexpr (running_in_debug_mode())
     {
-      unsigned int data_fe_deg =
-        (this->data->element_type ==
-         internal::MatrixFreeFunctions::ElementType::tensor_nedelec) ?
-          this->data->data[1].fe_degree :
-          this->data->data.front().fe_degree;
       // print error message when the dimensions do not match. Propose a
       // possible fix
       if ((static_cast<unsigned int>(fe_degree) !=
              numbers::invalid_unsigned_int &&
-           static_cast<unsigned int>(fe_degree) != data_fe_deg) ||
+           static_cast<unsigned int>(fe_degree) !=
+             this->data->data.front().fe_degree) ||
           n_q_points != this->n_quadrature_points)
         {
           std::string message =
@@ -6793,7 +6791,8 @@ FEEvaluation<dim,
             correct_pos += "  \n";
           message += "                                 " + correct_pos;
 
-          Assert(static_cast<unsigned int>(fe_degree) == data_fe_deg &&
+          Assert(static_cast<unsigned int>(fe_degree) ==
+                     this->data->data.front().fe_degree &&
                    n_q_points == this->n_quadrature_points,
                  ExcMessage(message));
         }

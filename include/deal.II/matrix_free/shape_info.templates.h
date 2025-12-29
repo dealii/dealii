@@ -311,13 +311,12 @@ namespace internal
 
           return;
         }
-      else if (dynamic_cast<const FE_NedelecNodal<dim> *>(
-                 &fe_in.base_element(base_element_number)))
+      else if (const FE_NedelecNodal<dim> *fe_nedelec =
+                 dynamic_cast<const FE_NedelecNodal<dim> *>(
+                   &fe_in.base_element(base_element_number)))
         {
           const auto quad = quad_in.get_tensor_basis()[0];
-          dynamic_cast<const FE_NedelecNodal<dim> *>(
-            &fe_in.base_element(base_element_number))
-            ->fill_shape_info(this, quad_in);
+          fe_nedelec->fill_shape_info(this, quad_in);
 
           const unsigned int n_q_points_1d = quad.size();
           if (dim == 3)
