@@ -69,12 +69,14 @@ export module dealii.external.vtk;
 export
 {
   using ::vtkCell;
+  using ::vtkCellData;
   using ::VTKCellType;
 #if DEAL_II_VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 3, 0)
   using ::vtkCleanUnstructuredGrid;
 #endif
   using ::vtkDataArray;
   using ::vtkDoubleArray;
+  using ::vtkPointData;
   using ::vtkPoints;
   using ::vtkSmartPointer;
   using ::vtkUnstructuredGrid;
