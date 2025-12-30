@@ -227,7 +227,7 @@ main(int argc, char **argv)
 
   // The 1D test hits a bug in clang:
   // https://github.com/llvm/llvm-project/issues/18060
-#if defined(DEAL_II_HAVE_FP_EXCEPTIONS)
+#if defined(DEBUG) && defined(DEAL_II_HAVE_FP_EXCEPTIONS)
   {
     const int current_fe_except = fegetexcept();
     fedisableexcept(current_fe_except);
