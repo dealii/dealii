@@ -18,10 +18,14 @@
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/point.h>
 
+#include <deal.II/dofs/dof_handler.h>
+
 #include <deal.II/fe/fe.h>
 
 #include <deal.II/grid/grid_tools.h>
 #include <deal.II/grid/tria.h>
+
+#include <deal.II/lac/vector.h>
 
 #ifdef DEAL_II_WITH_VTK
 
@@ -273,6 +277,36 @@ namespace VTKWrappers
                         const Vector<double>               &data,
                         const DoFHandler<dim, spacedim>    &dh,
                         VectorType                         &output_vector);
+
+  /**
+   * Read a VTK mesh and all data fields into a DoFHandler and output vector.
+   *
+   * This function reads the mesh from the specified VTK file, populates the
+   * Triangulation associated to the given DoFHandler, and queries all cell and
+   * vertex data fields. For each data field, a suitable FESystem is constructed
+   * (using FE_DGQ for cell data and FE_Q for vertex data, with the correct
+   * number of components). DoFs are distributed and renumbered block-wise. All
+   * data is read into the output_vector, and the names of the fields are stored
+   * in data_names.
+   *
+   * @param vtk_filename The name of the input VTK file.
+   * @param dof_handler The DoFHandler to distribute DoFs on the mesh.
+   * @param output_vector The vector to store all data field values.
+   * @param data_names The vector to store the names of all data fields found in
+   * the VTK file.
+   * @param cleanup If true, merge overlapping points in the VTK file (default:
+   * true).
+   * @param relative_tolerance Relative tolerance used when merging points via
+   * VTK's cleaning utilities (default: 0).
+   */
+  template <int dim, int spacedim>
+  void
+  read_vtk(const std::string         &vtk_filename,
+           DoFHandler<dim, spacedim> &dof_handler,
+           Vector<double>            &output_vector,
+           std::vector<std::string>  &data_names,
+           const bool                 cleanup            = true,
+           const double               relative_tolerance = 0.0);
 
 #  ifndef DOXYGEN
   // Template implementations

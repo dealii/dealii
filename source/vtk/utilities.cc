@@ -11,6 +11,8 @@
 // -----------------------------------------------------------------------------
 #include <deal.II/vtk/utilities.h>
 
+#include <algorithm>
+#include <fstream>
 #include <string>
 #include <vector>
 
@@ -500,6 +502,47 @@ namespace VTKWrappers
           data_names);
       }
   }
+
+
+  template <int dim, int spacedim>
+  void
+  read_vtk(const std::string         &vtk_filename,
+           DoFHandler<dim, spacedim> &dof_handler,
+           Vector<double>            &output_vector,
+           std::vector<std::string>  &data_names,
+           const bool                 cleanup,
+           const double               relative_tolerance)
+  {
+    // Get a non-const reference to the triangulation
+    auto &tria = const_cast<Triangulation<dim, spacedim> &>(
+      dof_handler.get_triangulation());
+
+    // Make sure the triangulation is actually a serial triangulation
+    auto parallel_tria =
+      dynamic_cast<const parallel::TriangulationBase<dim, spacedim> *>(&tria);
+    AssertThrow(parallel_tria == nullptr,
+                ExcMessage(
+                  "The input triangulation must be a serial triangulation."));
+
+    // Clear the triangulation to ensure it is empty before reading
+    tria.clear();
+    // Read the mesh from the VTK file
+    read_tria(vtk_filename, tria, cleanup, relative_tolerance);
+
+    Vector<double> raw_data_vector;
+    read_all_data(vtk_filename, raw_data_vector, cleanup, relative_tolerance);
+
+    auto [fe, data_names_from_fe] =
+      vtk_to_finite_element<dim, spacedim>(vtk_filename);
+
+    dof_handler.distribute_dofs(*fe);
+    output_vector.reinit(dof_handler.n_dofs());
+    data_to_dealii_vector(tria, raw_data_vector, dof_handler, output_vector);
+
+    AssertDimension(dof_handler.n_dofs(), output_vector.size());
+    AssertDimension(dof_handler.get_fe().n_blocks(), data_names_from_fe.size());
+    data_names = data_names_from_fe;
+  }
 #else
 DEAL_II_NAMESPACE_OPEN
 
@@ -537,6 +580,18 @@ namespace VTKWrappers
   std::pair<std::unique_ptr<FiniteElement<dim, spacedim>>,
             std::vector<std::string>>
   vtk_to_finite_element(const std::string &)
+  {
+    AssertThrow(false, ExcMessage("deal.II is not built with VTK support."));
+  }
+
+  template <int dim, int spacedim>
+  void
+  read_vtk(const std::string &,
+           DoFHandler<dim, spacedim> &,
+           Vector<double> &,
+           std::vector<std::string> &,
+           const bool,
+           const double)
   {
     AssertThrow(false, ExcMessage("deal.II is not built with VTK support."));
   }

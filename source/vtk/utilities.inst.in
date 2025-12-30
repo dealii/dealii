@@ -24,5 +24,13 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
                        std::vector<std::string>>
     vtk_to_finite_element<deal_II_dimension, deal_II_space_dimension>(
       const std::string &);
+
+    template void read_vtk<deal_II_dimension, deal_II_space_dimension>(
+      const std::string &,
+      DoFHandler<deal_II_dimension, deal_II_space_dimension> &,
+      Vector<double> &,
+      std::vector<std::string> &,
+      const bool,
+      const double);
 #endif
   }
