@@ -214,10 +214,6 @@ namespace LinearAlgebra
          */
         operator Number() const;
 
-        void
-        update_ghost_values()
-        {}
-
         /**
          * Exception
          */
@@ -332,7 +328,7 @@ namespace LinearAlgebra
        * need to generate a %parallel vector.
        */
       explicit Vector(const IndexSet &parallel_partitioner,
-                      const MPI_Comm  communicator);
+                      const MPI_Comm  communicator = MPI_COMM_WORLD);
 
       /**
        * In addition to just specifying one index set as in all the other
@@ -586,6 +582,11 @@ namespace LinearAlgebra
        */
       void
       add(const Number a);
+
+      void add(const Vector<Number, MemorySpace> &V, bool allow_different_maps = false) {
+        Assert(!allow_different_maps, ExcNotImplemented());
+        this->add(1, V);
+      }
 
       /**
        * Simple addition of a multiple of a vector, i.e. <tt>*this +=
@@ -890,6 +891,10 @@ namespace LinearAlgebra
        */
       void
       compress(const VectorOperation::values operation);
+
+   void
+        update_ghost_values()
+        {}
 
       /**
        * Return a const reference to the underlying Trilinos

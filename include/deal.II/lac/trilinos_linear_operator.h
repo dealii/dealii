@@ -21,6 +21,7 @@
 
 #  include <deal.II/lac/block_linear_operator.h>
 #  include <deal.II/lac/linear_operator.h>
+#include <deal.II/lac/trilinos_tpetra_to_trilinos_wrappers.h>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -28,10 +29,6 @@ namespace TrilinosWrappers
 {
   // Forward declarations:
 #  ifndef DOXYGEN
-  class SparseMatrix;
-  class PreconditionBase;
-  class BlockSparseMatrix;
-
   namespace internal
   {
     namespace LinearOperatorImplementation
