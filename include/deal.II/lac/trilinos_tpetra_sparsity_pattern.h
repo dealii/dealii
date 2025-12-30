@@ -1296,8 +1296,8 @@ namespace LinearAlgebra
       // accessor class. consequently, we need to somehow get an actual value
       // from it which we can by evaluating an expression such as when
       // multiplying the value produced by 2
-      Assert(sizeof(TrilinosWrappers::types::int_type) == sizeof((*begin) * 2),
-             ExcNotImplemented());
+      static_assert(sizeof(TrilinosWrappers::types::int_type) ==
+                    sizeof((*begin) * 2));
 
       const TrilinosWrappers::types::int_type *col_index_ptr_begin =
         reinterpret_cast<TrilinosWrappers::types::int_type *>(

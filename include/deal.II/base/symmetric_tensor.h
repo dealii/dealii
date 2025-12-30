@@ -1322,8 +1322,7 @@ SymmetricTensor<rank_, dim, Number>::SymmetricTensor(
       *reinterpret_cast<const typename base_tensor_type::array_type *>(array))
 {
   // ensure that the reinterpret_cast above actually works
-  Assert(sizeof(typename base_tensor_type::array_type) == sizeof(array),
-         ExcInternalError());
+  static_assert(sizeof(typename base_tensor_type::array_type) == sizeof(array));
 }
 
 
