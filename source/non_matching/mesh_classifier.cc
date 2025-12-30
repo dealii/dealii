@@ -56,22 +56,30 @@ namespace NonMatching
         "The incoming cell does not belong to the triangulation passed to "
         "the constructor.");
 
-      /**
-       * Return LocationToLevelSet::inside/outside if all values in incoming
-       * vector are negative/positive, otherwise return
-       * LocationToLevelSet::intersected.
+      /*
+       * Return LocationToLevelSet::inside/outside if all values in the vector
+       * are negative/positive.
+       * Return LocationToLevelSet::intersected if the values in the vector
+       * include both negative and positive numbers.
+       * Return LocationToLevelSet::aligned if all values in the vector are
+       * exactly zero.
        */
       template <typename VectorType>
       LocationToLevelSet
       location_from_dof_signs(const VectorType &local_levelset_values)
       {
-        const auto min_max_element =
+        const auto [min_element, max_element] =
           std::minmax_element(local_levelset_values.begin(),
                               local_levelset_values.end());
 
-        if (*min_max_element.second < 0)
+        // Note that we actually want to compare that the values are exactly
+        // floating point zero here, even if the rule of thumb is that one never
+        // should.
+        if (*min_element == 0.0 && *max_element == 0.0)
+          return LocationToLevelSet::aligned;
+        if (*max_element <= 0)
           return LocationToLevelSet::inside;
-        if (0 < *min_max_element.first)
+        if (0 <= *min_element)
           return LocationToLevelSet::outside;
 
         return LocationToLevelSet::intersected;
@@ -360,27 +368,65 @@ namespace NonMatching
     face_locations.assign(triangulation->n_raw_faces(),
                           LocationToLevelSet::unassigned);
 
+    // Returns weather the incoming LocationToLevelSet is in the incoming set.
+    // This lambda can be factored away once C++20 is enabled, since set then
+    // has a contains function.
+    const auto contains =
+      [](const std::set<LocationToLevelSet> &local_face_locations,
+         const LocationToLevelSet           &location) {
+        return local_face_locations.count(location) > 0;
+      };
+
     // Loop over all cells and determine the location of all non artificial
     // cells and faces.
     for (const auto &cell : triangulation->active_cell_iterators())
       if (!cell->is_artificial())
         {
-          const LocationToLevelSet face0_location =
-            determine_face_location_to_levelset(cell, 0);
+          std::set<LocationToLevelSet> local_face_locations;
 
-          face_locations[cell->face(0)->index()] = face0_location;
-          LocationToLevelSet cell_location       = face0_location;
-
-          for (unsigned int f = 1; f < GeometryInfo<dim>::faces_per_cell; ++f)
+          for (unsigned int f = 0; f < GeometryInfo<dim>::faces_per_cell; ++f)
             {
               const LocationToLevelSet face_location =
                 determine_face_location_to_levelset(cell, f);
 
               face_locations[cell->face(f)->index()] = face_location;
+              local_face_locations.insert(face_location);
+            }
 
-              if (face_location != face0_location)
+          LocationToLevelSet cell_location = LocationToLevelSet::unassigned;
+
+          const bool all_faces_have_same_location =
+            local_face_locations.size() == 1;
+
+          if (all_faces_have_same_location)
+            {
+              cell_location = *local_face_locations.cbegin();
+            }
+          else if (contains(local_face_locations,
+                            LocationToLevelSet::intersected))
+            {
+              cell_location = LocationToLevelSet::intersected;
+            }
+          else if (contains(local_face_locations, LocationToLevelSet::aligned))
+            {
+              Assert(local_face_locations.size() == 2, ExcNotImplemented());
+
+              if (contains(local_face_locations, LocationToLevelSet::outside))
+                cell_location = LocationToLevelSet::outside;
+              else // contains LocationToLevelSet::inside
                 cell_location = LocationToLevelSet::intersected;
             }
+          else
+            {
+              // In 2D, a cell can be intersected without any faces being
+              // intersected, if the zero contour cuts the cell diagonally
+              // through the vertices. In this case, two faces are inside and
+              // two are outside.
+              Assert(local_face_locations.size() == 2, ExcNotImplemented());
+              cell_location = LocationToLevelSet::intersected;
+            }
+
+
           cell_locations[cell->active_cell_index()] = cell_location;
         }
   }

@@ -56,6 +56,9 @@ location_to_string(const NonMatching::LocationToLevelSet location)
       case NonMatching::LocationToLevelSet::unassigned:
         name = "unassigned";
         break;
+      case NonMatching::LocationToLevelSet::aligned:
+        name = "aligned";
+        break;
       default:
         AssertThrow(false, ExcInternalError());
     }
@@ -189,6 +192,20 @@ test_negative_function()
 
 
 
+// Test MeshClassifier with a level set function that is constant zero.
+template <int dim>
+void
+test_zero_function()
+{
+  deallog << "test_zero_function";
+
+  const Functions::ZeroFunction<dim> level_set;
+
+  classify_with_discrete_and_analytic_level_set(level_set);
+}
+
+
+
 // Test MeshClassifier with a level set function corresponding to the plane
 // (x = 0) intersecting the hypercube [-1, 1]^dim.
 template <int dim>
@@ -202,6 +219,32 @@ test_intersection_x_eq_0_plane()
   const Point<dim> origo;
 
   const Functions::SignedDistance::Plane<dim> level_set(origo, plane_normal);
+
+  classify_with_discrete_and_analytic_level_set(level_set);
+}
+
+
+
+// Test MeshClassifier with a plane level set that has a zero contour that goes
+// straight through the center of a hypercube cell [-1,1]^dim,  with a normal
+// in the direction n = [1,1] in 2D. This test case is mainly of interest in 2D,
+// because then the zero contour goes straight through 2 of the nodes and there
+// are no faces that are intersected, i.e., two faces are inside and two are
+// outside.
+template <int dim>
+void
+test_intersection_diagonally_through_vertices()
+{
+  deallog << "test_intersection_diagonally_through_vertices" << std::endl;
+
+  Tensor<1, dim> plane_normal;
+  plane_normal[0] = 1;
+  plane_normal[1] = 1;
+
+  const Point<dim> point_in_plane;
+
+  const Functions::SignedDistance::Plane<dim> level_set(point_in_plane,
+                                                        plane_normal);
 
   classify_with_discrete_and_analytic_level_set(level_set);
 }
@@ -356,6 +399,56 @@ test_reclassify_called_multiple_times()
 
 
 
+/*
+ * Test MeshClassifier with a plane level set function such that the zero
+ * contour is aligned with face 0 of the cell. This makes the level set function
+ * positive over the cell except over face 0, where it is zero.
+ */
+template <int dim>
+void
+test_positive_but_face_aligned()
+{
+  deallog << "test_positive_but_face_aligned";
+
+  Tensor<1, dim> plane_normal;
+  plane_normal[0] = 1;
+
+  Point<dim> point_in_plane;
+  point_in_plane[0] = -1;
+
+  const Functions::SignedDistance::Plane<dim> level_set(point_in_plane,
+                                                        plane_normal);
+
+  classify_with_discrete_and_analytic_level_set(level_set);
+}
+
+
+
+/*
+ * Test MeshClassifier with a plane level set function such that the zero
+ * contour is aligned with face 1 of the cell. This makes the level set function
+ * negative over the cell except over face 1, where it is zero.
+ */
+template <int dim>
+void
+test_negative_but_face_aligned()
+{
+  deallog << "test_negative_but_face_aligned";
+
+  Tensor<1, dim> plane_normal;
+  plane_normal[0] = 1;
+
+  Point<dim> point_in_plane;
+  point_in_plane[0] = 1;
+
+  const Functions::SignedDistance::Plane<dim> level_set(point_in_plane,
+                                                        plane_normal);
+
+  classify_with_discrete_and_analytic_level_set(level_set);
+}
+
+
+
 template <int dim>
 void
 run_test()
@@ -364,12 +457,20 @@ run_test()
 
   test_negative_function<dim>();
   test_positive_function<dim>();
+  test_zero_function<dim>();
+
   test_intersection_x_eq_0_plane<dim>();
-  // This test doesn't make sense in 1D.
+  // These tests do not make sense in 1D.
   if (dim != 1)
     test_lagrange_coefficients_positive<dim>();
 
+  if (dim == 2)
+    test_intersection_diagonally_through_vertices<dim>();
+
   test_reclassify_called_multiple_times<dim>();
+
+  test_negative_but_face_aligned<dim>();
+  test_positive_but_face_aligned<dim>();
 }
 
 
