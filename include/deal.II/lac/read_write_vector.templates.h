@@ -25,6 +25,7 @@
 #include <deal.II/lac/read_write_vector.h>
 #include <deal.II/lac/vector.h>
 #include <deal.II/lac/vector_operations_internal.h>
+#include <deal.II/lac/la_parallel_block_vector.h>
 
 #ifdef DEAL_II_WITH_PETSC
 #  include <deal.II/lac/petsc_vector.h>
@@ -198,6 +199,44 @@ namespace LinearAlgebra
           for (size_type i = 0; i < stored.n_elements(); ++i)
             rw_vector.local_element(i) = tmp_vector(stored.nth_index_in_set(i));
       }
+    };
+
+
+
+    template <typename Number, typename BlockVectorType>
+    void
+    import_elements_from_block_vector(ReadWriteVector<Number>     &dst,
+                                      const BlockVectorType      &src,
+                                      const VectorOperation::values operation)
+    {
+      const auto &bi = src.get_block_indices();
+
+      const IndexSet &stored = dst.get_stored_elements();
+
+      for (unsigned int b = 0; b < src.n_blocks(); ++b)
+        {
+          const types::global_dof_index b0 = bi.block_start(b);
+          const types::global_dof_index b1 = b0 + bi.block_size(b);
+
+          // Build the subset of dst's stored indices that lie in this block, block-local numbering.
+          IndexSet block_local(bi.block_size(b));
+          for (auto it = stored.begin(); it != stored.end(); ++it)
+            if (*it >= b0 && *it < b1)
+              block_local.add_index(*it - b0);
+
+          if (block_local.n_elements() == 0)
+            continue;
+
+          ReadWriteVector<Number> tmp;
+          tmp.reinit(block_local);
+
+          // Per-block import: relies on existing import_elements() overloads
+          tmp.import_elements(src.block(b), operation);
+
+          // Scatter back into global indexing
+          for (auto it = block_local.begin(); it != block_local.end(); ++it)
+            dst[b0 + *it] = tmp[*it];
+        }
     };
   } // namespace internal
 
@@ -431,6 +470,18 @@ namespace LinearAlgebra
 
     internal::read_write_vector_functions<Number, MemorySpace>::import_elements(
       comm_pattern, vec.begin(), operation, *this);
+  }
+
+
+
+  template <typename Number>
+  template <typename MemorySpace>
+  void
+  ReadWriteVector<Number>::import_elements(
+    const distributed::BlockVector<Number, MemorySpace> &src,
+    const VectorOperation::values operation)
+  {
+    internal::import_elements_from_block_vector(*this, src, operation);
   }
 
 
@@ -801,6 +852,14 @@ namespace LinearAlgebra
                     communication_pattern);
   }
 
+
+  template <typename Number>
+  void
+  ReadWriteVector<Number>::import_elements(const TrilinosWrappers::MPI::BlockVector &src,
+                                           const VectorOperation::values operation)
+  {
+    internal::import_elements_from_block_vector(*this, src, operation);
+  }
 
 
 #  ifdef DEAL_II_TRILINOS_WITH_TPETRA

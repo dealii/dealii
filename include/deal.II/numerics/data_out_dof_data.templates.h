@@ -791,230 +791,143 @@ namespace internal
 
     namespace CreateVectors
     {
+    namespace
+    {
+        template <typename Dst, typename Src, typename = void>
+        struct has_import_elements : std::false_type {};
+
+        template <typename Dst, typename Src>
+        struct has_import_elements<
+          Dst,
+          Src,
+          std::void_t<decltype(std::declval<Dst &>().import_elements(
+            std::declval<const Src &>(),
+            VectorOperation::insert))>> : std::true_type {};
+
+
+        template <typename T>
+        struct is_distributed_vector : std::false_type
+        {};
+
+        template <typename Number, typename MemorySpace>
+        struct is_distributed_vector<
+          dealii::LinearAlgebra::distributed::Vector<Number, MemorySpace>>
+          : std::true_type
+        {};
+
+        template <typename Number, typename MemorySpace>
+        struct is_distributed_vector<
+          dealii::LinearAlgebra::distributed::BlockVector<Number, MemorySpace>>
+          : std::true_type
+        {};
+
+    #ifdef DEAL_II_WITH_PETSC
+        template <>
+        struct is_distributed_vector<dealii::PETScWrappers::MPI::Vector>
+          : std::true_type
+        {};
+
+        template <>
+        struct is_distributed_vector<dealii::PETScWrappers::MPI::BlockVector>
+          : std::true_type
+        {};
+    #endif
+
+    #ifdef DEAL_II_WITH_TRILINOS
+        template <>
+        struct is_distributed_vector<dealii::TrilinosWrappers::MPI::Vector>
+          : std::true_type
+        {};
+
+        template <>
+        struct is_distributed_vector<dealii::TrilinosWrappers::MPI::BlockVector>
+          : std::true_type
+        {};
+    #endif
+
+
+        template <typename DstNumber, typename SrcVector>
+        inline void
+        import_into(dealii::LinearAlgebra::ReadWriteVector<DstNumber> &dst,
+                    const SrcVector                                   &src)
+        {
+          using Src      = std::decay_t<SrcVector>;
+          using SrcValue = typename Src::value_type;
+
+          // Fast path: exact type match and import_elements exists
+          if constexpr (std::is_same_v<SrcValue, DstNumber> &&
+                        CreateVectors::has_import_elements<
+                        dealii::LinearAlgebra::ReadWriteVector<DstNumber>, Src>::value)
+          {
+            dst.import_elements(src, dealii::VectorOperation::insert);
+          }
+          else if constexpr (CreateVectors::has_import_elements<
+                             dealii::LinearAlgebra::ReadWriteVector<SrcValue>, Src>::value)
+          {
+            // Safe path for parallel vectors with conversion:
+            // import into RWV<SrcValue> then cast into dst.
+            dealii::LinearAlgebra::ReadWriteVector<SrcValue> tmp(dst.get_stored_elements());
+            tmp.import_elements(src, dealii::VectorOperation::insert);
+
+            // tmp and dst have same IndexSet, so loop is local-only.
+            for (const auto i : dst.get_stored_elements())
+              dst[i] = static_cast<DstNumber>(tmp[i]);
+          }
+          else
+          {
+            // Serial-only fallback: requires global read access
+            static_assert(!is_distributed_vector<SrcVector>::value,
+                          "Fallback import path reached for a distributed vector. "
+                          "This is possibly a bug: distributed vectors should use "
+                          "ReadWriteVector::import_elements() logic.");
+
+            for (const auto i : dst.get_stored_elements())
+              dst[i] = static_cast<DstNumber>(src(i));
+          }
+        }
+      } // namespace
+
+
       /**
-       * Copy the data from an arbitrary non-block vector to a
-       * LinearAlgebra::distributed::Vector.
+      * Create a local snapshot of a DoF vector on the locally relevant index set
+      * (owned + ghosts) by importing values from the distributed vector.
+      */
+      template <int dim,
+                int spacedim,
+                typename VectorType,
+                typename Number>
+      void
+      create_dof_vector(const DoFHandler<dim, spacedim>        &dof_handler,
+                        const VectorType                       &src,
+                        LinearAlgebra::ReadWriteVector<Number> &dst,
+                        const unsigned int level = numbers::invalid_unsigned_int)
+      {
+        const IndexSet locally_relevant_dofs =
+          (level == numbers::invalid_unsigned_int) ?
+            DoFTools::extract_locally_relevant_dofs(dof_handler) :
+            DoFTools::extract_locally_relevant_level_dofs(dof_handler, level);
+
+        dst.reinit(locally_relevant_dofs);
+        import_into(dst, src);
+      }
+
+      /**
+       * Create a globally indexed copy of a cell data vector for DataOut.
+       *
+       * Cell data in DataOut is accessed by a global index (cell number).
+       * The destination ReadWriteVector stores entries for all active cells,
+       * i.e., the full index range [0, src.size()) on each MPI rank.
        */
       template <typename VectorType, typename Number>
       void
-      copy_locally_owned_data_from(
-        const VectorType                           &src,
-        LinearAlgebra::distributed::Vector<Number> &dst)
+      create_cell_vector(const VectorType &src, LinearAlgebra::ReadWriteVector<Number> &dst)
       {
-        // If source and destination vector have the same underlying scalar,
-        // we can directly import elements by using only one temporary vector:
-        if constexpr (std::is_same_v<typename VectorType::value_type, Number>)
-          {
-            LinearAlgebra::ReadWriteVector<typename VectorType::value_type>
-              temp;
-            temp.reinit(src.locally_owned_elements());
-            temp.import_elements(src, VectorOperation::insert);
+        IndexSet stored(src.size());
+        stored.add_range(0, src.size());
+        stored.compress();
 
-            dst.import_elements(temp, VectorOperation::insert);
-          }
-        else
-          // The source and destination vector have different scalar types. We
-          // need to split the parallel import and local copy operations into
-          // two phases
-          {
-            LinearAlgebra::ReadWriteVector<typename VectorType::value_type>
-              temp;
-            temp.reinit(src.locally_owned_elements());
-            temp.import_elements(src, VectorOperation::insert);
-
-            LinearAlgebra::ReadWriteVector<Number> temp2;
-            temp2.reinit(temp, true);
-            temp2 = temp;
-
-            dst.import_elements(temp2, VectorOperation::insert);
-          }
-      }
-
-#ifdef DEAL_II_WITH_TRILINOS
-      template <typename Number>
-      void
-      copy_locally_owned_data_from(
-        const TrilinosWrappers::MPI::Vector        &src,
-        LinearAlgebra::distributed::Vector<Number> &dst)
-      {
-        // ReadWriteVector does not work for ghosted
-        // TrilinosWrappers::MPI::Vector objects. Fall back to copy the
-        // entries manually.
-        for (const auto i : dst.locally_owned_elements())
-          dst[i] = src[i];
-      }
-#endif
-
-#ifdef DEAL_II_TRILINOS_WITH_TPETRA
-      template <typename Number, typename MemorySpace>
-      void
-      copy_locally_owned_data_from(
-        const LinearAlgebra::TpetraWrappers::Vector<Number, MemorySpace> &src,
-        LinearAlgebra::distributed::Vector<Number>                       &dst)
-      {
-        // ReadWriteVector does not work for ghosted
-        // TrilinosWrappers::MPI::Vector objects. Fall back to copy the
-        // entries manually.
-        for (const auto i : dst.locally_owned_elements())
-          dst[i] = src[i];
-      }
-#endif
-
-      /**
-       * Create a ghosted-copy of a block dof vector.
-       */
-      template <int dim,
-                int spacedim,
-                typename VectorType,
-                typename Number,
-                std::enable_if_t<IsBlockVector<VectorType>::value, VectorType>
-                  * = nullptr>
-      void
-      create_dof_vector(
-        const DoFHandler<dim, spacedim>                 &dof_handler,
-        const VectorType                                &src,
-        LinearAlgebra::distributed::BlockVector<Number> &dst,
-        const unsigned int level = numbers::invalid_unsigned_int)
-      {
-        const IndexSet &locally_owned_dofs =
-          (level == numbers::invalid_unsigned_int) ?
-            dof_handler.locally_owned_dofs() :
-            dof_handler.locally_owned_mg_dofs(level);
-
-        const IndexSet locally_relevant_dofs =
-          (level == numbers::invalid_unsigned_int) ?
-            DoFTools::extract_locally_relevant_dofs(dof_handler) :
-            DoFTools::extract_locally_relevant_level_dofs(dof_handler, level);
-
-        std::vector<types::global_dof_index> n_indices_per_block(
-          src.n_blocks());
-
-        for (unsigned int b = 0; b < src.n_blocks(); ++b)
-          n_indices_per_block[b] = src.get_block_indices().block_size(b);
-
-        const auto locally_owned_dofs_b =
-          locally_owned_dofs.split_by_block(n_indices_per_block);
-        const auto locally_relevant_dofs_b =
-          locally_relevant_dofs.split_by_block(n_indices_per_block);
-
-        dst.reinit(src.n_blocks());
-
-        for (unsigned int b = 0; b < src.n_blocks(); ++b)
-          {
-            Assert(src.block(b).locally_owned_elements().is_contiguous(),
-                   ExcMessage(
-                     "Using non-contiguous vector blocks is not currently "
-                     "supported by DataOut and related classes. The typical "
-                     "way you may end up with such vectors is if you order "
-                     "degrees of freedom via DoFRenumber::component_wise() "
-                     "but then group several vector components into one "
-                     "vector block -- for example, all 'dim' components "
-                     "of a velocity are grouped into the same vector block. "
-                     "If you do this, you don't want to renumber degrees "
-                     "of freedom based on vector component, but instead "
-                     "based on the 'blocks' you will later use for grouping "
-                     "things into vectors. Take a look at step-32 and step-55 "
-                     "and how they use the second argument of "
-                     "DoFRenumber::component_wise()."));
-
-            dst.block(b).reinit(locally_owned_dofs_b[b],
-                                locally_relevant_dofs_b[b],
-                                dof_handler.get_mpi_communicator());
-            copy_locally_owned_data_from(src.block(b), dst.block(b));
-          }
-
-        dst.collect_sizes();
-
-        dst.update_ghost_values();
-      }
-
-      /**
-       * Create a ghosted-copy of a non-block dof vector.
-       */
-      template <int dim,
-                int spacedim,
-                typename VectorType,
-                typename Number,
-                std::enable_if_t<!IsBlockVector<VectorType>::value, VectorType>
-                  * = nullptr>
-      void
-      create_dof_vector(
-        const DoFHandler<dim, spacedim>                 &dof_handler,
-        const VectorType                                &src,
-        LinearAlgebra::distributed::BlockVector<Number> &dst,
-        const unsigned int level = numbers::invalid_unsigned_int)
-      {
-        const IndexSet &locally_owned_dofs =
-          (level == numbers::invalid_unsigned_int) ?
-            dof_handler.locally_owned_dofs() :
-            dof_handler.locally_owned_mg_dofs(level);
-
-        const IndexSet locally_relevant_dofs =
-          (level == numbers::invalid_unsigned_int) ?
-            DoFTools::extract_locally_relevant_dofs(dof_handler) :
-            DoFTools::extract_locally_relevant_level_dofs(dof_handler, level);
-
-
-        Assert(locally_owned_dofs.is_contiguous(),
-               ExcMessage(
-                 "You are trying to add a non-block vector with non-contiguous "
-                 "locally-owned index sets. This is not possible. Please "
-                 "consider to use an adequate block vector!"));
-
-        dst.reinit(1);
-
-        dst.block(0).reinit(locally_owned_dofs,
-                            locally_relevant_dofs,
-                            dof_handler.get_mpi_communicator());
-        copy_locally_owned_data_from(src, dst.block(0));
-
-        dst.collect_sizes();
-
-        dst.update_ghost_values();
-      }
-
-      /**
-       * Create a ghosted-copy of a block cell vector.
-       */
-      template <typename VectorType,
-                typename Number,
-                std::enable_if_t<IsBlockVector<VectorType>::value, VectorType>
-                  * = nullptr>
-      void
-      create_cell_vector(const VectorType                                &src,
-                         LinearAlgebra::distributed::BlockVector<Number> &dst)
-      {
-        dst.reinit(src.n_blocks());
-
-        for (unsigned int b = 0; b < src.n_blocks(); ++b)
-          {
-            dst.block(b).reinit(src.get_block_indices().block_size(b));
-            copy_locally_owned_data_from(src.block(b), dst.block(b));
-          }
-
-        dst.collect_sizes();
-      }
-
-
-      /**
-       * Create a ghosted-copy of a non-block cell vector.
-       */
-      template <typename VectorType,
-                typename Number,
-                std::enable_if_t<!IsBlockVector<VectorType>::value, VectorType>
-                  * = nullptr>
-      void
-      create_cell_vector(const VectorType                                &src,
-                         LinearAlgebra::distributed::BlockVector<Number> &dst)
-      {
-        dst.reinit(1);
-
-        dst.block(0).reinit(src.size());
-        copy_locally_owned_data_from(src, dst.block(0));
-
-        dst.collect_sizes();
-
-        dst.update_ghost_values();
+        dst.reinit(stored);
+        import_into(dst, src);
       }
     } // namespace CreateVectors
 
@@ -1149,7 +1062,7 @@ namespace internal
        * source vector and stores it until we no longer need it. No reference
        * to the original source vector is necessary nor stored.
        */
-      LinearAlgebra::distributed::BlockVector<ScalarType> vector;
+      LinearAlgebra::ReadWriteVector<ScalarType> vector;
     };
 
 
@@ -1196,7 +1109,7 @@ namespace internal
       const ComponentExtractor extract_component) const
     {
       return get_component(
-        internal::ElementAccess<LinearAlgebra::distributed::BlockVector<
+        internal::ElementAccess<LinearAlgebra::ReadWriteVector<
           ScalarType>>::get(vector, cell_number),
         extract_component);
     }
@@ -1463,7 +1376,7 @@ namespace internal
     void
     DataEntry<dim, spacedim, ScalarType>::clear()
     {
-      vector.reinit(0, 0);
+      vector.reinit(IndexSet());
       this->dof_handler = nullptr;
     }
 
@@ -1612,20 +1525,19 @@ namespace internal
       }
 
     private:
-      MGLevelObject<LinearAlgebra::distributed::BlockVector<ScalarType>>
-        vectors;
+      MGLevelObject<LinearAlgebra::ReadWriteVector<ScalarType>> vectors;
 
       /**
        * Extract the @p indices from @p vector and put them into @p values.
        */
       void
-      extract(const LinearAlgebra::distributed::BlockVector<ScalarType> &vector,
+      extract(const LinearAlgebra::ReadWriteVector<ScalarType> &rw_vector,
               const std::vector<types::global_dof_index> &indices,
               const ComponentExtractor                    extract_component,
               std::vector<double>                        &values) const
       {
         for (unsigned int i = 0; i < values.size(); ++i)
-          values[i] = get_component(vector[indices[i]], extract_component);
+          values[i] = get_component(rw_vector[indices[i]], extract_component);
       }
     };
 

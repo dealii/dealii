@@ -38,6 +38,7 @@
 #  include <deal.II/lac/trilinos_epetra_vector.h>
 #  include <deal.II/lac/trilinos_tpetra_block_vector.h>
 #  include <deal.II/lac/trilinos_tpetra_vector.h>
+#  include <deal.II/lac/trilinos_parallel_block_vector.h>
 
 DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
 #  include <Epetra_MultiVector.h>
@@ -312,6 +313,12 @@ namespace LinearAlgebra
       const std::shared_ptr<const Utilities::MPI::CommunicationPatternBase>
         &communication_pattern = {});
 
+
+    template <typename MemorySpace>
+    void
+    import_elements(const distributed::BlockVector<Number, MemorySpace> &src,
+                    const VectorOperation::values operation);
+
 #ifdef DEAL_II_WITH_PETSC
     /**
      * Imports all the elements present in the vector's IndexSet from the input
@@ -346,6 +353,10 @@ namespace LinearAlgebra
       VectorOperation::values              operation,
       const std::shared_ptr<const Utilities::MPI::CommunicationPatternBase>
         &communication_pattern = {});
+
+    void
+    import_elements(const TrilinosWrappers::MPI::BlockVector &src,
+                    const VectorOperation::values operation);
 
 #  ifdef DEAL_II_TRILINOS_WITH_TPETRA
     /**
