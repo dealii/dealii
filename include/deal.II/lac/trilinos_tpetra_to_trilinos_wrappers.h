@@ -113,8 +113,9 @@ namespace TrilinosWrappers
     BlockSparseMatrix<double, ::dealii::MemorySpace::Host>;
   using SparseMatrix = ::dealii::LinearAlgebra::TpetraWrappers::
     SparseMatrix<double, ::dealii::MemorySpace::Host>;
-  using SparsityPattern = ::dealii::LinearAlgebra::TpetraWrappers::
-    SparsityPattern<::dealii::MemorySpace::Host>;
+  using SparsityPattern =
+    ::dealii::LinearAlgebra::TpetraWrappers::SparsityPattern<
+      ::dealii::MemorySpace::Host>;
 #  else
   class BlockSparseMatrix;
   class SparseMatrix;

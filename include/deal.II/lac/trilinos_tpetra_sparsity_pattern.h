@@ -1092,14 +1092,12 @@ namespace LinearAlgebra
 
         // If at end of line: do one step, then cycle until we find a row with a
         // nonzero number of entries that is stored locally.
-        if (accessor.a_index >=
-              accessor.colnum_cache->size())
+        if (accessor.a_index >= accessor.colnum_cache->size())
           {
             accessor.a_index = 0;
             ++accessor.a_row;
 
-            while (accessor.a_row <
-                     accessor.sparsity_pattern->n_rows())
+            while (accessor.a_row < accessor.sparsity_pattern->n_rows())
               {
                 const auto row_length =
                   accessor.sparsity_pattern->row_length(accessor.a_row);

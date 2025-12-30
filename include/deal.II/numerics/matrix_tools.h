@@ -13,30 +13,30 @@
 // ------------------------------------------------------------------------
 
 #ifndef dealii_matrix_tools_h
-#  define dealii_matrix_tools_h
+#define dealii_matrix_tools_h
 
 
-#  include <deal.II/base/config.h>
+#include <deal.II/base/config.h>
 
-#  include <deal.II/base/exceptions.h>
-#  include <deal.II/base/function.h>
+#include <deal.II/base/exceptions.h>
+#include <deal.II/base/function.h>
 
-#  include <deal.II/lac/affine_constraints.h>
-#  include <deal.II/lac/trilinos_tpetra_to_trilinos_wrappers.h>
+#include <deal.II/lac/affine_constraints.h>
+#include <deal.II/lac/trilinos_tpetra_to_trilinos_wrappers.h>
 
-#  include <deal.II/numerics/matrix_creator.h>
+#include <deal.II/numerics/matrix_creator.h>
 
-#  include <map>
+#include <map>
 
-#  ifdef DEAL_II_WITH_PETSC
-#    include <petscsys.h>
-#  endif
+#ifdef DEAL_II_WITH_PETSC
+#  include <petscsys.h>
+#endif
 
 DEAL_II_NAMESPACE_OPEN
 
 
 // forward declarations
-#  ifndef DOXYGEN
+#ifndef DOXYGEN
 template <int dim>
 class Quadrature;
 
@@ -68,7 +68,7 @@ namespace hp
 } // namespace hp
 
 
-#    ifdef DEAL_II_WITH_PETSC
+#  ifdef DEAL_II_WITH_PETSC
 namespace PETScWrappers
 {
   class MatrixBase;
@@ -79,7 +79,7 @@ namespace PETScWrappers
     class BlockVector;
   } // namespace MPI
 } // namespace PETScWrappers
-#    endif
+#  endif
 #endif
 
 
@@ -327,7 +327,7 @@ namespace MatrixTools
     BlockVector<number>                             &right_hand_side,
     const bool                                       eliminate_columns = true);
 
-#    ifdef DEAL_II_WITH_PETSC
+#ifdef DEAL_II_WITH_PETSC
   /**
    * Apply Dirichlet boundary conditions to the system matrix and vectors as
    * described in the general documentation of this namespace. This function
@@ -354,9 +354,9 @@ namespace MatrixTools
     PETScWrappers::MPI::BlockVector                      &right_hand_side,
     const bool eliminate_columns = true);
 
-#    endif
+#endif
 
-#    ifdef DEAL_II_WITH_TRILINOS
+#ifdef DEAL_II_WITH_TRILINOS
   /**
    * Apply Dirichlet boundary conditions to the system matrix and vectors as
    * described in the general documentation of this namespace. This function
@@ -409,7 +409,7 @@ namespace MatrixTools
     TrilinosWrappers::MPI::BlockVector                      &solution,
     TrilinosWrappers::MPI::BlockVector                      &right_hand_side,
     const bool eliminate_columns = true);
-#    endif
+#endif
 
   /**
    * Rather than applying boundary values to the global matrix and vector
@@ -452,4 +452,4 @@ namespace MatrixTools
 
 DEAL_II_NAMESPACE_CLOSE
 
-#  endif
+#endif

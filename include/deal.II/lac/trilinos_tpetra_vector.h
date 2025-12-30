@@ -583,7 +583,10 @@ namespace LinearAlgebra
       void
       add(const Number a);
 
-      void add(const Vector<Number, MemorySpace> &V, bool allow_different_maps = false) {
+      void
+      add(const Vector<Number, MemorySpace> &V,
+          bool                               allow_different_maps = false)
+      {
         Assert(!allow_different_maps, ExcNotImplemented());
         this->add(1, V);
       }
@@ -892,9 +895,9 @@ namespace LinearAlgebra
       void
       compress(const VectorOperation::values operation);
 
-   void
-        update_ghost_values()
-        {}
+      void
+      update_ghost_values()
+      {}
 
       /**
        * Return a const reference to the underlying Trilinos
