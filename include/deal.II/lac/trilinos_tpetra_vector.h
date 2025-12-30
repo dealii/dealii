@@ -286,6 +286,8 @@ namespace LinearAlgebra
     template <typename Number, typename MemorySpace = dealii::MemorySpace::Host>
     class Vector : public ReadVector<Number>
     {
+      static_assert(std::is_same_v<MemorySpace, dealii::MemorySpace::Host> || std::is_same_v<MemorySpace, dealii::MemorySpace::Default>);
+
     public:
       /**
        * Declare some of the standard types used in all containers.
@@ -896,7 +898,7 @@ namespace LinearAlgebra
       compress(const VectorOperation::values operation);
 
       void
-      update_ghost_values()
+      update_ghost_values() const
       {}
 
       /**
@@ -912,6 +914,9 @@ namespace LinearAlgebra
        */
       TpetraTypes::VectorType<Number, MemorySpace> &
       trilinos_vector();
+
+      const TpetraTypes::MapType<MemorySpace> &
+      trilinos_partitioner() { return *vector->getMap(); }
 
       /**
        * Return a const Teuchos::RCP to the underlying Trilinos

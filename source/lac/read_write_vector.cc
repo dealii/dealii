@@ -93,13 +93,13 @@ namespace LinearAlgebra
     VectorOperation::values,
     const std::shared_ptr<const Utilities::MPI::CommunicationPatternBase> &);
   template void
-  ReadWriteVector<float>::import_elements(
-    const LinearAlgebra::TpetraWrappers::Vector<double, MemorySpace::Host> &,
+  ReadWriteVector<double>::import_elements(
+    const LinearAlgebra::TpetraWrappers::Vector<float, MemorySpace::Host> &,
     VectorOperation::values,
     const std::shared_ptr<const Utilities::MPI::CommunicationPatternBase> &);
   template void
-  ReadWriteVector<float>::import_elements(
-    const LinearAlgebra::TpetraWrappers::Vector<double, MemorySpace::Default> &,
+  ReadWriteVector<double>::import_elements(
+    const LinearAlgebra::TpetraWrappers::Vector<float, MemorySpace::Default> &,
     VectorOperation::values,
     const std::shared_ptr<const Utilities::MPI::CommunicationPatternBase> &);
 #  endif
@@ -115,16 +115,16 @@ namespace LinearAlgebra
     VectorOperation::values,
     const std::shared_ptr<const Utilities::MPI::CommunicationPatternBase> &);
   template void
-  ReadWriteVector<double>::import_elements(
-    const LinearAlgebra::TpetraWrappers::Vector<float, MemorySpace::Host> &,
+  ReadWriteVector<float>::import_elements(
+    const LinearAlgebra::TpetraWrappers::Vector<double, MemorySpace::Host> &,
     VectorOperation::values,
     const std::shared_ptr<const Utilities::MPI::CommunicationPatternBase> &);
   template void
-  ReadWriteVector<double>::import_elements(
-    const LinearAlgebra::TpetraWrappers::Vector<float, MemorySpace::Default> &,
+  ReadWriteVector<float>::import_elements(
+    const LinearAlgebra::TpetraWrappers::Vector<double, MemorySpace::Default> &,
     VectorOperation::values,
     const std::shared_ptr<const Utilities::MPI::CommunicationPatternBase> &);
-#  endif
+#endif
 #  ifdef DEAL_II_WITH_COMPLEX_VALUES
 #    ifdef DEAL_II_TRILINOS_WITH_TPETRA_INST_COMPLEX_FLOAT
   template void
@@ -139,15 +139,15 @@ namespace LinearAlgebra
                                                 MemorySpace::Default> &,
     VectorOperation::values,
     const std::shared_ptr<const Utilities::MPI::CommunicationPatternBase> &);
-  template void
-  ReadWriteVector<std::complex<float>>::import_elements(
-    const LinearAlgebra::TpetraWrappers::Vector<std::complex<double>,
+ template void
+  ReadWriteVector<std::complex<double>>::import_elements(
+    const LinearAlgebra::TpetraWrappers::Vector<std::complex<float>,
                                                 MemorySpace::Host> &,
     VectorOperation::values,
     const std::shared_ptr<const Utilities::MPI::CommunicationPatternBase> &);
   template void
-  ReadWriteVector<std::complex<float>>::import_elements(
-    const LinearAlgebra::TpetraWrappers::Vector<std::complex<double>,
+  ReadWriteVector<std::complex<double>>::import_elements(
+    const LinearAlgebra::TpetraWrappers::Vector<std::complex<float>,
                                                 MemorySpace::Default> &,
     VectorOperation::values,
     const std::shared_ptr<const Utilities::MPI::CommunicationPatternBase> &);
@@ -165,15 +165,15 @@ namespace LinearAlgebra
                                                 MemorySpace::Default> &,
     VectorOperation::values,
     const std::shared_ptr<const Utilities::MPI::CommunicationPatternBase> &);
-  template void
-  ReadWriteVector<std::complex<double>>::import_elements(
-    const LinearAlgebra::TpetraWrappers::Vector<std::complex<float>,
+ template void
+  ReadWriteVector<std::complex<float>>::import_elements(
+    const LinearAlgebra::TpetraWrappers::Vector<std::complex<double>,
                                                 MemorySpace::Host> &,
     VectorOperation::values,
     const std::shared_ptr<const Utilities::MPI::CommunicationPatternBase> &);
   template void
-  ReadWriteVector<std::complex<double>>::import_elements(
-    const LinearAlgebra::TpetraWrappers::Vector<std::complex<float>,
+  ReadWriteVector<std::complex<float>>::import_elements(
+    const LinearAlgebra::TpetraWrappers::Vector<std::complex<double>,
                                                 MemorySpace::Default> &,
     VectorOperation::values,
     const std::shared_ptr<const Utilities::MPI::CommunicationPatternBase> &);

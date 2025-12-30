@@ -33,6 +33,8 @@
 #  include <Tpetra_Core.hpp>
 #  include <Tpetra_CrsMatrix.hpp>
 
+#include <Tpetra_computeRowAndColumnOneNorms.hpp>
+
 #  include <type_traits>
 
 
@@ -931,10 +933,45 @@ namespace LinearAlgebra
       Number
       l1_norm() const
       {
-        DEAL_II_NOT_IMPLEMENTED();
-        // recent Trilinos has
-        // matrix->getNorm1();
-        return {};
+        #  if DEAL_II_TRILINOS_VERSION_GTE(16, 2, 0)
+return matrix->getNorm1();
+#else
+  auto equilInfo = Tpetra::computeRowAndColumnOneNorms(*matrix, false);
+  Number myMax;
+  using range_type = Kokkos::RangePolicy<typename MemorySpace::kokkos_space::execution_space, int>;
+  Kokkos::parallel_reduce(
+      "getNorm1", range_type(0, equilInfo.colNorms.extent(0)),
+      KOKKOS_LAMBDA(int i, Number & max) {
+        max = equilInfo.colNorms(i);
+      },
+      Kokkos::Max<Number>(myMax));
+  Number totalMax = 0;
+  Teuchos::reduceAll<int, Number>(*(matrix->getComm()), Teuchos::REDUCE_MAX, myMax,
+                                    Teuchos::outArg(totalMax));
+  return totalMax;
+#endif
+      }
+
+     Number
+      linfty_norm() const
+      {
+        #  if DEAL_II_TRILINOS_VERSION_GTE(16, 2, 0)
+return matrix->getNormInf();
+#else
+          auto equilInfo = Tpetra::computeRowOneNorms(*matrix);
+  Number myMax;
+  using range_type = Kokkos::RangePolicy<typename MemorySpace::kokkos_space::execution_space, int>;
+  Kokkos::parallel_reduce(
+      "getNormInf", range_type(0, equilInfo.rowNorms.extent(0)),
+      KOKKOS_LAMBDA(int i, Number & max) {
+        max = equilInfo.rowNorms(i);
+      },
+      Kokkos::Max<Number>(myMax));
+  Number totalMax = 0;
+  Teuchos::reduceAll<int, Number>(*(matrix->getComm()), Teuchos::REDUCE_MAX, myMax,
+                                    Teuchos::outArg(totalMax));
+  return totalMax;
+#endif
       }
 
       /** @} */
