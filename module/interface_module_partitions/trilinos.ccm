@@ -61,14 +61,16 @@ module;
 #  include <Epetra_SerialComm.h>
 #  include <Epetra_Vector.h>
 #  include <Ifpack_Chebyshev.h>
-#  include <NOX_Abstract_Group.H>
-#  include <NOX_Abstract_Vector.H>
-#  include <NOX_Solver_Factory.H>
-#  include <NOX_Solver_Generic.H>
-#  include <NOX_StatusTest_Combo.H>
-#  include <NOX_StatusTest_MaxIters.H>
-#  include <NOX_StatusTest_NormF.H>
-#  include <NOX_StatusTest_RelativeNormF.H>
+#  ifdef DEAL_II_TRILINOS_WITH_NOX
+#    include <NOX_Abstract_Group.H>
+#    include <NOX_Abstract_Vector.H>
+#    include <NOX_Solver_Factory.H>
+#    include <NOX_Solver_Generic.H>
+#    include <NOX_StatusTest_Combo.H>
+#    include <NOX_StatusTest_MaxIters.H>
+#    include <NOX_StatusTest_NormF.H>
+#    include <NOX_StatusTest_RelativeNormF.H>
+#  endif
 #  include <Teuchos_BLAS_types.hpp>
 #  include <Teuchos_Comm.hpp>
 #  include <Teuchos_ConfigDefs.hpp>
@@ -245,6 +247,7 @@ export
   } // namespace Tpetra
 #  endif
 
+#  ifdef DEAL_II_TRILINOS_WITH_NOX
   namespace NOX
   {
     namespace Abstract
@@ -274,6 +277,7 @@ export
     using ::NOX::CopyType;
     using ::NOX::size_type;
   } // namespace NOX
+#  endif
 
 #  ifdef DEAL_II_TRILINOS_WITH_ROL
   namespace ROL
