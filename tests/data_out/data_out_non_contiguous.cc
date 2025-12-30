@@ -29,7 +29,7 @@
 template <int dim>
 void
 force_noncontiguous_locally_owned_dofs(DoFHandler<dim> &dof_handler,
-                                       const MPI_Comm comm)
+                                       const MPI_Comm   comm)
 {
   const IndexSet locally_owned = dof_handler.locally_owned_dofs();
   const auto local_n = locally_owned.n_elements();
@@ -39,7 +39,7 @@ force_noncontiguous_locally_owned_dofs(DoFHandler<dim> &dof_handler,
 
   // How many DoFs does each rank own?
   const std::vector<types::global_dof_index> counts =
-      Utilities::MPI::all_gather(comm, local_n);
+    Utilities::MPI::all_gather(comm, local_n);
 
   // number of ranks that have at least (k+1) locally owned DoFs
   auto active_ranks_at = [&](const types::global_dof_index k) {
@@ -54,25 +54,25 @@ force_noncontiguous_locally_owned_dofs(DoFHandler<dim> &dof_handler,
   // a local ordinal k = 0..local_n-1, and map that to a new global index by
   // interleaving ranks:
   std::vector<types::global_dof_index> new_numbers(local_n);
-  types::global_dof_index             k = 0;
+  types::global_dof_index              k = 0;
   for (const auto i : locally_owned)
-  {
-    // How many items were emitted in all previous k-levels?
-    types::global_dof_index base = 0;
-    for (types::global_dof_index kk = 0; kk < k; ++kk)
-      base += active_ranks_at(kk);
+    {
+      // How many items were emitted in all previous k-levels?
+      types::global_dof_index base = 0;
+      for (types::global_dof_index kk = 0; kk < k; ++kk)
+        base += active_ranks_at(kk);
 
-    // Within this k-level, how many ranks < my_rank participate?
-    types::global_dof_index offset = 0;
-    for (unsigned int r = 0; r < my_rank; ++r)
-      if (counts[r] > k)
-        ++offset;
+      // Within this k-level, how many ranks < my_rank participate?
+      types::global_dof_index offset = 0;
+      for (unsigned int r = 0; r < my_rank; ++r)
+        if (counts[r] > k)
+          ++offset;
 
-    const types::global_dof_index new_i = base + offset;
+      const types::global_dof_index new_i = base + offset;
 
-    new_numbers[locally_owned.index_within_set(i)] = new_i;
-    ++k;
-  }
+      new_numbers[locally_owned.index_within_set(i)] = new_i;
+      ++k;
+    }
 
   dof_handler.renumber_dofs(new_numbers);
 
@@ -119,15 +119,15 @@ run(const MPI_Comm comm)
   double min_v = std::numeric_limits<double>::infinity();
   double max_v = -std::numeric_limits<double>::infinity();
   for (const auto &p : patches)
-  {
-    for (double v : p.data)
     {
-      min_v = std::min(min_v, v);
-      max_v = std::max(max_v, v);
-    }
+      for (double v : p.data)
+        {
+          min_v = std::min(min_v, v);
+          max_v = std::max(max_v, v);
+        }
 
-    deallog << "min_v=" << min_v << ", max_v=" << max_v << std::endl;
-  }
+      deallog << "min_v=" << min_v << ", max_v=" << max_v << std::endl;
+    }
   deallog << "patches=" << patches.size() << std::endl;
 
 
@@ -148,7 +148,7 @@ run(const MPI_Comm comm)
   for (const auto &cell : tria.active_cell_iterators())
     if (cell->is_locally_owned())
       cell_data[cell->global_active_cell_index()] =
-          static_cast<double>(cell->global_active_cell_index());
+        static_cast<double>(cell->global_active_cell_index());
 
   cell_data.compress(VectorOperation::insert);
 
@@ -162,15 +162,15 @@ run(const MPI_Comm comm)
   double min_c = std::numeric_limits<double>::infinity();
   double max_c = -std::numeric_limits<double>::infinity();
   for (const auto &p : cell_patches)
-  {
-    for (double v : p.data)
     {
-      min_c = std::min(min_c, v);
-      max_c = std::max(max_c, v);
-    }
+      for (double v : p.data)
+        {
+          min_c = std::min(min_c, v);
+          max_c = std::max(max_c, v);
+        }
 
-    deallog << "min_c=" << min_c << ", max_c=" << max_c << std::endl;
-  }
+      deallog << "min_c=" << min_c << ", max_c=" << max_c << std::endl;
+    }
   deallog << "cell_patches=" << cell_patches.size() << std::endl;
 }
 
@@ -183,4 +183,3 @@ main(int argc, char **argv)
 
   run<2>(MPI_COMM_WORLD);
 }
-

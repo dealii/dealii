@@ -791,10 +791,11 @@ namespace internal
 
     namespace CreateVectors
     {
-    namespace
-    {
+      namespace
+      {
         template <typename Dst, typename Src, typename = void>
-        struct has_import_elements : std::false_type {};
+        struct has_import_elements : std::false_type
+        {};
 
         template <typename Dst, typename Src>
         struct has_import_elements<
@@ -802,7 +803,8 @@ namespace internal
           Src,
           std::void_t<decltype(std::declval<Dst &>().import_elements(
             std::declval<const Src &>(),
-            VectorOperation::insert))>> : std::true_type {};
+            VectorOperation::insert))>> : std::true_type
+        {};
 
 
         template <typename T>
@@ -821,7 +823,7 @@ namespace internal
           : std::true_type
         {};
 
-    #ifdef DEAL_II_WITH_PETSC
+#ifdef DEAL_II_WITH_PETSC
         template <>
         struct is_distributed_vector<dealii::PETScWrappers::MPI::Vector>
           : std::true_type
@@ -831,9 +833,9 @@ namespace internal
         struct is_distributed_vector<dealii::PETScWrappers::MPI::BlockVector>
           : std::true_type
         {};
-    #endif
+#endif
 
-    #ifdef DEAL_II_WITH_TRILINOS
+#ifdef DEAL_II_WITH_TRILINOS
         template <>
         struct is_distributed_vector<dealii::TrilinosWrappers::MPI::Vector>
           : std::true_type
@@ -843,7 +845,7 @@ namespace internal
         struct is_distributed_vector<dealii::TrilinosWrappers::MPI::BlockVector>
           : std::true_type
         {};
-    #endif
+#endif
 
 
         template <typename DstNumber, typename SrcVector>
@@ -857,50 +859,52 @@ namespace internal
           // Fast path: exact type match and import_elements exists
           if constexpr (std::is_same_v<SrcValue, DstNumber> &&
                         CreateVectors::has_import_elements<
-                        dealii::LinearAlgebra::ReadWriteVector<DstNumber>, Src>::value)
-          {
-            dst.import_elements(src, dealii::VectorOperation::insert);
-          }
+                          dealii::LinearAlgebra::ReadWriteVector<DstNumber>,
+                          Src>::value)
+            {
+              dst.import_elements(src, dealii::VectorOperation::insert);
+            }
           else if constexpr (CreateVectors::has_import_elements<
-                             dealii::LinearAlgebra::ReadWriteVector<SrcValue>, Src>::value)
-          {
-            // Safe path for parallel vectors with conversion:
-            // import into RWV<SrcValue> then cast into dst.
-            dealii::LinearAlgebra::ReadWriteVector<SrcValue> tmp(dst.get_stored_elements());
-            tmp.import_elements(src, dealii::VectorOperation::insert);
+                               dealii::LinearAlgebra::ReadWriteVector<SrcValue>,
+                               Src>::value)
+            {
+              // Safe path for parallel vectors with conversion:
+              // import into RWV<SrcValue> then cast into dst.
+              dealii::LinearAlgebra::ReadWriteVector<SrcValue> tmp(
+                dst.get_stored_elements());
+              tmp.import_elements(src, dealii::VectorOperation::insert);
 
-            // tmp and dst have same IndexSet, so loop is local-only.
-            for (const auto i : dst.get_stored_elements())
-              dst[i] = static_cast<DstNumber>(tmp[i]);
-          }
+              // tmp and dst have same IndexSet, so loop is local-only.
+              for (const auto i : dst.get_stored_elements())
+                dst[i] = static_cast<DstNumber>(tmp[i]);
+            }
           else
-          {
-            // Serial-only fallback: requires global read access
-            static_assert(!is_distributed_vector<SrcVector>::value,
-                          "Fallback import path reached for a distributed vector. "
-                          "This is possibly a bug: distributed vectors should use "
-                          "ReadWriteVector::import_elements() logic.");
+            {
+              // Serial-only fallback: requires global read access
+              static_assert(
+                !is_distributed_vector<SrcVector>::value,
+                "Fallback import path reached for a distributed vector. "
+                "This is possibly a bug: distributed vectors should use "
+                "ReadWriteVector::import_elements() logic.");
 
-            for (const auto i : dst.get_stored_elements())
-              dst[i] = static_cast<DstNumber>(src(i));
-          }
+              for (const auto i : dst.get_stored_elements())
+                dst[i] = static_cast<DstNumber>(src(i));
+            }
         }
       } // namespace
 
 
       /**
-      * Create a local snapshot of a DoF vector on the locally relevant index set
-      * (owned + ghosts) by importing values from the distributed vector.
-      */
-      template <int dim,
-                int spacedim,
-                typename VectorType,
-                typename Number>
+       * Create a local snapshot of a DoF vector on the locally relevant index
+       * set (owned + ghosts) by importing values from the distributed vector.
+       */
+      template <int dim, int spacedim, typename VectorType, typename Number>
       void
-      create_dof_vector(const DoFHandler<dim, spacedim>        &dof_handler,
-                        const VectorType                       &src,
-                        LinearAlgebra::ReadWriteVector<Number> &dst,
-                        const unsigned int level = numbers::invalid_unsigned_int)
+      create_dof_vector(
+        const DoFHandler<dim, spacedim>        &dof_handler,
+        const VectorType                       &src,
+        LinearAlgebra::ReadWriteVector<Number> &dst,
+        const unsigned int level = numbers::invalid_unsigned_int)
       {
         const IndexSet locally_relevant_dofs =
           (level == numbers::invalid_unsigned_int) ?
@@ -920,7 +924,8 @@ namespace internal
        */
       template <typename VectorType, typename Number>
       void
-      create_cell_vector(const VectorType &src, LinearAlgebra::ReadWriteVector<Number> &dst)
+      create_cell_vector(const VectorType                       &src,
+                         LinearAlgebra::ReadWriteVector<Number> &dst)
       {
         IndexSet stored(src.size());
         stored.add_range(0, src.size());
@@ -1109,8 +1114,8 @@ namespace internal
       const ComponentExtractor extract_component) const
     {
       return get_component(
-        internal::ElementAccess<LinearAlgebra::ReadWriteVector<
-          ScalarType>>::get(vector, cell_number),
+        internal::ElementAccess<
+          LinearAlgebra::ReadWriteVector<ScalarType>>::get(vector, cell_number),
         extract_component);
     }
 
@@ -1532,9 +1537,9 @@ namespace internal
        */
       void
       extract(const LinearAlgebra::ReadWriteVector<ScalarType> &rw_vector,
-              const std::vector<types::global_dof_index> &indices,
-              const ComponentExtractor                    extract_component,
-              std::vector<double>                        &values) const
+              const std::vector<types::global_dof_index>       &indices,
+              const ComponentExtractor extract_component,
+              std::vector<double>     &values) const
       {
         for (unsigned int i = 0; i < values.size(); ++i)
           values[i] = get_component(rw_vector[indices[i]], extract_component);

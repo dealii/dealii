@@ -29,6 +29,7 @@
 
 #ifdef DEAL_II_WITH_PETSC
 #  include <deal.II/lac/petsc_vector.h>
+#  include <deal.II/lac/petsc_block_vector.h>
 #endif
 
 #ifdef DEAL_II_WITH_TRILINOS
@@ -235,7 +236,18 @@ namespace LinearAlgebra
 
           // Scatter back into global indexing
           for (auto it = block_local.begin(); it != block_local.end(); ++it)
-            dst[b0 + *it] = tmp[*it];
+          {
+            const auto gi = b0 + *it;
+
+            if (operation == VectorOperation::add)
+              dst[gi] += tmp[*it];
+            else if (operation == VectorOperation::min)
+              dst[gi] = get_min(dst[gi], tmp[*it]);
+            else if (operation == VectorOperation::max)
+              dst[gi] = get_max(dst[gi], tmp[*it]);
+            else  // insert
+              dst[gi] = tmp[*it];
+          }
         }
     };
   } // namespace internal
@@ -515,34 +527,62 @@ namespace LinearAlgebra
     {
       AssertThrow(false, ExcMessage("Tried to copy complex -> real"));
     }
+
   } // namespace internal
-
-
 
   template <typename Number>
   void
   ReadWriteVector<Number>::import_elements(
     const PETScWrappers::MPI::Vector &petsc_vec,
-    VectorOperation::values /*operation*/,
+    VectorOperation::values           operation,
     const std::shared_ptr<const Utilities::MPI::CommunicationPatternBase>
-      & /*communication_pattern*/)
+      &communication_pattern)
   {
-    // TODO: this works only if no communication is needed.
-    Assert(petsc_vec.locally_owned_elements() == stored_elements,
-           StandardExceptions::ExcInvalidState());
+    std::shared_ptr<const Utilities::MPI::Partitioner> comm_pattern;
+    if (communication_pattern.get() == nullptr)
+      {
+        comm_pattern = std::make_shared<Utilities::MPI::Partitioner>(
+          petsc_vec.locally_owned_elements(),
+          get_stored_elements(),
+          petsc_vec.get_mpi_communicator());
+      }
+    else
+      {
+        comm_pattern =
+          std::dynamic_pointer_cast<const Utilities::MPI::Partitioner>(
+            communication_pattern);
+        AssertThrow(comm_pattern != nullptr,
+                    ExcMessage("The communication pattern is not of type "
+                               "Utilities::MPI::Partitioner."));
+      }
 
-    // get a representation of the vector and copy it
-    const PetscScalar *start_ptr;
-    PetscErrorCode     ierr =
+    // PETSc local array provides the locally-owned entries (contiguous)
+    const PetscScalar *start_ptr = nullptr;
+    PetscErrorCode ierr =
       VecGetArrayRead(static_cast<const Vec &>(petsc_vec), &start_ptr);
     AssertThrow(ierr == 0, ExcPETScError(ierr));
 
-    const size_type vec_size = petsc_vec.locally_owned_size();
-    internal::copy_petsc_vector(start_ptr, start_ptr + vec_size, begin());
+    const unsigned int n_owned = comm_pattern->locally_owned_size();
+    AssertDimension(n_owned, petsc_vec.locally_owned_size());
 
-    // restore the representation of the vector
+    std::vector<Number> owned_values(n_owned);
+    internal::copy_petsc_vector(start_ptr, start_ptr + n_owned, owned_values.data());
+
     ierr = VecRestoreArrayRead(static_cast<const Vec &>(petsc_vec), &start_ptr);
     AssertThrow(ierr == 0, ExcPETScError(ierr));
+
+    // Do the actual MPI exchange + apply operation into *this*
+    internal::read_write_vector_functions<Number, ::dealii::MemorySpace::Host>::
+      import_elements(comm_pattern, owned_values.data(), operation, *this);
+  }
+
+  template <typename Number>
+  void
+  ReadWriteVector<Number>::import_elements(
+      const PETScWrappers::MPI::BlockVector &src,
+      const VectorOperation::values          operation)
+  {
+    internal::import_elements_from_block_vector(*this, src, operation);
   }
 #endif
 

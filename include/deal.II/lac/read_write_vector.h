@@ -70,6 +70,7 @@ namespace PETScWrappers
   namespace MPI
   {
     class Vector;
+    class BlockVector;
   }
 } // namespace PETScWrappers
 #  endif
@@ -330,10 +331,15 @@ namespace LinearAlgebra
      */
     void
     import_elements(
-      const PETScWrappers::MPI::Vector &petsc_vec,
-      VectorOperation::values           operation,
-      const std::shared_ptr<const Utilities::MPI::CommunicationPatternBase>
+        const PETScWrappers::MPI::Vector &petsc_vec,
+        VectorOperation::values           operation,
+        const std::shared_ptr<const Utilities::MPI::CommunicationPatternBase>
         &communication_pattern = {});
+
+    void
+    import_elements(
+        const PETScWrappers::MPI::BlockVector &src,
+        const VectorOperation::values          operation);
 #endif
 
 #ifdef DEAL_II_WITH_TRILINOS
