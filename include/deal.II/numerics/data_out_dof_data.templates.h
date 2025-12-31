@@ -791,8 +791,9 @@ namespace internal
 
     namespace CreateVectors
     {
-      namespace
-      {
+        template <class...>
+        using void_t = void;
+
         template <typename Dst, typename Src, typename = void>
         struct has_import_elements : std::false_type
         {};
@@ -801,7 +802,7 @@ namespace internal
         struct has_import_elements<
           Dst,
           Src,
-          std::void_t<decltype(std::declval<Dst &>().import_elements(
+          void_t<decltype(std::declval<Dst &>().import_elements(
             std::declval<const Src &>(),
             VectorOperation::insert))>> : std::true_type
         {};
@@ -858,13 +859,13 @@ namespace internal
 
           // Fast path: exact type match and import_elements exists
           if constexpr (std::is_same_v<SrcValue, DstNumber> &&
-                        CreateVectors::has_import_elements<
+                        has_import_elements<
                           dealii::LinearAlgebra::ReadWriteVector<DstNumber>,
                           Src>::value)
             {
               dst.import_elements(src, dealii::VectorOperation::insert);
             }
-          else if constexpr (CreateVectors::has_import_elements<
+          else if constexpr (has_import_elements<
                                dealii::LinearAlgebra::ReadWriteVector<SrcValue>,
                                Src>::value)
             {
@@ -891,7 +892,6 @@ namespace internal
                 dst[i] = static_cast<DstNumber>(src(i));
             }
         }
-      } // namespace
 
 
       /**
