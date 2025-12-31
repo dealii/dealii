@@ -32,7 +32,7 @@ force_noncontiguous_locally_owned_dofs(DoFHandler<dim> &dof_handler,
                                        const MPI_Comm   comm)
 {
   const IndexSet locally_owned = dof_handler.locally_owned_dofs();
-  const auto local_n = locally_owned.n_elements();
+  const auto     local_n       = locally_owned.n_elements();
 
   const unsigned int my_rank = Utilities::MPI::this_mpi_process(comm);
   const unsigned int n_ranks = Utilities::MPI::n_mpi_processes(comm);

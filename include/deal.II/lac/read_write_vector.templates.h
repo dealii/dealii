@@ -21,15 +21,15 @@
 #include <deal.II/base/partitioner.h>
 
 #include <deal.II/lac/exceptions.h>
+#include <deal.II/lac/la_parallel_block_vector.h>
 #include <deal.II/lac/la_parallel_vector.h>
 #include <deal.II/lac/read_write_vector.h>
 #include <deal.II/lac/vector.h>
 #include <deal.II/lac/vector_operations_internal.h>
-#include <deal.II/lac/la_parallel_block_vector.h>
 
 #ifdef DEAL_II_WITH_PETSC
-#  include <deal.II/lac/petsc_vector.h>
 #  include <deal.II/lac/petsc_block_vector.h>
+#  include <deal.II/lac/petsc_vector.h>
 #endif
 
 #ifdef DEAL_II_WITH_TRILINOS
@@ -206,8 +206,8 @@ namespace LinearAlgebra
 
     template <typename Number, typename BlockVectorType>
     void
-    import_elements_from_block_vector(ReadWriteVector<Number>     &dst,
-                                      const BlockVectorType      &src,
+    import_elements_from_block_vector(ReadWriteVector<Number>      &dst,
+                                      const BlockVectorType        &src,
                                       const VectorOperation::values operation)
     {
       const auto &bi = src.get_block_indices();
@@ -219,7 +219,8 @@ namespace LinearAlgebra
           const types::global_dof_index b0 = bi.block_start(b);
           const types::global_dof_index b1 = b0 + bi.block_size(b);
 
-          // Build the subset of dst's stored indices that lie in this block, block-local numbering.
+          // Build the subset of dst's stored indices that lie in this block,
+          // block-local numbering.
           IndexSet block_local(bi.block_size(b));
           for (auto it = stored.begin(); it != stored.end(); ++it)
             if (*it >= b0 && *it < b1)
@@ -236,18 +237,18 @@ namespace LinearAlgebra
 
           // Scatter back into global indexing
           for (auto it = block_local.begin(); it != block_local.end(); ++it)
-          {
-            const auto gi = b0 + *it;
+            {
+              const auto gi = b0 + *it;
 
-            if (operation == VectorOperation::add)
-              dst[gi] += tmp[*it];
-            else if (operation == VectorOperation::min)
-              dst[gi] = get_min(dst[gi], tmp[*it]);
-            else if (operation == VectorOperation::max)
-              dst[gi] = get_max(dst[gi], tmp[*it]);
-            else  // insert
-              dst[gi] = tmp[*it];
-          }
+              if (operation == VectorOperation::add)
+                dst[gi] += tmp[*it];
+              else if (operation == VectorOperation::min)
+                dst[gi] = get_min(dst[gi], tmp[*it]);
+              else if (operation == VectorOperation::max)
+                dst[gi] = get_max(dst[gi], tmp[*it]);
+              else // insert
+                dst[gi] = tmp[*it];
+            }
         }
     };
   } // namespace internal
@@ -491,7 +492,7 @@ namespace LinearAlgebra
   void
   ReadWriteVector<Number>::import_elements(
     const distributed::BlockVector<Number, MemorySpace> &src,
-    const VectorOperation::values operation)
+    const VectorOperation::values                        operation)
   {
     internal::import_elements_from_block_vector(*this, src, operation);
   }
@@ -558,7 +559,7 @@ namespace LinearAlgebra
 
     // PETSc local array provides the locally-owned entries (contiguous)
     const PetscScalar *start_ptr = nullptr;
-    PetscErrorCode ierr =
+    PetscErrorCode     ierr =
       VecGetArrayRead(static_cast<const Vec &>(petsc_vec), &start_ptr);
     AssertThrow(ierr == 0, ExcPETScError(ierr));
 
@@ -566,7 +567,9 @@ namespace LinearAlgebra
     AssertDimension(n_owned, petsc_vec.locally_owned_size());
 
     std::vector<Number> owned_values(n_owned);
-    internal::copy_petsc_vector(start_ptr, start_ptr + n_owned, owned_values.data());
+    internal::copy_petsc_vector(start_ptr,
+                                start_ptr + n_owned,
+                                owned_values.data());
 
     ierr = VecRestoreArrayRead(static_cast<const Vec &>(petsc_vec), &start_ptr);
     AssertThrow(ierr == 0, ExcPETScError(ierr));
@@ -579,8 +582,8 @@ namespace LinearAlgebra
   template <typename Number>
   void
   ReadWriteVector<Number>::import_elements(
-      const PETScWrappers::MPI::BlockVector &src,
-      const VectorOperation::values          operation)
+    const PETScWrappers::MPI::BlockVector &src,
+    const VectorOperation::values          operation)
   {
     internal::import_elements_from_block_vector(*this, src, operation);
   }
@@ -895,8 +898,9 @@ namespace LinearAlgebra
 
   template <typename Number>
   void
-  ReadWriteVector<Number>::import_elements(const TrilinosWrappers::MPI::BlockVector &src,
-                                           const VectorOperation::values operation)
+  ReadWriteVector<Number>::import_elements(
+    const TrilinosWrappers::MPI::BlockVector &src,
+    const VectorOperation::values             operation)
   {
     internal::import_elements_from_block_vector(*this, src, operation);
   }
