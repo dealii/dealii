@@ -867,34 +867,6 @@ namespace internal
       inline constexpr bool is_trilinos_vector_v =
         is_trilinos_vector<std::decay_t<T>>::value;
 
-#ifdef DEAL_II_WITH_TRILINOS
-      inline TrilinosWrappers::MPI::Vector
-      make_owned_nonghosted_copy(const TrilinosWrappers::MPI::Vector &src)
-      {
-        TrilinosWrappers::MPI::Vector owned;
-        owned.reinit(src.locally_owned_elements(),
-                     src.get_mpi_communicator(),
-                     /*omit_zeroing_entries=*/true);
-        owned = src;
-        return owned;
-      }
-
-      inline TrilinosWrappers::MPI::BlockVector
-      make_owned_nonghosted_copy(const TrilinosWrappers::MPI::BlockVector &src)
-      {
-        std::vector<IndexSet> partitioning(src.n_blocks());
-        for (unsigned int b = 0; b < src.n_blocks(); ++b)
-          partitioning[b] = src.block(b).locally_owned_elements();
-
-        TrilinosWrappers::MPI::BlockVector owned;
-        owned.reinit(partitioning,
-                     src.get_mpi_communicator(),
-                     /*omit_zeroing_entries=*/true);
-        owned = src;
-        return owned;
-      }
-#endif
-
       template <typename DstNumber, typename SrcVector>
       inline void
       import_into(dealii::LinearAlgebra::ReadWriteVector<DstNumber> &dst,
@@ -907,8 +879,12 @@ namespace internal
           {
             if (src.has_ghost_elements())
               {
-                const auto owned = make_owned_nonghosted_copy(src);
-                import_into(dst, owned);
+                // Ghosted Trilinos vectors store all locally relevant entries
+                // locally, so we can just read them directly without
+                // communication.
+                for (const auto i : dst.get_stored_elements())
+                  dst[i] = static_cast<DstNumber>(src(i));
+
                 return;
               }
           }
