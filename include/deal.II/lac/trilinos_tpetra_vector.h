@@ -286,7 +286,8 @@ namespace LinearAlgebra
     template <typename Number, typename MemorySpace = dealii::MemorySpace::Host>
     class Vector : public ReadVector<Number>
     {
-      static_assert(std::is_same_v<MemorySpace, dealii::MemorySpace::Host> || std::is_same_v<MemorySpace, dealii::MemorySpace::Default>);
+      static_assert(std::is_same_v<MemorySpace, dealii::MemorySpace::Host> ||
+                    std::is_same_v<MemorySpace, dealii::MemorySpace::Default>);
 
     public:
       /**
@@ -396,8 +397,7 @@ namespace LinearAlgebra
       void
       reinit(const Vector<Number, MemorySpace> &V,
              const bool                         omit_zeroing_entries = false,
-                   const bool    allow_different_maps =  false
-             );
+             const bool                         allow_different_maps = false);
 
       /**
        * Swap the contents of this vector and the other vector @p v. One could do
@@ -918,7 +918,10 @@ namespace LinearAlgebra
       trilinos_vector();
 
       const TpetraTypes::MapType<MemorySpace> &
-      trilinos_partitioner() { return *vector->getMap(); }
+      trilinos_partitioner()
+      {
+        return *vector->getMap();
+      }
 
       /**
        * Return a const Teuchos::RCP to the underlying Trilinos

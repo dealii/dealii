@@ -464,7 +464,8 @@ namespace LinearAlgebra
     SparseMatrix<Number, MemorySpace>::SparseMatrix(
       const size_type    m,
       const size_type    n,
-      const unsigned int n_max_entries_per_row) : SparseMatrix(SparsityPattern<MemorySpace>{m,n, n_max_entries_per_row})
+      const unsigned int n_max_entries_per_row)
+      : SparseMatrix(SparsityPattern<MemorySpace>{m, n, n_max_entries_per_row})
     {}
 
 

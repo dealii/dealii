@@ -1429,9 +1429,10 @@ SparseDirectMUMPS::vmult(VectorType &dst, const VectorType &src) const
           id.rhs_loc = const_cast<double *>(src.begin());
 #  endif
         }
-      else if constexpr(
-        std::is_same_v<VectorType, LinearAlgebra::distributed::Vector<double>>)
-          id.rhs_loc = const_cast<double *>(src.begin());
+      else if constexpr (std::is_same_v<
+                           VectorType,
+                           LinearAlgebra::distributed::Vector<double>>)
+        id.rhs_loc = const_cast<double *>(src.begin());
       else if constexpr (std::is_same_v<VectorType, PETScWrappers::MPI::Vector>)
         {
 #  ifdef DEAL_II_WITH_PETSC
@@ -1611,10 +1612,10 @@ InstantiateMUMPSMatVec(TrilinosWrappers::MPI::Vector)
 
 #  define InstantiateMUMPS(MATRIX) \
     template void SparseDirectMUMPS::initialize(const MATRIX &);
-      InstantiateMUMPS(SparseMatrix<double>)
-        InstantiateMUMPS(SparseMatrix<float>)
+        InstantiateMUMPS(SparseMatrix<double>)
+          InstantiateMUMPS(SparseMatrix<float>)
 #  if defined(DEAL_II_WITH_TRILINOS) && !defined(DEAL_II_TRILINOS_WITH_TPETRA)
-          InstantiateMUMPS(TrilinosWrappers::SparseMatrix)
+            InstantiateMUMPS(TrilinosWrappers::SparseMatrix)
 #  endif
 #  ifdef DEAL_II_WITH_PETSC
               InstantiateMUMPS(PETScWrappers::SparseMatrix)

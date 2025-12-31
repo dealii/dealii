@@ -286,8 +286,9 @@ namespace LinearAlgebra
                                         const bool omit_zeroing_entries,
                                         const bool allow_different_maps)
     {
-      if (allow_different_maps) {
-         Assert(omit_zeroing_entries == false,
+      if (allow_different_maps)
+        {
+          Assert(omit_zeroing_entries == false,
                  ExcMessage(
                    "It is not possible to exchange data with the "
                    "option 'omit_zeroing_entries' set, which would not write "
@@ -296,13 +297,16 @@ namespace LinearAlgebra
           AssertThrow(size() == V.size(),
                       ExcDimensionMismatch(size(), V.size()));
 
-          TpetraTypes::ImportType<MemorySpace> data_exchange(vector->getMap(), V.vector->getMap());
+          TpetraTypes::ImportType<MemorySpace> data_exchange(
+            vector->getMap(), V.vector->getMap());
           vector->doImport(*V.vector, data_exchange, Tpetra::INSERT);
-      } else {
-      reinit(V.locally_owned_elements(),
-             V.get_mpi_communicator(),
-             omit_zeroing_entries);
-      }
+        }
+      else
+        {
+          reinit(V.locally_owned_elements(),
+                 V.get_mpi_communicator(),
+                 omit_zeroing_entries);
+        }
     }
 
 
@@ -470,9 +474,9 @@ namespace LinearAlgebra
       AssertIsFinite(s);
       vector->putScalar(s);
       if (nonlocal_vector.get() != nullptr)
-           nonlocal_vector->putScalar(0.);
+        nonlocal_vector->putScalar(0.);
 
-       return *this;
+      return *this;
     }
 
 

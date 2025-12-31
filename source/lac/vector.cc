@@ -109,8 +109,11 @@ Vector<double>::operator=<double>(
 template Vector<double> &
 Vector<double>::operator=<double>(
   const LinearAlgebra::TpetraWrappers::Vector<double, MemorySpace::Default> &);
-template
-dealii::Vector<float>& dealii::Vector<float>::operator=<double, dealii::MemorySpace::Host>(dealii::LinearAlgebra::TpetraWrappers::Vector<double, dealii::MemorySpace::Host> const&);
+template dealii::Vector<float> &
+dealii::Vector<float>::operator=<double, dealii::MemorySpace::Host>(
+  const dealii::LinearAlgebra::TpetraWrappers::Vector<double,
+                                                      dealii::MemorySpace::Host>
+    &);
 #  endif
 
 #  ifdef DEAL_II_WITH_COMPLEX_VALUES

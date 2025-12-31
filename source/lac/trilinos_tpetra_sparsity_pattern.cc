@@ -24,8 +24,8 @@
 #  include <deal.II/lac/trilinos_index_access.h>
 #  include <deal.II/lac/trilinos_tpetra_sparsity_pattern.h>
 
-#include <Tpetra_CrsGraph_def.hpp>
 #  include <Teuchos_FancyOStream.hpp>
+#  include <Tpetra_CrsGraph_def.hpp>
 
 #  include <limits>
 
