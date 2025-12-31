@@ -445,14 +445,10 @@ namespace LinearAlgebra
     Vector<Number, MemorySpace> &
     Vector<Number, MemorySpace>::operator=(const dealii::Vector<OtherNumber> &V)
     {
-      static_assert(
-        std::is_same<Number, OtherNumber>::value,
-        "TpetraWrappers::Vector and dealii::Vector must use the same number type here.");
-
       vector.reset();
       nonlocal_vector.reset();
 
-      Teuchos::Array<OtherNumber> vector_data(V.begin(), V.end());
+      Teuchos::Array<Number> vector_data(V.begin(), V.end());
       vector = Utilities::Trilinos::internal::make_rcp<
         TpetraTypes::VectorType<Number, MemorySpace>>(
         V.locally_owned_elements()

@@ -464,22 +464,7 @@ namespace LinearAlgebra
     SparseMatrix<Number, MemorySpace>::SparseMatrix(
       const size_type    m,
       const size_type    n,
-      const unsigned int n_max_entries_per_row)
-      : column_space_map(Utilities::Trilinos::internal::make_rcp<
-                         TpetraTypes::MapType<MemorySpace>>(
-          static_cast<dealii::types::signed_global_dof_index>(n),
-          0,
-          Utilities::Trilinos::tpetra_comm_self()))
-      , matrix(Utilities::Trilinos::internal::make_rcp<
-               TpetraTypes::MatrixType<Number, MemorySpace>>(
-          Utilities::Trilinos::internal::make_rcp<
-            TpetraTypes::MapType<MemorySpace>>(
-            static_cast<dealii::types::signed_global_dof_index>(m),
-            0,
-            Utilities::Trilinos::tpetra_comm_self()),
-          column_space_map,
-          n_max_entries_per_row))
-      , compressed(false)
+      const unsigned int n_max_entries_per_row) : SparseMatrix(SparsityPattern<MemorySpace>{m,n, n_max_entries_per_row})
     {}
 
 
