@@ -222,9 +222,9 @@ namespace LinearAlgebra
           // Build the subset of dst's stored indices that lie in this block,
           // block-local numbering.
           IndexSet block_local(bi.block_size(b));
-          for (auto it = stored.begin(); it != stored.end(); ++it)
-            if (*it >= b0 && *it < b1)
-              block_local.add_index(*it - b0);
+          for (const auto gi : stored)
+            if (gi >= b0 && gi < b1)
+              block_local.add_index(gi - b0);
 
           if (block_local.n_elements() == 0)
             continue;
@@ -236,18 +236,18 @@ namespace LinearAlgebra
           tmp.import_elements(src.block(b), operation);
 
           // Scatter back into global indexing
-          for (auto it = block_local.begin(); it != block_local.end(); ++it)
+          for (const auto li : block_local)
             {
-              const auto gi = b0 + *it;
+              const auto gi = b0 + li;
 
               if (operation == VectorOperation::add)
-                dst[gi] += tmp[*it];
+                dst[gi] += tmp[li];
               else if (operation == VectorOperation::min)
-                dst[gi] = get_min(dst[gi], tmp[*it]);
+                dst[gi] = get_min(dst[gi], tmp[li]);
               else if (operation == VectorOperation::max)
-                dst[gi] = get_max(dst[gi], tmp[*it]);
+                dst[gi] = get_max(dst[gi], tmp[li]);
               else // insert
-                dst[gi] = tmp[*it];
+                dst[gi] = tmp[li];
             }
         }
     };
