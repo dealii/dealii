@@ -67,6 +67,8 @@ namespace LinearAlgebra
     template Vector<double, MemorySpace::Default> &
     Vector<double, MemorySpace::Default>::operator=
       <double>(const dealii::Vector<double> &);
+
+    template Vector<double, MemorySpace::Host>& Vector<double, MemorySpace::Host>::operator=<float>(const dealii::Vector<float>&);
     namespace internal
     {
       template class VectorReference<double, MemorySpace::Host>;

@@ -215,6 +215,7 @@ namespace LinearAlgebra
                                      sparsity_pattern,
                                      communicator,
                                      exchange_data);
+            trilinos_sparsity.compress();
             matrix = Utilities::Trilinos::internal::make_rcp<
               TpetraTypes::MatrixType<Number, MemorySpace>>(
               trilinos_sparsity.trilinos_sparsity_pattern());

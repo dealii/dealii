@@ -37,6 +37,8 @@ test(TrilinosWrappers::SparseMatrix &m)
 
   m.compress(VectorOperation::insert);
 
+  m.print(std::cout);
+
   // compare against the exact value of the
   // linfty-norm (max row-sum)
   deallog << m.linfty_norm() << std::endl;

@@ -933,45 +933,41 @@ namespace LinearAlgebra
       Number
       l1_norm() const
       {
-        #  if DEAL_II_TRILINOS_VERSION_GTE(16, 2, 0)
-return matrix->getNorm1();
-#else
+        // Trilinos 16.2.0 implements getNorm1() but is buggy. The implementation
+// below is copied from there after fixing the bug.
   auto equilInfo = Tpetra::computeRowAndColumnOneNorms(*matrix, false);
   Number myMax;
   using range_type = Kokkos::RangePolicy<typename MemorySpace::kokkos_space::execution_space, int>;
   Kokkos::parallel_reduce(
       "getNorm1", range_type(0, equilInfo.colNorms.extent(0)),
       KOKKOS_LAMBDA(int i, Number & max) {
-        max = equilInfo.colNorms(i);
+      max = Kokkos::max(max, equilInfo.colNorms(i));
       },
       Kokkos::Max<Number>(myMax));
   Number totalMax = 0;
   Teuchos::reduceAll<int, Number>(*(matrix->getComm()), Teuchos::REDUCE_MAX, myMax,
                                     Teuchos::outArg(totalMax));
   return totalMax;
-#endif
       }
 
      Number
       linfty_norm() const
       {
-        #  if DEAL_II_TRILINOS_VERSION_GTE(16, 2, 0)
-return matrix->getNormInf();
-#else
+// Trilinos 16.2.0 implements getNormInf() but is buggy. The implementation
+// below is copied from there after fixing the bug.
           auto equilInfo = Tpetra::computeRowOneNorms(*matrix);
   Number myMax;
   using range_type = Kokkos::RangePolicy<typename MemorySpace::kokkos_space::execution_space, int>;
   Kokkos::parallel_reduce(
       "getNormInf", range_type(0, equilInfo.rowNorms.extent(0)),
       KOKKOS_LAMBDA(int i, Number & max) {
-        max = equilInfo.rowNorms(i);
+        max = Kokkos::max(max, equilInfo.rowNorms(i));
       },
       Kokkos::Max<Number>(myMax));
   Number totalMax = 0;
   Teuchos::reduceAll<int, Number>(*(matrix->getComm()), Teuchos::REDUCE_MAX, myMax,
                                     Teuchos::outArg(totalMax));
   return totalMax;
-#endif
       }
 
       /** @} */
