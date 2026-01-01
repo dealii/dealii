@@ -68,8 +68,8 @@ private:
 
   LinearAlgebra::TpetraWrappers::SparseMatrix<double> system_matrix;
 
-  Vector<double> solution;
-  Vector<double> system_rhs;
+  LinearAlgebra::TpetraWrappers::Vector<double> solution;
+  LinearAlgebra::TpetraWrappers::Vector<double> system_rhs;
 };
 
 
@@ -160,8 +160,8 @@ Step4<dim>::setup_system()
   DoFTools::make_sparsity_pattern(dof_handler, c_sparsity, constraints, false);
   system_matrix.reinit(c_sparsity);
 
-  solution.reinit(dof_handler.n_dofs());
-  system_rhs.reinit(dof_handler.n_dofs());
+  solution.reinit(dof_handler.locally_owned_dofs());
+  system_rhs.reinit(dof_handler.locally_owned_dofs());
 }
 
 
@@ -235,9 +235,15 @@ Step4<dim>::solve()
   {
     solution = 0;
     SolverControl solver_control(1000, 1e-10);
-    SolverCG<>    solver(solver_control);
+    SolverCG<LinearAlgebra::TpetraWrappers::Vector<double>> solver(
+      solver_control);
     preconditioner.initialize(system_matrix, data);
     solver.solve(system_matrix, solution, system_rhs, preconditioner);
+    check_solver_within_range(
+      solver.solve(system_matrix, solution, system_rhs, preconditioner),
+      solver_control.last_step(),
+      20,
+      50);
   }
   deallog.pop();
 
@@ -248,9 +254,14 @@ Step4<dim>::solve()
   {
     solution = 0;
     SolverControl solver_control(1000, 1e-12);
-    SolverCG<>    solver(solver_control);
+    SolverCG<LinearAlgebra::TpetraWrappers::Vector<double>> solver(
+      solver_control);
     preconditioner.initialize(system_matrix, data);
-    solver.solve(system_matrix, solution, system_rhs, preconditioner);
+    check_solver_within_range(
+      solver.solve(system_matrix, solution, system_rhs, preconditioner),
+      solver_control.last_step(),
+      50,
+      80);
   }
   deallog.pop();
 

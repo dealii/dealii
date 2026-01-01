@@ -74,8 +74,8 @@ private:
   LinearAlgebra::TpetraWrappers::SparseMatrix<double> system_matrix;
   LinearAlgebra::TpetraWrappers::SparseMatrix<double> preconditioner_matrix;
 
-  Vector<double> solution;
-  Vector<double> system_rhs;
+  LinearAlgebra::TpetraWrappers::Vector<double> solution;
+  LinearAlgebra::TpetraWrappers::Vector<double> system_rhs;
 };
 
 
@@ -170,8 +170,8 @@ Step4<dim>::setup_system()
   system_matrix.reinit(c_sparsity);
   preconditioner_matrix.reinit(c_sparsity);
 
-  solution.reinit(dof_handler.n_dofs());
-  system_rhs.reinit(dof_handler.n_dofs());
+  solution.reinit(dof_handler.locally_owned_dofs());
+  system_rhs.reinit(dof_handler.locally_owned_dofs());
 }
 
 
@@ -288,7 +288,8 @@ Step4<dim>::solve()
   {
     solution = 0;
     SolverControl solver_control(1000, 1e-8);
-    SolverCG<>    solver(solver_control);
+    SolverCG<LinearAlgebra::TpetraWrappers::Vector<double>> solver(
+      solver_control);
     LinearAlgebra::TpetraWrappers::PreconditionAMGMueLu<double> preconditioner;
     preconditioner.initialize(system_matrix);
     check_solver_within_range(
@@ -303,7 +304,8 @@ Step4<dim>::solve()
   {
     solution = 0;
     SolverControl solver_control(1000, 1e-8);
-    SolverCG<>    solver(solver_control);
+    SolverCG<LinearAlgebra::TpetraWrappers::Vector<double>> solver(
+      solver_control);
     LinearAlgebra::TpetraWrappers::PreconditionAMGMueLu<double> preconditioner;
     preconditioner.initialize(preconditioner_matrix);
     check_solver_within_range(
