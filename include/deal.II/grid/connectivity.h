@@ -41,7 +41,6 @@ namespace internal
      * context of setting up the connectivity - and allowing direct simplified
      * access to the entries.
      */
-    template <typename T = unsigned int>
     struct CRS
     {
       /**
@@ -53,8 +52,8 @@ namespace internal
       /**
        * Constructor which allows to set the internal fields directly.
        */
-      CRS(const std::vector<std::size_t> &offsets,
-          const std::vector<T>           &columns)
+      CRS(const std::vector<std::size_t>  &offsets,
+          const std::vector<unsigned int> &columns)
         : offsets(offsets)
         , columns(columns)
       {}
@@ -68,7 +67,7 @@ namespace internal
       /**
        * The elements (typically column indices) stored in the CRS.
        */
-      std::vector<T> columns;
+      std::vector<unsigned int> columns;
     };
 
 
@@ -101,7 +100,6 @@ namespace internal
      * with markers highlighting the reason for the entry x:=bounding entities;
      * n:= neighboring entities; s:=sub-cell data
      */
-    template <typename T = unsigned int>
     struct Connectivity
     {
       Connectivity(const unsigned int                dim,
@@ -158,7 +156,7 @@ namespace internal
         return quad_types;
       }
 
-      inline CRS<T> &
+      inline CRS &
       entity_to_entities(const unsigned int from, const unsigned int to)
       {
         if (from == dim && to == dim)
@@ -177,7 +175,7 @@ namespace internal
         return cell_entities;
       }
 
-      inline const CRS<T> &
+      inline const CRS &
       entity_to_entities(const unsigned int from, const unsigned int to) const
       {
         if (from == dim && to == dim)
@@ -200,17 +198,17 @@ namespace internal
       const unsigned int         dim;
       std::vector<ReferenceCell> cell_types;
 
-      CRS<T> line_vertices;
+      CRS line_vertices;
 
       TriaObjectsOrientations line_orientation;
 
-      CRS<T> quad_vertices;
-      CRS<T> quad_lines;
+      CRS quad_vertices;
+      CRS quad_lines;
 
       TriaObjectsOrientations quad_orientation;
 
-      CRS<T> cell_entities;
-      CRS<T> neighbors;
+      CRS cell_entities;
+      CRS neighbors;
 
       std::vector<ReferenceCell> quad_types;
     };
@@ -224,9 +222,8 @@ namespace internal
      * @p con_cc connectivity cell-cell (for each cell-face it contains the
      *   index of the neighboring cell or -1 for boundary face)
      */
-    template <typename T>
     void
-    determine_neighbors(const CRS<T> &con_cf, CRS<T> &con_cc)
+    determine_neighbors(const CRS &con_cf, CRS &con_cc)
     {
       const auto &columns_cf = con_cf.columns;
       const auto &offsets_cf = con_cf.offsets;
@@ -239,10 +236,11 @@ namespace internal
 
       // clear and initialize with -1 (assume that all faces are at the
       // boundary)
-      columns_cc = std::vector<T>(columns_cf.size(), -1);
+      columns_cc = std::vector<unsigned int>(columns_cf.size(), -1);
       offsets_cc = offsets_cf;
 
-      std::vector<std::pair<T, unsigned int>> neighbors(n_faces, {-1, -1});
+      std::vector<std::pair<unsigned int, unsigned int>> neighbors(n_faces,
+                                                                   {-1, -1});
 
       // loop over all cells
       for (unsigned int i_0 = 0; i_0 < offsets_cf.size() - 1; ++i_0)
@@ -257,7 +255,7 @@ namespace internal
                   // face is visited the first time -> save the visiting cell
                   // and the face pointer
                   neighbors[columns_cf[j_0]] =
-                    std::pair<T, unsigned int>(i_0, j_0);
+                    std::pair<unsigned int, unsigned int>(i_0, j_0);
                 }
               else
                 {
@@ -285,9 +283,9 @@ namespace internal
     build_face_entities_templated(
       const unsigned int                face_dimensionality,
       const std::vector<ReferenceCell> &cell_types,
-      const CRS<unsigned int>          &crs,
-      CRS<unsigned int>                &crs_d,        // result
-      CRS<unsigned int>                &crs_0,        // result
+      const CRS                        &crs,
+      CRS                              &crs_d,        // result
+      CRS                              &crs_0,        // result
       TriaObjectsOrientations          &orientations, // result
       const FU                         &second_key_function)
     {
@@ -517,9 +515,9 @@ namespace internal
     void
     build_face_entities(const unsigned int                face_dimensionality,
                         const std::vector<ReferenceCell> &cell_types,
-                        const CRS<unsigned int>          &crs,
-                        CRS<unsigned int>                &crs_d,
-                        CRS<unsigned int>                &crs_0,
+                        const CRS                        &crs,
+                        CRS                              &crs_d,
+                        CRS                              &crs_0,
                         TriaObjectsOrientations          &orientations,
                         const FU                         &second_key_function)
     {
@@ -579,13 +577,13 @@ namespace internal
      */
     inline void
     build_intersection(const std::vector<ReferenceCell> &cell_types,
-                       const CRS<unsigned int>          &con_cv,
-                       const CRS<unsigned int>          &con_cl,
-                       const CRS<unsigned int>          &con_lv,
-                       const CRS<unsigned int>          &con_cq,
-                       const CRS<unsigned int>          &con_qv,
+                       const CRS                        &con_cv,
+                       const CRS                        &con_cl,
+                       const CRS                        &con_lv,
+                       const CRS                        &con_cq,
+                       const CRS                        &con_qv,
                        const TriaObjectsOrientations    &ori_cq,
-                       CRS<unsigned int>                &con_ql,   // result
+                       CRS                              &con_ql,   // result
                        TriaObjectsOrientations          &ori_ql,   // result
                        std::vector<ReferenceCell>       &quad_t_id // result
     )
@@ -687,15 +685,14 @@ namespace internal
      * implementation. It has been strongly adjusted to efficiently solely meet
      * our connectivity needs while sacrificing some of the flexibility there.
      */
-    template <typename T>
-    Connectivity<T>
+    Connectivity
     build_connectivity(const unsigned int                dim,
                        const std::vector<ReferenceCell> &cell_types,
-                       const CRS<T>                     &con_cv)
+                       const CRS                        &con_cv)
     {
-      Connectivity<T> connectivity(dim, cell_types);
+      Connectivity connectivity(dim, cell_types);
 
-      CRS<T> temp1; // needed for 3d
+      CRS temp1; // needed for 3d
 
       if (dim == 1)
         connectivity.entity_to_entities(1, 0) = con_cv;
@@ -787,14 +784,14 @@ namespace internal
     /**
      * Preprocessing step to remove the template argument dim.
      */
-    template <typename T, int dim>
-    Connectivity<T>
+    template <int dim>
+    Connectivity
     build_connectivity(const std::vector<CellData<dim>> &cells)
     {
       AssertThrow(cells.size() > 0, ExcMessage("No cells have been provided!"));
 
       // determine cell types and process vertices
-      std::vector<T> cell_vertices;
+      std::vector<unsigned int> cell_vertices;
       cell_vertices.reserve(std::accumulate(cells.begin(),
                                             cells.end(),
                                             0u,
@@ -844,9 +841,9 @@ namespace internal
         }
 
       // do the actual work
-      return build_connectivity<T>(dim,
-                                   cell_types,
-                                   {cell_vertices_offsets, cell_vertices});
+      return build_connectivity(dim,
+                                cell_types,
+                                {cell_vertices_offsets, cell_vertices});
     }
   } // namespace TriangulationImplementation
 } // namespace internal

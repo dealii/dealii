@@ -3269,8 +3269,8 @@ namespace internal
         tria.vertices_used.assign(vertices.size(), true);
 
         // compute connectivity
-        const auto connectivity   = build_connectivity<unsigned int>(cells);
-        const unsigned int n_cell = cells.size();
+        const auto         connectivity = build_connectivity(cells);
+        const unsigned int n_cell       = cells.size();
 
         // TriaObjects: lines
         if (dim >= 2)
@@ -3499,10 +3499,10 @@ namespace internal
       }
 
 
-      template <int structdim, int spacedim, typename T>
+      template <int structdim, int spacedim>
       static void
       process_subcelldata(
-        const CRS<T>                           &crs,
+        const CRS                              &crs,
         TriaObjects                            &obj,
         const std::vector<CellData<structdim>> &boundary_objects_in,
         const std::vector<Point<spacedim>>     &vertex_locations)
