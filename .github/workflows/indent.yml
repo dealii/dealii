@@ -85,5 +85,7 @@ jobs:
 
     steps:
     - uses: actions/checkout@v6
+      with:
+        fetch-depth: 0
     - run:  python -m pip install networkx
     - uses: pre-commit/action@v3.0.1
