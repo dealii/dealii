@@ -1105,7 +1105,7 @@ public:
    * Return a vector of vertex indices for all new cells required for isotropic
    * refinement.
    */
-  constexpr dealii::ndarray<unsigned int, 8, 4>
+  constexpr dealii::ndarray<unsigned int, 8, 8>
   new_isotropic_child_cell_vertices(const unsigned int refinement_choice) const;
 
   /**
@@ -1776,45 +1776,61 @@ ReferenceCell::new_isotropic_child_cell_faces(
 
 
 
-constexpr dealii::ndarray<unsigned int, 8, 4>
+constexpr dealii::ndarray<unsigned int, 8, 8>
 ReferenceCell::new_isotropic_child_cell_vertices(
   const unsigned int refinement_choice) const
 {
   // AssertIndexRange(refinement_choice, n_isotropic_refinement_choices());
 
+  constexpr unsigned int X = numbers::invalid_unsigned_int;
+
   switch (this->kind)
     {
       case ReferenceCells::Tetrahedron:
         {
-          constexpr dealii::ndarray<unsigned int, 3, 8, 4> cell_vertices_tet = {
+          constexpr dealii::ndarray<unsigned int, 3, 8, 8> cell_vertices_tet = {
             {// new line is (6,8)
-             {{{{0, 4, 6, 7}},
-               {{4, 1, 5, 8}},
-               {{6, 5, 2, 9}},
-               {{7, 8, 9, 3}},
-               {{4, 5, 6, 8}},
-               {{4, 7, 8, 6}},
-               {{6, 9, 7, 8}},
-               {{5, 8, 9, 6}}}},
+             {{{{0, 4, 6, 7, X, X, X, X}},
+               {{4, 1, 5, 8, X, X, X, X}},
+               {{6, 5, 2, 9, X, X, X, X}},
+               {{7, 8, 9, 3, X, X, X, X}},
+               {{4, 5, 6, 8, X, X, X, X}},
+               {{4, 7, 8, 6, X, X, X, X}},
+               {{6, 9, 7, 8, X, X, X, X}},
+               {{5, 8, 9, 6, X, X, X, X}}}},
              // new line is (5,7)
-             {{{{0, 4, 6, 7}},
-               {{4, 1, 5, 8}},
-               {{6, 5, 2, 9}},
-               {{7, 8, 9, 3}},
-               {{4, 5, 6, 7}},
-               {{4, 7, 8, 5}},
-               {{6, 9, 7, 5}},
-               {{5, 8, 9, 7}}}},
+             {{{{0, 4, 6, 7, X, X, X, X}},
+               {{4, 1, 5, 8, X, X, X, X}},
+               {{6, 5, 2, 9, X, X, X, X}},
+               {{7, 8, 9, 3, X, X, X, X}},
+               {{4, 5, 6, 7, X, X, X, X}},
+               {{4, 7, 8, 5, X, X, X, X}},
+               {{6, 9, 7, 5, X, X, X, X}},
+               {{5, 8, 9, 7, X, X, X, X}}}},
              // new line is (4,9)
-             {{{{0, 4, 6, 7}},
-               {{4, 1, 5, 8}},
-               {{6, 5, 2, 9}},
-               {{7, 8, 9, 3}},
-               {{4, 5, 6, 9}},
-               {{4, 7, 8, 9}},
-               {{6, 9, 7, 4}},
-               {{5, 8, 9, 4}}}}}};
+             {{{{0, 4, 6, 7, X, X, X, X}},
+               {{4, 1, 5, 8, X, X, X, X}},
+               {{6, 5, 2, 9, X, X, X, X}},
+               {{7, 8, 9, 3, X, X, X, X}},
+               {{4, 5, 6, 9, X, X, X, X}},
+               {{4, 7, 8, 9, X, X, X, X}},
+               {{6, 9, 7, 4, X, X, X, X}},
+               {{5, 8, 9, 4, X, X, X, X}}}}}};
           return cell_vertices_tet[refinement_choice];
+        }
+      case ReferenceCells::Hexahedron:
+        {
+          constexpr dealii::ndarray<unsigned int, 8, 8> cell_vertices_hex = {{
+            {{0, 10, 8, 24, 16, 22, 20, 26}},  // bottom children
+            {{10, 1, 24, 9, 22, 17, 26, 21}},  //
+            {{8, 24, 2, 11, 20, 26, 18, 23}},  //
+            {{24, 9, 11, 3, 26, 21, 23, 19}},  //
+            {{16, 22, 20, 26, 4, 14, 12, 25}}, // top children
+            {{22, 17, 26, 21, 14, 5, 25, 13}}, //
+            {{20, 26, 18, 23, 12, 25, 6, 15}}, //
+            {{26, 21, 23, 19, 25, 13, 15, 7}}  //
+          }};
+          return cell_vertices_hex;
         }
       default:
         DEAL_II_NOT_IMPLEMENTED();
