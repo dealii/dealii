@@ -24,6 +24,7 @@
 #include <deal.II/lac/exceptions.h>
 #include <deal.II/lac/identity_matrix.h>
 #include <deal.II/lac/sparsity_pattern.h>
+#include <deal.II/lac/trilinos_tpetra_to_trilinos_wrappers.h>
 #include <deal.II/lac/vector_operation.h>
 
 #include <iterator>
@@ -52,13 +53,6 @@ namespace Utilities
     sum(const SparseMatrix<Number> &, const MPI_Comm, SparseMatrix<Number> &);
   }
 } // namespace Utilities
-#  endif
-
-#  ifdef DEAL_II_WITH_TRILINOS
-namespace TrilinosWrappers
-{
-  class SparseMatrix;
-}
 #  endif
 #endif
 

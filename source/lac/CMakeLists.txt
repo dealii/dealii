@@ -127,16 +127,16 @@ endif()
 if(DEAL_II_WITH_TRILINOS)
   set(_unity_include_src
     ${_unity_include_src}
-    trilinos_block_sparse_matrix.cc
-    trilinos_block_vector.cc
+    #trilinos_block_sparse_matrix.cc
+    #trilinos_block_vector.cc
     trilinos_epetra_communication_pattern.cc
     trilinos_epetra_vector.cc
-    trilinos_precondition.cc
-    trilinos_precondition_ml.cc
-    trilinos_solver.cc
-    trilinos_sparse_matrix.cc
-    trilinos_sparsity_pattern.cc
-    trilinos_vector.cc
+    #trilinos_precondition.cc
+    #trilinos_precondition_ml.cc
+    #trilinos_solver.cc
+    #trilinos_sparse_matrix.cc
+    #trilinos_sparsity_pattern.cc
+    #trilinos_vector.cc
   )
 
   if(DEAL_II_TRILINOS_WITH_MUELU)

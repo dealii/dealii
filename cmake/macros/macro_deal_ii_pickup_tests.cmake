@@ -236,7 +236,7 @@ macro(deal_ii_pickup_tests)
   #
 
   set_if_empty(TEST_TIME_LIMIT "$ENV{TEST_TIME_LIMIT}")
-  set_if_empty(TEST_TIME_LIMIT 600)
+  set_if_empty(TEST_TIME_LIMIT 60)
 
   set_if_empty(TEST_MPI_RANK_LIMIT "$ENV{TEST_MPI_RANK_LIMIT}")
   set_if_empty(TEST_MPI_RANK_LIMIT 0)
