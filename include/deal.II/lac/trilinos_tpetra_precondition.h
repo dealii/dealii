@@ -1314,9 +1314,190 @@ namespace LinearAlgebra
       initialize(const SparseMatrix<Number, MemorySpace> &A,
                  const AdditionalData &additional_data = AdditionalData());
     };
-#  endif // DEAL_II_TRILINOS_WITH_IFPACK2
+#    ifdef DEAL_II_TRILINOS_WITH_TPETRA_MUELU
 
-  } // namespace TpetraWrappers
+    /**
+     * @brief The class for the algebraic multigrid preconditioner MueLu.
+     *
+     * @ingroup TpetraWrappers
+     * @ingroup Preconditioners
+     */
+    template <typename Number, typename MemorySpace = dealii::MemorySpace::Host>
+    class PreconditionAMGMueLu : public PreconditionBase<Number, MemorySpace>
+    {
+    public:
+      /**
+       * The chosen smoother is not supported or configured with Ifpack2.
+       */
+      DeclException1(
+        ExcTrilinosMueLuSmootherUnsupported,
+        std::string,
+        << "You tried to select the smoother type <" << arg1 << ">\n"
+        << "but this is not supported by our interface\n"
+        << "due to one of the following reasons:\n"
+        << "* This smoother does not exist\n"
+        << "* This smoother is not (yet) supported by our interface\n"
+        << "* This smoother is not (yet) supported by MueLu.\n");
+      DeclException1(
+        ExcTrilinosMueLuCoarseSolverUnsupported,
+        std::string,
+        << "You tried to select the coarse solver type <" << arg1 << ">\n"
+        << "but this is not supported by our interface\n"
+        << "due to one of the following reasons:\n"
+        << "* This coarse solver does not exist\n"
+        << "* This coarse solver is not (yet) supported by our interface\n"
+        << "* This coarse solver is not (yet) supported by MueLu.\n");
+
+      /**
+       * @brief The set of additional parameters to tune the preconditioner.
+       *
+       */
+      struct AdditionalData
+      {
+        /**
+         * @brief Constructor.
+         *
+         * By default, we pretend to work on elliptic problems with linear
+         * finite elements on a scalar equation.
+         *
+         * @param elliptic Optimize MueLu for elliptic problems?
+         * @param symmetric Assume for A to be symmetric?
+         * @param w_cycle Use W-cycle instead of V-cycle?
+         * @param aggregation_threshold Threshold for coarsening.
+         * @param smoother_sweeps Number of times to apply the smoother.
+         * @param smoother_overlap Overlap of smoother if run in parallel.
+         * @param output_details Print additional info to screen?
+         * @param smoother_type Determine the smoother to use.
+         * @param coarse_type Determine the coarse solver.
+         */
+        AdditionalData(const bool         elliptic              = true,
+                       const bool         symmetric             = true,
+                       const bool         w_cycle               = false,
+                       const double       aggregation_threshold = 1e-4,
+                       const int          smoother_sweeps       = 2,
+                       const int          smoother_overlap      = 0,
+                       const bool         output_details        = false,
+                       const std::string &smoother_type         = "Chebyshev",
+                       const std::string &coarse_type           = "KLU2");
+        /**
+         * @brief Optimize for elliptic problems?
+         *
+         * Determines what underlying multigrid algorithm should be used.
+         * For elliptic problems this would be smoothed aggregation
+         * and unsmoothed for non-elliptic problems.
+         *
+         */
+        bool elliptic;
+        /**
+         * @brief Assume A is symmetric?
+         *
+         * If A is symmetric the prolongation and restriction operators are
+         * transposes of each other.
+         */
+        bool symmetric;
+        /**
+         * @brief Use W cycle instead of V cycle.
+         *
+         * Use W-cycle instead of the default V-cycle.
+         */
+        bool w_cycle;
+        /**
+         * @brief Threshold for coarsening.
+         *
+         * This threshold tells the AMG setup how the coarsening should be
+         * performed. In MueLu all points that strongly couple with the
+         * tentative coarse-level point form one aggregate.
+         * The strong coupling is controlled by aggregation_threshold,
+         * meaning that all elements that are larger than aggregation_threshold
+         * times the diagonal element couple strongly.
+         */
+        double aggregation_threshold;
+        /**
+         * @brief Number of times pre- and post-smoothing is applied.
+         *
+         * For a Chebyshev smoother this determines the polynomial degree.
+         * Otherwise it determines how often the matrix-vector product of the
+         * smoother is applied.
+         */
+        int smoother_sweeps;
+        /**
+         * @brief Determine the overlap in the smoother when run in parallel.
+         *
+         */
+        int smoother_overlap;
+        /**
+         * @brief Print internal information details of MueLu to screen.
+         *
+         * This can be useful for debugging.
+         *
+         */
+        bool output_details;
+        /**
+         * @brief Determines which smoother to use for the AMG cycle
+         * The following possibilities are implemented in this interface.
+         * From Ifpack2:
+         * <ul>
+         * <li> "Jacobi" </li>
+         * <li> "l1 Jacobi" </li>
+         * <li> "Gauss Seidel" </li>
+         * <li> "l1 Gauss Seidel" </li>
+         * <li> "Symmetric Gauss Seidel" </li>
+         * <li> "Chebyshev" </li>
+         * <li> "ILU" </li>
+         * <li> "ILUT" </li>
+         * </ul>
+         * From Amesos2:
+         * <ul>
+         * <li> "KLU2" </li>
+         * <li> "SuperLU" </li>
+         * <li> "SuperLU_dist" </li>
+         * </ul>
+         *
+         */
+        std::string smoother_type;
+        /**
+         * @brief Type of smoother to use on the finer levels.
+         *
+         * The same settings as for the smoother type are possible.
+         */
+        std::string coarse_type;
+      };
+
+      PreconditionAMGMueLu() = default;
+
+      /**
+       * @brief Full control interface for constructing a MueLu preconditioner.
+       *
+       * MueLu allows the construction of very complex Multigrid hierarchies,
+       * through a complex Teuchos::ParameterList.
+       * This function allows anyone familiar with MueLu to directly pass such a
+       * list to MueLu.
+       *
+       * If you want to learn more about constructing such hierarchies both
+       * the MueLu User Guide and Tutorial are highly recommended.
+       *
+       */
+      void
+      initialize(SparseMatrix<Number, MemorySpace> &A,
+                 Teuchos::ParameterList            &parameters);
+
+      /**
+       * @brief Simplified interface for constructing a MueLu preconditioner
+       *
+       * MueLu allows the construction of very complex Multigrid hierarchies,
+       * through a complex Teuchos::ParameterList.
+       *
+       * This function constructs such a list internally based on the given
+       * additional_data. However, if you want full control over the hierarchy,
+       * you should use the other initialize function.
+       */
+      void
+      initialize(SparseMatrix<Number, MemorySpace> &A,
+                 const AdditionalData &additional_data = AdditionalData());
+    };
+#    endif
+#  endif // DEAL_II_TRILINOS_WITH_IFPACK2
+  }      // namespace TpetraWrappers
 } // namespace LinearAlgebra
 
 
