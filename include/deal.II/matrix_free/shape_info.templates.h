@@ -21,6 +21,7 @@
 #include <deal.II/base/memory_consumption.h>
 #include <deal.II/base/polynomial.h>
 #include <deal.II/base/polynomials_piecewise.h>
+#include <deal.II/base/polynomials_vector_anisotropic.h>
 #include <deal.II/base/qprojector.h>
 #include <deal.II/base/tensor_product_polynomials.h>
 #include <deal.II/base/utilities.h>
@@ -28,6 +29,7 @@
 #include <deal.II/fe/fe.h>
 #include <deal.II/fe/fe_dgp.h>
 #include <deal.II/fe/fe_dgq.h>
+#include <deal.II/fe/fe_nedelec.h>
 #include <deal.II/fe/fe_nothing.h>
 #include <deal.II/fe/fe_poly.h>
 #include <deal.II/fe/fe_pyramid_p.h>
@@ -307,6 +309,18 @@ namespace internal
           if (dim == 3)
             face_orientations_quad = compute_orientation_table(n_q_points_1d);
 
+          return;
+        }
+      else if (const FE_NedelecNodal<dim> *fe_nedelec =
+                 dynamic_cast<const FE_NedelecNodal<dim> *>(
+                   &fe_in.base_element(base_element_number)))
+        {
+          const auto quad = quad_in.get_tensor_basis()[0];
+          fe_nedelec->fill_shape_info(this, quad_in);
+
+          const unsigned int n_q_points_1d = quad.size();
+          if (dim == 3)
+            face_orientations_quad = compute_orientation_table(n_q_points_1d);
           return;
         }
       else if (quad_in.is_tensor_product() == false ||
