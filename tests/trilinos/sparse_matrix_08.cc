@@ -38,7 +38,7 @@ main(int argc, char **argv)
   partitioning.add_range(0, 3);
 
   // Add element (2,1) to the matrix
-  TrilinosWrappers::SparsityPattern sp(partitioning);
+  TrilinosWrappers::SparsityPattern sp(partitioning, MPI_COMM_WORLD, 1);
   sp.add(2, 1);
   sp.compress();
 
@@ -62,7 +62,7 @@ main(int argc, char **argv)
       }
 
   // Check that A can be reinitialized
-  TrilinosWrappers::SparsityPattern sp_2(partitioning);
+  TrilinosWrappers::SparsityPattern sp_2(partitioning, MPI_COMM_WORLD, 1);
   sp_2.add(1, 2);
   sp_2.compress();
   A.reinit(sp_2);

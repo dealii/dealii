@@ -66,7 +66,8 @@ test()
 
   TrilinosWrappers::SparsityPattern sp(row_partitioning,
                                        col_partitioning,
-                                       MPI_COMM_WORLD);
+                                       MPI_COMM_WORLD,
+                                       1);
   if ((n_procs == 1) || (my_id == 1))
     sp.add(2, 3);
   sp.compress();

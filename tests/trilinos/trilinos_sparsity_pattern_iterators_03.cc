@@ -68,7 +68,7 @@ main(int argc, char *argv[])
   dealii::IndexSet locallyOwnedDofs = dofHandler.locally_owned_dofs();
 
   dealiiLA::SparsityPattern sparsityPattern;
-  sparsityPattern.reinit(locallyOwnedDofs, mpiCommunicator);
+  sparsityPattern.reinit(locallyOwnedDofs, mpiCommunicator, 27);
   dealii::DoFTools::make_sparsity_pattern(
     dofHandler,
     sparsityPattern,
