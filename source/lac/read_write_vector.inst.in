@@ -31,6 +31,17 @@ for (S1, S2 : REAL_SCALARS)
     \}
   }
 
+for (SCALAR : REAL_SCALARS)
+  {
+    namespace LinearAlgebra
+    \{
+      template void
+      ReadWriteVector<SCALAR>::import_elements<dealii::MemorySpace::Host>(
+        const dealii::LinearAlgebra::distributed::
+          BlockVector<SCALAR, dealii::MemorySpace::Host> &,
+        VectorOperation::values);
+    \}
+  }
 
 for (SCALAR : COMPLEX_SCALARS)
   {
@@ -46,5 +57,17 @@ for (S1, S2 : COMPLEX_SCALARS)
     \{
       template void
       ReadWriteVector<S1>::reinit<S2>(const ReadWriteVector<S2> &, const bool);
+    \}
+  }
+
+for (SCALAR : COMPLEX_SCALARS)
+  {
+    namespace LinearAlgebra
+    \{
+      template void
+      ReadWriteVector<SCALAR>::import_elements<dealii::MemorySpace::Host>(
+        const dealii::LinearAlgebra::distributed::
+          BlockVector<SCALAR, dealii::MemorySpace::Host> &,
+        VectorOperation::values);
     \}
   }
