@@ -408,6 +408,9 @@ namespace TrilinosWrappers
     const ROLVector &other = dynamic_cast<const ROLVector &>(other_);
 
     Assert(vector_ptr->has_ghost_elements() == false, ExcGhostsPresent());
+    Assert(optimization_space.size() == vector_ptr->size(),
+           ExcMessage("Optimization space is out-of-sync. "
+                      "Please create a new wrapper."));
     Assert(optimization_space == other.optimization_space,
            ExcMessage("Optimization spaces of vectors do not match."));
 
@@ -427,6 +430,9 @@ namespace TrilinosWrappers
     const ROLVector &other = dynamic_cast<const ROLVector &>(other_);
 
     Assert(vector_ptr->has_ghost_elements() == false, ExcGhostsPresent());
+    Assert(optimization_space.size() == vector_ptr->size(),
+           ExcMessage("Optimization space is out-of-sync. "
+                      "Please create a new wrapper."));
     Assert(optimization_space == other.optimization_space,
            ExcMessage("Optimization spaces of vectors do not match."));
 
@@ -442,6 +448,10 @@ namespace TrilinosWrappers
   int
   ROLVector<VectorType>::dimension() const
   {
+    Assert(optimization_space.size() == vector_ptr->size(),
+           ExcMessage("Optimization space is out-of-sync. "
+                      "Please create a new wrapper."));
+
     return static_cast<int>(global_dimension);
   }
 
@@ -452,6 +462,9 @@ namespace TrilinosWrappers
   ROLVector<VectorType>::scale(const value_type alpha)
   {
     Assert(vector_ptr->has_ghost_elements() == false, ExcGhostsPresent());
+    Assert(optimization_space.size() == vector_ptr->size(),
+           ExcMessage("Optimization space is out-of-sync. "
+                      "Please create a new wrapper."));
 
     for (const auto i : optimization_space)
       (*vector_ptr)[i] *= alpha;
@@ -467,6 +480,9 @@ namespace TrilinosWrappers
   {
     const ROLVector &other = dynamic_cast<const ROLVector &>(other_);
 
+    Assert(optimization_space.size() == vector_ptr->size(),
+           ExcMessage("Optimization space is out-of-sync. "
+                      "Please create a new wrapper."));
     Assert(optimization_space == other.optimization_space,
            ExcMessage("Optimization spaces of vectors do not match."));
 
@@ -505,6 +521,9 @@ namespace TrilinosWrappers
   ROL::Ptr<ROL::Vector<typename VectorType::value_type>>
   ROLVector<VectorType>::basis(const int i) const
   {
+    Assert(optimization_space.size() == vector_ptr->size(),
+           ExcMessage("Optimization space is out-of-sync. "
+                      "Please create a new wrapper."));
     AssertIndexRange(i, global_dimension);
 
     // clone the internal vector as basis
@@ -537,6 +556,9 @@ namespace TrilinosWrappers
     const ROL::Elementwise::UnaryFunction<value_type> &f)
   {
     Assert(vector_ptr->has_ghost_elements() == false, ExcGhostsPresent());
+    Assert(optimization_space.size() == vector_ptr->size(),
+           ExcMessage("Optimization space is out-of-sync. "
+                      "Please create a new wrapper."));
 
     for (const auto i : optimization_space)
       (*vector_ptr)[i] = f.apply((*vector_ptr)[i]);
@@ -555,6 +577,9 @@ namespace TrilinosWrappers
     const ROLVector &other = dynamic_cast<const ROLVector &>(other_);
 
     Assert(vector_ptr->has_ghost_elements() == false, ExcGhostsPresent());
+    Assert(optimization_space.size() == vector_ptr->size(),
+           ExcMessage("Optimization space is out-of-sync. "
+                      "Please create a new wrapper."));
     Assert(optimization_space == other.optimization_space,
            ExcMessage("Optimization spaces of vectors do not match."));
 
@@ -571,6 +596,10 @@ namespace TrilinosWrappers
   ROLVector<VectorType>::reduce(
     const ROL::Elementwise::ReductionOp<value_type> &r) const
   {
+    Assert(optimization_space.size() == vector_ptr->size(),
+           ExcMessage("Optimization space is out-of-sync. "
+                      "Please create a new wrapper."));
+
     value_type result = r.initialValue();
 
     // local reduction
