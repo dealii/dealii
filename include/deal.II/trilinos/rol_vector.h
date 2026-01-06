@@ -207,7 +207,7 @@ namespace TrilinosWrappers
      * Return the global dimension of the optimization space.
      */
     int
-    dimension() const;
+    dimension() const override;
 
     /**
      * Set the wrapped vector to a given @p rol_vector by overwriting its
@@ -220,7 +220,7 @@ namespace TrilinosWrappers
      * @note @p rol_vector has to be of type ROLVector.
      */
     void
-    set(const ROL::Vector<value_type> &rol_vector);
+    set(const ROL::Vector<value_type> &rol_vector) override;
 
     /**
      * Add @p rol_vector to the wrapped vector.
@@ -231,7 +231,7 @@ namespace TrilinosWrappers
      * @note @p rol_vector has to be of type ROLVector.
      */
     void
-    plus(const ROL::Vector<value_type> &rol_vector);
+    plus(const ROL::Vector<value_type> &rol_vector) override;
 
     /**
      * Scale the wrapped vector by @p alpha and add @p rol_vector to it.
@@ -242,7 +242,8 @@ namespace TrilinosWrappers
      * @note @p rol_vector has to be of type ROLVector.
      */
     void
-    axpy(const value_type alpha, const ROL::Vector<value_type> &rol_vector);
+    axpy(const value_type               alpha,
+         const ROL::Vector<value_type> &rol_vector) override;
 
     /**
      * Scale the wrapped vector by @p alpha.
@@ -250,7 +251,7 @@ namespace TrilinosWrappers
      * The operation will only be applied to masked elements.
      */
     void
-    scale(const value_type alpha);
+    scale(const value_type alpha) override;
 
     /**
      * Return the dot product with a given @p rol_vector.
@@ -261,7 +262,7 @@ namespace TrilinosWrappers
      * @note @p rol_vector has to be of type ROLVector.
      */
     value_type
-    dot(const ROL::Vector<value_type> &rol_vector) const;
+    dot(const ROL::Vector<value_type> &rol_vector) const override;
 
     /**
      * Return the $L^{2}$ norm of the wrapped vector.
@@ -275,20 +276,20 @@ namespace TrilinosWrappers
      * if real_type and value_type are not of the same type.
      */
     value_type
-    norm() const;
+    norm() const override;
 
     /**
      * Return a clone of the wrapped vector as a pointer to the parent class.
      */
     ROL::Ptr<ROL::Vector<value_type>>
-    clone() const;
+    clone() const override;
 
     /**
      * Create and return a ROL pointer to the basis vector corresponding to the
      * @p i ${}^{th}$ element of the global optimization space.
      */
     ROL::Ptr<ROL::Vector<value_type>>
-    basis(const int i) const;
+    basis(const int i) const override;
 
     /**
      * Apply unary function @p f to all the elements of the wrapped vector.
@@ -296,7 +297,7 @@ namespace TrilinosWrappers
      * The operation will only be applied to masked elements.
      */
     void
-    applyUnary(const ROL::Elementwise::UnaryFunction<value_type> &f);
+    applyUnary(const ROL::Elementwise::UnaryFunction<value_type> &f) override;
 
     /**
      * Apply binary function @p f along with ROL::Vector @p rol_vector to all
@@ -309,7 +310,7 @@ namespace TrilinosWrappers
      */
     void
     applyBinary(const ROL::Elementwise::BinaryFunction<value_type> &f,
-                const ROL::Vector<value_type>                      &rol_vector);
+                const ROL::Vector<value_type> &rol_vector) override;
 
     /**
      * Return the accumulated value on applying reduction operation @p r on
@@ -318,7 +319,7 @@ namespace TrilinosWrappers
      * The operation will only be applied to masked elements.
      */
     value_type
-    reduce(const ROL::Elementwise::ReductionOp<value_type> &r) const;
+    reduce(const ROL::Elementwise::ReductionOp<value_type> &r) const override;
 
     /**
      * Print the wrapped vector to the output stream @p outStream.
@@ -327,7 +328,7 @@ namespace TrilinosWrappers
      * elements.
      */
     void
-    print(std::ostream &outStream) const;
+    print(std::ostream &outStream) const override;
   };
 
 
