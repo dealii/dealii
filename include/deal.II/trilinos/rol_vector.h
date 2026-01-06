@@ -75,14 +75,6 @@ namespace TrilinosWrappers
    * VectorType::value_type&
    * VectorType::operator[](const VectorType::size_type i);
    *
-   * // Return whether the vector currently is in a state where
-   * // ghost values can be read or not.
-   * bool VectorType::has_ghost_elements();
-   *
-   * // Fills the data field for ghost indices with the values stored
-   * // in the respective positions of the owning processor.
-   * void VectorType::update_ghost_values();
-   *
    * // Compress the vector i.e., flush the buffers of the
    * // vector object if it has any.
    * void VectorType::compress(VectorOperation::insert);
