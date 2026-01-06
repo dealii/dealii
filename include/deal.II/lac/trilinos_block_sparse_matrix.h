@@ -20,27 +20,35 @@
 
 #ifdef DEAL_II_WITH_TRILINOS
 
-#  include <deal.II/base/template_constraints.h>
+#  ifdef DEAL_II_TRILINOS_WITH_TPETRA
 
-#  include <deal.II/lac/block_matrix_base.h>
-#  include <deal.II/lac/exceptions.h>
-#  include <deal.II/lac/full_matrix.h>
-#  include <deal.II/lac/trilinos_parallel_block_vector.h>
-#  include <deal.II/lac/trilinos_sparse_matrix.h>
-#  include <deal.II/lac/trilinos_tpetra_block_sparse_matrix.h>
+#    include <deal.II/lac/trilinos_tpetra_block_sparse_matrix.h>
 
-#  include <cmath>
+DEAL_II_NAMESPACE_OPEN
+DEAL_II_NAMESPACE_CLOSE
+
+#  else
+
+#    include <deal.II/base/template_constraints.h>
+
+#    include <deal.II/lac/block_matrix_base.h>
+#    include <deal.II/lac/exceptions.h>
+#    include <deal.II/lac/full_matrix.h>
+#    include <deal.II/lac/trilinos_parallel_block_vector.h>
+#    include <deal.II/lac/trilinos_sparse_matrix.h>
+#    include <deal.II/lac/trilinos_tpetra_block_sparse_matrix.h>
+
+#    include <cmath>
 
 DEAL_II_NAMESPACE_OPEN
 
 // forward declarations
-#  ifndef DOXYGEN
+#    ifndef DOXYGEN
 class BlockSparsityPattern;
 template <typename number>
 class BlockSparseMatrix;
-#  endif
+#    endif
 
-#  ifndef DEAL_II_TRILINOS_WITH_TPETRA
 namespace TrilinosWrappers
 {
   /**
@@ -616,8 +624,6 @@ namespace TrilinosWrappers
 } /* namespace TrilinosWrappers */
 
 #  endif
-
-DEAL_II_NAMESPACE_CLOSE
 
 #else
 

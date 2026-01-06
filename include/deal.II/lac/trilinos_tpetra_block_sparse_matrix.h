@@ -26,7 +26,6 @@
 #  include <deal.II/lac/block_sparse_matrix.h>
 #  include <deal.II/lac/exceptions.h>
 #  include <deal.II/lac/full_matrix.h>
-#  include <deal.II/lac/trilinos_tpetra_block_sparse_matrix.h>
 #  include <deal.II/lac/trilinos_tpetra_sparse_matrix.h>
 
 #  include <cmath>

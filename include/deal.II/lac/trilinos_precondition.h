@@ -23,6 +23,9 @@
 #  include <deal.II/lac/trilinos_tpetra_precondition.h>
 #  include <deal.II/lac/trilinos_tpetra_to_trilinos_wrappers.h>
 
+DEAL_II_NAMESPACE_OPEN
+DEAL_II_NAMESPACE_CLOSE
+
 #else
 
 #  ifdef DEAL_II_WITH_TRILINOS
