@@ -104,6 +104,23 @@ namespace TrilinosWrappers
    * the largest value of int type. Some of the vectors in deal.II (see
    * @ref Vector)
    * may not satisfy the above requirements.
+   *
+   *
+   * <h3>Ghost elements on distributed vectors</h3>
+   *
+   * This wrapper class also manages all distributed vector classes of deal.II.
+   *
+   * ROL will manipulate the wrapped vector during the optimization progress.
+   * For vector classes of the PETScWrappers and TrilinosWrappers namespaces,
+   * this manipulation is only allowed on vectors \e without ghost elements.
+   * For the LinearAlgebra::distributed::Vector class, manipulation with ghost
+   * elements is permitted, although it requires a potentially slow ghost
+   * exchange. For more information on ghost vectors, see also the corresponding
+   * @ref GlossGhostedVector "glossary entry".
+   *
+   * To enforce the same behavior of this wrapper on all distributed vectors
+   * classes, we only allow manipulating operations for vectors \e without ghost
+   * elements.
    */
   template <typename VectorType>
   class ROLVector : public ROL::Vector<typename VectorType::value_type>
@@ -292,6 +309,7 @@ namespace TrilinosWrappers
   void
   ROLVector<VectorType>::plus(const ROL::Vector<value_type> &rol_vector)
   {
+    Assert(vector_ptr->has_ghost_elements() == false, ExcGhostsPresent());
     Assert(this->dimension() == rol_vector.dimension(),
            ExcDimensionMismatch(this->dimension(), rol_vector.dimension()));
 
@@ -308,6 +326,7 @@ namespace TrilinosWrappers
   ROLVector<VectorType>::axpy(const value_type               alpha,
                               const ROL::Vector<value_type> &rol_vector)
   {
+    Assert(vector_ptr->has_ghost_elements() == false, ExcGhostsPresent());
     Assert(this->dimension() == rol_vector.dimension(),
            ExcDimensionMismatch(this->dimension(), rol_vector.dimension()));
 
@@ -335,6 +354,8 @@ namespace TrilinosWrappers
   void
   ROLVector<VectorType>::scale(const value_type alpha)
   {
+    Assert(vector_ptr->has_ghost_elements() == false, ExcGhostsPresent());
+
     (*vector_ptr) *= alpha;
   }
 
@@ -399,6 +420,8 @@ namespace TrilinosWrappers
   ROLVector<VectorType>::applyUnary(
     const ROL::Elementwise::UnaryFunction<value_type> &f)
   {
+    Assert(vector_ptr->has_ghost_elements() == false, ExcGhostsPresent());
+
     const typename VectorType::iterator vend = vector_ptr->end();
 
     for (typename VectorType::iterator iterator = vector_ptr->begin();
@@ -417,6 +440,7 @@ namespace TrilinosWrappers
     const ROL::Elementwise::BinaryFunction<value_type> &f,
     const ROL::Vector<value_type>                      &rol_vector)
   {
+    Assert(vector_ptr->has_ghost_elements() == false, ExcGhostsPresent());
     Assert(this->dimension() == rol_vector.dimension(),
            ExcDimensionMismatch(this->dimension(), rol_vector.dimension()));
 
