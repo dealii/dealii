@@ -1080,30 +1080,60 @@ public:
   faces_for_given_vertex(const unsigned int vertex_index) const;
 
   /**
-   * Return a vector of line indices for all new faces required for isotropic
-   * refinement.
+   * Return a two-dimensional array `new_quad_lines`, where `new_quad_lines[q]`
+   * lists the lines building up the q'th quad required for isotropic
+   * refinement. For technical reasons, `new_quad_lines[q]` is of size (12, 4),
+   * but only the first (n_faces(), n_lines()) entries are used, with the rest
+   * being set to numbers::invalid_unsigned_int.
+   *
+   * The chosen isotropic refinement (see
+   * ReferenceCell::get_isotropic_refinement_choice) is provided by
+   * @p refinement_choice .
    */
   constexpr dealii::ndarray<unsigned int, 12, 4>
   new_isotropic_child_face_lines(const unsigned int refinement_choice) const;
 
   /**
-   * Return a vector of vertex indices for all new face lines required for
-   * isotropic refinement.
+   * Return a three-dimensional array `quad_lines_vertices`, where
+   * `quad_lines_vertices[q][l]` lists the pairs of vertices defining the l'th
+   * line of the q'th quad. It is used during isotropic refinement to determine
+   * the orientation of the l'th line in the q'th quad. For technical reasons,
+   * `quad_lines_vertices` is of the given size but only some entries are used
+   * (see occurrences within execute_refinement_isotropic() in tria.cc for more
+   * details).
+   *
+   * The chosen isotropic refinement (see
+   * ReferenceCell::get_isotropic_refinement_choice) is provided by
+   * @p refinement_choice .
    */
   constexpr dealii::ndarray<unsigned int, 12, 4, 2>
   new_isotropic_child_face_line_vertices(
     const unsigned int refinement_choice) const;
 
   /**
-   * Return a vector of face indices for all new cells required for isotropic
-   * refinement.
+   * Return a two-dimensional array `cell_quads`, where `cell_quads[c]` lists
+   * the quads of the c'th new child required for isotropic refinement. For
+   * technical reasons, `cell_quads[c]` is of size 6, but only the first
+   * n_faces() entries are used, with the rest being set to
+   * numbers::invalid_unsigned_int.
+   *
+   * The chosen isotropic refinement (see
+   * ReferenceCell::get_isotropic_refinement_choice) is provided by
+   * @p refinement_choice .
    */
   constexpr dealii::ndarray<unsigned int, 8, 6>
   new_isotropic_child_cell_faces(const unsigned int refinement_choice) const;
 
   /**
-   * Return a vector of vertex indices for all new cells required for isotropic
-   * refinement.
+   * Return a two-dimensional array `cell_vertices`, where `cell_vertices[c]`
+   * lists the vertices of the c'th new child required for isotropic refinement.
+   * For technical reasons, `cell_vertices[c]` is of size 8, but only the first
+   * n_vertices() entries are used, with the rest being set to
+   * numbers::invalid_unsigned_int.
+   *
+   * The chosen isotropic refinement (see
+   * ReferenceCell::get_isotropic_refinement_choice) is provided by
+   * @p refinement_choice .
    */
   constexpr dealii::ndarray<unsigned int, 8, 8>
   new_isotropic_child_cell_vertices(const unsigned int refinement_choice) const;
