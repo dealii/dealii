@@ -71,13 +71,16 @@ namespace TrilinosWrappers
    * // Resize the current vector if necessary (MPI safe).
    * VectorType& VectorType::operation=(const VectorType &);
    *
+   * // Return the global size of the current vector.
+   * VectorType::size_type VectorType::size();
+   *
    * // Access the value of the ith component.
    * VectorType::value_type&
    * VectorType::operator[](const VectorType::size_type i);
    *
    * // Compress the vector i.e., flush the buffers of the
    * // vector object if it has any.
-   * void VectorType::compress(VectorOperation::insert);
+   * void VectorType::compress(VectorOperation);
    * @endcode
    *
    * @note The current implementation in ROL doesn't support vector sizes above
