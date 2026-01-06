@@ -389,6 +389,8 @@ namespace TrilinosWrappers
   void
   ROLVector<VectorType>::set(const ROL::Vector<value_type> &other_)
   {
+    Assert(dynamic_cast<const ROLVector *>(&other_) != nullptr,
+           ExcInternalError());
     const ROLVector &other = dynamic_cast<const ROLVector &>(other_);
 
     // Perform a deep copy of the vector pointed to by vector_ptr.
@@ -405,6 +407,8 @@ namespace TrilinosWrappers
   void
   ROLVector<VectorType>::plus(const ROL::Vector<value_type> &other_)
   {
+    Assert(dynamic_cast<const ROLVector *>(&other_) != nullptr,
+           ExcInternalError());
     const ROLVector &other = dynamic_cast<const ROLVector &>(other_);
 
     Assert(vector_ptr->has_ghost_elements() == false, ExcGhostsPresent());
@@ -427,6 +431,8 @@ namespace TrilinosWrappers
   ROLVector<VectorType>::axpy(const value_type               alpha,
                               const ROL::Vector<value_type> &other_)
   {
+    Assert(dynamic_cast<const ROLVector *>(&other_) != nullptr,
+           ExcInternalError());
     const ROLVector &other = dynamic_cast<const ROLVector &>(other_);
 
     Assert(vector_ptr->has_ghost_elements() == false, ExcGhostsPresent());
@@ -478,6 +484,8 @@ namespace TrilinosWrappers
   typename VectorType::value_type
   ROLVector<VectorType>::dot(const ROL::Vector<value_type> &other_) const
   {
+    Assert(dynamic_cast<const ROLVector *>(&other_) != nullptr,
+           ExcInternalError());
     const ROLVector &other = dynamic_cast<const ROLVector &>(other_);
 
     Assert(optimization_space.size() == vector_ptr->size(),
@@ -574,6 +582,8 @@ namespace TrilinosWrappers
     const ROL::Elementwise::BinaryFunction<value_type> &f,
     const ROL::Vector<value_type>                      &other_)
   {
+    Assert(dynamic_cast<const ROLVector *>(&other_) != nullptr,
+           ExcInternalError());
     const ROLVector &other = dynamic_cast<const ROLVector &>(other_);
 
     Assert(vector_ptr->has_ghost_elements() == false, ExcGhostsPresent());
