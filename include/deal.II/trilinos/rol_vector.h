@@ -293,7 +293,9 @@ namespace TrilinosWrappers
     norm() const override;
 
     /**
-     * Return a clone of the wrapped vector as a pointer to the parent class.
+     * Create and return a ROL pointer to a clone of the wrapped vector.
+     * The cloned vector has the same size as the wrapped vector, but is
+     * initialized with zeros.
      */
     ROL::Ptr<ROL::Vector<value_type>>
     clone() const override;
@@ -535,9 +537,11 @@ namespace TrilinosWrappers
   ROL::Ptr<ROL::Vector<typename VectorType::value_type>>
   ROLVector<VectorType>::clone() const
   {
-    ROL::Ptr<VectorType> vec_ptr = ROL::makePtr<VectorType>(*vector_ptr);
+    // create new vector with same size as wrapped one
+    ROL::Ptr<VectorType> clone_ptr = ROL::makePtr<VectorType>();
+    clone_ptr->reinit(*vector_ptr, false);
 
-    return ROL::makePtr<ROLVector>(vec_ptr, optimization_space);
+    return ROL::makePtr<ROLVector>(clone_ptr, optimization_space);
     // TODO: also somehow pass the partial sums etc?
   }
 
