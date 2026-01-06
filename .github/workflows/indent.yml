@@ -24,13 +24,38 @@ jobs:
     steps:
     - uses: actions/checkout@v6
       with:
-        fetch-depth: 100
+        # Fetches full history, but only for the ref being checked out.
+        fetch-depth: 0
     - name: setup
       run: |
         ./contrib/utilities/download_clang_format
     - name: indent
       run: |
         ./contrib/utilities/check_indentation.sh
+    - name: detect merges
+      if: github.event_name == 'pull_request'
+      run: |
+        # Enable exit on error.
+        set -euo pipefail
+        # We already fetched the full head branch with actions/checkout.
+        # Now we also need to fetch the base branch.
+        git fetch --quiet origin $GITHUB_BASE_REF
+        # For pull_request events, HEAD contains a tentative merge from the
+        # feature into the base branch. Count the number of commits in this pull
+        # request for sanity checks. It should be 1 higher than in the feature
+        # branch (because of the merge commit).
+        echo "Number of commits: $(git rev-list origin/$GITHUB_BASE_REF..HEAD --count)"
+        # Commits with more than two parents are merge commits.
+        MERGES=$(git rev-list origin/$GITHUB_BASE_REF..HEAD --parents | awk 'NF > 2 { print $1 }')
+        # Check whether there are more merge commits than the tentative one.
+        if (( $(wc -w <<< "$MERGES") != 1 )); then
+          echo "Merge commits detected in this PR!"
+          for c in $MERGES; do
+            echo "  - $c"
+          done
+          exit 1
+        fi
+        echo "No merge commits found!"
 
   doxygen:
     # build the documentation
