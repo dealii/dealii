@@ -2232,9 +2232,16 @@ namespace internal
             }
           else
             {
-              Assert(false,
-                     ExcNotImplemented("Raviart-Thomas currently only possible "
-                                       "in 2d/3d and with templated degree"));
+              AssertThrow(false,
+                          ExcNotImplemented(
+                            "Raviart-Thomas currently only possible "
+                            "in 2d/3d and with templated degree for "
+                            "requested fe_degree and n_q_points_1d. "
+                            "Ensure that the highest used degree for "
+                            "Raviart-Thomas, fe_degree+1=" +
+                            std::to_string(
+                              fe_eval.get_shape_info().data[0].fe_degree) +
+                            ", does not exceed FE_EVAL_FACTORY_DEGREE_MAX."));
             }
         }
       else
