@@ -170,8 +170,11 @@ namespace TrilinosWrappers
     /**
      * Prefix sum of the number of elements in the optimization space of lower
      * rank MPI processes.
+     *
+     * Denotes the starting index in the optimization space, at which the
+     * locally owned elements of the wrapped vector begin.
      */
-    dealii::types::global_dof_index prefix_sum;
+    dealii::types::global_dof_index local_start_index;
 
   public:
     /**
@@ -368,7 +371,7 @@ namespace TrilinosWrappers
       ExcMessage(
         "Provided IndexSet needs to be a subset of locally owned indices."));
 
-    std::tie(prefix_sum, global_dimension) =
+    std::tie(local_start_index, global_dimension) =
       Utilities::MPI::partial_and_total_sum(optimization_space.n_elements(),
                                             vector_ptr->get_mpi_communicator());
 
@@ -413,7 +416,7 @@ namespace TrilinosWrappers
 
     optimization_space = other.optimization_space;
     global_dimension   = other.global_dimension;
-    prefix_sum         = other.prefix_sum;
+    local_start_index  = other.local_start_index;
   }
 
 
@@ -542,21 +545,24 @@ namespace TrilinosWrappers
 
   template <typename VectorType>
   ROL::Ptr<ROL::Vector<typename VectorType::value_type>>
-  ROLVector<VectorType>::basis(const int i) const
+  ROLVector<VectorType>::basis(const int global_index) const
   {
     Assert(optimization_space.size() == vector_ptr->size(),
            ExcMessage("Optimization space is out-of-sync. "
                       "Please create a new wrapper."));
-    AssertIndexRange(i, global_dimension);
+    AssertIndexRange(global_index, global_dimension);
 
     // clone the internal vector as basis
     ROL::Ptr<VectorType> basis_ptr = ROL::makePtr<VectorType>();
     basis_ptr->reinit(*vector_ptr, false);
 
-    // check whether the i-th basis belongs to us
-    if ((i >= prefix_sum) && (i < prefix_sum + optimization_space.n_elements()))
+    // check whether the i-th basis corresponds to one of the
+    // locally owned elements of the wrapped vector
+    if ((global_index >= local_start_index) &&
+        (global_index < local_start_index + optimization_space.n_elements()))
       {
-        const IndexSet::size_type local_index = i - prefix_sum;
+        const dealii::types::global_dof_index local_index =
+          global_index - local_start_index;
 
         // global dof index corresponding to i-th basis in optimization
         const dealii::types::global_dof_index global_dof_index =
