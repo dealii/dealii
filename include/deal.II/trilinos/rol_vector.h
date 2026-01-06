@@ -103,14 +103,14 @@ namespace TrilinosWrappers
    *
    * This can be achieved in two different ways: either through constrained
    * optimization; or by reducing the optimization space which allows
-   * unconstrained optimization. For the latter, one way to do it is masking
-   * those vector elements that correspond to the optimization space. All
-   * operations necessary for the optimization process would only \e see these
-   * masked entries, which are effectively only a subspace of the finite element
-   * discretization.
+   * unconstrained optimization. For the latter, one way to do it is explicitly
+   * defining those vector elements that correspond to the optimization space.
+   * All operations necessary for the optimization process would only \e see
+   * these specified entries, which are effectively only a subspace of the
+   * finite element discretization.
    *
-   * This wrapper class provides a means for masking using an IndexSet upon
-   * construction.
+   * This wrapper class provides a means for defining the optimization space
+   * using an IndexSet upon construction.
    *
    *
    * <h3>Ghost elements on distributed vectors</h3>
@@ -177,16 +177,22 @@ namespace TrilinosWrappers
     /**
      * Constructor.
      *
-     * The optimization space covers all locally owned degrees of freedom.
+     * This constructor does not take an index set as argument (for this, see
+     * the other constructor) and as a consequence considers all variables
+     * represented by the vector as available to optimization.
      */
     ROLVector(const ROL::Ptr<VectorType> &vector_ptr);
 
     /**
      * Constructor.
      *
-     * The IndexSet @p optimization_space masks entries in the wrapped vector
-     * on which the optimization process will be applied only. It needs to
-     * contain a subset of locally owned indices of the wrapped vector.
+     * The IndexSet @p optimization_space specifies entries in the wrapped
+     * vector on which the optimization process will be applied only. It needs
+     * to be equal to or a subset of the locally owned indices of the wrapped
+     * vector.
+     *
+     * Passing in the complete index set (partitioned among processors) is
+     * equivalent to the previous constructor.
      */
     ROLVector(const ROL::Ptr<VectorType> &vector_ptr,
               const IndexSet             &optimization_space);
@@ -225,8 +231,9 @@ namespace TrilinosWrappers
     /**
      * Add @p rol_vector to the wrapped vector.
      *
-     * The operation will only be applied to masked elements. Both vectors need
-     * to correspond to the same optimization space.
+     * The operation will only be applied to elements of the specified
+     * optimization space. Both vectors need to correspond to the same
+     * optimization space.
      *
      * @note @p rol_vector has to be of type ROLVector.
      */
@@ -236,8 +243,9 @@ namespace TrilinosWrappers
     /**
      * Scale the wrapped vector by @p alpha and add @p rol_vector to it.
      *
-     * The operation will only be applied to masked elements. Both vectors need
-     * to correspond to the same optimization space.
+     * The operation will only be applied to elements of the specified
+     * optimization space. Both vectors need to correspond to the same
+     * optimization space.
      *
      * @note @p rol_vector has to be of type ROLVector.
      */
@@ -248,7 +256,8 @@ namespace TrilinosWrappers
     /**
      * Scale the wrapped vector by @p alpha.
      *
-     * The operation will only be applied to masked elements.
+     * The operation will only be applied to elements of the specified
+     * optimization space.
      */
     void
     scale(const value_type alpha) override;
@@ -256,8 +265,9 @@ namespace TrilinosWrappers
     /**
      * Return the dot product with a given @p rol_vector.
      *
-     * The operation will only be applied to masked elements. Both vectors need
-     * to correspond to the same optimization space.
+     * The operation will only be applied to elements of the specified
+     * optimization space. Both vectors need to correspond to the same
+     * optimization space.
      *
      * @note @p rol_vector has to be of type ROLVector.
      */
@@ -267,7 +277,8 @@ namespace TrilinosWrappers
     /**
      * Return the $L^{2}$ norm of the wrapped vector.
      *
-     * The operation will only be applied to masked elements.
+     * The operation will only be applied to elements of the specified
+     * optimization space.
      *
      * The returned type is of ROLVector::value_type so as to maintain
      * consistency with ROL::Vector<ROLVector::value_type> and
@@ -294,7 +305,8 @@ namespace TrilinosWrappers
     /**
      * Apply unary function @p f to all the elements of the wrapped vector.
      *
-     * The operation will only be applied to masked elements.
+     * The operation will only be applied to elements of the specified
+     * optimization space.
      */
     void
     applyUnary(const ROL::Elementwise::UnaryFunction<value_type> &f) override;
@@ -303,8 +315,9 @@ namespace TrilinosWrappers
      * Apply binary function @p f along with ROL::Vector @p rol_vector to all
      * the elements of the wrapped vector.
      *
-     * The operation will only be applied to masked elements. Both vectors need
-     * to correspond to the same optimization space.
+     * The operation will only be applied to elements of the specified
+     * optimization space. Both vectors need to correspond to the same
+     * optimization space.
      *
      * @note @p rol_vector has to be of type ROLVector.
      */
@@ -316,7 +329,8 @@ namespace TrilinosWrappers
      * Return the accumulated value on applying reduction operation @p r on
      * all the elements of the wrapped vector.
      *
-     * The operation will only be applied to masked elements.
+     * The operation will only be applied to elements of the specified
+     * optimization space.
      */
     value_type
     reduce(const ROL::Elementwise::ReductionOp<value_type> &r) const override;
@@ -324,8 +338,8 @@ namespace TrilinosWrappers
     /**
      * Print the wrapped vector to the output stream @p outStream.
      *
-     * This function will print the entire vector, and not just the masked
-     * elements.
+     * This function will print the entire vector, and not just the elements of
+     * the specified optimization space.
      */
     void
     print(std::ostream &outStream) const override;
