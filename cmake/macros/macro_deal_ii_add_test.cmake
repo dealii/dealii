@@ -562,6 +562,7 @@ function(deal_ii_add_test _category _test_name _comparison_file)
           ${_test_directory}
         DEPENDS
           ${_target}
+          ${_source_file}
           ${DEAL_II_PATH}/${DEAL_II_SHARE_RELDIR}/scripts/normalize.pl
         COMMENT
           "Normalizing test output file ${_test_directory}/output"
