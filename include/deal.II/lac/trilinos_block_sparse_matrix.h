@@ -623,6 +623,8 @@ namespace TrilinosWrappers
 
 } /* namespace TrilinosWrappers */
 
+DEAL_II_NAMESPACE_CLOSE
+
 #  endif
 
 #else
