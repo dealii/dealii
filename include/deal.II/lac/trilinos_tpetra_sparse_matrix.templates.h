@@ -126,7 +126,9 @@ namespace LinearAlgebra
 
         // create the Tpetra::Vector
         typename TpetraTypes::VectorType<Number, MemorySpace> tpetra_dst(
-          M.trilinos_matrix().getRangeMap(), kokkos_dual_view_dst);
+          mode == Teuchos::TRANS ? M.trilinos_matrix().getDomainMap() :
+                                   M.trilinos_matrix().getRangeMap(),
+          kokkos_dual_view_dst);
 
         // For the src vector:
         // create a Kokkos::View from the src vector
@@ -141,7 +143,9 @@ namespace LinearAlgebra
 
         // create the Tpetra::Vector
         typename TpetraTypes::VectorType<Number, MemorySpace> tpetra_src(
-          M.trilinos_matrix().getDomainMap(), kokkos_dual_view_src);
+          mode == Teuchos::TRANS ? M.trilinos_matrix().getRangeMap() :
+                                   M.trilinos_matrix().getDomainMap(),
+          kokkos_dual_view_src);
 
         M.trilinos_matrix().apply(tpetra_src, tpetra_dst, mode, alpha, beta);
       }
