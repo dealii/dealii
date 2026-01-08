@@ -1080,32 +1080,62 @@ public:
   faces_for_given_vertex(const unsigned int vertex_index) const;
 
   /**
-   * Return a vector of line indices for all new faces required for isotropic
-   * refinement.
+   * Return a two-dimensional array `new_quad_lines`, where `new_quad_lines[q]`
+   * lists the lines building up the q'th quad required for isotropic
+   * refinement. For technical reasons, `new_quad_lines[q]` is of size (12, 4),
+   * but only the first (n_faces(), n_lines()) entries are used, with the rest
+   * being set to numbers::invalid_unsigned_int.
+   *
+   * The chosen isotropic refinement (see
+   * ReferenceCell::get_isotropic_refinement_choice) is provided by
+   * @p refinement_choice .
    */
   constexpr dealii::ndarray<unsigned int, 12, 4>
   new_isotropic_child_face_lines(const unsigned int refinement_choice) const;
 
   /**
-   * Return a vector of vertex indices for all new face lines required for
-   * isotropic refinement.
+   * Return a three-dimensional array `quad_lines_vertices`, where
+   * `quad_lines_vertices[q][l]` lists the pairs of vertices defining the l'th
+   * line of the q'th quad. It is used during isotropic refinement to determine
+   * the orientation of the l'th line in the q'th quad. For technical reasons,
+   * `quad_lines_vertices` is of the given size but only some entries are used
+   * (see occurrences within execute_refinement_isotropic() in tria.cc for more
+   * details).
+   *
+   * The chosen isotropic refinement (see
+   * ReferenceCell::get_isotropic_refinement_choice) is provided by
+   * @p refinement_choice .
    */
   constexpr dealii::ndarray<unsigned int, 12, 4, 2>
   new_isotropic_child_face_line_vertices(
     const unsigned int refinement_choice) const;
 
   /**
-   * Return a vector of face indices for all new cells required for isotropic
-   * refinement.
+   * Return a two-dimensional array `cell_quads`, where `cell_quads[c]` lists
+   * the quads of the c'th new child required for isotropic refinement. For
+   * technical reasons, `cell_quads[c]` is of size 6, but only the first
+   * n_faces() entries are used, with the rest being set to
+   * numbers::invalid_unsigned_int.
+   *
+   * The chosen isotropic refinement (see
+   * ReferenceCell::get_isotropic_refinement_choice) is provided by
+   * @p refinement_choice .
    */
   constexpr dealii::ndarray<unsigned int, 8, 6>
   new_isotropic_child_cell_faces(const unsigned int refinement_choice) const;
 
   /**
-   * Return a vector of vertex indices for all new cells required for isotropic
-   * refinement.
+   * Return a two-dimensional array `cell_vertices`, where `cell_vertices[c]`
+   * lists the vertices of the c'th new child required for isotropic refinement.
+   * For technical reasons, `cell_vertices[c]` is of size 8, but only the first
+   * n_vertices() entries are used, with the rest being set to
+   * numbers::invalid_unsigned_int.
+   *
+   * The chosen isotropic refinement (see
+   * ReferenceCell::get_isotropic_refinement_choice) is provided by
+   * @p refinement_choice .
    */
-  constexpr dealii::ndarray<unsigned int, 8, 4>
+  constexpr dealii::ndarray<unsigned int, 8, 8>
   new_isotropic_child_cell_vertices(const unsigned int refinement_choice) const;
 
   /**
@@ -1778,45 +1808,61 @@ ReferenceCell::new_isotropic_child_cell_faces(
 
 
 
-constexpr dealii::ndarray<unsigned int, 8, 4>
+constexpr dealii::ndarray<unsigned int, 8, 8>
 ReferenceCell::new_isotropic_child_cell_vertices(
   const unsigned int refinement_choice) const
 {
   AssertIndexRange(refinement_choice, n_isotropic_refinement_choices());
 
+  constexpr unsigned int X = numbers::invalid_unsigned_int;
+
   switch (this->kind)
     {
       case ReferenceCells::Tetrahedron:
         {
-          constexpr dealii::ndarray<unsigned int, 3, 8, 4> cell_vertices_tet = {
+          constexpr dealii::ndarray<unsigned int, 3, 8, 8> cell_vertices_tet = {
             {// new line is (6,8)
-             {{{{0, 4, 6, 7}},
-               {{4, 1, 5, 8}},
-               {{6, 5, 2, 9}},
-               {{7, 8, 9, 3}},
-               {{4, 5, 6, 8}},
-               {{4, 7, 8, 6}},
-               {{6, 9, 7, 8}},
-               {{5, 8, 9, 6}}}},
+             {{{{0, 4, 6, 7, X, X, X, X}},
+               {{4, 1, 5, 8, X, X, X, X}},
+               {{6, 5, 2, 9, X, X, X, X}},
+               {{7, 8, 9, 3, X, X, X, X}},
+               {{4, 5, 6, 8, X, X, X, X}},
+               {{4, 7, 8, 6, X, X, X, X}},
+               {{6, 9, 7, 8, X, X, X, X}},
+               {{5, 8, 9, 6, X, X, X, X}}}},
              // new line is (5,7)
-             {{{{0, 4, 6, 7}},
-               {{4, 1, 5, 8}},
-               {{6, 5, 2, 9}},
-               {{7, 8, 9, 3}},
-               {{4, 5, 6, 7}},
-               {{4, 7, 8, 5}},
-               {{6, 9, 7, 5}},
-               {{5, 8, 9, 7}}}},
+             {{{{0, 4, 6, 7, X, X, X, X}},
+               {{4, 1, 5, 8, X, X, X, X}},
+               {{6, 5, 2, 9, X, X, X, X}},
+               {{7, 8, 9, 3, X, X, X, X}},
+               {{4, 5, 6, 7, X, X, X, X}},
+               {{4, 7, 8, 5, X, X, X, X}},
+               {{6, 9, 7, 5, X, X, X, X}},
+               {{5, 8, 9, 7, X, X, X, X}}}},
              // new line is (4,9)
-             {{{{0, 4, 6, 7}},
-               {{4, 1, 5, 8}},
-               {{6, 5, 2, 9}},
-               {{7, 8, 9, 3}},
-               {{4, 5, 6, 9}},
-               {{4, 7, 8, 9}},
-               {{6, 9, 7, 4}},
-               {{5, 8, 9, 4}}}}}};
+             {{{{0, 4, 6, 7, X, X, X, X}},
+               {{4, 1, 5, 8, X, X, X, X}},
+               {{6, 5, 2, 9, X, X, X, X}},
+               {{7, 8, 9, 3, X, X, X, X}},
+               {{4, 5, 6, 9, X, X, X, X}},
+               {{4, 7, 8, 9, X, X, X, X}},
+               {{6, 9, 7, 4, X, X, X, X}},
+               {{5, 8, 9, 4, X, X, X, X}}}}}};
           return cell_vertices_tet[refinement_choice];
+        }
+      case ReferenceCells::Hexahedron:
+        {
+          constexpr dealii::ndarray<unsigned int, 8, 8> cell_vertices_hex = {{
+            {{0, 10, 8, 24, 16, 22, 20, 26}},  // bottom children
+            {{10, 1, 24, 9, 22, 17, 26, 21}},  //
+            {{8, 24, 2, 11, 20, 26, 18, 23}},  //
+            {{24, 9, 11, 3, 26, 21, 23, 19}},  //
+            {{16, 22, 20, 26, 4, 14, 12, 25}}, // top children
+            {{22, 17, 26, 21, 14, 5, 25, 13}}, //
+            {{20, 26, 18, 23, 12, 25, 6, 15}}, //
+            {{26, 21, 23, 19, 25, 13, 15, 7}}  //
+          }};
+          return cell_vertices_hex;
         }
       default:
         DEAL_II_NOT_IMPLEMENTED();
