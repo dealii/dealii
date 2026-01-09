@@ -317,9 +317,7 @@ namespace TrilinosWrappers
       "Use the overload specifying the number of entries per row!")
     SparsityPattern(const size_type m, const size_type n)
       : SparsityPattern(m, n, 0)
-    {
-      std::abort();
-    }
+    {}
 
     /**
      * Generate a sparsity pattern that is completely stored locally, having
@@ -372,7 +370,6 @@ namespace TrilinosWrappers
     reinit(const size_type m, const size_type n)
     {
       reinit(m, n, 0);
-      std::abort();
     }
 
     /**
@@ -462,17 +459,13 @@ namespace TrilinosWrappers
     SparsityPattern(const IndexSet &parallel_partitioning,
                     const MPI_Comm  communicator)
       : SparsityPattern(parallel_partitioning, communicator, 0)
-    {
-      std::abort();
-    }
+    {}
 
     DEAL_II_DEPRECATED_EARLY_WITH_COMMENT(
       "Use the overload specifying the MPI communicator and the number of entries per row!")
     SparsityPattern(const IndexSet &parallel_partitioning)
       : SparsityPattern(parallel_partitioning, MPI_COMM_WORLD, 0)
-    {
-      std::abort();
-    }
+    {}
 
     /**
      * Same as before, but now use the exact number of nonzeros in each m row.
@@ -516,9 +509,7 @@ namespace TrilinosWrappers
                         col_parallel_partitioning,
                         communicator,
                         0)
-    {
-      std::abort();
-    }
+    {}
 
     DEAL_II_DEPRECATED_EARLY_WITH_COMMENT(
       "Use the overload specifying the MPI communicator and the number of entries per row!")
@@ -528,9 +519,7 @@ namespace TrilinosWrappers
                         col_parallel_partitioning,
                         MPI_COMM_WORLD,
                         0)
-    {
-      std::abort();
-    }
+    {}
 
     /**
      * This constructor is similar to the one above, but it now takes two
@@ -591,9 +580,7 @@ namespace TrilinosWrappers
                         writable_rows,
                         communicator,
                         0)
-    {
-      std::abort();
-    }
+    {}
 
     DEAL_II_DEPRECATED_EARLY_WITH_COMMENT(
       "Use the overload specifying the MPI communicator and the number of entries per row!")
@@ -605,9 +592,7 @@ namespace TrilinosWrappers
                         writable_rows,
                         MPI_COMM_WORLD,
                         0)
-    {
-      std::abort();
-    }
+    {}
 
     /**
      * Reinitialization function for generating a square sparsity pattern
@@ -635,7 +620,6 @@ namespace TrilinosWrappers
     reinit(const IndexSet &parallel_partitioning, const MPI_Comm communicator)
     {
       reinit(parallel_partitioning, communicator, 0);
-      std::abort();
     }
 
     DEAL_II_DEPRECATED_EARLY_WITH_COMMENT(
@@ -644,7 +628,6 @@ namespace TrilinosWrappers
     reinit(const IndexSet &parallel_partitioning)
     {
       reinit(parallel_partitioning, MPI_COMM_WORLD, 0);
-      std::abort();
     }
 
     /**
@@ -695,7 +678,6 @@ namespace TrilinosWrappers
              col_parallel_partitioning,
              communicator,
              0);
-      std::abort();
     }
 
     DEAL_II_DEPRECATED_EARLY_WITH_COMMENT(
@@ -708,7 +690,6 @@ namespace TrilinosWrappers
              col_parallel_partitioning,
              MPI_COMM_WORLD,
              0);
-      std::abort();
     }
 
     /**
@@ -756,7 +737,6 @@ namespace TrilinosWrappers
              writeable_rows,
              communicator,
              0);
-      std::abort();
     }
 
     DEAL_II_DEPRECATED_EARLY_WITH_COMMENT(
@@ -771,7 +751,6 @@ namespace TrilinosWrappers
              writeable_rows,
              MPI_COMM_WORLD,
              0);
-      std::abort();
     }
 
 

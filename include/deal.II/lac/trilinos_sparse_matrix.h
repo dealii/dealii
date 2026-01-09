@@ -761,17 +761,13 @@ DEAL_II_NAMESPACE_OPEN // Do not convert for module purposes
     SparseMatrix(const IndexSet &parallel_partitioning,
                  const MPI_Comm  communicator)
       : SparseMatrix(parallel_partitioning, communicator, 0)
-    {
-      std::abort();
-    }
+    {}
 
     DEAL_II_DEPRECATED_EARLY_WITH_COMMENT(
       "Use the overload specifying the MPI communicator and the number of entries per row!")
     SparseMatrix(const IndexSet &parallel_partitioning)
       : SparseMatrix(parallel_partitioning, MPI_COMM_WORLD, 0)
-    {
-      std::abort();
-    }
+    {}
 
     /**
      * Same as before, but now set the number of nonzeros in each matrix row
@@ -812,9 +808,7 @@ DEAL_II_NAMESPACE_OPEN // Do not convert for module purposes
                      col_parallel_partitioning,
                      communicator,
                      0)
-    {
-      std::abort();
-    }
+    {}
 
     DEAL_II_DEPRECATED_EARLY_WITH_COMMENT(
       "Use the overload specifying the MPI communicator and the number of entries per row!")
@@ -824,9 +818,7 @@ DEAL_II_NAMESPACE_OPEN // Do not convert for module purposes
                      col_parallel_partitioning,
                      MPI_COMM_WORLD,
                      0)
-    {
-      std::abort();
-    }
+    {}
 
     /**
      * This constructor is similar to the one above, but it now takes two
