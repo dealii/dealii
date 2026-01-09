@@ -1,0 +1,4 @@
+New: LinearAlgebra::TpetraWrappers::PreconditionAMGMueLu has been added as
+preconditioner for TpetraWrappers::SparseMatrix.
+<br>
+(Jan Philipp Thiele, Daniel Arndt, 2026/01/08)

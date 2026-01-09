@@ -57,7 +57,6 @@ namespace LinearAlgebra
       /**
        * @brief Standardized data struct to pipe additional flags to the
        * preconditioner.
-       *
        */
       struct AdditionalData
       {};
@@ -66,7 +65,6 @@ namespace LinearAlgebra
        * @brief Constructor. Does not do anything. The <tt>initialize</tt> function of
        * the derived classes will have to create the preconditioner from a given
        * sparse matrix.
-       *
        */
       PreconditionBase() = default;
 
@@ -197,7 +195,6 @@ namespace LinearAlgebra
        * based on an AdditionalData object that exposes and defaults the most
        * sensible parameters. But some classes will also offer full
        * customization for experienced Trilinos users.
-       *
        */
       Teuchos::ParameterList parameter_list;
     };
@@ -220,7 +217,6 @@ namespace LinearAlgebra
     public:
       /**
        * @brief Construct identity preconditioner.
-       *
        */
       PreconditionIdentity() = default;
 
@@ -263,7 +259,6 @@ namespace LinearAlgebra
       /**
        * Initializes the preconditioner for the matrix <tt>A</tt> based on
        * the <tt>parameter_set</tt>.
-       *
        */
       void
       initialize(const SparseMatrix<Number, MemorySpace> &A);
@@ -348,7 +343,6 @@ namespace LinearAlgebra
      *
      * @ingroup TpetraWrappers
      * @ingroup Preconditioners
-     *
      */
     template <typename Number, typename MemorySpace = dealii::MemorySpace::Host>
     class PreconditionJacobi
@@ -357,7 +351,6 @@ namespace LinearAlgebra
     public:
       /**
        * @brief The set of additional parameters to tune the preconditioner.
-       *
        */
       struct AdditionalData
       {
@@ -368,7 +361,7 @@ namespace LinearAlgebra
          * The defaults yield a textbook Jacobi preconditioner.
          *
          * @param omega The damping factor for the relaxation.
-         * @param fix_diagonal Fix small diagonal entries for the inversion?
+         * @param fix_diagonal Fix small diagonal entries for the inversion.
          * @param min_diagonal Threshold for fix_diagonal.
          * @param n_sweeps Number of relaxation sweeps per call to vmult or Tvmult.
          */
@@ -379,7 +372,6 @@ namespace LinearAlgebra
 
         /**
          * @brief Relaxation damping factor.
-         *
          */
         double omega;
         /**
@@ -396,18 +388,15 @@ namespace LinearAlgebra
          *
          * If the threshold is zero (default) only entries which are exactly
          * zero will be replaced will small nonzero values.
-         *
          */
         double min_diagonal;
         /**
          * @brief Set how often the preconditioner should be applied during vmult() or Tvmult().
-         *
          */
         int n_sweeps;
       };
       /**
        * @brief Constructor.
-       *
        */
       PreconditionJacobi();
 
@@ -441,7 +430,6 @@ namespace LinearAlgebra
     public:
       /**
        * @brief The set of additional parameters to tune the preconditioner.
-       *
        */
       struct AdditionalData
       {
@@ -453,7 +441,7 @@ namespace LinearAlgebra
          * original publication.
          *
          * @param omega The damping factor for the relaxation.
-         * @param fix_diagonal Fix small diagonal entries for the inversion?
+         * @param fix_diagonal Fix small diagonal entries for the inversion.
          * @param min_diagonal Threshold for fix_diagonal.
          * @param n_sweeps Number of relaxation sweeps per call to vmult or Tvmult.
          */
@@ -464,7 +452,6 @@ namespace LinearAlgebra
 
         /**
          * @brief Relaxation damping factor.
-         *
          */
         double omega;
         /**
@@ -481,19 +468,16 @@ namespace LinearAlgebra
          *
          * If the threshold is zero (default) only entries which are exactly
          * zero will be replaced will small nonzero values.
-         *
          */
         double min_diagonal;
         /**
          * @brief Set how often the preconditioner should be applied during vmult() or Tvmult().
-         *
          */
         int n_sweeps;
       };
 
       /**
        * @brief Constructor.
-       *
        */
       PreconditionL1Jacobi();
 
@@ -528,7 +512,6 @@ namespace LinearAlgebra
     public:
       /**
        * @brief The set of additional parameters to tune the preconditioner.
-       *
        */
       struct AdditionalData
       {
@@ -541,7 +524,7 @@ namespace LinearAlgebra
          *
          * @param omega The damping factor for the relaxation.
          * @param eta Threshold parameter for diagonal correction.
-         * @param fix_diagonal Fix small diagonal entries for the inversion?
+         * @param fix_diagonal Fix small diagonal entries for the inversion.
          * @param min_diagonal Threshold for fix_diagonal.
          * @param n_sweeps Number of relaxation sweeps per call to vmult or Tvmult.
          */
@@ -553,7 +536,6 @@ namespace LinearAlgebra
 
         /**
          * @brief Relaxation damping factor.
-         *
          */
         double omega;
 
@@ -562,7 +544,6 @@ namespace LinearAlgebra
          *
          * The l1 correction for a row i will only be added if it is more than
          * eta times larger than the original diagonal entry.
-         *
          */
         double eta;
         /**
@@ -579,19 +560,16 @@ namespace LinearAlgebra
          *
          * If the threshold is zero (default) only entries which are exactly
          * zero will be replaced will small nonzero values.
-         *
          */
         double min_diagonal;
         /**
          * @brief Set how often the preconditioner should be applied during vmult() or Tvmult().
-         *
          */
         int n_sweeps;
       };
 
       /**
        * @brief Constructor.
-       *
        */
       PreconditionL1GaussSeidel();
 
@@ -623,7 +601,6 @@ namespace LinearAlgebra
     public:
       /**
        * @brief The set of additional parameters to tune the preconditioner.
-       *
        */
       struct AdditionalData
       {
@@ -635,7 +612,7 @@ namespace LinearAlgebra
          *
          * @param omega The damping factor for the relaxation.
          * @param overlap Overlap between processor local matrices.
-         * @param fix_diagonal Fix small diagonal entries for the inversion?
+         * @param fix_diagonal Fix small diagonal entries for the inversion.
          * @param min_diagonal Threshold for fix_diagonal.
          * @param n_sweeps Number of relaxation sweeps per call to vmult or Tvmult.
          */
@@ -647,7 +624,6 @@ namespace LinearAlgebra
 
         /**
          * @brief Relaxation damping factor.
-         *
          */
         double omega;
         /**
@@ -674,19 +650,16 @@ namespace LinearAlgebra
          *
          * If the threshold is zero (default) only entries which are exactly
          * zero will be replaced will small nonzero values.
-         *
          */
         double min_diagonal;
         /**
          * @brief Set how often the preconditioner should be applied during vmult() or Tvmult().
-         *
          */
         int n_sweeps;
       };
 
       /**
        * @brief Constructor.
-       *
        */
       PreconditionSOR();
 
@@ -715,7 +688,6 @@ namespace LinearAlgebra
     public:
       /**
        * @brief The set of additional parameters to tune the preconditioner.
-       *
        */
       struct AdditionalData
       {
@@ -727,7 +699,7 @@ namespace LinearAlgebra
          *
          * @param omega The damping factor for the relaxation.
          * @param overlap Overlap between processor local matrices.
-         * @param fix_diagonal Fix small diagonal entries for the inversion?
+         * @param fix_diagonal Fix small diagonal entries for the inversion.
          * @param min_diagonal Threshold for fix_diagonal.
          * @param n_sweeps Number of relaxation sweeps per call to vmult or Tvmult.
          */
@@ -739,7 +711,6 @@ namespace LinearAlgebra
 
         /**
          * @brief Relaxation damping factor.
-         *
          */
         double omega;
         /**
@@ -766,12 +737,10 @@ namespace LinearAlgebra
          *
          * If the threshold is zero (default) only entries which are exactly
          * zero will be replaced will small nonzero values.
-         *
          */
         double min_diagonal;
         /**
          * @brief Set how often the preconditioner should be applied during vmult() or Tvmult().
-         *
          */
         int n_sweeps;
       };
@@ -779,7 +748,6 @@ namespace LinearAlgebra
 
       /**
        * @brief Constructor.
-       *
        */
       PreconditionSSOR();
 
@@ -809,7 +777,6 @@ namespace LinearAlgebra
     public:
       /**
        * @brief The set of additional parameters to tune the preconditioner.
-       *
        */
       struct AdditionalData
       {
@@ -835,7 +802,6 @@ namespace LinearAlgebra
          * The degree directly corresponds to the number of matrix-vector
          * products that have to be performed during a single application of the
          * vmult() and Tvmult() operations.
-         *
          */
         int degree;
         /*
@@ -847,12 +813,10 @@ namespace LinearAlgebra
         double max_eigenvalue;
         /*
          * @brief Lower bound for the minimum eigenvalue of the matrix.
-         *
          */
         double min_eigenvalue;
         /**
          * @brief Estimated ratio between maximum and minimum eigenvalue.
-         *
          */
         double eigenvalue_ratio;
         /**
@@ -860,7 +824,6 @@ namespace LinearAlgebra
          *
          * If the threshold is zero (default) only entries which are exactly
          * zero will be replaced will small nonzero values.
-         *
          */
         double min_diagonal;
         /**
@@ -873,14 +836,12 @@ namespace LinearAlgebra
          * can be useful to append previous data to the Chebyshev corrections.
          * The user should really know what they are doing when setting this
          * flag to true.
-         *
          */
         bool nonzero_starting;
       };
 
       /**
        * @brief Constructor.
-       *
        */
       PreconditionChebyshev();
 
@@ -920,7 +881,6 @@ namespace LinearAlgebra
     public:
       /**
        * @brief The set of additional parameters to tune the preconditioner.
-       *
        */
       struct AdditionalData
       {
@@ -947,17 +907,14 @@ namespace LinearAlgebra
          *
          * Level-of-fill to increase the sparsity pattern of the preconditioner.
          * A large enough value will result in a complete LU factorization.
-         *
          */
         int ilu_fill;
         /**
          * @brief Constant to be added to each diagonal entry before factorization.
-         *
          */
         double ilu_atol;
         /**
          * @brief Factor to scale all diagonal entries by before factorization.
-         *
          */
         double ilu_rtol;
         /**
@@ -974,7 +931,6 @@ namespace LinearAlgebra
 
       /**
        * @brief Constructor.
-       *
        */
       PreconditionILU();
 
@@ -1004,7 +960,6 @@ namespace LinearAlgebra
     public:
       /**
        * @brief The set of additional parameters to tune the preconditioner.
-       *
        */
       struct AdditionalData
       {
@@ -1042,17 +997,14 @@ namespace LinearAlgebra
          * A large enough value will result in a complete LU factorization.
          * Note, however, that this will drastically increase the memory
          * requirement, especially for 3d simulations.
-         *
          */
         double ilut_fill;
         /**
          * @brief Constant to be added to each diagonal entry before factorization.
-         *
          */
         double ilut_atol;
         /**
          * @brief Factor to scale all diagonal entries by before factorization.
-         *
          */
         double ilut_rtol;
         /**
@@ -1071,7 +1023,6 @@ namespace LinearAlgebra
 
       /**
        * @brief Constructor.
-       *
        */
       PreconditionILUT();
 
@@ -1108,7 +1059,6 @@ namespace LinearAlgebra
     public:
       /**
        * @brief The set of additional parameters to tune the preconditioner.
-       *
        */
       struct AdditionalData
       {
@@ -1137,17 +1087,14 @@ namespace LinearAlgebra
         int n_local_parts;
         /**
          * @brief Relaxation damping factor.
-         *
          */
         double omega;
         /**
          * @brief Amount of overlap between blocks
-         *
          */
         int block_overlap;
         /**
          * @brief Set how often the preconditioner should be applied during vmult() or Tvmult().
-         *
          */
         int n_sweeps;
       };
@@ -1155,7 +1102,6 @@ namespace LinearAlgebra
 
       /**
        * @brief Constructor.
-       *
        */
       PreconditionBlockJacobi();
 
@@ -1188,7 +1134,6 @@ namespace LinearAlgebra
     public:
       /**
        * @brief The set of additional parameters to tune the preconditioner.
-       *
        */
       struct AdditionalData
       {
@@ -1216,7 +1161,6 @@ namespace LinearAlgebra
         int n_local_parts;
         /**
          * @brief Relaxation damping factor.
-         *
          */
         double omega;
         /**
@@ -1231,7 +1175,6 @@ namespace LinearAlgebra
         int overlap;
         /**
          * @brief Set how often the preconditioner should be applied during vmult() or Tvmult().
-         *
          */
         int n_sweeps;
       };
@@ -1261,7 +1204,6 @@ namespace LinearAlgebra
     public:
       /**
        * @brief The set of additional parameters to tune the preconditioner.
-       *
        */
       struct AdditionalData
       {
@@ -1288,7 +1230,6 @@ namespace LinearAlgebra
         int n_local_parts;
         /**
          * @brief Relaxation damping factor.
-         *
          */
         double omega;
         /**
@@ -1303,7 +1244,6 @@ namespace LinearAlgebra
         int overlap;
         /**
          * @brief Set how often the preconditioner should be applied during vmult() or Tvmult().
-         *
          */
         int n_sweeps;
       };
@@ -1314,9 +1254,177 @@ namespace LinearAlgebra
       initialize(const SparseMatrix<Number, MemorySpace> &A,
                  const AdditionalData &additional_data = AdditionalData());
     };
-#  endif // DEAL_II_TRILINOS_WITH_IFPACK2
+#    ifdef DEAL_II_TRILINOS_WITH_TPETRA_MUELU
 
-  } // namespace TpetraWrappers
+    /**
+     * @brief The class for the algebraic multigrid preconditioner MueLu.
+     *
+     * @ingroup TpetraWrappers
+     * @ingroup Preconditioners
+     */
+    template <typename Number, typename MemorySpace = dealii::MemorySpace::Host>
+    class PreconditionAMGMueLu : public PreconditionBase<Number, MemorySpace>
+    {
+    public:
+      /**
+       * The chosen smoother is not supported or configured with Ifpack2.
+       */
+      DeclException1(
+        ExcTrilinosMueLuSmootherUnsupported,
+        std::string,
+        << "You tried to select the smoother type <" << arg1 << ">\n"
+        << "but this is not supported by our interface\n"
+        << "due to one of the following reasons:\n"
+        << "* This smoother does not exist\n"
+        << "* This smoother is not (yet) supported by our interface\n"
+        << "* This smoother is not (yet) supported by MueLu.\n");
+      DeclException1(
+        ExcTrilinosMueLuCoarseSolverUnsupported,
+        std::string,
+        << "You tried to select the coarse solver type <" << arg1 << ">\n"
+        << "but this is not supported by our interface\n"
+        << "due to one of the following reasons:\n"
+        << "* This coarse solver does not exist\n"
+        << "* This coarse solver is not (yet) supported by our interface\n"
+        << "* This coarse solver is not (yet) supported by MueLu.\n");
+
+      /**
+       * @brief The set of additional parameters to tune the preconditioner.
+       */
+      struct AdditionalData
+      {
+        /**
+         * @brief Constructor.
+         *
+         * By default, we pretend to work on elliptic problems with linear
+         * finite elements on a scalar equation.
+         *
+         * @param elliptic Optimize MueLu for elliptic problems.
+         * @param symmetric Assume for A to be symmetric.
+         * @param w_cycle Use W-cycle instead of V-cycle.
+         * @param aggregation_threshold Threshold for coarsening.
+         * @param smoother_sweeps Number of times to apply the smoother.
+         * @param smoother_overlap Overlap of smoother if run in parallel.
+         * @param output_details Print additional info to screen.
+         * @param smoother_type Determine the smoother to use.
+         * @param coarse_type Determine the coarse solver.
+         */
+        AdditionalData(const bool         elliptic              = true,
+                       const bool         symmetric             = true,
+                       const bool         w_cycle               = false,
+                       const double       aggregation_threshold = 1e-4,
+                       const int          smoother_sweeps       = 2,
+                       const int          smoother_overlap      = 0,
+                       const bool         output_details        = false,
+                       const std::string &smoother_type         = "Chebyshev",
+                       const std::string &coarse_type           = "KLU2");
+        /**
+         * @brief Optimize for elliptic problems.
+         *
+         * Determines what underlying multigrid algorithm should be used.
+         * For elliptic problems this would be smoothed aggregation
+         * and unsmoothed for non-elliptic problems.
+         */
+        bool elliptic;
+        /**
+         * @brief Assume A is symmetric.
+         *
+         * If A is symmetric the prolongation and restriction operators are
+         * transposes of each other.
+         */
+        bool symmetric;
+        /**
+         * @brief Use W cycle instead of V cycle.
+         *
+         * Use W-cycle instead of the default V-cycle.
+         */
+        bool w_cycle;
+        /**
+         * @brief Threshold for coarsening.
+         *
+         * This threshold tells the AMG setup how the coarsening should be
+         * performed. In MueLu all points that strongly couple with the
+         * tentative coarse-level point form one aggregate.
+         * The strong coupling is controlled by aggregation_threshold,
+         * meaning that all elements that are larger than aggregation_threshold
+         * times the diagonal element couple strongly.
+         */
+        double aggregation_threshold;
+        /**
+         * @brief Number of times pre- and post-smoothing are applied.
+         *
+         * For a Chebyshev smoother this determines the polynomial degree.
+         * Otherwise it determines how often the matrix-vector product of the
+         * smoother is applied.
+         */
+        int smoother_sweeps;
+        /**
+         * @brief Determine the overlap in the smoother when run in parallel.
+         */
+        int smoother_overlap;
+        /**
+         * @brief Print internal information details of MueLu to screen.
+         */
+        bool output_details;
+        /**
+         * @brief Determines which smoother to use for the AMG cycle
+         * The following possibilities are implemented in this interface.
+         * From Ifpack2:
+         * <ul>
+         * <li> "Jacobi" </li>
+         * <li> "l1 Jacobi" </li>
+         * <li> "Gauss Seidel" </li>
+         * <li> "l1 Gauss Seidel" </li>
+         * <li> "Symmetric Gauss Seidel" </li>
+         * <li> "Chebyshev" </li>
+         * <li> "ILU" </li>
+         * <li> "ILUT" </li>
+         * </ul>
+         */
+        std::string smoother_type;
+        /**
+         * @brief Type of smoother to use on the finer levels.
+         *
+         * The same settings as for the smoother type are possible with the
+         * addition of "KLU2" from Amesos2.
+         */
+        std::string coarse_type;
+      };
+
+      PreconditionAMGMueLu() = default;
+
+      /**
+       * @brief Full control interface for constructing a MueLu preconditioner.
+       *
+       * MueLu allows the construction of very complex Multigrid hierarchies,
+       * through a complex Teuchos::ParameterList.
+       * This function allows anyone familiar with MueLu to directly pass such a
+       * list to MueLu.
+       *
+       * If you want to learn more about constructing such hierarchies both
+       * the MueLu User Guide and Tutorial are highly recommended.
+       */
+      void
+      initialize(SparseMatrix<Number, MemorySpace> &A,
+                 Teuchos::ParameterList            &parameters);
+
+      /**
+       * @brief Simplified interface for constructing a MueLu preconditioner
+       *
+       * MueLu allows the construction of very complex Multigrid hierarchies,
+       * through a complex Teuchos::ParameterList.
+       *
+       * This function constructs such a list internally based on the given
+       * additional_data. However, if you want full control over the hierarchy,
+       * you should use the other initialize function.
+       */
+      void
+      initialize(SparseMatrix<Number, MemorySpace> &A,
+                 const AdditionalData &additional_data = AdditionalData());
+    };
+#    endif
+#  endif // DEAL_II_TRILINOS_WITH_IFPACK2
+  }      // namespace TpetraWrappers
 } // namespace LinearAlgebra
 
 
