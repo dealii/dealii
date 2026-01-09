@@ -127,6 +127,8 @@ export
       using boost::archive::text_iarchive;
       using boost::archive::text_oarchive;
 
+      using boost::archive::no_header;
+
       namespace iterators
       {
         using boost::archive::iterators::base64_from_binary;
