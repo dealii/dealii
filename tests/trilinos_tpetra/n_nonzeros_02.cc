@@ -45,7 +45,7 @@ test()
 
   // create an empty sparsity pattern
   LinearAlgebra::TpetraWrappers::SparsityPattern<MemorySpace::Default> sparsity;
-  sparsity.reinit(dof_handler.n_dofs(), dof_handler.n_dofs());
+  sparsity.reinit(dof_handler.n_dofs(), dof_handler.n_dofs(), 9);
   DoFTools::make_sparsity_pattern(dof_handler,
                                   coupling,
                                   sparsity,

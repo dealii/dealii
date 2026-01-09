@@ -40,7 +40,7 @@ test()
   TrilinosWrappers::MPI::Vector src(rows, MPI_COMM_WORLD),
     dst(rows, MPI_COMM_WORLD);
 
-  TrilinosWrappers::SparseMatrix mat(rows, rows, MPI_COMM_WORLD);
+  TrilinosWrappers::SparseMatrix mat(rows, rows, MPI_COMM_WORLD, 4 * n_procs);
   for (const auto &row : rows)
     {
       const unsigned int i = row;

@@ -43,8 +43,8 @@ test()
   local_owned.add_range(myid * 3, myid * 3 + 3);
 
   // Create sparsity patterns
-  TrilinosWrappers::SparsityPattern sp1(local_owned, MPI_COMM_WORLD),
-    sp2(local_owned, MPI_COMM_WORLD);
+  TrilinosWrappers::SparsityPattern sp1(local_owned, MPI_COMM_WORLD, 3);
+  TrilinosWrappers::SparsityPattern sp2(local_owned, MPI_COMM_WORLD, 3);
 
   for (unsigned int i = myid * 3; i < myid * 3 + 3; ++i)
     for (unsigned int j = 0; j < local_owned.size(); ++j)

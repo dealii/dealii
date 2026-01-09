@@ -62,8 +62,22 @@ void
 reinit_sparsity_pattern(const DoFHandler<dim, spacedim>   &dof_handler,
                         TrilinosWrappers::SparsityPattern &sparsity_pattern)
 {
+  std::vector<unsigned int> counter(dof_handler.n_dofs(), 0);
+
+  std::vector<types::global_dof_index> local_dof_indices;
+
+  for (const auto &cell : dof_handler.active_cell_iterators())
+    if (cell->is_locally_owned())
+      {
+        local_dof_indices.resize(cell->get_fe().n_dofs_per_cell());
+
+        for (const auto i : local_dof_indices)
+          counter[i]++;
+      }
+
   sparsity_pattern.reinit(dof_handler.locally_owned_dofs(),
-                          dof_handler.get_mpi_communicator());
+                          dof_handler.get_mpi_communicator(),
+                          *std::max_element(counter.begin(), counter.end()));
 }
 
 template <int dim,

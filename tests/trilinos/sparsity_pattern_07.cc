@@ -35,10 +35,8 @@ main(int argc, char **argv)
   IndexSet relevant_set(n);
   relevant_set.add_range(0, n);
   IndexSet                          empty_set;
-  TrilinosWrappers::SparsityPattern sparsity(owned_set,
-                                             empty_set,
-                                             relevant_set,
-                                             MPI_COMM_WORLD);
+  TrilinosWrappers::SparsityPattern sparsity(
+    owned_set, empty_set, relevant_set, MPI_COMM_WORLD, 0);
 
   deallog << "\nBefore compressing sparsity pattern..." << std::endl;
   sparsity.compress();

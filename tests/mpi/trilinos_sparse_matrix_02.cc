@@ -58,7 +58,8 @@ test()
 
   TrilinosWrappers::SparsityPattern sp(locally_owned,
                                        locally_owned,
-                                       MPI_COMM_WORLD);
+                                       MPI_COMM_WORLD,
+                                       2);
   if (my_id == 0)
     {
       sp.add(0, 0);

@@ -204,7 +204,8 @@ test()
   // reference
   TrilinosWrappers::SparseMatrix sparse_matrix;
   {
-    TrilinosWrappers::SparsityPattern csp(owned_set, MPI_COMM_WORLD);
+    TrilinosWrappers::SparsityPattern csp(
+      owned_set, MPI_COMM_WORLD, std::pow(2 * dof.get_fe().degree + 1, dim));
     DoFTools::make_sparsity_pattern(dof,
                                     csp,
                                     constraints,
