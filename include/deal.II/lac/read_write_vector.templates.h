@@ -250,7 +250,7 @@ namespace LinearAlgebra
                 dst[gi] = tmp[li];
             }
         }
-    };
+    }
   } // namespace internal
 
 
