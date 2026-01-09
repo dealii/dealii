@@ -456,7 +456,7 @@ namespace Step75
       {
         const auto &dof_handler = this->matrix_free.get_dof_handler();
 
-        IndexSet locally_relevant_dofs =
+        const IndexSet locally_relevant_dofs =
           DoFTools::extract_locally_relevant_dofs(dof_handler);
         DynamicSparsityPattern dsp(locally_relevant_dofs);
         DoFTools::make_sparsity_pattern(dof_handler, dsp, this->constraints);
