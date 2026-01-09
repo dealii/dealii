@@ -158,6 +158,13 @@ if(DEAL_II_WITH_TRILINOS)
       trilinos_tpetra_sparsity_pattern.cc
       trilinos_tpetra_vector.cc
     )
+
+    if(DEAL_II_TRILINOS_WITH_TPETRA_MUELU)
+      set(_separate_src
+        ${_separate_src}
+        trilinos_tpetra_precondition_muelu.cc
+      )
+    endif()
   endif()
 
   set(_inst

@@ -286,6 +286,44 @@ macro(feature_trilinos_find_external var)
       endif()
     endif()
 
+    if(TRILINOS_WITH_MUELU AND TRILINOS_WITH_TPETRA)
+      #
+      # Check if MueLu is actually usable.
+      #
+      list(APPEND CMAKE_REQUIRED_INCLUDES ${Trilinos_INCLUDE_DIRS})
+      list(APPEND CMAKE_REQUIRED_INCLUDES ${MPI_CXX_INCLUDE_PATH})
+
+      list(APPEND CMAKE_REQUIRED_LIBRARIES ${Trilinos_LIBRARIES} ${MPI_LIBRARIES})
+      list(APPEND CMAKE_REQUIRED_FLAGS ${TRILINOS_CXX_FLAGS})
+
+      CHECK_CXX_SOURCE_COMPILES(
+        "
+        #include <MueLu_CreateTpetraPreconditioner.hpp>
+        int
+        main()
+        {
+        Tpetra::CrsMatrix<>  *matrix;
+          const auto teuchos_wrapped_matrix = Teuchos::rcp(matrix, false);
+          Teuchos::ParameterList parameters;
+          Teuchos::RCP<Tpetra::Operator<>> op = teuchos_wrapped_matrix;
+         MueLu::CreateTpetraPreconditioner(op, parameters);
+          return 0;
+        }
+        "
+        DEAL_II_TRILINOS_WITH_TPETRA_MUELU
+      )
+
+      reset_cmake_required()
+
+      if(NOT DEAL_II_TRILINOS_WITH_TPETRA_MUELU)
+        message(
+          STATUS
+          "MueLu was found but is not usable through Tpetra! Disabling
+          MueLu support with Tpetra."
+        )
+      endif()
+    endif()
+
     if(TRILINOS_WITH_MUELU)
       #
       # Check if MueLu is actually usable.
@@ -317,7 +355,8 @@ macro(feature_trilinos_find_external var)
       if(NOT TRILINOS_MUELU_IS_FUNCTIONAL)
         message(
           STATUS
-          "MueLu was found but is not usable through Epetra! Disabling MueLu support."
+          "MueLu was found but is not usable through Epetra! Disabling
+          MueLu support with Epetra."
         )
         set(TRILINOS_WITH_MUELU OFF)
       endif()
