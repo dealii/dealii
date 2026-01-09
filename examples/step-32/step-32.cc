@@ -1758,7 +1758,8 @@ namespace Step32
     TrilinosWrappers::SparsityPattern sp(temperature_partitioner,
                                          temperature_partitioner,
                                          temperature_relevant_partitioner,
-                                         MPI_COMM_WORLD);
+                                         MPI_COMM_WORLD,
+                                         0);
     sp.copy_from(dsp);
 
     temperature_matrix.reinit(sp);
