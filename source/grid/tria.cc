@@ -3502,7 +3502,7 @@ namespace internal
       template <int structdim, int spacedim>
       static void
       process_subcelldata(
-        const CRS                              &crs,
+        const ArrayOfArrays                    &crs,
         TriaObjects                            &obj,
         const std::vector<CellData<structdim>> &boundary_objects_in,
         const std::vector<Point<spacedim>>     &vertex_locations)

@@ -36,24 +36,22 @@ namespace internal
   namespace TriangulationImplementation
   {
     /**
-     * Compressed row storage sparse matrix. This class is similar to
-     * SparsityPattern but reduced to the bare minimum as needed here - in the
-     * context of setting up the connectivity - and allowing direct simplified
-     * access to the entries.
+     * A class that represents a (compressed) array of arrays. It is used to
+     * store the cell-to-vertex, cell-to-face, etc. lists.
      */
-    struct CRS
+    struct ArrayOfArrays
     {
       /**
        * Default constructor.
        */
-      CRS()
+      ArrayOfArrays()
         : offsets{0} {};
 
       /**
        * Constructor which allows to set the internal fields directly.
        */
-      CRS(const std::vector<std::size_t>  &offsets,
-          const std::vector<unsigned int> &columns)
+      ArrayOfArrays(const std::vector<std::size_t>  &offsets,
+                    const std::vector<unsigned int> &columns)
         : offsets(offsets)
         , columns(columns)
       {}
@@ -156,7 +154,7 @@ namespace internal
         return quad_types;
       }
 
-      inline CRS &
+      inline ArrayOfArrays &
       entity_to_entities(const unsigned int from, const unsigned int to)
       {
         if (from == dim && to == dim)
@@ -175,7 +173,7 @@ namespace internal
         return cell_entities;
       }
 
-      inline const CRS &
+      inline const ArrayOfArrays &
       entity_to_entities(const unsigned int from, const unsigned int to) const
       {
         if (from == dim && to == dim)
@@ -198,17 +196,17 @@ namespace internal
       const unsigned int         dim;
       std::vector<ReferenceCell> cell_types;
 
-      CRS line_vertices;
+      ArrayOfArrays line_vertices;
 
       TriaObjectsOrientations line_orientation;
 
-      CRS quad_vertices;
-      CRS quad_lines;
+      ArrayOfArrays quad_vertices;
+      ArrayOfArrays quad_lines;
 
       TriaObjectsOrientations quad_orientation;
 
-      CRS cell_entities;
-      CRS neighbors;
+      ArrayOfArrays cell_entities;
+      ArrayOfArrays neighbors;
 
       std::vector<ReferenceCell> quad_types;
     };
@@ -223,7 +221,7 @@ namespace internal
      *   index of the neighboring cell or -1 for boundary face)
      */
     void
-    determine_neighbors(const CRS &con_cf, CRS &con_cc)
+    determine_neighbors(const ArrayOfArrays &con_cf, ArrayOfArrays &con_cc)
     {
       const auto &columns_cf = con_cf.columns;
       const auto &offsets_cf = con_cf.offsets;
@@ -283,9 +281,9 @@ namespace internal
     build_face_entities_templated(
       const unsigned int                face_dimensionality,
       const std::vector<ReferenceCell> &cell_types,
-      const CRS                        &crs,
-      CRS                              &crs_d,        // result
-      CRS                              &crs_0,        // result
+      const ArrayOfArrays              &crs,
+      ArrayOfArrays                    &crs_d,        // result
+      ArrayOfArrays                    &crs_0,        // result
       TriaObjectsOrientations          &orientations, // result
       const FU                         &second_key_function)
     {
@@ -515,9 +513,9 @@ namespace internal
     void
     build_face_entities(const unsigned int                face_dimensionality,
                         const std::vector<ReferenceCell> &cell_types,
-                        const CRS                        &crs,
-                        CRS                              &crs_d,
-                        CRS                              &crs_0,
+                        const ArrayOfArrays              &crs,
+                        ArrayOfArrays                    &crs_d,
+                        ArrayOfArrays                    &crs_0,
                         TriaObjectsOrientations          &orientations,
                         const FU                         &second_key_function)
     {
@@ -577,13 +575,13 @@ namespace internal
      */
     inline void
     build_intersection(const std::vector<ReferenceCell> &cell_types,
-                       const CRS                        &con_cv,
-                       const CRS                        &con_cl,
-                       const CRS                        &con_lv,
-                       const CRS                        &con_cq,
-                       const CRS                        &con_qv,
+                       const ArrayOfArrays              &con_cv,
+                       const ArrayOfArrays              &con_cl,
+                       const ArrayOfArrays              &con_lv,
+                       const ArrayOfArrays              &con_cq,
+                       const ArrayOfArrays              &con_qv,
                        const TriaObjectsOrientations    &ori_cq,
-                       CRS                              &con_ql,   // result
+                       ArrayOfArrays                    &con_ql,   // result
                        TriaObjectsOrientations          &ori_ql,   // result
                        std::vector<ReferenceCell>       &quad_t_id // result
     )
@@ -688,11 +686,11 @@ namespace internal
     Connectivity
     build_connectivity(const unsigned int                dim,
                        const std::vector<ReferenceCell> &cell_types,
-                       const CRS                        &con_cv)
+                       const ArrayOfArrays              &con_cv)
     {
       Connectivity connectivity(dim, cell_types);
 
-      CRS temp1; // needed for 3d
+      ArrayOfArrays temp1; // needed for 3d
 
       if (dim == 1)
         connectivity.entity_to_entities(1, 0) = con_cv;
