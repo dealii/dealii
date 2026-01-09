@@ -27,6 +27,7 @@
 #  include <deal.II/base/index_set.h>
 #  include <deal.II/base/mpi_stub.h>
 
+#  include <deal.II/lac/dynamic_sparsity_pattern.h>
 #  include <deal.II/lac/exceptions.h>
 #  include <deal.II/lac/sparsity_pattern_base.h>
 
@@ -41,8 +42,6 @@ DEAL_II_NAMESPACE_OPEN
 
 // forward declarations
 #  ifndef DOXYGEN
-class DynamicSparsityPattern;
-
 namespace LinearAlgebra
 {
   namespace TpetraWrappers
@@ -1003,6 +1002,13 @@ namespace LinearAlgebra
        */
       Teuchos::RCP<TpetraTypes::GraphType<MemorySpace>> nonlocal_graph;
 
+      /**
+       * Before compress() is called, the sparsity pattern is stored in a
+       * DynamicSparsityPattern object if no guess for the number of elements
+       * per row is provided.
+       */
+      DynamicSparsityPattern dsp;
+
       // TODO: currently only for double
       friend class SparseMatrix<double, MemorySpace>;
       friend class SparsityPatternIterators::Accessor<MemorySpace>;
@@ -1239,6 +1245,10 @@ namespace LinearAlgebra
     inline bool
     SparsityPattern<MemorySpace>::in_local_range(const size_type index) const
     {
+      Assert(
+        is_compressed(),
+        ExcMessage(
+          "The sparsity pattern must be compressed before calling this function!"));
       const TrilinosWrappers::types::int_type begin =
         graph->getRowMap()->getMinGlobalIndex();
       const TrilinosWrappers::types::int_type end =
@@ -1283,10 +1293,16 @@ namespace LinearAlgebra
     SparsityPattern<MemorySpace>::add_entries(const size_type row,
                                               ForwardIterator begin,
                                               ForwardIterator end,
-                                              const bool /*indices_are_sorted*/)
+                                              const bool indices_are_sorted)
     {
       if (begin == end)
         return;
+
+      if (dsp.n_rows() > 0)
+        {
+          dsp.add_entries(row, begin, end, indices_are_sorted);
+          return;
+        }
 
       // verify that the size of the data type Trilinos expects matches that the
       // iterator points to. we allow for some slippage between signed and
@@ -1354,6 +1370,10 @@ namespace LinearAlgebra
     inline IndexSet
     SparsityPattern<MemorySpace>::locally_owned_domain_indices() const
     {
+      Assert(
+        is_compressed(),
+        ExcMessage(
+          "The sparsity pattern must be compressed before calling this function!"));
       return IndexSet(graph->getDomainMap().getConst());
     }
 
@@ -1363,6 +1383,10 @@ namespace LinearAlgebra
     inline IndexSet
     SparsityPattern<MemorySpace>::locally_owned_range_indices() const
     {
+      Assert(
+        is_compressed(),
+        ExcMessage(
+          "The sparsity pattern must be compressed before calling this function!"));
       return IndexSet(graph->getRangeMap().getConst());
     }
 
