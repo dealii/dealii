@@ -1,0 +1,21 @@
+
+DEAL:04225:Chebyshev::Solver stopped within 0 - 1 iterations
+DEAL:04225:SGS::Solver stopped within 5 - 15 iterations
+DEAL:04225:Measles::Error: 
+    You tried to select the smoother type <Measles>
+but this is not supported by our interface
+due to one of the following reasons:
+* This smoother does not exist
+* This smoother is not (yet) supported by our interface
+* This smoother is not (yet) supported by MueLu.
+
+DEAL:16641:Chebyshev::Solver stopped within 0 - 1 iterations
+DEAL:16641:SGS::Solver stopped within 5 - 15 iterations
+DEAL:16641:Measles::Error: 
+    You tried to select the smoother type <Measles>
+but this is not supported by our interface
+due to one of the following reasons:
+* This smoother does not exist
+* This smoother is not (yet) supported by our interface
+* This smoother is not (yet) supported by MueLu.
+
