@@ -57,6 +57,16 @@ namespace internal
       {}
 
       /**
+       * Constructor which allows to set the internal fields directly by
+       * moving data from the given arguments.
+       */
+      ArrayOfArrays(std::vector<std::size_t>  &&offsets,
+                    std::vector<unsigned int> &&columns)
+        : offsets(std::move(offsets))
+        , columns(std::move(columns))
+      {}
+
+      /**
        * Return the number of (inner) arrays stored by this object.
        */
       unsigned int
@@ -868,7 +878,8 @@ namespace internal
       // do the actual work
       return build_connectivity(dim,
                                 cell_types,
-                                {cell_vertices_offsets, cell_vertices});
+                                {std::move(cell_vertices_offsets),
+                                 std::move(cell_vertices)});
     }
   } // namespace TriangulationImplementation
 } // namespace internal
