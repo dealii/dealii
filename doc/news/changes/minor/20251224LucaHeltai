@@ -1,0 +1,5 @@
+New: The new function VTKWrappers::read_all_data() loads a VTK unstructured
+grid file (optionally cleaning overlapping points) and concatenates every point
+and cell data array it finds into the provided output vector.
+<br>
+(Luca Heltai, 2025/12/24)
