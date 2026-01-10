@@ -283,11 +283,30 @@ namespace LinearAlgebra
     template <typename Number, typename MemorySpace>
     void
     Vector<Number, MemorySpace>::reinit(const Vector<Number, MemorySpace> &V,
-                                        const bool omit_zeroing_entries)
+                                        const bool omit_zeroing_entries,
+                                        const bool allow_different_maps)
     {
-      reinit(V.locally_owned_elements(),
-             V.get_mpi_communicator(),
-             omit_zeroing_entries);
+      if (allow_different_maps)
+        {
+          Assert(omit_zeroing_entries == false,
+                 ExcMessage(
+                   "It is not possible to exchange data with the "
+                   "option 'omit_zeroing_entries' set, which would not write "
+                   "elements."));
+
+          AssertThrow(size() == V.size(),
+                      ExcDimensionMismatch(size(), V.size()));
+
+          TpetraTypes::ImportType<MemorySpace> data_exchange(
+            vector->getMap(), V.vector->getMap());
+          vector->doImport(*V.vector, data_exchange, Tpetra::INSERT);
+        }
+      else
+        {
+          reinit(V.locally_owned_elements(),
+                 V.get_mpi_communicator(),
+                 omit_zeroing_entries);
+        }
     }
 
 
@@ -430,14 +449,10 @@ namespace LinearAlgebra
     Vector<Number, MemorySpace> &
     Vector<Number, MemorySpace>::operator=(const dealii::Vector<OtherNumber> &V)
     {
-      static_assert(
-        std::is_same<Number, OtherNumber>::value,
-        "TpetraWrappers::Vector and dealii::Vector must use the same number type here.");
-
       vector.reset();
       nonlocal_vector.reset();
 
-      Teuchos::Array<OtherNumber> vector_data(V.begin(), V.end());
+      Teuchos::Array<Number> vector_data(V.begin(), V.end());
       vector = Utilities::Trilinos::internal::make_rcp<
         TpetraTypes::VectorType<Number, MemorySpace>>(
         V.locally_owned_elements()
@@ -456,17 +471,10 @@ namespace LinearAlgebra
     Vector<Number, MemorySpace> &
     Vector<Number, MemorySpace>::operator=(const Number s)
     {
-      Assert(s == Number(0.0),
-             ExcMessage("Only 0 can be assigned to a vector."));
-
-      // As checked above, we are only allowed to use d==0.0, so pass
-      // a constant zero (instead of a run-time value 'd' that *happens* to
-      // have a zero value) to the underlying class in hopes that the compiler
-      // can optimize this somehow.
-      vector->putScalar(/*s=*/0.0);
-
-      if (!nonlocal_vector.is_null())
-        nonlocal_vector->putScalar(/*s=*/0.0);
+      AssertIsFinite(s);
+      vector->putScalar(s);
+      if (nonlocal_vector.get() != nullptr)
+        nonlocal_vector->putScalar(0.);
 
       return *this;
     }

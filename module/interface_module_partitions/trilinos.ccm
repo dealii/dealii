@@ -122,6 +122,7 @@ module;
 #    include <Tpetra_Vector_decl.hpp>
 #    include <Tpetra_Vector_fwd.hpp>
 #    include <Tpetra_Version.hpp>
+#    include <Tpetra_computeRowAndColumnOneNorms.hpp>
 
 #    ifdef DEAL_II_TRILINOS_WITH_AMESOS2
 #      include <Amesos2.hpp>
@@ -233,6 +234,8 @@ export
       using ::Tpetra::KokkosCompat::KokkosDeviceWrapperNode;
     }
     using ::Tpetra::CombineMode;
+    using ::Tpetra::computeRowAndColumnOneNorms;
+    using ::Tpetra::computeRowOneNorms;
     using ::Tpetra::createExport;
     using ::Tpetra::createImport;
     using ::Tpetra::CrsGraph;
@@ -370,6 +373,7 @@ export
     using ::Teuchos::NO_TRANS;
     using ::Teuchos::null;
     using ::Teuchos::OrdinalTraits;
+    using ::Teuchos::outArg;
     using ::Teuchos::ParameterList;
     using ::Teuchos::rcp;
     using ::Teuchos::RCP;
@@ -377,6 +381,7 @@ export
     using ::Teuchos::rcp_dynamic_cast;
     using ::Teuchos::rcpFromRef;
     using ::Teuchos::rcpFromUndefRef;
+    using ::Teuchos::reduceAll;
     using ::Teuchos::ScalarTraits;
     using ::Teuchos::SerialDenseMatrix;
     using ::Teuchos::TRANS;

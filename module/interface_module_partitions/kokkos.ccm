@@ -68,6 +68,7 @@ export
     using ::Kokkos::DualView;
     using ::Kokkos::fence;
     using ::Kokkos::finalize;
+    using ::Kokkos::max;
     using ::Kokkos::MemoryTraits;
 #if DEAL_II_KOKKOS_VERSION_GTE(4, 0, 0)
     using ::Kokkos::fmax;
