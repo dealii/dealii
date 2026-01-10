@@ -57,6 +57,26 @@ namespace internal
       {}
 
       /**
+       * Return the number of (inner) arrays stored by this object.
+       */
+      unsigned int
+      size() const
+      {
+        return offsets.size() - 1;
+      }
+
+      /**
+       * Return a view of the `i`th array stored by this object.
+       */
+      ArrayView<const unsigned int>
+      operator[](const unsigned int i) const
+      {
+        AssertIndexRange(i, offsets.size() - 1);
+        return ArrayView<const unsigned int>(&columns[offsets[i]],
+                                             offsets[i + 1] - offsets[i]);
+      }
+
+      /**
        * For each row in the CRS, store the corresponding offsets in the
        * 'elements' array.
        */
