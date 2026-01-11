@@ -1,11 +1,19 @@
 // ------------------------------------------------------------------------
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2026 by the deal.II authors
+//
+// This file is part of the deal.II library.
+//
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
 // ------------------------------------------------------------------------
 
-// @tstmpi_numprocs 4
-// @tstrequires TRILINOS
+// This test verifies that DataOut correctly handles both DoF data and
+// cell data when locally owned DoFs are intentionally made non-contiguous.
 
 #include <deal.II/base/index_set.h>
 #include <deal.II/base/mpi.h>
@@ -21,6 +29,8 @@
 #include <deal.II/lac/trilinos_vector.h>
 
 #include <deal.II/numerics/data_out.h>
+
+#include <algorithm>
 
 #include "../tests.h"
 
@@ -42,12 +52,10 @@ force_noncontiguous_locally_owned_dofs(DoFHandler<dim> &dof_handler,
     Utilities::MPI::all_gather(comm, local_n);
 
   // number of ranks that have at least (k+1) locally owned DoFs
-  auto active_ranks_at = [&](const types::global_dof_index k) {
-    types::global_dof_index a = 0;
-    for (unsigned int r = 0; r < n_ranks; ++r)
-      if (counts[r] > k)
-        ++a;
-    return a;
+  auto active_ranks_at =
+    [&](const types::global_dof_index k) -> types::global_dof_index {
+    return static_cast<types::global_dof_index>(std::count_if(
+      counts.begin(), counts.end(), [k](const auto c) { return c > k; }));
   };
 
   // Enumerate locally owned DoFs in ascending order, assign each
@@ -63,10 +71,11 @@ force_noncontiguous_locally_owned_dofs(DoFHandler<dim> &dof_handler,
         base += active_ranks_at(kk);
 
       // Within this k-level, how many ranks < my_rank participate?
-      types::global_dof_index offset = 0;
-      for (unsigned int r = 0; r < my_rank; ++r)
-        if (counts[r] > k)
-          ++offset;
+      const types::global_dof_index offset =
+        static_cast<types::global_dof_index>(
+          std::count_if(counts.begin(),
+                        counts.begin() + my_rank,
+                        [k](const auto c) { return c > k; }));
 
       const types::global_dof_index new_i = base + offset;
 

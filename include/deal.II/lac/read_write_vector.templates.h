@@ -220,17 +220,13 @@ namespace LinearAlgebra
           const types::global_dof_index b1 = b0 + bi.block_size(b);
 
           // Build the subset of dst's stored indices that lie in this block,
-          // block-local numbering.
-          IndexSet block_local(bi.block_size(b));
-          for (const auto gi : stored)
-            if (gi >= b0 && gi < b1)
-              block_local.add_index(gi - b0);
+          // block-local numbering
+          const IndexSet block_local = stored.get_view(b0, b1);
 
           if (block_local.n_elements() == 0)
             continue;
 
-          ReadWriteVector<Number> tmp;
-          tmp.reinit(block_local);
+          ReadWriteVector<Number> tmp(block_local);
 
           // Per-block import: relies on existing import_elements() overloads
           tmp.import_elements(src.block(b), operation);
@@ -240,14 +236,16 @@ namespace LinearAlgebra
             {
               const auto gi = b0 + li;
 
-              if (operation == VectorOperation::add)
+              if (operation == VectorOperation::insert)
+                dst[gi] = tmp[li];
+              else if (operation == VectorOperation::add)
                 dst[gi] += tmp[li];
               else if (operation == VectorOperation::min)
                 dst[gi] = get_min(dst[gi], tmp[li]);
               else if (operation == VectorOperation::max)
                 dst[gi] = get_max(dst[gi], tmp[li]);
-              else // insert
-                dst[gi] = tmp[li];
+              else
+                DEAL_II_NOT_IMPLEMENTED();
             }
         }
     }

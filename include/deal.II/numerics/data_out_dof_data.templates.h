@@ -22,6 +22,7 @@
 #include <deal.II/base/numbers.h>
 #include <deal.II/base/quadrature_lib.h>
 #include <deal.II/base/signaling_nan.h>
+#include <deal.II/base/template_constraints.h>
 #include <deal.II/base/work_stream.h>
 
 #include <deal.II/dofs/dof_accessor.h>
@@ -791,62 +792,17 @@ namespace internal
 
     namespace CreateVectors
     {
-      template <class...>
-      using void_t = void;
-
-      template <typename Dst, typename Src, typename = void>
-      struct has_import_elements : std::false_type
-      {};
+      // Detect whether `Dst::import_elements(src, VectorOperation::insert)` is
+      // a valid expression (whether this overload exists)
+      template <typename Dst, typename Src>
+      using import_elements_insert_op =
+        decltype(std::declval<Dst &>().import_elements(
+          std::declval<const Src &>(),
+          dealii::VectorOperation::insert));
 
       template <typename Dst, typename Src>
-      struct has_import_elements<
-        Dst,
-        Src,
-        void_t<decltype(std::declval<Dst &>().import_elements(
-          std::declval<const Src &>(),
-          VectorOperation::insert))>> : std::true_type
-      {};
-
-
-      template <typename T>
-      struct is_distributed_vector : std::false_type
-      {};
-
-      template <typename Number, typename MemorySpace>
-      struct is_distributed_vector<
-        dealii::LinearAlgebra::distributed::Vector<Number, MemorySpace>>
-        : std::true_type
-      {};
-
-      template <typename Number, typename MemorySpace>
-      struct is_distributed_vector<
-        dealii::LinearAlgebra::distributed::BlockVector<Number, MemorySpace>>
-        : std::true_type
-      {};
-
-#ifdef DEAL_II_WITH_PETSC
-      template <>
-      struct is_distributed_vector<dealii::PETScWrappers::MPI::Vector>
-        : std::true_type
-      {};
-
-      template <>
-      struct is_distributed_vector<dealii::PETScWrappers::MPI::BlockVector>
-        : std::true_type
-      {};
-#endif
-
-#ifdef DEAL_II_WITH_TRILINOS
-      template <>
-      struct is_distributed_vector<dealii::TrilinosWrappers::MPI::Vector>
-        : std::true_type
-      {};
-
-      template <>
-      struct is_distributed_vector<dealii::TrilinosWrappers::MPI::BlockVector>
-        : std::true_type
-      {};
-#endif
+      inline constexpr bool has_import_elements_v =
+        internal::is_supported_operation<import_elements_insert_op, Dst, Src>;
 
       template <class T>
       struct is_trilinos_vector : std::false_type
@@ -867,15 +823,15 @@ namespace internal
       inline constexpr bool is_trilinos_vector_v =
         is_trilinos_vector<std::decay_t<T>>::value;
 
-      template <typename DstNumber, typename SrcVector>
+      template <typename DstNumberType, typename SrcVectorType>
       inline void
-      import_into(dealii::LinearAlgebra::ReadWriteVector<DstNumber> &dst,
-                  const SrcVector                                   &src)
+      import_into(dealii::LinearAlgebra::ReadWriteVector<DstNumberType> &dst,
+                  const SrcVectorType                                   &src)
       {
-        using Src      = std::decay_t<SrcVector>;
-        using SrcValue = typename Src::value_type;
+        using SrcType      = std::decay_t<SrcVectorType>;
+        using SrcValueType = typename SrcType::value_type;
 
-        if constexpr (is_trilinos_vector_v<Src>)
+        if constexpr (is_trilinos_vector_v<SrcType>)
           {
             if (src.has_ghost_elements())
               {
@@ -883,45 +839,46 @@ namespace internal
                 // locally, so we can just read them directly without
                 // communication.
                 for (const auto i : dst.get_stored_elements())
-                  dst[i] = static_cast<DstNumber>(src(i));
+                  dst[i] = static_cast<DstNumberType>(src(i));
 
                 return;
               }
           }
 
-        if constexpr (std::is_same_v<SrcValue, DstNumber> &&
-                      has_import_elements<
-                        dealii::LinearAlgebra::ReadWriteVector<DstNumber>,
-                        Src>::value)
+        if constexpr (std::is_same_v<SrcValueType, DstNumberType> &&
+                      has_import_elements_v<
+                        dealii::LinearAlgebra::ReadWriteVector<DstNumberType>,
+                        SrcType>)
           {
             // Fast path: exact type match and import_elements exists
             dst.import_elements(src, dealii::VectorOperation::insert);
           }
-        else if constexpr (has_import_elements<
-                             dealii::LinearAlgebra::ReadWriteVector<SrcValue>,
-                             Src>::value)
+        else if constexpr (has_import_elements_v<
+                             dealii::LinearAlgebra::ReadWriteVector<
+                               SrcValueType>,
+                             SrcType>)
           {
             // Safe path for parallel vectors with conversion:
-            // import into RWV<SrcValue> then cast into dst.
-            dealii::LinearAlgebra::ReadWriteVector<SrcValue> tmp(
+            // import into RWV<SrcValueType> then cast into dst.
+            dealii::LinearAlgebra::ReadWriteVector<SrcValueType> tmp(
               dst.get_stored_elements());
             tmp.import_elements(src, dealii::VectorOperation::insert);
 
             // tmp and dst have same IndexSet, so loop is local-only.
             for (const auto i : dst.get_stored_elements())
-              dst[i] = static_cast<DstNumber>(tmp[i]);
+              dst[i] = static_cast<DstNumberType>(tmp[i]);
           }
         else
           {
             // Serial-only fallback: requires global read access
             static_assert(
-              !is_distributed_vector<SrcVector>::value,
+              !dealii::concepts::internal::is_distributed_vector_type<SrcType>,
               "Fallback import path reached for a distributed vector. "
               "This is possibly a bug: distributed vectors should use "
               "ReadWriteVector::import_elements() logic.");
 
             for (const auto i : dst.get_stored_elements())
-              dst[i] = static_cast<DstNumber>(src(i));
+              dst[i] = static_cast<DstNumberType>(src(i));
           }
       }
 
@@ -959,9 +916,7 @@ namespace internal
       create_cell_vector(const VectorType                       &src,
                          LinearAlgebra::ReadWriteVector<Number> &dst)
       {
-        IndexSet stored(src.size());
-        stored.add_range(0, src.size());
-        stored.compress();
+        const IndexSet stored = complete_index_set(src.size());
 
         dst.reinit(stored);
         import_into(dst, src);

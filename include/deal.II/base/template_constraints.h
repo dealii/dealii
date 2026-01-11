@@ -937,6 +937,51 @@ namespace parallel
 
 namespace concepts
 {
+  namespace internal
+  {
+    /**
+     * CHeck whether a type represents an MPI-distributed vector whose element
+     * access may require communication.
+     *
+     * This trait explicitly enumerates known distributed vector types from
+     * deal.II, Trilinos, and PETSc.
+     */
+    template <class T>
+    inline constexpr bool is_distributed_vector_type = false;
+
+    // ---- deal.II LA distributed vectors ----
+    template <typename Number, typename MemorySpace>
+    inline constexpr bool is_distributed_vector_type<
+      dealii::LinearAlgebra::distributed::Vector<Number, MemorySpace>> = true;
+
+    template <typename Number, typename MemorySpace>
+    inline constexpr bool is_distributed_vector_type<
+      dealii::LinearAlgebra::distributed::BlockVector<Number, MemorySpace>> =
+      true;
+
+#ifdef DEAL_II_WITH_TRILINOS
+    template <>
+    inline constexpr bool
+      is_distributed_vector_type<dealii::TrilinosWrappers::MPI::Vector> = true;
+
+    template <>
+    inline constexpr bool
+      is_distributed_vector_type<dealii::TrilinosWrappers::MPI::BlockVector> =
+        true;
+#endif
+
+#ifdef DEAL_II_WITH_PETSC
+    template <>
+    inline constexpr bool
+      is_distributed_vector_type<dealii::PETScWrappers::MPI::Vector> = true;
+
+    template <>
+    inline constexpr bool
+      is_distributed_vector_type<dealii::PETScWrappers::MPI::BlockVector> =
+        true;
+#endif
+  } // namespace internal
+
 #if defined(DEAL_II_HAVE_CXX20) || defined(DOXYGEN)
   namespace internal
   {
