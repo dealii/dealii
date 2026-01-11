@@ -468,14 +468,16 @@ macro(feature_trilinos_configure_external)
   # Figure out all the possible instantiations we need:
   #
 
-  set(DEAL_II_EXPAND_TRILINOS_SPARSITY_PATTERN "TrilinosWrappers::SparsityPattern")
-  set(DEAL_II_EXPAND_TRILINOS_BLOCK_SPARSITY_PATTERN "TrilinosWrappers::BlockSparsityPattern")
-  set(DEAL_II_EXPAND_TRILINOS_SPARSE_MATRICES "TrilinosWrappers::SparseMatrix" "TrilinosWrappers::BlockSparseMatrix")
-  set(DEAL_II_EXPAND_TRILINOS_MPI_BLOCKVECTOR "TrilinosWrappers::MPI::BlockVector")
-  set(DEAL_II_EXPAND_TRILINOS_MPI_VECTOR "TrilinosWrappers::MPI::Vector")
+  if(NOT DEAL_II_TRILINOS_WITH_TPETRA)
+    set(DEAL_II_EXPAND_TRILINOS_SPARSITY_PATTERN "TrilinosWrappers::SparsityPattern")
+    set(DEAL_II_EXPAND_TRILINOS_BLOCK_SPARSITY_PATTERN "TrilinosWrappers::BlockSparsityPattern")
+    set(DEAL_II_EXPAND_TRILINOS_SPARSE_MATRICES "TrilinosWrappers::SparseMatrix" "TrilinosWrappers::BlockSparseMatrix")
+    set(DEAL_II_EXPAND_TRILINOS_MPI_BLOCKVECTOR "TrilinosWrappers::MPI::BlockVector")
+    set(DEAL_II_EXPAND_TRILINOS_MPI_VECTOR "TrilinosWrappers::MPI::Vector")
+  endif()
   set(DEAL_II_EXPAND_EPETRA_VECTOR "LinearAlgebra::EpetraWrappers::Vector")
 
-  if(${DEAL_II_TRILINOS_WITH_TPETRA})
+  if(DEAL_II_TRILINOS_WITH_TPETRA)
     if(DEAL_II_TRILINOS_WITH_TPETRA_INST_DOUBLE)
       set(DEAL_II_EXPAND_TPETRA_TYPES "double")
       set(DEAL_II_EXPAND_TPETRA_VECTOR_DOUBLE

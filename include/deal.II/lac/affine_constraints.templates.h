@@ -2635,6 +2635,7 @@ namespace internal
   // this is an operation that is different for all vector types and so we
   // need a few overloads
 #ifdef DEAL_II_WITH_TRILINOS
+#  ifndef DEAL_II_TRILINOS_WITH_TPETRA
   inline void
   import_vector_with_ghost_elements(
     const TrilinosWrappers::MPI::Vector &vec,
@@ -2644,22 +2645,18 @@ namespace internal
     const std::bool_constant<false> /*is_block_vector*/)
   {
     Assert(!vec.has_ghost_elements(), ExcGhostsPresent());
-#  ifdef DEAL_II_WITH_MPI
+#    ifdef DEAL_II_WITH_MPI
     const Epetra_MpiComm *mpi_comm =
       dynamic_cast<const Epetra_MpiComm *>(&vec.trilinos_vector().Comm());
 
     Assert(mpi_comm != nullptr, ExcInternalError());
     output.reinit(needed_elements, mpi_comm->GetMpiComm());
-#  else
+#    else
     output.reinit(needed_elements, MPI_COMM_SELF);
-#  endif
+#    endif
     output = vec;
   }
-#endif
-
-
-
-#ifdef DEAL_II_TRILINOS_WITH_TPETRA
+#  else
   template <typename Number, typename MemorySpace>
   inline void
   import_vector_with_ghost_elements(
@@ -2680,8 +2677,8 @@ namespace internal
 
     output = vec;
   }
-#endif // DEAL_II_TRILINOS_WITH_TPETRA
-
+#  endif // DEAL_II_TRILINOS_WITH_TPETRA
+#endif
 
 
 #ifdef DEAL_II_WITH_PETSC

@@ -143,6 +143,8 @@ Vector<Number>::Vector(const PETScWrappers::VectorBase &v)
 
 #ifdef DEAL_II_WITH_TRILINOS
 
+#  ifndef DEAL_II_TRILINOS_WITH_TPETRA
+
 template <typename Number>
 Vector<Number>::Vector(const TrilinosWrappers::MPI::Vector &v)
   : values(v.size())
@@ -177,10 +179,7 @@ Vector<Number>::Vector(const TrilinosWrappers::MPI::Vector &v)
     }
 }
 
-#endif
-
-
-#ifdef DEAL_II_TRILINOS_WITH_TPETRA
+#  else
 
 template <typename Number>
 template <typename OtherNumber, typename MemorySpace>
@@ -188,10 +187,6 @@ Vector<Number>::Vector(
   const LinearAlgebra::TpetraWrappers::Vector<OtherNumber, MemorySpace> &v)
   : values(v.size())
 {
-  static_assert(
-    std::is_same<Number, OtherNumber>::value,
-    "TpetraWrappers::Vector and dealii::Vector must use the same number type here.");
-
   if (size() != 0)
     {
       // Copy the distributed vector to
@@ -214,15 +209,15 @@ Vector<Number>::Vector(
       localized_vector.doImport(v.trilinos_vector(), *importer, Tpetra::INSERT);
 
       // get a kokkos view from the localized_vector
-#  if DEAL_II_TRILINOS_VERSION_GTE(13, 2, 0)
+#    if DEAL_II_TRILINOS_VERSION_GTE(13, 2, 0)
       auto localized_vector_2d =
         localized_vector.template getLocalView<Kokkos::HostSpace>(
           Tpetra::Access::ReadOnlyStruct{});
-#  else
+#    else
       localized_vector.template sync<Kokkos::HostSpace>();
       auto localized_vector_2d =
         localized_vector.template getLocalView<Kokkos::HostSpace>();
-#  endif
+#    endif
       auto localized_vector_1d =
         Kokkos::subview(localized_vector_2d, Kokkos::ALL(), 0);
       const size_t local_length = localized_vector.getLocalLength();
@@ -235,8 +230,8 @@ Vector<Number>::Vector(
     }
 }
 
+#  endif
 #endif
-
 
 template <typename Number>
 inline Vector<Number> &
@@ -827,6 +822,7 @@ Vector<Number>::operator=(const PETScWrappers::VectorBase &v)
 
 
 #ifdef DEAL_II_WITH_TRILINOS
+#  ifndef DEAL_II_TRILINOS_WITH_TPETRA
 
 template <typename Number>
 Vector<Number> &
@@ -864,11 +860,7 @@ Vector<Number>::operator=(const TrilinosWrappers::MPI::Vector &v)
   return *this;
 }
 
-#endif
-
-
-
-#ifdef DEAL_II_TRILINOS_WITH_TPETRA
+#  else
 
 template <typename Number>
 template <typename OtherNumber, typename MemorySpace>
@@ -876,10 +868,6 @@ Vector<Number> &
 Vector<Number>::operator=(
   const LinearAlgebra::TpetraWrappers::Vector<OtherNumber, MemorySpace> &v)
 {
-  static_assert(
-    std::is_same<Number, OtherNumber>::value,
-    "TpetraWrappers::Vector and dealii::Vector must use the same number type here.");
-
   if (v.size() != size())
     reinit(v.size(), true);
 
@@ -905,15 +893,15 @@ Vector<Number>::operator=(
       localized_vector.doImport(v.trilinos_vector(), *importer, Tpetra::INSERT);
 
       // get a kokkos view from the localized_vector
-#  if DEAL_II_TRILINOS_VERSION_GTE(13, 2, 0)
+#    if DEAL_II_TRILINOS_VERSION_GTE(13, 2, 0)
       auto localized_vector_2d =
         localized_vector.template getLocalView<Kokkos::HostSpace>(
           Tpetra::Access::ReadOnlyStruct{});
-#  else
+#    else
       localized_vector.template sync<Kokkos::HostSpace>();
       auto localized_vector_2d =
         localized_vector.template getLocalView<Kokkos::HostSpace>();
-#  endif
+#    endif
       auto localized_vector_1d =
         Kokkos::subview(localized_vector_2d, Kokkos::ALL(), 0);
       const size_t local_length = localized_vector.getLocalLength();
@@ -928,8 +916,8 @@ Vector<Number>::operator=(
   return *this;
 }
 
+#  endif
 #endif
-
 
 
 template <typename Number>

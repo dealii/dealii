@@ -23,6 +23,7 @@
 #include <deal.II/lac/block_indices.h>
 #include <deal.II/lac/block_vector_base.h>
 #include <deal.II/lac/la_parallel_vector.h>
+#include <deal.II/lac/trilinos_tpetra_to_trilinos_wrappers.h>
 #include <deal.II/lac/vector_operation.h>
 #include <deal.II/lac/vector_type_traits.h>
 
@@ -42,16 +43,6 @@ namespace PETScWrappers
     class BlockVector;
   }
 } // namespace PETScWrappers
-#  endif
-
-#  ifdef DEAL_II_WITH_TRILINOS
-namespace TrilinosWrappers
-{
-  namespace MPI
-  {
-    class BlockVector;
-  }
-} // namespace TrilinosWrappers
 #  endif
 #endif
 

@@ -119,24 +119,24 @@ dealii::AffineConstraints<double>::distribute<
 #endif
 
 #ifdef DEAL_II_WITH_TRILINOS
-INSTANTIATE_DLTG_VECTOR(TrilinosWrappers::MPI::Vector);
+// INSTANTIATE_DLTG_VECTOR(TrilinosWrappers::MPI::Vector);
 
 INSTANTIATE_DLTG_VECTORMATRIX(TrilinosWrappers::SparseMatrix, Vector<double>);
 INSTANTIATE_DLTG_VECTORMATRIX(TrilinosWrappers::SparseMatrix,
                               LinearAlgebra::distributed::Vector<double>);
-INSTANTIATE_DLTG_VECTORMATRIX(TrilinosWrappers::SparseMatrix,
-                              TrilinosWrappers::MPI::Vector);
+// INSTANTIATE_DLTG_VECTORMATRIX(TrilinosWrappers::SparseMatrix,
+//                               TrilinosWrappers::MPI::Vector);
 
 INSTANTIATE_DLTG_BLOCK_VECTORMATRIX(TrilinosWrappers::BlockSparseMatrix,
                                     Vector<double>);
 INSTANTIATE_DLTG_BLOCK_VECTORMATRIX(
   TrilinosWrappers::BlockSparseMatrix,
   LinearAlgebra::distributed::BlockVector<double>);
-INSTANTIATE_DLTG_BLOCK_VECTORMATRIX(TrilinosWrappers::BlockSparseMatrix,
-                                    TrilinosWrappers::MPI::BlockVector);
+// INSTANTIATE_DLTG_BLOCK_VECTORMATRIX(TrilinosWrappers::BlockSparseMatrix,
+//                                     TrilinosWrappers::MPI::BlockVector);
 
 INSTANTIATE_DLTG_MATRIX(TrilinosWrappers::SparseMatrix);
-INSTANTIATE_DLTG_MATRIX(TrilinosWrappers::BlockSparseMatrix);
+// INSTANTIATE_DLTG_MATRIX(TrilinosWrappers::BlockSparseMatrix);
 
 #  ifndef DOXYGEN
 #    if defined(DEAL_II_TRILINOS_WITH_TPETRA) && \

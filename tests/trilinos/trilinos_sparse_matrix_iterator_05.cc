@@ -37,6 +37,7 @@ test()
     for (unsigned int j = 0; j < 5; ++j)
       if (((i + 2 * j + 1) % 3 == 0) || (i == j))
         m.set(i, j, 1.);
+  m.compress(VectorOperation::insert);
 
   TrilinosWrappers::SparseMatrix::iterator i = m.begin();
   for (; i != m.end(); ++i)

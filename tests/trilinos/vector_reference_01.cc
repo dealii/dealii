@@ -37,9 +37,15 @@ test()
   v(1) = 1;
   v(2) = 2;
 
+#ifdef DEAL_II_TRILINOS_WITH_TPETRA
+  LinearAlgebra::TpetraWrappers::internal::VectorReference a(v(0));
+  LinearAlgebra::TpetraWrappers::internal::VectorReference b(v(1));
+  LinearAlgebra::TpetraWrappers::internal::VectorReference c(v(2));
+#else
   TrilinosWrappers::internal::VectorReference a(v(0));
   TrilinosWrappers::internal::VectorReference b(v(1));
   TrilinosWrappers::internal::VectorReference c(v(2));
+#endif
 
   // Copy the VectorReference objects. Note that operator= for these
   // objects does not copy the *content* of the reference object, but

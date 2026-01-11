@@ -22,6 +22,7 @@
 #include <deal.II/base/mpi_stub.h>
 #include <deal.II/base/std_cxx20/type_traits.h>
 
+#include <deal.II/lac/trilinos_tpetra_to_trilinos_wrappers.h>
 #include <deal.II/lac/vector_operation.h>
 
 #include <complex>
@@ -634,14 +635,6 @@ namespace PETScWrappers
 #endif
 
 #ifdef DEAL_II_WITH_TRILINOS
-namespace TrilinosWrappers
-{
-  namespace MPI
-  {
-    class Vector;
-    class BlockVector;
-  } // namespace MPI
-} // namespace TrilinosWrappers
 
 namespace LinearAlgebra
 {
@@ -649,23 +642,6 @@ namespace LinearAlgebra
   {
     class Vector;
   }
-
-#  ifdef DEAL_II_TRILINOS_WITH_TPETRA
-  namespace TpetraWrappers
-  {
-    template <typename Number, typename MemorySpace>
-    class Vector;
-
-    template <typename Number, typename MemorySpace>
-    class BlockVector;
-
-    template <typename Number, typename MemorySpace>
-    class SparseMatrix;
-
-    template <typename Number, typename MemorySpace>
-    class BlockSparseMatrix;
-  } // namespace TpetraWrappers
-#  endif
 } // namespace LinearAlgebra
 #endif
 

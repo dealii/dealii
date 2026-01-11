@@ -24,6 +24,7 @@
 #include <deal.II/base/numbers.h>
 
 #include <deal.II/lac/read_vector.h>
+#include <deal.II/lac/trilinos_tpetra_to_trilinos_wrappers.h>
 #include <deal.II/lac/vector_operation.h>
 #include <deal.II/lac/vector_type_traits.h>
 
@@ -44,27 +45,6 @@ namespace PETScWrappers
 {
   class VectorBase;
 }
-#  endif
-
-#  ifdef DEAL_II_WITH_TRILINOS
-namespace TrilinosWrappers
-{
-  namespace MPI
-  {
-    class Vector;
-  }
-} // namespace TrilinosWrappers
-#  endif
-
-#  ifdef DEAL_II_TRILINOS_WITH_TPETRA
-namespace LinearAlgebra
-{
-  namespace TpetraWrappers
-  {
-    template <typename Number, typename MemorySpace>
-    class Vector;
-  }
-} // namespace LinearAlgebra
 #  endif
 
 template <typename number>
@@ -225,6 +205,7 @@ public:
 #endif
 
 #ifdef DEAL_II_WITH_TRILINOS
+#  ifndef DEAL_II_TRILINOS_WITH_TPETRA
   /**
    * Another copy constructor: copy the values from a Trilinos wrapper vector.
    * This copy constructor is only available if Trilinos was detected during
@@ -240,9 +221,8 @@ public:
    * that needs to be executed by all MPI processes that jointly share @p v.
    */
   explicit Vector(const TrilinosWrappers::MPI::Vector &v);
-#endif
 
-#ifdef DEAL_II_TRILINOS_WITH_TPETRA
+#  else
   /**
    * Another copy constructor: copy the values from a Trilinos wrapper vector.
    * This copy constructor is only available if Trilinos was detected during
@@ -260,6 +240,7 @@ public:
   template <typename OtherNumber, typename MemorySpace>
   explicit Vector(
     const LinearAlgebra::TpetraWrappers::Vector<OtherNumber, MemorySpace> &v);
+#  endif
 #endif
 
   /**
@@ -456,6 +437,7 @@ public:
 
 
 #ifdef DEAL_II_WITH_TRILINOS
+#  ifndef DEAL_II_TRILINOS_WITH_TPETRA
   /**
    * Another copy operator: copy the values from a (sequential or parallel,
    * depending on the underlying compiler) Trilinos wrapper vector class. This
@@ -473,9 +455,7 @@ public:
    */
   Vector<Number> &
   operator=(const TrilinosWrappers::MPI::Vector &v);
-#endif
-
-#ifdef DEAL_II_TRILINOS_WITH_TPETRA
+#  else
   /**
    * Another copy operator: copy the values from a (sequential or parallel,
    * depending on the underlying compiler) Trilinos wrapper vector class. This
@@ -495,6 +475,7 @@ public:
   Vector<Number> &
   operator=(
     const LinearAlgebra::TpetraWrappers::Vector<OtherNumber, MemorySpace> &v);
+#  endif
 #endif
 
   /**
