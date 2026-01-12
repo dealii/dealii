@@ -301,18 +301,21 @@ namespace internal
     build_face_entities_templated(
       const unsigned int                face_dimensionality,
       const std::vector<ReferenceCell> &cell_types,
-      const ArrayOfArrays              &crs,
-      ArrayOfArrays                    &crs_d,        // result
-      ArrayOfArrays                    &crs_0,        // result
-      TriaObjectsOrientations          &orientations, // result
+      const ArrayOfArrays              &cells_to_vertices,
+      ArrayOfArrays                    &cells_to_faces, // result
+      ArrayOfArrays                    &crs_0,          // result
+      TriaObjectsOrientations          &orientations,   // result
       const FU                         &second_key_function)
     {
       const bool compatibility_mode = true;
 
-      const std::vector<std::size_t>  &cell_offsets  = crs.offsets;
-      const std::vector<unsigned int> &cell_vertices = crs.columns;
-      std::vector<std::size_t>        &offsets_d     = crs_d.offsets;
-      std::vector<unsigned int>       &columns_d     = crs_d.columns;
+      const std::vector<std::size_t> &cells_to_vertices_offsets =
+        cells_to_vertices.offsets;
+      const std::vector<unsigned int> &cells_to_vertices_indices =
+        cells_to_vertices.columns;
+      std::vector<std::size_t> &cells_to_faces_offsets = cells_to_faces.offsets;
+      std::vector<unsigned int> &cells_to_faces_indices =
+        cells_to_faces.columns;
 
       // note: we do not pre-allocate memory for these arrays because it turned
       // out that counting unique entities is more expensive than push_back().
@@ -355,8 +358,8 @@ namespace internal
       ad_entity_types.reserve(n_entities);
       ad_compatibility.reserve(n_entities);
 
-      offsets_d.resize(cell_types.size() + 1);
-      offsets_d[0] = 0;
+      cells_to_faces_offsets.resize(cell_types.size() + 1);
+      cells_to_faces_offsets[0] = 0;
 
       static const unsigned int offset = 1;
 
@@ -375,12 +378,13 @@ namespace internal
             (face_dimensionality == cell_type.get_dimension() - 1 ?
                cell_type.n_faces() :
                cell_type.n_lines());
-          offsets_d[c + 1] = offsets_d[c] + n_face_entities;
+          cells_to_faces_offsets[c + 1] =
+            cells_to_faces_offsets[c] + n_face_entities;
 
           // ... collect vertices of cell
           const dealii::ArrayView<const unsigned int> local_vertices(
-            cell_vertices.data() + cell_offsets[c],
-            cell_offsets[c + 1] - cell_offsets[c]);
+            cells_to_vertices_indices.data() + cells_to_vertices_offsets[c],
+            cells_to_vertices_offsets[c + 1] - cells_to_vertices_offsets[c]);
 
           // ... loop over all its entities
           for (unsigned int e = 0; e < n_face_entities; ++e)
@@ -442,7 +446,7 @@ namespace internal
             }
         }
 
-      columns_d.resize(keys.size());
+      cells_to_faces_indices.resize(keys.size());
       orientations.reinit(keys.size());
 
       // step 2: sort according to key so that entities with same key can be
@@ -518,7 +522,7 @@ namespace internal
                                     ref_indices.begin() +
                                       ad_entity_types[offset_i].n_vertices())));
             }
-          columns_d[offset_i] = counter;
+          cells_to_faces_indices[offset_i] = counter;
         }
       offsets_0.push_back(columns_0.size());
     }
@@ -533,8 +537,8 @@ namespace internal
     void
     build_face_entities(const unsigned int                face_dimensionality,
                         const std::vector<ReferenceCell> &cell_types,
-                        const ArrayOfArrays              &crs,
-                        ArrayOfArrays                    &crs_d,
+                        const ArrayOfArrays              &cells_to_vertices,
+                        ArrayOfArrays                    &cells_to_faces,
                         ArrayOfArrays                    &crs_0,
                         TriaObjectsOrientations          &orientations,
                         const FU                         &second_key_function)
@@ -559,24 +563,24 @@ namespace internal
       if (max_n_vertices == 2)
         build_face_entities_templated<2>(face_dimensionality,
                                          cell_types,
-                                         crs,
-                                         crs_d,
+                                         cells_to_vertices,
+                                         cells_to_faces,
                                          crs_0,
                                          orientations,
                                          second_key_function);
       else if (max_n_vertices == 3)
         build_face_entities_templated<3>(face_dimensionality,
                                          cell_types,
-                                         crs,
-                                         crs_d,
+                                         cells_to_vertices,
+                                         cells_to_faces,
                                          crs_0,
                                          orientations,
                                          second_key_function);
       else if (max_n_vertices == 4)
         build_face_entities_templated<4>(face_dimensionality,
                                          cell_types,
-                                         crs,
-                                         crs_d,
+                                         cells_to_vertices,
+                                         cells_to_faces,
                                          crs_0,
                                          orientations,
                                          second_key_function);
@@ -595,60 +599,60 @@ namespace internal
      */
     inline void
     build_intersection(const std::vector<ReferenceCell> &cell_types,
-                       const ArrayOfArrays              &con_cv,
-                       const ArrayOfArrays              &con_cl,
-                       const ArrayOfArrays              &con_lv,
-                       const ArrayOfArrays              &con_cq,
-                       const ArrayOfArrays              &con_qv,
+                       const ArrayOfArrays              &cells_to_vertices,
+                       const ArrayOfArrays              &cells_to_lines,
+                       const ArrayOfArrays              &lines_to_vertices,
+                       const ArrayOfArrays              &cells_to_quads,
+                       const ArrayOfArrays              &quads_to_vertices,
                        const TriaObjectsOrientations    &ori_cq,
-                       ArrayOfArrays                    &con_ql,   // result
-                       TriaObjectsOrientations          &ori_ql,   // result
-                       std::vector<ReferenceCell>       &quad_t_id // result
+                       ArrayOfArrays              &quads_to_lines, // result
+                       TriaObjectsOrientations    &ori_ql,         // result
+                       std::vector<ReferenceCell> &quad_t_id       // result
     )
     {
       // reset output
-      con_ql.offsets = {};
-      con_ql.columns = {};
+      quads_to_lines.offsets = {};
+      quads_to_lines.columns = {};
 
-      con_ql.offsets.resize(con_qv.offsets.size());
-      con_ql.offsets[0] = 0;
+      quads_to_lines.offsets.resize(quads_to_vertices.offsets.size());
+      quads_to_lines.offsets[0] = 0;
 
-      quad_t_id.resize(con_qv.offsets.size() - 1);
+      quad_t_id.resize(quads_to_vertices.offsets.size() - 1);
 
       // count the number of lines of each face
-      for (unsigned int c = 0; c < con_cq.offsets.size() - 1; ++c)
+      for (unsigned int c = 0; c < cells_to_quads.offsets.size() - 1; ++c)
         {
           // loop over faces
-          for (unsigned int f_ = con_cq.offsets[c], f_index = 0;
-               f_ < con_cq.offsets[c + 1];
+          for (unsigned int f_ = cells_to_quads.offsets[c], f_index = 0;
+               f_ < cells_to_quads.offsets[c + 1];
                ++f_, ++f_index)
             {
-              const unsigned int f = con_cq.columns[f_];
+              const unsigned int f = cells_to_quads.columns[f_];
 
-              con_ql.offsets[f + 1] =
+              quads_to_lines.offsets[f + 1] =
                 cell_types[c].face_reference_cell(f_index).n_lines();
             }
         }
 
       // use the counts to determine the offsets -> prefix sum
-      for (unsigned int i = 0; i < con_ql.offsets.size() - 1; ++i)
-        con_ql.offsets[i + 1] += con_ql.offsets[i];
+      for (unsigned int i = 0; i < quads_to_lines.offsets.size() - 1; ++i)
+        quads_to_lines.offsets[i + 1] += quads_to_lines.offsets[i];
 
       // allocate memory
-      con_ql.columns.resize(con_ql.offsets.back());
-      ori_ql.reinit(con_ql.offsets.back());
+      quads_to_lines.columns.resize(quads_to_lines.offsets.back());
+      ori_ql.reinit(quads_to_lines.offsets.back());
 
       // loop over cells
-      for (unsigned int c = 0; c < con_cq.offsets.size() - 1; ++c)
+      for (unsigned int c = 0; c < cells_to_quads.offsets.size() - 1; ++c)
         {
           const ReferenceCell cell_type = cell_types[c];
 
           // loop over faces
-          for (unsigned int f_ = con_cq.offsets[c], f_index = 0;
-               f_ < con_cq.offsets[c + 1];
+          for (unsigned int f_ = cells_to_quads.offsets[c], f_index = 0;
+               f_ < cells_to_quads.offsets[c + 1];
                ++f_, ++f_index)
             {
-              const unsigned int f = con_cq.columns[f_];
+              const unsigned int f = cells_to_quads.columns[f_];
 
               // only faces with default orientation have to do something
               if (ori_cq.get_combined_orientation(f_) !=
@@ -664,20 +668,23 @@ namespace internal
                     cell_type.face_to_cell_lines(
                       f_index, l, numbers::default_geometric_orientation);
                   const unsigned int global_line_index =
-                    con_cl.columns[con_cl.offsets[c] + local_line_index];
-                  con_ql.columns[con_ql.offsets[f] + l] = global_line_index;
+                    cells_to_lines
+                      .columns[cells_to_lines.offsets[c] + local_line_index];
+                  quads_to_lines.columns[quads_to_lines.offsets[f] + l] =
+                    global_line_index;
 
                   // determine orientation of line
                   bool same = true;
                   for (unsigned int v = 0; v < 2; ++v)
-                    if (con_cv
-                          .columns[con_cv.offsets[c] +
+                    if (cells_to_vertices
+                          .columns[cells_to_vertices.offsets[c] +
                                    cell_type.face_and_line_to_cell_vertices(
                                      f_index,
                                      l,
                                      v,
                                      numbers::default_geometric_orientation)] !=
-                        con_lv.columns[con_lv.offsets[global_line_index] + v])
+                        lines_to_vertices.columns
+                          [lines_to_vertices.offsets[global_line_index] + v])
                       {
                         same = false;
                         break;
@@ -685,7 +692,7 @@ namespace internal
 
                   // ... comparison gives orientation
                   ori_ql.set_combined_orientation(
-                    con_ql.offsets[f] + l,
+                    quads_to_lines.offsets[f] + l,
                     same ? numbers::default_geometric_orientation :
                            numbers::reverse_line_orientation);
                 }
@@ -706,14 +713,14 @@ namespace internal
     Connectivity
     build_connectivity(const unsigned int                dim,
                        const std::vector<ReferenceCell> &cell_types,
-                       const ArrayOfArrays              &con_cv)
+                       const ArrayOfArrays              &cells_to_vertices)
     {
       Connectivity connectivity(dim, cell_types);
 
       ArrayOfArrays temp1; // needed for 3d
 
       if (dim == 1)
-        connectivity.entity_to_entities(1, 0) = con_cv;
+        connectivity.entity_to_entities(1, 0) = cells_to_vertices;
 
       if (dim == 2 || dim == 3) // build lines
         {
@@ -722,7 +729,7 @@ namespace internal
           build_face_entities(
             1,
             connectivity.entity_types(dim),
-            con_cv,
+            cells_to_vertices,
             dim == 2 ? connectivity.entity_to_entities(2, 1) : temp1,
             connectivity.entity_to_entities(1, 0),
             dim == 2 ? connectivity.entity_orientations(1) : dummy,
@@ -737,7 +744,7 @@ namespace internal
           build_face_entities(
             2,
             connectivity.entity_types(3),
-            con_cv,
+            cells_to_vertices,
             connectivity.entity_to_entities(3, 2),
             connectivity.entity_to_entities(2, 0),
             connectivity.entity_orientations(2),
@@ -779,7 +786,7 @@ namespace internal
 
           // create connectivity: quad -> line
           build_intersection(connectivity.entity_types(3),
-                             con_cv,
+                             cells_to_vertices,
                              temp1,
                              connectivity.entity_to_entities(1, 0),
                              connectivity.entity_to_entities(3, 2),
