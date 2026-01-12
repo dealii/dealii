@@ -6254,7 +6254,8 @@ namespace internal
             }
         }
 
-        { // FACES (i.e., quads or triangles, or both)
+        { // FACES
+          // (i.e., quads or triangles, or both)
           typename Triangulation<dim, spacedim>::face_iterator
             face = triangulation.begin_face(),
             endf = triangulation.end_face();
@@ -6728,8 +6729,8 @@ namespace internal
                   // - The definition of the child cells.
                   //
                   // Number of meaningful entries in this list is
-                  //   9  Tetrahedron    17 Wedge
-                  //   ?  Pyramid        27 Hexahedron
+                  //   10  Tetrahedron    18 Wedge
+                  //    ?  Pyramid        27 Hexahedron
                   //
                   // The following algorithm is used to get the vertices.
                   //  1. Get vertices of the parent as provided.
@@ -6931,7 +6932,7 @@ namespace internal
                       // The parent vertex indices correlate nicely with the
                       // child indices of a tri and quad, as shown in the
                       // drawing for 2D face refinement (see the curly brackets
-                      // tagged {} \\ FACE). We can thus apply the existing
+                      // tagged {} // FACES). We can thus apply the existing
                       // algorithm for orientation correction of vertex indices
                       // and reinterpret the output. The only problem is child 3
                       // in triangles. However it is always in the center so no
@@ -7211,9 +7212,9 @@ namespace internal
                     // extract all the faces.
                     //  1. Add newly created faces to the beginning.
                     //  2. Get children of refined quad faces.
-                    //     for numbering see {} \\ FACE.
+                    //     for numbering see {} // FACE.
                     //  3. Get children of refined tri faces.
-                    //     for numbering see {} \\ FACE.
+                    //     for numbering see {} // FACE.
 
                     std::array<int, 36> face_indices;
 
@@ -7389,7 +7390,7 @@ namespace internal
                                   face->reference_cell()
                                     .get_combined_orientation(
                                       make_const_array_view(vertices_0),
-                                      make_const_array_view(vertices_1)));
+                                      make_array_view(vertices_1)));
                               }
                           }
                       }
