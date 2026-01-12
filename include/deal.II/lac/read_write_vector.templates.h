@@ -21,12 +21,14 @@
 #include <deal.II/base/partitioner.h>
 
 #include <deal.II/lac/exceptions.h>
+#include <deal.II/lac/la_parallel_block_vector.h>
 #include <deal.II/lac/la_parallel_vector.h>
 #include <deal.II/lac/read_write_vector.h>
 #include <deal.II/lac/vector.h>
 #include <deal.II/lac/vector_operations_internal.h>
 
 #ifdef DEAL_II_WITH_PETSC
+#  include <deal.II/lac/petsc_block_vector.h>
 #  include <deal.II/lac/petsc_vector.h>
 #endif
 
@@ -199,6 +201,54 @@ namespace LinearAlgebra
             rw_vector.local_element(i) = tmp_vector(stored.nth_index_in_set(i));
       }
     };
+
+
+
+    template <typename Number, typename BlockVectorType>
+    void
+    import_elements_from_block_vector(ReadWriteVector<Number>      &dst,
+                                      const BlockVectorType        &src,
+                                      const VectorOperation::values operation)
+    {
+      const auto &bi = src.get_block_indices();
+
+      const IndexSet &stored = dst.get_stored_elements();
+
+      for (unsigned int b = 0; b < src.n_blocks(); ++b)
+        {
+          const types::global_dof_index b0 = bi.block_start(b);
+          const types::global_dof_index b1 = b0 + bi.block_size(b);
+
+          // Build the subset of dst's stored indices that lie in this block,
+          // block-local numbering
+          const IndexSet block_local = stored.get_view(b0, b1);
+
+          if (block_local.n_elements() == 0)
+            continue;
+
+          ReadWriteVector<Number> tmp(block_local);
+
+          // Per-block import: relies on existing import_elements() overloads
+          tmp.import_elements(src.block(b), operation);
+
+          // Scatter back into global indexing
+          for (const auto li : block_local)
+            {
+              const auto gi = b0 + li;
+
+              if (operation == VectorOperation::insert)
+                dst[gi] = tmp[li];
+              else if (operation == VectorOperation::add)
+                dst[gi] += tmp[li];
+              else if (operation == VectorOperation::min)
+                dst[gi] = get_min(dst[gi], tmp[li]);
+              else if (operation == VectorOperation::max)
+                dst[gi] = get_max(dst[gi], tmp[li]);
+              else
+                DEAL_II_NOT_IMPLEMENTED();
+            }
+        }
+    }
   } // namespace internal
 
 
@@ -435,6 +485,18 @@ namespace LinearAlgebra
 
 
 
+  template <typename Number>
+  template <typename MemorySpace>
+  void
+  ReadWriteVector<Number>::import_elements(
+    const distributed::BlockVector<Number, MemorySpace> &src,
+    const VectorOperation::values                        operation)
+  {
+    internal::import_elements_from_block_vector(*this, src, operation);
+  }
+
+
+
 #ifdef DEAL_II_WITH_PETSC
   namespace internal
   {
@@ -464,34 +526,64 @@ namespace LinearAlgebra
     {
       AssertThrow(false, ExcMessage("Tried to copy complex -> real"));
     }
+
   } // namespace internal
-
-
 
   template <typename Number>
   void
   ReadWriteVector<Number>::import_elements(
     const PETScWrappers::MPI::Vector &petsc_vec,
-    VectorOperation::values /*operation*/,
+    VectorOperation::values           operation,
     const std::shared_ptr<const Utilities::MPI::CommunicationPatternBase>
-      & /*communication_pattern*/)
+      &communication_pattern)
   {
-    // TODO: this works only if no communication is needed.
-    Assert(petsc_vec.locally_owned_elements() == stored_elements,
-           StandardExceptions::ExcInvalidState());
+    std::shared_ptr<const Utilities::MPI::Partitioner> comm_pattern;
+    if (communication_pattern.get() == nullptr)
+      {
+        comm_pattern = std::make_shared<Utilities::MPI::Partitioner>(
+          petsc_vec.locally_owned_elements(),
+          get_stored_elements(),
+          petsc_vec.get_mpi_communicator());
+      }
+    else
+      {
+        comm_pattern =
+          std::dynamic_pointer_cast<const Utilities::MPI::Partitioner>(
+            communication_pattern);
+        AssertThrow(comm_pattern != nullptr,
+                    ExcMessage("The communication pattern is not of type "
+                               "Utilities::MPI::Partitioner."));
+      }
 
-    // get a representation of the vector and copy it
-    const PetscScalar *start_ptr;
+    // PETSc local array provides the locally-owned entries (contiguous)
+    const PetscScalar *start_ptr = nullptr;
     PetscErrorCode     ierr =
       VecGetArrayRead(static_cast<const Vec &>(petsc_vec), &start_ptr);
     AssertThrow(ierr == 0, ExcPETScError(ierr));
 
-    const size_type vec_size = petsc_vec.locally_owned_size();
-    internal::copy_petsc_vector(start_ptr, start_ptr + vec_size, begin());
+    const unsigned int n_owned = comm_pattern->locally_owned_size();
+    AssertDimension(n_owned, petsc_vec.locally_owned_size());
 
-    // restore the representation of the vector
+    std::vector<Number> owned_values(n_owned);
+    internal::copy_petsc_vector(start_ptr,
+                                start_ptr + n_owned,
+                                owned_values.data());
+
     ierr = VecRestoreArrayRead(static_cast<const Vec &>(petsc_vec), &start_ptr);
     AssertThrow(ierr == 0, ExcPETScError(ierr));
+
+    // Do the actual MPI exchange + apply operation into *this*
+    internal::read_write_vector_functions<Number, ::dealii::MemorySpace::Host>::
+      import_elements(comm_pattern, owned_values.data(), operation, *this);
+  }
+
+  template <typename Number>
+  void
+  ReadWriteVector<Number>::import_elements(
+    const PETScWrappers::MPI::BlockVector &src,
+    const VectorOperation::values          operation)
+  {
+    internal::import_elements_from_block_vector(*this, src, operation);
   }
 #endif
 
@@ -801,6 +893,15 @@ namespace LinearAlgebra
                     communication_pattern);
   }
 
+
+  template <typename Number>
+  void
+  ReadWriteVector<Number>::import_elements(
+    const TrilinosWrappers::MPI::BlockVector &src,
+    const VectorOperation::values             operation)
+  {
+    internal::import_elements_from_block_vector(*this, src, operation);
+  }
 
 
 #  ifdef DEAL_II_TRILINOS_WITH_TPETRA

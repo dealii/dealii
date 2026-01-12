@@ -1,0 +1,23 @@
+
+DEAL:0::min_v=0.00000, max_v=8.00000
+DEAL:0::patches=1
+DEAL:0::min_c=0.00000, max_c=0.00000
+DEAL:0::cell_patches=1
+
+DEAL:1::min_v=1.00000, max_v=8.00000
+DEAL:1::patches=1
+DEAL:1::min_c=1.00000, max_c=1.00000
+DEAL:1::cell_patches=1
+
+
+DEAL:2::min_v=2.00000, max_v=8.00000
+DEAL:2::patches=1
+DEAL:2::min_c=2.00000, max_c=2.00000
+DEAL:2::cell_patches=1
+
+
+DEAL:3::min_v=3.00000, max_v=8.00000
+DEAL:3::patches=1
+DEAL:3::min_c=3.00000, max_c=3.00000
+DEAL:3::cell_patches=1
+

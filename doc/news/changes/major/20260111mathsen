@@ -1,0 +1,5 @@
+DataOut has been generalized to correctly handle parallel vectors with
+arbitrary ownership layouts, improving robustness and correctness for
+distributed output.
+<br>
+(Mathias Anselmann, 2026/01/11)
