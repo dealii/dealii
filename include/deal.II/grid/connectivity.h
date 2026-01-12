@@ -247,25 +247,22 @@ namespace internal
      * Determine the neighbors of all cells.
      *
      * @p con_cf connectivity cell-face
-     * @p con_cc connectivity cell-cell (for each cell-face it contains the
+     * @return connectivity cell-cell (for each cell-face it contains the
      *   index of the neighboring cell or -1 for boundary face)
      */
-    void
-    determine_neighbors(const ArrayOfArrays &con_cf, ArrayOfArrays &con_cc)
+    ArrayOfArrays
+    determine_neighbors(const ArrayOfArrays &con_cf)
     {
       const auto &columns_cf = con_cf.columns;
       const auto &offsets_cf = con_cf.offsets;
-
-      auto &columns_cc = con_cc.columns;
-      auto &offsets_cc = con_cc.offsets;
 
       const unsigned int n_faces =
         *std::max_element(columns_cf.begin(), columns_cf.end()) + 1;
 
       // clear and initialize with -1 (assume that all faces are at the
       // boundary)
-      columns_cc = std::vector<unsigned int>(columns_cf.size(), -1);
-      offsets_cc = offsets_cf;
+      std::vector<unsigned int> columns_cc(columns_cf.size(), -1);
+      std::vector<std::size_t>  offsets_cc = offsets_cf;
 
       std::vector<std::pair<unsigned int, unsigned int>> neighbors(n_faces,
                                                                    {-1, -1});
@@ -295,6 +292,8 @@ namespace internal
                 }
             }
         }
+
+      return ArrayOfArrays(std::move(offsets_cc), std::move(columns_cc));
     }
 
 
@@ -808,8 +807,8 @@ namespace internal
         }
 
       // determine neighbors
-      determine_neighbors(connectivity.entity_to_entities(dim, dim - 1),
-                          connectivity.entity_to_entities(dim, dim));
+      connectivity.entity_to_entities(dim, dim) =
+        determine_neighbors(connectivity.entity_to_entities(dim, dim - 1));
 
       return connectivity;
     }
