@@ -1,0 +1,87 @@
+
+DEAL::--- Triangle ---
+DEAL::face orientation: 0
+DEAL::expected indices:   0 1 2 
+DEAL::calculated indices: 0 1 2 
+DEAL::expected lines:   0 3 6 
+DEAL::calculated lines: 0 3 6 
+DEAL::
+DEAL::face orientation: 1
+DEAL::expected indices:   0 2 1 
+DEAL::calculated indices: 0 2 1 
+DEAL::expected lines:   6 3 0 
+DEAL::calculated lines: 6 3 0 
+DEAL::
+DEAL::face orientation: 2
+DEAL::expected indices:   2 0 1 
+DEAL::calculated indices: 2 0 1 
+DEAL::expected lines:   6 0 3 
+DEAL::calculated lines: 6 0 3 
+DEAL::
+DEAL::face orientation: 3
+DEAL::expected indices:   2 1 0 
+DEAL::calculated indices: 2 1 0 
+DEAL::expected lines:   3 0 6 
+DEAL::calculated lines: 3 0 6 
+DEAL::
+DEAL::face orientation: 4
+DEAL::expected indices:   1 2 0 
+DEAL::calculated indices: 1 2 0 
+DEAL::expected lines:   3 6 0 
+DEAL::calculated lines: 3 6 0 
+DEAL::
+DEAL::face orientation: 5
+DEAL::expected indices:   1 0 2 
+DEAL::calculated indices: 1 0 2 
+DEAL::expected lines:   0 6 3 
+DEAL::calculated lines: 0 6 3 
+DEAL::
+DEAL::--- Quad ---
+DEAL::face orientation: 0
+DEAL::expected indices:   0 1 2 3 
+DEAL::calculated indices: 0 1 2 3 
+DEAL::expected lines:   1 2 0 4 
+DEAL::calculated lines: 1 2 0 4 
+DEAL::
+DEAL::face orientation: 1
+DEAL::expected indices:   0 2 1 3 
+DEAL::calculated indices: 0 2 1 3 
+DEAL::expected lines:   0 4 1 2 
+DEAL::calculated lines: 0 4 1 2 
+DEAL::
+DEAL::face orientation: 2
+DEAL::expected indices:   2 0 3 1 
+DEAL::calculated indices: 2 0 3 1 
+DEAL::expected lines:   4 0 1 2 
+DEAL::calculated lines: 4 0 1 2 
+DEAL::
+DEAL::face orientation: 3
+DEAL::expected indices:   2 3 0 1 
+DEAL::calculated indices: 2 3 0 1 
+DEAL::expected lines:   1 2 4 0 
+DEAL::calculated lines: 1 2 4 0 
+DEAL::
+DEAL::face orientation: 4
+DEAL::expected indices:   3 2 1 0 
+DEAL::calculated indices: 3 2 1 0 
+DEAL::expected lines:   2 1 4 0 
+DEAL::calculated lines: 2 1 4 0 
+DEAL::
+DEAL::face orientation: 5
+DEAL::expected indices:   3 1 2 0 
+DEAL::calculated indices: 3 1 2 0 
+DEAL::expected lines:   4 0 2 1 
+DEAL::calculated lines: 4 0 2 1 
+DEAL::
+DEAL::face orientation: 6
+DEAL::expected indices:   1 3 0 2 
+DEAL::calculated indices: 1 3 0 2 
+DEAL::expected lines:   0 4 2 1 
+DEAL::calculated lines: 0 4 2 1 
+DEAL::
+DEAL::face orientation: 7
+DEAL::expected indices:   1 0 3 2 
+DEAL::calculated indices: 1 0 3 2 
+DEAL::expected lines:   2 1 0 4 
+DEAL::calculated lines: 2 1 0 4 
+DEAL::

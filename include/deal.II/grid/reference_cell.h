@@ -720,6 +720,38 @@ public:
     const RefinementCase<dim - 1> face_refinement_case) const;
 
   /**
+   * Get the index of vertex @p vertex belonging to a quad of the reference cell
+   * @p quad_ref_cell, while accounting for the orientation @p quad_orientation.
+   * The vertex itself can be retrieved by calling `face.vertex(returned val)`.
+   *
+   * This is very similar to @see ReferenceCell::standard_to_real_face_vertex.
+   * However, this function is static and therefore independent of the context
+   * in which the quad is used (i.e., it doesn't care about which 3D cell the
+   * quad belongs to).
+   */
+  static constexpr unsigned int
+  standard_to_real_quad_vertex(
+    const unsigned int                 vertex,
+    const types::geometric_orientation quad_orientation,
+    const ReferenceCell                quad_ref_cell);
+
+  /**
+   * Get the index of line @p line belonging to a quad of the reference cell
+   * @p quad_ref_cell, while accounting for the orientation @p quad_orientation.
+   * The line itself can be retrieved by calling `face.line(returned val)`.
+   *
+   * This is very similar to @see ReferenceCell::standard_to_real_face_line.
+   * However, this function is static and therefore independent of the context
+   * in which the quad is used (i.e., it doesn't care about which 3D cell the
+   * quad belongs to).
+   */
+  static constexpr unsigned int
+  standard_to_real_quad_line(
+    const unsigned int                 line,
+    const types::geometric_orientation quad_orientation,
+    const ReferenceCell                quad_ref_cell);
+
+  /**
    * Get vertex index of vertex @p vertex belonging to face @p face of the
    * current cell while accounting for orientation @p face_orientation .
    */
@@ -3115,6 +3147,54 @@ ReferenceCell::face_vertex_location(const unsigned int face,
                     std::to_string(get_dimension()) + " dimensional."));
   return this->template vertex<dim>(face_to_cell_vertices(
     face, vertex, numbers::default_geometric_orientation));
+}
+
+
+
+inline constexpr unsigned int
+ReferenceCell::standard_to_real_quad_vertex(
+  const unsigned int                 vertex,
+  const types::geometric_orientation quad_orientation,
+  const ReferenceCell                quad_ref_cell)
+{
+  AssertIndexRange(vertex, quad_ref_cell.n_vertices());
+
+  switch (quad_ref_cell)
+    {
+      case ReferenceCells::Triangle:
+        return triangle_vertex_permutations[quad_orientation][vertex];
+      case ReferenceCells::Quadrilateral:
+        return quadrilateral_vertex_permutations[quad_orientation][vertex];
+      default:
+        // no other 2D cells are known to deal.II
+        DEAL_II_ASSERT_UNREACHABLE();
+    }
+
+  return 0;
+}
+
+
+
+inline constexpr unsigned int
+ReferenceCell::standard_to_real_quad_line(
+  const unsigned int                 line,
+  const types::geometric_orientation quad_orientation,
+  const ReferenceCell                quad_ref_cell)
+{
+  AssertIndexRange(line, quad_ref_cell.n_lines());
+
+  switch (quad_ref_cell)
+    {
+      case ReferenceCells::Triangle:
+        return triangle_line_permutations[quad_orientation][line];
+      case ReferenceCells::Quadrilateral:
+        return quadrilateral_line_permutations[quad_orientation][line];
+      default:
+        // no other 2D cells are known to deal.II
+        DEAL_II_ASSERT_UNREACHABLE();
+    }
+
+  return 0;
 }
 
 
