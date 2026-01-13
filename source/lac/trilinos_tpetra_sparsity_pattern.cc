@@ -417,7 +417,6 @@ namespace LinearAlgebra
                                                  n_entries_per_row);
 
         AssertDimension(sp.n_rows(), graph->getGlobalNumRows());
-        AssertDimension(sp.n_cols(), graph->getGlobalNumEntries());
 
         std::vector<TrilinosWrappers::types::int_type> row_indices;
 
