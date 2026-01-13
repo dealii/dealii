@@ -218,6 +218,7 @@ export
     using std::type_identity_t;
     using std::underlying_type_t;
     using std::unsigned_integral;
+    using std::void_t;
 
     // Numeric functions
     using std::abs;
