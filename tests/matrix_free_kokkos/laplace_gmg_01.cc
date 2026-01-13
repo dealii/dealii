@@ -13,9 +13,7 @@
 // ------------------------------------------------------------------------
 
 /*
- * Simple test problem of a Laplace operator on a hypercube validating the
- * MGTwoLevelTransferCopyToHost two level transfer class used alongside device
- * vectors.
+ * Solve a Laplace problem on a hypercube with h multigrid on device.
  */
 
 #include <deal.II/base/convergence_table.h>
@@ -35,8 +33,6 @@
 #include <deal.II/lac/precondition.h>
 #include <deal.II/lac/solver_cg.h>
 
-#include <deal.II/matrix_free/fe_evaluation.h>
-#include <deal.II/matrix_free/matrix_free.h>
 #include <deal.II/matrix_free/portable_fe_evaluation.h>
 #include <deal.II/matrix_free/portable_matrix_free.h>
 #include <deal.II/matrix_free/tools.h>
@@ -55,121 +51,6 @@
 #include "../tests.h"
 
 using namespace dealii;
-
-static unsigned int counter = 0;
-
-
-template <int dim,
-          int fe_degree,
-          int n_components,
-          typename Number,
-          typename MemorySpace>
-class LaplaceOperator;
-
-template <int dim, int fe_degree, int n_components, typename Number>
-class LaplaceOperator<dim, fe_degree, n_components, Number, MemorySpace::Host>
-  : public EnableObserverPointer
-{
-public:
-  using VectorType =
-    LinearAlgebra::distributed::Vector<Number, MemorySpace::Host>;
-
-  LaplaceOperator() = default;
-
-  void
-  reinit(const Mapping<dim>              &mapping,
-         const DoFHandler<dim>           &dof_handler,
-         const AffineConstraints<Number> &constraints,
-         const Quadrature<1>             &quadrature)
-  {
-    typename MatrixFree<dim, Number>::AdditionalData additional_data;
-    additional_data.mapping_update_flags = update_gradients;
-
-    matrix_free.reinit(
-      mapping, dof_handler, constraints, quadrature, additional_data);
-  }
-
-  types::global_dof_index
-  m() const
-  {
-    return matrix_free.get_dof_handler().n_dofs();
-  }
-
-  Number
-  el(unsigned int, unsigned int) const
-  {
-    DEAL_II_NOT_IMPLEMENTED();
-    return 0;
-  }
-
-  void
-  initialize_dof_vector(VectorType &vec) const
-  {
-    matrix_free.initialize_dof_vector(vec);
-  }
-
-  void
-  vmult(VectorType &dst, const VectorType &src) const
-  {
-    matrix_free.cell_loop(&LaplaceOperator::local_apply, this, dst, src, true);
-  }
-
-  void
-  Tvmult(VectorType &dst, const VectorType &src) const
-  {
-    AssertThrow(false, ExcNotImplemented());
-
-    (void)dst;
-    (void)src;
-  }
-
-  void
-  compute_inverse_diagonal(VectorType &diagonal_global) const
-  {
-    this->initialize_dof_vector(diagonal_global);
-
-    MatrixFreeTools::compute_diagonal(matrix_free,
-                                      diagonal_global,
-                                      &LaplaceOperator::do_vmult_cell_single,
-                                      this);
-
-    for (auto &e : diagonal_global)
-      e = (e == 0.0) ? 1.0 : (1.0 / e);
-  }
-
-private:
-  void
-  local_apply(const MatrixFree<dim, Number>               &data,
-              VectorType                                  &dst,
-              const VectorType                            &src,
-              const std::pair<unsigned int, unsigned int> &cell_range) const
-  {
-    FEEvaluation<dim, fe_degree, fe_degree + 1, n_components, Number> phi(data);
-    for (unsigned int cell = cell_range.first; cell < cell_range.second; ++cell)
-      {
-        phi.reinit(cell);
-
-        phi.read_dof_values_plain(src);
-        do_vmult_cell_single(phi);
-        phi.distribute_local_to_global(dst);
-      }
-  }
-
-  void
-  do_vmult_cell_single(
-    FEEvaluation<dim, fe_degree, fe_degree + 1, n_components, Number> &phi)
-    const
-  {
-    phi.evaluate(EvaluationFlags::gradients);
-    for (unsigned int q = 0; q < phi.n_q_points; ++q)
-      phi.submit_gradient(phi.get_gradient(q), q);
-    phi.integrate(EvaluationFlags::gradients);
-  }
-
-  MatrixFree<dim, Number> matrix_free;
-};
-
-
 
 template <int dim, int fe_degree, int n_components, typename Number>
 class LaplaceOperatorQuad
@@ -219,11 +100,7 @@ public:
 };
 
 template <int dim, int fe_degree, int n_components, typename Number>
-class LaplaceOperator<dim,
-                      fe_degree,
-                      n_components,
-                      Number,
-                      MemorySpace::Default> : public EnableObserverPointer
+class LaplaceOperator : public EnableObserverPointer
 {
 public:
   using VectorType =
@@ -288,6 +165,7 @@ public:
     matrix_free.initialize_dof_vector(diagonal_global);
     LaplaceOperatorQuad<dim, fe_degree, n_components, Number>
       laplace_operator_quad;
+
     MatrixFreeTools::
       compute_diagonal<dim, fe_degree, fe_degree + 1, n_components, Number>(
         matrix_free,
@@ -370,8 +248,7 @@ run(const unsigned int n_refinements)
   DoFTools::make_zero_boundary_constraints(dof_handler, constraints);
   constraints.close();
 
-  LaplaceOperator<dim, degree, n_components, Number, MemorySpace>
-    laplace_operator;
+  LaplaceOperator<dim, degree, n_components, Number> laplace_operator;
 
   laplace_operator.reinit(mapping,
                           dof_handler,
@@ -402,7 +279,7 @@ run(const unsigned int n_refinements)
     dst = 0.0;
   }
 
-  ReductionControl     solver_control;
+  SolverControl        solver_control(100, 1e-6 * src.l2_norm());
   SolverCG<VectorType> solver(solver_control);
 
   if (!use_multigrid)
@@ -415,7 +292,7 @@ run(const unsigned int n_refinements)
   else
     {
       using LevelMatrixType =
-        LaplaceOperator<dim, degree, n_components, Number, MemorySpace>;
+        LaplaceOperator<dim, degree, n_components, Number>;
       using SmootherPreconditionerType = DiagonalMatrix<VectorType>;
       using SmootherType               = PreconditionChebyshev<LevelMatrixType,
                                                  VectorType,
@@ -525,11 +402,11 @@ main(int argc, char **argv)
   Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
   mpi_initlog();
 
-  const unsigned int dim           = 3;
-  const unsigned int fe_degree     = 2;
-  unsigned int       n_refinements = 1;
+  const unsigned int dim       = 3;
+  const unsigned int fe_degree = 2;
 
-  run<dim, fe_degree, 1, MemorySpace::Default>(n_refinements);
+  run<dim, fe_degree, 1, MemorySpace::Default>(1);
+  run<dim, fe_degree, 1, MemorySpace::Default>(2);
 
   deallog << "Completed" << std::endl;
 }
