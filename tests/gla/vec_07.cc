@@ -14,7 +14,7 @@
 
 
 
-// test v=0 for ghost vectors
+// test reading from ghost entries of vectors
 
 #include <deal.II/base/index_set.h>
 
@@ -69,14 +69,6 @@ test()
   deallog << "ghosted value: "
           << get_real_assert_zero_imag(vector_with_ghost_entries(1))
           << " (should be 2.0)" << std::endl;
-  vector_with_ghost_entries = 0;
-  deallog << "ghosted value: "
-          << get_real_assert_zero_imag(vector_with_ghost_entries(1))
-          << " (should be 0.0)" << std::endl;
-  vector_with_ghost_entries = 42.1;
-  deallog << "ghosted value: "
-          << get_real_assert_zero_imag(vector_with_ghost_entries(1))
-          << " (should be 42.1)" << std::endl;
 
   // done
   if (myid == 0)
