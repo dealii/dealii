@@ -1411,7 +1411,10 @@ namespace LinearAlgebra
       inline const VectorReference<Number, MemorySpace> &
       VectorReference<Number, MemorySpace>::operator=(const Number &value) const
       {
+        Assert(!vector.has_ghost_elements(), ExcGhostsPresent());
+
         vector.set(1, &index, &value);
+
         return *this;
       }
 
@@ -1422,7 +1425,10 @@ namespace LinearAlgebra
       VectorReference<Number, MemorySpace>::operator+=(
         const Number &value) const
       {
+        Assert(!vector.has_ghost_elements(), ExcGhostsPresent());
+
         vector.add(1, &index, &value);
+
         return *this;
       }
 
@@ -1433,8 +1439,11 @@ namespace LinearAlgebra
       VectorReference<Number, MemorySpace>::operator-=(
         const Number &value) const
       {
-        Number new_value = -value;
+        Assert(!vector.has_ghost_elements(), ExcGhostsPresent());
+
+        const Number new_value = -value;
         vector.add(1, &index, &new_value);
+
         return *this;
       }
 
@@ -1445,8 +1454,11 @@ namespace LinearAlgebra
       VectorReference<Number, MemorySpace>::operator*=(
         const Number &value) const
       {
-        Number new_value = static_cast<Number>(*this) * value;
+        Assert(!vector.has_ghost_elements(), ExcGhostsPresent());
+
+        const Number new_value = static_cast<Number>(*this) * value;
         vector.set(1, &index, &new_value);
+
         return *this;
       }
 
@@ -1457,8 +1469,11 @@ namespace LinearAlgebra
       VectorReference<Number, MemorySpace>::operator/=(
         const Number &value) const
       {
-        Number new_value = static_cast<Number>(*this) / value;
+        Assert(!vector.has_ghost_elements(), ExcGhostsPresent());
+
+        const Number new_value = static_cast<Number>(*this) / value;
         vector.set(1, &index, &new_value);
+
         return *this;
       }
     } // namespace internal
@@ -1470,6 +1485,7 @@ namespace LinearAlgebra
   /** @} */
 
 } // namespace LinearAlgebra
+
 
 
 namespace internal

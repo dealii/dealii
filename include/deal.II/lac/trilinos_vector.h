@@ -1452,7 +1452,10 @@ namespace TrilinosWrappers
     inline const VectorReference &
     VectorReference::operator=(const TrilinosScalar &value) const
     {
+      Assert(!vector.has_ghost_elements(), ExcGhostsPresent());
+
       vector.set(1, &index, &value);
+
       return *this;
     }
 
@@ -1461,7 +1464,10 @@ namespace TrilinosWrappers
     inline const VectorReference &
     VectorReference::operator+=(const TrilinosScalar &value) const
     {
+      Assert(!vector.has_ghost_elements(), ExcGhostsPresent());
+
       vector.add(1, &index, &value);
+
       return *this;
     }
 
@@ -1470,8 +1476,11 @@ namespace TrilinosWrappers
     inline const VectorReference &
     VectorReference::operator-=(const TrilinosScalar &value) const
     {
-      TrilinosScalar new_value = -value;
+      Assert(!vector.has_ghost_elements(), ExcGhostsPresent());
+
+      const TrilinosScalar new_value = -value;
       vector.add(1, &index, &new_value);
+
       return *this;
     }
 
@@ -1480,8 +1489,12 @@ namespace TrilinosWrappers
     inline const VectorReference &
     VectorReference::operator*=(const TrilinosScalar &value) const
     {
-      TrilinosScalar new_value = static_cast<TrilinosScalar>(*this) * value;
+      Assert(!vector.has_ghost_elements(), ExcGhostsPresent());
+
+      const TrilinosScalar new_value =
+        static_cast<TrilinosScalar>(*this) * value;
       vector.set(1, &index, &new_value);
+
       return *this;
     }
 
@@ -1490,11 +1503,17 @@ namespace TrilinosWrappers
     inline const VectorReference &
     VectorReference::operator/=(const TrilinosScalar &value) const
     {
-      TrilinosScalar new_value = static_cast<TrilinosScalar>(*this) / value;
+      Assert(!vector.has_ghost_elements(), ExcGhostsPresent());
+
+      const TrilinosScalar new_value =
+        static_cast<TrilinosScalar>(*this) / value;
       vector.set(1, &index, &new_value);
+
       return *this;
     }
   } // namespace internal
+
+
 
   namespace MPI
   {

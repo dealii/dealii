@@ -721,6 +721,8 @@ namespace LinearAlgebra
       inline const VectorReference &
       VectorReference::operator=(const value_type &value) const
       {
+        Assert(!vector.has_ghost_elements(), ExcGhostsPresent());
+
         (*vector.vector)[0][index] = value;
 
         return *this;
@@ -731,7 +733,9 @@ namespace LinearAlgebra
       inline const VectorReference &
       VectorReference::operator+=(const value_type &value) const
       {
-        value_type new_value       = static_cast<value_type>(*this) + value;
+        Assert(!vector.has_ghost_elements(), ExcGhostsPresent());
+
+        const value_type new_value = static_cast<value_type>(*this) + value;
         (*vector.vector)[0][index] = new_value;
 
         return *this;
@@ -742,7 +746,9 @@ namespace LinearAlgebra
       inline const VectorReference &
       VectorReference::operator-=(const value_type &value) const
       {
-        value_type new_value       = static_cast<value_type>(*this) - value;
+        Assert(!vector.has_ghost_elements(), ExcGhostsPresent());
+
+        const value_type new_value = static_cast<value_type>(*this) - value;
         (*vector.vector)[0][index] = new_value;
 
         return *this;
@@ -753,7 +759,9 @@ namespace LinearAlgebra
       inline const VectorReference &
       VectorReference::operator*=(const value_type &value) const
       {
-        value_type new_value       = static_cast<value_type>(*this) * value;
+        Assert(!vector.has_ghost_elements(), ExcGhostsPresent());
+
+        const value_type new_value = static_cast<value_type>(*this) * value;
         (*vector.vector)[0][index] = new_value;
 
         return *this;
@@ -764,7 +772,9 @@ namespace LinearAlgebra
       inline const VectorReference &
       VectorReference::operator/=(const value_type &value) const
       {
-        value_type new_value       = static_cast<value_type>(*this) / value;
+        Assert(!vector.has_ghost_elements(), ExcGhostsPresent());
+
+        const value_type new_value = static_cast<value_type>(*this) / value;
         (*vector.vector)[0][index] = new_value;
 
         return *this;
