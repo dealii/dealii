@@ -456,6 +456,7 @@ namespace LinearAlgebra
     Vector<Number, MemorySpace> &
     Vector<Number, MemorySpace>::operator=(const Number s)
     {
+      Assert(!has_ghost_elements(), ExcGhostsPresent());
       Assert(s == Number(0.0),
              ExcMessage("Only 0 can be assigned to a vector."));
 
