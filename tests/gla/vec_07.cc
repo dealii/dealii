@@ -42,31 +42,40 @@ test()
   // are ghosting Element 1 (the second)
 
   IndexSet local_active(numproc * 2);
-  local_active.add_range(myid * 2, myid * 2 + 2);
+  local_active.add_range(myid * 2,
+                         myid * 2 + 2); // Process k owns entries 2k, 2k+1
+
   IndexSet local_relevant(numproc * 2);
-  local_relevant.add_range(1, 2);
+  local_relevant.add_range(1, 2); // All processes also have entry 1 as ghost
 
-  typename LA::MPI::Vector vb(local_active, MPI_COMM_WORLD);
-  typename LA::MPI::Vector v(local_active, local_relevant, MPI_COMM_WORLD);
+  typename LA::MPI::Vector fully_distributed_vector(local_active,
+                                                    MPI_COMM_WORLD);
 
-  vb = 1.0;
+  fully_distributed_vector = 1.0;
 
   // set local values
-  vb(myid * 2)     = myid * 2.0;
-  vb(myid * 2 + 1) = myid * 2.0 + 1.0;
+  fully_distributed_vector(myid * 2)     = myid * 2.0;
+  fully_distributed_vector(myid * 2 + 1) = myid * 2.0 + 1.0;
+  fully_distributed_vector.compress(VectorOperation::insert);
+  fully_distributed_vector *= 2.0;
 
-  vb.compress(VectorOperation::insert);
-  vb *= 2.0;
-  v = vb;
-  Assert(v.has_ghost_elements(), ExcInternalError());
+  typename LA::MPI::Vector vector_with_ghost_entries(local_active,
+                                                     local_relevant,
+                                                     MPI_COMM_WORLD);
+  vector_with_ghost_entries = fully_distributed_vector;
+  Assert(vector_with_ghost_entries.has_ghost_elements(), ExcInternalError());
 
-  deallog << "ghosted value: " << get_real_assert_zero_imag(v(1))
+  // Each process has entry 1 as a ghost (or actually owns it). Check this:
+  deallog << "ghosted value: "
+          << get_real_assert_zero_imag(vector_with_ghost_entries(1))
           << " (should be 2.0)" << std::endl;
-  v = 0;
-  deallog << "ghosted value: " << get_real_assert_zero_imag(v(1))
+  vector_with_ghost_entries = 0;
+  deallog << "ghosted value: "
+          << get_real_assert_zero_imag(vector_with_ghost_entries(1))
           << " (should be 0.0)" << std::endl;
-  v = 42.1;
-  deallog << "ghosted value: " << get_real_assert_zero_imag(v(1))
+  vector_with_ghost_entries = 42.1;
+  deallog << "ghosted value: "
+          << get_real_assert_zero_imag(vector_with_ghost_entries(1))
           << " (should be 42.1)" << std::endl;
 
   // done
