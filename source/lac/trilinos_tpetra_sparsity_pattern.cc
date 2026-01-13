@@ -416,6 +416,9 @@ namespace LinearAlgebra
                                                  col_map,
                                                  n_entries_per_row);
 
+        // We can't check for equality of sp.n_cols() and
+        // graph->getGlobalNumCols() here since we don't necessarily have a
+        // column map at this point.
         AssertDimension(sp.n_rows(), graph->getGlobalNumRows());
 
         std::vector<TrilinosWrappers::types::int_type> row_indices;
