@@ -3278,19 +3278,20 @@ namespace internal
             auto &lines_0 = tria.faces->lines; // data structure to be filled
 
             // get connectivity between quads and lines
-            const auto        &crs     = connectivity.entity_to_entities(1, 0);
-            const unsigned int n_lines = crs.offsets.size() - 1;
+            const auto &lines_to_vertices =
+              connectivity.entity_to_entities(1, 0);
+            const unsigned int n_lines = lines_to_vertices.offsets.size() - 1;
 
             // allocate memory
             reserve_space_(lines_0, n_lines);
 
             // loop over lines
             for (unsigned int line = 0; line < n_lines; ++line)
-              for (unsigned int i = crs.offsets[line], j = 0;
-                   i < crs.offsets[line + 1];
+              for (unsigned int i = lines_to_vertices.offsets[line], j = 0;
+                   i < lines_to_vertices.offsets[line + 1];
                    ++i, ++j)
                 lines_0.cells[line * ReferenceCells::max_n_faces<1>() + j] =
-                  crs.columns[i]; // set vertex indices
+                  lines_to_vertices.columns[i]; // set vertex indices
           }
 
         // TriaObjects: quads
@@ -3300,8 +3301,8 @@ namespace internal
             auto &faces   = *tria.faces;
 
             // get connectivity between quads and lines
-            const auto        &crs     = connectivity.entity_to_entities(2, 1);
-            const unsigned int n_quads = crs.offsets.size() - 1;
+            const auto &quads_to_lines = connectivity.entity_to_entities(2, 1);
+            const unsigned int n_quads = quads_to_lines.offsets.size() - 1;
 
             // allocate memory
             reserve_space_(quads_0, n_quads);
@@ -3315,14 +3316,14 @@ namespace internal
                 faces.set_quad_type(q, reference_cell);
 
                 // loop over all its lines
-                for (unsigned int i = crs.offsets[q], j = 0;
-                     i < crs.offsets[q + 1];
+                for (unsigned int i = quads_to_lines.offsets[q], j = 0;
+                     i < quads_to_lines.offsets[q + 1];
                      ++i, ++j, ++k)
                   {
                     AssertIndexRange(j, reference_cell.n_lines());
                     // set line index
                     quads_0.cells[q * ReferenceCells::max_n_lines<2>() + j] =
-                      crs.columns[i];
+                      quads_to_lines.columns[i];
 
                     // set line orientations
                     const auto combined_orientation =
@@ -3352,8 +3353,10 @@ namespace internal
           auto &level   = *tria.levels[0];
 
           // get connectivity between cells/faces and cells/cells
-          const auto &crs = connectivity.entity_to_entities(dim, dim - 1);
-          const auto &nei = connectivity.entity_to_entities(dim, dim);
+          const auto &cells_to_faces =
+            connectivity.entity_to_entities(dim, dim - 1);
+          const auto &cells_to_neighbor_cells =
+            connectivity.entity_to_entities(dim, dim);
 
           // in 2d optional: since in in pure QUAD meshes same line
           // orientations can be guaranteed
@@ -3390,18 +3393,20 @@ namespace internal
               level.reference_cell[cell] = connectivity.entity_types(dim)[cell];
 
               // loop over faces
-              for (unsigned int i = crs.offsets[cell], j = 0;
-                   i < crs.offsets[cell + 1];
+              for (unsigned int i = cells_to_faces.offsets[cell], j = 0;
+                   i < cells_to_faces.offsets[cell + 1];
                    ++i, ++j)
                 {
                   // set neighbor if not at boundary
-                  if (nei.columns[i] != static_cast<unsigned int>(-1))
+                  if (cells_to_neighbor_cells.columns[i] !=
+                      static_cast<unsigned int>(-1))
                     level.neighbors[cell * ReferenceCells::max_n_faces<dim>() +
-                                    j] = {0, nei.columns[i]};
+                                    j] = {0,
+                                          cells_to_neighbor_cells.columns[i]};
 
                   // set face indices
                   cells_0.cells[cell * ReferenceCells::max_n_faces<dim>() + j] =
-                    crs.columns[i];
+                    cells_to_faces.columns[i];
 
                   // set face orientation if needed
                   if (orientation_needed)
@@ -3426,14 +3431,15 @@ namespace internal
             std::vector<unsigned int> count(bids_face.size(), 0);
 
             // get connectivity between cells/faces
-            const auto &crs = connectivity.entity_to_entities(dim, dim - 1);
+            const auto &cells_to_faces =
+              connectivity.entity_to_entities(dim, dim - 1);
 
             // count how many cells are adjacent to the same face
             for (unsigned int cell = 0; cell < cells.size(); ++cell)
-              for (unsigned int i = crs.offsets[cell];
-                   i < crs.offsets[cell + 1];
+              for (unsigned int i = cells_to_faces.offsets[cell];
+                   i < cells_to_faces.offsets[cell + 1];
                    ++i)
-                count[crs.columns[i]]++;
+                count[cells_to_faces.columns[i]]++;
 
             // loop over all faces
             for (unsigned int face = 0; face < count.size(); ++face)
@@ -3448,11 +3454,13 @@ namespace internal
                   continue;
 
                 // ... and the lines of quads in 3d
-                const auto &crs = connectivity.entity_to_entities(2, 1);
-                for (unsigned int i = crs.offsets[face];
-                     i < crs.offsets[face + 1];
+                const auto &quads_to_lines =
+                  connectivity.entity_to_entities(2, 1);
+                for (unsigned int i = quads_to_lines.offsets[face];
+                     i < quads_to_lines.offsets[face + 1];
                      ++i)
-                  tria.faces->lines.boundary_or_material_id[crs.columns[i]]
+                  tria.faces->lines
+                    .boundary_or_material_id[quads_to_lines.columns[i]]
                     .boundary_id = 0;
               }
           }
@@ -3463,15 +3471,16 @@ namespace internal
 
             std::vector<unsigned int> type(vertices.size(), t_tba);
 
-            const auto &crs = connectivity.entity_to_entities(1, 0);
+            const auto &cells_to_vertices =
+              connectivity.entity_to_entities(1, 0);
 
             for (unsigned int cell = 0; cell < cells.size(); ++cell)
-              for (unsigned int i = crs.offsets[cell], j = 0;
-                   i < crs.offsets[cell + 1];
+              for (unsigned int i = cells_to_vertices.offsets[cell], j = 0;
+                   i < cells_to_vertices.offsets[cell + 1];
                    ++i, ++j)
-                if (type[crs.columns[i]] != t_inner)
-                  type[crs.columns[i]] =
-                    type[crs.columns[i]] == t_tba ? j : t_inner;
+                if (type[cells_to_vertices.columns[i]] != t_inner)
+                  type[cells_to_vertices.columns[i]] =
+                    type[cells_to_vertices.columns[i]] == t_tba ? j : t_inner;
 
             for (unsigned int face = 0; face < type.size(); ++face)
               {
