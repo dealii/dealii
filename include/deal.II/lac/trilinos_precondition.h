@@ -1285,7 +1285,7 @@ namespace TrilinosWrappers
    * is twofold.  When the initialize() function is invoked, a ML
    * preconditioner object is created based on the matrix that we want the
    * preconditioner to be based on. A call of the respective
-   * <code>vmult</code> function does call the respective operation in the
+   * <code>vmult</code> function calls the respective operation in the
    * Trilinos package, where it is called <code>ApplyInverse</code>. Use of
    * this class is explained in the step-31 tutorial program.
    *
@@ -1294,7 +1294,7 @@ namespace TrilinosWrappers
    * (Epetra) sparse matrices and vectors. There is support for use with
    * matrices of the dealii::SparseMatrix class and corresponding vectors,
    * too, but this requires generating a copy of the matrix, which is slower
-   * and takes (much) more memory. When doing such a copy operation, we can
+   * and takes (much) more memory. When doing such a copy operation, one can
    * still profit from the fact that some of the entries in the preconditioner
    * matrix are zero and hence can be neglected.
    *
@@ -1711,7 +1711,7 @@ namespace TrilinosWrappers
    * multigrid cycle. By default, this is a V-cycle, but the
    * AdditionalData class allows to also select a W-cycle.
    *
-   * @note You need to configure Trilinos with MueLU support for this
+   * @note You need to configure Trilinos with MueLu support for this
    * preconditioner to work.
    *
    * @note At the moment 64bit-indices are not supported.
