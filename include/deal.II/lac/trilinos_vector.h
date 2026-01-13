@@ -2258,6 +2258,7 @@ namespace TrilinosWrappers
     inline Vector &
     Vector::operator=(const TrilinosScalar s)
     {
+      Assert(!has_ghost_elements(), ExcGhostsPresent());
       AssertIsFinite(s);
 
       int ierr = vector->PutScalar(s);
