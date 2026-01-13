@@ -389,10 +389,10 @@ namespace Step9
   // <code>ExcDimensionMismatch</code> inheriting from ExceptionBase which
   // implements all necessary error output functions.
   //
-  // @note This exception we declare here is similar to the used inside the
-  // <code>AssertDimension</code> macro, which is a handy wrapper for
-  // checking that the dimensions of two given objects are equal, and that
-  // you have already seen in step-8.
+  // @note The exception so declared is similar to what you would use
+  // (under the hood) if you call the `AssertDimension` macro
+  // that checks that the dimensions of two objects are equal.
+  // You have already seen `AssertDimension` in step-8.
 
   class GradientEstimation
   {
