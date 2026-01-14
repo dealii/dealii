@@ -1257,7 +1257,19 @@ namespace LinearAlgebra
 #    ifdef DEAL_II_TRILINOS_WITH_TPETRA_MUELU
 
     /**
-     * @brief The class for the algebraic multigrid preconditioner MueLu.
+     * This class implements an algebraic multigrid (AMG) preconditioner based
+     * on the Trilinos MueLu implementation, which is a black-box preconditioner
+     * that works well for many PDE-based linear problems.
+     *
+     * This class can be used as a preconditioner for linear solvers. It
+     * also provides a `vmult()` function (implemented in the
+     * PreconditionBase base class) that, when called, performs one
+     * multigrid cycle. By default, this is a V-cycle, but the
+     * AdditionalData class allows to also select a W-cycle.
+     *
+     * @note You need to configure Trilinos with MueLu support for this
+     * preconditioner to work, and Trilinos needs to be built with the
+     * Tpetra package enabled.
      *
      * @ingroup TpetraWrappers
      * @ingroup Preconditioners
