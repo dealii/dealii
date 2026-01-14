@@ -48,6 +48,16 @@ namespace internal
         : offsets{0} {};
 
       /**
+       * Copy constructor.
+       */
+      ArrayOfArrays(const ArrayOfArrays &) = default;
+
+      /**
+       * Move constructor.
+       */
+      ArrayOfArrays(ArrayOfArrays &&) = default;
+
+      /**
        * Constructor which allows to set the internal fields directly.
        */
       ArrayOfArrays(const std::vector<std::size_t>  &offsets,
@@ -65,6 +75,18 @@ namespace internal
         : offsets(std::move(offsets))
         , columns(std::move(columns))
       {}
+
+      /**
+       * Copy operator.
+       */
+      ArrayOfArrays &
+      operator=(const ArrayOfArrays &) = default;
+
+      /**
+       * Move operator.
+       */
+      ArrayOfArrays &
+      operator=(ArrayOfArrays &&) = default;
 
       /**
        * Return the number of (inner) arrays stored by this object.
