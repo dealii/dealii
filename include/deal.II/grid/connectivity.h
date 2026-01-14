@@ -342,18 +342,11 @@ namespace internal
         cells_to_vertices.offsets;
       const std::vector<unsigned int> &cells_to_vertices_indices =
         cells_to_vertices.columns;
-      std::vector<std::size_t> &cells_to_faces_offsets = cells_to_faces.offsets;
-      std::vector<unsigned int> &cells_to_faces_indices =
-        cells_to_faces.columns;
 
       // note: we do not pre-allocate memory for these arrays because it turned
       // out that counting unique entities is more expensive than push_back().
-      std::vector<std::size_t>  &offsets_0 = crs_0.offsets;
-      std::vector<unsigned int> &columns_0 = crs_0.columns;
-
-      // clear
-      offsets_0 = {};
-      columns_0 = {};
+      std::vector<std::size_t>  offsets_0;
+      std::vector<unsigned int> columns_0;
 
       unsigned int n_entities = 0;
 
@@ -387,7 +380,7 @@ namespace internal
       ad_entity_types.reserve(n_entities);
       ad_compatibility.reserve(n_entities);
 
-      cells_to_faces_offsets.resize(cell_types.size() + 1);
+      std::vector<std::size_t> cells_to_faces_offsets(cell_types.size() + 1);
       cells_to_faces_offsets[0] = 0;
 
       static const unsigned int offset = 1;
@@ -475,7 +468,7 @@ namespace internal
             }
         }
 
-      cells_to_faces_indices.resize(keys.size());
+      std::vector<unsigned int> cells_to_faces_indices(keys.size());
       orientations.reinit(keys.size());
 
       // step 2: sort according to key so that entities with same key can be
@@ -554,6 +547,11 @@ namespace internal
           cells_to_faces_indices[offset_i] = counter;
         }
       offsets_0.push_back(columns_0.size());
+
+      // Finally build the output objects:
+      crs_0 = ArrayOfArrays(std::move(offsets_0), std::move(columns_0));
+      cells_to_faces = ArrayOfArrays(std::move(cells_to_faces_offsets),
+                                     std::move(cells_to_faces_indices));
     }
 
 
@@ -639,12 +637,10 @@ namespace internal
                        std::vector<ReferenceCell> &quad_t_id       // result
     )
     {
-      // reset output
-      quads_to_lines.offsets = {};
-      quads_to_lines.columns = {};
-
-      quads_to_lines.offsets.resize(quads_to_vertices.offsets.size());
-      quads_to_lines.offsets[0] = 0;
+      std::vector<std::size_t> quads_to_lines_offsets(
+        quads_to_vertices.offsets.size());
+      quads_to_lines_offsets[0] = 0;
+      std::vector<unsigned int> quads_to_lines_indices;
 
       quad_t_id.resize(quads_to_vertices.size());
 
@@ -658,18 +654,18 @@ namespace internal
             {
               const unsigned int f = cells_to_quads.columns[f_];
 
-              quads_to_lines.offsets[f + 1] =
+              quads_to_lines_offsets[f + 1] =
                 cell_types[c].face_reference_cell(f_index).n_lines();
             }
         }
 
       // use the counts to determine the offsets -> prefix sum
-      for (unsigned int i = 0; i < quads_to_lines.size(); ++i)
-        quads_to_lines.offsets[i + 1] += quads_to_lines.offsets[i];
+      for (unsigned int i = 0; i < quads_to_vertices.size(); ++i)
+        quads_to_lines_offsets[i + 1] += quads_to_lines_offsets[i];
 
       // allocate memory
-      quads_to_lines.columns.resize(quads_to_lines.offsets.back());
-      ori_ql.reinit(quads_to_lines.offsets.back());
+      quads_to_lines_indices.resize(quads_to_lines_offsets.back());
+      ori_ql.reinit(quads_to_lines_offsets.back());
 
       // loop over cells
       for (unsigned int c = 0; c < cells_to_quads.size(); ++c)
@@ -699,7 +695,7 @@ namespace internal
                   const unsigned int global_line_index =
                     cells_to_lines
                       .columns[cells_to_lines.offsets[c] + local_line_index];
-                  quads_to_lines.columns[quads_to_lines.offsets[f] + l] =
+                  quads_to_lines_indices[quads_to_lines_offsets[f] + l] =
                     global_line_index;
 
                   // determine orientation of line
@@ -721,12 +717,16 @@ namespace internal
 
                   // ... comparison gives orientation
                   ori_ql.set_combined_orientation(
-                    quads_to_lines.offsets[f] + l,
+                    quads_to_lines_offsets[f] + l,
                     same ? numbers::default_geometric_orientation :
                            numbers::reverse_line_orientation);
                 }
             }
         }
+
+      // Finally build the output object:
+      quads_to_lines = ArrayOfArrays(std::move(quads_to_lines_offsets),
+                                     std::move(quads_to_lines_indices));
     }
 
 
