@@ -17,6 +17,8 @@
 #include <deal.II/base/utilities.h>
 #include <deal.II/base/vectorization.h>
 
+#include <deal.II/fe/fe_nedelec.templates.h>
+
 #include <deal.II/matrix_free/shape_info.templates.h>
 
 #include <iostream>

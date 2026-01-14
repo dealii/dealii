@@ -4176,6 +4176,57 @@ inline DEAL_II_ALWAYS_INLINE
             }
           return value_out;
         }
+      else if (n_components == dim &&
+               this->data->element_type ==
+                 internal::MatrixFreeFunctions::ElementType::tensor_nedelec)
+        {
+          // Piola transform is required
+          if constexpr (running_in_debug_mode())
+            {
+              Assert(this->values_quad_initialized == true,
+                     internal::ExcAccessToUninitializedField());
+            }
+
+          AssertIndexRange(q_point, this->n_quadrature_points);
+          Assert(this->J_value != nullptr,
+                 internal::ExcMatrixFreeAccessToUninitializedMappingField(
+                   "update_values"));
+          const std::size_t nqp = this->n_quadrature_points;
+          Tensor<1, n_components, VectorizedArrayType> value_out;
+
+          if (!is_face &&
+              this->cell_type == internal::MatrixFreeFunctions::cartesian)
+            {
+              // Cartesian cell
+              const Tensor<2, dim, VectorizedArrayType> inv_transp_jac =
+                this->jacobian[0];
+
+
+              // J^{-T} * u
+              for (unsigned int comp = 0; comp < n_components; ++comp)
+                value_out[comp] = this->values_quad[comp * nqp + q_point] *
+                                  inv_transp_jac[comp][comp];
+            }
+          else
+            {
+              // Affine or general cell
+              const Tensor<2, dim, VectorizedArrayType> inv_t_jac =
+                (this->cell_type > internal::MatrixFreeFunctions::affine) ?
+                  this->jacobian[q_point] :
+                  this->jacobian[0];
+
+              // J^{-T} * u
+              for (unsigned int comp = 0; comp < n_components; ++comp)
+                {
+                  value_out[comp] =
+                    this->values_quad[q_point] * inv_t_jac[comp][0];
+                  for (unsigned int e = 1; e < dim; ++e)
+                    value_out[comp] +=
+                      this->values_quad[e * nqp + q_point] * inv_t_jac[comp][e];
+                }
+            }
+          return value_out;
+        }
       else
         {
           const std::size_t nqp = this->n_quadrature_points;
@@ -5037,6 +5088,65 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
                 }
             }
         }
+      else if (n_components == dim &&
+               this->data->element_type ==
+                 internal::MatrixFreeFunctions::ElementType::tensor_nedelec)
+        {
+          // Piola transform is required
+          AssertIndexRange(q_point, this->n_quadrature_points);
+          Assert(this->J_value != nullptr,
+                 internal::ExcMatrixFreeAccessToUninitializedMappingField(
+                   "update_value"));
+          if constexpr (running_in_debug_mode())
+            {
+              Assert(this->is_reinitialized, ExcNotInitialized());
+              this->values_quad_submitted = true;
+            }
+
+          VectorizedArrayType *values = this->values_quad + q_point;
+          const std::size_t    nqp    = this->n_quadrature_points;
+
+          if (!is_face &&
+              this->cell_type == internal::MatrixFreeFunctions::cartesian)
+            {
+              const Tensor<2, dim, VectorizedArrayType> inv_t_jac =
+                this->jacobian[0];
+              const VectorizedArrayType det_jac =
+                (dim == 2) ? this->jacobian[1][0][0] * this->jacobian[1][1][1] :
+                             this->jacobian[1][0][0] * this->jacobian[1][1][1] *
+                               this->jacobian[1][2][2];
+
+              const VectorizedArrayType weight =
+                this->quadrature_weights[q_point];
+
+              // J^{-1} * u * det(J) * weight
+              for (unsigned int comp = 0; comp < n_components; ++comp)
+                values[comp * nqp] =
+                  val_in[comp] * weight * inv_t_jac[comp][comp] * det_jac;
+            }
+          else
+            {
+              // Affine or general cell
+              const Tensor<2, dim, VectorizedArrayType> inv_t_jac =
+                (this->cell_type > internal::MatrixFreeFunctions::affine) ?
+                  this->jacobian[q_point] :
+                  this->jacobian[0];
+
+              const VectorizedArrayType fac =
+                ((this->cell_type > internal::MatrixFreeFunctions::affine) ?
+                   this->J_value[q_point] :
+                   this->J_value[0] * this->quadrature_weights[q_point]);
+
+              // J^{-1} * u * factor
+              for (unsigned int comp = 0; comp < n_components; ++comp)
+                {
+                  values[comp * nqp] = val_in[0] * inv_t_jac[0][comp];
+                  for (unsigned int e = 1; e < dim; ++e)
+                    values[comp * nqp] += val_in[e] * inv_t_jac[e][comp];
+                  values[comp * nqp] *= fac;
+                }
+            }
+        }
       else
         for (unsigned int comp = 0; comp < n_components; ++comp)
           values[comp * nqp] = val_in[comp] * JxW;
@@ -5842,6 +5952,97 @@ inline DEAL_II_ALWAYS_INLINE
                 "Do not try to modify the default template parameters used for"
                 " selectively enabling this function via std::enable_if!");
 
+  if (dim > 1 && this->data->element_type ==
+                   internal::MatrixFreeFunctions::ElementType::tensor_nedelec)
+    {
+      // Piola transformation required: Since the transformation for Nedelec
+      // is constructed to give a curl based on a scaled version of the
+      // reference curl, this function turns out to be particularly simple.
+      if constexpr (running_in_debug_mode())
+        {
+          Assert(this->gradients_quad_initialized == true,
+                 internal::ExcAccessToUninitializedField());
+        }
+      AssertIndexRange(q_point, this->n_quadrature_points);
+      Assert(this->jacobian != nullptr,
+             internal::ExcMatrixFreeAccessToUninitializedMappingField(
+               "update_gradients"));
+      Tensor<1, (dim == 2 ? 1 : dim), VectorizedArrayType> curl;
+      const std::size_t          nqp   = this->n_quadrature_points;
+      const std::size_t          nqp_d = nqp * dim;
+      const VectorizedArrayType *gradients =
+        this->gradients_quad + q_point * dim;
+      switch (dim)
+        {
+          case 2:
+            curl[0] = gradients[1 * nqp_d + 0] - gradients[0 * nqp_d + 1];
+            break;
+          case 3:
+            curl[0] = gradients[2 * nqp_d + 1] - gradients[1 * nqp_d + 2];
+            curl[1] = gradients[0 * nqp_d + 2] - gradients[2 * nqp_d + 0];
+            curl[2] = gradients[1 * nqp_d + 0] - gradients[0 * nqp_d + 1];
+            break;
+          default:
+            DEAL_II_NOT_IMPLEMENTED();
+        }
+      if (!is_face &&
+          this->cell_type == internal::MatrixFreeFunctions::cartesian)
+        {
+          VectorizedArrayType inv_det =
+            this->jacobian[0][0][0] *
+            ((dim == 2) ? this->jacobian[0][1][1] :
+                          this->jacobian[0][1][1] * this->jacobian[0][2][2]);
+
+          const Tensor<2, dim, VectorizedArrayType> jac = this->jacobian[1];
+
+          // J * curl * det(J^-1)
+          for (unsigned int d = 0; d < (dim == 2 ? 1 : dim); ++d)
+            {
+              if (dim == 2)
+                curl[d] *= inv_det;
+              else
+                curl[d] *= jac[d][d] * inv_det;
+            }
+        }
+      else
+        {
+          // Cell with general/constant Jacobian.
+          const Tensor<2, dim, VectorizedArrayType> inv_t_jac =
+            (this->cell_type > internal::MatrixFreeFunctions::affine) ?
+              this->jacobian[q_point] :
+              this->jacobian[0];
+          const Tensor<2, dim, VectorizedArrayType> jac =
+            (this->cell_type > internal::MatrixFreeFunctions::affine) ?
+              transpose(invert(inv_t_jac)) :
+              this->jacobian[1];
+
+          VectorizedArrayType inv_det = determinant(inv_t_jac);
+
+          // on faces in 2d, the determinant has the wrong sign due to ordering
+          // of derivatives
+          if (is_face && dim == 2 && this->get_face_no() < 2)
+            inv_det = -inv_det;
+
+          // J * curl * det(J^-1)
+          // In case of 2D its just a scaling with det(J^-1)
+          if constexpr (dim == 2)
+            curl[0] *= inv_det;
+          else
+            {
+              Tensor<1, dim, VectorizedArrayType> curl_temp;
+              for (unsigned int comp = 0; comp < dim; ++comp)
+                {
+                  curl_temp[comp] = curl[0] * jac[comp][0];
+                  for (unsigned int e = 1; e < dim; ++e)
+                    curl_temp[comp] += jac[comp][e] * curl[e];
+                }
+              for (unsigned int comp = 0; comp < dim; ++comp)
+                curl[comp] = curl_temp[comp] * inv_det;
+            }
+        }
+      return curl;
+    }
+
   // copy from generic function into dim-specialization function
   const Tensor<2, dim, VectorizedArrayType> grad = get_gradient(q_point);
   Tensor<1, (dim == 2 ? 1 : dim), VectorizedArrayType> curl;
@@ -6071,6 +6272,117 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
                 " selectively enabling this function via std::enable_if!");
 
   Tensor<2, dim, VectorizedArrayType> grad;
+
+  if (this->data->element_type ==
+      internal::MatrixFreeFunctions::ElementType::tensor_nedelec)
+    {
+      Tensor<1, (dim == 2) ? 1 : dim, VectorizedArrayType> curl_temp;
+
+      // Piola transform is required
+      AssertIndexRange(q_point, this->n_quadrature_points);
+      Assert(this->J_value != nullptr,
+             internal::ExcMatrixFreeAccessToUninitializedMappingField(
+               "update_value"));
+#  ifdef DEBUG
+      Assert(this->is_reinitialized, ExcNotInitialized());
+      this->gradients_quad_submitted = true;
+#  endif
+
+      const std::size_t    nqp_d     = this->n_quadrature_points * dim;
+      VectorizedArrayType *gradients = this->gradients_quad + q_point * dim;
+
+      if (!is_face &&
+          this->cell_type == internal::MatrixFreeFunctions::cartesian)
+        {
+          const Tensor<2, dim, VectorizedArrayType> jac = this->jacobian[1];
+          const VectorizedArrayType weight = this->quadrature_weights[q_point];
+
+          if constexpr (dim == 2)
+            {
+              curl_temp[0] = curl[0] * weight;
+            }
+          else if constexpr (dim == 3)
+            {
+              for (unsigned int comp = 0; comp < dim; ++comp)
+                {
+                  curl_temp[comp] = curl[comp] * jac[comp][comp] * weight;
+                }
+            }
+          else
+            DEAL_II_NOT_IMPLEMENTED();
+        }
+      else
+        {
+          // Affine or general cell
+          const Tensor<2, dim, VectorizedArrayType> inv_t_jac =
+            (this->cell_type > internal::MatrixFreeFunctions::affine) ?
+              this->jacobian[q_point] :
+              this->jacobian[0];
+
+          // Derivatives are reordered for faces. Need to take this into
+          // account and 1/inv_det != J_value for faces
+          const VectorizedArrayType fac =
+            (!is_face) ?
+              this->quadrature_weights[q_point] :
+              (((this->cell_type > internal::MatrixFreeFunctions::affine) ?
+                  this->J_value[q_point] :
+                  this->J_value[0] * this->quadrature_weights[q_point]) *
+               ((dim == 2 && this->get_face_no() < 2) ?
+                  -determinant(inv_t_jac) :
+                  determinant(inv_t_jac)));
+          const Tensor<2, dim, VectorizedArrayType> jac =
+            (this->cell_type > internal::MatrixFreeFunctions::affine) ?
+              transpose(invert(inv_t_jac)) :
+              this->jacobian[1];
+
+          if constexpr (dim == 2)
+            {
+              curl_temp[0] = curl[0] * fac;
+            }
+          else if constexpr (dim == 3)
+            {
+              // J^T * u * factor
+              for (unsigned int comp = 0; comp < n_components; ++comp)
+                {
+                  curl_temp[comp] = curl[0] * jac[0][comp];
+                  for (unsigned int e = 1; e < dim; ++e)
+                    curl_temp[comp] += curl[e] * jac[e][comp];
+                  curl_temp[comp] *= fac;
+                }
+            }
+          else
+            DEAL_II_NOT_IMPLEMENTED();
+        }
+      switch (dim)
+        {
+          case 2:
+            grad[1][0] = curl_temp[0];
+            grad[0][1] = -curl_temp[0];
+            grad[0][0] = 0;
+            grad[1][1] = 0;
+            break;
+          case 3:
+            grad[2][1] = curl_temp[0];
+            grad[1][2] = -curl_temp[0];
+            grad[0][2] = curl_temp[1];
+            grad[2][0] = -curl_temp[1];
+            grad[1][0] = curl_temp[2];
+            grad[0][1] = -curl_temp[2];
+            grad[0][0] = 0;
+            grad[1][1] = 0;
+            grad[2][2] = 0;
+            break;
+          default:
+            DEAL_II_NOT_IMPLEMENTED();
+        }
+      for (unsigned int d = 0; d < dim; ++d)
+        {
+          for (unsigned int comp = 0; comp < n_components; ++comp)
+            gradients[comp * nqp_d + d] = grad[comp][d];
+        }
+      return;
+    }
+
   switch (dim)
     {
       case 2:

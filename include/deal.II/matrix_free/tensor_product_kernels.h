@@ -2141,10 +2141,12 @@ namespace internal
 
 
 
-  template <int  dim,
-            int  fe_degree,
-            int  n_q_points_1d,
-            bool contract_over_rows,
+  template <int                              dim,
+            int                              fe_degree,
+            int                              n_q_points_1d,
+            bool                             contract_over_rows,
+            MatrixFreeFunctions::ElementType element_type =
+              MatrixFreeFunctions::tensor_raviart_thomas,
             bool symmetric_evaluate = true>
   struct EvaluatorTensorProductAnisotropic
   {
@@ -2174,10 +2176,20 @@ namespace internal
       Assert(contract_over_rows == false || !add_into_result,
              ExcMessage("Cannot add into result if contract_over_rows = true"));
 
-      constexpr int n_blocks1  = Utilities::pow(fe_degree, direction);
-      constexpr int n_blocks2  = Utilities::pow(fe_degree, dim - direction - 1);
-      constexpr int stride_in  = contract_over_rows ? 1 : stride;
-      constexpr int stride_out = contract_over_rows ? stride : 1;
+      constexpr int n_blocks1 =
+        Utilities::pow((element_type ==
+                        MatrixFreeFunctions::tensor_raviart_thomas) ?
+                         fe_degree :
+                         fe_degree + 2,
+                       direction);
+      constexpr int n_blocks2 =
+        Utilities::pow((element_type ==
+                        MatrixFreeFunctions::tensor_raviart_thomas) ?
+                         fe_degree :
+                         fe_degree + 2,
+                       dim - direction - 1);
+      constexpr int              stride_in  = contract_over_rows ? 1 : stride;
+      constexpr int              stride_out = contract_over_rows ? stride : 1;
       constexpr EvaluatorVariant variant =
         symmetric_evaluate ? evaluate_evenodd : evaluate_general;
 
@@ -2224,12 +2236,20 @@ namespace internal
                const int subface_index_1d = 0)
     {
       AssertIndexRange(direction, dim);
-      AssertDimension(fe_degree - 1, data.fe_degree);
+      AssertDimension((element_type ==
+                       MatrixFreeFunctions::tensor_raviart_thomas) ?
+                        fe_degree - 1 :
+                        fe_degree + 1,
+                      data.fe_degree);
       AssertDimension(n_q_points_1d, data.n_q_points_1d);
       static_assert(direction != normal_direction,
                     "Cannot interpolate tangentially in normal direction");
 
-      constexpr int  n_rows    = std::max(fe_degree, 0);
+      constexpr int internal_dof =
+        (element_type == MatrixFreeFunctions::tensor_raviart_thomas) ?
+          fe_degree :
+          fe_degree + 2;
+      constexpr int  n_rows    = std::max(internal_dof, 0);
       constexpr int  n_columns = n_q_points_1d;
       const Number2 *shape_data =
         symmetric_evaluate ?
@@ -2241,13 +2261,14 @@ namespace internal
         (direction > normal_direction) ?
           Utilities::pow(n_q_points_1d, direction) :
           (direction > 0 ?
-             (Utilities::pow(fe_degree, direction - 1) * n_q_points_1d) :
+             (Utilities::pow(internal_dof, direction - 1) * n_q_points_1d) :
              1);
       constexpr int n_blocks2 =
         (direction > normal_direction) ?
-          Utilities::pow(fe_degree, dim - 1 - direction) :
+          Utilities::pow(internal_dof, dim - 1 - direction) :
           ((direction + 1 < dim) ?
-             (Utilities::pow(fe_degree, dim - 2 - direction) * n_q_points_1d) :
+             (Utilities::pow(internal_dof, dim - 2 - direction) *
+              n_q_points_1d) :
              1);
 
       constexpr EvaluatorVariant variant =

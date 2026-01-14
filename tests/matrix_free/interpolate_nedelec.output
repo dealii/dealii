@@ -1,0 +1,50 @@
+
+DEAL:2d::Testing FE_NedelecNodal<2>(0)
+DEAL:2d::Error cell   values:     0.34641 0.72169 
+DEAL:2d::Error cell   curl: 3.3307e-16 0.0000 
+DEAL:2d::
+DEAL:2d::Error cell   values:     0.0000 0.0000 
+DEAL:2d::Error cell   curl: 0.0000 0.0000 
+DEAL:2d::
+DEAL:2d::Testing FE_NedelecNodal<2>(1)
+DEAL:2d::Error cell   values:     1.8504e-16 1.7733e-16 
+DEAL:2d::Error cell   curl: 1.3199e-15 0.0000 
+DEAL:2d::
+DEAL:2d::Error cell   values:     0.0000 0.0000 
+DEAL:2d::Error cell   curl: 0.0000 0.0000 
+DEAL:2d::
+DEAL:2d::Testing FE_NedelecNodal<2>(2)
+DEAL:2d::Error cell   values:     4.0506e-16 4.1633e-16 
+DEAL:2d::Error cell   curl: 2.5119e-15 0.0000 
+DEAL:2d::
+DEAL:2d::Error cell   values:     6.2172e-15 5.3291e-15 
+DEAL:2d::Error cell   curl: 2.3093e-14 0.0000 
+DEAL:2d::
+DEAL:2d::Testing FE_NedelecNodal<2>(3)
+DEAL:2d::Error cell   values:     2.5646e-16 2.2538e-16 
+DEAL:2d::Error cell   curl: 8.5709e-15 0.0000 
+DEAL:2d::
+DEAL:2d::Error cell   values:     2.9843e-15 2.4158e-15 
+DEAL:2d::Error cell   curl: 1.3301e-13 0.0000 
+DEAL:2d::
+DEAL:3d::Testing FE_NedelecNodal<3>(0)
+DEAL:3d::Error cell   values:     0.34641 0.72169 1.3279 
+DEAL:3d::Error cell   curl: 9.9920e-16 8.8818e-16 8.3267e-16 
+DEAL:3d::
+DEAL:3d::Error cell   values:     0.0000 0.0000 0.0000 
+DEAL:3d::Error cell   curl: 0.0000 0.0000 0.0000 
+DEAL:3d::
+DEAL:3d::Testing FE_NedelecNodal<3>(1)
+DEAL:3d::Error cell   values:     6.3195e-16 5.7362e-16 4.1196e-16 
+DEAL:3d::Error cell   curl: 2.1341e-15 2.5124e-15 2.8722e-15 
+DEAL:3d::
+DEAL:3d::Error cell   values:     0.0000 0.0000 4.7370e-15 
+DEAL:3d::Error cell   curl: 1.8948e-14 1.8948e-14 0.0000 
+DEAL:3d::
+DEAL:3d::Testing FE_NedelecNodal<3>(2)
+DEAL:3d::Error cell   values:     2.0478e-15 1.9583e-15 1.8710e-15 
+DEAL:3d::Error cell   curl: 4.9682e-15 8.2521e-15 6.0230e-15 
+DEAL:3d::
+DEAL:3d::Error cell   values:     1.4211e-14 1.4211e-14 1.5987e-14 
+DEAL:3d::Error cell   curl: 1.7764e-14 2.2204e-14 1.7764e-14 
+DEAL:3d::
