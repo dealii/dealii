@@ -253,42 +253,40 @@ namespace internal
     ArrayOfArrays
     determine_neighbors(const ArrayOfArrays &con_cf)
     {
-      const auto &columns_cf = con_cf.columns;
-      const auto &offsets_cf = con_cf.offsets;
-
       const unsigned int n_faces =
-        *std::max_element(columns_cf.begin(), columns_cf.end()) + 1;
+        *std::max_element(con_cf.columns.begin(), con_cf.columns.end()) + 1;
 
       // clear and initialize with -1 (assume that all faces are at the
       // boundary)
-      std::vector<unsigned int> columns_cc(columns_cf.size(), -1);
-      std::vector<std::size_t>  offsets_cc = offsets_cf;
+      std::vector<unsigned int> columns_cc(con_cf.columns.size(), -1);
+      std::vector<std::size_t>  offsets_cc = con_cf.offsets;
 
       std::vector<std::pair<unsigned int, unsigned int>> neighbors(n_faces,
                                                                    {-1, -1});
 
       // loop over all cells
-      for (unsigned int i_0 = 0; i_0 < offsets_cf.size() - 1; ++i_0)
+      unsigned int global_face_index = 0;
+      for (unsigned int cell = 0; cell < con_cf.size(); ++cell)
         {
           // ... and all its faces
-          for (std::size_t j_0 = offsets_cf[i_0]; j_0 < offsets_cf[i_0 + 1];
-               ++j_0)
+          const auto faces = con_cf[cell];
+          for (unsigned int f = 0; f < faces.size(); ++f, ++global_face_index)
             {
-              if (neighbors[columns_cf[j_0]].first ==
-                  static_cast<unsigned int>(-1))
+              if (neighbors[faces[f]].first == static_cast<unsigned int>(-1))
                 {
                   // face is visited the first time -> save the visiting cell
                   // and the face pointer
-                  neighbors[columns_cf[j_0]] =
-                    std::pair<unsigned int, unsigned int>(i_0, j_0);
+                  neighbors[faces[f]] =
+                    std::pair<unsigned int, unsigned int>(cell,
+                                                          global_face_index);
                 }
               else
                 {
                   // face is visited the second time -> now we know the cells
                   // on both sides of the face and we can determine for both
                   // cells the neighbor
-                  columns_cc[j_0] = neighbors[columns_cf[j_0]].first;
-                  columns_cc[neighbors[columns_cf[j_0]].second] = i_0;
+                  columns_cc[global_face_index] = neighbors[faces[f]].first;
+                  columns_cc[neighbors[faces[f]].second] = cell;
                 }
             }
         }
@@ -626,10 +624,10 @@ namespace internal
       quads_to_lines.offsets.resize(quads_to_vertices.offsets.size());
       quads_to_lines.offsets[0] = 0;
 
-      quad_t_id.resize(quads_to_vertices.offsets.size() - 1);
+      quad_t_id.resize(quads_to_vertices.size());
 
       // count the number of lines of each face
-      for (unsigned int c = 0; c < cells_to_quads.offsets.size() - 1; ++c)
+      for (unsigned int c = 0; c < cells_to_quads.size(); ++c)
         {
           // loop over faces
           for (unsigned int f_ = cells_to_quads.offsets[c], f_index = 0;
@@ -644,7 +642,7 @@ namespace internal
         }
 
       // use the counts to determine the offsets -> prefix sum
-      for (unsigned int i = 0; i < quads_to_lines.offsets.size() - 1; ++i)
+      for (unsigned int i = 0; i < quads_to_lines.size(); ++i)
         quads_to_lines.offsets[i + 1] += quads_to_lines.offsets[i];
 
       // allocate memory
@@ -652,7 +650,7 @@ namespace internal
       ori_ql.reinit(quads_to_lines.offsets.back());
 
       // loop over cells
-      for (unsigned int c = 0; c < cells_to_quads.offsets.size() - 1; ++c)
+      for (unsigned int c = 0; c < cells_to_quads.size(); ++c)
         {
           const ReferenceCell cell_type = cell_types[c];
 
@@ -771,20 +769,9 @@ namespace internal
               for (; l < cell_type.face_reference_cell(f).n_lines(); ++l)
                 {
                   AssertIndexRange(l, key.size());
-                  AssertIndexRange(c, temp1.offsets.size());
-                  AssertIndexRange(temp1.offsets[c] +
-                                     cell_type.face_to_cell_lines(
-                                       f,
-                                       l,
-                                       numbers::default_geometric_orientation),
-                                   temp1.columns.size());
-                  key[l] =
-                    temp1.columns[temp1.offsets[c] +
-                                  cell_type.face_to_cell_lines(
-                                    f,
-                                    l,
-                                    numbers::default_geometric_orientation)] +
-                    1 /*offset!*/;
+                  key[l] = temp1[c][cell_type.face_to_cell_lines(
+                             f, l, numbers::default_geometric_orientation)] +
+                           1 /*offset!*/;
                 }
 
               for (; l < key.size(); ++l)
