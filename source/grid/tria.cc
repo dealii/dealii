@@ -3380,6 +3380,7 @@ namespace internal
           reserve_space_(level, spacedim, n_cell, orientation_needed);
 
           // loop over all cells
+          unsigned int global_face_index = 0;
           for (unsigned int cell = 0; cell < n_cell; ++cell)
             {
               // set material ids
@@ -3395,7 +3396,8 @@ namespace internal
               // loop over faces
               const auto faces     = cells_to_faces[cell];
               const auto neighbors = cells_to_neighbor_cells[cell];
-              for (unsigned int f = 0; f < faces.size(); ++f)
+              for (unsigned int f = 0; f < faces.size();
+                   ++f, ++global_face_index)
                 {
                   // set neighbor if not at boundary
                   if (neighbors[f] != static_cast<unsigned int>(-1))
@@ -3412,8 +3414,7 @@ namespace internal
                       level.face_orientations.set_combined_orientation(
                         cell * ReferenceCells::max_n_faces<dim>() + f,
                         connectivity.entity_orientations(dim - 1)
-                          .get_combined_orientation(
-                            cells_to_faces.offsets[cell] + f));
+                          .get_combined_orientation(global_face_index));
                     }
                 }
             }

@@ -273,25 +273,43 @@ namespace internal
      *   index of the neighboring cell or -1 for boundary face)
      */
     ArrayOfArrays
-    determine_neighbors(const ArrayOfArrays &con_cf)
+    determine_neighbors(const ArrayOfArrays &cells_to_faces)
     {
-      const unsigned int n_faces =
-        *std::max_element(con_cf.columns.begin(), con_cf.columns.end()) + 1;
+      // First determine the maximal face number used. The number of faces
+      // is then one more (faces are counted starting at zero):
+      unsigned int n_faces = 0;
+      for (unsigned int cell = 0; cell < cells_to_faces.size(); ++cell)
+        {
+          const ArrayView<const unsigned int> face_indices =
+            cells_to_faces[cell];
+          n_faces = std::max(n_faces,
+                             *std::max_element(face_indices.begin(),
+                                               face_indices.end()) +
+                               1);
+        }
 
-      // clear and initialize with -1 (assume that all faces are at the
-      // boundary)
-      std::vector<unsigned int> columns_cc(con_cf.columns.size(), -1);
-      std::vector<std::size_t>  offsets_cc = con_cf.offsets;
+      std::vector<std::size_t> cells_to_cells_offsets(cells_to_faces.size() + 1,
+                                                      0u);
+      for (unsigned int cell = 0; cell < cells_to_faces.size(); ++cell)
+        {
+          const ArrayView<const unsigned int> face_indices =
+            cells_to_faces[cell];
+          cells_to_cells_offsets[cell + 1] =
+            cells_to_cells_offsets[cell] + face_indices.size();
+        }
+      std::vector<unsigned int> cells_to_cells_columns(
+        cells_to_cells_offsets.back(),
+        /* default: cells is at the boundary in this direction */ -1);
 
       std::vector<std::pair<unsigned int, unsigned int>> neighbors(n_faces,
                                                                    {-1, -1});
 
       // loop over all cells
       unsigned int global_face_index = 0;
-      for (unsigned int cell = 0; cell < con_cf.size(); ++cell)
+      for (unsigned int cell = 0; cell < cells_to_faces.size(); ++cell)
         {
           // ... and all its faces
-          const auto faces = con_cf[cell];
+          const auto faces = cells_to_faces[cell];
           for (unsigned int f = 0; f < faces.size(); ++f, ++global_face_index)
             {
               if (neighbors[faces[f]].first == static_cast<unsigned int>(-1))
@@ -307,13 +325,15 @@ namespace internal
                   // face is visited the second time -> now we know the cells
                   // on both sides of the face and we can determine for both
                   // cells the neighbor
-                  columns_cc[global_face_index] = neighbors[faces[f]].first;
-                  columns_cc[neighbors[faces[f]].second] = cell;
+                  cells_to_cells_columns[global_face_index] =
+                    neighbors[faces[f]].first;
+                  cells_to_cells_columns[neighbors[faces[f]].second] = cell;
                 }
             }
         }
 
-      return ArrayOfArrays(std::move(offsets_cc), std::move(columns_cc));
+      return ArrayOfArrays(std::move(cells_to_cells_offsets),
+                           std::move(cells_to_cells_columns));
     }
 
 
@@ -337,11 +357,6 @@ namespace internal
       const FU                         &second_key_function)
     {
       const bool compatibility_mode = true;
-
-      const std::vector<std::size_t> &cells_to_vertices_offsets =
-        cells_to_vertices.offsets;
-      const std::vector<unsigned int> &cells_to_vertices_indices =
-        cells_to_vertices.columns;
 
       // note: we do not pre-allocate memory for these arrays because it turned
       // out that counting unique entities is more expensive than push_back().
@@ -403,12 +418,9 @@ namespace internal
           cells_to_faces_offsets[c + 1] =
             cells_to_faces_offsets[c] + n_face_entities;
 
-          // ... collect vertices of cell
-          const dealii::ArrayView<const unsigned int> local_vertices(
-            cells_to_vertices_indices.data() + cells_to_vertices_offsets[c],
-            cells_to_vertices_offsets[c + 1] - cells_to_vertices_offsets[c]);
-
           // ... loop over all its entities
+          const ArrayView<const unsigned int> local_vertices =
+            cells_to_vertices[c];
           for (unsigned int e = 0; e < n_face_entities; ++e)
             {
               // ... determine global entity vertices
@@ -637,50 +649,51 @@ namespace internal
                        std::vector<ReferenceCell> &quad_t_id       // result
     )
     {
-      std::vector<std::size_t> quads_to_lines_offsets(
-        quads_to_vertices.offsets.size());
-      quads_to_lines_offsets[0] = 0;
-      std::vector<unsigned int> quads_to_lines_indices;
-
       quad_t_id.resize(quads_to_vertices.size());
 
-      // count the number of lines of each face
+      // Build the offsets of the compressed representation of the
+      // quads-to-lines array by counting the number of lines of each face.
+      // We do this by looping over all cells and querying their faces.
+      // This encounters faces in a random order, so we first
+      // store the number of lines of the f'th face in the (f+1)st
+      // offset and then run a prefix sum to sum up all
+      // previous offsets
+      std::vector<std::size_t> quads_to_lines_offsets(quads_to_vertices.size() +
+                                                      1);
       for (unsigned int c = 0; c < cells_to_quads.size(); ++c)
         {
           // loop over faces
-          for (unsigned int f_ = cells_to_quads.offsets[c], f_index = 0;
-               f_ < cells_to_quads.offsets[c + 1];
-               ++f_, ++f_index)
+          const ArrayView<const unsigned int> faces = cells_to_quads[c];
+          for (unsigned int f = 0; f < faces.size(); ++f)
             {
-              const unsigned int f = cells_to_quads.columns[f_];
-
-              quads_to_lines_offsets[f + 1] =
-                cell_types[c].face_reference_cell(f_index).n_lines();
+              quads_to_lines_offsets[faces[f] + 1] =
+                cell_types[c].face_reference_cell(f).n_lines();
             }
         }
-
-      // use the counts to determine the offsets -> prefix sum
-      for (unsigned int i = 0; i < quads_to_vertices.size(); ++i)
+      quads_to_lines_offsets[0] = 0;
+      for (unsigned int i = 0; i < quads_to_lines_offsets.size() - 1; ++i)
         quads_to_lines_offsets[i + 1] += quads_to_lines_offsets[i];
 
-      // allocate memory
-      quads_to_lines_indices.resize(quads_to_lines_offsets.back());
+      // Now that we have the offsets, allocate memory for the indices:
+      std::vector<unsigned int> quads_to_lines_indices(
+        quads_to_lines_offsets.back());
       ori_ql.reinit(quads_to_lines_offsets.back());
 
       // loop over cells
+      unsigned int global_face_index = 0;
       for (unsigned int c = 0; c < cells_to_quads.size(); ++c)
         {
           const ReferenceCell cell_type = cell_types[c];
 
           // loop over faces
-          for (unsigned int f_ = cells_to_quads.offsets[c], f_index = 0;
-               f_ < cells_to_quads.offsets[c + 1];
-               ++f_, ++f_index)
+          const ArrayView<const unsigned int> faces = cells_to_quads[c];
+          for (unsigned int f_index = 0; f_index < faces.size();
+               ++f_index, ++global_face_index)
             {
-              const unsigned int f = cells_to_quads.columns[f_];
+              const unsigned int f = faces[f_index];
 
               // only faces with default orientation have to do something
-              if (ori_cq.get_combined_orientation(f_) !=
+              if (ori_cq.get_combined_orientation(global_face_index) !=
                   numbers::default_geometric_orientation)
                 continue;
 
@@ -693,8 +706,7 @@ namespace internal
                     cell_type.face_to_cell_lines(
                       f_index, l, numbers::default_geometric_orientation);
                   const unsigned int global_line_index =
-                    cells_to_lines
-                      .columns[cells_to_lines.offsets[c] + local_line_index];
+                    cells_to_lines[c][local_line_index];
                   quads_to_lines_indices[quads_to_lines_offsets[f] + l] =
                     global_line_index;
 
@@ -702,14 +714,12 @@ namespace internal
                   bool same = true;
                   for (unsigned int v = 0; v < 2; ++v)
                     if (cells_to_vertices
-                          .columns[cells_to_vertices.offsets[c] +
-                                   cell_type.face_and_line_to_cell_vertices(
-                                     f_index,
-                                     l,
-                                     v,
-                                     numbers::default_geometric_orientation)] !=
-                        lines_to_vertices.columns
-                          [lines_to_vertices.offsets[global_line_index] + v])
+                          [c][cell_type.face_and_line_to_cell_vertices(
+                            f_index,
+                            l,
+                            v,
+                            numbers::default_geometric_orientation)] !=
+                        lines_to_vertices[global_line_index][v])
                       {
                         same = false;
                         break;
