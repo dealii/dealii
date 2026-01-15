@@ -8876,9 +8876,56 @@ namespace GridGenerator
                 }
               else
                 {
-                  Assert(
-                    false,
-                    ExcNotImplemented()); // 3d case not currently implemented
+                  if (v == 0)
+                    {
+                      new_cell.vertices = {
+                        cell->vertex_index(0),
+                        line_to_midpoint_vertex_map[cell->line(0)],
+                        line_to_midpoint_vertex_map[cell->line(2)],
+                        face_to_midpoint_vertex_map[cell->face(0)],
+                        line_to_midpoint_vertex_map[cell->line(3)],
+                        face_to_midpoint_vertex_map[cell->face(1)],
+                        face_to_midpoint_vertex_map[cell->face(2)],
+                        cell_to_midpoint_vertex_map[cell]};
+                    }
+                  else if (v == 1)
+                    {
+                      new_cell.vertices = {
+                        line_to_midpoint_vertex_map[cell->line(0)],
+                        cell->vertex_index(1),
+                        face_to_midpoint_vertex_map[cell->face(0)],
+                        line_to_midpoint_vertex_map[cell->line(1)],
+                        face_to_midpoint_vertex_map[cell->face(1)],
+                        line_to_midpoint_vertex_map[cell->line(4)],
+                        cell_to_midpoint_vertex_map[cell],
+                        face_to_midpoint_vertex_map[cell->face(3)]};
+                    }
+                  else if (v == 2)
+                    {
+                      new_cell.vertices = {
+                        line_to_midpoint_vertex_map[cell->line(2)],
+                        face_to_midpoint_vertex_map[cell->face(0)],
+                        cell->vertex_index(2),
+                        line_to_midpoint_vertex_map[cell->line(1)],
+                        face_to_midpoint_vertex_map[cell->face(2)],
+                        cell_to_midpoint_vertex_map[cell],
+                        line_to_midpoint_vertex_map[cell->line(5)],
+                        face_to_midpoint_vertex_map[cell->face(3)]};
+                    }
+                  else if (v == 3)
+                    {
+                      new_cell.vertices = {
+                        line_to_midpoint_vertex_map[cell->line(3)],
+                        face_to_midpoint_vertex_map[cell->face(1)],
+                        face_to_midpoint_vertex_map[cell->face(2)],
+                        cell_to_midpoint_vertex_map[cell],
+                        cell->vertex_index(3),
+                        line_to_midpoint_vertex_map[cell->line(4)],
+                        line_to_midpoint_vertex_map[cell->line(5)],
+                        face_to_midpoint_vertex_map[cell->face(3)]};
+                    }
+                  else
+                    DEAL_II_ASSERT_UNREACHABLE();
                 }
 
               new_cell.material_id = cell->material_id();
@@ -8911,9 +8958,36 @@ namespace GridGenerator
                   }
                 else
                   {
-                    Assert(
-                      false,
-                      ExcNotImplemented()); // 3d case not currently implemented
+                    CellData<dim - 1> child_face_1, child_face_2, child_face_3;
+
+                    child_face_1.vertices = {
+                      face->vertex_index(0),
+                      line_to_midpoint_vertex_map[face->line(0)],
+                      line_to_midpoint_vertex_map[face->line(2)],
+                      face_to_midpoint_vertex_map[face]};
+                    child_face_1.boundary_id = face->boundary_id();
+
+                    child_face_2.vertices = {
+                      line_to_midpoint_vertex_map[face->line(0)],
+                      face->vertex_index(1),
+                      face_to_midpoint_vertex_map[face],
+                      line_to_midpoint_vertex_map[face->line(1)]};
+
+                    child_face_2.boundary_id = face->boundary_id();
+
+                    child_face_3.vertices = {
+                      line_to_midpoint_vertex_map[face->line(2)],
+                      face_to_midpoint_vertex_map[face],
+                      face->vertex_index(2),
+                      line_to_midpoint_vertex_map[face->line(1)]};
+                    child_face_3.boundary_id = face->boundary_id();
+
+                    subcell_data.boundary_quads.emplace_back(
+                      std::move(child_face_1));
+                    subcell_data.boundary_quads.emplace_back(
+                      std::move(child_face_2));
+                    subcell_data.boundary_quads.emplace_back(
+                      std::move(child_face_3));
                   }
               }
 
@@ -8922,6 +8996,13 @@ namespace GridGenerator
         // meshes to simplex meshes, given that manifolds object are typically
         // specific for one cell type.
         out_tria.clear();
+
+        if constexpr (dim == 3)
+          {
+            GridTools::invert_cells_with_negative_measure(vertices, cell_data);
+            GridTools::consistently_order_cells(cell_data);
+          }
+
         out_tria.create_triangulation(vertices, cell_data, subcell_data);
 
         for (const auto i : out_tria.get_manifold_ids())
