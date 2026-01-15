@@ -95,6 +95,23 @@ macro(feature_trilinos_find_external var)
     endif()
 
     #
+    # We require at most Trilinos 16.2, as version 17.0 removed all deprecated
+    # packages that we still rely on.
+    #
+    if(TRILINOS_VERSION VERSION_GREATER_EQUAL 17.0)
+      message(STATUS "Could not find a sufficient Trilinos installation: "
+        "deal.II requires at most version 16.2, but version ${TRILINOS_VERSION} was found."
+      )
+      set(TRILINOS_ADDITIONAL_ERROR_STRING
+        ${TRILINOS_ADDITIONAL_ERROR_STRING}
+        "The Trilinos installation (found at \"${TRILINOS_DIR}\")\n"
+        "with version ${TRILINOS_VERSION} is too new.\n"
+        "deal.II requires at most version 16.2.\n\n"
+      )
+      set(${var} FALSE)
+    endif()
+
+    #
     # Trilinos has to be configured with the same MPI configuration as
     # deal.II.
     #
