@@ -14,7 +14,7 @@
  */
 
 // Test function GridGenerator::convert_simplex_to_hypercube_mesh() in
-// 2D for a mesh that consists of only a single triangle that is then
+// 2D and 3D for a mesh that consists of only a single simplex that is then
 // once refined. The function can deal with refined meshes, just not
 // adaptively refined ones, which it simply flattens into a single
 // coarse mesh before converting into a quad/hex mesh.
@@ -85,4 +85,5 @@ main()
 {
   initlog();
   check<2, 2>();
+  check<3, 3>();
 }

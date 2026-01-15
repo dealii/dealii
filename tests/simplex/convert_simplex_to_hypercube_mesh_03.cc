@@ -14,7 +14,7 @@
  */
 
 // Test function GridGenerator::convert_simplex_to_hypercube_mesh() in
-// 2D and 3D for a mesh that consists of only a single simplex.
+// 2D and 3D for a hypercube mesh subdivided into simplices.
 
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/grid_out.h>
@@ -29,13 +29,15 @@
 #include "../tests.h"
 
 
+using namespace dealii;
 
 template <int dim, int spacedim>
 void
 check()
 {
   Triangulation<dim, spacedim> in_tria, out_tria;
-  GridGenerator::reference_cell(in_tria, ReferenceCells::get_simplex<dim>());
+  GridGenerator::subdivided_hyper_cube_with_simplices(in_tria, 3);
+
 
   // make each cell a different material id
   unsigned int m_id = 1;
@@ -45,15 +47,27 @@ check()
     }
 
   // set different boundary ids and output
-  unsigned int b_id = 42;
   for (const auto &cell : in_tria)
     {
       for (const auto f : cell.face_indices())
         {
           if (cell.face(f)->at_boundary())
             {
-              cell.face(f)->set_boundary_id(b_id);
-              b_id++;
+              if (std::abs(cell.face(f)->center()[0] - 0.0) < 1e-12)
+                cell.face(f)->set_boundary_id(42);
+              if (std::abs(cell.face(f)->center()[0] - 1.0) < 1e-12)
+                cell.face(f)->set_boundary_id(43);
+              if (std::abs(cell.face(f)->center()[1] - 0.0) < 1e-12)
+                cell.face(f)->set_boundary_id(44);
+              if (std::abs(cell.face(f)->center()[1] - 1.0) < 1e-12)
+                cell.face(f)->set_boundary_id(45);
+              if constexpr (dim == 3)
+                {
+                  if (std::abs(cell.face(f)->center()[2] - 0.0) < 1e-12)
+                    cell.face(f)->set_boundary_id(46);
+                  if (std::abs(cell.face(f)->center()[2] - 1.0) < 1e-12)
+                    cell.face(f)->set_boundary_id(47);
+                }
             }
         }
     }
@@ -73,7 +87,6 @@ check()
       if (face->at_boundary())
         deallog << face << ", boundary id=" << face->boundary_id() << std::endl;
 }
-
 
 int
 main()
