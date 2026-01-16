@@ -28,6 +28,7 @@ if (DEAL_II_WITH_SUNDIALS)
 
   set(_inst
     ${_inst}
+    arkode.inst.in
     n_vector.inst.in
     )
 endif()
