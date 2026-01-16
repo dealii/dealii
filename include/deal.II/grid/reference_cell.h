@@ -973,6 +973,14 @@ public:
   Tensor<1, dim> unit_normal_vectors(const unsigned int face_no) const;
 
   /**
+   * The number of orientations this type of reference cell can have in case it
+   * is used as a codimensional object of a cell (only then there is a
+   * meaningful interpretation of orientation).
+   */
+  unsigned int
+  n_orientations() const;
+
+  /**
    * Return the number of orientations for a face in the ReferenceCell. For
    * example, for hexahedra this is 8 for every face since quadrilaterals have
    * 8 possible orientations.
@@ -3840,20 +3848,38 @@ ReferenceCell::face_normal_vector(const unsigned int face_no) const
 
 
 inline unsigned int
+ReferenceCell::n_orientations() const
+{
+  // 3D cells never are faces (because no 4D cells exist)
+  Assert(get_dimension() < 3, ExcImpossibleInDim(3));
+
+  switch (this->kind)
+    {
+      case ReferenceCells::Vertex:
+        return 1;
+      case ReferenceCells::Line:
+        return 2;
+      case ReferenceCells::Triangle:
+        return 6;
+      case ReferenceCells::Quadrilateral:
+        return 8;
+      case ReferenceCells::Invalid:
+        // might be reached in case n_face_orientations is called on a vertex
+        DEAL_II_ASSERT_UNREACHABLE();
+      default:
+        DEAL_II_NOT_IMPLEMENTED();
+    }
+  return numbers::invalid_unsigned_int;
+}
+
+
+
+inline unsigned int
 ReferenceCell::n_face_orientations(const unsigned int face_no) const
 {
   AssertIndexRange(face_no, n_faces());
-  if (get_dimension() == 1)
-    return 1;
-  if (get_dimension() == 2)
-    return 2;
-  else if (face_reference_cell(face_no) == ReferenceCells::Quadrilateral)
-    return 8;
-  else if (face_reference_cell(face_no) == ReferenceCells::Triangle)
-    return 6;
 
-  DEAL_II_ASSERT_UNREACHABLE();
-  return numbers::invalid_unsigned_int;
+  return face_reference_cell(face_no).n_orientations();
 }
 
 
