@@ -39,11 +39,11 @@ class Quadrature;
 
 /**
  * Implementation of scalar, discontinuous tensor product elements based on
- * equidistant support points.
+ * support points given by Gauss-Lobatto quadrature of suitable order.
  *
  * This is a discontinuous finite element based on tensor products of
  * Lagrangian polynomials. The shape functions are Lagrangian interpolants of
- * an equidistant grid of points on the unit cell. The points are numbered in
+ * a grid of Gauss-Lobatto points on the unit cell. The points are numbered in
  * lexicographical order, with <i>x</i> running fastest, then <i>y</i>, then
  * <i>z</i> (if these coordinates are present for a given space dimension at
  * all). For example, these are the node orderings for <tt>FE_DGQ(1)</tt> in
