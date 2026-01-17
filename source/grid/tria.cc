@@ -3278,20 +3278,21 @@ namespace internal
             auto &lines_0 = tria.faces->lines; // data structure to be filled
 
             // get connectivity between quads and lines
-            const auto &lines_to_vertices =
+            const ArrayOfArrays &lines_to_vertices =
               connectivity.entity_to_entities(1, 0);
-            const unsigned int n_lines = lines_to_vertices.offsets.size() - 1;
+            const unsigned int n_lines = lines_to_vertices.size();
 
             // allocate memory
             reserve_space_(lines_0, n_lines);
 
             // loop over lines
             for (unsigned int line = 0; line < n_lines; ++line)
-              for (unsigned int i = lines_to_vertices.offsets[line], j = 0;
-                   i < lines_to_vertices.offsets[line + 1];
-                   ++i, ++j)
-                lines_0.cells[line * ReferenceCells::max_n_faces<1>() + j] =
-                  lines_to_vertices.columns[i]; // set vertex indices
+              {
+                const auto vertices = lines_to_vertices[line];
+                for (unsigned int v = 0; v < vertices.size(); ++v)
+                  lines_0.cells[line * ReferenceCells::max_n_faces<1>() + v] =
+                    vertices[v]; // set vertex indices
+              }
           }
 
         // TriaObjects: quads
@@ -3302,7 +3303,7 @@ namespace internal
 
             // get connectivity between quads and lines
             const auto &quads_to_lines = connectivity.entity_to_entities(2, 1);
-            const unsigned int n_quads = quads_to_lines.offsets.size() - 1;
+            const unsigned int n_quads = quads_to_lines.size();
 
             // allocate memory
             reserve_space_(quads_0, n_quads);
@@ -3316,14 +3317,13 @@ namespace internal
                 faces.set_quad_type(q, reference_cell);
 
                 // loop over all its lines
-                for (unsigned int i = quads_to_lines.offsets[q], j = 0;
-                     i < quads_to_lines.offsets[q + 1];
-                     ++i, ++j, ++k)
+                const auto lines = quads_to_lines[q];
+                for (unsigned int l = 0; l < lines.size(); ++l, ++k)
                   {
-                    AssertIndexRange(j, reference_cell.n_lines());
+                    AssertIndexRange(l, reference_cell.n_lines());
                     // set line index
-                    quads_0.cells[q * ReferenceCells::max_n_lines<2>() + j] =
-                      quads_to_lines.columns[i];
+                    quads_0.cells[q * ReferenceCells::max_n_lines<2>() + l] =
+                      lines[l];
 
                     // set line orientations
                     const auto combined_orientation =
@@ -3340,7 +3340,7 @@ namespace internal
                     // store true for the default orientation and false for
                     // reversed.
                     faces.quads_line_orientations
-                      [q * ReferenceCells::max_n_lines<2>() + j] =
+                      [q * ReferenceCells::max_n_lines<2>() + l] =
                       combined_orientation ==
                       numbers::default_geometric_orientation;
                   }
@@ -3393,28 +3393,27 @@ namespace internal
               level.reference_cell[cell] = connectivity.entity_types(dim)[cell];
 
               // loop over faces
-              for (unsigned int i = cells_to_faces.offsets[cell], j = 0;
-                   i < cells_to_faces.offsets[cell + 1];
-                   ++i, ++j)
+              const auto faces     = cells_to_faces[cell];
+              const auto neighbors = cells_to_neighbor_cells[cell];
+              for (unsigned int f = 0; f < faces.size(); ++f)
                 {
                   // set neighbor if not at boundary
-                  if (cells_to_neighbor_cells.columns[i] !=
-                      static_cast<unsigned int>(-1))
+                  if (neighbors[f] != static_cast<unsigned int>(-1))
                     level.neighbors[cell * ReferenceCells::max_n_faces<dim>() +
-                                    j] = {0,
-                                          cells_to_neighbor_cells.columns[i]};
+                                    f] = {0, neighbors[f]};
 
                   // set face indices
-                  cells_0.cells[cell * ReferenceCells::max_n_faces<dim>() + j] =
-                    cells_to_faces.columns[i];
+                  cells_0.cells[cell * ReferenceCells::max_n_faces<dim>() + f] =
+                    faces[f];
 
                   // set face orientation if needed
                   if (orientation_needed)
                     {
                       level.face_orientations.set_combined_orientation(
-                        cell * ReferenceCells::max_n_faces<dim>() + j,
+                        cell * ReferenceCells::max_n_faces<dim>() + f,
                         connectivity.entity_orientations(dim - 1)
-                          .get_combined_orientation(i));
+                          .get_combined_orientation(
+                            cells_to_faces.offsets[cell] + f));
                     }
                 }
             }
@@ -3436,10 +3435,8 @@ namespace internal
 
             // count how many cells are adjacent to the same face
             for (unsigned int cell = 0; cell < cells.size(); ++cell)
-              for (unsigned int i = cells_to_faces.offsets[cell];
-                   i < cells_to_faces.offsets[cell + 1];
-                   ++i)
-                count[cells_to_faces.columns[i]]++;
+              for (const unsigned int face : cells_to_faces[cell])
+                ++count[face];
 
             // loop over all faces
             for (unsigned int face = 0; face < count.size(); ++face)
@@ -3456,12 +3453,9 @@ namespace internal
                 // ... and the lines of quads in 3d
                 const auto &quads_to_lines =
                   connectivity.entity_to_entities(2, 1);
-                for (unsigned int i = quads_to_lines.offsets[face];
-                     i < quads_to_lines.offsets[face + 1];
-                     ++i)
-                  tria.faces->lines
-                    .boundary_or_material_id[quads_to_lines.columns[i]]
-                    .boundary_id = 0;
+                for (const unsigned int line : quads_to_lines[face])
+                  tria.faces->lines.boundary_or_material_id[line].boundary_id =
+                    0;
               }
           }
         else // 1d
@@ -3475,12 +3469,13 @@ namespace internal
               connectivity.entity_to_entities(1, 0);
 
             for (unsigned int cell = 0; cell < cells.size(); ++cell)
-              for (unsigned int i = cells_to_vertices.offsets[cell], j = 0;
-                   i < cells_to_vertices.offsets[cell + 1];
-                   ++i, ++j)
-                if (type[cells_to_vertices.columns[i]] != t_inner)
-                  type[cells_to_vertices.columns[i]] =
-                    type[cells_to_vertices.columns[i]] == t_tba ? j : t_inner;
+              {
+                const auto vertices = cells_to_vertices[cell];
+                for (unsigned int v = 0; v < vertices.size(); ++v)
+                  if (type[vertices[v]] != t_inner)
+                    type[vertices[v]] =
+                      (type[vertices[v]] == t_tba ? v : t_inner);
+              }
 
             for (unsigned int face = 0; face < type.size(); ++face)
               {
@@ -3555,8 +3550,8 @@ namespace internal
                         ExcNotImplemented());
 
             // create key
-            key.assign(crs.columns.data() + crs.offsets[o],
-                       crs.columns.data() + crs.offsets[o + 1]);
+            const ArrayView<const unsigned int> indices = crs[o];
+            key.assign(indices.begin(), indices.end());
             std::sort(key.begin(), key.end());
 
             // is subcelldata provided? -> binary search
