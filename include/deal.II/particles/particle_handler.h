@@ -259,6 +259,45 @@ namespace Particles
       const;
 
     /**
+     * This function traverses the cell hierarchy starting from a cell obtained
+     * by moving @p relative_level levels upward from the given @p cell, and collects
+     * particles from all active cells in the resulting subtree.
+     *
+     * If @p relative_level is zero, the traversal starts at @p cell itself.
+     * If the resulting root cell is active, the returned vector contains
+     * exactly one particle range corresponding to that cell similar to calling
+     * particles_in_cell().
+     *
+     * @param cell A cell iterator identifying the reference cell in the triangulation.
+     * @param relative_level A non-negative integer specifying how many parent levels to
+     * move upward from @p cell before collecting particles.
+     *
+     * @return A vector of particle iterator ranges, one for each active descendant cell
+     * in the subtree rooted at the selected cell.
+     */
+    std::vector<particle_iterator_range>
+    particles_in_descendant_active_cells(
+      const typename Triangulation<dim, spacedim>::cell_iterator &cell,
+      const int relative_level) const;
+
+    /**
+     * For each cell on the given refinement level, this function returns a
+     * vector of iterator ranges over all particles that belong to this cell.
+     * The particles may be located in multiple descendant active cells, but are
+     * grouped according to their parent cell on the specified level.
+     *
+     * This function is equivalent to calling
+     * particles_in_descendant_active_cells() for all cells on the given level.
+     *
+     * @param level Refinement level of the parent cells.
+     * @return A map from cells on @p level to vectors of particle iterator ranges
+     * for particles inside the corresponding cells.
+     */
+    std::map<typename Triangulation<dim, spacedim>::cell_iterator,
+             std::vector<particle_iterator_range>>
+    particles_in_active_subtrees_of_parent_cells(const int level) const;
+
+    /**
      * Remove a particle pointed to by the iterator. Note that @p particle
      * and all iterators that point to other particles in the same cell
      * as @p particle will be invalidated during this call.
