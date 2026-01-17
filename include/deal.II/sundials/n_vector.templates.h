@@ -18,6 +18,8 @@
 
 #include <deal.II/base/config.h>
 
+#include <deal.II/base/mpi.h>
+
 #include <deal.II/sundials/n_vector.h>
 #include <deal.II/sundials/sundials_types.h>
 
@@ -897,9 +899,9 @@ namespace SUNDIALS
       dot_product_multi_all_reduce(int nv, N_Vector x, realtype *d)
       {
         ArrayView<realtype> products(d, nv);
-        Utilities::MPI::sum(products,
-                            get_mpi_communicator<VectorType>(x),
-                            products);
+        ::dealii::Utilities::MPI::sum(products,
+                                      get_mpi_communicator<VectorType>(x),
+                                      products);
         return 0;
       }
 
@@ -1045,8 +1047,8 @@ namespace SUNDIALS
         const auto local_min = *std::min_element(local_elements.begin(),
                                                  local_elements.end(),
                                                  indexed_less_than);
-        return Utilities::MPI::min((*vector)[local_min],
-                                   get_mpi_communicator<VectorType>(x));
+        return ::dealii::Utilities::MPI::min(
+          (*vector)[local_min], get_mpi_communicator<VectorType>(x));
       }
 
 
@@ -1085,8 +1087,8 @@ namespace SUNDIALS
                          vector->block(i)[*block_local_min_element]);
           }
 
-        return Utilities::MPI::min(proc_local_min,
-                                   get_mpi_communicator<VectorType>(x));
+        return ::dealii::Utilities::MPI::min(
+          proc_local_min, get_mpi_communicator<VectorType>(x));
       }
 
 
