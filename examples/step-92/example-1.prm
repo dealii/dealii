@@ -1,0 +1,27 @@
+# Listing of Parameters
+# ---------------------
+
+subsection Problem
+  
+  # mesh file name
+  set mesh filename = example-1
+
+  # physical domains
+  # each as       ID : Name         : kappa [A/Vm] : epsilon_r
+  set domains   =  0 : default      :   0.0        :       1.0  , \
+                  10 : conductor_1  :  56.0e+6     :       1.0  , \
+                  20 : conductor_2  :  56.0e+6     :       1.0  , \
+                  30 : barrier      :   0.0        :       4.0
+
+  # Dirichlet boundaries (and its electrostatic potentials "phi_e")
+  # each as        ID : Name         : phi_e [V]
+  set potentials =  0 : default      :   0.0     , \
+                   11 : terminal_11  :   1.0     , \
+                   12 : terminal_12  :   0.5     , \
+                   21 : terminal_21  :   0.5     , \
+                   22 : terminal_22  :  -1.0
+
+  # cells output data filename
+  set cells output data filename = example-1_cells_output_data
+
+end
