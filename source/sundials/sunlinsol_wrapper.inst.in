@@ -23,9 +23,12 @@ for (S : REAL_SCALARS; V : DEAL_II_VEC_TEMPLATES)
 // parallel Vector and BlockVector
 for (S : REAL_SCALARS; V : DEAL_II_VEC_TEMPLATES)
   {
-    template struct SUNDIALS::SundialsOperator<LinearAlgebra::distributed::V<S>>;
-    template struct SUNDIALS::SundialsPreconditioner<LinearAlgebra::distributed::V<S>>;
-    template class SUNDIALS::internal::LinearSolverWrapper<LinearAlgebra::distributed::V<S>>;
+    template struct SUNDIALS::SundialsOperator<
+      LinearAlgebra::distributed::V<S>>;
+    template struct SUNDIALS::SundialsPreconditioner<
+      LinearAlgebra::distributed::V<S>>;
+    template class SUNDIALS::internal::LinearSolverWrapper<
+      LinearAlgebra::distributed::V<S>>;
   }
 
 #if defined(DEAL_II_WITH_MPI) && defined(DEAL_II_WITH_TRILINOS)
@@ -34,7 +37,8 @@ for (V : DEAL_II_VEC_TEMPLATES)
   {
     template struct SUNDIALS::SundialsOperator<TrilinosWrappers::MPI::V>;
     template struct SUNDIALS::SundialsPreconditioner<TrilinosWrappers::MPI::V>;
-    template class SUNDIALS::internal::LinearSolverWrapper<TrilinosWrappers::MPI::V>;
+    template class SUNDIALS::internal::LinearSolverWrapper<
+      TrilinosWrappers::MPI::V>;
   }
 #endif
 
@@ -45,7 +49,8 @@ for (V : DEAL_II_VEC_TEMPLATES)
   {
     template struct SUNDIALS::SundialsOperator<PETScWrappers::MPI::V>;
     template struct SUNDIALS::SundialsPreconditioner<PETScWrappers::MPI::V>;
-    template class SUNDIALS::internal::LinearSolverWrapper<PETScWrappers::MPI::V>;
+    template class SUNDIALS::internal::LinearSolverWrapper<
+      PETScWrappers::MPI::V>;
   }
 #  endif
 #endif
