@@ -29,7 +29,7 @@ const unsigned int N = 15;
 void
 do_reinit(TrilinosWrappers::SparsityPattern &sp)
 {
-  sp.reinit((N - 1) * (N - 1), (N - 1) * (N - 1));
+  sp.reinit((N - 1) * (N - 1), (N - 1) * (N - 1), 5);
 }
 
 

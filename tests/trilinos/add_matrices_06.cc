@@ -32,7 +32,7 @@
 void
 test(TrilinosWrappers::SparseMatrix &m)
 {
-  TrilinosWrappers::SparseMatrix m2(m.m(), m.n(), 0), m3(m.m(), m.n(), 0);
+  TrilinosWrappers::SparseMatrix m2(m.m(), m.n(), 0), m3(m.m(), m.n(), 3);
 
   // first set a few entries one-by-one
   for (unsigned int i = 0; i < m.m(); ++i)

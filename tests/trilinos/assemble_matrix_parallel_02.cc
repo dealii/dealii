@@ -275,7 +275,7 @@ LaplaceProblem<dim>::setup_system()
   IndexSet locally_owned = dof_handler.locally_owned_dofs();
   {
     TrilinosWrappers::SparsityPattern csp;
-    csp.reinit(locally_owned, locally_owned, MPI_COMM_WORLD);
+    csp.reinit(locally_owned, locally_owned, MPI_COMM_WORLD, 9);
     DoFTools::make_sparsity_pattern(dof_handler, csp, constraints, false);
     csp.compress();
     reference_matrix.reinit(csp);
@@ -285,7 +285,7 @@ LaplaceProblem<dim>::setup_system()
     TrilinosWrappers::SparsityPattern csp;
     const IndexSet                    relevant_set =
       DoFTools::extract_locally_relevant_dofs(dof_handler);
-    csp.reinit(locally_owned, locally_owned, relevant_set, MPI_COMM_WORLD);
+    csp.reinit(locally_owned, locally_owned, relevant_set, MPI_COMM_WORLD, 9);
     DoFTools::make_sparsity_pattern(dof_handler, csp, constraints, false);
     csp.compress();
     test_matrix.reinit(csp);

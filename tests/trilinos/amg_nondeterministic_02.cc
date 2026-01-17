@@ -515,7 +515,7 @@ run()
     owned.add_range(0, dim);
 
 
-  TrilinosWrappers::SparsityPattern sp(owned);
+  TrilinosWrappers::SparsityPattern sp(owned, MPI_COMM_WORLD, 0);
 
   unsigned int n = sizeof(mati) / sizeof(*mati);
 
