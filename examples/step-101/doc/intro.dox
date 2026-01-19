@@ -6,46 +6,243 @@ This program was contributed by Lucía Agulló Martí in 2026.
 <h1>Introduction</h1>
 
 
-Broadly speaking, two classes of time integration schemes are commonly used 
-in finite element (FE) simulations: implicit and explicit methods. Implicit 
-integration schemes are often used for static or quasi-static applications 
-in which inertia effects can be neglected. Their main advantage is that they 
-are typically unconditionally stable with respect to the time step size. However, 
-their major disadvantage is that they require the solution of one or more 
+This tutorial focuses on Classical Mass Scaling (CMS), a method to
+artificially increase the critical time step in explicit time integration
+schemes. Therefore, this tutorial is based on step-8, which already introduced
+the concept of linear elasticity. 
+
+Broadly speaking, two classes of time integration schemes are commonly used
+in finite element (FE) simulations: implicit and explicit methods. Implicit
+integration schemes are often used for static or quasi-static applications
+in which inertia effects can be neglected. Their main advantage is that they
+are typically unconditionally stable with respect to the time step size. However,
+their major disadvantage is that they require the solution of one or more
 systems of equations at each step, which can be computationally expensive.
 
-Conversely, explicit integration methods are widely used for highly-dynamic 
-applications, such as impact and crash simulations, where inertia effects 
-dominate the response. Their main appeal lies in the fact that explicit time 
-integration schemes usually have less computationally expensive time steps 
-since they often do not have to solve large systems of equations. Instead, 
-the computational effort per time step is reduced to evaluating internal forces, 
-computing nodal acceleartions, and updating velocities and displacement using 
-simple time stepping formulas. No global linear systems need to be solved, which 
-significantly reduces the computational effort. Nevertheless, their main 
-disadvantage lies in the stability since explicit time integration schemes are 
-conditionally stable. Their stability depend on the size of the time step. 
-If the time step is too big, the solution becomes rapidly unstable, leading to 
-growing, non-physical oscillations. However, if the time step is too small, 
-the overall computation time grows rapidly; computing only a few-seconds long 
-crash could take hours and maybe even days. The restriction on the size of the 
+Conversely, explicit integration methods are widely used for highly-dynamic
+applications, such as impact and crash simulations, where inertia effects
+dominate the response. Their main appeal lies in the fact that explicit time
+integration schemes usually have less computationally expensive time steps
+since they often do not have to solve large systems of equations. Instead,
+the computational effort per time step is reduced to evaluating internal forces,
+computing nodal accelerations, and updating velocities and displacement using
+simple time stepping formulas. No global linear systems need to be solved, which
+significantly reduces the computational effort. Nevertheless, their main
+disadvantage lies in the stability since explicit time integration schemes are
+conditionally stable. Their stability depend on the size of the time step.
+If the time step is too big, the solution becomes rapidly unstable, leading to
+growing, non-physical oscillations. However, if the time step is too small,
+the overall computation time grows rapidly; computing only a few-seconds long
+crash could take hours and maybe even days. The restriction on the size of the
 time step is called the Courant-Friedrichs-Lewy (CFL) condition.
 
 
 <h3>Courant-Friedrichs-Lewy (CFL) condition</h3>
 
+The CFL condition restricts the numerical stability of explicit integration
+schemes through the critical step time. If the explicit integration scheme uses
+a time step larger than the critical step time, the solution will become
+numerically unstable, which manifests as rapidly growing, non-physical
+oscillations in the solution.
 
+This condition actually also has a physical meaning, and is not purely
+mathetical. It ensures that elastic waves do not travel more than one
+element length within a single time step.
+
+For linear elastic problems, the CFL condition can be written in the
+generic form:
+@f[
+  \Delta t \le \frac{h_{\text{char}}}{c_{\text{max}}}
+@f]
+where $h_{\text{char}}$ is the characteristic element length, and
+$c_{\text{max}}$ is the maximum wave propagation speed in the material.
+
+We see now that the CFL condition depends on the characteristic element
+length and on the maximum wave propagation speed in the material, which
+depends on the material stiffness. Therefore, very fine meshes and/or 
+very stiff materials result in very small critical time steps. However,
+sometimes the model needs such fine meshes to get plausible solutions, and
+the material cannot always be changed. This is exactly where Classical
+Mass Scaling, the main topic of this tutorial, could be used to artificially
+increase the critical time step.
 
 
 <h3>Characteristic element length</h3>
 
+Since this tutorial is based on step-8 so that the focuse lies solely on
+CMS, we restrict ourselves to using <code>FE_Q(1)</code> elements and
+2-dimensional problems. This means that we use bilinear functions for each
+component of the vector-valued finite element. The formulation of these
+elements is explained in detail in step-8.
 
+The characteristic element length $h_{\text{char}}$ plays a crucial role in
+the CFL condition as previously described. From a physical point of view,
+the characteristic element length represents the smallest distance over
+which information can propagate within a single time step without making
+the response numerically unstable. For low-order finite elements,
+such as the bilinear quadrilateral elements used in this tutorial,
+$h_{\text{char}}$ is the smallest edge length of an element $l_{\text{min}}$:
+@f[
+  h_{\text{char}} = l_{\text{min}}
+]
+
+It is important to note that this definition is only valid for the finite
+elements that we use in this tutorial, <code>FE_Q(1)</code> elements in
+2-dimensional problems. Other finite elements have other characteristic
+element lengths and you may require a formula to calculate them. The
+definitions of characteristic element lengths for various finite elements
+can be found in the literature.
 
 
 <h3>Material wave speeds</h3>
 
+The material wave speed is the speed with which the information, which in
+the case of FEM simulations of structural/solid mechanics would be a
+mechanical perturbance, is propagated inside a solid. In other words, it is
+the speed at which one part of the material "learns" that another part has
+been moved, deformed, or loaded.
 
+The material wave speed depends on the stiffness and the density of a material.
+Stiffer materials transmit waves faster, whereas denser materials react slower
+due to increased inertia. Therefore, in linear elasticity, the material wave
+speed usually has the form of:
+@f[
+  \text{wave speed} \sim \sqrt{\frac{\text{stiffness}}{\text{density}}}
+]
+
+In elastic solids, mechanical disturbances do not propagate in a single way.
+Instead we have two different types of waves as a consequence of the constitutive
+behavior of elastic materials and it reflects the different mechanisms by which
+stresses and strains are transmitted.
+
+The first type of waves we are looking at are longitudinal waves, also known as
+pressure or compressional waves. In these waves, the particle motion is aligned
+with the direction of wave propagation, which leads to local volumetric changes
+in the material. These waves are directly associated with the resistance of
+the material to volumetric deformation since they involve alternating
+compression and expansion. The resistance of the material to volumetric
+deformation is governed by the bulk and shear stiffness of the material, which
+is why longitudinal waves typically propagate at the highest speed. The
+formula for longitudinal wave speed in linear elastic materials is:
+@f[
+  c_p = \sqrt{\frac{\lambda + 2 \mu}{\rho}}
+]
+expressed with the Lamé parameters $\lambda$ and $\mu$. Expressed with
+the elastic modulus $E$ and the Poisson's ratio $\nu$, the formula becomes:
+@f[
+  c_p = \sqrt{\frac{E\,(1- \nu)}{(1+ \nu) \, (1-2 \nu) \, \rho}}
+]
+
+The second type of waves are transversal waves, also known as shear
+waves. In these waves, the particle motion is perpendicular to the
+direction of propagation, which results in shape changes without volume
+variation. These waves are directly associated with the resistance of
+the material to shear deformation. The resistance of the material to shear
+deformation is generally weaker than the resistance of the material to
+volumetric deformation. Consequently, transversal waves propagate more
+slowly than longitudinal waves. The formula for transversal wave
+speed in linear elastic materials expressed with the Lamé parameters is:
+@f[
+  c_s = \sqrt{\frac{\mu}{\rho}}
+]
+and expressed with the elastic modulus and the Poisson's ratio:
+@f[
+  c_s = \sqrt{\frac{E}{2 \, (1 + \nu) \, \rho}}
+]
+
+There exist multiple wave speeds, the longitudinal wave speed and the
+transversal wave speed. This is an intrinsic physical property of
+elastic materials. However, if we are looking at numerics, we care about
+the fastest wave speed, the longitudinal wave speed. This speed dictates
+the smallest time scale that we are allowed to have in explicit time
+integration methods so that the mechanical perturbances have enough
+time to propagate from one mesh element to another. Thus, we formulate
+the CFL condition with the help of the longitudinal wave speed, which
+in the following, will be called material wave speed or only wave speed.
+
+
+<h3>CFL condition for Q1 elements in 2D linear elastic problems</h3>
+
+Taking into account the characteristic element length of <code>FE_Q(1)</code>
+elements and the longitudinal wave speed in linear elastic materials
+we derive the CFL condition:
+@f[
+  \Delta t \le l_{\text{min}} \, \sqrt{\frac{\rho}{\lambda + 2 \, \mu}}
+]
+expressed with the Lamé parameters $\lambda$ and $\mu$, since these parameters
+had already been used in step-8, the base for this tutorial.
 
 
 <h3>Classical Mass Scaling (CMS) as a response to CFL limitations</h3>
 
+CMS is a numerical technique used in explicit finite element simulations
+to artificially increase the critical time step without modifying the
+spatial discretization. 
+
+Let's look at the 1-dimensional CFL condition, for example for a rod:
+@f[
+  \Delta t_{\text{ele,1D}} \le h_{\text{char}} \, \sqrt{\frac{\rho}{E}}
+]
+
+The critical time step of an element of a 1-dimensional rod depends on the
+characteristic element length $h_{\text{char}}$, density $\rho$ and
+elastic modulus $E$. So if we want to artificially increase the critical time
+step, we must investigate all three parameters.
+
+The first parameter, the characteristic element length $h_{\text{char}}$
+is a parameter that we do not want to change. The spatial discretization
+of a model can be a complex and computationally costly process, and we
+may need a very fine mesh due to the geometry of the model. So sometimes,
+remeshing is not a viable option, or even after remeshing some mesh elements
+can still be very small.
+
+We then take a look at the elastic modulus $E$. If we decrease it, the
+critical time step will increase. However, this would also make our material
+less stiff, and the simulation results may be influenced strongly.
+
+Lastly, we look at the density $\rho$. If we increase it, the critical time
+step will increase. The only problem would be that increasing the density
+means that we have additional mass in the system, and this modifies its
+overall inertia. However, we don't have to increase the density for all of
+the finite elements in the model. We can just add some artificial mass to
+the smallest elements, those that restrict the critical time step, to reach
+a bigger critical time step. As long as this mass increase is not in an
+important region of the model, and the mass is not dominating the physical
+behavior of the model, we can accept some small changes in its physical
+response. This is the core idea of CMS: artificially increasing the density
+of the smallest elements of the model to increase the critical time step.
+
+The formula for the required density increase of an element is then:
+@f[
+  \rho_{\text{add}} = E \, \left( \frac{\Delta t_{desired}}{h_{\text{char}}} \right)^{2} - \rho_{old}
+]
+
+We now take a look at the physical meaning of CMS. When we artificially
+increase the density of an element, we decrease the material wave speed
+through said element. This is due to the fact that, as we said earlier,
+denser materials react slower to mechanical perturbations due to increased
+inertia. Therefore, the time that the information needs to go from that
+element to the next element is longer, which allows us to increase the
+critical time step.
+
+
+<h3>Assessing the impact of artificially added mass on the physical response</h3>
+
+In CMS the density is scaled uniformly accross the entire computational
+domain. This modifies the overall inertia of the system, and therefore, the
+eigenmodes. So, while it improves computational efficiency by increasing the
+critical time step, it alters the dynamic response of the system. Nevertheless,
+CMS is still a powerful tool when we make sure that the additional mass does
+not have a dominating effect in the dynamic response of the system and it only
+results in small acceptable changes in its behavior.
+
+TODO: Add how to assess the impact.
+
+
+<h3>References and further reading</h3>
+
+- K.-J. Bathe, "Finite Element Procedures", Prentice Hall, 1996.
+- T. J. R. Hughes, "The Finite Element Method: Linear Static and Dynamic Finite Element Analysis", Dover Publications Inc., 2000.
+- R. D. Cook, D. Malkus, and M. Plesha, "Concepts and Applications of Finite Element Analysis", John Wiley \& Sons, 1989.
+- M. A. Crisfield, "Non-linear Finite Element Analysis of Solid and Structures - Volume 1: Essentials", John Wiley \& Sons, 1991.
+- M. A. Crisfield, "Non-linear Finite Element Analysis of Solid and Structures - Volume 2: Advanced Topics", John Wiley \& Sons, 1997.
