@@ -16,8 +16,8 @@
 
 // @sect3{Include files}
 
-// As usual, the first few include files are already known, so we will not
-// comment on them further.
+// First we include header files that we have already used in previous
+// example programs:
 #include <deal.II/base/quadrature_lib.h>
 #include <deal.II/base/function.h>
 #include <deal.II/base/tensor.h>
@@ -43,37 +43,24 @@
 #include <deal.II/numerics/data_out.h>
 #include <deal.II/numerics/error_estimator.h>
 
-// In this example, we need vector-valued finite elements. The support for
-// these can be found in the following include file:
 #include <deal.II/fe/fe_system.h>
-// We will compose the vector-valued finite elements from regular Q1 elements
-// which can be found here, as usual:
 #include <deal.II/fe/fe_q.h>
 
 // This again is C++:
 #include <fstream>
 #include <iostream>
 
-// The last step is as in previous programs. In particular, just like in
-// step-7, we pack everything that's specific to this program into a namespace
-// of its own.
-namespace Step8
+// The last step is as in all previous programs:
+namespace Step101
 {
   using namespace dealii;
 
   // @sect3{The <code>ElasticProblem</code> class template}
 
-  // The main class is, except for its name, almost unchanged with respect to
-  // the step-6 example.
-  //
-  // The only change is the use of a different class for the <code>fe</code>
-  // variable: Instead of a concrete finite element class such as FE_Q, we now
-  // use a more generic one, FESystem. In fact, FESystem is not really a
-  // finite element itself in that it does not implement shape functions of
-  // its own. Rather, it is a class that can be used to stack several other
-  // elements together to form one vector-valued finite element. In our case,
-  // we will compose the vector-valued element of <code>FE_Q(1)</code>
-  // objects, as shown below in the constructor of this class.
+  // The first part of the program is the declaration of the main class. All of
+  // this has been copied verbatim from step-8.
+
+  // TODO: If something is changed/added compared to step-8, comment it
   template <int dim>
   class ElasticProblem
   {
@@ -623,18 +610,18 @@ namespace Step8
         output_results(cycle);
       }
   }
-} // namespace Step8
+} // namespace Step101
 
 // @sect3{The <code>main</code> function}
 
-// After closing the <code>Step8</code> namespace in the last line above, the
+// After closing the <code>Step101</code> namespace in the last line above, the
 // following is the main function of the program and is again exactly like in
 // step-6 (apart from the changed class names, of course).
 int main()
 {
   try
     {
-      Step8::ElasticProblem<2> elastic_problem_2d;
+      Step101::ElasticProblem<2> elastic_problem_2d;
       elastic_problem_2d.run();
     }
   catch (std::exception &exc)
