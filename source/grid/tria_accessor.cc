@@ -3041,65 +3041,49 @@ CellAccessor<dim, spacedim>::neighbor_child_on_subface(
     {
       case 2:
         {
-          if (this->reference_cell() == ReferenceCells::Triangle)
-            {
-              const unsigned int neighbor_neighbor =
-                this->neighbor_of_neighbor(face);
-              const auto neighbor = this->neighbor(face);
-              // Triangles do not support anisotropic refinement
-              Assert(neighbor->refinement_case() ==
-                       RefinementCase<2>::isotropic_refinement,
-                     ExcNotImplemented());
-              // Since we are looking at two faces at once, we need to check if
-              // they have the same or opposing orientations rather than one
-              // individual face orientation value.
-              const auto relative_orientation =
-                neighbor->combined_face_orientation(neighbor_neighbor) ==
-                    this->combined_face_orientation(face) ?
-                  numbers::default_geometric_orientation :
-                  numbers::reverse_line_orientation;
-              const unsigned int neighbor_child_index =
-                neighbor->reference_cell().child_cell_on_face(
-                  neighbor_neighbor, subface, relative_orientation);
-              auto child = neighbor->child(neighbor_child_index);
-              Assert(!child->has_children(), ExcInternalError());
-              return child;
-            }
-          else if (this->reference_cell() == ReferenceCells::Quadrilateral)
-            {
-              const unsigned int neighbor_neighbor =
-                this->neighbor_of_neighbor(face);
-              const unsigned int neighbor_child_index =
-                GeometryInfo<dim>::child_cell_on_face(
-                  this->neighbor(face)->refinement_case(),
-                  neighbor_neighbor,
-                  subface);
+          Assert(this->reference_cell() == ReferenceCells::Triangle ||
+                   this->reference_cell() == ReferenceCells::Quadrilateral,
+                 ExcNotImplemented());
 
-              TriaIterator<CellAccessor<dim, spacedim>> sub_neighbor =
-                this->neighbor(face)->child(neighbor_child_index);
-              // the neighbors child can have children,
-              // which are not further refined along the
-              // face under consideration. as we are
-              // normally interested in one of this
-              // child's child, search for the right one.
-              while (sub_neighbor->has_children())
-                {
-                  Assert((GeometryInfo<dim>::face_refinement_case(
-                            sub_neighbor->refinement_case(),
-                            neighbor_neighbor) ==
-                          RefinementCase<dim>::no_refinement),
-                         ExcInternalError());
-                  sub_neighbor =
-                    sub_neighbor->child(GeometryInfo<dim>::child_cell_on_face(
-                      sub_neighbor->refinement_case(), neighbor_neighbor, 0));
-                }
+          const auto neighbor = this->neighbor(face);
+          if (neighbor->reference_cell() == ReferenceCells::Triangle)
+            Assert(neighbor->refinement_case() ==
+                     RefinementCase<2>::isotropic_refinement,
+                   ExcNotImplemented());
 
-              return sub_neighbor;
+          const unsigned int neighbor_neighbor =
+            this->neighbor_of_neighbor(face);
+
+          // if the refinement case is isotropic then ask the reference cell
+          // if not we are on a quad and can ask GeometryInfo, we check for that
+          // above
+          const unsigned int neighbor_child_index =
+            neighbor->refinement_case() ==
+                RefinementCase<2>::isotropic_refinement ?
+              neighbor->reference_cell().child_cell_on_face(
+                neighbor_neighbor,
+                subface,
+                neighbor->combined_face_orientation(neighbor_neighbor)) :
+              GeometryInfo<dim>::child_cell_on_face(neighbor->refinement_case(),
+                                                    neighbor_neighbor,
+                                                    subface,
+                                                    neighbor->face_orientation(
+                                                      neighbor_neighbor));
+
+          auto child = neighbor->child(neighbor_child_index);
+          if (neighbor->reference_cell() == ReferenceCells::Triangle)
+            Assert(!child->has_children(), ExcInternalError());
+          while (child->has_children())
+            {
+              Assert((GeometryInfo<dim>::face_refinement_case(
+                        child->refinement_case(), neighbor_neighbor) ==
+                      RefinementCase<dim>::no_refinement),
+                     ExcInternalError());
+              child = child->child(GeometryInfo<dim>::child_cell_on_face(
+                child->refinement_case(), neighbor_neighbor, 0));
             }
 
-          // if no reference cell type matches
-          DEAL_II_NOT_IMPLEMENTED();
-          return TriaIterator<CellAccessor<dim, spacedim>>();
+          return child;
         }
 
 
