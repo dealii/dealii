@@ -2773,17 +2773,17 @@ ReferenceCell::line_to_cell_vertices(const unsigned int line,
                                                                  {{1, 3}},
                                                                  {{0, 1}},
                                                                  {{2, 3}},
-                                                                 {{4, 0}},
+                                                                 {{0, 4}},
                                                                  {{1, 4}},
                                                                  {{2, 4}},
-                                                                 {{4, 3}}}};
+                                                                 {{3, 4}}}};
           return table[line][vertex];
         }
       case ReferenceCells::Wedge:
         {
-          static constexpr ndarray<unsigned int, 9, 2> table = {{{{1, 0}},
-                                                                 {{2, 1}},
-                                                                 {{0, 2}},
+          static constexpr ndarray<unsigned int, 9, 2> table = {{{{0, 1}},
+                                                                 {{1, 2}},
+                                                                 {{2, 0}},
                                                                  {{3, 4}},
                                                                  {{4, 5}},
                                                                  {{5, 3}},
