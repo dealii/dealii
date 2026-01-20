@@ -11,7 +11,7 @@ However, this can be extended in a number of ways. Some of these possibilities
 are briefly discussed below.
 
 
-<h4>Implementation into explicit FEM solvers and parallelization</h4>
+<h4>Implementation of CMS into explicit FEM solvers and parallelization</h4>
 
 This tutorial presents the technique of CMS including the definition and calculation
 of the characteristic element length, the material wave speed, the critical
