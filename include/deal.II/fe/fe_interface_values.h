@@ -1497,6 +1497,61 @@ public:
          const unsigned int fe_index_neighbor = numbers::invalid_unsigned_int);
 
   /**
+   * Same as above, takes additional arguments to specify the quadrature index
+   * and the mapping index of the neighbor.
+   * @param[in] cell An iterator to the first cell adjacent to the interface.
+   * @param[in] face_no An integer identifying which face of the first cell the
+   *   interface is on.
+   * @param[in] sub_face_no An integer identifying the subface (child) of the
+   *   face (identified by the previous two arguments) that the interface
+   *   corresponds to. If equal to numbers::invalid_unsigned_int, then the
+   *   interface is considered to be the entire face.
+   * @param[in] cell_neighbor An iterator to the second cell adjacent to
+   *   the interface. The type of this iterator does not have to equal that
+   *   of `cell`, but must be convertible to it. This allows using an
+   *   active cell iterator for `cell`, and `cell->neighbor(f)` for
+   *   `cell_neighbor`, since the return type of `cell->neighbor(f)` is
+   *   simply a cell iterator (not necessarily an active cell iterator).
+   * @param[in] face_no_neighbor Like `face_no`, just for the neighboring
+   *   cell.
+   * @param[in] sub_face_no_neighbor Like `sub_face_no`, just for the
+   *   neighboring cell.
+   * @param[in] fe_index If left at its default, use the finite element within
+   *   the hp::FECollection passed to the constructor as given by the dominating
+   *   finite element across the interface (only used if the FEInterface object
+   *   is initialized with an hp::FECollection, an hp::QCollection, and possibly
+   *   an hp::MappingCollection).
+   * @param[in] q_index The index of the quadrature object within the
+   *   hp::QCollection passed to the constructor to use on the current
+   *   interface. See the documentation above what happens if this argument
+   *   is not explicitly provided but left at its default value.
+   * @param[in] mapping_index The index of the mapping object within the
+   *   hp::MappingCollection passed to the constructor to use on the current
+   *   interface. See the documentation above what happens if this argument
+   *   is not explicitly provided but left at its default value.
+   * @param[in] fe_index_neighbor Active fe index of neighboring cell. Useful
+   *   if hp capabilities are used and for non-DoFHandler iterators.
+   * @param[in] q_index_neighbor Active fe quadrature index of neighboring cell.
+   * Useful if hp capabilities are used with different quadrature rules.
+   * @param[in] mapping_index_neighbor Active mapping index of neighboring cell.
+   * Useful if hp capabilities are used with different mappings.
+   */
+  template <typename CellIteratorType, typename CellNeighborIteratorType>
+  void
+  reinit(const CellIteratorType         &cell,
+         const unsigned int              face_no,
+         const unsigned int              sub_face_no,
+         const CellNeighborIteratorType &cell_neighbor,
+         const unsigned int              face_no_neighbor,
+         const unsigned int              sub_face_no_neighbor,
+         const unsigned int              fe_index,
+         const unsigned int              q_index,
+         const unsigned int              mapping_index,
+         const unsigned int              fe_index_neighbor,
+         const unsigned int              q_index_neighbor,
+         const unsigned int              mapping_index_neighbor);
+
+  /**
    * Re-initialize this object to be used on an interface given by a single face
    * @p face_no of the cell @p cell. This is useful to use FEInterfaceValues
    * on boundaries of the domain.
@@ -2401,6 +2456,39 @@ FEInterfaceValues<dim, spacedim>::reinit(
   const unsigned int              fe_index_in,
   const unsigned int              fe_index_neighbor_in)
 {
+  reinit(cell,
+         face_no,
+         sub_face_no,
+         cell_neighbor,
+         face_no_neighbor,
+         sub_face_no_neighbor,
+         fe_index_in,
+         q_index,
+         mapping_index,
+         fe_index_neighbor_in,
+         numbers::invalid_unsigned_int,
+         numbers::invalid_unsigned_int);
+}
+
+
+
+template <int dim, int spacedim>
+template <typename CellIteratorType, typename CellNeighborIteratorType>
+void
+FEInterfaceValues<dim, spacedim>::reinit(
+  const CellIteratorType         &cell,
+  const unsigned int              face_no,
+  const unsigned int              sub_face_no,
+  const CellNeighborIteratorType &cell_neighbor,
+  const unsigned int              face_no_neighbor,
+  const unsigned int              sub_face_no_neighbor,
+  const unsigned int              fe_index_in,
+  const unsigned int              q_index,
+  const unsigned int              mapping_index,
+  const unsigned int              fe_index_neighbor_in,
+  const unsigned int              q_index_neighbor,
+  const unsigned int              mapping_index_neighbor)
+{
   Assert(internal_fe_face_values || internal_hp_fe_face_values,
          ExcNotInitialized());
 
@@ -2539,6 +2627,17 @@ FEInterfaceValues<dim, spacedim>::reinit(
             }
         }
 
+      // If q_index_neighbor is given use it, if not use the values determined
+      // before
+      const unsigned int used_q_index_neighbor =
+        (q_index_neighbor == numbers::invalid_unsigned_int) ? used_q_index :
+                                                              q_index_neighbor;
+      // Same as for q_index_neighbor
+      const unsigned int used_mapping_index_neighbor =
+        (mapping_index_neighbor == numbers::invalid_unsigned_int) ?
+          used_mapping_index :
+          mapping_index_neighbor;
+
       // Same as if above, but when hp is enabled.
       if (sub_face_no == numbers::invalid_unsigned_int)
         {
@@ -2561,11 +2660,12 @@ FEInterfaceValues<dim, spacedim>::reinit(
         }
       if (sub_face_no_neighbor == numbers::invalid_unsigned_int)
         {
-          internal_hp_fe_face_values_neighbor->reinit(cell_neighbor,
-                                                      face_no_neighbor,
-                                                      used_q_index,
-                                                      used_mapping_index,
-                                                      active_fe_index_neighbor);
+          internal_hp_fe_face_values_neighbor->reinit(
+            cell_neighbor,
+            face_no_neighbor,
+            used_q_index_neighbor,
+            used_mapping_index_neighbor,
+            active_fe_index_neighbor);
 
           fe_face_values_neighbor = &const_cast<FEFaceValues<dim, spacedim> &>(
             internal_hp_fe_face_values_neighbor->get_present_fe_values());
@@ -2576,8 +2676,8 @@ FEInterfaceValues<dim, spacedim>::reinit(
             cell_neighbor,
             face_no_neighbor,
             sub_face_no_neighbor,
-            used_q_index,
-            used_mapping_index,
+            used_q_index_neighbor,
+            used_mapping_index_neighbor,
             active_fe_index_neighbor);
 
           fe_face_values_neighbor =
