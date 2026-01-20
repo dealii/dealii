@@ -1,7 +1,7 @@
 /* ------------------------------------------------------------------------
  *
  * SPDX-License-Identifier: LGPL-2.1-or-later
- * Copyright (C) 1999 - 2025 by the deal.II authors
+ * Copyright (C) 2025 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
@@ -876,14 +876,6 @@ namespace Step100
                 const unsigned int current_element_test_i =
                   fe_test.system_to_base_index(i).first.first;
 
-                // If we are in the test space for pressure, we build the load
-                // vector. For our plane wave problem this source term is null.
-                if ((current_element_test_i == 2) ||
-                    (current_element_test_i == 3))
-                  {
-                    l_vector(i) += 0;
-                  }
-
                 // The only two matrices that have some value in the interior of
                 // the cell is the $G$ and $B$ matrices. We
                 // will first construct the Gram matrix, so we will loop over
@@ -900,66 +892,66 @@ namespace Step100
                     // For example, if both <code>i</code> and <code>j</code>
                     // are in test space associated to the test functions
                     // $\mathbf{v}$, we build the terms $(\mathbf{v},
-                    // \overline{\mathbf{v}})_{\Omega_h}
+                    // \mathbf{v})_{\Omega_h}
                     // +
-                    // (\nabla \cdot \mathbf{v}, \overline{\nabla \cdot
-                    // \mathbf{v}})_{\Omega_h} + (\overline{i\omega}\mathbf{v},
-                    // i\omega \overline{ \mathbf{v}})_{\Omega_h}$ :
+                    // (\nabla \cdot \mathbf{v}, \nabla \cdot
+                    // \mathbf{v})_{\Omega_h} + (i\omega\mathbf{v},
+                    // i\omega \mathbf{v})_{\Omega_h}$ :
                     if (((current_element_test_i == 0) ||
                          (current_element_test_i == 1)) &&
                         ((current_element_test_j == 0) ||
                          (current_element_test_j == 1)))
                       {
                         G_matrix(i, j) +=
-                          (((v[j] * v_conj[i]) + (div_v[j] * div_v_conj[i]) +
-                            (iomega_conj * v[j] * iomega * v_conj[i])) *
+                          (((v_conj[i] * v[j]) + (div_v_conj[i] * div_v[j]) +
+                            (iomega_conj * v_conj[i] * iomega * v[j])) *
                            JxW)
                             .real();
                       }
-                    // If the dof <code>i</code> is in test function $mathbf{v}$
-                    // and dof <code>j</code> in test function $q$ we build the
-                    // terms $-(\nabla q, i\omega \overline{
-                    // \mathbf{v}})_{\Omega_h} - (\overline{ i\omega} q,
-                    // \overline{\nabla \cdot \mathbf{v}})_{\Omega_h}$ :
+                    // If the dof <code>i</code> is in test function
+                    // $\mathbf{v}$ and dof <code>j</code> in test function $q$
+                    // we build the terms $(i\omega \mathbf{v}, \nabla
+                    // q)_{\Omega_h} + (\nabla \cdot \mathbf{v}, i\omega
+                    // q)_{\Omega_h}$ :
                     else if (((current_element_test_i == 0) ||
                               (current_element_test_i == 1)) &&
                              ((current_element_test_j == 2) ||
                               (current_element_test_j == 3)))
                       {
-                        G_matrix(i, j) -=
-                          (((grad_q[j] * iomega * v_conj[i]) +
-                            (iomega_conj * q[j] * div_v_conj[i])) *
+                        G_matrix(i, j) +=
+                          (((iomega_conj * v_conj[i] * grad_q[j]) +
+                            (div_v_conj[i] * iomega * q[j])) *
                            JxW)
                             .real();
                       }
                     // If the dof <code>i</code> is in test function $q$ and the
                     // dof <code>j</code> is in the test function $\mathbf{v}$,
-                    // we build the terms $-(\overline{i\omega} \mathbf{v},
-                    // \overline{\nabla q})_{\Omega_h} - (\nabla \cdot
-                    // \mathbf{v}, i\omega \overline{ q})_{\Omega_h}$ :
+                    // we build the terms $(\nabla q, i\omega
+                    // \mathbf{v})_{\Omega_h} + (i\omega q, \nabla \cdot
+                    // \mathbf{v})_{\Omega_h}$ :
                     else if (((current_element_test_i == 2) ||
                               (current_element_test_i == 3)) &&
                              ((current_element_test_j == 0) ||
                               (current_element_test_j == 1)))
                       {
-                        G_matrix(i, j) -=
-                          (((iomega_conj * v[j] * grad_q_conj[i]) +
-                            (div_v[j] * iomega * q_conj[i])) *
+                        G_matrix(i, j) +=
+                          (((grad_q_conj[i] * iomega * v[j]) +
+                            (iomega_conj * q_conj[i] * div_v[j])) *
                            JxW)
                             .real();
                       }
                     // Finally, if both in test functions are in $q$, we build
-                    // the terms $(q, \overline{q})_{\Omega_h} + (\nabla q,
-                    // \overline{\nabla q})_{\Omega_h} + (\overline{ i\omega} q,
-                    // i\omega\overline{ q})_{\Omega_h}$:
+                    // the terms $(q, q)_{\Omega_h} + (\nabla q,
+                    // \nabla q)_{\Omega_h} + (i\omega q,
+                    // i\omega q)_{\Omega_h}$:
                     else if (((current_element_test_i == 2) ||
                               (current_element_test_i == 3)) &&
                              ((current_element_test_j == 2) ||
                               (current_element_test_j == 3)))
                       {
                         G_matrix(i, j) +=
-                          (((q[j] * q_conj[i]) + (grad_q[j] * grad_q_conj[i]) +
-                            (iomega_conj * q[j] * iomega * q_conj[i])) *
+                          (((q_conj[i] * q[j]) + (grad_q[j] * grad_q_conj[i]) +
+                            (iomega_conj * q_conj[i] * iomega * q[j])) *
                            JxW)
                             .real();
                       }
@@ -978,50 +970,61 @@ namespace Step100
 
                     // If dof <code>i</code> in test function $\mathbf{v}$ and
                     // dof <code>j</code> in trial function $\mathbf{u}$ we
-                    // build the term $(i\omega \mathbf{u},
-                    // \overline{\mathbf{v}})_{\Omega_h}$:
+                    // build the term $(\mathbf{v}, i\omega
+                    // \mathbf{u})_{\Omega_h}$:
                     if (((current_element_test_i == 0) ||
                          (current_element_test_i == 1)) &&
                         ((current_element_trial_j == 0) ||
                          (current_element_trial_j == 1)))
                       {
                         B_matrix(i, j) +=
-                          ((iomega * u[j] * v_conj[i]) * JxW).real();
+                          ((v_conj[i] * iomega * u[j]) * JxW).real();
                       }
                     // If dof <code>i</code> in test function $\mathbf{v}$ and
                     // dof <code>j</code> in trial function $p$ we build the
-                    // term $ -(p^*, \overline{\nabla \cdot
-                    // \mathbf{v}})_{\Omega_h}$:
+                    // term $ -( \nabla \cdot
+                    // \mathbf{v}, p^*)_{\Omega_h}$:
                     else if (((current_element_test_i == 0) ||
                               (current_element_test_i == 1)) &&
                              ((current_element_trial_j == 2) ||
                               (current_element_trial_j == 3)))
                       {
-                        B_matrix(i, j) -= ((p[j] * div_v_conj[i]) * JxW).real();
+                        B_matrix(i, j) -= ((div_v_conj[i] * p[j]) * JxW).real();
                       }
 
                     // If dof <code>i</code> in test function $q$ and dof
                     // <code>j</code> in trial function $\mathbf{u}$ we build
-                    // the term $-(\mathbf{u}, \overline{\nabla q})_{\Omega_h}$:
+                    // the term $-(\nabla q, \mathbf{u})_{\Omega_h}$:
                     else if (((current_element_test_i == 2) ||
                               (current_element_test_i == 3)) &&
                              ((current_element_trial_j == 0) ||
                               (current_element_trial_j == 1)))
                       {
                         B_matrix(i, j) -=
-                          ((u[j] * grad_q_conj[i]) * JxW).real();
+                          ((grad_q_conj[i] * u[j]) * JxW).real();
                       }
                     // If dof <code>i</code> in test function $q$ and dof
                     // <code>j</code> in trial function $p$ we build the term
-                    // $(i\omega p^*, \overline{q})_{\Omega_h}$:
+                    // $(q, i\omega p^*)_{\Omega_h}$:
                     else if (((current_element_test_i == 2) ||
                               (current_element_test_i == 3)) &&
                              ((current_element_trial_j == 2) ||
                               (current_element_trial_j == 3)))
                       {
                         B_matrix(i, j) +=
-                          ((iomega * p[j] * q_conj[i]) * JxW).real();
+                          ((q_conj[i] * iomega * p[j]) * JxW).real();
                       }
+                  }
+
+                // Finally, if we are in the test space for pressure, we would
+                // normally build the load vector. For our plane wave problem
+                // the source term is null, but we still show how to do it for
+                // completeness. So we build $(q, l)_{\Omega_h}$:
+                if ((current_element_test_i == 2) ||
+                    (current_element_test_i == 3))
+                  {
+                    double source_term = 0.0;
+                    l_vector(i) += (q_conj[i] * source_term * JxW).real();
                   }
               }
           }
@@ -1134,7 +1137,7 @@ namespace Step100
 
 
                             // We build $ \langle \mathbf{v} \cdot \mathbf{n},
-                            //  \overline{\mathbf{v} \cdot \mathbf{n}}
+                            //  \mathbf{v} \cdot \mathbf{n}
                             //  \rangle_{\Gamma_1 \cup \Gamma_3}$ :
                             if (((current_element_test_i == 0) ||
                                  (current_element_test_i == 1)) &&
@@ -1142,36 +1145,35 @@ namespace Step100
                                  (current_element_test_j == 1)))
                               {
                                 G_matrix(i, j) +=
-                                  (v_face_n[j] * v_face_n_conj[i] * JxW_face)
+                                  (v_face_n_conj[i] * v_face_n[j] * JxW_face)
                                     .real();
                               }
                             //  We build $\langle
-                            //  \overline{\frac{k_n}{\omega}}q,
-                            //  \overline{\mathbf{v} \cdot \mathbf{n}}
+                            //  \mathbf{v} \cdot \mathbf{n},\frac{k_n}{\omega}q
                             //  \rangle_{\Gamma_1 \cup \Gamma_3}$ :
                             else if (((current_element_test_i == 0) ||
                                       (current_element_test_i == 1)) &&
                                      ((current_element_test_j == 2) ||
                                       (current_element_test_j == 3)))
                               {
-                                G_matrix(i, j) += (kn_omega * q_face[j] *
-                                                   v_face_n_conj[i] * JxW_face)
+                                G_matrix(i, j) += (v_face_n_conj[i] * kn_omega *
+                                                   q_face[j] * JxW_face)
                                                     .real();
                               }
-                            // We build $\langle \mathbf{v} \cdot \mathbf{n},
-                            // \frac{k_n}{\omega}\overline{q} \rangle_{\Gamma_1
-                            // \cup \Gamma_3}$ :
+                            // We build $\langle \frac{k_n}{\omega}q, \mathbf{v}
+                            // \cdot \mathbf{n} \rangle_{\Gamma_1 \cup
+                            // \Gamma_3}$ :
                             else if (((current_element_test_i == 2) ||
                                       (current_element_test_i == 3)) &&
                                      ((current_element_test_j == 0) ||
                                       (current_element_test_j == 1)))
                               {
-                                G_matrix(i, j) += (v_face_n[j] * kn_omega *
-                                                   q_face_conj[i] * JxW_face)
+                                G_matrix(i, j) += (kn_omega * q_face_conj[i] *
+                                                   v_face_n[j] * JxW_face)
                                                     .real();
                               }
-                            // We build $\langle \overline{\frac{k_n}{\omega}}q,
-                            // \frac{k_n}{\omega}\overline{q} \rangle_{\Gamma_1
+                            // We build $\langle \frac{k_n}{\omega}q,
+                            // \frac{k_n}{\omega}q \rangle_{\Gamma_1
                             // \cup \Gamma_3}$ :
                             else if (((current_element_test_i == 2) ||
                                       (current_element_test_i == 3)) &&
@@ -1179,8 +1181,8 @@ namespace Step100
                                       (current_element_test_j == 3)))
                               {
                                 G_matrix(i, j) +=
-                                  (kn_omega * q_face[j] * kn_omega *
-                                   q_face_conj[i] * JxW_face)
+                                  (kn_omega * q_face_conj[i] * kn_omega *
+                                   q_face[j] * JxW_face)
                                     .real();
                               }
                           }
@@ -1195,8 +1197,8 @@ namespace Step100
                         const unsigned int current_element_trial_j =
                           fe_trial_skeleton.system_to_base_index(j).first.first;
 
-                        // We build the term $\left\langle \hat{p}^*,
-                        // \overline{\mathbf{v} \cdot \mathbf{n}}
+                        // We build the term $\left\langle
+                        // \mathbf{v} \cdot \mathbf{n}, \hat{p}^*
                         // \right\rangle_{\partial \Omega_h}$:
                         if (((current_element_test_i == 0) ||
                              (current_element_test_i == 1)) &&
@@ -1204,11 +1206,11 @@ namespace Step100
                              (current_element_trial_j == 3)))
                           {
                             B_hat_matrix(i, j) +=
-                              ((p_hat[j] * v_face_n_conj[i]) * JxW_face).real();
+                              ((v_face_n_conj[i] * p_hat[j]) * JxW_face).real();
                           }
 
-                        // We build the term $\left\langle \hat{u}_n,
-                        // \overline{q} \right\rangle_{\partial \Omega_h}$ :
+                        // We build the term $\left\langle q, \hat{u}_n
+                        // \right\rangle_{\partial \Omega_h}$ :
                         else if (((current_element_test_i == 2) ||
                                   (current_element_test_i == 3)) &&
                                  ((current_element_trial_j == 0) ||
@@ -1240,7 +1242,7 @@ namespace Step100
                               neighbor_cell_id > cell->index() ? 1. : -1.;
 
                             B_hat_matrix(i, j) +=
-                              (flux_orientation * u_hat_n[j] * q_face_conj[i] *
+                              (q_face_conj[i] * flux_orientation * u_hat_n[j] *
                                JxW_face)
                                 .real();
                           }
@@ -1267,17 +1269,22 @@ namespace Step100
                         // As for the load vector, we assemble the source terms
                         // for the Robin boundary even if it is null to
                         // illustrate the procedure.
+                        double source_term = 0.;
                         if ((current_element_trial_i == 0) ||
                             (current_element_trial_i == 1))
                           {
+                            // We build the term $- \langle \hat{u}_n, g_R
+                            // \rangle_{\Gamma_1 \cup \Gamma_3}$:
                             g_vector(i) -=
-                              ((0.) * u_hat_n_conj[i]).real() * JxW_face;
+                              (u_hat_n_conj[i] * source_term).real() * JxW_face;
                           }
                         else if ((current_element_trial_i == 2) ||
                                  (current_element_trial_i == 3))
                           {
+                            // We build the term $\langle \frac{k_n}{\omega}
+                            // \hat{p}^*, g_R \rangle_{\Gamma_1 \cup \Gamma_3}$:
                             g_vector(i) +=
-                              ((0.) * kn_omega * p_hat_conj[i]).real() *
+                              (kn_omega * p_hat_conj[i] * source_term).real() *
                               JxW_face;
                           }
 
@@ -1292,7 +1299,7 @@ namespace Step100
                                 .first.first;
 
                             // We build the term $- \langle \hat{u}_n,
-                            // \overline{\hat{u}_n} \rangle_{\Gamma_1 \cup
+                            // \hat{u}_n \rangle_{\Gamma_1 \cup
                             // \Gamma_3}$:
                             if (((current_element_trial_i == 0) ||
                                  (current_element_trial_i == 1)) &&
@@ -1300,13 +1307,12 @@ namespace Step100
                                  (current_element_trial_j == 1)))
                               {
                                 D_matrix(i, j) -=
-                                  (flux_orientation * u_hat_n[j] *
-                                   flux_orientation * u_hat_n_conj[i] *
-                                   JxW_face)
+                                  (flux_orientation * u_hat_n_conj[i] *
+                                   flux_orientation * u_hat_n[j] * JxW_face)
                                     .real();
                               }
                             // We build the term $ \langle \hat{u}_n,
-                            // \overline{\frac{k_n}{\omega} \hat{p}^*}
+                            // \frac{k_n}{\omega} \hat{p}^*
                             // \rangle_{\Gamma_1 \cup \Gamma_3}$:
                             else if (((current_element_trial_i == 0) ||
                                       (current_element_trial_i == 1)) &&
@@ -1314,12 +1320,12 @@ namespace Step100
                                       (current_element_trial_j == 3)))
                               {
                                 D_matrix(i, j) +=
-                                  (kn_omega * p_hat[j] * flux_orientation *
-                                   u_hat_n_conj[i] * JxW_face)
+                                  (flux_orientation * u_hat_n_conj[i] *
+                                   kn_omega * p_hat[j] * JxW_face)
                                     .real();
                               }
                             // We build the term $\langle \frac{k_n}{\omega}
-                            // \hat{p}^*, \overline{\hat{u}_n} \rangle_{\Gamma_1
+                            // \hat{p}^*, \hat{u}_n \rangle_{\Gamma_1
                             // \cup \Gamma_3}$:
                             else if (((current_element_trial_i == 2) ||
                                       (current_element_trial_i == 3)) &&
@@ -1327,21 +1333,21 @@ namespace Step100
                                       (current_element_trial_j == 1)))
                               {
                                 D_matrix(i, j) +=
-                                  (flux_orientation * u_hat_n[j] * kn_omega *
-                                   p_hat_conj[i] * JxW_face)
+                                  (kn_omega * p_hat_conj[i] * flux_orientation *
+                                   u_hat_n[j] * JxW_face)
                                     .real();
                               }
                             // We build the term $- \langle \frac{k_n}{\omega}
-                            // \hat{p}^*, \overline{\frac{k_n}{\omega}
-                            // \hat{p}^*} \rangle_{\Gamma_1 \cup \Gamma_3}$:
+                            // \hat{p}^*, \frac{k_n}{\omega}
+                            // \hat{p}^* \rangle_{\Gamma_1 \cup \Gamma_3}$:
                             else if (((current_element_trial_i == 2) ||
                                       (current_element_trial_i == 3)) &&
                                      ((current_element_trial_j == 2) ||
                                       (current_element_trial_j == 3)))
                               {
                                 D_matrix(i, j) -=
-                                  (kn_omega * p_hat[j] * kn_omega *
-                                   p_hat_conj[i] * JxW_face)
+                                  (kn_omega * p_hat_conj[i] * kn_omega *
+                                   p_hat[j] * JxW_face)
                                     .real();
                               }
                           }
