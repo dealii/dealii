@@ -656,7 +656,7 @@ namespace Step101
     double added_mass = 0.0;
 
     unsigned int cell_index = 0;
-    for (const auto &cell : triangulation.active_cell_iterators())
+    for (const auto &cell : dof_handler.active_cell_iterators())
     {
       const double cell_volume = cell->measure() * parameters.thickness;
       total_mass += rho0 * cell_volume;
