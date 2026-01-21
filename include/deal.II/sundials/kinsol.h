@@ -702,15 +702,6 @@ namespace SUNDIALS
      */
     std::function<void(void *kinsol_mem)> custom_setup;
 
-    /**
-     * Handle KINSOL exceptions.
-     */
-    DeclException1(ExcKINSOLError,
-                   int,
-                   << "One of the SUNDIALS KINSOL internal functions "
-                   << "returned a negative error code: " << arg1
-                   << ". Please consult SUNDIALS manual.");
-
   private:
     /**
      * Throw an exception when a function with the given name is not
@@ -764,6 +755,15 @@ namespace SUNDIALS
      */
     mutable std::exception_ptr pending_exception;
   };
+
+  /**
+   * Handle KINSOL exceptions.
+   */
+  DeclException1(ExcKINSOLError,
+                 int,
+                 << "One of the SUNDIALS KINSOL internal functions "
+                 << "returned a negative error code: " << arg1
+                 << ". Please consult SUNDIALS manual.");
 
 } // namespace SUNDIALS
 

@@ -1008,7 +1008,8 @@
  *
  * @ingroup Exceptions
  */
-#  define AssertARKode(code) Assert(code >= 0, ExcARKodeError(code))
+#  define AssertARKode(code) \
+    Assert(code >= 0, ::dealii::SUNDIALS::ExcARKodeError(code))
 
 /**
  * Assertion that checks that the error code produced by calling one
@@ -1027,7 +1028,8 @@
  *
  * @ingroup Exceptions
  */
-#  define AssertKINSOL(code) Assert(code >= 0, ExcKINSOLError(code))
+#  define AssertKINSOL(code) \
+    Assert(code >= 0, ::dealii::SUNDIALS::ExcKINSOLError(code))
 
 /**
  * Assertion that checks that the error code produced by calling one
@@ -1046,7 +1048,8 @@
  *
  * @ingroup Exceptions
  */
-#  define AssertIDA(code) Assert(code >= 0, ExcIDAError(code))
+#  define AssertIDA(code) \
+    Assert(code >= 0, ::dealii::SUNDIALS::ExcIDAError(code))
 #endif
 
 #endif
