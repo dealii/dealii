@@ -15,7 +15,7 @@
 
 // @sect3{Include files}
 
-// The DPG method requires a large breadth of elements type which are included
+// The DPG method requires a large breadth of element types which are included
 // below:
 
 #include <deal.II/fe/fe_dgq.h>
@@ -29,6 +29,7 @@
 #include <deal.II/base/convergence_table.h>
 #include <deal.II/base/function.h>
 #include <deal.II/base/quadrature_lib.h>
+#include <deal.II/base/tensor_function.h>
 
 #include <deal.II/dofs/dof_handler.h>
 #include <deal.II/dofs/dof_tools.h>
@@ -57,7 +58,7 @@
 #include <iostream>
 
 
-const long double pi = 3.141592653589793238462643;
+const double pi = dealii::numbers::PI;
 
 namespace Step100
 {
@@ -66,7 +67,7 @@ namespace Step100
   // In the following function declaration, we create the analytical
   // solutions of the velocity field ($\mathbf{u}$) and the pressure field
   // ($p^*$) as well as the associated boundary values. However, in this
-  // tutorial, we will avoid the use of deal.ii complex arithmetic capabilities
+  // tutorial, we will avoid the use of deal.II complex arithmetic capabilities
   // and only use the complex functions that are defined in the C++ standard
   // library. Consequently, in what follows, we will separate the real and
   // imaginary component of our spaces. Therefore, we will also define two
@@ -75,8 +76,12 @@ namespace Step100
 
   // We start and create the analytical solution class for kinematic pressure
   // ($p^*$). The analytical solution depends on the wavenumber $k$ and the
-  // angle
-  // $\theta$ which are passed to the constructor.
+  // angle $\theta$ which are passed to the constructor. Since we are splitting
+  // the solution in real and imaginary part, we can directly take $\Re(p^*) =
+  // \Re(e^{-i k (x \cos(\theta) + y \sin(\theta))}) = \cos(k (x \cos(\theta) +
+  // y \sin(\theta)))$ and $\Im(p^*) = \Im(e^{-i k (x \cos(\theta) + y
+  // \sin(\theta))}) = -\sin(k (x \cos(\theta) + y \sin(\theta)))$. The same
+  // goes for the velocity field.
   template <int dim>
   class AnalyticalSolution_p_real : public Function<dim>
   {
@@ -95,15 +100,12 @@ namespace Step100
   };
 
   template <int dim>
-  double AnalyticalSolution_p_real<dim>::value(
-    const Point<dim>                   &p,
-    [[maybe_unused]] const unsigned int component) const
+  double
+  AnalyticalSolution_p_real<dim>::value(const Point<dim> &p,
+                                        const unsigned int /*component*/) const
   {
-    constexpr std::complex<double> imag(0., 1.);
-
-    return std::exp(-imag * wavenumber *
-                    (p[0] * std::cos(theta) + p[1] * std::sin(theta)))
-      .real();
+    return std::cos(wavenumber *
+                    (p[0] * std::cos(theta) + p[1] * std::sin(theta)));
   }
 
   // The same goes for the imaginary part of the analytical solution.
@@ -125,34 +127,29 @@ namespace Step100
   };
 
   template <int dim>
-  double AnalyticalSolution_p_imag<dim>::value(
-    const Point<dim>                   &p,
-    [[maybe_unused]] const unsigned int component) const
+  double
+  AnalyticalSolution_p_imag<dim>::value(const Point<dim> &p,
+                                        const unsigned int /*component*/) const
   {
-    constexpr std::complex<double> imag(0., 1.);
-
-    return std::exp(-imag * wavenumber *
-                    (p[0] * std::cos(theta) + p[1] * std::sin(theta)))
-      .imag();
+    return -std::sin(wavenumber *
+                     (p[0] * std::cos(theta) + p[1] * std::sin(theta)));
   }
 
-
   // Now we will do the same for the velocity field ($\mathbf{u}$) and create
-  // two class that will return the real or the imaginary part of our
+  // two classes that will return the real or the imaginary part of our
   // analytical solution. This class is similar to the previous ones but
   // since the velocity field is a vector, we will need the function to return
-  // $dim$ component. For our problem of interest, $dim = 2$.
+  // $dim$ components. For our problem of interest, $dim = 2$.
   template <int dim>
-  class AnalyticalSolution_u_real : public Function<dim>
+  class AnalyticalSolution_u_real : public TensorFunction<1, dim>
   {
   public:
     AnalyticalSolution_u_real(const double wavenumber, const double theta)
-      : Function<dim>(2)
+      : TensorFunction<1, dim>()
       , wavenumber(wavenumber)
       , theta(theta)
     {}
-    virtual double value(const Point<dim>  &p,
-                         const unsigned int component) const override;
+    virtual Tensor<1, dim> value(const Point<dim> &p) const override;
 
   private:
     const double wavenumber;
@@ -160,39 +157,31 @@ namespace Step100
   };
 
   template <int dim>
-  double
-  AnalyticalSolution_u_real<dim>::value(const Point<dim>  &p,
-                                        const unsigned int component) const
+  Tensor<1, dim>
+  AnalyticalSolution_u_real<dim>::value(const Point<dim> &p) const
   {
-    AssertIndexRange(component, 2);
+    AssertDimension(dim, 2);
 
-    constexpr std::complex<double> imag(0., 1.);
-
-    if (component == 0)
-      return (std::cos(theta) *
-              std::exp(-imag * wavenumber *
-                       (p[0] * std::cos(theta) + p[1] * std::sin(theta))))
-        .real();
-
-
-    else
-      return (std::sin(theta) *
-              std::exp(-imag * wavenumber *
-                       (p[0] * std::cos(theta) + p[1] * std::sin(theta))))
-        .real();
+    Tensor<1, dim> return_value;
+    return_value[0] =
+      std::cos(theta) *
+      std::cos(wavenumber * (p[0] * std::cos(theta) + p[1] * std::sin(theta)));
+    return_value[1] =
+      std::sin(theta) *
+      std::cos(wavenumber * (p[0] * std::cos(theta) + p[1] * std::sin(theta)));
+    return return_value;
   }
 
   template <int dim>
-  class AnalyticalSolution_u_imag : public Function<dim>
+  class AnalyticalSolution_u_imag : public TensorFunction<1, dim>
   {
   public:
     AnalyticalSolution_u_imag(double wavenumber, double theta)
-      : Function<dim>(2)
+      : TensorFunction<1, dim>()
       , wavenumber(wavenumber)
       , theta(theta)
     {}
-    virtual double value(const Point<dim>  &p,
-                         const unsigned int component) const override;
+    virtual Tensor<1, dim> value(const Point<dim> &p) const override;
 
   private:
     const double wavenumber;
@@ -200,34 +189,29 @@ namespace Step100
   };
 
   template <int dim>
-  double
-  AnalyticalSolution_u_imag<dim>::value(const Point<dim>  &p,
-                                        const unsigned int component) const
+  Tensor<1, dim>
+  AnalyticalSolution_u_imag<dim>::value(const Point<dim> &p) const
   {
-    AssertIndexRange(component, 2);
+    AssertDimension(dim, 2);
 
-    constexpr std::complex<double> imag(0., 1.);
-
-    if (component == 0)
-      return (std::cos(theta) *
-              std::exp(-imag * wavenumber *
-                       (p[0] * std::cos(theta) + p[1] * std::sin(theta))))
-        .imag();
-
-    else
-      return (std::sin(theta) *
-              std::exp(-imag * wavenumber *
-                       (p[0] * std::cos(theta) + p[1] * std::sin(theta))))
-        .imag();
+    Tensor<1, dim> return_value;
+    return_value[0] =
+      std::cos(theta) *
+      -std::sin(wavenumber * (p[0] * std::cos(theta) + p[1] * std::sin(theta)));
+    return_value[1] =
+      std::sin(theta) *
+      -std::sin(wavenumber * (p[0] * std::cos(theta) + p[1] * std::sin(theta)));
+    return return_value;
   }
 
   // Similar classes are required for the boundary values functions. The main
   // difference is that the number of components will now be 4 because those
-  // functions will be applied to our space of skeletons unknowns via
+  // functions will be applied to our space of skeleton unknowns via
   // VectorTools::interpolate_boundary_values. This space has 4 components,
   // because the skeleton unknowns on faces for the velocity field are scalars
   // from the definition $\hat{u}_n = \mathbf{u} \cdot n$ and there are the real
-  // and imaginary part of both fields.
+  // and imaginary part of both fields. To ensure that the functions are called
+  // on the right component, we will add assertions in the value functions.
 
   template <int dim>
   class BoundaryValues_p_real : public Function<dim>
@@ -251,9 +235,12 @@ namespace Step100
     const Point<dim>                   &p,
     [[maybe_unused]] const unsigned int component) const
   {
-    constexpr std::complex<double> imag(0., 1.);
+    Assert(
+      component == 2,
+      ExcMessage(
+        "BoundaryValues_p_real::value called for wrong component; expected component 2 (p_hat_real)"));
 
-    return std::exp(-imag * wavenumber * p[1] * std::sin(theta)).real();
+    return std::cos(wavenumber * p[1] * std::sin(theta));
   }
 
   template <int dim>
@@ -278,10 +265,14 @@ namespace Step100
     const Point<dim>                   &p,
     [[maybe_unused]] const unsigned int component) const
   {
-    constexpr std::complex<double> imag(0., 1.);
+    Assert(
+      component == 3,
+      ExcMessage(
+        "BoundaryValues_p_imag::value called for wrong component; expected component 3 (p_hat_imag)"));
 
-    return std::exp(-imag * wavenumber * p[1] * std::sin(theta)).imag();
+    return -std::sin(wavenumber * p[1] * std::sin(theta));
   }
+
   template <int dim>
   class BoundaryValues_u_real : public Function<dim>
   {
@@ -304,11 +295,14 @@ namespace Step100
     const Point<dim>                   &p,
     [[maybe_unused]] const unsigned int component) const
   {
-    constexpr std::complex<double> imag(0., 1.);
-    return -1 * (std::sin(theta) *
-                 std::exp(-imag * wavenumber * p[0] * std::cos(theta)))
-                  .real();
+    Assert(
+      component == 0,
+      ExcMessage(
+        "BoundaryValues_u_real::value called for wrong component; expected component 0 (u_hat_real)"));
+    return -1 *
+           (std::sin(theta) * std::cos(wavenumber * p[0] * std::cos(theta)));
   }
+
   template <int dim>
   class BoundaryValues_u_imag : public Function<dim>
   {
@@ -331,11 +325,12 @@ namespace Step100
     const Point<dim>                   &p,
     [[maybe_unused]] const unsigned int component) const
   {
-    constexpr std::complex<double> imag(0., 1.);
+    Assert(
+      component == 1,
+      ExcMessage(
+        "BoundaryValues_u_imag::value called for wrong component; expected component 1 (u_hat_imag)"));
 
-    return -1 * (std::sin(theta) *
-                 std::exp(-imag * wavenumber * p[0] * std::cos(theta)))
-                  .imag();
+    return std::sin(theta) * std::sin(wavenumber * p[0] * std::cos(theta));
   }
 
   // @sect3{The <code>DPGHelmholtz</code> class declaration}
@@ -349,7 +344,7 @@ namespace Step100
   // skeleton;
   // - The <code>dof_handler_test</code> is for the test functions. Although we
   // do not use the unknowns associated with this DoFHandler, it enables us to
-  // evaluate the test function we will use in DPG.
+  // evaluate the test functions we will use in DPG.
 
   // The same applies for the three FESystem:
   // <code>fe_system_trial_interior</code>,
@@ -398,7 +393,7 @@ namespace Step100
     // skeleton degrees of freedom solution is used to
     // reconstruct the interior solution.
 
-    void assemble_system(bool solve_interior = false);
+    void assemble_system(bool solve_interior);
 
     // <code>solve_linear_system_skeleton</code> solves the linear system of
     // equations for the skeleton degree of freedom.
@@ -455,7 +450,7 @@ namespace Step100
     // However, the skeleton space does not have the same number of components
     // as the interior or the test space because the space $H^{-1/2}$ related to
     // the velocity field is a scalar field. Consequently, we need to define
-    // additional extractor specifically for the skeleton spaces.
+    // additional extractors specifically for the skeleton spaces.
     const FEValuesExtractors::Scalar extractor_u_hat_real;
     const FEValuesExtractors::Scalar extractor_u_hat_imag;
     const FEValuesExtractors::Scalar extractor_p_hat_real;
@@ -1640,20 +1635,15 @@ namespace Step100
             const double JxW      = fe_values_trial_interior.JxW(q_index);
             const auto  &position = quadrature_points[q_index];
 
+            L2_error_u_real += (local_u_real[q_index] -
+                                analytical_solution_u_real.value(position))
+                                 .norm_square() *
+                               JxW;
+            L2_error_u_imag += (local_u_imag[q_index] -
+                                analytical_solution_u_imag.value(position))
+                                 .norm_square() *
+                               JxW;
 
-            for (unsigned int i = 0; i < dim; ++i)
-              {
-                L2_error_u_real +=
-                  pow((local_u_real[q_index][i] -
-                       analytical_solution_u_real.value(position, i)),
-                      2) *
-                  JxW;
-                L2_error_u_imag +=
-                  pow((local_u_imag[q_index][i] -
-                       analytical_solution_u_imag.value(position, i)),
-                      2) *
-                  JxW;
-              }
 
             L2_error_p_real +=
               pow((local_p_real[q_index] -
@@ -1717,15 +1707,10 @@ namespace Step100
                 // sign only depends on the orientation of flux from the
                 // convention with respect to the normal vector and therefore
                 // change from one face to another.
-                u_hat_n_analytical_real = 0.;
-                u_hat_n_analytical_imag = 0.;
-                for (unsigned int i = 0; i < dim; ++i)
-                  {
-                    u_hat_n_analytical_real +=
-                      normal[i] * analytical_solution_u_real.value(position, i);
-                    u_hat_n_analytical_imag +=
-                      normal[i] * analytical_solution_u_imag.value(position, i);
-                  }
+                u_hat_n_analytical_real =
+                  normal * analytical_solution_u_real.value(position);
+                u_hat_n_analytical_imag =
+                  normal * analytical_solution_u_imag.value(position);
 
                 L2_error_u_hat_real += pow(abs(local_u_hat_real[q_index]) -
                                              abs(u_hat_n_analytical_real),
