@@ -649,8 +649,8 @@ namespace GridGenerator
    * the height and the width of the channel can be defined by the user.
    * This generator can be used for benchmarking Navier-Stokes solvers
    * for various flows around a sphere cases in 3D.
-   * The sphere is centered at $(0, 0, 0)$, has diameter twice inner_radius and lies at the center of a cube
-   * of length twice outer_radius.
+   * The sphere is centered at $(0, 0, 0)$, has diameter which is equal to two times the inner_radius and lies at the center of a cube
+   * of length which is two times the outer_radius.
    * The geometry consists of a channel of size $[-outer_radius - L_{pre}, outer_radius + L_{post}] \times
    * [-outer_radius - H_{below}, outer_radius + H_{above}] \times [-outer_radius - W_{front}, outer_radius + W_{back}] $ 
    * with the sphere inside. The channel has three distinct regions: <ol>
@@ -688,7 +688,7 @@ namespace GridGenerator
    * All these lengths must divide $2 \times \texttt{outer\_radius}$.
    * 
    *
-   * @param inner_radius Radius of the internal sphere.
+   * @param inner_radius  Radius of the sphere.
    * 
    * @param outer_radius Half of the edge length of the cube that contains the sphere.
    * 
