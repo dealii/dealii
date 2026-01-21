@@ -6043,8 +6043,22 @@ namespace internal
                           break;
 
                         case ReferenceCells::Pyramid:
-                        case ReferenceCells::Wedge:
+                          // TODO: Pyramid
                           DEAL_II_NOT_IMPLEMENTED();
+                          break;
+
+                        case ReferenceCells::Wedge:
+                          // - We wont need vertices (all required vertices will
+                          //   be provided by the refined faces)
+                          // - 3 lines will be required to build up the
+                          //   "refined" middle triangle
+                          // - 4 faces for the new refined middle triangle + 6
+                          //   faces for the quads building the wedges in
+                          //   z-direction. Rest will be provided via refinement
+                          //   of faces. Store them all as singles. See also
+                          //   https://link.springer.com/article/10.1007/BF01221213
+                          needed_lines_single += 3;
+                          needed_faces_single += 10;
                           break;
 
                         case ReferenceCells::Hexahedron:
@@ -6617,8 +6631,13 @@ namespace internal
                       break;
 
                     case ReferenceCells::Pyramid:
-                    case ReferenceCells::Wedge:
                       DEAL_II_NOT_IMPLEMENTED();
+                      // TODO: Pyramid
+                      break;
+
+                    case ReferenceCells::Wedge:
+                      n_new_lines = 3;
+                      n_new_faces = 10;
                       break;
 
                     case ReferenceCells::Hexahedron:
@@ -6902,8 +6921,24 @@ namespace internal
                         break;
 
                       case ReferenceCells::Pyramid:
-                      case ReferenceCells::Wedge:
+                        // TODO: Pyramid
                         DEAL_II_NOT_IMPLEMENTED();
+                        break;
+
+                      case ReferenceCells::Wedge:
+                        {
+                          // Directions so that middle tri looks like a 'normal'
+                          // refined tri (refined quads define outer lines)
+                          static constexpr dealii::ndarray<unsigned int, 3, 2>
+                            new_line_vertices = {{{{15, 16}}, //
+                                                  {{16, 17}}, //
+                                                  {{15, 17}}}};
+
+                          for (unsigned int i = 0; i < n_new_lines; ++i)
+                            new_lines[i]->set_bounding_object_indices(
+                              {vertex_indices[new_line_vertices[i][0]],
+                               vertex_indices[new_line_vertices[i][1]]});
+                        }
                         break;
 
                       case ReferenceCells::Hexahedron:
@@ -7308,9 +7343,18 @@ namespace internal
                                  face_indices[cell_faces[c][3]]});
                               break;
 
+                            // Pyramids and Wedges share same number of faces
                             case ReferenceCells::Pyramid:
-                            case ReferenceCells::Wedge:
+                              // TODO: Pyramid, just remove
                               DEAL_II_NOT_IMPLEMENTED();
+                            case ReferenceCells::Wedge:
+                              new_cell->set_bounding_object_indices(
+                                {face_indices[cell_faces[c][0]],
+                                 face_indices[cell_faces[c][1]],
+                                 face_indices[cell_faces[c][2]],
+                                 face_indices[cell_faces[c][3]],
+                                 face_indices[cell_faces[c][4]]});
+                              break;
 
                             case ReferenceCells::Hexahedron:
                               new_cell->set_bounding_object_indices(
