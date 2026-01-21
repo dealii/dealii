@@ -328,7 +328,7 @@ structure to the following:
     \end{pmatrix} \begin{pmatrix}
         \Psi^r \\ u_h    \\ \hat{u}_h
     \end{pmatrix} = \begin{pmatrix}
-        0 \\ 0 \\ g_R
+        l \\ 0 \\ g_R
     \end{pmatrix}.
 @f} 
 In the above, we choose the sign so that the whole system remains positive
@@ -386,7 +386,7 @@ our problem:
 \end{pmatrix}
 
 \begin{pmatrix} \mathbf{v} \\ q \\ \mathbf{u} \\ p^* \\ \hat{u}_n \\ \hat{p}^*
-\end{pmatrix} = \begin{pmatrix} 0 \\ 0 \\ 0 \\
+\end{pmatrix} = \begin{pmatrix} (\mathbf{v}, l)_{\Omega_h} \\ (q,l)_{\Omega_h} \\ 0 \\
 0 \\ - \langle \hat{u}_n, g_R \rangle_{\Gamma_1 \cup \Gamma_3}
 \\ \langle \frac{k_n}{\omega} \hat{p}^*, g_R \rangle_{\Gamma_1
 \cup \Gamma_3} \end{pmatrix}.  @f}
