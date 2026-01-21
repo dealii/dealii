@@ -1,0 +1,43 @@
+// ------------------------------------------------------------------------
+//
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2026 by the deal.II authors
+//
+// This file is part of the deal.II library.
+//
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
+//
+// ------------------------------------------------------------------------
+
+// serial Vector and BlockVector
+for (S : REAL_SCALARS; V : DEAL_II_VEC_TEMPLATES)
+  {
+    template class SUNDIALS::ARKode<V<S>>;
+  }
+
+// parallel Vector and BlockVector
+for (S : REAL_SCALARS; V : DEAL_II_VEC_TEMPLATES)
+  {
+    template class SUNDIALS::ARKode<LinearAlgebra::distributed::V<S>>;
+  }
+
+#if defined(DEAL_II_WITH_MPI) && defined(DEAL_II_WITH_TRILINOS)
+// TrilinosWrappers Vector and BlockVector
+for (V : DEAL_II_VEC_TEMPLATES)
+  {
+    template class SUNDIALS::ARKode<TrilinosWrappers::MPI::V>;
+  }
+#endif
+
+#if defined(DEAL_II_WITH_MPI) && defined(DEAL_II_WITH_PETSC)
+#  ifndef DEAL_II_PETSC_WITH_COMPLEX
+// PETScWrappers Vector and BlockVector
+for (V : DEAL_II_VEC_TEMPLATES)
+  {
+    template class SUNDIALS::ARKode<PETScWrappers::MPI::V>;
+  }
+#  endif
+#endif
