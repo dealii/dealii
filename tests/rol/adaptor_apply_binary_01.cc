@@ -12,12 +12,12 @@
 //
 // ------------------------------------------------------------------------
 
-// Check the ROLVector's applyBinary function applied to a fully
+// Check the ROLAdaptor's applyBinary function applied to a fully
 // distributed (MPI) vector.
 
 #include <deal.II/lac/generic_linear_algebra.h>
 
-#include <deal.II/trilinos/rol_vector.h>
+#include <deal.II/trilinos/rol_adaptor.h>
 
 #include "../tests.h"
 
@@ -82,8 +82,8 @@ test()
   ROL::Elementwise::Plus<double>     plus;
 
   // --- Testing the constructor
-  TrilinosWrappers::ROLVector<VectorType> a_rol(a_ptr);
-  TrilinosWrappers::ROLVector<VectorType> b_rol(b_ptr);
+  TrilinosWrappers::ROLAdaptor<VectorType> a_rol(a_ptr);
+  TrilinosWrappers::ROLAdaptor<VectorType> b_rol(b_ptr);
 
   a_rol.print(std::cout);
   b_rol.print(std::cout);

@@ -18,7 +18,7 @@
 #include <deal.II/base/config.h>
 
 #ifdef DEAL_II_TRILINOS_WITH_ROL
-#  include <deal.II/trilinos/rol_vector.h>
+#  include <deal.II/trilinos/rol_adaptor.h>
 
 
 DEAL_II_NAMESPACE_OPEN
@@ -26,14 +26,14 @@ DEAL_II_NAMESPACE_OPEN
 namespace Rol
 {
   /**
-   * @copydoc TrilinosWrappers::ROLVector
+   * @copydoc TrilinosWrappers::ROLAdaptor
    *
-   * @deprecated Use TrilinosWrappers::ROLVector instead.
+   * @deprecated Use TrilinosWrappers::ROLAdaptor instead.
    */
   template <typename VectorType>
   using VectorAdaptor DEAL_II_DEPRECATED_EARLY_WITH_COMMENT(
-    "Use dealii::TrilinosWrappers::ROLVector instead.") =
-    dealii::TrilinosWrappers::ROLVector<VectorType>;
+    "Use dealii::TrilinosWrappers::ROLAdaptor instead.") =
+    dealii::TrilinosWrappers::ROLAdaptor<VectorType>;
 } // namespace Rol
 
 DEAL_II_NAMESPACE_CLOSE

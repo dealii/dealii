@@ -14,7 +14,7 @@
 
 #include <deal.II/lac/generic_linear_algebra.h>
 
-#include <deal.II/trilinos/rol_vector.h>
+#include <deal.II/trilinos/rol_adaptor.h>
 
 #include <cmath>
 #include <iostream>
@@ -34,7 +34,7 @@ using namespace dealii;
 using VectorType = typename dealii::Vector<double>;
 
 template <class Real     = double,
-          typename Xprim = TrilinosWrappers::ROLVector<VectorType>>
+          typename Xprim = TrilinosWrappers::ROLAdaptor<VectorType>>
 class QuadraticObjective : public ROL::Objective<Real>
 {
 private:
@@ -88,7 +88,7 @@ test(const double x, const double y)
   (*x_ptr)[0] = x;
   (*x_ptr)[1] = y;
 
-  TrilinosWrappers::ROLVector<VectorType> x_rol(x_ptr);
+  TrilinosWrappers::ROLAdaptor<VectorType> x_rol(x_ptr);
 
   ROL::ParameterList parlist;
 

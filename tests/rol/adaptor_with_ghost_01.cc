@@ -12,12 +12,12 @@
 //
 // ------------------------------------------------------------------------
 
-// Check the ROLVector with MPI ghosted vectors using ROL::Vector's
+// Check the ROLAdaptor with MPI ghosted vectors using ROL::Vector's
 // checkVector() method.
 
 #include <deal.II/lac/generic_linear_algebra.h>
 
-#include <deal.II/trilinos/rol_vector.h>
+#include <deal.II/trilinos/rol_adaptor.h>
 
 #include "../tests.h"
 
@@ -95,9 +95,9 @@ test()
   ROL::Ptr<VectorType> c_ptr = ROL::makePtrFromRef<VectorType>(c);
 
   // --- Testing the constructor
-  TrilinosWrappers::ROLVector<VectorType> a_rol(a_ptr);
-  TrilinosWrappers::ROLVector<VectorType> b_rol(b_ptr);
-  TrilinosWrappers::ROLVector<VectorType> c_rol(c_ptr);
+  TrilinosWrappers::ROLAdaptor<VectorType> a_rol(a_ptr);
+  TrilinosWrappers::ROLAdaptor<VectorType> b_rol(b_ptr);
+  TrilinosWrappers::ROLAdaptor<VectorType> c_rol(c_ptr);
 
   ROL::Ptr<std::ostream> out_stream;
   ROL::nullstream        bhs; // outputs nothing

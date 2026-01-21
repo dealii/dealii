@@ -12,14 +12,14 @@
 //
 // ------------------------------------------------------------------------
 
-// Check ROLVector with an IndexSet mask.
+// Check ROLAdaptor with an IndexSet mask.
 
 #include <deal.II/base/index_set.h>
 #include <deal.II/base/signaling_nan.h>
 
 #include <deal.II/lac/vector.h>
 
-#include <deal.II/trilinos/rol_vector.h>
+#include <deal.II/trilinos/rol_adaptor.h>
 
 #include <ROL_Vector.hpp>
 
@@ -60,9 +60,9 @@ test()
     }
 
   // wrap for ROL
-  TrilinosWrappers::ROLVector<VectorType> u_rol(ROL::makePtrFromRef(u), mask);
-  TrilinosWrappers::ROLVector<VectorType> v_rol(ROL::makePtrFromRef(v), mask);
-  TrilinosWrappers::ROLVector<VectorType> w_rol(ROL::makePtrFromRef(w), mask);
+  TrilinosWrappers::ROLAdaptor<VectorType> u_rol(ROL::makePtrFromRef(u), mask);
+  TrilinosWrappers::ROLAdaptor<VectorType> v_rol(ROL::makePtrFromRef(v), mask);
+  TrilinosWrappers::ROLAdaptor<VectorType> w_rol(ROL::makePtrFromRef(w), mask);
 
   // let ROL do some checks
   u_rol.checkVector(v_rol, w_rol, true, deallog.get_file_stream());

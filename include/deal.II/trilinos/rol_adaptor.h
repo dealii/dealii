@@ -12,8 +12,8 @@
 //
 // ------------------------------------------------------------------------
 
-#ifndef dealii_trilinos_rol_vector_h
-#define dealii_trilinos_rol_vector_h
+#ifndef dealii_trilinos_rol_adaptor_h
+#define dealii_trilinos_rol_adaptor_h
 
 #include <deal.II/base/config.h>
 
@@ -22,8 +22,6 @@
 #  include <deal.II/base/index_set.h>
 #  include <deal.II/base/mpi.h>
 #  include <deal.II/base/types.h>
-
-#  include <deal.II/lac/vector.h>
 
 #  include <ROL_Vector.hpp>
 
@@ -52,10 +50,10 @@ namespace TrilinosWrappers
    * VectorType::real_type;  // The type for real-valued numbers.
    * ```
    *
-   * However, ROL doesn't distinguish ROLVector::value_type from
-   * ROLVector::real_type. This is due to ROL's assumption that the
-   * ROLVector::value_type itself is a type for real-valued numbers.
-   * Therefore, ROLVector supports vectors whose real_type is
+   * However, ROL doesn't distinguish ROLAdaptor::value_type from
+   * ROLAdaptor::real_type. This is due to ROL's assumption that the
+   * ROLAdaptor::value_type itself is a type for real-valued numbers.
+   * Therefore, ROLAdaptor supports vectors whose real_type is
    * convertible to value_type in the sense that
    * <code>std::is_convertible_v<real_type, value_type></code> yields
    * <code>true</code>.
@@ -125,7 +123,7 @@ namespace TrilinosWrappers
    * elements.
    */
   template <typename VectorType>
-  class ROLVector : public ROL::Vector<typename VectorType::value_type>
+  class ROLAdaptor : public ROL::Vector<typename VectorType::value_type>
   {
     /**
      * An alias for size type of <tt>VectorType</tt>.
@@ -179,7 +177,7 @@ namespace TrilinosWrappers
      * the other constructor) and as a consequence considers all variables
      * represented by the vector as available to optimization.
      */
-    ROLVector(const ROL::Ptr<VectorType> &vector_ptr);
+    ROLAdaptor(const ROL::Ptr<VectorType> &vector_ptr);
 
     /**
      * Constructor.
@@ -191,8 +189,8 @@ namespace TrilinosWrappers
      * Passing in the complete index set (partitioned among processors) is
      * equivalent to the previous constructor.
      */
-    ROLVector(const ROL::Ptr<VectorType> &vector_ptr,
-              const IndexSet             &optimization_space);
+    ROLAdaptor(const ROL::Ptr<VectorType> &vector_ptr,
+               const IndexSet             &optimization_space);
 
     /**
      * Return the ROL pointer to the wrapped vector.
@@ -220,7 +218,7 @@ namespace TrilinosWrappers
      * then <code> VectorType::operator=(const VectorType&) </code> should still
      * be allowed on it.
      *
-     * @note @p rol_vector has to be of type ROLVector.
+     * @note @p rol_vector has to be of type ROLAdaptor.
      */
     void
     set(const ROL::Vector<value_type> &rol_vector) override;
@@ -232,7 +230,7 @@ namespace TrilinosWrappers
      * optimization space. Both vectors need to correspond to the same
      * optimization space.
      *
-     * @note @p rol_vector has to be of type ROLVector.
+     * @note @p rol_vector has to be of type ROLAdaptor.
      */
     void
     plus(const ROL::Vector<value_type> &rol_vector) override;
@@ -244,7 +242,7 @@ namespace TrilinosWrappers
      * optimization space. Both vectors need to correspond to the same
      * optimization space.
      *
-     * @note @p rol_vector has to be of type ROLVector.
+     * @note @p rol_vector has to be of type ROLAdaptor.
      */
     void
     axpy(const value_type               alpha,
@@ -266,7 +264,7 @@ namespace TrilinosWrappers
      * optimization space. Both vectors need to correspond to the same
      * optimization space.
      *
-     * @note @p rol_vector has to be of type ROLVector.
+     * @note @p rol_vector has to be of type ROLAdaptor.
      */
     value_type
     dot(const ROL::Vector<value_type> &rol_vector) const override;
@@ -277,10 +275,10 @@ namespace TrilinosWrappers
      * The operation will only be applied to elements of the specified
      * optimization space.
      *
-     * The returned type is of ROLVector::value_type so as to maintain
-     * consistency with ROL::Vector<ROLVector::value_type> and
+     * The returned type is of ROLAdaptor::value_type so as to maintain
+     * consistency with ROL::Vector<ROLAdaptor::value_type> and
      * more importantly to not to create an overloaded version namely,
-     * <code> ROLVector::real_type norm() const; </code>
+     * <code> ROLAdaptor::real_type norm() const; </code>
      * if real_type and value_type are not of the same type.
      */
     value_type
@@ -318,7 +316,7 @@ namespace TrilinosWrappers
      * optimization space. Both vectors need to correspond to the same
      * optimization space.
      *
-     * @note @p rol_vector has to be of type ROLVector.
+     * @note @p rol_vector has to be of type ROLAdaptor.
      */
     void
     applyBinary(const ROL::Elementwise::BinaryFunction<value_type> &f,
@@ -350,15 +348,15 @@ namespace TrilinosWrappers
 
 
   template <typename VectorType>
-  ROLVector<VectorType>::ROLVector(const ROL::Ptr<VectorType> &vector_ptr)
-    : ROLVector(vector_ptr, vector_ptr->locally_owned_elements())
+  ROLAdaptor<VectorType>::ROLAdaptor(const ROL::Ptr<VectorType> &vector_ptr)
+    : ROLAdaptor(vector_ptr, vector_ptr->locally_owned_elements())
   {}
 
 
 
   template <typename VectorType>
-  ROLVector<VectorType>::ROLVector(const ROL::Ptr<VectorType> &vector_ptr,
-                                   const IndexSet &optimization_space)
+  ROLAdaptor<VectorType>::ROLAdaptor(const ROL::Ptr<VectorType> &vector_ptr,
+                                     const IndexSet &optimization_space)
     : vector_ptr(vector_ptr)
     , optimization_space(optimization_space)
   {
@@ -383,7 +381,7 @@ namespace TrilinosWrappers
 
   template <typename VectorType>
   ROL::Ptr<VectorType>
-  ROLVector<VectorType>::getVector()
+  ROLAdaptor<VectorType>::getVector()
   {
     return vector_ptr;
   }
@@ -392,7 +390,7 @@ namespace TrilinosWrappers
 
   template <typename VectorType>
   ROL::Ptr<const VectorType>
-  ROLVector<VectorType>::getVector() const
+  ROLAdaptor<VectorType>::getVector() const
   {
     return vector_ptr;
   }
@@ -401,11 +399,11 @@ namespace TrilinosWrappers
 
   template <typename VectorType>
   void
-  ROLVector<VectorType>::set(const ROL::Vector<value_type> &other_)
+  ROLAdaptor<VectorType>::set(const ROL::Vector<value_type> &other_)
   {
-    Assert(dynamic_cast<const ROLVector *>(&other_) != nullptr,
+    Assert(dynamic_cast<const ROLAdaptor *>(&other_) != nullptr,
            ExcInternalError());
-    const ROLVector &other = dynamic_cast<const ROLVector &>(other_);
+    const ROLAdaptor &other = dynamic_cast<const ROLAdaptor &>(other_);
 
     // Perform a deep copy of the vector pointed to by vector_ptr.
     (*vector_ptr) = *(other.getVector());
@@ -419,11 +417,11 @@ namespace TrilinosWrappers
 
   template <typename VectorType>
   void
-  ROLVector<VectorType>::plus(const ROL::Vector<value_type> &other_)
+  ROLAdaptor<VectorType>::plus(const ROL::Vector<value_type> &other_)
   {
-    Assert(dynamic_cast<const ROLVector *>(&other_) != nullptr,
+    Assert(dynamic_cast<const ROLAdaptor *>(&other_) != nullptr,
            ExcInternalError());
-    const ROLVector &other = dynamic_cast<const ROLVector &>(other_);
+    const ROLAdaptor &other = dynamic_cast<const ROLAdaptor &>(other_);
 
     Assert(vector_ptr->has_ghost_elements() == false, ExcGhostsPresent());
     Assert(optimization_space.size() == vector_ptr->size(),
@@ -442,12 +440,12 @@ namespace TrilinosWrappers
 
   template <typename VectorType>
   void
-  ROLVector<VectorType>::axpy(const value_type               alpha,
-                              const ROL::Vector<value_type> &other_)
+  ROLAdaptor<VectorType>::axpy(const value_type               alpha,
+                               const ROL::Vector<value_type> &other_)
   {
-    Assert(dynamic_cast<const ROLVector *>(&other_) != nullptr,
+    Assert(dynamic_cast<const ROLAdaptor *>(&other_) != nullptr,
            ExcInternalError());
-    const ROLVector &other = dynamic_cast<const ROLVector &>(other_);
+    const ROLAdaptor &other = dynamic_cast<const ROLAdaptor &>(other_);
 
     Assert(vector_ptr->has_ghost_elements() == false, ExcGhostsPresent());
     Assert(optimization_space.size() == vector_ptr->size(),
@@ -466,7 +464,7 @@ namespace TrilinosWrappers
 
   template <typename VectorType>
   int
-  ROLVector<VectorType>::dimension() const
+  ROLAdaptor<VectorType>::dimension() const
   {
     Assert(optimization_space.size() == vector_ptr->size(),
            ExcMessage("Optimization space is out-of-sync. "
@@ -479,7 +477,7 @@ namespace TrilinosWrappers
 
   template <typename VectorType>
   void
-  ROLVector<VectorType>::scale(const value_type alpha)
+  ROLAdaptor<VectorType>::scale(const value_type alpha)
   {
     Assert(vector_ptr->has_ghost_elements() == false, ExcGhostsPresent());
     Assert(optimization_space.size() == vector_ptr->size(),
@@ -496,11 +494,11 @@ namespace TrilinosWrappers
 
   template <typename VectorType>
   typename VectorType::value_type
-  ROLVector<VectorType>::dot(const ROL::Vector<value_type> &other_) const
+  ROLAdaptor<VectorType>::dot(const ROL::Vector<value_type> &other_) const
   {
-    Assert(dynamic_cast<const ROLVector *>(&other_) != nullptr,
+    Assert(dynamic_cast<const ROLAdaptor *>(&other_) != nullptr,
            ExcInternalError());
-    const ROLVector &other = dynamic_cast<const ROLVector &>(other_);
+    const ROLAdaptor &other = dynamic_cast<const ROLAdaptor &>(other_);
 
     Assert(optimization_space.size() == vector_ptr->size(),
            ExcMessage("Optimization space is out-of-sync. "
@@ -520,7 +518,7 @@ namespace TrilinosWrappers
 
   template <typename VectorType>
   typename VectorType::value_type
-  ROLVector<VectorType>::norm() const
+  ROLAdaptor<VectorType>::norm() const
   {
     return std::sqrt(this->dot(*this));
   }
@@ -529,13 +527,13 @@ namespace TrilinosWrappers
 
   template <typename VectorType>
   ROL::Ptr<ROL::Vector<typename VectorType::value_type>>
-  ROLVector<VectorType>::clone() const
+  ROLAdaptor<VectorType>::clone() const
   {
     // create new vector with same size as wrapped one
     ROL::Ptr<VectorType> clone_ptr = ROL::makePtr<VectorType>();
     clone_ptr->reinit(*vector_ptr, false);
 
-    return ROL::makePtr<ROLVector>(clone_ptr, optimization_space);
+    return ROL::makePtr<ROLAdaptor>(clone_ptr, optimization_space);
     // TODO: also somehow pass the partial sums etc?
   }
 
@@ -543,7 +541,7 @@ namespace TrilinosWrappers
 
   template <typename VectorType>
   ROL::Ptr<ROL::Vector<typename VectorType::value_type>>
-  ROLVector<VectorType>::basis(const int global_opt_index) const
+  ROLAdaptor<VectorType>::basis(const int global_opt_index) const
   {
     Assert(optimization_space.size() == vector_ptr->size(),
            ExcMessage("Optimization space is out-of-sync. "
@@ -572,7 +570,7 @@ namespace TrilinosWrappers
 
     basis_ptr->compress(VectorOperation::insert);
 
-    return ROL::makePtr<ROLVector>(basis_ptr, optimization_space);
+    return ROL::makePtr<ROLAdaptor>(basis_ptr, optimization_space);
     // TODO: also somehow pass the partial sums etc?
   }
 
@@ -580,7 +578,7 @@ namespace TrilinosWrappers
 
   template <typename VectorType>
   void
-  ROLVector<VectorType>::applyUnary(
+  ROLAdaptor<VectorType>::applyUnary(
     const ROL::Elementwise::UnaryFunction<value_type> &f)
   {
     Assert(vector_ptr->has_ghost_elements() == false, ExcGhostsPresent());
@@ -598,13 +596,13 @@ namespace TrilinosWrappers
 
   template <typename VectorType>
   void
-  ROLVector<VectorType>::applyBinary(
+  ROLAdaptor<VectorType>::applyBinary(
     const ROL::Elementwise::BinaryFunction<value_type> &f,
     const ROL::Vector<value_type>                      &other_)
   {
-    Assert(dynamic_cast<const ROLVector *>(&other_) != nullptr,
+    Assert(dynamic_cast<const ROLAdaptor *>(&other_) != nullptr,
            ExcInternalError());
-    const ROLVector &other = dynamic_cast<const ROLVector &>(other_);
+    const ROLAdaptor &other = dynamic_cast<const ROLAdaptor &>(other_);
 
     Assert(vector_ptr->has_ghost_elements() == false, ExcGhostsPresent());
     Assert(optimization_space.size() == vector_ptr->size(),
@@ -623,7 +621,7 @@ namespace TrilinosWrappers
 
   template <typename VectorType>
   typename VectorType::value_type
-  ROLVector<VectorType>::reduce(
+  ROLAdaptor<VectorType>::reduce(
     const ROL::Elementwise::ReductionOp<value_type> &r) const
   {
     Assert(optimization_space.size() == vector_ptr->size(),
@@ -652,7 +650,7 @@ namespace TrilinosWrappers
 
   template <typename VectorType>
   void
-  ROLVector<VectorType>::print(std::ostream &outStream) const
+  ROLAdaptor<VectorType>::print(std::ostream &outStream) const
   {
     vector_ptr->print(outStream);
   }
@@ -677,4 +675,4 @@ DEAL_II_NAMESPACE_CLOSE
 
 #endif // DEAL_II_TRILINOS_WITH_ROL
 
-#endif // dealii_trilinos_rol_vector_h
+#endif // dealii_trilinos_rol_adaptor_h
