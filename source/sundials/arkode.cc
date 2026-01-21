@@ -21,9 +21,17 @@
 
 #ifdef DEAL_II_WITH_SUNDIALS
 
-#  include <sundials/sundials_nvector.h>
-#  if DEAL_II_SUNDIALS_VERSION_GTE(6, 0, 0)
-#    include <sundials/sundials_context.h>
+#  include <deal.II/lac/block_vector.h>
+#  include <deal.II/lac/la_parallel_block_vector.h>
+#  include <deal.II/lac/la_parallel_vector.h>
+#  include <deal.II/lac/vector.h>
+#  ifdef DEAL_II_WITH_TRILINOS
+#    include <deal.II/lac/trilinos_parallel_block_vector.h>
+#    include <deal.II/lac/trilinos_vector.h>
+#  endif
+#  ifdef DEAL_II_WITH_PETSC
+#    include <deal.II/lac/petsc_block_vector.h>
+#    include <deal.II/lac/petsc_vector.h>
 #  endif
 
 DEAL_II_NAMESPACE_OPEN

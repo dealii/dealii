@@ -24,19 +24,6 @@
 
 #  include <deal.II/base/exceptions.h>
 
-#  include <deal.II/lac/block_vector.h>
-#  include <deal.II/lac/la_parallel_block_vector.h>
-#  include <deal.II/lac/la_parallel_vector.h>
-#  include <deal.II/lac/vector.h>
-#  ifdef DEAL_II_WITH_TRILINOS
-#    include <deal.II/lac/trilinos_parallel_block_vector.h>
-#    include <deal.II/lac/trilinos_vector.h>
-#  endif
-#  ifdef DEAL_II_WITH_PETSC
-#    include <deal.II/lac/petsc_block_vector.h>
-#    include <deal.II/lac/petsc_vector.h>
-#  endif
-
 #  include <deal.II/sundials/n_vector.h>
 #  include <deal.II/sundials/sundials_types.h>
 
