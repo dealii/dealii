@@ -1,0 +1,4 @@
+Reworked `execute_refinement_isotropic` to support cells with multiple face
+types. Additionally, support for the isotropic refinement of wedges was added.
+<br>
+(Andreas Steger, 2026/01/20)
