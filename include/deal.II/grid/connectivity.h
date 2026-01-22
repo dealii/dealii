@@ -108,6 +108,7 @@ namespace internal
                                              offsets[i + 1] - offsets[i]);
       }
 
+    private:
       /**
        * For each row in the CRS, store the corresponding offsets in the
        * 'elements' array.
