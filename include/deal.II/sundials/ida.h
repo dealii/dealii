@@ -1062,16 +1062,6 @@ namespace SUNDIALS
      */
     std::function<VectorType &()> get_local_tolerances;
 
-    /**
-     * Handle IDA exceptions.
-     */
-    DeclException1(ExcIDAError,
-                   int,
-                   << "One of SUNDIALS IDA's internal functions "
-                   << "returned an error code: " << arg1
-                   << ". Please consult SUNDIALS manual.");
-
-
   private:
     /**
      * Throw an exception when a function with the given name is not
@@ -1137,6 +1127,16 @@ namespace SUNDIALS
 #    endif // PETSC_USE_COMPLEX
 #  endif   // DEAL_II_WITH_PETSC
   };
+
+  /**
+   * Handle IDA exceptions.
+   */
+  DeclException1(ExcIDAError,
+                 int,
+                 << "One of SUNDIALS IDA's internal functions "
+                 << "returned an error code: " << arg1
+                 << ". Please consult SUNDIALS manual.");
+
 } // namespace SUNDIALS
 
 DEAL_II_NAMESPACE_CLOSE
