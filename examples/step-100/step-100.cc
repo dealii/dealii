@@ -1096,7 +1096,7 @@ namespace Step100
         // freedom and trial space face degrees of freedom to assemble the
         // corresponding contributions. The face contributions to the Gram
         // matrix only arise when the face lies on a Robin boundary. In that
-        // case, we add the appropriate terms based on the shape funtion the
+        // case, we add the appropriate terms based on the shape function the
         // dofs belong to (as for the cell loop):
         //  - If both <code>i</code> and <code>j</code> are in test space
         //  associated to the test functions $\mathbf{v}$ we build, $\langle
