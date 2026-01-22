@@ -535,7 +535,7 @@ jobs:
     - uses: actions/checkout@v6
       with:
         repository: kokkos/kokkos
-        ref: release-candidate-4.7.00
+        ref: 5.0.1
         path: kokkos
     - name: compile and install kokkos
       working-directory: kokkos
