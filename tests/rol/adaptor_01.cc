@@ -12,11 +12,11 @@
 //
 // ------------------------------------------------------------------------
 
-// Test to check ROLVector::set() and ROLVector::plus().
+// Test to check ROLAdaptor::set() and ROLAdaptor::plus().
 
 #include <deal.II/lac/generic_linear_algebra.h>
 
-#include <deal.II/trilinos/rol_vector.h>
+#include <deal.II/trilinos/rol_adaptor.h>
 
 #include "../tests.h"
 
@@ -29,21 +29,21 @@ test(const VectorType &given_vector)
     ROL::makePtr<VectorType>(given_vector);
 
   // --- Testing the constructor
-  TrilinosWrappers::ROLVector<VectorType> given_vector_rol(given_vector_ptr);
+  TrilinosWrappers::ROLAdaptor<VectorType> given_vector_rol(given_vector_ptr);
   AssertThrow(given_vector == *given_vector_rol.getVector(),
               ExcInternalError());
 
 
-  ROL::Ptr<VectorType>                    w_ptr = ROL::makePtr<VectorType>();
-  TrilinosWrappers::ROLVector<VectorType> w_rol(w_ptr);
+  ROL::Ptr<VectorType>                     w_ptr = ROL::makePtr<VectorType>();
+  TrilinosWrappers::ROLAdaptor<VectorType> w_rol(w_ptr);
 
-  // --- Testing ROLVector::set()
+  // --- Testing ROLAdaptor::set()
   {
     w_rol.set(given_vector_rol);
     AssertThrow(given_vector == *w_rol.getVector(), ExcInternalError());
   }
 
-  // --- Testing ROLVector::plus()
+  // --- Testing ROLAdaptor::plus()
   {
     VectorType u;
     u = given_vector;
